@@ -2,162 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1D0B276B30
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 09:50:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D9E5276BB7
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 10:23:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727256AbgIXHuT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 03:50:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56424 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726896AbgIXHuS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 03:50:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600933817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sqHArwthT57JphmHaTiMSE/ABTSL+yhvvPSNJ4OWT20=;
-        b=RFZF4p6ulQ0Hfp9QydZh+8u9zYUfDZ7Onk60mVy2gPkNKFcoym8WIoBDNunayCFbllpVSk
-        f9xXmaMiFu+GsFKPu05EoVAfLE8+VpTuSYhbaC/AySqL0IDirHVqD8wYI5SiIWtc3TWO/f
-        12boFnae1mMiF5+l+IX/QZkq+U3LRt8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-574-lkxC44rXNnum1nbglSgDDA-1; Thu, 24 Sep 2020 03:50:15 -0400
-X-MC-Unique: lkxC44rXNnum1nbglSgDDA-1
-Received: by mail-wr1-f69.google.com with SMTP id o6so908297wrp.1
-        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 00:50:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sqHArwthT57JphmHaTiMSE/ABTSL+yhvvPSNJ4OWT20=;
-        b=FynJpf7DevRB0cXPD68Lbg1nw4ewC77+AwrvKA5S/X8czQkf75BM9jdMPOuLtYtJhO
-         TQ8LmgiDa34sF+zoxDmD9sX7WbQt56FzkBV8dqJiSdJ+nOVcphwRXKT070Iaf5lC6Rn/
-         EzzpLmuH1Y/yHXe46hmQKyHDE6sUSenX9v9k2LP0oLWsIYGFRpmpypDhCobGzPjD1WJ5
-         3RHy6yWBk1xC4VrHGyXSugLuiBcHwlTX3qRPQrg+6XumdPskih1eCXRYmFEU6aIz8jRz
-         N9cy3Wff2wNoqIgI7ql5wKCUscaUgWt4loEB67O5X8WN+MeUHuiqPOyoPbJMYU/4JRvT
-         O5Gg==
-X-Gm-Message-State: AOAM533oLX7jNho+qTzft66UFs5p0Awzyp84AdhvPe3UuKHUWCUUHZDQ
-        b+1XNdRXg3pQ6q6RimSahSeOY8ooZpHSM5So7BGUGAyHD5ln5g4S/k/dNC+wZ7WOl3Y/FIHLxDM
-        mCwdKJQjD7fMj
-X-Received: by 2002:a1c:4d4:: with SMTP id 203mr3444734wme.102.1600933814576;
-        Thu, 24 Sep 2020 00:50:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzVfjv26Puupvq5kpzttvd3K18d03z40CEQlYqSb3TWLEs4O9kGbUJXSf4YGSZuLoHBXsvzKg==
-X-Received: by 2002:a1c:4d4:: with SMTP id 203mr3444708wme.102.1600933814287;
-        Thu, 24 Sep 2020 00:50:14 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-71-128.red.bezeqint.net. [79.179.71.128])
-        by smtp.gmail.com with ESMTPSA id y1sm2301869wma.36.2020.09.24.00.50.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2020 00:50:13 -0700 (PDT)
-Date:   Thu, 24 Sep 2020 03:50:09 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     lulu@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rob.miller@broadcom.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, hanand@xilinx.com,
-        mhabets@solarflare.com, eli@mellanox.com, amorenoz@redhat.com,
-        maxime.coquelin@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com, Eli Cohen <elic@nvidia.com>
-Subject: Re: [RFC PATCH 01/24] vhost-vdpa: fix backend feature ioctls
-Message-ID: <20200924034940-mutt-send-email-mst@kernel.org>
-References: <20200924032125.18619-1-jasowang@redhat.com>
- <20200924032125.18619-2-jasowang@redhat.com>
+        id S1726979AbgIXIXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 04:23:21 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:54512 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726837AbgIXIXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 04:23:21 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id BED77B6AD300A22DF907;
+        Thu, 24 Sep 2020 16:23:17 +0800 (CST)
+Received: from [10.174.185.226] (10.174.185.226) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 24 Sep 2020 16:23:10 +0800
+Subject: Re: [PATCH v10 04/11] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
+ type
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>,
+        <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
+        <robin.murphy@arm.com>
+References: <20200320161911.27494-1-eric.auger@redhat.com>
+ <20200320161911.27494-5-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <d21e74e5-00a7-79f9-24d2-c9385409cc05@huawei.com>
+Date:   Thu, 24 Sep 2020 16:23:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200924032125.18619-2-jasowang@redhat.com>
+In-Reply-To: <20200320161911.27494-5-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.226]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 11:21:02AM +0800, Jason Wang wrote:
-> Commit 653055b9acd4 ("vhost-vdpa: support get/set backend features")
-> introduces two malfunction backend features ioctls:
-> 
-> 1) the ioctls was blindly added to vring ioctl instead of vdpa device
->    ioctl
-> 2) vhost_set_backend_features() was called when dev mutex has already
->    been held which will lead a deadlock
-> 
-> This patch fixes the above issues.
-> 
-> Cc: Eli Cohen <elic@nvidia.com>
-> Reported-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> Fixes: 653055b9acd4 ("vhost-vdpa: support get/set backend features")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+Hi Eric,
 
-Don't we want the fixes queued right now, as opposed to the rest of the
-RFC?
-
-> ---
->  drivers/vhost/vdpa.c | 30 ++++++++++++++++--------------
->  1 file changed, 16 insertions(+), 14 deletions(-)
+On 2020/3/21 0:19, Eric Auger wrote:
+> Add a new specific DMA_FAULT region aiming to exposed nested mode
+> translation faults.
 > 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 3fab94f88894..796fe979f997 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -353,8 +353,6 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->  	struct vdpa_callback cb;
->  	struct vhost_virtqueue *vq;
->  	struct vhost_vring_state s;
-> -	u64 __user *featurep = argp;
-> -	u64 features;
->  	u32 idx;
->  	long r;
->  
-> @@ -381,18 +379,6 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->  
->  		vq->last_avail_idx = vq_state.avail_index;
->  		break;
-> -	case VHOST_GET_BACKEND_FEATURES:
-> -		features = VHOST_VDPA_BACKEND_FEATURES;
-> -		if (copy_to_user(featurep, &features, sizeof(features)))
-> -			return -EFAULT;
-> -		return 0;
-> -	case VHOST_SET_BACKEND_FEATURES:
-> -		if (copy_from_user(&features, featurep, sizeof(features)))
-> -			return -EFAULT;
-> -		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
-> -			return -EOPNOTSUPP;
-> -		vhost_set_backend_features(&v->vdev, features);
-> -		return 0;
->  	}
->  
->  	r = vhost_vring_ioctl(&v->vdev, cmd, argp);
-> @@ -440,8 +426,20 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
->  	struct vhost_vdpa *v = filep->private_data;
->  	struct vhost_dev *d = &v->vdev;
->  	void __user *argp = (void __user *)arg;
-> +	u64 __user *featurep = argp;
-> +	u64 features;
->  	long r;
->  
-> +	if (cmd == VHOST_SET_BACKEND_FEATURES) {
-> +		r = copy_from_user(&features, featurep, sizeof(features));
-> +		if (r)
-> +			return r;
-> +		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
-> +			return -EOPNOTSUPP;
-> +		vhost_set_backend_features(&v->vdev, features);
-> +		return 0;
-> +	}
+> The region has a ring buffer that contains the actual fault
+> records plus a header allowing to handle it (tail/head indices,
+> max capacity, entry size). At the moment the region is dimensionned
+> for 512 fault records.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+[...]
+
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 379a02c36e37..586b89debed5 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -260,6 +260,69 @@ int vfio_pci_set_power_state(struct vfio_pci_device *vdev, pci_power_t state)
+>   	return ret;
+>   }
+>   
+> +static void vfio_pci_dma_fault_release(struct vfio_pci_device *vdev,
+> +				       struct vfio_pci_region *region)
+> +{
+> +}
 > +
->  	mutex_lock(&d->mutex);
->  
->  	switch (cmd) {
-> @@ -476,6 +474,10 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
->  	case VHOST_VDPA_SET_CONFIG_CALL:
->  		r = vhost_vdpa_set_config_call(v, argp);
->  		break;
-> +	case VHOST_GET_BACKEND_FEATURES:
-> +		features = VHOST_VDPA_BACKEND_FEATURES;
-> +		r = copy_to_user(featurep, &features, sizeof(features));
-> +		break;
->  	default:
->  		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
->  		if (r == -ENOIOCTLCMD)
-> -- 
-> 2.20.1
+> +static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+> +					     struct vfio_pci_region *region,
+> +					     struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_region_info_cap_fault cap = {
+> +		.header.id = VFIO_REGION_INFO_CAP_DMA_FAULT,
+> +		.header.version = 1,
+> +		.version = 1,
+> +	};
+> +	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
+> +}
+> +
+> +static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
+> +	.rw		= vfio_pci_dma_fault_rw,
+> +	.release	= vfio_pci_dma_fault_release,
+> +	.add_capability = vfio_pci_dma_fault_add_capability,
+> +};
+> +
+> +#define DMA_FAULT_RING_LENGTH 512
+> +
+> +static int vfio_pci_init_dma_fault_region(struct vfio_pci_device *vdev)
+> +{
+> +	struct vfio_region_dma_fault *header;
+> +	size_t size;
+> +	int ret;
+> +
+> +	mutex_init(&vdev->fault_queue_lock);
+> +
+> +	/*
+> +	 * We provision 1 page for the header and space for
+> +	 * DMA_FAULT_RING_LENGTH fault records in the ring buffer.
+> +	 */
+> +	size = ALIGN(sizeof(struct iommu_fault) *
+> +		     DMA_FAULT_RING_LENGTH, PAGE_SIZE) + PAGE_SIZE;
+> +
+> +	vdev->fault_pages = kzalloc(size, GFP_KERNEL);
+> +	if (!vdev->fault_pages)
+> +		return -ENOMEM;
+> +
+> +	ret = vfio_pci_register_dev_region(vdev,
+> +		VFIO_REGION_TYPE_NESTED,
+> +		VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT,
+> +		&vfio_pci_dma_fault_regops, size,
+> +		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_WRITE,
+> +		vdev->fault_pages);
+> +	if (ret)
+> +		goto out;
+> +
+> +	header = (struct vfio_region_dma_fault *)vdev->fault_pages;
+> +	header->entry_size = sizeof(struct iommu_fault);
+> +	header->nb_entries = DMA_FAULT_RING_LENGTH;
+> +	header->offset = sizeof(struct vfio_region_dma_fault);
+> +	return 0;
+> +out:
+> +	kfree(vdev->fault_pages);
+> +	return ret;
+> +}
+> +
+>   static int vfio_pci_enable(struct vfio_pci_device *vdev)
+>   {
+>   	struct pci_dev *pdev = vdev->pdev;
+> @@ -358,6 +421,10 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+>   		}
+>   	}
+>   
+> +	ret = vfio_pci_init_dma_fault_region(vdev);
+> +	if (ret)
+> +		goto disable_exit;
+> +
+>   	vfio_pci_probe_mmaps(vdev);
+>   
+>   	return 0;
+> @@ -1383,6 +1450,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
+>   
+>   	vfio_iommu_group_put(pdev->dev.iommu_group, &pdev->dev);
+>   	kfree(vdev->region);
+> +	kfree(vdev->fault_pages);
+>   	mutex_destroy(&vdev->ioeventfds_lock);
+>   
+>   	if (!disable_idle_d3)
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index 8a2c7607d513..a392f50e3a99 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -119,6 +119,8 @@ struct vfio_pci_device {
+>   	int			ioeventfds_nr;
+>   	struct eventfd_ctx	*err_trigger;
+>   	struct eventfd_ctx	*req_trigger;
+> +	u8			*fault_pages;
 
+What's the reason to use 'u8'? It doesn't match the type of header, nor
+the type of ring buffer.
+
+> +	struct mutex		fault_queue_lock;
+>   	struct list_head	dummy_resources_list;
+>   	struct mutex		ioeventfds_lock;
+>   	struct list_head	ioeventfds_list;
+> @@ -150,6 +152,14 @@ extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+>   extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+>   			       uint64_t data, int count, int fd);
+>   
+> +struct vfio_pci_fault_abi {
+> +	u32 entry_size;
+> +};
+
+This is not used by this patch (and the whole series).
+
+> +
+> +extern size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev,
+> +				    char __user *buf, size_t count,
+> +				    loff_t *ppos, bool iswrite);
+> +
+>   extern int vfio_pci_init_perm_bits(void);
+>   extern void vfio_pci_uninit_perm_bits(void);
+>   
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index a87992892a9f..4004ab8cad0e 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -274,6 +274,51 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+>   	return done;
+>   }
+>   
+> +size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev, char __user *buf,
+> +			     size_t count, loff_t *ppos, bool iswrite)
+> +{
+> +	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	void *base = vdev->region[i].data;
+> +	int ret = -EFAULT;
+> +
+> +	if (pos >= vdev->region[i].size)
+> +		return -EINVAL;
+> +
+> +	count = min(count, (size_t)(vdev->region[i].size - pos));
+> +
+> +	mutex_lock(&vdev->fault_queue_lock);
+> +
+> +	if (iswrite) {
+> +		struct vfio_region_dma_fault *header =
+> +			(struct vfio_region_dma_fault *)base;
+> +		u32 new_tail;
+> +
+> +		if (pos != 0 || count != 4) {
+> +			ret = -EINVAL;
+> +			goto unlock;
+> +		}
+> +
+> +		if (copy_from_user((void *)&new_tail, buf, count))
+> +			goto unlock;
+> +
+> +		if (new_tail > header->nb_entries) {
+
+Maybe
+
+new_tail >= header->nb_entries ?
+
+> +			ret = -EINVAL;
+> +			goto unlock;
+> +		}
+> +		header->tail = new_tail;
+> +	} else {
+> +		if (copy_to_user(buf, base + pos, count))
+> +			goto unlock;
+> +	}
+> +	*ppos += count;
+> +	ret = count;
+> +unlock:
+> +	mutex_unlock(&vdev->fault_queue_lock);
+> +	return ret;
+> +}
+> +
+> +
+>   static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
+>   {
+>   	struct vfio_pci_ioeventfd *ioeventfd = opaque;
+
+
+Thanks,
+Zenghui
