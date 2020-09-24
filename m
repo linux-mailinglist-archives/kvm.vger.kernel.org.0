@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2209827798D
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 21:43:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8B4B27798C
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 21:43:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbgIXTnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 15:43:02 -0400
-Received: from mga18.intel.com ([134.134.136.126]:31793 "EHLO mga18.intel.com"
+        id S1726380AbgIXTnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 15:43:01 -0400
+Received: from mga18.intel.com ([134.134.136.126]:31798 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726239AbgIXTm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1725208AbgIXTm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 24 Sep 2020 15:42:56 -0400
-IronPort-SDR: D4iXNd6lfzcIyjuQvCELRGUAJOpT1jj5jRHaN7rwrcbkj3sKb9MEgGZ9Nsi2CSnqgKFJWb0uFu
- 10x3KBrC/Rtg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9754"; a="149076390"
+IronPort-SDR: PulKmsZSSvf/DAaeKcak2196070ZyGWCwXh92yOS+UocRmIAkfdRkV+AW9dGTtmSLAZpW80CXc
+ 3bPfLvj3Iikw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9754"; a="149076394"
 X-IronPort-AV: E=Sophos;i="5.77,299,1596524400"; 
-   d="scan'208";a="149076390"
+   d="scan'208";a="149076394"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 12:42:52 -0700
-IronPort-SDR: ZEDh0cnvrQ/71qCLp/tHzQ92oH133MPFU2OpzJ2aHR1x6plt8DKxd03AC/J/GbDRlJ3boIJjgg
- cXHSJdcGmdqQ==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 12:42:53 -0700
+IronPort-SDR: 4Q/JJEFaULhUtBA1BdlVSaephwv82tNSNACOQDBe9OCy1TlfKZsk7Xr2Z7ijxh5G674SFKVKDw
+ UUdk8boe/VAA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,299,1596524400"; 
-   d="scan'208";a="347953052"
+   d="scan'208";a="347953056"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
   by FMSMGA003.fm.intel.com with ESMTP; 24 Sep 2020 12:42:52 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -35,9 +35,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 3/5] KVM: VMX: Replace MSR_IA32_RTIT_OUTPUT_BASE_MASK with helper function
-Date:   Thu, 24 Sep 2020 12:42:48 -0700
-Message-Id: <20200924194250.19137-4-sean.j.christopherson@intel.com>
+Subject: [PATCH v3 4/5] KVM: x86: Move illegal GPA helper out of the MMU code
+Date:   Thu, 24 Sep 2020 12:42:49 -0700
+Message-Id: <20200924194250.19137-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200924194250.19137-1-sean.j.christopherson@intel.com>
 References: <20200924194250.19137-1-sean.j.christopherson@intel.com>
@@ -47,51 +47,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace the subtly not-a-constant MSR_IA32_RTIT_OUTPUT_BASE_MASK with a
-proper helper function to check whether or not the specified base is
-valid.  Blindly referencing the local 'vcpu' is especially nasty.
+Rename kvm_mmu_is_illegal_gpa() to kvm_vcpu_is_illegal_gpa() and move it
+to cpuid.h so that's it's colocated with cpuid_maxphyaddr().  The helper
+is not MMU specific and will gain a user that is completely unrelated to
+the MMU in a future patch.
 
+No functional change intended.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ arch/x86/kvm/cpuid.h   | 5 +++++
+ arch/x86/kvm/mmu.h     | 5 -----
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index be82da055fc4..0d41faf63b57 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -146,9 +146,6 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
- 	RTIT_STATUS_ERROR | RTIT_STATUS_STOPPED | \
- 	RTIT_STATUS_BYTECNT))
- 
--#define MSR_IA32_RTIT_OUTPUT_BASE_MASK \
--	(~((1UL << cpuid_maxphyaddr(vcpu)) - 1) | 0x7f)
--
- /*
-  * These 2 parameters are used to config the controls for Pause-Loop Exiting:
-  * ple_gap:    upper bound on the amount of time between two successive
-@@ -1037,6 +1034,12 @@ static inline bool pt_can_write_msr(struct vcpu_vmx *vmx)
- 	       !(vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN);
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 3a923ae15f2f..1d2c4f2e4bb6 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -34,6 +34,11 @@ static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.maxphyaddr;
  }
  
-+static inline bool pt_output_base_valid(struct kvm_vcpu *vcpu, u64 base)
++static inline bool kvm_vcpu_is_illegal_gpa(struct kvm_vcpu *vcpu, gpa_t gpa)
 +{
-+	/* The base must be 128-byte aligned and a legal physical address. */
-+	return !(base & (~((1UL << cpuid_maxphyaddr(vcpu)) - 1) | 0x7f));
++	return (gpa >= BIT_ULL(cpuid_maxphyaddr(vcpu)));
 +}
 +
- static inline void pt_load_msr(struct pt_ctx *ctx, u32 addr_range)
+ struct cpuid_reg {
+ 	u32 function;
+ 	u32 index;
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 5efc6081ca13..9c4a9c8e43d9 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -155,11 +155,6 @@ static inline bool is_write_protection(struct kvm_vcpu *vcpu)
+ 	return kvm_read_cr0_bits(vcpu, X86_CR0_WP);
+ }
+ 
+-static inline bool kvm_mmu_is_illegal_gpa(struct kvm_vcpu *vcpu, gpa_t gpa)
+-{
+-        return (gpa >= BIT_ULL(cpuid_maxphyaddr(vcpu)));
+-}
+-
+ /*
+  * Check if a given access (described through the I/D, W/R and U/S bits of a
+  * page fault error code pfec) causes a permission fault with the given PTE
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 76c5826e29a2..2e7251eec1f8 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -521,7 +521,7 @@ static gpa_t translate_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, u32 access,
+                                   struct x86_exception *exception)
  {
- 	u32 i;
-@@ -2167,7 +2170,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		    !intel_pt_validate_cap(vmx->pt_desc.caps,
- 					   PT_CAP_single_range_output))
- 			return 1;
--		if (data & MSR_IA32_RTIT_OUTPUT_BASE_MASK)
-+		if (!pt_output_base_valid(vcpu, data))
- 			return 1;
- 		vmx->pt_desc.guest.output_base = data;
- 		break;
+ 	/* Check if guest physical address doesn't exceed guest maximum */
+-	if (kvm_mmu_is_illegal_gpa(vcpu, gpa)) {
++	if (kvm_vcpu_is_illegal_gpa(vcpu, gpa)) {
+ 		exception->error_code |= PFERR_RSVD_MASK;
+ 		return UNMAPPED_GVA;
+ 	}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 0d41faf63b57..7987de212057 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5307,7 +5307,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+ 	 * would also use advanced VM-exit information for EPT violations to
+ 	 * reconstruct the page fault error code.
+ 	 */
+-	if (unlikely(kvm_mmu_is_illegal_gpa(vcpu, gpa)))
++	if (unlikely(kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
+ 		return kvm_emulate_instruction(vcpu, 0);
+ 
+ 	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
 -- 
 2.28.0
 
