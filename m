@@ -2,141 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 623FA276FF1
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 13:28:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1C4927703B
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 13:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727433AbgIXL2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 07:28:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51607 "EHLO
+        id S1727443AbgIXLsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 07:48:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32278 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726406AbgIXL2i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 07:28:38 -0400
+        by vger.kernel.org with ESMTP id S1726406AbgIXLsS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 07:48:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600946916;
+        s=mimecast20190719; t=1600948097;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=XkyuE6otC7AMsY0htojQ+VoObyQFXLQWY9hDVf/cLYo=;
-        b=C6eE6JI7NHgqT1eRxo3Vs73QUF83Z7RbP1gmhENbuEqS4Z/ni0HvnapNfWzVES+dK/f8IK
-        nb2nKc5u7zffhjMYzAVQSGDjBjHm3lTdEwTZMOBeEcuyvq4dftzB+cqyWfY8FLmLAeaBJt
-        wypxId0f9O+XyITsdB7UL9kXq2RiYxY=
+         in-reply-to:in-reply-to:references:references;
+        bh=eUnojTPDBYsn0EDBVIcCzWuO+UV0uq77LDnCi7RHHTU=;
+        b=LD4otdlOUXOm/CUdqgdiAAflJH4EbqkIO9U9/ryHdKgBZkmIfnbNzs1NljuZlaLEZFAi9q
+        9CQPXR4jrdHWnft6l5xnj8NDVFkmD4pdFf2hJbKIB9vimPuvYdUkA7ttVOQd44OJh+COvT
+        eHXuXzYe+C+HUNV6NR6meqghjH7thOI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-6Q3u14_SPS-ZFq51raXxfQ-1; Thu, 24 Sep 2020 07:28:34 -0400
-X-MC-Unique: 6Q3u14_SPS-ZFq51raXxfQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-56-Sa4jtv0DMTm4HpS8VftJKA-1; Thu, 24 Sep 2020 07:48:15 -0400
+X-MC-Unique: Sa4jtv0DMTm4HpS8VftJKA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C624781C463;
-        Thu, 24 Sep 2020 11:28:33 +0000 (UTC)
-Received: from [10.36.114.4] (ovpn-114-4.ams2.redhat.com [10.36.114.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BAE1373662;
-        Thu, 24 Sep 2020 11:28:32 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] s390x/selftest: Fix constraint of inline
- assembly
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20200924111746.131633-1-thuth@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <5eb78ea5-0482-2909-06e8-756a93b58728@redhat.com>
-Date:   Thu, 24 Sep 2020 13:28:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E630802EA4;
+        Thu, 24 Sep 2020 11:48:14 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 11C5955786;
+        Thu, 24 Sep 2020 11:48:12 +0000 (UTC)
+Date:   Thu, 24 Sep 2020 13:48:09 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] README: Reflect missing --getopt in
+ configure
+Message-ID: <20200924114809.3xndwpqgrbnzzmdh@kamzik.brq.redhat.com>
+References: <20200924100613.71136-1-r.bolshakov@yadro.com>
+ <43d1571b-8cf6-3304-b4df-650a65528843@redhat.com>
+ <20200924103054.GA69137@SPB-NB-133.local>
+ <7e0b838b-2a6d-b370-e031-8d804c23b822@redhat.com>
+ <20200924104836.GB69137@SPB-NB-133.local>
+ <b515b803-daec-5a1f-9d65-07c2f209f763@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200924111746.131633-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b515b803-daec-5a1f-9d65-07c2f209f763@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.09.20 13:17, Thomas Huth wrote:
-> Clang on s390x compains:
+On Thu, Sep 24, 2020 at 12:52:16PM +0200, Paolo Bonzini wrote:
+> On 24/09/20 12:48, Roman Bolshakov wrote:
+> > Unfortunately it has no effect (and I wouldn't want to do that to avoid
+> > issues with other scripts/software that implicitly depend on native
+> > utilities):
+> > 
+> > $ brew link --force gnu-getopt
+> > Warning: Refusing to link macOS provided/shadowed software: gnu-getopt
+> > If you need to have gnu-getopt first in your PATH run:
+> >   echo 'export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"' >> ~/.zshrc
+> > 
+> > So if it's possible I'd still prefer to add an option to specify
+> > --getopt in configure. I can resend a patch for that.
 > 
-> /home/thuth/devel/kvm-unit-tests/s390x/selftest.c:39:15: error:
->  %r0 used in an address
->         asm volatile("  stg %0,0(%0)\n" : : "r"(-1L));
->                      ^
-> <inline asm>:1:13: note: instantiated into assembly here
->                 stg %r0,0(%r0)
->                           ^
-> 
-> Right it is. We should not use address register 0 for STG.
-> Thus let's use the "a" constraint to avoid register 0 here.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  s390x/selftest.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/selftest.c b/s390x/selftest.c
-> index 4c16646..eaf5b18 100644
-> --- a/s390x/selftest.c
-> +++ b/s390x/selftest.c
-> @@ -36,7 +36,7 @@ static void test_pgm_int(void)
->  	check_pgm_int_code(PGM_INT_CODE_OPERATION);
->  
->  	expect_pgm_int();
-> -	asm volatile("	stg %0,0(%0)\n" : : "r"(-1L));
-> +	asm volatile("	stg %0,0(%0)\n" : : "a"(-1L));
->  	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
->  }
->  
-> 
+> No, I'm not going to accept that.  It's just Apple's stupidity.  I have
+> applied your patch, rewriting the harness in another language would
+> probably be a good idea though.
+>
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I also feel like we've outgrown Bash, especially when we implement
+things like migration tests. We have had requests to keep it Bash
+though in order to continue running in resource constrained environments.
+I think we can have both. We could rewrite the harness is a different
+language and then compile/generate standalone tests (as we already do
+to some extent). The standalone tests need to be compiled/generated in
+such a way that they can run in resource constrained environments.
+Finally, with standalone tests the only test runner you need is
 
--- 
+ for t in `ls tests`; do
+   tests/$t
+ done
+
+which can be written in the minimal scripting language of your choice.
+
 Thanks,
-
-David / dhildenb
+drew
 
