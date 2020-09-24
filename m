@@ -2,82 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA0AA276EC4
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 12:30:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45153276ED0
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 12:34:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727438AbgIXKa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 06:30:58 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:40324 "EHLO mta-01.yadro.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727349AbgIXKa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Sep 2020 06:30:57 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id CE44F57D54;
-        Thu, 24 Sep 2020 10:30:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        in-reply-to:content-disposition:content-type:content-type
-        :mime-version:references:message-id:subject:subject:from:from
-        :date:date:received:received:received; s=mta-01; t=1600943454;
-         x=1602757855; bh=3mGLLevBBfEc5p6XO79c/9Q11lMdjRKkb8bb753Hfy4=; b=
-        FB9QzUQoMC7+1k8Ke+oSE6HuAhTe+1St7uboOrgfcExNto20G/qE3q4U6F8ubpuE
-        LVAayvaNx1O0rxVz9e4vOQYPee0g2Fax4dWojeANprBLonRHM49ys1VZOL/GS3nl
-        1EpOHchREV4kZDUzy7zlhow0QBN0ZHFza48aErWRA88=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
-        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id QddTxFNbaNoG; Thu, 24 Sep 2020 13:30:54 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id DDE13579F2;
-        Thu, 24 Sep 2020 13:30:54 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 24
- Sep 2020 13:30:54 +0300
-Date:   Thu, 24 Sep 2020 13:30:54 +0300
-From:   Roman Bolshakov <r.bolshakov@yadro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>
+        id S1727407AbgIXKej (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 06:34:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27116 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726380AbgIXKej (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 06:34:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600943677;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=h3ySZ6gLp8GW6g2dh00MqMH7uqPgQZrVSw7ErFill4Q=;
+        b=W3mc6uq3Ms9uWOqsw0+qtPIhuRUx5+PTIofBTS8gQmMqonZDNx0xELScBYsiGM+p+7wen7
+        Ushe6hloMgGxhYn4nQLyLQ9M6PqujwKiIHnnBy3x8VmNjxMOIexWjx/8xKPq/PTljNRJ4M
+        RkeNrV5MDt3IEyyima/4HiwYFUQBKHg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-466-qgjXisWnPumDPMVJsywG9w-1; Thu, 24 Sep 2020 06:34:32 -0400
+X-MC-Unique: qgjXisWnPumDPMVJsywG9w-1
+Received: by mail-wm1-f71.google.com with SMTP id u5so1069396wme.3
+        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 03:34:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=h3ySZ6gLp8GW6g2dh00MqMH7uqPgQZrVSw7ErFill4Q=;
+        b=mU/Nsw3kHjdGIQv6iI46Qv0FSekhyMPnwrEn1wgPfT2RbPSS20AW91ueC2OYqWavIJ
+         7LIwL1hogv9m+U++sQ5aOG13rp7Aheewb9V3BYhF2FnsfYVOkDi/JlK2+L5ORLs3fzBT
+         L64Fxah2QlEXcd3/9jygAaelv4FY2WI0BOmADoUthUPdweCihDB86PTpG8BeypDL4GW4
+         1MP084Mhuqx12JINedSS2wt4KHfMpveyw1siwhgb6gtjy9vDPs3ZvaRQgnQBn+D6jAjX
+         Ig/z1bFvFc99pUdHr6riWk2FaaEoaZtTkUTWB5YJpz3qt8kDGKFce/1UIxcSB7nWJ9jc
+         sSpw==
+X-Gm-Message-State: AOAM533frMjgb0OQRSgmii7TcBQWXpl4utUJmseRaPAHYwBEn7m7m8nb
+        pgTERnUofIM7zv1ZpaSxf5QwE6kPfcSS7hp2WluCJ6psn9bjH8fByX+gsmC5+2ZTvvZIU6Yh4IQ
+        i4M8yAvni1BJN
+X-Received: by 2002:a1c:2042:: with SMTP id g63mr3994842wmg.174.1600943670588;
+        Thu, 24 Sep 2020 03:34:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwFVLSkEGslM/N1EHAYI5xAxtw5JlRgk6vQSWXb+uQmdLEjFyyIC+x9cR/Phr7JBGIztT//ww==
+X-Received: by 2002:a1c:2042:: with SMTP id g63mr3994826wmg.174.1600943670372;
+        Thu, 24 Sep 2020 03:34:30 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d80e:a78:c27b:93ed? ([2001:b07:6468:f312:d80e:a78:c27b:93ed])
+        by smtp.gmail.com with ESMTPSA id d6sm3190197wrq.67.2020.09.24.03.34.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Sep 2020 03:34:29 -0700 (PDT)
 Subject: Re: [kvm-unit-tests PATCH] README: Reflect missing --getopt in
  configure
-Message-ID: <20200924103054.GA69137@SPB-NB-133.local>
+To:     Roman Bolshakov <r.bolshakov@yadro.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>
 References: <20200924100613.71136-1-r.bolshakov@yadro.com>
  <43d1571b-8cf6-3304-b4df-650a65528843@redhat.com>
+ <20200924103054.GA69137@SPB-NB-133.local>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7e0b838b-2a6d-b370-e031-8d804c23b822@redhat.com>
+Date:   Thu, 24 Sep 2020 12:34:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <43d1571b-8cf6-3304-b4df-650a65528843@redhat.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
+In-Reply-To: <20200924103054.GA69137@SPB-NB-133.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 12:18:04PM +0200, Paolo Bonzini wrote:
-> On 24/09/20 12:06, Roman Bolshakov wrote:
-> > 83760814f637 ("configure: Check for new-enough getopt") has replaced
-> > proposed patch and doesn't introduce --getopt option in configure.
-> > Instead, `configure` and `run_tests.sh` expect proper getopt to be
-> > available in PATH.
+On 24/09/20 12:30, Roman Bolshakov wrote:
+> Yes, keg-only packages do not shadow system utilities (which either come
+> from FreeBSD or GNU but have the most recent GPL2 version, i.e. quite
+> old), so adding `brew --prefix`/bin to PATH doesn't help much.
 > 
-> Is this because getopt is "keg only"?  I thought you could just add
-> `brew --prefix`/bin to the path.  You can also do "brew link" if there
-> are no backwards-compatibility issues.
+> brew link doesn't help either :)
 > 
+> $ brew link gnu-getopt
+> 
+> Warning: Refusing to link macOS provided/shadowed software: gnu-getopt
+> If you need to have gnu-getopt first in your PATH run:
+>   echo 'export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"' >> ~/.zshrc
 
-Yes, keg-only packages do not shadow system utilities (which either come
-from FreeBSD or GNU but have the most recent GPL2 version, i.e. quite
-old), so adding `brew --prefix`/bin to PATH doesn't help much.
+Oh, that's not what https://docs.brew.sh/FAQ says:
 
-brew link doesn't help either :)
+-----
+What does “keg-only” mean?
 
-$ brew link gnu-getopt
+It means the formula is installed only into the Cellar and is not linked
+into /usr/local. This means most tools will not find it. You can see why
+a formula was installed as keg-only, and instructions to include it in
+your PATH, by running brew info <formula>.
 
-Warning: Refusing to link macOS provided/shadowed software: gnu-getopt
-If you need to have gnu-getopt first in your PATH run:
-  echo 'export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"' >> ~/.zshrc
+You can still link in the formula if you need to with brew link
+<formula>, though this can cause unexpected behaviour if you are
+shadowing macOS software.
+-----
 
-Thanks,
-Roman
+Apparently you need --force.
+
+Paolo
+
