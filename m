@@ -2,92 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29583276BDE
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 10:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC3B8276C57
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 10:50:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727301AbgIXI2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 04:28:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39948 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727240AbgIXI2k (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 04:28:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600936119;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JTY1j3OmhHbXJbAzmk77hPlarzC+ZBGY2AfyiVFzjX8=;
-        b=RivIQyflKbi3hH1bgSl5S3UoDUuMD7mkTvBjYGTs+zEUFb3k60U+AeE6TJcU1Y19aF3CVu
-        0aytNNOeDdxo60coQFoVryyR7zGyeT8yl/SlRba7PybDgCHN6QZC29J/YcVVh9TAbnWcVc
-        GOW2s784IdCopmqQLHRNnAqz7XEyBUY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-vMCWz1n0OkGl2bM0e4eECw-1; Thu, 24 Sep 2020 04:28:35 -0400
-X-MC-Unique: vMCWz1n0OkGl2bM0e4eECw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3CAE800462;
-        Thu, 24 Sep 2020 08:28:33 +0000 (UTC)
-Received: from [10.72.13.193] (ovpn-13-193.pek2.redhat.com [10.72.13.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9AC0C5D993;
-        Thu, 24 Sep 2020 08:28:19 +0000 (UTC)
-Subject: Re: [RFC PATCH 01/24] vhost-vdpa: fix backend feature ioctls
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     lulu@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rob.miller@broadcom.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, hanand@xilinx.com,
-        mhabets@solarflare.com, eli@mellanox.com, amorenoz@redhat.com,
-        maxime.coquelin@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com, Eli Cohen <elic@nvidia.com>
-References: <20200924032125.18619-1-jasowang@redhat.com>
- <20200924032125.18619-2-jasowang@redhat.com>
- <20200924034940-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <bebb65cd-732f-58b5-56f0-55ce61cde61f@redhat.com>
-Date:   Thu, 24 Sep 2020 16:28:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727324AbgIXIuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 04:50:04 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:14227 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726786AbgIXIuE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 04:50:04 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id E1988906A3711F42ACCA;
+        Thu, 24 Sep 2020 16:49:59 +0800 (CST)
+Received: from [10.174.185.226] (10.174.185.226) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 24 Sep 2020 16:49:53 +0800
+Subject: Re: [PATCH v10 05/11] vfio/pci: Register an iommu fault handler
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>,
+        <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
+        <robin.murphy@arm.com>
+References: <20200320161911.27494-1-eric.auger@redhat.com>
+ <20200320161911.27494-6-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <571978ff-ee8a-6e9f-6755-519d0871646f@huawei.com>
+Date:   Thu, 24 Sep 2020 16:49:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200924034940-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200320161911.27494-6-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.226]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Eric,
 
-On 2020/9/24 下午3:50, Michael S. Tsirkin wrote:
-> On Thu, Sep 24, 2020 at 11:21:02AM +0800, Jason Wang wrote:
->> Commit 653055b9acd4 ("vhost-vdpa: support get/set backend features")
->> introduces two malfunction backend features ioctls:
->>
->> 1) the ioctls was blindly added to vring ioctl instead of vdpa device
->>     ioctl
->> 2) vhost_set_backend_features() was called when dev mutex has already
->>     been held which will lead a deadlock
->>
->> This patch fixes the above issues.
->>
->> Cc: Eli Cohen<elic@nvidia.com>
->> Reported-by: Zhu Lingshan<lingshan.zhu@intel.com>
->> Fixes: 653055b9acd4 ("vhost-vdpa: support get/set backend features")
->> Signed-off-by: Jason Wang<jasowang@redhat.com>
-> Don't we want the fixes queued right now, as opposed to the rest of the
-> RFC?
+On 2020/3/21 0:19, Eric Auger wrote:
+> Register an IOMMU fault handler which records faults in
+> the DMA FAULT region ring buffer. In a subsequent patch, we
+> will add the signaling of a specific eventfd to allow the
+> userspace to be notified whenever a new fault as shown up.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+[...]
+
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 586b89debed5..69595c240baf 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -27,6 +27,7 @@
+>   #include <linux/vfio.h>
+>   #include <linux/vgaarb.h>
+>   #include <linux/nospec.h>
+> +#include <linux/circ_buf.h>
+>   
+>   #include "vfio_pci_private.h"
+>   
+> @@ -283,6 +284,38 @@ static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
+>   	.add_capability = vfio_pci_dma_fault_add_capability,
+>   };
+>   
+> +int vfio_pci_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
+> +{
+> +	struct vfio_pci_device *vdev = (struct vfio_pci_device *)data;
+> +	struct vfio_region_dma_fault *reg =
+> +		(struct vfio_region_dma_fault *)vdev->fault_pages;
+> +	struct iommu_fault *new =
+> +		(struct iommu_fault *)(vdev->fault_pages + reg->offset +
+> +			reg->head * reg->entry_size);
+
+Shouldn't 'reg->head' be protected under the fault_queue_lock? Otherwise
+things may change behind our backs...
+
+We shouldn't take any assumption about how IOMMU driver would report the
+fault (serially or in parallel), I think.
+
+> +	int head, tail, size;
+> +	int ret = 0;
+> +
+> +	if (fault->type != IOMMU_FAULT_DMA_UNRECOV)
+> +		return -ENOENT;
+> +
+> +	mutex_lock(&vdev->fault_queue_lock);
+> +
+> +	head = reg->head;
+> +	tail = reg->tail;
+> +	size = reg->nb_entries;
+> +
+> +	if (CIRC_SPACE(head, tail, size) < 1) {
+> +		ret = -ENOSPC;
+> +		goto unlock;
+> +	}
+> +
+> +	*new = *fault;
+> +	reg->head = (head + 1) % size;
+> +unlock:
+> +	mutex_unlock(&vdev->fault_queue_lock);
+> +	return ret;
+> +}
+> +
+>   #define DMA_FAULT_RING_LENGTH 512
+>   
+>   static int vfio_pci_init_dma_fault_region(struct vfio_pci_device *vdev)
+> @@ -317,6 +350,13 @@ static int vfio_pci_init_dma_fault_region(struct vfio_pci_device *vdev)
+>   	header->entry_size = sizeof(struct iommu_fault);
+>   	header->nb_entries = DMA_FAULT_RING_LENGTH;
+>   	header->offset = sizeof(struct vfio_region_dma_fault);
+> +
+> +	ret = iommu_register_device_fault_handler(&vdev->pdev->dev,
+> +					vfio_pci_iommu_dev_fault_handler,
+> +					vdev);
+> +	if (ret)
+> +		goto out;
+> +
+>   	return 0;
+>   out:
+>   	kfree(vdev->fault_pages);
 
 
-Yes, actually I've posted in before[1].
-
-Adding the patch here is to simplify the work for the guys that want to 
-do the work on top. E.g for Cindy to start the Qemu prototype.
-
-Thanks
-
-[1] https://www.spinics.net/lists/netdev/msg681247.html
-
-
+Thanks,
+Zenghui
