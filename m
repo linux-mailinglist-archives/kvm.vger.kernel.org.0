@@ -2,452 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C78DF276737
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 05:26:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BE7F27686A
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 07:31:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727131AbgIXD03 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 23:26:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22240 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726702AbgIXD02 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 23:26:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600917985;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+rilPBAsMXt6zsUPwIDn1uxXSz7Jh7iEk8zBLOz32K4=;
-        b=gycui8XRgOUROtTkW27QIpW6em5VhRZJUPLOV8mSQbJBau39dAhPNCsRYPd2yobMn/B6dv
-        wYTQoF9jOHefKLhJH9uSQBmTqIB8uM/f/oQDhRPySXcAhugHjJjnuSt5DLQJy3pvpVI30W
-        Z54HwEFtNsmDsxT4ANc+TUJ/eRkatKg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-GZRxHkCyPdKAYUzKRTcoTw-1; Wed, 23 Sep 2020 23:26:23 -0400
-X-MC-Unique: GZRxHkCyPdKAYUzKRTcoTw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3830B420F0;
-        Thu, 24 Sep 2020 03:26:22 +0000 (UTC)
-Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-13-193.pek2.redhat.com [10.72.13.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D6793782;
-        Thu, 24 Sep 2020 03:26:07 +0000 (UTC)
-From:   Jason Wang <jasowang@redhat.com>
-To:     mst@redhat.com, jasowang@redhat.com
-Cc:     lulu@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rob.miller@broadcom.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, hanand@xilinx.com,
-        mhabets@solarflare.com, eli@mellanox.com, amorenoz@redhat.com,
-        maxime.coquelin@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com
-Subject: [RFC PATCH 24/24] vdpasim: control virtqueue support
-Date:   Thu, 24 Sep 2020 11:21:25 +0800
-Message-Id: <20200924032125.18619-25-jasowang@redhat.com>
-In-Reply-To: <20200924032125.18619-1-jasowang@redhat.com>
-References: <20200924032125.18619-1-jasowang@redhat.com>
+        id S1726829AbgIXFbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 01:31:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37902 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726683AbgIXFbO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 01:31:14 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08O59QA8089871;
+        Thu, 24 Sep 2020 01:30:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=RVAYJ1+ohfp4WrP9CGBemRWlu8SvZ6N72YZ4FeIJg+w=;
+ b=k/oKuy0X4KvbZvKMe1Plm0o3m6eX2WobF7jqWWApZdv3Y4eNoqnwXGDUi2VoWQZ7Zbdf
+ R1ZYcDShL6Kr023twP9/VnG12LekGLXq338BIq11xACCnVDWsRbyHGWRNtTbPLaGJcHp
+ XJRUSvGQKa90otmyeHgdJSC4YuMJ8TIp2ULYg4CWo5g2h/cV5s37QSd5q26R++AJULYK
+ sR6KA97x8qqoVwzv4/EusY5ogXPgaVANU29YqOknB43cawM2/TAMsjSaRlCLSGp5lFLM
+ OJ9+JAmEo/+cled0uKkBtVtZEZzZsANhC2sBkmjXH+1Zu6EKuGP2Fb8vkMMEOsLLRio7 Jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33rn2a8cp2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Sep 2020 01:30:28 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08O5FOTG106863;
+        Thu, 24 Sep 2020 01:30:28 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33rn2a8cn1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Sep 2020 01:30:28 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08O5SeLP001960;
+        Thu, 24 Sep 2020 05:30:25 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 33n9m7thd9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Sep 2020 05:30:25 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08O5UMst28508438
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Sep 2020 05:30:22 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3474552050;
+        Thu, 24 Sep 2020 05:30:22 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.65.79])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 43B915205F;
+        Thu, 24 Sep 2020 05:30:21 +0000 (GMT)
+Subject: Re: [PATCH] KVM: Enable hardware before doing arch VM initialization
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Huacai Chen <chenhc@lemote.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20200923185757.1806-1-sean.j.christopherson@intel.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <af0ccfeb-14eb-58c4-724b-bd75532cb6a4@de.ibm.com>
+Date:   Thu, 24 Sep 2020 07:30:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200923185757.1806-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-24_01:2020-09-24,2020-09-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ adultscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=675
+ clxscore=1011 suspectscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009240036
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch introduces the control virtqueue support for vDPA
-simulator. This is a requirement for supporting advanced features like
-multiqueue.
 
-A requirement for control virtqueue is to isolate its memory access
-from the rx/tx virtqueues. This is because when using vDPA device
-for VM, the control virqueue may not be assigned to VM
-directly but shadowed by userspace VMM (Qemu).
 
-The isolation is done via the virtqueue groups and ASID support in
-vDPA through vhost-vdpa. The simulator is extended to have:
+On 23.09.20 20:57, Sean Christopherson wrote:
+> Swap the order of hardware_enable_all() and kvm_arch_init_vm() to
+> accommodate Intel's Trust Domain Extension (TDX), which needs VMX to be
+> fully enabled during VM init in order to make SEAMCALLs.
+> 
+> This also provides consistent ordering between kvm_create_vm() and
+> kvm_destroy_vm() with respect to calling kvm_arch_destroy_vm() and
+> hardware_disable_all().
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: Huacai Chen <chenhc@lemote.com>
+> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Cc: linux-mips@vger.kernel.org
+> Cc: Paul Mackerras <paulus@ozlabs.org>
+> Cc: kvm-ppc@vger.kernel.org
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Wanpeng Li <wanpengli@tencent.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+> 
+> Obviously not required until the TDX series comes along, but IMO KVM
+> should be consistent with respect to enabling and disabling virt support
+> in hardware.
+> 
+> Tested only on Intel hardware.  Unless I missed something, this only
+> affects x86, Arm and MIPS as hardware enabling is a nop for s390 and PPC.
 
-1) three virtqueues: RXVQ, TXVQ and CVQ (control virtqueue)
-2) two virtqueue groups: group 0 contains RX/TX, group 1 contains CVQ
-3) two address spaces and the simulator simply implements the address
-   spaces by mapping it 1:1 to IOTLB.
+Yes, looks fine from an s390 perspective.
 
-For the VM use cases, userspace(Qemu) may set AS 0 to group 0 and AS 1
-to group 1. So we have:
-
-1) The IOTLB for virtqueue group 0 contains the mappings of guest, so
-   RX and TX can be assigned to guest directly.
-2) The IOTLB for virtqueue group 1 contains the mappings of CVQ which
-   is the buffers that allocated and managed by userspace only so that
-   guest can not access the CVQ of vhost-vdpa.
-
-For the other use cases, since AS 0 is associated to all virtqueue
-groups by default. All virtqueues share the same mapping by default.
-
-To demonstrate the function, VIRITO_NET_F_CTRL_MACADDR is
-implemented in the simulator for the driver to set mac address.
-
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 189 +++++++++++++++++++++++++++----
- 1 file changed, 166 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 66d901fb4c57..3459539c4460 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -56,14 +56,18 @@ struct vdpasim_virtqueue {
- #define VDPASIM_QUEUE_MAX 256
- #define VDPASIM_DEVICE_ID 0x1
- #define VDPASIM_VENDOR_ID 0
--#define VDPASIM_VQ_NUM 0x2
-+#define VDPASIM_VQ_NUM 0x3
-+#define VDPASIM_AS_NUM 0x2
-+#define VDPASIM_GROUP_NUM 0x2
- #define VDPASIM_NAME "vdpasim-netdev"
- 
- static u64 vdpasim_features = (1ULL << VIRTIO_F_ANY_LAYOUT) |
- 			      (1ULL << VIRTIO_F_VERSION_1)  |
- 			      (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 			      (1ULL << VIRTIO_NET_F_MTU) |
--			      (1ULL << VIRTIO_NET_F_MAC);
-+			      (1ULL << VIRTIO_NET_F_MAC) |
-+			      (1ULL << VIRTIO_NET_F_CTRL_VQ) |
-+			      (1ULL << VIRTIO_NET_F_CTRL_MAC_ADDR);
- 
- /* State of each vdpasim device */
- struct vdpasim {
-@@ -143,11 +147,17 @@ static void vdpasim_reset(struct vdpasim *vdpasim)
- {
- 	int i;
- 
--	for (i = 0; i < VDPASIM_VQ_NUM; i++)
-+	spin_lock(&vdpasim->iommu_lock);
-+
-+	for (i = 0; i < VDPASIM_VQ_NUM; i++) {
- 		vdpasim_vq_reset(&vdpasim->vqs[i]);
-+		vringh_set_iotlb(&vdpasim->vqs[i].vring,
-+				 &vdpasim->iommu[0]);
-+	}
- 
--	spin_lock(&vdpasim->iommu_lock);
--	vhost_iotlb_reset(vdpasim->iommu);
-+	for (i = 0; i < VDPASIM_AS_NUM; i++) {
-+		vhost_iotlb_reset(&vdpasim->iommu[i]);
-+	}
- 	spin_unlock(&vdpasim->iommu_lock);
- 
- 	vdpasim->features = 0;
-@@ -187,6 +197,80 @@ static bool receive_filter(struct vdpasim *vdpasim, size_t len)
- 	return false;
- }
- 
-+virtio_net_ctrl_ack vdpasim_handle_ctrl_mac(struct vdpasim *vdpasim,
-+					    u8 cmd)
-+{
-+	struct vdpasim_virtqueue *cvq = &vdpasim->vqs[2];
-+	virtio_net_ctrl_ack status = VIRTIO_NET_ERR;
-+	size_t read;
-+
-+	switch (cmd) {
-+	case VIRTIO_NET_CTRL_MAC_ADDR_SET:
-+		read = vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov,
-+					     (void *)vdpasim->config.mac,
-+					     ETH_ALEN);
-+		if (read == ETH_ALEN)
-+			status = VIRTIO_NET_OK;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return status;
-+}
-+
-+static void vdpasim_handle_cvq(struct vdpasim *vdpasim)
-+{
-+	struct vdpasim_virtqueue *cvq = &vdpasim->vqs[2];
-+	virtio_net_ctrl_ack status = VIRTIO_NET_ERR;
-+	struct virtio_net_ctrl_hdr ctrl;
-+	size_t read, write;
-+	int err;
-+
-+	if (!(vdpasim->features & (1ULL << VIRTIO_NET_F_CTRL_VQ)))
-+		return;
-+
-+	if (!cvq->ready)
-+		return;
-+
-+	while (true) {
-+		err = vringh_getdesc_iotlb(&cvq->vring, &cvq->riov, &cvq->wiov,
-+					   &cvq->head, GFP_ATOMIC);
-+		if (err <= 0)
-+			break;
-+
-+		read = vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov, &ctrl,
-+					     sizeof(ctrl));
-+		if (read != sizeof(ctrl))
-+			break;
-+
-+		switch (ctrl.class) {
-+		case VIRTIO_NET_CTRL_MAC:
-+			status = vdpasim_handle_ctrl_mac(vdpasim, ctrl.cmd);
-+			break;
-+		default:
-+			break;
-+		}
-+
-+		/* Make sure data is wrote before advancing index */
-+		smp_wmb();
-+
-+		write = vringh_iov_push_iotlb(&cvq->vring, &cvq->wiov,
-+					      &status, sizeof (status));
-+		vringh_complete_iotlb(&cvq->vring, cvq->head, write);
-+		vringh_kiov_cleanup(&cvq->riov);
-+		vringh_kiov_cleanup(&cvq->wiov);
-+
-+		/* Make sure used is visible before rasing the interrupt. */
-+		smp_wmb();
-+
-+		local_bh_disable();
-+		if (cvq->cb)
-+			cvq->cb(cvq->private);
-+		local_bh_enable();
-+	}
-+}
-+
- static void vdpasim_work(struct work_struct *work)
- {
- 	struct vdpasim *vdpasim = container_of(work, struct
-@@ -272,7 +356,7 @@ static dma_addr_t vdpasim_map_page(struct device *dev, struct page *page,
- 				   unsigned long attrs)
- {
- 	struct vdpasim *vdpasim = dev_to_sim(dev);
--	struct vhost_iotlb *iommu = vdpasim->iommu;
-+	struct vhost_iotlb *iommu = &vdpasim->iommu[0];
- 	u64 pa = (page_to_pfn(page) << PAGE_SHIFT) + offset;
- 	int ret, perm = dir_to_perm(dir);
- 
-@@ -297,7 +381,7 @@ static void vdpasim_unmap_page(struct device *dev, dma_addr_t dma_addr,
- 			       unsigned long attrs)
- {
- 	struct vdpasim *vdpasim = dev_to_sim(dev);
--	struct vhost_iotlb *iommu = vdpasim->iommu;
-+	struct vhost_iotlb *iommu = &vdpasim->iommu[0];
- 
- 	spin_lock(&vdpasim->iommu_lock);
- 	vhost_iotlb_del_range(iommu, (u64)dma_addr,
-@@ -310,7 +394,7 @@ static void *vdpasim_alloc_coherent(struct device *dev, size_t size,
- 				    unsigned long attrs)
- {
- 	struct vdpasim *vdpasim = dev_to_sim(dev);
--	struct vhost_iotlb *iommu = vdpasim->iommu;
-+	struct vhost_iotlb *iommu = &vdpasim->iommu[0];
- 	void *addr = kmalloc(size, flag);
- 	int ret;
- 
-@@ -340,7 +424,7 @@ static void vdpasim_free_coherent(struct device *dev, size_t size,
- 				  unsigned long attrs)
- {
- 	struct vdpasim *vdpasim = dev_to_sim(dev);
--	struct vhost_iotlb *iommu = vdpasim->iommu;
-+	struct vhost_iotlb *iommu = &vdpasim->iommu[0];
- 
- 	spin_lock(&vdpasim->iommu_lock);
- 	vhost_iotlb_del_range(iommu, (u64)dma_addr,
-@@ -366,14 +450,17 @@ static struct vdpasim *vdpasim_create(void)
- 	struct vdpasim *vdpasim;
- 	struct device *dev;
- 	int ret = -ENOMEM;
-+	int i;
- 
- 	if (batch_mapping)
- 		ops = &vdpasim_net_batch_config_ops;
- 	else
- 		ops = &vdpasim_net_config_ops;
- 
-+	/* 3 virtqueues, 2 address spaces, 2 virtqueue groups */
- 	vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
--				    VDPASIM_VQ_NUM, 1, 1);
-+				    VDPASIM_VQ_NUM, VDPASIM_AS_NUM,
-+				    VDPASIM_GROUP_NUM);
- 	if (!vdpasim)
- 		goto err_alloc;
- 
-@@ -385,18 +472,23 @@ static struct vdpasim *vdpasim_create(void)
- 	dev->coherent_dma_mask = DMA_BIT_MASK(64);
- 	set_dma_ops(dev, &vdpasim_dma_ops);
- 
--	vdpasim->iommu = vhost_iotlb_alloc(2048, 0);
-+	vdpasim->iommu = kmalloc_array(VDPASIM_AS_NUM,
-+				       sizeof(*vdpasim->iommu), GFP_KERNEL);
- 	if (!vdpasim->iommu)
- 		goto err_iommu;
- 
-+	for (i = 0; i < VDPASIM_AS_NUM; i++)
-+		vhost_iotlb_init(&vdpasim->iommu[i], 0, 0);
-+
- 	vdpasim->buffer = kmalloc(PAGE_SIZE, GFP_KERNEL);
- 	if (!vdpasim->buffer)
- 		goto err_iommu;
- 
- 	eth_random_addr(vdpasim->config.mac);
- 
--	vringh_set_iotlb(&vdpasim->vqs[0].vring, vdpasim->iommu);
--	vringh_set_iotlb(&vdpasim->vqs[1].vring, vdpasim->iommu);
-+	/* Make sure that default ASID is zero */
-+	for (i = 0; i < VDPASIM_VQ_NUM; i++)
-+		vringh_set_iotlb(&vdpasim->vqs[i].vring, &vdpasim->iommu[0]);
- 
- 	vdpasim->vdpa.dma_dev = dev;
- 	ret = vdpa_register_device(&vdpasim->vdpa);
-@@ -438,7 +530,14 @@ static void vdpasim_kick_vq(struct vdpa_device *vdpa, u16 idx)
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
- 	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
- 
--	if (vq->ready)
-+	if (idx == 2) {
-+		/* Kernel virtio driver will do busy waiting for the
-+		 * result, so we can't handle cvq in the workqueue.
-+		 */
-+		spin_lock(&vdpasim->lock);
-+		vdpasim_handle_cvq(vdpasim);
-+		spin_unlock(&vdpasim->lock);
-+	} else if (vq->ready)
- 		schedule_work(&vdpasim->work);
- }
- 
-@@ -504,7 +603,11 @@ static u32 vdpasim_get_vq_align(struct vdpa_device *vdpa)
- 
- static u32 vdpasim_get_vq_group(struct vdpa_device *vdpa, u16 idx)
- {
--	return 0;
-+	/* RX and TX belongs to group 0, CVQ belongs to group 1 */
-+	if (idx == 2)
-+		return 1;
-+	else
-+		return 0;
- }
- 
- static u64 vdpasim_get_features(struct vdpa_device *vdpa)
-@@ -600,20 +703,53 @@ static u32 vdpasim_get_generation(struct vdpa_device *vdpa)
- 	return vdpasim->generation;
- }
- 
-+int vdpasim_set_group_asid(struct vdpa_device *vdpa, unsigned int group,
-+			   unsigned int asid)
-+{
-+	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-+	struct vhost_iotlb *iommu;
-+	int i;
-+
-+	if (group > VDPASIM_GROUP_NUM)
-+		return -EINVAL;
-+
-+	if (asid > VDPASIM_AS_NUM)
-+		return -EINVAL;
-+
-+	iommu = &vdpasim->iommu[asid];
-+
-+	spin_lock(&vdpasim->lock);
-+
-+	for (i = 0; i < VDPASIM_VQ_NUM; i++)
-+		if (vdpasim_get_vq_group(vdpa, i) == group)
-+			vringh_set_iotlb(&vdpasim->vqs[i].vring, iommu);
-+
-+	spin_unlock(&vdpasim->lock);
-+
-+	return 0;
-+}
-+
-+
- static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
- 			   struct vhost_iotlb *iotlb)
- {
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
- 	struct vhost_iotlb_map *map;
-+	struct vhost_iotlb *iommu;
- 	u64 start = 0ULL, last = 0ULL - 1;
- 	int ret;
- 
-+	if (asid >= VDPASIM_AS_NUM)
-+		return -EINVAL;
-+
- 	spin_lock(&vdpasim->iommu_lock);
--	vhost_iotlb_reset(vdpasim->iommu);
-+
-+	iommu = &vdpasim->iommu[asid];
-+	vhost_iotlb_reset(iommu);
- 
- 	for (map = vhost_iotlb_itree_first(iotlb, start, last); map;
- 	     map = vhost_iotlb_itree_next(map, start, last)) {
--		ret = vhost_iotlb_add_range(vdpasim->iommu, map->start,
-+		ret = vhost_iotlb_add_range(iommu, map->start,
- 					    map->last, map->addr, map->perm);
- 		if (ret)
- 			goto err;
-@@ -622,7 +758,7 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
- 	return 0;
- 
- err:
--	vhost_iotlb_reset(vdpasim->iommu);
-+	vhost_iotlb_reset(iommu);
- 	spin_unlock(&vdpasim->iommu_lock);
- 	return ret;
- }
-@@ -634,9 +770,12 @@ static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
- 	int ret;
- 
-+	if (asid >= VDPASIM_AS_NUM)
-+		return -EINVAL;
-+
- 	spin_lock(&vdpasim->iommu_lock);
--	ret = vhost_iotlb_add_range(vdpasim->iommu, iova, iova + size - 1, pa,
--				    perm);
-+	ret = vhost_iotlb_add_range(&vdpasim->iommu[asid], iova,
-+				    iova + size - 1, pa, perm);
- 	spin_unlock(&vdpasim->iommu_lock);
- 
- 	return ret;
-@@ -647,8 +786,11 @@ static int vdpasim_dma_unmap(struct vdpa_device *vdpa, unsigned int asid,
- {
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
- 
-+	if (asid >= VDPASIM_AS_NUM)
-+		return -EINVAL;
-+
- 	spin_lock(&vdpasim->iommu_lock);
--	vhost_iotlb_del_range(vdpasim->iommu, iova, iova + size - 1);
-+	vhost_iotlb_del_range(&vdpasim->iommu[asid], iova, iova + size - 1);
- 	spin_unlock(&vdpasim->iommu_lock);
- 
- 	return 0;
-@@ -660,8 +802,7 @@ static void vdpasim_free(struct vdpa_device *vdpa)
- 
- 	cancel_work_sync(&vdpasim->work);
- 	kfree(vdpasim->buffer);
--	if (vdpasim->iommu)
--		vhost_iotlb_free(vdpasim->iommu);
-+	vhost_iotlb_free(vdpasim->iommu);
- }
- 
- static const struct vdpa_config_ops vdpasim_net_config_ops = {
-@@ -686,6 +827,7 @@ static const struct vdpa_config_ops vdpasim_net_config_ops = {
- 	.get_config             = vdpasim_get_config,
- 	.set_config             = vdpasim_set_config,
- 	.get_generation         = vdpasim_get_generation,
-+	.set_group_asid         = vdpasim_set_group_asid,
- 	.dma_map                = vdpasim_dma_map,
- 	.dma_unmap              = vdpasim_dma_unmap,
- 	.free                   = vdpasim_free,
-@@ -713,6 +855,7 @@ static const struct vdpa_config_ops vdpasim_net_batch_config_ops = {
- 	.get_config             = vdpasim_get_config,
- 	.set_config             = vdpasim_set_config,
- 	.get_generation         = vdpasim_get_generation,
-+	.set_group_asid         = vdpasim_set_group_asid,
- 	.set_map                = vdpasim_set_map,
- 	.free                   = vdpasim_free,
- };
--- 
-2.20.1
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
