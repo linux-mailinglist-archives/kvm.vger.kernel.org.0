@@ -2,80 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 011E9277B00
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 23:20:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6C9D277B36
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 23:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726626AbgIXVUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 17:20:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36730 "EHLO
+        id S1726448AbgIXVsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 17:48:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726239AbgIXVUp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Sep 2020 17:20:45 -0400
-Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D136C0613D3
-        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 14:20:45 -0700 (PDT)
-Received: by mail-oo1-xc44.google.com with SMTP id z1so236510ooj.3
-        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 14:20:45 -0700 (PDT)
+        with ESMTP id S1726185AbgIXVsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 17:48:16 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9ED9C0613CE
+        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 14:48:15 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id x69so601725oia.8
+        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 14:48:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=BwiUYRS9W1C5pcKuYLLY/Mvk+3HUevzfSS92myNcc4U=;
-        b=MLiKBzU7eG6u1Z/cGRcRTW/IvgE0Ugw6tA2RVdCNbCpRibsl54FbgQNGtPDO09KVWW
-         laSauLqO5a3ly2kpMKGkHhrYAfe+eotJL4MKJBjaBMglmZ6kA4l1C6trSTQFEuonSTth
-         YVEqqeDnCHiQ/+O+ovy1A1g2bmjqEPdMCm0qWjLv2eRT4BoXzRshtqzCH5k+C2B3jJeP
-         SeaXFNV+IIsJth2SN44mbwvnL0Vvb1aMbHK2bmUMQXmtGMqUkFIY9SlWBxNdkTmPQwHz
-         S30TODI2DIIR6puEOE0CaSAlxpAgrQ0/KG0iNmmkUiVMolMla08u0R0hWwMQH0EBZ8YZ
-         an1A==
+        bh=xArRoyeelIzIpNPDluLH6f4v8ePnpcjzOS5A48X5f0w=;
+        b=B1c1WtVgsgU+MU3gEbQZPChT6adeHIhecNeka1JLXaUzoq0BXKK6voV7J3yMjvDc3w
+         W8FkWWtmm7ybExbABw2VDoq98F8IwlbYqi2NzPeII1Ze22GI73Y9s7ij2QiHzg0N/aJ1
+         QY54dKwVGA3U7o6oEAtEnMwD8sI/tL67pyuD5uR7QV9o5ilXb7tkYGOSjY5g4DkyNpmT
+         Sk4qtSIkJN9RL603u9flAL4etYSqafBnu8XJfpvDQzRo9E32QL3rCbl10zoBzYg2z4uo
+         RQeqvkawuD4pN0PaDpCU0Y3HsW1xVlDL6aQmbIv+l00cTI1gwkLVa8hQZPR4CKfmqg2g
+         spAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=BwiUYRS9W1C5pcKuYLLY/Mvk+3HUevzfSS92myNcc4U=;
-        b=MOVtEtJzNxziVbY6CPdG6KVUjpV+D/Ddmo1oxa+P5IExuAlt9gtZK3VIUPCeqd+V3a
-         hNQb/J3BwHoUvkWtBvGJq1JBI1n/TS9doxZpxFyZcZIWEMTApTbiNi+5eAZu7R915TaY
-         Sb12QVMVilJW8YUD2Uyjxr1l2vTr5tDkEJpwF8iJjEjUxTztTCMgzKjy1bA+lS03H4ti
-         ZWHV2VUak0LqwxjzF3T/AwTovOx4AIuM0hcXPsi5awRf7520z8HffUdSlUCv0IZ3yYwH
-         0ZtNS/W2GiJsSNWjN379sUQ57fWq8Yit6Da6blbUQnnxfZRmkUG/qXcIcrWrlk8MeMcU
-         9MSA==
-X-Gm-Message-State: AOAM533nwarPDJO1t1BfxgwS0gKnFltqgH90w5HVF/axLOYR75cj5Jof
-        2c/U9WX7qRkMUhY/a+gcwpEuW1kWGEIhRLKb301gYw==
-X-Google-Smtp-Source: ABdhPJxc6/CsfJJe80x2UiPvXGURYoMAvRyTh+3i8yuKipBwagzD0XQvTxmmLnmMmpryvrF9Y/dN+25KPc3vdZau89w=
-X-Received: by 2002:a4a:9bde:: with SMTP id b30mr850198ook.82.1600982444597;
- Thu, 24 Sep 2020 14:20:44 -0700 (PDT)
+        bh=xArRoyeelIzIpNPDluLH6f4v8ePnpcjzOS5A48X5f0w=;
+        b=m2+lK9wvmVhHaP5xkV4OZpMkfHlBmNO05XyND6PYWuSQZQ3Clmp/z2KQUA5uxMzKn7
+         SeFWwDn8ANkNOV/H0HkGfy612hbaATpH6ADQ0a1ACEo3VivvPAz6Sgqm47Qk/xG857ps
+         0y3ZUfnqcbDdrlawVq6CYcfeLraT3CBPkzGYQDIr0WLZ1xk/O8CpPaDwUIDTZje2y8Sp
+         VYTBmZPFvKvRhx6pNvUDMZYYCKgeHM7XYY8tJxwZYxWSS8Vq8rycYhVOiTtju9J42mw9
+         b33lYAHFDALb356MBbvtIvGFnoW+rtuLqR5Cbjulcykceb+9R+4kEsI50PzxWps7ZbT3
+         w2pQ==
+X-Gm-Message-State: AOAM530vQ9ga/C8NA3tV5gFKJQnNZTAfDJ16JsIyxiD/BaPyAotZfZ4Z
+        4ZicWQvjeo9OwIoaRf+t+d+U9yiC65eoAlVnlV6Vxg==
+X-Google-Smtp-Source: ABdhPJztT6apWUYRoRTm4fBFbAB4wIE8562b5j+yIz6Utz/Sx6C0LjkYbxRe+JXOxzPTM162lBmpFXrUPmbGHgDv55M=
+X-Received: by 2002:aca:d9c2:: with SMTP id q185mr527387oig.28.1600984094899;
+ Thu, 24 Sep 2020 14:48:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1600972918.git.thomas.lendacky@amd.com>
-In-Reply-To: <cover.1600972918.git.thomas.lendacky@amd.com>
+References: <20200923215352.17756-1-sean.j.christopherson@intel.com>
+In-Reply-To: <20200923215352.17756-1-sean.j.christopherson@intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 24 Sep 2020 14:20:33 -0700
-Message-ID: <CALMp9eS2C398GUKm9FP6xdVLN=NYTO3y+EMKv0ptGJ_dzxkP+g@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] INVD intercept change to skip instruction
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+Date:   Thu, 24 Sep 2020 14:48:03 -0700
+Message-ID: <CALMp9eQzZmV5k6qjHZgJYnKv3c7VPB7qEDJRLREW_NNUo=H1zA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Reset MMU context if guest toggles CR4.SMAP or CR4.PKE
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 11:42 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+On Wed, Sep 23, 2020 at 2:54 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> From: Tom Lendacky <thomas.lendacky@amd.com>
+> Reset the MMU context during kvm_set_cr4() if SMAP or PKE is toggled.
+> Recent commits to (correctly) not reload PDPTRs when SMAP/PKE are
+> toggled inadvertantly skipped the MMU context reset due to the mask
+> of bits that triggers PDPTR loads also being used to trigger MMU context
+> resets.
 >
-> This series updates the INVD intercept support for both SVM and VMX to
-> skip the instruction rather than emulating it, since emulation of this
-> instruction is just a NOP.
+> Fixes: 427890aff855 ("kvm: x86: Toggling CR4.SMAP does not load PDPTEs in PAE mode")
+> Fixes: cb957adb4ea4 ("kvm: x86: Toggling CR4.PKE does not load PDPTEs in PAE mode")
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Peter Shier <pshier@google.com>
+> Cc: Oliver Upton <oupton@google.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Isn't INVD a serializing instruction, whereas NOP isn't? IIRC, Intel
-doesn't architect VM-entry or VM-exit as serializing, though they
-probably are in practice. I'm not sure what AMD's stance on this is.
+Thanks for the fix!
+
+Reviewed-by: Jim Mattson <jmattson@google.com>
