@@ -2,194 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4BBB277785
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 19:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89E98277789
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 19:14:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728566AbgIXRMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 13:12:33 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:33434 "EHLO mta-01.yadro.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726477AbgIXRMd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Sep 2020 13:12:33 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id 1A6F557F56;
-        Thu, 24 Sep 2020 17:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        in-reply-to:content-disposition:content-type:content-type
-        :mime-version:references:message-id:subject:subject:from:from
-        :date:date:received:received:received; s=mta-01; t=1600967549;
-         x=1602781950; bh=Cmm2qkHgKP06phKHdVNHpTlFI0E3cPDC26vPMoMUBHg=; b=
-        D/mqZQdAEfKDIx6SUGCPT4lVGJUVMfFVgmSKgQ+Cjlb6PI66yu0q7eUp6KrlvyMq
-        ChMC84UV0knK5wct1Z4g6sZTQcAagJgGTdH6C5rZqRR3qp9AERvQPj9HGp6I3rlF
-        GrAXSthoYmBbldbezqsyoW69/i4F3NkaBdo5FdZPKac=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
-        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id Kew0N92j9HU7; Thu, 24 Sep 2020 20:12:29 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 11DC157EC3;
-        Thu, 24 Sep 2020 20:12:29 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 24
- Sep 2020 20:12:28 +0300
-Date:   Thu, 24 Sep 2020 20:12:28 +0300
-From:   Roman Bolshakov <r.bolshakov@yadro.com>
-To:     <kvm@vger.kernel.org>
-CC:     Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: realmode: Workaround clang issues
-Message-ID: <20200924171228.GA85563@SPB-NB-133.local>
-References: <20200924120516.77299-1-r.bolshakov@yadro.com>
+        id S1728609AbgIXROS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 13:14:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727292AbgIXROS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 13:14:18 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49834C0613D3
+        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 10:14:18 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id t12so3941868ilh.3
+        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 10:14:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=d7qA2pCOjfGY2J4C9a3hK7Y31a5puzQn53pmrgclQZw=;
+        b=Cm+EnbO8R6Rhe0M3XhAjM3bhfQgVVGxtQDrSKSJqwGM9vAVa9SlC1uUI+DBcqA0dbn
+         RjBnswnPvPCsXOX02ryIBI1MkVvQgfyc7IxC03zwSisFAQ97O6/BzPpgsW37W/gQK7o0
+         tskxlrU4MHu8vfsfYfTYBX+R5l4bqjjwC/VL1uM13kp2DAL21bfcJgmVf7j+5xnHbd43
+         cjWCwkgjQv7UAMtJVQA8fl+qGxtXhBx5KLhF+sT0TD2AheDtjvt66YkNMAkaB736Ghv2
+         KTM3XVCWPak4lmsSiS2jy3acc9xYX8IMmS0SeAh+k8TPMH54RgvbUOlTeTh26dexoI2b
+         MBHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=d7qA2pCOjfGY2J4C9a3hK7Y31a5puzQn53pmrgclQZw=;
+        b=VCi57YIH3OdARe9xqPNEqxcR2m1VFYbn3e4vkv2Oq5reIqTL2QZE3A+VkqXqB+ukMM
+         ahlGhFY0BQgj1r3fzkV9jfZ5lG0SHYNSMRyDK9r5wd4Suuh2COlYiOzvL27yg8xqzoSO
+         b5wjIG/Ljo9qMTzvtSZD0znOSzZ/ysKUZz/3MxtfdVcej3ZdDNGdyBcmHR36xk1Hc1Qj
+         NldfcfI8rdftt9s8Z8VpryiLsrdx4AvW7GlG1a6rKZMrJDdltEQMAjjuSpBzdrlgC6Zj
+         i/X4ymgPcQY926XqqSUGOyo28ZGt8i612h7K3ZIy6ZF9Poubw38VtRoVsGvsEcGjLsfh
+         gplg==
+X-Gm-Message-State: AOAM532A4HYZhNBMccrAJLNbJpNpZGZPOwO3sH6t5z2MY6X9g0g2gb1J
+        cQv0Rko+gYeFpfMr7vh78WAzVa3MTE0IDRBZk42Lcg==
+X-Google-Smtp-Source: ABdhPJyz06U7SojBoggPNrHicGI7L+FubuV3kHzJJXmpoSKX350ajHa+FkeOsjjHvc/Ph1OMKcqvzA620FRalNv082U=
+X-Received: by 2002:a92:9a82:: with SMTP id c2mr259843ill.285.1600967657126;
+ Thu, 24 Sep 2020 10:14:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200924120516.77299-1-r.bolshakov@yadro.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
+References: <cover.1598868203.git.yulei.kernel@gmail.com> <CANRm+CwhTVHXOV6HzawHS5E_ELA3nEw0AxY1-w8vX=EsADWGSw@mail.gmail.com>
+ <CANRm+CydqYmVbYz2pkT28wjKFS4AvmZ_iS4Sn1rnHT6G1S_=Mw@mail.gmail.com>
+In-Reply-To: <CANRm+CydqYmVbYz2pkT28wjKFS4AvmZ_iS4Sn1rnHT6G1S_=Mw@mail.gmail.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 24 Sep 2020 10:14:06 -0700
+Message-ID: <CANgfPd8uvkYyHLJh60vSKp1ZDi9T0ZWM9SeXEUm-1da+DqxTEQ@mail.gmail.com>
+Subject: Re: [RFC V2 0/9] x86/mmu:Introduce parallel memory virtualization to
+ boost performance
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Yulei Zhang <yulei.kernel@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Haiwei Li <lihaiwei.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 03:05:17PM +0300, Roman Bolshakov wrote:
-> clang doesn't properly support .code16gcc and generates wrong machine
-> code [1][2][3][4]. But the test works if object file is compiled with -m16 and
-> explicit suffixes are added for instructions.
-> 
-> 1. https://lore.kernel.org/kvm/4d20fbce-d247-abf4-3ceb-da2c0d48fc50@redhat.com/
-> 2. https://lore.kernel.org/kvm/20200915155959.GF52559@SPB-NB-133.local/
-> 3. https://lore.kernel.org/kvm/788b7191-6987-9399-f352-2e661255157e@redhat.com/
-> 4. https://lore.kernel.org/kvm/20200922212507.GA11460@SPB-NB-133.local/
-> 
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
->  .travis.yml         |  2 +-
->  x86/Makefile.common |  2 +-
->  x86/realmode.c      | 44 ++++++++++++++++++++++----------------------
->  3 files changed, 24 insertions(+), 24 deletions(-)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 2e5ae41..bd62190 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -24,7 +24,7 @@ jobs:
->        - BUILD_DIR="."
->        - TESTS="access asyncpf debug emulator ept hypercall hyperv_stimer
->                 hyperv_synic idt_test intel_iommu ioapic ioapic-split
-> -               kvmclock_test msr pcid rdpru rmap_chain s3 setjmp umip"
-> +               kvmclock_test msr pcid rdpru realmode rmap_chain s3 setjmp umip"
->        - ACCEL="kvm"
->  
->      - addons:
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 090ce22..5567d66 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -72,7 +72,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
->  	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
->  	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
->  
-> -$(TEST_DIR)/realmode.o: bits = 32
-> +$(TEST_DIR)/realmode.o: bits = 16
->  
->  $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
->  
-> diff --git a/x86/realmode.c b/x86/realmode.c
-> index 7c2d776..c8a6ae0 100644
-> --- a/x86/realmode.c
-> +++ b/x86/realmode.c
-> @@ -639,7 +639,7 @@ static void test_jcc_near(void)
->  
->  static void test_long_jmp(void)
->  {
-> -	MK_INSN(long_jmp, "call 1f\n\t"
-> +	MK_INSN(long_jmp, "calll 1f\n\t"
->  			  "jmp 2f\n\t"
->  			  "1: jmp $0, $test_function\n\t"
->  		          "2:\n\t");
-> @@ -728,26 +728,26 @@ static void test_null(void)
->  
->  static void test_pusha_popa(void)
->  {
-> -	MK_INSN(pusha, "pusha\n\t"
-> -		       "pop %edi\n\t"
-> -		       "pop %esi\n\t"
-> -		       "pop %ebp\n\t"
-> -		       "add $4, %esp\n\t"
-> -		       "pop %ebx\n\t"
-> -		       "pop %edx\n\t"
-> -		       "pop %ecx\n\t"
-> -		       "pop %eax\n\t"
-> +	MK_INSN(pusha, "pushal\n\t"
-> +		       "popl %edi\n\t"
-> +		       "popl %esi\n\t"
-> +		       "popl %ebp\n\t"
-> +		       "addl $4, %esp\n\t"
-> +		       "popl %ebx\n\t"
-> +		       "popl %edx\n\t"
-> +		       "popl %ecx\n\t"
-> +		       "popl %eax\n\t"
->  		       );
->  
-> -	MK_INSN(popa, "push %eax\n\t"
-> -		      "push %ecx\n\t"
-> -		      "push %edx\n\t"
-> -		      "push %ebx\n\t"
-> -		      "push %esp\n\t"
-> -		      "push %ebp\n\t"
-> -		      "push %esi\n\t"
-> -		      "push %edi\n\t"
-> -		      "popa\n\t"
-> +	MK_INSN(popa, "pushl %eax\n\t"
-> +		      "pushl %ecx\n\t"
-> +		      "pushl %edx\n\t"
-> +		      "pushl %ebx\n\t"
-> +		      "pushl %esp\n\t"
-> +		      "pushl %ebp\n\t"
-> +		      "pushl %esi\n\t"
-> +		      "pushl %edi\n\t"
-> +		      "popal\n\t"
->  		      );
->  
->  	init_inregs(&(struct regs){ .eax = 0, .ebx = 1, .ecx = 2, .edx = 3, .esi = 4, .edi = 5, .ebp = 6 });
-> @@ -761,9 +761,9 @@ static void test_pusha_popa(void)
->  
->  static void test_iret(void)
->  {
-> -	MK_INSN(iret32, "pushf\n\t"
-> +	MK_INSN(iret32, "pushfl\n\t"
->  			"pushl %cs\n\t"
-> -			"call 1f\n\t" /* a near call will push eip onto the stack */
-> +			"calll 1f\n\t" /* a near call will push eip onto the stack */
->  			"jmp 2f\n\t"
->  			"1: iretl\n\t"
->  			"2:\n\t"
-> @@ -782,7 +782,7 @@ static void test_iret(void)
->  			      "orl $0xffc18028, %eax\n\t"
->  			      "pushl %eax\n\t"
->  			      "pushl %cs\n\t"
-> -			      "call 1f\n\t"
-> +			      "calll 1f\n\t"
->  			      "jmp 2f\n\t"
->  			      "1: iretl\n\t"
->  			      "2:\n\t");
-> -- 
-> 2.28.0
-> 
+On Wed, Sep 23, 2020 at 11:28 PM Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> Any comments? Paolo! :)
 
-Hi,
+Hi, sorry to be so late in replying! I wanted to post the first part
+of the TDP MMU series I've been working on before responding so we
+could discuss the two together, but I haven't been able to get it out
+as fast as I would have liked. (I'll send it ASAP!) I'm hopeful that
+it will ultimately help address some of the page fault handling and
+lock contention issues you're addressing with these patches. I'd also
+be happy to work together to add a prepopulation feature to it. I'll
+put in some more comments inline below.
 
-I've noticed that the patch has been applied (thanks for that!) but a
-test fails for centos-7. It has gcc that doesn't support "-m16":
-https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/jobs/755387059
+> On Wed, 9 Sep 2020 at 11:04, Wanpeng Li <kernellwp@gmail.com> wrote:
+> >
+> > Any comments? guys!
+> > On Tue, 1 Sep 2020 at 19:52, <yulei.kernel@gmail.com> wrote:
+> > >
+> > > From: Yulei Zhang <yulei.kernel@gmail.com>
+> > >
+> > > Currently in KVM memory virtulization we relay on mmu_lock to
+> > > synchronize the memory mapping update, which make vCPUs work
+> > > in serialize mode and slow down the execution, especially after
+> > > migration to do substantial memory mapping will cause visible
+> > > performance drop, and it can get worse if guest has more vCPU
+> > > numbers and memories.
+> > >
+> > > The idea we present in this patch set is to mitigate the issue
+> > > with pre-constructed memory mapping table. We will fast pin the
+> > > guest memory to build up a global memory mapping table according
+> > > to the guest memslots changes and apply it to cr3, so that after
+> > > guest starts up all the vCPUs would be able to update the memory
+> > > simultaneously without page fault exception, thus the performance
+> > > improvement is expected.
 
-I'm going to come up with a patch that adds a test for the option and
-fixes the issue for older gcc, then bits = 16 would be used for modern
-compilers only.
+My understanding from this RFC is that your primary goal is to
+eliminate page fault latencies and lock contention arising from the
+first page faults incurred by vCPUs when initially populating the EPT.
+Is that right?
 
-Regards,
-Roman
+I have the impression that the pinning and generally static memory
+mappings are more a convenient simplification than part of a larger
+goal to avoid incurring page faults down the line. Is that correct?
+
+I ask because I didn't fully understand, from our conversation on v1
+of this RFC, why reimplementing the page fault handler and associated
+functions was necessary for the above goals, as I understood them.
+My impression of the prepopulation approach is that, KVM will
+sequentially populate all the EPT entries to map guest memory. I
+understand how this could be optimized to be quite efficient, but I
+don't understand how it would scale better than the existing
+implementation with one vCPU accessing memory.
+
+> > >
+> > > We use memory dirty pattern workload to test the initial patch
+> > > set and get positive result even with huge page enabled. For example,
+> > > we create guest with 32 vCPUs and 64G memories, and let the vcpus
+> > > dirty the entire memory region concurrently, as the initial patch
+> > > eliminate the overhead of mmu_lock, in 2M/1G huge page mode we would
+> > > get the job done in about 50% faster.
+
+In this benchmark did you include the time required to pre-populate
+the EPT or just the time required for the vCPUs to dirty memory?
+I ask because I'm curious if your priority is to decrease the total
+end-to-end time, or you just care about the guest experience, and not
+so much the VM startup time.
+How does this compare to the case where 1 vCPU reads every page of
+memory and then 32 vCPUs concurrently dirty every page?
+
+> > >
+> > > We only validate this feature on Intel x86 platform. And as Ben
+> > > pointed out in RFC V1, so far we disable the SMM for resource
+> > > consideration, drop the mmu notification as in this case the
+> > > memory is pinned.
+
+I'm excited to see big MMU changes like this, and I look forward to
+combining our needs towards a better MMU for the x86 TDP case. Have
+you thought about how you would build SMM and MMU notifier support
+onto this patch series? I know that the invalidate range notifiers, at
+least, added a lot of non-trivial complexity to the direct MMU
+implementation I presented last year.
+
+> > >
+> > > V1->V2:
+> > > * Rebase the code to kernel version 5.9.0-rc1.
+> > >
+> > > Yulei Zhang (9):
+> > >   Introduce new fields in kvm_arch/vcpu_arch struct for direct build EPT
+> > >     support
+> > >   Introduce page table population function for direct build EPT feature
+> > >   Introduce page table remove function for direct build EPT feature
+> > >   Add release function for direct build ept when guest VM exit
+> > >   Modify the page fault path to meet the direct build EPT requirement
+> > >   Apply the direct build EPT according to the memory slots change
+> > >   Add migration support when using direct build EPT
+> > >   Introduce kvm module parameter global_tdp to turn on the direct build
+> > >     EPT mode
+> > >   Handle certain mmu exposed functions properly while turn on direct
+> > >     build EPT mode
+> > >
+> > >  arch/mips/kvm/mips.c            |  13 +
+> > >  arch/powerpc/kvm/powerpc.c      |  13 +
+> > >  arch/s390/kvm/kvm-s390.c        |  13 +
+> > >  arch/x86/include/asm/kvm_host.h |  13 +-
+> > >  arch/x86/kvm/mmu/mmu.c          | 533 ++++++++++++++++++++++++++++++--
+> > >  arch/x86/kvm/svm/svm.c          |   2 +-
+> > >  arch/x86/kvm/vmx/vmx.c          |   7 +-
+> > >  arch/x86/kvm/x86.c              |  55 ++--
+> > >  include/linux/kvm_host.h        |   7 +-
+> > >  virt/kvm/kvm_main.c             |  43 ++-
+> > >  10 files changed, 639 insertions(+), 60 deletions(-)
+> > >
+> > > --
+> > > 2.17.1
+> > >
