@@ -2,146 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07DED276F57
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 13:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 819B9276FAB
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 13:17:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727522AbgIXLGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 07:06:35 -0400
-Received: from foss.arm.com ([217.140.110.172]:42280 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727476AbgIXLGY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Sep 2020 07:06:24 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AB9E152B;
-        Thu, 24 Sep 2020 04:06:23 -0700 (PDT)
-Received: from monolith.localdoman (unknown [10.37.8.98])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A0723F73B;
-        Thu, 24 Sep 2020 04:06:20 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc:     mark.rutland@arm.com, sumit.garg@linaro.org, maz@kernel.org,
-        swboyd@chromium.org, catalin.marinas@arm.com, will@kernel.org,
-        Julien Thierry <julien.thierry@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v7 5/7] KVM: arm64: pmu: Make overflow handler NMI safe
-Date:   Thu, 24 Sep 2020 12:07:04 +0100
-Message-Id: <20200924110706.254996-6-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200924110706.254996-1-alexandru.elisei@arm.com>
-References: <20200924110706.254996-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1727398AbgIXLR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 07:17:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24683 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726483AbgIXLR4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 07:17:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600946275;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=WkqZ/iREvhMbCNBzcXttwJxZSXR/+eOruAO+X3MZ0b8=;
+        b=FkAkKHNspzQlAzCKL+zikJlBkkRt3g0ruA6QOT2cL5yVZ1YFClgWNz+AoaW3YR54Mh/J7N
+        lmFOSN56dtHTxMmQ08HKDr6huRAg2MyNAKt/gAFSdHEp21I3lwlUTNl34sEP79l7SC57hp
+        3/NRrbOd2gxk50x2sJ2xU7wkCUcP7h8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-beVbKS9UO_izwZ16RD0YQQ-1; Thu, 24 Sep 2020 07:17:53 -0400
+X-MC-Unique: beVbKS9UO_izwZ16RD0YQQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3E7356B55;
+        Thu, 24 Sep 2020 11:17:52 +0000 (UTC)
+Received: from thuth.com (ovpn-113-113.ams2.redhat.com [10.36.113.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3924255778;
+        Thu, 24 Sep 2020 11:17:48 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: [kvm-unit-tests PATCH] s390x/selftest: Fix constraint of inline assembly
+Date:   Thu, 24 Sep 2020 13:17:46 +0200
+Message-Id: <20200924111746.131633-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Julien Thierry <julien.thierry@arm.com>
+Clang on s390x compains:
 
-kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
-NMI context, defer waking the vcpu to an irq_work queue.
+/home/thuth/devel/kvm-unit-tests/s390x/selftest.c:39:15: error:
+ %r0 used in an address
+        asm volatile("  stg %0,0(%0)\n" : : "r"(-1L));
+                     ^
+<inline asm>:1:13: note: instantiated into assembly here
+                stg %r0,0(%r0)
+                          ^
 
-A vcpu can be freed while it's not running by kvm_destroy_vm(). Prevent
-running the irq_work for a non-existent vcpu by calling irq_work_sync() on
-the PMU destroy path.
+Right it is. We should not use address register 0 for STG.
+Thus let's use the "a" constraint to avoid register 0 here.
 
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Tested-by: Sumit Garg <sumit.garg@linaro.org> (Developerbox)
-[Alexandru E.: Added irq_work_sync()]
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
-I suggested in v6 that I will add an irq_work_sync() to
-kvm_pmu_vcpu_reset(). It turns out it's not necessary: a vcpu reset is done
-by the vcpu being reset with interrupts enabled, which means all the work
-has had a chance to run before the reset takes place.
+ s390x/selftest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- arch/arm64/kvm/pmu-emul.c | 26 +++++++++++++++++++++++++-
- include/kvm/arm_pmu.h     |  1 +
- 2 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index f0d0312c0a55..81916e360b1e 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -269,6 +269,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+diff --git a/s390x/selftest.c b/s390x/selftest.c
+index 4c16646..eaf5b18 100644
+--- a/s390x/selftest.c
++++ b/s390x/selftest.c
+@@ -36,7 +36,7 @@ static void test_pgm_int(void)
+ 	check_pgm_int_code(PGM_INT_CODE_OPERATION);
  
- 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
- 		kvm_pmu_release_perf_event(&pmu->pmc[i]);
-+	irq_work_sync(&vcpu->arch.pmu.overflow_work);
+ 	expect_pgm_int();
+-	asm volatile("	stg %0,0(%0)\n" : : "r"(-1L));
++	asm volatile("	stg %0,0(%0)\n" : : "a"(-1L));
+ 	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
  }
  
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
-@@ -433,6 +434,22 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
- 	kvm_pmu_update_state(vcpu);
- }
- 
-+/**
-+ * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
-+ * to the event.
-+ * This is why we need a callback to do it once outside of the NMI context.
-+ */
-+static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_pmu *pmu;
-+
-+	pmu = container_of(work, struct kvm_pmu, overflow_work);
-+	vcpu = kvm_pmc_to_vcpu(pmu->pmc);
-+
-+	kvm_vcpu_kick(vcpu);
-+}
-+
- /**
-  * When the perf event overflows, set the overflow status and inform the vcpu.
-  */
-@@ -465,7 +482,11 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
- 
- 	if (kvm_pmu_overflow_status(vcpu)) {
- 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
--		kvm_vcpu_kick(vcpu);
-+
-+		if (!in_nmi())
-+			kvm_vcpu_kick(vcpu);
-+		else
-+			irq_work_queue(&vcpu->arch.pmu.overflow_work);
- 	}
- 
- 	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
-@@ -764,6 +785,9 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
- 
-+	init_irq_work(&vcpu->arch.pmu.overflow_work,
-+		      kvm_pmu_perf_overflow_notify_vcpu);
-+
- 	vcpu->arch.pmu.created = true;
- 	return 0;
- }
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 6db030439e29..dbf4f08d42e5 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -27,6 +27,7 @@ struct kvm_pmu {
- 	bool ready;
- 	bool created;
- 	bool irq_level;
-+	struct irq_work overflow_work;
- };
- 
- #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
 -- 
-2.28.0
+2.18.2
 
