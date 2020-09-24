@@ -2,88 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B3FE277055
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 13:54:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BFE6277093
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 14:07:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727499AbgIXLyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 07:54:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57614 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727458AbgIXLyj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 07:54:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600948478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IyjMyl8yCEq02WUFlkatr3VxC0jXaW6E4h2dyQjia/M=;
-        b=Miy23YMuIVElWlqsTF+aNoLNYd+XvLwmoVJnmtdhJrGKm7K1QgDi0VPzhF5YKOaIK/BaMc
-        pLX9RnLHot76ct5XOnykr1W+Ga55jkoLlNY9PpfZG03p1ZAYI2vnmypfHnTanRF8OwllR9
-        vv2ShMk4UDzbdQqVJhk5a5haRmP9d58=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-W1pL5RxfN_KZ0B5LyA_xZg-1; Thu, 24 Sep 2020 07:54:36 -0400
-X-MC-Unique: W1pL5RxfN_KZ0B5LyA_xZg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727702AbgIXMHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 08:07:09 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:45496 "EHLO mta-01.yadro.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727494AbgIXMHH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 08:07:07 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id 1AFFA579F2;
+        Thu, 24 Sep 2020 12:07:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        content-type:content-type:content-transfer-encoding:mime-version
+        :x-mailer:message-id:date:date:subject:subject:from:from
+        :received:received:received; s=mta-01; t=1600949222; x=
+        1602763623; bh=cprXYP/GN+1p2Jw7sjgIsH/PpPAVv1sAHLGBkanaBwU=; b=n
+        A7yfGOfsJwMceoqQq5584S7Qzz5X79lI9DNAuiXloyL1t2DskkD5c/LeFAzkuhQr
+        Kr50oy0HP+wXpCo5pywvSM0hmeiDsHC7FZ6Z4OL9GBbGLY2FMmENhqaImjnx9VPX
+        7iEwaxmwLKxf+4IB6gQjtlXIEa5Fb7M68vZ3vrdsA8=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id h8O6d-hiukJw; Thu, 24 Sep 2020 15:07:02 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A4861891E9C;
-        Thu, 24 Sep 2020 11:54:35 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-113.ams2.redhat.com [10.36.113.113])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5709B60C15;
-        Thu, 24 Sep 2020 11:54:34 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] README: Reflect missing --getopt in
- configure
-To:     Andrew Jones <drjones@redhat.com>,
+        by mta-01.yadro.com (Postfix) with ESMTPS id 3A82E579D6;
+        Thu, 24 Sep 2020 15:07:02 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 24
+ Sep 2020 15:07:02 +0300
+From:   Roman Bolshakov <r.bolshakov@yadro.com>
+To:     <kvm@vger.kernel.org>
+CC:     Roman Bolshakov <r.bolshakov@yadro.com>,
+        Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org
-References: <20200924100613.71136-1-r.bolshakov@yadro.com>
- <43d1571b-8cf6-3304-b4df-650a65528843@redhat.com>
- <20200924103054.GA69137@SPB-NB-133.local>
- <7e0b838b-2a6d-b370-e031-8d804c23b822@redhat.com>
- <20200924104836.GB69137@SPB-NB-133.local>
- <b515b803-daec-5a1f-9d65-07c2f209f763@redhat.com>
- <20200924114809.3xndwpqgrbnzzmdh@kamzik.brq.redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <3b38ff55-26ef-0965-f709-53b2c2a6a7cf@redhat.com>
-Date:   Thu, 24 Sep 2020 13:54:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+Subject: [kvm-unit-tests PATCH] x86: realmode: Workaround clang issues
+Date:   Thu, 24 Sep 2020 15:05:17 +0300
+Message-ID: <20200924120516.77299-1-r.bolshakov@yadro.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200924114809.3xndwpqgrbnzzmdh@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/2020 13.48, Andrew Jones wrote:
-> On Thu, Sep 24, 2020 at 12:52:16PM +0200, Paolo Bonzini wrote:
->> On 24/09/20 12:48, Roman Bolshakov wrote:
->>> Unfortunately it has no effect (and I wouldn't want to do that to avoid
->>> issues with other scripts/software that implicitly depend on native
->>> utilities):
->>>
->>> $ brew link --force gnu-getopt
->>> Warning: Refusing to link macOS provided/shadowed software: gnu-getopt
->>> If you need to have gnu-getopt first in your PATH run:
->>>   echo 'export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"' >> ~/.zshrc
->>>
->>> So if it's possible I'd still prefer to add an option to specify
->>> --getopt in configure. I can resend a patch for that.
->>
->> No, I'm not going to accept that.  It's just Apple's stupidity.  I have
->> applied your patch, rewriting the harness in another language would
->> probably be a good idea though.
-> 
-> I also feel like we've outgrown Bash, especially when we implement
-> things like migration tests.
-Any chance that we could then use some pre-existing test runner instead
-of re-inventing the wheel? E.g. I think Avocado already has some basic
-support for running the kvm-unit-tests, IIRC.
+clang doesn't properly support .code16gcc and generates wrong machine
+code [1][2][3][4]. But the test works if object file is compiled with -m16 and
+explicit suffixes are added for instructions.
 
- Thomas
+1. https://lore.kernel.org/kvm/4d20fbce-d247-abf4-3ceb-da2c0d48fc50@redhat.com/
+2. https://lore.kernel.org/kvm/20200915155959.GF52559@SPB-NB-133.local/
+3. https://lore.kernel.org/kvm/788b7191-6987-9399-f352-2e661255157e@redhat.com/
+4. https://lore.kernel.org/kvm/20200922212507.GA11460@SPB-NB-133.local/
+
+Suggested-by: Thomas Huth <thuth@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+---
+ .travis.yml         |  2 +-
+ x86/Makefile.common |  2 +-
+ x86/realmode.c      | 44 ++++++++++++++++++++++----------------------
+ 3 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index 2e5ae41..bd62190 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -24,7 +24,7 @@ jobs:
+       - BUILD_DIR="."
+       - TESTS="access asyncpf debug emulator ept hypercall hyperv_stimer
+                hyperv_synic idt_test intel_iommu ioapic ioapic-split
+-               kvmclock_test msr pcid rdpru rmap_chain s3 setjmp umip"
++               kvmclock_test msr pcid rdpru realmode rmap_chain s3 setjmp umip"
+       - ACCEL="kvm"
+ 
+     - addons:
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 090ce22..5567d66 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -72,7 +72,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
+ 	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
+ 	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+ 
+-$(TEST_DIR)/realmode.o: bits = 32
++$(TEST_DIR)/realmode.o: bits = 16
+ 
+ $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
+ 
+diff --git a/x86/realmode.c b/x86/realmode.c
+index 7c2d776..c8a6ae0 100644
+--- a/x86/realmode.c
++++ b/x86/realmode.c
+@@ -639,7 +639,7 @@ static void test_jcc_near(void)
+ 
+ static void test_long_jmp(void)
+ {
+-	MK_INSN(long_jmp, "call 1f\n\t"
++	MK_INSN(long_jmp, "calll 1f\n\t"
+ 			  "jmp 2f\n\t"
+ 			  "1: jmp $0, $test_function\n\t"
+ 		          "2:\n\t");
+@@ -728,26 +728,26 @@ static void test_null(void)
+ 
+ static void test_pusha_popa(void)
+ {
+-	MK_INSN(pusha, "pusha\n\t"
+-		       "pop %edi\n\t"
+-		       "pop %esi\n\t"
+-		       "pop %ebp\n\t"
+-		       "add $4, %esp\n\t"
+-		       "pop %ebx\n\t"
+-		       "pop %edx\n\t"
+-		       "pop %ecx\n\t"
+-		       "pop %eax\n\t"
++	MK_INSN(pusha, "pushal\n\t"
++		       "popl %edi\n\t"
++		       "popl %esi\n\t"
++		       "popl %ebp\n\t"
++		       "addl $4, %esp\n\t"
++		       "popl %ebx\n\t"
++		       "popl %edx\n\t"
++		       "popl %ecx\n\t"
++		       "popl %eax\n\t"
+ 		       );
+ 
+-	MK_INSN(popa, "push %eax\n\t"
+-		      "push %ecx\n\t"
+-		      "push %edx\n\t"
+-		      "push %ebx\n\t"
+-		      "push %esp\n\t"
+-		      "push %ebp\n\t"
+-		      "push %esi\n\t"
+-		      "push %edi\n\t"
+-		      "popa\n\t"
++	MK_INSN(popa, "pushl %eax\n\t"
++		      "pushl %ecx\n\t"
++		      "pushl %edx\n\t"
++		      "pushl %ebx\n\t"
++		      "pushl %esp\n\t"
++		      "pushl %ebp\n\t"
++		      "pushl %esi\n\t"
++		      "pushl %edi\n\t"
++		      "popal\n\t"
+ 		      );
+ 
+ 	init_inregs(&(struct regs){ .eax = 0, .ebx = 1, .ecx = 2, .edx = 3, .esi = 4, .edi = 5, .ebp = 6 });
+@@ -761,9 +761,9 @@ static void test_pusha_popa(void)
+ 
+ static void test_iret(void)
+ {
+-	MK_INSN(iret32, "pushf\n\t"
++	MK_INSN(iret32, "pushfl\n\t"
+ 			"pushl %cs\n\t"
+-			"call 1f\n\t" /* a near call will push eip onto the stack */
++			"calll 1f\n\t" /* a near call will push eip onto the stack */
+ 			"jmp 2f\n\t"
+ 			"1: iretl\n\t"
+ 			"2:\n\t"
+@@ -782,7 +782,7 @@ static void test_iret(void)
+ 			      "orl $0xffc18028, %eax\n\t"
+ 			      "pushl %eax\n\t"
+ 			      "pushl %cs\n\t"
+-			      "call 1f\n\t"
++			      "calll 1f\n\t"
+ 			      "jmp 2f\n\t"
+ 			      "1: iretl\n\t"
+ 			      "2:\n\t");
+-- 
+2.28.0
 
