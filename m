@@ -2,69 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91F2727782D
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 20:01:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E8ED277838
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 20:04:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728728AbgIXSBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 14:01:39 -0400
-Received: from mga07.intel.com ([134.134.136.100]:10426 "EHLO mga07.intel.com"
+        id S1728736AbgIXSEc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 14:04:32 -0400
+Received: from mga03.intel.com ([134.134.136.65]:45606 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728577AbgIXSBj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Sep 2020 14:01:39 -0400
-IronPort-SDR: tspAxKL38P51eu2PSgU6Ir6nbEdt8uMy8r8MvvcLvadxq6+P5PVSOp/zXzj6QT10NyH5CByIzT
- VogB/J68x3eQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9754"; a="225434734"
+        id S1727753AbgIXSEb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 14:04:31 -0400
+IronPort-SDR: EYQcTzeuJxdi0LyKEH6vU8EYlXbRcqmSNTIi8+6MR4ilgEfnQaI+K4f5AYP6Xac/70Nzb8GuYl
+ Xi4lEGSGfO4Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9754"; a="161365971"
 X-IronPort-AV: E=Sophos;i="5.77,298,1596524400"; 
-   d="scan'208";a="225434734"
+   d="scan'208";a="161365971"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 11:01:22 -0700
-IronPort-SDR: QJkOAgUtzmtFELwpkWXY/qDcpAauQAP7A0QAuKTa8XkbMa42AaMZapy+j9q6fR8Ru9ub+NgGCo
- M2n4erRyIbzA==
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 11:04:30 -0700
+IronPort-SDR: FVWvApzr7I7krFoC4sTcxfib8ECY6LWic7dQfyRAgWsZsGuvkFQSuor72shP+nk5Ou7PhJmV3u
+ MaZgTlXFREbA==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,298,1596524400"; 
-   d="scan'208";a="305920835"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 11:01:21 -0700
-Date:   Thu, 24 Sep 2020 11:01:20 -0700
+   d="scan'208";a="487023894"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
+  by orsmga005.jf.intel.com with ESMTP; 24 Sep 2020 11:04:30 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] KVM: VMX: Replace MSR_IA32_RTIT_OUTPUT_BASE_MASK
- with helper function
-Message-ID: <20200924180120.GA9649@linux.intel.com>
-References: <20200923163629.20168-1-sean.j.christopherson@intel.com>
- <20200923163629.20168-3-sean.j.christopherson@intel.com>
- <0a215e25-798d-3f17-0fcb-885806f2351b@redhat.com>
+Subject: [PATCH] KVM: VMX: Explicitly check for hv_remote_flush_tlb when loading pgd()
+Date:   Thu, 24 Sep 2020 11:04:29 -0700
+Message-Id: <20200924180429.10016-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a215e25-798d-3f17-0fcb-885806f2351b@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 23, 2020 at 07:07:22PM +0200, Paolo Bonzini wrote:
-> On 23/09/20 18:36, Sean Christopherson wrote:
-> > +static inline bool pt_output_base_valid(struct kvm_vcpu *vcpu, u64 base)
-> > +{
-> > +	/* The base must be 128-byte aligned and a legal physical address. */
-> > +	return !(base & (~((1UL << cpuid_maxphyaddr(vcpu)) - 1) | 0x7f));
-> > +}
-> 
-> The fact that you deemed a comment necessary says something already. :)
-> What about:
-> 
->         return !kvm_mmu_is_illegal_gpa(vcpu, base) && !(base & 0x7f);
-> 
-> (where this new usage makes it obvious that mmu should have been vcpu).
+Explicitly check that kvm_x86_ops.tlb_remote_flush() points at Hyper-V's
+implementation for PV flushing instead of assuming that a non-NULL
+implementation means running on Hyper-V.  Wrap the related logic in
+ifdeffery as hv_remote_flush_tlb() is defined iff CONFIG_HYPERV!=n.
 
-Ya.  I think it was a sort of sunk cost fallacy.  Dammit, I spent all that
-time figuring out what this code does, I'm keeping it!!!
+Short term, the explicit check makes it more obvious why a non-NULL
+tlb_remote_flush() triggers EPTP shenanigans.  Long term, this will
+allow TDX to define its own implementation of tlb_remote_flush() without
+running afoul of Hyper-V.
 
-v3 incoming...
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 7 +++++--
+ arch/x86/kvm/vmx/vmx.h | 2 ++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6f9a0c6d5dc5..a56fa9451b84 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3073,14 +3073,15 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
+ 		eptp = construct_eptp(vcpu, pgd, pgd_level);
+ 		vmcs_write64(EPT_POINTER, eptp);
+ 
+-		if (kvm_x86_ops.tlb_remote_flush) {
++#if IS_ENABLED(CONFIG_HYPERV)
++		if (kvm_x86_ops.tlb_remote_flush == hv_remote_flush_tlb) {
+ 			spin_lock(&to_kvm_vmx(kvm)->ept_pointer_lock);
+ 			to_vmx(vcpu)->ept_pointer = eptp;
+ 			to_kvm_vmx(kvm)->ept_pointers_match
+ 				= EPT_POINTERS_CHECK;
+ 			spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
+ 		}
+-
++#endif
+ 		if (!enable_unrestricted_guest && !is_paging(vcpu))
+ 			guest_cr3 = to_kvm_vmx(kvm)->ept_identity_map_addr;
+ 		else if (test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
+@@ -6956,7 +6957,9 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+ 
+ static int vmx_vm_init(struct kvm *kvm)
+ {
++#if IS_ENABLED(CONFIG_HYPERV)
+ 	spin_lock_init(&to_kvm_vmx(kvm)->ept_pointer_lock);
++#endif
+ 
+ 	if (!ple_gap)
+ 		kvm->arch.pause_in_guest = true;
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index d7ec66db5eb8..51107b7309bc 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -316,8 +316,10 @@ struct kvm_vmx {
+ 	bool ept_identity_pagetable_done;
+ 	gpa_t ept_identity_map_addr;
+ 
++#if IS_ENABLED(CONFIG_HYPERV)
+ 	enum ept_pointers_status ept_pointers_match;
+ 	spinlock_t ept_pointer_lock;
++#endif
+ };
+ 
+ bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+-- 
+2.28.0
+
