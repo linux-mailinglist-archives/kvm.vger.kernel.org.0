@@ -2,107 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D837727927F
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 22:45:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BF9527923C
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 22:37:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728991AbgIYUpF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 16:45:05 -0400
-Received: from mga09.intel.com ([134.134.136.24]:47349 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726239AbgIYUpE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Sep 2020 16:45:04 -0400
-IronPort-SDR: xEFUoVTYfMM4It91zDKooVCEQkLUg33ZXOOK7oSoUWvHSgRl2znZ4UnF2pQzUHv8HTXJgvm0mt
- 8a9YQQEnqJlw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9755"; a="162520234"
-X-IronPort-AV: E=Sophos;i="5.77,303,1596524400"; 
-   d="scan'208";a="162520234"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2020 13:24:03 -0700
-IronPort-SDR: oJ65aSLCggoBkbd5GAak9J1jvIjzhtI+iwBPYcyQyHCdFGadjygn4fR66pXXKKfgD7iFGJG3XE
- +i63exGPk15A==
-X-IronPort-AV: E=Sophos;i="5.77,303,1596524400"; 
-   d="scan'208";a="512372713"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2020 13:24:03 -0700
-Date:   Fri, 25 Sep 2020 13:24:01 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Cc:     kvm@vger.kernel.org
-Subject: Re: Which clocksource does KVM use?
-Message-ID: <20200925202401.GG31528@linux.intel.com>
-References: <CAJGDS+FJ1nW8E7f6_4OpbbyNyx9m2pzQA-pRvh3pQgLvdgGbHg@mail.gmail.com>
+        id S1728540AbgIYUdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 16:33:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36544 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726576AbgIYUYg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 16:24:36 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601065475;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=01ndKfa+GCpznGQ+xNkSEDCqzBhgr3SNm6LzFG9u5Yg=;
+        b=fCmESQcpQqkVNnYu1hcP+d34UKtQRa0P0r7hMwnuNoIvw8H6vK0/nj7lPp3g3otVbvItZO
+        vXW3qXZZ9heNXS270uSKL/g7Z39lwOAuBiGpBsqklpIUkZIpjnn7dSS75Vsour0UFVTPRN
+        q2baw16ppQ2cUyiTLHWmIxWJBsNXFKc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-va5XUeX_OcqsIqFdxdewxA-1; Fri, 25 Sep 2020 16:24:32 -0400
+X-MC-Unique: va5XUeX_OcqsIqFdxdewxA-1
+Received: by mail-wm1-f70.google.com with SMTP id a25so88234wmb.2
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 13:24:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=01ndKfa+GCpznGQ+xNkSEDCqzBhgr3SNm6LzFG9u5Yg=;
+        b=piTX0so3hIjRHXpcA1fS7XUB83hjoTt37wxyKOexR1TkioPVIPgFYNRSWgTr9798l0
+         9lpRZxDqw+X6UAm2x+VodiBB/YxfdNm5KA0svNBwWbzXl+ScVkXuclzy8MaRM26dokBw
+         F3NTpP27pap68gPQMca6eD2PH2kraB++iPT5MGXOLFaerBaCReNGtzNLAoVq3w4ZTb6A
+         7SzmOm5yqrTYWHtepHhKS5X8lcipOygs1mFbXNMA+VYP8gxFkPzeO9lcAENAQoAROldZ
+         s9NFSGE+5rOfgdJgHeMmLkSWb3d0in//O9OLQZ/AUSCnF3xJ7ufOZmtvfLHVbVaVDWZp
+         8WxQ==
+X-Gm-Message-State: AOAM530ILaespPC3F1wvnp+lISMWABn05S4gc1wyz9wafTGOARX4RbSu
+        15GbbxZ4cy7U1odXaM+81fQXN0iCInFD0Ot8Ftnhc6ZbdEPKiy51QrpyNY6QSJ1Dl917ABrwhcs
+        w7tlclNyHpVoV
+X-Received: by 2002:a5d:6547:: with SMTP id z7mr6208962wrv.322.1601065471444;
+        Fri, 25 Sep 2020 13:24:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyaQPODIezVDHXXWdfc2VVPnz/e845Ud7GS+vwdoI3SF/yRDmnPzuPoZlSWH536vc4TF+RGSQ==
+X-Received: by 2002:a5d:6547:: with SMTP id z7mr6208948wrv.322.1601065471178;
+        Fri, 25 Sep 2020 13:24:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
+        by smtp.gmail.com with ESMTPSA id l5sm188279wmf.10.2020.09.25.13.24.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Sep 2020 13:24:30 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/mmu: Stash 'kvm' in a local variable in
+ kvm_mmu_free_roots()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200923191204.8410-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b9c04020-3bd9-05f4-9306-4e24e7587740@redhat.com>
+Date:   Fri, 25 Sep 2020 22:24:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJGDS+FJ1nW8E7f6_4OpbbyNyx9m2pzQA-pRvh3pQgLvdgGbHg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200923191204.8410-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 08:06:44AM +0530, Arnabjyoti Kalita wrote:
-> I am running QEMU with KVM using the below command line -
+On 23/09/20 21:12, Sean Christopherson wrote:
+> To make kvm_mmu_free_roots() a bit more readable, capture 'kvm' in a
+> local variable instead of doing vcpu->kvm over and over (and over).
 > 
-> sudo ./qemu-system-x86_64 -m 1024 -machine pc-i440fx-3.0
-> -cpu qemu64,-kvmclock -accel kvm -netdev
-> tap,id=tap1,ifname=tap0,script=no,downscript=no
-> -device virtio-net-pci,netdev=tap1,mac=00:00:00:00:00:00
-> -drive file=ubuntu-16.04.server.qcow2,format=qcow2,if=none,id=img-direct
-> -device virtio-blk-pci,drive=img-direct
+> No functional change intended.
 > 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-> I can see that the current_clocksource used by the VM that is spawned
-> is reported as "tsc".
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 76c5826e29a2..cdc498093450 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3603,6 +3603,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+>  void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  			ulong roots_to_free)
+>  {
+> +	struct kvm *kvm = vcpu->kvm;
+>  	int i;
+>  	LIST_HEAD(invalid_list);
+>  	bool free_active_root = roots_to_free & KVM_MMU_ROOT_CURRENT;
+> @@ -3620,22 +3621,21 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  			return;
+>  	}
+>  
+> -	spin_lock(&vcpu->kvm->mmu_lock);
+> +	spin_lock(&kvm->mmu_lock);
+>  
+>  	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+>  		if (roots_to_free & KVM_MMU_ROOT_PREVIOUS(i))
+> -			mmu_free_root_page(vcpu->kvm, &mmu->prev_roots[i].hpa,
+> +			mmu_free_root_page(kvm, &mmu->prev_roots[i].hpa,
+>  					   &invalid_list);
+>  
+>  	if (free_active_root) {
+>  		if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
+>  		    (mmu->root_level >= PT64_ROOT_4LEVEL || mmu->direct_map)) {
+> -			mmu_free_root_page(vcpu->kvm, &mmu->root_hpa,
+> -					   &invalid_list);
+> +			mmu_free_root_page(kvm, &mmu->root_hpa, &invalid_list);
+>  		} else {
+>  			for (i = 0; i < 4; ++i)
+>  				if (mmu->pae_root[i] != 0)
+> -					mmu_free_root_page(vcpu->kvm,
+> +					mmu_free_root_page(kvm,
+>  							   &mmu->pae_root[i],
+>  							   &invalid_list);
+>  			mmu->root_hpa = INVALID_PAGE;
+> @@ -3643,8 +3643,8 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  		mmu->root_pgd = 0;
+>  	}
+>  
+> -	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
+> -	spin_unlock(&vcpu->kvm->mmu_lock);
+> +	kvm_mmu_commit_zap_page(kvm, &invalid_list);
+> +	spin_unlock(&kvm->mmu_lock);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_mmu_free_roots);
+>  
 > 
-> /sys/devices/system/clocksource/clocksource0$ cat current_clocksource
-> tsc
-> 
-> I collect a trace of the guest execution using IntelPT after running
-> the below command -
-> 
-> sudo ./perf kvm --guest --guestkallsyms=guest-kallsyms
-> --guestmodules=guest-modules
-> record -e intel_pt// -m ,65536
-> 
-> The IntelPT trace reveals that the function "read_hpet" gets called continuously
-> while I expected the function "read_tsc" to be called.
-> 
-> Does KVM change the clocksource in any way?
- 
-KVM's paravirt clock affects the clocksource, but that's disable in via
-"-kvmclock" in your command line.
 
-> I expect the clocksource to be set at boot time, how and why did the
-> clocksource change later? Does KVM not support the tsc clocksource ?
+Queued this one, for now.
 
-QEMU/KVM exposes TSC to the guest, but the Linux kernel's decision on whether
-or not to use the TSC as its clocksource isn't exactly straightforward.
+Paolo
 
-At a minimum, the TSC needs to be constant (count at the same rate regardless
-of p-state, i.e. core frequency), which is referred to as invtsc by QEMU.  At
-a glance, I don't think "-cpu qemu64" advertises support for invtsc.  This can
-be forced via "-cpu qemu64,+invtsc", though that may spit out some warnings if
-the host CPU itself doesn't have a constant TSC.  You can also override this
-in the guest kernel by adding "tsc=reliable" to your kernel params.
-
-C-states are another possible issu.  The kernel will mark the TSC as unstable
-if C2 or deeper is supported (and maybe even C1 with MWAIT?) and the TSC isn't
-marked as nonstop.  I don't _think_ this is relevant?  QEMU/KVM doesn't
-support advertising a nonstop TSC, but I assume QEMU also doesn't advertise C2
-or deeper (I've never actually looked), or MONITOR/MWAIT by default.
-
-If the above are ruled out, the kernel can also mark the TSC as unstable and
-switch to the HPET for a variety of other reasons.  You can check for this
-by grepping for "Marking TSC unstable due to" in the guest kernel logs.
-
-> Note:
-> 
-> I am using QEMU version 3.0. The guest runs a 4.4.0-116-generic linux kernel.
-> Both my qemu host as well as the target architecture is x86_64. The
-> host machine is
-> also using "tsc" clocksource.
-> 
-> Best Regards,
-> Arnab
