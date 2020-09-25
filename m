@@ -2,68 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ECB02791E3
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 22:18:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97C86279200
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 22:21:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728212AbgIYUSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 16:18:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27380 "EHLO
+        id S1727654AbgIYUVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 16:21:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44048 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726844AbgIYUQG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 16:16:06 -0400
+        by vger.kernel.org with ESMTP id S1728643AbgIYUTi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 16:19:38 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601064965;
+        s=mimecast20190719; t=1601065176;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yhl/Hsd69IkJCl0CUgFQtqM/mmGWznBMV8K5DH4cezQ=;
-        b=DPNYMGWKhslXDeXckZYxFO3WXFVrBeGKr+WAdB73+mS4ij+AUd/27XYiefTHAcvSMZm9HP
-        WgwMfjl9bYxJuz9M5tcjEgFxG1SyInat1snhNDJINxRkl7TVTc9hAKuxwbAF3XQKDMfABv
-        +BWjlcQOZMRZLERJHvEF2w++vMnPQMg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-9L4VkUJTP5WPbVZqFzIGxw-1; Fri, 25 Sep 2020 16:16:01 -0400
-X-MC-Unique: 9L4VkUJTP5WPbVZqFzIGxw-1
-Received: by mail-wm1-f70.google.com with SMTP id u5so65094wme.3
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 13:16:01 -0700 (PDT)
+        bh=QOmicvb+v8XFJSVsTFBCH7ova0V2RHuqhzizzi3hBkc=;
+        b=DQ5uPjCs9hRN80tacVZXiznZpAQAAOQdR6Agf4funw9TcCEIm3uUPZfiHZ+e9MNFwQ0QzZ
+        xBabin3OQ9DrFF+oHKMunajio1u3RQ6yeJ1rnyAGbdlCbo/gY41tVfKht4zGPWg2DHdNg/
+        qnvgC6GSOPPiHWJPxkbluUh+rXOoPVI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-JxpCExciOmqDvkkonQoFlA-1; Fri, 25 Sep 2020 16:19:35 -0400
+X-MC-Unique: JxpCExciOmqDvkkonQoFlA-1
+Received: by mail-wr1-f70.google.com with SMTP id s8so1498812wrb.15
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 13:19:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=yhl/Hsd69IkJCl0CUgFQtqM/mmGWznBMV8K5DH4cezQ=;
-        b=mjPEI59j43RbweEfUEQD9QsW6QYXIVxbehVvqiRH/Q2lnPKHMxv5wAIn2wfmOv5992
-         8BhUYrJjm4a5y/QR3ipTWfLDdYrYW7DzXIlT8u4XA7LksdRhLr74c0zJ5efXN8GykfdW
-         dImDrXhCx5OtbA8lzsZAHV54wRGn/L7fhmUV/rhdiST0Pn8HVYIVhjU2d/2F8/Ef94Eh
-         GHshA/EiiLRoticVPJG/eu5MeZrOINmAf0D0wRVuwNPKfDsKHj+r5bzPDCcKVBxUNgUX
-         M/l1l2k5WQvtyq4Rrze5tCQIYB0WJe3mpJNNl0Tgewzi7WCM/55giewJ7ehciREhH7oy
-         96TQ==
-X-Gm-Message-State: AOAM532tl1HssYXgO5HV5aPeq1SbsPJ2bhFiqmJWCgL1JtJhOv+6w6is
-        m1hE/HV1xycjyKhXLQDdRFdi2FNhtzNHd9PKyriPvtfB/L6Bghfkaj/lQ7R9gwaZTULdNSKaKcx
-        z0oSfoc04lheZ
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr6175510wrs.227.1601064960447;
-        Fri, 25 Sep 2020 13:16:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJylqyHYTjXqLHZ1ID1/RPnvh851snnby2Lsvah5UPlXNupftX3WXDUIYHw8Py2PIGY1bLejyA==
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr6175495wrs.227.1601064960251;
-        Fri, 25 Sep 2020 13:16:00 -0700 (PDT)
+        bh=QOmicvb+v8XFJSVsTFBCH7ova0V2RHuqhzizzi3hBkc=;
+        b=lU4nMWLe9j1F+s9f4pFGBTdGY/+1rHZigpnYW7Oo2xPiUPeh31UuKR02YBHGAsNaW0
+         UNMiHjqW2XLlXah7NXlQxMecRviT95GE0pkMofztIuPhF4/WxqUVuPhfKz7RBpU+UCA8
+         ChdNNiE2IiDv+cTZ1mPVF/ecbUlBTO6w8k5KJCt9O2Ns+eMala9nf9Y2H6pA3D1SPdio
+         Y84891I+TAbTdkjnd1+lkymHso28gU/mwk1dQazPJPvcFUNpd5QlsOO3r/VqbztHoXsI
+         ayxb0/zdmSlD+Z2rPJfQyPwuqgtAvl6w+oXyGK1QLzzMSLozz/AVrnNanRkGg+2qBqQC
+         yiDQ==
+X-Gm-Message-State: AOAM532gQQSh2L17e8bU+fKllrFx9yO7a/Q8USgAWpkZBS4zTPTmHCRl
+        Hp/eqWfju6x7I7IDsUjbLCWhn3TohDbq2KVg4ebbkvRb1kzF6HVfLINBeNKJd6AKlcmb0SCwDSF
+        9Lqz6XZCZ0KHd
+X-Received: by 2002:a05:600c:21c4:: with SMTP id x4mr271967wmj.107.1601065173115;
+        Fri, 25 Sep 2020 13:19:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxPYpGzkNK39+BACyS8a4wYMnLnXsLxh7emPSJdwO8sV+w4DiZVzAsu8R4Fb7wQ9gZAgqymNQ==
+X-Received: by 2002:a05:600c:21c4:: with SMTP id x4mr271957wmj.107.1601065172920;
+        Fri, 25 Sep 2020 13:19:32 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
-        by smtp.gmail.com with ESMTPSA id u17sm4333537wri.45.2020.09.25.13.15.59
+        by smtp.gmail.com with ESMTPSA id b188sm159838wmb.2.2020.09.25.13.19.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Sep 2020 13:15:59 -0700 (PDT)
-Subject: Re: [PATCH] cpuidle-haltpoll: fix error comments in
- arch_haltpoll_disable
-To:     Li Qiang <liq3ea@163.com>, x86@kernel.org, kvm@vger.kernel.org,
-        mtosatti@redhat.com
-Cc:     liq3ea@gmail.com, linux-kernel@vger.kernel.org
-References: <20200924155800.4939-1-liq3ea@163.com>
+        Fri, 25 Sep 2020 13:19:32 -0700 (PDT)
+Subject: Re: Which clocksource does KVM use?
+To:     Arnabjyoti Kalita <akalita@cs.stonybrook.edu>, kvm@vger.kernel.org
+References: <CAJGDS+FJ1nW8E7f6_4OpbbyNyx9m2pzQA-pRvh3pQgLvdgGbHg@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f505ee30-6d13-5b48-e772-c715b78c2400@redhat.com>
-Date:   Fri, 25 Sep 2020 22:15:58 +0200
+Message-ID: <440273d7-2c10-a433-8250-032a21d5eaf2@redhat.com>
+Date:   Fri, 25 Sep 2020 22:19:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200924155800.4939-1-liq3ea@163.com>
+In-Reply-To: <CAJGDS+FJ1nW8E7f6_4OpbbyNyx9m2pzQA-pRvh3pQgLvdgGbHg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,32 +68,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/20 17:58, Li Qiang wrote:
-> The 'arch_haltpoll_disable' is used to disable guest halt poll.
-> Correct the comments.
+On 25/09/20 04:36, Arnabjyoti Kalita wrote:
 > 
-> Fixes: a1c4423b02b21 ("cpuidle-haltpoll: disable host side polling when kvm virtualized")
-> Signed-off-by: Li Qiang <liq3ea@163.com>
-> ---
->  arch/x86/kernel/kvm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 08320b0b2b27..94ebb31cb4ce 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -954,7 +954,7 @@ void arch_haltpoll_disable(unsigned int cpu)
->  	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
->  		return;
->  
-> -	/* Enable guest halt poll disables host halt poll */
-> +	/* Disable guest halt poll enables host halt poll */
->  	smp_call_function_single(cpu, kvm_enable_host_haltpoll, NULL, 1);
->  }
->  EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
-> 
+> Does KVM change the clocksource in any way? I expect the clocksource
+> to be set at boot time,
+> how and why did the clocksource change later? Does KVM not support the
+> tsc clocksource ?
 
-Queued, thanks.
+The TSC clocksource might fail, in which case Linux will fallback to
+HPET.  Using kvmclock (which you have disabled) avoids the fallback.
 
 Paolo
 
