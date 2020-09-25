@@ -2,174 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98960279345
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 23:24:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15855279375
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 23:26:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729443AbgIYVYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 17:24:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33730 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729352AbgIYVXt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Sep 2020 17:23:49 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA599C0613D6
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:49 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id ic18so267423pjb.3
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=Qb8go8HycpjH5yveF+PfyYHMqnWZLnSFt7U7sjuOnrE=;
-        b=rXGM+YU5BRbaFP3RvtKtUPBu576cAytErIUb3kUMO/E1cSI+ZFLxB0tnLxPI1LI6t0
-         z2M2xLrk9a1hsIaIkdFcuZoa2QppeVZYyTjWqrxoJdyL07HBV1G9CFxpMxIlQgEfeURM
-         mv/Vpgo2dvH5I+ii4RdBDnR35BNsJ7LpSyJHBqQG19B7wDFRlXgwtOWiFIkp5dpjCC3z
-         ImSDfNzIiZthK3CUmuUO/+X4Za4emZUkyOan3n6KgL+ckGJzS1q00jhEL3BNtfjXNpu+
-         DaA7K+S7LmrcGnFRaU16qRHRwpjfP3UOFgEP8W07uwVAD90VlyqEbrJIakBGZabbvJqa
-         70GA==
+        id S1729764AbgIYVZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 17:25:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27495 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729602AbgIYVZJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 17:25:09 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601069108;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=riPiictfFiIPQJlTMTSKGVFjrTw+MUxj8C340DbapCg=;
+        b=B3aBd+Jue2bvAbXjiEM1w6FNqfTOtmarFP/uinTcrEcl+kxzOKfW/unSbDOtcAzJ4Vp7ck
+        /jYEHvh9MyybB5wHQ2yRAEsgQ9Rex7YSLqG4Szx2xt+kk0MEnOilkmht1LW+4+tRyfxtGS
+        ybLhW4rKoJ+Hm0rfpmYnEYS9inxDN0g=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-Jvac28q1OW-BOtrDY0X4fQ-1; Fri, 25 Sep 2020 17:25:06 -0400
+X-MC-Unique: Jvac28q1OW-BOtrDY0X4fQ-1
+Received: by mail-wr1-f72.google.com with SMTP id g6so1588462wrv.3
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:25:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=Qb8go8HycpjH5yveF+PfyYHMqnWZLnSFt7U7sjuOnrE=;
-        b=PjrpexAJ4bQyNh8TxeXlftvJlj5W45Rw/NZgNFpQYfHo34DQVaPEd0GORiml/9Xcxz
-         QIzwwcVSgMDarMMYHuPmgdOVdnjq5X7Xi8r5h+h7bJmdyXjliynxY8vHK1EKwFb3eLGj
-         NsFIMDC9SD0yKqrpn6TYsO/AsyL/I9y7IxBpXDxOKvl02i7am3QwoV3RAx42ycx+2tqb
-         /+SbM6LSc1q1qEfL1Bd+wRAS08rzhjm4vOQVioIWOOT0YGFWemJgV2A9C/iFcBVVItv6
-         LlNpID3+Zuw3z7uyVKpJqRy39vvNHedsLTEWgq5meWlB13rrtGm75bHmaKk/DxpNZ14g
-         WPdQ==
-X-Gm-Message-State: AOAM533Jo1c1fpPGCwWqxMk3O2tgFvF7pyVPuTuXvw3FIkMZbR2jdtLC
-        1za6wqD/jhqydGFmKLmS5Xxc89WGnA4x
-X-Google-Smtp-Source: ABdhPJysWah3jm8O7Wa66GBxjE9TeS1ZTdGpfHZiqr2pWyjnRuqDAwGoFqvCzWelnOy1dlxCz88T8C8/a2zk
-Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a17:90b:15c6:: with SMTP id
- lh6mr30176pjb.0.1601069029061; Fri, 25 Sep 2020 14:23:49 -0700 (PDT)
-Date:   Fri, 25 Sep 2020 14:23:02 -0700
-In-Reply-To: <20200925212302.3979661-1-bgardon@google.com>
-Message-Id: <20200925212302.3979661-23-bgardon@google.com>
-Mime-Version: 1.0
-References: <20200925212302.3979661-1-bgardon@google.com>
-X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [PATCH 22/22] kvm: mmu: Don't clear write flooding count for direct roots
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Cannon Matthews <cannonmatthews@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=riPiictfFiIPQJlTMTSKGVFjrTw+MUxj8C340DbapCg=;
+        b=qYevBqHdUYGL0cevsbfbuRIXrRFUw7DZuwrCaErD5QjT2z99Ood81FPKg/nndDTE7S
+         VfzFrTYl1X7bAhYF7QbUGf82sFFo5Q055YEeWk6XJnXIBoKtQ1/hI/sU/Xxl8DHzSdYd
+         h+OY5TQ035yTJQOemO5tUrPm63bNDfQWH+Qhw83Hmpl4CCt3hWnpLOVchr98mVWK/+xW
+         pvuCg3/asR9I+Gtv2UNysGqWZC8aEdOFttq/A43ddQfAqFe34Jcg6YjhIu2ycCDOsOFG
+         6MEmp8LaF7AmoeT5f8iZyTqO3UYSlqoM6WjcJRTQ1rBRVqWdC00QCkd6Vjh1JoAgNqIC
+         eGUA==
+X-Gm-Message-State: AOAM5302xFKcoQVOcFgek7BmTjPNLosLr836rhFzGdkjaVJT0Dy61Hn3
+        CUCIZfx8wSyunbT6o7uEgPloBxIPmffWVGrDNmqWH8ICtvz5djCm302hgG0QKPORIKznTybawDA
+        mJ2TczMUQ1w9w
+X-Received: by 2002:a7b:c345:: with SMTP id l5mr467587wmj.123.1601069105673;
+        Fri, 25 Sep 2020 14:25:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwF2fQVEB7mP0ZwLnuAqdfMg6p/VNXOUmn9kn/+6c9aR8oV+ZoJZ2QK6RmI7vvWOd/+MBuBrQ==
+X-Received: by 2002:a7b:c345:: with SMTP id l5mr467575wmj.123.1601069105475;
+        Fri, 25 Sep 2020 14:25:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
+        by smtp.gmail.com with ESMTPSA id h2sm4282661wrp.69.2020.09.25.14.25.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Sep 2020 14:25:04 -0700 (PDT)
+Subject: Re: [PATCH v2 6/8] KVM: x86/mmu: Rename 'hlevel' to 'level' in
+ FNAME(fetch)
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Junaid Shahid <junaids@google.com>
+References: <20200923183735.584-1-sean.j.christopherson@intel.com>
+ <20200923183735.584-7-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c7f7d08f-7f1e-455c-e265-c77d78eb537f@redhat.com>
+Date:   Fri, 25 Sep 2020 23:25:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20200923183735.584-7-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Direct roots don't have a write flooding count because the guest can't
-affect that paging structure. Thus there's no need to clear the write
-flooding count on a fast CR3 switch for direct roots.
+On 23/09/20 20:37, Sean Christopherson wrote:
+> Rename 'hlevel', which presumably stands for 'host level', to simply
+> 'level' in FNAME(fetch).  The variable hasn't tracked the host level for
+> quite some time.
 
-Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
-machine. This series introduced no new failures.
+One could say that it stands for "huge" level...  I am not too attached
+to it, the only qualm is that "level" is usually used as the starting or
+current level and rarely as the end level in a loop.  But then it's used
+like that in __direct_map, so...
 
-This series can be viewed in Gerrit at:
-	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2538
-
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/mmu.c     | 15 +++++++++++----
- arch/x86/kvm/mmu/tdp_mmu.c | 12 ++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.h |  2 ++
- 3 files changed, 25 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0ce7720a72d4e..345c934fabf4c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4267,7 +4267,8 @@ static void nonpaging_init_context(struct kvm_vcpu *vcpu,
- 	context->nx = false;
- }
- 
--static inline bool is_root_usable(struct kvm_mmu_root_info *root, gpa_t pgd,
-+static inline bool is_root_usable(struct kvm *kvm,
-+				  struct kvm_mmu_root_info *root, gpa_t pgd,
- 				  union kvm_mmu_page_role role)
- {
- 	return (role.direct || pgd == root->pgd) &&
-@@ -4293,13 +4294,13 @@ static bool cached_root_available(struct kvm_vcpu *vcpu, gpa_t new_pgd,
- 	root.pgd = mmu->root_pgd;
- 	root.hpa = mmu->root_hpa;
- 
--	if (is_root_usable(&root, new_pgd, new_role))
-+	if (is_root_usable(vcpu->kvm, &root, new_pgd, new_role))
- 		return true;
- 
- 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
- 		swap(root, mmu->prev_roots[i]);
- 
--		if (is_root_usable(&root, new_pgd, new_role))
-+		if (is_root_usable(vcpu->kvm, &root, new_pgd, new_role))
- 			break;
- 	}
- 
-@@ -4356,7 +4357,13 @@ static void __kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd,
- 	 */
- 	vcpu_clear_mmio_info(vcpu, MMIO_GVA_ANY);
- 
--	__clear_sp_write_flooding_count(to_shadow_page(vcpu->arch.mmu->root_hpa));
-+	/*
-+	 * If this is a direct root page, it doesn't have a write flooding
-+	 * count. Otherwise, clear the write flooding count.
-+	 */
-+	if (!new_role.direct)
-+		__clear_sp_write_flooding_count(
-+				to_shadow_page(vcpu->arch.mmu->root_hpa));
- }
- 
- void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd, bool skip_tlb_flush,
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 42dde27decd75..c07831b0c73e1 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -124,6 +124,18 @@ static struct kvm_mmu_page *find_tdp_mmu_root_with_role(
- 	return NULL;
- }
- 
-+hpa_t kvm_tdp_mmu_root_hpa_for_role(struct kvm *kvm,
-+				    union kvm_mmu_page_role role)
-+{
-+	struct kvm_mmu_page *root;
-+
-+	root = find_tdp_mmu_root_with_role(kvm, role);
-+	if (root)
-+		return __pa(root->spt);
-+
-+	return INVALID_PAGE;
-+}
-+
- static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
- 						   int level)
- {
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index cc0b7241975aa..2395ffa71bb05 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -9,6 +9,8 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
- 
- bool is_tdp_mmu_root(struct kvm *kvm, hpa_t root);
-+hpa_t kvm_tdp_mmu_root_hpa_for_role(struct kvm *kvm,
-+				    union kvm_mmu_page_role role);
- hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
- void kvm_tdp_mmu_put_root_hpa(struct kvm *kvm, hpa_t root_hpa);
- 
--- 
-2.28.0.709.gb0816b6eb0-goog
+Paolo
 
