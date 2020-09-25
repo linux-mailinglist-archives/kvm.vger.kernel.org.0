@@ -2,165 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F09B0278160
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 09:17:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DA9F2781F6
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 09:49:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727204AbgIYHRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 03:17:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47156 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727132AbgIYHRL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 03:17:11 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601018229;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PNpwrA8lXOvHab/9QCkiz1jy97WA5iVNthaa2NHSm0g=;
-        b=h1D61jko0yjk+8QlvQ49xvmk3OviRHuEDoa6ZrNAOQrVMj8vE8AhfPFzdzZC48+WixjAK6
-        lt0GUb2YipGFZ1Ts3oSSv4FCGsPxjwQjTRQiqL/vxLFlUw9/MBNZH2jLXIemxpF6mX8EXM
-        LHJ0rOHVNZtSNLlSQJSfn/InHcTimsA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-MG7ZzTUBNLahbmi9bl5zxQ-1; Fri, 25 Sep 2020 03:17:03 -0400
-X-MC-Unique: MG7ZzTUBNLahbmi9bl5zxQ-1
-Received: by mail-wm1-f72.google.com with SMTP id s24so496664wmh.1
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 00:17:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PNpwrA8lXOvHab/9QCkiz1jy97WA5iVNthaa2NHSm0g=;
-        b=qv3Tmw4Ssvqt2y/cwceKk4pbROBsO2J5odfm7Z2dMxwzfKIqLf0CDdI4TWWsNHW99z
-         e6elLT7SXdQhauOeoDGpuJrCW2/hmsHgTrqMqS8gfSkw0sS6Q887t4pDWuz4GjUQYDzx
-         iJY+GTwhqIkUy+TnXwaaJgufZn+TmT/KOYCdQ7QN830CdueF43e0EGwITGfgMpHkNmIN
-         6s4a/9f8Mzvp5I/CnUYGwFYcBBhTRantWAUtelgFtvz+uVi+E/R9vsqymLoCnnOdN1Nh
-         bkVIsZO9qAGCSAtiSq+0M7kvDri86tnk3WlokIrs03mn8DhxXxOnQXZXCqmD6yz2awbT
-         ScSA==
-X-Gm-Message-State: AOAM5320t9SbFtx6klw/Z5NttNytv//hs+TVQekvk8eS5rZMz12MBUfe
-        fC1LWlBuRR4fANoJdK9Rmy/6dZiF9ICNzqLneiru18/iJTs4aJV2Mjm15Y1AI5W85FRMlW6dMx4
-        A11WeAfmrGiUj
-X-Received: by 2002:adf:ec90:: with SMTP id z16mr2734724wrn.145.1601018221503;
-        Fri, 25 Sep 2020 00:17:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzDhvIZou+0OaNn+/6RrZTfn4XEB6Vgx6udwTFWZmSQw2PZsRw/+5bwv8MDOgaODUknADHsnQ==
-X-Received: by 2002:adf:ec90:: with SMTP id z16mr2734696wrn.145.1601018221170;
-        Fri, 25 Sep 2020 00:17:01 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
-        by smtp.gmail.com with ESMTPSA id n4sm1721900wrp.61.2020.09.25.00.17.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Sep 2020 00:17:00 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] configure: Test if compiler supports -m16
- on x86
-To:     Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org
-Cc:     Thomas Huth <thuth@redhat.com>
-References: <20200924182401.95891-1-r.bolshakov@yadro.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <36271d1b-70b5-a6d8-41df-d1c94a9c6504@redhat.com>
-Date:   Fri, 25 Sep 2020 09:17:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1727201AbgIYHtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 03:49:43 -0400
+Received: from mga01.intel.com ([192.55.52.88]:1027 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726990AbgIYHtn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Sep 2020 03:49:43 -0400
+IronPort-SDR: VWVG6dYUdkDj8A+M49SoVMTc5cfJtHOnPspx5c0fupaNo9ifpbsbGDCKn0MfAQuglp7i9s9JrP
+ LzSx60AEq8Tg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9754"; a="179549932"
+X-IronPort-AV: E=Sophos;i="5.77,301,1596524400"; 
+   d="scan'208";a="179549932"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2020 00:36:40 -0700
+IronPort-SDR: v0JNZ2kPgKyEGuUFxrezrdcDS9weHkNrQ48xyt9gP3NehIRlSTyFodjRVAzdsFsTJn2UwtxN74
+ R5T+EBlMxKDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,301,1596524400"; 
+   d="scan'208";a="306187525"
+Received: from yadong-antec.sh.intel.com ([10.239.158.61])
+  by orsmga003.jf.intel.com with ESMTP; 25 Sep 2020 00:36:38 -0700
+From:   yadong.qi@intel.com
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, Yadong Qi <yadong.qi@intel.com>
+Subject: [kvm-unit-tests PATCH] x86: vmx: Add test for SIPI signal processing
+Date:   Fri, 25 Sep 2020 15:36:24 +0800
+Message-Id: <20200925073624.245578-1-yadong.qi@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200924182401.95891-1-r.bolshakov@yadro.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/20 20:24, Roman Bolshakov wrote:
-> -m16 option is available only since GCC 4.9.0 [1]. That causes a build
-> failure on centos-7 [2] that has GCC 4.8.5.
-> 
-> Fallback to -m32 if -m16 is not available.
-> 
-> 1. http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59672
-> 2. https://gitlab.com/bonzini/kvm-unit-tests/-/jobs/755368387
-> 
-> Fixes: 2616ad934e2 ("x86: realmode: Workaround clang issues")
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+From: Yadong Qi <yadong.qi@intel.com>
 
-This is a simpler way to do it:
+The test verifies the following functionality:
+A SIPI signal received when CPU is in VMX non-root mode:
+    if ACTIVITY_STATE == WAIT_SIPI
+        VMExit with (reason == 4)
+    else
+        SIPI signal is ignored
 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 5567d66..781dba6 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -72,7 +72,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
- 	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
- 	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
+The test cases depends on IA32_VMX_MISC:bit(8), if this bit is 1
+then the test cases would be executed, otherwise the test cases
+would be skiped.
+
+Signed-off-by: Yadong Qi <yadong.qi@intel.com>
+---
+ lib/x86/msr.h     |   1 +
+ x86/unittests.cfg |   8 +++
+ x86/vmx.c         |   2 +-
+ x86/vmx.h         |   3 ++
+ x86/vmx_tests.c   | 134 ++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 147 insertions(+), 1 deletion(-)
+
+diff --git a/lib/x86/msr.h b/lib/x86/msr.h
+index 6ef5502..29e3947 100644
+--- a/lib/x86/msr.h
++++ b/lib/x86/msr.h
+@@ -421,6 +421,7 @@
+ #define MSR_IA32_VMX_TRUE_ENTRY		0x00000490
  
--$(TEST_DIR)/realmode.o: bits = 16
-+$(TEST_DIR)/realmode.o: bits := $(if $(call cc-option,-m16,""),16,32)
+ /* MSR_IA32_VMX_MISC bits */
++#define MSR_IA32_VMX_MISC_ACTIVITY_WAIT_SIPI		(1ULL << 8)
+ #define MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS	(1ULL << 29)
  
- $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
-
-It's a tiny bit slower because the check is done on every compilation,
-but only if realmode.o is stale.
-
-It passes CI (https://gitlab.com/bonzini/kvm-unit-tests/-/pipelines/194356382)
-so I plan to commit it.
-
-Paolo
-
-> ---
->  configure           | 11 +++++++++++
->  x86/Makefile.common |  4 ++++
->  2 files changed, 15 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index f930543..7dc2e3b 100755
-> --- a/configure
-> +++ b/configure
-> @@ -16,6 +16,7 @@ pretty_print_stacks=yes
->  environ_default=yes
->  u32_long=
->  wa_divide=
-> +m16_support=
->  vmm="qemu"
->  errata_force=0
->  erratatxt="$srcdir/errata.txt"
-> @@ -167,6 +168,15 @@ EOF
->    rm -f lib-test.{o,S}
->  fi
->  
-> +# check if -m16 is supported
-> +if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-> +  cat << EOF > lib-test.c
-> +int f(int a, int b) { return a + b; }
-> +EOF
-> +  m16_support=$("$cross_prefix$cc" -m16 -c lib-test.c >/dev/null 2>&1 && echo yes)
-> +  rm -f lib-test.{o,c}
-> +fi
-> +
->  # require enhanced getopt
->  getopt -T > /dev/null
->  if [ $? -ne 4 ]; then
-> @@ -224,6 +234,7 @@ ENVIRON_DEFAULT=$environ_default
->  ERRATATXT=$erratatxt
->  U32_LONG_FMT=$u32_long
->  WA_DIVIDE=$wa_divide
-> +M16_SUPPORT=$m16_support
->  EOF
->  
->  cat <<EOF > lib/config.h
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 5567d66..553bf49 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -72,7 +72,11 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
->  	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
->  	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
->  
-> +ifeq ($(M16_SUPPORT),yes)
->  $(TEST_DIR)/realmode.o: bits = 16
-> +else
-> +$(TEST_DIR)/realmode.o: bits = 32
-> +endif
->  
->  $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
->  
-> 
+ #define MSR_IA32_TSCDEADLINE		0x000006e0
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 3a79151..3e14a65 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -293,6 +293,14 @@ arch = x86_64
+ groups = vmx
+ timeout = 10
+ 
++[vmx_sipi_signal_test]
++file = vmx.flat
++smp = 2
++extra_params = -cpu host,+vmx -m 2048 -append vmx_sipi_signal_test
++arch = x86_64
++groups = vmx
++timeout = 10
++
+ [vmx_apic_passthrough_tpr_threshold_test]
+ file = vmx.flat
+ extra_params = -cpu host,+vmx -m 2048 -append vmx_apic_passthrough_tpr_threshold_test
+diff --git a/x86/vmx.c b/x86/vmx.c
+index 07415b4..e3a3fbf 100644
+--- a/x86/vmx.c
++++ b/x86/vmx.c
+@@ -1369,7 +1369,7 @@ static void init_vmcs_guest(void)
+ 	vmcs_write(GUEST_INTR_STATE, 0);
+ }
+ 
+-static int init_vmcs(struct vmcs **vmcs)
++int init_vmcs(struct vmcs **vmcs)
+ {
+ 	*vmcs = alloc_page();
+ 	(*vmcs)->hdr.revision_id = basic.revision;
+diff --git a/x86/vmx.h b/x86/vmx.h
+index d1c2436..9b17074 100644
+--- a/x86/vmx.h
++++ b/x86/vmx.h
+@@ -697,6 +697,8 @@ enum vm_entry_failure_code {
+ 
+ #define ACTV_ACTIVE		0
+ #define ACTV_HLT		1
++#define ACTV_SHUTDOWN		2
++#define ACTV_WAIT_SIPI		3
+ 
+ /*
+  * VMCS field encoding:
+@@ -856,6 +858,7 @@ static inline bool invvpid(unsigned long type, u64 vpid, u64 gla)
+ 
+ void enable_vmx(void);
+ void init_vmx(u64 *vmxon_region);
++int init_vmcs(struct vmcs **vmcs);
+ 
+ const char *exit_reason_description(u64 reason);
+ void print_vmexit_info(union exit_reason exit_reason);
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 22f0c7b..45b0f80 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -9608,6 +9608,139 @@ static void vmx_init_signal_test(void)
+ 	 */
+ }
+ 
++#define SIPI_SIGNAL_TEST_DELAY	100000000ULL
++
++static void vmx_sipi_test_guest(void)
++{
++	if (apic_id() == 0) {
++		/* wait AP enter guest with activity=WAIT_SIPI */
++		while (vmx_get_test_stage() != 1)
++			;
++		delay(SIPI_SIGNAL_TEST_DELAY);
++
++		/* First SIPI signal */
++		apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
++		report(1, "BSP(L2): Send first SIPI to cpu[%d]", id_map[1]);
++
++		/* wait AP enter guest */
++		while (vmx_get_test_stage() != 2)
++			;
++		delay(SIPI_SIGNAL_TEST_DELAY);
++
++		/* Second SIPI signal should be ignored since AP is not in WAIT_SIPI state */
++		apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
++		report(1, "BSP(L2): Send second SIPI to cpu[%d]", id_map[1]);
++
++		/* Delay a while to check whether second SIPI would cause VMExit */
++		delay(SIPI_SIGNAL_TEST_DELAY);
++
++		/* Test is done, notify AP to exit test */
++		vmx_set_test_stage(3);
++
++		/* wait AP exit non-root mode */
++		while (vmx_get_test_stage() != 5)
++			;
++	} else {
++		/* wait BSP notify test is done */
++		while (vmx_get_test_stage() != 3)
++			;
++
++		/* AP exit guest */
++		vmx_set_test_stage(4);
++	}
++}
++
++static void sipi_test_ap_thread(void *data)
++{
++	struct vmcs *ap_vmcs;
++	u64 *ap_vmxon_region;
++	void *ap_stack, *ap_syscall_stack;
++	u64 cpu_ctrl_0 = CPU_SECONDARY;
++	u64 cpu_ctrl_1 = 0;
++
++	/* Enter VMX operation (i.e. exec VMXON) */
++	ap_vmxon_region = alloc_page();
++	enable_vmx();
++	init_vmx(ap_vmxon_region);
++	_vmx_on(ap_vmxon_region);
++	init_vmcs(&ap_vmcs);
++	make_vmcs_current(ap_vmcs);
++
++	/* Set stack for AP */
++	ap_stack = alloc_page();
++	ap_syscall_stack = alloc_page();
++	vmcs_write(GUEST_RSP, (u64)(ap_stack + PAGE_SIZE - 1));
++	vmcs_write(GUEST_SYSENTER_ESP, (u64)(ap_syscall_stack + PAGE_SIZE - 1));
++
++	/* passthrough lapic to L2 */
++	disable_intercept_for_x2apic_msrs();
++	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) | cpu_ctrl_0);
++	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | cpu_ctrl_1);
++
++	/* Set guest activity state to wait-for-SIPI state */
++	vmcs_write(GUEST_ACTV_STATE, ACTV_WAIT_SIPI);
++
++	vmx_set_test_stage(1);
++
++	/* AP enter guest */
++	enter_guest();
++
++	if (vmcs_read(EXI_REASON) == VMX_SIPI) {
++		report(1, "AP: Handle SIPI VMExit");
++		vmcs_write(GUEST_ACTV_STATE, ACTV_ACTIVE);
++		vmx_set_test_stage(2);
++	} else {
++		report(0, "AP: Unexpected VMExit, reason=%ld", vmcs_read(EXI_REASON));
++		vmx_off();
++		return;
++	}
++
++	/* AP enter guest */
++	enter_guest();
++
++	report(vmcs_read(EXI_REASON) != VMX_SIPI,
++		"AP: should no SIPI VMExit since activity is not in WAIT_SIPI state");
++
++	/* notify BSP that AP is already exit from non-root mode */
++	vmx_set_test_stage(5);
++
++	/* Leave VMX operation */
++	vmx_off();
++}
++
++static void vmx_sipi_signal_test(void)
++{
++	if (!(rdmsr(MSR_IA32_VMX_MISC) & MSR_IA32_VMX_MISC_ACTIVITY_WAIT_SIPI)) {
++		printf("\tACTIVITY_WAIT_SIPI state is not supported.\n");
++		return;
++	}
++
++	if (cpu_count() < 2) {
++		report_skip(__func__);
++		return;
++	}
++
++	u64 cpu_ctrl_0 = CPU_SECONDARY;
++	u64 cpu_ctrl_1 = 0;
++
++	/* passthrough lapic */
++	disable_intercept_for_x2apic_msrs();
++	vmcs_write(PIN_CONTROLS, vmcs_read(PIN_CONTROLS) & ~PIN_EXTINT);
++	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) | cpu_ctrl_0);
++	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | cpu_ctrl_1);
++
++	test_set_guest(vmx_sipi_test_guest);
++
++	/* start AP */
++	on_cpu_async(1, sipi_test_ap_thread, NULL);
++
++	vmx_set_test_stage(0);
++
++	/* BSP enter guest */
++	enter_guest();
++}
++
++
+ enum vmcs_access {
+ 	ACCESS_VMREAD,
+ 	ACCESS_VMWRITE,
+@@ -10244,6 +10377,7 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(vmx_apic_passthrough_thread_test),
+ 	TEST(vmx_apic_passthrough_tpr_threshold_test),
+ 	TEST(vmx_init_signal_test),
++	TEST(vmx_sipi_signal_test),
+ 	/* VMCS Shadowing tests */
+ 	TEST(vmx_vmcs_shadow_test),
+ 	/* Regression tests */
+-- 
+2.25.1
 
