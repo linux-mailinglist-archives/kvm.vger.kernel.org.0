@@ -2,78 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7905278ED8
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 18:40:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09677278EED
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 18:43:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729337AbgIYQkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 12:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45960 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728056AbgIYQkV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Sep 2020 12:40:21 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD26EC0613D4
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 09:40:20 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id h17so2910159otr.1
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 09:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=adS2w4MfZVtQ+JdOzVjFl88CdbAyPhM8+osYUFtdj/U=;
-        b=m5NtFveSMLhfuRJGGdkLfEMup8cEopZ/jbnqb7UUZO0HMgcTV545eLiYK19f2Rtic9
-         XnixmPOvGbambOL+DhjMVQ9mGnjHwL1P63lW23ZeaEO5CtuX7BJVAuDISt87ZaFzaqji
-         +TQjVytRPzlc/f3cs+CnYLbe28QaWc/I3Y0KTEmvF+sQfXu+M9+G5B4+IG9tJkm66rVa
-         LssiqNZHVitPn5b4xTv8RcqNDD6hXDLkYK1+zwQcydYyoFgi6iBfLBm8BNH2WMTlsoAi
-         tCmQl5+2u9BjRUgBdaRT/uOKAwywJ/Qoc9DxSCWSzydl0lJh1NbwKzGeQbxoDOP7vrQP
-         gOSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=adS2w4MfZVtQ+JdOzVjFl88CdbAyPhM8+osYUFtdj/U=;
-        b=M7UP99dl95Sa3UQNvTYBYWLa9nnrpl7/OLoe4COxxJxiQRb+2/md7ApuZGBNygj8TS
-         gv7nofIw33/dp+emAD/q4lO+gXWZ0pq4EvrhQmMBOd0Q0W+wYZxCCRGH3XpSwKNuLDoD
-         TqgGG4Zo4OAc62P/HufF8LWrg2fHe5AH3U4ksAAHPIVXyCV8lPTCWAbAxHGJQIDg6seI
-         hAOIkIOaxB7JS8T/OQc1m1n/0MRBDBWOkaRbKXKSJetpgYBiJO/DWViTmmdaS4iT2l97
-         2VpJEt4whjFvGUvfgYKncF3FPr+GkLmrkPSCUpb8TtojoLlpNdSif2TKBcOEEkDnqfBn
-         un1g==
-X-Gm-Message-State: AOAM531cz112QeRl5hB8DlCEmAH7Ux0zj714drMn45V5x5OG4M4KeiOE
-        evnfculRziCqnJqkRDcVLXp76o8SjmwxSSRIZj/ciTcKpLs=
-X-Google-Smtp-Source: ABdhPJy/QdDf8ZZphXLshFnr46sMAVEmrQ6ga42OUf0dnO02EpnX+XXwrzbC1TlH5wbcBksxHK3/H9KCAGjVDCAkWbM=
-X-Received: by 2002:a05:6830:164e:: with SMTP id h14mr894858otr.56.1601052020022;
- Fri, 25 Sep 2020 09:40:20 -0700 (PDT)
+        id S1729078AbgIYQnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 12:43:37 -0400
+Received: from mga03.intel.com ([134.134.136.65]:28425 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728056AbgIYQng (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Sep 2020 12:43:36 -0400
+IronPort-SDR: tA0bg4iFV4nYZEbOmQKiRyruy7ZfU15ZfSR/iK9i/IFSAlhMxrAFkyOFwqH2gK9vLa0vUMeLXi
+ vP7g29AlPNwg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9755"; a="161667894"
+X-IronPort-AV: E=Sophos;i="5.77,302,1596524400"; 
+   d="scan'208";a="161667894"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2020 09:43:34 -0700
+IronPort-SDR: f4B58X8SpgGLHw963RM5Ma+/Ae2KBFNCvbxcs1+f9vGq3wJ3fv8bTzD2xJgaEXP6yOryHuJmJh
+ /7ANeBf3Roeg==
+X-IronPort-AV: E=Sophos;i="5.77,302,1596524400"; 
+   d="scan'208";a="512229079"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2020 09:43:34 -0700
+Date:   Fri, 25 Sep 2020 09:43:33 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Li RongQing <lirongqing@baidu.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH][v2] KVM: x86/mmu: fix counting of rmap entries in
+ pte_list_add
+Message-ID: <20200925164332.GA31528@linux.intel.com>
+References: <1600837138-21110-1-git-send-email-lirongqing@baidu.com>
 MIME-Version: 1.0
-References: <20200925143422.21718-1-graf@amazon.com> <20200925143422.21718-2-graf@amazon.com>
-In-Reply-To: <20200925143422.21718-2-graf@amazon.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 25 Sep 2020 09:40:08 -0700
-Message-ID: <CALMp9eSDH1F70i=-3wrC55ipz91qygrsPtw7RL4iCi09A-Da6A@mail.gmail.com>
-Subject: Re: [PATCH v8 1/8] KVM: x86: Return -ENOENT on unimplemented MSRs
-To:     Alexander Graf <graf@amazon.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        KarimAllah Raslan <karahmed@amazon.de>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1600837138-21110-1-git-send-email-lirongqing@baidu.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 7:34 AM Alexander Graf <graf@amazon.com> wrote:
->
-> When we find an MSR that we can not handle, bubble up that error code as
-> MSR error return code. Follow up patches will use that to expose the fact
-> that an MSR is not handled by KVM to user space.
->
-> Suggested-by: Aaron Lewis <aaronlewis@google.com>
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On Wed, Sep 23, 2020 at 12:58:58PM +0800, Li RongQing wrote:
+> counting of rmap entries was missed when desc->sptes is full
+> and desc->more is NULL
+> 
+> and merging two PTE_LIST_EXT-1 check as one, to avoids the
+> extra comparison to give slightly optimization
+
+Please write complete sentences, and use proper capitalization and punctuation.
+It's not a big deal for short changelogs, but it's crucial for readability of
+larger changelogs.
+
+E.g.
+
+  Fix an off-by-one style bug in pte_list_add() where it failed to account
+  the last full set of SPTEs, i.e. when desc->sptes is full and desc->more
+  is NULL.
+
+  Merge the two "PTE_LIST_EXT-1" checks as part of the fix to avoid an
+  extra comparison.
+
+> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+No need to give me credit, I just nitpicked the code, identifying the bug
+and the fix was all you. :-)
+
+Thanks for the fix!
+
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+
+Paolo,
+
+Although it's a bug fix, I don't think this needs a Fixes / Cc:stable.  The bug
+only results in rmap recycling being delayed by one rmap.  Stable kernels can
+probably live with an off-by-one bug given that RMAP_RECYCLE_THRESHOLD is
+completely arbitrary. :-)
+
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+> ---
+> diff with v1: merge two check as one
+> 
+>  arch/x86/kvm/mmu/mmu.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index a5d0207e7189..c4068be6bb3f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1273,12 +1273,14 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
+>  	} else {
+>  		rmap_printk("pte_list_add: %p %llx many->many\n", spte, *spte);
+>  		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
+> -		while (desc->sptes[PTE_LIST_EXT-1] && desc->more) {
+> -			desc = desc->more;
+> +		while (desc->sptes[PTE_LIST_EXT-1]) {
+>  			count += PTE_LIST_EXT;
+> -		}
+> -		if (desc->sptes[PTE_LIST_EXT-1]) {
+> -			desc->more = mmu_alloc_pte_list_desc(vcpu);
+> +
+> +			if (!desc->more) {
+> +				desc->more = mmu_alloc_pte_list_desc(vcpu);
+> +				desc = desc->more;
+> +				break;
+> +			}
+>  			desc = desc->more;
+>  		}
+>  		for (i = 0; desc->sptes[i]; ++i)
+> -- 
+> 2.16.2
+> 
