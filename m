@@ -2,76 +2,358 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BEF5F2783CF
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 11:18:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A56552783E4
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 11:24:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727723AbgIYJSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 05:18:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34145 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727428AbgIYJSH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 05:18:07 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601025486;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zdNyfj6okx2W0CrZGKgNIYWl+PLE9oMxshn2W1/Qz+k=;
-        b=Q2vT9869rer+gbOLhliJeC0GXNuBPt2hSyb5c3k2omDDn/J3wnQjZrxtrGehtK18Be+UbH
-        p+tP67Azow2WCdF5vUKxNo6k7EelzTA09kAbAleVaxZY6/Na3Ctc6fsRSNLWNTlGIMI1uF
-        sNbmhCpYxB/cfEj9ThFS0s13SBcUOL0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-HqoZG-fBNeqlt1m3Ax7ZHg-1; Fri, 25 Sep 2020 05:18:02 -0400
-X-MC-Unique: HqoZG-fBNeqlt1m3Ax7ZHg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54F131091068;
-        Fri, 25 Sep 2020 09:18:00 +0000 (UTC)
-Received: from gondolin (ovpn-112-192.ams2.redhat.com [10.36.112.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 083AD5D9F1;
-        Fri, 25 Sep 2020 09:17:48 +0000 (UTC)
-Date:   Fri, 25 Sep 2020 11:17:46 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
-        rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 3/7] s390x/pci: create a header dedicated to PCI CLP
-Message-ID: <20200925111746.2e3bf28f.cohuck@redhat.com>
-In-Reply-To: <1600529672-10243-4-git-send-email-mjrosato@linux.ibm.com>
-References: <1600529672-10243-1-git-send-email-mjrosato@linux.ibm.com>
-        <1600529672-10243-4-git-send-email-mjrosato@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727520AbgIYJYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 05:24:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56684 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727132AbgIYJYU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 05:24:20 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08P94q3X031249;
+        Fri, 25 Sep 2020 05:24:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=uvTWGz7Rwkk1/pmj+FJup9/s6JnUUQ7K6DxlYonyRZQ=;
+ b=FCCqtt82JCKqcdhb1z6kd/HamqjqDurGcL0Dpk6UgjQcE/2WZvcvZ6nrwqS7cP7UUZZq
+ lneIsi7fkm2gyfGiewMepIuA6I1/65S8g+hpl3yJlODlTH6y2tmLIGpFw4z9enxoTFUz
+ qXGPuS7PoIQ8nii8LMheFunem3X9zmDLYlC00CrjJMt2ewaF+DmarmQ+GK2rNVFnOGdT
+ XzgCyxsU6fYTNmDajjamLaFAZSy5MrTAM0VYE/l973CbW6qwgGixTMRW8S9QGq44bCX5
+ URsjOHdxY489O1hFKQcHyEJYzI37ZxOx9cp3NoY9ayRfR0l6eBCkupNEin+HySU5FJKt gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33sdbwryrr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Sep 2020 05:24:18 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08P95nW3035877;
+        Fri, 25 Sep 2020 05:24:18 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33sdbwryr3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Sep 2020 05:24:17 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08P9IRRL004939;
+        Fri, 25 Sep 2020 09:24:15 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 33n9m7u63s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Sep 2020 09:24:15 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08P9OC4J18022798
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Sep 2020 09:24:12 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B8F0C52050;
+        Fri, 25 Sep 2020 09:24:12 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.53.230])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 079BF5205F;
+        Fri, 25 Sep 2020 09:24:11 +0000 (GMT)
+Date:   Fri, 25 Sep 2020 11:24:10 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v10 04/16] s390/zcrypt: driver callback to indicate
+ resource in use
+Message-ID: <20200925112410.4134faae.pasic@linux.ibm.com>
+In-Reply-To: <20200821195616.13554-5-akrowiak@linux.ibm.com>
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+        <20200821195616.13554-5-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-25_02:2020-09-24,2020-09-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 impostorscore=0 suspectscore=0 spamscore=0
+ malwarescore=0 bulkscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009250063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 19 Sep 2020 11:34:28 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On Fri, 21 Aug 2020 15:56:04 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-> From: Pierre Morel <pmorel@linux.ibm.com>
+> Introduces a new driver callback to prevent a root user from unbinding
+> an AP queue from its device driver if the queue is in use. The intent of
+> this callback is to provide a driver with the means to prevent a root user
+> from inadvertently taking a queue away from a matrix mdev and giving it to
+> the host while it is assigned to the matrix mdev. The callback will
+> be invoked whenever a change to the AP bus's sysfs apmask or aqmask
+> attributes would result in one or more AP queues being removed from its
+> driver. If the callback responds in the affirmative for any driver
+> queried, the change to the apmask or aqmask will be rejected with a device
+> in use error.
 > 
-> To have a clean separation between s390-pci-bus.h and s390-pci-inst.h
-> headers we export the PCI CLP instructions in a dedicated header.
+> For this patch, only non-default drivers will be queried. Currently,
+> there is only one non-default driver, the vfio_ap device driver. The
+> vfio_ap device driver facilitates pass-through of an AP queue to a
+> guest. The idea here is that a guest may be administered by a different
+> sysadmin than the host and we don't want AP resources to unexpectedly
+> disappear from a guest's AP configuration (i.e., adapters, domains and
+> control domains assigned to the matrix mdev). This will enforce the proper
+> procedure for removing AP resources intended for guest usage which is to
+> first unassign them from the matrix mdev, then unbind them from the
+> vfio_ap device driver.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Reported-by: kernel test robot <lkp@intel.com>
 > ---
->  hw/s390x/s390-pci-bus.h  |   1 +
->  hw/s390x/s390-pci-clp.h  | 211 +++++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/s390-pci-inst.h | 196 -------------------------------------------
->  3 files changed, 212 insertions(+), 196 deletions(-)
->  create mode 100644 hw/s390x/s390-pci-clp.h
+>  drivers/s390/crypto/ap_bus.c | 148 ++++++++++++++++++++++++++++++++---
+>  drivers/s390/crypto/ap_bus.h |   4 +
+>  2 files changed, 142 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
+> index 24a1940b829e..db27bd931308 100644
+> --- a/drivers/s390/crypto/ap_bus.c
+> +++ b/drivers/s390/crypto/ap_bus.c
+> @@ -35,6 +35,7 @@
+>  #include <linux/mod_devicetable.h>
+>  #include <linux/debugfs.h>
+>  #include <linux/ctype.h>
+> +#include <linux/module.h>
+>  
+>  #include "ap_bus.h"
+>  #include "ap_debug.h"
+> @@ -889,6 +890,23 @@ static int modify_bitmap(const char *str, unsigned long *bitmap, int bits)
+>  	return 0;
+>  }
+>  
+> +static int ap_parse_bitmap_str(const char *str, unsigned long *bitmap, int bits,
+> +			       unsigned long *newmap)
+> +{
+> +	unsigned long size;
+> +	int rc;
+> +
+> +	size = BITS_TO_LONGS(bits)*sizeof(unsigned long);
+> +	if (*str == '+' || *str == '-') {
+> +		memcpy(newmap, bitmap, size);
+> +		rc = modify_bitmap(str, newmap, bits);
+> +	} else {
+> +		memset(newmap, 0, size);
+> +		rc = hex2bitmap(str, newmap, bits);
+> +	}
+> +	return rc;
+> +}
+> +
+>  int ap_parse_mask_str(const char *str,
+>  		      unsigned long *bitmap, int bits,
+>  		      struct mutex *lock)
+> @@ -908,14 +926,7 @@ int ap_parse_mask_str(const char *str,
+>  		kfree(newmap);
+>  		return -ERESTARTSYS;
+>  	}
+> -
+> -	if (*str == '+' || *str == '-') {
+> -		memcpy(newmap, bitmap, size);
+> -		rc = modify_bitmap(str, newmap, bits);
+> -	} else {
+> -		memset(newmap, 0, size);
+> -		rc = hex2bitmap(str, newmap, bits);
+> -	}
+> +	rc = ap_parse_bitmap_str(str, bitmap, bits, newmap);
+>  	if (rc == 0)
+>  		memcpy(bitmap, newmap, size);
+>  	mutex_unlock(lock);
+> @@ -1107,12 +1118,70 @@ static ssize_t apmask_show(struct bus_type *bus, char *buf)
+>  	return rc;
+>  }
+>  
+> +static int __verify_card_reservations(struct device_driver *drv, void *data)
+> +{
+> +	int rc = 0;
+> +	struct ap_driver *ap_drv = to_ap_drv(drv);
+> +	unsigned long *newapm = (unsigned long *)data;
+> +
+> +	/*
+> +	 * No need to verify whether the driver is using the queues if it is the
+> +	 * default driver.
+> +	 */
+> +	if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
+> +		return 0;
+> +
+> +	/* The non-default driver's module must be loaded */
+> +	if (!try_module_get(drv->owner))
+> +		return 0;
+> +
+> +	if (ap_drv->in_use)
+> +		if (ap_drv->in_use(newapm, ap_perms.aqm))
+> +			rc = -EADDRINUSE;
+> +
+> +	module_put(drv->owner);
+> +
+> +	return rc;
+> +}
+> +
+> +static int apmask_commit(unsigned long *newapm)
+> +{
+> +	int rc;
+> +	unsigned long reserved[BITS_TO_LONGS(AP_DEVICES)];
+> +
+> +	/*
+> +	 * Check if any bits in the apmask have been set which will
+> +	 * result in queues being removed from non-default drivers
+> +	 */
+> +	if (bitmap_andnot(reserved, newapm, ap_perms.apm, AP_DEVICES)) {
+> +		rc = bus_for_each_drv(&ap_bus_type, NULL, reserved,
+> +				      __verify_card_reservations);
+> +		if (rc)
+> +			return rc;
+> +	}
 
-Looks sane; but I wonder whether we should move the stuff under
-include/hw/s390x/.
+I understand the above asks all the non-default drivers if some of the
+queues are 'used'. But AFAIU this reflects the truth ap_drv->in_use()
+is only telling us something about a given moment...
+
+> +
+> +	memcpy(ap_perms.apm, newapm, APMASKSIZE);
+
+... So I fail to understand what will prevent us from performing a
+successful commit if some of the resources become 'used' between
+the call to the in_use() callback and the memcpy.
+
+Of course I might be wrong.
+
+BTW I was never a fan of this mechanism, so I don't mind if it
+does not work perfectly, and this should catch most of the cases. Just
+want to make sure we don't introduce more confusion than necessary.
+
+> +
+> +	return 0;
+> +}
+> +
+>  static ssize_t apmask_store(struct bus_type *bus, const char *buf,
+>  			    size_t count)
+>  {
+>  	int rc;
+> +	DECLARE_BITMAP(newapm, AP_DEVICES);
+> +
+> +	if (mutex_lock_interruptible(&ap_perms_mutex))
+> +		return -ERESTARTSYS;
+> +
+> +	rc = ap_parse_bitmap_str(buf, ap_perms.apm, AP_DEVICES, newapm);
+> +	if (rc)
+> +		goto done;
+>  
+> -	rc = ap_parse_mask_str(buf, ap_perms.apm, AP_DEVICES, &ap_perms_mutex);
+> +	rc = apmask_commit(newapm);
+> +
+> +done:
+> +	mutex_unlock(&ap_perms_mutex);
+>  	if (rc)
+>  		return rc;
+>  
+> @@ -1138,12 +1207,71 @@ static ssize_t aqmask_show(struct bus_type *bus, char *buf)
+>  	return rc;
+>  }
+>  
+> +static int __verify_queue_reservations(struct device_driver *drv, void *data)
+> +{
+> +	int rc = 0;
+> +	struct ap_driver *ap_drv = to_ap_drv(drv);
+> +	unsigned long *newaqm = (unsigned long *)data;
+> +
+> +	/*
+> +	 * If the reserved bits do not identify queues reserved for use by the
+> +	 * non-default driver, there is no need to verify the driver is using
+> +	 * the queues.
+> +	 */
+> +	if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
+> +		return 0;
+> +
+> +	/* The non-default driver's module must be loaded */
+> +	if (!try_module_get(drv->owner))
+> +		return 0;
+> +
+> +	if (ap_drv->in_use)
+> +		if (ap_drv->in_use(ap_perms.apm, newaqm))
+> +			rc = -EADDRINUSE;
+> +
+> +	module_put(drv->owner);
+> +
+> +	return rc;
+> +}
+> +
+> +static int aqmask_commit(unsigned long *newaqm)
+> +{
+> +	int rc;
+> +	unsigned long reserved[BITS_TO_LONGS(AP_DOMAINS)];
+> +
+> +	/*
+> +	 * Check if any bits in the aqmask have been set which will
+> +	 * result in queues being removed from non-default drivers
+> +	 */
+> +	if (bitmap_andnot(reserved, newaqm, ap_perms.aqm, AP_DOMAINS)) {
+> +		rc = bus_for_each_drv(&ap_bus_type, NULL, reserved,
+> +				      __verify_queue_reservations);
+> +		if (rc)
+> +			return rc;
+> +	}
+> +
+> +	memcpy(ap_perms.aqm, newaqm, AQMASKSIZE);
+> +
+
+Same here.
+
+Regards,
+Halil
+
+> +	return 0;
+> +}
+> +
+>  static ssize_t aqmask_store(struct bus_type *bus, const char *buf,
+>  			    size_t count)
+>  {
+>  	int rc;
+> +	DECLARE_BITMAP(newaqm, AP_DOMAINS);
+>  
+> -	rc = ap_parse_mask_str(buf, ap_perms.aqm, AP_DOMAINS, &ap_perms_mutex);
+> +	if (mutex_lock_interruptible(&ap_perms_mutex))
+> +		return -ERESTARTSYS;
+> +
+> +	rc = ap_parse_bitmap_str(buf, ap_perms.aqm, AP_DOMAINS, newaqm);
+> +	if (rc)
+> +		goto done;
+> +
+> +	rc = aqmask_commit(newaqm);
+> +
+> +done:
+> +	mutex_unlock(&ap_perms_mutex);
+>  	if (rc)
+>  		return rc;
+>  
+> diff --git a/drivers/s390/crypto/ap_bus.h b/drivers/s390/crypto/ap_bus.h
+> index 1ea046324e8f..48c57b3d53a0 100644
+> --- a/drivers/s390/crypto/ap_bus.h
+> +++ b/drivers/s390/crypto/ap_bus.h
+> @@ -136,6 +136,7 @@ struct ap_driver {
+>  
+>  	int (*probe)(struct ap_device *);
+>  	void (*remove)(struct ap_device *);
+> +	bool (*in_use)(unsigned long *apm, unsigned long *aqm);
+>  };
+>  
+>  #define to_ap_drv(x) container_of((x), struct ap_driver, driver)
+> @@ -255,6 +256,9 @@ void ap_queue_init_state(struct ap_queue *aq);
+>  struct ap_card *ap_card_create(int id, int queue_depth, int raw_device_type,
+>  			       int comp_device_type, unsigned int functions);
+>  
+> +#define APMASKSIZE (BITS_TO_LONGS(AP_DEVICES) * sizeof(unsigned long))
+> +#define AQMASKSIZE (BITS_TO_LONGS(AP_DOMAINS) * sizeof(unsigned long))
+> +
+>  struct ap_perms {
+>  	unsigned long ioctlm[BITS_TO_LONGS(AP_IOCTLS)];
+>  	unsigned long apm[BITS_TO_LONGS(AP_DEVICES)];
 
