@@ -2,120 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C02427889F
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 14:57:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D5AD278A7A
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 16:11:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729688AbgIYM4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 08:56:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45305 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729426AbgIYM4x (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 08:56:53 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601038611;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tLaN6wNxAJedTAEARZR2wzt9J+KwCcgGOOE1+Pn6oqA=;
-        b=Ux1gEOHXy5voP5WAJ6SyrqzA76xFDJ5oukNgExgDNrFHWIr2Bqn/TeE5yy9eDX9EV3/yKI
-        dC3CWxpKrfTH6FmscG8mHv1zc6feDwnTvwT3EGcIzWligFrrNMFkX8ZqjQ/+i0yl/m4/B6
-        f1xhLKTHhVKzKuCJgvjX1Xn3rlDfWgs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-_xQLfJ4PNXqc-_mTimnZGg-1; Fri, 25 Sep 2020 08:56:49 -0400
-X-MC-Unique: _xQLfJ4PNXqc-_mTimnZGg-1
-Received: by mail-wm1-f70.google.com with SMTP id l26so800268wmg.7
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 05:56:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tLaN6wNxAJedTAEARZR2wzt9J+KwCcgGOOE1+Pn6oqA=;
-        b=BqczwTs+kGsHenFy5RaTwDM8RErNsxssIodMHU/e8/3IDE182Z33KNDoCcwVCETc0j
-         c7y5vMiUVvdqdybvrNoIRoxiFZ06b/hr5scNMSGbCMOQe5iwtPFxoDmMgVSbDlb4Lz8V
-         ZRrJ/puERrDlAHe+cBjNerqzXFy2dz+OCgMQIqLTlFzkfJAOpzZnkCjRJAMx22ZoOCAM
-         X55C+uBIkAp60iciZCw49yyr9Ox7tHAqjofSrsb3ldKpMZdcaPtIRKm+5T6qj+E9vZTz
-         Zh0oU9AdHtBdmnInr5kR7TxvvJLGA8K6jDwUR8jU2QJG4n+wXJa2XYMnFG/G6g+3mhMv
-         u/fw==
-X-Gm-Message-State: AOAM531ruF2r0P3EGRNSY2NgSYpmGm1smPyrOs1ZZpqpXzvKCGbUKOil
-        ZNY7WlcVU3w2+CIE5oJJTK3cPJMsaLIWFFW3jPyA0F2WY+1ZRdd1IM1hW1DzoSjZPP45BFQ4ZDC
-        ieQrr44zT8Vsa
-X-Received: by 2002:a5d:5090:: with SMTP id a16mr4635123wrt.247.1601038608617;
-        Fri, 25 Sep 2020 05:56:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJtjH6ww8wa5mn9vN9H73nVPxRf/FCgiLluhD+ECewFmA2i0pOH6ZEKBGjQYNMyw4apNrObQ==
-X-Received: by 2002:a5d:5090:: with SMTP id a16mr4635103wrt.247.1601038608413;
-        Fri, 25 Sep 2020 05:56:48 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
-        by smtp.gmail.com with ESMTPSA id y6sm2862442wrn.41.2020.09.25.05.56.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Sep 2020 05:56:47 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: Reset MMU context if guest toggles CR4.SMAP or
- CR4.PKE
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>
-References: <20200923215352.17756-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <52f35035-94cd-9a4e-263a-6b3641e5d44c@redhat.com>
-Date:   Fri, 25 Sep 2020 14:56:47 +0200
+        id S1728753AbgIYOKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 10:10:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11720 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727290AbgIYOKb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 10:10:31 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08PE1pKH065304;
+        Fri, 25 Sep 2020 10:10:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=IShSNVfYfjJus+mZ22FD6Xy3V6hlTL4uvy8GRN67aWE=;
+ b=q/MHHfUdZwPeQsyc1xOjhpBExqF9NcCDPe5jQ4uYcdTuyJjxQQkmuK2+aThdAtZGMRT8
+ WMUhb5jkKAp6vLKzeD4mQ8Py6DIlRFOfKtotP5Wj2HI4VnFSEYM+fJ+ppxBGPDy6/56n
+ 3JMe4EQ+SB4Y9SiRlsL79ANMzwEx8B5NuGtvu4cRC/+SXGGzODmas61OjmPuigUfofOl
+ 3OeAiOOlU0aTxD7XW/XnPlHSssjkVB9OoW4RaG2qCHc6CHSpDo3zzcJnqb8sMWfWpSuS
+ F8Bt6NLGuQROPhrQkAY03Vgein8Ccxn3kW7WKreofPjV5h/3Dtuhuum5RIHEPlog2qgG Zw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33sfavdmn2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Sep 2020 10:10:19 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08PE1tf8065789;
+        Fri, 25 Sep 2020 10:10:18 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33sfavdmjx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Sep 2020 10:10:18 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08PE797B025928;
+        Fri, 25 Sep 2020 14:10:16 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma02dal.us.ibm.com with ESMTP id 33n9ma60yd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Sep 2020 14:10:16 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08PEAFOY42336592
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Sep 2020 14:10:15 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6243B124062;
+        Fri, 25 Sep 2020 14:10:15 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3147F12405A;
+        Fri, 25 Sep 2020 14:10:13 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.16.144])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 25 Sep 2020 14:10:12 +0000 (GMT)
+Subject: Re: [PATCH 3/7] s390x/pci: create a header dedicated to PCI CLP
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
+        rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, qemu-s390x@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <1600529672-10243-1-git-send-email-mjrosato@linux.ibm.com>
+ <1600529672-10243-4-git-send-email-mjrosato@linux.ibm.com>
+ <20200925111746.2e3bf28f.cohuck@redhat.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <9303d8c1-dd93-6e63-d90e-0303bd42677b@linux.ibm.com>
+Date:   Fri, 25 Sep 2020 10:10:12 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200923215352.17756-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200925111746.2e3bf28f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-25_11:2020-09-24,2020-09-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ clxscore=1015 priorityscore=1501 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 mlxscore=0 spamscore=0 adultscore=0
+ mlxlogscore=907 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009250095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/20 23:53, Sean Christopherson wrote:
-> Reset the MMU context during kvm_set_cr4() if SMAP or PKE is toggled.
-> Recent commits to (correctly) not reload PDPTRs when SMAP/PKE are
-> toggled inadvertantly skipped the MMU context reset due to the mask
-> of bits that triggers PDPTR loads also being used to trigger MMU context
-> resets.
+On 9/25/20 5:17 AM, Cornelia Huck wrote:
+> On Sat, 19 Sep 2020 11:34:28 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 > 
-> Fixes: 427890aff855 ("kvm: x86: Toggling CR4.SMAP does not load PDPTEs in PAE mode")
-> Fixes: cb957adb4ea4 ("kvm: x86: Toggling CR4.PKE does not load PDPTEs in PAE mode")
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Peter Shier <pshier@google.com>
-> Cc: Oliver Upton <oupton@google.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/x86.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>> From: Pierre Morel <pmorel@linux.ibm.com>
+>>
+>> To have a clean separation between s390-pci-bus.h and s390-pci-inst.h
+>> headers we export the PCI CLP instructions in a dedicated header.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   hw/s390x/s390-pci-bus.h  |   1 +
+>>   hw/s390x/s390-pci-clp.h  | 211 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   hw/s390x/s390-pci-inst.h | 196 -------------------------------------------
+>>   3 files changed, 212 insertions(+), 196 deletions(-)
+>>   create mode 100644 hw/s390x/s390-pci-clp.h
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 17f4995e80a7..fd0da41bc149 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -977,6 +977,7 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->  	unsigned long old_cr4 = kvm_read_cr4(vcpu);
->  	unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE | X86_CR4_PAE |
->  				   X86_CR4_SMEP;
-> +	unsigned long mmu_role_bits = pdptr_bits | X86_CR4_SMAP | X86_CR4_PKE;
->  
->  	if (kvm_valid_cr4(vcpu, cr4))
->  		return 1;
-> @@ -1004,7 +1005,7 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->  	if (kvm_x86_ops.set_cr4(vcpu, cr4))
->  		return 1;
->  
-> -	if (((cr4 ^ old_cr4) & pdptr_bits) ||
-> +	if (((cr4 ^ old_cr4) & mmu_role_bits) ||
->  	    (!(cr4 & X86_CR4_PCIDE) && (old_cr4 & X86_CR4_PCIDE)))
->  		kvm_mmu_reset_context(vcpu);
->  
+> Looks sane; but I wonder whether we should move the stuff under
+> include/hw/s390x/.
 > 
 
-Queued, thanks.
+Probably.  I'd be fine with creating this file under include, but if 
+we're going to do that we should plan to move the other s390-pci* ones 
+too.  For this patchset, I can change this patch to put the new header 
+in include/hw/s390x, easy enough.
 
-Paolo
+I'll plan to do a separate cleanup patchset to move s390-pci-bus.h and 
+s390-pci-inst.h.
 
+How would you like me to handle s390-pci-vfio.h (this is a new file 
+added by both this patch set and 's390x/pci: Accomodate vfio DMA 
+limiting') --  It seems likely that the latter patch set will merge 
+first, so my thought would be to avoid a cleanup on this one and just 
+re-send 's390x/pci: Accomodate vfio DMA limiting' once the kernel part 
+hits mainline (it's currently in linux-next via Alex) with 
+s390-pci-vfio.h also created in include/hw/s390x (and I guess the 
+MAINTAINERS hit for it too). Sound OK?
