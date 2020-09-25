@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37370279353
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 23:24:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A75D3279349
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 23:24:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729524AbgIYVYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 17:24:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33624 "EHLO
+        id S1729204AbgIYVXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 17:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728909AbgIYVX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Sep 2020 17:23:28 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF016C0613D6
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:28 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id t128so134946pgb.23
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:28 -0700 (PDT)
+        with ESMTP id S1729208AbgIYVXf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Sep 2020 17:23:35 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF503C0613D8
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:30 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id y2so2648445qvs.14
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=qdut5f7Gn8gtFAtWyzdbgJG1DGusgtNnyf9bk1NcfOU=;
-        b=n75SNZmXp+ycob3LZ9+327WCtH9N9zGtSq+mKW0Q3r75hy61EtZRYo6aZvdyEz1o+d
-         dvJmZNWRlk+ad9Sxq1VUpAeP4FPlR4sdTYyd0ExIzO3tKxyASj3UubfDR75DF7Aph+Og
-         SEdioV9D1Wk+dAQH2y54qCXohE4CIHysUtcsBTJ8KFYJ/WZNGTkyVhaCzGXcFOVuYsHv
-         iaASSwpGPExonjwlRSGDzLG36gReqtihq4j2Nps9JC7BKLM000waKIiAlud/Y/+dvFgR
-         IhHXF+cR3J21Vf7RWjoGfatlnVnpGoCl/bWF2mCiwuQMBYH77iujutnGJ1iNqFPY4f/i
-         1cug==
+        bh=pNPbyzdy4uZV3DP217Bt0WHUXD3oX1/wytImNmZHn8U=;
+        b=aRYjgaixoPJBp/KStmOjkU+cTijMIae2uSaZvbtEcGrrJXOnqFY8LtgjbIYmvcm1GI
+         a2lak5FEqo2KPG/1mb+F0p0QHduPz3PSm9tiGg9v8rs4I2vGoZC3TpXzgFk0LdpKbtQC
+         sonw79QOkuGwHUC9oxeCXTWqlGT50Uwys8Pt5AZqGT0iH1wxF90SOOjXAre2NPKfivqo
+         l9R/zEOJhUb/qibl5hidseTqQvjaIKQKiEXLBNj3E9qNjXngyvmLbomZyB1nQz9VCnhn
+         I4LNeRWxDDxgIZWvY6udyvSgd5QOrh9g6bL1N2cd81jH4oXN/Io1S7DO+iV9IvPe4Qni
+         2ylQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=qdut5f7Gn8gtFAtWyzdbgJG1DGusgtNnyf9bk1NcfOU=;
-        b=ivxD6oFVRPJ0hPBaNhc/zWdaIC+7lNZKnJnWidutqegS+TNXdCfHgfAybYVCV9SWHa
-         QEho98rVNhBGZ1QafHrMM02URbGZl+/EoIrGfv4NJhKUeSUhAqmllRRfOxECdk4rWf/x
-         StJeEpyLoHjjlzrRkq2kAl6gsaXTS7FsndaY05QqQeUPcOcgdOVR17vXRt2kxIe0QREH
-         RmLoLOR+xtgi7Sbh78612cMkf0NL+PqZe2J5TmiPTqMa76rc2TQ3iVxcRXq7Hf1G9s+j
-         hKdy+A5vbaw15KO66pxH16d0AUj1Fh/VVwuCGiKLFK9CKgQ0BcK9mmoyG8NfRrRcQmlx
-         eC8g==
-X-Gm-Message-State: AOAM533/NOhgbAHU6wLcBsRdaPd06Hq6Q1v1FxDT8mqFC7jSgFnotm6U
-        NpXOup+MlHsWQ7mvB8KwBAFGsj1rsl8H
-X-Google-Smtp-Source: ABdhPJyEegOo4xGdxZTPvHQvTOHItCy4eaaDeJsRP6IK53GOW1QTD5m2g4papmcyOQKHh1LuccKZxxgHTQiC
+        bh=pNPbyzdy4uZV3DP217Bt0WHUXD3oX1/wytImNmZHn8U=;
+        b=gjYl5g3uWzybwpfQHJJKAbNIR/22WWwEicsYSf5lvoSKimEaIQ55Q6KHEU1iB+OoAB
+         19pufNhk17zrLm8DKGIELgFbTJC5U6OaFZMgtTzsYFRsr4pjMzvXsnLeSXFpHum+nAOa
+         lACLpyB6el7sTNKosZ9tXldjbu3DclPVrYzGmIYIw/bDzQYy9yDXe8o9TYPiQ9TPs4ur
+         Tgh4hwq8DDFutn+mjzSY3pj8T9QrK7arLee0mnKAPPr2w6uo7pqFptdorPf97fuZKDo6
+         oE2iSIqi2A+XX/ClCQkzNOegac/xXrjDOmc5IxLOlaLCZXut/KKRezEfMjc8VuMfTPCA
+         59Yw==
+X-Gm-Message-State: AOAM533Gfbi12JIoyHtGvHMBqZABSPqoUjBo/7ZNY8I+10mgj8DQBnKb
+        TaQYz1w+QRizKXLFtDHr4+K2SOAqAsoE
+X-Google-Smtp-Source: ABdhPJzVOIKkGH44/sMKpQKYViiKvkjAodLvduGiZr6OkdYZn9iwyH8auNMyEptbtjPKMoxXrXzgoxfnarxT
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a62:cd49:0:b029:150:7742:c6c8 with SMTP id
- o70-20020a62cd490000b02901507742c6c8mr1001560pfg.61.1601069008209; Fri, 25
- Sep 2020 14:23:28 -0700 (PDT)
-Date:   Fri, 25 Sep 2020 14:22:51 -0700
+ (user=bgardon job=sendgmr) by 2002:a05:6214:292:: with SMTP id
+ l18mr639868qvv.5.1601069010017; Fri, 25 Sep 2020 14:23:30 -0700 (PDT)
+Date:   Fri, 25 Sep 2020 14:22:52 -0700
 In-Reply-To: <20200925212302.3979661-1-bgardon@google.com>
-Message-Id: <20200925212302.3979661-12-bgardon@google.com>
+Message-Id: <20200925212302.3979661-13-bgardon@google.com>
 Mime-Version: 1.0
 References: <20200925212302.3979661-1-bgardon@google.com>
 X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [PATCH 11/22] kvm: mmu: Factor out allocating a new tdp_mmu_page
+Subject: [PATCH 12/22] kvm: mmu: Allocate struct kvm_mmu_pages for all pages
+ in TDP MMU
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Cannon Matthews <cannonmatthews@google.com>,
@@ -73,9 +73,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the code to allocate a struct kvm_mmu_page for the TDP MMU out of the
-root allocation code to support allocating a struct kvm_mmu_page for every
-page of page table memory used by the TDP MMU, in the next commit.
+Attach struct kvm_mmu_pages to every page in the TDP MMU to track
+metadata, facilitate NX reclaim, and enable inproved parallelism of MMU
+operations in future patches.
 
 Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
 machine. This series introduced no new failures.
@@ -85,106 +85,85 @@ This series can be viewed in Gerrit at:
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 59 ++++++++++++++++++++++++--------------
- 1 file changed, 38 insertions(+), 21 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  4 ++++
+ arch/x86/kvm/mmu/tdp_mmu.c      | 13 ++++++++++---
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9ce6b35ecb33a..a76bcb51d43d8 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -972,7 +972,11 @@ struct kvm_arch {
+ 	 * operations.
+ 	 */
+ 	bool tdp_mmu_enabled;
++
++	/* List of struct tdp_mmu_pages being used as roots */
+ 	struct list_head tdp_mmu_roots;
++	/* List of struct tdp_mmu_pages not being used as roots */
++	struct list_head tdp_mmu_pages;
+ };
+ 
+ struct kvm_vm_stat {
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 37bdebc2592ea..a3bcee6bf30e8 100644
+index a3bcee6bf30e8..557e780bdf9f9 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -123,27 +123,50 @@ static struct kvm_mmu_page *find_tdp_mmu_root_with_role(
- 	return NULL;
+@@ -30,6 +30,7 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+ 	kvm->arch.tdp_mmu_enabled = true;
+ 
+ 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
++	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
  }
  
--static struct kvm_mmu_page *alloc_tdp_mmu_root(struct kvm_vcpu *vcpu,
--					       union kvm_mmu_page_role role)
-+static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
-+						   int level)
-+{
-+	union kvm_mmu_page_role role;
-+
-+	role = vcpu->arch.mmu->mmu_role.base;
-+	role.level = vcpu->arch.mmu->shadow_root_level;
-+	role.direct = true;
-+	role.gpte_is_8_bytes = true;
-+	role.access = ACC_ALL;
-+
-+	return role;
-+}
-+
-+static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-+					       int level)
-+{
+ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+@@ -244,6 +245,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool is_leaf = is_present && is_last_spte(new_spte, level);
+ 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
+ 	u64 *pt;
 +	struct kvm_mmu_page *sp;
+ 	u64 old_child_spte;
+ 	int i;
+ 
+@@ -309,6 +311,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	 */
+ 	if (was_present && !was_leaf && (pfn_changed || !is_present)) {
+ 		pt = spte_to_child_pt(old_spte, level);
++		sp = sptep_to_sp(pt);
 +
-+	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-+	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-+	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-+
-+	sp->role.word = page_role_for_level(vcpu, level).word;
-+	sp->gfn = gfn;
-+	sp->tdp_mmu_page = true;
-+
-+	return sp;
-+}
-+
-+static struct kvm_mmu_page *alloc_tdp_mmu_root(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu_page *new_root;
- 	struct kvm_mmu_page *root;
++		list_del(&sp->link);
  
--	new_root = kvm_mmu_memory_cache_alloc(
--			&vcpu->arch.mmu_page_header_cache);
--	new_root->spt = kvm_mmu_memory_cache_alloc(
--			&vcpu->arch.mmu_shadow_page_cache);
--	set_page_private(virt_to_page(new_root->spt), (unsigned long)new_root);
--
--	new_root->role.word = role.word;
-+	new_root = alloc_tdp_mmu_page(vcpu, 0,
-+				      vcpu->arch.mmu->shadow_root_level);
- 	new_root->root_count = 1;
--	new_root->gfn = 0;
--	new_root->tdp_mmu_page = true;
+ 		for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+ 			old_child_spte = *(pt + i);
+@@ -322,6 +327,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 						   KVM_PAGES_PER_HPAGE(level));
  
- 	spin_lock(&vcpu->kvm->mmu_lock);
- 
- 	/* Check that no matching root exists before adding this one. */
--	root = find_tdp_mmu_root_with_role(vcpu->kvm, role);
-+	root = find_tdp_mmu_root_with_role(vcpu->kvm,
-+		page_role_for_level(vcpu, vcpu->arch.mmu->shadow_root_level));
- 	if (root) {
- 		get_tdp_mmu_root(vcpu->kvm, root);
- 		spin_unlock(&vcpu->kvm->mmu_lock);
-@@ -161,18 +184,12 @@ static struct kvm_mmu_page *alloc_tdp_mmu_root(struct kvm_vcpu *vcpu,
- static struct kvm_mmu_page *get_tdp_mmu_vcpu_root(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu_page *root;
--	union kvm_mmu_page_role role;
--
--	role = vcpu->arch.mmu->mmu_role.base;
--	role.level = vcpu->arch.mmu->shadow_root_level;
--	role.direct = true;
--	role.gpte_is_8_bytes = true;
--	role.access = ACC_ALL;
- 
- 	spin_lock(&vcpu->kvm->mmu_lock);
- 
- 	/* Search for an already allocated root with the same role. */
--	root = find_tdp_mmu_root_with_role(vcpu->kvm, role);
-+	root = find_tdp_mmu_root_with_role(vcpu->kvm,
-+		page_role_for_level(vcpu, vcpu->arch.mmu->shadow_root_level));
- 	if (root) {
- 		get_tdp_mmu_root(vcpu->kvm, root);
- 		spin_unlock(&vcpu->kvm->mmu_lock);
-@@ -182,7 +199,7 @@ static struct kvm_mmu_page *get_tdp_mmu_vcpu_root(struct kvm_vcpu *vcpu)
- 	spin_unlock(&vcpu->kvm->mmu_lock);
- 
- 	/* If there is no appropriate root, allocate one. */
--	root = alloc_tdp_mmu_root(vcpu, role);
-+	root = alloc_tdp_mmu_root(vcpu);
- 
- 	return root;
+ 		free_page((unsigned long)pt);
++		kmem_cache_free(mmu_page_header_cache, sp);
+ 	}
  }
+ 
+@@ -474,8 +480,7 @@ int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu, int write, int map_writable,
+ 			   bool prefault, bool account_disallowed_nx_lpage)
+ {
+ 	struct tdp_iter iter;
+-	struct kvm_mmu_memory_cache *pf_pt_cache =
+-			&vcpu->arch.mmu_shadow_page_cache;
++	struct kvm_mmu_page *sp;
+ 	u64 *child_pt;
+ 	u64 new_spte;
+ 	int ret;
+@@ -520,7 +525,9 @@ int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu, int write, int map_writable,
+ 		}
+ 
+ 		if (!is_shadow_present_pte(iter.old_spte)) {
+-			child_pt = kvm_mmu_memory_cache_alloc(pf_pt_cache);
++			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
++			list_add(&sp->link, &vcpu->kvm->arch.tdp_mmu_pages);
++			child_pt = sp->spt;
+ 			clear_page(child_pt);
+ 			new_spte = make_nonleaf_spte(child_pt,
+ 						     !shadow_accessed_mask);
 -- 
 2.28.0.709.gb0816b6eb0-goog
 
