@@ -2,91 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20B6027946B
-	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 00:58:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13CA32794D4
+	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 01:37:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729058AbgIYW6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 18:58:11 -0400
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21758 "EHLO
-        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726412AbgIYW6L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Sep 2020 18:58:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1601074679; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=kZKgJt5iNy54n81MIwBi6ge401g8Jx0XjODJO2vrnxfKKJ3JFBWODmhHDFNbkBcauXAQqWjb8VWf0b6nzGKFImzniX6zF5UxTvUM9oiEW7IYubuYiNM+e59RMXXXpdCaX+nomNlPvYR/Y9uhBpkLBXX6e883vdmFa0VzCECREDE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1601074679; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=7jYJb4UCuN3HKMTiIcPMyOK0JBjcIMZHxNulBkfarVs=; 
-        b=OfQnSUBZDuwjbL6oJ7FBNORz31UcNPXYZYj45qq+Co8dFAkkEt1cMy490YtwrVaIHy/Qf3KKMcY1uU1NmsASrgUnbAeCaeEIoM7dlalEySNjkWiUNd2CKm8WpAPGqsv4UG5jmYFEpde7gAx+ihJfIHofFDCz+D7GsX89nGKm0x4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1601074677971243.91342495746062; Fri, 25 Sep 2020 15:57:57 -0700 (PDT)
-Subject: Re: [PATCH v4 0/6] Qemu SEV-ES guest support
-Message-ID: <160107467617.10465.16659228009221665839@66eaa9a8a123>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <cover.1601060620.git.thomas.lendacky@amd.com>
+        id S1729318AbgIYXg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 19:36:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37400 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726309AbgIYXg5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 19:36:57 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601077016;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=WD+Mt/pFl73GwFi148Y3nb0ypbYCbFWTzG/uad5+3Yc=;
+        b=gkN98x6xvUvHcysf8EHNU93RCgdgFf0BhScT/XtVO6u+teu7A+r/pHmvhOIypKuaDVfeIJ
+        rsJzHO41MX5/8MM/ENwoi3M7FUyDu9oB5OEQiU2ZoW8yecYElsPg4eMmA8ZcrlmsK27hVn
+        Z9uPZt27E4HKRaFRP9BPQnaoYWl65Mw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-uZ1HHfikPIeHM8yKzTDdOg-1; Fri, 25 Sep 2020 19:36:53 -0400
+X-MC-Unique: uZ1HHfikPIeHM8yKzTDdOg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4E8680732A;
+        Fri, 25 Sep 2020 23:36:52 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8505F19C66;
+        Fri, 25 Sep 2020 23:36:52 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM fixes for Linux 5.9-rc7
+Date:   Fri, 25 Sep 2020 19:36:52 -0400
+Message-Id: <20200925233652.2187766-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     thomas.lendacky@amd.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, brijesh.singh@amd.com,
-        ehabkost@redhat.com, mst@redhat.com, ckuehl@redhat.com,
-        mtosatti@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
-        jslaby@suse.cz, rth@twiddle.net
-Date:   Fri, 25 Sep 2020 15:57:57 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNjAxMDYwNjIwLmdp
-dC50aG9tYXMubGVuZGFja3lAYW1kLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
-IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
-IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpDIGxpbmtlciBmb3IgdGhl
-IGhvc3QgbWFjaGluZTogY2MgbGQuYmZkIDIuMjctNDMKSG9zdCBtYWNoaW5lIGNwdSBmYW1pbHk6
-IHg4Nl82NApIb3N0IG1hY2hpbmUgY3B1OiB4ODZfNjQKLi4vc3JjL21lc29uLmJ1aWxkOjEwOiBX
-QVJOSU5HOiBNb2R1bGUgdW5zdGFibGUta2V5dmFsIGhhcyBubyBiYWNrd2FyZHMgb3IgZm9yd2Fy
-ZHMgY29tcGF0aWJpbGl0eSBhbmQgbWlnaHQgbm90IGV4aXN0IGluIGZ1dHVyZSByZWxlYXNlcy4K
-UHJvZ3JhbSBzaCBmb3VuZDogWUVTClByb2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvdXNyL2Jp
-bi9weXRob24zKQpDb25maWd1cmluZyBuaW5qYXRvb2wgdXNpbmcgY29uZmlndXJhdGlvbgotLS0K
-ICBURVNUICAgIGlvdGVzdC1xY293MjogMDI5CnNvY2tldF9hY2NlcHQgZmFpbGVkOiBSZXNvdXJj
-ZSB0ZW1wb3JhcmlseSB1bmF2YWlsYWJsZQoqKgpFUlJPUjouLi9zcmMvdGVzdHMvcXRlc3QvbGli
-cXRlc3QuYzozMDE6cXRlc3RfaW5pdF93aXRob3V0X3FtcF9oYW5kc2hha2U6IGFzc2VydGlvbiBm
-YWlsZWQ6IChzLT5mZCA+PSAwICYmIHMtPnFtcF9mZCA+PSAwKQouLi9zcmMvdGVzdHMvcXRlc3Qv
-bGlicXRlc3QuYzoxNjY6IGtpbGxfcWVtdSgpIHRyaWVkIHRvIHRlcm1pbmF0ZSBRRU1VIHByb2Nl
-c3MgYnV0IGVuY291bnRlcmVkIGV4aXQgc3RhdHVzIDEgKGV4cGVjdGVkIDApCkVSUk9SIHF0ZXN0
-LXg4Nl82NDogYmlvcy10YWJsZXMtdGVzdCAtIEJhaWwgb3V0ISBFUlJPUjouLi9zcmMvdGVzdHMv
-cXRlc3QvbGlicXRlc3QuYzozMDE6cXRlc3RfaW5pdF93aXRob3V0X3FtcF9oYW5kc2hha2U6IGFz
-c2VydGlvbiBmYWlsZWQ6IChzLT5mZCA+PSAwICYmIHMtPnFtcF9mZCA+PSAwKQptYWtlOiAqKiog
-W3J1bi10ZXN0LTEzOF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
-b2JzLi4uLgpDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJuZWwgbW9kdWxlOiBObyBzdWNoIGZpbGUg
-b3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogLWFjY2VsIGt2bTogZmFpbGVkIHRvIGlu
-aXRpYWxpemUga3ZtOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5Ci0tLQogICAgcmFpc2UgQ2Fs
-bGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJy
-b3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tcm0nLCAnLS1s
-YWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWFjOGRlODE2Mzg2ZjQzZmJiZDM1ZThlZWY3
-NzEwMzg1JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZp
-bmVkJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0n
-LCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19F
-TlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9w
-YXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYn
-LCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWhtZjhwbzNnL3NyYy9kb2NrZXItc3JjLjIw
-MjAtMDktMjUtMTguNDAuMzIuMjQwMDU6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXUvY2VudG9z
-NycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJv
-IGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51
-dWlkPWFjOGRlODE2Mzg2ZjQzZmJiZDM1ZThlZWY3NzEwMzg1Cm1ha2VbMV06ICoqKiBbZG9ja2Vy
-LXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hl
-dy10ZXN0ZXItdG1wLWhtZjhwbzNnL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVp
-Y2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxN20yMy40MTRzCnVzZXIgICAgMG0yMS45NTNz
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9j
-b3Zlci4xNjAxMDYwNjIwLmdpdC50aG9tYXMubGVuZGFja3lAYW1kLmNvbS90ZXN0aW5nLmRvY2tl
-ci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Linus,
+
+The following changes since commit 32251b07d532174d66941488c112ec046f646157:
+
+  Merge tag 'kvm-s390-master-5.9-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-master (2020-09-20 17:31:15 -0400)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 4bb05f30483fd21ea5413eaf1182768f251cf625:
+
+  KVM: SVM: Add a dedicated INVD intercept routine (2020-09-25 13:27:35 -0400)
+
+----------------------------------------------------------------
+Five small fixes.  The nested migration bug will be fixed
+with a better API in 5.10 or 5.11, for now this is a fix
+that works with existing userspace but keeps the current
+ugly API.
+
+----------------------------------------------------------------
+Maxim Levitsky (1):
+      KVM: x86: fix MSR_IA32_TSC read for nested migration
+
+Mohammed Gamal (1):
+      KVM: x86: VMX: Make smaller physical guest address space support user-configurable
+
+Sean Christopherson (1):
+      KVM: x86: Reset MMU context if guest toggles CR4.SMAP or CR4.PKE
+
+Tom Lendacky (1):
+      KVM: SVM: Add a dedicated INVD intercept routine
+
+Yang Weijiang (1):
+      selftests: kvm: Fix assert failure in single-step test
+
+ arch/x86/kvm/svm/svm.c                          |  8 +++++++-
+ arch/x86/kvm/vmx/vmx.c                          | 15 ++++++++++-----
+ arch/x86/kvm/vmx/vmx.h                          |  5 ++++-
+ arch/x86/kvm/x86.c                              | 22 ++++++++++++++++++----
+ tools/testing/selftests/kvm/x86_64/debug_regs.c |  2 +-
+ 5 files changed, 40 insertions(+), 12 deletions(-)
+
