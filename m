@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A29127934B
+	by mail.lfdr.de (Postfix) with ESMTP id 33FAF27934C
 	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 23:24:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729178AbgIYVXm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 17:23:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33648 "EHLO
+        id S1728967AbgIYVXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 17:23:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729196AbgIYVXf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1729203AbgIYVXf (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 25 Sep 2020 17:23:35 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EAF6C0613DC
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:32 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id r184so3018175qka.21
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:32 -0700 (PDT)
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03A7CC0613DE
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:33 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id p11so278827pjv.2
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 14:23:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=uYos/4sZVdvJsXvHVNRoyrmDbfs5jzElVh9jP80i41w=;
-        b=G9grlhxj+HtyqbvctWFd6D2comHM/DsEHcFELG3q5sdigAtI3zUKLWOn6EPcnzKlY+
-         MbJucJB/NCCXzNuOGISYHjVQ29ELJr9K0EKdt67k3mhsyHJzgLR08VirBiYVx1lJhWOT
-         ssVD0KX1jNo6gi+nQnbg8x6FMJvoA+/ZG6l3Sij0i2b8RtpdMkAbojY7PCHaSHqWqZCS
-         ipO8vM7vlh1K6W/QCQF9+GtqWWoSv0XV0aNNksMFW19m1gWNbCo9gsze4SVQ2XpQwcNa
-         KbnMKaOtO8yBkvwjMa968daGRcJqhlH1fR+K+au1d4f2uVTo97iUYbiAuUHz4eXXgLo2
-         sxjQ==
+        bh=V/5gyg3b1e2ud3cg8TI5rpqY4AhLEdY7X2TDge3jAek=;
+        b=ijNRLRNmK8bNQMiKB51n8oMQdPgAncOf8UKcf7TPO/35Qp7hv/fwsayZJTr8T7viay
+         tUGLUo8vbV04OgAZNtShTIwuaPdUXN7nOe5d1enViWhGiDqya4Vm39ToNUxCeCQkqkjq
+         jU6NnvnQPuchegsnhjWOl94QGfD0oRkYQkjXVGM0HlwH+o7r0SukFZIOlOAreLujy9/G
+         ajdqhKMRg8wl6qhjrH9KYgCGXzbMA+W4hEB3sFPE31+0D6HrwtuXrpeqVrltXXQfuTkJ
+         apVe0gD7Uf+ajpH32IO6IE4/7KKj9SE44RSJG3CFpQpeFpkCjP3s/fvBCdTX/bS9IfMM
+         P8NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=uYos/4sZVdvJsXvHVNRoyrmDbfs5jzElVh9jP80i41w=;
-        b=rYGLi/oU8vyp7fZnZWtoTCHxlXOrRafzjS0q+JS2RcdnhBremgkYBOWnzQULxjUJOR
-         dUsNHwjH5H89Swd1lGPmsZIn4I+JQtXROTHq3UlRYCiCd4CoUiFlpJH1MT4MtG+41AFu
-         vNgMorwIdstOExobxLdir1aZxC3ESwlChR/CL9rlUVuPPPar4nSJzHkQsXEOYWohOqrd
-         qnvwLPbTBD3A5sj2hecQjq/BqiS6ex/95TXjB0+Lidk9Psy3vW013Dwvr3pAHmDyoqoy
-         q+7TjiptHvOdeduoXzuemlngnKawMd2h3Kc7As8RYwAMjhRJ6khiKiXZ8WHUP2o3WxJJ
-         /8hw==
-X-Gm-Message-State: AOAM532JRg+x2ZiRA/gXjlrTGBnq4euDBXjU15dr4qHsUg2V1kFF+RIN
-        pDG0c+8W1ghBX5BAHBtanGZaWnv9d43J
-X-Google-Smtp-Source: ABdhPJxtFOw51sQanwNBWDZItA0R4Pb9VRTruYEcKh3jRqvwaWSYsTKOwn6fiXFmj2WGPoYa9ilpwbnw0YrQ
+        bh=V/5gyg3b1e2ud3cg8TI5rpqY4AhLEdY7X2TDge3jAek=;
+        b=Z14licQCbQ8Zgx0fKaHd2qs5ZXYCJEmI8s85dZ/GbSDVh3I9zMfdZolF67PvAzEdJD
+         zCtc5VUTtyg2g3V/wYGMLoyUR468DPP52Ws/fed3WagrAxFZIVjefelf8QJeKlUSDbzp
+         6DhggGhW5nZCCdFa4HK5MXz+ZjJTDGPod9BdL7dh8+HqQy3QQcC7+Ae45l7Ptfkg9NnT
+         1xG1tSRJ4z+OO4z84o+lB7dk6KL/zECIgAg6mAqhlyUv/N6ZaLVpZ+/kBXF5dCU12HXZ
+         irzzjfXNUyMsa8MCqC3wJPanjt8uEG9YafgaH1lHoOI60ZztUb736kGvkyZvRAM3UYH2
+         /Jnw==
+X-Gm-Message-State: AOAM5324y/0hQkv/KNRpABR/mD0GpHqQWz8EuZnWDlQffA0hlbXZz7Nm
+        fFoWHRNANCfb/8xiRhgALY7fXwoUMgiR
+X-Google-Smtp-Source: ABdhPJyAaseQrHpUJntVt4+GThwAkECWq7yLGgUxzMprjqzyHSSxPzY5gPa5abbqexeNVzqcEZcoJdBqAOFn
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:ad4:4594:: with SMTP id
- x20mr716275qvu.4.1601069011627; Fri, 25 Sep 2020 14:23:31 -0700 (PDT)
-Date:   Fri, 25 Sep 2020 14:22:53 -0700
+ (user=bgardon job=sendgmr) by 2002:a17:902:fe83:b029:d2:2359:e64b with SMTP
+ id x3-20020a170902fe83b02900d22359e64bmr1313762plm.7.1601069013480; Fri, 25
+ Sep 2020 14:23:33 -0700 (PDT)
+Date:   Fri, 25 Sep 2020 14:22:54 -0700
 In-Reply-To: <20200925212302.3979661-1-bgardon@google.com>
-Message-Id: <20200925212302.3979661-14-bgardon@google.com>
+Message-Id: <20200925212302.3979661-15-bgardon@google.com>
 Mime-Version: 1.0
 References: <20200925212302.3979661-1-bgardon@google.com>
 X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [PATCH 13/22] kvm: mmu: Support invalidate range MMU notifier for TDP MMU
+Subject: [PATCH 14/22] kvm: mmu: Add access tracking for tdp_mmu
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Cannon Matthews <cannonmatthews@google.com>,
@@ -73,8 +74,10 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 In order to interoperate correctly with the rest of KVM and other Linux
-subsystems, the TDP MMU must correctly handle various MMU notifiers. Add
-hooks to handle the invalidate range family of MMU notifiers.
+subsystems, the TDP MMU must correctly handle various MMU notifiers. The
+main Linux MM uses the access tracking MMU notifiers for swap and other
+features. Add hooks to handle the test/flush HVA (range) family of
+MMU notifiers.
 
 Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
 machine. This series introduced no new failures.
@@ -84,167 +87,277 @@ This series can be viewed in Gerrit at:
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  9 ++++-
- arch/x86/kvm/mmu/tdp_mmu.c | 80 +++++++++++++++++++++++++++++++++++---
- arch/x86/kvm/mmu/tdp_mmu.h |  3 ++
- 3 files changed, 86 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          |  29 ++++++---
+ arch/x86/kvm/mmu/mmu_internal.h |   7 +++
+ arch/x86/kvm/mmu/tdp_mmu.c      | 103 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/mmu/tdp_mmu.h      |   4 ++
+ 4 files changed, 133 insertions(+), 10 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 52d661a758585..0ddfdab942554 100644
+index 0ddfdab942554..8c1e806b3d53f 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1884,7 +1884,14 @@ static int kvm_handle_hva(struct kvm *kvm, unsigned long hva,
- int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
- 			unsigned flags)
- {
--	return kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
-+	int r;
-+
-+	r = kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
-+
-+	if (kvm->arch.tdp_mmu_enabled)
-+		r |= kvm_tdp_mmu_zap_hva_range(kvm, start, end);
-+
-+	return r;
+@@ -212,12 +212,12 @@ static struct percpu_counter kvm_total_used_mmu_pages;
+ 
+ static u64 __read_mostly shadow_nx_mask;
+ static u64 __read_mostly shadow_x_mask;	/* mutual exclusive with nx_mask */
+-static u64 __read_mostly shadow_user_mask;
++u64 __read_mostly shadow_user_mask;
+ u64 __read_mostly shadow_accessed_mask;
+ static u64 __read_mostly shadow_dirty_mask;
+ static u64 __read_mostly shadow_mmio_value;
+ static u64 __read_mostly shadow_mmio_access_mask;
+-static u64 __read_mostly shadow_present_mask;
++u64 __read_mostly shadow_present_mask;
+ static u64 __read_mostly shadow_me_mask;
+ 
+ /*
+@@ -265,7 +265,6 @@ static u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
+ static u8 __read_mostly shadow_phys_bits;
+ 
+ static void mmu_spte_set(u64 *sptep, u64 spte);
+-static bool is_executable_pte(u64 spte);
+ static union kvm_mmu_page_role
+ kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu);
+ 
+@@ -332,7 +331,7 @@ static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.mmu == &vcpu->arch.guest_mmu;
  }
  
- int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+-static inline bool spte_ad_enabled(u64 spte)
++inline bool spte_ad_enabled(u64 spte)
+ {
+ 	MMU_WARN_ON(is_mmio_spte(spte));
+ 	return (spte & SPTE_SPECIAL_MASK) != SPTE_AD_DISABLED_MASK;
+@@ -607,7 +606,7 @@ int is_last_spte(u64 pte, int level)
+ 	return 0;
+ }
+ 
+-static bool is_executable_pte(u64 spte)
++bool is_executable_pte(u64 spte)
+ {
+ 	return (spte & (shadow_x_mask | shadow_nx_mask)) == shadow_x_mask;
+ }
+@@ -791,7 +790,7 @@ static bool spte_has_volatile_bits(u64 spte)
+ 	return false;
+ }
+ 
+-static bool is_accessed_spte(u64 spte)
++bool is_accessed_spte(u64 spte)
+ {
+ 	u64 accessed_mask = spte_shadow_accessed_mask(spte);
+ 
+@@ -941,7 +940,7 @@ static u64 mmu_spte_get_lockless(u64 *sptep)
+ 	return __get_spte_lockless(sptep);
+ }
+ 
+-static u64 mark_spte_for_access_track(u64 spte)
++u64 mark_spte_for_access_track(u64 spte)
+ {
+ 	if (spte_ad_enabled(spte))
+ 		return spte & ~shadow_accessed_mask;
+@@ -1945,12 +1944,24 @@ static void rmap_recycle(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
+ 
+ int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
+ {
+-	return kvm_handle_hva_range(kvm, start, end, 0, kvm_age_rmapp);
++	int young = false;
++
++	young = kvm_handle_hva_range(kvm, start, end, 0, kvm_age_rmapp);
++	if (kvm->arch.tdp_mmu_enabled)
++		young |= kvm_tdp_mmu_age_hva_range(kvm, start, end);
++
++	return young;
+ }
+ 
+ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
+ {
+-	return kvm_handle_hva(kvm, hva, 0, kvm_test_age_rmapp);
++	int young = false;
++
++	young = kvm_handle_hva(kvm, hva, 0, kvm_test_age_rmapp);
++	if (kvm->arch.tdp_mmu_enabled)
++		young |= kvm_tdp_mmu_test_age_hva(kvm, hva);
++
++	return young;
+ }
+ 
+ #ifdef MMU_DEBUG
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 4cef9da051847..228bda0885552 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -80,7 +80,9 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 	(PT64_BASE_ADDR_MASK & ((1ULL << (PAGE_SHIFT + (((level) - 1) \
+ 						* PT64_LEVEL_BITS))) - 1))
+ 
++extern u64 shadow_user_mask;
+ extern u64 shadow_accessed_mask;
++extern u64 shadow_present_mask;
+ 
+ #define ACC_EXEC_MASK    1
+ #define ACC_WRITE_MASK   PT_WRITABLE_MASK
+@@ -95,6 +97,9 @@ int is_last_spte(u64 pte, int level);
+ bool is_dirty_spte(u64 spte);
+ int is_large_pte(u64 pte);
+ bool is_access_track_spte(u64 spte);
++bool is_accessed_spte(u64 spte);
++bool spte_ad_enabled(u64 spte);
++bool is_executable_pte(u64 spte);
+ 
+ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm, u64 start_gfn,
+ 					u64 pages);
+@@ -132,4 +137,6 @@ bool is_nx_huge_page_enabled(void);
+ 
+ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+ 
++u64 mark_spte_for_access_track(u64 spte);
++
+ #endif /* __KVM_X86_MMU_INTERNAL_H */
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 557e780bdf9f9..1cea58db78a13 100644
+index 1cea58db78a13..0a4b98669b3ef 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -60,7 +60,7 @@ bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
+@@ -224,6 +224,18 @@ static int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
+ 	return sp->role.smm ? 1 : 0;
  }
  
- static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
--			  gfn_t start, gfn_t end);
-+			  gfn_t start, gfn_t end, bool can_yield);
- 
- static void free_tdp_mmu_root(struct kvm *kvm, struct kvm_mmu_page *root)
- {
-@@ -73,7 +73,7 @@ static void free_tdp_mmu_root(struct kvm *kvm, struct kvm_mmu_page *root)
- 
- 	list_del(&root->link);
- 
--	zap_gfn_range(kvm, root, 0, max_gfn);
-+	zap_gfn_range(kvm, root, 0, max_gfn, false);
- 
- 	free_page((unsigned long)root->spt);
- 	kmem_cache_free(mmu_page_header_cache, root);
-@@ -361,9 +361,14 @@ static bool tdp_mmu_iter_cond_resched(struct kvm *kvm, struct tdp_iter *iter)
-  * non-root pages mapping GFNs strictly within that range. Returns true if
-  * SPTEs have been cleared and a TLB flush is needed before releasing the
-  * MMU lock.
-+ * If can_yield is true, will release the MMU lock and reschedule if the
-+ * scheduler needs the CPU or there is contention on the MMU lock. If this
-+ * function cannot yield, it will not release the MMU lock or reschedule and
-+ * the caller must ensure it does not supply too large a GFN range, or the
-+ * operation can cause a soft lockup.
-  */
- static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
--			  gfn_t start, gfn_t end)
-+			  gfn_t start, gfn_t end, bool can_yield)
- {
- 	struct tdp_iter iter;
- 	bool flush_needed = false;
-@@ -387,7 +392,10 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 		handle_changed_spte(kvm, as_id, iter.gfn, iter.old_spte, 0,
- 				    iter.level);
- 
--		flush_needed = !tdp_mmu_iter_cond_resched(kvm, &iter);
-+		if (can_yield)
-+			flush_needed = !tdp_mmu_iter_cond_resched(kvm, &iter);
-+		else
-+			flush_needed = true;
- 	}
- 	return flush_needed;
- }
-@@ -410,7 +418,7 @@ bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end)
- 		 */
- 		get_tdp_mmu_root(kvm, root);
- 
--		flush = zap_gfn_range(kvm, root, start, end) || flush;
-+		flush = zap_gfn_range(kvm, root, start, end, true) || flush;
- 
- 		put_tdp_mmu_root(kvm, root);
- 	}
-@@ -551,3 +559,65 @@ int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu, int write, int map_writable,
- 
- 	return ret;
- }
-+
-+static int kvm_tdp_mmu_handle_hva_range(struct kvm *kvm, unsigned long start,
-+		unsigned long end, unsigned long data,
-+		int (*handler)(struct kvm *kvm, struct kvm_memory_slot *slot,
-+			       struct kvm_mmu_page *root, gfn_t start,
-+			       gfn_t end, unsigned long data))
++static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
 +{
-+	struct kvm_memslots *slots;
-+	struct kvm_memory_slot *memslot;
-+	struct kvm_mmu_page *root;
-+	int ret = 0;
-+	int as_id;
++	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
 +
-+	for_each_tdp_mmu_root(kvm, root) {
++	if (!is_shadow_present_pte(old_spte) || !is_last_spte(old_spte, level))
++		return;
++
++	if (is_accessed_spte(old_spte) &&
++	    (!is_accessed_spte(new_spte) || pfn_changed))
++		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
++}
++
+ /**
+  * handle_changed_spte - handle bookkeeping associated with an SPTE change
+  * @kvm: kvm instance
+@@ -236,7 +248,7 @@ static int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
+  * Handle bookkeeping that might result from the modification of a SPTE.
+  * This function must be called for all TDP SPTE modifications.
+  */
+-static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
++static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 				u64 old_spte, u64 new_spte, int level)
+ {
+ 	bool was_present = is_shadow_present_pte(old_spte);
+@@ -331,6 +343,13 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	}
+ }
+ 
++static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
++				u64 old_spte, u64 new_spte, int level)
++{
++	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level);
++	handle_changed_spte_acc_track(old_spte, new_spte, level);
++}
++
+ #define for_each_tdp_pte_root(_iter, _root, _start, _end) \
+ 	for_each_tdp_pte(_iter, _root->spt, _root->role.level, _start, _end)
+ 
+@@ -621,3 +640,85 @@ int kvm_tdp_mmu_zap_hva_range(struct kvm *kvm, unsigned long start,
+ 	return kvm_tdp_mmu_handle_hva_range(kvm, start, end, 0,
+ 					    zap_gfn_range_hva_wrapper);
+ }
++
++/*
++ * Mark the SPTEs range of GFNs [start, end) unaccessed and return non-zero
++ * if any of the GFNs in the range have been accessed.
++ */
++static int age_gfn_range(struct kvm *kvm, struct kvm_memory_slot *slot,
++			 struct kvm_mmu_page *root, gfn_t start, gfn_t end,
++			 unsigned long unused)
++{
++	struct tdp_iter iter;
++	int young = 0;
++	u64 new_spte = 0;
++	int as_id = kvm_mmu_page_as_id(root);
++
++	for_each_tdp_pte_root(iter, root, start, end) {
++		if (!is_shadow_present_pte(iter.old_spte) ||
++		    !is_last_spte(iter.old_spte, iter.level))
++			continue;
++
 +		/*
-+		 * Take a reference on the root so that it cannot be freed if
-+		 * this thread releases the MMU lock and yields in this loop.
++		 * If we have a non-accessed entry we don't need to change the
++		 * pte.
 +		 */
-+		get_tdp_mmu_root(kvm, root);
++		if (!is_accessed_spte(iter.old_spte))
++			continue;
 +
-+		as_id = kvm_mmu_page_as_id(root);
-+		slots = __kvm_memslots(kvm, as_id);
-+		kvm_for_each_memslot(memslot, slots) {
-+			unsigned long hva_start, hva_end;
-+			gfn_t gfn_start, gfn_end;
++		new_spte = iter.old_spte;
 +
-+			hva_start = max(start, memslot->userspace_addr);
-+			hva_end = min(end, memslot->userspace_addr +
-+				      (memslot->npages << PAGE_SHIFT));
-+			if (hva_start >= hva_end)
-+				continue;
++		if (spte_ad_enabled(new_spte)) {
++			clear_bit((ffs(shadow_accessed_mask) - 1),
++				  (unsigned long *)&new_spte);
++		} else {
 +			/*
-+			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
-+			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
++			 * Capture the dirty status of the page, so that it doesn't get
++			 * lost when the SPTE is marked for access tracking.
 +			 */
-+			gfn_start = hva_to_gfn_memslot(hva_start, memslot);
-+			gfn_end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, memslot);
++			if (is_writable_pte(new_spte))
++				kvm_set_pfn_dirty(spte_to_pfn(new_spte));
 +
-+			ret |= handler(kvm, memslot, root, gfn_start,
-+				       gfn_end, data);
++			new_spte = mark_spte_for_access_track(new_spte);
 +		}
 +
-+		put_tdp_mmu_root(kvm, root);
++		*iter.sptep = new_spte;
++		__handle_changed_spte(kvm, as_id, iter.gfn, iter.old_spte,
++				      new_spte, iter.level);
++		young = true;
 +	}
 +
-+	return ret;
++	return young;
 +}
 +
-+static int zap_gfn_range_hva_wrapper(struct kvm *kvm,
-+				     struct kvm_memory_slot *slot,
-+				     struct kvm_mmu_page *root, gfn_t start,
-+				     gfn_t end, unsigned long unused)
-+{
-+	return zap_gfn_range(kvm, root, start, end, false);
-+}
-+
-+int kvm_tdp_mmu_zap_hva_range(struct kvm *kvm, unsigned long start,
++int kvm_tdp_mmu_age_hva_range(struct kvm *kvm, unsigned long start,
 +			      unsigned long end)
 +{
 +	return kvm_tdp_mmu_handle_hva_range(kvm, start, end, 0,
-+					    zap_gfn_range_hva_wrapper);
++					    age_gfn_range);
++}
++
++static int test_age_gfn(struct kvm *kvm, struct kvm_memory_slot *slot,
++			struct kvm_mmu_page *root, gfn_t gfn, gfn_t unused,
++			unsigned long unused2)
++{
++	struct tdp_iter iter;
++	int young = 0;
++
++	for_each_tdp_pte_root(iter, root, gfn, gfn + 1) {
++		if (!is_shadow_present_pte(iter.old_spte) ||
++		    !is_last_spte(iter.old_spte, iter.level))
++			continue;
++
++		if (is_accessed_spte(iter.old_spte))
++			young = true;
++	}
++
++	return young;
++}
++
++int kvm_tdp_mmu_test_age_hva(struct kvm *kvm, unsigned long hva)
++{
++	return kvm_tdp_mmu_handle_hva_range(kvm, hva, hva + 1, 0,
++					    test_age_gfn);
 +}
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index abf23dc0ab7ad..ce804a97bfa1d 100644
+index ce804a97bfa1d..f316773b7b5a8 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.h
 +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -18,4 +18,7 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm);
- int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu, int write, int map_writable,
- 			   int level, gpa_t gpa, kvm_pfn_t pfn, bool prefault,
- 			   bool lpage_disallowed);
+@@ -21,4 +21,8 @@ int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu, int write, int map_writable,
+ 
+ int kvm_tdp_mmu_zap_hva_range(struct kvm *kvm, unsigned long start,
+ 			      unsigned long end);
 +
-+int kvm_tdp_mmu_zap_hva_range(struct kvm *kvm, unsigned long start,
++int kvm_tdp_mmu_age_hva_range(struct kvm *kvm, unsigned long start,
 +			      unsigned long end);
++int kvm_tdp_mmu_test_age_hva(struct kvm *kvm, unsigned long hva);
  #endif /* __KVM_X86_MMU_TDP_MMU_H */
 -- 
 2.28.0.709.gb0816b6eb0-goog
