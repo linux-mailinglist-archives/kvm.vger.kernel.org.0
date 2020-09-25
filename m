@@ -2,96 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA9F52783C4
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 11:16:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEF5F2783CF
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 11:18:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727842AbgIYJQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 05:16:42 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:59626 "EHLO mta-01.yadro.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726990AbgIYJQm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Sep 2020 05:16:42 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id 5C19558089;
-        Fri, 25 Sep 2020 09:16:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        in-reply-to:content-disposition:content-type:content-type
-        :mime-version:references:message-id:subject:subject:from:from
-        :date:date:received:received:received; s=mta-01; t=1601025398;
-         x=1602839799; bh=O4NvdRfYmNELvyXNyO4j1LWxpAr7DHrinRknM25HkGU=; b=
-        evP/U6/NXeSMdxs16plnzlplW9fa+UOQ5YD/x2xAVlKY+9zzOllNts9gtWWKKO++
-        q7eQmk9gBJt3fkwOz/V9Slhjm6DHVnsBSzSafqg/Yh7Mat8Du4vrY5wV3foFw78j
-        az7XLIhzw5wODeAR/+mvL3UDkiv0IWr2xiWEO/kCY4U=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
-        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id vM_EvN1fbxtZ; Fri, 25 Sep 2020 12:16:38 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        id S1727723AbgIYJSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 05:18:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34145 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727428AbgIYJSH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 05:18:07 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601025486;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zdNyfj6okx2W0CrZGKgNIYWl+PLE9oMxshn2W1/Qz+k=;
+        b=Q2vT9869rer+gbOLhliJeC0GXNuBPt2hSyb5c3k2omDDn/J3wnQjZrxtrGehtK18Be+UbH
+        p+tP67Azow2WCdF5vUKxNo6k7EelzTA09kAbAleVaxZY6/Na3Ctc6fsRSNLWNTlGIMI1uF
+        sNbmhCpYxB/cfEj9ThFS0s13SBcUOL0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-495-HqoZG-fBNeqlt1m3Ax7ZHg-1; Fri, 25 Sep 2020 05:18:02 -0400
+X-MC-Unique: HqoZG-fBNeqlt1m3Ax7ZHg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id B007A58086;
-        Fri, 25 Sep 2020 12:16:38 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 25
- Sep 2020 12:16:38 +0300
-Date:   Fri, 25 Sep 2020 12:16:37 +0300
-From:   Roman Bolshakov <r.bolshakov@yadro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] configure: Test if compiler supports -m16
- on x86
-Message-ID: <20200925091637.GB85563@SPB-NB-133.local>
-References: <20200924182401.95891-1-r.bolshakov@yadro.com>
- <36271d1b-70b5-a6d8-41df-d1c94a9c6504@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54F131091068;
+        Fri, 25 Sep 2020 09:18:00 +0000 (UTC)
+Received: from gondolin (ovpn-112-192.ams2.redhat.com [10.36.112.192])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 083AD5D9F1;
+        Fri, 25 Sep 2020 09:17:48 +0000 (UTC)
+Date:   Fri, 25 Sep 2020 11:17:46 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
+        rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, qemu-s390x@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 3/7] s390x/pci: create a header dedicated to PCI CLP
+Message-ID: <20200925111746.2e3bf28f.cohuck@redhat.com>
+In-Reply-To: <1600529672-10243-4-git-send-email-mjrosato@linux.ibm.com>
+References: <1600529672-10243-1-git-send-email-mjrosato@linux.ibm.com>
+        <1600529672-10243-4-git-send-email-mjrosato@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <36271d1b-70b5-a6d8-41df-d1c94a9c6504@redhat.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 09:17:00AM +0200, Paolo Bonzini wrote:
-> On 24/09/20 20:24, Roman Bolshakov wrote:
-> > -m16 option is available only since GCC 4.9.0 [1]. That causes a build
-> > failure on centos-7 [2] that has GCC 4.8.5.
-> > 
-> > Fallback to -m32 if -m16 is not available.
-> > 
-> > 1. http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59672
-> > 2. https://gitlab.com/bonzini/kvm-unit-tests/-/jobs/755368387
-> > 
-> > Fixes: 2616ad934e2 ("x86: realmode: Workaround clang issues")
-> > Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> 
-> This is a simpler way to do it:
-> 
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 5567d66..781dba6 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -72,7 +72,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
->  	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
->  	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
->  
-> -$(TEST_DIR)/realmode.o: bits = 16
-> +$(TEST_DIR)/realmode.o: bits := $(if $(call cc-option,-m16,""),16,32)
->  
->  $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
-> 
-> It's a tiny bit slower because the check is done on every compilation,
-> but only if realmode.o is stale.
-> 
-> It passes CI (https://gitlab.com/bonzini/kvm-unit-tests/-/pipelines/194356382)
-> so I plan to commit it.
-> 
+On Sat, 19 Sep 2020 11:34:28 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-That's fine,
-Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> From: Pierre Morel <pmorel@linux.ibm.com>
+> 
+> To have a clean separation between s390-pci-bus.h and s390-pci-inst.h
+> headers we export the PCI CLP instructions in a dedicated header.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.h  |   1 +
+>  hw/s390x/s390-pci-clp.h  | 211 +++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-pci-inst.h | 196 -------------------------------------------
+>  3 files changed, 212 insertions(+), 196 deletions(-)
+>  create mode 100644 hw/s390x/s390-pci-clp.h
 
-Thanks,
-Roman
+Looks sane; but I wonder whether we should move the stuff under
+include/hw/s390x/.
+
