@@ -2,216 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18D3627869E
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 14:04:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F266D2786D1
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 14:16:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728404AbgIYMEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 08:04:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59570 "EHLO
+        id S1728452AbgIYMQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 08:16:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727749AbgIYMEP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Sep 2020 08:04:15 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC262C0613CE;
-        Fri, 25 Sep 2020 05:04:14 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id s66so2048206otb.2;
-        Fri, 25 Sep 2020 05:04:14 -0700 (PDT)
+        with ESMTP id S1728336AbgIYMQc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Sep 2020 08:16:32 -0400
+Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F23C0613D4
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 05:16:31 -0700 (PDT)
+Received: by mail-qv1-xf42.google.com with SMTP id z18so1185238qvp.6
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 05:16:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=df9Z5CtgBUrnK04XFpV4Jf8VxBtCIPJAq7EYMVh2EmA=;
-        b=OlbGtfWIIR8Fl58hMpF1ZyVNIKubUDjHOh6jO73tptaAvxk291KE1SrQlLUko8pscf
-         jqBmZz1i2HYioPIR79O937JCXVvo8Xs+Hod5EHSrqWghTO7vqFvtVDKYKN2VcUDFvnYb
-         RJ463QwiBOt/ZdoH0W5cgEBFW7tizmQH+m3Wc1wCH4bCNteTV/U0elOQd9rfXudg9A78
-         gq0jGTYSiijP01wC4TcnI/3XT5NfgpM2lsufT1x1lmVRqJbUbSMV/I+u1Vs1iLhOjfpo
-         NPNRsc/9EQ7D1u7Q3f+/P5IJr9hfzFiughxR9MG8xBu7yVsp3rHT8ZYQXxeYR0Uwg8wE
-         dLLA==
+        bh=yln7AR3ZR4p27n/j7+7xhsbcOtNwJrCtmwDsHN2fdUQ=;
+        b=DzWU05b6w2zZiVHCrTpprsoQhBqCNrX3HmdPZzyihbcxzdqULiEJxSULmYcebb7VnB
+         362O7PeU+3mlVppNYw1xEsrBaBo9tPocZsBewaSl6xhyp1cyVmpkFI13O2n11dfsQa6l
+         vaGFGZUhQntMlUEE0uZY98lECN90iL4yOISZ3NwP50fC9GDjkfQmsx+vL9viYYiZo3Kd
+         gtUUegf2EBm5w7CDKGP1iFq5Z1zlcJ3ylHQVbCb5jVvdZrWYGDKq+aCV6zSEZCuCUGSY
+         LVXxUf8Inas33vLGk4Hn1bWTHt81cOqwStUeqbUcGTzQr4rvFnub1QQdiwTk75mq4jly
+         l86Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=df9Z5CtgBUrnK04XFpV4Jf8VxBtCIPJAq7EYMVh2EmA=;
-        b=s1UhoL65BQB6Qui1jpoHisYb4GmXpQL7EH2MJmidtAkL2s6wSmuevUOlFOtGhgtn9Z
-         j17XhVyb2+mYS2kHtxvBn0UtMJgZTGiET6BpMrM7Ee6yjSYpWlsaAOLKrwoARCIDGqxf
-         hnKWjv7pewxOUgzOIy9lBZC20em/hV2FH3DYAcKqWFJwWrFWUVOBuSDPUzv1LEUBID72
-         h75Jwws5jnC/o4BMMXJdvSnY3We/Gd+jJCOKaNo32olQ8lXTR+yPOUr8fc71ZrSxw270
-         PxCT4bCDntxEiLHXCAoMml1I/JDw/wuUM43/Twa9b1Latprqv3QU8AENXGoeuKZPe/0F
-         oXDw==
-X-Gm-Message-State: AOAM533nROa8tArwHlCSXcMX1B3Fg+sKk0UyqCkoFIxSR7Biz0Xy5kp+
-        CGoe4A/b9QJpcQa4hNmLPUplsGacXOqKtcrIavU=
-X-Google-Smtp-Source: ABdhPJz0UhP8VCSafF75MpbYkWp1RE/rQ7OxzIAap+PmbH5gQykgOgk2xfneT/EdGUpmvgtPtJgEQ42yYxYrW5J5iKU=
-X-Received: by 2002:a9d:12ab:: with SMTP id g40mr2692575otg.369.1601035454054;
- Fri, 25 Sep 2020 05:04:14 -0700 (PDT)
+        bh=yln7AR3ZR4p27n/j7+7xhsbcOtNwJrCtmwDsHN2fdUQ=;
+        b=VeCoMeXMieSeMgDt8NNlbLBuZIvxlEwS18M+3gnCGQuqaY9Py/+YojpOi9Rh5Lw5nM
+         SRknMj6TnbLPdNrG5ByXdIj7iayrzmKLHqFU+UVt0KI+gG2znUM9eXyA5Dfcg64xJYrj
+         i7MljoqemK22qbtkjdy9v+5ZsM8Mj0/gCSeQgDFK6TV03Fyzy6PLiAvqa0IMeFt3mqjs
+         mmxLaKutX128f8QaQPjdfFOTyRz6ZG9OB5o04eC3VcZhc2WRfc3Dq2kY+tZQDeI0Zf79
+         T5YMoQbSaWf5nlKk6KmHlAZy9PxRxIbZ3uIy6Wtov/xRGNEaNUjb91hjg0MNPrxYLMHR
+         XGMw==
+X-Gm-Message-State: AOAM531dh6cXIusgJ2L73sarRK59CkdS+h8NuViKi2fimw7BJXN+XSek
+        kLQRx+iIjoSdXik1UgdWSvUvMPlp/hwTsni6nPqjYA==
+X-Google-Smtp-Source: ABdhPJx9B2hS6GJWN+2kXk2lxO9y8nuAjLORtds3pD9dp9ZxvQFWebC9/7WeLieRBLfx2ZqQzgHT1ZycMDbLplaYZ+8=
+X-Received: by 2002:ad4:47cc:: with SMTP id p12mr4045516qvw.26.1601036190515;
+ Fri, 25 Sep 2020 05:16:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1598868203.git.yulei.kernel@gmail.com> <CANRm+CwhTVHXOV6HzawHS5E_ELA3nEw0AxY1-w8vX=EsADWGSw@mail.gmail.com>
- <CANRm+CydqYmVbYz2pkT28wjKFS4AvmZ_iS4Sn1rnHT6G1S_=Mw@mail.gmail.com> <CANgfPd8uvkYyHLJh60vSKp1ZDi9T0ZWM9SeXEUm-1da+DqxTEQ@mail.gmail.com>
-In-Reply-To: <CANgfPd8uvkYyHLJh60vSKp1ZDi9T0ZWM9SeXEUm-1da+DqxTEQ@mail.gmail.com>
-From:   yulei zhang <yulei.kernel@gmail.com>
-Date:   Fri, 25 Sep 2020 20:04:03 +0800
-Message-ID: <CACZOiM1JTX3w567dzThM-nPUrUksPnxks4goafoALDq1z_iNsw@mail.gmail.com>
-Subject: Re: [RFC V2 0/9] x86/mmu:Introduce parallel memory virtualization to
- boost performance
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+References: <0000000000002c37a605afce4504@google.com> <CACT4Y+ZMMu1o7HTjFYC++JYWQoEN3STMo38utqpmFRCkQy2u-Q@mail.gmail.com>
+In-Reply-To: <CACT4Y+ZMMu1o7HTjFYC++JYWQoEN3STMo38utqpmFRCkQy2u-Q@mail.gmail.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Fri, 25 Sep 2020 14:16:19 +0200
+Message-ID: <CACT4Y+ak9rtau8E8doyP1Dwqq0fVm5J0fdZ8EGy3=mnUr0-Yiw@mail.gmail.com>
+Subject: Re: general protection fault in pvclock_gtod_notify (2)
+To:     syzbot <syzbot+1dccfcb049726389379c@syzkaller.appspotmail.com>
+Cc:     Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
         Jim Mattson <jmattson@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Haiwei Li <lihaiwei.kernel@gmail.com>
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, wanpengli@tencent.com,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 1:14 AM Ben Gardon <bgardon@google.com> wrote:
+On Mon, Sep 21, 2020 at 10:10 AM Dmitry Vyukov <dvyukov@google.com> wrote:
 >
-> On Wed, Sep 23, 2020 at 11:28 PM Wanpeng Li <kernellwp@gmail.com> wrote:
+> On Mon, Sep 21, 2020 at 10:02 AM syzbot
+> <syzbot+1dccfcb049726389379c@syzkaller.appspotmail.com> wrote:
 > >
-> > Any comments? Paolo! :)
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    eb5f95f1 Merge tag 's390-5.9-6' of git://git.kernel.org/pu..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=14720ac3900000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=cd992d74d6c7e62
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=1dccfcb049726389379c
+> > compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
+> >
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+1dccfcb049726389379c@syzkaller.appspotmail.com
+> >
+> > general protection fault, probably for non-canonical address 0x1ffffffef40f602c: 0000 [#1] PREEMPT SMP KASAN
+> > CPU: 1 PID: 3915 Comm: systemd-udevd Not tainted 5.9.0-rc5-syzkaller #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> > RIP: 0010:update_pvclock_gtod arch/x86/kvm/x86.c:1743 [inline]
+> > RIP: 0010:pvclock_gtod_notify+0x11d/0x490 arch/x86/kvm/x86.c:7452
+> > Code: 10 48 89 f8 48 c1 e8 03 42 80 3c 20 00 74 05 e8 69 76 a7 00 49 8b 47 10 48 89 05 f6 08 cb 09 49 8d 7f 08 48 89 f8 48 c1 e8 03 <42> 80 3c 70 07 77 00 e8 47 76 a7 00 49 8b 47 08 48 89 05 dc 08 cb
+> > RSP: 0018:ffffc90000da8c50 EFLAGS: 00010806
+> > RAX: 1ffffffff1707d7e RBX: ffffffff894cc67c RCX: ffffffff815adc44
+> > RDX: dffffc0000000000 RSI: 0000000000000008 RDI: ffffffff8b83ebf0
+> > RBP: ffffffff894bd1a8 R08: dffffc0000000000 R09: fffffbfff167daa0
+> > R10: fffffbfff167daa0 R11: 0000000000000000 R12: dffffc0000000000
+> > R13: 00000000ffffffff R14: ffffffff814f7157 R15: ffffffff8b83ebe8
+> > FS:  00007f7a9e2c88c0(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000000000744138 CR3: 00000000a256d000 CR4: 00000000001526e0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > Call Trace:
+> >  <IRQ>
+> >  notifier_call_chain kernel/notifier.c:83 [inline]
+> >  __raw_notifier_call_chain kernel/notifier.c:361 [inline]
+> >  raw_notifier_call_chain+0xe7/0x170 kernel/notifier.c:368
+> >  update_pvclock_gtod kernel/time/timekeeping.c:581 [inline]
+> >  timekeeping_update+0x281/0x3f0 kernel/time/timekeeping.c:675
+> >  timekeeping_advance+0x830/0xa00 kernel/time/timekeeping.c:2122
+> >  tick_sched_do_timer kernel/time/tick-sched.c:147 [inline]
+> >  tick_sched_timer+0xba/0x410 kernel/time/tick-sched.c:1321
+> >  __run_hrtimer kernel/time/hrtimer.c:1524 [inline]
+> >  __hrtimer_run_queues+0x42d/0x930 kernel/time/hrtimer.c:1588
+> >  hrtimer_interrupt+0x373/0xd60 kernel/time/hrtimer.c:1650
+> >  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1080 [inline]
+> >  __sysvec_apic_timer_interrupt+0xf0/0x260 arch/x86/kernel/apic/apic.c:1097
+> >  asm_call_on_stack+0xf/0x20 arch/x86/entry/entry_64.S:706
+> >  </IRQ>
+> >  __run_on_irqstack arch/x86/include/asm/irq_stack.h:22 [inline]
+> >  run_on_irqstack_cond arch/x86/include/asm/irq_stack.h:48 [inline]
+> >  sysvec_apic_timer_interrupt+0x94/0xf0 arch/x86/kernel/apic/apic.c:1091
+> >  asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:581
+> > RIP: 0010:___might_sleep+0x60/0x570 kernel/sched/core.c:7265
+> > Code: ff ff e8 e3 d2 d9 06 85 c0 74 1f c6 05 49 10 39 08 01 48 c7 c7 2a 87 09 89 be 61 1c 00 00 48 c7 c2 11 89 09 89 e8 90 a4 08 00 <e8> 4b d5 d9 06 85 c0 74 3d 80 3d 22 10 39 08 00 75 34 48 c7 c7 20
+> > RSP: 0018:ffffc900011f7b08 EFLAGS: 00000246
+> > RAX: 0000000000000000 RBX: 0000000000000c40 RCX: dffffc0000000000
+> > RDX: 0000000000000000 RSI: ffffffff894fe578 RDI: 0000000000000282
+> > RBP: ffff8880aa440900 R08: dffffc0000000000 R09: fffffbfff167da9f
+> > R10: fffffbfff167da9f R11: 0000000000000000 R12: 0000000000001000
+> > R13: 0000000000000c40 R14: 0000000000000000 R15: 0000000000000000
+> >  cache_alloc_debugcheck_before mm/slab.c:2984 [inline]
+> >  slab_alloc mm/slab.c:3302 [inline]
+> >  __do_kmalloc mm/slab.c:3653 [inline]
+> >  __kmalloc+0x94/0x300 mm/slab.c:3664
+> >  kmalloc include/linux/slab.h:559 [inline]
+> >  tomoyo_realpath_from_path+0xd8/0x630 security/tomoyo/realpath.c:254
+> >  tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
+> >  tomoyo_path_perm+0x17d/0x740 security/tomoyo/file.c:822
+> >  security_inode_getattr+0xc0/0x140 security/security.c:1278
+> >  vfs_getattr fs/stat.c:121 [inline]
+> >  vfs_statx+0x118/0x380 fs/stat.c:206
+> >  vfs_lstat include/linux/fs.h:3178 [inline]
+> >  __do_sys_newlstat fs/stat.c:374 [inline]
+> >  __se_sys_newlstat fs/stat.c:368 [inline]
+> >  __x64_sys_newlstat+0x81/0xd0 fs/stat.c:368
+> >  do_syscall_64+0x31/0x70 arch/x86/entry/common.c:46
+> >  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> > RIP: 0033:0x7f7a9d13b335
+> > Code: 69 db 2b 00 64 c7 00 16 00 00 00 b8 ff ff ff ff c3 0f 1f 40 00 83 ff 01 48 89 f0 77 30 48 89 c7 48 89 d6 b8 06 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 03 f3 c3 90 48 8b 15 31 db 2b 00 f7 d8 64 89
+> > RSP: 002b:00007fff5eaa2608 EFLAGS: 00000246 ORIG_RAX: 0000000000000006
+> > RAX: ffffffffffffffda RBX: 0000564636a00770 RCX: 00007f7a9d13b335
+> > RDX: 00007fff5eaa2640 RSI: 00007fff5eaa2640 RDI: 00005646369ff770
+> > RBP: 00007fff5eaa2700 R08: 00007f7a9d3fa178 R09: 0000000000001010
+> > R10: 0000000000000020 R11: 0000000000000246 R12: 00005646369ff770
+> > R13: 00005646369ff790 R14: 00005646369a42bb R15: 00005646369a42c0
+> > Modules linked in:
+> > ---[ end trace 4ff96b4858c23e64 ]---
+> > RIP: 0010:update_pvclock_gtod arch/x86/kvm/x86.c:1743 [inline]
+> > RIP: 0010:pvclock_gtod_notify+0x11d/0x490 arch/x86/kvm/x86.c:7452
+> > Code: 10 48 89 f8 48 c1 e8 03 42 80 3c 20 00 74 05 e8 69 76 a7 00 49 8b 47 10 48 89 05 f6 08 cb 09 49 8d 7f 08 48 89 f8 48 c1 e8 03 <42> 80 3c 70 07 77 00 e8 47 76 a7 00 49 8b 47 08 48 89 05 dc 08 cb
+> > RSP: 0018:ffffc90000da8c50 EFLAGS: 00010806
+> > RAX: 1ffffffff1707d7e RBX: ffffffff894cc67c RCX: ffffffff815adc44
+> > RDX: dffffc0000000000 RSI: 0000000000000008 RDI: ffffffff8b83ebf0
+> > RBP: ffffffff894bd1a8 R08: dffffc0000000000 R09: fffffbfff167daa0
+> > R10: fffffbfff167daa0 R11: 0000000000000000 R12: dffffc0000000000
+> > R13: 00000000ffffffff R14: ffffffff814f7157 R15: ffffffff8b83ebe8
+> > FS:  00007f7a9e2c88c0(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000000000744138 CR3: 00000000a256d000 CR4: 00000000001526e0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> >
+> >
+> > ---
+> > This report is generated by a bot. It may contain errors.
+> > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >
+> > syzbot will keep track of this issue. See:
+> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 >
-> Hi, sorry to be so late in replying! I wanted to post the first part
-> of the TDP MMU series I've been working on before responding so we
-> could discuss the two together, but I haven't been able to get it out
-> as fast as I would have liked. (I'll send it ASAP!) I'm hopeful that
-> it will ultimately help address some of the page fault handling and
-> lock contention issues you're addressing with these patches. I'd also
-> be happy to work together to add a prepopulation feature to it. I'll
-> put in some more comments inline below.
+> The failure mode looks somewhat similar to:
+> general protection fault in perf_misc_flags
+> https://syzkaller.appspot.com/bug?extid=ce179bc99e64377c24bc
+> https://groups.google.com/g/syzkaller-bugs/c/d5GC1V8S34k/m/6LTarP8mBAAJ
 >
+> only clang, gpf in systems code, happened few times
 
-Thanks for the feedback and looking forward to your patchset.
+There is strong indication that this is a manifestation of the same
+problem we see in other crashes.
+Let's make one canonical bug for this:
 
-> > On Wed, 9 Sep 2020 at 11:04, Wanpeng Li <kernellwp@gmail.com> wrote:
-> > >
-> > > Any comments? guys!
-> > > On Tue, 1 Sep 2020 at 19:52, <yulei.kernel@gmail.com> wrote:
-> > > >
-> > > > From: Yulei Zhang <yulei.kernel@gmail.com>
-> > > >
-> > > > Currently in KVM memory virtulization we relay on mmu_lock to
-> > > > synchronize the memory mapping update, which make vCPUs work
-> > > > in serialize mode and slow down the execution, especially after
-> > > > migration to do substantial memory mapping will cause visible
-> > > > performance drop, and it can get worse if guest has more vCPU
-> > > > numbers and memories.
-> > > >
-> > > > The idea we present in this patch set is to mitigate the issue
-> > > > with pre-constructed memory mapping table. We will fast pin the
-> > > > guest memory to build up a global memory mapping table according
-> > > > to the guest memslots changes and apply it to cr3, so that after
-> > > > guest starts up all the vCPUs would be able to update the memory
-> > > > simultaneously without page fault exception, thus the performance
-> > > > improvement is expected.
->
-> My understanding from this RFC is that your primary goal is to
-> eliminate page fault latencies and lock contention arising from the
-> first page faults incurred by vCPUs when initially populating the EPT.
-> Is that right?
->
-
-That's right.
-
-> I have the impression that the pinning and generally static memory
-> mappings are more a convenient simplification than part of a larger
-> goal to avoid incurring page faults down the line. Is that correct?
->
-> I ask because I didn't fully understand, from our conversation on v1
-> of this RFC, why reimplementing the page fault handler and associated
-> functions was necessary for the above goals, as I understood them.
-> My impression of the prepopulation approach is that, KVM will
-> sequentially populate all the EPT entries to map guest memory. I
-> understand how this could be optimized to be quite efficient, but I
-> don't understand how it would scale better than the existing
-> implementation with one vCPU accessing memory.
->
-
-I don't think our goal is to simply eliminate the page fault. Our
-target scenario
-is in live migration, when the workload resume on the destination VM after
-migrate, it will kick off the vcpus to build the gfn to pfn mapping,
-but due to the
-mmu_lock it holds the vcpus to execute in sequential which significantly slows
-down the workload execution in VM and affect the end user experience, especially
-when it is memory sensitive workload. Pre-populate the EPT entries
-will solve the
-problem smoothly as it allows the vcpus to execute in parallel after migration.
-
-> > > >
-> > > > We use memory dirty pattern workload to test the initial patch
-> > > > set and get positive result even with huge page enabled. For example,
-> > > > we create guest with 32 vCPUs and 64G memories, and let the vcpus
-> > > > dirty the entire memory region concurrently, as the initial patch
-> > > > eliminate the overhead of mmu_lock, in 2M/1G huge page mode we would
-> > > > get the job done in about 50% faster.
->
-> In this benchmark did you include the time required to pre-populate
-> the EPT or just the time required for the vCPUs to dirty memory?
-> I ask because I'm curious if your priority is to decrease the total
-> end-to-end time, or you just care about the guest experience, and not
-> so much the VM startup time.
-
-We compare the time for each vcpu thread to finish the dirty job. Yes, it can
-take some time for the page table pre-populate, but as each vcpu thread
-can gain a huge advantage with concurrent dirty write, if we count that in
-the total time it is still a better result.
-
-> How does this compare to the case where 1 vCPU reads every page of
-> memory and then 32 vCPUs concurrently dirty every page?
->
-
-Haven't tried this yet, I think the major difference would be the page fault
-latency introduced by the one vCPU read.
-
-> > > >
-> > > > We only validate this feature on Intel x86 platform. And as Ben
-> > > > pointed out in RFC V1, so far we disable the SMM for resource
-> > > > consideration, drop the mmu notification as in this case the
-> > > > memory is pinned.
->
-> I'm excited to see big MMU changes like this, and I look forward to
-> combining our needs towards a better MMU for the x86 TDP case. Have
-> you thought about how you would build SMM and MMU notifier support
-> onto this patch series? I know that the invalidate range notifiers, at
-> least, added a lot of non-trivial complexity to the direct MMU
-> implementation I presented last year.
->
-
-Thanks for the suggestion, I will think about it.
-
-> > > >
-> > > > V1->V2:
-> > > > * Rebase the code to kernel version 5.9.0-rc1.
-> > > >
-> > > > Yulei Zhang (9):
-> > > >   Introduce new fields in kvm_arch/vcpu_arch struct for direct build EPT
-> > > >     support
-> > > >   Introduce page table population function for direct build EPT feature
-> > > >   Introduce page table remove function for direct build EPT feature
-> > > >   Add release function for direct build ept when guest VM exit
-> > > >   Modify the page fault path to meet the direct build EPT requirement
-> > > >   Apply the direct build EPT according to the memory slots change
-> > > >   Add migration support when using direct build EPT
-> > > >   Introduce kvm module parameter global_tdp to turn on the direct build
-> > > >     EPT mode
-> > > >   Handle certain mmu exposed functions properly while turn on direct
-> > > >     build EPT mode
-> > > >
-> > > >  arch/mips/kvm/mips.c            |  13 +
-> > > >  arch/powerpc/kvm/powerpc.c      |  13 +
-> > > >  arch/s390/kvm/kvm-s390.c        |  13 +
-> > > >  arch/x86/include/asm/kvm_host.h |  13 +-
-> > > >  arch/x86/kvm/mmu/mmu.c          | 533 ++++++++++++++++++++++++++++++--
-> > > >  arch/x86/kvm/svm/svm.c          |   2 +-
-> > > >  arch/x86/kvm/vmx/vmx.c          |   7 +-
-> > > >  arch/x86/kvm/x86.c              |  55 ++--
-> > > >  include/linux/kvm_host.h        |   7 +-
-> > > >  virt/kvm/kvm_main.c             |  43 ++-
-> > > >  10 files changed, 639 insertions(+), 60 deletions(-)
-> > > >
-> > > > --
-> > > > 2.17.1
-> > > >
+#syz dup: general protection fault in perf_misc_flags
