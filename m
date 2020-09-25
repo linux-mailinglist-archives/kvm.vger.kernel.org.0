@@ -2,80 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54D1B27944D
-	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 00:44:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20B6027946B
+	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 00:58:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbgIYWoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 18:44:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43947 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726636AbgIYWoa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 18:44:30 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601073869;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=mOIyCgY/IoGKS+vL+syjQpfoJXSV5VORDkFB2B1OxTk=;
-        b=H0VJOJkjbIEb3hrAqKOo3c3meB1nyKm0FV8ZTg8BsK73FvBwaTFybUpReHJydBVIRqwzPK
-        WDp28jy8PlXSVzNDYQaiViUE1fBayIV7HdhAF1XzWMhOWEwUzwIoQodMRo5ymJitXn7i+f
-        pryV5d3voADDkdcPHYyBklm3RSPCbWs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-cRG3j9lePA2oIC6tBNZvBQ-1; Fri, 25 Sep 2020 18:44:27 -0400
-X-MC-Unique: cRG3j9lePA2oIC6tBNZvBQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64E6A1DDFB
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 22:44:26 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 281707367E
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 22:44:26 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] x86: cover emulation of reduced MAXPHYADDR
-Date:   Fri, 25 Sep 2020 18:44:25 -0400
-Message-Id: <20200925224425.2178862-1-pbonzini@redhat.com>
+        id S1729058AbgIYW6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 18:58:11 -0400
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21758 "EHLO
+        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726412AbgIYW6L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Sep 2020 18:58:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1601074679; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=kZKgJt5iNy54n81MIwBi6ge401g8Jx0XjODJO2vrnxfKKJ3JFBWODmhHDFNbkBcauXAQqWjb8VWf0b6nzGKFImzniX6zF5UxTvUM9oiEW7IYubuYiNM+e59RMXXXpdCaX+nomNlPvYR/Y9uhBpkLBXX6e883vdmFa0VzCECREDE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1601074679; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=7jYJb4UCuN3HKMTiIcPMyOK0JBjcIMZHxNulBkfarVs=; 
+        b=OfQnSUBZDuwjbL6oJ7FBNORz31UcNPXYZYj45qq+Co8dFAkkEt1cMy490YtwrVaIHy/Qf3KKMcY1uU1NmsASrgUnbAeCaeEIoM7dlalEySNjkWiUNd2CKm8WpAPGqsv4UG5jmYFEpde7gAx+ihJfIHofFDCz+D7GsX89nGKm0x4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1601074677971243.91342495746062; Fri, 25 Sep 2020 15:57:57 -0700 (PDT)
+Subject: Re: [PATCH v4 0/6] Qemu SEV-ES guest support
+Message-ID: <160107467617.10465.16659228009221665839@66eaa9a8a123>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <cover.1601060620.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     thomas.lendacky@amd.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, brijesh.singh@amd.com,
+        ehabkost@redhat.com, mst@redhat.com, ckuehl@redhat.com,
+        mtosatti@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
+        jslaby@suse.cz, rth@twiddle.net
+Date:   Fri, 25 Sep 2020 15:57:57 -0700 (PDT)
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a variant of x86/access.flat that covers the emulation
-of guest-MAXPHYADDR < host-MAXPHYADDR.  Use an old-ish
-CPU model because to speed up the test, as Ivy Bridge did
-not have SMEP and PKU.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/unittests.cfg | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 4fa42fa..bab1cce 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -116,9 +116,16 @@ extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
- [access]
- file = access.flat
- arch = x86_64
--extra_params = -cpu host,host-phys-bits
-+extra_params = -cpu max
- timeout = 180
- 
-+[access-reduced-maxphyaddr]
-+file = access.flat
-+arch = x86_64
-+extra_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off
-+timeout = 180
-+check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
-+
- [smap]
- file = smap.flat
- extra_params = -cpu host
--- 
-2.26.2
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNjAxMDYwNjIwLmdp
+dC50aG9tYXMubGVuZGFja3lAYW1kLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
+IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
+IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpDIGxpbmtlciBmb3IgdGhl
+IGhvc3QgbWFjaGluZTogY2MgbGQuYmZkIDIuMjctNDMKSG9zdCBtYWNoaW5lIGNwdSBmYW1pbHk6
+IHg4Nl82NApIb3N0IG1hY2hpbmUgY3B1OiB4ODZfNjQKLi4vc3JjL21lc29uLmJ1aWxkOjEwOiBX
+QVJOSU5HOiBNb2R1bGUgdW5zdGFibGUta2V5dmFsIGhhcyBubyBiYWNrd2FyZHMgb3IgZm9yd2Fy
+ZHMgY29tcGF0aWJpbGl0eSBhbmQgbWlnaHQgbm90IGV4aXN0IGluIGZ1dHVyZSByZWxlYXNlcy4K
+UHJvZ3JhbSBzaCBmb3VuZDogWUVTClByb2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvdXNyL2Jp
+bi9weXRob24zKQpDb25maWd1cmluZyBuaW5qYXRvb2wgdXNpbmcgY29uZmlndXJhdGlvbgotLS0K
+ICBURVNUICAgIGlvdGVzdC1xY293MjogMDI5CnNvY2tldF9hY2NlcHQgZmFpbGVkOiBSZXNvdXJj
+ZSB0ZW1wb3JhcmlseSB1bmF2YWlsYWJsZQoqKgpFUlJPUjouLi9zcmMvdGVzdHMvcXRlc3QvbGli
+cXRlc3QuYzozMDE6cXRlc3RfaW5pdF93aXRob3V0X3FtcF9oYW5kc2hha2U6IGFzc2VydGlvbiBm
+YWlsZWQ6IChzLT5mZCA+PSAwICYmIHMtPnFtcF9mZCA+PSAwKQouLi9zcmMvdGVzdHMvcXRlc3Qv
+bGlicXRlc3QuYzoxNjY6IGtpbGxfcWVtdSgpIHRyaWVkIHRvIHRlcm1pbmF0ZSBRRU1VIHByb2Nl
+c3MgYnV0IGVuY291bnRlcmVkIGV4aXQgc3RhdHVzIDEgKGV4cGVjdGVkIDApCkVSUk9SIHF0ZXN0
+LXg4Nl82NDogYmlvcy10YWJsZXMtdGVzdCAtIEJhaWwgb3V0ISBFUlJPUjouLi9zcmMvdGVzdHMv
+cXRlc3QvbGlicXRlc3QuYzozMDE6cXRlc3RfaW5pdF93aXRob3V0X3FtcF9oYW5kc2hha2U6IGFz
+c2VydGlvbiBmYWlsZWQ6IChzLT5mZCA+PSAwICYmIHMtPnFtcF9mZCA+PSAwKQptYWtlOiAqKiog
+W3J1bi10ZXN0LTEzOF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
+b2JzLi4uLgpDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJuZWwgbW9kdWxlOiBObyBzdWNoIGZpbGUg
+b3IgZGlyZWN0b3J5CnFlbXUtc3lzdGVtLXg4Nl82NDogLWFjY2VsIGt2bTogZmFpbGVkIHRvIGlu
+aXRpYWxpemUga3ZtOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5Ci0tLQogICAgcmFpc2UgQ2Fs
+bGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJy
+b3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tcm0nLCAnLS1s
+YWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWFjOGRlODE2Mzg2ZjQzZmJiZDM1ZThlZWY3
+NzEwMzg1JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZp
+bmVkJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0n
+LCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19F
+TlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9w
+YXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYn
+LCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWhtZjhwbzNnL3NyYy9kb2NrZXItc3JjLjIw
+MjAtMDktMjUtMTguNDAuMzIuMjQwMDU6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXUvY2VudG9z
+NycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJv
+IGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51
+dWlkPWFjOGRlODE2Mzg2ZjQzZmJiZDM1ZThlZWY3NzEwMzg1Cm1ha2VbMV06ICoqKiBbZG9ja2Vy
+LXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLWhtZjhwbzNnL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVp
+Y2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxN20yMy40MTRzCnVzZXIgICAgMG0yMS45NTNz
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9j
+b3Zlci4xNjAxMDYwNjIwLmdpdC50aG9tYXMubGVuZGFja3lAYW1kLmNvbS90ZXN0aW5nLmRvY2tl
+ci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
