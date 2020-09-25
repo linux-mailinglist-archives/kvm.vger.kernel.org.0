@@ -2,102 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CBE4278FA3
-	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 19:31:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 564B5279010
+	for <lists+kvm@lfdr.de>; Fri, 25 Sep 2020 20:07:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729627AbgIYRbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 13:31:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33937 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729620AbgIYRbS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 13:31:18 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601055076;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kgoDrp/Imua9rkBntWaYSIW0+QvG7ttl6BenhB/EUzM=;
-        b=cj00RDE6mNraJcMoE0SAPDfNQWhAYVR6rz+86Szbz7KxdDtXdLuvlU0RZWqJPvpjsDbwDx
-        gbjZn0lfh3Jck08CZ61W2TYSfXMO0QsZs570729zOtFGfajAr7q9bNzY82W2Lm9GMXMlOw
-        BcHJjY/ijbhinhBEN1WuUMVl6BxonH4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-Gn9wk9XqNHyWoEVBzaMdLw-1; Fri, 25 Sep 2020 13:31:14 -0400
-X-MC-Unique: Gn9wk9XqNHyWoEVBzaMdLw-1
-Received: by mail-wr1-f69.google.com with SMTP id y3so1325925wrl.21
-        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 10:31:14 -0700 (PDT)
+        id S1729631AbgIYSHz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 14:07:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726368AbgIYSHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Sep 2020 14:07:55 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA1AC0613CE;
+        Fri, 25 Sep 2020 11:07:55 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id x16so2465669pgj.3;
+        Fri, 25 Sep 2020 11:07:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JsCppV/bmsXZUBRfSaY9SL27S9Ub2HG1i6C0hRa6EVE=;
+        b=tZdsuSUsj0ng7HTsKzxvOHVBb5mFFSSEzLq0L+JGhTu918YqYGnycwGT26nyT7SiTj
+         wM275tJEa40Upp3J35MGnNt1tpE6uev0CFw2oSdL3vJAHiTkgqKfNoPur1JQ+Pf+8B0z
+         Y9igeHsm83sQuWywKLlC/VCKMi4ov7baF9YjQfmUclyLlZ9i6dWYTNrv4gWdCY7/pdhb
+         dJ3WYvo8tbjydhobEbtVgFNVA5lWKW8YWRzXbKMgsJsJ8xWEXZiv3CH1+58/wHIa2ocz
+         Sa8SjIv2Y4gmRrJPVbRqWQhi23rMDf9zHqBg7FhN46rFg8EHXqpwHLFnLxsGnOu9hlMv
+         XMBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=kgoDrp/Imua9rkBntWaYSIW0+QvG7ttl6BenhB/EUzM=;
-        b=ETrCQYoA+7G5+e0qLujv8nDE5y1UCrSAl0bo3mO1f89Tb5Umx6Pk6vHjgF6pbG4wxT
-         lrE5H8dd3kerge20nX4T9z5s2pfpXwBypIv7wxI64RGlO95Dfq6FJIdMSd5VF9dlrqWM
-         O5q2ixS6qUxlBbREe+nY9Xw8McburyexGi7MVi7Oz9EEH9L6A51ReJn8WdS9zBx1v8FR
-         fUVPlMjcoLDFVVQm52kFccDmaHT1f97AGrx3U/J2jMyk4dSNMy61GmafuCFAEUqYsDWx
-         5Tf3OHRR9gxj6v4p1wptBepckcUYoLxPDpylU8AUnyUK3xUzO/7FH95j0J4/3EMOFmE5
-         pgvQ==
-X-Gm-Message-State: AOAM530uDQd6fdH/qkLIexrufIRSDqgvi6umCGGJsRXlFUjjfc7MA860
-        Sp7pgD5nIk9F+sDYrUe9IgmywVS2QRW4mKS6hZJu6FoDDllM4jRcBA7wk2bDtRMCTVdigtkWR9+
-        hS+BJ9lVYUuVy
-X-Received: by 2002:a1c:4c0d:: with SMTP id z13mr4020259wmf.113.1601055073294;
-        Fri, 25 Sep 2020 10:31:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzPTDkbJwYC2USu6HcpR/XlLvGZo9MtasrQB1dk8DmaTxAl37UdJ+X+8ppmKhjjYed/hBPwxQ==
-X-Received: by 2002:a1c:4c0d:: with SMTP id z13mr4020240wmf.113.1601055073075;
-        Fri, 25 Sep 2020 10:31:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
-        by smtp.gmail.com with ESMTPSA id p11sm3389322wma.11.2020.09.25.10.31.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Sep 2020 10:31:12 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] INVD intercept change to skip instruction
-To:     Jim Mattson <jmattson@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <cover.1600972918.git.thomas.lendacky@amd.com>
- <CALMp9eS2C398GUKm9FP6xdVLN=NYTO3y+EMKv0ptGJ_dzxkP+g@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e8aa489b-493c-87d2-3d26-a34d6eef810f@redhat.com>
-Date:   Fri, 25 Sep 2020 19:31:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        bh=JsCppV/bmsXZUBRfSaY9SL27S9Ub2HG1i6C0hRa6EVE=;
+        b=gO73vZnWpyCweDNlUJeI1oxlC4q0mr0ppCjYI0qXmIBo8rINSvKwm2LYSrbQdcRqdN
+         2gvWoauYXxH5oLS4SG0XWy1xQOEnc8o02KcKXYbTypXsU6kCMQCP1AQTtf5/m7QrRuIY
+         pSYiMmSgfgajsD+0vBbu0M+Vs5jUPyG9SKVNVw/j4s5CxkxXSQ4R1K+WolEO71qs+21m
+         QqLWW6LlIXNuR1gSZLahpSmjoIJ9vHyJB0rkg4golbCXsJ/241/37Ois4WFtnwraf+VD
+         TCafPMllHm870XBHp6QR6/1qaBY6FBZFYvA7c3JcOjxrC5rlYfA4kpe0K7GEkzgbb9Uv
+         jouA==
+X-Gm-Message-State: AOAM531vxWyVl1+43CqpeqeZ3kCb0lQl4bbm+Ab7VQtLUGwjh0tFx0zs
+        GMOX6LCHtdvAQA2dzTxTA3eYHiv0x5/V
+X-Google-Smtp-Source: ABdhPJy1/0rKu+54wFhxJYw5dahCMg3cJvq7kuvb+TbDH6a/hXEP5JwMHA2BI2v7o2jCmtEpz5KiHg==
+X-Received: by 2002:a63:5102:: with SMTP id f2mr151366pgb.15.1601057265909;
+        Fri, 25 Sep 2020 11:07:45 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id ie13sm2700535pjb.5.2020.09.25.11.07.42
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 25 Sep 2020 11:07:45 -0700 (PDT)
+From:   lihaiwei.kernel@gmail.com
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, Haiwei Li <lihaiwei@tencent.com>
+Subject: [PATCH v3] KVM: Check the allocation of pv cpu mask
+Date:   Sat, 26 Sep 2020 02:07:38 +0800
+Message-Id: <20200925180738.4426-1-lihaiwei.kernel@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eS2C398GUKm9FP6xdVLN=NYTO3y+EMKv0ptGJ_dzxkP+g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/20 23:20, Jim Mattson wrote:
-> On Thu, Sep 24, 2020 at 11:42 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->>
->> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> This series updates the INVD intercept support for both SVM and VMX to
->> skip the instruction rather than emulating it, since emulation of this
->> instruction is just a NOP.
-> 
-> Isn't INVD a serializing instruction, whereas NOP isn't? IIRC, Intel
-> doesn't architect VM-entry or VM-exit as serializing, though they
-> probably are in practice. I'm not sure what AMD's stance on this is.
+From: Haiwei Li <lihaiwei@tencent.com>
 
-Of course that isn't changed by this patch, though.
+check the allocation of per-cpu __pv_cpu_mask.
 
-Queuing both, but a clarification would be useful.  The same applies
-even to CPUID.
+Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+v1 -> v2:
+ * add CONFIG_SMP for kvm_send_ipi_mask_allbutself to prevent build error
+v2 -> v3:
+ * always check the allocation of __pv_cpu_mask in kvm_flush_tlb_others
 
-Paolo
+ arch/x86/kernel/kvm.c | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 9663ba31347c..1e5da6db519c 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -553,7 +553,6 @@ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
+ static void kvm_setup_pv_ipi(void)
+ {
+ 	apic->send_IPI_mask = kvm_send_ipi_mask;
+-	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
+ 	pr_info("setup PV IPIs\n");
+ }
+ 
+@@ -619,6 +618,11 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+ 	struct kvm_steal_time *src;
+ 	struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+ 
++	if (unlikely(!flushmask)) {
++		native_flush_tlb_others(cpumask, info);
++		return;
++	}
++
+ 	cpumask_copy(flushmask, cpumask);
+ 	/*
+ 	 * We have to call flush only on online vCPUs. And
+@@ -765,6 +769,14 @@ static __init int activate_jump_labels(void)
+ }
+ arch_initcall(activate_jump_labels);
+ 
++static void kvm_free_cpumask(void)
++{
++	unsigned int cpu;
++
++	for_each_possible_cpu(cpu)
++		free_cpumask_var(per_cpu(__pv_cpu_mask, cpu));
++}
++
+ static __init int kvm_alloc_cpumask(void)
+ {
+ 	int cpu;
+@@ -783,11 +795,20 @@ static __init int kvm_alloc_cpumask(void)
+ 
+ 	if (alloc)
+ 		for_each_possible_cpu(cpu) {
+-			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+-				GFP_KERNEL, cpu_to_node(cpu));
++			if (!zalloc_cpumask_var_node(
++				per_cpu_ptr(&__pv_cpu_mask, cpu),
++				GFP_KERNEL, cpu_to_node(cpu)))
++				goto zalloc_cpumask_fail;
+ 		}
+ 
++#if defined(CONFIG_SMP)
++	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
++#endif
+ 	return 0;
++
++zalloc_cpumask_fail:
++	kvm_free_cpumask();
++	return -ENOMEM;
+ }
+ arch_initcall(kvm_alloc_cpumask);
+ 
+-- 
+2.18.4
 
