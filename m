@@ -2,149 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE1F22795B3
-	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 02:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FA862795CD
+	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 03:04:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729832AbgIZA4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Sep 2020 20:56:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43502 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729424AbgIZA4O (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 20:56:14 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08Q0mVtd064150;
-        Fri, 25 Sep 2020 20:56:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=cf6hvWkTo8OFE10cNfyaIwPYVXcBPhnJ5CUj9nT8RQc=;
- b=kOQ6XlhWk1ZuF1qotWqLiDkMwHikxjdAOQ0ypO/VckYgagA+NGXZN97Zkn+WY5O+G4ds
- RiyhAR5zrag7PsRZT/0TE9l4xna1k4f86lp6w0eJ07W8zSlBzRDFfckjvb6VlF4dO94J
- rejMCnoEdEcmCIUHQx/uWYvYCycuMXEm+s4GqUSj7M22AJ2FPd/cJc7DtmptJ7qPSuQE
- +KkibBp+acnDWTGvYh/uc6S0MmWbyCIxCWz9qjHgrEGa/D1F2wXejrkIsrI7nmhv8oRW
- pewRtHr55rGbFP4u4S3LURZC0wUlWT7iq5bI2Uht4Wws/ki9mJrlnND9TNvfkWaVB8rp sQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33sue583hr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 25 Sep 2020 20:56:10 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08Q0oimA068472;
-        Fri, 25 Sep 2020 20:56:09 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33sue583ha-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 25 Sep 2020 20:56:09 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08Q0mUU7030414;
-        Sat, 26 Sep 2020 00:56:07 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 33n98guhwv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 26 Sep 2020 00:56:07 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08Q0u4PF23527738
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 26 Sep 2020 00:56:04 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 343F752050;
-        Sat, 26 Sep 2020 00:56:04 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.172.136])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AEA335204E;
-        Sat, 26 Sep 2020 00:56:03 +0000 (GMT)
-Date:   Sat, 26 Sep 2020 02:56:01 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pmorel@linux.ibm.com,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        kwankhede@nvidia.com, borntraeger@de.ibm.com
-Subject: Re: [PATCH] s390/vfio-ap: fix unregister GISC when KVM is already
- gone results in OOPS
-Message-ID: <20200926025601.2ad52b77.pasic@linux.ibm.com>
-In-Reply-To: <3795bc75-9d5e-2098-fd18-f1cbaef9c290@linux.ibm.com>
-References: <20200918170234.5807-1-akrowiak@linux.ibm.com>
-        <20200921174536.49e45e68.pasic@linux.ibm.com>
-        <3795bc75-9d5e-2098-fd18-f1cbaef9c290@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1729789AbgIZBEy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Sep 2020 21:04:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52131 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729493AbgIZBEy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Sep 2020 21:04:54 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601082292;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+AwseT+/GGS6sFSPoMzAPTCoGWM/VtfjGcVl9z21PIw=;
+        b=gTDlDNVOUbTvMKdCFQAJebVSFbHKdGFvETIh13hQST0mmNGj1P1J4I2fW4petpwomFva4f
+        C0AMRpcGX6SK3JG7A1GVXA401p1ku/scY9PrgV4nmiqjwvNZUon+yCdeCZEfN11JUxW8JW
+        cS0/kHIDFa1JM4pSxpKLSDY6VmuIGkQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-1tnlzL1AP-2X7RNC0ApzBg-1; Fri, 25 Sep 2020 21:04:51 -0400
+X-MC-Unique: 1tnlzL1AP-2X7RNC0ApzBg-1
+Received: by mail-wm1-f71.google.com with SMTP id x6so203635wmi.1
+        for <kvm@vger.kernel.org>; Fri, 25 Sep 2020 18:04:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+AwseT+/GGS6sFSPoMzAPTCoGWM/VtfjGcVl9z21PIw=;
+        b=pzg+qB45B2pIa853T9yLSOY2nOw+IIsNL+gjOTEzxFwq9AUJir9QmQXjlV1gO2z2+a
+         IMyE0DebVwISVRQzuuspW4/8hMAcb+i1UNoqY06JoL69XN7SfLDqD2a/MFIZS+DdDVsO
+         1XoSmUDH2rby6rEyOqHVp9vACsnLHIE3oJbLFKCWY754QIZiTO0zEAn6CGSTY2+uYib9
+         Cq9TjghwCrj6axWvFrpwAAcXnjvrWEcA/97SftP5+uNW8DRLTu4CYXjw66Z2VvMvPXMu
+         2xDMucpN8ThdzbUXikg8hRMIQk0lU9h5Y3bxImdSJYC8TrTywGN/4HVAu6Jt49A7i1mT
+         wC0g==
+X-Gm-Message-State: AOAM530heVgSA3qb1zsoNQufqz/o9QqHuGuM69FRuvW4mZ8zXfj1SKoB
+        SUH3mo7IGXc4fuTRt10eGVF4R3pEFU5flCkwv2UT+F4VlQk+vW0wYu/H1DDXMvLTuzXunuCKCdY
+        nzme3s1PFdbaP
+X-Received: by 2002:a7b:c345:: with SMTP id l5mr216216wmj.123.1601082289800;
+        Fri, 25 Sep 2020 18:04:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4QnWTyDg1SsX25sriM+6EtXy0WYajzU3GY2hw5oItwHCJjibASEiaeipogqWD2RoLdluZlw==
+X-Received: by 2002:a7b:c345:: with SMTP id l5mr216191wmj.123.1601082289589;
+        Fri, 25 Sep 2020 18:04:49 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
+        by smtp.gmail.com with ESMTPSA id i3sm4582866wrs.4.2020.09.25.18.04.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Sep 2020 18:04:48 -0700 (PDT)
+Subject: Re: [PATCH 17/22] kvm: mmu: Support dirty logging for the TDP MMU
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20200925212302.3979661-1-bgardon@google.com>
+ <20200925212302.3979661-18-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6990180c-f99c-3f1d-ef6a-57e37a9999d2@redhat.com>
+Date:   Sat, 26 Sep 2020 03:04:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-25_19:2020-09-24,2020-09-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0
- suspectscore=2 spamscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009260001
+In-Reply-To: <20200925212302.3979661-18-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 25 Sep 2020 18:29:16 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 25/09/20 23:22, Ben Gardon wrote:
+>  				start_level, KVM_MAX_HUGEPAGE_LEVEL, false);
+> +	if (kvm->arch.tdp_mmu_enabled)
+> +		flush = kvm_tdp_mmu_wrprot_slot(kvm, memslot, false) || flush;
+>  	spin_unlock(&kvm->mmu_lock);
+>  
+
+In fact you can just pass down the end-level KVM_MAX_HUGEPAGE_LEVEL or
+PGLEVEL_4K here to kvm_tdp_mmu_wrprot_slot and from there to
+wrprot_gfn_range.
 
 > 
-> 
-> On 9/21/20 11:45 AM, Halil Pasic wrote:
-> > On Fri, 18 Sep 2020 13:02:34 -0400
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >
-> >> Attempting to unregister Guest Interruption Subclass (GISC) when the
-> >> link between the matrix mdev and KVM has been removed results in the
-> >> following:
-> >>
-> >>     "Kernel panic -not syncing: Fatal exception: panic_on_oops"
-> >>
-> >> This patch fixes this bug by verifying the matrix mdev and KVM are still
-> >> linked prior to unregistering the GISC.
-> >
-> > I read from your commit message that this happens when the link between
-> > the KVM and the matrix mdev was established and then got severed.
-> >
-> > I assume the interrupts were previously enabled, and were not been
-> > disabled or cleaned up because q->saved_isc != VFIO_AP_ISC_INVALID.
-> >
-> > That means the guest enabled  interrupts and then for whatever
-> > reason got destroyed, and this happens on mdev cleanup.
-> >
-> > Does it happen all the time or is it some sort of a race?
-> 
-> This is a race condition that happens when a guest is terminated and the 
-> mdev is
-> removed in rapid succession. I came across it with one of my hades test 
-> cases
-> on cleanup of the resources after the test case completes. There is a 
-> bug in the problem appears
-> the vfio_ap_mdev_releasefunction because it tries to reset the APQNs 
-> after the bits are
-> cleared from the matrix_mdev.matrix, so the resets never happen.
-> 
+> +		/*
+> +		 * Take a reference on the root so that it cannot be freed if
+> +		 * this thread releases the MMU lock and yields in this loop.
+> +		 */
+> +		get_tdp_mmu_root(kvm, root);
+> +
+> +		spte_set = wrprot_gfn_range(kvm, root, slot->base_gfn,
+> +				slot->base_gfn + slot->npages, skip_4k) ||
+> +			   spte_set;
+> +
+> +		put_tdp_mmu_root(kvm, root);
 
-That sounds very strange. I couldn't find the place where we clear the
-bits in matrix_mdev.matrix except for unassign. Currently the unassign
-is supposed to be enabled only after we have no guest and we have
-cleaned up the queues (which should restore VFIO_AP_ISC_INVALID). Does
-your test do any unassign operations? (I'm not sure the we always do
-like we are supposed to.)
 
-Now if we did not clear the bits from matrix_mdev.matrix then this
-could be an use after free scenario (where we interpret already
-re-purposed memory as matrix_mdev.matrix).
+Generalyl using "|=" is the more common idiom in mmu.c.
 
-> Fixing that, however, does not resolve the issue, so I'm in the process 
-> of doing a bunch of
-> tracing to see the flow of the resets etc. during the lifecycle of the 
-> mdev during this
-> hades test. I should have a better answer next week.
->
+> +static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+> +			   gfn_t start, gfn_t end)
+> ...
+> +		__handle_changed_spte(kvm, as_id, iter.gfn, iter.old_spte,
+> +				      new_spte, iter.level);
+> +		handle_changed_spte_acc_track(iter.old_spte, new_spte,
+> +					      iter.level);
 
-My take away is that we don't understand what exactly is going wrong, and
-so this patch is at best a mitigation (not a real fix). Does that sound
-about correct?
+Is it worth not calling handle_changed_spte?  handle_changed_spte_dlog
+obviously will never fire but duplicating the code is a bit ugly.
 
-Regards,
-Halil
+I guess this patch is the first one that really gives the "feeling" of
+what the data structures look like.  The main difference with the shadow
+MMU is that you have the tdp_iter instead of the callback-based code of
+slot_handle_level_range, but otherwise it's not hard to follow one if
+you know the other.  Reorganizing the code so that mmu.c is little more
+than a wrapper around the two will help as well in this respect.
 
-[..]
+Paolo
+
