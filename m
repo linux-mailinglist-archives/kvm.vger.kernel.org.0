@@ -2,76 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 02DAE27977C
-	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 09:16:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E6952797EF
+	for <lists+kvm@lfdr.de>; Sat, 26 Sep 2020 10:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728780AbgIZHQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Sep 2020 03:16:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60412 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726149AbgIZHQU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 26 Sep 2020 03:16:20 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08Q71prM173502;
-        Sat, 26 Sep 2020 03:16:17 -0400
+        id S1728991AbgIZIYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 26 Sep 2020 04:24:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59014 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726037AbgIZIYV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 26 Sep 2020 04:24:21 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08Q8I4pY161946;
+        Sat, 26 Sep 2020 04:24:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=EHOoB4YRKUENh+HWxkIaXw/x+fqoGpXBewLUWbWsNJA=;
- b=MaZr2RUDr7oCWks1nuB+b5p0bRWmAqVxiXcVxo2QzNmEWgzueM/5lAJ0FHOyUhJGdiCu
- KsJacRnkZu86NWJUlTa5AKsdGOK3+ebTG2H1N7Era77+4Wqxwn6vlwxpQ4lzrFghPbaV
- sl/IQu4oXKx0UuPXXUuR+L/JAyK8Wq7GLsRM9DdHkPSY3gYv8hvHVNOmtD1zTQRacSJC
- U5Nr65dPbqO+Lpt76D0TZ1PTCatv7I4/0IajpURsGZM7SrsNzueveR6us4XUlUmrmP3x
- DnZr0CiGRBeSki2eOEj+shy7QgfzbiIRwKTbejeMmm8YGshijZLvbV6N4d+3D28OhvJz tg== 
+ bh=G+Gbr71OC+7ot3fzNU1lSATWaR52HohgPx4lAsH9S6w=;
+ b=GklKrl5o0JbFWuPaJWQ3PToqaZA6faMYbKP4wi/jv+QcjvPSVEHds4LplgoUiymF736X
+ RPUU21engH09b1/Ul+MEhKIanN+g6z9zMznJhhI6fSkG+ipp5fDKeLbeuHdNQYeS7gwC
+ jUs92j6Ds/rsK0PGZycg36UPdX16Arg9Mi3dsg+AEv1h3FKLNT7YHp6I8FqrLelYbs7K
+ xVJS5wXTphV2dUDX5O4I6c68XCXgSXqR2z+hxR9bV/SUO1jPeo4WMa7XugHp5YqDpf7y
+ HaG/ZlStlMRgfyCLfYvjC+7nTjCqrpBjTYlj3CzvCX7a+ywFuEKV5tUIXN/ugh9M8eRb GA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33t0f18p2p-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33t20x82wk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 26 Sep 2020 03:16:17 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08Q71sQK173589;
-        Sat, 26 Sep 2020 03:16:16 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33t0f18p2a-1
+        Sat, 26 Sep 2020 04:24:17 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08Q8KC1T166802;
+        Sat, 26 Sep 2020 04:24:17 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33t20x82wa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 26 Sep 2020 03:16:16 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08Q7EoHs004771;
-        Sat, 26 Sep 2020 07:16:15 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 33sw97r590-1
+        Sat, 26 Sep 2020 04:24:17 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08Q8GZ02027857;
+        Sat, 26 Sep 2020 08:24:15 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 33svwgr77x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 26 Sep 2020 07:16:14 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08Q7GCGW23462344
+        Sat, 26 Sep 2020 08:24:15 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08Q8OCk320578812
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 26 Sep 2020 07:16:12 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3A8274C040;
-        Sat, 26 Sep 2020 07:16:12 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 73BA94C044;
-        Sat, 26 Sep 2020 07:16:11 +0000 (GMT)
+        Sat, 26 Sep 2020 08:24:12 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA1CEA4051;
+        Sat, 26 Sep 2020 08:24:12 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DF6C9A404D;
+        Sat, 26 Sep 2020 08:24:11 +0000 (GMT)
 Received: from oc2783563651 (unknown [9.145.162.14])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sat, 26 Sep 2020 07:16:11 +0000 (GMT)
-Date:   Sat, 26 Sep 2020 09:16:09 +0200
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sat, 26 Sep 2020 08:24:11 +0000 (GMT)
+Date:   Sat, 26 Sep 2020 10:24:09 +0200
 From:   Halil Pasic <pasic@linux.ibm.com>
 To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com
-Subject: Re: [PATCH v10 07/16] s390/vfio-ap: sysfs attribute to display the
- guest's matrix
-Message-ID: <20200926091609.29565e87.pasic@linux.ibm.com>
-In-Reply-To: <d2e623f3-65fa-e764-61ce-b7e8c35fd399@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v10 08/16] s390/vfio-ap: filter matrix for unavailable
+ queue devices
+Message-ID: <20200926102409.7884bdd1.pasic@linux.ibm.com>
+In-Reply-To: <20200821195616.13554-9-akrowiak@linux.ibm.com>
 References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
-        <20200821195616.13554-8-akrowiak@linux.ibm.com>
-        <20200917163448.4db80db3.cohuck@redhat.com>
-        <d2e623f3-65fa-e764-61ce-b7e8c35fd399@linux.ibm.com>
+        <20200821195616.13554-9-akrowiak@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
@@ -79,120 +76,312 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-26_05:2020-09-24,2020-09-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1015 adultscore=0 bulkscore=0
- suspectscore=0 impostorscore=0 priorityscore=1501 phishscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009260061
+ definitions=2020-09-26_06:2020-09-24,2020-09-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1015 spamscore=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 malwarescore=0 impostorscore=0 bulkscore=0
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009260069
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 18 Sep 2020 13:09:25 -0400
+On Fri, 21 Aug 2020 15:56:08 -0400
 Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
+> Even though APQNs for queues that are not in the host's AP configuration
+> may be assigned to a matrix mdev, we do not want to set bits in the guest's
+> APCB for APQNs that do not reference AP queue devices bound to the vfio_ap
+> device driver. Ideally, it would be great if such APQNs could be filtered
+> out before setting the bits in the guest's APCB; however, the architecture
+> precludes filtering individual APQNs. Consequently, either the APID or APQI
+> must be filtered.
 > 
+> This patch introduces code to filter the APIDs or APQIs assigned to the
+> matrix mdev's AP configuration before assigning them to the guest's AP
+> configuration (i.e., APCB). We'll start by filtering the APIDs:
 > 
-> On 9/17/20 10:34 AM, Cornelia Huck wrote:
-> > On Fri, 21 Aug 2020 15:56:07 -0400
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >
-> >> The matrix of adapters and domains configured in a guest's CRYCB may
-> >> differ from the matrix of adapters and domains assigned to the matrix mdev,
-> >> so this patch introduces a sysfs attribute to display the matrix of a guest
-> >> using the matrix mdev. For a matrix mdev denoted by $uuid, the crycb for a
-> >> guest using the matrix mdev can be displayed as follows:
-> >>
-> >>     cat /sys/devices/vfio_ap/matrix/$uuid/guest_matrix
-> >>
-> >> If a guest is not using the matrix mdev at the time the crycb is displayed,
-> >> an error (ENODEV) will be returned.
-> >>
-> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> >> ---
-> >>   drivers/s390/crypto/vfio_ap_ops.c | 58 +++++++++++++++++++++++++++++++
-> >>   1 file changed, 58 insertions(+)
-> >>
-> >> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> >> index efb229033f9e..30bf23734af6 100644
-> >> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> >> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> >> @@ -1119,6 +1119,63 @@ static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
-> >>   }
-> >>   static DEVICE_ATTR_RO(matrix);
-> >>   
-> >> +static ssize_t guest_matrix_show(struct device *dev,
-> >> +				 struct device_attribute *attr, char *buf)
-> >> +{
-> >> +	struct mdev_device *mdev = mdev_from_dev(dev);
-> >> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
-> >> +	char *bufpos = buf;
-> >> +	unsigned long apid;
-> >> +	unsigned long apqi;
-> >> +	unsigned long apid1;
-> >> +	unsigned long apqi1;
-> >> +	unsigned long napm_bits = matrix_mdev->shadow_apcb.apm_max + 1;
-> >> +	unsigned long naqm_bits = matrix_mdev->shadow_apcb.aqm_max + 1;
-> >> +	int nchars = 0;
-> >> +	int n;
-> >> +
-> >> +	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
-> >> +		return -ENODEV;
-> >> +
-> >> +	apid1 = find_first_bit_inv(matrix_mdev->shadow_apcb.apm, napm_bits);
-> >> +	apqi1 = find_first_bit_inv(matrix_mdev->shadow_apcb.aqm, naqm_bits);
-> >> +
-> >> +	mutex_lock(&matrix_dev->lock);
-> >> +
-> >> +	if ((apid1 < napm_bits) && (apqi1 < naqm_bits)) {
-> >> +		for_each_set_bit_inv(apid, matrix_mdev->shadow_apcb.apm,
-> >> +				     napm_bits) {
-> >> +			for_each_set_bit_inv(apqi,
-> >> +					     matrix_mdev->shadow_apcb.aqm,
-> >> +					     naqm_bits) {
-> >> +				n = sprintf(bufpos, "%02lx.%04lx\n", apid,
-> >> +					    apqi);
-> >> +				bufpos += n;
-> >> +				nchars += n;
-> >> +			}
-> >> +		}
-> >> +	} else if (apid1 < napm_bits) {
-> >> +		for_each_set_bit_inv(apid, matrix_mdev->shadow_apcb.apm,
-> >> +				     napm_bits) {
-> >> +			n = sprintf(bufpos, "%02lx.\n", apid);
-> >> +			bufpos += n;
-> >> +			nchars += n;
-> >> +		}
-> >> +	} else if (apqi1 < naqm_bits) {
-> >> +		for_each_set_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm,
-> >> +				     naqm_bits) {
-> >> +			n = sprintf(bufpos, ".%04lx\n", apqi);
-> >> +			bufpos += n;
-> >> +			nchars += n;
-> >> +		}
-> >> +	}
-> >> +
-> >> +	mutex_unlock(&matrix_dev->lock);
-> >> +
-> >> +	return nchars;
-> >> +}
-> > This basically looks like a version of matrix_show() operating on the
-> > shadow apcb. I'm wondering if we could consolidate these two functions
-> > by passing in the structure to operate on as a parameter? Might not be
-> > worth the effort, though.
+>    If an APQN assigned to the matrix mdev's AP configuration does not
+>    reference a queue device bound to the vfio_ap device driver, the APID
+>    will be filtered out (i.e., not assigned to the guest's APCB).
 > 
-> We still need the two functions because they back the mdev's
-> sysfs matrix and guest_matrix attributes, but we could call a function.
-> I'm not sure it buys us much though.
+> If every APID assigned to the matrix mdev is filtered out, then we'll try
+> filtering the APQI's:
+> 
+>    If an APQN assigned to the matrix mdev's AP configuration does not
+>    reference a queue device bound to the vfio_ap device driver, the APQI
+>    will be filtered out (i.e., not assigned to the guest's APCB).
+> 
+> In any case, if after filtering either the APIDs or APQIs there are any
+> APQNs that can be assigned to the guest's APCB, they will be assigned and
+> the CRYCB will be hot plugged into the guest.
+> 
+> Example
+> =======
+> 
+> APQNs bound to vfio_ap device driver:
+>    04.0004
+>    04.0047
+>    04.0054
+> 
+>    05.0005
+>    05.0047
+>    05.0054
+> 
+> Assignments to matrix mdev:
+>    APIDs  APQIs  -> APQNs
+>    04     0004      04.0004
+>    05     0005      04.0005
+>           0047      04.0047
+>           0054      04.0054
+>                     05.0004
+>                     05.0005
+>                     05.0047
+>                     04.0054
+> 
+> Filter APIDs:
+>    APID 04 will be filtered because APQN 04.0005 is not bound.
+>    APID 05 will be filtered because APQN 05.0004 is not bound.
+>    APQNs remaining: None
+> 
+> Filter APQIs:
+>    APQI 04 will be filtered because APQN 05.0004 is not bound.
+>    APQI 05 will be filtered because APQN 04.0005 is not bound.
+>    APQNs remaining: 04.0047, 04.0054, 05.0047, 05.0054
+> 
+> APQNs 04.0047, 04.0054, 05.0047, 05.0054 will be assigned to the CRYCB and
+> hot plugged into the KVM guest.
+> 
 
-The logic seems identical with the exception that the guest variant
-checks if vfio_ap_mdev_has_crycb(matrix_mdev). I'm not a big fan of
-duplicated code, and especially not in such close proximity. I'm voting
-for factoring out the common logic.
+I find this logic where we first do one strategy, and if nothing remains
+do the other strategy a little confusing. I will ramble on about it some
+more in the code.
 
-Otherwise looks OK.
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 159 +++++++++++++++++++++++++++++-
+>  1 file changed, 155 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 30bf23734af6..eaf4e9eab6cb 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -326,7 +326,7 @@ static bool vfio_ap_mdev_has_crycb(struct ap_matrix_mdev *matrix_mdev)
+>  	return (matrix_mdev->kvm && matrix_mdev->kvm->arch.crypto.crycbd);
+>  }
+>  
+> -static void vfio_ap_mdev_commit_crycb(struct ap_matrix_mdev *matrix_mdev)
+> +static void vfio_ap_mdev_commit_shadow_apcb(struct ap_matrix_mdev *matrix_mdev)
+>  {
+>  	kvm_arch_crypto_set_masks(matrix_mdev->kvm,
+>  				  matrix_mdev->shadow_apcb.apm,
+> @@ -597,6 +597,157 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev,
+>  	return 0;
+>  }
+>  
+> +/**
+> + * vfio_ap_mdev_filter_matrix
+> + *
+> + * Filter APQNs assigned to the matrix mdev that do not reference an AP queue
+> + * device bound to the vfio_ap device driver.
+> + *
+> + * @matrix_mdev:  the matrix mdev whose AP configuration is to be filtered
+> + * @shadow_apcb:  the shadow of the KVM guest's APCB (contains AP configuration
+> + *		  for guest)
+> + * @filter_apids: boolean value indicating whether the APQNs shall be filtered
+> + *		  by APID (true) or by APQI (false).
+> + *
+> + * Returns the number of APQNs remaining after filtering is complete.
+> + */
+> +static int vfio_ap_mdev_filter_matrix(struct ap_matrix_mdev *matrix_mdev,
+> +				      struct ap_matrix *shadow_apcb,
+> +				      bool filter_apids)
+> +{
+> +	unsigned long apid, apqi, apqn;
+> +
+> +	memcpy(shadow_apcb, &matrix_mdev->matrix, sizeof(*shadow_apcb));
+> +
+> +	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, AP_DEVICES) {
+> +		/*
+> +		 * If the APID is not assigned to the host AP configuration,
+> +		 * we can not assign it to the guest's AP configuration
+> +		 */
+> +		if (!test_bit_inv(apid,
+> +				  (unsigned long *)matrix_dev->info.apm)) {
 
-Regards,
-Halil
+The patch description and the code seem to be out of sync. Here you do
+some filtering based on the host's  AP config info read at module read at
+module initialization time.
+
+> +			clear_bit_inv(apid, shadow_apcb->apm);
+> +			continue;
+> +		}
+> +
+> +		for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
+> +				     AP_DOMAINS) {
+> +			/*
+> +			 * If the APQI is not assigned to the host AP
+> +			 * configuration, then it can not be assigned to the
+> +			 * guest's AP configuration
+> +			 */
+> +			if (!test_bit_inv(apqi, (unsigned long *)
+> +					  matrix_dev->info.aqm)) {
+> +				clear_bit_inv(apqi, shadow_apcb->aqm);
+> +				continue;
+> +			}
+> +
+> +			/*
+> +			 * If the APQN is not bound to the vfio_ap device
+> +			 * driver, then we can't assign it to the guest's
+> +			 * AP configuration. The AP architecture won't
+> +			 * allow filtering of a single APQN, so if we're
+> +			 * filtering APIDs, then filter the APID; otherwise,
+> +			 * filter the APQI.
+> +			 */
+> +			apqn = AP_MKQID(apid, apqi);
+> +			if (!vfio_ap_get_queue(apqn)) {
+
+Is this really gonna give NULL if the queue is not bound to vfio-ap? I
+don't think so. This will get NULL if the queue is not known to the AP
+bus, or has no driver-data assigned. In the current state it should give
+you non-NULL if another driver has the queue, and maintains it's own
+driver specific data in drvdata.
+
+> +				if (filter_apids)
+> +					clear_bit_inv(apid, shadow_apcb->apm);
+> +				else
+> +					clear_bit_inv(apqi, shadow_apcb->aqm);
+> +				break;
+> +			}
+> +		}
+> +
+> +		/*
+> +		 * If we're filtering APQIs and all of them have been filtered,
+> +		 * there's no need to continue filtering.
+> +		 */
+> +		if (!filter_apids)
+> +			if (bitmap_empty(shadow_apcb->aqm, AP_DOMAINS))
+> +				break;
+> +	}
+> +
+> +	return bitmap_weight(shadow_apcb->apm, AP_DEVICES) *
+> +	       bitmap_weight(shadow_apcb->aqm, AP_DOMAINS);
+> +}
+> +
+> +/**
+> + * vfio_ap_mdev_config_shadow_apcb
+> + *
+> + * Configure the shadow of a KVM guest's APCB specifying the adapters, domains
+> + * and control domains to be assigned to the guest. The shadow APCB will be
+> + * configured after filtering the APQNs assigned to the matrix mdev that do not
+> + * reference a queue device bound to the vfio_ap device driver.
+> + *
+> + * @matrix_mdev: the matrix mdev whose shadow APCB is to be configured.
+> + *
+> + * Returns true if the shadow APCB contents have been changed; otherwise,
+> + * returns false.
+> + */
+> +static bool vfio_ap_mdev_config_shadow_apcb(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	int napm, naqm;
+> +	struct ap_matrix shadow_apcb;
+> +
+> +	vfio_ap_matrix_init(&matrix_dev->info, &shadow_apcb);
+> +	napm = bitmap_weight(matrix_mdev->matrix.apm, AP_DEVICES);
+> +	naqm = bitmap_weight(matrix_mdev->matrix.aqm, AP_DOMAINS);
+> +
+> +	/*
+> +	 * If there are no APIDs or no APQIs assigned to the matrix mdev,
+> +	 * then no APQNs shall be assigned to the guest CRYCB.
+> +	 */
+> +	if ((napm != 0) || (naqm != 0)) {
+> +		/*
+> +		 * Filter the APIDs assigned to the matrix mdev for APQNs that
+> +		 * do not reference an AP queue device bound to the driver.
+> +		 */
+> +		napm = vfio_ap_mdev_filter_matrix(matrix_mdev, &shadow_apcb,
+> +						  true);
+> +		/*
+> +		 * If there are no APQNs that can be assigned to the guest's
+> +		 * CRYCB after filtering, then try filtering the APQIs.
+> +		 */
+> +		if (napm == 0) {
+
+When do we expect this to happen? Currently we don't assign queues that
+are not bound to us, and we have ->in_use() that inhibits disappearance
+of queues due to re-partitioning.
+
+So what we are left with is queue becomes unavailable to the host
+because of a config change, and maybe manual unbind -- not sure about
+that.
+
+Now if matrix_dev->info was to reflect the config the bus acts by, which
+seems to the idea behind patch 12 we could react accordingly (if the
+domain is gone filter aqm).
+
+I mean, the purpose of this callback seems to be getting us out of
+trouble when domains are missing across all cards (i.e. some domains
+were assigned away from us on the lower level).
+
+Or am I missing something?
+
+> +			naqm = vfio_ap_mdev_filter_matrix(matrix_mdev,
+> +							  &shadow_apcb, false);
+> +
+> +			/*
+> +			 * If there are no APQNs that can be assigned to the
+> +			 * matrix mdev after filtering the APQIs, then no APQNs
+> +			 * shall be assigned to the guest's CRYCB.
+> +			 */
+> +			if (naqm == 0) {
+> +				bitmap_clear(shadow_apcb.apm, 0, AP_DEVICES);
+> +				bitmap_clear(shadow_apcb.aqm, 0, AP_DOMAINS);
+> +			}
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * If the guest's AP configuration has not changed, then return
+> +	 * indicating such.
+> +	 */
+> +	if (bitmap_equal(matrix_mdev->shadow_apcb.apm, shadow_apcb.apm,
+> +			 AP_DEVICES) &&
+> +	    bitmap_equal(matrix_mdev->shadow_apcb.aqm, shadow_apcb.aqm,
+> +			 AP_DOMAINS) &&
+> +	    bitmap_equal(matrix_mdev->shadow_apcb.adm, shadow_apcb.adm,
+> +			 AP_DOMAINS))
+> +		return false;
+> +
+> +	/*
+> +	 * Copy the changes to the guest's CRYCB, then return indicating that
+> +	 * the guest's AP configuration has changed.
+> +	 */
+> +	memcpy(&matrix_mdev->shadow_apcb, &shadow_apcb, sizeof(shadow_apcb));
+> +
+> +	return true;
+> +}
+> +
+>  enum qlink_type {
+>  	LINK_APID,
+>  	LINK_APQI,
+> @@ -1284,9 +1435,8 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>  	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
+>  		return NOTIFY_DONE;
+>  
+> -	memcpy(&matrix_mdev->shadow_apcb, &matrix_mdev->matrix,
+> -	       sizeof(matrix_mdev->shadow_apcb));
+> -	vfio_ap_mdev_commit_crycb(matrix_mdev);
+> +	if (vfio_ap_mdev_config_shadow_apcb(matrix_mdev))
+> +		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+>  
+>  	return NOTIFY_OK;
+>  }
+> @@ -1396,6 +1546,7 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
+>  	mutex_lock(&matrix_dev->lock);
+>  	if (matrix_mdev->kvm) {
+>  		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> +		vfio_ap_matrix_clear_masks(&matrix_mdev->shadow_apcb);
+>  		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+>  		vfio_ap_mdev_reset_queues(mdev);
+>  		kvm_put_kvm(matrix_mdev->kvm);
 
