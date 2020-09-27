@@ -2,186 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C39EF279CFD
-	for <lists+kvm@lfdr.de>; Sun, 27 Sep 2020 02:03:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D595E279D24
+	for <lists+kvm@lfdr.de>; Sun, 27 Sep 2020 02:18:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728111AbgI0AD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Sep 2020 20:03:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61704 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726242AbgI0AD0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 26 Sep 2020 20:03:26 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08R01TYX151753;
-        Sat, 26 Sep 2020 20:03:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=M0PhSozL3gyEL26b9uq7FZv8dv+vWETw1ww0FRa/cog=;
- b=NhOvzXSf6K/jXbVM32R2omjGqeIR3LBxemVIdpX9X+783LPkT4XaP+lvOXi6zaZAGgh4
- +90erdi4Js3cPrdO23KyvlfJ7eZnmQEsxOVFeVRpLApD0w5/8AvxoRGIIWk2Cnd/rSek
- hmxhl3Bac+yHfyhw1CJEJoTeTr+BNkSsoei/ZJKdoWUFUgLoajsr9KPJIH7FB7kBoZZ5
- ra0LSNpzAbrqamaJrNNBXrrQnAK8ibZYU6wUGsLJFa8Jr+ZvMhRFiCOOVVFHNk1L5IbO
- Ll4NcDqPxPGokz/Dheu6VjC2H8lCKmGk2qE4VK47qY2ME8E+G+wWRf+2E2UH4CHZe6+/ wA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33teh2s6d6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 26 Sep 2020 20:03:24 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08R03NO8156695;
-        Sat, 26 Sep 2020 20:03:24 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33teh2s6cp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 26 Sep 2020 20:03:23 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08R03MU8009665;
-        Sun, 27 Sep 2020 00:03:22 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 33sw988cdd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 27 Sep 2020 00:03:22 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08R03Jfa26411400
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 27 Sep 2020 00:03:19 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F152242042;
-        Sun, 27 Sep 2020 00:03:18 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2BCA342049;
-        Sun, 27 Sep 2020 00:03:18 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.162.14])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sun, 27 Sep 2020 00:03:18 +0000 (GMT)
-Date:   Sun, 27 Sep 2020 02:03:16 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v10 10/16] s390/vfio-ap: allow configuration of matrix
- mdev in use by a KVM guest
-Message-ID: <20200927020316.38bf3fa1.pasic@linux.ibm.com>
-In-Reply-To: <20200821195616.13554-11-akrowiak@linux.ibm.com>
-References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
-        <20200821195616.13554-11-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1727614AbgI0ASg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 26 Sep 2020 20:18:36 -0400
+Received: from mail-eopbgr750138.outbound.protection.outlook.com ([40.107.75.138]:40005
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726426AbgI0ASf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 26 Sep 2020 20:18:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AaKX6EweekmV8v9gXHcEb9fQ0vHuRPdtTL/lLNGr7Ij3bHNEzNKmi+CTCjVfNkrx3XRii5lHRhE/bRT7TLAq4BubTgi4QyBhFricO9MHdsPc/B3zJY/4TEUZ/fmnq8P6RLXhBfiHMSddujw1S+YHjxVWUt0lyM8VDSaziST6SMjOgo4+478+dfKh5ZbBAhejXDajcnrnrDxZztjatwcIZWXndbK0sS61/X/H0gdZbxA/h1tqxp2+VlsKnBsycsNwS36ay45FevgYFyMkgJvWye54m1MwJ6kz/2ud7QahHTGkQVQYDO0c1ZKr6WZu2ZxRcldVWhmOwuKgQdjLAREkpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=67+CDl5yP75S43Le9/llTiHJx3sXvsJYvyeQpTwH9Qw=;
+ b=PcR+Yw1W1ro/rVrJ3Axp0JSqgVZ4hPylDACHy8/BQuX+Jef4dQK1IXbEsz9OXZIPAxP3cWiEFstUItKdp6CHX3+uyuasbR1yOo8loiXklEUjs2rRRYTJj5ntKHRkMkzVsAyx2a3SUzyH2/WJ/B9D1rQs2u58Qwkcc+YKqB3DaCG8BjcyBbX05aCrhQj7ycr9B+WRws5oKqElhVTTd+anwjpYrgVBjzIpifRALRmr2BDQ/PyL0Pfop+P7gE7uspndEc2W6rPP8s3HF5BOND6ISWf+W7a5Hba3F6gctgbXLl4zKKjaysnycMbYgq4WjY0L9EhLVfp+8FvKs/IkWhDPiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=67+CDl5yP75S43Le9/llTiHJx3sXvsJYvyeQpTwH9Qw=;
+ b=KnIcJVouFUIAvDlhaUxTAvsIrHg77z+FIAa/yowj5rYrCD+txI5MBQOl9qmu1bbifcj52ZjKDZcT9DlwaXisWhCTSCIZhZIFGFXWkZN/95mGXE2MuhxrfVFBNmRBPjjgxErVJSKItPzGpuyg9EHV97TLZzhwGoA69cSNK1F5PKw=
+Received: from MW2PR2101MB1052.namprd21.prod.outlook.com (2603:10b6:302:a::16)
+ by MWHPR2101MB0731.namprd21.prod.outlook.com (2603:10b6:301:81::37) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.18; Sun, 27 Sep
+ 2020 00:18:31 +0000
+Received: from MW2PR2101MB1052.namprd21.prod.outlook.com
+ ([fe80::d00b:3909:23b:83f1]) by MW2PR2101MB1052.namprd21.prod.outlook.com
+ ([fe80::d00b:3909:23b:83f1%4]) with mapi id 15.20.3412.028; Sun, 27 Sep 2020
+ 00:18:31 +0000
+From:   Michael Kelley <mikelley@microsoft.com>
+To:     Joseph Salisbury <Joseph.Salisbury@microsoft.com>,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        vkuznets <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH] x86/hyperv: Remove aliases with X64 in their name
+Thread-Topic: [PATCH] x86/hyperv: Remove aliases with X64 in their name
+Thread-Index: AQHWlBEKxEisZQTT3UK9Y8yazUtcyal7nviA
+Date:   Sun, 27 Sep 2020 00:18:31 +0000
+Message-ID: <MW2PR2101MB1052912692515787D192F6E4D7340@MW2PR2101MB1052.namprd21.prod.outlook.com>
+References: <1601130386-11111-1-git-send-email-jsalisbury@linux.microsoft.com>
+In-Reply-To: <1601130386-11111-1-git-send-email-jsalisbury@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-09-27T00:18:29Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=1c1d70a0-0a68-4b48-87fd-082f93f3aadc;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0
+authentication-results: microsoft.com; dkim=none (message not signed)
+ header.d=none;microsoft.com; dmarc=none action=none
+ header.from=microsoft.com;
+x-originating-ip: [24.22.167.197]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: e5bc0e02-8ff2-4285-7665-08d8627add85
+x-ms-traffictypediagnostic: MWHPR2101MB0731:
+x-ms-exchange-transport-forked: True
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-microsoft-antispam-prvs: <MWHPR2101MB0731B2EA923D1D3290F0D238D7340@MWHPR2101MB0731.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2887;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3XSrrDGeTO1qFbL6lUmvfDQcihfFfWE9PXpFQ3dYNuqzQiciCDaAeE6bAAzw7Iks+0eIBGbV6kxRkrikmXohr1ZNDdvlPuQpLOONGeUxGnVw/vw4Kq8yNKjMl2KUnLUzaz83spwXu7cep4WTqpbp0D+YvKuQp+kTlJy/Zi9r7O3k7M8D+f5L4yc/m+TJJW8hXIeLqvE/VtZsvjKOf8lcKZTS+3VbdZVa04LHr+oYc2qrDZW9KL1to/bFivmSe8R8vnj/UqeEx0TPzX0/QVDzwugASubeem0I/2d7Cc8E+4V69tYcLD/IIyD/Qp/SGqHY+bWFChQBmLkH2tCKWR+OUoX5q3YGfAU0apF5jDKcNUnIWQrkUi3zytPQGWntqP7P
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR2101MB1052.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(39860400002)(346002)(396003)(376002)(316002)(186003)(8990500004)(33656002)(66946007)(76116006)(110136005)(6506007)(54906003)(7696005)(71200400001)(82960400001)(82950400001)(83380400001)(8936002)(66446008)(2906002)(9686003)(478600001)(10290500003)(86362001)(4744005)(55016002)(5660300002)(26005)(52536014)(64756008)(66556008)(66476007)(7416002)(8676002)(4326008)(921003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: jXGclzbeuHcPSW9GLcArAurk7ifO5GLmGZe/mmEsH9J2dcY7KNo//8WN1uLxllpfXZB93wOK3abPDmIYfjsSkWQIduTKNwTzllKKXu63pQK1wP8z/BL3IP8/QKJ8NtbR4JNhjNn408kTyalq4J7MW3fl1CxZabk4aWTH+JWjBNw0fUxUhCnS4TybgbalWECnvoqftAnr+t1DO6mIUn308P1YwyF1YCXsDdp5W+iAoCDjgTvhH3Eth3D6ioiX+mJ59FyKokZTQhcezQIzpIQfFKMlrvhnn/6HdM+4Dnn4aMOsW+Q3VeuhANpRHVw4V1FQrl0oS6Ht7++ycrGCs7jRd3i8DzXSoKNHYaaKJMjHbsX0d2WRrzBvaDLXPtS8BOE/APqKHEu1Twm/xEYi9ho+U5WM617FNvU8DIBfnvyjUJe1TBGV1GG+DRuKgTwW33j3q4b5o3CvRjO26JW/zmz0zRxjG9IkfFz9189K0/KEWqahCa5fYf2Vlf9qDnUmazWg1lRlnDH2fY+19GXioh9ql90OSbQ3F8o9LckXk3AzT+JqxFMQgf8MFQYK30R2OmWEQ8eZY77Q52hjCHkpUb87dBgWqxHOnaUdQLMNNHVK6FxMFnPu2BYie4x08LmAMKt+qUXZKIcP4FQLuOaFiiaOoA==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-26_21:2020-09-24,2020-09-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- malwarescore=0 mlxscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
- mlxlogscore=999 clxscore=1015 priorityscore=1501 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009260214
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR2101MB1052.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5bc0e02-8ff2-4285-7665-08d8627add85
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2020 00:18:31.4289
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rJvt5nEXiMukN0AqheOeFuLRgNYpdm2KoK/iqercfx5uCFHkxwBDJvpVQMUA85a4xDOdwz1oQSoxeIl+XlChnTuEGlljXUplvqnVHQrfs9I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR2101MB0731
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 21 Aug 2020 15:56:10 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> The current support for pass-through crypto adapters does not allow
-> configuration of a matrix mdev when it is in use by a KVM guest. Let's
-> allow AP resources - i.e., adapters, domains and control domains - to be
-> assigned to or unassigned from a matrix mdev while it is in use by a guest.
-> This is in preparation for the introduction of support for dynamic
-> configuration of the AP matrix for a running KVM guest.
-
-AFAIU this will let the user do the assign, which will however only take
-effect if the same mdev is re-used with a freshly constructed VM, or?
-
-This is however supposed to change real soon (in patch 11). From the
-perspective of bisectability we would end up with a single commit that
-acts funny.
-
-How about switching up patches 10 and 11. This way the changes you have
-in the current 11 would remain dormant until the changes in the current
-10 enable the complete new feature (hotplug)?
-
-
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+From: Joseph Salisbury <jsalisbury@linux.microsoft.com> Sent: Saturday, Sep=
+tember 26, 2020 7:26 AM
+>=20
+> In the architecture independent version of hyperv-tlfs.h, commit c55a844f=
+46f958b
+> removed the "X64" in the symbol names so they would make sense for both x=
+86 and
+> ARM64.  That commit added aliases with the "X64" in the x86 version of hy=
+perv-tlfs.h
+> so that existing x86 code would continue to compile.
+>=20
+> As a cleanup, update the x86 code to use the symbols without the "X64", t=
+hen remove
+> the aliases.  There's no functional change.
+>=20
+> Signed-off-by: Joseph Salisbury <joseph.salisbury@microsoft.com>
 > ---
->  drivers/s390/crypto/vfio_ap_ops.c | 24 ------------------------
->  1 file changed, 24 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 24fd47e43b80..cf3321eb239b 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -773,10 +773,6 @@ static ssize_t assign_adapter_store(struct device *dev,
->  	struct mdev_device *mdev = mdev_from_dev(dev);
->  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  
-> -	/* If the guest is running, disallow assignment of adapter */
-> -	if (matrix_mdev->kvm)
-> -		return -EBUSY;
-> -
->  	ret = kstrtoul(buf, 0, &apid);
->  	if (ret)
->  		return ret;
-> @@ -828,10 +824,6 @@ static ssize_t unassign_adapter_store(struct device *dev,
->  	struct mdev_device *mdev = mdev_from_dev(dev);
->  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  
-> -	/* If the guest is running, disallow un-assignment of adapter */
-> -	if (matrix_mdev->kvm)
-> -		return -EBUSY;
-> -
->  	ret = kstrtoul(buf, 0, &apid);
->  	if (ret)
->  		return ret;
-> @@ -891,10 +883,6 @@ static ssize_t assign_domain_store(struct device *dev,
->  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  	unsigned long max_apqi = matrix_mdev->matrix.aqm_max;
->  
-> -	/* If the guest is running, disallow assignment of domain */
-> -	if (matrix_mdev->kvm)
-> -		return -EBUSY;
-> -
->  	ret = kstrtoul(buf, 0, &apqi);
->  	if (ret)
->  		return ret;
-> @@ -946,10 +934,6 @@ static ssize_t unassign_domain_store(struct device *dev,
->  	struct mdev_device *mdev = mdev_from_dev(dev);
->  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  
-> -	/* If the guest is running, disallow un-assignment of domain */
-> -	if (matrix_mdev->kvm)
-> -		return -EBUSY;
-> -
->  	ret = kstrtoul(buf, 0, &apqi);
->  	if (ret)
->  		return ret;
-> @@ -991,10 +975,6 @@ static ssize_t assign_control_domain_store(struct device *dev,
->  	struct mdev_device *mdev = mdev_from_dev(dev);
->  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  
-> -	/* If the guest is running, disallow assignment of control domain */
-> -	if (matrix_mdev->kvm)
-> -		return -EBUSY;
-> -
->  	ret = kstrtoul(buf, 0, &id);
->  	if (ret)
->  		return ret;
-> @@ -1036,10 +1016,6 @@ static ssize_t unassign_control_domain_store(struct device *dev,
->  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  	unsigned long max_domid =  matrix_mdev->matrix.adm_max;
->  
-> -	/* If the guest is running, disallow un-assignment of control domain */
-> -	if (matrix_mdev->kvm)
-> -		return -EBUSY;
-> -
->  	ret = kstrtoul(buf, 0, &domid);
->  	if (ret)
->  		return ret;
+>  arch/x86/hyperv/hv_init.c          |  8 ++++----
+>  arch/x86/hyperv/hv_spinlock.c      |  2 +-
+>  arch/x86/include/asm/hyperv-tlfs.h | 33 ------------------------------
+>  arch/x86/kernel/cpu/mshyperv.c     |  8 ++++----
+>  arch/x86/kvm/hyperv.c              | 20 +++++++++---------
+>  5 files changed, 19 insertions(+), 52 deletions(-)
+>=20
 
+Reviewed-by: Michael Kelley <mikelley@microsoft.com>
