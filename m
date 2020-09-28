@@ -2,250 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 542C427AFF1
-	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 16:23:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86C4527B08C
+	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 17:11:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726424AbgI1OXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Sep 2020 10:23:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20044 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726526AbgI1OXs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 10:23:48 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08SEBT13127454;
-        Mon, 28 Sep 2020 10:23:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=tZWG+2p/xlDOByL5lYGeOEc7ZMoYpuu8PiqCDJ6CaFM=;
- b=DVFQa4rGLG51f4BCy02JMgOb8QvBU74j452SadNsK9dDnAp27fbiucCWfChZI2t0kx/o
- q85WI16JIiBT3aSgx6MiqZzS8IYu6094SwXay3Keebtsvr7teRMnlVmnKNhmYfbx5pQK
- V16gNeG45jhGZp+akApJly6q54x0Btp1iQ3JQYBBh/jodIlJ/CyMiH5BXUfx6cPKlDtf
- qpAOxlspOjOwgI8OS/IDoVHgbKB4/HM7D+e8y8FPeDCfkdjCzjE+EywKsgHJj0zkVEmZ
- mfPdpAS68zsmFh5fLPcp78csFgSDBMA9nHCGR49NFr8CfonNVk0ZkJev7yf5ott06OkC Iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33uhcdgcnu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Sep 2020 10:23:46 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08SECXwl130193;
-        Mon, 28 Sep 2020 10:23:45 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33uhcdgcme-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Sep 2020 10:23:45 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08SEMeQ5019941;
-        Mon, 28 Sep 2020 14:23:43 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 33sw9894uk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Sep 2020 14:23:43 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08SENex87864640
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Sep 2020 14:23:40 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A1BE242041;
-        Mon, 28 Sep 2020 14:23:40 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3BF7D4203F;
-        Mon, 28 Sep 2020 14:23:40 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.66.164])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 28 Sep 2020 14:23:40 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v2 4/4] s390x: css: pv: css test adaptation for PV
-Date:   Mon, 28 Sep 2020 16:23:37 +0200
-Message-Id: <1601303017-8176-5-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
-References: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-28_14:2020-09-28,2020-09-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- spamscore=0 bulkscore=0 suspectscore=3 mlxlogscore=759 adultscore=0
- lowpriorityscore=0 malwarescore=0 clxscore=1015 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009280108
+        id S1726566AbgI1PLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Sep 2020 11:11:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55047 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726477AbgI1PLb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 11:11:31 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601305890;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qlwOFkZa79dswmCrZ/uMRqRS1jmqGoMfOKy6A9Hyy7M=;
+        b=bJSxrKI9I4fIZKC5BtbUbnXEJEOsy6hAT3bqOvKcrWQpruv106kXvdGpnTiRalSSShUxl0
+        XZf1kH2q2zaAS9i1WZ/dnncr5W8e9EcWulclSdS0iPOOX+1N7w5OqrPXQ0+/lhOMpzTNQG
+        Q49hBBzz7zRB4IqXJBqH6mTJU8D4PTo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-e7xCA-xFO3yqyFro-jybag-1; Mon, 28 Sep 2020 11:11:28 -0400
+X-MC-Unique: e7xCA-xFO3yqyFro-jybag-1
+Received: by mail-wm1-f71.google.com with SMTP id s24so470897wmh.1
+        for <kvm@vger.kernel.org>; Mon, 28 Sep 2020 08:11:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qlwOFkZa79dswmCrZ/uMRqRS1jmqGoMfOKy6A9Hyy7M=;
+        b=bmgws0XMg20O5xxrx6Kif4nxfoOJmDZydJda21Xl0OAZe5+15ygJMXXTXnpOsz79uC
+         YQi2scAgScoMc4SogIYyQ2pm/2z9uOyfjqRutcMLK4GeiV2UkMFIQmBOe1X4mQ56J3/W
+         XgzJG+HgxDrpwd3AI5XJlZP3wt+0DesqaRmhOzuzL3Km+XYDsSF2113yh2RVcxXIkrq0
+         e+0lEp92OhV6QaKfrEagmno8NSz+cGZkMkACP16fR5YwOOtmYQPG+p3eACFGWNlIU69K
+         ZphFR0llObG1kpX523GwiWQbdiFJWgvXBX6ZyuiZa2pAKze/T2s1XYKmbFGyC5jWCXRK
+         K1Uw==
+X-Gm-Message-State: AOAM531I2AueH0vZIur1L0dzkzAth/tj0dnnn3VDSgNMu6nk8ff22hFA
+        gsrBIzt50tyC5g99SuFQ2UIOvhdIoooa5P5hCoPtcd0wsOIEP9GeyjRJuq5CAxkqY/gFTSxk0OX
+        g9b+Nyd6VEje5
+X-Received: by 2002:a7b:c453:: with SMTP id l19mr1994823wmi.163.1601305887270;
+        Mon, 28 Sep 2020 08:11:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxgH0fT+EfPSAu5naON5BaV2Jj5VdZVepiW0koYQfjuo8C9SZFrH2qlZO6pNrjHwWe3U9fRrg==
+X-Received: by 2002:a7b:c453:: with SMTP id l19mr1994807wmi.163.1601305887080;
+        Mon, 28 Sep 2020 08:11:27 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f4f8:dc3e:26e3:38c7? ([2001:b07:6468:f312:f4f8:dc3e:26e3:38c7])
+        by smtp.gmail.com with ESMTPSA id y5sm1636990wmg.21.2020.09.28.08.11.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Sep 2020 08:11:26 -0700 (PDT)
+Subject: Re: [PATCH 15/22] kvm: mmu: Support changed pte notifier in tdp MMU
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20200925212302.3979661-1-bgardon@google.com>
+ <20200925212302.3979661-16-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <622ffc59-d914-c718-3f2f-952f714ac63c@redhat.com>
+Date:   Mon, 28 Sep 2020 17:11:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20200925212302.3979661-16-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We want the tests to automatically work with or without protected
-virtualisation.
-To do this we need to share the I/O memory with the host.
+On 25/09/20 23:22, Ben Gardon wrote:
+> +		*iter.sptep = 0;
+> +		handle_changed_spte(kvm, as_id, iter.gfn, iter.old_spte,
+> +				    new_spte, iter.level);
+> +
 
-Let's replace all static allocations with dynamic allocations
-to clearly separate shared and private memory.
+Can you explain why new_spte is passed here instead of 0?
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/css.h     |  3 +--
- lib/s390x/css_lib.c | 28 ++++++++--------------------
- s390x/css.c         | 35 ++++++++++++++++++++++++-----------
- 3 files changed, 33 insertions(+), 33 deletions(-)
+All calls to handle_changed_spte are preceded by "*something = 
+new_spte" except this one, so I'm thinking of having a change_spte 
+function like
 
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 221b67c..e3dee9f 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -283,8 +283,7 @@ int css_enable(int schid, int isc);
- 
- /* Library functions */
- int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw);
--int start_single_ccw(unsigned int sid, int code, void *data, int count,
--		     unsigned char flags);
-+struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags);
- void css_irq_io(void);
- int css_residual_count(unsigned int schid);
- 
-diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-index 8e02371..6a0a0ec 100644
---- a/lib/s390x/css_lib.c
-+++ b/lib/s390x/css_lib.c
-@@ -18,6 +18,7 @@
- #include <asm/time.h>
- #include <asm/arch_def.h>
- 
-+#include <malloc_io.h>
- #include <css.h>
- 
- static struct schib schib;
-@@ -202,33 +203,20 @@ int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
- 	return ssch(sid, &orb);
- }
- 
--/*
-- * In the future, we want to implement support for CCW chains;
-- * for that, we will need to work with ccw1 pointers.
-- */
--static struct ccw1 unique_ccw;
--
--int start_single_ccw(unsigned int sid, int code, void *data, int count,
--		     unsigned char flags)
-+struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags)
- {
--	int cc;
--	struct ccw1 *ccw = &unique_ccw;
-+	struct ccw1 *ccw;
-+
-+	ccw = alloc_io_page(sizeof(*ccw));
-+	if (!ccw)
-+		return NULL;
- 
--	report_prefix_push("start_subchannel");
--	/* Build the CCW chain with a single CCW */
- 	ccw->code = code;
- 	ccw->flags = flags;
- 	ccw->count = count;
- 	ccw->data_address = (int)(unsigned long)data;
- 
--	cc = start_ccw1_chain(sid, ccw);
--	if (cc) {
--		report(0, "cc = %d", cc);
--		report_prefix_pop();
--		return cc;
--	}
--	report_prefix_pop();
--	return 0;
-+	return ccw;
- }
- 
- /* wait_and_check_io_completion:
-diff --git a/s390x/css.c b/s390x/css.c
-index ee3bc83..4b0b6b1 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -17,13 +17,15 @@
- #include <interrupt.h>
- #include <asm/arch_def.h>
- 
-+#include <malloc_io.h>
- #include <css.h>
-+#include <asm/barrier.h>
- 
- #define DEFAULT_CU_TYPE		0x3832 /* virtio-ccw */
- static unsigned long cu_type = DEFAULT_CU_TYPE;
- 
- static int test_device_sid;
--static struct senseid senseid;
-+static struct senseid *senseid;
- 
- static void test_enumerate(void)
- {
-@@ -57,6 +59,7 @@ static void test_enable(void)
-  */
- static void test_sense(void)
- {
-+	struct ccw1 *ccw;
- 	int ret;
- 	int len;
- 
-@@ -80,9 +83,15 @@ static void test_sense(void)
- 
- 	lowcore_ptr->io_int_param = 0;
- 
--	memset(&senseid, 0, sizeof(senseid));
--	ret = start_single_ccw(test_device_sid, CCW_CMD_SENSE_ID,
--			       &senseid, sizeof(senseid), CCW_F_SLI);
-+	senseid = alloc_io_page(sizeof(*senseid));
-+	if (!senseid)
-+		goto error_senseid;
-+
-+	ccw = ccw_alloc(CCW_CMD_SENSE_ID, senseid, sizeof(*senseid), CCW_F_SLI);
-+	if (!ccw)
-+		goto error_ccw;
-+
-+	ret = start_ccw1_chain(test_device_sid, ccw);
- 	if (ret)
- 		goto error;
- 
-@@ -97,7 +106,7 @@ static void test_sense(void)
- 	if (ret < 0) {
- 		report_info("no valid residual count");
- 	} else if (ret != 0) {
--		len = sizeof(senseid) - ret;
-+		len = sizeof(*senseid) - ret;
- 		if (ret && len < CSS_SENSEID_COMMON_LEN) {
- 			report(0, "transferred a too short length: %d", ret);
- 			goto error;
-@@ -105,21 +114,25 @@ static void test_sense(void)
- 			report_info("transferred a shorter length: %d", len);
- 	}
- 
--	if (senseid.reserved != 0xff) {
--		report(0, "transferred garbage: 0x%02x", senseid.reserved);
-+	if (senseid->reserved != 0xff) {
-+		report(0, "transferred garbage: 0x%02x", senseid->reserved);
- 		goto error;
- 	}
- 
- 	report_prefix_pop();
- 
- 	report_info("reserved 0x%02x cu_type 0x%04x cu_model 0x%02x dev_type 0x%04x dev_model 0x%02x",
--		    senseid.reserved, senseid.cu_type, senseid.cu_model,
--		    senseid.dev_type, senseid.dev_model);
-+		    senseid->reserved, senseid->cu_type, senseid->cu_model,
-+		    senseid->dev_type, senseid->dev_model);
- 
--	report(senseid.cu_type == cu_type, "cu_type expected 0x%04x got 0x%04x",
--	       (uint16_t) cu_type, senseid.cu_type);
-+	report(senseid->cu_type == cu_type, "cu_type expected 0x%04x got 0x%04x",
-+	       (uint16_t) cu_type, senseid->cu_type);
- 
- error:
-+	free_io_page(ccw);
-+error_ccw:
-+	free_io_page(senseid);
-+error_senseid:
- 	unregister_io_int_func(css_irq_io);
- }
- 
--- 
-2.25.1
+static void change_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+                        u64 *sptep, u64 new_spte, int level)
+{
+        u64 old_spte = *sptep;
+        *sptep = new_spte;
+
+        __handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level);
+        handle_changed_spte_acc_track(old_spte, new_spte, level);
+        handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte, new_spte, level);
+}
+
+in addition to the previously-mentioned cleanup of always calling
+handle_changed_spte instead of special-casing calls to two of the
+three functions.  It would be a nice place to add the
+trace_kvm_mmu_set_spte tracepoint, too.
+
+Paolo
 
