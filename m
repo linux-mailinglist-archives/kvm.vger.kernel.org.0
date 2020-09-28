@@ -2,349 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A6EF27B116
-	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 17:41:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C804E27B11F
+	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 17:45:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726630AbgI1PlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Sep 2020 11:41:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34208 "EHLO
+        id S1726665AbgI1PpX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Sep 2020 11:45:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52569 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726461AbgI1PlV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 11:41:21 -0400
+        by vger.kernel.org with ESMTP id S1726629AbgI1PpW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 11:45:22 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601307678;
+        s=mimecast20190719; t=1601307919;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Pn8lOEOUIOpTEOepzxqWcrUmnDNkzY2Axg51GzweM4Y=;
-        b=e6ULXYeXD4gsa9ymq91P8XeUOrl3L3B6alqaegS1qQL9Xq+mOVS3HlIETgCvz6Hem+AP0o
-        AuvuwzUH4SjhrighzBCYF+ArsXaA6yJkC+Nb9Th/O3K/Y4GP/3w62dbYbTfqMzY7vs/gn1
-        3h29HuUgwqg0m9/TjRcFcPo31UXUlqM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-qNpy43wYM8u8sBpSYcUyig-1; Mon, 28 Sep 2020 11:41:13 -0400
-X-MC-Unique: qNpy43wYM8u8sBpSYcUyig-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F146185A0D2;
-        Mon, 28 Sep 2020 15:41:12 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9648C5C1BB;
-        Mon, 28 Sep 2020 15:41:08 +0000 (UTC)
-Date:   Mon, 28 Sep 2020 11:41:07 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Richard Henderson <rth@twiddle.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH] target/i386: add -cpu,lbr=true support to enable guest
- LBR
-Message-ID: <20200928154107.GX3717385@habkost.net>
-References: <20200726153229.27149-1-like.xu@linux.intel.com>
- <20200726153229.27149-3-like.xu@linux.intel.com>
- <20200924220523.GL3717385@habkost.net>
- <958128c6-39e8-96fe-34d8-7be1888f4144@intel.com>
+        bh=EmoLZH3c7F182vOGcdO5c+/L/iT9ksAovxdw1FKXD9c=;
+        b=ewlg2CnPr+sfIwk0/2uWRX2HaypRD6ibv53AEJSlNG4B78ABwg+UzVUDQQFGMNcM+DCeiP
+        DT6V1YoVBMpkLo/2F/EH0dcPL2ZmMUdZpWhUiAps1Mie0x4ojK4Rgo+WFhWF3J4Uck9rmL
+        /aEOBulU6Zy6bF6sE3CCUrU1cdaxoW0=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-x9R2YtCtM1CN2a9gZWmfwQ-1; Mon, 28 Sep 2020 11:45:18 -0400
+X-MC-Unique: x9R2YtCtM1CN2a9gZWmfwQ-1
+Received: by mail-qt1-f199.google.com with SMTP id u6so898711qte.8
+        for <kvm@vger.kernel.org>; Mon, 28 Sep 2020 08:45:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EmoLZH3c7F182vOGcdO5c+/L/iT9ksAovxdw1FKXD9c=;
+        b=uk5px0k3+uCMsLyIB/kzGtLcPGgvBM05xF2RliwBTCorUJPUnxIw2zvHNrliGmD2cC
+         CLVdCFqcrGDZzCRKFLXBmRO1Doma2B/2xsA7q9jUhc/rJXRY2WUl0PXEfDjYwZ17xUXL
+         bN8Xks/O2ZiaKi3uSJ6f5jv1kcZbhhom0UEELf/cU3mstLLbFRnaSkygzGXu4Yc+hTme
+         zreWcZI4KR+peIAme9Ylf2Szx1Bry/MH0qEO0/ttwTLyjblCX9lnen7rRZH9xivThtTR
+         uW/vUZz+SV/986DsB4PX5IM8Zh1Db4Td3WOBLBaSz6A8KkfgdkZYLA53wL4eOYXqnwGE
+         jb2g==
+X-Gm-Message-State: AOAM531m4AJaPIHPm4OvxRK5OEc4SNRHO9WssIquVMGFfR+KXGgz2noR
+        /NOcw3K8bg1/QTKVcKhQs+mJH98zzoInL9lFEsQ1YgmN565Z8Am4Z7/XirPShH1eJW1VLHEsDj+
+        KvPyR5B9a+swFfQMM5P+6/ECTY3Fn
+X-Received: by 2002:ac8:7208:: with SMTP id a8mr2254004qtp.22.1601307917128;
+        Mon, 28 Sep 2020 08:45:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz80d8ZwANAMEdVFkB8z7olGrnUdIuUyaYlxzd50B5cqWKATJ661zvv/uzVeTXVFzBZ/7/34/QGcwHXPNeAh0k=
+X-Received: by 2002:ac8:7208:: with SMTP id a8mr2253964qtp.22.1601307916793;
+ Mon, 28 Sep 2020 08:45:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <958128c6-39e8-96fe-34d8-7be1888f4144@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200924032125.18619-1-jasowang@redhat.com> <20200924032125.18619-9-jasowang@redhat.com>
+In-Reply-To: <20200924032125.18619-9-jasowang@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Mon, 28 Sep 2020 17:44:40 +0200
+Message-ID: <CAJaqyWdDX4JoPUHHXxkB=veiK9nETyqCPEJxcrHdjLmpE4PRCg@mail.gmail.com>
+Subject: Re: [RFC PATCH 08/24] vdpa: introduce virtqueue groups
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Michael Tsirkin <mst@redhat.com>, Cindy Lu <lulu@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Rob Miller <rob.miller@broadcom.com>,
+        lingshan.zhu@intel.com, Harpreet Singh Anand <hanand@xilinx.com>,
+        mhabets@solarflare.com, eli@mellanox.com,
+        Adrian Moreno Zapata <amorenoz@redhat.com>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 28, 2020 at 10:51:03PM +0800, Xu, Like wrote:
-> Hi Eduardo,
-> 
-> Thanks for your detailed review.
-> 
-> On 2020/9/25 6:05, Eduardo Habkost wrote:
-> > I've just noticed this on my review queue (apologies for the long
-> > delay).  Comments below:
-> > 
-> > On Sun, Jul 26, 2020 at 11:32:20PM +0800, Like Xu wrote:
-> > > The LBR feature would be enabled on the guest if:
-> > > - the KVM is enabled and the PMU is enabled and,
-> > > - the msr-based-feature IA32_PERF_CAPABILITIES is supporterd and,
-> > > - the supported returned value for lbr_fmt from this msr is not zero.
-> > > 
-> > > The LBR feature would be disabled on the guest if:
-> > > - the msr-based-feature IA32_PERF_CAPABILITIES is unsupporterd OR,
-> > > - qemu set the IA32_PERF_CAPABILITIES msr feature without lbr_fmt values OR,
-> > > - the requested guest vcpu model doesn't support PDCM.
-> > > 
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Richard Henderson <rth@twiddle.net>
-> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > > Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> > > Cc: qemu-devel@nongnu.org
-> > > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> > > ---
-> > >   hw/i386/pc.c      |  1 +
-> > >   target/i386/cpu.c | 24 ++++++++++++++++++++++--
-> > >   target/i386/cpu.h |  2 ++
-> > >   target/i386/kvm.c |  7 ++++++-
-> > >   4 files changed, 31 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > > index 3d419d5991..857aff75bb 100644
-> > > --- a/hw/i386/pc.c
-> > > +++ b/hw/i386/pc.c
-> > > @@ -318,6 +318,7 @@ GlobalProperty pc_compat_1_5[] = {
-> > >       { "Nehalem-" TYPE_X86_CPU, "min-level", "2" },
-> > >       { "virtio-net-pci", "any_layout", "off" },
-> > >       { TYPE_X86_CPU, "pmu", "on" },
-> > > +    { TYPE_X86_CPU, "lbr", "on" },
-> > Why is this line here?
-> I'll remove it.
-> > 
-> > >       { "i440FX-pcihost", "short_root_bus", "0" },
-> > >       { "q35-pcihost", "short_root_bus", "0" },
-> > >   };
-> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > index 588f32e136..c803994887 100644
-> > > --- a/target/i386/cpu.c
-> > > +++ b/target/i386/cpu.c
-> > > @@ -1142,8 +1142,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> > >       [FEAT_PERF_CAPABILITIES] = {
-> > >           .type = MSR_FEATURE_WORD,
-> > >           .feat_names = {
-> > > -            NULL, NULL, NULL, NULL,
-> > > -            NULL, NULL, NULL, NULL,
-> > > +            "lbr-fmt-bit-0", "lbr-fmt-bit-1", "lbr-fmt-bit-2", "lbr-fmt-bit-3",
-> > > +            "lbr-fmt-bit-4", "lbr-fmt-bit-5", NULL, NULL,
-> > What about a separate "lbr-fmt" int property instead of
-> > individual bit properties?
-> 
-> I'm not sure if you mean adding a "separate lbr-fmt int property"
-> like "uint64_t tcg_features" to 'struct FeatureWordInfo'.
-> 
-> Would you mind providing more implementation hints,
-> considering the PEBS_FMT will be added later ?
+On Thu, Sep 24, 2020 at 5:23 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+> This patch introduces virtqueue groups to vDPA device. The virtqueue
+> group is the minimal set of virtqueues that must share an address
+> space. And the adddress space identifier could only be attached to
+> a specific virtqueue group.
+>
+> A new mandated bus operation is introduced to get the virtqueue group
+> ID for a specific virtqueue.
+>
+> All the vDPA device drivers were converted to simply support a single
+> virtqueue group.
+>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/vdpa/ifcvf/ifcvf_main.c   |  9 ++++++++-
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c |  8 +++++++-
+>  drivers/vdpa/vdpa.c               |  4 +++-
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c  | 11 ++++++++++-
+>  include/linux/vdpa.h              | 12 +++++++++---
+>  5 files changed, 37 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index 076d7ac5e723..e6a0be374e51 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -327,6 +327,11 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+>         return IFCVF_QUEUE_ALIGNMENT;
+>  }
+>
+> +static u32 ifcvf_vdpa_get_vq_group(struct vdpa_device *vdpa, u16 idx)
+> +{
+> +       return 0;
+> +}
+> +
+>  static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
+>                                   unsigned int offset,
+>                                   void *buf, unsigned int len)
+> @@ -387,6 +392,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
+>         .get_device_id  = ifcvf_vdpa_get_device_id,
+>         .get_vendor_id  = ifcvf_vdpa_get_vendor_id,
+>         .get_vq_align   = ifcvf_vdpa_get_vq_align,
+> +       .get_vq_group   = ifcvf_vdpa_get_vq_group,
+>         .get_config     = ifcvf_vdpa_get_config,
+>         .set_config     = ifcvf_vdpa_set_config,
+>         .set_config_cb  = ifcvf_vdpa_set_config_cb,
+> @@ -434,7 +440,8 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>
+>         adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
+>                                     dev, &ifc_vdpa_ops,
+> -                                   IFCVF_MAX_QUEUE_PAIRS * 2);
+> +                                   IFCVF_MAX_QUEUE_PAIRS * 2, 1);
+> +
+>         if (adapter == NULL) {
+>                 IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
+>                 return -ENOMEM;
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> index 9df69d5efe8c..4e480f4f754e 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -1428,6 +1428,11 @@ static u32 mlx5_vdpa_get_vq_align(struct vdpa_device *vdev)
+>         return PAGE_SIZE;
+>  }
+>
+> +static u32 mlx5_vdpa_get_vq_group(struct vdpa_device *vdpa, u16 idx)
+> +{
+> +       return 0;
+> +}
+> +
+>  enum { MLX5_VIRTIO_NET_F_GUEST_CSUM = 1 << 9,
+>         MLX5_VIRTIO_NET_F_CSUM = 1 << 10,
+>         MLX5_VIRTIO_NET_F_HOST_TSO6 = 1 << 11,
+> @@ -1838,6 +1843,7 @@ static const struct vdpa_config_ops mlx5_vdpa_ops = {
+>         .get_vq_notification = mlx5_get_vq_notification,
+>         .get_vq_irq = mlx5_get_vq_irq,
+>         .get_vq_align = mlx5_vdpa_get_vq_align,
+> +       .get_vq_group = mlx5_vdpa_get_vq_group,
+>         .get_features = mlx5_vdpa_get_features,
+>         .set_features = mlx5_vdpa_set_features,
+>         .set_config_cb = mlx5_vdpa_set_config_cb,
+> @@ -1925,7 +1931,7 @@ void *mlx5_vdpa_add_dev(struct mlx5_core_dev *mdev)
+>         max_vqs = min_t(u32, max_vqs, MLX5_MAX_SUPPORTED_VQS);
+>
+>         ndev = vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, mdev->device, &mlx5_vdpa_ops,
+> -                                2 * mlx5_vdpa_max_qps(max_vqs));
+> +                                2 * mlx5_vdpa_max_qps(max_vqs), 1);
+>         if (IS_ERR(ndev))
+>                 return ndev;
+>
+> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+> index a69ffc991e13..46399746ec7c 100644
+> --- a/drivers/vdpa/vdpa.c
+> +++ b/drivers/vdpa/vdpa.c
+> @@ -62,6 +62,7 @@ static void vdpa_release_dev(struct device *d)
+>   * @parent: the parent device
+>   * @config: the bus operations that is supported by this device
+>   * @nvqs: number of virtqueues supported by this device
+> + * @ngroups: number of groups supported by this device
 
-You can add a regular uint8_t field to X86CPU, use
-DEFINE_PROP_UINT8 at x86_cpu_properties[], and just validate/copy
-the bits to cpu->features[FEAT_PERF_CAPABILITIES][bits 0:5] on
-x86_cpu_realizefn().
+Hi!
 
+Maybe the description of "ngroups" could be "number of *virtqueue*
+groups supported by this device"? I think that it could be needed in
+some contexts reading the code.
 
-> 
-> > 
-> > What happens if LBR_FMT on the host (returned by
-> > kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES) is
-> > different than the one configured for the guest?
-> To enable guest LBR, guest LBR_FMT must be the same as host LBR_FMT.
-> > Can KVM emulate
-> > a CPU with different LBR_FMT, or it must match the host?
-> It must match the host since the LBR registers are model specified.
+Thanks!
 
-OK, this means the value set in cpu->features[] need to be
-validated against the host in x86_cpu_filter_features().
-
-It can be similar to what's done for intel-pt bits, but instead
-of comparing to constants (the intel-pt bits in CPUID are
-constant today), you can compare the host value with
-cpu->features[FEAT_PERF_CAPABILITIES].
-
-Maybe a FeatureWordInfo.validate_feature(X86CPU *, FeatureWord)
-callback could be added, so we could just define separate
-validation functions for each feature word, to be called
-automatically by x86_cpu_filter_features().  This could be done
-as a follow-up patch, though.
-
-
-> > 
-> > If LBR_FMT must always match the host, the feature needs to block
-> > live migration.
-> It's migrable enough of the perf cap LBR version matches,
-> don't need full model number match.
-
-As long as the requirements are validated inside
-x86_cpu_filter_features(), it should be OK to make it migratable.
-
-> 
-> For example it's fine to migrate from SKY to CLX.
-> > I guess this is already the case because PDCM is
-> > cleared if !cpu->enable_pmu.  Adding PDCM to .unmigratable_flags
-> > is probably a good idea, though.
-> I'm trying to make LBR migration-friendly as much as possible w/ your help.
-> 
-> If Arch LBR is enabled for SPR guest, the situation will be different
-> hence adding PDCM to .unmigratable_flags may not help it.
-
-OK, in this case forget what I said about setting it on
-.unmigratable_flags.  The constraints for making the feature
-migratable should be same ones mentioned for intel-pt at:
-https://lore.kernel.org/qemu-devel/20200923141502.GO2044576@habkost.net/
-
-
-> > 
-> > 
-> > 
-> > >               NULL, NULL, NULL, NULL,
-> > >               NULL, "full-width-write", NULL, NULL,
-> > >               NULL, NULL, NULL, NULL,
-> > > @@ -4224,6 +4224,12 @@ static bool lmce_supported(void)
-> > >       return !!(mce_cap & MCG_LMCE_P);
-> > >   }
-> > > +static inline bool lbr_supported(void)
-> > > +{
-> > > +    return kvm_enabled() && (kvm_arch_get_supported_msr_feature(kvm_state,
-> > > +        MSR_IA32_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT);
-> > > +}
-> > You can rewrite this is an accelerator-independent way as:
-> >    (x86_cpu_get_supported_feature_word(FEAT_PERF_CAPABILITIES) & PERF_CAP_LBR_FMT)
-> Thanks, I'll apply it.
-> > 
-> > However, is this really supposed to return false if LBR_FMT is 000000?
-> I think it's fine to return false if LBR_FMT is 000000.
-
-Don't we want to support hosts that have PDCM
-(CPUID[1].ECX[bit 15]) = 1 and
-IA32_PERF_CAPABILITIES.LBR_FMT[bits 5:0] = 000000 ?
-
-> > 
-> > > +
-> > >   #define CPUID_MODEL_ID_SZ 48
-> > >   /**
-> > > @@ -4327,6 +4333,9 @@ static void max_x86_cpu_initfn(Object *obj)
-> > >       }
-> > >       object_property_set_bool(OBJECT(cpu), "pmu", true, &error_abort);
-> > > +    if (lbr_supported()) {
-> > > +        object_property_set_bool(OBJECT(cpu), "lbr", true, &error_abort);
-> > Why is this necessary?
-> > 
-> > If kvm_arch_get_supported_msr_feature(MSR_IA32_PERF_CAPABILITIES)
-> > return the PERF_CAP_LBR_FMT bits set,
-> > x86_cpu_get_supported_feature_word() will return those bits, and
-> > they will be automatically set at
-> > env->features[FEAT_PERF_CAPABILITIES].
-> Thanks, I'll remove it.
-> > > +    }
-> > >   }
-> > >   static const TypeInfo max_x86_cpu_type_info = {
-> > > @@ -5535,6 +5544,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> > >           }
-> > >           if (!cpu->enable_pmu) {
-> > >               *ecx &= ~CPUID_EXT_PDCM;
-> > > +            if (cpu->enable_lbr) {
-> > > +                warn_report("LBR is unsupported since guest PMU is disabled.");
-> > > +                exit(1);
-> > > +            }
-> > >           }
-> > >           break;
-> > >       case 2:
-> > > @@ -6553,6 +6566,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-> > >           }
-> > >       }
-> > > +    if (!cpu->max_features && cpu->enable_lbr &&
-> > Why do we need to check for !cpu->max_features here?
-> I'll remove it.
-> > 
-> > > +        !(env->features[FEAT_1_ECX] & CPUID_EXT_PDCM)) {
-> > > +        warn_report("requested vcpu model doesn't support PDCM for LBR.");
-> > > +        exit(1);
-> > Please report errors using error_setg(errp, ...) instead.
-> I'll apply it.
-> > 
-> > > +    }
-> > > +
-> > >       if (cpu->ucode_rev == 0) {
-> > >           /* The default is the same as KVM's.  */
-> > >           if (IS_AMD_CPU(env)) {
-> > > @@ -7187,6 +7206,7 @@ static Property x86_cpu_properties[] = {
-> > >   #endif
-> > >       DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-> > >       DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-> > > +    DEFINE_PROP_BOOL("lbr", X86CPU, enable_lbr, false),
-> > When exactly do we want to set lbr=off explicitly?  What's the
-> > expected outcome when lbr=off?
-> We set pmu=off explicitly, so does lbr=off.
-> 
-> When set lbr=off, the LBR-related registers accesses from guest bring #GP
-> and expected outcome is just like pmu=off.
-
-How are those registers enumerated?  Maybe I'm looking at an
-outdated version of the Intel SDM or I couldn't find the right
-section.
-
-> > 
-> > >       DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
-> > >                          HYPERV_SPINLOCK_NEVER_RETRY),
-> > > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > > index e1a5c174dc..a059913e26 100644
-> > > --- a/target/i386/cpu.h
-> > > +++ b/target/i386/cpu.h
-> > > @@ -357,6 +357,7 @@ typedef enum X86Seg {
-> > >   #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
-> > >   #define MSR_IA32_PERF_CAPABILITIES      0x345
-> > > +#define PERF_CAP_LBR_FMT      0x3f
-> > >   #define MSR_IA32_TSX_CTRL		0x122
-> > >   #define MSR_IA32_TSCDEADLINE            0x6e0
-> > > @@ -1702,6 +1703,7 @@ struct X86CPU {
-> > >        * capabilities) directly to the guest.
-> > >        */
-> > >       bool enable_pmu;
-> > > +    bool enable_lbr;
-> > This is a good place to document what enable_lbr=true|false
-> > means (see questions above).
-> > 
-> I'll document it here.
-> > >       /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
-> > >        * disabled by default to avoid breaking migration between QEMU with
-> > > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > > index b8455c89ed..feb33d5472 100644
-> > > --- a/target/i386/kvm.c
-> > > +++ b/target/i386/kvm.c
-> > > @@ -2690,8 +2690,10 @@ static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
-> > >       uint64_t kvm_perf_cap =
-> > >           kvm_arch_get_supported_msr_feature(kvm_state,
-> > >                                              MSR_IA32_PERF_CAPABILITIES);
-> > > -
-> > >       if (kvm_perf_cap) {
-> > > +        if (!cpu->enable_lbr) {
-> > > +            kvm_perf_cap &= ~PERF_CAP_LBR_FMT;
-> > > +        }
-> > Why is this necessary?  If enable_lbr is false,
-> > f[FEAT_PERF_CAPABILITIES] should not have those bits set at all.
-> I'll remove it.
-> > 
-> > >           kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
-> > >                           kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
-> > >       }
-> > > @@ -2731,6 +2733,9 @@ static void kvm_init_msrs(X86CPU *cpu)
-> > >       if (has_msr_perf_capabs && cpu->enable_pmu) {
-> > >           kvm_msr_entry_add_perf(cpu, env->features);
-> > > +    } else if (!has_msr_perf_capabs && cpu->enable_lbr) {
-> > > +        warn_report("KVM doesn't support MSR_IA32_PERF_CAPABILITIES for LBR.");
-> > > +        exit(1);
-> > This is not the appropriate place to check for unsupported
-> > features.  x86_cpu_realizefn() and/or x86_cpu_filter_features()
-> > is.
-> Thanks, I'll apply it in the x86_cpu_filter_features().
-> 
-> Please let me if you have more comments.
-> 
-> Thanks,
-> Like Xu
-> > >       }
-> > >       if (has_msr_ucode_rev) {
-> > > -- 
-> > > 2.21.3
-> > > 
-> 
-
--- 
-Eduardo
+>   * @size: size of the parent structure that contains private data
+>   *
+>   * Driver should use vdpa_alloc_device() wrapper macro instead of
+> @@ -72,7 +73,7 @@ static void vdpa_release_dev(struct device *d)
+>   */
+>  struct vdpa_device *__vdpa_alloc_device(struct device *parent,
+>                                         const struct vdpa_config_ops *config,
+> -                                       int nvqs,
+> +                                       int nvqs, unsigned int ngroups,
+>                                         size_t size)
+>  {
+>         struct vdpa_device *vdev;
+> @@ -100,6 +101,7 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
+>         vdev->config = config;
+>         vdev->features_valid = false;
+>         vdev->nvqs = nvqs;
+> +       vdev->ngroups = ngroups;
+>
+>         err = dev_set_name(&vdev->dev, "vdpa%u", vdev->index);
+>         if (err)
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> index 62d640327145..6669c561bc6e 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -75,6 +75,7 @@ struct vdpasim {
+>         u32 status;
+>         u32 generation;
+>         u64 features;
+> +       u32 groups;
+>         /* spinlock to synchronize iommu table */
+>         spinlock_t iommu_lock;
+>  };
+> @@ -352,7 +353,8 @@ static struct vdpasim *vdpasim_create(void)
+>         else
+>                 ops = &vdpasim_net_config_ops;
+>
+> -       vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops, VDPASIM_VQ_NUM);
+> +       vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
+> +                                   VDPASIM_VQ_NUM, 1);
+>         if (!vdpasim)
+>                 goto err_alloc;
+>
+> @@ -481,6 +483,11 @@ static u32 vdpasim_get_vq_align(struct vdpa_device *vdpa)
+>         return VDPASIM_QUEUE_ALIGN;
+>  }
+>
+> +static u32 vdpasim_get_vq_group(struct vdpa_device *vdpa, u16 idx)
+> +{
+> +       return 0;
+> +}
+> +
+>  static u64 vdpasim_get_features(struct vdpa_device *vdpa)
+>  {
+>         return vdpasim_features;
+> @@ -646,6 +653,7 @@ static const struct vdpa_config_ops vdpasim_net_config_ops = {
+>         .set_vq_state           = vdpasim_set_vq_state,
+>         .get_vq_state           = vdpasim_get_vq_state,
+>         .get_vq_align           = vdpasim_get_vq_align,
+> +       .get_vq_group           = vdpasim_get_vq_group,
+>         .get_features           = vdpasim_get_features,
+>         .set_features           = vdpasim_set_features,
+>         .set_config_cb          = vdpasim_set_config_cb,
+> @@ -672,6 +680,7 @@ static const struct vdpa_config_ops vdpasim_net_batch_config_ops = {
+>         .set_vq_state           = vdpasim_set_vq_state,
+>         .get_vq_state           = vdpasim_get_vq_state,
+>         .get_vq_align           = vdpasim_get_vq_align,
+> +       .get_vq_group           = vdpasim_get_vq_group,
+>         .get_features           = vdpasim_get_features,
+>         .set_features           = vdpasim_set_features,
+>         .set_config_cb          = vdpasim_set_config_cb,
+> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> index df169c2f5c0f..d829512efd27 100644
+> --- a/include/linux/vdpa.h
+> +++ b/include/linux/vdpa.h
+> @@ -51,6 +51,7 @@ struct vdpa_device {
+>         unsigned int index;
+>         bool features_valid;
+>         int nvqs;
+> +       unsigned int ngroups;
+>  };
+>
+>  /**
+> @@ -109,6 +110,10 @@ struct vdpa_device {
+>   *                             for the device
+>   *                             @vdev: vdpa device
+>   *                             Returns virtqueue algin requirement
+> + * @get_vq_group:              Get the group id for a specific virtqueue
+> + *                             @vdev: vdpa device
+> + *                             @idx: virtqueue index
+> + *                             Returns u32: group id for this virtqueue
+>   * @get_features:              Get virtio features supported by the device
+>   *                             @vdev: vdpa device
+>   *                             Returns the virtio features support by the
+> @@ -203,6 +208,7 @@ struct vdpa_config_ops {
+>
+>         /* Device ops */
+>         u32 (*get_vq_align)(struct vdpa_device *vdev);
+> +       u32 (*get_vq_group)(struct vdpa_device *vdev, u16 idx);
+>         u64 (*get_features)(struct vdpa_device *vdev);
+>         int (*set_features)(struct vdpa_device *vdev, u64 features);
+>         void (*set_config_cb)(struct vdpa_device *vdev,
+> @@ -230,12 +236,12 @@ struct vdpa_config_ops {
+>
+>  struct vdpa_device *__vdpa_alloc_device(struct device *parent,
+>                                         const struct vdpa_config_ops *config,
+> -                                       int nvqs,
+> +                                       int nvqs, unsigned int ngroups,
+>                                         size_t size);
+>
+> -#define vdpa_alloc_device(dev_struct, member, parent, config, nvqs)   \
+> +#define vdpa_alloc_device(dev_struct, member, parent, config, nvqs, ngroups) \
+>                           container_of(__vdpa_alloc_device( \
+> -                                      parent, config, nvqs, \
+> +                                      parent, config, nvqs, ngroups, \
+>                                        sizeof(dev_struct) + \
+>                                        BUILD_BUG_ON_ZERO(offsetof( \
+>                                        dev_struct, member))), \
+> --
+> 2.20.1
+>
 
