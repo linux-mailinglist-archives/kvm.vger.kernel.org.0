@@ -2,104 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A84D27B33B
-	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 19:31:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7494227B39B
+	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 19:50:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726621AbgI1RbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Sep 2020 13:31:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47057 "EHLO
+        id S1726562AbgI1RuN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Sep 2020 13:50:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40852 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726424AbgI1RbS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 13:31:18 -0400
+        by vger.kernel.org with ESMTP id S1726310AbgI1RuN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 13:50:13 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601314277;
+        s=mimecast20190719; t=1601315412;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BmBUVhbY8uYL/9rFspjmnabiru47MygeGdBGbv0g4Ck=;
-        b=HYjM4uWSGL0Ua6CJn28Wli9scPYlNtwJoFNze8WRPN6dUe8Mtk7e7keBaBGDAaRrQjyh2Q
-        cQiD4YxTnSpUE+ws6ZxtU6PaOn7vawyq8AgKp5R2oOLxmSWgenv3qNxFyP5wZ2805dzQve
-        p5XoAyyXH/ureAblIUqCiMXAx0SWYwE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-MtjNDhinOvq_PS6Ftle2vA-1; Mon, 28 Sep 2020 13:31:15 -0400
-X-MC-Unique: MtjNDhinOvq_PS6Ftle2vA-1
-Received: by mail-wr1-f72.google.com with SMTP id f18so669700wrv.19
-        for <kvm@vger.kernel.org>; Mon, 28 Sep 2020 10:31:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BmBUVhbY8uYL/9rFspjmnabiru47MygeGdBGbv0g4Ck=;
-        b=cidvtPHV6uUw/tkaSMDI1uVoUChuc3Fj8SAxivMcSGWtdI/1RZlMqZi+ugliRz9CPd
-         drF1a8e7uGciP/HI6cXYkw/4m7w41LG/dSt6Vx6ADYu4mIjOtHYaQR5MKiMRFnVIzygX
-         Einw3xa5UVfNcx2IuTJUcuZk4yILtjIKiao/cLywKgDxwzT6RJGxip+MmYhUrRJ2PkFy
-         hespaVot13KyRZ43lEF5j4hEhCkEIUzwuzqBbvktSvNdo/GQPlZRbuQuUA/kvZ1FInKI
-         +Pgv44Z8NTHPyclc8vAqH53JeftAxRR33dZ0Y19mogsECf5op4Gm6WtWknd7rKcSkJp4
-         6lnw==
-X-Gm-Message-State: AOAM530FNbHvsh4Rjt4Hd/u9nAZrl6QfYVrbL7YqzDJUs9QPyaCwgZ3r
-        uTs9Lz8oeGgprcT7IqPQFgNJOAnoP5CgemSea47Jz+PaOqRLNAxilvxYjvZYQO1qgomXTJi8NIz
-        LINkUIE7ttBsp
-X-Received: by 2002:a7b:cb17:: with SMTP id u23mr262377wmj.166.1601314274216;
-        Mon, 28 Sep 2020 10:31:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwwaUnnk7NPkByA7LLdvtAfjRG19RKiw8pzMjMqzLNtVXmwZmZHbRHGM9re/YfcV595i17Rww==
-X-Received: by 2002:a7b:cb17:: with SMTP id u23mr262350wmj.166.1601314273923;
-        Mon, 28 Sep 2020 10:31:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f4f8:dc3e:26e3:38c7? ([2001:b07:6468:f312:f4f8:dc3e:26e3:38c7])
-        by smtp.gmail.com with ESMTPSA id f6sm2225248wro.5.2020.09.28.10.31.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Sep 2020 10:31:12 -0700 (PDT)
-Subject: Re: [PATCH 00/22] Introduce the TDP MMU
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20200925212302.3979661-1-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <425b098c-dbe0-d614-8e62-1f50b2f63272@redhat.com>
-Date:   Mon, 28 Sep 2020 19:31:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20200925212302.3979661-1-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+         to:to:cc:cc; bh=vN7WzldusaKhlRAuePh92B0vVXzTNGz9OjZAHACw6VE=;
+        b=e3EREt2VTfVkXg81ULImmDASeF7eDEGO7njrpWnQtCsyJ8oh55+qJL6TO7S8MlSUg/HMlQ
+        QPpghmFP034zwa2i2E4ltWZSDMsBGidE2tZvDh2EnFCeqAfzin/yGAqNwLQ8F791MVLuxC
+        HY6oEdMwUfjxdncraNxl1pLa4l8YOvk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-n0Ooviu2OLmdpekXqCI5Qw-1; Mon, 28 Sep 2020 13:50:04 -0400
+X-MC-Unique: n0Ooviu2OLmdpekXqCI5Qw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C4C5801AAF;
+        Mon, 28 Sep 2020 17:50:03 +0000 (UTC)
+Received: from thuth.com (unknown [10.40.192.131])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AC712100238C;
+        Mon, 28 Sep 2020 17:50:01 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PULL 00/11] s390x and generic script updates
+Date:   Mon, 28 Sep 2020 19:49:47 +0200
+Message-Id: <20200928174958.26690-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/09/20 23:22, Ben Gardon wrote:
-> This series is the first of two. In this series we add a basic
-> implementation of the TDP MMU. In the next series we will improve the
-> performance of the TDP MMU and allow it to execute MMU operations
-> in parallel.
+ Hi Paolo,
 
-I have finished rebasing and adding a few cleanups on top, but I don't
-have time to test it today.  I think the changes shouldn't get too much
-in the way of the second series, but I've also pushed your v1 unmodified
-to kvm/tdp-mmu for future convenience.  I'll await for your feedback in
-the meanwhile!
+the following changes since commit 58c94d57a51a6927a68e3f09627b2d85e3404c0f:
 
-One feature that I noticed is missing is the shrinker.  What are your
-plans (or opinions) around it?
+  travis.yml: Use TRAVIS_BUILD_DIR to refer to the top directory (2020-09-25 10:00:36 +0200)
 
-Also, the code generally assume a 64-bit CPU (i.e. that writes to 64-bit
-PTEs are atomic).  That is not a big issue, it just needs a small change
-on top to make the TDP MMU conditional on CONFIG_X86_64.
+are available in the Git repository at:
 
-Thanks,
+  https://gitlab.com/huth/kvm-unit-tests.git tags/pull-request-2020-09-28
 
-Paolo
+for you to fetch changes up to b508e1147055255ecce93a95916363bda8c8f299:
+
+  scripts/arch-run: use ncat rather than nc. (2020-09-28 15:03:50 +0200)
+
+----------------------------------------------------------------
+- s390x protected VM support
+- Some other small s390x improvements
+- Generic improvements in the scripts (better TAP13 names, nc -> ncat, ...)
+----------------------------------------------------------------
+
+Jamie Iles (1):
+      scripts/arch-run: use ncat rather than nc.
+
+Marc Hartmayer (6):
+      runtime.bash: remove outdated comment
+      Use same test names in the default and the TAP13 output format
+      common.bash: run `cmd` only if a test case was found
+      scripts: add support for architecture dependent functions
+      run_tests/mkstandalone: add arch_cmd hook
+      s390x: add Protected VM support
+
+Thomas Huth (4):
+      configure: Add a check for the bash version
+      travis.yml: Update from Bionic to Focal
+      travis.yml: Update the list of s390x tests
+      s390x/selftest: Fix constraint of inline assembly
+
+ .travis.yml             |  7 ++++---
+ README.md               |  3 ++-
+ configure               | 14 ++++++++++++++
+ run_tests.sh            | 18 +++++++++---------
+ s390x/Makefile          | 15 ++++++++++++++-
+ s390x/selftest.c        |  2 +-
+ s390x/selftest.parmfile |  1 +
+ s390x/unittests.cfg     |  1 +
+ scripts/arch-run.bash   |  6 +++---
+ scripts/common.bash     | 21 +++++++++++++++++++--
+ scripts/mkstandalone.sh |  4 ----
+ scripts/runtime.bash    |  9 +++------
+ scripts/s390x/func.bash | 35 +++++++++++++++++++++++++++++++++++
+ 13 files changed, 106 insertions(+), 30 deletions(-)
+ create mode 100644 s390x/selftest.parmfile
+ create mode 100644 scripts/s390x/func.bash
 
