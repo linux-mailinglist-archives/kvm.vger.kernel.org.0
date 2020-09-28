@@ -2,59 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5C0D27AA7A
-	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 11:13:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7F8227AA94
+	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 11:21:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726751AbgI1JNe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Sep 2020 05:13:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34860 "EHLO
+        id S1726736AbgI1JVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Sep 2020 05:21:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3808 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726565AbgI1JNd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 05:13:33 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08S91wIV125580;
-        Mon, 28 Sep 2020 05:13:06 -0400
+        by vger.kernel.org with ESMTP id S1726497AbgI1JVX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 05:21:23 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08S942gG177926;
+        Mon, 28 Sep 2020 05:21:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
- content-type; s=pp1; bh=+fnxOmYt5Sd/B6QBpFPIwJ+OwUhbRhQuiUxDdpQAJG8=;
- b=VqX7A/oK8O8BTHCmnkttJazPHP0R9O1olLHUCJikOygrAAQ17ity5TZtvYPZT5Tv9i6Y
- sVCxlXTMZcRJlAUfB7Z2kJcpjrDbXfLdT3DryobkWVvWnFXv2Aa9QC4PS97eyoG3Ck02
- CqCNuojJ28tI+hW27r7jwcoxxu5ORoRfWANoYIhgUWNhn1BAZKUVvjeMsyM2ZY6QgPAa
- 40RcbvbLC494mOUWTp8vnirV1xKYs9qdqSn3yn+ngkOU5tamW50r+jZY60Rxon3TZ0F9
- 6i1t+Sd9nCozfz244VTGm9PqPXC9iLtQ3QQzi6hiDlXpjmDuGwHcG99ZyzY05vUd5Y31 yA== 
+ content-type : content-transfer-encoding; s=pp1;
+ bh=YbZbtdbVyfrk9wBmhGOdAdrGCRJdYKQaM2JizYtLuHA=;
+ b=ATcYo3Q4D7Z6ciyiK00eU38OnKwDdPa3yKefSsdqfdiIUyHhJM6SpRovhh9dtDn3LuyA
+ i4kn4Bc1V0HaSvMx8IQsXwFjnBfpvrajze5zZhgvB5pEjyHOxfGL67xbZ524YrVYcgA7
+ 8Yj/TwRQJUz9NtRAzyrJCiBAAAn4vKlEbK5q1tQtupmAT9oG6y274gC0lNCCaoyr7+8C
+ F4sG2vIaNK8HQGQHdyq2ququWdFWtwNpnWnAS0gyS/v2GrUONIFFElU8Sy/cAKkkiQjR
+ fmHLDjms9BMymNNsitLnj67+us/ARyup1ogaxo3cmD0RhczlJ2rb2mIz9aqOgFNlJBDG 2w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33uck8rs9s-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33ubyxj6ju-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Sep 2020 05:13:05 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08S92GXJ127159;
-        Mon, 28 Sep 2020 05:13:05 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33uck8rs8s-1
+        Mon, 28 Sep 2020 05:21:07 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08S96huJ186910;
+        Mon, 28 Sep 2020 05:21:07 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33ubyxj6hq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Sep 2020 05:13:05 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08S9CGiu009987;
-        Mon, 28 Sep 2020 09:13:02 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 33u5r9gbb2-1
+        Mon, 28 Sep 2020 05:21:06 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08S9Cqcj030324;
+        Mon, 28 Sep 2020 09:21:04 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 33sw98905y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Sep 2020 09:13:02 +0000
+        Mon, 28 Sep 2020 09:21:04 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08S9D0kg30409048
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08S9L14o9175382
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Sep 2020 09:13:00 GMT
+        Mon, 28 Sep 2020 09:21:01 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 75DE14C040;
-        Mon, 28 Sep 2020 09:13:00 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id BCCA74C04E;
+        Mon, 28 Sep 2020 09:21:01 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 690104C04A;
-        Mon, 28 Sep 2020 09:12:59 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.48.120])
+        by IMSVA (Postfix) with ESMTP id D88B94C058;
+        Mon, 28 Sep 2020 09:21:00 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.36.223])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 28 Sep 2020 09:12:59 +0000 (GMT)
+        Mon, 28 Sep 2020 09:21:00 +0000 (GMT)
 Subject: Re: [RFC Patch 0/2] KVM: SVM: Cgroup support for SVM SEV ASIDs
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Vipin Sharma <vipinsh@google.com>
 Cc:     thomas.lendacky@amd.com, tj@kernel.org, lizefan@huawei.com,
@@ -65,165 +67,126 @@ Cc:     thomas.lendacky@amd.com, tj@kernel.org, lizefan@huawei.com,
         linux-kernel@vger.kernel.org,
         "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
         linux-s390 <linux-s390@vger.kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
+        Paul Mackerras <paulus@ozlabs.org>
 References: <20200922004024.3699923-1-vipinsh@google.com>
  <20200922014836.GA26507@linux.intel.com>
  <45117fcc-d6b8-fab9-11dc-79181058ed62@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b896ea83-7b98-7c86-f147-446faf2dbc44@linux.ibm.com>
-Date:   Mon, 28 Sep 2020 11:12:58 +0200
+ <b896ea83-7b98-7c86-f147-446faf2dbc44@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <b9a7ae9f-0ec0-cd44-b466-29f6552804ed@de.ibm.com>
+Date:   Mon, 28 Sep 2020 11:21:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <45117fcc-d6b8-fab9-11dc-79181058ed62@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="VfA9Q2MEC6jqxTvBZM48CGM7TI8K8VyRY"
+In-Reply-To: <b896ea83-7b98-7c86-f147-446faf2dbc44@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-28_07:2020-09-24,2020-09-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1011 bulkscore=0 adultscore=0 mlxscore=0 spamscore=0
- malwarescore=0 suspectscore=0 impostorscore=0 mlxlogscore=999
- priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2009280071
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ lowpriorityscore=0 clxscore=1011 impostorscore=0 malwarescore=0
+ adultscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009280076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VfA9Q2MEC6jqxTvBZM48CGM7TI8K8VyRY
-Content-Type: multipart/mixed; boundary="Kz97w4axyoHn1iOg02JLWtj5V7UOUmbLC"
-
---Kz97w4axyoHn1iOg02JLWtj5V7UOUmbLC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 9/23/20 2:47 PM, Paolo Bonzini wrote:
-> On 22/09/20 03:48, Sean Christopherson wrote:
->> This should be genericized to not be SEV specific.  TDX has a similar
->> scarcity issue in the form of key IDs, which IIUC are analogous to SEV=
- ASIDs
->> (gave myself a quick crash course on SEV ASIDs).  Functionally, I doub=
-t it
->> would change anything, I think it'd just be a bunch of renaming.  The =
-hardest
->> part would probably be figuring out a name :-).
+On 28.09.20 11:12, Janosch Frank wrote:
+> On 9/23/20 2:47 PM, Paolo Bonzini wrote:
+>> On 22/09/20 03:48, Sean Christopherson wrote:
+>>> This should be genericized to not be SEV specific.  TDX has a similar
+>>> scarcity issue in the form of key IDs, which IIUC are analogous to SEV ASIDs
+>>> (gave myself a quick crash course on SEV ASIDs).  Functionally, I doubt it
+>>> would change anything, I think it'd just be a bunch of renaming.  The hardest
+>>> part would probably be figuring out a name :-).
+>>>
+>>> Another idea would be to go even more generic and implement a KVM cgroup
+>>> that accounts the number of VMs of a particular type, e.g. legacy, SEV,
+>>> SEV-ES?, and TDX.  That has potential future problems though as it falls
+>>> apart if hardware every supports 1:MANY VMs:KEYS, or if there is a need to
+>>> account keys outside of KVM, e.g. if MKTME for non-KVM cases ever sees the
+>>> light of day.
 >>
->> Another idea would be to go even more generic and implement a KVM cgro=
-up
->> that accounts the number of VMs of a particular type, e.g. legacy, SEV=
-,
->> SEV-ES?, and TDX.  That has potential future problems though as it fal=
-ls
->> apart if hardware every supports 1:MANY VMs:KEYS, or if there is a nee=
-d to
->> account keys outside of KVM, e.g. if MKTME for non-KVM cases ever sees=
- the
->> light of day.
->=20
-> Or also MANY:1 (we are thinking of having multiple VMs share the same
-> SEV ASID).
->=20
-> It might even be the same on s390 and PPC, in which case we probably
-> want to implement this in virt/kvm.  Paul, Janosch, do you think this
-> would make sense for you?  The original commit message is below.
->=20
-> Paolo
->=20
->> On Mon, Sep 21, 2020 at 05:40:22PM -0700, Vipin Sharma wrote:
->>> Hello,
->>>
->>> This patch series adds a new SEV controller for tracking and limiting=
+>> Or also MANY:1 (we are thinking of having multiple VMs share the same
+>> SEV ASID).
+>>
+>> It might even be the same on s390 and PPC, in which case we probably
+>> want to implement this in virt/kvm.  Paul, Janosch, do you think this
+>> would make sense for you?  The original commit message is below.
+>>
+>> Paolo
+>>
+>>> On Mon, Sep 21, 2020 at 05:40:22PM -0700, Vipin Sharma wrote:
+>>>> Hello,
+>>>>
+>>>> This patch series adds a new SEV controller for tracking and limiting
+>>>> the usage of SEV ASIDs on the AMD SVM platform.
+>>>>
+>>>> SEV ASIDs are used in creating encrypted VM and lightweight sandboxes
+>>>> but this resource is in very limited quantity on a host.
+>>>>
+>>>> This limited quantity creates issues like SEV ASID starvation and
+>>>> unoptimized scheduling in the cloud infrastructure.
+>>>>
+>>>> SEV controller provides SEV ASID tracking and resource control
+>>>> mechanisms.
+>>
+> 
+> On s390 we currently support a few million protected guests per LPAR so
+> guest IDs are not exactly scarce. However having accounting for them
+> might add some value nevertheless, especially when having large amount
+> of protected containers.
+> 
+> @Christian: Any thoughts on this?
 
->>> the usage of SEV ASIDs on the AMD SVM platform.
->>>
->>> SEV ASIDs are used in creating encrypted VM and lightweight sandboxes=
+Yes, maybe it is a good idea to limit containers to only have a sane number
+of secure guests, so that a malicious pod cannot consume all IDs by calling
+CREATE_VM and KVM_PV_ENABLE million times or so.
 
->>> but this resource is in very limited quantity on a host.
->>>
->>> This limited quantity creates issues like SEV ASID starvation and
->>> unoptimized scheduling in the cloud infrastructure.
->>>
->>> SEV controller provides SEV ASID tracking and resource control
->>> mechanisms.
->=20
-
-On s390 we currently support a few million protected guests per LPAR so
-guest IDs are not exactly scarce. However having accounting for them
-might add some value nevertheless, especially when having large amount
-of protected containers.
-
-@Christian: Any thoughts on this?
-
-
---Kz97w4axyoHn1iOg02JLWtj5V7UOUmbLC--
-
---VfA9Q2MEC6jqxTvBZM48CGM7TI8K8VyRY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl9xqRoACgkQ41TmuOI4
-ufiRzw//RQLYgVIDnvQ53hh7q4lVn4eqNunUK4JM6ZVR6uv5/qUq49XGb1Qhnxf7
-HCNyzi4jR30hu/gs+Bp6YPAlyjc8KLQUDSFvHYSWwrkeJuQQ/MZAQfxOR6xX0lo4
-/TP3WrtxU+9gQSoa0Zr1QdZBmgMC2bkqgST7JEwVMrY9zNqQR9BfFPxcyEHoOcq9
-6dBqP4icN5fNA8p7naD/do70gNR80yji0InDPmKvNP4HEczXwH/gDEYt6LECwIKq
-cwL3MX6iJI0BHBrOxSHKvYvQlR7df0VyUPpdsTNXZrUUYpLyA7drX5jsJdRz5Fmq
-cOIJlmawm0LxAzYP9EtvzCIsSrysuSrgzqznCRWyi8dnJB2paEqKZ/UCs2nXH28v
-lWEu/B7UCEDKDZnZG/KStBiTkwvepN1Dvo2jGlee9S8zEzcniTVtIdl+lfyB4c/m
-ozSco0feBmH6m2KC3c6MHkYZTJR8eiLb7aZflWlxm5Mx0lrurH2vr8lTXC5BOrpw
-WTxc/OEJ3hxwdW0e7WecjvaAKMckDaJaS5bD2uJP1Lg5YZKcx7icp4Jn/DjXut98
-b4EzqcAlj8D9PwZXZizo135eyasTQ9b4GpZEUX5E5Yq2m53/GNdO1BhP4iP+B87W
-6oAKnmpbrgsGkuZaQlfmUMvxG0JEuq88gbRX15BvTKkivnPJG/c=
-=WSBY
------END PGP SIGNATURE-----
-
---VfA9Q2MEC6jqxTvBZM48CGM7TI8K8VyRY--
 
