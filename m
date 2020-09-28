@@ -2,184 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4775527AFEE
-	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 16:23:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 542C427AFF1
+	for <lists+kvm@lfdr.de>; Mon, 28 Sep 2020 16:23:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726594AbgI1OXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Sep 2020 10:23:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55954 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726327AbgI1OXq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 10:23:46 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08SEF1Jq180246;
-        Mon, 28 Sep 2020 10:23:45 -0400
+        id S1726424AbgI1OXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Sep 2020 10:23:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20044 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726526AbgI1OXs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Sep 2020 10:23:48 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08SEBT13127454;
+        Mon, 28 Sep 2020 10:23:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references; s=pp1;
- bh=t/R7ZuIsmXi9xFx/wc8fRhRD4oRDdVZ64/oQYAyqeGc=;
- b=EREND/qSRzpuGFvpWm36c0pnU0WaxbAVwdMnkidDhD6EocMl4fgW73t1Lf6ChOvpj1j+
- kK513JXnYE/N/2wqf5WdcMgHCFtQ0iv2Kmyw/ukwaVjsGSjjk7eiTXaOKtDuMqU2eytJ
- 5rXtq6RTydDz4o3C+khzCyhKfXEmYjG++xdKTNJxYiVaQeIPmlgwYhJ/88AleoDpokXM
- GE+kfwQb5Hd2+D3FlkMq8LwlhMyATC2bM08uBkbv4Mi11vEPemaQpcM5xajOFmUp9oRx
- K4TqcJa4P3bPi/+oNEd3UUEoSBK15uenZPaixlAap9xVLxRV7d5WTZq4107slx+ZM3wZ mg== 
+ bh=tZWG+2p/xlDOByL5lYGeOEc7ZMoYpuu8PiqCDJ6CaFM=;
+ b=DVFQa4rGLG51f4BCy02JMgOb8QvBU74j452SadNsK9dDnAp27fbiucCWfChZI2t0kx/o
+ q85WI16JIiBT3aSgx6MiqZzS8IYu6094SwXay3Keebtsvr7teRMnlVmnKNhmYfbx5pQK
+ V16gNeG45jhGZp+akApJly6q54x0Btp1iQ3JQYBBh/jodIlJ/CyMiH5BXUfx6cPKlDtf
+ qpAOxlspOjOwgI8OS/IDoVHgbKB4/HM7D+e8y8FPeDCfkdjCzjE+EywKsgHJj0zkVEmZ
+ mfPdpAS68zsmFh5fLPcp78csFgSDBMA9nHCGR49NFr8CfonNVk0ZkJev7yf5ott06OkC Iw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33uhe8g7r5-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33uhcdgcnu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Sep 2020 10:23:46 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08SECXwl130193;
+        Mon, 28 Sep 2020 10:23:45 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33uhcdgcme-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 28 Sep 2020 10:23:45 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08SEFtJ9182553;
-        Mon, 28 Sep 2020 10:23:44 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33uhe8g7qe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Sep 2020 10:23:44 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08SELnNf008125;
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08SEMeQ5019941;
         Mon, 28 Sep 2020 14:23:43 GMT
 Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 33u5r9gmef-1
+        by ppma03fra.de.ibm.com with ESMTP id 33sw9894uk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 28 Sep 2020 14:23:43 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08SENelw27591118
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08SENex87864640
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 28 Sep 2020 14:23:40 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A35142045;
+        by IMSVA (Postfix) with ESMTP id A1BE242041;
         Mon, 28 Sep 2020 14:23:40 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BAB0242047;
-        Mon, 28 Sep 2020 14:23:39 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3BF7D4203F;
+        Mon, 28 Sep 2020 14:23:40 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.66.164])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 28 Sep 2020 14:23:39 +0000 (GMT)
+        Mon, 28 Sep 2020 14:23:40 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
         imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v2 3/4] s390x: define UV compatible I/O allocation
-Date:   Mon, 28 Sep 2020 16:23:36 +0200
-Message-Id: <1601303017-8176-4-git-send-email-pmorel@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v2 4/4] s390x: css: pv: css test adaptation for PV
+Date:   Mon, 28 Sep 2020 16:23:37 +0200
+Message-Id: <1601303017-8176-5-git-send-email-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
 References: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-28_14:2020-09-28,2020-09-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- malwarescore=0 suspectscore=3 priorityscore=1501 bulkscore=0
- lowpriorityscore=0 adultscore=0 impostorscore=0 phishscore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ spamscore=0 bulkscore=0 suspectscore=3 mlxlogscore=759 adultscore=0
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2009280108
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To centralize the memory allocation for I/O we define
-the alloc/free_io_page() functions which share the I/O
-memory with the host in case the guest runs with
-protected virtualization.
+We want the tests to automatically work with or without protected
+virtualisation.
+To do this we need to share the I/O memory with the host.
+
+Let's replace all static allocations with dynamic allocations
+to clearly separate shared and private memory.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- lib/s390x/malloc_io.c | 49 +++++++++++++++++++++++++++++++++++++++++++
- lib/s390x/malloc_io.h | 18 ++++++++++++++++
- s390x/Makefile        |  1 +
- 3 files changed, 68 insertions(+)
- create mode 100644 lib/s390x/malloc_io.c
- create mode 100644 lib/s390x/malloc_io.h
+ lib/s390x/css.h     |  3 +--
+ lib/s390x/css_lib.c | 28 ++++++++--------------------
+ s390x/css.c         | 35 ++++++++++++++++++++++++-----------
+ 3 files changed, 33 insertions(+), 33 deletions(-)
 
-diff --git a/lib/s390x/malloc_io.c b/lib/s390x/malloc_io.c
-new file mode 100644
-index 0000000..388e568
---- /dev/null
-+++ b/lib/s390x/malloc_io.c
-@@ -0,0 +1,49 @@
-+/*
-+ * I/O page allocation
-+ *
-+ * Copyright (c) 2020 IBM Corp
-+ *
-+ * Authors:
-+ *  Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ *
-+ * Using this interface provide host access to the allocated pages in
-+ * case the guest is a secure guest.
-+ * This is needed for I/O buffers.
-+ *
-+ */
-+#include <libcflat.h>
-+#include <alloc_dma_page.h>
-+#include <asm/uv.h>
-+#include <malloc_io.h>
-+#include <asm/facility.h>
-+
-+void *alloc_io_page(int size)
-+{
-+	void *p;
-+
-+	assert(size <= PAGE_SIZE);
-+
-+	p = get_dma_page();
-+	if (!p)
-+		return NULL;
-+	memset(p, 0, PAGE_SIZE);
-+
-+	if (!test_facility(158))
-+		return p;
-+
-+	if (uv_set_shared((unsigned long)p) == 0)
-+		return p;
-+
-+	put_dma_page(p);
-+	return NULL;
-+}
-+
-+void free_io_page(void *p)
-+{
-+	if (test_facility(158))
-+		uv_remove_shared((unsigned long)p);
-+	put_dma_page(p);
-+}
-diff --git a/lib/s390x/malloc_io.h b/lib/s390x/malloc_io.h
-new file mode 100644
-index 0000000..c6ed481
---- /dev/null
-+++ b/lib/s390x/malloc_io.h
-@@ -0,0 +1,18 @@
-+/*
-+ * I/O allocations
-+ *
-+ * Copyright (c) 2020 IBM Corp
-+ *
-+ * Authors:
-+ *  Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+#ifndef _S390X_MALLOC_IO_H_
-+#define _S390X_MALLOC_IO_H_
-+
-+void *alloc_io_page(int size);
-+void free_io_page(void *p);
-+
-+#endif /* _S390X_MALLOC_IO_H_ */
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 109ef9f..1b1dc9f 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -63,6 +63,7 @@ cflatobjs += lib/s390x/smp.o
- cflatobjs += lib/s390x/vm.o
- cflatobjs += lib/s390x/css_dump.o
- cflatobjs += lib/s390x/css_lib.o
-+cflatobjs += lib/s390x/malloc_io.o
+diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+index 221b67c..e3dee9f 100644
+--- a/lib/s390x/css.h
++++ b/lib/s390x/css.h
+@@ -283,8 +283,7 @@ int css_enable(int schid, int isc);
  
- OBJDIRS += lib/s390x
+ /* Library functions */
+ int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw);
+-int start_single_ccw(unsigned int sid, int code, void *data, int count,
+-		     unsigned char flags);
++struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags);
+ void css_irq_io(void);
+ int css_residual_count(unsigned int schid);
+ 
+diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+index 8e02371..6a0a0ec 100644
+--- a/lib/s390x/css_lib.c
++++ b/lib/s390x/css_lib.c
+@@ -18,6 +18,7 @@
+ #include <asm/time.h>
+ #include <asm/arch_def.h>
+ 
++#include <malloc_io.h>
+ #include <css.h>
+ 
+ static struct schib schib;
+@@ -202,33 +203,20 @@ int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
+ 	return ssch(sid, &orb);
+ }
+ 
+-/*
+- * In the future, we want to implement support for CCW chains;
+- * for that, we will need to work with ccw1 pointers.
+- */
+-static struct ccw1 unique_ccw;
+-
+-int start_single_ccw(unsigned int sid, int code, void *data, int count,
+-		     unsigned char flags)
++struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags)
+ {
+-	int cc;
+-	struct ccw1 *ccw = &unique_ccw;
++	struct ccw1 *ccw;
++
++	ccw = alloc_io_page(sizeof(*ccw));
++	if (!ccw)
++		return NULL;
+ 
+-	report_prefix_push("start_subchannel");
+-	/* Build the CCW chain with a single CCW */
+ 	ccw->code = code;
+ 	ccw->flags = flags;
+ 	ccw->count = count;
+ 	ccw->data_address = (int)(unsigned long)data;
+ 
+-	cc = start_ccw1_chain(sid, ccw);
+-	if (cc) {
+-		report(0, "cc = %d", cc);
+-		report_prefix_pop();
+-		return cc;
+-	}
+-	report_prefix_pop();
+-	return 0;
++	return ccw;
+ }
+ 
+ /* wait_and_check_io_completion:
+diff --git a/s390x/css.c b/s390x/css.c
+index ee3bc83..4b0b6b1 100644
+--- a/s390x/css.c
++++ b/s390x/css.c
+@@ -17,13 +17,15 @@
+ #include <interrupt.h>
+ #include <asm/arch_def.h>
+ 
++#include <malloc_io.h>
+ #include <css.h>
++#include <asm/barrier.h>
+ 
+ #define DEFAULT_CU_TYPE		0x3832 /* virtio-ccw */
+ static unsigned long cu_type = DEFAULT_CU_TYPE;
+ 
+ static int test_device_sid;
+-static struct senseid senseid;
++static struct senseid *senseid;
+ 
+ static void test_enumerate(void)
+ {
+@@ -57,6 +59,7 @@ static void test_enable(void)
+  */
+ static void test_sense(void)
+ {
++	struct ccw1 *ccw;
+ 	int ret;
+ 	int len;
+ 
+@@ -80,9 +83,15 @@ static void test_sense(void)
+ 
+ 	lowcore_ptr->io_int_param = 0;
+ 
+-	memset(&senseid, 0, sizeof(senseid));
+-	ret = start_single_ccw(test_device_sid, CCW_CMD_SENSE_ID,
+-			       &senseid, sizeof(senseid), CCW_F_SLI);
++	senseid = alloc_io_page(sizeof(*senseid));
++	if (!senseid)
++		goto error_senseid;
++
++	ccw = ccw_alloc(CCW_CMD_SENSE_ID, senseid, sizeof(*senseid), CCW_F_SLI);
++	if (!ccw)
++		goto error_ccw;
++
++	ret = start_ccw1_chain(test_device_sid, ccw);
+ 	if (ret)
+ 		goto error;
+ 
+@@ -97,7 +106,7 @@ static void test_sense(void)
+ 	if (ret < 0) {
+ 		report_info("no valid residual count");
+ 	} else if (ret != 0) {
+-		len = sizeof(senseid) - ret;
++		len = sizeof(*senseid) - ret;
+ 		if (ret && len < CSS_SENSEID_COMMON_LEN) {
+ 			report(0, "transferred a too short length: %d", ret);
+ 			goto error;
+@@ -105,21 +114,25 @@ static void test_sense(void)
+ 			report_info("transferred a shorter length: %d", len);
+ 	}
+ 
+-	if (senseid.reserved != 0xff) {
+-		report(0, "transferred garbage: 0x%02x", senseid.reserved);
++	if (senseid->reserved != 0xff) {
++		report(0, "transferred garbage: 0x%02x", senseid->reserved);
+ 		goto error;
+ 	}
+ 
+ 	report_prefix_pop();
+ 
+ 	report_info("reserved 0x%02x cu_type 0x%04x cu_model 0x%02x dev_type 0x%04x dev_model 0x%02x",
+-		    senseid.reserved, senseid.cu_type, senseid.cu_model,
+-		    senseid.dev_type, senseid.dev_model);
++		    senseid->reserved, senseid->cu_type, senseid->cu_model,
++		    senseid->dev_type, senseid->dev_model);
+ 
+-	report(senseid.cu_type == cu_type, "cu_type expected 0x%04x got 0x%04x",
+-	       (uint16_t) cu_type, senseid.cu_type);
++	report(senseid->cu_type == cu_type, "cu_type expected 0x%04x got 0x%04x",
++	       (uint16_t) cu_type, senseid->cu_type);
+ 
+ error:
++	free_io_page(ccw);
++error_ccw:
++	free_io_page(senseid);
++error_senseid:
+ 	unregister_io_int_func(css_irq_io);
+ }
  
 -- 
 2.25.1
