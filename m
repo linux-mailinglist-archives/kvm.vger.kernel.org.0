@@ -2,132 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B619927C03C
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 10:58:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19C3A27C086
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 11:09:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727731AbgI2I6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 04:58:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58036 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727035AbgI2I6n (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 04:58:43 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601369922;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9jRT8eA9mpjJTYD9d7uu+BPwsbppj+9Qbebe40cVOSA=;
-        b=cbwiVDoFvs50NQN4OYSQ+7GiXmdUy1V+/d6Sz/0DIvrvmB0Yg9N7gWcQNLd0AgqM1cOJvQ
-        xEy/boYwzGA/bZkhExCBwa3hiTReMPmCW6shZcyFeTt74VM5xl79SPS4M2Jo45wvuGhKRc
-        XkLmL2HW/U1wSfTBFw1t/4aKnjz5wbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-GP81xXMZN_-p7PHZ8IcjPw-1; Tue, 29 Sep 2020 04:58:40 -0400
-X-MC-Unique: GP81xXMZN_-p7PHZ8IcjPw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05B751054F92;
-        Tue, 29 Sep 2020 08:58:39 +0000 (UTC)
-Received: from thuth.remote.csb (unknown [10.40.193.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 127A47881E;
-        Tue, 29 Sep 2020 08:58:37 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PULL 00/11] s390x and generic script updates
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20200928174958.26690-1-thuth@redhat.com>
- <fa187ed1-0e02-62e5-ba27-4f64782b3cfd@redhat.com>
- <b143b9d8-6c5f-b850-ba96-34b9bb337d22@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <7cc4071f-60da-7699-685e-b108c58dff79@redhat.com>
-Date:   Tue, 29 Sep 2020 10:58:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727887AbgI2JJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 05:09:31 -0400
+Received: from mga04.intel.com ([192.55.52.120]:8993 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727831AbgI2JJb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Sep 2020 05:09:31 -0400
+IronPort-SDR: 5nG2zDOC1VUSQ/8TIJzpCbXvHLOnEHGtLtVAIHItc/xBI6PrJ3MYi4tHhaqJEGoChA60dWveRm
+ tU+xV8uyvwPA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="159525592"
+X-IronPort-AV: E=Sophos;i="5.77,317,1596524400"; 
+   d="asc'?scan'208";a="159525592"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 02:09:29 -0700
+IronPort-SDR: V8B+5zTyvtgoVu447vuHYdkRQH8Z5TJxy2UP8i/0hZHyPQeN3SxAY9LP/badVJ3iuMTYBodH4Q
+ Fl7WEtaA/4LA==
+X-IronPort-AV: E=Sophos;i="5.77,317,1596524400"; 
+   d="asc'?scan'208";a="489399476"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 02:09:26 -0700
+Date:   Tue, 29 Sep 2020 16:49:26 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     Fred Gao <fred.gao@intel.com>
+Cc:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        Xiong Zhang <xiong.y.zhang@intel.com>,
+        Hang Yuan <hang.yuan@linux.intel.com>,
+        Stuart Summers <stuart.summers@intel.com>,
+        Lucas De Marchi <lucas.demarchi@intel.com>
+Subject: Re: [PATCH v2] vfio/pci: Refine Intel IGD OpRegion support
+Message-ID: <20200929084926.GH27141@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20200929161038.15465-1-fred.gao@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <b143b9d8-6c5f-b850-ba96-34b9bb337d22@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
+Content-Disposition: inline
+In-Reply-To: <20200929161038.15465-1-fred.gao@intel.com>
+User-Agent: Mutt/1.10.0 (2018-05-17)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/09/2020 10.49, Janosch Frank wrote:
-> On 9/29/20 10:38 AM, Paolo Bonzini wrote:
->> On 28/09/20 19:49, Thomas Huth wrote:
->>>  Hi Paolo,
->>>
->>> the following changes since commit 58c94d57a51a6927a68e3f09627b2d85e3404c0f:
->>>
->>>   travis.yml: Use TRAVIS_BUILD_DIR to refer to the top directory (2020-09-25 10:00:36 +0200)
->>>
->>> are available in the Git repository at:
->>>
->>>   https://gitlab.com/huth/kvm-unit-tests.git tags/pull-request-2020-09-28
->>>
->>> for you to fetch changes up to b508e1147055255ecce93a95916363bda8c8f299:
->>>
->>>   scripts/arch-run: use ncat rather than nc. (2020-09-28 15:03:50 +0200)
->>>
->>> ----------------------------------------------------------------
->>> - s390x protected VM support
->>> - Some other small s390x improvements
->>> - Generic improvements in the scripts (better TAP13 names, nc -> ncat, ...)
->>> ----------------------------------------------------------------
->>>
->>> Jamie Iles (1):
->>>       scripts/arch-run: use ncat rather than nc.
->>>
->>> Marc Hartmayer (6):
->>>       runtime.bash: remove outdated comment
->>>       Use same test names in the default and the TAP13 output format
->>>       common.bash: run `cmd` only if a test case was found
->>>       scripts: add support for architecture dependent functions
->>>       run_tests/mkstandalone: add arch_cmd hook
->>>       s390x: add Protected VM support
->>>
->>> Thomas Huth (4):
->>>       configure: Add a check for the bash version
->>>       travis.yml: Update from Bionic to Focal
->>>       travis.yml: Update the list of s390x tests
->>>       s390x/selftest: Fix constraint of inline assembly
->>>
->>>  .travis.yml             |  7 ++++---
->>>  README.md               |  3 ++-
->>>  configure               | 14 ++++++++++++++
->>>  run_tests.sh            | 18 +++++++++---------
->>>  s390x/Makefile          | 15 ++++++++++++++-
->>>  s390x/selftest.c        |  2 +-
->>>  s390x/selftest.parmfile |  1 +
->>>  s390x/unittests.cfg     |  1 +
->>>  scripts/arch-run.bash   |  6 +++---
->>>  scripts/common.bash     | 21 +++++++++++++++++++--
->>>  scripts/mkstandalone.sh |  4 ----
->>>  scripts/runtime.bash    |  9 +++------
->>>  scripts/s390x/func.bash | 35 +++++++++++++++++++++++++++++++++++
->>>  13 files changed, 106 insertions(+), 30 deletions(-)
->>>  create mode 100644 s390x/selftest.parmfile
->>>  create mode 100644 scripts/s390x/func.bash
->>>
->>
->> Pulled, thanks (for now to my clone; waiting for CI to complete).
->> Should we switch to Gitlab merge requests for pull requests only (i.e.
->> patches still go on the mailing list)?
->>
->> Paolo
->>
-> 
-> Hrm, that would force everyone to use Gitlab and I see some value in
-> having pull request mails on the lists. You just opened the Pandora's
-> box of discussions :-)
-> 
-> If it's easier for you I'd be open to open a marge request and send out
-> pull mails at the same time so people can comment without login to Gitlab.
 
-... or maybe the people who already have a gitlab account could simply
-include the URL to their CI run in their pull request cover letter...?
+--HlL+5n6rz5pIUxbD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Thomas
 
+On 2020.09.30 00:10:38 +0800, Fred Gao wrote:
+> Bypass the IGD initialization for Intel's dgfx devices with own expansion
+> ROM and the host/LPC bridge config space are no longer accessed.
+>=20
+> v2: simply test if discrete or integrated gfx device
+>     with root bus. (Alex Williamson)
+>
+
+Patch title is somehow misleading that better change to what this one does
+that skip VFIO IGD setup for Intel discrete graphics card.
+
+With that,
+
+Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Cc: Xiong Zhang <xiong.y.zhang@intel.com>
+> Cc: Hang Yuan <hang.yuan@linux.intel.com>
+> Cc: Stuart Summers <stuart.summers@intel.com>
+> Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
+> Signed-off-by: Fred Gao <fred.gao@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index f634c81998bb..9258ccfadb79 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -336,10 +336,11 @@ static int vfio_pci_enable(struct vfio_pci_device *=
+vdev)
+>  	if (!vfio_vga_disabled() && vfio_pci_is_vga(pdev))
+>  		vdev->has_vga =3D true;
+> =20
+> -
+> +	/* Intel's dgfx should not appear on root bus */
+>  	if (vfio_pci_is_vga(pdev) &&
+>  	    pdev->vendor =3D=3D PCI_VENDOR_ID_INTEL &&
+> -	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
+> +	    IS_ENABLED(CONFIG_VFIO_PCI_IGD) &&
+> +	    pci_is_root_bus(pdev->bus)) {
+>  		ret =3D vfio_pci_igd_init(vdev);
+>  		if (ret) {
+>  			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
+> --=20
+> 2.24.1.1.gb6d4d82bd5
+>=20
+
+--=20
+
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--HlL+5n6rz5pIUxbD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCX3L1FQAKCRCxBBozTXgY
+J0HhAJ4zPRLTzVpVZIG1lz/KPtRhS21HnwCeN0l7hSLjgzmKH81NVxD5ObtDDfU=
+=fdQd
+-----END PGP SIGNATURE-----
+
+--HlL+5n6rz5pIUxbD--
