@@ -2,171 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64A9E27C026
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 10:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B619927C03C
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 10:58:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727931AbgI2Ize (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 04:55:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41048 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727826AbgI2Izb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Sep 2020 04:55:31 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B24C061755;
-        Tue, 29 Sep 2020 01:55:29 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id z19so3845092pfn.8;
-        Tue, 29 Sep 2020 01:55:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=yLZJxx2l7hUl8Pgn3o5psWobrD3TjYQxwKuaDcKpaAs=;
-        b=P1SOZ08oNzcpvT4+1QdPJIKbuRcOJfMQYnh/POijnSls+YiMR3I01WSLLQF026Ji+X
-         sFBFvMWHQy+8WmXb6uZE4C2CbkWqcJPyLYNTydGkMRnQtnAwU/GUhQhCPptmv+1+9o5m
-         x+E8wV87cHvjSDpzqY7+yQchBCePaRo8WyWvXXzySB3dkUhQouA/8T0Qscq4EwhqYyV3
-         sSE9LR0vxv3Du/u7SqZj35C3wzKvOJlS1xT0KH+2HXiDPUxmMi+2DUVQFsucygQNj0KR
-         1BPzUvV5xbBNyLK/gIgPbQU6XKjaOzNNqRxcQkHb3LygnjzPbQ48YaxitC433eIgUAPv
-         wU7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=yLZJxx2l7hUl8Pgn3o5psWobrD3TjYQxwKuaDcKpaAs=;
-        b=ZykxsLdlMfhPCpFcfWvFO/SsMlTQ5jIMGKyliPnIh33dLstQNGHFU3iwrEPIV6QNUw
-         Z8+hkKj0Fl58iVIi4xfXXup2n9N/eZ3N7+Lt7znnUDPtfPBSVRQ3sWV9rOZiZwlUv39n
-         TuiRRLN+Ho+MgbzNODC30xA97FoSzigxBeSSldW1ZNd1JYttdg2JoSV6+AoyX3NeOk7m
-         QyJBBfJc+0Xyd2OKZCAVXG7gFYUpR2KN6T0Vj8XumUoIZI0+ukGI0xN6Nd6RkUOhI8T/
-         dVv7fO9FMK8PWDUUU02fpIzatKS8m6shX8J10ZtdZmOcGZE7zFTUQ8fkDFNGCFUOewwW
-         pMfw==
-X-Gm-Message-State: AOAM533cyBxGEu5TUsTgxG74uum6VVZIFrjQXdrzQ5hJ1dvTlAm7hOFL
-        ADQI606Gcerc74wEf2QHmG9sbKe02BjH
-X-Google-Smtp-Source: ABdhPJzFiU1OJyLuqrPQYy4g/DXmxjdQ1IuHdxUHeRilWdjdpUgleXtTv+wvD1zReMnlywsDc95k7w==
-X-Received: by 2002:a63:1925:: with SMTP id z37mr2502003pgl.23.1601369729029;
-        Tue, 29 Sep 2020 01:55:29 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id x185sm4616952pfc.188.2020.09.29.01.55.25
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Sep 2020 01:55:28 -0700 (PDT)
-From:   lihaiwei.kernel@gmail.com
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, Haiwei Li <lihaiwei@tencent.com>
-Subject: [PATCH] KVM: x86: Add tracepoint for dr_write/dr_read
-Date:   Tue, 29 Sep 2020 16:55:15 +0800
-Message-Id: <20200929085515.24059-1-lihaiwei.kernel@gmail.com>
-X-Mailer: git-send-email 2.28.0
+        id S1727731AbgI2I6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 04:58:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58036 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727035AbgI2I6n (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 04:58:43 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601369922;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9jRT8eA9mpjJTYD9d7uu+BPwsbppj+9Qbebe40cVOSA=;
+        b=cbwiVDoFvs50NQN4OYSQ+7GiXmdUy1V+/d6Sz/0DIvrvmB0Yg9N7gWcQNLd0AgqM1cOJvQ
+        xEy/boYwzGA/bZkhExCBwa3hiTReMPmCW6shZcyFeTt74VM5xl79SPS4M2Jo45wvuGhKRc
+        XkLmL2HW/U1wSfTBFw1t/4aKnjz5wbw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-GP81xXMZN_-p7PHZ8IcjPw-1; Tue, 29 Sep 2020 04:58:40 -0400
+X-MC-Unique: GP81xXMZN_-p7PHZ8IcjPw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05B751054F92;
+        Tue, 29 Sep 2020 08:58:39 +0000 (UTC)
+Received: from thuth.remote.csb (unknown [10.40.193.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 127A47881E;
+        Tue, 29 Sep 2020 08:58:37 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PULL 00/11] s390x and generic script updates
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20200928174958.26690-1-thuth@redhat.com>
+ <fa187ed1-0e02-62e5-ba27-4f64782b3cfd@redhat.com>
+ <b143b9d8-6c5f-b850-ba96-34b9bb337d22@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <7cc4071f-60da-7699-685e-b108c58dff79@redhat.com>
+Date:   Tue, 29 Sep 2020 10:58:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <b143b9d8-6c5f-b850-ba96-34b9bb337d22@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Haiwei Li <lihaiwei@tencent.com>
+On 29/09/2020 10.49, Janosch Frank wrote:
+> On 9/29/20 10:38 AM, Paolo Bonzini wrote:
+>> On 28/09/20 19:49, Thomas Huth wrote:
+>>>  Hi Paolo,
+>>>
+>>> the following changes since commit 58c94d57a51a6927a68e3f09627b2d85e3404c0f:
+>>>
+>>>   travis.yml: Use TRAVIS_BUILD_DIR to refer to the top directory (2020-09-25 10:00:36 +0200)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>   https://gitlab.com/huth/kvm-unit-tests.git tags/pull-request-2020-09-28
+>>>
+>>> for you to fetch changes up to b508e1147055255ecce93a95916363bda8c8f299:
+>>>
+>>>   scripts/arch-run: use ncat rather than nc. (2020-09-28 15:03:50 +0200)
+>>>
+>>> ----------------------------------------------------------------
+>>> - s390x protected VM support
+>>> - Some other small s390x improvements
+>>> - Generic improvements in the scripts (better TAP13 names, nc -> ncat, ...)
+>>> ----------------------------------------------------------------
+>>>
+>>> Jamie Iles (1):
+>>>       scripts/arch-run: use ncat rather than nc.
+>>>
+>>> Marc Hartmayer (6):
+>>>       runtime.bash: remove outdated comment
+>>>       Use same test names in the default and the TAP13 output format
+>>>       common.bash: run `cmd` only if a test case was found
+>>>       scripts: add support for architecture dependent functions
+>>>       run_tests/mkstandalone: add arch_cmd hook
+>>>       s390x: add Protected VM support
+>>>
+>>> Thomas Huth (4):
+>>>       configure: Add a check for the bash version
+>>>       travis.yml: Update from Bionic to Focal
+>>>       travis.yml: Update the list of s390x tests
+>>>       s390x/selftest: Fix constraint of inline assembly
+>>>
+>>>  .travis.yml             |  7 ++++---
+>>>  README.md               |  3 ++-
+>>>  configure               | 14 ++++++++++++++
+>>>  run_tests.sh            | 18 +++++++++---------
+>>>  s390x/Makefile          | 15 ++++++++++++++-
+>>>  s390x/selftest.c        |  2 +-
+>>>  s390x/selftest.parmfile |  1 +
+>>>  s390x/unittests.cfg     |  1 +
+>>>  scripts/arch-run.bash   |  6 +++---
+>>>  scripts/common.bash     | 21 +++++++++++++++++++--
+>>>  scripts/mkstandalone.sh |  4 ----
+>>>  scripts/runtime.bash    |  9 +++------
+>>>  scripts/s390x/func.bash | 35 +++++++++++++++++++++++++++++++++++
+>>>  13 files changed, 106 insertions(+), 30 deletions(-)
+>>>  create mode 100644 s390x/selftest.parmfile
+>>>  create mode 100644 scripts/s390x/func.bash
+>>>
+>>
+>> Pulled, thanks (for now to my clone; waiting for CI to complete).
+>> Should we switch to Gitlab merge requests for pull requests only (i.e.
+>> patches still go on the mailing list)?
+>>
+>> Paolo
+>>
+> 
+> Hrm, that would force everyone to use Gitlab and I see some value in
+> having pull request mails on the lists. You just opened the Pandora's
+> box of discussions :-)
+> 
+> If it's easier for you I'd be open to open a marge request and send out
+> pull mails at the same time so people can comment without login to Gitlab.
 
-Add tracepoint trace_kvm_dr_write/trace_kvm_dr_read for x86 kvm.
+... or maybe the people who already have a gitlab account could simply
+include the URL to their CI run in their pull request cover letter...?
 
-Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
----
- arch/x86/kvm/svm/svm.c |  2 ++
- arch/x86/kvm/trace.h   | 27 +++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c | 10 ++++++++--
- arch/x86/kvm/x86.c     |  1 +
- 4 files changed, 38 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 4f401fc6a05d..52c69551aea4 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2423,12 +2423,14 @@ static int dr_interception(struct vcpu_svm *svm)
- 		if (!kvm_require_dr(&svm->vcpu, dr - 16))
- 			return 1;
- 		val = kvm_register_read(&svm->vcpu, reg);
-+		trace_kvm_dr_write(dr - 16, val);
- 		kvm_set_dr(&svm->vcpu, dr - 16, val);
- 	} else {
- 		if (!kvm_require_dr(&svm->vcpu, dr))
- 			return 1;
- 		kvm_get_dr(&svm->vcpu, dr, &val);
- 		kvm_register_write(&svm->vcpu, reg, val);
-+		trace_kvm_dr_read(dr, val);
- 	}
- 
- 	return kvm_skip_emulated_instruction(&svm->vcpu);
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index aef960f90f26..b3bf54405862 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -405,6 +405,33 @@ TRACE_EVENT(kvm_cr,
- #define trace_kvm_cr_read(cr, val)		trace_kvm_cr(0, cr, val)
- #define trace_kvm_cr_write(cr, val)		trace_kvm_cr(1, cr, val)
- 
-+/*
-+ * Tracepoint for guest DR access.
-+ */
-+TRACE_EVENT(kvm_dr,
-+	TP_PROTO(unsigned int rw, unsigned int dr, unsigned long val),
-+	TP_ARGS(rw, dr, val),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned int,	rw		)
-+		__field(	unsigned int,	dr		)
-+		__field(	unsigned long,	val		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->rw		= rw;
-+		__entry->dr		= dr;
-+		__entry->val		= val;
-+	),
-+
-+	TP_printk("dr_%s %x = 0x%lx",
-+		  __entry->rw ? "write" : "read",
-+		  __entry->dr, __entry->val)
-+);
-+
-+#define trace_kvm_dr_read(dr, val)		trace_kvm_dr(0, dr, val)
-+#define trace_kvm_dr_write(dr, val)		trace_kvm_dr(1, dr, val)
-+
- TRACE_EVENT(kvm_pic_set_irq,
- 	    TP_PROTO(__u8 chip, __u8 pin, __u8 elcr, __u8 imr, bool coalesced),
- 	    TP_ARGS(chip, pin, elcr, imr, coalesced),
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4551a7e80ebc..f78fd297d51e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5091,10 +5091,16 @@ static int handle_dr(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_get_dr(vcpu, dr, &val))
- 			return 1;
-+		trace_kvm_dr_read(dr, val);
- 		kvm_register_write(vcpu, reg, val);
--	} else
--		if (kvm_set_dr(vcpu, dr, kvm_register_readl(vcpu, reg)))
-+	} else {
-+		unsigned long val;
-+
-+		val = kvm_register_readl(vcpu, reg);
-+		trace_kvm_dr_write(dr, val);
-+		if (kvm_set_dr(vcpu, dr, val))
- 			return 1;
-+	}
- 
- 	return kvm_skip_emulated_instruction(vcpu);
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c4015a43cc8a..68cb7b331324 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11153,6 +11153,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_msr);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_cr);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_dr);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmrun);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit_inject);
--- 
-2.18.4
+ Thomas
 
