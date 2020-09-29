@@ -2,283 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BBEA27D197
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 16:41:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1637827D1C1
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 16:47:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731651AbgI2OlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 10:41:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54874 "EHLO
+        id S1731349AbgI2Orf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 10:47:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40233 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728818AbgI2OlC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 10:41:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601390460;
+        by vger.kernel.org with ESMTP id S1728937AbgI2Orf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 10:47:35 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601390853;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l0ySg0110w8OW3invBGriU5wyED1HKE44VPvaG4UaUQ=;
-        b=AuXITHLMddNggqzrWY49AcL+Ts2OjZigYZwG2vVUvy3IqvwxnZ8CYvnhZePE2BHv5d+d0Q
-        MDdxnn3PWPv63TOISMStceqyU4QqARDiZw7PDVf40SvgIe/GREN2jUTmwhDOQU0ktKE5+f
-        nHuE/EgEXz/byTCU6nEgaiNVGMZXBEo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-Feif_FpfPsWCCeDNAVmoOg-1; Tue, 29 Sep 2020 10:40:58 -0400
-X-MC-Unique: Feif_FpfPsWCCeDNAVmoOg-1
-Received: by mail-qk1-f200.google.com with SMTP id m23so2784675qkh.10
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 07:40:58 -0700 (PDT)
+        bh=PtRKjvr2xKdnyYEHitFUee6d7Brs/dWCC9MF1YYO3xM=;
+        b=IksYDtnuZyRBSML19JirOJP6+HOk2rU69at/CKVG9PYJQ4JUIhC6ZcYpfdXg3+e0CXp6RM
+        B263CjemAjFMfUb6WiP2yJRNrTiQVCPvacxikZfF8S6OkGSOyAijkfYb+W9BqLrcDWX3Vh
+        jIINX5GqxNURNBZntH5E7z26Td0owm4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-hgccNxGxMWK4aWJQo79dNA-1; Tue, 29 Sep 2020 10:47:31 -0400
+X-MC-Unique: hgccNxGxMWK4aWJQo79dNA-1
+Received: by mail-wm1-f72.google.com with SMTP id m25so1943943wmi.0
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 07:47:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=l0ySg0110w8OW3invBGriU5wyED1HKE44VPvaG4UaUQ=;
-        b=EDT/PJMAvBO6bC8Wte441mHUBm1EpRj5Go3rlgAOf/qt623Az8T805WtZMC6hC2eOg
-         LxVQzYRqVNVVae4c4H7OWz8SEpC6H5OuNGBGpHVHwZV1EszyFeqHA3J9AmX5toSBvCrZ
-         N66MRg/lmySU/BwFPkCUM41f4hwp8JhWEpKtsA8sYT78SnyL2QDXZfZ4vac9zyTunHHe
-         sH4GhzMad+o9RSOtYV2wwQr/JxJxkp1pm9lw0e7b9F0C3Qr2GEzeisF/tjeZ8vrf2qJI
-         +WAD6GtiSzpVt+u058ZkmunUGQZwrHd76e0qU7dyEkUa8LT3TaP3nn83WGHKm/pbcRVd
-         bJMA==
-X-Gm-Message-State: AOAM532IT2q0fqcQY64LPOCdZ9+Jb4cS5EcoprovVgR35qR5w7v4Sx3n
-        5Hlmv2HzndMzZ9F4r1D3U/kAwJyynC2xhL07aQC6aB6B55NCZcX9XqwsKTVvugu7l850YsQUuim
-        RRdYev4ihc5A31ATdI+qNRw1vr/5p
-X-Received: by 2002:a05:620a:b1a:: with SMTP id t26mr4681278qkg.353.1601390456424;
-        Tue, 29 Sep 2020 07:40:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxGXRiKbOouJmxqcaB852zvTvNt3brwJyM0RvvbA+jNO5LTY2XthmJfteBTC1EPfiJm02VqdiHjaCBPFS/38Hw=
-X-Received: by 2002:a05:620a:b1a:: with SMTP id t26mr4681238qkg.353.1601390456048;
- Tue, 29 Sep 2020 07:40:56 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PtRKjvr2xKdnyYEHitFUee6d7Brs/dWCC9MF1YYO3xM=;
+        b=m2GeaumwIZ5fbjU3a8pWa1WB4H+zdOqpEP2edNxZTnEJW7CCdpVyjESl+locu0lEqH
+         c0m5CU+9+/7tBTHI1QnLLPSbTOIqJF6dUm9TQk0DMpxxlrVY/t6wkXANutWGp7XnzdiW
+         NOmDmbP64tK1PlaoFntTLFE0cA9LhKvXOY8bBSxRG5bNXuPgH2h4IKr493FCVG3RcgJb
+         vDU/Ok5Q7VuFAQP5/0b7exQk2TIK/pk7HnncdskhuJjt4kbH+1gw21V6A4y6lBKZdnbg
+         UpQbuDKSk4AeTuWev5RVW2wdPR0yWxwh8DhzuJwdbplJCVfQnBXsd+m3Sot+Swrt9dy7
+         6EUw==
+X-Gm-Message-State: AOAM531yp1CYKt0/BaknWis4HBbfmVyAC/4ZPgVotSDwfaN5KnKUNXE6
+        1BVnvZHN+ep5EP5b9GmHQL0on34zRVIgcq9rbGieshqzZy1t1Vu3nBkrFt6nlh2RfVZzWN6stfc
+        gD6CQmASeePmq
+X-Received: by 2002:a1c:9c4b:: with SMTP id f72mr4941943wme.188.1601390850360;
+        Tue, 29 Sep 2020 07:47:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVvIsgRlLltuU7/F3qHNhZaYh3pEjgJZUzHs5Wbg6c+re1FxA/iDBgncxK9LACmKogcerxaw==
+X-Received: by 2002:a1c:9c4b:: with SMTP id f72mr4941915wme.188.1601390850039;
+        Tue, 29 Sep 2020 07:47:30 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9dbe:2c91:3d1b:58c6? ([2001:b07:6468:f312:9dbe:2c91:3d1b:58c6])
+        by smtp.gmail.com with ESMTPSA id t17sm6687615wrx.82.2020.09.29.07.47.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Sep 2020 07:47:28 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
+ support user-configurable
+To:     Qian Cai <cai@redhat.com>, Mohammed Gamal <mgamal@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-next@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+References: <20200903141122.72908-1-mgamal@redhat.com>
+ <1f42d8f084083cdf6933977eafbb31741080f7eb.camel@redhat.com>
+ <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
+ <ebcd39a5-364f-c4ac-f8c7-41057a3d84be@redhat.com>
+ <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
+Date:   Tue, 29 Sep 2020 16:47:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200924032125.18619-1-jasowang@redhat.com> <20200924032125.18619-14-jasowang@redhat.com>
-In-Reply-To: <20200924032125.18619-14-jasowang@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Tue, 29 Sep 2020 16:40:19 +0200
-Message-ID: <CAJaqyWf5tP9DtSc1JP_c4iOkHeVhnEm=kpW4Cv3cMLXfm71h0Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 13/24] vhost-vdpa: introduce ASID based IOTLB
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Michael Tsirkin <mst@redhat.com>, Cindy Lu <lulu@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Rob Miller <rob.miller@broadcom.com>,
-        lingshan.zhu@intel.com, Harpreet Singh Anand <hanand@xilinx.com>,
-        mhabets@solarflare.com, eli@mellanox.com,
-        Adrian Moreno Zapata <amorenoz@redhat.com>,
-        Maxime Coquelin <maxime.coquelin@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 5:24 AM Jason Wang <jasowang@redhat.com> wrote:
->
-> This patch introduces the support of ASID based IOTLB by tagging IOTLB
-> with a unique ASID. This is a must for supporting ASID based vhost
-> IOTLB API by the following patches.
->
-> IOTLB were stored in a hlist and new IOTLB will be allocated when a
-> new ASID is seen via IOTLB API and destoryed when there's no mapping
-> associated with an ASID.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vhost/vdpa.c | 94 +++++++++++++++++++++++++++++++++-----------
->  1 file changed, 72 insertions(+), 22 deletions(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 6552987544d7..1ba7e95619b5 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -34,13 +34,21 @@ enum {
->
->  #define VHOST_VDPA_DEV_MAX (1U << MINORBITS)
->
-> +#define VHOST_VDPA_IOTLB_BUCKETS 16
-> +
-> +struct vhost_vdpa_as {
-> +       struct hlist_node hash_link;
-> +       struct vhost_iotlb iotlb;
-> +       u32 id;
-> +};
-> +
->  struct vhost_vdpa {
->         struct vhost_dev vdev;
->         struct iommu_domain *domain;
->         struct vhost_virtqueue *vqs;
->         struct completion completion;
->         struct vdpa_device *vdpa;
-> -       struct vhost_iotlb *iotlb;
-> +       struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
->         struct device dev;
->         struct cdev cdev;
->         atomic_t opened;
-> @@ -49,12 +57,64 @@ struct vhost_vdpa {
->         int minor;
->         struct eventfd_ctx *config_ctx;
->         int in_batch;
-> +       int used_as;
+On 29/09/20 15:39, Qian Cai wrote:
+> On Tue, 2020-09-29 at 14:26 +0200, Paolo Bonzini wrote:
+>> On 29/09/20 13:59, Qian Cai wrote:
+>>> WARN_ON_ONCE(!allow_smaller_maxphyaddr);
+>>>
+>>> I noticed the origin patch did not have this WARN_ON_ONCE(), but the
+>>> mainline
+>>> commit b96e6506c2ea ("KVM: x86: VMX: Make smaller physical guest address
+>>> space
+>>> support user-configurable") does have it for some reasons.
+>>
+>> Because that part of the code should not be reached.  The exception
+>> bitmap is set up with
+>>
+>>         if (!vmx_need_pf_intercept(vcpu))
+>>                 eb &= ~(1u << PF_VECTOR);
+>>
+>> where
+>>
+>> static inline bool vmx_need_pf_intercept(struct kvm_vcpu *vcpu)
+>> {
+>>         if (!enable_ept)
+>>                 return true;
+>>
+>>         return allow_smaller_maxphyaddr &&
+>> 		 cpuid_maxphyaddr(vcpu) < boot_cpu_data.x86_phys_bits;
+>> }
+>>
+>> We shouldn't get here if "enable_ept && !allow_smaller_maxphyaddr",
+>> which implies vmx_need_pf_intercept(vcpu) == false.  So the warning is
+>> genuine; I've sent a patch.
+> 
+> Care to provide a link to the patch? Just curious.
+> 
 
-Hi!
+Ok, I haven't sent it yet. :)  But here it is:
 
-The variable `used_as` is not used anywhere outside this commit, and
-in this commit is only tracking the number os AS added, not being able
-to query it or using it by limiting them or anything like that.
+commit 608e2791d7353e7d777bf32038ca3e7d548155a4 (HEAD -> kvm-master)
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue Sep 29 08:31:32 2020 -0400
 
-If I'm right, could we consider deleting it? Or am I missing some usage of it?
+    KVM: VMX: update PFEC_MASK/PFEC_MATCH together with PF intercept
+    
+    The PFEC_MASK and PFEC_MATCH fields in the VMCS reverse the meaning of
+    the #PF intercept bit in the exception bitmap when they do not match.
+    This means that, if PFEC_MASK and/or PFEC_MATCH are set, the
+    hypervisor can get a vmexit for #PF exceptions even when the
+    corresponding bit is clear in the exception bitmap.
+    
+    This is unexpected and is promptly reported as a WARN_ON_ONCE.
+    To fix it, reset PFEC_MASK and PFEC_MATCH when the #PF intercept
+    is disabled (as is common with enable_ept && !allow_smaller_maxphyaddr).
+    
+    Reported-by: Qian Cai <cai@redhat.com>>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I smoke tested all the series deleting that variable and everything
-seems right to me.
-
-Thanks!
-
->  };
->
->  static DEFINE_IDA(vhost_vdpa_ida);
->
->  static dev_t vhost_vdpa_major;
->
-> +static struct vhost_vdpa_as *asid_to_as(struct vhost_vdpa *v, u32 asid)
-> +{
-> +       struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
-> +       struct vhost_vdpa_as *as;
-> +
-> +       hlist_for_each_entry(as, head, hash_link)
-> +               if (as->id == asid)
-> +                       return as;
-> +
-> +       return NULL;
-> +}
-> +
-> +static struct vhost_vdpa_as *vhost_vdpa_alloc_as(struct vhost_vdpa *v, u32 asid)
-> +{
-> +       struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
-> +       struct vhost_vdpa_as *as;
-> +
-> +       if (asid_to_as(v, asid))
-> +               return NULL;
-> +
-> +       as = kmalloc(sizeof(*as), GFP_KERNEL);
-> +       if (!as)
-> +               return NULL;
-> +
-> +       vhost_iotlb_init(&as->iotlb, 0, 0);
-> +       as->id = asid;
-> +       hlist_add_head(&as->hash_link, head);
-> +       ++v->used_as;
-> +
-> +       return as;
-> +}
-> +
-> +static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
-> +{
-> +       struct vhost_vdpa_as *as = asid_to_as(v, asid);
-> +
-> +       /* Remove default address space is not allowed */
-> +       if (asid == 0)
-> +               return -EINVAL;
-> +
-> +       if (!as)
-> +               return -EINVAL;
-> +
-> +       hlist_del(&as->hash_link);
-> +       vhost_iotlb_reset(&as->iotlb);
-> +       kfree(as);
-> +       --v->used_as;
-> +
-> +       return 0;
-> +}
-> +
->  static void handle_vq_kick(struct vhost_work *work)
->  {
->         struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
-> @@ -513,15 +573,6 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
->         }
->  }
->
-> -static void vhost_vdpa_iotlb_free(struct vhost_vdpa *v)
-> -{
-> -       struct vhost_iotlb *iotlb = v->iotlb;
-> -
-> -       vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1);
-> -       kfree(v->iotlb);
-> -       v->iotlb = NULL;
-> -}
-> -
->  static int perm_to_iommu_flags(u32 perm)
->  {
->         int flags = 0;
-> @@ -681,7 +732,8 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u32 asid,
->         struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
->         struct vdpa_device *vdpa = v->vdpa;
->         const struct vdpa_config_ops *ops = vdpa->config;
-> -       struct vhost_iotlb *iotlb = v->iotlb;
-> +       struct vhost_vdpa_as *as = asid_to_as(v, 0);
-> +       struct vhost_iotlb *iotlb = &as->iotlb;
->         int r = 0;
->
->         if (asid != 0)
-> @@ -775,6 +827,7 @@ static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
->  {
->         vhost_dev_cleanup(&v->vdev);
->         kfree(v->vdev.vqs);
-> +       vhost_vdpa_remove_as(v, 0);
->  }
->
->  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
-> @@ -807,23 +860,18 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
->         vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
->                        vhost_vdpa_process_iotlb_msg);
->
-> -       dev->iotlb = vhost_iotlb_alloc(0, 0);
-> -       if (!dev->iotlb) {
-> -               r = -ENOMEM;
-> -               goto err_init_iotlb;
-> -       }
-> +       if (!vhost_vdpa_alloc_as(v, 0))
-> +               goto err_alloc_as;
->
->         r = vhost_vdpa_alloc_domain(v);
->         if (r)
-> -               goto err_alloc_domain;
-> +               goto err_alloc_as;
->
->         filep->private_data = v;
->
->         return 0;
->
-> -err_alloc_domain:
-> -       vhost_vdpa_iotlb_free(v);
-> -err_init_iotlb:
-> +err_alloc_as:
->         vhost_vdpa_cleanup(v);
->  err:
->         atomic_dec(&v->opened);
-> @@ -851,7 +899,6 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
->         filep->private_data = NULL;
->         vhost_vdpa_reset(v);
->         vhost_dev_stop(&v->vdev);
-> -       vhost_vdpa_iotlb_free(v);
->         vhost_vdpa_free_domain(v);
->         vhost_vdpa_config_put(v);
->         vhost_vdpa_clean_irq(v);
-> @@ -950,7 +997,7 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->         const struct vdpa_config_ops *ops = vdpa->config;
->         struct vhost_vdpa *v;
->         int minor;
-> -       int r;
-> +       int i, r;
->
->         /* Only support 1 address space */
->         if (vdpa->ngroups != 1)
-> @@ -1002,6 +1049,9 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->         init_completion(&v->completion);
->         vdpa_set_drvdata(vdpa, v);
->
-> +       for (i = 0; i < VHOST_VDPA_IOTLB_BUCKETS; i++)
-> +               INIT_HLIST_HEAD(&v->as[i]);
-> +
->         return 0;
->
->  err:
-> --
-> 2.20.1
->
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f0384e93548a..f4e9c310032a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -794,6 +794,18 @@ void update_exception_bitmap(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (is_guest_mode(vcpu))
+ 		eb |= get_vmcs12(vcpu)->exception_bitmap;
++        else {
++		/*
++		 * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
++		 * between guest and host.  In that case we only care about present
++		 * faults.  For vmcs02, however, PFEC_MASK and PFEC_MATCH are set in
++		 * prepare_vmcs02_rare.
++		 */
++		bool selective_pf_trap = enable_ept && (eb & (1u << PF_VECTOR));
++		int mask = selective_pf_trap ? PFERR_PRESENT_MASK : 0;
++		vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, mask);
++		vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, mask);
++	}
+ 
+ 	vmcs_write32(EXCEPTION_BITMAP, eb);
+ }
+@@ -4355,16 +4367,6 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 		vmx->pt_desc.guest.output_mask = 0x7F;
+ 		vmcs_write64(GUEST_IA32_RTIT_CTL, 0);
+ 	}
+-
+-	/*
+-	 * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
+-	 * between guest and host.  In that case we only care about present
+-	 * faults.
+-	 */
+-	if (enable_ept) {
+-		vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, PFERR_PRESENT_MASK);
+-		vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, PFERR_PRESENT_MASK);
+-	}
+ }
+ 
+ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 
