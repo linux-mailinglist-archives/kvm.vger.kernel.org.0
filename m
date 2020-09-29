@@ -2,116 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81F8627D3AE
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 18:30:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34A0C27D3C5
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 18:43:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729748AbgI2Qaz convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 29 Sep 2020 12:30:55 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:42719 "EHLO
-        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728392AbgI2Qay (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 12:30:54 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-I2UtjzlUPB67qVbSA7NVdQ-1; Tue, 29 Sep 2020 12:30:51 -0400
-X-MC-Unique: I2UtjzlUPB67qVbSA7NVdQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 446DD188C127;
-        Tue, 29 Sep 2020 16:30:50 +0000 (UTC)
-Received: from bahia.lan (ovpn-113-41.ams2.redhat.com [10.36.113.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D4125D9CA;
-        Tue, 29 Sep 2020 16:30:45 +0000 (UTC)
-Subject: [PATCH v2 2/2] vhost: Don't call log_access_ok() when using IOTLB
-From:   Greg Kurz <groug@kaod.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, qemu-devel@nongnu.org,
-        Laurent Vivier <laurent@vivier.eu>,
-        David Gibson <david@gibson.dropbear.id.au>
-Date:   Tue, 29 Sep 2020 18:30:44 +0200
-Message-ID: <160139704424.162128.7839027287942194310.stgit@bahia.lan>
-In-Reply-To: <160139701999.162128.2399875915342200263.stgit@bahia.lan>
-References: <160139701999.162128.2399875915342200263.stgit@bahia.lan>
-User-Agent: StGit/0.21
+        id S1728765AbgI2Qn3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 12:43:29 -0400
+Received: from mga01.intel.com ([192.55.52.88]:65283 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728315AbgI2Qn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Sep 2020 12:43:29 -0400
+IronPort-SDR: TgVse+CqN8WTUbYoX2oWQP0RAUkv3u4WPlyb/zIfkNYuaRoBhXeAbVBjOc5el0mkfM5PTyyH6o
+ BfIbxj0vHEVw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9759"; a="180392441"
+X-IronPort-AV: E=Sophos;i="5.77,319,1596524400"; 
+   d="scan'208";a="180392441"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 09:43:27 -0700
+IronPort-SDR: fWyAFBIHyQ+wveHnIpO07eZ8pdmmeKuVx3G+F1bLuBLj8A6D8XnWUTidxZ3y4ZGuGWZggCk37K
+ DkrtLv9mjK3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,319,1596524400"; 
+   d="scan'208";a="293723386"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
+  by fmsmga007.fm.intel.com with ESMTP; 29 Sep 2020 09:43:26 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [kvm-unit-tests PATCH] x86: Make Hyper-V tests x86_64 only
+Date:   Tue, 29 Sep 2020 09:43:25 -0700
+Message-Id: <20200929164325.30605-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the IOTLB device is enabled, the log_guest_addr that is passed by
-userspace to the VHOST_SET_VRING_ADDR ioctl, and which is then written
-to vq->log_addr, is a GIOVA. All writes to this address are translated
-by log_user() to writes to an HVA, and then ultimately logged through
-the corresponding GPAs in log_write_hva(). No logging will ever occur
-with vq->log_addr in this case. It is thus wrong to pass vq->log_addr
-and log_guest_addr to log_access_vq() which assumes they are actual
-GPAs.
+Skip the Hyper-V tests on i386, they explicitly run with kvm64 and crash
+immediately when run in i386, i.e. waste 90 seconds waiting for the
+timeout to fire.
 
-Introduce a new vq_log_used_access_ok() helper that only checks accesses
-to the log for the used structure when there isn't an IOTLB device around.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- drivers/vhost/vhost.c |   23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+ x86/unittests.cfg | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index c3b49975dc28..5996e32fa818 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1370,6 +1370,20 @@ bool vhost_log_access_ok(struct vhost_dev *dev)
- }
- EXPORT_SYMBOL_GPL(vhost_log_access_ok);
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 3a79151..0651778 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -314,18 +314,21 @@ arch = x86_64
+ file = hyperv_synic.flat
+ smp = 2
+ extra_params = -cpu kvm64,hv_vpindex,hv_synic -device hyperv-testdev
++arch = x86_64
+ groups = hyperv
  
-+static bool vq_log_used_access_ok(struct vhost_virtqueue *vq,
-+				  void __user *log_base,
-+				  bool log_used,
-+				  u64 log_addr,
-+				  size_t log_size)
-+{
-+	/* If an IOTLB device is present, log_addr is a GIOVA that
-+	 * will never be logged by log_used(). */
-+	if (vq->iotlb)
-+		return true;
-+
-+	return !log_used || log_access_ok(log_base, log_addr, log_size);
-+}
-+
- /* Verify access for write logging. */
- /* Caller should have vq mutex and device mutex */
- static bool vq_log_access_ok(struct vhost_virtqueue *vq,
-@@ -1377,8 +1391,8 @@ static bool vq_log_access_ok(struct vhost_virtqueue *vq,
- {
- 	return vq_memory_access_ok(log_base, vq->umem,
- 				   vhost_has_feature(vq, VHOST_F_LOG_ALL)) &&
--		(!vq->log_used || log_access_ok(log_base, vq->log_addr,
--				  vhost_get_used_size(vq, vq->num)));
-+		vq_log_used_access_ok(vq, log_base, vq->log_used, vq->log_addr,
-+				      vhost_get_used_size(vq, vq->num));
- }
+ [hyperv_connections]
+ file = hyperv_connections.flat
+ smp = 2
+ extra_params = -cpu kvm64,hv_vpindex,hv_synic -device hyperv-testdev
++arch = x86_64
+ groups = hyperv
  
- /* Can we start vq? */
-@@ -1517,8 +1531,9 @@ static long vhost_vring_set_addr(struct vhost_dev *d,
- 			return -EINVAL;
+ [hyperv_stimer]
+ file = hyperv_stimer.flat
+ smp = 2
+ extra_params = -cpu kvm64,hv_vpindex,hv_time,hv_synic,hv_stimer -device hyperv-testdev
++arch = x86_64
+ groups = hyperv
  
- 		/* Also validate log access for used ring if enabled. */
--		if ((a.flags & (0x1 << VHOST_VRING_F_LOG)) &&
--			!log_access_ok(vq->log_base, a.log_guest_addr,
-+		if (!vq_log_used_access_ok(vq, vq->log_base,
-+				a.flags & (0x1 << VHOST_VRING_F_LOG),
-+				a.log_guest_addr,
- 				sizeof *vq->used +
- 				vq->num * sizeof *vq->used->ring))
- 			return -EINVAL;
-
+ [hyperv_clock]
+-- 
+2.28.0
 
