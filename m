@@ -2,98 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE30327BBA6
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 05:53:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E84B327BBD6
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 06:16:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727331AbgI2DxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Sep 2020 23:53:01 -0400
-Received: from mga17.intel.com ([192.55.52.151]:63648 "EHLO mga17.intel.com"
+        id S1725536AbgI2EQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 00:16:19 -0400
+Received: from mga12.intel.com ([192.55.52.136]:49236 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726064AbgI2DxB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Sep 2020 23:53:01 -0400
-IronPort-SDR: PSaEE/V5kVTMc36yVcOWeJpjD34M9z807+uZ24Zso1zXqmppG7Q2ixEgmsccYYVMXTcpMy2Tmf
- pe4j83Qo97zg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="142130338"
+        id S1725300AbgI2EQS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Sep 2020 00:16:18 -0400
+IronPort-SDR: 8x9ufB+8lNPuLi2gUoTdevAeyDOpEU4GeBKUBa+hn3XoAL6FSiG4xARD8RNqlPq9fUASnDjTsH
+ fH5fpt3i7s4A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="141511349"
 X-IronPort-AV: E=Sophos;i="5.77,316,1596524400"; 
-   d="scan'208";a="142130338"
+   d="scan'208";a="141511349"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 20:52:59 -0700
-IronPort-SDR: hteUO/I0NkRZCWCqDL3H7Bh47P1tPJPqBYjCk6dgjVJo4jwAQFholEK4c5dCMLnGrHfNswXOR4
- bEWpDRx0rI0A==
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 21:03:14 -0700
+IronPort-SDR: H+A8gaOj84RpkZt74p+GjpzFAfHlGf+IYoh0enZRvL1fIkCabp2geqNngGtJ0RW1hP8m88adg4
+ YJ7mfJIdYITg==
 X-IronPort-AV: E=Sophos;i="5.77,316,1596524400"; 
-   d="scan'208";a="457102758"
+   d="scan'208";a="350068368"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 20:52:59 -0700
-Date:   Mon, 28 Sep 2020 20:52:57 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 21:03:13 -0700
+Date:   Mon, 28 Sep 2020 21:03:11 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Huacai Chen <chenhc@lemote.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        kvm-ppc@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: Re: [RFC PATCH 3/3] KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs
- that are fatal to the VM
-Message-ID: <20200929035257.GH31514@linux.intel.com>
-References: <20200923224530.17735-1-sean.j.christopherson@intel.com>
- <20200923224530.17735-4-sean.j.christopherson@intel.com>
- <878scze4l5.fsf@vitty.brq.redhat.com>
- <20200924181134.GB9649@linux.intel.com>
- <87k0wichht.fsf@vitty.brq.redhat.com>
- <20200925171233.GC31528@linux.intel.com>
- <731dd323-8c66-77ff-cf15-4bbdea34bcf9@redhat.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, jmattson@google.com, pbonzini@redhat.com,
+        vkuznets@redhat.com, qemu-devel@nongnu.org
+Subject: Re: [PATCH 1/6 v3] KVM: x86: Change names of some of the kvm_x86_ops
+ functions to make them more semantical and readable
+Message-ID: <20200929040309.GI31514@linux.intel.com>
+References: <1595895050-105504-1-git-send-email-krish.sadhukhan@oracle.com>
+ <1595895050-105504-2-git-send-email-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <731dd323-8c66-77ff-cf15-4bbdea34bcf9@redhat.com>
+In-Reply-To: <1595895050-105504-2-git-send-email-krish.sadhukhan@oracle.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 11:06:10PM +0200, Paolo Bonzini wrote:
-> On 25/09/20 19:12, Sean Christopherson wrote:
-> >> Do we actually want to prevent *all* ioctls? E.g. when 'vm bugged'
-> >> condition is triggered userspace may want to extract some information to
-> >> assist debugging but even things like KVM_GET_[S]REGS will just return
-> >> -EIO. I'm not sure it is generally safe to enable *everything* (except
-> >> for KVM_RUN which should definitely be forbidden) so maybe your approach
-> >> is preferable.
-> >
-> > The answer to this probably depends on the answer to the first question of
-> > when it's appropriate to use KVM_BUG().  E.g. if we limit usage to fatal or
-> > dangrous cases, then blocking all ioctls() is probably the right thing do do.
-> 
-> I think usage should be limited to dangerous cases, basically WARN_ON
-> level.  However I agree with Vitaly that KVM_GET_* should be allowed.
+This needs a changelog.
 
-Makes sense.
+I would also split the non-x86 parts, i.e. the kvm_arch_* renames, to a
+separate patch.
 
-On the topic of feedback from Vitaly, while dredging through my mailbox I
-rediscovered his suggestion of kvm->kvm_internal_bug (or maybe just
-kvm->internal_bug) instead of kvm->vm_bugged[*].  Like past me, I like the
-"internal" variants better.
+On Tue, Jul 28, 2020 at 12:10:45AM +0000, Krish Sadhukhan wrote:
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+> @@ -4016,15 +4016,15 @@ static int svm_vm_init(struct kvm *kvm)
+>  	.tlb_flush_gva = svm_flush_tlb_gva,
+>  	.tlb_flush_guest = svm_flush_tlb,
+>  
+> -	.run = svm_vcpu_run,
+> +	.vcpu_run = svm_vcpu_run,
+>  	.handle_exit = handle_exit,
+>  	.skip_emulated_instruction = skip_emulated_instruction,
+>  	.update_emulated_instruction = NULL,
+>  	.set_interrupt_shadow = svm_set_interrupt_shadow,
+>  	.get_interrupt_shadow = svm_get_interrupt_shadow,
+>  	.patch_hypercall = svm_patch_hypercall,
+> -	.set_irq = svm_set_irq,
+> -	.set_nmi = svm_inject_nmi,
+> +	.inject_irq = svm_set_irq,
 
-[*] https://lkml.kernel.org/r/20190930153358.GD14693@linux.intel.com
+I would strongly prefer these renames to be fully recursive within a single
+patch, i.e. rename svm_set_irq() as well.
 
-> The other question is whether to return -EIO or KVM_EXIT_INTERNAL_ERROR.
->  The latter is more likely to be handled already by userspace.
+Ditto for the unsetup->teardown change.
 
-And probably less confusing for unsuspecting users.  E.g. -EIO is most
-likely to be interpreted as "I screwed up", whereas KVM_EXIT_INTERNAL_ERROR
-will correctly be read as "KVM screwed up".
+> +	.inject_nmi = svm_inject_nmi,
+>  	.queue_exception = svm_queue_exception,
+>  	.cancel_injection = svm_cancel_injection,
+>  	.interrupt_allowed = svm_interrupt_allowed,
+> @@ -4080,8 +4080,8 @@ static int svm_vm_init(struct kvm *kvm)
+>  	.enable_smi_window = enable_smi_window,
+>  
+>  	.mem_enc_op = svm_mem_enc_op,
+> -	.mem_enc_reg_region = svm_register_enc_region,
+> -	.mem_enc_unreg_region = svm_unregister_enc_region,
+> +	.mem_enc_register_region = svm_register_enc_region,
+> +	.mem_enc_unregister_region = svm_unregister_enc_region,
+>  
+>  	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
+>  
+
+...
+
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4fdf303..cb6f153 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1469,15 +1469,15 @@ struct kvm_s390_ucas_mapping {
+>  #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
+>  #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
+>  /* Memory Encryption Commands */
+> -#define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
+> +#define KVM_MEM_ENC_OP	            _IOWR(KVMIO, 0xba, unsigned long)
+
+Renaming macros in uapi headers will break userspace.
+
+We could do
+
+  #define KVM_MEMORY_ENCRYPT_OP	KVM_MEM_ENC_OP
+
+internally, but personally I think it would do more harm than good.
+
+>  struct kvm_enc_region {
+>  	__u64 addr;
+>  	__u64 size;
+>  };
+>  
+> -#define KVM_MEMORY_ENCRYPT_REG_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
+> -#define KVM_MEMORY_ENCRYPT_UNREG_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
+> +#define KVM_MEM_ENC_REGISTER_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
+> +#define KVM_MEM_ENC_UNREGISTER_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
+>  
+>  /* Available with KVM_CAP_HYPERV_EVENTFD */
+>  #define KVM_HYPERV_EVENTFD        _IOW(KVMIO,  0xbd, struct kvm_hyperv_eventfd)
