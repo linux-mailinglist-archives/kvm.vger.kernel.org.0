@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0824627DC37
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 00:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9491127DC38
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 00:44:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728875AbgI2WoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 18:44:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41885 "EHLO
+        id S1728966AbgI2WoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 18:44:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20333 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728860AbgI2WoR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 18:44:17 -0400
+        by vger.kernel.org with ESMTP id S1728930AbgI2WoW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 18:44:22 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601419456;
+        s=mimecast20190719; t=1601419461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fVtzhoPQ9oRe5A4whgi5/tX3r24KuxvOyig0n+4hw6k=;
-        b=PHWvgZgwnPBuN08mYdI+e2MAUd+frzRoOP6kAdur50LRba23uRMnxy1PxPYUS/g8Zvt0Ai
-        mhRWblm4vru1xWeL0rym3WSaECPAFbhyNSFl5sABrfT07JDPNRnwH26EWUquVfaL8R957N
-        jqEpRu6WAtf9+OQGWxORim+xxnUNeM0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-tVekPGQTNHOEcxQWK9vNmA-1; Tue, 29 Sep 2020 18:44:14 -0400
-X-MC-Unique: tVekPGQTNHOEcxQWK9vNmA-1
-Received: by mail-wr1-f72.google.com with SMTP id a2so2345762wrp.8
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 15:44:14 -0700 (PDT)
+        bh=9dR9Nk0eM9jSf6djV760qyeufq0GIQie0fmgNB3aO7w=;
+        b=PTlzYPKcstPxoAuB3OFhmY47tSSFDviIPSAgnL7JEm0iCBkHG5Uf7frh2bJBwaznaoY/f7
+        52HmfU8abVO6PgdGFSSQBZGyNbIdbkDDz5TnMuM0RMi4B0BkcX+3ArUfb2ddAczQ2WNZMU
+        3APiHm9r+JvDeShqYgoXJVYMPNPYnqM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-Q_fXLT1aPjWxvUQXVVSurA-1; Tue, 29 Sep 2020 18:44:19 -0400
+X-MC-Unique: Q_fXLT1aPjWxvUQXVVSurA-1
+Received: by mail-wm1-f70.google.com with SMTP id r83so1991729wma.8
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 15:44:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=fVtzhoPQ9oRe5A4whgi5/tX3r24KuxvOyig0n+4hw6k=;
-        b=RGz71pSRV1nmQMI0KcvQt+RW8miWP9nlYsSvIA+TBzmRntxa9fIZByoLepxrp36FTo
-         m1gEmd8bcdEheiJQ+4WtFaREkkJEVIeoggbRfUvQfwyYx630oyLFhHnZWqorViuN2pr/
-         stQvYyA5soiziph5JdPb4shpE4GVVd7lZWiAlF43nbIVinw4/yO3adZoPlBUUhfC/zOf
-         3DKPy9lgbOzEPkdL1FCkmPRemLjkHU4pkLKWa4fM8O1qchayzIepaPln1SBOEAQ9AHvm
-         u6EdYnCUY3nsPQtE9x6XOnYP/AK5pTnKL10O68LItsxpQN0vgIAI9QujSti62lFD6rYx
-         2XYA==
-X-Gm-Message-State: AOAM533OvhiiP2id5X9oZLPM1W2jGc6t/9UStWtKSwRpyS8afYMxkaKv
-        q/oE3aCFEqwti4COSwbRBziRQB0BZc/3FM+okdjA+KnKjKiKm0bhuLgXSCdWuOirg5txCecbCFV
-        nsSSP2yvKxcUA
-X-Received: by 2002:a5d:5261:: with SMTP id l1mr6619428wrc.193.1601419453411;
-        Tue, 29 Sep 2020 15:44:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzeOEbx68Td8hBaYyIFzxkCzoKhQ+EE4XU8IG3LB8RbTCWtKeOlhoOS8sgyI3yT3aeSBndgRw==
-X-Received: by 2002:a5d:5261:: with SMTP id l1mr6619416wrc.193.1601419453250;
-        Tue, 29 Sep 2020 15:44:13 -0700 (PDT)
+        bh=9dR9Nk0eM9jSf6djV760qyeufq0GIQie0fmgNB3aO7w=;
+        b=umao2M7Qbth3mjpr1Gn2jJV6JcFP0R7U57NHqbyzLgIi7B/tYsNwhbudMq0ehFQEYU
+         vA4ZJqjGzUFK2Wy8LGTkU76U6VymZRn5F3fPhw0ZTTbFOAI9Ye046XdUj24UXodlWlr3
+         8fwMigt2QzoIOm40yeAcodv0bpRKqTqDaEbdobsULBQd282TyGP1nkUdAiZzAM+775mw
+         5e0aBR3k7F5Ru+KhdOZZ7qBIVzDB3/whDUzg6LNEkFFQ6sytyCY7/175GH+nWvQCHIMm
+         /lokBLu67pJVPA5vsj65uU1Nrn6hiqC8yAgO8TaFeQUi0AIOBnPzNqVzUsk72z1GcvWw
+         aSig==
+X-Gm-Message-State: AOAM530YdYDuCT389sCUvnmI/PDyDJ3o4necWoEwUoz/77jXAuO0hcuI
+        sAuY3I4uUUzSR106IoBeKVul2Xq6ITE3NiLZHIP5cYpUMpreihavRjD2AeDyqTC4LZoCgw+25nq
+        WbN3ZBovYPfwj
+X-Received: by 2002:adf:fd01:: with SMTP id e1mr6312398wrr.44.1601419458523;
+        Tue, 29 Sep 2020 15:44:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxwh51NEq7twr61W/5e9Rg5U9losDLPsHpgTL0nTFBNwMoNiIws2/CzkKqcV0aZDFoO9xffGw==
+X-Received: by 2002:adf:fd01:: with SMTP id e1mr6312389wrr.44.1601419458354;
+        Tue, 29 Sep 2020 15:44:18 -0700 (PDT)
 Received: from x1w.redhat.com (74.red-83-53-161.dynamicip.rima-tde.net. [83.53.161.74])
-        by smtp.gmail.com with ESMTPSA id l18sm7902646wrp.84.2020.09.29.15.44.11
+        by smtp.gmail.com with ESMTPSA id y1sm7440740wmi.36.2020.09.29.15.44.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2020 15:44:12 -0700 (PDT)
+        Tue, 29 Sep 2020 15:44:17 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Thomas Huth <thuth@redhat.com>,
@@ -60,9 +60,9 @@ Cc:     Thomas Huth <thuth@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v4 03/12] target/arm: Select SEMIHOSTING if TCG is available
-Date:   Wed, 30 Sep 2020 00:43:46 +0200
-Message-Id: <20200929224355.1224017-4-philmd@redhat.com>
+Subject: [PATCH v4 04/12] target/arm: Restrict ARMv4 cpus to TCG accel
+Date:   Wed, 30 Sep 2020 00:43:47 +0200
+Message-Id: <20200929224355.1224017-5-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200929224355.1224017-1-philmd@redhat.com>
 References: <20200929224355.1224017-1-philmd@redhat.com>
@@ -74,32 +74,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a kconfig entry which not explicitly selected by another
-entry, but which selects SEMIHOSTING if TCG is available.
+KVM requires a cpu based on (at least) the ARMv7 architecture.
 
-This avoids:
+Only enable the following ARMv4 CPUs when TCG is available:
 
-  /usr/bin/ld: libqemu-aarch64-softmmu.fa.p/target_arm_arm-semi.c.o: in function `do_arm_semihosting':
-  target/arm/arm-semi.c:784: undefined reference to `qemu_semihosting_console_outc'
-  target/arm/arm-semi.c:787: undefined reference to `qemu_semihosting_console_outs'
-  /usr/bin/ld: target/arm/arm-semi.c:815: undefined reference to `qemu_semihosting_console_inc'
+  - StrongARM (SA1100/1110)
+  - OMAP1510 (TI925T)
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/arm/Kconfig | 4 ++++
- 1 file changed, 4 insertions(+)
- create mode 100644 target/arm/Kconfig
+ hw/arm/Kconfig | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/arm/Kconfig b/target/arm/Kconfig
-new file mode 100644
-index 0000000000..972d9a1b9a
---- /dev/null
-+++ b/target/arm/Kconfig
-@@ -0,0 +1,4 @@
-+# arch-specific rule to select SEMIHOSTING if ARM && TCG
-+config ARM_SEMIHOSTING
-+    default y if TCG
-+    select SEMIHOSTING
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 7d040827af..b546b20654 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -1,3 +1,7 @@
++config ARM_V4
++    bool
++    select TCG
++
+ config ARM_VIRT
+     bool
+     imply PCI_DEVICES
+@@ -30,6 +34,7 @@ config ARM_VIRT
+ 
+ config CHEETAH
+     bool
++    select ARM_V4
+     select OMAP
+     select TSC210X
+ 
+@@ -244,6 +249,7 @@ config COLLIE
+ 
+ config SX1
+     bool
++    select ARM_V4
+     select OMAP
+ 
+ config VERSATILE
 -- 
 2.26.2
 
