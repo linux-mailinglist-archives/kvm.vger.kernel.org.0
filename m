@@ -2,113 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FC2927C117
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 11:28:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B55C27C285
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 12:36:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727937AbgI2J2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 05:28:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58925 "EHLO
+        id S1728227AbgI2Kgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 06:36:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37017 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727841AbgI2J2F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 05:28:05 -0400
+        by vger.kernel.org with ESMTP id S1725306AbgI2Kgg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 06:36:36 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601371683;
+        s=mimecast20190719; t=1601375793;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pYuc3/1S5yymvfflLAL9MMp/Ok6n0ZAyFbN3sbJRaT0=;
-        b=Jj/USoMBCSfieJHQR6JlxE4ZFYyfJEkT7W+lnGLf9g4i6cpQj3E+HyuIbaW9/EvlTgKFHt
-        CmK98WCW9XLnk4AxKIYN/b6IGN8lPpmOR3GJvS8pHkoo86z7MdLU8q7KCAaR0Taf3TGeyy
-        86MYWsKr3Jz3VXqyCi4M/JOhRUYKU64=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-580-qegXtShCOwWT77D3KJtmZg-1; Tue, 29 Sep 2020 05:27:23 -0400
-X-MC-Unique: qegXtShCOwWT77D3KJtmZg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D80C801ADD;
-        Tue, 29 Sep 2020 09:27:21 +0000 (UTC)
-Received: from gondolin (ovpn-113-63.ams2.redhat.com [10.36.113.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A67356198B;
-        Tue, 29 Sep 2020 09:27:13 +0000 (UTC)
-Date:   Tue, 29 Sep 2020 11:27:10 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        bh=I5YYFgfx5BlxcJjZ2anX8oHsy00ljGmpjltg0at7zMM=;
+        b=QQDfjGisA0XIcKFESFkOTd8CLfVzkgUWa7MauPYhNZHx6dSY+TObjHIhRJdELH3UHorVal
+        8NgcJZo9noLMiKOCsxAH87LQpFpHTIj5kT8eo00pAvk9ZrgYiBE3dINDMdTwH8ocjmtoRk
+        FpY6UI3svOrj3IknL+eBAgGtCGvWNBk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-7KKxUMVoN6mAZ0Dyfkg89A-1; Tue, 29 Sep 2020 06:36:31 -0400
+X-MC-Unique: 7KKxUMVoN6mAZ0Dyfkg89A-1
+Received: by mail-wm1-f69.google.com with SMTP id x6so1666084wmi.1
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 03:36:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=I5YYFgfx5BlxcJjZ2anX8oHsy00ljGmpjltg0at7zMM=;
+        b=Q3l/08XB3Xt92ctJqz7QE7ErrYD4//9dK2S40qL9cz8S9NDqomj79ucH1QW5USNI+r
+         u7MF0xBtrGIjhHw0SJ6u9OFGRh3ViUc3WY4y8NaUzw5lk6SX0GOSCEg8k7JtXQNQizav
+         /CcLqA2sZ8k+hDprDFWAsG5mJ/9jSk/aEPAS6n/6fBV4N3vfckP+AWLKH6igJuEJFB1K
+         vMxV/0pAWJNZciymfVVf4IFpHZGBdAMdaBcQ/OvRw35uPcl9C2HkdQ7Z0nr/4gMmpExm
+         ni4FW28UuwsPIva4aI2TbXkj5QDn3+fGN6IXp+1FUuYVBKx1TrmUfVnXrDpbKGRjDEjO
+         FuEg==
+X-Gm-Message-State: AOAM533mskkPi/gB6HnelFAII8Pd5lmH+PdrORMNddCr087qMonuUCYS
+        OQmOYZgWYM9Qupbmf0QPpY8qHLt4LIecwj7l2WsGW4LdY8An7CqXxgkTHLrVpRMZS9y9QNUF61d
+        4/ZbN1v1xbfqo
+X-Received: by 2002:a7b:c401:: with SMTP id k1mr3743597wmi.120.1601375790321;
+        Tue, 29 Sep 2020 03:36:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw1hBlibSkko/LAft8fxp3KWccCLsb2lvaX6Rp2ClMvNy4t8LCP+r9kdfFAUVwpGSAiYf7VwQ==
+X-Received: by 2002:a7b:c401:: with SMTP id k1mr3743568wmi.120.1601375790047;
+        Tue, 29 Sep 2020 03:36:30 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id m12sm4738035wml.38.2020.09.29.03.36.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Sep 2020 03:36:29 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Huacai Chen <chenhc@lemote.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        kvm-ppc@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: Re: [RFC PATCH 0/3] KVM: Introduce "VM bugged" concept
-Message-ID: <20200929112710.3ce1365f.cohuck@redhat.com>
-In-Reply-To: <20200923224530.17735-1-sean.j.christopherson@intel.com>
-References: <20200923224530.17735-1-sean.j.christopherson@intel.com>
-Organization: Red Hat GmbH
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jon Doron <arilou@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/7] KVM: x86: hyper-v: always advertise HV_STIMER_DIRECT_MODE_AVAILABLE
+In-Reply-To: <ded79131-bef1-cb56-68ca-d2bc596a4425@redhat.com>
+References: <20200924145757.1035782-1-vkuznets@redhat.com> <20200924145757.1035782-5-vkuznets@redhat.com> <ded79131-bef1-cb56-68ca-d2bc596a4425@redhat.com>
+Date:   Tue, 29 Sep 2020 12:36:28 +0200
+Message-ID: <875z7wdg43.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Sep 2020 15:45:27 -0700
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> This series introduces a concept we've discussed a few times in x86 land.
-> The crux of the problem is that x86 has a few cases where KVM could
-> theoretically encounter a software or hardware bug deep in a call stack
-> without any sane way to propagate the error out to userspace.
-> 
-> Another use case would be for scenarios where letting the VM live will
-> do more harm than good, e.g. we've been using KVM_BUG_ON for early TDX
-> enabling as botching anything related to secure paging all but guarantees
-> there will be a flood of WARNs and error messages because lower level PTE
-> operations will fail if an upper level operation failed.
-> 
-> The basic idea is to WARN_ONCE if a bug is encountered, kick all vCPUs out
-> to userspace, and mark the VM as bugged so that no ioctls() can be issued
-> on the VM or its devices/vCPUs.
+> On 24/09/20 16:57, Vitaly Kuznetsov wrote:
+>> HV_STIMER_DIRECT_MODE_AVAILABLE is the last conditionally set feature bit
+>> in KVM_GET_SUPPORTED_HV_CPUID but it doesn't have to be conditional: first,
+>> this bit is only an indication to userspace VMM that direct mode stimers
+>> are supported, it still requires manual enablement (enabling SynIC) to
+>> work so no VMM should just blindly copy it to guest CPUIDs. Second,
+>> lapic_in_kernel() is a must for SynIC. Expose the bit unconditionally.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/hyperv.c | 8 +-------
+>>  1 file changed, 1 insertion(+), 7 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> index 6da20f91cd59..503829f71270 100644
+>> --- a/arch/x86/kvm/hyperv.c
+>> +++ b/arch/x86/kvm/hyperv.c
+>> @@ -2028,13 +2028,7 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+>>  			ent->ebx |= HV_DEBUGGING;
+>>  			ent->edx |= HV_X64_GUEST_DEBUGGING_AVAILABLE;
+>>  			ent->edx |= HV_FEATURE_DEBUG_MSRS_AVAILABLE;
+>> -
+>> -			/*
+>> -			 * Direct Synthetic timers only make sense with in-kernel
+>> -			 * LAPIC
+>> -			 */
+>> -			if (lapic_in_kernel(vcpu))
+>> -				ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
+>> +			ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
+>>  
+>>  			break;
+>>  
+>> 
+>
+> Sorry for the late reply.  I think this is making things worse.  It's
+> obviously okay to add a system KVM_GET_SUPPORTED_HV_CPUID, and I guess
+> it makes sense to have bits in there that require to enable a
+> capability.  For example, KVM_GET_SUPPORTED_CPUID has a couple bits such
+> as X2APIC, that we return even if they require in-kernel irqchip.
+>
+> For the vCPU version however we should be able to copy the returned
+> leaves to KVM_SET_CPUID2, meaning that unsupported features should be
+> masked.
 
-I think this makes a lot of sense.
+What I don't quite like about exposing HV_STIMER_DIRECT_MODE_AVAILABLE
+conditionally is that we're requiring userspace to have a certain
+control flow: first, it needs to create irqchip and only then call
+KVM_GET_SUPPORTED_HV_CPUID or it won't know that
+HV_STIMER_DIRECT_MODE_AVAILABLE is supported. 
 
-Are there other user space interactions where we want to generate an
-error for a bugged VM, e.g. via eventfd?
+Also, are you only concerned about HV_STIMER_DIRECT_MODE_AVAILABLE? E.g.
+PATCH3 of this series is somewhat similar, it exposes eVMCS even when
+the corresponding CAP wasn't enabled.
 
-And can we make the 'bugged' information available to user space in a
-structured way?
+While I slightly prefer to get rid of this conditional feature exposure
+once and for all, I don't really feel very strong about it. We can have
+the system ioctl which always exposes all supported features and vCPU
+version which only exposes what is currently enabled. We would, however,
+need to preserve some inconsistency as a legacy: e.g. SynIC bits are now
+exposed unconditionally, even before KVM_CAP_HYPERV_SYNIC[2] is enabled
+(and if we change that we will break at least QEMU).
 
-> 
-> RFC as I've done nowhere near enough testing to verify that rejecting the
-> ioctls(), evicting running vCPUs, etc... works as intended.
-> 
-> Sean Christopherson (3):
->   KVM: Export kvm_make_all_cpus_request() for use in marking VMs as
->     bugged
->   KVM: Add infrastructure and macro to mark VM as bugged
->   KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the
->     VM
-> 
->  arch/x86/kvm/svm/svm.c   |  2 +-
->  arch/x86/kvm/vmx/vmx.c   | 23 ++++++++++++--------
->  arch/x86/kvm/x86.c       |  4 ++++
->  include/linux/kvm_host.h | 45 ++++++++++++++++++++++++++++++++--------
->  virt/kvm/kvm_main.c      | 11 +++++-----
->  5 files changed, 61 insertions(+), 24 deletions(-)
-> 
+-- 
+Vitaly
 
