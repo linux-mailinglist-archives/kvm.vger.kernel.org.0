@@ -2,113 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E51DD27D05C
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 16:00:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BBEA27D197
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 16:41:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730274AbgI2OAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 10:00:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4408 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728867AbgI2OAR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 10:00:17 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08TDXEk6012810;
-        Tue, 29 Sep 2020 10:00:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=KurX2Tj63i/99Pxz+3bnSVJmPd/cjS5Oqc++vVhCztw=;
- b=I429lhf6O8/1lpZRHHpoEXXn4ty9LLqGsxwiPwQ9zmZCDsqK9OwAJgX1plNpGpaQLSs8
- WqrOsc4rtPYnnBm2g7SnAB3AgLqAlcv/cJomCWh8qip8fUZ4wm2hZVcxkTagArz6hkbc
- vdveH7djk5/3PZZYm5umopIhlwC33bENwcmYxgmxM197/rUnT1RFj6EjmsloTL38x/JJ
- BNP+ZxjLa849VMHwfbQZyEUtkoLYWjeiuMIj7tLwgIFBRtv2XXJpzWNuv2hATEA6rWts
- k3E4FFlhC8FTC2/EYhGdGcMvq4CtujESEJFvEkkHkCHwAQ6B53t5nwS6LAonp870wbCY RA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33v4ybujva-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Sep 2020 10:00:15 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08TDXF1g012903;
-        Tue, 29 Sep 2020 10:00:14 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33v4ybujtw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Sep 2020 10:00:14 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08TDvxZ1014673;
-        Tue, 29 Sep 2020 14:00:13 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma03wdc.us.ibm.com with ESMTP id 33sw98vkp0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Sep 2020 14:00:13 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08TE0Ati59834800
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 29 Sep 2020 14:00:10 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A3A9B136079;
-        Tue, 29 Sep 2020 14:00:03 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1115913605D;
-        Tue, 29 Sep 2020 14:00:02 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.170.177])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 29 Sep 2020 14:00:01 +0000 (GMT)
-Subject: Re: [PATCH v10 05/16] s390/vfio-ap: implement in-use callback for
- vfio_ap driver
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
-References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
- <20200821195616.13554-6-akrowiak@linux.ibm.com>
- <20200925112941.71589591.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <b6810e67-1e50-d62c-8c9e-57429e8a239f@linux.ibm.com>
-Date:   Tue, 29 Sep 2020 10:00:01 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1731651AbgI2OlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 10:41:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54874 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728818AbgI2OlC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 10:41:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601390460;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=l0ySg0110w8OW3invBGriU5wyED1HKE44VPvaG4UaUQ=;
+        b=AuXITHLMddNggqzrWY49AcL+Ts2OjZigYZwG2vVUvy3IqvwxnZ8CYvnhZePE2BHv5d+d0Q
+        MDdxnn3PWPv63TOISMStceqyU4QqARDiZw7PDVf40SvgIe/GREN2jUTmwhDOQU0ktKE5+f
+        nHuE/EgEXz/byTCU6nEgaiNVGMZXBEo=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-Feif_FpfPsWCCeDNAVmoOg-1; Tue, 29 Sep 2020 10:40:58 -0400
+X-MC-Unique: Feif_FpfPsWCCeDNAVmoOg-1
+Received: by mail-qk1-f200.google.com with SMTP id m23so2784675qkh.10
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 07:40:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=l0ySg0110w8OW3invBGriU5wyED1HKE44VPvaG4UaUQ=;
+        b=EDT/PJMAvBO6bC8Wte441mHUBm1EpRj5Go3rlgAOf/qt623Az8T805WtZMC6hC2eOg
+         LxVQzYRqVNVVae4c4H7OWz8SEpC6H5OuNGBGpHVHwZV1EszyFeqHA3J9AmX5toSBvCrZ
+         N66MRg/lmySU/BwFPkCUM41f4hwp8JhWEpKtsA8sYT78SnyL2QDXZfZ4vac9zyTunHHe
+         sH4GhzMad+o9RSOtYV2wwQr/JxJxkp1pm9lw0e7b9F0C3Qr2GEzeisF/tjeZ8vrf2qJI
+         +WAD6GtiSzpVt+u058ZkmunUGQZwrHd76e0qU7dyEkUa8LT3TaP3nn83WGHKm/pbcRVd
+         bJMA==
+X-Gm-Message-State: AOAM532IT2q0fqcQY64LPOCdZ9+Jb4cS5EcoprovVgR35qR5w7v4Sx3n
+        5Hlmv2HzndMzZ9F4r1D3U/kAwJyynC2xhL07aQC6aB6B55NCZcX9XqwsKTVvugu7l850YsQUuim
+        RRdYev4ihc5A31ATdI+qNRw1vr/5p
+X-Received: by 2002:a05:620a:b1a:: with SMTP id t26mr4681278qkg.353.1601390456424;
+        Tue, 29 Sep 2020 07:40:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxGXRiKbOouJmxqcaB852zvTvNt3brwJyM0RvvbA+jNO5LTY2XthmJfteBTC1EPfiJm02VqdiHjaCBPFS/38Hw=
+X-Received: by 2002:a05:620a:b1a:: with SMTP id t26mr4681238qkg.353.1601390456048;
+ Tue, 29 Sep 2020 07:40:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200925112941.71589591.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-29_04:2020-09-29,2020-09-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 impostorscore=0 adultscore=0 spamscore=0
- bulkscore=0 priorityscore=1501 mlxlogscore=879 mlxscore=0 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009290119
+References: <20200924032125.18619-1-jasowang@redhat.com> <20200924032125.18619-14-jasowang@redhat.com>
+In-Reply-To: <20200924032125.18619-14-jasowang@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Tue, 29 Sep 2020 16:40:19 +0200
+Message-ID: <CAJaqyWf5tP9DtSc1JP_c4iOkHeVhnEm=kpW4Cv3cMLXfm71h0Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 13/24] vhost-vdpa: introduce ASID based IOTLB
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Michael Tsirkin <mst@redhat.com>, Cindy Lu <lulu@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Rob Miller <rob.miller@broadcom.com>,
+        lingshan.zhu@intel.com, Harpreet Singh Anand <hanand@xilinx.com>,
+        mhabets@solarflare.com, eli@mellanox.com,
+        Adrian Moreno Zapata <amorenoz@redhat.com>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 9/25/20 5:29 AM, Halil Pasic wrote:
-> On Fri, 21 Aug 2020 15:56:05 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Thu, Sep 24, 2020 at 5:24 AM Jason Wang <jasowang@redhat.com> wrote:
 >
->> +
->> +bool vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
->> +{
->> +	bool in_use;
->> +
->> +	mutex_lock(&matrix_dev->lock);
->> +	in_use = !!vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);
->> +	mutex_unlock(&matrix_dev->lock);
-> See also my comment for patch 4. AFAIU as soon as you release the lock
-> the in_use may become outdated in any moment.
-
-See my response to your comment for patch 4.
-
+> This patch introduces the support of ASID based IOTLB by tagging IOTLB
+> with a unique ASID. This is a must for supporting ASID based vhost
+> IOTLB API by the following patches.
 >
->> +
->> +	return in_use;
->> +}
+> IOTLB were stored in a hlist and new IOTLB will be allocated when a
+> new ASID is seen via IOTLB API and destoryed when there's no mapping
+> associated with an ASID.
+>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/vhost/vdpa.c | 94 +++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 72 insertions(+), 22 deletions(-)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 6552987544d7..1ba7e95619b5 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -34,13 +34,21 @@ enum {
+>
+>  #define VHOST_VDPA_DEV_MAX (1U << MINORBITS)
+>
+> +#define VHOST_VDPA_IOTLB_BUCKETS 16
+> +
+> +struct vhost_vdpa_as {
+> +       struct hlist_node hash_link;
+> +       struct vhost_iotlb iotlb;
+> +       u32 id;
+> +};
+> +
+>  struct vhost_vdpa {
+>         struct vhost_dev vdev;
+>         struct iommu_domain *domain;
+>         struct vhost_virtqueue *vqs;
+>         struct completion completion;
+>         struct vdpa_device *vdpa;
+> -       struct vhost_iotlb *iotlb;
+> +       struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
+>         struct device dev;
+>         struct cdev cdev;
+>         atomic_t opened;
+> @@ -49,12 +57,64 @@ struct vhost_vdpa {
+>         int minor;
+>         struct eventfd_ctx *config_ctx;
+>         int in_batch;
+> +       int used_as;
+
+Hi!
+
+The variable `used_as` is not used anywhere outside this commit, and
+in this commit is only tracking the number os AS added, not being able
+to query it or using it by limiting them or anything like that.
+
+If I'm right, could we consider deleting it? Or am I missing some usage of it?
+
+I smoke tested all the series deleting that variable and everything
+seems right to me.
+
+Thanks!
+
+>  };
+>
+>  static DEFINE_IDA(vhost_vdpa_ida);
+>
+>  static dev_t vhost_vdpa_major;
+>
+> +static struct vhost_vdpa_as *asid_to_as(struct vhost_vdpa *v, u32 asid)
+> +{
+> +       struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
+> +       struct vhost_vdpa_as *as;
+> +
+> +       hlist_for_each_entry(as, head, hash_link)
+> +               if (as->id == asid)
+> +                       return as;
+> +
+> +       return NULL;
+> +}
+> +
+> +static struct vhost_vdpa_as *vhost_vdpa_alloc_as(struct vhost_vdpa *v, u32 asid)
+> +{
+> +       struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
+> +       struct vhost_vdpa_as *as;
+> +
+> +       if (asid_to_as(v, asid))
+> +               return NULL;
+> +
+> +       as = kmalloc(sizeof(*as), GFP_KERNEL);
+> +       if (!as)
+> +               return NULL;
+> +
+> +       vhost_iotlb_init(&as->iotlb, 0, 0);
+> +       as->id = asid;
+> +       hlist_add_head(&as->hash_link, head);
+> +       ++v->used_as;
+> +
+> +       return as;
+> +}
+> +
+> +static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
+> +{
+> +       struct vhost_vdpa_as *as = asid_to_as(v, asid);
+> +
+> +       /* Remove default address space is not allowed */
+> +       if (asid == 0)
+> +               return -EINVAL;
+> +
+> +       if (!as)
+> +               return -EINVAL;
+> +
+> +       hlist_del(&as->hash_link);
+> +       vhost_iotlb_reset(&as->iotlb);
+> +       kfree(as);
+> +       --v->used_as;
+> +
+> +       return 0;
+> +}
+> +
+>  static void handle_vq_kick(struct vhost_work *work)
+>  {
+>         struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
+> @@ -513,15 +573,6 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
+>         }
+>  }
+>
+> -static void vhost_vdpa_iotlb_free(struct vhost_vdpa *v)
+> -{
+> -       struct vhost_iotlb *iotlb = v->iotlb;
+> -
+> -       vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1);
+> -       kfree(v->iotlb);
+> -       v->iotlb = NULL;
+> -}
+> -
+>  static int perm_to_iommu_flags(u32 perm)
+>  {
+>         int flags = 0;
+> @@ -681,7 +732,8 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u32 asid,
+>         struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
+>         struct vdpa_device *vdpa = v->vdpa;
+>         const struct vdpa_config_ops *ops = vdpa->config;
+> -       struct vhost_iotlb *iotlb = v->iotlb;
+> +       struct vhost_vdpa_as *as = asid_to_as(v, 0);
+> +       struct vhost_iotlb *iotlb = &as->iotlb;
+>         int r = 0;
+>
+>         if (asid != 0)
+> @@ -775,6 +827,7 @@ static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
+>  {
+>         vhost_dev_cleanup(&v->vdev);
+>         kfree(v->vdev.vqs);
+> +       vhost_vdpa_remove_as(v, 0);
+>  }
+>
+>  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+> @@ -807,23 +860,18 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>         vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+>                        vhost_vdpa_process_iotlb_msg);
+>
+> -       dev->iotlb = vhost_iotlb_alloc(0, 0);
+> -       if (!dev->iotlb) {
+> -               r = -ENOMEM;
+> -               goto err_init_iotlb;
+> -       }
+> +       if (!vhost_vdpa_alloc_as(v, 0))
+> +               goto err_alloc_as;
+>
+>         r = vhost_vdpa_alloc_domain(v);
+>         if (r)
+> -               goto err_alloc_domain;
+> +               goto err_alloc_as;
+>
+>         filep->private_data = v;
+>
+>         return 0;
+>
+> -err_alloc_domain:
+> -       vhost_vdpa_iotlb_free(v);
+> -err_init_iotlb:
+> +err_alloc_as:
+>         vhost_vdpa_cleanup(v);
+>  err:
+>         atomic_dec(&v->opened);
+> @@ -851,7 +899,6 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+>         filep->private_data = NULL;
+>         vhost_vdpa_reset(v);
+>         vhost_dev_stop(&v->vdev);
+> -       vhost_vdpa_iotlb_free(v);
+>         vhost_vdpa_free_domain(v);
+>         vhost_vdpa_config_put(v);
+>         vhost_vdpa_clean_irq(v);
+> @@ -950,7 +997,7 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>         const struct vdpa_config_ops *ops = vdpa->config;
+>         struct vhost_vdpa *v;
+>         int minor;
+> -       int r;
+> +       int i, r;
+>
+>         /* Only support 1 address space */
+>         if (vdpa->ngroups != 1)
+> @@ -1002,6 +1049,9 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>         init_completion(&v->completion);
+>         vdpa_set_drvdata(vdpa, v);
+>
+> +       for (i = 0; i < VHOST_VDPA_IOTLB_BUCKETS; i++)
+> +               INIT_HLIST_HEAD(&v->as[i]);
+> +
+>         return 0;
+>
+>  err:
+> --
+> 2.20.1
+>
 
