@@ -2,145 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4896F27D226
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 17:08:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3571227D233
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 17:10:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731500AbgI2PIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 11:08:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41150 "EHLO
+        id S1731420AbgI2PKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 11:10:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49249 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729396AbgI2PIB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 11:08:01 -0400
+        by vger.kernel.org with ESMTP id S1729963AbgI2PKJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 11:10:09 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601392079;
+        s=mimecast20190719; t=1601392208;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ATkTYcE6abvtZsnqbXxZ3DqrF8xItuHfBg8J1L8+iQ0=;
-        b=KbLfTZUttPjHoft9cPlBzU64BNvPXx1rfjNz6H1WpYmZ3M+Ti9MNelYfzcXVept0XIG3pV
-        2AFeegiK/sMYwTYvQv8g6FmtVjxFohB1TTIRkU0c5XLeidboO5FgGEo1mtrzVln6svzvAR
-        X5n1wk0Xp4TDm1uw5RmZ2DGu+bwr4EE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-fHc3eT8SNFCN2mwTcDkFbA-1; Tue, 29 Sep 2020 11:07:57 -0400
-X-MC-Unique: fHc3eT8SNFCN2mwTcDkFbA-1
-Received: by mail-wr1-f69.google.com with SMTP id a12so1884026wrg.13
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 08:07:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ATkTYcE6abvtZsnqbXxZ3DqrF8xItuHfBg8J1L8+iQ0=;
-        b=mHha5QqCun2xlg7dfcNWlIVo8fyKJMaihSY5QQCTkab4+r4K+YU0UcdrqkaedLhPUV
-         ULtLgbbqSKd0GfaGDhu39qafMQuSxSlsvcZqK0gBSOgvRfiohGL30R/u/InXDdO45yq0
-         pYaZD4M1lDZ0D/WPHZS/C3YDxlEsp1TWV1M22onZRxYYywDGJt9rDUFrNBDQznJx6cKT
-         z6hk2xNDr+lJzYF03Zch+WHqkSzhc8Gx/L2Vg9Nt/KDf2BnlSz1QB+YfUBLPLXSdAD4R
-         oNOzykzlvVv6iAYoiuYPbF6t7vDGf4usa9XkKorc9S3+0WViJzU/uNUO0NRsqxSh0V4A
-         7uXQ==
-X-Gm-Message-State: AOAM530OdT8u11aQe7eEON10OQiqspUVu8HG6xfhlOlomudeZt650+XT
-        CTN05+eHwhNul29uxdQdIM/f153yFOsSDNiQqEIUe5HGVoQkwA0kf3cmZwmdWK6IWq/eWRWw5VR
-        Z0R36MRDYv96C
-X-Received: by 2002:a1c:4b04:: with SMTP id y4mr5016159wma.111.1601392075955;
-        Tue, 29 Sep 2020 08:07:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJya48B0QW3dph1tb9JdX9nlLaz1scgdROIsHArpeP7pTdOKyw+sgYuIwp/ksbF821eJ3zw6Ww==
-X-Received: by 2002:a1c:4b04:: with SMTP id y4mr5016134wma.111.1601392075676;
-        Tue, 29 Sep 2020 08:07:55 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9dbe:2c91:3d1b:58c6? ([2001:b07:6468:f312:9dbe:2c91:3d1b:58c6])
-        by smtp.gmail.com with ESMTPSA id 70sm6347471wmb.41.2020.09.29.08.07.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Sep 2020 08:07:54 -0700 (PDT)
-Subject: Re: [PATCH 17/22] kvm: mmu: Support dirty logging for the TDP MMU
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xAend5D4n0puvrh6V/dnpWIor7tFXJ4ZRbs/LW8W9/Y=;
+        b=QGXpIkPwGivJ7R2BXNuUiV5UYVDGIBoYYyMWCKwS5Gg5fw5lR4/L+1ZGYD4qp1FbsLl4ui
+        0McIJGoVH3BxaOjAI7KHo5D6o0f31mWj9m5TEfOE9aWFT30SFt4n1zu8ED+FxVAws6KwfM
+        qK8XgOMr1xcwYEZn0XI4cDqDhaEMVuc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-QZ-9gau8Nt-qac9udG7_hQ-1; Tue, 29 Sep 2020 11:10:04 -0400
+X-MC-Unique: QZ-9gau8Nt-qac9udG7_hQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B145956B2C;
+        Tue, 29 Sep 2020 15:09:47 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 358C97366C;
+        Tue, 29 Sep 2020 15:09:45 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20200925212302.3979661-1-bgardon@google.com>
- <20200925212302.3979661-18-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aabb139e-6801-cd45-bf16-f698ce8e66e2@redhat.com>
-Date:   Tue, 29 Sep 2020 17:07:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jon Doron <arilou@gmail.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/2] KVM: x86: hyper-v: make KVM_GET_SUPPORTED_HV_CPUID more useful
+Date:   Tue, 29 Sep 2020 17:09:42 +0200
+Message-Id: <20200929150944.1235688-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200925212302.3979661-18-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/09/20 23:22, Ben Gardon wrote:
-> +	for_each_tdp_pte_root(iter, root, start, end) {
-> +iteration_start:
-> +		if (!is_shadow_present_pte(iter.old_spte))
-> +			continue;
-> +
-> +		/*
-> +		 * If this entry points to a page of 4K entries, and 4k entries
-> +		 * should be skipped, skip the whole page. If the non-leaf
-> +		 * entry is at a higher level, move on to the next,
-> +		 * (lower level) entry.
-> +		 */
-> +		if (!is_last_spte(iter.old_spte, iter.level)) {
-> +			if (skip_4k && iter.level == PG_LEVEL_2M) {
-> +				tdp_iter_next_no_step_down(&iter);
-> +				if (iter.valid && iter.gfn >= end)
-> +					goto iteration_start;
-> +				else
-> +					break;
+Changes since v2:
+- Keep vCPU version of the ioctl intact but make it 'deprecated' in
+  api.rst [Paolo Bonzini]
+- First two patches of v2 series already made it to kvm/queue
 
-The iteration_start label confuses me mightily. :)  That would be a case
-where iter.gfn >= end (so for_each_tdp_pte_root would exit) but you want
-to proceed anyway with the gfn that was found by
-tdp_iter_next_no_step_down.  Are you sure you didn't mean
+QEMU series using the feature:
+https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg02017.html
 
-	if (iter.valid && iter.gfn < end)
-		goto iteration_start;
-	else
-		break;
+Original description:
 
-because that would make much more sense: basically a "continue" that
-skips the tdp_iter_next.  With the min_level change I suggested no
-Friday, it would become something like this:
+KVM_GET_SUPPORTED_HV_CPUID was initially implemented as a vCPU ioctl but
+this is not very useful when VMM is just trying to query which Hyper-V
+features are supported by the host prior to creating VM/vCPUs. The data
+in KVM_GET_SUPPORTED_HV_CPUID is mostly static with a few exceptions but
+it seems we can change this. Add support for KVM_GET_SUPPORTED_HV_CPUID as
+a system ioctl as well.
 
-        for_each_tdp_pte_root_level(iter, root, start, end, min_level) {
-                if (!is_shadow_present_pte(iter.old_spte) ||
-                    !is_last_spte(iter.old_spte, iter.level))
-                        continue;
+QEMU specific description:
+In some cases QEMU needs to collect the information about which Hyper-V
+features are supported by KVM and pass it up the stack. For non-hyper-v
+features this is done with system-wide KVM_GET_SUPPORTED_CPUID/
+KVM_GET_MSRS ioctls but Hyper-V specific features don't get in the output
+(as Hyper-V CPUIDs intersect with KVM's). In QEMU, CPU feature expansion
+happens before any KVM vcpus are created so KVM_GET_SUPPORTED_HV_CPUID
+can't be used in its current shape.
 
-                new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
+Vitaly Kuznetsov (2):
+  KVM: x86: hyper-v: allow KVM_GET_SUPPORTED_HV_CPUID as a system ioctl
+  KVM: selftests: test KVM_GET_SUPPORTED_HV_CPUID as a system ioctl
 
-		*iter.sptep = new_spte;
-                handle_change_spte(kvm, as_id, iter.gfn, iter.old_spte,
-				   new_spte, iter.level);
+ Documentation/virt/kvm/api.rst                | 16 ++--
+ arch/x86/kvm/hyperv.c                         |  6 +-
+ arch/x86/kvm/hyperv.h                         |  4 +-
+ arch/x86/kvm/vmx/evmcs.c                      |  3 +-
+ arch/x86/kvm/x86.c                            | 45 ++++++----
+ include/uapi/linux/kvm.h                      |  3 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |  2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 26 ++++++
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       | 87 +++++++++++--------
+ 9 files changed, 123 insertions(+), 69 deletions(-)
 
-                spte_set = true;
-                tdp_mmu_iter_cond_resched(kvm, &iter);
-        }
-
-which is all nice and understandable.
-
-Also, related to this function, why ignore the return value of
-tdp_mmu_iter_cond_resched?  It does makes sense to assign spte_set =
-true since, just like in kvm_mmu_slot_largepage_remove_write_access's
-instance of slot_handle_large_level, you don't even need to flush on
-cond_resched.  However, in order to do that you would have to add some
-kind of "bool flush_on_resched" argument to tdp_mmu_iter_cond_resched,
-or have two separate functions tdp_mmu_iter_cond_{flush_and_,}resched.
-
-The same is true of clear_dirty_gfn_range and set_dirty_gfn_range.
-
-Paolo
+-- 
+2.25.4
 
