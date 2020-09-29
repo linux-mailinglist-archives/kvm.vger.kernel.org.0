@@ -2,122 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1732B27BF8F
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 10:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 758AB27BFB5
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 10:38:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbgI2IdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 04:33:01 -0400
-Received: from mga03.intel.com ([134.134.136.65]:28183 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727861AbgI2Ic7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Sep 2020 04:32:59 -0400
-IronPort-SDR: Bzm53Qv815IqFbYKkSqPJknws+FHB0QfUOZnuEpKlI16Ce3YWymc76Wg8HsCadCVr/q3qG5boP
- H39LM86/KQag==
-X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="162208087"
-X-IronPort-AV: E=Sophos;i="5.77,317,1596524400"; 
-   d="scan'208";a="162208087"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 01:32:55 -0700
-IronPort-SDR: ffF4X8xUM90uT9z1sAE6xYa7icy/8e2mMQp7+7pFB7Lq7fHgztXFbYrcO526yzj7DQFDC795bg
- RqssajENttnA==
-X-IronPort-AV: E=Sophos;i="5.77,317,1596524400"; 
-   d="scan'208";a="338542200"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 01:32:54 -0700
-Date:   Tue, 29 Sep 2020 01:32:53 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [RFC PATCH 1/2] kvm/x86: intercept guest changes to X86_CR4_LA57
-Message-ID: <20200929083250.GM353@linux.intel.com>
-References: <20200928083047.3349-1-jiangshanlai@gmail.com>
- <20200928162417.GA28825@linux.intel.com>
- <CAJhGHyAYXARENZ7OExenZO6tiWAaSQ=jzEG+7j0rjCsa9e5-dA@mail.gmail.com>
+        id S1727605AbgI2Iik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 04:38:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45205 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727474AbgI2Iij (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 04:38:39 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601368718;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZOcN8D8lplbSyngCMYSWkzRt4MxqDxAghoicRfiMun0=;
+        b=dk3yjMjnxHywe2oveED5IC+VtnhgckqNz4/M/E2KQqf9/1HOuvbI5j5G9cgVwClwFvRQzP
+        PkntTr8vnbYZQMI7OfnAnOCN68pwNxyg4JxCpZe4fhtMeFrCKxA+EdBbhkxUwvOI5VwuZv
+        r8Iq0G+jlxEQ0Psia/yYyCttNKEM8Gw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-2o8zL5smORqfnF15qcUz1A-1; Tue, 29 Sep 2020 04:38:33 -0400
+X-MC-Unique: 2o8zL5smORqfnF15qcUz1A-1
+Received: by mail-wr1-f71.google.com with SMTP id v5so1470440wrr.0
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 01:38:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZOcN8D8lplbSyngCMYSWkzRt4MxqDxAghoicRfiMun0=;
+        b=Z70HFDVRTk3/e7VNdW1z6UZSWffV25mRJxHSIm5hozLQK4ZD3XvczR0B9feNYfZcEe
+         1NTl2WhkXWFh8KWKFiWGG5xVFv5dEQCZikNYMwEnvCPWZGmni3x/ZfJBQfbBuhp15O08
+         ougPm93xfyOzJ1Icrto2ERx8ozHPs2rj/r7ojqLgZQMK8zIAgO8ysSqp8uwpm1m0UN+N
+         Hk/hB4n3FSFaKz01iGPbfddFfnSXmRuSZqIitOGKeYHv0WaLVBYdGI8Nu21+zR8n27Yd
+         sw6a6Vipn5ZYg2EAyuEYybVEQQ1Iui0PpZmEvXs8VrrG2IAMUTdZmAhsbYHeqYb6hBel
+         BgnA==
+X-Gm-Message-State: AOAM531oSOs7SjE9On6+KU2YSdmYemPHSxjMI39rASgPtzbGCBybiJZ4
+        rNrQh6GwgtF7m9pqAVMMx5LWW8/G+e3ZO9SO52zYDG9oXjQ9LG+Y7F1sit0HjeaU9OzZgFb/xps
+        iJwKZWKNQYe7o
+X-Received: by 2002:adf:90a2:: with SMTP id i31mr3174270wri.276.1601368712046;
+        Tue, 29 Sep 2020 01:38:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyhLC11wiMgvdwG5borpsJw3UTu+mOIS1ClSfLvOv0d/LoYJ07zqZkrmAStdwGcApDNyfA2VA==
+X-Received: by 2002:adf:90a2:: with SMTP id i31mr3174241wri.276.1601368711759;
+        Tue, 29 Sep 2020 01:38:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9dbe:2c91:3d1b:58c6? ([2001:b07:6468:f312:9dbe:2c91:3d1b:58c6])
+        by smtp.gmail.com with ESMTPSA id y207sm4450549wmc.17.2020.09.29.01.38.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Sep 2020 01:38:31 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PULL 00/11] s390x and generic script updates
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>
+References: <20200928174958.26690-1-thuth@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fa187ed1-0e02-62e5-ba27-4f64782b3cfd@redhat.com>
+Date:   Tue, 29 Sep 2020 10:38:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyAYXARENZ7OExenZO6tiWAaSQ=jzEG+7j0rjCsa9e5-dA@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200928174958.26690-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 29, 2020 at 01:32:45PM +0800, Lai Jiangshan wrote:
-> On Tue, Sep 29, 2020 at 12:24 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Mon, Sep 28, 2020 at 04:30:46PM +0800, Lai Jiangshan wrote:
-> > > From: Lai Jiangshan <laijs@linux.alibaba.com>
-> > >
-> > > When shadowpaping is enabled, guest should not be allowed
-> > > to toggle X86_CR4_LA57. And X86_CR4_LA57 is a rarely changed
-> > > bit, so we can just intercept all the attempts to toggle it
-> > > no matter shadowpaping is in used or not.
-> > >
-> > > Fixes: fd8cb433734ee ("KVM: MMU: Expose the LA57 feature to VM.")
-> > > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > Cc: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> > > ---
-> > >   No test to toggle X86_CR4_LA57 in guest since I can't access to
-> > >   any CPU supports it. Maybe it is not a real problem.
-> >
+On 28/09/20 19:49, Thomas Huth wrote:
+>  Hi Paolo,
 > 
+> the following changes since commit 58c94d57a51a6927a68e3f09627b2d85e3404c0f:
 > 
-> Hello
+>   travis.yml: Use TRAVIS_BUILD_DIR to refer to the top directory (2020-09-25 10:00:36 +0200)
 > 
-> Thanks for reviewing.
+> are available in the Git repository at:
 > 
-> > LA57 doesn't need to be intercepted.  It can't be toggled in 64-bit mode
-> > (causes a #GP), and it's ignored in 32-bit mode.  That means LA57 can only
-> > take effect when 64-bit mode is enabled, at which time KVM will update its
-> > MMU context accordingly.
-> >
+>   https://gitlab.com/huth/kvm-unit-tests.git tags/pull-request-2020-09-28
 > 
-> Oh, I missed that part which is so obvious that the patch
-> seems impertinent.
+> for you to fetch changes up to b508e1147055255ecce93a95916363bda8c8f299:
 > 
-> But X86_CR4_LA57 is so fundamental that it makes me afraid to
-> give it over to guests. And it is rarely changed too. At least,
-> there is no better reason to give it to the guest than
-> intercepting it.
+>   scripts/arch-run: use ncat rather than nc. (2020-09-28 15:03:50 +0200)
 > 
-> There might be another reason that this patch is still needed with
-> an updated changelog.
+> ----------------------------------------------------------------
+> - s390x protected VM support
+> - Some other small s390x improvements
+> - Generic improvements in the scripts (better TAP13 names, nc -> ncat, ...)
+> ----------------------------------------------------------------
 > 
-> When a user (via VMM such as qemu) launches a VM with LA57 disabled
-> in its cpuid on a LA57 enabled host. The hypervisor, IMO, needs to
-> intercept guest's changes to X86_CR4_LA57 even when the guest is still
-> in the non-paging mode. Otherwise the hypervisor failed to detective
-> such combination when the guest changes paging mode later.
+> Jamie Iles (1):
+>       scripts/arch-run: use ncat rather than nc.
 > 
-> Anyway, maybe it is still not a real problem.
+> Marc Hartmayer (6):
+>       runtime.bash: remove outdated comment
+>       Use same test names in the default and the TAP13 output format
+>       common.bash: run `cmd` only if a test case was found
+>       scripts: add support for architecture dependent functions
+>       run_tests/mkstandalone: add arch_cmd hook
+>       s390x: add Protected VM support
+> 
+> Thomas Huth (4):
+>       configure: Add a check for the bash version
+>       travis.yml: Update from Bionic to Focal
+>       travis.yml: Update the list of s390x tests
+>       s390x/selftest: Fix constraint of inline assembly
+> 
+>  .travis.yml             |  7 ++++---
+>  README.md               |  3 ++-
+>  configure               | 14 ++++++++++++++
+>  run_tests.sh            | 18 +++++++++---------
+>  s390x/Makefile          | 15 ++++++++++++++-
+>  s390x/selftest.c        |  2 +-
+>  s390x/selftest.parmfile |  1 +
+>  s390x/unittests.cfg     |  1 +
+>  scripts/arch-run.bash   |  6 +++---
+>  scripts/common.bash     | 21 +++++++++++++++++++--
+>  scripts/mkstandalone.sh |  4 ----
+>  scripts/runtime.bash    |  9 +++------
+>  scripts/s390x/func.bash | 35 +++++++++++++++++++++++++++++++++++
+>  13 files changed, 106 insertions(+), 30 deletions(-)
+>  create mode 100644 s390x/selftest.parmfile
+>  create mode 100644 scripts/s390x/func.bash
+> 
 
-Oof, the above is a KVM bug, though in a more generic manner.  All reserved
-bits should be intercepted, not just LA57.  LA57 is the only affected bit at
-the moment, but proper support is needed as the follow-on patch to let the
-guest toggle FSGSBASE would introduce the same bug.
+Pulled, thanks (for now to my clone; waiting for CI to complete).
+Should we switch to Gitlab merge requests for pull requests only (i.e.
+patches still go on the mailing list)?
 
-Sadly, fixing this is a bit of a mess.  Well, fixing LA57 is easy, e.g. this
-patch will do the trick.  But actually refreshing the CR4 guest/host mask when
-the guest's CPUID is updated is a pain, and that's what's needed for proper
-FSGSBASE support.
+Paolo
 
-I'll send a series, bookended by these two RFC patches, with patches to
-intercept CR4 reserved bits smushed in between.  I agree there's no point in
-letting the guest write LA57 directly, it's almost literally a once-per-boot
-thing.  I wouldn't be surprised if intercepting it is a net win (but still
-inconsequential), e.g. due to the MMU having to grab CR4 out of the VMCS.
