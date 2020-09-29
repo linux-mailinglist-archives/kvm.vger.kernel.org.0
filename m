@@ -2,96 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 040D127BB4F
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 05:13:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 070F727BB72
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 05:21:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727305AbgI2DNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Sep 2020 23:13:44 -0400
-Received: from mga01.intel.com ([192.55.52.88]:48888 "EHLO mga01.intel.com"
+        id S1727300AbgI2DVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Sep 2020 23:21:24 -0400
+Received: from mga05.intel.com ([192.55.52.43]:56113 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726064AbgI2DNn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Sep 2020 23:13:43 -0400
-IronPort-SDR: ZAXWmCA/aiYj1IZQlVLtBznq5qO3dKxtbtpMpOGfq4uS5qsrsxCyO1vnlNhED+2RqrApHVX23e
- cv5u6l40nRdw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="180260932"
+        id S1726421AbgI2DVY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Sep 2020 23:21:24 -0400
+IronPort-SDR: 504y/LCfIGTGlSgE3yT/EViSWj7lle61FwWbAMyZ/Oy4GAbFBGcpQ324amPl0NPIowLXiIWkHl
+ melI9VfdTTJQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9758"; a="246841671"
 X-IronPort-AV: E=Sophos;i="5.77,316,1596524400"; 
-   d="scan'208";a="180260932"
+   d="scan'208";a="246841671"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 20:13:43 -0700
-IronPort-SDR: oqJKntNQQ7OsFrbWSvU0KKwvEI/MzZEgbi7ox6mn0kQs960dmSYL8CFbzDgm0jBfAGVcgX0ZYs
- /hPV2Dy1X9gA==
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 20:21:23 -0700
+IronPort-SDR: hD0R5aNKsx7VJQxeF/PJDsMQIVzs5Cspp5A8UKp2err7yykVMytonoVNDR5hKAjT6N+lueCpab
+ KAy4NPpmZYGQ==
 X-IronPort-AV: E=Sophos;i="5.77,316,1596524400"; 
-   d="scan'208";a="488869172"
+   d="scan'208";a="324517086"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 20:13:43 -0700
-Date:   Mon, 28 Sep 2020 20:13:42 -0700
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2020 20:21:23 -0700
+Date:   Mon, 28 Sep 2020 20:21:22 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v13 02/10] KVM: x86/vmx: Make vmx_set_intercept_for_msr()
- non-static and expose it
-Message-ID: <20200929031342.GD31514@linux.intel.com>
-References: <20200726153229.27149-1-like.xu@linux.intel.com>
- <20200726153229.27149-4-like.xu@linux.intel.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH 3/3 v3] nVMX: Test vmentry of unrestricted (unpaged
+ protected) nested guest
+Message-ID: <20200929032122.GF31514@linux.intel.com>
+References: <20200921081027.23047-1-krish.sadhukhan@oracle.com>
+ <20200921081027.23047-4-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200726153229.27149-4-like.xu@linux.intel.com>
+In-Reply-To: <20200921081027.23047-4-krish.sadhukhan@oracle.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jul 26, 2020 at 11:32:21PM +0800, Like Xu wrote:
-> It's reasonable to call vmx_set_intercept_for_msr() in other vmx-specific
-> files (e.g. pmu_intel.c), so expose it without semantic changes hopefully.
-
-I suppose it's reasonable, but you still need to state what is actually
-going to use it.
-
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 4 ++--
->  arch/x86/kvm/vmx/vmx.h | 2 ++
->  2 files changed, 4 insertions(+), 2 deletions(-)
+On Mon, Sep 21, 2020 at 08:10:27AM +0000, Krish Sadhukhan wrote:
+> According to section "UNRESTRICTED GUESTS" in SDM vol 3c, if the
+> "unrestricted guest" secondary VM-execution control is set, guests can run
+> in unpaged protected mode or in real mode. This patch tests vmetnry of an
+> unrestricted guest in unpaged protected mode.
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index dcde73a230c6..162c668d58f5 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -3772,8 +3772,8 @@ static __always_inline void vmx_enable_intercept_for_msr(unsigned long *msr_bitm
->  	}
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+
+SOB chain is wrong.  Missing a Co-developed-by?  Or is Jim supposed to be
+the author?
+
+> ---
+>  x86/vmx.c       |  2 +-
+>  x86/vmx.h       |  1 +
+>  x86/vmx_tests.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 50 insertions(+), 1 deletion(-)
+> 
+> diff --git a/x86/vmx.c b/x86/vmx.c
+> index 07415b4..1a84a74 100644
+> --- a/x86/vmx.c
+> +++ b/x86/vmx.c
+> @@ -1699,7 +1699,7 @@ static void test_vmx_caps(void)
 >  }
 >  
-> -static __always_inline void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
-> -			     			      u32 msr, int type, bool value)
-> +__always_inline void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
-> +					 u32 msr, int type, bool value)
+>  /* This function can only be called in guest */
+> -static void __attribute__((__used__)) hypercall(u32 hypercall_no)
+> +void __attribute__((__used__)) hypercall(u32 hypercall_no)
 >  {
->  	if (value)
->  		vmx_enable_intercept_for_msr(msr_bitmap, msr, type);
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 0d06951e607c..08c850596cfc 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -356,6 +356,8 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
->  int vmx_find_msr_index(struct vmx_msrs *m, u32 msr);
->  int vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
->  			      struct x86_exception *e);
-> +void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
-> +			      u32 msr, int type, bool value);
-
-This completely defeats the purpose of __always_inline.
-
+>  	u64 val = 0;
+>  	val = (hypercall_no & HYPERCALL_MASK) | HYPERCALL_BIT;
+> diff --git a/x86/vmx.h b/x86/vmx.h
+> index d1c2436..e29301e 100644
+> --- a/x86/vmx.h
+> +++ b/x86/vmx.h
+> @@ -895,6 +895,7 @@ bool ept_ad_bits_supported(void);
+>  void __enter_guest(u8 abort_flag, struct vmentry_result *result);
+>  void enter_guest(void);
+>  void enter_guest_with_bad_controls(void);
+> +void hypercall(u32 hypercall_no);
 >  
->  #define POSTED_INTR_ON  0
->  #define POSTED_INTR_SN  1
+>  typedef void (*test_guest_func)(void);
+>  typedef void (*test_teardown_func)(void *data);
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 22f0c7b..1cadc56 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -8029,6 +8029,53 @@ static void vmx_guest_state_area_test(void)
+>  	enter_guest();
+>  }
+>  
+> +extern void unrestricted_guest_main(void);
+> +asm (".code32\n"
+> +	"unrestricted_guest_main:\n"
+> +	"vmcall\n"
+> +	"nop\n"
+> +	"mov $1, %edi\n"
+> +	"call hypercall\n"
+> +	".code64\n");
+> +
+> +static void setup_unrestricted_guest(void)
+> +{
+> +	vmcs_write(GUEST_CR0, vmcs_read(GUEST_CR0) & ~(X86_CR0_PG));
+> +	vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) & ~ENT_GUEST_64);
+> +	vmcs_write(GUEST_EFER, vmcs_read(GUEST_EFER) & ~EFER_LMA);
+> +	vmcs_write(GUEST_RIP, virt_to_phys(unrestricted_guest_main));
+> +}
+> +
+> +static void unsetup_unrestricted_guest(void)
+> +{
+> +	vmcs_write(GUEST_CR0, vmcs_read(GUEST_CR0) | X86_CR0_PG);
+> +	vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) | ENT_GUEST_64);
+> +	vmcs_write(GUEST_EFER, vmcs_read(GUEST_EFER) | EFER_LMA);
+> +	vmcs_write(GUEST_RIP, (u64) phys_to_virt(vmcs_read(GUEST_RIP)));
+> +	vmcs_write(GUEST_RSP, (u64) phys_to_virt(vmcs_read(GUEST_RSP)));
+> +}
+> +
+> +/*
+> + * If "unrestricted guest" secondary VM-execution control is set, guests
+> + * can run in unpaged protected mode.
+> + */
+> +static void vmentry_unrestricted_guest_test(void)
+> +{
+> +	test_set_guest(unrestricted_guest_main);
+> +	setup_unrestricted_guest();
+> +	if (setup_ept(false))
+> +		test_skip("EPT not supported");
+> +       vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | CPU_URG);
+> +       test_guest_state("Unrestricted guest test", false, CPU_URG, "CPU_URG");
+
+Indentation looks funky.
+
+> +
+> +	/*
+> +	 * Let the guest finish execution as a regular guest
+> +	 */
+> +	unsetup_unrestricted_guest();
+> +	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) & ~CPU_URG);
+> +	enter_guest();
+> +}
+> +
+>  static bool valid_vmcs_for_vmentry(void)
+>  {
+>  	struct vmcs *current_vmcs = NULL;
+> @@ -10234,6 +10281,7 @@ struct vmx_test vmx_tests[] = {
+>  	TEST(vmx_host_state_area_test),
+>  	TEST(vmx_guest_state_area_test),
+>  	TEST(vmentry_movss_shadow_test),
+> +	TEST(vmentry_unrestricted_guest_test),
+>  	/* APICv tests */
+>  	TEST(vmx_eoi_bitmap_ioapic_scan_test),
+>  	TEST(vmx_hlt_with_rvi_test),
 > -- 
-> 2.21.3
+> 2.18.4
 > 
