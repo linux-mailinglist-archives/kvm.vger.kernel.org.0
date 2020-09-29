@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AE4927DC36
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 00:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0824627DC37
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 00:44:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728786AbgI2WoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 18:44:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58049 "EHLO
+        id S1728875AbgI2WoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 18:44:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41885 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728752AbgI2WoP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 18:44:15 -0400
+        by vger.kernel.org with ESMTP id S1728860AbgI2WoR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 18:44:17 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601419453;
+        s=mimecast20190719; t=1601419456;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fnVaKlxSjgosYNWUZ3C9BB5KnUFHrX+zW6dbopznvYU=;
-        b=gseoum29fdMMi9pAAhmaHd/MpI6MgtF4z/bkBo/74ggV083oewrBdNu98p9UrTSOSAZQYA
-        K6NAcLuH0/cKtoGLZK7QMZMhxzyT+FkJnn5NTTGbCOb5pEDJLQtCztY+lDUceSmxdcdtvG
-        fNh0xJiXpy/WGljQrH7cAFKm+8+mm7Y=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-N5EKgtdrPGycX8WYivndOg-1; Tue, 29 Sep 2020 18:44:09 -0400
-X-MC-Unique: N5EKgtdrPGycX8WYivndOg-1
-Received: by mail-wr1-f71.google.com with SMTP id v12so2361617wrm.9
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 15:44:09 -0700 (PDT)
+        bh=fVtzhoPQ9oRe5A4whgi5/tX3r24KuxvOyig0n+4hw6k=;
+        b=PHWvgZgwnPBuN08mYdI+e2MAUd+frzRoOP6kAdur50LRba23uRMnxy1PxPYUS/g8Zvt0Ai
+        mhRWblm4vru1xWeL0rym3WSaECPAFbhyNSFl5sABrfT07JDPNRnwH26EWUquVfaL8R957N
+        jqEpRu6WAtf9+OQGWxORim+xxnUNeM0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-tVekPGQTNHOEcxQWK9vNmA-1; Tue, 29 Sep 2020 18:44:14 -0400
+X-MC-Unique: tVekPGQTNHOEcxQWK9vNmA-1
+Received: by mail-wr1-f72.google.com with SMTP id a2so2345762wrp.8
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 15:44:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=fnVaKlxSjgosYNWUZ3C9BB5KnUFHrX+zW6dbopznvYU=;
-        b=Y3a4le9ZSGWdSWjQnDaiA4KydoGVCw7sh7DMWpPfeMlLd71iGMhFeiynW8hZo6aBak
-         sAgWxPNzq6ibcQQ3jNOQymDTy6Foy6hw52ZEtyvFUw2CdOaX9Dr0DpGG5QkzcXxRpEgz
-         RrbqKKs6veNIrp4lUhB/7dwcolfScj4aceTXfslu3rJ1czxb+0za9S9tJ9faSLS3ycsq
-         e/n+AZRI5MAFKCstRwcdMygUz+1rpk/P6iF/iBXdgayn1AKwlRrbKciFw5wKPdZDGhQa
-         jzangOSB1nzM97b3lOTpFgoq6vvYDI9utC8T88jc+7MB0s/Vuj3Kaea9Ho2cM9wwwE+n
-         yyUg==
-X-Gm-Message-State: AOAM53399S7GDANqgk+oHKgEwvv70GeMD/X5MIhsZ3KcPTQQuglTW7in
-        kkcoTUn2SejhLw4pxkwsP5fW4+/LLpv69CXw7d8DtD2yWdGZUv3lsVTATNzOQitTx3nUgbqHCU2
-        3UHpgZ7kv0ZeY
-X-Received: by 2002:adf:f2d0:: with SMTP id d16mr6386590wrp.332.1601419448302;
-        Tue, 29 Sep 2020 15:44:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz32LQg/FraBPNB2aGTQWNffth7R+ByzmBlrprh0rhJbQuVc73LtYh8e6YQu2ibVKmeTxTjoQ==
-X-Received: by 2002:adf:f2d0:: with SMTP id d16mr6386570wrp.332.1601419448124;
-        Tue, 29 Sep 2020 15:44:08 -0700 (PDT)
+        bh=fVtzhoPQ9oRe5A4whgi5/tX3r24KuxvOyig0n+4hw6k=;
+        b=RGz71pSRV1nmQMI0KcvQt+RW8miWP9nlYsSvIA+TBzmRntxa9fIZByoLepxrp36FTo
+         m1gEmd8bcdEheiJQ+4WtFaREkkJEVIeoggbRfUvQfwyYx630oyLFhHnZWqorViuN2pr/
+         stQvYyA5soiziph5JdPb4shpE4GVVd7lZWiAlF43nbIVinw4/yO3adZoPlBUUhfC/zOf
+         3DKPy9lgbOzEPkdL1FCkmPRemLjkHU4pkLKWa4fM8O1qchayzIepaPln1SBOEAQ9AHvm
+         u6EdYnCUY3nsPQtE9x6XOnYP/AK5pTnKL10O68LItsxpQN0vgIAI9QujSti62lFD6rYx
+         2XYA==
+X-Gm-Message-State: AOAM533OvhiiP2id5X9oZLPM1W2jGc6t/9UStWtKSwRpyS8afYMxkaKv
+        q/oE3aCFEqwti4COSwbRBziRQB0BZc/3FM+okdjA+KnKjKiKm0bhuLgXSCdWuOirg5txCecbCFV
+        nsSSP2yvKxcUA
+X-Received: by 2002:a5d:5261:: with SMTP id l1mr6619428wrc.193.1601419453411;
+        Tue, 29 Sep 2020 15:44:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzeOEbx68Td8hBaYyIFzxkCzoKhQ+EE4XU8IG3LB8RbTCWtKeOlhoOS8sgyI3yT3aeSBndgRw==
+X-Received: by 2002:a5d:5261:: with SMTP id l1mr6619416wrc.193.1601419453250;
+        Tue, 29 Sep 2020 15:44:13 -0700 (PDT)
 Received: from x1w.redhat.com (74.red-83-53-161.dynamicip.rima-tde.net. [83.53.161.74])
-        by smtp.gmail.com with ESMTPSA id e13sm8276536wre.60.2020.09.29.15.44.06
+        by smtp.gmail.com with ESMTPSA id l18sm7902646wrp.84.2020.09.29.15.44.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2020 15:44:07 -0700 (PDT)
+        Tue, 29 Sep 2020 15:44:12 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Thomas Huth <thuth@redhat.com>,
@@ -59,11 +59,10 @@ Cc:     Thomas Huth <thuth@redhat.com>,
         Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Claudio Fontana <cfontana@suse.de>
-Subject: [PATCH v4 02/12] meson: Allow optional target/${ARCH}/Kconfig
-Date:   Wed, 30 Sep 2020 00:43:45 +0200
-Message-Id: <20200929224355.1224017-3-philmd@redhat.com>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH v4 03/12] target/arm: Select SEMIHOSTING if TCG is available
+Date:   Wed, 30 Sep 2020 00:43:46 +0200
+Message-Id: <20200929224355.1224017-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200929224355.1224017-1-philmd@redhat.com>
 References: <20200929224355.1224017-1-philmd@redhat.com>
@@ -75,47 +74,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Extend the generic Meson script to pass optional target Kconfig
-file to the minikconf script.
+Add a kconfig entry which not explicitly selected by another
+entry, but which selects SEMIHOSTING if TCG is available.
+
+This avoids:
+
+  /usr/bin/ld: libqemu-aarch64-softmmu.fa.p/target_arm_arm-semi.c.o: in function `do_arm_semihosting':
+  target/arm/arm-semi.c:784: undefined reference to `qemu_semihosting_console_outc'
+  target/arm/arm-semi.c:787: undefined reference to `qemu_semihosting_console_outs'
+  /usr/bin/ld: target/arm/arm-semi.c:815: undefined reference to `qemu_semihosting_console_inc'
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-We could use fs.exists() but is_file() is more specific
-(can not be a directory).
+ target/arm/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+ create mode 100644 target/arm/Kconfig
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Claudio Fontana <cfontana@suse.de>
----
- meson.build | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/meson.build b/meson.build
-index d36dd085b5..9ab5d514d7 100644
---- a/meson.build
-+++ b/meson.build
-@@ -529,6 +529,7 @@ kconfig_external_symbols = [
- ]
- ignored = ['TARGET_XML_FILES', 'TARGET_ABI_DIR', 'TARGET_DIRS']
- 
-+fs = import('fs')
- foreach target : target_dirs
-   config_target = keyval.load(meson.current_build_dir() / target / 'config-target.mak')
- 
-@@ -569,8 +570,13 @@ foreach target : target_dirs
-     endforeach
- 
-     config_devices_mak = target + '-config-devices.mak'
-+    target_kconfig = 'target' / config_target['TARGET_BASE_ARCH'] / 'Kconfig'
-+    minikconf_input = ['default-configs' / target + '.mak', 'Kconfig']
-+    if fs.is_file(target_kconfig)
-+      minikconf_input += [target_kconfig]
-+    endif
-     config_devices_mak = configure_file(
--      input: ['default-configs' / target + '.mak', 'Kconfig'],
-+      input: minikconf_input,
-       output: config_devices_mak,
-       depfile: config_devices_mak + '.d',
-       capture: true,
+diff --git a/target/arm/Kconfig b/target/arm/Kconfig
+new file mode 100644
+index 0000000000..972d9a1b9a
+--- /dev/null
++++ b/target/arm/Kconfig
+@@ -0,0 +1,4 @@
++# arch-specific rule to select SEMIHOSTING if ARM && TCG
++config ARM_SEMIHOSTING
++    default y if TCG
++    select SEMIHOSTING
 -- 
 2.26.2
 
