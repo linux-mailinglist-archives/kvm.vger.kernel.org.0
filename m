@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C79C27D795
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 22:07:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 271A027D7C0
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 22:11:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728976AbgI2UHD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 16:07:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60974 "EHLO
+        id S1729019AbgI2ULq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 16:11:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728969AbgI2UHD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Sep 2020 16:07:03 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 786E3C061755
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 13:07:01 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id j11so17043309ejk.0
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 13:07:01 -0700 (PDT)
+        with ESMTP id S1728825AbgI2ULq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Sep 2020 16:11:46 -0400
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28749C061755
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 13:11:46 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id gr14so17065861ejb.1
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 13:11:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=u1h2fvvT4OPp+mDt9BSuEIwI1NU5rX5oD8xSPHyS3oE=;
-        b=t0WcvVombLhwdXdTCcUWhl2itrZyb/IumcAxL3uVxGyb+WGHU7Uoz2ogoqkVeZAGQG
-         gW2aYszOTJ2aNsbB+Z7NeadAmAPSpjGCuOEUp39eBda8VphQlH9gIWkuTtSj77LJ420/
-         vF54QA5aweY79WlMUb7c3cN0o9CvJGUE+WTyQte3ECfZObuWUpdj9EPiWNEYkwgpj7GH
-         ascElJ35lrz2DMJ0n/C6k96ywcVccRucu9kHhvLPb3qgPv1z0IcZoajuknEAnKVtrnzt
-         ViwIn7o/SNtjAmnE92xgSNB+qc6WQwHs3Wp8lIFhQqnKMy71Vse1JvjQELUunP9Uqndf
-         0miw==
+        bh=73MxEsPtUT/TTCdrgP6iPP4/Lq4sm/5f1xzmLyh6hxA=;
+        b=ggxhdLxCcavZ37JWVQnppWDOQKG1qFmxrrJTXv2OCkUF5/4r6+TJGKFxoXwaqduF9D
+         6qWtqG6zl2kmkzE7lPX96g5ScHb4lB7arVx+fYXAPR0RVB3q7RJXKRLX6gTuA649f27t
+         jUgxK/HMOVu48tiF7jgMaAK/mr/dI71tC9Ijb0H+pxCjuuaSuScQ43hLgmiJJyv547rw
+         QIvi5b+16P9Up6iGBm/QoVJBf2GQNZXhGk2RzT5RacStnF51hlJ3n3LDYcub6+CIfoGa
+         MjHJe+SYfRlmsZrFI91Lh1ENWcZrKnrEl+MVtDQcOMSt1oAYbykPKBh9maC/8DatLmTw
+         nQPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=u1h2fvvT4OPp+mDt9BSuEIwI1NU5rX5oD8xSPHyS3oE=;
-        b=Elf7fDBcWwwAvFZCJ3I2borW8jVvK+u1JBwMT619aC7hwvaVW66mhPQVLoY1X3DvEQ
-         5bH1Ad9goHWDZ6aW5JMHVxRFQrROu882bxCUqeLclTdeP+9KqT2Hf0E+e900D9af8vkr
-         EFzf1fOHseKH6KFRN82/XcMXVGlfAcwBsZlRRUaL5y9EDk2XMHKSOYccBfQvnhRq/XFI
-         PIRMYhz+YnZcX3L5aTA8RZfABzucP+qN1I8j1j7FEM8XMaBm8uW/J13CvrWMcQjrgttL
-         wfN5bORqcs1yPzCguegOGgWfo5yd14DlhuW99Rtsq42P3cTNDLEMnirT+6Vwa/+u1lgr
-         bHIQ==
-X-Gm-Message-State: AOAM530/W9mdHYORSjgK99TkVP5bkEyql+tNAGVrIPZUEcShzggC4v3d
-        41Hukx+Ng6075cxK/k6aDlbIGVwQRvIW/Az2HqtplQ==
-X-Google-Smtp-Source: ABdhPJzNvPmfpqeFF5weiJ06WOCbfrwLMo30g1vXELPjVSGmAHTe0OlZZUhZENuMjibdqJ8Ah+loAU7hXvzaKksnKQA=
-X-Received: by 2002:a17:906:d936:: with SMTP id rn22mr5774019ejb.4.1601410020098;
- Tue, 29 Sep 2020 13:07:00 -0700 (PDT)
+        bh=73MxEsPtUT/TTCdrgP6iPP4/Lq4sm/5f1xzmLyh6hxA=;
+        b=VqYSCi/Ld4PNYHHMQvv/IXzunOlEl66goXxuE0I/4NcqWu3Hg66PojgI/gtXUto188
+         uj/scgKNL7oIdCSiwAGIbBzgSbwDEtndD7e/XY074AFIhYCskQCtLl8Vu1bLoNLipA+9
+         +V+A8d1NsMxybNI7d7/YNHCPHIHUQFF5+Lf4rT5RdhZ38dZKA75UwBGAdU4t58vgH1Wp
+         ZKsvw3U+Z8pkX7sE6I0jIPC5OjNl9jKezfBjVhXhPNcqksS9L+YzNRE1LxAceGp3fT1K
+         hgQdYjg149hFkPZy1DwrfSl02O8izYy20YhieuXQQiJuCUyKmqW7L+ZUs/uYnw6dy7KU
+         vpOA==
+X-Gm-Message-State: AOAM532aYWtSsXIF/3Pzg3rLMIYkfwODzNCOu5lFNaMZyG5W9KcMwtvE
+        3M9eH8KxV4Dtlu4wc7ggxBkcGZ9UjuebIYUzemFTLQ==
+X-Google-Smtp-Source: ABdhPJyg+ZLsFEMn4YKZQIGAM4gNsSD24gIeZvsuq9F+1zA0aKU9tg0AxMmILZyBdUSEqXkHWTobmd3jnYwL0+Xng5I=
+X-Received: by 2002:a17:906:4a53:: with SMTP id a19mr5876763ejv.56.1601410304552;
+ Tue, 29 Sep 2020 13:11:44 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200316160634.3386-1-philmd@redhat.com> <20200316160634.3386-18-philmd@redhat.com>
-In-Reply-To: <20200316160634.3386-18-philmd@redhat.com>
+ <CAFEAcA-Rt__Du0TqqVFov4mNoBvC9hTt7t7e-3G45Eck4z94tQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-Rt__Du0TqqVFov4mNoBvC9hTt7t7e-3G45Eck4z94tQ@mail.gmail.com>
 From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 29 Sep 2020 21:06:48 +0100
-Message-ID: <CAFEAcA-Rt__Du0TqqVFov4mNoBvC9hTt7t7e-3G45Eck4z94tQ@mail.gmail.com>
+Date:   Tue, 29 Sep 2020 21:11:33 +0100
+Message-ID: <CAFEAcA-u53dVdv8EJdeeOWxw+SfPJueTq7M6g0vBF5XM2Go4zw@mail.gmail.com>
 Subject: Re: [PATCH v3 17/19] hw/arm: Automatically select the 'virt' machine
  on KVM
 To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
@@ -64,35 +65,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 Mar 2020 at 16:08, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+On Tue, 29 Sep 2020 at 21:06, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
 >
-> When building a KVM-only QEMU, the 'virt' machine is a good
-> default :)
+> On Mon, 16 Mar 2020 at 16:08, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+> >
+> > When building a KVM-only QEMU, the 'virt' machine is a good
+> > default :)
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > ---
+> >  hw/arm/Kconfig | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> > index d0903d8544..8e801cd15f 100644
+> > --- a/hw/arm/Kconfig
+> > +++ b/hw/arm/Kconfig
+> > @@ -1,5 +1,6 @@
+> >  config ARM_VIRT
+> >      bool
+> > +    default y if KVM
+> >      imply PCI_DEVICES
+> >      imply TEST_DEVICES
+> >      imply VFIO_AMD_XGBE
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/arm/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index d0903d8544..8e801cd15f 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -1,5 +1,6 @@
->  config ARM_VIRT
->      bool
-> +    default y if KVM
->      imply PCI_DEVICES
->      imply TEST_DEVICES
->      imply VFIO_AMD_XGBE
+> What does this actually do ? Why should the choice of
+> accelerator affect what boards we pull in by default?
 
-What does this actually do ? Why should the choice of
-accelerator affect what boards we pull in by default?
-I can see why you'd want to disable boards that only
-work with accelerators we don't enable, ie don't build
-TCG-only boards unless CONFIG_TCG, but this is the other
-way around...
+Put another way, our current default is "build everything",
+so "default y if ..." on a board is a no-op...
 
-thanks
 -- PMM
