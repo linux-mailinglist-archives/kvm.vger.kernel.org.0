@@ -2,86 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E193A27C10A
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 11:25:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FC2927C117
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 11:28:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727950AbgI2JZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 05:25:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45740 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727700AbgI2JZS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Sep 2020 05:25:18 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5F73C061755;
-        Tue, 29 Sep 2020 02:25:17 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id j19so1175653pjl.4;
-        Tue, 29 Sep 2020 02:25:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zbW0HeVoQwcWNP2ANJpj9racJHJLkStbpDgZaBi6ul8=;
-        b=nGTtFOiGZGZEicHch+Scdl+5XHVvTFbsbUDlTVtIabcQ79pEsRHbWNthPU9ahqvGb7
-         IVVjBvUg1EiwW1nZ3TjGwUu0HTJsWyEbna11J0MttBfXvplioYELn8Y0H5A0fNzq6ygQ
-         OUtHNzeg7Ep5RqBnXj6m/B7yOJ3JnR6o2QhsaXa7s3QajIpkhPB/FQMMELhHkA8HShWj
-         LvCkkszlcI7h8qHfzB3BgmTLpiMqTJgej4+aIPK/101aUK+UEMzoDJLYnyXeLD2Y9MW4
-         MVMLlKAQy2oCjxN0JZf0hU9Vy+2tmtrZnwUhYJH2pdNAjF+lUUMvyhjvBDbi1LmMUUXT
-         WJDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zbW0HeVoQwcWNP2ANJpj9racJHJLkStbpDgZaBi6ul8=;
-        b=POyFu8pUUXcOWEOJ+zDQ8Qwa+XPNB8aT84sMptFzfPeFZuD8nM9F+HNEc2hlm+Muh6
-         u22AGiP73TDPzPinIGDPOC36qa2e/w2NO/r7cSRzFAWrEjqTzGkvsy3Dv+gm05rY/3Lo
-         1jmCQPvFb+yc60TJa3nmv5VFMobPfqNrax+u7BUIDg/wOfpz0yiSd43YX/EVEQqW/kRG
-         45NYhQ8mgl9dICPMW+cSOnnFnkKfBOS1oThunV0to3ALdbKqznP7erNYrr4qeOr7MFD9
-         8kbyHI4XY7NkV+PgsxtHbCUF0btPfn7yCdWS3LQZkW6XrZ60swwkjctbj7ELg+hCUPwM
-         o3fQ==
-X-Gm-Message-State: AOAM531k41tj6bp0ISpnUdjOu+U0IJupGAA96qqCw507NwRQgWR28JBw
-        ffXOl2t4SI4MG8SzfVqoyA==
-X-Google-Smtp-Source: ABdhPJxa6giD4jtY2/Pj3zBWZAPrAKlHFxdIyQKU/FZqPeVGw3I0Sf4xFVxNbhFR3fJa4rMh0AXyJg==
-X-Received: by 2002:a17:90b:1b03:: with SMTP id nu3mr3066035pjb.148.1601371517456;
-        Tue, 29 Sep 2020 02:25:17 -0700 (PDT)
-Received: from [127.0.0.1] ([103.7.29.9])
-        by smtp.gmail.com with ESMTPSA id i62sm4719940pfe.140.2020.09.29.02.25.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Sep 2020 02:25:16 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: Add tracepoint for dr_write/dr_read
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, Haiwei Li <lihaiwei@tencent.com>
-References: <20200929085515.24059-1-lihaiwei.kernel@gmail.com>
- <20200929090133.GI2611@hirez.programming.kicks-ass.net>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Message-ID: <d28afb27-fc22-e467-0aab-5140e9f3c09a@gmail.com>
-Date:   Tue, 29 Sep 2020 17:25:04 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.2
+        id S1727937AbgI2J2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 05:28:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58925 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727841AbgI2J2F (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 05:28:05 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601371683;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pYuc3/1S5yymvfflLAL9MMp/Ok6n0ZAyFbN3sbJRaT0=;
+        b=Jj/USoMBCSfieJHQR6JlxE4ZFYyfJEkT7W+lnGLf9g4i6cpQj3E+HyuIbaW9/EvlTgKFHt
+        CmK98WCW9XLnk4AxKIYN/b6IGN8lPpmOR3GJvS8pHkoo86z7MdLU8q7KCAaR0Taf3TGeyy
+        86MYWsKr3Jz3VXqyCi4M/JOhRUYKU64=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-580-qegXtShCOwWT77D3KJtmZg-1; Tue, 29 Sep 2020 05:27:23 -0400
+X-MC-Unique: qegXtShCOwWT77D3KJtmZg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D80C801ADD;
+        Tue, 29 Sep 2020 09:27:21 +0000 (UTC)
+Received: from gondolin (ovpn-113-63.ams2.redhat.com [10.36.113.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A67356198B;
+        Tue, 29 Sep 2020 09:27:13 +0000 (UTC)
+Date:   Tue, 29 Sep 2020 11:27:10 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Huacai Chen <chenhc@lemote.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [RFC PATCH 0/3] KVM: Introduce "VM bugged" concept
+Message-ID: <20200929112710.3ce1365f.cohuck@redhat.com>
+In-Reply-To: <20200923224530.17735-1-sean.j.christopherson@intel.com>
+References: <20200923224530.17735-1-sean.j.christopherson@intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200929090133.GI2611@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 23 Sep 2020 15:45:27 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-
-On 20/9/29 17:01, Peter Zijlstra wrote:
-> On Tue, Sep 29, 2020 at 04:55:15PM +0800, lihaiwei.kernel@gmail.com wrote:
->> From: Haiwei Li <lihaiwei@tencent.com>
->>
->> Add tracepoint trace_kvm_dr_write/trace_kvm_dr_read for x86 kvm.
+> This series introduces a concept we've discussed a few times in x86 land.
+> The crux of the problem is that x86 has a few cases where KVM could
+> theoretically encounter a software or hardware bug deep in a call stack
+> without any sane way to propagate the error out to userspace.
 > 
-> This is a changelog in the: i++; /* increment i */, style. Totally
-> inadequate.
+> Another use case would be for scenarios where letting the VM live will
+> do more harm than good, e.g. we've been using KVM_BUG_ON for early TDX
+> enabling as botching anything related to secure paging all but guarantees
+> there will be a flood of WARNs and error messages because lower level PTE
+> operations will fail if an upper level operation failed.
+> 
+> The basic idea is to WARN_ONCE if a bug is encountered, kick all vCPUs out
+> to userspace, and mark the VM as bugged so that no ioctls() can be issued
+> on the VM or its devices/vCPUs.
 
-I will improve the changelog and resend. Thanks.
+I think this makes a lot of sense.
 
-     Haiwei
+Are there other user space interactions where we want to generate an
+error for a bugged VM, e.g. via eventfd?
+
+And can we make the 'bugged' information available to user space in a
+structured way?
+
+> 
+> RFC as I've done nowhere near enough testing to verify that rejecting the
+> ioctls(), evicting running vCPUs, etc... works as intended.
+> 
+> Sean Christopherson (3):
+>   KVM: Export kvm_make_all_cpus_request() for use in marking VMs as
+>     bugged
+>   KVM: Add infrastructure and macro to mark VM as bugged
+>   KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the
+>     VM
+> 
+>  arch/x86/kvm/svm/svm.c   |  2 +-
+>  arch/x86/kvm/vmx/vmx.c   | 23 ++++++++++++--------
+>  arch/x86/kvm/x86.c       |  4 ++++
+>  include/linux/kvm_host.h | 45 ++++++++++++++++++++++++++++++++--------
+>  virt/kvm/kvm_main.c      | 11 +++++-----
+>  5 files changed, 61 insertions(+), 24 deletions(-)
+> 
+
