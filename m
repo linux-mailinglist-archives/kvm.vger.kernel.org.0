@@ -2,76 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1637827D1C1
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 16:47:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4896F27D226
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 17:08:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731349AbgI2Orf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 10:47:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40233 "EHLO
+        id S1731500AbgI2PIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 11:08:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41150 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728937AbgI2Orf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 10:47:35 -0400
+        by vger.kernel.org with ESMTP id S1729396AbgI2PIB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 11:08:01 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601390853;
+        s=mimecast20190719; t=1601392079;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PtRKjvr2xKdnyYEHitFUee6d7Brs/dWCC9MF1YYO3xM=;
-        b=IksYDtnuZyRBSML19JirOJP6+HOk2rU69at/CKVG9PYJQ4JUIhC6ZcYpfdXg3+e0CXp6RM
-        B263CjemAjFMfUb6WiP2yJRNrTiQVCPvacxikZfF8S6OkGSOyAijkfYb+W9BqLrcDWX3Vh
-        jIINX5GqxNURNBZntH5E7z26Td0owm4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-hgccNxGxMWK4aWJQo79dNA-1; Tue, 29 Sep 2020 10:47:31 -0400
-X-MC-Unique: hgccNxGxMWK4aWJQo79dNA-1
-Received: by mail-wm1-f72.google.com with SMTP id m25so1943943wmi.0
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 07:47:31 -0700 (PDT)
+        bh=ATkTYcE6abvtZsnqbXxZ3DqrF8xItuHfBg8J1L8+iQ0=;
+        b=KbLfTZUttPjHoft9cPlBzU64BNvPXx1rfjNz6H1WpYmZ3M+Ti9MNelYfzcXVept0XIG3pV
+        2AFeegiK/sMYwTYvQv8g6FmtVjxFohB1TTIRkU0c5XLeidboO5FgGEo1mtrzVln6svzvAR
+        X5n1wk0Xp4TDm1uw5RmZ2DGu+bwr4EE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-fHc3eT8SNFCN2mwTcDkFbA-1; Tue, 29 Sep 2020 11:07:57 -0400
+X-MC-Unique: fHc3eT8SNFCN2mwTcDkFbA-1
+Received: by mail-wr1-f69.google.com with SMTP id a12so1884026wrg.13
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 08:07:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=PtRKjvr2xKdnyYEHitFUee6d7Brs/dWCC9MF1YYO3xM=;
-        b=m2GeaumwIZ5fbjU3a8pWa1WB4H+zdOqpEP2edNxZTnEJW7CCdpVyjESl+locu0lEqH
-         c0m5CU+9+/7tBTHI1QnLLPSbTOIqJF6dUm9TQk0DMpxxlrVY/t6wkXANutWGp7XnzdiW
-         NOmDmbP64tK1PlaoFntTLFE0cA9LhKvXOY8bBSxRG5bNXuPgH2h4IKr493FCVG3RcgJb
-         vDU/Ok5Q7VuFAQP5/0b7exQk2TIK/pk7HnncdskhuJjt4kbH+1gw21V6A4y6lBKZdnbg
-         UpQbuDKSk4AeTuWev5RVW2wdPR0yWxwh8DhzuJwdbplJCVfQnBXsd+m3Sot+Swrt9dy7
-         6EUw==
-X-Gm-Message-State: AOAM531yp1CYKt0/BaknWis4HBbfmVyAC/4ZPgVotSDwfaN5KnKUNXE6
-        1BVnvZHN+ep5EP5b9GmHQL0on34zRVIgcq9rbGieshqzZy1t1Vu3nBkrFt6nlh2RfVZzWN6stfc
-        gD6CQmASeePmq
-X-Received: by 2002:a1c:9c4b:: with SMTP id f72mr4941943wme.188.1601390850360;
-        Tue, 29 Sep 2020 07:47:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwVvIsgRlLltuU7/F3qHNhZaYh3pEjgJZUzHs5Wbg6c+re1FxA/iDBgncxK9LACmKogcerxaw==
-X-Received: by 2002:a1c:9c4b:: with SMTP id f72mr4941915wme.188.1601390850039;
-        Tue, 29 Sep 2020 07:47:30 -0700 (PDT)
+        bh=ATkTYcE6abvtZsnqbXxZ3DqrF8xItuHfBg8J1L8+iQ0=;
+        b=mHha5QqCun2xlg7dfcNWlIVo8fyKJMaihSY5QQCTkab4+r4K+YU0UcdrqkaedLhPUV
+         ULtLgbbqSKd0GfaGDhu39qafMQuSxSlsvcZqK0gBSOgvRfiohGL30R/u/InXDdO45yq0
+         pYaZD4M1lDZ0D/WPHZS/C3YDxlEsp1TWV1M22onZRxYYywDGJt9rDUFrNBDQznJx6cKT
+         z6hk2xNDr+lJzYF03Zch+WHqkSzhc8Gx/L2Vg9Nt/KDf2BnlSz1QB+YfUBLPLXSdAD4R
+         oNOzykzlvVv6iAYoiuYPbF6t7vDGf4usa9XkKorc9S3+0WViJzU/uNUO0NRsqxSh0V4A
+         7uXQ==
+X-Gm-Message-State: AOAM530OdT8u11aQe7eEON10OQiqspUVu8HG6xfhlOlomudeZt650+XT
+        CTN05+eHwhNul29uxdQdIM/f153yFOsSDNiQqEIUe5HGVoQkwA0kf3cmZwmdWK6IWq/eWRWw5VR
+        Z0R36MRDYv96C
+X-Received: by 2002:a1c:4b04:: with SMTP id y4mr5016159wma.111.1601392075955;
+        Tue, 29 Sep 2020 08:07:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJya48B0QW3dph1tb9JdX9nlLaz1scgdROIsHArpeP7pTdOKyw+sgYuIwp/ksbF821eJ3zw6Ww==
+X-Received: by 2002:a1c:4b04:: with SMTP id y4mr5016134wma.111.1601392075676;
+        Tue, 29 Sep 2020 08:07:55 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9dbe:2c91:3d1b:58c6? ([2001:b07:6468:f312:9dbe:2c91:3d1b:58c6])
-        by smtp.gmail.com with ESMTPSA id t17sm6687615wrx.82.2020.09.29.07.47.26
+        by smtp.gmail.com with ESMTPSA id 70sm6347471wmb.41.2020.09.29.08.07.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Sep 2020 07:47:28 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
- support user-configurable
-To:     Qian Cai <cai@redhat.com>, Mohammed Gamal <mgamal@redhat.com>,
+        Tue, 29 Sep 2020 08:07:54 -0700 (PDT)
+Subject: Re: [PATCH 17/22] kvm: mmu: Support dirty logging for the TDP MMU
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-next@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-References: <20200903141122.72908-1-mgamal@redhat.com>
- <1f42d8f084083cdf6933977eafbb31741080f7eb.camel@redhat.com>
- <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
- <ebcd39a5-364f-c4ac-f8c7-41057a3d84be@redhat.com>
- <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
+Cc:     Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20200925212302.3979661-1-bgardon@google.com>
+ <20200925212302.3979661-18-bgardon@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
-Date:   Tue, 29 Sep 2020 16:47:26 +0200
+Message-ID: <aabb139e-6801-cd45-bf16-f698ce8e66e2@redhat.com>
+Date:   Tue, 29 Sep 2020 17:07:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
+In-Reply-To: <20200925212302.3979661-18-bgardon@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,100 +81,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/09/20 15:39, Qian Cai wrote:
-> On Tue, 2020-09-29 at 14:26 +0200, Paolo Bonzini wrote:
->> On 29/09/20 13:59, Qian Cai wrote:
->>> WARN_ON_ONCE(!allow_smaller_maxphyaddr);
->>>
->>> I noticed the origin patch did not have this WARN_ON_ONCE(), but the
->>> mainline
->>> commit b96e6506c2ea ("KVM: x86: VMX: Make smaller physical guest address
->>> space
->>> support user-configurable") does have it for some reasons.
->>
->> Because that part of the code should not be reached.  The exception
->> bitmap is set up with
->>
->>         if (!vmx_need_pf_intercept(vcpu))
->>                 eb &= ~(1u << PF_VECTOR);
->>
->> where
->>
->> static inline bool vmx_need_pf_intercept(struct kvm_vcpu *vcpu)
->> {
->>         if (!enable_ept)
->>                 return true;
->>
->>         return allow_smaller_maxphyaddr &&
->> 		 cpuid_maxphyaddr(vcpu) < boot_cpu_data.x86_phys_bits;
->> }
->>
->> We shouldn't get here if "enable_ept && !allow_smaller_maxphyaddr",
->> which implies vmx_need_pf_intercept(vcpu) == false.  So the warning is
->> genuine; I've sent a patch.
-> 
-> Care to provide a link to the patch? Just curious.
-> 
+On 25/09/20 23:22, Ben Gardon wrote:
+> +	for_each_tdp_pte_root(iter, root, start, end) {
+> +iteration_start:
+> +		if (!is_shadow_present_pte(iter.old_spte))
+> +			continue;
+> +
+> +		/*
+> +		 * If this entry points to a page of 4K entries, and 4k entries
+> +		 * should be skipped, skip the whole page. If the non-leaf
+> +		 * entry is at a higher level, move on to the next,
+> +		 * (lower level) entry.
+> +		 */
+> +		if (!is_last_spte(iter.old_spte, iter.level)) {
+> +			if (skip_4k && iter.level == PG_LEVEL_2M) {
+> +				tdp_iter_next_no_step_down(&iter);
+> +				if (iter.valid && iter.gfn >= end)
+> +					goto iteration_start;
+> +				else
+> +					break;
 
-Ok, I haven't sent it yet. :)  But here it is:
+The iteration_start label confuses me mightily. :)  That would be a case
+where iter.gfn >= end (so for_each_tdp_pte_root would exit) but you want
+to proceed anyway with the gfn that was found by
+tdp_iter_next_no_step_down.  Are you sure you didn't mean
 
-commit 608e2791d7353e7d777bf32038ca3e7d548155a4 (HEAD -> kvm-master)
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue Sep 29 08:31:32 2020 -0400
+	if (iter.valid && iter.gfn < end)
+		goto iteration_start;
+	else
+		break;
 
-    KVM: VMX: update PFEC_MASK/PFEC_MATCH together with PF intercept
-    
-    The PFEC_MASK and PFEC_MATCH fields in the VMCS reverse the meaning of
-    the #PF intercept bit in the exception bitmap when they do not match.
-    This means that, if PFEC_MASK and/or PFEC_MATCH are set, the
-    hypervisor can get a vmexit for #PF exceptions even when the
-    corresponding bit is clear in the exception bitmap.
-    
-    This is unexpected and is promptly reported as a WARN_ON_ONCE.
-    To fix it, reset PFEC_MASK and PFEC_MATCH when the #PF intercept
-    is disabled (as is common with enable_ept && !allow_smaller_maxphyaddr).
-    
-    Reported-by: Qian Cai <cai@redhat.com>>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+because that would make much more sense: basically a "continue" that
+skips the tdp_iter_next.  With the min_level change I suggested no
+Friday, it would become something like this:
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f0384e93548a..f4e9c310032a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -794,6 +794,18 @@ void update_exception_bitmap(struct kvm_vcpu *vcpu)
- 	 */
- 	if (is_guest_mode(vcpu))
- 		eb |= get_vmcs12(vcpu)->exception_bitmap;
-+        else {
-+		/*
-+		 * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
-+		 * between guest and host.  In that case we only care about present
-+		 * faults.  For vmcs02, however, PFEC_MASK and PFEC_MATCH are set in
-+		 * prepare_vmcs02_rare.
-+		 */
-+		bool selective_pf_trap = enable_ept && (eb & (1u << PF_VECTOR));
-+		int mask = selective_pf_trap ? PFERR_PRESENT_MASK : 0;
-+		vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, mask);
-+		vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, mask);
-+	}
- 
- 	vmcs_write32(EXCEPTION_BITMAP, eb);
- }
-@@ -4355,16 +4367,6 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 		vmx->pt_desc.guest.output_mask = 0x7F;
- 		vmcs_write64(GUEST_IA32_RTIT_CTL, 0);
- 	}
--
--	/*
--	 * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
--	 * between guest and host.  In that case we only care about present
--	 * faults.
--	 */
--	if (enable_ept) {
--		vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, PFERR_PRESENT_MASK);
--		vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, PFERR_PRESENT_MASK);
--	}
- }
- 
- static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+        for_each_tdp_pte_root_level(iter, root, start, end, min_level) {
+                if (!is_shadow_present_pte(iter.old_spte) ||
+                    !is_last_spte(iter.old_spte, iter.level))
+                        continue;
+
+                new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
+
+		*iter.sptep = new_spte;
+                handle_change_spte(kvm, as_id, iter.gfn, iter.old_spte,
+				   new_spte, iter.level);
+
+                spte_set = true;
+                tdp_mmu_iter_cond_resched(kvm, &iter);
+        }
+
+which is all nice and understandable.
+
+Also, related to this function, why ignore the return value of
+tdp_mmu_iter_cond_resched?  It does makes sense to assign spte_set =
+true since, just like in kvm_mmu_slot_largepage_remove_write_access's
+instance of slot_handle_large_level, you don't even need to flush on
+cond_resched.  However, in order to do that you would have to add some
+kind of "bool flush_on_resched" argument to tdp_mmu_iter_cond_resched,
+or have two separate functions tdp_mmu_iter_cond_{flush_and_,}resched.
+
+The same is true of clear_dirty_gfn_range and set_dirty_gfn_range.
+
+Paolo
 
