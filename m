@@ -2,109 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4288A27CB4A
-	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 14:27:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A158527CBCC
+	for <lists+kvm@lfdr.de>; Tue, 29 Sep 2020 14:31:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731712AbgI2M01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Sep 2020 08:26:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54681 "EHLO
+        id S1732961AbgI2Mas (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Sep 2020 08:30:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38686 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732601AbgI2M0X (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 08:26:23 -0400
+        by vger.kernel.org with ESMTP id S1728922AbgI2L3Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Sep 2020 07:29:24 -0400
 Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601382382;
+        s=mimecast20190719; t=1601378941;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gYCM27eQBX+C1GSLSFKxmj4gnOFHGu50TnKuH5f77Uw=;
-        b=jS7ExrUUunNlaNpIfEx2mW0rq+0mvyEe3KGFcJHmIUSXlPz8DlwMLDEV+e/oMZlafa1ts9
-        nSKOuXQnoZoeu74LZpKhxepWY7Ut8qJfXRss1CABR/mCyXClT66A9uB0WO3KDdLewFyc9u
-        hrdmbMQw0XkYM8FefsJSSxPQUwyNpDI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424--D99FV2yMiaFK78kUiqO1A-1; Tue, 29 Sep 2020 08:26:20 -0400
-X-MC-Unique: -D99FV2yMiaFK78kUiqO1A-1
-Received: by mail-wr1-f72.google.com with SMTP id l15so1690021wro.10
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 05:26:20 -0700 (PDT)
+        bh=Jgd9+IvcGT8+fG9kgn+qU1iqHDwGn9/rK0K5vQ757us=;
+        b=XaBXvrCBo7C+TIY1v+/9Nllr8xK4QYDutPIrQCdr8fGyYT5bLPHpXaVNNfwwf46z3J+CTt
+        Y6KEjHSqQaekiYntcEujjpMwZPLu5qsdiKL+YjGVB88DCmgWXYvjvTTnkBZSj7AZjZxc3n
+        BlsfiCxvW5ytPiTwOc7n1Orepwb0Onk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-Y2_r3N1sM1GBS9R5ZKxqOw-1; Tue, 29 Sep 2020 07:26:39 -0400
+X-MC-Unique: Y2_r3N1sM1GBS9R5ZKxqOw-1
+Received: by mail-wm1-f72.google.com with SMTP id x6so1713212wmi.1
+        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 04:26:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gYCM27eQBX+C1GSLSFKxmj4gnOFHGu50TnKuH5f77Uw=;
-        b=gKU9+4bYrRHFkzdXtP3ODlE4kbJ+hMX5HeyfLjmEBwGq8h6LUKokVHkDyCDcVXaJ8P
-         YzuUZBylx1eaUQqzUNjuwkx4izo8pi2/PwA40cBUBOffktz9/yiMURrlGqCoEKwqwKDw
-         CAN26GHr1W/Zg1OP+4TwGFHaBpAyPwgowM6nFnckpMnVIDefJYNNFcieexLguTLfwTyI
-         pdmTswEU0pSMa1/7zd+NzLPcxAa1ysaA8Cw02Bif8vDsSEuwSPqdJ/ALlud/0ZRij46f
-         JE55/oqyoxDl3mmJPm8iG5IH7mORDAief89MU2rAJBeXZE608quZ1hJJK/G/x0XFIRsI
-         JfHg==
-X-Gm-Message-State: AOAM5319XGoHrTcPQiPoVVdXqRAfwtNpIc73zA4fLH72j4MLmFoQ/xgV
-        as2AhS+Balmv1a+irOas8XqMyJ40LWSmC+e8e0Ktj5pUnWFrPhyLXJ+nN3JnQubNy8aHnupnbFe
-        yBMRTcqw+BRsh
-X-Received: by 2002:a7b:c749:: with SMTP id w9mr4033760wmk.29.1601382376051;
-        Tue, 29 Sep 2020 05:26:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz2s4HKbrVlR26BGHrynO5370fP6WNbutA1OCmeWGjDR5Zag1+91h5hGA+sTgEMJPKwtl+9PA==
-X-Received: by 2002:a7b:c749:: with SMTP id w9mr4033734wmk.29.1601382375843;
-        Tue, 29 Sep 2020 05:26:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9dbe:2c91:3d1b:58c6? ([2001:b07:6468:f312:9dbe:2c91:3d1b:58c6])
-        by smtp.gmail.com with ESMTPSA id l18sm5937819wrp.84.2020.09.29.05.26.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Sep 2020 05:26:15 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
- support user-configurable
-To:     Qian Cai <cai@redhat.com>, Mohammed Gamal <mgamal@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-next@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-References: <20200903141122.72908-1-mgamal@redhat.com>
- <1f42d8f084083cdf6933977eafbb31741080f7eb.camel@redhat.com>
- <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ebcd39a5-364f-c4ac-f8c7-41057a3d84be@redhat.com>
-Date:   Tue, 29 Sep 2020 14:26:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Jgd9+IvcGT8+fG9kgn+qU1iqHDwGn9/rK0K5vQ757us=;
+        b=MjnKG5g/3ZCBs5q1dCNK/KamQgwxUI49/2a8MfkBf4piPLCIa2JNyuN2uOESoYSgrH
+         En4gEvkFU4crksDTxraRu9wiHmQmMnc/5+Esluh2SpNT/ls05IjNLIQ0p4bJBVNf2FCi
+         bhPcwo8gYX1b+8PDFHH1Sy3Ip8yo3Y/2hCAtSbO5wSk4SRglFXd+KGiGstfix2x3EVsB
+         cJfs7rNvptHNADYL4L2gLMgGd69c5uxwOpbxfzB+PlheYXpaFRYxuYS1tnVzHa8EuvqU
+         NrbA/cAoAQEsRehLnxnWqNjvytOcnwX5Jn/jVjexP6tGfKikIo+45BLKZfJvt4xvl5nM
+         W9bw==
+X-Gm-Message-State: AOAM532VCuQE2qwY5MLJo4WozCIEUH8DipWDK5xMXuYcNMq06TpdaOrK
+        JdJPH3DbmbmXfGiAHGzPPXixICKgwwj3bltumicxdy8cN6ObbcX9AszhXrbmccorMQ47UT8jzS8
+        +w4Ijnkv+jFmI
+X-Received: by 2002:a7b:c192:: with SMTP id y18mr3898921wmi.108.1601378798018;
+        Tue, 29 Sep 2020 04:26:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwyxP52XOengRaEtx3AULabzHo2vMHQxAZX3YMtDk64jHdZoOKQWBO6sgitlALK/aRFssPWCA==
+X-Received: by 2002:a7b:c192:: with SMTP id y18mr3898895wmi.108.1601378797780;
+        Tue, 29 Sep 2020 04:26:37 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id a10sm5010727wmj.38.2020.09.29.04.26.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Sep 2020 04:26:37 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jon Doron <arilou@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/7] KVM: x86: hyper-v: always advertise HV_STIMER_DIRECT_MODE_AVAILABLE
+In-Reply-To: <34ea6c7c-6c10-5cdb-de75-6b4afc023dd2@redhat.com>
+References: <20200924145757.1035782-1-vkuznets@redhat.com> <20200924145757.1035782-5-vkuznets@redhat.com> <ded79131-bef1-cb56-68ca-d2bc596a4425@redhat.com> <875z7wdg43.fsf@vitty.brq.redhat.com> <34ea6c7c-6c10-5cdb-de75-6b4afc023dd2@redhat.com>
+Date:   Tue, 29 Sep 2020 13:26:36 +0200
+Message-ID: <87lfgsbz83.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/09/20 13:59, Qian Cai wrote:
-> 
-> WARN_ON_ONCE(!allow_smaller_maxphyaddr);
-> 
-> I noticed the origin patch did not have this WARN_ON_ONCE(), but the mainline
-> commit b96e6506c2ea ("KVM: x86: VMX: Make smaller physical guest address space
-> support user-configurable") does have it for some reasons.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Because that part of the code should not be reached.  The exception
-bitmap is set up with
+> On 29/09/20 12:36, Vitaly Kuznetsov wrote:
+>>> Sorry for the late reply.  I think this is making things worse.  It's
+>>> obviously okay to add a system KVM_GET_SUPPORTED_HV_CPUID, and I guess
+>>> it makes sense to have bits in there that require to enable a
+>>> capability.  For example, KVM_GET_SUPPORTED_CPUID has a couple bits such
+>>> as X2APIC, that we return even if they require in-kernel irqchip.
+>>>
+>>> For the vCPU version however we should be able to copy the returned
+>>> leaves to KVM_SET_CPUID2, meaning that unsupported features should be
+>>> masked.
+>> What I don't quite like about exposing HV_STIMER_DIRECT_MODE_AVAILABLE
+>> conditionally is that we're requiring userspace to have a certain
+>> control flow: first, it needs to create irqchip and only then call
+>> KVM_GET_SUPPORTED_HV_CPUID or it won't know that
+>> HV_STIMER_DIRECT_MODE_AVAILABLE is supported. 
+>> 
+>> Also, are you only concerned about HV_STIMER_DIRECT_MODE_AVAILABLE? E.g.
+>> PATCH3 of this series is somewhat similar, it exposes eVMCS even when
+>> the corresponding CAP wasn't enabled.
+>
+> All of them, but this was only about the vCPU ioctl.  I agree with you
+> that the system ioctl should return everything unconditionally.
+>
+> But perhaps the best thing to do is to deprecate the vCPU ioctl and just
+> leave it as is with all its quirks.
+>
 
-        if (!vmx_need_pf_intercept(vcpu))
-                eb &= ~(1u << PF_VECTOR);
+Ok, I'll do exactly that. I'm not sure if there are any
+KVM_GET_SUPPORTED_HV_CPUID users out there bisedes QEMU/selftest but
+let's take the 'safest' approach.
 
-where
-
-static inline bool vmx_need_pf_intercept(struct kvm_vcpu *vcpu)
-{
-        if (!enable_ept)
-                return true;
-
-        return allow_smaller_maxphyaddr &&
-		 cpuid_maxphyaddr(vcpu) < boot_cpu_data.x86_phys_bits;
-}
-
-We shouldn't get here if "enable_ept && !allow_smaller_maxphyaddr",
-which implies vmx_need_pf_intercept(vcpu) == false.  So the warning is
-genuine; I've sent a patch.
-
-Paolo
+-- 
+Vitaly
 
