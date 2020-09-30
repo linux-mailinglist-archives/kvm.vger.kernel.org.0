@@ -2,131 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 768EB27E824
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 14:02:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F03D027E8AD
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 14:36:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729548AbgI3MCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 08:02:21 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11095 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728235AbgI3MCU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 08:02:20 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f7473990002>; Wed, 30 Sep 2020 05:01:29 -0700
-Received: from mtl-vdi-166.wap.labs.mlnx (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 30 Sep
- 2020 12:02:06 +0000
-Date:   Wed, 30 Sep 2020 15:02:02 +0300
-From:   Eli Cohen <elic@nvidia.com>
-To:     Jason Wang <jasowang@redhat.com>
-CC:     <mst@redhat.com>, <lulu@redhat.com>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <rob.miller@broadcom.com>, <lingshan.zhu@intel.com>,
-        <eperezma@redhat.com>, <hanand@xilinx.com>,
-        <mhabets@solarflare.com>, <elic@nvidia.com>, <amorenoz@redhat.com>,
-        <maxime.coquelin@redhat.com>, <stefanha@redhat.com>,
-        <sgarzare@redhat.com>
-Subject: Re: [RFC PATCH 06/24] vhost-vdpa: switch to use vhost-vdpa specific
- IOTLB
-Message-ID: <20200930120202.GA229518@mtl-vdi-166.wap.labs.mlnx>
-References: <20200924032125.18619-1-jasowang@redhat.com>
- <20200924032125.18619-7-jasowang@redhat.com>
+        id S1729873AbgI3Mgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 08:36:50 -0400
+Received: from foss.arm.com ([217.140.110.172]:35376 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728235AbgI3Mgu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 08:36:50 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FFC530E;
+        Wed, 30 Sep 2020 05:36:49 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EF553F6CF;
+        Wed, 30 Sep 2020 05:36:47 -0700 (PDT)
+Subject: Re: [PATCH v7 5/7] KVM: arm64: pmu: Make overflow handler NMI safe
+To:     Will Deacon <will@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        mark.rutland@arm.com, sumit.garg@linaro.org, maz@kernel.org,
+        swboyd@chromium.org, catalin.marinas@arm.com,
+        Julien Thierry <julien.thierry@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20200924110706.254996-1-alexandru.elisei@arm.com>
+ <20200924110706.254996-6-alexandru.elisei@arm.com>
+ <20200928175725.GB11792@willie-the-truck>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <6b1ecdef-3a42-c428-2309-753b1470e3de@arm.com>
+Date:   Wed, 30 Sep 2020 13:37:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200924032125.18619-7-jasowang@redhat.com>
-User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1601467289; bh=HTWvti/vuxtKoYKzUD6BxgnjRBPp9SCs9dRrrQvaN+c=;
-        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-         Content-Type:Content-Disposition:In-Reply-To:User-Agent:
-         X-Originating-IP:X-ClientProxiedBy;
-        b=FVu00aG3ONgcRFrBmD7zJd8ni1KmaI0rxs/mH8LJzd74Y4kLlSvizri95M/muuVm7
-         XSs2w3M5mZG/Vm9aBREZPBmOGHF4X8T+9DfbKBg/rxQWP3I0d9dTF2ym3W2YIAYDeD
-         ZDabCWv5vzTEjbNbsG8JbZ+PEjM1AeuCEilCKCYpRXW1mZDoSIonUclkyDSrK10oLa
-         cgWFnl2UcRrtKiaaewi3k9sz89p3M6q22jmOJ4FU0HWqOcmGc0JKtGV/y4Qi8wjqk8
-         tQZqXeIdZTHsxiw+wqKCdNnpQb9IL1ztePuGxy8aq+mSfMIja2rP8c2Ue8wKVieYFh
-         xiRgekRLah/Xg==
+In-Reply-To: <20200928175725.GB11792@willie-the-truck>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 11:21:07AM +0800, Jason Wang wrote:
-> To ease the implementation of per group ASID support for vDPA
-> device. This patch switches to use a vhost-vdpa specific IOTLB to
-> avoid the unnecessary refactoring of the vhost core.
-> 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vhost/vdpa.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 74bef1c15a70..ec3c94f706c1 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -40,6 +40,7 @@ struct vhost_vdpa {
->  	struct vhost_virtqueue *vqs;
->  	struct completion completion;
->  	struct vdpa_device *vdpa;
-> +	struct vhost_iotlb *iotlb;
->  	struct device dev;
->  	struct cdev cdev;
->  	atomic_t opened;
-> @@ -514,12 +515,11 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
->  
->  static void vhost_vdpa_iotlb_free(struct vhost_vdpa *v)
->  {
-> -	struct vhost_dev *dev = &v->vdev;
-> -	struct vhost_iotlb *iotlb = dev->iotlb;
-> +	struct vhost_iotlb *iotlb = v->iotlb;
->  
->  	vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1);
-> -	kfree(dev->iotlb);
-> -	dev->iotlb = NULL;
-> +	kfree(v->iotlb);
-> +	v->iotlb = NULL;
->  }
->  
->  static int perm_to_iommu_flags(u32 perm)
-> @@ -681,7 +681,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
->  	struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
->  	struct vdpa_device *vdpa = v->vdpa;
->  	const struct vdpa_config_ops *ops = vdpa->config;
-> -	struct vhost_iotlb *iotlb = dev->iotlb;
-> +	struct vhost_iotlb *iotlb = v->iotlb;
->  	int r = 0;
->  
->  	r = vhost_dev_check_owner(dev);
-> @@ -812,12 +812,14 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
->  
->  	r = vhost_vdpa_alloc_domain(v);
->  	if (r)
-> -		goto err_init_iotlb;
-> +		goto err_alloc_domain;
+Hi Will,
 
-You're still using this:
-dev->iotlb = vhost_iotlb_alloc(0, 0);
+On 9/28/20 6:57 PM, Will Deacon wrote:
 
-Shouldn't you use
-v->iotlb = host_iotlb_alloc(0, 0);
+> On Thu, Sep 24, 2020 at 12:07:04PM +0100, Alexandru Elisei wrote:
+>> From: Julien Thierry <julien.thierry@arm.com>
+>>
+>> kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
+>> NMI context, defer waking the vcpu to an irq_work queue.
+>>
+>> A vcpu can be freed while it's not running by kvm_destroy_vm(). Prevent
+>> running the irq_work for a non-existent vcpu by calling irq_work_sync() on
+>> the PMU destroy path.
+>>
+>> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Will Deacon <will.deacon@arm.com>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+>> Cc: kvm@vger.kernel.org
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+>> Tested-by: Sumit Garg <sumit.garg@linaro.org> (Developerbox)
+>> [Alexandru E.: Added irq_work_sync()]
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>> I suggested in v6 that I will add an irq_work_sync() to
+>> kvm_pmu_vcpu_reset(). It turns out it's not necessary: a vcpu reset is done
+>> by the vcpu being reset with interrupts enabled, which means all the work
+>> has had a chance to run before the reset takes place.
+> I don't understand this ^^
 
-to set the vdpa device iotlb field?
+Marc had the same comment, I replied in his email. I thought about it and you're
+right, it doesn't make much sense.
 
->  
->  	filep->private_data = v;
->  
->  	return 0;
->  
-> +err_alloc_domain:
-> +	vhost_vdpa_iotlb_free(v);
->  err_init_iotlb:
->  	vhost_vdpa_cleanup(v);
->  err:
-> -- 
-> 2.20.1
-> 
+>
+> But the patch itself looks good, so I'm going to queue this lot anyway!
+
+Thank you for picking up the series!
+
+Thanks,
+Alex
