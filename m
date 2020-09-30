@@ -2,127 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E254527E94D
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 15:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7E3627E95F
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 15:20:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728496AbgI3NRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 09:17:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26177 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725776AbgI3NRQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 09:17:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601471834;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k+T3hp1G/8usQabHu6Z+BeraaB8GJWxJvx9lFv1z4Og=;
-        b=Q7TcezTCB1xb2JRAT6Hfo0aRjeW+tcKMnXUgGdMal/VGdrKt55fjCS5G2ukmLCs+LyD1pr
-        Iu0wdIgvKR+94kuRjGflOoWCRpIoeCjrLKArsmjjar6DhQrWudmq9lAr/W4Tw7PMUtw13a
-        xvGUlbMUXyyDiC/uvTHfCYHZjO+LyAU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-mCM0ed2WN2GVszw8a32W6w-1; Wed, 30 Sep 2020 09:17:09 -0400
-X-MC-Unique: mCM0ed2WN2GVszw8a32W6w-1
-Received: by mail-wm1-f72.google.com with SMTP id 23so456982wmk.8
-        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 06:17:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=k+T3hp1G/8usQabHu6Z+BeraaB8GJWxJvx9lFv1z4Og=;
-        b=bE1ATWv8d55DxxXQtTyuMiLiQCmQtYoRenIs2pkm40dKCPX2Q1Fw09bCJW/Hjv1SK7
-         3hI/jLSZNbOO2bGiVBi/7HYL/kELx2UA+xcqsUDeh6hywTbIAg1+RWvRL2tkIJ8W5cYk
-         0OvWY/Nl2x82MzFp12O4/gq1OcMu2AWYHgpWp2RpKvoNmwYP6p6BGqJfXdL0e4IprrNI
-         H2oApAOfHYDY7kWS2v+SSBsClbnyJTGWNVcHmn5ndXmDfoQkv4Yvel3hzwBMkSM80twM
-         7pX2z+3h0/j21k2PBJuOESEdSVj7soF6Gnxhicz5LuBx04ZrearFEp/SN6759NPZZJI1
-         Ds/g==
-X-Gm-Message-State: AOAM530F5QKhNCctedvhdB3yvBiW8Y0Gh0a6FJAcASp0HB7/bjPF0myv
-        DftUV6fcZiKCDqz34DAsxsASSt1UW0P4ynDMswsKEkhDM8UWIa+T9wwBZAjux5Bdnio6DHmFtr6
-        qwy99ikk9JCLD
-X-Received: by 2002:a5d:570b:: with SMTP id a11mr3221723wrv.139.1601471828200;
-        Wed, 30 Sep 2020 06:17:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFWiFaTR4B/SjKzTAPoCC3OoRM1zFV1RHDbm+NroRgIJcx+EUjmdCrnL/ItnriRxkgp0BBAA==
-X-Received: by 2002:a5d:570b:: with SMTP id a11mr3221701wrv.139.1601471827982;
-        Wed, 30 Sep 2020 06:17:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:75e3:aaa7:77d6:f4e4? ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
-        by smtp.gmail.com with ESMTPSA id h3sm3118133wrq.0.2020.09.30.06.17.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Sep 2020 06:17:07 -0700 (PDT)
-Subject: Re: [PATCH v4 02/12] meson: Allow optional target/${ARCH}/Kconfig
-To:     Claudio Fontana <cfontana@suse.de>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Fam Zheng <fam@euphon.net>,
-        Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
-References: <20200929224355.1224017-1-philmd@redhat.com>
- <20200929224355.1224017-3-philmd@redhat.com>
- <19b1318a-f9be-5808-760b-ba7748d48267@suse.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <254ee778-e8b6-9acf-d7c7-075eb3a88a65@redhat.com>
-Date:   Wed, 30 Sep 2020 15:17:06 +0200
+        id S1730198AbgI3NUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 09:20:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47528 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725776AbgI3NUC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 09:20:02 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08UD32EZ196315;
+        Wed, 30 Sep 2020 09:19:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+4wBy/rox5ENbH0r0Oww+Ct1SMgUWQQGqCAqvAC6+iQ=;
+ b=PnTIrywY9Eed6aEoOv7QKRJKB8NOttlJBiS6x4qo4UhgpBeF6st5pcd+TmTexXX8q876
+ xiiOiVLcTnQmA+pSk5wGUStweGmaW0z+IPzE1yN1POsQUqMZYz63bOS3U+fUqJ2+zVZN
+ vCNOyG+GZn+1/KVmtSyoQWy56hjCpYbtKqQgkw0MKQMclQW+qbOpD3xfIaS5Z3YQbKu8
+ TtopAXFRwCMI+d7DTAolsEVShK5Ls4hWCSz5ij9B279owFKOYBRm9SOFJOfj38+TTi00
+ QIpPIFc9X43bjKTkZ/3EkeUAyUbGiVLdXBLuCbYpJExKOC2jcuWg/5w7Ur4yZdECaEPT 5A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33vq8nfmrh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Sep 2020 09:19:59 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08UD3psJ004325;
+        Wed, 30 Sep 2020 09:19:59 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33vq8nfmr9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Sep 2020 09:19:59 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08UDHDHu007694;
+        Wed, 30 Sep 2020 13:19:58 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma03dal.us.ibm.com with ESMTP id 33sw99pw7s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Sep 2020 13:19:58 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08UDJoTU27198074
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Sep 2020 13:19:50 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0BDB0BE053;
+        Wed, 30 Sep 2020 13:19:55 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA2F7BE04F;
+        Wed, 30 Sep 2020 13:19:51 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.170.177])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 30 Sep 2020 13:19:51 +0000 (GMT)
+Subject: Re: [PATCH v10 10/16] s390/vfio-ap: allow configuration of matrix
+ mdev in use by a KVM guest
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+ <20200821195616.13554-11-akrowiak@linux.ibm.com>
+ <20200927020316.38bf3fa1.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <d854afee-51bc-997b-26fc-72b9560f3a0f@linux.ibm.com>
+Date:   Wed, 30 Sep 2020 09:19:50 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <19b1318a-f9be-5808-760b-ba7748d48267@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200927020316.38bf3fa1.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-30_07:2020-09-30,2020-09-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 adultscore=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009300104
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/20 14:50, Claudio Fontana wrote:
-> On 9/30/20 12:43 AM, Philippe Mathieu-Daudé wrote:
->> Extend the generic Meson script to pass optional target Kconfig
->> file to the minikconf script.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> We could use fs.exists() but is_file() is more specific
->> (can not be a directory).
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Claudio Fontana <cfontana@suse.de>
->> ---
->>  meson.build | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/meson.build b/meson.build
->> index d36dd085b5..9ab5d514d7 100644
->> --- a/meson.build
->> +++ b/meson.build
->> @@ -529,6 +529,7 @@ kconfig_external_symbols = [
->>  ]
->>  ignored = ['TARGET_XML_FILES', 'TARGET_ABI_DIR', 'TARGET_DIRS']
->>  
->> +fs = import('fs')
->>  foreach target : target_dirs
->>    config_target = keyval.load(meson.current_build_dir() / target / 'config-target.mak')
->>  
->> @@ -569,8 +570,13 @@ foreach target : target_dirs
->>      endforeach
->>  
->>      config_devices_mak = target + '-config-devices.mak'
->> +    target_kconfig = 'target' / config_target['TARGET_BASE_ARCH'] / 'Kconfig'
->> +    minikconf_input = ['default-configs' / target + '.mak', 'Kconfig']
->> +    if fs.is_file(target_kconfig)
->> +      minikconf_input += [target_kconfig]
->> +    endif
->>      config_devices_mak = configure_file(
->> -      input: ['default-configs' / target + '.mak', 'Kconfig'],
->> +      input: minikconf_input,
->>        output: config_devices_mak,
->>        depfile: config_devices_mak + '.d',
->>        capture: true,
->>
-> 
-> I can't say I understand it, but the general idea seems right to me.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+On 9/26/20 8:03 PM, Halil Pasic wrote:
+> On Fri, 21 Aug 2020 15:56:10 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> The current support for pass-through crypto adapters does not allow
+>> configuration of a matrix mdev when it is in use by a KVM guest. Let's
+>> allow AP resources - i.e., adapters, domains and control domains - to be
+>> assigned to or unassigned from a matrix mdev while it is in use by a guest.
+>> This is in preparation for the introduction of support for dynamic
+>> configuration of the AP matrix for a running KVM guest.
+> AFAIU this will let the user do the assign, which will however only take
+> effect if the same mdev is re-used with a freshly constructed VM, or?
+>
+> This is however supposed to change real soon (in patch 11). From the
+> perspective of bisectability we would end up with a single commit that
+> acts funny.
+>
+> How about switching up patches 10 and 11. This way the changes you have
+> in the current 11 would remain dormant until the changes in the current
+> 10 enable the complete new feature (hotplug)?
+
+I can do that, but maybe it makes more sense to squash patches 10
+and 11 since they are completely dependent on each other. What say
+you?
+
+>
+>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   drivers/s390/crypto/vfio_ap_ops.c | 24 ------------------------
+>>   1 file changed, 24 deletions(-)
+>>
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+>> index 24fd47e43b80..cf3321eb239b 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -773,10 +773,6 @@ static ssize_t assign_adapter_store(struct device *dev,
+>>   	struct mdev_device *mdev = mdev_from_dev(dev);
+>>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>   
+>> -	/* If the guest is running, disallow assignment of adapter */
+>> -	if (matrix_mdev->kvm)
+>> -		return -EBUSY;
+>> -
+>>   	ret = kstrtoul(buf, 0, &apid);
+>>   	if (ret)
+>>   		return ret;
+>> @@ -828,10 +824,6 @@ static ssize_t unassign_adapter_store(struct device *dev,
+>>   	struct mdev_device *mdev = mdev_from_dev(dev);
+>>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>   
+>> -	/* If the guest is running, disallow un-assignment of adapter */
+>> -	if (matrix_mdev->kvm)
+>> -		return -EBUSY;
+>> -
+>>   	ret = kstrtoul(buf, 0, &apid);
+>>   	if (ret)
+>>   		return ret;
+>> @@ -891,10 +883,6 @@ static ssize_t assign_domain_store(struct device *dev,
+>>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>   	unsigned long max_apqi = matrix_mdev->matrix.aqm_max;
+>>   
+>> -	/* If the guest is running, disallow assignment of domain */
+>> -	if (matrix_mdev->kvm)
+>> -		return -EBUSY;
+>> -
+>>   	ret = kstrtoul(buf, 0, &apqi);
+>>   	if (ret)
+>>   		return ret;
+>> @@ -946,10 +934,6 @@ static ssize_t unassign_domain_store(struct device *dev,
+>>   	struct mdev_device *mdev = mdev_from_dev(dev);
+>>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>   
+>> -	/* If the guest is running, disallow un-assignment of domain */
+>> -	if (matrix_mdev->kvm)
+>> -		return -EBUSY;
+>> -
+>>   	ret = kstrtoul(buf, 0, &apqi);
+>>   	if (ret)
+>>   		return ret;
+>> @@ -991,10 +975,6 @@ static ssize_t assign_control_domain_store(struct device *dev,
+>>   	struct mdev_device *mdev = mdev_from_dev(dev);
+>>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>   
+>> -	/* If the guest is running, disallow assignment of control domain */
+>> -	if (matrix_mdev->kvm)
+>> -		return -EBUSY;
+>> -
+>>   	ret = kstrtoul(buf, 0, &id);
+>>   	if (ret)
+>>   		return ret;
+>> @@ -1036,10 +1016,6 @@ static ssize_t unassign_control_domain_store(struct device *dev,
+>>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>   	unsigned long max_domid =  matrix_mdev->matrix.adm_max;
+>>   
+>> -	/* If the guest is running, disallow un-assignment of control domain */
+>> -	if (matrix_mdev->kvm)
+>> -		return -EBUSY;
+>> -
+>>   	ret = kstrtoul(buf, 0, &domid);
+>>   	if (ret)
+>>   		return ret;
 
