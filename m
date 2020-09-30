@@ -2,139 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8964827F525
-	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 00:29:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04EE327F532
+	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 00:34:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731626AbgI3W3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 18:29:40 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22224 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730398AbgI3W3k (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 18:29:40 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08UM2Dse065892;
-        Wed, 30 Sep 2020 18:29:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=bqnKSnYGkMCTbMLLZkuOCFSYLg7Fmfo08VtiyWQBCJY=;
- b=tus6AHdOze2k/FZcRkIhwA8epIJYOL//4BpfUwO49ALKs672nn5a2t6SitBCUye85DXF
- XNqu4Oi+8lLZdTAoXMDlzC37cS9M8TwpM8fL5KmlAU/tv9ZxwTtBsU7uAtH79Rgfo4Nq
- yTg0iwUOC4Ib0lTehGtyDh7Quc2AKvSK7ekFPyWl889T4wyNlughAKRaKaEeVy71aopo
- ZIHWTnW9s1GFXfJ+T5alL37BW+9rZJp0gO/K5q8YGuUSJJR2MtCE5jjtyArRE7pbZvUn
- BLiwg8htBmPdn4PBMlfXG0U0I7q3wt2qY+PYKZV8UeCXPKWadP93Y8Ecp8OFIRwjza4N IQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33w2618ycp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Sep 2020 18:29:39 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08UMMslD009593;
-        Wed, 30 Sep 2020 18:29:39 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33w2618ybs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Sep 2020 18:29:39 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08UMROl7013228;
-        Wed, 30 Sep 2020 22:29:36 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 33sw984utx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Sep 2020 22:29:36 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08UMTXhU14549402
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 30 Sep 2020 22:29:33 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B9ABFAE045;
-        Wed, 30 Sep 2020 22:29:33 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F4118AE04D;
-        Wed, 30 Sep 2020 22:29:32 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.63.21])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 30 Sep 2020 22:29:32 +0000 (GMT)
-Date:   Thu, 1 Oct 2020 00:29:30 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v10 09/16] s390/vfio-ap: allow assignment of unavailable
- AP queues to mdev device
-Message-ID: <20201001002930.26185810.pasic@linux.ibm.com>
-In-Reply-To: <76600ed5-60cc-c530-56db-43f7026d8c8e@linux.ibm.com>
-References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
-        <20200821195616.13554-10-akrowiak@linux.ibm.com>
-        <20200927014902.1a1a0d8c.pasic@linux.ibm.com>
-        <76600ed5-60cc-c530-56db-43f7026d8c8e@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1731339AbgI3WeD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 18:34:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51684 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725799AbgI3WeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 18:34:03 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B17DC0613D0
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 15:34:02 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id g7so4262572iov.13
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 15:34:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+S9ma2h9nZrG9Sat/6z/ehgUrIx5BYnTDTi/tV6A6k4=;
+        b=I3B14Ii7kuDQDslqdcm/IPjckSxnWQUi4OXiqFU5KnR6INOv6VpiNMsKafQ5WPIWKg
+         y2bajmGzD1rNhvlzwFClWar0ikBP4/uBWoA0C5AIioOc9u5Qy+hLDKGyiJuDAig84rJh
+         nvY5JO9BFmvI4PaW1xUI39uEIaKeW/xIF0Es347XU7ez+qoUU6h+16taGC2220lkx2gj
+         jHPKf+0/YkVuJj29oS5lvnIYbm/umJ1IFWfA0PteJzWDPswwnDe9Gn6VhbByGJ6sN0Ze
+         KFb0pNkX+tt1HhZx8sOK80US9EPdKzS9/kAz5ORuPm/wl3DRgUm9/tHFeCOrJCm8WC/K
+         InOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+S9ma2h9nZrG9Sat/6z/ehgUrIx5BYnTDTi/tV6A6k4=;
+        b=nR1aMEbiGoqRjqw5CFKQUcLURNJAi8DKBFHJdJemZV1hmmwGdXx6Z4zK+DlyFWyGeS
+         2nT+IqMLCqm8rWo+qbFGN0T8wAhzNL10ycHBLYqQfhKAc0tAWXSytKI8mZo99466lJwU
+         LDxbc6xtj120UJsZfL2q2J8iqj8rn70NxDvbFRcg3aZiBVQv6ReasJof5Oh9EAOyTQrw
+         8Q1/CVGiPED2yF4IE7Sn/aDQpZjAJG98pAe4Y+OAQiYas8g/K9NGls9s+zfyUGdjW7Zn
+         N0FMhiZ8wAG+t0PqyrjDr0ioUAcTXTwVFVHZMjpRrjfuZOFVkZy+oxTwZSVwzqNECNwi
+         vPTg==
+X-Gm-Message-State: AOAM530K5Hwy1T+wEjNaZdA5OcDBtGE4kA2oaCK3jicpFZ/6Z+mMEwNY
+        pdoWyxY7YdB94SjaTy+rQvZUwYMuZSEe4silhOB79w==
+X-Google-Smtp-Source: ABdhPJwLWfY5kfVzNFAU16o9aKJQSSccovFArV9jJq7IdHkyon92S/JDGl+GtDilvhp1G6pIJ7JPsrdWg3jKU46iWPY=
+X-Received: by 2002:a05:6638:1643:: with SMTP id a3mr3730239jat.4.1601505241093;
+ Wed, 30 Sep 2020 15:34:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-30_13:2020-09-30,2020-09-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- adultscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
- spamscore=0 suspectscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009300174
+References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-21-bgardon@google.com>
+ <20200930181556.GJ32672@linux.intel.com> <d2bcf512-00f3-8499-420d-b31690bdb511@redhat.com>
+In-Reply-To: <d2bcf512-00f3-8499-420d-b31690bdb511@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 30 Sep 2020 15:33:50 -0700
+Message-ID: <CANgfPd9h_Epb8qZZ6qCP5BKD0DOYv5v2NQm-J2ajq9_wXfWb1g@mail.gmail.com>
+Subject: Re: [PATCH 20/22] kvm: mmu: NX largepage recovery for TDP MMU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 30 Sep 2020 08:59:36 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Wed, Sep 30, 2020 at 12:56 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 30/09/20 20:15, Sean Christopherson wrote:
+> > On Fri, Sep 25, 2020 at 02:23:00PM -0700, Ben Gardon wrote:
+> >> +/*
+> >> + * Clear non-leaf SPTEs and free the page tables they point to, if those SPTEs
+> >> + * exist in order to allow execute access on a region that would otherwise be
+> >> + * mapped as a large page.
+> >> + */
+> >> +void kvm_tdp_mmu_recover_nx_lpages(struct kvm *kvm)
+> >> +{
+> >> +    struct kvm_mmu_page *sp;
+> >> +    bool flush;
+> >> +    int rcu_idx;
+> >> +    unsigned int ratio;
+> >> +    ulong to_zap;
+> >> +    u64 old_spte;
+> >> +
+> >> +    rcu_idx = srcu_read_lock(&kvm->srcu);
+> >> +    spin_lock(&kvm->mmu_lock);
+> >> +
+> >> +    ratio = READ_ONCE(nx_huge_pages_recovery_ratio);
+> >> +    to_zap = ratio ? DIV_ROUND_UP(kvm->stat.nx_lpage_splits, ratio) : 0;
+> >
+> > This is broken, and possibly related to Paolo's INIT_LIST_HEAD issue.  The TDP
+> > MMU never increments nx_lpage_splits, it instead has its own counter,
+> > tdp_mmu_lpage_disallowed_page_count.  Unless I'm missing something, to_zap is
+> > guaranteed to be zero and thus this is completely untested.
+>
+> Except if you do shadow paging (through nested EPT) and then it bombs
+> immediately. :)
+>
+> > I don't see any reason for a separate tdp_mmu_lpage_disallowed_page_count,
+> > a single VM can't have both a legacy MMU and a TDP MMU, so it's not like there
+> > will be collisions with other code incrementing nx_lpage_splits.   And the TDP
+> > MMU should be updating stats anyways.
+>
+> This is true, but having two counters is necessary (in the current
+> implementation) because otherwise you zap more than the requested ratio
+> of pages.
+>
+> The simplest solution is to add a "bool tdp_page" to struct
+> kvm_mmu_page, so that you can have a single list of
+> lpage_disallowed_pages and a single thread.  The while loop can then
+> dispatch to the right "zapper" code.
 
-> >> @@ -572,6 +455,11 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev,
-> >>   	DECLARE_BITMAP(aqm, AP_DOMAINS);
-> >>   
-> >>   	list_for_each_entry(lstdev, &matrix_dev->mdev_list, node) {
-> >> +		/*
-> >> +		 * If either of the input masks belongs to the mdev to which an
-> >> +		 * AP resource is being assigned, then we don't need to verify
-> >> +		 * that mdev's masks.
-> >> +		 */
-> >>   		if (matrix_mdev == lstdev)
-> >>   			continue;
-> >>     
-> > Seems unrelated.  
-> 
-> What seems unrelated? The matrix_mdev passed in is the mdev to which 
-> assignment is
-> being made. This function is verifying that no APQN assigned to the 
-> matrix_mdev is
-> assigned to any other mdev. Since we are looping through all mdevs here, 
-> we are
-> skipping the verification if the current mdev being examined is the same 
-> as the matrix_mdev
-> to which the assignment is being made. Maybe I'm not understanding your 
-> point here.
+I actually did add that bool in patch 4: kvm: mmu: Allocate and free
+TDP MMU roots.
+I'm a little nervous about putting them in the same list, but I agree
+it would definitely simplify the implementation of reclaim.
 
-Sorry I did not explain myself clear enough. By seems unrelated, I mean
-that while valid possibly it does not contribute towards achieving the
-objective of the patch (as stated by the commit message and the short
-description).
+>
+> Anyway this patch is completely broken, so let's kick it away to the
+> next round.
 
-AFAICT this is about documenting some pre-existing logic that is not
-changed, nor it needs to be changed to achieve the objective.
+Understood, sorry I didn't test this one better. I'll incorporate your
+feedback and include it in the next series.
 
-This patch does not change the function at all (except for the
-comment). If the comment is about the new arguments, then is
-belongs to "implement in-use callback for vfio_ap driver" where those
-were added.
-
-BTW I find the comment hard to understand because I don't see "If either
-of the input masks belongs to the mdev to which an  AP resource is being
-assigned expressed in the code.
-
-I would rather have the docstring of the function updated so the
-relationship of the three arguments is clear.
-
-Regards,
-Halil
+>
+> Paolo
+>
+> >> +
+> >> +    while (to_zap &&
+> >> +           !list_empty(&kvm->arch.tdp_mmu_lpage_disallowed_pages)) {
+> >> +            /*
+> >> +             * We use a separate list instead of just using active_mmu_pages
+> >> +             * because the number of lpage_disallowed pages is expected to
+> >> +             * be relatively small compared to the total.
+> >> +             */
+> >> +            sp = list_first_entry(&kvm->arch.tdp_mmu_lpage_disallowed_pages,
+> >> +                                  struct kvm_mmu_page,
+> >> +                                  lpage_disallowed_link);
+> >> +
+> >> +            old_spte = *sp->parent_sptep;
+> >> +            *sp->parent_sptep = 0;
+> >> +
+> >> +            list_del(&sp->lpage_disallowed_link);
+> >> +            kvm->arch.tdp_mmu_lpage_disallowed_page_count--;
+> >> +
+> >> +            handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), sp->gfn,
+> >> +                                old_spte, 0, sp->role.level + 1);
+> >> +
+> >> +            flush = true;
+> >> +
+> >> +            if (!--to_zap || need_resched() ||
+> >> +                spin_needbreak(&kvm->mmu_lock)) {
+> >> +                    flush = false;
+> >> +                    kvm_flush_remote_tlbs(kvm);
+> >> +                    if (to_zap)
+> >> +                            cond_resched_lock(&kvm->mmu_lock);
+> >> +            }
+> >> +    }
+> >> +
+> >> +    if (flush)
+> >> +            kvm_flush_remote_tlbs(kvm);
+> >> +
+> >> +    spin_unlock(&kvm->mmu_lock);
+> >> +    srcu_read_unlock(&kvm->srcu, rcu_idx);
+> >> +}
+> >> +
+> >> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> >> index 2ecb047211a6d..45ea2d44545db 100644
+> >> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> >> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> >> @@ -43,4 +43,6 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+> >>
+> >>  bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+> >>                                 struct kvm_memory_slot *slot, gfn_t gfn);
+> >> +
+> >> +void kvm_tdp_mmu_recover_nx_lpages(struct kvm *kvm);
+> >>  #endif /* __KVM_X86_MMU_TDP_MMU_H */
+> >> --
+> >> 2.28.0.709.gb0816b6eb0-goog
+> >>
+> >
+>
