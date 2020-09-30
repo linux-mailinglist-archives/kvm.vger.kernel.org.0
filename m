@@ -2,60 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0B4E27EFC1
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 18:55:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BBE227EFCA
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 18:57:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725893AbgI3QzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 12:55:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50084 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725355AbgI3QzZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 12:55:25 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601484924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B8EZjCnkyFc1cMjpMH0gu6rS7aovGZS/4aH0BOoM7mI=;
-        b=JxD9uODF6ehguRl5nBuD3w8SP2h3SmXuFAdbxURdR+Fu+Qb2IE+fHtTCwq7HNiw/AVw+yR
-        YCi+e90OPh/WQkqC6OuAPj/xDA2aMoEkC7h2FmL7EeckZYn6R+v2SXGeWy+yEWpFwaDkWs
-        frUTYJ6YrMryqoWJyXO6CBBbSsddR3o=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-5UZSkqYZN5KD839hDaBPqw-1; Wed, 30 Sep 2020 12:55:21 -0400
-X-MC-Unique: 5UZSkqYZN5KD839hDaBPqw-1
-Received: by mail-wm1-f69.google.com with SMTP id l15so57106wmh.9
-        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 09:55:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=B8EZjCnkyFc1cMjpMH0gu6rS7aovGZS/4aH0BOoM7mI=;
-        b=tTT8MKqiRDZ5IyC3O6N4GzzwPB2W9zeeJLz/eGViWcLm6AbZ8JdLR5DXBFa97RFhSa
-         8Z2Nw0j6G4p6a7YJgRzGeX+owmMlIV17JBN6Ruk1H6vh2+AA3iSVS/CZSVdTHhfakg5Z
-         748B5qj551HywrvSDHazBCnFoVJg+vbDadNFjqE836yNR0v1BJMT5UY7xAZec5j6JYzk
-         XGxztjKgnHMveaD7+7PGKIBPCEcPJThLF6M04RGstwrteIBv12Styx9zmX1jmJZ+mh+x
-         5tu/nh4wnOq7zOkXkVYM0sNlgGZpRwZjN0XhSArqzxXDXRhze7AXN03u+U4A9OdWkahS
-         QDnw==
-X-Gm-Message-State: AOAM532i+KiVxY/1vRJKr6p7AQ3aaFvMyksXwJHRE9z0bs/V64vpTYhw
-        +KTJCXoHqh23iMzLElTbwGQROK0CmJG5N0J6z/2uMO40UFFOS6Jme931USWjxXnFRJuYQHLawI7
-        hgI2hThegJOhT
-X-Received: by 2002:a1c:b703:: with SMTP id h3mr3915211wmf.131.1601484920443;
-        Wed, 30 Sep 2020 09:55:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzpqMWMCf8rNOLTb8uVhzIBXgspOLuTByal+8MYiknPL2xBZbFeEcfJ4nRe0PKpiG562hHDqw==
-X-Received: by 2002:a1c:b703:: with SMTP id h3mr3915176wmf.131.1601484920155;
-        Wed, 30 Sep 2020 09:55:20 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:75e3:aaa7:77d6:f4e4? ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
-        by smtp.gmail.com with ESMTPSA id h4sm4746659wrm.54.2020.09.30.09.55.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Sep 2020 09:55:19 -0700 (PDT)
-Subject: Re: [PATCH 10/22] kvm: mmu: Add TDP MMU PF handler
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Ben Gardon <bgardon@google.com>
+        id S1730897AbgI3Q5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 12:57:41 -0400
+Received: from mga06.intel.com ([134.134.136.31]:40787 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725355AbgI3Q5k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 12:57:40 -0400
+IronPort-SDR: 0npcKAL53ecuQhJjqC8MKfUR2KrfCxK3kNpAa68bDL9vC89OS2eTeElxR706r5pNFRvcZhYYY/
+ lQ3E5m748v2g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9760"; a="224090047"
+X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
+   d="scan'208";a="224090047"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2020 09:57:39 -0700
+IronPort-SDR: xgByRAS1TUQW6FtwogJdlBUEjw+uFGJXHQTS2GTLfGkhvG3qi1lGYOLmsck3UytTgMIQ/Y4qiq
+ 0fyK6ra7Qqyg==
+X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
+   d="scan'208";a="350727926"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2020 09:57:37 -0700
+Date:   Wed, 30 Sep 2020 09:57:34 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Ben Gardon <bgardon@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Cannon Matthews <cannonmatthews@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
         Peter Feiner <pfeiner@google.com>,
         Junaid Shahid <junaids@google.com>,
@@ -64,34 +40,68 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Subject: Re: [PATCH 03/22] kvm: mmu: Init / Uninit the TDP MMU
+Message-ID: <20200930165734.GE32672@linux.intel.com>
 References: <20200925212302.3979661-1-bgardon@google.com>
- <20200925212302.3979661-11-bgardon@google.com>
- <20200930163740.GD32672@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4ee2a2cf-625b-3c10-a7da-75677ea37aa3@redhat.com>
-Date:   Wed, 30 Sep 2020 18:55:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ <20200925212302.3979661-4-bgardon@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20200930163740.GD32672@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200925212302.3979661-4-bgardon@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/20 18:37, Sean Christopherson wrote:
->> +
->> +	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
->> +		return RET_PF_RETRY;
-> I feel like we should kill off these silly WARNs in the existing code instead
-> of adding more.  If they actually fired, I'm pretty sure that they would
-> continue firing and spamming the kernel log until the VM is killed as I don't
-> see how restarting the guest will magically fix anything.
+On Fri, Sep 25, 2020 at 02:22:43PM -0700, Ben Gardon wrote:
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> new file mode 100644
+> index 0000000000000..8241e18c111e6
+> --- /dev/null
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -0,0 +1,34 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#include "tdp_mmu.h"
+> +
+> +static bool __read_mostly tdp_mmu_enabled = true;
+> +module_param_named(tdp_mmu, tdp_mmu_enabled, bool, 0644);
 
-This is true, but I think it's better to be defensive.  They're
-certainly all candidates for KVM_BUG_ON.
+This param should not exist until the TDP MMU is fully functional, e.g. running
+KVM against "kvm: mmu: Support zapping SPTEs in the TDP MMU" immediately hits a
+BUG() in the rmap code.  I haven't wrapped my head around the entire series to
+grok whether it make sense to incrementally enable the TDP MMU, but my gut says
+that's probably non-sensical.  The local variable can exist (default to false)
+so that you can flip a single switch to enable the code instead of having to
+plumb in the variable to its consumers.
 
-Paolo
-
+  kernel BUG at arch/x86/kvm/mmu/mmu.c:1427!
+  invalid opcode: 0000 [#1] SMP
+  CPU: 4 PID: 1218 Comm: stable Not tainted 5.9.0-rc4+ #44
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:rmap_get_first.isra.0+0x51/0x60 [kvm]
+  Code: <0f> 0b 45 31 c0 4c 89 c0 c3 66 0f 1f 44 00 00 0f 1f 44 00 00 49 b9
+  RSP: 0018:ffffc9000099fb50 EFLAGS: 00010246
+  RAX: 0000000000000000 RBX: 0000000000001000 RCX: 0000000000000000
+  RDX: ffffc9000099fb60 RSI: ffffc9000099fb58 RDI: ffff88816b1a7ec8
+  RBP: ffff88816b1a7e70 R08: ffff888173c95000 R09: ffff88816b1a7448
+  R10: 00000000000000f8 R11: ffff88817bd29c70 R12: ffffc90000981000
+  R13: ffffc9000099fbac R14: ffffc90000989a88 R15: ffff88816b1a7ec8
+  FS:  00007f7a755fd700(0000) GS:ffff88817bd00000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 00007f7a60141000 CR3: 000000016b031004 CR4: 0000000000172ea0
+  Call Trace:
+   __kvm_mmu_prepare_zap_page+0x98/0x330 [kvm]
+   kvm_mmu_zap_all_fast+0x100/0x190 [kvm]
+   kvm_page_track_flush_slot+0x54/0x80 [kvm]
+   kvm_set_memslot+0x198/0x640 [kvm]
+   kvm_delete_memslot+0x59/0xc0 [kvm]
+   __kvm_set_memory_region+0x494/0x560 [kvm]
+   ? khugepaged+0x470/0x2230
+   ? mem_cgroup_charge_statistics.isra.0+0x1c/0x40
+   kvm_set_memory_region+0x27/0x40 [kvm]
+   kvm_vm_ioctl+0x379/0xca0 [kvm]
+   ? do_user_addr_fault+0x1ad/0x3a7
+   __x64_sys_ioctl+0x83/0xb0
+   do_syscall_64+0x33/0x80
+   entry_SYSCALL_64_after_hwframe+0x44/0xa9
