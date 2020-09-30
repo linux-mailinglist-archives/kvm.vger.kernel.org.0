@@ -2,196 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D81927E676
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 12:21:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DA1527E79E
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 13:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728660AbgI3KVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 06:21:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54509 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727426AbgI3KVK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 06:21:10 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601461267;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=HKpq2oK2WNEzy5cJcVWHYsGnoJrgoZmDSZIZJeod+bc=;
-        b=YILA/kOD8qIy5GCIS8lcDzIKcuJG6gMEOIHIw74dLTYB/Afps+TU14kqvpEmO9zNl5RNm2
-        NfqRxt4DKpvNZhSjzSBwMLC3jnkV43MZKSsuOJ6jMZpCe2M7dnF3f5J4im5sm2EwmF+2lp
-        3Rg1y0081AL1fnNO5e0r/uKUB7xhKZI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-CxPU7WBqP3-ZkRbgY14APw-1; Wed, 30 Sep 2020 06:21:02 -0400
-X-MC-Unique: CxPU7WBqP3-ZkRbgY14APw-1
-Received: by mail-wm1-f72.google.com with SMTP id b20so528996wmj.1
-        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 03:21:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=HKpq2oK2WNEzy5cJcVWHYsGnoJrgoZmDSZIZJeod+bc=;
-        b=MzS5TbNwNMPFgkhLM7Ai6+clYOJJdVsWqHxFju/iPSF8SZl9yJ38vq2YUnHxSBqaKQ
-         0fswsD8xsOCYr4voPtvHHIauR56pjG3iKylHC7Wl/yWxiqhMJw41mAcW3uWP+ksK57Dr
-         H6YMmI9gdFod0dQvw102XfQWcKxtqvBoFY4kogGoVMy41RFqOBtI6BCCJDQzmvDiXtBJ
-         MKPK00HIXjDD/Ue/J7RyuQBF5/wnrDvnSMVCis3SQ7RVElwFGj2971r/tmTzHkH8I/8A
-         u1E2ALcKk3e67s9XrSrxaE025yMioAMaKO52o3Ic9Dhwqzlh0P4e9H8q87TdrKY7VlD0
-         CNGA==
-X-Gm-Message-State: AOAM533S/mwwOm7pBHFoIjhKhUGum4vACVH2CJXcEXTtFbuaAxA/PHpw
-        mUN6Nwnlj2Cu8780Vf0rt1LLnbmJyS6fEzlTdIIEh0eRh07M0UuQsAW+V1qqou5JLZGJCUuHmwV
-        fuE26KfKehmtQ
-X-Received: by 2002:a1c:7907:: with SMTP id l7mr2167347wme.89.1601461260925;
-        Wed, 30 Sep 2020 03:21:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyUkYNeBmg4ryAVKpcvFhKstjspsqkUFb63VCsE3fOeoa3MF067WBDzveobq9yJkTb55TuZUw==
-X-Received: by 2002:a1c:7907:: with SMTP id l7mr2167326wme.89.1601461260625;
-        Wed, 30 Sep 2020 03:21:00 -0700 (PDT)
-Received: from [192.168.1.36] (74.red-83-53-161.dynamicip.rima-tde.net. [83.53.161.74])
-        by smtp.gmail.com with ESMTPSA id i33sm2255084wri.79.2020.09.30.03.20.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Sep 2020 03:21:00 -0700 (PDT)
-Subject: Re: [PATCH v4 00/12] Support disabling TCG on ARM (part 2)
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Richard Henderson <rth@twiddle.net>
-References: <20200929224355.1224017-1-philmd@redhat.com>
- <20200930095841.3df7f8ee@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <1dd2c094-284c-0e32-bae3-0c227e5399ab@redhat.com>
-Date:   Wed, 30 Sep 2020 12:20:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1729104AbgI3L0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 07:26:34 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:6628 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725779AbgI3L0e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 07:26:34 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f746b370001>; Wed, 30 Sep 2020 04:25:43 -0700
+Received: from mtl-vdi-166.wap.labs.mlnx (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 30 Sep
+ 2020 11:26:13 +0000
+Date:   Wed, 30 Sep 2020 14:26:09 +0300
+From:   Eli Cohen <elic@nvidia.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     <mst@redhat.com>, <lulu@redhat.com>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <rob.miller@broadcom.com>, <lingshan.zhu@intel.com>,
+        <eperezma@redhat.com>, <hanand@xilinx.com>,
+        <mhabets@solarflare.com>, <eli@mellanox.com>,
+        <amorenoz@redhat.com>, <maxime.coquelin@redhat.com>,
+        <stefanha@redhat.com>, <sgarzare@redhat.com>
+Subject: Re: [RFC PATCH 05/24] vhost-vdpa: passing iotlb to IOMMU mapping
+ helpers
+Message-ID: <20200930112609.GA223360@mtl-vdi-166.wap.labs.mlnx>
+References: <20200924032125.18619-1-jasowang@redhat.com>
+ <20200924032125.18619-6-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200930095841.3df7f8ee@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200924032125.18619-6-jasowang@redhat.com>
+User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1601465143; bh=u57iORwVvbadjjyoszxFFavgb47TLdIvXVYH0Cqdc+g=;
+        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+         Content-Type:Content-Disposition:In-Reply-To:User-Agent:
+         X-Originating-IP:X-ClientProxiedBy;
+        b=i4tKtThQimyZ7JSMvWCUBSmEHDw2aBUIDvMxnN4HDSMcw2xveDTMwDTfEuKkIhfx8
+         m5mzX9G5vxpjoZwjjc55uX3PRK3bhpJ099uKxSn23cOQTlKaAycAFGRHp3LTZY/sJM
+         ZQGhXpQAVF+04cXZLE0nyl3HAc22+0/4OJVj31YPbt7MShwoY27WQsfdfKWYuw1D+k
+         ox1xmCWTJ4ldq7jUukJ6JVhABYvRk6C6ItNSEr4qMnJwMsHYwiMrV0a75FR4Yuy/V7
+         VTpXSKu2Q5xA19u3gNzKmWHcjn/2Ffcmsd4V/PPAD1yeqkijuqCVAsO9eezlrTtGT/
+         1K4PEizEOlr+Q==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/30/20 9:58 AM, Igor Mammedov wrote:
-> On Wed, 30 Sep 2020 00:43:43 +0200
-> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
-> 
->> Cover from Samuel Ortiz from (part 1) [1]:
->>
->>   This patchset allows for building and running ARM targets with TCG
->>   disabled. [...]
->>
->>   The rationale behind this work comes from the NEMU project where we're
->>   trying to only support x86 and ARM 64-bit architectures, without
->>   including the TCG code base. We can only do so if we can build and run
->>   ARM binaries with TCG disabled.
-> 
-> I don't recall exact reason but TCG variant is used by bios-tables-test
-> to test arm/virt so it will probably break that
-> (it has something to do with how KVM uses CPU/GIC, which was making
-> ACPI tables not stable (i.e. depend on host), so comparison with master
-> tables was failing)
+On Thu, Sep 24, 2020 at 11:21:06AM +0800, Jason Wang wrote:
+> To prepare for the ASID support for vhost-vdpa, try to pass IOTLB
+> object to dma helpers.
 
-Not a problem, we can restrict bios-tables-test to TCG.
-
-I don't expect the KVM-only build being able to run many
-of our current tests, as most of them expect TCG.
-
-I'll have a look at restricting the TCG-dependent tests
-after this series get accepted.
+Maybe it's worth mentioning here that this patch does not change any
+functionality and is presented as a preparation for passing different
+iotlb's instead of using dev->iotlb
 
 > 
->>
->> v4 almost 2 years later... [2]:
->> - Rebased on Meson
->> - Addressed Richard review comments
->> - Addressed Claudio review comments
->>
->> v3 almost 18 months later [3]:
->> - Rebased
->> - Addressed Thomas review comments
->> - Added Travis-CI job to keep building --disable-tcg on ARM
->>
->> v2 [4]:
->> - Addressed review comments from Richard and Thomas from v1 [1]
->>
->> Regards,
->>
->> Phil.
->>
->> [1]: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02451.html
->> [2]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg689168.html
->> [3]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg641796.html
->> [4]: https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05003.html
->>
->> Green CI:
->> - https://cirrus-ci.com/build/4572961761918976
->> - https://gitlab.com/philmd/qemu/-/pipelines/196047779
->> - https://travis-ci.org/github/philmd/qemu/builds/731370972
->>
->> Based-on: <20200929125609.1088330-1-philmd@redhat.com>
->> "hw/arm: Restrict APEI tables generation to the 'virt' machine"
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg745792.html
->>
->> Philippe Mathieu-Daudé (10):
->>   accel/tcg: Add stub for cpu_loop_exit()
->>   meson: Allow optional target/${ARCH}/Kconfig
->>   target/arm: Select SEMIHOSTING if TCG is available
->>   target/arm: Restrict ARMv4 cpus to TCG accel
->>   target/arm: Restrict ARMv5 cpus to TCG accel
->>   target/arm: Restrict ARMv6 cpus to TCG accel
->>   target/arm: Restrict ARMv7 R-profile cpus to TCG accel
->>   target/arm: Restrict ARMv7 M-profile cpus to TCG accel
->>   target/arm: Reorder meson.build rules
->>   .travis.yml: Add a KVM-only Aarch64 job
->>
->> Samuel Ortiz (1):
->>   target/arm: Do not build TCG objects when TCG is off
->>
->> Thomas Huth (1):
->>   target/arm: Make m_helper.c optional via CONFIG_ARM_V7M
->>
->>  default-configs/arm-softmmu.mak |  3 --
->>  meson.build                     |  8 +++-
->>  target/arm/cpu.h                | 12 ------
->>  accel/stubs/tcg-stub.c          |  5 +++
->>  target/arm/cpu_tcg.c            |  4 +-
->>  target/arm/helper.c             |  7 ----
->>  target/arm/m_helper-stub.c      | 73 +++++++++++++++++++++++++++++++++
->>  .travis.yml                     | 35 ++++++++++++++++
->>  hw/arm/Kconfig                  | 32 +++++++++++++++
->>  target/arm/Kconfig              |  4 ++
->>  target/arm/meson.build          | 40 +++++++++++-------
->>  11 files changed, 184 insertions(+), 39 deletions(-)
->>  create mode 100644 target/arm/m_helper-stub.c
->>  create mode 100644 target/arm/Kconfig
->>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/vhost/vdpa.c | 40 ++++++++++++++++++++++------------------
+>  1 file changed, 22 insertions(+), 18 deletions(-)
 > 
-
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 9c641274b9f3..74bef1c15a70 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -489,10 +489,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+>  	return r;
+>  }
+>  
+> -static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
+> +static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
+> +				   struct vhost_iotlb *iotlb,
+> +				   u64 start, u64 last)
+>  {
+>  	struct vhost_dev *dev = &v->vdev;
+> -	struct vhost_iotlb *iotlb = dev->iotlb;
+>  	struct vhost_iotlb_map *map;
+>  	struct page *page;
+>  	unsigned long pfn, pinned;
+> @@ -514,8 +515,9 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
+>  static void vhost_vdpa_iotlb_free(struct vhost_vdpa *v)
+>  {
+>  	struct vhost_dev *dev = &v->vdev;
+> +	struct vhost_iotlb *iotlb = dev->iotlb;
+>  
+> -	vhost_vdpa_iotlb_unmap(v, 0ULL, 0ULL - 1);
+> +	vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1);
+>  	kfree(dev->iotlb);
+>  	dev->iotlb = NULL;
+>  }
+> @@ -542,15 +544,14 @@ static int perm_to_iommu_flags(u32 perm)
+>  	return flags | IOMMU_CACHE;
+>  }
+>  
+> -static int vhost_vdpa_map(struct vhost_vdpa *v,
+> +static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
+>  			  u64 iova, u64 size, u64 pa, u32 perm)
+>  {
+> -	struct vhost_dev *dev = &v->vdev;
+>  	struct vdpa_device *vdpa = v->vdpa;
+>  	const struct vdpa_config_ops *ops = vdpa->config;
+>  	int r = 0;
+>  
+> -	r = vhost_iotlb_add_range(dev->iotlb, iova, iova + size - 1,
+> +	r = vhost_iotlb_add_range(iotlb, iova, iova + size - 1,
+>  				  pa, perm);
+>  	if (r)
+>  		return r;
+> @@ -559,7 +560,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
+>  		r = ops->dma_map(vdpa, iova, size, pa, perm);
+>  	} else if (ops->set_map) {
+>  		if (!v->in_batch)
+> -			r = ops->set_map(vdpa, dev->iotlb);
+> +			r = ops->set_map(vdpa, iotlb);
+>  	} else {
+>  		r = iommu_map(v->domain, iova, pa, size,
+>  			      perm_to_iommu_flags(perm));
+> @@ -568,29 +569,30 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
+>  	return r;
+>  }
+>  
+> -static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
+> +static void vhost_vdpa_unmap(struct vhost_vdpa *v,
+> +			     struct vhost_iotlb *iotlb,
+> +			     u64 iova, u64 size)
+>  {
+> -	struct vhost_dev *dev = &v->vdev;
+>  	struct vdpa_device *vdpa = v->vdpa;
+>  	const struct vdpa_config_ops *ops = vdpa->config;
+>  
+> -	vhost_vdpa_iotlb_unmap(v, iova, iova + size - 1);
+> +	vhost_vdpa_iotlb_unmap(v, iotlb, iova, iova + size - 1);
+>  
+>  	if (ops->dma_map) {
+>  		ops->dma_unmap(vdpa, iova, size);
+>  	} else if (ops->set_map) {
+>  		if (!v->in_batch)
+> -			ops->set_map(vdpa, dev->iotlb);
+> +			ops->set_map(vdpa, iotlb);
+>  	} else {
+>  		iommu_unmap(v->domain, iova, size);
+>  	}
+>  }
+>  
+>  static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+> +					   struct vhost_iotlb *iotlb,
+>  					   struct vhost_iotlb_msg *msg)
+>  {
+>  	struct vhost_dev *dev = &v->vdev;
+> -	struct vhost_iotlb *iotlb = dev->iotlb;
+>  	struct page **page_list;
+>  	unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
+>  	unsigned int gup_flags = FOLL_LONGTERM;
+> @@ -644,7 +646,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>  			if (last_pfn && (this_pfn != last_pfn + 1)) {
+>  				/* Pin a contiguous chunk of memory */
+>  				csize = (last_pfn - map_pfn + 1) << PAGE_SHIFT;
+> -				if (vhost_vdpa_map(v, iova, csize,
+> +				if (vhost_vdpa_map(v, iotlb, iova, csize,
+>  						   map_pfn << PAGE_SHIFT,
+>  						   msg->perm))
+>  					goto out;
+> @@ -660,11 +662,12 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>  	}
+>  
+>  	/* Pin the rest chunk */
+> -	ret = vhost_vdpa_map(v, iova, (last_pfn - map_pfn + 1) << PAGE_SHIFT,
+> +	ret = vhost_vdpa_map(v, iotlb, iova,
+> +			     (last_pfn - map_pfn + 1) << PAGE_SHIFT,
+>  			     map_pfn << PAGE_SHIFT, msg->perm);
+>  out:
+>  	if (ret) {
+> -		vhost_vdpa_unmap(v, msg->iova, msg->size);
+> +		vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
+>  		atomic64_sub(npages, &dev->mm->pinned_vm);
+>  	}
+>  	mmap_read_unlock(dev->mm);
+> @@ -678,6 +681,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+>  	struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
+>  	struct vdpa_device *vdpa = v->vdpa;
+>  	const struct vdpa_config_ops *ops = vdpa->config;
+> +	struct vhost_iotlb *iotlb = dev->iotlb;
+>  	int r = 0;
+>  
+>  	r = vhost_dev_check_owner(dev);
+> @@ -686,17 +690,17 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+>  
+>  	switch (msg->type) {
+>  	case VHOST_IOTLB_UPDATE:
+> -		r = vhost_vdpa_process_iotlb_update(v, msg);
+> +		r = vhost_vdpa_process_iotlb_update(v, iotlb, msg);
+>  		break;
+>  	case VHOST_IOTLB_INVALIDATE:
+> -		vhost_vdpa_unmap(v, msg->iova, msg->size);
+> +		vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
+>  		break;
+>  	case VHOST_IOTLB_BATCH_BEGIN:
+>  		v->in_batch = true;
+>  		break;
+>  	case VHOST_IOTLB_BATCH_END:
+>  		if (v->in_batch && ops->set_map)
+> -			ops->set_map(vdpa, dev->iotlb);
+> +			ops->set_map(vdpa, iotlb);
+>  		v->in_batch = false;
+>  		break;
+>  	default:
+> -- 
+> 2.20.1
+> 
