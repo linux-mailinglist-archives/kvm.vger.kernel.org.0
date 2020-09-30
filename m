@@ -2,61 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3CD227F50E
-	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 00:23:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F312627F51C
+	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 00:28:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731440AbgI3WXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 18:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50086 "EHLO
+        id S1731449AbgI3W2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 18:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730958AbgI3WXu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 18:23:50 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B8F4C0613D0
-        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 15:23:50 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id z13so4249190iom.8
-        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 15:23:50 -0700 (PDT)
+        with ESMTP id S1731211AbgI3W2C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 18:28:02 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC834C061755
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 15:28:00 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id c5so3998619ilk.11
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 15:28:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=stcuGU/AmuexDn/xDJU4W3SgmvykF2WxUHKZBjdx8/Q=;
-        b=pB7B3hpbwzKCM8OLwFLMu657QencM4uNHvjZw2pf8j8HF9GyE4GLREYAIWJI8nVhVZ
-         sTBV8LBK6dZr6t9MG5fmrIsc1R9KeV50VjzoFfjzFrqjcGmXvbKFi+V6YpFWGkNfuZ+7
-         HYxsJT8/0LGMNo4ODcISOBKsB1tRFVeDKjWoOOo5GOv6HhDP8G41kzPTCmxNx9DBmURu
-         kTQXB7BqeAoRY+/HIF7uDMajjEghf3uT9eSD3rB9AVQj3bvdrP/zKGRyhXKRhY6rKj4Z
-         y+B3Ym97axaNjv4BO3MmGzmOKs2OrUf5OwCvGivIR4q2MNBWElHSj6n1M5Gwk4RhaRy4
-         9cOw==
+        bh=wkN3WnPe8Q74Bq/fxwpUdgVX4tK0nQ0EycCSxHmpFCc=;
+        b=iltQRbF9ZGmvROU2UUfhSc5Lwtbxc8i7aFmLFsxPZMz4vcDQZZfI6qQPyDKVmhDWDM
+         YiJ+x53+ELioQmMxs1iHvFgl9Z5UGCAhaUbX9kmaCpnLhKft0uWTDC01AupHysxVbdcd
+         Y+CZfB+PbyV/xCeH1FuIugwjgPFzNYiTWQTjsJgTUSB1HiBtzLZeTzDJkvuO1AaxnxSz
+         eFs0KI4T/4Cv/WdKKCabBHM7w+KNDNqR/4x9C5nVPYl5jfQzY1vKMZaYfVqAX3vzQyc3
+         xkXy+OTieIwj1ZCiOwG2m9F3V+HA1LwDB3gcwFmhi8UvqucmbIUZwKzB/PHA4fy/kvpG
+         OHWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=stcuGU/AmuexDn/xDJU4W3SgmvykF2WxUHKZBjdx8/Q=;
-        b=e3EQzLCtA/M2Mu6Uozp+mf16stju9+bNmFX/q5cIsEdr9Z++5tWMzOBabnQ1c5QYK7
-         UcE31yyh4SsJx7acjr0zxs+5f4yleRZZMPpo4n5fhP/AQjmBtf59GaO/rr0mXYO3BUVR
-         7hdG9ZDQIqrzvsvcKW9X75EOAru8Z1xR/TjIXrxUWQLh715Iu1bvrY6s8ah62930mSum
-         ceMrsZJcJmOBDnitUOuydrgke89O5hRO0iLg0V70yoDXX9OEAT/Z8/flFm8eS5DxaPmy
-         lVS0wTcHkzzqs+otjaCLIDexGjrSd5o+Wa6MLxhLDTuW+L6xxz/YX6EOpvM/3n5fGTU4
-         C9Hg==
-X-Gm-Message-State: AOAM531Uwscsu8Uer2er7JBREGNJesGxjE1iPc1uvUY8MwEUbDoIvzoW
-        JtjVZEXNPNf0eCU4vTT7BEB3PHKWj9V8i11l8h2Dkw==
-X-Google-Smtp-Source: ABdhPJw0s5dS3pBRaUkk/qRn8bsc/omxtWg+5h0+w6X5DYeRtzrIGMmq2LI5GLLwlzDTjlOJnkTCzRRbMIFCUkaybtY=
-X-Received: by 2002:a05:6638:f07:: with SMTP id h7mr3619834jas.25.1601504629460;
- Wed, 30 Sep 2020 15:23:49 -0700 (PDT)
+        bh=wkN3WnPe8Q74Bq/fxwpUdgVX4tK0nQ0EycCSxHmpFCc=;
+        b=m0qFpVhFjmdql03VBsHnvhSKwsq5lfGc3Q3n3rP+JUrhVoqdzOYCdbKQ46wi0CbPDW
+         k1IyPngb7JBnypHdr0zZ8UrDKmLxPs1tVzs4hyVIFnhJIYf1yOApkQwZ7qAmcQ+iljgr
+         2Wh8WRjRNIRtU1WG3gqCVh40OclvA05m9rlh+w+NDXqUL8kvU6DIMYBcn+QDq6AGKpy+
+         DDptTgAZDeYkxy+4+E/3cI0xWMxsa1QSRbDyB0hC/8IA64I+rfqMmqce0x68Pv3uDQyH
+         Zd92mw1Fhi5ETCIpffgmBvMdeTbquUVB/r1PgLaG1zI+XC1FW4jCS/a+uqVavhAXix3t
+         LpTQ==
+X-Gm-Message-State: AOAM5323OIMTyq1QveCbYlYQObNjqZdknGzvROPkvYT7OGkKDTAmfA/z
+        NvkaGh95R3mFEQnXgvJvH0pucNiTuFCH/cCB/POYDw==
+X-Google-Smtp-Source: ABdhPJzBNxsrt2nz+I/MkKIokvF9hK7rFYqdCRoU83A5pz3PHlgyss/IOLMeUM6A/j4dZualxzQHhQo0niv2zOO2cR4=
+X-Received: by 2002:a92:cbcd:: with SMTP id s13mr84761ilq.306.1601504879965;
+ Wed, 30 Sep 2020 15:27:59 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-21-bgardon@google.com>
- <aa7752b0-d2d2-f387-602f-fbf3f0edf450@redhat.com>
-In-Reply-To: <aa7752b0-d2d2-f387-602f-fbf3f0edf450@redhat.com>
+ <20200930181556.GJ32672@linux.intel.com>
+In-Reply-To: <20200930181556.GJ32672@linux.intel.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 30 Sep 2020 15:23:38 -0700
-Message-ID: <CANgfPd89WzcDV+DTxvkqfobCdCXHwtkFwpy90H4oNRftDOVrnA@mail.gmail.com>
+Date:   Wed, 30 Sep 2020 15:27:48 -0700
+Message-ID: <CANgfPd-A0gvBxpjYo3L5vZcv6xaxG92zkBUiLJA8ddJ+B5NJuA@mail.gmail.com>
 Subject: Re: [PATCH 20/22] kvm: mmu: NX largepage recovery for TDP MMU
-To:     Paolo Bonzini <pbonzini@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
         Peter Feiner <pfeiner@google.com>,
         Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
@@ -69,23 +68,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 6:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Sep 30, 2020 at 11:16 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> On 25/09/20 23:23, Ben Gardon wrote:
+> On Fri, Sep 25, 2020 at 02:23:00PM -0700, Ben Gardon wrote:
+> > +/*
+> > + * Clear non-leaf SPTEs and free the page tables they point to, if those SPTEs
+> > + * exist in order to allow execute access on a region that would otherwise be
+> > + * mapped as a large page.
+> > + */
+> > +void kvm_tdp_mmu_recover_nx_lpages(struct kvm *kvm)
+> > +{
+> > +     struct kvm_mmu_page *sp;
+> > +     bool flush;
+> > +     int rcu_idx;
+> > +     unsigned int ratio;
+> > +     ulong to_zap;
+> > +     u64 old_spte;
 > > +
-> > +     if (!kvm->arch.tdp_mmu_enabled)
-> > +             return err;
+> > +     rcu_idx = srcu_read_lock(&kvm->srcu);
+> > +     spin_lock(&kvm->mmu_lock);
 > > +
-> > +     err = kvm_vm_create_worker_thread(kvm, kvm_nx_lpage_recovery_worker, 1,
-> > +                     "kvm-nx-lpage-tdp-mmu-recovery",
-> > +                     &kvm->arch.nx_lpage_tdp_mmu_recovery_thread);
+> > +     ratio = READ_ONCE(nx_huge_pages_recovery_ratio);
+> > +     to_zap = ratio ? DIV_ROUND_UP(kvm->stat.nx_lpage_splits, ratio) : 0;
 >
-> Any reason to have two threads?
->
-> Paolo
+> This is broken, and possibly related to Paolo's INIT_LIST_HEAD issue.  The TDP
+> MMU never increments nx_lpage_splits, it instead has its own counter,
+> tdp_mmu_lpage_disallowed_page_count.  Unless I'm missing something, to_zap is
+> guaranteed to be zero and thus this is completely untested.
 
-At some point it felt cleaner. In this patch set NX reclaim is pretty
-similar between the "shadow MMU" and TDP MMU so they don't really need
-to be separate threads.
+Good catch, I should write some NX reclaim selftests.
 
 >
+> I don't see any reason for a separate tdp_mmu_lpage_disallowed_page_count,
+> a single VM can't have both a legacy MMU and a TDP MMU, so it's not like there
+> will be collisions with other code incrementing nx_lpage_splits.   And the TDP
+> MMU should be updating stats anyways.
+
+A VM actually can have both the legacy MMU and TDP MMU, by design. The
+legacy MMU handles nested. Eventually I'd like the TDP MMU to be
+responsible for building nested shadow TDP tables, but haven't
+implemented it.
+
+>
+> > +
+> > +     while (to_zap &&
+> > +            !list_empty(&kvm->arch.tdp_mmu_lpage_disallowed_pages)) {
+> > +             /*
+> > +              * We use a separate list instead of just using active_mmu_pages
+> > +              * because the number of lpage_disallowed pages is expected to
+> > +              * be relatively small compared to the total.
+> > +              */
+> > +             sp = list_first_entry(&kvm->arch.tdp_mmu_lpage_disallowed_pages,
+> > +                                   struct kvm_mmu_page,
+> > +                                   lpage_disallowed_link);
+> > +
+> > +             old_spte = *sp->parent_sptep;
+> > +             *sp->parent_sptep = 0;
+> > +
+> > +             list_del(&sp->lpage_disallowed_link);
+> > +             kvm->arch.tdp_mmu_lpage_disallowed_page_count--;
+> > +
+> > +             handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), sp->gfn,
+> > +                                 old_spte, 0, sp->role.level + 1);
+> > +
+> > +             flush = true;
+> > +
+> > +             if (!--to_zap || need_resched() ||
+> > +                 spin_needbreak(&kvm->mmu_lock)) {
+> > +                     flush = false;
+> > +                     kvm_flush_remote_tlbs(kvm);
+> > +                     if (to_zap)
+> > +                             cond_resched_lock(&kvm->mmu_lock);
+> > +             }
+> > +     }
+> > +
+> > +     if (flush)
+> > +             kvm_flush_remote_tlbs(kvm);
+> > +
+> > +     spin_unlock(&kvm->mmu_lock);
+> > +     srcu_read_unlock(&kvm->srcu, rcu_idx);
+> > +}
+> > +
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> > index 2ecb047211a6d..45ea2d44545db 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> > @@ -43,4 +43,6 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+> >
+> >  bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+> >                                  struct kvm_memory_slot *slot, gfn_t gfn);
+> > +
+> > +void kvm_tdp_mmu_recover_nx_lpages(struct kvm *kvm);
+> >  #endif /* __KVM_X86_MMU_TDP_MMU_H */
+> > --
+> > 2.28.0.709.gb0816b6eb0-goog
+> >
