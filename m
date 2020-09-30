@@ -2,91 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F03D027E8AD
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 14:36:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3545127E8EB
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 14:50:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729873AbgI3Mgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 08:36:50 -0400
-Received: from foss.arm.com ([217.140.110.172]:35376 "EHLO foss.arm.com"
+        id S1728496AbgI3Mug (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 08:50:36 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54866 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728235AbgI3Mgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 08:36:50 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FFC530E;
-        Wed, 30 Sep 2020 05:36:49 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EF553F6CF;
-        Wed, 30 Sep 2020 05:36:47 -0700 (PDT)
-Subject: Re: [PATCH v7 5/7] KVM: arm64: pmu: Make overflow handler NMI safe
-To:     Will Deacon <will@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        mark.rutland@arm.com, sumit.garg@linaro.org, maz@kernel.org,
-        swboyd@chromium.org, catalin.marinas@arm.com,
-        Julien Thierry <julien.thierry@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20200924110706.254996-1-alexandru.elisei@arm.com>
- <20200924110706.254996-6-alexandru.elisei@arm.com>
- <20200928175725.GB11792@willie-the-truck>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <6b1ecdef-3a42-c428-2309-753b1470e3de@arm.com>
-Date:   Wed, 30 Sep 2020 13:37:49 +0100
+        id S1725776AbgI3Mug (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 08:50:36 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 29CA0AF26;
+        Wed, 30 Sep 2020 12:50:35 +0000 (UTC)
+Subject: Re: [PATCH v4 02/12] meson: Allow optional target/${ARCH}/Kconfig
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Fam Zheng <fam@euphon.net>,
+        Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
+References: <20200929224355.1224017-1-philmd@redhat.com>
+ <20200929224355.1224017-3-philmd@redhat.com>
+From:   Claudio Fontana <cfontana@suse.de>
+Message-ID: <19b1318a-f9be-5808-760b-ba7748d48267@suse.de>
+Date:   Wed, 30 Sep 2020 14:50:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200928175725.GB11792@willie-the-truck>
+In-Reply-To: <20200929224355.1224017-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On 9/30/20 12:43 AM, Philippe Mathieu-Daudé wrote:
+> Extend the generic Meson script to pass optional target Kconfig
+> file to the minikconf script.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> We could use fs.exists() but is_file() is more specific
+> (can not be a directory).
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Claudio Fontana <cfontana@suse.de>
+> ---
+>  meson.build | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/meson.build b/meson.build
+> index d36dd085b5..9ab5d514d7 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -529,6 +529,7 @@ kconfig_external_symbols = [
+>  ]
+>  ignored = ['TARGET_XML_FILES', 'TARGET_ABI_DIR', 'TARGET_DIRS']
+>  
+> +fs = import('fs')
+>  foreach target : target_dirs
+>    config_target = keyval.load(meson.current_build_dir() / target / 'config-target.mak')
+>  
+> @@ -569,8 +570,13 @@ foreach target : target_dirs
+>      endforeach
+>  
+>      config_devices_mak = target + '-config-devices.mak'
+> +    target_kconfig = 'target' / config_target['TARGET_BASE_ARCH'] / 'Kconfig'
+> +    minikconf_input = ['default-configs' / target + '.mak', 'Kconfig']
+> +    if fs.is_file(target_kconfig)
+> +      minikconf_input += [target_kconfig]
+> +    endif
+>      config_devices_mak = configure_file(
+> -      input: ['default-configs' / target + '.mak', 'Kconfig'],
+> +      input: minikconf_input,
+>        output: config_devices_mak,
+>        depfile: config_devices_mak + '.d',
+>        capture: true,
+> 
 
-On 9/28/20 6:57 PM, Will Deacon wrote:
+I can't say I understand it, but the general idea seems right to me.
 
-> On Thu, Sep 24, 2020 at 12:07:04PM +0100, Alexandru Elisei wrote:
->> From: Julien Thierry <julien.thierry@arm.com>
->>
->> kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
->> NMI context, defer waking the vcpu to an irq_work queue.
->>
->> A vcpu can be freed while it's not running by kvm_destroy_vm(). Prevent
->> running the irq_work for a non-existent vcpu by calling irq_work_sync() on
->> the PMU destroy path.
->>
->> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
->> Cc: kvm@vger.kernel.org
->> Cc: kvmarm@lists.cs.columbia.edu
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> Tested-by: Sumit Garg <sumit.garg@linaro.org> (Developerbox)
->> [Alexandru E.: Added irq_work_sync()]
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->> I suggested in v6 that I will add an irq_work_sync() to
->> kvm_pmu_vcpu_reset(). It turns out it's not necessary: a vcpu reset is done
->> by the vcpu being reset with interrupts enabled, which means all the work
->> has had a chance to run before the reset takes place.
-> I don't understand this ^^
+Ciao,
 
-Marc had the same comment, I replied in his email. I thought about it and you're
-right, it doesn't make much sense.
-
->
-> But the patch itself looks good, so I'm going to queue this lot anyway!
-
-Thank you for picking up the series!
-
-Thanks,
-Alex
+Claudio
