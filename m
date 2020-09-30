@@ -2,115 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA44F27F1A0
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 20:51:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 055F727F1A5
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 20:54:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729806AbgI3SvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 14:51:16 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:2488 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725771AbgI3SvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 14:51:16 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f74d3700000>; Wed, 30 Sep 2020 11:50:24 -0700
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 30 Sep
- 2020 18:51:09 +0000
-Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.51) by
- HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Wed, 30 Sep 2020 18:51:09 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N+zxFYw91wL1/C4wFwbQEYm+7NHM8E1AZ8F6oadgIeyZctxyidXdmhETx7n1N0EiO3pYtj94pae7OWTrKogAguVTXTQDg8fmGMK2NDf44AuZP7D3If69DRC4Zx/91naEs13t9GudZO33wXGCEEL9FfYVBIueJLXVq3q3IKQDYjCbO+RHE6Et3qc90Pz6BoviDTWDU/tzfRCUQiUpHWhOWMOUfGTGlegf8zKcx+mv15cKpEMT0eH4h385XjVztyWC3hq9naKKE9btOcXmsmZF/PO4z0Y3eNzbsquvrNHapeD/mPiRdeNFk8OVSIKaSvsJnoRupRryte3oQfDKQIi5DA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FOi6aT5JY7VhLnV3Z8NYw2z6y8P6KLonvyYhymTC9Jo=;
- b=I9gutspRKLsBhGPip37tV3WMcRd0f/ZVcWhcdJUc2byyeTyfPGQCJA/1QmED2kuI/s8GmAGJS2FMDgv4ia/PNPLRDB5WspKwh0s5ACGm94LLTHKMS2idPIiuHfK/fDED7T2cZnjNedEEqmF6IbzuieY2mQczPjfFUPK1KAuw/8gqysN1Oc7UMVpTUPyy4ovDRzsfHKVV+yVqPtZixdm8kVsF6Y94+z1BLhoPM8Np4/uVXLZvovUv3DSXtUiRhS9KudaXMF66ucX56Az9l82QvJKnwy4kd3r1rPX3yBiDXcwOCGfiL0XzDS+K9lNqzMFaMIlBXLUMGbrVGY7Egxp+dQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4011.namprd12.prod.outlook.com (2603:10b6:5:1c5::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.23; Wed, 30 Sep
- 2020 18:51:05 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3433.032; Wed, 30 Sep 2020
- 18:51:05 +0000
-Date:   Wed, 30 Sep 2020 15:51:03 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-CC:     Dave Jiang <dave.jiang@intel.com>, <vkoul@kernel.org>,
-        <megha.dey@intel.com>, <maz@kernel.org>, <bhelgaas@google.com>,
-        <alex.williamson@redhat.com>, <jacob.jun.pan@intel.com>,
-        <ashok.raj@intel.com>, <yi.l.liu@intel.com>, <baolu.lu@intel.com>,
-        <kevin.tian@intel.com>, <sanjay.k.kumar@intel.com>,
-        <tony.luck@intel.com>, <jing.lin@intel.com>,
-        <dan.j.williams@intel.com>, <kwankhede@nvidia.com>,
-        <eric.auger@redhat.com>, <parav@mellanox.com>, <rafael@kernel.org>,
-        <netanelg@mellanox.com>, <shahafs@mellanox.com>,
-        <yan.y.zhao@linux.intel.com>, <pbonzini@redhat.com>,
-        <samuel.ortiz@intel.com>, <mona.hossain@intel.com>,
-        <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <x86@kernel.org>, <linux-pci@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-Subject: Re: [PATCH v3 05/18] dmaengine: idxd: add IMS support in base driver
-Message-ID: <20200930185103.GT816047@nvidia.com>
-References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
- <160021248979.67751.3799965857372703876.stgit@djiang5-desk3.ch.intel.com>
- <87sgazgl0b.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <87sgazgl0b.fsf@nanos.tec.linutronix.de>
-X-ClientProxiedBy: MN2PR20CA0057.namprd20.prod.outlook.com
- (2603:10b6:208:235::26) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1728140AbgI3SyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 14:54:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45782 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725355AbgI3SyD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 14:54:03 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50742C0613D0
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 11:54:01 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id q1so2939848ilt.6
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 11:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xTNb6k0KTUZX28SgX8/5ctYvSHWMCeVd2LxNdQK0xQ4=;
+        b=mNVt7KwILbHTFKGN8sOmwybaVaBebXwgaoyhB8MY7W8UJSmfh8sYHOBYfD7qMeXpeq
+         yHCgziCffMDqBY3VlGTYRmx99EMIRzHyzouWCV2ElzliV7zYyCK9F4aHtTe54od5qSvc
+         hNsNXScsb5Pr9iUr5vlqdD5LI6T4v3gTcDMAFwT5XQevBh6GTq6RzNOPTKxCXH2ITh8S
+         LgQwitquZXQP8QMrdxDhr4/OFAyviHNGvplWZpsZdaWHbbxannDN5sWcFeJojzYGBn6U
+         mEk5Vqw/BILqfV49RJEwgQTD/tadT3zUg3/Wn2whqB2XV9LH5gXDf05cOh02o2ApdJSK
+         1ghQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xTNb6k0KTUZX28SgX8/5ctYvSHWMCeVd2LxNdQK0xQ4=;
+        b=KdX0kqR9RU+m9u2ROyBEo90KR61KlTYKnkF+0NX+u2q463P4DF5nA5XWaWOiyqmC5O
+         v5JwvRRwkJxPOy0QJcDjswxFE5m1JzVJ68we6sfb9T1QvN5iyu3ttoQ/8TT23jVnFZHS
+         AbxsIshM6t0qglHfISm8DwDGOl5u5q/Tk2zUiKvyDmYobUxm5cic56DuXLLbunwqGMQz
+         fr5wtxJS5yD41RiF6oViGC2RmVWohQMO7iNKTj97lPCHJKgh9MZpDjg9rqrtLR6Esplk
+         Dx/qT5dnGSjt23QS2Xm9L+cMoEwDBVeGbcadA4K5ADk894VwGTB1remyebZfBoT8y8/k
+         1+Mg==
+X-Gm-Message-State: AOAM530DmSam6CyaJTt9K3R512iGYjUBTbdgYGqrOlUGJAk+8qNagjGj
+        57H71uPfFSY6qx6JjXtizdAhY3kZcIVC/S4m3DW29w==
+X-Google-Smtp-Source: ABdhPJy6gFwSvJfYUnaQReXTw7OFukqCdbfGFdk4FOB5w1igPVzF3wcyMnYrwZVkhHIYJcIv0oDqmukb8rucUACJtxE=
+X-Received: by 2002:a92:cbcd:: with SMTP id s13mr3111986ilq.306.1601492040319;
+ Wed, 30 Sep 2020 11:54:00 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR20CA0057.namprd20.prod.outlook.com (2603:10b6:208:235::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.36 via Frontend Transport; Wed, 30 Sep 2020 18:51:04 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kNhBv-004KoW-EB; Wed, 30 Sep 2020 15:51:03 -0300
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1601491824; bh=FOi6aT5JY7VhLnV3Z8NYw2z6y8P6KLonvyYhymTC9Jo=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
-        b=dznN3RUUtbBT6eXa10zVADnFdgjMWwSpCg/elXgF33cvQGyUfzz1a+j/aGrAHwZh3
-         Z/21CKUlJ01erPcQIVqXGc0RBsfnKx3Bit07565gV3YHbLwyk1xR16tYaH2+NJchUE
-         8D0ETpzfYSHeEmGlnv0s6dgNAjhFmd4tZ8SZQNPLJkeR29ca7yRpPFs00WYg5B/Yj5
-         YD6yIGZRB+NlmpnAj+QhM0Yjm6s7zs1OmSpZXZHPgpmineW2teGAMJGIufiAxkdve5
-         Et0M+cEP9R8qI+FknqXPchTpkuOVfjYlbB4UvGDoVU3rwf4xlVKvydNuUnAU4s4kKq
-         oUFLQB1Xl6oyw==
+References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-12-bgardon@google.com>
+ <66db4185-d794-4b3e-89c2-c07f4f2b5f2a@redhat.com>
+In-Reply-To: <66db4185-d794-4b3e-89c2-c07f4f2b5f2a@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 30 Sep 2020 11:53:49 -0700
+Message-ID: <CANgfPd8A4VS0Mq-QR7wgzNDMd_UYwxja=Vn7oW0KMoce8RXVww@mail.gmail.com>
+Subject: Re: [PATCH 11/22] kvm: mmu: Factor out allocating a new tdp_mmu_page
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 30, 2020 at 08:47:00PM +0200, Thomas Gleixner wrote:
+On Fri, Sep 25, 2020 at 5:22 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 25/09/20 23:22, Ben Gardon wrote:
+> > Move the code to allocate a struct kvm_mmu_page for the TDP MMU out of the
+> > root allocation code to support allocating a struct kvm_mmu_page for every
+> > page of page table memory used by the TDP MMU, in the next commit.
+> >
+> > Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
+> > machine. This series introduced no new failures.
+> >
+> > This series can be viewed in Gerrit at:
+> >       https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2538
+>
+> Maybe worth squashing into the earlier patch.
+>
+> Paolo
+>
 
-> > +	pci_read_config_dword(pdev, SIOVCAP(dvsec), &val32);
-> > +	if ((val32 & 0x1) && idxd->hw.gen_cap.max_ims_mult) {
-> > +		idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
-> > +		dev_dbg(dev, "IMS size: %u\n", idxd->ims_size);
-> > +		set_bit(IDXD_FLAG_SIOV_SUPPORTED, &idxd->flags);
-> > +		dev_dbg(&pdev->dev, "IMS supported for device\n");
-> > +		return;
-> > +	}
-> > +
-> > +	dev_dbg(&pdev->dev, "SIOV unsupported for device\n");
-> 
-> It's really hard to find the code inside all of this dev_dbg()
-> noise. But why is this capability check done in this driver? Is this
-> capability stuff really IDXD specific or is the next device which
-> supports this going to copy and pasta the above?
-
-It is the weirdest thing, IMHO. Intel defined a dvsec cap in their
-SIOV cookbook, but as far as I can see it serves no purpose at
-all.
-
-Last time I asked I got some unclear mumbling about "OEMs".
-
-I expect you'll see all Intel drivers copying this code.
-
-Jason
+That sounds good to me. Definitely reduces churn in the series.
