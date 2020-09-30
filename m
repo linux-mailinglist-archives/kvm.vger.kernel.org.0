@@ -2,218 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DA1527E79E
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 13:26:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEB1727E7D7
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 13:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729104AbgI3L0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 07:26:34 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:6628 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725779AbgI3L0e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 07:26:34 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f746b370001>; Wed, 30 Sep 2020 04:25:43 -0700
-Received: from mtl-vdi-166.wap.labs.mlnx (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 30 Sep
- 2020 11:26:13 +0000
-Date:   Wed, 30 Sep 2020 14:26:09 +0300
-From:   Eli Cohen <elic@nvidia.com>
-To:     Jason Wang <jasowang@redhat.com>
-CC:     <mst@redhat.com>, <lulu@redhat.com>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <rob.miller@broadcom.com>, <lingshan.zhu@intel.com>,
-        <eperezma@redhat.com>, <hanand@xilinx.com>,
-        <mhabets@solarflare.com>, <eli@mellanox.com>,
-        <amorenoz@redhat.com>, <maxime.coquelin@redhat.com>,
-        <stefanha@redhat.com>, <sgarzare@redhat.com>
-Subject: Re: [RFC PATCH 05/24] vhost-vdpa: passing iotlb to IOMMU mapping
- helpers
-Message-ID: <20200930112609.GA223360@mtl-vdi-166.wap.labs.mlnx>
-References: <20200924032125.18619-1-jasowang@redhat.com>
- <20200924032125.18619-6-jasowang@redhat.com>
+        id S1729556AbgI3Lpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 07:45:52 -0400
+Received: from foss.arm.com ([217.140.110.172]:34684 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729424AbgI3Lpv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 07:45:51 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A8E730E;
+        Wed, 30 Sep 2020 04:45:51 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 170DA3F6CF;
+        Wed, 30 Sep 2020 04:45:48 -0700 (PDT)
+Subject: Re: [PATCH v7 5/7] KVM: arm64: pmu: Make overflow handler NMI safe
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        mark.rutland@arm.com, sumit.garg@linaro.org, swboyd@chromium.org,
+        catalin.marinas@arm.com, will@kernel.org,
+        Julien Thierry <julien.thierry@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20200924110706.254996-1-alexandru.elisei@arm.com>
+ <20200924110706.254996-6-alexandru.elisei@arm.com>
+ <14a0562fee95d5c7aa5bc6b67d213858@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <3379a8af-67ae-f71f-316d-3baa5fadc6dd@arm.com>
+Date:   Wed, 30 Sep 2020 12:46:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200924032125.18619-6-jasowang@redhat.com>
-User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1601465143; bh=u57iORwVvbadjjyoszxFFavgb47TLdIvXVYH0Cqdc+g=;
-        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-         Content-Type:Content-Disposition:In-Reply-To:User-Agent:
-         X-Originating-IP:X-ClientProxiedBy;
-        b=i4tKtThQimyZ7JSMvWCUBSmEHDw2aBUIDvMxnN4HDSMcw2xveDTMwDTfEuKkIhfx8
-         m5mzX9G5vxpjoZwjjc55uX3PRK3bhpJ099uKxSn23cOQTlKaAycAFGRHp3LTZY/sJM
-         ZQGhXpQAVF+04cXZLE0nyl3HAc22+0/4OJVj31YPbt7MShwoY27WQsfdfKWYuw1D+k
-         ox1xmCWTJ4ldq7jUukJ6JVhABYvRk6C6ItNSEr4qMnJwMsHYwiMrV0a75FR4Yuy/V7
-         VTpXSKu2Q5xA19u3gNzKmWHcjn/2Ffcmsd4V/PPAD1yeqkijuqCVAsO9eezlrTtGT/
-         1K4PEizEOlr+Q==
+In-Reply-To: <14a0562fee95d5c7aa5bc6b67d213858@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 11:21:06AM +0800, Jason Wang wrote:
-> To prepare for the ASID support for vhost-vdpa, try to pass IOTLB
-> object to dma helpers.
+Hello,
 
-Maybe it's worth mentioning here that this patch does not change any
-functionality and is presented as a preparation for passing different
-iotlb's instead of using dev->iotlb
+On 9/29/20 9:11 AM, Marc Zyngier wrote:
+> On 2020-09-24 12:07, Alexandru Elisei wrote:
+>> From: Julien Thierry <julien.thierry@arm.com>
+>>
+>> kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
+>> NMI context, defer waking the vcpu to an irq_work queue.
+>>
+>> A vcpu can be freed while it's not running by kvm_destroy_vm(). Prevent
+>> running the irq_work for a non-existent vcpu by calling irq_work_sync() on
+>> the PMU destroy path.
+>>
+>> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Will Deacon <will.deacon@arm.com>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+>> Cc: kvm@vger.kernel.org
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+>> Tested-by: Sumit Garg <sumit.garg@linaro.org> (Developerbox)
+>> [Alexandru E.: Added irq_work_sync()]
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>> I suggested in v6 that I will add an irq_work_sync() to
+>> kvm_pmu_vcpu_reset(). It turns out it's not necessary: a vcpu reset is done
+>> by the vcpu being reset with interrupts enabled, which means all the work
+>> has had a chance to run before the reset takes place.
+>
+> I don't understand your argument about interrupts being enabled. The real
+> reason for not needing any synchronization is that all that the queued work
+> does is to kick the vcpu. Given that the vcpu is resetting, no amount of
+> kicking is going to change anything (it is already outside of the guest).
+>
+> Things are obviously different on destroy, where the vcpu is actively going
+> away and we need to make sure we don't use stale data.
 
-> 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vhost/vdpa.c | 40 ++++++++++++++++++++++------------------
->  1 file changed, 22 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 9c641274b9f3..74bef1c15a70 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -489,10 +489,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
->  	return r;
->  }
->  
-> -static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
-> +static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
-> +				   struct vhost_iotlb *iotlb,
-> +				   u64 start, u64 last)
->  {
->  	struct vhost_dev *dev = &v->vdev;
-> -	struct vhost_iotlb *iotlb = dev->iotlb;
->  	struct vhost_iotlb_map *map;
->  	struct page *page;
->  	unsigned long pfn, pinned;
-> @@ -514,8 +515,9 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
->  static void vhost_vdpa_iotlb_free(struct vhost_vdpa *v)
->  {
->  	struct vhost_dev *dev = &v->vdev;
-> +	struct vhost_iotlb *iotlb = dev->iotlb;
->  
-> -	vhost_vdpa_iotlb_unmap(v, 0ULL, 0ULL - 1);
-> +	vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1);
->  	kfree(dev->iotlb);
->  	dev->iotlb = NULL;
->  }
-> @@ -542,15 +544,14 @@ static int perm_to_iommu_flags(u32 perm)
->  	return flags | IOMMU_CACHE;
->  }
->  
-> -static int vhost_vdpa_map(struct vhost_vdpa *v,
-> +static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->  			  u64 iova, u64 size, u64 pa, u32 perm)
->  {
-> -	struct vhost_dev *dev = &v->vdev;
->  	struct vdpa_device *vdpa = v->vdpa;
->  	const struct vdpa_config_ops *ops = vdpa->config;
->  	int r = 0;
->  
-> -	r = vhost_iotlb_add_range(dev->iotlb, iova, iova + size - 1,
-> +	r = vhost_iotlb_add_range(iotlb, iova, iova + size - 1,
->  				  pa, perm);
->  	if (r)
->  		return r;
-> @@ -559,7 +560,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
->  		r = ops->dma_map(vdpa, iova, size, pa, perm);
->  	} else if (ops->set_map) {
->  		if (!v->in_batch)
-> -			r = ops->set_map(vdpa, dev->iotlb);
-> +			r = ops->set_map(vdpa, iotlb);
->  	} else {
->  		r = iommu_map(v->domain, iova, pa, size,
->  			      perm_to_iommu_flags(perm));
-> @@ -568,29 +569,30 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
->  	return r;
->  }
->  
-> -static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
-> +static void vhost_vdpa_unmap(struct vhost_vdpa *v,
-> +			     struct vhost_iotlb *iotlb,
-> +			     u64 iova, u64 size)
->  {
-> -	struct vhost_dev *dev = &v->vdev;
->  	struct vdpa_device *vdpa = v->vdpa;
->  	const struct vdpa_config_ops *ops = vdpa->config;
->  
-> -	vhost_vdpa_iotlb_unmap(v, iova, iova + size - 1);
-> +	vhost_vdpa_iotlb_unmap(v, iotlb, iova, iova + size - 1);
->  
->  	if (ops->dma_map) {
->  		ops->dma_unmap(vdpa, iova, size);
->  	} else if (ops->set_map) {
->  		if (!v->in_batch)
-> -			ops->set_map(vdpa, dev->iotlb);
-> +			ops->set_map(vdpa, iotlb);
->  	} else {
->  		iommu_unmap(v->domain, iova, size);
->  	}
->  }
->  
->  static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
-> +					   struct vhost_iotlb *iotlb,
->  					   struct vhost_iotlb_msg *msg)
->  {
->  	struct vhost_dev *dev = &v->vdev;
-> -	struct vhost_iotlb *iotlb = dev->iotlb;
->  	struct page **page_list;
->  	unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
->  	unsigned int gup_flags = FOLL_LONGTERM;
-> @@ -644,7 +646,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->  			if (last_pfn && (this_pfn != last_pfn + 1)) {
->  				/* Pin a contiguous chunk of memory */
->  				csize = (last_pfn - map_pfn + 1) << PAGE_SHIFT;
-> -				if (vhost_vdpa_map(v, iova, csize,
-> +				if (vhost_vdpa_map(v, iotlb, iova, csize,
->  						   map_pfn << PAGE_SHIFT,
->  						   msg->perm))
->  					goto out;
-> @@ -660,11 +662,12 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->  	}
->  
->  	/* Pin the rest chunk */
-> -	ret = vhost_vdpa_map(v, iova, (last_pfn - map_pfn + 1) << PAGE_SHIFT,
-> +	ret = vhost_vdpa_map(v, iotlb, iova,
-> +			     (last_pfn - map_pfn + 1) << PAGE_SHIFT,
->  			     map_pfn << PAGE_SHIFT, msg->perm);
->  out:
->  	if (ret) {
-> -		vhost_vdpa_unmap(v, msg->iova, msg->size);
-> +		vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
->  		atomic64_sub(npages, &dev->mm->pinned_vm);
->  	}
->  	mmap_read_unlock(dev->mm);
-> @@ -678,6 +681,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
->  	struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
->  	struct vdpa_device *vdpa = v->vdpa;
->  	const struct vdpa_config_ops *ops = vdpa->config;
-> +	struct vhost_iotlb *iotlb = dev->iotlb;
->  	int r = 0;
->  
->  	r = vhost_dev_check_owner(dev);
-> @@ -686,17 +690,17 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
->  
->  	switch (msg->type) {
->  	case VHOST_IOTLB_UPDATE:
-> -		r = vhost_vdpa_process_iotlb_update(v, msg);
-> +		r = vhost_vdpa_process_iotlb_update(v, iotlb, msg);
->  		break;
->  	case VHOST_IOTLB_INVALIDATE:
-> -		vhost_vdpa_unmap(v, msg->iova, msg->size);
-> +		vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
->  		break;
->  	case VHOST_IOTLB_BATCH_BEGIN:
->  		v->in_batch = true;
->  		break;
->  	case VHOST_IOTLB_BATCH_END:
->  		if (v->in_batch && ops->set_map)
-> -			ops->set_map(vdpa, dev->iotlb);
-> +			ops->set_map(vdpa, iotlb);
->  		v->in_batch = false;
->  		break;
->  	default:
-> -- 
-> 2.20.1
-> 
+Like you and Will noticed, the above really doesn't make much sense. The reason we
+don't need to wait for the irq_work to be finished on reset is indeed that the
+vcpu isn't freed, so we will never trigger a use-after-free bug.
+
+>
+>>
+>>  arch/arm64/kvm/pmu-emul.c | 26 +++++++++++++++++++++++++-
+>>  include/kvm/arm_pmu.h     |  1 +
+>>  2 files changed, 26 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>> index f0d0312c0a55..81916e360b1e 100644
+>> --- a/arch/arm64/kvm/pmu-emul.c
+>> +++ b/arch/arm64/kvm/pmu-emul.c
+>> @@ -269,6 +269,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+>>
+>>      for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+>>          kvm_pmu_release_perf_event(&pmu->pmc[i]);
+>> +    irq_work_sync(&vcpu->arch.pmu.overflow_work);
+>>  }
+>>
+>>  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>> @@ -433,6 +434,22 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+>>      kvm_pmu_update_state(vcpu);
+>>  }
+>>
+>> +/**
+>> + * When perf interrupt is an NMI, we cannot safely notify the vcpu
+>> corresponding
+>> + * to the event.
+>> + * This is why we need a callback to do it once outside of the NMI context.
+>> + */
+>> +static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
+>> +{
+>> +    struct kvm_vcpu *vcpu;
+>> +    struct kvm_pmu *pmu;
+>> +
+>> +    pmu = container_of(work, struct kvm_pmu, overflow_work);
+>> +    vcpu = kvm_pmc_to_vcpu(pmu->pmc);
+>> +
+>> +    kvm_vcpu_kick(vcpu);
+>> +}
+>> +
+>>  /**
+>>   * When the perf event overflows, set the overflow status and inform the vcpu.
+>>   */
+>> @@ -465,7 +482,11 @@ static void kvm_pmu_perf_overflow(struct
+>> perf_event *perf_event,
+>>
+>>      if (kvm_pmu_overflow_status(vcpu)) {
+>>          kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>> -        kvm_vcpu_kick(vcpu);
+>> +
+>> +        if (!in_nmi())
+>> +            kvm_vcpu_kick(vcpu);
+>> +        else
+>> +            irq_work_queue(&vcpu->arch.pmu.overflow_work);
+>>      }
+>>
+>>      cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
+>> @@ -764,6 +785,9 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>>              return ret;
+>>      }
+>>
+>> +    init_irq_work(&vcpu->arch.pmu.overflow_work,
+>> +              kvm_pmu_perf_overflow_notify_vcpu);
+>> +
+>>      vcpu->arch.pmu.created = true;
+>>      return 0;
+>>  }
+>> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+>> index 6db030439e29..dbf4f08d42e5 100644
+>> --- a/include/kvm/arm_pmu.h
+>> +++ b/include/kvm/arm_pmu.h
+>> @@ -27,6 +27,7 @@ struct kvm_pmu {
+>>      bool ready;
+>>      bool created;
+>>      bool irq_level;
+>> +    struct irq_work overflow_work;
+>
+> Nit: placing this new field right after the pmc array would avoid creating
+> an unnecessary padding in the structure. Not a big deal, and definitely
+> something we can sort out when applying the patch.
+
+That makes sense, overflow_work must be aligned to 8 bytes, and there are 16
+elements in the pmc array, which means no padding is required for the
+overflow_work field.
+
+Thanks,
+Alex
