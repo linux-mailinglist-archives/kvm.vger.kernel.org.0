@@ -2,137 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04E4027F482
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 23:55:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F334F27F495
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 23:57:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731211AbgI3VzR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 17:55:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36607 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731213AbgI3Vy7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 17:54:59 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601502897;
+        id S1731085AbgI3V5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 17:57:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45942 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730470AbgI3V5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 17:57:25 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC1D2C061755;
+        Wed, 30 Sep 2020 14:57:24 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1601503043;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=nwkOICvOQaXOWcko8kpLlTGev7mN/mGmU8J6lWaTsxY=;
-        b=TvGviHcsgWhNm3+smDnoagEc3mDLR59bCbTjra/BCU6AKF1vYmCtlUQqhrgDgqHA7dUaD4
-        nxSC5kPPq+0+K4b4/B69QWMu2mG87RBEBICIOA6Nr9BrU/VkE/hdb+2IGVHK0761MMEIhX
-        77N20eAgJjCmUl3jWOd9eZ/8GpLpNI0=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-eeGxDRTcOnKEvOExGT8MpA-1; Wed, 30 Sep 2020 17:54:53 -0400
-X-MC-Unique: eeGxDRTcOnKEvOExGT8MpA-1
-Received: by mail-qv1-f69.google.com with SMTP id k14so1839354qvw.20
-        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 14:54:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nwkOICvOQaXOWcko8kpLlTGev7mN/mGmU8J6lWaTsxY=;
-        b=YykrRJkKR+vbgI/njUbpnK99BlkxGHk2rpR1wKgYLTNknTHj8gXWrpLtAEtI/dbTs0
-         XaSJ/gt5FhGhzBWKgb3lTVGpO/MhOGPZeJUJVU2Vz30rJN7hlrdFY4xiDzIBBmmtUfQu
-         Z0+UzgmdZYtjKqw4RI5ywaBTCzE7VsnWCVDsBkObsnoYMZ8Xdd0DROiP/YYa+01rMhKs
-         YFAONJwY++CxSKsJ/Zf3317dVyK1RPYA0r7yKwgBB8QxL9OaSpg0nR2pOTvruL3k6juu
-         DD/qmVh5hSsHKbOWad8L5MYOI3RllPAEW7fa+gfVYncptxhMympSyhc8WuYbIkvk3ULa
-         eVvQ==
-X-Gm-Message-State: AOAM533eN3LOsCJQOkisG6U1tbceHOXwxJfsMhlZfRFXmhAZDDA6BhAk
-        /+lAnKyhwQF4l47CBkArUeqxdskvli5NSZ/a1NF7hToEA7SAUt11L3wtv+aUvUVo3JiyrOKtjL0
-        y5isRTsqO3TxU
-X-Received: by 2002:a05:6214:1873:: with SMTP id eh19mr4582601qvb.16.1601502893275;
-        Wed, 30 Sep 2020 14:54:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybLwVY6jEpq4x2HA+sDFN0U69X2dz5Fiuq3Ua/MNBMapwHzf9NElvAEdB+0tfsaWQi1xfS1Q==
-X-Received: by 2002:a05:6214:1873:: with SMTP id eh19mr4582577qvb.16.1601502893059;
-        Wed, 30 Sep 2020 14:54:53 -0700 (PDT)
-Received: from xz-x1.redhat.com (toroon474qw-lp130-09-184-147-14-204.dsl.bell.ca. [184.147.14.204])
-        by smtp.gmail.com with ESMTPSA id a11sm3903690qto.2.2020.09.30.14.54.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2020 14:54:52 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
-Subject: [PATCH v12 13/13] KVM: selftests: Add "-c" parameter to dirty log test
-Date:   Wed, 30 Sep 2020 17:54:51 -0400
-Message-Id: <20200930215451.48391-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200930214948.47225-1-peterx@redhat.com>
-References: <20200930214948.47225-1-peterx@redhat.com>
+        bh=aE8dC9I5iKTJGv2hkvbLLzQFcBGFHFP/7J2ECzWs5Rw=;
+        b=pwA8eJ1rz8WzO5MjZ1Kay52a8lgyypTxazoN9apYsq1+TD9DLP3zkX1BxEX0ZtiDdON2Lc
+        hUfS1vRc7hVo4qZLyDGKLtJ9hhgRsQxPnfIYQupptsbwrXv1Gq6MoXc3rvZSfhVzmOfiMe
+        J6mqjT66RmVTPDCQjDuuI3ITS5kS7SqqRvRvJGPkAQfwLLf3qZimT3K220ebxVy2XWjAci
+        UOt0XFMLKwXiiNiMZ9Kxcdgi7kez/7I1a0csTVt6iiZ1yZUM3O7Sl6T2dYvxnBaaf3WLkM
+        1n8G7Hawr2WoTXuJLX/6huBPe8QudF4g4Mvg2gSCk7kbLP/cMkmt2B0GWl+ccg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1601503043;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aE8dC9I5iKTJGv2hkvbLLzQFcBGFHFP/7J2ECzWs5Rw=;
+        b=2sMwS7zfROc6xXIExg1b0iGDgg6gLNAfMrWZJRgLHJh4Y4JThgs/2h59DehPhq2BLB2Xq1
+        yY1wK5ZMHUg9ICBw==
+To:     "Raj\, Ashok" <ashok.raj@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
+        megha.dey@intel.com, maz@kernel.org, bhelgaas@google.com,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com,
+        sanjay.k.kumar@intel.com, tony.luck@intel.com, jing.lin@intel.com,
+        dan.j.williams@intel.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, parav@mellanox.com, rafael@kernel.org,
+        netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Ashok Raj <ashok.raj@intel.com>
+Subject: Re: [PATCH v3 05/18] dmaengine: idxd: add IMS support in base driver
+In-Reply-To: <20200930214941.GB26492@otc-nc-03>
+References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com> <160021248979.67751.3799965857372703876.stgit@djiang5-desk3.ch.intel.com> <87sgazgl0b.fsf@nanos.tec.linutronix.de> <20200930185103.GT816047@nvidia.com> <20200930214941.GB26492@otc-nc-03>
+Date:   Wed, 30 Sep 2020 23:57:22 +0200
+Message-ID: <87d023gc71.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's only used to override the existing dirty ring size/count.  If
-with a bigger ring count, we test async of dirty ring.  If with a
-smaller ring count, we test ring full code path.  Async is default.
+On Wed, Sep 30 2020 at 14:49, Ashok Raj wrote:
+>> It is the weirdest thing, IMHO. Intel defined a dvsec cap in their
+>> SIOV cookbook, but as far as I can see it serves no purpose at
+>> all.
+>> 
+>> Last time I asked I got some unclear mumbling about "OEMs".
+>> 
+> One of the parameters it has is the "supported system page-sizes" which is
+> usually there in the SRIOV properties. So it needed a place holder for
+> that. 
+>
+> IMS is a device specific capability, and I almost forgot why we needed
+> until I had to checking internally. Remember when a device is given to a
+> guest, MSIX routing via Interrupt Remapping is automatic via the VFIO/IRQFD
+> and such.
 
-It has no use for non-dirty-ring tests.
+-ENOPARSE
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+> When we provision an entire PCI device that is IMS capable. The guest
+> driver does know it can update the IMS entries directly without going to
+> the host. But in order to do remapping we need something like how we manage
+> PASID allocation from guest, so an IRTE entry can be allocated and the host
+> driver can write the proper values for IMS.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 4b404dfdc2f9..80c42c87265e 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -168,6 +168,7 @@ static enum log_mode_t host_log_mode_option = LOG_MODE_ALL;
- /* Logging mode for current run */
- static enum log_mode_t host_log_mode;
- static pthread_t vcpu_thread;
-+static uint32_t test_dirty_ring_count = TEST_DIRTY_RING_COUNT;
- 
- /* Only way to pass this to the signal handler */
- static struct kvm_vm *current_vm;
-@@ -250,7 +251,7 @@ static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
- 	 */
--	vm_enable_dirty_ring(vm, TEST_DIRTY_RING_COUNT *
-+	vm_enable_dirty_ring(vm, test_dirty_ring_count *
- 			     sizeof(struct kvm_dirty_gfn));
- }
- 
-@@ -272,7 +273,7 @@ static uint32_t dirty_ring_collect_one(struct kvm_dirty_gfn *dirty_gfns,
- 	uint32_t count = 0;
- 
- 	while (true) {
--		cur = &dirty_gfns[*fetch_index % TEST_DIRTY_RING_COUNT];
-+		cur = &dirty_gfns[*fetch_index % test_dirty_ring_count];
- 		if (!dirty_gfn_is_dirtied(cur))
- 			break;
- 		TEST_ASSERT(cur->slot == slot, "Slot number didn't match: "
-@@ -778,6 +779,9 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
-+	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
-+	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
- 	printf(" -I: specify interval in ms (default: %"PRIu64" ms)\n",
-@@ -833,8 +837,11 @@ int main(int argc, char *argv[])
- 	guest_mode_init(VM_MODE_P40V48_4K, true, true);
- #endif
- 
--	while ((opt = getopt(argc, argv, "hi:I:p:m:M:")) != -1) {
-+	while ((opt = getopt(argc, argv, "c:hi:I:p:m:M:")) != -1) {
- 		switch (opt) {
-+		case 'c':
-+			test_dirty_ring_count = strtol(optarg, NULL, 10);
-+			break;
- 		case 'i':
- 			iterations = strtol(optarg, NULL, 10);
- 			break;
--- 
-2.26.2
+And how is that related to that capbility thing?
 
+Also this stuff is host side and not guest side. I seriously doubt that
+you want to hand in the whole PCI device which contains the IMS
+thing. The whole point of IMS was as far as I was told that you can
+create gazillions of subdevices and have seperate MSI interrupts for
+each of them.
+
+Thanks,
+
+        tglx
