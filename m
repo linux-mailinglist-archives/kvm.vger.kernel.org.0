@@ -2,71 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 542EE27F169
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 20:36:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDC3727F16C
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 20:37:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729143AbgI3Sgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 14:36:40 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:58694 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725355AbgI3Sgk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 14:36:40 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1601490997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PR+4u0iF2BLBMfq+3fHnkGcyOOKUutVuuT2qZHGZ98Q=;
-        b=4E1HTTViAIJcas2IXgwEtiQjb5QUMX6yZzDEQnTGQpLRPCtsGHo2JH0jc8NtW/faZgXYFJ
-        l1K5xbs+pstgpUAVR+qsodkhg5Dw5MOMTqb93VWjIBTZcam99GjW5nehr/QuYx/1hgsPf3
-        pYNcXggeNMmztZnivOJkGbA1jF0Yf63xd54y37f9kHSMzhXqqzTgIJgIRXrfe8UWdAujNX
-        8OHcdG6vrX935YSJvHaan5hpacNmK+7JmafpTES4uOM959cGWnYaeQvpSIbuPaFlaUpjnh
-        G2XKqvFX1WZpbF2A6++wU5Iyb4hkcpuetq8rRrbjejDBWu2/psVwRVfVkCdThQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1601490997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PR+4u0iF2BLBMfq+3fHnkGcyOOKUutVuuT2qZHGZ98Q=;
-        b=V/Rq6jQQobnS61rz3apq21GL3NbMdiFlEOU8ltngRKU8W6KZt1g6vzXXvYzsZlaMuoJVR3
-        fXv7Tjm5G7p0X3AA==
-To:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
-        megha.dey@intel.com, maz@kernel.org, bhelgaas@google.com,
-        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
-        ashok.raj@intel.com, jgg@mellanox.com, yi.l.liu@intel.com,
-        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
-        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
-        jgg@mellanox.com, rafael@kernel.org, netanelg@mellanox.com,
-        shahafs@mellanox.com, yan.y.zhao@linux.intel.com,
-        pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
-Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 04/18] dmaengine: idxd: add interrupt handle request support
-In-Reply-To: <160021248280.67751.12525558281536923518.stgit@djiang5-desk3.ch.intel.com>
-References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com> <160021248280.67751.12525558281536923518.stgit@djiang5-desk3.ch.intel.com>
-Date:   Wed, 30 Sep 2020 20:36:37 +0200
-Message-ID: <87v9fvglhm.fsf@nanos.tec.linutronix.de>
+        id S1729556AbgI3ShL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 14:37:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43168 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729484AbgI3ShL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 14:37:11 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31647C061755
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 11:37:10 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id m17so3074391ioo.1
+        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 11:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=siO3Ww0UuN5awZ2/4Q5j7OZO9fAp8wT77tzaQkVz9ls=;
+        b=T8SfNyHQgRssrwuMGSNe1Hy/76JeGn2jrPuT+PfCKTcMA+kHHXx4IEX5rcbeHKij7B
+         oMn52MBkpnsqi1o4exKmNOUjzWgl7Lezy8pZ99oQicQynhRlyIy5aZ5F82im+qGqEgjp
+         4nVSf5F66vWxWpvScXVvyiVKdKv/hGTHdQD+gBMNfX88OkQkJUnd6IBB3WLSl6U3pOSd
+         iz1go36055uPNZQ9b58FWuDpUlqWl5hU/zwiqtX7K0npYdqjtB1rpnO1FXHa82awerZn
+         qaV/44+3IrMo9sQcjBhq4cDXLwRTP5GGPXM+vaoz0Gq/f+UjWtk6q4iGPBXjrPBuyOC2
+         vEZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=siO3Ww0UuN5awZ2/4Q5j7OZO9fAp8wT77tzaQkVz9ls=;
+        b=oy2pbJcVaqU1v+S0nqQrm9eXIwBE4Va6ekeKfh45+zeK0UhoVX+0RfJQev6fhJogfN
+         26/LII4Merb5tbe2a6EfIK1dZDakLR7IrFwqK6RyEiqCIJyjieRxS8xTonAosrKN5JtS
+         knT4rPeymTNHWHR0xl4MSfRYSjDC1xSAiZ7hsk+aB+QP+J3SX5ocuI7vCOVxUqfn+IPA
+         kVgYh6EyRq1X9//l5PSLqKEllU2w/BL7KS6p/GRMPKM0XSW7PSGOfc7SgbOwbMxaNqSN
+         TsXMQE8kvISG9+Om/pwYk1yoJYFoNTgslyAjG17KwG90X79whFsjfocunV00T2U0uN6M
+         CzaA==
+X-Gm-Message-State: AOAM530ToUr35OJOKep5d/UrfgUGeb0F53c1MmQTLjBYjSUtzBXhFYTl
+        WTblm1vNsICN2NlcQTuOSKKgKlFVGQGn3JEU0Q5pmw==
+X-Google-Smtp-Source: ABdhPJyrDW/AxccGOy65cPaYmmkijKPXeqYJQd2vflxz3Oebc2oWK2N+MGk2VZheSovYTphfB9JJpHAFymDelDyt1+A=
+X-Received: by 2002:a05:6602:2d55:: with SMTP id d21mr2647330iow.134.1601491029262;
+ Wed, 30 Sep 2020 11:37:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-4-bgardon@google.com>
+ <20200930053430.GE29405@linux.intel.com>
+In-Reply-To: <20200930053430.GE29405@linux.intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 30 Sep 2020 11:36:58 -0700
+Message-ID: <CANgfPd-ErY5BgPooX0URYY1SFpLADJ9UfHKYQJsuE4JNh6dKRQ@mail.gmail.com>
+Subject: Re: [PATCH 03/22] kvm: mmu: Init / Uninit the TDP MMU
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 15 2020 at 16:28, Dave Jiang wrote:
->  
-> +#define INT_HANDLE_IMS_TABLE	0x10000
-> +int idxd_device_request_int_handle(struct idxd_device *idxd, int idx,
-> +				   int *handle, enum idxd_interrupt_type irq_type)
+On Tue, Sep 29, 2020 at 10:35 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Nit on all the shortlogs, can you use "KVM: x86/mmu" instead of "kvm: mmu"?
 
-New lines exist for a reason and this glued together define and function
-definition is unreadable garbage.
+Will do.
 
-Also is that magic bit a software flag or defined by hardware? If the
-latter then you want to move it to the other hardware defines.
+>
+> On Fri, Sep 25, 2020 at 02:22:43PM -0700, Ben Gardon wrote:
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > new file mode 100644
+> > index 0000000000000..8241e18c111e6
+> > --- /dev/null
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -0,0 +1,34 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +
+> > +#include "tdp_mmu.h"
+> > +
+> > +static bool __read_mostly tdp_mmu_enabled = true;
+> > +module_param_named(tdp_mmu, tdp_mmu_enabled, bool, 0644);
+>
+> Do y'all actually toggle tdp_mmu_enabled while VMs are running?  I can see
+> having a per-VM capability, or a read-only module param, but a writable
+> module param is... interesting.
 
-Thanks,
+We don't use this much, but it is useful when running tests to be able
+to go back and forth between running with and without the TDP MMU. I
+should have added a note that the module parameter is mostly for
+development purposes.
 
-        tglx
- 
+>
+> > +static bool is_tdp_mmu_enabled(void)
+> > +{
+> > +     if (!READ_ONCE(tdp_mmu_enabled))
+> > +             return false;
+> > +
+> > +     if (WARN_ONCE(!tdp_enabled,
+> > +                   "Creating a VM with TDP MMU enabled requires TDP."))
+>
+> This should be enforced, i.e. clear tdp_mmu_enabled if !tdp_enabled.  As is,
+> it's a user triggerable WARN, which is not good, e.g. with PANIC_ON_WARN.
+
+That's a good point.
+
+>
+> > +             return false;
+> > +
+> > +     return true;
+> > +}
