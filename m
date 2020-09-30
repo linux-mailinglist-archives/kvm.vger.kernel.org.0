@@ -2,84 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0523E27DF41
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 06:17:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAD7F27DF88
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 06:35:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725872AbgI3ERL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 00:17:11 -0400
-Received: from mga18.intel.com ([134.134.136.126]:60796 "EHLO mga18.intel.com"
+        id S1725497AbgI3Eep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 00:34:45 -0400
+Received: from mga18.intel.com ([134.134.136.126]:62136 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725839AbgI3ERF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 00:17:05 -0400
-IronPort-SDR: BamU55C/aaQPyjxkn/PoFetVVBwvj3fi0UMC9v4Of+/tMIAygAiIWlZtc6xuH+288BBkEd6E52
- T5KbvXBF7WBA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9759"; a="150137455"
+        id S1725320AbgI3Eep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 00:34:45 -0400
+IronPort-SDR: 4Q29jt/rxga4o+qNpiIm/HZxMdOBttS4QfFMYe5/smxpCK9l4VbEckMjiPicBTLc1KAIlCfSj4
+ VMqKrOM/1cpA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9759"; a="150139301"
 X-IronPort-AV: E=Sophos;i="5.77,321,1596524400"; 
-   d="scan'208";a="150137455"
+   d="scan'208";a="150139301"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 21:17:03 -0700
-IronPort-SDR: /saY0BVd/QPYHi2iRfhP+TIsXqXfC2ZUELIrQ5kKEmWXwWZ/Kt5OUuoP71JLRX3Tj3J2liN954
- uoWY0rpNQ4uw==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 21:34:38 -0700
+IronPort-SDR: HRN2pWgZ8qN0KdZ3U1ggSlM8pWjto+E30PZZRbC2imRsfI2rb0FmcU1m9pNRI8p6eEA9Fuk9Nm
+ 7yMj5uOsLdIA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,321,1596524400"; 
-   d="scan'208";a="415607871"
+   d="scan'208";a="338932499"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by fmsmga001.fm.intel.com with ESMTP; 29 Sep 2020 21:17:03 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 29 Sep 2020 21:34:37 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>
-Subject: [PATCH 5/5] KVM: x86: Let the guest own CR4.FSGSBASE
-Date:   Tue, 29 Sep 2020 21:16:59 -0700
-Message-Id: <20200930041659.28181-6-sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [kvm-unit-tests PATCH] x86: Add one-off test to verify setting LA57 fails when it's unsupported
+Date:   Tue, 29 Sep 2020 21:34:36 -0700
+Message-Id: <20200930043436.29270-1-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200930041659.28181-1-sean.j.christopherson@intel.com>
-References: <20200930041659.28181-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
+Add an i386-only test to check that setting CR4.LA57 fails when 5-level
+paging is not exposed to the guest.  Old versions of KVM don't intercept
+LA57 by default on VMX, which means a clever guest could set LA57
+without it being detected by KVM.
 
-Add FSGSBASE to the set of possible guest-owned CR4 bits, i.e. let the
-guest own it on VMX.  KVM never queries the guest's CR4.FSGSBASE value,
-thus there is no reason to force VM-Exit on FSGSBASE being toggled.
+This test is i386-only because toggling CR4.LA57 in long mode is
+illegal, i.e. won't verify the desired KVM behavior.
 
-Note, because FSGSBASE is conditionally available, this is dependent on
-recent changes to intercept reserved CR4 bits and to update the CR4
-guest/host mask in response to guest CPUID changes.
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-[sean: added justification in changelog]
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/kvm_cache_regs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ x86/Makefile.i386 |  2 +-
+ x86/la57.c        | 13 +++++++++++++
+ x86/unittests.cfg |  4 ++++
+ 3 files changed, 18 insertions(+), 1 deletion(-)
+ create mode 100644 x86/la57.c
 
-diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
-index ca0781b41df9..a889563ad02d 100644
---- a/arch/x86/kvm/kvm_cache_regs.h
-+++ b/arch/x86/kvm/kvm_cache_regs.h
-@@ -7,7 +7,7 @@
- #define KVM_POSSIBLE_CR0_GUEST_BITS X86_CR0_TS
- #define KVM_POSSIBLE_CR4_GUEST_BITS				  \
- 	(X86_CR4_PVI | X86_CR4_DE | X86_CR4_PCE | X86_CR4_OSFXSR  \
--	 | X86_CR4_OSXMMEXCPT | X86_CR4_PGE | X86_CR4_TSD)
-+	 | X86_CR4_OSXMMEXCPT | X86_CR4_PGE | X86_CR4_TSD | X86_CR4_FSGSBASE)
+diff --git a/x86/Makefile.i386 b/x86/Makefile.i386
+index be9d6bc..c04e5aa 100644
+--- a/x86/Makefile.i386
++++ b/x86/Makefile.i386
+@@ -6,6 +6,6 @@ COMMON_CFLAGS += -mno-sse -mno-sse2
+ cflatobjs += lib/x86/setjmp32.o
  
- #define BUILD_KVM_GPR_ACCESSORS(lname, uname)				      \
- static __always_inline unsigned long kvm_##lname##_read(struct kvm_vcpu *vcpu)\
+ tests = $(TEST_DIR)/taskswitch.flat $(TEST_DIR)/taskswitch2.flat \
+-	$(TEST_DIR)/cmpxchg8b.flat
++	$(TEST_DIR)/cmpxchg8b.flat $(TEST_DIR)/la57.flat
+ 
+ include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+diff --git a/x86/la57.c b/x86/la57.c
+new file mode 100644
+index 0000000..b537bb2
+--- /dev/null
++++ b/x86/la57.c
+@@ -0,0 +1,13 @@
++#include "libcflat.h"
++#include "processor.h"
++#include "desc.h"
++
++int main(int ac, char **av)
++{
++	int vector = write_cr4_checking(read_cr4() | X86_CR4_LA57);
++	int expected = this_cpu_has(X86_FEATURE_LA57) ? 0 : 13;
++
++	report(vector == expected, "%s when CR4.LA57 %ssupported",
++	       expected ? "#GP" : "No fault", expected ? "un" : "");
++	return report_summary();
++}
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 3a79151..6eb8e19 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -245,6 +245,10 @@ arch = x86_64
+ file = umip.flat
+ extra_params = -cpu qemu64,+umip
+ 
++[la57]
++file = la57.flat
++arch = i386
++
+ [vmx]
+ file = vmx.flat
+ extra_params = -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
 -- 
 2.28.0
 
