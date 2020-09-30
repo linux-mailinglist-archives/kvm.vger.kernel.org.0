@@ -2,176 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01C1527F18C
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 20:47:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA44F27F1A0
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 20:51:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728679AbgI3SrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 14:47:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44704 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725771AbgI3SrC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Sep 2020 14:47:02 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5971BC061755;
-        Wed, 30 Sep 2020 11:47:02 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1601491620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kiz7/SWQLMON7gelenhbRoI004ot0P3TXeRig/vUtf8=;
-        b=FnBUQwSBNvrI0nokrDqg6i8UJatcEh036RkTZftkYPnd2WIKqBzrsdUP1wORktBjNMDR2o
-        YrTGjAGBipUeFG06yagvJu9lP+aMvez434GltolhXeWVrGIAzLaCAEcLBs9m8KxcKQ3l7A
-        fEEXY3Ikr3vxVKzOZbYkOaRNLLYbv79OmzDmAnz2CAZMJkRFOW/PaJk5/3lXvUX40yIH5g
-        Ne9by9mNNv3HLF+djsUjj0Gjns82LIZ2QSlw2S1GEl/07VTkmA56t2ObMfGpQUNgHUcbNV
-        00tBd1nmnPvhPoXPMCFbeTD2amaijF4tv/Iu1IzW943AKVvNBOrjo5naso1VCA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1601491620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kiz7/SWQLMON7gelenhbRoI004ot0P3TXeRig/vUtf8=;
-        b=t7u3wtm+0S4OfXWOLfbXFH8pT3Q3dCWAWR0ow5pLJjaiqxW/1k0yT6cjYpzur6UxGibU2x
-        Aa+28214OubJyNAA==
-To:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
-        megha.dey@intel.com, maz@kernel.org, bhelgaas@google.com,
-        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
-        ashok.raj@intel.com, jgg@mellanox.com, yi.l.liu@intel.com,
-        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
-        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
-        jgg@mellanox.com, rafael@kernel.org, netanelg@mellanox.com,
-        shahafs@mellanox.com, yan.y.zhao@linux.intel.com,
-        pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
-Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+        id S1729806AbgI3SvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 14:51:16 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:2488 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725771AbgI3SvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 14:51:16 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f74d3700000>; Wed, 30 Sep 2020 11:50:24 -0700
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 30 Sep
+ 2020 18:51:09 +0000
+Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.51) by
+ HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Wed, 30 Sep 2020 18:51:09 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N+zxFYw91wL1/C4wFwbQEYm+7NHM8E1AZ8F6oadgIeyZctxyidXdmhETx7n1N0EiO3pYtj94pae7OWTrKogAguVTXTQDg8fmGMK2NDf44AuZP7D3If69DRC4Zx/91naEs13t9GudZO33wXGCEEL9FfYVBIueJLXVq3q3IKQDYjCbO+RHE6Et3qc90Pz6BoviDTWDU/tzfRCUQiUpHWhOWMOUfGTGlegf8zKcx+mv15cKpEMT0eH4h385XjVztyWC3hq9naKKE9btOcXmsmZF/PO4z0Y3eNzbsquvrNHapeD/mPiRdeNFk8OVSIKaSvsJnoRupRryte3oQfDKQIi5DA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FOi6aT5JY7VhLnV3Z8NYw2z6y8P6KLonvyYhymTC9Jo=;
+ b=I9gutspRKLsBhGPip37tV3WMcRd0f/ZVcWhcdJUc2byyeTyfPGQCJA/1QmED2kuI/s8GmAGJS2FMDgv4ia/PNPLRDB5WspKwh0s5ACGm94LLTHKMS2idPIiuHfK/fDED7T2cZnjNedEEqmF6IbzuieY2mQczPjfFUPK1KAuw/8gqysN1Oc7UMVpTUPyy4ovDRzsfHKVV+yVqPtZixdm8kVsF6Y94+z1BLhoPM8Np4/uVXLZvovUv3DSXtUiRhS9KudaXMF66ucX56Az9l82QvJKnwy4kd3r1rPX3yBiDXcwOCGfiL0XzDS+K9lNqzMFaMIlBXLUMGbrVGY7Egxp+dQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4011.namprd12.prod.outlook.com (2603:10b6:5:1c5::28) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.23; Wed, 30 Sep
+ 2020 18:51:05 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3433.032; Wed, 30 Sep 2020
+ 18:51:05 +0000
+Date:   Wed, 30 Sep 2020 15:51:03 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+CC:     Dave Jiang <dave.jiang@intel.com>, <vkoul@kernel.org>,
+        <megha.dey@intel.com>, <maz@kernel.org>, <bhelgaas@google.com>,
+        <alex.williamson@redhat.com>, <jacob.jun.pan@intel.com>,
+        <ashok.raj@intel.com>, <yi.l.liu@intel.com>, <baolu.lu@intel.com>,
+        <kevin.tian@intel.com>, <sanjay.k.kumar@intel.com>,
+        <tony.luck@intel.com>, <jing.lin@intel.com>,
+        <dan.j.williams@intel.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <parav@mellanox.com>, <rafael@kernel.org>,
+        <netanelg@mellanox.com>, <shahafs@mellanox.com>,
+        <yan.y.zhao@linux.intel.com>, <pbonzini@redhat.com>,
+        <samuel.ortiz@intel.com>, <mona.hossain@intel.com>,
+        <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <x86@kernel.org>, <linux-pci@vger.kernel.org>,
+        <kvm@vger.kernel.org>
 Subject: Re: [PATCH v3 05/18] dmaengine: idxd: add IMS support in base driver
-In-Reply-To: <160021248979.67751.3799965857372703876.stgit@djiang5-desk3.ch.intel.com>
-References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com> <160021248979.67751.3799965857372703876.stgit@djiang5-desk3.ch.intel.com>
-Date:   Wed, 30 Sep 2020 20:47:00 +0200
-Message-ID: <87sgazgl0b.fsf@nanos.tec.linutronix.de>
+Message-ID: <20200930185103.GT816047@nvidia.com>
+References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
+ <160021248979.67751.3799965857372703876.stgit@djiang5-desk3.ch.intel.com>
+ <87sgazgl0b.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <87sgazgl0b.fsf@nanos.tec.linutronix.de>
+X-ClientProxiedBy: MN2PR20CA0057.namprd20.prod.outlook.com
+ (2603:10b6:208:235::26) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR20CA0057.namprd20.prod.outlook.com (2603:10b6:208:235::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.36 via Frontend Transport; Wed, 30 Sep 2020 18:51:04 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kNhBv-004KoW-EB; Wed, 30 Sep 2020 15:51:03 -0300
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1601491824; bh=FOi6aT5JY7VhLnV3Z8NYw2z6y8P6KLonvyYhymTC9Jo=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
+        b=dznN3RUUtbBT6eXa10zVADnFdgjMWwSpCg/elXgF33cvQGyUfzz1a+j/aGrAHwZh3
+         Z/21CKUlJ01erPcQIVqXGc0RBsfnKx3Bit07565gV3YHbLwyk1xR16tYaH2+NJchUE
+         8D0ETpzfYSHeEmGlnv0s6dgNAjhFmd4tZ8SZQNPLJkeR29ca7yRpPFs00WYg5B/Yj5
+         YD6yIGZRB+NlmpnAj+QhM0Yjm6s7zs1OmSpZXZHPgpmineW2teGAMJGIufiAxkdve5
+         Et0M+cEP9R8qI+FknqXPchTpkuOVfjYlbB4UvGDoVU3rwf4xlVKvydNuUnAU4s4kKq
+         oUFLQB1Xl6oyw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 15 2020 at 16:28, Dave Jiang wrote:
->  struct idxd_device {
-> @@ -170,6 +171,7 @@ struct idxd_device {
->  
->  	int num_groups;
->  
-> +	u32 ims_offset;
->  	u32 msix_perm_offset;
->  	u32 wqcfg_offset;
->  	u32 grpcfg_offset;
-> @@ -177,6 +179,7 @@ struct idxd_device {
->  
->  	u64 max_xfer_bytes;
->  	u32 max_batch_size;
-> +	int ims_size;
->  	int max_groups;
->  	int max_engines;
->  	int max_tokens;
-> @@ -196,6 +199,7 @@ struct idxd_device {
->  	struct work_struct work;
->  
->  	int *int_handles;
-> +	struct sbitmap ims_sbmap;
+On Wed, Sep 30, 2020 at 08:47:00PM +0200, Thomas Gleixner wrote:
 
-This bitmap is needed for what?
+> > +	pci_read_config_dword(pdev, SIOVCAP(dvsec), &val32);
+> > +	if ((val32 & 0x1) && idxd->hw.gen_cap.max_ims_mult) {
+> > +		idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
+> > +		dev_dbg(dev, "IMS size: %u\n", idxd->ims_size);
+> > +		set_bit(IDXD_FLAG_SIOV_SUPPORTED, &idxd->flags);
+> > +		dev_dbg(&pdev->dev, "IMS supported for device\n");
+> > +		return;
+> > +	}
+> > +
+> > +	dev_dbg(&pdev->dev, "SIOV unsupported for device\n");
+> 
+> It's really hard to find the code inside all of this dev_dbg()
+> noise. But why is this capability check done in this driver? Is this
+> capability stuff really IDXD specific or is the next device which
+> supports this going to copy and pasta the above?
 
-> --- a/drivers/dma/idxd/init.c
-> +++ b/drivers/dma/idxd/init.c
-> @@ -231,10 +231,51 @@ static void idxd_read_table_offsets(struct idxd_device *idxd)
->  	idxd->msix_perm_offset = offsets.msix_perm * 0x100;
->  	dev_dbg(dev, "IDXD MSIX Permission Offset: %#x\n",
->  		idxd->msix_perm_offset);
-> +	idxd->ims_offset = offsets.ims * 0x100;
+It is the weirdest thing, IMHO. Intel defined a dvsec cap in their
+SIOV cookbook, but as far as I can see it serves no purpose at
+all.
 
-Magic constant pulled out of thin air. #define ....
+Last time I asked I got some unclear mumbling about "OEMs".
 
-> +	dev_dbg(dev, "IDXD IMS Offset: %#x\n", idxd->ims_offset);
->  	idxd->perfmon_offset = offsets.perfmon * 0x100;
->  	dev_dbg(dev, "IDXD Perfmon Offset: %#x\n", idxd->perfmon_offset);
->  }
->  
-> +#define PCI_DEVSEC_CAP		0x23
-> +#define SIOVDVSEC1(offset)	((offset) + 0x4)
-> +#define SIOVDVSEC2(offset)	((offset) + 0x8)
-> +#define DVSECID			0x5
-> +#define SIOVCAP(offset)		((offset) + 0x14)
-> +
-> +static void idxd_check_siov(struct idxd_device *idxd)
-> +{
-> +	struct pci_dev *pdev = idxd->pdev;
-> +	struct device *dev = &pdev->dev;
-> +	int dvsec;
-> +	u16 val16;
-> +	u32 val32;
-> +
-> +	dvsec = pci_find_ext_capability(pdev, PCI_DEVSEC_CAP);
-> +	pci_read_config_word(pdev, SIOVDVSEC1(dvsec), &val16);
-> +	if (val16 != PCI_VENDOR_ID_INTEL) {
-> +		dev_dbg(&pdev->dev, "DVSEC vendor id is not Intel\n");
-> +		return;
-> +	}
-> +
-> +	pci_read_config_word(pdev, SIOVDVSEC2(dvsec), &val16);
-> +	if (val16 != DVSECID) {
-> +		dev_dbg(&pdev->dev, "DVSEC ID is not SIOV\n");
-> +		return;
-> +	}
-> +
-> +	pci_read_config_dword(pdev, SIOVCAP(dvsec), &val32);
-> +	if ((val32 & 0x1) && idxd->hw.gen_cap.max_ims_mult) {
-> +		idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
-> +		dev_dbg(dev, "IMS size: %u\n", idxd->ims_size);
-> +		set_bit(IDXD_FLAG_SIOV_SUPPORTED, &idxd->flags);
-> +		dev_dbg(&pdev->dev, "IMS supported for device\n");
-> +		return;
-> +	}
-> +
-> +	dev_dbg(&pdev->dev, "SIOV unsupported for device\n");
+I expect you'll see all Intel drivers copying this code.
 
-It's really hard to find the code inside all of this dev_dbg()
-noise. But why is this capability check done in this driver? Is this
-capability stuff really IDXD specific or is the next device which
-supports this going to copy and pasta the above?
-
->  static void idxd_read_caps(struct idxd_device *idxd)
->  {
->  	struct device *dev = &idxd->pdev->dev;
-> @@ -253,6 +294,7 @@ static void idxd_read_caps(struct idxd_device *idxd)
->  	dev_dbg(dev, "max xfer size: %llu bytes\n", idxd->max_xfer_bytes);
->  	idxd->max_batch_size = 1U << idxd->hw.gen_cap.max_batch_shift;
->  	dev_dbg(dev, "max batch size: %u\n", idxd->max_batch_size);
-> +	idxd_check_siov(idxd);
->  	if (idxd->hw.gen_cap.config_en)
->  		set_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags);
->  
-> @@ -347,9 +389,19 @@ static int idxd_probe(struct idxd_device *idxd)
->  
->  	idxd->major = idxd_cdev_get_major(idxd);
->  
-> +	if (idxd->ims_size) {
-> +		rc = sbitmap_init_node(&idxd->ims_sbmap, idxd->ims_size, -1,
-> +				       GFP_KERNEL, dev_to_node(dev));
-> +		if (rc < 0)
-> +			goto sbitmap_fail;
-> +	}
-
-Ah, here the bitmap is allocated, but it's still completely unclear what
-it is used for.
-
-The subject line is misleading as hell. This does not add support, it's
-doing some magic capability checks and allocates stuff which nobody
-knows what it is used for.
-
-Thanks,
-
-        tglx
-
-
+Jason
