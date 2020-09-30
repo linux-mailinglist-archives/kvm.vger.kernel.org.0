@@ -2,92 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61E5827E118
-	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 08:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A31A727E212
+	for <lists+kvm@lfdr.de>; Wed, 30 Sep 2020 09:08:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725884AbgI3GaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 02:30:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20800 "EHLO
+        id S1728525AbgI3HIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 03:08:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55646 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725776AbgI3GaL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 02:30:11 -0400
+        by vger.kernel.org with ESMTP id S1728416AbgI3HId (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 03:08:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601447410;
+        s=mimecast20190719; t=1601449712;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j86M+7uzw2vXNKqDCk9DKrNbVH+omew22uwCG12+/cY=;
-        b=SOJeIr5zacf+uAUbm0JIVIgLZDRHUhU2X5PYJWjcvOHDdqu2TRB3WKrVovnfAk5JeG6nW7
-        ho+x+/HKXl94FP/mnuig423KAm5NswYbyqyO4jUsF16VzvL0ztLpiWlkxW2ZWnc2MLZtnH
-        APEzxNlhPVkHMtnyIrTGnUUWwDIXGx4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-PQjo6UqkMdudq7ZNTNbrXA-1; Wed, 30 Sep 2020 02:30:08 -0400
-X-MC-Unique: PQjo6UqkMdudq7ZNTNbrXA-1
-Received: by mail-wr1-f69.google.com with SMTP id g6so224334wrv.3
-        for <kvm@vger.kernel.org>; Tue, 29 Sep 2020 23:30:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j86M+7uzw2vXNKqDCk9DKrNbVH+omew22uwCG12+/cY=;
-        b=AB4fxVPABx1zUViy0htQcEh72B+xhhXHo3gP3cRAl5Rqa/A9dTlImUsclsX18qF43m
-         WExf/Z4xKXSVk7vSzpaEWNPVEj64o2GnPTviaJZbZs6zCEBaBGZ38zuAvNdfk265f6a4
-         UqUwH6WmFWKGwIepDhS9LqiRHMgwsgjBT4+nIpTkv2tZ85Y3ucPJcvcsY01/oRhjeuHH
-         V0oHCvLF6Sawjcb8oUGH7mmJNX2AGH4HKjKhpQrvBKC/6p5yReGR9aAEHj+rcdgHit1q
-         ULwdBaMRjyHjkNm5Wvm4ihjRpi2qs5NS/fgWxIT+9XeDqTwvmtONJ7Wg+9QwZQGd+GzA
-         F5/w==
-X-Gm-Message-State: AOAM531l/pGxU44R48TmrxfKOftTyU+DIXXDwTpKnA3Axbwc1qJlo7M/
-        PzO9owEuyAb909wpzGEB7TKtLZMSSRUHY8bm8bp+C8jDTk0YZLhkaQs24JNWkESLQuIaZtU3+wG
-        s6x9XWnh13bUz
-X-Received: by 2002:a5d:6691:: with SMTP id l17mr1305370wru.10.1601447407146;
-        Tue, 29 Sep 2020 23:30:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyASWaG3yl3m26xkbJUdvbhGIpEfJMjIX5qb3Td12Uo50xunQLlbIDptoRdxeQDVz3TMDgW1Q==
-X-Received: by 2002:a5d:6691:: with SMTP id l17mr1305344wru.10.1601447406965;
-        Tue, 29 Sep 2020 23:30:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:75e3:aaa7:77d6:f4e4? ([2001:b07:6468:f312:75e3:aaa7:77d6:f4e4])
-        by smtp.gmail.com with ESMTPSA id m13sm1022054wml.5.2020.09.29.23.30.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Sep 2020 23:30:06 -0700 (PDT)
-Subject: Re: [PATCH 00/22] Introduce the TDP MMU
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20200925212302.3979661-1-bgardon@google.com>
- <20200930061903.GD29659@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <13590996-ac0c-71bc-1946-7966fcbf94ba@redhat.com>
-Date:   Wed, 30 Sep 2020 08:30:05 +0200
+        bh=7kUs5d+Zsd2wY/LnTcUI6w/pXXOgggi3joJfi847hNg=;
+        b=cvhd22dhumvZ/cUjQgTWsVVhyi93SZsfDRfnqyYb0OJ5ZbzpmGyQ5Ewk9gAJPYrXJrA3gd
+        ERO10zIcoYcPOhE67Mxx3bCUb9/+FP1135WbmfzYshrNgG9jGxLa40bzt/JB16oNcz144S
+        KZjAngELpC5VbesOZiigKuqd49gBR98=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-e6i0tfBfOgCcVxw46at20Q-1; Wed, 30 Sep 2020 03:08:30 -0400
+X-MC-Unique: e6i0tfBfOgCcVxw46at20Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EBD51005E64;
+        Wed, 30 Sep 2020 07:08:28 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-148.ams2.redhat.com [10.36.112.148])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 34D5473678;
+        Wed, 30 Sep 2020 07:08:25 +0000 (UTC)
+Subject: Re: [PATCH v4 01/12] accel/tcg: Add stub for cpu_loop_exit()
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Fam Zheng <fam@euphon.net>,
+        Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>,
+        Keith Packard <keithp@keithp.com>
+References: <20200929224355.1224017-1-philmd@redhat.com>
+ <20200929224355.1224017-2-philmd@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <b8a687c8-248f-abc5-a046-37e6d84a21c8@redhat.com>
+Date:   Wed, 30 Sep 2020 09:08:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200930061903.GD29659@linux.intel.com>
+In-Reply-To: <20200929224355.1224017-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/20 08:19, Sean Christopherson wrote:
-> In case Paolo is feeling trigger happy, I'm going to try and get through the
-> second half of this series tomorrow.
+On 30/09/2020 00.43, Philippe Mathieu-Daudé wrote:
+> Since the support of SYS_READC in commit 8de702cb67 the
+> semihosting code is strongly depedent of the TCG accelerator
+> via a call to cpu_loop_exit().
+> 
+> Ideally we would only build semihosting support when TCG
+> is available, but unfortunately this is not trivial because
+> semihosting is used by many targets in different configurations.
+> For now add a simple stub to avoid link failure when building
+> with --disable-tcg:
+> 
+>   hw/semihosting/console.c:160: undefined reference to `cpu_loop_exit'
+> 
+> Cc: Keith Packard <keithp@keithp.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  accel/stubs/tcg-stub.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
+> index e4bbf997aa..1eec7fb90e 100644
+> --- a/accel/stubs/tcg-stub.c
+> +++ b/accel/stubs/tcg-stub.c
+> @@ -29,3 +29,8 @@ void *probe_access(CPUArchState *env, target_ulong addr, int size,
+>       /* Handled by hardware accelerator. */
+>       g_assert_not_reached();
+>  }
+> +
+> +void cpu_loop_exit(CPUState *cpu)
+> +{
+> +    g_assert_not_reached();
+> +}
+> 
 
-I'm indeed feeling trigger happy about this series, but I wasn't
-planning to include it in kvm.git this week.  I'll have my version
-posted by tomorrow, and I'll include some of your feedback already when
-it does not make incremental review too much harder.
-
-Paolo
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
