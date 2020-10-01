@@ -2,116 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D66728084F
-	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 22:18:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCC972808AE
+	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 22:45:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733006AbgJAUS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Oct 2020 16:18:26 -0400
-Received: from mail-io1-f79.google.com ([209.85.166.79]:45993 "EHLO
-        mail-io1-f79.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726671AbgJAUSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Oct 2020 16:18:25 -0400
-Received: by mail-io1-f79.google.com with SMTP id p65so4464660iod.12
-        for <kvm@vger.kernel.org>; Thu, 01 Oct 2020 13:18:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=OXIZsSnUOlc4gw4iyjdMyg6484OMYqcylRmSwR+4wSw=;
-        b=SkZzvGZu7ah05ESE3BgbcCr3F6/Ocivz5YKBwqzZOxhBcP6A/l3xWNVko/TO29xcrr
-         UWeAmgTm6QaVunfNVxN43suwXtUyI6vY/SJAY1QcxwXt/vYpo3BXJ4PglvfBz2I4IPGc
-         H2m6sDpL+fiPVpQOy3YKolVEGW7JBz2ZlMeHKqhGesJyYeXizlldu+5ZPKxFO8z8udqF
-         gRqz4EkLqhn76J90WyZ8pVgEgDGUH3TO6f5Q0P/zTG7Wk51AMIyd/AAG2PwBCgLhObeF
-         vkKuTDvRo4St7/Jz67E9VwqU8w83/tc7tfPHT0Glax8O1Ju4Utt9TkPvNOUSeVBQyJ6x
-         l4Dw==
-X-Gm-Message-State: AOAM530kb45KULMhTqYSCub4jUvJJXXwso8pb5P4mprvg350DNmprveE
-        gC8khvoH4g02jdxT+jCaDoX7FDqp7/Fw7+gkPH+imN95Irbh
-X-Google-Smtp-Source: ABdhPJwT/dpYIRCW3/PoHCOUt9O1bS/nQ9SMyEkaCehe2TanjqOnWqQbBKb5eZrQlzsed5b2jOZsjZDiHJWLKEX47Ksdg2cuvdi/
-MIME-Version: 1.0
-X-Received: by 2002:a5e:820d:: with SMTP id l13mr6866782iom.3.1601583504502;
- Thu, 01 Oct 2020 13:18:24 -0700 (PDT)
-Date:   Thu, 01 Oct 2020 13:18:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000dd392b05b0a1b7ac@google.com>
-Subject: WARNING in handle_exception_nmi
-From:   syzbot <syzbot+4e78ae6b12b00b9d1042@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        id S1733256AbgJAUoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Oct 2020 16:44:09 -0400
+Received: from mga11.intel.com ([192.55.52.93]:58726 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733064AbgJAUnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Oct 2020 16:43:16 -0400
+IronPort-SDR: fza0v1cjHYKP6SqAW60YTJKuwKoYpQuNhb/YIARKPxMNCjZvZ97rfWamEVkEjmbGwfHsVRVIJi
+ nw37Acklo+2Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9761"; a="160170701"
+X-IronPort-AV: E=Sophos;i="5.77,325,1596524400"; 
+   d="scan'208";a="160170701"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2020 13:42:51 -0700
+IronPort-SDR: JT3cW7si4Isk6UuP3TJx5OsaCMJyGh1CNUi+kkrWKavd7ITA25Gy+gTjjqZWdjpg5JrNMIm9OC
+ UKoMZJNULj8Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,325,1596524400"; 
+   d="scan'208";a="351297026"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Oct 2020 13:42:51 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     tglx@linutronix.de, mingo@kernel.org, bp@suse.de, luto@kernel.org,
         x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     len.brown@intel.com, dave.hansen@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        chang.seok.bae@intel.com, kvm@vger.kernel.org
+Subject: [RFC PATCH 01/22] x86/fpu/xstate: Modify area init helper prototypes to access all the possible areas
+Date:   Thu,  1 Oct 2020 13:38:52 -0700
+Message-Id: <20201001203913.9125-2-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201001203913.9125-1-chang.seok.bae@intel.com>
+References: <20201001203913.9125-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+The xstate infrastructure is not flexible to support dynamic areas in
+task->fpu. Change the fpstate_init() prototype to access task->fpu
+directly. It treats a null pointer as indicating init_fpstate, as this
+initial data does not belong to any task. For the compacted format,
+fpstate_init_xstate() now accepts the state component bitmap to configure
+XCOMP_BV.
 
-syzbot found the following issue on:
+No functional change.
 
-HEAD commit:    fb0155a0 Merge tag 'nfs-for-5.9-3' of git://git.linux-nfs...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11a7329d900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=adebb40048274f92
-dashboard link: https://syzkaller.appspot.com/bug?extid=4e78ae6b12b00b9d1042
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=173937ad900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1041373d900000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4e78ae6b12b00b9d1042@syzkaller.appspotmail.com
-
-L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 6854 at arch/x86/kvm/vmx/vmx.c:4809 handle_exception_nmi+0x1051/0x12a0 arch/x86/kvm/vmx/vmx.c:4809
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 6854 Comm: syz-executor665 Not tainted 5.9.0-rc7-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1d6/0x29e lib/dump_stack.c:118
- panic+0x2c0/0x800 kernel/panic.c:231
- __warn+0x227/0x250 kernel/panic.c:600
- report_bug+0x1b1/0x2e0 lib/bug.c:198
- handle_bug+0x42/0x80 arch/x86/kernel/traps.c:234
- exc_invalid_op+0x16/0x40 arch/x86/kernel/traps.c:254
- asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:536
-RIP: 0010:handle_exception_nmi+0x1051/0x12a0 arch/x86/kvm/vmx/vmx.c:4809
-Code: fd 98 00 e9 17 f1 ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c da f0 ff ff 48 89 df e8 a9 fd 98 00 e9 cd f0 ff ff e8 1f 19 59 00 <0f> 0b e9 e0 f6 ff ff 89 d1 80 e1 07 80 c1 03 38 c1 0f 8c f4 f1 ff
-RSP: 0018:ffffc90000e979b0 EFLAGS: 00010293
-RAX: ffffffff811be461 RBX: fffffffffffffff8 RCX: ffff888091f42200
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000001
-RBP: 0000000000000000 R08: ffffffff811bdb3a R09: ffffed1014faf071
-R10: ffffed1014faf071 R11: 0000000000000000 R12: ffff8880a7d78380
-R13: 1ffff11014faf026 R14: ffff8880a7d78040 R15: 0000000000000002
- vcpu_enter_guest+0x6725/0x8a50 arch/x86/kvm/x86.c:8655
- vcpu_run+0x332/0xc00 arch/x86/kvm/x86.c:8720
- kvm_arch_vcpu_ioctl_run+0x451/0x8f0 arch/x86/kvm/x86.c:8937
- kvm_vcpu_ioctl+0x64f/0xa50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3230
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:739
- do_syscall_64+0x31/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x443bb9
-Code: e8 dc a3 02 00 48 83 c4 18 c3 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 db 00 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007fff4f9aff08 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 0000000000443bb9
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-RBP: 00000000006ce018 R08: 0000000000000000 R09: 00000000004002c8
-R10: 0000000000000012 R11: 0000000000000246 R12: 0000000000404120
-R13: 00000000004041b0 R14: 0000000000000000 R15: 0000000000000000
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
-
-
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Reviewed-by: Len Brown <len.brown@intel.com>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ arch/x86/include/asm/fpu/internal.h |  6 +++---
+ arch/x86/kernel/fpu/core.c          | 14 +++++++++++---
+ arch/x86/kernel/fpu/init.c          |  2 +-
+ arch/x86/kernel/fpu/regset.c        |  2 +-
+ arch/x86/kernel/fpu/xstate.c        |  3 +--
+ arch/x86/kvm/x86.c                  |  2 +-
+ 6 files changed, 18 insertions(+), 11 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 0a460f2a3f90..c404fedf1a75 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -79,20 +79,20 @@ static __always_inline __pure bool use_fxsr(void)
+ 
+ extern union fpregs_state init_fpstate;
+ 
+-extern void fpstate_init(union fpregs_state *state);
++extern void fpstate_init(struct fpu *fpu);
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+ #else
+ static inline void fpstate_init_soft(struct swregs_state *soft) {}
+ #endif
+ 
+-static inline void fpstate_init_xstate(struct xregs_state *xsave)
++static inline void fpstate_init_xstate(struct xregs_state *xsave, u64 xcomp_mask)
+ {
+ 	/*
+ 	 * XRSTORS requires these bits set in xcomp_bv, or it will
+ 	 * trigger #GP:
+ 	 */
+-	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xfeatures_mask_all;
++	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xcomp_mask;
+ }
+ 
+ static inline void fpstate_init_fxstate(struct fxregs_state *fx)
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index eb86a2b831b1..41d926c76615 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -191,8 +191,16 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
+ 	fp->fos = 0xffff0000u;
+ }
+ 
+-void fpstate_init(union fpregs_state *state)
++/* If a null pointer is given, assume to take the initial FPU state, init_fpstate. */
++void fpstate_init(struct fpu *fpu)
+ {
++	union fpregs_state *state;
++
++	if (fpu)
++		state = &fpu->state;
++	else
++		state = &init_fpstate;
++
+ 	if (!static_cpu_has(X86_FEATURE_FPU)) {
+ 		fpstate_init_soft(&state->soft);
+ 		return;
+@@ -201,7 +209,7 @@ void fpstate_init(union fpregs_state *state)
+ 	memset(state, 0, fpu_kernel_xstate_size);
+ 
+ 	if (static_cpu_has(X86_FEATURE_XSAVES))
+-		fpstate_init_xstate(&state->xsave);
++		fpstate_init_xstate(&state->xsave, xfeatures_mask_all);
+ 	if (static_cpu_has(X86_FEATURE_FXSR))
+ 		fpstate_init_fxstate(&state->fxsave);
+ 	else
+@@ -261,7 +269,7 @@ static void fpu__initialize(struct fpu *fpu)
+ 	WARN_ON_FPU(fpu != &current->thread.fpu);
+ 
+ 	set_thread_flag(TIF_NEED_FPU_LOAD);
+-	fpstate_init(&fpu->state);
++	fpstate_init(fpu);
+ 	trace_x86_fpu_init_state(fpu);
+ }
+ 
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 61ddc3a5e5c2..4e89a2698cfb 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -125,7 +125,7 @@ static void __init fpu__init_system_generic(void)
+ 	 * Set up the legacy init FPU context. (xstate init might overwrite this
+ 	 * with a more modern format, if the CPU supports it.)
+ 	 */
+-	fpstate_init(&init_fpstate);
++	fpstate_init(NULL);
+ 
+ 	fpu__init_system_mxcsr();
+ }
+diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
+index c413756ba89f..4c4d9059ff36 100644
+--- a/arch/x86/kernel/fpu/regset.c
++++ b/arch/x86/kernel/fpu/regset.c
+@@ -144,7 +144,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
+ 	 * In case of failure, mark all states as init:
+ 	 */
+ 	if (ret)
+-		fpstate_init(&fpu->state);
++		fpstate_init(fpu);
+ 
+ 	return ret;
+ }
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index 038e19c0019e..ee4946c60ab1 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -454,8 +454,7 @@ static void __init setup_init_fpu_buf(void)
+ 	print_xstate_features();
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+-		init_fpstate.xsave.header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+-						     xfeatures_mask_all;
++		fpstate_init_xstate(&init_fpstate.xsave, xfeatures_mask_all);
+ 
+ 	/*
+ 	 * Init all the features state with header.xfeatures being 0x0
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ce856e0ece84..9da8cb4b8589 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9448,7 +9448,7 @@ static int sync_regs(struct kvm_vcpu *vcpu)
+ 
+ static void fx_init(struct kvm_vcpu *vcpu)
+ {
+-	fpstate_init(&vcpu->arch.guest_fpu->state);
++	fpstate_init(vcpu->arch.guest_fpu);
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+ 			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+-- 
+2.17.1
+
