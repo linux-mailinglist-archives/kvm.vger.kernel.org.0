@@ -2,77 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01E5227F6D1
-	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 02:42:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01B3827F6DF
+	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 02:50:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732187AbgJAAmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Sep 2020 20:42:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57397 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731339AbgJAAmX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Sep 2020 20:42:23 -0400
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601512942;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1dZAHWtiKSMf8mYBi0q5UFXISwoH04KbR1oFeQ0MPNQ=;
-        b=P2vZSEdwV0+DCsqwpeMnsKgnO0B2BK7jSd7MxDNZDFkN7pYYtNyXvmQZgkyDOGNPxVsPp8
-        DC5W19PzR29mEbNvFnNcsqN+qLRzull3BeyOEWfgYjNdZvYTQbx3SjQq/4K1WaZvVyrXOU
-        0IhSDTXobFevQjHcXey/LXiWs7E6/Ac=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-QX91XpIaOH22LGKwJB44Wg-1; Wed, 30 Sep 2020 20:42:18 -0400
-X-MC-Unique: QX91XpIaOH22LGKwJB44Wg-1
-Received: by mail-qt1-f198.google.com with SMTP id 7so2438300qtp.18
-        for <kvm@vger.kernel.org>; Wed, 30 Sep 2020 17:42:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1dZAHWtiKSMf8mYBi0q5UFXISwoH04KbR1oFeQ0MPNQ=;
-        b=g11s5zawbV/Nt7WrPO8hdJkrdURh+zFjXkz+81bLNo11fmMGw/FnKJbYSkI3f6A2Ni
-         wdK2/G4w5DuVkqry0RJCQcXT3yNH30QN4W/5e8NhCNi7Nq0AEuPlK8AJt0io0vQ36qua
-         HFjtaKW0oN/fR/azbohoXhDkW9MxXBNfAtUX8sS/voVuzI5lidK2M9oo8W32Umxg+NDb
-         tOK/VI+NYFqHmEuqGYDxoKgxYSpzMHI6+rW6tO1v68AFiogjL2DmiDJwZMb40sZh4n6A
-         yAxiRMV3DI7tpvaXQhte75rePiEB1vkLLQy0gf2PRnTh5A2Xs/Y3CgcoK1ILoglkKre8
-         mi8g==
-X-Gm-Message-State: AOAM530iPWY+30vA2HhMtLxCzVQgT2grxhQ9TUqGlYw/Vzn5h1V01n2R
-        9oyZWM1rUNQT7kbWxATkMLXXyBSpJtMpAS/HPn+5rZvBS59gmMufSHqz06h618FEiKQd4zEpYe+
-        RxS6IN2n6HWyL
-X-Received: by 2002:a05:620a:b18:: with SMTP id t24mr5452563qkg.401.1601512937986;
-        Wed, 30 Sep 2020 17:42:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyIDSvnLGUwNL+2BLIEvn9OGWviDasq6qOhSb244j0gvhx6q/5RSZ+zbvBvAe8dG2VfZreS1Q==
-X-Received: by 2002:a05:620a:b18:: with SMTP id t24mr5452548qkg.401.1601512937723;
-        Wed, 30 Sep 2020 17:42:17 -0700 (PDT)
-Received: from xz-x1 (toroon474qw-lp130-09-184-147-14-204.dsl.bell.ca. [184.147.14.204])
-        by smtp.gmail.com with ESMTPSA id y46sm4602375qtc.30.2020.09.30.17.42.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2020 17:42:17 -0700 (PDT)
-Date:   Wed, 30 Sep 2020 20:42:18 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v12 00/13] KVM: Dirty ring interface
-Message-ID: <20201001004218.GA6063@xz-x1>
-References: <20200930214948.47225-1-peterx@redhat.com>
+        id S1732261AbgJAAuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Sep 2020 20:50:50 -0400
+Received: from mga06.intel.com ([134.134.136.31]:16253 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730155AbgJAAuu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Sep 2020 20:50:50 -0400
+IronPort-SDR: XwDaK8Pu50MlxwFJaFtHbBExUmA+wfVVhNI8gli80t2g/kg00rRG7+ezGIV0gqiN2Qqjk+WkgH
+ osM1/PPgHaag==
+X-IronPort-AV: E=McAfee;i="6000,8403,9760"; a="224191697"
+X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
+   d="scan'208";a="224191697"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2020 17:50:45 -0700
+IronPort-SDR: zzWp8FNr668IQ5GQjFyU9cpz1qcqsFaxhqS8h+vAZG1QMbrKPCDAvRVwG33Hqt/5YcL62YFy3S
+ IHF6BJWOtNXQ==
+X-IronPort-AV: E=Sophos;i="5.77,322,1596524400"; 
+   d="scan'208";a="351734009"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2020 17:50:43 -0700
+Date:   Wed, 30 Sep 2020 17:50:42 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH 3/4 v2] KVM: nSVM: Test non-MBZ reserved bits in CR3 in
+ long mode
+Message-ID: <20201001005041.GE2988@linux.intel.com>
+References: <20200928072043.9359-1-krish.sadhukhan@oracle.com>
+ <20200928072043.9359-4-krish.sadhukhan@oracle.com>
+ <20200929031154.GC31514@linux.intel.com>
+ <5f236941-5086-167a-6518-6191d8ef04cf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200930214948.47225-1-peterx@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5f236941-5086-167a-6518-6191d8ef04cf@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 30, 2020 at 05:49:35PM -0400, Peter Xu wrote:
-> - rebase
+On Wed, Sep 30, 2020 at 05:29:24PM -0700, Krish Sadhukhan wrote:
+> 
+> On 9/28/20 8:11 PM, Sean Christopherson wrote:
+> >On Mon, Sep 28, 2020 at 07:20:42AM +0000, Krish Sadhukhan wrote:
+> >>According to section "CR3" in APM vol. 2, the non-MBZ reserved bits in CR3
+> >>need to be set by software as follows:
+> >>
+> >>	"Reserved Bits. Reserved fields should be cleared to 0 by software
+> >>	when writing CR3."
+> >Nothing in the shortlog or changelog actually states what this patch does.
+> >"Test non-MBZ reserved bits in CR3 in long mode" is rather ambiguous, and
+> >IIUC, the changelog is straight up misleading.
+> >
+> >Based on the discussion from v1, I _think_ this test verifies that KVM does
+> >_not_ fail nested VMRUN if non-MBZ bits are set, correct?
+> 
+> Not KVM, hardware rather.  Hardware doesn't consider it as an invalid guest
+> state if non-MBZ reserved bits are set.
+> >
+> >If so, then something like:
+> >
+> >   KVM: nSVM: Verify non-MBZ CR3 reserved bits can be set in long mode
+> >
+> >with further explanation in the changelog would be very helpful.
+> 
+> Even though the non-MBZ reserved bits are ignored by the consistency checks
+> in hardware, eventually page-table walks fail. So, I am wondering whether it
 
-I made the same mistake again on rebasing to 5.9-rc7 rather than kvm/queue.
-Doing it again.  Sorry for the noise.
+Page table walks fail how?  Are you referring to forcing the #NPF, or does
+the CPU puke on the non-MBZ reserved bits at some point?
 
--- 
-Peter Xu
+> is appropriate to say,
+> 
+>             "Verify non-MBZ CR3 reserved bits can be set in long mode"
+> 
+> because the test is inducing an artificial failure even before any guest
+> instruction is executed. We are not entering the guest with these bits set.
 
+Yes we are, unless I'm misunderstanding how SVM handles VMRUN.  "entering" the
+guest does not mean successfully executing guest code, it means loading guest
+state and completing the world switch.  I don't think I'm misunderstanding,
+because the test explicitly clears the NPT PML4[0]'s present bit to induce a
+#NPF.  That means the CPU is fetching instructions, and again unless there's
+details about NPT that I'm missing, the fact that the test sees a #NPF means
+that the CPU successfully completed the GVA->GPA translation using the "bad"
+CR3.
+
+> I prefer to keep the commit header as is and rather expand the commit
+> message to explain what I have described here. How about that ?
+
+That's fine, so long as it documents both what the test is actually verifying
+and what is/isn't legal.
