@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4F2527FFF9
-	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 15:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91D41280009
+	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 15:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732361AbgJANVo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Oct 2020 09:21:44 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:8510 "EHLO
+        id S1732353AbgJANYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Oct 2020 09:24:02 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:8749 "EHLO
         hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731993AbgJANVj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Oct 2020 09:21:39 -0400
+        with ESMTP id S1731993AbgJANX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Oct 2020 09:23:59 -0400
 Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f75d77b0000>; Thu, 01 Oct 2020 06:19:55 -0700
+        id <B5f75d8070000>; Thu, 01 Oct 2020 06:22:15 -0700
 Received: from mtl-vdi-166.wap.labs.mlnx (10.124.1.5) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 1 Oct
- 2020 13:21:27 +0000
-Date:   Thu, 1 Oct 2020 16:21:24 +0300
+ 2020 13:23:35 +0000
+Date:   Thu, 1 Oct 2020 16:23:31 +0300
 From:   Eli Cohen <elic@nvidia.com>
 To:     Jason Wang <jasowang@redhat.com>
 CC:     <mst@redhat.com>, <lulu@redhat.com>, <kvm@vger.kernel.org>,
@@ -24,11 +24,11 @@ CC:     <mst@redhat.com>, <lulu@redhat.com>, <kvm@vger.kernel.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <rob.miller@broadcom.com>, <lingshan.zhu@intel.com>,
         <eperezma@redhat.com>, <hanand@xilinx.com>,
-        <mhabets@solarflare.com>, <elic@nvidia.com>, <amorenoz@redhat.com>,
-        <maxime.coquelin@redhat.com>, <stefanha@redhat.com>,
-        <sgarzare@redhat.com>
+        <mhabets@solarflare.com>, <eli@mellanox.com>,
+        <amorenoz@redhat.com>, <maxime.coquelin@redhat.com>,
+        <stefanha@redhat.com>, <sgarzare@redhat.com>
 Subject: Re: [RFC PATCH 09/24] vdpa: multiple address spaces support
-Message-ID: <20201001132124.GA32363@mtl-vdi-166.wap.labs.mlnx>
+Message-ID: <20201001132331.GB32363@mtl-vdi-166.wap.labs.mlnx>
 References: <20200924032125.18619-1-jasowang@redhat.com>
  <20200924032125.18619-10-jasowang@redhat.com>
 MIME-Version: 1.0
@@ -40,16 +40,16 @@ X-Originating-IP: [10.124.1.5]
 X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
  HQMAIL107.nvidia.com (172.20.187.13)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1601558395; bh=JVGGQlso0zbstvS5VRI/Znfgr/hkwvr0Uer+8mHFvcs=;
+        t=1601558535; bh=kp/Ocq6z65dn7EOpaMsVskaU2OGuaUVeh2bPnEWOIpI=;
         h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
          Content-Type:Content-Disposition:In-Reply-To:User-Agent:
          X-Originating-IP:X-ClientProxiedBy;
-        b=f4nKLsrWsZcO8XTxjVzU5+a6oPX+qAKeuZEdYlv5LJbywED2+I/ubG3Xs+0ODBOms
-         C1o0l/272nL9NAQbsQYd9rX11XIfpSjBalHjLsNtwxc9G7LaJ96QzHfM7fCUTGh/47
-         TaWh86mIsaRSxL7/I/TGUGB2uhqUrb0OuZzgM9LA1uYq1OJj4zzfVpDixDYmcpKzZ9
-         GBcvAFtQQjMlG8AWTSriQf5svKX5xl6pruKRTNWT8khDzXl8Kx6stfHtoIzdsqMZEA
-         6+FSq2mOVmFNlkX+ts/YfC1Q5CB98ght5cHcB/Kfm4Y0LpvUpvhqo5sY0AlZPRj2Jl
-         4IZymXooKZJpw==
+        b=IVA6kUSf73Dklq4/Dc+9WYaQhsmIdekvyfqu4XLfbwZhp959WwZyM7y54TXjmdO/O
+         /WgnmIFLbPWHmF5Qg+jXWSIPOyfgvB1T8rC/1Zk/Up3X1MMrGTz9sdvVlg/bQDEUuX
+         U5adTh20iNBoxROF67eg4qkln+1Evn/BMlI+54CghIYI36oqKe10UG+UOT0KDI1ekt
+         0PB+DS+RCrTKXJgWUU1uqeGug2tz3jSuEBSFfk3cW64O7HwytNlUwwyuVszAY82Reu
+         PadVxSlfRp2qilE7Yh0mr2z2lhdbHx37CxUEsEf92AVgFqHfsdMiUflLzXmNp+qOPl
+         HqQth9XQpq0KA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -70,10 +70,6 @@ On Thu, Sep 24, 2020 at 11:21:10AM +0800, Jason Wang wrote:
 > This RFC patch only converts for the device that wants its own
 > IOMMU/DMA translation logic. So it will rejects the device with more
 > that 1 address space that depends on platform IOMMU. The plan to
-
-This is not apparent from the code. Instead you enforce number of groups
-to 1.
-
 > moving all the DMA mapping logic to the vDPA device driver instead of
 > doing it in vhost-vDPA (otherwise it could result a very complicated
 > APIs and actually vhost-vDPA doesn't care about how the actual
@@ -242,10 +238,10 @@ to 1.
 > +	/* Only support 1 address space */
 > +	if (vdpa->ngroups != 1)
 > +		return -ENOTSUPP;
+
+Checkpatch warning:  prefer EOPNOTSUPP
+
 > +
-
-Did you mean to check agains vdpa->nas?
-
 >  	/* Currently, we only accept the network devices. */
 >  	if (ops->get_device_id(vdpa) != VIRTIO_ID_NET)
 >  		return -ENOTSUPP;
