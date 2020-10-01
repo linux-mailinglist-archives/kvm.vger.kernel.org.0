@@ -2,116 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 232F327FDB1
-	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 12:50:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F06AD27FE3C
+	for <lists+kvm@lfdr.de>; Thu,  1 Oct 2020 13:20:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732116AbgJAKuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Oct 2020 06:50:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49522 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731131AbgJAKuy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Oct 2020 06:50:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601549453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QjFX6e9cghTx7DqhRBG3J6jv+MSt+PanN5FRPWF2tkg=;
-        b=aLwRh/dG9KA2x9Mvc4pzsSM7qI8hoJigGEjpW27oayGAGq+U9wSMi6oHLKOLyBu/zlpCuT
-        L9H7GmtqyXAQSqJ0wzATcuVC4K0n6wmWPaMxlBM5ZHETcUFMy6xb7zzruDt3jfne8IOgEn
-        JipWt+vog5YFs6u4CvW/IyhOJ9R3VYg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-GylfmTUBOmuS5bdSke_o2g-1; Thu, 01 Oct 2020 06:50:51 -0400
-X-MC-Unique: GylfmTUBOmuS5bdSke_o2g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB0C2186DD27
-        for <kvm@vger.kernel.org>; Thu,  1 Oct 2020 10:50:50 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-107.ams2.redhat.com [10.36.112.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CED8C100238C;
-        Thu,  1 Oct 2020 10:50:49 +0000 (UTC)
-Subject: Re: [PATCH v2 5/7] arm/pmu: Fix inline assembly for Clang
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, lvivier@redhat.com
-References: <20201001072234.143703-1-thuth@redhat.com>
- <20201001072234.143703-6-thuth@redhat.com>
- <20201001091239.cfuazqd6ear726pd@kamzik.brq.redhat.com>
- <20201001091435.vhpkrogomzqmihpm@kamzik.brq.redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <331cdf48-d406-1a86-f929-c18f102f339c@redhat.com>
-Date:   Thu, 1 Oct 2020 12:50:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1731816AbgJALU0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Oct 2020 07:20:26 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55235 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731134AbgJALU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Oct 2020 07:20:26 -0400
+Received: by mail-wm1-f68.google.com with SMTP id s13so2486034wmh.4;
+        Thu, 01 Oct 2020 04:20:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=kZt2zy/Lwar12EpzsAU+4I+PUix2uePSQ1boZKXlZbM=;
+        b=B+hp5AXvO+qvWEMhpHX10f+zMcOxZDHJvY+z8gF+vQLDc3H2wHIXZwC9jEDbZtvMtO
+         WUyDG9eUlKGijywFeNxxJrs/iK0KyTSn3pF7KNjTxlHvBFafmA/zm6Qqyb/fClEmNtqe
+         5HOtDO9mDFg3cPLt11QL5uFMNb/Si8H9pwrByx0WQ646hPJFsfetIwYd3ew8caGv1cCw
+         IXAz5xMTKo4whPm4w0nM+Z+S7Y/m2aufogjGvwxiS6ef1S905/O7KUyg+6FE+Wh7YAwJ
+         0n+uEw5s4v4c6g0IxilMpc5c1/MXCzJ64xUtpfq+u6Logkwbj2KF7qSZx88cC/JKg5lV
+         rrrA==
+X-Gm-Message-State: AOAM530V96R8dytvswaNBtmnMfvpbIG7vFrdLnHrAh6CmQuVxStZ3Qyz
+        UbJqDmEWJP451oSMigD77xmCaks6Ppw=
+X-Google-Smtp-Source: ABdhPJxkB1EfFW+sdX3dph2xmIMIlse6uAZJ5j9V/jkkxdGL2OujglwQsUXsdaNBzRAi0Zsl1b3rfA==
+X-Received: by 2002:a7b:c958:: with SMTP id i24mr8349585wml.50.1601551221189;
+        Thu, 01 Oct 2020 04:20:21 -0700 (PDT)
+Received: from msft-t490s.teknoraver.net (net-5-95-179-222.cust.vodafonedsl.it. [5.95.179.222])
+        by smtp.gmail.com with ESMTPSA id r14sm8406689wrn.56.2020.10.01.04.20.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Oct 2020 04:20:20 -0700 (PDT)
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH] x86/kvm: hide KVM options from menuconfig when KVM is not compiled
+Date:   Thu,  1 Oct 2020 13:20:14 +0200
+Message-Id: <20201001112014.9561-1-mcroce@linux.microsoft.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20201001091435.vhpkrogomzqmihpm@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/10/2020 11.14, Andrew Jones wrote:
-> On Thu, Oct 01, 2020 at 11:12:43AM +0200, Andrew Jones wrote:
->> On Thu, Oct 01, 2020 at 09:22:32AM +0200, Thomas Huth wrote:
->>> Clang complains here:
->>>
->>> arm/pmu.c:201:16: error: value size does not match register size specified by
->>>  the constraint and modifier [-Werror,-Wasm-operand-widths]
->>>         : [pmcr] "r" (pmcr)
->>>                       ^
->>> arm/pmu.c:194:18: note: use constraint modifier "w"
->>>         "       msr     pmcr_el0, %[pmcr]\n"
->>>                                   ^~~~~~~
->>>                                   %w[pmcr]
->>> arm/pmu.c:200:17: error: value size does not match register size specified by
->>>  the constraint and modifier [-Werror,-Wasm-operand-widths]
->>>         : [loop] "+r" (loop)
->>>                        ^
->>> arm/pmu.c:196:11: note: use constraint modifier "w"
->>>         "1:     subs    %[loop], %[loop], #1\n"
->>>                         ^~~~~~~
->>>                         %w[loop]
->>> arm/pmu.c:200:17: error: value size does not match register size specified by
->>>  the constraint and modifier [-Werror,-Wasm-operand-widths]
->>>         : [loop] "+r" (loop)
->>>                        ^
->>> arm/pmu.c:196:20: note: use constraint modifier "w"
->>>         "1:     subs    %[loop], %[loop], #1\n"
->>>                                  ^~~~~~~
->>>                                  %w[loop]
->>> arm/pmu.c:284:35: error: value size does not match register size specified
->>>  by the constraint and modifier [-Werror,-Wasm-operand-widths]
->>>         : [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
->>>                                          ^
->>> arm/pmu.c:274:28: note: use constraint modifier "w"
->>>         "       msr     pmcr_el0, %[pmcr]\n"
->>>                                   ^~~~~~~
->>>                                   %w[pmcr]
->>> arm/pmu.c:284:54: error: value size does not match register size specified
->>>  by the constraint and modifier [-Werror,-Wasm-operand-widths]
->>>         : [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
->>>                                                             ^
->>> arm/pmu.c:276:23: note: use constraint modifier "w"
->>>         "       mov     x10, %[loop]\n"
->>>                              ^~~~~~~
->>>                              %w[loop]
->>>
->>> pmcr should be 64-bit since it is a sysreg, but for loop we can use the
->>> "w" modifier.
->>>
->>> Suggested-by: Drew Jones <drjones@redhat.com>
-> 
-> Not a huge deal, but I use my official first name 'Andrew' on my tags.
-> I know, I like confusing people by flipping back and forth between
-> Andrew and Drew...
+From: Matteo Croce <mcroce@microsoft.com>
 
-Sorry, IIRC I simply copy-n-pasted your name and e-mail address from the
-MAINTAINERS file ... maybe you should fix it there to avoid such situations?
+Let KVM_WERROR depend on KVM, so it doesn't show in menuconfig alone.
 
- Thomas
+Signed-off-by: Matteo Croce <mcroce@microsoft.com>
+---
+ arch/x86/kvm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index fbd5bd7a945a..f92dfd8ef10d 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -66,6 +66,7 @@ config KVM_WERROR
+ 	default y if X86_64 && !KASAN
+ 	# We use the dependency on !COMPILE_TEST to not be enabled
+ 	# blindly in allmodconfig or allyesconfig configurations
++	depends on KVM
+ 	depends on (X86_64 && !KASAN) || !COMPILE_TEST
+ 	depends on EXPERT
+ 	help
+-- 
+2.26.2
 
