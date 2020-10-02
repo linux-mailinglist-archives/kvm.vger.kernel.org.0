@@ -2,212 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 611C1281C83
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 22:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 103C0281C8B
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 22:06:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725836AbgJBUCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 16:02:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40570 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725446AbgJBUCX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 16:02:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601668941;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cmmt6ukcvMZBYZywRswM35DlTDZ0Ae8+OR9cm9+v1p8=;
-        b=QI3gijQJJ9B+0YJoiMH0GrAPiXse6rvn0JppxJmJ6Ce9u3UlWR/KGfQXpaUjY/zOEHJmo0
-        e0QcxwkixDYYe9OKKPEXVvBlZus1tV4iK050+S4pIAWA/mIcYawpOvIcxPyFo+3Gm0nDKo
-        JQrQYQJfLxhdwixAUxtXCxMc4o01tY4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-tupgEu_OM4CswgZR7ONbqA-1; Fri, 02 Oct 2020 16:02:19 -0400
-X-MC-Unique: tupgEu_OM4CswgZR7ONbqA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44992640A9;
-        Fri,  2 Oct 2020 20:02:18 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-130.rdu2.redhat.com [10.10.115.130])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C3A195D9D5;
-        Fri,  2 Oct 2020 20:02:14 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 4F6A1224B7D; Fri,  2 Oct 2020 16:02:14 -0400 (EDT)
-Date:   Fri, 2 Oct 2020 16:02:14 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtio-fs-list <virtio-fs@redhat.com>, vkuznets@redhat.com,
-        pbonzini@redhat.com
-Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
-Message-ID: <20201002200214.GB10232@redhat.com>
-References: <20200720211359.GF502563@redhat.com>
- <20200929043700.GL31514@linux.intel.com>
- <20201001215508.GD3522@redhat.com>
- <20201001223320.GI7474@linux.intel.com>
- <20201002153854.GC3119@redhat.com>
- <20201002183036.GB24460@linux.intel.com>
- <20201002192734.GD3119@redhat.com>
- <20201002194517.GD24460@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201002194517.GD24460@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        id S1725681AbgJBUGq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 16:06:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2858 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725446AbgJBUGq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 16:06:46 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 092K2Jav110817;
+        Fri, 2 Oct 2020 16:06:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=+JYwpC35tUm/nlFFYqmK4F+lxWr/aRuhCz48GQWyD0k=;
+ b=CB+/aRw/ks6mUxhkT5hiHsAWRzO9eYOgMLbgsTiSYg2H74wfiFGxhn+maRr+t3Z8DFcV
+ JloVp3PtycRqjdhjkG8QqJjH9TM46fvAx4ZfJ5TPi/6+gdNNSaCu/lF+B688hQCH9rzb
+ LezwrmnY9AGjD8Asbsv92/4W3E2k0FQVCIthrPymZSEQc5lr1K38kIHihSDESoHK3/NK
+ Xi4oaPVIPg5vuCoMpCh1ySHrFdq69osTbA8AXe+sRWun/CK8dvbLUb9HNWEAUlkeCwsH
+ K0kVTHxtj7ZIyN9OVuEeIBKYhLSPwsNFNPrF2rdKF6/tvtg9fZVIp+NvhUOEEDDAMD1F yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33xaqmrb0e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Oct 2020 16:06:37 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 092K5HvV125763;
+        Fri, 2 Oct 2020 16:06:37 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33xaqmrb05-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Oct 2020 16:06:37 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 092Jl8D5005732;
+        Fri, 2 Oct 2020 20:06:36 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma02wdc.us.ibm.com with ESMTP id 33sw9a09g2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Oct 2020 20:06:36 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 092K6VsO32833974
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 2 Oct 2020 20:06:31 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 46D7FBE054;
+        Fri,  2 Oct 2020 20:06:35 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F031BBE04F;
+        Fri,  2 Oct 2020 20:06:33 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.4.25])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri,  2 Oct 2020 20:06:33 +0000 (GMT)
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     cohuck@redhat.com, thuth@redhat.com
+Cc:     pmorel@linux.ibm.com, schnelle@linux.ibm.com, rth@twiddle.net,
+        david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+        mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com,
+        qemu-s390x@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: [PATCH v2 0/9] Retrieve zPCI hardware information from VFIO
+Date:   Fri,  2 Oct 2020 16:06:22 -0400
+Message-Id: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-02_14:2020-10-02,2020-10-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ mlxlogscore=999 mlxscore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 spamscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010020142
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 02, 2020 at 12:45:18PM -0700, Sean Christopherson wrote:
-> On Fri, Oct 02, 2020 at 03:27:34PM -0400, Vivek Goyal wrote:
-> > On Fri, Oct 02, 2020 at 11:30:37AM -0700, Sean Christopherson wrote:
-> > > On Fri, Oct 02, 2020 at 11:38:54AM -0400, Vivek Goyal wrote:
-> > > > On Thu, Oct 01, 2020 at 03:33:20PM -0700, Sean Christopherson wrote:
-> > > > > Alternatively, what about adding a new KVM request type to handle this?
-> > > > > E.g. when the APF comes back with -EFAULT, snapshot the GFN and make a
-> > > > > request.  The vCPU then gets kicked and exits to userspace.  Before exiting
-> > > > > to userspace, the request handler resets vcpu->arch.apf.error_gfn.  Bad GFNs
-> > > > > simply get if error_gfn is "valid", i.e. there's a pending request.
-> > > > 
-> > > > Sorry, I did not understand the above proposal. Can you please elaborate
-> > > > a bit more. Part of it is that I don't know much about KVM requests.
-> > > > Looking at the code it looks like that main loop is parsing if some
-> > > > kvm request is pending and executing that action.
-> > > > 
-> > > > Don't we want to make sure that we exit to user space when guest retries
-> > > > error gfn access again.
-> > > 
-> > > > In this case once we get -EFAULT, we will still inject page_ready into
-> > > > guest. And then either same process or a different process might run. 
-> > > > 
-> > > > So when exactly code raises a kvm request. If I raise it right when
-> > > > I get -EFAULT, then kvm will exit to user space upon next entry
-> > > > time. But there is no guarantee guest vcpu is running the process which
-> > > > actually accessed the error gfn. And that probably means that register
-> > > > state of cpu does not mean much and one can not easily figure out
-> > > > which task tried to access the bad memory and when.
-> > > > 
-> > > > That's why we prepare a list of error gfn and only exit to user space
-> > > > when error_gfn access is retried so that guest vcpu context is correct.
-> > > > 
-> > > > What am I missing?
-> > > 
-> > > I don't think it's necessary to provide userspace with the register state of
-> > > the guest task that hit the bad page.  Other than debugging, I don't see how
-> > > userspace can do anything useful which such information.
-> > 
-> > I think debugging is the whole point so that user can figure out which
-> > access by guest task resulted in bad memory access. I would think this
-> > will be important piece of information.
-> 
-> But isn't this failure due to a truncation in the host?  Why would we care
-> about debugging the guest?  It hasn't done anything wrong, has it?  Or am I
-> misunderstanding the original problem statement.
+This patchset exploits the VFIO ZPCI CLP region, which provides hardware
+information about passed-through s390 PCI devices that can be shared with
+the guest.
 
-I think you understood problem statement right. If guest has right
-context, it just gives additional information who tried to access
-the missing memory page. 
+The retrieval of this information is done once per function (and for a
+subset of data, once per function group) and is performed at time of device
+plug.  Some elements provided in the CLP region must still be forced to
+default values for now to reflect what QEMU actually provides support for.
 
-> 
-> > > To fully handle the situation, the guest needs to remove the bad page from
-> > > its memory pool.  Once the page is offlined, the guest kernel's error
-> > > handling will kick in when a task accesses the bad page (or nothing ever
-> > > touches the bad page again and everyone is happy).
-> > 
-> > This is not really a case of bad page as such. It is more of a page
-> > gone missing/trucated. And no new user can map it. We just need to
-> > worry about existing users who already have it mapped.
-> 
-> What do you mean by "no new user can map it"?  Are you talking about guest
-> tasks or host tasks?  If guest tasks, how would the guest know the page is
-> missing and thus prevent mapping the non-existent page?
+The original work for this feature was done by Pierre Morel.
 
-If a new task wants mmap(), it will send a request to virtiofsd/qemu
-on host. If file has been truncated, then mapping beyond file size
-will fail and process will get error.  So they will not be able to
-map a page which has been truncated.
+Associated kernel patchset:
+https://lkml.org/lkml/2020/10/2/981
 
-> 
-> > > Note, I'm not necessarily suggesting that QEMU piggyback its #MC injection
-> > > to handle this, but I suspect the resulting behavior will look quite similar,
-> > > e.g. notify the virtiofs driver in the guest, which does some magic to take
-> > > the offending region offline, and then guest tasks get SIGBUS or whatever.
-> > > 
-> > > I also don't think it's KVM's responsibility to _directly_ handle such a
-> > > scenario.  As I said in an earlier version, KVM can't possibly know _why_ a
-> > > page fault came back with -EFAULT, only userspace can connect the dots of
-> > > GPA -> HVA -> vm_area_struct -> file -> inject event.  KVM definitely should
-> > > exit to userspace on the -EFAULT instead of hanging the guest, but that can
-> > > be done via a new request, as suggested.
-> > 
-> > KVM atleast should have the mechanism to report this back to guest. And
-> > we don't have any. There only seems to be #MC stuff for poisoned pages.
-> > I am not sure how much we can build on top of #MC stuff to take care
-> > of this case. One problem with #MC I found was that it generates
-> > synchronous #MC only on load and not store. So all the code is
-> > written in such a way that synchronous #MC can happen only on load
-> > and hence the error handling. 
-> > 
-> > Stores generate different kind of #MC that too asynchronously and
-> > caller will not know about it immiditely. But in this case we need
-> > to know about error in the context of caller both for loads and stores.
-> > 
-> > Anyway, I agree that this patch does not solve the problem of race
-> > free synchronous event inject into the guest. That's something yet
-> > to be solved either by #VE or by #MC or by #foo.
-> > 
-> > This patch is only doing two things.
-> > 
-> > - Because we don't have a mechanism to report errors to guest, use
-> >   the second best method and exit to user space.
-> 
-> Not that it matters at this point, but IMO exiting to userspace is the
-> correct behavior, not simply "second best method".  Again, KVM by design
-> does not know what lies behind any given HVA, and therefore should not be
-> making decisions about how to handle bad HVAs.
->  
-> > - Make behavior consistent between synchronous fault and async faults.
-> >   Currently sync faults exit to user space on error while async
-> >    faults spin infinitely.
-> 
-> Yes, and this part can be done with a new request type.  Adding a new
-> request doesn't commit KVM to any ABI changes, e.g. userspace will still
-> see an -EFAULT return, and nothing more.  I.e. handling this via request
-> doesn't prevent switching to synchronous exits in the future, if such a
-> feature is required.
+Changes from v1:
+- Added 2 patches to the front of this set that move the s390-pci-bus.h and
+  s390-pci-inst.h files to include + associated MAINTAINERS hit.  These
+  can be applied separately, but are included here for the sake of
+  simplicity.
+- Patch 4: header update placeholder refreshed to rc7
+- Patch 5: Move new s390-pci-clp.h to include folder
+- Patch 6+: s/grp/group/ and fallout from this
+- Patch 9: Move new s390-pci-vfio.h to include folder
 
-I am really not sure what benfit this kvm request is bringing to the
-table. To me maintaining a hash table and exiting when guest retries
-is much nicer desgin. In fact, once we have the mechanism to
-inject error into the guest using an exception, We can easily plug
-that into the same path.
 
-If memory usage is a concern, we can reduce the hash table size to say
-4 or 8.
+Matthew Rosato (6):
+  s390x/pci: Move header files to include/hw/s390x
+  MAINTAINERS: Update s390 PCI entry to include headers
+  update-linux-headers: Add vfio_zdev.h
+  linux-headers: update against 5.9-rc7
+  s390x/pci: clean up s390 PCI groups
+  s390x/pci: get zPCI function info from host
 
-How is this change commiting KVM to an ABI?
+Pierre Morel (3):
+  s390x/pci: create a header dedicated to PCI CLP
+  s390x/pci: use a PCI Group structure
+  s390x/pci: use a PCI Function structure
 
-> 
-> > Once we have a method to report errors back to guest, then we first
-> > should report error back to guest. And only in the absense of such
-> > mechanism we should exit to user space.
-> 
-> I don't see the value in extending KVM's ABI to avoid the exit to userspace.
-> E.g. we could add a memslot flag to autoreflect -EFAULT as an event of some
-> form, but this is a slow path, the extra time should be a non-issue.
+ MAINTAINERS                                        |   1 +
+ hw/s390x/meson.build                               |   1 +
+ hw/s390x/s390-pci-bus.c                            |  86 ++++-
+ hw/s390x/s390-pci-bus.h                            | 372 --------------------
+ hw/s390x/s390-pci-inst.c                           |  33 +-
+ hw/s390x/s390-pci-inst.h                           | 312 -----------------
+ hw/s390x/s390-pci-vfio.c                           | 235 +++++++++++++
+ hw/s390x/s390-virtio-ccw.c                         |   2 +-
+ include/hw/s390x/s390-pci-bus.h                    | 385 +++++++++++++++++++++
+ include/hw/s390x/s390-pci-clp.h                    | 215 ++++++++++++
+ include/hw/s390x/s390-pci-inst.h                   | 116 +++++++
+ include/hw/s390x/s390-pci-vfio.h                   |  19 +
+ .../drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h |  14 +-
+ linux-headers/linux/kvm.h                          |   6 +-
+ linux-headers/linux/vfio.h                         |   5 +
+ scripts/update-linux-headers.sh                    |   2 +-
+ 16 files changed, 1085 insertions(+), 719 deletions(-)
+ delete mode 100644 hw/s390x/s390-pci-bus.h
+ delete mode 100644 hw/s390x/s390-pci-inst.h
+ create mode 100644 hw/s390x/s390-pci-vfio.c
+ create mode 100644 include/hw/s390x/s390-pci-bus.h
+ create mode 100644 include/hw/s390x/s390-pci-clp.h
+ create mode 100644 include/hw/s390x/s390-pci-inst.h
+ create mode 100644 include/hw/s390x/s390-pci-vfio.h
 
-IIUC, you are saying that this becomes the property of memory region. Some
-memory regions can choose their errors being reported back to guest
-(using some kind of flag in memslot). And in the absense of such flag,
-default behavior will continue to be exit to user space?
-
-I guess that's fine if we don't want to treat all the memory areas in
-same way. I can't think why reporting errors for all areas to guest
-is a bad idea. Let guest either handle the error or die if it can't
-handle it. But that discussion is for some other day. Our first problem
-is that we don't have a race free mechanism to report errors.
-
-Thanks
-Vivek
+-- 
+1.8.3.1
 
