@@ -2,254 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 595F7281D20
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 22:50:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76D29281D7E
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 23:13:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725747AbgJBUuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 16:50:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41977 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725550AbgJBUuw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 16:50:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601671850;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PJQhB+t94WBF6cwzUrrUQvGU9wSuYBixWW1qSFR2D3E=;
-        b=KD/bJfs08kaPgGJQQ2om3ipdfj7+RQm2ceCUf/ZSIGMrAcMD6piyNaq1CvB0W+TT47Awav
-        AfM5xpK2Bynol5cAJELohLtol97I8zC/M3ClRThR7vUm6pYLe8BRlzp04H+Q+WX6lTfipz
-        stsO08JWuMVlFArgi+QH1pfd/+4Tjtg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-WMUo00QQNr2hZx7ntc84fA-1; Fri, 02 Oct 2020 16:50:48 -0400
-X-MC-Unique: WMUo00QQNr2hZx7ntc84fA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EDFB18829D3;
-        Fri,  2 Oct 2020 20:50:47 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB22B60C17;
-        Fri,  2 Oct 2020 20:50:43 +0000 (UTC)
-Date:   Fri, 2 Oct 2020 14:50:43 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Diana Craciun <diana.craciun@oss.nxp.com>
-Cc:     kvm@vger.kernel.org, bharatb.linux@gmail.com,
-        linux-kernel@vger.kernel.org, eric.auger@redhat.com,
-        Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Subject: Re: [PATCH v5 09/10] vfio/fsl-mc: Add read/write support for fsl-mc
- devices
-Message-ID: <20201002145043.3d663f92@x1.home>
-In-Reply-To: <20200929090339.17659-10-diana.craciun@oss.nxp.com>
-References: <20200929090339.17659-1-diana.craciun@oss.nxp.com>
-        <20200929090339.17659-10-diana.craciun@oss.nxp.com>
-Organization: Red Hat
+        id S1725803AbgJBVNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 17:13:18 -0400
+Received: from mga09.intel.com ([134.134.136.24]:45640 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725790AbgJBVNS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Oct 2020 17:13:18 -0400
+IronPort-SDR: vBjrkXoMLjjOfRMmvLVEC4vy4kUhBp5nHYCy0XuZCM043pU6MsLsS+R1qVn7fH0wLEsBP+T3CD
+ bRlzLQCScrHQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9762"; a="163943621"
+X-IronPort-AV: E=Sophos;i="5.77,329,1596524400"; 
+   d="scan'208";a="163943621"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 14:13:16 -0700
+IronPort-SDR: pQGgRIgg0M6SqXsE9oyEJOdVjWVBrdtupz/k2OHNIa7Lp5wd2v966VGGnZJCKLdGa6B3MZ4+DO
+ sOxB5mdFJwCA==
+X-IronPort-AV: E=Sophos;i="5.77,329,1596524400"; 
+   d="scan'208";a="516027807"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 14:13:15 -0700
+Date:   Fri, 2 Oct 2020 14:13:14 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtio-fs-list <virtio-fs@redhat.com>, vkuznets@redhat.com,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
+Message-ID: <20201002211314.GE24460@linux.intel.com>
+References: <20200720211359.GF502563@redhat.com>
+ <20200929043700.GL31514@linux.intel.com>
+ <20201001215508.GD3522@redhat.com>
+ <20201001223320.GI7474@linux.intel.com>
+ <20201002153854.GC3119@redhat.com>
+ <20201002183036.GB24460@linux.intel.com>
+ <20201002192734.GD3119@redhat.com>
+ <20201002194517.GD24460@linux.intel.com>
+ <20201002200214.GB10232@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201002200214.GB10232@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 29 Sep 2020 12:03:38 +0300
-Diana Craciun <diana.craciun@oss.nxp.com> wrote:
-
-> The software uses a memory-mapped I/O command interface (MC portals) to
-> communicate with the MC hardware. This command interface is used to
-> discover, enumerate, configure and remove DPAA2 objects. The DPAA2
-> objects use MSIs, so the command interface needs to be emulated
-> such that the correct MSI is configured in the hardware (the guest
-> has the virtual MSIs).
+On Fri, Oct 02, 2020 at 04:02:14PM -0400, Vivek Goyal wrote:
+> On Fri, Oct 02, 2020 at 12:45:18PM -0700, Sean Christopherson wrote:
+> > On Fri, Oct 02, 2020 at 03:27:34PM -0400, Vivek Goyal wrote:
+> > > On Fri, Oct 02, 2020 at 11:30:37AM -0700, Sean Christopherson wrote:
+> > > > On Fri, Oct 02, 2020 at 11:38:54AM -0400, Vivek Goyal wrote:
+> > > > I don't think it's necessary to provide userspace with the register state of
+> > > > the guest task that hit the bad page.  Other than debugging, I don't see how
+> > > > userspace can do anything useful which such information.
+> > > 
+> > > I think debugging is the whole point so that user can figure out which
+> > > access by guest task resulted in bad memory access. I would think this
+> > > will be important piece of information.
+> > 
+> > But isn't this failure due to a truncation in the host?  Why would we care
+> > about debugging the guest?  It hasn't done anything wrong, has it?  Or am I
+> > misunderstanding the original problem statement.
 > 
-> This patch is adding read/write support for fsl-mc devices. The mc
-> commands are emulated by the userspace. The host is just passing
-> the correct command to the hardware.
+> I think you understood problem statement right. If guest has right
+> context, it just gives additional information who tried to access
+> the missing memory page. 
+
+Yes, but it's not actionable, e.g. QEMU can't do anything differently given
+a guest RIP.  It's useful information for hands-on debug, but the information
+can be easily collected through other means when doing hands-on debug.
+ 
+> > > > To fully handle the situation, the guest needs to remove the bad page from
+> > > > its memory pool.  Once the page is offlined, the guest kernel's error
+> > > > handling will kick in when a task accesses the bad page (or nothing ever
+> > > > touches the bad page again and everyone is happy).
+> > > 
+> > > This is not really a case of bad page as such. It is more of a page
+> > > gone missing/trucated. And no new user can map it. We just need to
+> > > worry about existing users who already have it mapped.
+> > 
+> > What do you mean by "no new user can map it"?  Are you talking about guest
+> > tasks or host tasks?  If guest tasks, how would the guest know the page is
+> > missing and thus prevent mapping the non-existent page?
 > 
-> Also the current patch limits userspace to write complete
-> 64byte command once and read 64byte response by one ioctl.
+> If a new task wants mmap(), it will send a request to virtiofsd/qemu
+> on host. If file has been truncated, then mapping beyond file size
+> will fail and process will get error.  So they will not be able to
+> map a page which has been truncated.
+
+Ah.  Is there anything that prevents the notification side of things from
+being handled purely within the virtiofs layer?  E.g. host notifies the guest
+that a file got truncated, virtiofs driver in the guest invokes a kernel API
+to remove the page(s).
+
+> > > > Note, I'm not necessarily suggesting that QEMU piggyback its #MC injection
+> > > > to handle this, but I suspect the resulting behavior will look quite similar,
+> > > > e.g. notify the virtiofs driver in the guest, which does some magic to take
+> > > > the offending region offline, and then guest tasks get SIGBUS or whatever.
+> > > > 
+> > > > I also don't think it's KVM's responsibility to _directly_ handle such a
+> > > > scenario.  As I said in an earlier version, KVM can't possibly know _why_ a
+> > > > page fault came back with -EFAULT, only userspace can connect the dots of
+> > > > GPA -> HVA -> vm_area_struct -> file -> inject event.  KVM definitely should
+> > > > exit to userspace on the -EFAULT instead of hanging the guest, but that can
+> > > > be done via a new request, as suggested.
+> > > 
+> > > KVM atleast should have the mechanism to report this back to guest. And
+> > > we don't have any. There only seems to be #MC stuff for poisoned pages.
+> > > I am not sure how much we can build on top of #MC stuff to take care
+> > > of this case. One problem with #MC I found was that it generates
+> > > synchronous #MC only on load and not store. So all the code is
+> > > written in such a way that synchronous #MC can happen only on load
+> > > and hence the error handling. 
+> > > 
+> > > Stores generate different kind of #MC that too asynchronously and
+> > > caller will not know about it immiditely. But in this case we need
+> > > to know about error in the context of caller both for loads and stores.
+> > > 
+> > > Anyway, I agree that this patch does not solve the problem of race
+> > > free synchronous event inject into the guest. That's something yet
+> > > to be solved either by #VE or by #MC or by #foo.
+> > > 
+> > > This patch is only doing two things.
+> > > 
+> > > - Because we don't have a mechanism to report errors to guest, use
+> > >   the second best method and exit to user space.
+> > 
+> > Not that it matters at this point, but IMO exiting to userspace is the
+> > correct behavior, not simply "second best method".  Again, KVM by design
+> > does not know what lies behind any given HVA, and therefore should not be
+> > making decisions about how to handle bad HVAs.
+> >  
+> > > - Make behavior consistent between synchronous fault and async faults.
+> > >   Currently sync faults exit to user space on error while async
+> > >    faults spin infinitely.
+> > 
+> > Yes, and this part can be done with a new request type.  Adding a new
+> > request doesn't commit KVM to any ABI changes, e.g. userspace will still
+> > see an -EFAULT return, and nothing more.  I.e. handling this via request
+> > doesn't prevent switching to synchronous exits in the future, if such a
+> > feature is required.
 > 
-> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
-> ---
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 118 +++++++++++++++++++++-
->  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |   1 +
->  2 files changed, 116 insertions(+), 3 deletions(-)
+> I am really not sure what benfit this kvm request is bringing to the
+> table. To me maintaining a hash table and exiting when guest retries
+> is much nicer desgin.
+
+8 bytes pre vCPU versus 512 bytes per vCPU, with no guesswork.  I.e. the
+request can guarantee the first access to a truncated file will be reported
+to userspace.
+
+> In fact, once we have the mechanism to inject error into the guest using an
+> exception, We can easily plug that into the same path.
+
+You're blurring the two things together.  The first step is to fix the
+infinite loop by exiting to userspace with -EFAULT.  Notifying the guest of
+the truncated file is a completely different problem to solve.  Reporting
+-EFAULT to userspace is a pure bug fix, and is not unique to DAX.
+
+> If memory usage is a concern, we can reduce the hash table size to say
+> 4 or 8.
 > 
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> index 82157837f37a..0aff99cdf722 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> @@ -12,6 +12,7 @@
->  #include <linux/types.h>
->  #include <linux/vfio.h>
->  #include <linux/fsl/mc.h>
-> +#include <linux/delay.h>
->  
->  #include "vfio_fsl_mc_private.h"
->  
-> @@ -115,7 +116,9 @@ static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
->  				!(vdev->regions[i].size & ~PAGE_MASK))
->  			vdev->regions[i].flags |=
->  					VFIO_REGION_INFO_FLAG_MMAP;
-> -
-> +		vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_READ;
-> +		if (!(mc_dev->regions[i].flags & IORESOURCE_READONLY))
-> +			vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_WRITE;
->  	}
->  
->  	return 0;
-> @@ -123,6 +126,11 @@ static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
->  
->  static void vfio_fsl_mc_regions_cleanup(struct vfio_fsl_mc_device *vdev)
->  {
-> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +	int i;
-> +
-> +	for (i = 0; i < mc_dev->obj_desc.region_count; i++)
-> +		iounmap(vdev->regions[i].ioaddr);
->  	kfree(vdev->regions);
->  }
->  
-> @@ -301,13 +309,117 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
->  static ssize_t vfio_fsl_mc_read(void *device_data, char __user *buf,
->  				size_t count, loff_t *ppos)
->  {
-> -	return -EINVAL;
-> +	struct vfio_fsl_mc_device *vdev = device_data;
-> +	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-> +	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +	struct vfio_fsl_mc_region *region;
-> +	u64 data[8];
-> +	int i;
-> +
-> +	if (index >= mc_dev->obj_desc.region_count)
-> +		return -EINVAL;
-> +
-> +	region = &vdev->regions[index];
-> +
-> +	if (!(region->flags & VFIO_REGION_INFO_FLAG_READ))
-> +		return -EINVAL;
+> How is this change commiting KVM to an ABI?
 
-Nit, there are no regions w/o read access according to the regions_init
-code above.  Maybe this is just for symmetry with write?  Keep it if
-you prefer.  Thanks,
+I didn't mean to imply this patch changes the ABI.  What I was trying to say
+is that going with the request-based implementation doesn't commit KVM to
+new behavior, e.g. we can yank out the request implementation in favor of
+something else if the need arises.
 
-Alex
+> > > Once we have a method to report errors back to guest, then we first
+> > > should report error back to guest. And only in the absense of such
+> > > mechanism we should exit to user space.
+> > 
+> > I don't see the value in extending KVM's ABI to avoid the exit to userspace.
+> > E.g. we could add a memslot flag to autoreflect -EFAULT as an event of some
+> > form, but this is a slow path, the extra time should be a non-issue.
+> 
+> IIUC, you are saying that this becomes the property of memory region. Some
+> memory regions can choose their errors being reported back to guest
+> (using some kind of flag in memslot). And in the absense of such flag,
+> default behavior will continue to be exit to user space?
+> 
+> I guess that's fine if we don't want to treat all the memory areas in
+> same way. I can't think why reporting errors for all areas to guest
+> is a bad idea.
 
-> +
-> +	if (!region->ioaddr) {
-> +		region->ioaddr = ioremap(region->addr, region->size);
-> +		if (!region->ioaddr)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	if (count != 64 || off != 0)
-> +		return -EINVAL;
-> +
-> +	for (i = 7; i >= 0; i--)
-> +		data[i] = readq(region->ioaddr + i * sizeof(uint64_t));
-> +
-> +	if (copy_to_user(buf, data, 64))
-> +		return -EFAULT;
-> +
-> +	return count;
-> +}
-> +
-> +#define MC_CMD_COMPLETION_TIMEOUT_MS    5000
-> +#define MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS    500
-> +
-> +static int vfio_fsl_mc_send_command(void __iomem *ioaddr, uint64_t *cmd_data)
-> +{
-> +	int i;
-> +	enum mc_cmd_status status;
-> +	unsigned long timeout_usecs = MC_CMD_COMPLETION_TIMEOUT_MS * 1000;
-> +
-> +	/* Write at command parameter into portal */
-> +	for (i = 7; i >= 1; i--)
-> +		writeq_relaxed(cmd_data[i], ioaddr + i * sizeof(uint64_t));
-> +
-> +	/* Write command header in the end */
-> +	writeq(cmd_data[0], ioaddr);
-> +
-> +	/* Wait for response before returning to user-space
-> +	 * This can be optimized in future to even prepare response
-> +	 * before returning to user-space and avoid read ioctl.
-> +	 */
-> +	for (;;) {
-> +		u64 header;
-> +		struct mc_cmd_header *resp_hdr;
-> +
-> +		header = cpu_to_le64(readq_relaxed(ioaddr));
-> +
-> +		resp_hdr = (struct mc_cmd_header *)&header;
-> +		status = (enum mc_cmd_status)resp_hdr->status;
-> +		if (status != MC_CMD_STATUS_READY)
-> +			break;
-> +
-> +		udelay(MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS);
-> +		timeout_usecs -= MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS;
-> +		if (timeout_usecs == 0)
-> +			return -ETIMEDOUT;
-> +	}
-> +
-> +	return 0;
->  }
->  
->  static ssize_t vfio_fsl_mc_write(void *device_data, const char __user *buf,
->  				 size_t count, loff_t *ppos)
->  {
-> -	return -EINVAL;
-> +	struct vfio_fsl_mc_device *vdev = device_data;
-> +	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-> +	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +	struct vfio_fsl_mc_region *region;
-> +	u64 data[8];
-> +	int ret;
-> +
-> +	if (index >= mc_dev->obj_desc.region_count)
-> +		return -EINVAL;
-> +
-> +	region = &vdev->regions[index];
-> +
-> +	if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE))
-> +		return -EINVAL;
-> +
-> +	if (!region->ioaddr) {
-> +		region->ioaddr = ioremap(region->addr, region->size);
-> +		if (!region->ioaddr)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	if (count != 64 || off != 0)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&data, buf, 64))
-> +		return -EFAULT;
-> +
-> +	ret = vfio_fsl_mc_send_command(region->ioaddr, data);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return count;
-> +
->  }
->  
->  static int vfio_fsl_mc_mmap_mmio(struct vfio_fsl_mc_region region,
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> index 7aa49b9ba60d..a97ee691ed47 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> @@ -32,6 +32,7 @@ struct vfio_fsl_mc_region {
->  	u32			type;
->  	u64			addr;
->  	resource_size_t		size;
-> +	void __iomem		*ioaddr;
->  };
->  
->  struct vfio_fsl_mc_device {
+Because it'd be bleeding host information to the guest.  E.g. if there's a
+a host kernel bug that causes gup() to fail, then KVM would inject a random
+fault into the guest, which is all kinds of bad.
 
+> Let guest either handle the error or die if it can't
+> handle it. But that discussion is for some other day. Our first problem
+> is that we don't have a race free mechanism to report errors.
+> 
+> Thanks
+> Vivek
+> 
