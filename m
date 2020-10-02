@@ -2,64 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 389BC281B97
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 21:22:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6650A281B76
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 21:21:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388425AbgJBTWK convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 2 Oct 2020 15:22:10 -0400
-Received: from mx.metalurgs.lv ([81.198.125.103]:50644 "EHLO mx.metalurgs.lv"
+        id S1726813AbgJBTVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 15:21:22 -0400
+Received: from mga06.intel.com ([134.134.136.31]:3336 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388419AbgJBTWK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Oct 2020 15:22:10 -0400
-X-Greylist: delayed 379 seconds by postgrey-1.27 at vger.kernel.org; Fri, 02 Oct 2020 15:22:09 EDT
-Received: from mx.metalurgs.lv (localhost [127.0.0.1])
-        by mx.metalurgs.lv (Postfix) with ESMTP id EAB3D62B90
-        for <kvm@vger.kernel.org>; Fri,  2 Oct 2020 22:15:48 +0300 (EEST)
-Received: from kas30pipe.localhost (localhost [127.0.0.1])
-        by mx.metalurgs.lv (Postfix) with ESMTP id D0DCB62B89
-        for <kvm@vger.kernel.org>; Fri,  2 Oct 2020 22:15:48 +0300 (EEST)
-Received: by mx.metalurgs.lv (Postfix, from userid 1005)
-        id 247A862C27; Fri,  2 Oct 2020 22:15:46 +0300 (EEST)
-Received: from [100.64.1.74] (unknown [190.15.125.50])
-        (Authenticated sender: admin)
-        by mx.metalurgs.lv (Postfix) with ESMTPA id C506162BA5;
-        Fri,  2 Oct 2020 22:15:40 +0300 (EEST)
+        id S1725991AbgJBTVV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Oct 2020 15:21:21 -0400
+IronPort-SDR: lJnbzwL2YIai6zOk7d+2Lz8htZMw4rjrO8FI3rwJfVZbf95XWGEaxb673bUiFyUf8sSjS6QZtA
+ vH3GeA+3lcrg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9762"; a="224672944"
+X-IronPort-AV: E=Sophos;i="5.77,328,1596524400"; 
+   d="scan'208";a="224672944"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 12:21:19 -0700
+IronPort-SDR: +10UPm6pc0i2Lg70cAbiEOioaXg1TvU3P2t9atU5+dg/Ny4/IQGqJ8k0hXww4jBau5RZWNGKqs
+ jw+RKrUdmf8A==
+X-IronPort-AV: E=Sophos;i="5.77,328,1596524400"; 
+   d="scan'208";a="313604902"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 12:21:19 -0700
+Date:   Fri, 2 Oct 2020 12:21:18 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Quentin Grolleau <quentin.grolleau@gmail.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: Qemu crash when trying to boot a VM with 4 NVME in PCI
+ passthrough with KVM internal error. Suberror: 1
+Message-ID: <20201002192113.GC24460@linux.intel.com>
+References: <CA+BWSia-x86d3+C_zm+B0ZJEJWSne+Q95Z+cy02XHkr+pOtQGQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Description: Mail message body
-To:     Recipients <financialcapability6@gmail.com>
-From:   "Mr. Hashim Bin" <financialcapability6@gmail.com>
-Date:   Fri, 02 Oct 2020 16:15:33 -0300
-Reply-To: binmurrah@gmail.com
-X-SpamTest-Envelope-From: financialcapability6@gmail.com
-X-SpamTest-Group-ID: 00000000
-X-SpamTest-Info: Profiles 71303 [Jan 01 2015]
-X-SpamTest-Info: {TO: forged address, i.e. recipient, investors, public, etc.}
-X-SpamTest-Info: {DATE: unreal year}
-X-SpamTest-Method: none
-X-SpamTest-Rate: 55
-X-SpamTest-Status: Not detected
-X-SpamTest-Status-Extended: not_detected
-X-SpamTest-Version: SMTP-Filter Version 3.0.0 [0284], KAS30/Release
-Message-ID: <20201002191547.247A862C27@mx.metalurgs.lv>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Subject: Low Rate Loan.
-X-Anti-Virus: Kaspersky Anti-Virus for Linux Mail Server 5.6.39/RELEASE,
-         bases: 20140401 #7726142, check: 20201002 notchecked
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+BWSia-x86d3+C_zm+B0ZJEJWSne+Q95Z+cy02XHkr+pOtQGQ@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Dear,
+On Fri, Oct 02, 2020 at 02:09:09PM +0200, Quentin Grolleau wrote:
+> Hello,
+> 
+> 
+> I wanted to know where i can file a bug about "KVM internal error. Suberror: 1"
+> 
+> Is it on Qemu side, Kernel side or Kvm one ?
 
-We are Investment Company offering Corporate and Personal
-Loan at 3% Interest Rate for a duration of 10Years.
+The error itself doesn't assign blame to any one component, KVM is simply
+stating that it failed instruction emulation.  Emulation can fail for a
+number of reasons, in this case it fails because the guest code stream is
+garbage.  But, _why_ the guest code stream is garbage is unknown.
 
-We also pay 1% commission to brokers, who introduce project
-owners for finance or other opportunities.
+> More details :
+> 
+> 
+> I having problems getting VM to run with QEMU 4.0 and 4 NVME in PCI passthrough
+> When I create a VM, it quickly goes into a paused state and never
+> seems to start working.
+> 
+> Log shows emulation failure :
+> 
+> KVM internal error. Suberror: 1
+> emulation failure
+> EAX=00000086 EBX=000041d8 ECX=00000001 EDX=00008e68
+> ESI=00000f01 EDI=00000000 EBP=0000004f ESP=00008e4e
+> EIP=00000000 EFL=00210093 [--S-A-C] CPL=0 II=0 A20=1 SMM=0 HLT=0
+> ES =9000 00090000 0000ffff 00009300
+> CS =bffc 000bffc0 0000ffff 00009f00
 
-Please get back to me if you are interested for more
-details.
+I believe 0xb0000 - 0xbffff is used for expansion/option ROMs.
 
-Yours faithfully,
-Hashim Bin 
+> SS =9000 00090000 0000ffff 00009300
+> DS =9000 00090000 0000ffff 00009300
+> FS =9000 00090000 0000ffff 00009300
+> GS =9000 00090000 0000ffff 00009300
+> LDT=0000 00000000 0000ffff 00008200
+> TR =0000 00000000 0000ffff 00008b00
+> GDT=     00008160 00000028
+> IDT=     00000000 000003ff
+> CR0=00000010 CR2=00000000 CR3=00000000 CR4=00000000
+> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000
+> DR3=0000000000000000
+> DR6=00000000ffff0ff0 DR7=0000000000000400
+> EFER=0000000000000000
+> Code=<20> 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20
+> 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07
+> 20 07 20 07 20 07
+
+This is the direct cause of emulation failure, the guest code stream is
+junk.  That could be due to guest BIOS jumping to the wrong location, QEMU
+not correctly setting up guest memory, incorrect configuration of memory,
+etc...
+
+Given the above EIP=0 and a CS:EIP pointing at expansion memory, my best
+guest is that the guest BIOS jumped into an option ROM and gets garbage.
+
+One thought would be to disable option ROMs for all devices by overriding
+each device's romfile to be null, e.g.
+
+  -device virtio-net-pci,netdev=hostnet0,id=net0,mac=fa:16:3e:55:8e:0d,bus=pci.0,addr=0x3,romfile=
+
+That's not necessarily a solution, but it might help get a better idea of
+what's going wrong.  Note, not all devices support "romfile", my super
+sophisticated method for disabling option ROMs has been to add "romfile="
+for every device and then remove the ones QEMU complains about :-)
+
+Further debug/insight in this area is well beyond my area of expertise.
