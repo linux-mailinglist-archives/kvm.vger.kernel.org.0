@@ -2,60 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90EE8280D32
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 07:50:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2562C280D2E
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 07:50:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726113AbgJBFuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 01:50:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59822 "EHLO mail.kernel.org"
+        id S1726164AbgJBFuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 01:50:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59824 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725971AbgJBFt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1725983AbgJBFt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 2 Oct 2020 01:49:59 -0400
 Received: from mail.kernel.org (ip5f5ad59f.dynamic.kabel-deutschland.de [95.90.213.159])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 85847208C7;
+        by mail.kernel.org (Postfix) with ESMTPSA id 83ACB208B6;
         Fri,  2 Oct 2020 05:49:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1601617798;
-        bh=FBPwZnSsMqIWKQkD2zCJOP8xtefKz0VFKlRBsQSz4YE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ejgMZ/l6FXxzU+YdRTwMxdT0f1Q+4gbrj+84EBxH2JN9yIe9vDe8W07jPvUyVE/UW
-         pwqbFJ9yYWMl5Ms1dxYbPS7KEwa6ATt81MqjfNpvhhwgtMSJSrT18+F2izm1Y7rpLF
-         3mFQ7DT+0UPX36PDklpu0eXa1Raxyyql02Wb8Kf4=
+        bh=W+WftqWQvk0umhBnRI3lw/fTCzD2Ao+YYmSzLVqon2g=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=CzKP5ruiYQlxyOj9hJ23C9smv3IqrqMPl7+kBSTPF5bZQhFaYVkCIsuZrc7cxDPQt
+         zD1oOYVmUpvYtK3MocRa6VRT9OJNpneVd9iB8SG0ww9jY2kOmLqxHC7v0ke7xqrm/6
+         HfZBh2E45NdgW4IbfPG98PyFT6X+mv8rmv8tKquw=
 Received: from mchehab by mail.kernel.org with local (Exim 4.94)
         (envelope-from <mchehab@kernel.org>)
-        id 1kODx6-006hij-79; Fri, 02 Oct 2020 07:49:56 +0200
+        id 1kODx6-006hin-9U; Fri, 02 Oct 2020 07:49:56 +0200
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        "David S. Miller" <davem@davemloft.net>,
+        "Jonathan Corbet" <corbet@lwn.net>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Andrew Jones <drjones@redhat.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Eugeniu Rosca <erosca@de.adit-jv.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jeff Dike <jdike@addtoit.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
         Marc Zyngier <maz@kernel.org>,
         Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Taehee Yoo <ap420073@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ulrich Hecht <uli+renesas@fpond.eu>,
-        Wolfram Sang <wsa@kernel.org>, kvm@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org
-Subject: [PATCH 0/6] Fix new html build warnings from next-20201001
-Date:   Fri,  2 Oct 2020 07:49:44 +0200
-Message-Id: <cover.1601616399.git.mchehab+huawei@kernel.org>
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/6] docs: vcpu.rst: fix some build warnings
+Date:   Fri,  2 Oct 2020 07:49:46 +0200
+Message-Id: <b5385dd0213f1f070667925bf7a807bf5270ba78.1601616399.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <cover.1601616399.git.mchehab+huawei@kernel.org>
+References: <cover.1601616399.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
@@ -63,55 +49,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are some new warnings when building the documentation from
-yesterday's linux next. This small series fix them.
+As warned with make htmldocs:
 
-- patch 1 documents two new kernel-doc parameters on a net core file.
-  I used the commit log in order to help documenting them;
-- patch 2 fixes some tags at UMLv2 howto;
-- patches 3 and 5 add some new documents at the corresponding
-  index file.
-- patch 4 changes kernel-doc script for it to recognize typedef enums.
+	.../Documentation/virt/kvm/devices/vcpu.rst:70: WARNING: Malformed table.
+	Text in column margin in table line 2.
 
-Patch 4 should probably be merged via docs tree, but the others
-are against stuff recently added at linux-next. So, the better is to
-merge them directly at the trees which introduced the issue.
+	=======  ======================================================
+	-ENODEV: PMUv3 not supported or GIC not initialized
+	-ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
+	         configured as required prior to calling this attribute
+	-EBUSY:  PMUv3 already initialized
+	-EINVAL: Invalid filter range
+	=======  ======================================================
 
--
+The ':' character for two lines are above the size of the column.
+Besides that, other tables at the file doesn't use ':', so
+just drop them.
 
-As a reference, the patches fixing all html build warnings are at:
+While here, also fix this warning also introduced at the same patch:
 
-	https://git.linuxtv.org/mchehab/experimental.git/log/?h=sphinx3-fixes-v3
+	.../Documentation/virt/kvm/devices/vcpu.rst:88: WARNING: Block quote ends without a blank line; unexpected unindent.
 
-Such series also adds support for Sphinx versions 3.1 and above.
+By marking the C code as a literal block.
 
-It should be noticed that, with Sphinx version 3 and above, there
-are a few new warnings, because currently Sphinx assumes a
-that names are unique for all C symbols. There are a few cases
-where we have the same name for a function and for a struct at
-the Kernel. Upstream is already working on a solution for that.
+Fixes: 8be86a5eec04 ("KVM: arm64: Document PMU filtering API")
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ Documentation/virt/kvm/devices/vcpu.rst | 26 ++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-So, for now, I recomend doing html builds with version < 3.
-
-
-Mauro Carvalho Chehab (6):
-  net: core: document two new elements of struct net_device
-  docs: vcpu.rst: fix some build warnings
-  docs: virt: user_mode_linux_howto_v2.rst: fix a literal block markup
-  docs: i2c: index.rst: add slave-testunit-backend.rst
-  scripts: kernel-doc: add support for typedef enum
-  docs: gpio: add a new document to its index.rst
-
- Documentation/admin-guide/gpio/index.rst      |  1 +
- .../admin-guide/hw-vuln/l1d_flush.rst         |  3 +--
- Documentation/i2c/index.rst                   |  1 +
- Documentation/virt/kvm/devices/vcpu.rst       | 26 +++++++++----------
- .../virt/uml/user_mode_linux_howto_v2.rst     |  1 +
- include/linux/netdevice.h                     |  5 ++++
- scripts/kernel-doc                            | 15 ++++++++---
- 7 files changed, 33 insertions(+), 19 deletions(-)
-
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+index da7c2ef7dafc..2acec3b9ef65 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -67,25 +67,25 @@ irqchip.
+ :Returns:
+ 
+ 	 =======  ======================================================
+-	 -ENODEV: PMUv3 not supported or GIC not initialized
+-	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
++	 -ENODEV  PMUv3 not supported or GIC not initialized
++	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
+ 	 	  configured as required prior to calling this attribute
+-	 -EBUSY:  PMUv3 already initialized
+-	 -EINVAL: Invalid filter range
++	 -EBUSY   PMUv3 already initialized
++	 -EINVAL  Invalid filter range
+ 	 =======  ======================================================
+ 
+-Request the installation of a PMU event filter described as follows:
++Request the installation of a PMU event filter described as follows::
+ 
+-struct kvm_pmu_event_filter {
+-	__u16	base_event;
+-	__u16	nevents;
++    struct kvm_pmu_event_filter {
++	    __u16	base_event;
++	    __u16	nevents;
+ 
+-#define KVM_PMU_EVENT_ALLOW	0
+-#define KVM_PMU_EVENT_DENY	1
++    #define KVM_PMU_EVENT_ALLOW	0
++    #define KVM_PMU_EVENT_DENY	1
+ 
+-	__u8	action;
+-	__u8	pad[3];
+-};
++	    __u8	action;
++	    __u8	pad[3];
++    };
+ 
+ A filter range is defined as the range [@base_event, @base_event + @nevents),
+ together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). The
 -- 
 2.26.2
-
 
