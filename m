@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E1F128193F
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:29:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB7CF28194B
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:31:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388288AbgJBR3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 13:29:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388247AbgJBR3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Oct 2020 13:29:05 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF52CC0613E3
-        for <kvm@vger.kernel.org>; Fri,  2 Oct 2020 10:29:05 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id a2so2095960otr.11
-        for <kvm@vger.kernel.org>; Fri, 02 Oct 2020 10:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RQsg6ahWktyPvURwiyd1VgLtMh0Q43RTGiqOocC5R54=;
-        b=UO94HG6O0IX1kgvtQIyBLRmnKZ0ICSk8JVo/6rlaOMXI6yCPT+tEy43d5N5dN6RMUu
-         qHNIfX1buI6VYT5mzWWRXhrkrkj7bUZ+hUM/ua2NafAM7SWj08OhoQ7wQ1ueK+5IqAkM
-         sNCGxBatn9yvcPEuKxA+Pve+PTi6Vi1mFZnkwiSQYNmHbrRQ13vF8YFoSA0/Lgfpwmu1
-         zhVXPYiIUavX0O2QT2OgjblVpc713KBNN8kE+LdGbzN5mox0j1JgvbsndHaXkEfDAVVr
-         1I0Lcf8nmC2FfQBXdeV5JJ9t2sxYmmh/36bupWw2UhNHB3RgKF2i6VIxidXMdLy8dBEh
-         hrCg==
+        id S2388291AbgJBRbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 13:31:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53656 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388248AbgJBRbD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 13:31:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601659861;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TxOHOh0IIejZk+BuR1OyBgwvkUAEztBJORaBCqWyOAI=;
+        b=gAlF4Fb9O5p+bwmkrO3IQWzUsbDWwBUIIKUgIbfPUEOA9oIyL+m9zqL9PwIqFWNG/DgtPO
+        z7gKvzm1WyO9P1hY6sRNfnnBJKGYQOpJW0YKn3wZrXugURbV7VB0NOmuGGFEYSiDZ3Xwhi
+        NL6nHfS6lkZyX7hIMF0xhxdUfdB8KH8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-596-l4is5hPdOzaxwHpmxuY0pQ-1; Fri, 02 Oct 2020 13:31:00 -0400
+X-MC-Unique: l4is5hPdOzaxwHpmxuY0pQ-1
+Received: by mail-wm1-f70.google.com with SMTP id y6so746931wmi.7
+        for <kvm@vger.kernel.org>; Fri, 02 Oct 2020 10:30:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RQsg6ahWktyPvURwiyd1VgLtMh0Q43RTGiqOocC5R54=;
-        b=Dn0JsnX/wGrlxvwgQlJZKBIkf37OYuu2BDpkuKgtbTG+Xj6uqE4PLpR4vYPfqDA+nv
-         Jqa4bvwAVjxEO0XKrmC1aKKzfA6VowM8yfx093/6UAr1TZ5a60EoEX6u4OoGFwt6+qUe
-         vLhFRxuVRaGGZnxKGkCKS6H1nHEV09h3K3Pr5Cwjk/JIfbA8DgIieSdotdwg84WqM1H4
-         y2gTJAgcBlgU1CfVo79MwrIszo72vnLh7zzXf1vSmeKvMPKyeDwqRqGD5qzJP+MOdJ80
-         m/oas1MsRlcQC4+XDOopsKpHFzHKRSkzFpU0NDJAgGZvW8DD2ITjXqvVxz1r58gyAuPF
-         l8fA==
-X-Gm-Message-State: AOAM530AvsqUx8HF+wdUOboJHTAKh14kpcxZF183Hay6bUkbQamxSRhI
-        7eTMA9ozW3HpDrscNcKP5jvHK8YBTlLquqVfLBcFDA==
-X-Google-Smtp-Source: ABdhPJxL6pus8jowMU3LdrwfzIwO1FYffuY4IL2IunOFog16IDAVC1S+1qq0Dsb/eucmve/Nj9gINZs8R32PMNR28rI=
-X-Received: by 2002:a05:6830:2104:: with SMTP id i4mr2576095otc.266.1601659744837;
- Fri, 02 Oct 2020 10:29:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200903141122.72908-1-mgamal@redhat.com> <1f42d8f084083cdf6933977eafbb31741080f7eb.camel@redhat.com>
- <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
- <ebcd39a5-364f-c4ac-f8c7-41057a3d84be@redhat.com> <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
- <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
-In-Reply-To: <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Fri, 2 Oct 2020 22:58:53 +0530
-Message-ID: <CA+G9fYvm1Ux7XmmXgpPHmLJ4WbRoPowbEfbub1HC2G4E-1r-1g@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TxOHOh0IIejZk+BuR1OyBgwvkUAEztBJORaBCqWyOAI=;
+        b=UQLTFdIuYUQXx9TQfMb5b1rooWgs8BrGPCjypX67h+05EBx5lCslD+OSs4UsPGlsGx
+         rBFwWowCr4ddluT23yF7LVG6NVZ0yd/h65YPpMu+ELs6u+FU2gRcqPMo0mY8Q2w2vQf5
+         llHbqoZ+FnUbIW3fF2SqZ7jNRCvsSMcqII+ynoxwi8kxtCcy1cOja28+f5VJVlVLvOQd
+         dD/2C7pGJNQXmUl1g+Pf25B9kBeXzUgHeNnqIr77yomST2lsBZbvTFWhvkoL+5aI7J/I
+         0szPmzkOSS53SVzOXV3ZEjyZs2aDlBvuGrGKhyDI5whyMuJWH0eWPgtWJ1o/dGjNaCdQ
+         VK0Q==
+X-Gm-Message-State: AOAM531cJjWf068pBNSzY8AdQ3NlekJQfW+h7Z7/lpk4Dtl4upz9G1o4
+        DoQy9MwWmxOaC4gsAzM2wiAUlz+A9TkI2hnDMEhNrN7B2dCq2UYfqrfk4H3vRWy8vUQR0yVoHss
+        3VDdu/fWUCXbR
+X-Received: by 2002:a7b:c0c1:: with SMTP id s1mr4244456wmh.73.1601659858186;
+        Fri, 02 Oct 2020 10:30:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxM8WopKn+E/7ZEMfQTo4iJ+AulaHlScB3Vysd80PrpI/qioSdeZTkZO1byHJi2o6MFioQsA==
+X-Received: by 2002:a7b:c0c1:: with SMTP id s1mr4244432wmh.73.1601659857933;
+        Fri, 02 Oct 2020 10:30:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:47e0:e742:75ba:b84d? ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
+        by smtp.gmail.com with ESMTPSA id o194sm2808207wme.24.2020.10.02.10.30.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Oct 2020 10:30:57 -0700 (PDT)
 Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
  support user-configurable
-To:     Paolo Bonzini <pbonzini@redhat.com>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
 Cc:     Qian Cai <cai@redhat.com>, Mohammed Gamal <mgamal@redhat.com>,
         kvm list <kvm@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>,
@@ -67,123 +66,49 @@ Cc:     Qian Cai <cai@redhat.com>, Mohammed Gamal <mgamal@redhat.com>,
         Linux-Next Mailing List <linux-next@vger.kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         lkft-triage@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20200903141122.72908-1-mgamal@redhat.com>
+ <1f42d8f084083cdf6933977eafbb31741080f7eb.camel@redhat.com>
+ <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
+ <ebcd39a5-364f-c4ac-f8c7-41057a3d84be@redhat.com>
+ <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
+ <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
+ <CA+G9fYvm1Ux7XmmXgpPHmLJ4WbRoPowbEfbub1HC2G4E-1r-1g@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <68a67f54-af5c-8b33-6b87-a67ccbbfc155@redhat.com>
+Date:   Fri, 2 Oct 2020 19:30:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <CA+G9fYvm1Ux7XmmXgpPHmLJ4WbRoPowbEfbub1HC2G4E-1r-1g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On 02/10/20 19:28, Naresh Kamboju wrote:
+>>
+>> commit 608e2791d7353e7d777bf32038ca3e7d548155a4 (HEAD -> kvm-master)
+>> Author: Paolo Bonzini <pbonzini@redhat.com>
+>> Date:   Tue Sep 29 08:31:32 2020 -0400
+>>
+>>     KVM: VMX: update PFEC_MASK/PFEC_MATCH together with PF intercept
+>>
+>>     The PFEC_MASK and PFEC_MATCH fields in the VMCS reverse the meaning of
+>>     the #PF intercept bit in the exception bitmap when they do not match.
+>>     This means that, if PFEC_MASK and/or PFEC_MATCH are set, the
+>>     hypervisor can get a vmexit for #PF exceptions even when the
+>>     corresponding bit is clear in the exception bitmap.
+>>
+>>     This is unexpected and is promptly reported as a WARN_ON_ONCE.
+>>     To fix it, reset PFEC_MASK and PFEC_MATCH when the #PF intercept
+>>     is disabled (as is common with enable_ept && !allow_smaller_maxphyaddr).
+> I have tested this patch on an x86_64 machine and the reported issue is gone.
+> 
 
-Thanks for the patch.
+Thanks, the issue with my disk is gone too so it'll get to Linus in time
+for rc8.
 
-On Tue, 29 Sep 2020 at 20:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 29/09/20 15:39, Qian Cai wrote:
-> > On Tue, 2020-09-29 at 14:26 +0200, Paolo Bonzini wrote:
-> >> On 29/09/20 13:59, Qian Cai wrote:
-> >>> WARN_ON_ONCE(!allow_smaller_maxphyaddr);
-> >>>
-> >>> I noticed the origin patch did not have this WARN_ON_ONCE(), but the
-> >>> mainline
-> >>> commit b96e6506c2ea ("KVM: x86: VMX: Make smaller physical guest address
-> >>> space
-> >>> support user-configurable") does have it for some reasons.
-> >>
-> >> Because that part of the code should not be reached.  The exception
-> >> bitmap is set up with
-> >>
-> >>         if (!vmx_need_pf_intercept(vcpu))
-> >>                 eb &= ~(1u << PF_VECTOR);
-> >>
-> >> where
-> >>
-> >> static inline bool vmx_need_pf_intercept(struct kvm_vcpu *vcpu)
-> >> {
-> >>         if (!enable_ept)
-> >>                 return true;
-> >>
-> >>         return allow_smaller_maxphyaddr &&
-> >>               cpuid_maxphyaddr(vcpu) < boot_cpu_data.x86_phys_bits;
-> >> }
-> >>
-> >> We shouldn't get here if "enable_ept && !allow_smaller_maxphyaddr",
-> >> which implies vmx_need_pf_intercept(vcpu) == false.  So the warning is
-> >> genuine; I've sent a patch.
-> >
-> > Care to provide a link to the patch? Just curious.
-> >
->
-> Ok, I haven't sent it yet. :)  But here it is:
->
-> commit 608e2791d7353e7d777bf32038ca3e7d548155a4 (HEAD -> kvm-master)
-> Author: Paolo Bonzini <pbonzini@redhat.com>
-> Date:   Tue Sep 29 08:31:32 2020 -0400
->
->     KVM: VMX: update PFEC_MASK/PFEC_MATCH together with PF intercept
->
->     The PFEC_MASK and PFEC_MATCH fields in the VMCS reverse the meaning of
->     the #PF intercept bit in the exception bitmap when they do not match.
->     This means that, if PFEC_MASK and/or PFEC_MATCH are set, the
->     hypervisor can get a vmexit for #PF exceptions even when the
->     corresponding bit is clear in the exception bitmap.
->
->     This is unexpected and is promptly reported as a WARN_ON_ONCE.
->     To fix it, reset PFEC_MASK and PFEC_MATCH when the #PF intercept
->     is disabled (as is common with enable_ept && !allow_smaller_maxphyaddr).
+Paolo
 
-I have tested this patch on an x86_64 machine and the reported issue is gone.
-
->
->     Reported-by: Qian Cai <cai@redhat.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Tested-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index f0384e93548a..f4e9c310032a 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -794,6 +794,18 @@ void update_exception_bitmap(struct kvm_vcpu *vcpu)
->          */
->         if (is_guest_mode(vcpu))
->                 eb |= get_vmcs12(vcpu)->exception_bitmap;
-> +        else {
-> +               /*
-> +                * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
-> +                * between guest and host.  In that case we only care about present
-> +                * faults.  For vmcs02, however, PFEC_MASK and PFEC_MATCH are set in
-> +                * prepare_vmcs02_rare.
-> +                */
-> +               bool selective_pf_trap = enable_ept && (eb & (1u << PF_VECTOR));
-> +               int mask = selective_pf_trap ? PFERR_PRESENT_MASK : 0;
-> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, mask);
-> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, mask);
-> +       }
->
->         vmcs_write32(EXCEPTION_BITMAP, eb);
->  }
-> @@ -4355,16 +4367,6 @@ static void init_vmcs(struct vcpu_vmx *vmx)
->                 vmx->pt_desc.guest.output_mask = 0x7F;
->                 vmcs_write64(GUEST_IA32_RTIT_CTL, 0);
->         }
-> -
-> -       /*
-> -        * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
-> -        * between guest and host.  In that case we only care about present
-> -        * faults.
-> -        */
-> -       if (enable_ept) {
-> -               vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, PFERR_PRESENT_MASK);
-> -               vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, PFERR_PRESENT_MASK);
-> -       }
->  }
->
->  static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->
-
-test log link
-https://lkft.validation.linaro.org/scheduler/job/1813223
-
-- Naresh
