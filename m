@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CBBF2818BF
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3BCA2818C0
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:06:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388532AbgJBRGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 13:06:47 -0400
-Received: from mail-eopbgr770054.outbound.protection.outlook.com ([40.107.77.54]:30056
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        id S2388555AbgJBRGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 13:06:55 -0400
+Received: from mail-mw2nam10on2053.outbound.protection.outlook.com ([40.107.94.53]:24864
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388054AbgJBRGq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Oct 2020 13:06:46 -0400
+        id S2388176AbgJBRGy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Oct 2020 13:06:54 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GH7MuoUH4QtJtTqmGeyQF51tFEkIA6ZuC+eT2TgNV0tqgklSwx4Ebpg9EvAl2+ArI/mO6eqon0N2fqKicEUbVAyMV+Ql5uoClLAYEBcBzdNP16MwzB4aXd+U0wEgeZc9H7usnid2IUK9nAcSzydb6WkWv4laNKJGQNbiZlVQ5FZ91gL9OWlNVRSz8VCSWHgOn3NQu/SP8J10FhVKhbZLgmqzX1eRpOBJEzw5Su2R8zbkLFTyCyT0oxX2A64NtlV//nOOSaRhb5LzqxsJsjj+tvXmmberbZdKZMJBLAXJTuwPloliECftHkQrajrzxQsQSBpwybo4k/YXjhTFVw5UNg==
+ b=G+ARChB4UR4r5Dzfcg+Aw/FZQbW4ESQN4//5cXYVUmMkAg4YGcPXlp2uZ9TK5McUITqGu9Re9EetPMFPUkvmcc+6lOhpakLQnmfbUN4HRjWQxEarzWgQ21oesuMvWoaX84OVkgRGbe5TRl9n2tbfT0gQ62BQJwwLa4wWuNTw0t/a+naWnrI8l15HhlIEv/yUH76ziCz7jePZYW0uNAmOpJ+x6z2E7OoTWDfDXHP17UJdmVm9Sy21uEm3nE1JHt6/cE8nGWX1M7m/yPQZvWtLr78xsCHzg4G+VJu18MA9Sfbc2sV05KgS0k7kfn98D9Huh5N9GpX9alyRstAR7Zx0vg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y2ZSSbEckuDtY4WfsBGcix7XSH5yfxaFl6aityseS8Y=;
- b=BJ28x29SJT3J7bJyRL6g5VC7rkSCbwHen7zfvaSHQ1HA9B5JF9Zo8lMoqDC8MGq1HRBTghn0pW02QvUM2rnERfueUTb2QLrqv4S0cPW2wBq1flH3ku39ub4CCibIN6f7XV9zBp/8i47TDHvADOw0vGgT0HIOIDknpN58icEr5GN40JkoK+j1mBeag+uDWs+1t2aAmMQEMrTXCLNnubdzcgeI6ZB8Uhjd7jjvQV3QeugrnVbqexdk9ufKqB13mlCac16HVhYIEbrSZeLgWF5LDQ7UStzFKzdMGloRZ/Q0cKC007+v+3R30NcdEAKL7eB9STw/DoEIcW5M/5Vg0Q0T1A==
+ bh=g2KlgJuLHnq7yAR0m73thWz5SptZu+rjCjMnvahWsNI=;
+ b=Ffy4ZdYgguv4Zs2zDEDEswXF0QlzhGWoEkLEDFvFkfY27W81Uj2ifjPCkKoP1b1Hrq79btmxIsRMQxBVkd8zMTN6/1CCq4rQBRlrYPT0awu7aRMRW47zY8wlCgsp6FqdFuhDDrTQr0L96IgmJFGYW40fz7W4anOQCSH5Lw/w9P30nPM1BrGnBgpE8nZ79W9OM4Xu64Z0jD01YuFR0/UZthJNck6MqN1Dg+DQndXQURUOsEjm4IMACUxN9dQxCGR8Akv3cfn8wHoOHZG7iX6XxTwf8StAMqPOVGc2+180A60a3IkbrMNgV00DgrIX/u2q2Z/1K/GBT2VGluJTMsSRJw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y2ZSSbEckuDtY4WfsBGcix7XSH5yfxaFl6aityseS8Y=;
- b=WfxIb+Gve0A80wZnY6jPXDi0Qz3oP0p0eOursesRU2xB7JuU2nmjgbcLEOqwvUpWkq+gZ5jIQJVzj/0v70p6CEy8q7vqWCsgkiL5Dgo271ioktVeNrtZXAwkM31HAglPBQ3S6AnRP8LdUarzw/CDG10rUvOqYPc3Gv4utD8dTXw=
+ bh=g2KlgJuLHnq7yAR0m73thWz5SptZu+rjCjMnvahWsNI=;
+ b=zOYHYgqZjiiwgf3FcdWheIaz7RibzoXQjASi9erKGyAulBAs0rRNWhPck7X9xWx1nxzbIeewFNQ1qTBVvh4xYZ5UQMTRJsBSrTyqKTGO/1MtM+qrZWPucix30Hb1xYDk+KRybDVrSYMHK/GTDYw0kPqKJZ70g4CjE/VTk9cF9bE=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
  DM6PR12MB4218.namprd12.prod.outlook.com (2603:10b6:5:21b::16) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3433.35; Fri, 2 Oct 2020 17:06:42 +0000
+ 15.20.3433.35; Fri, 2 Oct 2020 17:06:51 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::4d88:9239:2419:7348]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::4d88:9239:2419:7348%2]) with mapi id 15.20.3433.039; Fri, 2 Oct 2020
- 17:06:42 +0000
+ 17:06:51 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,43 +48,43 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 25/33] KVM: SVM: Guest FPU state save/restore not needed for SEV-ES guest
-Date:   Fri,  2 Oct 2020 12:02:49 -0500
-Message-Id: <7f5959a865807fac16f377100fbc141e1155eaf0.1601658176.git.thomas.lendacky@amd.com>
+Subject: [RFC PATCH v2 26/33] KVM: SVM: Add support for booting APs for an SEV-ES guest
+Date:   Fri,  2 Oct 2020 12:02:50 -0500
+Message-Id: <66d0fe825c2ab5c5077f3754fb5355097ed6c1da.1601658176.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1601658176.git.thomas.lendacky@amd.com>
 References: <cover.1601658176.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN1PR12CA0072.namprd12.prod.outlook.com
- (2603:10b6:802:20::43) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0501CA0062.namprd05.prod.outlook.com
+ (2603:10b6:803:41::39) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by SN1PR12CA0072.namprd12.prod.outlook.com (2603:10b6:802:20::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.37 via Frontend Transport; Fri, 2 Oct 2020 17:06:41 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by SN4PR0501CA0062.namprd05.prod.outlook.com (2603:10b6:803:41::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.14 via Frontend Transport; Fri, 2 Oct 2020 17:06:50 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 3d628e74-4a33-4c0f-cb7e-08d866f5891a
+X-MS-Office365-Filtering-Correlation-Id: 3ec2305e-7dff-41ec-efe1-08d866f58e04
 X-MS-TrafficTypeDiagnostic: DM6PR12MB4218:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB42189872C8A0722B44D648C2EC310@DM6PR12MB4218.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1850;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB42186096DF00290773E24ACCEC310@DM6PR12MB4218.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dwQMRSgtDC0KGZ4wHts5lka3caOhNhoI4JmeO515uunzbLWWDLAr2jMWYSzMkuy8twiIod7H20jrhaT9KC7z2RXv4yUADzYJ/KbkQpIr/0kEc16YTfkHMNBreW4GKdMx4fq0KiIJXr9pt/b3XODcoE9gfOsca4RQz8Y0lPeFdWnVJSizIIu/Qwej1BZnudjGV/0xAHDp9rj1M1UUq47iCHQ24wAzKObm2oktl4UW1kfqFlz/Qf9Ju0LSz/8+6SE6OLXiuzXF0j03ZpAv2I8sG8lOGnd+hcA8IQdsPRqJr3fg/NbSz3FdXSuFvhRgW8jQS2GD+EgK8jxZvfXqeVofNQ==
+X-Microsoft-Antispam-Message-Info: Fs9iPP3+Ti764B1gV6mTsdltRJWOq6YuAiat/FZshCAFQav+WqICi8Tn1bsfkK3zf4wikuEWSutprNpFDBbSs8B5jatdFsPt/HgQ9TZl7PV6OssPBDtqJGHJbI7s1XwID6XWk16kInfR+kAVTmtxbrQVkUxsAJS9wlDffZI5GxTwKH1uX/REXjmuO2yMwRM6G+Foacn/NNELF5utdJ9WVi5EbmZSqthrUPeI/+0arXkjoM0kx4jiaiZIK4epE58AvTXLK745EIjZFBYRw7P5r+37+J3idYtJwyc59l6Sa8Cc3iNULwC6LYU1iVttyW25Jqa+Ll/QY6gtJ0xaGRyC6Q==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(39860400002)(366004)(136003)(376002)(8676002)(83380400001)(6486002)(2616005)(66556008)(956004)(66476007)(66946007)(52116002)(7696005)(4326008)(36756003)(5660300002)(8936002)(16526019)(186003)(2906002)(54906003)(316002)(26005)(7416002)(478600001)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 5ah7bLVT12tsl+A18cfnwvAiP75ai97GGqJHnuuJSO4Pk0FF9TyRCeGsqKkAn+0ZKJMkr42is4T8kZlDf0YV9p2Nw7z29HYW3nK5cPYNG8aS3rqZQOTw7kE/g2t3YmJIXyH/B3fkB9OAkX0P0I9bFT469Hy4MWeRhR5rN3bGPE9M9P9MU87gygArTUrcYvI6aoSqiwM+L+O/AGECuID37mP7B2CfETNa0oBRcFnPeYYDANhQ36QZ1RZWpJw1sq+9zdzBkeyKnDmDYocMc/bsDM+3BtAyPE/6hP90+8v5CrSBv938ZXIUCaI5AyVHQoORVCAu/h7y0gTXfY54whINymlWQw88B/Td7NK5hA1KK8iKweTAFIf95hF+9rIAzgoO1eTlDrNVzm+IoIHZlqOEpz11C8Avu5cxWMEoI2jTu+3asmym8QeZnLgqhdb6kmtlRi9dDEwx8ntRw2Ha1rsqE1KgULi5ERoDkU7bi93pHwqk6oWVNoMVG1wuP6jVvbwDO6IiWDASypMI04C5sDDXxqUSdyWA+AcoeyUCK2kKytytH1m26pc3C7xmwheLQcLxb5vawfFEQ9UiEI26/xhsxUUC49TfCx7vN/kWnr24GoNkzuzL1e8+P34A5fhBpYk71b1KJUTYbnKURkGJBrpSnA==
+X-MS-Exchange-AntiSpam-MessageData: DmBFrKqAOtnYn6j+Nya057DvUtNNeQzfFbVkJwAfYLaQoh/Zge88HTLcTQLYpuMhHy1nAHaiIpO0JG4sJ3i/S3o0Y92Cyy6ff3ZmT7T91NPnenVGst80VJdiBbsTSXSyPQMX0Sa9ioDI0V4fkqY5K6Gce9eB38Py+6bCDayJPrWRx84tHFNg6rfhPOXWLqe7dCsygkze6+09mTkTz/QWj4MDmHjKWHUW9m3adwcJJ0oO3IWD47OUqH/9VQhco//1raBKVJp9Iru6sUE1X9zXuPdOlCVlMn3doyI+fhqSrfBIfGQLid1hQzPkNDoBfwsi+8LDpdeWCwhuUDkP2sED4JJ0ePGDP0+FTlqXVspNQ6C4vdU9x4bMVCy8/63yTQQXqVhh860sXgd1kzknqWlEy3kCrhJ5jujThraYkGwZBpGvcSmmqUmRO1AO7IiUMSRwVOMjO1ZKa2bgMEyKRV4G7v1kWFiRIbzVssDIGqZbKf0ZebIXRFGLcjkbm/G70idI+yGE/XpPxw/rqf5Qn4QLi3GvQleWmuD2kif+12QzGi4j+GoCjcWAq35JC2L3Mq5ElF9pJFTAu1x3LtPa3hFrAPZttqIE0kCNk8wpv4JhSxlu90TU0lx6xRBc+JZAp14csXolV1Gc3M38kZIKwC5zpA==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d628e74-4a33-4c0f-cb7e-08d866f5891a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ec2305e-7dff-41ec-efe1-08d866f58e04
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2020 17:06:42.8119
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2020 17:06:51.0553
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D2qi1y7hCV/NICu8uXCE3NBkMe9lHMeA6ei+y+EWfSoZK+o5b2jUUxdTdJBE5eK7WzjlihqG0NA7tK4cAjQ2Eg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: CP+td19h1pPY5T3oz2zImpNygfPYYdDvJkqIAHIIYgyGTfnjCLFb3lsRqM4KTsZHDfLEJM+EDunJ0d3rw0aJkQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4218
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -92,203 +92,207 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-The guest FPU state is automatically restored on VMRUN and saved on VMEXIT
-by the hardware, so there is no reason to do this in KVM. Eliminate the
-allocation of the guest_fpu save area and key off that to skip operations
-related to the guest FPU state.
+Typically under KVM, an AP is booted using the INIT-SIPI-SIPI sequence,
+where the guest vCPU register state is updated and then the vCPU is VMRUN
+to begin execution of the AP. For an SEV-ES guest, this won't work because
+the guest register state is encrypted.
+
+Following the GHCB specification, the hypervisor must not alter the guest
+register state, so KVM must track an AP/vCPU boot. Should the guest want
+to park the AP, it must use the AP Reset Hold exit event in place of, for
+example, a HLT loop.
+
+First AP boot (first INIT-SIPI-SIPI sequence):
+  Execute the AP (vCPU) as it was initialized and measured by the SEV-ES
+  support. It is up to the guest to transfer control of the AP to the
+  proper location.
+
+Subsequent AP boot:
+  KVM will expect to receive an AP Reset Hold exit event indicating that
+  the vCPU is being parked and will require an INIT-SIPI-SIPI sequence to
+  awaken it. When the AP Reset Hold exit event is received, KVM will place
+  the vCPU into a simulated HLT mode. Upon receiving the INIT-SIPI-SIPI
+  sequence, KVM will make the vCPU runnable. It is again up to the guest
+  to then transfer control of the AP to the proper location.
+
+The GHCB specification also requires the hypervisor to save the address of
+an AP Jump Table so that, for example, vCPUs that have been parked by UEFI
+can be started by the OS. Provide support for the AP Jump Table set/get
+exit code.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
  arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/svm/svm.c          | 10 ++++++
- arch/x86/kvm/x86.c              | 56 +++++++++++++++++++++++++++------
- 3 files changed, 58 insertions(+), 10 deletions(-)
+ arch/x86/kvm/svm/sev.c          | 50 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c          |  7 +++++
+ arch/x86/kvm/svm/svm.h          |  3 ++
+ arch/x86/kvm/x86.c              |  9 ++++++
+ 5 files changed, 71 insertions(+)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 30f1300a05c0..d5ca8c6b0d5e 100644
+index d5ca8c6b0d5e..9218cb8a180a 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1444,6 +1444,8 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
- int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
- 		    int reason, bool has_error_code, u32 error_code);
+@@ -1254,6 +1254,8 @@ struct kvm_x86_ops {
  
-+void kvm_free_guest_fpu(struct kvm_vcpu *vcpu);
+ 	void (*migrate_timers)(struct kvm_vcpu *vcpu);
+ 	void (*msr_filter_changed)(struct kvm_vcpu *vcpu);
 +
- int __kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned long cr0);
- int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
- int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3);
++	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
+ };
+ 
+ struct kvm_x86_nested_ops {
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index f6f1bb93f172..f771173021d8 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -16,6 +16,8 @@
+ #include <linux/swap.h>
+ #include <linux/trace_events.h>
+ 
++#include <asm/trapnr.h>
++
+ #include "x86.h"
+ #include "svm.h"
+ #include "cpuid.h"
+@@ -1359,6 +1361,8 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 		if (!ghcb_sw_scratch_is_valid(ghcb))
+ 			goto vmgexit_err;
+ 		break;
++	case SVM_VMGEXIT_AP_HLT_LOOP:
++	case SVM_VMGEXIT_AP_JUMP_TABLE:
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		break;
+ 	default:
+@@ -1674,6 +1678,35 @@ int sev_handle_vmgexit(struct vcpu_svm *svm)
+ 					    control->exit_info_2,
+ 					    svm->ghcb_sa);
+ 		break;
++	case SVM_VMGEXIT_AP_HLT_LOOP:
++		svm->ap_hlt_loop = true;
++		ret = kvm_emulate_halt(&svm->vcpu);
++		break;
++	case SVM_VMGEXIT_AP_JUMP_TABLE: {
++		struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
++
++		switch (control->exit_info_1) {
++		case 0:
++			/* Set AP jump table address */
++			sev->ap_jump_table = control->exit_info_2;
++			break;
++		case 1:
++			/* Get AP jump table address */
++			ghcb_set_sw_exit_info_2(ghcb, sev->ap_jump_table);
++			break;
++		default:
++			pr_err("svm: vmgexit: unsupported AP jump table request - exit_info_1=%#llx\n",
++			       control->exit_info_1);
++			ghcb_set_sw_exit_info_1(ghcb, 1);
++			ghcb_set_sw_exit_info_2(ghcb,
++						X86_TRAP_UD |
++						SVM_EVTINJ_TYPE_EXEPT |
++						SVM_EVTINJ_VALID);
++		}
++
++		ret = 1;
++		break;
++	}
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(&svm->vcpu, "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+ 			    control->exit_info_1, control->exit_info_2);
+@@ -1693,3 +1726,20 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+ 	return kvm_sev_es_string_io(&svm->vcpu, size, port,
+ 				    svm->ghcb_sa, svm->ghcb_sa_len, in);
+ }
++
++void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	/* First SIPI: Use the the values as initially set by the VMM */
++	if (!svm->ap_hlt_loop)
++		return;
++
++	/*
++	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
++	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
++	 * non-zero value.
++	 */
++	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++	svm->ap_hlt_loop = false;
++}
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index de44f7f2b7a8..13560b90b81a 100644
+index 13560b90b81a..71be48f0113e 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -1301,6 +1301,14 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 		vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
- 		if (!vmsa_page)
- 			goto error_free_hsave_page;
-+
-+		/*
-+		 * SEV-ES guests maintain an encrypted version of their FPU
-+		 * state which is restored and saved on VMRUN and VMEXIT.
-+		 * Free the fpu structure to prevent KVM from attempting to
-+		 * access the FPU state.
-+		 */
-+		kvm_free_guest_fpu(vcpu);
- 	}
- 
- 	err = avic_init_vcpu(svm);
-@@ -3792,6 +3800,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- 		svm_set_dr6(svm, DR6_FIXED_1 | DR6_RTM);
- 
- 	clgi();
-+
- 	kvm_load_guest_xsave_state(vcpu);
- 
- 	kvm_wait_lapic_expire(vcpu);
-@@ -3837,6 +3846,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- 		kvm_before_interrupt(&svm->vcpu);
- 
- 	kvm_load_host_xsave_state(vcpu);
-+
- 	stgi();
- 
- 	/* Any pending NMI will happen here */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 20fabf578ab7..931a17ba5cbd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4407,6 +4407,9 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
- static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
- 					 struct kvm_xsave *guest_xsave)
- {
-+	if (!vcpu->arch.guest_fpu)
-+		return;
-+
- 	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
- 		memset(guest_xsave, 0, sizeof(struct kvm_xsave));
- 		fill_xsave((u8 *) guest_xsave->region, vcpu);
-@@ -4424,9 +4427,14 @@ static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
- static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
- 					struct kvm_xsave *guest_xsave)
- {
--	u64 xstate_bv =
--		*(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)];
--	u32 mxcsr = *(u32 *)&guest_xsave->region[XSAVE_MXCSR_OFFSET / sizeof(u32)];
-+	u64 xstate_bv;
-+	u32 mxcsr;
-+
-+	if (!vcpu->arch.guest_fpu)
-+		return 0;
-+
-+	xstate_bv = *(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)];
-+	mxcsr = *(u32 *)&guest_xsave->region[XSAVE_MXCSR_OFFSET / sizeof(u32)];
- 
- 	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
- 		/*
-@@ -9126,9 +9134,14 @@ static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
- 
- 	kvm_save_current_fpu(vcpu->arch.user_fpu);
- 
--	/* PKRU is separately restored in kvm_x86_ops.run.  */
--	__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
--				~XFEATURE_MASK_PKRU);
-+	/*
-+	 * Guests with protected state can't have it set by the hypervisor,
-+	 * so skip trying to set it.
-+	 */
-+	if (vcpu->arch.guest_fpu)
-+		/* PKRU is separately restored in kvm_x86_ops.run. */
-+		__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
-+					~XFEATURE_MASK_PKRU);
- 
- 	fpregs_mark_activate();
- 	fpregs_unlock();
-@@ -9141,7 +9154,12 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
- {
- 	fpregs_lock();
- 
--	kvm_save_current_fpu(vcpu->arch.guest_fpu);
-+	/*
-+	 * Guests with protected state can't have it read by the hypervisor,
-+	 * so skip trying to save it.
-+	 */
-+	if (vcpu->arch.guest_fpu)
-+		kvm_save_current_fpu(vcpu->arch.guest_fpu);
- 
- 	copy_kernel_to_fpregs(&vcpu->arch.user_fpu->state);
- 
-@@ -9657,6 +9675,9 @@ int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
- {
- 	struct fxregs_state *fxsave;
- 
-+	if (!vcpu->arch.guest_fpu)
-+		return 0;
-+
- 	vcpu_load(vcpu);
- 
- 	fxsave = &vcpu->arch.guest_fpu->state.fxsave;
-@@ -9677,6 +9698,9 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
- {
- 	struct fxregs_state *fxsave;
- 
-+	if (!vcpu->arch.guest_fpu)
-+		return 0;
-+
- 	vcpu_load(vcpu);
- 
- 	fxsave = &vcpu->arch.guest_fpu->state.fxsave;
-@@ -9735,6 +9759,9 @@ static int sync_regs(struct kvm_vcpu *vcpu)
- 
- static void fx_init(struct kvm_vcpu *vcpu)
- {
-+	if (!vcpu->arch.guest_fpu)
-+		return;
-+
- 	fpstate_init(&vcpu->arch.guest_fpu->state);
- 	if (boot_cpu_has(X86_FEATURE_XSAVES))
- 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
-@@ -9748,6 +9775,15 @@ static void fx_init(struct kvm_vcpu *vcpu)
- 	vcpu->arch.cr0 |= X86_CR0_ET;
+@@ -4391,6 +4391,11 @@ static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ 		   (vmcb_is_intercept(&svm->vmcb->control, INTERCEPT_INIT));
  }
  
-+void kvm_free_guest_fpu(struct kvm_vcpu *vcpu)
++static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
 +{
-+	if (vcpu->arch.guest_fpu) {
-+		kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
-+		vcpu->arch.guest_fpu = NULL;
-+	}
++	sev_vcpu_deliver_sipi_vector(vcpu, vector);
 +}
-+EXPORT_SYMBOL_GPL(kvm_free_guest_fpu);
 +
- int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+ static void svm_vm_destroy(struct kvm *kvm)
  {
- 	if (kvm_check_tsc_unstable() && atomic_read(&kvm->online_vcpus) != 0)
-@@ -9843,7 +9879,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	return 0;
+ 	avic_vm_destroy(kvm);
+@@ -4531,6 +4536,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
  
- free_guest_fpu:
--	kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
-+	kvm_free_guest_fpu(vcpu);
- free_user_fpu:
- 	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
- free_emulate_ctxt:
-@@ -9897,7 +9933,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kmem_cache_free(x86_emulator_cache, vcpu->arch.emulate_ctxt);
- 	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
- 	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
--	kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
-+	kvm_free_guest_fpu(vcpu);
+ 	.msr_filter_changed = svm_msr_filter_changed,
++
++	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+ };
  
- 	kvm_hv_vcpu_uninit(vcpu);
- 	kvm_pmu_destroy(vcpu);
-@@ -9944,7 +9980,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	kvm_async_pf_hash_reset(vcpu);
- 	vcpu->arch.apf.halted = false;
+ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 084ba4dfd9e2..0d011f68064c 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -68,6 +68,7 @@ struct kvm_sev_info {
+ 	int fd;			/* SEV device fd */
+ 	unsigned long pages_locked; /* Number of pages locked */
+ 	struct list_head regions_list;  /* List of registered regions */
++	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
+ };
  
--	if (kvm_mpx_supported()) {
-+	if (vcpu->arch.guest_fpu && kvm_mpx_supported()) {
- 		void *mpx_state_buffer;
+ struct kvm_svm {
+@@ -171,6 +172,7 @@ struct vcpu_svm {
+ 	struct vmcb_save_area *vmsa;
+ 	struct ghcb *ghcb;
+ 	struct kvm_host_map ghcb_map;
++	bool ap_hlt_loop;
  
- 		/*
+ 	/* SEV-ES scratch area support */
+ 	void *ghcb_sa;
+@@ -564,5 +566,6 @@ void __init sev_hardware_setup(void);
+ void sev_hardware_teardown(void);
+ int sev_handle_vmgexit(struct vcpu_svm *svm);
+ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
++void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ 
+ #endif
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 931a17ba5cbd..c211376a1329 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10023,6 +10023,15 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ {
+ 	struct kvm_segment cs;
+ 
++	/*
++	 * Guests with protected state can't have their state altered by KVM,
++	 * call the vcpu_deliver_sipi_vector() x86 op for processing.
++	 */
++	if (vcpu->arch.guest_state_protected) {
++		kvm_x86_ops.vcpu_deliver_sipi_vector(vcpu, vector);
++		return;
++	}
++
+ 	kvm_get_segment(vcpu, &cs, VCPU_SREG_CS);
+ 	cs.selector = vector << 8;
+ 	cs.base = vector << 12;
 -- 
 2.28.0
 
