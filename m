@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C31A0281884
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:03:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8B44281885
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388208AbgJBRDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 13:03:19 -0400
-Received: from mail-mw2nam10on2070.outbound.protection.outlook.com ([40.107.94.70]:47009
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        id S2388246AbgJBRDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 13:03:25 -0400
+Received: from mail-eopbgr770073.outbound.protection.outlook.com ([40.107.77.73]:20128
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725995AbgJBRDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Oct 2020 13:03:18 -0400
+        id S1726224AbgJBRDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Oct 2020 13:03:25 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jEOlKOpI2NaaFolVRzp1BD+M56dZfXySoABh4UVD7hFf2Fstf6GVGVuaIrQdPFnTbmc0VBRzG/hfRTBh9PkXcuSo7rUEt5FtQ8asPjPIgO1nF2NzHKkVMVOc4fCAhy22yLcFVlY0yU6jq66FbhkYRPmfEHfL6eQ3UFGbXdjjOlgohGJd1W6uUD0yAvjaq84ZO8QFfzPeXapQB0UIHxaKZF3rKo/S2/nGH6lP6eon4QdyK6AGAehDTJPNt9I4Ywc/0XfXydQQNkd19yJSVylIklgzl1/8tkjrGbX44SJuHAmFHu2j5zeeIW6KAylgeYMNwN5eMa/Ji+i2SeXkT64JkQ==
+ b=VykRV1qWItWIFXGKAJlAQ7nJNy5AdEzmQDypGtpxhnLZz/27J6UrFGX+65SlnuDYm1BYtJDQndfJwGYdNerWAnfUSB+CJbsg2fgXOKENLyOiyDHOOpWKlg2VfOCkiGSEoQXN9CkVL4ROxULoMFdT0bWg9gd0k2HhiOfSNbMIqeprhryGKQ3c9Y455pK1+QuqRkIEO6zUQhOqjyeaBNko37D794KG+/QZIWOCA3l/peQSM1Zi7fby8T3fzcMpR8NdB1innesgxSvUGl6lrGe/3hwQQlIS3VS7FlAZPSq73Xcn2m/2wwKW1RA8RoSxXks2FKVz3EH1tgxK7lNTtqZEyg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A/hFUML1z4GtZgMMRdtKLHjxDcERlIOilWMysLeE7nc=;
- b=US69HKu0gvCSzzQcYVHBzDxxNUbUdcv9oDwnOOc5yLOGPSiX6SX88zrZpOF8iqMzlC3dSif5p6nbJi+xU/0wKe+aFC672bCjHgvZJv+qH/QbZkbrXbXhXxsgdFZfX4YZnxQMwkYg9naENLaWKOsOuq7NrtntTJTeE5SPdDjyv6WppOnk9M4jpKoRX5NjYSUvcGSHOk0FdCq0LJGz8Iv8WcgqKzSMA3D2/fSiU11KazBd1KuNm10zA1y5n2vd6mtCUsRVMiZ+ehehiEk/+LjKxmI7fw60dKo8A3n85x+VXHnoxbUjB5QUp22taOlbTLMmy0ahcE51Uinpgc9Bg4Qu8Q==
+ bh=O5dAjRtLqXPCMFK+M/jwLa4b/t2Fn6BY5q79TaGmjCk=;
+ b=Hf90HVdjo//8xzhXwjgMnjpWBVqcWNiLPMzcJ6YksjD/BGrshDy3/NVQnMTGoHVUFkajLaE/f0SIhPvEU0oGGmT6QVjQdbI3iuEuPoRVtAw52XwYmS781XW05DyrlAav0VBgxU3PC8totx78EeI2NGLVkWE1pfxV/fpVtD5OF/ChwSwC0qn/7myisFHyXdmuZVpYg3blf12F3T+zUp4lBoYNC4y5bax5jYTn4skkfoyFZgJhR6qDrDCuU92eZXuSwEAT8iGEzbTVZD8ZGQpLjMlqtDS60YgsHVIjwy3NjcZwmiVqmZ43dnMKeuh1BFLBoqb1p24n+trdsgZ7bO0K3A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A/hFUML1z4GtZgMMRdtKLHjxDcERlIOilWMysLeE7nc=;
- b=sBtVvUUHapHPYvIkTLovNWIXoRA5eIexyOdYLp1FPXfPjvhJMGBAF+yPYZBLYbYBMUdHrvkZMvGbQoN6CcIUju2Igrtt7s1UxNx7xOMsIanBWJXL2Q7uNY0UK6fuIekor6AWgEFjy2f2lT8OcfjyWgGSDdAjl11Pz1lD9FNABtE=
+ bh=O5dAjRtLqXPCMFK+M/jwLa4b/t2Fn6BY5q79TaGmjCk=;
+ b=Pmz8pnwlyaMFsUh21g9LiCgZDOaT6V6uzVSud2ubgLCEha9RcfFHvix69LHNc0FTj4D/4kpCF+JMWJQznWVX5rRF/hPje/M7yx6/ktDaJz672AcYD1MA5xY57LDa5IPzolDvL43k+2HdA+N7Kn8m2mE4PdkwxLiKskK3U5VayAM=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
  DM6PR12MB4218.namprd12.prod.outlook.com (2603:10b6:5:21b::16) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3433.35; Fri, 2 Oct 2020 17:03:14 +0000
+ 15.20.3433.35; Fri, 2 Oct 2020 17:03:22 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::4d88:9239:2419:7348]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::4d88:9239:2419:7348%2]) with mapi id 15.20.3433.039; Fri, 2 Oct 2020
- 17:03:14 +0000
+ 17:03:22 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,41 +48,43 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 00/33] SEV-ES hypervisor support
-Date:   Fri,  2 Oct 2020 12:02:24 -0500
-Message-Id: <cover.1601658176.git.thomas.lendacky@amd.com>
+Subject: [RFC PATCH v2 01/33] KVM: SVM: Remove the call to sev_platform_status() during setup
+Date:   Fri,  2 Oct 2020 12:02:25 -0500
+Message-Id: <25be6a2f43efdf8af842c175cbf4d8542a15482d.1601658176.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1601658176.git.thomas.lendacky@amd.com>
+References: <cover.1601658176.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN4PR0401CA0020.namprd04.prod.outlook.com
- (2603:10b6:803:21::30) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0008.namprd11.prod.outlook.com
+ (2603:10b6:806:d3::13) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by SN4PR0401CA0020.namprd04.prod.outlook.com (2603:10b6:803:21::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.37 via Frontend Transport; Fri, 2 Oct 2020 17:03:13 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by SA0PR11CA0008.namprd11.prod.outlook.com (2603:10b6:806:d3::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.37 via Frontend Transport; Fri, 2 Oct 2020 17:03:21 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 754e4b59-a84e-4f9e-8145-08d866f50cea
+X-MS-Office365-Filtering-Correlation-Id: 8fa4ba96-ec59-41f1-de16-08d866f511cc
 X-MS-TrafficTypeDiagnostic: DM6PR12MB4218:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4218CF1C83B27A6A822752FBEC310@DM6PR12MB4218.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1850;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB4218F3525C4A8820A69C2178EC310@DM6PR12MB4218.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lIn7bRdN67EaOQuTGtx4kzoWGCgZm3t5idNHyUM+irXGokRu2NJHUW/IF2OKaUfNBNejAB3EedZ3lIqxUjbWgnJiGwtkH7YL/imk67eSs7lDNpz7mVmEwxmapW4auREv0ku+pnucuRHV0isu7rPA+nabF0eXa5GhrA6cqJ4O89B72qzUrUNmMurJ3pInUxUdeHexm1+P3mVHCKXfs6JXNIMPbYvYIWsdA1WTjSAA7YNikYZm8Wf0naLSRSRlga43eaYrkRhoQt1Y4o3xZKkV3izW/WvCkYesdKGTcQszeOkN/rXcjyUZkDHoEfsuqrPwDmPu61ywPKAjIotO61WNg31NVhPBUowMhggbT70IsDbX57MljjvF9uB70L09vJG0fPuqombqawIaQt/KOhk4mw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(39860400002)(366004)(136003)(376002)(6666004)(8676002)(83380400001)(83080400001)(6486002)(2616005)(66556008)(956004)(66476007)(66946007)(52116002)(7696005)(4326008)(36756003)(5660300002)(8936002)(16526019)(186003)(2906002)(54906003)(316002)(26005)(966005)(7416002)(478600001)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 61hu1bcywvcmlcA+Ve9dUGmb/0qQ+bOyFJilV/C1iGhVj7WQCZ4WHy9F2LgpeNsyxEkWK1rzGPOa1mbU2enTH8Tq47zyfCPWmvQoHN2jNcc3C0E/nVqxO/qsNII8rOnHjgWUMnOTA2Z5kpZK2Pxe5xZE6SStjqfHGcEOcKhRzhCe5OcvEz5nhD+3cmrm+MOiXYUJy0p3I9A+2DPL3AeyWMd5t3+yYLcSN3CFx9w+Hmn6dGKNqtyG4RoU6PJ4upxWq1D6j1cDcw8cGI4x0NkdZUZxoMvxrWh2yc1jBF9JnxZDc5yiFSAUAyxWSn6iSznwKeNOsz/NzWZ4RxMN0dNjwRJC/So752/IMqO51LkXdrASb3YPrzgQ1eQb8aZvSZVHQm8K3amSGe8jnW81F+r5lXUbn7rmh9Kh8uneVKUmAtNz3nRHQ1uDOpoqmvDEUVgzbT3yHJSuBSkKD4HWSOSXL1WNNBf1eKCUnbQ5MMo0CNGY8JgCJ0uLAKPJfhivC/c0aGhxVUT+HIZD1DZpm7HxUKxhDTGZEv/dYtYgyGWy7BwO+3bRdE1GABWcPFDzVf1wS5qIl82vTd/HXCme+sznA4CVOc/8DQx/EBkBLc20m/uVnh/kvpEWW1bRXEl0MUQktTtPol6gLHon6FCovimgMw==
+X-Microsoft-Antispam-Message-Info: CNuWyWEutMVYzfKSWshDsa1PZLSTakFAjzr6/4Qq6gmAFizKwOAB22HABDnqI3+FvfyOwf5yd+kAMOzEXDEnDM0IWQG6tugQ9gOEBTCHcgdlmxa+h7vR5rdl0QNbpRSTOhI4qEgriVcuai0EbMXcGbwqQntjJxeGVJp47l1V65HNCkUjz/2f3GTpGpJJIABClY5wFwMRszIHc/Z5VXxA/uAR8hfYMK8LE8JgaIk+UQF/+L1EJpPH10vAVfhMcT8cmP/nr4pOXKrMT/Or1KR6PfZFA1cOuFRo4AmLiUP/OnrCs1Fwu+dmmB7/QONDVQbzSt55d5dUoicudDAW4YnAcA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(39860400002)(366004)(136003)(376002)(8676002)(83380400001)(6486002)(2616005)(66556008)(956004)(66476007)(66946007)(52116002)(7696005)(4326008)(36756003)(5660300002)(8936002)(16526019)(186003)(2906002)(54906003)(316002)(26005)(7416002)(478600001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 5qXLSHZTNlyIppQ1SS4iVRp2efIgP9BBF0HM2nqb64xkhGZTMGFPCHMyDCkcZ3f0s8wxig9vOGqip7FuRlDWO6wFXKLaqUP7JvuCeBGUDES8m/6k5N+syP+Eh2uMjijSzyR8ud5lvyLKaMfMnqSi1x4B76s31L/k2bNvnyAMfRE7XxSMV25K1S7CC8T2rC3NzaBMKcLg5Ki5Xr5X0MdYf6Qb5votwyaK0uItQne0tKJ1jsTEm8r5GomHSGI9lOSK3hJaxx9x/nY5GYhz6j0AaBCTBUMXAT6GvUbdJhM4z6/GPwT7SugqtKUD2XTwAAA9lC+2tlkAZ9rCuakbTQP1lZaVJpOToSl0ft/L7zspb1NLjlyvFP9Qm2DV7f5UKh04e0GSlhkQ30bHNkoI9SIoiSDFFzaxvjBB8dUMeIBBYJTSiuf9sk0GA9+wTy/28fMgw/Op8EnPs3HhGFVfrWzZlzj8+Kvw9TZfHOpsmr9FFR1LAip51OfmQeBSdL+QeAtI7OtHIFv6n2SlmKdedDtwGvoHdlCrJPEt50BXQFXU8fqZ8E4R7Lx6tnPGMpklDWIl5L9kqyIIj4kHj4hLA8bBB+uv6ErOggD5mqs2gnux1t0BAoT8ADDUhQYXFFUoReXWX5YlJdRsuPzMZyyZJnFqBQ==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 754e4b59-a84e-4f9e-8145-08d866f50cea
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8fa4ba96-ec59-41f1-de16-08d866f511cc
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2020 17:03:14.4320
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2020 17:03:22.6613
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uq0S5xEJSaFs99+/MlmURlUWTR9h+SHiY4dG9Wo5bduNfGSFffK8mWw1WclTHGsXwq7OgRp8rUKPZc8s3MhsDw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: pbAXq0h3rUG50CN0XYYxNuUBl7Tb/+1p5LIVgxhEX2dxyXV2oeLbY46R4i+ZetwcXwWR7m4LbbFE6gqoOAPZjQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4218
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -90,152 +92,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-This patch series provides support for running SEV-ES guests under KVM.
+When both KVM support and the CCP driver are built into the kernel instead
+of as modules, KVM initialization happens before CCP initialization. As a
+result, sev_platform_status() will return a failure when it is called from
+sev_hardware_setup(), when this isn't really an error condition.
 
-Secure Encrypted Virtualization - Encrypted State (SEV-ES) expands on the
-SEV support to protect the guest register state from the hypervisor. See
-"AMD64 Architecture Programmer's Manual Volume 2: System Programming",
-section "15.35 Encrypted State (SEV-ES)" [1].
+Since sev_platform_status() doesn't need to be called at this time anyway,
+remove the invocation from sev_hardware_setup().
 
-In order to allow a hypervisor to perform functions on behalf of a guest,
-there is architectural support for notifying a guest's operating system
-when certain types of VMEXITs are about to occur. This allows the guest to
-selectively share information with the hypervisor to satisfy the requested
-function. The notification is performed using a new exception, the VMM
-Communication exception (#VC). The information is shared through the
-Guest-Hypervisor Communication Block (GHCB) using the VMGEXIT instruction.
-The GHCB format and the protocol for using it is documented in "SEV-ES
-Guest-Hypervisor Communication Block Standardization" [2].
-
-Under SEV-ES, a vCPU save area (VMSA) must be encrypted. SVM is updated to
-build the initial VMSA and then encrypt it before running the guest. Once
-encrypted, it must not be modified by the hypervisor. Modification of the
-VMSA will result in the VMRUN instruction failing with a SHUTDOWN exit
-code. KVM must support the VMGEXIT exit code in order to perform the
-necessary functions required of the guest. The GHCB is used to exchange
-the information needed by both the hypervisor and the guest.
-
-To simplify access to the VMSA and the GHCB, SVM uses an accessor function
-to obtain the address of the either the VMSA or the GHCB, depending on the
-stage of execution of the guest.
-
-There are changes to some of the intercepts that are needed under SEV-ES.
-For example, CR0 writes cannot be intercepted, so the code needs to ensure
-that the intercept is not enabled during execution or that the hypervisor
-does not try to read the register as part of exit processing. Another
-example is shutdown processing, where the vCPU cannot be directly reset.
-
-Support is added to handle VMGEXIT events and implement the GHCB protocol.
-This includes supporting standard exit events, like a CPUID instruction
-intercept, to new support, for things like AP processor booting. Much of
-the existing SVM intercept support can be re-used by setting the exit
-code information from the VMGEXIT and calling the appropriate intercept
-handlers.
-
-Finally, to launch and run an SEV-ES guest requires changes to the vCPU
-initialization, loading and execution.
-
-[1] https://www.amd.com/system/files/TechDocs/24593.pdf
-[2] https://developer.amd.com/wp-content/resources/56421.pdf
-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
+ arch/x86/kvm/svm/sev.c | 22 +---------------------
+ 1 file changed, 1 insertion(+), 21 deletions(-)
 
-These patches are based on a commit of the KVM next branch. However, I had
-to backport recent SEV-ES guest patches (a previous series to the actual
-patches that are now in the tip tree) into my development branch, since
-there are prereq patches needed by this series. As a result, this patch
-series will not successfully build or apply to the KVM next branch as is.
-
-A version of the tree can be found at:
-https://github.com/AMDESE/linux/tree/sev-es-5.9-v1
-
-Changes from v1:
-- Removed the VMSA indirection support:
-  - On LAUNCH_UPDATE_VMSA, sync traditional VMSA over to the new SEV-ES
-    VMSA area to be encrypted.
-  - On VMGEXIT VMEXIT, directly copy valid registers into vCPU arch
-    register array from GHCB. On VMRUN (following a VMGEXIT), directly
-    copy dirty vCPU arch registers to GHCB.
-  - Removed reg_read_override()/reg_write_override() KVM ops.
-- Added VMGEXIT exit-reason validation.
-- Changed kvm_vcpu_arch variable vmsa_encrypted to guest_state_protected
-- Updated the tracking support for EFER/CR0/CR4/CR8 to minimize changes
-  to the x86.c code
-- Updated __set_sregs to not set any register values (previously supported
-  setting the tracked values of EFER/CR0/CR4/CR8)
-- Added support for reporting SMM capability at the VM-level. This allows
-  an SEV-ES guest to indicate SMM is not supported
-- Updated FPU support to check for a guest FPU save area before using it.
-  Updated SVM to free guest FPU for an SEV-ES guest during KVM create_vcpu
-  op.
-- Removed changes to the kvm_skip_emulated_instruction()
-- Added VMSA validity checks before invoking LAUNCH_UPDATE_VMSA
-- Minor code restructuring in areas for better readability
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-
-Tom Lendacky (33):
-  KVM: SVM: Remove the call to sev_platform_status() during setup
-  KVM: SVM: Add support for SEV-ES capability in KVM
-  KVM: SVM: Add GHCB accessor functions for retrieving fields
-  KVM: SVM: Add support for the SEV-ES VMSA
-  KVM: x86: Mark GPRs dirty when written
-  KVM: SVM: Add required changes to support intercepts under SEV-ES
-  KVM: SVM: Prevent debugging under SEV-ES
-  KVM: SVM: Do not allow instruction emulation under SEV-ES
-  KVM: SVM: Cannot re-initialize the VMCB after shutdown with SEV-ES
-  KVM: SVM: Prepare for SEV-ES exit handling in the sev.c file
-  KVM: SVM: Add initial support for a VMGEXIT VMEXIT
-  KVM: SVM: Create trace events for VMGEXIT processing
-  KVM: SVM: Add support for SEV-ES GHCB MSR protocol function 0x002
-  KVM: SVM: Add support for SEV-ES GHCB MSR protocol function 0x004
-  KVM: SVM: Add support for SEV-ES GHCB MSR protocol function 0x100
-  KVM: SVM: Create trace events for VMGEXIT MSR protocol processing
-  KVM: SVM: Support MMIO for an SEV-ES guest
-  KVM: SVM: Support port IO operations for an SEV-ES guest
-  KVM: SVM: Add support for EFER write traps for an SEV-ES guest
-  KVM: SVM: Add support for CR0 write traps for an SEV-ES guest
-  KVM: SVM: Add support for CR4 write traps for an SEV-ES guest
-  KVM: SVM: Add support for CR8 write traps for an SEV-ES guest
-  KVM: x86: Update __get_sregs() / __set_sregs() to support SEV-ES
-  KVM: SVM: Do not report support for SMM for an SEV-ES guest
-  KVM: SVM: Guest FPU state save/restore not needed for SEV-ES guest
-  KVM: SVM: Add support for booting APs for an SEV-ES guest
-  KVM: SVM: Add NMI support for an SEV-ES guest
-  KVM: SVM: Set the encryption mask for the SVM host save area
-  KVM: SVM: Update ASID allocation to support SEV-ES guests
-  KVM: SVM: Provide support for SEV-ES vCPU creation/loading
-  KVM: SVM: Provide support for SEV-ES vCPU loading
-  KVM: SVM: Provide an updated VMRUN invocation for SEV-ES guests
-  KVM: SVM: Provide support to launch and run an SEV-ES guest
-
- arch/x86/include/asm/kvm_host.h  |  12 +-
- arch/x86/include/asm/msr-index.h |   1 +
- arch/x86/include/asm/svm.h       |  40 +-
- arch/x86/include/uapi/asm/svm.h  |  28 ++
- arch/x86/kernel/cpu/vmware.c     |  12 +-
- arch/x86/kvm/Kconfig             |   3 +-
- arch/x86/kvm/cpuid.c             |   1 +
- arch/x86/kvm/kvm_cache_regs.h    |  51 +-
- arch/x86/kvm/svm/sev.c           | 837 +++++++++++++++++++++++++++++--
- arch/x86/kvm/svm/svm.c           | 465 +++++++++++++----
- arch/x86/kvm/svm/svm.h           | 165 ++++--
- arch/x86/kvm/svm/vmenter.S       |  50 ++
- arch/x86/kvm/trace.h             |  97 ++++
- arch/x86/kvm/vmx/vmx.c           |   6 +-
- arch/x86/kvm/x86.c               | 364 ++++++++++++--
- arch/x86/kvm/x86.h               |   9 +
- 16 files changed, 1892 insertions(+), 249 deletions(-)
-
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 65e15c22bd3c..2febbf916af2 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1126,9 +1126,6 @@ void sev_vm_destroy(struct kvm *kvm)
+ 
+ int __init sev_hardware_setup(void)
+ {
+-	struct sev_user_data_status *status;
+-	int rc;
+-
+ 	/* Maximum number of encrypted guests supported simultaneously */
+ 	max_sev_asid = cpuid_ecx(0x8000001F);
+ 
+@@ -1147,26 +1144,9 @@ int __init sev_hardware_setup(void)
+ 	if (!sev_reclaim_asid_bitmap)
+ 		return 1;
+ 
+-	status = kmalloc(sizeof(*status), GFP_KERNEL);
+-	if (!status)
+-		return 1;
+-
+-	/*
+-	 * Check SEV platform status.
+-	 *
+-	 * PLATFORM_STATUS can be called in any state, if we failed to query
+-	 * the PLATFORM status then either PSP firmware does not support SEV
+-	 * feature or SEV firmware is dead.
+-	 */
+-	rc = sev_platform_status(status, NULL);
+-	if (rc)
+-		goto err;
+-
+ 	pr_info("SEV supported\n");
+ 
+-err:
+-	kfree(status);
+-	return rc;
++	return 0;
+ }
+ 
+ void sev_hardware_teardown(void)
 -- 
 2.28.0
 
