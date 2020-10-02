@@ -2,203 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76D29281D7E
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 23:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 755CB281DC7
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 23:44:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725803AbgJBVNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 17:13:18 -0400
-Received: from mga09.intel.com ([134.134.136.24]:45640 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725790AbgJBVNS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Oct 2020 17:13:18 -0400
-IronPort-SDR: vBjrkXoMLjjOfRMmvLVEC4vy4kUhBp5nHYCy0XuZCM043pU6MsLsS+R1qVn7fH0wLEsBP+T3CD
- bRlzLQCScrHQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9762"; a="163943621"
-X-IronPort-AV: E=Sophos;i="5.77,329,1596524400"; 
-   d="scan'208";a="163943621"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 14:13:16 -0700
-IronPort-SDR: pQGgRIgg0M6SqXsE9oyEJOdVjWVBrdtupz/k2OHNIa7Lp5wd2v966VGGnZJCKLdGa6B3MZ4+DO
- sOxB5mdFJwCA==
-X-IronPort-AV: E=Sophos;i="5.77,329,1596524400"; 
-   d="scan'208";a="516027807"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 14:13:15 -0700
-Date:   Fri, 2 Oct 2020 14:13:14 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vivek Goyal <vgoyal@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtio-fs-list <virtio-fs@redhat.com>, vkuznets@redhat.com,
-        pbonzini@redhat.com
-Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
-Message-ID: <20201002211314.GE24460@linux.intel.com>
-References: <20200720211359.GF502563@redhat.com>
- <20200929043700.GL31514@linux.intel.com>
- <20201001215508.GD3522@redhat.com>
- <20201001223320.GI7474@linux.intel.com>
- <20201002153854.GC3119@redhat.com>
- <20201002183036.GB24460@linux.intel.com>
- <20201002192734.GD3119@redhat.com>
- <20201002194517.GD24460@linux.intel.com>
- <20201002200214.GB10232@redhat.com>
+        id S1725778AbgJBVo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 17:44:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20483 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725770AbgJBVo0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 17:44:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601675064;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dIUcpI90aSUwNTpPMvVsD/mHHXAF5R2q8TjeCL/HeFE=;
+        b=OYSBnC2pNHdxTCldN/IhS04jfsOT5f/qkUFV0IawJ6jD0x2VsDP6zeqQijklVWdRQzOwKM
+        6eSt5bYikRt4RlIwmiH61emU0zXzNZi3XRGIz7D5EBB0rrfKeeMQSTfvdefyzXAa1cFYmF
+        H6o1EzY+t2vYbNQ3Gdeg4JjsGYU7Zto=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-69-A2XFeJ3kMfmQGEod4k17Tw-1; Fri, 02 Oct 2020 17:44:20 -0400
+X-MC-Unique: A2XFeJ3kMfmQGEod4k17Tw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF451803F74;
+        Fri,  2 Oct 2020 21:44:18 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 400FB55793;
+        Fri,  2 Oct 2020 21:44:18 +0000 (UTC)
+Date:   Fri, 2 Oct 2020 15:44:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/5] vfio-pci/zdev: define the vfio_zdev header
+Message-ID: <20201002154417.20c2a7ef@x1.home>
+In-Reply-To: <1601668844-5798-4-git-send-email-mjrosato@linux.ibm.com>
+References: <1601668844-5798-1-git-send-email-mjrosato@linux.ibm.com>
+        <1601668844-5798-4-git-send-email-mjrosato@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201002200214.GB10232@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 02, 2020 at 04:02:14PM -0400, Vivek Goyal wrote:
-> On Fri, Oct 02, 2020 at 12:45:18PM -0700, Sean Christopherson wrote:
-> > On Fri, Oct 02, 2020 at 03:27:34PM -0400, Vivek Goyal wrote:
-> > > On Fri, Oct 02, 2020 at 11:30:37AM -0700, Sean Christopherson wrote:
-> > > > On Fri, Oct 02, 2020 at 11:38:54AM -0400, Vivek Goyal wrote:
-> > > > I don't think it's necessary to provide userspace with the register state of
-> > > > the guest task that hit the bad page.  Other than debugging, I don't see how
-> > > > userspace can do anything useful which such information.
-> > > 
-> > > I think debugging is the whole point so that user can figure out which
-> > > access by guest task resulted in bad memory access. I would think this
-> > > will be important piece of information.
-> > 
-> > But isn't this failure due to a truncation in the host?  Why would we care
-> > about debugging the guest?  It hasn't done anything wrong, has it?  Or am I
-> > misunderstanding the original problem statement.
+On Fri,  2 Oct 2020 16:00:42 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+
+> We define a new device region in vfio.h to be able to get the ZPCI CLP
+> information by reading this region from userspace.
 > 
-> I think you understood problem statement right. If guest has right
-> context, it just gives additional information who tried to access
-> the missing memory page. 
-
-Yes, but it's not actionable, e.g. QEMU can't do anything differently given
-a guest RIP.  It's useful information for hands-on debug, but the information
-can be easily collected through other means when doing hands-on debug.
- 
-> > > > To fully handle the situation, the guest needs to remove the bad page from
-> > > > its memory pool.  Once the page is offlined, the guest kernel's error
-> > > > handling will kick in when a task accesses the bad page (or nothing ever
-> > > > touches the bad page again and everyone is happy).
-> > > 
-> > > This is not really a case of bad page as such. It is more of a page
-> > > gone missing/trucated. And no new user can map it. We just need to
-> > > worry about existing users who already have it mapped.
-> > 
-> > What do you mean by "no new user can map it"?  Are you talking about guest
-> > tasks or host tasks?  If guest tasks, how would the guest know the page is
-> > missing and thus prevent mapping the non-existent page?
+> We create a new file, vfio_zdev.h to define the structure of the new
+> region defined in vfio.h
 > 
-> If a new task wants mmap(), it will send a request to virtiofsd/qemu
-> on host. If file has been truncated, then mapping beyond file size
-> will fail and process will get error.  So they will not be able to
-> map a page which has been truncated.
-
-Ah.  Is there anything that prevents the notification side of things from
-being handled purely within the virtiofs layer?  E.g. host notifies the guest
-that a file got truncated, virtiofs driver in the guest invokes a kernel API
-to remove the page(s).
-
-> > > > Note, I'm not necessarily suggesting that QEMU piggyback its #MC injection
-> > > > to handle this, but I suspect the resulting behavior will look quite similar,
-> > > > e.g. notify the virtiofs driver in the guest, which does some magic to take
-> > > > the offending region offline, and then guest tasks get SIGBUS or whatever.
-> > > > 
-> > > > I also don't think it's KVM's responsibility to _directly_ handle such a
-> > > > scenario.  As I said in an earlier version, KVM can't possibly know _why_ a
-> > > > page fault came back with -EFAULT, only userspace can connect the dots of
-> > > > GPA -> HVA -> vm_area_struct -> file -> inject event.  KVM definitely should
-> > > > exit to userspace on the -EFAULT instead of hanging the guest, but that can
-> > > > be done via a new request, as suggested.
-> > > 
-> > > KVM atleast should have the mechanism to report this back to guest. And
-> > > we don't have any. There only seems to be #MC stuff for poisoned pages.
-> > > I am not sure how much we can build on top of #MC stuff to take care
-> > > of this case. One problem with #MC I found was that it generates
-> > > synchronous #MC only on load and not store. So all the code is
-> > > written in such a way that synchronous #MC can happen only on load
-> > > and hence the error handling. 
-> > > 
-> > > Stores generate different kind of #MC that too asynchronously and
-> > > caller will not know about it immiditely. But in this case we need
-> > > to know about error in the context of caller both for loads and stores.
-> > > 
-> > > Anyway, I agree that this patch does not solve the problem of race
-> > > free synchronous event inject into the guest. That's something yet
-> > > to be solved either by #VE or by #MC or by #foo.
-> > > 
-> > > This patch is only doing two things.
-> > > 
-> > > - Because we don't have a mechanism to report errors to guest, use
-> > >   the second best method and exit to user space.
-> > 
-> > Not that it matters at this point, but IMO exiting to userspace is the
-> > correct behavior, not simply "second best method".  Again, KVM by design
-> > does not know what lies behind any given HVA, and therefore should not be
-> > making decisions about how to handle bad HVAs.
-> >  
-> > > - Make behavior consistent between synchronous fault and async faults.
-> > >   Currently sync faults exit to user space on error while async
-> > >    faults spin infinitely.
-> > 
-> > Yes, and this part can be done with a new request type.  Adding a new
-> > request doesn't commit KVM to any ABI changes, e.g. userspace will still
-> > see an -EFAULT return, and nothing more.  I.e. handling this via request
-> > doesn't prevent switching to synchronous exits in the future, if such a
-> > feature is required.
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  include/uapi/linux/vfio.h      |   5 ++
+>  include/uapi/linux/vfio_zdev.h | 118 +++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 123 insertions(+)
+>  create mode 100644 include/uapi/linux/vfio_zdev.h
 > 
-> I am really not sure what benfit this kvm request is bringing to the
-> table. To me maintaining a hash table and exiting when guest retries
-> is much nicer desgin.
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 9204705..65eb367 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -326,6 +326,11 @@ struct vfio_region_info_cap_type {
+>   * to do TLB invalidation on a GPU.
+>   */
+>  #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+> +/*
+> + * IBM zPCI specific hardware feature information for a devcie.  The contents
+> + * of this region are mapped by struct vfio_region_zpci_info.
+> + */
+> +#define VFIO_REGION_SUBTYPE_IBM_ZPCI_CLP	(2)
+>  
+>  /* sub-types for VFIO_REGION_TYPE_GFX */
+>  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
+> new file mode 100644
+> index 0000000..1c8fb62
+> --- /dev/null
+> +++ b/include/uapi/linux/vfio_zdev.h
+> @@ -0,0 +1,118 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Region definition for ZPCI devices
+> + *
+> + * Copyright IBM Corp. 2020
+> + *
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + *            Matthew Rosato <mjrosato@linux.ibm.com>
+> + */
+> +
+> +#ifndef _VFIO_ZDEV_H_
+> +#define _VFIO_ZDEV_H_
+> +
+> +#include <linux/types.h>
+> +
+> +/**
+> + * struct vfio_region_zpci_info - ZPCI information
+> + *
+> + * This region provides zPCI specific hardware feature information for a
+> + * device.
+> + *
+> + * The ZPCI information structure is presented as a chain of CLP features
+> + * defined below. argsz provides the size of the entire region, and offset
+> + * provides the location of the first CLP feature in the chain.
+> + *
+> + */
+> +struct vfio_region_zpci_info {
+> +	__u32 argsz;		/* Size of entire payload */
+> +	__u32 offset;		/* Location of first entry */
+> +};
+> +
+> +/**
+> + * struct vfio_region_zpci_info_hdr - ZPCI header information
+> + *
+> + * This structure is included at the top of each CLP feature to define what
+> + * type of CLP feature is presented / the structure version. The next value
+> + * defines the offset of the next CLP feature, and is an offset from the very
+> + * beginning of the region (vfio_region_zpci_info).
+> + *
+> + * Each CLP feature must have it's own unique 'id'.
+> + */
+> +struct vfio_region_zpci_info_hdr {
+> +	__u16 id;		/* Identifies the CLP type */
+> +	__u16	version;	/* version of the CLP data */
+> +	__u32 next;		/* Offset of next entry */
+> +};
+> +
+> +/**
+> + * struct vfio_region_zpci_info_pci - Base PCI Function information
+> + *
+> + * This region provides a set of descriptive information about the associated
+> + * PCI function.
+> + */
+> +#define VFIO_REGION_ZPCI_INFO_BASE	1
+> +
+> +struct vfio_region_zpci_info_base {
+> +	struct vfio_region_zpci_info_hdr hdr;
+> +	__u64 start_dma;	/* Start of available DMA addresses */
+> +	__u64 end_dma;		/* End of available DMA addresses */
+> +	__u16 pchid;		/* Physical Channel ID */
+> +	__u16 vfn;		/* Virtual function number */
+> +	__u16 fmb_length;	/* Measurement Block Length (in bytes) */
+> +	__u8 pft;		/* PCI Function Type */
+> +	__u8 gid;		/* PCI function group ID */
+> +};
+> +
+> +
+> +/**
+> + * struct vfio_region_zpci_info_group - Base PCI Function Group information
+> + *
+> + * This region provides a set of descriptive information about the group of PCI
+> + * functions that the associated device belongs to.
+> + */
+> +#define VFIO_REGION_ZPCI_INFO_GROUP	2
+> +
+> +struct vfio_region_zpci_info_group {
+> +	struct vfio_region_zpci_info_hdr hdr;
+> +	__u64 dasm;		/* DMA Address space mask */
+> +	__u64 msi_addr;		/* MSI address */
+> +	__u64 flags;
+> +#define VFIO_PCI_ZDEV_FLAGS_REFRESH 1 /* Use program-specified TLB refresh */
+> +	__u16 mui;		/* Measurement Block Update Interval */
+> +	__u16 noi;		/* Maximum number of MSIs */
+> +	__u16 maxstbl;		/* Maximum Store Block Length */
+> +	__u8 version;		/* Supported PCI Version */
+> +};
+> +
+> +/**
+> + * struct vfio_region_zpci_info_util - Utility String
+> + *
+> + * This region provides the utility string for the associated device, which is
+> + * a device identifier string made up of EBCDID characters.  'size' specifies
+> + * the length of 'util_str'.
+> + */
+> +#define VFIO_REGION_ZPCI_INFO_UTIL	3
+> +
+> +struct vfio_region_zpci_info_util {
+> +	struct vfio_region_zpci_info_hdr hdr;
+> +	__u32 size;
+> +	__u8 util_str[];
+> +};
+> +
+> +/**
+> + * struct vfio_region_zpci_info_pfip - PCI Function Path
+> + *
+> + * This region provides the PCI function path string, which is an identifier
+> + * that describes the internal hardware path of the device. 'size' specifies
+> + * the length of 'pfip'.
+> + */
+> +#define VFIO_REGION_ZPCI_INFO_PFIP	4
+> +
+> +struct vfio_region_zpci_info_pfip {
+> +struct vfio_region_zpci_info_hdr hdr;
+> +	__u32 size;
+> +	__u8 pfip[];
+> +};
+> +
+> +#endif
 
-8 bytes pre vCPU versus 512 bytes per vCPU, with no guesswork.  I.e. the
-request can guarantee the first access to a truncated file will be reported
-to userspace.
+Can you discuss why a region with embedded capability chain is a better
+solution than extending the VFIO_DEVICE_GET_INFO ioctl to support a
+capability chain and providing this info there?  This all appears to be
+read-only info, so what's the benefit of duplicating yet another
+capability chain in a region?  It would also be possible to define four
+separate device specific regions, one for each of these capabilities
+rather than creating this chain.  It just seems like a strange approach
+TBH.  Thanks,
 
-> In fact, once we have the mechanism to inject error into the guest using an
-> exception, We can easily plug that into the same path.
+Alex
 
-You're blurring the two things together.  The first step is to fix the
-infinite loop by exiting to userspace with -EFAULT.  Notifying the guest of
-the truncated file is a completely different problem to solve.  Reporting
--EFAULT to userspace is a pure bug fix, and is not unique to DAX.
-
-> If memory usage is a concern, we can reduce the hash table size to say
-> 4 or 8.
-> 
-> How is this change commiting KVM to an ABI?
-
-I didn't mean to imply this patch changes the ABI.  What I was trying to say
-is that going with the request-based implementation doesn't commit KVM to
-new behavior, e.g. we can yank out the request implementation in favor of
-something else if the need arises.
-
-> > > Once we have a method to report errors back to guest, then we first
-> > > should report error back to guest. And only in the absense of such
-> > > mechanism we should exit to user space.
-> > 
-> > I don't see the value in extending KVM's ABI to avoid the exit to userspace.
-> > E.g. we could add a memslot flag to autoreflect -EFAULT as an event of some
-> > form, but this is a slow path, the extra time should be a non-issue.
-> 
-> IIUC, you are saying that this becomes the property of memory region. Some
-> memory regions can choose their errors being reported back to guest
-> (using some kind of flag in memslot). And in the absense of such flag,
-> default behavior will continue to be exit to user space?
-> 
-> I guess that's fine if we don't want to treat all the memory areas in
-> same way. I can't think why reporting errors for all areas to guest
-> is a bad idea.
-
-Because it'd be bleeding host information to the guest.  E.g. if there's a
-a host kernel bug that causes gup() to fail, then KVM would inject a random
-fault into the guest, which is all kinds of bad.
-
-> Let guest either handle the error or die if it can't
-> handle it. But that discussion is for some other day. Our first problem
-> is that we don't have a race free mechanism to report errors.
-> 
-> Thanks
-> Vivek
-> 
