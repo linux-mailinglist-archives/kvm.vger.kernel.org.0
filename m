@@ -2,154 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D133A280E5C
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 09:58:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06A45280EA1
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 10:20:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726352AbgJBH6P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 03:58:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57669 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726274AbgJBH6P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 03:58:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601625493;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tMgNt08CRRmOXK3CIWenyUlTQX/4sjp7rZl7HOrw3DA=;
-        b=MCUrcoAHndWtbiWMIWhFj1Ce2cx20Jk5ky5nUgCtUd0aldh8eSIwJ8kd20/XdItV5LeWk+
-        v8a47Nw5Ia5qkBF7HrJEgjqo70dEMYmos4sSYMJOHDtiatRTXoXSrvOcMC59KPbipOTL0C
-        4ofsoVGZ69U6uns6y8oCeAVakpuQXks=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-bt54GKG6MFqfDs06ugbr9g-1; Fri, 02 Oct 2020 03:58:12 -0400
-X-MC-Unique: bt54GKG6MFqfDs06ugbr9g-1
-Received: by mail-wr1-f72.google.com with SMTP id w7so258368wrp.2
-        for <kvm@vger.kernel.org>; Fri, 02 Oct 2020 00:58:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tMgNt08CRRmOXK3CIWenyUlTQX/4sjp7rZl7HOrw3DA=;
-        b=EbjrMla8ZZuWDs0la2BtythgAOB1a6xJR8S9DEtTuqPgVN7TVXwnCYJ5mtSlSY7Bzb
-         S+uSsNLLO7cX105lHmpGPYF4OOp88M9bvOWqabO3J15SB12VSRxq+W77IhsEOHBWCNlP
-         ONPRrYLWIAXFfzqYLyvp9eatCApKNh+9tkadwB7NAn+PaXXOT1OOjXJGolD31CBUtrgs
-         gvz5kzwZbI7/f8DRQWozA5kWS+nIsbxkmQZlH2InSvs7gldidvTPnatujK3dBSPX/LCC
-         0E8Kmh566fVOUqce9LCQFVoU7Lg/olMXzWlQy058t0rOz8NeP4bpw7odl5PJcU9W2nU8
-         9TKA==
-X-Gm-Message-State: AOAM531tH71/GP75VryBn6/a0Ek6zvCoJIUx5aakO8z8yeRhKhdz0q/+
-        vcBW6TPtp39NFCtvIyZ5k4N+FOjnPQTfMaNUe45Ar2qMifgIoZjWhTKFc7jZOCx7iSamXBaiXUC
-        kc29L769NP21M
-X-Received: by 2002:adf:a418:: with SMTP id d24mr1537775wra.80.1601625490926;
-        Fri, 02 Oct 2020 00:58:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyUO9y3AQg+kiMtHtpbAMV9S0Gq+elcdmP6P7MKm/4WwsJy3zoXR0uDgD0rnCYmyCKvBmBQ4A==
-X-Received: by 2002:adf:a418:: with SMTP id d24mr1537748wra.80.1601625490656;
-        Fri, 02 Oct 2020 00:58:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:11eb:3314:c22:e3c7? ([2001:b07:6468:f312:11eb:3314:c22:e3c7])
-        by smtp.gmail.com with ESMTPSA id 76sm891200wma.42.2020.10.02.00.58.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Oct 2020 00:58:10 -0700 (PDT)
-Subject: Re: [PATCH 2/6] docs: vcpu.rst: fix some build warnings
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
+        id S2387561AbgJBIUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 04:20:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56880 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725961AbgJBIUN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Oct 2020 04:20:13 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6B55420719;
+        Fri,  2 Oct 2020 08:20:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1601626812;
+        bh=eCXSiU2FIhwyMUdAzE/HQoSwO9e7c1WQEH8tvyiMQns=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=01oagkzbJzHnhjV2zf9J7vsHUTejgJ/cLcBOFBC4wrj7b06/ce6VUwjqoJKa3ScTy
+         1CQlS3SP/MqGvCIhyFVjDz6/4pZfMM5aJgDUKGB7Wh3oxLHAhHq2Dl0/Dxlr9uPwJx
+         aAO/Wp2r1hBVGU4D0kVg+mRrSDqAuWNAtXGDeZ0Q=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kOGIU-00GeG7-Q0; Fri, 02 Oct 2020 09:20:10 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, David Brazdil <dbrazdil@google.com>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Dennis Zhou <dennis@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Tejun Heo <tj@kernel.org>,
+        kernel-team@android.com, Christoph Lameter <cl@linux.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        kvm@vger.kernel.org, linux-i2c@vger.kernel.org,
+        Andrew Lunn <andrew@lunn.ch>, linux-gpio@vger.kernel.org,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Jeff Dike <jdike@addtoit.com>, Taehee Yoo <ap420073@gmail.com>,
+        Eugeniu Rosca <erosca@de.adit-jv.com>,
+        Richard Weinberger <richard@nod.at>,
         Andrew Jones <drjones@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
+        Wolfram Sang <wsa@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-um@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Mathieu Poirier <mathieu.poirier@linaro.org>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+        Ulrich Hecht <uli+renesas@fpond.eu>
+Subject: Re: [PATCH 0/6] Fix new html build warnings from next-20201001
+Date:   Fri,  2 Oct 2020 09:19:59 +0100
+Message-Id: <160162675379.1930042.15447480570555160964.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1601616399.git.mchehab+huawei@kernel.org>
 References: <cover.1601616399.git.mchehab+huawei@kernel.org>
- <b5385dd0213f1f070667925bf7a807bf5270ba78.1601616399.git.mchehab+huawei@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c3cb6146-4910-ea8e-f07c-9935cb971a18@redhat.com>
-Date:   Fri, 2 Oct 2020 09:58:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <b5385dd0213f1f070667925bf7a807bf5270ba78.1601616399.git.mchehab+huawei@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, dbrazdil@google.com, linux-doc@vger.kernel.org, mchehab+huawei@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, dennis@kernel.org, catalin.marinas@arm.com, will@kernel.org, tj@kernel.org, kernel-team@android.com, cl@linux.com, pbonzini@redhat.com, kuba@kernel.org, netdev@vger.kernel.org, geert+renesas@glider.be, kvm@vger.kernel.org, linux-i2c@vger.kernel.org, andrew@lunn.ch, linux-gpio@vger.kernel.org, anton.ivanov@cambridgegreys.com, davem@davemloft.net, bgolaszewski@baylibre.com, jdike@addtoit.com, ap420073@gmail.com, erosca@de.adit-jv.com, richard@nod.at, drjones@redhat.com, wsa@kernel.org, linus.walleij@linaro.org, tglx@linutronix.de, linux-um@lists.infradead.org, alexandru.elisei@arm.com, sblbir@amazon.com, corbet@lwn.net, mathieu.poirier@linaro.org, uli+renesas@fpond.eu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/10/20 07:49, Mauro Carvalho Chehab wrote:
-> As warned with make htmldocs:
+On Fri, 2 Oct 2020 07:49:44 +0200, Mauro Carvalho Chehab wrote:
+> There are some new warnings when building the documentation from
+> yesterday's linux next. This small series fix them.
 > 
-> 	.../Documentation/virt/kvm/devices/vcpu.rst:70: WARNING: Malformed table.
-> 	Text in column margin in table line 2.
+> - patch 1 documents two new kernel-doc parameters on a net core file.
+>   I used the commit log in order to help documenting them;
+> - patch 2 fixes some tags at UMLv2 howto;
+> - patches 3 and 5 add some new documents at the corresponding
+>   index file.
+> - patch 4 changes kernel-doc script for it to recognize typedef enums.
 > 
-> 	=======  ======================================================
-> 	-ENODEV: PMUv3 not supported or GIC not initialized
-> 	-ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
-> 	         configured as required prior to calling this attribute
-> 	-EBUSY:  PMUv3 already initialized
-> 	-EINVAL: Invalid filter range
-> 	=======  ======================================================
-> 
-> The ':' character for two lines are above the size of the column.
-> Besides that, other tables at the file doesn't use ':', so
-> just drop them.
-> 
-> While here, also fix this warning also introduced at the same patch:
-> 
-> 	.../Documentation/virt/kvm/devices/vcpu.rst:88: WARNING: Block quote ends without a blank line; unexpected unindent.
-> 
-> By marking the C code as a literal block.
-> 
-> Fixes: 8be86a5eec04 ("KVM: arm64: Document PMU filtering API")
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->  Documentation/virt/kvm/devices/vcpu.rst | 26 ++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index da7c2ef7dafc..2acec3b9ef65 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -67,25 +67,25 @@ irqchip.
->  :Returns:
->  
->  	 =======  ======================================================
-> -	 -ENODEV: PMUv3 not supported or GIC not initialized
-> -	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
-> +	 -ENODEV  PMUv3 not supported or GIC not initialized
-> +	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
->  	 	  configured as required prior to calling this attribute
-> -	 -EBUSY:  PMUv3 already initialized
-> -	 -EINVAL: Invalid filter range
-> +	 -EBUSY   PMUv3 already initialized
-> +	 -EINVAL  Invalid filter range
->  	 =======  ======================================================
->  
-> -Request the installation of a PMU event filter described as follows:
-> +Request the installation of a PMU event filter described as follows::
->  
-> -struct kvm_pmu_event_filter {
-> -	__u16	base_event;
-> -	__u16	nevents;
-> +    struct kvm_pmu_event_filter {
-> +	    __u16	base_event;
-> +	    __u16	nevents;
->  
-> -#define KVM_PMU_EVENT_ALLOW	0
-> -#define KVM_PMU_EVENT_DENY	1
-> +    #define KVM_PMU_EVENT_ALLOW	0
-> +    #define KVM_PMU_EVENT_DENY	1
->  
-> -	__u8	action;
-> -	__u8	pad[3];
-> -};
-> +	    __u8	action;
-> +	    __u8	pad[3];
-> +    };
->  
->  A filter range is defined as the range [@base_event, @base_event + @nevents),
->  together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). The
-> 
+> [...]
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Applied to next, thanks!
+
+[2/6] KVM: arm64: Fix some documentation build warnings
+      commit: 030bdf3698b7c3af190dd1fe714f0545f23441d0
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
