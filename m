@@ -2,223 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 158B828191F
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:24:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E1F128193F
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:29:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbgJBRYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 13:24:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47275 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726096AbgJBRYs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 13:24:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601659486;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Wyu/6NebhFiG1x2CbhG734h8rPbGSszDRSh0XvBsFik=;
-        b=MUDIjAzUL37TdRVzLTrfnuTWtIajiEnONgt4Zd+VrsuvveJxisvkGJFd3oFZbRCn8HsiSo
-        aMQWYVVKb+NRyUXlvuh5Sfl/PElWW+jwJLa/ls8VblzZkCmHP2W6L5sK6/8bi5S4e/gn6v
-        kswj2pdI2ow970gzeEsiSTA1o5UVr78=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-_NWWWqabOnGv48SMm1Q4Nw-1; Fri, 02 Oct 2020 13:24:43 -0400
-X-MC-Unique: _NWWWqabOnGv48SMm1Q4Nw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A62D801ABD;
-        Fri,  2 Oct 2020 17:24:42 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E9EA60CD1;
-        Fri,  2 Oct 2020 17:24:38 +0000 (UTC)
-Date:   Fri, 2 Oct 2020 11:24:37 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Diana Craciun <diana.craciun@oss.nxp.com>
-Cc:     kvm@vger.kernel.org, bharatb.linux@gmail.com,
-        linux-kernel@vger.kernel.org, eric.auger@redhat.com,
-        Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Subject: Re: [PATCH v5 02/10] vfio/fsl-mc: Scan DPRC objects on vfio-fsl-mc
- driver bind
-Message-ID: <20201002112437.0b15a986@x1.home>
-In-Reply-To: <20200929090339.17659-3-diana.craciun@oss.nxp.com>
-References: <20200929090339.17659-1-diana.craciun@oss.nxp.com>
-        <20200929090339.17659-3-diana.craciun@oss.nxp.com>
-Organization: Red Hat
+        id S2388288AbgJBR3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 13:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54278 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388247AbgJBR3F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Oct 2020 13:29:05 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF52CC0613E3
+        for <kvm@vger.kernel.org>; Fri,  2 Oct 2020 10:29:05 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id a2so2095960otr.11
+        for <kvm@vger.kernel.org>; Fri, 02 Oct 2020 10:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RQsg6ahWktyPvURwiyd1VgLtMh0Q43RTGiqOocC5R54=;
+        b=UO94HG6O0IX1kgvtQIyBLRmnKZ0ICSk8JVo/6rlaOMXI6yCPT+tEy43d5N5dN6RMUu
+         qHNIfX1buI6VYT5mzWWRXhrkrkj7bUZ+hUM/ua2NafAM7SWj08OhoQ7wQ1ueK+5IqAkM
+         sNCGxBatn9yvcPEuKxA+Pve+PTi6Vi1mFZnkwiSQYNmHbrRQ13vF8YFoSA0/Lgfpwmu1
+         zhVXPYiIUavX0O2QT2OgjblVpc713KBNN8kE+LdGbzN5mox0j1JgvbsndHaXkEfDAVVr
+         1I0Lcf8nmC2FfQBXdeV5JJ9t2sxYmmh/36bupWw2UhNHB3RgKF2i6VIxidXMdLy8dBEh
+         hrCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RQsg6ahWktyPvURwiyd1VgLtMh0Q43RTGiqOocC5R54=;
+        b=Dn0JsnX/wGrlxvwgQlJZKBIkf37OYuu2BDpkuKgtbTG+Xj6uqE4PLpR4vYPfqDA+nv
+         Jqa4bvwAVjxEO0XKrmC1aKKzfA6VowM8yfx093/6UAr1TZ5a60EoEX6u4OoGFwt6+qUe
+         vLhFRxuVRaGGZnxKGkCKS6H1nHEV09h3K3Pr5Cwjk/JIfbA8DgIieSdotdwg84WqM1H4
+         y2gTJAgcBlgU1CfVo79MwrIszo72vnLh7zzXf1vSmeKvMPKyeDwqRqGD5qzJP+MOdJ80
+         m/oas1MsRlcQC4+XDOopsKpHFzHKRSkzFpU0NDJAgGZvW8DD2ITjXqvVxz1r58gyAuPF
+         l8fA==
+X-Gm-Message-State: AOAM530AvsqUx8HF+wdUOboJHTAKh14kpcxZF183Hay6bUkbQamxSRhI
+        7eTMA9ozW3HpDrscNcKP5jvHK8YBTlLquqVfLBcFDA==
+X-Google-Smtp-Source: ABdhPJxL6pus8jowMU3LdrwfzIwO1FYffuY4IL2IunOFog16IDAVC1S+1qq0Dsb/eucmve/Nj9gINZs8R32PMNR28rI=
+X-Received: by 2002:a05:6830:2104:: with SMTP id i4mr2576095otc.266.1601659744837;
+ Fri, 02 Oct 2020 10:29:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20200903141122.72908-1-mgamal@redhat.com> <1f42d8f084083cdf6933977eafbb31741080f7eb.camel@redhat.com>
+ <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
+ <ebcd39a5-364f-c4ac-f8c7-41057a3d84be@redhat.com> <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
+ <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
+In-Reply-To: <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Fri, 2 Oct 2020 22:58:53 +0530
+Message-ID: <CA+G9fYvm1Ux7XmmXgpPHmLJ4WbRoPowbEfbub1HC2G4E-1r-1g@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
+ support user-configurable
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Qian Cai <cai@redhat.com>, Mohammed Gamal <mgamal@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        lkft-triage@lists.linaro.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 29 Sep 2020 12:03:31 +0300
-Diana Craciun <diana.craciun@oss.nxp.com> wrote:
+Hi Paolo,
 
-> The DPRC (Data Path Resource Container) device is a bus device and has
-> child devices attached to it. When the vfio-fsl-mc driver is probed
-> the DPRC is scanned and the child devices discovered and initialized.
-> 
-> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
-> ---
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 90 +++++++++++++++++++++++
->  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  1 +
->  2 files changed, 91 insertions(+)
-> 
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> index a7a483a1e90b..ba44d6d01cc9 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> @@ -15,6 +15,8 @@
->  
->  #include "vfio_fsl_mc_private.h"
->  
-> +static struct fsl_mc_driver vfio_fsl_mc_driver;
-> +
->  static int vfio_fsl_mc_open(void *device_data)
->  {
->  	if (!try_module_get(THIS_MODULE))
-> @@ -84,6 +86,79 @@ static const struct vfio_device_ops vfio_fsl_mc_ops = {
->  	.mmap		= vfio_fsl_mc_mmap,
->  };
->  
-> +static int vfio_fsl_mc_bus_notifier(struct notifier_block *nb,
-> +				    unsigned long action, void *data)
-> +{
-> +	struct vfio_fsl_mc_device *vdev = container_of(nb,
-> +					struct vfio_fsl_mc_device, nb);
-> +	struct device *dev = data;
-> +	struct fsl_mc_device *mc_dev = to_fsl_mc_device(dev);
-> +	struct fsl_mc_device *mc_cont = to_fsl_mc_device(mc_dev->dev.parent);
-> +
-> +	if (action == BUS_NOTIFY_ADD_DEVICE &&
-> +	    vdev->mc_dev == mc_cont) {
-> +		mc_dev->driver_override = kasprintf(GFP_KERNEL, "%s",
-> +						    vfio_fsl_mc_ops.name);
-> +		if (!mc_dev->driver_override)
-> +			dev_warn(dev, "VFIO_FSL_MC: Setting driver override for device in dprc %s failed\n",
-> +			     dev_name(&mc_cont->dev));
-> +		else
-> +			dev_info(dev, "VFIO_FSL_MC: Setting driver override for device in dprc %s\n",
-> +			 dev_name(&mc_cont->dev));
+Thanks for the patch.
 
-Nit, some whitespace inconsistencies on the second line of each of
-these.  I can fixup on commit if we don't find anything else worth a
-respin.
+On Tue, 29 Sep 2020 at 20:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 29/09/20 15:39, Qian Cai wrote:
+> > On Tue, 2020-09-29 at 14:26 +0200, Paolo Bonzini wrote:
+> >> On 29/09/20 13:59, Qian Cai wrote:
+> >>> WARN_ON_ONCE(!allow_smaller_maxphyaddr);
+> >>>
+> >>> I noticed the origin patch did not have this WARN_ON_ONCE(), but the
+> >>> mainline
+> >>> commit b96e6506c2ea ("KVM: x86: VMX: Make smaller physical guest address
+> >>> space
+> >>> support user-configurable") does have it for some reasons.
+> >>
+> >> Because that part of the code should not be reached.  The exception
+> >> bitmap is set up with
+> >>
+> >>         if (!vmx_need_pf_intercept(vcpu))
+> >>                 eb &= ~(1u << PF_VECTOR);
+> >>
+> >> where
+> >>
+> >> static inline bool vmx_need_pf_intercept(struct kvm_vcpu *vcpu)
+> >> {
+> >>         if (!enable_ept)
+> >>                 return true;
+> >>
+> >>         return allow_smaller_maxphyaddr &&
+> >>               cpuid_maxphyaddr(vcpu) < boot_cpu_data.x86_phys_bits;
+> >> }
+> >>
+> >> We shouldn't get here if "enable_ept && !allow_smaller_maxphyaddr",
+> >> which implies vmx_need_pf_intercept(vcpu) == false.  So the warning is
+> >> genuine; I've sent a patch.
+> >
+> > Care to provide a link to the patch? Just curious.
+> >
+>
+> Ok, I haven't sent it yet. :)  But here it is:
+>
+> commit 608e2791d7353e7d777bf32038ca3e7d548155a4 (HEAD -> kvm-master)
+> Author: Paolo Bonzini <pbonzini@redhat.com>
+> Date:   Tue Sep 29 08:31:32 2020 -0400
+>
+>     KVM: VMX: update PFEC_MASK/PFEC_MATCH together with PF intercept
+>
+>     The PFEC_MASK and PFEC_MATCH fields in the VMCS reverse the meaning of
+>     the #PF intercept bit in the exception bitmap when they do not match.
+>     This means that, if PFEC_MASK and/or PFEC_MATCH are set, the
+>     hypervisor can get a vmexit for #PF exceptions even when the
+>     corresponding bit is clear in the exception bitmap.
+>
+>     This is unexpected and is promptly reported as a WARN_ON_ONCE.
+>     To fix it, reset PFEC_MASK and PFEC_MATCH when the #PF intercept
+>     is disabled (as is common with enable_ept && !allow_smaller_maxphyaddr).
 
-> +	} else if (action == BUS_NOTIFY_BOUND_DRIVER &&
-> +		vdev->mc_dev == mc_cont) {
-> +		struct fsl_mc_driver *mc_drv = to_fsl_mc_driver(dev->driver);
-> +
-> +		if (mc_drv && mc_drv != &vfio_fsl_mc_driver)
-> +			dev_warn(dev, "VFIO_FSL_MC: Object %s bound to driver %s while DPRC bound to vfio-fsl-mc\n",
-> +				 dev_name(dev), mc_drv->driver.name);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int vfio_fsl_mc_init_device(struct vfio_fsl_mc_device *vdev)
-> +{
-> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +	int ret;
-> +
-> +	/* Non-dprc devices share mc_io from parent */
-> +	if (!is_fsl_mc_bus_dprc(mc_dev)) {
-> +		struct fsl_mc_device *mc_cont = to_fsl_mc_device(mc_dev->dev.parent);
-> +
-> +		mc_dev->mc_io = mc_cont->mc_io;
-> +		return 0;
-> +	}
-> +
-> +	vdev->nb.notifier_call = vfio_fsl_mc_bus_notifier;
-> +	ret = bus_register_notifier(&fsl_mc_bus_type, &vdev->nb);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* open DPRC, allocate a MC portal */
-> +	ret = dprc_setup(mc_dev);
-> +	if (ret) {
-> +		dev_err(&mc_dev->dev, "VFIO_FSL_MC: Failed to setup DPRC (%d)\n", ret);
-> +		goto out_nc_unreg;
-> +	}
-> +
-> +	ret = dprc_scan_container(mc_dev, false);
-> +	if (ret) {
-> +		dev_err(&mc_dev->dev, "VFIO_FSL_MC: Container scanning failed (%d)\n", ret);
-> +		goto out_dprc_cleanup;
-> +	}
+I have tested this patch on an x86_64 machine and the reported issue is gone.
 
-If I understand this correctly, we've setup the bus notifier to write
-the driver override as each sub-devices appear on the bus from this
-scan.  When non-dprc devices are removed below, it appears we remove all
-their sub-devices.  Is there a chance here that an error from the scan
-leaves residual sub-devices, ie. should we proceed the below
-dprc_cleanup() with a call to dprc_remove_devices() to be certain none
-remain?  Thanks,
+>
+>     Reported-by: Qian Cai <cai@redhat.com>
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Alex
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Tested-by: Naresh Kamboju <naresh.kamboju@linaro.org>
 
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f0384e93548a..f4e9c310032a 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -794,6 +794,18 @@ void update_exception_bitmap(struct kvm_vcpu *vcpu)
+>          */
+>         if (is_guest_mode(vcpu))
+>                 eb |= get_vmcs12(vcpu)->exception_bitmap;
+> +        else {
+> +               /*
+> +                * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
+> +                * between guest and host.  In that case we only care about present
+> +                * faults.  For vmcs02, however, PFEC_MASK and PFEC_MATCH are set in
+> +                * prepare_vmcs02_rare.
+> +                */
+> +               bool selective_pf_trap = enable_ept && (eb & (1u << PF_VECTOR));
+> +               int mask = selective_pf_trap ? PFERR_PRESENT_MASK : 0;
+> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, mask);
+> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, mask);
+> +       }
+>
+>         vmcs_write32(EXCEPTION_BITMAP, eb);
+>  }
+> @@ -4355,16 +4367,6 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>                 vmx->pt_desc.guest.output_mask = 0x7F;
+>                 vmcs_write64(GUEST_IA32_RTIT_CTL, 0);
+>         }
+> -
+> -       /*
+> -        * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
+> -        * between guest and host.  In that case we only care about present
+> -        * faults.
+> -        */
+> -       if (enable_ept) {
+> -               vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, PFERR_PRESENT_MASK);
+> -               vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, PFERR_PRESENT_MASK);
+> -       }
+>  }
+>
+>  static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>
 
-> +
-> +	return 0;
-> +
-> +out_dprc_cleanup:
-> +	dprc_cleanup(mc_dev);
-> +out_nc_unreg:
-> +	bus_unregister_notifier(&fsl_mc_bus_type, &vdev->nb);
-> +	vdev->nb.notifier_call = NULL;
-> +
-> +	return ret;
-> +}
-> +
->  static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
->  {
->  	struct iommu_group *group;
-> @@ -110,8 +185,15 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
->  		dev_err(dev, "VFIO_FSL_MC: Failed to add to vfio group\n");
->  		goto out_group_put;
->  	}
-> +
-> +	ret = vfio_fsl_mc_init_device(vdev);
-> +	if (ret)
-> +		goto out_group_dev;
-> +
->  	return 0;
->  
-> +out_group_dev:
-> +	vfio_del_group_dev(dev);
->  out_group_put:
->  	vfio_iommu_group_put(group, dev);
->  	return ret;
-> @@ -126,6 +208,14 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
->  	if (!vdev)
->  		return -EINVAL;
->  
-> +	if (is_fsl_mc_bus_dprc(mc_dev)) {
-> +		dprc_remove_devices(mc_dev, NULL, 0);
-> +		dprc_cleanup(mc_dev);
-> +	}
-> +
-> +	if (vdev->nb.notifier_call)
-> +		bus_unregister_notifier(&fsl_mc_bus_type, &vdev->nb);
-> +
->  	vfio_iommu_group_put(mc_dev->dev.iommu_group, dev);
->  
->  	return 0;
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> index e79cc116f6b8..37d61eaa58c8 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> @@ -9,6 +9,7 @@
->  
->  struct vfio_fsl_mc_device {
->  	struct fsl_mc_device		*mc_dev;
-> +	struct notifier_block        nb;
->  };
->  
->  #endif /* VFIO_FSL_MC_PRIVATE_H */
+test log link
+https://lkft.validation.linaro.org/scheduler/job/1813223
 
+- Naresh
