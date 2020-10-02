@@ -2,113 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB7CF28194B
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 19:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9F7B281ABA
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 20:18:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388291AbgJBRbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 13:31:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53656 "EHLO
+        id S2387768AbgJBSS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 14:18:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50536 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388248AbgJBRbD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 13:31:03 -0400
+        by vger.kernel.org with ESMTP id S1726017AbgJBSS5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 14:18:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601659861;
+        s=mimecast20190719; t=1601662735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TxOHOh0IIejZk+BuR1OyBgwvkUAEztBJORaBCqWyOAI=;
-        b=gAlF4Fb9O5p+bwmkrO3IQWzUsbDWwBUIIKUgIbfPUEOA9oIyL+m9zqL9PwIqFWNG/DgtPO
-        z7gKvzm1WyO9P1hY6sRNfnnBJKGYQOpJW0YKn3wZrXugURbV7VB0NOmuGGFEYSiDZ3Xwhi
-        NL6nHfS6lkZyX7hIMF0xhxdUfdB8KH8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-l4is5hPdOzaxwHpmxuY0pQ-1; Fri, 02 Oct 2020 13:31:00 -0400
-X-MC-Unique: l4is5hPdOzaxwHpmxuY0pQ-1
-Received: by mail-wm1-f70.google.com with SMTP id y6so746931wmi.7
-        for <kvm@vger.kernel.org>; Fri, 02 Oct 2020 10:30:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TxOHOh0IIejZk+BuR1OyBgwvkUAEztBJORaBCqWyOAI=;
-        b=UQLTFdIuYUQXx9TQfMb5b1rooWgs8BrGPCjypX67h+05EBx5lCslD+OSs4UsPGlsGx
-         rBFwWowCr4ddluT23yF7LVG6NVZ0yd/h65YPpMu+ELs6u+FU2gRcqPMo0mY8Q2w2vQf5
-         llHbqoZ+FnUbIW3fF2SqZ7jNRCvsSMcqII+ynoxwi8kxtCcy1cOja28+f5VJVlVLvOQd
-         dD/2C7pGJNQXmUl1g+Pf25B9kBeXzUgHeNnqIr77yomST2lsBZbvTFWhvkoL+5aI7J/I
-         0szPmzkOSS53SVzOXV3ZEjyZs2aDlBvuGrGKhyDI5whyMuJWH0eWPgtWJ1o/dGjNaCdQ
-         VK0Q==
-X-Gm-Message-State: AOAM531cJjWf068pBNSzY8AdQ3NlekJQfW+h7Z7/lpk4Dtl4upz9G1o4
-        DoQy9MwWmxOaC4gsAzM2wiAUlz+A9TkI2hnDMEhNrN7B2dCq2UYfqrfk4H3vRWy8vUQR0yVoHss
-        3VDdu/fWUCXbR
-X-Received: by 2002:a7b:c0c1:: with SMTP id s1mr4244456wmh.73.1601659858186;
-        Fri, 02 Oct 2020 10:30:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzxM8WopKn+E/7ZEMfQTo4iJ+AulaHlScB3Vysd80PrpI/qioSdeZTkZO1byHJi2o6MFioQsA==
-X-Received: by 2002:a7b:c0c1:: with SMTP id s1mr4244432wmh.73.1601659857933;
-        Fri, 02 Oct 2020 10:30:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:47e0:e742:75ba:b84d? ([2001:b07:6468:f312:47e0:e742:75ba:b84d])
-        by smtp.gmail.com with ESMTPSA id o194sm2808207wme.24.2020.10.02.10.30.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Oct 2020 10:30:57 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
- support user-configurable
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Qian Cai <cai@redhat.com>, Mohammed Gamal <mgamal@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        lkft-triage@lists.linaro.org
-References: <20200903141122.72908-1-mgamal@redhat.com>
- <1f42d8f084083cdf6933977eafbb31741080f7eb.camel@redhat.com>
- <e1dee0fd2b4be9d8ea183d3cf6d601cf9566fde9.camel@redhat.com>
- <ebcd39a5-364f-c4ac-f8c7-41057a3d84be@redhat.com>
- <2063b592f82f680edf61dad575f7c092d11d8ba3.camel@redhat.com>
- <c385b225-77fb-cf2a-fba3-c70a9b6d541d@redhat.com>
- <CA+G9fYvm1Ux7XmmXgpPHmLJ4WbRoPowbEfbub1HC2G4E-1r-1g@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <68a67f54-af5c-8b33-6b87-a67ccbbfc155@redhat.com>
-Date:   Fri, 2 Oct 2020 19:30:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        bh=IH8F866OWsGPhTpURhBie5+G2Wdh5o25NFqTjcx6COE=;
+        b=Op2An5xJOinu3TilFoq0wxvPeTqwGZJvc9RINYI+jUE3vVLitw5VfVwCjxwK7pmpdMsNko
+        ebLYPjYeL8yTTpjsTtobVwBxCGOYXt6a6fRVMBJplH77QwcW/LGhRFD7SbriHKK9cMFZyR
+        /H3ez1V9SYxZ1lqthI5bPFXqCcsk8dA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-68-5t7wkShYPVWUqOk0yvaTZw-1; Fri, 02 Oct 2020 14:18:53 -0400
+X-MC-Unique: 5t7wkShYPVWUqOk0yvaTZw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B82D7802B4C;
+        Fri,  2 Oct 2020 18:18:52 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.110])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AF55610013D7;
+        Fri,  2 Oct 2020 18:18:47 +0000 (UTC)
+Date:   Fri, 2 Oct 2020 20:18:44 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, frankja@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        lvivier@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/7] lib/list: Add double linked list
+ management functions
+Message-ID: <20201002181844.jknzoeyigdew26ek@kamzik.brq.redhat.com>
+References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
+ <20201002154420.292134-2-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+G9fYvm1Ux7XmmXgpPHmLJ4WbRoPowbEfbub1HC2G4E-1r-1g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201002154420.292134-2-imbrenda@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/10/20 19:28, Naresh Kamboju wrote:
->>
->> commit 608e2791d7353e7d777bf32038ca3e7d548155a4 (HEAD -> kvm-master)
->> Author: Paolo Bonzini <pbonzini@redhat.com>
->> Date:   Tue Sep 29 08:31:32 2020 -0400
->>
->>     KVM: VMX: update PFEC_MASK/PFEC_MATCH together with PF intercept
->>
->>     The PFEC_MASK and PFEC_MATCH fields in the VMCS reverse the meaning of
->>     the #PF intercept bit in the exception bitmap when they do not match.
->>     This means that, if PFEC_MASK and/or PFEC_MATCH are set, the
->>     hypervisor can get a vmexit for #PF exceptions even when the
->>     corresponding bit is clear in the exception bitmap.
->>
->>     This is unexpected and is promptly reported as a WARN_ON_ONCE.
->>     To fix it, reset PFEC_MASK and PFEC_MATCH when the #PF intercept
->>     is disabled (as is common with enable_ept && !allow_smaller_maxphyaddr).
-> I have tested this patch on an x86_64 machine and the reported issue is gone.
+On Fri, Oct 02, 2020 at 05:44:14PM +0200, Claudio Imbrenda wrote:
+> Add simple double linked lists.
 > 
+> Apart from the struct itself, there are functions to add and remove
+> items, and check for emptyness.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  lib/list.h | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 53 insertions(+)
+>  create mode 100644 lib/list.h
+> 
+> diff --git a/lib/list.h b/lib/list.h
+> new file mode 100644
+> index 0000000..702a78c
+> --- /dev/null
+> +++ b/lib/list.h
+> @@ -0,0 +1,53 @@
+> +#ifndef LIST_H
+> +#define LIST_H
+> +
+> +#include <stdbool.h>
+> +
+> +/*
+> + * Simple double linked list. The pointer to the list is a list item itself,
+> + * like in the kernel implementation.
+> + */
+> +struct linked_list {
+> +	struct linked_list *prev;
+> +	struct linked_list *next;
+> +};
+> +
+> +/*
+> + * An empty list is a list item whose prev and next both point to itself.
+> + * Returns true if the list is empty.
+> + */
+> +static inline bool is_list_empty(struct linked_list *p)
 
-Thanks, the issue with my disk is gone too so it'll get to Linus in time
-for rc8.
+I'd prefer the 'is' to be dropped or to come after 'list' in the name.
+Or, why not just use all the same names as the kernel, including call
+the structure list_head?
 
-Paolo
+> +{
+> +	return !p->next || !p->prev || p == p->next || p == p->prev;
+
+The '||'s can't be right and I'm not sure what you want to do about the
+NULLs. I think forbidding them is probably best, meaning this function
+should be
+
+ {
+  assert(p && p->prev && p->next);
+  return p->prev == p && p->next == p;
+ }
+
+But since p can't be NULL, then we should always return true from this
+function anyway, as a list with a single entry ('p') isn't empty.
+The kernel's list_empty() call explicitly calls its parameter 'head',
+because it expects a list's head pointer, which is a pointer to a
+list_head that is not embedded in a structure.
+
+> +}
+> +
+> +/*
+> + * Remove the given element from the list, if the list is not already empty.
+> + * The removed element is returned.
+> + */
+> +static inline struct linked_list *list_remove(struct linked_list *l)
+> +{
+> +	if (is_list_empty(l))
+> +		return NULL;
+
+This isn't necessary. Removing an entry from a list of one entry is still
+the entry.
+
+> +
+> +	l->prev->next = l->next;
+> +	l->next->prev = l->prev;
+> +	l->prev = l->next = NULL;
+> +
+> +	return l;
+> +}
+> +
+> +/*
+> + * Add the given element after the given list head.
+> + */
+> +static inline void list_add(struct linked_list *head, struct linked_list *li)
+> +{
+> +	assert(li);
+> +	assert(head);
+> +	li->prev = head;
+> +	li->next = head->next;
+> +	head->next->prev = li;
+> +	head->next = li;
+> +}
+> +
+> +#endif
+> -- 
+> 2.26.2
+>
+
+I think we should just copy the kernel's list_head much closer.
+
+Thanks,
+drew 
 
