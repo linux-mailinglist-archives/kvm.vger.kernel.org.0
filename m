@@ -2,112 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6650A281B76
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 21:21:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C03E5281C00
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 21:27:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726813AbgJBTVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 15:21:22 -0400
-Received: from mga06.intel.com ([134.134.136.31]:3336 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725991AbgJBTVV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Oct 2020 15:21:21 -0400
-IronPort-SDR: lJnbzwL2YIai6zOk7d+2Lz8htZMw4rjrO8FI3rwJfVZbf95XWGEaxb673bUiFyUf8sSjS6QZtA
- vH3GeA+3lcrg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9762"; a="224672944"
-X-IronPort-AV: E=Sophos;i="5.77,328,1596524400"; 
-   d="scan'208";a="224672944"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 12:21:19 -0700
-IronPort-SDR: +10UPm6pc0i2Lg70cAbiEOioaXg1TvU3P2t9atU5+dg/Ny4/IQGqJ8k0hXww4jBau5RZWNGKqs
- jw+RKrUdmf8A==
-X-IronPort-AV: E=Sophos;i="5.77,328,1596524400"; 
-   d="scan'208";a="313604902"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2020 12:21:19 -0700
-Date:   Fri, 2 Oct 2020 12:21:18 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Quentin Grolleau <quentin.grolleau@gmail.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: Qemu crash when trying to boot a VM with 4 NVME in PCI
- passthrough with KVM internal error. Suberror: 1
-Message-ID: <20201002192113.GC24460@linux.intel.com>
-References: <CA+BWSia-x86d3+C_zm+B0ZJEJWSne+Q95Z+cy02XHkr+pOtQGQ@mail.gmail.com>
+        id S2388474AbgJBT1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 15:27:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38548 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725991AbgJBT1n (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 15:27:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601666861;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AluZbmdSHvTUeq+jAjMYrv397RTUgpSdXrYzowWOHjI=;
+        b=ETrzfSrHSP+UGOvOnSY8qv0Dxqh5ecqi9LIiUtF9h2t0Xp5DhJn2Ni0DJWUKkSHP1SwT2N
+        FDWaSdMDL3qEJO2+VVPexsJbHlzdVOwOgYI+xjKtceu13b2+36M+Gvj/csC4E9XA66fkWy
+        948OnlvLRyQrY898MkdLcr+4GvNydPo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-8rmzyweMMxmvNWuKaqcxdQ-1; Fri, 02 Oct 2020 15:27:40 -0400
+X-MC-Unique: 8rmzyweMMxmvNWuKaqcxdQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95248425E8;
+        Fri,  2 Oct 2020 19:27:38 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-130.rdu2.redhat.com [10.10.115.130])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C1CA60BE2;
+        Fri,  2 Oct 2020 19:27:35 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id E8AC5224B7D; Fri,  2 Oct 2020 15:27:34 -0400 (EDT)
+Date:   Fri, 2 Oct 2020 15:27:34 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtio-fs-list <virtio-fs@redhat.com>, vkuznets@redhat.com,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
+Message-ID: <20201002192734.GD3119@redhat.com>
+References: <20200720211359.GF502563@redhat.com>
+ <20200929043700.GL31514@linux.intel.com>
+ <20201001215508.GD3522@redhat.com>
+ <20201001223320.GI7474@linux.intel.com>
+ <20201002153854.GC3119@redhat.com>
+ <20201002183036.GB24460@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+BWSia-x86d3+C_zm+B0ZJEJWSne+Q95Z+cy02XHkr+pOtQGQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20201002183036.GB24460@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 02, 2020 at 02:09:09PM +0200, Quentin Grolleau wrote:
-> Hello,
+On Fri, Oct 02, 2020 at 11:30:37AM -0700, Sean Christopherson wrote:
+> On Fri, Oct 02, 2020 at 11:38:54AM -0400, Vivek Goyal wrote:
+> > On Thu, Oct 01, 2020 at 03:33:20PM -0700, Sean Christopherson wrote:
+> > > Alternatively, what about adding a new KVM request type to handle this?
+> > > E.g. when the APF comes back with -EFAULT, snapshot the GFN and make a
+> > > request.  The vCPU then gets kicked and exits to userspace.  Before exiting
+> > > to userspace, the request handler resets vcpu->arch.apf.error_gfn.  Bad GFNs
+> > > simply get if error_gfn is "valid", i.e. there's a pending request.
+> > 
+> > Sorry, I did not understand the above proposal. Can you please elaborate
+> > a bit more. Part of it is that I don't know much about KVM requests.
+> > Looking at the code it looks like that main loop is parsing if some
+> > kvm request is pending and executing that action.
+> > 
+> > Don't we want to make sure that we exit to user space when guest retries
+> > error gfn access again.
 > 
+> > In this case once we get -EFAULT, we will still inject page_ready into
+> > guest. And then either same process or a different process might run. 
+> > 
+> > So when exactly code raises a kvm request. If I raise it right when
+> > I get -EFAULT, then kvm will exit to user space upon next entry
+> > time. But there is no guarantee guest vcpu is running the process which
+> > actually accessed the error gfn. And that probably means that register
+> > state of cpu does not mean much and one can not easily figure out
+> > which task tried to access the bad memory and when.
+> > 
+> > That's why we prepare a list of error gfn and only exit to user space
+> > when error_gfn access is retried so that guest vcpu context is correct.
+> > 
+> > What am I missing?
 > 
-> I wanted to know where i can file a bug about "KVM internal error. Suberror: 1"
+> I don't think it's necessary to provide userspace with the register state of
+> the guest task that hit the bad page.  Other than debugging, I don't see how
+> userspace can do anything useful which such information.
+
+I think debugging is the whole point so that user can figure out which
+access by guest task resulted in bad memory access. I would think this
+will be important piece of information.
+
 > 
-> Is it on Qemu side, Kernel side or Kvm one ?
-
-The error itself doesn't assign blame to any one component, KVM is simply
-stating that it failed instruction emulation.  Emulation can fail for a
-number of reasons, in this case it fails because the guest code stream is
-garbage.  But, _why_ the guest code stream is garbage is unknown.
-
-> More details :
+> Even if you want to inject an event of some form into the guest, having the
+> correct context for the event itself is not required.  IMO it's perfectly
+> reasonable for such an event to be asynchronous.
 > 
+> IIUC, your end goal is to be able to gracefully handle DAX file truncation.
+> Simply killing the guest task that hit the bad page isn't sufficient, as
+> nothing prevents a future task from accessing the same bad page.
+
+Next task can't even mmap that page mmap will fail. File got truncated,
+that page does not exist. 
+
+So sending SIGBUS to task should definitely solve the problem. We also
+need to solve the issue for guest kernel accessing the page which got
+truncated on host. In that case we need to use correct memcpy helpers
+and use exception table magic and return error code to user space.
+
+> To fully
+> handle the situation, the guest needs to remove the bad page from its memory
+> pool.  Once the page is offlined, the guest kernel's error handling will
+> kick in when a task accesses the bad page (or nothing ever touches the bad
+> page again and everyone is happy).
+
+This is not really a case of bad page as such. It is more of a page
+gone missing/trucated. And no new user can map it. We just need to
+worry about existing users who already have it mapped.
+
 > 
-> I having problems getting VM to run with QEMU 4.0 and 4 NVME in PCI passthrough
-> When I create a VM, it quickly goes into a paused state and never
-> seems to start working.
+> Note, I'm not necessarily suggesting that QEMU piggyback its #MC injection
+> to handle this, but I suspect the resulting behavior will look quite similar,
+> e.g. notify the virtiofs driver in the guest, which does some magic to take
+> the offending region offline, and then guest tasks get SIGBUS or whatever.
 > 
-> Log shows emulation failure :
-> 
-> KVM internal error. Suberror: 1
-> emulation failure
-> EAX=00000086 EBX=000041d8 ECX=00000001 EDX=00008e68
-> ESI=00000f01 EDI=00000000 EBP=0000004f ESP=00008e4e
-> EIP=00000000 EFL=00210093 [--S-A-C] CPL=0 II=0 A20=1 SMM=0 HLT=0
-> ES =9000 00090000 0000ffff 00009300
-> CS =bffc 000bffc0 0000ffff 00009f00
+> I also don't think it's KVM's responsibility to _directly_ handle such a
+> scenario.  As I said in an earlier version, KVM can't possibly know _why_ a
+> page fault came back with -EFAULT, only userspace can connect the dots of
+> GPA -> HVA -> vm_area_struct -> file -> inject event.  KVM definitely should
+> exit to userspace on the -EFAULT instead of hanging the guest, but that can
+> be done via a new request, as suggested.
 
-I believe 0xb0000 - 0xbffff is used for expansion/option ROMs.
+KVM atleast should have the mechanism to report this back to guest. And
+we don't have any. There only seems to be #MC stuff for poisoned pages.
+I am not sure how much we can build on top of #MC stuff to take care
+of this case. One problem with #MC I found was that it generates
+synchronous #MC only on load and not store. So all the code is
+written in such a way that synchronous #MC can happen only on load
+and hence the error handling. 
 
-> SS =9000 00090000 0000ffff 00009300
-> DS =9000 00090000 0000ffff 00009300
-> FS =9000 00090000 0000ffff 00009300
-> GS =9000 00090000 0000ffff 00009300
-> LDT=0000 00000000 0000ffff 00008200
-> TR =0000 00000000 0000ffff 00008b00
-> GDT=     00008160 00000028
-> IDT=     00000000 000003ff
-> CR0=00000010 CR2=00000000 CR3=00000000 CR4=00000000
-> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000
-> DR3=0000000000000000
-> DR6=00000000ffff0ff0 DR7=0000000000000400
-> EFER=0000000000000000
-> Code=<20> 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20
-> 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07 20 07
-> 20 07 20 07 20 07
+Stores generate different kind of #MC that too asynchronously and
+caller will not know about it immiditely. But in this case we need
+to know about error in the context of caller both for loads and stores.
 
-This is the direct cause of emulation failure, the guest code stream is
-junk.  That could be due to guest BIOS jumping to the wrong location, QEMU
-not correctly setting up guest memory, incorrect configuration of memory,
-etc...
+Anyway, I agree that this patch does not solve the problem of race
+free synchronous event inject into the guest. That's something yet
+to be solved either by #VE or by #MC or by #foo.
 
-Given the above EIP=0 and a CS:EIP pointing at expansion memory, my best
-guest is that the guest BIOS jumped into an option ROM and gets garbage.
+This patch is only doing two things.
 
-One thought would be to disable option ROMs for all devices by overriding
-each device's romfile to be null, e.g.
+- Because we don't have a mechanism to report errors to guest, use
+  the second best method and exit to user space.
 
-  -device virtio-net-pci,netdev=hostnet0,id=net0,mac=fa:16:3e:55:8e:0d,bus=pci.0,addr=0x3,romfile=
+- Make behavior consistent between synchronous fault and async faults.
+  Currently sync faults exit to user space on error while async
+   faults spin infinitely.
 
-That's not necessarily a solution, but it might help get a better idea of
-what's going wrong.  Note, not all devices support "romfile", my super
-sophisticated method for disabling option ROMs has been to add "romfile="
-for every device and then remove the ones QEMU complains about :-)
+Once we have a method to report errors back to guest, then we first
+should report error back to guest. And only in the absense of such
+mechanism we should exit to user space.
 
-Further debug/insight in this area is well beyond my area of expertise.
+Thanks
+Vivek
+
