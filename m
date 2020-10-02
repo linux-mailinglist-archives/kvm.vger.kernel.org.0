@@ -2,136 +2,341 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1094281CCF
-	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 22:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 913DE281CEC
+	for <lists+kvm@lfdr.de>; Fri,  2 Oct 2020 22:29:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725790AbgJBUSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Oct 2020 16:18:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60984 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725536AbgJBUS3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 16:18:29 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 092K1w7O008793;
-        Fri, 2 Oct 2020 16:18:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Iz8GtRGjp+QU5TRzo1glFjFvmg1Z5wCPlTvS572cwwM=;
- b=N3eSpmhnSxsa8XkXvuSFsXsxQDL2A3e0GhSfaFEL02OEivEFrjcQnhE6vI0Ky0iu7Ku0
- Ebv2iRbQHlW2VTOLzR8fY8lgVS6dQ8rgEPA+fMqAJpkhranKqKUMgcM6uzBmXHTePlBg
- ic7lTKr5EVdfXMBdt+wIypEIHbjiQfYwhlZSSKgfaL3EdTGDg1/mkJNyCW+hTy0i42bw
- b08KyQ52TNugkbshe+6udC1KOK/Nw43MfljL07ziqMUcuNusKFsGKTHB1/KuzhH+hWay
- NSw0BFQNg/iAs3BDbLai8OXxyggKR2HowYWZVlZ4Kl3KELLu9spoEsEBVQRtlkrSoIVg eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33x9uasxgb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Oct 2020 16:18:29 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 092K2eQ5011377;
-        Fri, 2 Oct 2020 16:18:28 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33x9uasxfw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Oct 2020 16:18:28 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 092KH6xE011867;
-        Fri, 2 Oct 2020 20:18:27 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02wdc.us.ibm.com with ESMTP id 33sw9a0baw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Oct 2020 20:18:27 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 092KIQpU55247182
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Oct 2020 20:18:26 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E6893AC05F;
-        Fri,  2 Oct 2020 20:18:25 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C5D52AC05B;
-        Fri,  2 Oct 2020 20:18:23 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.4.25])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Oct 2020 20:18:23 +0000 (GMT)
-Subject: Re: [PATCH v2 0/5] Pass zPCI hardware information via VFIO
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com
-Cc:     pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1601668844-5798-1-git-send-email-mjrosato@linux.ibm.com>
-Message-ID: <28d77f9a-0f73-82a8-7dc8-61451f13f375@linux.ibm.com>
-Date:   Fri, 2 Oct 2020 16:18:22 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1725616AbgJBU3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Oct 2020 16:29:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25627 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725283AbgJBU3P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 2 Oct 2020 16:29:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601670552;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ChISgzMVjHM/phUkpmC2n2EoXtFo/13m2xsh0l9TWM8=;
+        b=DpJxoXc5EALO9BDW2Z3aKgz250rHWPw8X6VNvDJI5ayCZInPoVu7tYGH2fTq2iFFm4kd+9
+        lpYvTS4K+WR648OT6ADKEiYMDq3TUdeHAdkaV8sxoT4YKjIC3uhakfUGCV29ms0JCcMUIy
+        J2jdJq71NTksXC+eXA24DQyU11ndMlg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-ky6rYsRuMhutC5jhijYc7Q-1; Fri, 02 Oct 2020 16:29:08 -0400
+X-MC-Unique: ky6rYsRuMhutC5jhijYc7Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AFD78030DB;
+        Fri,  2 Oct 2020 20:29:07 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E4A055577E;
+        Fri,  2 Oct 2020 20:29:02 +0000 (UTC)
+Date:   Fri, 2 Oct 2020 14:29:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Diana Craciun <diana.craciun@oss.nxp.com>
+Cc:     kvm@vger.kernel.org, bharatb.linux@gmail.com,
+        linux-kernel@vger.kernel.org, eric.auger@redhat.com,
+        Bharat Bhushan <Bharat.Bhushan@nxp.com>
+Subject: Re: [PATCH v5 08/10] vfio/fsl-mc: trigger an interrupt via eventfd
+Message-ID: <20201002142902.16cfc5da@x1.home>
+In-Reply-To: <20200929090339.17659-9-diana.craciun@oss.nxp.com>
+References: <20200929090339.17659-1-diana.craciun@oss.nxp.com>
+        <20200929090339.17659-9-diana.craciun@oss.nxp.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <1601668844-5798-1-git-send-email-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-02_14:2020-10-02,2020-10-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 impostorscore=0 spamscore=0
- malwarescore=0 bulkscore=0 phishscore=0 adultscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010020142
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/2/20 4:00 PM, Matthew Rosato wrote:
-> This patchset provides a means by which hardware information about the
-> underlying PCI device can be passed up to userspace (ie, QEMU) so that
-> this hardware information can be used rather than previously hard-coded
-> assumptions. A new VFIO region type is defined which holds this
-> information.
-> 
-> A form of these patches saw some rounds last year but has been back-
-> tabled for a while.  The original work for this feature was done by Pierre
-> Morel. I'd like to refresh the discussion on this and get this finished up
-> so that we can move forward with better-supporting additional types of
-> PCI-attached devices.  The proposal here presents a completely different
-> region mapping vs the prior approach, taking inspiration from vfio info
-> capability chains to provide device CLP information in a way that allows
-> for future expansion (new CLP features).
-> 
-> This feature is toggled via the CONFIG_VFIO_PCI_ZDEV configuration entry.
-> 
-> Changes from v1:
-> - Added ACKs (thanks!)
-> - Patch 2: Minor change:s/util_avail/util_str_avail/ per Niklas
-> - Patch 3: removed __packed
-> - Patch 3: rework various descriptions / comment blocks
-> - New patch: MAINTAINERS hit to cover new files.
-> 
+On Tue, 29 Sep 2020 12:03:37 +0300
+Diana Craciun <diana.craciun@oss.nxp.com> wrote:
 
-Link to latest QEMU patchset:
-https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00673.html
+> This patch allows to set an eventfd for fsl-mc device interrupts
+> and also to trigger the interrupt eventfd from userspace for testing.
+> 
+> All fsl-mc device interrupts are MSIs. The MSIs are allocated from
+> the MSI domain only once per DPRC and used by all the DPAA2 objects.
+> The interrupts are managed by the DPRC in a pool of interrupts. Each
+> device requests interrupts from this pool. The pool is allocated
+> when the first virtual device is setting the interrupts.
+> The pool of interrupts is protected by a lock.
+> 
+> The DPRC has an interrupt of its own which indicates if the DPRC
+> contents have changed. However, currently, the contents of a DPRC
+> assigned to the guest cannot be changed at runtime, so this interrupt
+> is not configured.
+> 
+> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
+> ---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c         |  24 +++-
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    | 161 +++++++++++++++++++++-
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  10 ++
+>  3 files changed, 193 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> index 2919e2d0041b..82157837f37a 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -155,12 +155,34 @@ static int vfio_fsl_mc_open(void *device_data)
+>  static void vfio_fsl_mc_release(void *device_data)
+>  {
+>  	struct vfio_fsl_mc_device *vdev = device_data;
+> +	int ret;
+>  
+>  	mutex_lock(&vdev->reflck->lock);
+>  
+> -	if (!(--vdev->refcnt))
+> +	if (!(--vdev->refcnt)) {
+> +		struct fsl_mc_device *mc_dev = vdev->mc_dev;
+> +		struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
+> +		struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
+> +
+>  		vfio_fsl_mc_regions_cleanup(vdev);
+>  
+> +		/* reset the device before cleaning up the interrupts */
+> +		ret = dprc_reset_container(mc_cont->mc_io, 0,
+> +		      mc_cont->mc_handle,
+> +			  mc_cont->obj_desc.id,
+> +			  DPRC_RESET_OPTION_NON_RECURSIVE);
+> +
+> +		if (ret) {
+> +			dev_warn(&mc_cont->dev, "VFIO_FLS_MC: reset device has failed (%d)\n",
+> +				 ret);
+> +			WARN_ON(1);
+> +		}
+> +
+> +		vfio_fsl_mc_irqs_cleanup(vdev);
+> +
+> +		fsl_mc_cleanup_irq_pool(mc_cont);
+> +	}
+> +
+>  	mutex_unlock(&vdev->reflck->lock);
+>  
+>  	module_put(THIS_MODULE);
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> index 5232f208e361..992ee18f1f6f 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> @@ -13,12 +13,150 @@
+>  #include "linux/fsl/mc.h"
+>  #include "vfio_fsl_mc_private.h"
+>  
+> +int vfio_fsl_mc_irqs_allocate(struct vfio_fsl_mc_device *vdev)
+> +{
+> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
+> +	struct vfio_fsl_mc_irq *mc_irq;
+> +	int irq_count;
+> +	int ret, i;
+> +
+> +	/* Device does not support any interrupt */
+> +	if (mc_dev->obj_desc.irq_count == 0)
+> +		return 0;
+> +
+> +	/* interrupts were already allocated for this device */
+> +	if (vdev->mc_irqs)
+> +		return 0;
+> +
+> +	irq_count = mc_dev->obj_desc.irq_count;
+> +
+> +	mc_irq = kcalloc(irq_count, sizeof(*mc_irq), GFP_KERNEL);
+> +	if (!mc_irq)
+> +		return -ENOMEM;
+> +
+> +	/* Allocate IRQs */
+> +	ret = fsl_mc_allocate_irqs(mc_dev);
+> +	if (ret) {
+> +		kfree(mc_irq);
+> +		return ret;
+> +	}
+> +
+> +	for (i = 0; i < irq_count; i++) {
+> +		mc_irq[i].count = 1;
+> +		mc_irq[i].flags = VFIO_IRQ_INFO_EVENTFD;
+> +	}
+> +
+> +	vdev->mc_irqs = mc_irq;
+> +
+> +	return 0;
+> +}
+> +
+> +static irqreturn_t vfio_fsl_mc_irq_handler(int irq_num, void *arg)
+> +{
+> +	struct vfio_fsl_mc_irq *mc_irq = (struct vfio_fsl_mc_irq *)arg;
+> +
+> +	eventfd_signal(mc_irq->trigger, 1);
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static int vfio_set_trigger(struct vfio_fsl_mc_device *vdev,
+> +						   int index, int fd)
+> +{
+> +	struct vfio_fsl_mc_irq *irq = &vdev->mc_irqs[index];
+> +	struct eventfd_ctx *trigger;
+> +	int hwirq;
+> +	int ret;
+> +
+> +	hwirq = vdev->mc_dev->irqs[index]->msi_desc->irq;
+> +	if (irq->trigger) {
+> +		free_irq(hwirq, irq);
+> +		kfree(irq->name);
+> +		eventfd_ctx_put(irq->trigger);
+> +		irq->trigger = NULL;
+> +	}
+> +
+> +	if (fd < 0) /* Disable only */
+> +		return 0;
+> +
+> +	irq->name = kasprintf(GFP_KERNEL, "vfio-irq[%d](%s)",
+> +			    hwirq, dev_name(&vdev->mc_dev->dev));
+> +	if (!irq->name)
+> +		return -ENOMEM;
+> +
+> +	trigger = eventfd_ctx_fdget(fd);
+> +	if (IS_ERR(trigger)) {
+> +		kfree(irq->name);
+> +		return PTR_ERR(trigger);
+> +	}
+> +
+> +	irq->trigger = trigger;
+> +
+> +	ret = request_irq(hwirq, vfio_fsl_mc_irq_handler, 0,
+> +		  irq->name, irq);
+> +	if (ret) {
+> +		kfree(irq->name);
+> +		eventfd_ctx_put(trigger);
+> +		irq->trigger = NULL;
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
+>  				       unsigned int index, unsigned int start,
+>  				       unsigned int count, u32 flags,
+>  				       void *data)
+>  {
+> -	return -EINVAL;
+> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
+> +	int ret, hwirq;
+> +	struct vfio_fsl_mc_irq *irq;
+> +	struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
+> +	struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
+> +
+> +	if (start != 0 || count != 1)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&vdev->reflck->lock);
+> +	ret = fsl_mc_populate_irq_pool(mc_cont,
+> +			FSL_MC_IRQ_POOL_MAX_TOTAL_IRQS);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	ret = vfio_fsl_mc_irqs_allocate(vdev);
+> +	if (ret)
+> +		goto unlock;
+> +	mutex_unlock(&vdev->reflck->lock);
+> +
+> +	if (!count && (flags & VFIO_IRQ_SET_DATA_NONE))
+> +		return vfio_set_trigger(vdev, index, -1);
+> +
+> +	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+> +		s32 fd = *(s32 *)data;
+> +
+> +		return vfio_set_trigger(vdev, index, fd);
+> +	}
+> +
+> +	hwirq = vdev->mc_dev->irqs[index]->msi_desc->irq;
+> +
+> +	irq = &vdev->mc_irqs[index];
+> +
+> +	if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> +		vfio_fsl_mc_irq_handler(hwirq, irq);
+> +
+> +	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+> +		u8 trigger = *(u8 *)data;
+> +
+> +		if (trigger)
+> +			vfio_fsl_mc_irq_handler(hwirq, irq);
+> +	}
+> +
+> +	return 0;
+> +
+> +unlock:
+> +	mutex_unlock(&vdev->reflck->lock);
+> +	return ret;
+> +
+>  }
+>  
+>  int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
+> @@ -32,3 +170,24 @@ int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
+>  	else
+>  		return -EINVAL;
+>  }
+> +
+> +/* Free All IRQs for the given MC object */
+> +void vfio_fsl_mc_irqs_cleanup(struct vfio_fsl_mc_device *vdev)
+> +{
+> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
+> +	int irq_count = mc_dev->obj_desc.irq_count;
+> +	int i;
+> +
+> +	/* Device does not support any interrupt or the interrupts
+> +	 * were not configured
+> +	 */
+> +	if (mc_dev->obj_desc.irq_count == 0 || !vdev->mc_irqs)
 
-> Matthew Rosato (5):
->    s390/pci: stash version in the zpci_dev
->    s390/pci: track whether util_str is valid in the zpci_dev
->    vfio-pci/zdev: define the vfio_zdev header
->    vfio-pci/zdev: use a device region to retrieve zPCI information
->    MAINTAINERS: Add entry for s390 vfio-pci
-> 
->   MAINTAINERS                         |   8 ++
->   arch/s390/include/asm/pci.h         |   4 +-
->   arch/s390/pci/pci_clp.c             |   2 +
->   drivers/vfio/pci/Kconfig            |  13 ++
->   drivers/vfio/pci/Makefile           |   1 +
->   drivers/vfio/pci/vfio_pci.c         |   8 ++
->   drivers/vfio/pci/vfio_pci_private.h |  10 ++
->   drivers/vfio/pci/vfio_pci_zdev.c    | 242 ++++++++++++++++++++++++++++++++++++
->   include/uapi/linux/vfio.h           |   5 +
->   include/uapi/linux/vfio_zdev.h      | 118 ++++++++++++++++++
->   10 files changed, 410 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/vfio/pci/vfio_pci_zdev.c
->   create mode 100644 include/uapi/linux/vfio_zdev.h
-> 
+Nit, the former test seems unnecessary, the latter test covers both
+cases.  Comment style also switched here.  Thanks,
+
+Alex
+
+> +		return;
+> +
+> +	for (i = 0; i < irq_count; i++)
+> +		vfio_set_trigger(vdev, i, -1);
+> +
+> +	fsl_mc_free_irqs(mc_dev);
+> +	kfree(vdev->mc_irqs);
+> +	vdev->mc_irqs = NULL;
+> +}
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> index 2c3f625a3240..7aa49b9ba60d 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> @@ -15,6 +15,13 @@
+>  #define VFIO_FSL_MC_INDEX_TO_OFFSET(index)	\
+>  	((u64)(index) << VFIO_FSL_MC_OFFSET_SHIFT)
+>  
+> +struct vfio_fsl_mc_irq {
+> +	u32         flags;
+> +	u32         count;
+> +	struct eventfd_ctx  *trigger;
+> +	char            *name;
+> +};
+> +
+>  struct vfio_fsl_mc_reflck {
+>  	struct kref		kref;
+>  	struct mutex		lock;
+> @@ -34,6 +41,7 @@ struct vfio_fsl_mc_device {
+>  	struct vfio_fsl_mc_region	*regions;
+>  	struct vfio_fsl_mc_reflck   *reflck;
+>  	struct mutex         igate;
+> +	struct vfio_fsl_mc_irq      *mc_irqs;
+>  };
+>  
+>  extern int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
+> @@ -41,4 +49,6 @@ extern int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
+>  			       unsigned int start, unsigned int count,
+>  			       void *data);
+>  
+> +void vfio_fsl_mc_irqs_cleanup(struct vfio_fsl_mc_device *vdev);
+> +
+>  #endif /* VFIO_FSL_MC_PRIVATE_H */
 
