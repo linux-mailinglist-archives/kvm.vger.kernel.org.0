@@ -2,274 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 959AF2822A0
-	for <lists+kvm@lfdr.de>; Sat,  3 Oct 2020 10:47:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7BC32822A4
+	for <lists+kvm@lfdr.de>; Sat,  3 Oct 2020 10:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725772AbgJCIq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Oct 2020 04:46:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30370 "EHLO
+        id S1725767AbgJCIsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Oct 2020 04:48:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54833 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725648AbgJCIq7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 3 Oct 2020 04:46:59 -0400
+        by vger.kernel.org with ESMTP id S1725601AbgJCIsS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 3 Oct 2020 04:48:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601714816;
+        s=mimecast20190719; t=1601714897;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2jQtJcALDeYTL3NsNlDsYx0cNd3ug04HK+dB9V6M4eo=;
-        b=JOoR943Byj1l/It8m8xnYHoWts6B3AccJTKUz4eKT/x21d7XEAVAoR5A/l6t7vqfA2+CgH
-        xfCQTtUO6ffwkVku8LzBw8bBBn7Wp3GDTX+WOMst8DiDnrmcZPH+MT08jk380X/09eb7Rr
-        FlaXgAGmgflOwchfXHdKvfvtotRPKrI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-Nu-HbliLNv-TBmleXrV-QA-1; Sat, 03 Oct 2020 04:46:52 -0400
-X-MC-Unique: Nu-HbliLNv-TBmleXrV-QA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37C4D801ABD;
-        Sat,  3 Oct 2020 08:46:51 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-112-40.ams2.redhat.com [10.36.112.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AAC785C1DA;
-        Sat,  3 Oct 2020 08:46:42 +0000 (UTC)
-Date:   Sat, 3 Oct 2020 10:46:39 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        lvivier@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 2/7] lib/vmalloc: vmalloc support for
- handling allocation metadata
-Message-ID: <20201003084639.s36ngidcfqtehygh@kamzik.brq.redhat.com>
-References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
- <20201002154420.292134-3-imbrenda@linux.ibm.com>
+        bh=/yD2Xg+heLEf/P4MLYz+dS5vx/J1O0Ekd2CO4abRGUI=;
+        b=IZBvuzTz3/gX1eODDowjdNzWz67prVyS566rsBHR6xJ6z39WoXCxpU9GBnILNG2YlvqG70
+        Gmh4CaT9dInJiN/Da7Fko3okm7sBShHdYy7PKMrmlh5IFXY/STGLvWV1dV/ZjsEuCBcBDQ
+        EpQDldvLOW7ykK9dupD0BxBluagVTJg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-245-mxUhvGPqNyeSEYF4m48TNQ-1; Sat, 03 Oct 2020 04:48:13 -0400
+X-MC-Unique: mxUhvGPqNyeSEYF4m48TNQ-1
+Received: by mail-wr1-f70.google.com with SMTP id r16so1575883wrm.18
+        for <kvm@vger.kernel.org>; Sat, 03 Oct 2020 01:48:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/yD2Xg+heLEf/P4MLYz+dS5vx/J1O0Ekd2CO4abRGUI=;
+        b=FtaPZcFwOsC561lmFEUTPJx/iHDVjrMgBSb1cnlqGe4K+SIxIMhCNnKyk8xkeQNCKg
+         RZtWvCHfR1eKAgLEm8OyhE3C9IksNRJxX2lb/Pr5xfVLXP+q+Cu5TzPS1qTLEwxf3N3a
+         FY0m43u14b9MR4zp2w1C8goOPCAcyb/5a33Vo8XFd+ldVBjtXJHdGFyBewo00u6zno0h
+         MTAmHjAOpf/+yiWLP2gU/tB1hZDLjc3xXpjROm1Ju4JrfnxDrCYFRZyD6ZxlWvk9qP+x
+         GDzNa9ukVSRjO6ApsTA5+mKQjP2LM17nAJ78K83gbSfSk/4E/dMPt0psNz+AoEFq2fsQ
+         /aJA==
+X-Gm-Message-State: AOAM532GIankj1LS7XRniq2fgtyco5TfjRnyQYh0J75stIqxs1YkE/OB
+        bN43gMd5Hzt4bSTX81yTGSlKW3uGIMZAutaYmecRo45AK7+Vj7etaOCAFykqxFScXGLk4jT0hJS
+        7gnTgrbmgQYiJ
+X-Received: by 2002:a5d:55c8:: with SMTP id i8mr7276932wrw.331.1601714892045;
+        Sat, 03 Oct 2020 01:48:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwAIX0iUFCBJ4wyETu7XcFXy583sWva8tpa1gx50dhNU0Dwz4oNCcxqQkasJf6KRmPiXxW7Lw==
+X-Received: by 2002:a5d:55c8:: with SMTP id i8mr7276871wrw.331.1601714891730;
+        Sat, 03 Oct 2020 01:48:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f6ef:6259:374d:b794? ([2001:b07:6468:f312:f6ef:6259:374d:b794])
+        by smtp.gmail.com with ESMTPSA id u81sm1344487wmg.43.2020.10.03.01.48.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 03 Oct 2020 01:48:11 -0700 (PDT)
+Subject: Re: [PATCH v3] qemu/atomic.h: rename atomic_ to qatomic_
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc:     Fam Zheng <fam@euphon.net>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        sheepdog@lists.wpkg.org, Paul Durrant <paul@xen.org>,
+        Jason Wang <jasowang@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Alberto Garcia <berto@igalia.com>, kvm@vger.kernel.org,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Juan Quintela <quintela@redhat.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        Liu Yuan <namei.unix@gmail.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Thomas Huth <thuth@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+        xen-devel@lists.xenproject.org, qemu-riscv@nongnu.org,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        John Snow <jsnow@redhat.com>,
+        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        qemu-block@nongnu.org,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Max Reitz <mreitz@redhat.com>,
+        Sagar Karandikar <sagark@eecs.berkeley.edu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20200923105646.47864-1-stefanha@redhat.com>
+ <4e65d6fa-0a7e-015b-eb6f-5dd1cc3ddd91@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <45ba3626-0e06-96c7-5ed8-ea561ae20f15@redhat.com>
+Date:   Sat, 3 Oct 2020 10:48:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201002154420.292134-3-imbrenda@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <4e65d6fa-0a7e-015b-eb6f-5dd1cc3ddd91@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 02, 2020 at 05:44:15PM +0200, Claudio Imbrenda wrote:
-> Add allocation metadata handling to vmalloc.
+On 02/10/20 18:43, Matthew Rosato wrote:
+>> diff --git
+>> a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> index acd4c8346d..7b4062a1a1 100644
+>> ---
+>> a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> +++
+>> b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> @@ -68,7 +68,7 @@ static inline int pvrdma_idx_valid(uint32_t idx,
+>> uint32_t max_elems)
+>>     static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
+>>   {
+>> -    const unsigned int idx = atomic_read(var);
+>> +    const unsigned int idx = qatomic_read(var);
+>>         if (pvrdma_idx_valid(idx, max_elems))
+>>           return idx & (max_elems - 1);
+>> @@ -77,17 +77,17 @@ static inline int32_t pvrdma_idx(int *var,
+>> uint32_t max_elems)
+>>     static inline void pvrdma_idx_ring_inc(int *var, uint32_t max_elems)
+>>   {
+>> -    uint32_t idx = atomic_read(var) + 1;    /* Increment. */
+>> +    uint32_t idx = qatomic_read(var) + 1;    /* Increment. */
+>>         idx &= (max_elems << 1) - 1;        /* Modulo size, flip gen. */
+>> -    atomic_set(var, idx);
+>> +    qatomic_set(var, idx);
+>>   }
+>>     static inline int32_t pvrdma_idx_ring_has_space(const struct
+>> pvrdma_ring *r,
+>>                             uint32_t max_elems, uint32_t *out_tail)
+>>   {
+>> -    const uint32_t tail = atomic_read(&r->prod_tail);
+>> -    const uint32_t head = atomic_read(&r->cons_head);
+>> +    const uint32_t tail = qatomic_read(&r->prod_tail);
+>> +    const uint32_t head = qatomic_read(&r->cons_head);
+>>         if (pvrdma_idx_valid(tail, max_elems) &&
+>>           pvrdma_idx_valid(head, max_elems)) {
+>> @@ -100,8 +100,8 @@ static inline int32_t
+>> pvrdma_idx_ring_has_space(const struct pvrdma_ring *r,
+>>   static inline int32_t pvrdma_idx_ring_has_data(const struct
+>> pvrdma_ring *r,
+>>                            uint32_t max_elems, uint32_t *out_head)
+>>   {
+>> -    const uint32_t tail = atomic_read(&r->prod_tail);
+>> -    const uint32_t head = atomic_read(&r->cons_head);
+>> +    const uint32_t tail = qatomic_read(&r->prod_tail);
+>> +    const uint32_t head = qatomic_read(&r->cons_head);
+>>         if (pvrdma_idx_valid(tail, max_elems) &&
+>>           pvrdma_idx_valid(head, max_elems)) {
 > 
-> In upcoming patches, allocation metadata will have to be handled
-> directly bt the lower level allocators, and will not be handled by the
-> common wrapper.
 > 
-> In this patch, the number of allocated pages plus a magic value are
-> written immediately before the returned pointer. This means that multi
-> page allocations will allocate one extra page (which is not worse than
-> what the current allocator does).
-> 
-> For small allocations there is an optimization: the returned address is
-> intentionally not page-aligned. This signals that the allocation
-> spanned one page only. In this case the metadata is only the magic
-> value, and it is also saved immediately before the returned pointer.
-> Since the pointer does not point to the begininng of the page, there is
-> always space in the same page for the magic value.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  lib/vmalloc.c | 105 +++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 95 insertions(+), 10 deletions(-)
-> 
-> diff --git a/lib/vmalloc.c b/lib/vmalloc.c
-> index e0c7b6b..2f25734 100644
-> --- a/lib/vmalloc.c
-> +++ b/lib/vmalloc.c
-> @@ -15,6 +15,16 @@
->  #include <bitops.h>
->  #include "vmalloc.h"
->  
-> +#define VM_MAGIC 0x7E57C0DE
-> +
-> +#define GET_METADATA(x) (((struct metadata *)(x)) - 1)
-> +#define GET_MAGIC(x) (*((unsigned long *)(x) - 1))
-> +
-> +struct metadata {
-> +	unsigned long npages;
-> +	unsigned long magic;
-> +};
-> +
->  static struct spinlock lock;
->  static void *vfree_top = 0;
->  static void *page_root;
-> @@ -25,8 +35,14 @@ static void *page_root;
->   *
->   * nr is the number of pages to allocate
->   * alignment_pages is the alignment of the allocation *in pages*
-> + * metadata indicates whether an extra (unaligned) page needs to be allocated
-> + * right before the main (aligned) allocation.
-> + *
-> + * The return value points to the first allocated virtual page, which will
-> + * be the (potentially unaligned) metadata page if the metadata flag is
-> + * specified.
->   */
-> -void *alloc_vpages_aligned(ulong nr, unsigned int align_order)
-> +static void *do_alloc_vpages(ulong nr, unsigned int align_order, bool metadata)
->  {
->  	uintptr_t ptr;
->  
-> @@ -34,6 +50,8 @@ void *alloc_vpages_aligned(ulong nr, unsigned int align_order)
->  	ptr = (uintptr_t)vfree_top;
->  	ptr -= PAGE_SIZE * nr;
->  	ptr &= GENMASK_ULL(63, PAGE_SHIFT + align_order);
-> +	if (metadata)
-> +		ptr -= PAGE_SIZE;
->  	vfree_top = (void *)ptr;
->  	spin_unlock(&lock);
->  
-> @@ -41,6 +59,11 @@ void *alloc_vpages_aligned(ulong nr, unsigned int align_order)
->  	return (void *)ptr;
->  }
->  
-> +void *alloc_vpages_aligned(ulong nr, unsigned int align_order)
-> +{
-> +	return do_alloc_vpages(nr, align_order, false);
-> +}
-> +
->  void *alloc_vpages(ulong nr)
->  {
->  	return alloc_vpages_aligned(nr, 0);
-> @@ -69,35 +92,97 @@ void *vmap(phys_addr_t phys, size_t size)
->  	return mem;
->  }
->  
-> +/*
-> + * Allocate one page, for an object with specified alignment.
-> + * The resulting pointer will be aligned to the required alignment, but
-> + * intentionally not page-aligned.
-> + * The metadata for single pages allocation is just the magic value,
-> + * which is placed right before the pointer, like for bigger allocations.
-> + */
-> +static void *vm_alloc_one_page(size_t alignment)
-> +{
-> +	void *p;
-> +
-> +	/* this guarantees that there will be space for the magic value */
-> +	assert(alignment >= sizeof(uintptr_t));
-> +	assert(alignment < PAGE_SIZE);
-> +	p = alloc_vpage();
-> +	install_page(page_root, virt_to_phys(alloc_page()), p);
-> +	p = (void *)((uintptr_t)p + alignment);
-> +	/* write the magic value right before the returned address */
-> +	GET_MAGIC(p) = VM_MAGIC;
-> +	return p;
-> +}
-> +
->  /*
->   * Allocate virtual memory, with the specified minimum alignment.
-> + * If the allocation fits in one page, only one page is allocated. Otherwise
-> + * enough pages are allocated for the object, plus one to keep metadata
-> + * information about the allocation.
->   */
->  static void *vm_memalign(size_t alignment, size_t size)
->  {
-> +	struct metadata *m;
->  	phys_addr_t pa;
-> -	void *mem, *p;
-> +	uintptr_t p;
-> +	void *mem;
-> +	size_t i;
->  
-> +	if (!size)
-> +		return NULL;
->  	assert(is_power_of_2(alignment));
->  
-> +	if (alignment < sizeof(uintptr_t))
-> +		alignment = sizeof(uintptr_t);
-> +	/* it fits in one page, allocate only one page */
-> +	if (alignment + size <= PAGE_SIZE)
-> +		return vm_alloc_one_page(alignment);
->  	size = PAGE_ALIGN(size) / PAGE_SIZE;
->  	alignment = get_order(PAGE_ALIGN(alignment) / PAGE_SIZE);
-> -	mem = p = alloc_vpages_aligned(size, alignment);
-> -	while (size--) {
-> +	mem = do_alloc_vpages(size, alignment, true);
-> +	p = (uintptr_t)mem;
-> +	/* skip the metadata page */
-> +	mem = (void *)(p + PAGE_SIZE);
-> +	/*
-> +	 * time to actually allocate the physical pages to back our virtual
-> +	 * allocation; note that we need to allocate one extra page (for the
-> +	 * metadata), hence the <=
-> +	 */
-> +	for (i = 0; i <= size; i++, p += PAGE_SIZE) {
->  		pa = virt_to_phys(alloc_page());
->  		assert(pa);
-> -		install_page(page_root, pa, p);
-> -		p += PAGE_SIZE;
-> +		install_page(page_root, pa, (void *)p);
->  	}
-> +	m = GET_METADATA(mem);
-> +	m->npages = size;
-> +	m->magic = VM_MAGIC;
->  	return mem;
->  }
->  
->  static void vm_free(void *mem, size_t size)
->  {
-> -	while (size) {
-> -		free_page(phys_to_virt(virt_to_pte_phys(page_root, mem)));
-> -		mem += PAGE_SIZE;
-> -		size -= PAGE_SIZE;
-> +	struct metadata *m;
-> +	uintptr_t ptr, end;
-> +
-> +	/* the pointer is not page-aligned, it was a single-page allocation */
-> +	if (!IS_ALIGNED((uintptr_t)mem, PAGE_SIZE)) {
-> +		assert(GET_MAGIC(mem) == VM_MAGIC);
-> +		ptr = virt_to_pte_phys(page_root, mem) & PAGE_MASK;
-> +		free_page(phys_to_virt(ptr));
-> +		return;
->  	}
-> +
-> +	/* the pointer is page-aligned, it was a multi-page allocation */
-> +	m = GET_METADATA(mem);
-> +	assert(m->magic == VM_MAGIC);
-> +	assert(m->npages > 0);
-> +	/* free all the pages including the metadata page */
-> +	ptr = (uintptr_t)mem - PAGE_SIZE;
-> +	end = ptr + m->npages * PAGE_SIZE;
-> +	for ( ; ptr < end; ptr += PAGE_SIZE)
-> +		free_page(phys_to_virt(virt_to_pte_phys(page_root, (void *)ptr)));
-> +	/* free the last one separately to avoid overflow issues */
-> +	free_page(phys_to_virt(virt_to_pte_phys(page_root, (void *)ptr)));
+> It looks like the changes in this file are going to get reverted the
+> next time someone does a linux header sync.
 
-I don't get this. How is
+Source code should not be at all imported from Linux.  The hacks that
+accomodate pvrdma in update-linux-headers.sh (like s/atomic_t/u32/)
+really have no place there; the files in
+include/standard-headers/drivers/infiniband/hw/vmw_pvrdma should all be
+moved in hw/.
 
- for (p = start; p < end; p += step)
-   process(p);
- process(p)
-
-different from
-
- for (p = start; p <= end; p += step)
-   process(p);
-
-To avoid overflow issues we should simple ensure start and end are
-computed correctly. Also, I'd prefer 'end' point to the actual end,
-not the last included page, e.g. start=0x1000, end=0x1fff. Then we
-have
-
- start = get_start();
- assert(PAGE_ALIGN(start) == start);
- end = start + nr_pages * PAGE_SIZE - 1;
- assert(start < end);
- for (p = start; start < end; p += PAGE_SIZE)
-   process(p);
-
-Thanks,
-drew
-
-
->  }
->  
->  static struct alloc_ops vmalloc_ops = {
-> -- 
-> 2.26.2
-> 
+Paolo
 
