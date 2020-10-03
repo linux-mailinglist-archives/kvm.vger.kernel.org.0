@@ -2,116 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC02F28237A
-	for <lists+kvm@lfdr.de>; Sat,  3 Oct 2020 12:02:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E9AA28237F
+	for <lists+kvm@lfdr.de>; Sat,  3 Oct 2020 12:04:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725891AbgJCKC0 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 3 Oct 2020 06:02:26 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:29446 "EHLO
-        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725884AbgJCKCX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 3 Oct 2020 06:02:23 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-tgmJOLFBPUuJiiTYcs74xg-1; Sat, 03 Oct 2020 06:02:18 -0400
-X-MC-Unique: tgmJOLFBPUuJiiTYcs74xg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F43185A0C1;
-        Sat,  3 Oct 2020 10:02:16 +0000 (UTC)
-Received: from bahia.lan (ovpn-112-192.ams2.redhat.com [10.36.112.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C57B110013C4;
-        Sat,  3 Oct 2020 10:02:14 +0000 (UTC)
-Subject: [PATCH v3 3/3] vhost: Don't call log_access_ok() when using IOTLB
-From:   Greg Kurz <groug@kaod.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
-        David Gibson <david@gibson.dropbear.id.au>
-Date:   Sat, 03 Oct 2020 12:02:13 +0200
-Message-ID: <160171933385.284610.10189082586063280867.stgit@bahia.lan>
-In-Reply-To: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
-References: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
-User-Agent: StGit/0.21
+        id S1725781AbgJCKEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Oct 2020 06:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37802 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbgJCKEB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Oct 2020 06:04:01 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A2AC0613D0
+        for <kvm@vger.kernel.org>; Sat,  3 Oct 2020 03:04:01 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id x69so3766874oia.8
+        for <kvm@vger.kernel.org>; Sat, 03 Oct 2020 03:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=cG+rDiGufIRUZmngOUTf5V0P1gEN2vU/I0BKD4lYt1U=;
+        b=HdJSC7mDbiLifLA6qFPvkUWJX0Cfc+6dls/6n6VrDuxJqkAIlTuLnRTeeccAZCwVEq
+         WbRW1oCg1sZgeVV5YMgz5+gQR/KoLrI1UQvGKPwV5CEN2zoNmXM/Y8qqKPnnFkHjcBTN
+         A4TW+urnAoa+fse2BW7gDWhVtwgWazBcDb8ZCYZVYH9dLDcFbePe6vObYCwKtSNiSffo
+         ZVx77zc/+/D1RqLVe5T+pTqzja9KMwWUvT5fXgS3vmCV7lM2APa/mXGQxCyZhsewcmNV
+         nO80LcoiyKmAzMqM6uqV7upkTS4QCMgJV7xAjrn90AiPr4B0Z5ywj8Iwwl71vldE3Nny
+         owlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cG+rDiGufIRUZmngOUTf5V0P1gEN2vU/I0BKD4lYt1U=;
+        b=mcFUs+K7La0285d13qyp/UZuPcjIv/3hYQ2NntJsBP2VqsD93875zG8z5evpMV7idN
+         KkndXS52ImKBMjJBUZq0yrDc4mv3frbsOfe7tuqp6Ejxja/E7atbvFNspp9mI65O4+6b
+         dk76Ha+uR4ogZsqA3Baw47Z9x/0ZuEcWVJ0XwaLGPxmk9rZwIVOL3TAjJE7F1yBF4fAx
+         J3WdF3fvVGSWW22j6D5xDnYfThmQOCUeOObSrO05fkiER88kU4OgpBU2f9gOZZaDmsh8
+         HZCeLMT8MZ+UqNYcwmbnuxV7EYAYKuSqdFpe2vwhBaMn1uF1CgLlI0Usl6l7xhLv7Fop
+         Ngvw==
+X-Gm-Message-State: AOAM531xinDJauhudP2Tqw1f1RZ1njW2Ml1LaA9lsr7ivVEf5+EI9C3G
+        YiUBPrCLv79nsCQrrHJ6zt7UuA==
+X-Google-Smtp-Source: ABdhPJwIeDtlbvhrW+UehIVEor+MVHY96lsLif2Knq/6uJbUXaH4H8RsDWtuRdpkBSxiFT5aLe+D9A==
+X-Received: by 2002:aca:ef03:: with SMTP id n3mr3457690oih.67.1601719441143;
+        Sat, 03 Oct 2020 03:04:01 -0700 (PDT)
+Received: from [10.10.73.179] (fixed-187-189-51-144.totalplay.net. [187.189.51.144])
+        by smtp.gmail.com with ESMTPSA id j21sm1162131otq.18.2020.10.03.03.03.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 03 Oct 2020 03:04:00 -0700 (PDT)
+Subject: Re: [PATCH v4 12/12] .travis.yml: Add a KVM-only Aarch64 job
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fam Zheng <fam@euphon.net>,
+        Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
+References: <20200929224355.1224017-1-philmd@redhat.com>
+ <20200929224355.1224017-13-philmd@redhat.com>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bd4c4587-de23-7612-48c7-afc8b94ab9fb@linaro.org>
+Date:   Sat, 3 Oct 2020 05:03:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20200929224355.1224017-13-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the IOTLB device is enabled, the log_guest_addr that is passed by
-userspace to the VHOST_SET_VRING_ADDR ioctl, and which is then written
-to vq->log_addr, is a GIOVA. All writes to this address are translated
-by log_user() to writes to an HVA, and then ultimately logged through
-the corresponding GPAs in log_write_hva(). No logging will ever occur
-with vq->log_addr in this case. It is thus wrong to pass vq->log_addr
-and log_guest_addr to log_access_vq() which assumes they are actual
-GPAs.
+On 9/29/20 5:43 PM, Philippe Mathieu-Daudé wrote:
+> Add a job to build QEMU on Aarch64 with TCG disabled, so
+> this configuration won't bitrot over time.
+> 
+> We explicitly modify default-configs/aarch64-softmmu.mak to
+> only select the 'virt' and 'SBSA-REF' machines.
 
-Introduce a new vq_log_used_access_ok() helper that only checks accesses
-to the log for the used structure when there isn't an IOTLB device around.
+I really wish we didn't have to do this.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- drivers/vhost/vhost.c |   23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+Can't we e.g. *not* list all of the arm boards explicitly in default-configs,
+but use the Kconfig "default y if ..."?
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 9d2c225fb518..9ad45e1d27f0 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1370,6 +1370,20 @@ bool vhost_log_access_ok(struct vhost_dev *dev)
- }
- EXPORT_SYMBOL_GPL(vhost_log_access_ok);
- 
-+static bool vq_log_used_access_ok(struct vhost_virtqueue *vq,
-+				  void __user *log_base,
-+				  bool log_used,
-+				  u64 log_addr)
-+{
-+	/* If an IOTLB device is present, log_addr is a GIOVA that
-+	 * will never be logged by log_used(). */
-+	if (vq->iotlb)
-+		return true;
-+
-+	return !log_used || log_access_ok(log_base, log_addr,
-+					  vhost_get_used_size(vq, vq->num));
-+}
-+
- /* Verify access for write logging. */
- /* Caller should have vq mutex and device mutex */
- static bool vq_log_access_ok(struct vhost_virtqueue *vq,
-@@ -1377,8 +1391,7 @@ static bool vq_log_access_ok(struct vhost_virtqueue *vq,
- {
- 	return vq_memory_access_ok(log_base, vq->umem,
- 				   vhost_has_feature(vq, VHOST_F_LOG_ALL)) &&
--		(!vq->log_used || log_access_ok(log_base, vq->log_addr,
--				  vhost_get_used_size(vq, vq->num)));
-+		vq_log_used_access_ok(vq, log_base, vq->log_used, vq->log_addr);
- }
- 
- /* Can we start vq? */
-@@ -1517,9 +1530,9 @@ static long vhost_vring_set_addr(struct vhost_dev *d,
- 			return -EINVAL;
- 
- 		/* Also validate log access for used ring if enabled. */
--		if ((a.flags & (0x1 << VHOST_VRING_F_LOG)) &&
--			!log_access_ok(vq->log_base, a.log_guest_addr,
--				       vhost_get_used_size(vq, vq->num)))
-+		if (!vq_log_used_access_ok(vq, vq->log_base,
-+				a.flags & (0x1 << VHOST_VRING_F_LOG),
-+				a.log_guest_addr))
- 			return -EINVAL;
- 	}
- 
+Seems like that would let --disable-tcg work as expected.
+One should still be able to create custom configs with e.g.
+CONFIG_EXYNOS4=n or CONIFIG_ARM_V4=n, correct?
 
 
+r~
