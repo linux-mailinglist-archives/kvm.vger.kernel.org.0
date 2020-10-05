@@ -2,229 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F94C283E46
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 20:26:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77AA6283DF4
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 20:04:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728053AbgJES0O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 14:26:14 -0400
-Received: from loire.is.ed.ac.uk ([129.215.16.10]:35876 "EHLO
-        loire.is.ed.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725960AbgJES0N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Oct 2020 14:26:13 -0400
-X-Greylist: delayed 2310 seconds by postgrey-1.27 at vger.kernel.org; Mon, 05 Oct 2020 14:26:10 EDT
-Received: from exseed.ed.ac.uk (hbdkb3.is.ed.ac.uk [129.215.235.37])
-        by loire.is.ed.ac.uk (8.14.7/8.14.7) with ESMTP id 095HlahD025589
-        (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Mon, 5 Oct 2020 18:47:36 +0100
-Received: from hbdat3.is.ed.ac.uk (129.215.235.38) by hbdkb3.is.ed.ac.uk
- (129.215.235.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Mon, 5 Oct 2020
- 18:47:36 +0100
-Received: from EUR02-HE1-obe.outbound.protection.outlook.com (104.47.5.57) by
- hbdat3.is.ed.ac.uk (129.215.235.38) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3
- via Frontend Transport; Mon, 5 Oct 2020 18:47:36 +0100
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SSEZAK1qiZ5HYPU5iEPcP5yP/ZDNBnhOCKVXA+OYixKLRtrsUynvxAD6i6zAPik7uS9JdqQs+4lEjISF/5tyd8aYB+Uivsqq2PedcSOD7RKa9MkkrGmYqU2r/mgemXUCTsPSRVLgyfKRLHaOGI8CljPchNRVfo4gzKPpr6Q53Aog6G5lDMLbprJYBW3eygTL/ogbHCbZKtVDp7sdRa8P6Df72OB2eSDtQx85UOh+D6gLkHO9BvrPEijuXMy1X7t+0uzuKU/CpNcljO1uXs3voPSGIPXZVuDtZScukZYjhsgMHdHx7zNwJpxYW8BrQ1nCChPCCc5aexcP+agOOOhVCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RjQb16XEsZGxyjO3BVsAtaojf+6vaxFjknTc+zTpopY=;
- b=NfgiI2hVTYunIvtCrPOQBA/m7Kn8okA9oIKdMv0X2YA4s20uEgZD5iq/3oGVApHmXVATqOBxlXeniOFNCfoUhFu8aDORxk43535ANeT/UjacAgCS7Ml7FZ4370bZI3r2e54OVuNNmHKnChk15XntnMNTB06+YqFdoxZV557xeMJUW23Lfy2orrtT0EXhLPxQ1a5nuUSNSu09679hDe9pE/3MEhtczfX+mLjMqAar4Y+fMJfAPqo/WQqHiL2aQ0IMYn0EYr+v0CY/xPb4PKsdXl7qhlE/7IB48nt8GWevVddjN+101LJ4MRANLTautMI0DgoMbHYLC78e7WlFwsrlWQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=ed.ac.uk; dmarc=pass action=none header.from=ed.ac.uk;
- dkim=pass header.d=ed.ac.uk; arc=none
-Received: from AM7PR05MB7076.eurprd05.prod.outlook.com (2603:10a6:20b:1af::19)
- by AM6PR05MB4215.eurprd05.prod.outlook.com (2603:10a6:209:3f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3433.37; Mon, 5 Oct
- 2020 17:47:35 +0000
-Received: from AM7PR05MB7076.eurprd05.prod.outlook.com
- ([fe80::c9af:88a9:6fef:7b63]) by AM7PR05MB7076.eurprd05.prod.outlook.com
- ([fe80::c9af:88a9:6fef:7b63%5]) with mapi id 15.20.3433.044; Mon, 5 Oct 2020
- 17:47:35 +0000
-From:   BARBALACE Antonio <antonio.barbalace@ed.ac.uk>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "will@kernel.org" <will@kernel.org>,
-        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>
-Subject: kvmtool: vhost MQ support
-Thread-Topic: kvmtool: vhost MQ support
-Thread-Index: AdabPziwTOUsNiurQESVfC61e3LkNA==
-Date:   Mon, 5 Oct 2020 17:47:35 +0000
-Message-ID: <AM7PR05MB7076F55498C85087F09421F6CC0C0@AM7PR05MB7076.eurprd05.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=ed.ac.uk;
-x-originating-ip: [82.38.204.131]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2d38c632-1494-47e5-2d83-08d86956be58
-x-ms-traffictypediagnostic: AM6PR05MB4215:
-x-microsoft-antispam-prvs: <AM6PR05MB4215D884765325D7858FF6E4CC0C0@AM6PR05MB4215.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: FAfcZDrCZl7pjhWpwIpwybhXPEGnwvcgLEZ4ThOOzOh8H8Zuc4wa+THwRYzhlLlPo2TfX8towpazwr42iIUO1hw1+zvC1nY83mPdp9DYfBsi5qF8Vo7IRgQJPAtZ2+mr+29dAgbRkBqZy3A0EXkiwBzO9eZ7rOPK+CosWWU3x0aZVKry4CGuW+ZZDWC38KeiZtVxv6Bl7rAOYrU3SangvrhzsPl/TXF0yvLvo10Bn6WarZ/VlZwAs3dnA3ElZrQlZYUW/UvQ7tmDV7KS+mjbnznHeDu+g4YYfP9lyr4BL1ZTz4q1hSBPd3ptWshMj7IG8g1k+tnKxf6dJc65xXbbkQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM7PR05MB7076.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(136003)(396003)(376002)(346002)(366004)(66556008)(66446008)(66616009)(66946007)(66476007)(64756008)(76116006)(55016002)(7696005)(99936003)(786003)(4326008)(54906003)(316002)(86362001)(4744005)(26005)(9686003)(71200400001)(52536014)(6506007)(2906002)(186003)(8676002)(478600001)(5660300002)(8936002)(6916009)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: qzCmJZFjqqzWaxnv0Q0eon4Jhw5a0ip4ZqbIm1tSrQvEbHAcueB0o6f65bc4EE0cyxCRB+mHr8G/lBS6vZQqWzhG5M7Y7IQJwqMJ+Yufo7Nnj5adGtH5jSEhXxlxqhTQmy1KE9nkCsowOF2yiXB8vk53F8N9ZXn4Xefym2yckv1eDVM3tENVIxQl2ltwlW3sxyKuYbDFdJ9Vhs5gff0F3/COmCV7elMoRHBQBzTaueF0OqJWUDlcybNhI0MD0f/dAs+2b0yHhV5R44FXmLjwmMjyc5q9G7LVsnx1a0OqSOPzhmMvgbHJX11EaVWKD+hg8E+roFUMqgxeUWQOomABjSddWxcJM1zNE3UWSOzKNxyTkPni8zFmyIvzs6rRKu5A2hBpiIxnCyOhYZAyaHSQ23nDzUSZgyYhBPmb740lBfMxsLl/j/Eqc1mADX0wFoTsKhMGnJenm/lCPyXbpcyrHSGDhVJONQXQJh9YB3SgHji3QKCRw8LKyj0T/SYmE7t0Rfoqgfn52q1XNIfKlKZv3jKRXRsRAn44K6APfD773DrBvDXLCUptvJ+YzB0vagkJPeozEeDtwij24NpDf4iKBufMjUJLoV93nyTu6t2RrztqzEwvD9d8owofCKbGSm6xj28o4hXI5+tYwnd3wbPXOw==
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/mixed;
-        boundary="_002_AM7PR05MB7076F55498C85087F09421F6CC0C0AM7PR05MB7076eurp_"
+        id S1726859AbgJESEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 14:04:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44361 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726248AbgJESEd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 14:04:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601921071;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XG1Rp+u5vv5Be2qRPXa/mDytSYLqQgxc7eXveQCiRcA=;
+        b=WKzxNKfgFduX2Fi/nlFTzv929+R8YvH8q359ZHDK6yCXnWDSfexjPgRuAbj29btWEf/yP4
+        8/0F/bOsbMMSycJs8Xk0kBoRmqBo+OZwwY3+W2CY8i9DX7AP0eeH464Uj5d9/GjWE5RR4q
+        gXqg9gR+4u8MDzo4XEsbi9yX4dlmduI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-483-tdvdL8E0OVi8iNEPseHhag-1; Mon, 05 Oct 2020 14:04:27 -0400
+X-MC-Unique: tdvdL8E0OVi8iNEPseHhag-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05208100854A;
+        Mon,  5 Oct 2020 18:04:26 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.195.207])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 11FC875120;
+        Mon,  5 Oct 2020 18:04:20 +0000 (UTC)
+Date:   Mon, 5 Oct 2020 20:04:18 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, frankja@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        lvivier@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 4/7] lib/alloc_page: complete rewrite
+ of the page allocator
+Message-ID: <20201005180418.elbco6jifqtu36lq@kamzik.brq.redhat.com>
+References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
+ <20201002154420.292134-5-imbrenda@linux.ibm.com>
+ <20201005124039.sf6mbytv5da3hxed@kamzik.brq.redhat.com>
+ <20201005175613.1215b61e@ibm-vm>
+ <20201005165311.w37u3b2fpuqvf2ob@kamzik.brq.redhat.com>
+ <20201005191817.608eb451@ibm-vm>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR05MB7076.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d38c632-1494-47e5-2d83-08d86956be58
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Oct 2020 17:47:35.3742
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 2e9f06b0-1669-4589-8789-10a06934dc61
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UgQp2D5g9W4BYLh5Ed/fAJvC508w0dbTC3bj+1+wiAJWnnQNNsEDWzMtgm6GeNfnkXUuYAs7NfGQnDQRoxXwCg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR05MB4215
-X-OriginatorOrg: ed.ac.uk
-X-Edinburgh-Scanned: at loire.is.ed.ac.uk
-    with MIMEDefang 2.84, Sophie, Sophos Anti-Virus, Clam AntiVirus
-X-Scanned-By: MIMEDefang 2.84 on 129.215.16.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201005191817.608eb451@ibm-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---_002_AM7PR05MB7076F55498C85087F09421F6CC0C0AM7PR05MB7076eurp_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+On Mon, Oct 05, 2020 at 07:18:17PM +0200, Claudio Imbrenda wrote:
+> On Mon, 5 Oct 2020 18:53:11 +0200
+> Andrew Jones <drjones@redhat.com> wrote:
+> > That won't work for 32-bit processors that support physical addresses
+> > that are larger than 32-bits - if the target has more than 4G and the
+> > unit test wants to access that high memory. Using phys_addr_t
+> > everywhere you want a physical address avoids that problem.
+> 
+> no it doesn't. you can't even handle the freelist if it's in high
+> memory. consider that the current allocator also does not handle high
+> memory. and there is no infrastructure to shortly map high memory.
+> 
+> if a 32 bit test wants to access high memory, it will have to manage it
+> manually
 
-This patch enables vhost MQ to support in kvmtool without any Linux kernel =
-modification.
-The patch takes the same approach as QEMU -- for each queue pair a new /dev=
-/vhost-net fd is created.
-Fds are kept in ndev->vhost_fds, with ndev->vhost_fd =3D=3D ndev->vhost_fds=
-[0] (to avoid further modification to the existent source code).
-Thanks, Antonio Barbalace
-The University of Edinburgh is a charitable body, registered in Scotland, w=
-ith registration number SC005336.
+But the point of this series is to rewrite the allocator in order to
+add features such as allocations from different memory zones, like
+high memory, and also to fix its shortcomings. It seems like we should
+start by fixing the current allocator's lack of concern for physical
+and virtual address distinctions.
 
---_002_AM7PR05MB7076F55498C85087F09421F6CC0C0AM7PR05MB7076eurp_
-Content-Type: application/octet-stream; name="kvmtool-vhost_mq.patch"
-Content-Description: kvmtool-vhost_mq.patch
-Content-Disposition: attachment; filename="kvmtool-vhost_mq.patch"; size=6423;
-	creation-date="Mon, 05 Oct 2020 17:42:00 GMT";
-	modification-date="Mon, 05 Oct 2020 17:42:00 GMT"
-Content-Transfer-Encoding: base64
+> > Using a list member for list operations and container_of() to get
+> > back to the object would help readability.
+> 
+> except that the "object" is the block of free memory, and the only
+> thing inside it is the list object at the very beginning. I think it's
+> overkill to use container_of in that case, since the only thing is the
+> list itself, and it's at the beginning of the free block.
 
-ZGlmZiAtLWdpdCBhL3ZpcnRpby9uZXQuYyBiL3ZpcnRpby9uZXQuYwppbmRleCAxZWUzYzE5Li5i
-YWUzMDE5IDEwMDY0NAotLS0gYS92aXJ0aW8vbmV0LmMKKysrIGIvdmlydGlvL25ldC5jCkBAIC01
-OCw2ICs1OCw3IEBAIHN0cnVjdCBuZXRfZGV2IHsKIAl1MzIJCQkJZmVhdHVyZXMsIHF1ZXVlX3Bh
-aXJzOwogCiAJaW50CQkJCXZob3N0X2ZkOworCWludAkJCQl2aG9zdF9mZHNbVklSVElPX05FVF9O
-VU1fUVVFVUVTXTsKIAlpbnQJCQkJdGFwX2ZkOwogCWNoYXIJCQkJdGFwX25hbWVbSUZOQU1TSVpd
-OwogCWJvb2wJCQkJdGFwX3VmbzsKQEAgLTUxMiw2ICs1MTMsNyBAQCBzdGF0aWMgaW50IHZpcnRp
-b19uZXRfX3Zob3N0X3NldF9mZWF0dXJlcyhzdHJ1Y3QgbmV0X2RldiAqbmRldikKIHsKIAl1NjQg
-ZmVhdHVyZXMgPSAxVUwgPDwgVklSVElPX1JJTkdfRl9FVkVOVF9JRFg7CiAJdTY0IHZob3N0X2Zl
-YXR1cmVzOworCWludCBpLCByID0gMDsKIAogCWlmIChpb2N0bChuZGV2LT52aG9zdF9mZCwgVkhP
-U1RfR0VUX0ZFQVRVUkVTLCAmdmhvc3RfZmVhdHVyZXMpICE9IDApCiAJCWRpZV9wZXJyb3IoIlZI
-T1NUX0dFVF9GRUFUVVJFUyBmYWlsZWQiKTsKQEAgLTUyMSw3ICs1MjMsOSBAQCBzdGF0aWMgaW50
-IHZpcnRpb19uZXRfX3Zob3N0X3NldF9mZWF0dXJlcyhzdHJ1Y3QgbmV0X2RldiAqbmRldikKIAkJ
-CWhhc192aXJ0aW9fZmVhdHVyZShuZGV2LCBWSVJUSU9fTkVUX0ZfTVJHX1JYQlVGKSkKIAkJZmVh
-dHVyZXMgfD0gMVVMIDw8IFZJUlRJT19ORVRfRl9NUkdfUlhCVUY7CiAKLQlyZXR1cm4gaW9jdGwo
-bmRldi0+dmhvc3RfZmQsIFZIT1NUX1NFVF9GRUFUVVJFUywgJmZlYXR1cmVzKTsKKwlmb3IgKGk9
-MDsgKCh1MzIpaSA8IG5kZXYtPnF1ZXVlX3BhaXJzKSAmJiAociA+PSAwKTsgaSsrKQorCQlyID0g
-aW9jdGwobmRldi0+dmhvc3RfZmRzW2ldLCBWSE9TVF9TRVRfRkVBVFVSRVMsICZmZWF0dXJlcyk7
-IAorCXJldHVybiByOwogfQogCiBzdGF0aWMgdm9pZCBzZXRfZ3Vlc3RfZmVhdHVyZXMoc3RydWN0
-IGt2bSAqa3ZtLCB2b2lkICpkZXYsIHUzMiBmZWF0dXJlcykKQEAgLTU3OCw3ICs1ODIsNyBAQCBz
-dGF0aWMgYm9vbCBpc19jdHJsX3ZxKHN0cnVjdCBuZXRfZGV2ICpuZGV2LCB1MzIgdnEpCiBzdGF0
-aWMgaW50IGluaXRfdnEoc3RydWN0IGt2bSAqa3ZtLCB2b2lkICpkZXYsIHUzMiB2cSwgdTMyIHBh
-Z2Vfc2l6ZSwgdTMyIGFsaWduLAogCQkgICB1MzIgcGZuKQogewotCXN0cnVjdCB2aG9zdF92cmlu
-Z19zdGF0ZSBzdGF0ZSA9IHsgLmluZGV4ID0gdnEgfTsKKwlzdHJ1Y3Qgdmhvc3RfdnJpbmdfc3Rh
-dGUgc3RhdGUgPSB7IC5pbmRleCA9ICh2cSAlMikgfTsKIAlzdHJ1Y3QgbmV0X2Rldl9xdWV1ZSAq
-bmV0X3F1ZXVlOwogCXN0cnVjdCB2aG9zdF92cmluZ19hZGRyIGFkZHI7CiAJc3RydWN0IG5ldF9k
-ZXYgKm5kZXYgPSBkZXY7CkBAIC02MTksMjMgKzYyMywyNCBAQCBzdGF0aWMgaW50IGluaXRfdnEo
-c3RydWN0IGt2bSAqa3ZtLCB2b2lkICpkZXYsIHUzMiB2cSwgdTMyIHBhZ2Vfc2l6ZSwgdTMyIGFs
-aWduLAogCWlmIChxdWV1ZS0+ZW5kaWFuICE9IFZJUlRJT19FTkRJQU5fSE9TVCkKIAkJZGllX3Bl
-cnJvcigiVkhPU1QgcmVxdWlyZXMgdGhlIHNhbWUgZW5kaWFubmVzcyBpbiBndWVzdCBhbmQgaG9z
-dCIpOwogCi0Jc3RhdGUubnVtID0gcXVldWUtPnZyaW5nLm51bTsKLQlyID0gaW9jdGwobmRldi0+
-dmhvc3RfZmQsIFZIT1NUX1NFVF9WUklOR19OVU0sICZzdGF0ZSk7CisJc3RhdGUubnVtID0gcXVl
-dWUtPnZyaW5nLm51bTsgLy9udW1iZXIgb2YgZGVjcmlwdG9ycworICAgICAgICByID0gaW9jdGwo
-bmRldi0+dmhvc3RfZmRzWyh2cSAvMildLCBWSE9TVF9TRVRfVlJJTkdfTlVNLCAmc3RhdGUpOwog
-CWlmIChyIDwgMCkKIAkJZGllX3BlcnJvcigiVkhPU1RfU0VUX1ZSSU5HX05VTSBmYWlsZWQiKTsK
-LQlzdGF0ZS5udW0gPSAwOwotCXIgPSBpb2N0bChuZGV2LT52aG9zdF9mZCwgVkhPU1RfU0VUX1ZS
-SU5HX0JBU0UsICZzdGF0ZSk7CisKKwlzdGF0ZS5udW0gPSAwOyAvL2Rlc2NyaXB0b3JzIGJhc2UK
-KwlyID0gaW9jdGwobmRldi0+dmhvc3RfZmRzWyh2cSAvMildLCBWSE9TVF9TRVRfVlJJTkdfQkFT
-RSwgJnN0YXRlKTsKIAlpZiAociA8IDApCiAJCWRpZV9wZXJyb3IoIlZIT1NUX1NFVF9WUklOR19C
-QVNFIGZhaWxlZCIpOwogCiAJYWRkciA9IChzdHJ1Y3Qgdmhvc3RfdnJpbmdfYWRkcikgewotCQku
-aW5kZXggPSB2cSwKKwkJLmluZGV4ID0gKHZxICUyKSwKIAkJLmRlc2NfdXNlcl9hZGRyID0gKHU2
-NCkodW5zaWduZWQgbG9uZylxdWV1ZS0+dnJpbmcuZGVzYywKIAkJLmF2YWlsX3VzZXJfYWRkciA9
-ICh1NjQpKHVuc2lnbmVkIGxvbmcpcXVldWUtPnZyaW5nLmF2YWlsLAogCQkudXNlZF91c2VyX2Fk
-ZHIgPSAodTY0KSh1bnNpZ25lZCBsb25nKXF1ZXVlLT52cmluZy51c2VkLAogCX07CiAKLQlyID0g
-aW9jdGwobmRldi0+dmhvc3RfZmQsIFZIT1NUX1NFVF9WUklOR19BRERSLCAmYWRkcik7CisJciA9
-IGlvY3RsKG5kZXYtPnZob3N0X2Zkc1sodnEgLzIpXSwgVkhPU1RfU0VUX1ZSSU5HX0FERFIsICZh
-ZGRyKTsKIAlpZiAociA8IDApCiAJCWRpZV9wZXJyb3IoIlZIT1NUX1NFVF9WUklOR19BRERSIGZh
-aWxlZCIpOwogCkBAIC02NTksNyArNjY0LDcgQEAgc3RhdGljIHZvaWQgZXhpdF92cShzdHJ1Y3Qg
-a3ZtICprdm0sIHZvaWQgKmRldiwgdTMyIHZxKQogCSAqLwogCWlmIChuZGV2LT52aG9zdF9mZCAm
-JiAhaXNfY3RybF92cShuZGV2LCB2cSkpIHsKIAkJcHJfd2FybmluZygiQ2Fubm90IHJlc2V0IFZI
-T1NUIHF1ZXVlIik7Ci0JCWlvY3RsKG5kZXYtPnZob3N0X2ZkLCBWSE9TVF9SRVNFVF9PV05FUik7
-CisJCWlvY3RsKG5kZXYtPnZob3N0X2Zkc1sodnEgLzIpXSwgVkhPU1RfUkVTRVRfT1dORVIpOwog
-CQlyZXR1cm47CiAJfQogCkBAIC02ODIsNyArNjg3LDcgQEAgc3RhdGljIHZvaWQgbm90aWZ5X3Zx
-X2dzaShzdHJ1Y3Qga3ZtICprdm0sIHZvaWQgKmRldiwgdTMyIHZxLCB1MzIgZ3NpKQogCQlyZXR1
-cm47CiAKIAlmaWxlID0gKHN0cnVjdCB2aG9zdF92cmluZ19maWxlKSB7Ci0JCS5pbmRleAk9IHZx
-LAorCQkuaW5kZXgJPSAodnEgJSAyKSwKIAkJLmZkCT0gZXZlbnRmZCgwLCAwKSwKIAl9OwogCkBA
-IC02OTMsMzEgKzY5OCwzMiBAQCBzdGF0aWMgdm9pZCBub3RpZnlfdnFfZ3NpKHN0cnVjdCBrdm0g
-Kmt2bSwgdm9pZCAqZGV2LCB1MzIgdnEsIHUzMiBnc2kpCiAJcXVldWUtPmlycWZkID0gZmlsZS5m
-ZDsKIAlxdWV1ZS0+Z3NpID0gZ3NpOwogCi0JciA9IGlvY3RsKG5kZXYtPnZob3N0X2ZkLCBWSE9T
-VF9TRVRfVlJJTkdfQ0FMTCwgJmZpbGUpOworCXIgPSBpb2N0bChuZGV2LT52aG9zdF9mZHNbKHZx
-IC8yKV0sIFZIT1NUX1NFVF9WUklOR19DQUxMLCAmZmlsZSk7CiAJaWYgKHIgPCAwKQogCQlkaWVf
-cGVycm9yKCJWSE9TVF9TRVRfVlJJTkdfQ0FMTCBmYWlsZWQiKTsKKwogCWZpbGUuZmQgPSBuZGV2
-LT50YXBfZmQ7Ci0JciA9IGlvY3RsKG5kZXYtPnZob3N0X2ZkLCBWSE9TVF9ORVRfU0VUX0JBQ0tF
-TkQsICZmaWxlKTsKKwlyID0gaW9jdGwobmRldi0+dmhvc3RfZmRzWyh2cSAvMildLCBWSE9TVF9O
-RVRfU0VUX0JBQ0tFTkQsICZmaWxlKTsKIAlpZiAociAhPSAwKQogCQlkaWUoIlZIT1NUX05FVF9T
-RVRfQkFDS0VORCBmYWlsZWQgJWQiLCBlcnJubyk7Ci0KIH0KIAogc3RhdGljIHZvaWQgbm90aWZ5
-X3ZxX2V2ZW50ZmQoc3RydWN0IGt2bSAqa3ZtLCB2b2lkICpkZXYsIHUzMiB2cSwgdTMyIGVmZCkK
-IHsKIAlzdHJ1Y3QgbmV0X2RldiAqbmRldiA9IGRldjsKIAlzdHJ1Y3Qgdmhvc3RfdnJpbmdfZmls
-ZSBmaWxlID0gewotCQkuaW5kZXgJPSB2cSwKKwkJLmluZGV4CT0gKHZxICUgMiksCiAJCS5mZAk9
-IGVmZCwKIAl9OwogCWludCByOwogCi0JaWYgKG5kZXYtPnZob3N0X2ZkID09IDAgfHwgaXNfY3Ry
-bF92cShuZGV2LCB2cSkpCisJaWYgKG5kZXYtPnZob3N0X2ZkID09IDAgfHwgaXNfY3RybF92cShu
-ZGV2LCB2cSkpIHsKIAkJcmV0dXJuOworCX0KKwlyID0gaW9jdGwobmRldi0+dmhvc3RfZmRzWyh2
-cSAvMildLCBWSE9TVF9TRVRfVlJJTkdfS0lDSywgJmZpbGUpOwogCi0JciA9IGlvY3RsKG5kZXYt
-PnZob3N0X2ZkLCBWSE9TVF9TRVRfVlJJTkdfS0lDSywgJmZpbGUpOwogCWlmIChyIDwgMCkKLQkJ
-ZGllX3BlcnJvcigiVkhPU1RfU0VUX1ZSSU5HX0tJQ0sgZmFpbGVkIik7CisJCWRpZV9wZXJyb3Io
-IlZIT1NUX1NFVF9WUklOR19LSUNLIGZhaWxlZCB0ZXN0Iik7CiB9CiAKIHN0YXRpYyBpbnQgbm90
-aWZ5X3ZxKHN0cnVjdCBrdm0gKmt2bSwgdm9pZCAqZGV2LCB1MzIgdnEpCkBAIC03NzcsMTAgKzc4
-Myw2IEBAIHN0YXRpYyB2b2lkIHZpcnRpb19uZXRfX3Zob3N0X2luaXQoc3RydWN0IGt2bSAqa3Zt
-LCBzdHJ1Y3QgbmV0X2RldiAqbmRldikKIAlzdHJ1Y3Qgdmhvc3RfbWVtb3J5ICptZW07CiAJaW50
-IHIsIGk7CiAKLQluZGV2LT52aG9zdF9mZCA9IG9wZW4oIi9kZXYvdmhvc3QtbmV0IiwgT19SRFdS
-KTsKLQlpZiAobmRldi0+dmhvc3RfZmQgPCAwKQotCQlkaWVfcGVycm9yKCJGYWlsZWQgb3Blbm5p
-bmcgdmhvc3QtbmV0IGRldmljZSIpOwotCiAJbWVtID0gY2FsbG9jKDEsIHNpemVvZigqbWVtKSAr
-IGt2bS0+bWVtX3Nsb3RzICogc2l6ZW9mKHN0cnVjdCB2aG9zdF9tZW1vcnlfcmVnaW9uKSk7CiAJ
-aWYgKG1lbSA9PSBOVUxMKQogCQlkaWUoIkZhaWxlZCBhbGxvY2F0aW5nIG1lbW9yeSBmb3Igdmhv
-c3QgbWVtb3J5IG1hcCIpOwpAQCAtNzk2LDEzICs3OTgsMjIgQEAgc3RhdGljIHZvaWQgdmlydGlv
-X25ldF9fdmhvc3RfaW5pdChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBuZXRfZGV2ICpuZGV2KQog
-CX0KIAltZW0tPm5yZWdpb25zID0gaTsKIAotCXIgPSBpb2N0bChuZGV2LT52aG9zdF9mZCwgVkhP
-U1RfU0VUX09XTkVSKTsKLQlpZiAociAhPSAwKQotCQlkaWVfcGVycm9yKCJWSE9TVF9TRVRfT1dO
-RVIgZmFpbGVkIik7CisJZm9yIChpPTA7ICgodTMyKWkgPCBuZGV2LT5xdWV1ZV9wYWlycykgJiYg
-CisJCQkoaSA8IFZJUlRJT19ORVRfTlVNX1FVRVVFUyk7IGkrKykgewogCi0JciA9IGlvY3RsKG5k
-ZXYtPnZob3N0X2ZkLCBWSE9TVF9TRVRfTUVNX1RBQkxFLCBtZW0pOwotCWlmIChyICE9IDApCi0J
-CWRpZV9wZXJyb3IoIlZIT1NUX1NFVF9NRU1fVEFCTEUgZmFpbGVkIik7CisJCW5kZXYtPnZob3N0
-X2Zkc1tpXSA9IG9wZW4oIi9kZXYvdmhvc3QtbmV0IiwgT19SRFdSKTsKKwkgICAgICAgIGlmIChu
-ZGV2LT52aG9zdF9mZHNbaV0gPCAwKQorCQkJZGllX3BlcnJvcigiRmFpbGVkIG9wZW5uaW5nIHZo
-b3N0LW5ldCBkZXZpY2UiKTsKKworCQlyID0gaW9jdGwobmRldi0+dmhvc3RfZmRzW2ldLCBWSE9T
-VF9TRVRfT1dORVIpOworCQlpZiAociAhPSAwKQorCQkJZGllX3BlcnJvcigiVkhPU1RfU0VUX09X
-TkVSIGZhaWxlZCIpOworCQorCQlyID0gaW9jdGwobmRldi0+dmhvc3RfZmRzW2ldLCBWSE9TVF9T
-RVRfTUVNX1RBQkxFLCBtZW0pOworCQlpZiAociAhPSAwKQorCQkJZGllX3BlcnJvcigiVkhPU1Rf
-U0VUX01FTV9UQUJMRSBmYWlsZWQiKTsKKwl9CisJbmRldi0+dmhvc3RfZmQgPSBuZGV2LT52aG9z
-dF9mZHNbMF07CiAKIAluZGV2LT52ZGV2LnVzZV92aG9zdCA9IHRydWU7CiAKQEAgLTk2Niw3ICs5
-NzcsNiBAQCBzdGF0aWMgaW50IHZpcnRpb19uZXRfX2luaXRfb25lKHN0cnVjdCB2aXJ0aW9fbmV0
-X3BhcmFtcyAqcGFyYW1zKQogCQkJCSAgICJmYWxsaW5nIGJhY2sgdG8gJXMuIiwgcGFyYW1zLT50
-cmFucywKIAkJCQkgICB2aXJ0aW9fdHJhbnNfbmFtZSh0cmFucykpOwogCX0KLQogCXIgPSB2aXJ0
-aW9faW5pdChwYXJhbXMtPmt2bSwgbmRldiwgJm5kZXYtPnZkZXYsIG9wcywgdHJhbnMsCiAJCQlQ
-Q0lfREVWSUNFX0lEX1ZJUlRJT19ORVQsIFZJUlRJT19JRF9ORVQsIFBDSV9DTEFTU19ORVQpOwog
-CWlmIChyIDwgMCkgewpkaWZmIC0tZ2l0IGEvdmlydGlvL3BjaS5jIGIvdmlydGlvL3BjaS5jCmlu
-ZGV4IGM2NTI5NDkuLjdhMTUzMmIgMTAwNjQ0Ci0tLSBhL3ZpcnRpby9wY2kuYworKysgYi92aXJ0
-aW8vcGNpLmMKQEAgLTQ0LDcgKzQ0LDggQEAgc3RhdGljIGludCB2aXJ0aW9fcGNpX19pbml0X2lv
-ZXZlbnRmZChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCB2aXJ0aW9fZGV2aWNlICp2ZGUKIAkgKiBW
-aG9zdCB3aWxsIHBvbGwgdGhlIGV2ZW50ZmQgaW4gaG9zdCBrZXJuZWwgc2lkZSwgb3RoZXJ3aXNl
-IHdlCiAJICogbmVlZCB0byBwb2xsIGluIHVzZXJzcGFjZS4KIAkgKi8KLQlpZiAoIXZkZXYtPnVz
-ZV92aG9zdCkKKwlpZiAoICghdmRldi0+dXNlX3Zob3N0KSB8fAorCQkoKHUzMil2ZGV2LT5vcHMt
-PmdldF92cV9jb3VudChrdm0sIHZwY2ktPmRldik9PSh2cSsxKSkgKQogCQlmbGFncyB8PSBJT0VW
-RU5URkRfRkxBR19VU0VSX1BPTEw7CiAKIAkvKiBpb3BvcnQgKi8K
+Fair enough, but I'm also thinking it might be overkill to introduce
+a general list API at all if all we need to do is insert and delete
+blocks, and ones where we're aware of where the pointers are.
 
---_002_AM7PR05MB7076F55498C85087F09421F6CC0C0AM7PR05MB7076eurp_--
+> so what I gather at the end is that I have to write a physical memory
+> allocator for a complex OS that has to seamlessly access high memory.
+
+We definitely don't want complexity. Trade-offs for simplicity are
+good, but they should be implemented in a way that assert when
+assumptions fail. If we want to limit memory access to 4G for 32-bit
+architectures, then we should add some code to clamp upper physical
+addresses and some asserts for unit tests that try to use them. If
+the allocator wants to depend on the identity map to simplify its
+implementation, then that's probably OK too, but I'd still keep
+the interfaces clean: physical addresses should be phys_addr_t,
+virtual addresses that should be the identity mapping of physical
+addresses should be checked, e.g. assert(virt_to_phys(vaddr) == vaddr)
+
+> 
+> I'll try to come up with something
+> 
+
+Thanks,
+drew
+
