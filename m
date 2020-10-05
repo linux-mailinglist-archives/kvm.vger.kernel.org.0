@@ -2,105 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D77A6283C77
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 18:28:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A182283EFB
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 20:48:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728920AbgJEQ2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 12:28:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42554 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727149AbgJEQ2l (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 12:28:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601915320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tU8DTXGRfuZJtH+Jchkjus4Q0juje0A4w+blb1fUA1c=;
-        b=Hv7dcaG0d73TlpfTzxjtwq4guviRPEPoSswf5qF/gZrTf2TOwEwoYaCm8OSy758BDo3Tjs
-        S83ZTDWxQKRgjH/1GNmeiVrDkxMadt2Yun4s5ICYd17YpFHRSeCN6q2Ds1M1rCKJF0C0Pb
-        dzq9VSDbjHNxk5QM9m1Z9H752ufx0GI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-jmUA64K-Pw-tRVEgtNLdXA-1; Mon, 05 Oct 2020 12:28:36 -0400
-X-MC-Unique: jmUA64K-Pw-tRVEgtNLdXA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7503B1029D30;
-        Mon,  5 Oct 2020 16:28:16 +0000 (UTC)
-Received: from gondolin (ovpn-112-191.ams2.redhat.com [10.36.112.191])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E95FF78AB4;
-        Mon,  5 Oct 2020 16:28:13 +0000 (UTC)
-Date:   Mon, 5 Oct 2020 18:28:11 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
+        id S1729141AbgJESsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 14:48:43 -0400
+Received: from mga04.intel.com ([192.55.52.120]:6073 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725940AbgJESsm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Oct 2020 14:48:42 -0400
+IronPort-SDR: 7zcPUNdQjXrXvJPuSiRRSbLjR0qMtGvOzFRAv8upB209E2ULv30Zwpy433O2nK3gcjPX23Nmzt
+ AMU5wCDafiMQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9765"; a="161223978"
+X-IronPort-AV: E=Sophos;i="5.77,340,1596524400"; 
+   d="scan'208";a="161223978"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2020 11:48:36 -0700
+IronPort-SDR: pwdHY0+Clex6uhiQvof1tlh+ZaTorD5tBhzBp13QuXfmQhYbhxrk1rlflHdcUNlRaW+BpzA2ca
+ mig0mG0rW8rw==
+X-IronPort-AV: E=Sophos;i="5.77,340,1596524400"; 
+   d="scan'208";a="516318049"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2020 09:37:48 -0700
+Date:   Mon, 5 Oct 2020 09:37:44 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] vfio-pci/zdev: define the vfio_zdev header
-Message-ID: <20201005182811.6c17ed6b.cohuck@redhat.com>
-In-Reply-To: <e0688173-8c5a-1797-8398-235c5e406bc1@linux.ibm.com>
-References: <1601668844-5798-1-git-send-email-mjrosato@linux.ibm.com>
-        <1601668844-5798-4-git-send-email-mjrosato@linux.ibm.com>
-        <20201002154417.20c2a7ef@x1.home>
-        <8a71af3b-f8fc-48b2-45c6-51222fd2455b@linux.ibm.com>
-        <20201005180107.5d027441.cohuck@redhat.com>
-        <e0688173-8c5a-1797-8398-235c5e406bc1@linux.ibm.com>
-Organization: Red Hat GmbH
+Subject: Re: [PATCH] KVM: x86: filter guest NX capability for cpuid2
+Message-ID: <20201005163743.GE11938@linux.intel.com>
+References: <20201005145921.84848-1-tianjia.zhang@linux.alibaba.com>
+ <87ft6s8zdg.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ft6s8zdg.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 5 Oct 2020 12:16:10 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-
-> On 10/5/20 12:01 PM, Cornelia Huck wrote:
-> > On Mon, 5 Oct 2020 09:52:25 -0400
-> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> >   
-> >> On 10/2/20 5:44 PM, Alex Williamson wrote:  
-> >   
-> >>> Can you discuss why a region with embedded capability chain is a better
-> >>> solution than extending the VFIO_DEVICE_GET_INFO ioctl to support a
-> >>> capability chain and providing this info there?  This all appears to be
-> >>> read-only info, so what's the benefit of duplicating yet another  
-> >>
-> >> It is indeed read-only info, and the device region was defined as such.
-> >>
-> >> I would not necessarily be opposed to extending VFIO_DEVICE_GET_INFO
-> >> with these defined as capabilities; I'd say a primary motivating factor
-> >> to putting these in their own region was to avoid stuffing a bunch of
-> >> s390-specific capabilities into a general-purpose ioctl response.  
-> > 
-> > Can't you make the zdev code register the capabilities? That would put
-> > them nicely into their own configurable part.
-> >   
+On Mon, Oct 05, 2020 at 05:29:47PM +0200, Vitaly Kuznetsov wrote:
+> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> writes:
 > 
-> I can still keep the code that adds these capabilities in the zdev .c 
-> file, thus meaning they will only be added for s390 zpci devices -- but 
-> the actual definition of them should probably instead be in vfio.h, no? 
-> (maybe that's what you mean, but let's lay it out just in case)
+> > Original KVM_SET_CPUID has removed NX on non-NX hosts as it did
+> > before. but KVM_SET_CPUID2 does not. The two should be consistent.
+> >
+> > Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> > ---
+> >  arch/x86/kvm/cpuid.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index 3fd6eec202d7..3e7ba2b11acb 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -257,6 +257,7 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
+> >  		goto out;
+> >  	}
+> >  
+> > +	cpuid_fix_nx_cap(vcpu);
+> >  	kvm_update_cpuid_runtime(vcpu);
+> >  	kvm_vcpu_after_set_cpuid(vcpu);
+> >  out:
 > 
-> The capability IDs would be shared with any other potential user of 
-> VFIO_DEVICE_GET_INFO (I guess there is precedent for this already, 
-> nvlink2 does this for vfio_region_info, see 
-> VFIO_REGION_INFO_CAP_NVLINK2_SSATGT as an example).
+> I stumbled upon this too and came to the conclusion this is
+> intentional, e.g. see this:
 > 
-> Today, ZPCI would be the only users of VFIO_DEVICE_GET_INFO capability 
-> chains.  Tomorrow, some other type might use them too.  Unless we want 
-> to put a stake in the ground that says there will never be a case for a 
-> capability that all devices share on VFIO_DEVICE_GET_INFO, I think we 
-> should keep the IDs unique and define the capabilities in vfio.h but do 
-> the corresponding add_capability() calls from a zdev-specific file.
+> commit 0771671749b59a507b6da4efb931c44d9691e248
+> Author: Dan Kenigsberg <danken@qumranet.com>
+> Date:   Wed Nov 21 17:10:04 2007 +0200
+> 
+>     KVM: Enhance guest cpuid management
+> 
+> ...
+> 
+>     [avi: fix original KVM_SET_CPUID not removing nx on non-nx hosts as it did
+>           before]
+> 
+> but this is a very, very old story.
 
-Agreed. We should have enough space for multiple users, and I do not
-consider reserving the IDs cluttering.
-
+Doesn't mean it's bogus though :-)  _If_ we want to extend this behavior to
+KVM_SET_CPUID2, there should be a justified need.
