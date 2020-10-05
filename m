@@ -2,127 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 435EB283FCB
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 21:41:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74017283F5B
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 21:13:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729480AbgJETlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 15:41:13 -0400
-Received: from mga17.intel.com ([192.55.52.151]:19752 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729302AbgJETlN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Oct 2020 15:41:13 -0400
-IronPort-SDR: Bdw+cKsjTJ//04f6oh3Zxhgc3NQT9tb006m0ZwF7n152IAfu36hBoiNhk5O9q3DJ5F160QPfg0
- ZQ3O4ZJiEfrQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9765"; a="143832465"
-X-IronPort-AV: E=Sophos;i="5.77,340,1596524400"; 
-   d="scan'208";a="143832465"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP; 05 Oct 2020 12:26:06 -0700
-IronPort-SDR: lxF6D25Y207qlLNXScXhxkLPsDRbK1kc/MVlkM2tgjHEmEqB9WNJ8MI7ZEXXSbfyiX3amIf/dz
- tc0QX9Ic3oBg==
-X-IronPort-AV: E=Sophos;i="5.77,340,1596524400"; 
-   d="scan'208";a="517163416"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2020 11:43:35 -0700
-Date:   Mon, 5 Oct 2020 11:43:20 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Alexander Graf <graf@amazon.com>, kvm list <kvm@vger.kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        KarimAllah Raslan <karahmed@amazon.de>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 6/8] KVM: x86: VMX: Prevent MSR passthrough when MSR
- access is denied
-Message-ID: <20201005184320.GA15803@linux.intel.com>
-References: <20200925143422.21718-1-graf@amazon.com>
- <20200925143422.21718-7-graf@amazon.com>
- <20201002011139.GA5473@xz-x1>
+        id S1727982AbgJETM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 15:12:27 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:56756 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726657AbgJETM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Oct 2020 15:12:26 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095J9t3c109421;
+        Mon, 5 Oct 2020 19:12:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=J2CNHLbQUaQBrncpPwC9uFIbCgspT//xg1VJuXRr1uo=;
+ b=tvMMfn8G50xRV1hMPIUfkJHKuR/OHxuJIjkPL5/0+YKgMfiJvXlUfqNgVxs9u/MSp0D8
+ nPhMJbg042rZwEopEI27tCz2v3z36AiQlRGYqxdZ8d93ZZTvwsZ2NxxRATHs4RGdfjk0
+ Bme9z+21Vp2Z2g5HMxyCq9uQEP0jyqTtVqR/NQlaWZM0vCU8gii86agc/FUC9x8EDQeM
+ hxweXeAgCkVQz/UDI8vgZmr61foZKTgatadyTDCpZwnRXtf3tcgYlGLW/8MpeV641b0K
+ 86wV4fPGSfl3xhDk4iOn0UcNORyGCxQV3v4W+tU0B0G39JGUd0GlAtrKPV+2s+46WG+U HA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 33ym34ccte-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 05 Oct 2020 19:12:21 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 095IpE41182653;
+        Mon, 5 Oct 2020 19:10:21 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 33y2vkw6qv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 05 Oct 2020 19:10:21 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 095JAJ7q011426;
+        Mon, 5 Oct 2020 19:10:19 GMT
+Received: from localhost.localdomain (/10.159.233.8)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 05 Oct 2020 12:10:19 -0700
+Subject: Re: [PATCH 3/4 v2] KVM: nSVM: Test non-MBZ reserved bits in CR3 in
+ long mode
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+References: <20200928072043.9359-1-krish.sadhukhan@oracle.com>
+ <20200928072043.9359-4-krish.sadhukhan@oracle.com>
+ <20200929031154.GC31514@linux.intel.com>
+ <5f236941-5086-167a-6518-6191d8ef04cf@oracle.com>
+ <20201001005041.GE2988@linux.intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <7669d79b-1d3b-f37c-ef90-b78a50d7491f@oracle.com>
+Date:   Mon, 5 Oct 2020 12:10:12 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201002011139.GA5473@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20201001005041.GE2988@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9765 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 suspectscore=0 spamscore=0 phishscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010050136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9765 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 priorityscore=1501
+ mlxscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0 spamscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010050137
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 01, 2020 at 09:11:39PM -0400, Peter Xu wrote:
-> Hi,
-> 
-> I reported in the v13 cover letter of kvm dirty ring series that this patch
-> seems to have been broken.  Today I tried to reproduce with a simplest vm, and
-> after a closer look...
-> 
-> On Fri, Sep 25, 2020 at 04:34:20PM +0200, Alexander Graf wrote:
-> > @@ -3764,15 +3859,14 @@ static u8 vmx_msr_bitmap_mode(struct kvm_vcpu *vcpu)
-> >  	return mode;
-> >  }
-> >  
-> > -static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu,
-> > -					 unsigned long *msr_bitmap, u8 mode)
-> > +static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu, u8 mode)
-> >  {
-> >  	int msr;
-> >  
-> > -	for (msr = 0x800; msr <= 0x8ff; msr += BITS_PER_LONG) {
-> > -		unsigned word = msr / BITS_PER_LONG;
-> > -		msr_bitmap[word] = (mode & MSR_BITMAP_MODE_X2APIC_APICV) ? 0 : ~0;
-> > -		msr_bitmap[word + (0x800 / sizeof(long))] = ~0;
-> > +	for (msr = 0x800; msr <= 0x8ff; msr++) {
-> > +		bool intercepted = !!(mode & MSR_BITMAP_MODE_X2APIC_APICV);
-> > +
-> > +		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_RW, intercepted);
 
-Yeah, this is busted.
+On 9/30/20 5:50 PM, Sean Christopherson wrote:
+> On Wed, Sep 30, 2020 at 05:29:24PM -0700, Krish Sadhukhan wrote:
+>> On 9/28/20 8:11 PM, Sean Christopherson wrote:
+>>> On Mon, Sep 28, 2020 at 07:20:42AM +0000, Krish Sadhukhan wrote:
+>>>> According to section "CR3" in APM vol. 2, the non-MBZ reserved bits in CR3
+>>>> need to be set by software as follows:
+>>>>
+>>>> 	"Reserved Bits. Reserved fields should be cleared to 0 by software
+>>>> 	when writing CR3."
+>>> Nothing in the shortlog or changelog actually states what this patch does.
+>>> "Test non-MBZ reserved bits in CR3 in long mode" is rather ambiguous, and
+>>> IIUC, the changelog is straight up misleading.
+>>>
+>>> Based on the discussion from v1, I _think_ this test verifies that KVM does
+>>> _not_ fail nested VMRUN if non-MBZ bits are set, correct?
+>> Not KVM, hardware rather.  Hardware doesn't consider it as an invalid guest
+>> state if non-MBZ reserved bits are set.
+>>> If so, then something like:
+>>>
+>>>    KVM: nSVM: Verify non-MBZ CR3 reserved bits can be set in long mode
+>>>
+>>> with further explanation in the changelog would be very helpful.
+>> Even though the non-MBZ reserved bits are ignored by the consistency checks
+>> in hardware, eventually page-table walks fail. So, I am wondering whether it
+> Page table walks fail how?  Are you referring to forcing the #NPF, or does
+> the CPU puke on the non-MBZ reserved bits at some point?
 
-> >  	}
-> >  
-> >  	if (mode & MSR_BITMAP_MODE_X2APIC) {
-> 
-> ... I think we may want below change to be squashed:
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index d160aad59697..7d3f2815b04d 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -3781,9 +3781,10 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu, u8 mode)
->         int msr;
->  
->         for (msr = 0x800; msr <= 0x8ff; msr++) {
-> -               bool intercepted = !!(mode & MSR_BITMAP_MODE_X2APIC_APICV);
-> +               bool apicv = mode & MSR_BITMAP_MODE_X2APIC_APICV;
->  
-> -               vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_RW, intercepted);
-> +               vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_R, !apicv);
-> +               vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_W, true);
 
-I would prefer a full revert of sorts.  Allowing userspace to intercept reads
-to x2APIC MSRs when APICV is fully enabled for the guest simply can't work.
-The LAPIC and thus virtual APIC is in-kernel and cannot be directly accessed
-by userspace.  I doubt it actually affects real world performance, but
-resetting each MSR one-by-one bugs me.
+I notice the following in my experiments when I don't clear the P bit in 
+NPT PML4[0] to induce an
+#NPF:
 
-Intercepting writes to TPR, EOI and SELF_IPI are somewhat plausible, but I
-just don't see how intercepting reads when APICV is active is a sane setup.
+     1. In long mode and in legacy-PAE mode, guest VMMCALL is 
+successfully executed and kvm_x86_ops.handle_exit() receives VMEXIT_VMMCALL.
 
-I'll send a patch and we can go from there.
+     2. In legacy-non-PAE mode, kvm_x86_ops.handle_exit(), receives 
+VMEXIT_NPF.
 
->         }
->  
->         if (mode & MSR_BITMAP_MODE_X2APIC) {
-> 
-> This fixes my problem the same as having this patch reverted.
-> 
-> -- 
-> Peter Xu
-> 
+>
+>> is appropriate to say,
+>>
+>>              "Verify non-MBZ CR3 reserved bits can be set in long mode"
+>>
+>> because the test is inducing an artificial failure even before any guest
+>> instruction is executed. We are not entering the guest with these bits set.
+> Yes we are, unless I'm misunderstanding how SVM handles VMRUN.  "entering" the
+> guest does not mean successfully executing guest code, it means loading guest
+> state and completing the world switch.  I don't think I'm misunderstanding,
+> because the test explicitly clears the NPT PML4[0]'s present bit to induce a
+> #NPF.  That means the CPU is fetching instructions, and again unless there's
+> details about NPT that I'm missing, the fact that the test sees a #NPF means
+> that the CPU successfully completed the GVA->GPA translation using the "bad"
+> CR3.
+
+
+You are right. According to APM, the hardware loads the guest state 
+first and then does the consistency checking. So, yes, world switch 
+happens before consistency checking begins.
+
+>
+>> I prefer to keep the commit header as is and rather expand the commit
+>> message to explain what I have described here. How about that ?
+> That's fine, so long as it documents both what the test is actually verifying
+> and what is/isn't legal.
