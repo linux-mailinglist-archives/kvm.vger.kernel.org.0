@@ -2,193 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC87C283530
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 13:51:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B186283535
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 13:54:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726070AbgJELvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 07:51:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58605 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725914AbgJELvP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 07:51:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601898673;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BjE3q5SqsZGBQmpmhfatyBhIujQJSM42VjvWFiS2jTU=;
-        b=Kf2B1lJIVGrSSE3J6H+tOvgeWPsmxbgd6NCtuBFhdS8R62tL8+YmUldRr/xw3vMpEM6vji
-        NCC/Gt6JDYD3gImiQInimz0DZZwqKm073qLauGHjkRh6CKdR2XLuXy89mx+VI+FbAjld/t
-        XezpvaDoQU6gEOqq72Qbkb5UsZV3j+g=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-iijJwU2QNTOKmKl3DRGCZQ-1; Mon, 05 Oct 2020 07:51:11 -0400
-X-MC-Unique: iijJwU2QNTOKmKl3DRGCZQ-1
-Received: by mail-wr1-f72.google.com with SMTP id w7so3925086wrp.2
-        for <kvm@vger.kernel.org>; Mon, 05 Oct 2020 04:51:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=BjE3q5SqsZGBQmpmhfatyBhIujQJSM42VjvWFiS2jTU=;
-        b=cO7+7hkOKtGz/l6x2KJ4T2yi6pKEaLvZGsTAPZEqhFByhp7RWICwOMLMrVq0a0BXj8
-         dTd1ORZukcaE8QApg4/o9lxVtVxok6NhQArDtvuMy9pcguU1E28j9D2EDqmGGXvuYL2A
-         xAdqVuBZ1Fp8w4SMKKxmyfWs4a0Agz2ff6GotnD7RP22xHdEBfnDBBSLjaNYHWTMx4p1
-         rYCicCjmbXBGydHoIrcgbcIRtEqT+6D2Kx136512YB+bkHab13Qh39IFe6vGqe0IyD/W
-         f23ng6vaSKdOMEc6twxyHfNvI3FXN3THrHRKP2axGGllDBTD3KBiXuvP5B85DaRhORaZ
-         Uk5Q==
-X-Gm-Message-State: AOAM532O/Bkm3brIisUwqwHVgYqvTPrlyYI6hidR0rbm29jZZysLPKFv
-        QC+5ecnXqhbg5t/1Yl7rHpA+SsgJf8Zmenc0GIAOVUf03ya/TJlQpuAQKB4jpbrwyw7B1+HMHx1
-        dTY+77fEtvYI3
-X-Received: by 2002:a5d:660d:: with SMTP id n13mr17748666wru.308.1601898670432;
-        Mon, 05 Oct 2020 04:51:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwsx0tvR3zXziRScmcFCgsrWruPUl1whTfR7CXCpYhCWp+/X1cjmCctlOWkVPmlvRCMBb7e1Q==
-X-Received: by 2002:a5d:660d:: with SMTP id n13mr17748636wru.308.1601898670087;
-        Mon, 05 Oct 2020 04:51:10 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id u81sm9460790wmg.43.2020.10.05.04.51.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2020 04:51:09 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Wei Huang <whuang2@amd.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: x86: disconnect kvm_check_cpuid() from vcpu->arch.cpuid_entries
-In-Reply-To: <85c31c92e6775b9d8ccd088e3f61659cac1c8cae.camel@redhat.com>
-References: <20201001130541.1398392-1-vkuznets@redhat.com> <20201001130541.1398392-2-vkuznets@redhat.com> <85c31c92e6775b9d8ccd088e3f61659cac1c8cae.camel@redhat.com>
-Date:   Mon, 05 Oct 2020 13:51:08 +0200
-Message-ID: <87imbo99hv.fsf@vitty.brq.redhat.com>
+        id S1725946AbgJELyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 07:54:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23292 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725914AbgJELyt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 07:54:49 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 095BgsnB101169
+        for <kvm@vger.kernel.org>; Mon, 5 Oct 2020 07:54:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=0BGGaZVlZu8r04E5WuIjjh8FYjN0KQcHGaHmZVMAdik=;
+ b=dOGA2+UJ6oonCyhUDL+nABk7XyWAJe2D+qgI/Y/qJV01LV+514g+15ffjfkb5YNyimEU
+ VBYL1x0ywD+m2rYD//L8VeEuVficX0bmHTSo2FDYKhXxwqWXT7/Y8wUmQvBDdU6wpkvX
+ hi9PdBlB5A7tx6Sl2Hib9TmD539N8ZaLR8ekddbdvGIHMgpMXI2hPhBAQSQT3SOHrn4z
+ dam7n79szqW13f01Z4Uo5Q3+/L5WCBTj2EovkOUPCSpk6IL9PLV1z4zk0OMy14bP1Q/J
+ e6b2fZPQltWTnlKPy3zY//htYY1bGY6pwWKspmQF0thUMlWdJ2xiQjgjdf3r7pTvMGuP aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3402uug9ku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 05 Oct 2020 07:54:48 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 095BjS59111948
+        for <kvm@vger.kernel.org>; Mon, 5 Oct 2020 07:54:48 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3402uug9kb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Oct 2020 07:54:48 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 095Bqaq6030585;
+        Mon, 5 Oct 2020 11:54:46 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 33xgx813hb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Oct 2020 11:54:45 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 095BshYv28115416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Oct 2020 11:54:43 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 192F6A405F;
+        Mon,  5 Oct 2020 11:54:43 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC519A4053;
+        Mon,  5 Oct 2020 11:54:42 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.6.235])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Oct 2020 11:54:42 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 0/7] Rewrite the allocators
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, lvivier@redhat.com
+References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <aec4a269-efba-83c0-cbbb-c78b132b1fa9@linux.ibm.com>
+Date:   Mon, 5 Oct 2020 13:54:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20201002154420.292134-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-05_06:2020-10-02,2020-10-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=2 mlxlogscore=927
+ malwarescore=0 impostorscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010050083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-> On Thu, 2020-10-01 at 15:05 +0200, Vitaly Kuznetsov wrote:
->> As a preparatory step to allocating vcpu->arch.cpuid_entries dynamically
->> make kvm_check_cpuid() check work with an arbitrary 'struct kvm_cpuid_entry2'
->> array.
->> 
->> Currently, when kvm_check_cpuid() fails we reset vcpu->arch.cpuid_nent to
->> 0 and this is kind of weird, i.e. one would expect CPUIDs to remain
->> unchanged when KVM_SET_CPUID[2] call fails.
-> Since this specific patch doesn't fix this, maybe move this chunk to following patches,
-> or to the cover letter?
 
-Basically, this kind of pairs with what's after 'No functional change
-intended' below: we admit the problem but don't fix it because we can't
-(yet) and then in PATCH3 we do two things at once. It would be great to
-separate these two changes but this doesn't seem to be possible without
-an unneeded code churn.
+On 2020-10-02 17:44, Claudio Imbrenda wrote:
+> The KVM unit tests are increasingly being used to test more than just
+> KVM. They are being used to test TCG, qemu I/O device emulation, other
+> hypervisors, and even actual hardware.
+> 
+> The existing memory allocators are becoming more and more inadequate to
+> the needs of the upcoming unit tests (but also some existing ones, see
+> below).
+> 
+> Some important features that are lacking:
+> * ability to perform a small physical page allocation with a big
+>    alignment withtout wasting huge amounts of memory
+> * ability to allocate physical pages from specific pools/areaas (e.g.
+>    below 16M, or 4G, etc)
+> * ability to reserve arbitrary pages (if free), removing them from the
+>    free pool
+> 
+> Some other features that are nice, but not so fundamental:
+> * no need for the generic allocator to keep track of metadata
+>    (i.e. allocation size), this is now handled by the lower level
+>    allocators
+> * coalescing small blocks into bigger ones, to allow contiguous memory
+>    freed in small blocks in a random order to be used for large
+>    allocations again
+> 
+> This is achieved in the following ways:
+> 
+> For the virtual allocator:
+> * only the virtul allocator needs one extra page of metadata, but only
+>    for allocations that wouldn't fit in one page
+> 
+> For the page allocator:
+> * page allocator has up to 6 memory pools, each pool has a metadata
+>    area; the metadata has a byte for each page in the area, describing
+>    the order of the block it belongs to, and whether it is free
+> * if there are no free blocks of the desired size, a bigger block is
+>    split until we reach the required size; the unused parts of the block
+>    are put back in the free lists
+> * if an allocation needs ablock with a larger alignment than its size, a
+>    larger block of (at least) the required order is split; the unused parts
+>    put back in the appropriate free lists
+> * if the allocation could not be satisfied, the next allowed area is
+>    searched; the allocation fails only when all allowed areas have been
+>    tried
+> * new functions to perform allocations from specific areas; the areas
+>    are arch-dependent and should be set up by the arch code
+> * for now x86 has a memory area for "lowest" memory under 16MB, one for
+>    "low" memory under 4GB and one for the rest, while s390x has one for under
+>    2GB and one for the rest; suggestions for more fine grained areas or for
+>    the other architectures are welcome
 
-That said, I'm completely fine with dropping this chunk from the commit
-message if it sound inapropriate here.
 
->
->> 
->> No functional change intended. It would've been possible to move the updated
->> kvm_check_cpuid() in kvm_vcpu_ioctl_set_cpuid2() and check the supplied
->> input before we start updating vcpu->arch.cpuid_entries/nent but we
->> can't do the same in kvm_vcpu_ioctl_set_cpuid() as we'll have to copy
->> 'struct kvm_cpuid_entry' entries first. The change will be made when
->> vcpu->arch.cpuid_entries[] array becomes allocated dynamically.
->> 
->> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/cpuid.c | 38 +++++++++++++++++++++++---------------
->>  1 file changed, 23 insertions(+), 15 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 37c3668a774f..529348ddedc1 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -54,7 +54,24 @@ static u32 xstate_required_size(u64 xstate_bv, bool compacted)
->>  
->>  #define F feature_bit
->>  
->> -static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
->> +static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
->> +	struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
->> +{
->> +	struct kvm_cpuid_entry2 *e;
->> +	int i;
->> +
->> +	for (i = 0; i < nent; i++) {
->> +		e = &entries[i];
->> +
->> +		if (e->function == function && (e->index == index ||
->> +		    !(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)))
->> +			return e;
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
->>  {
->>  	struct kvm_cpuid_entry2 *best;
->>  
->> @@ -62,7 +79,7 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
->>  	 * The existing code assumes virtual address is 48-bit or 57-bit in the
->>  	 * canonical address checks; exit if it is ever changed.
->>  	 */
->> -	best = kvm_find_cpuid_entry(vcpu, 0x80000008, 0);
->> +	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
->>  	if (best) {
->>  		int vaddr_bits = (best->eax & 0xff00) >> 8;
->>  
->> @@ -220,7 +237,7 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
->>  		vcpu->arch.cpuid_entries[i].padding[2] = 0;
->>  	}
->>  	vcpu->arch.cpuid_nent = cpuid->nent;
->> -	r = kvm_check_cpuid(vcpu);
->> +	r = kvm_check_cpuid(vcpu->arch.cpuid_entries, cpuid->nent);
->>  	if (r) {
->>  		vcpu->arch.cpuid_nent = 0;
->>  		kvfree(cpuid_entries);
->> @@ -250,7 +267,7 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
->>  			   cpuid->nent * sizeof(struct kvm_cpuid_entry2)))
->>  		goto out;
->>  	vcpu->arch.cpuid_nent = cpuid->nent;
->> -	r = kvm_check_cpuid(vcpu);
->> +	r = kvm_check_cpuid(vcpu->arch.cpuid_entries, cpuid->nent);
->>  	if (r) {
->>  		vcpu->arch.cpuid_nent = 0;
->>  		goto out;
->> @@ -940,17 +957,8 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->>  struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
->>  					      u32 function, u32 index)
->>  {
->> -	struct kvm_cpuid_entry2 *e;
->> -	int i;
->> -
->> -	for (i = 0; i < vcpu->arch.cpuid_nent; ++i) {
->> -		e = &vcpu->arch.cpuid_entries[i];
->> -
->> -		if (e->function == function && (e->index == index ||
->> -		    !(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)))
->> -			return e;
->> -	}
->> -	return NULL;
->> +	return cpuid_entry2_find(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent,
->> +				 function, index);
->>  }
->>  EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry);
->>  
->
-> Other than minor note to the commit message, this looks fine, so
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->
+While doing a page allocator, the topology is not the only 
+characteristic we may need to specify.
+Specific page characteristics like rights, access flags, cache behavior 
+may be useful when testing I/O for some architectures.
+This obviously will need some connection to the MMU handling.
 
-Thanks!
+Wouldn't it be interesting to use a bitmap flag as argument to 
+page_alloc() to define separate regions, even if the connection with the 
+MMU is done in a future series?
+
+Regards,
+Pierre
 
 -- 
-Vitaly
-
+Pierre Morel
+IBM Lab Boeblingen
