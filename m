@@ -2,104 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 994C7283858
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 16:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA606283899
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 16:59:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726869AbgJEOqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 10:46:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42034 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726861AbgJEOqU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Oct 2020 10:46:20 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD1AAC0613A8
-        for <kvm@vger.kernel.org>; Mon,  5 Oct 2020 07:46:19 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id z1so9891864wrt.3
-        for <kvm@vger.kernel.org>; Mon, 05 Oct 2020 07:46:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Mti8ToBgeF8Xz8ii2x7rVmWXfXxcziA9CWhs2/5AMEo=;
-        b=GqOXyYSc7hqR7m+PYE0zPD9UnibSUIVSI8A/3uHbx25H4uPe8Djx0YXph+V1W64iUr
-         XwhtUbptGAqonoJp9MNFNvKsssIpVp1CSKeVqOynJDPW9ChZuchcZ58OABG/SslXNJbt
-         3wqKD25DA2LV3BwcVnR1fFb/s2LTxI/GtgT8mdMyPpmTj5f+NAPn+aVAfN+4Xk2cMkGw
-         QbRcvYL0qkFrvhbQFGc3krQcMyyhSmHAe2nLY3jZXN+Z9h9hFOPagpTqjSgNKTTKIx6L
-         VjsU5mQ7IG+ZsG1NbQXzVjUoG0g4exPie9H0A/tkPDryhIC7GCeVI9YMbvDcueXrsqjj
-         tXSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Mti8ToBgeF8Xz8ii2x7rVmWXfXxcziA9CWhs2/5AMEo=;
-        b=cmuhY7SP4TUax5vjiVmGvMl6l8SRTlD97umINxJVSMjU5+FnAV9EUKeTrN7aSp4rq0
-         YFfMqn0iTJMoZeIamD5KSszHHCgSDc2auA6NdhLA7m25H2xpCwbTcB7pcb/DgEAf/RX9
-         GME7dGGJ9bZGZ4xVS9xf5xnB58NfmlTQFbIGPV8QOZ3wg9BJeJaH0YT+bYpwEjFFXnGE
-         RIP6AQz8KkCfK8oGgHoGkvlZKA3mmqj03ADlPIg6V8CID/hbJi1/D3dvDa9CtYvJfWQR
-         ueKcIzAtW0sAQ5kuRmdtcj/Jkn3bBSqGUWJUglNgnYB4vLai1hs240V1FS9xlMThxLAD
-         VwkA==
-X-Gm-Message-State: AOAM531sImeA2eOnIYhE5RgbPt+S5OZAmZ6Y68Yzw5TIf5a+DQpTp+sp
-        gNTIqF+Y7qN5RsNc8FioPl4=
-X-Google-Smtp-Source: ABdhPJz3USeDjZJlyWbMTaAKsHxwnbf3k3DjM4vHKrfgkQJg1Rkm4IqH3DyGE1iatUY7ikg32gfWrQ==
-X-Received: by 2002:adf:fd49:: with SMTP id h9mr8172713wrs.115.1601909178459;
-        Mon, 05 Oct 2020 07:46:18 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id u66sm370498wme.1.2020.10.05.07.46.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2020 07:46:16 -0700 (PDT)
-Date:   Mon, 5 Oct 2020 15:46:15 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Juan Quintela <quintela@redhat.com>
-Cc:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org,
-        John Snow <jsnow@redhat.com>
-Subject: Re: KVM call for agenda for 2020-10-06
-Message-ID: <20201005144615.GE5029@stefanha-x1.localdomain>
-References: <874kndm1t3.fsf@secure.mitica>
+        id S1726601AbgJEO70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 10:59:26 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64050 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726562AbgJEO7Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 10:59:25 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 095EiLNv014920
+        for <kvm@vger.kernel.org>; Mon, 5 Oct 2020 10:59:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GWNYiu6I8+987D9u5X+0YZsTIL/furQ2zcuiM+7A6fA=;
+ b=Go9oDtnRvxcoBLn8R8g99IJmOO2e/Q3O1dLK/CJ3PFckFwTnWYmbhfMcphnZyQI0m43d
+ 2aFPXjYmsQcPj0jpachF5qLdm37UvP/JaWYYUvgusDa1zzB+ut9zdpsOTILiyPFfAV40
+ SN9ywD0djfxhNy2J7E4h0V1MJf33wFaDPBds8P0rvQylcuRu+Vc75FsKEtWuumZOldzZ
+ pIPHx39/qlHpjx+bz1oM3E34xIRLqddZGxBDkX+tBdXowLBmRa6YGa7/bqgV9IiSWtHD
+ guChQ791bIX1VLS6QaylC+y4QsJaQscdLk7c2fdg9JPrzDCmdcDCpOZ5nXqOjUdVqCUT nQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3405gw0fdq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 05 Oct 2020 10:59:24 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 095EiR2V015438
+        for <kvm@vger.kernel.org>; Mon, 5 Oct 2020 10:59:24 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3405gw0fcx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Oct 2020 10:59:24 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 095ExEvC014588;
+        Mon, 5 Oct 2020 14:59:21 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 33xgjh29mf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Oct 2020 14:59:21 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 095ExIFW26804600
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Oct 2020 14:59:19 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DF61D5205F;
+        Mon,  5 Oct 2020 14:59:18 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.2.175])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 342E452050;
+        Mon,  5 Oct 2020 14:59:18 +0000 (GMT)
+Date:   Mon, 5 Oct 2020 16:59:16 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, frankja@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        lvivier@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 0/7] Rewrite the allocators
+Message-ID: <20201005165916.56849a13@ibm-vm>
+In-Reply-To: <ceff99e4-e79c-2d92-fb02-f5a020da3ff1@linux.ibm.com>
+References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
+        <aec4a269-efba-83c0-cbbb-c78b132b1fa9@linux.ibm.com>
+        <20201005143503.669922f5@ibm-vm>
+        <ceff99e4-e79c-2d92-fb02-f5a020da3ff1@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="kA1LkgxZ0NN7Mz3A"
-Content-Disposition: inline
-In-Reply-To: <874kndm1t3.fsf@secure.mitica>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-05_10:2020-10-05,2020-10-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 clxscore=1015 malwarescore=0 phishscore=0 mlxscore=0
+ impostorscore=0 suspectscore=0 mlxlogscore=316 lowpriorityscore=0
+ adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010050110
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 5 Oct 2020 14:57:15 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
---kA1LkgxZ0NN7Mz3A
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 2020-10-05 14:35, Claudio Imbrenda wrote:
+> > On Mon, 5 Oct 2020 13:54:42 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> > 
+> > [...]
+> >   
+> >> While doing a page allocator, the topology is not the only
+> >> characteristic we may need to specify.
+> >> Specific page characteristics like rights, access flags, cache
+> >> behavior may be useful when testing I/O for some architectures.
+> >> This obviously will need some connection to the MMU handling.
+> >>
+> >> Wouldn't it be interesting to use a bitmap flag as argument to
+> >> page_alloc() to define separate regions, even if the connection
+> >> with the MMU is done in a future series?  
+> > 
+> > the physical allocator is only concerned with the physical pages. if
+> > you need special MMU flags to be set, then you should enable the MMU
+> > and fiddle with the flags and settings yourself.
+> >   
+> 
+> AFAIU the page_allocator() works on virtual addresses if the MMU has 
+> been initialized.
 
-On Fri, Oct 02, 2020 at 11:09:44AM +0200, Juan Quintela wrote:
-> For this call, we have agenda!!
->=20
-> John Snow wants to talk about his new (and excting) developments with
-> x-configure.  Stay tuned.
+no, it still works on physical addresses, which happen to be identity
+mapped by the MMU. don't forget that the page tables are
+themselves allocated with the page allocator. 
 
-Hi,
-Juan will be offline tomorrow so I will moderate the call.
+> Considering that more and more tests will enable the MMU by default, 
+> eventually with a simple logical mapping, it seems to me that having
+> the possibility to give the page allocator more information about the
+> page access configuration could be interesting.
 
-You can join the call from your web browser here:
-https://bluejeans.com/497377100
+I disagree.
 
-Meeting ID: 497377100
-Phone numbers: https://www.redhat.com/en/conference-numbers
+I think we should not violate the layering here.
 
-Stefan
+> I find that using two different interfaces, both related to memory 
+> handling, to have a proper memory configuration for an I/O page may
+> be complicated without some way to link page allocator and MMU tables
+> together.
 
---kA1LkgxZ0NN7Mz3A
-Content-Type: application/pgp-signature; name="signature.asc"
+If you want to allocate an identity mapped page and also change its
+properties at the same time, you can always write a wrapper.
 
------BEGIN PGP SIGNATURE-----
+keep the page allocator working only on physical addresses, add a
+function to change the properties of the mapping, and add a wrapper
+for the two.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl97MbcACgkQnKSrs4Gr
-c8g8IwgAxK7tu8b3HFYwYyigwdvR/mgdyTPF5sj4wq+uwsJGrn+QZxEyg1SbFGCX
-WcEy1vWEO9gXdcAkNvswz2sogML3vEQV7RE9zXLEC3S5sTK7LB2k7Is4oXKPgP0+
-5tbKK4l3GU1bs4Z4rgZT/iBvikhuvdEtHulFWdE8SO/WsmbRctyowNuNHolSm34Z
-+GPFQGhxShZeSAftHMirCyYFiz/M5pAzjOUCsTUGMCRevNC0XAuYa8pf9VTwSJwr
-CyV1Ks+Lrc2DP03BuPKblwUbkFt/muiNjaVEyVBd65TIcoBx5pn2c3xSxCgy0CYz
-RQulsmPO8OgcLb038/MsKZsjuNLjMg==
-=hwnF
------END PGP SIGNATURE-----
 
---kA1LkgxZ0NN7Mz3A--
+
