@@ -2,199 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7253283319
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 11:23:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F22612833A6
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 11:53:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725934AbgJEJXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 05:23:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38341 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725887AbgJEJXD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 05:23:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601889781;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=ugm8HlWBBQwIq6YqZ4bqZwMlHXIN2IqfB12xnKXSLh4=;
-        b=Zr9+LqYH3m2q1IdW/ADuGp20Tk7QlIixE07mwiyHONqiy1dKr+GD29vIth2xPrTvCiVOBX
-        nhhRxBed0uZ6lnORynUOpP/PTlZzMbnn1CSJO7GiBz/FWLv7hjIv/g24yUmD4gAQgDluWy
-        mgiSFU5Fa2oh0mNV0DYWVO4KlemTDjQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-yGfYEv3kP3WGCk5YE7_AHw-1; Mon, 05 Oct 2020 05:22:58 -0400
-X-MC-Unique: yGfYEv3kP3WGCk5YE7_AHw-1
-Received: by mail-wm1-f69.google.com with SMTP id 73so1532876wma.5
-        for <kvm@vger.kernel.org>; Mon, 05 Oct 2020 02:22:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=ugm8HlWBBQwIq6YqZ4bqZwMlHXIN2IqfB12xnKXSLh4=;
-        b=DQTFiHTWYWkyh0uC+uDVv6Qt52Po5f5e2l7FRBdqdwrn0ggHmIKAeKc5UaqKcVtR91
-         83CpUPfMA2D0xSCHS0leTYLx8dqvYrR0rgTjcVQMW7XJBRkXD1v6g7Ffrp5Z204Fv1Jv
-         vKli/xVA//w2rkjTqKdj9ttsxRZN0OH48s2UHF48aS2hMn8zSUVkWPD6Qb+cZLgUV9wM
-         FVPeNfLVOij2yq7CVOvVn1OmAV01BBLdM5UTn2b8sDU7gcinlVFksMpC9M3eWNv5hcNf
-         FfdjuZwoMD3TkMPCgLRHfrmL13DyoYF5J8hWlfMwYSt07i2rQ9INx6XhNRvTBRFn7yuG
-         QDmA==
-X-Gm-Message-State: AOAM533B2GIdsZKz60xClYb2ImYuyipQwDCzcporzpYvubqHGrZxoXzQ
-        qAdNvFeCrwDnCxTiVGDlX393Yh4NrfRZE6S7V+hwPFI2bN9V0L+2CL0Apwvb3QSE3pLdmE4GcqS
-        c8tW12Yvs6oGq
-X-Received: by 2002:adf:dd46:: with SMTP id u6mr5188156wrm.295.1601889777064;
-        Mon, 05 Oct 2020 02:22:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyrKIsZvC6VCHHIw4whcHXW+LhIfZVH91rvZ5S3upGP+1eW7tYsX6+I6wejZGnSuKWVujq9IA==
-X-Received: by 2002:adf:dd46:: with SMTP id u6mr5188134wrm.295.1601889776884;
-        Mon, 05 Oct 2020 02:22:56 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
-        by smtp.gmail.com with ESMTPSA id a7sm11085392wmh.6.2020.10.05.02.22.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Oct 2020 02:22:56 -0700 (PDT)
-Subject: Re: [PATCH v3 17/19] hw/arm: Automatically select the 'virt' machine
- on KVM
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        kvm-devel <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
-        qemu-arm <qemu-arm@nongnu.org>, Fam Zheng <fam@euphon.net>,
-        Richard Henderson <richard.henderson@linaro.org>
-References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-18-philmd@redhat.com>
- <CAFEAcA-Rt__Du0TqqVFov4mNoBvC9hTt7t7e-3G45Eck4z94tQ@mail.gmail.com>
- <CAFEAcA-u53dVdv8EJdeeOWxw+SfPJueTq7M6g0vBF5XM2Go4zw@mail.gmail.com>
- <c7d07e18-57dd-7b55-f3dc-283c9d13e4b5@redhat.com>
- <8253ddd7-3149-17d9-1174-6474c4bde605@redhat.com>
- <36629bed-9b32-01a0-fdc2-831b10e4bad9@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f3b931f5-c785-1d98-edd1-e5fcc91ff0ce@redhat.com>
-Date:   Mon, 5 Oct 2020 11:22:54 +0200
+        id S1725984AbgJEJxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 05:53:09 -0400
+Received: from lizzard.sbs.de ([194.138.37.39]:47231 "EHLO lizzard.sbs.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725919AbgJEJxH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Oct 2020 05:53:07 -0400
+X-Greylist: delayed 429 seconds by postgrey-1.27 at vger.kernel.org; Mon, 05 Oct 2020 05:53:05 EDT
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+        by lizzard.sbs.de (8.15.2/8.15.2) with ESMTPS id 0959jgqd008084
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Oct 2020 11:45:42 +0200
+Received: from [167.87.39.163] ([167.87.39.163])
+        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 0959jf0Y008810;
+        Mon, 5 Oct 2020 11:45:42 +0200
+Subject: Re: scripts/gdb: issues when loading modules after lx-symbols
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Kieran Bingham <kbingham@kernel.org>, linux-kernel@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm <kvm@vger.kernel.org>
+References: <CAGxU2F7+Tf+hJxxadT_Rw01O43RU9RsasJiVLpukbhvo1w++fA@mail.gmail.com>
+ <9e247182-2cc3-9fac-e12e-9743ef24ec43@siemens.com>
+ <20201005081451.ajtm6rctimrg5frr@steredhat>
+ <0b862e95-c2a7-ad00-5f57-8d958e4af20c@siemens.com>
+ <20201005092953.zu7pn2lveo3j2w4s@steredhat>
+From:   Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <1aef313c-e399-0f56-17a7-f73c9a189200@siemens.com>
+Date:   Mon, 5 Oct 2020 11:45:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <36629bed-9b32-01a0-fdc2-831b10e4bad9@redhat.com>
+In-Reply-To: <20201005092953.zu7pn2lveo3j2w4s@steredhat>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/1/20 5:05 PM, Philippe Mathieu-Daudé wrote:
-> On 10/1/20 9:38 AM, Paolo Bonzini wrote:
->> On 29/09/20 22:36, Philippe Mathieu-Daudé wrote:
->>> Yes, the problem if I don't restrict to KVM, when
->>> using the Xen accelerator odd things occur
->>> (using configure --enable-xen --disable-tcg --disable-kvm):
+On 05.10.20 11:29, Stefano Garzarella wrote:
+> On Mon, Oct 05, 2020 at 10:33:30AM +0200, Jan Kiszka wrote:
+>> On 05.10.20 10:14, Stefano Garzarella wrote:
+>>> On Sun, Oct 04, 2020 at 08:52:37PM +0200, Jan Kiszka wrote:
+>>>> On 01.10.20 16:31, Stefano Garzarella wrote:
+>>>>> Hi,
+>>>>> I had some issues with gdb scripts and kernel modules in Linux 5.9-rc7.
+>>>>>
+>>>>> If the modules are already loaded, and I do 'lx-symbols', all work fine.
+>>>>> But, if I load a kernel module after 'lx-symbols', I had this issue:
+>>>>>
+>>>>> [ 5093.393940] invalid opcode: 0000 [#1] SMP PTI
+>>>>> [ 5093.395134] CPU: 0 PID: 576 Comm: modprobe Not tainted 5.9.0-rc7-ste-00010-gf0b671d9608d-dirty #2
+>>>>> [ 5093.397566] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.13.0-2.fc32 04/01/2014
+>>>>> [ 5093.400761] RIP: 0010:do_init_module+0x1/0x270
+>>>>> [ 5093.402553] Code: ff ff e9 cf fe ff ff 0f 0b 49 c7 c4 f2 ff ff ff e9 c1 fe ff ff e8 5f b2 65 00 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 cc <1f> 44 00 00 55 ba 10 00 00 00 be c0 0c 00 00 48 89 e5 41 56 41 55
+>>>>> [ 5093.409505] RSP: 0018:ffffc90000563d18 EFLAGS: 00010246
+>>>>> [ 5093.412056] RAX: 0000000000000000 RBX: ffffffffc010a0c0 RCX: 0000000000004ee3
+>>>>> [ 5093.414472] RDX: 0000000000004ee2 RSI: ffffea0001efe188 RDI: ffffffffc010a0c0
+>>>>> [ 5093.416349] RBP: ffffc90000563e50 R08: 0000000000000000 R09: 0000000000000002
+>>>>> [ 5093.418044] R10: 0000000000000096 R11: 00000000000008a4 R12: ffff88807a0d1280
+>>>>> [ 5093.424721] R13: ffffffffc010a110 R14: ffff88807a0d1300 R15: ffffc90000563e70
+>>>>> [ 5093.427138] FS:  00007f018f632740(0000) GS:ffff88807dc00000(0000) knlGS:0000000000000000
+>>>>> [ 5093.430037] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>> [ 5093.432279] CR2: 000055fbe282b239 CR3: 000000007922a006 CR4: 0000000000170ef0
+>>>>> [ 5093.435096] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>>>> [ 5093.436765] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>>>> [ 5093.439689] Call Trace:
+>>>>> [ 5093.440954]  ? load_module+0x24b6/0x27d0
+>>>>> [ 5093.443212]  ? __kernel_read+0xd6/0x150
+>>>>> [ 5093.445140]  __do_sys_finit_module+0xd3/0xf0
+>>>>> [ 5093.446877]  __x64_sys_finit_module+0x1a/0x20
+>>>>> [ 5093.449098]  do_syscall_64+0x38/0x50
+>>>>> [ 5093.450877]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>>>>> [ 5093.456153] RIP: 0033:0x7f018f75c43d
+>>>>> [ 5093.457728] Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 2b 6a 0c 00 f7 d8 64 89 01 48
+>>>>> [ 5093.466349] RSP: 002b:00007ffd7f080368 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+>>>>> [ 5093.470613] RAX: ffffffffffffffda RBX: 0000557e5c96f9c0 RCX: 00007f018f75c43d
+>>>>> [ 5093.474747] RDX: 0000000000000000 RSI: 0000557e5c964288 RDI: 0000000000000003
+>>>>> [ 5093.478049] RBP: 0000000000040000 R08: 0000000000000000 R09: 0000000000000000
+>>>>> [ 5093.481298] R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000000000
+>>>>> [ 5093.483725] R13: 0000557e5c964288 R14: 0000557e5c96f950 R15: 0000557e5c9775c0
+>>>>> [ 5093.485778] Modules linked in: virtio_vdpa(+) vdpa sunrpc kvm_intel kvm irqbypass virtio_blk virtio_rng rng_core [last unloaded: virtio_vdpa]
+>>>>> [ 5093.488695] ---[ end trace 23712ecebc11f53c ]---
+>>>>>
+>>>>> Guest kernel: Linux 5.9-rc7
+>>>>> gdb: GNU gdb (GDB) Fedora 9.1-6.fc32
+>>>>> I tried with QEMU 4.2.1 and the latest master branch: same issue.
+>>>>>
+>>>>>
+>>>>> I did some digging, and skipping the gdb 'add-symbol-file' command in symbol.py
+>>>>> avoid the issue, but of course I don't have the symbols loaded:
+>>>>>
+>>>>>     diff --git a/scripts/gdb/linux/symbols.py b/scripts/gdb/linux/symbols.py
+>>>>>     index 1be9763cf8bb..eadfaa4d4907 100644
+>>>>>     --- a/scripts/gdb/linux/symbols.py
+>>>>>     +++ b/scripts/gdb/linux/symbols.py
+>>>>>     @@ -129,7 +129,7 @@ lx-symbols command."""
+>>>>>                      filename=module_file,
+>>>>>                      addr=module_addr,
+>>>>>                      sections=self._section_arguments(module))
+>>>>>     -            gdb.execute(cmdline, to_string=True)
+>>>>>     +            #gdb.execute(cmdline, to_string=True)
+>>>>>                  if module_name not in self.loaded_modules:
+>>>>>                      self.loaded_modules.append(module_name)
+>>>>>              else:
+>>>>>
+>>>>> I tried several modules and this happens every time after '(gdb) lx-symbols'.
+>>>>>
+>>>>> Do you have any hints?
+>>>>>
+>>>> I assume you are debugging a kernel inside QEMU/KVM, right?
 >>>
->>> Compiling C object libqemu-i386-softmmu.fa.p/hw_cpu_a15mpcore.c.o
->>> hw/cpu/a15mpcore.c:28:10: fatal error: kvm_arm.h: No such file or directory
+>>> Right!
 >>>
->>> See
->>> https://wiki.xenproject.org/wiki/Xen_ARM_with_Virtualization_Extensions#Use_of_qemu-system-i386_on_ARM
+>>>>                                                             Does it work
+>>>> without -enable-kvm?
+>>>
+>>> Yes, disabling kvm it works.
+>>>
 >>
->> I don't understand.  Is Xen adding CONFIG_ARM_VIRT=y to
->> default-configs/i386-softmmu.mak??
+>> OK, there it is, still...
+>> What may also "work" is going down to single core.
 > 
-> No, this is when using:
+> No, I tried with single core and kvm enabled and I have the same issue.
 > 
->  config ARM_VIRT
->      bool
-> +    default y
+>>
+>>>>
+>>>> Debugging guests in KVM mode at least was unstable for a long time. I
+>>>> avoided setting soft-BPs - which is what the script does for the sake of
+>>>> tracking modules loading -, falling back to hw-BPs, as I had no time to
+>>>> debug that further. /Maybe/ that's the issue here.
+>>>
+>>> Thanks for the suggestion, I'll try to have a look.
+>>>
+>>
+>> Would be great if this issue could finally be resolved. And then covered
+>> by the kvm-unit tests. Those still succeed, I think.
 > 
-> I had the understanding devices in hw/$BASEARCH would be only
-> included for $ARCH, but I was wrong, any arch kconfig-include
-> the devices of the other archs.
+> Yeah, I'm a bit busy, but I'll try to find a fix.
 > 
-> I tried the following diff which doesn't build because various
-> devices in *non*-archdep folders use arch-specific Kconfig values:
+> Just an update, I tried to follow your suggestion using hw-BPs, but
+> unfortunately the gdb python module doesn't provide an easy way to set
+> them, so I hacked a bit gdb forcing hw-BPs and with this patch applied
+> to gdb I don't see the issue anymore:
 > 
-> -- >8 --
-> diff --git a/meson.build b/meson.build
-> index 9ab5d514d7..cfe19d0007 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -575,6 +575,7 @@ foreach target : target_dirs
->      if fs.is_file(target_kconfig)
->        minikconf_input += [target_kconfig]
->      endif
-> +    minikconf_input += 'hw' / config_target['TARGET_BASE_ARCH'] / 'Kconfig'
->      config_devices_mak = configure_file(
->        input: minikconf_input,
->        output: config_devices_mak,
-> diff --git a/hw/Kconfig b/hw/Kconfig
-> index 4de1797ffd..64c120175a 100644
-> --- a/hw/Kconfig
-> +++ b/hw/Kconfig
-> @@ -41,29 +41,29 @@ source vfio/Kconfig
->  source watchdog/Kconfig
+> diff --git a/gdb/python/py-breakpoint.c b/gdb/python/py-breakpoint.c
+> index 7369c91ad9..df8ec92049 100644
+> --- a/gdb/python/py-breakpoint.c
+> +++ b/gdb/python/py-breakpoint.c
+> @@ -57,7 +57,7 @@ struct pybp_code
+>  static struct pybp_code pybp_codes[] =
+>  {
+>    { "BP_NONE", bp_none},
+> -  { "BP_BREAKPOINT", bp_breakpoint},
+> +  { "BP_BREAKPOINT", bp_hardware_breakpoint},
+>    { "BP_WATCHPOINT", bp_watchpoint},
+>    { "BP_HARDWARE_WATCHPOINT", bp_hardware_watchpoint},
+>    { "BP_READ_WATCHPOINT", bp_read_watchpoint},
+> @@ -383,7 +383,7 @@ bppy_get_location (PyObject *self, void *closure)
 > 
->  # arch Kconfig
-> -source arm/Kconfig
-> -source alpha/Kconfig
-> -source avr/Kconfig
-> -source cris/Kconfig
-> -source hppa/Kconfig
-> -source i386/Kconfig
-> -source lm32/Kconfig
-> -source m68k/Kconfig
-> -source microblaze/Kconfig
-> -source mips/Kconfig
-> -source moxie/Kconfig
-> -source nios2/Kconfig
-> -source openrisc/Kconfig
-> -source ppc/Kconfig
-> -source riscv/Kconfig
-> -source rx/Kconfig
-> -source s390x/Kconfig
-> -source sh4/Kconfig
-> -source sparc/Kconfig
-> -source sparc64/Kconfig
-> -source tricore/Kconfig
-> -source unicore32/Kconfig
-> -source xtensa/Kconfig
+>    BPPY_REQUIRE_VALID (obj);
 > 
->  # Symbols used by multiple targets
->  config TEST_DEVICES
-> ---
+> -  if (obj->bp->type != bp_breakpoint)
+> +  if (obj->bp->type != bp_hardware_breakpoint)
+>      Py_RETURN_NONE;
+> 
+>    const char *str = event_location_to_string (obj->bp->location.get ());
+> @@ -730,7 +730,7 @@ bppy_init (PyObject *self, PyObject *args, PyObject *kwargs)
+>                                     "temporary","source", "function",
+>                                     "label", "line", "qualified", NULL };
+>    const char *spec = NULL;
+> -  enum bptype type = bp_breakpoint;
+> +  enum bptype type = bp_hardware_breakpoint;
+>    int access_type = hw_write;
+>    PyObject *internal = NULL;
+>    PyObject *temporary = NULL;
+> @@ -792,7 +792,7 @@ bppy_init (PyObject *self, PyObject *args, PyObject *kwargs)
+>      {
+>        switch (type)
+>         {
+> -       case bp_breakpoint:
+> +       case bp_hardware_breakpoint:
+>           {
+>             event_location_up location;
+>             symbol_name_match_type func_name_match_type
+> @@ -834,7 +834,7 @@ bppy_init (PyObject *self, PyObject *args, PyObject *kwargs)
+>             create_breakpoint (python_gdbarch,
+>                                location.get (), NULL, -1, NULL,
+>                                0,
+> -                              temporary_bp, bp_breakpoint,
+> +                              temporary_bp, bp_hardware_breakpoint,
+>                                0,
+>                                AUTO_BOOLEAN_TRUE,
+>                                ops,
+> @@ -1007,7 +1007,7 @@ gdbpy_breakpoint_created (struct breakpoint *bp)
+>    if (!user_breakpoint_p (bp) && bppy_pending_object == NULL)
+>      return;
+> 
+> -  if (bp->type != bp_breakpoint
+> +  if (bp->type != bp_hardware_breakpoint
+>        && bp->type != bp_watchpoint
+>        && bp->type != bp_hardware_watchpoint
+>        && bp->type != bp_read_watchpoint
+> 
+> Of course it is an hack, but it's a starting point :-)
+> 
 
-List of arch-indep Kconfig using arch-defined selectors:
+There are two key differences with soft vs. hard BPs:
 
-hw/acpi/Kconfig:42:    depends on PC
-hw/intc/Kconfig:31:    depends on ARM_GIC && KVM
-hw/intc/Kconfig:36:    depends on OPENPIC && KVM
-hw/intc/Kconfig:40:    depends on POWERNV || PSERIES
-hw/intc/Kconfig:49:    depends on XICS && KVM
-hw/intc/Kconfig:60:    depends on S390_FLIC && KVM
-hw/mem/Kconfig:11:    depends on (PC || PSERIES || ARM_VIRT)
-hw/pci-bridge/Kconfig:8:    default y if Q35
-hw/timer/Kconfig:14:    default y if PC
-hw/tpm/Kconfig:18:    depends on TPM && PC
-hw/tpm/Kconfig:24:    depends on TPM && PSERIES
-hw/vfio/Kconfig:16:    depends on LINUX && S390_CCW_VIRTIO
-hw/vfio/Kconfig:38:    depends on LINUX && S390_CCW_VIRTIO
+ - guest code modification to inject and remove INT3 (looking at your
+   panic, this might be the first thing to check)
+ - different exception vectors and their reflection to or filtering from
+   the guest
 
+Both are similar in that the need to step over the intercepted
+instruction in order to resume - except that soft BP needs a
+remove-step-restore-INT3 cycle.
+
+You should try debugging that without the lx-symbols script, just by
+adding soft BPs and watching what happens to the guest, what becomes
+incorrectly visible to it. Report, and maybe KVM folks can jump in
+(adding the list).
+
+Jan
+
+-- 
+Siemens AG, T RDA IOT
+Corporate Competence Center Embedded Linux
