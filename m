@@ -2,187 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87C3E283639
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 15:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E11B2836F4
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 15:52:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbgJENGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 09:06:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23981 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725891AbgJENGd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 09:06:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601903192;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rT1In7KRFR7gVxexNgzl5bOh4i2rJfIrzyttGdWSaSU=;
-        b=bptdC5fptQ2ILAFrZTZt8hXDI9CBv2gHTMDPRibrCipAYaknAG1iXrjr46NtxLDCCiaCzZ
-        qaKj/jGeW30odpjQ/ZfTAtY6XUv0m3HzTXPAW1T33vYDv8t9zPbKljFJA3zurJpTiC4SsD
-        Riot6Y80qDMpnVKfV1pjqW/esNShg1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-480-lZdmJO2zN8KT4an-unLauQ-1; Mon, 05 Oct 2020 09:06:31 -0400
-X-MC-Unique: lZdmJO2zN8KT4an-unLauQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B2B2EA5E1;
-        Mon,  5 Oct 2020 13:06:29 +0000 (UTC)
-Received: from starship (unknown [10.35.206.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F253B26185;
-        Mon,  5 Oct 2020 13:06:26 +0000 (UTC)
-Message-ID: <90e7b37a614d2cd723726a44b81395c3e9d158f0.camel@redhat.com>
-Subject: Re: [PATCH 1/3] KVM: x86: disconnect kvm_check_cpuid() from
- vcpu->arch.cpuid_entries
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Wei Huang <whuang2@amd.com>, linux-kernel@vger.kernel.org
-Date:   Mon, 05 Oct 2020 16:06:25 +0300
-In-Reply-To: <87imbo99hv.fsf@vitty.brq.redhat.com>
-References: <20201001130541.1398392-1-vkuznets@redhat.com>
-         <20201001130541.1398392-2-vkuznets@redhat.com>
-         <85c31c92e6775b9d8ccd088e3f61659cac1c8cae.camel@redhat.com>
-         <87imbo99hv.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        id S1726329AbgJENwg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 09:52:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42092 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725903AbgJENwd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 09:52:33 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 095DX3WC031074;
+        Mon, 5 Oct 2020 09:52:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=5Tu85tMvxAfJtn3MRQVpZy6Rxyaa7xa4ANZfREPO0JU=;
+ b=ISIc+mk7tYR1ygGthTa3gCdWWknPd7fkpubn1HBPXkyDSaRuMQjbpv11zmLUo2ldaFJs
+ h24VtZYJykrtFMzE5aDKWfrCSc6cjZQjIZXkaMZECIZJoVnByG+TjhrQbv9uZP7QUfbO
+ G5N+rX2AV2CKdt7priGfdJYTONoxkp9NgyR8MSGGP92lN+yPxXsmy+CxgbJVvAYECWov
+ XAKxHh6rMM476eOM9it2CTsUfFQhvP8xTFGti8MF3Oy2+MW/5SWqaRFdAdc1QAXhNDkT
+ e1Yn2wuTCgJ7YDhKB1WjFFNUuMWOjburW9Cr45tbs13g9/blMDbUDKWNQSSz9UHzHmKW LQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3403qwt7rr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Oct 2020 09:52:31 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 095DXc0W033785;
+        Mon, 5 Oct 2020 09:52:30 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3403qwt7ra-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Oct 2020 09:52:30 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 095DlO3x011710;
+        Mon, 5 Oct 2020 13:52:29 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01dal.us.ibm.com with ESMTP id 33xgx93vf0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Oct 2020 13:52:29 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 095DqRY718415884
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Oct 2020 13:52:28 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DB014112061;
+        Mon,  5 Oct 2020 13:52:27 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47EDD112064;
+        Mon,  5 Oct 2020 13:52:26 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Oct 2020 13:52:26 +0000 (GMT)
+Subject: Re: [PATCH v2 3/5] vfio-pci/zdev: define the vfio_zdev header
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1601668844-5798-1-git-send-email-mjrosato@linux.ibm.com>
+ <1601668844-5798-4-git-send-email-mjrosato@linux.ibm.com>
+ <20201002154417.20c2a7ef@x1.home>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <8a71af3b-f8fc-48b2-45c6-51222fd2455b@linux.ibm.com>
+Date:   Mon, 5 Oct 2020 09:52:25 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
+In-Reply-To: <20201002154417.20c2a7ef@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-05_07:2020-10-02,2020-10-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 malwarescore=0 bulkscore=0 adultscore=0 impostorscore=0
+ mlxscore=0 suspectscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010050098
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-10-05 at 13:51 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
+On 10/2/20 5:44 PM, Alex Williamson wrote:
+> On Fri,  2 Oct 2020 16:00:42 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 > 
-> > On Thu, 2020-10-01 at 15:05 +0200, Vitaly Kuznetsov wrote:
-> > > As a preparatory step to allocating vcpu->arch.cpuid_entries dynamically
-> > > make kvm_check_cpuid() check work with an arbitrary 'struct kvm_cpuid_entry2'
-> > > array.
-> > > 
-> > > Currently, when kvm_check_cpuid() fails we reset vcpu->arch.cpuid_nent to
-> > > 0 and this is kind of weird, i.e. one would expect CPUIDs to remain
-> > > unchanged when KVM_SET_CPUID[2] call fails.
-> > Since this specific patch doesn't fix this, maybe move this chunk to following patches,
-> > or to the cover letter?
+>> We define a new device region in vfio.h to be able to get the ZPCI CLP
+>> information by reading this region from userspace.
+>>
+>> We create a new file, vfio_zdev.h to define the structure of the new
+>> region defined in vfio.h
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   include/uapi/linux/vfio.h      |   5 ++
+>>   include/uapi/linux/vfio_zdev.h | 118 +++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 123 insertions(+)
+>>   create mode 100644 include/uapi/linux/vfio_zdev.h
+>>
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index 9204705..65eb367 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -326,6 +326,11 @@ struct vfio_region_info_cap_type {
+>>    * to do TLB invalidation on a GPU.
+>>    */
+>>   #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+>> +/*
+>> + * IBM zPCI specific hardware feature information for a devcie.  The contents
+>> + * of this region are mapped by struct vfio_region_zpci_info.
+>> + */
+>> +#define VFIO_REGION_SUBTYPE_IBM_ZPCI_CLP	(2)
+>>   
+>>   /* sub-types for VFIO_REGION_TYPE_GFX */
+>>   #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+>> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
+>> new file mode 100644
+>> index 0000000..1c8fb62
+>> --- /dev/null
+>> +++ b/include/uapi/linux/vfio_zdev.h
+>> @@ -0,0 +1,118 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/*
+>> + * Region definition for ZPCI devices
+>> + *
+>> + * Copyright IBM Corp. 2020
+>> + *
+>> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+>> + *            Matthew Rosato <mjrosato@linux.ibm.com>
+>> + */
+>> +
+>> +#ifndef _VFIO_ZDEV_H_
+>> +#define _VFIO_ZDEV_H_
+>> +
+>> +#include <linux/types.h>
+>> +
+>> +/**
+>> + * struct vfio_region_zpci_info - ZPCI information
+>> + *
+>> + * This region provides zPCI specific hardware feature information for a
+>> + * device.
+>> + *
+>> + * The ZPCI information structure is presented as a chain of CLP features
+>> + * defined below. argsz provides the size of the entire region, and offset
+>> + * provides the location of the first CLP feature in the chain.
+>> + *
+>> + */
+>> +struct vfio_region_zpci_info {
+>> +	__u32 argsz;		/* Size of entire payload */
+>> +	__u32 offset;		/* Location of first entry */
+>> +};
+>> +
+>> +/**
+>> + * struct vfio_region_zpci_info_hdr - ZPCI header information
+>> + *
+>> + * This structure is included at the top of each CLP feature to define what
+>> + * type of CLP feature is presented / the structure version. The next value
+>> + * defines the offset of the next CLP feature, and is an offset from the very
+>> + * beginning of the region (vfio_region_zpci_info).
+>> + *
+>> + * Each CLP feature must have it's own unique 'id'.
+>> + */
+>> +struct vfio_region_zpci_info_hdr {
+>> +	__u16 id;		/* Identifies the CLP type */
+>> +	__u16	version;	/* version of the CLP data */
+>> +	__u32 next;		/* Offset of next entry */
+>> +};
+>> +
+>> +/**
+>> + * struct vfio_region_zpci_info_pci - Base PCI Function information
+>> + *
+>> + * This region provides a set of descriptive information about the associated
+>> + * PCI function.
+>> + */
+>> +#define VFIO_REGION_ZPCI_INFO_BASE	1
+>> +
+>> +struct vfio_region_zpci_info_base {
+>> +	struct vfio_region_zpci_info_hdr hdr;
+>> +	__u64 start_dma;	/* Start of available DMA addresses */
+>> +	__u64 end_dma;		/* End of available DMA addresses */
+>> +	__u16 pchid;		/* Physical Channel ID */
+>> +	__u16 vfn;		/* Virtual function number */
+>> +	__u16 fmb_length;	/* Measurement Block Length (in bytes) */
+>> +	__u8 pft;		/* PCI Function Type */
+>> +	__u8 gid;		/* PCI function group ID */
+>> +};
+>> +
+>> +
+>> +/**
+>> + * struct vfio_region_zpci_info_group - Base PCI Function Group information
+>> + *
+>> + * This region provides a set of descriptive information about the group of PCI
+>> + * functions that the associated device belongs to.
+>> + */
+>> +#define VFIO_REGION_ZPCI_INFO_GROUP	2
+>> +
+>> +struct vfio_region_zpci_info_group {
+>> +	struct vfio_region_zpci_info_hdr hdr;
+>> +	__u64 dasm;		/* DMA Address space mask */
+>> +	__u64 msi_addr;		/* MSI address */
+>> +	__u64 flags;
+>> +#define VFIO_PCI_ZDEV_FLAGS_REFRESH 1 /* Use program-specified TLB refresh */
+>> +	__u16 mui;		/* Measurement Block Update Interval */
+>> +	__u16 noi;		/* Maximum number of MSIs */
+>> +	__u16 maxstbl;		/* Maximum Store Block Length */
+>> +	__u8 version;		/* Supported PCI Version */
+>> +};
+>> +
+>> +/**
+>> + * struct vfio_region_zpci_info_util - Utility String
+>> + *
+>> + * This region provides the utility string for the associated device, which is
+>> + * a device identifier string made up of EBCDID characters.  'size' specifies
+>> + * the length of 'util_str'.
+>> + */
+>> +#define VFIO_REGION_ZPCI_INFO_UTIL	3
+>> +
+>> +struct vfio_region_zpci_info_util {
+>> +	struct vfio_region_zpci_info_hdr hdr;
+>> +	__u32 size;
+>> +	__u8 util_str[];
+>> +};
+>> +
+>> +/**
+>> + * struct vfio_region_zpci_info_pfip - PCI Function Path
+>> + *
+>> + * This region provides the PCI function path string, which is an identifier
+>> + * that describes the internal hardware path of the device. 'size' specifies
+>> + * the length of 'pfip'.
+>> + */
+>> +#define VFIO_REGION_ZPCI_INFO_PFIP	4
+>> +
+>> +struct vfio_region_zpci_info_pfip {
+>> +struct vfio_region_zpci_info_hdr hdr;
+>> +	__u32 size;
+>> +	__u8 pfip[];
+>> +};
+>> +
+>> +#endif
 > 
-> Basically, this kind of pairs with what's after 'No functional change
-> intended' below: we admit the problem but don't fix it because we can't
-> (yet) and then in PATCH3 we do two things at once. It would be great to
-> separate these two changes but this doesn't seem to be possible without
-> an unneeded code churn.
-> 
-> That said, I'm completely fine with dropping this chunk from the commit
-> message if it sound inapropriate here.
-It just threw me a bit off course while trying to understand what the patch does.
+> Can you discuss why a region with embedded capability chain is a better
+> solution than extending the VFIO_DEVICE_GET_INFO ioctl to support a
+> capability chain and providing this info there?  This all appears to be
+> read-only info, so what's the benefit of duplicating yet another
 
-Best regards,
-	Maxim Levitsky
+It is indeed read-only info, and the device region was defined as such.
 
-> 
-> > > No functional change intended. It would've been possible to move the updated
-> > > kvm_check_cpuid() in kvm_vcpu_ioctl_set_cpuid2() and check the supplied
-> > > input before we start updating vcpu->arch.cpuid_entries/nent but we
-> > > can't do the same in kvm_vcpu_ioctl_set_cpuid() as we'll have to copy
-> > > 'struct kvm_cpuid_entry' entries first. The change will be made when
-> > > vcpu->arch.cpuid_entries[] array becomes allocated dynamically.
-> > > 
-> > > Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > ---
-> > >  arch/x86/kvm/cpuid.c | 38 +++++++++++++++++++++++---------------
-> > >  1 file changed, 23 insertions(+), 15 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > index 37c3668a774f..529348ddedc1 100644
-> > > --- a/arch/x86/kvm/cpuid.c
-> > > +++ b/arch/x86/kvm/cpuid.c
-> > > @@ -54,7 +54,24 @@ static u32 xstate_required_size(u64 xstate_bv, bool compacted)
-> > >  
-> > >  #define F feature_bit
-> > >  
-> > > -static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
-> > > +static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
-> > > +	struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
-> > > +{
-> > > +	struct kvm_cpuid_entry2 *e;
-> > > +	int i;
-> > > +
-> > > +	for (i = 0; i < nent; i++) {
-> > > +		e = &entries[i];
-> > > +
-> > > +		if (e->function == function && (e->index == index ||
-> > > +		    !(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)))
-> > > +			return e;
-> > > +	}
-> > > +
-> > > +	return NULL;
-> > > +}
-> > > +
-> > > +static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
-> > >  {
-> > >  	struct kvm_cpuid_entry2 *best;
-> > >  
-> > > @@ -62,7 +79,7 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
-> > >  	 * The existing code assumes virtual address is 48-bit or 57-bit in the
-> > >  	 * canonical address checks; exit if it is ever changed.
-> > >  	 */
-> > > -	best = kvm_find_cpuid_entry(vcpu, 0x80000008, 0);
-> > > +	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
-> > >  	if (best) {
-> > >  		int vaddr_bits = (best->eax & 0xff00) >> 8;
-> > >  
-> > > @@ -220,7 +237,7 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
-> > >  		vcpu->arch.cpuid_entries[i].padding[2] = 0;
-> > >  	}
-> > >  	vcpu->arch.cpuid_nent = cpuid->nent;
-> > > -	r = kvm_check_cpuid(vcpu);
-> > > +	r = kvm_check_cpuid(vcpu->arch.cpuid_entries, cpuid->nent);
-> > >  	if (r) {
-> > >  		vcpu->arch.cpuid_nent = 0;
-> > >  		kvfree(cpuid_entries);
-> > > @@ -250,7 +267,7 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
-> > >  			   cpuid->nent * sizeof(struct kvm_cpuid_entry2)))
-> > >  		goto out;
-> > >  	vcpu->arch.cpuid_nent = cpuid->nent;
-> > > -	r = kvm_check_cpuid(vcpu);
-> > > +	r = kvm_check_cpuid(vcpu->arch.cpuid_entries, cpuid->nent);
-> > >  	if (r) {
-> > >  		vcpu->arch.cpuid_nent = 0;
-> > >  		goto out;
-> > > @@ -940,17 +957,8 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
-> > >  struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
-> > >  					      u32 function, u32 index)
-> > >  {
-> > > -	struct kvm_cpuid_entry2 *e;
-> > > -	int i;
-> > > -
-> > > -	for (i = 0; i < vcpu->arch.cpuid_nent; ++i) {
-> > > -		e = &vcpu->arch.cpuid_entries[i];
-> > > -
-> > > -		if (e->function == function && (e->index == index ||
-> > > -		    !(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)))
-> > > -			return e;
-> > > -	}
-> > > -	return NULL;
-> > > +	return cpuid_entry2_find(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent,
-> > > +				 function, index);
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry);
-> > >  
-> > 
-> > Other than minor note to the commit message, this looks fine, so
-> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > 
-> 
-> Thanks!
-> 
+I would not necessarily be opposed to extending VFIO_DEVICE_GET_INFO 
+with these defined as capabilities; I'd say a primary motivating factor 
+to putting these in their own region was to avoid stuffing a bunch of 
+s390-specific capabilities into a general-purpose ioctl response.
+
+But if you're OK with that notion, I can give that a crack in v3.
+
+> capability chain in a region?  It would also be possible to define four
+> separate device specific regions, one for each of these capabilities
+> rather than creating this chain.  It just seems like a strange approach
+
+I'm not sure if creating separate regions would be the right approach 
+though; these are just the first 4.  There will definitely be additional 
+capabilities in support of new zPCI features moving forward, I'm not 
+sure how many regions we really want to end up with.  Some might be as 
+small as a single field, which seems more in-line with capabilities vs 
+an entire region.
 
 
