@@ -2,146 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB2AE283C39
-	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 18:17:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D667283EF7
+	for <lists+kvm@lfdr.de>; Mon,  5 Oct 2020 20:48:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728422AbgJEQQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Oct 2020 12:16:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28816 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726657AbgJEQQR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Oct 2020 12:16:17 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 095G2OKt009680;
-        Mon, 5 Oct 2020 12:16:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=z+eJ36YCUnqSArUqCt5T9m96+aNX3zifOe7tV23w7Yk=;
- b=NovfCKZ4jhYGRkKBRgrTg06sPyct6QQwi5tU1cRUwf10ykhwDNgAJfjWinFAoq6Vg8SO
- TewBrlPhDGq/Pxitocx26QTnUpMT0yiJ9h9BuhYsh8ild7QcWxyFtf8YePPRtgLjyndu
- 5VpCcj9MR4F8d/UAeQZmmTNx1NeAWyghS8lRCJLSKJKG1WAQTURvvaPuvOw5AkTiaJxW
- 1LPA8FJyl2BIPPdnu/sC5l7om5lqyTNDZQNvSXoHe0Ffwghds47g1ytsk5tXgjiR7q0d
- 0UpYN/sy0qZP3Xmrno22Bt8c4czYYx9/1QgsbniIXeYT8pWrvbWAY0FWvUZw0W0aLcp8 /A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3405nmjud6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Oct 2020 12:16:15 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 095G3cAY016047;
-        Mon, 5 Oct 2020 12:16:15 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3405nmjucs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Oct 2020 12:16:15 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 095GEnMp015581;
-        Mon, 5 Oct 2020 16:16:14 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma01wdc.us.ibm.com with ESMTP id 33xgx8rsws-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Oct 2020 16:16:14 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 095GGDkX51904800
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Oct 2020 16:16:13 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 33324112064;
-        Mon,  5 Oct 2020 16:16:13 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 81D9B112061;
-        Mon,  5 Oct 2020 16:16:11 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  5 Oct 2020 16:16:11 +0000 (GMT)
-Subject: Re: [PATCH v2 3/5] vfio-pci/zdev: define the vfio_zdev header
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1601668844-5798-1-git-send-email-mjrosato@linux.ibm.com>
- <1601668844-5798-4-git-send-email-mjrosato@linux.ibm.com>
- <20201002154417.20c2a7ef@x1.home>
- <8a71af3b-f8fc-48b2-45c6-51222fd2455b@linux.ibm.com>
- <20201005180107.5d027441.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <e0688173-8c5a-1797-8398-235c5e406bc1@linux.ibm.com>
-Date:   Mon, 5 Oct 2020 12:16:10 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1729097AbgJESrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Oct 2020 14:47:48 -0400
+Received: from mga18.intel.com ([134.134.136.126]:47742 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725940AbgJESrr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Oct 2020 14:47:47 -0400
+IronPort-SDR: l57Wjg1OwZ/uPavpltYCl9J4/6ewp6C7VMn0DYHu+pwTgW7llAXTUPvbS/DEjx/BAdFan3m8gO
+ 0fqhIog5KCvg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9765"; a="151622929"
+X-IronPort-AV: E=Sophos;i="5.77,340,1596524400"; 
+   d="scan'208";a="151622929"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2020 11:47:37 -0700
+IronPort-SDR: VThCkMd3d/Yu3WZuz2UNoDj9UNgjNkNre9QkADdqhmiJoHFzSaVMzt901EXH2dOqxn1nDtrEOu
+ 7w01H7Th+tuA==
+X-IronPort-AV: E=Sophos;i="5.77,340,1596524400"; 
+   d="scan'208";a="459817381"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2020 09:16:32 -0700
+Date:   Mon, 5 Oct 2020 09:16:20 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtio-fs-list <virtio-fs@redhat.com>, vkuznets@redhat.com,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
+Message-ID: <20201005161620.GC11938@linux.intel.com>
+References: <20200929043700.GL31514@linux.intel.com>
+ <20201001215508.GD3522@redhat.com>
+ <20201001223320.GI7474@linux.intel.com>
+ <20201002153854.GC3119@redhat.com>
+ <20201002183036.GB24460@linux.intel.com>
+ <20201002192734.GD3119@redhat.com>
+ <20201002194517.GD24460@linux.intel.com>
+ <20201002200214.GB10232@redhat.com>
+ <20201002211314.GE24460@linux.intel.com>
+ <20201005153318.GA4302@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201005180107.5d027441.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-05_11:2020-10-05,2020-10-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 mlxlogscore=999
- clxscore=1015 phishscore=0 mlxscore=0 impostorscore=0 malwarescore=0
- bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010050116
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201005153318.GA4302@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/5/20 12:01 PM, Cornelia Huck wrote:
-> On Mon, 5 Oct 2020 09:52:25 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On Mon, Oct 05, 2020 at 11:33:18AM -0400, Vivek Goyal wrote:
+> On Fri, Oct 02, 2020 at 02:13:14PM -0700, Sean Christopherson wrote:
+> Now I have few questions.
 > 
->> On 10/2/20 5:44 PM, Alex Williamson wrote:
+> - If we exit to user space asynchronously (using kvm request), what debug
+>   information is in there which tells user which address is bad. I admit
+>   that even above trace does not seem to be telling me directly which
+>   address (HVA?) is bad.
 > 
->>> Can you discuss why a region with embedded capability chain is a better
->>> solution than extending the VFIO_DEVICE_GET_INFO ioctl to support a
->>> capability chain and providing this info there?  This all appears to be
->>> read-only info, so what's the benefit of duplicating yet another
->>
->> It is indeed read-only info, and the device region was defined as such.
->>
->> I would not necessarily be opposed to extending VFIO_DEVICE_GET_INFO
->> with these defined as capabilities; I'd say a primary motivating factor
->> to putting these in their own region was to avoid stuffing a bunch of
->> s390-specific capabilities into a general-purpose ioctl response.
+>   But if I take a crash dump of guest, using above information I should
+>   be able to get to GPA which is problematic. And looking at /proc/iomem
+>   it should also tell which device this memory region is in.
 > 
-> Can't you make the zdev code register the capabilities? That would put
-> them nicely into their own configurable part.
+>   Also using this crash dump one should be able to walk through virtiofs data
+>   structures and figure out which file and what offset with-in file does
+>   it belong to. Now one can look at filesystem on host and see file got
+>   truncated and it will become obvious it can't be faulted in. And then
+>   one can continue to debug that how did we arrive here.
 > 
+> But if we don't exit to user space synchronously, Only relevant
+> information we seem to have is -EFAULT. Apart from that, how does one
+> figure out what address is bad, or who tried to access it. Or which
+> file/offset does it belong to etc.
+>
+> I agree that problem is not necessarily in guest code. But by exiting
+> synchronously, it gives enough information that one can use crash
+> dump to get to bottom of the issue. If we exit to user space
+> asynchronously, all this information will be lost and it might make
+> it very hard to figure out (if not impossible), what's going on.
 
-I can still keep the code that adds these capabilities in the zdev .c 
-file, thus meaning they will only be added for s390 zpci devices -- but 
-the actual definition of them should probably instead be in vfio.h, no? 
-(maybe that's what you mean, but let's lay it out just in case)
+If we want userspace to be able to do something useful, KVM should explicitly
+inform userspace about the error, userspace shouldn't simply assume that
+-EFAULT means a HVA->PFN lookup failed.  Userspace also shouldn't have to
+query guest state to handle the error, as that won't work for protected guests
+guests like SEV-ES and TDX.
 
-The capability IDs would be shared with any other potential user of 
-VFIO_DEVICE_GET_INFO (I guess there is precedent for this already, 
-nvlink2 does this for vfio_region_info, see 
-VFIO_REGION_INFO_CAP_NVLINK2_SSATGT as an example).
+I can think of two options:
 
-Today, ZPCI would be the only users of VFIO_DEVICE_GET_INFO capability 
-chains.  Tomorrow, some other type might use them too.  Unless we want 
-to put a stake in the ground that says there will never be a case for a 
-capability that all devices share on VFIO_DEVICE_GET_INFO, I think we 
-should keep the IDs unique and define the capabilities in vfio.h but do 
-the corresponding add_capability() calls from a zdev-specific file.
+  1. Send a signal, a la kvm_send_hwpoison_signal().
 
->>
->> But if you're OK with that notion, I can give that a crack in v3.
->>
->>> capability chain in a region?  It would also be possible to define four
->>> separate device specific regions, one for each of these capabilities
->>> rather than creating this chain.  It just seems like a strange approach
->>
->> I'm not sure if creating separate regions would be the right approach
->> though; these are just the first 4.  There will definitely be additional
->> capabilities in support of new zPCI features moving forward, I'm not
->> sure how many regions we really want to end up with.  Some might be as
->> small as a single field, which seems more in-line with capabilities vs
->> an entire region.
+  2. Add a userspace exit reason along with a new entry in the run struct,
+     e.g. that provides the bad GPA, HVA, possibly permissions, etc...
+
+> > > > > > To fully handle the situation, the guest needs to remove the bad page from
+> > > > > > its memory pool.  Once the page is offlined, the guest kernel's error
+> > > > > > handling will kick in when a task accesses the bad page (or nothing ever
+> > > > > > touches the bad page again and everyone is happy).
+> > > > > 
+> > > > > This is not really a case of bad page as such. It is more of a page
+> > > > > gone missing/trucated. And no new user can map it. We just need to
+> > > > > worry about existing users who already have it mapped.
+> > > > 
+> > > > What do you mean by "no new user can map it"?  Are you talking about guest
+> > > > tasks or host tasks?  If guest tasks, how would the guest know the page is
+> > > > missing and thus prevent mapping the non-existent page?
+> > > 
+> > > If a new task wants mmap(), it will send a request to virtiofsd/qemu
+> > > on host. If file has been truncated, then mapping beyond file size
+> > > will fail and process will get error.  So they will not be able to
+> > > map a page which has been truncated.
+> > 
+> > Ah.  Is there anything that prevents the notification side of things from
+> > being handled purely within the virtiofs layer?  E.g. host notifies the guest
+> > that a file got truncated, virtiofs driver in the guest invokes a kernel API
+> > to remove the page(s).
 > 
-> If we are expecting more of these in the future, going with GET_INFO
-> capabilities when adding new ones seems like the best approach.
+> virtiofsd notifications can help a bit but not in all cases. For example,
+> If file got truncated and guest kernel accesses it immidiately after that,
+> (before notification arrives), it will hang and notification will not
+> be able to do much.
 > 
+> So while notification might be nice to have, but we still will need some
+> sort of error reporting from kvm.
 
+And I'm in full agreement with that.  What I'm saying is that resolving the
+infinite loop is a _bug fix_ and is completely orthogonal to adding a new
+mechanism to handle the file truncation scenario.
