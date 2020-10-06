@@ -2,325 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFE88284B37
-	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 13:58:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 822BE284CAF
+	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 15:46:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbgJFL6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Oct 2020 07:58:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50396 "EHLO
+        id S1726139AbgJFNqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Oct 2020 09:46:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45089 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726074AbgJFL6b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Oct 2020 07:58:31 -0400
+        by vger.kernel.org with ESMTP id S1726013AbgJFNqk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Oct 2020 09:46:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601985509;
+        s=mimecast20190719; t=1601991998;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=++G+Zcfk1rwxxjrbSt9E7kviCL52xsOg66+5duMLn5Y=;
-        b=iz1Cj9H68Ez/WtuplCJGLd2BTxZ573qBINMesIzK4EQ8Z2tkdvWe/Axu1SzwAfux/wZ/PK
-        yiTr5rDHmU/StKHSKEHUIKaosbnxJDcOzQGTHKH8gl/6IphWjvPtJnrj0L85RltpuXLGXa
-        bikyVnc9WEhD3IzqN6qrxJ/nU7+Phb8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-rDGFvaYuMEOdnBWRm35Ahw-1; Tue, 06 Oct 2020 07:58:28 -0400
-X-MC-Unique: rDGFvaYuMEOdnBWRm35Ahw-1
-Received: by mail-wr1-f71.google.com with SMTP id g6so5279740wrv.3
-        for <kvm@vger.kernel.org>; Tue, 06 Oct 2020 04:58:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=++G+Zcfk1rwxxjrbSt9E7kviCL52xsOg66+5duMLn5Y=;
-        b=SZLfB2/OkOGfbD90cFWhLstDjwpV3YegZbWVn9Za8nHKnGUmwPzrMAlY1BzVokqMvU
-         09khEczCe74S88m8JyV9R3AVG4ZvciyXwviy/F2rMENrPJm1EG70T0DweMb7JIOc8/K9
-         bN+I/wL4K2jC+ThdZWFGcUHZAf+ZNbJd/7dXPS1/nf9nKG7fjhAGd7DDhZl1yubVUsH9
-         9Jltxxyq5cnLg5YRM4RIH6xCdrupF3YaWdvbuTnpMs/dL+BfOjkwY/dJ6NuQwcECJ6TW
-         kdbZVe5haU3AjjDiuYB53ozXBoAaWfZVu75A/b+VWqGT6EtSjvy5Cxql58RhgUMdgqAh
-         V+Cg==
-X-Gm-Message-State: AOAM532sQLV+DxG9lNzY4w4hI7cy1ZwAsW2lLlLHWU1frnprk0bCR9qo
-        iznzumbRj0uQnfCGv+nV9ExUbZrJJsJxRBNtmSwfvjnsyZk6xt6sBr8Gp6mJaSI9WQtf4ZH1tw8
-        aYaPgog6reGL6
-X-Received: by 2002:adf:a3db:: with SMTP id m27mr4770199wrb.277.1601985506578;
-        Tue, 06 Oct 2020 04:58:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw6Sp5W+WqZXC/hbqf5I4EH+CsnZ3iNz7ejs5V3Pl/kNSWE0RV8qhqqVj/4rKejD7Tan6Fong==
-X-Received: by 2002:adf:a3db:: with SMTP id m27mr4770156wrb.277.1601985506079;
-        Tue, 06 Oct 2020 04:58:26 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id k15sm4487867wrv.90.2020.10.06.04.58.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2020 04:58:25 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     BARBALACE Antonio <antonio.barbalace@ed.ac.uk>
-Cc:     "will\@kernel.org" <will@kernel.org>,
-        "julien.thierry.kdev\@gmail.com" <julien.thierry.kdev@gmail.com>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: kvmtool: vhost MQ support
-In-Reply-To: <AM7PR05MB7076F55498C85087F09421F6CC0C0@AM7PR05MB7076.eurprd05.prod.outlook.com>
-References: <AM7PR05MB7076F55498C85087F09421F6CC0C0@AM7PR05MB7076.eurprd05.prod.outlook.com>
-Date:   Tue, 06 Oct 2020 13:58:24 +0200
-Message-ID: <87a6wz8t27.fsf@vitty.brq.redhat.com>
+        bh=cfRavjoFjpVYow5g6GANBDu/ddRusDzHcHdXr7NgCLc=;
+        b=O6mINS4zTY1mDFXyZNQxeno+Nln+NiTbQ3VlmNBHKseJqE7rU/nSKZTf++I93QYfMQzyZs
+        b3kw/dgMgqYPSdZ7eOzOj54tsL/4eQ8S8xXlnFfOEA6knXV1E7gs4W1Xt1aDkxmjlbrx5U
+        jc0RR10qj9sE53og3RR9sZNMCtg21ZU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-6XIYramKNHK8Y3XmZaVOaw-1; Tue, 06 Oct 2020 09:46:34 -0400
+X-MC-Unique: 6XIYramKNHK8Y3XmZaVOaw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A60F802B45;
+        Tue,  6 Oct 2020 13:46:33 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-117-72.rdu2.redhat.com [10.10.117.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B681376640;
+        Tue,  6 Oct 2020 13:46:29 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 464ED220AD7; Tue,  6 Oct 2020 09:46:29 -0400 (EDT)
+Date:   Tue, 6 Oct 2020 09:46:29 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtio-fs-list <virtio-fs@redhat.com>, vkuznets@redhat.com,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
+Message-ID: <20201006134629.GB5306@redhat.com>
+References: <20201001215508.GD3522@redhat.com>
+ <20201001223320.GI7474@linux.intel.com>
+ <20201002153854.GC3119@redhat.com>
+ <20201002183036.GB24460@linux.intel.com>
+ <20201002192734.GD3119@redhat.com>
+ <20201002194517.GD24460@linux.intel.com>
+ <20201002200214.GB10232@redhat.com>
+ <20201002211314.GE24460@linux.intel.com>
+ <20201005153318.GA4302@redhat.com>
+ <20201005161620.GC11938@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201005161620.GC11938@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-BARBALACE Antonio <antonio.barbalace@ed.ac.uk> writes:
+On Mon, Oct 05, 2020 at 09:16:20AM -0700, Sean Christopherson wrote:
+> On Mon, Oct 05, 2020 at 11:33:18AM -0400, Vivek Goyal wrote:
+> > On Fri, Oct 02, 2020 at 02:13:14PM -0700, Sean Christopherson wrote:
+> > Now I have few questions.
+> > 
+> > - If we exit to user space asynchronously (using kvm request), what debug
+> >   information is in there which tells user which address is bad. I admit
+> >   that even above trace does not seem to be telling me directly which
+> >   address (HVA?) is bad.
+> > 
+> >   But if I take a crash dump of guest, using above information I should
+> >   be able to get to GPA which is problematic. And looking at /proc/iomem
+> >   it should also tell which device this memory region is in.
+> > 
+> >   Also using this crash dump one should be able to walk through virtiofs data
+> >   structures and figure out which file and what offset with-in file does
+> >   it belong to. Now one can look at filesystem on host and see file got
+> >   truncated and it will become obvious it can't be faulted in. And then
+> >   one can continue to debug that how did we arrive here.
+> > 
+> > But if we don't exit to user space synchronously, Only relevant
+> > information we seem to have is -EFAULT. Apart from that, how does one
+> > figure out what address is bad, or who tried to access it. Or which
+> > file/offset does it belong to etc.
+> >
+> > I agree that problem is not necessarily in guest code. But by exiting
+> > synchronously, it gives enough information that one can use crash
+> > dump to get to bottom of the issue. If we exit to user space
+> > asynchronously, all this information will be lost and it might make
+> > it very hard to figure out (if not impossible), what's going on.
+> 
+> If we want userspace to be able to do something useful, KVM should explicitly
+> inform userspace about the error, userspace shouldn't simply assume that
+> -EFAULT means a HVA->PFN lookup failed.
 
-> This patch enables vhost MQ to support in kvmtool without any Linux kernel modification.
-> The patch takes the same approach as QEMU -- for each queue pair a new /dev/vhost-net fd is created.
-> Fds are kept in ndev->vhost_fds, with ndev->vhost_fd == ndev->vhost_fds[0] (to avoid further modification to the existent source code).
-> Thanks, Antonio Barbalace
-> The University of Edinburgh is a charitable body, registered in Scotland, with registration number SC005336.
-> diff --git a/virtio/net.c b/virtio/net.c
-> index 1ee3c19..bae3019 100644
-> --- a/virtio/net.c
-> +++ b/virtio/net.c
-> @@ -58,6 +58,7 @@ struct net_dev {
->  	u32				features, queue_pairs;
->  
->  	int				vhost_fd;
-> +	int				vhost_fds[VIRTIO_NET_NUM_QUEUES];
->  	int				tap_fd;
->  	char				tap_name[IFNAMSIZ];
->  	bool				tap_ufo;
-> @@ -512,6 +513,7 @@ static int virtio_net__vhost_set_features(struct net_dev *ndev)
->  {
->  	u64 features = 1UL << VIRTIO_RING_F_EVENT_IDX;
->  	u64 vhost_features;
-> +	int i, r = 0;
->  
->  	if (ioctl(ndev->vhost_fd, VHOST_GET_FEATURES, &vhost_features) != 0)
->  		die_perror("VHOST_GET_FEATURES failed");
-> @@ -521,7 +523,9 @@ static int virtio_net__vhost_set_features(struct net_dev *ndev)
->  			has_virtio_feature(ndev, VIRTIO_NET_F_MRG_RXBUF))
->  		features |= 1UL << VIRTIO_NET_F_MRG_RXBUF;
->  
-> -	return ioctl(ndev->vhost_fd, VHOST_SET_FEATURES, &features);
-> +	for (i=0; ((u32)i < ndev->queue_pairs) && (r >= 0); i++)
+I guess that's fine. But for this patch, user space is not doing anything.
+Its just printing error -EFAULT and dumping guest state (Same as we do
+in case of synchronous fault).
 
-Neither a virtio nor a kvmtool person here, just some comments about the
-style below.
+> Userspace also shouldn't have to
+> query guest state to handle the error, as that won't work for protected guests
+> guests like SEV-ES and TDX.
 
-Nit: more spaces needed:
-	for (i = 0; 
+So qemu would not be able to dump vcpu register state when kvm returns
+with -EFAULT for the case of SEV-ES and TDX?
 
-(u32) cast is not really needed because ndev->queue_pairs is caped with
-VIRTIO_NET_NUM_QUEUES and 
+> 
+> I can think of two options:
+> 
+>   1. Send a signal, a la kvm_send_hwpoison_signal().
 
-ndev->queue_pairs = max(1, min(VIRTIO_NET_NUM_QUEUES, params->mq));
+This works because -EHWPOISON is a special kind of error which is
+different from -EFAULT. For truncation, even kvm gets -EFAULT.
 
-alternatively, you can just declare i as 'u32'.
+        if (vm_fault & (VM_FAULT_HWPOISON | VM_FAULT_HWPOISON_LARGE))
+                return (foll_flags & FOLL_HWPOISON) ? -EHWPOISON : -EFAULT;
+        if (vm_fault & (VM_FAULT_SIGBUS | VM_FAULT_SIGSEGV))
+                return -EFAULT;
 
-> +		r = ioctl(ndev->vhost_fds[i], VHOST_SET_FEATURES, &features); 
+Anyway, if -EFAULT is too generic, and we need something finer grained,
+that can be looked into when we actually have a method where kvm/qemu
+injects error into guest.
 
-To improve the readability I'd suggest to write this as
+> 
+>   2. Add a userspace exit reason along with a new entry in the run struct,
+>      e.g. that provides the bad GPA, HVA, possibly permissions, etc...
 
-	for (i=0; i < ndev->queue_pairs; i++) {
-		r = ioctl(ndev->vhost_fds[i], VHOST_SET_FEATURES, &features);
-		if (r)
-			break;
-	}
+This sounds more reasonable to me. That is kvm gives additional
+information to qemu about failing HVA and GPA with -EFAULT and that
+can be helpful in debugging a problem. This seems like an extension
+of KVM API.
 
+Even with this, if we want to figure out which file got truncated, we
+will need to take a dump of guest and try to figure out which file
+this GPA is currently mapping(By looking at virtiofs data structures).
+And that becomes little easier if vcpu is running the task which 
+accessed that GPA. Anyway, if we have failing GPA, I think it should
+be possible to figure out inode even without accessing task being
+current on vcpu.
 
-> +	return r;
->  }
->  
->  static void set_guest_features(struct kvm *kvm, void *dev, u32 features)
-> @@ -578,7 +582,7 @@ static bool is_ctrl_vq(struct net_dev *ndev, u32 vq)
->  static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
->  		   u32 pfn)
->  {
-> -	struct vhost_vring_state state = { .index = vq };
-> +	struct vhost_vring_state state = { .index = (vq %2) };
+So we seem to have 3 options.
 
-Nit: superfluous parentheses
+A. Just exit to user space with -EFAULT (using kvm request) and don't
+   wait for the accessing task to run on vcpu again. 
 
->  	struct net_dev_queue *net_queue;
->  	struct vhost_vring_addr addr;
->  	struct net_dev *ndev = dev;
-> @@ -619,23 +623,24 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
->  	if (queue->endian != VIRTIO_ENDIAN_HOST)
->  		die_perror("VHOST requires the same endianness in guest and host");
->  
-> -	state.num = queue->vring.num;
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_NUM, &state);
-> +	state.num = queue->vring.num; //number of decriptors
+B. Store error gfn in an hash and exit to user space when task accessing
+   gfn runs again.
 
-I don't see C++ style comments anywhere in this file, use /* */ instead.
+C. Extend KVM API and report failing HVA/GFN access by guest. And that
+   should allow not having to exit to user space synchronously.
 
-> +        r = ioctl(ndev->vhost_fds[(vq /2)], VHOST_SET_VRING_NUM, &state);
-
-Indentation. Also, you seem to be using 'vq / 2' a lot, maybe assign
-this to a local variable.
-
->  	if (r < 0)
->  		die_perror("VHOST_SET_VRING_NUM failed");
-> -	state.num = 0;
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_BASE, &state);
-> +
-> +	state.num = 0; //descriptors base
-
-Comment style.
-
-> +	r = ioctl(ndev->vhost_fds[(vq /2)], VHOST_SET_VRING_BASE, &state);
->  	if (r < 0)
->  		die_perror("VHOST_SET_VRING_BASE failed");
->  
->  	addr = (struct vhost_vring_addr) {
-> -		.index = vq,
-> +		.index = (vq %2),
->  		.desc_user_addr = (u64)(unsigned long)queue->vring.desc,
->  		.avail_user_addr = (u64)(unsigned long)queue->vring.avail,
->  		.used_user_addr = (u64)(unsigned long)queue->vring.used,
->  	};
->  
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_ADDR, &addr);
-> +	r = ioctl(ndev->vhost_fds[(vq /2)], VHOST_SET_VRING_ADDR, &addr);
->  	if (r < 0)
->  		die_perror("VHOST_SET_VRING_ADDR failed");
->  
-> @@ -659,7 +664,7 @@ static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
->  	 */
->  	if (ndev->vhost_fd && !is_ctrl_vq(ndev, vq)) {
->  		pr_warning("Cannot reset VHOST queue");
-> -		ioctl(ndev->vhost_fd, VHOST_RESET_OWNER);
-> +		ioctl(ndev->vhost_fds[(vq /2)], VHOST_RESET_OWNER);
->  		return;
->  	}
->  
-> @@ -682,7 +687,7 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
->  		return;
->  
->  	file = (struct vhost_vring_file) {
-> -		.index	= vq,
-> +		.index	= (vq % 2),
->  		.fd	= eventfd(0, 0),
->  	};
->  
-> @@ -693,31 +698,32 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
->  	queue->irqfd = file.fd;
->  	queue->gsi = gsi;
->  
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_CALL, &file);
-> +	r = ioctl(ndev->vhost_fds[(vq /2)], VHOST_SET_VRING_CALL, &file);
->  	if (r < 0)
->  		die_perror("VHOST_SET_VRING_CALL failed");
-> +
->  	file.fd = ndev->tap_fd;
-> -	r = ioctl(ndev->vhost_fd, VHOST_NET_SET_BACKEND, &file);
-> +	r = ioctl(ndev->vhost_fds[(vq /2)], VHOST_NET_SET_BACKEND, &file);
->  	if (r != 0)
->  		die("VHOST_NET_SET_BACKEND failed %d", errno);
-> -
->  }
->  
->  static void notify_vq_eventfd(struct kvm *kvm, void *dev, u32 vq, u32 efd)
->  {
->  	struct net_dev *ndev = dev;
->  	struct vhost_vring_file file = {
-> -		.index	= vq,
-> +		.index	= (vq % 2),
->  		.fd	= efd,
->  	};
->  	int r;
->  
-> -	if (ndev->vhost_fd == 0 || is_ctrl_vq(ndev, vq))
-> +	if (ndev->vhost_fd == 0 || is_ctrl_vq(ndev, vq)) {
->  		return;
-> +	}
-> +	r = ioctl(ndev->vhost_fds[(vq /2)], VHOST_SET_VRING_KICK, &file);
->  
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_KICK, &file);
->  	if (r < 0)
-> -		die_perror("VHOST_SET_VRING_KICK failed");
-> +		die_perror("VHOST_SET_VRING_KICK failed test");
-
-What is this 'failed test' about? Stray change?
-
->  }
->  
->  static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
-> @@ -777,10 +783,6 @@ static void virtio_net__vhost_init(struct kvm *kvm, struct net_dev *ndev)
->  	struct vhost_memory *mem;
->  	int r, i;
->  
-> -	ndev->vhost_fd = open("/dev/vhost-net", O_RDWR);
-> -	if (ndev->vhost_fd < 0)
-> -		die_perror("Failed openning vhost-net device");
-> -
->  	mem = calloc(1, sizeof(*mem) + kvm->mem_slots * sizeof(struct vhost_memory_region));
->  	if (mem == NULL)
->  		die("Failed allocating memory for vhost memory map");
-> @@ -796,13 +798,22 @@ static void virtio_net__vhost_init(struct kvm *kvm, struct net_dev *ndev)
->  	}
->  	mem->nregions = i;
->  
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_OWNER);
-> -	if (r != 0)
-> -		die_perror("VHOST_SET_OWNER failed");
-> +	for (i=0; ((u32)i < ndev->queue_pairs) && 
-> +			(i < VIRTIO_NET_NUM_QUEUES); i++) {
->  
-
-Same as above.
-
-> -	r = ioctl(ndev->vhost_fd, VHOST_SET_MEM_TABLE, mem);
-> -	if (r != 0)
-> -		die_perror("VHOST_SET_MEM_TABLE failed");
-> +		ndev->vhost_fds[i] = open("/dev/vhost-net", O_RDWR);
-> +	        if (ndev->vhost_fds[i] < 0)
-> +			die_perror("Failed openning vhost-net device");
-> +
-> +		r = ioctl(ndev->vhost_fds[i], VHOST_SET_OWNER);
-> +		if (r != 0)
-> +			die_perror("VHOST_SET_OWNER failed");
-> +	
-> +		r = ioctl(ndev->vhost_fds[i], VHOST_SET_MEM_TABLE, mem);
-> +		if (r != 0)
-> +			die_perror("VHOST_SET_MEM_TABLE failed");
-> +	}
-> +	ndev->vhost_fd = ndev->vhost_fds[0];
-
-Do we actually need 'vhost_fd' at all, can we just use vhost_fds[0] in a
-few places where it is still present?
-
->  
->  	ndev->vdev.use_vhost = true;
->  
-> @@ -966,7 +977,6 @@ static int virtio_net__init_one(struct virtio_net_params *params)
->  				   "falling back to %s.", params->trans,
->  				   virtio_trans_name(trans));
->  	}
-> -
-
-Stray change?
-
->  	r = virtio_init(params->kvm, ndev, &ndev->vdev, ops, trans,
->  			PCI_DEVICE_ID_VIRTIO_NET, VIRTIO_ID_NET, PCI_CLASS_NET);
->  	if (r < 0) {
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index c652949..7a1532b 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -44,7 +44,8 @@ static int virtio_pci__init_ioeventfd(struct kvm *kvm, struct virtio_device *vde
->  	 * Vhost will poll the eventfd in host kernel side, otherwise we
->  	 * need to poll in userspace.
->  	 */
-> -	if (!vdev->use_vhost)
-> +	if ( (!vdev->use_vhost) ||
-
-Xen coding style detected :-) Just
-
-	if (!vdev->use_vhost || (vdev->ops->get_vq_count(kvm, vpci->dev) = vq + 1)
-
-would do fine.
-
-> +		((u32)vdev->ops->get_vq_count(kvm, vpci->dev)==(vq+1)) )
->  		flags |= IOEVENTFD_FLAG_USER_POLL;
->  
->  	/* ioport */
-
--- 
-Vitaly
+Thanks
+Vivek
 
