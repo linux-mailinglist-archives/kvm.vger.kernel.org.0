@@ -2,71 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB21528539C
-	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 23:06:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7A5828539F
+	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 23:07:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727365AbgJFVG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Oct 2020 17:06:26 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:38896 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727270AbgJFVG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Oct 2020 17:06:26 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1602018384;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dJsRLR/GkQ9y55O/CRKVyWEVz7Xo2QXtu4Qp1z7vboQ=;
-        b=BumlTzJoaEazB1qg0hEMqrqLjk17pzwuyeAZCv8B4WQH/n5eEctgvA3WOsEaB+xaeEj+90
-        lQh/ds6d9BQaeYTOcnM0nd0ikZC+V/UWeMf6jAVNbdNT3av9BL7qrNoCMvqbdziHzy2m0z
-        PN0XKqhnVwosi+iqtZ68xm76qYs0EvC29/02kJB5g/CQUvFBEl36w3PCVACLkAm9573ZUL
-        19qaTmLc/HKZ/RXQvhNYqUBF2jDQzytl3MhfR3nOPuqsge//c8VdtQUrnQT1N/9HG56kcC
-        AXTqAmFjMJWgHN7ExlPSLGXBa2TdzK079Htko7R+C/ilxyUS0EXVvV1k+o4xDA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1602018384;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dJsRLR/GkQ9y55O/CRKVyWEVz7Xo2QXtu4Qp1z7vboQ=;
-        b=q0LCsvJPrT9MflDeA3d4nXkFpjov+sYU6mnQ6FkKbfUFdxZE9G83qKg9++8n7MHXDg04nh
-        3YNP1h4k2nv0+eDg==
-To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
-Cc:     iommu <iommu@lists.linux-foundation.org>,
+        id S1727334AbgJFVHf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Oct 2020 17:07:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40648 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727176AbgJFVHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Oct 2020 17:07:35 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0705AC061755;
+        Tue,  6 Oct 2020 14:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Message-ID:From:CC:To:Subject:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
+        Date:Sender:Reply-To:Content-ID:Content-Description;
+        bh=raBJSUw2Pij7PT/rmhEwVTTdaxcjc+zHVTOGifxTEq0=; b=gyjSY0FpzhPBu92z/xXp6in+HW
+        CNRn7wm1Ue5GnjypviGr/n6WwXPtKA3mLrAhl629I0lDHj1gOQmdh7AnTFiM4uyVr8g+zBAobtiw1
+        oMNcsgyuAAnLIN1FJpsr5D55fQc+neHiaDLDlOQ6B61p8AG5Lu2/5XVNcgFR9yR38ISnSR2NX9iV2
+        A0Bk+bwYFEWaZOe+2W2ZGokjAqbVYgTscw8RfHWrWTLpV+1Tc5VNC12DC0GGKPYh5u1sZ+3Ir9I+X
+        WaA9qVsjoNSA713IFdYBe01Qli0aJShZkySZFpr/eB1fNxyW/hRM5E/aJpQ3G16bttEqpKW+0cPe/
+        hbi0nacA==;
+Received: from [2001:8b0:10b:1:ad95:471b:fe64:9cc3]
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kPuBF-0003ga-DY; Tue, 06 Oct 2020 21:07:29 +0000
+Date:   Tue, 06 Oct 2020 22:07:26 +0100
+User-Agent: K-9 Mail for Android
+In-Reply-To: <87r1qb5ash.fsf@nanos.tec.linutronix.de>
+References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org> <20201005152856.974112-1-dwmw2@infradead.org> <20201005152856.974112-5-dwmw2@infradead.org> <87r1qb5ash.fsf@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 05/13] genirq: Prepare for default affinity to be passed to __irq_alloc_descs()
+To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
+CC:     iommu <iommu@lists.linux-foundation.org>,
         kvm <kvm@vger.kernel.org>, linux-hyperv@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 06/13] genirq: Add default_affinity argument to __irq_alloc_descs()
-In-Reply-To: <20201005152856.974112-6-dwmw2@infradead.org>
-References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org> <20201005152856.974112-1-dwmw2@infradead.org> <20201005152856.974112-6-dwmw2@infradead.org>
-Date:   Tue, 06 Oct 2020 23:06:23 +0200
-Message-ID: <87o8lf5ak0.fsf@nanos.tec.linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain
+From:   David Woodhouse <dwmw2@infradead.org>
+Message-ID: <BC75F5DC-BA63-46D6-B273-E30EEAA3D989@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 05 2020 at 16:28, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> It already takes an array of affinities for each individual irq being
-> allocated but that's awkward to allocate and populate in the case
-> where they're all the same and inherited from the irqdomain, so pass
-> the default in separately as a simple cpumask.
 
-So we need another cpumask argument exposed to the world just because
-it's so hard to extend struct irq_affinity_desc so it supports that use
-case as well. It's not written in stone that this struct can only
-support arrays.
 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  include/linux/irq.h    | 10 ++++++----
->  kernel/irq/devres.c    |  8 ++++++--
->  kernel/irq/irqdesc.c   | 10 ++++++++--
->  kernel/irq/irqdomain.c |  6 +++---
+On 6 October 2020 22:01:18 BST, Thomas Gleixner <tglx@linutronix=2Ede> wro=
+te:
+>On Mon, Oct 05 2020 at 16:28, David Woodhouse wrote:
+>> =20
+>>  #else /* CONFIG_SMP */
+>> =20
+>> +#define irq_default_affinity (NULL)
+>
+>=2E=2E=2E
+>
+>>  static int alloc_descs(unsigned int start, unsigned int cnt, int
+>node,
+>>  		       const struct irq_affinity_desc *affinity,
+>> +		       const struct cpumask *default_affinity,
+>>  		       struct module *owner)
+>>  {
+>>  	struct irq_desc *desc;
+>>  	int i;
+>> =20
+>>  	/* Validate affinity mask(s) */
+>> +	if (!default_affinity || cpumask_empty(default_affinity))
+>> +		return -EINVAL;
+>
+>How is that supposed to work on UP?
 
-git grep __irq_alloc_descs() might help you to find _all_ instances ...
+Hm, good point=2E
 
-Thanks,
+>Aside of that I really hate to have yet another argument just
+>because=2E
 
-        tglx
+Yeah, I was trying to avoid having to allocate a whole array of irq_affini=
+ty_desc just to fill them all in with the same default=2E
+
+But perhaps I need to treat the "affinity_max" like we do cpu_online_mask,=
+ and allow affinity to be set even to offline/unreachable CPUs at this poin=
+t=2E Then we can be more relaxed about the default affinities=2E
+
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
