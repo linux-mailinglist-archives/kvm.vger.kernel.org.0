@@ -2,134 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A08E32851A7
-	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 20:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37237285211
+	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 21:07:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726841AbgJFSfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Oct 2020 14:35:12 -0400
-Received: from mga09.intel.com ([134.134.136.24]:9314 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725906AbgJFSfM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Oct 2020 14:35:12 -0400
-IronPort-SDR: cVd3o22uFl2/jQArJOob66txAh9DIsakqoWKNhn+VXk3XBgYyq2b8dCOQzgf32iOWzaMM6Mkf4
- fiDoO2bv6gzQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9765"; a="164762015"
-X-IronPort-AV: E=Sophos;i="5.77,343,1596524400"; 
-   d="scan'208";a="164762015"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2020 11:35:03 -0700
-IronPort-SDR: SUEmG4YCC05mmETbutccpVDvJK8Y1GFbNiBcCARxE9UTi0TmmHIfGFxxVfO56PZYlSbH2xs9sP
- NXHktZWmKnzA==
-X-IronPort-AV: E=Sophos;i="5.77,343,1596524400"; 
-   d="scan'208";a="315784611"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2020 11:35:03 -0700
-Date:   Tue, 6 Oct 2020 11:35:02 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH] KVM: nVMX: Morph notification vector IRQ on nested
- VM-Enter to pending PI
-Message-ID: <20201006183501.GD17610@linux.intel.com>
-References: <20200812175129.12172-1-sean.j.christopherson@intel.com>
- <CALMp9eTc9opgQ4pU92wmKSM6gUv6AEKZRqSnv_Q+rzixOLOZiw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eTc9opgQ4pU92wmKSM6gUv6AEKZRqSnv_Q+rzixOLOZiw@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1727010AbgJFTHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Oct 2020 15:07:09 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:57530 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727005AbgJFTHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Oct 2020 15:07:09 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 096IxQOq088675;
+        Tue, 6 Oct 2020 19:07:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=ndSK4g9KZoHOQRn8n6rYfB8krcATpjQavrXaq/WBQRQ=;
+ b=mVAQDFa7oxkodt+nctOuWNww57z0WutnQeig/T4AUJJ0dnn7LWchMAFg6TKmXq6xAVsZ
+ 8pDSVoVTNH6aUe8fh0YcSYmt1lki3qTNnePSKEqVT4Z/0q7cssmI39FrLhMwKVDf/2rd
+ eO8FqhnMc6rzb7X7LPsgRUZ0T23x2YWNZRaUAXlDufHZgrt19Y50zLxBaZSZaWjfogxV
+ tRwpO54yX+i8Xb8vCnr1VgzOzVcf6AKqgqgb+ZS0CWBQZCtFwwbUXPpWwD836HcHU6hD
+ LIk0lmXg2pcde1F49CtBc+43dsLfAc6iZrxQLIDPYp/OEg5mqOKItbb00D2lwtDBVONp Yw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 33xhxmwuqc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 06 Oct 2020 19:07:04 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 096J1HiI134063;
+        Tue, 6 Oct 2020 19:07:04 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 33y2vnep17-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 06 Oct 2020 19:07:04 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 096J72Gu004242;
+        Tue, 6 Oct 2020 19:07:02 GMT
+Received: from nsvm-sadhukhan-1.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 06 Oct 2020 12:07:02 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Subject: [PATCH 0/4 v3] KVM: nSVM: Add checks for CR3 and CR4 reserved bits to svm_set_nested_state() and test CR3 non-MBZ reserved bits
+Date:   Tue,  6 Oct 2020 19:06:50 +0000
+Message-Id: <20201006190654.32305-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.18.4
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9766 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=803
+ malwarescore=0 suspectscore=1 spamscore=0 phishscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010060123
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9766 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 bulkscore=0
+ impostorscore=0 lowpriorityscore=0 suspectscore=1 phishscore=0
+ mlxlogscore=822 adultscore=0 clxscore=1015 spamscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010060123
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 06, 2020 at 10:36:09AM -0700, Jim Mattson wrote:
-> On Wed, Aug 12, 2020 at 10:51 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On successful nested VM-Enter, check for pending interrupts and convert
-> > the highest priority interrupt to a pending posted interrupt if it
-> > matches L2's notification vector.  If the vCPU receives a notification
-> > interrupt before nested VM-Enter (assuming L1 disables IRQs before doing
-> > VM-Enter), the pending interrupt (for L1) should be recognized and
-> > processed as a posted interrupt when interrupts become unblocked after
-> > VM-Enter to L2.
-> >
-> > This fixes a bug where L1/L2 will get stuck in an infinite loop if L1 is
-> > trying to inject an interrupt into L2 by setting the appropriate bit in
-> > L2's PIR and sending a self-IPI prior to VM-Enter (as opposed to KVM's
-> > method of manually moving the vector from PIR->vIRR/RVI).  KVM will
-> > observe the IPI while the vCPU is in L1 context and so won't immediately
-> > morph it to a posted interrupt for L2.  The pending interrupt will be
-> > seen by vmx_check_nested_events(), cause KVM to force an immediate exit
-> > after nested VM-Enter, and eventually be reflected to L1 as a VM-Exit.
-> > After handling the VM-Exit, L1 will see that L2 has a pending interrupt
-> > in PIR, send another IPI, and repeat until L2 is killed.
-> >
-> > Note, posted interrupts require virtual interrupt deliveriy, and virtual
-> > interrupt delivery requires exit-on-interrupt, ergo interrupts will be
-> > unconditionally unmasked on VM-Enter if posted interrupts are enabled.
-> >
-> > Fixes: 705699a13994 ("KVM: nVMX: Enable nested posted interrupt processing")
-> > Cc: stable@vger.kernel.org
-> > Cc: Liran Alon <liran.alon@oracle.com>
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> I don't think this is the best fix.
+v2 -> v3:
+	Patch# 2: The local variable "nested_vmcb_lma" in
+		  nested_vmcb_check_cr3_cr4() has been removed.
+	Patch# 3: Commit message has been enhanced to explain what the test
+		  is doing and why, when testing the 1-setting of the
+		  non-MBZ-reserved bits.
+		  Also, the test for legacy-PAE mode has been added. Commit
+		  header reflects this addition.
 
-I agree, even without any more explanantion :-)
 
-> I believe the real problem is the way that external and posted
-> interrupts are handled in vmx_check_nested_events().
-> 
-> First of all, I believe that the existing call to
-> vmx_complete_nested_posted_interrupt() at the end of
-> vmx_check_nested_events() is far too aggressive. Unless I am missing
-> something in the SDM, posted interrupt processing is *only* triggered
-> when the notification vector is received in VMX non-root mode. It is
-> not triggered on VM-entry.
+[PATCH 1/4 v3] KVM: nSVM: CR3 MBZ bits are only 63:52
+[PATCH 2/4 v3] KVM: nSVM: Add check for reserved bits for CR3, CR4, DR6,
+[PATCH 3/4 v3] nSVM: Test non-MBZ reserved bits in CR3 in long mode and
+[PATCH 4/4 v3] KVM: nSVM: nested_vmcb_checks() needs to check all bits
 
-That's my understanding as well.  Virtual interrupt delivery is evaluated
-on VM-Enter, but not posted interrupts.
+ arch/x86/kvm/svm/nested.c | 52 ++++++++++++++++++++++++++---------------------
+ arch/x86/kvm/svm/svm.h    |  2 +-
+ 2 files changed, 30 insertions(+), 24 deletions(-)
 
-  Evaluation of pending virtual interrupts is caused only by VM entry, TPR
-  virtualization, EOI virtualization, self-IPI virtualization, and posted-
-  interrupt processing. 
+Krish Sadhukhan (3):
+      KVM: nSVM: CR3 MBZ bits are only 63:52
+      KVM: nSVM: Add check for reserved bits for CR3, CR4, DR6, DR7 and EFER to svm_set_nested_state()
+      KVM: nSVM: nested_vmcb_checks() needs to check all bits of EFER
 
-> Looking back one block, we have:
-> 
-> if (kvm_cpu_has_interrupt(vcpu) && !vmx_interrupt_blocked(vcpu)) {
->     if (block_nested_events)
->         return -EBUSY;
->     if (!nested_exit_on_intr(vcpu))
->         goto no_vmexit;
->     nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT, 0, 0);
->     return 0;
-> }
-> 
-> If nested_exit_on_intr() is true, we should first check to see if
-> "acknowledge interrupt on exit" is set. If so, we should acknowledge
-> the interrupt right here, with a call to kvm_cpu_get_interrupt(),
-> rather than deep in the guts of nested_vmx_vmexit(). If the vector we
-> get is the notification vector from VMCS12, then we should call
-> vmx_complete_nested_posted_interrupt(). Otherwise, we should call
-> nested_vmx_vmexit(EXIT_REASON_EXTERNAL_INTERRUPT) as we do now.
+ x86/svm.h       |  4 +++-
+ x86/svm_tests.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 63 insertions(+), 7 deletions(-)
 
-That makes sense.  And we can pass in exit_intr_info instead of computing
-it in nested_vmx_vmexit() since this is the only path that does a nested
-exit with EXIT_REASON_EXTERNAL_INTERRUPT.
+Krish Sadhukhan (1):
+      nSVM: Test non-MBZ reserved bits in CR3 in long mode and legacy PAE mode
 
-> Furthermore, vmx_complete_nested_posted_interrupt() should write to
-> the L1 EOI register, as indicated in step 4 of the 7-step sequence
-> detailed in section 29.6 of the SDM, volume 3. It skips this step
-> today.
-
-Yar.
-
-Thanks Jim!  I'll get a series out.
