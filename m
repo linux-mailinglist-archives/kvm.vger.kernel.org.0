@@ -2,163 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 398AE2853D3
-	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 23:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB9D02853D8
+	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 23:26:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727470AbgJFVWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Oct 2020 17:22:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42974 "EHLO
+        id S1727424AbgJFV0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Oct 2020 17:26:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727301AbgJFVWt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Oct 2020 17:22:49 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D313EC061755
-        for <kvm@vger.kernel.org>; Tue,  6 Oct 2020 14:22:48 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id z8so2977003lfd.11
-        for <kvm@vger.kernel.org>; Tue, 06 Oct 2020 14:22:48 -0700 (PDT)
+        with ESMTP id S1727334AbgJFV0A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Oct 2020 17:26:00 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BA5C061755
+        for <kvm@vger.kernel.org>; Tue,  6 Oct 2020 14:26:00 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id b5so4045plk.2
+        for <kvm@vger.kernel.org>; Tue, 06 Oct 2020 14:26:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kqf0mfPbDxUJw+w6TI82pAryJKbZXD6ERc1Br897awA=;
-        b=FVUrmxNSnwxfguQIoLwhB3PwdpdxFvlIvs7dmFxZEFRTNZoW/rhfFleYV0ZKhMLZB0
-         +09XmvwJTp2Fvz6umhz3jUcC9+lFcx5t//ysmFtqT2zBHlMGEDPtpTc8O84R2tH0wKmF
-         JIm6IRLP/+1wSUsC2H/vUfMizhs/HCKrSyq2ULOT3LvG1fJKxBrkum5INBXF5T1qgnyl
-         zL73DYY0CIujLPhx0haxCU00wxNNA5BZnUzDq+UIzBvp5vJzU+Zn9nAI6M0ubx7j+SYK
-         rVON5EqLho0hbxs5mvEZ3LKqwJszdwE+qU34S34yH1KcI579XxJQsemZ1AFM+QoqDUbg
-         x0QA==
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=m7ttRV8rxTRBgNYSIiZwVYKNAnTImX3Y55fX7B/kzUI=;
+        b=ALiWkA7iJQTTIVU6uDzu/Vdsbxuffb31jdFBEG5EMHztgBWCVSbo+afuYKzdfIpQWQ
+         a/6WpG9Zwdp+kC4Js3uX8VJP1ibbKM+49VHj45bV7BHCgWcihg4+Sc9ShfxwHage4ahO
+         EjE7VJQzVqZNq0iuK0cWu+MyxSXXJ8Uz15V1S/j4Sri2Ph0FI8MBNab1Z7cgSmpcW5xk
+         cTHKmkjfA5GiH2KgdrF0Nnj5JyNpnU+ib80YyaJpFq7l0J6B7dOzx7CjoRakgp+zog2m
+         81Kf0BHMzr/vkYl8wPNCZ1aqW3iN6uzAd2C8RgEEmyyQDnh/w4919++P6JW4+XolotO2
+         TaqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kqf0mfPbDxUJw+w6TI82pAryJKbZXD6ERc1Br897awA=;
-        b=o3EZcW+O3ZJ4NqpsYp9NiHNBL7QXWIIfZpB+aM4Lv0xRlKEfQv7t6y6OLD1+ydKLr9
-         K6E14Vl3XFuhoh0fgOHqzzPhj+Coz/XfLl/VWN7L0EhoX34zYcauVawOOI/IPYZ+iuM9
-         PVsNF3C6JiyHzX7JFr3nAXcAGpN3OUa3aMDaX6De1M3HP18IC/AGvVZloBIfFmgdapwE
-         UVeYYQRjr7qsM/KYbPNZSS7xpofercQtpm5w4uGy+qmNwqr1df+eMYhBZQ4YjM++Lmv5
-         uGIQkvj+sHUYe0Fr1MGIiAY/l3f+BNpso09jrBo+TsdcuKxtV0SA4i7kC5z49WvWwJlW
-         A4VQ==
-X-Gm-Message-State: AOAM532rg0tEX/XRwC32UsJsSxS/epGzqlcXkCQWxHm6EPpFcSrYfX+d
-        A95riv7HqRXohbt2/gwFitvdTK40onbjEmZcbsw5fw==
-X-Google-Smtp-Source: ABdhPJzDVu79X2bMHe1wvPdya0pCa53aKeq61U6EVOSzv1ylR6iO7CRJesyo+0hXqfdtsNs6ZWvtr6Nf0LrbXRMyMGU=
-X-Received: by 2002:ac2:4316:: with SMTP id l22mr1047155lfh.310.1602019366938;
- Tue, 06 Oct 2020 14:22:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200812175129.12172-1-sean.j.christopherson@intel.com>
- <CALMp9eTc9opgQ4pU92wmKSM6gUv6AEKZRqSnv_Q+rzixOLOZiw@mail.gmail.com> <20201006183501.GD17610@linux.intel.com>
-In-Reply-To: <20201006183501.GD17610@linux.intel.com>
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=m7ttRV8rxTRBgNYSIiZwVYKNAnTImX3Y55fX7B/kzUI=;
+        b=TsJJR15Y78X3Yx11BgkTVWxGQAknuof7FkVfoWyhSNAf5+zoNHaVfaulIAQqtF8Dq7
+         1IOjnelchF8MZa5KtOY3M6nvybLggJMwzhWQvelPgOjdJO7IP4Is1WZgSoerrYYf53Cr
+         dTWNnfbL1b6gCXc8EbJFMBsetyHJhOq6C6Pp8G0bpdJFGcUJ6c63JZuLoSbXaUbov5dS
+         /8/WSCaeimvj9HaDlq0tZMT2Do+5p+oDuhH4wDqbbWSXqnwOzwZxLt196zxkKGuyj60F
+         QiRpbTTuOuYU9y8I07CqfpLsqzLFEUOupSRzic6sk0hjzqgxqN/f323QgNzhOoJbMOPQ
+         F/wg==
+X-Gm-Message-State: AOAM531Q7nwMpJ1wVA/jAT0sAWE6lnQ2l7QqQWAtzkYEx9dMKjOkMQH6
+        2MjpBYrs/uewhiLs8ACd5Fzz2VbBdSiG2KLKjqEEYunG3ZOE3IAOkn0je9hxeMOoBis/uO9lIIT
+        ss01nDDgQ0jL+gEMbPxofwngtL0bMoERDYzT2eHuSmD92ZdaAGvSG0MxnAw==
+X-Google-Smtp-Source: ABdhPJylZ8fFG2yjs/EezQopTT1eYnCvaEcVFpyYUxDY/BlpHzBRr2kIpLRO5v10ibzhxWcCFJDCsBDCAfg=
+Sender: "oupton via sendgmr" <oupton@oupton.sea.corp.google.com>
+X-Received: from oupton.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef5:7be1])
+ (user=oupton job=sendgmr) by 2002:a17:90a:1188:: with SMTP id
+ e8mr58668pja.61.1602019559785; Tue, 06 Oct 2020 14:25:59 -0700 (PDT)
+Date:   Tue,  6 Oct 2020 14:25:56 -0700
+Message-Id: <20201006212556.882066-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.806.g8561365e88-goog
+Subject: [kvm-unit-tests PATCH] x86: vmx: add regression test for posted interrupts
 From:   Oliver Upton <oupton@google.com>
-Date:   Tue, 6 Oct 2020 14:22:35 -0700
-Message-ID: <CAOQ_Qsgycf+p1=XfWVdG+2qpECcMWvPP7L5hM-AJN-V-_brv7g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Morph notification vector IRQ on nested
- VM-Enter to pending PI
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+To:     kvm@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Liran Alon <liran.alon@oracle.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 6, 2020 at 11:35 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Tue, Oct 06, 2020 at 10:36:09AM -0700, Jim Mattson wrote:
-> > On Wed, Aug 12, 2020 at 10:51 AM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > On successful nested VM-Enter, check for pending interrupts and convert
-> > > the highest priority interrupt to a pending posted interrupt if it
-> > > matches L2's notification vector.  If the vCPU receives a notification
-> > > interrupt before nested VM-Enter (assuming L1 disables IRQs before doing
-> > > VM-Enter), the pending interrupt (for L1) should be recognized and
-> > > processed as a posted interrupt when interrupts become unblocked after
-> > > VM-Enter to L2.
-> > >
-> > > This fixes a bug where L1/L2 will get stuck in an infinite loop if L1 is
-> > > trying to inject an interrupt into L2 by setting the appropriate bit in
-> > > L2's PIR and sending a self-IPI prior to VM-Enter (as opposed to KVM's
-> > > method of manually moving the vector from PIR->vIRR/RVI).  KVM will
-> > > observe the IPI while the vCPU is in L1 context and so won't immediately
-> > > morph it to a posted interrupt for L2.  The pending interrupt will be
-> > > seen by vmx_check_nested_events(), cause KVM to force an immediate exit
-> > > after nested VM-Enter, and eventually be reflected to L1 as a VM-Exit.
-> > > After handling the VM-Exit, L1 will see that L2 has a pending interrupt
-> > > in PIR, send another IPI, and repeat until L2 is killed.
-> > >
-> > > Note, posted interrupts require virtual interrupt deliveriy, and virtual
-> > > interrupt delivery requires exit-on-interrupt, ergo interrupts will be
-> > > unconditionally unmasked on VM-Enter if posted interrupts are enabled.
-> > >
-> > > Fixes: 705699a13994 ("KVM: nVMX: Enable nested posted interrupt processing")
-> > > Cc: stable@vger.kernel.org
-> > > Cc: Liran Alon <liran.alon@oracle.com>
-> > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > ---
-> > I don't think this is the best fix.
->
-> I agree, even without any more explanantion :-)
->
-> > I believe the real problem is the way that external and posted
-> > interrupts are handled in vmx_check_nested_events().
-> >
-> > First of all, I believe that the existing call to
-> > vmx_complete_nested_posted_interrupt() at the end of
-> > vmx_check_nested_events() is far too aggressive. Unless I am missing
-> > something in the SDM, posted interrupt processing is *only* triggered
-> > when the notification vector is received in VMX non-root mode. It is
-> > not triggered on VM-entry.
->
-> That's my understanding as well.  Virtual interrupt delivery is evaluated
-> on VM-Enter, but not posted interrupts.
->
->   Evaluation of pending virtual interrupts is caused only by VM entry, TPR
->   virtualization, EOI virtualization, self-IPI virtualization, and posted-
->   interrupt processing.
->
-> > Looking back one block, we have:
-> >
-> > if (kvm_cpu_has_interrupt(vcpu) && !vmx_interrupt_blocked(vcpu)) {
-> >     if (block_nested_events)
-> >         return -EBUSY;
-> >     if (!nested_exit_on_intr(vcpu))
-> >         goto no_vmexit;
-> >     nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT, 0, 0);
-> >     return 0;
-> > }
-> >
-> > If nested_exit_on_intr() is true, we should first check to see if
-> > "acknowledge interrupt on exit" is set. If so, we should acknowledge
-> > the interrupt right here, with a call to kvm_cpu_get_interrupt(),
-> > rather than deep in the guts of nested_vmx_vmexit(). If the vector we
-> > get is the notification vector from VMCS12, then we should call
-> > vmx_complete_nested_posted_interrupt(). Otherwise, we should call
-> > nested_vmx_vmexit(EXIT_REASON_EXTERNAL_INTERRUPT) as we do now.
->
-> That makes sense.  And we can pass in exit_intr_info instead of computing
-> it in nested_vmx_vmexit() since this is the only path that does a nested
-> exit with EXIT_REASON_EXTERNAL_INTERRUPT.
->
-> > Furthermore, vmx_complete_nested_posted_interrupt() should write to
-> > the L1 EOI register, as indicated in step 4 of the 7-step sequence
-> > detailed in section 29.6 of the SDM, volume 3. It skips this step
-> > today.
->
-> Yar.
->
-> Thanks Jim!  I'll get a series out.
+If a guest blocks interrupts for the entirety of running in root mode
+(RFLAGS.IF=0), a pending interrupt corresponding to the posted-interrupt
+vector set in the VMCS should result in an interrupt posting to the vIRR
+at VM-entry. However, on KVM this is not the case. The pending interrupt
+is not recognized as the posted-interrupt vector and instead results in
+an external interrupt VM-exit.
 
-Hey Sean,
+Add a regression test to exercise this issue.
 
-I actually ran into this issue as well before noticing your patch. I
-have a repro kvm-unit-test that I'll send out shortly.
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ lib/x86/asm/bitops.h |  8 +++++
+ x86/vmx_tests.c      | 76 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
 
-Thanks for looking into this!
+diff --git a/lib/x86/asm/bitops.h b/lib/x86/asm/bitops.h
+index 13a25ec9853d..ce5743538f65 100644
+--- a/lib/x86/asm/bitops.h
++++ b/lib/x86/asm/bitops.h
+@@ -13,4 +13,12 @@
+ 
+ #define HAVE_BUILTIN_FLS 1
+ 
++static inline void test_and_set_bit(long nr, unsigned long *addr)
++{
++	asm volatile("lock; bts %1, %0"
++		     : "+m" (*addr)
++		     : "Ir" (nr)
++		     : "memory");
++}
++
+ #endif
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index d2084ae9e8ce..9ba9a5d452a2 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -10430,6 +10430,81 @@ static void atomic_switch_overflow_msrs_test(void)
+ 		test_skip("Test is only supported on KVM");
+ }
+ 
++#define PI_VECTOR 0xe0
++#define PI_TEST_VECTOR 0x21
++
++static void enable_posted_interrupts(void)
++{
++	void *pi_desc = alloc_page();
++
++	vmcs_set_bits(PIN_CONTROLS, PIN_POST_INTR);
++	vmcs_set_bits(EXI_CONTROLS, EXI_INTA);
++	vmcs_write(PINV, PI_VECTOR);
++	vmcs_write(POSTED_INTR_DESC_ADDR, (u64)pi_desc);
++}
++
++static unsigned long *get_pi_desc(void)
++{
++	return (unsigned long *)vmcs_read(POSTED_INTR_DESC_ADDR);
++}
++
++static void post_interrupt(u8 vector, u32 dest)
++{
++	unsigned long *pi_desc = get_pi_desc();
++
++	test_and_set_bit(vector, pi_desc);
++	test_and_set_bit(256, pi_desc);
++	apic_icr_write(PI_VECTOR, dest);
++}
++
++static struct vmx_posted_interrupt_test_args {
++	bool isr_fired;
++} vmx_posted_interrupt_test_args;
++
++static void vmx_posted_interrupt_test_isr(isr_regs_t *regs)
++{
++	volatile struct vmx_posted_interrupt_test_args *args
++			= &vmx_posted_interrupt_test_args;
++
++	args->isr_fired = true;
++	eoi();
++}
++
++static void vmx_posted_interrupt_test_guest(void)
++{
++	handle_irq(PI_TEST_VECTOR, vmx_posted_interrupt_test_isr);
++	irq_enable();
++	vmcall();
++	asm volatile("nop");
++	vmcall();
++}
++
++static void vmx_posted_interrupt_test(void)
++{
++	volatile struct vmx_posted_interrupt_test_args *args
++			= &vmx_posted_interrupt_test_args;
++
++	if (!cpu_has_apicv()) {
++		report_skip(__func__);
++		return;
++	}
++
++	enable_vid();
++	enable_posted_interrupts();
++	test_set_guest(vmx_posted_interrupt_test_guest);
++
++	enter_guest();
++	skip_exit_vmcall();
++
++	irq_disable();
++	post_interrupt(PI_TEST_VECTOR, apic_id());
++	enter_guest();
++
++	skip_exit_vmcall();
++	TEST_ASSERT(args->isr_fired);
++	enter_guest();
++}
++
+ #define TEST(name) { #name, .v2 = name }
+ 
+ /* name/init/guest_main/exit_handler/syscall_handler/guest_regs */
+@@ -10533,5 +10608,6 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(rdtsc_vmexit_diff_test),
+ 	TEST(vmx_mtf_test),
+ 	TEST(vmx_mtf_pdpte_test),
++	TEST(vmx_posted_interrupt_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, {0} },
+ };
+-- 
+2.28.0.806.g8561365e88-goog
 
---
-Oliver
