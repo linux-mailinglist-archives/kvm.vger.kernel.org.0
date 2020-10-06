@@ -2,130 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 014602850E6
-	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 19:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F6B12850F2
+	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 19:38:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726610AbgJFRgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Oct 2020 13:36:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36300 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726604AbgJFRgW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Oct 2020 13:36:22 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5809C0613D1
-        for <kvm@vger.kernel.org>; Tue,  6 Oct 2020 10:36:21 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id u126so13403663oif.13
-        for <kvm@vger.kernel.org>; Tue, 06 Oct 2020 10:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mazb5p/CVINtUGXj46lnFOxfjQtw41l3/+VIi18FkLw=;
-        b=E/PxT/QY9txUSAaodb4r9PU1yFxoQB8DUFXg7mPwcRbdpYpMNWJsJemOTSHPhrdR9w
-         pVN7xGtz5uShbPDtIqGfccYEXA71CJ3ijXoKu70FQjCdt3xsNz6aHH+YaroUlrbxfkZE
-         oFo0YTjKAtwO/Ig5OS/QEW9iPlOvE9p29P7/Kd9Py5KbvnFKusWfav03RsDOHuCubYpg
-         1JVymeyRhermYVz3C0u5VZa0PuDL7W0IfW+4TkmQi7JSSmctqWlrcr2oIY8q1lhy5FIN
-         27dm9BoU9WVGMHYe5dSNc93XDVB4x1FWYsPpA+sEbMhoVsNiSWVQWLCFsGjD7/Kd9mMP
-         7DWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mazb5p/CVINtUGXj46lnFOxfjQtw41l3/+VIi18FkLw=;
-        b=OTi9O7VAxVXHlCDfT6Has48Tdfbde98ffBd6H5szd1tIXAz2cLNlDn1cfK+1IXLz0i
-         XOtivVxpMz3NVUxvVbJCx0+6veIvOK2X1z+VX8pzJiE5cnmnqu9+JHFarmuZ/hAX6Yyi
-         mJjUOoxEamqYmYbCX1W7XJp1/mCfIng0dljTrO+AdT4p+nKwdDuDRr9E6Q6irDuXGTjc
-         LNwH8VOyXwyOuy/w1c+bs1xswaROT1k96ClXYSEx/vK1hZot4H+xvtSgNHvVVS4azWVQ
-         ISiOVeiz4eWUKkRpGEMAiv1HnA+DY/iNNe4yghdTFGQSCd+uXAFLLMecQRZyjnM5WLXb
-         qjqA==
-X-Gm-Message-State: AOAM53233W51atL6gHw/4QluKMazAFf9O2cE687M2ZtSk0pvw6FpMhbb
-        6p4lt7G6/je2kqWqAQs6guLO6gsN/NqLSJ/1iEb/JA==
-X-Google-Smtp-Source: ABdhPJyKZ1uYnyMjkzt69ciMheqHv/JFAvfxq8TFacleYotNjpffENQEBZV1uIVcpJwo1DjZrIhsZwzpNhn96/r0e8I=
-X-Received: by 2002:aca:5b05:: with SMTP id p5mr3259808oib.6.1602005780792;
- Tue, 06 Oct 2020 10:36:20 -0700 (PDT)
+        id S1726561AbgJFRin (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Oct 2020 13:38:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10970 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726137AbgJFRij (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Oct 2020 13:38:39 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 096HWTnA102630;
+        Tue, 6 Oct 2020 13:38:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=yetm3O9T97JOXDDqZxQ5H5pUsa4oUP9tp3Y6sM5yu1Q=;
+ b=V3JdMzjC2w4t6EZo2zWnvhPebekmW1DovAp0bXSZJFH1GxTWi2nBrUKnTIaHNu5byHFX
+ FAkTMArO5U4nrHdxtxuLlGlh1cJ1Li3d76atWTa/1WEy762fAy3vLSB036ApOTi4hK52
+ aFg2BdzHE7R57AKJRFBim+YlZaOsAB49OGyObWUSaF4dPs2QuyADlyKP0oHr3/8mymwM
+ etEh1r4XczQ9PO/JT0DxS2nPuM1x7Lbdlc5UqlOm2PvOenQtZwN/X0RVnfPEI1TDBefM
+ VFTGvO8Yd00XgygBmj9Gv4uN3tG7EcFyxD2nV42Jf2MQaUD4K8Dz9q6W0ml9EUUFIhzm UA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 340uwfacn6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Oct 2020 13:38:33 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 096HZWTc127389;
+        Tue, 6 Oct 2020 13:38:32 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 340uwfacmh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Oct 2020 13:38:32 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 096HbXbS004717;
+        Tue, 6 Oct 2020 17:38:31 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma02dal.us.ibm.com with ESMTP id 33xgx9fegc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Oct 2020 17:38:31 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 096HcU9T41812412
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Oct 2020 17:38:30 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D9B34112069;
+        Tue,  6 Oct 2020 17:38:30 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 93C64112062;
+        Tue,  6 Oct 2020 17:38:28 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  6 Oct 2020 17:38:28 +0000 (GMT)
+Subject: Re: [PATCH v2 1/9] s390x/pci: Move header files to include/hw/s390x
+To:     Richard Henderson <rth@twiddle.net>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
+        david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+        mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com,
+        qemu-s390x@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
+ <1601669191-6731-2-git-send-email-mjrosato@linux.ibm.com>
+ <20201006173259.1ec36597.cohuck@redhat.com>
+ <e9f6c3e1-9341-b0d0-9fb2-b34ebd19bcba@linux.ibm.com>
+ <1c118c1d-8c9b-9b7b-d1ec-2080aaa1c1a3@twiddle.net>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <b715826d-dcfb-8ed3-7050-d09904d6ed40@linux.ibm.com>
+Date:   Tue, 6 Oct 2020 13:38:27 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-References: <20200812175129.12172-1-sean.j.christopherson@intel.com>
-In-Reply-To: <20200812175129.12172-1-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 6 Oct 2020 10:36:09 -0700
-Message-ID: <CALMp9eTc9opgQ4pU92wmKSM6gUv6AEKZRqSnv_Q+rzixOLOZiw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Morph notification vector IRQ on nested
- VM-Enter to pending PI
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1c118c1d-8c9b-9b7b-d1ec-2080aaa1c1a3@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-06_09:2020-10-06,2020-10-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
+ mlxscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010060108
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 12, 2020 at 10:51 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On successful nested VM-Enter, check for pending interrupts and convert
-> the highest priority interrupt to a pending posted interrupt if it
-> matches L2's notification vector.  If the vCPU receives a notification
-> interrupt before nested VM-Enter (assuming L1 disables IRQs before doing
-> VM-Enter), the pending interrupt (for L1) should be recognized and
-> processed as a posted interrupt when interrupts become unblocked after
-> VM-Enter to L2.
->
-> This fixes a bug where L1/L2 will get stuck in an infinite loop if L1 is
-> trying to inject an interrupt into L2 by setting the appropriate bit in
-> L2's PIR and sending a self-IPI prior to VM-Enter (as opposed to KVM's
-> method of manually moving the vector from PIR->vIRR/RVI).  KVM will
-> observe the IPI while the vCPU is in L1 context and so won't immediately
-> morph it to a posted interrupt for L2.  The pending interrupt will be
-> seen by vmx_check_nested_events(), cause KVM to force an immediate exit
-> after nested VM-Enter, and eventually be reflected to L1 as a VM-Exit.
-> After handling the VM-Exit, L1 will see that L2 has a pending interrupt
-> in PIR, send another IPI, and repeat until L2 is killed.
->
-> Note, posted interrupts require virtual interrupt deliveriy, and virtual
-> interrupt delivery requires exit-on-interrupt, ergo interrupts will be
-> unconditionally unmasked on VM-Enter if posted interrupts are enabled.
->
-> Fixes: 705699a13994 ("KVM: nVMX: Enable nested posted interrupt processing")
-> Cc: stable@vger.kernel.org
-> Cc: Liran Alon <liran.alon@oracle.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
-I don't think this is the best fix.
+On 10/6/20 1:33 PM, Richard Henderson wrote:
+> On 10/6/20 11:43 AM, Matthew Rosato wrote:
+>>> Looks good, but...
+>>>
+>>> <meta>Is there any way to coax out a more reviewable version of this
+>>> via git mv?</meta>
+>>>
+>>
+>> I tried git mv, but a diff between the old patch and the new patch looks the
+>> same (other than the fact that I squashed the MAINTAINERS hit in)
+> 
+> git format-patch --find-renames[=<pct>]
+> 
+> Though I'm surprised it's not doing that by default.
+> 
+> r~
+> 
 
-I believe the real problem is the way that external and posted
-interrupts are handled in vmx_check_nested_events().
+Huh, neat.  That looks alot better, gives something that looks like:
 
-First of all, I believe that the existing call to
-vmx_complete_nested_posted_interrupt() at the end of
-vmx_check_nested_events() is far too aggressive. Unless I am missing
-something in the SDM, posted interrupt processing is *only* triggered
-when the notification vector is received in VMX non-root mode. It is
-not triggered on VM-entry.
+diff --git a/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
+similarity index 100%
+rename from hw/s390x/s390-pci-bus.h
+rename to include/hw/s390x/s390-pci-bus.h
+diff --git a/hw/s390x/s390-pci-inst.h b/include/hw/s390x/s390-pci-inst.h
+similarity index 100%
+rename from hw/s390x/s390-pci-inst.h
+rename to include/hw/s390x/s390-pci-inst.h
 
-Looking back one block, we have:
+Thanks!
 
-if (kvm_cpu_has_interrupt(vcpu) && !vmx_interrupt_blocked(vcpu)) {
-    if (block_nested_events)
-        return -EBUSY;
-    if (!nested_exit_on_intr(vcpu))
-        goto no_vmexit;
-    nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT, 0, 0);
-    return 0;
-}
-
-If nested_exit_on_intr() is true, we should first check to see if
-"acknowledge interrupt on exit" is set. If so, we should acknowledge
-the interrupt right here, with a call to kvm_cpu_get_interrupt(),
-rather than deep in the guts of nested_vmx_vmexit(). If the vector we
-get is the notification vector from VMCS12, then we should call
-vmx_complete_nested_posted_interrupt(). Otherwise, we should call
-nested_vmx_vmexit(EXIT_REASON_EXTERNAL_INTERRUPT) as we do now.
-
-Furthermore, vmx_complete_nested_posted_interrupt() should write to
-the L1 EOI register, as indicated in step 4 of the 7-step sequence
-detailed in section 29.6 of the SDM, volume 3. It skips this step
-today.
