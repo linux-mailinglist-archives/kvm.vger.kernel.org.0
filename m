@@ -2,117 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A80C2285019
-	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 18:43:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F110C28508F
+	for <lists+kvm@lfdr.de>; Tue,  6 Oct 2020 19:17:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726128AbgJFQnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Oct 2020 12:43:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43574 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725902AbgJFQnv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Oct 2020 12:43:51 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 096GY1Hx130363;
-        Tue, 6 Oct 2020 12:43:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=6fBu163/RX6BbYHQSuxFl5MRtXVdZH8OGOOYZn+xBB8=;
- b=c/bH43McqehtycNkOvLnT/7qk2TslqufeS873QwMJDMVath1w5NIYZ2VW7lR8QEsurYo
- lPTVfQue0X2rY4+P7vp9JOYcPWuaYo4Q9LWR3XWnxG/TeRcpHE0K9VHmu+a5pLhpIht0
- AjlXZqhc+mM8zWDCxua/ZliM2MFG+QySaQzdwgsox/w1/8akb3f/cdWiifStgq4zReZd
- FGlHoehjo8JRhLZbpAuBGAEpcQr2Qsrs4ZsELKHG7xmGYvQ2lfUjbgxPMpi+3rJ5PLU1
- XuSE9cxAuabpEMyaIPUZCio1H4IorLcVv2MvdA935jytJIW4cD0RrzsMlGjcstHJcuTc 7A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 340v5v0a98-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Oct 2020 12:43:44 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 096GY5tS130837;
-        Tue, 6 Oct 2020 12:43:44 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 340v5v0a8y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Oct 2020 12:43:44 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 096GfRZM027954;
-        Tue, 6 Oct 2020 16:43:43 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma03dal.us.ibm.com with ESMTP id 33xgx9f31f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Oct 2020 16:43:43 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 096Ghgdo52560238
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Oct 2020 16:43:42 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8B1B4112062;
-        Tue,  6 Oct 2020 16:43:42 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2919D112061;
-        Tue,  6 Oct 2020 16:43:40 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Oct 2020 16:43:39 +0000 (GMT)
-Subject: Re: [PATCH v2 1/9] s390x/pci: Move header files to include/hw/s390x
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
-        rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <1601669191-6731-1-git-send-email-mjrosato@linux.ibm.com>
- <1601669191-6731-2-git-send-email-mjrosato@linux.ibm.com>
- <20201006173259.1ec36597.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <e9f6c3e1-9341-b0d0-9fb2-b34ebd19bcba@linux.ibm.com>
-Date:   Tue, 6 Oct 2020 12:43:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1726002AbgJFRRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Oct 2020 13:17:20 -0400
+Received: from mga05.intel.com ([192.55.52.43]:56410 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725902AbgJFRRU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Oct 2020 13:17:20 -0400
+IronPort-SDR: JwG/zZYucnqANSln8iCWHIPUu0Z4iFgm5tk8lU+/fe11ZBlSLE53YYug8IJN+2S5+qW7jqkvkb
+ wNauNVNFS2GQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9765"; a="249300989"
+X-IronPort-AV: E=Sophos;i="5.77,343,1596524400"; 
+   d="scan'208";a="249300989"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2020 10:17:06 -0700
+IronPort-SDR: m+Tc5wq9sWO0NnqVdPajk56RgYJuwBhCaLiCcwUTC2KqKoUADxb93Jjs7styw57WgIjZitEn4p
+ XZCRfVeRmV8w==
+X-IronPort-AV: E=Sophos;i="5.77,343,1596524400"; 
+   d="scan'208";a="527456307"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2020 10:17:06 -0700
+Date:   Tue, 6 Oct 2020 10:17:04 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Vivek Goyal <vgoyal@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtio-fs-list <virtio-fs@redhat.com>, pbonzini@redhat.com
+Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
+Message-ID: <20201006171704.GC17610@linux.intel.com>
+References: <20201005153318.GA4302@redhat.com>
+ <20201005161620.GC11938@linux.intel.com>
+ <20201006134629.GB5306@redhat.com>
+ <877ds38n6r.fsf@vitty.brq.redhat.com>
+ <20201006141501.GC5306@redhat.com>
+ <874kn78l2z.fsf@vitty.brq.redhat.com>
+ <20201006150817.GD5306@redhat.com>
+ <871rib8ji1.fsf@vitty.brq.redhat.com>
+ <20201006161200.GB17610@linux.intel.com>
+ <87y2kj71gj.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201006173259.1ec36597.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-06_09:2020-10-06,2020-10-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- adultscore=0 lowpriorityscore=0 mlxlogscore=999 impostorscore=0
- suspectscore=0 bulkscore=0 spamscore=0 mlxscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2010060102
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87y2kj71gj.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/6/20 11:32 AM, Cornelia Huck wrote:
-> On Fri,  2 Oct 2020 16:06:23 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On Tue, Oct 06, 2020 at 06:39:56PM +0200, Vitaly Kuznetsov wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
 > 
->> Seems a more appropriate location for them.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   hw/s390x/s390-pci-bus.c          |   4 +-
->>   hw/s390x/s390-pci-bus.h          | 372 ---------------------------------------
->>   hw/s390x/s390-pci-inst.c         |   4 +-
->>   hw/s390x/s390-pci-inst.h         | 312 --------------------------------
->>   hw/s390x/s390-virtio-ccw.c       |   2 +-
->>   include/hw/s390x/s390-pci-bus.h  | 372 +++++++++++++++++++++++++++++++++++++++
->>   include/hw/s390x/s390-pci-inst.h | 312 ++++++++++++++++++++++++++++++++
->>   7 files changed, 689 insertions(+), 689 deletions(-)
->>   delete mode 100644 hw/s390x/s390-pci-bus.h
->>   delete mode 100644 hw/s390x/s390-pci-inst.h
->>   create mode 100644 include/hw/s390x/s390-pci-bus.h
->>   create mode 100644 include/hw/s390x/s390-pci-inst.h
+> > On Tue, Oct 06, 2020 at 05:24:54PM +0200, Vitaly Kuznetsov wrote:
+> >> Vivek Goyal <vgoyal@redhat.com> writes:
+> >> > So you will have to report token (along with -EFAULT) to user space. So this
+> >> > is basically the 3rd proposal which is extension of kvm API and will
+> >> > report say HVA/GFN also to user space along with -EFAULT.
+> >> 
+> >> Right, I meant to say that guest kernel has full register state of the
+> >> userspace process which caused APF to get queued and instead of trying
+> >> to extract it in KVM and pass to userspace in case of a (later) failure
+> >> we limit KVM api change to contain token or GFN only and somehow keep
+> >> the rest in the guest. This should help with TDX/SEV-ES.
+> >
+> > Whatever gets reported to userspace should be identical with and without
+> > async page faults, i.e. it definitely shouldn't have token information.
+> >
 > 
-> Looks good, but...
+> Oh, right, when the error gets reported synchronously guest's kernel is
+> not yet aware of the issue so it won't be possible to find anything in
+> its kdump if userspace decides to crash it immediately. The register
+> state (if available) will be actual though.
 > 
-> <meta>Is there any way to coax out a more reviewable version of this
-> via git mv?</meta>
+> > Note, TDX doesn't allow injection exceptions, so reflecting a #PF back
+> > into the guest is not an option.  
 > 
+> Not even #MC? So sad :-)
 
-I tried git mv, but a diff between the old patch and the new patch looks 
-the same (other than the fact that I squashed the MAINTAINERS hit in)
+Heh, #MC isn't allowed either, yet...
 
+> > Nor do I think that's "correct" behavior (see everyone's objections to
+> > using #PF for APF fixed).  I.e. the event should probably be an IRQ.
+> 
+> I recall Paolo objected against making APF 'page not present' into in
+> interrupt as it will require some very special handling to make sure it
+> gets injected (and handled) immediately but I'm not really sure how big
+> the hack is going to be, maybe in the light of TDX/SEV-ES it's worth a
+> try.
+
+This shouldn't have anything to do with APF.  Again, the event injection is
+needed even in the synchronous case as the file truncation in the host can
+affect existing mappings in the guest.
+
+I don't know that the mechanism needs to be virtiofs specific or if there can
+be a more generic "these PFNs have disappeared", but it's most definitely
+orthogonal to APF.
