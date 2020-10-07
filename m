@@ -2,48 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E38A285945
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 09:19:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6545D28594B
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 09:22:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727646AbgJGHTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 03:19:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49894 "EHLO
+        id S1727671AbgJGHWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 03:22:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726041AbgJGHTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 03:19:50 -0400
+        with ESMTP id S1726041AbgJGHWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 03:22:13 -0400
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FD78C061755;
-        Wed,  7 Oct 2020 00:19:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F38C061755;
+        Wed,  7 Oct 2020 00:22:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YdGdKgih2+qKjoFh3CKPOS58AYpOTWzANV+vTx0lHl8=; b=M/YrKSaFtZsJplTBYt4Jhu9rMR
-        sf8rAW6eT2qHAVqAdgF2+7W9G8ho3rFwbyLecv/BHEcb/VRKpTLOhDAyWR8SreqpjiRmHXQgr87Ba
-        3WGa8rAlKa2mBnKO+gUYWISdn7IEGuRnNWO0oPuUaR97XXVw0J1o5OPa38RX8PjkveffK59WTKAp6
-        GGrMV+WnHFwfFpAguQsGPalCku/jYXXCwTBkdX4QNWoM9Hu6PipIcY3XN272fSBO6C5zp+hhO2VNS
-        KS/Izsv+zX9DO8hOHph6mgZJ+oKP4fr7D5ZxDGBqdrHxZ23E91OCmCsyw6ape3U0IrTWL4xQVHUhQ
-        I2Odv/ZA==;
-Received: from dyn-229.woodhou.se ([90.155.92.229] helo=u3832b3a9db3152.infradead.org)
+        bh=S9jCLowV89NVKZECycX9j1APfco3OP0R5c0bpu/+tdw=; b=FBwDcZ54+M5RpkohwVNDVWYCsQ
+        X6ybcPgQuCfyWuiYzYfgpuN974LhQa3c7bzRFq2QmB8khLwVYgO4xZIO6P5O/bpgoAd9614SbWb38
+        g81xz508rYU2EFIzGnWBEy8ypc7YxK5RdtM7VkbhTq0V65GjSOKJ5L2+1/o0LHrYANEP+LkUXWcZe
+        NrIVqcTazgsjmSydDvctREayr+AhuHd0BzNwy4EFiGjaMLkF3ZgxhbJSjDi51vsvPJC+BHV0rf+uG
+        5WCUhF58CfKhiGapQEe+woB992VjI6xjDeQSAS95VcBWx73qS30T6ZodF8Fdvf5QKu64ZN5G2Op+r
+        lZSRCTuA==;
+Received: from dyn-229.woodhou.se ([90.155.92.229])
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kQ3jl-0002y8-9V; Wed, 07 Oct 2020 07:19:45 +0000
-Message-ID: <75d79c50d586c18f0b1509423ed673670fc76431.camel@infradead.org>
-Subject: Re: [PATCH 07/13] irqdomain: Add max_affinity argument to
- irq_domain_alloc_descs()
+        id 1kQ3m5-00037g-Uy; Wed, 07 Oct 2020 07:22:10 +0000
+Message-ID: <e9ca765e104eb6536382941e1830b75a472ad4bf.camel@infradead.org>
+Subject: Re: [PATCH 08/13] genirq: Add irq_domain_set_affinity()
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
 Cc:     iommu <iommu@lists.linux-foundation.org>,
         kvm <kvm@vger.kernel.org>, linux-hyperv@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 07 Oct 2020 08:19:42 +0100
-In-Reply-To: <87lfgj59mp.fsf@nanos.tec.linutronix.de>
+Date:   Wed, 07 Oct 2020 08:22:08 +0100
+In-Reply-To: <87imbn59d6.fsf@nanos.tec.linutronix.de>
 References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org>
          <20201005152856.974112-1-dwmw2@infradead.org>
-         <20201005152856.974112-7-dwmw2@infradead.org>
-         <87lfgj59mp.fsf@nanos.tec.linutronix.de>
+         <20201005152856.974112-8-dwmw2@infradead.org>
+         <87imbn59d6.fsf@nanos.tec.linutronix.de>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-fDgAMJE7KcsqM9RJqBeR"
+        boundary="=-uz+n5DkHtlQQrpuUVWOW"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -52,99 +51,30 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-fDgAMJE7KcsqM9RJqBeR
+--=-uz+n5DkHtlQQrpuUVWOW
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2020-10-06 at 23:26 +0200, Thomas Gleixner wrote:
-> On Mon, Oct 05 2020 at 16:28, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > This is the maximum possible set of CPUs which can be used. Use it
-> > to calculate the default affinity requested from __irq_alloc_descs()
-> > by first attempting to find the intersection with irq_default_affinity,
-> > or falling back to using just the max_affinity if the intersection
-> > would be empty.
+On Tue, 2020-10-06 at 23:32 +0200, Thomas Gleixner wrote:
+> What the heck? Why does this need a setter function which is exported?
+> So that random driver writers can fiddle with it?
 >=20
-> And why do we need that as yet another argument?
->=20
-> This is an optional property of the irq domain, really and no caller has
-> any business with that.=20
+> The affinity mask restriction of an irq domain is already known when the
+> domain is created.
 
-Because irq_domain_alloc_descs() doesn't actually *take* the domain as
-an argument. It's more of an internal function, which is only non-
-static because it's used from kernel/irq/ipi.c too for some reason. If
-we convert the IPI code to just call __irq_alloc_descs() directly,
-perhaps that we can actually make irq_domain_alloc_decs() static.
+It's exported because __irq_domain_add is exported. I didn't want to
+just add a rarely-used extra argument to __irq_domain_add and the other
+public APIs which call into it, and figured a separate setter function
+was the simplest option.
 
-> >  int irq_domain_alloc_descs(int virq, unsigned int cnt, irq_hw_number_t=
- hwirq,
-> > -			   int node, const struct irq_affinity_desc *affinity)
-> > +			   int node, const struct irq_affinity_desc *affinity,
-> > +			   const struct cpumask *max_affinity)
-> >  {
-> > +	cpumask_var_t default_affinity;
-> >  	unsigned int hint;
-> > +	int i;
-> > +
-> > +	/* Check requested per-IRQ affinities are in the possible range */
-> > +	if (affinity && max_affinity) {
-> > +		for (i =3D 0; i < cnt; i++)
-> > +			if (!cpumask_subset(&affinity[i].mask, max_affinity))
-> > +				return -EINVAL;
->=20
-> https://lore.kernel.org/r/alpine.DEB.2.20.1701171956290.3645@nanos
->=20
-> What is preventing the affinity spreading code from spreading the masks
-> out to unusable CPUs? The changelog is silent about that part.
+I can rework to add the argument to __irq_domain_add if you prefer.
 
-I'm coming to the conclusion that we should allow unusable CPUs to be
-specified at this point, just as we do offline CPUs. That's largely
-driven by the realisation that our x86_non_ir_cpumask is only going to
-contain online CPUs anyway, and hotplugged CPUs only get added to it as
-they are brought online.
-
-> > +	/*
-> > +	 * Generate default affinity. Either the possible subset of
-> > +	 * irq_default_affinity if such a subset is non-empty, or fall
-> > +	 * back to the provided max_affinity if there is no intersection.
->=20
-> ..
-> > +	 * And just a copy of irq_default_affinity in the
-> > +	 * !CONFIG_CPUMASK_OFFSTACK case.
->=20
-> We know that already...
->=20
-> > +	 */
-> > +	memset(&default_affinity, 0, sizeof(default_affinity));
->=20
-> Right, memset() before allocating is useful.
-
-The memset is because there's no cpumask_var_t initialiser that I can
-see. So cpumask_available() on the uninitialised 'default_affinity'
-variable might be true even in the OFFSTACK case.
-
-> > +	if ((max_affinity &&
-> > +	     !cpumask_subset(irq_default_affinity, max_affinity))) {
-> > +		if (!alloc_cpumask_var(&default_affinity, GFP_KERNEL))
-> > +			return -ENOMEM;
-> > +		cpumask_and(default_affinity, max_affinity,
-> > +			    irq_default_affinity);
-> > +		if (cpumask_empty(default_affinity))
-> > +			cpumask_copy(default_affinity, max_affinity);
-> > +	} else if (cpumask_available(default_affinity))
-> > +		cpumask_copy(default_affinity, irq_default_affinity);
->=20
-> That's garbage and unreadable.
-
-That's why there was a comment explaining it... at which point you
-claimed to already know :)
-
-Clearly the comment didn't do the job it was supposed to do. I'll
-rework.
+Or we can declare that restricted affinity *isn't* something that IRQ
+domains provided by modules can have, and just not export the setter
+function?
 
 
---=-fDgAMJE7KcsqM9RJqBeR
+--=-uz+n5DkHtlQQrpuUVWOW
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -227,20 +157,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDA3MDcxOTQyWjAvBgkqhkiG9w0BCQQxIgQgaAVErEvd0t1ln8k/iiswoCcNAcXesFHLx3pq43tu
-Mf8wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MDA3MDcyMjA4WjAvBgkqhkiG9w0BCQQxIgQgjprsgUoDUvmwZl15EEkDm7fxwjpgEpcr8hYObxqi
+hawwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAAmnmXyvTKZRpJT0dgGhwnmOeyDsnXMpSp6n9jAA5BbpWWVn/jDvf+YEWI9zhwVa
-vF5ormV+aCJV/ufK98OnKMXCT4n9IRT4LaJB0GkUeQnheQ0l+nDY0XhvuFEjWL2k0NiNUAm0PHji
-GXMfcBBmNe7Z4+tfh8K75C6lfex9We6ydDJt5KDerkS1P/a9hHiaSyY1rd8aEtQszeNaS9BSo+dl
-VNVlE/3ttFBwV8YEzccpxwFZCT1/G4TcHRTempUT6jTl35NBzYP3xPD5RCARdCV24rh/2sL5KqLD
-XLdoCftuBFYcEGv9NQiFHw7mVU+a+QyVAMsVyi9ZvWrWwjY1DBoAAAAAAAA=
+DQEBAQUABIIBACBUeHn8bjM3uhp4XfKq0L7fHih4GiuroMck23EHHvesE0EPSahptgdxTZuHCeXe
+wshfEPxlk+qkU6QQO/4lYboKBj2NRRhw18pB+9tHVDS2e2JNUeM2HJlixOspBCGjfSfEbZ66X1OY
+l6H3x0bckdWT5Vtn3U9iKm6js7lKMXjDLBBc0x7n4ufwk54GqL0n4EakA41eRThEUmmM9u0vG5Ps
+Kmuk47i8Qo3KqkUAaoZ05NyAPLN9tl+JJ3ozZExr5nGsaoI4IRMgqsBxhlwdT+x6suIwO1by4jIY
+Zr6rKpS6161iWlYgAK+MwfzROQJMKprngCLeGfT9bx+2Ic+l0tkAAAAAAAA=
 
 
---=-fDgAMJE7KcsqM9RJqBeR--
+--=-uz+n5DkHtlQQrpuUVWOW--
 
