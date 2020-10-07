@@ -2,54 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14C87286A17
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 23:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF38D286A38
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 23:33:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727948AbgJGVaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 17:30:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
+        id S1728792AbgJGVcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 17:32:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726013AbgJGVaN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 17:30:13 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21666C061755
-        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 14:30:13 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id 60so3667491otw.3
-        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 14:30:13 -0700 (PDT)
+        with ESMTP id S1728783AbgJGVce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 17:32:34 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C71EC0613D9
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 14:32:16 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id f10so3655043otb.6
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 14:32:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ffwll.ch; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=nNtozmj/MGUZLHZxI3A6qXOhVAeMPho+2jjUlqwzPiY=;
-        b=BaAFboFhzjSDkIsRiKkVY5HnY80F0qFikzkwGLzbiZiDPe/NeBFe6zpt+tRZBXwSlf
-         cldboSnNlcSz1Qnd+/D1yNqcLjwz5qLQP01nnTJ9te1SLWuuX0nGjEu12aT61tF+abrF
-         VMjcmWsESAMRsIG40QQOk22zLTky3pJD0lB9E=
+        bh=01I5VHKcQ0Dg84F8780Uou6AbP019yNjabrXwkN3FWI=;
+        b=EsRG22Aeif0x7Fbzs6uS7UAW1oFsXuKdkNN+DciLkMByiGR6/7rpuHQHKW6/AYGkAn
+         zrXGNaV+G01Fb5dYxCysglSq8utf14bdInT6jX9GxymWnqFGPIlDsp8egMegVyGA9tVd
+         bezdfQ1dOo3mL3oMRvpHXhZ6JlfgpDfbq6e/M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=nNtozmj/MGUZLHZxI3A6qXOhVAeMPho+2jjUlqwzPiY=;
-        b=DD4+o+r33s3hi9K+oxylOILZ/+ItzY4eJt8iwI8pZzUTJwL5Gkvkwvf+CezQSqExCu
-         a6NhyP73Ch7kx17FjOfE4Lde/HwdXBfJ2JUDq5uh/FCtd4dJNaf1bzc8E5RuUK00YYhO
-         Bw523rf6GbJEUTPIKWR655WbJTyFGta3mksDRUvzBa4frBGN1ZEf9w4U9NOgZAwV2OQ9
-         BuJtlu6HD95jr1b/E74EHC/Ej/TKbW3Dh31EwK0BQHOdKWqt2nOQAQ8hROJmKxb2ZpWK
-         RzzThORusYBrJgJPes6qhosOAYUayJjbdxFTPmKL44HcntLrphn0A351NfMUct6bQcsJ
-         IPAA==
-X-Gm-Message-State: AOAM532IPR+EnmYrJRy+44+Dms9Zytgn1Mo4dHbkyrT/6EOLWYITMaf3
-        RIb8Zjp/Q0crijoXlAz6dnrLcAlCXa+hoHRLuWh17w==
-X-Google-Smtp-Source: ABdhPJzDIRAj53qXn+wCstFj7fFAXvpqHS6peJb8d7VCpx3oiEDiFkz29m0ZVMR9QW+s4BR0BiMsr7SeQunifX3iVl4=
-X-Received: by 2002:a05:6830:1e56:: with SMTP id e22mr2939594otj.303.1602106212518;
- Wed, 07 Oct 2020 14:30:12 -0700 (PDT)
+        bh=01I5VHKcQ0Dg84F8780Uou6AbP019yNjabrXwkN3FWI=;
+        b=bnkZYtchOlhuibmpepsix/+VFgH8dHhMoyO60CPtqNRJWj+QKd/ZxL+BrlMkkjsDB9
+         zudzy47D22OHuKiKdBFXGU0QrPwemZEwfQ1gpc1pJq+YlugkMgDeE2eHYo4AGGhmP8xH
+         /gPZlfT9NBQ0y+DyTpdUFPImhkoUqY8zmr7s+pFreZ2IycZp1YnVECq1OVeZLHm+O/56
+         hMMhrtH2xWeFViVDKKNKHHa2vKx4fh8cuW++YXieXnHoegv9WnNBUCa3hk16xO6h8mxr
+         hUNNsa/Mwqivw0PwfnvyN7QWTMXXTgZV+5Zt8eqzOmEahTnK4qh8RbMFT7VU0jfS+TYE
+         Rf7A==
+X-Gm-Message-State: AOAM531+SfykFbx47ArsCbDeqiA47rTuTeRJgWh6tCYxCKt/TePZoLcX
+        JtDqoYCV2FnUeP3szk1kh1zZ/mqSScqWRZOkOxQ8SQ==
+X-Google-Smtp-Source: ABdhPJzxWMICpxSHWZnAhfWjQXFxsNyJBAQQUSj60l2wem5bqozDzlbaSID7bj3+IM7C+O1TUPt7xYaFL4y/8poAm3Q=
+X-Received: by 2002:a05:6830:1e56:: with SMTP id e22mr2944031otj.303.1602106335551;
+ Wed, 07 Oct 2020 14:32:15 -0700 (PDT)
 MIME-Version: 1.0
 References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-6-daniel.vetter@ffwll.ch> <fc0ac3fb-2758-bef1-76b4-8ac2449f5743@nvidia.com>
-In-Reply-To: <fc0ac3fb-2758-bef1-76b4-8ac2449f5743@nvidia.com>
+ <20201007164426.1812530-2-daniel.vetter@ffwll.ch> <80718789-b3de-c30a-03c5-7c8cbf41f7d9@nvidia.com>
+In-Reply-To: <80718789-b3de-c30a-03c5-7c8cbf41f7d9@nvidia.com>
 From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Wed, 7 Oct 2020 23:30:01 +0200
-Message-ID: <CAKMK7uF7QBksDRsWhpuv-QhM3CN3+Gzg0-o-O-3rCsMWtr48xQ@mail.gmail.com>
-Subject: Re: [PATCH 05/13] mm/frame-vector: Use FOLL_LONGTERM
-To:     John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 7 Oct 2020 23:32:04 +0200
+Message-ID: <CAKMK7uEuwmCkpSeKxjDgHXWrE9P-TbawLoQ4dpu0nc4MYykScA@mail.gmail.com>
+Subject: Re: [PATCH 01/13] drm/exynos: Stop using frame_vector helpers
+To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
         LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
         Linux MM <linux-mm@kvack.org>,
@@ -59,38 +58,36 @@ Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
         <linux-media@vger.kernel.org>, linux-s390@vger.kernel.org,
         Daniel Vetter <daniel.vetter@intel.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
-        Pawel Osciak <pawel@osciak.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Inki Dae <inki.dae@samsung.com>,
+        Joonyoung Shim <jy0922.shim@samsung.com>,
+        Seung-Woo Kim <sw0312.kim@samsung.com>,
         Kyungmin Park <kyungmin.park@samsung.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 7, 2020 at 11:13 PM John Hubbard <jhubbard@nvidia.com> wrote:
+On Wed, Oct 7, 2020 at 10:33 PM John Hubbard <jhubbard@nvidia.com> wrote:
 >
 > On 10/7/20 9:44 AM, Daniel Vetter wrote:
-> > This is used by media/videbuf2 for persistent dma mappings, not just
-> > for a single dma operation and then freed again, so needs
-> > FOLL_LONGTERM.
-> >
-> > Unfortunately current pup_locked doesn't support FOLL_LONGTERM due to
-> > locking issues. Rework the code to pull the pup path out from the
-> > mmap_sem critical section as suggested by Jason.
+> > All we need are a pages array, pin_user_pages_fast can give us that
+> > directly. Plus this avoids the entire raw pfn side of get_vaddr_frames.
 > >
 > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
 > > Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> > Cc: Pawel Osciak <pawel@osciak.com>
-> > Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+> > Cc: Inki Dae <inki.dae@samsung.com>
+> > Cc: Joonyoung Shim <jy0922.shim@samsung.com>
+> > Cc: Seung-Woo Kim <sw0312.kim@samsung.com>
 > > Cc: Kyungmin Park <kyungmin.park@samsung.com>
-> > Cc: Tomasz Figa <tfiga@chromium.org>
-> > Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> > Cc: Kukjin Kim <kgene@kernel.org>
+> > Cc: Krzysztof Kozlowski <krzk@kernel.org>
 > > Cc: Andrew Morton <akpm@linux-foundation.org>
 > > Cc: John Hubbard <jhubbard@nvidia.com>
 > > Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
@@ -101,109 +98,165 @@ On Wed, Oct 7, 2020 at 11:13 PM John Hubbard <jhubbard@nvidia.com> wrote:
 > > Cc: linux-samsung-soc@vger.kernel.org
 > > Cc: linux-media@vger.kernel.org
 > > ---
-> >   mm/frame_vector.c | 36 +++++++++++-------------------------
-> >   1 file changed, 11 insertions(+), 25 deletions(-)
+> >   drivers/gpu/drm/exynos/Kconfig          |  1 -
+> >   drivers/gpu/drm/exynos/exynos_drm_g2d.c | 48 ++++++++++++------------=
+-
+> >   2 files changed, 22 insertions(+), 27 deletions(-)
 > >
-> > diff --git a/mm/frame_vector.c b/mm/frame_vector.c
-> > index 10f82d5643b6..39db520a51dc 100644
-> > --- a/mm/frame_vector.c
-> > +++ b/mm/frame_vector.c
-> > @@ -38,7 +38,6 @@ int get_vaddr_frames(unsigned long start, unsigned in=
-t nr_frames,
-> >       struct vm_area_struct *vma;
-> >       int ret =3D 0;
-> >       int err;
-> > -     int locked;
+> > diff --git a/drivers/gpu/drm/exynos/Kconfig b/drivers/gpu/drm/exynos/Kc=
+onfig
+> > index 6417f374b923..43257ef3c09d 100644
+> > --- a/drivers/gpu/drm/exynos/Kconfig
+> > +++ b/drivers/gpu/drm/exynos/Kconfig
+> > @@ -88,7 +88,6 @@ comment "Sub-drivers"
+> >   config DRM_EXYNOS_G2D
+> >       bool "G2D"
+> >       depends on VIDEO_SAMSUNG_S5P_G2D=3Dn || COMPILE_TEST
+> > -     select FRAME_VECTOR
+> >       help
+> >         Choose this option if you want to use Exynos G2D for DRM.
 > >
-> >       if (nr_frames =3D=3D 0)
-> >               return 0;
-> > @@ -48,35 +47,22 @@ int get_vaddr_frames(unsigned long start, unsigned =
-int nr_frames,
-> >
-> >       start =3D untagged_addr(start);
-> >
-> > +     ret =3D pin_user_pages_fast(start, nr_frames,
-> > +                               FOLL_FORCE | FOLL_WRITE | FOLL_LONGTERM=
-,
-> > +                               (struct page **)(vec->ptrs));
-> > +     if (ret > 0) {
-> > +             vec->got_ref =3D true;
-> > +             vec->is_pfns =3D false;
-> > +             goto out_unlocked;
-> > +     }
+> > diff --git a/drivers/gpu/drm/exynos/exynos_drm_g2d.c b/drivers/gpu/drm/=
+exynos/exynos_drm_g2d.c
+> > index 967a5cdc120e..c83f6faac9de 100644
+> > --- a/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+> > +++ b/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+> > @@ -205,7 +205,8 @@ struct g2d_cmdlist_userptr {
+> >       dma_addr_t              dma_addr;
+> >       unsigned long           userptr;
+> >       unsigned long           size;
+> > -     struct frame_vector     *vec;
+> > +     struct page             **pages;
+> > +     unsigned int            npages;
+> >       struct sg_table         *sgt;
+> >       atomic_t                refcount;
+> >       bool                    in_pool;
+> > @@ -378,7 +379,7 @@ static void g2d_userptr_put_dma_addr(struct g2d_dat=
+a *g2d,
+> >                                       bool force)
+> >   {
+> >       struct g2d_cmdlist_userptr *g2d_userptr =3D obj;
+> > -     struct page **pages;
+> > +     int i;
 >
-> This part looks good, and changing to _fast is a potential performance im=
-provement,
-> too.
+> The above line can also be deleted, see below.
 >
-> > +
-> >       mmap_read_lock(mm);
-> > -     locked =3D 1;
-> >       vma =3D find_vma_intersection(mm, start, start + 1);
-> >       if (!vma) {
-> >               ret =3D -EFAULT;
-> >               goto out;
+> >
+> >       if (!obj)
+> >               return;
+> > @@ -398,15 +399,11 @@ static void g2d_userptr_put_dma_addr(struct g2d_d=
+ata *g2d,
+> >       dma_unmap_sgtable(to_dma_dev(g2d->drm_dev), g2d_userptr->sgt,
+> >                         DMA_BIDIRECTIONAL, 0);
+> >
+> > -     pages =3D frame_vector_pages(g2d_userptr->vec);
+> > -     if (!IS_ERR(pages)) {
+> > -             int i;
+> > +     for (i =3D 0; i < g2d_userptr->npages; i++)
+> > +             set_page_dirty_lock(g2d_userptr->pages[i]);
+> >
+> > -             for (i =3D 0; i < frame_vector_count(g2d_userptr->vec); i=
+++)
+> > -                     set_page_dirty_lock(pages[i]);
+> > -     }
+> > -     put_vaddr_frames(g2d_userptr->vec);
+> > -     frame_vector_destroy(g2d_userptr->vec);
+> > +     unpin_user_pages(g2d_userptr->pages, g2d_userptr->npages);
+> > +     kvfree(g2d_userptr->pages);
+>
+> You can avoid writing your own loop, and just simplify the whole thing do=
+wn to
+> two lines:
+>
+>         unpin_user_pages_dirty_lock(g2d_userptr->pages, g2d_userptr->npag=
+es,
+>                                     true);
+>         kvfree(g2d_userptr->pages);
+
+Oh nice, this is neat. I'll also roll it out in the habanalabs patch,
+that has the same thing. Well almost, it only uses set_page_dirty, not
+the _lock variant. But I have no idea whether that matters or not?
+-Daniel
+
+>
+>
+> >
+> >       if (!g2d_userptr->out_of_list)
+> >               list_del_init(&g2d_userptr->list);
+> > @@ -474,35 +471,34 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struc=
+t g2d_data *g2d,
+> >       offset =3D userptr & ~PAGE_MASK;
+> >       end =3D PAGE_ALIGN(userptr + size);
+> >       npages =3D (end - start) >> PAGE_SHIFT;
+> > -     g2d_userptr->vec =3D frame_vector_create(npages);
+> > -     if (!g2d_userptr->vec) {
+> > +     g2d_userptr->pages =3D kvmalloc_array(npages, sizeof(*g2d_userptr=
+->pages),
+> > +                                         GFP_KERNEL);
+> > +     if (!g2d_userptr->pages) {
+> >               ret =3D -ENOMEM;
+> >               goto err_free;
 > >       }
 > >
-> > -     /*
-> > -      * While get_vaddr_frames() could be used for transient (kernel
-> > -      * controlled lifetime) pinning of memory pages all current
-> > -      * users establish long term (userspace controlled lifetime)
-> > -      * page pinning. Treat get_vaddr_frames() like
-> > -      * get_user_pages_longterm() and disallow it for filesystem-dax
-> > -      * mappings.
-> > -      */
-> > -     if (vma_is_fsdax(vma)) {
-> > -             ret =3D -EOPNOTSUPP;
-> > -             goto out;
+> > -     ret =3D get_vaddr_frames(start, npages, FOLL_FORCE | FOLL_WRITE,
+> > -             g2d_userptr->vec);
+> > +     ret =3D pin_user_pages_fast(start, npages, FOLL_FORCE | FOLL_WRIT=
+E,
+> > +                               g2d_userptr->pages);
+> >       if (ret !=3D npages) {
+> >               DRM_DEV_ERROR(g2d->dev,
+> >                             "failed to get user pages from userptr.\n")=
+;
+> >               if (ret < 0)
+> > -                     goto err_destroy_framevec;
+> > -             ret =3D -EFAULT;
+> > -             goto err_put_framevec;
 > > -     }
->
-> Are you sure we don't need to check vma_is_fsdax() anymore?
-
-Since FOLL_LONGTERM checks for this and can only return struct page
-backed memory, and explicitly excludes VM_IO | VM_PFNMAP, was assuming
-this is not needed for follow_pfn. And the get_user_pages_locked this
-used back then didn't have the same check, hence why it was added (and
-FOLL_LONGTERM still doesn't work for the _locked versions, as you
-pointed out on the last round of this discussion).
-
-But now that you're asking, I have no idea whether fsdax vma can also
-be of VM_IO | VM_PFNMAP type. I'm not seeing that set anywhere in
-fs/dax.c, but that says nothing :-)
-
-Dan, you added this check originally, do we need it for VM_SPECIAL vmas too=
-?
-
-Thanks, Daniel
-
->
-> > -
-> > -     if (!(vma->vm_flags & (VM_IO | VM_PFNMAP))) {
-> > -             vec->got_ref =3D true;
-> > -             vec->is_pfns =3D false;
-> > -             ret =3D pin_user_pages_locked(start, nr_frames,
-> > -                     gup_flags, (struct page **)(vec->ptrs), &locked);
-> > -             goto out;
-> > -     }
-> > -
-> >       vec->got_ref =3D false;
-> >       vec->is_pfns =3D true;
-> >       do {
-> > @@ -101,8 +87,8 @@ int get_vaddr_frames(unsigned long start, unsigned i=
-nt nr_frames,
-> >               vma =3D find_vma_intersection(mm, start, start + 1);
-> >       } while (vma && vma->vm_flags & (VM_IO | VM_PFNMAP));
-> >   out:
-> > -     if (locked)
-> > -             mmap_read_unlock(mm);
-> > +     mmap_read_unlock(mm);
-> > +out_unlocked:
-> >       if (!ret)
+> > -     if (frame_vector_to_pages(g2d_userptr->vec) < 0) {
+> > +                     goto err_destroy_pages;
+> > +             npages =3D ret;
 > >               ret =3D -EFAULT;
-> >       if (ret > 0)
+> > -             goto err_put_framevec;
+> > +             goto err_unpin_pages;
+> >       }
+> > +     g2d_userptr->npages =3D npages;
+> >
+> >       sgt =3D kzalloc(sizeof(*sgt), GFP_KERNEL);
+> >       if (!sgt) {
+> >               ret =3D -ENOMEM;
+> > -             goto err_put_framevec;
+> > +             goto err_unpin_pages;
+> >       }
+> >
+> >       ret =3D sg_alloc_table_from_pages(sgt,
+> > -                                     frame_vector_pages(g2d_userptr->v=
+ec),
+> > +                                     g2d_userptr->pages,
+> >                                       npages, offset, size, GFP_KERNEL)=
+;
+> >       if (ret < 0) {
+> >               DRM_DEV_ERROR(g2d->dev, "failed to get sgt from pages.\n"=
+);
+> > @@ -538,11 +534,11 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struc=
+t g2d_data *g2d,
+> >   err_free_sgt:
+> >       kfree(sgt);
+> >
+> > -err_put_framevec:
+> > -     put_vaddr_frames(g2d_userptr->vec);
+> > +err_unpin_pages:
+> > +     unpin_user_pages(g2d_userptr->pages, npages);
+> >
+> > -err_destroy_framevec:
+> > -     frame_vector_destroy(g2d_userptr->vec);
+> > +err_destroy_pages:
+> > +     kvfree(g2d_userptr->pages);
+> >
+> >   err_free:
+> >       kfree(g2d_userptr);
 > >
 >
-> All of the error handling still looks accurate there.
+> The rest all looks good, you've avoided the usual API pitfalls. :)
 >
 > thanks,
 > --
