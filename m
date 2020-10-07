@@ -2,112 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46F6E286586
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:12:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 488F02865BB
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:18:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727732AbgJGRMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 13:12:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57094 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726219AbgJGRMg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 13:12:36 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C82CC061755
-        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 10:12:36 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id f10so2926202otb.6
-        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:12:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ds2b6pt8mpuSnK1WqusZcK5IPcMpzyRXiJsNhW5qyYM=;
-        b=XywxnLHwupjUJptE/EVD6sBBvmwp1LZdLWVQN7sGbbfMYl92hBOlZr7ZFS4X+E/amg
-         opzvB15wo+wkKlQcyzXYRqNCcc6ZTwDvf0ncSkJzjaY9dJ7cef2oaD3bBKharNZqlUDk
-         SK2SYwy12YuTYhWzjRrLHd7+bMmqCT/EcoV/4=
+        id S1728162AbgJGRS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 13:18:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36913 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726763AbgJGRSZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 13:18:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602091104;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/v7nvWSVPw21rmS+GFFSvbPZ5gWBbt3l5XRpI+aI+Hg=;
+        b=PEigp3Gd8KJNA2OO5W4pNZjRv+SRPUa8WxVNa7D5z8nmuBq2Q6dn22suLzl9QQThytthcn
+        lGB2FTvq8aWiHzOhNg3Djy8lA+Arlfm0c8qcoquEfsxg+E8hMqDsVBPRlMFXOEsZFnwPKa
+        vzmeA5CvVdVJsbeeGLys9ZUwavF+Unw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-Pqfl5rtRN2qEJtgYKXBTTw-1; Wed, 07 Oct 2020 13:18:22 -0400
+X-MC-Unique: Pqfl5rtRN2qEJtgYKXBTTw-1
+Received: by mail-wm1-f69.google.com with SMTP id 73so1130885wma.5
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:18:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ds2b6pt8mpuSnK1WqusZcK5IPcMpzyRXiJsNhW5qyYM=;
-        b=UV3UzkkhZLs+Y0tAbaSU9QKXusD8zAaWvRBqLThct7vfpJbpvQi+dPifA9aLdv26Zj
-         izvrq0se0+MZsk5tHn/7m9mfv4BhfEjvqju7/oIwLu6ZlcPXCceCueMMrR6xe1K1KGgG
-         pa0UEFZM8Ci4pkVX1lk1qGpAX8UbiTFMs3H5/MeudoPjQGYvW9WWg8FxX4vHpKRG4u3D
-         u9id8I1f6BSTBffHJWq1o0syffKr/NGG8jRQNHzz3oCRlc4RcaKQUTHt3IiEdrkcOO2I
-         NDSrcP9HgxxZniJ0vWrlOIt5GPmchrsLJ3RoF4nMs/KLIw2VIKoRNzdmJ4+OGU0hmF6/
-         sGTA==
-X-Gm-Message-State: AOAM530bkOF5UqGX2+e/Ni6w7kw9u65TYGi/86EUgfbW4aXYmCJ3e59m
-        s8SBDDDS7WP1U3W5hHavzswv1CE6cJnLcb+NY1EYYw==
-X-Google-Smtp-Source: ABdhPJzTO+z2ObbheXgto8t7rJhDCsKMuOtKVLpylgXo93WqdqDznkfE8ic3+XhZYxCrctCNbkyO32BPlJ+tqH+Wfoo=
-X-Received: by 2002:a05:6830:1c3c:: with SMTP id f28mr2639345ote.188.1602090755973;
- Wed, 07 Oct 2020 10:12:35 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/v7nvWSVPw21rmS+GFFSvbPZ5gWBbt3l5XRpI+aI+Hg=;
+        b=PJW21N7i8Hn7c9GZdYwNvTny/1IX3+PkqbvB7sxnL2KFOXxag7ZHAoSUeFmxNREXOq
+         hZBkHWAL6p2vqAlnrhw9uTN6p41QCYAJNTwU2mY4YC8eBUmQVmCbazu8/rsDFisjO7Bq
+         LzgBxbgli3mNNXjGL+HQBkB0xdFrQA51yavUoT9CC9Tsas0x8yXJu2fK+FyKACCohpWw
+         /o6GNZ54HrqSdCAEHVP8w5yCXrgtQsPovoYJmhIutrxLfp5qVhFBvL04rrnvnPUKH3T9
+         AnwbWKQBcg0b7+rapmLy856GgLW9BOzkcyj0LT50BXsVdXxbz9/gdYo548DMcvu72/TE
+         +S5g==
+X-Gm-Message-State: AOAM531S/I0TldjuKjvSyuW9HsG+CddLFepEbPoMB/vpfXnUbseq/EbY
+        Mc/U3x97m/GAFeSPJXTmvXqIz/f4WeniSLnshCh0ZUCbQubUUEaVZ9bmw1WgfF04SFN7ZLDhhGF
+        qJjjJDfaNGbGq
+X-Received: by 2002:a1c:7302:: with SMTP id d2mr4631651wmb.133.1602091101035;
+        Wed, 07 Oct 2020 10:18:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyKPP74qZQsmdxyvkGEn9VUtPzb5ZTroAyk+Nnw3EhYDtq8OtPP0lUjG9SJzJF7Ewpy5P4qlA==
+X-Received: by 2002:a1c:7302:: with SMTP id d2mr4631622wmb.133.1602091100710;
+        Wed, 07 Oct 2020 10:18:20 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d2f4:5943:190c:39ff? ([2001:b07:6468:f312:d2f4:5943:190c:39ff])
+        by smtp.gmail.com with ESMTPSA id f12sm3396397wmf.26.2020.10.07.10.18.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Oct 2020 10:18:19 -0700 (PDT)
+Subject: Re: [PATCH 15/22] kvm: mmu: Support changed pte notifier in tdp MMU
+To:     Ben Gardon <bgardon@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20200925212302.3979661-1-bgardon@google.com>
+ <20200925212302.3979661-16-bgardon@google.com>
+ <622ffc59-d914-c718-3f2f-952f714ac63c@redhat.com>
+ <CANgfPd_8SpHkCd=NyBKtRFWKkczx4SMxPLRon-kx9Oc6P7b=Ew@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7636707a-b622-90a3-e641-18662938f6dd@redhat.com>
+Date:   Wed, 7 Oct 2020 19:18:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-6-daniel.vetter@ffwll.ch> <20201007165316.GT5177@ziepe.ca>
-In-Reply-To: <20201007165316.GT5177@ziepe.ca>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Wed, 7 Oct 2020 19:12:24 +0200
-Message-ID: <CAKMK7uGTpZcHwrBNQOXwzDAzyfSgoLSt_Dae_3hMRE2xwGx+GA@mail.gmail.com>
-Subject: Re: [PATCH 05/13] mm/frame-vector: Use FOLL_LONGTERM
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>, linux-s390@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Pawel Osciak <pawel@osciak.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CANgfPd_8SpHkCd=NyBKtRFWKkczx4SMxPLRon-kx9Oc6P7b=Ew@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 7, 2020 at 6:53 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Wed, Oct 07, 2020 at 06:44:18PM +0200, Daniel Vetter wrote:
-> >
-> > -     /*
-> > -      * While get_vaddr_frames() could be used for transient (kernel
-> > -      * controlled lifetime) pinning of memory pages all current
-> > -      * users establish long term (userspace controlled lifetime)
-> > -      * page pinning. Treat get_vaddr_frames() like
-> > -      * get_user_pages_longterm() and disallow it for filesystem-dax
-> > -      * mappings.
-> > -      */
-> > -     if (vma_is_fsdax(vma)) {
-> > -             ret = -EOPNOTSUPP;
-> > -             goto out;
-> > -     }
-> > -
-> > -     if (!(vma->vm_flags & (VM_IO | VM_PFNMAP))) {
-> > -             vec->got_ref = true;
-> > -             vec->is_pfns = false;
-> > -             ret = pin_user_pages_locked(start, nr_frames,
-> > -                     gup_flags, (struct page **)(vec->ptrs), &locked);
-> > -             goto out;
-> > -     }
->
-> The vm_flags still need to be checked before going into the while
-> loop. If the break is taken then nothing would check vm_flags
+On 07/10/20 18:53, Ben Gardon wrote:
+>> in addition to the previously-mentioned cleanup of always calling
+>> handle_changed_spte instead of special-casing calls to two of the
+>> three functions.  It would be a nice place to add the
+>> trace_kvm_mmu_set_spte tracepoint, too.
+> I'm not sure we can avoid special casing calls to the access tracking
+> and dirty logging handler functions. At least in the past that's
+> created bugs with things being marked dirty or accessed when they
+> shouldn't be. I'll revisit those assumptions. It would certainly be
+> nice to get rid of that complexity.
+> 
+> I agree that putting the SPTE assignment and handler functions in a
+> helper function would clean up the code. I'll do that.
 
-Hm right that's a bin inconsistent. follow_pfn also checks for this,
-so I think we can just ditch this entirely both here and in the do {}
-while () check, simplifying the latter to just while (vma). Well, just
-make it a real loop with less confusing control flow probably.
+Well that's not easy if you have to think of which functions have to be
+called.
 
-Or prefer I keep this and touch the code less?
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+I'll take a closer look at the access tracking and dirty logging cases
+to try and understand what those bugs can be.  Apart from that I have my
+suggested changes and I can probably finish testing them and send them
+out tomorrow.
+
+Paolo
+
+> I got some
+> feedback on the RFC I sent last year which led me to open-code a lot
+> more, but I think this is still a good cleanup.
+
