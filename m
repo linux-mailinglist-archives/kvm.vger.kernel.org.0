@@ -2,102 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5113E286648
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEA12286672
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 20:02:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728695AbgJGRyS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 13:54:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22025 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728298AbgJGRyQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 13:54:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602093255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vH9Kiij2/aTW7bWMoqRFax1aZ04huQLmyjYHxGrPQdc=;
-        b=hy588wNbTybUX2yppO//PNsX1EET+say0PxYsk/8vuf8eFLWIVDevGsXwZ50nyLkNyNkTg
-        RuVbMSg2AvO7+wXoNYlFxiuHnuFzDMPiFaTJvQKzMqZxCFTjGgI7z72XEjSr3xJcewGL8u
-        g3VVkNfWhZtNZE9XKX+F1xSO5NSYjj8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-35ozINl1NuyNN1RbO3eHEw-1; Wed, 07 Oct 2020 13:54:11 -0400
-X-MC-Unique: 35ozINl1NuyNN1RbO3eHEw-1
-Received: by mail-wr1-f71.google.com with SMTP id 33so1692645wrk.12
-        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:54:11 -0700 (PDT)
+        id S1728370AbgJGSBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 14:01:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36650 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727975AbgJGSBy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 14:01:54 -0400
+Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B12AC061755
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 11:01:54 -0700 (PDT)
+Received: by mail-oo1-xc41.google.com with SMTP id y127so843321ooa.5
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 11:01:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=KjKZykFuT09vi8gvWSxWfIoih5+HtjIRxuS5MgzFTGo=;
+        b=XlsYCfTVgW+6nmGAiv0O62GLPsC5r7eB+oidAEHNavDRGpWicEbtNZg9to7A5saHMp
+         zaYRD/gT5inYX9JmqOP5ZzySgAIOp0+59TPao6y2kIbw9G7KU0mdvCuhCQrafShecj0J
+         tHZf4mGHu3aegW49dmX0ZJptYBRUrRuO4MkvA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vH9Kiij2/aTW7bWMoqRFax1aZ04huQLmyjYHxGrPQdc=;
-        b=M55VTZHmfvi0C+VeXgm/3VBgIpyLrUFGa26V7BOfADvdWg+2Ae7ILErbZ8jsjPLB21
-         AemKx5gKFfVy2z4FP6HIpoYivhXw0ZAJl8K2htE8jOJ0Osz2sVXimPazTfp6bXcNiMwi
-         Wrs8/UlaIgNU6qhdM/lbqV48XUmDcvpzSvDKXlL9N5ZkUZYFucFbTpFr3ExaQiDFfcAA
-         nbXvVlf7rxwDwdyPDm0BMLIPeKSlOPdl1bgVopXbNMZciyfkHWB3055pEdTWl/HUwwpa
-         nNaOwoUxKloIkU7M4jbBT/df25tpklC3z8xDgu/VPCR2TX+s0HkN8L6RpipzNgttYmT2
-         kbzw==
-X-Gm-Message-State: AOAM530SI+KD/yEBwSOHzLHhYDKOfRB+OMTwEtytaULvfEWUUUGi/PW9
-        ZR34JQlskMAx37IYblaxSVHkxonT9WBfqmQB1t1xdFlZN736UDPV5PARB+EvrVFLcNeUDnMqMi8
-        rGBdljXz/EfNo
-X-Received: by 2002:a1c:3105:: with SMTP id x5mr4237273wmx.143.1602093250496;
-        Wed, 07 Oct 2020 10:54:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx4+uUHG31siOZb1tYt9cPAYxZ5B/XQn33ayWCITZONCDeGW1eaR6Zh3CPhBOOARnjaPLcSNQ==
-X-Received: by 2002:a1c:3105:: with SMTP id x5mr4237182wmx.143.1602093249068;
-        Wed, 07 Oct 2020 10:54:09 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d2f4:5943:190c:39ff? ([2001:b07:6468:f312:d2f4:5943:190c:39ff])
-        by smtp.gmail.com with ESMTPSA id 67sm3587452wmb.31.2020.10.07.10.54.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Oct 2020 10:54:08 -0700 (PDT)
-Subject: Re: [PATCH 15/22] kvm: mmu: Support changed pte notifier in tdp MMU
-To:     Ben Gardon <bgardon@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20200925212302.3979661-1-bgardon@google.com>
- <20200925212302.3979661-16-bgardon@google.com>
- <622ffc59-d914-c718-3f2f-952f714ac63c@redhat.com>
- <CANgfPd_8SpHkCd=NyBKtRFWKkczx4SMxPLRon-kx9Oc6P7b=Ew@mail.gmail.com>
- <7636707a-b622-90a3-e641-18662938f6dd@redhat.com>
- <CANgfPd_F_EurkfGquC79cEHa=4A2AMfnCAfMHPpAXa-6w4+bsg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5bb8168c-e4a2-6365-f220-13b67c9c375d@redhat.com>
-Date:   Wed, 7 Oct 2020 19:54:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=KjKZykFuT09vi8gvWSxWfIoih5+HtjIRxuS5MgzFTGo=;
+        b=q5jzApsJxlcLoSDrLC+h9Qgxms9NG+A4rJo2LuTmc0BDGh9oS/uxrM2LmZxb4xVjAL
+         PPBVYmEKtw8qnCY6JJWIN2vDLTBQgB/tullR/DP9osv/0cLnhD15cRn8/5aDBlmQXFiW
+         tHRTmKa0gBBIWSe8wAojhGodtIU/Rr0hlXXqeyV+rYz5/KcM+YtuxZoVdnOF87YQjn1X
+         kTxBbPD8UG/AEVC2gXLPMHKVfc/7Ri3ui8Ux1r0DfZtUZ3Ha5HHf4qGx4dx3KlH6J4ec
+         CDl9vOriogDwuKvBJVr8EezenYvHa8ygCVtlGMSkaW0rGvtB7gvTQ0O2rU3Np/VwiO9q
+         xmiQ==
+X-Gm-Message-State: AOAM530WtrpTg+cql3gtho8mv+ThbmS/Gw+6HqR5gQvnGlxpqYo2vR1I
+        vyYb+NLdwtQ4JLqAZcC1fpZuYVBn3xMDcY3+49M9fkJwPnYk6A==
+X-Google-Smtp-Source: ABdhPJwJzYY7PIFYfmYEAKc+uMwrEIxle3PFN75o5nMMKSdxenHBbi1fgd2mUNbWFOGRvdaIUhxGwTNij1DRYovGNtE=
+X-Received: by 2002:a4a:c011:: with SMTP id v17mr2806667oop.89.1602093713265;
+ Wed, 07 Oct 2020 11:01:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CANgfPd_F_EurkfGquC79cEHa=4A2AMfnCAfMHPpAXa-6w4+bsg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
+ <20201007164426.1812530-8-daniel.vetter@ffwll.ch> <20201007172746.GU5177@ziepe.ca>
+In-Reply-To: <20201007172746.GU5177@ziepe.ca>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Wed, 7 Oct 2020 20:01:42 +0200
+Message-ID: <CAKMK7uH3P-6zs5MVceFD7872owqtcktqsTaQAOKNyaBg4_w=aA@mail.gmail.com>
+Subject: Re: [PATCH 07/13] mm: close race in generic_access_phys
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, linux-s390@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Rik van Riel <riel@redhat.com>,
+        Benjamin Herrensmidt <benh@kernel.crashing.org>,
+        Dave Airlie <airlied@linux.ie>,
+        Hugh Dickins <hugh@veritas.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Daniel Vetter <daniel.vetter@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/10/20 19:30, Ben Gardon wrote:
->> Well that's not easy if you have to think of which functions have to be
->> called.
->>
->> I'll take a closer look at the access tracking and dirty logging cases
->> to try and understand what those bugs can be.  Apart from that I have my
->> suggested changes and I can probably finish testing them and send them
->> out tomorrow.
-> Awesome, thank you. I'll look forward to seeing them. Will you be
-> applying those changes to the tdp_mmu branch you created as well?
-> 
+On Wed, Oct 7, 2020 at 7:27 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Wed, Oct 07, 2020 at 06:44:20PM +0200, Daniel Vetter wrote:
+> > Way back it was a reasonable assumptions that iomem mappings never
+> > change the pfn range they point at. But this has changed:
+> >
+> > - gpu drivers dynamically manage their memory nowadays, invalidating
+> >   ptes with unmap_mapping_range when buffers get moved
+> >
+> > - contiguous dma allocations have moved from dedicated carvetouts to
+> >   cma regions. This means if we miss the unmap the pfn might contain
+> >   pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
+> >
+> > - even /dev/mem now invalidates mappings when the kernel requests that
+> >   iomem region when CONFIG_IO_STRICT_DEVMEM is set, see 3234ac664a87
+> >   ("/dev/mem: Revoke mappings when a driver claims the region")
+> >
+> > Accessing pfns obtained from ptes without holding all the locks is
+> > therefore no longer a good idea. Fix this.
+> >
+> > Since ioremap might need to manipulate pagetables too we need to drop
+> > the pt lock and have a retry loop if we raced.
+> >
+> > While at it, also add kerneldoc and improve the comment for the
+> > vma_ops->access function. It's for accessing, not for moving the
+> > memory from iomem to system memory, as the old comment seemed to
+> > suggest.
+> >
+> > References: 28b2ee20c7cb ("access_process_vm device memory infrastructu=
+re")
+> > Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: Kees Cook <keescook@chromium.org>
+> > Cc: Rik van Riel <riel@redhat.com>
+> > Cc: Benjamin Herrensmidt <benh@kernel.crashing.org>
+> > Cc: Dave Airlie <airlied@linux.ie>
+> > Cc: Hugh Dickins <hugh@veritas.com>
+> > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > Cc: John Hubbard <jhubbard@nvidia.com>
+> > Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > Cc: Jan Kara <jack@suse.cz>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: linux-mm@kvack.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: linux-samsung-soc@vger.kernel.org
+> > Cc: linux-media@vger.kernel.org
+> > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > ---
+> >  include/linux/mm.h |  3 ++-
+> >  mm/memory.c        | 44 ++++++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 44 insertions(+), 3 deletions(-)
+>
+> This does seem to solve the race with revoke_devmem(), but it is really u=
+gly.
+>
+> It would be much nicer to wrap a rwsem around this access and the unmap.
+>
+> Any place using it has a nice linear translation from vm_off to pfn,
+> so I don't think there is a such a good reason to use follow_pte in
+> the first place.
+>
+> ie why not the helper be this:
+>
+>  int generic_access_phys(unsigned long pfn, unsigned long pgprot,
+>       void *buf, size_t len, bool write)
+>
+> Then something like dev/mem would compute pfn and obtain the lock:
+>
+> dev_access(struct vm_area_struct *vma, unsigned long addr, void *buf, int=
+ len, int write)
+> {
+>      cpu_addr =3D vma->vm_pgoff*PAGE_SIZE + (addr - vma->vm_start));
+>
+>      /* FIXME: Has to be over each page of len */
+>      if (!devmem_is_allowed_access(PHYS_PFN(cpu_addr/4096)))
+>            return -EPERM;
+>
+>      down_read(&mem_sem);
+>      generic_access_phys(cpu_addr/4096, pgprot_val(vma->vm_page_prot),
+>                          buf, len, write);
+>      up_read(&mem_sem);
+> }
+>
+> The other cases looked simpler because they don't revoke, here the
+> mmap_sem alone should be enough protection, they would just need to
+> provide the linear translation to pfn.
+>
+> What do you think?
 
-No, only to the rebased version.
+I think it'd fix the bug, until someone wires ->access up for
+drivers/gpu, or the next subsystem. This is also just for ptrace, so
+we really don't care when we stall the vm badly and other silly
+things. So I figured the somewhat ugly, but full generic solution is
+the better one, so that people who want to be able to ptrace
+read/write their iomem mmaps can just sprinkle this wherever they feel
+like.
 
-Paolo
-
+But yeah if we go with most minimal fix, i.e. only trying to fix the
+current users, then your thing should work and is simpler. But it
+leaves the door open for future problems.
+-Daniel
+--=20
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
