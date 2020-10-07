@@ -2,301 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2E56286AC7
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 00:18:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E49B286AD5
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 00:24:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728846AbgJGWSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 18:18:49 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:13064 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726463AbgJGWSt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 18:18:49 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f7e3ebb0000>; Wed, 07 Oct 2020 15:18:35 -0700
-Received: from [10.2.85.86] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 7 Oct
- 2020 22:18:42 +0000
-Subject: Re: [PATCH 06/13] media: videobuf2: Move frame_vector into media
- subsystem
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>
-CC:     <kvm@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-samsung-soc@vger.kernel.org>, <linux-media@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
+        id S1728275AbgJGWYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 18:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49136 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728761AbgJGWYK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 18:24:10 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7FC1C0613D5
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 15:24:09 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id i5so3841343edr.5
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 15:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Zic23vwE4RxhL64QubFNAgrR6bPLwF/Sw808vPXOvcE=;
+        b=QQSRcBFI6KAV++JS9/GFj7Fmw4j7a/iMiUg1ZTuLmVxWhkZMKv0QD8k1ukWq7eq/is
+         aqhku7tesefyyeplMfP+uZ40G5Eu5h32eX3quWRsYX4t93t8hfPAksy+eKFnntLzh659
+         XKe6EgVkLvN8qFLGttYIbd5R75etFF329oIsGVg7tFamYwMf914oOqvj5Aj57gMZmmXn
+         BdX+R3HH+c0ZbeHsryryJmXxzi8LbxHVyDfXa28xyWATs9steaqxyt3ORz7tJ5iS3p0B
+         /C9lomlbRYU4nllCvXcMpiVBxaPdCxNSDAwt+Wnv7NkDlHC0AVoEJJmmbnIbcEEDMbkk
+         VNvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Zic23vwE4RxhL64QubFNAgrR6bPLwF/Sw808vPXOvcE=;
+        b=d/Se5u3/0olPLmJ7K1cKaKpdyWpzOPR2iw/nDl9MjdWWyxUvs3qtodz99leGp/OZFE
+         a/Vk2kxfsmfpMHapppa+FswN5LcoqJoNitE4v9CcCAViuILycNt+vuGjdULyiCoLplrI
+         g5d52EcwlcRh64t0v9LE284x0WirqlYCR3rq0OaWVGEQgoqnPqn9nNsXyH6Dg1YxLDCS
+         vX+j1rhsknVAh6x+Nam4AhxuDMhCGhlhgR9kDq/EYZ02KTd3RXGw0HREKX0TmQczvJYJ
+         TJFVFcdyKTvpPCXbRvIybDh/r9pjaHFYejoBO+V2ThGPSyeX/nA4AZDl2cjIZ0+H8bgl
+         fc8g==
+X-Gm-Message-State: AOAM533z85WZSSAAf+gX/hIhHfzuS6i3cLJNi+/oQJ/m7rTuQPkgmlVZ
+        4RzvCLM6NZ3xOYp/nlGq6i0/q4PWaCLEg6XB45yugA==
+X-Google-Smtp-Source: ABdhPJyEbSoLmGrub89sZew46mtuYR5cC3wqZnDpHg2eEdBRv6ndP1ZtRmu/HFaFG/gOZx15NdgN0Q/4bhJSTz4VXAk=
+X-Received: by 2002:a50:d0d0:: with SMTP id g16mr5862132edf.18.1602109448239;
+ Wed, 07 Oct 2020 15:24:08 -0700 (PDT)
+MIME-Version: 1.0
+References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
+ <20201007164426.1812530-11-daniel.vetter@ffwll.ch> <CAPcyv4hBL68A7CZa+YnooufDH2tevoxrx32DTJMQ6OHRnec7QQ@mail.gmail.com>
+ <CAKMK7uFoxiPdjO-yhd-mKqumnTpjcENEReb1sOYhOwRRCL0wpQ@mail.gmail.com>
+In-Reply-To: <CAKMK7uFoxiPdjO-yhd-mKqumnTpjcENEReb1sOYhOwRRCL0wpQ@mail.gmail.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 7 Oct 2020 15:23:57 -0700
+Message-ID: <CAPcyv4jGxsB5so8mKqYrsn2CEc7nO2yPvzZZ_mvM_-R=BZfKHg@mail.gmail.com>
+Subject: Re: [PATCH 10/13] PCI: revoke mappings like devmem
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
         Daniel Vetter <daniel.vetter@intel.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
-        Pawel Osciak <pawel@osciak.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        "Kyungmin Park" <kyungmin.park@samsung.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
         Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
         =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>
-References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-7-daniel.vetter@ffwll.ch>
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <25f92b5b-0bf8-98b9-a056-413b08850341@nvidia.com>
-Date:   Wed, 7 Oct 2020 15:18:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-MIME-Version: 1.0
-In-Reply-To: <20201007164426.1812530-7-daniel.vetter@ffwll.ch>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1602109115; bh=RBb11DPNv4MaIyVxWn7lW9yIg1xY4SBFzpNcqMq9OMk=;
-        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
-         MIME-Version:In-Reply-To:Content-Type:Content-Language:
-         Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
-        b=K+rmowKL9KsU86qg+jrSSUEuBWd2ZUS2RQSHTr1UAVR+xQWbIYZqI/lWcXkWKRKC0
-         FgqMEsXEv/Ac8sDbgyS8J/RImVj8o2rSDKpicHDFi8gX/9RXMmtXi/FhaEyoXbsFmK
-         BLXkJ8MjZoHU/0ca+VCu5im9jhSxmy0wCQdIRc3l4T5Ui/NAKplYUx+vAwDuu37pZN
-         kAfG0zTuR2D4/T/iTrUnkT7nZglx37YlScaC4n79del3V/kZkahukyVNTQmzrBkqOB
-         UEMd5dXALdAzo95nw80FkkrV635q8AXItXVNCqcWplCocQMssGeSAokhbNWFpTO4Uz
-         QN6bY0O+bT2gg==
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/7/20 9:44 AM, Daniel Vetter wrote:
-> It's the only user. This also garbage collects the CONFIG_FRAME_VECTOR
-> symbol from all over the tree (well just one place, somehow omap media
-> driver still had this in its Kconfig, despite not using it).
->=20
-> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Pawel Osciak <pawel@osciak.com>
-> Cc: Marek Szyprowski <m.szyprowski@samsung.com>
-> Cc: Kyungmin Park <kyungmin.park@samsung.com>
-> Cc: Tomasz Figa <tfiga@chromium.org>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: John Hubbard <jhubbard@nvidia.com>
-> Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: linux-mm@kvack.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-samsung-soc@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
-> ---
+On Wed, Oct 7, 2020 at 12:49 PM Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
+>
+> On Wed, Oct 7, 2020 at 9:33 PM Dan Williams <dan.j.williams@intel.com> wrote:
+> >
+> > On Wed, Oct 7, 2020 at 11:11 AM Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
+> > >
+> > > Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims
+> > > the region") /dev/kmem zaps ptes when the kernel requests exclusive
+> > > acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, this is
+> > > the default for all driver uses.
+> > >
+> > > Except there's two more ways to access pci bars: sysfs and proc mmap
+> > > support. Let's plug that hole.
+> >
+> > Ooh, yes, lets.
+> >
+> > > For revoke_devmem() to work we need to link our vma into the same
+> > > address_space, with consistent vma->vm_pgoff. ->pgoff is already
+> > > adjusted, because that's how (io_)remap_pfn_range works, but for the
+> > > mapping we need to adjust vma->vm_file->f_mapping. Usually that's done
+> > > at ->open time, but that's a bit tricky here with all the entry points
+> > > and arch code. So instead create a fake file and adjust vma->vm_file.
+> >
+> > I don't think you want to share the devmem inode for this, this should
+> > be based off the sysfs inode which I believe there is already only one
+> > instance per resource. In contrast /dev/mem can have multiple inodes
+> > because anyone can just mknod a new character device file, the same
+> > problem does not exist for sysfs.
+>
+> But then I need to find the right one, plus I also need to find the
+> right one for the procfs side. That gets messy, and I already have no
+> idea how to really test this. Shared address_space is the same trick
+> we're using in drm (where we have multiple things all pointing to the
+> same underlying resources, through different files), and it gets the
+> job done. So that's why I figured the shared address_space is the
+> cleaner solution since then unmap_mapping_range takes care of
+> iterating over all vma for us. I guess I could reimplement that logic
+> with our own locking and everything in revoke_devmem, but feels a bit
+> silly. But it would also solve the problem of having mutliple
+> different mknod of /dev/kmem with different address_space behind them.
+> Also because of how remap_pfn_range works, all these vma do use the
+> same pgoff already anyway.
 
-Failed to spot any problems here. :)
-
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-
-thanks,
---=20
-John Hubbard
-NVIDIA
-
->   drivers/media/common/videobuf2/Kconfig        |  1 -
->   drivers/media/common/videobuf2/Makefile       |  1 +
->   .../media/common/videobuf2}/frame_vector.c    |  2 +
->   drivers/media/platform/omap/Kconfig           |  1 -
->   include/linux/mm.h                            | 42 -------------------
->   include/media/videobuf2-core.h                | 42 +++++++++++++++++++
->   mm/Kconfig                                    |  3 --
->   mm/Makefile                                   |  1 -
->   8 files changed, 45 insertions(+), 48 deletions(-)
->   rename {mm =3D> drivers/media/common/videobuf2}/frame_vector.c (99%)
->=20
-> diff --git a/drivers/media/common/videobuf2/Kconfig b/drivers/media/commo=
-n/videobuf2/Kconfig
-> index edbc99ebba87..d2223a12c95f 100644
-> --- a/drivers/media/common/videobuf2/Kconfig
-> +++ b/drivers/media/common/videobuf2/Kconfig
-> @@ -9,7 +9,6 @@ config VIDEOBUF2_V4L2
->  =20
->   config VIDEOBUF2_MEMOPS
->   	tristate
-> -	select FRAME_VECTOR
->  =20
->   config VIDEOBUF2_DMA_CONTIG
->   	tristate
-> diff --git a/drivers/media/common/videobuf2/Makefile b/drivers/media/comm=
-on/videobuf2/Makefile
-> index 77bebe8b202f..54306f8d096c 100644
-> --- a/drivers/media/common/videobuf2/Makefile
-> +++ b/drivers/media/common/videobuf2/Makefile
-> @@ -1,5 +1,6 @@
->   # SPDX-License-Identifier: GPL-2.0
->   videobuf2-common-objs :=3D videobuf2-core.o
-> +videobuf2-common-objs +=3D frame_vector.o
->  =20
->   ifeq ($(CONFIG_TRACEPOINTS),y)
->     videobuf2-common-objs +=3D vb2-trace.o
-> diff --git a/mm/frame_vector.c b/drivers/media/common/videobuf2/frame_vec=
-tor.c
-> similarity index 99%
-> rename from mm/frame_vector.c
-> rename to drivers/media/common/videobuf2/frame_vector.c
-> index 39db520a51dc..b95f4f371681 100644
-> --- a/mm/frame_vector.c
-> +++ b/drivers/media/common/videobuf2/frame_vector.c
-> @@ -8,6 +8,8 @@
->   #include <linux/pagemap.h>
->   #include <linux/sched.h>
->  =20
-> +#include <media/videobuf2-core.h>
-> +
->   /**
->    * get_vaddr_frames() - map virtual addresses to pfns
->    * @start:	starting user address
-> diff --git a/drivers/media/platform/omap/Kconfig b/drivers/media/platform=
-/omap/Kconfig
-> index f73b5893220d..de16de46c0f4 100644
-> --- a/drivers/media/platform/omap/Kconfig
-> +++ b/drivers/media/platform/omap/Kconfig
-> @@ -12,6 +12,5 @@ config VIDEO_OMAP2_VOUT
->   	depends on VIDEO_V4L2
->   	select VIDEOBUF2_DMA_CONTIG
->   	select OMAP2_VRFB if ARCH_OMAP2 || ARCH_OMAP3
-> -	select FRAME_VECTOR
->   	help
->   	  V4L2 Display driver support for OMAP2/3 based boards.
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 16b799a0522c..acd60fbf1a5a 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1743,48 +1743,6 @@ int account_locked_vm(struct mm_struct *mm, unsign=
-ed long pages, bool inc);
->   int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool=
- inc,
->   			struct task_struct *task, bool bypass_rlim);
->  =20
-> -/* Container for pinned pfns / pages */
-> -struct frame_vector {
-> -	unsigned int nr_allocated;	/* Number of frames we have space for */
-> -	unsigned int nr_frames;	/* Number of frames stored in ptrs array */
-> -	bool got_ref;		/* Did we pin pages by getting page ref? */
-> -	bool is_pfns;		/* Does array contain pages or pfns? */
-> -	void *ptrs[];		/* Array of pinned pfns / pages. Use
-> -				 * pfns_vector_pages() or pfns_vector_pfns()
-> -				 * for access */
-> -};
-> -
-> -struct frame_vector *frame_vector_create(unsigned int nr_frames);
-> -void frame_vector_destroy(struct frame_vector *vec);
-> -int get_vaddr_frames(unsigned long start, unsigned int nr_pfns,
-> -		     unsigned int gup_flags, struct frame_vector *vec);
-> -void put_vaddr_frames(struct frame_vector *vec);
-> -int frame_vector_to_pages(struct frame_vector *vec);
-> -void frame_vector_to_pfns(struct frame_vector *vec);
-> -
-> -static inline unsigned int frame_vector_count(struct frame_vector *vec)
-> -{
-> -	return vec->nr_frames;
-> -}
-> -
-> -static inline struct page **frame_vector_pages(struct frame_vector *vec)
-> -{
-> -	if (vec->is_pfns) {
-> -		int err =3D frame_vector_to_pages(vec);
-> -
-> -		if (err)
-> -			return ERR_PTR(err);
-> -	}
-> -	return (struct page **)(vec->ptrs);
-> -}
-> -
-> -static inline unsigned long *frame_vector_pfns(struct frame_vector *vec)
-> -{
-> -	if (!vec->is_pfns)
-> -		frame_vector_to_pfns(vec);
-> -	return (unsigned long *)(vec->ptrs);
-> -}
-> -
->   struct kvec;
->   int get_kernel_pages(const struct kvec *iov, int nr_pages, int write,
->   			struct page **pages);
-> diff --git a/include/media/videobuf2-core.h b/include/media/videobuf2-cor=
-e.h
-> index bbb3f26fbde9..a2e75ca0334f 100644
-> --- a/include/media/videobuf2-core.h
-> +++ b/include/media/videobuf2-core.h
-> @@ -1254,4 +1254,46 @@ bool vb2_request_object_is_buffer(struct media_req=
-uest_object *obj);
->    */
->   unsigned int vb2_request_buffer_cnt(struct media_request *req);
->  =20
-> +/* Container for pinned pfns / pages in frame_vector.c */
-> +struct frame_vector {
-> +	unsigned int nr_allocated;	/* Number of frames we have space for */
-> +	unsigned int nr_frames;	/* Number of frames stored in ptrs array */
-> +	bool got_ref;		/* Did we pin pages by getting page ref? */
-> +	bool is_pfns;		/* Does array contain pages or pfns? */
-> +	void *ptrs[];		/* Array of pinned pfns / pages. Use
-> +				 * pfns_vector_pages() or pfns_vector_pfns()
-> +				 * for access */
-> +};
-> +
-> +struct frame_vector *frame_vector_create(unsigned int nr_frames);
-> +void frame_vector_destroy(struct frame_vector *vec);
-> +int get_vaddr_frames(unsigned long start, unsigned int nr_pfns,
-> +		     unsigned int gup_flags, struct frame_vector *vec);
-> +void put_vaddr_frames(struct frame_vector *vec);
-> +int frame_vector_to_pages(struct frame_vector *vec);
-> +void frame_vector_to_pfns(struct frame_vector *vec);
-> +
-> +static inline unsigned int frame_vector_count(struct frame_vector *vec)
-> +{
-> +	return vec->nr_frames;
-> +}
-> +
-> +static inline struct page **frame_vector_pages(struct frame_vector *vec)
-> +{
-> +	if (vec->is_pfns) {
-> +		int err =3D frame_vector_to_pages(vec);
-> +
-> +		if (err)
-> +			return ERR_PTR(err);
-> +	}
-> +	return (struct page **)(vec->ptrs);
-> +}
-> +
-> +static inline unsigned long *frame_vector_pfns(struct frame_vector *vec)
-> +{
-> +	if (!vec->is_pfns)
-> +		frame_vector_to_pfns(vec);
-> +	return (unsigned long *)(vec->ptrs);
-> +}
-> +
->   #endif /* _MEDIA_VIDEOBUF2_CORE_H */
-> diff --git a/mm/Kconfig b/mm/Kconfig
-> index 6c974888f86f..da6c943fe9f1 100644
-> --- a/mm/Kconfig
-> +++ b/mm/Kconfig
-> @@ -815,9 +815,6 @@ config DEVICE_PRIVATE
->   	  memory; i.e., memory that is only accessible from the device (or
->   	  group of devices). You likely also want to select HMM_MIRROR.
->  =20
-> -config FRAME_VECTOR
-> -	bool
-> -
->   config ARCH_USES_HIGH_VMA_FLAGS
->   	bool
->   config ARCH_HAS_PKEYS
-> diff --git a/mm/Makefile b/mm/Makefile
-> index d5649f1c12c0..a025fd6c6afd 100644
-> --- a/mm/Makefile
-> +++ b/mm/Makefile
-> @@ -111,7 +111,6 @@ obj-$(CONFIG_PAGE_EXTENSION) +=3D page_ext.o
->   obj-$(CONFIG_CMA_DEBUGFS) +=3D cma_debug.o
->   obj-$(CONFIG_USERFAULTFD) +=3D userfaultfd.o
->   obj-$(CONFIG_IDLE_PAGE_TRACKING) +=3D page_idle.o
-> -obj-$(CONFIG_FRAME_VECTOR) +=3D frame_vector.o
->   obj-$(CONFIG_DEBUG_PAGE_REF) +=3D debug_page_ref.o
->   obj-$(CONFIG_HARDENED_USERCOPY) +=3D usercopy.o
->   obj-$(CONFIG_PERCPU_STATS) +=3D percpu-stats.o
->=20
-
+True, remap_pfn_range() makes sure that ->pgoff is an absolute
+physical address offset for all use cases. So you might be able to
+just point proc_bus_pci_open() at the shared devmem address space. For
+sysfs it's messier. I think you would need to somehow get the inode
+from kernfs_fop_open() to adjust its address space, but only if the
+bin_file will ultimately be used for PCI memory.
