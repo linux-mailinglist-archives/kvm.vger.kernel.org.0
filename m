@@ -2,171 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 441262867ED
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:00:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 258CB2867FF
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:04:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728131AbgJGTA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 15:00:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727732AbgJGTA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 15:00:26 -0400
-Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCD2FC0613D5
-        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 12:00:25 -0700 (PDT)
-Received: by mail-qv1-xf41.google.com with SMTP id q10so1793057qvs.1
-        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 12:00:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=gwCbc+E55rt8fvg0Z5RrVkUNpQiUldF+rgqAtNMU+jY=;
-        b=cMpNZVJG4K3eU3P6Jrd5CX0FOMJ/Il/vK4/7K8PoeJK7lgtOlsvjUxgy6GDWgBQ9D2
-         Aw5daoxRX/jrMpwNlaXAoNbojcae9A3GOXghtCpRVV9HiqHG68GEdYZUDKJSzv88i+3p
-         aFkcGAX3Swzr2MMkwPQxIHr1Vh0HtpCatuWCeA2XXODcHpk/xTpMM82sPz7LoWoj7YYW
-         Luz6GqqQzWzkcXY5HEYy6sj4zsu7Bc3sA+CDzGGX0SAXYkf0OGAbHVxxlJGYn7JBpuJm
-         7XOCU2H2Wb2aAXJ06fg5h12CT15LqHGmR1WX6xifpDWK1MH5EARIEabM4b4xkoRgWTA0
-         GO+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=gwCbc+E55rt8fvg0Z5RrVkUNpQiUldF+rgqAtNMU+jY=;
-        b=KJlvToZ6jT130vX0b5qS9Hz3CbW+QpeT56o0g5RLbFhlbZZoG9UZriOcIqWhLmP1Qz
-         Wjb1/mE7m847kcsvtnpzJ8yIFMMEVOP0fJzH3iKmgLcVzrLb2Cza06B61PdUS2xXaHit
-         4tJUWUDL6JNYgAIrhOvT3P2aeBtexE8w92SCPpdbDdK+Eb//5EZ0FOZO4hZiJEiHcpzL
-         q8CAB6GLLKaL1kxAB18YTIlsX4sh+oQwM5+esHHtxLl2I3snoz6lSVB7dGvgwvfErzO5
-         TZAD/xSlJIXkvHIyweJ68Elsmv6Ei7wpHlXbqh0Knepe5LWZVM3DO9hZwdOYHmZSIvpZ
-         z27Q==
-X-Gm-Message-State: AOAM531gXL6kYTtVqrb6OD4fCqwJ1HncpEeXrhteIoJh8yb/4LeDy6XZ
-        x3R9nRknpxcIJq+K49tkQHjwQg==
-X-Google-Smtp-Source: ABdhPJzTPvAeI7la8FWGJoa8jqCaN28XQwmJorKlewk43J8Zj2TVezuTxCVG7tggprHbo9uup+dLjQ==
-X-Received: by 2002:a0c:9d03:: with SMTP id m3mr4454155qvf.54.1602097224984;
-        Wed, 07 Oct 2020 12:00:24 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id v65sm2143675qkb.88.2020.10.07.12.00.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2020 12:00:24 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kQEfn-001EwU-Q3; Wed, 07 Oct 2020 16:00:23 -0300
-Date:   Wed, 7 Oct 2020 16:00:23 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>, linux-s390@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH 11/13] mm: add unsafe_follow_pfn
-Message-ID: <20201007190023.GA5177@ziepe.ca>
-References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-12-daniel.vetter@ffwll.ch>
- <20201007173647.GW5177@ziepe.ca>
- <CAKMK7uE9sbK_tGhJbsnHgD9rOnx-dr=2xmpMw7RvvvpPLnjVVA@mail.gmail.com>
+        id S1728111AbgJGTEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 15:04:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48636 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727463AbgJGTEe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 15:04:34 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 097J2fIA010981;
+        Wed, 7 Oct 2020 15:04:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=UOaDIPUYd9d53EGnjMoc+nuXYhpqeBpClS36ypy/+fw=;
+ b=gMBl5qJt2Ds3APOZasJVONoTVGQLqmlRLIlVRE3GluZuINe0PIn29VOPfpX+MMXTL+Vr
+ QN1HcpEY+XRsVQBA35CfbAjYIDuH+6CLE50V/r6Sh/j+L6XSzHDxUaA0GXpfRH4kmCzq
+ 2QNtgaLBteMj7b8KgfjvjySiiEqaAN90troGiUpwHuSuiHrtbdmHzpekFXdc2Lj5FBoq
+ vRaEo4UqAue3x3A0W96WbvhiQdeTbYno8+962UqiHSWyqkiHtff9ns46HT7SUmL7q9ax
+ lT/U0CpyurVovF4xQ9p9r0yh9jalhOKUvTuERbAT4o/lW8Xgu0G3alLh4JZHmMDD5CKn VQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 341k938be1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Oct 2020 15:04:21 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 097J3QdM014045;
+        Wed, 7 Oct 2020 15:04:21 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 341k938bdp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Oct 2020 15:04:21 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097IkpgP005207;
+        Wed, 7 Oct 2020 19:04:20 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma01wdc.us.ibm.com with ESMTP id 33xgx99a45-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Oct 2020 19:04:20 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 097J4Jcb52232498
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 7 Oct 2020 19:04:20 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DB2C7AC060;
+        Wed,  7 Oct 2020 19:04:19 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B99F3AC05B;
+        Wed,  7 Oct 2020 19:04:17 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  7 Oct 2020 19:04:17 +0000 (GMT)
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     cohuck@redhat.com, thuth@redhat.com
+Cc:     pmorel@linux.ibm.com, schnelle@linux.ibm.com, rth@twiddle.net,
+        david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+        mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com,
+        qemu-s390x@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: [PATCH v3 00/10] Retrieve zPCI hardware information from VFIO
+Date:   Wed,  7 Oct 2020 15:04:05 -0400
+Message-Id: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKMK7uE9sbK_tGhJbsnHgD9rOnx-dr=2xmpMw7RvvvpPLnjVVA@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-07_10:2020-10-07,2020-10-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 clxscore=1015 malwarescore=0 suspectscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 spamscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2010070118
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 07, 2020 at 08:10:34PM +0200, Daniel Vetter wrote:
-> On Wed, Oct 7, 2020 at 7:36 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Wed, Oct 07, 2020 at 06:44:24PM +0200, Daniel Vetter wrote:
-> > > Way back it was a reasonable assumptions that iomem mappings never
-> > > change the pfn range they point at. But this has changed:
-> > >
-> > > - gpu drivers dynamically manage their memory nowadays, invalidating
-> > > ptes with unmap_mapping_range when buffers get moved
-> > >
-> > > - contiguous dma allocations have moved from dedicated carvetouts to
-> > > cma regions. This means if we miss the unmap the pfn might contain
-> > > pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
-> > >
-> > > - even /dev/mem now invalidates mappings when the kernel requests that
-> > > iomem region when CONFIG_IO_STRICT_DEVMEM is set, see 3234ac664a87
-> > > ("/dev/mem: Revoke mappings when a driver claims the region")
-> > >
-> > > Accessing pfns obtained from ptes without holding all the locks is
-> > > therefore no longer a good idea.
-> > >
-> > > Unfortunately there's some users where this is not fixable (like v4l
-> > > userptr of iomem mappings) or involves a pile of work (vfio type1
-> > > iommu). For now annotate these as unsafe and splat appropriately.
-> > >
-> > > This patch adds an unsafe_follow_pfn, which later patches will then
-> > > roll out to all appropriate places.
-> > >
-> > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> > > Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> > > Cc: Kees Cook <keescook@chromium.org>
-> > > Cc: Dan Williams <dan.j.williams@intel.com>
-> > > Cc: Andrew Morton <akpm@linux-foundation.org>
-> > > Cc: John Hubbard <jhubbard@nvidia.com>
-> > > Cc: Jérôme Glisse <jglisse@redhat.com>
-> > > Cc: Jan Kara <jack@suse.cz>
-> > > Cc: Dan Williams <dan.j.williams@intel.com>
-> > > Cc: linux-mm@kvack.org
-> > > Cc: linux-arm-kernel@lists.infradead.org
-> > > Cc: linux-samsung-soc@vger.kernel.org
-> > > Cc: linux-media@vger.kernel.org
-> > > Cc: kvm@vger.kernel.org
-> > >  include/linux/mm.h |  2 ++
-> > >  mm/memory.c        | 32 +++++++++++++++++++++++++++++++-
-> > >  mm/nommu.c         | 17 +++++++++++++++++
-> > >  security/Kconfig   | 13 +++++++++++++
-> > >  4 files changed, 63 insertions(+), 1 deletion(-)
-> >
-> > Makes sense to me.
-> >
-> > I wonder if we could change the original follow_pfn to require the
-> > ptep and then lockdep_assert_held() it against the page table lock?
-> 
-> The safe variant with the pagetable lock is follow_pte_pmd. The only
-> way to make follow_pfn safe is if you have an mmu notifier and
-> corresponding retry logic. That is not covered by lockdep (it would
-> splat if we annotate the retry side), so I'm not sure how you'd check
-> for that?
+This patchset adds code to s390 pci to examine the VFIO_DEVICE_GET_INFO 
+capability chain, looking for capabilities that describe the underlying
+hardware and features of the passed-through device.
 
-Right OK.
+The retrieval of this information is done once per function (and for a
+subset of data, once per function group) and is performed at time of device
+plug.  Some elements provided via the capability chain must still be forced
+to default values for now to reflect what QEMU actually provides support
+for.
 
-> Checking for ptep lock doesn't work here, since the one leftover safe
-> user of this (kvm) doesn't need that at all, because it has the mmu
-> notifier.
+The original work for this feature was done by Pierre Morel.
 
-Ah, so a better name and/or function kdoc for follow_pfn is probably a
-good iead in this patch as well.
+Associated kernel patchset:
+https://lkml.org/lkml/2020/10/7/813
 
-> So I think we're as good as it gets, since I really have no idea how
-> to make sure follow_pfn callers do have an mmu notifier registered.
+Tested using a host kernel with/without the VFIO_DEVICE_GET_INFO changes
+and a QEMU with/without the VFIO_DEVICE_GET_INFO changes to validate
+VFIO_DEVICE_GET_INFO remains backwards-compatible.
 
-Yah, can't be done. Most mmu notifier users should be using
-hmm_range_fault anyhow, kvm is really very special here.
- 
-> I've followed the few other CONFIG_STRICT_FOO I've seen, which are all
-> explicit enables and default to "do not break uapi, damn the
-> (security) bugs". Which is I think how this should be done. It is in
-> the security section though, so hopefully competent distros will
-> enable this all.
 
-I thought the strict ones were more general and less clear security
-worries, not bugs like this.
+Changes since v2:
+- Added ACKs/RBs (thanks!)
+- Squashed the first 2 patches, and tried again using by formatting the 
+  set with --find-renames / diff.renames.  (Thanks Richard and Paolo!)
+  As before, this first patch can be applied separately but is included
+  here for the sake of simplicity.
+- Copied patch 'vfio: Create shared routine for scanning info capabilities'
+  from the 'Accomodate vfio DMA limiting' set, as it's now needed here too.
+  We can drop it from this set later once the former is applied.
+- Refresh the linux-header placeholder.  Manually omit the qatomic->atomic
+  pvrdma revert for now.
+- New patch to add a helper function for finding VFIO_DEVICE_GET_INFO
+  capabilities.  Depends on 'vfio: Create shared routine for scanning info
+  capabilities'
+- re-write the last patch to use VFIO_DEVICE_GET_INFO capabilities instead
+  of a vfio device region
 
-This is "allow a user triggerable use after free bug to exist in the
-kernel"
+Matthew Rosato (7):
+  s390x/pci: Move header files to include/hw/s390x
+  vfio: Create shared routine for scanning info capabilities
+  update-linux-headers: Add vfio_zdev.h
+  linux-headers: update against 5.9-rc8
+  s390x/pci: clean up s390 PCI groups
+  vfio: Add routine for finding VFIO_DEVICE_GET_INFO capabilities
+  s390x/pci: get zPCI function info from host
 
-Jason
+Pierre Morel (3):
+  s390x/pci: create a header dedicated to PCI CLP
+  s390x/pci: use a PCI Group structure
+  s390x/pci: use a PCI Function structure
+
+ MAINTAINERS                                        |   1 +
+ hw/s390x/meson.build                               |   1 +
+ hw/s390x/s390-pci-bus.c                            |  86 ++++++++-
+ hw/s390x/s390-pci-inst.c                           |  33 ++--
+ hw/s390x/s390-pci-vfio.c                           | 197 +++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c                         |   2 +-
+ hw/vfio/common.c                                   |  31 +++-
+ {hw => include/hw}/s390x/s390-pci-bus.h            |  13 ++
+ .../hw/s390x/s390-pci-clp.h                        | 123 ++-----------
+ include/hw/s390x/s390-pci-inst.h                   | 116 ++++++++++++
+ include/hw/s390x/s390-pci-vfio.h                   |  19 ++
+ include/hw/vfio/vfio-common.h                      |   2 +
+ linux-headers/linux/kvm.h                          |   6 +-
+ linux-headers/linux/vfio.h                         |  11 ++
+ linux-headers/linux/vfio_zdev.h                    |  78 ++++++++
+ scripts/update-linux-headers.sh                    |   2 +-
+ 16 files changed, 575 insertions(+), 146 deletions(-)
+ create mode 100644 hw/s390x/s390-pci-vfio.c
+ rename {hw => include/hw}/s390x/s390-pci-bus.h (96%)
+ rename hw/s390x/s390-pci-inst.h => include/hw/s390x/s390-pci-clp.h (59%)
+ create mode 100644 include/hw/s390x/s390-pci-inst.h
+ create mode 100644 include/hw/s390x/s390-pci-vfio.h
+ create mode 100644 linux-headers/linux/vfio_zdev.h
+
+-- 
+1.8.3.1
+
