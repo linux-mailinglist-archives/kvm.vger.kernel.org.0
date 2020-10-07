@@ -2,105 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F6822865F2
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04B51286604
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:33:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728526AbgJGRaX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 13:30:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59928 "EHLO
+        id S1728615AbgJGRd0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 13:33:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726100AbgJGRaX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 13:30:23 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B81C061755
-        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 10:30:22 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id k6so3238912ior.2
-        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:30:22 -0700 (PDT)
+        with ESMTP id S1726348AbgJGRd0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 13:33:26 -0400
+Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E59CBC061755
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 10:33:25 -0700 (PDT)
+Received: by mail-qv1-xf41.google.com with SMTP id cv1so1623259qvb.2
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:33:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pQ3RmkMpjXxSLR81pkKdGt+TZH44v4hpamp0wM2Tbvs=;
-        b=Se9nw5FgHFtKsm8GMYSImWv2wXIqCCOCv6pqlrWzBIvY0KyFKYLSgBJbdclE74rN0V
-         L0OzzCyXjwmzqY5CvOwmW1s23GoVCPICapYUZFiSyQ3VzyBQJpfZ+6B7eKkncs8IsvXR
-         slEUoHEbK3sqOXSRrw0ZRR2s39x9H1sNI4Ysl2tET0kOXOHkex1NPPywMNawv3w1f+sB
-         c6lulPb33S1fRXiAC5OZMKjd4VOO5Q3jJ7RhTgSz7ELXfAEp8rJq7zc0JWvoRTDpcC0Q
-         cTGuo3+wxAiYN9Cg6g/Jn6XY557RX4qkZ2GxwutbY+LCvSQ633tA4zpsHUJpBQTsLVbR
-         lMZw==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TdSre1+FiF17b2WS+AUXMuyymNAaLTf4uLT17E+pnFU=;
+        b=I7/owwaByfC+T615S4yoAl1o98d1ue1FvXLjxM8yebhh+9JecaDPgFNy3dbnkmB8TN
+         Vzx15ySYhGig+ha8DgJwv0JB9nc9mTmHX7s01XzVMtrzGqF7F5ysx9nVT6a95aQv8luf
+         ubR2OEMsVZaWQ7RmDyyDSLyoP0q7IOFEADlrOkM8v9xk0+G5fAvCgdRAbNUwL2HYX/wg
+         NdxL0Agtty3FgSPu+bQMrdJNei+OMp8ipKgGOhWKyjOjRZlk7D/1NKUJUn0ab2X75jIZ
+         GLdNE/c4Zf4maicgzgeRTMpXMrGmFUZrqUFukx9r5Pv+87LO5DNFvo/M0m7x2mbqppxs
+         Yd4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pQ3RmkMpjXxSLR81pkKdGt+TZH44v4hpamp0wM2Tbvs=;
-        b=AQcAlAGRwB2ypRGyoLsPW1NFBOw3qP+1GeNJazJpH68bK+LW8vwmHb+rLU9QO/TLQY
-         HPSWOL+l4cLY0HhUQqch4GFeD2uSCYw8XiUgRyHohMAY6JPTVoPXePd0hsxbB+NuT/MJ
-         Z4lg4xNjy9LjOYwaGPT67vinUu10G+yrjePkU7OwDI95xzwCmIC4Q7im5n5qh4gnN+vV
-         cVDxmQUXTsF56gG5/K+y09j72wYrUFFeG6iCwhfgtMA9oTkNKzHC3AizY7B/+prI/nhA
-         atmdMSmbPgO7FYWmPJMPxsDZ8ScOYWfClnazWDQExHacNpHvUdI518mzWYtCQDTqvIXY
-         j86A==
-X-Gm-Message-State: AOAM532tdkp6dogkvHalZa7F+reVOjZ92WDAg+RZStii6bKwcsPAgRaz
-        /pRK2DXsrW1xe++hNEDqEC33Ur20cBo6Ki50g+TtUA==
-X-Google-Smtp-Source: ABdhPJytlhBgnWm3jW2tGSy64WkRj5mYfdnZRMLgkPXFNiRl5vrEqOTNvUu8Lz/HHEZVJWadIix3VN17uQKF1IQZXao=
-X-Received: by 2002:a6b:1646:: with SMTP id 67mr3090555iow.189.1602091821740;
- Wed, 07 Oct 2020 10:30:21 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TdSre1+FiF17b2WS+AUXMuyymNAaLTf4uLT17E+pnFU=;
+        b=YaLNhX9wUMcmzYYqNJ0z5sN3wJ/A7KjgB58MS4agQPYABMUNXC9dSgpObU3zwUVzCz
+         2dM+6kEgyEaZiFPa0A+J4B21L3Mg45uBP5vmi5C1AG1Ko/BJG+YkHwzP7afzdWyser0e
+         Rea180L3nnzukr6j7BQojYAoz5K9tmjxzk570VL32sGB6kLBJNNJaRXzPPkB6S/q6TIT
+         p3JRIamsooY4tHfrD2Gpz6tNvCzQIwfOch9nsPbw1e2D8mtDuvhnlYN7xtCdXScDbztD
+         TI5cypHbNyE+sRelH0S8OSU/m1/MvKlfbJZgsR/IAnmA6rKLJi5Pf2IeeJYE19Mm4NYc
+         U4pw==
+X-Gm-Message-State: AOAM532ISZmS6aTIyaaKocZuIIRRmoQz/3gc2SDSuSFUxb2FLy6iDhtW
+        Jc/mOf6OTbIUwdM5eTIGX4nTKQ==
+X-Google-Smtp-Source: ABdhPJw0qC4HxiG6+lNGoLhXdKRQ6phNXWeAziKb0zM4HKIClbwU3fAgBb5ZP6iA8tkK3T/vsUzqKA==
+X-Received: by 2002:ad4:456c:: with SMTP id o12mr4490006qvu.48.1602092005183;
+        Wed, 07 Oct 2020 10:33:25 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id 184sm1954180qkl.104.2020.10.07.10.33.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Oct 2020 10:33:24 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kQDJb-0010xU-S5; Wed, 07 Oct 2020 14:33:23 -0300
+Date:   Wed, 7 Oct 2020 14:33:23 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, linux-s390@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Pawel Osciak <pawel@osciak.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Tomasz Figa <tfiga@chromium.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>
+Subject: Re: [PATCH 05/13] mm/frame-vector: Use FOLL_LONGTERM
+Message-ID: <20201007173323.GV5177@ziepe.ca>
+References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
+ <20201007164426.1812530-6-daniel.vetter@ffwll.ch>
+ <20201007165316.GT5177@ziepe.ca>
+ <CAKMK7uGTpZcHwrBNQOXwzDAzyfSgoLSt_Dae_3hMRE2xwGx+GA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-16-bgardon@google.com>
- <622ffc59-d914-c718-3f2f-952f714ac63c@redhat.com> <CANgfPd_8SpHkCd=NyBKtRFWKkczx4SMxPLRon-kx9Oc6P7b=Ew@mail.gmail.com>
- <7636707a-b622-90a3-e641-18662938f6dd@redhat.com>
-In-Reply-To: <7636707a-b622-90a3-e641-18662938f6dd@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 7 Oct 2020 10:30:10 -0700
-Message-ID: <CANgfPd_F_EurkfGquC79cEHa=4A2AMfnCAfMHPpAXa-6w4+bsg@mail.gmail.com>
-Subject: Re: [PATCH 15/22] kvm: mmu: Support changed pte notifier in tdp MMU
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKMK7uGTpZcHwrBNQOXwzDAzyfSgoLSt_Dae_3hMRE2xwGx+GA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 7, 2020 at 10:18 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 07/10/20 18:53, Ben Gardon wrote:
-> >> in addition to the previously-mentioned cleanup of always calling
-> >> handle_changed_spte instead of special-casing calls to two of the
-> >> three functions.  It would be a nice place to add the
-> >> trace_kvm_mmu_set_spte tracepoint, too.
-> > I'm not sure we can avoid special casing calls to the access tracking
-> > and dirty logging handler functions. At least in the past that's
-> > created bugs with things being marked dirty or accessed when they
-> > shouldn't be. I'll revisit those assumptions. It would certainly be
-> > nice to get rid of that complexity.
+On Wed, Oct 07, 2020 at 07:12:24PM +0200, Daniel Vetter wrote:
+> On Wed, Oct 7, 2020 at 6:53 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
 > >
-> > I agree that putting the SPTE assignment and handler functions in a
-> > helper function would clean up the code. I'll do that.
->
-> Well that's not easy if you have to think of which functions have to be
-> called.
->
-> I'll take a closer look at the access tracking and dirty logging cases
-> to try and understand what those bugs can be.  Apart from that I have my
-> suggested changes and I can probably finish testing them and send them
-> out tomorrow.
+> > On Wed, Oct 07, 2020 at 06:44:18PM +0200, Daniel Vetter wrote:
+> > >
+> > > -     /*
+> > > -      * While get_vaddr_frames() could be used for transient (kernel
+> > > -      * controlled lifetime) pinning of memory pages all current
+> > > -      * users establish long term (userspace controlled lifetime)
+> > > -      * page pinning. Treat get_vaddr_frames() like
+> > > -      * get_user_pages_longterm() and disallow it for filesystem-dax
+> > > -      * mappings.
+> > > -      */
+> > > -     if (vma_is_fsdax(vma)) {
+> > > -             ret = -EOPNOTSUPP;
+> > > -             goto out;
+> > > -     }
+> > > -
+> > > -     if (!(vma->vm_flags & (VM_IO | VM_PFNMAP))) {
+> > > -             vec->got_ref = true;
+> > > -             vec->is_pfns = false;
+> > > -             ret = pin_user_pages_locked(start, nr_frames,
+> > > -                     gup_flags, (struct page **)(vec->ptrs), &locked);
+> > > -             goto out;
+> > > -     }
+> >
+> > The vm_flags still need to be checked before going into the while
+> > loop. If the break is taken then nothing would check vm_flags
+> 
+> Hm right that's a bin inconsistent. follow_pfn also checks for this,
+> so I think we can just ditch this entirely both here and in the do {}
+> while () check, simplifying the latter to just while (vma). Well, just
+> make it a real loop with less confusing control flow probably.
 
-Awesome, thank you. I'll look forward to seeing them. Will you be
-applying those changes to the tdp_mmu branch you created as well?
+It does read very poorly with the redundant check, espeically since I
+keep forgetting follow_pfn does it too :\
 
->
-> Paolo
->
-> > I got some
-> > feedback on the RFC I sent last year which led me to open-code a lot
-> > more, but I think this is still a good cleanup.
->
+Jason
