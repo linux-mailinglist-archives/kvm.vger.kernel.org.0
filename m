@@ -2,123 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91BB7286958
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 22:46:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DEFC286969
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 22:53:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728336AbgJGUqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 16:46:07 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:4378 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727817AbgJGUqH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 16:46:07 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f7e28d60001>; Wed, 07 Oct 2020 13:45:10 -0700
-Received: from [10.2.85.86] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 7 Oct
- 2020 20:46:04 +0000
-Subject: Re: [PATCH 04/13] misc/habana: Use FOLL_LONGTERM for userptr
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>
-CC:     <kvm@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-samsung-soc@vger.kernel.org>, <linux-media@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Oded Gabbay <oded.gabbay@gmail.com>,
-        "Omer Shpigelman" <oshpigelman@habana.ai>,
-        Ofir Bitton <obitton@habana.ai>,
-        "Tomer Tayar" <ttayar@habana.ai>,
-        Moti Haimovski <mhaimovski@habana.ai>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        Pawel Piskorski <ppiskorski@habana.ai>
-References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-5-daniel.vetter@ffwll.ch>
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <ce781e05-044f-b62b-6a39-952d73ed1597@nvidia.com>
-Date:   Wed, 7 Oct 2020 13:46:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1728229AbgJGUxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 16:53:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35086 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726013AbgJGUxW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 16:53:22 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAB39C061755;
+        Wed,  7 Oct 2020 13:53:21 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1602103997;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vtcDCCITF2nkZPQBpg36c9Atf4ukHGwLOFXCwRKCklg=;
+        b=AVOpOeOwTC7C9yDmwrVPcB9C1aPMvhP/5PdP/qru4UkSe/Tg4pCe1Ov9uEYmh05Pn0Q0O1
+        njUkv+k7Hbf3l2DqWYdLQP4gb2+2Hpo0MffsYbxrvGzTW1kryRFPNq7DuLRZs4RnfEUJAL
+        Ce5FKKgPccq9WUrVPutCxus8e4M2PRseZsfw/COTCVvsKrngI7uYglaFkoxmV8aaFczyhx
+        4fZzfBjBSiF/RTkCxSVFeXV9U9TAXodE1e+4d/p7A8eD8EmICmC+2FDDJBTaJwix0w0xga
+        u8+31OmCuh8cj5+eKe28oQ6NiW5YG4AvVQ35FRelSHvkwColN93pjwFEjzbJRA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1602103997;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vtcDCCITF2nkZPQBpg36c9Atf4ukHGwLOFXCwRKCklg=;
+        b=uUXdWeB5iUUDQ1glmjUlfVx7FfzR42lEIjygybtN2704wXPeHGr8n5iedwh+Gwwo5mRYe/
+        FbUVKijLxJK86VBA==
+To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
+Cc:     iommu <iommu@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>, linux-hyperv@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 07/13] irqdomain: Add max_affinity argument to irq_domain_alloc_descs()
+In-Reply-To: <7FA24FCF-E197-4502-BC89-0902E4053554@infradead.org>
+References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org> <20201005152856.974112-1-dwmw2@infradead.org> <20201005152856.974112-7-dwmw2@infradead.org> <87lfgj59mp.fsf@nanos.tec.linutronix.de> <75d79c50d586c18f0b1509423ed673670fc76431.camel@infradead.org> <87tuv640nw.fsf@nanos.tec.linutronix.de> <336029ca32524147a61b6fa1eb734debc9d51a00.camel@infradead.org> <87a6wy3u6n.fsf@nanos.tec.linutronix.de> <7FA24FCF-E197-4502-BC89-0902E4053554@infradead.org>
+Date:   Wed, 07 Oct 2020 22:53:17 +0200
+Message-ID: <87tuv53ghu.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20201007164426.1812530-5-daniel.vetter@ffwll.ch>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1602103510; bh=7gGgalGDQ5Ct6e6oxVX0GKF6fkHgYYKPLymOR6tYzGU=;
-        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
-         MIME-Version:In-Reply-To:Content-Type:Content-Language:
-         Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
-        b=hDjrDWj3freRp1ybK4xKGh41JWbS/a33PUUY+OIWq7wCWr+gCw+Y7YWb5GlTFEByE
-         06K89H4PC9BMZJaiw+BZP5M8S63s07IUAQmo5lhkpnjZjEHyuHCRX/mEyfrbv2RBi5
-         uJ6DJLDc5KN5KysnSSFAUMzyEIRMWCHps09MbLSPAmKyksOETypirPJ00zDDmc2NCZ
-         lJPmgPC8cvOAyzelVuiBvVdtaxIZHAi58+kUse68GpdmUNRj3f+Wze2ZUsmO23bUkK
-         9BmqvzTyBGOaJd5NV2EhoHkVJltdEz8lMfwvWRt1wL0j/5/KzKm43UEdXWpjm7rSjF
-         Pm1sw+83JPf1g==
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/7/20 9:44 AM, Daniel Vetter wrote:
-> These are persistent, not just for the duration of a dma operation.
->=20
-> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: John Hubbard <jhubbard@nvidia.com>
-> Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: linux-mm@kvack.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-samsung-soc@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: Oded Gabbay <oded.gabbay@gmail.com>
-> Cc: Omer Shpigelman <oshpigelman@habana.ai>
-> Cc: Ofir Bitton <obitton@habana.ai>
-> Cc: Tomer Tayar <ttayar@habana.ai>
-> Cc: Moti Haimovski <mhaimovski@habana.ai>
-> Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Pawel Piskorski <ppiskorski@habana.ai>
-> ---
->   drivers/misc/habanalabs/common/memory.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/misc/habanalabs/common/memory.c b/drivers/misc/haban=
-alabs/common/memory.c
-> index ef89cfa2f95a..94bef8faa82a 100644
-> --- a/drivers/misc/habanalabs/common/memory.c
-> +++ b/drivers/misc/habanalabs/common/memory.c
-> @@ -1288,7 +1288,8 @@ static int get_user_memory(struct hl_device *hdev, =
-u64 addr, u64 size,
->   		return -ENOMEM;
->   	}
->  =20
-> -	rc =3D pin_user_pages_fast(start, npages, FOLL_FORCE | FOLL_WRITE,
-> +	rc =3D pin_user_pages_fast(start, npages,
-> +				 FOLL_FORCE | FOLL_WRITE | FOLL_LONGTERM,
->   				 userptr->pages);
->  =20
->   	if (rc !=3D npages) {
->=20
+On Wed, Oct 07 2020 at 17:11, David Woodhouse wrote:
+> On 7 October 2020 16:57:36 BST, Thomas Gleixner <tglx@linutronix.de> wrote:
+>>There is not lot's of nastiness.
+>
+> OK, but I think we do have to cope with the fact that the limit is
+> dynamic, and a CPU might be added which widens the mask. I think
+> that's fundamental and not x86-specific.
 
-Again, from a pin_user_pages_fast() point of view, and not being at all fam=
-iliar
-with the habana driver (but their use of this really does seem clearly _LON=
-GTERM!):
+Yes, but it needs some thoughts vs. serialization against CPU hotplug.
 
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+The stability of that cpumask is architecture specific if the calling
+context cannot serialize against CPU hotplug. The hot-unplug case is
+less interesting because the mask does not shrink, it only get's wider.
 
-thanks,
---=20
-John Hubbard
-NVIDIA
+That's why I want a callback instead of a pointer assignment and that
+callback cannot return a pointer to something which can be modified
+concurrently, it needs to update a caller provided mask so that the
+result is at least consistent in itself.
+
+It just occured to me that there is something which needs some more
+thought vs. CPU hotunplug as well:
+
+  Right now we just check whether there are enough vectors available on
+  the remaining online CPUs so that the interrupts which have an
+  effective affinity directed to the outgoing CPU can be migrated away
+  (modulo the managed ones).
+
+  That check obviously needs to take the target CPU restrictions into
+  account to prevent that devices end up with no target at the end.
+
+I bet there are some other interesting bits and pieces which need
+some care...
+
+Thanks,
+
+        tglx
+
+
