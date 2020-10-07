@@ -2,102 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E29928686E
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:39:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F0CE286894
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:47:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727727AbgJGTju (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 15:39:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24189 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727345AbgJGTju (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 15:39:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602099589;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cOqgbm6jLuc+pkMp+rGK/onrrL4PUBHXfHnkokJUxJA=;
-        b=OcoYS8paXU3moy937yqrGGvlxJWj2UIpbK5S3j4BgDAAWz+LlOUExEJf3YhkLZcvCqwtbE
-        5ZCP8aRAPWz1pYT07EM1XHSRPRGXQE6afEuubCDPajY7POuO0QiCvoYQc8xK+tjgLAZyIQ
-        2ZFa2g9+6CLk1woiIBwktKrAMMdUNmE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-bi3W629PPgyimimEII7m_w-1; Wed, 07 Oct 2020 15:39:47 -0400
-X-MC-Unique: bi3W629PPgyimimEII7m_w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D51B31007464;
-        Wed,  7 Oct 2020 19:39:45 +0000 (UTC)
-Received: from w520.home (ovpn-113-244.phx2.redhat.com [10.3.113.244])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1AC12702E7;
-        Wed,  7 Oct 2020 19:39:45 +0000 (UTC)
-Date:   Wed, 7 Oct 2020 13:39:44 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/5] Pass zPCI hardware information via VFIO
-Message-ID: <20201007133944.52782a7e@w520.home>
-In-Reply-To: <1602096984-13703-1-git-send-email-mjrosato@linux.ibm.com>
-References: <1602096984-13703-1-git-send-email-mjrosato@linux.ibm.com>
+        id S1728512AbgJGTrz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 15:47:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53208 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728499AbgJGTrv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 15:47:51 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 397A3C0613D5
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 12:47:50 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id 26so3760024ois.5
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 12:47:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=orhfCBuFEmd+KVAmHbcaixIkjSSik8aIdF2Y5AlSlTI=;
+        b=HqHL85aeU7x4vZRr8aFR2YVRrwspH04y26fUbXHdW1zHn9JiRP4t6c+95tolblKSFE
+         g6rmEte7OQz0vHT+Gxy0F+wmZQx2vj40nuDXq6VEJEgecoLqF0as8JHJF/ZRBUJmFjHz
+         fkLaTYyh9AGF6bz08/AxSynt04XwHMSoqg8zg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=orhfCBuFEmd+KVAmHbcaixIkjSSik8aIdF2Y5AlSlTI=;
+        b=PDNsDY5VzFzLSl06BycYZXSj3hzJefDA4Bu1gelHtSI71vK7Jm/aROoh7ZGa/jknWv
+         GWGeqCy4AsDcsP/tLe2c4lRag8/GB2otkeKNmKlAvb4NCpesT3lwgjoG3hoZ1RNqzcDb
+         wImdm1W1gqMfuU13CtMTzXEzDMMs+o8nj1ai8fnslPGzCkKZoOwVXh6b8i8Vhzqv2ZIC
+         od5+C6LpqGLYPKpPSCwIyC6kbSaR0gH1oxuR13+WPK5VCaTfqYm9IAejHGv8CaL5CbEp
+         VClis+o0und9pyJlRD36WiOiF7xQgPrwpTl5xu5WjLDh5pvKZwKHJVB41yz0maXI8N9e
+         ATEA==
+X-Gm-Message-State: AOAM533sRRAoO9gBYu+XEcwbHltBsNNMPVrluyWFfSauEh71GdXYFA+f
+        8Scr7ygLh/T9soAaP1jOm5kJUBt+1epuGn6Bk8+CSw==
+X-Google-Smtp-Source: ABdhPJxToTx3ndOy1U0dVrBcYAKX9wm3X1TZHa+mGhrb1Py/rD32WJ5mouUCMFv7wj7Vm8hLjOzC1v6C7W/A3Mayy3I=
+X-Received: by 2002:aca:6083:: with SMTP id u125mr2978051oib.14.1602100069344;
+ Wed, 07 Oct 2020 12:47:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
+ <20201007164426.1812530-11-daniel.vetter@ffwll.ch> <CAPcyv4hBL68A7CZa+YnooufDH2tevoxrx32DTJMQ6OHRnec7QQ@mail.gmail.com>
+In-Reply-To: <CAPcyv4hBL68A7CZa+YnooufDH2tevoxrx32DTJMQ6OHRnec7QQ@mail.gmail.com>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Wed, 7 Oct 2020 21:47:37 +0200
+Message-ID: <CAKMK7uFoxiPdjO-yhd-mKqumnTpjcENEReb1sOYhOwRRCL0wpQ@mail.gmail.com>
+Subject: Re: [PATCH 10/13] PCI: revoke mappings like devmem
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  7 Oct 2020 14:56:19 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On Wed, Oct 7, 2020 at 9:33 PM Dan Williams <dan.j.williams@intel.com> wrote:
+>
+> On Wed, Oct 7, 2020 at 11:11 AM Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
+> >
+> > Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims
+> > the region") /dev/kmem zaps ptes when the kernel requests exclusive
+> > acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, this is
+> > the default for all driver uses.
+> >
+> > Except there's two more ways to access pci bars: sysfs and proc mmap
+> > support. Let's plug that hole.
+>
+> Ooh, yes, lets.
+>
+> > For revoke_devmem() to work we need to link our vma into the same
+> > address_space, with consistent vma->vm_pgoff. ->pgoff is already
+> > adjusted, because that's how (io_)remap_pfn_range works, but for the
+> > mapping we need to adjust vma->vm_file->f_mapping. Usually that's done
+> > at ->open time, but that's a bit tricky here with all the entry points
+> > and arch code. So instead create a fake file and adjust vma->vm_file.
+>
+> I don't think you want to share the devmem inode for this, this should
+> be based off the sysfs inode which I believe there is already only one
+> instance per resource. In contrast /dev/mem can have multiple inodes
+> because anyone can just mknod a new character device file, the same
+> problem does not exist for sysfs.
 
-> This patchset provides a means by which hardware information about the
-> underlying PCI device can be passed up to userspace (ie, QEMU) so that
-> this hardware information can be used rather than previously hard-coded
-> assumptions. The VFIO_DEVICE_GET_INFO ioctl is extended to allow capability
-> chains and zPCI devices provide the hardware information via capabilities.
-> 
-> A form of these patches saw some rounds last year but has been back-
-> tabled for a while.  The original work for this feature was done by Pierre
-> Morel. I'd like to refresh the discussion on this and get this finished up
-> so that we can move forward with better-supporting additional types of
-> PCI-attached devices.  
-> 
-> This feature is toggled via the CONFIG_VFIO_PCI_ZDEV configuration entry. 
-> 
-> Changes since v2:
-> - Added ACKs (thanks!)
-> - Patch 3+4: Re-write to use VFIO_DEVICE_GET_INFO capabilities rather than
->   a vfio device region.
-
-Looks good to me, I'll let Connie and others double check and throw in
-their reviews, but I'll plan to include this for v5.10.  Thanks,
-
-Alex
- 
-> Matthew Rosato (5):
->   s390/pci: stash version in the zpci_dev
->   s390/pci: track whether util_str is valid in the zpci_dev
->   vfio: Introduce capability definitions for VFIO_DEVICE_GET_INFO
->   vfio-pci/zdev: Add zPCI capabilities to VFIO_DEVICE_GET_INFO
->   MAINTAINERS: Add entry for s390 vfio-pci
-> 
->  MAINTAINERS                         |   8 ++
->  arch/s390/include/asm/pci.h         |   4 +-
->  arch/s390/pci/pci_clp.c             |   2 +
->  drivers/vfio/pci/Kconfig            |  13 ++++
->  drivers/vfio/pci/Makefile           |   1 +
->  drivers/vfio/pci/vfio_pci.c         |  37 ++++++++++
->  drivers/vfio/pci/vfio_pci_private.h |  12 +++
->  drivers/vfio/pci/vfio_pci_zdev.c    | 143 ++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h           |  11 +++
->  include/uapi/linux/vfio_zdev.h      |  78 ++++++++++++++++++++
->  10 files changed, 308 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/vfio/pci/vfio_pci_zdev.c
->  create mode 100644 include/uapi/linux/vfio_zdev.h
-> 
-
+But then I need to find the right one, plus I also need to find the
+right one for the procfs side. That gets messy, and I already have no
+idea how to really test this. Shared address_space is the same trick
+we're using in drm (where we have multiple things all pointing to the
+same underlying resources, through different files), and it gets the
+job done. So that's why I figured the shared address_space is the
+cleaner solution since then unmap_mapping_range takes care of
+iterating over all vma for us. I guess I could reimplement that logic
+with our own locking and everything in revoke_devmem, but feels a bit
+silly. But it would also solve the problem of having mutliple
+different mknod of /dev/kmem with different address_space behind them.
+Also because of how remap_pfn_range works, all these vma do use the
+same pgoff already anyway.
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
