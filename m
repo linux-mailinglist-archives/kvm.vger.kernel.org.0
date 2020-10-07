@@ -2,142 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72CA0286618
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:39:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB24128663A
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728056AbgJGRjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 13:39:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727878AbgJGRjO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 13:39:14 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83152C0613D4
-        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 10:39:13 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id a23so3735350qkg.13
-        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:39:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=muCEajJ6hDOPl6eL85j4HlmJ9WtV9zWU+bfCV/Cq9BI=;
-        b=Dz0OOWtV09rElfhUKte1coDG1XmH70sU+t7XSvzch8QKv+JqccAMRzt3CfP44+/AfQ
-         BSOmkO0/4DojdkfFvQXoQgyy0jQhFfYLuGtSpIEzw2ZgOz60sA9Vk6P6Joyx8mLM7oVI
-         GulM3GKMb4JRE2TKQ53Eo7+b0LYA9pmvGiN/xhtwvUGDgP8zpeZiK3xp1njllpvHZ6s7
-         +zEZsvi99NmVaNYy4acbivpnVkuHyfeEWt1WrvUqBOOC668uWgAj9EFU3nanuKQfFrvC
-         NI/B5LDgDV7l6mq+xucfE4i5Vmh8E5S9NLZXdlnDCI7i7X4L/RR/AAH2/qqGFU9zUkKq
-         IF+w==
+        id S1728528AbgJGRu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 13:50:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39476 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728489AbgJGRu2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 13:50:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602093026;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a54dLyoHfWLvYVfrDW9YKtGjscMrE+CPCU7zwIofNGM=;
+        b=E0J8m/dYLOQCirsOIFSVXV4P133ueCE5kT3BalU1uZnAcDnRN5MeD0M265QU4UXT8R5FOw
+        7QLKbxQ1qyB2M5NXSXTvlzGv9RXooldTOv+iNki9kGroa7qPo+dXJFzLSVvxJFzV4RiTaq
+        mJBWZ3+hSuBF+9qkq+OUeAKqtRNp93Q=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-iNZny7KlOFq3uw2k1U50XA-1; Wed, 07 Oct 2020 13:50:24 -0400
+X-MC-Unique: iNZny7KlOFq3uw2k1U50XA-1
+Received: by mail-wm1-f70.google.com with SMTP id p17so1206210wmi.7
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:50:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=muCEajJ6hDOPl6eL85j4HlmJ9WtV9zWU+bfCV/Cq9BI=;
-        b=fVUCcJJhpqHvCgiiVnDATJmtGKZfQoF9Di/mXYcvD/2iWSGgfXSs7mMRC/xqTnX1bh
-         venjtTgSxPfq4FyVKmO+AFv5u8VLiVALeE/evOIZOzbs7ROVeVjf5whCB3CPcne3nprb
-         27ogv8be6PwLAWEWfUevxFWJfxfQsXcN6+9MVyr8YioZq6MyAXYobHTgdcVxnXPp+gxw
-         j4eurHW/Qsy7QckttgJ2vwTHpkQLWmhvnWyijSm0cwHkLmt2a9kZfziv2P5QHJ8xh7+s
-         uZy+dzAfzzKbBGNlIhIAYK3IDElTHNPTpaQciQAi3XEcKx3c/+AayhSxBy+N+cN2n/QI
-         0hpw==
-X-Gm-Message-State: AOAM5313yA24lMjVGsF2Gz6PyotKxvrEyG9koas/uw997AOpdPh3X+RC
-        gN74jkLnxJcNmU7NUTvLZsa/UQ==
-X-Google-Smtp-Source: ABdhPJwRH/CX2FYRARUgG1+mzIa/QuVNWzg4jQoHZB7NOT97+fmtc0eat9IRh9q/mSpxChFc0Hp56Q==
-X-Received: by 2002:a05:620a:54f:: with SMTP id o15mr3905794qko.91.1602092352650;
-        Wed, 07 Oct 2020 10:39:12 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id d14sm2013598qtr.62.2020.10.07.10.39.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2020 10:39:11 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kQDPD-00112O-7o; Wed, 07 Oct 2020 14:39:11 -0300
-Date:   Wed, 7 Oct 2020 14:39:11 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH 13/13] vfio/type1: Mark follow_pfn as unsafe
-Message-ID: <20201007173911.GX5177@ziepe.ca>
-References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-14-daniel.vetter@ffwll.ch>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=a54dLyoHfWLvYVfrDW9YKtGjscMrE+CPCU7zwIofNGM=;
+        b=l6GtiYtJgF0g1P0JF8bsowKCMwqPuKiqUHrkiIgJtkpPWMEPl6bO4mj4fjfyX3JUls
+         lcYNoCbpOVqLG/C5+bOx/pcIf5tZjc9Yk9BqFsSht5rwrMdnZqJeIhHGHAG2bD0PHsA9
+         m2+p3HYQdi/bG0AZVyaZb4Bzoi2YK9r39/bwN6HIgZMJhv1sPwPt0Let42XAGIDwvndh
+         8ZjUab905CuRM8/sSRHedJxLRKa6Ez1ZhPSUk4ULkUtkIw1jtnOcs4ceYhu5k0BlPEKH
+         2woaof4zlF/0Z9RXqdJaGnX9bHQvQtgk1UK7ERNMF2kIV2Dl3abMomNDujsJF9S5dMlc
+         8K8g==
+X-Gm-Message-State: AOAM530JhD2s3xZog0c8+/Q5adtM0yOwMduqJwEP3JSqC/yz1pZDVgnG
+        XaVnLN5aSN5wQdoFWo/9Xk+vNxNNc+NDTZo9hB2Oa9x2laZTHc6ChDtejOTJGVU7/LB8C1hr1ge
+        zqYNkNmV60kob
+X-Received: by 2002:a5d:6a85:: with SMTP id s5mr5068986wru.90.1602093022769;
+        Wed, 07 Oct 2020 10:50:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw+KNtLI6Q/fyWROjeJM0mDYXTnMD0R+iAiJ5XgupNU6bUZjaCv9qjZyVDsi8DSRg0AvSX5+w==
+X-Received: by 2002:a5d:6a85:: with SMTP id s5mr5068965wru.90.1602093022533;
+        Wed, 07 Oct 2020 10:50:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d2f4:5943:190c:39ff? ([2001:b07:6468:f312:d2f4:5943:190c:39ff])
+        by smtp.gmail.com with ESMTPSA id d30sm4079023wrc.19.2020.10.07.10.50.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Oct 2020 10:50:21 -0700 (PDT)
+Subject: Re: KVM call for agenda for 2020-10-06
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Markus Armbruster <armbru@redhat.com>,
+        Daniel Berrange <berrange@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>
+References: <874kndm1t3.fsf@secure.mitica>
+ <20201005144615.GE5029@stefanha-x1.localdomain>
+ <CAJSP0QVZcEQueXG1gjwuLszdUtXWi1tgB5muLL6QHJjNTOmyfQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8fce8f99-56bd-6a87-9789-325d6ffff54d@redhat.com>
+Date:   Wed, 7 Oct 2020 19:50:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <CAJSP0QVZcEQueXG1gjwuLszdUtXWi1tgB5muLL6QHJjNTOmyfQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201007164426.1812530-14-daniel.vetter@ffwll.ch>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 07, 2020 at 06:44:26PM +0200, Daniel Vetter wrote:
-> The code seems to stuff these pfns into iommu pts (or something like
-> that, I didn't follow), but there's no mmu_notifier to ensure that
-> access is synchronized with pte updates.
-> 
-> Hence mark these as unsafe. This means that with
-> CONFIG_STRICT_FOLLOW_PFN, these will be rejected.
-> 
-> Real fix is to wire up an mmu_notifier ... somehow. Probably means any
-> invalidate is a fatal fault for this vfio device, but then this
-> shouldn't ever happen if userspace is reasonable.
-> 
-> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: John Hubbard <jhubbard@nvidia.com>
-> Cc: Jérôme Glisse <jglisse@redhat.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: linux-mm@kvack.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-samsung-soc@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: kvm@vger.kernel.org
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 5fbf0c1f7433..a4d53f3d0a35 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -421,7 +421,7 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
->  {
->  	int ret;
->  
-> -	ret = follow_pfn(vma, vaddr, pfn);
-> +	ret = unsafe_follow_pfn(vma, vaddr, pfn);
->  	if (ret) {
->  		bool unlocked = false;
->  
-> @@ -435,7 +435,7 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
->  		if (ret)
->  			return ret;
->  
-> -		ret = follow_pfn(vma, vaddr, pfn);
-> +		ret = unsafe_follow_pfn(vma, vaddr, pfn);
->  	}
+On 06/10/20 20:21, Stefan Hajnoczi wrote:
+>     * Does command-line order matter?
+>         * Two options: allow any order OR left-to-right ordering
+>         * Andrea Bolognani: Most users expect left-to-right ordering,
+> why allow any order?
+>         * Eduardo Habkost: Can we enforce left-to-right ordering or do
+> we need to follow the deprecation process?
+>         * Daniel Berrange: Solve compability by introducing new
+> binaries without the burden of backwards compability
 
-This is actually being commonly used, so it needs fixing.
+I think "new binaries" shouldn't even have a command line; all
+configuration should happen through QMP commands.  Those are naturally
+time-ordered, which is equivalent to left-to-right, and therefore the
+question is sidestepped.  Perhaps even having a command line in
+qemu-storage-daemon was a mistake.
 
-When I talked to Alex about this last we had worked out a patch series
-that adds a test on vm_ops that the vma came from vfio in the first
-place. The VMA's created by VFIO are 'safe' as the PTEs are never changed.
+For "old binaries" we are not adding too many options, so apart from the
+nasty distinction between early and late objects we're at least not
+making it worse.
 
-Jason
+The big question to me is whether the configuration should be
+QAPI-based, that is based on QAPI structs, or QMP-based.  If the latter,
+"object-add" (and to a lesser extent "device-add") are fine mechanisms
+for configuration.  There is still need for better QOM introspection,
+but it would be much simpler than doing QOM object creation via QAPI
+struct, if at all possible.						
+
+Paolo
+
