@@ -2,131 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6933286825
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B227286839
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:25:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727968AbgJGTSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 15:18:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46702 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726111AbgJGTSa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 15:18:30 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 097JCIM8077366;
-        Wed, 7 Oct 2020 15:18:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=JJ/LXoRz0pu4Rw1PUxwfzjwrdgbQmhPd42lBF4MfwIk=;
- b=SR2luMIp+4HlhjlQ6SXsXo1M6FMbaQ9nbQUBuLx3RKPXqYlwB7phHnTHGs/Zyx9A8qOj
- bmihEM3KYtO/MqSbCpH85huVLsA/gxMLqVg4RyG2Y2tMID6sKrBye89KzmhaFCl9LLAz
- 7QrvZu9RwsUaW6dIx+FgR7A0ONPJrYOw8V0IVdmMReXJwO5SZzR0GN7E+BB28SC1C+Ro
- KmEXBpnBOUfEd6CgODTX/pPMF15ApBUAAKGa8aXKolw+dI295CAQaETwdd8GM4/iu3q3
- NAAR6voiZc9UEDurEnOZpTxPQp+5B/EnooYHSee8iuMnhgn0ng0YEau3MH3Zg8VFIAu9 Qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 341kmd84tc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 15:18:29 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 097JFRa6089753;
-        Wed, 7 Oct 2020 15:18:29 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 341kmd84t6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 15:18:28 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097JHd5M020834;
-        Wed, 7 Oct 2020 19:18:28 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma02dal.us.ibm.com with ESMTP id 33xgx9sr7h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 19:18:28 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 097JIQwe54329734
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Oct 2020 19:18:26 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4C9A6112061;
-        Wed,  7 Oct 2020 19:18:26 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 936F0112062;
-        Wed,  7 Oct 2020 19:18:24 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Oct 2020 19:18:24 +0000 (GMT)
-Subject: Re: [PATCH v3 0/5] Pass zPCI hardware information via VFIO
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com
-Cc:     pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1602096984-13703-1-git-send-email-mjrosato@linux.ibm.com>
-Message-ID: <7bff9eac-2704-438a-89e8-f2f4cca60757@linux.ibm.com>
-Date:   Wed, 7 Oct 2020 15:18:23 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1728230AbgJGTZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 15:25:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49652 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728205AbgJGTZE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 15:25:04 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7D0DC0613D2
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 12:25:02 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id 16so3657021oix.9
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 12:25:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BZRP/YEUZ8RoSb8Ypgb3DGxVhdoAtHRN1N0p0L0pWpA=;
+        b=IfegH4nwN/o6kcQDvfu01nenDUeNQgBkda4/dhczUdP0kMFXcvE572DUDzf1wvqGpa
+         nyp1a/D73Mflnvnu40XfTC32OrNKnzCHp2mvGEYcnzK1KJ6+dezHuXb9vC5VNmLGIhTb
+         kwAV9e9OpEVj4sQ6ggzRYYm32tqaPtdzoptpI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BZRP/YEUZ8RoSb8Ypgb3DGxVhdoAtHRN1N0p0L0pWpA=;
+        b=ghaauUzPqc0bRd19O+e9tlMklFAQgIHsTsItkqPsyar0OTX2Zul7qr2oCKoFi82PGu
+         hVAgF9OqAbLp/x7FMK5PAzEn2w8zFf/57nMIkpEznvCWkLU7epZKW1F5HlFdjsj7o82z
+         gyP701thtxbgm3U9JjObZ5jYdlqmiF2dj3Xqpa90XIjRAwFZbSAll1CZ5MH6sSCJTRFu
+         nQxGSUz93+EfaIySJs9sMl1BqFhESbqzCAogTU9BUHbCTRENS9k9OKftWthHC6gI1AKm
+         BB9D1OtBw1Pj3foT6bx7YmXS5VZWygTsCOvLdq6zXm+hMEBHlaaIPwneHtQmC9OCeJng
+         EnPw==
+X-Gm-Message-State: AOAM532vjOSH5JjuajYS1hH4Gzf7aoHETOktdaKaQ60sPcTHqFO2pWfq
+        eytr/alVUkUDqNPvcu/pbBrPtc79sGxSeEV8OS12Jg==
+X-Google-Smtp-Source: ABdhPJzhvBCanKpF9yHYf4rPvV3OgJoXcQ8bSZqPwzVGdWv0uBGdiJso5tL8awsEi+dW1GpdYavbUXQPpc/1p2uOTug=
+X-Received: by 2002:aca:6083:: with SMTP id u125mr2929990oib.14.1602098701967;
+ Wed, 07 Oct 2020 12:25:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1602096984-13703-1-git-send-email-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-07_10:2020-10-07,2020-10-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- impostorscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 lowpriorityscore=0
- malwarescore=0 phishscore=0 adultscore=0 suspectscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2010070118
+References: <20201007164426.1812530-11-daniel.vetter@ffwll.ch> <20201007184131.GA3259154@bjorn-Precision-5520>
+In-Reply-To: <20201007184131.GA3259154@bjorn-Precision-5520>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Wed, 7 Oct 2020 21:24:49 +0200
+Message-ID: <CAKMK7uEi-PaoP2mSgg-aub49gctjTbwW6-X4nuRLnv1uzTh9dQ@mail.gmail.com>
+Subject: Re: [PATCH 10/13] PCI: revoke mappings like devmem
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, linux-s390@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/7/20 2:56 PM, Matthew Rosato wrote:
-> This patchset provides a means by which hardware information about the
-> underlying PCI device can be passed up to userspace (ie, QEMU) so that
-> this hardware information can be used rather than previously hard-coded
-> assumptions. The VFIO_DEVICE_GET_INFO ioctl is extended to allow capability
-> chains and zPCI devices provide the hardware information via capabilities.
-> 
-> A form of these patches saw some rounds last year but has been back-
-> tabled for a while.  The original work for this feature was done by Pierre
-> Morel. I'd like to refresh the discussion on this and get this finished up
-> so that we can move forward with better-supporting additional types of
-> PCI-attached devices.
-> 
-> This feature is toggled via the CONFIG_VFIO_PCI_ZDEV configuration entry.
-> 
-> Changes since v2:
-> - Added ACKs (thanks!)
-> - Patch 3+4: Re-write to use VFIO_DEVICE_GET_INFO capabilities rather than
->    a vfio device region.
+On Wed, Oct 7, 2020 at 8:41 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
+>
+> Capitalize subject, like other patches in this series and previous
+> drivers/pci history.
+>
+> On Wed, Oct 07, 2020 at 06:44:23PM +0200, Daniel Vetter wrote:
+> > Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims
+> > the region") /dev/kmem zaps ptes when the kernel requests exclusive
+> > acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, this is
+> > the default for all driver uses.
+> >
+> > Except there's two more ways to access pci bars: sysfs and proc mmap
+> > support. Let's plug that hole.
+>
+> s/pci/PCI/ in commit logs and comments.
+>
+> > For revoke_devmem() to work we need to link our vma into the same
+> > address_space, with consistent vma->vm_pgoff. ->pgoff is already
+> > adjusted, because that's how (io_)remap_pfn_range works, but for the
+> > mapping we need to adjust vma->vm_file->f_mapping. Usually that's done
+> > at ->open time, but that's a bit tricky here with all the entry points
+> > and arch code. So instead create a fake file and adjust vma->vm_file.
+> >
+> > Note this only works for ARCH_GENERIC_PCI_MMAP_RESOURCE. But that
+> > seems to be a subset of architectures support STRICT_DEVMEM, so we
+> > should be good.
+> >
+> > The only difference in access checks left is that sysfs pci mmap does
+> > not check for CAP_RAWIO. But I think that makes some sense compared to
+> > /dev/mem and proc, where one file gives you access to everything and
+> > no ownership applies.
+>
+> > --- a/drivers/char/mem.c
+> > +++ b/drivers/char/mem.c
+> > @@ -810,6 +810,7 @@ static loff_t memory_lseek(struct file *file, loff_t offset, int orig)
+> >  }
+> >
+> >  static struct inode *devmem_inode;
+> > +static struct vfsmount *devmem_vfs_mount;
+> >
+> >  #ifdef CONFIG_IO_STRICT_DEVMEM
+> >  void revoke_devmem(struct resource *res)
+> > @@ -843,6 +844,20 @@ void revoke_devmem(struct resource *res)
+> >
+> >       unmap_mapping_range(inode->i_mapping, res->start, resource_size(res), 1);
+> >  }
+> > +
+> > +struct file *devmem_getfile(void)
+> > +{
+> > +     struct file *file;
+> > +
+> > +     file = alloc_file_pseudo(devmem_inode, devmem_vfs_mount, "devmem",
+> > +                              O_RDWR, &kmem_fops);
+> > +     if (IS_ERR(file))
+> > +             return NULL;
+> > +
+> > +     file->f_mapping = devmem_indoe->i_mapping;
+>
+> "devmem_indoe"?  Obviously not compiled, I guess?
 
-Link to latest QEMU patch set:
-https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg01948.html
+Yeah apologies, I forgot to compile this with CONFIG_IO_STRICT_DEVMEM
+set. The entire series is more rfc about the overall problem really, I
+need to also figure out how to even this this somehow. I guess there's
+nothing really ready made here?
+-Daniel
 
-> 
-> Matthew Rosato (5):
->    s390/pci: stash version in the zpci_dev
->    s390/pci: track whether util_str is valid in the zpci_dev
->    vfio: Introduce capability definitions for VFIO_DEVICE_GET_INFO
->    vfio-pci/zdev: Add zPCI capabilities to VFIO_DEVICE_GET_INFO
->    MAINTAINERS: Add entry for s390 vfio-pci
-> 
->   MAINTAINERS                         |   8 ++
->   arch/s390/include/asm/pci.h         |   4 +-
->   arch/s390/pci/pci_clp.c             |   2 +
->   drivers/vfio/pci/Kconfig            |  13 ++++
->   drivers/vfio/pci/Makefile           |   1 +
->   drivers/vfio/pci/vfio_pci.c         |  37 ++++++++++
->   drivers/vfio/pci/vfio_pci_private.h |  12 +++
->   drivers/vfio/pci/vfio_pci_zdev.c    | 143 ++++++++++++++++++++++++++++++++++++
->   include/uapi/linux/vfio.h           |  11 +++
->   include/uapi/linux/vfio_zdev.h      |  78 ++++++++++++++++++++
->   10 files changed, 308 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/vfio/pci/vfio_pci_zdev.c
->   create mode 100644 include/uapi/linux/vfio_zdev.h
-> 
+> > --- a/include/linux/ioport.h
+> > +++ b/include/linux/ioport.h
+> > @@ -304,8 +304,10 @@ struct resource *request_free_mem_region(struct resource *base,
+> >
+> >  #ifdef CONFIG_IO_STRICT_DEVMEM
+> >  void revoke_devmem(struct resource *res);
+> > +struct file *devm_getfile(void);
+> >  #else
+> >  static inline void revoke_devmem(struct resource *res) { };
+> > +static inline struct file *devmem_getfile(void) { return NULL; };
+>
+> I guess these names are supposed to match?
+>
+> >  #endif
+> >
+> >  #endif /* __ASSEMBLY__ */
+> > --
+> > 2.28.0
+> >
 
+
+
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
