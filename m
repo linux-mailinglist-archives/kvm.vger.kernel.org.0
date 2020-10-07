@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 937E42865E4
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:28:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F6822865F2
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 19:30:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727779AbgJGR2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 13:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59652 "EHLO
+        id S1728526AbgJGRaX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 13:30:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726434AbgJGR2l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 13:28:41 -0400
+        with ESMTP id S1726100AbgJGRaX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 13:30:23 -0400
 Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F240C061755
-        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 10:28:41 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id k6so3233030ior.2
-        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:28:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B81C061755
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 10:30:22 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id k6so3238912ior.2
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 10:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Gzog+3s7evIu2Oc1rtwTUl+9x6mD7V8+jB/FerDJf6g=;
-        b=nX/4Q/YGjmebBLp4gLg8J2yprcJQilHAS6qA1FHs5eLbDhe6iwzEYvpmsJs/PP94Kp
-         GCzwHPrwqADg8+WqzbUbeFeB4eX4KHZvo0buxluUokPbtybLhx8dhFMWlcQAd4CKe10t
-         26nG5444aSaobp5nO22ausRmcHQy//aglJ0fRKo9ARJvEW1Yrw8Ky7WccdZpsJuYm3e/
-         xQS3dc0ny8dD/YDLaIBmKmsuC02TSE/s94jTazNbKJ4VAxjuvrFEJSzCQ/Eg9TGtG3ES
-         0m7EI+PaTupmbB5L+0UtEw9R9srPbyfyOmGMXNBfZhOTPadOU/ZYwAIGwrkLzEgvL1mu
-         hmWA==
+        bh=pQ3RmkMpjXxSLR81pkKdGt+TZH44v4hpamp0wM2Tbvs=;
+        b=Se9nw5FgHFtKsm8GMYSImWv2wXIqCCOCv6pqlrWzBIvY0KyFKYLSgBJbdclE74rN0V
+         L0OzzCyXjwmzqY5CvOwmW1s23GoVCPICapYUZFiSyQ3VzyBQJpfZ+6B7eKkncs8IsvXR
+         slEUoHEbK3sqOXSRrw0ZRR2s39x9H1sNI4Ysl2tET0kOXOHkex1NPPywMNawv3w1f+sB
+         c6lulPb33S1fRXiAC5OZMKjd4VOO5Q3jJ7RhTgSz7ELXfAEp8rJq7zc0JWvoRTDpcC0Q
+         cTGuo3+wxAiYN9Cg6g/Jn6XY557RX4qkZ2GxwutbY+LCvSQ633tA4zpsHUJpBQTsLVbR
+         lMZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Gzog+3s7evIu2Oc1rtwTUl+9x6mD7V8+jB/FerDJf6g=;
-        b=cftnXQsbuzO3D0x6e9R10zUMsQ/96G1Gp9qIhqVpNG7+Syyyzdy8s4pzS89+N/idzv
-         wLyy6UiFDiCUvqKZcF4+VFokkBO17JjEB5hD9dpxs5XtF71BeD29szJtgKMWL2zRwTnZ
-         qOot/rSwlJOK7kcEJEJbsL8LL7NNKryBkJCAO0OplIHpFg2CKk5DLHULYZyHlohodYtQ
-         mtrkGbewqTjGUKua4MMmKn9sYQk90G8EB9RkgWsH/CpuQVwo6HLFnwscK1NBvI7/ekMg
-         yyIc3eOa40T74rl2Z1w/0o9TQgi/BphLvh2JursiZwuxJPMBVhkxsJnLDlqXqwLO9pXj
-         jJYA==
-X-Gm-Message-State: AOAM532RQb3+Q1yc/FzDc9ZPmqe+GZ2Vcv+g05RKl4mLZyJkFOgQsYJt
-        U1R8ldnG+EUmxUP3nzlnjA6T9mdNJgXhbUri9KPQQw==
-X-Google-Smtp-Source: ABdhPJx+5QZ/4AZZSBIqs4Xz/+pawpkCt8kkhCfoEeqQkigGdJRmMdYgOotYq/Tj/ADhEivC6xDJq+FADqbvmAySDHU=
-X-Received: by 2002:a02:2ac1:: with SMTP id w184mr3827019jaw.44.1602091720153;
- Wed, 07 Oct 2020 10:28:40 -0700 (PDT)
+        bh=pQ3RmkMpjXxSLR81pkKdGt+TZH44v4hpamp0wM2Tbvs=;
+        b=AQcAlAGRwB2ypRGyoLsPW1NFBOw3qP+1GeNJazJpH68bK+LW8vwmHb+rLU9QO/TLQY
+         HPSWOL+l4cLY0HhUQqch4GFeD2uSCYw8XiUgRyHohMAY6JPTVoPXePd0hsxbB+NuT/MJ
+         Z4lg4xNjy9LjOYwaGPT67vinUu10G+yrjePkU7OwDI95xzwCmIC4Q7im5n5qh4gnN+vV
+         cVDxmQUXTsF56gG5/K+y09j72wYrUFFeG6iCwhfgtMA9oTkNKzHC3AizY7B/+prI/nhA
+         atmdMSmbPgO7FYWmPJMPxsDZ8ScOYWfClnazWDQExHacNpHvUdI518mzWYtCQDTqvIXY
+         j86A==
+X-Gm-Message-State: AOAM532tdkp6dogkvHalZa7F+reVOjZ92WDAg+RZStii6bKwcsPAgRaz
+        /pRK2DXsrW1xe++hNEDqEC33Ur20cBo6Ki50g+TtUA==
+X-Google-Smtp-Source: ABdhPJytlhBgnWm3jW2tGSy64WkRj5mYfdnZRMLgkPXFNiRl5vrEqOTNvUu8Lz/HHEZVJWadIix3VN17uQKF1IQZXao=
+X-Received: by 2002:a6b:1646:: with SMTP id 67mr3090555iow.189.1602091821740;
+ Wed, 07 Oct 2020 10:30:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-19-bgardon@google.com>
- <44822999-f5dc-6116-db12-a41f5bd80dd8@redhat.com> <CANgfPd_dQ19sZz2wzSfz7-RzdbQrfP6cYJLpSYbyNyQW6Uf09Q@mail.gmail.com>
- <5dc72eec-a4bd-f31a-f439-cdf8c5b48c05@redhat.com>
-In-Reply-To: <5dc72eec-a4bd-f31a-f439-cdf8c5b48c05@redhat.com>
+References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-16-bgardon@google.com>
+ <622ffc59-d914-c718-3f2f-952f714ac63c@redhat.com> <CANgfPd_8SpHkCd=NyBKtRFWKkczx4SMxPLRon-kx9Oc6P7b=Ew@mail.gmail.com>
+ <7636707a-b622-90a3-e641-18662938f6dd@redhat.com>
+In-Reply-To: <7636707a-b622-90a3-e641-18662938f6dd@redhat.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 7 Oct 2020 10:28:29 -0700
-Message-ID: <CANgfPd8Nzi2Cb3cvh5nFoaXTPbfm7Y77e4iM6-zOp5Qa3wNJBw@mail.gmail.com>
-Subject: Re: [PATCH 18/22] kvm: mmu: Support disabling dirty logging for the
- tdp MMU
+Date:   Wed, 7 Oct 2020 10:30:10 -0700
+Message-ID: <CANgfPd_F_EurkfGquC79cEHa=4A2AMfnCAfMHPpAXa-6w4+bsg@mail.gmail.com>
+Subject: Re: [PATCH 15/22] kvm: mmu: Support changed pte notifier in tdp MMU
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Cannon Matthews <cannonmatthews@google.com>,
@@ -71,55 +70,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 7, 2020 at 10:21 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Oct 7, 2020 at 10:18 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On 07/10/20 18:30, Ben Gardon wrote:
-> >> I'm starting to wonder if another iterator like
-> >> for_each_tdp_leaf_pte_root would be clearer, since this idiom repeats
-> >> itself quite often.  The tdp_iter_next_leaf function would be easily
-> >> implemented as
-> >>
-> >>         while (likely(iter->valid) &&
-> >>                (!is_shadow_present_pte(iter.old_spte) ||
-> >>                 is_last_spte(iter.old_spte, iter.level))
-> >>                 tdp_iter_next(iter);
-> > Do you see a substantial efficiency difference between adding a
-> > tdp_iter_next_leaf and building on for_each_tdp_pte_using_root with
-> > something like:
+> On 07/10/20 18:53, Ben Gardon wrote:
+> >> in addition to the previously-mentioned cleanup of always calling
+> >> handle_changed_spte instead of special-casing calls to two of the
+> >> three functions.  It would be a nice place to add the
+> >> trace_kvm_mmu_set_spte tracepoint, too.
+> > I'm not sure we can avoid special casing calls to the access tracking
+> > and dirty logging handler functions. At least in the past that's
+> > created bugs with things being marked dirty or accessed when they
+> > shouldn't be. I'll revisit those assumptions. It would certainly be
+> > nice to get rid of that complexity.
 > >
-> > #define for_each_tdp_leaf_pte_using_root(_iter, _root, _start, _end)    \
-> >         for_each_tdp_pte_using_root(_iter, _root, _start, _end)         \
-> >                 if (!is_shadow_present_pte(_iter.old_spte) ||           \
-> >                     !is_last_spte(_iter.old_spte, _iter.level))         \
-> >                         continue;                                       \
-> >                 else
-> >
-> > I agree that putting those checks in a wrapper makes the code more concise.
-> >
+> > I agree that putting the SPTE assignment and handler functions in a
+> > helper function would clean up the code. I'll do that.
 >
-> No, that would be just another way to write the same thing.  That said,
-> making the iteration API more complicated also has disadvantages because
-> if get a Cartesian explosion of changes.
-
-I wouldn't be too worried about that. The only things I ever found
-worth making an iterator case for were:
-Every SPTE
-Every present SPTE
-Every present leaf SPTE
-
-And really there aren't many cases that use the middle one.
-
+> Well that's not easy if you have to think of which functions have to be
+> called.
 >
-> Regarding the naming, I'm leaning towards
->
->     tdp_root_for_each_pte
->     tdp_vcpu_for_each_pte
->
-> which is shorter than the version with "using" and still clarifies that
-> "root" and "vcpu" are the thing that the iteration works on.
+> I'll take a closer look at the access tracking and dirty logging cases
+> to try and understand what those bugs can be.  Apart from that I have my
+> suggested changes and I can probably finish testing them and send them
+> out tomorrow.
 
-That sounds good to me. I agree it's similarly clear.
+Awesome, thank you. I'll look forward to seeing them. Will you be
+applying those changes to the tdp_mmu branch you created as well?
 
 >
 > Paolo
+>
+> > I got some
+> > feedback on the RFC I sent last year which led me to open-code a lot
+> > more, but I think this is still a good cleanup.
 >
