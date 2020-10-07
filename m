@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6545D28594B
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 09:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82C1228597A
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 09:26:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727671AbgJGHWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 03:22:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
+        id S1727660AbgJGH0D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 03:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726041AbgJGHWN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 03:22:13 -0400
+        with ESMTP id S1726771AbgJGH0D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 03:26:03 -0400
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F38C061755;
-        Wed,  7 Oct 2020 00:22:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3650DC061755;
+        Wed,  7 Oct 2020 00:26:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=S9jCLowV89NVKZECycX9j1APfco3OP0R5c0bpu/+tdw=; b=FBwDcZ54+M5RpkohwVNDVWYCsQ
-        X6ybcPgQuCfyWuiYzYfgpuN974LhQa3c7bzRFq2QmB8khLwVYgO4xZIO6P5O/bpgoAd9614SbWb38
-        g81xz508rYU2EFIzGnWBEy8ypc7YxK5RdtM7VkbhTq0V65GjSOKJ5L2+1/o0LHrYANEP+LkUXWcZe
-        NrIVqcTazgsjmSydDvctREayr+AhuHd0BzNwy4EFiGjaMLkF3ZgxhbJSjDi51vsvPJC+BHV0rf+uG
-        5WCUhF58CfKhiGapQEe+woB992VjI6xjDeQSAS95VcBWx73qS30T6ZodF8Fdvf5QKu64ZN5G2Op+r
-        lZSRCTuA==;
+        bh=syUPKwqvv3fci5Hq35S7nX/yxZnCRe91ZJjttKg/EGo=; b=SzZq0Q027pjcgKN2Pgye+LowNv
+        G674Vw8JM0+X4PRS/gV9Q1vWoY96ToLiYbJgLlUk/Hy0HLrdUbvB38LBHFhwe3FiPvEPnZp8Xvgci
+        IoTM8SjbsAVVMFnCRPWGgsAMK7lov4TxmhW4AY2YhY1w909W4Iq0xHOc53Lr5MomdKuHfuTlGBOWR
+        c7YvtOwrepp7A/+mP36gds3g+7txURI8wmGgFJ0pBooOyVL/mlzytHI0r97ZtFyak9sbL8IR68Fke
+        IStrPa7Wc9LvQ4Ww7Q03Ljm695p7ebCxv++ydkMhVOVMLEeYaSwhs9MJtAoi+5XP1Ur66qgFHgiaK
+        ukC/Godg==;
 Received: from dyn-229.woodhou.se ([90.155.92.229])
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kQ3m5-00037g-Uy; Wed, 07 Oct 2020 07:22:10 +0000
-Message-ID: <e9ca765e104eb6536382941e1830b75a472ad4bf.camel@infradead.org>
-Subject: Re: [PATCH 08/13] genirq: Add irq_domain_set_affinity()
+        id 1kQ3pm-0003j2-FW; Wed, 07 Oct 2020 07:25:58 +0000
+Message-ID: <3bc0d6d001b276f881310714fb59ea03ac0e5173.camel@infradead.org>
+Subject: Re: [PATCH 09/13] x86/irq: Add x86_non_ir_cpumask
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
 Cc:     iommu <iommu@lists.linux-foundation.org>,
         kvm <kvm@vger.kernel.org>, linux-hyperv@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 07 Oct 2020 08:22:08 +0100
-In-Reply-To: <87imbn59d6.fsf@nanos.tec.linutronix.de>
+Date:   Wed, 07 Oct 2020 08:25:57 +0100
+In-Reply-To: <87ft6r58vy.fsf@nanos.tec.linutronix.de>
 References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org>
          <20201005152856.974112-1-dwmw2@infradead.org>
-         <20201005152856.974112-8-dwmw2@infradead.org>
-         <87imbn59d6.fsf@nanos.tec.linutronix.de>
+         <20201005152856.974112-9-dwmw2@infradead.org>
+         <87ft6r58vy.fsf@nanos.tec.linutronix.de>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-uz+n5DkHtlQQrpuUVWOW"
+        boundary="=-rhvX1BHXNHKXOa8UeZf1"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -51,30 +51,83 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-uz+n5DkHtlQQrpuUVWOW
+--=-rhvX1BHXNHKXOa8UeZf1
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2020-10-06 at 23:32 +0200, Thomas Gleixner wrote:
-> What the heck? Why does this need a setter function which is exported?
-> So that random driver writers can fiddle with it?
+On Tue, 2020-10-06 at 23:42 +0200, Thomas Gleixner wrote:
+> On Mon, Oct 05 2020 at 16:28, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > This is the mask of CPUs to which IRQs can be delivered without
+> > interrupt
+> > remapping.
+> > =20
+> > +/* Mask of CPUs which can be targeted by non-remapped interrupts.
+> > */
+> > +cpumask_t x86_non_ir_cpumask =3D { CPU_BITS_ALL };
 >=20
-> The affinity mask restriction of an irq domain is already known when the
-> domain is created.
+> What?
 
-It's exported because __irq_domain_add is exported. I didn't want to
-just add a rarely-used extra argument to __irq_domain_add and the other
-public APIs which call into it, and figured a separate setter function
-was the simplest option.
+By default, if we didn't hit any limits, all CPUs can be targeted by
+external interrupts. It's the default today.
 
-I can rework to add the argument to __irq_domain_add if you prefer.
+Or at least we pretend it is, modulo the bugs :)
 
-Or we can declare that restricted affinity *isn't* something that IRQ
-domains provided by modules can have, and just not export the setter
-function?
+> >  #ifdef CONFIG_X86_32
+> > =20
+> >  /*
+> > @@ -1838,6 +1841,7 @@ static __init void x2apic_enable(void)
+> >  static __init void try_to_enable_x2apic(int remap_mode)
+> >  {
+> >  	u32 apic_limit =3D 0;
+> > +	int i;
+> > =20
+> >  	if (x2apic_state =3D=3D X2APIC_DISABLED)
+> >  		return;
+> > @@ -1880,6 +1884,14 @@ static __init void try_to_enable_x2apic(int rema=
+p_mode)
+> >  	if (apic_limit)
+> >  		x2apic_set_max_apicid(apic_limit);
+> > =20
+> > +	/* Build the affinity mask for interrupts that can't be remapped. */
+> > +	cpumask_clear(&x86_non_ir_cpumask);
+> > +	i =3D min_t(unsigned int, num_possible_cpus() - 1, apic_limit);
+> > +	for ( ; i >=3D 0; i--) {
+> > +		if (cpu_physical_id(i) <=3D apic_limit)
+> > +			cpumask_set_cpu(i, &x86_non_ir_cpumask);
+> > +	}
+>=20
+> Blink. If the APIC id is not linear with the cpu numbers then this
+> results in a reduced addressable set of CPUs. WHY?
 
+Hm, good question. That loop was cargo-culted from hyperv-iommu.c;
+perhaps it makes more sense there because Hyper-V really does promise
+that linearity, or perhaps it was already buggy. Will fix.
 
---=-uz+n5DkHtlQQrpuUVWOW
+In fact, in apic.c I could probably just use the cpuid_to_apicid array
+which is right there in the file.
+
+> > diff --git a/arch/x86/kernel/apic/io_apic.c b/arch/x86/kernel/apic/io_a=
+pic.c
+> > index aa9a3b54a96c..4d0ef46fedb9 100644
+> > --- a/arch/x86/kernel/apic/io_apic.c
+> > +++ b/arch/x86/kernel/apic/io_apic.c
+> > @@ -2098,6 +2098,8 @@ static int mp_alloc_timer_irq(int ioapic, int pin=
+)
+> >  		struct irq_alloc_info info;
+> > =20
+> >  		ioapic_set_alloc_attr(&info, NUMA_NO_NODE, 0, 0);
+> > +		if (domain->parent =3D=3D x86_vector_domain)
+> > +			info.mask =3D &x86_non_ir_cpumask;
+>=20
+> We are not going to sprinkle such domain checks all over the
+> place. Again, the mask is a property of the interrupt domain.
+
+Yeah, that's a hangover from the first attempts which I forgot to
+delete.
+
+--=-rhvX1BHXNHKXOa8UeZf1
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -157,20 +210,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDA3MDcyMjA4WjAvBgkqhkiG9w0BCQQxIgQgjprsgUoDUvmwZl15EEkDm7fxwjpgEpcr8hYObxqi
-hawwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MDA3MDcyNTU3WjAvBgkqhkiG9w0BCQQxIgQg1lT13lbXopSfI3w3ERAB43Pw2dnoadFPGmz/BTdh
+ou0wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBACBUeHn8bjM3uhp4XfKq0L7fHih4GiuroMck23EHHvesE0EPSahptgdxTZuHCeXe
-wshfEPxlk+qkU6QQO/4lYboKBj2NRRhw18pB+9tHVDS2e2JNUeM2HJlixOspBCGjfSfEbZ66X1OY
-l6H3x0bckdWT5Vtn3U9iKm6js7lKMXjDLBBc0x7n4ufwk54GqL0n4EakA41eRThEUmmM9u0vG5Ps
-Kmuk47i8Qo3KqkUAaoZ05NyAPLN9tl+JJ3ozZExr5nGsaoI4IRMgqsBxhlwdT+x6suIwO1by4jIY
-Zr6rKpS6161iWlYgAK+MwfzROQJMKprngCLeGfT9bx+2Ic+l0tkAAAAAAAA=
+DQEBAQUABIIBAAKUJzXoXbqTKSFmZzWs97oz0YCxNlWQVKJh6OAbeW8+LCfTcU9TpGscZ/Y4MK49
+uJ7mFxzCrWUAwUNLfjdKICXPO4XfzSb0CEwvwynIKtwr04XxHHLVbRcPfslTLWhbOvUCIQ7TVdJn
+LHxrHabveIBGA3HpNX5vx3ildtlrQMA1iTLlIHY0oAgT93mVV7qFGF91LWPNsvfr2Dy3KX2Xr3ns
+VE1S3R8Cmh9L/4EgFbXk+/XRILYIQ/2A65IKHAQFTlRxYZxcx5+dlMD74qbxKSfCRGnVO43h8cND
+By324TrplSSVjfPHSatJqAU+SVHUT2X4fCzbxXAvUqg0g7U9yvcAAAAAAAA=
 
 
---=-uz+n5DkHtlQQrpuUVWOW--
+--=-rhvX1BHXNHKXOa8UeZf1--
 
