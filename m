@@ -2,241 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40F3C286806
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:04:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7B25286805
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 21:04:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728363AbgJGTE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 15:04:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24198 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728330AbgJGTEz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 15:04:55 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 097J2Ln7001652;
-        Wed, 7 Oct 2020 15:04:37 -0400
+        id S1728336AbgJGTEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 15:04:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8750 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728330AbgJGTEx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 15:04:53 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 097J2VW9155947;
+        Wed, 7 Oct 2020 15:04:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references; s=pp1;
- bh=/c4aQd29M1auT0/CyDwBkm84KfpaCpql/9dOy4nQC0E=;
- b=tJTc/IEUWXoUncYcK4Mn2/FeMTb2Xx4MX/e7+T7Djzs6LUD6srG4geJyvPKJX7am58QI
- rfHVssnv2kAHp4CBnS7wJWZ80izVZduucA/qPKqFub/qO6SvAxo0tbG3PwF3QW5qBelw
- GFnhK6p0km24Necj4k0bFEzbeY3/x4KblcllZBNGLl+lRDX7oZyDvF+uPQSGFv6xs1YC
- DdHK4vkAAvzOGcnvcgBa+eko5/+BuoT+R0OKPFdgxX+DF8sJTpd/KKNpEvFeItJdHSsD
- Ci9EuG/ULXMQY70VA7tDPeb/9VSNUYtSJHrxpZOvrdAoILHCBQXcueyV3fGUv06bw5fu mQ== 
+ bh=mPRqIry+1htThAWT37oYyw8XVX4dUwbBHMUdDjTjQWY=;
+ b=ppaXn1gBc73BzCAXxUDtT6KyAZZUO5B/pISdf4faOH81SP61CLEiAVoQ+w2XRpGo/jag
+ HkX16Cug4g8UckgQP1i5Wj0+VDnDTbhrP3MGx3BltLi3PleKAeGz7fzC6c6DdBY3enuQ
+ Gp/CLuzXzA1Puy29sXGg5wkQC2gTKDM4MDH/XSKpGbd9c9mjycEdPNn+fR6+Ehbi5Vs4
+ TteCM4dhZElNeiuZZoNUZyid0yaQIvhvEoFtDrhpTcdZpjMLC1kLnACvZh060QdH6tK9
+ 6UhuTHVeFa0fV88q6fBFNztE2s6BhJ2puG56mC+fVPY8bGExCd8pWXkpS8Y5kltdkTDL Jg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 341k6q8jpn-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 341j4yjmpw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 15:04:37 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 097J2V9R003147;
-        Wed, 7 Oct 2020 15:04:37 -0400
+        Wed, 07 Oct 2020 15:04:40 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 097J2ekd156546;
+        Wed, 7 Oct 2020 15:04:40 -0400
 Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 341k6q8jp8-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 341j4yjmpd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 15:04:37 -0400
+        Wed, 07 Oct 2020 15:04:40 -0400
 Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097IlWBI003103;
-        Wed, 7 Oct 2020 19:04:36 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma03dal.us.ibm.com with ESMTP id 33xgx9spak-1
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 097IlUre003045;
+        Wed, 7 Oct 2020 19:04:39 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03dal.us.ibm.com with ESMTP id 33xgx9spb5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Oct 2020 19:04:36 +0000
+        Wed, 07 Oct 2020 19:04:39 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 097J4ZTF46596546
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 097J4cNC30015976
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Oct 2020 19:04:35 GMT
+        Wed, 7 Oct 2020 19:04:38 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BF535AC060;
-        Wed,  7 Oct 2020 19:04:35 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 7481BAC05F;
+        Wed,  7 Oct 2020 19:04:38 +0000 (GMT)
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 86D72AC05B;
-        Wed,  7 Oct 2020 19:04:33 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 1BA7EAC05E;
+        Wed,  7 Oct 2020 19:04:36 +0000 (GMT)
 Received: from oc4221205838.ibm.com (unknown [9.211.60.106])
         by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Oct 2020 19:04:33 +0000 (GMT)
+        Wed,  7 Oct 2020 19:04:35 +0000 (GMT)
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
 To:     cohuck@redhat.com, thuth@redhat.com
 Cc:     pmorel@linux.ibm.com, schnelle@linux.ibm.com, rth@twiddle.net,
         david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
         mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com,
         qemu-s390x@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [PATCH v3 06/10] s390x/pci: use a PCI Group structure
-Date:   Wed,  7 Oct 2020 15:04:11 -0400
-Message-Id: <1602097455-15658-7-git-send-email-mjrosato@linux.ibm.com>
+Subject: [PATCH v3 07/10] s390x/pci: clean up s390 PCI groups
+Date:   Wed,  7 Oct 2020 15:04:12 -0400
+Message-Id: <1602097455-15658-8-git-send-email-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
 References: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-10-07_10:2020-10-07,2020-10-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- suspectscore=2 bulkscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
- mlxscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0 clxscore=1015
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ adultscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
+ mlxlogscore=999 suspectscore=0 impostorscore=0 bulkscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2010070118
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+Add a step to remove all stashed PCI groups to avoid stale data between
+machine resets.
 
-We use a S390PCIGroup structure to hold the information related to a
-zPCI Function group.
-
-This allows us to be ready to support multiple groups and to retrieve
-the group information from the host.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- hw/s390x/s390-pci-bus.c         | 42 +++++++++++++++++++++++++++++++++++++++++
- hw/s390x/s390-pci-inst.c        | 23 +++++++++++++---------
- include/hw/s390x/s390-pci-bus.h | 10 ++++++++++
- 3 files changed, 66 insertions(+), 9 deletions(-)
+ hw/s390x/s390-pci-bus.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index a929340..c99f2f0 100644
+index c99f2f0..c34f14a 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -737,6 +737,46 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
-     object_unref(OBJECT(iommu));
- }
- 
-+static S390PCIGroup *s390_group_create(int id)
-+{
-+    S390PCIGroup *group;
-+    S390pciState *s = s390_get_phb();
-+
-+    group = g_new0(S390PCIGroup, 1);
-+    group->id = id;
-+    QTAILQ_INSERT_TAIL(&s->zpci_groups, group, link);
-+    return group;
-+}
-+
-+S390PCIGroup *s390_group_find(int id)
-+{
-+    S390PCIGroup *group;
-+    S390pciState *s = s390_get_phb();
-+
-+    QTAILQ_FOREACH(group, &s->zpci_groups, link) {
-+        if (group->id == id) {
-+            return group;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void s390_pci_init_default_group(void)
-+{
-+    S390PCIGroup *group;
-+    ClpRspQueryPciGrp *resgrp;
-+
-+    group = s390_group_create(ZPCI_DEFAULT_FN_GRP);
-+    resgrp = &group->zpci_group;
-+    resgrp->fr = 1;
-+    stq_p(&resgrp->dasm, 0);
-+    stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
-+    stw_p(&resgrp->mui, DEFAULT_MUI);
-+    stw_p(&resgrp->i, 128);
-+    stw_p(&resgrp->maxstbl, 128);
-+    resgrp->version = 0;
-+}
-+
- static void s390_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     PCIBus *b;
-@@ -764,7 +804,9 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
-     s->bus_no = 0;
-     QTAILQ_INIT(&s->pending_sei);
-     QTAILQ_INIT(&s->zpci_devs);
-+    QTAILQ_INIT(&s->zpci_groups);
- 
-+    s390_pci_init_default_group();
-     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
+@@ -811,6 +811,17 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
                               S390_ADAPTER_SUPPRESSIBLE, errp);
  }
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 639b13c..aeb8b5f 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -284,21 +284,25 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
-         stq_p(&resquery->edma, ZPCI_EDMA_ADDR);
-         stl_p(&resquery->fid, pbdev->fid);
-         stw_p(&resquery->pchid, 0);
--        stw_p(&resquery->ug, 1);
-+        stw_p(&resquery->ug, ZPCI_DEFAULT_FN_GRP);
-         stl_p(&resquery->uid, pbdev->uid);
-         stw_p(&resquery->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-     case CLP_QUERY_PCI_FNGRP: {
-         ClpRspQueryPciGrp *resgrp = (ClpRspQueryPciGrp *)resh;
--        resgrp->fr = 1;
--        stq_p(&resgrp->dasm, 0);
--        stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
--        stw_p(&resgrp->mui, DEFAULT_MUI);
--        stw_p(&resgrp->i, 128);
--        stw_p(&resgrp->maxstbl, 128);
--        resgrp->version = 0;
  
-+        ClpReqQueryPciGrp *reqgrp = (ClpReqQueryPciGrp *)reqh;
-+        S390PCIGroup *group;
++static void s390_pcihost_unrealize(DeviceState *dev)
++{
++    S390PCIGroup *group;
++    S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
 +
-+        group = s390_group_find(reqgrp->g);
-+        if (!group) {
-+            /* We do not allow access to unknown groups */
-+            /* The group must have been obtained with a vfio device */
-+            stw_p(&resgrp->hdr.rsp, CLP_RC_QUERYPCIFG_PFGID);
-+            goto out;
-+        }
-+        memcpy(resgrp, &group->zpci_group, sizeof(ClpRspQueryPciGrp));
-         stw_p(&resgrp->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-@@ -754,7 +758,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-     }
-     /* Length must be greater than 8, a multiple of 8 */
-     /* and not greater than maxstbl */
--    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
-+    if ((len <= 8) || (len % 8) ||
-+        (len > pbdev->pci_group->zpci_group.maxstbl)) {
-         goto specification_error;
-     }
-     /* Do not cross a 4K-byte boundary */
-diff --git a/include/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
-index 04e7cb6..52f6e7b 100644
---- a/include/hw/s390x/s390-pci-bus.h
-+++ b/include/hw/s390x/s390-pci-bus.h
-@@ -308,6 +308,14 @@ typedef struct ZpciFmb {
- } ZpciFmb;
- QEMU_BUILD_BUG_MSG(offsetof(ZpciFmb, fmt0) != 48, "padding in ZpciFmb");
- 
-+#define ZPCI_DEFAULT_FN_GRP 0x20
-+typedef struct S390PCIGroup {
-+    ClpRspQueryPciGrp zpci_group;
-+    int id;
-+    QTAILQ_ENTRY(S390PCIGroup) link;
-+} S390PCIGroup;
-+S390PCIGroup *s390_group_find(int id);
++    while (!QTAILQ_EMPTY(&s->zpci_groups)) {
++        group = QTAILQ_FIRST(&s->zpci_groups);
++        QTAILQ_REMOVE(&s->zpci_groups, group, link);
++    }
++}
 +
- struct S390PCIBusDevice {
-     DeviceState qdev;
-     PCIDevice *pdev;
-@@ -325,6 +333,7 @@ struct S390PCIBusDevice {
-     uint16_t noi;
-     uint16_t maxstbl;
-     uint8_t sum;
-+    S390PCIGroup *pci_group;
-     S390MsixInfo msix;
-     AdapterRoutes routes;
-     S390PCIIOMMU *iommu;
-@@ -349,6 +358,7 @@ struct S390pciState {
-     GHashTable *zpci_table;
-     QTAILQ_HEAD(, SeiContainer) pending_sei;
-     QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
-+    QTAILQ_HEAD(, S390PCIGroup) zpci_groups;
- };
+ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+ {
+     char *name;
+@@ -1165,6 +1176,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
  
- S390pciState *s390_get_phb(void);
+     dc->reset = s390_pcihost_reset;
+     dc->realize = s390_pcihost_realize;
++    dc->unrealize = s390_pcihost_unrealize;
+     hc->pre_plug = s390_pcihost_pre_plug;
+     hc->plug = s390_pcihost_plug;
+     hc->unplug_request = s390_pcihost_unplug_request;
 -- 
 1.8.3.1
 
