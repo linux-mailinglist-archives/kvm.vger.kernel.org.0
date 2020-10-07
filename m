@@ -2,78 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B97CA28642A
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 18:31:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2E5A28652C
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 18:46:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727437AbgJGQa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 12:30:59 -0400
-Received: from sonic311-14.consmr.mail.bf2.yahoo.com ([74.6.131.124]:40414
-        "EHLO sonic311-14.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728022AbgJGQa4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 12:30:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1602088255; bh=PxMwWzXvs+dqOoH0/FHvFmQpYH2JguaCUHYAVLLmaiw=; h=Date:From:Reply-To:Subject:References:From:Subject; b=Eyg6+y7F+LYPs1JL7GqgNsvO0nfvvD6QTQz0zOjjYH19h7e8uybDqNpfpbvrPJPohEyJzEiU3Q/ZG1NSMK16U64m5lhBv6rL4BI4VHHhBZXH/586P0Y6eadgI7oc5jaWs6MK4R6jE7V2kPE+nWnPevVh043TlvsRz2DNVWISVUbpSdNnzUVow/iau1wdIxg/nud5SXCu/DYo/8oWxzE3q6VSgpN/Fic0UL2WjL9++9HJn10Ltvs/n5mVlKDFJ9xVA58bmqSWtx/gzKI28dlfexENwG4oU4DRYR5Ogs7SOneJr6ToEIv4lOeqzdn+AaIs4dSRNg00hmRst8NWoFhJHg==
-X-YMail-OSG: 4aQ3EjIVM1kNrUzwOnljlQu8.0p2CfIRAN5JD0Cli4AuIgTd4MQO28dQQQgnSBW
- L4u3VPCRBJYYqL1mSHyimTelxTZ76mT_etPsIRCR84Ii49WCxCGfSO.iRBd4SeTBGHOfixcLTIPh
- kY2SSP5Dt03abSms08gfR.uMZEee9oroZOgsHLt.zc5PoIzDIDCTUT8JgiCfFokZBb6mqGs1BfkJ
- rAu0Td.2MfiohMIneIOWswKeOz8JKGQKZJzzShmV0y7WLa.mAMei_qrCYtAND66BZBLh3agr127g
- nYfEjplF0_oUTv7nQmuIegapgQo7mIy6OJ0S0AlvAV4q91LHaSMzUOdkRylqhFVkVAeDHwXog4j5
- l9Bci60cAsSJuZdnnx9fiobxCHLfbN7_dMXrJG65zAVCJMRGE22dK7ChcjRP9IjHxHpGA7gq6lfb
- eLaVjrhzifoUCQ.pOnekG9zR7M1t.2Btgf2l_TPhLHf552VcYbaxcyGDTQE167N5owsOkfxACdmD
- CyCIIso9Ug80vBYkJV.suOkA11FY5v1Q2qJafGgTesMlGEwPfWKbg2KH3s9UXTPApxKCfN1FkhK8
- LJm0I_Kdg1JCO7GtDOQcvbQtiL7GkShC7sLcEvvi5rWC4bklf_gK0l8rUv6EPeZw3eqt01l3gYNs
- AIsMMY1LWFA_ZmciYH4HDFxauzIUCghA47rkl.zkUZGOlCSGzTWYZBy05bnfGETI9Hbn1KHe0msU
- VLsU7V4qsvkBieplxNf5TNz2LlD0iHgVvzBO4IygCaDV2RoRBVUMHYjaYOQrTKlPg1Crn7f.ny6q
- QptRned0bH0jU8UMwW0n76PmzxJC2pnjv2aMZl3kzxuxOyQo5CX5Ug4fK5fp0E1mfFBNtlE_lFdO
- REF_X9Rr5KfFPyervVhLAgcUFGEh0lNnIDBmcVUXP4NUli_ydtGnZXGfuHrpbiOVIWlWLS_e9dvx
- OS9EgyTUziHWKme90bdpqCbwd20.344v.x9QMuIoMFYJwqKJ6dGDTHbJu2eIMyXaOni1DWT_jyY4
- Fm7YdjA9yPk4mLkj2DVmKna5dG3tr.8DRcoUHCsRfTy0mAOvX3zm_YDVRgTS8j31twXJv5DIBBVl
- scLgYiOlSj_uw_oVN6jni2UW6Mx_0eXYj7pIMPvedsuPVaixjDJL8thKX7.TXKB6YN56ZRtlxJgt
- I.ns9VCCrofiw7T0gZqb_hA91bnOV9TcdRv8zieiNriXcVw6cboKIVio2Ss_sOO6_mAXL16tnGEa
- HW173U2iCb8hRwauswHMtkc_lZCZ2DvNW37QDfaNiCzuWZdwGkMbfy0k8cz6dgmVU3audXJcl1hk
- qUeJkR_PSZ0ttNHxf39j6oRPQw8I2AQ53Ce0szMlbyUCN0V9DNWuNUJ5ZS1ooqbTyldbPaPw_F9H
- EV6VpmChy8oI6k2jsWPLjxjLATmETWeg70PjJFMJ1v9IJrQ--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.bf2.yahoo.com with HTTP; Wed, 7 Oct 2020 16:30:55 +0000
-Date:   Wed, 7 Oct 2020 16:30:55 +0000 (UTC)
-From:   Marilyn Robert <fredodinga22@gmail.com>
-Reply-To: marilyobert@gmail.com
-Message-ID: <1936210565.150941.1602088255223@mail.yahoo.com>
-Subject: =?UTF-8?B?0J3QsNGY0LzQuNC70LAg0LrQsNGYINCz0L7RgdC/0L7QtNCw0YDQvtGC?=
+        id S1727954AbgJGQqW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 12:46:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52672 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727958AbgJGQof (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 12:44:35 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53AD4C0613D5
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 09:44:34 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id e18so2963963wrw.9
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 09:44:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ioe0Byeg/DIJ2PK+KoHAeY/RgUBhGUsvQd2LPXMyjpk=;
+        b=LKBDOiNhqwNLkwa9WP1zzXHrjwlM9UxdR+2aww5WQtbHhuceIwa/VXYYnC9UZ6hdtp
+         mvYMFJ7UpZJyZnXE8eOz53fPGIesR/n7+X+8Z0F7CtzFKuDxeUJ2E389J/P0gE5voMHe
+         oEJ9yMHSIcqvjSDbm4eT0/N3ZkXflXq1Fg4A8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ioe0Byeg/DIJ2PK+KoHAeY/RgUBhGUsvQd2LPXMyjpk=;
+        b=FLxrZ7R+INh3Kl+VHhbDxkH0a46yy/kW44WmcOVo9UUZs3AwOkc62Oqh5VZpbZQ+fQ
+         ZS9zTluPBlF+q4YGfuug4DOfPNizY+ObOzMmP2ANQvQTmWuIvHsTUBt+/6ySRfmzB5S7
+         gYdq4BiX7g82vwRdGV7+/aP0MyjOAwZ6l8pUN+9xxs6Jq+RHRq/Hor0ZMpvbLhzupAmW
+         i75kW2afdeQF76/GIYsJxpj+E8Bo21DjTJFmU6AKup6rVzzb3f5BIE1aM8Dh0zDAoBwv
+         SYLdF5dAiVkT0dKxu446UaDI/y/CaIVoxsjaOyyob3Jmh297iwP7x38kuJ5qTPQOBqPp
+         p7sA==
+X-Gm-Message-State: AOAM533ZYG9x/QyISdoRKME4GEgp/HJGxTUbtENc/ylpW1Z9XVkVslaP
+        /QT6eKXG4wL3YsSGMIAegs7rqeXqxBRdLy0y
+X-Google-Smtp-Source: ABdhPJzRELPHTJISw4N/fSU+gR/P4h8ZIocAzvLavw2ceiWiegfiQvvhsxcd+sZUYD7qwXN8jRsOdg==
+X-Received: by 2002:adf:e74d:: with SMTP id c13mr4372958wrn.45.1602089072696;
+        Wed, 07 Oct 2020 09:44:32 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id z191sm3332280wme.40.2020.10.07.09.44.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Oct 2020 09:44:32 -0700 (PDT)
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+To:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-s390@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>
+Subject: [PATCH 00/13] follow_pfn and other iomap races
+Date:   Wed,  7 Oct 2020 18:44:13 +0200
+Message-Id: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-References: <1936210565.150941.1602088255223.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.16795 YMailNodin Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36
-To:     unlisted-recipients:; (no To-header on input)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCtCd0LDRmNC80LjQu9CwINC60LDRmCDQs9C+0YHQv9C+0LTQsNGA0L7Rgg0KDQrQiNCw0YEg
-0YHRg9C8IDY4LdCz0L7QtNC40YjQvdCwINC20LXQvdCwLCDQutC+0ZjQsCDRgdGC0YDQsNC00LAg
-0L7QtCDQv9GA0L7QtNC+0LvQttC10L0g0LrQsNGA0YbQuNC90L7QvCDQvdCwINC00L7RmNC60LAs
-INC+0LQg0YHQuNGC0LUg0LzQtdC00LjRhtC40L3RgdC60Lgg0LjQvdC00LjQutCw0YbQuNC4LCDQ
-vNC+0ZjQsNGC0LAg0YHQvtGB0YLQvtGY0LHQsCDQvdCw0LLQuNGB0YLQuNC90LAg0YHQtSDQstC7
-0L7RiNC4INC4INC+0YfQuNCz0LvQtdC00L3QviDQtSDQtNC10LrQsCDQvNC+0LbQtdCx0Lgg0L3Q
-tdC80LAg0LTQsCDQttC40LLQtdCw0Lwg0L/QvtCy0LXRnNC1INC+0LQg0YjQtdGB0YIg0LzQtdGB
-0LXRhtC4INC60LDQutC+INGA0LXQt9GD0LvRgtCw0YIg0L3QsCDQsdGA0LfQuNC+0YIg0YDQsNGB
-0YIg0Lgg0LHQvtC70LrQsNGC0LAg0YjRgtC+INGB0LUg0ZjQsNCy0YPQstCwINC60LDRmCDQvdC1
-0LAuINCc0L7RmNC+0YIg0YHQvtC/0YDRg9CzINC/0L7Rh9C40L3QsCDQvdC10LrQvtC70LrRgyDQ
-s9C+0LTQuNC90Lgg0L3QsNC90LDQt9Cw0LQg0Lgg0L3QsNGI0LjRgtC1INC00L7Qu9Cz0Lgg0LPQ
-vtC00LjQvdC4INCx0YDQsNC6INC90LUg0LHQtdCwINCx0LvQsNCz0L7RgdC70L7QstC10L3QuCDR
-gdC+INC90LjRgtGDINC10LTQvdC+INC00LXRgtC1LCDQv9C+INC90LXQs9C+0LLQsNGC0LAg0YHQ
-vNGA0YIg0LPQviDQvdCw0YHQu9C10LTQuNCyINGG0LXQu9C+0YLQviDQvdC10LPQvtCy0L4g0LHQ
-vtCz0LDRgtGB0YLQstC+Lg0KDQrQlNC+0LDRk9Cw0Lwg0LrQsNGYINCy0LDRgSDQvtGC0LrQsNC6
-0L4g0YHQtSDQv9C+0LzQvtC70LjQsiDQt9CwINGC0L7QsCwg0L/QvtC00LPQvtGC0LLQtdC9INGB
-0YPQvCDQtNCwINC00L7QvdC40YDQsNC8INGB0YPQvNCwINC+0LQgMiwgMzAwLCAwMDAg0LXQstGA
-0LAg0LfQsCDQv9C+0LzQvtGIINC90LAg0YHQuNGA0L7QvNCw0YjQvdC40YLQtSwg0YHQuNGA0L7Q
-vNCw0YjQvdC40YLQtSDQuCDQv9C+0LzQsNC70LrRgyDQv9GA0LjQstC40LvQtdCz0LjRgNCw0L3Q
-uNGC0LUg0LzQtdGT0YMg0LLQsNGI0LjRgtC1INGB0L7QsdGA0LDQvdC40ZjQsCAvINC+0L/RiNGC
-0LXRgdGC0LLQvi4g0JfQsNCx0LXQu9C10LbQtdGC0LUg0LTQtdC60LAg0L7QstC+0Zgg0YTQvtC9
-0LQg0LUg0LTQtdC/0L7QvdC40YDQsNC9INCy0L4g0LHQsNC90LrQsCDQutCw0LTQtSDRiNGC0L4g
-0YDQsNCx0L7RgtC10YjQtSDQvNC+0ZjQvtGCINGB0L7Qv9GA0YPQsy4gQXBwcmVjaWF0ZdC1INGG
-0LXQvdCw0Lwg0LDQutC+INC+0LHRgNC90LXRgtC1INCy0L3QuNC80LDQvdC40LUg0L3QsCDQvNC+
-0LXRgtC+INCx0LDRgNCw0ZrQtSDQt9CwINC/0YDQvtC/0LDQs9C40YDQsNGa0LUg0L3QsCDQvNCw
-0YHQsNC20LDRgtCwINC90LAg0LrRgNCw0LvRgdGC0LLQvtGC0L4sINGc0LUg0LLQuCDQtNCw0LTQ
-sNC8INC/0L7QstC10ZzQtSDQtNC10YLQsNC70Lgg0LfQsCDRgtC+0LAg0LrQsNC60L4g0LTQsCDQ
-v9C+0YHRgtCw0L/QuNGC0LUuDQoNCtCR0LvQsNCz0L7QtNCw0YDQsNC8DQrQky3Rk9CwINCc0LXR
-gNC40LvQuNC9INCg0L7QsdC10YDRgg==
+Hi all,
+
+This developed from a discussion with Jason, starting with some patches
+touching get_vaddr_frame that I typed up.
+
+The problem is that way back VM_IO | VM_PFNMAP mappings were pretty
+static, and so just following the ptes to derive a pfn and then use that
+somewhere else was ok.
+
+But we're no longer in such a world, there's tons of little races and some
+fundamental problems.
+
+This series here is an attempt to at least scope the problem, it's all the
+issues I've found with quite some code reading all over the tree:
+- first part tries to move mm/frame-vector.c away, it's fundamentally an
+  unsafe thing
+- two patches to close follow_pfn races by holding pt locks
+- two pci patches where I spotted inconsinstencies between the 3 different
+  ways userspace can map pci bars
+- and finally some patches to mark up the remaining issue
+
+No testing beyond "it compiles", this is very much an rfc to figure out
+whether this makes sense, whether it's a real thing, and how to fix this
+up properly.
+
+Cheers, Daniel
+
+Daniel Vetter (13):
+  drm/exynos: Stop using frame_vector helpers
+  drm/exynos: Use FOLL_LONGTERM for g2d cmdlists
+  misc/habana: Stop using frame_vector helpers
+  misc/habana: Use FOLL_LONGTERM for userptr
+  mm/frame-vector: Use FOLL_LONGTERM
+  media: videobuf2: Move frame_vector into media subsystem
+  mm: close race in generic_access_phys
+  s390/pci: Remove races against pte updates
+  PCI: obey iomem restrictions for procfs mmap
+  PCI: revoke mappings like devmem
+  mm: add unsafe_follow_pfn
+  media/videbuf1|2: Mark follow_pfn usage as unsafe
+  vfio/type1: Mark follow_pfn as unsafe
+
+ arch/s390/pci/pci_mmio.c                      | 98 +++++++++++--------
+ drivers/char/mem.c                            | 16 ++-
+ drivers/gpu/drm/exynos/Kconfig                |  1 -
+ drivers/gpu/drm/exynos/exynos_drm_g2d.c       | 49 +++++-----
+ drivers/media/common/videobuf2/Kconfig        |  1 -
+ drivers/media/common/videobuf2/Makefile       |  1 +
+ .../media/common/videobuf2}/frame_vector.c    | 40 +++-----
+ drivers/media/platform/omap/Kconfig           |  1 -
+ drivers/media/v4l2-core/videobuf-dma-contig.c |  2 +-
+ drivers/misc/habanalabs/Kconfig               |  1 -
+ drivers/misc/habanalabs/common/habanalabs.h   |  3 +-
+ drivers/misc/habanalabs/common/memory.c       | 52 +++++-----
+ drivers/pci/mmap.c                            |  3 +
+ drivers/pci/proc.c                            |  5 +
+ drivers/vfio/vfio_iommu_type1.c               |  4 +-
+ include/linux/ioport.h                        |  2 +
+ include/linux/mm.h                            | 47 +--------
+ include/media/videobuf2-core.h                | 42 ++++++++
+ mm/Kconfig                                    |  3 -
+ mm/Makefile                                   |  1 -
+ mm/memory.c                                   | 76 +++++++++++++-
+ mm/nommu.c                                    | 17 ++++
+ security/Kconfig                              | 13 +++
+ 23 files changed, 296 insertions(+), 182 deletions(-)
+ rename {mm => drivers/media/common/videobuf2}/frame_vector.c (90%)
+
+-- 
+2.28.0
+
