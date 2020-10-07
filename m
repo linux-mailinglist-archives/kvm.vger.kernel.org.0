@@ -2,94 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DF34286367
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 18:15:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 352B428640C
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 18:30:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729130AbgJGQPy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 12:15:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48236 "EHLO
+        id S1727937AbgJGQah (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 12:30:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727430AbgJGQPy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 12:15:54 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840F5C061755;
-        Wed,  7 Oct 2020 09:15:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Message-ID:From:CC:To:Subject:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
-        Date:Sender:Reply-To:Content-ID:Content-Description;
-        bh=Q6S7G7tGIHEqMVdJUjNSVW5hIw+z7ajO0YGWhkaXjSI=; b=i3r5Nrb74EDsnzTQBZt426eZe6
-        lhKaUTzwFykgLMHJIO9OgQlL4q1LwPDiWCtoZkxbt+rOyshpP0Sd2sFad9uGV0Za1Qr7L/9U6jKE2
-        sr6l2Fi4NRgzf++ci9sF7M8RzzIzflkeKGEODWBKiWe1qJWU53ZP3e2rTYxAbmDhIQ6NINBfu0qmx
-        9pX3HbVZQgxWh9kpWoyD60hm8ze4PSznFcKIB8mPZpEmKNNFw+jIEyjS7TTKAuIuIfVRrBmV1CxUO
-        rNkSnSsEyKmpx7F3DACHLp42gF+HxNWNHGhPtZOw/t9UTC4ifHPMq+VNmtjm3lkO+26b037kcV+7U
-        pIE+/r6w==;
-Received: from [2001:8b0:10b:1:ad95:471b:fe64:9cc3]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kQC6Y-0005hC-Mm; Wed, 07 Oct 2020 16:15:50 +0000
-Date:   Wed, 07 Oct 2020 17:15:48 +0100
-User-Agent: K-9 Mail for Android
-In-Reply-To: <877ds23txo.fsf@nanos.tec.linutronix.de>
-References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org> <20201005152856.974112-1-dwmw2@infradead.org> <20201005152856.974112-10-dwmw2@infradead.org> <87d01v58bw.fsf@nanos.tec.linutronix.de> <d34efce9ca5a4a9d8d8609f872143e306bf5ee98.camel@infradead.org> <874kn65h0r.fsf@nanos.tec.linutronix.de> <F9476D19-3D08-4CE6-A535-6C1D2E9BA88D@infradead.org> <87imbm3zdq.fsf@nanos.tec.linutronix.de> <1b1fda3079627748e1f5084ddae8a686258c78d9.camel@infradead.org> <877ds23txo.fsf@nanos.tec.linutronix.de>
+        with ESMTP id S1727908AbgJGQah (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 12:30:37 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D775CC061755
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 09:30:36 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id o9so2878313ilo.0
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 09:30:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UYMk+BlOXeIbztTTmOGtrLRWb7ewhHw6QepmeLnJlMQ=;
+        b=Y4+NKXdlYiaTxkXT9l/2+Nk56HfwQ2izplaW+tMW3d0vI4hwfIC5V8T2ruDvM0wUNb
+         yAPjVLoCd3dSKe2CMd6GozDwwbjRFayGNqlAb00cDAldU9bBDMLQfDJNr1gfV5cHAAaf
+         /Z77J4+EhN66Oxu7/U6S2CevfxJwD8Y/meciKSGT0YiMbOeBYXIyiKiYjReB102VMaQ2
+         pk01mw9bZbvbUxpipQXJIWIZ8X+p311eE3aTLuxeb5hV41N5AtMTbTX46pfwersSs8SQ
+         IxEnrPM5BvSJ9lgamii7Kt//gXnrI3fPFKGpbt95RQHe2+2TJ2LX0CESU0s2JRmQ1an/
+         IxRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UYMk+BlOXeIbztTTmOGtrLRWb7ewhHw6QepmeLnJlMQ=;
+        b=nIz+YmZMtfhj7OuX56+lcfBWIk1ZCOZBiZVZnMCMtyb/NA8z5K4b7/qNve2TuhN1up
+         CYjGiyMzM63RAUHM/R3EzQ2Cn6csMbuCeOrMTQ/bh6up9DiZxPEeglF4SbMjb5aTTe1r
+         wUa74K4tL44U3uKw2dRC1doSwxCRy5ZY4ZBK4k7kFN6c0xYw8tAMde+iPbkhbyWuFBAC
+         Svltfu63dJCqQC2m3VXPuuMZ8UerKfnf5MgAwhcDTfJV+/R3BGuahe0qiIQkHfoWivtg
+         XSdd/5YMHaeW+sGuTmmaoG+bxCTMwHdynLi9W0A3AZ1834wSgC6EEsk780ppDZNV04VG
+         Sb/w==
+X-Gm-Message-State: AOAM532FS5BW+YRexU+e3K6sYPrREMK6eiBTF/MC3ft0OpNSYkPxZ5dq
+        22ONmyEp+U1sU+Yva1gVNA6hvI04rCFESZzsgWpv4g==
+X-Google-Smtp-Source: ABdhPJz1pivHDuMpRIp1ymbBND8FIwBI+9YWjqbDyuFQsSBKh6gKtzo/VQ/hpFczpGrC3Z/Fe1wNF06wJy3f0eJ9Kos=
+X-Received: by 2002:a92:cbcd:: with SMTP id s13mr3157728ilq.306.1602088235893;
+ Wed, 07 Oct 2020 09:30:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 10/13] x86/irq: Limit IOAPIC and MSI domains' affinity without IR
-To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
-CC:     iommu <iommu@lists.linux-foundation.org>,
-        kvm <kvm@vger.kernel.org>, linux-hyperv@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-From:   David Woodhouse <dwmw2@infradead.org>
-Message-ID: <244EB899-6273-416C-8376-68FBCE0DA47A@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-19-bgardon@google.com>
+ <44822999-f5dc-6116-db12-a41f5bd80dd8@redhat.com>
+In-Reply-To: <44822999-f5dc-6116-db12-a41f5bd80dd8@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 7 Oct 2020 09:30:24 -0700
+Message-ID: <CANgfPd_dQ19sZz2wzSfz7-RzdbQrfP6cYJLpSYbyNyQW6Uf09Q@mail.gmail.com>
+Subject: Re: [PATCH 18/22] kvm: mmu: Support disabling dirty logging for the
+ tdp MMU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7 October 2020 17:02:59 BST, Thomas Gleixner <tglx@linutronix=2Ede> wro=
-te:
->On Wed, Oct 07 2020 at 15:23, David Woodhouse wrote:
->> On Wed, 2020-10-07 at 16:05 +0200, Thomas Gleixner wrote:
->>> On Wed, Oct 07 2020 at 14:08, David Woodhouse wrote:
->>> > On 7 October 2020 13:59:00 BST, Thomas Gleixner
-><tglx@linutronix=2Ede> wrote:
->>> > > On Wed, Oct 07 2020 at 08:48, David Woodhouse wrote:
->>> > > > To fix *that* case, we really do need the whole series giving
->us per-
->>> > > > domain restricted affinity, and to use it for those
->MSIs/IOAPICs that
->>> > > > the IRQ remapping doesn't cover=2E
->>> > >=20
->>> > > Which do not exist today=2E
->>> >=20
->>> > Sure=2E But at patch 10/13 into this particular patch series, it
->*does*
->>> > exist=2E
->>>=20
->>> As I told you before: Your ordering is wrong=2E We do not introduce
->bugs
->>> first and then fix them later =2E=2E=2E=2E
->>
->> I didn't introduce that bug; it's been there for years=2E Fixing it
->> properly requires per-irqdomain affinity limits=2E
->>
->> There's a cute little TODO at least in the Intel irq-remapping
->driver,
->> noting that we should probably check if there are any IOAPICs that
->> aren't in the scope of any DRHD at all=2E But that's all=2E
+On Fri, Sep 25, 2020 at 6:09 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
->So someone forgot to remove the cute little TODO when this was added:
+> On 25/09/20 23:22, Ben Gardon wrote:
+> > +     for_each_tdp_pte_root(iter, root, start, end) {
+> > +             if (!is_shadow_present_pte(iter.old_spte) ||
+> > +                 is_last_spte(iter.old_spte, iter.level))
+> > +                     continue;
+> > +
 >
->       if (parse_ioapics_under_ir()) {
->                pr_info("Not enabling interrupt remapping\n");
->                goto error;
->        }
+> I'm starting to wonder if another iterator like
+> for_each_tdp_leaf_pte_root would be clearer, since this idiom repeats
+> itself quite often.  The tdp_iter_next_leaf function would be easily
+> implemented as
+>
+>         while (likely(iter->valid) &&
+>                (!is_shadow_present_pte(iter.old_spte) ||
+>                 is_last_spte(iter.old_spte, iter.level))
+>                 tdp_iter_next(iter);
 
-And HPET, and PCI devices including those that might be hotplugged in futu=
-re and not be covered by any extant IOMMU's scope?
+Do you see a substantial efficiency difference between adding a
+tdp_iter_next_leaf and building on for_each_tdp_pte_using_root with
+something like:
 
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+#define for_each_tdp_leaf_pte_using_root(_iter, _root, _start, _end)    \
+        for_each_tdp_pte_using_root(_iter, _root, _start, _end)         \
+                if (!is_shadow_present_pte(_iter.old_spte) ||           \
+                    !is_last_spte(_iter.old_spte, _iter.level))         \
+                        continue;                                       \
+                else
+
+I agree that putting those checks in a wrapper makes the code more concise.
+
+>
+> Paolo
+>
