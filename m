@@ -2,100 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92D7D286677
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 20:04:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A3D0286691
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 20:10:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728186AbgJGSEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 14:04:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35001 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727904AbgJGSEq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Oct 2020 14:04:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602093885;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=hA/Ic/DvHRIWAAPJE/LGTu0E2S1egMhpGna2Sykdi3w=;
-        b=gFsoczKD154lsyNb1b3O0vqhlDCSL57YrjDb+A99qai/65XVGYgxQ0BuzhqVwetDNDTpum
-        iAhvK0k40ku/7K2vBOS0bIyAQzccdCYymBk7SQdgLmxVqWfs7pDiczmoi6WIwljdGG//jD
-        bhQn1d0e8OR+OSKMFx0ZxYJ4Mz+OisM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-6FM-k7x8Mj2c74P_45QdLQ-1; Wed, 07 Oct 2020 14:04:36 -0400
-X-MC-Unique: 6FM-k7x8Mj2c74P_45QdLQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD39F18C9F59;
-        Wed,  7 Oct 2020 18:04:34 +0000 (UTC)
-Received: from redhat.com (ovpn-114-68.ams2.redhat.com [10.36.114.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F6C55DA2A;
-        Wed,  7 Oct 2020 18:04:32 +0000 (UTC)
-Date:   Wed, 7 Oct 2020 19:04:29 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>
-Subject: Re: KVM call for agenda for 2020-10-06
-Message-ID: <20201007180429.GI2505881@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <874kndm1t3.fsf@secure.mitica>
- <20201005144615.GE5029@stefanha-x1.localdomain>
- <CAJSP0QVZcEQueXG1gjwuLszdUtXWi1tgB5muLL6QHJjNTOmyfQ@mail.gmail.com>
- <8fce8f99-56bd-6a87-9789-325d6ffff54d@redhat.com>
+        id S1728654AbgJGSKq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 14:10:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38026 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727814AbgJGSKq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 14:10:46 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE959C0613D3
+        for <kvm@vger.kernel.org>; Wed,  7 Oct 2020 11:10:45 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id q21so3085150ota.8
+        for <kvm@vger.kernel.org>; Wed, 07 Oct 2020 11:10:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=xxzMWzZDg+VcRWGQ/c2kzQrjqzz9Zr/vQmYEu/FEsRY=;
+        b=JHHbdSa3yjRCRnWpyNRhKKiSEOBUKxgo2tfjYtBvhCHpORb0ALeU5M+5x5K5yNzCHm
+         lADTYYQR32EHxoVtfzUaalEzZmnDh6DAaDz8LEVrvhIFw/92GoGYNABw2nQYniRBDjZZ
+         trEXtjVKX20MlR66/aUzrdTZc9L9Ye/bFneWk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=xxzMWzZDg+VcRWGQ/c2kzQrjqzz9Zr/vQmYEu/FEsRY=;
+        b=lotMqEyPTtWan/ymdrQ+hpea/PXW6v4koygl/QCzlgfy1tymKcbBbDIzOL+y9DCjW9
+         pOf/Moo6O6d+wF+lEEKl2yS4rOxOgElCK7Mh5u9hJFQq/Hi3THl50SrnPTHs6JGaUgrM
+         sUbl4eJvKS/pFv9mQB5yXpYdwgbfd5eHmBm+QHU5P2dCa9zfPkwKEH/Gjm7vc9ssoRGv
+         c177z8zw/fj2e3F/b/U+mgMFRdYruFK5GPDqIGgqPqQHNGJHSC10RuXXQEwHH2MpRrQL
+         8d9voy0GdZ1sSIdD36Y30PaeuN02SffnWrC5kE0HLViPwMjq86vcSAcS2LlTpw7nDKwV
+         9yPQ==
+X-Gm-Message-State: AOAM532QLLgkdwkgRyCbnMjZUC4TghKx+r5QZCT0w1T7P/f2RkmHD38I
+        +vIHEXBCnubLt0vgibSqmHghggFVLCg5ruFFu4k1aA==
+X-Google-Smtp-Source: ABdhPJw9fFZN/ovuisic7f8Uj9KPXiMNmYYqtFH7SfVt9HtB4IgG/AqVfKw/vHLMcJ5OwO7pnRxjiIvlLFeiVdztT+E=
+X-Received: by 2002:a05:6830:1e56:: with SMTP id e22mr2510412otj.303.1602094245171;
+ Wed, 07 Oct 2020 11:10:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8fce8f99-56bd-6a87-9789-325d6ffff54d@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
+ <20201007164426.1812530-12-daniel.vetter@ffwll.ch> <20201007173647.GW5177@ziepe.ca>
+In-Reply-To: <20201007173647.GW5177@ziepe.ca>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Wed, 7 Oct 2020 20:10:34 +0200
+Message-ID: <CAKMK7uE9sbK_tGhJbsnHgD9rOnx-dr=2xmpMw7RvvvpPLnjVVA@mail.gmail.com>
+Subject: Re: [PATCH 11/13] mm: add unsafe_follow_pfn
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, linux-s390@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 07, 2020 at 07:50:20PM +0200, Paolo Bonzini wrote:
-> On 06/10/20 20:21, Stefan Hajnoczi wrote:
-> >     * Does command-line order matter?
-> >         * Two options: allow any order OR left-to-right ordering
-> >         * Andrea Bolognani: Most users expect left-to-right ordering,
-> > why allow any order?
-> >         * Eduardo Habkost: Can we enforce left-to-right ordering or do
-> > we need to follow the deprecation process?
-> >         * Daniel Berrange: Solve compability by introducing new
-> > binaries without the burden of backwards compability
-> 
-> I think "new binaries" shouldn't even have a command line; all
-> configuration should happen through QMP commands.  Those are naturally
-> time-ordered, which is equivalent to left-to-right, and therefore the
-> question is sidestepped.  Perhaps even having a command line in
-> qemu-storage-daemon was a mistake.
+On Wed, Oct 7, 2020 at 7:36 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Wed, Oct 07, 2020 at 06:44:24PM +0200, Daniel Vetter wrote:
+> > Way back it was a reasonable assumptions that iomem mappings never
+> > change the pfn range they point at. But this has changed:
+> >
+> > - gpu drivers dynamically manage their memory nowadays, invalidating
+> > ptes with unmap_mapping_range when buffers get moved
+> >
+> > - contiguous dma allocations have moved from dedicated carvetouts to
+> > cma regions. This means if we miss the unmap the pfn might contain
+> > pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
+> >
+> > - even /dev/mem now invalidates mappings when the kernel requests that
+> > iomem region when CONFIG_IO_STRICT_DEVMEM is set, see 3234ac664a87
+> > ("/dev/mem: Revoke mappings when a driver claims the region")
+> >
+> > Accessing pfns obtained from ptes without holding all the locks is
+> > therefore no longer a good idea.
+> >
+> > Unfortunately there's some users where this is not fixable (like v4l
+> > userptr of iomem mappings) or involves a pile of work (vfio type1
+> > iommu). For now annotate these as unsafe and splat appropriately.
+> >
+> > This patch adds an unsafe_follow_pfn, which later patches will then
+> > roll out to all appropriate places.
+> >
+> > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> > Cc: Kees Cook <keescook@chromium.org>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > Cc: John Hubbard <jhubbard@nvidia.com>
+> > Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > Cc: Jan Kara <jack@suse.cz>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: linux-mm@kvack.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: linux-samsung-soc@vger.kernel.org
+> > Cc: linux-media@vger.kernel.org
+> > Cc: kvm@vger.kernel.org
+> > ---
+> >  include/linux/mm.h |  2 ++
+> >  mm/memory.c        | 32 +++++++++++++++++++++++++++++++-
+> >  mm/nommu.c         | 17 +++++++++++++++++
+> >  security/Kconfig   | 13 +++++++++++++
+> >  4 files changed, 63 insertions(+), 1 deletion(-)
+>
+> Makes sense to me.
+>
+> I wonder if we could change the original follow_pfn to require the
+> ptep and then lockdep_assert_held() it against the page table lock?
 
-Non-interactive configuration is a nice property for simpler integration
-use cases. eg launching from the shell is tedious with QMP compared to
-CLI args.
+The safe variant with the pagetable lock is follow_pte_pmd. The only
+way to make follow_pfn safe is if you have an mmu notifier and
+corresponding retry logic. That is not covered by lockdep (it would
+splat if we annotate the retry side), so I'm not sure how you'd check
+for that?
 
-This could be addressed though by having a configuration file to load
-config from, where the config entries can be mapped 1-1 onto QMP commands,
-essentially making the config file a non-interactive QMP.
+Checking for ptep lock doesn't work here, since the one leftover safe
+user of this (kvm) doesn't need that at all, because it has the mmu
+notifier.
 
-> The big question to me is whether the configuration should be
-> QAPI-based, that is based on QAPI structs, or QMP-based.  If the latter,
-> "object-add" (and to a lesser extent "device-add") are fine mechanisms
-> for configuration.  There is still need for better QOM introspection,
-> but it would be much simpler than doing QOM object creation via QAPI
-> struct, if at all possible.
+Also follow_pte_pmd will splat with lockdep if you get it wrong, since
+the function leaves you with the right ptlock lock when it returns. If
+you forget to unlock that, lockdep will complain.
 
+So I think we're as good as it gets, since I really have no idea how
+to make sure follow_pfn callers do have an mmu notifier registered.
 
+> > +int unsafe_follow_pfn(struct vm_area_struct *vma, unsigned long addres=
+s,
+> > +     unsigned long *pfn)
+> > +{
+> > +#ifdef CONFIG_STRICT_FOLLOW_PFN
+> > +     pr_info("unsafe follow_pfn usage rejected, see
+> > CONFIG_STRICT_FOLLOW_PFN\n");
+>
+> Wonder if we can print something useful here, like the current
+> PID/process name?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Yeah adding comm/pid here makes sense.
 
+> > diff --git a/security/Kconfig b/security/Kconfig
+> > index 7561f6f99f1d..48945402e103 100644
+> > --- a/security/Kconfig
+> > +++ b/security/Kconfig
+> > @@ -230,6 +230,19 @@ config STATIC_USERMODEHELPER_PATH
+> >         If you wish for all usermode helper programs to be disabled,
+> >         specify an empty string here (i.e. "").
+> >
+> > +config STRICT_FOLLOW_PFN
+> > +     bool "Disable unsafe use of follow_pfn"
+> > +     depends on MMU
+>
+> I would probably invert this CONFIG_ALLOW_UNSAFE_FOLLOW_PFN
+> default n
+
+I've followed the few other CONFIG_STRICT_FOO I've seen, which are all
+explicit enables and default to "do not break uapi, damn the
+(security) bugs". Which is I think how this should be done. It is in
+the security section though, so hopefully competent distros will
+enable this all.
+-Daniel
+--=20
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
