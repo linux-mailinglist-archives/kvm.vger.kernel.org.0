@@ -2,48 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 398C2285EB0
-	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 14:04:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 402DD285EF3
+	for <lists+kvm@lfdr.de>; Wed,  7 Oct 2020 14:20:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728068AbgJGME4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Oct 2020 08:04:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
+        id S1728166AbgJGMUZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Oct 2020 08:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727253AbgJGME4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Oct 2020 08:04:56 -0400
+        with ESMTP id S1727927AbgJGMUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Oct 2020 08:20:25 -0400
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B059C061755;
-        Wed,  7 Oct 2020 05:04:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA16C061755;
+        Wed,  7 Oct 2020 05:20:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=pZGiY5noKvQRAXEKfr2AsRMHMWTJzoh21GKinD4soDA=; b=mV8TWI21U6Il1n1oxUg3bVysFz
-        3Ym/eXZr7wa8aT0XHORjWjaby4O79Jvtpotu+qzoqyEm7TUFVTiznAc8LIih1zpJw16LioKK1c2EH
-        PXaU9CaF8NOpMdW4gR0PdbuTqmpjSLBzck685Wzit0xmpe8cJV7cczBYh6+3t3+/HFBQmkG11iChN
-        OiaXH3srNBoMcGj7o+1cP7AJkGAUzFlQbmaOclWR7KDG4HQeo8y3Yjjl079XLYcqXd+bvNi5+5nDA
-        VNUvQwD0qnuafLF6+//lsX6HGQUFQD8Wer9art68PdOtz05cmElRP2uhF4AFj4K7zO4fKfCw5T0XO
-        IUo0xj1g==;
+        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:Date:Cc:To:
+        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=QVdD3TQ2H6lJ3p8rHm4Fp9Y1icR9/VihX18vHOISEEM=; b=x/d2uFk8Hy5K8rV8FK5BCbfmK4
+        P/DG5WBcs5qbI0hOmIASOKELpBbPskWT0Gw+jopgoRvPaMAmdjMq4NWk+8nOSqmBeYt1COIEFtiMH
+        pxf4u+e0klNXyoSBB3nzz7zp786+GIvi+XYK+OPNgs9oDZobWN5CdnQvQe9bj/laKopPCyuIkE8wH
+        Wu6h2GiMBFn5M3BEe2rblqeRI3V7EsaWkYqOkKOdIF68SsM2rXQOJY9sum/WQwLthnN89a0Si1/Px
+        c45Cl552vYxCzmVDLj6N1QwW+xFmiNwarpbo2/BguoAtorxV0Ai2zUab1GJAZ/fEAXpMW6FPy382R
+        F3D8B6eg==;
 Received: from [54.239.6.187] (helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kQ8Bg-0006lx-4v; Wed, 07 Oct 2020 12:04:52 +0000
-Message-ID: <e84dcf9a6b21283b2698bb27d99e16749ec09ba5.camel@infradead.org>
-Subject: Re: [PATCH 13/13] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
+        id 1kQ8Qg-0007ya-Mo; Wed, 07 Oct 2020 12:20:22 +0000
+Message-ID: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org>
+Subject: [PATCH 0/5] Fix x2apic enablement and allow up to 32768 CPUs
+ without IR where supported
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org
-Cc:     iommu <iommu@lists.linux-foundation.org>,
-        kvm <kvm@vger.kernel.org>, linux-hyperv@vger.kernel.org
-Date:   Wed, 07 Oct 2020 13:04:49 +0100
-In-Reply-To: <8a502c78-71d7-83f6-7ba8-b16fd41e64fe@redhat.com>
-References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org>
-         <20201005152856.974112-1-dwmw2@infradead.org>
-         <20201005152856.974112-13-dwmw2@infradead.org>
-         <472a34e3-2981-0c7b-1fb0-da8debbdc728@redhat.com>
-         <b1f7e1210580acdf4673498be71eaf33acb8c146.camel@infradead.org>
-         <8a502c78-71d7-83f6-7ba8-b16fd41e64fe@redhat.com>
+To:     x86 <x86@kernel.org>
+Cc:     kvm <kvm@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Date:   Wed, 07 Oct 2020 13:20:20 +0100
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-O5FMPBwiRENgcc+MYz1U"
+        boundary="=-8N6e39WOR/Z3ep/X8dQa"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -52,30 +47,23 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-O5FMPBwiRENgcc+MYz1U
+--=-8N6e39WOR/Z3ep/X8dQa
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2020-10-07 at 13:15 +0200, Paolo Bonzini wrote:
-> On 07/10/20 10:59, David Woodhouse wrote:
-> > Yeah, I was expecting the per-irqdomain affinity support to take a few
-> > iterations. But this part, still sticking with the current behaviour of
-> > only allowing CPUs to come online at all if they can be reached by all
-> > interrupts, can probably go in first.
-> >=20
-> > It's presumably (hopefully!) a blocker for the qemu patch which exposes
-> > the same feature bit defined in this patch.
->=20
-> Yeah, though we could split it further and get the documentation part in
-> first.  That would let the QEMU part go through.
+Splitting out the simpler parts of my previous patch set. The full
+support for per-irqdomain affinity limits will take a bit more work but
+this part is quite simple.
 
-Potentially. Although I've worked out that the first patch in my
-series, adding x2apic_set_max_apicid(), is actually a bug fix because
-it fixes the behaviour if you only *hotplug* CPUs with APIC IDs > 255
-and there were none of them present at boot time.
+Since we don't yet have per-irqdomain affinity, we currently attempt to
+avoid bringing CPUs online at all if they can't be targeted by external
+interrupts. Except we still let them get hotplugged later... which is
+moderately suboptimal.
 
-So I'll post this set on its own to start with, and then focus on the
-per-irqdomain affinity support after that.
+Fix that, and support the hypervisor enlightenment which at least
+extends the range of targetable APIC IDs to 15 bits, as seen in the
+patch at https://patchwork.kernel.org/patch/11816693/ for qemu.
+
 
 David Woodhouse (5):
       x86/apic: Fix x2apic enablement without interrupt remapping
@@ -84,7 +72,22 @@ David Woodhouse (5):
       x86/apic: Support 15 bits of APIC ID in IOAPIC/MSI where available
       x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
 
---=-O5FMPBwiRENgcc+MYz1U
+ Documentation/virt/kvm/cpuid.rst     |  4 ++++
+ arch/x86/include/asm/apic.h          |  1 +
+ arch/x86/include/asm/io_apic.h       |  3 ++-
+ arch/x86/include/asm/mpspec.h        |  1 +
+ arch/x86/include/asm/x86_init.h      |  2 ++
+ arch/x86/include/uapi/asm/kvm_para.h |  1 +
+ arch/x86/kernel/apic/apic.c          | 27 +++++++++++++++++++++------
+ arch/x86/kernel/apic/io_apic.c       | 19 +++++++++++++------
+ arch/x86/kernel/apic/msi.c           | 41 ++++++++++++++++++++++++++++++++=
++++------
+ arch/x86/kernel/apic/x2apic_phys.c   |  9 +++++++++
+ arch/x86/kernel/kvm.c                |  6 ++++++
+ arch/x86/kernel/x86_init.c           |  1 +
+ 12 files changed, 96 insertions(+), 19 deletions(-)
+
+--=-8N6e39WOR/Z3ep/X8dQa
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -167,20 +170,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDA3MTIwNDQ5WjAvBgkqhkiG9w0BCQQxIgQgqi59sTMRC4j3O9poDHya3rCKrBCcnTdm75wFL8wR
-Ivkwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MDA3MTIyMDIwWjAvBgkqhkiG9w0BCQQxIgQgXGozTIERFgKMz2Ah2LVqUmIycxm63NbWr/52vmFR
+brAwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAKWcQTfAo4fCYYUfPUkUhKEPtLNECH34FGSXeElQU+3mGDkURI2//098M6JNk+2f
-zjxfkHTC7jIX6ff68l0Um3L6WgpYZ02vQPIrbOaoiyYV2zF6LmWe4Hi9zhDLvR0ghauEcbwVKdJM
-9/aDQr/Nxi9jiMBNbxnSxiCODmS/qsI3/D7LsuwFKgUXn4lP4OnwHsLZPKjfaZlKWYdEKsSInCTA
-VHnhaqYEh9SiMPUc8Dn8SOp3VXkV+Q61UDAfhMJBc49aFFOa3viYaj6ytit2ZrPeQxuk3b/neGmS
-GQHHT4NvDoBLKcjaCexyFPJqXQxDxwFa54Mus+S4BhDdwSL/QOsAAAAAAAA=
+DQEBAQUABIIBAJnuZPs+eezCUA3yJ4N/YAuiRlTujTPA0uuVMx+P2OI11cSE93mC9oSLTexH4kU2
+D6ksH5UxxXpPAByacVr9nC7WkjvuaYhLEUtdta+pXiLCh6c5KQxNY/8tUBOLuY/B2RFwVq/seRUF
+k8Kmvv7j8XGucCb6W1Qi4n4ZnTJyEkbYjgU4fqQDzLY93B7FTR2ki3lT4gHQF01uDELkjECZMeLM
+cxElvY84QAyRXSvfqgRycWp7HDy8cp0D0gBoQuilV/Mqmq/teSKfFX+Yjj2aFIfNxy1rWjO4WyT4
+hxpKmKzZoyeXzm98Gt9SMgth40rP44hJD1FuK0FEbelLX2JRjWsAAAAAAAA=
 
 
---=-O5FMPBwiRENgcc+MYz1U--
+--=-8N6e39WOR/Z3ep/X8dQa--
 
