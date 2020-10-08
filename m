@@ -2,232 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CD6B287467
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 14:41:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE3B6287471
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 14:41:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729998AbgJHMlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 08:41:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39838 "EHLO
+        id S1730062AbgJHMlw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 08:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729824AbgJHMlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 08:41:00 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17EAEC061755;
-        Thu,  8 Oct 2020 05:41:00 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1602160858;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kxroEkMT5O65MYaakoHs0S8A9ZmiZNNxOQXIf8c8848=;
-        b=JLDQ1enhdPqwwGJ5u5iLQdncHS+AbvmH1KrMD2IlYekyh7j9CW12Hv2CPrmTOQsB1gbd7W
-        WWCLTLCJNROx4TH73Ruqxh6TtIy+TjG6YEMz5J+oq09SAgqb/8IqGKwh6DBMRqPTKuc4IC
-        GzCvN0BymNNn0pA8i80JsUVHKcuvNfNOOFXtDjUiOmkPWm6Y+gl6ZCImvNepV+zMyEFUOc
-        QvuIJtXHF/tw3qCpqv5eYl/lqoQjjkQAeQEE5+P/VVyhYIZYun4GZvMhFuapuxp8Kt1GDb
-        cLiTdIWfxLH+8uXndFnW5nBRR9HGYAjUxPYQr5v/SmL6d94vv8+72Eo+P3+nBw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1602160858;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kxroEkMT5O65MYaakoHs0S8A9ZmiZNNxOQXIf8c8848=;
-        b=sPUfW/DhvQqEeWAtPcFjW5eFspwuXzH2Lv6Nnhu3oJHl0XOqEDHX9HxfDANeYaLgerp4hl
-        MCMG1lir+ZiOT6Bg==
-To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
-Cc:     iommu <iommu@lists.linux-foundation.org>,
-        kvm <kvm@vger.kernel.org>, linux-hyperv@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 07/13] irqdomain: Add max_affinity argument to irq_domain_alloc_descs()
-In-Reply-To: <2c0712352812ab114cb711236703fd7c308a5bf2.camel@infradead.org>
-References: <77e64f977f559412f62b467fd062d051ea288f14.camel@infradead.org> <20201005152856.974112-1-dwmw2@infradead.org> <20201005152856.974112-7-dwmw2@infradead.org> <87lfgj59mp.fsf@nanos.tec.linutronix.de> <75d79c50d586c18f0b1509423ed673670fc76431.camel@infradead.org> <87tuv640nw.fsf@nanos.tec.linutronix.de> <336029ca32524147a61b6fa1eb734debc9d51a00.camel@infradead.org> <87a6wy3u6n.fsf@nanos.tec.linutronix.de> <119c2f993cac5d57c54d4720addc9f32bf1daadd.camel@infradead.org> <87k0w12h8u.fsf@nanos.tec.linutronix.de> <2c0712352812ab114cb711236703fd7c308a5bf2.camel@infradead.org>
-Date:   Thu, 08 Oct 2020 14:40:57 +0200
-Message-ID: <878scgx546.fsf@nanos.tec.linutronix.de>
+        with ESMTP id S1730045AbgJHMlv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 08:41:51 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C825C061755
+        for <kvm@vger.kernel.org>; Thu,  8 Oct 2020 05:41:51 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id y14so4161097pgf.12
+        for <kvm@vger.kernel.org>; Thu, 08 Oct 2020 05:41:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=urluBRAZhemlAGNYR9JHz7//XtKVwD7KOsOnuK3XEvE=;
+        b=i93YgqfP2Qs8dlAx7dyQ+W0IRG7pAxhJwW9+eRHcvMVYP3djMki+CGM6zO0EVJGk6K
+         IbQzLSWJO3N1l0EX9JrKSfHEa7utNqIB47jME7UstUYw4VjXJ3eqfisu2Lv5k6vC2Rji
+         RXYD2ZA+lWznWQWoRqSMqejEaxBGkz94802iEmzJd0MCBP2cDlv790XzP6x1cW1hFd/9
+         VynwcCRsd9uDLYGf7l4gaVrI2jMIq7IhzjCPA4DTCHUEEBJWY9srCgIimdgBAYkzeSSZ
+         OrD77ImZWUgTRcr1HoKIi9uUAfbiDRf/QR54E/fTvbFXgKqiTQNN+jJNb/teyHBDz9PA
+         L6Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=urluBRAZhemlAGNYR9JHz7//XtKVwD7KOsOnuK3XEvE=;
+        b=WzRaf1033MoR4Ze8fs4KWnJjB1RmrWzrmVeon9RTU2zigwiaPj1I8V7ULlLTg2fOn0
+         qN+U1A/4cP4VeoOFJcrEYHYVA/zwpNfAb9ceh4GskjIMk3nA3Tr0xpxcdXq9ciuEOKWY
+         MRZOcc9V6IObcZpP5cXCDaRSWi6fI2anZ++SbJun4tRGS+LloN9K/uguDCERmW6vOcLo
+         M/yhsfqg2GE0NukPZyPkI712ybhrPcDBcdXXJQAPX5wIAKGet+MeKnXxb8a6ej1CMytX
+         4G80GHJL0u/EGY0SPok06W8GkCj7u6u4BNWG3FFi1Vve6djrcGFpoDPHOnOaxA6X/05f
+         gGmg==
+X-Gm-Message-State: AOAM532KFy7u+HyNOze/nqYw7ZWqmYoQgHRqXAJyOW2MxLQk+ltD5JWC
+        daRn2SiBJb1h+NrpxMzthtVfng==
+X-Google-Smtp-Source: ABdhPJxnQ64uysYsu/F9BjeJkE2gf+57wvTrXl8yFyGGP/X1izZlhvOyXG/ViriTgaaOJPI9vrc0XQ==
+X-Received: by 2002:a17:90a:6787:: with SMTP id o7mr8072496pjj.125.1602160910911;
+        Thu, 08 Oct 2020 05:41:50 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id k11sm7411830pjs.18.2020.10.08.05.41.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Oct 2020 05:41:49 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kQVEx-001U2l-UT; Thu, 08 Oct 2020 09:41:47 -0300
+Date:   Thu, 8 Oct 2020 09:41:47 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>
+Subject: Re: [PATCH 10/13] PCI: revoke mappings like devmem
+Message-ID: <20201008124147.GD5177@ziepe.ca>
+References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
+ <20201007164426.1812530-11-daniel.vetter@ffwll.ch>
+ <CAPcyv4hBL68A7CZa+YnooufDH2tevoxrx32DTJMQ6OHRnec7QQ@mail.gmail.com>
+ <20201007232448.GC5177@ziepe.ca>
+ <CAPcyv4jA9fe40r_2SfrCtOaeE85V88TA3NNQZOmQMNj=MdsPyw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4jA9fe40r_2SfrCtOaeE85V88TA3NNQZOmQMNj=MdsPyw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 08 2020 at 12:10, David Woodhouse wrote:
-> On Thu, 2020-10-08 at 11:34 +0200, Thomas Gleixner wrote:
->> The overall conclusion for this is:
->> 
->>  1) X2APIC support on bare metal w/o irq remapping is not going to
->>     happen unless you:
->> 
->>       - added support in multi-queue devices which utilize managed
->>         interrupts
->>         
->>       - audited the whole tree for other assumptions related to the
->>         reachability of possible CPUs.
->> 
->>     I'm not expecting you to be done with that before I retire so for
->>     me it's just not going to happen :)
->
-> Makes sense. It probably does mean we should a BUG_ON for the case
-> where IRQ remapping *is* enabled but any device is found which isn't
-> behind it. But that's OK.
+On Thu, Oct 08, 2020 at 12:49:54AM -0700, Dan Williams wrote:
 
-We can kinda gracefully handle that. See the completely untested and
-incomplete patch below.
+> > This is what got me thinking maybe this needs to be a bit bigger
+> > generic infrastructure - eg enter this scheme from fops mmap and
+> > everything else is in mm/user_iomem.c
+> 
+> It still requires every file that can map physical memory to have its
+> ->open fop do
 
->>  2) X2APIC support on VIRT is possible if the extended ID magic is
->>     supported by the hypervisor because that does not make any CPU
->>     unreachable for MSI and therefore the multi-queue muck and
->>     everything else just works.
->> 
->>     This requires to have either the domain affinity limitation for HPET
->>     in place or just to force disable HPET or at least HPET-MSI which is
->>     a reasonable tradeoff.
->> 
->>     HPET is not required for guests which have kvmclock and
->>     APIC/deadline timer and known (hypervisor provided) frequencies.
->
-> HPET-MSI should work fine. Like the IOAPIC, it's just a child of the
-> *actual* MSI domain. The address/data in the MSI message are completely
-> opaque to it, and if the parent domain happens to put meaningful
-> information into bits 11-5 of the MSI address, the HPET won't even
-> notice.
->
-> The HPET's Tn_FSB_INT_ADDR register does have a full 32 bits of the MSI
-> address; it's not doing bit-swizzling like the IOAPIC does, which might
-> potentially *not* have been able to set certain bits in the MSI.
+Common infrastructure would have to create a dummy struct file at mmap
+time with the global inode and attach that to the VMA.
 
-Indeed. I thought it was crippled in some way, but you're right it has
-all the bits.
-
-Thanks,
-
-        tglx
----
-Subject: x86/iommu: Make interrupt remapping more robust
-From: Thomas Gleixner <tglx@linutronix.de>
-Date: Thu, 08 Oct 2020 14:09:44 +0200
-
-Needs to be split into pieces and cover PCI proper. Right now PCI gets a
-NULL pointer assigned which makes it explode at the wrong place
-later. Also hyperv iommu wants some love.
-
-NOT-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- arch/x86/kernel/apic/io_apic.c      |    4 +++-
- arch/x86/kernel/apic/msi.c          |   24 ++++++++++++++----------
- drivers/iommu/amd/iommu.c           |    6 +++---
- drivers/iommu/intel/irq_remapping.c |    4 ++--
- 4 files changed, 22 insertions(+), 16 deletions(-)
-
---- a/arch/x86/kernel/apic/io_apic.c
-+++ b/arch/x86/kernel/apic/io_apic.c
-@@ -2300,7 +2300,9 @@ static int mp_irqdomain_create(int ioapi
- 	info.type = X86_IRQ_ALLOC_TYPE_IOAPIC_GET_PARENT;
- 	info.devid = mpc_ioapic_id(ioapic);
- 	parent = irq_remapping_get_irq_domain(&info);
--	if (!parent)
-+	if (IS_ERR(parent))
-+		return PTR_ERR(parent);
-+	else if (!parent)
- 		parent = x86_vector_domain;
- 	else
- 		name = "IO-APIC-IR";
---- a/arch/x86/kernel/apic/msi.c
-+++ b/arch/x86/kernel/apic/msi.c
-@@ -415,9 +415,9 @@ static struct msi_domain_info hpet_msi_d
- struct irq_domain *hpet_create_irq_domain(int hpet_id)
- {
- 	struct msi_domain_info *domain_info;
-+	struct fwnode_handle *fn = NULL;
- 	struct irq_domain *parent, *d;
- 	struct irq_alloc_info info;
--	struct fwnode_handle *fn;
- 
- 	if (x86_vector_domain == NULL)
- 		return NULL;
-@@ -432,25 +432,29 @@ struct irq_domain *hpet_create_irq_domai
- 	init_irq_alloc_info(&info, NULL);
- 	info.type = X86_IRQ_ALLOC_TYPE_HPET_GET_PARENT;
- 	info.devid = hpet_id;
-+
- 	parent = irq_remapping_get_irq_domain(&info);
--	if (parent == NULL)
-+	if (IS_ERR(parent))
-+		goto fail;
-+	else if (!parent)
- 		parent = x86_vector_domain;
- 	else
- 		hpet_msi_controller.name = "IR-HPET-MSI";
- 
- 	fn = irq_domain_alloc_named_id_fwnode(hpet_msi_controller.name,
- 					      hpet_id);
--	if (!fn) {
--		kfree(domain_info);
--		return NULL;
--	}
-+	if (!fn)
-+		goto fail;
- 
- 	d = msi_create_irq_domain(fn, domain_info, parent);
--	if (!d) {
--		irq_domain_free_fwnode(fn);
--		kfree(domain_info);
--	}
-+	if (!d)
-+		goto fail;
- 	return d;
-+
-+fail:
-+	irq_domain_free_fwnode(fn);
-+	kfree(domain_info);
-+	return NULL;
- }
- 
- int hpet_assign_irq(struct irq_domain *domain, struct hpet_channel *hc,
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -3557,7 +3557,7 @@ static struct irq_domain *get_irq_domain
- 	struct amd_iommu *iommu = amd_iommu_rlookup_table[devid];
- 
- 	if (!iommu)
--		return NULL;
-+		return ERR_PTR(-ENODEV);
- 
- 	switch (info->type) {
- 	case X86_IRQ_ALLOC_TYPE_IOAPIC_GET_PARENT:
-@@ -3565,7 +3565,7 @@ static struct irq_domain *get_irq_domain
- 		return iommu->ir_domain;
- 	default:
- 		WARN_ON_ONCE(1);
--		return NULL;
-+		return ERR_PTR(-ENODEV);
- 	}
- }
- 
-@@ -3578,7 +3578,7 @@ static struct irq_domain *get_irq_domain
- 
- 	devid = get_devid(info);
- 	if (devid < 0)
--		return NULL;
-+		return ERR_PTR(-ENODEV);
- 	return get_irq_domain_for_devid(info, devid);
- }
- 
---- a/drivers/iommu/intel/irq_remapping.c
-+++ b/drivers/iommu/intel/irq_remapping.c
-@@ -212,7 +212,7 @@ static struct irq_domain *map_hpet_to_ir
- 		if (ir_hpet[i].id == hpet_id && ir_hpet[i].iommu)
- 			return ir_hpet[i].iommu->ir_domain;
- 	}
--	return NULL;
-+	return ERR_PTR(-ENODEV);
- }
- 
- static struct intel_iommu *map_ioapic_to_iommu(int apic)
-@@ -230,7 +230,7 @@ static struct irq_domain *map_ioapic_to_
- {
- 	struct intel_iommu *iommu = map_ioapic_to_iommu(apic);
- 
--	return iommu ? iommu->ir_domain : NULL;
-+	return iommu ? iommu->ir_domain : ERR_PTR(-ENODEV);
- }
- 
- static struct irq_domain *map_dev_to_ir(struct pci_dev *dev)
+Jason
