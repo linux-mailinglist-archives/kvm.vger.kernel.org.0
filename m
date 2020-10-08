@@ -2,75 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AE80287F17
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 01:27:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9303A287F24
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 01:32:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730993AbgJHX1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 19:27:09 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:53588 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725969AbgJHX1J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 19:27:09 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1602199626;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mCF0g/+MND1nwyGx+3yFFM5NagyeBqr5yClJxHT9QEA=;
-        b=Swp8IJ+Dgcfzc0AiaM09Ka+XguUbPbdks8xUopa30a0QG9VTUz1p8OEM/pGJUj68R66uKo
-        3BNSmfCEhBPwkb8gb5JL4X55GCeGTMuIK1C1gxHhGqSuscAuXf8wAkIfOwuc+l67uhL3Xe
-        BqUhMtEBt3gBjhNjB+VlWJuFDj9QSipDsfeTtxaYo7SEDz1Go6f4eLWBGNVolW/TsKzcAx
-        ydm1GNGRt4oEliwJTKULEbyOwkKClOsukVdfspauVbOvwTZbIA9O7efNhcV6ZK2tGqNIwt
-        MftjjoJYadRztuHmP53tOwnPCc2E7z5TtmehSD/jmszTLaRQy/YjrMb2cJsBnQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1602199626;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mCF0g/+MND1nwyGx+3yFFM5NagyeBqr5yClJxHT9QEA=;
-        b=p20GZo4A08k/MQ9YpJFZ8xL4ZpcN/OzaBgyB0Z6JYGu3goDxY7suWz1HdpJ6zXE5AO7QvB
-        KZHAotM6g3c4ycCw==
-To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
-In-Reply-To: <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org>
-References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org> <20201007122046.1113577-1-dwmw2@infradead.org> <20201007122046.1113577-5-dwmw2@infradead.org> <87blhcx6qz.fsf@nanos.tec.linutronix.de> <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org> <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org> <87362owhcb.fsf@nanos.tec.linutronix.de> <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org>
-Date:   Fri, 09 Oct 2020 01:27:06 +0200
-Message-ID: <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
+        id S1731022AbgJHXcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 19:32:18 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:2986 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725969AbgJHXcR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 19:32:17 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f7fa1490000>; Thu, 08 Oct 2020 16:31:21 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 8 Oct
+ 2020 23:32:15 +0000
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by HQMAIL111.nvidia.com (172.20.187.18) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Thu, 8 Oct 2020 23:32:15 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TWNHKUdaDPE1VNAPxR6Gt2K5FuH2pqnpqwaEj03IGPuwVHyxyqjgl2pktCKBJb/SW+mMZJPPqxSHugGaWbz3/gzvjdha1zW3OzOhBdeV9wQM86Vdu2s4QLL5Jrgvb6Wk/apl74D9/xG52igA1ACd8c6zhEdr1/kVLpAyDLgEBAT99/gGBmRI64AhJAa2/UW+m0SAIcSJITsWrJwWSMnOBon++DDVb6htZ1u+VIbqVLCukaiI+YpE2YvzBhljQoM/zLQcdDx8s+KfGTtx7LlKoR3VUmfx1uOXLSnlj5eWg2vBbwAXbOlv3WJ6KH7oUJ/0EJn9rnukwIiwBJSWcp1Vlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aBtcuxQxGJxVZM+1oIT81t1EHEQwgCbCuLxZ/puM0lM=;
+ b=Ng8NwShyoTROn0u6U5WEyQMWzqKTTTZ2S7UfXi4myfX7LvqOMM8OwcGC1i83MaV5tnor/cuQ+Cn8YQqIzNmvmHcZGtk3GiXehjoasKWzSphbpgypnFbKDbuTwu7BU3mBv0/tuA3SRHNS5oByZqMAsbPjJQyM6vD8Ajvo1NbxnJc2VNIZpO4BKYOL4+46jU+oWsx5vGn5Mep3cO9pLeYwdiD6+ilMP7clwaeFAlaE068HDpQi+492O3e6qBqMxE8W5DCI15xwgmtJ8NOLuAEPEWewOnrcsbb9HxZJW0YaVeFjAdQRFv5TS3ySpsPRkGkQvwl7zIkuxAzztHosbGv9WQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4235.namprd12.prod.outlook.com (2603:10b6:5:220::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.22; Thu, 8 Oct
+ 2020 23:32:12 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3433.046; Thu, 8 Oct 2020
+ 23:32:12 +0000
+Date:   Thu, 8 Oct 2020 20:32:10 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+CC:     Dave Jiang <dave.jiang@intel.com>, <vkoul@kernel.org>,
+        <megha.dey@intel.com>, <maz@kernel.org>, <bhelgaas@google.com>,
+        <alex.williamson@redhat.com>, <jacob.jun.pan@intel.com>,
+        <ashok.raj@intel.com>, <yi.l.liu@intel.com>, <baolu.lu@intel.com>,
+        <kevin.tian@intel.com>, <sanjay.k.kumar@intel.com>,
+        <tony.luck@intel.com>, <jing.lin@intel.com>,
+        <dan.j.williams@intel.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <parav@mellanox.com>, <rafael@kernel.org>,
+        <netanelg@mellanox.com>, <shahafs@mellanox.com>,
+        <yan.y.zhao@linux.intel.com>, <pbonzini@redhat.com>,
+        <samuel.ortiz@intel.com>, <mona.hossain@intel.com>,
+        <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <x86@kernel.org>, <linux-pci@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 11/18] dmaengine: idxd: ims setup for the vdcm
+Message-ID: <20201008233210.GH4734@nvidia.com>
+References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
+ <160021253189.67751.12686144284999931703.stgit@djiang5-desk3.ch.intel.com>
+ <87mu17ghr1.fsf@nanos.tec.linutronix.de>
+ <0f9bdae0-73d7-1b4e-b478-3cbd05c095f4@intel.com>
+ <87r1q92mkx.fsf@nanos.tec.linutronix.de>
+ <44e19c5d-a0d2-0ade-442c-61727701f4d8@intel.com>
+ <87y2kgux2l.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <87y2kgux2l.fsf@nanos.tec.linutronix.de>
+X-ClientProxiedBy: MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22)
+ To DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23 via Frontend Transport; Thu, 8 Oct 2020 23:32:11 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kQfOM-001m41-HQ; Thu, 08 Oct 2020 20:32:10 -0300
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1602199881; bh=aBtcuxQxGJxVZM+1oIT81t1EHEQwgCbCuLxZ/puM0lM=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
+        b=B/JDEQlZM46MkF3BhLd4T+hnuXCsrXAHZucvFPgqloQbGFehwUZBZlljDAGFWQ06A
+         cFLP0poowVHeHzDZrxYUhSnsK14XZYbBqN0A+teX0lffrc3E5PAlrbTbx8FvDhGRN/
+         YvAG7hKXOVlYo9CdMthkfEe4Y08kP2srpuNWN526VeqRCWrMJyTV52H09tBSeS+q/2
+         C5JtWR/2sjTE9p/O34uvcEPHQxMkuR1uY/qOFvE+guM/Ep1LlyOMCwr6EMqbrtm2f3
+         E+nwpUQ8y2AKKWxwY5khNN9yaNxpFENbmZSESJOtqNjAGUb+xkr+WMIwNYBaF0Ufe/
+         ysW7kPitaWw4g==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 08 2020 at 22:39, David Woodhouse wrote:
-> On Thu, 2020-10-08 at 23:14 +0200, Thomas Gleixner wrote:
->> > 
->> > (We'd want the x86_vector_domain to actually have an MSI compose
->> > function in the !CONFIG_PCI_MSI case if we did this, of course.)
->> 
->> The compose function and the vector domain wrapper can simply move to
->> vector.c
->
-> I ended up putting __irq_msi_compose_msg() into apic.c and that way I
-> can make virt_ext_dest_id static in that file.
->
-> And then I can move all the HPET-MSI support into hpet.c too.
+On Fri, Oct 09, 2020 at 01:17:38AM +0200, Thomas Gleixner wrote:
+> Dave,
+> 
+> On Thu, Oct 08 2020 at 09:51, Dave Jiang wrote:
+> > On 10/8/2020 12:39 AM, Thomas Gleixner wrote:
+> >> On Wed, Oct 07 2020 at 14:54, Dave Jiang wrote:
+> >>> On 9/30/2020 12:57 PM, Thomas Gleixner wrote:
+> >>>> Aside of that this is fiddling in the IMS storage array behind the irq
+> >>>> chips back without any comment here and a big fat comment about the
+> >>>> shared usage of ims_slot::ctrl in the irq chip driver.
+> >>>>
+> >>> This is to program the pasid fields in the IMS table entry. Was
+> >>> thinking the pasid fields may be considered device specific so didn't
+> >>> attempt to add the support to the core code.
+> >> 
+> >> Well, the problem is that this is not really irq chip functionality.
+> >> 
+> >> But the PASID programming needs to touch the IMS storage which is also
+> >> touched by the irq chip.
+> >> 
+> >> This might be correct as is, but without a big fat comment explaining
+> >> WHY it is safe to do so without any form of serialization this is just
+> >> voodoo and unreviewable.
+> >> 
+> >> Can you please explain when the PASID is programmed and what the state
+> >> of the interrupt is at that point? Is this a one off setup operation or
+> >> does this happen dynamically at random points during runtime?
+> >
+> > I will put in comments for the function to explain why and when we modify the 
+> > pasid field for the IMS entry. Programming of the pasid is done right before we 
+> > request irq. And the clearing is done after we free the irq. We will not be 
+> > touching the IMS field at runtime. So the touching of the entry should be safe.
+> 
+> Thanks for clarifying that.
+> 
+> Thinking more about it, that very same thing will be needed for any
+> other IMS device and of course this is not going to end well because
+> some driver will fiddle with the PASID at the wrong time.
 
-Works for me.
+Why? This looks like some quirk of the IDXD HW where it just randomly
+put PASID along with the IRQ mask register. Probably because PASID is
+not the full 32 bits.
 
-> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/ext_dest_id
+AFAIK the PASID is not tagged on the MemWr TLP triggering the
+interrupt, so it really is unrelated to the irq.
 
-For the next submission, can you please
+I think the ioread to get the PASID is rather ugly, it should pluck
+the PASID out of some driver specific data structure with proper
+locking, and thus use the sleepable version of the irqchip?
 
- - pick up the -ENODEV changes for HPET/IOAPIC which I posted earlier
+This is really not that different from what I was describing for queue
+contexts - the queue context needs to be assigned to the irq # before
+it can be used in the irq chip other wise there is no idea where to
+write the msg to. Just like pasid here.
 
- - shuffle all that compose/IOAPIC cleanup around
-
-before adding that extended dest id stuff.
-
-Thanks,
-
-        tglx
+Jason
