@@ -2,97 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A743B287B8A
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 20:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03524287BAD
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 20:27:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727816AbgJHSS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 14:18:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35916 "EHLO
+        id S1728934AbgJHS1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 14:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727754AbgJHSS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 14:18:26 -0400
-Received: from forward102j.mail.yandex.net (forward102j.mail.yandex.net [IPv6:2a02:6b8:0:801:2::102])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D4CC061755
-        for <kvm@vger.kernel.org>; Thu,  8 Oct 2020 11:18:25 -0700 (PDT)
-Received: from mxback13j.mail.yandex.net (mxback13j.mail.yandex.net [IPv6:2a02:6b8:0:1619::88])
-        by forward102j.mail.yandex.net (Yandex) with ESMTP id 01D6DF200FC;
-        Thu,  8 Oct 2020 21:18:21 +0300 (MSK)
-Received: from iva5-057a0d1fbbd8.qloud-c.yandex.net (iva5-057a0d1fbbd8.qloud-c.yandex.net [2a02:6b8:c0c:7f1c:0:640:57a:d1f])
-        by mxback13j.mail.yandex.net (mxback/Yandex) with ESMTP id RfimM7jweV-IKdGnEhk;
-        Thu, 08 Oct 2020 21:18:20 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1602181100;
-        bh=cFs6DvdMaKWn5+qm6nyo0Jb17ex+dF10ztqVuJwEsR0=;
-        h=In-Reply-To:From:To:Subject:Cc:Date:References:Message-ID;
-        b=vWLvcpLh5wN8l5/1IwiTYp8M1YjvMoa+R6hg2pkGEwaKmHMiCyX2KM2HDvZbg5qsY
-         wpRi7Op6nJM9HVt7olbLt5ih/PYT1zvNxBC+9nWyhsWxlXDSr5i5p3HmZgyu4NOQAC
-         AAv4elQ82k7g7rqQ1FditDibRWgec/7thmOvU2HA=
-Authentication-Results: mxback13j.mail.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by iva5-057a0d1fbbd8.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id VYNFEb9DbQ-IKmWX7U3;
-        Thu, 08 Oct 2020 21:18:20 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH 0/6] KVM: x86: KVM_SET_SREGS.CR4 bug fixes and cleanup
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201007014417.29276-1-sean.j.christopherson@intel.com>
- <99334de1-ba3d-dfac-0730-e637d39b948f@yandex.ru>
- <20201008175951.GA9267@linux.intel.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
-Date:   Thu, 8 Oct 2020 21:18:18 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        with ESMTP id S1728662AbgJHS1u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 14:27:50 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A7D0C0613D2
+        for <kvm@vger.kernel.org>; Thu,  8 Oct 2020 11:27:50 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id c5so6683747ilr.9
+        for <kvm@vger.kernel.org>; Thu, 08 Oct 2020 11:27:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RrkOdAbBDCwyeOQ37z5tV7CnkLENGAjGaGO/schUabQ=;
+        b=KOwuXgfsy9d3hZ9ebY1MDbA+SQZ34Ep/hpkIyi8xd/Dzs9rEKt+5vx2AiS6+Cqohrf
+         WUu1wEzLRxNjDKUUKrGAiu8Sh6LunX42uuGSGKthYgpZLrbUp9a6XlrUQZHp4R3dyZSG
+         A8QT+Bjdc9CK8oYU7MkpW/4899D7lD3plf1FxnSFhUgoUIRNOa1wb9O+Ul3y+g3MWXYi
+         MoV9lwPLXmhoKVDd6m4Ps/XTbjYdaenWSmXkncPd6DwJ5P8Z7U+gh+cojH0Uaad3+QjD
+         uPUNlh3k7E6bB2LtRrjm+l5Bu0HNLzZSeb0ch/kEnd/YjUlnMBeR8pd79dGcCj+WLQmD
+         OeYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RrkOdAbBDCwyeOQ37z5tV7CnkLENGAjGaGO/schUabQ=;
+        b=ajEh9uDd1lhyPqqsTSdMkAVs/Ns8kFB1rMtHtNpjCjLkuhmgrUMgfS2bk/G1piDaPh
+         +I8BIA7PtnK/rB3Y2s690vPKOe2GrHX2+n6rei8ztEf+HIAiW7pXdZPYYOsoLj25CQ0m
+         pvB9f4vMshL3HOA9vmBQ5E3eVgKMbkwexEx0ozzPen3L2Oz8vWV3yRz+p4XZUSj9ZT3d
+         xaBJny8PlvirJ0YM1xKxIBc4YiNY/tRTPOq8iwy0rAJfGe1lGD0Jh8ub1mzAhnmkFQzP
+         h1MRZCCVpl7llFSPCq4d1qvEpwrmjHLkK2LICR7MCZFup6Ptvhql8LJ+M9p72J8s2T1E
+         kSNg==
+X-Gm-Message-State: AOAM532pgVykxADZpSQaBwdeKvbcPF9Vxmbdo/ebgjbBzURWtscms39x
+        wk3OrgTtfCGOaQAjefvnBYBWXMy9iLE/leOMtNk3Tw==
+X-Google-Smtp-Source: ABdhPJx2ISXtg+5wgVEGtpWtH9JkiOPqpq0nDgXIkl0aFwYeEmDjLStOH9ErLi1lPojEWjAmlzHEdZhgs6x7qCFck04=
+X-Received: by 2002:a92:7914:: with SMTP id u20mr7656969ilc.203.1602181668922;
+ Thu, 08 Oct 2020 11:27:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201008175951.GA9267@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-18-bgardon@google.com>
+ <6990180c-f99c-3f1d-ef6a-57e37a9999d2@redhat.com>
+In-Reply-To: <6990180c-f99c-3f1d-ef6a-57e37a9999d2@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 8 Oct 2020 11:27:37 -0700
+Message-ID: <CANgfPd8itkAnPqr=PfFn3Jf1O_NbY90AEQBKDQ8OR14CagDOzg@mail.gmail.com>
+Subject: Re: [PATCH 17/22] kvm: mmu: Support dirty logging for the TDP MMU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-08.10.2020 20:59, Sean Christopherson пишет:
-> On Thu, Oct 08, 2020 at 07:00:13PM +0300, stsp wrote:
->> 07.10.2020 04:44, Sean Christopherson пишет:
->>> Two bug fixes to handle KVM_SET_SREGS without a preceding KVM_SET_CPUID2.
->> Hi Sean & KVM devs.
->>
->> I tested the patches, and wherever I
->> set VMXE in CR4, I now get
->> KVM: KVM_SET_SREGS: Invalid argument
->> Before the patch I was able (with many
->> problems, but still) to set VMXE sometimes.
->>
->> So its a NAK so far, waiting for an update. :)
-> IIRC, you said you were going to test on AMD?  Assuming that's correct,
+On Fri, Sep 25, 2020 at 6:04 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 25/09/20 23:22, Ben Gardon wrote:
+> >                               start_level, KVM_MAX_HUGEPAGE_LEVEL, false);
+> > +     if (kvm->arch.tdp_mmu_enabled)
+> > +             flush = kvm_tdp_mmu_wrprot_slot(kvm, memslot, false) || flush;
+> >       spin_unlock(&kvm->mmu_lock);
+> >
+>
+> In fact you can just pass down the end-level KVM_MAX_HUGEPAGE_LEVEL or
+> PGLEVEL_4K here to kvm_tdp_mmu_wrprot_slot and from there to
+> wrprot_gfn_range.
 
-Yes, that is true.
+That makes sense. My only worry there is the added complexity of error
+handling values besides PG_LEVEL_2M and PG_LEVEL_4K. Since there are
+only two callers, I don't think that will be too much of a problem
+though. I don't think KVM_MAX_HUGEPAGE_LEVEL would actually be a good
+value to pass in as I don't think that would write protect 2M
+mappings. KVM_MAX_HUGEPAGE_LEVEL is defined as PG_LEVEL_1G, or 3.
 
+>
+> >
+> > +             /*
+> > +              * Take a reference on the root so that it cannot be freed if
+> > +              * this thread releases the MMU lock and yields in this loop.
+> > +              */
+> > +             get_tdp_mmu_root(kvm, root);
+> > +
+> > +             spte_set = wrprot_gfn_range(kvm, root, slot->base_gfn,
+> > +                             slot->base_gfn + slot->npages, skip_4k) ||
+> > +                        spte_set;
+> > +
+> > +             put_tdp_mmu_root(kvm, root);
+>
+>
+> Generalyl using "|=" is the more common idiom in mmu.c.
 
->   -EINVAL
-> is the expected behavior.  KVM was essentially lying before; it never actually
-> set CR4.VMXE in hardware, it just didn't properply detect the error and so VMXE
-> was set in KVM's shadow of the guest's CR4.
+I changed to this in response to some feedback on the RFC, about
+mixing bitwise ops and bools, but I like the |= syntax more as well.
 
-Hmm. But at least it was lying
-similarly on AMD and Intel CPUs. :)
-So I was able to reproduce the problems
-myself.
-Do you mean, any AMD tests are now
-useless, and we need to proceed with
-Intel tests only?
-
-Then additional question.
-On old Intel CPUs we needed to set
-VMXE in guest to make it to work in
-nested-guest mode.
-Is it still needed even with your patches?
-Or the nested-guest mode will work
-now even on older Intel CPUs and KVM
-will set VMXE for us itself, when needed?
-
+>
+> > +static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+> > +                        gfn_t start, gfn_t end)
+> > ...
+> > +             __handle_changed_spte(kvm, as_id, iter.gfn, iter.old_spte,
+> > +                                   new_spte, iter.level);
+> > +             handle_changed_spte_acc_track(iter.old_spte, new_spte,
+> > +                                           iter.level);
+>
+> Is it worth not calling handle_changed_spte?  handle_changed_spte_dlog
+> obviously will never fire but duplicating the code is a bit ugly.
+>
+> I guess this patch is the first one that really gives the "feeling" of
+> what the data structures look like.  The main difference with the shadow
+> MMU is that you have the tdp_iter instead of the callback-based code of
+> slot_handle_level_range, but otherwise it's not hard to follow one if
+> you know the other.  Reorganizing the code so that mmu.c is little more
+> than a wrapper around the two will help as well in this respect.
+>
+> Paolo
+>
