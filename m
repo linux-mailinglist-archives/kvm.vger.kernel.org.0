@@ -2,125 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1765D286FD2
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 09:50:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 449A6286FF2
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 09:53:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728181AbgJHHuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 03:50:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51266 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728167AbgJHHuI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 03:50:08 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7326FC0613D5
-        for <kvm@vger.kernel.org>; Thu,  8 Oct 2020 00:50:07 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id v19so4826454edx.9
-        for <kvm@vger.kernel.org>; Thu, 08 Oct 2020 00:50:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=grdLjPbma4xWpmrd4kIhxHd3k84viXKhZjuHjyaNtUE=;
-        b=OpyjCwq7o157Xb/2yloDuUEV/w+tdNn7bUkqj6LGjYZdXbdkHQlqz4Xs0Zg4Edt33w
-         0nqk5otSDvrBFIDqX3NWTcYGdyooPoOy++oKoeLN7+9FcA3Y2j9gM2FY12udB5BbTLzF
-         o4Fgw3h+eUO3zgDHQ6b7I7KPL5f+fMHf9I0lTVCozAWjOJH1Lu9JW2FcOGR5M99QQ9cG
-         2z2FugDTtkLvyx7A5kfM8jqHqXj/RdTCprPD7XpZha+SBgeMVVhbtPHFs1tz0HiaUe6C
-         BI4I++Hc0Q/c9P8rPs6vNR5tBGxtF7FZ8cn1qblN1zBUwaF08Qp+hX6dqbT1VyZULWij
-         t42Q==
+        id S1728582AbgJHHx4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 03:53:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37193 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728551AbgJHHxy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Oct 2020 03:53:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602143632;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EeM2tLJZZ0I2/r5lqO36RjPkuKxF/JUEoiCYcpWWhqk=;
+        b=ZgoC3w7QSWyCOVwtlVTogZhL3L1m8FLkSGCjyZ+U9orJsbb/kyq7hNKy9q/T8BYtfGv7Vp
+        vm1S90kMAI3r4wIxVnkcUgOgwF4tlH52gNRx2GRLAVq1JwssRieDpz+0CGZM9VnbaRQQck
+        KtjJGViBJO1uhy5I6vGLPxcPlf92BNA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-yR4Zlmg1MYqHYgX-HGRVew-1; Thu, 08 Oct 2020 03:53:50 -0400
+X-MC-Unique: yR4Zlmg1MYqHYgX-HGRVew-1
+Received: by mail-wm1-f71.google.com with SMTP id l15so2835851wmh.9
+        for <kvm@vger.kernel.org>; Thu, 08 Oct 2020 00:53:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=grdLjPbma4xWpmrd4kIhxHd3k84viXKhZjuHjyaNtUE=;
-        b=SbNVIq+SVaJJskyWEcPhLL4OGuP/ivLoQxeQ0DL+r3o0ZrRXXRMDuw47DScJimROBP
-         GSvxg4GntZPhIN1HmCIOdxQUEY1gNsMGRAZGV82dPoDBNvYMYCVk0/SKps3smazJpaZc
-         VSmfD4TpkbtglXssn3Q6oNYnrbY7B3iEqDoEMGxdmjgL6uKOuI29RtqOrImQAACuQWxa
-         TQ1iHLf0NoWfQJ78BxL/a2Iv4YJdBt3S/W5GHvt7KU0lE0dUyppxKJ2thEqOXvTHInVb
-         FT1Lgc8q36WEofMKJxpahheTHGOlpZ6lNfAKgSy3YzL0tlGetYSFMD2JAuy8sLSrrD8g
-         nCuA==
-X-Gm-Message-State: AOAM533YJqqAcpcBHqjpDILKpellVJwq9jeGI9fxDuoZesKmxTUeifo6
-        YwWYvtTJj7B0enGzFWzKomE+3QPI61OKoLWN25p2aA==
-X-Google-Smtp-Source: ABdhPJysuJa5L2PxuxTzTLWSnwn1TbnDhi3QjUi/pDReBeAUTyUIbYuBaOL8Vyczi/qAthRLw4c82m5S1UkBlboYvQw=
-X-Received: by 2002:aa7:cd1a:: with SMTP id b26mr960294edw.97.1602143405978;
- Thu, 08 Oct 2020 00:50:05 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=EeM2tLJZZ0I2/r5lqO36RjPkuKxF/JUEoiCYcpWWhqk=;
+        b=ROQNBpDoHoXmXjVEIWOLgAOuh0drafFYwJ/8ATJc3bCNtCHSzdrK2G+TlDIlhu2RRE
+         VJkctminpz+tGGCTUdUcWruSJ4TppucE5ymEFQTumK/DD5S55lqGIf5oI6ixz4PimlKd
+         V/zeBHGDEQNUs6SaXgQV1qb5a350GZIVOy0jtJ0fc0/zPc6vgiwVHGlcZbpNkd+kU+Pu
+         M2nJ+/HVt75buBAqUgJZrDWOIcqBWezwvALuVoDbUeF5k4RjmGCLJNxq+jClLj7U4WTA
+         1m27r4O6ETa3MTCSaQpIJBCnDCO1O0nINqlv1TZ4lFN8SNKxNi+Tq+zO6BJT618nYzRa
+         +YXw==
+X-Gm-Message-State: AOAM530BMGXNWwSOxAsIrVN+vSEFydSiNj5pOrRYKKIFhHgjZITJ1L50
+        Z+lza5ncVKxPSnwFV3CwZFv0AmiYdsGEzl4+e8eAeNV+v7Bi3FSv+uKjdd7DQLlHZ2kqBw6dd4o
+        L+uiUvb612Uby
+X-Received: by 2002:a1c:18e:: with SMTP id 136mr7256355wmb.22.1602143629380;
+        Thu, 08 Oct 2020 00:53:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxlqMrh6Oifv8gtpC0X15zKaWdZW+8KKdLiQ7jPmO272mmr1uqaYmTj1jdafiVks0BedvgiZQ==
+X-Received: by 2002:a1c:18e:: with SMTP id 136mr7256338wmb.22.1602143629140;
+        Thu, 08 Oct 2020 00:53:49 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:bb8c:429c:6de1:f4ec? ([2001:b07:6468:f312:bb8c:429c:6de1:f4ec])
+        by smtp.gmail.com with ESMTPSA id t124sm5954769wmg.31.2020.10.08.00.53.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Oct 2020 00:53:48 -0700 (PDT)
+Subject: Re: [PATCH] target/i386: Support up to 32768 CPUs without IRQ
+ remapping
+To:     David Woodhouse <dwmw2@infradead.org>,
+        qemu-devel <qemu-devel@nongnu.org>
+Cc:     x86 <x86@kernel.org>, kvm <kvm@vger.kernel.org>
+References: <78097f9218300e63e751e077a0a5ca029b56ba46.camel@infradead.org>
+ <6f8704bf-f832-9fcc-5d98-d8e8b562fe2f@redhat.com>
+ <698c8ab6783a3113d90d8435d07a2dce6a2e2ec9.camel@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7b9c8ca4-e89e-e140-d591-76dcb2cad485@redhat.com>
+Date:   Thu, 8 Oct 2020 09:53:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-11-daniel.vetter@ffwll.ch> <CAPcyv4hBL68A7CZa+YnooufDH2tevoxrx32DTJMQ6OHRnec7QQ@mail.gmail.com>
- <20201007232448.GC5177@ziepe.ca>
-In-Reply-To: <20201007232448.GC5177@ziepe.ca>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Thu, 8 Oct 2020 00:49:54 -0700
-Message-ID: <CAPcyv4jA9fe40r_2SfrCtOaeE85V88TA3NNQZOmQMNj=MdsPyw@mail.gmail.com>
-Subject: Re: [PATCH 10/13] PCI: revoke mappings like devmem
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
-        Linux PCI <linux-pci@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <698c8ab6783a3113d90d8435d07a2dce6a2e2ec9.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 7, 2020 at 4:25 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Wed, Oct 07, 2020 at 12:33:06PM -0700, Dan Williams wrote:
-> > On Wed, Oct 7, 2020 at 11:11 AM Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
-> > >
-> > > Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims
-> > > the region") /dev/kmem zaps ptes when the kernel requests exclusive
-> > > acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, this is
-> > > the default for all driver uses.
-> > >
-> > > Except there's two more ways to access pci bars: sysfs and proc mmap
-> > > support. Let's plug that hole.
-> >
-> > Ooh, yes, lets.
-> >
-> > >
-> > > For revoke_devmem() to work we need to link our vma into the same
-> > > address_space, with consistent vma->vm_pgoff. ->pgoff is already
-> > > adjusted, because that's how (io_)remap_pfn_range works, but for the
-> > > mapping we need to adjust vma->vm_file->f_mapping. Usually that's done
-> > > at ->open time, but that's a bit tricky here with all the entry points
-> > > and arch code. So instead create a fake file and adjust vma->vm_file.
-> >
-> > I don't think you want to share the devmem inode for this, this should
-> > be based off the sysfs inode which I believe there is already only one
-> > instance per resource. In contrast /dev/mem can have multiple inodes
-> > because anyone can just mknod a new character device file, the same
-> > problem does not exist for sysfs.
->
-> The inode does not come from the filesystem char/mem.c creates a
-> singular anon inode in devmem_init_inode()
+On 08/10/20 09:29, David Woodhouse wrote:
+> On Thu, 2020-10-08 at 08:56 +0200, Paolo Bonzini wrote:
+>> On 05/10/20 16:18, David Woodhouse wrote:
+>>> +        if (kvm_irqchip_is_split()) {
+>>> +            ret |= 1U << KVM_FEATURE_MSI_EXT_DEST_ID;
+>>> +        }
+>>
+>> IIUC this is because in-kernel IOAPIC still doesn't work; and when it
+>> does, KVM will advertise the feature itself so no other QEMU changes
+>> will be needed.
+> 
+> More the MSI handling than the IOAPIC. I haven't actually worked out
+> *what* handles cycles to addresses in the 0xFEExxxxx range for the in-
+> kernel irqchip and turns them into interrupts (after putting them
+> through interrupt remapping, if/when the kernel learns to do that).
 
-That's not quite right, An inode does come from the filesystem I just
-arranged for that inode's i_mapping to be set to a common instance.
+That's easy: it's QEMU. :)  See kvm_apic_mem_write in hw/i386/kvm/apic.c
+(note that this memory region is never used when the CPU accesses
+0xFEExxxxx, only when QEMU does.
 
-> Seems OK to use this more widely, but it feels a bit weird to live in
-> char/memory.c.
+Conversion from the IOAPIC and MSI formats to struct kvm_lapic_irq is
+completely separate in KVM, it is respectively in ioapic_service and
+kvm_set_msi_irq.  Both of them prepare a struct kvm_lapic_irq, but
+they're two different paths.
 
-Sure, now that more users have arrived it should move somewhere common.
+> Ideally the IOAPIC would just swizzle the bits in its RTE to create an
+> MSI message and pass it on to the same code to be (translated and)
+> delivered.
+> 
+> You'll note my qemu patch didn't touch IOAPIC code at all, because
+> qemu's IOAPIC really does just that.
 
-> This is what got me thinking maybe this needs to be a bit bigger
-> generic infrastructure - eg enter this scheme from fops mmap and
-> everything else is in mm/user_iomem.c
+Indeed the nice thing about irqchip=split is that the handling of device
+interrupts is entirely confined within QEMU, no matter if they're IOAPIC
+or MSI.  And because we had to implement interrupt remapping, the IOAPIC
+is effectively using MSIs to deliver its interrupts.
 
-It still requires every file that can map physical memory to have its
-->open fop do
+There's still the hack to communicate IOAPIC routes to KVM and have it
+set the EOI exit bitmap correctly, though.  The code is in
+kvm_scan_ioapic_routes and it uses kvm_set_msi_irq (with irqchip=split
+everything is also an MSI within the kernel).  I think you're not
+handling that correctly for CPUs >255, so after all we _do_ need some
+kernel support.
 
-       inode->i_mapping = devmem_inode->i_mapping;
-       filp->f_mapping = inode->i_mapping;
+Paolo
 
-I don't see how you can centralize that part.
+>> I queued this, though of course it has to wait for the corresponding
+>> kernel patches to be accepted (or separated into doc and non-KVM
+>> parts; we'll see).
+> 
+> Thanks.
+> 
+
