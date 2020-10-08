@@ -2,46 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DBC4F287497
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 14:55:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D7432874B1
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 15:01:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730147AbgJHMzR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 08:55:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42086 "EHLO
+        id S1730199AbgJHNAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 09:00:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729722AbgJHMzR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 08:55:17 -0400
+        with ESMTP id S1729986AbgJHNAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 09:00:55 -0400
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50502C061755;
-        Thu,  8 Oct 2020 05:55:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD9DC061755;
+        Thu,  8 Oct 2020 06:00:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=aNNcCE0mbpOZLAl8UNG8xrkvYMgkEwtJCWwcUQOMat0=; b=3hBCcETQ3DdLeBpJqqnuGC5xu0
-        QTxF82DJF+beio/ndQd4cLKOTgWola33+aM/sHFz6S9D5dmZPbeX0ONuWIziE1f9vncdemcOcw8EF
-        wAncHw6DAGZecvKiU1fvLE0YHCG1yGBp6/UvKPa56XABb+syFmCAjAbkdsHyW9Dj11PBq4J50he4p
-        ly5x6lexT4oq165DG2RcupmLOAhu7sCuvJWWtPeFczaAr75FgeZUuAZ5SMer+B4eKcnziNkYTdto5
-        vUz9M1nDa+O7WsL6thbXaWpMaekhm//m4x7P1uA43qZRwn0bBvD2eyc6q+nbrj+uA9LmPb1w1lbxg
-        IkElzxbw==;
-Received: from [54.239.6.186] (helo=freeip.amazon.com)
+        bh=ogLTQUVw7RQ0SMq88BDwOj5osDnJSkZ9cgiGR6v2BYU=; b=PwTZFfmJ6c4MmnWKrl6n6YjlC2
+        oBGoxTP9T/JpX2sqOtFIXX2MRd/n2JdX3wDobhwlIshC5GJAusEJ+opHifxo20h92ARH8eVEwiklm
+        YT65Y0KVRSyZWwFT8J2S8zeAuInfi+r0iu3nh8cxg8usm8r8qUOmHvurUvNsp8B1KalnIVQAmHM4J
+        GzsC5hImN+DKARu8VUGy39YfnlhmTCym81C+e7Et2pGj8QVrdoKwasjha+f86Dfd2e9CCuBauWFVV
+        5X1mg1AJPkPs/39+KhZlV/ByANq14DZjA2Fbc0rAz3aBrjiL6jzf0fZu4y2DqQm7sRutdqaxT79ak
+        qFaf61QA==;
+Received: from [54.239.6.190] (helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kQVRw-0006EV-As; Thu, 08 Oct 2020 12:55:12 +0000
-Message-ID: <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org>
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
+        id 1kQVXP-0006w8-He; Thu, 08 Oct 2020 13:00:51 +0000
+Message-ID: <83b53bc01a8ac72b4fd6e050bb97a2ef97090c5f.camel@infradead.org>
+Subject: Re: [PATCH 4/5] x86/apic: Support 15 bits of APIC ID in IOAPIC/MSI
+ where available
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
 Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel <linux-kernel@vger.kernel.org>
-Date:   Thu, 08 Oct 2020 13:55:10 +0100
-In-Reply-To: <87blhcx6qz.fsf@nanos.tec.linutronix.de>
+Date:   Thu, 08 Oct 2020 14:00:49 +0100
+In-Reply-To: <87h7r5vsog.fsf@nanos.tec.linutronix.de>
 References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org>
          <20201007122046.1113577-1-dwmw2@infradead.org>
-         <20201007122046.1113577-5-dwmw2@infradead.org>
-         <87blhcx6qz.fsf@nanos.tec.linutronix.de>
+         <20201007122046.1113577-4-dwmw2@infradead.org>
+         <87h7r5vsog.fsf@nanos.tec.linutronix.de>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-erlCzoHY6Q60DDG0SDRX"
+        boundary="=-Y7B0799qZx7FNIGn7I7d"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -50,54 +51,68 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-erlCzoHY6Q60DDG0SDRX
+--=-Y7B0799qZx7FNIGn7I7d
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2020-10-08 at 14:05 +0200, Thomas Gleixner wrote:
-> Why MSI_EXT_DEST_ID? It's enabling that for MSI and IO/APIC. The
-> underlying mechanism might be the same, but APIC_EXT_DEST_ID is more
-> general and then you might also make the explanation of that bit
-> match the changelog.
+On Thu, 2020-10-08 at 13:54 +0200, Thomas Gleixner wrote:
+> On Wed, Oct 07 2020 at 13:20, David Woodhouse wrote:
+> > =20
+> > +	/*
+> > +	 * If the hypervisor supports extended destination ID in IOAPIC
+> > +	 * and MSI, that increases the maximum APIC ID that can be used
+> > +	 * for non-remapped IRQ domains.
+> > +	 */
+> > +	if (x86_init.hyper.msi_ext_dest_id()) {
+> > +		msi_ext_dest_id =3D 1;
+> > +		apic_limit =3D 32767;
+> > +	}
+>=20
+> This needs to be outside of the remap mode check because?
 
-It's enabling it for *everything* that generates MSI cycles =E2=80=94 which
-includes IOAPIC, HPET, and MSI-capable PCI devices. Hell, and anything
-else which feels like generating a physical address cycle to 0xFEExxxxx
-addresses.
 
-Again, the IOAPIC is just a device for turning pin-based interrupts
-into MSIs. Bits 19-4 of the address it writes to are taken directly
-from bits 63-48 of the IOAPIC RTE. There's complexity elsewhere but for
-*those* bits, It just uses the bits it's given, just like a PCI device
-or an HPET would.=20
+Once upon a time, there was a later patch in the series which *also*
+used the apic_limit variable to generate a maximum affinity mask.
 
-When I implemented this in qemu I didn't even *touch* the IOAPIC
-support; it doesn't affect the IOAPIC at all, just like it doesn't
-affect the HPET or any of the MSI-capable PCI devices that qemu
-emulates. They just put the bits on the bus that they're told to, when
-they want to generate an interrupt.
+Now we've ditched that idea, I can put this back inside the remap mode
+check.
 
-This feature is an MSI feature.
+>=20
+> > +
+> >  	if (remap_mode !=3D IRQ_REMAP_X2APIC_MODE) {
+> >  		/*
+> >  		 * Using X2APIC without IR is not architecturally supported
+> > @@ -1856,9 +1868,10 @@ static __init void try_to_enable_x2apic(int rema=
+p_mode)
+> >  		 * in physical mode, and CPUs with an APIC ID that cannnot
+> >  		 * be addressed must not be brought online.
+> >  		 */
+> > -		x2apic_set_max_apicid(255);
+> > +		x2apic_set_max_apicid(apic_limit);
+> >  		x2apic_phys =3D 1;
+> >  	}
+> > +
+> >  	x2apic_enable();
+> >  }
+> > =20
+> > diff --git a/arch/x86/kernel/apic/msi.c b/arch/x86/kernel/apic/msi.c
+> > index 2825e003259c..85206f971284 100644
+> > --- a/arch/x86/kernel/apic/msi.c
+> > +++ b/arch/x86/kernel/apic/msi.c
+> > @@ -23,8 +23,11 @@
+> > =20
+> >  struct irq_domain *x86_pci_msi_default_domain __ro_after_init;
+> > =20
+> > +int msi_ext_dest_id __ro_after_init;
+>=20
+> bool please.
+>=20
+> Aside of that this breaks the build for a kernel with CONFIG_PCI_MSI=3Dn
 
-Not an HPET feature.
+Will fix (and rename).
 
-Not a PCI feature.
 
-Not an IOAPIC feature.
-
-The fact that a *Linux* guest has special-case knowledge in its IOAPIC
-driver that duplicates what the MSI message composition does, is not a
-good justification for naming the feature bit bizarrely.
-
-In fact I'm really tempted to make Linux's io_apic.c just use
-irq_chip_compose_msi_msg() and swizzle the bits out of the message
-identically for IR and non-IR alike (modulo the pin hack), and delete
-the IR_IO_APIC_route_entry struct completely.=20
-
-That also completely removes the ext_dest_id trick from visibility in
-io_apic.c. And might avoid further confusion.
-
---=-erlCzoHY6Q60DDG0SDRX
+--=-Y7B0799qZx7FNIGn7I7d
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -180,20 +195,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDA4MTI1NTEwWjAvBgkqhkiG9w0BCQQxIgQgYdKqifa2ax5CKc4E4GimLBK/xheIgoUyA/Xl3UmC
-8zowgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MDA4MTMwMDQ5WjAvBgkqhkiG9w0BCQQxIgQgvaXTtT1wO9/sEkq/Y1YAIED4Yc+h9naQkV5TILlI
+k6gwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBABQnyGftpEvNLzZdFwsjHLZ9eAhtr4t59P+5kMteW3fvKqBxjUy0Po8fMku2p9Do
-kKVl0u3Rs29kKU1KpobJY7Lx6DTT5Q31qmZptUArIkh88YVbShmnx0sIjeR0eGzSP6/iSwhJ6I1E
-p7z6H0QaaXbzLG99uyn2RLLqJvCSCAiuI7iphV04rgS9hrIjBfZx8wxP52aBIfe8CH9mEl/01qll
-4bP/bylFway/glqO/XHStVpoTESkDdrCsupqHTYsXEcSIaAbYgS/UxMYR3cVrikENdIQoTyhxraM
-MnAMXKNaD4sJtCBfSZtRhdrfLR9rD3C0i53n1FrRIcDT/DKR+XUAAAAAAAA=
+DQEBAQUABIIBAFdcipgM7LY5RuRuULv192X59n8xzhYec34VRz4VqxbG0uXzy+RpssgZ8hOvdqqY
+8cO4sYOFFwxbJq+6oNSSLyLcWTm16USl22gJ3Rkw7zKdMqXiSXSfpe4GPRTohtjAVSmvcsg6wW9n
+B/06rtD6XAFCd1WYvK83faImelohqUxAXs6DhBBKzCTeS7L1mVaD6owgSBdp0az6YxzmwAYW26OY
+fiXT4xekjtH4vHxyFnINmGc9lX4O6Hn1+aGTaASyfyD4qT267L0hdDVlM5tbxLW4y2dLduYOE5JO
+LwfJ3Kre1kiJ2NsVOr+tVQMi06d2kk2NxBjHR5u3+aYnnPioy8EAAAAAAAA=
 
 
---=-erlCzoHY6Q60DDG0SDRX--
+--=-Y7B0799qZx7FNIGn7I7d--
 
