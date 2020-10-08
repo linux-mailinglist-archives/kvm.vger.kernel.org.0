@@ -2,142 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BD74287D0D
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 22:24:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB5BD287D13
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 22:27:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730312AbgJHUYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 16:24:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50604 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730289AbgJHUYo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Oct 2020 16:24:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602188682;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=juQFOMH9dE2p8xOLnKEBSnl6iWukaOWDLTPaWnsLC+o=;
-        b=K9bqkj8NveP2ZgawZGGSv/N2pR05H8lNYxMq2UpzE5CV5D8fwi9iD8inOfz1GommZDOe5H
-        mgOTaPaQQE+e7nDcDSnnO/tZNL1pxw5Ge/IXieVBbDx6zzEuy+M0Ri4W8ZaHFQgvSp7Jwg
-        iPF+vHuWeMnA1SMKc4ydRGkWloLGHDE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-oFiJD_a4MdCHmSqnYg3OOg-1; Thu, 08 Oct 2020 16:24:40 -0400
-X-MC-Unique: oFiJD_a4MdCHmSqnYg3OOg-1
-Received: by mail-wm1-f72.google.com with SMTP id v14so3515526wmj.6
-        for <kvm@vger.kernel.org>; Thu, 08 Oct 2020 13:24:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=juQFOMH9dE2p8xOLnKEBSnl6iWukaOWDLTPaWnsLC+o=;
-        b=llrl801TUr9kycHohcvKQaeHa52uy3dy2BvRQhUiD8ArxhRwO9ywI/OPZ2RAbtRflL
-         m8VgUs2t1sS0O6X1sX+Zogg9eJUax4AR5COkJJFCK/v46aL5hx+DlO1fcYd0l6gXfmij
-         JHXi55hrR9K9npns4ZnLR7rfD5KeivwHa8N7oP+RTtSFseUbVPF3/KPJSzukZtQ5QQ8k
-         nqSxcfvy7wKpxvzPQKuLIc28UZ768/G2B21ZjTVf7JLlrNK0rewqCxa2qN22KokyqcUL
-         XQqXFjRcZhgByFtHSGduLZCHwGMv9y0FZkyPfItWbBuc0bXFyhBRXTIy4byu57YtCG6l
-         pnMQ==
-X-Gm-Message-State: AOAM532vu5MYYP2YlKN6AKRF4XmfXvGJY8+fBVEPtEzlOkOVxzrsel+9
-        CFxr3qAAz2fUUiFeAYtZr/3j2Mp40psWv47ZTv+Anb87zTaQnT4Ha149VWywLVGbyU/b+V+w/tL
-        l4lTmdCnAqxPa
-X-Received: by 2002:adf:b1cb:: with SMTP id r11mr11288704wra.339.1602188679373;
-        Thu, 08 Oct 2020 13:24:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz0zutp4sbmwgxVvnc/6mlFYkwIqy4tqWMrqBnp4FuNBBRC6tgWuOZeJwG4AHMnrpjmvfj3JQ==
-X-Received: by 2002:adf:b1cb:: with SMTP id r11mr11288685wra.339.1602188679120;
-        Thu, 08 Oct 2020 13:24:39 -0700 (PDT)
-Received: from steredhat (host-79-27-201-176.retail.telecomitalia.it. [79.27.201.176])
-        by smtp.gmail.com with ESMTPSA id c4sm8699628wrp.85.2020.10.08.13.24.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2020 13:24:38 -0700 (PDT)
-Date:   Thu, 8 Oct 2020 22:24:36 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Rusty Russell <rusty@rustcorp.com.au>, stable@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH] vringh: fix __vringh_iov() when riov and wiov are
- different
-Message-ID: <20201008202436.r33jqbbttqynfvhe@steredhat>
-References: <20201008161311.114398-1-sgarzare@redhat.com>
- <20201008160035-mutt-send-email-mst@kernel.org>
+        id S1730288AbgJHU1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 16:27:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55816 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729280AbgJHU1i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 16:27:38 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E5B5C0613D2;
+        Thu,  8 Oct 2020 13:27:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=7jif2k9zcZ8cHV0IvpYw8TET4vLh557VQNExhD1A4Wo=; b=CTzcYsDLt2qZcuaRE50e5/Tk0x
+        RORejz9K7yDXQyTYhwvrg2JWgAcrr9LYrXw6bsr6DS4rkl0ey7kkju4NqD5Q0Mjvk4GAElSkaMq7f
+        RkpyWSqvrV8IWfmiFG80+lSVgrT4+QcRoXKwfaGxRAVRY3/kQEHr0O9sxUNOpfIUEz8l32dqleWeN
+        hwKhOPdKI0D21AuXgGOsCDP7GsBGteclbShiuMLFKxMSpfIGquwuZKwG8hMVrJxmVAZzuzBM4T0Uk
+        La63iEZMMhHGqBJ59SqoXFtB+cFa5O931XHzGVAACARHUCliVLXRBXH2DY8Bvq2u7FgWYFVuMQaQl
+        3FCQ0bjQ==;
+Received: from [2601:1c0:6280:3f0::2c9a]
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kQcVY-00014w-Tq; Thu, 08 Oct 2020 20:27:25 +0000
+Subject: Re: [PATCH 02/35] mm: support direct memory reservation
+To:     yulei.kernel@gmail.com, akpm@linux-foundation.org,
+        naoya.horiguchi@nec.com, viro@zeniv.linux.org.uk,
+        pbonzini@redhat.com
+Cc:     linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xiaoguangrong.eric@gmail.com,
+        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
+        Yulei Zhang <yuleixzhang@tencent.com>,
+        Xiao Guangrong <gloryxiao@tencent.com>
+References: <cover.1602093760.git.yuleixzhang@tencent.com>
+ <2fbc347a5f52591fc9da8d708fef0be238eb06a5.1602093760.git.yuleixzhang@tencent.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <84108593-f56a-8897-2026-a27d07a4824e@infradead.org>
+Date:   Thu, 8 Oct 2020 13:27:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201008160035-mutt-send-email-mst@kernel.org>
+In-Reply-To: <2fbc347a5f52591fc9da8d708fef0be238eb06a5.1602093760.git.yuleixzhang@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 08, 2020 at 04:00:51PM -0400, Michael S. Tsirkin wrote:
-> On Thu, Oct 08, 2020 at 06:13:11PM +0200, Stefano Garzarella wrote:
-> > If riov and wiov are both defined and they point to different
-> > objects, only riov is initialized. If the wiov is not initialized
-> > by the caller, the function fails returning -EINVAL and printing
-> > "Readable desc 0x... after writable" error message.
-> > 
-> > Let's replace the 'else if' clause with 'if' to initialize both
-> > riov and wiov if they are not NULL.
-> > 
-> > As checkpatch pointed out, we also avoid crashing the kernel
-> > when riov and wiov are both NULL, replacing BUG() with WARN_ON()
-> > and returning -EINVAL.
-> > 
-> > Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> Can you add more detail please? when does this trigger?
+On 10/8/20 12:53 AM, yulei.kernel@gmail.com wrote:
+> diff --git a/mm/Kconfig b/mm/Kconfig
+> index 6c974888f86f..e1995da11cea 100644
+> --- a/mm/Kconfig
+> +++ b/mm/Kconfig
+> @@ -226,6 +226,15 @@ config BALLOON_COMPACTION
+>  	  scenario aforementioned and helps improving memory defragmentation.
+>  
+>  #
+> +# support for direct memory basics
+> +config DMEM
+> +	bool "Direct Memory Reservation"
+> +	def_bool n
 
-I'm developing vdpa_sim_blk and I'm using vringh_getdesc_iotlb()
-to get readable and writable buffers.
+Drop the def_bool line.
 
-With virtio-blk devices a descriptors has both readable and writable
-buffers (eg. virtio_blk_outhdr in the readable buffer and status as last byte
-of writable buffer).
-So, I'm calling vringh_getdesc_iotlb() one time to get both type of buffer
-and put them in 2 iovecs:
+> +	depends on SPARSEMEM
+> +	help
+> +	  Allow reservation of memory which could be dedicated usage of dmem.
 
-	ret = vringh_getdesc_iotlb(&vq->vring, &vq->riov, &vq->wiov,
-				   &vq->head, GFP_ATOMIC);
+	                                             dedicated to the use of dmem.
+or
+	                              which could be for the dedicated use of dmem.
 
-With this patch applied it works well, without the function fails
-returning -EINVAL and printing "Readable desc 0x... after writable".
+> +	  It's the basics of dmemfs.
 
-Am I using vringh_getdesc_iotlb() in the wrong way?
+	           basis
 
-Thanks,
-Stefano
 
-> 
-> > ---
-> >  drivers/vhost/vringh.c | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> > index e059a9a47cdf..8bd8b403f087 100644
-> > --- a/drivers/vhost/vringh.c
-> > +++ b/drivers/vhost/vringh.c
-> > @@ -284,13 +284,14 @@ __vringh_iov(struct vringh *vrh, u16 i,
-> >  	desc_max = vrh->vring.num;
-> >  	up_next = -1;
-> >  
-> > +	/* You must want something! */
-> > +	if (WARN_ON(!riov && !wiov))
-> > +		return -EINVAL;
-> > +
-> >  	if (riov)
-> >  		riov->i = riov->used = 0;
-> > -	else if (wiov)
-> > +	if (wiov)
-> >  		wiov->i = wiov->used = 0;
-> > -	else
-> > -		/* You must want something! */
-> > -		BUG();
-> >  
-> >  	for (;;) {
-> >  		void *addr;
-> > -- 
-> > 2.26.2
-> 
+-- 
+~Randy
 
