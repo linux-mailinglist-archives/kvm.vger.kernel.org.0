@@ -2,117 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AC3A286F7A
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 09:31:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82168286FA6
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 09:39:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbgJHHbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 03:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48402 "EHLO
+        id S1727694AbgJHHj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 03:39:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725849AbgJHHbv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 03:31:51 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C06EEC0613D3
-        for <kvm@vger.kernel.org>; Thu,  8 Oct 2020 00:31:49 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id l85so5322303oih.10
-        for <kvm@vger.kernel.org>; Thu, 08 Oct 2020 00:31:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ogkw1NmOSWleETzvxYwVZZIizSINMS0qQkiw0aowwRQ=;
-        b=dAa4UrodoeKqvvGBic2n/ikfUtGXIrA84JDvhHoeTG0wQyvzwM6zRb58ASAp90bOAP
-         Z0Gq9W2/rAIbo9tt/Rdw3PX+Bn1vOefBbbpajIIFIeMsYr0JsELM1frkf/Q6RzY+4q6w
-         KwDjwJvmHbSV+DyPoGD+FRH2axWgRzr70NSco=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ogkw1NmOSWleETzvxYwVZZIizSINMS0qQkiw0aowwRQ=;
-        b=fUD9KvH9FrsXSJTrS417RK1oV+vl95MA6C4xXMoaSNm2BMsDPyKqtCfo590eOzmTbm
-         9bOd/1LQWYsbHN25rsgu20BcGOXCPliMP+Vn6ktNpj7POo3fyLDVUj4sLQaUjl7DxugK
-         k3S9FkY3PWgAlH7sH28UNfMPFXjLa+VUe5kEsWaGhmb+9zEx3Tu/2Dopay23ze8Wj5hy
-         hD4EuaWge3ZODE3d1HG2rDa5TGEYJNM9pTnklZMo/JkSny5lUBXQN8s9dAuxwf7P4Vcr
-         wpxAsjHEf/BDHH17YtsP/ufn1dIaX6DTW2qyC653GFSdZv9req/U3N0R2SBAFlVGJlJA
-         HkuQ==
-X-Gm-Message-State: AOAM533clXvLC5qFdbc6paB+P2M4vu8IHT/XTF5OB5KfHw1O7lSm8DOC
-        +DO+XcIM5qT4cKLK0iaBlN5V6kvtY4oSbUSWwBQb4A==
-X-Google-Smtp-Source: ABdhPJx491RwkFJI9puzs4morldhkHhy8TQN885mw0wtSqvJNbvAlJbcViFwT+IWX3hheU/oD67HmER0Hab3kMQkGCo=
-X-Received: by 2002:aca:6083:: with SMTP id u125mr4379406oib.14.1602142309051;
- Thu, 08 Oct 2020 00:31:49 -0700 (PDT)
+        with ESMTP id S1727224AbgJHHj2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 03:39:28 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BDC9C061755;
+        Thu,  8 Oct 2020 00:39:28 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1602142766;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wGS8RvPqjWluL2zEoasmPYr+Mt5G8eg7w6trwMiIRys=;
+        b=g9sr7Db6oViY7+CNLNPLqR2diLWAEuYBHLUy/gNyBzuAWzXRUgeUCs6sNOZpxLofDhl+i6
+        68Fd1xmKCe2rwDvq/sd7PiT7+B5XvK8VScniD1E/1UG5GG5n3PQaEjVFd5Stx1YlLqKv7B
+        9XwIRII8xSs4awPsfGqvHoLy5muOKShFWHqOW0jSXflOCow69afm+4nz71foETF3RSbH7s
+        ePMmR11SPMWL2vmoJMViNcwI0n3TsbNss5yxMEWcJ3pjyRWKyv5VJsUUwrjOU9UixwRzZf
+        bpfq+sDP8CfUzrSK65nj/ZFfGBlny2Z6RTdEfPu0VMOUudDamZtQg4b5EmyRww==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1602142766;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wGS8RvPqjWluL2zEoasmPYr+Mt5G8eg7w6trwMiIRys=;
+        b=usUoY8ncbtaKaCM2W+geUKP8rahFbzcy+Er9Fhx50RETPyNpyWBGA5efdMzHwrX80a2EbK
+        iU4RrqW+LMMyioDQ==
+To:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
+        megha.dey@intel.com, maz@kernel.org, bhelgaas@google.com,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        ashok.raj@intel.com, jgg@mellanox.com, yi.l.liu@intel.com,
+        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        rafael@kernel.org, netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com
+Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 11/18] dmaengine: idxd: ims setup for the vdcm
+In-Reply-To: <0f9bdae0-73d7-1b4e-b478-3cbd05c095f4@intel.com>
+References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com> <160021253189.67751.12686144284999931703.stgit@djiang5-desk3.ch.intel.com> <87mu17ghr1.fsf@nanos.tec.linutronix.de> <0f9bdae0-73d7-1b4e-b478-3cbd05c095f4@intel.com>
+Date:   Thu, 08 Oct 2020 09:39:26 +0200
+Message-ID: <87r1q92mkx.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-References: <20201007164426.1812530-1-daniel.vetter@ffwll.ch>
- <20201007164426.1812530-11-daniel.vetter@ffwll.ch> <CAPcyv4hBL68A7CZa+YnooufDH2tevoxrx32DTJMQ6OHRnec7QQ@mail.gmail.com>
- <20201007232448.GC5177@ziepe.ca>
-In-Reply-To: <20201007232448.GC5177@ziepe.ca>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Thu, 8 Oct 2020 09:31:37 +0200
-Message-ID: <CAKMK7uF6pdQScwcihBq+9BZ7bSrNXimi-ddN8w7zg2ANhSduWw@mail.gmail.com>
-Subject: Re: [PATCH 10/13] PCI: revoke mappings like devmem
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
-        Linux PCI <linux-pci@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 8, 2020 at 1:24 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Wed, Oct 07, 2020 at 12:33:06PM -0700, Dan Williams wrote:
-> > On Wed, Oct 7, 2020 at 11:11 AM Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
-> > >
-> > > Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims
-> > > the region") /dev/kmem zaps ptes when the kernel requests exclusive
-> > > acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, this is
-> > > the default for all driver uses.
-> > >
-> > > Except there's two more ways to access pci bars: sysfs and proc mmap
-> > > support. Let's plug that hole.
-> >
-> > Ooh, yes, lets.
-> >
-> > >
-> > > For revoke_devmem() to work we need to link our vma into the same
-> > > address_space, with consistent vma->vm_pgoff. ->pgoff is already
-> > > adjusted, because that's how (io_)remap_pfn_range works, but for the
-> > > mapping we need to adjust vma->vm_file->f_mapping. Usually that's done
-> > > at ->open time, but that's a bit tricky here with all the entry points
-> > > and arch code. So instead create a fake file and adjust vma->vm_file.
-> >
-> > I don't think you want to share the devmem inode for this, this should
-> > be based off the sysfs inode which I believe there is already only one
-> > instance per resource. In contrast /dev/mem can have multiple inodes
-> > because anyone can just mknod a new character device file, the same
-> > problem does not exist for sysfs.
->
-> The inode does not come from the filesystem char/mem.c creates a
-> singular anon inode in devmem_init_inode()
->
-> Seems OK to use this more widely, but it feels a bit weird to live in
-> char/memory.c.
->
-> This is what got me thinking maybe this needs to be a bit bigger
-> generic infrastructure - eg enter this scheme from fops mmap and
-> everything else is in mm/user_iomem.c
+On Wed, Oct 07 2020 at 14:54, Dave Jiang wrote:
+> On 9/30/2020 12:57 PM, Thomas Gleixner wrote:
+>> Aside of that this is fiddling in the IMS storage array behind the irq
+>> chips back without any comment here and a big fat comment about the
+>> shared usage of ims_slot::ctrl in the irq chip driver.
+>> 
+> This is to program the pasid fields in the IMS table entry. Was
+> thinking the pasid fields may be considered device specific so didn't
+> attempt to add the support to the core code.
 
-Yeah moving it to iomem and renaming it to have an iomem_prefix
-instead of devmem sounds like a good idea.
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Well, the problem is that this is not really irq chip functionality.
+
+But the PASID programming needs to touch the IMS storage which is also
+touched by the irq chip.
+
+This might be correct as is, but without a big fat comment explaining
+WHY it is safe to do so without any form of serialization this is just
+voodoo and unreviewable.
+
+Can you please explain when the PASID is programmed and what the state
+of the interrupt is at that point? Is this a one off setup operation or
+does this happen dynamically at random points during runtime?
+
+This needs to be clarified first.
+
+Thanks,
+
+        tglx
+
+
