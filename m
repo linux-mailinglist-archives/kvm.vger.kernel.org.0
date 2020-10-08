@@ -2,131 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59A84287D3F
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 22:34:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D2FE287D52
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 22:43:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730288AbgJHUe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 16:34:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725917AbgJHUe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 16:34:27 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E5A4C0613D2;
-        Thu,  8 Oct 2020 13:34:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=p+sWvwr5fj3pIZ69PzilhbvvjIg6DA9KEI2Chppr5F4=; b=bbnVi60TUED7FdFwXGm/6JNPKU
-        IOEkniGGLwDwcUwfAWG2L/C0kH6MDFl2XNbtMO16r/cTZMxx2xjKTJpKg9/Xh0TU5UOvLlx/8o8/R
-        EJTO/Hz2jeRC1Nl7Kv7bZa/cv/AO0kRX6AnGzrw/nFvLbRVMxh0CS4mje/auiqQSLCNtaZZNxFmYx
-        svPDfWytLKSQskS6r4KvBsM6nBHLk8VUNkNoNHfqlqiafeiQ6W7tSasegcd52nB7fMsysKopaCiln
-        o8GyaF0Ujr9b+7sHjkp98rSuv19gpCvCRUptueg/EG8YCBvbAJFs28kr3pTWyRz1BDMqPlkIweEjm
-        phJU3bhA==;
-Received: from [2601:1c0:6280:3f0::2c9a]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kQccC-0001ZY-49; Thu, 08 Oct 2020 20:34:16 +0000
-Subject: Re: [PATCH 02/35] mm: support direct memory reservation
-To:     yulei.kernel@gmail.com, akpm@linux-foundation.org,
-        naoya.horiguchi@nec.com, viro@zeniv.linux.org.uk,
-        pbonzini@redhat.com
-Cc:     linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xiaoguangrong.eric@gmail.com,
-        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
-        Yulei Zhang <yuleixzhang@tencent.com>,
-        Xiao Guangrong <gloryxiao@tencent.com>
-References: <cover.1602093760.git.yuleixzhang@tencent.com>
- <2fbc347a5f52591fc9da8d708fef0be238eb06a5.1602093760.git.yuleixzhang@tencent.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <b1703e32-052a-e56b-a4d3-ddd361953f6d@infradead.org>
-Date:   Thu, 8 Oct 2020 13:34:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1729038AbgJHUnH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 16:43:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46265 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728901AbgJHUnH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Oct 2020 16:43:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602189785;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=huKURS9xZVwjRl6HwVKXLMhhJbFrna5oxeAZtRaNfLM=;
+        b=XntqAV6R1GvrlFkLdDIUC/xMyHYjio6kfZv35RvU8oZm2LQ7ab3J4QTY2VlTAW9a6WKQlr
+        +3jYcB0QSYCA3Q18i9LGBI1tltuO2Mhwg89ZrjXTHBfqRs/LsVdHkNLn6/2fAf6EnbAg+r
+        SB4hJ6oxNm0YJ+n0igiAt+eQh0fgXHE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-0rDDCUGZOiWINQ_Q48nHTg-1; Thu, 08 Oct 2020 16:43:03 -0400
+X-MC-Unique: 0rDDCUGZOiWINQ_Q48nHTg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B147425EB;
+        Thu,  8 Oct 2020 20:43:02 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-112-116.ams2.redhat.com [10.36.112.116])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 556BD55786;
+        Thu,  8 Oct 2020 20:42:57 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     mst@redhat.com
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Rusty Russell <rusty@rustcorp.com.au>,
+        Jason Wang <jasowang@redhat.com>
+Subject: [PATCH v2] vringh: fix __vringh_iov() when riov and wiov are different
+Date:   Thu,  8 Oct 2020 22:42:56 +0200
+Message-Id: <20201008204256.162292-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2fbc347a5f52591fc9da8d708fef0be238eb06a5.1602093760.git.yuleixzhang@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/8/20 12:53 AM, yulei.kernel@gmail.com wrote:
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index a1068742a6df..da15d4fc49db 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -980,6 +980,44 @@
->  			The filter can be disabled or changed to another
->  			driver later using sysfs.
->  
-> +	dmem=[!]size[KMG]
-> +			[KNL, NUMA] When CONFIG_DMEM is set, this means
-> +			the size of memory reserved for dmemfs on each numa
+If riov and wiov are both defined and they point to different
+objects, only riov is initialized. If the wiov is not initialized
+by the caller, the function fails returning -EINVAL and printing
+"Readable desc 0x... after writable" error message.
 
-			                                               NUMA
+This issue happens when descriptors have both readable and writable
+buffers (eg. virtio-blk devices has virtio_blk_outhdr in the readable
+buffer and status as last byte of writable buffer) and we call
+__vringh_iov() to get both type of buffers in two different iovecs.
 
-> +			memory node and 'size' must be aligned to the default
-> +			alignment that is the size of memory section which is
-> +			128M on default on x86_64. If set '!', such amount of
+Let's replace the 'else if' clause with 'if' to initialize both
+riov and wiov if they are not NULL.
 
-			     by default
+As checkpatch pointed out, we also avoid crashing the kernel
+when riov and wiov are both NULL, replacing BUG() with WARN_ON()
+and returning -EINVAL.
 
-> +			memory on each node will be owned by kernel and dmemfs
-> +			own the rest of memory on each node.
+Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
+Cc: stable@vger.kernel.org
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ drivers/vhost/vringh.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-			owns
-
-> +			Example: Reserve 4G memory on each node for dmemfs
-> +				dmem = 4G
-
-IIRC, you don't want spaces in this example.
-Or did you check? Does the kernel's command line parser accept & ignore spaces like these?
-
-
-> +
-> +	dmem=[!]size[KMG]:align[KMG]
-> +			[KNL, NUMA] Ditto. 'align' should be power of two and
-> +			it's not smaller than the default alignment. Also
-
-	drop "it's"
-
-> +			'size' must be aligned to 'align'.
-> +			Example: Bad dmem parameter because 'size' misaligned
-> +				dmem=0x40200000:1G
-> +
-> +	dmem=size[KMG]@addr[KMG]
-> +			[KNL] When CONFIG_DMEM is set, this marks specific
-> +			memory as reserved for dmemfs. Region of memory will be
-> +			used by dmemfs, from addr to addr + size. Reserving a
-> +			certain memory region for kernel is illegal so '!' is
-> +			forbidden. Should not assign 'addr' to 0 because kernel
-> +			will occupy fixed memory region begin at 0 address.
-
-			                                beginning
-
-> +			Ditto, 'size' and 'addr' must be aligned to default
-> +			alignment.
-> +			Example: Exclude memory from 5G-6G for dmemfs.
-> +				dmem=1G@5G
-> +
-> +	dmem=size[KMG]@addr[KMG]:align[KMG]
-> +			[KNL] Ditto. 'align' should be power of two and it's
-
-		Drop "it's"
-
-> +			not smaller than the default alignment. Also 'size'
-> +			and 'addr' must be aligned to 'align'. Specially,
-> +			'@addr' and ':align' could occur in any order.
-> +			Example: Exclude memory from 5G-6G for dmemfs.
-> +				dmem=1G:1G@5G
-> +
->  	driver_async_probe=  [KNL]
->  			List of driver names to be probed asynchronously.
->  			Format: <driver_name1>,<driver_name2>...
-
-
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index e059a9a47cdf..8bd8b403f087 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -284,13 +284,14 @@ __vringh_iov(struct vringh *vrh, u16 i,
+ 	desc_max = vrh->vring.num;
+ 	up_next = -1;
+ 
++	/* You must want something! */
++	if (WARN_ON(!riov && !wiov))
++		return -EINVAL;
++
+ 	if (riov)
+ 		riov->i = riov->used = 0;
+-	else if (wiov)
++	if (wiov)
+ 		wiov->i = wiov->used = 0;
+-	else
+-		/* You must want something! */
+-		BUG();
+ 
+ 	for (;;) {
+ 		void *addr;
 -- 
-~Randy
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
+2.26.2
+
