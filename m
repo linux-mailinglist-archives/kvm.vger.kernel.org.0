@@ -2,100 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D2FE287D52
-	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 22:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 568FC287DAB
+	for <lists+kvm@lfdr.de>; Thu,  8 Oct 2020 23:12:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729038AbgJHUnH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 16:43:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46265 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728901AbgJHUnH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Oct 2020 16:43:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602189785;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=huKURS9xZVwjRl6HwVKXLMhhJbFrna5oxeAZtRaNfLM=;
-        b=XntqAV6R1GvrlFkLdDIUC/xMyHYjio6kfZv35RvU8oZm2LQ7ab3J4QTY2VlTAW9a6WKQlr
-        +3jYcB0QSYCA3Q18i9LGBI1tltuO2Mhwg89ZrjXTHBfqRs/LsVdHkNLn6/2fAf6EnbAg+r
-        SB4hJ6oxNm0YJ+n0igiAt+eQh0fgXHE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-0rDDCUGZOiWINQ_Q48nHTg-1; Thu, 08 Oct 2020 16:43:03 -0400
-X-MC-Unique: 0rDDCUGZOiWINQ_Q48nHTg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B147425EB;
-        Thu,  8 Oct 2020 20:43:02 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-112-116.ams2.redhat.com [10.36.112.116])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 556BD55786;
-        Thu,  8 Oct 2020 20:42:57 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     mst@redhat.com
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        Jason Wang <jasowang@redhat.com>
-Subject: [PATCH v2] vringh: fix __vringh_iov() when riov and wiov are different
-Date:   Thu,  8 Oct 2020 22:42:56 +0200
-Message-Id: <20201008204256.162292-1-sgarzare@redhat.com>
+        id S1728934AbgJHVME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 17:12:04 -0400
+Received: from [58.87.100.240] ([58.87.100.240]:59884 "EHLO
+        mail.hebei-kuixing.com" rhost-flags-FAIL-FAIL-OK-OK)
+        by vger.kernel.org with ESMTP id S1726766AbgJHVMD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Oct 2020 17:12:03 -0400
+X-Greylist: delayed 622 seconds by postgrey-1.27 at vger.kernel.org; Thu, 08 Oct 2020 17:12:02 EDT
+Received: from localhost (unknown [127.0.0.1])
+        by mail.hebei-kuixing.com (Postfix) with ESMTP id 0F46860E7E;
+        Thu,  8 Oct 2020 21:01:40 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at hebei-kuixing.com
+Received: from mail.hebei-kuixing.com ([127.0.0.1])
+        by localhost (mail.hebei-kuixing.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id NXVkdo_yTtlL; Fri,  9 Oct 2020 05:01:39 +0800 (CST)
+Received: from User (unknown [185.248.12.71])
+        by mail.hebei-kuixing.com (Postfix) with ESMTPA id A741A613AA;
+        Fri,  9 Oct 2020 05:01:17 +0800 (CST)
+Reply-To: <kim.leang2011@yahoo.com>
+From:   " Kim Leang" <sales@hebei-kuixing.com>
+Subject: Greeting!
+Date:   Fri, 9 Oct 2020 00:01:37 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain;
+        charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-Id: <20201008210140.0F46860E7E@mail.hebei-kuixing.com>
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If riov and wiov are both defined and they point to different
-objects, only riov is initialized. If the wiov is not initialized
-by the caller, the function fails returning -EINVAL and printing
-"Readable desc 0x... after writable" error message.
+Greeting!
 
-This issue happens when descriptors have both readable and writable
-buffers (eg. virtio-blk devices has virtio_blk_outhdr in the readable
-buffer and status as last byte of writable buffer) and we call
-__vringh_iov() to get both type of buffers in two different iovecs.
+I am contacting you to receive and share with me an abandoned fund ( $21,537.000.00 ) left in our bank by a deceased customer. I was going through the Internet search when I found your email address. My name is Mr. Kim Leang.
 
-Let's replace the 'else if' clause with 'if' to initialize both
-riov and wiov if they are not NULL.
+I want to utilize this opportunity and make use of this fund if I should present your name to the bank to stand as his business associate/ trustee for the fund to be released to you via Visa card for easy withdrawals in any VISA ATM machine anywhere in the World.
 
-As checkpatch pointed out, we also avoid crashing the kernel
-when riov and wiov are both NULL, replacing BUG() with WARN_ON()
-and returning -EINVAL.
+The bank will also give you international online transfer options. With these you can transfer the funds without any risk.
 
-Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- drivers/vhost/vringh.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Should you be interested in working with me in this project? Please reply back and let's benefit from this golden opportunity.You are my first contact. I shall wait a few days and if I do not hear from you, I shall look for another person.
 
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index e059a9a47cdf..8bd8b403f087 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -284,13 +284,14 @@ __vringh_iov(struct vringh *vrh, u16 i,
- 	desc_max = vrh->vring.num;
- 	up_next = -1;
- 
-+	/* You must want something! */
-+	if (WARN_ON(!riov && !wiov))
-+		return -EINVAL;
-+
- 	if (riov)
- 		riov->i = riov->used = 0;
--	else if (wiov)
-+	if (wiov)
- 		wiov->i = wiov->used = 0;
--	else
--		/* You must want something! */
--		BUG();
- 
- 	for (;;) {
- 		void *addr;
--- 
-2.26.2
-
+Thanks and have a nice day,
+Mr. Kim Leang.
