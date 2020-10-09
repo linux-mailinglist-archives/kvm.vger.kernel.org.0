@@ -2,110 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8297288A75
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 16:12:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8761288A97
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 16:19:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388672AbgJIOMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 10:12:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50620 "EHLO
+        id S2388697AbgJIOTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 10:19:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388664AbgJIOMC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 10:12:02 -0400
-Received: from forward102o.mail.yandex.net (forward102o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::602])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB661C0613D6
-        for <kvm@vger.kernel.org>; Fri,  9 Oct 2020 07:12:01 -0700 (PDT)
-Received: from forward101q.mail.yandex.net (forward101q.mail.yandex.net [IPv6:2a02:6b8:c0e:4b:0:640:4012:bb98])
-        by forward102o.mail.yandex.net (Yandex) with ESMTP id 5295A66800B3;
-        Fri,  9 Oct 2020 17:11:54 +0300 (MSK)
-Received: from mxback10q.mail.yandex.net (mxback10q.mail.yandex.net [IPv6:2a02:6b8:c0e:1b4:0:640:b6ef:cb3])
-        by forward101q.mail.yandex.net (Yandex) with ESMTP id 401B9CF40005;
-        Fri,  9 Oct 2020 17:11:54 +0300 (MSK)
-Received: from vla5-47b3f4751bc4.qloud-c.yandex.net (vla5-47b3f4751bc4.qloud-c.yandex.net [2a02:6b8:c18:3508:0:640:47b3:f475])
-        by mxback10q.mail.yandex.net (mxback/Yandex) with ESMTP id zrKwLBa7XU-BrCWgPYm;
-        Fri, 09 Oct 2020 17:11:54 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1602252714;
-        bh=QnZ5DRgh9AnhoAJPFzwxk5KVV2gYGi2dmlD6DyGmKEA=;
-        h=In-Reply-To:From:To:Subject:Cc:Date:References:Message-ID;
-        b=qoKSWL5Irds4zNXcW8OIvqGV4gZzGvoG2OmbmAMTCDT1pqnaUdmIY2x40VbGZzzpp
-         4453f/zbW/P8CxB8UzfTi7s8Wm5x8Q9QC351yAXaHn7HqUXt24/0ogN/QjF+cevzG7
-         AQHePYzIR91g2SWD1/RPArp9eu5h4fNpP+fJhQ/E=
-Authentication-Results: mxback10q.mail.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by vla5-47b3f4751bc4.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id DI6R0U7krW-Brnm8Vah;
-        Fri, 09 Oct 2020 17:11:53 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH 0/6] KVM: x86: KVM_SET_SREGS.CR4 bug fixes and cleanup
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201007014417.29276-1-sean.j.christopherson@intel.com>
- <99334de1-ba3d-dfac-0730-e637d39b948f@yandex.ru>
- <20201008175951.GA9267@linux.intel.com>
- <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
- <20201009040453.GA10744@linux.intel.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <5dfa55f3-ecdf-9f8d-2d45-d2e6e54f2daa@yandex.ru>
-Date:   Fri, 9 Oct 2020 17:11:51 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        with ESMTP id S2388696AbgJIOTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Oct 2020 10:19:07 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C54AC0613D6
+        for <kvm@vger.kernel.org>; Fri,  9 Oct 2020 07:19:05 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id m13so9103068otl.9
+        for <kvm@vger.kernel.org>; Fri, 09 Oct 2020 07:19:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=MM70QuqTQsUBVq7gYXvXBZty2HeYwYo1AwlGqBndKzc=;
+        b=TXHPzxH9Da/xVr/PCQoDGy8c0zPWy+ggD3CN9+uIIarhuboqtJeD+WQppuYxHsd6Lw
+         Y7BHU63LYKcn8Q19C0ojPAIbHvLgUU7idHjBxl/cqvgWdtq9sYwq7aJadM3ewUTikvYS
+         Or+ZtapYPyo5QGIWg5F96VAf0fQY9D81hLV+0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=MM70QuqTQsUBVq7gYXvXBZty2HeYwYo1AwlGqBndKzc=;
+        b=sgkpCf/cvLt6SxRCOAe7q43WX4CdJJu22KfwBWjovQwiib9+Kye452DFWIa1HCG6UA
+         /0zKJRHQ2CpOEFebJnEVgovcTVHT7abOd6tb2e1xO5AdGsx2uTynKqMET7Mnj7GRXhL1
+         spYr8peTNS1gZWbBvmkDB3I+iFtqBCcd7ahVr5BCV6yWgWElOWWkLAyO0KkfRzjjjU6p
+         tU2y5ILtzK6DLGQgvnKy6CBHhbg1EeCIFbWK7uAMxXCAObznCtqS9qZ3i+OgrK+mu0gT
+         klFuIJKnGXiB1Ishouv3ieZPtBX97qeMUhKwIbe2zo7fuK1d5xPvPNM7IuiXLzk7Jg+H
+         gfPA==
+X-Gm-Message-State: AOAM533pSAfTaAbxeVhwXvXrMu93pA2yv6JBPP8WNUImxBKpDrDo+28V
+        H8hcNRX07NipJ4FPzBaYaHIwFgxSRXnBfC7JsX3a4Q==
+X-Google-Smtp-Source: ABdhPJzNidxPOYe2uXf9i2kyX3nO4EFb7XRxsxlaQUOxC+n0ejMSsQdbIKmUu2me6/FBsUnaPi9FuwTaAIvXBztd7mE=
+X-Received: by 2002:a05:6830:1c3c:: with SMTP id f28mr9534834ote.188.1602253144991;
+ Fri, 09 Oct 2020 07:19:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201009040453.GA10744@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
+ <20201009075934.3509076-18-daniel.vetter@ffwll.ch> <20201009094750.GQ6112@intel.com>
+ <CAKMK7uH3o3hnRkTDqr93PR=wuRejpty+AbyMacoEFDDb6OgJeQ@mail.gmail.com> <20201009104154.GR6112@intel.com>
+In-Reply-To: <20201009104154.GR6112@intel.com>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Fri, 9 Oct 2020 16:18:53 +0200
+Message-ID: <CAKMK7uEp71+B3EVTezog8U3VY=DUYAbe1QeqZH9NEG8T37M_Cw@mail.gmail.com>
+Subject: Re: [PATCH v2 17/17] drm/i915: Properly request PCI BARs
+To:     =?UTF-8?B?VmlsbGUgU3lyasOkbMOk?= <ville.syrjala@linux.intel.com>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Kees Cook <keescook@chromium.org>,
+        KVM list <kvm@vger.kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Linux PCI <linux-pci@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-09.10.2020 07:04, Sean Christopherson пишет:
->> Hmm. But at least it was lying
->> similarly on AMD and Intel CPUs. :)
->> So I was able to reproduce the problems
->> myself.
->> Do you mean, any AMD tests are now useless, and we need to proceed with Intel
->> tests only?
-> For anything VMXE related, yes.
-
-What would be the expected behaviour
-on Intel, if it is set? Any difference with AMD?
-
-
->> Then additional question.
->> On old Intel CPUs we needed to set VMXE in guest to make it to work in
->> nested-guest mode.
->> Is it still needed even with your patches?
->> Or the nested-guest mode will work now even on older Intel CPUs and KVM will
->> set VMXE for us itself, when needed?
-> I'm struggling to even come up with a theory as to how setting VMXE from
-> userspace would have impacted KVM with unrestricted_guest=n, let alone fixed
-> anything.
+On Fri, Oct 9, 2020 at 12:42 PM Ville Syrj=C3=A4l=C3=A4
+<ville.syrjala@linux.intel.com> wrote:
 >
-> CR4.VMXE must always be 1 in _hardware_ when VMX is on, including when running
-> the guest.  But KVM forces vmcs.GUEST_CR4.VMXE=1 at all times, regardless of
-> the guest's actual value (the guest sees a shadow value when it reads CR4).
+> On Fri, Oct 09, 2020 at 12:01:39PM +0200, Daniel Vetter wrote:
+> > On Fri, Oct 9, 2020 at 11:47 AM Ville Syrj=C3=A4l=C3=A4
+> > <ville.syrjala@linux.intel.com> wrote:
+> > >
+> > > On Fri, Oct 09, 2020 at 09:59:34AM +0200, Daniel Vetter wrote:
+> > > > When trying to test my CONFIG_IO_STRICT_DEVMEM changes I realized t=
+hey
+> > > > do nothing for i915. Because i915 doesn't request any regions, like
+> > > > pretty much all drm pci drivers. I guess this is some very old
+> > > > remnants from the userspace modesetting days, when we wanted to
+> > > > co-exist with the fbdev driver. Which usually requested these
+> > > > resources.
+> > > >
+> > > > But makes me wonder why the pci subsystem doesn't just request
+> > > > resource automatically when we map a bar and a pci driver is bound?
+> > > >
+> > > > Knowledge about which pci bars we need kludged together from
+> > > > intel_uncore.c and intel_gtt.c from i915 and intel-gtt.c over in th=
+e
+> > > > fake agp driver.
+> > > >
+> > > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > > > Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> > > > Cc: Kees Cook <keescook@chromium.org>
+> > > > Cc: Dan Williams <dan.j.williams@intel.com>
+> > > > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > > > Cc: John Hubbard <jhubbard@nvidia.com>
+> > > > Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > > > Cc: Jan Kara <jack@suse.cz>
+> > > > Cc: Dan Williams <dan.j.williams@intel.com>
+> > > > Cc: linux-mm@kvack.org
+> > > > Cc: linux-arm-kernel@lists.infradead.org
+> > > > Cc: linux-samsung-soc@vger.kernel.org
+> > > > Cc: linux-media@vger.kernel.org
+> > > > Cc: Bjorn Helgaas <bhelgaas@google.com>
+> > > > Cc: linux-pci@vger.kernel.org
+> > > > ---
+> > > >  drivers/gpu/drm/i915/intel_uncore.c | 25 +++++++++++++++++++++++--
+> > > >  1 file changed, 23 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/drivers/gpu/drm/i915/intel_uncore.c b/drivers/gpu/drm/=
+i915/intel_uncore.c
+> > > > index 54e201fdeba4..ce39049d8919 100644
+> > > > --- a/drivers/gpu/drm/i915/intel_uncore.c
+> > > > +++ b/drivers/gpu/drm/i915/intel_uncore.c
+> > > > @@ -1692,10 +1692,13 @@ static int uncore_mmio_setup(struct intel_u=
+ncore *uncore)
+> > > >       struct pci_dev *pdev =3D i915->drm.pdev;
+> > > >       int mmio_bar;
+> > > >       int mmio_size;
+> > > > +     int bar_selection;
+> > >
+> > > Signed bitmasks always make me uneasy. But looks like
+> > > that's what it is in the pci api. So meh.
+> >
+> > Yeah it's surprising.
+> >
+> > > > +     int ret;
+> > > >
+> > > >       mmio_bar =3D IS_GEN(i915, 2) ? 1 : 0;
+> > > > +     bar_selection =3D BIT (2) | BIT(mmio_bar);
+> > >                            ^
+> > > spurious space
+> > >
+> > > That's also not correct for gen2 I think.
+> > >
+> > > gen2:
+> > > 0 =3D GMADR
+> > > 1 =3D MMADR
+> > > 2 =3D IOBAR
+> > >
+> > > gen3:
+> > > 0 =3D MMADR
+> > > 1 =3D IOBAR
+> > > 2 =3D GMADR
+> > > 3 =3D GTTADR
+> > >
+> > > gen4+:
+> > > 0+1 =3D GTTMMADR
+> > > 2+3 =3D GMADR
+> > > 4 =3D IOBAR
+> > >
+> > > Maybe we should just have an explicit list of bars like that in a
+> > > comment?
+> > >
+> > > I'd also suggest sucking this bitmask calculation into a small helper
+> > > so you can reuse it for the release.
+> >
+> > tbh I just hacked this up for testing. Given how almost no other drm
+> > driver does this, I'm wondering whether we should or not.
+> >
+> > Also the only reason why I didn't just use the pci_request_regions
+> > helper is to avoid the vga ioport range, since that's managed by
+> > vgaarbiter.
 >
-> And unless I grossly misunderstand dosemu2, it's not doing anything related to
-> nested virtualization, i.e. the stuffing VMXE=1 for the guest's shadow value
-> should have absolutely zero impact.
+> VGA io range isn't part of any bar. Or do you mean just the io decode
+> enable bit in the pci command register? That should be just a matter
+> or pci_enable_device() vs. pci_enable_device_mem() I think. So nothing
+> to do with which bars we've requested IIRC.
 >
-> More than likely, VMXE was a red herring.
+> >
+> > So I think if we go for this for real we should:
+> > - register the vga ioport range in the vgaarbiter
+> > - have a pci_request_iomem_regions helper that grabs all mem bars
+> > - roll that out to all drm pci drivers
+> >
+> > Or something like that. The other complication is when we resize the
+> > iobar. So not really sure what to do here.
+>
+> We resize it?
 
-Yes, it was. :(
-(as you can see from the end of the
-github thread)
+By default I thought firmware puts everything (well, squeezes) into
+the lower 32bit. Maybe they stopped doing that. So when we want the
+full bar (for discrete at least) we need to resize it and put it
+somewhere in the 64bit range above end of system memory.
 
-
->    Given that the reporter is also
-> seeing the same bug on bare metal after moving to kernel 5.4, odds are good
-> the issue is related to unrestricted_guest=n and has nothing to do with nVMX.
-
-But we do not use unrestricted guest.
-We use v86 under KVM.
-The only other effect of setting VMXE
-was clearing VME. Which shouldn't affect
-anything either, right?
-
+So I guess correct phrasing is "we will resize it" :-)
+-Daniel
+--=20
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
