@@ -2,104 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 522C52888BE
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 14:31:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 013662888C3
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 14:32:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731782AbgJIMbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 08:31:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35042 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731589AbgJIMbM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 08:31:12 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E11DC0613D7
-        for <kvm@vger.kernel.org>; Fri,  9 Oct 2020 05:31:12 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id s47so7749340qth.4
-        for <kvm@vger.kernel.org>; Fri, 09 Oct 2020 05:31:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=K8oqjNwy1IItwzS5nAtnJfKoqbYdlnvHoUJ/yQIxMlE=;
-        b=cdaBlGmBZL4cakXZlvJuZERmIRIX6jD7dwzimgC10KWdoWEXxqnVyCAO2D0RVxCrE3
-         SiHI343vdap2cRRglH6ua6mGWuo7/fxfox6RkGqmDhIsAnKFSeohUX9VYGJSKAwhIU6B
-         2TcxKC37KpT1QUH/a9OmlQtDEo327+kakIXLdXGqBOKFhRN4BS67JiDu+bvG4a5CPI+r
-         pqcyhIAj+gFL2/lmzDWusy4E62ErCo67w+IagQCo+gX4l+6CaOr61WFu2i1yy0l+Wgf3
-         xGuhQ4gDKh6os3wK0BjatM5g2y6nWPQvLIHBtHwaCM52uhc/sKGK0XWe8qKcZr9st8fm
-         fLCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=K8oqjNwy1IItwzS5nAtnJfKoqbYdlnvHoUJ/yQIxMlE=;
-        b=uigM+sc7NLiaii3J8OTVG6hWi0Ylr2nyksl++bCT1bM8aaAEdiJNncV5id3j2XB3sf
-         3r8/zrohG5xwnkQ+HJ4nwfOTUdok+DrrQKemc49Eyi0guh0rTtvdh3TxdfpSVZduab47
-         c/SjCmiirpjCIoZQIzM83lCCBJubMEiNe8DS88qpdiK6vJHzoPRP15ZGVsUFKl0XVCWZ
-         jfTorT5ryTWlS2ezBvkhfLKxvtYvY5qRj/4tvdrSw/t/biZt484lSUQAvAcPk/iySpgQ
-         RmImBitNklF4WIgAcokNoWgC0AWQbMQEZDzpBO6NHW1PBLq3EHXPEvmbqqmL/zKNzETw
-         0zGQ==
-X-Gm-Message-State: AOAM532IfR0p3WSrCw6e5ZCaFwhVY+oImmOqvaCEMCZCgQfYtm4ss07N
-        j0BrN2YZgz4Bx3BbMpRV1QMkCQ==
-X-Google-Smtp-Source: ABdhPJxG8zCIXDditfEGKgb8JSFeGI61awPyS7AMuV2YFh9LkEtvSTVL1XgAfKTEjxIzUEviyqvgUw==
-X-Received: by 2002:ac8:d8d:: with SMTP id s13mr12568868qti.42.1602246671500;
-        Fri, 09 Oct 2020 05:31:11 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id g1sm6069368qtp.74.2020.10.09.05.31.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Oct 2020 05:31:10 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kQrYD-001xsF-Sz; Fri, 09 Oct 2020 09:31:09 -0300
-Date:   Fri, 9 Oct 2020 09:31:09 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Subject: Re: [PATCH v2 14/17] resource: Move devmem revoke code to resource
- framework
-Message-ID: <20201009123109.GO5177@ziepe.ca>
-References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
- <20201009075934.3509076-15-daniel.vetter@ffwll.ch>
+        id S2387411AbgJIMb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 08:31:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29150 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726501AbgJIMb5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Oct 2020 08:31:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602246715;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6yZ9l/rYX1Gt+CSni2U2g8W0CJRek8YcNXwgHxtmpF4=;
+        b=VBgd33y8hUXh4sPN4wE57voM5hAt5rEVNEwTRlmPZ6ShcoAFMQgDElB8G9gCOBKBEFvIDq
+        7a3fTw15FVhdJahHs6OQAJniup34j9clGrXy9tbSRQtRKGj4zvCuEj7+y9N+ZZEMClkehF
+        NhlUlIOA+OCstojvvdQ0SoWMDP5OfeE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-Pd7Sy1pPOrKh2toMQQRikw-1; Fri, 09 Oct 2020 08:31:53 -0400
+X-MC-Unique: Pd7Sy1pPOrKh2toMQQRikw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8757425FC;
+        Fri,  9 Oct 2020 12:31:52 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-114-62.rdu2.redhat.com [10.10.114.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F28EC109516B;
+        Fri,  9 Oct 2020 12:31:50 +0000 (UTC)
+Subject: Re: [PATCH] KVM: SVM: Use a separate vmcb for the nested L2 guest
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, wei.huang2@amd.com
+References: <20200917192306.2080-1-cavery@redhat.com>
+ <587d1da1a037dd3ab7844c5cacc50bfda5ce6021.camel@redhat.com>
+ <aaaadb29-6299-5537-47a9-072ca34ba512@redhat.com>
+ <0007205290de75f04f5f2a92b891815438fd2f2f.camel@redhat.com>
+From:   Cathy Avery <cavery@redhat.com>
+Message-ID: <5849a6ae-30c3-95f2-6d97-80dcb66022c1@redhat.com>
+Date:   Fri, 9 Oct 2020 08:31:49 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201009075934.3509076-15-daniel.vetter@ffwll.ch>
+In-Reply-To: <0007205290de75f04f5f2a92b891815438fd2f2f.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 09, 2020 at 09:59:31AM +0200, Daniel Vetter wrote:
+On 10/8/20 6:23 AM, Maxim Levitsky wrote:
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 0a06e62010d8c..7293ba23b3cbc 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -436,6 +436,9 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
+>          WARN_ON(svm->vmcb == svm->nested.vmcb02);
+>   
+>          svm->nested.vmcb02->control = svm->vmcb01->control;
+> +
+> +       nested_svm_vmloadsave(svm->vmcb01, svm->nested.vmcb02);
+> +
+>          svm->vmcb = svm->nested.vmcb02;
+>          svm->vmcb_pa = svm->nested.vmcb02_pa;
+>          load_nested_vmcb_control(svm, &nested_vmcb->control);
+> @@ -622,6 +625,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>          if (svm->vmcb01->control.asid == 0)
+>                  svm->vmcb01->control.asid = svm->nested.vmcb02->control.asid;
+>   
+> +       nested_svm_vmloadsave(svm->nested.vmcb02, svm->vmcb01);
+>          svm->vmcb = svm->vmcb01;
+>          svm->vmcb_pa = svm->nested.vmcb01_pa;
+>   
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index b66239b26885d..ee9f87fe611f2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1097,6 +1097,7 @@ static void init_vmcb(struct vcpu_svm *svm)
+>                  clr_cr_intercept(svm, INTERCEPT_CR3_READ);
+>                  clr_cr_intercept(svm, INTERCEPT_CR3_WRITE);
+>                  save->g_pat = svm->vcpu.arch.pat;
+> +               svm->nested.vmcb02->save.g_pat = svm->vcpu.arch.pat;
+>                  save->cr3 = 0;
+>                  save->cr4 = 0;
+>          }
 
-> +struct address_space *iomem_get_mapping(void)
-> +{
-> +	return iomem_inode->i_mapping;
+OK this worked for me. Thanks!
 
-This should pair an acquire with the release below
-
-> +	/*
-> +	 * Publish /dev/mem initialized.
-> +	 * Pairs with smp_load_acquire() in revoke_iomem().
-> +	 */
-> +	smp_store_release(&iomem_inode, inode);
-
-However, this seems abnormal, initcalls rarely do this kind of stuff
-with global data..
-
-The kernel crashes if this fs_initcall is raced with
-iomem_get_mapping() due to the unconditional dereference, so I think
-it can be safely switched to a simple assignment.
-
-Jason
