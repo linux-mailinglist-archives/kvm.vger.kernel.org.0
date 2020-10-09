@@ -2,190 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28528288818
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 13:54:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6074A28881E
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 13:57:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388224AbgJILyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 07:54:41 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:52848 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732480AbgJILyk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 07:54:40 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 099BocOe079912;
-        Fri, 9 Oct 2020 11:53:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=gC3p3SG+FOYjnql41FZPAxse6J88pzuXf0fi/UYfcFE=;
- b=Jtl7dgY4XPEm8DTdUcFPeLJSJEnIG9CUlxdDNhmpftpZj+ZN53wq3Uo9m7YGhAJcrMkg
- osRBeTCrsz+5makM+wcSscIeTidVW7vArJpjt26bmxz/zMY79SbytBAwrEjMZrcujcEE
- uqdgLKGqoN/1GpJkTFvtgBnPjB5x4C9FvGnwLx73G//xhkjMksMblxagD6ff9EZj8EUK
- QtNKQiljaQ6sJbp/qCTXiAl3t9uA+KMQJHlSPOE5cLURt1b+tFPwMj+YDL0r0xb5uK2Y
- NP4y42FMJ+G2v9/qHkVP/C5+vACRsti46QbUOK/itZss723T8mjoV6akW/5Tu2V6jMM4 cQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 342kvys2hm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 09 Oct 2020 11:53:20 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 099BpP3I156582;
-        Fri, 9 Oct 2020 11:53:20 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 342gurbwfq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 09 Oct 2020 11:53:20 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 099BrEPL001428;
-        Fri, 9 Oct 2020 11:53:14 GMT
-Received: from [10.175.178.74] (/10.175.178.74)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 09 Oct 2020 04:53:14 -0700
-Subject: Re: [PATCH 00/35] Enhance memory utilization with DMEMFS
-To:     yulei zhang <yulei.kernel@gmail.com>
-Cc:     linux-fsdevel@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Haiwei Li <lihaiwei.kernel@gmail.com>,
-        Yulei Zhang <yuleixzhang@tencent.com>,
-        akpm@linux-foundation.org, naoya.horiguchi@nec.com,
-        viro@zeniv.linux.org.uk, Paolo Bonzini <pbonzini@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Jane Y Chu <jane.chu@oracle.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Muchun Song <songmuchun@bytedance.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-References: <cover.1602093760.git.yuleixzhang@tencent.com>
- <bdd0250e-4e14-f407-a584-f39af12c4e09@oracle.com>
- <CACZOiM2qKhogXQ_DXzWjGM5UCeCuEqT6wnR=f2Wi_T45_uoYHQ@mail.gmail.com>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <b963565b-61d8-89d3-1abd-50cd8c8daad5@oracle.com>
-Date:   Fri, 9 Oct 2020 12:53:08 +0100
+        id S2388255AbgJIL5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 07:57:43 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:10414 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732480AbgJIL5n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Oct 2020 07:57:43 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f804ffe0000>; Fri, 09 Oct 2020 04:56:46 -0700
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 9 Oct
+ 2020 11:57:42 +0000
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Fri, 9 Oct 2020 11:57:42 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NvrUxQPlXnyV9CeIGniPf+V8s/rP7ADVK4e66aaSJTdrx+dab1VgJTjCXZjUFUwA+f4LPFL6hIJVsjrAG7b2J+JZE8LJkhI00eEJGgXARyhAu6pT9WuixMrFSgGTgNqGXQszl0fJgQ+26vscv1TFtdbyFx7wDjmXo0Fdmu2hug65yDIVyIE09SxauyE7ZmYTTvvPY9s0PftFbnXRDLXv+ERFJNQXVEZER0VcMFnzjg/owv4axEDCFjZNGkrEO5yOtfbrL17YGmS1bnZ8QaR4kRidIaUzsEWaU+r91JoiHcT4Igsui2ujotoLiMYj2ALJTaE8DPGaxNQv3Bv42vKqeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vuNFOkVvS+Zf5/DO+Q6L2tltqT555sMBAanpEkNoGBc=;
+ b=IK5mc+heraa1qAiuP/+P59nvpRfCEIGJ11r/LwnDJfz92xi3FPRPjLTkDRCd8AuIwFQw9FLJJRRIGz6+BT4vLqv/No5CwoNqjQvVKlFja4wXCzrtNAgpHJqCafz0jq4UHl5wsBZM6ED7r1ljMRKTpq9H3eQo+p5bTlkJ4mwE4E3D1DwX/K7CZQV6/jykRlJwHCkaAfOlQWDsvqgdzcRE9wB1Hz752P8gSBiZ2m8mcF8gfKgEoIaSNUBKOUz87v8TS522szv0wbtJxJ/MopQBl/5pWfGCtTQYUE1zg/7HVe6JTbZahApt/9lhFSX8Q3h3ItIcHNRv4+Iw3kw7kKZ/vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4451.namprd12.prod.outlook.com (2603:10b6:5:2ab::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23; Fri, 9 Oct
+ 2020 11:57:40 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3455.026; Fri, 9 Oct 2020
+ 11:57:39 +0000
+Date:   Fri, 9 Oct 2020 08:57:37 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Raj, Ashok" <ashok.raj@intel.com>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        Dave Jiang <dave.jiang@intel.com>, <vkoul@kernel.org>,
+        <megha.dey@intel.com>, <maz@kernel.org>, <bhelgaas@google.com>,
+        <alex.williamson@redhat.com>, <jacob.jun.pan@intel.com>,
+        <yi.l.liu@intel.com>, <baolu.lu@intel.com>, <kevin.tian@intel.com>,
+        <sanjay.k.kumar@intel.com>, <tony.luck@intel.com>,
+        <jing.lin@intel.com>, <dan.j.williams@intel.com>,
+        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
+        <parav@mellanox.com>, <rafael@kernel.org>, <netanelg@mellanox.com>,
+        <shahafs@mellanox.com>, <yan.y.zhao@linux.intel.com>,
+        <pbonzini@redhat.com>, <samuel.ortiz@intel.com>,
+        <mona.hossain@intel.com>, <dmaengine@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 11/18] dmaengine: idxd: ims setup for the vdcm
+Message-ID: <20201009115737.GI4734@nvidia.com>
+References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
+ <160021253189.67751.12686144284999931703.stgit@djiang5-desk3.ch.intel.com>
+ <87mu17ghr1.fsf@nanos.tec.linutronix.de>
+ <0f9bdae0-73d7-1b4e-b478-3cbd05c095f4@intel.com>
+ <87r1q92mkx.fsf@nanos.tec.linutronix.de>
+ <44e19c5d-a0d2-0ade-442c-61727701f4d8@intel.com>
+ <87y2kgux2l.fsf@nanos.tec.linutronix.de> <20201008233210.GH4734@nvidia.com>
+ <20201009012231.GA60263@otc-nc-03>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20201009012231.GA60263@otc-nc-03>
+X-ClientProxiedBy: MN2PR15CA0041.namprd15.prod.outlook.com
+ (2603:10b6:208:237::10) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <CACZOiM2qKhogXQ_DXzWjGM5UCeCuEqT6wnR=f2Wi_T45_uoYHQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9768 signatures=668681
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- bulkscore=0 malwarescore=0 mlxscore=0 spamscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010090084
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9768 signatures=668681
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 clxscore=1015
- phishscore=0 spamscore=0 mlxlogscore=999 impostorscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 adultscore=0
- lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2010090084
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR15CA0041.namprd15.prod.outlook.com (2603:10b6:208:237::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23 via Frontend Transport; Fri, 9 Oct 2020 11:57:39 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kQr1l-001xP1-CZ; Fri, 09 Oct 2020 08:57:37 -0300
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1602244606; bh=vuNFOkVvS+Zf5/DO+Q6L2tltqT555sMBAanpEkNoGBc=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
+        b=BbrNDoVMJ4Cn+J3fVi80gJ7wltUQTj5GNM+ZoauKPqtyhvW4N7B4POQhFOYMpDJNu
+         GB6jHCpRGuylid+lYjvfPAYHN1mTZWUS9xreBLlbYVind/S3bed6ct+BitDRbicRPf
+         EpBgCWHg7hhmJETSrkAGw/ydaMjtcXiSvkIqClKcbAKtchbHu+t/gmUirLiU9gVleT
+         5VN3miLPZUScCtdcga+9Bql5Kt/Q82rRL4ZclaO5sE0KdyBLOte3Glo0mEeKHM3+nj
+         8bjrTD4a8yzzulyiexmAJJQfRHwXuRaSDANzXQB4+YxMu43Wy8yMIXERy3cSDHgR6O
+         GQlwXjZ3iWoCA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/9/20 12:39 PM, yulei zhang wrote:
-> Joao, thanks a lot for the feedback. One more thing needs to mention
-> is that dmemfs also support fine-grained
-> memory management which makes it more flexible for tenants with
-> different requirements.
-> 
-So as DAX when it allows to partition a region (starting 5.10). Meaning you have a region
-which you dedicated to userspace. That region can then be partitioning into devices which
-give you access to multiple (possibly discontinuous) extents with at a given page
-granularity (selectable when you create the device), accessed through mmap().
-You can then give that device to a cgroup. Or you can return that memory back to the
-kernel (should you run into OOM situation), or you recreate the same mappings across
-reboot/kexec.
+On Thu, Oct 08, 2020 at 06:22:31PM -0700, Raj, Ashok wrote:
 
-I probably need to read your patches again, but can you extend on the 'dmemfs also support
-fine-grained memory management' to understand what is the gap that you mention?
+> Not randomly put there Jason :-).. There is a good reason for it. 
 
-> On Fri, Oct 9, 2020 at 3:01 AM Joao Martins <joao.m.martins@oracle.com> wrote:
->>
->> [adding a couple folks that directly or indirectly work on the subject]
->>
->> On 10/8/20 8:53 AM, yulei.kernel@gmail.com wrote:
->>> From: Yulei Zhang <yuleixzhang@tencent.com>
->>>
->>> In current system each physical memory page is assocaited with
->>> a page structure which is used to track the usage of this page.
->>> But due to the memory usage rapidly growing in cloud environment,
->>> we find the resource consuming for page structure storage becomes
->>> highly remarkable. So is it an expense that we could spare?
->>>
->> Happy to see another person working to solve the same problem!
->>
->> I am really glad to see more folks being interested in solving
->> this problem and I hope we can join efforts?
->>
->> BTW, there is also a second benefit in removing struct page -
->> which is carving out memory from the direct map.
->>
->>> This patchset introduces an idea about how to save the extra
->>> memory through a new virtual filesystem -- dmemfs.
->>>
->>> Dmemfs (Direct Memory filesystem) is device memory or reserved
->>> memory based filesystem. This kind of memory is special as it
->>> is not managed by kernel and most important it is without 'struct page'.
->>> Therefore we can leverage the extra memory from the host system
->>> to support more tenants in our cloud service.
->>>
->> This is like a walk down the memory lane.
->>
->> About a year ago we followed the same exact idea/motivation to
->> have memory outside of the direct map (and removing struct page overhead)
->> and started with our own layer/thingie. However we realized that DAX
->> is one the subsystems which already gives you direct access to memory
->> for free (and is already upstream), plus a couple of things which we
->> found more handy.
->>
->> So we sent an RFC a couple months ago:
->>
->> https://lore.kernel.org/linux-mm/20200110190313.17144-1-joao.m.martins@oracle.com/
->>
->> Since then majority of the work has been in improving DAX[1].
->> But now that is done I am going to follow up with the above patchset.
->>
->> [1]
->> https://lore.kernel.org/linux-mm/159625229779.3040297.11363509688097221416.stgit@dwillia2-desk3.amr.corp.intel.com/
->>
->> (Give me a couple of days and I will send you the link to the latest
->> patches on a git-tree - would love feedback!)
->>
->> The struct page removal for DAX would then be small, and ticks the
->> same bells and whistles (MCE handling, reserving PAT memtypes, ptrace
->> support) that we both do, with a smaller diffstat and it doesn't
->> touch KVM (not at least fundamentally).
->>
->>         15 files changed, 401 insertions(+), 38 deletions(-)
->>
->> The things needed in core-mm is for handling PMD/PUD PAGE_SPECIAL much
->> like we both do. Furthermore there wouldn't be a need for a new vm type,
->> consuming an extra page bit (in addition to PAGE_SPECIAL) or new filesystem.
->>
->> [1]
->> https://lore.kernel.org/linux-mm/159625229779.3040297.11363509688097221416.stgit@dwillia2-desk3.amr.corp.intel.com/
->>
->>
->>> We uses a kernel boot parameter 'dmem=' to reserve the system
->>> memory when the host system boots up, the details can be checked
->>> in /Documentation/admin-guide/kernel-parameters.txt.
->>>
->>> Theoretically for each 4k physical page it can save 64 bytes if
->>> we drop the 'struct page', so for guest memory with 320G it can
->>> save about 5G physical memory totally.
->>>
->> Also worth mentioning that if you only care about 'struct page' cost, and not on the
->> security boundary, there's also some work on hugetlbfs preallocation of hugepages into
->> tricking vmemmap in reusing tail pages.
->>
->>   https://lore.kernel.org/linux-mm/20200915125947.26204-1-songmuchun@bytedance.com/
->>
->> Going forward that could also make sense for device-dax to avoid so many
->> struct pages allocated (which would require its transition to compound
->> struct pages like hugetlbfs which we are looking at too). In addition an
->> idea <handwaving> would be perhaps to have a stricter mode in DAX where
->> we initialize/use the metadata ('struct page') but remove the underlaying
->> PFNs (of the 'struct page') from the direct map having to bear the cost of
->> mapping/unmapping on gup/pup.
->>
->>         Joao
+Sure the PASID value being associated with the IRQ make sense, but
+combining that register with the interrupt mask is just a compltely
+random thing to do.
+
+If this HW was using MSI-X PASID would have been given its own
+register.
+
+Jason
