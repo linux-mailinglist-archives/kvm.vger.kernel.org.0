@@ -2,129 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D656E287F7E
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 02:28:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1CC287FAD
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 02:58:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726432AbgJIA1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 20:27:53 -0400
-Received: from mga12.intel.com ([192.55.52.136]:3671 "EHLO mga12.intel.com"
+        id S1729915AbgJIA60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 20:58:26 -0400
+Received: from mga04.intel.com ([192.55.52.120]:23450 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725852AbgJIA1x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Oct 2020 20:27:53 -0400
-IronPort-SDR: +MBYDWk4VhBxgPSfPPjPyvv9fX/ThHRYkaYyzH4eLFl91nZXuo/igUZi1y+RY3K5CpSx9C7bcQ
- qoaEL3fosooA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9768"; a="144746270"
+        id S1725979AbgJIA6Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 20:58:25 -0400
+IronPort-SDR: mNat5ftlMF+/aWBh96+2/dYhPUUD6sngEFY7KAD/UadEp78eRPxpHSN4M8HwjPhjBUGjHDTAkF
+ MIKXSBnc74wQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9768"; a="162789248"
 X-IronPort-AV: E=Sophos;i="5.77,353,1596524400"; 
-   d="scan'208";a="144746270"
+   d="scan'208";a="162789248"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2020 17:27:52 -0700
-IronPort-SDR: G3ApJRs9DBx5tMoV7ZPGy8Bg/cN73V13Moz6rrx+oiCZ5sre2aH8z8P9emVRtPEZjgShz5RNjH
- txQKIq5ScDcA==
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2020 17:58:24 -0700
+IronPort-SDR: GltQmS+4InnTbci6lMsS7uuuC/Au3gBVh1CnYduQ9e/hpEY/YA5KVKJ92y8dtUlTQcMasbgIaH
+ +DhCc/+CdoIA==
 X-IronPort-AV: E=Sophos;i="5.77,353,1596524400"; 
-   d="scan'208";a="528709663"
-Received: from djiang5-mobl1.amr.corp.intel.com (HELO [10.209.50.136]) ([10.209.50.136])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2020 17:27:50 -0700
-Subject: Re: [PATCH v3 11/18] dmaengine: idxd: ims setup for the vdcm
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
-        bhelgaas@google.com, alex.williamson@redhat.com,
-        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
-        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
-        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
-        rafael@kernel.org, netanelg@mellanox.com, shahafs@mellanox.com,
-        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
-        samuel.ortiz@intel.com, mona.hossain@intel.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
- <160021253189.67751.12686144284999931703.stgit@djiang5-desk3.ch.intel.com>
- <87mu17ghr1.fsf@nanos.tec.linutronix.de>
- <0f9bdae0-73d7-1b4e-b478-3cbd05c095f4@intel.com>
- <87r1q92mkx.fsf@nanos.tec.linutronix.de>
- <44e19c5d-a0d2-0ade-442c-61727701f4d8@intel.com>
- <87y2kgux2l.fsf@nanos.tec.linutronix.de> <20201008233210.GH4734@nvidia.com>
-From:   Dave Jiang <dave.jiang@intel.com>
-Message-ID: <ccb6ab6e-6079-160b-56f7-ab42c0816401@intel.com>
-Date:   Thu, 8 Oct 2020 17:27:49 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+   d="scan'208";a="328742638"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2020 17:58:24 -0700
+Date:   Thu, 8 Oct 2020 17:58:23 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     yulei.kernel@gmail.com
+Cc:     akpm@linux-foundation.org, naoya.horiguchi@nec.com,
+        viro@zeniv.linux.org.uk, pbonzini@redhat.com,
+        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xiaoguangrong.eric@gmail.com,
+        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
+        Yulei Zhang <yuleixzhang@tencent.com>,
+        Chen Zhuo <sagazchen@tencent.com>
+Subject: Re: [PATCH 22/35] kvm, x86: Distinguish dmemfs page from mmio page
+Message-ID: <20201009005823.GA11151@linux.intel.com>
+References: <cover.1602093760.git.yuleixzhang@tencent.com>
+ <b2b6837785f6786575823c919788464373d3ee05.1602093760.git.yuleixzhang@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20201008233210.GH4734@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b2b6837785f6786575823c919788464373d3ee05.1602093760.git.yuleixzhang@tencent.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Oct 08, 2020 at 03:54:12PM +0800, yulei.kernel@gmail.com wrote:
+> From: Yulei Zhang <yuleixzhang@tencent.com>
+> 
+> Dmem page is pfn invalid but not mmio. Support cacheable
+> dmem page for kvm.
+> 
+> Signed-off-by: Chen Zhuo <sagazchen@tencent.com>
+> Signed-off-by: Yulei Zhang <yuleixzhang@tencent.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 5 +++--
+>  include/linux/dmem.h   | 7 +++++++
+>  mm/dmem.c              | 7 +++++++
+>  3 files changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 71aa3da2a0b7..0115c1767063 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -41,6 +41,7 @@
+>  #include <linux/hash.h>
+>  #include <linux/kern_levels.h>
+>  #include <linux/kthread.h>
+> +#include <linux/dmem.h>
+>  
+>  #include <asm/page.h>
+>  #include <asm/memtype.h>
+> @@ -2962,9 +2963,9 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
+>  			 */
+>  			(!pat_enabled() || pat_pfn_immune_to_uc_mtrr(pfn));
+>  
+> -	return !e820__mapped_raw_any(pfn_to_hpa(pfn),
+> +	return (!e820__mapped_raw_any(pfn_to_hpa(pfn),
+>  				     pfn_to_hpa(pfn + 1) - 1,
+> -				     E820_TYPE_RAM);
+> +				     E820_TYPE_RAM)) || (!is_dmem_pfn(pfn));
 
+This is wrong.  As is, the logic reads "A PFN is MMIO if it is INVALID &&
+(!RAM || !DMEM)".  The obvious fix would be to change it to "INVALID &&
+!RAM && !DMEM", but that begs the question of whether or DMEM is reported
+as RAM.  I don't see any e820 related changes in the series, i.e. no evidence
+that dmem yanks its memory out of the e820 tables, which makes me think this
+change is unnecessary.
 
-On 10/8/2020 4:32 PM, Jason Gunthorpe wrote:
-> On Fri, Oct 09, 2020 at 01:17:38AM +0200, Thomas Gleixner wrote:
->> Dave,
->>
->> On Thu, Oct 08 2020 at 09:51, Dave Jiang wrote:
->>> On 10/8/2020 12:39 AM, Thomas Gleixner wrote:
->>>> On Wed, Oct 07 2020 at 14:54, Dave Jiang wrote:
->>>>> On 9/30/2020 12:57 PM, Thomas Gleixner wrote:
->>>>>> Aside of that this is fiddling in the IMS storage array behind the irq
->>>>>> chips back without any comment here and a big fat comment about the
->>>>>> shared usage of ims_slot::ctrl in the irq chip driver.
->>>>>>
->>>>> This is to program the pasid fields in the IMS table entry. Was
->>>>> thinking the pasid fields may be considered device specific so didn't
->>>>> attempt to add the support to the core code.
->>>>
->>>> Well, the problem is that this is not really irq chip functionality.
->>>>
->>>> But the PASID programming needs to touch the IMS storage which is also
->>>> touched by the irq chip.
->>>>
->>>> This might be correct as is, but without a big fat comment explaining
->>>> WHY it is safe to do so without any form of serialization this is just
->>>> voodoo and unreviewable.
->>>>
->>>> Can you please explain when the PASID is programmed and what the state
->>>> of the interrupt is at that point? Is this a one off setup operation or
->>>> does this happen dynamically at random points during runtime?
->>>
->>> I will put in comments for the function to explain why and when we modify the
->>> pasid field for the IMS entry. Programming of the pasid is done right before we
->>> request irq. And the clearing is done after we free the irq. We will not be
->>> touching the IMS field at runtime. So the touching of the entry should be safe.
->>
->> Thanks for clarifying that.
->>
->> Thinking more about it, that very same thing will be needed for any
->> other IMS device and of course this is not going to end well because
->> some driver will fiddle with the PASID at the wrong time.
-> 
-> Why? This looks like some quirk of the IDXD HW where it just randomly
-> put PASID along with the IRQ mask register. Probably because PASID is
-> not the full 32 bits.
-
-The hardware checks that the PASID in the descriptor matches the PASID in the 
-IMS entry, to prevent user-mode software from arbitrarily choosing any interrupt 
-vector it wants. User mode software has to request an IMS entry from the kernel 
-driver and the driver fills in the PASID in the IMS so that only that process 
-can use that IMS entry.
-
-> 
-> AFAIK the PASID is not tagged on the MemWr TLP triggering the
-> interrupt, so it really is unrelated to the irq.
-> 
-> I think the ioread to get the PASID is rather ugly, it should pluck
-> the PASID out of some driver specific data structure with proper
-> locking, and thus use the sleepable version of the irqchip?
-> 
-> This is really not that different from what I was describing for queue
-> contexts - the queue context needs to be assigned to the irq # before
-> it can be used in the irq chip other wise there is no idea where to
-> write the msg to. Just like pasid here.
-> 
-> Jason
-> 
+>  }
+>  
+>  /* Bits which may be returned by set_spte() */
