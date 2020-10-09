@@ -2,232 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C28528802F
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 04:01:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6B5E2880AB
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 05:21:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730900AbgJICB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Oct 2020 22:01:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48045 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729285AbgJICB1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Oct 2020 22:01:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602208885;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3s9R39Og5RHDHefHI3q9yhoEDWORC7I7mmgIVvKh3e0=;
-        b=G6yZT7hgEKVDYGOL+hhId7rfNUzxwNtQqzKAjEBGNEE7npUpyR+Xl6RIx/UObrxF1EgcM1
-        2oWwJZyC0y6eh4jx2nQj40nSgrXh9YMqoj84XiLiUtjxHa80laXt/iYJisurvJJ/6Xuaww
-        pTuDb7UkWX7HV9UW+FecxhrkDIIfNF0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-q4BrAy5gNG227A1gPlmfPA-1; Thu, 08 Oct 2020 22:01:23 -0400
-X-MC-Unique: q4BrAy5gNG227A1gPlmfPA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F286B427C2;
-        Fri,  9 Oct 2020 02:01:21 +0000 (UTC)
-Received: from [10.72.13.133] (ovpn-13-133.pek2.redhat.com [10.72.13.133])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BC3B5D9E8;
-        Fri,  9 Oct 2020 02:01:07 +0000 (UTC)
-Subject: Re: [RFC PATCH 05/24] vhost-vdpa: passing iotlb to IOMMU mapping
- helpers
-To:     Eli Cohen <elic@nvidia.com>
-Cc:     mst@redhat.com, lulu@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rob.miller@broadcom.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, hanand@xilinx.com,
-        mhabets@solarflare.com, eli@mellanox.com, amorenoz@redhat.com,
-        maxime.coquelin@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com
-References: <20200924032125.18619-1-jasowang@redhat.com>
- <20200924032125.18619-6-jasowang@redhat.com>
- <20200930112609.GA223360@mtl-vdi-166.wap.labs.mlnx>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <5f083453-d070-d8a8-1f75-5de1c299cd0b@redhat.com>
-Date:   Fri, 9 Oct 2020 10:01:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1731484AbgJIDVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Oct 2020 23:21:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729593AbgJIDVj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Oct 2020 23:21:39 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38603C0613D2;
+        Thu,  8 Oct 2020 20:21:39 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id 144so5676230pfb.4;
+        Thu, 08 Oct 2020 20:21:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0n2V4MNRGwK1cK7V9UjFbAKsyNZxYNY7DcB/CQ3zBuc=;
+        b=FmR7r7WuUzf6gUGF6OFjv2dQL5leGw/lgwp81U2pADktuMUVBLv7fwGXphDnnbvyzB
+         QyOolcHzcRu4uPTA1p6DAvn/hTv/HX3v/XDXJmX/lGzsl8Mct2hd3NSIJyBgMLyNR/Lc
+         mE+X8NR4Us1Zx7B3D4mzGR4x566SJ8XB422YLPkIQYLmlrPGtv1X/fQ5f4uJGrRxm/rV
+         wZ/oiDyDEiaXaXCroTtEOzCqCXm8RPJNGYMIRXRN+pKFUMFeADBn4U23UzSsgFit/LIB
+         kvULcnWtjB8frMWwi/58Bsnk3GX+LToNHhM2FV4LNRiNu2+vBpQ7MboDHh77LVhmKtwg
+         wFKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0n2V4MNRGwK1cK7V9UjFbAKsyNZxYNY7DcB/CQ3zBuc=;
+        b=XynTTp8kct97y735f6bPt4ohPcJXaLGlGHIJoU6iI3qlIsZGnqLISHSdzr5Q07gVYd
+         apdPybabBWfRdWB/FV/zekfd5r3pQB/edHiIH6+edgwlYSDU2m9tIwyuiFZbAO0nUVpI
+         52EWfBROgA9xsiV8KZ65/G1f+k5qYaMcxKQLllHody49LOex9XKydYQxXVruyIDuPCQu
+         lUUzMqi12C2Xic8AhYPjA0TtK6RZn1tcpp6X4K2tC5BP5E9qj8eYzGMGU+Q/xM+L+J8Y
+         z9CLxKV8L2H/lD9B7QhMYX0ebB+1robDt9Lqo72B9IDin4BoRJ650vMc7q/y1xYRgCFB
+         HGzg==
+X-Gm-Message-State: AOAM531nNfo3V3TDIQuW6L17eARUKa3X7REBx8JKx3ZVlQCibRAImKjJ
+        TjwPuxJ1XVLqrzTQoNciCnL2uzR8udPB
+X-Google-Smtp-Source: ABdhPJxzqbUV/5/fLWGXY727cgDJb+dYic2DCum+KeYwdQN1029d1bqNe6L0CaPXNlAY0CvZLda1AA==
+X-Received: by 2002:a17:90a:248:: with SMTP id t8mr2458390pje.64.1602213698403;
+        Thu, 08 Oct 2020 20:21:38 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id gl24sm378241pjb.50.2020.10.08.20.21.35
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Oct 2020 20:21:37 -0700 (PDT)
+From:   lihaiwei.kernel@gmail.com
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, Haiwei Li <lihaiwei@tencent.com>
+Subject: [PATCH v2] KVM: x86: Add tracepoint for dr_write/dr_read
+Date:   Fri,  9 Oct 2020 11:21:30 +0800
+Message-Id: <20201009032130.6774-1-lihaiwei.kernel@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200930112609.GA223360@mtl-vdi-166.wap.labs.mlnx>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Haiwei Li <lihaiwei@tencent.com>
 
-On 2020/9/30 下午7:26, Eli Cohen wrote:
-> On Thu, Sep 24, 2020 at 11:21:06AM +0800, Jason Wang wrote:
->> To prepare for the ASID support for vhost-vdpa, try to pass IOTLB
->> object to dma helpers.
-> Maybe it's worth mentioning here that this patch does not change any
-> functionality and is presented as a preparation for passing different
-> iotlb's instead of using dev->iotlb
+When vmexit occurs caused by accessing dr, there is no tracepoint to track
+this action. Add tracepoint for this on x86 kvm.
 
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+v1 -> v2:
+ * Improve the changelog 
 
-Right, let me add them in the next version.
+ arch/x86/kvm/svm/svm.c |  2 ++
+ arch/x86/kvm/trace.h   | 27 +++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c | 10 ++++++++--
+ arch/x86/kvm/x86.c     |  1 +
+ 4 files changed, 38 insertions(+), 2 deletions(-)
 
-Thanks
-
-
->
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
->>   drivers/vhost/vdpa.c | 40 ++++++++++++++++++++++------------------
->>   1 file changed, 22 insertions(+), 18 deletions(-)
->>
->> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> index 9c641274b9f3..74bef1c15a70 100644
->> --- a/drivers/vhost/vdpa.c
->> +++ b/drivers/vhost/vdpa.c
->> @@ -489,10 +489,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
->>   	return r;
->>   }
->>   
->> -static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
->> +static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
->> +				   struct vhost_iotlb *iotlb,
->> +				   u64 start, u64 last)
->>   {
->>   	struct vhost_dev *dev = &v->vdev;
->> -	struct vhost_iotlb *iotlb = dev->iotlb;
->>   	struct vhost_iotlb_map *map;
->>   	struct page *page;
->>   	unsigned long pfn, pinned;
->> @@ -514,8 +515,9 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
->>   static void vhost_vdpa_iotlb_free(struct vhost_vdpa *v)
->>   {
->>   	struct vhost_dev *dev = &v->vdev;
->> +	struct vhost_iotlb *iotlb = dev->iotlb;
->>   
->> -	vhost_vdpa_iotlb_unmap(v, 0ULL, 0ULL - 1);
->> +	vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1);
->>   	kfree(dev->iotlb);
->>   	dev->iotlb = NULL;
->>   }
->> @@ -542,15 +544,14 @@ static int perm_to_iommu_flags(u32 perm)
->>   	return flags | IOMMU_CACHE;
->>   }
->>   
->> -static int vhost_vdpa_map(struct vhost_vdpa *v,
->> +static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->>   			  u64 iova, u64 size, u64 pa, u32 perm)
->>   {
->> -	struct vhost_dev *dev = &v->vdev;
->>   	struct vdpa_device *vdpa = v->vdpa;
->>   	const struct vdpa_config_ops *ops = vdpa->config;
->>   	int r = 0;
->>   
->> -	r = vhost_iotlb_add_range(dev->iotlb, iova, iova + size - 1,
->> +	r = vhost_iotlb_add_range(iotlb, iova, iova + size - 1,
->>   				  pa, perm);
->>   	if (r)
->>   		return r;
->> @@ -559,7 +560,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
->>   		r = ops->dma_map(vdpa, iova, size, pa, perm);
->>   	} else if (ops->set_map) {
->>   		if (!v->in_batch)
->> -			r = ops->set_map(vdpa, dev->iotlb);
->> +			r = ops->set_map(vdpa, iotlb);
->>   	} else {
->>   		r = iommu_map(v->domain, iova, pa, size,
->>   			      perm_to_iommu_flags(perm));
->> @@ -568,29 +569,30 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
->>   	return r;
->>   }
->>   
->> -static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
->> +static void vhost_vdpa_unmap(struct vhost_vdpa *v,
->> +			     struct vhost_iotlb *iotlb,
->> +			     u64 iova, u64 size)
->>   {
->> -	struct vhost_dev *dev = &v->vdev;
->>   	struct vdpa_device *vdpa = v->vdpa;
->>   	const struct vdpa_config_ops *ops = vdpa->config;
->>   
->> -	vhost_vdpa_iotlb_unmap(v, iova, iova + size - 1);
->> +	vhost_vdpa_iotlb_unmap(v, iotlb, iova, iova + size - 1);
->>   
->>   	if (ops->dma_map) {
->>   		ops->dma_unmap(vdpa, iova, size);
->>   	} else if (ops->set_map) {
->>   		if (!v->in_batch)
->> -			ops->set_map(vdpa, dev->iotlb);
->> +			ops->set_map(vdpa, iotlb);
->>   	} else {
->>   		iommu_unmap(v->domain, iova, size);
->>   	}
->>   }
->>   
->>   static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->> +					   struct vhost_iotlb *iotlb,
->>   					   struct vhost_iotlb_msg *msg)
->>   {
->>   	struct vhost_dev *dev = &v->vdev;
->> -	struct vhost_iotlb *iotlb = dev->iotlb;
->>   	struct page **page_list;
->>   	unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
->>   	unsigned int gup_flags = FOLL_LONGTERM;
->> @@ -644,7 +646,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->>   			if (last_pfn && (this_pfn != last_pfn + 1)) {
->>   				/* Pin a contiguous chunk of memory */
->>   				csize = (last_pfn - map_pfn + 1) << PAGE_SHIFT;
->> -				if (vhost_vdpa_map(v, iova, csize,
->> +				if (vhost_vdpa_map(v, iotlb, iova, csize,
->>   						   map_pfn << PAGE_SHIFT,
->>   						   msg->perm))
->>   					goto out;
->> @@ -660,11 +662,12 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->>   	}
->>   
->>   	/* Pin the rest chunk */
->> -	ret = vhost_vdpa_map(v, iova, (last_pfn - map_pfn + 1) << PAGE_SHIFT,
->> +	ret = vhost_vdpa_map(v, iotlb, iova,
->> +			     (last_pfn - map_pfn + 1) << PAGE_SHIFT,
->>   			     map_pfn << PAGE_SHIFT, msg->perm);
->>   out:
->>   	if (ret) {
->> -		vhost_vdpa_unmap(v, msg->iova, msg->size);
->> +		vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
->>   		atomic64_sub(npages, &dev->mm->pinned_vm);
->>   	}
->>   	mmap_read_unlock(dev->mm);
->> @@ -678,6 +681,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
->>   	struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
->>   	struct vdpa_device *vdpa = v->vdpa;
->>   	const struct vdpa_config_ops *ops = vdpa->config;
->> +	struct vhost_iotlb *iotlb = dev->iotlb;
->>   	int r = 0;
->>   
->>   	r = vhost_dev_check_owner(dev);
->> @@ -686,17 +690,17 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
->>   
->>   	switch (msg->type) {
->>   	case VHOST_IOTLB_UPDATE:
->> -		r = vhost_vdpa_process_iotlb_update(v, msg);
->> +		r = vhost_vdpa_process_iotlb_update(v, iotlb, msg);
->>   		break;
->>   	case VHOST_IOTLB_INVALIDATE:
->> -		vhost_vdpa_unmap(v, msg->iova, msg->size);
->> +		vhost_vdpa_unmap(v, iotlb, msg->iova, msg->size);
->>   		break;
->>   	case VHOST_IOTLB_BATCH_BEGIN:
->>   		v->in_batch = true;
->>   		break;
->>   	case VHOST_IOTLB_BATCH_END:
->>   		if (v->in_batch && ops->set_map)
->> -			ops->set_map(vdpa, dev->iotlb);
->> +			ops->set_map(vdpa, iotlb);
->>   		v->in_batch = false;
->>   		break;
->>   	default:
->> -- 
->> 2.20.1
->>
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 4f401fc6a05d..52c69551aea4 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2423,12 +2423,14 @@ static int dr_interception(struct vcpu_svm *svm)
+ 		if (!kvm_require_dr(&svm->vcpu, dr - 16))
+ 			return 1;
+ 		val = kvm_register_read(&svm->vcpu, reg);
++		trace_kvm_dr_write(dr - 16, val);
+ 		kvm_set_dr(&svm->vcpu, dr - 16, val);
+ 	} else {
+ 		if (!kvm_require_dr(&svm->vcpu, dr))
+ 			return 1;
+ 		kvm_get_dr(&svm->vcpu, dr, &val);
+ 		kvm_register_write(&svm->vcpu, reg, val);
++		trace_kvm_dr_read(dr, val);
+ 	}
+ 
+ 	return kvm_skip_emulated_instruction(&svm->vcpu);
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index aef960f90f26..b3bf54405862 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -405,6 +405,33 @@ TRACE_EVENT(kvm_cr,
+ #define trace_kvm_cr_read(cr, val)		trace_kvm_cr(0, cr, val)
+ #define trace_kvm_cr_write(cr, val)		trace_kvm_cr(1, cr, val)
+ 
++/*
++ * Tracepoint for guest DR access.
++ */
++TRACE_EVENT(kvm_dr,
++	TP_PROTO(unsigned int rw, unsigned int dr, unsigned long val),
++	TP_ARGS(rw, dr, val),
++
++	TP_STRUCT__entry(
++		__field(	unsigned int,	rw		)
++		__field(	unsigned int,	dr		)
++		__field(	unsigned long,	val		)
++	),
++
++	TP_fast_assign(
++		__entry->rw		= rw;
++		__entry->dr		= dr;
++		__entry->val		= val;
++	),
++
++	TP_printk("dr_%s %x = 0x%lx",
++		  __entry->rw ? "write" : "read",
++		  __entry->dr, __entry->val)
++);
++
++#define trace_kvm_dr_read(dr, val)		trace_kvm_dr(0, dr, val)
++#define trace_kvm_dr_write(dr, val)		trace_kvm_dr(1, dr, val)
++
+ TRACE_EVENT(kvm_pic_set_irq,
+ 	    TP_PROTO(__u8 chip, __u8 pin, __u8 elcr, __u8 imr, bool coalesced),
+ 	    TP_ARGS(chip, pin, elcr, imr, coalesced),
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4551a7e80ebc..f78fd297d51e 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5091,10 +5091,16 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 
+ 		if (kvm_get_dr(vcpu, dr, &val))
+ 			return 1;
++		trace_kvm_dr_read(dr, val);
+ 		kvm_register_write(vcpu, reg, val);
+-	} else
+-		if (kvm_set_dr(vcpu, dr, kvm_register_readl(vcpu, reg)))
++	} else {
++		unsigned long val;
++
++		val = kvm_register_readl(vcpu, reg);
++		trace_kvm_dr_write(dr, val);
++		if (kvm_set_dr(vcpu, dr, val))
+ 			return 1;
++	}
+ 
+ 	return kvm_skip_emulated_instruction(vcpu);
+ }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c4015a43cc8a..68cb7b331324 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11153,6 +11153,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_msr);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_cr);
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_dr);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmrun);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit_inject);
+-- 
+2.18.4
 
