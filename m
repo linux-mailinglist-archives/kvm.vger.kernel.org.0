@@ -2,83 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B308288598
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 10:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CCCE28860B
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 11:38:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732968AbgJIIxN convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 9 Oct 2020 04:53:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52642 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732492AbgJIIxN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 04:53:13 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209593] New: netdevice: eth0: failed to disable LRO
-Date:   Fri, 09 Oct 2020 08:53:12 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: pancakezwk@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-209593-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1733101AbgJIJiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 05:38:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37126 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733132AbgJIJiS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Oct 2020 05:38:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602236298;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6NBJSYlvfZHWze2N1l/klbUKCpQ65WesNQZgDHDHlo0=;
+        b=BtsxfnVcPf5j+DGiSksR2wgVCQwLl1t69nUvaUWDFmQOqQbJcRi6Oik7UysH4sLajkbvTY
+        m1fTKFZbUDYJwV1jsqb+ZFRqYQIhk+D6k5kTcvboUhjY4d9w0Lw1Tk/xtFYfihxnJNIgHK
+        wvqRMcdQAFONyyutD6L2wfCkaOj+TOs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-480-H9ceGU0_O2qlXp24GhJ_7w-1; Fri, 09 Oct 2020 05:38:14 -0400
+X-MC-Unique: H9ceGU0_O2qlXp24GhJ_7w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9491085EE94;
+        Fri,  9 Oct 2020 09:38:12 +0000 (UTC)
+Received: from gondolin (ovpn-113-40.ams2.redhat.com [10.36.113.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6983F60E1C;
+        Fri,  9 Oct 2020 09:38:07 +0000 (UTC)
+Date:   Fri, 9 Oct 2020 11:38:04 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/5] vfio: Introduce capability definitions for
+ VFIO_DEVICE_GET_INFO
+Message-ID: <20201009113804.6ccc9738.cohuck@redhat.com>
+In-Reply-To: <1602096984-13703-4-git-send-email-mjrosato@linux.ibm.com>
+References: <1602096984-13703-1-git-send-email-mjrosato@linux.ibm.com>
+        <1602096984-13703-4-git-send-email-mjrosato@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209593
+On Wed,  7 Oct 2020 14:56:22 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-            Bug ID: 209593
-           Summary: netdevice: eth0: failed to disable LRO
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.4.54
-          Hardware: x86-64
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: pancakezwk@gmail.com
-        Regression: No
+> Allow the VFIO_DEVICE_GET_INFO ioctl to include a capability chain.
+> Add a flag indicating capability chain support, and introduce the
+> definitions for the first set of capabilities which are specified to
+> s390 zPCI devices.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  include/uapi/linux/vfio.h      | 11 ++++++
+>  include/uapi/linux/vfio_zdev.h | 78 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 89 insertions(+)
+>  create mode 100644 include/uapi/linux/vfio_zdev.h
 
-Created attachment 292907
-  --> https://bugzilla.kernel.org/attachment.cgi?id=292907&action=edit
-dmesg log
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-When the 5.4.54 kernel is started on the cloud host, the lro feature of the
-network card is enabled by default and cannot be disabled. 
-
-
-When I run docker, I want to turn off the lro feature.
-
-
-Is this a kernel bug?  
-
-
-The feature is added to the patch of the main line
-
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/drivers/net/virtio_net.c?id=a02e8964eaf9271a8a5fcc0c55bd13f933bafc56
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
