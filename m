@@ -2,169 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2788D288DCE
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 18:10:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71940288DD3
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 18:11:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389497AbgJIQKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 12:10:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61154 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389144AbgJIQKu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Oct 2020 12:10:50 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 099G82r3071747;
-        Fri, 9 Oct 2020 12:10:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=0QLi4paJGb0S3fVTsgrrDVvPHBvJDMXZXzi4Ge+c8jc=;
- b=IskbalZtc7S6ogIi1EErJiIKLsUiP9lVq/mknxmVkXCb/iq4Oyklm2qaCUv1IAt80AkF
- cHe9thuGZW6DDUQ9RUsjQbLXWCVSHQrJZHGo421xEYv83qjHvuNY2UiQLEPKw0wmrEwr
- qRmnTyzwL3P//ZExrb6bpjnyEAWfQWfvmsLuwQ/gOQkOQX3BtKudTLQzQFZSytW+gof5
- 83uiEmpX3RkqBV0UThEWltIEQI9m0VY9cKuhxTDG0RH69uWpWyRGWGM2gB8KstziW3qK
- /2h5h1nSZk0f0bPmIqhp497NdtO/4eRC1ffLO1GIoSVSlIU7V/54gUgVo0Qx2tr34wfw nA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 342tr9rruc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Oct 2020 12:10:37 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 099G8BL8072739;
-        Fri, 9 Oct 2020 12:10:36 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 342tr9rru1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Oct 2020 12:10:36 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 099G7gFw024692;
-        Fri, 9 Oct 2020 16:10:36 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02dal.us.ibm.com with ESMTP id 3429hrg5bu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Oct 2020 16:10:36 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 099GAZtH54329756
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Oct 2020 16:10:35 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C687AE063;
-        Fri,  9 Oct 2020 16:10:35 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0151AE060;
-        Fri,  9 Oct 2020 16:10:32 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.80.216.179])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Oct 2020 16:10:32 +0000 (GMT)
-Subject: Re: [PATCH v3 10/10] s390x/pci: get zPCI function info from host
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
-        rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <1602097455-15658-1-git-send-email-mjrosato@linux.ibm.com>
- <1602097455-15658-11-git-send-email-mjrosato@linux.ibm.com>
- <20201009174807.6d800999.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <6b5f9372-325c-9136-e5c5-4ff885ea8e15@linux.ibm.com>
-Date:   Fri, 9 Oct 2020 12:10:29 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S2389599AbgJIQLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 12:11:37 -0400
+Received: from mga06.intel.com ([134.134.136.31]:47375 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388882AbgJIQLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Oct 2020 12:11:37 -0400
+IronPort-SDR: l0oa+VIBgcLrPR+HnGTLBGs5PX7DUycs+0I03Ov6gGfOEe7lflZFtRbzmho8m24CQbebutI9gD
+ zR3IlICCmFFw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9769"; a="227152850"
+X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
+   d="scan'208";a="227152850"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 09:11:35 -0700
+IronPort-SDR: bsFMhdrIf0qWvQzdN1jIBDkd7A6O35ARwW4FggGWDxvCPRz/BVKn1BTZI0VH0Okpcg5gOx4lON
+ PEZ0k4N+fxbw==
+X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
+   d="scan'208";a="528984520"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 09:11:35 -0700
+Date:   Fri, 9 Oct 2020 09:11:34 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     stsp <stsp2@yandex.ru>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/6] KVM: x86: KVM_SET_SREGS.CR4 bug fixes and cleanup
+Message-ID: <20201009161134.GB16234@linux.intel.com>
+References: <20201007014417.29276-1-sean.j.christopherson@intel.com>
+ <99334de1-ba3d-dfac-0730-e637d39b948f@yandex.ru>
+ <20201008175951.GA9267@linux.intel.com>
+ <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
+ <20201009040453.GA10744@linux.intel.com>
+ <5dfa55f3-ecdf-9f8d-2d45-d2e6e54f2daa@yandex.ru>
+ <20201009153053.GA16234@linux.intel.com>
+ <5bf99bdf-b16f-8caf-ba61-860457606b8e@yandex.ru>
 MIME-Version: 1.0
-In-Reply-To: <20201009174807.6d800999.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-09_06:2020-10-09,2020-10-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- impostorscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0 bulkscore=0
- spamscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010090116
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5bf99bdf-b16f-8caf-ba61-860457606b8e@yandex.ru>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/9/20 11:48 AM, Cornelia Huck wrote:
-> On Wed,  7 Oct 2020 15:04:15 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On Fri, Oct 09, 2020 at 06:48:21PM +0300, stsp wrote:
+> 09.10.2020 18:30, Sean Christopherson пишет:
+> >On Fri, Oct 09, 2020 at 05:11:51PM +0300, stsp wrote:
+> >>09.10.2020 07:04, Sean Christopherson пишет:
+> >>>>Hmm. But at least it was lying
+> >>>>similarly on AMD and Intel CPUs. :)
+> >>>>So I was able to reproduce the problems
+> >>>>myself.
+> >>>>Do you mean, any AMD tests are now useless, and we need to proceed with Intel
+> >>>>tests only?
+> >>>For anything VMXE related, yes.
+> >>What would be the expected behaviour on Intel, if it is set? Any difference
+> >>with AMD?
+> >On Intel, userspace should be able to stuff CR4.VMXE=1 via KVM_SET_SREGS if
+> >the 'nested' module param is 1, e.g. if 'modprobe kvm_intel nested=1'.  Note,
+> >'nested' is enabled by default on kernel 5.0 and later.
 > 
->> We use the capability chains of the VFIO_DEVICE_GET_INFO ioctl to retrieve
->> the CLP information that the kernel exports.
->>
->> To be compatible with previous kernel versions we fall back on previous
->> predefined values, same as the emulation values, when the ioctl is found
->> to not support capability chains. If individual CLP capabilities are not
->> found, we fall back on default values for only those capabilities missing
->> from the chain.
->>
->> This patch is based on work previously done by Pierre Morel.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   hw/s390x/meson.build             |   1 +
->>   hw/s390x/s390-pci-bus.c          |  10 +-
->>   hw/s390x/s390-pci-vfio.c         | 197 +++++++++++++++++++++++++++++++++++++++
->>   include/hw/s390x/s390-pci-bus.h  |   1 +
->>   include/hw/s390x/s390-pci-clp.h  |  12 ++-
->>   include/hw/s390x/s390-pci-vfio.h |  19 ++++
->>   6 files changed, 233 insertions(+), 7 deletions(-)
->>   create mode 100644 hw/s390x/s390-pci-vfio.c
->>   create mode 100644 include/hw/s390x/s390-pci-vfio.h
+> So if I understand you correctly, we
+> need to test that:
+> - with nested=0 VMXE gives EINVAL
+> - with nested=1 VMXE changes nothing
+> visible, except probably to allow guest
+> to read that value (we won't test guest
+> reading though).
 > 
-> (...)
-> 
->> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
->> new file mode 100644
->> index 0000000..43684c6
->> --- /dev/null
->> +++ b/hw/s390x/s390-pci-vfio.c
->> @@ -0,0 +1,197 @@
->> +/*
->> + * s390 vfio-pci interfaces
->> + *
->> + * Copyright 2020 IBM Corp.
->> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
->> + * your option) any later version. See the COPYING file in the top-level
->> + * directory.
->> + */
->> +
->> +#include <sys/ioctl.h>
->> +#include <linux/vfio.h>
->> +#include <linux/vfio_zdev.h>
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/s390x/s390-pci-bus.h"
->> +#include "hw/s390x/s390-pci-clp.h"
->> +#include "hw/s390x/s390-pci-vfio.h"
->> +#include "hw/vfio/pci.h"
->> +
->> +#ifndef DEBUG_S390PCI_VFIO
->> +#define DEBUG_S390PCI_VFIO  0
->> +#endif
->> +
->> +#define DPRINTF(fmt, ...)                                          \
->> +    do {                                                           \
->> +        if (DEBUG_S390PCI_VFIO) {                                  \
->> +            fprintf(stderr, "S390pci-vfio: " fmt, ## __VA_ARGS__); \
->> +        }                                                          \
->> +    } while (0)
-> 
-> Not really a fan of DPRINTF. Can you maybe use trace events instead?
-> 
+> Is this correct?
 
-Sure, I was just continuing what -inst.c and -bus.c do today.  I'll 
-remove DPRINTF here and look at what trace-events make sense, with a 
-note to convert the rest of s390-pci* to use trace events at some later 
-time.
-
-> Other than that, looks good to me.
+Yep, exactly!
+ 
+> >With AMD, setting CR4.VMXE=1 is never allowed as AMD doesn't support VMX,
 > 
+> OK, for that I can give you a
+> Tested-by: Stas Sergeev <stsp@users.sourceforge.net>
+> 
+> because I confirm that on AMD it now consistently returns EINVAL, whereas
+> without your patches it did random crap, depending on whether it is a first
+> call to KVM_SET_SREGS, or not first.
+> 
+> 
+> >>But we do not use unrestricted guest.
+> >>We use v86 under KVM.
+> >Unrestricted guest can kick in even if CR0.PG=1 && CR0.PE=1, e.g. there are
+> >segmentation checks that apply if and only if unrestricted_guest=0.  Long story
+> >short, without a deep audit, it's basically impossible to rule out a dependency
+> >on unrestricted guest since you're playing around with v86.
+> 
+> You mean "unrestricted_guest" as a module parameter, rather than the similar
+> named CPU feature, right? So we may depend on unrestricted_guest parameter,
+> but not on a hardware feature, correct?
 
-Thanks!  Assuming nobody has further comments, I'll plan to send both 
-this set (with the change above) and the 's390x/pci: Accomodate vfio DMA 
-limiting' set merged together with a single linux header sync once 
-5.10-rc1 is available, sound OK?
+The unrestricted_guest module param is tied directly to the hardware feature,
+i.e. if kvm_intel.unrestricted_guest=0 then KVM will run guests with
+unrestricted guest disabled.  That doesn't necessarily mean any of the
+behavior that is allowed by unrestricted guest will be encountered, but if
+it is encountered, then it will be handled by the CPU instead of causing a
+VM-Exit and requiring KVM emulation.
+
+The reported is using an old CPU that doesn't support unrestricted guest,
+so both the hardware feature and the module param will be off/0.
+
+> >>The only other effect of setting VMXE was clearing VME. Which shouldn't
+> >>affect anything either, right?
+> >Hmm, clearing VME would mean that exceptions/interrupts within the guest would
+> >trigger a switch out of v86 and into vanilla protected mode.  v86 and PM have
+> >different consistency checks, particularly for segmentation, so it's plausible
+> >that clearing CR4.VME inadvertantly worked around the bug by avoiding invalid
+> >guest state for v86.
+> 
+> Lets assume that was the case.  With those github guys its not possible to do
+> any consistent checks. :(
+
+K.  If this is ever a problem in the future, having a way relatively simple
+reproducer, e.g. something we can run without having to build/install a
+variety of tools, would make it easier to debug.  In theory, the bug should be
+reproducible even on modern hardware by loading KVM with unrestricted_guest=0.
