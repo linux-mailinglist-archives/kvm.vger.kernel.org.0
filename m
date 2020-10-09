@@ -2,107 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55FB32880F9
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 06:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAAF22880FC
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 06:05:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726297AbgJIEE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 00:04:57 -0400
-Received: from mga11.intel.com ([192.55.52.93]:31807 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725900AbgJIEE5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 00:04:57 -0400
-IronPort-SDR: N6d1oaqBDdJR82SBxv4S6iv8wBwbLFbvGWZDl8l1TdSmCAzKH8+uFmu7iP/wBTRn2cX1RhpJVX
- rYKaqQNYWFWA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9768"; a="161978532"
-X-IronPort-AV: E=Sophos;i="5.77,353,1596524400"; 
-   d="scan'208";a="161978532"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2020 21:04:56 -0700
-IronPort-SDR: oEHWgLjGrJmd0ZI6degJEsCEK+TtMZkw848BowrzsJucExZ1FWxdrzFdkKCPvkVTH7DD52LC0n
- mH8ZjVE/4rKg==
-X-IronPort-AV: E=Sophos;i="5.77,353,1596524400"; 
-   d="scan'208";a="462048992"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2020 21:04:55 -0700
-Date:   Thu, 8 Oct 2020 21:04:54 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     stsp <stsp2@yandex.ru>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/6] KVM: x86: KVM_SET_SREGS.CR4 bug fixes and cleanup
-Message-ID: <20201009040453.GA10744@linux.intel.com>
-References: <20201007014417.29276-1-sean.j.christopherson@intel.com>
- <99334de1-ba3d-dfac-0730-e637d39b948f@yandex.ru>
- <20201008175951.GA9267@linux.intel.com>
- <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
+        id S1726611AbgJIEFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 00:05:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32411 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726375AbgJIEFq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Oct 2020 00:05:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602216345;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YKXcX1Zdg1COG+JHgP7kxCkfawMp8ssx2TcF3Bvm0fI=;
+        b=U0v78F9XbB03QJ4gFwNAwTQA9vlmrAGWqMFO2CCLXWhxAkxhpwD2dcEhm/eY3Gxy6Rbzxv
+        zEUiu4SI+FssojgbvYkLDbD9YCAwRZ+/FHjvxcxwMfo25Vw0Ur1bBMoyFNlsp9ygHrh65i
+        SMk1Zxf39m3tiST90O5xY55vFdd6Qlo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-MQnK_CGjM6qCMDUK3oEmaQ-1; Fri, 09 Oct 2020 00:05:41 -0400
+X-MC-Unique: MQnK_CGjM6qCMDUK3oEmaQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06F5280B70A;
+        Fri,  9 Oct 2020 04:05:40 +0000 (UTC)
+Received: from [10.72.13.133] (ovpn-13-133.pek2.redhat.com [10.72.13.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BB42100164C;
+        Fri,  9 Oct 2020 04:05:20 +0000 (UTC)
+Subject: Re: [PATCH v2] vringh: fix __vringh_iov() when riov and wiov are
+ different
+To:     Stefano Garzarella <sgarzare@redhat.com>, mst@redhat.com
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Rusty Russell <rusty@rustcorp.com.au>
+References: <20201008204256.162292-1-sgarzare@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <8d84abcb-2f2e-8f24-039f-447e8686b878@redhat.com>
+Date:   Fri, 9 Oct 2020 12:05:15 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <20201008204256.162292-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 08, 2020 at 09:18:18PM +0300, stsp wrote:
-> 08.10.2020 20:59, Sean Christopherson пишет:
-> >On Thu, Oct 08, 2020 at 07:00:13PM +0300, stsp wrote:
-> >>07.10.2020 04:44, Sean Christopherson пишет:
-> >>>Two bug fixes to handle KVM_SET_SREGS without a preceding KVM_SET_CPUID2.
-> >>Hi Sean & KVM devs.
-> >>
-> >>I tested the patches, and wherever I
-> >>set VMXE in CR4, I now get
-> >>KVM: KVM_SET_SREGS: Invalid argument
-> >>Before the patch I was able (with many
-> >>problems, but still) to set VMXE sometimes.
-> >>
-> >>So its a NAK so far, waiting for an update. :)
-> >IIRC, you said you were going to test on AMD?  Assuming that's correct,
-> 
-> Yes, that is true.
-> 
-> 
-> >  -EINVAL
-> >is the expected behavior.  KVM was essentially lying before; it never actually
-> >set CR4.VMXE in hardware, it just didn't properply detect the error and so VMXE
-> >was set in KVM's shadow of the guest's CR4.
-> 
-> Hmm. But at least it was lying
-> similarly on AMD and Intel CPUs. :)
-> So I was able to reproduce the problems
-> myself.
-> Do you mean, any AMD tests are now useless, and we need to proceed with Intel
-> tests only?
 
-For anything VMXE related, yes.
+On 2020/10/9 上午4:42, Stefano Garzarella wrote:
+> If riov and wiov are both defined and they point to different
+> objects, only riov is initialized. If the wiov is not initialized
+> by the caller, the function fails returning -EINVAL and printing
+> "Readable desc 0x... after writable" error message.
+>
+> This issue happens when descriptors have both readable and writable
+> buffers (eg. virtio-blk devices has virtio_blk_outhdr in the readable
+> buffer and status as last byte of writable buffer) and we call
+> __vringh_iov() to get both type of buffers in two different iovecs.
+>
+> Let's replace the 'else if' clause with 'if' to initialize both
+> riov and wiov if they are not NULL.
+>
+> As checkpatch pointed out, we also avoid crashing the kernel
+> when riov and wiov are both NULL, replacing BUG() with WARN_ON()
+> and returning -EINVAL.
 
-> Then additional question.
-> On old Intel CPUs we needed to set VMXE in guest to make it to work in
-> nested-guest mode.
-> Is it still needed even with your patches?
-> Or the nested-guest mode will work now even on older Intel CPUs and KVM will
-> set VMXE for us itself, when needed?
 
-I'm struggling to even come up with a theory as to how setting VMXE from
-userspace would have impacted KVM with unrestricted_guest=n, let alone fixed
-anything.
+It looks like I met the exact similar issue when developing ctrl vq 
+support (which requires both READ and WRITE descriptor).
 
-CR4.VMXE must always be 1 in _hardware_ when VMX is on, including when running
-the guest.  But KVM forces vmcs.GUEST_CR4.VMXE=1 at all times, regardless of
-the guest's actual value (the guest sees a shadow value when it reads CR4).
+While I was trying to fix the issue I found the following comment:
 
-And unless I grossly misunderstand dosemu2, it's not doing anything related to
-nested virtualization, i.e. the stuffing VMXE=1 for the guest's shadow value
-should have absolutely zero impact.
+  * Note that you may need to clean up riov and wiov, even on error!
+  */
+int vringh_getdesc_iotlb(struct vringh *vrh,
 
-More than likely, VMXE was a red herring.  Given that the reporter is also
-seeing the same bug on bare metal after moving to kernel 5.4, odds are good
-the issue is related to unrestricted_guest=n and has nothing to do with nVMX.
+I saw some driver call vringh_kiov_cleanup().
+
+So I just follow to use that.
+
+I'm not quite sure which one is better.
+
+Thanks
+
+
+>
+> Fixes: f87d0fbb5798 ("vringh: host-side implementation of virtio rings.")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>   drivers/vhost/vringh.c | 9 +++++----
+>   1 file changed, 5 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index e059a9a47cdf..8bd8b403f087 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -284,13 +284,14 @@ __vringh_iov(struct vringh *vrh, u16 i,
+>   	desc_max = vrh->vring.num;
+>   	up_next = -1;
+>   
+> +	/* You must want something! */
+> +	if (WARN_ON(!riov && !wiov))
+> +		return -EINVAL;
+> +
+>   	if (riov)
+>   		riov->i = riov->used = 0;
+> -	else if (wiov)
+> +	if (wiov)
+>   		wiov->i = wiov->used = 0;
+> -	else
+> -		/* You must want something! */
+> -		BUG();
+>   
+>   	for (;;) {
+>   		void *addr;
+
