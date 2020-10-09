@@ -2,137 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD3F62888EE
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 14:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C31F2888F5
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 14:38:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387416AbgJIMhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 08:37:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48512 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725852AbgJIMhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 08:37:31 -0400
-Received: from coco.lan (ip5f5ad5d0.dynamic.kabel-deutschland.de [95.90.213.208])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E09B7206BE;
-        Fri,  9 Oct 2020 12:37:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602247050;
-        bh=ruiGPoaea6akiTHS+AvFSiqq7lSiUQn1p22q5WNA1W0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=wSJCIxYl4F1jPbJncw+V2h9y4FuE4LpMRU+tKrXF5utyqs5uMgts7afTuLBBRKYAr
-         9YH6N1saYfI0AZj6UgTF6HO2LEUi/3X8iseC4ywPkN0VC2VLOj6D9SUZBOHZPx53Oi
-         C8BqC/PANqTv9j0OylEQJGHm8asglolwe8J3aDiU=
-Date:   Fri, 9 Oct 2020 14:37:23 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v2 09/17] mm: Add unsafe_follow_pfn
-Message-ID: <20201009143723.45609bfb@coco.lan>
-In-Reply-To: <20201009122111.GN5177@ziepe.ca>
-References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
-        <20201009075934.3509076-10-daniel.vetter@ffwll.ch>
-        <20201009123421.67a80d72@coco.lan>
-        <20201009122111.GN5177@ziepe.ca>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S2387555AbgJIMiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 08:38:52 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:21557 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725852AbgJIMiw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Oct 2020 08:38:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1602247132; x=1633783132;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=6xBhJ8by2D1nWOOf6t/4w1yrLDpdz2aUaAaueQsLwC4=;
+  b=Oo8VPSluI7DZYlcs4w2v9jHj6ByOa2NS1ua/KOrFqOUn5teA/kkXVyCn
+   oUunCmqjZ+OveTXYn1uAMv+SV+RySbgM03bTyp7j+amCZjl3QwqcgJCdz
+   AemRW2myMidKmbu45xsJ3/VN08HJKAHmhFQj2Awx+Kl8AmoUEWRnAtMwA
+   g=;
+X-IronPort-AV: E=Sophos;i="5.77,355,1596499200"; 
+   d="scan'208";a="74853098"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-c7c08562.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 09 Oct 2020 12:38:44 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1e-c7c08562.us-east-1.amazon.com (Postfix) with ESMTPS id DD1AB245EB1;
+        Fri,  9 Oct 2020 12:38:42 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 9 Oct 2020 12:38:42 +0000
+Received: from edge-cache-155.e-maa3.amazon.com (10.43.161.24) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 9 Oct 2020 12:38:40 +0000
+Subject: Re: [PATCH v2 3/4] selftests: kvm: Add exception handling to
+ selftests
+To:     Aaron Lewis <aaronlewis@google.com>
+CC:     <pshier@google.com>, <jmattson@google.com>, <kvm@vger.kernel.org>
+References: <20201009114615.2187411-1-aaronlewis@google.com>
+ <20201009114615.2187411-4-aaronlewis@google.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <fbaf1a2d-04b2-6c19-d80f-6fc0459a8583@amazon.com>
+Date:   Fri, 9 Oct 2020 14:38:38 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.3.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20201009114615.2187411-4-aaronlewis@google.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.24]
+X-ClientProxiedBy: EX13D14UWC003.ant.amazon.com (10.43.162.19) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Fri, 9 Oct 2020 09:21:11 -0300
-Jason Gunthorpe <jgg@ziepe.ca> escreveu:
+CgpPbiAwOS4xMC4yMCAxMzo0NiwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4gQWRkIHRoZSBpbmZy
+YXN0cnVjdHVyZSBuZWVkZWQgdG8gZW5hYmxlIGV4Y2VwdGlvbiBoYW5kbGluZyBpbiBzZWxmdGVz
+dHMuCj4gVGhpcyBhbGxvd3MgYW55IG9mIHRoZSBleGNlcHRpb24gYW5kIGludGVycnVwdCB2ZWN0
+b3JzIHRvIGJlIG92ZXJyaWRkZW4KPiBpbiB0aGUgZ3Vlc3QuCj4gCj4gU2lnbmVkLW9mZi1ieTog
+QWFyb24gTGV3aXMgPGFhcm9ubGV3aXNAZ29vZ2xlLmNvbT4KPiAtLS0KPiAKPiB2MSAtPiB2MjoK
+PiAKPiAgICAtIFVzZSBleGNlcHRpb25faGFuZGxlcnMgaW5zdGVhZCBvZiBncyBiYXNlIHRvIHBh
+c3MgdGFibGUgdG8gdGhlIGd1ZXN0Lgo+ICAgIC0gTW92ZSB1bmV4cGVjdGVkIHZlY3RvciBhc3Nl
+cnQgdG8gcHJvY2Vzc29yLmMuCj4gCj4gLS0tCj4gICB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9r
+dm0vTWFrZWZpbGUgICAgICAgICAgfCAgMTkgKystCj4gICAuLi4vc2VsZnRlc3RzL2t2bS9pbmNs
+dWRlL3g4Nl82NC9wcm9jZXNzb3IuaCAgfCAgMjUgKysrKwo+ICAgdG9vbHMvdGVzdGluZy9zZWxm
+dGVzdHMva3ZtL2xpYi9rdm1fdXRpbC5jICAgIHwgICA1ICsKPiAgIC4uLi9zZWxmdGVzdHMva3Zt
+L2xpYi9rdm1fdXRpbF9pbnRlcm5hbC5oICAgICB8ICAgMiArCj4gICAuLi4vc2VsZnRlc3RzL2t2
+bS9saWIveDg2XzY0L2hhbmRsZXJzLlMgICAgICAgfCAgODEgKysrKysrKysrKysrKwo+ICAgLi4u
+L3NlbGZ0ZXN0cy9rdm0vbGliL3g4Nl82NC9wcm9jZXNzb3IuYyAgICAgIHwgMTE0ICsrKysrKysr
+KysrKysrKysrLQo+ICAgNiBmaWxlcyBjaGFuZ2VkLCAyMzcgaW5zZXJ0aW9ucygrKSwgOSBkZWxl
+dGlvbnMoLSkKPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9r
+dm0vbGliL3g4Nl82NC9oYW5kbGVycy5TCj4gCj4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcv
+c2VsZnRlc3RzL2t2bS9NYWtlZmlsZSBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9NYWtl
+ZmlsZQo+IGluZGV4IDdlYmU3MWZiY2E1My4uYWFhZjk5MmZhZjg3IDEwMDY0NAo+IC0tLSBhL3Rv
+b2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9NYWtlZmlsZQo+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcv
+c2VsZnRlc3RzL2t2bS9NYWtlZmlsZQo+IEBAIC0zNCw3ICszNCw3IEBAIGlmZXEgKCQoQVJDSCks
+czM5MCkKPiAgIGVuZGlmCj4gCj4gICBMSUJLVk0gPSBsaWIvYXNzZXJ0LmMgbGliL2VsZi5jIGxp
+Yi9pby5jIGxpYi9rdm1fdXRpbC5jIGxpYi9zcGFyc2ViaXQuYyBsaWIvdGVzdF91dGlsLmMKPiAt
+TElCS1ZNX3g4Nl82NCA9IGxpYi94ODZfNjQvcHJvY2Vzc29yLmMgbGliL3g4Nl82NC92bXguYyBs
+aWIveDg2XzY0L3N2bS5jIGxpYi94ODZfNjQvdWNhbGwuYwo+ICtMSUJLVk1feDg2XzY0ID0gbGli
+L3g4Nl82NC9wcm9jZXNzb3IuYyBsaWIveDg2XzY0L3ZteC5jIGxpYi94ODZfNjQvc3ZtLmMgbGli
+L3g4Nl82NC91Y2FsbC5jIGxpYi94ODZfNjQvaGFuZGxlcnMuUwo+ICAgTElCS1ZNX2FhcmNoNjQg
+PSBsaWIvYWFyY2g2NC9wcm9jZXNzb3IuYyBsaWIvYWFyY2g2NC91Y2FsbC5jCj4gICBMSUJLVk1f
+czM5MHggPSBsaWIvczM5MHgvcHJvY2Vzc29yLmMgbGliL3MzOTB4L3VjYWxsLmMKPiAKPiBAQCAt
+MTEwLDE0ICsxMTAsMjEgQEAgTERGTEFHUyArPSAtcHRocmVhZCAkKG5vLXBpZS1vcHRpb24pICQo
+cGdzdGUtb3B0aW9uKQo+ICAgaW5jbHVkZSAuLi9saWIubWsKPiAKPiAgIFNUQVRJQ19MSUJTIDo9
+ICQoT1VUUFVUKS9saWJrdm0uYQo+IC1MSUJLVk1fT0JKIDo9ICQocGF0c3Vic3QgJS5jLCAkKE9V
+VFBVVCkvJS5vLCAkKExJQktWTSkpCj4gLUVYVFJBX0NMRUFOICs9ICQoTElCS1ZNX09CSikgJChT
+VEFUSUNfTElCUykgY3Njb3BlLioKPiArTElCS1ZNX0MgOj0gJChmaWx0ZXIgJS5jLCQoTElCS1ZN
+KSkKPiArTElCS1ZNX1MgOj0gJChmaWx0ZXIgJS5TLCQoTElCS1ZNKSkKPiArTElCS1ZNX0NfT0JK
+IDo9ICQocGF0c3Vic3QgJS5jLCAkKE9VVFBVVCkvJS5vLCAkKExJQktWTV9DKSkKPiArTElCS1ZN
+X1NfT0JKIDo9ICQocGF0c3Vic3QgJS5TLCAkKE9VVFBVVCkvJS5vLCAkKExJQktWTV9TKSkKPiAr
+RVhUUkFfQ0xFQU4gKz0gJChMSUJLVk1fQ19PQkopICQoTElCS1ZNX1NfT0JKKSAkKFNUQVRJQ19M
+SUJTKSBjc2NvcGUuKgo+ICsKPiAreCA6PSAkKHNoZWxsIG1rZGlyIC1wICQoc29ydCAkKGRpciAk
+KExJQktWTV9DX09CSikgJChMSUJLVk1fU19PQkopKSkpCj4gKyQoTElCS1ZNX0NfT0JKKTogJChP
+VVRQVVQpLyUubzogJS5jCj4gKyAgICAgICAkKENDKSAkKENGTEFHUykgJChDUFBGTEFHUykgJChU
+QVJHRVRfQVJDSCkgLWMgJDwgLW8gJEAKPiAKPiAteCA6PSAkKHNoZWxsIG1rZGlyIC1wICQoc29y
+dCAkKGRpciAkKExJQktWTV9PQkopKSkpCj4gLSQoTElCS1ZNX09CSik6ICQoT1VUUFVUKS8lLm86
+ICUuYwo+ICskKExJQktWTV9TX09CSik6ICQoT1VUUFVUKS8lLm86ICUuUwo+ICAgICAgICAgICQo
+Q0MpICQoQ0ZMQUdTKSAkKENQUEZMQUdTKSAkKFRBUkdFVF9BUkNIKSAtYyAkPCAtbyAkQAo+IAo+
+IC0kKE9VVFBVVCkvbGlia3ZtLmE6ICQoTElCS1ZNX09CSikKPiArTElCS1ZNX09CSlMgPSAkKExJ
+QktWTV9DX09CSikgJChMSUJLVk1fU19PQkopCj4gKyQoT1VUUFVUKS9saWJrdm0uYTogJChMSUJL
+Vk1fT0JKUykKPiAgICAgICAgICAkKEFSKSBjcnMgJEAgJF4KPiAKPiAgIHggOj0gJChzaGVsbCBt
+a2RpciAtcCAkKHNvcnQgJChkaXIgJChURVNUX0dFTl9QUk9HUykpKSkKPiBkaWZmIC0tZ2l0IGEv
+dG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2luY2x1ZGUveDg2XzY0L3Byb2Nlc3Nvci5oIGIv
+dG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2luY2x1ZGUveDg2XzY0L3Byb2Nlc3Nvci5oCj4g
+aW5kZXggMGE2NWU3YmI1MjQ5Li5iMGE0MzE0MWZiYjMgMTAwNjQ0Cj4gLS0tIGEvdG9vbHMvdGVz
+dGluZy9zZWxmdGVzdHMva3ZtL2luY2x1ZGUveDg2XzY0L3Byb2Nlc3Nvci5oCj4gKysrIGIvdG9v
+bHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2luY2x1ZGUveDg2XzY0L3Byb2Nlc3Nvci5oCj4gQEAg
+LTM2LDYgKzM2LDggQEAKPiAgICNkZWZpbmUgWDg2X0NSNF9TTUFQICAgICAgICAgICAoMXVsIDw8
+IDIxKQo+ICAgI2RlZmluZSBYODZfQ1I0X1BLRSAgICAgICAgICAgICgxdWwgPDwgMjIpCj4gCj4g
+KyNkZWZpbmUgVU5FWFBFQ1RFRF9WRUNUT1JfUE9SVCAweGZmZjB1Cj4gKwo+ICAgLyogR2VuZXJh
+bCBSZWdpc3RlcnMgaW4gNjQtQml0IE1vZGUgKi8KPiAgIHN0cnVjdCBncHI2NF9yZWdzIHsKPiAg
+ICAgICAgICB1NjQgcmF4Owo+IEBAIC0yMzksNiArMjQxLDExIEBAIHN0YXRpYyBpbmxpbmUgc3Ry
+dWN0IGRlc2NfcHRyIGdldF9pZHQodm9pZCkKPiAgICAgICAgICByZXR1cm4gaWR0Owo+ICAgfQo+
+IAo+ICtzdGF0aWMgaW5saW5lIHZvaWQgb3V0bCh1aW50MTZfdCBwb3J0LCB1aW50MzJfdCB2YWx1
+ZSkKPiArewo+ICsgICAgICAgX19hc21fXyBfX3ZvbGF0aWxlX18oIm91dGwgJSVlYXgsICUlZHgi
+IDogOiAiZCIocG9ydCksICJhIih2YWx1ZSkpOwo+ICt9Cj4gKwo+ICAgI2RlZmluZSBTRVRfWE1N
+KF9fdmFyLCBfX3htbSkgXAo+ICAgICAgICAgIGFzbSB2b2xhdGlsZSgibW92cSAlMCwgJSUiI19f
+eG1tIDogOiAiciIoX192YXIpIDogI19feG1tKQo+IAo+IEBAIC0zMzgsNiArMzQ1LDI0IEBAIHVp
+bnQzMl90IGt2bV9nZXRfY3B1aWRfbWF4X2Jhc2ljKHZvaWQpOwo+ICAgdWludDMyX3Qga3ZtX2dl
+dF9jcHVpZF9tYXhfZXh0ZW5kZWQodm9pZCk7Cj4gICB2b2lkIGt2bV9nZXRfY3B1X2FkZHJlc3Nf
+d2lkdGgodW5zaWduZWQgaW50ICpwYV9iaXRzLCB1bnNpZ25lZCBpbnQgKnZhX2JpdHMpOwo+IAo+
+ICtzdHJ1Y3QgZXhfcmVncyB7Cj4gKyAgICAgICB1aW50NjRfdCByYXgsIHJjeCwgcmR4LCByYng7
+Cj4gKyAgICAgICB1aW50NjRfdCByYnAsIHJzaSwgcmRpOwo+ICsgICAgICAgdWludDY0X3Qgcjgs
+IHI5LCByMTAsIHIxMTsKPiArICAgICAgIHVpbnQ2NF90IHIxMiwgcjEzLCByMTQsIHIxNTsKPiAr
+ICAgICAgIHVpbnQ2NF90IHZlY3RvcjsKPiArICAgICAgIHVpbnQ2NF90IGVycm9yX2NvZGU7Cj4g
+KyAgICAgICB1aW50NjRfdCByaXA7Cj4gKyAgICAgICB1aW50NjRfdCBjczsKPiArICAgICAgIHVp
+bnQ2NF90IHJmbGFnczsKPiArfTsKPiArCj4gK3ZvaWQgdm1faW5pdF9kZXNjcmlwdG9yX3RhYmxl
+cyhzdHJ1Y3Qga3ZtX3ZtICp2bSk7Cj4gK3ZvaWQgdmNwdV9pbml0X2Rlc2NyaXB0b3JfdGFibGVz
+KHN0cnVjdCBrdm1fdm0gKnZtLCB1aW50MzJfdCB2Y3B1aWQpOwo+ICt2b2lkIHZtX2hhbmRsZV9l
+eGNlcHRpb24oc3RydWN0IGt2bV92bSAqdm0sIGludCB2ZWN0b3IsCj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgdm9pZCAoKmhhbmRsZXIpKHN0cnVjdCBleF9yZWdzICopKTsKPiArdm9pZCBhc3Nl
+cnRfb25fdW5oYW5kbGVkX2V4Y2VwdGlvbihzdHJ1Y3Qga3ZtX3ZtICp2bSwgdWludDMyX3QgdmNw
+dWlkKTsKPiArCj4gICAvKgo+ICAgICogQmFzaWMgQ1BVIGNvbnRyb2wgaW4gQ1IwCj4gICAgKi8K
+PiBkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2xpYi9rdm1fdXRpbC5j
+IGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2xpYi9rdm1fdXRpbC5jCj4gaW5kZXggNzQ3
+NzZlZTIyOGYyLi5lY2JiNWU0ZjllZjYgMTAwNjQ0Cj4gLS0tIGEvdG9vbHMvdGVzdGluZy9zZWxm
+dGVzdHMva3ZtL2xpYi9rdm1fdXRpbC5jCj4gKysrIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMv
+a3ZtL2xpYi9rdm1fdXRpbC5jCj4gQEAgLTExOTUsNiArMTE5NSwxMSBAQCBpbnQgX3ZjcHVfcnVu
+KHN0cnVjdCBrdm1fdm0gKnZtLCB1aW50MzJfdCB2Y3B1aWQpCj4gICAgICAgICAgZG8gewo+ICAg
+ICAgICAgICAgICAgICAgcmMgPSBpb2N0bCh2Y3B1LT5mZCwgS1ZNX1JVTiwgTlVMTCk7Cj4gICAg
+ICAgICAgfSB3aGlsZSAocmMgPT0gLTEgJiYgZXJybm8gPT0gRUlOVFIpOwo+ICsKPiArI2lmZGVm
+IF9feDg2XzY0X18KPiArICAgICAgIGFzc2VydF9vbl91bmhhbmRsZWRfZXhjZXB0aW9uKHZtLCB2
+Y3B1aWQpOwo+ICsjZW5kaWYKCkNhbiB3ZSBhdm9pZCB0aGUgI2lmZGVmIGFuZCBpbnN0ZWFkIGp1
+c3QgaW1wbGVtZW50IGEgc3R1YiBmdW5jdGlvbiBmb3IgCnRoZSBvdGhlciBhcmNocz8gVGhlbiBt
+b3ZlIHRoZSBwcm90b3R5cGUgdGhlIHRoZSBmdW5jdGlvbiB0byBhIGdlbmVyaWMgCmhlYWRlciBv
+ZiBjb3Vyc2UuCgpBbGV4CgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJI
+CktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlh
+biBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENo
+YXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAy
+ODkgMjM3IDg3OQoKCg==
 
-> On Fri, Oct 09, 2020 at 12:34:21PM +0200, Mauro Carvalho Chehab wrote:
-> > Hi,
-> > 
-> > Em Fri,  9 Oct 2020 09:59:26 +0200
-> > Daniel Vetter <daniel.vetter@ffwll.ch> escreveu:
-> >   
-> > > Way back it was a reasonable assumptions that iomem mappings never
-> > > change the pfn range they point at. But this has changed:
-> > > 
-> > > - gpu drivers dynamically manage their memory nowadays, invalidating
-> > > ptes with unmap_mapping_range when buffers get moved
-> > > 
-> > > - contiguous dma allocations have moved from dedicated carvetouts to
-> > > cma regions. This means if we miss the unmap the pfn might contain
-> > > pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
-> > > 
-> > > - even /dev/mem now invalidates mappings when the kernel requests that
-> > > iomem region when CONFIG_IO_STRICT_DEVMEM is set, see 3234ac664a87
-> > > ("/dev/mem: Revoke mappings when a driver claims the region")
-> > > 
-> > > Accessing pfns obtained from ptes without holding all the locks is
-> > > therefore no longer a good idea.
-> > > 
-> > > Unfortunately there's some users where this is not fixable (like v4l
-> > > userptr of iomem mappings) or involves a pile of work (vfio type1
-> > > iommu). For now annotate these as unsafe and splat appropriately.
-> > > 
-> > > This patch adds an unsafe_follow_pfn, which later patches will then
-> > > roll out to all appropriate places.  
-> > 
-> > NACK, as this breaks an existing userspace API on media.  
-> 
-> It doesn't break it. You get a big warning the thing is broken and it
-> keeps working.
-> 
-> We can't leave such a huge security hole open - it impacts other
-> subsystems, distros need to be able to run in a secure mode.
-
-Well, if distros disable it, then apps will break.
-
-> > While I agree that using the userptr on media is something that
-> > new drivers may not support, as DMABUF is a better way of
-> > handling it, changing this for existing ones is a big no, 
-> > as it may break usersapace.  
-> 
-> media community needs to work to fix this, not pretend it is OK to
-> keep going as-is.
-
-> Dealing with security issues is the one case where an uABI break might
-> be acceptable.
-> 
-> If you want to NAK it then you need to come up with the work to do
-> something here correctly that will support the old drivers without the
-> kernel taint.
-> 
-> Unfortunately making things uncomfortable for the subsystem is the big
-> hammer the core kernel needs to use to actually get this security work
-> done by those responsible.
-
-
-I'm not pretending that this is ok. Just pointing that the approach
-taken is NOT OK.
-
-I'm not a mm/ expert, but, from what I understood from Daniel's patch
-description is that this is unsafe *only if*  __GFP_MOVABLE is used.
-
-Well, no drivers inside the media subsystem uses such flag, although
-they may rely on some infrastructure that could be using it behind
-the bars.
-
-If this is the case, the proper fix seems to have a GFP_NOT_MOVABLE 
-flag that it would be denying the core mm code to set __GFP_MOVABLE.
-
-Please let address the issue on this way, instead of broken an
-userspace API that it is there since 1991.
-
-Thanks,
-Mauro
