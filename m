@@ -2,96 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 013662888C3
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 14:32:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD3F62888EE
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 14:37:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387411AbgJIMb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 08:31:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29150 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726501AbgJIMb5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Oct 2020 08:31:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602246715;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6yZ9l/rYX1Gt+CSni2U2g8W0CJRek8YcNXwgHxtmpF4=;
-        b=VBgd33y8hUXh4sPN4wE57voM5hAt5rEVNEwTRlmPZ6ShcoAFMQgDElB8G9gCOBKBEFvIDq
-        7a3fTw15FVhdJahHs6OQAJniup34j9clGrXy9tbSRQtRKGj4zvCuEj7+y9N+ZZEMClkehF
-        NhlUlIOA+OCstojvvdQ0SoWMDP5OfeE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-Pd7Sy1pPOrKh2toMQQRikw-1; Fri, 09 Oct 2020 08:31:53 -0400
-X-MC-Unique: Pd7Sy1pPOrKh2toMQQRikw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2387416AbgJIMhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 08:37:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48512 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725852AbgJIMhb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Oct 2020 08:37:31 -0400
+Received: from coco.lan (ip5f5ad5d0.dynamic.kabel-deutschland.de [95.90.213.208])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8757425FC;
-        Fri,  9 Oct 2020 12:31:52 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-114-62.rdu2.redhat.com [10.10.114.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F28EC109516B;
-        Fri,  9 Oct 2020 12:31:50 +0000 (UTC)
-Subject: Re: [PATCH] KVM: SVM: Use a separate vmcb for the nested L2 guest
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, wei.huang2@amd.com
-References: <20200917192306.2080-1-cavery@redhat.com>
- <587d1da1a037dd3ab7844c5cacc50bfda5ce6021.camel@redhat.com>
- <aaaadb29-6299-5537-47a9-072ca34ba512@redhat.com>
- <0007205290de75f04f5f2a92b891815438fd2f2f.camel@redhat.com>
-From:   Cathy Avery <cavery@redhat.com>
-Message-ID: <5849a6ae-30c3-95f2-6d97-80dcb66022c1@redhat.com>
-Date:   Fri, 9 Oct 2020 08:31:49 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        by mail.kernel.org (Postfix) with ESMTPSA id E09B7206BE;
+        Fri,  9 Oct 2020 12:37:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1602247050;
+        bh=ruiGPoaea6akiTHS+AvFSiqq7lSiUQn1p22q5WNA1W0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=wSJCIxYl4F1jPbJncw+V2h9y4FuE4LpMRU+tKrXF5utyqs5uMgts7afTuLBBRKYAr
+         9YH6N1saYfI0AZj6UgTF6HO2LEUi/3X8iseC4ywPkN0VC2VLOj6D9SUZBOHZPx53Oi
+         C8BqC/PANqTv9j0OylEQJGHm8asglolwe8J3aDiU=
+Date:   Fri, 9 Oct 2020 14:37:23 +0200
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v2 09/17] mm: Add unsafe_follow_pfn
+Message-ID: <20201009143723.45609bfb@coco.lan>
+In-Reply-To: <20201009122111.GN5177@ziepe.ca>
+References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
+        <20201009075934.3509076-10-daniel.vetter@ffwll.ch>
+        <20201009123421.67a80d72@coco.lan>
+        <20201009122111.GN5177@ziepe.ca>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <0007205290de75f04f5f2a92b891815438fd2f2f.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/8/20 6:23 AM, Maxim Levitsky wrote:
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 0a06e62010d8c..7293ba23b3cbc 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -436,6 +436,9 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
->          WARN_ON(svm->vmcb == svm->nested.vmcb02);
->   
->          svm->nested.vmcb02->control = svm->vmcb01->control;
-> +
-> +       nested_svm_vmloadsave(svm->vmcb01, svm->nested.vmcb02);
-> +
->          svm->vmcb = svm->nested.vmcb02;
->          svm->vmcb_pa = svm->nested.vmcb02_pa;
->          load_nested_vmcb_control(svm, &nested_vmcb->control);
-> @@ -622,6 +625,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->          if (svm->vmcb01->control.asid == 0)
->                  svm->vmcb01->control.asid = svm->nested.vmcb02->control.asid;
->   
-> +       nested_svm_vmloadsave(svm->nested.vmcb02, svm->vmcb01);
->          svm->vmcb = svm->vmcb01;
->          svm->vmcb_pa = svm->nested.vmcb01_pa;
->   
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index b66239b26885d..ee9f87fe611f2 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1097,6 +1097,7 @@ static void init_vmcb(struct vcpu_svm *svm)
->                  clr_cr_intercept(svm, INTERCEPT_CR3_READ);
->                  clr_cr_intercept(svm, INTERCEPT_CR3_WRITE);
->                  save->g_pat = svm->vcpu.arch.pat;
-> +               svm->nested.vmcb02->save.g_pat = svm->vcpu.arch.pat;
->                  save->cr3 = 0;
->                  save->cr4 = 0;
->          }
+Em Fri, 9 Oct 2020 09:21:11 -0300
+Jason Gunthorpe <jgg@ziepe.ca> escreveu:
 
-OK this worked for me. Thanks!
+> On Fri, Oct 09, 2020 at 12:34:21PM +0200, Mauro Carvalho Chehab wrote:
+> > Hi,
+> > 
+> > Em Fri,  9 Oct 2020 09:59:26 +0200
+> > Daniel Vetter <daniel.vetter@ffwll.ch> escreveu:
+> >   
+> > > Way back it was a reasonable assumptions that iomem mappings never
+> > > change the pfn range they point at. But this has changed:
+> > > 
+> > > - gpu drivers dynamically manage their memory nowadays, invalidating
+> > > ptes with unmap_mapping_range when buffers get moved
+> > > 
+> > > - contiguous dma allocations have moved from dedicated carvetouts to
+> > > cma regions. This means if we miss the unmap the pfn might contain
+> > > pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
+> > > 
+> > > - even /dev/mem now invalidates mappings when the kernel requests that
+> > > iomem region when CONFIG_IO_STRICT_DEVMEM is set, see 3234ac664a87
+> > > ("/dev/mem: Revoke mappings when a driver claims the region")
+> > > 
+> > > Accessing pfns obtained from ptes without holding all the locks is
+> > > therefore no longer a good idea.
+> > > 
+> > > Unfortunately there's some users where this is not fixable (like v4l
+> > > userptr of iomem mappings) or involves a pile of work (vfio type1
+> > > iommu). For now annotate these as unsafe and splat appropriately.
+> > > 
+> > > This patch adds an unsafe_follow_pfn, which later patches will then
+> > > roll out to all appropriate places.  
+> > 
+> > NACK, as this breaks an existing userspace API on media.  
+> 
+> It doesn't break it. You get a big warning the thing is broken and it
+> keeps working.
+> 
+> We can't leave such a huge security hole open - it impacts other
+> subsystems, distros need to be able to run in a secure mode.
 
+Well, if distros disable it, then apps will break.
+
+> > While I agree that using the userptr on media is something that
+> > new drivers may not support, as DMABUF is a better way of
+> > handling it, changing this for existing ones is a big no, 
+> > as it may break usersapace.  
+> 
+> media community needs to work to fix this, not pretend it is OK to
+> keep going as-is.
+
+> Dealing with security issues is the one case where an uABI break might
+> be acceptable.
+> 
+> If you want to NAK it then you need to come up with the work to do
+> something here correctly that will support the old drivers without the
+> kernel taint.
+> 
+> Unfortunately making things uncomfortable for the subsystem is the big
+> hammer the core kernel needs to use to actually get this security work
+> done by those responsible.
+
+
+I'm not pretending that this is ok. Just pointing that the approach
+taken is NOT OK.
+
+I'm not a mm/ expert, but, from what I understood from Daniel's patch
+description is that this is unsafe *only if*  __GFP_MOVABLE is used.
+
+Well, no drivers inside the media subsystem uses such flag, although
+they may rely on some infrastructure that could be using it behind
+the bars.
+
+If this is the case, the proper fix seems to have a GFP_NOT_MOVABLE 
+flag that it would be denying the core mm code to set __GFP_MOVABLE.
+
+Please let address the issue on this way, instead of broken an
+userspace API that it is there since 1991.
+
+Thanks,
+Mauro
