@@ -2,96 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B22C42881F6
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 08:07:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 658A6288273
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 08:38:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729081AbgJIGHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 02:07:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60332 "EHLO
+        id S1731021AbgJIGhK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 02:37:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727313AbgJIGHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 02:07:21 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6A4C0613D2;
-        Thu,  8 Oct 2020 23:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Message-ID:From:CC:To:Subject:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
-        Date:Sender:Reply-To:Content-ID:Content-Description;
-        bh=2p54TBCV6IXlB1szJ2D6yALxADUV3N3loPFLFKdD3xk=; b=pn5UGAr5HAqsQpWLR4av2ytYWN
-        TELUOkUz01XHHf2B6D+mLuxcmrAThFnkldCL2X7IaajhWHFWkgh1efUPyrogVMJysuBxNxnJhn2gN
-        sTaUROJzHF5Y2ZQEF2ZAXVnpVhD1RpMheFiWGpPti5xCNkXY92CixDOivmf0QJpNKJP9wFuTp723z
-        6P3iboa0stO8xE8myqJ+T0aALaukQkWIIjRqFCYz92lkMHBETCJGPjKr13z82+SDbLnWFIscrpUSy
-        PtPqGkkjL+TRN6c/PI88uXflEISrzqPHgI0zNi8K1FoLdHIyfuRgRYM34nAhJPlh8L5l+knU/iNtJ
-        cSZ/Anaw==;
-Received: from [2001:8b0:10b:1:ad95:471b:fe64:9cc3]
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kQlYi-0007za-0i; Fri, 09 Oct 2020 06:07:16 +0000
-Date:   Fri, 09 Oct 2020 07:07:12 +0100
-User-Agent: K-9 Mail for Android
-In-Reply-To: <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
-References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org> <20201007122046.1113577-1-dwmw2@infradead.org> <20201007122046.1113577-5-dwmw2@infradead.org> <87blhcx6qz.fsf@nanos.tec.linutronix.de> <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org> <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org> <87362owhcb.fsf@nanos.tec.linutronix.de> <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org> <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
+        with ESMTP id S1732030AbgJIGfj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Oct 2020 02:35:39 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CE8C0613D4;
+        Thu,  8 Oct 2020 23:35:38 -0700 (PDT)
+Date:   Fri, 09 Oct 2020 06:35:36 -0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1602225337;
+        h=from:from:sender:sender:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+        bh=oUDb2HwG8cuVizWUDjf89gYYGCboHOSex7ly9vGcN4A=;
+        b=G+CP1sIAMbOQ0ASZ6pNjOh+NoDmz1xAT621kduUcAB0Fv4o+qHpwAAxR7jSExU5ofA7xrK
+        sAmZHnI/Ui6HG07SL+3PHMy1wdbdiUDbN0v7h5Xc2E0f0q/eg6+/zHWhB8XKqY0F50tQh3
+        CN5NMyF1XlclE7Ek/w2s4aEJDOTuECEl9vIqfw+CsrVYZVAJP9V8Nw0OaZHGnpzF/pj8mq
+        Y51kPyAdmY2+jaOMXXUmY5Xrn95jGHRhEn3YXkAzl7cM1KFKwsAcyCWee0yku/RnQY/bac
+        BDKNERaJb4itqKg0cerkoPmboArP+Tp826Rg/8CD0l7/AxFT7RLxiAUNYPxjhQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1602225337;
+        h=from:from:sender:sender:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+        bh=oUDb2HwG8cuVizWUDjf89gYYGCboHOSex7ly9vGcN4A=;
+        b=vz4ghSJps1vPvwlbaKzJQbJfeX7f7C20CAyLQ5qtnS6tasXBM4uQNigvjU2n7nz7nAyrcX
+        9lUfLNOmsuDqfxDw==
+From:   "tip-bot2 for Madhuparna Bhowmik" <tip-bot2@linutronix.de>
+Sender: tip-bot2@linutronix.de
+Reply-to: linux-kernel@vger.kernel.org
+To:     linux-tip-commits@vger.kernel.org
+Subject: [tip: core/rcu] kvm: mmu: page_track: Fix RCU list API usage
+Cc:     Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
-To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
-CC:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-From:   David Woodhouse <dwmw2@infradead.org>
-Message-ID: <770B6323-61CC-4D33-B2B2-797686BD9D56@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Message-ID: <160222533671.7002.15652338637485531444.tip-bot2@tip-bot2>
+Robot-ID: <tip-bot2.linutronix.de>
+Robot-Unsubscribe: Contact <mailto:tglx@linutronix.de> to get blacklisted from these emails
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The following commit has been merged into the core/rcu branch of tip:
 
+Commit-ID:     df9a30fd1f70a757df193acd7396622eee23e527
+Gitweb:        https://git.kernel.org/tip/df9a30fd1f70a757df193acd7396622eee23e527
+Author:        Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+AuthorDate:    Sun, 12 Jul 2020 18:40:03 +05:30
+Committer:     Paul E. McKenney <paulmck@kernel.org>
+CommitterDate: Mon, 24 Aug 2020 18:36:23 -07:00
 
-On 9 October 2020 00:27:06 BST, Thomas Gleixner <tglx@linutronix=2Ede> wro=
-te:
->On Thu, Oct 08 2020 at 22:39, David Woodhouse wrote:
->> On Thu, 2020-10-08 at 23:14 +0200, Thomas Gleixner wrote:
->>> >=20
->>> > (We'd want the x86_vector_domain to actually have an MSI compose
->>> > function in the !CONFIG_PCI_MSI case if we did this, of course=2E)
->>>=20
->>> The compose function and the vector domain wrapper can simply move
->to
->>> vector=2Ec
->>
->> I ended up putting __irq_msi_compose_msg() into apic=2Ec and that way I
->> can make virt_ext_dest_id static in that file=2E
->>
->> And then I can move all the HPET-MSI support into hpet=2Ec too=2E
->
->Works for me=2E
->
->>
->https://git=2Einfradead=2Eorg/users/dwmw2/linux=2Egit/shortlog/refs/heads=
-/ext_dest_id
->
->For the next submission, can you please
->
-> - pick up the -ENODEV changes for HPET/IOAPIC which I posted earlier
+kvm: mmu: page_track: Fix RCU list API usage
 
-Ack=2E
+Use hlist_for_each_entry_srcu() instead of hlist_for_each_entry_rcu()
+as it also checkes if the right lock is held.
+Using hlist_for_each_entry_rcu() with a condition argument will not
+report the cases where a SRCU protected list is traversed using
+rcu_read_lock(). Hence, use hlist_for_each_entry_srcu().
 
-> - shuffle all that compose/IOAPIC cleanup around
+Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Cc: <kvm@vger.kernel.org>
+---
+ arch/x86/kvm/mmu/page_track.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-I'd prefer the MSI swizzling bit to stay last in the series=2E I want to s=
-tare hard at the hyperv-iommu part a bit more, and ideally even have it tes=
-ted=2E I'd prefer the real functionality that I care about, not to depend o=
-n that cleanup=2E
-
-If it actually let me remove all mention of ext_dest_id from the IOAPIC co=
-de and use *only* MSI swizzling, I'd be keener to reorder=2E But as noted, =
-there are a couple of manual RTE constructions in there still anyway=2E
-
-I can move __irq_compose_msi_msg() earlier in the series though, and then =
-virt_ext_dest_id can be static in apic=2Ec from its inception=2E
-
-OK?
-
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index a84a141..8443a67 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -229,7 +229,8 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 		return;
+ 
+ 	idx = srcu_read_lock(&head->track_srcu);
+-	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
++	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
++				srcu_read_lock_held(&head->track_srcu))
+ 		if (n->track_write)
+ 			n->track_write(vcpu, gpa, new, bytes, n);
+ 	srcu_read_unlock(&head->track_srcu, idx);
+@@ -254,7 +255,8 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+ 		return;
+ 
+ 	idx = srcu_read_lock(&head->track_srcu);
+-	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
++	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
++				srcu_read_lock_held(&head->track_srcu))
+ 		if (n->track_flush_slot)
+ 			n->track_flush_slot(kvm, slot, n);
+ 	srcu_read_unlock(&head->track_srcu, idx);
