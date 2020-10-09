@@ -2,125 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3D81288D48
-	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 17:48:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C81AF288D9F
+	for <lists+kvm@lfdr.de>; Fri,  9 Oct 2020 18:03:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389486AbgJIPs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Oct 2020 11:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37470 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389144AbgJIPs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Oct 2020 11:48:29 -0400
-Received: from forward105o.mail.yandex.net (forward105o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::608])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55277C0613D2;
-        Fri,  9 Oct 2020 08:48:28 -0700 (PDT)
-Received: from mxback14j.mail.yandex.net (mxback14j.mail.yandex.net [IPv6:2a02:6b8:0:1619::90])
-        by forward105o.mail.yandex.net (Yandex) with ESMTP id 308CA420191C;
-        Fri,  9 Oct 2020 18:48:24 +0300 (MSK)
-Received: from myt6-efff10c3476a.qloud-c.yandex.net (myt6-efff10c3476a.qloud-c.yandex.net [2a02:6b8:c12:13a3:0:640:efff:10c3])
-        by mxback14j.mail.yandex.net (mxback/Yandex) with ESMTP id WAnDOLR12X-mNkSxxve;
-        Fri, 09 Oct 2020 18:48:24 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1602258504;
-        bh=nE34g5pkiv+lyAv8KGYmFqhMePEwK7biDs9eZPxRsC4=;
-        h=In-Reply-To:From:To:Subject:Cc:Date:References:Message-ID;
-        b=sKY1w1KQeRWoVPIxkWPy2BuJ0QArwURKhswJVOWva5qLqdXebdWa+pyW98QiNsN0m
-         sUKGAFBlPX1kRAxyRI+3amc4syVHoDxt2jmtpyWnd4EYHo0WOMBJ/bHN2nN98/5cUT
-         Kfc0P0cZp0LSrM5QEtJe380YrynzJkSmrPHs4TGY=
-Authentication-Results: mxback14j.mail.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by myt6-efff10c3476a.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id TnvO1WRrh9-mNIuqjPx;
-        Fri, 09 Oct 2020 18:48:23 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH 0/6] KVM: x86: KVM_SET_SREGS.CR4 bug fixes and cleanup
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201007014417.29276-1-sean.j.christopherson@intel.com>
- <99334de1-ba3d-dfac-0730-e637d39b948f@yandex.ru>
- <20201008175951.GA9267@linux.intel.com>
- <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
- <20201009040453.GA10744@linux.intel.com>
- <5dfa55f3-ecdf-9f8d-2d45-d2e6e54f2daa@yandex.ru>
- <20201009153053.GA16234@linux.intel.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <5bf99bdf-b16f-8caf-ba61-860457606b8e@yandex.ru>
-Date:   Fri, 9 Oct 2020 18:48:21 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S2389518AbgJIQCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Oct 2020 12:02:54 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:58854 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389135AbgJIQCx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Oct 2020 12:02:53 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1602259371;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZHt8XKpvOg8gA4nFcOb4ywxF5VhRSTiXsFiBgkwu8B8=;
+        b=PZXU42J+noDD0cxK0VwzkFTB1O1ZMlVR4ciJrWmGNNjCW7z+U6/fPdM/VrIK5jn891zfRF
+        zsZySS/8mYik/JuGzKmmWWbEya2Zwm3ZS4siFcm+rWM0kbLOX2SVR0ClM3ytOeJvQr7QZh
+        dAcxQ5R6F6FknxrG9JuOt07A8eUCSza53Cv5AuC+hlpDhlrxB51jXTgZVtlzqteqGKToAP
+        AP/Y2z83BB+TMGZL6Bs2yRDuYy581E6ItMpfV1UcXhLxmcNOEf/iGEWUwFN4Cxv135AYmk
+        FTgQgJNVyUhJD+vIFuFMk2+g0f9SGIOwu6wLNAJ/T5b2Qfyths1T+PSzw1DNXw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1602259371;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZHt8XKpvOg8gA4nFcOb4ywxF5VhRSTiXsFiBgkwu8B8=;
+        b=w1fJ/MJLSeMBuSGG0nDlKWfzrPoFMaZhljKfwDjF06uVySTctoTPsdDTaJTQNfblBx2kFS
+        umsjrxsBGffaBqDw==
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
+        megha.dey@intel.com, maz@kernel.org, bhelgaas@google.com,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com,
+        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        rafael@kernel.org, netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 11/18] dmaengine: idxd: ims setup for the vdcm
+In-Reply-To: <20201009145236.GM4734@nvidia.com>
+References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com> <160021253189.67751.12686144284999931703.stgit@djiang5-desk3.ch.intel.com> <87mu17ghr1.fsf@nanos.tec.linutronix.de> <0f9bdae0-73d7-1b4e-b478-3cbd05c095f4@intel.com> <87r1q92mkx.fsf@nanos.tec.linutronix.de> <44e19c5d-a0d2-0ade-442c-61727701f4d8@intel.com> <87y2kgux2l.fsf@nanos.tec.linutronix.de> <20201008233210.GH4734@nvidia.com> <87v9fjtq5w.fsf@nanos.tec.linutronix.de> <20201009145236.GM4734@nvidia.com>
+Date:   Fri, 09 Oct 2020 18:02:51 +0200
+Message-ID: <87d01rtmj8.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20201009153053.GA16234@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-09.10.2020 18:30, Sean Christopherson пишет:
-> On Fri, Oct 09, 2020 at 05:11:51PM +0300, stsp wrote:
->> 09.10.2020 07:04, Sean Christopherson пишет:
->>>> Hmm. But at least it was lying
->>>> similarly on AMD and Intel CPUs. :)
->>>> So I was able to reproduce the problems
->>>> myself.
->>>> Do you mean, any AMD tests are now useless, and we need to proceed with Intel
->>>> tests only?
->>> For anything VMXE related, yes.
->> What would be the expected behaviour on Intel, if it is set? Any difference
->> with AMD?
-> On Intel, userspace should be able to stuff CR4.VMXE=1 via KVM_SET_SREGS if
-> the 'nested' module param is 1, e.g. if 'modprobe kvm_intel nested=1'.  Note,
-> 'nested' is enabled by default on kernel 5.0 and later.
+On Fri, Oct 09 2020 at 11:52, Jason Gunthorpe wrote:
+> On Fri, Oct 09, 2020 at 04:44:27PM +0200, Thomas Gleixner wrote:
+>> > This is really not that different from what I was describing for queue
+>> > contexts - the queue context needs to be assigned to the irq # before
+>> > it can be used in the irq chip other wise there is no idea where to
+>> > write the msg to. Just like pasid here.
+>> 
+>> Not really. In the IDXD case the storage is known when the host device
+>> and the irq domain is initialized which is not the case for your variant
+>> and it neither needs to send a magic command to the device to update the
+>> data.
+>
+> I mean, needing the PASID vs needing the memory address before the IRQ
+> can be use are basically the same issue. Data needs to be attached to
+> the IRQ before it can be programmed.. In this case programming with
+> the wrong PASID could lead to a security issue.
 
-So if I understand you correctly, we
-need to test that:
-- with nested=0 VMXE gives EINVAL
-- with nested=1 VMXE changes nothing
-visible, except probably to allow guest
-to read that value (we won't test guest
-reading though).
+Yeah. I looked at doing it similar to the callback I added for
+retrieving the shadow storage pointer, but the PASID is not necessarily
+established at that point.
 
-Is this correct?
+>> I agree that irq_set_auxdata() is not the most elegant thing, but the
+>> alternative solutions I looked at are just worse.
+>
+> It seems reasonable, but quite an obfuscated way to tell a driver they
+> need to hold irq_get_desc_buslock() when touching data shared with the
+> irqchip ops.. Not that I have a better suggestion
 
+It's an obfuscated way to make obfuscated hardware supported :)
 
-> With AMD, setting CR4.VMXE=1 is never allowed as AMD doesn't support VMX,
+Thanks,
 
-OK, for that I can give you a
-Tested-by: Stas Sergeev <stsp@users.sourceforge.net>
-
-because I confirm that on AMD it now
-consistently returns EINVAL, whereas
-without your patches it did random crap,
-depending on whether it is a first call to
-KVM_SET_SREGS, or not first.
-
-
->> But we do not use unrestricted guest.
->> We use v86 under KVM.
-> Unrestricted guest can kick in even if CR0.PG=1 && CR0.PE=1, e.g. there are
-> segmentation checks that apply if and only if unrestricted_guest=0.  Long story
-> short, without a deep audit, it's basically impossible to rule out a dependency
-> on unrestricted guest since you're playing around with v86.
-
-You mean "unrestricted_guest" as a module
-parameter, rather than the similar named CPU
-feature, right? So we may depend on
-unrestricted_guest parameter, but not on a
-hardware feature, correct?
-
-
->> The only other effect of setting VMXE was clearing VME. Which shouldn't
->> affect anything either, right?
-> Hmm, clearing VME would mean that exceptions/interrupts within the guest would
-> trigger a switch out of v86 and into vanilla protected mode.  v86 and PM have
-> different consistency checks, particularly for segmentation, so it's plausible
-> that clearing CR4.VME inadvertantly worked around the bug by avoiding invalid
-> guest state for v86.
-
-Lets assume that was the case.
-With those github guys its not possible
-to do any consistent checks. :(
-
+        tglx
