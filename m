@@ -2,409 +2,351 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F8B828A19C
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B26828A1A1
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:18:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729982AbgJJVwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Oct 2020 17:52:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41764 "EHLO
+        id S1730272AbgJJVyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Oct 2020 17:54:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730994AbgJJTw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Oct 2020 15:52:26 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE18C0613AB
-        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 03:54:01 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id m11so11315305otk.13
-        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 03:54:01 -0700 (PDT)
+        with ESMTP id S1731143AbgJJTxc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Oct 2020 15:53:32 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A37E2C0613B2;
+        Sat, 10 Oct 2020 04:01:10 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id x7so6578182eje.8;
+        Sat, 10 Oct 2020 04:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kid7J+A/Wd8FKFLCdGKgzMsKnx5ZLnDQ6KOmisXcIDs=;
-        b=hetiOf5IFXbFkUtjTPDACRx6O8/TnI/VjswYmbO3VBhYstT6NqT9X2x3eFvybc6gsJ
-         EE8+AzEu4BQcajXzp1ZL5WHAnPRAnNJLzMT5F/8QAf7upL/UVuBJpK1bpolUyxhHB3TP
-         VM+f548v/CmVhdRxf2iQzc0a1x8DbAaqx/KpI=
+         :cc:content-transfer-encoding;
+        bh=s/JjXOEeRSJGaAuAZRbhKPqxB460/d1BYOMgsWsZowU=;
+        b=N3tDPyTp2ltI3u0R/jUXaTU5h6XPGdeMA0C8Y48TIIWyRRIKQGJBFH0i49OTIpWbLq
+         2Nm20aAi/o6+uHu+dFD4ZvKysN8h6DOW9wwSv1GUidCGpNTxgnncgLCdRsYw22vAJJux
+         scY75W7+pImxQzik2oj/2EtAaLmFpSKmvFw4FEp/r3e1S769/vlucFY22EZAdHwGDf1W
+         5UzXHqZPW/NwSHHQS+nodQzmJFsJnXe7IuiHmAC19+26m/bQcuwuW9jYYW4VzmawkDXT
+         b3GkVrnnm/QuM+8OVhZxZsQBPxUmiytsoT02gRdT1GLScJkrDSIKN5P+N8j7yigMJiMT
+         +tbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kid7J+A/Wd8FKFLCdGKgzMsKnx5ZLnDQ6KOmisXcIDs=;
-        b=KBzbsk7M02CbcAluDM/djOVnJ2JRDLoQOSMjAxNbC/+9rF/TVB2MxX/+SWuSlCED7S
-         tsOC+akrzLA+S45dm3U6YGNJmKiLaeXrd/5bN+Jj4XeFxDKk6umslchJBPktbjVZzMrj
-         CeWs/U3r2YaMUoHRy1LQqLM8bexIx/r+EQkhREG69Jbbf+EqFnGTC2j4rqiKiY8DwGVq
-         26APUojFRj8NrCc0/dAP1jd4uHMV6Xmrs8Y1Ffb+EIN7/g20o0uCfeluvJhfCA2CocBb
-         HYGPQIVyoS3KuPYONi+R35HtiTdlCbJfTNGYA+lJ+D72y3By9Uf7Uwzg6kUPpdeYNEFO
-         ss7A==
-X-Gm-Message-State: AOAM532NsvTZnWw432z9448QOLwEggRiAZ8U7MCRg15AdSv9tLMJ0g/J
-        rk0msFEu7eJNLrt2VrsyH8J52kTtm/jI4dxnVfVz2Q==
-X-Google-Smtp-Source: ABdhPJx+JdEHfdRxaOV1K2wKGEH7PZhb9Ho2MShNadWAXfbctrgpIK/MYT0ZPOky7BdDt7uP2jc1R24HQzAp7RJ+t70=
-X-Received: by 2002:a05:6830:8b:: with SMTP id a11mr568933oto.303.1602327240268;
- Sat, 10 Oct 2020 03:54:00 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=s/JjXOEeRSJGaAuAZRbhKPqxB460/d1BYOMgsWsZowU=;
+        b=s9reMOuLOLk6ipdmldajCxjnF/VICjPZhm1Imrlj1zN9jqLKaeWXo8JDlfqQNYLy8t
+         2AQrpFeYxcd7DMtDs30lxjwJQaHB28HS6YqKvY+pPA9+Sthgx17P9uknClhucWLJCOC1
+         M5U9nBCFL3b8zkxrXvimxb+tjnPh5U2U7lLYK/DdWOHuXCHofF3ha1OpW0Eh4965stfw
+         y0E5xobLeItRq2py3zrLUBhcct/SxXikWPT9rb+IGuUiZmEMAErpwPd0CuktJyvX8uiI
+         iVVaStBOCLDoxgErl5r7ksxUOEndn6VzggbgP8LNVqe3hKs4whOA4an1BoF7nUaOJfvm
+         QzLA==
+X-Gm-Message-State: AOAM533TlHcHITqZ2u7tKqIL7ABdeNTcWftw6RhiQ+7yEtXYIMzATT0a
+        1M5vMAS2ii5N71JYDtSvgfMrAlR6nEmvkYC2NZY=
+X-Google-Smtp-Source: ABdhPJxV9IL3SmuV6bzqnSPq1dRpFWaSbyDOxQSb+7YZy7shPJXmaN/Mhtfal9R/3vJ5XcHcrpbqpfSKsK+yOWkkuvI=
+X-Received: by 2002:a17:906:9417:: with SMTP id q23mr18534457ejx.536.1602327669254;
+ Sat, 10 Oct 2020 04:01:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
- <20201009075934.3509076-10-daniel.vetter@ffwll.ch> <20201009123421.67a80d72@coco.lan>
- <20201009122111.GN5177@ziepe.ca> <20201009143723.45609bfb@coco.lan>
- <20201009124850.GP5177@ziepe.ca> <CAKMK7uF-hrSwzFQkp6qEP88hM1Qg8TMQOunuRHh=f2+D8MaMRg@mail.gmail.com>
- <20201010112122.587f9945@coco.lan>
-In-Reply-To: <20201010112122.587f9945@coco.lan>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Sat, 10 Oct 2020 12:53:49 +0200
-Message-ID: <CAKMK7uEKP5UMKeQHkTHWYUJkp=mz-Hvh-fJZy1KP3kT2xHpHrg@mail.gmail.com>
-Subject: Re: [PATCH v2 09/17] mm: Add unsafe_follow_pfn
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Linus Torvalds <torvalds@linux-foundation.org>
+References: <1601470479-26848-1-git-send-email-guomin_chen@sina.com>
+ <20200930080919.1a9c66f8@x1.home> <CAEEwsfRZt=r54SWOqbKvF60zPKu2tiTeQtFcFW14Hp92kT6M9Q@mail.gmail.com>
+ <20201009124423.2a8603f7@x1.home>
+In-Reply-To: <20201009124423.2a8603f7@x1.home>
+From:   gchen chen <gchen.guomin@gmail.com>
+Date:   Sat, 10 Oct 2020 19:01:30 +0800
+Message-ID: <CAEEwsfRDLFxkV5ZwNy9+3N3u9RtiCtErC6CK3k+ft0=jQtTv_A@mail.gmail.com>
+Subject: Re: [PATCH] irqbypass: fix error handle when irq_bypass_register_producer()
+ return fails
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     guomin_chen@sina.com, Cornelia Huck <cohuck@redhat.com>,
+        Jiang Yi <giangyi@amazon.com>, Marc Zyngier <maz@kernel.org>,
+        Peter Xu <peterx@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mauro,
-
-You might want to read the patches more carefully, because what you're
-demanding is what my patches do. Short summary:
-
-- if STRICT_FOLLOW_PFN is set:
-a) normal memory is handled as-is (i.e. your example works) through
-the addition of FOLL_LONGTERM. This is the "pin the pages correctly"
-approach you're demanding
-b) for non-page memory (zerocopy sharing before dma-buf was upstreamed
-is the only use-case for this) it is correctly rejected with -EINVAL
-
-- if you do have blobby userspace which requires the zero-copy using
-userptr to work, and doesn't have any of the fallbacks implemented
-that you describe, this would be a regression. That's why
-STRICT_FOLLOW_PFN can be unset. And yes there's a real security issue
-in this usage, Marek also confirmed that the removal of the vma copy
-code a few years ago essentially broke even the weak assumptions that
-made the code work 10+ years ago when it was merged.
-
-so tdlr; Everything you described will keep working even with the new
-flag set, and everything you demand must be implemented _is_
-implemented in this patch series.
-
-Also please keep in mind that we are _not_ talking about the general
-userptr support that was merge ~20 years ago. This patch series here
-is _only_ about the zerocpy userptr support merged with 50ac952d2263
-("[media] videobuf2-dma-sg: Support io userptr operations on io
-memory") in 2013.
-
-Why this hack was merged in 2013 when we merged dma-buf almost 2 years
-before that I have no idea about. Imo that patch simply should never
-have landed, and instead dma-buf support prioritized.
-
-Cheers, Daniel
-
-
-On Sat, Oct 10, 2020 at 11:21 AM Mauro Carvalho Chehab
-<mchehab+huawei@kernel.org> wrote:
+Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2020=E5=B9=B410=E6=9C=
+=8810=E6=97=A5=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=882:44=E5=86=99=E9=81=93=
+=EF=BC=9A
 >
-> Em Fri, 9 Oct 2020 19:52:05 +0200
-> Daniel Vetter <daniel.vetter@ffwll.ch> escreveu:
+> On Fri, 9 Oct 2020 12:30:04 +0800
+> gchen chen <gchen.guomin@gmail.com> wrote:
 >
-> > On Fri, Oct 9, 2020 at 2:48 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=
+=9C=8830=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:09=E5=86=99=E9=81=
+=93=EF=BC=9A
 > > >
-> > > On Fri, Oct 09, 2020 at 02:37:23PM +0200, Mauro Carvalho Chehab wrote:
 > > >
-> > > > I'm not a mm/ expert, but, from what I understood from Daniel's patch
-> > > > description is that this is unsafe *only if*  __GFP_MOVABLE is used.
+> > > Please version your postings so we know which one to consider as the
+> > > current proposal.
 > > >
-> > > No, it is unconditionally unsafe. The CMA movable mappings are
-> > > specific VMAs that will have bad issues here, but there are other
-> > > types too.
->
-> I didn't check the mm dirty details, but I strongly suspect that the mm
-> code has a way to prevent moving a mmapped page while it is still in usage.
->
-> If not, then the entire movable pages concept sounds broken to me, and
-> has to be fixed at mm subsystem.
->
+> > > On Wed, 30 Sep 2020 20:54:39 +0800
+> > > guomin_chen@sina.com wrote:
 > > >
-> > > The only way to do something at a VMA level is to have a list of OK
-> > > VMAs, eg because they were creatd via a special mmap helper from the
-> > > media subsystem.
->
-> I'm not sure if I'm following you on that. The media API can work with
-> different ways of sending buffers to userspace:
->
->         - read();
->
->         - using the overlay mode. This interface is deprecated in
->           practice, being replaced by DMABUF. Only a few older hardware
->           supports it, and it depends on an special X11 helper driver
->           for it to work.
->
->         - via DMABUF:
->                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/dmabuf.html
->
->         - via mmap, using a mmap helper:
->                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/mmap.html
->
->         - via mmap, using userspace-provided pointers:
->                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/userp.html
->
-> The existing open-source programs usually chose one or more of the above
-> modes. if the Kernel driver returns -EINVAL when an mmapped streaming I/O
-> mode is not supported, userspace has to select a different method.
->
-> Most userspace open source programs have fallback support: if one
-> mmap I/O method fails, it selects another one, although this is not
-> a mandatory requirement. I found (and fixed) a few ones that were
-> relying exclusively on userptr support, but I didn't make a
-> comprehensive check.
->
-> Also there are a number of relevant closed-source apps that we have no
-> idea about what methods they use, like Skype, and other similar
-> videoconferencing programs. Breaking support for those, specially at
-> a time where people are relying on it in order to participate on
-> conferences and doing internal meetings is a **very bad** idea.
->
-> So, whatever solution is taken, it should not be dumping warning
-> messages at the system and tainting the Kernel, but, instead, checking
-> if the userspace request is valid or not. If it is invalid, return the
-> proper error code via the right V4L2 ioctl, in order to let userspace
-> choose a different method. I the request is valid, refcount the pages
-> for them to not be moved while they're still in usage.
->
-> -
->
-> Let me provide some background about how things work at the media
-> subsytem. If you want to know more, the userspace-provided memory
-> mapped pointers work is described here:
->
->         https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/userp.html#userp
->
-> Basically, userspace calls either one of those ioctls:
->
->         VIDIOC_CREATE_BUFS:
->                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/vidioc-create-bufs.html
->
-> Which is translated into a videobuf2 call to: vb2_ioctl_create_bufs()
->
->         VIDIOC_REQBUFS
->                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/vidioc-reqbufs.html#vidioc-reqbufs
->
-> Which is translated into a videobuf2 call to: vb2_ioctl_reqbufs()
->
-> Both internally calls vb2_verify_memory_type(), which is responsible
-> for checking if the provided pointers are OK for the usage and/or do
-> all necessary page allocations, and taking care of any special
-> requirements. This could easily have some additional checks to
-> verify if the requested VMA address has pages that are movable or
-> not, ensuring that ensure that the VMA is OK, and locking them in
-> order to prevent the mm code to move such pages while they are in
-> usage by the media subsystem.
->
-> Now, as I said before, I don't know the dirty details about how
-> to lock those pages at the mm subsystem in order to avoid it
-> to move the used pages. Yet, when vb2_create_framevec()
-> is called, the check if VMA is OK should already be happened
-> at vb2_verify_memory_type().
->
-> -
->
-> It should be noticed that the dirty hack added by patch 09/17
-> and 10/17 affects *all* types of memory allocations at V4L2,
-> as this kAPI is called by the 3 different memory models
-> supported at the media subsystem:
->
->         drivers/media/common/videobuf2/videobuf2-vmalloc.c
->         drivers/media/common/videobuf2/videobuf2-dma-contig.c
->         drivers/media/common/videobuf2/videobuf2-dma-sg.c
->
-> In other words, with this code:
->
->         int unsafe_follow_pfn(struct vm_area_struct *vma, unsigned long address,
->                 unsigned long *pfn)
->         {
->         #ifdef CONFIG_STRICT_FOLLOW_PFN
->                 pr_info("unsafe follow_pfn usage rejected, see CONFIG_STRICT_FOLLOW_PFN\n");
->                 return -EINVAL;
->         #else
->                 WARN_ONCE(1, "unsafe follow_pfn usage\n");
->                 add_taint(TAINT_USER, LOCKDEP_STILL_OK);
->
->                 return follow_pfn(vma, address, pfn);
->         #endif
->
-> you're unconditionally breaking the media userspace API support not
-> only for embedded systems that could be using userptr instead of
-> DMA_BUF, but also for *all* video devices, including USB cameras.
->
-> This is **NOT** an acceptable solution.
->
-> So, I stand my NACK to this approach.
->
-> > > > Well, no drivers inside the media subsystem uses such flag, although
-> > > > they may rely on some infrastructure that could be using it behind
-> > > > the bars.
+> > > > From: guomin chen <guomin_chen@sina.com>
+> > > >
+> > > > When the producer object registration fails,In the future, due to
+> > > > incorrect matching when unregistering, list_del(&producer->node)
+> > > > may still be called, then trigger a BUG:
+> > > >
+> > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c8c=
+da5) registration fails: -16
+> > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c8c=
+da5) registration fails: -16
+> > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c8c=
+da5) registration fails: -16
+> > > >     ...
+> > > >     list_del corruption, ffff8f7fb8ba0828->next is LIST_POISON1 (de=
+ad000000000100)
+> > > >     ------------[ cut here ]------------
+> > > >     kernel BUG at lib/list_debug.c:47!
+> > > >     invalid opcode: 0000 [#1] SMP NOPTI
+> > > >     CPU: 29 PID: 3914 Comm: qemu-kvm Kdump: loaded Tainted: G      =
+E
+> > > >     -------- - -4.18.0-193.6.3.el8.x86_64 #1
+> > > >     Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CT=
+O1WW]-,
+> > > >     BIOS -[IVE636Z-2.13]- 07/18/2019
+> > > >     RIP: 0010:__list_del_entry_valid.cold.1+0x12/0x4c
+> > > >     Code: ce ff 0f 0b 48 89 c1 4c 89 c6 48 c7 c7 40 85 4d 88 e8 8c =
+bc
+> > > >           ce ff 0f 0b 48 89 fe 48 89 c2 48 c7 c7 d0 85 4d 88 e8 78 =
+bc
+> > > >           ce ff <0f> 0b 48 c7 c7 80 86 4d 88 e8 6a bc ce ff 0f 0b 4=
+8
+> > > >           89 f2 48 89 fe
+> > > >     RSP: 0018:ffffaa9d60197d20 EFLAGS: 00010246
+> > > >     RAX: 000000000000004e RBX: ffff8f7fb8ba0828 RCX: 00000000000000=
+00
+> > > >     RDX: 0000000000000000 RSI: ffff8f7fbf4d6a08 RDI: ffff8f7fbf4d6a=
+08
+> > > >     RBP: 0000000000000000 R08: 000000000000084b R09: 00000000000000=
+5d
+> > > >     R10: 0000000000000000 R11: ffffaa9d60197bd0 R12: ffff8f4fbe8630=
+00
+> > > >     R13: 00000000000000c2 R14: 0000000000000000 R15: 00000000000000=
+00
+> > > >     FS:  00007f7cb97fa700(0000) GS:ffff8f7fbf4c0000(0000)
+> > > >     knlGS:0000000000000000
+> > > >     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > >     CR2: 00007fcf31da4000 CR3: 0000005f6d404001 CR4: 00000000007626=
+e0
+> > > >     DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000000=
+00
+> > > >     DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000004=
+00
+> > > >     PKRU: 55555554
+> > > >     Call Trace:
+> > > >         irq_bypass_unregister_producer+0x9b/0xf0 [irqbypass]
+> > > >         vfio_msi_set_vector_signal+0x8c/0x290 [vfio_pci]
+> > > >         ? load_fixmap_gdt+0x22/0x30
+> > > >         vfio_msi_set_block+0x6e/0xd0 [vfio_pci]
+> > > >         vfio_pci_ioctl+0x218/0xbe0 [vfio_pci]
+> > > >         ? kvm_vcpu_ioctl+0xf2/0x5f0 [kvm]
+> > > >         do_vfs_ioctl+0xa4/0x630
+> > > >         ? syscall_trace_enter+0x1d3/0x2c0
+> > > >         ksys_ioctl+0x60/0x90
+> > > >         __x64_sys_ioctl+0x16/0x20
+> > > >         do_syscall_64+0x5b/0x1a0
+> > > >         entry_SYSCALL_64_after_hwframe+0x65/0xca
+> > > >
+> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > > Cc: Cornelia Huck <cohuck@redhat.com>
+> > > > Cc: Jiang Yi <giangyi@amazon.com>
+> > > > Cc: Marc Zyngier <maz@kernel.org>
+> > > > Cc: Peter Xu <peterx@redhat.com>
+> > > > Cc: Eric Auger <eric.auger@redhat.com>
+> > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > > > Cc: Jason Wang <jasowang@redhat.com>
+> > > > Cc: kvm@vger.kernel.org
+> > > > Cc: linux-kernel@vger.kernel.org
+> > > > Signed-off-by: guomin chen <guomin_chen@sina.com>
+> > > > ---
+> > > >  drivers/vfio/pci/vfio_pci_intrs.c | 13 +++++++++++--
+> > > >  drivers/vhost/vdpa.c              |  7 +++++++
+> > > >  2 files changed, 18 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/v=
+fio_pci_intrs.c
+> > > > index 1d9fb25..c371943 100644
+> > > > --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> > > > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> > > > @@ -352,12 +352,21 @@ static int vfio_msi_set_vector_signal(struct =
+vfio_pci_device *vdev,
+> > > >       vdev->ctx[vector].producer.token =3D trigger;
+> > > >       vdev->ctx[vector].producer.irq =3D irq;
+> > > >       ret =3D irq_bypass_register_producer(&vdev->ctx[vector].produ=
+cer);
+> > > > -     if (unlikely(ret))
+> > > > +     if (unlikely(ret)) {
+> > > >               dev_info(&pdev->dev,
+> > > >               "irq bypass producer (token %p) registration fails: %=
+d\n",
+> > > >               vdev->ctx[vector].producer.token, ret);
+> > > >
+> > > > -     vdev->ctx[vector].trigger =3D trigger;
+> > > > +             kfree(vdev->ctx[vector].name);
+> > > > +             eventfd_ctx_put(trigger);
+> > > > +
+> > > > +             cmd =3D vfio_pci_memory_lock_and_enable(vdev);
+> > > > +             free_irq(irq, trigger);
+> > > > +             vfio_pci_memory_unlock_and_restore(vdev, cmd);
+> > > > +
+> > > > +             vdev->ctx[vector].trigger =3D NULL;
+> > > > +     } else
+> > > > +             vdev->ctx[vector].trigger =3D trigger;
+> > > >
+> > > >       return 0;
+> > > >  }
 > > >
-> > > It doesn't matter, nothing prevents the user from calling media APIs
-> > > on mmaps it gets from other subsystems.
+> > > Once again, the irq bypass registration cannot cause the vector setup
+> > > to fail, either by returning an error code or failing to configure th=
+e
+> > > vector while returning success.  It's my assertion that we simply nee=
+d
+> > > to set the producer.token to NULL on failure such that unregistering
+> > > the producer will not generate a match, as you've done below.  The
+> > > vector still works even if this registration fails.
+> > >
+> > Yes,  the irq bypass registration cannot cause the vector setup to fail=
+.
+> > But if I simply set producer.token to NULL when fails, instead of
+> > cleaning up vector, it will trigger the following BUG:
 > >
-> > I think a good first step would be to disable userptr of non struct
-> > page backed storage going forward for any new hw support. Even on
-> > existing drivers. dma-buf sharing has been around for long enough now
-> > that this shouldn't be a problem. Unfortunately right now this doesn't
-> > seem to exist, so the entire problem keeps getting perpetuated.
+> > vfio_ecap_init: 0000:db:00.0 hiding ecap 0x1e@0x310
+> > vfio-pci 0000:db:00.0: irq bypass producer (token 000000004409229f)
+> > registration fails: -16
+> > ------------[ cut here ]------------
+> > kernel BUG at drivers/pci/msi.c:352!
+> > invalid opcode: 0000 [#1] SMP NOPTI
+> > CPU: 55 PID: 9389 Comm: qemu-kvm Kdump: loaded Tainted: G
+> > E    --------- -  - 4.18.0-193.irqb.r1.el8.x86_64 #1
+> > Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CTO1WW]-,
+> >   BIOS -[IVE636Z-2.13]- 07/18/2019
+> > RIP: 0010:free_msi_irqs+0x180/0x1b0
+> > Code: 14 85 c0 0f 84 d5 fe ff ff 31 ed eb 0f 83 c5 01 39 6b 14 0f 86
+> >       c5 fe ff ff 8b 7b 10 01 ef e8 d7 4a c9 ff 48 83 78 70 00 74 e3
+> >   <0f> 0b 49 8d b5 b0 00 00 00 e8 e2 e3 c9 ff e9 c7 fe ff ff 48
+> >   8b 7b
+> > RSP: 0018:ffffaeca4f4bfcd8 EFLAGS: 00010286
+> > RAX: ffff8bec77441600 RBX: ffff8bbcdb637e40 RCX: 0000000000000000
+> > RDX: 0000000000000000 RSI: 00000000000001ab RDI: ffffffff8ea5b2a0
+> > RBP: 0000000000000000 R08: ffff8bec7e746828 R09: ffff8bec7e7466a8
+> > R10: 0000000000000000 R11: 0000000000000000 R12: ffff8bbcde921308
+> > R13: ffff8bbcde921000 R14: 000000000000000b R15: 0000000000000021
+> > FS:  00007fd18d7fa700(0000) GS:ffff8bec7f6c0000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007f83650024a0 CR3: 000000476e70c001 CR4: 00000000007626e0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > PKRU: 55555554
+> > Call Trace:
+> >  pci_disable_msix+0xf3/0x120
+> >  pci_free_irq_vectors+0xe/0x20
+> >  vfio_msi_disable+0x89/0xd0 [vfio_pci]
+> >  vfio_pci_set_msi_trigger+0x229/0x2d0 [vfio_pci]
+> >  vfio_pci_ioctl+0x24f/0xdb0 [vfio_pci]
+> >  ? pollwake+0x74/0x90
+> >  ? wake_up_q+0x70/0x70
+> >  do_vfs_ioctl+0xa4/0x630
+> >  ? __alloc_fd+0x33/0x140
+> >  ? syscall_trace_enter+0x1d3/0x2c0
+> >  ksys_ioctl+0x60/0x90
+> >  __x64_sys_ioctl+0x16/0x20
+> >  do_syscall_64+0x5b/0x1a0
+> >  entry_SYSCALL_64_after_hwframe+0x65/0xca
 >
-> Well, the media uAPI does support DMABUF (both import and export):
+> Please post the patch that triggers this, I'm not yet convinced we're
+> speaking of the same solution.  The user ioctl cannot fail due to the
+> failure to setup a bypass accelerator, nor can the ioctl return success
+> without configuring all of the user requested vectors, which is what I
+> understand the v2 patch above to do.  We simply want to configure the
+> failed producer such that when we unregister it at user request, we
+> avoid creating a bogus match.  It's not apparent to me why doing that
+> would cause any changes to the setup or teardown of the MSI vector in
+> PCI code.  Thanks,
 >
->         https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/dmabuf.html
->         https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/vidioc-expbuf.html#vidioc-expbuf
+> Alex
 >
-> And I fully agree that newer programs should use DMABUF when sharing
-> buffers with DRM subsystem, but that's not my main concern.
->
-> What I do want is to not break userspace support nor to taint the Kernel
-> due to a valid uAPI call.
->
-> A valid uAPI call should check if the parameters passed though it are
-> valid. If they are, it should handle. Otherwise, it should return
-> -EINVAL, without tainting the Kernel or printing warning messages.
->
-> The approach took by patches 09/17 and 10/17 doesn't do that.
-> Instead, they just unconditionally breaks the media uAPI.
->
-> What should be done, instead, is to drop patch 10/17, and work on
-> a way for the code inside vb2_create_framevec() to ensure that, if
-> USERPTR is used, the memory pages will be properly locked while the
-> driver is using, returning -EINVAL only if there's no way to proceed,
-> without tainting the Kernel.
->
-> >
-> > > > If this is the case, the proper fix seems to have a GFP_NOT_MOVABLE
-> > > > flag that it would be denying the core mm code to set __GFP_MOVABLE.
-> > >
-> > > We can't tell from the VMA these kinds of details..
-> > >
-> > > It has to go the other direction, evey mmap that might be used as a
-> > > userptr here has to be found and the VMA specially created to allow
-> > > its use. At least that is a kernel only change, but will need people
-> > > with the HW to do this work.
-> >
-> > I think the only reasonable way to keep this working is:
-> > - add a struct dma_buf *vma_tryget_dma_buf(struct vm_area_struct *vma);
->
-> Not sure how an userspace buffer could be mapped to be using it,
-> specially since the buffer may not even be imported/exported
-> from the DRM subsystem, but it could simply be allocated
-> via glibc calloc()/malloc().
->
-> > - add dma-buf export support to fbdev and v4l
->
-> V4L has support for it already.
->
-> > - roll this out everywhere we still need it.
->
-> That's where things are hard. This is not like DRM, where the APIs
-> are called via some open source libraries that are also managed
-> by DRM upstream developers.
->
-> In the case of the media subsystem, while we added a libv4l sometime
-> ago, not all userspace apps use it, as a large part of them used
-> to exist before the addition of the libraries. Also, we're currently
-> trying to deprecate libv4l, at least for embedded systems, in favor
-> of libcamera.
->
-> On media, there are lots of closed source apps that uses the media API
-> directly. Even talking about open source ones, there are lots of
-> different apps, including not only media-specific apps, but also
-> generic ones, like web browsers, which don't use the libraries we
-> wrote.
->
-> An userspace API breakage would take *huge* efforts and will take
-> lots of time to have it merged everywhere. It will cause lots of
-> troubles everywhere.
->
-> > Realistically this just isn't going to happen.
->
-> Why not? Any app developer could already use DMA-BUF if required,
-> as the upstream support was added several years ago.
->
-> > And anything else just
-> > reimplements half of dma-buf,
->
-> It is just the opposite: those uAPIs came years before dma-buf.
-> In other words, it was dma-buf that re-implemented it ;-)
->
-> Now, I agree with you that dma-buf is a way cooler than the past
-> alternatives.
->
-> -
->
-> It sounds to me that you're considering on only one use case of
-> USERPTR: to pass a buffer created from DRM. As far as I'm aware,
-> only embedded userspace applications actually do that.
->
-> Yet, there are a number of other applications that do something like
-> the userptr_capture() function on this code:
->
->         https://git.linuxtv.org/v4l-utils.git/tree/contrib/test/v4l2grab.c
->
-> E. g. using glibc alloc functions like calloc() to allocate memory,
-> passing the user-allocated data to the Kernel via something like this:
->
->         struct v4l2_requestbuffers req;
->         struct v4l2_buffer buf;
->         int n_buffers = 2;
->
->         req.count  = 2;
->         req.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
->         req.memory = V4L2_MEMORY_USERPTR;
->         if (ioctl(fd, VIDIOC_REQBUFS, &req))
->                 return errno;
->
->         for (i = 0; i < req.count; ++i) {
->                 buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
->                 buf.memory = V4L2_MEMORY_USERPTR;
->                 buf.index = i;
->                 buf.m.userptr = (unsigned long)buffers[i].start;
->                 buf.length = buffers[i].length;
->                 if (ioctl(fd, VIDIOC_QBUF, &buf))
->                         return errno;
->         }
->         if (ioctl(fd, VIDIOC_STREAMON, &req.type))
->                 return errno;
->
->         /* some capture loop */
->
->         ioctl(fd, VIDIOC_STREAMOFF, &req.type);
->
-> I can't possibly see *any* security issues with the above code.
->
-> As I said before, VIDIOC_REQBUFS should be checking if the userspace
-> buffers are OK and ensure that their refcounts will be incremented,
-> in order to avoid mm to move the pages used there, freeing the
-> refconts when VIDIOC_STREAMOFF - or close(fd) - is called.
->
-> > which is kinda pointless (you need
-> > minimally refcounting and some way to get at a promise of a permanent
-> > sg list for dma. Plus probably the vmap for kernel cpu access.
->
-> Yeah, refcounting needs to happen.
->
-> Thanks,
-> Mauro
+Hi Alex, as you said before, I only need to set the producer.token
+to NULL on failure such that unregistering the producer will not
+generate a match.
 
+So I wrote a patch (As you said patch v2), as follows:
 
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c
+b/drivers/vfio/pci/vfio_pci_intrs.c
+index 1d9fb25..1969cd0 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -352,12 +352,15 @@ static int vfio_msi_set_vector_signal(struct
+vfio_pci_device *vdev,
+        vdev->ctx[vector].producer.token =3D trigger;
+        vdev->ctx[vector].producer.irq =3D irq;
+        ret =3D irq_bypass_register_producer(&vdev->ctx[vector].producer);
+-       if (unlikely(ret))
++       if (unlikely(ret)) {
+                dev_info(&pdev->dev,
+                "irq bypass producer (token %p) registration fails: %d\n",
+                vdev->ctx[vector].producer.token, ret);
 
+-       vdev->ctx[vector].trigger =3D trigger;
++               eventfd_ctx_put(trigger);
++               vdev->ctx[vector].trigger =3D NULL;
++       } else
++               vdev->ctx[vector].trigger =3D trigger;
+
+        return 0;
+ }
 --
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+
+However, when I use this patch to testing, the following bugs are
+triggered when vfio_msi_disable() called because the msi vector
+is not cleaned up:
+
+vfio_ecap_init: 0000:db:00.0 hiding ecap 0x1e@0x310
+vfio-pci 0000:db:00.0: irq bypass producer (token 000000004409229f)
+registration fails: -16
+------------[ cut here ]------------
+kernel BUG at drivers/pci/msi.c:352!
+invalid opcode: 0000 [#1] SMP NOPTI
+CPU: 55 PID: 9389 Comm: qemu-kvm Kdump: loaded Tainted: G
+E    --------- -  - 4.18.0-193.irqb.r1.el8.x86_64 #1
+Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CTO1WW]-,
+  BIOS -[IVE636Z-2.13]- 07/18/2019
+RIP: 0010:free_msi_irqs+0x180/0x1b0
+Code: 14 85 c0 0f 84 d5 fe ff ff 31 ed eb 0f 83 c5 01 39 6b 14 0f 86
+      c5 fe ff ff 8b 7b 10 01 ef e8 d7 4a c9 ff 48 83 78 70 00 74 e3
+  <0f> 0b 49 8d b5 b0 00 00 00 e8 e2 e3 c9 ff e9 c7 fe ff ff 48
+  8b 7b
+RSP: 0018:ffffaeca4f4bfcd8 EFLAGS: 00010286
+RAX: ffff8bec77441600 RBX: ffff8bbcdb637e40 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 00000000000001ab RDI: ffffffff8ea5b2a0
+RBP: 0000000000000000 R08: ffff8bec7e746828 R09: ffff8bec7e7466a8
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff8bbcde921308
+R13: ffff8bbcde921000 R14: 000000000000000b R15: 0000000000000021
+FS:  00007fd18d7fa700(0000) GS:ffff8bec7f6c0000(0000) knlGS:000000000000000=
+0
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f83650024a0 CR3: 000000476e70c001 CR4: 00000000007626e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ pci_disable_msix+0xf3/0x120
+ pci_free_irq_vectors+0xe/0x20
+ vfio_msi_disable+0x89/0xd0 [vfio_pci]
+ vfio_pci_set_msi_trigger+0x229/0x2d0 [vfio_pci]
+ vfio_pci_ioctl+0x24f/0xdb0 [vfio_pci]
+ ? pollwake+0x74/0x90
+ ? wake_up_q+0x70/0x70
+ do_vfs_ioctl+0xa4/0x630
+ ? __alloc_fd+0x33/0x140
+ ? syscall_trace_enter+0x1d3/0x2c0
+ ksys_ioctl+0x60/0x90
+ __x64_sys_ioctl+0x16/0x20
+ do_syscall_64+0x5b/0x1a0
+ entry_SYSCALL_64_after_hwframe+0x65/0xca
