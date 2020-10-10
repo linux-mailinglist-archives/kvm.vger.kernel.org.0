@@ -2,378 +2,318 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C05DF28A197
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:15:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75EC028A195
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729096AbgJJVqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Oct 2020 17:46:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21304 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731358AbgJJTMF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 10 Oct 2020 15:12:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602357121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1h/nRBk2arluNdKPAJW+4TdB6cCxCnlxIzgG9iIxYr4=;
-        b=PMT/i/Eu92slcUYWKGbEAEjpHq7rL/vhlDbRazTrsthsZlgmABztjmUuvl6BAro4RhoUZF
-        ioImmWobkV5J//OxYemr6GzzPTcWFtGjUpm+GtTtDe22uv/gG0Q9I2FcwaN1UhqvQamT/M
-        dJS64yS5lDUoyAcKcR4tzMKsMFVLBWw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-5UcgNiA4PvyZVop1_vzfXA-1; Sat, 10 Oct 2020 10:26:15 -0400
-X-MC-Unique: 5UcgNiA4PvyZVop1_vzfXA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729547AbgJJVsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Oct 2020 17:48:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52086 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731451AbgJJTXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Oct 2020 15:23:16 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E55F051B1;
-        Sat, 10 Oct 2020 14:26:13 +0000 (UTC)
-Received: from x1.home (ovpn-113-35.phx2.redhat.com [10.3.113.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6728C7665D;
-        Sat, 10 Oct 2020 14:26:03 +0000 (UTC)
-Date:   Sat, 10 Oct 2020 08:26:03 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     gchen chen <gchen.guomin@gmail.com>
-Cc:     guomin_chen@sina.com, Cornelia Huck <cohuck@redhat.com>,
-        Jiang Yi <giangyi@amazon.com>, Marc Zyngier <maz@kernel.org>,
-        Peter Xu <peterx@redhat.com>,
+        by mail.kernel.org (Postfix) with ESMTPSA id EA23C22365;
+        Sat, 10 Oct 2020 16:38:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1602347934;
+        bh=49EtDC0f8LwP6BYJIv8036l4/kegw0KVNNCxs5tOkyA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=jCfqssPCphNw1TWDRIqo7Wk8JSRKG0Or4jmvJ178Z3xTLNNpry/CZISljkDp3KX8t
+         zRWeaovwq0eOa4VRbKgHwFFEnlQAv2B+df+GsGg705yxNnTNAOMAPdi9RFWu3PjN5I
+         EWeCGuuvyIObLUtvi0w6jsSF+UVPIPyqJLszRnFY=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kRHtT-001JIN-Tq; Sat, 10 Oct 2020 17:38:52 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Scull <ascull@google.com>,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Brazdil <dbrazdil@google.com>,
         Eric Auger <eric.auger@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] irqbypass: fix error handle when
- irq_bypass_register_producer() return fails
-Message-ID: <20201010082603.1658be16@x1.home>
-In-Reply-To: <CAEEwsfRDLFxkV5ZwNy9+3N3u9RtiCtErC6CK3k+ft0=jQtTv_A@mail.gmail.com>
-References: <1601470479-26848-1-git-send-email-guomin_chen@sina.com>
-        <20200930080919.1a9c66f8@x1.home>
-        <CAEEwsfRZt=r54SWOqbKvF60zPKu2tiTeQtFcFW14Hp92kT6M9Q@mail.gmail.com>
-        <20201009124423.2a8603f7@x1.home>
-        <CAEEwsfRDLFxkV5ZwNy9+3N3u9RtiCtErC6CK3k+ft0=jQtTv_A@mail.gmail.com>
-Organization: Red Hat
+        Gavin Shan <gshan@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        kernel test robot <lkp@intel.com>,
+        Liu Shixin <liushixin2@huawei.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Tian Tao <tiantao6@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Xiaofei Tan <tanxiaofei@huawei.com>, kernel-team@android.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 updates for 5.10
+Date:   Sat, 10 Oct 2020 17:38:37 +0100
+Message-Id: <20201010163837.1409855-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, ascull@google.com, asteinhauser@google.com, dan.carpenter@oracle.com, dbrazdil@google.com, eric.auger@redhat.com, gshan@redhat.com, james.morse@arm.com, lkp@intel.com, liushixin2@huawei.com, mchehab+huawei@kernel.org, qperret@google.com, steven.price@arm.com, sudeep.holla@arm.com, suzuki.poulose@arm.com, tiantao6@hisilicon.com, will@kernel.org, tanxiaofei@huawei.com, kernel-team@android.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 10 Oct 2020 19:01:30 +0800
-gchen chen <gchen.guomin@gmail.com> wrote:
+Paolo,
 
-> Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2020=E5=B9=B410=E6=
-=9C=8810=E6=97=A5=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=882:44=E5=86=99=E9=81=
-=93=EF=BC=9A
-> >
-> > On Fri, 9 Oct 2020 12:30:04 +0800
-> > gchen chen <gchen.guomin@gmail.com> wrote:
-> > =20
-> > > Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2020=E5=B9=B49=
-=E6=9C=8830=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:09=E5=86=99=E9=
-=81=93=EF=BC=9A =20
-> > > >
-> > > >
-> > > > Please version your postings so we know which one to consider as the
-> > > > current proposal.
-> > > >
-> > > > On Wed, 30 Sep 2020 20:54:39 +0800
-> > > > guomin_chen@sina.com wrote:
-> > > > =20
-> > > > > From: guomin chen <guomin_chen@sina.com>
-> > > > >
-> > > > > When the producer object registration fails,In the future, due to
-> > > > > incorrect matching when unregistering, list_del(&producer->node)
-> > > > > may still be called, then trigger a BUG:
-> > > > >
-> > > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c=
-8cda5) registration fails: -16
-> > > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c=
-8cda5) registration fails: -16
-> > > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c=
-8cda5) registration fails: -16
-> > > > >     ...
-> > > > >     list_del corruption, ffff8f7fb8ba0828->next is LIST_POISON1 (=
-dead000000000100)
-> > > > >     ------------[ cut here ]------------
-> > > > >     kernel BUG at lib/list_debug.c:47!
-> > > > >     invalid opcode: 0000 [#1] SMP NOPTI
-> > > > >     CPU: 29 PID: 3914 Comm: qemu-kvm Kdump: loaded Tainted: G    =
-  E
-> > > > >     -------- - -4.18.0-193.6.3.el8.x86_64 #1
-> > > > >     Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06=
-CTO1WW]-,
-> > > > >     BIOS -[IVE636Z-2.13]- 07/18/2019
-> > > > >     RIP: 0010:__list_del_entry_valid.cold.1+0x12/0x4c
-> > > > >     Code: ce ff 0f 0b 48 89 c1 4c 89 c6 48 c7 c7 40 85 4d 88 e8 8=
-c bc
-> > > > >           ce ff 0f 0b 48 89 fe 48 89 c2 48 c7 c7 d0 85 4d 88 e8 7=
-8 bc
-> > > > >           ce ff <0f> 0b 48 c7 c7 80 86 4d 88 e8 6a bc ce ff 0f 0b=
- 48
-> > > > >           89 f2 48 89 fe
-> > > > >     RSP: 0018:ffffaa9d60197d20 EFLAGS: 00010246
-> > > > >     RAX: 000000000000004e RBX: ffff8f7fb8ba0828 RCX: 000000000000=
-0000
-> > > > >     RDX: 0000000000000000 RSI: ffff8f7fbf4d6a08 RDI: ffff8f7fbf4d=
-6a08
-> > > > >     RBP: 0000000000000000 R08: 000000000000084b R09: 000000000000=
-005d
-> > > > >     R10: 0000000000000000 R11: ffffaa9d60197bd0 R12: ffff8f4fbe86=
-3000
-> > > > >     R13: 00000000000000c2 R14: 0000000000000000 R15: 000000000000=
-0000
-> > > > >     FS:  00007f7cb97fa700(0000) GS:ffff8f7fbf4c0000(0000)
-> > > > >     knlGS:0000000000000000
-> > > > >     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > >     CR2: 00007fcf31da4000 CR3: 0000005f6d404001 CR4: 000000000076=
-26e0
-> > > > >     DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000000=
-0000
-> > > > >     DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000000=
-0400
-> > > > >     PKRU: 55555554
-> > > > >     Call Trace:
-> > > > >         irq_bypass_unregister_producer+0x9b/0xf0 [irqbypass]
-> > > > >         vfio_msi_set_vector_signal+0x8c/0x290 [vfio_pci]
-> > > > >         ? load_fixmap_gdt+0x22/0x30
-> > > > >         vfio_msi_set_block+0x6e/0xd0 [vfio_pci]
-> > > > >         vfio_pci_ioctl+0x218/0xbe0 [vfio_pci]
-> > > > >         ? kvm_vcpu_ioctl+0xf2/0x5f0 [kvm]
-> > > > >         do_vfs_ioctl+0xa4/0x630
-> > > > >         ? syscall_trace_enter+0x1d3/0x2c0
-> > > > >         ksys_ioctl+0x60/0x90
-> > > > >         __x64_sys_ioctl+0x16/0x20
-> > > > >         do_syscall_64+0x5b/0x1a0
-> > > > >         entry_SYSCALL_64_after_hwframe+0x65/0xca
-> > > > >
-> > > > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > > > Cc: Cornelia Huck <cohuck@redhat.com>
-> > > > > Cc: Jiang Yi <giangyi@amazon.com>
-> > > > > Cc: Marc Zyngier <maz@kernel.org>
-> > > > > Cc: Peter Xu <peterx@redhat.com>
-> > > > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > > Cc: Jason Wang <jasowang@redhat.com>
-> > > > > Cc: kvm@vger.kernel.org
-> > > > > Cc: linux-kernel@vger.kernel.org
-> > > > > Signed-off-by: guomin chen <guomin_chen@sina.com>
-> > > > > ---
-> > > > >  drivers/vfio/pci/vfio_pci_intrs.c | 13 +++++++++++--
-> > > > >  drivers/vhost/vdpa.c              |  7 +++++++
-> > > > >  2 files changed, 18 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci=
-/vfio_pci_intrs.c
-> > > > > index 1d9fb25..c371943 100644
-> > > > > --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> > > > > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> > > > > @@ -352,12 +352,21 @@ static int vfio_msi_set_vector_signal(struc=
-t vfio_pci_device *vdev,
-> > > > >       vdev->ctx[vector].producer.token =3D trigger;
-> > > > >       vdev->ctx[vector].producer.irq =3D irq;
-> > > > >       ret =3D irq_bypass_register_producer(&vdev->ctx[vector].pro=
-ducer);
-> > > > > -     if (unlikely(ret))
-> > > > > +     if (unlikely(ret)) {
-> > > > >               dev_info(&pdev->dev,
-> > > > >               "irq bypass producer (token %p) registration fails:=
- %d\n",
-> > > > >               vdev->ctx[vector].producer.token, ret);
-> > > > >
-> > > > > -     vdev->ctx[vector].trigger =3D trigger;
-> > > > > +             kfree(vdev->ctx[vector].name);
-> > > > > +             eventfd_ctx_put(trigger);
-> > > > > +
-> > > > > +             cmd =3D vfio_pci_memory_lock_and_enable(vdev);
-> > > > > +             free_irq(irq, trigger);
-> > > > > +             vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> > > > > +
-> > > > > +             vdev->ctx[vector].trigger =3D NULL;
-> > > > > +     } else
-> > > > > +             vdev->ctx[vector].trigger =3D trigger;
-> > > > >
-> > > > >       return 0;
-> > > > >  } =20
-> > > >
-> > > > Once again, the irq bypass registration cannot cause the vector set=
-up
-> > > > to fail, either by returning an error code or failing to configure =
-the
-> > > > vector while returning success.  It's my assertion that we simply n=
-eed
-> > > > to set the producer.token to NULL on failure such that unregistering
-> > > > the producer will not generate a match, as you've done below.  The
-> > > > vector still works even if this registration fails.
-> > > > =20
-> > > Yes,  the irq bypass registration cannot cause the vector setup to fa=
-il.
-> > > But if I simply set producer.token to NULL when fails, instead of
-> > > cleaning up vector, it will trigger the following BUG:
-> > >
-> > > vfio_ecap_init: 0000:db:00.0 hiding ecap 0x1e@0x310
-> > > vfio-pci 0000:db:00.0: irq bypass producer (token 000000004409229f)
-> > > registration fails: -16
-> > > ------------[ cut here ]------------
-> > > kernel BUG at drivers/pci/msi.c:352!
-> > > invalid opcode: 0000 [#1] SMP NOPTI
-> > > CPU: 55 PID: 9389 Comm: qemu-kvm Kdump: loaded Tainted: G
-> > > E    --------- -  - 4.18.0-193.irqb.r1.el8.x86_64 #1
-> > > Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CTO1WW]-,
-> > >   BIOS -[IVE636Z-2.13]- 07/18/2019
-> > > RIP: 0010:free_msi_irqs+0x180/0x1b0
-> > > Code: 14 85 c0 0f 84 d5 fe ff ff 31 ed eb 0f 83 c5 01 39 6b 14 0f 86
-> > >       c5 fe ff ff 8b 7b 10 01 ef e8 d7 4a c9 ff 48 83 78 70 00 74 e3
-> > >   <0f> 0b 49 8d b5 b0 00 00 00 e8 e2 e3 c9 ff e9 c7 fe ff ff 48
-> > >   8b 7b
-> > > RSP: 0018:ffffaeca4f4bfcd8 EFLAGS: 00010286
-> > > RAX: ffff8bec77441600 RBX: ffff8bbcdb637e40 RCX: 0000000000000000
-> > > RDX: 0000000000000000 RSI: 00000000000001ab RDI: ffffffff8ea5b2a0
-> > > RBP: 0000000000000000 R08: ffff8bec7e746828 R09: ffff8bec7e7466a8
-> > > R10: 0000000000000000 R11: 0000000000000000 R12: ffff8bbcde921308
-> > > R13: ffff8bbcde921000 R14: 000000000000000b R15: 0000000000000021
-> > > FS:  00007fd18d7fa700(0000) GS:ffff8bec7f6c0000(0000) knlGS:000000000=
-0000000
-> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > CR2: 00007f83650024a0 CR3: 000000476e70c001 CR4: 00000000007626e0
-> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > > PKRU: 55555554
-> > > Call Trace:
-> > >  pci_disable_msix+0xf3/0x120
-> > >  pci_free_irq_vectors+0xe/0x20
-> > >  vfio_msi_disable+0x89/0xd0 [vfio_pci]
-> > >  vfio_pci_set_msi_trigger+0x229/0x2d0 [vfio_pci]
-> > >  vfio_pci_ioctl+0x24f/0xdb0 [vfio_pci]
-> > >  ? pollwake+0x74/0x90
-> > >  ? wake_up_q+0x70/0x70
-> > >  do_vfs_ioctl+0xa4/0x630
-> > >  ? __alloc_fd+0x33/0x140
-> > >  ? syscall_trace_enter+0x1d3/0x2c0
-> > >  ksys_ioctl+0x60/0x90
-> > >  __x64_sys_ioctl+0x16/0x20
-> > >  do_syscall_64+0x5b/0x1a0
-> > >  entry_SYSCALL_64_after_hwframe+0x65/0xca =20
-> >
-> > Please post the patch that triggers this, I'm not yet convinced we're
-> > speaking of the same solution.  The user ioctl cannot fail due to the
-> > failure to setup a bypass accelerator, nor can the ioctl return success
-> > without configuring all of the user requested vectors, which is what I
-> > understand the v2 patch above to do.  We simply want to configure the
-> > failed producer such that when we unregister it at user request, we
-> > avoid creating a bogus match.  It's not apparent to me why doing that
-> > would cause any changes to the setup or teardown of the MSI vector in
-> > PCI code.  Thanks,
-> >
-> > Alex
-> > =20
-> Hi Alex, as you said before, I only need to set the producer.token
-> to NULL on failure such that unregistering the producer will not
-> generate a match.
->=20
-> So I wrote a patch (As you said patch v2), as follows:
->=20
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c
-> b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 1d9fb25..1969cd0 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -352,12 +352,15 @@ static int vfio_msi_set_vector_signal(struct
-> vfio_pci_device *vdev,
->         vdev->ctx[vector].producer.token =3D trigger;
->         vdev->ctx[vector].producer.irq =3D irq;
->         ret =3D irq_bypass_register_producer(&vdev->ctx[vector].producer);
-> -       if (unlikely(ret))
-> +       if (unlikely(ret)) {
->                 dev_info(&pdev->dev,
->                 "irq bypass producer (token %p) registration fails: %d\n",
->                 vdev->ctx[vector].producer.token, ret);
->=20
-> -       vdev->ctx[vector].trigger =3D trigger;
-> +               eventfd_ctx_put(trigger);
-> +               vdev->ctx[vector].trigger =3D NULL;
-> +       } else
-> +               vdev->ctx[vector].trigger =3D trigger;
->=20
->         return 0;
->  }
+Here's the (pretty large) set of KVM/arm64 updates for 5.10.
 
-How does this remotely match "only need to set the producer.token to
-NULL on failure"?  What I'm suggesting is:
+This time around, more of the work we're doing on the pKVM front: new
+page table code, new EL2-private data structures, including a per-CPU
+infrastructure. Also, we now have a way for userspace to decide which
+PMU events get counted. Finally, a complete rework of the Spectre
+mitigation, as the existing code had quickly become completely
+unmaintainable.
 
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -352,10 +352,12 @@ static int vfio_msi_set_vector_signal(struct vfio_pci=
-_device *vdev,
-        vdev->ctx[vector].producer.token =3D trigger;
-        vdev->ctx[vector].producer.irq =3D irq;
-        ret =3D irq_bypass_register_producer(&vdev->ctx[vector].producer);
--       if (unlikely(ret))
-+       if (unlikely(ret)) {
-                dev_info(&pdev->dev,
-                "irq bypass producer (token %p) registration fails: %d\n",
-                vdev->ctx[vector].producer.token, ret);
-+               vdev->ctx[vector].producer.token =3D NULL;
-+       }
-=20
-        vdev->ctx[vector].trigger =3D trigger;
-=20
-This is exactly what you proposed for vhost/vdpa.c, so I don't see why
-you're playing with the trigger context, which will clearly cause
-problems.  Thanks,
+A couple of notes:
+- The Spectre stuff is a shared branch between the arm64 and the KVM,
+  so both tries carry the whole thing
 
-Alex
+- The branch is based on -rc4, but would have (badly) conflicted with
+  some of the fixes merged in -rc5. So I did the merge myself, solving
+  the conflicts myself. This may explain why some of the patches have
+  an air of "déjà vu" (the steal-time fixes, for example)...
 
-> --
->=20
-> However, when I use this patch to testing, the following bugs are
-> triggered when vfio_msi_disable() called because the msi vector
-> is not cleaned up:
->=20
-> vfio_ecap_init: 0000:db:00.0 hiding ecap 0x1e@0x310
-> vfio-pci 0000:db:00.0: irq bypass producer (token 000000004409229f)
-> registration fails: -16
-> ------------[ cut here ]------------
-> kernel BUG at drivers/pci/msi.c:352!
-> invalid opcode: 0000 [#1] SMP NOPTI
-> CPU: 55 PID: 9389 Comm: qemu-kvm Kdump: loaded Tainted: G
-> E    --------- -  - 4.18.0-193.irqb.r1.el8.x86_64 #1
-> Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CTO1WW]-,
->   BIOS -[IVE636Z-2.13]- 07/18/2019
-> RIP: 0010:free_msi_irqs+0x180/0x1b0
-> Code: 14 85 c0 0f 84 d5 fe ff ff 31 ed eb 0f 83 c5 01 39 6b 14 0f 86
->       c5 fe ff ff 8b 7b 10 01 ef e8 d7 4a c9 ff 48 83 78 70 00 74 e3
->   <0f> 0b 49 8d b5 b0 00 00 00 e8 e2 e3 c9 ff e9 c7 fe ff ff 48
->   8b 7b
-> RSP: 0018:ffffaeca4f4bfcd8 EFLAGS: 00010286
-> RAX: ffff8bec77441600 RBX: ffff8bbcdb637e40 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 00000000000001ab RDI: ffffffff8ea5b2a0
-> RBP: 0000000000000000 R08: ffff8bec7e746828 R09: ffff8bec7e7466a8
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff8bbcde921308
-> R13: ffff8bbcde921000 R14: 000000000000000b R15: 0000000000000021
-> FS:  00007fd18d7fa700(0000) GS:ffff8bec7f6c0000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f83650024a0 CR3: 000000476e70c001 CR4: 00000000007626e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->  pci_disable_msix+0xf3/0x120
->  pci_free_irq_vectors+0xe/0x20
->  vfio_msi_disable+0x89/0xd0 [vfio_pci]
->  vfio_pci_set_msi_trigger+0x229/0x2d0 [vfio_pci]
->  vfio_pci_ioctl+0x24f/0xdb0 [vfio_pci]
->  ? pollwake+0x74/0x90
->  ? wake_up_q+0x70/0x70
->  do_vfs_ioctl+0xa4/0x630
->  ? __alloc_fd+0x33/0x140
->  ? syscall_trace_enter+0x1d3/0x2c0
->  ksys_ioctl+0x60/0x90
->  __x64_sys_ioctl+0x16/0x20
->  do_syscall_64+0x5b/0x1a0
->  entry_SYSCALL_64_after_hwframe+0x65/0xca
->=20
+The following changes since commit f4d51dffc6c01a9e94650d95ce0104964f8ae822:
 
+  Linux 5.9-rc4 (2020-09-06 17:11:40 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.10
+
+for you to fetch changes up to 4e5dc64c43192b4fd4c96ac150a8f013065f5f5b:
+
+  Merge branches 'kvm-arm64/pt-new' and 'kvm-arm64/pmu-5.9' into kvmarm-master/next (2020-10-02 09:25:55 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 updates for Linux 5.10
+
+- New page table code for both hypervisor and guest stage-2
+- Introduction of a new EL2-private host context
+- Allow EL2 to have its own private per-CPU variables
+- Support of PMU event filtering
+- Complete rework of the Spectre mitigation
+
+----------------------------------------------------------------
+Alexandru Elisei (5):
+      KVM: arm64: Update page shift if stage 2 block mapping not supported
+      KVM: arm64: Try PMD block mappings if PUD mappings are not supported
+      KVM: arm64: Do not flush memslot if FWB is supported
+      KVM: arm64: Add undocumented return values for PMU device control group
+      KVM: arm64: Match PMU error code descriptions with error conditions
+
+Andrew Jones (6):
+      KVM: arm64: pvtime: steal-time is only supported when configured
+      KVM: arm64: pvtime: Fix potential loss of stolen time
+      KVM: arm64: Drop type input from kvm_put_guest
+      KVM: arm64: pvtime: Fix stolen time accounting across migration
+      KVM: Documentation: Minor fixups
+      arm64/x86: KVM: Introduce steal-time cap
+
+Andrew Scull (19):
+      KVM: arm64: Remove __activate_vm wrapper
+      KVM: arm64: Remove hyp_panic arguments
+      KVM: arm64: Remove kvm_host_data_t typedef
+      KVM: arm64: Choose hyp symbol based on context
+      KVM: arm64: Save chosen hyp vector to a percpu variable
+      KVM: arm64: nVHE: Use separate vector for the host
+      KVM: arm64: nVHE: Don't consume host SErrors with ESB
+      KVM: arm64: Introduce hyp context
+      KVM: arm64: Update context references from host to hyp
+      KVM: arm64: Restore hyp when panicking in guest context
+      KVM: arm64: Share context save and restore macros
+      KVM: arm64: nVHE: Switch to hyp context for EL2
+      KVM: arm64: nVHE: Handle hyp panics
+      KVM: arm64: nVHE: Pass pointers consistently to hyp-init
+      smccc: Define vendor hyp owned service call region
+      smccc: Use separate variables for args and results
+      KVM: arm64: nVHE: Migrate hyp interface to SMCCC
+      KVM: arm64: nVHE: Migrate hyp-init to SMCCC
+      KVM: arm64: nVHE: Fix pointers during SMCCC convertion
+
+David Brazdil (10):
+      kvm: arm64: Partially link nVHE hyp code, simplify HYPCOPY
+      kvm: arm64: Move nVHE hyp namespace macros to hyp_image.h
+      kvm: arm64: Only define __kvm_ex_table for CONFIG_KVM
+      kvm: arm64: Remove __hyp_this_cpu_read
+      kvm: arm64: Remove hyp_adr/ldr_this_cpu
+      kvm: arm64: Add helpers for accessing nVHE hyp per-cpu vars
+      kvm: arm64: Duplicate arm64_ssbd_callback_required for nVHE hyp
+      kvm: arm64: Create separate instances of kvm_host_data for VHE/nVHE
+      kvm: arm64: Set up hyp percpu data for nVHE
+      kvm: arm64: Remove unnecessary hyp mappings
+
+Liu Shixin (1):
+      KVM: arm64: vgic-debug: Convert to use DEFINE_SEQ_ATTRIBUTE macro
+
+Marc Zyngier (23):
+      KVM: arm64: Do not try to map PUDs when they are folded into PMD
+      KVM: arm64: Fix address truncation in traces
+      Merge branch 'kvm-arm64/pt-new' into kvmarm-master/next
+      Merge branch 'kvm-arm64/nvhe-hyp-context' into kvmarm-master/next
+      Merge branch 'kvm-arm64/pt-new' into kvmarm-master/next
+      Merge branch 'kvm-arm64/misc-5.10' into kvmarm-master/next
+      arm64: Make use of ARCH_WORKAROUND_1 even when KVM is not enabled
+      arm64: Run ARCH_WORKAROUND_1 enabling code on all CPUs
+      KVM: arm64: Refactor PMU attribute error handling
+      KVM: arm64: Use event mask matching architecture revision
+      KVM: arm64: Add PMU event filtering infrastructure
+      KVM: arm64: Mask out filtered events in PCMEID{0,1}_EL1
+      KVM: arm64: Document PMU filtering API
+      Merge branch 'kvm-arm64/pmu-5.9' into kvmarm-master/next
+      arm64: Run ARCH_WORKAROUND_2 enabling code on all CPUs
+      KVM: arm64: Set CSV2 for guests on hardware unaffected by Spectre-v2
+      KVM: arm64: Simplify handling of ARCH_WORKAROUND_2
+      KVM: arm64: Get rid of kvm_arm_have_ssbd()
+      KVM: arm64: Convert ARCH_WORKAROUND_2 to arm64_get_spectre_v4_state()
+      arm64: Get rid of arm64_ssbd_state
+      Merge remote-tracking branch 'arm64/for-next/ghostbusters' into kvm-arm64/hyp-pcpu
+      Merge branch 'kvm-arm64/hyp-pcpu' into kvmarm-master/next
+      Merge branches 'kvm-arm64/pt-new' and 'kvm-arm64/pmu-5.9' into kvmarm-master/next
+
+Mauro Carvalho Chehab (1):
+      KVM: arm64: Fix some documentation build warnings
+
+Quentin Perret (4):
+      KVM: arm64: Add support for stage-2 write-protect in generic page-table
+      KVM: arm64: Convert write-protect operation to generic page-table API
+      KVM: arm64: Add support for stage-2 cache flushing in generic page-table
+      KVM: arm64: Convert memslot cache-flushing code to generic page-table API
+
+Tian Tao (1):
+      KVM: arm64: Fix inject_fault.c kernel-doc warnings
+
+Will Deacon (33):
+      KVM: arm64: Remove kvm_mmu_free_memory_caches()
+      KVM: arm64: Add stand-alone page-table walker infrastructure
+      KVM: arm64: Add support for creating kernel-agnostic stage-1 page tables
+      KVM: arm64: Use generic allocator for hyp stage-1 page-tables
+      KVM: arm64: Add support for creating kernel-agnostic stage-2 page tables
+      KVM: arm64: Add support for stage-2 map()/unmap() in generic page-table
+      KVM: arm64: Convert kvm_phys_addr_ioremap() to generic page-table API
+      KVM: arm64: Convert kvm_set_spte_hva() to generic page-table API
+      KVM: arm64: Convert unmap_stage2_range() to generic page-table API
+      KVM: arm64: Add support for stage-2 page-aging in generic page-table
+      KVM: arm64: Convert page-aging and access faults to generic page-table API
+      KVM: arm64: Add support for relaxing stage-2 perms in generic page-table code
+      KVM: arm64: Convert user_mem_abort() to generic page-table API
+      KVM: arm64: Check the pgt instead of the pgd when modifying page-table
+      KVM: arm64: Remove unused page-table code
+      KVM: arm64: Remove unused 'pgd' field from 'struct kvm_s2_mmu'
+      KVM: arm64: Don't constrain maximum IPA size based on host configuration
+      arm64: Remove Spectre-related CONFIG_* options
+      KVM: arm64: Replace CONFIG_KVM_INDIRECT_VECTORS with CONFIG_RANDOMIZE_BASE
+      KVM: arm64: Simplify install_bp_hardening_cb()
+      arm64: Rename ARM64_HARDEN_BRANCH_PREDICTOR to ARM64_SPECTRE_V2
+      arm64: Introduce separate file for spectre mitigations and reporting
+      arm64: Rewrite Spectre-v2 mitigation code
+      arm64: Group start_thread() functions together
+      arm64: Treat SSBS as a non-strict system feature
+      arm64: Rename ARM64_SSBD to ARM64_SPECTRE_V4
+      arm64: Move SSBD prctl() handler alongside other spectre mitigation code
+      arm64: Rewrite Spectre-v4 mitigation code
+      KVM: arm64: Allow patching EL2 vectors even with KASLR is not enabled
+      arm64: Pull in task_stack_page() to Spectre-v4 mitigation code
+      arm64: Add support for PR_SPEC_DISABLE_NOEXEC prctl() option
+      KVM: arm64: Pass level hint to TLBI during stage-2 permission fault
+      KVM: arm64: Ensure user_mem_abort() return value is initialised
+
+Xiaofei Tan (1):
+      KVM: arm64: Fix doc warnings in mmu code
+
+ Documentation/virt/kvm/api.rst            |   22 +-
+ Documentation/virt/kvm/devices/vcpu.rst   |   57 +-
+ arch/arm64/Kconfig                        |   26 -
+ arch/arm64/include/asm/assembler.h        |   29 +-
+ arch/arm64/include/asm/cpucaps.h          |    4 +-
+ arch/arm64/include/asm/cpufeature.h       |   24 -
+ arch/arm64/include/asm/hyp_image.h        |   36 +
+ arch/arm64/include/asm/kvm_asm.h          |  192 +++-
+ arch/arm64/include/asm/kvm_emulate.h      |   14 -
+ arch/arm64/include/asm/kvm_host.h         |   77 +-
+ arch/arm64/include/asm/kvm_hyp.h          |    9 +-
+ arch/arm64/include/asm/kvm_mmu.h          |  341 +-----
+ arch/arm64/include/asm/kvm_pgtable.h      |  309 +++++
+ arch/arm64/include/asm/kvm_ptrauth.h      |    6 +-
+ arch/arm64/include/asm/mmu.h              |   11 +-
+ arch/arm64/include/asm/percpu.h           |   28 +-
+ arch/arm64/include/asm/pgtable-hwdef.h    |   24 -
+ arch/arm64/include/asm/pgtable-prot.h     |   19 -
+ arch/arm64/include/asm/processor.h        |   44 +-
+ arch/arm64/include/asm/spectre.h          |   32 +
+ arch/arm64/include/asm/stage2_pgtable.h   |  215 ----
+ arch/arm64/include/uapi/asm/kvm.h         |   25 +
+ arch/arm64/kernel/Makefile                |    3 +-
+ arch/arm64/kernel/cpu_errata.c            |  487 +-------
+ arch/arm64/kernel/cpufeature.c            |   51 +-
+ arch/arm64/kernel/entry.S                 |   10 +-
+ arch/arm64/kernel/hibernate.c             |    6 +-
+ arch/arm64/kernel/image-vars.h            |    5 -
+ arch/arm64/kernel/process.c               |   23 +-
+ arch/arm64/kernel/proton-pack.c           |  792 +++++++++++++
+ arch/arm64/kernel/ssbd.c                  |  129 ---
+ arch/arm64/kernel/suspend.c               |    3 +-
+ arch/arm64/kernel/vmlinux.lds.S           |   13 +
+ arch/arm64/kvm/Kconfig                    |    3 -
+ arch/arm64/kvm/Makefile                   |    2 +-
+ arch/arm64/kvm/arm.c                      |  113 +-
+ arch/arm64/kvm/hyp.S                      |   34 -
+ arch/arm64/kvm/hyp/Makefile               |    3 +-
+ arch/arm64/kvm/hyp/entry.S                |   95 +-
+ arch/arm64/kvm/hyp/hyp-entry.S            |  107 +-
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h |    4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h   |   48 +-
+ arch/arm64/kvm/hyp/nvhe/.gitignore        |    2 +
+ arch/arm64/kvm/hyp/nvhe/Makefile          |   62 +-
+ arch/arm64/kvm/hyp/nvhe/host.S            |  187 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S        |   67 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c        |  117 ++
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S         |   19 +
+ arch/arm64/kvm/hyp/nvhe/switch.c          |   52 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c             |    2 -
+ arch/arm64/kvm/hyp/pgtable.c              |  892 +++++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c           |   35 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |    4 +-
+ arch/arm64/kvm/hypercalls.c               |   33 +-
+ arch/arm64/kvm/inject_fault.c             |    1 +
+ arch/arm64/kvm/mmu.c                      | 1759 +++++------------------------
+ arch/arm64/kvm/pmu-emul.c                 |  195 +++-
+ arch/arm64/kvm/pmu.c                      |   13 +-
+ arch/arm64/kvm/psci.c                     |   74 +-
+ arch/arm64/kvm/pvtime.c                   |   29 +-
+ arch/arm64/kvm/reset.c                    |   44 +-
+ arch/arm64/kvm/sys_regs.c                 |    8 +-
+ arch/arm64/kvm/trace_arm.h                |   16 +-
+ arch/arm64/kvm/trace_handle_exit.h        |    6 +-
+ arch/arm64/kvm/vgic/vgic-debug.c          |   24 +-
+ arch/arm64/kvm/vgic/vgic-v3.c             |    4 +-
+ arch/x86/kvm/x86.c                        |    3 +
+ include/kvm/arm_pmu.h                     |    5 +
+ include/linux/arm-smccc.h                 |   74 +-
+ include/linux/kvm_host.h                  |   31 +-
+ include/uapi/linux/kvm.h                  |    1 +
+ 71 files changed, 3658 insertions(+), 3576 deletions(-)
+ create mode 100644 arch/arm64/include/asm/hyp_image.h
+ create mode 100644 arch/arm64/include/asm/kvm_pgtable.h
+ create mode 100644 arch/arm64/include/asm/spectre.h
+ create mode 100644 arch/arm64/kernel/proton-pack.c
+ delete mode 100644 arch/arm64/kernel/ssbd.c
+ delete mode 100644 arch/arm64/kvm/hyp.S
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/.gitignore
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/host.S
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp-main.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+ create mode 100644 arch/arm64/kvm/hyp/pgtable.c
