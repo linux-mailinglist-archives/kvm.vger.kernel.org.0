@@ -2,205 +2,409 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37D9528A19D
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:18:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F8B828A19C
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:18:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730037AbgJJVwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Oct 2020 17:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41772 "EHLO
+        id S1729982AbgJJVwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Oct 2020 17:52:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731184AbgJJTxO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Oct 2020 15:53:14 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBD0C0613E6;
-        Sat, 10 Oct 2020 03:06:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GHZDtUt4W1bVB/qw218w/S2pc/jqhfdX3ImjBozjRww=; b=am5bVJGWF2zRpCBtu2kTilOYGh
-        EancgJ/SLTMQ9DUQkgCZa1Rg8gOkzj60wIe2JiW/K0jouAYqa01fOfmiyO3NpbdyeWgRvoxZhdIMW
-        i13hnOPauDl0syhKGE4biOhjX8SOHcFPRaYWF4QKybWoMYUJXFiQ2r/qFhffx4ueAPe8IKXtoD9uf
-        p/Z32V/H4NXzm4uSDp4z8ueE0b9jc8UrPH8yHH5r+eUS4NGxb8/MVT6g2RtvLKB7vho6WsMM0L+lY
-        Gtz1hTVBQIZeYf10SF1iDYOiEcEhLLDUDGH+aR1iQ/noW4/9YQC85pPyBKgXXHarxX3Wxa0hJ6zNh
-        z4VagU1g==;
-Received: from dyn-229.woodhou.se ([90.155.92.229] helo=u3832b3a9db3152.infradead.org)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kRBlq-0007Ev-MP; Sat, 10 Oct 2020 10:06:34 +0000
-Message-ID: <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org>
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Date:   Sat, 10 Oct 2020 11:06:32 +0100
-In-Reply-To: <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
-References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org>
-         <20201007122046.1113577-1-dwmw2@infradead.org>
-         <20201007122046.1113577-5-dwmw2@infradead.org>
-         <87blhcx6qz.fsf@nanos.tec.linutronix.de>
-         <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org>
-         <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org>
-         <87362owhcb.fsf@nanos.tec.linutronix.de>
-         <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org>
-         <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-CVnF36jvfens/1iyj624"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        with ESMTP id S1730994AbgJJTw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Oct 2020 15:52:26 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE18C0613AB
+        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 03:54:01 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id m11so11315305otk.13
+        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 03:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kid7J+A/Wd8FKFLCdGKgzMsKnx5ZLnDQ6KOmisXcIDs=;
+        b=hetiOf5IFXbFkUtjTPDACRx6O8/TnI/VjswYmbO3VBhYstT6NqT9X2x3eFvybc6gsJ
+         EE8+AzEu4BQcajXzp1ZL5WHAnPRAnNJLzMT5F/8QAf7upL/UVuBJpK1bpolUyxhHB3TP
+         VM+f548v/CmVhdRxf2iQzc0a1x8DbAaqx/KpI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kid7J+A/Wd8FKFLCdGKgzMsKnx5ZLnDQ6KOmisXcIDs=;
+        b=KBzbsk7M02CbcAluDM/djOVnJ2JRDLoQOSMjAxNbC/+9rF/TVB2MxX/+SWuSlCED7S
+         tsOC+akrzLA+S45dm3U6YGNJmKiLaeXrd/5bN+Jj4XeFxDKk6umslchJBPktbjVZzMrj
+         CeWs/U3r2YaMUoHRy1LQqLM8bexIx/r+EQkhREG69Jbbf+EqFnGTC2j4rqiKiY8DwGVq
+         26APUojFRj8NrCc0/dAP1jd4uHMV6Xmrs8Y1Ffb+EIN7/g20o0uCfeluvJhfCA2CocBb
+         HYGPQIVyoS3KuPYONi+R35HtiTdlCbJfTNGYA+lJ+D72y3By9Uf7Uwzg6kUPpdeYNEFO
+         ss7A==
+X-Gm-Message-State: AOAM532NsvTZnWw432z9448QOLwEggRiAZ8U7MCRg15AdSv9tLMJ0g/J
+        rk0msFEu7eJNLrt2VrsyH8J52kTtm/jI4dxnVfVz2Q==
+X-Google-Smtp-Source: ABdhPJx+JdEHfdRxaOV1K2wKGEH7PZhb9Ho2MShNadWAXfbctrgpIK/MYT0ZPOky7BdDt7uP2jc1R24HQzAp7RJ+t70=
+X-Received: by 2002:a05:6830:8b:: with SMTP id a11mr568933oto.303.1602327240268;
+ Sat, 10 Oct 2020 03:54:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
+ <20201009075934.3509076-10-daniel.vetter@ffwll.ch> <20201009123421.67a80d72@coco.lan>
+ <20201009122111.GN5177@ziepe.ca> <20201009143723.45609bfb@coco.lan>
+ <20201009124850.GP5177@ziepe.ca> <CAKMK7uF-hrSwzFQkp6qEP88hM1Qg8TMQOunuRHh=f2+D8MaMRg@mail.gmail.com>
+ <20201010112122.587f9945@coco.lan>
+In-Reply-To: <20201010112122.587f9945@coco.lan>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Sat, 10 Oct 2020 12:53:49 +0200
+Message-ID: <CAKMK7uEKP5UMKeQHkTHWYUJkp=mz-Hvh-fJZy1KP3kT2xHpHrg@mail.gmail.com>
+Subject: Re: [PATCH v2 09/17] mm: Add unsafe_follow_pfn
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Mauro,
 
---=-CVnF36jvfens/1iyj624
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+You might want to read the patches more carefully, because what you're
+demanding is what my patches do. Short summary:
 
-On Fri, 2020-10-09 at 01:27 +0200, Thomas Gleixner wrote:
-> On Thu, Oct 08 2020 at 22:39, David Woodhouse wrote:
-> > On Thu, 2020-10-08 at 23:14 +0200, Thomas Gleixner wrote:
-> > > >=20
-> > > > (We'd want the x86_vector_domain to actually have an MSI compose
-> > > > function in the !CONFIG_PCI_MSI case if we did this, of course.)
-> > >=20
-> > > The compose function and the vector domain wrapper can simply move to
-> > > vector.c
-> >=20
-> > I ended up putting __irq_msi_compose_msg() into apic.c and that way I
-> > can make virt_ext_dest_id static in that file.
-> >=20
-> > And then I can move all the HPET-MSI support into hpet.c too.
->=20
-> Works for me.
->=20
-> > https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/ext=
-_dest_id
->=20
-> For the next submission, can you please
->=20
->  - pick up the -ENODEV changes for HPET/IOAPIC which I posted earlier
+- if STRICT_FOLLOW_PFN is set:
+a) normal memory is handled as-is (i.e. your example works) through
+the addition of FOLL_LONGTERM. This is the "pin the pages correctly"
+approach you're demanding
+b) for non-page memory (zerocopy sharing before dma-buf was upstreamed
+is the only use-case for this) it is correctly rejected with -EINVAL
 
-I think the world will be a nicer place if HPET and IOAPIC have their
-own struct device and their drivers can just use dev_get_msi_domain().
+- if you do have blobby userspace which requires the zero-copy using
+userptr to work, and doesn't have any of the fallbacks implemented
+that you describe, this would be a regression. That's why
+STRICT_FOLLOW_PFN can be unset. And yes there's a real security issue
+in this usage, Marek also confirmed that the removal of the vma copy
+code a few years ago essentially broke even the weak assumptions that
+made the code work 10+ years ago when it was merged.
 
-The IRQ remapping drivers already plug into the device-add notifier and
-can fill in the appropriate MSI domain just like they do=C2=B9 for PCI and
-ACPI devices.
+so tdlr; Everything you described will keep working even with the new
+flag set, and everything you demand must be implemented _is_
+implemented in this patch series.
 
-Using platform_add_bundle() for HPET looks trivial enough; I'll have a
-play with that and then do IOAPIC too if/when the initialisation order
-and hotplug handling all works out OK to install the correct
-msi_domain.
+Also please keep in mind that we are _not_ talking about the general
+userptr support that was merge ~20 years ago. This patch series here
+is _only_ about the zerocpy userptr support merged with 50ac952d2263
+("[media] videobuf2-dma-sg: Support io userptr operations on io
+memory") in 2013.
 
---=20
-dwmw2
+Why this hack was merged in 2013 when we merged dma-buf almost 2 years
+before that I have no idea about. Imo that patch simply should never
+have landed, and instead dma-buf support prioritized.
 
-=C2=B9 Yeah, I know they don't do it directly; it's done in=20
-  pcibios_add_device(). But maybe they should? Because yeah, I also=20
-  know they don't do it for ACPI devices either, because nothing does,
-  and IRQ remapping on ANDD-listed devices doesn't work AFAICT.
+Cheers, Daniel
 
 
---=-CVnF36jvfens/1iyj624
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+On Sat, Oct 10, 2020 at 11:21 AM Mauro Carvalho Chehab
+<mchehab+huawei@kernel.org> wrote:
+>
+> Em Fri, 9 Oct 2020 19:52:05 +0200
+> Daniel Vetter <daniel.vetter@ffwll.ch> escreveu:
+>
+> > On Fri, Oct 9, 2020 at 2:48 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Fri, Oct 09, 2020 at 02:37:23PM +0200, Mauro Carvalho Chehab wrote:
+> > >
+> > > > I'm not a mm/ expert, but, from what I understood from Daniel's patch
+> > > > description is that this is unsafe *only if*  __GFP_MOVABLE is used.
+> > >
+> > > No, it is unconditionally unsafe. The CMA movable mappings are
+> > > specific VMAs that will have bad issues here, but there are other
+> > > types too.
+>
+> I didn't check the mm dirty details, but I strongly suspect that the mm
+> code has a way to prevent moving a mmapped page while it is still in usage.
+>
+> If not, then the entire movable pages concept sounds broken to me, and
+> has to be fixed at mm subsystem.
+>
+> > >
+> > > The only way to do something at a VMA level is to have a list of OK
+> > > VMAs, eg because they were creatd via a special mmap helper from the
+> > > media subsystem.
+>
+> I'm not sure if I'm following you on that. The media API can work with
+> different ways of sending buffers to userspace:
+>
+>         - read();
+>
+>         - using the overlay mode. This interface is deprecated in
+>           practice, being replaced by DMABUF. Only a few older hardware
+>           supports it, and it depends on an special X11 helper driver
+>           for it to work.
+>
+>         - via DMABUF:
+>                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/dmabuf.html
+>
+>         - via mmap, using a mmap helper:
+>                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/mmap.html
+>
+>         - via mmap, using userspace-provided pointers:
+>                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/userp.html
+>
+> The existing open-source programs usually chose one or more of the above
+> modes. if the Kernel driver returns -EINVAL when an mmapped streaming I/O
+> mode is not supported, userspace has to select a different method.
+>
+> Most userspace open source programs have fallback support: if one
+> mmap I/O method fails, it selects another one, although this is not
+> a mandatory requirement. I found (and fixed) a few ones that were
+> relying exclusively on userptr support, but I didn't make a
+> comprehensive check.
+>
+> Also there are a number of relevant closed-source apps that we have no
+> idea about what methods they use, like Skype, and other similar
+> videoconferencing programs. Breaking support for those, specially at
+> a time where people are relying on it in order to participate on
+> conferences and doing internal meetings is a **very bad** idea.
+>
+> So, whatever solution is taken, it should not be dumping warning
+> messages at the system and tainting the Kernel, but, instead, checking
+> if the userspace request is valid or not. If it is invalid, return the
+> proper error code via the right V4L2 ioctl, in order to let userspace
+> choose a different method. I the request is valid, refcount the pages
+> for them to not be moved while they're still in usage.
+>
+> -
+>
+> Let me provide some background about how things work at the media
+> subsytem. If you want to know more, the userspace-provided memory
+> mapped pointers work is described here:
+>
+>         https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/userp.html#userp
+>
+> Basically, userspace calls either one of those ioctls:
+>
+>         VIDIOC_CREATE_BUFS:
+>                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/vidioc-create-bufs.html
+>
+> Which is translated into a videobuf2 call to: vb2_ioctl_create_bufs()
+>
+>         VIDIOC_REQBUFS
+>                 https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/vidioc-reqbufs.html#vidioc-reqbufs
+>
+> Which is translated into a videobuf2 call to: vb2_ioctl_reqbufs()
+>
+> Both internally calls vb2_verify_memory_type(), which is responsible
+> for checking if the provided pointers are OK for the usage and/or do
+> all necessary page allocations, and taking care of any special
+> requirements. This could easily have some additional checks to
+> verify if the requested VMA address has pages that are movable or
+> not, ensuring that ensure that the VMA is OK, and locking them in
+> order to prevent the mm code to move such pages while they are in
+> usage by the media subsystem.
+>
+> Now, as I said before, I don't know the dirty details about how
+> to lock those pages at the mm subsystem in order to avoid it
+> to move the used pages. Yet, when vb2_create_framevec()
+> is called, the check if VMA is OK should already be happened
+> at vb2_verify_memory_type().
+>
+> -
+>
+> It should be noticed that the dirty hack added by patch 09/17
+> and 10/17 affects *all* types of memory allocations at V4L2,
+> as this kAPI is called by the 3 different memory models
+> supported at the media subsystem:
+>
+>         drivers/media/common/videobuf2/videobuf2-vmalloc.c
+>         drivers/media/common/videobuf2/videobuf2-dma-contig.c
+>         drivers/media/common/videobuf2/videobuf2-dma-sg.c
+>
+> In other words, with this code:
+>
+>         int unsafe_follow_pfn(struct vm_area_struct *vma, unsigned long address,
+>                 unsigned long *pfn)
+>         {
+>         #ifdef CONFIG_STRICT_FOLLOW_PFN
+>                 pr_info("unsafe follow_pfn usage rejected, see CONFIG_STRICT_FOLLOW_PFN\n");
+>                 return -EINVAL;
+>         #else
+>                 WARN_ONCE(1, "unsafe follow_pfn usage\n");
+>                 add_taint(TAINT_USER, LOCKDEP_STILL_OK);
+>
+>                 return follow_pfn(vma, address, pfn);
+>         #endif
+>
+> you're unconditionally breaking the media userspace API support not
+> only for embedded systems that could be using userptr instead of
+> DMA_BUF, but also for *all* video devices, including USB cameras.
+>
+> This is **NOT** an acceptable solution.
+>
+> So, I stand my NACK to this approach.
+>
+> > > > Well, no drivers inside the media subsystem uses such flag, although
+> > > > they may rely on some infrastructure that could be using it behind
+> > > > the bars.
+> > >
+> > > It doesn't matter, nothing prevents the user from calling media APIs
+> > > on mmaps it gets from other subsystems.
+> >
+> > I think a good first step would be to disable userptr of non struct
+> > page backed storage going forward for any new hw support. Even on
+> > existing drivers. dma-buf sharing has been around for long enough now
+> > that this shouldn't be a problem. Unfortunately right now this doesn't
+> > seem to exist, so the entire problem keeps getting perpetuated.
+>
+> Well, the media uAPI does support DMABUF (both import and export):
+>
+>         https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/dmabuf.html
+>         https://linuxtv.org/downloads/v4l-dvb-apis-new/userspace-api/v4l/vidioc-expbuf.html#vidioc-expbuf
+>
+> And I fully agree that newer programs should use DMABUF when sharing
+> buffers with DRM subsystem, but that's not my main concern.
+>
+> What I do want is to not break userspace support nor to taint the Kernel
+> due to a valid uAPI call.
+>
+> A valid uAPI call should check if the parameters passed though it are
+> valid. If they are, it should handle. Otherwise, it should return
+> -EINVAL, without tainting the Kernel or printing warning messages.
+>
+> The approach took by patches 09/17 and 10/17 doesn't do that.
+> Instead, they just unconditionally breaks the media uAPI.
+>
+> What should be done, instead, is to drop patch 10/17, and work on
+> a way for the code inside vb2_create_framevec() to ensure that, if
+> USERPTR is used, the memory pages will be properly locked while the
+> driver is using, returning -EINVAL only if there's no way to proceed,
+> without tainting the Kernel.
+>
+> >
+> > > > If this is the case, the proper fix seems to have a GFP_NOT_MOVABLE
+> > > > flag that it would be denying the core mm code to set __GFP_MOVABLE.
+> > >
+> > > We can't tell from the VMA these kinds of details..
+> > >
+> > > It has to go the other direction, evey mmap that might be used as a
+> > > userptr here has to be found and the VMA specially created to allow
+> > > its use. At least that is a kernel only change, but will need people
+> > > with the HW to do this work.
+> >
+> > I think the only reasonable way to keep this working is:
+> > - add a struct dma_buf *vma_tryget_dma_buf(struct vm_area_struct *vma);
+>
+> Not sure how an userspace buffer could be mapped to be using it,
+> specially since the buffer may not even be imported/exported
+> from the DRM subsystem, but it could simply be allocated
+> via glibc calloc()/malloc().
+>
+> > - add dma-buf export support to fbdev and v4l
+>
+> V4L has support for it already.
+>
+> > - roll this out everywhere we still need it.
+>
+> That's where things are hard. This is not like DRM, where the APIs
+> are called via some open source libraries that are also managed
+> by DRM upstream developers.
+>
+> In the case of the media subsystem, while we added a libv4l sometime
+> ago, not all userspace apps use it, as a large part of them used
+> to exist before the addition of the libraries. Also, we're currently
+> trying to deprecate libv4l, at least for embedded systems, in favor
+> of libcamera.
+>
+> On media, there are lots of closed source apps that uses the media API
+> directly. Even talking about open source ones, there are lots of
+> different apps, including not only media-specific apps, but also
+> generic ones, like web browsers, which don't use the libraries we
+> wrote.
+>
+> An userspace API breakage would take *huge* efforts and will take
+> lots of time to have it merged everywhere. It will cause lots of
+> troubles everywhere.
+>
+> > Realistically this just isn't going to happen.
+>
+> Why not? Any app developer could already use DMA-BUF if required,
+> as the upstream support was added several years ago.
+>
+> > And anything else just
+> > reimplements half of dma-buf,
+>
+> It is just the opposite: those uAPIs came years before dma-buf.
+> In other words, it was dma-buf that re-implemented it ;-)
+>
+> Now, I agree with you that dma-buf is a way cooler than the past
+> alternatives.
+>
+> -
+>
+> It sounds to me that you're considering on only one use case of
+> USERPTR: to pass a buffer created from DRM. As far as I'm aware,
+> only embedded userspace applications actually do that.
+>
+> Yet, there are a number of other applications that do something like
+> the userptr_capture() function on this code:
+>
+>         https://git.linuxtv.org/v4l-utils.git/tree/contrib/test/v4l2grab.c
+>
+> E. g. using glibc alloc functions like calloc() to allocate memory,
+> passing the user-allocated data to the Kernel via something like this:
+>
+>         struct v4l2_requestbuffers req;
+>         struct v4l2_buffer buf;
+>         int n_buffers = 2;
+>
+>         req.count  = 2;
+>         req.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+>         req.memory = V4L2_MEMORY_USERPTR;
+>         if (ioctl(fd, VIDIOC_REQBUFS, &req))
+>                 return errno;
+>
+>         for (i = 0; i < req.count; ++i) {
+>                 buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+>                 buf.memory = V4L2_MEMORY_USERPTR;
+>                 buf.index = i;
+>                 buf.m.userptr = (unsigned long)buffers[i].start;
+>                 buf.length = buffers[i].length;
+>                 if (ioctl(fd, VIDIOC_QBUF, &buf))
+>                         return errno;
+>         }
+>         if (ioctl(fd, VIDIOC_STREAMON, &req.type))
+>                 return errno;
+>
+>         /* some capture loop */
+>
+>         ioctl(fd, VIDIOC_STREAMOFF, &req.type);
+>
+> I can't possibly see *any* security issues with the above code.
+>
+> As I said before, VIDIOC_REQBUFS should be checking if the userspace
+> buffers are OK and ensure that their refcounts will be incremented,
+> in order to avoid mm to move the pages used there, freeing the
+> refconts when VIDIOC_STREAMOFF - or close(fd) - is called.
+>
+> > which is kinda pointless (you need
+> > minimally refcounting and some way to get at a promise of a permanent
+> > sg list for dma. Plus probably the vmap for kernel cpu access.
+>
+> Yeah, refcounting needs to happen.
+>
+> Thanks,
+> Mauro
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDEwMTAwNjMyWjAvBgkqhkiG9w0BCQQxIgQgqYqxlJa1tp0g0785H53/zgFfqw2jvELbnYWrhs0K
-w/kwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAEJUJbGYteOYcYcdjf1QXTt8iWQ7y6R7vqYdikjoDXKgq6hbn988Jf2iojIVVdeu
-SrspxHhhr52PZWog0NADf7z5tovu30Km7ZUfPWb56Ikkshl0ltmWFGHbFHVdBN9hYjDPSLZPKmzO
-3Wa/gazOCWF0/b8KAB77tSkF7cFFiCIgtIoG3LtVNjRWC8UVmepk/eSNCL8VsrICCfkJqS/Ib1Bf
-X2R3Cw9Y9lfbEHXyOeU/2sohvHfFsO/zLhYUUSlX9RsY24J/BMLD8OUIvpuW8GKxyIvSTyjwLVPw
-tfX4jeoQpGSp6/iIbgY2pCrtuEa9Iqke5KA7dgiWouLtJM1+I5YAAAAAAAA=
 
 
---=-CVnF36jvfens/1iyj624--
-
+--
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
