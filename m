@@ -2,351 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B26828A1A1
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:18:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26CC928A18F
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:06:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730272AbgJJVyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Oct 2020 17:54:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41762 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731143AbgJJTxc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Oct 2020 15:53:32 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A37E2C0613B2;
-        Sat, 10 Oct 2020 04:01:10 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id x7so6578182eje.8;
-        Sat, 10 Oct 2020 04:01:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=s/JjXOEeRSJGaAuAZRbhKPqxB460/d1BYOMgsWsZowU=;
-        b=N3tDPyTp2ltI3u0R/jUXaTU5h6XPGdeMA0C8Y48TIIWyRRIKQGJBFH0i49OTIpWbLq
-         2Nm20aAi/o6+uHu+dFD4ZvKysN8h6DOW9wwSv1GUidCGpNTxgnncgLCdRsYw22vAJJux
-         scY75W7+pImxQzik2oj/2EtAaLmFpSKmvFw4FEp/r3e1S769/vlucFY22EZAdHwGDf1W
-         5UzXHqZPW/NwSHHQS+nodQzmJFsJnXe7IuiHmAC19+26m/bQcuwuW9jYYW4VzmawkDXT
-         b3GkVrnnm/QuM+8OVhZxZsQBPxUmiytsoT02gRdT1GLScJkrDSIKN5P+N8j7yigMJiMT
-         +tbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=s/JjXOEeRSJGaAuAZRbhKPqxB460/d1BYOMgsWsZowU=;
-        b=s9reMOuLOLk6ipdmldajCxjnF/VICjPZhm1Imrlj1zN9jqLKaeWXo8JDlfqQNYLy8t
-         2AQrpFeYxcd7DMtDs30lxjwJQaHB28HS6YqKvY+pPA9+Sthgx17P9uknClhucWLJCOC1
-         M5U9nBCFL3b8zkxrXvimxb+tjnPh5U2U7lLYK/DdWOHuXCHofF3ha1OpW0Eh4965stfw
-         y0E5xobLeItRq2py3zrLUBhcct/SxXikWPT9rb+IGuUiZmEMAErpwPd0CuktJyvX8uiI
-         iVVaStBOCLDoxgErl5r7ksxUOEndn6VzggbgP8LNVqe3hKs4whOA4an1BoF7nUaOJfvm
-         QzLA==
-X-Gm-Message-State: AOAM533TlHcHITqZ2u7tKqIL7ABdeNTcWftw6RhiQ+7yEtXYIMzATT0a
-        1M5vMAS2ii5N71JYDtSvgfMrAlR6nEmvkYC2NZY=
-X-Google-Smtp-Source: ABdhPJxV9IL3SmuV6bzqnSPq1dRpFWaSbyDOxQSb+7YZy7shPJXmaN/Mhtfal9R/3vJ5XcHcrpbqpfSKsK+yOWkkuvI=
-X-Received: by 2002:a17:906:9417:: with SMTP id q23mr18534457ejx.536.1602327669254;
- Sat, 10 Oct 2020 04:01:09 -0700 (PDT)
+        id S1726591AbgJJVnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Oct 2020 17:43:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45754 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730107AbgJJSpS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 10 Oct 2020 14:45:18 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09ABWvjj162390
+        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 07:36:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=in-reply-to : subject :
+ from : to : cc : date : mime-version : references :
+ content-transfer-encoding : content-type : message-id; s=pp1;
+ bh=NiDLo4pOxkTOHNh379y2lMt59tGJeK9BGhibE+AHe30=;
+ b=fFl+sWZ60CJNW5vj7Uw0QdIFBZaJLDIK+TmFY7+uXdPQEExbAUVKU05YhKg5dS5u6J9M
+ gRTcbWK1ehAiHgiW0QiEErv4vh+5MOV1iJMmz3AgZqVrCWi+Nh1nNGlGLl5qNxYu9TT3
+ rsErWvzJTnT/TvD/yGmIkQ5cIJnW2dxyfP5KEerqQF50430xLTdRCdzrzGOBj/IVBjpb
+ ZIGntFQpbgC01amsKXwfy1cB65UwCiqnbdgLT6Z6Qd+CSe7yV4n3BXy+qSd8xdiYdQTK
+ an7SA2yY6csjDSnstIEkYdPhg6mYvKJGwGGY1NoLkcuzdqKyvDxx/5UGYpv3tzPn6Oq9 ZA== 
+Received: from smtp.notes.na.collabserv.com (smtp.notes.na.collabserv.com [192.155.248.91])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 343bxtr8yk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 07:36:56 -0400
+Received: from localhost
+        by smtp.notes.na.collabserv.com with smtp.notes.na.collabserv.com ESMTP
+        for <kvm@vger.kernel.org> from <BMT@zurich.ibm.com>;
+        Sat, 10 Oct 2020 11:36:55 -0000
+Received: from us1a3-smtp05.a3.dal06.isc4sb.com (10.146.71.159)
+        by smtp.notes.na.collabserv.com (10.106.227.143) with smtp.notes.na.collabserv.com ESMTP;
+        Sat, 10 Oct 2020 11:36:50 -0000
+Received: from us1a3-mail162.a3.dal06.isc4sb.com ([10.146.71.4])
+          by us1a3-smtp05.a3.dal06.isc4sb.com
+          with ESMTP id 2020101011364991-175970 ;
+          Sat, 10 Oct 2020 11:36:49 +0000 
+In-Reply-To: <20201009195033.3208459-11-ira.weiny@intel.com>
+Subject: Re: [PATCH RFC PKS/PMEM 10/58] drivers/rdma: Utilize new kmap_thread()
+From:   "Bernard Metzler" <BMT@zurich.ibm.com>
+To:     ira.weiny@intel.com
+Cc:     "Andrew Morton" <akpm@linux-foundation.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "Andy Lutomirski" <luto@kernel.org>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        "Mike Marciniszyn" <mike.marciniszyn@intel.com>,
+        "Dennis Dalessandro" <dennis.dalessandro@intel.com>,
+        "Doug Ledford" <dledford@redhat.com>,
+        "Jason Gunthorpe" <jgg@ziepe.ca>,
+        "Faisal Latif" <faisal.latif@intel.com>,
+        "Shiraz Saleem" <shiraz.saleem@intel.com>, x86@kernel.org,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        "Dan Williams" <dan.j.williams@intel.com>,
+        "Fenghua Yu" <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+        kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
+        linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
+        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-rdma@vger.kernel.org, amd-gfx@lists.freed.esktop.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        drbd-dev@tron.linbit.com, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
+        samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
+Date:   Sat, 10 Oct 2020 11:36:49 +0000
 MIME-Version: 1.0
-References: <1601470479-26848-1-git-send-email-guomin_chen@sina.com>
- <20200930080919.1a9c66f8@x1.home> <CAEEwsfRZt=r54SWOqbKvF60zPKu2tiTeQtFcFW14Hp92kT6M9Q@mail.gmail.com>
- <20201009124423.2a8603f7@x1.home>
-In-Reply-To: <20201009124423.2a8603f7@x1.home>
-From:   gchen chen <gchen.guomin@gmail.com>
-Date:   Sat, 10 Oct 2020 19:01:30 +0800
-Message-ID: <CAEEwsfRDLFxkV5ZwNy9+3N3u9RtiCtErC6CK3k+ft0=jQtTv_A@mail.gmail.com>
-Subject: Re: [PATCH] irqbypass: fix error handle when irq_bypass_register_producer()
- return fails
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     guomin_chen@sina.com, Cornelia Huck <cohuck@redhat.com>,
-        Jiang Yi <giangyi@amazon.com>, Marc Zyngier <maz@kernel.org>,
-        Peter Xu <peterx@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Sensitivity: 
+Importance: Normal
+X-Priority: 3 (Normal)
+References: <20201009195033.3208459-11-ira.weiny@intel.com>,<20201009195033.3208459-1-ira.weiny@intel.com>
+X-Mailer: IBM iNotes ($HaikuForm 1054.1) | IBM Domino Build
+ SCN1812108_20180501T0841_FP65 April 15, 2020 at 09:48
+X-LLNOutbound: False
+X-Disclaimed: 59823
+X-TNEFEvaluated: 1
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+x-cbid: 20101011-2475-0000-0000-0000044A0339
+X-IBM-SpamModules-Scores: BY=0.233045; FL=0; FP=0; FZ=0; HX=0; KW=0; PH=0;
+ SC=0.421684; ST=0; TS=0; UL=0; ISC=; MB=0.000000
+X-IBM-SpamModules-Versions: BY=3.00013982; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000295; SDB=6.01447073; UDB=6.00777937; IPR=6.01229775;
+ MB=3.00034472; MTD=3.00000008; XFM=3.00000015; UTC=2020-10-10 11:36:54
+X-IBM-AV-DETECTION: SAVI=unsuspicious REMOTE=unsuspicious XFE=unused
+X-IBM-AV-VERSION: SAVI=2020-10-10 06:57:40 - 6.00011937
+x-cbparentid: 20101011-2476-0000-0000-0000DAA5035B
+Message-Id: <OF849D92D8.F4735ECA-ON002585FD.003F5F27-002585FD.003FCBD6@notes.na.collabserv.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-10_07:2020-10-09,2020-10-10 signatures=0
+X-Proofpoint-Spam-Reason: orgsafe
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2020=E5=B9=B410=E6=9C=
-=8810=E6=97=A5=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=882:44=E5=86=99=E9=81=93=
-=EF=BC=9A
+-----ira.weiny@intel.com wrote: -----
+
+>To: "Andrew Morton" <akpm@linux-foundation.org>, "Thomas Gleixner"
+><tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
+>Petkov" <bp@alien8.de>, "Andy Lutomirski" <luto@kernel.org>, "Peter
+>Zijlstra" <peterz@infradead.org>
+>From: ira.weiny@intel.com
+>Date: 10/09/2020 09:52PM
+>Cc: "Ira Weiny" <ira.weiny@intel.com>, "Mike Marciniszyn"
+><mike.marciniszyn@intel.com>, "Dennis Dalessandro"
+><dennis.dalessandro@intel.com>, "Doug Ledford" <dledford@redhat.com>,
+>"Jason Gunthorpe" <jgg@ziepe.ca>, "Faisal Latif"
+><faisal.latif@intel.com>, "Shiraz Saleem" <shiraz.saleem@intel.com>,
+>"Bernard Metzler" <bmt@zurich.ibm.com>, x86@kernel.org, "Dave Hansen"
+><dave.hansen@linux.intel.com>, "Dan Williams"
+><dan.j.williams@intel.com>, "Fenghua Yu" <fenghua.yu@intel.com>,
+>linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+>linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
+>linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+>linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+>netdev@vger.kernel.org, bpf@vger.kernel.org,
+>kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
+>linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
+>linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
+>linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+>linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+>linux-ext4@vger.kernel.org, linux-aio@kvack.org,
+>io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+>linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
+>reiserfs-devel@vger.kernel.org,
+>linux-f2fs-devel@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+>cluster-devel@redhat.com, ecryptfs@vger.kernel.org,
+>linux-cifs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+>linux-afs@lists.infradead.org, linux-rdma@vger.kernel.org,
+>amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+>intel-gfx@lists.freedesktop.org, drbd-dev@tron.linbit.com,
+>linux-block@vger.kernel.org, xen-devel@lists.xenproject.org,
+>linux-cachefs@redhat.com, samba-technical@lists.samba.org,
+>intel-wired-lan@lists.osuosl.org
+>Subject: [EXTERNAL] [PATCH RFC PKS/PMEM 10/58] drivers/rdma: Utilize
+>new kmap=5Fthread()
 >
-> On Fri, 9 Oct 2020 12:30:04 +0800
-> gchen chen <gchen.guomin@gmail.com> wrote:
+>From: Ira Weiny <ira.weiny@intel.com>
 >
-> > Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=
-=9C=8830=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:09=E5=86=99=E9=81=
-=93=EF=BC=9A
-> > >
-> > >
-> > > Please version your postings so we know which one to consider as the
-> > > current proposal.
-> > >
-> > > On Wed, 30 Sep 2020 20:54:39 +0800
-> > > guomin_chen@sina.com wrote:
-> > >
-> > > > From: guomin chen <guomin_chen@sina.com>
-> > > >
-> > > > When the producer object registration fails,In the future, due to
-> > > > incorrect matching when unregistering, list_del(&producer->node)
-> > > > may still be called, then trigger a BUG:
-> > > >
-> > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c8c=
-da5) registration fails: -16
-> > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c8c=
-da5) registration fails: -16
-> > > >     vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c8c=
-da5) registration fails: -16
-> > > >     ...
-> > > >     list_del corruption, ffff8f7fb8ba0828->next is LIST_POISON1 (de=
-ad000000000100)
-> > > >     ------------[ cut here ]------------
-> > > >     kernel BUG at lib/list_debug.c:47!
-> > > >     invalid opcode: 0000 [#1] SMP NOPTI
-> > > >     CPU: 29 PID: 3914 Comm: qemu-kvm Kdump: loaded Tainted: G      =
-E
-> > > >     -------- - -4.18.0-193.6.3.el8.x86_64 #1
-> > > >     Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CT=
-O1WW]-,
-> > > >     BIOS -[IVE636Z-2.13]- 07/18/2019
-> > > >     RIP: 0010:__list_del_entry_valid.cold.1+0x12/0x4c
-> > > >     Code: ce ff 0f 0b 48 89 c1 4c 89 c6 48 c7 c7 40 85 4d 88 e8 8c =
-bc
-> > > >           ce ff 0f 0b 48 89 fe 48 89 c2 48 c7 c7 d0 85 4d 88 e8 78 =
-bc
-> > > >           ce ff <0f> 0b 48 c7 c7 80 86 4d 88 e8 6a bc ce ff 0f 0b 4=
-8
-> > > >           89 f2 48 89 fe
-> > > >     RSP: 0018:ffffaa9d60197d20 EFLAGS: 00010246
-> > > >     RAX: 000000000000004e RBX: ffff8f7fb8ba0828 RCX: 00000000000000=
-00
-> > > >     RDX: 0000000000000000 RSI: ffff8f7fbf4d6a08 RDI: ffff8f7fbf4d6a=
-08
-> > > >     RBP: 0000000000000000 R08: 000000000000084b R09: 00000000000000=
-5d
-> > > >     R10: 0000000000000000 R11: ffffaa9d60197bd0 R12: ffff8f4fbe8630=
-00
-> > > >     R13: 00000000000000c2 R14: 0000000000000000 R15: 00000000000000=
-00
-> > > >     FS:  00007f7cb97fa700(0000) GS:ffff8f7fbf4c0000(0000)
-> > > >     knlGS:0000000000000000
-> > > >     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > >     CR2: 00007fcf31da4000 CR3: 0000005f6d404001 CR4: 00000000007626=
-e0
-> > > >     DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000000=
-00
-> > > >     DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000004=
-00
-> > > >     PKRU: 55555554
-> > > >     Call Trace:
-> > > >         irq_bypass_unregister_producer+0x9b/0xf0 [irqbypass]
-> > > >         vfio_msi_set_vector_signal+0x8c/0x290 [vfio_pci]
-> > > >         ? load_fixmap_gdt+0x22/0x30
-> > > >         vfio_msi_set_block+0x6e/0xd0 [vfio_pci]
-> > > >         vfio_pci_ioctl+0x218/0xbe0 [vfio_pci]
-> > > >         ? kvm_vcpu_ioctl+0xf2/0x5f0 [kvm]
-> > > >         do_vfs_ioctl+0xa4/0x630
-> > > >         ? syscall_trace_enter+0x1d3/0x2c0
-> > > >         ksys_ioctl+0x60/0x90
-> > > >         __x64_sys_ioctl+0x16/0x20
-> > > >         do_syscall_64+0x5b/0x1a0
-> > > >         entry_SYSCALL_64_after_hwframe+0x65/0xca
-> > > >
-> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > > Cc: Cornelia Huck <cohuck@redhat.com>
-> > > > Cc: Jiang Yi <giangyi@amazon.com>
-> > > > Cc: Marc Zyngier <maz@kernel.org>
-> > > > Cc: Peter Xu <peterx@redhat.com>
-> > > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > Cc: Jason Wang <jasowang@redhat.com>
-> > > > Cc: kvm@vger.kernel.org
-> > > > Cc: linux-kernel@vger.kernel.org
-> > > > Signed-off-by: guomin chen <guomin_chen@sina.com>
-> > > > ---
-> > > >  drivers/vfio/pci/vfio_pci_intrs.c | 13 +++++++++++--
-> > > >  drivers/vhost/vdpa.c              |  7 +++++++
-> > > >  2 files changed, 18 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/v=
-fio_pci_intrs.c
-> > > > index 1d9fb25..c371943 100644
-> > > > --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> > > > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> > > > @@ -352,12 +352,21 @@ static int vfio_msi_set_vector_signal(struct =
-vfio_pci_device *vdev,
-> > > >       vdev->ctx[vector].producer.token =3D trigger;
-> > > >       vdev->ctx[vector].producer.irq =3D irq;
-> > > >       ret =3D irq_bypass_register_producer(&vdev->ctx[vector].produ=
-cer);
-> > > > -     if (unlikely(ret))
-> > > > +     if (unlikely(ret)) {
-> > > >               dev_info(&pdev->dev,
-> > > >               "irq bypass producer (token %p) registration fails: %=
-d\n",
-> > > >               vdev->ctx[vector].producer.token, ret);
-> > > >
-> > > > -     vdev->ctx[vector].trigger =3D trigger;
-> > > > +             kfree(vdev->ctx[vector].name);
-> > > > +             eventfd_ctx_put(trigger);
-> > > > +
-> > > > +             cmd =3D vfio_pci_memory_lock_and_enable(vdev);
-> > > > +             free_irq(irq, trigger);
-> > > > +             vfio_pci_memory_unlock_and_restore(vdev, cmd);
-> > > > +
-> > > > +             vdev->ctx[vector].trigger =3D NULL;
-> > > > +     } else
-> > > > +             vdev->ctx[vector].trigger =3D trigger;
-> > > >
-> > > >       return 0;
-> > > >  }
-> > >
-> > > Once again, the irq bypass registration cannot cause the vector setup
-> > > to fail, either by returning an error code or failing to configure th=
-e
-> > > vector while returning success.  It's my assertion that we simply nee=
-d
-> > > to set the producer.token to NULL on failure such that unregistering
-> > > the producer will not generate a match, as you've done below.  The
-> > > vector still works even if this registration fails.
-> > >
-> > Yes,  the irq bypass registration cannot cause the vector setup to fail=
-.
-> > But if I simply set producer.token to NULL when fails, instead of
-> > cleaning up vector, it will trigger the following BUG:
-> >
-> > vfio_ecap_init: 0000:db:00.0 hiding ecap 0x1e@0x310
-> > vfio-pci 0000:db:00.0: irq bypass producer (token 000000004409229f)
-> > registration fails: -16
-> > ------------[ cut here ]------------
-> > kernel BUG at drivers/pci/msi.c:352!
-> > invalid opcode: 0000 [#1] SMP NOPTI
-> > CPU: 55 PID: 9389 Comm: qemu-kvm Kdump: loaded Tainted: G
-> > E    --------- -  - 4.18.0-193.irqb.r1.el8.x86_64 #1
-> > Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CTO1WW]-,
-> >   BIOS -[IVE636Z-2.13]- 07/18/2019
-> > RIP: 0010:free_msi_irqs+0x180/0x1b0
-> > Code: 14 85 c0 0f 84 d5 fe ff ff 31 ed eb 0f 83 c5 01 39 6b 14 0f 86
-> >       c5 fe ff ff 8b 7b 10 01 ef e8 d7 4a c9 ff 48 83 78 70 00 74 e3
-> >   <0f> 0b 49 8d b5 b0 00 00 00 e8 e2 e3 c9 ff e9 c7 fe ff ff 48
-> >   8b 7b
-> > RSP: 0018:ffffaeca4f4bfcd8 EFLAGS: 00010286
-> > RAX: ffff8bec77441600 RBX: ffff8bbcdb637e40 RCX: 0000000000000000
-> > RDX: 0000000000000000 RSI: 00000000000001ab RDI: ffffffff8ea5b2a0
-> > RBP: 0000000000000000 R08: ffff8bec7e746828 R09: ffff8bec7e7466a8
-> > R10: 0000000000000000 R11: 0000000000000000 R12: ffff8bbcde921308
-> > R13: ffff8bbcde921000 R14: 000000000000000b R15: 0000000000000021
-> > FS:  00007fd18d7fa700(0000) GS:ffff8bec7f6c0000(0000) knlGS:00000000000=
-00000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 00007f83650024a0 CR3: 000000476e70c001 CR4: 00000000007626e0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > PKRU: 55555554
-> > Call Trace:
-> >  pci_disable_msix+0xf3/0x120
-> >  pci_free_irq_vectors+0xe/0x20
-> >  vfio_msi_disable+0x89/0xd0 [vfio_pci]
-> >  vfio_pci_set_msi_trigger+0x229/0x2d0 [vfio_pci]
-> >  vfio_pci_ioctl+0x24f/0xdb0 [vfio_pci]
-> >  ? pollwake+0x74/0x90
-> >  ? wake_up_q+0x70/0x70
-> >  do_vfs_ioctl+0xa4/0x630
-> >  ? __alloc_fd+0x33/0x140
-> >  ? syscall_trace_enter+0x1d3/0x2c0
-> >  ksys_ioctl+0x60/0x90
-> >  __x64_sys_ioctl+0x16/0x20
-> >  do_syscall_64+0x5b/0x1a0
-> >  entry_SYSCALL_64_after_hwframe+0x65/0xca
+>The kmap() calls in these drivers are localized to a single thread.
+>To
+>avoid the over head of global PKRS updates use the new kmap=5Fthread()
+>call.
 >
-> Please post the patch that triggers this, I'm not yet convinced we're
-> speaking of the same solution.  The user ioctl cannot fail due to the
-> failure to setup a bypass accelerator, nor can the ioctl return success
-> without configuring all of the user requested vectors, which is what I
-> understand the v2 patch above to do.  We simply want to configure the
-> failed producer such that when we unregister it at user request, we
-> avoid creating a bogus match.  It's not apparent to me why doing that
-> would cause any changes to the setup or teardown of the MSI vector in
-> PCI code.  Thanks,
+>Cc: Mike Marciniszyn <mike.marciniszyn@intel.com>
+>Cc: Dennis Dalessandro <dennis.dalessandro@intel.com>
+>Cc: Doug Ledford <dledford@redhat.com>
+>Cc: Jason Gunthorpe <jgg@ziepe.ca>
+>Cc: Faisal Latif <faisal.latif@intel.com>
+>Cc: Shiraz Saleem <shiraz.saleem@intel.com>
+>Cc: Bernard Metzler <bmt@zurich.ibm.com>
+>Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+>---
+> drivers/infiniband/hw/hfi1/sdma.c      |  4 ++--
+> drivers/infiniband/hw/i40iw/i40iw=5Fcm.c | 10 +++++-----
+> drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c  | 14 +++++++-------
+> 3 files changed, 14 insertions(+), 14 deletions(-)
 >
-> Alex
+>diff --git a/drivers/infiniband/hw/hfi1/sdma.c
+>b/drivers/infiniband/hw/hfi1/sdma.c
+>index 04575c9afd61..09d206e3229a 100644
+>--- a/drivers/infiniband/hw/hfi1/sdma.c
+>+++ b/drivers/infiniband/hw/hfi1/sdma.c
+>@@ -3130,7 +3130,7 @@ int ext=5Fcoal=5Fsdma=5Ftx=5Fdescs(struct hfi1=5Fdev=
+data
+>*dd, struct sdma=5Ftxreq *tx,
+> 		}
+>=20
+> 		if (type =3D=3D SDMA=5FMAP=5FPAGE) {
+>-			kvaddr =3D kmap(page);
+>+			kvaddr =3D kmap=5Fthread(page);
+> 			kvaddr +=3D offset;
+> 		} else if (WARN=5FON(!kvaddr)) {
+> 			=5F=5Fsdma=5Ftxclean(dd, tx);
+>@@ -3140,7 +3140,7 @@ int ext=5Fcoal=5Fsdma=5Ftx=5Fdescs(struct hfi1=5Fdev=
+data
+>*dd, struct sdma=5Ftxreq *tx,
+> 		memcpy(tx->coalesce=5Fbuf + tx->coalesce=5Fidx, kvaddr, len);
+> 		tx->coalesce=5Fidx +=3D len;
+> 		if (type =3D=3D SDMA=5FMAP=5FPAGE)
+>-			kunmap(page);
+>+			kunmap=5Fthread(page);
+>=20
+> 		/* If there is more data, return */
+> 		if (tx->tlen - tx->coalesce=5Fidx)
+>diff --git a/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>b/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>index a3b95805c154..122d7a5642a1 100644
+>--- a/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>+++ b/drivers/infiniband/hw/i40iw/i40iw=5Fcm.c
+>@@ -3721,7 +3721,7 @@ int i40iw=5Faccept(struct iw=5Fcm=5Fid *cm=5Fid, str=
+uct
+>iw=5Fcm=5Fconn=5Fparam *conn=5Fparam)
+> 		ibmr->device =3D iwpd->ibpd.device;
+> 		iwqp->lsmm=5Fmr =3D ibmr;
+> 		if (iwqp->page)
+>-			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap(iwqp->page);
+>+			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap=5Fthread(iwqp->page);
+> 		dev->iw=5Fpriv=5Fqp=5Fops->qp=5Fsend=5Flsmm(&iwqp->sc=5Fqp,
+> 							iwqp->ietf=5Fmem.va,
+> 							(accept.size + conn=5Fparam->private=5Fdata=5Flen),
+>@@ -3729,12 +3729,12 @@ int i40iw=5Faccept(struct iw=5Fcm=5Fid *cm=5Fid,
+>struct iw=5Fcm=5Fconn=5Fparam *conn=5Fparam)
+>=20
+> 	} else {
+> 		if (iwqp->page)
+>-			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap(iwqp->page);
+>+			iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap=5Fthread(iwqp->page);
+> 		dev->iw=5Fpriv=5Fqp=5Fops->qp=5Fsend=5Flsmm(&iwqp->sc=5Fqp, NULL, 0, 0);
+> 	}
+>=20
+> 	if (iwqp->page)
+>-		kunmap(iwqp->page);
+>+		kunmap=5Fthread(iwqp->page);
+>=20
+> 	iwqp->cm=5Fid =3D cm=5Fid;
+> 	cm=5Fnode->cm=5Fid =3D cm=5Fid;
+>@@ -4102,10 +4102,10 @@ static void i40iw=5Fcm=5Fevent=5Fconnected(struct
+>i40iw=5Fcm=5Fevent *event)
+> 	i40iw=5Fcm=5Finit=5Ftsa=5Fconn(iwqp, cm=5Fnode);
+> 	read0 =3D (cm=5Fnode->send=5Frdma0=5Fop =3D=3D SEND=5FRDMA=5FREAD=5FZERO=
+);
+> 	if (iwqp->page)
+>-		iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap(iwqp->page);
+>+		iwqp->sc=5Fqp.qp=5Fuk.sq=5Fbase =3D kmap=5Fthread(iwqp->page);
+> 	dev->iw=5Fpriv=5Fqp=5Fops->qp=5Fsend=5Frtt(&iwqp->sc=5Fqp, read0);
+> 	if (iwqp->page)
+>-		kunmap(iwqp->page);
+>+		kunmap=5Fthread(iwqp->page);
+>=20
+> 	memset(&attr, 0, sizeof(attr));
+> 	attr.qp=5Fstate =3D IB=5FQPS=5FRTS;
+>diff --git a/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>b/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>index d19d8325588b..4ed37c328d02 100644
+>--- a/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>+++ b/drivers/infiniband/sw/siw/siw=5Fqp=5Ftx.c
+>@@ -76,7 +76,7 @@ static int siw=5Ftry=5F1seg(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>void *paddr)
+> 			if (unlikely(!p))
+> 				return -EFAULT;
+>=20
+>-			buffer =3D kmap(p);
+>+			buffer =3D kmap=5Fthread(p);
+>=20
+> 			if (likely(PAGE=5FSIZE - off >=3D bytes)) {
+> 				memcpy(paddr, buffer + off, bytes);
+>@@ -84,7 +84,7 @@ static int siw=5Ftry=5F1seg(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>void *paddr)
+> 				unsigned long part =3D bytes - (PAGE=5FSIZE - off);
+>=20
+> 				memcpy(paddr, buffer + off, part);
+>-				kunmap(p);
+>+				kunmap=5Fthread(p);
+>=20
+> 				if (!mem->is=5Fpbl)
+> 					p =3D siw=5Fget=5Fupage(mem->umem,
+>@@ -96,10 +96,10 @@ static int siw=5Ftry=5F1seg(struct siw=5Fiwarp=5Ftx
+>*c=5Ftx, void *paddr)
+> 				if (unlikely(!p))
+> 					return -EFAULT;
+>=20
+>-				buffer =3D kmap(p);
+>+				buffer =3D kmap=5Fthread(p);
+> 				memcpy(paddr + part, buffer, bytes - part);
+> 			}
+>-			kunmap(p);
+>+			kunmap=5Fthread(p);
+> 		}
+> 	}
+> 	return (int)bytes;
+>@@ -505,7 +505,7 @@ static int siw=5Ftx=5Fhdt(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>struct socket *s)
+> 				page=5Farray[seg] =3D p;
+>=20
+> 				if (!c=5Ftx->use=5Fsendpage) {
+>-					iov[seg].iov=5Fbase =3D kmap(p) + fp=5Foff;
+>+					iov[seg].iov=5Fbase =3D kmap=5Fthread(p) + fp=5Foff;
+
+This misses a corresponding kunmap=5Fthread() in siw=5Funmap=5Fpages()
+(pls change line 403 in siw=5Fqp=5Ftx.c as well)
+
+Thanks,
+Bernard.
+
+> 					iov[seg].iov=5Flen =3D plen;
+>=20
+> 					/* Remember for later kunmap() */
+>@@ -518,9 +518,9 @@ static int siw=5Ftx=5Fhdt(struct siw=5Fiwarp=5Ftx *c=
+=5Ftx,
+>struct socket *s)
+> 							plen);
+> 				} else if (do=5Fcrc) {
+> 					crypto=5Fshash=5Fupdate(c=5Ftx->mpa=5Fcrc=5Fhd,
+>-							    kmap(p) + fp=5Foff,
+>+							    kmap=5Fthread(p) + fp=5Foff,
+> 							    plen);
+>-					kunmap(p);
+>+					kunmap=5Fthread(p);
+> 				}
+> 			} else {
+> 				u64 va =3D sge->laddr + sge=5Foff;
+>--=20
+>2.28.0.rc0.12.gb6a658bd00c9
 >
-Hi Alex, as you said before, I only need to set the producer.token
-to NULL on failure such that unregistering the producer will not
-generate a match.
+>
 
-So I wrote a patch (As you said patch v2), as follows:
-
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c
-b/drivers/vfio/pci/vfio_pci_intrs.c
-index 1d9fb25..1969cd0 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -352,12 +352,15 @@ static int vfio_msi_set_vector_signal(struct
-vfio_pci_device *vdev,
-        vdev->ctx[vector].producer.token =3D trigger;
-        vdev->ctx[vector].producer.irq =3D irq;
-        ret =3D irq_bypass_register_producer(&vdev->ctx[vector].producer);
--       if (unlikely(ret))
-+       if (unlikely(ret)) {
-                dev_info(&pdev->dev,
-                "irq bypass producer (token %p) registration fails: %d\n",
-                vdev->ctx[vector].producer.token, ret);
-
--       vdev->ctx[vector].trigger =3D trigger;
-+               eventfd_ctx_put(trigger);
-+               vdev->ctx[vector].trigger =3D NULL;
-+       } else
-+               vdev->ctx[vector].trigger =3D trigger;
-
-        return 0;
- }
---
-
-However, when I use this patch to testing, the following bugs are
-triggered when vfio_msi_disable() called because the msi vector
-is not cleaned up:
-
-vfio_ecap_init: 0000:db:00.0 hiding ecap 0x1e@0x310
-vfio-pci 0000:db:00.0: irq bypass producer (token 000000004409229f)
-registration fails: -16
-------------[ cut here ]------------
-kernel BUG at drivers/pci/msi.c:352!
-invalid opcode: 0000 [#1] SMP NOPTI
-CPU: 55 PID: 9389 Comm: qemu-kvm Kdump: loaded Tainted: G
-E    --------- -  - 4.18.0-193.irqb.r1.el8.x86_64 #1
-Hardware name: Lenovo ThinkSystem SR650 -[7X06CTO1WW]-/-[7X06CTO1WW]-,
-  BIOS -[IVE636Z-2.13]- 07/18/2019
-RIP: 0010:free_msi_irqs+0x180/0x1b0
-Code: 14 85 c0 0f 84 d5 fe ff ff 31 ed eb 0f 83 c5 01 39 6b 14 0f 86
-      c5 fe ff ff 8b 7b 10 01 ef e8 d7 4a c9 ff 48 83 78 70 00 74 e3
-  <0f> 0b 49 8d b5 b0 00 00 00 e8 e2 e3 c9 ff e9 c7 fe ff ff 48
-  8b 7b
-RSP: 0018:ffffaeca4f4bfcd8 EFLAGS: 00010286
-RAX: ffff8bec77441600 RBX: ffff8bbcdb637e40 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 00000000000001ab RDI: ffffffff8ea5b2a0
-RBP: 0000000000000000 R08: ffff8bec7e746828 R09: ffff8bec7e7466a8
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff8bbcde921308
-R13: ffff8bbcde921000 R14: 000000000000000b R15: 0000000000000021
-FS:  00007fd18d7fa700(0000) GS:ffff8bec7f6c0000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f83650024a0 CR3: 000000476e70c001 CR4: 00000000007626e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- pci_disable_msix+0xf3/0x120
- pci_free_irq_vectors+0xe/0x20
- vfio_msi_disable+0x89/0xd0 [vfio_pci]
- vfio_pci_set_msi_trigger+0x229/0x2d0 [vfio_pci]
- vfio_pci_ioctl+0x24f/0xdb0 [vfio_pci]
- ? pollwake+0x74/0x90
- ? wake_up_q+0x70/0x70
- do_vfs_ioctl+0xa4/0x630
- ? __alloc_fd+0x33/0x140
- ? syscall_trace_enter+0x1d3/0x2c0
- ksys_ioctl+0x60/0x90
- __x64_sys_ioctl+0x16/0x20
- do_syscall_64+0x5b/0x1a0
- entry_SYSCALL_64_after_hwframe+0x65/0xca
