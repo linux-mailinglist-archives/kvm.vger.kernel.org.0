@@ -2,318 +2,390 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75EC028A195
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:15:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 634AF28A1AC
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:51:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729547AbgJJVsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Oct 2020 17:48:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52086 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731451AbgJJTXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Oct 2020 15:23:16 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1729584AbgJJVsp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Oct 2020 17:48:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20709 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731468AbgJJT0P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 10 Oct 2020 15:26:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602357970;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aP/K+DgmGw8NzOvyxrhD5nfIQkxl9UYyz3dVwV8TdR0=;
+        b=Il76osMmKZ0lBPnDfNLPHEVIdkI/ocR8EPIO8A9Ogmy66DFN6ksRCKlLzza3FKxcfBKCDj
+        6zE4DGw+lIpNEpqUoxxqDVVzZWk19QHa2DuzVGyCxE+81vNDJsFLjWkEtI1s57YpNYD0T4
+        T33k964R4atWtiDjeqbs/BAj6KmPPkQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-ihf6AnL6PGWllPiapeHS5Q-1; Sat, 10 Oct 2020 13:02:16 -0400
+X-MC-Unique: ihf6AnL6PGWllPiapeHS5Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EA23C22365;
-        Sat, 10 Oct 2020 16:38:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602347934;
-        bh=49EtDC0f8LwP6BYJIv8036l4/kegw0KVNNCxs5tOkyA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=jCfqssPCphNw1TWDRIqo7Wk8JSRKG0Or4jmvJ178Z3xTLNNpry/CZISljkDp3KX8t
-         zRWeaovwq0eOa4VRbKgHwFFEnlQAv2B+df+GsGg705yxNnTNAOMAPdi9RFWu3PjN5I
-         EWeCGuuvyIObLUtvi0w6jsSF+UVPIPyqJLszRnFY=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1kRHtT-001JIN-Tq; Sat, 10 Oct 2020 17:38:52 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Scull <ascull@google.com>,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        David Brazdil <dbrazdil@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        kernel test robot <lkp@intel.com>,
-        Liu Shixin <liushixin2@huawei.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Tian Tao <tiantao6@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Xiaofei Tan <tanxiaofei@huawei.com>, kernel-team@android.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 updates for 5.10
-Date:   Sat, 10 Oct 2020 17:38:37 +0100
-Message-Id: <20201010163837.1409855-1-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E57D9107AD28;
+        Sat, 10 Oct 2020 17:02:14 +0000 (UTC)
+Received: from [10.36.113.210] (ovpn-113-210.ams2.redhat.com [10.36.113.210])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0806873660;
+        Sat, 10 Oct 2020 17:02:09 +0000 (UTC)
+Subject: Re: [PATCH v6 01/10] vfio/fsl-mc: Add VFIO framework skeleton for
+ fsl-mc devices
+To:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, bharatb.linux@gmail.com,
+        laurentiu.tudor@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
+References: <20201005173654.31773-1-diana.craciun@oss.nxp.com>
+ <20201005173654.31773-2-diana.craciun@oss.nxp.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <f589ab40-c398-09d5-e8e0-ac3bdb87d123@redhat.com>
+Date:   Sat, 10 Oct 2020 19:02:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, ascull@google.com, asteinhauser@google.com, dan.carpenter@oracle.com, dbrazdil@google.com, eric.auger@redhat.com, gshan@redhat.com, james.morse@arm.com, lkp@intel.com, liushixin2@huawei.com, mchehab+huawei@kernel.org, qperret@google.com, steven.price@arm.com, sudeep.holla@arm.com, suzuki.poulose@arm.com, tiantao6@hisilicon.com, will@kernel.org, tanxiaofei@huawei.com, kernel-team@android.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20201005173654.31773-2-diana.craciun@oss.nxp.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+Hi Diana,
 
-Here's the (pretty large) set of KVM/arm64 updates for 5.10.
+On 10/5/20 7:36 PM, Diana Craciun wrote:
+> From: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+> 
+> DPAA2 (Data Path Acceleration Architecture) consists in
+> mechanisms for processing Ethernet packets, queue management,
+> accelerators, etc.
+> 
+> The Management Complex (mc) is a hardware entity that manages the DPAA2
+> hardware resources. It provides an object-based abstraction for software
+> drivers to use the DPAA2 hardware. The MC mediates operations such as
+> create, discover, destroy of DPAA2 objects.
+> The MC provides memory-mapped I/O command interfaces (MC portals) which
+> DPAA2 software drivers use to operate on DPAA2 objects.
+> 
+> A DPRC is a container object that holds other types of DPAA2 objects.
+> Each object in the DPRC is a Linux device and bound to a driver.
+> The MC-bus driver is a platform driver (different from PCI or platform
+> bus). The DPRC driver does runtime management of a bus instance. It
+> performs the initial scan of the DPRC and handles changes in the DPRC
+> configuration (adding/removing objects).
+> 
+> All objects inside a container share the same hardware isolation
+> context, meaning that only an entire DPRC can be assigned to
+> a virtual machine.
+> When a container is assigned to a virtual machine, all the objects
+> within that container are assigned to that virtual machine.
+> The DPRC container assigned to the virtual machine is not allowed
+> to change contents (add/remove objects) by the guest. The restriction
+> is set by the host and enforced by the mc hardware.
+> 
+> The DPAA2 objects can be directly assigned to the guest. However
+> the MC portals (the memory mapped command interface to the MC) need
+> to be emulated because there are commands that configure the
+> interrupts and the isolation IDs which are virtual in the guest.
+> 
+> Example:
+> echo vfio-fsl-mc > /sys/bus/fsl-mc/devices/dprc.2/driver_override
+> echo dprc.2 > /sys/bus/fsl-mc/drivers/vfio-fsl-mc/bind
+> 
+> The dprc.2 is bound to the VFIO driver and all the objects within
+> dprc.2 are going to be bound to the VFIO driver.
+> 
+> This patch adds the infrastructure for VFIO support for fsl-mc
+> devices. Subsequent patches will add support for binding and secure
+> assigning these devices using VFIO.
+> 
+> More details about the DPAA2 objects can be found here:
+> Documentation/networking/device_drivers/freescale/dpaa2/overview.rst
+> 
+> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-This time around, more of the work we're doing on the pKVM front: new
-page table code, new EL2-private data structures, including a per-CPU
-infrastructure. Also, we now have a way for userspace to decide which
-PMU events get counted. Finally, a complete rework of the Spectre
-mitigation, as the existing code had quickly become completely
-unmaintainable.
+Thanks
 
-A couple of notes:
-- The Spectre stuff is a shared branch between the arm64 and the KVM,
-  so both tries carry the whole thing
+Eric
 
-- The branch is based on -rc4, but would have (badly) conflicted with
-  some of the fixes merged in -rc5. So I did the merge myself, solving
-  the conflicts myself. This may explain why some of the patches have
-  an air of "déjà vu" (the steal-time fixes, for example)...
+> ---
+>  MAINTAINERS                               |   6 +
+>  drivers/vfio/Kconfig                      |   1 +
+>  drivers/vfio/Makefile                     |   1 +
+>  drivers/vfio/fsl-mc/Kconfig               |   9 ++
+>  drivers/vfio/fsl-mc/Makefile              |   4 +
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 157 ++++++++++++++++++++++
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  14 ++
+>  include/uapi/linux/vfio.h                 |   1 +
+>  8 files changed, 193 insertions(+)
+>  create mode 100644 drivers/vfio/fsl-mc/Kconfig
+>  create mode 100644 drivers/vfio/fsl-mc/Makefile
+>  create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc.c
+>  create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 33b27e62ce19..1046f4065ac1 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -18258,6 +18258,12 @@ F:	drivers/vfio/
+>  F:	include/linux/vfio.h
+>  F:	include/uapi/linux/vfio.h
+>  
+> +VFIO FSL-MC DRIVER
+> +M:	Diana Craciun <diana.craciun@oss.nxp.com>
+> +L:	kvm@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/vfio/fsl-mc/
+> +
+>  VFIO MEDIATED DEVICE DRIVERS
+>  M:	Kirti Wankhede <kwankhede@nvidia.com>
+>  L:	kvm@vger.kernel.org
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index fd17db9b432f..5533df91b257 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -47,4 +47,5 @@ menuconfig VFIO_NOIOMMU
+>  source "drivers/vfio/pci/Kconfig"
+>  source "drivers/vfio/platform/Kconfig"
+>  source "drivers/vfio/mdev/Kconfig"
+> +source "drivers/vfio/fsl-mc/Kconfig"
+>  source "virt/lib/Kconfig"
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index de67c4725cce..fee73f3d9480 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -9,3 +9,4 @@ obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o
+>  obj-$(CONFIG_VFIO_PCI) += pci/
+>  obj-$(CONFIG_VFIO_PLATFORM) += platform/
+>  obj-$(CONFIG_VFIO_MDEV) += mdev/
+> +obj-$(CONFIG_VFIO_FSL_MC) += fsl-mc/
+> diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
+> new file mode 100644
+> index 000000000000..b1a527d6b6f2
+> --- /dev/null
+> +++ b/drivers/vfio/fsl-mc/Kconfig
+> @@ -0,0 +1,9 @@
+> +config VFIO_FSL_MC
+> +	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
+> +	depends on VFIO && FSL_MC_BUS && EVENTFD
+> +	help
+> +	  Driver to enable support for the VFIO QorIQ DPAA2 fsl-mc
+> +	  (Management Complex) devices. This is required to passthrough
+> +	  fsl-mc bus devices using the VFIO framework.
+> +
+> +	  If you don't know what to do here, say N.
+> diff --git a/drivers/vfio/fsl-mc/Makefile b/drivers/vfio/fsl-mc/Makefile
+> new file mode 100644
+> index 000000000000..0c6e5d2ddaae
+> --- /dev/null
+> +++ b/drivers/vfio/fsl-mc/Makefile
+> @@ -0,0 +1,4 @@
+> +# SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+> +
+> +vfio-fsl-mc-y := vfio_fsl_mc.o
+> +obj-$(CONFIG_VFIO_FSL_MC) += vfio-fsl-mc.o
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> new file mode 100644
+> index 000000000000..a7a483a1e90b
+> --- /dev/null
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -0,0 +1,157 @@
+> +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+> +/*
+> + * Copyright 2013-2016 Freescale Semiconductor Inc.
+> + * Copyright 2016-2017,2019-2020 NXP
+> + */
+> +
+> +#include <linux/device.h>
+> +#include <linux/iommu.h>
+> +#include <linux/module.h>
+> +#include <linux/mutex.h>
+> +#include <linux/slab.h>
+> +#include <linux/types.h>
+> +#include <linux/vfio.h>
+> +#include <linux/fsl/mc.h>
+> +
+> +#include "vfio_fsl_mc_private.h"
+> +
+> +static int vfio_fsl_mc_open(void *device_data)
+> +{
+> +	if (!try_module_get(THIS_MODULE))
+> +		return -ENODEV;
+> +
+> +	return 0;
+> +}
+> +
+> +static void vfio_fsl_mc_release(void *device_data)
+> +{
+> +	module_put(THIS_MODULE);
+> +}
+> +
+> +static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
+> +			      unsigned long arg)
+> +{
+> +	switch (cmd) {
+> +	case VFIO_DEVICE_GET_INFO:
+> +	{
+> +		return -ENOTTY;
+> +	}
+> +	case VFIO_DEVICE_GET_REGION_INFO:
+> +	{
+> +		return -ENOTTY;
+> +	}
+> +	case VFIO_DEVICE_GET_IRQ_INFO:
+> +	{
+> +		return -ENOTTY;
+> +	}
+> +	case VFIO_DEVICE_SET_IRQS:
+> +	{
+> +		return -ENOTTY;
+> +	}
+> +	case VFIO_DEVICE_RESET:
+> +	{
+> +		return -ENOTTY;
+> +	}
+> +	default:
+> +		return -ENOTTY;
+> +	}
+> +}
+> +
+> +static ssize_t vfio_fsl_mc_read(void *device_data, char __user *buf,
+> +				size_t count, loff_t *ppos)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static ssize_t vfio_fsl_mc_write(void *device_data, const char __user *buf,
+> +				 size_t count, loff_t *ppos)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static int vfio_fsl_mc_mmap(void *device_data, struct vm_area_struct *vma)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static const struct vfio_device_ops vfio_fsl_mc_ops = {
+> +	.name		= "vfio-fsl-mc",
+> +	.open		= vfio_fsl_mc_open,
+> +	.release	= vfio_fsl_mc_release,
+> +	.ioctl		= vfio_fsl_mc_ioctl,
+> +	.read		= vfio_fsl_mc_read,
+> +	.write		= vfio_fsl_mc_write,
+> +	.mmap		= vfio_fsl_mc_mmap,
+> +};
+> +
+> +static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+> +{
+> +	struct iommu_group *group;
+> +	struct vfio_fsl_mc_device *vdev;
+> +	struct device *dev = &mc_dev->dev;
+> +	int ret;
+> +
+> +	group = vfio_iommu_group_get(dev);
+> +	if (!group) {
+> +		dev_err(dev, "VFIO_FSL_MC: No IOMMU group\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	vdev = devm_kzalloc(dev, sizeof(*vdev), GFP_KERNEL);
+> +	if (!vdev) {
+> +		ret = -ENOMEM;
+> +		goto out_group_put;
+> +	}
+> +
+> +	vdev->mc_dev = mc_dev;
+> +
+> +	ret = vfio_add_group_dev(dev, &vfio_fsl_mc_ops, vdev);
+> +	if (ret) {
+> +		dev_err(dev, "VFIO_FSL_MC: Failed to add to vfio group\n");
+> +		goto out_group_put;
+> +	}
+> +	return 0;
+> +
+> +out_group_put:
+> +	vfio_iommu_group_put(group, dev);
+> +	return ret;
+> +}
+> +
+> +static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
+> +{
+> +	struct vfio_fsl_mc_device *vdev;
+> +	struct device *dev = &mc_dev->dev;
+> +
+> +	vdev = vfio_del_group_dev(dev);
+> +	if (!vdev)
+> +		return -EINVAL;
+> +
+> +	vfio_iommu_group_put(mc_dev->dev.iommu_group, dev);
+> +
+> +	return 0;
+> +}
+> +
+> +static struct fsl_mc_driver vfio_fsl_mc_driver = {
+> +	.probe		= vfio_fsl_mc_probe,
+> +	.remove		= vfio_fsl_mc_remove,
+> +	.driver	= {
+> +		.name	= "vfio-fsl-mc",
+> +		.owner	= THIS_MODULE,
+> +	},
+> +};
+> +
+> +static int __init vfio_fsl_mc_driver_init(void)
+> +{
+> +	return fsl_mc_driver_register(&vfio_fsl_mc_driver);
+> +}
+> +
+> +static void __exit vfio_fsl_mc_driver_exit(void)
+> +{
+> +	fsl_mc_driver_unregister(&vfio_fsl_mc_driver);
+> +}
+> +
+> +module_init(vfio_fsl_mc_driver_init);
+> +module_exit(vfio_fsl_mc_driver_exit);
+> +
+> +MODULE_LICENSE("Dual BSD/GPL");
+> +MODULE_DESCRIPTION("VFIO for FSL-MC devices - User Level meta-driver");
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> new file mode 100644
+> index 000000000000..e79cc116f6b8
+> --- /dev/null
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
+> +/*
+> + * Copyright 2013-2016 Freescale Semiconductor Inc.
+> + * Copyright 2016,2019-2020 NXP
+> + */
+> +
+> +#ifndef VFIO_FSL_MC_PRIVATE_H
+> +#define VFIO_FSL_MC_PRIVATE_H
+> +
+> +struct vfio_fsl_mc_device {
+> +	struct fsl_mc_device		*mc_dev;
+> +};
+> +
+> +#endif /* VFIO_FSL_MC_PRIVATE_H */
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 920470502329..95deac891378 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -201,6 +201,7 @@ struct vfio_device_info {
+>  #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+>  #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
+>  #define VFIO_DEVICE_FLAGS_AP	(1 << 5)	/* vfio-ap device */
+> +#define VFIO_DEVICE_FLAGS_FSL_MC (1 << 6)	/* vfio-fsl-mc device */
+>  	__u32	num_regions;	/* Max region index + 1 */
+>  	__u32	num_irqs;	/* Max IRQ index + 1 */
+>  };
+> 
 
-The following changes since commit f4d51dffc6c01a9e94650d95ce0104964f8ae822:
-
-  Linux 5.9-rc4 (2020-09-06 17:11:40 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.10
-
-for you to fetch changes up to 4e5dc64c43192b4fd4c96ac150a8f013065f5f5b:
-
-  Merge branches 'kvm-arm64/pt-new' and 'kvm-arm64/pmu-5.9' into kvmarm-master/next (2020-10-02 09:25:55 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 updates for Linux 5.10
-
-- New page table code for both hypervisor and guest stage-2
-- Introduction of a new EL2-private host context
-- Allow EL2 to have its own private per-CPU variables
-- Support of PMU event filtering
-- Complete rework of the Spectre mitigation
-
-----------------------------------------------------------------
-Alexandru Elisei (5):
-      KVM: arm64: Update page shift if stage 2 block mapping not supported
-      KVM: arm64: Try PMD block mappings if PUD mappings are not supported
-      KVM: arm64: Do not flush memslot if FWB is supported
-      KVM: arm64: Add undocumented return values for PMU device control group
-      KVM: arm64: Match PMU error code descriptions with error conditions
-
-Andrew Jones (6):
-      KVM: arm64: pvtime: steal-time is only supported when configured
-      KVM: arm64: pvtime: Fix potential loss of stolen time
-      KVM: arm64: Drop type input from kvm_put_guest
-      KVM: arm64: pvtime: Fix stolen time accounting across migration
-      KVM: Documentation: Minor fixups
-      arm64/x86: KVM: Introduce steal-time cap
-
-Andrew Scull (19):
-      KVM: arm64: Remove __activate_vm wrapper
-      KVM: arm64: Remove hyp_panic arguments
-      KVM: arm64: Remove kvm_host_data_t typedef
-      KVM: arm64: Choose hyp symbol based on context
-      KVM: arm64: Save chosen hyp vector to a percpu variable
-      KVM: arm64: nVHE: Use separate vector for the host
-      KVM: arm64: nVHE: Don't consume host SErrors with ESB
-      KVM: arm64: Introduce hyp context
-      KVM: arm64: Update context references from host to hyp
-      KVM: arm64: Restore hyp when panicking in guest context
-      KVM: arm64: Share context save and restore macros
-      KVM: arm64: nVHE: Switch to hyp context for EL2
-      KVM: arm64: nVHE: Handle hyp panics
-      KVM: arm64: nVHE: Pass pointers consistently to hyp-init
-      smccc: Define vendor hyp owned service call region
-      smccc: Use separate variables for args and results
-      KVM: arm64: nVHE: Migrate hyp interface to SMCCC
-      KVM: arm64: nVHE: Migrate hyp-init to SMCCC
-      KVM: arm64: nVHE: Fix pointers during SMCCC convertion
-
-David Brazdil (10):
-      kvm: arm64: Partially link nVHE hyp code, simplify HYPCOPY
-      kvm: arm64: Move nVHE hyp namespace macros to hyp_image.h
-      kvm: arm64: Only define __kvm_ex_table for CONFIG_KVM
-      kvm: arm64: Remove __hyp_this_cpu_read
-      kvm: arm64: Remove hyp_adr/ldr_this_cpu
-      kvm: arm64: Add helpers for accessing nVHE hyp per-cpu vars
-      kvm: arm64: Duplicate arm64_ssbd_callback_required for nVHE hyp
-      kvm: arm64: Create separate instances of kvm_host_data for VHE/nVHE
-      kvm: arm64: Set up hyp percpu data for nVHE
-      kvm: arm64: Remove unnecessary hyp mappings
-
-Liu Shixin (1):
-      KVM: arm64: vgic-debug: Convert to use DEFINE_SEQ_ATTRIBUTE macro
-
-Marc Zyngier (23):
-      KVM: arm64: Do not try to map PUDs when they are folded into PMD
-      KVM: arm64: Fix address truncation in traces
-      Merge branch 'kvm-arm64/pt-new' into kvmarm-master/next
-      Merge branch 'kvm-arm64/nvhe-hyp-context' into kvmarm-master/next
-      Merge branch 'kvm-arm64/pt-new' into kvmarm-master/next
-      Merge branch 'kvm-arm64/misc-5.10' into kvmarm-master/next
-      arm64: Make use of ARCH_WORKAROUND_1 even when KVM is not enabled
-      arm64: Run ARCH_WORKAROUND_1 enabling code on all CPUs
-      KVM: arm64: Refactor PMU attribute error handling
-      KVM: arm64: Use event mask matching architecture revision
-      KVM: arm64: Add PMU event filtering infrastructure
-      KVM: arm64: Mask out filtered events in PCMEID{0,1}_EL1
-      KVM: arm64: Document PMU filtering API
-      Merge branch 'kvm-arm64/pmu-5.9' into kvmarm-master/next
-      arm64: Run ARCH_WORKAROUND_2 enabling code on all CPUs
-      KVM: arm64: Set CSV2 for guests on hardware unaffected by Spectre-v2
-      KVM: arm64: Simplify handling of ARCH_WORKAROUND_2
-      KVM: arm64: Get rid of kvm_arm_have_ssbd()
-      KVM: arm64: Convert ARCH_WORKAROUND_2 to arm64_get_spectre_v4_state()
-      arm64: Get rid of arm64_ssbd_state
-      Merge remote-tracking branch 'arm64/for-next/ghostbusters' into kvm-arm64/hyp-pcpu
-      Merge branch 'kvm-arm64/hyp-pcpu' into kvmarm-master/next
-      Merge branches 'kvm-arm64/pt-new' and 'kvm-arm64/pmu-5.9' into kvmarm-master/next
-
-Mauro Carvalho Chehab (1):
-      KVM: arm64: Fix some documentation build warnings
-
-Quentin Perret (4):
-      KVM: arm64: Add support for stage-2 write-protect in generic page-table
-      KVM: arm64: Convert write-protect operation to generic page-table API
-      KVM: arm64: Add support for stage-2 cache flushing in generic page-table
-      KVM: arm64: Convert memslot cache-flushing code to generic page-table API
-
-Tian Tao (1):
-      KVM: arm64: Fix inject_fault.c kernel-doc warnings
-
-Will Deacon (33):
-      KVM: arm64: Remove kvm_mmu_free_memory_caches()
-      KVM: arm64: Add stand-alone page-table walker infrastructure
-      KVM: arm64: Add support for creating kernel-agnostic stage-1 page tables
-      KVM: arm64: Use generic allocator for hyp stage-1 page-tables
-      KVM: arm64: Add support for creating kernel-agnostic stage-2 page tables
-      KVM: arm64: Add support for stage-2 map()/unmap() in generic page-table
-      KVM: arm64: Convert kvm_phys_addr_ioremap() to generic page-table API
-      KVM: arm64: Convert kvm_set_spte_hva() to generic page-table API
-      KVM: arm64: Convert unmap_stage2_range() to generic page-table API
-      KVM: arm64: Add support for stage-2 page-aging in generic page-table
-      KVM: arm64: Convert page-aging and access faults to generic page-table API
-      KVM: arm64: Add support for relaxing stage-2 perms in generic page-table code
-      KVM: arm64: Convert user_mem_abort() to generic page-table API
-      KVM: arm64: Check the pgt instead of the pgd when modifying page-table
-      KVM: arm64: Remove unused page-table code
-      KVM: arm64: Remove unused 'pgd' field from 'struct kvm_s2_mmu'
-      KVM: arm64: Don't constrain maximum IPA size based on host configuration
-      arm64: Remove Spectre-related CONFIG_* options
-      KVM: arm64: Replace CONFIG_KVM_INDIRECT_VECTORS with CONFIG_RANDOMIZE_BASE
-      KVM: arm64: Simplify install_bp_hardening_cb()
-      arm64: Rename ARM64_HARDEN_BRANCH_PREDICTOR to ARM64_SPECTRE_V2
-      arm64: Introduce separate file for spectre mitigations and reporting
-      arm64: Rewrite Spectre-v2 mitigation code
-      arm64: Group start_thread() functions together
-      arm64: Treat SSBS as a non-strict system feature
-      arm64: Rename ARM64_SSBD to ARM64_SPECTRE_V4
-      arm64: Move SSBD prctl() handler alongside other spectre mitigation code
-      arm64: Rewrite Spectre-v4 mitigation code
-      KVM: arm64: Allow patching EL2 vectors even with KASLR is not enabled
-      arm64: Pull in task_stack_page() to Spectre-v4 mitigation code
-      arm64: Add support for PR_SPEC_DISABLE_NOEXEC prctl() option
-      KVM: arm64: Pass level hint to TLBI during stage-2 permission fault
-      KVM: arm64: Ensure user_mem_abort() return value is initialised
-
-Xiaofei Tan (1):
-      KVM: arm64: Fix doc warnings in mmu code
-
- Documentation/virt/kvm/api.rst            |   22 +-
- Documentation/virt/kvm/devices/vcpu.rst   |   57 +-
- arch/arm64/Kconfig                        |   26 -
- arch/arm64/include/asm/assembler.h        |   29 +-
- arch/arm64/include/asm/cpucaps.h          |    4 +-
- arch/arm64/include/asm/cpufeature.h       |   24 -
- arch/arm64/include/asm/hyp_image.h        |   36 +
- arch/arm64/include/asm/kvm_asm.h          |  192 +++-
- arch/arm64/include/asm/kvm_emulate.h      |   14 -
- arch/arm64/include/asm/kvm_host.h         |   77 +-
- arch/arm64/include/asm/kvm_hyp.h          |    9 +-
- arch/arm64/include/asm/kvm_mmu.h          |  341 +-----
- arch/arm64/include/asm/kvm_pgtable.h      |  309 +++++
- arch/arm64/include/asm/kvm_ptrauth.h      |    6 +-
- arch/arm64/include/asm/mmu.h              |   11 +-
- arch/arm64/include/asm/percpu.h           |   28 +-
- arch/arm64/include/asm/pgtable-hwdef.h    |   24 -
- arch/arm64/include/asm/pgtable-prot.h     |   19 -
- arch/arm64/include/asm/processor.h        |   44 +-
- arch/arm64/include/asm/spectre.h          |   32 +
- arch/arm64/include/asm/stage2_pgtable.h   |  215 ----
- arch/arm64/include/uapi/asm/kvm.h         |   25 +
- arch/arm64/kernel/Makefile                |    3 +-
- arch/arm64/kernel/cpu_errata.c            |  487 +-------
- arch/arm64/kernel/cpufeature.c            |   51 +-
- arch/arm64/kernel/entry.S                 |   10 +-
- arch/arm64/kernel/hibernate.c             |    6 +-
- arch/arm64/kernel/image-vars.h            |    5 -
- arch/arm64/kernel/process.c               |   23 +-
- arch/arm64/kernel/proton-pack.c           |  792 +++++++++++++
- arch/arm64/kernel/ssbd.c                  |  129 ---
- arch/arm64/kernel/suspend.c               |    3 +-
- arch/arm64/kernel/vmlinux.lds.S           |   13 +
- arch/arm64/kvm/Kconfig                    |    3 -
- arch/arm64/kvm/Makefile                   |    2 +-
- arch/arm64/kvm/arm.c                      |  113 +-
- arch/arm64/kvm/hyp.S                      |   34 -
- arch/arm64/kvm/hyp/Makefile               |    3 +-
- arch/arm64/kvm/hyp/entry.S                |   95 +-
- arch/arm64/kvm/hyp/hyp-entry.S            |  107 +-
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h |    4 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h   |   48 +-
- arch/arm64/kvm/hyp/nvhe/.gitignore        |    2 +
- arch/arm64/kvm/hyp/nvhe/Makefile          |   62 +-
- arch/arm64/kvm/hyp/nvhe/host.S            |  187 +++
- arch/arm64/kvm/hyp/nvhe/hyp-init.S        |   67 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c        |  117 ++
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S         |   19 +
- arch/arm64/kvm/hyp/nvhe/switch.c          |   52 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c             |    2 -
- arch/arm64/kvm/hyp/pgtable.c              |  892 +++++++++++++++
- arch/arm64/kvm/hyp/vhe/switch.c           |   35 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |    4 +-
- arch/arm64/kvm/hypercalls.c               |   33 +-
- arch/arm64/kvm/inject_fault.c             |    1 +
- arch/arm64/kvm/mmu.c                      | 1759 +++++------------------------
- arch/arm64/kvm/pmu-emul.c                 |  195 +++-
- arch/arm64/kvm/pmu.c                      |   13 +-
- arch/arm64/kvm/psci.c                     |   74 +-
- arch/arm64/kvm/pvtime.c                   |   29 +-
- arch/arm64/kvm/reset.c                    |   44 +-
- arch/arm64/kvm/sys_regs.c                 |    8 +-
- arch/arm64/kvm/trace_arm.h                |   16 +-
- arch/arm64/kvm/trace_handle_exit.h        |    6 +-
- arch/arm64/kvm/vgic/vgic-debug.c          |   24 +-
- arch/arm64/kvm/vgic/vgic-v3.c             |    4 +-
- arch/x86/kvm/x86.c                        |    3 +
- include/kvm/arm_pmu.h                     |    5 +
- include/linux/arm-smccc.h                 |   74 +-
- include/linux/kvm_host.h                  |   31 +-
- include/uapi/linux/kvm.h                  |    1 +
- 71 files changed, 3658 insertions(+), 3576 deletions(-)
- create mode 100644 arch/arm64/include/asm/hyp_image.h
- create mode 100644 arch/arm64/include/asm/kvm_pgtable.h
- create mode 100644 arch/arm64/include/asm/spectre.h
- create mode 100644 arch/arm64/kernel/proton-pack.c
- delete mode 100644 arch/arm64/kernel/ssbd.c
- delete mode 100644 arch/arm64/kvm/hyp.S
- create mode 100644 arch/arm64/kvm/hyp/nvhe/.gitignore
- create mode 100644 arch/arm64/kvm/hyp/nvhe/host.S
- create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp-main.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp.lds.S
- create mode 100644 arch/arm64/kvm/hyp/pgtable.c
