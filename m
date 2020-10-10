@@ -2,77 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90A0728A1A0
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:18:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE21528A1A2
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 00:19:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730185AbgJJVxy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Oct 2020 17:53:54 -0400
+        id S1730293AbgJJVyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Oct 2020 17:54:32 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731197AbgJJTxO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Oct 2020 15:53:14 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783CCC0613B3;
-        Sat, 10 Oct 2020 04:44:15 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1602330250;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N1SBsytax/FJJ63UuUy61d7oPnuBmwnuAFt8dWJDPIY=;
-        b=wAtldDLOX6giKCz7dGGhSXozepspB6Z5q/gsjMmYzjA0Z5/Tl+2bYBKvPAhBkt+l+tCg/+
-        YceoJzi5VgGAyUnjrH9Wiloj7m7gotU9rzErupjj0zw0E6cDQbpMiI9kCJnY4C965fTiSf
-        vfXrIOldKpqzaXAqe50obgHfmo6Co+88KTwBGs1ffV3UJTYTBfLT8dtbnXwIkWKMrO20q7
-        MisAG/rGkTNX3uHxjPja4Og/aOkoR19w4rvVEe1d19NG25lyOOhzVNos5p81hoqQEK5iU5
-        8h1yOxorYGhD57Gnt2j6bsTnmHcRql2BkZmf2uuxJp+Uopwxy/QG5bizUMQ8hg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1602330250;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N1SBsytax/FJJ63UuUy61d7oPnuBmwnuAFt8dWJDPIY=;
-        b=rYPtLdNnBXpCcz5l4C7q/3Nqs9/82l0nQU39pU9MjbzTL3QAqR5yiCMt+uqYlFTQsWCpd5
-        g3buI2njI1c3W+AA==
-To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
-In-Reply-To: <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org>
-References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org> <20201007122046.1113577-1-dwmw2@infradead.org> <20201007122046.1113577-5-dwmw2@infradead.org> <87blhcx6qz.fsf@nanos.tec.linutronix.de> <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org> <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org> <87362owhcb.fsf@nanos.tec.linutronix.de> <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org> <87tuv4uwmt.fsf@nanos.tec.linutronix.de> <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org>
-Date:   Sat, 10 Oct 2020 13:44:10 +0200
-Message-ID: <874kn2s3ud.fsf@nanos.tec.linutronix.de>
+        with ESMTP id S1731519AbgJJTxu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Oct 2020 15:53:50 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B351FC0613BB
+        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 04:56:12 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id x62so13144328oix.11
+        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 04:56:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kVkxIdHN6o3O+u6tSfedNSb1VzfwX2F8ZeWL/VdW1R0=;
+        b=PmcQ6HnUaDFVR4ZG1jxYVR6Iy6yUiTRwMlYI1/tSbKPEa/kwoMlz7zfmOuI2hn6KYq
+         V0dHtSf/LrEJbqhpaMjU8h/EJY/bF1jSwPEMaaWBwHAo1f9SuoP4vCo+L5gVrMpGB++A
+         PnZ1b3eYUezb1GhvqoZ2KN7Thv1h+lAXB1upE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kVkxIdHN6o3O+u6tSfedNSb1VzfwX2F8ZeWL/VdW1R0=;
+        b=bzu38OTce0g4s03HiYgLeSA88smrcqxvaRFULEXc/8RaHKs4i4MCsHZbb+ZaSMhqD9
+         vLl13X1HcnBdO7dIunGoxIexBnHjjnUP0BmcEDxt1EgYkEACnbT2Quq/bp2uGdsD5Yw5
+         1yMj49qJX6Diohev8TYRSC6dDiyqTsxG/NBfQhFzaioOhvt4iRj0Sn7JDtsvLEpfztS8
+         dx46kfdd2zgZZx8VwcllZYPeKuSMxjStWtccML93YuR0MnVKvZ7zRnV0h1iHsil+LT1O
+         ARgC2JA4X0hGMxzNzr3qLdcV4bCdfzqYDxiydAZ9cG+cbWZu2L0ejCLUD/5qr52M/r6/
+         VULg==
+X-Gm-Message-State: AOAM532b3sBmj/W80/FHCMCq0+gVOryn3eaARWbzsQVq8x/8UVEt0TNH
+        QnJ4+OGm9Vl/t7jNIVRHw49bm2JUg6QqeAhQwIzZkw==
+X-Google-Smtp-Source: ABdhPJzKftVU1haFUl3kJpPXCXE2YEa9neFI+uGYsToCivJpyHsTIlVZins4yYKilYPHMWVOsn/OllhI0jrgavqKgKA=
+X-Received: by 2002:aca:cc01:: with SMTP id c1mr3655546oig.128.1602330971569;
+ Sat, 10 Oct 2020 04:56:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
+ <20201009075934.3509076-10-daniel.vetter@ffwll.ch> <20201009123421.67a80d72@coco.lan>
+ <20201009122111.GN5177@ziepe.ca> <20201009143723.45609bfb@coco.lan>
+ <20201009124850.GP5177@ziepe.ca> <CAKMK7uF-hrSwzFQkp6qEP88hM1Qg8TMQOunuRHh=f2+D8MaMRg@mail.gmail.com>
+ <20201010112122.587f9945@coco.lan> <CAKMK7uEKP5UMKeQHkTHWYUJkp=mz-Hvh-fJZy1KP3kT2xHpHrg@mail.gmail.com>
+ <20201010133929.746d0529@coco.lan>
+In-Reply-To: <20201010133929.746d0529@coco.lan>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Sat, 10 Oct 2020 13:56:00 +0200
+Message-ID: <CAKMK7uEwT0TBvHtVMHeSW2gwt2nhm7mpd2pNuUHUCz=EaYM3yw@mail.gmail.com>
+Subject: Re: [PATCH v2 09/17] mm: Add unsafe_follow_pfn
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 10 2020 at 11:06, David Woodhouse wrote:
-> On Fri, 2020-10-09 at 01:27 +0200, Thomas Gleixner wrote:
->> On Thu, Oct 08 2020 at 22:39, David Woodhouse wrote:
->> For the next submission, can you please
->>=20
->>  - pick up the -ENODEV changes for HPET/IOAPIC which I posted earlier
+On Sat, Oct 10, 2020 at 1:39 PM Mauro Carvalho Chehab
+<mchehab+huawei@kernel.org> wrote:
 >
-> I think the world will be a nicer place if HPET and IOAPIC have their
-> own struct device and their drivers can just use dev_get_msi_domain().
+> Em Sat, 10 Oct 2020 12:53:49 +0200
+> Daniel Vetter <daniel.vetter@ffwll.ch> escreveu:
 >
-> The IRQ remapping drivers already plug into the device-add notifier and
-> can fill in the appropriate MSI domain just like they do=C2=B9 for PCI and
-> ACPI devices.
+> > Hi Mauro,
+> >
+> > You might want to read the patches more carefully, because what you're
+> > demanding is what my patches do. Short summary:
+> >
+> > - if STRICT_FOLLOW_PFN is set:
+> > a) normal memory is handled as-is (i.e. your example works) through
+> > the addition of FOLL_LONGTERM. This is the "pin the pages correctly"
+> > approach you're demanding
+> > b) for non-page memory (zerocopy sharing before dma-buf was upstreamed
+> > is the only use-case for this) it is correctly rejected with -EINVAL
+> >
+> > - if you do have blobby userspace which requires the zero-copy using
+> > userptr to work, and doesn't have any of the fallbacks implemented
+> > that you describe, this would be a regression. That's why
+> > STRICT_FOLLOW_PFN can be unset. And yes there's a real security issue
+> > in this usage, Marek also confirmed that the removal of the vma copy
+> > code a few years ago essentially broke even the weak assumptions that
+> > made the code work 10+ years ago when it was merged.
+> >
+> > so tdlr; Everything you described will keep working even with the new
+> > flag set, and everything you demand must be implemented _is_
+> > implemented in this patch series.
+> >
+> > Also please keep in mind that we are _not_ talking about the general
+> > userptr support that was merge ~20 years ago. This patch series here
+> > is _only_ about the zerocpy userptr support merged with 50ac952d2263
+> > ("[media] videobuf2-dma-sg: Support io userptr operations on io
+> > memory") in 2013.
 >
-> Using platform_add_bundle() for HPET looks trivial enough; I'll have a
-> play with that and then do IOAPIC too if/when the initialisation order
-> and hotplug handling all works out OK to install the correct
-> msi_domain.
+> Ok, now it is making more sense. Please update the comments for
+> patch 10/17 to describe the above.
 
-Yes, I was wondering about that when I made PCI at least use that
-mechanism, but had not had time to actually look at it.
+Will do.
 
-Thanks,
+> We need some time to test this though, in order to check if no
+> regressions were added (except the ones due to changeset 50ac952d2263).
 
-        tglx
+Yeah testing of the previous patches to switch to FOLL_LONGTERM would
+be really good. I also need that for habanalabs and ideally exynos
+too. All the userptr for normal memory should keep working, and with
+FOLL_LONGTERM it should actually work better, since with that it
+should now correctly interact with pagecache and fs code, not just
+with anon memory from malloc.
+
+Thanks, Daniel
+
+> > Why this hack was merged in 2013 when we merged dma-buf almost 2 years
+> > before that I have no idea about. Imo that patch simply should never
+> > have landed, and instead dma-buf support prioritized.
+>
+> If I recall correctly, we didn't have any DMABUF support
+> at the media subsystem, back on 2013.
+>
+> It took some time for the DMA-BUF to arrive at media, as this
+> was not a top priority. Also, there aren't many developers that
+> understand the memory model well enough to implement DMA-BUF support
+> and touch the VB2 code, which is quite complex, as it supports
+> lots of different ways for I/O, plus works with vmalloc, DMA
+> contig and DMA scatter/gather.
+>
+> Changes there should carefully be tested against different
+> drivers, in order to avoid regressions on it.
+>
+> > Cheers, Daniel
+>
+> Thanks,
+> Mauro
+
+
+
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
