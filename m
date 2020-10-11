@@ -2,107 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DBCF28A60F
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 08:47:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71DAE28A61F
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 09:29:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728741AbgJKGrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 11 Oct 2020 02:47:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40098 "EHLO
+        id S1728891AbgJKH3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Oct 2020 03:29:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24976 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728686AbgJKGq7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 11 Oct 2020 02:46:59 -0400
+        by vger.kernel.org with ESMTP id S1726461AbgJKH3U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 11 Oct 2020 03:29:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602398818;
+        s=mimecast20190719; t=1602401358;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e9DBg94y3dH4K7OJQw3QhobflJnhMnjEF2bmY+pjq5A=;
-        b=OFCWahH1n9KRH6eiNbA2SLjxeSKoz2gE8hQi+rVnmvTDfzpT5sXK3od2ATBbdJUkG44cfF
-        iBCZiGQ1uofQvUoWi++spnzcNCjbq3KPQu8qZS+uHphVrCgCNt9KSwmyxmQkvWBveuKaKf
-        sHnJxC9Eyz53sISNZAWvjqcxzbZqAwA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-ifyxuR1NMb6-_I6943wdLw-1; Sun, 11 Oct 2020 02:46:54 -0400
-X-MC-Unique: ifyxuR1NMb6-_I6943wdLw-1
-Received: by mail-wm1-f70.google.com with SMTP id g125so5198884wme.1
-        for <kvm@vger.kernel.org>; Sat, 10 Oct 2020 23:46:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=e9DBg94y3dH4K7OJQw3QhobflJnhMnjEF2bmY+pjq5A=;
-        b=sh7B0zXXQ4feCJrc+L4zwByFR1ozYzqJzdFrpi6NSI7zp9ncgI+mPxp2AsxHOBtbdq
-         GXe+SL2jGnzs93/udQlen3LEmoMDIbIJTBjlg5CbztQuxj1BWdi1IhDCUTuOjgebwqwN
-         UE7abj+yUOdKVY78//IjZ3lPfwNaTKp78VjDVndXy+YM0f1uPCl+5ArsVJFD57h/+UGf
-         YXX7PUjn3/LsYnsScxISqWXBMK4SKwU6jw9P0gD7NHWU4Z7mVExcjr0zThoviXzDqTTc
-         XAywoNoXWxAk67F5wXXadPSzxFl6i3LrfCx9z+O9AsI6LYWUORECejlCOXdxBkPPWOcn
-         dZuA==
-X-Gm-Message-State: AOAM531q2MHPO6X8CmzIvuPU2thjXSKkQGTVPLLmFy2EO3lkEomyeNR5
-        LOcp2nVLuQ7vLOqu5jfH9IfN+FUY70TWdPzmbWJ3FE7i4Zv7sCrzlBXTnvY8STsdZTjg2ghBWzi
-        pl7n8FEyfjjRg
-X-Received: by 2002:a1c:a513:: with SMTP id o19mr5421306wme.130.1602398813151;
-        Sat, 10 Oct 2020 23:46:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyM5mr9XODNM/0FDfdYSqdgaQBm+SlNnogDVtVm9qnwQtawYEdi+JIuDir297EELqzQhHaTMQ==
-X-Received: by 2002:a1c:a513:: with SMTP id o19mr5421290wme.130.1602398812957;
-        Sat, 10 Oct 2020 23:46:52 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-76-41.red.bezeqint.net. [79.179.76.41])
-        by smtp.gmail.com with ESMTPSA id j5sm14175503wrx.88.2020.10.10.23.46.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2020 23:46:52 -0700 (PDT)
-Date:   Sun, 11 Oct 2020 02:46:49 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Greg Kurz <groug@kaod.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
-        Laurent Vivier <laurent@vivier.eu>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v3 2/3] vhost: Use vhost_get_used_size() in
- vhost_vring_set_addr()
-Message-ID: <20201011024636-mutt-send-email-mst@kernel.org>
-References: <160171888144.284610.4628526949393013039.stgit@bahia.lan>
- <160171932300.284610.11846106312938909461.stgit@bahia.lan>
- <5fc896c6-e60d-db0b-f7b0-5b6806d70b8e@redhat.com>
+        bh=EukZMor/4zhpLBCTClJNKoCARtZ10v2yP3vMMY5YbeQ=;
+        b=PpiH5UAohajJupE5P53CcRUx/o+7EJgHCPLpWufdaSdXTFidvJrh2pJ1lDLDyiV9duEunF
+        JZkUrjfK3tkHaSzqs1l5GKIV4wOsNWuVbOiCDgNnp8YlDvj3iD3tawQWhi7CnaaIVCtQ21
+        Zmzvy7OdVNRWo+Mv5hCIrZqYJW0o6es=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-sFvNnduiOL-dcplo7VOcwQ-1; Sun, 11 Oct 2020 03:29:16 -0400
+X-MC-Unique: sFvNnduiOL-dcplo7VOcwQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 580AA80F044;
+        Sun, 11 Oct 2020 07:29:15 +0000 (UTC)
+Received: from starship (unknown [10.35.206.144])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F55946;
+        Sun, 11 Oct 2020 07:29:06 +0000 (UTC)
+Message-ID: <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
+Subject: Re: Why guest physical addresses are not the same as the
+ corresponding host virtual addresses in QEMU/KVM? Thanks!
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     harry harry <hiharryharryharry@gmail.com>, qemu-devel@nongnu.org,
+        mathieu.tarral@protonmail.com, stefanha@redhat.com,
+        libvir-list@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com
+Date:   Sun, 11 Oct 2020 10:29:05 +0300
+In-Reply-To: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
+References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5fc896c6-e60d-db0b-f7b0-5b6806d70b8e@redhat.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 10, 2020 at 10:32:13AM +0800, Jason Wang wrote:
+On Sun, 2020-10-11 at 01:26 -0400, harry harry wrote:
+> Hi QEMU/KVM developers,
 > 
-> On 2020/10/3 下午6:02, Greg Kurz wrote:
-> > The open-coded computation of the used size doesn't take the event
-> > into account when the VIRTIO_RING_F_EVENT_IDX feature is present.
-> > Fix that by using vhost_get_used_size().
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >   drivers/vhost/vhost.c |    3 +--
-> >   1 file changed, 1 insertion(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index c3b49975dc28..9d2c225fb518 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -1519,8 +1519,7 @@ static long vhost_vring_set_addr(struct vhost_dev *d,
-> >   		/* Also validate log access for used ring if enabled. */
-> >   		if ((a.flags & (0x1 << VHOST_VRING_F_LOG)) &&
-> >   			!log_access_ok(vq->log_base, a.log_guest_addr,
-> > -				sizeof *vq->used +
-> > -				vq->num * sizeof *vq->used->ring))
-> > +				       vhost_get_used_size(vq, vq->num)))
-> >   			return -EINVAL;
-> >   	}
-> > 
-> > 
+> I am sorry if my email disturbs you. I did an experiment and found the
+> guest physical addresses (GPAs) are not the same as the corresponding
+> host virtual addresses (HVAs). I am curious about why; I think they
+> should be the same. I am very appreciated if you can give some
+> comments and suggestions about 1) why GPAs and HVAs are not the same
+> in the following experiment; 2) are there any better experiments to
+> look into the reasons? Any other comments/suggestions are also very
+> welcome. Thanks!
 > 
-> Acked-by: Jason Wang <jasowang@redhat.com>
+> The experiment is like this: in a single vCPU VM, I ran a program
+> allocating and referencing lots of pages (e.g., 100*1024) and didn't
+> let the program terminate. Then, I checked the program's guest virtual
+> addresses (GVAs) and GPAs through parsing its pagemap and maps files
+> located at /proc/pid/pagemap and /proc/pid/maps, respectively. At
+> last, in the host OS, I checked the vCPU's pagemap and maps files to
+> find the program's HVAs and host physical addresses (HPAs); I actually
+> checked the new allocated physical pages in the host OS after the
+> program was executed in the guest OS.
+> 
+> With the above experiment, I found GPAs of the program are different
+> from its corresponding HVAs. BTW, Intel EPT and other related Intel
+> virtualization techniques were enabled.
+> 
+> Thanks,
+> Harry
+> 
+The fundemental reason is that some HVAs (e.g. QEMU's virtual memory addresses) are already allocated
+for qemu's own use (e.g qemu code/heap/etc) prior to the guest starting up. 
 
-Linus already merged this, I can't add your ack, sorry!
+KVM does though use quite effiecient way of mapping HVA's to GPA. It uses an array of arbitrary sized HVA areas
+(which we call memslots) and for each such area/memslot you specify the GPA to map to. In theory QEMU 
+could allocate the whole guest's memory in one contiguous area and map it as single memslot to the guest. 
+In practice there are MMIO holes, and various other reasons why there will be more that 1 memslot.
+ 
+Best regards,
+	Maxim Levitsky
 
