@@ -2,91 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6789B28A97C
-	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 20:50:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E294028AAA6
+	for <lists+kvm@lfdr.de>; Sun, 11 Oct 2020 23:15:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727550AbgJKSuZ convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 11 Oct 2020 14:50:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59594 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728779AbgJKSuY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 11 Oct 2020 14:50:24 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 203477] [AMD][KVM] Windows L1 guest becomes extremely slow and
- unusable after enabling Hyper-V
-Date:   Sun, 11 Oct 2020 18:50:23 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luoyonggang@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-203477-28872-1OefpayFqW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203477-28872@https.bugzilla.kernel.org/>
-References: <bug-203477-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S2387488AbgJKVPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Oct 2020 17:15:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48818 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387457AbgJKVP3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 11 Oct 2020 17:15:29 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94EC6C0613CE;
+        Sun, 11 Oct 2020 14:15:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Message-ID:From:CC:To:Subject:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
+        Date:Sender:Reply-To:Content-ID:Content-Description;
+        bh=HaNvNJNqShxRibbaAVJtLOGl045COY2jHpkwhNWQ1O8=; b=r8zg1sCeWkNKE7gc7C+e+At4lA
+        bdH0jciNm36VvbZ6MEuKXmbGcb8NaOaAQD3vfDn30e6roeFhDmvCz2AXFfYxZ8YMpCK4xKnYSCcG/
+        m35HTKIOvnsjNQoAXnWPEkKlgr/Ob8DCkeQLdh44yx/enLT8fSA8ttHEN1iwgXT9caFJOki3c1uyR
+        2xPfeg4UQqy17CHYPbYOQwH8B/9kRe5C58LYSG2F6KsDMwFQAzXf6DJRH98IXEt/0PilDDw8Jx8pF
+        wxgvCahUwzEbaAw2m0whT9IDFgRDdE97DQzjnEy/nBQ23oYBbT8EkO/tPsYr+TbVI0Q/TPpxzVCVl
+        j8FhJB8Q==;
+Received: from [2001:8b0:10b:1:ad95:471b:fe64:9cc3]
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kRigX-0002Jt-Hz; Sun, 11 Oct 2020 21:15:18 +0000
+Date:   Sun, 11 Oct 2020 22:15:13 +0100
+User-Agent: K-9 Mail for Android
+In-Reply-To: <87pn5or8k7.fsf@nanos.tec.linutronix.de>
+References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org> <20201007122046.1113577-1-dwmw2@infradead.org> <20201007122046.1113577-5-dwmw2@infradead.org> <87blhcx6qz.fsf@nanos.tec.linutronix.de> <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org> <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org> <87362owhcb.fsf@nanos.tec.linutronix.de> <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org> <87tuv4uwmt.fsf@nanos.tec.linutronix.de> <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org> <874kn2s3ud.fsf@nanos.tec.linutronix.de> <0E51DAB1-5973-4226-B127-65D77DC46CB5@infradead.org> <87pn5or8k7.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
+To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
+CC:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+From:   David Woodhouse <dwmw2@infradead.org>
+Message-ID: <F0F0A646-8DBA-4448-933F-993A3335BD59@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203477
 
---- Comment #6 from Yonggang Luo (luoyonggang@gmail.com) ---
-The command line I am using
-```
-/usr/bin/kvm -id 101 -name Win10-Video -chardev
-socket,id=qmp,path=/var/run/qemu-server/101.qmp,server,nowait -mon
-chardev=qmp,mode=control -chardev
-socket,id=qmp-event,path=/var/run/qmeventd.sock,reconnect=5 -mon
-chardev=qmp-event,mode=control -pidfile /var/run/qemu-server/101.pid -daemonize
--smbios type=1,uuid=0e1a8f04-2fcd-4e7b-a615-b5f60c17c244 -smp
-16,sockets=1,cores=16,maxcpus=16 -nodefaults -boot
-menu=on,strict=on,reboot-timeout=1000,splash=/usr/share/qemu-server/bootsplash.jpg
--vnc unix:/var/run/qemu-server/101.vnc,password -no-hpet -cpu
-kvm64,enforce,hv_ipi,hv_relaxed,hv_reset,hv_runtime,hv_spinlocks=0x1fff,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vpindex,+kvm_pv_eoi,+kvm_pv_unhalt,+lahf_lm,+sep
--m 16384 -readconfig /usr/share/qemu-server/pve-q35-4.0.cfg -device
-vmgenid,guid=4d51db1b-14b4-48ee-a10e-87e12165dd90 -device
-nec-usb-xhci,id=xhci,bus=pci.1,addr=0x1b -device
-usb-tablet,id=tablet,bus=ehci.0,port=1 -device
-usb-host,bus=xhci.0,hostbus=4,hostport=2,id=usb0 -device
-qxl-vga,id=vga,bus=pcie.0,addr=0x1 -device
-virtio-serial,id=spice,bus=pci.0,addr=0x9 -chardev
-spicevmc,id=vdagent,name=vdagent -device
-virtserialport,chardev=vdagent,name=com.redhat.spice.0 -spice
-tls-port=61000,addr=127.0.0.1,tls-ciphers=HIGH,seamless-migration=on -device
-virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x3 -iscsi
-initiator-name=iqn.1993-08.org.debian:01:fbd3a8f979d -drive
-file=/var/lib/vz/template/iso/virtio-win-0.1.189.iso,if=none,id=drive-ide0,media=cdrom,aio=threads
--device ide-cd,bus=ide.0,unit=0,drive=drive-ide0,id=ide0,bootindex=200 -drive
-file=/var/lib/vz/template/iso/cn_windows_10_business_editions_version_2004_updated_sep_2020_x64_dvd_7134ba4b.iso,if=none,id=drive-ide2,media=cdrom,aio=threads
--device ide-cd,bus=ide.1,unit=0,drive=drive-ide2,id=ide2,bootindex=201 -drive
-file=/dev/pve/vm-101-disk-0,if=none,id=drive-virtio0,format=raw,cache=none,aio=native,detect-zeroes=on
--device
-virtio-blk-pci,drive=drive-virtio0,id=virtio0,bus=pci.0,addr=0xa,bootindex=100
--netdev
-type=tap,id=net0,ifname=tap101i0,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on
--device
-virtio-net-pci,mac=AE:79:28:76:97:65,netdev=net0,bus=pci.0,addr=0x12,id=net0,bootindex=300
--rtc driftfix=slew,base=localtime -machine type=q35+pve0 -global
-kvm-pit.lost_tick_policy=discard -cpu
-host,enforce,hv_ipi,hv_relaxed,hv_reset,hv_runtime,hv_spinlocks=0x1fff,hv_stimer,hv_synic,hv_time,hv_vapic,hv_vpindex,+kvm_pv_eoi,+kvm_pv_unhalt,+lahf_lm,+sep,+svm,-hypervisor
-```
 
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+On 11 October 2020 18:12:08 BST, Thomas Gleixner <tglx@linutronix=2Ede> wr=
+ote:
+>On Sat, Oct 10 2020 at 12:58, David Woodhouse wrote:
+>> On 10 October 2020 12:44:10 BST, Thomas Gleixner <tglx@linutronix=2Ede>
+>wrote:
+>>>On Sat, Oct 10 2020 at 11:06, David Woodhouse wrote:
+>
+>>>> The IRQ remapping drivers already plug into the device-add notifier
+>>>> and can fill in the appropriate MSI domain just like they do=C2=B9 fo=
+r
+>>>> PCI and ACPI devices=2E
+>>>> Using platform_add_bundle() for HPET looks trivial enough; I'll
+>have
+>>>> a play with that and then do IOAPIC too if/when the initialisation
+>>>> order and hotplug handling all works out OK to install the correct
+>>>> msi_domain=2E
+>>>
+>>> Yes, I was wondering about that when I made PCI at least use that
+>>> mechanism, but had not had time to actually look at it=2E
+>>
+>> Yeah=2E There's some muttering to be done for HPET about whether it's
+>> *its* MSI domain or whether it's the parent domain=2E But I'll have a
+>> play=2E I think we'll be able to drop the whole
+>> irq_remapping_get_irq_domain() thing=2E
+>
+>That would be really nice=2E
+
+I can make it work for HPET if I fix up the point at which the IRQ remappi=
+ng code registers a notifier on the platform bus=2E (At IRQ remap setup tim=
+e is too early; when it registers the PCI bus notifier is too late=2E)
+
+IOAPIC is harder though as the platform bus doesn't even exist that early=
+=2E Maybe an early platform bus is possible but it would have to turn out p=
+articularly simple to do, or I'd need to find another use case too, to just=
+ify it=2E Will continue to play=2E=2E=2E=2E
+
+>> Either way, it's a separate cleanup and the 15-bit APIC ID series I
+>> posted yesterday should be fine as it is=2E
+>
+>I go over it in the next days once more and stick it into my devel tree
+>until rc1=2E Need to get some conflicts sorted with that Device MSI
+>stuff=2E
+
+While playing with HPET I noticed I need s/CONFIG_PCI_MSI/CONFIG_IRQ_GENER=
+IC_MSI/ where the variables are declared at the top of msi=2Ec to match the=
+ change I made later on=2E Can post v3 of the series or you can silently fi=
+x it up as you go; please advise=2E
+
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
