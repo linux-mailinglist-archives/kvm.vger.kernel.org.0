@@ -2,107 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0ABD28B832
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 15:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DFDA28B9D8
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 16:04:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390000AbgJLNuF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 09:50:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60672 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389812AbgJLNtT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Oct 2020 09:49:19 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36C8C0613D0
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 06:49:18 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id m22so4459890ots.4
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 06:49:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8X09Z4RduZw54E7UULyfcMVsq59sUX38yzJavXEvAuQ=;
-        b=OxcKeNhvQoR0L8nxbCn1cXzOLqpqQBDfywbnUKwin8fP1jeNNo8TXGjdlV3i/RFefc
-         kiDn5u8kWGFx2VxB985ageHcqSHKlzq4zLw3IXCA9ks8vIzNebZc3IQZx/DZrDgmJSXd
-         NsUKEksWwYQT7XMaHoiEwCdO/DkttVP0ejuaI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8X09Z4RduZw54E7UULyfcMVsq59sUX38yzJavXEvAuQ=;
-        b=qQUTBOlZd9J7GeC+DimOK6RB7Ru+9jaCZKspPnaupgQP8uAuQpg/pvvXpAb+266m6Z
-         8NOcejFqXa4rcLdZEHNkqhuAv3+J43VMw0A9O+x2hU9OC3rZbR2eQo4jNkLQ5u/NMIm1
-         pG5TBp8N9pBhh0KXWXeRISr01nxypwzoUt3lKZGMSjsUzQao4o14DIs+WJhwKJpDdo9M
-         pO2OSq+QoAUHk/AUqfXa+7beOIVt1PQzPcraSHQWmsK7I8urLmym4qAUZQ6bwtKY1BzS
-         yadf2GDJjbYpvw0PzN90NS71ll2sRZ+AVPY3QfM1IanhoJuH0kbOFdeCnF89c47f8nJa
-         /hPA==
-X-Gm-Message-State: AOAM532HdK6T2yEAFuP5LLbESxNFN2RFV961cHjfvpS8jSFygpQNsmQd
-        T+qUZTWWJAgfF15ikxthPrLlMhJcweBGueYCvEto1A==
-X-Google-Smtp-Source: ABdhPJx2SbzoAtarumY1qTqnmUTVH9IgcM13EmZUSL9fGwCe3viWjRc3PXrzmY6z+PXG92wLIZXLR8i7oO5kJrgMePc=
-X-Received: by 2002:a05:6830:8b:: with SMTP id a11mr7008058oto.303.1602510558346;
- Mon, 12 Oct 2020 06:49:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
- <20201009075934.3509076-10-daniel.vetter@ffwll.ch> <20201009123421.67a80d72@coco.lan>
- <20201009122111.GN5177@ziepe.ca> <20201009143723.45609bfb@coco.lan>
- <CGME20201009124900eucas1p26c93caa29c9925f1eef9be9ff7c6c65c@eucas1p2.samsung.com>
- <20201009124850.GP5177@ziepe.ca> <ed68968b-27bc-d776-8da8-ef21d6b3c378@samsung.com>
-In-Reply-To: <ed68968b-27bc-d776-8da8-ef21d6b3c378@samsung.com>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Mon, 12 Oct 2020 15:49:07 +0200
-Message-ID: <CAKMK7uGLOubJrr9A=usxkoVx+nXDW3bxhykfeU-TYXTUZyBoeQ@mail.gmail.com>
-Subject: Re: [PATCH v2 09/17] mm: Add unsafe_follow_pfn
-To:     Marek Szyprowski <m.szyprowski@samsung.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, Kees Cook <keescook@chromium.org>,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+        id S2390918AbgJLOEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 10:04:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12896 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2403767AbgJLODw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Oct 2020 10:03:52 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09CE17Ne018109;
+        Mon, 12 Oct 2020 10:03:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9XZVPCzxR7io9Yrm5bz2pZhnBT0B6bmEzvhzPr5tu+k=;
+ b=lM6Lq1hxDAVbJy/T/9DGSzvJGB/1tT6cuVQtMb6COlj6rIfR/a9hYwvFChI1USLqQirz
+ fNaHBlYt4yxmdR2LZk39peXNUpw0iBDbS2UZObEvi5gEjbJqs4LA7VRt3BsrkBf5Pc4s
+ FqlfeBb7+NH70qz1nKV2Wv+mO3iv3xvbzNrv1CT6KHgNV4sBVrNvkeS98IfstwwJ2okx
+ stPGOZeyzURa8zgX/NVPdt35+W3+sskKlYR2sugwCuMGF1lj3qQdUtd3tHQRsM5sNWiu
+ UHWKGlTA3uwkcS2SFZbM7C6UEDpnKqh4O4KG8y6hutCho2WBIMuPOydex3vIfRDRvSz9 WA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 344qdaahcr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Oct 2020 10:03:35 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09CE1ukg021820;
+        Mon, 12 Oct 2020 10:03:34 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 344qdaahb8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Oct 2020 10:03:34 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09CE3Wk4004006;
+        Mon, 12 Oct 2020 14:03:32 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06fra.de.ibm.com with ESMTP id 34347h12ug-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Oct 2020 14:03:32 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09CE3TKb28115244
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Oct 2020 14:03:29 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BC61A42045;
+        Mon, 12 Oct 2020 14:03:29 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ECCA342042;
+        Mon, 12 Oct 2020 14:03:28 +0000 (GMT)
+Received: from [9.145.9.103] (unknown [9.145.9.103])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Oct 2020 14:03:28 +0000 (GMT)
+Subject: Re: [PATCH v2 08/17] s390/pci: Remove races against pte updates
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>,
         DRI Development <dri-devel@lists.freedesktop.org>,
-        Linux MM <linux-mm@kvack.org>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
         Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
         Dan Williams <dan.j.williams@intel.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>
+References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
+ <20201009075934.3509076-9-daniel.vetter@ffwll.ch>
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+Message-ID: <6deb08dd-46f3-bf26-5362-fdc696f6fd74@linux.ibm.com>
+Date:   Mon, 12 Oct 2020 16:03:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+MIME-Version: 1.0
+In-Reply-To: <20201009075934.3509076-9-daniel.vetter@ffwll.ch>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-12_09:2020-10-12,2020-10-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 bulkscore=0 impostorscore=0 malwarescore=0 phishscore=0
+ adultscore=0 mlxlogscore=999 spamscore=0 clxscore=1011 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010120109
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 12, 2020 at 12:47 PM Marek Szyprowski
-<m.szyprowski@samsung.com> wrote:
->
-> Hi Jason,
->
-> On 09.10.2020 14:48, Jason Gunthorpe wrote:
-> > On Fri, Oct 09, 2020 at 02:37:23PM +0200, Mauro Carvalho Chehab wrote:
-> >
-> >> I'm not a mm/ expert, but, from what I understood from Daniel's patch
-> >> description is that this is unsafe *only if*  __GFP_MOVABLE is used.
-> > No, it is unconditionally unsafe. The CMA movable mappings are
-> > specific VMAs that will have bad issues here, but there are other
-> > types too.
->
-> I'm trying to follow this thread, but I really wonder what do you mean
-> by CMA movable mappings? If a buffer has been allocated from CMA and
-> used for DMA, it won't be moved in the memory. It will stay at the same
-> physical memory address all the time until freed by the owner. It just a
-> matter of proper usage count tracking to delay freeing if it is still
-> used somewhere.
+Hi Daniel,
 
- Yup. The problem is that this usage count tracking doesn't exist. And
-drivers could at least in theory treat CMA like vram and swap buffers
-in&out of it, so just refcounting the userspace vma isn't enough. In
-practice, right now, it might be enough for CMA drivers though (but
-there's more that's possible here).
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+freshly back from my vacation I've just taken a look at your patch.
+First thanks for this fix and the detailed commit description.
+Definitely makes sense to fix this and you can add my
+
+Acked-by: Niklas Schnelle <schnelle@linux.ibm.com>
+
+Content wise it all looks sane and clear and since Gerald did the testing,
+I would have applied it to our tree already, but I got some trivial
+checkpatch violations that probably apply to the whole series.
+I've commented them inline below.
+If you confirm there I can do the fixups when applying or you can resend.
+
+On 10/9/20 9:59 AM, Daniel Vetter wrote:
+> Way back it was a reasonable assumptions that iomem mappings never
+> change the pfn range they point at. But this has changed:
+> 
+> - gpu drivers dynamically manage their memory nowadays, invalidating
+> ptes with unmap_mapping_range when buffers get moved
+> 
+> - contiguous dma allocations have moved from dedicated carvetouts to
+> cma regions. This means if we miss the unmap the pfn might contain
+> pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
+> 
+> - even /dev/mem now invalidates mappings when the kernel requests that
+> iomem region when CONFIG_IO_STRICT_DEVMEM is set, see 3234ac664a87
+
+The above commit mention should use the format
+'commit 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims the region")'
+otherwise this results in a checkpatch ERROR.
+
+> ("/dev/mem: Revoke mappings when a driver claims the region")
+> 
+> Accessing pfns obtained from ptes without holding all the locks is
+> therefore no longer a good idea. Fix this.
+> 
+> Since zpci_memcpy_from|toio seems to not do anything nefarious with
+> locks we just need to open code get_pfn and follow_pfn and make sure
+> we drop the locks only after we've done. The write function also needs
+
+just a typo but just saw it "we're" instead of "we've"
+
+> the copy_from_user move, since we can't take userspace faults while
+> holding the mmap sem.
+> 
+> Reviewed-by: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+> 
+No empty line after the Revied-by tag.
+
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+
+Your Signed-off-by mail address does not match the one you're sending from,
+this yields a checkpatch warning when using git am with your mail.
+This is probably just a silly misconfiguration but since Signed-offs
+are signatures should I change this to 
+"Daniel Vetter <daniel.vetter@ffwll.ch>" which is the one you're
+sending from and also in the MAINTAINERS file?
+
+
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: John Hubbard <jhubbard@nvidia.com>
+> Cc: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+
+The above Cc: line for Dan Williams is a duplicate
+
+> Cc: linux-mm@kvack.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-samsung-soc@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+> Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+> Cc: linux-s390@vger.kernel.org
+> --
+> v2: Move VM_IO | VM_PFNMAP checks around so they keep returning EINVAL
+> like before (Gerard)
+
+I think the above should go before the CC/Signed-off/Reviewev block.
+
+> ---
+>  arch/s390/pci/pci_mmio.c | 98 +++++++++++++++++++++++-----------------
+>  1 file changed, 57 insertions(+), 41 deletions(-)
+> 
+> diff --git a/arch/s390/pci/pci_mmio.c b/arch/s390/pci/pci_mmio.c
+> index 401cf670a243..1a6adbc68ee8 100644
+> --- a/arch/s390/pci/pci_mmio.c
+> +++ b/arch/s390/pci/pci_mmio.c
+> @@ -119,33 +119,15 @@ static inline int __memcpy_toio_inuser(void __iomem *dst,
+>  	return rc;
+>  }
+>  
+> -static long get_pfn(unsigned long user_addr, unsigned long access,
+> -		    unsigned long *pfn)
+> -{
+> -	struct vm_area_struct *vma;
+> -	long ret;
+> -
+> -	mmap_read_lock(current->mm);
+> -	ret = -EINVAL;
+> -	vma = find_vma(current->mm, user_addr);
+> -	if (!vma)
+> -		goto out;
+> -	ret = -EACCES;
+> -	if (!(vma->vm_flags & access))
+> -		goto out;
+> -	ret = follow_pfn(vma, user_addr, pfn);
+> -out:
+> -	mmap_read_unlock(current->mm);
+> -	return ret;
+> -}
+> -
+>  SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
+>  		const void __user *, user_buffer, size_t, length)
+>  {
+>  	u8 local_buf[64];
+>  	void __iomem *io_addr;
+>  	void *buf;
+> -	unsigned long pfn;
+> +	struct vm_area_struct *vma;
+> +	pte_t *ptep;
+> +	spinlock_t *ptl;
+
+With checkpatch.pl --strict the above yields a complained
+"CHECK: spinlock_t definition without comment" but I think
+that's really okay since your commit description is very clear.
+Same oin line 277.
+
+... snip ...
