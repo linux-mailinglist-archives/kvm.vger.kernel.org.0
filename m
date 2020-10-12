@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CC3C28C360
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 22:53:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4120B28C402
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 23:28:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731488AbgJLUxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 16:53:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55890 "EHLO
+        id S1729982AbgJLV1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 17:27:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2274 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726510AbgJLUxU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Oct 2020 16:53:20 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09CKWMGX104962;
-        Mon, 12 Oct 2020 16:53:18 -0400
+        by vger.kernel.org with ESMTP id S1726348AbgJLV1w (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Oct 2020 17:27:52 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09CL1idn114122;
+        Mon, 12 Oct 2020 17:27:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=uYwph7UXBRMAvitUu3rOSDYGUUrvxjTgHJSuVzNcHHg=;
- b=KVG7TTe7gvKuOoWvCO9IKeZ5UieVAd/VqGCx7PapD4HsqY8UHfnjxclgf222Gl63Sjfs
- JNuw/vAwJCp5JcEml6Rk05sEAU6/c2gQOtcR/EoZVKGoSi5n4xKXhF8O6frM+Qphhhm3
- E4dnnu8BXWrcm4irxAMAnxyyJWX3GS7+lgjey8Dvgcnp1siPWRv+lHXdh+ceua6ZoNk9
- BWJhAnNN3UyUp0Dl9oQuOvEm2WlF/y1+RIPBKxFKH082o1mMnkhPDwtfAJMMU8XnzKx0
- 2ZmgIphFFbYZEYwU9/UGcP32TKQMg3WX83JOeY5WAMCNdXIw1cy8REToJYvAAQt6YB/R bg== 
+ bh=myU/DteIURSWurvS9ME1bVo31BjIRt1zRFBxspz4xj0=;
+ b=e9EmgJVd503+ADvrOZtgS4b45IwNAgwzcjjY5Z2PfmGN14xJwfI6t+4M8RJAKPLBTzog
+ 9LQBmZnvpwnUOlwbOlznzvFGrnKsRKhxK/MI+Rp/xb4Gm7JJoyuDxV9GeBKLl9lG1U5n
+ lE2hANGFvw7eMY9rDSezUCM0ceW9kZ1WOIIQpPU6qjSsAj7Awv5yDoHmSWCpbVsNikpc
+ XEXNY1QX6BGuzHQQY3jFx0/hcpstSdYT/BfEpKKtjgiYzzSm+zFFhyktxe4TtoYXpKey
+ LaSy34yO57oecF09G43mKbTXhUtoCvUiXOc7j8KWG79j35EYquych5cuN9igLDX0Wfmf UQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 344w3ta5kv-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 344v8tm29h-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Oct 2020 16:53:18 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09CKWpik106038;
-        Mon, 12 Oct 2020 16:53:17 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 344w3ta5kg-1
+        Mon, 12 Oct 2020 17:27:50 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09CL1mPX114265;
+        Mon, 12 Oct 2020 17:27:50 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 344v8tm299-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Oct 2020 16:53:17 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09CKpnYu012842;
-        Mon, 12 Oct 2020 20:53:16 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma02dal.us.ibm.com with ESMTP id 3434k970kw-1
+        Mon, 12 Oct 2020 17:27:50 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09CLCvpI011100;
+        Mon, 12 Oct 2020 21:27:49 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma05wdc.us.ibm.com with ESMTP id 3434k8tk3j-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Oct 2020 20:53:16 +0000
+        Mon, 12 Oct 2020 21:27:48 +0000
 Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09CKr81631064484
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09CLRjw034734578
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Oct 2020 20:53:08 GMT
+        Mon, 12 Oct 2020 21:27:45 GMT
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 78BBF6A04D;
-        Mon, 12 Oct 2020 20:53:13 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 9BDA36A047;
+        Mon, 12 Oct 2020 21:27:45 +0000 (GMT)
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B11C06A047;
-        Mon, 12 Oct 2020 20:53:11 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D5B0F6A051;
+        Mon, 12 Oct 2020 21:27:43 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.85.170.177])
         by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 12 Oct 2020 20:53:11 +0000 (GMT)
+        Mon, 12 Oct 2020 21:27:43 +0000 (GMT)
 Subject: Re: [PATCH v10 13/16] s390/vfio-ap: handle host AP config change
  notification
 To:     Halil Pasic <pasic@linux.ibm.com>
@@ -68,8 +68,8 @@ References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
  <20200821195616.13554-14-akrowiak@linux.ibm.com>
  <20200928033817.20b95549.pasic@linux.ibm.com>
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <9fa63ecd-4dd4-d13d-4805-91fc4c322b7c@linux.ibm.com>
-Date:   Mon, 12 Oct 2020 16:53:10 -0400
+Message-ID: <e5ddd1ae-0c35-0089-1d40-30157065dece@linux.ibm.com>
+Date:   Mon, 12 Oct 2020 17:27:43 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
@@ -80,11 +80,11 @@ Content-Language: en-US
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-10-12_17:2020-10-12,2020-10-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0 suspectscore=0
- clxscore=1015 malwarescore=0 lowpriorityscore=0 adultscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010120150
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ mlxscore=0 adultscore=0 clxscore=1015 mlxlogscore=999 suspectscore=0
+ impostorscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010120154
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -108,6 +108,23 @@ On 9/27/20 9:38 PM, Halil Pasic wrote:
 >
 > I mean if the removal is for a reason different that host config change,
 > we wont update the guest_matrix or?
+
+This patch specifically handles AP configuration change notification.
+The idea behind this notification is that if a configuration change results
+in one or more queues getting removed from the guest, it can be done
+in bulk before each of the queues is unbound by the AP bus. That way
+any cleanup (e.g., resets etc.) can be performed before the bus gets
+control.
+
+Also, keep in mind that an unbind can take place for reasons other than
+an AP configuration change:
+1. Manual unbind of a queue
+2. Deconfiguration of an adapter
+3. Adapter is broken (e.g., CHECKSTOP)
+If the queue is being unbound as a result of an AP configuration
+change, the vfio_ap_remove_queue() function will ignore the
+unbind because it has already been handled by this on_config_changed
+callback prior to the unbind operation (see patch 15/16).
 >
 >> ---
 >>   drivers/s390/crypto/vfio_ap_drv.c     |   5 +-
@@ -273,6 +290,9 @@ Yes, I'll remove it.
 > I guess, we could accomplish the unassign with operations operating on
 > full bitmaps (without looping over bits), but I have no strong opinion
 > here.
+
+Yes we can and will.
+
 >
 >> +
 >> +	return unassigned;
@@ -366,6 +386,9 @@ Yes, I'll remove it.
 > 	D;
 > and your wouldn't end up that deep indentation. It is a style thing,
 > so unless regulated by the official coding style, it is up to you :)
+
+I will simplify it.
+
 >
 >
 >> +					unassigned = true;
