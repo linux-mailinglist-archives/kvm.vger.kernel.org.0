@@ -2,103 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5717428BF47
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 19:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5477B28BF80
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 20:16:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403772AbgJLR4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 13:56:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42442 "EHLO
+        id S2390828AbgJLSQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 14:16:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390827AbgJLR4I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Oct 2020 13:56:08 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A73C0613D0
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 10:56:07 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id f10so16618368otb.6
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 10:56:07 -0700 (PDT)
+        with ESMTP id S2389885AbgJLSQh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Oct 2020 14:16:37 -0400
+Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880E3C0613D0
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 11:16:37 -0700 (PDT)
+Received: by mail-oo1-xc43.google.com with SMTP id o20so4277627ook.1
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 11:16:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ynshGyGxXH52PDD9UJq4+1p/woBGcxlKFru5YAED32M=;
-        b=POgI3WcbpTYW+8ffmyMUk4x1++KXNeKgKUGLzte25A/6bMOLN3G5IgnZuN4XlXfTPO
-         feeVdNw9KM0QHaabRz1hRcUwQa/qsSlKeGd5SFRIas6RbArXiu3V/Xb3ljywiJyC+Tt9
-         MtE+QrfepaKBDKWYpj2u3TrAMAl+xCiCkUKBvAlbRldw1yuIPt3KUN7jZf8OMImoK8jr
-         kt489b9sn6YGRYnj8oV9spNwRdMdiyL/QLdBWuXjhaat/kiAz705aPdtroHMjq73r2Ns
-         uJM8NP8vjz/M3UsnQ6eStcC0kem1RkwnCu+IJbwkTmyTCL8pVl+8LyqGB+szJwOsmYLO
-         Mq9Q==
+        bh=iUAJKW6hddojVyqh8dZ17EQuKVGjDKTcIVQSo3DvGY0=;
+        b=jUGlRAHx9t4hlUWIl6vgZ9RvE7VQO7uW8YCiNz9p9v2A0p0YpOokDMj7gCd2Za1PaY
+         gDvcSli7lnw04U3crAOsNSbz2XP4CprmhX7z3dan+H+B1etKiqTzWNFT/Zsm4D4YcWiC
+         DoBTzCIcZynEuH6KwoiYNfWSjxFnEknZg7S7eCVeJHtDcbSirj9uf6zittl+YRRK2nIb
+         9I7XJ1jxthtH5WjX4r9bw3HddhOQu5XP5yicgeUoMWxxju4KBRnR63nIr5JkHydXY6Zm
+         6ULysluMwsw+l/HShjmkBtYvcE53Zly7zrSaVzzVIPXq/c0PLZG/UMwqJFlr94n9/rB6
+         KbuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ynshGyGxXH52PDD9UJq4+1p/woBGcxlKFru5YAED32M=;
-        b=VS1LYmBxpnSPX+mIITQ3iIdONhOvSucuRh2Zfccl7PEZk2vmUlYai3HUCl4rNYG/6V
-         PIqVOwRgunqqr4VfWHOxWHU866kXPx0ZPxaX9+1J7JIEaulpX8LnIKjUuLXKvV06vWQd
-         eWnAVdgeuXqdZKU4NiR5OkIkSMNBFNyAcE2Rgzv5duDTWiLvl2MFFmqDYHpkZ6gPW1Jo
-         XEVHSN7EDf7WYcbp9/jqvvYkcCY48Uiu5w1JESeLgCBuR7Hm9QUh8vLQa7F+SfXXy2zV
-         s/P0kkqkBkoJfo79Zf54HCkvis6R5FfMfwgLRDoeO2vWUbRBed5wNyg5NdTfX5fmuCtb
-         EGsw==
-X-Gm-Message-State: AOAM5324dbANrjsGFdHRjKA38OnP9G1RK/Z1tKxXTX6wdY61a8Hk8Ws9
-        zYlEqrp2oHhdPp2E9zzDWy67zuYSS7DAoKTpHOqMBA==
-X-Google-Smtp-Source: ABdhPJzeUyd/W+apsqkqIut4CuK8ngIZxJKwJ5bxKCm6fnJ6xnUXIuAiAClJ8OQJDyTqUbnTa4VqeYhbsXlzgO8a9lw=
-X-Received: by 2002:a9d:51c4:: with SMTP id d4mr7169650oth.56.1602525366360;
- Mon, 12 Oct 2020 10:56:06 -0700 (PDT)
+        bh=iUAJKW6hddojVyqh8dZ17EQuKVGjDKTcIVQSo3DvGY0=;
+        b=fEVPi+cn6kd7qNl6kqbrAgLKaQiKi2Y8fCbrWEWd0dtWQTnS7ff2ehOSOJlg2MIXu9
+         qpV7gtnmvCKRn/i/mWQPD1lNdNqpbMbooTRqGBf0mBtrwghlGpKLRNkIvTwXSwVQh3xC
+         fMNvoTdRjIfnKPgtn0XtKWDVbXYWP1YYd4blIVJtsndwZxZAaAqMp3IF5wUqbmXakt6X
+         PSdwnRrMfXcsEJEE7zYrm6t20oGFRmyhxryNvNtyCmj/Idp5i0oytsrZeopNx8IUQY7t
+         nERVi35M127sRn0o2KIAHYGGzX5x7Bt8ZheFQQwgE5/q6AeNAzS0gWjJxPsoX+xgPF8Q
+         eQQQ==
+X-Gm-Message-State: AOAM530uMBl9MAGRm/iXAUyA4QMydxECHXU4faIsbnHPQwApbwf+Sxwj
+        5mHWsBaA/B05+soW/rSDghImfWfzqPClfm3aMXASCpBsqsE=
+X-Google-Smtp-Source: ABdhPJz/nCbxBgLQ8VfFTLChSymaXzsfNsbFUqJJSXeoKYczfE3SfLBMhhiMuPrqnDy3odDvLay70ThIS2k/DwdlYNM=
+X-Received: by 2002:a4a:b811:: with SMTP id g17mr2897504oop.82.1602526596603;
+ Mon, 12 Oct 2020 11:16:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200508203938.88508-1-jmattson@google.com> <D121A03E-6861-4736-8070-5D1E4FEE1D32@gmail.com>
- <20201012163219.GC26135@linux.intel.com> <5A0776F7-7314-408C-8C58-7C4727823906@gmail.com>
-In-Reply-To: <5A0776F7-7314-408C-8C58-7C4727823906@gmail.com>
+References: <20200818002537.207910-1-pshier@google.com> <4A2666E9-2C3F-4216-9944-70AC3413C09B@gmail.com>
+ <7C2513EE-5754-4F42-9700-7FE43C6A0805@gmail.com>
+In-Reply-To: <7C2513EE-5754-4F42-9700-7FE43C6A0805@gmail.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 12 Oct 2020 10:55:54 -0700
-Message-ID: <CALMp9eTkDOCkHaWrqYXKvOuZG4NheSwEgiqGzjwAt6fAdC1Z4A@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: VMX: Add a VMX-preemption timer
- expiration test
+Date:   Mon, 12 Oct 2020 11:16:24 -0700
+Message-ID: <CALMp9eQBgJwLLk-9in=v1wwrj2_p5T3aLfaj79Y6Yzh+CEE1SA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: vmx: Add test for MTF on a guest
+ MOV-to-CR0 that enables PAE
 To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>
+Cc:     Peter Shier <pshier@google.com>, KVM <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I don't know of any relevant hardware errata. The test verifies that
-the implementation adheres to the architectural specification.
+On Sat, Oct 10, 2020 at 2:52 AM Nadav Amit <nadav.amit@gmail.com> wrote:
 
-KVM clearly doesn't adhere to the architectural specification. I don't
-know what is wrong with your Broadwell machine.
+> I guess that the test makes an assumption that there are no addresses
+> greater than 4GB. When I reduce the size of the memory, the test passes.
 
-On Mon, Oct 12, 2020 at 9:47 AM Nadav Amit <nadav.amit@gmail.com> wrote:
->
-> > On Oct 12, 2020, at 9:32 AM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Sat, Oct 10, 2020 at 01:42:26AM -0700, Nadav Amit wrote:
-> >>> On May 8, 2020, at 1:39 PM, Jim Mattson <jmattson@google.com> wrote:
-> >>>
-> >>> When the VMX-preemption timer is activated, code executing in VMX
-> >>> non-root operation should never be able to record a TSC value beyond
-> >>> the deadline imposed by adding the scaled VMX-preemption timer value
-> >>> to the first TSC value observed by the guest after VM-entry.
-> >>>
-> >>> Signed-off-by: Jim Mattson <jmattson@google.com>
-> >>> Reviewed-by: Peter Shier <pshier@google.com>
-> >>
-> >> This test failed on my bare-metal machine (Broadwell):
-> >>
-> >> Test suite: vmx_preemption_timer_expiry_test
-> >> FAIL: Last stored guest TSC (44435478250637180) < TSC deadline (44435478250419552)
-> >>
-> >> Any hints why, perhaps based on the motivation for the test?
-> >
-> > This test also fails intermittently on my Haswell and Coffee Lake systems when
-> > running on KVM.  I haven't done any "debug" beyond a quick glance at the test.
-> >
-> > The intent of the test is to verify that KVM injects preemption timer VM-Exits
-> > without violating the architectural guarantees of the timer, e.g. that the exit
-> > isn't delayed by something else happening in the system.
->
-> Thanks for testing it. I was wondering how come KVM does not experience such
-> failures.
->
-> I figured the basic motivation of the patch, but I was wondering whether
-> there is some errata that the test is supposed to check.
->
+Yes; the identity-mapped page used for real-address mode has to be
+less than 4Gb.
+
+I think this can be fixed with an entry in unittests.cfg that specifies -m 2048.
