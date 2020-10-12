@@ -2,150 +2,407 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6399328C4B7
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 00:22:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DF0528C515
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 01:00:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389166AbgJLWWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 18:22:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37938 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388524AbgJLWWM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Oct 2020 18:22:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602541330;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yjGUBxBoe8Q9Umu8r0BjI9ieeAxQ0aLM4vfXiCy6qYo=;
-        b=Pqp4sm5TbkeNJTEcOA/RoFHVQAQ0ZVzdnZTsQz50FdL2jfay2OrI3k9VVN7S/5vvcgfULi
-        LWhAZkwThq9HBWrAAtH9Np9g1BG9RnKFdgFvYjZznOg7sjbSb/0UMl+BPsYmsDskKjuAau
-        pYaIcuCZ3kWzFl6J8x9SmBGIO3UrzRE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-9cn0hldNPXSJ6G789FaMow-1; Mon, 12 Oct 2020 18:22:02 -0400
-X-MC-Unique: 9cn0hldNPXSJ6G789FaMow-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 465075200;
-        Mon, 12 Oct 2020 22:22:01 +0000 (UTC)
-Received: from w520.home (ovpn-113-35.phx2.redhat.com [10.3.113.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D437B76643;
-        Mon, 12 Oct 2020 22:21:57 +0000 (UTC)
-Date:   Mon, 12 Oct 2020 16:21:57 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>, kbuild-all@lists.01.org,
-        kvm@vger.kernel.org, Bharat Bhushan <Bharat.Bhushan@nxp.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: Re: [vfio:next 19/27] drivers/vfio/fsl-mc/vfio_fsl_mc.c:189:36:
- error: 'FSL_MC_REGION_CACHEABLE' undeclared
-Message-ID: <20201012162157.532edd5f@w520.home>
-In-Reply-To: <202010130507.H3A1OKjq-lkp@intel.com>
-References: <202010130507.H3A1OKjq-lkp@intel.com>
+        id S2390956AbgJLXAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 19:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33542 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390941AbgJLW7s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Oct 2020 18:59:48 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6790C0613D1
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 15:59:47 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id q9so19491607iow.6
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 15:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cNsRLEkySf3v54+YqIeevQ4fb9eVdZRoPO5zed6Njvg=;
+        b=J1+jbZmmGQs6PTdls6Glk+YhlKexrpR3t27C8STz3O3vJY3CMk0xd+/zPRRewn9fYU
+         A8D5KhRdh4bOmRpqhuu3pWzWv+FHKrc4dQ860B5Da+bN1mqW+X1AigVTImy47Am5AEug
+         rGodI/tjj+zuE9b6C++WLf1M9XCGvavdsjANnEU04BtKNGvtZVdQUOj/KnWqEKCZTY07
+         UwZBpfhCGooQzcWGduU0SBjZdZKMeAsj7LkzSlN1Nq2OvFvn9HGLdvERsHfW0TEqSw56
+         WsL+mcwI2l6q97V23AUH5XHx4es0hxmEiJUWdxpcz2k8urS2hrF2fBZx04IXBxAIIeow
+         u75w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cNsRLEkySf3v54+YqIeevQ4fb9eVdZRoPO5zed6Njvg=;
+        b=dunb6j/Hp1leyefi3sw3Zl2yiSop/om2ntnPN908LvLZinAxrwcHV6ZccQsoY6okC/
+         UpHX6Sf31xtO6ULI6o2epeidoR7eUGZKQ/4CvDuWBjhzVlchX/hmfXcJp6cfiY9gMK8l
+         Mfrv42UEEus5E5RaEadibS7eye96k2K28y11PGwBmdfNg93REdIDFbJEclt5gnT2S9mI
+         Up5htsbrrCAsxhd1hTGBWDbH91MeZXjzX9Rsp1LMHqqZ+oB44h+OQVdr76gHUouodXjL
+         z3HLf0LI3BYcMUq8pMaVqsiEiiq7XOqYXZX+1eUI51HWIMIGMCLuvqqMUK9XeOy6h220
+         PImA==
+X-Gm-Message-State: AOAM530broOyyHCUlQKQjkHtrUcrrO82zg1Q3c2RfwJKvqJpcgybMjfO
+        PWTYW0F6fIHY1/W4T7GVrGq45TWN6CNjHp49oESpPQ==
+X-Google-Smtp-Source: ABdhPJy/CL3a+iDKKsZCRVNHyp1AS4/aW/91KE1iht4vaOkv37WURoQ0hLz5TGJNc5vgHWJEVVAIUrIJBvGKO+0HkNg=
+X-Received: by 2002:a5d:97c2:: with SMTP id k2mr18626090ios.9.1602543586731;
+ Mon, 12 Oct 2020 15:59:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20200925212302.3979661-1-bgardon@google.com> <20200925212302.3979661-5-bgardon@google.com>
+ <20200930060610.GA29659@linux.intel.com>
+In-Reply-To: <20200930060610.GA29659@linux.intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 12 Oct 2020 15:59:35 -0700
+Message-ID: <CANgfPd90pTFr_36EhHsZjYkmFdyhyxYsRVxQ4_63znT1ri7jOw@mail.gmail.com>
+Subject: Re: [PATCH 04/22] kvm: mmu: Allocate and free TDP MMU roots
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Sep 29, 2020 at 11:06 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Fri, Sep 25, 2020 at 02:22:44PM -0700, Ben Gardon wrote:
+>   static u64 __read_mostly shadow_nx_mask;
+> > @@ -3597,10 +3592,14 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+> >       if (!VALID_PAGE(*root_hpa))
+> >               return;
+> >
+> > -     sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
+> > -     --sp->root_count;
+> > -     if (!sp->root_count && sp->role.invalid)
+> > -             kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
+> > +     if (is_tdp_mmu_root(kvm, *root_hpa)) {
+> > +             kvm_tdp_mmu_put_root_hpa(kvm, *root_hpa);
+> > +     } else {
+> > +             sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
+> > +             --sp->root_count;
+> > +             if (!sp->root_count && sp->role.invalid)
+> > +                     kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
+>
+> Hmm, I see that future patches use put_tdp_mmu_root()/get_tdp_mmu_root(),
+> but the code itself isn't specific to the TDP MMU.  Even if this ends up
+> being the only non-TDP user of get/put, I think it'd be worth making them
+> common helpers, e.g.
+>
+>         sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
+>         if (mmu_put_root(sp) {
+>                 if (is_tdp_mmu(...))
+>                         kvm_tdp_mmu_free_root(kvm, sp);
+>                 else if (sp->role.invalid)
+>                         kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
+>         }
+>
+> > +     }
+> >
+> >       *root_hpa = INVALID_PAGE;
+> >  }
+> > @@ -3691,7 +3690,13 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+> >       unsigned i;
+> >
+> >       if (shadow_root_level >= PT64_ROOT_4LEVEL) {
+> > -             root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level, true);
+> > +             if (vcpu->kvm->arch.tdp_mmu_enabled) {
+>
+> I believe this will break 32-bit NPT.  Or at a minimum, look weird.  It'd
+> be better to explicitly disable the TDP MMU on 32-bit KVM, then this becomes
+>
+>         if (vcpu->kvm->arch.tdp_mmu_enabled) {
+>
+>         } else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
+>
+>         } else {
+>
+>         }
+>
 
-While I'm a little surprise to see an i386 build pulling in
-vfio_fsl_mc, I see that CONFIG_FSL_MC_BUS does enable compile testing
-on various other archs.  I assume therefore that this is just the lack
-of the necessary fsl-bus series to enable the vfio_fsl_mc driver.
-Both should be present in the next linux-next tree and I'm aware to
-send my pull request after GregKH's to get the ordering of these
-correct in mainline.  Please let me know if there are any other
-concerns from anyone.  Thanks,
+How does this break 32-bit NPT? I'm not sure I understand how we would
+get into a bad state here because I'm not familiar with the specifics
+of 32 bit NPT.
 
-Alex
-
-
-On Tue, 13 Oct 2020 05:59:09 +0800
-kernel test robot <lkp@intel.com> wrote:
-
-> tree:   https://github.com/awilliam/linux-vfio.git next
-> head:   2099363255f123f6c9abcfa8531bbec65a8f1820
-> commit: 67247289688d49a610a956c23c4ff032f0281845 [19/27] vfio/fsl-mc: Allow userspace to MMAP fsl-mc device MMIO regions
-> config: i386-allyesconfig (attached as .config)
-> compiler: gcc-9 (Debian 9.3.0-15) 9.3.0
-> reproduce (this is a W=1 build):
->         # https://github.com/awilliam/linux-vfio/commit/67247289688d49a610a956c23c4ff032f0281845
->         git remote add vfio https://github.com/awilliam/linux-vfio.git
->         git fetch --no-tags vfio next
->         git checkout 67247289688d49a610a956c23c4ff032f0281845
->         # save the attached .config to linux build tree
->         make W=1 ARCH=i386 
-> 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> All errors (new ones prefixed by >>):
-> 
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c: In function 'vfio_fsl_mc_mmap_mmio':
-> >> drivers/vfio/fsl-mc/vfio_fsl_mc.c:189:36: error: 'FSL_MC_REGION_CACHEABLE' undeclared (first use in this function)  
->      189 |  region_cacheable = (region.type & FSL_MC_REGION_CACHEABLE) &&
->          |                                    ^~~~~~~~~~~~~~~~~~~~~~~
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c:189:36: note: each undeclared identifier is reported only once for each function it appears in
-> >> drivers/vfio/fsl-mc/vfio_fsl_mc.c:190:22: error: 'FSL_MC_REGION_SHAREABLE' undeclared (first use in this function)  
->      190 |       (region.type & FSL_MC_REGION_SHAREABLE);
->          |                      ^~~~~~~~~~~~~~~~~~~~~~~
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c: In function 'vfio_fsl_mc_bus_notifier':
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c:256:9: error: 'struct fsl_mc_device' has no member named 'driver_override'
->      256 |   mc_dev->driver_override = kasprintf(GFP_KERNEL, "%s",
->          |         ^~
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c:258:14: error: 'struct fsl_mc_device' has no member named 'driver_override'
->      258 |   if (!mc_dev->driver_override)
->          |              ^~
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c: In function 'vfio_fsl_mc_init_device':
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c:295:8: error: implicit declaration of function 'dprc_setup' [-Werror=implicit-function-declaration]
->      295 |  ret = dprc_setup(mc_dev);
->          |        ^~~~~~~~~~
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c:301:8: error: implicit declaration of function 'dprc_scan_container' [-Werror=implicit-function-declaration]
->      301 |  ret = dprc_scan_container(mc_dev, false);
->          |        ^~~~~~~~~~~~~~~~~~~
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c:310:2: error: implicit declaration of function 'dprc_remove_devices' [-Werror=implicit-function-declaration]
->      310 |  dprc_remove_devices(mc_dev, NULL, 0);
->          |  ^~~~~~~~~~~~~~~~~~~
->    drivers/vfio/fsl-mc/vfio_fsl_mc.c:311:2: error: implicit declaration of function 'dprc_cleanup' [-Werror=implicit-function-declaration]
->      311 |  dprc_cleanup(mc_dev);
->          |  ^~~~~~~~~~~~
->    cc1: some warnings being treated as errors
-> 
-> vim +/FSL_MC_REGION_CACHEABLE +189 drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> 
->    174	
->    175	static int vfio_fsl_mc_mmap_mmio(struct vfio_fsl_mc_region region,
->    176					 struct vm_area_struct *vma)
->    177	{
->    178		u64 size = vma->vm_end - vma->vm_start;
->    179		u64 pgoff, base;
->    180		u8 region_cacheable;
->    181	
->    182		pgoff = vma->vm_pgoff &
->    183			((1U << (VFIO_FSL_MC_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
->    184		base = pgoff << PAGE_SHIFT;
->    185	
->    186		if (region.size < PAGE_SIZE || base + size > region.size)
->    187			return -EINVAL;
->    188	
->  > 189		region_cacheable = (region.type & FSL_MC_REGION_CACHEABLE) &&
->  > 190				   (region.type & FSL_MC_REGION_SHAREABLE);  
->    191		if (!region_cacheable)
->    192			vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
->    193	
->    194		vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
->    195	
->    196		return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
->    197				       size, vma->vm_page_prot);
->    198	}
->    199	
-> 
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
-
+> > +                     root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
+> > +             } else {
+> > +                     root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level,
+> > +                                           true);
+> > +             }
+>
+> May not matter in the end, but the braces aren't needed.
+>
+> > +
+> >               if (!VALID_PAGE(root))
+> >                       return -ENOSPC;
+> >               vcpu->arch.mmu->root_hpa = root;
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 65bb110847858..530b7d893c7b3 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -41,8 +41,12 @@ struct kvm_mmu_page {
+> >
+> >       /* Number of writes since the last time traversal visited this page.  */
+> >       atomic_t write_flooding_count;
+> > +
+> > +     bool tdp_mmu_page;
+> >  };
+> >
+> > +extern struct kmem_cache *mmu_page_header_cache;
+> > +
+> >  static inline struct kvm_mmu_page *to_shadow_page(hpa_t shadow_page)
+> >  {
+> >       struct page *page = pfn_to_page(shadow_page >> PAGE_SHIFT);
+> > @@ -69,6 +73,11 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+> >       (((address) >> PT64_LEVEL_SHIFT(level)) & ((1 << PT64_LEVEL_BITS) - 1))
+> >  #define SHADOW_PT_INDEX(addr, level) PT64_INDEX(addr, level)
+> >
+> > +#define ACC_EXEC_MASK    1
+> > +#define ACC_WRITE_MASK   PT_WRITABLE_MASK
+> > +#define ACC_USER_MASK    PT_USER_MASK
+> > +#define ACC_ALL          (ACC_EXEC_MASK | ACC_WRITE_MASK | ACC_USER_MASK)
+> > +
+> >  /* Functions for interpreting SPTEs */
+> >  kvm_pfn_t spte_to_pfn(u64 pte);
+> >  bool is_mmio_spte(u64 spte);
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 8241e18c111e6..cdca829e42040 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -1,5 +1,7 @@
+> >  /* SPDX-License-Identifier: GPL-2.0 */
+> >
+> > +#include "mmu.h"
+> > +#include "mmu_internal.h"
+> >  #include "tdp_mmu.h"
+> >
+> >  static bool __read_mostly tdp_mmu_enabled = true;
+> > @@ -25,10 +27,165 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+> >
+> >       /* This should not be changed for the lifetime of the VM. */
+> >       kvm->arch.tdp_mmu_enabled = true;
+> > +
+> > +     INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
+> >  }
+> >
+> >  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+> >  {
+> >       if (!kvm->arch.tdp_mmu_enabled)
+> >               return;
+> > +
+> > +     WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
+> > +}
+> > +
+> > +#define for_each_tdp_mmu_root(_kvm, _root)                       \
+> > +     list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)
+> > +
+> > +bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
+> > +{
+> > +     struct kvm_mmu_page *root;
+> > +
+> > +     if (!kvm->arch.tdp_mmu_enabled)
+> > +             return false;
+> > +
+> > +     root = to_shadow_page(hpa);
+> > +
+> > +     if (WARN_ON(!root))
+> > +             return false;
+> > +
+> > +     return root->tdp_mmu_page;
+>
+> Why all the extra checks?
+>
+> > +}
+> > +
+> > +static void free_tdp_mmu_root(struct kvm *kvm, struct kvm_mmu_page *root)
+> > +{
+> > +     lockdep_assert_held(&kvm->mmu_lock);
+> > +
+> > +     WARN_ON(root->root_count);
+> > +     WARN_ON(!root->tdp_mmu_page);
+> > +
+> > +     list_del(&root->link);
+> > +
+> > +     free_page((unsigned long)root->spt);
+> > +     kmem_cache_free(mmu_page_header_cache, root);
+> > +}
+> > +
+> > +static void put_tdp_mmu_root(struct kvm *kvm, struct kvm_mmu_page *root)
+> > +{
+> > +     lockdep_assert_held(&kvm->mmu_lock);
+> > +
+> > +     root->root_count--;
+> > +     if (!root->root_count)
+> > +             free_tdp_mmu_root(kvm, root);
+> > +}
+> > +
+> > +static void get_tdp_mmu_root(struct kvm *kvm, struct kvm_mmu_page *root)
+> > +{
+> > +     lockdep_assert_held(&kvm->mmu_lock);
+> > +     WARN_ON(!root->root_count);
+> > +
+> > +     root->root_count++;
+> > +}
+> > +
+> > +void kvm_tdp_mmu_put_root_hpa(struct kvm *kvm, hpa_t root_hpa)
+> > +{
+> > +     struct kvm_mmu_page *root;
+> > +
+> > +     root = to_shadow_page(root_hpa);
+> > +
+> > +     if (WARN_ON(!root))
+> > +             return;
+> > +
+> > +     put_tdp_mmu_root(kvm, root);
+> > +}
+> > +
+> > +static struct kvm_mmu_page *find_tdp_mmu_root_with_role(
+> > +             struct kvm *kvm, union kvm_mmu_page_role role)
+> > +{
+> > +     struct kvm_mmu_page *root;
+> > +
+> > +     lockdep_assert_held(&kvm->mmu_lock);
+> > +     for_each_tdp_mmu_root(kvm, root) {
+> > +             WARN_ON(!root->root_count);
+> > +
+> > +             if (root->role.word == role.word)
+> > +                     return root;
+> > +     }
+> > +
+> > +     return NULL;
+> > +}
+> > +
+> > +static struct kvm_mmu_page *alloc_tdp_mmu_root(struct kvm_vcpu *vcpu,
+> > +                                            union kvm_mmu_page_role role)
+> > +{
+> > +     struct kvm_mmu_page *new_root;
+> > +     struct kvm_mmu_page *root;
+> > +
+> > +     new_root = kvm_mmu_memory_cache_alloc(
+> > +                     &vcpu->arch.mmu_page_header_cache);
+> > +     new_root->spt = kvm_mmu_memory_cache_alloc(
+> > +                     &vcpu->arch.mmu_shadow_page_cache);
+> > +     set_page_private(virt_to_page(new_root->spt), (unsigned long)new_root);
+> > +
+> > +     new_root->role.word = role.word;
+> > +     new_root->root_count = 1;
+> > +     new_root->gfn = 0;
+> > +     new_root->tdp_mmu_page = true;
+> > +
+> > +     spin_lock(&vcpu->kvm->mmu_lock);
+> > +
+> > +     /* Check that no matching root exists before adding this one. */
+> > +     root = find_tdp_mmu_root_with_role(vcpu->kvm, role);
+> > +     if (root) {
+> > +             get_tdp_mmu_root(vcpu->kvm, root);
+> > +             spin_unlock(&vcpu->kvm->mmu_lock);
+>
+> Hrm, I'm not a big fan of dropping locks in the middle of functions, but the
+> alternatives aren't great.  :-/  Best I can come up with is
+>
+>         if (root)
+>                 get_tdp_mmu_root()
+>         else
+>                 list_add();
+>
+>         spin_unlock();
+>
+>         if (root) {
+>                 free_page()
+>                 kmem_cache_free()
+>         } else {
+>                 root = new_root;
+>         }
+>
+>         return root;
+>
+> Not sure that's any better.
+>
+> > +             free_page((unsigned long)new_root->spt);
+> > +             kmem_cache_free(mmu_page_header_cache, new_root);
+> > +             return root;
+> > +     }
+> > +
+> > +     list_add(&new_root->link, &vcpu->kvm->arch.tdp_mmu_roots);
+> > +     spin_unlock(&vcpu->kvm->mmu_lock);
+> > +
+> > +     return new_root;
+> > +}
+> > +
+> > +static struct kvm_mmu_page *get_tdp_mmu_vcpu_root(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm_mmu_page *root;
+> > +     union kvm_mmu_page_role role;
+> > +
+> > +     role = vcpu->arch.mmu->mmu_role.base;
+> > +     role.level = vcpu->arch.mmu->shadow_root_level;
+> > +     role.direct = true;
+> > +     role.gpte_is_8_bytes = true;
+> > +     role.access = ACC_ALL;
+> > +
+> > +     spin_lock(&vcpu->kvm->mmu_lock);
+> > +
+> > +     /* Search for an already allocated root with the same role. */
+> > +     root = find_tdp_mmu_root_with_role(vcpu->kvm, role);
+> > +     if (root) {
+> > +             get_tdp_mmu_root(vcpu->kvm, root);
+> > +             spin_unlock(&vcpu->kvm->mmu_lock);
+>
+> Rather than manually unlock and return, this can be
+>
+>         if (root)
+>                 get_tdp_mmju_root();
+>
+>         spin_unlock()
+>
+>         if (!root)
+>                 root = alloc_tdp_mmu_root();
+>
+>         return root;
+>
+> You could also add a helper to do the "get" along with the "find".  Not sure
+> if that's worth the code.
+>
+> > +             return root;
+> > +     }
+> > +
+> > +     spin_unlock(&vcpu->kvm->mmu_lock);
+> > +
+> > +     /* If there is no appropriate root, allocate one. */
+> > +     root = alloc_tdp_mmu_root(vcpu, role);
+> > +
+> > +     return root;
+> > +}
+> > +
+> > +hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm_mmu_page *root;
+> > +
+> > +     root = get_tdp_mmu_vcpu_root(vcpu);
+> > +     if (!root)
+> > +             return INVALID_PAGE;
+> > +
+> > +     return __pa(root->spt);
+> >  }
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> > index dd3764f5a9aa3..9274debffeaa1 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> > @@ -7,4 +7,9 @@
+> >
+> >  void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
+> >  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
+> > +
+> > +bool is_tdp_mmu_root(struct kvm *kvm, hpa_t root);
+> > +hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
+> > +void kvm_tdp_mmu_put_root_hpa(struct kvm *kvm, hpa_t root_hpa);
+> > +
+> >  #endif /* __KVM_X86_MMU_TDP_MMU_H */
+> > --
+> > 2.28.0.709.gb0816b6eb0-goog
+> >
