@@ -2,90 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8B7428BFB7
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 20:29:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 405F828BFC1
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 20:31:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387832AbgJLS3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 14:29:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54622 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387669AbgJLS3O (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Oct 2020 14:29:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602527353;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1KMvAtvKDBYaeH7vpaDvjszCZ2uUkSgLQMYqCcOYOR0=;
-        b=hMtYyoAupBNyx46f4BhwXZz3WzQp/NB9AwAwnu7TJkELdMffhK8kkf3lYZoYlpmVrs84Y0
-        6A4fYBqwn0KWQxbNeQdzB+57KajSDmCz2QxbQpb96Ft+2zigZtQ4wHAQOHfXVlsI3BYCYQ
-        bODJJQOrYwvMB6N5ikAtrBuwXiLEFK0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-KZgc_9BnPniHY7vs0UjlWg-1; Mon, 12 Oct 2020 14:29:11 -0400
-X-MC-Unique: KZgc_9BnPniHY7vs0UjlWg-1
-Received: by mail-wm1-f71.google.com with SMTP id p17so5399559wmi.7
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 11:29:11 -0700 (PDT)
+        id S2388193AbgJLSbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 14:31:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47906 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387669AbgJLSbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Oct 2020 14:31:25 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF74C0613D0
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 11:31:25 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id h2so9070377pll.11
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 11:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=ZcMTMynEPIOH3c2ch38zU1fqI4EnSpaHA3AjU3AE5LE=;
+        b=uTz7zIG+m/7QnmfbI+/bmDL7bU1e2gTbDSNkmu5a9RuAfh6OX+6wDv0DUhsUD4xoM/
+         JjkU+jbvRtksQzU6THxbqlSYt55KvjsoVjKmbytTRFJaVgwEe2A2Ex6Tmzdr0So1XPbk
+         a/PQf85bXr43WIqv0tO6ZATS4erXfYjgNZz/BbM72JOLbnVU8wRhN96RUwrdkDyE9kUE
+         FlhQdGOShPX7YVvyIfKlNnV/usHsoVLNfLdorEyCa5vMocb51mCDAOsluhh7iKeywuuH
+         GAXKHya+1iaMPi2IUiWB3ZcDlmvABKThoxOCTDHH5qSqBOnzaAoQOIkGFyb28HeaOkTv
+         hkhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1KMvAtvKDBYaeH7vpaDvjszCZ2uUkSgLQMYqCcOYOR0=;
-        b=qanFWnn4ueedD7WI9RbOHBoziYEp+tBb/t9IZLlOViD0rHI713QbpJe1yT69l6NuOg
-         ErTRFGc2t7LetVs2HyHDMwgZf0yyx8z+jVuf+ypoXhgmC3B4u0btggPK6dJJUM7SVlfE
-         PeMfT2UlKgWKKn8vRHyAC9eUVkw+WlTSjGq+bXfCTtXUMThxDw2BuLVkA3dHqWHDKt4e
-         uSLIHB0+p3Ej3AHt6Z1AfK2BPh+ES3bgCM8WDgeC2YnBIpu8g8uk8L8fffBdMDYWb0Hg
-         XKXnD2qEoiEl71Abdn3glwqwqXiGjJs1JCETe8L1mJZlErR6C87dW6YcIuqYdXIBEpL1
-         8zlA==
-X-Gm-Message-State: AOAM531Hcph645JUzaYkd/OJV3vYkNapBGNAfcE8NhPY6OIIM4rUWgDP
-        Ffb/WlWETQkVIb5jopN4T9UfHpDOysC+uOhMXp+WyqZTk3vfaDunw22aZv8hQVC+V1N74qzbbVA
-        zcq/geVFZjT7W
-X-Received: by 2002:a1c:111:: with SMTP id 17mr7762732wmb.74.1602527350737;
-        Mon, 12 Oct 2020 11:29:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJynpw1y9FYhWbRA9/cpFOKjuhGtatNwL3a/KAEU0swRGxGG8xz04FD6gk3kiD5Ga6/aansVPw==
-X-Received: by 2002:a1c:111:: with SMTP id 17mr7762718wmb.74.1602527350535;
-        Mon, 12 Oct 2020 11:29:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7ffb:1107:73ba:dbcf? ([2001:b07:6468:f312:7ffb:1107:73ba:dbcf])
-        by smtp.gmail.com with ESMTPSA id z11sm25459560wrh.70.2020.10.12.11.29.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Oct 2020 11:29:10 -0700 (PDT)
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=ZcMTMynEPIOH3c2ch38zU1fqI4EnSpaHA3AjU3AE5LE=;
+        b=krL6OcEwd0nxGLYh2rB/FwZ5yJ8GQRE2VAJFrQb4rvxZmJJE4LqEb9rstXMXTYPvWp
+         KFwZeYUSrlAB/6AZ1hJhdViZaQOHNfSZnFzWJGgaslM/9utVbQ+jIId+5lPLJng/9Y9S
+         hkks3OmPzpY/bJQ6oJogColw73UcQGPruNM4uXS3BRIrcjqeipRQ4Qp/ZY/rpq8VLICy
+         7zp7UnLFohBBfTZe3aeR8kO1ketQmHk0VnKEiZg99fJOb5ydDx5FJFADpL4zHFKovm3N
+         fVAfhFUaACQ43orHMpqn7Shb1GM8Dq1/BeQlE8FmsZEs+/J+7i3a8OkHzrgNbZn0QUvb
+         w8Qg==
+X-Gm-Message-State: AOAM533N2Za6rgErgyzvqUbetqT9Fi2Q+DEkR0ZD2bKzTRp+ZPic5hFv
+        WOYGVO+0apBNPSiuIMSZWcY=
+X-Google-Smtp-Source: ABdhPJzDu13oE+P1K9sd9BLnAwr/3JbfLBIGLGU1gAUJQpjS+vrSH3DPgxeo5UCfoZQLz8BVybdzdA==
+X-Received: by 2002:a17:902:9008:b029:d3:b4d2:9a2 with SMTP id a8-20020a1709029008b02900d3b4d209a2mr24401153plp.15.1602527484526;
+        Mon, 12 Oct 2020 11:31:24 -0700 (PDT)
+Received: from ?IPv6:2601:647:4700:9b2:8cd7:a47f:78d6:7975? ([2601:647:4700:9b2:8cd7:a47f:78d6:7975])
+        by smtp.gmail.com with ESMTPSA id x12sm21657191pfr.156.2020.10.12.11.31.23
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 12 Oct 2020 11:31:23 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
 Subject: Re: [kvm-unit-tests PATCH] x86: VMX: Add a VMX-preemption timer
  expiration test
-To:     Nadav Amit <nadav.amit@gmail.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <386c6f5a-945a-6cef-2a0b-61f91f8c1bfe@redhat.com>
+Date:   Mon, 12 Oct 2020 11:31:22 -0700
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         KVM <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <354EB465-6F61-4AED-89B1-AB49A984A8A1@gmail.com>
 References: <20200508203938.88508-1-jmattson@google.com>
  <D121A03E-6861-4736-8070-5D1E4FEE1D32@gmail.com>
  <20201012163219.GC26135@linux.intel.com>
  <5A0776F7-7314-408C-8C58-7C4727823906@gmail.com>
  <CALMp9eTkDOCkHaWrqYXKvOuZG4NheSwEgiqGzjwAt6fAdC1Z4A@mail.gmail.com>
  <E545AD34-A593-4753-9F22-A36D99BFFE10@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <386c6f5a-945a-6cef-2a0b-61f91f8c1bfe@redhat.com>
-Date:   Mon, 12 Oct 2020 20:29:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <E545AD34-A593-4753-9F22-A36D99BFFE10@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+ <386c6f5a-945a-6cef-2a0b-61f91f8c1bfe@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/10/20 20:17, Nadav Amit wrote:
->>
->> KVM clearly doesn't adhere to the architectural specification. I don't
->> know what is wrong with your Broadwell machine.
-> Are you saying that the test is expected to fail on KVM? And that Sean’s
-> failures are expected?
-> 
+> On Oct 12, 2020, at 11:29 AM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>=20
+> On 12/10/20 20:17, Nadav Amit wrote:
+>>> KVM clearly doesn't adhere to the architectural specification. I =
+don't
+>>> know what is wrong with your Broadwell machine.
+>> Are you saying that the test is expected to fail on KVM? And that =
+Sean=E2=80=99s
+>> failures are expected?
+>=20
+> It's not expected to fail, but it's apparently broken.
 
-It's not expected to fail, but it's apparently broken.
-
-Paolo
+Hm=E2=80=A6 Based on my results on bare-metal, it might be an =
+architectural issue or
+a test issue, and not a KVM issue.
 
