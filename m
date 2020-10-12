@@ -2,138 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F16F28AB2B
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 02:07:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8950928AB5A
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 03:20:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729636AbgJLAHo convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 11 Oct 2020 20:07:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54580 "EHLO mail.kernel.org"
+        id S1727282AbgJLBTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Oct 2020 21:19:39 -0400
+Received: from mga14.intel.com ([192.55.52.115]:6712 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726148AbgJLAHn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 11 Oct 2020 20:07:43 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209253] Loss of connectivity on guest after important host <->
- guest traffic
-Date:   Mon, 12 Oct 2020 00:07:42 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: arequipeno@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209253-28872-miUHCSKsTI@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209253-28872@https.bugzilla.kernel.org/>
-References: <bug-209253-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1727132AbgJLBTj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 11 Oct 2020 21:19:39 -0400
+IronPort-SDR: qTAmnYp9FJA67n5MsUY8j10lvgSZ1OD+B6wx7y76m99tiNwjakdJz7n7HiSHtxA58g/Z7AvHMZ
+ 0kgyMLujFzfw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9771"; a="164890354"
+X-IronPort-AV: E=Sophos;i="5.77,365,1596524400"; 
+   d="scan'208";a="164890354"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2020 18:19:38 -0700
+IronPort-SDR: ENr5O3DMvqgMXJBB7DwBmwd6Zpf7xUFaj4giJu1FfY3m20N+qEZFWy0deQjha3q0eU3eG4IH1S
+ SVKnvBhooHUw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,365,1596524400"; 
+   d="scan'208";a="520500221"
+Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
+  by fmsmga005.fm.intel.com with ESMTP; 11 Oct 2020 18:19:38 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Sun, 11 Oct 2020 18:19:37 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Sun, 11 Oct 2020 18:19:37 -0700
+Received: from NAM02-BL2-obe.outbound.protection.outlook.com (104.47.38.54) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Sun, 11 Oct 2020 18:19:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RqeAXrTxDy9uTXYO3davL1MFBDvdaTarRMaUCQ5pkjQ5NDmThA2Qb0gy3n+GZmpYTr9dOyycXz2CsT8qRFfpVzIaN/1lMUO7OclusEap4LQMCdD9xjqg9hXznfb7B23wKRL3RO5BtXQzafNRe4mGVoIvNdjgAT8b++UrMMLTkZA8BJJfpwijT9rMDmWnuft7Y07OjlL29jSNxtrc12zo1hQJvJylgGm/QxgmEuq0reeUlwpWegdAHuDQKfqsFKUn/P81ELzWQSv59Z1TRCs++WxGmLHvYzLx92z7XjGTb86THKbgw0a4ZtS6pFOiSURcjdlRsePah8atBBKu3FzICg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wY0lBv+pLBj/OBBgvO+vtGENANV2IvfFyxPpZq4u/RE=;
+ b=alwlaMM5bjQH5/YWeevEpf+rxogwetc3XEdzdbbMb8pklcSpIREMkdA9Re82YBfXi3DZmRRpQB+k/T8OP3NuGp7xHclLeSGdPnmKWxwqxxhfWwRVPcb/SM8cdsyGCv1Sbz5QB5Oiq7bEtIsoPl8eOmYW7PVLg4WJovo48+XyprkBAXSGN4/Gs4mxFlqZJdo051+d/6r/TmiXGwFTaRvkvSxuOCmTHc61Y2qG9T9FGz2l5GOfKS9bWHg0i+QCk+TgeHmX2Rrif9VB5NZdDfIRv96itWrt6so2/9gTJkq+nQKcc+c7uUUReR1QzgB7TxnyN4LB8VNqs/f5JDMIpBGfNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wY0lBv+pLBj/OBBgvO+vtGENANV2IvfFyxPpZq4u/RE=;
+ b=dxeF6mPj1ww/rD8fBXR8uE2J0BYGdPpzQSycoh/sQusVsfGZWuMkE6Ny4RESqpkaAJUl1Hges1ppR+u0VZSexBoDvfigblJvf7Xxcak0KNxrGsDBW+Zuf8tLnPZoBIt+Www1oc2+85zajcL2IbkahZV5PYlb6ktfwe2sVwqQdUM=
+Received: from MWHPR11MB1968.namprd11.prod.outlook.com (2603:10b6:300:113::16)
+ by MWHPR1101MB2207.namprd11.prod.outlook.com (2603:10b6:301:58::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.24; Mon, 12 Oct
+ 2020 01:19:33 +0000
+Received: from MWHPR11MB1968.namprd11.prod.outlook.com
+ ([fe80::9976:e74f:b8e:dc15]) by MWHPR11MB1968.namprd11.prod.outlook.com
+ ([fe80::9976:e74f:b8e:dc15%7]) with mapi id 15.20.3455.029; Mon, 12 Oct 2020
+ 01:19:33 +0000
+From:   "Qi, Yadong" <yadong.qi@intel.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: RE: [kvm-unit-tests PATCH] x86: vmx: Add test for SIPI signal
+ processing
+Thread-Topic: [kvm-unit-tests PATCH] x86: vmx: Add test for SIPI signal
+ processing
+Thread-Index: AQHWkw6i3URq225llEmaCd1JoJ27OqmHFl8AgAmNrACAApzMIA==
+Date:   Mon, 12 Oct 2020 01:19:33 +0000
+Message-ID: <MWHPR11MB196876354169E0DB6046BA5BE3070@MWHPR11MB1968.namprd11.prod.outlook.com>
+References: <20200925073624.245578-1-yadong.qi@intel.com>
+ <MWHPR11MB1968C521D356F1D1FA17EE6EE30F0@MWHPR11MB1968.namprd11.prod.outlook.com>
+ <3705293E-84DE-41ED-9DD1-D837855C079B@gmail.com>
+In-Reply-To: <3705293E-84DE-41ED-9DD1-D837855C079B@gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.5.1.3
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.55.46.36]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3026e8ec-44a0-4e8b-cdf0-08d86e4ce09c
+x-ms-traffictypediagnostic: MWHPR1101MB2207:
+x-microsoft-antispam-prvs: <MWHPR1101MB2207D75A023EE3E2FAC5EBC0E3070@MWHPR1101MB2207.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /vWkoTQhGsDVNtfChq9Q4IWVmL8Uv6AaBE8E1fE/CxmOJoyzNapMAAETrB7p5rXkpDiyTk8q1k9TosYwqQzib4EgHuVpe7wiv8UeTvrSNGOwgkI/6wNsZhnxda3hCFQC27em6ZedQD+fvnHCoqsvo46CVTRk2VZeB/Y37d5FpcX7jLyryFqmFItydqr3OVEEjGqZOgPkLmR1RJA22s1AOXWW6/98lU8VxYnnaQw9EnbKYy0cNmQnLny6p3sZo9iaFbQNH78qU4j9DHRCMi+gLahgnljb0ufj+anpYXmXEouRR+AqF6PD7yEHeMzq/wKy+Q6zsVm9cGsHE0ELrvZn6g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1968.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(136003)(376002)(346002)(39860400002)(186003)(54906003)(64756008)(316002)(6916009)(8936002)(55016002)(66476007)(26005)(71200400001)(76116006)(66946007)(5660300002)(66556008)(7696005)(66446008)(52536014)(33656002)(2906002)(478600001)(86362001)(8676002)(6506007)(9686003)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: Llgc68so169RJIJzERnXdhlqV0xA7nLeBKmw7BCPqWmcf0KT5WF5GwR4zVfxWl10kP6Th+ORXDbPL6XaCFjc/mAtB0KcUkGn605PVsfZta0/WlIEVhy8qKvhmxXQ0ow/8fNEtfDk3v/TVEvD6WrUz5c93jlbYPezs6Y10Pyn6IxBPFC4k6LVNSGdu4R+9X0ABFWYLsTjcQA/ySv5jpHFzXtId5vxhGlug+69XvD66RPa88xMeyo9cTdxeGJg4JtkZnVbwpYBqtrLBhnYnQmmfDPGcS0PaizGqfO+uiQFOeXgCmrJxd+eN0aRUFR4nZOtM9hU2NEBlAZQU9+kk1hrEDQrczySf0oAvxSaIIEBAe5pKOMLe4WlXkbiRlFMsp/Varms+pbA6Wp/l1tfZwmQC2kjEf6ogCl+lV6ivUDmDjl4UrVOzaOaYMV9/mKSwaPpYH/VAaOtjaDSjAg1ZC31s/vnFRDgJ+br0KoMczQjWYMLaDpfpbT2XCRsnWrnVbhaeEiGMRwP1YJzLQSVN7jaOCcG2QpLBH3xAzYnaGb+YJGPT1ctJQ1Y7H7yktYXc4VILWklLEadPPzB+lgl6jKSg1AB6PSPK9s64vaUpFC6CXujLlFk2j7K6BInA8Q3z6X+RleQqxbuU+AeuOL5jVRDsQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1968.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3026e8ec-44a0-4e8b-cdf0-08d86e4ce09c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Oct 2020 01:19:33.5928
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Et4ceR2sVgrtNdmDvU2b0z4vYZRTSXTut4ZOJ8R7BOLQ64l4rhxeoXzooYhm0gCx7nTXA36WkcPEW3VgDbEbNA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2207
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209253
+>=20
+> On my bare-metal machine, I get a #GP on the WRMSR that writes the EOI in=
+side
+> ipi() :
+>=20
+> Test suite: vmx_sipi_signal_test
+> Unhandled exception 13 #GP at ip 0000000000417eba
+> error_code=3D0000      rflags=3D00010002      cs=3D00000008
+> rax=3D0000000000000000 rcx=3D000000000000080b rdx=3D0000000000000000
+> rbx=3D0000000000000000
+> rbp=3D000000000053a238 rsi=3D0000000000000000 rdi=3D000000000000000b
+> r8=3D000000000000000a  r9=3D00000000000003f8 r10=3D000000000000000d
+> r11=3D0000000000000000
+> r12=3D000000000040c7a5 r13=3D0000000000000000 r14=3D0000000000000000
+> r15=3D0000000000000000
+> cr0=3D0000000080000011 cr2=3D0000000000000000 cr3=3D000000000041f000
+> cr4=3D0000000000000020
+> cr8=3D0000000000000000
+> 	STACK: @417eba 417f36 417481 417383
+>=20
+> I did not dig much deeper. Could it be that there is some confusion betwe=
+en
+> xapic/x2apic ?
 
-Ian Pilcher (arequipeno@gmail.com) changed:
+Thanks, Nadav.
+I cannot reproduce the #GP issue on my bare metal machine.
+And I am a little bit confused, there is no EOI MSR write in this test suit=
+e,
+how the #GP comes out...
+Could you provide more info for me to reproduce the issue?
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |arequipeno@gmail.com
+Best Regard
+Yadong
 
---- Comment #1 from Ian Pilcher (arequipeno@gmail.com) ---
-I am seeing a very similar crash, but the device in my case is an NVIDIA GPU,
-passed through to a Windows guest for video processing.
-
-[ 6094.567434] WARNING: CPU: 7 PID: 2524 at fs/eventfd.c:74
-eventfd_signal+0x88/0xa0
-[ 6094.567464] Modules linked in: vhost_net vhost tap vhost_iotlb tun
-nft_chain_nat 8021q garp mrp stp llc sch_ingress bonding openvswitch nsh
-nf_conncount nf_nat nft_counter ipt_REJECT ip6t_REJECT nf_reject_ipv4
-nf_reject_ipv6 xt_state xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
-nft_compat nf_tables nfnetlink intel_rapl_msr intel_rapl_common sb_edac
-x86_pkg_temp_thermal sunrpc intel_powerclamp coretemp raid10 kvm_intel iTCO_wdt
-intel_pmc_bxt kvm iTCO_vendor_support gpio_ich ipmi_ssif rapl ixgbe
-intel_cstate joydev i2c_i801 igb intel_uncore ioatdma mei_me acpi_ipmi
-i2c_smbus mdio intel_pch_thermal mei dca lpc_ich ipmi_si ipmi_devintf
-ipmi_msghandler acpi_pad vfat fat ip_tables xfs ast drm_vram_helper
-drm_ttm_helper i2c_algo_bit drm_kms_helper cec ttm mxm_wmi drm crct10dif_pclmul
-crc32_pclmul crc32c_intel ghash_clmulni_intel wmi vfio_pci irqbypass
-vfio_virqfd vfio_iommu_type1 vfio
-[ 6094.567794] CPU: 7 PID: 2524 Comm: CPU 3/KVM Not tainted
-5.8.13-200.fc32.x86_64 #1
-[ 6094.567834] Hardware name: Supermicro SYS-5028D-TN4T/X10SDV-TLN4F, BIOS 2.1
-11/22/2019
-[ 6094.567868] RIP: 0010:eventfd_signal+0x88/0xa0
-[ 6094.567889] Code: 03 00 00 00 4c 89 f7 e8 26 16 db ff 65 ff 0d 3f f3 ca 43
-4c 89 ee 4c 89 f7 e8 34 8e 7f 00 4c 89 e0 5b 5d 41 5c 41 5d 41 5e c3 <0f> 0b 45
-31 e4 5b 5d 4c 89 e0 41 5c 41 5d 41 5e c3 0f 1f 80 00 00
-[ 6094.567974] RSP: 0018:ffffac8780b97bb0 EFLAGS: 00010286
-[ 6094.567996] RAX: 00000000ffffffff RBX: ffff9b01c8ed0000 RCX:
-0000000000000004
-[ 6094.568021] RDX: 00000000c8088704 RSI: 0000000000000001 RDI:
-ffff9b11ef445240
-[ 6094.568050] RBP: ffffac8780b97c18 R08: ffff9b11ef4cdf40 R09:
-00000000c8088708
-[ 6094.568080] R10: 0000000000000000 R11: 0000000000000190 R12:
-0000000000000002
-[ 6094.568105] R13: ffff9b11ef4bbb00 R14: ffff9b11ef4cdf40 R15:
-ffff9b11ef4bbb00
-[ 6094.568145] FS:  00007f30b8b78700(0000) GS:ffff9b123fbc0000(0000)
-knlGS:000000ad76006000
-[ 6094.568178] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 6094.568202] CR2: 000001d9b5100000 CR3: 0000001fb0ed2003 CR4:
-00000000003626e0
-[ 6094.568232] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[ 6094.568261] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-0000000000000400
-[ 6094.568290] Call Trace:
-[ 6094.568336]  ioeventfd_write+0x51/0x80 [kvm]
-[ 6094.568385]  __kvm_io_bus_write+0x88/0xb0 [kvm]
-[ 6094.568417]  kvm_io_bus_write+0x43/0x60 [kvm]
-[ 6094.568454]  write_mmio+0x70/0xf0 [kvm]
-[ 6094.568488]  emulator_read_write_onepage+0x11e/0x330 [kvm]
-[ 6094.568527]  emulator_read_write+0xca/0x180 [kvm]
-[ 6094.568564]  segmented_write.isra.0+0x4a/0x60 [kvm]
-[ 6094.568601]  x86_emulate_insn+0x850/0xe60 [kvm]
-[ 6094.568636]  x86_emulate_instruction+0x2c7/0x780 [kvm]
-[ 6094.568680]  ? kvm_io_bus_write+0x43/0x60 [kvm]
-[ 6094.569821]  kvm_arch_vcpu_ioctl_run+0xeb9/0x1770 [kvm]
-[ 6094.570963]  kvm_vcpu_ioctl+0x209/0x590 [kvm]
-[ 6094.572099]  ksys_ioctl+0x82/0xc0
-[ 6094.573208]  __x64_sys_ioctl+0x16/0x20
-[ 6094.574294]  do_syscall_64+0x4d/0x90
-[ 6094.575348]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[ 6094.576388] RIP: 0033:0x7f30c2bac3bb
-[ 6094.577422] Code: 0f 1e fa 48 8b 05 dd aa 0c 00 64 c7 00 26 00 00 00 48 c7
-c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01
-f0 ff ff 73 01 c3 48 8b 0d ad aa 0c 00 f7 d8 64 89 01 48
-[ 6094.579603] RSP: 002b:00007f30b8b77668 EFLAGS: 00000246 ORIG_RAX:
-0000000000000010
-[ 6094.580713] RAX: ffffffffffffffda RBX: 000056277c8e4ae0 RCX:
-00007f30c2bac3bb
-[ 6094.581835] RDX: 0000000000000000 RSI: 000000000000ae80 RDI:
-000000000000001e
-[ 6094.582951] RBP: 00007f30c010a000 R08: 000056277aebebf0 R09:
-0000000000000000
-[ 6094.584028] R10: 0000000000000001 R11: 0000000000000246 R12:
-0000000000000001
-[ 6094.585078] R13: 00007f30c010b001 R14: 0000000000000000 R15:
-000056277b358a00
-[ 6094.586103] ---[ end trace dab8395baf5baf8c ]---
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
