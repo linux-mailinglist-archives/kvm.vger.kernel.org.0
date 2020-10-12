@@ -2,144 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1905F28B27D
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 12:47:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C65928B350
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 13:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387696AbgJLKq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 06:46:59 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:37754 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387523AbgJLKq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Oct 2020 06:46:58 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20201012104646euoutp02c908649c6fe71e642e46cb80144c53c9~9OObbPvMG1936819368euoutp02q
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 10:46:46 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20201012104646euoutp02c908649c6fe71e642e46cb80144c53c9~9OObbPvMG1936819368euoutp02q
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1602499606;
-        bh=FBmOg/5UhT/YwJB06QgXBxAcIx7JXNwKhGcqnotWc+k=;
-        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
-        b=NghxrJGQ6/YiTq2zrHZ6ulVedQnVkd9ykBo7R+2+/L00bFfsXQe3BRr2qxvy/Q7/P
-         2e2g6G3h8Kp+gp/6HCIIw/1DxPWamglyioN4Rp2kCU89hovb9IvS/sWxi6g2RCO7OA
-         dc+5gwIwcL+q7pLjSm0FUgkdsc4E+xlbeXNy8Vew=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20201012104641eucas1p17f1275af0f512f70177adbd61d0c77ae~9OOWjmv2u0406004060eucas1p1O;
-        Mon, 12 Oct 2020 10:46:41 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 29.90.06456.114348F5; Mon, 12
-        Oct 2020 11:46:41 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20201012104640eucas1p12399708a49a999b779fdce7e9e6204cc~9OOWGKOWa0406004060eucas1p1N;
-        Mon, 12 Oct 2020 10:46:40 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20201012104640eusmtrp118dc9ecd8a25c4a1defe7637d1cabe04~9OOWFQWUJ3076730767eusmtrp1a;
-        Mon, 12 Oct 2020 10:46:40 +0000 (GMT)
-X-AuditID: cbfec7f2-7efff70000001938-c3-5f843411fe20
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id E6.DA.06314.014348F5; Mon, 12
-        Oct 2020 11:46:40 +0100 (BST)
-Received: from [106.210.88.143] (unknown [106.210.88.143]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20201012104639eusmtip1bed2fa0e6bb06eea4bbd6376d06d96fa~9OOVGfB640624706247eusmtip1Q;
-        Mon, 12 Oct 2020 10:46:39 +0000 (GMT)
-Subject: Re: [PATCH v2 09/17] mm: Add unsafe_follow_pfn
-To:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
+        id S2388023AbgJLLBJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 07:01:09 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52094 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387706AbgJLLBI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Oct 2020 07:01:08 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09CAeuUv104186;
+        Mon, 12 Oct 2020 10:59:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=mb38IA085msJPf3gFvtjrmF9NBFtVRnlOijm9ZWxvF0=;
+ b=z3kKsMth4Qtystg74wgCgSdTaLPxkgl29g8CFmlTAku9jCMLAqFLjm6BhptUvNas0BlW
+ rsyXxe4DfYrde7du+AH+CrXkqLs7ItRgvYmdZwqydt6b71T/WsBd2eA7fenG5WBYphiO
+ KJ+sq8ERG9xrqZODbvYilAbc2C48Nw9+3ia01ksiL4OM9whLZ4EUDeLj/+uCyb2iDDd4
+ vU2LaEiLsATKrpCwPsD2/MQIkVAl86CqKTjaP1hlOecwsJbz/lVoffdH+PwLOuoDRubl
+ N6NNsGk0Ln0lFGdomt//yty2RseIfqTiN1uWTYrVNXzV6Q251tcV8wt34VWc4Vl3f7BM BA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 3434wkched-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 12 Oct 2020 10:59:50 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09CAtav8126988;
+        Mon, 12 Oct 2020 10:59:50 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 343phkphjx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Oct 2020 10:59:50 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09CAxigG027754;
+        Mon, 12 Oct 2020 10:59:45 GMT
+Received: from [10.175.201.106] (/10.175.201.106)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 12 Oct 2020 03:59:44 -0700
+Subject: Re: [PATCH 00/35] Enhance memory utilization with DMEMFS
+To:     yulei zhang <yulei.kernel@gmail.com>
+Cc:     linux-fsdevel@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Haiwei Li <lihaiwei.kernel@gmail.com>,
+        Yulei Zhang <yuleixzhang@tencent.com>,
+        akpm@linux-foundation.org, naoya.horiguchi@nec.com,
+        viro@zeniv.linux.org.uk, Paolo Bonzini <pbonzini@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Jane Y Chu <jane.chu@oracle.com>,
         Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
-Message-ID: <ed68968b-27bc-d776-8da8-ef21d6b3c378@samsung.com>
-Date:   Mon, 12 Oct 2020 12:46:39 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0)
-        Gecko/20100101 Thunderbird/78.3.2
+        Muchun Song <songmuchun@bytedance.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+References: <cover.1602093760.git.yuleixzhang@tencent.com>
+ <bdd0250e-4e14-f407-a584-f39af12c4e09@oracle.com>
+ <CACZOiM2qKhogXQ_DXzWjGM5UCeCuEqT6wnR=f2Wi_T45_uoYHQ@mail.gmail.com>
+ <b963565b-61d8-89d3-1abd-50cd8c8daad5@oracle.com>
+ <CACZOiM26GPtqkGyecG=NGuB3etipV5-KgN+s19_U1WJrFxtYPQ@mail.gmail.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <98be093d-c869-941a-6dd9-fb16356f763b@oracle.com>
+Date:   Mon, 12 Oct 2020 11:59:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <20201009124850.GP5177@ziepe.ca>
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CACZOiM26GPtqkGyecG=NGuB3etipV5-KgN+s19_U1WJrFxtYPQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHec85OzuOjhyn4oNFxbpRoCbdXrCiNOVQFH0LirKpB4vcss1p
-        2oekRdpcYUaoc6TTIhXNWl5CzWxZ02ZmZillmaag0hxoGtrV4+nit99z/f+fl5chlRfpQOa4
-        NknQadUJKlpB1T6d6Qjy2Xg+er2rTomtVRU0zr3WibBt4D2Jb7XfJnH3lIfGBblGAufntaI5
-        GiHw3eFiOW7P0mDrtVPY/umNDL+qt9LYfKdGhj9U/JLhbJuRxHkvmgg8UPAa4cHLbvkOX74g
-        /SXFP5guoviSxlGCt5dfpHn7RI6cb837RvH9WU6Cv3fjLH/JOE7znqbXNN9e1CLnJ+1L+ZrJ
-        d9R+9qBia5yQcDxZ0IVsP6o4NpHtpBN/0Kcflo4Q6ahRZkIMA9xGyOkMMyEvRsmVIpgdjzIh
-        xRx/QWAaKKGkwiSCjCmZyGL/cP1HWmq6haCizYOkwIPA0VkxP+HLbYG+J9OEyH7cASi6IW5S
-        MCRnlMHg9StysUBzoWBym2jRBstth8ruQ2Ka4laB2d2LRPbnYuCF7TspMsv5QFv+0Px+Ly4I
-        Zt1l83mSWwZ1busfDoC3Q4WEqAVcMwOjrW9JyfYuGB+zERL7wpizWi7xEnBdNVPSgBHBQEel
-        XArMCF6dy0NSVxj0dczOOyW5tVBVHyK93U543KCW0Bt63T6SB2/Iqc0lpTQLmReU0o7VYHHe
-        /qf6qLOLzEYqy4LLLAuusSy4xvJftghR5ShAMOg18YI+VCukBOvVGr1BGx8ce1JjR3Mf1PXT
-        OXEfTXXFOBDHINUiNjHCGK2UqZP1qRoHAoZU+bHhz11HlGycOjVN0J2M1hkSBL0DLWYoVQC7
-        oXj0sJKLVycJJwQhUdD9rRKMV2A6upxURpRfiE5xzbasfFmf2e248752RY/WusY+EcKzQa2b
-        yxo6DpcUbjhjWW77OtPbn6gtbTQwM9kz+5oViyKqlHt6qm8u3/Q55np3w7SqkoGowL4+7wB3
-        msF4IKs8rCXKHbkpvTh8d2FwV+xdT4H227Yll3qeP/PfmzEZWRlizo9QUfpj6tB1pE6v/g39
-        D1qlnAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprPKsWRmVeSWpSXmKPExsVy+t/xu7oCJi3xBgd/61vMWb+GzWL61AuM
-        Fgsf3mW2WH5mHbPFla/v2SxmT29mspg54wQjkPWCyWLj00XsFme6cy3mTC202PT4GqvF5V1z
-        2Cx6Nmxltbi35j+rxYSFzcwWM87vY7J4OPsqo8WjvrfsDsIesxsusnjs/baAxWPxnpdMHptW
-        dbJ5bPo0id3jxIzfLB73u48zeWxeUu/R2/yOzeP9vqtsHmcWHGH3+LxJzmPr59ssAbxRejZF
-        +aUlqQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehmfJhxnK/jL
-        VrF/xQumBsY9rF2MnBwSAiYST3c9YOti5OIQEljKKPFpwUI2iISMxMlpDVBFwhJ/rnVBFb1l
-        lFiy/T1YkbCAucSdo9+YQGwRgXCJFde2sYAUMQu0skr0f3/FCtFxhUniw4YFLCBVbAKGEl1v
-        QUZxcPAK2EmsvRINEmYRUJXoeXuDEcQWFUiS+H61C8zmFRCUODnzCVgrp4CuxK+3K5lBbGYB
-        M4l5mx9C2fIS29/OgbLFJW49mc80gVFoFpL2WUhaZiFpmYWkZQEjyypGkdTS4tz03GJDveLE
-        3OLSvHS95PzcTYzAxLHt2M/NOxgvbQw+xCjAwajEw1vg3BwvxJpYVlyZe4hRgoNZSYTX6ezp
-        OCHelMTKqtSi/Pii0pzU4kOMpkDPTWSWEk3OBya1vJJ4Q1NDcwtLQ3Njc2MzCyVx3g6BgzFC
-        AumJJanZqakFqUUwfUwcnFINjBP0ZoqvvFqnv+FIxLrLR6OFHcN1rwTdnOzX5zrB1DyuYfJ7
-        MUWZ97vP7kiU7VA/cK/wtYheR8rURQ4x+QfW6kmrPtmxYj9DgOqPsG51GQmepY5KV14ZW/87
-        /PkNR9SjqFdGC1Y6Wq177rAmeInF1viLbUIcXOyhu1+eMVlW6+p6x/XeOZmd65VYijMSDbWY
-        i4oTAaq2ugIyAwAA
-X-CMS-MailID: 20201012104640eucas1p12399708a49a999b779fdce7e9e6204cc
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20201009124900eucas1p26c93caa29c9925f1eef9be9ff7c6c65c
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20201009124900eucas1p26c93caa29c9925f1eef9be9ff7c6c65c
-References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
-        <20201009075934.3509076-10-daniel.vetter@ffwll.ch>
-        <20201009123421.67a80d72@coco.lan> <20201009122111.GN5177@ziepe.ca>
-        <20201009143723.45609bfb@coco.lan>
-        <CGME20201009124900eucas1p26c93caa29c9925f1eef9be9ff7c6c65c@eucas1p2.samsung.com>
-        <20201009124850.GP5177@ziepe.ca>
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9771 signatures=668681
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 adultscore=0
+ bulkscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010120090
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9771 signatures=668681
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 impostorscore=0 clxscore=1015
+ spamscore=0 priorityscore=1501 bulkscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010120089
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+On 10/10/20 9:15 AM, yulei zhang wrote:
+> On Fri, Oct 9, 2020 at 7:53 PM Joao Martins <joao.m.martins@oracle.com> wrote:
+>> On 10/9/20 12:39 PM, yulei zhang wrote:
+>>> Joao, thanks a lot for the feedback. One more thing needs to mention
+>>> is that dmemfs also support fine-grained
+>>> memory management which makes it more flexible for tenants with
+>>> different requirements.
+>>>
+>> So as DAX when it allows to partition a region (starting 5.10). Meaning you have a region
+>> which you dedicated to userspace. That region can then be partitioning into devices which
+>> give you access to multiple (possibly discontinuous) extents with at a given page
+>> granularity (selectable when you create the device), accessed through mmap().
+>> You can then give that device to a cgroup. Or you can return that memory back to the
+>> kernel (should you run into OOM situation), or you recreate the same mappings across
+>> reboot/kexec.
+>>
+>> I probably need to read your patches again, but can you extend on the 'dmemfs also support
+>> fine-grained memory management' to understand what is the gap that you mention?
+>>
+> sure, dmemfs uses bitmap to track the memory usage in the reserved
+> memory region in
+> a given page size granularity. And for each user the memory can be
+> discrete as well.
+> 
+That same functionality of tracking reserved region usage across different users at any
+page granularity is covered the DAX series I mentioned below. The discrete part -- IIUC
+what you meant -- is then reduced using DAX ABI/tools to create a device file vs a filesystem.
 
-On 09.10.2020 14:48, Jason Gunthorpe wrote:
-> On Fri, Oct 09, 2020 at 02:37:23PM +0200, Mauro Carvalho Chehab wrote:
->
->> I'm not a mm/ expert, but, from what I understood from Daniel's patch
->> description is that this is unsafe *only if*  __GFP_MOVABLE is used.
-> No, it is unconditionally unsafe. The CMA movable mappings are
-> specific VMAs that will have bad issues here, but there are other
-> types too.
-
-I'm trying to follow this thread, but I really wonder what do you mean 
-by CMA movable mappings? If a buffer has been allocated from CMA and 
-used for DMA, it won't be moved in the memory. It will stay at the same 
-physical memory address all the time until freed by the owner. It just a 
-matter of proper usage count tracking to delay freeing if it is still 
-used somewhere.
-
-Best regards
-
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
-
+>>> On Fri, Oct 9, 2020 at 3:01 AM Joao Martins <joao.m.martins@oracle.com> wrote:
+>>>>
+>>>> [adding a couple folks that directly or indirectly work on the subject]
+>>>>
+>>>> On 10/8/20 8:53 AM, yulei.kernel@gmail.com wrote:
+>>>>> From: Yulei Zhang <yuleixzhang@tencent.com>
+>>>>>
+>>>>> In current system each physical memory page is assocaited with
+>>>>> a page structure which is used to track the usage of this page.
+>>>>> But due to the memory usage rapidly growing in cloud environment,
+>>>>> we find the resource consuming for page structure storage becomes
+>>>>> highly remarkable. So is it an expense that we could spare?
+>>>>>
+>>>> Happy to see another person working to solve the same problem!
+>>>>
+>>>> I am really glad to see more folks being interested in solving
+>>>> this problem and I hope we can join efforts?
+>>>>
+>>>> BTW, there is also a second benefit in removing struct page -
+>>>> which is carving out memory from the direct map.
+>>>>
+>>>>> This patchset introduces an idea about how to save the extra
+>>>>> memory through a new virtual filesystem -- dmemfs.
+>>>>>
+>>>>> Dmemfs (Direct Memory filesystem) is device memory or reserved
+>>>>> memory based filesystem. This kind of memory is special as it
+>>>>> is not managed by kernel and most important it is without 'struct page'.
+>>>>> Therefore we can leverage the extra memory from the host system
+>>>>> to support more tenants in our cloud service.
+>>>>>
+>>>> This is like a walk down the memory lane.
+>>>>
+>>>> About a year ago we followed the same exact idea/motivation to
+>>>> have memory outside of the direct map (and removing struct page overhead)
+>>>> and started with our own layer/thingie. However we realized that DAX
+>>>> is one the subsystems which already gives you direct access to memory
+>>>> for free (and is already upstream), plus a couple of things which we
+>>>> found more handy.
+>>>>
+>>>> So we sent an RFC a couple months ago:
+>>>>
+>>>> https://lore.kernel.org/linux-mm/20200110190313.17144-1-joao.m.martins@oracle.com/
+>>>>
+>>>> Since then majority of the work has been in improving DAX[1].
+>>>> But now that is done I am going to follow up with the above patchset.
+>>>>
+>>>> [1]
+>>>> https://lore.kernel.org/linux-mm/159625229779.3040297.11363509688097221416.stgit@dwillia2-desk3.amr.corp.intel.com/
+>>>>
+>>>> (Give me a couple of days and I will send you the link to the latest
+>>>> patches on a git-tree - would love feedback!)
+>>>>
+>>>> The struct page removal for DAX would then be small, and ticks the
+>>>> same bells and whistles (MCE handling, reserving PAT memtypes, ptrace
+>>>> support) that we both do, with a smaller diffstat and it doesn't
+>>>> touch KVM (not at least fundamentally).
+>>>>
+>>>>         15 files changed, 401 insertions(+), 38 deletions(-)
+>>>>
+>>>> The things needed in core-mm is for handling PMD/PUD PAGE_SPECIAL much
+>>>> like we both do. Furthermore there wouldn't be a need for a new vm type,
+>>>> consuming an extra page bit (in addition to PAGE_SPECIAL) or new filesystem.
+>>>>
+>>>> [1]
+>>>> https://lore.kernel.org/linux-mm/159625229779.3040297.11363509688097221416.stgit@dwillia2-desk3.amr.corp.intel.com/
+>>>>
+>>>>
+>>>>> We uses a kernel boot parameter 'dmem=' to reserve the system
+>>>>> memory when the host system boots up, the details can be checked
+>>>>> in /Documentation/admin-guide/kernel-parameters.txt.
+>>>>>
+>>>>> Theoretically for each 4k physical page it can save 64 bytes if
+>>>>> we drop the 'struct page', so for guest memory with 320G it can
+>>>>> save about 5G physical memory totally.
+>>>>>
+>>>> Also worth mentioning that if you only care about 'struct page' cost, and not on the
+>>>> security boundary, there's also some work on hugetlbfs preallocation of hugepages into
+>>>> tricking vmemmap in reusing tail pages.
+>>>>
+>>>>   https://lore.kernel.org/linux-mm/20200915125947.26204-1-songmuchun@bytedance.com/
+>>>>
+>>>> Going forward that could also make sense for device-dax to avoid so many
+>>>> struct pages allocated (which would require its transition to compound
+>>>> struct pages like hugetlbfs which we are looking at too). In addition an
+>>>> idea <handwaving> would be perhaps to have a stricter mode in DAX where
+>>>> we initialize/use the metadata ('struct page') but remove the underlaying
+>>>> PFNs (of the 'struct page') from the direct map having to bear the cost of
+>>>> mapping/unmapping on gup/pup.
+>>>>
+>>>>         Joao
