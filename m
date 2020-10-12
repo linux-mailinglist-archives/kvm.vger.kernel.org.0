@@ -2,64 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF9BE28BFDB
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 20:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C388828BFF2
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 20:46:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387909AbgJLSiS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 14:38:18 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:46842 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726636AbgJLSiS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Oct 2020 14:38:18 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1602527896;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AIJJxrRTYI7/G4jUBhTF1PuYkEEiQEXkfOYIuChW94Q=;
-        b=2CnO3irtn1TPs1W8K6cSo8Fi1B+04BiL4p9scFJK6PxfDb+QaQB/hafstqIZkSTTC6DT0Z
-        7QaBIzeajNCjTYW8SVApOK4QCF69OgumOFBSHEKvmmTKyPG/i7Uewpd38oFZvLg0pRq6z8
-        DP8tjNKtawl/XmzvL5fUtdUCB+ixK9kzXmFfIeLHmNgOiKhbD0q4chsFEl6NORV1iUOcko
-        Odt6p/FEg/sTf+xx20g8+9zzY2Jqf453TDglxP6Z/hGlj4qDzdDDMqNJqTc0LQD74Y8xOR
-        bpFK3WX1p45yer6mwbif+rt4sJXaj0q7cq/88GxhIfUQu6K7C8F6NtC6Ft14Xw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1602527896;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AIJJxrRTYI7/G4jUBhTF1PuYkEEiQEXkfOYIuChW94Q=;
-        b=RzhatGEc49jSWbj2iqK6QoIQCvLwtYoyESzglE8MeZ4Ni8Nyy++ScWap8ts92tTHnIBl27
-        BZqR/wNVniffCUAQ==
-To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org,
-        Marc Zyngier <maz@kernel.org>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
-In-Reply-To: <25c54f8e5da1fd5cf3b01ad2fdc1640c5d86baa1.camel@infradead.org>
-References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org> <20201007122046.1113577-1-dwmw2@infradead.org> <20201007122046.1113577-5-dwmw2@infradead.org> <87blhcx6qz.fsf@nanos.tec.linutronix.de> <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org> <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org> <87362owhcb.fsf@nanos.tec.linutronix.de> <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org> <87tuv4uwmt.fsf@nanos.tec.linutronix.de> <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org> <874kn2s3ud.fsf@nanos.tec.linutronix.de> <0E51DAB1-5973-4226-B127-65D77DC46CB5@infradead.org> <87pn5or8k7.fsf@nanos.tec.linutronix.de> <F0F0A646-8DBA-4448-933F-993A3335BD59@infradead.org> <87ft6jrdpk.fsf@nanos.tec.linutronix.de> <25c54f8e5da1fd5cf3b01ad2fdc1640c5d86baa1.camel@infradead.org>
-Date:   Mon, 12 Oct 2020 20:38:16 +0200
-Message-ID: <87362jqoh3.fsf@nanos.tec.linutronix.de>
+        id S1729698AbgJLSqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 14:46:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50272 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726742AbgJLSqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Oct 2020 14:46:16 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC17C0613D0
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 11:46:16 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id n61so16733564ota.10
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 11:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=AIUOfjvEalibEOMS1HqaFhKw8FWbHrQSvVLFBmzV0Yw=;
+        b=NcJ1o3Aq9NPR3ZeLpuUXon5bg02gpJQ7bKtLdNE/CUyVPK7XJ/h3knzy0qU87S3Rlo
+         hfVPxCVS+VVr51GSM+QKXU2Gan1Z0wg6+OoH9p/haRwWgq0TmJD7DuH1aKpR2zfGrRKj
+         NA/dpwPwew5RJh66rfXjLVJAVRXeurSOQeYomaGYhZLCuAVMBPzYTSQ2+USLokIihVOb
+         FWdzcrOf7qA8HmUP4c0wmT9RBGyxrFCC4eXT1+3idInK6AMlsdmR8rrhBkkU+P8EtLbL
+         Mqt9ucfVUZhCK+Eevmn9XUAtG4SveVNTXn5+pKB53hDGvxra0HkejGNWFTaZFfVfs3zx
+         XUOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=AIUOfjvEalibEOMS1HqaFhKw8FWbHrQSvVLFBmzV0Yw=;
+        b=W4a3xo2upzMXt956DD0dD6ijIk8GV5asKZw/J+9rDkY7qZP7mLFD8mLPHxTdr+QrpL
+         fci6aZianYF5dJePFSaRmXE3kDgD17pGSJ/hdEqfb2E3tAqrdg6JL4e/csSc6r6dr867
+         hcp+u/7TMUKnjPl7tFDvv+e1R8f0Ac0+2b4akb24D/2OOt36+dcmSBuwMHqv3CVa1xj1
+         Mw4xLUcCISUeeHa9F8u2u5bEY3fW6r3wLygi1yu5rG/rGFKPiaiQvC+T7szuZnH4ZDZz
+         MXlmFSjTEtpwbsFFEVpYHchefQhFYW38pYyXcFzhkFR8hSQZBJeWSa1X2u1PdlTC7LXj
+         BOtg==
+X-Gm-Message-State: AOAM533L4L2MjK4BlCBkdDLJSIPr2bLnKhc0DQjewi5GLUsMVOVOjOYv
+        Vo1WDkggug6xIoTJk3fbbT89+AdoQxgbdllLXXMreTNASNQP5A==
+X-Google-Smtp-Source: ABdhPJxy5tP6bGtOj5+z2RAVKsyh15D4xs2TvaplmIXT+6A/WwNfthz7sftRGxHxxWw/gSaPbptjhyl/Skz8g7vbac4=
+X-Received: by 2002:a9d:51c4:: with SMTP id d4mr7286220oth.56.1602528375359;
+ Mon, 12 Oct 2020 11:46:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20200508203938.88508-1-jmattson@google.com> <D121A03E-6861-4736-8070-5D1E4FEE1D32@gmail.com>
+ <20201012163219.GC26135@linux.intel.com> <5A0776F7-7314-408C-8C58-7C4727823906@gmail.com>
+ <CALMp9eTkDOCkHaWrqYXKvOuZG4NheSwEgiqGzjwAt6fAdC1Z4A@mail.gmail.com>
+ <E545AD34-A593-4753-9F22-A36D99BFFE10@gmail.com> <386c6f5a-945a-6cef-2a0b-61f91f8c1bfe@redhat.com>
+ <354EB465-6F61-4AED-89B1-AB49A984A8A1@gmail.com>
+In-Reply-To: <354EB465-6F61-4AED-89B1-AB49A984A8A1@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 12 Oct 2020 11:46:03 -0700
+Message-ID: <CALMp9eSe35-8jCzXjYkGVkHfam2CPGCO5+A=1+OGGCnKb_yEPA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: VMX: Add a VMX-preemption timer
+ expiration test
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        KVM <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 12 2020 at 17:06, David Woodhouse wrote:
-> On Mon, 2020-10-12 at 11:33 +0200, Thomas Gleixner wrote:
->> You might want to look into using irq_find_matching_fwspec() instead for
->> both HPET and IOAPIC. That needs a select() callback implemented in the
->> remapping domains.
+On Mon, Oct 12, 2020 at 11:31 AM Nadav Amit <nadav.amit@gmail.com> wrote:
 >
-> That works.
+> > On Oct 12, 2020, at 11:29 AM, Paolo Bonzini <pbonzini@redhat.com> wrote=
+:
+> >
+> > On 12/10/20 20:17, Nadav Amit wrote:
+> >>> KVM clearly doesn't adhere to the architectural specification. I don'=
+t
+> >>> know what is wrong with your Broadwell machine.
+> >> Are you saying that the test is expected to fail on KVM? And that Sean=
+=E2=80=99s
+> >> failures are expected?
+> >
+> > It's not expected to fail, but it's apparently broken.
+>
+> Hm=E2=80=A6 Based on my results on bare-metal, it might be an architectur=
+al issue or
+> a test issue, and not a KVM issue.
 
-:)
+From section 25.5.1 of the SDM, volume 3:
 
-Nasty, but way better than what we have now. Now I start to wonder
-whether we can get rid of a few other things as well especially the
-non-standard alloc_info thingy.
+If the last VM entry was performed with the 1-setting of =E2=80=9Cactivate
+VMX-preemption timer=E2=80=9D VM-execution control,
+the VMX-preemption timer counts down (from the value loaded by VM
+entry; see Section 26.7.4) in VMX non-
+root operation. When the timer counts down to zero, it stops counting
+down and a VM exit occurs (see Section
+25.2).
 
-Thanks,
+The test is actually quite lax, in that it doesn't start tracking VMX
+non-root operation time until actually in the guest. Hardware is free
+to start tracking VMX non-root operation time during VM-entry.
 
-        tglx
+If the test can both observe a TSC value after the VMX-preemption
+timer deadline *and* store that value to memory, then the store
+instruction must have started executing after the VMX-preemption timer
+has counted down to zero. Per the SDM, a VM-exit should have occurred
+before the store could retire.
+
+Of course, there could be a test bug.
