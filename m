@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BBE828C1A0
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 21:47:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EB6F28C1A1
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 21:47:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391347AbgJLTro (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 15:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59922 "EHLO
+        id S2391493AbgJLTrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Oct 2020 15:47:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391478AbgJLTrn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Oct 2020 15:47:43 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790E7C0613D1
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 12:47:43 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id w11so3061192pgf.18
-        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 12:47:43 -0700 (PDT)
+        with ESMTP id S2391219AbgJLTrr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Oct 2020 15:47:47 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 440E7C0613D1
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 12:47:46 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id y17so13472517qkf.15
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 12:47:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=fcHsD/Mg51qiV+MYCCs5Pufq2WHVlY4bU+bl6w+GYtI=;
-        b=Xy/dPTlecfeeKwxFw09U+fPxlHxREDAJtvk1LjrlzFePewCkfyj4QaOAdMPR0k+ceX
-         4WbFH//8GPUJ35JIfy8P/JdXzJgDEqz5RwiWcPrHznuuGP9I7asGo8g5zAxseRgqrYDM
-         aW7n3K0JBp23Um40LX05w7rWlXqdr7kOU6Dpn9qINMIQvXsNpn+yBhJaIwDzlMI3Gv6E
-         d4w+CueMiO9s8yO8Nnle76Gsy5MpWcmYdw7gwYGmdqR4+Xe9RBU6iOia4jT3h86tU5Aa
-         y0xZn5ayvQ0efchJuLR3gdYVv58FmaDoGcoKlGewm9fPSGQiye0z2dOOQvBrCPDxYmwU
-         lAuA==
+        bh=EVBqkHSTIb1bjQbr6fD1KuxvWK06J5YOcXkQUKPn7+E=;
+        b=Ykb95eXXcTGi2T5eSoFyVQPwWU831oYFgzUriCkIF9YZ4ruwDn0sGyFHfCEtdUT4AB
+         egdJ5XVNJp1hnaaZSx58uH4YH2EyA/PFHBBjfDk7SoqWeVUM/NOcvnvEtcGLOUfKmhZA
+         7YgKH9qfDk/ZnuYbCMsScWjpRcGrr+hBBlOpQf2ZKIWsfxfxnnihJGPicOzekA1R5uo5
+         7uOatX14YcAkUrzxPy5sQR+4h5A3Qo8Et98T9OmV0sDNSu6AQ1rwtOz5IZdhwar09Knk
+         T+zF4iRiEbrKLVMQ7YMgiu7O9qphq7AUaSUzJH4fcwAllxxjwlyvWcjJ5FWVLUMUnp1x
+         CQOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=fcHsD/Mg51qiV+MYCCs5Pufq2WHVlY4bU+bl6w+GYtI=;
-        b=OoA5T1MTbUA0DqwRomynJVCrPhZTv2JBwebvl+ec0dlX2xufnonHZINsb2AYk6EIDJ
-         tFz8AHEGfGpN30ASdM/9mse8tll5+YqKZBSJlgOAESe2xC01U3UxsYw+OwKz+//jMzfo
-         TwFokrkGQXAY2bfdgIg1DQBD9oqH3vj5M+johalYC2oBjRlAJIEBT6W0jLiFvXsA7CWH
-         1SDxK7S5Y36LhhLdtNQkULjD3fRjxiIvNSJNkELyH4Ch1qv3x5cE4e9YHgWzz/J1PvJ0
-         CKuGBAEBFZoPovEGIMFMDd4WSZKb8lZhZWwIbuus5HCIO92tZz2lDpJGwRSr2zbXLkks
-         IvJA==
-X-Gm-Message-State: AOAM531PJzS9ltc8f7taDSiLiKMRlZpByReAN2mua3tu5fJaGvwIC4Yj
-        F2G3phm3xio4f8rEJmjvwrGvbB2xn/Dk/yFQ
-X-Google-Smtp-Source: ABdhPJyrGYzE5MRpSq9h45ahvEP3lOScv6gqTWAQZJJ78ksqcHHlcexaAbbWAZ/nEDzZX0HP3nFVImApITaj23ww
+        bh=EVBqkHSTIb1bjQbr6fD1KuxvWK06J5YOcXkQUKPn7+E=;
+        b=d0tSmLe4LvZKvAnW66WmsKNC6V+36rrGgzeRYijpnsB/6U01h3YUz/wDZbdembCh0z
+         FtDMRlmpJnANhMCsdaFxC10QaDlIvUbNfhw3VmuDVKome2sLh9uiWa3dzzBfn6T46043
+         DaBJdxGmg+XYnhzWcbAQDUSk78vhhggVrnaREjHlYhllmtmKQIQa4aGFV5c7PpmS7FGc
+         5TGwffcBs3z26YIqiG4Otd5YdjPfPoFozSo5uv5GLK8njhexEUWByI0XVPZ5L9EGtAg+
+         g/0zfiE15//LcQu85G053a9cm8ruOejLI6gxMwElf4I1AsNGNmrkHXufY/1S8zxHhO9X
+         mf4A==
+X-Gm-Message-State: AOAM530jJtxVVpzEuwkK/wndzXDl+YW9VRFWVBVVv0omykaAo1SENAm/
+        Omxw7DCeOWVqsjCzoM+b49wvaDLsjZF5K3Dx
+X-Google-Smtp-Source: ABdhPJxM6z40as0EV1Be1PFTGBuiD0vMq3ir19VcA3DJACSCqWPhChjVRULztVhW7qKS4GC44kXv8/Y36lNTWXIJ
 Sender: "aaronlewis via sendgmr" <aaronlewis@aaronlewis1.sea.corp.google.com>
 X-Received: from aaronlewis1.sea.corp.google.com ([2620:15c:100:202:a28c:fdff:fed8:8d46])
- (user=aaronlewis job=sendgmr) by 2002:a17:90a:940c:: with SMTP id
- r12mr3123638pjo.1.1602532062639; Mon, 12 Oct 2020 12:47:42 -0700 (PDT)
-Date:   Mon, 12 Oct 2020 12:47:15 -0700
+ (user=aaronlewis job=sendgmr) by 2002:a0c:b6d7:: with SMTP id
+ h23mr27184501qve.17.1602532065357; Mon, 12 Oct 2020 12:47:45 -0700 (PDT)
+Date:   Mon, 12 Oct 2020 12:47:16 -0700
 In-Reply-To: <20201012194716.3950330-1-aaronlewis@google.com>
-Message-Id: <20201012194716.3950330-4-aaronlewis@google.com>
+Message-Id: <20201012194716.3950330-5-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20201012194716.3950330-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v3 3/4] selftests: kvm: Add exception handling to selftests
+Subject: [PATCH v3 4/4] selftests: kvm: Test MSR exiting to userspace
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     graf@amazon.com
 Cc:     pshier@google.com, jmattson@google.com, kvm@vger.kernel.org,
@@ -61,413 +61,645 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the infrastructure needed to enable exception handling in selftests.
-This allows any of the exception and interrupt vectors to be overridden
-in the guest.
+Add a selftest to test that when the ioctl KVM_X86_SET_MSR_FILTER is
+called with an MSR list, those MSRs exit to userspace.
+
+This test uses 3 MSRs to test this:
+  1. MSR_IA32_XSS, an MSR the kernel knows about.
+  2. MSR_IA32_FLUSH_CMD, an MSR the kernel does not know about.
+  3. MSR_NON_EXISTENT, an MSR invented in this test for the purposes of
+     passing a fake MSR from the guest to userspace.  KVM just acts as a
+     pass through.
+
+Userspace is also able to inject a #GP.  This is demonstrated when
+MSR_IA32_XSS and MSR_IA32_FLUSH_CMD are misused in the test.  When this
+happens a #GP is initiated in userspace to be thrown in the guest which is
+handled gracefully by the exception handling framework introduced earlier
+in this series.
+
+Tests for the generic instruction emulator were also added.  For this to
+work the module parameter kvm.force_emulation_prefix=1 has to be enabled.
+If it isn't enabled the tests will be skipped.
+
+A test was also added to ensure the MSR permission bitmap is being set
+correctly by executing reads and writes of MSR_FS_BASE and MSR_GS_BASE
+in the guest while alternating which MSR userspace should intercept.  If
+the permission bitmap is being set correctly only one of the MSRs should
+be coming through at a time, and the guest should be able to read and
+write the other one directly.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
 ---
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   2 +
+ .../kvm/x86_64/userspace_msr_exit_test.c      | 560 ++++++++++++++++++
+ 4 files changed, 564 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
 
-v1 -> v2:
-
-  - Use exception_handlers instead of gs base to pass table to the guest.
-  - Move unexpected vector assert to processor.c.
-
-v2 -> v3:
-
-  - Add stubs for assert_on_unhandled_exception() in aarch64 and s390x.
-
----
- tools/testing/selftests/kvm/Makefile          |  19 ++-
- .../testing/selftests/kvm/include/kvm_util.h  |   2 +
- .../selftests/kvm/include/x86_64/processor.h  |  24 ++++
- .../selftests/kvm/lib/aarch64/processor.c     |   4 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +
- .../selftests/kvm/lib/kvm_util_internal.h     |   2 +
- .../selftests/kvm/lib/s390x/processor.c       |   4 +
- .../selftests/kvm/lib/x86_64/handlers.S       |  81 +++++++++++++
- .../selftests/kvm/lib/x86_64/processor.c      | 114 +++++++++++++++++-
- 9 files changed, 244 insertions(+), 9 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/handlers.S
-
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 307ceaadbbb9..30686fbb8b9f 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -15,6 +15,7 @@
+ /x86_64/vmx_preemption_timer_test
+ /x86_64/svm_vmcall_test
+ /x86_64/sync_regs_test
++/x86_64/userspace_msr_exit_test
+ /x86_64/vmx_close_while_nested_test
+ /x86_64/vmx_dirty_log_test
+ /x86_64/vmx_set_nested_state_test
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 7ebe71fbca53..aaaf992faf87 100644
+index aaaf992faf87..7acc14d06ba8 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -34,7 +34,7 @@ ifeq ($(ARCH),s390)
- endif
- 
- LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c lib/test_util.c
--LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c
-+LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
- LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
- LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c
- 
-@@ -110,14 +110,21 @@ LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
- include ../lib.mk
- 
- STATIC_LIBS := $(OUTPUT)/libkvm.a
--LIBKVM_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM))
--EXTRA_CLEAN += $(LIBKVM_OBJ) $(STATIC_LIBS) cscope.*
-+LIBKVM_C := $(filter %.c,$(LIBKVM))
-+LIBKVM_S := $(filter %.S,$(LIBKVM))
-+LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
-+LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
-+EXTRA_CLEAN += $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(STATIC_LIBS) cscope.*
-+
-+x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
-+$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
- 
--x := $(shell mkdir -p $(sort $(dir $(LIBKVM_OBJ))))
--$(LIBKVM_OBJ): $(OUTPUT)/%.o: %.c
-+$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
- 
--$(OUTPUT)/libkvm.a: $(LIBKVM_OBJ)
-+LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ)
-+$(OUTPUT)/libkvm.a: $(LIBKVM_OBJS)
- 	$(AR) crs $@ $^
- 
- x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 919e161dd289..356930690bea 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -294,6 +294,8 @@ int vm_create_device(struct kvm_vm *vm, struct kvm_create_device *cd);
- 	memcpy(&(g), _p, sizeof(g));				\
- })
- 
-+void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid);
-+
- /* Common ucalls */
- enum {
- 	UCALL_NONE,
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 0a65e7bb5249..02530dc6339b 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -36,6 +36,8 @@
- #define X86_CR4_SMAP		(1ul << 21)
- #define X86_CR4_PKE		(1ul << 22)
- 
-+#define UNEXPECTED_VECTOR_PORT 0xfff0u
-+
- /* General Registers in 64-Bit Mode */
- struct gpr64_regs {
- 	u64 rax;
-@@ -239,6 +241,11 @@ static inline struct desc_ptr get_idt(void)
- 	return idt;
- }
- 
-+static inline void outl(uint16_t port, uint32_t value)
-+{
-+	__asm__ __volatile__("outl %%eax, %%dx" : : "d"(port), "a"(value));
-+}
-+
- #define SET_XMM(__var, __xmm) \
- 	asm volatile("movq %0, %%"#__xmm : : "r"(__var) : #__xmm)
- 
-@@ -338,6 +345,23 @@ uint32_t kvm_get_cpuid_max_basic(void);
- uint32_t kvm_get_cpuid_max_extended(void);
- void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits);
- 
-+struct ex_regs {
-+	uint64_t rax, rcx, rdx, rbx;
-+	uint64_t rbp, rsi, rdi;
-+	uint64_t r8, r9, r10, r11;
-+	uint64_t r12, r13, r14, r15;
-+	uint64_t vector;
-+	uint64_t error_code;
-+	uint64_t rip;
-+	uint64_t cs;
-+	uint64_t rflags;
-+};
-+
-+void vm_init_descriptor_tables(struct kvm_vm *vm);
-+void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
-+void vm_handle_exception(struct kvm_vm *vm, int vector,
-+			void (*handler)(struct ex_regs *));
-+
- /*
-  * Basic CPU control in CR0
-  */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 2afa6618b396..d6c32c328e9a 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -350,3 +350,7 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
- 
- 	va_end(ap);
- }
-+
-+void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
-+{
-+}
+@@ -49,6 +49,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/state_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+ TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+ TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
++TEST_GEN_PROGS_x86_64 += x86_64/userspace_msr_exit_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 74776ee228f2..9a7115071c66 100644
+index 9a7115071c66..b662d2d7b07c 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1195,6 +1195,9 @@ int _vcpu_run(struct kvm_vm *vm, uint32_t vcpuid)
- 	do {
- 		rc = ioctl(vcpu->fd, KVM_RUN, NULL);
- 	} while (rc == -1 && errno == EINTR);
-+
-+	assert_on_unhandled_exception(vm, vcpuid);
-+
- 	return rc;
- }
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-index 2ef446520748..f07d383d03a1 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-+++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-@@ -50,6 +50,8 @@ struct kvm_vm {
- 	vm_paddr_t pgd;
- 	vm_vaddr_t gdt;
- 	vm_vaddr_t tss;
-+	vm_vaddr_t idt;
-+	vm_vaddr_t handlers;
- };
- 
- struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid);
-diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-index a88c5d665725..7349bb2e1a24 100644
---- a/tools/testing/selftests/kvm/lib/s390x/processor.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-@@ -241,3 +241,7 @@ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
- 	fprintf(stream, "%*spstate: psw: 0x%.16llx:0x%.16llx\n",
- 		indent, "", vcpu->state->psw_mask, vcpu->state->psw_addr);
- }
-+
-+void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
-+{
-+}
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/handlers.S b/tools/testing/selftests/kvm/lib/x86_64/handlers.S
+@@ -1593,6 +1593,8 @@ static struct exit_reason {
+ 	{KVM_EXIT_INTERNAL_ERROR, "INTERNAL_ERROR"},
+ 	{KVM_EXIT_OSI, "OSI"},
+ 	{KVM_EXIT_PAPR_HCALL, "PAPR_HCALL"},
++	{KVM_EXIT_X86_RDMSR, "RDMSR"},
++	{KVM_EXIT_X86_WRMSR, "WRMSR"},
+ #ifdef KVM_EXIT_MEMORY_NOT_PRESENT
+ 	{KVM_EXIT_MEMORY_NOT_PRESENT, "MEMORY_NOT_PRESENT"},
+ #endif
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
 new file mode 100644
-index 000000000000..aaf7bc7d2ce1
+index 000000000000..e8b6918cdea0
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86_64/handlers.S
-@@ -0,0 +1,81 @@
-+handle_exception:
-+	push %r15
-+	push %r14
-+	push %r13
-+	push %r12
-+	push %r11
-+	push %r10
-+	push %r9
-+	push %r8
-+
-+	push %rdi
-+	push %rsi
-+	push %rbp
-+	push %rbx
-+	push %rdx
-+	push %rcx
-+	push %rax
-+	mov %rsp, %rdi
-+
-+	call route_exception
-+
-+	pop %rax
-+	pop %rcx
-+	pop %rdx
-+	pop %rbx
-+	pop %rbp
-+	pop %rsi
-+	pop %rdi
-+	pop %r8
-+	pop %r9
-+	pop %r10
-+	pop %r11
-+	pop %r12
-+	pop %r13
-+	pop %r14
-+	pop %r15
-+
-+	/* Discard vector and error code. */
-+	add $16, %rsp
-+	iretq
-+
++++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+@@ -0,0 +1,560 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Build the handle_exception wrappers which push the vector/error code on the
-+ * stack and an array of pointers to those wrappers.
++ * Copyright (C) 2020, Google LLC.
++ *
++ * Tests for exiting into userspace on registered MSRs
 + */
-+.pushsection .rodata
-+.globl idt_handlers
-+idt_handlers:
-+.popsection
 +
-+.macro HANDLERS has_error from to
-+	vector = \from
-+	.rept \to - \from + 1
-+	.align 8
++#define _GNU_SOURCE /* for program_invocation_short_name */
++#include <sys/ioctl.h>
 +
-+	/* Fetch current address and append it to idt_handlers. */
-+	current_handler = .
-+.pushsection .rodata
-+.quad current_handler
-+.popsection
++#include "test_util.h"
++#include "kvm_util.h"
++#include "vmx.h"
 +
-+	.if ! \has_error
-+	pushq $0
-+	.endif
-+	pushq $vector
-+	jmp handle_exception
-+	vector = vector + 1
-+	.endr
-+.endm
++/* Forced emulation prefix, used to invoke the emulator unconditionally. */
++#define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
++#define KVM_FEP_LENGTH 5
++static int fep_available = 1;
 +
-+.global idt_handler_code
-+idt_handler_code:
-+	HANDLERS has_error=0 from=0  to=7
-+	HANDLERS has_error=1 from=8  to=8
-+	HANDLERS has_error=0 from=9  to=9
-+	HANDLERS has_error=1 from=10 to=14
-+	HANDLERS has_error=0 from=15 to=16
-+	HANDLERS has_error=1 from=17 to=17
-+	HANDLERS has_error=0 from=18 to=255
++#define VCPU_ID	      1
++#define MSR_NON_EXISTENT 0x474f4f00
 +
-+.section        .note.GNU-stack, "", %progbits
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 1ccf6c9b3476..66228297ac03 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -12,9 +12,18 @@
- #include "../kvm_util_internal.h"
- #include "processor.h"
- 
-+#ifndef NUM_INTERRUPTS
-+#define NUM_INTERRUPTS 256
-+#endif
-+
-+#define DEFAULT_CODE_SELECTOR 0x8
-+#define DEFAULT_DATA_SELECTOR 0x10
-+
- /* Minimum physical address used for virtual translation tables. */
- #define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
- 
-+vm_vaddr_t exception_handlers;
-+
- /* Virtual translation table structure declarations */
- struct pageMapL4Entry {
- 	uint64_t present:1;
-@@ -557,9 +566,9 @@ static void vcpu_setup(struct kvm_vm *vm, int vcpuid, int pgd_memslot, int gdt_m
- 		sregs.efer |= (EFER_LME | EFER_LMA | EFER_NX);
- 
- 		kvm_seg_set_unusable(&sregs.ldt);
--		kvm_seg_set_kernel_code_64bit(vm, 0x8, &sregs.cs);
--		kvm_seg_set_kernel_data_64bit(vm, 0x10, &sregs.ds);
--		kvm_seg_set_kernel_data_64bit(vm, 0x10, &sregs.es);
-+		kvm_seg_set_kernel_code_64bit(vm, DEFAULT_CODE_SELECTOR, &sregs.cs);
-+		kvm_seg_set_kernel_data_64bit(vm, DEFAULT_DATA_SELECTOR, &sregs.ds);
-+		kvm_seg_set_kernel_data_64bit(vm, DEFAULT_DATA_SELECTOR, &sregs.es);
- 		kvm_setup_tss_64bit(vm, &sregs.tr, 0x18, gdt_memslot, pgd_memslot);
- 		break;
- 
-@@ -1119,3 +1128,102 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
- 		*va_bits = (entry->eax >> 8) & 0xff;
- 	}
- }
-+
-+struct idt_entry {
-+	uint16_t offset0;
-+	uint16_t selector;
-+	uint16_t ist : 3;
-+	uint16_t : 5;
-+	uint16_t type : 4;
-+	uint16_t : 1;
-+	uint16_t dpl : 2;
-+	uint16_t p : 1;
-+	uint16_t offset1;
-+	uint32_t offset2; uint32_t reserved;
++u64 deny_bits = 0;
++struct kvm_msr_filter filter = {
++	.flags = KVM_MSR_FILTER_DEFAULT_ALLOW,
++	.ranges = {
++		{
++			.flags = KVM_MSR_FILTER_READ |
++				 KVM_MSR_FILTER_WRITE,
++			.nmsrs = 1,
++			/* Test an MSR the kernel knows about. */
++			.base = MSR_IA32_XSS,
++			.bitmap = (uint8_t*)&deny_bits,
++		}, {
++			.flags = KVM_MSR_FILTER_READ |
++				 KVM_MSR_FILTER_WRITE,
++			.nmsrs = 1,
++			/* Test an MSR the kernel doesn't know about. */
++			.base = MSR_IA32_FLUSH_CMD,
++			.bitmap = (uint8_t*)&deny_bits,
++		}, {
++			.flags = KVM_MSR_FILTER_READ |
++				 KVM_MSR_FILTER_WRITE,
++			.nmsrs = 1,
++			/* Test a fabricated MSR that no one knows about. */
++			.base = MSR_NON_EXISTENT,
++			.bitmap = (uint8_t*)&deny_bits,
++		},
++	},
 +};
 +
-+static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
-+			  int dpl, unsigned short selector)
-+{
-+	struct idt_entry *base =
-+		(struct idt_entry *)addr_gva2hva(vm, vm->idt);
-+	struct idt_entry *e = &base[vector];
++struct kvm_msr_filter filter_fs = {
++	.flags = KVM_MSR_FILTER_DEFAULT_ALLOW,
++	.ranges = {
++		{
++			.flags = KVM_MSR_FILTER_READ |
++				 KVM_MSR_FILTER_WRITE,
++			.nmsrs = 1,
++			.base = MSR_FS_BASE,
++			.bitmap = (uint8_t*)&deny_bits,
++		},
++	},
++};
 +
-+	memset(e, 0, sizeof(*e));
-+	e->offset0 = addr;
-+	e->selector = selector;
-+	e->ist = 0;
-+	e->type = 14;
-+	e->dpl = dpl;
-+	e->p = 1;
-+	e->offset1 = addr >> 16;
-+	e->offset2 = addr >> 32;
++struct kvm_msr_filter filter_gs = {
++	.flags = KVM_MSR_FILTER_DEFAULT_ALLOW,
++	.ranges = {
++		{
++			.flags = KVM_MSR_FILTER_READ |
++				 KVM_MSR_FILTER_WRITE,
++			.nmsrs = 1,
++			.base = MSR_GS_BASE,
++			.bitmap = (uint8_t*)&deny_bits,
++		},
++	},
++};
++
++uint64_t msr_non_existent_data;
++int guest_exception_count;
++
++/*
++ * Note: Force test_rdmsr() to not be inlined to prevent the labels,
++ * rdmsr_start and rdmsr_end, from being defined multiple times.
++ */
++static noinline uint64_t test_rdmsr(uint32_t msr)
++{
++	uint32_t a, d;
++
++	guest_exception_count = 0;
++
++	__asm__ __volatile__("rdmsr_start: rdmsr; rdmsr_end:" :
++			"=a"(a), "=d"(d) : "c"(msr) : "memory");
++
++	return a | ((uint64_t) d << 32);
 +}
 +
-+void kvm_exit_unexpected_vector(uint32_t value)
++/*
++ * Note: Force test_wrmsr() to not be inlined to prevent the labels,
++ * wrmsr_start and wrmsr_end, from being defined multiple times.
++ */
++static noinline void test_wrmsr(uint32_t msr, uint64_t value)
 +{
-+	outl(UNEXPECTED_VECTOR_PORT, value);
++	uint32_t a = value;
++	uint32_t d = value >> 32;
++
++	guest_exception_count = 0;
++
++	__asm__ __volatile__("wrmsr_start: wrmsr; wrmsr_end:" ::
++			"a"(a), "d"(d), "c"(msr) : "memory");
 +}
 +
-+void route_exception(struct ex_regs *regs)
-+{
-+	typedef void(*handler)(struct ex_regs *);
-+	handler *handlers = (handler *)exception_handlers;
++extern char rdmsr_start, rdmsr_end;
++extern char wrmsr_start, wrmsr_end;
 +
-+	if (handlers && handlers[regs->vector]) {
-+		handlers[regs->vector](regs);
-+		return;
++/*
++ * Note: Force test_em_rdmsr() to not be inlined to prevent the labels,
++ * rdmsr_start and rdmsr_end, from being defined multiple times.
++ */
++static noinline uint64_t test_em_rdmsr(uint32_t msr)
++{
++	uint32_t a, d;
++
++	guest_exception_count = 0;
++
++	__asm__ __volatile__(KVM_FEP "em_rdmsr_start: rdmsr; em_rdmsr_end:" :
++			"=a"(a), "=d"(d) : "c"(msr) : "memory");
++
++	return a | ((uint64_t) d << 32);
++}
++
++/*
++ * Note: Force test_em_wrmsr() to not be inlined to prevent the labels,
++ * wrmsr_start and wrmsr_end, from being defined multiple times.
++ */
++static noinline void test_em_wrmsr(uint32_t msr, uint64_t value)
++{
++	uint32_t a = value;
++	uint32_t d = value >> 32;
++
++	guest_exception_count = 0;
++
++	__asm__ __volatile__(KVM_FEP "em_wrmsr_start: wrmsr; em_wrmsr_end:" ::
++			"a"(a), "d"(d), "c"(msr) : "memory");
++}
++
++extern char em_rdmsr_start, em_rdmsr_end;
++extern char em_wrmsr_start, em_wrmsr_end;
++
++static void guest_code(void)
++{
++	uint64_t data;
++
++	/*
++	 * Test userspace intercepting rdmsr / wrmsr for MSR_IA32_XSS.
++	 *
++	 * A GP is thrown if anything other than 0 is written to
++	 * MSR_IA32_XSS.
++	 */
++	data = test_rdmsr(MSR_IA32_XSS);
++	GUEST_ASSERT(data == 0);
++	GUEST_ASSERT(guest_exception_count == 0);
++
++	test_wrmsr(MSR_IA32_XSS, 0);
++	GUEST_ASSERT(guest_exception_count == 0);
++
++	test_wrmsr(MSR_IA32_XSS, 1);
++	GUEST_ASSERT(guest_exception_count == 1);
++
++	/*
++	 * Test userspace intercepting rdmsr / wrmsr for MSR_IA32_FLUSH_CMD.
++	 *
++	 * A GP is thrown if MSR_IA32_FLUSH_CMD is read
++	 * from or if a value other than 1 is written to it.
++	 */
++	test_rdmsr(MSR_IA32_FLUSH_CMD);
++	GUEST_ASSERT(guest_exception_count == 1);
++
++	test_wrmsr(MSR_IA32_FLUSH_CMD, 0);
++	GUEST_ASSERT(guest_exception_count == 1);
++
++	test_wrmsr(MSR_IA32_FLUSH_CMD, 1);
++	GUEST_ASSERT(guest_exception_count == 0);
++
++	/*
++	 * Test userspace intercepting rdmsr / wrmsr for MSR_NON_EXISTENT.
++	 *
++	 * Test that a fabricated MSR can pass through the kernel
++	 * and be handled in userspace.
++	 */
++	test_wrmsr(MSR_NON_EXISTENT, 2);
++	GUEST_ASSERT(guest_exception_count == 0);
++
++	data = test_rdmsr(MSR_NON_EXISTENT);
++	GUEST_ASSERT(data == 2);
++	GUEST_ASSERT(guest_exception_count == 0);
++
++	/*
++	 * Test to see if the instruction emulator is available (ie: the module
++	 * parameter 'kvm.force_emulation_prefix=1' is set).  This instruction
++	 * will #UD if it isn't available.
++	 */
++	__asm__ __volatile__(KVM_FEP "nop");
++
++	if (fep_available) {
++		/* Let userspace know we aren't done. */
++		GUEST_SYNC(0);
++
++		/*
++		 * Now run the same tests with the instruction emulator.
++		 */
++		data = test_em_rdmsr(MSR_IA32_XSS);
++		GUEST_ASSERT(data == 0);
++		GUEST_ASSERT(guest_exception_count == 0);
++		test_em_wrmsr(MSR_IA32_XSS, 0);
++		GUEST_ASSERT(guest_exception_count == 0);
++		test_em_wrmsr(MSR_IA32_XSS, 1);
++		GUEST_ASSERT(guest_exception_count == 1);
++
++		test_em_rdmsr(MSR_IA32_FLUSH_CMD);
++		GUEST_ASSERT(guest_exception_count == 1);
++		test_em_wrmsr(MSR_IA32_FLUSH_CMD, 0);
++		GUEST_ASSERT(guest_exception_count == 1);
++		test_em_wrmsr(MSR_IA32_FLUSH_CMD, 1);
++		GUEST_ASSERT(guest_exception_count == 0);
++
++		test_em_wrmsr(MSR_NON_EXISTENT, 2);
++		GUEST_ASSERT(guest_exception_count == 0);
++		data = test_em_rdmsr(MSR_NON_EXISTENT);
++		GUEST_ASSERT(data == 2);
++		GUEST_ASSERT(guest_exception_count == 0);
 +	}
 +
-+	kvm_exit_unexpected_vector(regs->vector);
++	GUEST_DONE();
 +}
 +
-+void vm_init_descriptor_tables(struct kvm_vm *vm)
-+{
-+	extern void *idt_handlers;
-+	int i;
 +
-+	vm->idt = vm_vaddr_alloc(vm, getpagesize(), 0x2000, 0, 0);
-+	vm->handlers = vm_vaddr_alloc(vm, 256 * sizeof(void *), 0x2000, 0, 0);
-+	/* Handlers have the same address in both address spaces.*/
-+	for (i = 0; i < NUM_INTERRUPTS; i++)
-+		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0,
-+			DEFAULT_CODE_SELECTOR);
++static void guest_code_permission_bitmap(void)
++{
++	uint64_t data;
++
++	test_wrmsr(MSR_FS_BASE, 0);
++	data = test_rdmsr(MSR_FS_BASE);
++	GUEST_ASSERT(data == MSR_FS_BASE);
++
++	test_wrmsr(MSR_GS_BASE, 0);
++	data = test_rdmsr(MSR_GS_BASE);
++	GUEST_ASSERT(data == 0);
++
++	/* Let userspace know to switch the filter */
++	GUEST_SYNC(0);
++
++	test_wrmsr(MSR_FS_BASE, 0);
++	data = test_rdmsr(MSR_FS_BASE);
++	GUEST_ASSERT(data == 0);
++
++	test_wrmsr(MSR_GS_BASE, 0);
++	data = test_rdmsr(MSR_GS_BASE);
++	GUEST_ASSERT(data == MSR_GS_BASE);
++
++	GUEST_DONE();
 +}
 +
-+void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
++static void __guest_gp_handler(struct ex_regs *regs,
++			       char *r_start, char *r_end,
++			       char *w_start, char *w_end)
 +{
-+	struct kvm_sregs sregs;
-+
-+	vcpu_sregs_get(vm, vcpuid, &sregs);
-+	sregs.idt.base = vm->idt;
-+	sregs.idt.limit = NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
-+	sregs.gdt.base = vm->gdt;
-+	sregs.gdt.limit = getpagesize() - 1;
-+	kvm_seg_set_kernel_data_64bit(NULL, DEFAULT_DATA_SELECTOR, &sregs.gs);
-+	vcpu_sregs_set(vm, vcpuid, &sregs);
-+	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
-+}
-+
-+void vm_handle_exception(struct kvm_vm *vm, int vector,
-+			 void (*handler)(struct ex_regs *))
-+{
-+	vm_vaddr_t *handlers = (vm_vaddr_t *)addr_gva2hva(vm, vm->handlers);
-+
-+	handlers[vector] = (vm_vaddr_t)handler;
-+}
-+
-+void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
-+{
-+	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
-+		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
-+		&& vcpu_state(vm, vcpuid)->io.size == 4) {
-+		/* Grab pointer to io data */
-+		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
-+			+ vcpu_state(vm, vcpuid)->io.data_offset;
-+
-+		TEST_ASSERT(false,
-+			    "Unexpected vectored event in guest (vector:0x%x)",
-+			    *data);
++	if (regs->rip == (uintptr_t)r_start) {
++		regs->rip = (uintptr_t)r_end;
++		regs->rax = 0;
++		regs->rdx = 0;
++	} else if (regs->rip == (uintptr_t)w_start) {
++		regs->rip = (uintptr_t)w_end;
++	} else {
++		GUEST_ASSERT(!"RIP is at an unknown location!");
 +	}
++
++	++guest_exception_count;
++}
++
++static void guest_gp_handler(struct ex_regs *regs)
++{
++	__guest_gp_handler(regs, &rdmsr_start, &rdmsr_end,
++			   &wrmsr_start, &wrmsr_end);
++}
++
++static void guest_fep_gp_handler(struct ex_regs *regs)
++{
++	__guest_gp_handler(regs, &em_rdmsr_start, &em_rdmsr_end,
++			   &em_wrmsr_start, &em_wrmsr_end);
++}
++
++static void guest_ud_handler(struct ex_regs *regs)
++{
++	fep_available = 0;
++	regs->rip += KVM_FEP_LENGTH;
++}
++
++static void run_guest(struct kvm_vm *vm)
++{
++	int rc;
++
++	rc = _vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(rc == 0, "vcpu_run failed: %d\n", rc);
++}
++
++static void check_for_guest_assert(struct kvm_vm *vm)
++{
++	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
++	struct ucall uc;
++
++	if (run->exit_reason == KVM_EXIT_IO &&
++		get_ucall(vm, VCPU_ID, &uc) == UCALL_ABORT) {
++			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
++				__FILE__, uc.args[1]);
++	}
++}
++
++static void process_rdmsr(struct kvm_vm *vm, uint32_t msr_index)
++{
++	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
++
++	check_for_guest_assert(vm);
++
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_X86_RDMSR,
++		    "Unexpected exit reason: %u (%s),\n",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++	TEST_ASSERT(run->msr.index == msr_index,
++			"Unexpected msr (0x%04x), expected 0x%04x",
++			run->msr.index, msr_index);
++
++	switch (run->msr.index) {
++	case MSR_IA32_XSS:
++		run->msr.data = 0;
++		break;
++	case MSR_IA32_FLUSH_CMD:
++		run->msr.error = 1;
++		break;
++	case MSR_NON_EXISTENT:
++		run->msr.data = msr_non_existent_data;
++		break;
++	case MSR_FS_BASE:
++		run->msr.data = MSR_FS_BASE;
++		break;
++	case MSR_GS_BASE:
++		run->msr.data = MSR_GS_BASE;
++		break;
++	default:
++		TEST_ASSERT(false, "Unexpected MSR: 0x%04x", run->msr.index);
++	}
++}
++
++static void process_wrmsr(struct kvm_vm *vm, uint32_t msr_index)
++{
++	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
++
++	check_for_guest_assert(vm);
++
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_X86_WRMSR,
++		    "Unexpected exit reason: %u (%s),\n",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++	TEST_ASSERT(run->msr.index == msr_index,
++			"Unexpected msr (0x%04x), expected 0x%04x",
++			run->msr.index, msr_index);
++
++	switch (run->msr.index) {
++	case MSR_IA32_XSS:
++		if (run->msr.data != 0)
++			run->msr.error = 1;
++		break;
++	case MSR_IA32_FLUSH_CMD:
++		if (run->msr.data != 1)
++			run->msr.error = 1;
++		break;
++	case MSR_NON_EXISTENT:
++		msr_non_existent_data = run->msr.data;
++		break;
++	case MSR_FS_BASE:
++	case MSR_GS_BASE:
++		break;
++	default:
++		TEST_ASSERT(false, "Unexpected MSR: 0x%04x", run->msr.index);
++	}
++}
++
++static void process_ucall_done(struct kvm_vm *vm)
++{
++	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
++	struct ucall uc;
++
++	check_for_guest_assert(vm);
++
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++		    "Unexpected exit reason: %u (%s)",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++
++	TEST_ASSERT(get_ucall(vm, VCPU_ID, &uc) == UCALL_DONE,
++		    "Unexpected ucall command: %lu, expected UCALL_DONE (%d)",
++		    uc.cmd, UCALL_DONE);
++}
++
++static uint64_t process_ucall(struct kvm_vm *vm)
++{
++	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
++	struct ucall uc = {};
++
++	check_for_guest_assert(vm);
++
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++		    "Unexpected exit reason: %u (%s)",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++
++	switch (get_ucall(vm, VCPU_ID, &uc)) {
++	case UCALL_SYNC:
++		break;
++	case UCALL_ABORT:
++		check_for_guest_assert(vm);
++		break;
++	case UCALL_DONE:
++		process_ucall_done(vm);
++		break;
++	default:
++		TEST_ASSERT(false, "Unexpected ucall");
++	}
++
++	return uc.cmd;
++}
++
++static void run_guest_then_process_rdmsr(struct kvm_vm *vm, uint32_t msr_index)
++{
++	run_guest(vm);
++	process_rdmsr(vm, msr_index);
++}
++
++static void run_guest_then_process_wrmsr(struct kvm_vm *vm, uint32_t msr_index)
++{
++	run_guest(vm);
++	process_wrmsr(vm, msr_index);
++}
++
++static uint64_t run_guest_then_process_ucall(struct kvm_vm *vm)
++{
++	run_guest(vm);
++	return process_ucall(vm);
++}
++
++static void run_guest_then_process_ucall_done(struct kvm_vm *vm)
++{
++	run_guest(vm);
++	process_ucall_done(vm);
++}
++
++static void test_msr_filter(void) {
++	struct kvm_enable_cap cap = {
++		.cap = KVM_CAP_X86_USER_SPACE_MSR,
++		.args[0] = KVM_MSR_EXIT_REASON_FILTER,
++	};
++	struct kvm_vm *vm;
++	int rc;
++
++	/* Create VM */
++	vm = vm_create_default(VCPU_ID, 0, guest_code);
++	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
++
++	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
++	TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
++	vm_enable_cap(vm, &cap);
++
++	rc = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
++	TEST_ASSERT(rc, "KVM_CAP_X86_MSR_FILTER is available");
++
++	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter);
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vm, VCPU_ID);
++
++	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
++
++	/* Process guest code userspace exits. */
++	run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
++	run_guest_then_process_wrmsr(vm, MSR_IA32_XSS);
++	run_guest_then_process_wrmsr(vm, MSR_IA32_XSS);
++
++	run_guest_then_process_rdmsr(vm, MSR_IA32_FLUSH_CMD);
++	run_guest_then_process_wrmsr(vm, MSR_IA32_FLUSH_CMD);
++	run_guest_then_process_wrmsr(vm, MSR_IA32_FLUSH_CMD);
++
++	run_guest_then_process_wrmsr(vm, MSR_NON_EXISTENT);
++	run_guest_then_process_rdmsr(vm, MSR_NON_EXISTENT);
++
++	vm_handle_exception(vm, UD_VECTOR, guest_ud_handler);
++	run_guest(vm);
++	vm_handle_exception(vm, UD_VECTOR, NULL);
++
++	if (process_ucall(vm) != UCALL_DONE) {
++		vm_handle_exception(vm, GP_VECTOR, guest_fep_gp_handler);
++
++		/* Process emulated rdmsr and wrmsr instructions. */
++		run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
++		run_guest_then_process_wrmsr(vm, MSR_IA32_XSS);
++		run_guest_then_process_wrmsr(vm, MSR_IA32_XSS);
++
++		run_guest_then_process_rdmsr(vm, MSR_IA32_FLUSH_CMD);
++		run_guest_then_process_wrmsr(vm, MSR_IA32_FLUSH_CMD);
++		run_guest_then_process_wrmsr(vm, MSR_IA32_FLUSH_CMD);
++
++		run_guest_then_process_wrmsr(vm, MSR_NON_EXISTENT);
++		run_guest_then_process_rdmsr(vm, MSR_NON_EXISTENT);
++
++		/* Confirm the guest completed without issues. */
++		run_guest_then_process_ucall_done(vm);
++	} else {
++		printf("To run the instruction emulated tests set the module parameter 'kvm.force_emulation_prefix=1'\n");
++	}
++
++	kvm_vm_free(vm);
++}
++
++static void test_msr_permission_bitmap(void) {
++	struct kvm_enable_cap cap = {
++		.cap = KVM_CAP_X86_USER_SPACE_MSR,
++		.args[0] = KVM_MSR_EXIT_REASON_FILTER,
++	};
++	struct kvm_vm *vm;
++	int rc;
++
++	/* Create VM */
++	vm = vm_create_default(VCPU_ID, 0, guest_code_permission_bitmap);
++	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
++
++	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
++	TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
++	vm_enable_cap(vm, &cap);
++
++	rc = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
++	TEST_ASSERT(rc, "KVM_CAP_X86_MSR_FILTER is available");
++
++	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter_fs);
++	run_guest_then_process_wrmsr(vm, MSR_FS_BASE);
++	run_guest_then_process_rdmsr(vm, MSR_FS_BASE);
++	TEST_ASSERT(run_guest_then_process_ucall(vm) == UCALL_SYNC, "Expected ucall state to be UCALL_SYNC.");
++	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter_gs);
++	run_guest_then_process_wrmsr(vm, MSR_GS_BASE);
++	run_guest_then_process_rdmsr(vm, MSR_GS_BASE);
++	run_guest_then_process_ucall_done(vm);
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	test_msr_filter();
++
++	test_msr_permission_bitmap();
++
++	return 0;
 +}
 -- 
 2.28.0.1011.ga647a8990f-goog
