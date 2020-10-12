@@ -2,81 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7159428B406
-	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 13:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E061228B468
+	for <lists+kvm@lfdr.de>; Mon, 12 Oct 2020 14:13:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388219AbgJLLoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 07:44:15 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:56143 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388135AbgJLLoP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Oct 2020 07:44:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1602503055; x=1634039055;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=U84fx8pVm+Z2TmCsTavucgq6/dcFyJSIgiuXXQfUYnw=;
-  b=NJXNR02jrCfMWNSWee6WR6rFwUrY3piqOapmRfiZHqX5RgNOHvAk9ZqL
-   j4lDU0crzfvWFZ6CnF0eCcVWqIaK4q/jBZiO09ELJgGGpoDJur8Zbh69C
-   qigFQpqADMWF9izzBdcNbQMRkhTbCbu1cvH/cR1utl6IOXBdjaDWPLBn1
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.77,366,1596499200"; 
-   d="scan'208";a="60728688"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 12 Oct 2020 11:44:09 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com (Postfix) with ESMTPS id 37610A1F25;
-        Mon, 12 Oct 2020 11:44:07 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 12 Oct 2020 11:44:06 +0000
-Received: from freeip.amazon.com (10.43.160.116) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 12 Oct 2020 11:44:05 +0000
-Subject: Re: [PATCH v2 3/4] selftests: kvm: Add exception handling to
- selftests
-To:     Aaron Lewis <aaronlewis@google.com>
-CC:     Peter Shier <pshier@google.com>, Jim Mattson <jmattson@google.com>,
-        "kvm list" <kvm@vger.kernel.org>
-References: <20201009114615.2187411-1-aaronlewis@google.com>
- <20201009114615.2187411-4-aaronlewis@google.com>
- <fbaf1a2d-04b2-6c19-d80f-6fc0459a8583@amazon.com>
- <CAAAPnDFTwb3o44gxdC7ONTJLob44BLus0zEza--j0exhsys=aA@mail.gmail.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <954837b0-884e-26c3-988e-487dffa9e894@amazon.com>
-Date:   Mon, 12 Oct 2020 13:44:03 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.3.2
+        id S2388389AbgJLMNd convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 12 Oct 2020 08:13:33 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3631 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388209AbgJLMNd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Oct 2020 08:13:33 -0400
+X-Greylist: delayed 966 seconds by postgrey-1.27 at vger.kernel.org; Mon, 12 Oct 2020 08:13:32 EDT
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id 000DCF8DF6F97C310D13;
+        Mon, 12 Oct 2020 19:57:24 +0800 (CST)
+Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.75]) by
+ DGGEMM405-HUB.china.huawei.com ([10.3.20.213]) with mapi id 14.03.0487.000;
+ Mon, 12 Oct 2020 19:57:21 +0800
+From:   "Zengtao (B)" <prime.zeng@hisilicon.com>
+To:     "yulei.kernel@gmail.com" <yulei.kernel@gmail.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
+        "kernellwp@gmail.com" <kernellwp@gmail.com>,
+        "lihaiwei.kernel@gmail.com" <lihaiwei.kernel@gmail.com>,
+        Yulei Zhang <yuleixzhang@tencent.com>
+Subject: RE: [PATCH 00/35] Enhance memory utilization with DMEMFS
+Thread-Topic: [PATCH 00/35] Enhance memory utilization with DMEMFS
+Thread-Index: AQHWnUhD+KX8RHawSUyoBEEGXF5fO6mT4mTw
+Date:   Mon, 12 Oct 2020 11:57:20 +0000
+Message-ID: <678F3D1BB717D949B966B68EAEB446ED49E01801@dggemm526-mbx.china.huawei.com>
+References: <cover.1602093760.git.yuleixzhang@tencent.com>
+In-Reply-To: <cover.1602093760.git.yuleixzhang@tencent.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.74.221.187]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <CAAAPnDFTwb3o44gxdC7ONTJLob44BLus0zEza--j0exhsys=aA@mail.gmail.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.116]
-X-ClientProxiedBy: EX13D46UWC003.ant.amazon.com (10.43.162.119) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAwOS4xMC4yMCAxNzozMiwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4+PiArI2lmZGVmIF9f
-eDg2XzY0X18KPj4+ICsgICAgICAgYXNzZXJ0X29uX3VuaGFuZGxlZF9leGNlcHRpb24odm0sIHZj
-cHVpZCk7Cj4+PiArI2VuZGlmCj4+Cj4+IENhbiB3ZSBhdm9pZCB0aGUgI2lmZGVmIGFuZCBpbnN0
-ZWFkIGp1c3QgaW1wbGVtZW50IGEgc3R1YiBmdW5jdGlvbiBmb3IKPj4gdGhlIG90aGVyIGFyY2hz
-PyBUaGVuIG1vdmUgdGhlIHByb3RvdHlwZSB0aGUgdGhlIGZ1bmN0aW9uIHRvIGEgZ2VuZXJpYwo+
-PiBoZWFkZXIgb2YgY291cnNlLgo+Pgo+PiBBbGV4Cj4gCj4gSSBjb25zaWRlcmVkIHRoYXQsIEkg
-ZXZlbiBpbXBsZW1lbnRlZCBpdCB0aGF0IHdheSBhdCBmaXJzdCwgYnV0IHdoZW4gSQo+IGxvb2tl
-ZCBhcm91bmQgSSBzYXcgbm8gZXhhbXBsZXMgb2Ygc3R1YnMgaW4gdGhlIG90aGVyIGFyY2hzLCBh
-bmQgSSBzYXcKPiBhbiBleGFtcGxlIG9mIGxlYXZpbmcgdGhlICNpZmRlZiB3aXRoIGEgY29ycmVz
-cG9uZGluZyBhcmNoIHNwZWNpZmljCj4gaW1wbGVtZW50YXRpb24gIChpZToga3ZtX2dldF9jcHVf
-YWRkcmVzc193aWR0aCgpKS4gIFRoYXQncyB3aHkgSSB3ZW50Cj4gd2l0aCBpdCB0aGlzIHdheS4g
-IElmIHRoZSBzdHViIGlzIHByZWZlcnJlZCBJIGNhbiBjaGFuZ2UgaXQuCgpXZSB1c3VhbGx5IGRv
-IHRoZSBzdHViIHdheSBpbiBub3JtYWwgS1ZNIGNvZGUuIEknZCBwcmVmZXIgdG8gY29weSB0aGF0
-IApkZXNpZ24gcGF0dGVybiBpbiB0aGUgc2VsZnRlc3QgY29kZSBhcyB3ZWxsIC0gaXQgbWFrZXMg
-dGhpbmdzIGVhc2llciB0byAKZm9sbG93IElNSE8uCgpUaGFua3MsCgpBbGV4CgoKCgpBbWF6b24g
-RGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJs
-aW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlz
-cwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5
-MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
+> -----Original Message-----
+> From: yulei.kernel@gmail.com [mailto:yulei.kernel@gmail.com]
+> Sent: Thursday, October 08, 2020 3:54 PM
+> To: akpm@linux-foundation.org; naoya.horiguchi@nec.com;
+> viro@zeniv.linux.org.uk; pbonzini@redhat.com
+> Cc: linux-fsdevel@vger.kernel.org; kvm@vger.kernel.org;
+> linux-kernel@vger.kernel.org; xiaoguangrong.eric@gmail.com;
+> kernellwp@gmail.com; lihaiwei.kernel@gmail.com; Yulei Zhang
+> Subject: [PATCH 00/35] Enhance memory utilization with DMEMFS
+> 
+> From: Yulei Zhang <yuleixzhang@tencent.com>
+> 
+> In current system each physical memory page is assocaited with
+> a page structure which is used to track the usage of this page.
+> But due to the memory usage rapidly growing in cloud environment,
+> we find the resource consuming for page structure storage becomes
+> highly remarkable. So is it an expense that we could spare?
+> 
+> This patchset introduces an idea about how to save the extra
+> memory through a new virtual filesystem -- dmemfs.
+> 
+> Dmemfs (Direct Memory filesystem) is device memory or reserved
+> memory based filesystem. This kind of memory is special as it
+> is not managed by kernel and most important it is without 'struct page'.
+> Therefore we can leverage the extra memory from the host system
+> to support more tenants in our cloud service.
+> 
+> We uses a kernel boot parameter 'dmem=' to reserve the system
+> memory when the host system boots up, the details can be checked
+> in /Documentation/admin-guide/kernel-parameters.txt.
+> 
+> Theoretically for each 4k physical page it can save 64 bytes if
+> we drop the 'struct page', so for guest memory with 320G it can
+> save about 5G physical memory totally.
+
+Sounds interesting, but seems your patch only support x86, have you
+ considered aarch64?
+
+Regards
+Zengtao 
