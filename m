@@ -2,102 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4A3228CB01
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 11:29:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAF6028CB38
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 11:53:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404082AbgJMJ3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 05:29:00 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:50742 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404002AbgJMJ3A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 05:29:00 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1602581338;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=i1O8s2NVMzbyTSIoC4o/Bwar79MyscBpN/wzySOZcMw=;
-        b=uW10zmnCzpx8UpyrI4zhoFNOFIHWmSBmaIKQ1uNCVYOuvlE6I3feCA/I+xTDsa8G+BjPVX
-        jloVQ462c1Fz+bO9mauuDLjZeaz2foRoWuuwKFIn2y5N8iMVDxc9HZLfHDoeS9xTJe48Et
-        VjMgzM0okp4b33094pb3/81t14Rqb4rWrwwLXtZXMLD8G/IQISUbl3xsNA5w6/RS4/hnfB
-        9xS857zBSaJLvqOPjjqVLm/7PVx8+n0ND0DxdIy3I1Tfk0MQWRRgRGnplyaudWsAzY9FsH
-        cQIDl7eF8JJdE2kVGMnFP/I0s6VYa/xehQvK5hI44hlxA+xL5xRHGq4iHEFEpw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1602581338;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=i1O8s2NVMzbyTSIoC4o/Bwar79MyscBpN/wzySOZcMw=;
-        b=RmYf0hPn7lHf2YQ43+wjz+Den8N3u/H2ix92RASeMAwPOXCiE+bCDz5igYTzwmrHv79p30
-        KC35nfQ7sEgB+hAg==
-To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org,
-        Marc Zyngier <maz@kernel.org>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
-In-Reply-To: <0de733f6384874d68afba2606119d0d9b1e8b34e.camel@infradead.org>
-References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org>
- <20201007122046.1113577-1-dwmw2@infradead.org>
- <20201007122046.1113577-5-dwmw2@infradead.org>
- <87blhcx6qz.fsf@nanos.tec.linutronix.de>
- <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org>
- <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org>
- <87362owhcb.fsf@nanos.tec.linutronix.de>
- <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org>
- <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
- <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org>
- <874kn2s3ud.fsf@nanos.tec.linutronix.de>
- <0E51DAB1-5973-4226-B127-65D77DC46CB5@infradead.org>
- <87pn5or8k7.fsf@nanos.tec.linutronix.de>
- <F0F0A646-8DBA-4448-933F-993A3335BD59@infradead.org>
- <87ft6jrdpk.fsf@nanos.tec.linutronix.de>
- <25c54f8e5da1fd5cf3b01ad2fdc1640c5d86baa1.camel@infradead.org>
- <87362jqoh3.fsf@nanos.tec.linutronix.de>
- <1abc2a34c894c32eb474a868671577f6991579df.camel@infradead.org>
- <87eem3ozxd.fsf@nanos.tec.linutronix.de>
- <0de733f6384874d68afba2606119d0d9b1e8b34e.camel@infradead.org>
-Date:   Tue, 13 Oct 2020 11:28:58 +0200
-Message-ID: <87zh4qo4o5.fsf@nanos.tec.linutronix.de>
+        id S1727192AbgJMJxs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 05:53:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726120AbgJMJxs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Oct 2020 05:53:48 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 506DFC0613D0;
+        Tue, 13 Oct 2020 02:53:48 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id w141so21902589oia.2;
+        Tue, 13 Oct 2020 02:53:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=lyB08XWhqOUJQK6ifm/WpCCovJvCw1e4gjA29DSo70o=;
+        b=Hle4/yXumsNYrAL4PtajK+6wiPj+EIy8o1isAuZSObqhOHmBzOQ1DvjJoAwAt4E5/R
+         +P4O+f2qgAADtlkHSoOI+1VSqFnHP1zlO/XQjD3S8dfQX9hPnALnl01ziXfEUWxt3DfD
+         vfB98mOJFqAyD4kZp6F/ffCQLvqzHF519AvdqCHPFO5tREiDPzGSQpD/rgpyxLR8RfM6
+         Otn/hcCLfHQJ5Uc7ZctmYCFr5W33agu54nHvcjXg/j3cQO2O4lcE9QcbmDPfIOO8iDye
+         JVnQ/21qKgB2KGEJY2ZjllPl0+AjasgdEELKaN8QvgbjGshpCSK5uRTA9v0cpsbdkAFK
+         Uelw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=lyB08XWhqOUJQK6ifm/WpCCovJvCw1e4gjA29DSo70o=;
+        b=NtgLIQolTbUUtYym6bf8bTf/PYZH9yW81sBpSlOH6TXcPMlXGkke+bOAsL4lv2qVxF
+         skqDYiabnC8P0HnoVZqDb9vzEc++4wIie6+WYK2qtsrsgeCX0nhgsbgUavaLIjiQR30B
+         szBTTgsiOb5ACL/7gXG12pPafg5jK26p3265kCOZOlI6slrSG5CEJNw9urb4q8aShOGE
+         79FGnkiWvQbVe3VZL+M1Y+V1TE939JfAc+lb2W3AC/dRDhvd5gKxRDDEtzoMeXWUU/OP
+         vMPiSjLkE7wJ4Zu/4NvdCLJyfgpBqAbwRryxh4QoM4HG3xB3u93/x5mcaQWl1XVFaKCw
+         OaRA==
+X-Gm-Message-State: AOAM531wqgQ2XHa1EKeQViTyWEnqUwxoe/+6yCZhwRlaYi8DQrtKRzTu
+        Xxciy5yq3quAXSyY3fuBonlWmodoe98PA+zByfzvyGGkkSA=
+X-Google-Smtp-Source: ABdhPJwvHK7qenSGPnVGtyxegEBVSleoetTJevfMvGpRo0rVhyTc9bUr3RWMz6+QrV7I0F9jPNV2KRGRBzj4ole9/sQ=
+X-Received: by 2002:a05:6808:89:: with SMTP id s9mr2929894oic.58.1602582827567;
+ Tue, 13 Oct 2020 02:53:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <cover.1602093760.git.yuleixzhang@tencent.com> <87e23dfbac6f4a68e61d91cddfdfe157163975c1.1602093760.git.yuleixzhang@tencent.com>
+ <72f4ddeb-157a-808a-2846-dd9961a9c269@redhat.com>
+In-Reply-To: <72f4ddeb-157a-808a-2846-dd9961a9c269@redhat.com>
+From:   yulei zhang <yulei.kernel@gmail.com>
+Date:   Tue, 13 Oct 2020 17:53:36 +0800
+Message-ID: <CACZOiM0c9AdD97RrtBaSjFvteqWEqdU4SG1DFcLRZ49G=3u4-A@mail.gmail.com>
+Subject: Re: [PATCH 04/35] dmem: let pat recognize dmem
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     akpm@linux-foundation.org, naoya.horiguchi@nec.com,
+        viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Haiwei Li <lihaiwei.kernel@gmail.com>,
+        Yulei Zhang <yuleixzhang@tencent.com>,
+        Xiao Guangrong <gloryxiao@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 13 2020 at 08:52, David Woodhouse wrote:
-> On Tue, 2020-10-13 at 00:13 +0200, Thomas Gleixner wrote:
-> +       dom = irq_find_matching_fwspec(fwspec, DOMAIN_BUS_IR);
-> +       if (dom)
-> +               return IS_ERR(dom) ? NULL : dom;
-> +
-> +       return x86_vector_domain;
-> +}
+On Tue, Oct 13, 2020 at 3:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Ick. There's no need for that.
+> On 08/10/20 09:53, yulei.kernel@gmail.com wrote:
+> > From: Yulei Zhang <yuleixzhang@tencent.com>
+> >
+> > x86 pat uses 'struct page' by only checking if it's system ram,
+> > however it is not true if dmem is used, let's teach pat to
+> > recognize this case if it is ram but it is !pfn_valid()
+> >
+> > We always use WB for dmem and any attempt to change this
+> > behavior will be rejected and WARN_ON is triggered
+> >
+> > Signed-off-by: Xiao Guangrong <gloryxiao@tencent.com>
+> > Signed-off-by: Yulei Zhang <yuleixzhang@tencent.com>
 >
-> Eliminating that awful "if not found then slip the x86_vector_domain in
-> as a special case" was the whole *point* of using
-> irq_find_matching_fwspec() in the first place.
+> Hooks like these will make it very hard to merge this series.
+>
+> I like the idea of struct page-backed memory, but this is a lot of code
+> and I wonder if it's worth adding all these complications.
+>
+> One can already use mem=3D to remove the "struct page" cost for most of
+> the host memory, and manage the allocation of the remaining memory in
+> userspace with /dev/mem.  What is the advantage of doing this in the kern=
+el?
+>
+> Paolo
+>
 
-The point was to get rid of irq_remapping_get_irq_domain().
-
-And TBH,
-
-        if (apicid_valid(32768))
-
-is just another way to slip the vector domain in. It's just differently
-awful.
-
-Having an explicit answer from the search for IR:
-
-    - Here is the domain
-    - Your device is not registered properly
-    - IR not enabled or not supported
-
-is way more obvious than the above disguised is_remapping_enabled()
-check.
-
-Thanks,
-
-        tglx
+hi Paolo=EF=BC=8Cas far as I know there are a few limitations to play with
+/dev/mem in this case.
+1. access to /dev/men is restricted due to the security requirement,
+but usually our virtual machines are unprivileged processes.
+2. what we get from /dev/mem is a whole block of memory, as dynamic
+VMs running on /dev/mem will cause memory fragment, it needs extra logic
+to manage the allocation and recovery to avoid wasted memory. dmemfs
+can support this and also leverage the kernel tlb management.
+3. it needs to support hugepage with different page size granularity.
+4. MCE recovery capability is also required.
