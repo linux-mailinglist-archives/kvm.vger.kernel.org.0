@@ -2,172 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 927CF28D120
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 17:19:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 375A628D3D4
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 20:43:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389271AbgJMPTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 11:19:24 -0400
-Received: from mga18.intel.com ([134.134.136.126]:18332 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728182AbgJMPTX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 11:19:23 -0400
-IronPort-SDR: /gLuTYnlYlXaab2Ep5CFRwEKgWN3pWiW5PaAeycjr2mD8i9Kx985Bjsh2I6HXe6MCrtKVUvsCR
- P3Ue31MuGkOw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9773"; a="153758526"
-X-IronPort-AV: E=Sophos;i="5.77,371,1596524400"; 
-   d="scan'208";a="153758526"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2020 08:19:23 -0700
-IronPort-SDR: 68v83ePltu6fCpHLnKAtzuDojhuDtqYXFse292zQmKpbBF38Vlbmz6OE1xgG7XI4zstI/qfXnz
- jtIQsHXe39vA==
-X-IronPort-AV: E=Sophos;i="5.77,371,1596524400"; 
-   d="scan'208";a="463524379"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2020 08:19:22 -0700
-Date:   Tue, 13 Oct 2020 08:19:21 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM/nVMX: Move nested_vmx_check_vmentry_hw inline
- assembly to vmenter.S
-Message-ID: <20201013150921.GB13936@linux.intel.com>
-References: <20201007144312.55203-1-ubizjak@gmail.com>
+        id S2388506AbgJMSmt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 14:42:49 -0400
+Received: from pb-sasl-trial2.pobox.com ([64.147.108.86]:53763 "EHLO
+        pb-sasl-trial2.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388132AbgJMSms (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Oct 2020 14:42:48 -0400
+X-Greylist: delayed 346 seconds by postgrey-1.27 at vger.kernel.org; Tue, 13 Oct 2020 14:42:45 EDT
+Received: from pb-sasl-trial2.pobox.com (localhost.local [127.0.0.1])
+        by pb-sasl-trial2.pobox.com (Postfix) with ESMTP id B35092F08C;
+        Tue, 13 Oct 2020 14:36:58 -0400 (EDT)
+        (envelope-from nico@fluxnic.net)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=pobox.com; h=date:from:to
+        :cc:subject:in-reply-to:message-id:references:mime-version
+        :content-type; s=sasl; bh=1qdRcPgrMg9PaaTRWeHMHkWBgn4=; b=Epy+q5
+        ans9ahJwXxlQvxdjICPrBYTo3ECIn9AzWxzmuo835zX7Go5RA+la+QVdJswbYHqY
+        OA9uOWP+RHqwo1f/1Hjwskkbh9itwsmr5IKrZUme2Q4YRp5bQABuumhmd/Yh0NKM
+        sMhZUgbkZQs79wJJn2wtIPZ7EN0v5uRSG8bTQ=
+Received: from pb-smtp1.nyi.icgroup.com (pb-smtp1.pobox.com [10.90.30.53])
+        by pb-sasl-trial2.pobox.com (Postfix) with ESMTP id 7910C2F08B;
+        Tue, 13 Oct 2020 14:36:58 -0400 (EDT)
+        (envelope-from nico@fluxnic.net)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=fluxnic.net;
+ h=date:from:to:cc:subject:in-reply-to:message-id:references:mime-version:content-type; s=2016-12.pbsmtp; bh=/xoWviDLFg5PKRQ9rObRWDXVC++pmZtYhfbDb0DFq7E=; b=v5OoWtflZD131TYsBl2A9g0L/PCRe2nu6sy2IJY2ys8stI3sGPGydjk9hbVpZeTUKIjemrnRhLwKFlAM+dXEIGXz5t0LfwSiRA8m7hrB4WLH79+9F2ww8ICEhYu0fLjFgoDc1lKWqG4ZKNRDYjtbn/p6CJBipu1Te7ZvLuk/HMw=
+Received: from yoda.home (unknown [24.203.50.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by pb-smtp1.pobox.com (Postfix) with ESMTPSA id CD98F955F4;
+        Tue, 13 Oct 2020 14:36:57 -0400 (EDT)
+        (envelope-from nico@fluxnic.net)
+Received: from xanadu.home (xanadu.home [192.168.2.2])
+        by yoda.home (Postfix) with ESMTPSA id CF7492DA0BC7;
+        Tue, 13 Oct 2020 14:36:56 -0400 (EDT)
+Date:   Tue, 13 Oct 2020 14:36:56 -0400 (EDT)
+From:   Nicolas Pitre <nico@fluxnic.net>
+To:     Ira Weiny <ira.weiny@intel.com>
+cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>, x86@kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+        kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
+        linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
+        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-rdma@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
+        samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH RFC PKS/PMEM 33/58] fs/cramfs: Utilize new
+ kmap_thread()
+In-Reply-To: <20201009195033.3208459-34-ira.weiny@intel.com>
+Message-ID: <nycvar.YSQ.7.78.906.2010131436200.2184@knanqh.ubzr>
+References: <20201009195033.3208459-1-ira.weiny@intel.com> <20201009195033.3208459-34-ira.weiny@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201007144312.55203-1-ubizjak@gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+X-Pobox-Relay-ID: 13301A02-0D83-11EB-84D0-D152C8D8090B-78420484!pb-smtp1.pobox.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 07, 2020 at 04:43:12PM +0200, Uros Bizjak wrote:
-> Move the big inline assembly block from nested_vmx_check_vmentry_hw
-> to vmenter.S assembly file, taking into account all ABI requirements.
+On Fri, 9 Oct 2020, ira.weiny@intel.com wrote:
+
+> From: Ira Weiny <ira.weiny@intel.com>
 > 
-> The new function is modelled after __vmx_vcpu_run, and also calls
-> vmx_update_host_rsp instead of open-coding the function in assembly.
-
-Is there specific motivation for this change?  The inline asm is ugly, but
-it's contained.
-
-If we really want to get rid of the inline asm, I'd probably vote to simply
-use __vmx_vcpu_run() instead of adding another assembly helper.  The (double)
-GPR save/restore is wasteful, but this flow is basically anti-performance
-anyways.  Outside of KVM developers, I doubt anyone actually enables this path.
-
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> ---
->  arch/x86/kvm/vmx/nested.c  | 32 +++-----------------------------
->  arch/x86/kvm/vmx/vmenter.S | 36 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 39 insertions(+), 29 deletions(-)
+> The kmap() calls in this FS are localized to a single thread.  To avoid
+> the over head of global PKRS updates use the new kmap_thread() call.
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 1bb6b31eb646..7b26e983e31c 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3012,6 +3012,8 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+> Cc: Nicolas Pitre <nico@fluxnic.net>
+> Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+
+Acked-by: Nicolas Pitre <nico@fluxnic.net>
+
+>  fs/cramfs/inode.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
+> index 912308600d39..003c014a42ed 100644
+> --- a/fs/cramfs/inode.c
+> +++ b/fs/cramfs/inode.c
+> @@ -247,8 +247,8 @@ static void *cramfs_blkdev_read(struct super_block *sb, unsigned int offset,
+>  		struct page *page = pages[i];
+>  
+>  		if (page) {
+> -			memcpy(data, kmap(page), PAGE_SIZE);
+> -			kunmap(page);
+> +			memcpy(data, kmap_thread(page), PAGE_SIZE);
+> +			kunmap_thread(page);
+>  			put_page(page);
+>  		} else
+>  			memset(data, 0, PAGE_SIZE);
+> @@ -826,7 +826,7 @@ static int cramfs_readpage(struct file *file, struct page *page)
+>  
+>  	maxblock = (inode->i_size + PAGE_SIZE - 1) >> PAGE_SHIFT;
+>  	bytes_filled = 0;
+> -	pgdata = kmap(page);
+> +	pgdata = kmap_thread(page);
+>  
+>  	if (page->index < maxblock) {
+>  		struct super_block *sb = inode->i_sb;
+> @@ -914,13 +914,13 @@ static int cramfs_readpage(struct file *file, struct page *page)
+>  
+>  	memset(pgdata + bytes_filled, 0, PAGE_SIZE - bytes_filled);
+>  	flush_dcache_page(page);
+> -	kunmap(page);
+> +	kunmap_thread(page);
+>  	SetPageUptodate(page);
+>  	unlock_page(page);
 >  	return 0;
->  }
 >  
-> +bool __nested_vmx_check_vmentry_hw(struct vcpu_vmx *vmx, bool launched);
-> +
->  static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -3050,35 +3052,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
->  		vmx->loaded_vmcs->host_state.cr4 = cr4;
->  	}
->  
-> -	asm(
-> -		"sub $%c[wordsize], %%" _ASM_SP "\n\t" /* temporarily adjust RSP for CALL */
-> -		"cmp %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
-> -		"je 1f \n\t"
-> -		__ex("vmwrite %%" _ASM_SP ", %[HOST_RSP]") "\n\t"
-> -		"mov %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
-> -		"1: \n\t"
-> -		"add $%c[wordsize], %%" _ASM_SP "\n\t" /* un-adjust RSP */
-> -
-> -		/* Check if vmlaunch or vmresume is needed */
-> -		"cmpb $0, %c[launched](%[loaded_vmcs])\n\t"
-> -
-> -		/*
-> -		 * VMLAUNCH and VMRESUME clear RFLAGS.{CF,ZF} on VM-Exit, set
-> -		 * RFLAGS.CF on VM-Fail Invalid and set RFLAGS.ZF on VM-Fail
-> -		 * Valid.  vmx_vmenter() directly "returns" RFLAGS, and so the
-> -		 * results of VM-Enter is captured via CC_{SET,OUT} to vm_fail.
-> -		 */
-> -		"call vmx_vmenter\n\t"
-> -
-> -		CC_SET(be)
-> -	      : ASM_CALL_CONSTRAINT, CC_OUT(be) (vm_fail)
-> -	      :	[HOST_RSP]"r"((unsigned long)HOST_RSP),
-> -		[loaded_vmcs]"r"(vmx->loaded_vmcs),
-> -		[launched]"i"(offsetof(struct loaded_vmcs, launched)),
-> -		[host_state_rsp]"i"(offsetof(struct loaded_vmcs, host_state.rsp)),
-> -		[wordsize]"i"(sizeof(ulong))
-> -	      : "memory"
-> -	);
-> +	vm_fail = __nested_vmx_check_vmentry_hw(vmx, vmx->loaded_vmcs->launched);
->  
->  	if (vmx->msr_autoload.host.nr)
->  		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
-> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> index 799db084a336..9fdcbd9320dc 100644
-> --- a/arch/x86/kvm/vmx/vmenter.S
-> +++ b/arch/x86/kvm/vmx/vmenter.S
-> @@ -234,6 +234,42 @@ SYM_FUNC_START(__vmx_vcpu_run)
->  	jmp 1b
->  SYM_FUNC_END(__vmx_vcpu_run)
->  
-> +/**
-> + * __nested_vmx_check_vmentry_hw - Run a vCPU via a transition to
-> + *				   a nested VMX guest mode
-
-This function comment is incorrect, this helper doesn't run the vCPU, it
-simply executes VMLAUNCH or VMRESUME, which are expected to fail (and we're
-in BUG_ON territory if they don't).
-
-> + * @vmx:	struct vcpu_vmx * (forwarded to vmx_update_host_rsp)
-> + * @launched:	%true if the VMCS has been launched
-> + *
-> + * Returns:
-> + *	0 on VM-Exit, 1 on VM-Fail
-> + */
-> +SYM_FUNC_START(__nested_vmx_check_vmentry_hw)
-> +	push %_ASM_BP
-> +	mov  %_ASM_SP, %_ASM_BP
-> +
-> +	push %_ASM_BX
-> +
-> +	/* Copy @launched to BL, _ASM_ARG2 is volatile. */
-> +	mov %_ASM_ARG2B, %bl
-> +
-> +	/* Adjust RSP to account for the CALL to vmx_vmenter(). */
-> +	lea -WORD_SIZE(%_ASM_SP), %_ASM_ARG2
-> +	call vmx_update_host_rsp
-> +
-> +	/* Check if vmlaunch or vmresume is needed */
-> +	cmpb $0, %bl
-> +
-> +	/* Enter guest mode */
-> +	call vmx_vmenter
-> +
-> +	/* Return 0 on VM-Exit, 1 on VM-Fail */
-> +	setbe %al
-> +
-> +	pop %_ASM_BX
-> +
-> +	pop %_ASM_BP
-> +	ret
-> +SYM_FUNC_END(__nested_vmx_check_vmentry_hw)
->  
->  .section .text, "ax"
->  
+>  err:
+> -	kunmap(page);
+> +	kunmap_thread(page);
+>  	ClearPageUptodate(page);
+>  	SetPageError(page);
+>  	unlock_page(page);
 > -- 
-> 2.26.2
+> 2.28.0.rc0.12.gb6a658bd00c9
+> 
 > 
