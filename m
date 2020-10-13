@@ -2,85 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1781328CAD1
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 11:14:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4A3228CB01
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 11:29:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404228AbgJMJOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 05:14:31 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:45946 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403911AbgJMJOb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 05:14:31 -0400
-Received: from mail-pj1-f70.google.com ([209.85.216.70])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <po-hsu.lin@canonical.com>)
-        id 1kSGO5-0007Ic-HY
-        for kvm@vger.kernel.org; Tue, 13 Oct 2020 09:14:29 +0000
-Received: by mail-pj1-f70.google.com with SMTP id r1so1820078pjp.5
-        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 02:14:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VNJOKkvPfRVJ4oA2MF0E6/OVvHsrdR5Ytgp8RCYFYlY=;
-        b=VNBbeZu9qtiyrYse34uDRh6DKS+bRb6BHxYbLv/lFntiOSfJziHk6IhTCdO7a4/Jzl
-         kMnVrpBHmx1kUoAOha0d2pPzFcETfo+NzWdj8Fa07gmwryunGCMOTIxoSFfsTtyxqmWP
-         Undr8khgm5iG8wuSaXaPgcimcPV6nsrjMtI5yk84nN57v0whkGOxmRCXNn/M/Ra8IGGt
-         zR+gKsRSDm7Ot/iRY36sneQ1PPCNgUdqjRceThxzB8lxFLdNyJnDvu0F9kpexPJ/t8Nj
-         M02WThCCOb7wtDUqA0GIyl2ZWttbV02FTp9orbC52qt206DIWORMXAdWDsgWHPMCYcV2
-         d11A==
-X-Gm-Message-State: AOAM533eY3smldd2Ww39cUKoeNgDJJDZHBkFSqRq8LLX6mJdCCTpDoTl
-        GSZpo//MViwCo8iKFH2uePyfhVfLQDPYcMFTezas6OY/q47x5tFpGJ5XPUusE+F9ySLA0jSnvE/
-        lEGW2TTGAk71W6mjpNK9KdpBK21Wp
-X-Received: by 2002:aa7:93b6:0:b029:155:3b0b:d47a with SMTP id x22-20020aa793b60000b02901553b0bd47amr23779681pff.47.1602580467914;
-        Tue, 13 Oct 2020 02:14:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwgkPdSOroV9BNlKuvtOXnMSHizdH5O609f2SgXbAJfwi//GVI3+Ao6/PO6xSCXVyC2IVavwQ==
-X-Received: by 2002:aa7:93b6:0:b029:155:3b0b:d47a with SMTP id x22-20020aa793b60000b02901553b0bd47amr23779665pff.47.1602580467618;
-        Tue, 13 Oct 2020 02:14:27 -0700 (PDT)
-Received: from localhost.localdomain ([2001:67c:1560:8007::aac:c227])
-        by smtp.gmail.com with ESMTPSA id m22sm21112458pfk.214.2020.10.13.02.14.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Oct 2020 02:14:26 -0700 (PDT)
-From:   Po-Hsu Lin <po-hsu.lin@canonical.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     po-hsu.lin@canonical.com
-Subject: [kvm-unit-tests PATCHv2] unittests.cfg: Increase timeout for apic test
-Date:   Tue, 13 Oct 2020 17:12:37 +0800
-Message-Id: <20201013091237.67132-1-po-hsu.lin@canonical.com>
-X-Mailer: git-send-email 2.25.1
+        id S2404082AbgJMJ3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 05:29:00 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50742 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404002AbgJMJ3A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Oct 2020 05:29:00 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1602581338;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i1O8s2NVMzbyTSIoC4o/Bwar79MyscBpN/wzySOZcMw=;
+        b=uW10zmnCzpx8UpyrI4zhoFNOFIHWmSBmaIKQ1uNCVYOuvlE6I3feCA/I+xTDsa8G+BjPVX
+        jloVQ462c1Fz+bO9mauuDLjZeaz2foRoWuuwKFIn2y5N8iMVDxc9HZLfHDoeS9xTJe48Et
+        VjMgzM0okp4b33094pb3/81t14Rqb4rWrwwLXtZXMLD8G/IQISUbl3xsNA5w6/RS4/hnfB
+        9xS857zBSaJLvqOPjjqVLm/7PVx8+n0ND0DxdIy3I1Tfk0MQWRRgRGnplyaudWsAzY9FsH
+        cQIDl7eF8JJdE2kVGMnFP/I0s6VYa/xehQvK5hI44hlxA+xL5xRHGq4iHEFEpw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1602581338;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i1O8s2NVMzbyTSIoC4o/Bwar79MyscBpN/wzySOZcMw=;
+        b=RmYf0hPn7lHf2YQ43+wjz+Den8N3u/H2ix92RASeMAwPOXCiE+bCDz5igYTzwmrHv79p30
+        KC35nfQ7sEgB+hAg==
+To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org,
+        Marc Zyngier <maz@kernel.org>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
+In-Reply-To: <0de733f6384874d68afba2606119d0d9b1e8b34e.camel@infradead.org>
+References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org>
+ <20201007122046.1113577-1-dwmw2@infradead.org>
+ <20201007122046.1113577-5-dwmw2@infradead.org>
+ <87blhcx6qz.fsf@nanos.tec.linutronix.de>
+ <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org>
+ <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org>
+ <87362owhcb.fsf@nanos.tec.linutronix.de>
+ <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org>
+ <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
+ <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org>
+ <874kn2s3ud.fsf@nanos.tec.linutronix.de>
+ <0E51DAB1-5973-4226-B127-65D77DC46CB5@infradead.org>
+ <87pn5or8k7.fsf@nanos.tec.linutronix.de>
+ <F0F0A646-8DBA-4448-933F-993A3335BD59@infradead.org>
+ <87ft6jrdpk.fsf@nanos.tec.linutronix.de>
+ <25c54f8e5da1fd5cf3b01ad2fdc1640c5d86baa1.camel@infradead.org>
+ <87362jqoh3.fsf@nanos.tec.linutronix.de>
+ <1abc2a34c894c32eb474a868671577f6991579df.camel@infradead.org>
+ <87eem3ozxd.fsf@nanos.tec.linutronix.de>
+ <0de733f6384874d68afba2606119d0d9b1e8b34e.camel@infradead.org>
+Date:   Tue, 13 Oct 2020 11:28:58 +0200
+Message-ID: <87zh4qo4o5.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We found that on Azure cloud hyperv instance Standard_D48_v3, it will
-take about 45 seconds to run this apic test.
+On Tue, Oct 13 2020 at 08:52, David Woodhouse wrote:
+> On Tue, 2020-10-13 at 00:13 +0200, Thomas Gleixner wrote:
+> +       dom = irq_find_matching_fwspec(fwspec, DOMAIN_BUS_IR);
+> +       if (dom)
+> +               return IS_ERR(dom) ? NULL : dom;
+> +
+> +       return x86_vector_domain;
+> +}
+>
+> Ick. There's no need for that.
+>
+> Eliminating that awful "if not found then slip the x86_vector_domain in
+> as a special case" was the whole *point* of using
+> irq_find_matching_fwspec() in the first place.
 
-It takes even longer (about 150 seconds) to run inside a KVM instance
-VM.Standard2.1 on Oracle cloud.
+The point was to get rid of irq_remapping_get_irq_domain().
 
-Bump the timeout threshold to give it a chance to finish.
+And TBH,
 
-Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
----
- x86/unittests.cfg | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+        if (apicid_valid(32768))
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 872d679..c72a659 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -41,7 +41,7 @@ file = apic.flat
- smp = 2
- extra_params = -cpu qemu64,+x2apic,+tsc-deadline
- arch = x86_64
--timeout = 30
-+timeout = 240
- 
- [ioapic]
- file = ioapic.flat
--- 
-2.25.1
+is just another way to slip the vector domain in. It's just differently
+awful.
 
+Having an explicit answer from the search for IR:
+
+    - Here is the domain
+    - Your device is not registered properly
+    - IR not enabled or not supported
+
+is way more obvious than the above disguised is_remapping_enabled()
+check.
+
+Thanks,
+
+        tglx
