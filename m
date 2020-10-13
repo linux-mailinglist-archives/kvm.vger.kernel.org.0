@@ -2,343 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DCAE28C842
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 07:29:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09E6C28C854
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 07:41:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732404AbgJMF3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 01:29:11 -0400
-Received: from mga18.intel.com ([134.134.136.126]:27641 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726963AbgJMF3K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 01:29:10 -0400
-IronPort-SDR: rxEe78uO7kC68cnBsfFEPr66z2ezXHQJh2+HY+/0CEOAJn8LPvu7PUncNf5PNUPvM1RztMRg2T
- xYm+GrWJ8v5g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9772"; a="153683401"
-X-IronPort-AV: E=Sophos;i="5.77,369,1596524400"; 
-   d="scan'208";a="153683401"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2020 22:29:09 -0700
-IronPort-SDR: VZ/hPyiLtVwzDDjIwiOv0sOe1BhH1ZnJ0bmmbf2SOsKxbhZvwpCTyTaT1d6nRP+6iRbSk0dE+O
- CcbpptfVhtQg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,369,1596524400"; 
-   d="scan'208";a="463360037"
-Received: from yadong-antec.sh.intel.com ([10.239.158.61])
-  by orsmga004.jf.intel.com with ESMTP; 12 Oct 2020 22:29:07 -0700
-From:   yadong.qi@intel.com
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, nadav.amit@gmail.com,
-        Yadong Qi <yadong.qi@intel.com>
-Subject: [kvm-unit-tests PATCH v2] x86: vmx: Add test for SIPI signal processing
-Date:   Tue, 13 Oct 2020 13:28:45 +0800
-Message-Id: <20201013052845.249113-1-yadong.qi@intel.com>
-X-Mailer: git-send-email 2.25.1
+        id S1732494AbgJMFlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 01:41:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23694 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732465AbgJMFlE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Oct 2020 01:41:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602567663;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=an1gCRpqueGjFmWqkLo6oeT53oDVqi18CPdvDvMunMk=;
+        b=X3ve+OGg2MPMo+vkoCD/dib5jC633PZUlK3NfQEkMV1ZQhCZsGjDy9gTxzTd42CK4MUt7f
+        +6EbGbEofCfwBS3LBGmiQ7cYqrEeGGAa29tv5vWcA7rduYDh56cAV6S3fQvMXgIBqS/46g
+        ZwBK3p89bj4z9RsAg1rwtO41Erb+Kxc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-559-wFv5dTD3NV6L4xTTMKvdjg-1; Tue, 13 Oct 2020 01:41:01 -0400
+X-MC-Unique: wFv5dTD3NV6L4xTTMKvdjg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E71C21018F63;
+        Tue, 13 Oct 2020 05:40:59 +0000 (UTC)
+Received: from [10.72.13.59] (ovpn-13-59.pek2.redhat.com [10.72.13.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B11261A92A;
+        Tue, 13 Oct 2020 05:40:45 +0000 (UTC)
+Subject: Re: [RFC PATCH 10/24] vdpa: introduce config operations for
+ associating ASID to a virtqueue group
+To:     Eli Cohen <elic@nvidia.com>
+Cc:     mst@redhat.com, lulu@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rob.miller@broadcom.com,
+        lingshan.zhu@intel.com, eperezma@redhat.com, hanand@xilinx.com,
+        mhabets@solarflare.com, amorenoz@redhat.com,
+        maxime.coquelin@redhat.com, stefanha@redhat.com,
+        sgarzare@redhat.com
+References: <20200924032125.18619-1-jasowang@redhat.com>
+ <20200924032125.18619-11-jasowang@redhat.com>
+ <20201001132927.GC32363@mtl-vdi-166.wap.labs.mlnx>
+ <70af3ff0-74ed-e519-56f5-d61e6a48767f@redhat.com>
+ <20201012065931.GA42327@mtl-vdi-166.wap.labs.mlnx>
+ <b1ac150b-0845-874f-75d0-7440133a1d41@redhat.com>
+ <20201012081725.GB42327@mtl-vdi-166.wap.labs.mlnx>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <3e4a8bea-f187-3843-c1d1-75d0b86a137b@redhat.com>
+Date:   Tue, 13 Oct 2020 13:40:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20201012081725.GB42327@mtl-vdi-166.wap.labs.mlnx>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Yadong Qi <yadong.qi@intel.com>
 
-The test verifies the following functionality:
-A SIPI signal received when CPU is in VMX non-root mode:
-    if ACTIVITY_STATE == WAIT_SIPI
-        VMExit with (reason == 4)
-    else
-        SIPI signal is ignored
+On 2020/10/12 下午4:17, Eli Cohen wrote:
+> On Mon, Oct 12, 2020 at 03:45:10PM +0800, Jason Wang wrote:
+>>> So in theory we can have several asid's (for different virtqueues), each
+>>> one should be followed by a specific set_map call. If this is so, how do
+>>> I know if I met all the conditions run my driver? Maybe we need another
+>>> callback to let the driver know it should not expect more set_maps().
+>>
+>> This should work similarly as in the past. Two parts of the work is expected
+>> to be done by the driver:
+>>
+>> 1) store the mapping somewhere (e.g hardware) during set_map()
+>> 2) associating mapping with a specific virtqueue
+>>
+>> The only difference is that more than one mapping is used now.
+> ok, so like today, I will always get DRIVER_OK after I got all the
+> set_maps(), right?
 
-The test cases depends on IA32_VMX_MISC:bit(8), if this bit is 1
-then the test cases would be executed, otherwise the test cases
-would be skiped.
 
-Signed-off-by: Yadong Qi <yadong.qi@intel.com>
----
-v1->v2:
- * update CR3 on AP
+Yes.
 
----
- lib/x86/msr.h       |   1 +
- lib/x86/processor.h |   5 ++
- x86/apic.c          |   5 --
- x86/ioapic.c        |   5 --
- x86/unittests.cfg   |   8 +++
- x86/vmx.c           |   2 +-
- x86/vmx.h           |   3 +
- x86/vmx_tests.c     | 138 ++++++++++++++++++++++++++++++++++++++++++++
- 8 files changed, 156 insertions(+), 11 deletions(-)
+Thanks
 
-diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-index 6ef5502..29e3947 100644
---- a/lib/x86/msr.h
-+++ b/lib/x86/msr.h
-@@ -421,6 +421,7 @@
- #define MSR_IA32_VMX_TRUE_ENTRY		0x00000490
- 
- /* MSR_IA32_VMX_MISC bits */
-+#define MSR_IA32_VMX_MISC_ACTIVITY_WAIT_SIPI		(1ULL << 8)
- #define MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS	(1ULL << 29)
- 
- #define MSR_IA32_TSCDEADLINE		0x000006e0
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index c2c487c..849554f 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -359,6 +359,11 @@ static inline ulong read_cr3(void)
-     return val;
- }
- 
-+static inline void update_cr3(void *cr3)
-+{
-+    write_cr3((ulong)cr3);
-+}
-+
- static inline void write_cr4(ulong val)
- {
-     asm volatile ("mov %0, %%cr4" : : "r"(val) : "memory");
-diff --git a/x86/apic.c b/x86/apic.c
-index a7681fe..b57345b 100644
---- a/x86/apic.c
-+++ b/x86/apic.c
-@@ -318,11 +318,6 @@ static void nmi_handler(isr_regs_t *regs)
-     nmi_hlt_counter += regs->rip == (ulong)post_sti;
- }
- 
--static void update_cr3(void *cr3)
--{
--    write_cr3((ulong)cr3);
--}
--
- static void test_sti_nmi(void)
- {
-     unsigned old_counter;
-diff --git a/x86/ioapic.c b/x86/ioapic.c
-index b9f6dd2..7cbccd7 100644
---- a/x86/ioapic.c
-+++ b/x86/ioapic.c
-@@ -463,11 +463,6 @@ static void test_ioapic_logical_destination_mode(void)
- 	report(g_isr_86 == nr_vcpus, "ioapic logical destination mode");
- }
- 
--static void update_cr3(void *cr3)
--{
--	write_cr3((ulong)cr3);
--}
--
- int main(void)
- {
- 	setup_vm();
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 872d679..c035c79 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -305,6 +305,14 @@ arch = x86_64
- groups = vmx
- timeout = 10
- 
-+[vmx_sipi_signal_test]
-+file = vmx.flat
-+smp = 2
-+extra_params = -cpu host,+vmx -m 2048 -append vmx_sipi_signal_test
-+arch = x86_64
-+groups = vmx
-+timeout = 10
-+
- [vmx_apic_passthrough_tpr_threshold_test]
- file = vmx.flat
- extra_params = -cpu host,+vmx -m 2048 -append vmx_apic_passthrough_tpr_threshold_test
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 1a84a74..f0b853a 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -1369,7 +1369,7 @@ static void init_vmcs_guest(void)
- 	vmcs_write(GUEST_INTR_STATE, 0);
- }
- 
--static int init_vmcs(struct vmcs **vmcs)
-+int init_vmcs(struct vmcs **vmcs)
- {
- 	*vmcs = alloc_page();
- 	(*vmcs)->hdr.revision_id = basic.revision;
-diff --git a/x86/vmx.h b/x86/vmx.h
-index e29301e..7e39b84 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -697,6 +697,8 @@ enum vm_entry_failure_code {
- 
- #define ACTV_ACTIVE		0
- #define ACTV_HLT		1
-+#define ACTV_SHUTDOWN		2
-+#define ACTV_WAIT_SIPI		3
- 
- /*
-  * VMCS field encoding:
-@@ -856,6 +858,7 @@ static inline bool invvpid(unsigned long type, u64 vpid, u64 gla)
- 
- void enable_vmx(void);
- void init_vmx(u64 *vmxon_region);
-+int init_vmcs(struct vmcs **vmcs);
- 
- const char *exit_reason_description(u64 reason);
- void print_vmexit_info(union exit_reason exit_reason);
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index d2084ae..4e8215e 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -9855,6 +9855,143 @@ static void vmx_init_signal_test(void)
- 	 */
- }
- 
-+#define SIPI_SIGNAL_TEST_DELAY	100000000ULL
-+
-+static void vmx_sipi_test_guest(void)
-+{
-+	if (apic_id() == 0) {
-+		/* wait AP enter guest with activity=WAIT_SIPI */
-+		while (vmx_get_test_stage() != 1)
-+			;
-+		delay(SIPI_SIGNAL_TEST_DELAY);
-+
-+		/* First SIPI signal */
-+		apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
-+		report(1, "BSP(L2): Send first SIPI to cpu[%d]", id_map[1]);
-+
-+		/* wait AP enter guest */
-+		while (vmx_get_test_stage() != 2)
-+			;
-+		delay(SIPI_SIGNAL_TEST_DELAY);
-+
-+		/* Second SIPI signal should be ignored since AP is not in WAIT_SIPI state */
-+		apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
-+		report(1, "BSP(L2): Send second SIPI to cpu[%d]", id_map[1]);
-+
-+		/* Delay a while to check whether second SIPI would cause VMExit */
-+		delay(SIPI_SIGNAL_TEST_DELAY);
-+
-+		/* Test is done, notify AP to exit test */
-+		vmx_set_test_stage(3);
-+
-+		/* wait AP exit non-root mode */
-+		while (vmx_get_test_stage() != 5)
-+			;
-+	} else {
-+		/* wait BSP notify test is done */
-+		while (vmx_get_test_stage() != 3)
-+			;
-+
-+		/* AP exit guest */
-+		vmx_set_test_stage(4);
-+	}
-+}
-+
-+static void sipi_test_ap_thread(void *data)
-+{
-+	struct vmcs *ap_vmcs;
-+	u64 *ap_vmxon_region;
-+	void *ap_stack, *ap_syscall_stack;
-+	u64 cpu_ctrl_0 = CPU_SECONDARY;
-+	u64 cpu_ctrl_1 = 0;
-+
-+	/* Enter VMX operation (i.e. exec VMXON) */
-+	ap_vmxon_region = alloc_page();
-+	enable_vmx();
-+	init_vmx(ap_vmxon_region);
-+	_vmx_on(ap_vmxon_region);
-+	init_vmcs(&ap_vmcs);
-+	make_vmcs_current(ap_vmcs);
-+
-+	/* Set stack for AP */
-+	ap_stack = alloc_page();
-+	ap_syscall_stack = alloc_page();
-+	vmcs_write(GUEST_RSP, (u64)(ap_stack + PAGE_SIZE - 1));
-+	vmcs_write(GUEST_SYSENTER_ESP, (u64)(ap_syscall_stack + PAGE_SIZE - 1));
-+
-+	/* passthrough lapic to L2 */
-+	disable_intercept_for_x2apic_msrs();
-+	vmcs_write(PIN_CONTROLS, vmcs_read(PIN_CONTROLS) & ~PIN_EXTINT);
-+	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) | cpu_ctrl_0);
-+	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | cpu_ctrl_1);
-+
-+	/* Set guest activity state to wait-for-SIPI state */
-+	vmcs_write(GUEST_ACTV_STATE, ACTV_WAIT_SIPI);
-+
-+	vmx_set_test_stage(1);
-+
-+	/* AP enter guest */
-+	enter_guest();
-+
-+	if (vmcs_read(EXI_REASON) == VMX_SIPI) {
-+		report(1, "AP: Handle SIPI VMExit");
-+		vmcs_write(GUEST_ACTV_STATE, ACTV_ACTIVE);
-+		vmx_set_test_stage(2);
-+	} else {
-+		report(0, "AP: Unexpected VMExit, reason=%ld", vmcs_read(EXI_REASON));
-+		vmx_off();
-+		return;
-+	}
-+
-+	/* AP enter guest */
-+	enter_guest();
-+
-+	report(vmcs_read(EXI_REASON) != VMX_SIPI,
-+		"AP: should no SIPI VMExit since activity is not in WAIT_SIPI state");
-+
-+	/* notify BSP that AP is already exit from non-root mode */
-+	vmx_set_test_stage(5);
-+
-+	/* Leave VMX operation */
-+	vmx_off();
-+}
-+
-+static void vmx_sipi_signal_test(void)
-+{
-+	if (!(rdmsr(MSR_IA32_VMX_MISC) & MSR_IA32_VMX_MISC_ACTIVITY_WAIT_SIPI)) {
-+		printf("\tACTIVITY_WAIT_SIPI state is not supported.\n");
-+		return;
-+	}
-+
-+	if (cpu_count() < 2) {
-+		report_skip(__func__);
-+		return;
-+	}
-+
-+	u64 cpu_ctrl_0 = CPU_SECONDARY;
-+	u64 cpu_ctrl_1 = 0;
-+
-+	/* passthrough lapic to L2 */
-+	disable_intercept_for_x2apic_msrs();
-+	vmcs_write(PIN_CONTROLS, vmcs_read(PIN_CONTROLS) & ~PIN_EXTINT);
-+	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) | cpu_ctrl_0);
-+	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | cpu_ctrl_1);
-+
-+	test_set_guest(vmx_sipi_test_guest);
-+
-+	/* update CR3 on AP */
-+	on_cpu(1, update_cr3, (void *)read_cr3());
-+
-+	/* start AP */
-+	on_cpu_async(1, sipi_test_ap_thread, NULL);
-+
-+	vmx_set_test_stage(0);
-+
-+	/* BSP enter guest */
-+	enter_guest();
-+}
-+
-+
- enum vmcs_access {
- 	ACCESS_VMREAD,
- 	ACCESS_VMWRITE,
-@@ -10492,6 +10629,7 @@ struct vmx_test vmx_tests[] = {
- 	TEST(vmx_apic_passthrough_thread_test),
- 	TEST(vmx_apic_passthrough_tpr_threshold_test),
- 	TEST(vmx_init_signal_test),
-+	TEST(vmx_sipi_signal_test),
- 	/* VMCS Shadowing tests */
- 	TEST(vmx_vmcs_shadow_test),
- 	/* Regression tests */
--- 
-2.25.1
+
+>
+>> For the issue of more set_maps(), driver should be always ready for the new
+>> set_maps() call instead of not expecting new set_maps() since guest memory
+>> topology could be changed due to several reasons.
+>>
+>> Qemu or vhost-vDPA will try their best to avoid the frequency of set_maps()
+>> for better performance (e.g through batched IOTLB updating). E.g there
+>> should be at most one set_map() during one time of guest booting.
+>>
+>>
 
