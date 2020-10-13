@@ -2,114 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3D4B28C737
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 04:45:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A20628C800
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 06:31:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726873AbgJMCp0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Oct 2020 22:45:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40060 "EHLO
+        id S1731602AbgJMEa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 00:30:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726511AbgJMCpZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Oct 2020 22:45:25 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C476FC0613D0;
-        Mon, 12 Oct 2020 19:45:25 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id l85so20889260oih.10;
-        Mon, 12 Oct 2020 19:45:25 -0700 (PDT)
+        with ESMTP id S1728336AbgJMEa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Oct 2020 00:30:59 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5ACC0613D0
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 21:30:59 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id v6so4952137lfa.13
+        for <kvm@vger.kernel.org>; Mon, 12 Oct 2020 21:30:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=vZTbY4ShhrUv//2VK29yAWGy/g3LO64/rb+sQCyegOQ=;
-        b=VBUKIfL8soO6/VWyli861iToCaYbpd+QOyNJbE+8U5PLnX9wGz2xXhYmNSouy4f0Md
-         iig+kLaS/LdoCnY5iiTjitLUKUHg6SeXJpnJuG+zruwehAtH10ksY2mEMVihvo7ygVQ4
-         nFyyt3X+FY/FSftH5/xKqAAnYz1pACXmPOu5VnxsySouxk3nf/a3McUZyYS50bHTjwM7
-         eexOBDVEKDpkbdE84sIEUboP3yXcxahKdz7Td96ur7WcgbcXFyxSXxg5TjSr+YhD2I9k
-         o+jq9+WS8g4VPaML2qqldtmAvLY/AYFtFr7Bxl3ydKjdFHYx0AD+HXTcGqaEmmRh1cyM
-         4LWg==
+        bh=uHznmbCYbnVYecu07LGVp8fB7JwZJ5KDqnd/eEunNDM=;
+        b=hbSfxJ5CVGioEMU5n741pcODDKPoNH5SSgkekndiWv1TT4qukDXBS5vlebLXLizLhR
+         b4/xZNkOX8GUCTMfRcbFxVTmHfXDintMAv+I0dCZu8x10B0BeVAb1EK6iyIwsKelyB6W
+         49HWvQPmRhTPe7czs0xYGmBuAxhIKguXdm6U/LkmhdQaXYY/6HK690XILw4aD60MQzPP
+         2hX5naXiVNg0y+rLLAeVix/vfEo/6fwcLnJnfLFGi7Q59OdXMtQEC9mfQysKcWYV0z1R
+         6Y+HGXCqylbL01C3ndpfSZsNs6QT594drgNLbt2xh6sWKUtdoaoXvp7rjDZ078WFKoIH
+         YX+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=vZTbY4ShhrUv//2VK29yAWGy/g3LO64/rb+sQCyegOQ=;
-        b=axT9EPk3SSbHzHPx7fMk5XjRNKb5d3S63H2jkxSCYq/6RFUFfX0qBzyueNszQBpqXN
-         tr4BvIL2+AIrnPMzOFveJ1W8KdoziAukrWgVwg1x4Iloii6NjVj2v8gblYy5XLAKGIyG
-         cqAN7NOy2MozmUtuQFoosD02f3AyHxCshAx9mNeZZbk9lR4/8gASCLFBRJj+p9L030Fe
-         w2L+eCvpHBBo6ds8UXCH3TqwNp0u8UY8oIuAD1seoFUISzrFqjD4iRWOt5e3wkeZS90O
-         MsayvRsuOMoobdGdabZfiUbJFaugj1f4O4h66CowlBcHQbj5mgK5EqkcWqrdLbagTJ34
-         uX4g==
-X-Gm-Message-State: AOAM531FJglwylS8LXKkhlBmQ6VqWbH5Hf9xEPPF5suJ6kkXvZb83uAa
-        B7pQKtnLurkVgqGJIKMx0NPBRH6qeXysvGXegOg=
-X-Google-Smtp-Source: ABdhPJzXv8XjFlSJhZQcHJtIqnVcHRwWkhQpDEv50RxyifDLE0hGnMIkdx5eZHJ0yf+Ul5ig1if0+P9WDPQt+UvXks4=
-X-Received: by 2002:aca:f455:: with SMTP id s82mr13204747oih.40.1602557125107;
- Mon, 12 Oct 2020 19:45:25 -0700 (PDT)
+        bh=uHznmbCYbnVYecu07LGVp8fB7JwZJ5KDqnd/eEunNDM=;
+        b=SCJYjppt28PFY29JXp5sStudINaZNvdh+JxZzASFUSh7SeIr6kp3/nAzBx9vV6rIoj
+         G/wjIu/gw6SopCHjIpJcfDGYi7FfbubLrsneAKnbL53ugsuhyvNxwQR6D10+38uSeuX8
+         wx44KRAJHZDM9PmwR17ffwIcZjDxpTEnmoc/vtkqSY8y+Azxiwgif3PbtWrMdfZjiJ2X
+         lI1UWoSHgatFq2fJ+3KYlufOT/DcFttGY4cCb3xeCkQ81IrSCoKDdvYdflWhLFt6qRN5
+         h9GFn/IOvPoc3r/mBE3Yo0WjWU1nHqxm5QrJRUlVIiz/H3gyaXmK045bWKo6VKb75LVe
+         2Iuw==
+X-Gm-Message-State: AOAM531APpoZnPwLy9E9s4F8YazF6XlNeBxpmW+Bi3aVgQvq9qOLXSHN
+        IAalL6dmpntyplWarMX/6HlAvyv2IDIf7IetXZQ=
+X-Google-Smtp-Source: ABdhPJw5ESgwC0DgMZ9wENbc2k3XxUS8EJuXNnfvWh0zkKlUw6sic73+LBqE6Y3TydBD4veYlUsxLM4tVDHZ9ncz+Gk=
+X-Received: by 2002:a19:c6cc:: with SMTP id w195mr2030275lff.24.1602563456727;
+ Mon, 12 Oct 2020 21:30:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1602093760.git.yuleixzhang@tencent.com> <678F3D1BB717D949B966B68EAEB446ED49E01801@dggemm526-mbx.china.huawei.com>
-In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED49E01801@dggemm526-mbx.china.huawei.com>
-From:   yulei zhang <yulei.kernel@gmail.com>
-Date:   Tue, 13 Oct 2020 10:45:14 +0800
-Message-ID: <CACZOiM2UbA-1hTVQkA4sjX+PVduCdjycFdenR2QxPqkG8kYxpg@mail.gmail.com>
-Subject: Re: [PATCH 00/35] Enhance memory utilization with DMEMFS
-To:     "Zengtao (B)" <prime.zeng@hisilicon.com>
-Cc:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
-        "kernellwp@gmail.com" <kernellwp@gmail.com>,
-        "lihaiwei.kernel@gmail.com" <lihaiwei.kernel@gmail.com>,
-        Yulei Zhang <yuleixzhang@tencent.com>
+References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
+ <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
+ <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com> <20201012165428.GD26135@linux.intel.com>
+In-Reply-To: <20201012165428.GD26135@linux.intel.com>
+From:   harry harry <hiharryharryharry@gmail.com>
+Date:   Tue, 13 Oct 2020 00:30:39 -0400
+Message-ID: <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
+Subject: Re: Why guest physical addresses are not the same as the
+ corresponding host virtual addresses in QEMU/KVM? Thanks!
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
+        mathieu.tarral@protonmail.com, stefanha@redhat.com,
+        libvir-list@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 12, 2020 at 7:57 PM Zengtao (B) <prime.zeng@hisilicon.com> wrote:
->
->
-> > -----Original Message-----
-> > From: yulei.kernel@gmail.com [mailto:yulei.kernel@gmail.com]
-> > Sent: Thursday, October 08, 2020 3:54 PM
-> > To: akpm@linux-foundation.org; naoya.horiguchi@nec.com;
-> > viro@zeniv.linux.org.uk; pbonzini@redhat.com
-> > Cc: linux-fsdevel@vger.kernel.org; kvm@vger.kernel.org;
-> > linux-kernel@vger.kernel.org; xiaoguangrong.eric@gmail.com;
-> > kernellwp@gmail.com; lihaiwei.kernel@gmail.com; Yulei Zhang
-> > Subject: [PATCH 00/35] Enhance memory utilization with DMEMFS
-> >
-> > From: Yulei Zhang <yuleixzhang@tencent.com>
-> >
-> > In current system each physical memory page is assocaited with
-> > a page structure which is used to track the usage of this page.
-> > But due to the memory usage rapidly growing in cloud environment,
-> > we find the resource consuming for page structure storage becomes
-> > highly remarkable. So is it an expense that we could spare?
-> >
-> > This patchset introduces an idea about how to save the extra
-> > memory through a new virtual filesystem -- dmemfs.
-> >
-> > Dmemfs (Direct Memory filesystem) is device memory or reserved
-> > memory based filesystem. This kind of memory is special as it
-> > is not managed by kernel and most important it is without 'struct page'.
-> > Therefore we can leverage the extra memory from the host system
-> > to support more tenants in our cloud service.
-> >
-> > We uses a kernel boot parameter 'dmem=' to reserve the system
-> > memory when the host system boots up, the details can be checked
-> > in /Documentation/admin-guide/kernel-parameters.txt.
-> >
-> > Theoretically for each 4k physical page it can save 64 bytes if
-> > we drop the 'struct page', so for guest memory with 320G it can
-> > save about 5G physical memory totally.
->
-> Sounds interesting, but seems your patch only support x86, have you
->  considered aarch64?
->
-> Regards
-> Zengtao
+Hi Sean,
 
-Thanks, so far we only verify it on x86 server, may extend to arm platform
-in the future.
+Thank you very much for your thorough explanations. Please see my
+inline replies as follows. Thanks!
+
+On Mon, Oct 12, 2020 at 12:54 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> No, the guest physical address spaces is not intrinsically tied to the host
+> virtual address spaces.  The fact that GPAs and HVAs are related in KVM is a
+> property KVM's architecture.  EPT/NPT has absolutely nothing to do with HVAs.
+>
+> As Maxim pointed out, KVM links a guest's physical address space, i.e. GPAs, to
+> the host's virtual address space, i.e. HVAs, via memslots.  For all intents and
+> purposes, this is an extra layer of address translation that is purely software
+> defined.  The memslots allow KVM to retrieve the HPA for a given GPA when
+> servicing a shadow page fault (a.k.a. EPT violation).
+>
+> When EPT is enabled, a shadow page fault due to an unmapped GPA will look like:
+>
+>  GVA -> [guest page tables] -> GPA -> EPT Violation VM-Exit
+>
+> The above walk of the guest page tables is done in hardware.  KVM then does the
+> following walks in software to retrieve the desired HPA:
+>
+>  GPA -> [memslots] -> HVA -> [host page tables] -> HPA
+
+Do you mean that GPAs are different from their corresponding HVAs when
+KVM does the walks (as you said above) in software?
+
+Thanks,
+Harry
