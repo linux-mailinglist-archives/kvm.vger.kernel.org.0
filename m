@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0489328C9E2
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 10:14:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1211028C9EB
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 10:14:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391315AbgJMIMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 04:12:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34086 "EHLO
+        id S2391266AbgJMIM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 04:12:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391113AbgJMIML (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 04:12:11 -0400
+        with ESMTP id S2391063AbgJMIMI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Oct 2020 04:12:08 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11E0AC0613D0;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18374C0613D7;
         Tue, 13 Oct 2020 01:12:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
-        To:From:Reply-To:Content-ID:Content-Description;
-        bh=RgWc9nkynvcBFppQsEDwLqzLhZzcJ5woAloxK69DHIY=; b=I6ttXtQgUdffmuQ7izO5ZTJ+aR
-        5Wk4Qq54h7x2WilXjyV4qwN72fxXZpRyMItZOj1qf3eB9+MvjcyWI5lvWlrGqymrsuZc+tGESrje1
-        WlxrbcO455lesZYUd3Lu8CyyunuIbv4CbzoN7Ve9Lcoi9TV7oyUBR0mjsnnG6UFaoudzR2j2X8Au3
-        t0jJJbMgIAgMvhzVVlVzHvsu5QjdfCB4Y/E1h4CNKXoG9Brv81RYmEwOzdzfQQ2gaEBWAEyX4urR/
-        TvEiPUnTzM6Ol2B8GSbH8epMHYQpOnx2GOYoeU91aTGe6p4/41zlvxat5LVdgCEkmbNJiMPweczgK
-        cVf0rsxA==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=EY8UHzC6+5/iDJsfDzabkl6LPehqG3ZtEqYxa4ewh6o=; b=Q+cMUieQWgDbWqlRk6eSdi2Goq
+        w4opBNGckPwtNox/hjjkpzSKduFWkniiM62a9BNOz3omxqd7LmwuhvMMfKHhmvneRc2Y7q9Emk3IJ
+        Gpq790hBMJOcSHeWvqDUp6HKrwkJkMcJT1o7eaiQDcZiqt+B82cdLbRHNpwwyVPibK/LszJfwbTKQ
+        RCo0fhNtVRokIeFP3g5qGTj+LK/1pbZUHMuGcyAbofjzW7kGsyI4LiIGfsuUxJtL+/m8pJBLGeHLc
+        3e/mg0uhAKUDX5nzK7YFhfi+ZDgKDC4BJPfudyanlNWmGHWWF0s1GHbq/BJDAE68MXZX36ehTaI/X
+        CMZ69h8A==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kSFPM-0006fN-QR; Tue, 13 Oct 2020 08:12:01 +0000
+        id 1kSFPM-0006fO-Qj; Tue, 13 Oct 2020 08:12:01 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.93 #3 (Red Hat Linux))
-        id 1kSFPM-006XXJ-BR; Tue, 13 Oct 2020 09:11:44 +0100
+        id 1kSFPM-006XXM-CG; Tue, 13 Oct 2020 09:11:44 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     x86@kernel.org
 Cc:     kvm <kvm@vger.kernel.org>, iommu@lists.linux-foundation.org,
@@ -36,14 +36,14 @@ Cc:     kvm <kvm@vger.kernel.org>, iommu@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         linux-hyperv@vger.kernel.org, maz@misterjones.org
-Subject: [PATCH 0/9] Remove irq_remapping_get_irq_domain()
-Date:   Tue, 13 Oct 2020 09:11:30 +0100
-Message-Id: <20201013081139.1558200-1-dwmw2@infradead.org>
+Subject: [PATCH 1/9] genirq/irqdomain: Implement get_name() method on irqchip fwnodes
+Date:   Tue, 13 Oct 2020 09:11:31 +0100
+Message-Id: <20201013081139.1558200-2-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <0de733f6384874d68afba2606119d0d9b1e8b34e.camel@infradead.org>
+In-Reply-To: <20201013081139.1558200-1-dwmw2@infradead.org>
 References: <0de733f6384874d68afba2606119d0d9b1e8b34e.camel@infradead.org>
+ <20201013081139.1558200-1-dwmw2@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -51,57 +51,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I didn't much like the I/OAPIC and HPET drivers having magical knowledge
-that they had to substitute x86_vector_domain if their call to
-irq_remapping_get_irq_domain() returned NULL.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-When Thomas tried to make it handle error returns from …get_irq_domain() 
-distinctly from the NULL case too, it made me even sadder. So I killed 
-it with fire.
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ kernel/irq/irqdomain.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-Now they just use irq_find_matching_fwspec() to find an appropriate
-irqdomain. Each remapping irqdomain just needs to say 'yep, that's me'
-for the HPETs or I/OAPICs which are within their scope, while the
-x86_vector_domain accepts them all but only if interrupt remapping
-is *disabled*. No more special knowledge in the caller.
-
-If IR is enabled and there's a child device which escapes the scope of
-all remapping units, it gets NULL for its parent irqdomain and will
-fail to initialise, which is the correct thing to do in that "should
-never happen" case. For HPET that'll mean that it just doesn't support
-MSI, while I/OAPIC will refuse to initialise and trigger a BUG_ON
-because Linux quite likes it when *all* the I/OAPICs it knows about get
-initialised successfully.
-
-This is on top of the previous 'ext_dest_id' series at
-https://patchwork.kernel.org/project/kvm/list/?series=362037
-
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/ext_dest_id
-
-David Woodhouse (9):
-      genirq/irqdomain: Implement get_name() method on irqchip fwnodes
-      x86/apic: Add select() method on vector irqdomain
-      iommu/amd: Implement select() method on remapping irqdomain
-      iommu/vt-d: Implement select() method on remapping irqdomain
-      iommu/hyper-v: Implement select() method on remapping irqdomain
-      x86/hpet: Use irq_find_matching_fwspec() to find remapping irqdomain
-      x86/ioapic: Use irq_find_matching_fwspec() to find remapping irqdomain
-      x86: Kill all traces of irq_remapping_get_irq_domain()
-      iommu/vt-d: Simplify intel_irq_remapping_select()
-
- arch/x86/include/asm/hw_irq.h        |  2 --
- arch/x86/include/asm/irq_remapping.h |  9 ---------
- arch/x86/include/asm/irqdomain.h     |  3 +++
- arch/x86/kernel/apic/io_apic.c       | 24 ++++++++++++------------
- arch/x86/kernel/apic/vector.c        | 43 +++++++++++++++++++++++++++++++++++++++++++
- arch/x86/kernel/hpet.c               | 23 +++++++++++++----------
- drivers/iommu/amd/iommu.c            | 53 +++++++++++++++++++----------------------------------
- drivers/iommu/hyperv-iommu.c         | 18 +++++++++---------
- drivers/iommu/intel/irq_remapping.c  | 43 +++++++++++++++++--------------------------
- drivers/iommu/irq_remapping.c        | 14 --------------
- drivers/iommu/irq_remapping.h        |  3 ---
- kernel/irq/irqdomain.c               | 11 ++++++++++-
- 12 files changed, 126 insertions(+), 120 deletions(-)
-
-
+diff --git a/kernel/irq/irqdomain.c b/kernel/irq/irqdomain.c
+index 76cd7ebd1178..6440f97c412e 100644
+--- a/kernel/irq/irqdomain.c
++++ b/kernel/irq/irqdomain.c
+@@ -42,7 +42,16 @@ static inline void debugfs_add_domain_dir(struct irq_domain *d) { }
+ static inline void debugfs_remove_domain_dir(struct irq_domain *d) { }
+ #endif
+ 
+-const struct fwnode_operations irqchip_fwnode_ops;
++static const char *irqchip_fwnode_get_name(const struct fwnode_handle *fwnode)
++{
++	struct irqchip_fwid *fwid = container_of(fwnode, struct irqchip_fwid, fwnode);
++
++	return fwid->name;
++}
++
++const struct fwnode_operations irqchip_fwnode_ops = {
++	.get_name = irqchip_fwnode_get_name,
++};
+ EXPORT_SYMBOL_GPL(irqchip_fwnode_ops);
+ 
+ /**
+-- 
+2.26.2
 
