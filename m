@@ -2,135 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A81B28C8F1
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 09:03:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54F4028C936
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 09:27:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389868AbgJMHDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 03:03:33 -0400
-Received: from mga09.intel.com ([134.134.136.24]:17265 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389808AbgJMHDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 03:03:33 -0400
-IronPort-SDR: ZsVtQJ5107ilPUaeUIJTXEIE3ckXWWdUYRIBjNbWdaHejpLGpKGQhshq2SfonCKvn5UP2s7R+I
- wu96hnUfX/fA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9772"; a="165974980"
-X-IronPort-AV: E=Sophos;i="5.77,369,1596524400"; 
-   d="scan'208";a="165974980"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2020 00:03:32 -0700
-IronPort-SDR: yiC8yNDOFHFMq6VXclrifsMfmqj6MBvsTppvCcYTh5upRUuK1B85ppDfm3fitbb9opdaiA4hn1
- gvz6ZX3fKJjw==
-X-IronPort-AV: E=Sophos;i="5.77,369,1596524400"; 
-   d="scan'208";a="330004494"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2020 00:03:32 -0700
-Date:   Tue, 13 Oct 2020 00:03:31 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     harry harry <hiharryharryharry@gmail.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
-        mathieu.tarral@protonmail.com, stefanha@redhat.com,
-        libvir-list@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: Why guest physical addresses are not the same as the
- corresponding host virtual addresses in QEMU/KVM? Thanks!
-Message-ID: <20201013070329.GC11344@linux.intel.com>
-References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
- <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
- <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
- <20201012165428.GD26135@linux.intel.com>
- <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
- <20201013045245.GA11344@linux.intel.com>
- <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
+        id S2390054AbgJMH1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 03:27:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44339 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389874AbgJMH1U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Oct 2020 03:27:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602574038;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U29b+DpSNEK8t7VlArhSyxRK4Bdvo64dhfMqIFz57jI=;
+        b=Tikn7NUcWUEWnTzMrc/bhhgLXNogzAAMQW9NynZo0eo4WaT0xGme9aVG9tg3FYD3gGIKqm
+        ooMAxA01Ef4LRZNQh88cFO/ql8dxY84rmAIpRyJO4HzgTwqEaIu1F4k4ZiCoYJORmLKHqw
+        Fb8OrPKYIWJtbOdULSDxGXRhrmnnyqQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-540-j6AO5cC-M_mGhGAQkzfEaQ-1; Tue, 13 Oct 2020 03:27:16 -0400
+X-MC-Unique: j6AO5cC-M_mGhGAQkzfEaQ-1
+Received: by mail-wr1-f71.google.com with SMTP id m20so4177430wrb.21
+        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 00:27:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=U29b+DpSNEK8t7VlArhSyxRK4Bdvo64dhfMqIFz57jI=;
+        b=By8U3giBO3JaYnHQyKxJdXL23y/MGGiqFNMg7q5MHFUVdRMdPDiFuQuuUacFL6az/+
+         cIyi54hJAvo4S1/Ap0TT4GfLd70JeGZen6ioCTqgDTMKPPU7pEQq87PGE/jh8dCrdcqr
+         pDrWNk4mS9zYNGv8Sb4f2KyuBq6nx/Xtqw4azZ/HsA6dVtDNfjKXqPJz1lhpa7xh6/qI
+         Mom4mp8YzlnT7YAlvaFXS5b8Jw4dWsXXudqtQyBvzi15xB423Oxs/VgeVJXrpglB6xIs
+         ro98DUNYkXhhBSHnHdla31BV4mN1RbMU961US2im3j3CXlkOADCU+BWxn0N2J8TDbTp4
+         TLgw==
+X-Gm-Message-State: AOAM531D3jOsU9Oa6q5AxBoe3nGRlPJzJJh+KX+0WZvrWt7Vv6v8BQuZ
+        kDyKUtwEGYaYGWIu+NyhYO4zS2KWQFTj2eRK2S8cC5aZ+ZhxEOSX68owtuuBEk0JWeQ7XRW60wS
+        Dlb7CoFzxZPhe
+X-Received: by 2002:adf:e78b:: with SMTP id n11mr35392294wrm.280.1602574035544;
+        Tue, 13 Oct 2020 00:27:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxQQxP8+9P0wsLZ02YH3DOZOSRsW9JaGdCw5AWhVTclsuWN0jiwlLQJrBd+Ygaz9BMFlz6mIg==
+X-Received: by 2002:adf:e78b:: with SMTP id n11mr35392272wrm.280.1602574035354;
+        Tue, 13 Oct 2020 00:27:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:61dd:85cb:23fc:fd54? ([2001:b07:6468:f312:61dd:85cb:23fc:fd54])
+        by smtp.gmail.com with ESMTPSA id t124sm27268833wmg.31.2020.10.13.00.27.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Oct 2020 00:27:14 -0700 (PDT)
+Subject: Re: [PATCH 04/35] dmem: let pat recognize dmem
+To:     yulei.kernel@gmail.com, akpm@linux-foundation.org,
+        naoya.horiguchi@nec.com, viro@zeniv.linux.org.uk
+Cc:     linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xiaoguangrong.eric@gmail.com,
+        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
+        Yulei Zhang <yuleixzhang@tencent.com>,
+        Xiao Guangrong <gloryxiao@tencent.com>
+References: <cover.1602093760.git.yuleixzhang@tencent.com>
+ <87e23dfbac6f4a68e61d91cddfdfe157163975c1.1602093760.git.yuleixzhang@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <72f4ddeb-157a-808a-2846-dd9961a9c269@redhat.com>
+Date:   Tue, 13 Oct 2020 09:27:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <87e23dfbac6f4a68e61d91cddfdfe157163975c1.1602093760.git.yuleixzhang@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 13, 2020 at 01:33:28AM -0400, harry harry wrote:
-> > > Do you mean that GPAs are different from their corresponding HVAs when
-> > > KVM does the walks (as you said above) in software?
-> >
-> > What do you mean by "different"?  GPAs and HVAs are two completely
-> different
-> > address spaces.
+On 08/10/20 09:53, yulei.kernel@gmail.com wrote:
+> From: Yulei Zhang <yuleixzhang@tencent.com>
 > 
-> Let me give you one concrete example as follows to explain the meaning of
-> ``different''.
+> x86 pat uses 'struct page' by only checking if it's system ram,
+> however it is not true if dmem is used, let's teach pat to
+> recognize this case if it is ram but it is !pfn_valid()
 > 
-> Suppose a program is running in a single-vCPU VM. The program allocates and
-> references one page (e.g., array[1024*4]). Assume that allocating and
-> referencing the page in the guest OS triggers a page fault and host OS
-> allocates a machine page to back it.
+> We always use WB for dmem and any attempt to change this
+> behavior will be rejected and WARN_ON is triggered
 > 
-> Assume that GVA of array[0] is 0x000000000021 and its corresponding GPA is
-> 0x0000000000000081. I think array[0]'s corresponding HVA should also be
-> 0x0000000000000081, which is the same as array[0]'s GPA. If array[0]'s HVA
-> is not 0x0000000000000081, array[0]'s GPA is* different* from its
-> corresponding HVA.
-> 
-> Now, let's assume array[0]'s GPA is different from its corresponding HVA. I
-> think there might be one issue like this: I think MMU's hardware logic to
-> translate ``GPA ->[extended/nested page tables] -> HPA''[1] should be the
-> same as ``VA-> [page tables] -> PA"[2]; if true, how does KVM find the
-> correct HPA with the different HVA (e.g., array[0]'s HVA is not
-> 0x0000000000000081) when there are EPT violations?
+> Signed-off-by: Xiao Guangrong <gloryxiao@tencent.com>
+> Signed-off-by: Yulei Zhang <yuleixzhang@tencent.com>
 
-This is where memslots come in.  Think of memslots as a one-level page tablea
-that translate GPAs to HVAs.  A memslot, set by userspace, tells KVM the
-corresponding HVA for a given GPA.
+Hooks like these will make it very hard to merge this series.
 
-Before the guest is running (assuming host userspace isn't broken), the
-userspace VMM will first allocate virtual memory (HVA) for all physical
-memory it wants to map into the guest (GPA).  It then tells KVM how to
-translate a given GPA to its HVA by creating a memslot.
+I like the idea of struct page-backed memory, but this is a lot of code
+and I wonder if it's worth adding all these complications.
 
-To avoid getting lost in a tangent about page offsets, let's assume array[0]'s
-GPA = 0xa000.  For KVM to create a GPA->HPA mapping for the guest, there _must_
-be a memslot that translates GPA 0xa000 to an HVA[*].  Let's say HVA = 0xb000.
+One can already use mem= to remove the "struct page" cost for most of
+the host memory, and manage the allocation of the remaining memory in
+userspace with /dev/mem.  What is the advantage of doing this in the kernel?
 
-On an EPT violation, KVM does a memslot lookup to translate the GPA (0xa000) to
-its HVA (0xb000), and then walks the host page tables to translate the HVA into
-a HPA (let's say that ends up being 0xc000).  KVM then stuffs 0xc000 into the
-EPT tables, which yields:
+Paolo
 
-  GPA    -> HVA    (KVM memslots)
-  0xa000    0xb000
-
-  HVA    -> HPA    (host page tables)
-  0xb000    0xc000
-
-  GPA    -> HPA    (extended page tables)
-  0xa000    0xc000
-
-To keep the EPT tables synchronized with the host page tables, if HVA->HPA
-changes, e.g. HVA 0xb000 is remapped to HPA 0xd000, then KVM will get notified
-by the host kernel that the HVA has been unmapped and will find and unmap
-the corresponding GPA (again via memslots) to HPA translations.
-
-Ditto for the case where userspace moves a memslot, e.g. if HVA is changed
-to 0xe000, KVM will first unmap all old GPA->HPA translations so that accesses
-to GPA 0xa000 from the guest will take an EPT violation and see the new HVA
-(and presumably a new HPA).
-
-[*] If there is no memslot, KVM will exit to userspace on the EPT violation,
-    with some information about what GPA the guest was accessing.  This is how
-    emulated MMIO is implemented, e.g. userspace intentionally doesn't back a
-    GPA with a memslot so that it can trap guest accesses to said GPA for the
-    purpose of emulating a device.
-
-> [1] Please note that this hardware walk is the last step, which only
-> translates the guest physical address to the host physical address through
-> the four-level nested page table.
-> [2] Please note that this hardware walk assumes translating the VA to the
-> PA without virtualization involvement.
-> 
-> Please note that the above addresses are not real and just use for
-> explanations.
-> 
-> Thanks,
-> Harry
