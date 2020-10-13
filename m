@@ -2,239 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 668AA28CB74
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 12:16:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDBC228CBA2
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 12:28:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729406AbgJMKQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 06:16:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
+        id S1731170AbgJMK2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 06:28:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726935AbgJMKQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 06:16:09 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 860FEC0613D0;
-        Tue, 13 Oct 2020 03:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=5Er//8ohC9wYbLX9QACaAMI63gHl/CEo7kNgSZrS2os=; b=rm2zBx8bNLiQnUwh36FPE+hO8+
-        /w9lmvWhzi2315H+dNyhd0bV1IyvnnnDHvOhN6gvZkK2vcxrXepWmDACsQqs5WtKeDM4R3CTPNN18
-        n5KQv75XsJRvJHsPGQc4xjr2KRWsiUTJ3tbwb1YyLQhQm2gBGjoF15oaRaUU42DpV8o8ahhgekGFD
-        isOSixnE8MtcI2vafmR9yBnbH5TacB3Cs6xPM0MfRnLH7VeIou9FWX1apEd+MgnV+BJmkEILzc7Kn
-        ipoh72dX3XWVBtcomzGHeBIIMyMI3uV8/g8r+l3Rq68+SMD/hRUCA3sAclrOdmldcmCfDsECoQ4YM
-        pG7Nz1ZA==;
-Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=u3832b3a9db3152.ant.amazon.com)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kSHLd-0000ba-Vu; Tue, 13 Oct 2020 10:16:02 +0000
-Message-ID: <1d213d46b9f94ba9e14876eb08da995ca6ddeffb.camel@infradead.org>
-Subject: Re: [PATCH 5/5] x86/kvm: Add KVM_FEATURE_MSI_EXT_DEST_ID
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Marc Zyngier <maz@kernel.org>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Date:   Tue, 13 Oct 2020 11:15:59 +0100
-In-Reply-To: <87zh4qo4o5.fsf@nanos.tec.linutronix.de>
-References: <803bb6b2212e65c568c84ff6882c2aa8a0ee03d5.camel@infradead.org>
-         <20201007122046.1113577-1-dwmw2@infradead.org>
-         <20201007122046.1113577-5-dwmw2@infradead.org>
-         <87blhcx6qz.fsf@nanos.tec.linutronix.de>
-         <f27b17cf4ab64fdb4f14a056bd8c6a93795d9a85.camel@infradead.org>
-         <95625dfce360756b99641c31212634c1bf80a69a.camel@infradead.org>
-         <87362owhcb.fsf@nanos.tec.linutronix.de>
-         <c6f21628733cac23fd28679842c20423df2dd423.camel@infradead.org>
-         <87tuv4uwmt.fsf@nanos.tec.linutronix.de>
-         <958f0d5c9844f94f2ce47a762c5453329b9e737e.camel@infradead.org>
-         <874kn2s3ud.fsf@nanos.tec.linutronix.de>
-         <0E51DAB1-5973-4226-B127-65D77DC46CB5@infradead.org>
-         <87pn5or8k7.fsf@nanos.tec.linutronix.de>
-         <F0F0A646-8DBA-4448-933F-993A3335BD59@infradead.org>
-         <87ft6jrdpk.fsf@nanos.tec.linutronix.de>
-         <25c54f8e5da1fd5cf3b01ad2fdc1640c5d86baa1.camel@infradead.org>
-         <87362jqoh3.fsf@nanos.tec.linutronix.de>
-         <1abc2a34c894c32eb474a868671577f6991579df.camel@infradead.org>
-         <87eem3ozxd.fsf@nanos.tec.linutronix.de>
-         <0de733f6384874d68afba2606119d0d9b1e8b34e.camel@infradead.org>
-         <87zh4qo4o5.fsf@nanos.tec.linutronix.de>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-0Ie2CDTRpzf+UVyr1cMu"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        with ESMTP id S1729516AbgJMK2W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Oct 2020 06:28:22 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031E6C0613D0
+        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 03:28:21 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id u21so27514813eja.2
+        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 03:28:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=AOyGbFGBFW7IttULzsANlRi4lqSr3VNc7xD02DIgAWM=;
+        b=akq3IGx88v65EmpzfX3uQCPH4Z/ifmvztR0aVsED6cf/SUl9WzA8IN0RykxXcIZswS
+         FchIteuFvzAkYHkpkpAPrb0L2Y5WXvtSBsLbZvQuJsJBuu6oJevmkB/ECVXSY/itUMjc
+         ENRlh/P7TgrixcQr9fnv01sRHxHygggxTusXO7yM13o+bof+VAskRyFDmMNIbWNSHMRm
+         oPYrqoLgQAx4uzWDk6XxiTEML9iypT9O2f86gO7BpR2bWWa07vDL4CoQUi6OaPDpWV4t
+         NszlZgoUZRPTgc+5AEM3GWTAgqpRZuHGOXQzNILgJpbppePhONqeNW2OpEuWg0rXtTKs
+         ogPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AOyGbFGBFW7IttULzsANlRi4lqSr3VNc7xD02DIgAWM=;
+        b=S1S6Jjy8GA0IKhY77HjJqPrVtYd/34L2MpWzHS4UxPwN6fXtFEvfazRvfnapVFRD0P
+         ewSHvWKQ5qj7JQZIMz1yCHWHWWiEp6oGUYO1/ZTpGmULeQj+QgaPGLW331HKQ3QxuPwi
+         Rx0HJHtGzxp5PqcYD2r2Oog+i1e5dLcOe1sCsYwhYk8xOxw+7+6mlzhZ5Pds73LUG7LS
+         iBul6IlamGwzvIky/K2jHuFtffQp0VkW62vov3/PNp4KZzN2445rhuwk3Kk31Jk3q2eq
+         jsyG0lDHSfNuinFeugTctnmhbDhgX4S1lsDxF/9h+7O5weWKgv2av6dMkDIxnG3I+ZYV
+         OqOw==
+X-Gm-Message-State: AOAM533PmbnszGNOOYSOAx8vvwUwU8dHePAJy6r/olkDFlRrqGti3pRH
+        CJzOIpE6FLpUaKRuXxzGoOJ8SksFVT1uIw==
+X-Google-Smtp-Source: ABdhPJziTva1KqYf14pDRVtwD3+jwROqc/Tcpgez4s5eirqsZWkYGdAehcgVgInF2li4RYF2MIEwMQ==
+X-Received: by 2002:a17:906:d8e:: with SMTP id m14mr33694709eji.448.1602584898502;
+        Tue, 13 Oct 2020 03:28:18 -0700 (PDT)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+        by smtp.gmail.com with ESMTPSA id b6sm12848314edu.21.2020.10.13.03.28.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Oct 2020 03:28:17 -0700 (PDT)
+Date:   Tue, 13 Oct 2020 12:27:58 +0200
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: (proposal) RE: [PATCH v7 00/16] vfio: expose virtual Shared
+ Virtual Addressing to VMs
+Message-ID: <20201013102758.GB694407@myrica>
+References: <MWHPR11MB1645CFB0C594933E92A844AC8C070@MWHPR11MB1645.namprd11.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MWHPR11MB1645CFB0C594933E92A844AC8C070@MWHPR11MB1645.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Oct 12, 2020 at 08:38:54AM +0000, Tian, Kevin wrote:
+> > From: Jason Wang <jasowang@redhat.com>
+> > Sent: Monday, September 14, 2020 12:20 PM
+> >
+> [...]
+>  > If it's possible, I would suggest a generic uAPI instead of a VFIO
+> > specific one.
+> > 
+> > Jason suggest something like /dev/sva. There will be a lot of other
+> > subsystems that could benefit from this (e.g vDPA).
+> > 
+> > Have you ever considered this approach?
+> > 
+> 
+> Hi, Jason,
+> 
+> We did some study on this approach and below is the output. It's a
+> long writing but I didn't find a way to further abstract w/o losing 
+> necessary context. Sorry about that.
+> 
+> Overall the real purpose of this series is to enable IOMMU nested
+> translation capability with vSVA as one major usage, through
+> below new uAPIs:
+> 	1) Report/enable IOMMU nested translation capability;
+> 	2) Allocate/free PASID;
+> 	3) Bind/unbind guest page table;
+> 	4) Invalidate IOMMU cache;
+> 	5) Handle IOMMU page request/response (not in this series);
+> 1/3/4) is the minimal set for using IOMMU nested translation, with 
+> the other two optional. For example, the guest may enable vSVA on 
+> a device without using PASID. Or, it may bind its gIOVA page table 
+> which doesn't require page fault support. Finally, all operations can 
+> be applied to either physical device or subdevice.
+> 
+> Then we evaluated each uAPI whether generalizing it is a good thing 
+> both in concept and regarding to complexity.
+> 
+> First, unlike other uAPIs which are all backed by iommu_ops, PASID 
+> allocation/free is through the IOASID sub-system. From this angle
+> we feel generalizing PASID management does make some sense. 
+> First, PASID is just a number and not related to any device before 
+> it's bound to a page table and IOMMU domain. Second, PASID is a 
+> global resource (at least on Intel VT-d), while having separate VFIO/
+> VDPA allocation interfaces may easily cause confusion in userspace,
+> e.g. which interface to be used if both VFIO/VDPA devices exist. 
+> Moreover, an unified interface allows centralized control over how 
+> many PASIDs are allowed per process.
+> 
+> One unclear part with this generalization is about the permission.
+> Do we open this interface to any process or only to those which
+> have assigned devices? If the latter, what would be the mechanism
+> to coordinate between this new interface and specific passthrough 
+> frameworks? A more tricky case, vSVA support on ARM (Eric/Jean
+> please correct me) plans to do per-device PASID namespace which
+> is built on a bind_pasid_table iommu callback to allow guest fully 
+> manage its PASIDs on a given passthrough device.
 
---=-0Ie2CDTRpzf+UVyr1cMu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Yes we need a bind_pasid_table. The guest needs to allocate the PASID
+tables because they are accessed via guest-physical addresses by the HW
+SMMU.
 
-On Tue, 2020-10-13 at 11:28 +0200, Thomas Gleixner wrote:
-> On Tue, Oct 13 2020 at 08:52, David Woodhouse wrote:
-> > On Tue, 2020-10-13 at 00:13 +0200, Thomas Gleixner wrote:
-> > +       dom =3D irq_find_matching_fwspec(fwspec, DOMAIN_BUS_IR);
-> > +       if (dom)
-> > +               return IS_ERR(dom) ? NULL : dom;
-> > +
-> > +       return x86_vector_domain;
-> > +}
-> >=20
-> > Ick. There's no need for that.
-> >=20
-> > Eliminating that awful "if not found then slip the x86_vector_domain in
-> > as a special case" was the whole *point* of using
-> > irq_find_matching_fwspec() in the first place.
->=20
-> The point was to get rid of irq_remapping_get_irq_domain().
+With bind_pasid_table, the invalidation message also requires a scope to
+invalidate a whole PASID context, in addition to invalidating a mappings
+ranges.
 
-My reason for doing it was to get rid of irq_remapping_get_irq_domain()
-*because* I hated the special-casing and magical slipping in of
-x86_vector_domain when it returned NULL.
+> I'm not sure 
+> how such requirement can be unified w/o involving passthrough
+> frameworks, or whether ARM could also switch to global PASID 
+> style...
 
-> And TBH,
->=20
->         if (apicid_valid(32768))
->=20
-> is just another way to slip the vector domain in. It's just differently
-> awful.
+Not planned at the moment, sorry. It requires a PV IOMMU to do PASID
+allocation, which is possible with virtio-iommu but not with a vSMMU
+emulation. The VM will manage its own PASID space. The upside is that we
+don't need userspace access to IOASID, so I won't pester you with comments
+on that part of the API :)
 
-For me, that's very much not just "slipping the vector domain in".
-That's the vector domain returning true in its *own* ->select()
-function, in the circumstances where it wants to be used.
+> Second, IOMMU nested translation is a per IOMMU domain
+> capability. Since IOMMU domains are managed by VFIO/VDPA
+>  (alloc/free domain, attach/detach device, set/get domain attribute,
+> etc.), reporting/enabling the nesting capability is an natural 
+> extension to the domain uAPI of existing passthrough frameworks. 
+> Actually, VFIO already includes a nesting enable interface even 
+> before this series. So it doesn't make sense to generalize this uAPI 
+> out.
 
-The key difference is that nobody needs an external magic pointer to
-the x86_vector_domain. In a true irqdomain hierarchy system, shouldn't
-we be trying to eliminate *all* those magic pointers to specific
-domains, if we can?
+Agree for enabling, but for reporting we did consider adding a sysfs
+interface in /sys/class/iommu/ describing an IOMMU's properties. Then
+opted for VFIO capabilities to keep the API nice and contained, but if
+we're breaking up the API, sysfs might be more convenient to use and
+extend.
 
-And sure, the apicid_valid(32768) as a proxy for irq_remapping_enabled
-is a bit of an ugly trick. I suppose we can explicitly expose
-irq_remapping_enabled from drivers/iommu if we wanted to.
+> Then the tricky part comes with the remaining operations (3/4/5),
+> which are all backed by iommu_ops thus effective only within an 
+> IOMMU domain. To generalize them, the first thing is to find a way 
+> to associate the sva_FD (opened through generic /dev/sva) with an 
+> IOMMU domain that is created by VFIO/VDPA. The second thing is 
+> to replicate {domain<->device/subdevice} association in /dev/sva 
+> path because some operations (e.g. page fault) is triggered/handled 
+> per device/subdevice. Therefore, /dev/sva must provide both per-
+> domain and per-device uAPIs similar to what VFIO/VDPA already 
+> does. Moreover, mapping page fault to subdevice requires pre-
+> registering subdevice fault data to IOMMU layer when binding 
+> guest page table, while such fault data can be only retrieved from 
+> parent driver through VFIO/VDPA. 
+> 
+> However, we failed to find a good way even at the 1st step about
+> domain association. The iommu domains are not exposed to the
+> userspace, and there is no 1:1 mapping between domain and device.
+> In VFIO, all devices within the same VFIO container share the address
+> space but they may be organized in multiple IOMMU domains based
+> on their bus type. How (should we let) the userspace know the
+> domain information and open an sva_FD for each domain is the main
+> problem here.
+> 
+> In the end we just realized that doing such generalization doesn't
+> really lead to a clear design and instead requires tight coordination 
+> between /dev/sva and VFIO/VDPA for almost every new uAPI 
+> (especially about synchronization when the domain/device 
+> association is changed or when the device/subdevice is being reset/
+> drained). Finally it may become a usability burden to the userspace
+> on proper use of the two interfaces on the assigned device.
+>  
+> Based on above analysis we feel that just generalizing PASID mgmt.
+> might be a good thing to look at while the remaining operations are 
+> better being VFIO/VDPA specific uAPIs. anyway in concept those are 
+> just a subset of the page table management capabilities that an 
+> IOMMU domain affords. Since all other aspects of the IOMMU domain 
+> is managed by VFIO/VDPA already, continuing this path for new nesting
+> capability sounds natural. There is another option by generalizing the 
+> entire IOMMU domain management (sort of the entire vfio_iommu_
+> type1), but it's unclear whether such intrusive change is worthwhile 
+> (especially when VFIO/VDPA already goes different route even in legacy
+> mapping uAPI: map/unmap vs. IOTLB).
 
-> Having an explicit answer from the search for IR:
->=20
->     - Here is the domain
->     - Your device is not registered properly
->     - IR not enabled or not supported
->=20
-> is way more obvious than the above disguised is_remapping_enabled()
-> check.
+I agree with your analysis. A new coarse /dev/sva interface would need to
+carry all the VFIO abstractions of container (minus map/unmap) and
+group+device, which are not necessarily needed by VDPA and others, while
+the original VFIO interface needs to stay for compatibility. To me it
+makes more sense to extend each API separately, but have them embed common
+structures (bind/inval) and share some resources through external
+interfaces (IOASID, nesting properties, IOPF queue).
 
-I just don't even like thinking of it as a 'search for IR'.
-
-HPET shouldn't be caring about IR any more than PCI devices do. It just
-wants its parent irqdomain, that's all.
-
-For I/OAPIC there's the slight complexity that it does actually ack
-level-triggered interrupts differently when it's behind IR. But I don't
-think we need a whole separate irq_chip for that; surely it could be
-handled internally in ioapic_ack_level() ?=20
-
-Either way, even with that slight hack it's nicer to think of
-mp_irqdomain_create() just wanting to find its parent domain, without
-any special knowledge of IR and falling back to x86_parent_domain. The
-hack for IR level-ack is then self-contained.
-
---=-0Ie2CDTRpzf+UVyr1cMu
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDEzMTAxNTU5WjAvBgkqhkiG9w0BCQQxIgQgWUX5qbvYPqY6YSIsSbHrCFk2Iw83lylY3q1hQNk7
-rOUwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBACYZorhR3gCioIghnOFygqY5Js6J+i7wZFJ2L/z5spoCQO0Ssdb78YJTDPb9fPSF
-2UoIVyQIKxW/hTBbpFGkA/HVc7jQFaRunzVf4Nit5N6aAKBkpJTQEsFzeDm5SfV9vr+i2+Bjwq0N
-CMt9zCKFRrKAF1eRV6daZnvkIPECej7tYUieH3kYg1QPIWLLYCMTqxX+A8dZ91RSoWr+bPc89tTO
-0+Vl5rPlhDsfk0POz0SJanAWUu09sv4NVdgy2xEK+0IfAncuFqlXtJ9GM3etG8/HRcpb4l1x9jHS
-6y9kQxXI/NoCUdvz8OgRM6G5rrsJXh5AGa0cP2QSqZup2bQHYooAAAAAAAA=
-
-
---=-0Ie2CDTRpzf+UVyr1cMu--
-
+Thanks,
+Jean
