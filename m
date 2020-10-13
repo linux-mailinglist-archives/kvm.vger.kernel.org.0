@@ -2,57 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3438D28D4C6
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 21:42:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0438628D51F
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 22:02:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726400AbgJMTlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 15:41:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55994 "EHLO
+        id S1727962AbgJMUC2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 16:02:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728068AbgJMTlw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 15:41:52 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F42C0613D5
-        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 12:41:52 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id dt13so1403534ejb.12
-        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 12:41:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jlOzF1QhqikCoQxsvfJV6M6Hjgbrow9dB9uNs1AoGLE=;
-        b=kTjS5KS3nYcf/wrvTsuRt1BvzGw557kJOoPvyzYoBgiqb4b8bKtbI2/mMLiZYyRjFR
-         J9ydTuu0x47x+MEvbUBFhFH3/2QgRWgMVRtg9k6OLuYDe131Mp/cuPa30fJMGhSFjepr
-         cqBBXWNROTwzHkSN49lY/psarWhxU27El5EYWXEJaiWvhTqo66L6QK98x3Y0Yvi2nF9y
-         UTW/CUag9LBP+VfPW+1mn8JfLpPCSXoAzeg5FBjWoJMu0+7UEW9Ka5T8iigFwOd+JDvR
-         rrctnvxFOZW164mxjZq4IMmZGZxG4l2jAUbsCf6skOMzcKIRAwJ8OakZ/jL0rfexuXSd
-         7ngQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jlOzF1QhqikCoQxsvfJV6M6Hjgbrow9dB9uNs1AoGLE=;
-        b=ca3nbPF4ZR/zeI64Smz9tQZ+360t60Dwjs0t3t8MJibvvR/RpL4LLOy2UTHk5eH6d2
-         S8L7y/tseOXxB5l6n9Nd1I2z6CTAo8b2T+xgcVziyogndF/hVuqTjlC8bGBHwWoyYbY2
-         ADwqwjBug5hT5/vAgiwkS6JhMJjtfMLaZQRTI3LlT0kc1BN4Y1xje/hfOzCCRZFpB4oX
-         VAd9FQZNZCISng6jWeWZ1iT5XZYvOyW3g3+vRB6jGLzUO2BCb7ChcZMkk9laMXRzWJNr
-         HlQ7et4vRnc2Va/5LJB8xxFvzuhVMoB85vbTwY760IrqpOtiRD6ToUoW/mJDM3hgr4NS
-         HD7g==
-X-Gm-Message-State: AOAM5338DAUKPohk+LYqFP713xgqRcYEwXK3P2sMRIOeWhdP5NaYO8BV
-        vImD14DsOL+Yq9hFOIQkJsHWhrNb59PlvDq2TLK2zg==
-X-Google-Smtp-Source: ABdhPJxGxhMZ7o2BYtIDXOupUr3pSHVXck0tIwC9HMZ0nIbp0pU6AQKRljKqMwVkoxmX0BYp74elTVEnpYvo3LWFH24=
-X-Received: by 2002:a17:906:7e47:: with SMTP id z7mr1390518ejr.418.1602618108255;
- Tue, 13 Oct 2020 12:41:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201009195033.3208459-1-ira.weiny@intel.com> <20201009195033.3208459-34-ira.weiny@intel.com>
- <CAPcyv4gL3jfw4d+SJGPqAD3Dp4F_K=X3domuN4ndAA1FQDGcPg@mail.gmail.com> <20201013193643.GK20115@casper.infradead.org>
-In-Reply-To: <20201013193643.GK20115@casper.infradead.org>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 13 Oct 2020 12:41:36 -0700
-Message-ID: <CAPcyv4gL70FcLe8az7ezmpcZV=bG0Cka7daKWcCdmV4GoenSZw@mail.gmail.com>
-Subject: Re: [PATCH RFC PKS/PMEM 33/58] fs/cramfs: Utilize new kmap_thread()
+        with ESMTP id S1726763AbgJMUC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Oct 2020 16:02:28 -0400
+Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7997C061755;
+        Tue, 13 Oct 2020 13:02:27 -0700 (PDT)
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kSQUX-00H96b-NT; Tue, 13 Oct 2020 20:01:49 +0000
+Date:   Tue, 13 Oct 2020 21:01:49 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Matthew Wilcox <willy@infradead.org>
-Cc:     "Weiny, Ira" <ira.weiny@intel.com>,
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        "Weiny, Ira" <ira.weiny@intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -92,54 +60,56 @@ Cc:     "Weiny, Ira" <ira.weiny@intel.com>,
         xen-devel <xen-devel@lists.xenproject.org>,
         linux-cachefs@redhat.com, samba-technical@lists.samba.org,
         intel-wired-lan@lists.osuosl.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH RFC PKS/PMEM 33/58] fs/cramfs: Utilize new kmap_thread()
+Message-ID: <20201013200149.GI3576660@ZenIV.linux.org.uk>
+References: <20201009195033.3208459-1-ira.weiny@intel.com>
+ <20201009195033.3208459-34-ira.weiny@intel.com>
+ <CAPcyv4gL3jfw4d+SJGPqAD3Dp4F_K=X3domuN4ndAA1FQDGcPg@mail.gmail.com>
+ <20201013193643.GK20115@casper.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201013193643.GK20115@casper.infradead.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 13, 2020 at 12:37 PM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Tue, Oct 13, 2020 at 11:44:29AM -0700, Dan Williams wrote:
-> > On Fri, Oct 9, 2020 at 12:52 PM <ira.weiny@intel.com> wrote:
-> > >
-> > > From: Ira Weiny <ira.weiny@intel.com>
-> > >
-> > > The kmap() calls in this FS are localized to a single thread.  To avoid
-> > > the over head of global PKRS updates use the new kmap_thread() call.
-> > >
-> > > Cc: Nicolas Pitre <nico@fluxnic.net>
-> > > Signed-off-by: Ira Weiny <ira.weiny@intel.com>
-> > > ---
-> > >  fs/cramfs/inode.c | 10 +++++-----
-> > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
-> > > index 912308600d39..003c014a42ed 100644
-> > > --- a/fs/cramfs/inode.c
-> > > +++ b/fs/cramfs/inode.c
-> > > @@ -247,8 +247,8 @@ static void *cramfs_blkdev_read(struct super_block *sb, unsigned int offset,
-> > >                 struct page *page = pages[i];
-> > >
-> > >                 if (page) {
-> > > -                       memcpy(data, kmap(page), PAGE_SIZE);
-> > > -                       kunmap(page);
-> > > +                       memcpy(data, kmap_thread(page), PAGE_SIZE);
-> > > +                       kunmap_thread(page);
-> >
-> > Why does this need a sleepable kmap? This looks like a textbook
-> > kmap_atomic() use case.
->
-> There's a lot of code of this form.  Could we perhaps have:
->
+On Tue, Oct 13, 2020 at 08:36:43PM +0100, Matthew Wilcox wrote:
+
 > static inline void copy_to_highpage(struct page *to, void *vfrom, unsigned int size)
 > {
->         char *vto = kmap_atomic(to);
->
->         memcpy(vto, vfrom, size);
->         kunmap_atomic(vto);
+> 	char *vto = kmap_atomic(to);
+> 
+> 	memcpy(vto, vfrom, size);
+> 	kunmap_atomic(vto);
 > }
->
+> 
 > in linux/highmem.h ?
 
-Nice, yes, that could also replace the local ones in lib/iov_iter.c
-(memcpy_{to,from}_page())
+You mean, like
+static void memcpy_from_page(char *to, struct page *page, size_t offset, size_t len)
+{
+        char *from = kmap_atomic(page);
+        memcpy(to, from + offset, len);
+        kunmap_atomic(from);
+}
+
+static void memcpy_to_page(struct page *page, size_t offset, const char *from, size_t len)
+{
+        char *to = kmap_atomic(page);
+        memcpy(to + offset, from, len);
+        kunmap_atomic(to);
+}
+
+static void memzero_page(struct page *page, size_t offset, size_t len)
+{
+        char *addr = kmap_atomic(page);
+        memset(addr + offset, 0, len);
+        kunmap_atomic(addr);
+}
+
+in lib/iov_iter.c?  FWIW, I don't like that "highpage" in the name and
+highmem.h as location - these make perfect sense regardless of highmem;
+they are normal memory operations with page + offset used instead of
+a pointer...
