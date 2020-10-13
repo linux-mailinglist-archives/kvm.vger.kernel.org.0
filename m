@@ -2,124 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B323628D3EC
-	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 20:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFE8E28D453
+	for <lists+kvm@lfdr.de>; Tue, 13 Oct 2020 21:21:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732295AbgJMSon (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Oct 2020 14:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47168 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731649AbgJMSon (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Oct 2020 14:44:43 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9825C0613D7
-        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 11:44:42 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id p13so524680edi.7
-        for <kvm@vger.kernel.org>; Tue, 13 Oct 2020 11:44:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ACWQZXFIYAYZvPtA0kqqET9/h2VeNuWUmvFkuiSdGDk=;
-        b=DayNIijN9rJ4wynxycYBrXAQR84x3xjByl1z2VFzt7YCa69TNkAlkIdWKG0xwP6Yp3
-         3F/H2nz44gihJO9JHyXWzYL4P1dc46CKqiaNR3yRo/w37eMMjkAo/koyRg9J9cet4J5o
-         8pAZLke452kN1ce4bdWIlGHc47qEL6KSVsDbeqJDAMDzDUrFyC9OKIrNu9C/VaSoREWg
-         9B9an2yfiyuzSelcHqdOabrCOxSG6vx+IObNMb98zyieMNME4f/11W7Es7O7m/+Kevvk
-         a0bkM4fWgVplo/2Lunr6iSwR8tSVOWAyX1+gyP4UJdvdg+R8/4qIc/xXlFMWt9dzq4A3
-         WVxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ACWQZXFIYAYZvPtA0kqqET9/h2VeNuWUmvFkuiSdGDk=;
-        b=D+PbtaLvLpgvwJxUn93sWRuqxmUXg1sSd+nRpPA+lAaWBPjzxyRL+/jTzeh7WGiLv0
-         xxkxKYgfRR3NHqmfrdKPZqcBT9uPk9JlwxsMTUmoNzxwUA+cYvXWYmUMgrPRX/8lcsfA
-         Yof2mFjj2L7vvxwu1K9C0dxLocdavk3jWofn/Y1vCiMmsPk1Buzq+xWUOr6XveYiE5TC
-         s+WAIKt2lfEY3d4HbCG6caUVAtbesLpH6bnD3NwjnxQGHHFgMV6oOAoB8iIBACHUbCn5
-         /WZHP3o0EdHp+4LcErU8oNOdneGS9peAYNRu1XFwbgBwi4GkhiD/Ant8cAx2BwfLFphK
-         N6BA==
-X-Gm-Message-State: AOAM530gaEBxP4ISmqX6ZwG4+wA5l8RBXMkjcqTd+N8D0KHb+fR+fvlp
-        8RX2ZfzAiVTpMfzvAX0cHJJ3hvijvHySrHIE2ohMJg==
-X-Google-Smtp-Source: ABdhPJx/D4CFI8iBKDneanR6scqyHSM4b5ae7bBsGU7JbHG59bZqw8grXz+3fxsJ2hpJPfBR1HipQc3XH+/A2xgb2Ys=
-X-Received: by 2002:a50:8e1e:: with SMTP id 30mr1027503edw.354.1602614681174;
- Tue, 13 Oct 2020 11:44:41 -0700 (PDT)
+        id S1732445AbgJMTVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Oct 2020 15:21:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23859 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726279AbgJMTVH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Oct 2020 15:21:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602616866;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8nvgtXTquS8dzOFxzvVIFZBcvvmF0cQfNkdQi9WaUQQ=;
+        b=VkhqX+b44kLWCXlvfiuVgrh+rYWOK/hd5Bm9//p9V/75EAVK50uXKBSV8aYWNLjtwCOhUE
+        adBaP6jaWPK8hJjXvqCZKp1CUXwwICNrqpJjvoPuBhA57uxpb7g+z000uqPza5aEs6lU/k
+        AnWvCNNfB+bxAEPD4P2qjUKBKkRhEME=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-zsrMlvLSP-e-lM1eucPdmg-1; Tue, 13 Oct 2020 15:21:04 -0400
+X-MC-Unique: zsrMlvLSP-e-lM1eucPdmg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12F01802B7C;
+        Tue, 13 Oct 2020 19:21:03 +0000 (UTC)
+Received: from w520.home (ovpn-113-35.phx2.redhat.com [10.3.113.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B486127C21;
+        Tue, 13 Oct 2020 19:21:02 +0000 (UTC)
+Date:   Tue, 13 Oct 2020 13:21:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Diana Craciun <diana.craciun@oss.nxp.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        laurentiu.tudor@nxp.com
+Subject: Re: [PATCH v2] vfio/fsl-mc: Fixed vfio-fsl-mc driver compilation on
+ 32 bit
+Message-ID: <20201013132102.57e431ba@w520.home>
+In-Reply-To: <20201013150651.12808-1-diana.craciun@oss.nxp.com>
+References: <20201013150651.12808-1-diana.craciun@oss.nxp.com>
 MIME-Version: 1.0
-References: <20201009195033.3208459-1-ira.weiny@intel.com> <20201009195033.3208459-34-ira.weiny@intel.com>
-In-Reply-To: <20201009195033.3208459-34-ira.weiny@intel.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 13 Oct 2020 11:44:29 -0700
-Message-ID: <CAPcyv4gL3jfw4d+SJGPqAD3Dp4F_K=X3domuN4ndAA1FQDGcPg@mail.gmail.com>
-Subject: Re: [PATCH RFC PKS/PMEM 33/58] fs/cramfs: Utilize new kmap_thread()
-To:     "Weiny, Ira" <ira.weiny@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Nicolas Pitre <nico@fluxnic.net>, X86 ML <x86@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>, linux-kselftest@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, bpf@vger.kernel.org,
-        Kexec Mailing List <kexec@lists.infradead.org>,
-        linux-bcache@vger.kernel.org, linux-mtd@lists.infradead.org,
-        devel@driverdev.osuosl.org, linux-efi <linux-efi@vger.kernel.org>,
-        linux-mmc@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>,
-        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        linux-ext4 <linux-ext4@vger.kernel.org>, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
-        reiserfs-devel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
-        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-afs@lists.infradead.org,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, intel-gfx@lists.freedesktop.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        xen-devel <xen-devel@lists.xenproject.org>,
-        linux-cachefs@redhat.com, samba-technical@lists.samba.org,
-        intel-wired-lan@lists.osuosl.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 9, 2020 at 12:52 PM <ira.weiny@intel.com> wrote:
->
-> From: Ira Weiny <ira.weiny@intel.com>
->
-> The kmap() calls in this FS are localized to a single thread.  To avoid
-> the over head of global PKRS updates use the new kmap_thread() call.
->
-> Cc: Nicolas Pitre <nico@fluxnic.net>
-> Signed-off-by: Ira Weiny <ira.weiny@intel.com>
-> ---
->  fs/cramfs/inode.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
-> index 912308600d39..003c014a42ed 100644
-> --- a/fs/cramfs/inode.c
-> +++ b/fs/cramfs/inode.c
-> @@ -247,8 +247,8 @@ static void *cramfs_blkdev_read(struct super_block *sb, unsigned int offset,
->                 struct page *page = pages[i];
->
->                 if (page) {
-> -                       memcpy(data, kmap(page), PAGE_SIZE);
-> -                       kunmap(page);
-> +                       memcpy(data, kmap_thread(page), PAGE_SIZE);
-> +                       kunmap_thread(page);
+On Tue, 13 Oct 2020 18:06:51 +0300
+Diana Craciun <diana.craciun@oss.nxp.com> wrote:
 
-Why does this need a sleepable kmap? This looks like a textbook
-kmap_atomic() use case.
+> The FSL_MC_BUS on which the VFIO-FSL-MC driver is dependent on
+> can be compiled on other architectures as well (not only ARM64)
+> including 32 bit architectures.
+> Include linux/io-64-nonatomic-hi-lo.h to make writeq/readq used
+> in the driver available on 32bit platforms.
+> 
+> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
+> ---
+> v1 --> v2
+>  - Added prefix to patch description
+> 
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> index d009f873578c..80fc7f4ed343 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/vfio.h>
+>  #include <linux/fsl/mc.h>
+>  #include <linux/delay.h>
+> +#include <linux/io-64-nonatomic-hi-lo.h>
+>  
+>  #include "vfio_fsl_mc_private.h"
+>  
+
+Thanks, applied and pushed to next.  Hopefully it's either this or the
+merge ordering biting us with linux-next.  Thanks,
+
+Alex
+
