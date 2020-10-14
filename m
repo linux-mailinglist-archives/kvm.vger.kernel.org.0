@@ -2,99 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C00C828DC59
-	for <lists+kvm@lfdr.de>; Wed, 14 Oct 2020 11:06:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41B6528DE44
+	for <lists+kvm@lfdr.de>; Wed, 14 Oct 2020 12:07:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728292AbgJNJFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Oct 2020 05:05:35 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:65507 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbgJNJFe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Oct 2020 05:05:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1602666335; x=1634202335;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=y4uF4ZEBK32Jc4xw6gI6FEIourHHlYCRqz8nki0gYyI=;
-  b=qOkMFX5sufrRtwI98Q7oKihHHXk37ODwvS3A6bG83oyN/IH2ycib0lcC
-   Q2oxQIV+Cy0C5pQbEnXqWfgUwEYH0txiSN45eecLiplhhORP/4moc1i+u
-   /CRwTHoO9JFt68ueghICBuh2Ugl5sx94+Wr3LvJHmflQd9DIDH7LUsGgj
-   I=;
-X-IronPort-AV: E=Sophos;i="5.77,374,1596499200"; 
-   d="scan'208";a="83212214"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 14 Oct 2020 09:05:21 +0000
-Received: from EX13D16EUB003.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com (Postfix) with ESMTPS id 10167A2236;
-        Wed, 14 Oct 2020 09:05:16 +0000 (UTC)
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.71) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 14 Oct 2020 09:05:06 +0000
-From:   Andra Paraschiv <andraprs@amazon.com>
-To:     linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "David Duncan" <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Karen Noel <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v1] nitro_enclaves: Fixup type of the poll result assigned value
-Date:   Wed, 14 Oct 2020 12:05:00 +0300
-Message-ID: <20201014090500.75678-1-andraprs@amazon.com>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
+        id S1728925AbgJNKHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Oct 2020 06:07:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52092 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725985AbgJNKHR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Oct 2020 06:07:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602670035;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=D5KqYEUpfycrQPhzEmIDML2TPVxdekkeeWQmKWvWXAo=;
+        b=OOeAam359ErtXF3/0bSrVsJmcGvBWcbKijqJqAyBFsfFx8rXW/fBbCQdF1I18aBoLJu9NM
+        94r9wCzE/uU0+c5WOL6vQl3l9kw/xGo1g0vxa6XFyiFPo+KiXf8jd/L5kzV88/ceNT6cPd
+        Pj6rWoVe34d8APTU1B30L0sj0FBfSbw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-221-wwy8auPNM-WqgPCwHeU1sQ-1; Wed, 14 Oct 2020 06:07:12 -0400
+X-MC-Unique: wwy8auPNM-WqgPCwHeU1sQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 033068BAF69;
+        Wed, 14 Oct 2020 10:07:05 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EA9EF7B7A9;
+        Wed, 14 Oct 2020 10:06:59 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: VMX: eVMCS: make evmcs_sanitize_exec_ctrls() work again
+Date:   Wed, 14 Oct 2020 12:06:58 +0200
+Message-Id: <20201014100658.2346024-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.43.161.71]
-X-ClientProxiedBy: EX13D43UWC001.ant.amazon.com (10.43.162.69) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the assigned value of the poll result to be EPOLLHUP instead of
-POLLHUP to match the __poll_t type.
+It was noticed that evmcs_sanitize_exec_ctrls() is not being executed
+nowadays despite the code checking 'enable_evmcs' static key looking
+correct. Turns out, static key magic doesn't work in '__init' section
+(and it is unclear when things changed) but setup_vmcs_config() is called
+only once per CPU so we don't really need it to. Switch to checking
+'enlightened_vmcs' instead, it is supposed to be in sync with
+'enable_evmcs'.
 
-Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-Reported-by: kernel test robot <lkp@intel.com>
+Opportunistically make evmcs_sanitize_exec_ctrls '__init' and drop unneeded
+extra newline from it.
+
+Reported-by: Yang Weijiang <weijiang.yang@intel.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- drivers/virt/nitro_enclaves/ne_misc_dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/vmx/evmcs.c | 3 +--
+ arch/x86/kvm/vmx/evmcs.h | 2 +-
+ arch/x86/kvm/vmx/vmx.c   | 2 +-
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-index f06622b48d69..9148566455e8 100644
---- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
-+++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-@@ -1508,7 +1508,7 @@ static __poll_t ne_enclave_poll(struct file *file, poll_table *wait)
- 	if (!ne_enclave->has_event)
- 		return mask;
+diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+index e5325bd0f304..f3199bb02f22 100644
+--- a/arch/x86/kvm/vmx/evmcs.c
++++ b/arch/x86/kvm/vmx/evmcs.c
+@@ -297,14 +297,13 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
+ };
+ const unsigned int nr_evmcs_1_fields = ARRAY_SIZE(vmcs_field_to_evmcs_1);
  
--	mask = POLLHUP;
-+	mask = EPOLLHUP;
+-void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
++__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
+ {
+ 	vmcs_conf->pin_based_exec_ctrl &= ~EVMCS1_UNSUPPORTED_PINCTRL;
+ 	vmcs_conf->cpu_based_2nd_exec_ctrl &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
  
- 	return mask;
+ 	vmcs_conf->vmexit_ctrl &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
+ 	vmcs_conf->vmentry_ctrl &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
+-
  }
+ #endif
+ 
+diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+index e5f7a7ebf27d..3333326b3702 100644
+--- a/arch/x86/kvm/vmx/evmcs.h
++++ b/arch/x86/kvm/vmx/evmcs.h
+@@ -185,7 +185,7 @@ static inline void evmcs_load(u64 phys_addr)
+ 	vp_ap->enlighten_vmentry = 1;
+ }
+ 
+-void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
++__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
+ #else /* !IS_ENABLED(CONFIG_HYPERV) */
+ static inline void evmcs_write64(unsigned long field, u64 value) {}
+ static inline void evmcs_write32(unsigned long field, u32 value) {}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 96979c09ebd1..d529349d9b33 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2607,7 +2607,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	vmcs_conf->vmexit_ctrl         = _vmexit_control;
+ 	vmcs_conf->vmentry_ctrl        = _vmentry_control;
+ 
+-	if (static_branch_unlikely(&enable_evmcs))
++	if (enlightened_vmcs)
+ 		evmcs_sanitize_exec_ctrls(vmcs_conf);
+ 
+ 	return 0;
 -- 
-2.20.1 (Apple Git-117)
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
+2.25.4
 
