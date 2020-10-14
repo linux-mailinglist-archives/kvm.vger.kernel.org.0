@@ -2,108 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C4CB28DB8B
-	for <lists+kvm@lfdr.de>; Wed, 14 Oct 2020 10:31:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C00C828DC59
+	for <lists+kvm@lfdr.de>; Wed, 14 Oct 2020 11:06:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729378AbgJNI3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Oct 2020 04:29:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54017 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728325AbgJNI3e (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Oct 2020 04:29:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602664175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ay2KiFfdQQ+ULyuVIu9EMCKBauoiTeJO7YqRn+3s6dY=;
-        b=TGnXIbhWrHL284tqBREYU7Tlm0+NCDL5pTOmhCOdxq9gAyIl0HDsmNrIDx2NhR1hTyBnLj
-        kW4cteozbjSa/dTgVEXqs9+71fOmB8R4Nhmqc79ut5Y1j7wkQo6VqWjvziw/GBHLQ9j15a
-        Ewep7uF7k9S/QgkS5fwd9s49AtD1bLc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-578-GaK5RsY_NDu5mWnq1vJ9EQ-1; Wed, 14 Oct 2020 04:29:34 -0400
-X-MC-Unique: GaK5RsY_NDu5mWnq1vJ9EQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC47D879528;
-        Wed, 14 Oct 2020 08:29:32 +0000 (UTC)
-Received: from starship (unknown [10.35.206.248])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AF131610F3;
-        Wed, 14 Oct 2020 08:29:24 +0000 (UTC)
-Message-ID: <a4f3816dab09f4e28e33c66b8ff8273147415567.camel@redhat.com>
-Subject: Re: Why guest physical addresses are not the same as the
- corresponding host virtual addresses in QEMU/KVM? Thanks!
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     harry harry <hiharryharryharry@gmail.com>,
+        id S1728292AbgJNJFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Oct 2020 05:05:35 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:65507 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726032AbgJNJFe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Oct 2020 05:05:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1602666335; x=1634202335;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=y4uF4ZEBK32Jc4xw6gI6FEIourHHlYCRqz8nki0gYyI=;
+  b=qOkMFX5sufrRtwI98Q7oKihHHXk37ODwvS3A6bG83oyN/IH2ycib0lcC
+   Q2oxQIV+Cy0C5pQbEnXqWfgUwEYH0txiSN45eecLiplhhORP/4moc1i+u
+   /CRwTHoO9JFt68ueghICBuh2Ugl5sx94+Wr3LvJHmflQd9DIDH7LUsGgj
+   I=;
+X-IronPort-AV: E=Sophos;i="5.77,374,1596499200"; 
+   d="scan'208";a="83212214"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 14 Oct 2020 09:05:21 +0000
+Received: from EX13D16EUB003.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com (Postfix) with ESMTPS id 10167A2236;
+        Wed, 14 Oct 2020 09:05:16 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.71) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 14 Oct 2020 09:05:06 +0000
+From:   Andra Paraschiv <andraprs@amazon.com>
+To:     linux-kernel <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "David Duncan" <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     qemu-devel@nongnu.org, mathieu.tarral@protonmail.com,
-        stefanha@redhat.com, libvir-list@redhat.com, kvm@vger.kernel.org
-Date:   Wed, 14 Oct 2020 11:29:23 +0300
-In-Reply-To: <CA+-xGqOMKRh+_5vYXeLOiGnTMw4L_gUccqdQ+HGSOzuTosp6tw@mail.gmail.com>
-References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
-         <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
-         <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
-         <20201012165428.GD26135@linux.intel.com>
-         <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
-         <20201013045245.GA11344@linux.intel.com>
-         <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
-         <CA+-xGqMMa-DB1SND5MRugusDafjNA9CVw-=OBK7q=CK1impmTQ@mail.gmail.com>
-         <a163c2d8-d8a1-dc03-6230-a2e104e3b039@redhat.com>
-         <CA+-xGqOMKRh+_5vYXeLOiGnTMw4L_gUccqdQ+HGSOzuTosp6tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>,
+        Andra Paraschiv <andraprs@amazon.com>
+Subject: [PATCH v1] nitro_enclaves: Fixup type of the poll result assigned value
+Date:   Wed, 14 Oct 2020 12:05:00 +0300
+Message-ID: <20201014090500.75678-1-andraprs@amazon.com>
+X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 MIME-Version: 1.0
+X-Originating-IP: [10.43.161.71]
+X-ClientProxiedBy: EX13D43UWC001.ant.amazon.com (10.43.162.69) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2020-10-13 at 16:36 -0400, harry harry wrote:
-> Hi Paolo and Sean,
-> 
-> Thanks much for your prompt replies and clear explanations.
-> 
-> On Tue, Oct 13, 2020 at 2:43 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > No, the logic to find the HPA with a given HVA is the same as the
-> > hardware logic to translate HVA -> HPA.  That is it uses the host
-> > "regular" page tables, not the nested page tables.
-> > 
-> > In order to translate GPA to HPA, instead, KVM does not use the nested
-> > page tables.
-> 
-> I am curious why KVM does not directly use GPAs as HVAs and leverage
-> nested page tables to translate HVAs (i.e., GPAs) to HPAs? Is that
-> because 1) the hardware logic of ``GPA -> [extended/nested page
-> tables] -> HPA[*]'' is different[**] from the hardware logic of ``HVA
-> -> [host regular page tables] -> HPA''; 2) if 1) is true, it is
-> natural to reuse Linux's original functionality to translate HVAs to
-> HPAs through regular page tables.
-I would like to emphisise again. The HVA space is not fully free when a guest starts,
-since it contains qemu's heap, code, data, and whatever qemu needs. However guest't
-GPA address space must be allocated fully. E.g if qemu heap starts at 0x40000,
-then guest can't have physical memory at 0x40000 following your suggestion, which
-is wrong. It can be in theory done by blacklisting these areas via ACPI/BIOS provided
-memory map, but that would be very very difficult to maintain and not worth it.
+Update the assigned value of the poll result to be EPOLLHUP instead of
+POLLHUP to match the __poll_t type.
 
-Best regards,
-	Maxim Levitsky
+Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+Reported-by: kernel test robot <lkp@intel.com>
+---
+ drivers/virt/nitro_enclaves/ne_misc_dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> [*]: Here, the translation means the last step for MMU to translate a
-> GVA's corresponding GPA to an HPA through the extended/nested page
-> tables.
-> [**]: To my knowledge, the hardware logic of ``GPA -> [extended/nested
-> page tables] -> HPA'' seems to be the same as the hardware logic of
-> ``HVA -> [host regular page tables] -> HPA''. I appreciate it if you
-> could point out the differences I ignored. Thanks!
-> 
-> Best,
-> Harry
-> 
+diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+index f06622b48d69..9148566455e8 100644
+--- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
++++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+@@ -1508,7 +1508,7 @@ static __poll_t ne_enclave_poll(struct file *file, poll_table *wait)
+ 	if (!ne_enclave->has_event)
+ 		return mask;
+ 
+-	mask = POLLHUP;
++	mask = EPOLLHUP;
+ 
+ 	return mask;
+ }
+-- 
+2.20.1 (Apple Git-117)
 
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
 
