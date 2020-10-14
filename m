@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 558F928E651
-	for <lists+kvm@lfdr.de>; Wed, 14 Oct 2020 20:27:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C460728E652
+	for <lists+kvm@lfdr.de>; Wed, 14 Oct 2020 20:28:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389350AbgJNS1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Oct 2020 14:27:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40206 "EHLO
+        id S2389292AbgJNS1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Oct 2020 14:27:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389426AbgJNS1s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Oct 2020 14:27:48 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF76C0613D8
-        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 11:27:34 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id m126so349133qkd.13
-        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 11:27:34 -0700 (PDT)
+        with ESMTP id S2389380AbgJNS1q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Oct 2020 14:27:46 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D552C0613DC
+        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 11:27:35 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id w13so54868plq.20
+        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 11:27:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=784t8a81EqGn9vK4Ge4RJ0ESjE9KKEOgOyqmynlKty8=;
-        b=s0GCOtZv55Gjd1XHXBNohAfLhPXXnWUIpl5wRjQa0+qx7m9d24d8lNaf2d5GleFDYx
-         FleZ1dK7ZTfsCYqTl3v8ni6T9+4V+z2sDpnoQRfG2nA/pIO4I4vguFIGpMIQZdbmggBo
-         87aIbQ3ugz5pmTHQDNkNwjji7NWAj9QFs4HvpHNHsVtEzowDK/n+MXtcofriSQVxpBCz
-         AOF1ImkpJ3oHPXTl5IyeBlaNcRU0Mph+k+mCNJtE1a7dwdvyHgrYkHPvK3lkbAxzgd70
-         xLH0KM8bpSCr+0Q9RXVm88RwpmUaA48qFNld6VHL5c2f2OSaDu506sYRjPsZkCnaJrA+
-         Oy6A==
+        bh=NfhHIv01r/iE20pouU33Lbt4LnC3KxWGgnbW83wgNA4=;
+        b=b37+flGVdYc9pMf69O6wTflTQ0F23977EsCnDucMNS2a/nbjlnWlMyF2a7QyV9jcTH
+         yKPRrJcQNLnWU7fQgXg9qz5jDCgwDx8YvqgFI4WqCZHKhnPvd8QueGefDAYtL0x7LUHC
+         38NHii5LekFJL+HhAfxerFLEDaVDwD8OxL4ilLR4rLNGRgX3Cz4qDy+56R7hQOpJLnn1
+         zj/Rsz8c5lDdBBN35eGshLjX5mWgp8MELqwI+Beqho3sPOOE0QA/dxvIeWJmmYf3xuYx
+         swmPZnCQXCcaFHreu7dFdsq+lyq+fxMuldXyYaSUbVZxAyaWDIazrdMxis1X8kH/xoYK
+         ViWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=784t8a81EqGn9vK4Ge4RJ0ESjE9KKEOgOyqmynlKty8=;
-        b=rCNLJHN846NF76YBcpJ9GF55JiT2pez1ygzVkv3HYFhXoE5AROdIaNojxP8LUjnmEJ
-         sG/AfkmPpR8wRQdWkETgMRj0ohkte3qvTtw6u9jdPjLS+2mM7bD64B7ZTxWhx2yCJ3fv
-         tT2IUuQpo3kpk85LTu1aq3kQUZ1sLtDKfsYHdF9uC/6d34xLIS0sld440u+UZG4Iwr5w
-         PlWZKG/h7ohsLtjinDL2sjA6k8Mk5zFNARgB31AL1O6JQljUzrTieBJc8xDcxmLwGysd
-         hGq10FMBo0lNXPno4uqS/mJMohAIUeibdWwbKls8/j8ntxPjOA5ho5uLl3243+KOwOzW
-         6u3g==
-X-Gm-Message-State: AOAM5331noqxDJ5WiYLIfeL2QG/B2Yi6ACLG5R5oPwUyU1BLI3gogRlW
-        qndAkGv3eb2lN62A/eMUliYATSiA1oAG
-X-Google-Smtp-Source: ABdhPJz0zfyLeokjzsNy8itq7rVjzagA+2DwEboiDW0FQFTIsV+gGl/ieGnSnFL25RShz2/4Btae//px32HM
+        bh=NfhHIv01r/iE20pouU33Lbt4LnC3KxWGgnbW83wgNA4=;
+        b=XOFIz4vK4W0qkyFntpRhPSFsi0krTxyE9r379mnw4OwPIzOxpAjRPsqVt0+uopvXvd
+         NVZvBPpfDfuCyvZKYo3GcHZ0G6KzP6mB/ZUPCSsTjvg112okVinYaUQcUW8oyGVRfIj8
+         ZqDzZD83rD9Z5dIbgImYRCz+m4gRKKJ7/rAuNi5PvSzlVhFz9Nqcx4swieql5bXtDVoU
+         bT0LkvCY30WcJQteJEK3Qdrh5bUqpYvvKqaA2BHZhtubdepRz3q0do3BlJyeQpJBNO0N
+         q1e0U+87JP259DJHx8jDKr8jk5uU1FAMVnoF6oGU1LzTgRN7Hv7aI8Sm6KJ2KXTEhqsP
+         nJYA==
+X-Gm-Message-State: AOAM531h/S0UchMbm318amecYUZGFwEQQTDAx6gGE3V974eIXHso9nj2
+        gNZtWJmjl+cFjTySQPqsGdh3J8l2SNJ7
+X-Google-Smtp-Source: ABdhPJwh+4pXkt1KDW+/VoCNIzHgIyI4NOVovjSw8yRkOVMMgj+zgajSBgIoPeCREGWWy0ljrAsA/FfWvD7z
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a0c:9e0e:: with SMTP id
- p14mr547966qve.25.1602700053163; Wed, 14 Oct 2020 11:27:33 -0700 (PDT)
-Date:   Wed, 14 Oct 2020 11:26:56 -0700
+ (user=bgardon job=sendgmr) by 2002:a63:570d:: with SMTP id
+ l13mr242121pgb.172.1602700055147; Wed, 14 Oct 2020 11:27:35 -0700 (PDT)
+Date:   Wed, 14 Oct 2020 11:26:57 -0700
 In-Reply-To: <20201014182700.2888246-1-bgardon@google.com>
-Message-Id: <20201014182700.2888246-17-bgardon@google.com>
+Message-Id: <20201014182700.2888246-18-bgardon@google.com>
 Mime-Version: 1.0
 References: <20201014182700.2888246-1-bgardon@google.com>
 X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v2 16/20] kvm: x86/mmu: Support disabling dirty logging for
- the tdp MMU
+Subject: [PATCH v2 17/20] kvm: x86/mmu: Support write protection for nesting
+ in tdp MMU
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Cannon Matthews <cannonmatthews@google.com>,
@@ -73,12 +73,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dirty logging ultimately breaks down MMU mappings to 4k granularity.
-When dirty logging is no longer needed, these granaular mappings
-represent a useless performance penalty. When dirty logging is disabled,
-search the paging structure for mappings that could be re-constituted
-into a large page mapping. Zap those mappings so that they can be
-faulted in again at a higher mapping level.
+To support nested virtualization, KVM will sometimes need to write
+protect pages which are part of a shadowed paging structure or are not
+writable in the shadowed paging structure. Add a function to write
+protect GFN mappings for this purpose.
 
 Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
 machine. This series introduced no new failures.
@@ -88,102 +86,95 @@ This series can be viewed in Gerrit at:
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  3 ++
- arch/x86/kvm/mmu/tdp_mmu.c | 59 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.h |  2 ++
- 3 files changed, 64 insertions(+)
+ arch/x86/kvm/mmu/mmu.c     |  4 +++
+ arch/x86/kvm/mmu/tdp_mmu.c | 50 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.h |  3 +++
+ 3 files changed, 57 insertions(+)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b2ce57761d2f1..8fcf5e955c475 100644
+index 8fcf5e955c475..58d2412817c87 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5918,6 +5918,9 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 	spin_lock(&kvm->mmu_lock);
- 	slot_handle_leaf(kvm, (struct kvm_memory_slot *)memslot,
- 			 kvm_mmu_zap_collapsible_spte, true);
-+
+@@ -1553,6 +1553,10 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 		write_protected |= __rmap_write_protect(kvm, rmap_head, true);
+ 	}
+ 
 +	if (kvm->arch.tdp_mmu_enabled)
-+		kvm_tdp_mmu_zap_collapsible_sptes(kvm, memslot);
- 	spin_unlock(&kvm->mmu_lock);
++		write_protected |=
++			kvm_tdp_mmu_write_protect_gfn(kvm, slot, gfn);
++
+ 	return write_protected;
  }
  
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 099c7d68aeb1d..94624cc1df84c 100644
+index 94624cc1df84c..c471f2e977d11 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1019,3 +1019,62 @@ bool kvm_tdp_mmu_slot_set_dirty(struct kvm *kvm, struct kvm_memory_slot *slot)
- 	return spte_set;
+@@ -1078,3 +1078,53 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+ 		put_tdp_mmu_root(kvm, root);
+ 	}
  }
- 
++
 +/*
-+ * Clear non-leaf entries (and free associated page tables) which could
-+ * be replaced by large mappings, for GFNs within the slot.
++ * Removes write access on the last level SPTE mapping this GFN and unsets the
++ * SPTE_MMU_WRITABLE bit to ensure future writes continue to be intercepted.
++ * Returns true if an SPTE was set and a TLB flush is needed.
 + */
-+static void zap_collapsible_spte_range(struct kvm *kvm,
-+				       struct kvm_mmu_page *root,
-+				       gfn_t start, gfn_t end)
++static bool write_protect_gfn(struct kvm *kvm, struct kvm_mmu_page *root,
++			      gfn_t gfn)
 +{
 +	struct tdp_iter iter;
-+	kvm_pfn_t pfn;
++	u64 new_spte;
 +	bool spte_set = false;
 +
-+	tdp_root_for_each_pte(iter, root, start, end) {
-+		if (!is_shadow_present_pte(iter.old_spte) ||
-+		    is_last_spte(iter.old_spte, iter.level))
-+			continue;
++	tdp_root_for_each_leaf_pte(iter, root, gfn, gfn + 1) {
++		if (!is_writable_pte(iter.old_spte))
++			break;
 +
-+		pfn = spte_to_pfn(iter.old_spte);
-+		if (kvm_is_reserved_pfn(pfn) ||
-+		    !PageTransCompoundMap(pfn_to_page(pfn)))
-+			continue;
++		new_spte = iter.old_spte &
++			~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
 +
-+		tdp_mmu_set_spte(kvm, &iter, 0);
++		tdp_mmu_set_spte(kvm, &iter, new_spte);
 +		spte_set = true;
-+
-+		spte_set = !tdp_mmu_iter_cond_resched(kvm, &iter);
 +	}
 +
-+	if (spte_set)
-+		kvm_flush_remote_tlbs(kvm);
++	return spte_set;
 +}
 +
 +/*
-+ * Clear non-leaf entries (and free associated page tables) which could
-+ * be replaced by large mappings, for GFNs within the slot.
++ * Removes write access on the last level SPTE mapping this GFN and unsets the
++ * SPTE_MMU_WRITABLE bit to ensure future writes continue to be intercepted.
++ * Returns true if an SPTE was set and a TLB flush is needed.
 + */
-+void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
-+				       const struct kvm_memory_slot *slot)
++bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
++				   struct kvm_memory_slot *slot, gfn_t gfn)
 +{
 +	struct kvm_mmu_page *root;
 +	int root_as_id;
++	bool spte_set = false;
 +
++	lockdep_assert_held(&kvm->mmu_lock);
 +	for_each_tdp_mmu_root(kvm, root) {
 +		root_as_id = kvm_mmu_page_as_id(root);
 +		if (root_as_id != slot->as_id)
 +			continue;
 +
-+		/*
-+		 * Take a reference on the root so that it cannot be freed if
-+		 * this thread releases the MMU lock and yields in this loop.
-+		 */
-+		get_tdp_mmu_root(kvm, root);
-+
-+		zap_collapsible_spte_range(kvm, root, slot->base_gfn,
-+					   slot->base_gfn + slot->npages);
-+
-+		put_tdp_mmu_root(kvm, root);
++		spte_set = write_protect_gfn(kvm, root, gfn) || spte_set;
 +	}
++	return spte_set;
 +}
++
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index add8bb97c56dd..dc4cdc5cc29f5 100644
+index dc4cdc5cc29f5..b66283db43221 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.h
 +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -38,4 +38,6 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 				       gfn_t gfn, unsigned long mask,
- 				       bool wrprot);
+@@ -40,4 +40,7 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
  bool kvm_tdp_mmu_slot_set_dirty(struct kvm *kvm, struct kvm_memory_slot *slot);
-+void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
-+				       const struct kvm_memory_slot *slot);
+ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+ 				       const struct kvm_memory_slot *slot);
++
++bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
++				   struct kvm_memory_slot *slot, gfn_t gfn);
  #endif /* __KVM_X86_MMU_TDP_MMU_H */
 -- 
 2.28.0.1011.ga647a8990f-goog
