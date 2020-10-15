@@ -2,356 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6351728ED53
-	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 09:02:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26FD028EDED
+	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 09:53:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbgJOHCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Oct 2020 03:02:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48922 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725208AbgJOHCn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 03:02:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602745360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vBCSmFMJY7igQRLgMbhUKDh37OLKPTQK/eIJaLN2QF8=;
-        b=QCBg9UIQ0CZ0ewhRvJ6m3bhh0+pMqToKBWjk1Wp6llo8ttIc9viFtpNMfqSVim/HzNkinM
-        68Dh2fn6Qjodn7AcRt0lZeQh/1HSQk+tp4JXAKjJ7Yb+en23DvEPdf++d6ze9SMUyTgROQ
-        uqT+BY6q23gkGRabgbRI1Cj0vRnmn+o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-nwF8bSNBMi-WVu0diFEL5g-1; Thu, 15 Oct 2020 03:02:39 -0400
-X-MC-Unique: nwF8bSNBMi-WVu0diFEL5g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7EDA1018F7E;
-        Thu, 15 Oct 2020 07:02:36 +0000 (UTC)
-Received: from [10.72.13.96] (ovpn-13-96.pek2.redhat.com [10.72.13.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B65F1002382;
-        Thu, 15 Oct 2020 07:02:18 +0000 (UTC)
-Subject: Re: (proposal) RE: [PATCH v7 00/16] vfio: expose virtual Shared
- Virtual Addressing to VMs
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <MWHPR11MB1645CFB0C594933E92A844AC8C070@MWHPR11MB1645.namprd11.prod.outlook.com>
- <45faf89a-0a40-2a7a-0a76-d7ba76d0813b@redhat.com>
- <MWHPR11MB1645CF252CF3493F4A9487508C050@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20201014171055.328a52f4@w520.home>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <543c3994-5baf-f9ff-a4ae-f4df499c8d6c@redhat.com>
-Date:   Thu, 15 Oct 2020 15:02:16 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1729772AbgJOHw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Oct 2020 03:52:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52060 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728407AbgJOHw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Oct 2020 03:52:57 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB35C0613D4
+        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 00:52:57 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id h10so2159426oie.5
+        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 00:52:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dhgu0dLDhdQohJO0sNuXaA2MoyXlGux/K8QZDPyJw6s=;
+        b=NQD+qENEedFTKTlCD6h9DOFh4k6HLUd6xx7kkg5MeHaBwzG9gVFDzGcXE0xF2GmrJD
+         dLMqZcDoQnkhUjU4yMSE+zE4g//7Vq4+UQwWv9N7H2FoDKlMxRcCLi7ps+MFAHdaZ3wK
+         m9vmqDW1HLA7Gqj0yGcpzsjCUkgy10konM9bI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dhgu0dLDhdQohJO0sNuXaA2MoyXlGux/K8QZDPyJw6s=;
+        b=NIblww9arVUHlKVrgj2RAO3bI082sJVD1UsFBRz1hLx/8gaJQf6y7LDPQr1jL+iSzU
+         QQE1XB+t3oYWKF3d5jmc702Xj11+XRAsTLsoN3YBKn8aW2XTrfk+7Gtz7rVJLkNnEOrO
+         AOWAQ1UR/3wZ5UaAk+bzlC2VKi3VQrxL5VQsIGzYLdg0pq04vGDlOHpcCYyAWeIX+Ae8
+         nC9wOQg8lx+ljh7vEyRChw8ZNhckbFHi0ZyCTD0JlfyzJBGBRCf9fAYgZB4mouoAiJSz
+         d7gmh9FrglmSqEWU7HiKS+IL56IPzZkxpcl4MhtWNj6YmvsvQf1BC6WBRuW7fVja7Bmu
+         NiQw==
+X-Gm-Message-State: AOAM531/rQ/jpUNny0++kKsi49gvThPNl07xCzLcNtH1yfq3lPtFUk6E
+        oDbt/VrVYpmT7uoyNs6qas5qpwfeXLhGzkXAYo+vwg==
+X-Google-Smtp-Source: ABdhPJwzY298KqMl0piyY6WC1v3Jsl2LfZBMZXpCc0fBF/BMSEZT1UgqTE6Ob3TXXLbgq4lcb2cTsJzeh8/K8Jd2l54=
+X-Received: by 2002:aca:6083:: with SMTP id u125mr1369147oib.14.1602748376570;
+ Thu, 15 Oct 2020 00:52:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201014171055.328a52f4@w520.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
+ <20201009075934.3509076-15-daniel.vetter@ffwll.ch> <20201009123109.GO5177@ziepe.ca>
+ <CAKMK7uFpPP-Q0jC0vM7vYPEcg0m4NzTw+Ld=swdTF3BgMX5Qug@mail.gmail.com>
+ <20201009143209.GS5177@ziepe.ca> <CAPcyv4j54O8ac6WB3LEeNud2r11V26gA0PRKK9bhyEMF67AXtQ@mail.gmail.com>
+ <20201015000939.GD6763@ziepe.ca>
+In-Reply-To: <20201015000939.GD6763@ziepe.ca>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Thu, 15 Oct 2020 09:52:45 +0200
+Message-ID: <CAKMK7uGu8yWRAGZX-dz-sXHsGufXKm003J5zuQr2AwNMG4+DUw@mail.gmail.com>
+Subject: Re: [PATCH v2 14/17] resource: Move devmem revoke code to resource framework
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Hildenbrand <david@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/10/15 上午7:10, Alex Williamson wrote:
-> On Wed, 14 Oct 2020 03:08:31 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Thu, Oct 15, 2020 at 2:09 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
 >
->>> From: Jason Wang <jasowang@redhat.com>
->>> Sent: Tuesday, October 13, 2020 2:22 PM
->>>
->>>
->>> On 2020/10/12 下午4:38, Tian, Kevin wrote:
->>>>> From: Jason Wang <jasowang@redhat.com>
->>>>> Sent: Monday, September 14, 2020 12:20 PM
->>>>>   
->>>> [...]
->>>>    > If it's possible, I would suggest a generic uAPI instead of a VFIO
->>>>> specific one.
->>>>>
->>>>> Jason suggest something like /dev/sva. There will be a lot of other
->>>>> subsystems that could benefit from this (e.g vDPA).
->>>>>
->>>>> Have you ever considered this approach?
->>>>>   
->>>> Hi, Jason,
->>>>
->>>> We did some study on this approach and below is the output. It's a
->>>> long writing but I didn't find a way to further abstract w/o losing
->>>> necessary context. Sorry about that.
->>>>
->>>> Overall the real purpose of this series is to enable IOMMU nested
->>>> translation capability with vSVA as one major usage, through
->>>> below new uAPIs:
->>>> 	1) Report/enable IOMMU nested translation capability;
->>>> 	2) Allocate/free PASID;
->>>> 	3) Bind/unbind guest page table;
->>>> 	4) Invalidate IOMMU cache;
->>>> 	5) Handle IOMMU page request/response (not in this series);
->>>> 1/3/4) is the minimal set for using IOMMU nested translation, with
->>>> the other two optional. For example, the guest may enable vSVA on
->>>> a device without using PASID. Or, it may bind its gIOVA page table
->>>> which doesn't require page fault support. Finally, all operations can
->>>> be applied to either physical device or subdevice.
->>>>
->>>> Then we evaluated each uAPI whether generalizing it is a good thing
->>>> both in concept and regarding to complexity.
->>>>
->>>> First, unlike other uAPIs which are all backed by iommu_ops, PASID
->>>> allocation/free is through the IOASID sub-system.
->>>
->>> A question here, is IOASID expected to be the single management
->>> interface for PASID?
->> yes
->>
->>> (I'm asking since there're already vendor specific IDA based PASID
->>> allocator e.g amdgpu_pasid_alloc())
->> That comes before IOASID core was introduced. I think it should be
->> changed to use the new generic interface. Jacob/Jean can better
->> comment if other reason exists for this exception.
->>
->>>    
->>>>    From this angle
->>>> we feel generalizing PASID management does make some sense.
->>>> First, PASID is just a number and not related to any device before
->>>> it's bound to a page table and IOMMU domain. Second, PASID is a
->>>> global resource (at least on Intel VT-d),
->>>
->>> I think we need a definition of "global" here. It looks to me for vt-d
->>> the PASID table is per device.
->> PASID table is per device, thus VT-d could support per-device PASIDs
->> in concept. However on Intel platform we require PASIDs to be managed
->> in system-wide (cross host and guest) when combining vSVA, SIOV, SR-IOV
->> and ENQCMD together. Thus the host creates only one 'global' PASID
->> namespace but do use per-device PASID table to assure isolation between
->> devices on Intel platforms. But ARM does it differently as Jean explained.
->> They have a global namespace for host processes on all host-owned
->> devices (same as Intel), but then per-device namespace when a device
->> (and its PASID table) is assigned to userspace.
->>
->>> Another question, is this possible to have two DMAR hardware unit(at
->>> least I can see two even in my laptop). In this case, is PASID still a
->>> global resource?
->> yes
->>
->>>    
->>>>    while having separate VFIO/
->>>> VDPA allocation interfaces may easily cause confusion in userspace,
->>>> e.g. which interface to be used if both VFIO/VDPA devices exist.
->>>> Moreover, an unified interface allows centralized control over how
->>>> many PASIDs are allowed per process.
->>>
->>> Yes.
->>>
->>>    
->>>> One unclear part with this generalization is about the permission.
->>>> Do we open this interface to any process or only to those which
->>>> have assigned devices? If the latter, what would be the mechanism
->>>> to coordinate between this new interface and specific passthrough
->>>> frameworks?
->>>
->>> I'm not sure, but if you just want a permission, you probably can
->>> introduce new capability (CAP_XXX) for this.
->>>
->>>    
->>>>    A more tricky case, vSVA support on ARM (Eric/Jean
->>>> please correct me) plans to do per-device PASID namespace which
->>>> is built on a bind_pasid_table iommu callback to allow guest fully
->>>> manage its PASIDs on a given passthrough device.
->>>
->>> I see, so I think the answer is to prepare for the namespace support
->>> from the start. (btw, I don't see how namespace is handled in current
->>> IOASID module?)
->> The PASID table is based on GPA when nested translation is enabled
->> on ARM SMMU. This design implies that the guest manages PASID
->> table thus PASIDs instead of going through host-side API on assigned
->> device. From this angle we don't need explicit namespace in the host
->> API. Just need a way to control how many PASIDs a process is allowed
->> to allocate in the global namespace. btw IOASID module already has
->> 'set' concept per-process and PASIDs are managed per-set. Then the
->> quota control can be easily introduced in the 'set' level.
->>
->>>    
->>>>    I'm not sure
->>>> how such requirement can be unified w/o involving passthrough
->>>> frameworks, or whether ARM could also switch to global PASID
->>>> style...
->>>>
->>>> Second, IOMMU nested translation is a per IOMMU domain
->>>> capability. Since IOMMU domains are managed by VFIO/VDPA
->>>>    (alloc/free domain, attach/detach device, set/get domain attribute,
->>>> etc.), reporting/enabling the nesting capability is an natural
->>>> extension to the domain uAPI of existing passthrough frameworks.
->>>> Actually, VFIO already includes a nesting enable interface even
->>>> before this series. So it doesn't make sense to generalize this uAPI
->>>> out.
->>>
->>> So my understanding is that VFIO already:
->>>
->>> 1) use multiple fds
->>> 2) separate IOMMU ops to a dedicated container fd (type1 iommu)
->>> 3) provides API to associated devices/group with a container
-> This is not really correct, or at least doesn't match my mental model.
-> A vfio container represents a set of groups (one or more devices per
-> group), which share an IOMMU model and context.  The user separately
-> opens a vfio container and group device files.  A group is associated
-> to the container via ioctl on the group, providing the container fd.
-> The user then sets the IOMMU model on the container, which selects the
-> vfio IOMMU uAPI they'll use.  We support multiple IOMMU models where
-> each vfio IOMMU backend registers a set of callbacks with vfio-core.
-
-
-Yes.
-
-
+> On Fri, Oct 09, 2020 at 11:28:54AM -0700, Dan Williams wrote:
+> > On Fri, Oct 9, 2020 at 7:32 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Fri, Oct 09, 2020 at 04:24:45PM +0200, Daniel Vetter wrote:
+> > > > On Fri, Oct 9, 2020 at 2:31 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > > > >
+> > > > > On Fri, Oct 09, 2020 at 09:59:31AM +0200, Daniel Vetter wrote:
+> > > > >
+> > > > > > +struct address_space *iomem_get_mapping(void)
+> > > > > > +{
+> > > > > > +     return iomem_inode->i_mapping;
+> > > > >
+> > > > > This should pair an acquire with the release below
+> > > > >
+> > > > > > +     /*
+> > > > > > +      * Publish /dev/mem initialized.
+> > > > > > +      * Pairs with smp_load_acquire() in revoke_iomem().
+> > > > > > +      */
+> > > > > > +     smp_store_release(&iomem_inode, inode);
+> > > > >
+> > > > > However, this seems abnormal, initcalls rarely do this kind of stuff
+> > > > > with global data..
+> > > > >
+> > > > > The kernel crashes if this fs_initcall is raced with
+> > > > > iomem_get_mapping() due to the unconditional dereference, so I think
+> > > > > it can be safely switched to a simple assignment.
+> > > >
+> > > > Ah yes I checked this all, but forgot to correctly annotate the
+> > > > iomem_get_mapping access. For reference, see b34e7e298d7a ("/dev/mem:
+> > > > Add missing memory barriers for devmem_inode").
+> > >
+> > > Oh yikes, so revoke_iomem can run concurrently during early boot,
+> > > tricky.
+> >
+> > It runs early because request_mem_region() can run before fs_initcall.
+> > Rather than add an unnecessary lock just arrange for the revoke to be
+> > skipped before the inode is initialized. The expectation is that any
+> > early resource reservations will block future userspace mapping
+> > attempts.
 >
->>> And all the proposal in this series is to reuse the container fd. It
->>> should be possible to replace e.g type1 IOMMU with a unified module.
->> yes, this is the alternative option that I raised in the last paragraph.
-> "[R]euse the container fd" is where I get lost here.  The container is
-> a fundamental part of vfio.  Does this instead mean to introduce a new
-> vfio IOMMU backend model?
+> Actually, on this point a simple WRITE_ONCE/READ_ONCE pairing is OK,
+> Paul once explained that the pointer chase on the READ_ONCE side is
+> required to be like an acquire - this is why rcu_dereference is just
+> READ_ONCE
+
+Indeed this changed with the sm_read_barrier_depends() removal a year
+ago. Before that READ_ONCE and rcu_dereference where not actually the
+same. I guess I'll throw a patch on top to switch that over too.
+-Daniel
 
 
-Yes, a new backend model or allow using external module as its IOMMU 
-backend.
 
 
->    The module would need to interact with vfio
-> via vfio_iommu_driver_ops callbacks, so this "unified module" requires
-> a vfio interface.  I don't understand how this contributes to something
-> that vdpa would also make use of.
-
-
-If an external module is allowed, then it could be reused by vDPA and 
-any other subsystems that want to do vSVA.
-
-
->
->
->>>> Then the tricky part comes with the remaining operations (3/4/5),
->>>> which are all backed by iommu_ops thus effective only within an
->>>> IOMMU domain. To generalize them, the first thing is to find a way
->>>> to associate the sva_FD (opened through generic /dev/sva) with an
->>>> IOMMU domain that is created by VFIO/VDPA. The second thing is
->>>> to replicate {domain<->device/subdevice} association in /dev/sva
->>>> path because some operations (e.g. page fault) is triggered/handled
->>>> per device/subdevice.
->>>
->>> Is there any reason that the #PF can not be handled via SVA fd?
->> using per-device FDs or multiplexing all fault info through one sva_FD
->> is just an implementation choice. The key is to mark faults per device/
->> subdevice thus anyway requires a userspace-visible handle/tag to
->> represent device/subdevice and the domain/device association must
->> be constructed in this new path.
->>
->>>    
->>>>    Therefore, /dev/sva must provide both per-
->>>> domain and per-device uAPIs similar to what VFIO/VDPA already
->>>> does. Moreover, mapping page fault to subdevice requires pre-
->>>> registering subdevice fault data to IOMMU layer when binding
->>>> guest page table, while such fault data can be only retrieved from
->>>> parent driver through VFIO/VDPA.
->>>>
->>>> However, we failed to find a good way even at the 1st step about
->>>> domain association. The iommu domains are not exposed to the
->>>> userspace, and there is no 1:1 mapping between domain and device.
->>>> In VFIO, all devices within the same VFIO container share the address
->>>> space but they may be organized in multiple IOMMU domains based
->>>> on their bus type. How (should we let) the userspace know the
-
->>>> domain information and open an sva_FD for each domain is the main
->>>> problem here.
->>>
->>> The SVA fd is not necessarily opened by userspace. It could be get
->>> through subsystem specific uAPIs.
->>>
->>> E.g for vDPA if a vDPA device contains several vSVA-capable domains, we can:
->>>
->>> 1) introduce uAPI for userspace to know the number of vSVA-capable
->>> domain
->>> 2) introduce e.g VDPA_GET_SVA_FD to get the fd for each vSVA-capable
->>> domain
->> and also new interface to notify userspace when a domain disappears
->> or a device is detached? Finally looks we are creating a completely set
->> of new subsystem specific uAPIs just for generalizing another set of
->> subsystem specific uAPIs. Remember after separating PASID mgmt.
->> out then most of remaining vSVA uAPIs are simpler wrapper of IOMMU
->> API. Replicating them is much easier logic than developing a new glue
->> mechanism in each subsystem.
-> Right, I don't see the advantage here, subsystem specific uAPIs using
-> common internal interfaces is what was being proposed.
-
-
-The problem is if PASID is per device, then this could work. But if it's 
-not, we will get conflict if more than one devices (subsystems) want to 
-use the same PASID to identify the same process address space. If this 
-is true, we need a uAPI beyond VFIO specific one.
-
-
->
->>>> In the end we just realized that doing such generalization doesn't
->>>> really lead to a clear design and instead requires tight coordination
->>>> between /dev/sva and VFIO/VDPA for almost every new uAPI
->>>> (especially about synchronization when the domain/device
->>>> association is changed or when the device/subdevice is being reset/
->>>> drained). Finally it may become a usability burden to the userspace
->>>> on proper use of the two interfaces on the assigned device.
->>>>
->>>> Based on above analysis we feel that just generalizing PASID mgmt.
->>>> might be a good thing to look at while the remaining operations are
->>>> better being VFIO/VDPA specific uAPIs. anyway in concept those are
->>>> just a subset of the page table management capabilities that an
->>>> IOMMU domain affords. Since all other aspects of the IOMMU domain
->>>> is managed by VFIO/VDPA already, continuing this path for new nesting
->>>> capability sounds natural. There is another option by generalizing the
->>>> entire IOMMU domain management (sort of the entire vfio_iommu_
->>>> type1), but it's unclear whether such intrusive change is worthwhile
->>>> (especially when VFIO/VDPA already goes different route even in legacy
->>>> mapping uAPI: map/unmap vs. IOTLB).
->>>>
->>>> Thoughts?
->>>
->>> I'm ok with starting with a unified PASID management and consider the
->>> unified vSVA/vIOMMU uAPI later.
->>>    
->> Glad to see that we have consensus here. :)
-> I see the benefit in a common PASID quota mechanism rather than the
-> ad-hoc limits introduced for vfio, but vfio integration does have the
-> benefit of being tied to device access, whereas it seems it seems a
-> user will need to be granted some CAP_SVA capability separate from the
-> device to make use of this interface.  It's possible for vfio to honor
-> shared limits, just as we make use of locked memory limits shared by
-> the task, so I'm not sure yet the benefit provided by a separate
-> userspace interface outside of vfio.  A separate interface also throws
-> a kink is userspace use of vfio, where we expect the interface is
-> largely self contained, ie. if a user has access to the vfio group and
-> container device files, they can fully make use of their device, up to
-> limits imposed by things like locked memory.  I'm concerned that
-> management tools will actually need to understand the intended usage of
-> a device in order to grant new capabilities, file access, and limits to
-> a process making use of these features.  Hopefully your prototype will
-> clarify some of those aspects.  Thanks,
->
-> Alex
-
+--
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
