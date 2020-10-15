@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43CA428EED8
-	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 10:57:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D217228EEED
+	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 11:01:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387810AbgJOI5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Oct 2020 04:57:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57386 "EHLO
+        id S2388585AbgJOJBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Oct 2020 05:01:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22767 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726329AbgJOI5i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 04:57:38 -0400
+        by vger.kernel.org with ESMTP id S2387848AbgJOJBS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 05:01:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602752256;
+        s=mimecast20190719; t=1602752476;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=Vs53K3dR0CYf1Qg7eg5iONDidevT0kf82kw/Xly804A=;
-        b=KHCslS6sdJjuKYJZKULrI+/tVgbx0z87TvmY1Nr1jT/1Li3bQ8FEmKHfG7CCWqIkG+r/YK
-        CSgNrJH5sRdXDT2UpKD2yUGQsqgQaiN8+mmgUSdGslg3b+Vq55Ml9X8TckSZOtUrtmYb9F
-        EwwGz6d7GLxkvBOKraDmjMWb2Esu+A0=
+        bh=9EDFsxpwcxC951vEAEF+TMmq/CNmoquc1R9sCp6Po3M=;
+        b=EkE/LFhCbsMBn3Hjq02KZZ0ofan8loqCoB1zbHqYcIhZuJDVKCzdaGLFGhghYs4noZmtS1
+        em24XLxDzMi62IOwmHBQbPGbBi5vp5Kk6oIgxrGyoShFvt0jYAQ6vTK6JYjegidvI70gd5
+        EbGpwVuAOtcv8jQbt9qp170O65TiL2w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-437-LfQw1OLbPJSvlwj9yyAtIw-1; Thu, 15 Oct 2020 04:57:34 -0400
-X-MC-Unique: LfQw1OLbPJSvlwj9yyAtIw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-41-n0F5IPgnORq-n62lM0ttrA-1; Thu, 15 Oct 2020 05:01:12 -0400
+X-MC-Unique: n0F5IPgnORq-n62lM0ttrA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4033186DD28;
-        Thu, 15 Oct 2020 08:57:32 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35A1A803629;
+        Thu, 15 Oct 2020 09:01:10 +0000 (UTC)
 Received: from [10.36.114.207] (ovpn-114-207.ams2.redhat.com [10.36.114.207])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AF695D9D5;
-        Thu, 15 Oct 2020 08:57:26 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18773100238C;
+        Thu, 15 Oct 2020 09:01:03 +0000 (UTC)
 Subject: Re: cgroup and FALLOC_FL_PUNCH_HOLE: WARNING: CPU: 13 PID: 2438 at
  mm/page_counter.c:57 page_counter_uncharge+0x4b/0x5
 From:   David Hildenbrand <david@redhat.com>
@@ -52,6 +52,7 @@ References: <c1ea7548-622c-eda7-66f4-e4ae5b6ee8fc@redhat.com>
  <65a1946f-dbf9-5767-5b51-9c1b786051d1@redhat.com>
  <5f196069-8b98-0ad3-55e8-19af03d715cd@oracle.com>
  <32ea3107-b1bc-f39e-3cf8-f6ef427235ef@redhat.com>
+ <075968b6-9e2e-b625-8dc1-a7e5ed0bfd71@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -97,113 +98,91 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat GmbH
-Message-ID: <075968b6-9e2e-b625-8dc1-a7e5ed0bfd71@redhat.com>
-Date:   Thu, 15 Oct 2020 10:57:25 +0200
+Message-ID: <69b8b3a2-fa3a-394f-2659-10a7170ac616@redhat.com>
+Date:   Thu, 15 Oct 2020 11:01:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <32ea3107-b1bc-f39e-3cf8-f6ef427235ef@redhat.com>
+In-Reply-To: <075968b6-9e2e-b625-8dc1-a7e5ed0bfd71@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.10.20 09:56, David Hildenbrand wrote:
-> On 14.10.20 20:31, Mike Kravetz wrote:
->> On 10/14/20 11:18 AM, David Hildenbrand wrote:
->>> On 14.10.20 19:56, Mina Almasry wrote:
->>>> On Wed, Oct 14, 2020 at 9:15 AM David Hildenbrand <david@redhat.com> wrote:
+On 15.10.20 10:57, David Hildenbrand wrote:
+> On 15.10.20 09:56, David Hildenbrand wrote:
+>> On 14.10.20 20:31, Mike Kravetz wrote:
+>>> On 10/14/20 11:18 AM, David Hildenbrand wrote:
+>>>> On 14.10.20 19:56, Mina Almasry wrote:
+>>>>> On Wed, Oct 14, 2020 at 9:15 AM David Hildenbrand <david@redhat.com> wrote:
+>>>>>>
+>>>>>> On 14.10.20 17:22, David Hildenbrand wrote:
+>>>>>>> Hi everybody,
+>>>>>>>
+>>>>>>> Michal Privoznik played with "free page reporting" in QEMU/virtio-balloon
+>>>>>>> with hugetlbfs and reported that this results in [1]
+>>>>>>>
+>>>>>>> 1. WARNING: CPU: 13 PID: 2438 at mm/page_counter.c:57 page_counter_uncharge+0x4b/0x5
+>>>>>>>
+>>>>>>> 2. Any hugetlbfs allocations failing. (I assume because some accounting is wrong)
+>>>>>>>
+>>>>>>>
+>>>>>>> QEMU with free page hinting uses fallocate(FALLOC_FL_PUNCH_HOLE)
+>>>>>>> to discard pages that are reported as free by a VM. The reporting
+>>>>>>> granularity is in pageblock granularity. So when the guest reports
+>>>>>>> 2M chunks, we fallocate(FALLOC_FL_PUNCH_HOLE) one huge page in QEMU.
+>>>>>>>
+>>>>>>> I was also able to reproduce (also with virtio-mem, which similarly
+>>>>>>> uses fallocate(FALLOC_FL_PUNCH_HOLE)) on latest v5.9
+>>>>>>> (and on v5.7.X from F32).
+>>>>>>>
+>>>>>>> Looks like something with fallocate(FALLOC_FL_PUNCH_HOLE) accounting
+>>>>>>> is broken with cgroups. I did *not* try without cgroups yet.
+>>>>>>>
+>>>>>>> Any ideas?
 >>>>>
->>>>> On 14.10.20 17:22, David Hildenbrand wrote:
->>>>>> Hi everybody,
->>>>>>
->>>>>> Michal Privoznik played with "free page reporting" in QEMU/virtio-balloon
->>>>>> with hugetlbfs and reported that this results in [1]
->>>>>>
->>>>>> 1. WARNING: CPU: 13 PID: 2438 at mm/page_counter.c:57 page_counter_uncharge+0x4b/0x5
->>>>>>
->>>>>> 2. Any hugetlbfs allocations failing. (I assume because some accounting is wrong)
->>>>>>
->>>>>>
->>>>>> QEMU with free page hinting uses fallocate(FALLOC_FL_PUNCH_HOLE)
->>>>>> to discard pages that are reported as free by a VM. The reporting
->>>>>> granularity is in pageblock granularity. So when the guest reports
->>>>>> 2M chunks, we fallocate(FALLOC_FL_PUNCH_HOLE) one huge page in QEMU.
->>>>>>
->>>>>> I was also able to reproduce (also with virtio-mem, which similarly
->>>>>> uses fallocate(FALLOC_FL_PUNCH_HOLE)) on latest v5.9
->>>>>> (and on v5.7.X from F32).
->>>>>>
->>>>>> Looks like something with fallocate(FALLOC_FL_PUNCH_HOLE) accounting
->>>>>> is broken with cgroups. I did *not* try without cgroups yet.
->>>>>>
->>>>>> Any ideas?
+>>>>> Hi David,
+>>>>>
+>>>>> I may be able to dig in and take a look. How do I reproduce this
+>>>>> though? I just fallocate(FALLOC_FL_PUNCH_HOLE) one 2MB page in a
+>>>>> hugetlb region?
+>>>>>
 >>>>
->>>> Hi David,
+>>>> Hi Mina,
 >>>>
->>>> I may be able to dig in and take a look. How do I reproduce this
->>>> though? I just fallocate(FALLOC_FL_PUNCH_HOLE) one 2MB page in a
->>>> hugetlb region?
+>>>> thanks for having a look. I started poking around myself but,
+>>>> being new to cgroup code, I even failed to understand why that code gets
+>>>> triggered though the hugetlb controller isn't even enabled.
 >>>>
+>>>> I assume you at least have to make sure that there is
+>>>> a page populated (MMAP_POPULATE, or read/write it). But I am not
+>>>> sure yet if a single fallocate(FALLOC_FL_PUNCH_HOLE) is
+>>>> sufficient, or if it will require a sequence of
+>>>> populate+discard(punch) (or multi-threading).
 >>>
->>> Hi Mina,
+>>> FWIW - I ran libhugetlbfs tests which do a bunch of hole punching
+>>> with (and without) hugetlb controller enabled and did not see this issue.
 >>>
->>> thanks for having a look. I started poking around myself but,
->>> being new to cgroup code, I even failed to understand why that code gets
->>> triggered though the hugetlb controller isn't even enabled.
->>>
->>> I assume you at least have to make sure that there is
->>> a page populated (MMAP_POPULATE, or read/write it). But I am not
->>> sure yet if a single fallocate(FALLOC_FL_PUNCH_HOLE) is
->>> sufficient, or if it will require a sequence of
->>> populate+discard(punch) (or multi-threading).
+>>> May need to reproduce via QEMU as below.
 >>
->> FWIW - I ran libhugetlbfs tests which do a bunch of hole punching
->> with (and without) hugetlb controller enabled and did not see this issue.
+>> Not sure if relevant, but QEMU should be using
+>> memfd_create(MFD_HUGETLB|MFD_HUGE_2MB) to obtain a hugetlbfs file.
 >>
->> May need to reproduce via QEMU as below.
+>> Also, QEMU fallocate(FALLOC_FL_PUNCH_HOLE)'s a significant of memory of
+>> the md (e.g., > 90%).
+>>
 > 
-> Not sure if relevant, but QEMU should be using
-> memfd_create(MFD_HUGETLB|MFD_HUGE_2MB) to obtain a hugetlbfs file.
+> I just tried to reproduce by doing random accesses + random fallocate(FALLOC_FL_PUNCH_HOLE) within a file - without success.
 > 
-> Also, QEMU fallocate(FALLOC_FL_PUNCH_HOLE)'s a significant of memory of
-> the md (e.g., > 90%).
+> So could be
+> 1. KVM is involved messing this up
+> 2. Multi-threading is involved
 > 
 
-I just tried to reproduce by doing random accesses + random fallocate(FALLOC_FL_PUNCH_HOLE) within a file - without success.
-
-So could be
-1. KVM is involved messing this up
-2. Multi-threading is involved
-
-However, I am also able to reproduce with only a single VCPU (there is still the QEMU main thread, but it limits the chance for races).
-
-Even KVM spits fire after a while, which could be a side effect of allocations failing:
-
-error: kvm run failed Bad address
-RAX=0000000000000000 RBX=ffff8c12c9c217c0 RCX=ffff8c12fb1b8fc0 RDX=0000000000000007
-RSI=ffff8c12c9c217c0 RDI=ffff8c12c9c217c8 RBP=000000000000000d RSP=ffffb3964040fa68
-R8 =0000000000000008 R9 =ffff8c12c9c20000 R10=ffff8c12fffd5000 R11=00000000000303c0
-R12=ffff8c12c9c217c0 R13=0000000000000008 R14=0000000000000001 R15=fffff31d44270800
-RIP=ffffffffaf33ba0f RFL=00000246 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0000 0000000000000000 00000000 00000000
-CS =0010 0000000000000000 ffffffff 00a09b00 DPL=0 CS64 [-RA]
-SS =0018 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-DS =0000 0000000000000000 00000000 00000000
-FS =0000 00007f8fabc87040 00000000 00000000
-GS =0000 ffff8c12fbc00000 00000000 00000000
-LDT=0000 fffffe0000000000 00000000 00000000
-TR =0040 fffffe0000003000 00004087 00008b00 DPL=0 TSS64-busy
-GDT=     fffffe0000001000 0000007f
-IDT=     fffffe0000000000 00000fff
-CR0=80050033 CR2=0000560e10895398 CR3=00000001073b2000 CR4=00350ef0
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000 
-DR6=00000000ffff0ff0 DR7=0000000000000400
-EFER=0000000000000d01
-Code=0f 0b eb e2 90 0f 1f 44 00 00 53 48 89 fb 31 c0 48 8d 7f 08 <48> c7 47 f8 00 00 00 00 48 89 d9 48 c7 c2 44 d3 52
+Able to reproduce with TCG under QEMU, so not a KVM issue.
 
 -- 
 Thanks,
