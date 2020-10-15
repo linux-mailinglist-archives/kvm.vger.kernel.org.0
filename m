@@ -2,88 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 949A328F8E7
-	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 20:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7238528F9D3
+	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 21:59:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391060AbgJOSwU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Oct 2020 14:52:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58888 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726196AbgJOSwU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 14:52:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602787938;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uSej2UjMQRw9PUOU9ztxUjTXF07dstBYT40GdW1tXXg=;
-        b=ZUIU5w5JVKM0wLAjTP6F1zZs5vTIn8PXauT8BujSiCpcVm3anBelpNf5dRVrFPs9A/IxIW
-        2M7fi8oVT9MO2orX7QNXgo5K1KnFX0U8LwV0qKg0b7VNJNuzcn0tWFWCJGm3/0r2uD5RLS
-        FNouABPQFmVRDImyPeNfQitJdL1OdCY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-UdXtL369OZSRB1ZZs07CXw-1; Thu, 15 Oct 2020 14:52:16 -0400
-X-MC-Unique: UdXtL369OZSRB1ZZs07CXw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CFEA86ABDC;
-        Thu, 15 Oct 2020 18:52:15 +0000 (UTC)
-Received: from w520.home (ovpn-113-35.phx2.redhat.com [10.3.113.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 20C351972A;
-        Thu, 15 Oct 2020 18:52:11 +0000 (UTC)
-Date:   Thu, 15 Oct 2020 12:52:11 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Colin King <colin.king@canonical.com>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio/fsl-mc: fix the return of the uninitialized
- variable ret
-Message-ID: <20201015125211.3ff46dc1@w520.home>
-In-Reply-To: <20201015122226.485911-1-colin.king@canonical.com>
-References: <20201015122226.485911-1-colin.king@canonical.com>
+        id S2392044AbgJOT7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Oct 2020 15:59:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28354 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2392040AbgJOT7a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 15:59:30 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09FJhNHR108651
+        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 15:59:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=4rNH/kSXbugYyucooL+bhUSNEEJOnfiXYfy0CKFG/8A=;
+ b=alW8IqsSyQk8ug8lpBexH/OYCJ7ASr+/9f5LZ6rXtR9g1GuGE8Am9uqThwU33wu1M+RT
+ 2JgeUJ1wGkfPLYymXJakpivIpgWKaCbhhb0rCQcAyAyPviRVQLW8N/K1B5z4Vru4IN6t
+ 93bqr6r+4wlMiMAQXTWeLsROQi1O1wtSNjD1kG5A+qxJvM/PUlwHr0JkpKvnsYpI680B
+ U/YJzpUexuLaQHxO+pb9v+skHWXbMyXBzZGIRuaOTg5fdz10pALp0nbDB/Y5DMTmpikW
+ Vg6PzjKD9ILY7fYLJg+FHysCKDxvayp3P8nqdn0MPvyk8XzCfQ3x4nZhU+/lkAU7Gr7N Kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 346vu38e7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 15:59:29 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09FJjvx0117967
+        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 15:59:28 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 346vu38e7e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Oct 2020 15:59:28 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09FJvwH7028679;
+        Thu, 15 Oct 2020 19:59:28 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02dal.us.ibm.com with ESMTP id 3434ka7ehf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Oct 2020 19:59:27 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09FJxQud43057414
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Oct 2020 19:59:26 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F37B7805F;
+        Thu, 15 Oct 2020 19:59:26 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1DFAD7805C;
+        Thu, 15 Oct 2020 19:59:26 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.130.217])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Oct 2020 19:59:25 +0000 (GMT)
+From:   Collin Walling <walling@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com
+Subject: [PATCH v2 0/2] DIAG 318 tests and fix
+Date:   Thu, 15 Oct 2020 15:59:11 -0400
+Message-Id: <20201015195913.101065-1-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-15_15:2020-10-14,2020-10-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 spamscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 mlxlogscore=807 suspectscore=1 mlxscore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010150129
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 15 Oct 2020 13:22:26 +0100
-Colin King <colin.king@canonical.com> wrote:
+Two patches: one that fixes a case where the DIAG 318 info was not 
+actually being reset during load normal, and another patch to inroduce
+selftests for DIAG 318 -- which helped discover the aforementioned issue ;)
 
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> Currently the success path in function vfio_fsl_mc_reflck_attach is
-> returning an uninitialized value in variable ret. Fix this by setting
-> this to zero to indicate success.
-> 
-> Addresses-Coverity: ("Uninitialized scalar variable")
-> Fixes: f2ba7e8c947b ("vfio/fsl-mc: Added lock support in preparation for interrupt handling")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> index 80fc7f4ed343..42a5decb78d1 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> @@ -84,6 +84,7 @@ static int vfio_fsl_mc_reflck_attach(struct vfio_fsl_mc_device *vdev)
->  		vfio_fsl_mc_reflck_get(cont_vdev->reflck);
->  		vdev->reflck = cont_vdev->reflck;
->  		vfio_device_put(device);
-> +		ret = 0;
->  	}
->  
->  unlock:
+Collin Walling (2):
+  s390/kvm: fix diag318 reset
+  self_tests/kvm: sync_regs and reset tests for diag318
 
-Looks correct to me, unless Diana would rather set the initial value to
-zero instead.  Thanks,
+ arch/s390/kvm/kvm-s390.c                      |  2 +-
+ tools/testing/selftests/kvm/Makefile          |  2 +-
+ .../kvm/include/s390x/diag318_test_handler.h  | 13 +++
+ .../kvm/lib/s390x/diag318_test_handler.c      | 82 +++++++++++++++++++
+ tools/testing/selftests/kvm/s390x/resets.c    | 14 ++++
+ .../selftests/kvm/s390x/sync_regs_test.c      | 16 +++-
+ 6 files changed, 126 insertions(+), 3 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h
+ create mode 100644 tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c
 
-Alex
+-- 
+2.26.2
 
