@@ -2,136 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD69628E9FC
-	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 03:29:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 636D428EBB5
+	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 05:44:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732279AbgJOB3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Oct 2020 21:29:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49016 "EHLO
+        id S1730298AbgJODoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Oct 2020 23:44:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732231AbgJOB3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Oct 2020 21:29:38 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24887C002158
-        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 17:09:42 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id x20so1048769qkn.1
-        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 17:09:42 -0700 (PDT)
+        with ESMTP id S1727281AbgJODoR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Oct 2020 23:44:17 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E76EC061755
+        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 20:44:16 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id p15so1631146ljj.8
+        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 20:44:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=D7q4upZx4LUmHy2sbcBxGXxr7CK8polpuI+TBJh2iFg=;
-        b=VY1qyIeCcrX28JfPsmo/gMmvUMC4KhNWUx2AWTC7SFuNhKKNC7E5pi4i351EUrbB2J
-         iQEeEBv2iqbPt4yG9cu9z6JKaTTcI0uH0ifbEwEuYd7uQ+JCfqlrCKPwMTRONzTIq1+2
-         r10P6EtGAwdMqLqGZOKON3zvZUuPyniSm0E4b9X4QVYcKPq5x9sxgp/64dd/q9ifg4bh
-         6h21xPcqmh90YO0WNB5wNN8lxy2kzpTs2joeQm0QgPxqx6k5VPT8scnHtsXoGOHGppiW
-         EBkQ8XI+pghayLloQzkOY+ZWhXI0lRPbg5OXZafpWC/LHi0yuGDtirCrwS4LepbltR1w
-         8p9g==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HHTEFLARrai9jAcwvYx9rODqAnP/mRVKE4w7Ff4URe4=;
+        b=qfZILCfxkUpQvE6YU3Z9UodjGZTM49N99Qs09Qi/4D5OgMHut9bruj5fsGafj+WSqd
+         IzSk2arafb2CF6N468LF2DMB9Ru6VOsUrx9OcRJnPaGGsxkEQlQEFe5Iruz9ANnaL6qo
+         bFrI68ljv6tVt4AR+c/yd/G4suzPxvqoS+5sfzfdLVbRfwnsTEhIx5p60B2AylA92DYL
+         lKwZtP2S8JaHJAQeuulu5cQ2npU0PtTcVhmbsSsDcsjyI4LIW95dIePKGAen64iJDxMS
+         7/cvyDiaoN5ikqwUy82WUUjLha/tTcqc+TG96F+SsaIDxH6/WVUQR1Xu7K80mlEnsf3P
+         mf3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=D7q4upZx4LUmHy2sbcBxGXxr7CK8polpuI+TBJh2iFg=;
-        b=s6nHrCINjOc0vHBdBeILLUFe6VhFbBP7RtNZjhRuxm2VuEhqC/LPiN1utJoZhNo9Ay
-         ZfRwxTnLXjaQhPU9Ks9SXKeF/TZd5z4E7STYVlmV4XhBVzoeRvWpjNtfEfUKkISYI3Gb
-         DwZIl/Wx68mMZvgpphYlEsi76IhNc1rNbQf7HmpGhOvciW/a8IhAPTa8o1aezo/GNo+5
-         cHp7LDZNtB4Gn+zK798PDPpi1WszLwQu/NeY4qB2tSHYKIUSO9nVDeybcsOQPv2aIjAH
-         Qn74Psa/VoXsNKfUabwsVvYAKeyxMfrosHBfqI9XmGYVSPSMaJbvNtl2L2J8zhsDVw5K
-         21Og==
-X-Gm-Message-State: AOAM532CjdEHYnZKrmEc8yZJk5ZsqFHqpSkYl05FH1FVrrlXZVy9X5/Q
-        aQRSBgWquQ9eG/Rb+pJ2914T/g==
-X-Google-Smtp-Source: ABdhPJz1YpfemWgv6ITHdO1cDHAUR6b7J4qWqW/ErSGbJ1yD3QFJwI22cUMtAvpN9oIOH7a/n3cIYg==
-X-Received: by 2002:a05:620a:2e3:: with SMTP id a3mr1513988qko.117.1602720581354;
-        Wed, 14 Oct 2020 17:09:41 -0700 (PDT)
-Received: from ziepe.ca ([142.177.128.188])
-        by smtp.gmail.com with ESMTPSA id y44sm525252qtb.50.2020.10.14.17.09.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 14 Oct 2020 17:09:40 -0700 (PDT)
-Received: from jgg by jggl.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kSqpv-0002GP-8c; Wed, 14 Oct 2020 21:09:39 -0300
-Date:   Wed, 14 Oct 2020 21:09:39 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Subject: Re: [PATCH v2 14/17] resource: Move devmem revoke code to resource
- framework
-Message-ID: <20201015000939.GD6763@ziepe.ca>
-References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
- <20201009075934.3509076-15-daniel.vetter@ffwll.ch>
- <20201009123109.GO5177@ziepe.ca>
- <CAKMK7uFpPP-Q0jC0vM7vYPEcg0m4NzTw+Ld=swdTF3BgMX5Qug@mail.gmail.com>
- <20201009143209.GS5177@ziepe.ca>
- <CAPcyv4j54O8ac6WB3LEeNud2r11V26gA0PRKK9bhyEMF67AXtQ@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HHTEFLARrai9jAcwvYx9rODqAnP/mRVKE4w7Ff4URe4=;
+        b=ttCwmvvPVY3Mu732UAx9nqLfCKjqip2a6v54Gs5T66aWRN2clzPqU0cqchVh0NQXH9
+         CMman4ZSeco6ZC9zNYLdAEwMhi7yP/Wu6hxmO6qlQd1GvhDnyZnH6b9YWE48GKO648Z1
+         mizOHHTVI9pJ28etWaylE1h7gq+a3u0r4qnLckcHwyFkortf7wz/k630XV32v4DvXelZ
+         Kxvhj+NOxo2Q9RFS8rNwR2KoMVWOAooQgnJBwIg+6FGXHWe2sPjlZJYPpI2ABVC+suVu
+         JoTq14oXhzbto65O3cyYC73BWwGx8fMLqqKog+QPrOV6JSudOsXoODj526DFhp34Y9Nt
+         tgQQ==
+X-Gm-Message-State: AOAM531J1okavP0Z9weDRxzCUeqV8p6UyE0Jvbx2pM+lI+bTudS2rddu
+        vubeFOs6xAdwq+OmYOdu+Dd9QvqnWQvmg6FfDzA=
+X-Google-Smtp-Source: ABdhPJwrojk583U17UFreB26E6EJBzeY9pns7nnbhf5WVPSQWFljj9y5nCaSrAUUweCPWKFxAyW3SN3Koo6Xjpsvyx8=
+X-Received: by 2002:a2e:b006:: with SMTP id y6mr419563ljk.462.1602733454595;
+ Wed, 14 Oct 2020 20:44:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4j54O8ac6WB3LEeNud2r11V26gA0PRKK9bhyEMF67AXtQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
+ <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
+ <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
+ <20201012165428.GD26135@linux.intel.com> <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
+ <20201013045245.GA11344@linux.intel.com> <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
+ <20201013070329.GC11344@linux.intel.com> <CA+-xGqO37RzQDg5dnE_3NWMp6+u2L02GQDqoSr3RdedoMBugrg@mail.gmail.com>
+ <626a8667-be00-96b7-f21d-1ec7648ee1e6@redhat.com>
+In-Reply-To: <626a8667-be00-96b7-f21d-1ec7648ee1e6@redhat.com>
+From:   harry harry <hiharryharryharry@gmail.com>
+Date:   Wed, 14 Oct 2020 23:43:54 -0400
+Message-ID: <CA+-xGqMdVm1tqDMt9PTOxi80oEW_3pFiQaH+WvQfpZ9K1QJKDw@mail.gmail.com>
+Subject: Re: Why guest physical addresses are not the same as the
+ corresponding host virtual addresses in QEMU/KVM? Thanks!
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
+        mathieu.tarral@protonmail.com, stefanha@redhat.com,
+        libvir-list@redhat.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 09, 2020 at 11:28:54AM -0700, Dan Williams wrote:
-> On Fri, Oct 9, 2020 at 7:32 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Fri, Oct 09, 2020 at 04:24:45PM +0200, Daniel Vetter wrote:
-> > > On Fri, Oct 9, 2020 at 2:31 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > > >
-> > > > On Fri, Oct 09, 2020 at 09:59:31AM +0200, Daniel Vetter wrote:
-> > > >
-> > > > > +struct address_space *iomem_get_mapping(void)
-> > > > > +{
-> > > > > +     return iomem_inode->i_mapping;
-> > > >
-> > > > This should pair an acquire with the release below
-> > > >
-> > > > > +     /*
-> > > > > +      * Publish /dev/mem initialized.
-> > > > > +      * Pairs with smp_load_acquire() in revoke_iomem().
-> > > > > +      */
-> > > > > +     smp_store_release(&iomem_inode, inode);
-> > > >
-> > > > However, this seems abnormal, initcalls rarely do this kind of stuff
-> > > > with global data..
-> > > >
-> > > > The kernel crashes if this fs_initcall is raced with
-> > > > iomem_get_mapping() due to the unconditional dereference, so I think
-> > > > it can be safely switched to a simple assignment.
-> > >
-> > > Ah yes I checked this all, but forgot to correctly annotate the
-> > > iomem_get_mapping access. For reference, see b34e7e298d7a ("/dev/mem:
-> > > Add missing memory barriers for devmem_inode").
-> >
-> > Oh yikes, so revoke_iomem can run concurrently during early boot,
-> > tricky.
-> 
-> It runs early because request_mem_region() can run before fs_initcall.
-> Rather than add an unnecessary lock just arrange for the revoke to be
-> skipped before the inode is initialized. The expectation is that any
-> early resource reservations will block future userspace mapping
-> attempts.
+Hi Paolo and Sean,
 
-Actually, on this point a simple WRITE_ONCE/READ_ONCE pairing is OK,
-Paul once explained that the pointer chase on the READ_ONCE side is
-required to be like an acquire - this is why rcu_dereference is just
-READ_ONCE
+It is clear to me now. Thanks much for your reply and help.
 
-Jason
+
+Best regards,
+Harry
