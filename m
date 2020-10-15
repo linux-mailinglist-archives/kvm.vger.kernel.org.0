@@ -2,105 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5620728EE9C
-	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 10:36:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDBE728EEA3
+	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 10:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730383AbgJOIg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Oct 2020 04:36:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29495 "EHLO
+        id S2387514AbgJOIiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Oct 2020 04:38:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40747 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729723AbgJOIg1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 04:36:27 -0400
+        by vger.kernel.org with ESMTP id S1729723AbgJOIiP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 04:38:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602750986;
+        s=mimecast20190719; t=1602751094;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F9w+zoR3mTh4DtIeByMLVWAPvOZriJCigcRbM/VP8aw=;
-        b=bYVCaItHin9A++vES+AxBcm8jSdiwYf3P/i7idOnJg/l7l+pP/iaELOFqbtaSTj62hTivI
-        yF+eebXQHL0lsuzxs9DucHJ0QV7TJ/aBxEItI6bDtSJ8cknSSFdspk0x+SWbMsxozWB+6i
-        WPQE+Zr2lXo4Hf9Kpa84iomj4OcNwLg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-1Eef26uFM2W7wUK8FZWpQg-1; Thu, 15 Oct 2020 04:36:24 -0400
-X-MC-Unique: 1Eef26uFM2W7wUK8FZWpQg-1
-Received: by mail-wr1-f69.google.com with SMTP id r8so1363577wrp.5
-        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 01:36:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=F9w+zoR3mTh4DtIeByMLVWAPvOZriJCigcRbM/VP8aw=;
-        b=qcAYgRvskX6hMukCgS0zf0/IKe2rljd4FhxLQ+kW5la/X30Y2z6FpsEHsa5vDGZtLO
-         uv7Nwt2t1ZpZOrpmFUOX4ibY45ihFuuVt/7zXGhdYU6TyN/YyeNkFwnmiWWKmjCpZJQc
-         kjrG0AqBJrYU446cWWi3qjtaGGMZeXGTzijnMMLS3sulVek844jmLuXlGHvz1EYN8Irq
-         qoF+GFNoJEt1r2cFnCcs4d3bvu1wp8Ow5zoptPeQXL20OjxArRe2oU6+SL4kzGosOmDJ
-         sENthOjaoJnaEeDFRKzBVE4KcaS/dQrwA8ZisYErurYvrboc6yLgb/WnuVjuIXlKWSUP
-         ogPw==
-X-Gm-Message-State: AOAM533/SuKJMScd/THy8znaYHG0zFZ/gbGYecFTAY4wxH2JtbsJztp3
-        HpH0cabTGf+xnq70GKgeAF3Syl8HoWB74j/LhUv3Z6fFpJEm0oAG+S8Ehw9E/o3Tda1H33cPsPt
-        BViTTSeg1DrL6
-X-Received: by 2002:a5d:4282:: with SMTP id k2mr2862901wrq.270.1602750982735;
-        Thu, 15 Oct 2020 01:36:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyHhoAc7Dlx/JVvHBmD8h1cRTJzfpcSL2nHAdXTzwpVkG7rAkL9RB8EiqO0uzOZES6LPCgG3A==
-X-Received: by 2002:a5d:4282:: with SMTP id k2mr2862887wrq.270.1602750982564;
-        Thu, 15 Oct 2020 01:36:22 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id t83sm3376042wmt.43.2020.10.15.01.36.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2020 01:36:21 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6jK4Ei2H315PjcLRzKj4JaFTscxNE7NtNEtqf0KEIlI=;
+        b=ZfmC8ovoxEbxquSK2CqF0s+xhiaeoKO0KatslQ+uA4o6cXxT2rNvROyMQgxsHb1bYNXwlZ
+        uTeuNgccgDjteM529AEdLj3CIJofcCyn5wJrVvz4xiIns1VgR1UsDcn2ghWl5Mq3ioGVKj
+        /lbfT30jTrQcYLFR6PRpVdCwQ2scHJA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-qUiGZwBFMqSPwE5eBB0Jvg-1; Thu, 15 Oct 2020 04:38:13 -0400
+X-MC-Unique: qUiGZwBFMqSPwE5eBB0Jvg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 008E864082
+        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 08:38:12 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B3255D9CD;
+        Thu, 15 Oct 2020 08:38:10 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests] runtime.bash: skip test when checked file doesn't exist
-In-Reply-To: <849201e6-2c21-154d-cb5c-712bd9c3d3b4@redhat.com>
-References: <20201014154258.2437510-1-vkuznets@redhat.com> <849201e6-2c21-154d-cb5c-712bd9c3d3b4@redhat.com>
-Date:   Thu, 15 Oct 2020 10:36:20 +0200
-Message-ID: <87o8l36g3f.fsf@vitty.brq.redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Huth <thuth@redhat.com>, Andrew Jones <drjones@redhat.com>
+Subject: [PATCH v2 kvm-unit-tests] runtime.bash: skip test when checked file doesn't exist
+Date:   Thu, 15 Oct 2020 10:38:08 +0200
+Message-Id: <20201015083808.2488268-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thomas Huth <thuth@redhat.com> writes:
+Currently, we have the following check condition in x86/unittests.cfg:
 
-> On 14/10/2020 17.42, Vitaly Kuznetsov wrote:
->> Currently, we have the following check condition in x86/unittests.cfg:
->> 
->> check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
->> 
->> the check, however, passes successfully on AMD because the checked file
->> is just missing. This doesn't sound right, reverse the check: fail
->> if the content of the file doesn't match the expectation or if the
->> file is not there.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  scripts/runtime.bash | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->> 
->> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
->> index 3121c1ffdae8..f94c094de03b 100644
->> --- a/scripts/runtime.bash
->> +++ b/scripts/runtime.bash
->> @@ -118,7 +118,10 @@ function run()
->>      for check_param in "${check[@]}"; do
->>          path=${check_param%%=*}
->>          value=${check_param#*=}
->> -        if [ -f "$path" ] && [ "$(cat $path)" != "$value" ]; then
->> +	if [ -z "$path" ]; then
->> +            continue
->> +	fi
->
-> That runtime.bash script seems to use spaces for indentation, not tabs ...
-> so could you please use spaces for your patch, too?
->
+check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
 
-Yea, trusted my editior to do the right thing and it let me down... v2
-is coming!
+the check, however, passes successfully on AMD because the checked file
+is just missing. This doesn't sound right, reverse the check: fail
+if the content of the file doesn't match the expectation or if the
+file is not there.
 
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+Changes since v1:
+- tabs -> spaces [Thomas]
+---
+ scripts/runtime.bash | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 3121c1ffdae8..99d242d5cf8c 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -118,7 +118,10 @@ function run()
+     for check_param in "${check[@]}"; do
+         path=${check_param%%=*}
+         value=${check_param#*=}
+-        if [ -f "$path" ] && [ "$(cat $path)" != "$value" ]; then
++        if [ -z "$path" ]; then
++            continue
++        fi
++        if [ ! -f "$path" ] || [ "$(cat $path)" != "$value" ]; then
+             print_result "SKIP" $testname "" "$path not equal to $value"
+             return 2
+         fi
 -- 
-Vitaly
+2.25.4
 
