@@ -2,133 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDD1528F5DA
-	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 17:29:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7526F28F644
+	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 18:00:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389721AbgJOP3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Oct 2020 11:29:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388357AbgJOP3T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Oct 2020 11:29:19 -0400
-Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9455C0613D5
-        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 08:29:17 -0700 (PDT)
-Received: by mail-oo1-xc42.google.com with SMTP id f2so814357ooj.2
-        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 08:29:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LJwfZvZzZbL3U3dsefi4j72Jm0TppMPnsxaVcVl6iT0=;
-        b=jiwyZuJU82zqfM3xXQZkNpewO6fCkqA7igabDZ79l9dEml7MlNt9/W6KspOKdTFMBv
-         l0ZZKLNyCyInH/bWkyXoNA3+A+JhbIMgDBR1thG0QOHKB4hsUrxgAlsNauv981ymHMte
-         aG33qVap5atzCP8H/NRFqSDXso79lnD2nYDfc=
+        id S2388560AbgJOQAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Oct 2020 12:00:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30780 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388393AbgJOP77 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Oct 2020 11:59:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602777598;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=P+Fz1xnny1QViwthSCJcz6si5Gd9eekT3vsqmAf12Bw=;
+        b=UQjs0ozeQjRCe0up70bwq51fD8YhbmFqMCLgD8c02x+1rl6cvfAszpPB69N5hGonz3UuCS
+        9g4f0bErxODZAUaIBSjIUIOGlRFij30iuGTvCi3QTbZy1x86f2UEghP+yzX/JjWFs2JGsw
+        QNf2qeBYz0H0XuFnhSQonFZdsNV/3bU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-130-yHfPs7LKPICEDHrdoMEGHQ-1; Thu, 15 Oct 2020 11:59:57 -0400
+X-MC-Unique: yHfPs7LKPICEDHrdoMEGHQ-1
+Received: by mail-wm1-f70.google.com with SMTP id l15so2068615wmh.9
+        for <kvm@vger.kernel.org>; Thu, 15 Oct 2020 08:59:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LJwfZvZzZbL3U3dsefi4j72Jm0TppMPnsxaVcVl6iT0=;
-        b=uNrqzIncsFa7EmnisKAMf4xNi0W54uCji973mtrH6WJmUNVRXZ21OJWa5gPtVzdKPw
-         29FvrddW/DO0Ss2jgJ7LOSBwOFu/4oLwBe8duPwrKRVWRmi9XVV+Cu/IoLnQebAD0r12
-         TD4S5MUZJu/jMVmdCzRCEzpI4ooIUtWi1DGQQEpuhUTtaWGtvqH3kl36UsFoHE0N33pU
-         UPIS3GMriBSTDHGmunKqrD4fAkgznsvilqJLLK2aPfb6nkw/EDpGxga3ey56jJdWSeYN
-         gZFjrRT0kkY1NHR75neVtHyfN6q7FFya9ZYACGGzFWqa5zRpqcBCShpKVR/JmjnBloCa
-         L4ew==
-X-Gm-Message-State: AOAM530/qP3SCDY3JiG55dlryzY46CqpSWSJki8X8dwYKns+6cdlmmin
-        sZL8LN8p5UCuB7v2+gsAA8ZfAByqy2ZbsyqpQTMTdw==
-X-Google-Smtp-Source: ABdhPJwHGqKFcBCVEj4Z9lD8mpPIRoQJxs6gS7mqbJLVOqKjzGL3o2Yivo5QSuS7JTOQT9EJ/KzY1r55eHOicMya4wY=
-X-Received: by 2002:a4a:e1d7:: with SMTP id n23mr2788554oot.85.1602775756786;
- Thu, 15 Oct 2020 08:29:16 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=P+Fz1xnny1QViwthSCJcz6si5Gd9eekT3vsqmAf12Bw=;
+        b=rJl7X/xymsUz936tEH1lSaW8JeIdcMQdesgh1m7DbFTXwHKr4YHQl27LIJ++kqR5y+
+         BarSJ7F9A9Cy1zaSovBLMp2YRdZgEbh2+CYOdmgLp5O2cG40Xwpiy+/+NUZQPqemxeFb
+         E27UkJ2bxO6sBbKGhZkgD2Kk6QWAahebkenloui9CZ/Rar23io4Tq2r1IH3YPm9XAmCU
+         aBnTp2uih7z10/0hxE4wB1fUQYrc0RLuuRNY05rt91rG6Y2il4peF6v4eTAa8XqvKseO
+         OcjhSaq15sWf51h6PlzL4jJ3h1hAP6Rgta8bkC2NOfuxln4jYTmO7FTjGhnLXt7WZ1Gu
+         6aRA==
+X-Gm-Message-State: AOAM533H0r12zg9STyD7q8HfxnOmtZ1vm2rN1/BC/k/J4FoVc18VElhY
+        GUm6RKKhmGMg3ODytUkNExS/pFX7DV8rR57MvMM4O+UCoukvjsbVAP8fpbtCZTtesPwTJNv8QKe
+        Dxi2+keNiOWEj
+X-Received: by 2002:adf:8285:: with SMTP id 5mr4964106wrc.330.1602777594701;
+        Thu, 15 Oct 2020 08:59:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+/O35BobPrgxPh/vxMF+1XSqwrMdjPaj2aUYTYqzrheoyYdashF6JZ3qdQS4nsNlZ8IF30Q==
+X-Received: by 2002:adf:8285:: with SMTP id 5mr4964088wrc.330.1602777594434;
+        Thu, 15 Oct 2020 08:59:54 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id c16sm5448938wrx.31.2020.10.15.08.59.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Oct 2020 08:59:53 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Po-Hsu Lin <po-hsu.lin@canonical.com>
+Cc:     po-hsu.lin@canonical.com, kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCHv2] unittests.cfg: Increase timeout for apic test
+In-Reply-To: <20201013091237.67132-1-po-hsu.lin@canonical.com>
+References: <20201013091237.67132-1-po-hsu.lin@canonical.com>
+Date:   Thu, 15 Oct 2020 17:59:52 +0200
+Message-ID: <87d01j5vk7.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20201009075934.3509076-1-daniel.vetter@ffwll.ch>
- <20201009075934.3509076-15-daniel.vetter@ffwll.ch> <20201009123109.GO5177@ziepe.ca>
- <CAKMK7uFpPP-Q0jC0vM7vYPEcg0m4NzTw+Ld=swdTF3BgMX5Qug@mail.gmail.com>
- <20201009143209.GS5177@ziepe.ca> <CAPcyv4j54O8ac6WB3LEeNud2r11V26gA0PRKK9bhyEMF67AXtQ@mail.gmail.com>
- <20201015000939.GD6763@ziepe.ca>
-In-Reply-To: <20201015000939.GD6763@ziepe.ca>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Thu, 15 Oct 2020 17:29:05 +0200
-Message-ID: <CAKMK7uGeVzbe3=FR=a5MEfzDsrog6D4+Bkiaj8FrVeOLu3-9Mw@mail.gmail.com>
-Subject: Re: [PATCH v2 14/17] resource: Move devmem revoke code to resource framework
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 15, 2020 at 2:09 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Fri, Oct 09, 2020 at 11:28:54AM -0700, Dan Williams wrote:
-> > On Fri, Oct 9, 2020 at 7:32 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > >
-> > > On Fri, Oct 09, 2020 at 04:24:45PM +0200, Daniel Vetter wrote:
-> > > > On Fri, Oct 9, 2020 at 2:31 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > > > >
-> > > > > On Fri, Oct 09, 2020 at 09:59:31AM +0200, Daniel Vetter wrote:
-> > > > >
-> > > > > > +struct address_space *iomem_get_mapping(void)
-> > > > > > +{
-> > > > > > +     return iomem_inode->i_mapping;
-> > > > >
-> > > > > This should pair an acquire with the release below
-> > > > >
-> > > > > > +     /*
-> > > > > > +      * Publish /dev/mem initialized.
-> > > > > > +      * Pairs with smp_load_acquire() in revoke_iomem().
-> > > > > > +      */
-> > > > > > +     smp_store_release(&iomem_inode, inode);
-> > > > >
-> > > > > However, this seems abnormal, initcalls rarely do this kind of stuff
-> > > > > with global data..
-> > > > >
-> > > > > The kernel crashes if this fs_initcall is raced with
-> > > > > iomem_get_mapping() due to the unconditional dereference, so I think
-> > > > > it can be safely switched to a simple assignment.
-> > > >
-> > > > Ah yes I checked this all, but forgot to correctly annotate the
-> > > > iomem_get_mapping access. For reference, see b34e7e298d7a ("/dev/mem:
-> > > > Add missing memory barriers for devmem_inode").
-> > >
-> > > Oh yikes, so revoke_iomem can run concurrently during early boot,
-> > > tricky.
-> >
-> > It runs early because request_mem_region() can run before fs_initcall.
-> > Rather than add an unnecessary lock just arrange for the revoke to be
-> > skipped before the inode is initialized. The expectation is that any
-> > early resource reservations will block future userspace mapping
-> > attempts.
->
-> Actually, on this point a simple WRITE_ONCE/READ_ONCE pairing is OK,
-> Paul once explained that the pointer chase on the READ_ONCE side is
-> required to be like an acquire - this is why rcu_dereference is just
-> READ_ONCE
+Po-Hsu Lin <po-hsu.lin@canonical.com> writes:
 
-Hm so WRITE_ONCE doesn't have any barriers, and we'd need that for
-updating the pointer. That would leave things rather inconsistent, so
-I think I'll just leave it as-is for symmetry reasons. None of this
-code matters for performance anyway, so micro-optimizing barriers
-seems a bit silly.
--Daniel
+> We found that on Azure cloud hyperv instance Standard_D48_v3, it will
+> take about 45 seconds to run this apic test.
+>
+> It takes even longer (about 150 seconds) to run inside a KVM instance
+> VM.Standard2.1 on Oracle cloud.
+>
+> Bump the timeout threshold to give it a chance to finish.
+>
+> Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
+> ---
+>  x86/unittests.cfg | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 872d679..c72a659 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -41,7 +41,7 @@ file = apic.flat
+>  smp = 2
+>  extra_params = -cpu qemu64,+x2apic,+tsc-deadline
+>  arch = x86_64
+> -timeout = 30
+> +timeout = 240
+>  
+>  [ioapic]
+>  file = ioapic.flat
+
+AFAIR the default timeout for tests where timeout it not set explicitly
+is 90s so don't you need to also modify it for other tests like
+'apic-split', 'ioapic', 'ioapic-split', ... ?
+
+I was thinking about introducing a 'timeout multiplier' or something to
+run_tests.sh for running in slow (read: nested) environments, doing that
+would allow us to keep reasonably small timeouts by default. This is
+somewhat important as tests tend to hang and waiting for 4 minutes every
+time is not great.
+
 -- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Vitaly
+
