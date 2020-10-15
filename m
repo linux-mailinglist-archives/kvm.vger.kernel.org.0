@@ -2,75 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 636D428EBB5
-	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 05:44:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B766128EBB6
+	for <lists+kvm@lfdr.de>; Thu, 15 Oct 2020 05:45:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730298AbgJODoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Oct 2020 23:44:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42004 "EHLO
+        id S1729312AbgJODpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Oct 2020 23:45:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727281AbgJODoR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Oct 2020 23:44:17 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E76EC061755
-        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 20:44:16 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id p15so1631146ljj.8
-        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 20:44:15 -0700 (PDT)
+        with ESMTP id S1727281AbgJODpZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Oct 2020 23:45:25 -0400
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7744C061755
+        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 20:45:23 -0700 (PDT)
+Received: by mail-lf1-x142.google.com with SMTP id b1so1840046lfp.11
+        for <kvm@vger.kernel.org>; Wed, 14 Oct 2020 20:45:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=HHTEFLARrai9jAcwvYx9rODqAnP/mRVKE4w7Ff4URe4=;
-        b=qfZILCfxkUpQvE6YU3Z9UodjGZTM49N99Qs09Qi/4D5OgMHut9bruj5fsGafj+WSqd
-         IzSk2arafb2CF6N468LF2DMB9Ru6VOsUrx9OcRJnPaGGsxkEQlQEFe5Iruz9ANnaL6qo
-         bFrI68ljv6tVt4AR+c/yd/G4suzPxvqoS+5sfzfdLVbRfwnsTEhIx5p60B2AylA92DYL
-         lKwZtP2S8JaHJAQeuulu5cQ2npU0PtTcVhmbsSsDcsjyI4LIW95dIePKGAen64iJDxMS
-         7/cvyDiaoN5ikqwUy82WUUjLha/tTcqc+TG96F+SsaIDxH6/WVUQR1Xu7K80mlEnsf3P
-         mf3w==
+        bh=z9zMX2coYN8H3CBILNpr7q+Vk2fAdNTcRYoWO7ULwRE=;
+        b=kKMdDH+imlskdTjp+gjVXY1DrKt1Ep3Ytjb9qBpCPjUyBhxbCRiecmIslucxehpO4n
+         94K6JKqf4UWSCahN3lwioeQ1xls6OR+ilsIPeQej9Otm8Zr6MrYAxTtSJwp0K6pzKYHU
+         L2y1CMmLkLgDHlFIA/AZ9NpRnJW6tranwh6+AYlOSR2COC8/lGkWHPJJM8q7TPU7HfmW
+         Pj+YaAK3TdiMtE7RrMsMD2MK0zu/h9FdyrISKIc7dH1knGMCNQVCCQu5+WskQsLcUxG/
+         /uAveQssjFvYZ2PW7294kGGKD89Mnw7fMO2Sgym2cJk8lQWa3ZcpqsVTe5NmNkbWpgWE
+         k1MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=HHTEFLARrai9jAcwvYx9rODqAnP/mRVKE4w7Ff4URe4=;
-        b=ttCwmvvPVY3Mu732UAx9nqLfCKjqip2a6v54Gs5T66aWRN2clzPqU0cqchVh0NQXH9
-         CMman4ZSeco6ZC9zNYLdAEwMhi7yP/Wu6hxmO6qlQd1GvhDnyZnH6b9YWE48GKO648Z1
-         mizOHHTVI9pJ28etWaylE1h7gq+a3u0r4qnLckcHwyFkortf7wz/k630XV32v4DvXelZ
-         Kxvhj+NOxo2Q9RFS8rNwR2KoMVWOAooQgnJBwIg+6FGXHWe2sPjlZJYPpI2ABVC+suVu
-         JoTq14oXhzbto65O3cyYC73BWwGx8fMLqqKog+QPrOV6JSudOsXoODj526DFhp34Y9Nt
-         tgQQ==
-X-Gm-Message-State: AOAM531J1okavP0Z9weDRxzCUeqV8p6UyE0Jvbx2pM+lI+bTudS2rddu
-        vubeFOs6xAdwq+OmYOdu+Dd9QvqnWQvmg6FfDzA=
-X-Google-Smtp-Source: ABdhPJwrojk583U17UFreB26E6EJBzeY9pns7nnbhf5WVPSQWFljj9y5nCaSrAUUweCPWKFxAyW3SN3Koo6Xjpsvyx8=
-X-Received: by 2002:a2e:b006:: with SMTP id y6mr419563ljk.462.1602733454595;
- Wed, 14 Oct 2020 20:44:14 -0700 (PDT)
+        bh=z9zMX2coYN8H3CBILNpr7q+Vk2fAdNTcRYoWO7ULwRE=;
+        b=bKyxEKdzTjugoJDR1DdOm0+hCwnR5/Q4peHnxwuIDkg9Izjh0saZlak0ZD+BJOifEQ
+         BjXEOawNZpwCHfDOOWXWYf65YIBa3dKUnESG46w5sjaNUqQHPWc1vwmp5TmqGJzRYBpz
+         VcxOgAz82FMAv7o1HldqxriJMSpjrDm7Kd2a08btpJGjc5SLTapc/0i0i1kHEjovwAHS
+         Tme9Dglf3l1PfEyveX32/wCFJkdt460Vm2EpJyyANvvdlMj3E/ei1XApZI1XRJl4Lnzd
+         B9MqyW2ApKzUE4I6B/aGE/dbOmMkS229iluRwz9DW/U7cffdb/SGC9yhcmbCZSNVf5HX
+         YcLA==
+X-Gm-Message-State: AOAM533uqCZreFwYUPT4j2ELwhQj1n2om9mh4zIvP8RuH1xnwR+QpO2W
+        cUqzCO/sJXmxaOAweHa5et4MbzWeQ7zPIcusnjU=
+X-Google-Smtp-Source: ABdhPJxmhGw0f35E0C3XKDWPhs9gxr7BD5N3ErbxT6FYWhPozjavL7xvKRkSdQMsQ7Mb2VXX/bDxA/I2LFN3YqzxYxM=
+X-Received: by 2002:a19:4bd4:: with SMTP id y203mr330362lfa.539.1602733522366;
+ Wed, 14 Oct 2020 20:45:22 -0700 (PDT)
 MIME-Version: 1.0
 References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
  <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
  <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
  <20201012165428.GD26135@linux.intel.com> <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
  <20201013045245.GA11344@linux.intel.com> <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
- <20201013070329.GC11344@linux.intel.com> <CA+-xGqO37RzQDg5dnE_3NWMp6+u2L02GQDqoSr3RdedoMBugrg@mail.gmail.com>
- <626a8667-be00-96b7-f21d-1ec7648ee1e6@redhat.com>
-In-Reply-To: <626a8667-be00-96b7-f21d-1ec7648ee1e6@redhat.com>
+ <CA+-xGqMMa-DB1SND5MRugusDafjNA9CVw-=OBK7q=CK1impmTQ@mail.gmail.com>
+ <a163c2d8-d8a1-dc03-6230-a2e104e3b039@redhat.com> <CA+-xGqOMKRh+_5vYXeLOiGnTMw4L_gUccqdQ+HGSOzuTosp6tw@mail.gmail.com>
+ <a4f3816dab09f4e28e33c66b8ff8273147415567.camel@redhat.com>
+In-Reply-To: <a4f3816dab09f4e28e33c66b8ff8273147415567.camel@redhat.com>
 From:   harry harry <hiharryharryharry@gmail.com>
-Date:   Wed, 14 Oct 2020 23:43:54 -0400
-Message-ID: <CA+-xGqMdVm1tqDMt9PTOxi80oEW_3pFiQaH+WvQfpZ9K1QJKDw@mail.gmail.com>
+Date:   Wed, 14 Oct 2020 23:45:02 -0400
+Message-ID: <CA+-xGqME1C180HcEfOF2cxUtmH6ZeeGqbGYjfYrE7ke8DpuzUg@mail.gmail.com>
 Subject: Re: Why guest physical addresses are not the same as the
  corresponding host virtual addresses in QEMU/KVM? Thanks!
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
-        mathieu.tarral@protonmail.com, stefanha@redhat.com,
-        libvir-list@redhat.com, kvm@vger.kernel.org
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        qemu-devel@nongnu.org, mathieu.tarral@protonmail.com,
+        stefanha@redhat.com, libvir-list@redhat.com, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo and Sean,
+Hi Maxim,
 
-It is clear to me now. Thanks much for your reply and help.
+Thanks for your emphasis. It's much clearer.
 
-
-Best regards,
+Best,
 Harry
