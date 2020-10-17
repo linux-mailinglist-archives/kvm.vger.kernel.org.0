@@ -2,127 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFD2D290FA4
-	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 07:53:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7819291007
+	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 08:12:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436763AbgJQFxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Oct 2020 01:53:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55968 "EHLO
+        id S2437009AbgJQGMT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Oct 2020 02:12:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436688AbgJQFxR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Oct 2020 01:53:17 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3818C0613E7
-        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 22:53:16 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id c21so5013200ljn.13
-        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 22:53:16 -0700 (PDT)
+        with ESMTP id S2436918AbgJQGMT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Oct 2020 02:12:19 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A560C061755
+        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 23:12:19 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id v12so2363978ply.12
+        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 23:12:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=M3YB82PP3WUpBHFEbh3oPhQQSux8Pw6AFe+SN7DiJGw=;
-        b=amsP3PlI3ZycdlVxgLx5tS3RcZ/aE2JugXN/de8WjJzEbbWQfg5yay9mu9yMNOTQEG
-         zDGufeyQG0D8nAwfy0A+eh+5b93z85bXUL2cX8T/4mhVh2wiIWZNqlk28ZRb4QzNB/dh
-         AIBnGWL+ksEigCgQdVu62IDy26gLVIDUnczpRvNend8MTTwuaCQtont43SmFPbW4CRcT
-         cmRIzAt2jsd2hPhc8PRzFfChw9wh+qGJaBiAl8a3e2bI5TkwKjB9tCNO3N3jC/SV0wIn
-         USEp5Yt0/QCw/q0JJrWcSGJN2B9ryqMiiGMVPf4OXy69UAR96sfkVVyhw3En3TdcYtr6
-         S+7g==
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=IBwDRknN7DUE22GjRcZ+zTg/FbCmUOPdhNoxxvl0ET0=;
+        b=fiMq9Fn0pzgVMNP/VjjbyZjJkWY+PH0UQXP5Q3PE/fnS+YXFsevSym6BMJ4ICI7Unt
+         7BC4Y7AzfD0Cfe2As07tI8yqhADJvUJ1ymHaxmk4wcQnB4O496eTU5YicOg+WbDjgnup
+         YeUy9no8gHdN90rkfjK+Ui4i3idcPmFEBe9ea5ekSvSRRz47aLqmxpy3q12fyFFiezoI
+         zsTTFPpPSCbiRw8WOyansR6QeG2XduyfDcxHpZBwSzdqZ2xip4KMwm2ZyBn+jsrAwaNp
+         HqfM03MR8Dlo8R63QyWJtIvoUecb4wO9OvZx/HLXjGhPVgkQaG5XCfq2HetgBxIfekmr
+         laDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=M3YB82PP3WUpBHFEbh3oPhQQSux8Pw6AFe+SN7DiJGw=;
-        b=pDCJzusI+9KBOPl37L3EFXmuYWB/B8NuxUgzmoYLKf6PjjfIMgI0eMkXxoRmsgMc62
-         xJUT+qQLjuIfj0/27N5mChf3qRU4kqUPkilNk9KAh/1AnUZkvcrA8OsEI3KFIgqffGBM
-         BcZwnmvxlH5STEttEM5HZKP8oIfOm1+TVHh1HoE/hT6rKpF4hk+uuHCaMJZ3O1cLpvxN
-         VTpCvO4vrajcPWwtGg6iW7BC389cOScZ6Ov8PYTuzFLyLLcBMoXoYnamZAyd1FZD1B6n
-         79FbH6/WaA2NhsNPSk3FXoFy6IAYDLOWr5FZsWEwK9twCaqaDtnauzXYclWLJKWEP64M
-         xBhg==
-X-Gm-Message-State: AOAM532ePyb9oq9Sfwjz3f8XIWN6I8IeAqVpyHoAn41G6iR82hwbCsPy
-        vk61npK6oGhmqyzKe7JwrKtlpbWR/K1apOnpGhg0Ng==
-X-Google-Smtp-Source: ABdhPJyqRwgfzaNO4k6jC4+ngiz4xp94h1rvkVA6jI+YkhoWwbWi6nRJWMl5uQZtM/9C6Yz+umn28GEOA1tFiD8OGAE=
-X-Received: by 2002:a2e:504b:: with SMTP id v11mr2673538ljd.138.1602913994976;
- Fri, 16 Oct 2020 22:53:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
- <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
- <20201017033606.GA14014@1wt.eu> <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
- <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com> <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
- <20201017053712.GA14105@1wt.eu>
-In-Reply-To: <20201017053712.GA14105@1wt.eu>
-From:   Jann Horn <jannh@google.com>
-Date:   Sat, 17 Oct 2020 07:52:48 +0200
-Message-ID: <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To:     Willy Tarreau <w@1wt.eu>
-Cc:     Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jason Donenfeld <Jason@zx2c4.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "open list:VIRTIO GPU DRIVER" 
-        <virtualization@lists.linux-foundation.org>,
-        "Graf (AWS), Alexander" <graf@amazon.de>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>, bonzini@gnu.org,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, oridgar@gmail.com,
-        ghammer@redhat.com, Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Linux API <linux-api@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=IBwDRknN7DUE22GjRcZ+zTg/FbCmUOPdhNoxxvl0ET0=;
+        b=NEANRxjBggJ5fhfeBwui6yxv+NBSNPUZcb0IndeufnRrwdAfylcCf+p++FvnexZlOW
+         fwPDEZ9VC74lkgLx80Mav+tscbXYmUzknBcmyqN3A0rNIQ0DQCQGUtJnK21ayEU/B9zf
+         1nsszj+DcgpwevMmAlQuMv0iFyyExotS7oHyBQkcIZjGGxCboNNME8HzC2hELF4m8O0M
+         N2On1tV9WxLA0+/TrrZMjPCirDI+8NJPz1+BvVhMOuLRStT8cpQDDXWnZJSVbrEx+QaW
+         XC/kPSQnYEnykqWbSU+RgCrMA0TcXD79IHn9qI/Q3gEhM/qy9JnM8N6KilfRsgg/0j+p
+         7DeA==
+X-Gm-Message-State: AOAM530aLulu6TNW3TV8mU6x5XEYjl4uryruH0OOSEmxsjTCjUJ21KhT
+        hu4jWdhsHMpt7zYESpf9CyU=
+X-Google-Smtp-Source: ABdhPJyJZbIjpjsHorvTpei7+3UjewvDib+UP0SYjsIz15GvXw7HKkI0mJeGTvI/gFyP785MBNSCUw==
+X-Received: by 2002:a17:902:a588:b029:d3:7f4a:28a2 with SMTP id az8-20020a170902a588b02900d37f4a28a2mr7586496plb.26.1602915138581;
+        Fri, 16 Oct 2020 23:12:18 -0700 (PDT)
+Received: from ?IPv6:2601:647:4700:9b2:a16c:70da:997e:1c1b? ([2601:647:4700:9b2:a16c:70da:997e:1c1b])
+        by smtp.gmail.com with ESMTPSA id d129sm4743442pfc.161.2020.10.16.23.12.17
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 16 Oct 2020 23:12:17 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
+Subject: Re: [PATCH 2/2] nSVM: Test reserved values for 'Type' and invalid
+ vectors in EVENTINJ
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20201017000234.42326-3-krish.sadhukhan@oracle.com>
+Date:   Fri, 16 Oct 2020 23:12:16 -0700
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <3C14E481-3298-41CD-A04F-4AC46F9E2C1A@gmail.com>
+References: <20201017000234.42326-1-krish.sadhukhan@oracle.com>
+ <20201017000234.42326-3-krish.sadhukhan@oracle.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 17, 2020 at 7:37 AM Willy Tarreau <w@1wt.eu> wrote:
-> On Sat, Oct 17, 2020 at 07:01:31AM +0200, Jann Horn wrote:
-> > Microsoft's documentation
-> > (http://go.microsoft.com/fwlink/?LinkId=260709) says that the VM
-> > Generation ID that we get after a fork "is a 128-bit,
-> > cryptographically random integer value". If multiple people use the
-> > same image, it guarantees that each use of the image gets its own,
-> > fresh ID:
->
-> No. It cannot be more unique than the source that feeds that cryptographic
-> transformation. All it guarantees is that the entropy source is protected
-> from being guessed based on the output. Applying cryptography on a simple
-> counter provides apparently random numbers that will be unique for a long
-> period for the same source, but as soon as you duplicate that code between
-> users and they start from the same counter they'll get the same IDs.
->
-> This is why I think that using a counter is better if you really need something
-> unique. Randoms only reduce predictability which helps avoiding collisions.
+> On Oct 16, 2020, at 5:02 PM, Krish Sadhukhan =
+<krish.sadhukhan@oracle.com> wrote:
+>=20
+> According to sections "Canonicalization and Consistency Checks" and =
+"Event
+> Injection" in APM vol 2
+>=20
+>    VMRUN exits with VMEXIT_INVALID error code if either:
+>      - Reserved values of TYPE have been specified, or
+>      - TYPE =3D 3 (exception) has been specified with a vector that =
+does not
+> 	correspond to an exception (this includes vector 2, which is an =
+NMI,
+> 	not an exception).
+>=20
+> Existing tests already cover part of the second rule. This patch =
+covers the
+> the first rule and the missing pieces of the second rule.
+>=20
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+> x86/svm_tests.c | 40 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 40 insertions(+)
+>=20
+> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+> index f78c9e4..e6554e4 100644
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -2132,6 +2132,45 @@ static void test_dr(void)
+> 	vmcb->save.dr7 =3D dr_saved;
+> }
+>=20
+> +static void test_event_inject(void)
+> +{
+> +	u32 i;
+> +	u32 event_inj_saved =3D vmcb->control.event_inj;
+> +
+> +	handle_exception(DE_VECTOR, my_isr);
+> +
+> +	report (svm_vmrun() =3D=3D SVM_EXIT_VMMCALL && count_exc =3D=3D =
+0, "Test "
+> +	    "No EVENTINJ");
+> +
+> +	/*
+> +	 * Reserved values for 'Type' in EVENTINJ causes VMEXIT_INVALID.
+> +	 */
+> +	for (i =3D 1; i < 8; i++) {
+> +		if (i !=3D 1 && i < 5)
+> +			continue;
+> +		vmcb->control.event_inj =3D DE_VECTOR |
+> +		    i << SVM_EVTINJ_TYPE_SHIFT | SVM_EVTINJ_VALID;
+> +		report(svm_vmrun() =3D=3D SVM_EXIT_ERR && count_exc =3D=3D=
+ 0,
+> +		    "Test invalid TYPE (%x) in EVENTINJ", i);
+> +	}
+> +
+> +	/*
+> +	 * Invalid vector number for event type 'exception' in EVENTINJ
+> +	 * causes VMEXIT_INVALID.
+> +	 */
+> +	i =3D 32;
+> +	while (i < 256) {
+> +		vmcb->control.event_inj =3D i | SVM_EVTINJ_TYPE_EXEPT |
+> +		    SVM_EVTINJ_VALID;
+> +		report(svm_vmrun() =3D=3D SVM_EXIT_ERR && count_exc =3D=3D=
+ 0,
+> +		    "Test invalid vector (%u) in EVENTINJ for event type =
+"
+> +		    "\'exception\'", i);
+> +		i +=3D 4;
+> +	}
 
-Microsoft's spec tells us that they're giving us cryptographically
-random numbers. Where they're getting those from is not our problem.
-(And if even the hypervisor is not able to collect enough entropy to
-securely generate random numbers, worrying about RNG reseeding in the
-guest would be kinda pointless, we'd be fairly screwed anyway.)
+I know that kvm-unit-tests has nothing to do with style, but can=E2=80=99t=
+ this loop
+be turned into a for-loop for readability?
 
-Also note that we don't actually need to *always* reinitialize RNG
-state on forks for functional correctness; it is fine if that fails
-with a probability of 2^-128, because functionally everything will be
-fine, and an attacker who is that lucky could also just guess an AES
-key (which has the same probability of being successful). (And also
-2^-128 is such a tiny number that it doesn't matter anyway.)
+And why "i +=3D 4" ?
 
-> And I'm saying this as someone who had on his external gateway the same SSH
-> host key as 89 other hosts on the net, each of them using randoms to provide
-> a universally unique one...
-
-If your SSH host key was shared with 89 other hosts, it evidently
-wasn't generated from cryptographically random numbers. :P Either
-because the key generator was not properly hooked up to the system's
-entropy pool (if you're talking about the Debian fiasco), or because
-the system simply did not have enough entropy available. (Or because
-the key generator is broken, but I don't think that ever happened with
-OpenSSH?)
