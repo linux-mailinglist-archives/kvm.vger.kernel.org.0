@@ -2,210 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4D9F2912CC
-	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 17:59:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E0FB29135D
+	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 19:56:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437802AbgJQP7g convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 17 Oct 2020 11:59:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43632 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2437772AbgJQP7f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Oct 2020 11:59:35 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209253] Loss of connectivity on guest after important host <->
- guest traffic
-Date:   Sat, 17 Oct 2020 15:59:34 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kdev@mb706.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209253-28872-LSL4VMiteM@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209253-28872@https.bugzilla.kernel.org/>
-References: <bug-209253-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S2438714AbgJQRyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Oct 2020 13:54:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53464 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2438689AbgJQRyo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Oct 2020 13:54:44 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2906EC061755;
+        Sat, 17 Oct 2020 10:54:44 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id hk7so3243215pjb.2;
+        Sat, 17 Oct 2020 10:54:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ywf91qFk4g7sz+DlmxxY8d4Lv3wU4S3rRm5J3fQEk4I=;
+        b=UZMxJgpw2+g0COQ0LZ330jX8puaeXgFg86Yfbu4RbU2DBTTg61lxtelBciP6dNan4K
+         UmV5FoIhzK7ibnO9G4ii5EDKh+HWCsi/8+eVxGxEXcfOlfsoPHFlQtT0k2AV3QOLVu+1
+         hny/0fnCMOeS8dsZYnwWypgG56VNHBgALMCJz2mazB5ia2xo8EfX4q3QaNqv23qcxw/f
+         Ou7X+Aab1THgbP9vdSrkyxJv2Cuo/5gwXIanzJ/UrkrxvJxX3Edc8yXReN3FI98DLDNb
+         sPfjeqEgDsNMzEu+28ZHFJRJ/4yim5X2H/xv/0RPHSAu5p/SFtwvcblfr28DbnKO+/sh
+         h+IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ywf91qFk4g7sz+DlmxxY8d4Lv3wU4S3rRm5J3fQEk4I=;
+        b=WWDJ0cgOKzT7gsW6KUgK7dhrOfmTvQLEW+sCFBPYCEioNs3Tmdy/pP3kP/HWbZV7v6
+         1W0C4VnuL1bR2GRKMSfYslISTDJbuvxTXefn6aZs+XeK1w7nk+7sBkCwgSyH9yn4QR6j
+         l3jP8117sZCqgm4ok7j/vjnG8Zkmhlx2B34tzhjres/GFAzZ/axdIVG+8baw6IQ4jykC
+         q2vSuphUlkZeWKXHyjzUOiiFreSQQGtFFDiYoqPr5UplTR4lNG7PGzJLGIHrb2cnRoRH
+         lnAkCE+QVYB/zAuOlXBqUxTDPNlm1RX2Unflt6zoCC9KkLjn2aNWZMz0/HEvbeEMPWJx
+         +PPw==
+X-Gm-Message-State: AOAM531HQWwsMGmTxDpv5PVINzamsiEGm4ijpTgRDoFV1+x3Lr3GXAtr
+        pw0wFq78311oRb00E/T6E2inYzP2Tdmp
+X-Google-Smtp-Source: ABdhPJzWAzu9OVUFxwRwXzu0nwufS/0UacK/dYlj/pcYUHlETMRaHkFvdxPLGJ4p+Q9uF4gGoYpj2A==
+X-Received: by 2002:a17:902:8508:b029:d5:af79:8b40 with SMTP id bj8-20020a1709028508b02900d5af798b40mr9886951plb.28.1602957283250;
+        Sat, 17 Oct 2020 10:54:43 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id b3sm6309041pfd.66.2020.10.17.10.54.40
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 17 Oct 2020 10:54:42 -0700 (PDT)
+From:   lihaiwei.kernel@gmail.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, Haiwei Li <lihaiwei@tencent.com>
+Subject: [PATCH v4] KVM: Check the allocation of pv cpu mask
+Date:   Sun, 18 Oct 2020 01:54:36 +0800
+Message-Id: <20201017175436.17116-1-lihaiwei.kernel@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209253
+From: Haiwei Li <lihaiwei@tencent.com>
 
-Martin (kdev@mb706.com) changed:
+check the allocation of per-cpu __pv_cpu_mask. Init
+'send_IPI_mask_allbutself' only when successful and check the allocation
+of __pv_cpu_mask in 'kvm_flush_tlb_others'.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |kdev@mb706.com
+Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+v1 -> v2:
+ * add CONFIG_SMP for kvm_send_ipi_mask_allbutself to prevent build error
+v2 -> v3:
+ * always check the allocation of __pv_cpu_mask in kvm_flush_tlb_others
+v3 -> v4:
+ * mov kvm_setup_pv_ipi to kvm_alloc_cpumask and get rid of kvm_apic_init
 
---- Comment #2 from Martin (kdev@mb706.com) ---
-I am having problems possibly related to Clement's, and likely related to
-Ian's. 
-I am running KVM on a dual Nvidia GPU machine, passing one GPU through to the
-KVM guest (Ubuntu 20.04.1).
-The setup ran stable for quite a while on Fedora 31 (5.7.15-100). After
-upgrading to Fedora 32 (5.8.13), the system tends to run well for a few hours
-after rebooting, and then produces oopses (below). After the oops, VirtIO
-drives, VirtIO network cards, and PCIe passthrough tend to hang indefinitely
-within minutes of rebooting the guest, usually making the guest inoperable
-(unless only non-VirtIO devices and no GPU passthrough are used). Rebooting the
-host makes things work again for a few hours until the next oops happens. I am
-on 5.8.14 now with the same problem.
+ arch/x86/kernel/kvm.c | 53 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 36 insertions(+), 17 deletions(-)
 
-Oops 1 (I saw this twice, once on 5.8.13-200 and once on 5.8.14-200):
-
-WARNING: CPU: 28 PID: 17651 at fs/eventfd.c:74 eventfd_signal+0x88/0xa0
-Modules linked in: vhost_net vhost tap vhost_iotlb v4l2loopback(OE) xt_nat
-xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT nf_nat_tftp nft_objref
-nf_conntrack_tftp tun bridge stp llc evdi(OE) vboxnetadp(OE) vboxnetflt(OE)
-vboxdrv(OE) nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet
-nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_tables
-ebtable_nat ebtable_broute ip6table_nat ip6table_mangle ip6table_raw
-ip6table_security iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
-iptable_mangle iptable_raw iptable_security ip_set nfnetlink ebtable_filter
-ebtables ip6table_filter ip6_tables iptable_filter sunrpc ucsi_ccg typec_ucsi
-nvidia_drm(POE) typec nvidia_modeset(POE) snd_hda_codec_realtek nvidia_uvm(OE)
-snd_hda_codec_generic ledtrig_audio snd_hda_codec_hdmi btusb edac_mce_amd btrtl
-btbcm snd_hda_intel uvcvideo iwlmvm snd_intel_dspcfg kvm_amd btintel
-snd_usb_audio snd_hda_codec videobuf2_vmalloc videobuf2_memops snd_usbmidi_lib
-mac80211
- nvidia(POE) kvm bluetooth snd_hda_core videobuf2_v4l2 snd_rawmidi snd_hwdep
-videobuf2_common libarc4 snd_seq iwlwifi videodev joydev rapl snd_seq_device
-ecdh_generic wmi_bmof pcspkr cfg80211 mc ecc snd_pcm drm_kms_helper snd_timer
-sp5100_tco k10temp snd i2c_piix4 rfkill soundcore cec i2c_nvidia_gpu gpio_amdpt
-gpio_generic acpi_cpufreq drm ip_tables dm_crypt hid_lenovo mxm_wmi
-crct10dif_pclmul crc32_pclmul crc32c_intel nvme ghash_clmulni_intel nvme_core
-igb wacom ccp uas dca usb_storage i2c_algo_bit wmi pinctrl_amd vfio_pci
-irqbypass vfio_virqfd vfio_iommu_type1 vfio fuse
-CPU: 28 PID: 17651 Comm: CPU 5/KVM Tainted: P           OE    
-5.8.13-200.fc32.x86_64 #1
-Hardware name: Gigabyte Technology Co., Ltd. X399 DESIGNARE EX/X399 DESIGNARE
-EX-CF, BIOS F12 12/11/2019
-RIP: 0010:eventfd_signal+0x88/0xa0
-Code: 03 00 00 00 4c 89 f7 e8 26 16 db ff 65 ff 0d 3f f3 ca 4b 4c 89 ee 4c 89
-f7 e8 34 8e 7f 00 4c 89 e0 5b 5d 41 5c 41 5d 41 5e c3 <0f> 0b 45 31 e4 5b 5d 4c
-89 e0 41 5c 41 5d 41 5e c3 0f 1f 80 00 00
-RSP: 0018:ffffab10c8db7bb0 EFLAGS: 00010286
-RAX: 00000000ffffffff RBX: ffff9a71e16b8000 RCX: 0000000000000004
-RDX: 00000000c8088704 RSI: 0000000000000001 RDI: ffff9a8335656580
-RBP: ffffab10c8db7c18 R08: ffff9a72f7d120a0 R09: 00000000c8088708
-R10: 0000000000000000 R11: 0000000000000014 R12: 0000000000000001
-R13: ffff9a72a3153448 R14: ffff9a72f7d120a0 R15: ffff9a72a3153448
-FS:  0000000000000000(0000) GS:ffff9a7e7f280000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f64e403f024 CR3: 000000041b5f4000 CR4: 00000000003406e0
-Call Trace:
- ioeventfd_write+0x51/0x80 [kvm]
- __kvm_io_bus_write+0x88/0xb0 [kvm]
- kvm_io_bus_write+0x43/0x60 [kvm]
- write_mmio+0x70/0xf0 [kvm]
- emulator_read_write_onepage+0x11e/0x330 [kvm]
- emulator_read_write+0xca/0x180 [kvm]
- segmented_write.isra.0+0x4a/0x60 [kvm]
- x86_emulate_insn+0x850/0xe60 [kvm]
- x86_emulate_instruction+0x2c7/0x780 [kvm]
- ? kvm_set_cr8+0x1e/0x40 [kvm]
- kvm_arch_vcpu_ioctl_run+0xeb9/0x1770 [kvm]
- ? x86_pmu_enable+0x106/0x2f0
- ? __switch_to_xtra+0x495/0x500
- kvm_vcpu_ioctl+0x209/0x590 [kvm]
- ksys_ioctl+0x82/0xc0
- __x64_sys_ioctl+0x16/0x20
- do_syscall_64+0x4d/0x90
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x7f5f6a84f3bb
-Code: 0f 1e fa 48 8b 05 dd aa 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff
-c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01
-c3 48 8b 0d ad aa 0c 00 f7 d8 64 89 01 48
-RSP: 002b:00007f5f527fb668 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000055c459b6f1f0 RCX: 00007f5f6a84f3bb
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000022
-RBP: 00007f5f6bcca000 R08: 000055c45750abf0 R09: 000000003b9aca00
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007f5f6bccb004 R14: 0000000000000000 R15: 000055c4579a4a00
-
-Oops 2 (saw this once on 5.8.14-200):
-
-WARNING: CPU: 24 PID: 0 at fs/eventfd.c:74 eventfd_signal+0x88/0xa0
-Modules linked in: v4l2loopback(OE) nfnetlink_queue nfnetlink_log vhost_net
-vhost tap vhost_iotlb xt_nat xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT
-nf_nat_tftp nft_objref nf_conntrack_tftp tun bridge stp llc vboxnetadp(OE)
-vboxnetflt(OE) vboxdrv(OE) nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib
-nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat
-nf_tables ebtable_nat ebtable_broute ip6table_nat ip6table_mangle ip6table_raw
-ip6table_security iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
-iptable_mangle iptable_raw iptable_security ip_set nfnetlink ebtable_filter
-ebtables ip6table_filter ip6_tables iptable_filter sunrpc nvidia_drm(POE)
-nvidia_modeset(POE) iwlmvm nvidia_uvm(OE) snd_hda_codec_realtek ucsi_ccg
-typec_ucsi mac80211 typec edac_mce_amd snd_hda_codec_generic ledtrig_audio
-snd_hda_codec_hdmi uvcvideo btusb btrtl btbcm nvidia(POE) snd_hda_intel
-videobuf2_vmalloc libarc4 kvm_amd btintel videobuf2_memops snd_intel_dspcfg
- snd_hda_codec videobuf2_v4l2 kvm bluetooth videobuf2_common snd_usb_audio
-iwlwifi snd_hda_core videodev snd_usbmidi_lib snd_hwdep snd_seq snd_rawmidi
-joydev rapl snd_seq_device ecdh_generic mc pcspkr wmi_bmof ecc cfg80211 snd_pcm
-drm_kms_helper snd_timer snd sp5100_tco i2c_piix4 k10temp rfkill soundcore cec
-i2c_nvidia_gpu gpio_amdpt gpio_generic acpi_cpufreq drm ip_tables dm_crypt
-mxm_wmi crct10dif_pclmul crc32_pclmul crc32c_intel nvme ghash_clmulni_intel igb
-nvme_core wacom uas dca hid_lenovo ccp usb_storage i2c_algo_bit wmi pinctrl_amd
-vfio_pci irqbypass vfio_virqfd vfio_iommu_type1 vfio fuse
-CPU: 24 PID: 0 Comm: swapper/24 Tainted: P           OE    
-5.8.14-200.fc32.x86_64 #1
-Hardware name: Gigabyte Technology Co., Ltd. X399 DESIGNARE EX/X399 DESIGNARE
-EX-CF, BIOS F12 12/11/2019
-RIP: 0010:eventfd_signal+0x88/0xa0
-Code: 03 00 00 00 4c 89 f7 e8 a6 14 db ff 65 ff 0d bf f1 ca 78 4c 89 ee 4c 89
-f7 e8 b4 9c 7f 00 4c 89 e0 5b 5d 41 5c 41 5d 41 5e c3 <0f> 0b 45 31 e4 5b 5d 4c
-89 e0 41 5c 41 5d 41 5e c3 0f 1f 80 00 00
-RSP: 0018:ffffb5e2c6d2cf38 EFLAGS: 00010002
-RAX: 0000000000000001 RBX: ffff894a2a1f1480 RCX: 000000000000001f
-RDX: ffff89423920ce00 RSI: 0000000000000001 RDI: ffff894929afc580
-RBP: ffff89423920cea4 R08: ffffb5e2c6d2cff8 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 00000000000000a1
-R13: 0000000000000000 R14: ffffb5e2c6d2cfb4 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff89423f180000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055ae44aa8990 CR3: 0000000797204000 CR4: 00000000003406e0
-Call Trace:
- <IRQ>
- vfio_msihandler+0x12/0x20 [vfio_pci]
- __handle_irq_event_percpu+0x42/0x180
- handle_irq_event+0x47/0x8a
- handle_edge_irq+0x87/0x220
- asm_call_irq_on_stack+0x12/0x20
- </IRQ>
- common_interrupt+0xb2/0x140
- asm_common_interrupt+0x1e/0x40
-RIP: 0010:cpuidle_enter_state+0xb6/0x3f0
-Code: 90 a5 6b 78 e8 5b be 7b ff 49 89 c7 0f 1f 44 00 00 31 ff e8 2c d7 7b ff
-80 7c 24 0f 00 0f 85 d4 01 00 00 fb 66 0f 1f 44 00 00 <45> 85 e4 0f 88 e0 01 00
-00 49 63 d4 4c 2b 7c 24 10 48 8d 04 52 48
-RSP: 0018:ffffb5e2c0337e88 EFLAGS: 00000246
-RAX: ffff89423f1aa2c0 RBX: ffff89423366e400 RCX: 000000000000001f
-RDX: 0000000000000000 RSI: 000000002abf3055 RDI: 0000000000000000
-RBP: ffffffff88b78940 R08: 00000a86556fd237 R09: 0000000000000018
-R10: 0000000000002358 R11: 0000000000000781 R12: 0000000000000002
-R13: ffff89423366e400 R14: 0000000000000002 R15: 00000a86556fd237
- ? cpuidle_enter_state+0xa4/0x3f0
- cpuidle_enter+0x29/0x40
- do_idle+0x1d5/0x2a0
- cpu_startup_entry+0x19/0x20
- start_secondary+0x144/0x170
- secondary_startup_64+0xb6/0xc0
-
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 42c6e0deff9e..be28203cc098 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -547,16 +547,6 @@ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
+ 	__send_ipi_mask(local_mask, vector);
+ }
+ 
+-/*
+- * Set the IPI entry points
+- */
+-static void kvm_setup_pv_ipi(void)
+-{
+-	apic->send_IPI_mask = kvm_send_ipi_mask;
+-	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
+-	pr_info("setup PV IPIs\n");
+-}
+-
+ static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
+ {
+ 	int cpu;
+@@ -619,6 +609,11 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+ 	struct kvm_steal_time *src;
+ 	struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+ 
++	if (unlikely(!flushmask)) {
++		native_flush_tlb_others(cpumask, info);
++		return;
++	}
++
+ 	cpumask_copy(flushmask, cpumask);
+ 	/*
+ 	 * We have to call flush only on online vCPUs. And
+@@ -732,10 +727,6 @@ static uint32_t __init kvm_detect(void)
+ 
+ static void __init kvm_apic_init(void)
+ {
+-#if defined(CONFIG_SMP)
+-	if (pv_ipi_supported())
+-		kvm_setup_pv_ipi();
+-#endif
+ }
+ 
+ static void __init kvm_init_platform(void)
+@@ -765,10 +756,18 @@ static __init int activate_jump_labels(void)
+ }
+ arch_initcall(activate_jump_labels);
+ 
++static void kvm_free_cpumask(void)
++{
++	unsigned int cpu;
++
++	for_each_possible_cpu(cpu)
++		free_cpumask_var(per_cpu(__pv_cpu_mask, cpu));
++}
++
+ static __init int kvm_alloc_cpumask(void)
+ {
+ 	int cpu;
+-	bool alloc = false;
++	bool alloc = false, alloced = true;
+ 
+ 	if (!kvm_para_available() || nopv)
+ 		return 0;
+@@ -783,10 +782,30 @@ static __init int kvm_alloc_cpumask(void)
+ 
+ 	if (alloc)
+ 		for_each_possible_cpu(cpu) {
+-			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+-				GFP_KERNEL, cpu_to_node(cpu));
++			if (!zalloc_cpumask_var_node(
++				per_cpu_ptr(&__pv_cpu_mask, cpu),
++				GFP_KERNEL, cpu_to_node(cpu))) {
++				alloced = false;
++				break;
++			}
+ 		}
+ 
++#if defined(CONFIG_SMP)
++	/* Set the IPI entry points */
++	if (pv_ipi_supported()) {
++		apic->send_IPI_mask = kvm_send_ipi_mask;
++		if (alloced)
++			apic->send_IPI_mask_allbutself =
++				kvm_send_ipi_mask_allbutself;
++		pr_info("setup PV IPIs\n");
++	}
++#endif
++
++	if (!alloced) {
++		kvm_free_cpumask();
++		return -ENOMEM;
++	}
++
+ 	return 0;
+ }
+ arch_initcall(kvm_alloc_cpumask);
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+2.18.4
+
