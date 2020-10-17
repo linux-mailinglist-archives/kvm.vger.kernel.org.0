@@ -2,162 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8FD9290FD7
-	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 08:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDD73290F78
+	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 07:39:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436819AbgJQGBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Oct 2020 02:01:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57290 "EHLO
+        id S2436557AbgJQFjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Oct 2020 01:39:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436924AbgJQGBm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Oct 2020 02:01:42 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CD95C05BD1A
-        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 21:03:05 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id d24so4895568ljg.10
-        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 21:03:05 -0700 (PDT)
+        with ESMTP id S2436538AbgJQFjn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Oct 2020 01:39:43 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98260C05BD2E
+        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 22:01:59 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id i2so4994880ljg.4
+        for <kvm@vger.kernel.org>; Fri, 16 Oct 2020 22:01:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uR2yRSoFIyQFa85ZmyTeQWbKesy0kogveF0JOmK3HCU=;
-        b=G0aFMwnXL3XlqQtltqTo0eoChMRvdBPFzMoicowzO+xAY5WA7wnecLBujcLmZah0k/
-         e5mpG2PgiCXI5UV6aPxyJHgp+ak3mHqsIwGNyATLAY9IpyytJ/yv/eUNLEx8n5Z8IWxM
-         5Ev81C4+GL/IiR5iIz/ra80OcP7ctuQ69Pj2L7/QrHYXrCEAAle4I31KIYWKOWdz7wXn
-         M3HFOt505tL/bufF7RKhxyavqsmuktaYt6aLjMXM2bezAY35bwnHVGu6RsGL9aReXefA
-         CUnwlpUOUePqMTfmrge6m16eiA1+eUvlxTaBEHUJphVGNMuBAicVc8kqC269vRlgE0G9
-         pD+w==
+         :cc:content-transfer-encoding;
+        bh=Hx7Q/ww8SNQlC+Vff55Qg1KHQPfa6zByV8YGUpfQHNk=;
+        b=Mj4ipAZT8hm2EFBVYWNa/tPYN08h/c6I9aqqDDNKd/U1Gx8lY/fq6SCOLleNehgJrg
+         16iTyZDjW3bOYh1hhqWtA77oKiTI+TPM4N1Keo/JnJzSrlqFLzW7RPlCSwXodHNBHioe
+         60sjtbu/3EHa3YEwd0uy5df4RemUuD5LYm5H+8Y1Jz0qZOf6lUVUq/8KwhvUZ8M3r7Gw
+         bWF2ycp8+cBNuu5EidPWzLVcRpMEVOSaAgokNP1gQ/Vcr6lzp6alR3rT1I0+BfHSKna1
+         MUB9pFRtzc7GBqzTpgUnKrsGKvi+izpGnZj97WNgEpuknnloyOVePKBpgA5B1rIzMjOM
+         A/bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uR2yRSoFIyQFa85ZmyTeQWbKesy0kogveF0JOmK3HCU=;
-        b=hHcE5/jYcbNjuWJRWVqmHHhcGtMJ5Lov3hkXhlUz086xnVIaKdISXC0/tQSTDjoH9o
-         VK99tOcj4S70dObPo5iElsfJa5+Up9+Ub9EkdpUoYUYhL7YWoZuTv6+M9sn9cn4jQhCU
-         eUUF4og1lRx7bDOEDOdCcDvK4sYIeAk1ncf+IfbpcF81uuvZfrSSfpW2nkhQVKgflwk7
-         eZ15ElJlg/Aj/gyPNZS3SQsTBs7yjsOOqkdm6g4B1jxU3szf5ZJZUVm71IR3wnS9/mj0
-         kdGGK3bY05IB1FnMTYZgaFWVX4z5a/0c5drBc9r+Si6NAdpb6Rk1j+m5C1hWuwVw9NOT
-         DEQQ==
-X-Gm-Message-State: AOAM532kjWY5lUjJ8rwnmP4AJ4NzQ/tMOjkpTOT3x1pG84tZM0Kj//be
-        X51CDkUvvLf08AxGuS8S5fRE/xPjXpJ55V5yfzRkSg==
-X-Google-Smtp-Source: ABdhPJyWM+KuxWSKm+WZakQM1coYpvqzhvFBssVoo8yKJsSvLXOonodEkq1Mrj4Ytt2McNT6VBun6xj6Gc9/hPkEfDk=
-X-Received: by 2002:a2e:8816:: with SMTP id x22mr2543467ljh.377.1602907383409;
- Fri, 16 Oct 2020 21:03:03 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Hx7Q/ww8SNQlC+Vff55Qg1KHQPfa6zByV8YGUpfQHNk=;
+        b=CYjdKb7SzqWSyDDBt/qgB6xof1+XjdJZwB7A8oct3CHnDK/paql9WlQSUkPSyUVchl
+         Nhq3TzTvMHytQZY3YT/DTh7IQpryqqzLmgdjN2vyiWZvtTuceTDo2OKoaPzRnnsY71nq
+         kGiSW8mkzhdwJxhS0DkNJxgBiEdnjJ+fXuk8RtuwPpzrIgLZB/OWXXmK1cckIjuWqCtO
+         IP/oFQIr2i6FPgtCgsNdRFGGkzPhk72wPsUggKcT4YoZDgrBL6P+KdHk5thfn1vlswgv
+         wKcChn1CBw2j8LJWGAj4fE88zZUQDVZDeruVmAAPrCIaFTcBBGX5cXDmHEG/BtgmF6hy
+         vFEw==
+X-Gm-Message-State: AOAM531gCZE9utwEotI1GqcgBMnnvzL/VOrirKKnDMkYe7FjO+BGOn62
+        pFd51QXW8wX5OsV9CayjMgxIeqExCykx/uXHN3pgFw==
+X-Google-Smtp-Source: ABdhPJxCQSIczBapjLlcHFxQX22QzzHRPdqAFoK5FO3ftEN502eaH7vfcq23H3Fg7kt7YZD0VFtLi0VxAAPhKjminMo=
+X-Received: by 2002:a2e:b6cf:: with SMTP id m15mr2566942ljo.74.1602910917566;
+ Fri, 16 Oct 2020 22:01:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
- <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com> <20201017033606.GA14014@1wt.eu>
-In-Reply-To: <20201017033606.GA14014@1wt.eu>
+ <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+ <20201017033606.GA14014@1wt.eu> <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
+ <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
+In-Reply-To: <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
 From:   Jann Horn <jannh@google.com>
-Date:   Sat, 17 Oct 2020 06:02:36 +0200
-Message-ID: <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
+Date:   Sat, 17 Oct 2020 07:01:31 +0200
+Message-ID: <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
 Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To:     Willy Tarreau <w@1wt.eu>
-Cc:     "Catangiu, Adrian Costin" <acatan@amazon.com>,
+To:     Colm MacCarthaigh <colmmacc@amazon.com>
+Cc:     Willy Tarreau <w@1wt.eu>,
+        "Catangiu, Adrian Costin" <acatan@amazon.com>,
         Andy Lutomirski <luto@kernel.org>,
         Jason Donenfeld <Jason@zx2c4.com>,
         "Theodore Y. Ts'o" <tytso@mit.edu>,
         Eric Biggers <ebiggers@kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        "open list:VIRTIO GPU DRIVER" 
         <virtualization@lists.linux-foundation.org>,
         "Graf (AWS), Alexander" <graf@amazon.de>,
-        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "bonzini@gnu.org" <bonzini@gnu.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>, bonzini@gnu.org,
         "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        "oridgar@gmail.com" <oridgar@gmail.com>,
-        "ghammer@redhat.com" <ghammer@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "Weiss, Radu" <raduweis@amazon.com>, oridgar@gmail.com,
+        ghammer@redhat.com, Jonathan Corbet <corbet@lwn.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Qemu Developers <qemu-devel@nongnu.org>,
         KVM list <kvm@vger.kernel.org>,
         Michal Hocko <mhocko@kernel.org>,
         "Rafael J. Wysocki" <rafael@kernel.org>,
         Pavel Machek <pavel@ucw.cz>,
         Linux API <linux-api@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 17, 2020 at 5:36 AM Willy Tarreau <w@1wt.eu> wrote:
-> On Sat, Oct 17, 2020 at 03:40:08AM +0200, Jann Horn wrote:
-> > [adding some more people who are interested in RNG stuff: Andy, Jason,
-> > Theodore, Willy Tarreau, Eric Biggers. also linux-api@, because this
-> > concerns some pretty fundamental API stuff related to RNG usage]
-> >
-> > On Fri, Oct 16, 2020 at 4:33 PM Catangiu, Adrian Costin
-> > <acatan@amazon.com> wrote:
-> > > This patch is a driver which exposes the Virtual Machine Generation ID
-> > > via a char-dev FS interface that provides ID update sync and async
-> > > notification, retrieval and confirmation mechanisms:
-> > >
-> > > When the device is 'open()'ed a copy of the current vm UUID is
-> > > associated with the file handle. 'read()' operations block until the
-> > > associated UUID is no longer up to date - until HW vm gen id changes -
-> > > at which point the new UUID is provided/returned. Nonblocking 'read()'
-> > > uses EWOULDBLOCK to signal that there is no _new_ UUID available.
-> > >
-> > > 'poll()' is implemented to allow polling for UUID updates. Such
-> > > updates result in 'EPOLLIN' events.
-> > >
-> > > Subsequent read()s following a UUID update no longer block, but return
-> > > the updated UUID. The application needs to acknowledge the UUID update
-> > > by confirming it through a 'write()'.
-> > > Only on writing back to the driver the right/latest UUID, will the
-> > > driver mark this "watcher" as up to date and remove EPOLLIN status.
-> > >
-> > > 'mmap()' support allows mapping a single read-only shared page which
-> > > will always contain the latest UUID value at offset 0.
-> >
-> > It would be nicer if that page just contained an incrementing counter,
-> > instead of a UUID. It's not like the application cares *what* the UUID
-> > changed to, just that it *did* change and all RNGs state now needs to
-> > be reseeded from the kernel, right? And an application can't reliably
-> > read the entire UUID from the memory mapping anyway, because the VM
-> > might be forked in the middle.
-> >
-> > So I think your kernel driver should detect UUID changes and then turn
-> > those into a monotonically incrementing counter. (Probably 64 bits
-> > wide?) (That's probably also a little bit faster than comparing an
-> > entire UUID.)
+On Sat, Oct 17, 2020 at 6:34 AM Colm MacCarthaigh <colmmacc@amazon.com> wro=
+te:
+> On 16 Oct 2020, at 21:02, Jann Horn wrote:
+> > On Sat, Oct 17, 2020 at 5:36 AM Willy Tarreau <w@1wt.eu> wrote:
+> > But in userspace, we just need a simple counter. There's no need for
+> > us to worry about anything else, like timestamps or whatever. If we
+> > repeatedly fork a paused VM, the forked VMs will see the same counter
+> > value, but that's totally fine, because the only thing that matters to
+> > userspace is that the counter changes when the VM is forked.
 >
-> I agree with this. Further, I'm observing there is a very common
-> confusion between "universally unique" and "random". Randoms are
-> needed when seeking unpredictability. A random number generator
-> *must* be able to return the same value multiple times in a row
-> (though this is rare), otherwise it's not random.
-[...]
-> If the UUIDs used there are real UUIDs, it could be as simple as
-> updating them according to their format, i.e. updating the timestamp,
-> and if the timestamp is already the same, just increase the seq counter.
-> Doing this doesn't require entropy, doesn't need to block and doesn't
-> needlessly leak randoms that sometimes make people feel nervous.
+> For user-space, even a single bit would do. We added MADVISE_WIPEONFORK
+> so that userspace libraries can detect fork()/clone() robustly, for the
+> same reasons. It just wipes a page as the indicator, which is
+> effectively a single-bit signal, and it works well. On the user-space
+> side of this, I=E2=80=99m keen to find a solution like that that we can u=
+se
+> fairly easily inside of portable libraries and applications. The =E2=80=
+=9Chave
+> I forked=E2=80=9D checks do end up in hot paths, so it=E2=80=99s nice if =
+they can be
+> CPU cache friendly. Comparing a whole 128-bit value wouldn=E2=80=99t be m=
+y
+> favorite.
 
-Those UUIDs are supplied by existing hypervisor code; in that regard,
-this is almost like a driver for a hardware device. It is written
-against a fixed API provided by the underlying machine. Making sure
-that the sequence of UUIDs, as seen from inside the machine, never
-changes back to a previous one is the responsibility of the hypervisor
-and out of scope for this driver.
+I'm pretty sure a single bit is not enough if you want to have a
+single page, shared across the entire system, that stores the VM
+forking state; you need a counter for that.
 
-Microsoft's spec document (which is a .docx file for reasons I don't
-understand) actually promises us that it is a cryptographically random
-128-bit integer value, which means that if you fork a VM 2^64 times,
-the probability that any two of those VMs have the same counter is
-2^-64. That should be good enough.
+> > And actually, since the value is a cryptographically random 128-bit
+> > value, I think that we should definitely use it to help reseed the
+> > kernel's RNG, and keep it secret from userspace. That way, even if the
+> > VM image is public, we can ensure that going forward, the kernel RNG
+> > will return securely random data.
+>
+> If the image is public, you need some extra new raw entropy from
+> somewhere. The gen-id could be mixed in, that can=E2=80=99t do any harm a=
+s
+> long as rigorous cryptographic mixing with the prior state is used, but
+> if that=E2=80=99s all you do then the final state is still deterministic =
+and
+> non-secret.
 
-But in userspace, we just need a simple counter. There's no need for
-us to worry about anything else, like timestamps or whatever. If we
-repeatedly fork a paused VM, the forked VMs will see the same counter
-value, but that's totally fine, because the only thing that matters to
-userspace is that the counter changes when the VM is forked.
+Microsoft's documentation
+(http://go.microsoft.com/fwlink/?LinkId=3D260709) says that the VM
+Generation ID that we get after a fork "is a 128-bit,
+cryptographically random integer value". If multiple people use the
+same image, it guarantees that each use of the image gets its own,
+fresh ID: The table in section "How to implement virtual machine
+generation ID support in a virtualization platform" says that (among
+other things) "Virtual machine is imported, copied, or cloned"
+generates a new generation ID.
 
-And actually, since the value is a cryptographically random 128-bit
-value, I think that we should definitely use it to help reseed the
-kernel's RNG, and keep it secret from userspace. That way, even if the
-VM image is public, we can ensure that going forward, the kernel RNG
-will return securely random data.
+So the RNG state after mixing in the new VM Generation ID would
+contain 128 bits of secret entropy not known to anyone else, including
+people with access to the VM image.
+
+Now, 128 bits of cryptographically random data aren't _optimal_; I
+think something on the order of 256 bits would be nicer from a
+theoretical standpoint. But in practice I think we'll be good with the
+128 bits we're getting (since the number of users who fork a VM image
+is probably not going to be so large that worst-case collision
+probabilities matter).
+
+> The kernel would need to use the change as a trigger to
+> measure some entropy (e.g. interrupts and RDRAND, or whatever). Our just
+> define the machine contract as =E2=80=9Cthis has to be unique random data=
+ and
+> if it=E2=80=99s not unique, or if it=E2=80=99s pubic, you=E2=80=99re toas=
+t=E2=80=9D.
+
+As far as I can tell from Microsoft's spec, that is a guarantee we're
+already getting.
