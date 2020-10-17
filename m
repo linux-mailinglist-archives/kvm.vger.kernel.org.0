@@ -2,257 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36DCA29136E
-	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 20:09:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97E7A291376
+	for <lists+kvm@lfdr.de>; Sat, 17 Oct 2020 20:10:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437943AbgJQSJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Oct 2020 14:09:31 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:47208 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2411020AbgJQSJb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Oct 2020 14:09:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1602958167; x=1634494167;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=sMRJ1nmaaZClOicpi2VfDlHuqHED+gJWzf9LpOrjUvA=;
-  b=b9yEHz9k3WjlKmBVIzVRRpcuGdm6bPeRyT+r/tUqaqHSDIJ3su4Mnw3g
-   c/6EqmoaRprDj5lrcwSsFjtUnV0X84CIdWmgxe8KeeYBhyvTyGSr08ln1
-   a5qbSUj+tNGxKjj23bPqd+uF6Ucl39juA6xjoPV9KghJnX/Riglr6mVF7
-   4=;
-X-IronPort-AV: E=Sophos;i="5.77,387,1596499200"; 
-   d="scan'208";a="61770157"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 17 Oct 2020 18:09:21 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com (Postfix) with ESMTPS id A2E1DA2039;
-        Sat, 17 Oct 2020 18:09:14 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Sat, 17 Oct 2020 18:09:14 +0000
-Received: from freeip.amazon.com (10.43.162.241) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Sat, 17 Oct 2020 18:09:08 +0000
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jann Horn <jannh@google.com>
-CC:     Willy Tarreau <w@1wt.eu>, Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "open list:VIRTIO GPU DRIVER" 
-        <virtualization@lists.linux-foundation.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>, <bonzini@gnu.org>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, <oridgar@gmail.com>,
-        <ghammer@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Qemu Developers" <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>,
-        "Michal Hocko" <mhocko@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Pavel Machek" <pavel@ucw.cz>,
-        Linux API <linux-api@vger.kernel.org>,
-        "Christian Borntraeger" <borntraeger@de.ibm.com>,
-        <mpe@ellerman.id.au>
-References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
- <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
- <20201017033606.GA14014@1wt.eu>
- <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
- <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
- <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
- <20201017053712.GA14105@1wt.eu>
- <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
- <20201017064442.GA14117@1wt.eu>
- <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
- <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
-Date:   Sat, 17 Oct 2020 20:09:06 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.3.2
+        id S2438773AbgJQSKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Oct 2020 14:10:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49430 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2437951AbgJQSKl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Oct 2020 14:10:41 -0400
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 71FB3207C4
+        for <kvm@vger.kernel.org>; Sat, 17 Oct 2020 18:10:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1602958240;
+        bh=bNUjXzAtYTeF0xeyT4fVDlewqtbmx5JXgMhZlub6oWs=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=E91waNn4ZtmLoF+oFchMCxHmAkludYsQ7OeW6RKoQ6iC0rwTYydJwXiBUq3HX6PSg
+         CXudjtt4jyTzDpxpcE9A6e4RLyEU1NYawoWmJAF6N8Wh/UL0fpvhsnOFE9/6SHzF7i
+         DPAEJbDUL4Id8TuSiOSQX19gNZrEUAPPM47yH2hE=
+Received: by mail-wm1-f44.google.com with SMTP id p15so6470868wmi.4
+        for <kvm@vger.kernel.org>; Sat, 17 Oct 2020 11:10:40 -0700 (PDT)
+X-Gm-Message-State: AOAM5303QRr84rr3BEuqL+S61OQt4CUKAZ5lgLPUbFb3pM54M6iSkz7K
+        1uqSzUpJ+II9I7tA1DQ9ycdImN+ioMBHpg8NHau5JA==
+X-Google-Smtp-Source: ABdhPJytCiWOtxm84RCgZCVoArKJ0KdKOuxfgPiMKVnnwQm0gaac8Rg/0NC502KkEJ0/X88L4LXO8HEf81QzCgT9VjQ=
+X-Received: by 2002:a1c:6457:: with SMTP id y84mr9330642wmb.36.1602958237946;
+ Sat, 17 Oct 2020 11:10:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.241]
-X-ClientProxiedBy: EX13D15UWB004.ant.amazon.com (10.43.161.61) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com> <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+In-Reply-To: <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Sat, 17 Oct 2020 11:10:26 -0700
+X-Gmail-Original-Message-ID: <CALCETrViTg_BWvRa+nfDWq=_B_ithzL-anVJNpsgHaXe9VgCNQ@mail.gmail.com>
+Message-ID: <CALCETrViTg_BWvRa+nfDWq=_B_ithzL-anVJNpsgHaXe9VgCNQ@mail.gmail.com>
+Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
+To:     Jann Horn <jannh@google.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc:     "Catangiu, Adrian Costin" <acatan@amazon.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jason Donenfeld <Jason@zx2c4.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "bonzini@gnu.org" <bonzini@gnu.org>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        "oridgar@gmail.com" <oridgar@gmail.com>,
+        "ghammer@redhat.com" <ghammer@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>,
+        Linux API <linux-api@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgSmFzb24sCgpPbiAxNy4xMC4yMCAxNToyNCwgSmFzb24gQS4gRG9uZW5mZWxkIHdyb3RlOgo+
-IAo+IEFmdGVyIGRpc2N1c3NpbmcgdGhpcyBvZmZsaW5lIHdpdGggSmFubiBhIGJpdCwgSSBoYXZl
-IGEgZmV3IGdlbmVyYWwKPiBjb21tZW50cyBvbiB0aGUgZGVzaWduIG9mIHRoaXMuCj4gCj4gRmly
-c3QsIHRoZSBVVUlEIGNvbW11bmljYXRlZCBieSB0aGUgaHlwZXJ2aXNvciBzaG91bGQgYmUgY29u
-c3VtZWQgYnkKPiB0aGUga2VybmVsIC0tIGFkZGVkIGFzIGFub3RoZXIgaW5wdXQgdG8gdGhlIHJu
-ZyAtLSBhbmQgdGhlbiB1c2Vyc3BhY2UKCldlIGRlZmluaXRlbHkgd2FudCBhIGtlcm5lbCBpbnRl
-cm5hbCBub3RpZmllciBhcyB3ZWxsLCB5ZXMgOikuCgo+IHNob3VsZCBiZSBub3RpZmllZCB0aGF0
-IGl0IHNob3VsZCByZXNlZWQgYW55IHVzZXJzcGFjZSBSTkdzIHRoYXQgaXQKPiBtYXkgaGF2ZSwg
-d2l0aG91dCBhY3R1YWxseSBjb21tdW5pY2F0aW5nIHRoYXQgVVVJRCB0byB1c2Vyc3BhY2UuIElP
-VywKCkkgYWxzbyB0ZW5kIHRvIGFncmVlIHRoYXQgaXQgbWFrZXMgc2Vuc2UgdG8gZGlzY29ubmVj
-dCB0aGUgYWN0dWFsIFVVSUQgCndlIHJlY2VpdmUgZnJvbSB0aGUgbm90aWZpY2F0aW9uIHRvIHVz
-ZXIgc3BhY2UuIFRoaXMgd291bGQgYWxsb3cgdXMgdG8gCmNyZWF0ZSBhIGdlbmVyaWMgbWVjaGFu
-aXNtIGZvciBWTSBzYXZlL3Jlc3RvcmUgY3ljbGVzIGFjcm9zcyBkaWZmZXJlbnQgCmh5cGVydmlz
-b3JzLiBMZXQgbWUgYWRkIFBQQyBhbmQgczM5MHggcGVvcGxlIHRvIHRoZSBDQyBsaXN0IHRvIHNl
-ZSAKd2hldGhlciB0aGV5IGhhdmUgYW55dGhpbmcgcmVtb3RlbHkgc2ltaWxhciB0byB0aGUgVm1H
-ZW5JRCBtZWNoYW5pc20uIApGb3IgeDg2IGFuZCBhYXJjaDY0LCB0aGUgQUNQSSBhbmQgbWVtb3J5
-IGJhc2VkIFZtR2VuSUQgaW1wbGVtZW50ZWQgaGVyZSAKaXMgdGhlIG1vc3Qgb2J2aW91cyBvcHRp
-b24gdG8gaW1wbGVtZW50IElNSE8uIEl0J3MgYWxzbyBhbHJlYWR5IAppbXBsZW1lbnRlZCBpbiBh
-bGwgbWFqb3IgaHlwZXJ2aXNvcnMuCgo+IEkgYWdyZWUgd2l0aCBKYW5uIHRoZXJlLiBUaGVuLCBp
-dCdzIHRoZSBmdW5jdGlvbmluZyBvZiB0aGlzCj4gbm90aWZpY2F0aW9uIG1lY2hhbmlzbSB0byB1
-c2Vyc3BhY2UgdGhhdCBpcyBpbnRlcmVzdGluZyB0byBtZS4KCkFic29sdXRlbHkhIFBsZWFzZSBo
-YXZlIGEgbG9vayBhdCB0aGUgcHJldmlvdXMgZGlzY3Vzc2lvbiBoZXJlOgoKIApodHRwczovL2xv
-cmUua2VybmVsLm9yZy9saW51eC1wbS9CNzc5M0I3QS0zNjYwLTQ3NjktOUI5QS1GRkNGMjUwNzI4
-QkJAYW1hem9uLmNvbS8KClRoZSB1c2VyIHNwYWNlIGludGVyZmFjZSBpcyBhYnNvbHV0ZWx5IHdo
-YXQgdGhpcyBpcyBhYm91dC4KCj4gVGhlcmUgYXJlIGEgZmV3IGRlc2lnbiBnb2FscyBvZiBub3Rp
-ZnlpbmcgdXNlcnNwYWNlOiBpdCBzaG91bGQgYmUKPiBmYXN0LCBiZWNhdXNlIHBlb3BsZSB3aG8g
-YXJlIHVzaW5nIHVzZXJzcGFjZSBSTkdzIGFyZSB1c3VhbGx5IGRvaW5nIHNvCj4gaW4gdGhlIGZp
-cnN0IHBsYWNlIHRvIGNvbXBsZXRlbHkgYXZvaWQgc3lzY2FsbCBvdmVyaGVhZCBmb3Igd2hhdGV2
-ZXIKPiBoaWdoIHBlcmZvcm1hbmNlIGFwcGxpY2F0aW9uIHRoZXkgaGF2ZSAtIGUuZy4gSSByZWNh
-bGwgY29udmVyc2F0aW9ucwo+IHdpdGggQ29sbSBhYm91dCBoaXMgVExTIGltcGxlbWVudGF0aW9u
-IG5lZWRpbmcgdG8gbWFrZSByYW5kb20gSVZzCj4gX3JlYWxseV8gZmFzdC4gSXQgc2hvdWxkIGFs
-c28gaGFwcGVuIGFzIGVhcmx5IGFzIHBvc3NpYmxlLCB3aXRoIG5vCj4gcmFjZSBvciBhcyBtaW5p
-bWFsIGFzIHBvc3NpYmxlIHJhY2Ugd2luZG93LCBzbyB0aGF0IHVzZXJzcGFjZSBkb2Vzbid0Cj4g
-YmVnaW4gdXNpbmcgb2xkIHJhbmRvbW5lc3MgYW5kIHRoZW4gc3dpdGNoIG92ZXIgYWZ0ZXIgdGhl
-IGRhbWFnZSBpcwo+IGFscmVhZHkgZG9uZS4KClRoZXJlIGFyZSBtdWx0aXBsZSBmYWNldHMgYW5k
-IGRpZmZlcmVudCB0eXBlcyBvZiBjb25zdW1lcnMgaGVyZS4gRm9yIGEgCnVzZXIgc3BhY2UgUk5H
-LCBJIGFncmVlIHRoYXQgZmFzdCBhbmQgYXMgcmFjZSBmcmVlIGFzIHBvc3NpYmxlIGlzIGtleS4g
-ClRoYXQncyB3aGF0IHRoZSBtbWFwIGludGVyZmFjZSBpcyB0aGVyZSBmb3IuCgpUaGVyZSBhcmUg
-YXBwbGljYXRpb25zIHdheSBiZXlvbmQgdGhhdCB0aG91Z2guIFdoYXQgZG8geW91IGRvIHdpdGgg
-CmFwcGxpY2F0aW9ucyB0aGF0IGFscmVhZHkgY29uc3VtZWQgcmFuZG9tbmVzcz8gRm9yIGV4YW1w
-bGUgYSBjYWNoZWQgcG9vbCAKb2YgU1NMIGtleXMuIE9yIGEgaGlnaGVyIGxldmVsIGxhbmd1YWdl
-IHByaW1pdGl2ZSB0aGF0IGNvbnN1bWVzIApyYW5kb21uZXNzIGFuZCBjYWNoZXMgaXRzIHNlZWQg
-c29tZXdoZXJlIGluIGFuIGludGVybmFsIGRhdGEgc3RydWN0dXJlLiAKT3IgZXZlbiB3b3JzZTog
-eW91ciBzeXN0ZW0ncyBob3N0IHNzaCBrZXkuCgpGb3IgdGhvc2UgdHlwZXMgb2YgZXZlbnRzLCBh
-biBtbWFwIChvciB2RFNPKSBpbnRlcmZhY2UgZG9lcyBub3Qgd29yay4gV2UgCm5lZWQgdG8gYWN0
-aXZlbHkgYWxsb3cgdXNlciBzcGFjZSBhcHBsaWNhdGlvbnMgdG8gcmVhZGp1c3QgdG8gdGhlIG5l
-dyAKZW52aXJvbm1lbnQgLSBlaXRoZXIgaW50ZXJuYWxseSAodGhlIGxhbmd1YWdlIHByaW1pdGl2
-ZSBjYXNlKSBvciB0aHJvdWdoIAphIHN5c3RlbSBldmVudCwgbWF5YmUgZXZlbiBhcyBzeXN0ZW1k
-IHRyaWdnZXIgKHRoZSBzc2ggaG9zdCBrZXkgY2FzZSkuCgpUbyBnaXZlIGV2ZXJ5b25lIGVub3Vn
-aCB0aW1lIGJlZm9yZSB3ZSBjb25zaWRlciBhIHN5c3RlbSBhcyAidXBkYXRlZCB0byAKdGhlIG5l
-dyBlbnZpcm9ubWVudCIsIHdlIGhhdmUgdGhlIGNhbGxiYWNrIGxvZ2ljIHdpdGggdGhlICJPcmNo
-ZXN0cmF0b3IiIAp0aGF0IGNhbiBjaGVjayB3aGV0aGVyIGFsbCBsaXN0ZW5lcnMgdG8gc3lzdGVt
-IHdpZGUgdXBkYXRlcyBjb25maXJtcyAKdGhleSBhZGp1c3RlZCB0aGVtc2VsdmVzLgoKVGhhdCdz
-IHdoYXQgdGhlIHJlc3Qgb2YgdGhlIGxvZ2ljIGlzIHRoZXJlIGZvcjogQSByZWFkK3BvbGwgaW50
-ZXJmYWNlIAphbmQgYWxsIG9mIHRoZSBvcmNoZXN0cmF0aW9uIGxvZ2ljLiBJdCdzIG5vdCBmb3Ig
-dGhlIHVzZXIgc3BhY2UgUk5HIApjYXNlLCBpdCdzIGZvciBhbGwgb2YgaXRzIGRvd25zdHJlYW0g
-dXNlcnMuCgo+IEknbSBhbHNvIG5vdCB3ZWRkZWQgdG8gdXNpbmcgTWljcm9zb2Z0J3MgcHJvcHJp
-ZXRhcnkgaHlwZXJ2aXNvciBkZXNpZ24KPiBmb3IgdGhpcy4gSWYgd2UgY29tZSB1cCB3aXRoIGEg
-YmV0dGVyIGludGVyZmFjZSwgSSBkb24ndCB0aGluayBpdCdzCj4gYXNraW5nIHRvbyBtdWNoIHRv
-IGltcGxlbWVudCB0aGF0IGFuZCByZWFzb25hYmx5IGV4cGVjdCBmb3IgTWljcm9zb2Z0Cj4gdG8g
-Y2F0Y2ggdXAuIE1heWJlIHNvbWVvbmUgaGVyZSB3aWxsIGZpbmQgdGhhdCBjb250cm92ZXJzaWFs
-LCBidXQKPiB3aGF0ZXZlciAtLSBkaXNjdXNzaW5nIGlkZWFsIGRlc2lnbnMgZG9lcyBub3Qgc2Vl
-bSBvdXQgb2YgcGxhY2Ugb3IKPiBpbmFwcHJvcHJpYXRlIGZvciBob3cgd2UgdXN1YWxseSBhcHBy
-b2FjaCB0aGluZ3MgaW4gdGhlIGtlcm5lbCwgYW5kIGEKPiBjbG9zZWQgc291cmNlIGh5cGVydmlz
-b3IgY29taW5nIGFsb25nIHNob3VsZG4ndCBkaXNydXB0IHRoYXQuCgpUaGUgbWFpbiBib251cyBw
-b2ludCBvbiB0aGlzIGludGVyZmFjZSBpcyB0aGF0IEh5cGVyLVYsIFZNd2FyZSBhbmQgUUVNVSAK
-aW1wbGVtZW50IGl0IGFscmVhZHkuIEl0IHdvdWxkIGJlIGEgdmVyeSBuYXR1cmFsIGZvciBpbnRv
-IHRoZSBlY29zeXN0ZW0uIApJIGFncmVlIHRob3VnaCB0aGF0IHdlIHNob3VsZG4ndCBoYXZlIG91
-ciB1c2VyIHNwYWNlIGludGVyZmFjZSAKbmVjZXNzYXJpbHkgZGljdGF0ZWQgYnkgaXQ6IE90aGVy
-IGh5cGVydmlzb3JzIG1heSBpbXBsZW1lbnQgZGlmZmVyZW50IAp3YXlzIHN1Y2ggYXMgYSBzaW1w
-bGUgZWRnZSBJUlEgdGhhdCBnZXRzIHRyaWdnZXJlZCB3aGVuZXZlciB0aGUgVk0gZ2V0cyAKcmVz
-dW1lZC4KCj4gU28sIGFueXdheSwgaGVyZSBhcmUgYSBmZXcgb3B0aW9ucyB3aXRoIHNvbWUgcHJv
-cyBhbmQgY29ucyBmb3IgdGhlCj4ga2VybmVsIG5vdGlmeWluZyB1c2Vyc3BhY2UgdGhhdCBpdHMg
-Uk5HIHNob3VsZCByZXNlZWQuCgpJIGNhbiBvbmx5IHN0cmVzcyBhZ2FpbiB0aGF0IHdlIHNob3Vs
-ZCBub3QgYmUgbGFzZXIgZm9jdXNlZCBvbiB0aGUgUk5HIApjYXNlLiBJbiBhIGxvdCBvZiBjYXNl
-cywgZGF0YSBoYXMgYWxyZWFkeSBiZWVuIGdlbmVyYXRlZCBieSB0aGUgUk5HIApiZWZvcmUgdGhl
-IHNuYXBzaG90IGFuZCBuZWVkcyB0byBiZSByZWluaXRpYWxpemVkIGFmdGVyIHRoZSBzbmFwc2hv
-dC4gSW4gCm90aGVyIGNhc2VzIHN1Y2ggYXMgc3lzdGVtIFVVSURzLCBpdCdzIGNvbXBsZXRlbHkg
-b3J0aG9nb25hbCB0byB0aGUgUk5HLgoKPiAKPiAxLiBTSUdSTkQgLSBhIG5ldyBzaWduYWwuIExv
-bC4KCkRvYWJsZSwgYnV0IGEgbG90IG9mIHBsdW1iaW5nIGluIHVzZXIgc3BhY2UuIEl0J3MgYWxz
-byBub3QgbmVjZXNzYXJpbHkgYSAKZ29vZCBmb3IgZm9yIGV2ZW50IG5vdGlmaWNhdGlvbiBpbiBt
-b3N0IHVzZXIgc3BhY2UgYXBwbGljYXRpb25zLgoKPiAKPiAyLiBVc2Vyc3BhY2Ugb3BlbnMgYSBm
-aWxlIGRlc2NyaXB0b3IgdGhhdCBpdCBjYW4gZXBvbGwgb24uIFByb3MgYXJlCj4gdGhhdCBtYW55
-IG5vdGlmaWNhdGlvbiBtZWNoYW5pc21zIGFscmVhZHkgdXNlIHRoaXMuIENvbnMgaXMgdGhhdCB0
-aGlzCj4gcmVxdWlyZXMgc3lzY2FsbCBhbmQgbWlnaHQgYmUgbW9yZSByYWN5IHRoYW4gd2Ugd2Fu
-dC4gQW5vdGhlciBjb24gaXMKPiB0aGF0IHRoaXMgYSBuZXcgdGhpbmcgZm9yIHVzZXJzcGFjZSBw
-cm9ncmFtcyB0byBkby4KClRoYXQncyBwYXJ0IG9mIHdoYXQgdGhpcyBwYXRjaCBkb2VzLCByaWdo
-dD8gVGhpcyBwYXRjaCBpbXBsZW1lbnRzIApyZWFkK3BvbGwgYXMgd2VsbCBhcyBtbWFwKCkgZm9y
-IGhpZ2ggc3BlZWQgcmVhZHMuCgo+IDMuIFdlIHN0aWNrIGFuIGF0b21pYyBjb3VudGVyIGluIHRo
-ZSB2RFNPLCBKYW5uJ3Mgc3VnZ2VzdGlvbi4gUHJvcyBhcmUKPiB0aGF0IHRoaXMgaXMgZXh0cmVt
-ZWx5IGZhc3QsIGFuZCBhbHNvIHNpbXBsZSB0byB1c2UgYW5kIGltcGxlbWVudC4KPiBUaGVyZSBh
-cmUgZW5vdWdoIHNlcXVlbmNlIHBvaW50cyBpbiB0eXBpY2FsIGNyeXB0byBwcm9ncmFtcyB0aGF0
-Cj4gY2hlY2tpbmcgdG8gc2VlIHdoZXRoZXIgdGhpcyBjb3VudGVyIGhhcyBjaGFuZ2VkIGJlZm9y
-ZSBkb2luZyB3aGF0ZXZlcgo+IG9wZXJhdGlvbiBzZWVtcyBlYXN5IGVub3VnaC4gQ29ucyBhcmUg
-dGhhdCB0eXBpY2FsbHkgd2UndmUgYmVlbgo+IGNvbnNlcnZhdGl2ZSBhYm91dCBhZGRpbmcgdGhp
-bmdzIHRvIHRoZSB2RFNPLCBhbmQgdGhpcyBpcyBhbHNvIGEgbmV3Cj4gdGhpbmcgZm9yIHVzZXJz
-cGFjZSBwcm9ncmFtcyB0byBkby4KClRoZSBiaWcgY29uIGlzIHRoYXQgaXRzIHVzZSBpcyBnb2lu
-ZyB0byBiZSBzdXBlciBsaW1pdGVkIHRvIGFwcGxpY2F0aW9ucyAKdGhhdCBjYW4gYmUgYWRhcHRl
-ZCB0byBjaGVjayB0aGVpciAidm0gZ2VuZXJhdGlvbiIgdGhyb3VnaCBhIHZEU08gY2FsbCAvIApy
-ZWFkIGV2ZXJ5IHRpbWUgdGhleSBjb25zdW1lIGRhdGEgdGhhdCBtYXkgcG90ZW50aWFsbHkgbmVl
-ZCB0byBiZSAKcmVnZW5lcmF0ZWQuCgpUaGlzIHByb2JhYmx5IHdvcmtzIGZvciB0aGUgcHVyZSBS
-TkcgY2FzZS4gSXQgZmFsbHMgYXBhcnQgZm9yIG1vcmUgCnNvcGhpc3RpY2F0ZWQgdGhpbmdzIHN1
-Y2ggYXMgInJlZG8gbXkgc3NoIGhvc3Qga2V5cyBhbmQgcmVzdGFydCB0aGUgCnNlcnZpY2UiIG9y
-ICJyZWdlbmVyYXRlIG15IHNhbWJhIG1hY2hpbmUgdXVpZCIuCgo+IDQuIFdlIGFscmVhZHkgaGF2
-ZSBhIG1lY2hhbmlzbSBmb3IgdGhpcyBraW5kIG9mIHRoaW5nLCBiZWNhdXNlIHRoZQo+IHNhbWUg
-aXNzdWUgY29tZXMgdXAgd2hlbiBmb3JrKClpbmcuIFRoZSBzb2x1dGlvbiB3YXMgTUFEVl9XSVBF
-T05GT1JLLAo+IHdoZXJlIHVzZXJzcGFjZSBtYXJrcyBhIHBhZ2UgdG8gYmUgemVyb2VkIHdoZW4g
-Zm9ya2luZywgZm9yIHRoZQo+IHB1cnBvc2VzIG9mIHRoZSBSTkcgYmVpbmcgbm90aWZpZWQgd2hl
-biBpdHMgd29ybGQgZ2V0cyBzcGxpdCBpbiB0d28uCj4gVGhpcyBpcyBiYXNpY2FsbHkgdGhlIHNh
-bWUgdGhpbmcgYXMgd2UncmUgZGlzY3Vzc2luZyBoZXJlIHdpdGggZ3Vlc3QKPiBzbmFwc2hvdHMs
-IGV4Y2VwdCBpdCdzIG9uIHRoZSBzeXN0ZW0gbGV2ZWwgcmF0aGVyIHRoYW4gdGhlIHByb2Nlc3MK
-PiBsZXZlbCwgYW5kIGEgc3lzdGVtIGhhcyBtYW55IHByb2Nlc3Nlcy4gQnV0IHRoZSBwcm9ibGVt
-IHNwYWNlIGlzIHN0aWxsCj4gYWxtb3N0IHRoZSBzYW1lLCBhbmQgd2UgY291bGQgc2ltcGx5IHJl
-dXNlIHRoYXQgc2FtZSBtZWNoYW5pc20uIFRoZXJlCj4gYXJlIGEgZmV3IGltcGxlbWVudGF0aW9u
-IHN0cmF0ZWdpZXMgZm9yIHRoYXQ6CgpZdXAsIHRoYXQncyB3aGVyZSB3ZSBzdGFydGVkIGZyb20g
-OikuIEFuZCB0aGVuIHdlIHJhbiBpbnRvIHJlc2lzdGFuY2UgYnkgCnRoZSBtbSBwZW9wbGUgKG9u
-IENDIGhlcmUpLiBBbmQgdGhlbiB3ZSBsb29rZWQgYXQgdGhlIHByb2JsZW0gbW9yZSBpbiAKZGVw
-dGggYW5kIGNoZWNrZWQgd2hhdCBpdCB3b3VsZCB0YWtlIHRvIGZvciBleGFtcGxlIGltcGxlbWVu
-dCB0aGlzIGZvciAKdXNlciBzcGFjZSBSTkdzIGluIEphdmEuIEl0J3MgLi4uIG1vcmUgY29tcGxp
-Y2F0ZWQgdGhhbiBvbmUgbWF5IHRoaW5rIGF0IApmaXJzdC4KCj4gNGEuIFdlIG1lc3Mgd2l0aCB0
-aGUgUFRFcyBvZiBhbGwgcHJvY2Vzc2VzJyBwYWdlcyB0aGF0IGFyZQo+IE1BRFZfV0lQRU9ORk9S
-SywgbGlrZSBmb3JrIGRvZXMgbm93LCB3aGVuIHRoZSBoeXBlcnZpc29yIG5vdGlmaWVzIHVzCj4g
-dG8gZG8gc28uIFRoZW4gd2Ugd2luZCB1cCByZXVzaW5nIHRoZSBhbHJlYWR5IGV4aXN0aW5nIGxv
-Z2ljIGZvcgo+IHVzZXJzcGFjZSBSTkdzLiBDb25zIG1pZ2h0IGJlIHRoYXQgdGhpcyB1c3VhbGx5
-IHJlcXVpcmVzIHNlbWFwaG9yZXMsCj4gYW5kIHdlJ3JlIGluIGlycSBjb250ZXh0LCBzbyB3ZSdk
-IGhhdmUgdG8gaG9pc3QgdG8gYSB3b3JrcXVldWUsIHdoaWNoCj4gbWVhbnMgZWl0aGVyIG1vcmUg
-d2FrZSB1cCBsYXRlbmN5LCBvciBhIGxhcmdlciByYWNlIHdpbmRvdy4KPiAKPiA0Yi4gV2UganVz
-dCBtZW16ZXJvIGFsbCBwcm9jZXNzZXMnIHBhZ2VzIHRoYXQgYXJlIE1BRFZfV0lQRU9ORk9SSywK
-PiB3aGVuIHRoZSBoeXBlcnZpc29yIG5vdGlmaWVzIHVzIHRvIGRvIHNvLiBUaGVuIHdlIHdpbmQg
-dXAgcmV1c2luZyB0aGUKPiBhbHJlYWR5IGV4aXN0aW5nIGxvZ2ljIGZvciB1c2Vyc3BhY2UgUk5H
-cy4KPiAKPiA0Yy4gVGhlIGd1ZXN0IGtlcm5lbCBtYWludGFpbnMgYW4gYXJyYXkgb2YgcGh5c2lj
-YWwgYWRkcmVzc2VzIHRoYXQgYXJlCj4gTUFEVl9XSVBFT05GT1JLLiBUaGUgaHlwZXJ2aXNvciBr
-bm93cyBhYm91dCB0aGlzIGFycmF5IGFuZCBpdHMKPiBsb2NhdGlvbiB0aHJvdWdoIHdoYXRldmVy
-IHByb3RvY29sLCBhbmQgYmVmb3JlIHJlc3VtaW5nIGEKPiBtb3ZlZC9zbmFwc2hvdHRlZC9kdXBs
-aWNhdGVkIFZNLCBpdCB0YWtlcyB0aGUgcmVzcG9uc2liaWxpdHkgZm9yCj4gbWVtemVyb2luZyB0
-aGlzIG1lbW9yeS4gVGhlIGh1Z2UgcHJvIGhlcmUgd291bGQgYmUgdGhhdCB0aGlzCj4gZWxpbWlu
-YXRlcyBhbGwgcmFjZXMsIGFuZCByZWR1Y2VzIGNvbXBsZXhpdHkgcXVpdGUgYSBiaXQsIGJlY2F1
-c2UgdGhlCj4gaHlwZXJ2aXNvciBjYW4gcGVyZmVjdGx5IHN5bmNocm9uaXplIGl0cyBicmluZ3Vw
-IChhbmQgU01QIGJyaW5ndXApCj4gd2l0aCB0aGlzLCBhbmQgaXQgY2FuIGV2ZW4gb3B0aW1pemUg
-dGhpbmdzIGxpa2Ugb24tZGlzayBtZW1vcnkKPiBzbmFwc2hvdHMgdG8gc2ltcGx5IG5vdCB3cml0
-ZSBvdXQgdGhvc2UgcGFnZXMgdG8gZGlzay4KPiAKPiBBIDRjLWxpa2UgYXBwcm9hY2ggc2VlbXMg
-bGlrZSBpdCdkIGJlIGEgbG90IG9mIGJhbmcgZm9yIHRoZSBidWNrIC0tIHdlCj4gcmV1c2UgdGhl
-IGV4aXN0aW5nIG1lY2hhbmlzbSAoTUFEVl9XSVBFT05GT1JLKSwgc28gdGhlcmUncyBubyBuZXcK
-PiB1c2Vyc3BhY2UgQVBJIHRvIGRlYWwgd2l0aCwgYW5kIGl0J2QgYmUgcmFjZSBmcmVlLCBhbmQg
-ZWxpbWluYXRlIGEgbG90Cj4gb2Yga2VybmVsIGNvbXBsZXhpdHkuCj4gCj4gQnV0IDRiIGFuZCAz
-IGRvbid0IHNlZW0gdG9vIGJhZCBlaXRoZXIuCj4gCj4gQW55IHRob3VnaHRzIG9uIDRjPyBJcyB0
-aGF0IHV0dGVybHkgaW5zYW5lLCBvciBkb2VzIHRoYXQgYWN0dWFsbHkgZ2V0Cj4gdXMgc29tZXdo
-ZXJlIGNsb3NlIHRvIHdoYXQgd2Ugd2FudD8KCkFsbCBvZiB0aGUgb3B0aW9ucyBmb3IgIjQiIGFy
-ZSBwb3NzaWJsZSBhbmQgaGF2ZSBhbiBSRkMgb3V0LiBQbGVhc2UgCmNoZWNrIG91dCB0aGUgZGlz
-Y3Vzc2lvbiBsaW5rZWQgYWJvdmUgOikuCgpUaGUgcHJvYmxlbSB3aXRoIGFueXRoaW5nIHRoYXQg
-cmVsaWVzIG9uIGNsb3NlIGxvb3AgcmVhZHMgKG9wdGlvbnMgMys0KSAKaXMgbm90IGdvaW5nIHRv
-IHdvcmsgd2VsbCB3aXRoIHRoZSBtb3JlIHNvcGhpc3RpY2F0ZWQgdXNlIGNhc2Ugb2YgCmRlcml2
-ZWQgZGF0YS4KCklNSE8gaXQgd2lsbCBib2lsIGRvd24gdG8gImJvdGgiLiBXZSB3aWxsIG5lZWQg
-YSBoaWdoLXNwZWVkIGludGVyZmFjZSAKdGhhdCB3aXRoIGNsb3NlLXRvLTAgb3ZlcmhlYWQgdGVs
-bHMgeW91IGVpdGhlciB0aGUgZ2VuZXJhdGlvbiBJRCBvciAKY2xlYXJzIHBhZ2VzIChvcHRpb25z
-IDMrNCkgYXMgd2VsbCBhcyBzb21ldGhpbmcgdGhhdCBpcyBiaWdnZXIgZm9yIAphcHBsaWNhdGlv
-bnMgdGhhdCBjYW4gZWl0aGVyIGludHJpbnNpY2FsbHkgKHNzaGQpIG9yIGJ5IHN5c3RlbSBkZXNp
-Z24gCihKYXZhKSBub3QgYWRvcHQgdGhlIG1lY2hhbmlzbXMgYWJvdmUgZWFzaWx5LgoKVGhhdCBz
-YWlkLCB3ZSBuZWVkIHRvIHN0YXJ0IHNvbWV3aGVyZS4gSSBkb24ndCBtaW5kIHdoaWNoIGFuZ2xl
-IHdlIHN0YXJ0IApmcm9tLiBCdXQgdGhpcyBpcyBhIHJlYWwgd29ybGQgcHJvYmxlbSBhbmQgb25l
-IHRoYXQgd2lsbCBvbmx5IGJlY29tZSAKbW9yZSBwcmV2YWxlbnQgb3ZlciB0aW1lIGFzIFZNcyBh
-cmUgdXNlZCBmb3IgbW9yZSB0aGFuIG9ubHkgeW91ciAKdHJhZGl0aW9uYWwgZW50ZXJwcmlzZSBo
-YXJkd2FyZSBjb25zb2xpZGF0aW9uLgoKCkFsZXgKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRl
-ciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVo
-cnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0g
-QW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxp
-bgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On Fri, Oct 16, 2020 at 6:40 PM Jann Horn <jannh@google.com> wrote:
+>
+> [adding some more people who are interested in RNG stuff: Andy, Jason,
+> Theodore, Willy Tarreau, Eric Biggers. also linux-api@, because this
+> concerns some pretty fundamental API stuff related to RNG usage]
+>
+> On Fri, Oct 16, 2020 at 4:33 PM Catangiu, Adrian Costin
+> <acatan@amazon.com> wrote:
+> > - Background
+> >
+> > The VM Generation ID is a feature defined by Microsoft (paper:
+> > http://go.microsoft.com/fwlink/?LinkId=260709) and supported by
+> > multiple hypervisor vendors.
+> >
+> > The feature is required in virtualized environments by apps that work
+> > with local copies/caches of world-unique data such as random values,
+> > uuids, monotonically increasing counters, etc.
+> > Such apps can be negatively affected by VM snapshotting when the VM
+> > is either cloned or returned to an earlier point in time.
+> >
+> > The VM Generation ID is a simple concept meant to alleviate the issue
+> > by providing a unique ID that changes each time the VM is restored
+> > from a snapshot. The hw provided UUID value can be used to
+> > differentiate between VMs or different generations of the same VM.
+> >
+> > - Problem
+> >
+> > The VM Generation ID is exposed through an ACPI device by multiple
+> > hypervisor vendors but neither the vendors or upstream Linux have no
+> > default driver for it leaving users to fend for themselves.
+> >
+> > Furthermore, simply finding out about a VM generation change is only
+> > the starting point of a process to renew internal states of possibly
+> > multiple applications across the system. This process could benefit
+> > from a driver that provides an interface through which orchestration
+> > can be easily done.
+> >
+> > - Solution
+> >
+> > This patch is a driver which exposes the Virtual Machine Generation ID
+> > via a char-dev FS interface that provides ID update sync and async
+> > notification, retrieval and confirmation mechanisms:
+> >
+> > When the device is 'open()'ed a copy of the current vm UUID is
+> > associated with the file handle. 'read()' operations block until the
+> > associated UUID is no longer up to date - until HW vm gen id changes -
+> > at which point the new UUID is provided/returned. Nonblocking 'read()'
+> > uses EWOULDBLOCK to signal that there is no _new_ UUID available.
+> >
+> > 'poll()' is implemented to allow polling for UUID updates. Such
+> > updates result in 'EPOLLIN' events.
+> >
+> > Subsequent read()s following a UUID update no longer block, but return
+> > the updated UUID. The application needs to acknowledge the UUID update
+> > by confirming it through a 'write()'.
+> > Only on writing back to the driver the right/latest UUID, will the
+> > driver mark this "watcher" as up to date and remove EPOLLIN status.
+> >
+> > 'mmap()' support allows mapping a single read-only shared page which
+> > will always contain the latest UUID value at offset 0.
+>
+> It would be nicer if that page just contained an incrementing counter,
+> instead of a UUID. It's not like the application cares *what* the UUID
+> changed to, just that it *did* change and all RNGs state now needs to
+> be reseeded from the kernel, right? And an application can't reliably
+> read the entire UUID from the memory mapping anyway, because the VM
+> might be forked in the middle.
+>
+> So I think your kernel driver should detect UUID changes and then turn
+> those into a monotonically incrementing counter. (Probably 64 bits
+> wide?) (That's probably also a little bit faster than comparing an
+> entire UUID.)
+>
+> An option might be to put that counter into the vDSO, instead of a
+> separate VMA; but I don't know how the other folks feel about that.
+> Andy, do you have opinions on this? That way, normal userspace code
+> that uses this infrastructure wouldn't have to mess around with a
+> special device at all. And it'd be usable in seccomp sandboxes and so
+> on without needing special plumbing. And libraries wouldn't have to
+> call open() and mess with file descriptor numbers.
 
+The vDSO might be annoyingly slow for this.  Something like the rseq
+page might make sense.  It could be a generic indication of "system
+went through some form of suspend".
