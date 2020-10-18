@@ -2,63 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5826B291546
-	for <lists+kvm@lfdr.de>; Sun, 18 Oct 2020 04:08:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56C42291558
+	for <lists+kvm@lfdr.de>; Sun, 18 Oct 2020 05:15:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440093AbgJRCIg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Oct 2020 22:08:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44270 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2439906AbgJRCIf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Oct 2020 22:08:35 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D588C0613D3
-        for <kvm@vger.kernel.org>; Sat, 17 Oct 2020 19:08:33 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id y16so7271468ljk.1
-        for <kvm@vger.kernel.org>; Sat, 17 Oct 2020 19:08:33 -0700 (PDT)
+        id S1726000AbgJRDO6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Oct 2020 23:14:58 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:55809 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725272AbgJRDO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Oct 2020 23:14:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EoL7d0lHzdswPEFGsAEJJdNfE07sA8igVy5PEUcTbDQ=;
-        b=JYBvkmsN9RysEeFQRgQMS2IGgQheKP8WCpVEITeoShBcDrScb2YzXJWCS9fBQBrxMO
-         n86hAFDTEQHXskSLJ578m/TKYBOiwMg0z/aLu4hSKM9fzy3Bml2AtFnKiNFHXmC81ou5
-         oLgoTyjjd7m8dU7zn1iDkaLBmUIFwukS3W1degboeUcB5xxmHAwJ7X7ZJjY5qLq4Uevz
-         9565oX51vhmKmr/jiZRuPNAZjyZvYkS6kUYo9TyvCsqYY8xkBsy/gcixSZeElDfa4GKl
-         lQjC5lLseYNii8XoYpb7znRj1djIzK3pwUzl9c71Hf2cfPLya0ovLXiar856omGyFgtc
-         cBdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EoL7d0lHzdswPEFGsAEJJdNfE07sA8igVy5PEUcTbDQ=;
-        b=F33whTDL4L38MnuzF0jAXARsKotmtI38HkLj4WSNcFLk+rGt+3NBsAWTjUau5cRDsh
-         IZGgxPp1w9R2RE4wxQnv3koX9aCIKphD/6f4Oba7FN4TQIh2iRu6DqtorR+1wkvc0bs5
-         JOFH063ytGOzuiNkthBDvWIImR0/lMAl5Amks2Z9y8oaWrSUP+YZk8CW+/W4FpGzNNCy
-         11DN8KzQd7LUiPKXt5+LpBWpdtc2s3xfBzlT8Dtld+1UdMFOI0VKSypOpXtZ2ovekwEF
-         O73fJx3IIIb1t53G5sq/oJMurnOEX1a0+cFvo8q0CiTJFo2gKZQ9i/wdvMAHgkmani5L
-         PWWA==
-X-Gm-Message-State: AOAM530hJ82nmgfrzDcXm5EL3VQOrX0oOIjelOnxdWN5/fpHYnlqrehn
-        hXwLhi5DHbS33bm4eepO8/tYxpM8sY/QFuAu8BRdFg==
-X-Google-Smtp-Source: ABdhPJxVC4A8hz5Ph8xI5Lcuiwu6i49AGWglYFrVbrHYISFimwHqgN7R9bAY4u2r3Hi8cj+JpNCqLDs0HlkcXSFAtqI=
-X-Received: by 2002:a05:651c:1313:: with SMTP id u19mr1073920lja.47.1602986911177;
- Sat, 17 Oct 2020 19:08:31 -0700 (PDT)
-MIME-Version: 1.0
-References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
- <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
- <20201017033606.GA14014@1wt.eu> <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
- <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com> <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
- <20201017053712.GA14105@1wt.eu> <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
- <20201017064442.GA14117@1wt.eu> <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
- <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com> <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
-In-Reply-To: <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
-From:   Jann Horn <jannh@google.com>
-Date:   Sun, 18 Oct 2020 04:08:04 +0200
-Message-ID: <CAG48ez0JYK2_tk0DuEgKY2y0d38N+O5HJrH2je7RRk6o7XBixA@mail.gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1602990896; x=1634526896;
+  h=from:to:cc:date:message-id:in-reply-to:references:
+   mime-version:content-transfer-encoding:subject;
+  bh=kIh+rRe+DAK991cXZIDGGhSKZFK3HLJICasoN4MVkPs=;
+  b=p1tEFy1Zye/SOQhYaLeT6QwLv0nk0xZO7pJpCbV/HDQiJagPDBG9mG6+
+   4dkZRDwJpXl+sk4J0A5xPC7pAbTM1aq+iLvv1a96NBDW0lsFKhd7NzwGX
+   bD3nyU53Y9IDXg6609aC1a5nWndYQxp6l2Q6nBxyoLFQzDkiCm/t30/Jq
+   E=;
+X-IronPort-AV: E=Sophos;i="5.77,388,1596499200"; 
+   d="scan'208";a="85580626"
 Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To:     Alexander Graf <graf@amazon.de>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, Willy Tarreau <w@1wt.eu>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-87a10be6.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 18 Oct 2020 03:14:50 +0000
+Received: from EX13MTAUWA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-87a10be6.us-west-2.amazon.com (Postfix) with ESMTPS id 3B7C8A1D8B;
+        Sun, 18 Oct 2020 03:14:49 +0000 (UTC)
+Received: from EX13D01UWA003.ant.amazon.com (10.43.160.107) by
+ EX13MTAUWA001.ant.amazon.com (10.43.160.58) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sun, 18 Oct 2020 03:14:48 +0000
+Received: from [10.50.20.109] (10.43.160.125) by EX13d01UWA003.ant.amazon.com
+ (10.43.160.107) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 18 Oct
+ 2020 03:14:48 +0000
+From:   Colm MacCarthaigh <colmmacc@amazon.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC:     Jann Horn <jannh@google.com>, Willy Tarreau <w@1wt.eu>,
         "Catangiu, Adrian Costin" <acatan@amazon.com>,
         Andy Lutomirski <luto@kernel.org>,
         "Theodore Y. Ts'o" <tytso@mit.edu>,
@@ -67,10 +46,11 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, Willy Tarreau <w@1wt.eu>,
         kernel list <linux-kernel@vger.kernel.org>,
         "open list:VIRTIO GPU DRIVER" 
         <virtualization@lists.linux-foundation.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>, bonzini@gnu.org,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>, <bonzini@gnu.org>,
         "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, oridgar@gmail.com,
-        ghammer@redhat.com, Jonathan Corbet <corbet@lwn.net>,
+        "Weiss, Radu" <raduweis@amazon.com>, <oridgar@gmail.com>,
+        <ghammer@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Qemu Developers <qemu-devel@nongnu.org>,
@@ -78,68 +58,82 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, Willy Tarreau <w@1wt.eu>,
         Michal Hocko <mhocko@kernel.org>,
         "Rafael J. Wysocki" <rafael@kernel.org>,
         Pavel Machek <pavel@ucw.cz>,
-        Linux API <linux-api@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Content-Type: text/plain; charset="UTF-8"
+        Linux API <linux-api@vger.kernel.org>
+Date:   Sat, 17 Oct 2020 20:14:47 -0700
+X-Mailer: MailMate Trial (1.13.2r5673)
+Message-ID: <6A556D58-04B7-4FC6-A7F9-138BD7E41731@amazon.com>
+In-Reply-To: <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
+References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
+ <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+ <20201017033606.GA14014@1wt.eu>
+ <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
+ <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
+ <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
+ <20201017053712.GA14105@1wt.eu>
+ <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
+ <20201017064442.GA14117@1wt.eu>
+ <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
+ <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.43.160.125]
+X-ClientProxiedBy: EX13D36UWB002.ant.amazon.com (10.43.161.149) To
+ EX13d01UWA003.ant.amazon.com (10.43.160.107)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 17, 2020 at 8:09 PM Alexander Graf <graf@amazon.de> wrote:
-> There are applications way beyond that though. What do you do with
-> applications that already consumed randomness? For example a cached pool
-> of SSL keys. Or a higher level language primitive that consumes
-> randomness and caches its seed somewhere in an internal data structure.
 
-For deterministic protection, those would also have to poll some
-memory location that tells them whether the VmGenID changed:
 
-1. between reading entropy from their RNG pool and using it
-2. between collecting data from external sources (user input, clock,
-...) and encrypting it
+On 17 Oct 2020, at 6:24, Jason A. Donenfeld wrote:
 
-and synchronously shoot down the connection if a change happened. If
-e.g. an application inside the VM has an AES-GCM-encrypted TLS
-connection and, directly after the VM is restored, triggers an
-application-level timeout that sends some fixed message across the
-connection, then the TLS library must guarantee that either the VM was
-already committed to sending exactly that message before the VM was
-forked or the message will be blocked. If we don't do that, an
-attacker who captures both a single packet from the forked VM and
-traffic from the old VM can decrypt the next message from the old VM
-after the fork (because AES-GCM is like AES-CTR plus an authenticator,
-and CTR means that when keystream reuse occurs and one of the
-plaintexts is known, the attacker can simply recover the other
-plaintext using XOR).
+> There are a few design goals of notifying userspace: it should be
+> fast, because people who are using userspace RNGs are usually doing so
+> in the first place to completely avoid syscall overhead for whatever
+> high performance application they have - e.g. I recall conversations
+> with Colm about his TLS implementation needing to make random IVs
+> _really_ fast.
 
-(Or maybe, in disaster failover environments, TLS 1.3 servers could
-get away with rekeying the connection instead of shooting it down? Ask
-your resident friendly cryptographer whether that would be secure, I
-am not one.)
+That’s our old friend TLS1.1 in CBC mode, which needs a random 
+explicit IV for every record sent. Speed is still a reason at the 
+margins in cases like that, but getrandom() is really fast. A stickier 
+problem is that getrandom() is not certified for use with every 
+compliance standard, and those often dictate precise use of some NIST 
+DRBG or NRBG construction. That keeps people proliferating user-space 
+RNGs even when speed isn’t as important.
 
-I don't think a mechanism based around asynchronously telling the
-application and waiting for it to confirm the rotation at a later
-point is going to cut it; we should have some hard semantics on when
-an application needs to poll this value.
+> It should also happen as early as possible, with no
+> race or as minimal as possible race window, so that userspace doesn't
+> begin using old randomness and then switch over after the damage is
+> already done.
 
-> Or even worse: your system's host ssh key.
++1 to this, and I’d add that anyone making VM snapshots that they plan 
+to restore from multiple times really needs to think this through top to 
+bottom. The system would likely need to be put in to some kind of 
+quiescent state when the snapshot is taken.
 
-Mmmh... I think I normally would not want a VM to reset its host ssh
-key after merely restoring a snapshot though? And more importantly,
-Microsoft's docs say that they also change the VmGenID on disaster
-failover. I think you very much wouldn't want your server to lose its
-host key every time disaster failover happens. On the other hand,
-after importing a public VM image, it might be a good idea.
+> So, anyway, here are a few options with some pros and cons for the
+> kernel notifying userspace that its RNG should reseed.
+>
+> 1. SIGRND - a new signal. Lol.
+>
+> 2. Userspace opens a file descriptor that it can epoll on. Pros are
+> that many notification mechanisms already use this. Cons is that this
+> requires syscall and might be more racy than we want. Another con is
+> that this a new thing for userspace programs to do.
 
-I guess you could push that responsibility on the user, by adding an
-option to the sshd_config that tells OpenSSH whether the host key
-should be rotated on an ID change or not... but that still would not
-be particularly pretty.
+A library like OpenSSL or BoringSSL also has to account for running 
+inside a chroot, which also makes this hard.
 
-Ideally we would have the host tell us what type of events happened to
-the VM, or something like that... or maybe even get the host VM
-management software to ask the user whether they're importing a public
-image... I really feel like with Microsoft's current protocol, we
-don't get enough information to figure out what we should do about
-private long-term authentication keys.
+> Any thoughts on 4c? Is that utterly insane, or does that actually get
+> us somewhere close to what we want?
+
+I still like 4c, and as a user-space crypto-person, and a VM person, 
+they have a lot of appeal. Alex and Adrian’s replies get into some of 
+the sufficiency challenge. But for user-space libraries like the *SSLs, 
+the JVMs, and other runtimes where RNGs show up, it could plug in easily 
+enough.
+
+-
+Colm
