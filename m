@@ -2,121 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D6E4292A31
-	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 17:18:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78E35292A57
+	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 17:26:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730070AbgJSPSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Oct 2020 11:18:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21907 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729849AbgJSPSE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Oct 2020 11:18:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603120682;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eBCguRNOfJllp0/NwaH8eTnMNWpZQS4LUPzl0zBKDS8=;
-        b=TAJrUwTPoW6bH4ndvHFkm97pTVxO8pmu2twmojHdXamY1MFUbtnjCkODEMqe7oVIL0rAvl
-        B2GuS/f4PlDV+6Lu+9YJKWAnRI7x6NI8Z8yQnBl2iCgPbEuof8i6NUlwsdh32/1k25dq/d
-        DzHznZ9VykFOVoMUFgW0mXlXhW2oANs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-5mZo14OrOEyUoW5_XMTUwQ-1; Mon, 19 Oct 2020 11:18:01 -0400
-X-MC-Unique: 5mZo14OrOEyUoW5_XMTUwQ-1
-Received: by mail-wm1-f71.google.com with SMTP id r19so53328wmh.9
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 08:18:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eBCguRNOfJllp0/NwaH8eTnMNWpZQS4LUPzl0zBKDS8=;
-        b=oDg784m0qxH+cAMHScNnY+ccOaesjQbR/aMYrw1geqqZiTWbA8kZQxfNSx25ZahxQh
-         sMJ/pImKTSuGGVDRhCySh1dAoKwH6bRvWqFiwx364pwxDVCqkQ0+K+mmXhNZNSPGVtZq
-         BhC5/CmYDe+KXROW42JfsbIv1/cm04/vjz9aUBFQxQZ2BmgNcj0czYFEW0jEFxx4eOrZ
-         Dg2qBQeVkwXcQCRcZDQ+IvTFUjTjxch/gdJ/preASmI5yhutq1tO15oNmTdHm/RCEULe
-         +J7ZS827MA4Rpcl7Z0wyYwuyBtOIyTfzz/0qiU+KaF5JUmb3M3gY5qmPGEceWei49hwd
-         Nd5Q==
-X-Gm-Message-State: AOAM5328j1HT9Kceca3WvM9YtIJm6gxnxcfRaNEvA1krE5VcXENAQgPm
-        vVeiiB34Vp1/uk8E+aENqvFzCZcc79QKi4j+kJWBxXp+QbYivYKNB67I1QZq4OABzHSgyqliTb4
-        uJOs9GbPH3zmC
-X-Received: by 2002:a5d:4fc5:: with SMTP id h5mr962wrw.145.1603120679956;
-        Mon, 19 Oct 2020 08:17:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWFhrFkA1K5rxHXvfwUbrF2K0FMCTnE2rtnx+2maY1gGUIwZkJLmkLXmqp8oLhPjcNOmX5lA==
-X-Received: by 2002:a5d:4fc5:: with SMTP id h5mr932wrw.145.1603120679721;
-        Mon, 19 Oct 2020 08:17:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w5sm356911wmg.42.2020.10.19.08.17.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Oct 2020 08:17:58 -0700 (PDT)
-Subject: Re: [PATCH] x86/kvm: Update the comment about asynchronous page fault
- in exc_page_fault()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org
-Cc:     kvm@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        id S1730020AbgJSP0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Oct 2020 11:26:05 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:12118 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729845AbgJSP0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Oct 2020 11:26:04 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f8dafb00000>; Mon, 19 Oct 2020 08:24:32 -0700
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 19 Oct
+ 2020 15:25:59 +0000
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
+ by HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Mon, 19 Oct 2020 15:25:59 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SKP+uw1ITdvEQILBuaPFapvHGELoFV2OLZUU05Er/bM9bHbXuZCsxMQnHDMrPRVYxLEBkqJLM8qDO1n7XjWpCzn9Ocq+Bl06OSF1MIVD+Ilc0r/ULVyveW8XVG6fa42xEzN7/UpgxOVATPSCP5t+4vscDV20FwSURZpmSyFbPB6GcBf0VlcwNbI4kQ+uu2SircDb7t9W2L7h7JL6m5gsNBrKkOGjD2pneHWyDbsW6pQnnZMJdF3dBhZELIYF4mGNimgNyIB03v99Tocb6uDpEiTawfoOKYNu9jSkA0eHGk9B5+4PiRjgo7X5PyDnjP1h7BHaGjugFWxbHWa1Bj7Y7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EAD4YhYy4w/iIVhyD1aD9WKwwuU5PyaeU+HlrQwSGwI=;
+ b=EAheS2T1b/iPSxXsQ4rOS8ugxQLCgSei2Gk8+/XZrQrw1RIC06FJt3ub/qD116GLtoSVafL6vt7Mkj7Q7PHIRZKImB4Sj0GVTCO1ikWaR4qHsF8Qsp9Vtk5Ft1EvMQcn0T7A416uigeyNfEFa9sZqqwWkXPo0USwIqMBTG12D6egOqMxAKJuz0LmolVPLR6ZTwjWJal5MCdXMUymnyLl+aw5Fvvhs4ebUQEgmcCbgzhrPyIMEMPUfEADTaiv98vf4+6o9FpWdGOU6pPku5PYa5WJwoIuYs+8t4JYF0dW0pHFB54KJ0O/6rjMuz+z27EK/jhOApw9+AUaB5AWbUx9+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4266.namprd12.prod.outlook.com (2603:10b6:5:21a::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Mon, 19 Oct
+ 2020 15:25:58 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3477.028; Mon, 19 Oct 2020
+ 15:25:58 +0000
+Date:   Mon, 19 Oct 2020 12:25:56 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+CC:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arch@vger.kernel.org>, <linux-mm@kvack.org>,
+        <kvm@vger.kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Matt Fleming <matt@codeblueprint.co.uk>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-References: <20201002154313.1505327-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ee54faa-b204-ccec-da42-8029f834b80e@redhat.com>
-Date:   Mon, 19 Oct 2020 17:17:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        "Andy Lutomirski" <luto@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Alexander Potapenko <glider@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Rik van Riel <riel@redhat.com>,
+        Larry Woodman <lwoodman@redhat.com>,
+        "Dave Young" <dyoung@redhat.com>,
+        Toshimitsu Kani <toshi.kani@hpe.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: AMD SME encrpytion and PCI BAR pages to user space
+Message-ID: <20201019152556.GA560082@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: MN2PR05CA0054.namprd05.prod.outlook.com
+ (2603:10b6:208:236::23) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <20201002154313.1505327-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR05CA0054.namprd05.prod.outlook.com (2603:10b6:208:236::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.8 via Frontend Transport; Mon, 19 Oct 2020 15:25:57 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kUX2q-002LsA-MN; Mon, 19 Oct 2020 12:25:56 -0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1603121072; bh=EAD4YhYy4w/iIVhyD1aD9WKwwuU5PyaeU+HlrQwSGwI=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:Content-Type:Content-Disposition:
+         X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType;
+        b=a9wjNQx/jaO6toRrCHDO33yzuLunPbL4estPTGud0blfahf3VGVP20iAccliJWmmL
+         nUFtUyvw7dzs6hzTtRo8vH+7mjE75JM7GcPDWApHAojhIp6euvyKfyMpIQvjcizAJf
+         zIwcuieZ+RjigrmYERMW0Ht/CQGaLx/iP/x/NiNbu07KZOHY3o7GzX2ikAMLQFDvGA
+         DjYzUGn0fWRlfA7REZBc38O8dA5jq7vWq1O+kDtl9fpUYNEpnvHK7rvrbLDLSBN+1S
+         rXdRg5gc+P0tFs/RhKfFbMDYlpg8Z8NcYWuEzdofha9d4iyZyAt8Ft3qIVwoJdjVhy
+         SGgGdYyjHoh3A==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/10/20 17:43, Vitaly Kuznetsov wrote:
-> KVM was switched to interrupt-based mechanism for 'page ready' event
-> delivery in Linux-5.8 (see commit 2635b5c4a0e4 ("KVM: x86: interrupt based
-> APF 'page ready' event delivery")) and #PF (ab)use for 'page ready' event
-> delivery was removed. Linux guest switched to this new mechanism
-> exclusively in 5.9 (see commit b1d405751cd5 ("KVM: x86: Switch KVM guest to
-> using interrupts for page ready APF delivery")) so it is not possible to
-> get older KVM (APF mechanism won't be enabled). Update the comment in
-> exc_page_fault() to reflect the new reality.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/mm/fault.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-> index 6e3e8a124903..3cf77592ac54 100644
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -1446,11 +1446,14 @@ DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)
->  	prefetchw(&current->mm->mmap_lock);
->  
->  	/*
-> -	 * KVM has two types of events that are, logically, interrupts, but
-> -	 * are unfortunately delivered using the #PF vector.  These events are
-> -	 * "you just accessed valid memory, but the host doesn't have it right
-> -	 * now, so I'll put you to sleep if you continue" and "that memory
-> -	 * you tried to access earlier is available now."
-> +	 * KVM uses #PF vector to deliver 'page not present' events to guests
-> +	 * (asynchronous page fault mechanism). The event happens when a
-> +	 * userspace task is trying to access some valid (from guest's point of
-> +	 * view) memory which is not currently mapped by the host (e.g. the
-> +	 * memory is swapped out). Note, the corresponding "page ready" event
-> +	 * which is injected when the memory becomes available, is delived via
-> +	 * an interrupt mechanism and not a #PF exception
-> +	 * (see arch/x86/kernel/kvm.c: sysvec_kvm_asyncpf_interrupt()).
->  	 *
->  	 * We are relying on the interrupted context being sane (valid RSP,
->  	 * relevant locks not held, etc.), which is fine as long as the
-> 
+Hi Tom,
 
-Queued, thanks.
+We've found a bug where systems that have the AMD SME turned on are
+not able to run RDMA work loads. It seems the kernel is automatically
+encrypting VMA's pointing at PCI BAR memory created by
+io_remap_pfn_range() - adding a prot_decrypted() causes things to
+start working.
 
-Paolo
+To me this is surprising, before I go adding random prot_decrypted()
+into the RDMA subsystem can you confirm this is actually how things
+are expected to work?
 
+Is RDMA missing something? I don't see anything special in VFIO for
+instance and the two are very similar - does VFIO work with SME, eg
+DPDK or something unrelated to virtualization?
+     
+Is there a reason not to just add prot_decrypted() to
+io_remap_pfn_range()? Is there use cases where a caller actually wants
+encrypted io memory?
+
+I saw your original patch series edited a few drivers this way, but
+not nearly enough. So I feel like I'm missing something.. Does vfio
+work with SME? I couldn't find any sign of it calling prot_decrypted()
+either?
+
+(BTW, I don't have any AMD SME systems to test on here, I'm getting
+ this bug report from deployed system, running a distro kernel)
+
+Thanks,
+Jason
