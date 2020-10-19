@@ -2,100 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 379E3292BE9
-	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 18:53:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62447292C11
+	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 19:00:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730641AbgJSQw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Oct 2020 12:52:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36160 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729879AbgJSQw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Oct 2020 12:52:59 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689BCC0613CE
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 09:52:59 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id f19so265797pfj.11
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 09:52:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Yw8E0ulWVQlaL8BcUt/yjwge7L71Y/eTIrTpA11Zcik=;
-        b=Ozqj0QKhRLwCZUypzAhoMCYcqflkJW6uhB2cAhcv0S/w9rmhjiv/05CpffjWJE5iIA
-         gX8UlsJq3LsksITCZGCtXLlFowsLrpi32LO3FGWSQo2EQnmzOFuSiv5+iAz6gRczSj+t
-         BJ+Zm9pesLWVcE6z1JzNDE7erfaUXtntZQGIrovPS0COnXKCFk8hI8gDBi4f/vldSM1S
-         xoWOUBiSbkuBnFx0z1eKUeQCFsHU3kxiFQKdZtQR+PI+i3jDKhRiYKRV5uRKgSlkkOTj
-         QZBpycxVoWiEcaai4JCIqXBj7RUhltu5PcVx3j9vgYETSYw08qa6gH7rfsbYSwIeIOLN
-         EtBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Yw8E0ulWVQlaL8BcUt/yjwge7L71Y/eTIrTpA11Zcik=;
-        b=OE7mz7ZaRfl0jiyzwrdq/+U7SOnlLc/kz8a6SnCnMZZD8MkyYfzQT5Ob6uiBW5xrux
-         Yr4V5c1Rx7d6cdjLZsssTmhfPFor6P7a0bSEZ9IDlmCfBaGQblDTBXS7ex3KeHHem/Dq
-         ISkdrca7b7xw/TriHti7WAV3fyOnHP+bQv6eJv+Xb4Pwsr8FeQpbrwksVP8id0b3qJna
-         /Bu4a9+de/UkHWAqs016NdgXpTsMATqFFSYFH0N/nN96/JjE+oLDE9yriDy0UNQL1tWe
-         vVmo54B7EVSIITiD5Mbr4GCdtFpoT/vjb2NBTsA+MTeROWmUcJgUK0x50uk/VHyettn1
-         ltPg==
-X-Gm-Message-State: AOAM532I7ZjRCILkykFdwLGSCkEDOg7uM5WvyQ2K0iFCzDjQ72qoC5LM
-        oHxj/SQQ7I6QfUn09JE2Zfs=
-X-Google-Smtp-Source: ABdhPJyPbf6PgoB8x9yfETwZAocp/F3nmpXLKelzdxh5YAQKyCDP4I2zJJPWgsi6LTmosaQD5mITJw==
-X-Received: by 2002:a63:1e65:: with SMTP id p37mr501773pgm.131.1603126378829;
-        Mon, 19 Oct 2020 09:52:58 -0700 (PDT)
-Received: from ?IPv6:2601:647:4700:9b2:c031:b044:ee25:f7b0? ([2601:647:4700:9b2:c031:b044:ee25:f7b0])
-        by smtp.gmail.com with ESMTPSA id y126sm187984pgb.40.2020.10.19.09.52.57
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Oct 2020 09:52:58 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [kvm-unit-tests PATCHv2] unittests.cfg: Increase timeout for apic
- test
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <a6e33cd7d0084d6389a02786225db0e8@intel.com>
-Date:   Mon, 19 Oct 2020 09:52:57 -0700
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Po-Hsu Lin <po-hsu.lin@canonical.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C67F3473-32FE-4099-BBB1-8BB31B1ED95D@gmail.com>
-References: <20201013091237.67132-1-po-hsu.lin@canonical.com>
- <87d01j5vk7.fsf@vitty.brq.redhat.com>
- <20201015163539.GA27813@linux.intel.com>
- <87o8ky4fkf.fsf@vitty.brq.redhat.com>
- <a6e33cd7d0084d6389a02786225db0e8@intel.com>
-To:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+        id S1730834AbgJSRAj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Oct 2020 13:00:39 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:3503 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730645AbgJSRAj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Oct 2020 13:00:39 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f8dc6070005>; Mon, 19 Oct 2020 09:59:51 -0700
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 19 Oct
+ 2020 17:00:32 +0000
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by HQMAIL109.nvidia.com (172.20.187.15) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Mon, 19 Oct 2020 17:00:32 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ao5g7wQ5l4KdEVVjatUuiUzF1HR9QQGQEdAULXVahcoU1VMPDUvLlSDogC49gjQJMGySQhXO4tvG/gxk3mdiq5Rme61SZ/aw4l3EanmjbA3MFO4AlCoHcacWPciiSYVkmVtg74n+dRo7LInfgi5esyooXotBqustwfa6HX63oA1yMiOPJcZQmc+a6ZehY+uDxuuQdKGjyV8OU1e9W8B+wC6KQqVLgrwlPk+7bqNchctyJj7moEEcrQ+fxeLddYcsv74y5nbndyH10TJnmUIkFN7PU8ksIlgQ7zmB51LH435T4gH34QvY9LkYFM2JKnmg5DsIpfW3/GKuAKbiSHfzSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pdcSjjWZePS0hH/ubWLT74o1FPXKYWW71rD9/WjGt00=;
+ b=SmowLsGN0KAXz8sVtXfP4ihgWSt4t0gPYutDeOU2QiSyI8TOSUp2VvyV71pCEsZWxbpZmk9CVg2HyHU6eEpSTuKoFEmtYW5EUFJ9tiuRK1CYxz3xO3K86yLS1hnScud9+1+2PAZUce9T/x5VCxDJuD+1Kse3zYbxX9/v5hY9ZCabrOq2nafXaggvN+Fl/UnsMSpMUaeFP4lZHUOyQiQqUDBB+UAaaIbM5pYlj147v9Vb22AmkpsaXTAPaWeCNo0ThBOKzkECcs6WBMillRRfutR2P3XQodQKcQrZezLTWeICin6nVns4UntoBO4UHkkvF3CtknfSDQ4lfkvuOaWwgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB3116.namprd12.prod.outlook.com (2603:10b6:5:38::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Mon, 19 Oct
+ 2020 17:00:31 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3477.028; Mon, 19 Oct 2020
+ 17:00:31 +0000
+Date:   Mon, 19 Oct 2020 14:00:29 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+CC:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arch@vger.kernel.org>, <linux-mm@kvack.org>,
+        <kvm@vger.kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Matt Fleming <matt@codeblueprint.co.uk>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "Andy Lutomirski" <luto@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Alexander Potapenko <glider@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Rik van Riel <riel@redhat.com>,
+        Larry Woodman <lwoodman@redhat.com>,
+        "Dave Young" <dyoung@redhat.com>,
+        Toshimitsu Kani <toshi.kani@hpe.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: AMD SME encrpytion and PCI BAR pages to user space
+Message-ID: <20201019170029.GU6219@nvidia.com>
+References: <20201019152556.GA560082@nvidia.com>
+ <4b9f13bf-3f82-1aed-c7be-0eaecebc5d82@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <4b9f13bf-3f82-1aed-c7be-0eaecebc5d82@amd.com>
+X-ClientProxiedBy: YT1PR01CA0096.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:2d::35) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (206.223.160.26) by YT1PR01CA0096.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:2d::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21 via Frontend Transport; Mon, 19 Oct 2020 17:00:31 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kUYWL-002OXy-Ml; Mon, 19 Oct 2020 14:00:29 -0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1603126791; bh=pdcSjjWZePS0hH/ubWLT74o1FPXKYWW71rD9/WjGt00=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType;
+        b=lCn/SDs70aiXrQpWqP/anl+ViQ+NtikaVW6bkKMcpy+6HB+KCpnl84LqvuulOO6iZ
+         wfS1BMN1l7eOSf/3JujExDLUZiqfrSyjQhSpQcUsMhMEh0dqWQwF2Ip8gaqnhOarkI
+         ti5jdkn6JuJSw92F3krnj3df63pzVw8NgzrpsU7rg3XIqnDLbob7DoP642Bkb2hO5H
+         7/GvBqm2PBKX2PhMkkZEovBLhDDySpmfzo6YcWJM3QeuiGe6NoUCca8Cd1+czhKw2z
+         tTyiW9JRfpsPlCVramEfX758UhYYYjgcobLOqma1CTxJ3m93GQBuJewyrdadh6rQ9O
+         AdHMVtrOm7PSA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Oct 19, 2020, at 9:37 AM, Christopherson, Sean J =
-<sean.j.christopherson@intel.com> wrote:
->=20
-> On Mon, Oct 19, 2020 at 01:32:00PM +0200, Vitaly Kuznetsov wrote:
->> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->>> E.g. does running 1M loops in test_multiple_nmi() really add value =
-versus
->>> say 10k or 100k loops?
->>=20
->> Oddly enough, I vaguely remember this particular test hanging
->> *sometimes* after a few thousand loops but I don't remember any
->> details.
->=20
-> Thousands still ain't millions :-D.
->=20
-> IMO, the unit tests should sit between a smoke test and a long =
-running,
-> intensive stress test, i.e. the default config shouldn't be trying to =
-find
-> literal one-in-a-million bugs on every run.
+On Mon, Oct 19, 2020 at 11:36:16AM -0500, Tom Lendacky wrote:
 
-IIRC, this test failed on VMware, and according to our previous =
-discussions,
-does not follow the SDM as NMIs might be collapsed [1].
+> > Is RDMA missing something? I don't see anything special in VFIO for
+> > instance and the two are very similar - does VFIO work with SME, eg
+> > DPDK or something unrelated to virtualization?
+> 
+> If user space is mapping un-encrypted memory, then, yes, it would seem
+> that there is a gap in the support where the pgprot_decrypted() would be
+> needed in order to override the protection map.
 
-[1] https://marc.info/?l=3Dkvm&m=3D145876994031502&w=3D2
+It isn't "memory" it is PCI BAR pages, eg memory mapped IO
 
+> > Is there a reason not to just add prot_decrypted() to
+> > io_remap_pfn_range()? Is there use cases where a caller actually wants
+> > encrypted io memory?
+> 
+> As long as you never have physical memory / ram being mapped in this path,
+> it seems that applying pgprot_decrypted() would be ok.
+
+I think the word 'io' implies this is the case..
+
+Let me make a patch for this avenue then, I think it is not OK to add
+pgprot_decrypted to every driver.. We already have the special
+distinction with io and non-io remap, that seems better.
+
+> > I saw your original patch series edited a few drivers this way, but
+> > not nearly enough. So I feel like I'm missing something.. Does vfio
+> > work with SME? I couldn't find any sign of it calling prot_decrypted()
+> > either?
+> 
+> I haven't tested SME with VFIO/DPDK.
+
+Hum, I assume it is broken also. Actually quite a swath of drivers
+and devices will be broken under this :\
+
+Jason
