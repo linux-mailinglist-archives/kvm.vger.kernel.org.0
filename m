@@ -2,175 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFFB2291849
-	for <lists+kvm@lfdr.de>; Sun, 18 Oct 2020 18:14:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B0302923C2
+	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 10:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726928AbgJRQOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 18 Oct 2020 12:14:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41130 "EHLO mail.kernel.org"
+        id S1728239AbgJSIjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Oct 2020 04:39:11 -0400
+Received: from mga18.intel.com ([134.134.136.126]:53094 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726613AbgJRQOP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 18 Oct 2020 12:14:15 -0400
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B63CE22240
-        for <kvm@vger.kernel.org>; Sun, 18 Oct 2020 16:14:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603037655;
-        bh=QkAuJOFzVf0Wwxo6H++VdX8xdeoi48QFNUPVWESxEeY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=rffJvgFw8irrIGZAcek+x0zg/gt4Gi/MwUN3UHhn0YsqDBUlTjD/VMQRp4txU3C+R
-         9evpOGeEmginVuSv16P6vdFf9xqJoNVP8Pi/M625Nhhn3oq9KVeHXUUkp59uv/Qj1A
-         1hXbIGy2bo1vH3hofY0qSAhRGjG62+Ze93DId1hg=
-Received: by mail-wm1-f51.google.com with SMTP id a72so7946467wme.5
-        for <kvm@vger.kernel.org>; Sun, 18 Oct 2020 09:14:14 -0700 (PDT)
-X-Gm-Message-State: AOAM533IJp9kYt2U+wqNhSwKrvxYNHSDCbUTRmRV4rOIW7TIUUTm2WOy
-        fQkRjo3liUaDjSsQSeH7KtoviljsHPdMGe+GuPgfUQ==
-X-Google-Smtp-Source: ABdhPJzAXECqLOcgtU/8DSPTTXSAjc3cG+qUKXcQQZ/UMNZ2TU+94ycOvtKGPaT5rUWM66K+feNpmT6EZJqfh4RkIck=
-X-Received: by 2002:a05:600c:2256:: with SMTP id a22mr13760040wmm.138.1603037652395;
- Sun, 18 Oct 2020 09:14:12 -0700 (PDT)
+        id S1727326AbgJSIjL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Oct 2020 04:39:11 -0400
+IronPort-SDR: k5gnsY/nU4yvjupMp78P5Gp0OQL5oSJ8aGL+WCUtImH7gK0pk2zWvEslcwvWLwuyNVl7VKqEUb
+ y87ydukzy+fQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9778"; a="154782290"
+X-IronPort-AV: E=Sophos;i="5.77,394,1596524400"; 
+   d="scan'208";a="154782290"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2020 01:39:08 -0700
+IronPort-SDR: SsBi3BWk3Ipj4qUs3doUykY9IZajErQk63kzu3twvpUcVujzbzCxjfFHMeNzBg6S41DwAqJTuM
+ Da6ntlXQYM8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,394,1596524400"; 
+   d="scan'208";a="532541641"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by orsmga005.jf.intel.com with ESMTP; 19 Oct 2020 01:39:10 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 19 Oct 2020 01:39:09 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 19 Oct 2020 01:39:08 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 19 Oct 2020 01:39:08 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.36.59) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Mon, 19 Oct 2020 01:39:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ck/RBE1pjbICfVkZ99gJ6/9BDRDwPk9S1LnjZ/X1zGAVMcjBjR0E5Cjbj4l1hKqQGrE5f78o+mFQHEFlGeHY0zWqLaAkd920PjH008rNdMlCN78ImBYk3FiGCUPRGg3Z2Ht0Qsoce+5+OQHcGAqCILzxzuF+X3CPgZgNVYzay3SB6gFnvnxYtx5Hoe47Mut97Jaoczsb7pEQ6a5TZZWY3FCaIP7OR0GFmqRksaFI6TOWFl3Y36g34vpuy4EXWSgpt+FjbZfZ9IvbwNV0zDXxaAKbrqSKpICbbfWgROCuVeoAOik4DBt4ajd/Z3ZMj7KCIO2jnMERjrPCUjUEnhjQbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LmSAepqYF/pPC5gZiNd9Ffs4Br7w51RWwDow8eWxobk=;
+ b=DAhckdsO1FN3o3pyj+OGCHaXwSIqTPk/sOF87VqV8eQSNaF8EPTeVD9F2mr6LgSIEPh53g4wpAR+agxPFadgITm9HN4eeF/L3t51k8JZnLR1QR6WOePkpv7ENDMPJ05FJTRXwWFimhOuJ1q7xlmokw8aEWAWttZPB9UXlqnFDyv5PQFCd5rD0m46UpmtiG/MSdtv8U2No9PzlKCKu6f7CoI6l7KG8uHP6DG0wZlbKBO2C+H5urd/ySy7hqwSJDxalNdefGvVpnGBYWVpsxbDfJnvitEU0bN9yHdFxtC5ZCCxQgCYa2UdEaGrTEsSLAPaPArWPSOhPmvytMPgMcmbOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LmSAepqYF/pPC5gZiNd9Ffs4Br7w51RWwDow8eWxobk=;
+ b=mMHcyOVZlF4+At5GF5Lxa6UWbakjmGaAa+8BKFh0yD1QQ6884F36VGUb4yE39Wq36R8ysVE0wbQNMzNjySEAOWDQvCbWrlmb3wpEV68zEIOwdTQSDxHlrab9vFBhnST8miTguN3AYHl8P4zi6uFZN2fTnTQKVNN5rNkEXAPkoJw=
+Received: from DM5PR11MB1435.namprd11.prod.outlook.com (2603:10b6:4:7::18) by
+ DM6PR11MB2857.namprd11.prod.outlook.com (2603:10b6:5:cb::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3477.23; Mon, 19 Oct 2020 08:39:04 +0000
+Received: from DM5PR11MB1435.namprd11.prod.outlook.com
+ ([fe80::a1ec:ba6b:5057:be2f]) by DM5PR11MB1435.namprd11.prod.outlook.com
+ ([fe80::a1ec:ba6b:5057:be2f%11]) with mapi id 15.20.3477.028; Mon, 19 Oct
+ 2020 08:39:04 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Jason Wang <jasowang@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: RE: (proposal) RE: [PATCH v7 00/16] vfio: expose virtual Shared
+ Virtual Addressing to VMs
+Thread-Topic: (proposal) RE: [PATCH v7 00/16] vfio: expose virtual Shared
+ Virtual Addressing to VMs
+Thread-Index: AdagceQQLvqwjRCrQOaq1hZ7MgDUUABZWmqgAH60bgAAh22vsA==
+Date:   Mon, 19 Oct 2020 08:39:03 +0000
+Message-ID: <DM5PR11MB1435A3AEC0637C4531F2FE92C31E0@DM5PR11MB1435.namprd11.prod.outlook.com>
+References: <MWHPR11MB1645CFB0C594933E92A844AC8C070@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <MWHPR11MB1645AE971BD8DAF72CE3E1198C050@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20201016153632.GM6219@nvidia.com>
+In-Reply-To: <20201016153632.GM6219@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-reaction: no-action
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [221.220.190.251]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8791266a-f74b-45aa-36f9-08d8740a6f6d
+x-ms-traffictypediagnostic: DM6PR11MB2857:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR11MB28578DFF31CF4434B2D021ABC31E0@DM6PR11MB2857.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: glSu/bh0k3Nvbgk8GNyxKvPCWgtq8TEdsBXANlRLuqUYGKh0BdtFK0MbYXub1Fuu+ek28r/Xz/4ujqHXPtX7HDI4jopTmshhaY84yYO/pqAuRfStNPc+XY3OF/cjZ4MCxM75AO5WyPPUrcgEzNHz06RggtJkIXuKDLnVut5IBPX1+XJyvDmaByQfuJPoyDooLdlXsjnn7RlhNT31UCfHQO4022Lui5LR6PNSJhiqCAwwWjrefQb/cCdNPAaVya9FOnW3GDIJ7KzqshfNCJ88FN3hr5hfF9KcPUAQMMowR1F4ejH9eQbVV2pWNW74nDu0qqLv78XWj9JddK3eQhlqWw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(366004)(396003)(346002)(136003)(64756008)(66556008)(110136005)(66446008)(76116006)(54906003)(55016002)(66946007)(7416002)(316002)(66476007)(2906002)(83380400001)(86362001)(5660300002)(52536014)(71200400001)(8676002)(478600001)(4326008)(6636002)(7696005)(186003)(9686003)(33656002)(6506007)(8936002)(26005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: Q1a/jVnmdE9L0gQ32ell9nkuP5N1++oQGnFKhD1XuNlT618HEm/JlnjObBgk+NIEEwGYShZ1e7Itjnl9GgZo+LdSlqUa7xCXgoYPWyVAxxV6dddZQ/tJnV9lVIOSgQjIofcbxEGLZGkblUVqG9y/Sd9eJs9tpbJob47lFTmtLfvXHekibPUFQQu9VHwuSB7Fj2oEVI2tfPGHJnMkTcuqczDeV0kBhXWgt3oBrvjTWYjOsLqkL30AdA5O83XlQxvOSTnJIRjHENcllk7ccHT17yeGssb5PUpr6LZytMabKuTOwjOjj5jsqWZ6yTbsi5v7DVfYCDW3r0LNsTuhv8/DwA+cRUgDvLDTwb1BCBjApWD+pijhFgwdpraT5Pe7du5xOl3V1OhNCDaj0qdIRdyMTu/noKkpxv2bn82A41+/EOPxWHuj7aRRu8zYlgJNayOLikiVE8SCfLkgQlykj7u1Z6bRG1YCPs14v6zYLMc+sZEUfKR/4O2Kj/uftyzFzteX8jZkVr6oyhnfMwfKQ6ybFfnqoygqHjmtVXJeUSAs+hvjM75DVoa9sp0opDUUM98TdmzeAFtZ/aK0MMlJeHjDOVPx6UY3/xqau6y+Vz+uyi4CGPcWhMGBsmnTyiLS7GZtFvbwpX5ZmJTw40UcKGcO6A==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
- <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com> <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
- <20201017053712.GA14105@1wt.eu> <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
- <20201017064442.GA14117@1wt.eu> <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
- <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
- <20201018114625-mutt-send-email-mst@kernel.org> <CALCETrXBJZnKXo2QLKVWSgAhSMdwEVHeut6pRw4P92CR_5A-fQ@mail.gmail.com>
- <20201018115524-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20201018115524-mutt-send-email-mst@kernel.org>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Sun, 18 Oct 2020 09:14:00 -0700
-X-Gmail-Original-Message-ID: <CALCETrUeRAhmEFR6EFXz8HzDYd2doZ2TMyZmu1pU_-yAPA6KDw@mail.gmail.com>
-Message-ID: <CALCETrUeRAhmEFR6EFXz8HzDYd2doZ2TMyZmu1pU_-yAPA6KDw@mail.gmail.com>
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jann Horn <jannh@google.com>, Willy Tarreau <w@1wt.eu>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "open list:VIRTIO GPU DRIVER" 
-        <virtualization@lists.linux-foundation.org>,
-        "Graf (AWS), Alexander" <graf@amazon.de>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>, bonzini@gnu.org,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, oridgar@gmail.com,
-        ghammer@redhat.com, Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Linux API <linux-api@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR11MB1435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8791266a-f74b-45aa-36f9-08d8740a6f6d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Oct 2020 08:39:03.8609
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nCftJPlY7Xz90ZdFnCY9RtDKsfufoGx7z8B8LctJWSY0P/uHBysSaDGTdISO4AtWdhE6VBWi7NbNc+VseulxOw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB2857
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 18, 2020 at 8:59 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Sun, Oct 18, 2020 at 08:54:36AM -0700, Andy Lutomirski wrote:
-> > On Sun, Oct 18, 2020 at 8:52 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Sat, Oct 17, 2020 at 03:24:08PM +0200, Jason A. Donenfeld wrote:
-> > > > 4c. The guest kernel maintains an array of physical addresses that are
-> > > > MADV_WIPEONFORK. The hypervisor knows about this array and its
-> > > > location through whatever protocol, and before resuming a
-> > > > moved/snapshotted/duplicated VM, it takes the responsibility for
-> > > > memzeroing this memory. The huge pro here would be that this
-> > > > eliminates all races, and reduces complexity quite a bit, because the
-> > > > hypervisor can perfectly synchronize its bringup (and SMP bringup)
-> > > > with this, and it can even optimize things like on-disk memory
-> > > > snapshots to simply not write out those pages to disk.
-> > > >
-> > > > A 4c-like approach seems like it'd be a lot of bang for the buck -- we
-> > > > reuse the existing mechanism (MADV_WIPEONFORK), so there's no new
-> > > > userspace API to deal with, and it'd be race free, and eliminate a lot
-> > > > of kernel complexity.
-> > >
-> > > Clearly this has a chance to break applications, right?
-> > > If there's an app that uses this as a non-system-calls way
-> > > to find out whether there was a fork, it will break
-> > > when wipe triggers without a fork ...
-> > > For example, imagine:
-> > >
-> > > MADV_WIPEONFORK
-> > > copy secret data to MADV_DONTFORK
-> > > fork
-> > >
-> > >
-> > > used to work, with this change it gets 0s instead of the secret data.
-> > >
-> > >
-> > > I am also not sure it's wise to expose each guest process
-> > > to the hypervisor like this. E.g. each process needs a
-> > > guest physical address of its own then. This is a finite resource.
-> > >
-> > >
-> > > The mmap interface proposed here is somewhat baroque, but it is
-> > > certainly simple to implement ...
+Hi Jason,
+
+Good to see your response.
+
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, October 16, 2020 11:37 PM
+>=20
+> On Wed, Oct 14, 2020 at 03:16:22AM +0000, Tian, Kevin wrote:
+> > Hi, Alex and Jason (G),
 > >
-> > Wipe of fork/vmgenid/whatever could end up being much more problematic
-> > than it naively appears -- it could be wiped in the middle of a read.
-> > Either the API needs to handle this cleanly, or we need something more
-> > aggressive like signal-on-fork.
-> >
-> > --Andy
->
->
-> Right, it's not on fork, it's actually when process is snapshotted.
->
-> If we assume it's CRIU we care about, then I
-> wonder what's wrong with something like
-> MADV_CHANGEONPTRACE_SEIZE
-> and basically say it's X bytes which change the value...
+> > How about your opinion for this new proposal? For now looks both
+> > Jason (W) and Jean are OK with this direction and more discussions
+> > are possibly required for the new /dev/ioasid interface. Internally
+> > we're doing a quick prototype to see any unforeseen issue with this
+> > separation.
+>=20
+> Assuming VDPA and VFIO will be the only two users so duplicating
+> everything only twice sounds pretty restricting to me.
+>=20
+> > > Second, IOMMU nested translation is a per IOMMU domain
+> > > capability. Since IOMMU domains are managed by VFIO/VDPA
+> > >  (alloc/free domain, attach/detach device, set/get domain attribute,
+> > > etc.), reporting/enabling the nesting capability is an natural
+> > > extension to the domain uAPI of existing passthrough frameworks.
+> > > Actually, VFIO already includes a nesting enable interface even
+> > > before this series. So it doesn't make sense to generalize this uAPI
+> > > out.
+>=20
+> The subsystem that obtains an IOMMU domain for a device would have to
+> register it with an open FD of the '/dev/sva'. That is the connection
+> between the two subsystems. It would be some simple kernel internal
+> stuff:
+>=20
+>   sva =3D get_sva_from_file(fd);
 
-I feel like we may be approaching this from the wrong end.  Rather
-than saying "what data structure can the kernel expose that might
-plausibly be useful", how about we try identifying some specific
-userspace needs and see what a good solution could look like.  I can
-identify two major cryptographic use cases:
+Is this fd provided by userspace? I suppose the /dev/sva has a set of uAPIs
+which will finally program page table to host iommu driver. As far as I kno=
+w,
+it's weird for VFIO user. Why should VFIO user connect to a /dev/sva fd aft=
+er
+it sets a proper iommu type to the opened container. VFIO container already
+stands for an iommu context with which userspace could program page mapping
+to host iommu.
 
-1. A userspace RNG.  The API exposed by the userspace end is a
-function that generates random numbers.  The userspace code in turn
-wants to know some things from the kernel: it wants some
-best-quality-available random seed data from the kernel (and possibly
-an indication of how good it is) as well as an indication of whether
-the userspace memory may have been cloned or rolled back, or, failing
-that, an indication of whether a reseed is needed.  Userspace could
-implement a wide variety of algorithms on top depending on its goals
-and compliance requirements, but the end goal is for the userspace
-part to be very, very fast.
+>   sva_register_device_to_pasid(sva, pasid, pci_device, iommu_domain);
 
-2. A userspace crypto stack that wants to avoid shooting itself in the
-foot due to inadvertently doing the same thing twice.  For example, an
-AES-GCM stack does not want to reuse an IV, *expecially* if there is
-even the slightest chance that it might reuse the IV for different
-data.  This use case doesn't necessarily involve random numbers, but,
-if anything, it needs to be even faster than #1.
+So this is supposed to be called by VFIO/VDPA to register the info to /dev/=
+sva.
+right? And in dev/sva, it will also maintain the device/iommu_domain and pa=
+sid
+info? will it be duplicated with VFIO/VDPA?
 
-The threats here are not really the same.  For #1, a userspace RNG
-should be able to recover from a scenario in which an adversary clones
-the entire process *and gets to own the clone*.  For example, in
-Android, an adversary can often gain complete control of a fork of the
-zygote -- this shouldn't adversely affect the security properties of
-other forks.  Similarly, a server farm could operate by having one
-booted server that is cloned to create more workers.  Those clones
-could be provisioned with secrets and permissions post-clone, and at
-attacker gaining control of a fresh clone could be considered
-acceptable.  For #2, in contrast, if an adversary gains control of a
-clone of an AES-GCM session, they learn the key outright -- the
-relevant attack scenario is that the adversary gets to interact with
-two clones without compromising either clone per se.
+> Not sure why this is a roadblock?
+>=20
+> How would this be any different from having some kernel libsva that
+> VDPA and VFIO would both rely on?
+>=20
+> You don't plan to just open code all this stuff in VFIO, do you?
+>=20
+> > > Then the tricky part comes with the remaining operations (3/4/5),
+> > > which are all backed by iommu_ops thus effective only within an
+> > > IOMMU domain. To generalize them, the first thing is to find a way
+> > > to associate the sva_FD (opened through generic /dev/sva) with an
+> > > IOMMU domain that is created by VFIO/VDPA. The second thing is
+> > > to replicate {domain<->device/subdevice} association in /dev/sva
+> > > path because some operations (e.g. page fault) is triggered/handled
+> > > per device/subdevice. Therefore, /dev/sva must provide both per-
+> > > domain and per-device uAPIs similar to what VFIO/VDPA already
+> > > does.
+>=20
+> Yes, the point here was to move the general APIs out of VFIO and into
+> a sharable location. So, of course one would expect some duplication
+> during the transition period.
+>=20
+> > > Moreover, mapping page fault to subdevice requires pre-
+> > > registering subdevice fault data to IOMMU layer when binding
+> > > guest page table, while such fault data can be only retrieved from
+> > > parent driver through VFIO/VDPA.
+>=20
+> Not sure what this means, page fault should be tied to the PASID, any
+> hookup needed for that should be done in-kernel when the device is
+> connected to the PASID.
 
-It's worth noting that, in both cases, there could possibly be more
-than one instance of an RNG or an AES-GCM session in the same process.
-This means that using signals is awkward but not necessarily
-impossibly.  (This is an area in which Linux, and POSIX in general, is
-much weaker than Windows.)
+you may refer to chapter 7.4.1.1 of VT-d spec. Page request is reported to
+software together with the requestor id of the device. For the page request
+injects to guest, it should have the device info.
+
+Regards,
+Yi Liu
+
+>=20
+> > > space but they may be organized in multiple IOMMU domains based
+> > > on their bus type. How (should we let) the userspace know the
+> > > domain information and open an sva_FD for each domain is the main
+> > > problem here.
+>=20
+> Why is one sva_FD per iommu domain required? The HW can attach the
+> same PASID to multiple iommu domains, right?
+>=20
+> > > In the end we just realized that doing such generalization doesn't
+> > > really lead to a clear design and instead requires tight coordination
+> > > between /dev/sva and VFIO/VDPA for almost every new uAPI
+> > > (especially about synchronization when the domain/device
+> > > association is changed or when the device/subdevice is being reset/
+> > > drained). Finally it may become a usability burden to the userspace
+> > > on proper use of the two interfaces on the assigned device.
+>=20
+> If you have a list of things that needs to be done to attach a PCI
+> device to a PASID then of course they should be tidy kernel APIs
+> already, and not just hard wired into VFIO.
+>=20
+> The worst outcome would be to have VDPA and VFIO have to different
+> ways to do all of this with a different set of bugs. Bug fixes/new
+> features in VFIO won't flow over to VDPA.
+>=20
+> Jason
