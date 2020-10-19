@@ -2,211 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3528D292721
-	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 14:21:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 369D1292768
+	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 14:36:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726599AbgJSMVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Oct 2020 08:21:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49766 "EHLO
+        id S1727126AbgJSMge (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Oct 2020 08:36:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726249AbgJSMVb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Oct 2020 08:21:31 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22E8FC0613CE
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 05:21:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=3oHfWUXk3qVFMnHH5ircx03MhaN2SxWFEIH3A81Swgc=; b=hySh44LPVSY4Dgz9w+cQKmuY+t
-        iuzjsHPcmw1RsXbMnzWqZb65fUIvwUpPSTGeEuNETHQJCK8xK7SaalIgqQqyxL8QoUbZLa7E4yrOL
-        bTEK+K4dOiy0eKm5F3ME8RN66PtvG68vP8Au1Q2+44OXAkl8/3RZ/KEenelZra6DZB/kA4U3a0pDP
-        pk9ZCsSIVtvRPQ2dlux1rgW9ssC3fAQ/NIxMjlO6ake4IrrvncTw8pLEy8BmNTdaoX9zP8y4w65R8
-        nZTQDfl2+INNCqQtGFNgkxTmHmE6bQA/cXygJDikZLACwjfOcPE2U5MrpRJgl2vdMvRYGeD1SAtBB
-        8sMM5xLw==;
-Received: from 54-240-197-236.amazon.com ([54.240.197.236] helo=freeip.amazon.com)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kUUAE-0001kQ-LE; Mon, 19 Oct 2020 12:21:22 +0000
-Message-ID: <c337e15dec18e291399b294823dccbdb63976a38.camel@infradead.org>
-Subject: Re: [PATCH] target/i386: Support up to 32768 CPUs without IRQ
- remapping
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>
-Cc:     x86 <x86@kernel.org>, kvm <kvm@vger.kernel.org>
-Date:   Mon, 19 Oct 2020 13:21:20 +0100
-In-Reply-To: <7b9c8ca4-e89e-e140-d591-76dcb2cad485@redhat.com>
-References: <78097f9218300e63e751e077a0a5ca029b56ba46.camel@infradead.org>
-         <6f8704bf-f832-9fcc-5d98-d8e8b562fe2f@redhat.com>
-         <698c8ab6783a3113d90d8435d07a2dce6a2e2ec9.camel@infradead.org>
-         <7b9c8ca4-e89e-e140-d591-76dcb2cad485@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-DaYkaLxGml+9Bwtl8RWR"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        with ESMTP id S1726336AbgJSMge (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Oct 2020 08:36:34 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C07C0613CE;
+        Mon, 19 Oct 2020 05:36:33 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id j18so5955472pfa.0;
+        Mon, 19 Oct 2020 05:36:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+IfHdmrtrv7otmFjk0VFjYsi8am5SoJYfDZn7Odg9ks=;
+        b=FCxvk7rIOyC+X6GUmHiNsy0mJ/C9wmgoMDAVThoszbRGA2kcJWbqvt4whfWZuMrd3e
+         pJR/v5PyRCz0/ECXgA5r8ao3jxGp+fHhqymslaoXyibzydh2Y4NXRzciL4TBAXHtPKlJ
+         amiZiaCoKXzzwQbvFUOyfqukdrOPUB3ABlW5Tpd2Fj2g11Mn4wXbtPGjSIIdsQM8Qwud
+         KBq3VSPZP5+d87/tnJIuj3XWxb+/sBg+ttZW2bBP8k1Ze7w0n5DPEM+RsPg9urqJE/2W
+         n30OG5mx/hcjNfr+MjHHsBwrblqTxbCp6A8q4THVyjqyGbCLhM9xrmgkTq3IZzO6Dcib
+         bzlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+IfHdmrtrv7otmFjk0VFjYsi8am5SoJYfDZn7Odg9ks=;
+        b=b25/GSCLvWRR2Sf7D6VPDBtHxBfS/V1VQUwFrTcdPopBtEHzAg39PdeCmRHVJz6qfR
+         5FZQvz9qrkXBymBQ/6lNb1ENGjlCxIBfyKECLH4xfSKT/i1U9oFmat5L9bJFmeIkb+iU
+         VuHN9CmfiMZhBK9P8/3+cAmRaaRRfiGj+yp+fvpeyoxAqFFhVmimu/n2GINkSAnUpM1F
+         bu2BTJEm7SBU1TGT0Asd6JxzxNDKZeW8IHH1r5mUqbTg8RNl0vFP1Q+lGu29naHwSzxL
+         3g/oRfnnO5i1jaizE0y3LU4xFer8WFWX1ul+J+/yvs0vN0gpG2Jzw9MXq57/25060bL8
+         goew==
+X-Gm-Message-State: AOAM531j+TePSA9Azcs1tlMvp+77cDEUVgEYTKGv3bo+zv6d6eI/jYWK
+        KVaZ92THl/pmlFgg1xgYTw==
+X-Google-Smtp-Source: ABdhPJwqR7O6RVpQ3SkuAp7z4wPratZdwY+vM2/A2iDJoPq+hvwPjuNkA46qkJFjR9qkIgh9rfMW7Q==
+X-Received: by 2002:a63:560a:: with SMTP id k10mr14086693pgb.350.1603110993220;
+        Mon, 19 Oct 2020 05:36:33 -0700 (PDT)
+Received: from [127.0.0.1] ([103.7.29.7])
+        by smtp.gmail.com with ESMTPSA id a11sm3681517pfn.125.2020.10.19.05.36.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Oct 2020 05:36:32 -0700 (PDT)
+Subject: Re: [PATCH v4] KVM: Check the allocation of pv cpu mask
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        Haiwei Li <lihaiwei@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20201017175436.17116-1-lihaiwei.kernel@gmail.com>
+ <87r1pu4fxv.fsf@vitty.brq.redhat.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Message-ID: <0330c9df-7ede-815b-0e6e-10fb883eda35@gmail.com>
+Date:   Mon, 19 Oct 2020 20:36:22 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.3.3
+MIME-Version: 1.0
+In-Reply-To: <87r1pu4fxv.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 20/10/19 19:23, Vitaly Kuznetsov wrote:
+> lihaiwei.kernel@gmail.com writes:
+> 
+>> From: Haiwei Li <lihaiwei@tencent.com>
+>>
+>> check the allocation of per-cpu __pv_cpu_mask. Init
+>> 'send_IPI_mask_allbutself' only when successful and check the allocation
+>> of __pv_cpu_mask in 'kvm_flush_tlb_others'.
+>>
+>> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+>> ---
+>> v1 -> v2:
+>>   * add CONFIG_SMP for kvm_send_ipi_mask_allbutself to prevent build error
+>> v2 -> v3:
+>>   * always check the allocation of __pv_cpu_mask in kvm_flush_tlb_others
+>> v3 -> v4:
+>>   * mov kvm_setup_pv_ipi to kvm_alloc_cpumask and get rid of kvm_apic_init
+>>
+>>   arch/x86/kernel/kvm.c | 53 +++++++++++++++++++++++++++++--------------
+>>   1 file changed, 36 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>> index 42c6e0deff9e..be28203cc098 100644
+>> --- a/arch/x86/kernel/kvm.c
+>> +++ b/arch/x86/kernel/kvm.c
+>> @@ -547,16 +547,6 @@ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
+>>   	__send_ipi_mask(local_mask, vector);
+>>   }
+>>   
+>> -/*
+>> - * Set the IPI entry points
+>> - */
+>> -static void kvm_setup_pv_ipi(void)
+>> -{
+>> -	apic->send_IPI_mask = kvm_send_ipi_mask;
+>> -	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
+>> -	pr_info("setup PV IPIs\n");
+>> -}
+>> -
+>>   static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
+>>   {
+>>   	int cpu;
+>> @@ -619,6 +609,11 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+>>   	struct kvm_steal_time *src;
+>>   	struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+>>   
+>> +	if (unlikely(!flushmask)) {
+>> +		native_flush_tlb_others(cpumask, info);
+>> +		return;
+>> +	}
+>> +
+>>   	cpumask_copy(flushmask, cpumask);
+>>   	/*
+>>   	 * We have to call flush only on online vCPUs. And
+>> @@ -732,10 +727,6 @@ static uint32_t __init kvm_detect(void)
+>>   
+>>   static void __init kvm_apic_init(void)
+>>   {
+>> -#if defined(CONFIG_SMP)
+>> -	if (pv_ipi_supported())
+>> -		kvm_setup_pv_ipi();
+>> -#endif
+>>   }
+> 
+> Do we still need the now-empty function?
 
---=-DaYkaLxGml+9Bwtl8RWR
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+It's not necessary. I will remove it.
 
-On Thu, 2020-10-08 at 09:53 +0200, Paolo Bonzini wrote:
-> Indeed the nice thing about irqchip=3Dsplit is that the handling of devic=
-e
-> interrupts is entirely confined within QEMU, no matter if they're IOAPIC
-> or MSI.  And because we had to implement interrupt remapping, the IOAPIC
-> is effectively using MSIs to deliver its interrupts.
->=20
-> There's still the hack to communicate IOAPIC routes to KVM and have it
-> set the EOI exit bitmap correctly, though.  The code is in
-> kvm_scan_ioapic_routes and it uses kvm_set_msi_irq (with irqchip=3Dsplit
-> everything is also an MSI within the kernel).  I think you're not
-> handling that correctly for CPUs >255, so after all we _do_ need some
-> kernel support.
+> 
+>>   
+>>   static void __init kvm_init_platform(void)
+>> @@ -765,10 +756,18 @@ static __init int activate_jump_labels(void)
+>>   }
+>>   arch_initcall(activate_jump_labels);
+>>   
+>> +static void kvm_free_cpumask(void)
+>> +{
+>> +	unsigned int cpu;
+>> +
+>> +	for_each_possible_cpu(cpu)
+>> +		free_cpumask_var(per_cpu(__pv_cpu_mask, cpu));
+>> +}
+>> +
+>>   static __init int kvm_alloc_cpumask(void)
+>>   {
+>>   	int cpu;
+>> -	bool alloc = false;
+>> +	bool alloc = false, alloced = true;
+>>   
+>>   	if (!kvm_para_available() || nopv)
+>>   		return 0;
+>> @@ -783,10 +782,30 @@ static __init int kvm_alloc_cpumask(void)
+>>   
+>>   	if (alloc)
+>>   		for_each_possible_cpu(cpu) {
+>> -			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+>> -				GFP_KERNEL, cpu_to_node(cpu));
+>> +			if (!zalloc_cpumask_var_node(
+>> +				per_cpu_ptr(&__pv_cpu_mask, cpu),
+>> +				GFP_KERNEL, cpu_to_node(cpu))) {
+>> +				alloced = false;
+>> +				break;
+>> +			}
+>>   		}
+>>   
+>> +#if defined(CONFIG_SMP)
+>> +	/* Set the IPI entry points */
+>> +	if (pv_ipi_supported()) {
+> 
+> What if we define pv_ipi_supported() in !CONFIG_SMP case as 'false'?
+> 
+> The code we have above:
+> 
+>          if (pv_tlb_flush_supported())
+> 		alloc = true;
+> 
+> #if defined(CONFIG_SMP)
+>          if (pv_ipi_supported())
+> 		alloc = true;
+> #endif
+> 
+>        	if (alloc)
+> ...
+> 
+> will transform into 'if (pv_tlb_flush_supported() ||
+> pv_ipi_supported())' and we'll get rid of 'alloc' variable.
+> 
+> Also, we can probably get rid of this new 'alloced' variable and switch
+> to checking if the cpumask for the last CPU in cpu_possible_mask is not
+> NULL.
 
-I think that works out OK.
+Get it. It's a good point. I will do it. Thanks for your patience and 
+kindness.
 
-In QEMU's ioapic_update_kvm_routes() it calls ioapic_entry_parse()
-which generates the actual "bus" MSI with the extended dest ID in bits
-11-5 of the address.
+>   
+>> +		apic->send_IPI_mask = kvm_send_ipi_mask;
+>> +		if (alloced)
+>> +			apic->send_IPI_mask_allbutself =
+>> +				kvm_send_ipi_mask_allbutself;
+>> +		pr_info("setup PV IPIs\n");
+> 
+> I'd rather not set 'apic->send_IPI_mask = kvm_send_ipi_mask' in case we
+> failed to alloc cpumask too. It is weird that in case of an allocation
+> failure *some* IPIs will use the PV path and some won't. It's going to
+> be a nightmare to debug.
 
-That MSI message is passed to kvm_irqchip_update_msi_route() which
-passes it through translation =E2=80=94  which does interrupt remapping and
-shifting the ext bits up into ->address_hi as the KVM X2APIC API
-expects.
+Agree. And 'pv_ops.mmu.tlb_remove_table = tlb_remove_table' should not 
+be set either. What do you think? Thanks.
 
-So when the kernel's kvm_scan_ioapic_routes() goes looking,
-kvm_set_msi_irq() fills 'irq' in with the correct dest_id, and
-kvm_apic_match_dest() does the right thing.
-
-No?
-
-
-As far as I can tell, we *do* have a QEMU bug =E2=80=94 not related to the =
-ext
-dest ID =E2=80=94 because for MSIs of assigned devices we don't update the =
-KVM
-IRQ routing table when the Interrupt Remapping IEC cache is flushed.
-
-> Paolo
->=20
-> > > I queued this, though of course it has to wait for the corresponding
-> > > kernel patches to be accepted (or separated into doc and non-KVM
-> > > parts; we'll see).
-> >=20
-> > Thanks.
-
-So... it'll hit the tip.git tree and thus linux-next as soon as Linus
-releases 5.10-rc1, and it'll then get merged into 5.11-rc1 and be in
-the 5.11 release.
-
-At which of those three points in time would you be happy to merge it
-to QEMU? If it's either of the latter two, maybe it *is* worth doing a
-patch which *only* reserves the feature bit, and trying to slip it into
-5.10?
-
---=-DaYkaLxGml+9Bwtl8RWR
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDE5MTIyMTIwWjAvBgkqhkiG9w0BCQQxIgQg0Kb4pRDsiFZgELJ9ArjGuepltRcPQI+/FZ7vjhVH
-/mwwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBACXm/20XPCub0I54QBHR77V0qrztTD9NY1c7WH+WsW2GRh+IcCN4Hmpopu14xJeJ
-jWwYkL368nvAtjNp8g88eBmWs5Z9UsGH/4b//i5G09m1EF60ctXoXMD8LsZ5jvPiNu0/FnT3HGxN
-nxqjKj4pHxWtCkpoc+b39rSHtYWtbU7ZSfwAehf40lRxsvZlR3zGBnehnsqkmZaUdZfVeSO0aYUp
-+VSgSDtM/2DV8TMXzUnCQNvITziWbgUGcZ5xP49nMG47KY0Yu0O2plfQYfLMT5iXNIEelmU7SpSc
-PxHFWgB6mBPEcK0ZI65Vev5dDjEFj+zOMPIDtJJMOvuCRQrmLwAAAAAAAAA=
-
-
---=-DaYkaLxGml+9Bwtl8RWR--
-
+     Haiwei Li
