@@ -2,75 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93C2C292AE4
-	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 17:52:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65B52292AE6
+	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 17:54:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730475AbgJSPwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Oct 2020 11:52:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22269 "EHLO
+        id S1730408AbgJSPyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Oct 2020 11:54:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42831 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730051AbgJSPwf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Oct 2020 11:52:35 -0400
+        by vger.kernel.org with ESMTP id S1730025AbgJSPyx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Oct 2020 11:54:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603122754;
+        s=mimecast20190719; t=1603122891;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XC8R3HHY11M/hrrbkifbLXLUcYHIAgrXDf8csH9a4/c=;
-        b=CPOf9f2G5vkY4dJMi+6voPoT4RxrqloMfa1gHJ1HPLCwHg/7aEIrJZzMfcQBwmuHlzjuAj
-        u4CmKbiJVV92OhYmbboePVp21nxLTb7jEgEmBXHVhPYnDvkQRXrSJ8BWugMSPQI8fJMKca
-        r1g0zZ1ZRtqYAxzqIGBLSJL1/f8zUWo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-fXHy414SNwmcVtCxwchmGQ-1; Mon, 19 Oct 2020 11:52:30 -0400
-X-MC-Unique: fXHy414SNwmcVtCxwchmGQ-1
-Received: by mail-wr1-f71.google.com with SMTP id t3so52868wrq.2
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 08:52:30 -0700 (PDT)
+        bh=4z1phI+SVOyafuXVS/D26W6DGzBcOPHN9ROuznA6UNI=;
+        b=SnbcoH8JWaAdp/oTyzef6Gh2DqRof8EBN2p+gCIe/4s0unoUsoX1triZeR1s29ojM2QrMH
+        dHL7hKd7CiywfS93LuAqsicvnx080zfhsaGJgSG8rOZmAPHrb/cFC1SR4vQzqsRmBrRQdo
+        QJ8ZQuU9bzqzfw38PvdvOM75s7B1z6M=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-CfOElL6BNcWnurDIbN5qRA-1; Mon, 19 Oct 2020 11:54:50 -0400
+X-MC-Unique: CfOElL6BNcWnurDIbN5qRA-1
+Received: by mail-wr1-f72.google.com with SMTP id b11so55122wrm.3
+        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 08:54:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XC8R3HHY11M/hrrbkifbLXLUcYHIAgrXDf8csH9a4/c=;
-        b=msK3GkWjjT2xI+t/wadCDACfEOEx6ud6CZnT30DjOaaBoc12B9LRrrSCrixJOD3sfe
-         0GDRa2cpjJajxzmGgFW8+e7hR/PGXb2Lrx2Ry7OTZH11PIRAbGiGtXLftZFJHfeQ0aDS
-         e/9okqLD3XzxENSFMNfaJ7FEuE3Vi3hbmsCTBOuJQnR8nx/KcBcJQUHMS/sdzN7pMokP
-         f6wNRX8IzWQE4Yjaj5PEHe4I0f9s6D4Q5+tky6fGvCtQ5j9DQnAosGIVJ69pRhKkvE3q
-         UuTaeYPKBLr7ykiG9y0NjEE6+aXkGJBU1s/2C+xPpFA+TZ0pss3MnOHsPt7GZtZRYiLX
-         W6Pg==
-X-Gm-Message-State: AOAM531vMtf7CArL7sYzQH/73a454t4rxhWcm1abJxlENTbri6yj+XEH
-        uBV98fXem1DCZdwii+lnk1uXK3qqMdW3OC0NjHwoI2/zYGDkzlFKCR4fUjX0NFz6y/lIy1ioIlo
-        YugT/GghVGLuI
-X-Received: by 2002:a1c:2108:: with SMTP id h8mr26420wmh.63.1603122749204;
-        Mon, 19 Oct 2020 08:52:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx2AwSIV8crVhtGFxc2jh3WIKCAGDXH1rOOylH1uDp8JeVmB4VsCq9Uxr0spo00NdxsC9Mtcw==
-X-Received: by 2002:a1c:2108:: with SMTP id h8mr26394wmh.63.1603122748931;
-        Mon, 19 Oct 2020 08:52:28 -0700 (PDT)
+        bh=4z1phI+SVOyafuXVS/D26W6DGzBcOPHN9ROuznA6UNI=;
+        b=sxsyBW546x19Mq+zRT3lMs7lQEfTHp62c7WHedF6ScepuNm921fxlkKFuzruynMal4
+         X/MOrswgvlHwvzQZ4RCLAB4Gj8AQKeT7x2efp54z/LIPf2iajHP+Q5w/z5RA6OTPYbFJ
+         ggKFnjPljXl971/aFP+XBbIYNSPEL/p+ggIzFYB3msGQSOdUbJfcE6TtujA/CD8GA7uE
+         YmSwDBCvlX8oKK+Kz5B8Eu/QtCpQs0gv+Hd+L8FvttWONWE3qyCAmZkheVMIbbxLXURv
+         9hMQUgaDB1RBdeu6d+3LtEBCYPXLrFQA5HgfKk465xHWSHhr6edOUfCligN4Mq/PwX5y
+         6aQg==
+X-Gm-Message-State: AOAM5315BmYgeCMs5gMo284M7z38kE+e56hQGRQVpmiMI4JVCnhsE0oJ
+        eGUqdke7TpngsPqTW+KV3ppz5cC62RTk8IXGtLLsg3yMy7u89XHWeKUhd2quVyobXt7L4+bkaCL
+        p4a/jIEH2hfFX
+X-Received: by 2002:a05:600c:255:: with SMTP id 21mr39445wmj.69.1603122888718;
+        Mon, 19 Oct 2020 08:54:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzzdPa+6nVJnTD0myUKcXmclhTnkyjSzj09HiHnr2jgW57lnv4yiOFefo5M+s3BG0ruzYbjQQ==
+X-Received: by 2002:a05:600c:255:: with SMTP id 21mr39417wmj.69.1603122888503;
+        Mon, 19 Oct 2020 08:54:48 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id t10sm455946wmf.46.2020.10.19.08.52.27
+        by smtp.gmail.com with ESMTPSA id u20sm1188wmm.29.2020.10.19.08.54.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Oct 2020 08:52:28 -0700 (PDT)
-Subject: Re: [PATCH v7 0/4] KVM: nSVM: ondemand nested state allocation
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20201001112954.6258-1-mlevitsk@redhat.com>
+        Mon, 19 Oct 2020 08:54:47 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SVM: Initialize prev_ga_tag before use
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     joro@8bytes.org
+References: <20201003232707.4662-1-suravee.suthikulpanit@amd.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2c7ad393-9a7e-359e-a076-0d9ed702fe23@redhat.com>
-Date:   Mon, 19 Oct 2020 17:52:27 +0200
+Message-ID: <f45801ff-9fd8-636d-44df-74a70a41a712@redhat.com>
+Date:   Mon, 19 Oct 2020 17:54:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201001112954.6258-1-mlevitsk@redhat.com>
+In-Reply-To: <20201003232707.4662-1-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,55 +70,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/10/20 13:29, Maxim Levitsky wrote:
-> This is the next version of this patch series.
+On 04/10/20 01:27, Suravee Suthikulpanit wrote:
+> The function amd_ir_set_vcpu_affinity makes use of the parameter struct
+> amd_iommu_pi_data.prev_ga_tag to determine if it should delete struct
+> amd_iommu_pi_data from a list when not running in AVIC mode.
 > 
-> In V5 I adopted Sean Christopherson's suggestion to make .set_efer return
-> a negative error (-ENOMEM in this case) which in most cases in kvm
-> propagates to the userspace.
+> However, prev_ga_tag is initialized only when AVIC is enabled. The non-zero
+> uninitialized value can cause unintended code path, which ends up making
+> use of the struct vcpu_svm.ir_list and ir_list_lock without being
+> initialized (since they are intended only for the AVIC case).
 > 
-> I noticed though that wrmsr emulation code doesn't do this and instead
-> it injects #GP to the guest on _any_ error.
+> This triggers NULL pointer dereference bug in the function vm_ir_list_del
+> with the following call trace:
 > 
-> So I fixed the wrmsr code to behave in a similar way to the rest
-> of the kvm code.
-> (#GP only on a positive error value, and forward the negative error to
-> the userspace)
+>     svm_update_pi_irte+0x3c2/0x550 [kvm_amd]
+>     ? proc_create_single_data+0x41/0x50
+>     kvm_arch_irq_bypass_add_producer+0x40/0x60 [kvm]
+>     __connect+0x5f/0xb0 [irqbypass]
+>     irq_bypass_register_producer+0xf8/0x120 [irqbypass]
+>     vfio_msi_set_vector_signal+0x1de/0x2d0 [vfio_pci]
+>     vfio_msi_set_block+0x77/0xe0 [vfio_pci]
+>     vfio_pci_set_msi_trigger+0x25c/0x2f0 [vfio_pci]
+>     vfio_pci_set_irqs_ioctl+0x88/0xb0 [vfio_pci]
+>     vfio_pci_ioctl+0x2ea/0xed0 [vfio_pci]
+>     ? alloc_file_pseudo+0xa5/0x100
+>     vfio_device_fops_unl_ioctl+0x26/0x30 [vfio]
+>     ? vfio_device_fops_unl_ioctl+0x26/0x30 [vfio]
+>     __x64_sys_ioctl+0x96/0xd0
+>     do_syscall_64+0x37/0x80
+>     entry_SYSCALL_64_after_hwframe+0x44/0xa9
 > 
-> I had to adjust one wrmsr handler (xen_hvm_config) to stop it from returning
-> negative values	so that new WRMSR emulation behavior doesn't break it.
-> This patch was only compile tested.
+> Therefore, initialize prev_ga_tag to zero before use. This should be safe
+> because ga_tag value 0 is invalid (see function avic_vm_init).
 > 
-> The memory allocation failure was tested by always returning -ENOMEM
-> from svm_allocate_nested.
+> Fixes: dfa20099e26e ("KVM: SVM: Refactor AVIC vcpu initialization into avic_init_vcpu()")
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> The nested allocation itself was tested by countless attempts to run
-> nested guests, do nested migration on both my AMD and Intel machines.
-> I wasn't able to break it.
-> 
-> Changes from V5: addressed Sean Christopherson's review feedback.
-> Changes from V6: rebased the code on latest kvm/queue
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> Maxim Levitsky (4):
->   KVM: x86: xen_hvm_config: cleanup return values
->   KVM: x86: report negative values from wrmsr emulation to userspace
->   KVM: x86: allow kvm_x86_ops.set_efer to return an error value
->   KVM: nSVM: implement on demand allocation of the nested state
-> 
->  arch/x86/include/asm/kvm_host.h |  2 +-
->  arch/x86/kvm/emulate.c          |  4 +--
->  arch/x86/kvm/svm/nested.c       | 42 ++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c          | 64 ++++++++++++++++++---------------
->  arch/x86/kvm/svm/svm.h          | 10 +++++-
->  arch/x86/kvm/vmx/vmx.c          |  6 ++--
->  arch/x86/kvm/x86.c              | 39 ++++++++++----------
->  7 files changed, 114 insertions(+), 53 deletions(-)
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index ac830cd50830..381d22daa4ac 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -868,6 +868,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>  			 * - Tell IOMMU to use legacy mode for this interrupt.
+>  			 * - Retrieve ga_tag of prior interrupt remapping data.
+>  			 */
+> +			pi.prev_ga_tag = 0;
+>  			pi.is_guest_mode = false;
+>  			ret = irq_set_vcpu_affinity(host_irq, &pi);
+>  
 > 
 
-Queued, thanks.
+Queued (with Cc: stable), thanks.
 
 Paolo
 
