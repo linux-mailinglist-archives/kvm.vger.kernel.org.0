@@ -2,163 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B66BA292C5E
-	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 19:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F7A0292C68
+	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 19:15:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730687AbgJSRLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Oct 2020 13:11:45 -0400
-Received: from mail-co1nam11on2060.outbound.protection.outlook.com ([40.107.220.60]:52960
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730186AbgJSRLo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Oct 2020 13:11:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=duNTZFEBjVppEE08A+3JcGVL5u/bXBestDVf+obkRTtC/tJNJ5D74GgQ3rD0CknQZacRQa+DctT0EZ7KUdm7xcfpqUuK/EJj56N+CpMOuC0FeKivFcr6LyzOy5FHK2e1WyUrGjw8rqN64qJWPaDGSPvfyFw3qlzNXAsKoHThYjVZOy3XLRi8/2nUg/kUdEvWsiWUkxNV4CW6qGXQ6PVGMzEZeTjz8KnClvXfapxOCA0Ao1P0oSpGZwSkVdH82ultk4lzZMO4mHklXH61drrcSQ3BCCrRpajjfgzhqwbPH8CeOwhWVqUwg/dP2rsIEt+o1OypT6VD8VDiOogXwUAv3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qq8euBMDQqGWidJipXSz6c5Ve5AvJpNiZkT3wHG+HL0=;
- b=cUoo8VKf8HLgd5kWUdc7c3ISGs4vFh1kGxorOxtkAJT5o7WyI2PQG9s1LsQHhY8+yp5ePkuQzSnKogRF6ufn55AXRP3IWCXge7RsZHVuN9D61AtW8swX0nXfk+aWOpJOAmfFwk/2ARTPZmXNfvW4NJ7QjUjVCaib5DmEcqpBGeY8fCdDcq9NdiBJqxrk7nM5SHoqW+mg91pDBzg8GfTSEWniMnopsdkxHlmamZqwhL162jzyIrNMDzq9hI5MOYPMU+Am0qAFBmnQYYsrra7uXuHkLeGtWkoDrYF74ErNJPJZtROx/c8Y0oNALe+DFc9Nw/XEXUYRrqQXJGBj8cP5IA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qq8euBMDQqGWidJipXSz6c5Ve5AvJpNiZkT3wHG+HL0=;
- b=Tkcm2l5UsWRMOnLNB/boUUewjzTk69BaVEcXVlEXJ7C0Ia5exfuNawdPTV3mka7K/x0If9p8tdJB+MU2aoIwJsRZdSBqrHGQev7VwtZk2rjjDRmoItDFTDfhfv++ar+5Z+9eB3cdgV4H0t2GPSsyhzI1nNRvxeguxBilcJdGFfQ=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR12MB1836.namprd12.prod.outlook.com (2603:10b6:3:114::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.22; Mon, 19 Oct 2020 17:11:39 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::e442:c052:8a2c:5fba]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::e442:c052:8a2c:5fba%6]) with mapi id 15.20.3477.028; Mon, 19 Oct 2020
- 17:11:39 +0000
-Subject: Re: AMD SME encrpytion and PCI BAR pages to user space
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-mm@kvack.org,
-        kvm@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Matt Fleming <matt@codeblueprint.co.uk>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Potapenko <glider@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Rik van Riel <riel@redhat.com>,
-        Larry Woodman <lwoodman@redhat.com>,
-        Dave Young <dyoung@redhat.com>,
-        Toshimitsu Kani <toshi.kani@hpe.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20201019152556.GA560082@nvidia.com>
- <4b9f13bf-3f82-1aed-c7be-0eaecebc5d82@amd.com>
- <20201019170029.GU6219@nvidia.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <d0e18bf8-b591-6af8-198d-82f629cda695@amd.com>
-Date:   Mon, 19 Oct 2020 12:11:36 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20201019170029.GU6219@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA9PR10CA0018.namprd10.prod.outlook.com
- (2603:10b6:806:a7::23) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S1730897AbgJSRPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Oct 2020 13:15:05 -0400
+Received: from mail.efficios.com ([167.114.26.124]:34144 "EHLO
+        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730646AbgJSRPF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Oct 2020 13:15:05 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id AADCB2707BD;
+        Mon, 19 Oct 2020 13:15:03 -0400 (EDT)
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id QTruwX3BYTn2; Mon, 19 Oct 2020 13:15:03 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 284FE270752;
+        Mon, 19 Oct 2020 13:15:03 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 284FE270752
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+        s=default; t=1603127703;
+        bh=a4Kyq9ggmnqJgL1OMZgiL3YI8Vq7lTIeBQc5QZoN7D4=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=Rleo5KpYLxJL9bE+eS/IDKaOFoEmvkq70bRu+JU0FvBo/l/SmYGCBDQs+xaFOFVHh
+         BJLQKLA6tCK8ZaIUWSrsP9eNGLLZGdYFBrCmdjHdnSkKFJRiWBCddq7bINqO1JrS6z
+         LiDZeRjCGch2dLFOuXwqHnn+Ivxs2sOrIF5lAwNdQIXqAC1yn7Wcp2M95eK+hTAjh2
+         2bA+wXNULdWuS9DpiktZT7bNyAwruDfMklfP+qTv7VM9LXYilPo5xXvaq8H58JbRBX
+         xy5xAXA9Jfvdh96AGWs2I075RgU0Y4TmN5l6CqHVGnXdNU7ZWMEVZ3OrX5Vg/g/cFz
+         WJ9MFFce5aMuQ==
+X-Virus-Scanned: amavisd-new at efficios.com
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id yP-ztTyztNwI; Mon, 19 Oct 2020 13:15:03 -0400 (EDT)
+Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
+        by mail.efficios.com (Postfix) with ESMTP id 0FA782707BC;
+        Mon, 19 Oct 2020 13:15:03 -0400 (EDT)
+Date:   Mon, 19 Oct 2020 13:15:02 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Jann Horn <jannh@google.com>,
+        "Catangiu, Adrian Costin" <acatan@amazon.com>,
+        Jason Donenfeld <Jason@zx2c4.com>,
+        Theodore Tso <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "open list, DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>, bonzini@gnu.org,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>, oridgar@gmail.com,
+        ghammer@redhat.com, Jonathan Corbet <corbet@lwn.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        mst@redhat.com, qemu-devel@nongnu.org,
+        KVM list <kvm@vger.kernel.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>,
+        linux-api <linux-api@vger.kernel.org>
+Message-ID: <476895871.28084.1603127702969.JavaMail.zimbra@efficios.com>
+In-Reply-To: <CALCETrViTg_BWvRa+nfDWq=_B_ithzL-anVJNpsgHaXe9VgCNQ@mail.gmail.com>
+References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com> <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com> <CALCETrViTg_BWvRa+nfDWq=_B_ithzL-anVJNpsgHaXe9VgCNQ@mail.gmail.com>
+Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by SA9PR10CA0018.namprd10.prod.outlook.com (2603:10b6:806:a7::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21 via Frontend Transport; Mon, 19 Oct 2020 17:11:38 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: bbc001ad-1e08-4874-7040-08d874520af4
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1836:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1836BA0D98269B58ADC8B041EC1E0@DM5PR12MB1836.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QsU8LbbCRygctQ+zzgg1N5OAi7fOh7/L440T1wTlQBliDVQuFiyVn/MP8Z8vBtAj78URyNhJNSMicmoyTOszuxhX3dGRNrz1xBw0JfNcjKnIwVwSJi6MwEzw1JdpdrvSB053zdSBw9C65tQaRRI+JYdjNidoKZsN468GESvtpQgmDnIZ465UthZKlMANY235Eh464wKqGxYvUgKd9EjK718MyYn7k6Sddq1xxPIE2u0Axxl8TxsWgoJG53GdxazlfolwyGF4AOYftPyvyFiGyVcvTXdlopBawkMw8CLj5EsRqbO1AI+10BarNKaEkcOB3cJM3hl3gjxB9hdsidDO7uf/LBudJfM48Wlrt/PMEt+qq2u0ypnvgdT0rgyz4p9Y
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(366004)(346002)(376002)(396003)(36756003)(8676002)(66556008)(66476007)(53546011)(31696002)(7416002)(66946007)(6916009)(16576012)(956004)(316002)(186003)(16526019)(26005)(2616005)(8936002)(52116002)(6486002)(2906002)(31686004)(83380400001)(478600001)(54906003)(86362001)(4326008)(5660300002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: E2dmv38yDCygXBVOlD9LtxMTXgv7JoY43ff3+p2x68p4ddmRExlFDZaSyoIPTD6y7IzTGnc8TYxvGSqQQpzxMywNrEvyyLeZFRUKkcD5HC688iJ6fP+I4nze8x91xX7hQfGt9r0winEDr/aipkUmFtVV02qHdCpBf/FFbQ4ZDalt7KG0FfRhlHcbAWQN+l/2kXCcIvj3n3gkJoPtU3cdw5JHJJqLNCjSOCjc6aIiTSCyLW85a1Ss6g9uh0VcPkjuYR8MbdUYB5iEEcR2JL7/mjfhjA/OKoyuT7illJ0ubaEJA0bbnU9KZoURFUau6bDrMmcmqZVri+iebRp3t7bWOiqb0mZauw09vY9cnO13fE7cY56VGPo/AdDwybeEVWBdrAFmjDEl4RxJ6MbY0r0tAy1Fzpjl0Nq5U48Zmevl0eRiG1J/d6qQG0Cv+PpBSYXdiNXFaO8IRgZEMWiZ81GnSczjg89daWmd/7/+vUfczcdK3pIlksIg2ND1FRvIdiYwjBrk0ZMkHqiQv0HsojA2eX5OFtAB1Ij/SijU1dozqGvNqTbj6uC66/gRdYo/mIhjGqGp7l6kZHFSj0pqC/FfkyOQHBAdmXf3FwXa76LD0dtPDeyRqPDWP6/b2v0ybEGUhkjZcNu6FhKsEbV4e4zgSg==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbc001ad-1e08-4874-7040-08d874520af4
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2020 17:11:39.6025
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CoWU2lJhGZ/7w3qku+SI15zQawhfDOkKulw8IQ451agVNli1wyCGd/rxrX7nC/Rg+pIvNTrAFXRnmq472pcwLQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1836
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [167.114.26.124]
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF81 (Linux)/8.8.15_GA_3968)
+Thread-Topic: drivers/virt: vmgenid: add vm generation id driver
+Thread-Index: LGqdszkWAp7MsnjacXz6ZDq20p5wzw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/19/20 12:00 PM, Jason Gunthorpe wrote:
-> On Mon, Oct 19, 2020 at 11:36:16AM -0500, Tom Lendacky wrote:
-> 
->>> Is RDMA missing something? I don't see anything special in VFIO for
->>> instance and the two are very similar - does VFIO work with SME, eg
->>> DPDK or something unrelated to virtualization?
+----- On Oct 17, 2020, at 2:10 PM, Andy Lutomirski luto@kernel.org wrote:
+
+> On Fri, Oct 16, 2020 at 6:40 PM Jann Horn <jannh@google.com> wrote:
 >>
->> If user space is mapping un-encrypted memory, then, yes, it would seem
->> that there is a gap in the support where the pgprot_decrypted() would be
->> needed in order to override the protection map.
-> 
-> It isn't "memory" it is PCI BAR pages, eg memory mapped IO
-
-Right, I understand that.
-
-> 
->>> Is there a reason not to just add prot_decrypted() to
->>> io_remap_pfn_range()? Is there use cases where a caller actually wants
->>> encrypted io memory?
+>> [adding some more people who are interested in RNG stuff: Andy, Jason,
+>> Theodore, Willy Tarreau, Eric Biggers. also linux-api@, because this
+>> concerns some pretty fundamental API stuff related to RNG usage]
 >>
->> As long as you never have physical memory / ram being mapped in this path,
->> it seems that applying pgprot_decrypted() would be ok.
-> 
-> I think the word 'io' implies this is the case..
-
-Heh, you would think so, but I found quite a few things that used ioremap
-instead of memremap when developing this.
-
-> 
-> Let me make a patch for this avenue then, I think it is not OK to add
-> pgprot_decrypted to every driver.. We already have the special
-> distinction with io and non-io remap, that seems better.
-
-Yup, seems reasonable.
-
-> 
->>> I saw your original patch series edited a few drivers this way, but
->>> not nearly enough. So I feel like I'm missing something.. Does vfio
->>> work with SME? I couldn't find any sign of it calling prot_decrypted()
->>> either?
+>> On Fri, Oct 16, 2020 at 4:33 PM Catangiu, Adrian Costin
+>> <acatan@amazon.com> wrote:
+>> > - Background
+>> >
+>> > The VM Generation ID is a feature defined by Microsoft (paper:
+>> > http://go.microsoft.com/fwlink/?LinkId=260709) and supported by
+>> > multiple hypervisor vendors.
+>> >
+>> > The feature is required in virtualized environments by apps that work
+>> > with local copies/caches of world-unique data such as random values,
+>> > uuids, monotonically increasing counters, etc.
+>> > Such apps can be negatively affected by VM snapshotting when the VM
+>> > is either cloned or returned to an earlier point in time.
+>> >
+>> > The VM Generation ID is a simple concept meant to alleviate the issue
+>> > by providing a unique ID that changes each time the VM is restored
+>> > from a snapshot. The hw provided UUID value can be used to
+>> > differentiate between VMs or different generations of the same VM.
+>> >
+>> > - Problem
+>> >
+>> > The VM Generation ID is exposed through an ACPI device by multiple
+>> > hypervisor vendors but neither the vendors or upstream Linux have no
+>> > default driver for it leaving users to fend for themselves.
+>> >
+>> > Furthermore, simply finding out about a VM generation change is only
+>> > the starting point of a process to renew internal states of possibly
+>> > multiple applications across the system. This process could benefit
+>> > from a driver that provides an interface through which orchestration
+>> > can be easily done.
+>> >
+>> > - Solution
+>> >
+>> > This patch is a driver which exposes the Virtual Machine Generation ID
+>> > via a char-dev FS interface that provides ID update sync and async
+>> > notification, retrieval and confirmation mechanisms:
+>> >
+>> > When the device is 'open()'ed a copy of the current vm UUID is
+>> > associated with the file handle. 'read()' operations block until the
+>> > associated UUID is no longer up to date - until HW vm gen id changes -
+>> > at which point the new UUID is provided/returned. Nonblocking 'read()'
+>> > uses EWOULDBLOCK to signal that there is no _new_ UUID available.
+>> >
+>> > 'poll()' is implemented to allow polling for UUID updates. Such
+>> > updates result in 'EPOLLIN' events.
+>> >
+>> > Subsequent read()s following a UUID update no longer block, but return
+>> > the updated UUID. The application needs to acknowledge the UUID update
+>> > by confirming it through a 'write()'.
+>> > Only on writing back to the driver the right/latest UUID, will the
+>> > driver mark this "watcher" as up to date and remove EPOLLIN status.
+>> >
+>> > 'mmap()' support allows mapping a single read-only shared page which
+>> > will always contain the latest UUID value at offset 0.
 >>
->> I haven't tested SME with VFIO/DPDK.
+>> It would be nicer if that page just contained an incrementing counter,
+>> instead of a UUID. It's not like the application cares *what* the UUID
+>> changed to, just that it *did* change and all RNGs state now needs to
+>> be reseeded from the kernel, right? And an application can't reliably
+>> read the entire UUID from the memory mapping anyway, because the VM
+>> might be forked in the middle.
+>>
+>> So I think your kernel driver should detect UUID changes and then turn
+>> those into a monotonically incrementing counter. (Probably 64 bits
+>> wide?) (That's probably also a little bit faster than comparing an
+>> entire UUID.)
+>>
+>> An option might be to put that counter into the vDSO, instead of a
+>> separate VMA; but I don't know how the other folks feel about that.
+>> Andy, do you have opinions on this? That way, normal userspace code
+>> that uses this infrastructure wouldn't have to mess around with a
+>> special device at all. And it'd be usable in seccomp sandboxes and so
+>> on without needing special plumbing. And libraries wouldn't have to
+>> call open() and mess with file descriptor numbers.
 > 
-> Hum, I assume it is broken also. Actually quite a swath of drivers
-> and devices will be broken under this :\
+> The vDSO might be annoyingly slow for this.  Something like the rseq
+> page might make sense.  It could be a generic indication of "system
+> went through some form of suspend".
 
-Not sure what you mean by the last statement - in general or when running
-under VFIO/DPDK? In general, traditional in kernel drivers work just fine
-under SME without any changes.
+This might indeed fit nicely as an extension of my KTLS prototype (extensible rseq):
+
+https://lore.kernel.org/lkml/20200925181518.4141-1-mathieu.desnoyers@efficios.com/
+
+There are a few ways we could wire things up. One might be to add the
+UUID field into the extended KTLS structure (so it's always updated after it
+changes on next return to user-space). For this I assume that the Linux scheduler
+within the guest VM always preempts all threads before a VM is suspended (is that
+indeed true ?).
+
+This leads to one important question though: how is the UUID check vs commit operation
+made atomic with respect to suspend ? Unless we use rseq critical sections in assembly,
+where the kernel will abort the rseq critical section on preemption, I don't see how we
+can ensure that the UUID value does not change right after it has been checked, before
+the "commit" side-effect. And what is the expected "commit" side-effect ? Is it a store
+to a variable in user-space memory, or is it issuing a system call which sends a packet over
+the network ?
 
 Thanks,
-Tom
 
-> 
-> Jason
-> 
+Mathieu
+
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
