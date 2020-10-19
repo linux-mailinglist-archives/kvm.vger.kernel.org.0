@@ -2,84 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 654E4292831
-	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 15:30:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 332B7292848
+	for <lists+kvm@lfdr.de>; Mon, 19 Oct 2020 15:38:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728310AbgJSNav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Oct 2020 09:30:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59508 "EHLO
+        id S1728312AbgJSNh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Oct 2020 09:37:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28289 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728300AbgJSNas (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Oct 2020 09:30:48 -0400
+        by vger.kernel.org with ESMTP id S1728258AbgJSNh5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Oct 2020 09:37:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603114247;
+        s=mimecast20190719; t=1603114676;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=aDNhLJRM/nT1vY+letQJHejcGlh5BSbNPHby1Nx3QTw=;
-        b=GCCuXnZsPCBazEtlFI4QyOwvERJRxzl6mGKqsVHRhqhEU/ml1vco6tzE0+t4vbEO9E8wYQ
-        t14ibqbnyEjJMCXCTWNxPpSGSaa5XMOlNlic2f987EzSnRca5YZsd3KZHWfjvT2/VaISEN
-        p+ExlF4j/OpmrgixUClIFOm/c0oAvMs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-DMC7xye6Pm6bjRiyB6VbNw-1; Mon, 19 Oct 2020 09:30:44 -0400
-X-MC-Unique: DMC7xye6Pm6bjRiyB6VbNw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C868F876E3F;
-        Mon, 19 Oct 2020 13:30:42 +0000 (UTC)
-Received: from gimli.home (ovpn-112-77.phx2.redhat.com [10.3.112.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 36C345B4AD;
-        Mon, 19 Oct 2020 13:30:37 +0000 (UTC)
-Subject: [PATCH] vfio/pci: Clear token on bypass registration failure
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        guomin_chen@sina.com, gchen.guomin@gmail.com
-Date:   Mon, 19 Oct 2020 07:30:37 -0600
-Message-ID: <160311419702.25406.2436004222669241097.stgit@gimli.home>
-User-Agent: StGit/0.21-dirty
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mS8bITCyzTOP2XiCenDLyc/N0OBdUAE0vG9p0LTiHC0=;
+        b=dbN5F1BOOpQ1/0ptlzjrTNkjkrmgrgWaktiHCc7wu9jq0heMd/LwpwXn5xYonMv2HutO/T
+        MrUiC+sZCM1xoAb27kDfYUei4oCRBs7yeCKlVx8gEmsWGvU46hxG1qWqQ0xeSDPZdX4eeC
+        947zmGPYaewBUQY1eqzvHNoCTNiSxdU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-MkwAqYLAMgSr_4-1SRtEWw-1; Mon, 19 Oct 2020 09:37:54 -0400
+X-MC-Unique: MkwAqYLAMgSr_4-1SRtEWw-1
+Received: by mail-wr1-f72.google.com with SMTP id n14so7423585wrp.1
+        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 06:37:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mS8bITCyzTOP2XiCenDLyc/N0OBdUAE0vG9p0LTiHC0=;
+        b=qe6/OgmHaagtIyM8vH18SmHjx+Iz5HMEfrB/E/t8XIk1x6Kkq8u5I2+Gsbl9+npHP4
+         FCXPM5SqXmTF85hhhw6nSkeAHHbNZa37Ncr2aAHvkXDCa/BtRfyVw5A8R6b2xFePO4Qh
+         t7EIo/SdctlSObDl4fbf7m0F5s5ijtxAWYcLQoI/ae4LVBT5gqE25FRbAq4nqz0YdodB
+         4w1AAJswrtWAjWDAhOoCU3pAxHKhpgY8+ciP+XnJK9h8yYICO5g1KA3UIqXWsPiEuULf
+         EhQ9uN1WtH6UWkvkG2OkOGHpHG329wQo9ijsN5o4DFFITM5oTsIg2lWpGl0jbBLPbp7X
+         7riw==
+X-Gm-Message-State: AOAM533tl7pAsKzAKhE71hchne1w8iXUrY1bM4y/cpA/vHr4bdT5BMWz
+        VVnMeYk597MT545W10yhmXIVfuRNQ0mx+mOLFh53/J43MBPBj7XeLt/VCZ1BYsGzVwEAGXpwMJO
+        xNgK/Ibf+iKiQ
+X-Received: by 2002:a5d:6cc8:: with SMTP id c8mr18748406wrc.233.1603114672884;
+        Mon, 19 Oct 2020 06:37:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxAbCwKwVrnG9IjlEBOZo1+niRf9C9XuEZwHILJgt8/gQc3q9lqDdmd/vrjTfgDna8KJRZWMA==
+X-Received: by 2002:a5d:6cc8:: with SMTP id c8mr18748381wrc.233.1603114672632;
+        Mon, 19 Oct 2020 06:37:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id x81sm81282wmb.11.2020.10.19.06.37.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Oct 2020 06:37:52 -0700 (PDT)
+Subject: Re: [PATCH 00/35] Enhance memory utilization with DMEMFS
+To:     Dan Williams <dan.j.williams@intel.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Cc:     yulei zhang <yulei.kernel@gmail.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Haiwei Li <lihaiwei.kernel@gmail.com>,
+        Yulei Zhang <yuleixzhang@tencent.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Jane Y Chu <jane.chu@oracle.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+References: <cover.1602093760.git.yuleixzhang@tencent.com>
+ <bdd0250e-4e14-f407-a584-f39af12c4e09@oracle.com>
+ <CACZOiM2qKhogXQ_DXzWjGM5UCeCuEqT6wnR=f2Wi_T45_uoYHQ@mail.gmail.com>
+ <b963565b-61d8-89d3-1abd-50cd8c8daad5@oracle.com>
+ <CACZOiM26GPtqkGyecG=NGuB3etipV5-KgN+s19_U1WJrFxtYPQ@mail.gmail.com>
+ <98be093d-c869-941a-6dd9-fb16356f763b@oracle.com>
+ <CAPcyv4jZ7XTnYd7vLQ18xij7d+80jU0zLs+ykS2frY-LMPS=Nw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3626f5ff-b6a0-0811-5899-703a0714897d@redhat.com>
+Date:   Mon, 19 Oct 2020 15:37:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAPcyv4jZ7XTnYd7vLQ18xij7d+80jU0zLs+ykS2frY-LMPS=Nw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The eventfd context is used as our irqbypass token, therefore if an
-eventfd is re-used, our token is the same.  The irqbypass code will
-return an -EBUSY in this case, but we'll still attempt to unregister
-the producer, where if that duplicate token still exists, results in
-removing the wrong object.  Clear the token of failed producers so
-that they harmlessly fall out when unregistered.
+On 15/10/20 00:25, Dan Williams wrote:
+> Now, with recent device-dax extensions, it
+> also has a coarse grained memory management system for  physical
+> address-space partitioning and a path for struct-page-less backing for
+> VMs. What feature gaps remain vs dmemfs, and can those gaps be closed
+> with incremental improvements to the 2 existing memory-management
+> systems?
 
-Fixes: 6d7425f109d2 ("vfio: Register/unregister irq_bypass_producer")
-Reported-by: guomin chen <guomin_chen@sina.com>
-Tested-by: guomin chen <guomin_chen@sina.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci_intrs.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+If I understand correctly, devm_memremap_pages() on ZONE_DEVICE memory
+would still create the "struct page" albeit lazily?  KVM then would use
+the usual get_user_pages() path.
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 1d9fb2592945..869dce5f134d 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -352,11 +352,13 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
- 	vdev->ctx[vector].producer.token = trigger;
- 	vdev->ctx[vector].producer.irq = irq;
- 	ret = irq_bypass_register_producer(&vdev->ctx[vector].producer);
--	if (unlikely(ret))
-+	if (unlikely(ret)) {
- 		dev_info(&pdev->dev,
- 		"irq bypass producer (token %p) registration fails: %d\n",
- 		vdev->ctx[vector].producer.token, ret);
- 
-+		vdev->ctx[vector].producer.token = NULL;
-+	}
- 	vdev->ctx[vector].trigger = trigger;
- 
- 	return 0;
+Looking more closely at the implementation of dmemfs, I don't understand
+is why dmemfs needs VM_DMEM etc. and cannot provide access to mmap-ed
+memory using remap_pfn_range and VM_PFNMAP, just like /dev/mem.  If it
+did that KVM would get physical addresses using fixup_user_fault and
+never need pfn_to_page() or get_user_pages().  I'm not saying that would
+instantly be an approval, but it would make remove a lot of hooks.
+
+Paolo
 
