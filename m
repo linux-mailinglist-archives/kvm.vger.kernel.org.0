@@ -2,265 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86741293454
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 07:38:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13A52293471
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 07:54:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391697AbgJTFih (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 01:38:37 -0400
-Received: from mga02.intel.com ([134.134.136.20]:20071 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730259AbgJTFig (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 01:38:36 -0400
-IronPort-SDR: vT5fld99U33EriXE4KR9kXoTGeCTPAP/kME3SRdWYG577ozuTRKbtICbGuPJkaI4L+8ELY7wD5
- 01y4pg6lNXXQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9779"; a="154101442"
-X-IronPort-AV: E=Sophos;i="5.77,396,1596524400"; 
-   d="scan'208";a="154101442"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2020 22:38:35 -0700
-IronPort-SDR: v9/XfDJIvNtVKseTmZmdab4FJ/Uk5g0Y5B38FCBpmCUitHQtodSIL/NJdeOAkeKA+QEoxZP/bw
- eKruGg5VfwRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,396,1596524400"; 
-   d="scan'208";a="347724680"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga004.fm.intel.com with ESMTP; 19 Oct 2020 22:38:33 -0700
-Message-ID: <364312b2e7effbf50d4327c06c61d6157bc08386.camel@linux.intel.com>
-Subject: Re: [RFC PATCH 1/9] KVM:x86: Abstract sub functions from
- kvm_update_cpuid_runtime() and kvm_vcpu_after_set_cpuid()
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, xiaoyao.li@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, robert.hu@intel.com
-Date:   Tue, 20 Oct 2020 13:38:32 +0800
-In-Reply-To: <20200929045649.GM31514@linux.intel.com>
-References: <1596163347-18574-1-git-send-email-robert.hu@linux.intel.com>
-         <1596163347-18574-2-git-send-email-robert.hu@linux.intel.com>
-         <20200929045649.GM31514@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
-Mime-Version: 1.0
+        id S2391763AbgJTFx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 01:53:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36167 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2391759AbgJTFx6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 01:53:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603173236;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IO8mqQP8viTih7BxwdVCRxHdeokgDkWpgYtMoz+bqqc=;
+        b=ZmAATp9w+GtrkQO7rSDMpMYmLxEod/5mRPcKy8x9dmikn2nHWOu4d9ejkLJYmQTlIsDgNe
+        TJM4U/HWgjtcB5SwpoFbWqgwwXrbbj4APTnc1dwWbHKJx7CfFkiOAal3d9rKNRBvERtXid
+        tT1WpDYhvlr7B7SgqwMfEOrkgfOpf4c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-208-PS4KOyj6N6uaSkfZFD3pIQ-1; Tue, 20 Oct 2020 01:53:54 -0400
+X-MC-Unique: PS4KOyj6N6uaSkfZFD3pIQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 561D418A0727;
+        Tue, 20 Oct 2020 05:53:53 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-107.ams2.redhat.com [10.36.112.107])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6284E5B4A3;
+        Tue, 20 Oct 2020 05:53:50 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCHv2] unittests.cfg: Increase timeout for apic
+ test
+To:     Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Po-Hsu Lin <po-hsu.lin@canonical.com>, kvm@vger.kernel.org
+References: <20201013091237.67132-1-po-hsu.lin@canonical.com>
+ <87d01j5vk7.fsf@vitty.brq.redhat.com>
+ <20201015163539.GA27813@linux.intel.com>
+ <1b9e716f-fb13-9ea3-0895-0da0f9e9e163@redhat.com>
+ <20201016174044.eg72aordkchdr5l2@kamzik.brq.redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <1e37df99-2d5c-be4c-4f42-1534f6164982@redhat.com>
+Date:   Tue, 20 Oct 2020 07:53:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20201016174044.eg72aordkchdr5l2@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-09-28 at 21:56 -0700, Sean Christopherson wrote:
-> I think you want "extract", not "abstract".
+On 16/10/2020 19.40, Andrew Jones wrote:
+> On Fri, Oct 16, 2020 at 07:02:57PM +0200, Paolo Bonzini wrote:
+>> On 15/10/20 18:35, Sean Christopherson wrote:
+>>> The port80 test in particular is an absolute waste of time.
+>>>
+>>
+>> True, OTOH it was meant as a benchmark.  I think we can just delete it
+>> or move it to vmexit.
+>>
 > 
-> 
-> On Fri, Jul 31, 2020 at 10:42:19AM +0800, Robert Hoo wrote:
-> > Add below functions, whose aggregation equals
-> > kvm_update_cpuid_runtime() and
-> > kvm_vcpu_after_set_cpuid().
-> > 
-> > void kvm_osxsave_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > void kvm_pke_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > void kvm_apic_base_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > void kvm_mwait_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > void kvm_xcr0_update_cpuid(struct kvm_vcpu *vcpu)
-> > static void kvm_pv_unhalt_update_cpuid(struct kvm_vcpu *vcpu)
-> > static void kvm_update_maxphyaddr(struct kvm_vcpu *vcpu)
-> > static void kvm_update_lapic_timer_mode(struct kvm_vcpu *vcpu)
-> > 
-> > And, for some among the above, avoid double check set or clear
-> > inside function
-> > body, but provided by caller.
-> > 
-> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c | 99
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  arch/x86/kvm/cpuid.h |  6 ++++
-> >  2 files changed, 105 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 7d92854..efa7182 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -73,6 +73,105 @@ static int kvm_check_cpuid(struct kvm_vcpu
-> > *vcpu)
-> >  	return 0;
-> >  }
-> >  
-> > +void kvm_osxsave_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > +{
-> > +	struct kvm_cpuid_entry2 *best;
-> 
-> I vote that we opportunistically move away from the "best"
-> terminology.  Either
-> there's a matching entry or there's not.  Using "e" would probably
-> shave a few
-> lines of code.
-> 
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, 1, 0);
-> > +
-> > +	if (best && boot_cpu_has(X86_FEATURE_XSAVE)) {
-> 
-> Braces not needed. We should also check boot_cpu_has() first, it's
-> constant
-> time and maybe even in the cache, whereas finding CPUID entries is
-> linear
-> time and outright slow.
-> 
-> Actually, can you add a helper to handle this?  With tht
-> boot_cpu_has() check
-> outside of the helper?  That'll allow the helper to be used for more
-> features,
-> and will force checking boot_cpu_has() first.  Hmm, and not all of
-> the callers
-> will need the boot_cpu_has() check, e.g. toggling PKE from
-> kvm_set_cr4()
-> doesn't need to be guarded because KVM disallows setting PKE if it's
-> not
-> supported by the host.
+> If you want to keep the code, but only run it manually sometimes,
+> then you can mark the test as nodefault.
 
-Do you mean because in kvm_set_cr4(), it has kvm_valid_cr4(vcpu, cr4)
-check first?
+Please let's avoid that. Code that does not get run by default tends to
+bitrot. I suggest to decrease the amount of loops by default, and if
+somebody still wants to run this as a kind of benchmark, maybe the amount of
+loops could be made configurable? (i.e. so that you could control it via an
+argv[] parameter?)
 
-Then how about the other 2 callers of kvm_pke_update_cpuid()?
-enter_smm() -- I think it can ommit boot_cpu_has() check as well.
-because it unconditionally cleared all CR4 bit before calls
-kvm_set_cr4().
-__set_sregs() -- looks like it doesn't valid host PKE status before
-call kvm_pke_update_cpuid(). Can I ommit boot_cpu_has() as well?
-
-So, I don't think kvm_pke_update_cpuid() can leverage the helper. Am I
-right?
-
-> 
-> static inline void guest_cpuid_change(struct kvm_vcpu *vcpu, u32
-> function,
-> 				      u32 index, unsigned int feature,
-> bool set)
-> {
-> 	struct kvm_cpuid_entry2 *e =  kvm_find_cpuid_entry(vcpu,
-> function, index);
-> 
-> 	if (e)
-> 		cpuid_entry_change(best, X86_FEATURE_OSXSAVE, set);
-> }
-
-Thanks Sean, I'm going to have this helper in v2 and have your signed-
-off-by.
-> 
-> > +		cpuid_entry_change(best, X86_FEATURE_OSXSAVE, set);
-> > +	}
-> > +}
-> > +
-> > +void kvm_pke_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > +{
-> > +	struct kvm_cpuid_entry2 *best;
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, 7, 0);
-> > +
-> > +	if (best && boot_cpu_has(X86_FEATURE_PKU)) {
-> > +		cpuid_entry_change(best, X86_FEATURE_OSPKE, set);
-> > +	}
-> > +}
-> > +
-> > +void kvm_xcr0_update_cpuid(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_cpuid_entry2 *best;a
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
-> > +	if (!best) {
-> > +		vcpu->arch.guest_supported_xcr0 = 0;
-> > +	} else {
-> > +		vcpu->arch.guest_supported_xcr0 =
-> > +			(best->eax | ((u64)best->edx << 32)) &
-> > supported_xcr0;
-> > +		best->ebx = xstate_required_size(vcpu->arch.xcr0,
-> > false);
-> > +	}
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
-> > +	if (!best)
-> > +		return;
-> > +	if (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-> > +				cpuid_entry_has(best,
-> > X86_FEATURE_XSAVEC))
-> 
-> Indentation should be aligned, e.g.
-> 
-> 	if (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-> 	    cpuid_entry_has(best, X86_FEATURE_XSAVEC))
-> 
-> 
-> > +		best->ebx = xstate_required_size(vcpu->arch.xcr0,
-> > true);
-> > +}
-> > +
-> > +static void kvm_pv_unhalt_update_cpuid(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_cpuid_entry2 *best;
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
-> > +	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
-> > +					(best->eax & (1 <<
-> > KVM_FEATURE_PV_UNHALT)))
-> > +		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
-> > +}
-> > +
-> > +void kvm_mwait_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > +{
-> > +	struct kvm_cpuid_entry2 *best;
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-> > +	if (best)
-> > +		cpuid_entry_change(best, X86_FEATURE_MWAIT, set);
-> > +}
-> > +
-> > +static void kvm_update_maxphyaddr(struct kvm_vcpu *vcpu)
-> > +{
-> > +
-> > +	/* Note, maxphyaddr must be updated before tdp_level. */
-> > +	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
-> > +	vcpu->arch.tdp_level = kvm_x86_ops.get_tdp_level(vcpu);
-> > +	kvm_mmu_reset_context(vcpu);
-> > +}
-> > +
-> > +void kvm_apic_base_update_cpuid(struct kvm_vcpu *vcpu, bool set)
-> > +{
-> > +	struct kvm_cpuid_entry2 *best;
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, 1, 0);
-> > +	if (!best)
-> > +		return;
-> > +
-> > +	cpuid_entry_change(best, X86_FEATURE_APIC, set);
-> > +}
-> > +
-> > +static void kvm_update_lapic_timer_mode(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_cpuid_entry2 *best;
-> > +	struct kvm_lapic *apic = vcpu->arch.apic;
-> > +
-> > +	best = kvm_find_cpuid_entry(vcpu, 1, 0);
-> > +	if (!best)
-> > +		return;
-> > +
-> > +	if (apic) {
-> 
-> Check apic before the lookup.
-> 
-> > +		if (cpuid_entry_has(best,
-> > X86_FEATURE_TSC_DEADLINE_TIMER))
-> > +			apic->lapic_timer.timer_mode_mask = 3 << 17;
-> > +		else
-> > +			apic->lapic_timer.timer_mode_mask = 1 << 17;
-> > +	}
-> > +}
-> > +
-> >  void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
-> >  {
-
-...
-> > -- 
-> > 1.8.3.1
-> > 
+ Thomas
 
