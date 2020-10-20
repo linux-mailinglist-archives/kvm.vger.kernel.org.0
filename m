@@ -2,41 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00778293971
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 12:55:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C4EF293A43
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 13:49:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393372AbgJTKzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 06:55:39 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:31161 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392324AbgJTKzj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 06:55:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1603191339; x=1634727339;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=U3yVkHvQcrDS2rt3RLujo6WsTk7VispOOKaDDDybcRk=;
-  b=B0HjdIyZMzFdLNlmXN9PFIoxY8CcpF7ClT5Mj2O+HX3uph0iwLf3OOmg
-   Cp6iNdHDat42EV7LQXGHREm/9J7pb4U4V8208nPqL9c8UW4lpVEsawpNa
-   vqsoak+4+uzrSHFZyIpG1R0JWZrwp0YDvXhOVmXd7aDBaSJc6EK/5tOOi
-   8=;
-X-IronPort-AV: E=Sophos;i="5.77,396,1596499200"; 
-   d="scan'208";a="78136956"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 20 Oct 2020 10:55:33 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com (Postfix) with ESMTPS id 6232AA1891;
-        Tue, 20 Oct 2020 10:52:25 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 20 Oct 2020 10:52:24 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.162.231) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 20 Oct 2020 10:52:22 +0000
-Subject: Re: [PATCH] KVM: VMX: Forbid userspace MSR filters for x2APIC
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        id S2393826AbgJTLti (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 07:49:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34115 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2393623AbgJTLth (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 07:49:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603194576;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HJOHi7hCCCjte1IjtmuV53qRpJLxyma9mr6NzsxivYY=;
+        b=Nz/PG1fPfuxxjp1tnWvdrn1E6wUZE9gFfrXeF7LVsTPfHqypQxYHX+KtQ7XA0WiNZ5d3ki
+        JUBizNe7AzYJjizeiRcwC9i2JOZfzn2R/06pmaC6h8gAV0cBt47GFSxFfXVyg3wqDxwPJG
+        Eo9Gprz9dJ/DgXkCSXCVlEsmS3IQuys=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-HRLsH-31OFurgGxKFO_CvQ-1; Tue, 20 Oct 2020 07:49:34 -0400
+X-MC-Unique: HRLsH-31OFurgGxKFO_CvQ-1
+Received: by mail-wr1-f72.google.com with SMTP id m20so704028wrb.21
+        for <kvm@vger.kernel.org>; Tue, 20 Oct 2020 04:49:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HJOHi7hCCCjte1IjtmuV53qRpJLxyma9mr6NzsxivYY=;
+        b=l1SgiHeM6QoeNFtcWMBrsuTN1rUIq4bQYtqWgFn18AdVzprPBellB7S6cIJcKCL3wv
+         TigHR7bc0sKKTD2sSSSHsD6kqUqM9cfHPuRRsghUn9mi3y8BnzPrvRrrLEgnH9Szkxc/
+         Lo0+BoVTYtOVkS+2GYx3uBHXWDXTOiT4TWKBns1q7LpMOVCi21ys5pavQhGl2jVhjRBi
+         Umw08VZLF1oD07mRdR9J8YbWoOdIG/Qsz/LiAeT0xh2j6EojRsmoXSxupvezgu4Ptv8X
+         Hu6Chfs/jRSZRg44+LUzobQa8k0TuGP8ntneDFPMaIMRfbaBjAFR5CHsvfEaG3Ho6gVr
+         KX5Q==
+X-Gm-Message-State: AOAM5334CptF7hYrmJjcw3pKW6Mzz3VCFd7zF8CVOZc2RGZ9nwqjan3O
+        W+btEypIkIjlnepshXYidaGDUo7qp6bEatTozVpFjBt5dLnLP3h3oqyACe/LyW9SPWW5mMXLwyl
+        v4Vc8ClNHmz7a
+X-Received: by 2002:a1c:32c6:: with SMTP id y189mr2644619wmy.51.1603194573146;
+        Tue, 20 Oct 2020 04:49:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwSAcDTZqsLEt3bb+95AsHI8IRoDgAog7DIIwwjTsqb14PwgPsSXiaZNkhonOMQ+nf1v3nhHQ==
+X-Received: by 2002:a1c:32c6:: with SMTP id y189mr2644591wmy.51.1603194572890;
+        Tue, 20 Oct 2020 04:49:32 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b15sm2631962wrm.65.2020.10.20.04.49.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Oct 2020 04:49:32 -0700 (PDT)
+To:     Alexander Graf <graf@amazon.de>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Aaron Lewis <aaronlewis@google.com>,
         Peter Xu <peterx@redhat.com>,
@@ -46,55 +62,60 @@ References: <20201019170519.1855564-1-pbonzini@redhat.com>
  <c9dd6726-2783-2dfd-14d1-5cec6f69f051@redhat.com>
  <bce2aee1-bfac-0640-066b-068fa5f12cf8@amazon.de>
  <6edd5e08-92c2-40ff-57be-37b92d1ca2bc@redhat.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <47eb1a4a-d015-b573-d773-e34e578ad753@amazon.de>
-Date:   Tue, 20 Oct 2020 12:52:20 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.3.3
+ <47eb1a4a-d015-b573-d773-e34e578ad753@amazon.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: VMX: Forbid userspace MSR filters for x2APIC
+Message-ID: <ac2be818-04c8-6027-870c-184148e511ef@redhat.com>
+Date:   Tue, 20 Oct 2020 13:49:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <6edd5e08-92c2-40ff-57be-37b92d1ca2bc@redhat.com>
+In-Reply-To: <47eb1a4a-d015-b573-d773-e34e578ad753@amazon.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Originating-IP: [10.43.162.231]
-X-ClientProxiedBy: EX13D23UWC001.ant.amazon.com (10.43.162.196) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyMC4xMC4yMCAxMjozNCwgUGFvbG8gQm9uemluaSB3cm90ZToKPiAKPiBPbiAyMC8xMC8y
-MCAxMTo0OCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+Cj4+ICAgICAgY291bnQ6IDEsCj4+ICAg
-ICAgZGVmYXVsdF9hbGxvdzogZmFsc2UsCj4+ICAgICAgcmFuZ2VzOiBbCj4+ICAgICAgICAgIHsK
-Pj4gICAgICAgICAgICAgIGZsYWdzOiBLVk1fTVNSX0ZJTFRFUl9SRUFELAo+PiAgICAgICAgICAg
-ICAgbm1zcnM6IDEsCj4+ICAgICAgICAgICAgICBiYXNlOiBNU1JfRUZFUiwKPj4gICAgICAgICAg
-ICAgIGJpdG1hcDogeyAxIH0sCj4+ICAgICAgICAgIH0sCj4+ICAgICAgXSwKPj4gfQo+Pgo+PiBU
-aGF0IGZpbHRlciB3b3VsZCBzZXQgYWxsIHgyYXBpYyByZWdpc3RlcnMgdG8gImRlbnkiLCBidXQg
-d291bGQgbm90IGJlCj4+IGNhdWdodCBieSB0aGUgY29kZSBhYm92ZS4gQ29udmVyc2VseSwgYSBy
-YW5nZSB0aGF0IGV4cGxpY2l0bHkgYWxsb3dzCj4+IHgyYXBpYyByYW5nZXMgd2l0aCBkZWZhdWx0
-X2FsbG93PTAgd291bGQgYmUgcmVqZWN0ZWQgYnkgdGhpcyBwYXRjaC4KPiAKPiBZZXMsIGJ1dCB0
-aGUgaWRlYSBpcyB0aGF0IHgyYXBpYyByZWdpc3RlcnMgYXJlIGFsd2F5cyBhbGxvd2VkLCBldmVu
-Cj4gb3ZlcnJpZGluZyBkZWZhdWx0X2FsbG93LCBhbmQgdGhlcmVmb3JlIGl0IG1ha2VzIG5vIHNl
-bnNlIHRvIGhhdmUgdGhlbQo+IGluIGEgcmFuZ2UuICBUaGUgcGF0Y2ggaXMgb25seSBtYWtpbmcg
-dGhpbmdzIGZhaWwgZWFybHkgZm9yIHVzZXJzcGFjZSwKPiB0aGUgcG9saWN5IGlzIGRlZmluZWQg
-YnkgU2VhbidzIHBhdGNoLgoKSSBkb24ndCB0aGluayB3ZSBzaG91bGQgZmFpbCBvbiB0aGUgZm9s
-bG93aW5nOgoKewogICAgIGRlZmF1bHRfYWxsb3c6IGZhbHNlLAogICAgIHJhbmdlczogWwogICAg
-ICAgICB7CiAgICAgICAgICAgICBmbGFnczogS1ZNX01TUl9GSUxURVJfUkVBRCwKICAgICAgICAg
-ICAgIG5tc3JzOiA0MDk2LAogICAgICAgICAgICAgYmFzZTogMCwKICAgICAgICAgICAgIGJpdG1h
-cDogeyAxLCAxLCAxLCAxLCBbLi4uXSB9LAogICAgICAgICB9LAogICAgICAgICB7CiAgICAgICAg
-ICAgICBmbGFnczogS1ZNX01TUl9GSUxURVJfUkVBRCwKICAgICAgICAgICAgIG5tc3JzOiA0MDk2
-LAogICAgICAgICAgICAgYmFzZTogMHhjMDAwMDAwMCwKICAgICAgICAgICAgIGJpdG1hcDogeyAx
-LCAxLCAxLCAxLCBbLi4uXSB9LAogICAgICAgICB9LAogICAgIF0sCn0KCmFzIGEgd2F5IHRvIHNh
-eSAiZXZlcnl0aGluZyBpbiBub3JtYWwgcmFuZ2VzIGlzIGFsbG93ZWQsIHRoZSByZXN0IHBsZWFz
-ZSAKZGVmbGVjdCIuIE9yIGV2ZW4ganVzdCB0byBzZXQgZGVmYXVsdCBwb2xpY2llcyB3aXRoIGxl
-c3MgcmFuZ2VzLgoKT3IgdG8gc2F5IGl0IGRpZmZlcmVudGx5OiBXaHkgY2FuJ3Qgd2UganVzdCBj
-aGVjayBleHBsaWNpdGx5IGFmdGVyIApzZXR0aW5nIHVwIGFsbCBmaWx0ZXIgbGlzdHMgd2hldGhl
-ciB4MmFwaWMgTVNScyBhcmUgKmRlbmllZCo/IElmIHNvLCAKY2xlYXIgdGhlIGZpbHRlciBhbmQg
-cmV0dXJuIC1FSU5WQUwuCgpUaGF0IHN0aWxsIGxlYXZlcyB0aGUgY2FzZSB3aGVyZSB4MmFwaWMg
-aXMgbm90IGhhbmRsZWQgaW4ta2VybmVsLCBidXQgCkknbSBwZXJmZWN0bHkgaGFwcHkgdG8gaWdu
-b3JlIHRoYXQgb25lIGFzICJ1c2VyIHNwYWNlIHNob3VsZCBub3QgY2FyZSIgOikuCgoKQWxleAoK
-CgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAox
-MDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25h
-dGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRl
-ciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+On 20/10/20 12:52, Alexander Graf wrote:
+>>
+>> Yes, but the idea is that x2apic registers are always allowed, even
+>> overriding default_allow, and therefore it makes no sense to have them
+>> in a range.  The patch is only making things fail early for userspace,
+>> the policy is defined by Sean's patch.
+> 
+> I don't think we should fail on the following:
+> 
+> {
+>     default_allow: false,
+>     ranges: [
+>         {
+>             flags: KVM_MSR_FILTER_READ,
+>             nmsrs: 4096,
+>             base: 0,
+>             bitmap: { 1, 1, 1, 1, [...] },
+>         },
+>         {
+>             flags: KVM_MSR_FILTER_READ,
+>             nmsrs: 4096,
+>             base: 0xc0000000,
+>             bitmap: { 1, 1, 1, 1, [...] },
+>         },
+>     ],
+> }
+> 
+> as a way to say "everything in normal ranges is allowed, the rest please
+> deflect". Or even just to set default policies with less ranges.
+> 
+> Or to say it differently: Why can't we just check explicitly after
+> setting up all filter lists whether x2apic MSRs are *denied*? If so,
+> clear the filter and return -EINVAL.
+
+Hmm, if you start looking at the bitmaps setting up default-deny
+policies correctly is almost impossible :/ because you'd have to ensure
+that you have at least one range covering the x2apic MSRs.  I'll just
+document that x2APIC MSRs ignore the filter.
+
+Paolo
 
