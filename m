@@ -2,99 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD8AE293506
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 08:32:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 550EF293588
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 09:13:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404335AbgJTGca (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 02:32:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20602 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2404329AbgJTGc3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 02:32:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603175548;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kUV7+7Yb5gWkt6R5BK6/Nubk0EIUzqlyn1lORobljU8=;
-        b=Jz7RDHtXTXvhtf8nQIX8KEzgi4N9srlBn/yyO3DxUQ5wbJvmYAymYw4fz+9NMJauXb+saH
-        AFKHqnLktoW1ZQjOw8Lp2hEHaXTNhXXwBqauILaffTB8OG6Updcvm+d04FKZDv1vu5qH8L
-        onc33xfPjrdRlCOY7OzuNjXVEzG+hes=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-TllFas1gNjWKqFl0xh-Dfg-1; Tue, 20 Oct 2020 02:32:24 -0400
-X-MC-Unique: TllFas1gNjWKqFl0xh-Dfg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E71A01006C8C;
-        Tue, 20 Oct 2020 06:32:21 +0000 (UTC)
-Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E70976EF59;
-        Tue, 20 Oct 2020 06:32:13 +0000 (UTC)
-Subject: Re: [PATCH 2/2] KVM: not link irqfd with a fake IRQ bypass producer
-To:     Zhenzhong Duan <zhenzhong.duan@gmail.com>,
+        id S1729601AbgJTHNA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 03:13:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728706AbgJTHNA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Oct 2020 03:13:00 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F0A0C061755;
+        Tue, 20 Oct 2020 00:13:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=WCNIsXqbUXOzIVXmiOYfRO/Rzg9TJllAtewiaSP3GKM=; b=ZxA8J6JPfMDUEAIlDegD6VN7Mw
+        kTiSBVZpDoHIFc4FUAK5xxpb0h6osBndnpMCaK/V1S6gc0r57wzZp9JD6kkTt+hkDnUGLeZCVRIVP
+        IKEFiR3euGhM133RXC6Fp3cWuP6Oml7l8/eoDxl361J46PF0VmzPOtnnImaWoSmmmyDGhIjNqpL+x
+        5s7tw6oaMt3QnNrabjpPBEfwikdlJBvW9w7+fapOwvAHAj6CRWWlY230ozrl2jLS1CnOmgtU7cuU+
+        QQVzmuM2RoJrYg5qyKb0gyilwxREcsCLvLj4/LkszvTE0hBeN6YQ+NXqSlRqODdHQowUqhPJQn8Wc
+        LApoqxOw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kUloh-0002R6-8F; Tue, 20 Oct 2020 07:12:19 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 914613011FE;
+        Tue, 20 Oct 2020 09:12:17 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 807E02038FA06; Tue, 20 Oct 2020 09:12:17 +0200 (CEST)
+Date:   Tue, 20 Oct 2020 09:12:17 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Cc:     netdev@vger.kernel.org, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, mst@redhat.com
-References: <20201019090657.131-1-zhenzhong.duan@gmail.com>
- <20201019090657.131-2-zhenzhong.duan@gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <7eec99d5-e36b-ee5b-5b6c-1486e453a083@redhat.com>
-Date:   Tue, 20 Oct 2020 14:32:12 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFCv2 15/16] KVM: Unmap protected pages from direct mapping
+Message-ID: <20201020071217.GU2611@hirez.programming.kicks-ass.net>
+References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
+ <20201020061859.18385-16-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20201019090657.131-2-zhenzhong.duan@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201020061859.18385-16-kirill.shutemov@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Oct 20, 2020 at 09:18:58AM +0300, Kirill A. Shutemov wrote:
+> If the protected memory feature enabled, unmap guest memory from
+> kernel's direct mappings.
+> 
+> Migration and KSM is disabled for protected memory as it would require a
+> special treatment.
 
-On 2020/10/19 下午5:06, Zhenzhong Duan wrote:
-> In case failure to setup Post interrupt for an IRQ, it make no sense
-> to assign irqfd->producer to the producer.
->
-> This change makes code more robust.
-
-
-It's better to describe what issue we will get without this patch.
-
-Thanks
-
-
->
-> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@gmail.com>
-> ---
->   arch/x86/kvm/x86.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ce856e0..277e961 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10683,13 +10683,14 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->   		container_of(cons, struct kvm_kernel_irqfd, consumer);
->   	int ret;
->   
-> -	irqfd->producer = prod;
->   	kvm_arch_start_assignment(irqfd->kvm);
->   	ret = kvm_x86_ops.update_pi_irte(irqfd->kvm,
->   					 prod->irq, irqfd->gsi, 1);
->   
->   	if (ret)
->   		kvm_arch_end_assignment(irqfd->kvm);
-> +	else
-> +		irqfd->producer = prod;
->   
->   	return ret;
->   }
-
+How isn't disabling migration a problem? Are we going to back allocation
+by CMA instead?
