@@ -2,90 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D404B293717
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 10:49:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BC712937B9
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 11:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392154AbgJTIto (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 04:49:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36772 "EHLO
+        id S2392609AbgJTJNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 05:13:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32563 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389465AbgJTIto (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 04:49:44 -0400
+        by vger.kernel.org with ESMTP id S2392601AbgJTJNO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 05:13:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603183782;
+        s=mimecast20190719; t=1603185193;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5Yge5XZ1kJndyKXSjT5PcbgRRLsIiYT+p8n0M0YIBn0=;
-        b=YdSkL+yeEui5fc7w1jdqFmEHDR3Yk9bXSi38DUf+kAWWKW/zEw4PohaT2cURhhf5NTFAyr
-        UdD9CdGkTzYtRDdPS69rCWlx0eOSiT9jkd6ffG0TSULEWmuwPlsTRHyyLBWcSx1UhhHnNn
-        q/6kBUt/WxsQhrbAjeaO+XAGqUxmQ00=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-mhpnnwHqORaUZej_zqSmyg-1; Tue, 20 Oct 2020 04:49:40 -0400
-X-MC-Unique: mhpnnwHqORaUZej_zqSmyg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1FDA1009E2E;
-        Tue, 20 Oct 2020 08:49:39 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 468F610023A5;
-        Tue, 20 Oct 2020 08:49:38 +0000 (UTC)
-Date:   Tue, 20 Oct 2020 10:49:35 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Po-Hsu Lin <po-hsu.lin@canonical.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCHv2] unittests.cfg: Increase timeout for
- apic test
-Message-ID: <20201020084935.ltaitsuz45fr3wnm@kamzik.brq.redhat.com>
-References: <20201013091237.67132-1-po-hsu.lin@canonical.com>
- <87d01j5vk7.fsf@vitty.brq.redhat.com>
- <20201015163539.GA27813@linux.intel.com>
- <1b9e716f-fb13-9ea3-0895-0da0f9e9e163@redhat.com>
- <20201016174044.eg72aordkchdr5l2@kamzik.brq.redhat.com>
- <1e37df99-2d5c-be4c-4f42-1534f6164982@redhat.com>
+        bh=oOEy9aT9NtMMFJrshH7arUKD1nGqLIA4h6tvbyg+cCQ=;
+        b=LCJZi89OrGNkFFIHRJT7lbuv04P3ML8t+Pe2kekJ6UiDtw25zVTe9Wnp2HJdXqTMxbcXQ+
+        v+9O7rZBg/SQlEbJLiimyh3BrThehMSkK/Pj/uZdvnYowHMxJ4mYMRWtH0RAkkKC+gAZh0
+        yvvUK+JEpzoh06eIeLINPyUXFwDjcB8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-485-gBl5e1fWNqGKDgmv08LG4g-1; Tue, 20 Oct 2020 05:13:11 -0400
+X-MC-Unique: gBl5e1fWNqGKDgmv08LG4g-1
+Received: by mail-wr1-f70.google.com with SMTP id k14so554397wrd.6
+        for <kvm@vger.kernel.org>; Tue, 20 Oct 2020 02:13:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oOEy9aT9NtMMFJrshH7arUKD1nGqLIA4h6tvbyg+cCQ=;
+        b=XObg3QxAJ9XDVfvfMAVsGRZe0yUk7Di9/SX9UwS6PeLwy/f2rNR3D+hrlv12/FR/hN
+         pn4vPo40VQPma799Xw5iVygNhq8NtNVZrfsLXZ5Mp3qFv/GzfNAP55R0qN3gBeH7E7um
+         uIFHBJ195X1ckCRNGr7Ww+ocUgg//TRJ7j0WVEOiBTtmaS4XnN0A/lwtnwLa2WZJxJvc
+         QmmdNIIlztKyx8XIbfmESppN5GYiyc7fv++hscRmhloGu2BD4kGsvu/bam9RD8PEf0Fb
+         iTybSJ8SDmriozQWNvDyEXkAVGY+pNIU67QXcFtLdBPuO+rEkRxqlGZA5Q6MbPr4oJ9P
+         e6lA==
+X-Gm-Message-State: AOAM530YShJjr5QD1PMZo2X+VxkSOqc4dc7W02HEdpge6j0EDH3yveph
+        VSaKu9i1rKUp7pbnFZUHvRZNx0wPSHMh8BaJGyirbGe7dZcP0MwhHQcK7taD3vhNEvw4FlcYGta
+        OZMu8bt3/Mzom
+X-Received: by 2002:a1c:7f14:: with SMTP id a20mr1869314wmd.95.1603185190639;
+        Tue, 20 Oct 2020 02:13:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwYLeXYXKL0aEWIz3HPFIHkZmIWRXrsEo41r73AgTQ1N4YxYXVrI7Ur44rryYm+YqVyWuwqUA==
+X-Received: by 2002:a1c:7f14:: with SMTP id a20mr1869301wmd.95.1603185190434;
+        Tue, 20 Oct 2020 02:13:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j7sm1942145wrn.81.2020.10.20.02.13.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Oct 2020 02:13:09 -0700 (PDT)
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>
+References: <20200930041659.28181-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 0/5] KVM: x86: Handle reserved CR4 bit interception in VMX
+Message-ID: <8bf5e849-3a7d-a30a-061b-0a67a57de865@redhat.com>
+Date:   Tue, 20 Oct 2020 11:13:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e37df99-2d5c-be4c-4f42-1534f6164982@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200930041659.28181-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 20, 2020 at 07:53:49AM +0200, Thomas Huth wrote:
-> On 16/10/2020 19.40, Andrew Jones wrote:
-> > On Fri, Oct 16, 2020 at 07:02:57PM +0200, Paolo Bonzini wrote:
-> >> On 15/10/20 18:35, Sean Christopherson wrote:
-> >>> The port80 test in particular is an absolute waste of time.
-> >>>
-> >>
-> >> True, OTOH it was meant as a benchmark.  I think we can just delete it
-> >> or move it to vmexit.
-> >>
-> > 
-> > If you want to keep the code, but only run it manually sometimes,
-> > then you can mark the test as nodefault.
+On 30/09/20 06:16, Sean Christopherson wrote:
+> This series stems from Lai's RFC patches to intercept LA57 and let the
+> guest own FSGSBASE[*].  Discussion and inspection revealed that KVM does
+> not handle the case where LA57 is supported in hardware but not exposed to
+> the guest.  This is actually true for all CR4 bits, but LA57 is currently
+> the only bit that can be reserved and also owned by the guest.  I have
+> a unit test for this that I'll post separately.
 > 
-> Please let's avoid that. Code that does not get run by default tends to
-> bitrot. I suggest to decrease the amount of loops by default, and if
-> somebody still wants to run this as a kind of benchmark, maybe the amount of
-> loops could be made configurable? (i.e. so that you could control it via an
-> argv[] parameter?)
->
+> Intercepting LA57 was by far the easiest fix for the immedidate bug, and
+> is likely the right change in the long term as there's no justification
+> for letting the guest own LA57.
+> 
+> The middle three patches adjust VMX's CR4 guest/host mask to intercept
+> reserved bits.  This required reworking CPUID updates to also refresh said
+> mask at the correct time.
+> 
+> The last past is Lai's, which let's the guest own FSGSBASE.  This depends
+> on the reserved bit handling being in place.
+> 
+> Ran everything through unit tests, and ran the kernel's FSGSBASE selftests
+> in a VM.
+> 
+> [*] https://lkml.kernel.org/r/20200928083047.3349-1-jiangshanlai@gmail.com
+> 
+> Lai Jiangshan (2):
+>   KVM: x86: Intercept LA57 to inject #GP fault when it's reserved
+>   KVM: x86: Let the guest own CR4.FSGSBASE
+> 
+> Sean Christopherson (3):
+>   KVM: x86: Invoke vendor's vcpu_after_set_cpuid() after all common
+>     updates
+>   KVM: x86: Move call to update_exception_bitmap() into VMX code
+>   KVM: VMX: Intercept guest reserved CR4 bits to inject #GP fault
+> 
+>  arch/x86/kvm/cpuid.c          |  6 +++---
+>  arch/x86/kvm/kvm_cache_regs.h |  2 +-
+>  arch/x86/kvm/vmx/vmx.c        | 18 +++++++++++++-----
+>  3 files changed, 17 insertions(+), 9 deletions(-)
+> 
 
-I think both make sense. Making the number of loops variable is a good
-idea in order to keep the test running in CI in a reasonable amount of
-time (the timeout can also be adjusted by the CI runner, of course). Also,
-marking the test as nodefault makes sense if nobody really cares about
-the output unless they're specifically doing some benchmarking. Nothing
-stops travis or other CI from running nodefault tests, they just have to
-be explicitly requested.
+Queued, thanks.
 
-Thanks,
-drew 
+Paolo
 
