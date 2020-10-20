@@ -2,167 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C53F293B95
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 14:30:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32E55293C28
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 14:47:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394293AbgJTMaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 08:30:39 -0400
-Received: from foss.arm.com ([217.140.110.172]:50944 "EHLO foss.arm.com"
+        id S2406605AbgJTMrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 08:47:33 -0400
+Received: from mga09.intel.com ([134.134.136.24]:17337 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405998AbgJTMaj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 08:30:39 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F0E4030E;
-        Tue, 20 Oct 2020 05:30:37 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D544F3F66E;
-        Tue, 20 Oct 2020 05:30:36 -0700 (PDT)
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool] arm64: Determine kernel offset even on non-seekable file descriptors
-Date:   Tue, 20 Oct 2020 13:30:32 +0100
-Message-Id: <20201020123032.167234-1-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
+        id S2406408AbgJTMrb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Oct 2020 08:47:31 -0400
+IronPort-SDR: 2YY5ZbnXLKYCSld7mxX7xrs2nTSMTDbpr2OlFN4FqdA2HhfguVMJ1r4EIYiPkPwdoNapzjyaJe
+ gukk96k7jxKQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9779"; a="167319105"
+X-IronPort-AV: E=Sophos;i="5.77,397,1596524400"; 
+   d="scan'208";a="167319105"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2020 05:47:30 -0700
+IronPort-SDR: kAVLCB4RupND9uUWmn26k6SJRCJbLtbuRawIljFVd+ITvyLkXt7FId8CXkbZUW3SCaYDueHK8G
+ a8n3G2bJKIOg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,397,1596524400"; 
+   d="scan'208";a="332244362"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga002.jf.intel.com with ESMTP; 20 Oct 2020 05:47:25 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+        id BB5B9376; Tue, 20 Oct 2020 15:47:24 +0300 (EEST)
+Date:   Tue, 20 Oct 2020 15:47:24 +0300
+From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFCv2 05/16] x86/kvm: Make VirtIO use DMA API in KVM guest
+Message-ID: <20201020124724.mk66h5ulm3xwdksc@black.fi.intel.com>
+References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
+ <20201020061859.18385-6-kirill.shutemov@linux.intel.com>
+ <20201020080658.GA21238@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201020080658.GA21238@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit c9acdae1d2e7 ("arm64: Use default kernel offset when the image
-file can't be seeked") "guessed" the arm64 kernel offset to be the old
-default of 512K if the file descriptor for the kernel image could not
-be seeked. This mostly works today because most modern kernels are
-somewhat forgiving when loaded at the wrong offset, but emit a warning:
+On Tue, Oct 20, 2020 at 09:06:58AM +0100, Christoph Hellwig wrote:
+> NAK.  Any virtio implementation that needs special DMA OPS treatment
+> needs to set the VIRTIO_F_ACCESS_PLATFORM bit.  The only reason the
+> Xen hack existst is because it slipped in a long time ago and we can't
+> fix that any more.
 
-[Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
+Thanks. Will fix.
 
-To fix this properly, let's drop the seek operation altogether, instead
-give the kernel header parsing function a memory buffer, containing the
-first 64 bytes of the kernel file. We read the rest of the file into the
-right location after this function has decoded the proper kernel offset.
-
-This brings back proper loading even for kernels loaded via pipes.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/aarch64/include/kvm/kvm-arch.h |  3 ++-
- arm/aarch64/kvm.c                  | 26 ++++++++------------------
- arm/kvm.c                          | 13 ++++++++++---
- 3 files changed, 20 insertions(+), 22 deletions(-)
-
-diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-index 55ef8ed1..7e6cffb6 100644
---- a/arm/aarch64/include/kvm/kvm-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-arch.h
-@@ -2,7 +2,8 @@
- #define KVM__KVM_ARCH_H
- 
- struct kvm;
--unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
-+unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, void *header,
-+					     unsigned int bufsize);
- 
- #define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
- 				ARM_LOMAP_MAX_MEMORY		:	\
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index 49e1dd31..9a6460ac 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -10,39 +10,29 @@
-  * instead of Little-Endian. BE kernels of this vintage may fail to
-  * boot. See Documentation/arm64/booting.rst in your local kernel tree.
-  */
--unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
-+unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm,
-+					     void *buffer, unsigned int bufsize)
- {
--	struct arm64_image_header header;
--	off_t cur_offset;
--	ssize_t size;
-+	struct arm64_image_header *header = buffer;
- 	const char *warn_str;
- 
- 	/* the 32bit kernel offset is a well known value */
- 	if (kvm->cfg.arch.aarch32_guest)
- 		return 0x8000;
- 
--	cur_offset = lseek(fd, 0, SEEK_CUR);
--	if (cur_offset == (off_t)-1 ||
--	    lseek(fd, 0, SEEK_SET) == (off_t)-1) {
--		warn_str = "Failed to seek in kernel image file";
-+	if (bufsize < sizeof(*header)) {
-+		warn_str = "Provided kernel header too small";
- 		goto fail;
- 	}
- 
--	size = xread(fd, &header, sizeof(header));
--	if (size < 0 || (size_t)size < sizeof(header))
--		die("Failed to read kernel image header");
--
--	lseek(fd, cur_offset, SEEK_SET);
--
--	if (memcmp(&header.magic, ARM64_IMAGE_MAGIC, sizeof(header.magic)))
-+	if (memcmp(&header->magic, ARM64_IMAGE_MAGIC, sizeof(header->magic)))
- 		pr_warning("Kernel image magic not matching");
- 
--	if (le64_to_cpu(header.image_size))
--		return le64_to_cpu(header.text_offset);
-+	if (le64_to_cpu(header->image_size))
-+		return le64_to_cpu(header->text_offset);
- 
- 	warn_str = "Image size is 0";
- fail:
- 	pr_warning("%s, assuming TEXT_OFFSET to be 0x80000", warn_str);
- 	return 0x80000;
- }
--
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 5aea18fe..685fabb1 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -90,12 +90,14 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 
- #define FDT_ALIGN	SZ_2M
- #define INITRD_ALIGN	4
-+#define MAX_KERNEL_HEADER_SIZE	64
- bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 				 const char *kernel_cmdline)
- {
- 	void *pos, *kernel_end, *limit;
- 	unsigned long guest_addr;
- 	ssize_t file_size;
-+	char header[MAX_KERNEL_HEADER_SIZE];
- 
- 	/*
- 	 * Linux requires the initrd and dtb to be mapped inside lowmem,
-@@ -103,16 +105,21 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 	 */
- 	limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
- 
--	pos = kvm->ram_start + kvm__arch_get_kern_offset(kvm, fd_kernel);
-+	if (xread(fd_kernel, header, sizeof(header)) != sizeof(header))
-+		die_perror("kernel header read");
-+	pos = kvm->ram_start + kvm__arch_get_kern_offset(kvm, header,
-+							 sizeof(header));
- 	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
--	file_size = read_file(fd_kernel, pos, limit - pos);
-+	memcpy(pos, header, sizeof(header));
-+	file_size = read_file(fd_kernel, pos + sizeof(header),
-+			      limit - pos - sizeof(header));
- 	if (file_size < 0) {
- 		if (errno == ENOMEM)
- 			die("kernel image too big to contain in guest memory.");
- 
- 		die_perror("kernel read");
- 	}
--	kernel_end = pos + file_size;
-+	kernel_end = pos + file_size + sizeof(header);
- 	pr_debug("Loaded kernel to 0x%llx (%zd bytes)",
- 		 kvm->arch.kern_guest_start, file_size);
- 
 -- 
-2.17.1
-
+ Kirill A. Shutemov
