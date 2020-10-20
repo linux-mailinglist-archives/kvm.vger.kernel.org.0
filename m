@@ -2,119 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B66C294119
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 19:10:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4598C294126
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 19:12:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395197AbgJTRKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 13:10:10 -0400
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21783 "EHLO
-        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2395195AbgJTRKK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 13:10:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1603213786; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=NO1THYQT4/SnYBB4YgpAqwV0vSAIvo23hfXel5SNeU0kA8+m49+xLo8+W8Ed5TYi5cAbRHdQzEemggNgwyADgUsMKRwoHgE0wlhvukgfpdpErEL8CHYrXXmzm9pNUfYX6LLDpUq8CuVWp3BDu8P9duc31kuXAMJZIFhoEM4kEwk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1603213786; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=F9zjySQ7eK2n1IxyD0OTvLK0oOuNHLbxG4kQna5/nVg=; 
-        b=Q/E9fWSIa8qJZSWvOcdU5PA97KYHah9R2jC9h7yHroCEjiFBHHLOzPnwVc0XW6nKNeZukgDfvXAxRUpwoe4uXg8MLU7Ybq2jBFbo/RuFqYXqdsjiIo9fJ1T5zzTmLu/NaojwRp/VvdW2lMZXiSOI9eTE27oWduXJrBbWVLgyMsk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1603213784335701.8473065267893; Tue, 20 Oct 2020 10:09:44 -0700 (PDT)
-Subject: Re: [PATCH 0/2] KVM: Introduce ioeventfd read support
-Message-ID: <160321378294.32698.10418451773306647758@66eaa9a8a123>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20201020170056.433528-1-ameynarkhede03@gmail.com>
+        id S2395153AbgJTRMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 13:12:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37368 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390192AbgJTRMW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Oct 2020 13:12:22 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C676C0613CE
+        for <kvm@vger.kernel.org>; Tue, 20 Oct 2020 10:12:22 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id q136so2896110oic.8
+        for <kvm@vger.kernel.org>; Tue, 20 Oct 2020 10:12:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=TnQWFq6PlsNzb2Pdo04Z3ZD92uvkhYe9cU0O+K4el9w=;
+        b=g5xMeMVi6AwqQaMxooxRde02kKLx44lmSnI6n5JbMWK9QlRWVYD0hd6hr6/lqctj9b
+         NLajLBAGjOp9nNz/7KnayOnbprUkQZAywy7Gei411trQMLDF6UR3eiMvo3K6WWERsOmo
+         s9N/pH0nLFR1Z85uRMQ4mvmi8l07gUwryQNcyNf0U4fo4RBjPl3g0LM8fkvs6jsQINj1
+         JTbtV5Mfe5VH8HfIiRzbIFhjM+oeUOyfcGWQ+Zz/opLF3KA3LEpFFB1ThWFvrD496Uve
+         SYOxKz1lrDRpYor5xbqI38r9HWKKK5sAYNYpaO6ovPuJd9quZB3Vwv9N2TwshVr0KDIK
+         LiKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=TnQWFq6PlsNzb2Pdo04Z3ZD92uvkhYe9cU0O+K4el9w=;
+        b=HWr4A+4c/7HCr4erPVxnZt5DYZj77ZMZC5V3STNFWTShZDc+w0iWYGRg/qTrkjYfTN
+         Z3kW1mP3XkOosFCe6vGP+GCSRIswwz249X4vL3WnHtdaaekPGBjf56Hd6m/PpZOI+7jC
+         TOaxY3zCJkfiYBpbdqQKfjPChfST6GT7twVhbHugU0YIN0JdE/O3LX0sAzjRaZnRU8ED
+         Z66Nk8cOgCjGpmj2aeiPklf9/yDEveDd4l3FPnmhTuGZ/f+GQdciJ+9VOZDIhlr3UR0k
+         7XmSXNTs/Ti0DEwNWG0QcEPMYRr1L4lqgTpFO7jI516lmmYPeyMoN1ASN/D65UeIT2nC
+         v/Og==
+X-Gm-Message-State: AOAM533bAGKyQld3zm81U2YaWAmtP0X2rsvZflIEG40sjw9fQOHV0MnQ
+        wj+Rdy4i94L744ufCOE9qrbTLOERL49TpGXRf3iLPneQrAI=
+X-Google-Smtp-Source: ABdhPJzDuXKxslqzKafb4zNgPruT78455kNtMq0Zn7hZ+Yj7BZ4DwozTplReslg1yAZpoyjCSCIgnwYkr2FMy4LoYWM=
+X-Received: by 2002:aca:f202:: with SMTP id q2mr2400033oih.6.1603213941232;
+ Tue, 20 Oct 2020 10:12:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     ameynarkhede03@gmail.com
-Cc:     qemu-devel@nongnu.org, ameynarkhede03@gmail.com,
-        pbonzini@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        mst@redhat.com
-Date:   Tue, 20 Oct 2020 10:09:44 -0700 (PDT)
-X-ZohoMailClient: External
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 20 Oct 2020 10:12:09 -0700
+Message-ID: <CALMp9eRYN7acRAOhoVWjz+WuYpB6g40NYNo9zXYe4yXVqTFQzQ@mail.gmail.com>
+Subject: CPUID.40000001H:EDX.KVM_HINTS_REALTIME[bit 0]
+To:     kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAyMDE3MDA1Ni40MzM1
-MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
-dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
-bW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMTAyMDE3MDA1
-Ni40MzM1MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20KU3ViamVjdDogW1BBVENIIDAvMl0g
-S1ZNOiBJbnRyb2R1Y2UgaW9ldmVudGZkIHJlYWQgc3VwcG9ydAoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMTAyMDE2MzczOC4yNzcwMC0xLWFsZXgu
-YmVubmVlQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDIwMTAyMDE2MzczOC4yNzcwMC0xLWFsZXgu
-YmVubmVlQGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMTAyMDE3
-MDA1Ni40MzM1MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDIwMTAy
-MDE3MDA1Ni40MzM1MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20KU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwplY2NjYTMzIGt2bTogQWRkIGlvZXZlbnRmZCByZWFkIHRlc3QgY29k
-ZQozM2IzZGU2IGxpbnV4LWhlYWRlcnM6IEFkZCBzdXBwb3J0IGZvciByZWFkcyBpbiBpb2V2ZW50
-ZmQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMiBDaGVja2luZyBjb21taXQgMzNiM2RlNjcyMjE5
-IChsaW51eC1oZWFkZXJzOiBBZGQgc3VwcG9ydCBmb3IgcmVhZHMgaW4gaW9ldmVudGZkKQoyLzIg
-Q2hlY2tpbmcgY29tbWl0IGVjY2NhMzMwOThjNiAoa3ZtOiBBZGQgaW9ldmVudGZkIHJlYWQgdGVz
-dCBjb2RlKQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMTogRklM
-RTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDE2OgorXkleSV5JXkkgIHVpbnQ2NF90IHNpemUsIGJv
-b2wgZGF0YW1hdGNoKSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzMzOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5jOjEwMTg6CiteSWludCByZXQ7JAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzQ6IEZJTEU6IGFjY2VsL2t2bS9r
-dm0tYWxsLmM6MTAxOToKK15Jc3RydWN0IGt2bV9pb2V2ZW50ZmQgaW9ldmVudCA9IHskCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzU6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxs
-LmM6MTAyMDoKKyAgICAgICAgICAgICAgIC5kYXRhbWF0Y2ggPSBkYXRhbWF0Y2ggPyBhZGp1c3Rf
-aW9ldmVudGZkX2VuZGlhbm5lc3ModmFsLCBzaXplKSA6IDAsCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzNTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDIw
-OgorICAgICAgICBeSS5kYXRhbWF0Y2ggPSBkYXRhbWF0Y2ggPyBhZGp1c3RfaW9ldmVudGZkX2Vu
-ZGlhbm5lc3ModmFsLCBzaXplKSA6IDAsJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMzY6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTAyMToKK15JXkkuZGF0
-YXJlYWQgPSB2YWwsJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-Mzc6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTAyMjoKK15JXkkuYWRkciA9IGFkZHIsJAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzg6IEZJTEU6IGFjY2Vs
-L2t2bS9rdm0tYWxsLmM6MTAyMzoKK15JXkkubGVuID0gc2l6ZSwkCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzOTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzox
-MDI0OgorXkleSS5mbGFncyA9IEtWTV9JT0VWRU5URkRfRkxBR19EQVRBUkVBRCwkCgpFUlJPUjog
-Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MDogRklMRTogYWNjZWwva3ZtL2t2
-bS1hbGwuYzoxMDI1OgorXkleSS5mZCA9IGZkLCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzQxOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5jOjEwMjY6CiteSX07
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDM6IEZJTEU6IGFj
-Y2VsL2t2bS9rdm0tYWxsLmM6MTAyODoKK15JaWYgKCFrdm1fZW5hYmxlZCgpKSB7JAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IGFjY2VsL2t2bS9r
-dm0tYWxsLmM6MTAyOToKK15JXklyZXR1cm4gLUVOT1NZUzskCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0NTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDMw
-OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDc6IEZJ
-TEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTAzMjoKK15JaWYgKGRhdGFtYXRjaCkgeyQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ5OiBGSUxFOiBhY2NlbC9rdm0v
-a3ZtLWFsbC5jOjEwMzQ6CiteSX0kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiM1MTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDM2OgorXklyZXQgPSBrdm1f
-dm1faW9jdGwoa3ZtX3N0YXRlLCBLVk1fSU9FVkVOVEZELCAmaW9ldmVudCk7JAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTM6IEZJTEU6IGFjY2VsL2t2bS9rdm0t
-YWxsLmM6MTAzODoKK15JaWYgKHJldCA8IDApIHskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiM1NDogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDM5OgorXkle
-SXJldHVybiAtZXJybm87JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNTU6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTA0MDoKK15JfSQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU3OiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFs
-bC5jOjEwNDI6CiteSXJldHVybiAwOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzgwOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5jOjIyOTg6CiteSXByaW50Zigi
-RmFpbGVkIHRvIGluaXRpYWxpemUgRXZlbnROb3RpZmllclxuIik7JAoKRVJST1I6IGVsc2Ugc2hv
-dWxkIGZvbGxvdyBjbG9zZSBicmFjZSAnfScKIzgyOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5j
-OjIzMDA6CisgICAgfQorICAgIGVsc2UgewoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
-IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojODc6IEZJTEU6IGFjY2VsL2t2bS9rdm0t
-YWxsLmM6MjMwNToKKyAgICAgICAgaWYgKHJldCA8IDApClsuLi5dCgp0b3RhbDogMjMgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCA3OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMjAxMDIwMTcwMDU2LjQzMzUyOC0xLWFtZXluYXJraGVkZTAzQGdtYWlsLmNvbS90
-ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Per the KVM_GET_SUPPORTED_CPUID ioctl, the KVM_HINTS_REALTIME CPUID
+bit is never supported.
+
+Is this just an oversight?
