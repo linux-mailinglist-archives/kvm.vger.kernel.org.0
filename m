@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF5542934BF
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 08:19:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B84C2934C4
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 08:19:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403914AbgJTGTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 02:19:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48554 "EHLO
+        id S2403935AbgJTGTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 02:19:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403878AbgJTGTM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 02:19:12 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F81C0613D5
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:12 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id j30so674664lfp.4
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:12 -0700 (PDT)
+        with ESMTP id S2403885AbgJTGTN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Oct 2020 02:19:13 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 290F4C061755
+        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:13 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id l28so649951lfp.10
+        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=4qhCOwzKNOI3O5QHd++Ps6ruP4fb4SeRwyQf+CUv0m0=;
-        b=GSndWaHnIpcamiRyrAj/fiORS32HM6qZwJJRgw4zwfhl+YwtSi5jQEtTN8kpJEO0Fb
-         0JI6szeDJonivYoGkzAE1rxYCANs9iOW+9gJP0+02XULrrfBtTTIBbiwSnDIMj36B4Xb
-         +O5CFhfYyhABpZ1YJi+jeVZMpFcgDoFjW/B+KKJk4F4ZQFKBXe0Cx/FG4BWP1EEVRU2C
-         HpTUlFC78LY3LUwUgbuyOoUCFe2A0vc0bFsA4gBASokNt58UOLPrZ0vg7qogFxL2se3l
-         Gkxv5aV4dnb1/3ipAJyLqgx6uPlPF9cxZoFA1IChj913U7BlB9bmxXqjYbLA9+QNWwmX
-         PL4Q==
+        bh=YqXoyWzrpggXifhp2ZZvkYQN13pzHcgcJE84Cdo/0fA=;
+        b=OvuEbAZWg3vpu8+LZy777g08/QYkrpy0M/C3pJJUVn5405klpLJKvddwUm/X8YG7sp
+         GyOX+PH1FyvsxFbYCY9z84kfL6l126OrW4VmCKmakO3y1HTg9VEyY02PYG1PEge7/Q8r
+         z2j50GS5eoRh2cLyya1+OFS64Xwz8sEdMr3uN1ZnQBxMTBotnH7o/PoKd8pHThWyvsn+
+         uRCnDYRMb9t5l1XcGamPtITidQt8bkWtkHpL0SGaWPxfwx4Wwu0AkhnmRi2RXvyTfx5A
+         MJ9bSUBb3CHAqNR0w2ov2Jg1ExbFBpFv7W9z60KdpSn3fpPMRxCujKX9CYht0WBYmcls
+         MjlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=4qhCOwzKNOI3O5QHd++Ps6ruP4fb4SeRwyQf+CUv0m0=;
-        b=QHA+CnhA57r14khu7x+RhHvhkdhXpYWT5SRSecG5rEZ5PgC0RRA9CB/Ql6pIMb76N8
-         uE4VTjgR20Osq4zItqCu5Dsk5vHmosE9M2axFFGW9PGTdHiP2yFtPCPwfiGjjLfRdmeD
-         zo1V68sRVZXf15jrCICb/a7W9QGDzdyKSDEiO29IgfWc/gB6ojaGSCdLAvsarac6VNIc
-         Rx8uu5EJc3euxRXm3uO+9NmioYLmI0+2WbmnOGYY3X4YZmkmuHpydMlCr/uq/KtK2mGz
-         z4BZI+pldkf5gFXf3eeBnutTbQOFbp9U66+rq3M84agmEy98BPPu1YYhWO1SQilqaCwF
-         UDLQ==
-X-Gm-Message-State: AOAM530vY9oCQaTKeArgSxkIAwwEfSt6N4UysFppJBmCm5LAKAwzW7OH
-        McvR0TlsgRazSyBDvpAuuQbZdQ==
-X-Google-Smtp-Source: ABdhPJz0bYAWSZ6yvrE2dNCscOjdmtJQ3urSk2sm+men3qnSmbPZ0P47RPkjLyJGfn+xTukQu7Ie0w==
-X-Received: by 2002:a19:5f52:: with SMTP id a18mr372073lfj.511.1603174750811;
-        Mon, 19 Oct 2020 23:19:10 -0700 (PDT)
+        bh=YqXoyWzrpggXifhp2ZZvkYQN13pzHcgcJE84Cdo/0fA=;
+        b=btsLz0ujQQburydyGrxi+fwFoxdySKFRkhsJ8LkaLJd5jwq2/c3dZHAy/D6ipQfbFx
+         xTp7JpDkLAJwB++6iLWL5pYVfhb8nZ5+fnjv8d8cUAH0YaZ7dzxQ6Uftnsnf/5Bcdv/S
+         tS4HEDrh6/hI/bwODAKg4HE+L7Idp2XyfjTprFZmSeXyjy4UBbIgnvOQYbUl6ShIJnjZ
+         JVeguHz40J5LtaRZ2ScdWceCaxDKFQYjly39a9x0eT1daLZ2DGzg52BdfSsQnGvY3EkA
+         y4z4PHXSwxPKLPDZliKO3k0NLCydVqSCFoWN0x6wp+8HV9L9C0gJBE7DLAKOYZvFk4L5
+         cZjA==
+X-Gm-Message-State: AOAM532GqlsRlK/05GQH3LcZosXdUE3iqJwy5znhx7XhdG3wZzzi9n9W
+        +Cu5U+uOHm5DIIFcSZszkYj4xg==
+X-Google-Smtp-Source: ABdhPJx1Za/f8n8gS2Lf4tVPWSC9ysXQk4V29HtHvIrTK/S7VXXVqCjMAeIH20fbfqK12CcIlnQacA==
+X-Received: by 2002:a19:4cd:: with SMTP id 196mr374025lfe.484.1603174751608;
+        Mon, 19 Oct 2020 23:19:11 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id e28sm194113ljp.28.2020.10.19.23.19.07
+        by smtp.gmail.com with ESMTPSA id o14sm136989lfc.29.2020.10.19.23.19.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 19 Oct 2020 23:19:09 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 1BCF0102F6B; Tue, 20 Oct 2020 09:19:02 +0300 (+03)
+        id 24A6D102F6C; Tue, 20 Oct 2020 09:19:02 +0300 (+03)
 To:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -71,9 +71,9 @@ Cc:     David Rientjes <rientjes@google.com>,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFCv2 12/16] KVM: x86: Enabled protected memory extension
-Date:   Tue, 20 Oct 2020 09:18:55 +0300
-Message-Id: <20201020061859.18385-13-kirill.shutemov@linux.intel.com>
+Subject: [RFCv2 13/16] KVM: Rework copy_to/from_guest() to avoid direct mapping
+Date:   Tue, 20 Oct 2020 09:18:56 +0300
+Message-Id: <20201020061859.18385-14-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
 References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
@@ -83,105 +83,229 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wire up hypercalls for the feature and define VM_KVM_PROTECTED.
+We are going unmap guest pages from direct mapping and cannot rely on it
+for guest memory access. Use temporary kmap_atomic()-style mapping to
+access guest memory.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/Kconfig     | 1 +
- arch/x86/kvm/Kconfig | 1 +
- arch/x86/kvm/cpuid.c | 3 ++-
- arch/x86/kvm/x86.c   | 9 +++++++++
- include/linux/mm.h   | 6 ++++++
- 5 files changed, 19 insertions(+), 1 deletion(-)
+ virt/kvm/kvm_main.c      |  27 ++++++++++-
+ virt/lib/mem_protected.c | 101 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 126 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index b22b95517437..0bcbdadb97d6 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -807,6 +807,7 @@ config KVM_GUEST
- 	select X86_HV_CALLBACK_VECTOR
- 	select X86_MEM_ENCRYPT_COMMON
- 	select SWIOTLB
-+	select ARCH_USES_HIGH_VMA_FLAGS
- 	default y
- 	help
- 	  This option enables various optimizations for running under the KVM
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index fbd5bd7a945a..2ea77c2a8029 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -46,6 +46,7 @@ config KVM
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_VFIO
- 	select SRCU
-+	select HAVE_KVM_PROTECTED_MEMORY
- 	help
- 	  Support hosting fully virtualized guest machines using hardware
- 	  virtualization extensions.  You will need a fairly recent
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 3fd6eec202d7..eed33db032fb 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -746,7 +746,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			     (1 << KVM_FEATURE_PV_SEND_IPI) |
- 			     (1 << KVM_FEATURE_POLL_CONTROL) |
- 			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
--			     (1 << KVM_FEATURE_ASYNC_PF_INT);
-+			     (1 << KVM_FEATURE_ASYNC_PF_INT) |
-+			     (1 << KVM_FEATURE_MEM_PROTECTED);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 4c008c7b4974..9b569b78874a 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -51,6 +51,7 @@
+ #include <linux/io.h>
+ #include <linux/lockdep.h>
+ #include <linux/kthread.h>
++#include <linux/pagewalk.h>
  
- 		if (sched_info_on())
- 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ce856e0ece84..e89ff39204f0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7752,6 +7752,15 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		kvm_sched_yield(vcpu->kvm, a0);
- 		ret = 0;
- 		break;
-+	case KVM_HC_ENABLE_MEM_PROTECTED:
-+		ret = kvm_protect_all_memory(vcpu->kvm);
-+		break;
-+	case KVM_HC_MEM_SHARE:
-+		ret = kvm_protect_memory(vcpu->kvm, a0, a1, false);
-+		break;
-+	case KVM_HC_MEM_UNSHARE:
-+		ret = kvm_protect_memory(vcpu->kvm, a0, a1, true);
-+		break;
- 	default:
- 		ret = -KVM_ENOSYS;
- 		break;
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index c8d8cdcbc425..ee274d27e764 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -304,11 +304,13 @@ extern unsigned int kobjsize(const void *objp);
- #define VM_HIGH_ARCH_BIT_2	34	/* bit only usable on 64-bit architectures */
- #define VM_HIGH_ARCH_BIT_3	35	/* bit only usable on 64-bit architectures */
- #define VM_HIGH_ARCH_BIT_4	36	/* bit only usable on 64-bit architectures */
-+#define VM_HIGH_ARCH_BIT_5	37	/* bit only usable on 64-bit architectures */
- #define VM_HIGH_ARCH_0	BIT(VM_HIGH_ARCH_BIT_0)
- #define VM_HIGH_ARCH_1	BIT(VM_HIGH_ARCH_BIT_1)
- #define VM_HIGH_ARCH_2	BIT(VM_HIGH_ARCH_BIT_2)
- #define VM_HIGH_ARCH_3	BIT(VM_HIGH_ARCH_BIT_3)
- #define VM_HIGH_ARCH_4	BIT(VM_HIGH_ARCH_BIT_4)
-+#define VM_HIGH_ARCH_5	BIT(VM_HIGH_ARCH_BIT_5)
- #endif /* CONFIG_ARCH_USES_HIGH_VMA_FLAGS */
+ #include <asm/processor.h>
+ #include <asm/ioctl.h>
+@@ -154,6 +155,12 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm);
+ static unsigned long long kvm_createvm_count;
+ static unsigned long long kvm_active_vms;
  
- #ifdef CONFIG_ARCH_HAS_PKEYS
-@@ -342,7 +344,11 @@ extern unsigned int kobjsize(const void *objp);
- # define VM_MAPPED_COPY	VM_ARCH_1	/* T if mapped copy of data (nommu mmap) */
- #endif
++void *kvm_map_page_atomic(struct page *page);
++void kvm_unmap_page_atomic(void *vaddr);
++
++int kvm_init_protected_memory(void);
++void kvm_exit_protected_memory(void);
++
+ int __kvm_protect_memory(unsigned long start, unsigned long end, bool protect);
  
-+#if defined(CONFIG_X86_64) && defined(CONFIG_KVM)
-+#define VM_KVM_PROTECTED VM_HIGH_ARCH_5
-+#else
- #define VM_KVM_PROTECTED 0
-+#endif
+ __weak void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+@@ -2329,6 +2336,7 @@ int copy_from_guest(void *data, unsigned long hva, int len, bool protected)
+ 	int offset = offset_in_page(hva);
+ 	struct page *page;
+ 	int npages, seg;
++	void *vaddr;
  
- #ifndef VM_GROWSUP
- # define VM_GROWSUP	VM_NONE
+ 	if (!protected)
+ 		return __copy_from_user(data, (void __user *)hva, len);
+@@ -2341,7 +2349,11 @@ int copy_from_guest(void *data, unsigned long hva, int len, bool protected)
+ 		npages = get_user_pages_unlocked(hva, 1, &page, FOLL_KVM);
+ 		if (npages != 1)
+ 			return -EFAULT;
+-		memcpy(data, page_address(page) + offset, seg);
++
++		vaddr = kvm_map_page_atomic(page);
++		memcpy(data, vaddr + offset, seg);
++		kvm_unmap_page_atomic(vaddr);
++
+ 		put_page(page);
+ 		len -= seg;
+ 		hva += seg;
+@@ -2356,6 +2368,7 @@ int copy_to_guest(unsigned long hva, const void *data, int len, bool protected)
+ 	int offset = offset_in_page(hva);
+ 	struct page *page;
+ 	int npages, seg;
++	void *vaddr;
+ 
+ 	if (!protected)
+ 		return __copy_to_user((void __user *)hva, data, len);
+@@ -2369,7 +2382,11 @@ int copy_to_guest(unsigned long hva, const void *data, int len, bool protected)
+ 						 FOLL_WRITE | FOLL_KVM);
+ 		if (npages != 1)
+ 			return -EFAULT;
+-		memcpy(page_address(page) + offset, data, seg);
++
++		vaddr = kvm_map_page_atomic(page);
++		memcpy(vaddr + offset, data, seg);
++		kvm_unmap_page_atomic(vaddr);
++
+ 		put_page(page);
+ 		len -= seg;
+ 		hva += seg;
+@@ -4945,6 +4962,10 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 	if (r)
+ 		goto out_free;
+ 
++	if (IS_ENABLED(CONFIG_HAVE_KVM_PROTECTED_MEMORY) &&
++	    kvm_init_protected_memory())
++		goto out_unreg;
++
+ 	kvm_chardev_ops.owner = module;
+ 	kvm_vm_fops.owner = module;
+ 	kvm_vcpu_fops.owner = module;
+@@ -4968,6 +4989,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 	return 0;
+ 
+ out_unreg:
++	kvm_exit_protected_memory();
+ 	kvm_async_pf_deinit();
+ out_free:
+ 	kmem_cache_destroy(kvm_vcpu_cache);
+@@ -4989,6 +5011,7 @@ EXPORT_SYMBOL_GPL(kvm_init);
+ 
+ void kvm_exit(void)
+ {
++	kvm_exit_protected_memory();
+ 	debugfs_remove_recursive(kvm_debugfs_dir);
+ 	misc_deregister(&kvm_dev);
+ 	kmem_cache_destroy(kvm_vcpu_cache);
+diff --git a/virt/lib/mem_protected.c b/virt/lib/mem_protected.c
+index 0b01dd74f29c..1dfe82534242 100644
+--- a/virt/lib/mem_protected.c
++++ b/virt/lib/mem_protected.c
+@@ -5,6 +5,100 @@
+ #include <linux/vmalloc.h>
+ #include <asm/tlbflush.h>
+ 
++static pte_t **guest_map_ptes;
++static struct vm_struct *guest_map_area;
++
++void *kvm_map_page_atomic(struct page *page)
++{
++	pte_t *pte;
++	void *vaddr;
++
++	preempt_disable();
++	pte = guest_map_ptes[smp_processor_id()];
++	vaddr = guest_map_area->addr + smp_processor_id() * PAGE_SIZE;
++	set_pte(pte, mk_pte(page, PAGE_KERNEL));
++	return vaddr;
++}
++EXPORT_SYMBOL_GPL(kvm_map_page_atomic);
++
++void kvm_unmap_page_atomic(void *vaddr)
++{
++	pte_t *pte = guest_map_ptes[smp_processor_id()];
++	set_pte(pte, __pte(0));
++	flush_tlb_one_kernel((unsigned long)vaddr);
++	preempt_enable();
++}
++EXPORT_SYMBOL_GPL(kvm_unmap_page_atomic);
++
++int kvm_init_protected_memory(void)
++{
++	guest_map_ptes = kmalloc_array(num_possible_cpus(),
++				       sizeof(pte_t *), GFP_KERNEL);
++	if (!guest_map_ptes)
++		return -ENOMEM;
++
++	guest_map_area = alloc_vm_area(PAGE_SIZE * num_possible_cpus(),
++				       guest_map_ptes);
++	if (!guest_map_ptes) {
++		kfree(guest_map_ptes);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(kvm_init_protected_memory);
++
++void kvm_exit_protected_memory(void)
++{
++	if (guest_map_area)
++		free_vm_area(guest_map_area);
++	if (guest_map_ptes)
++		kfree(guest_map_ptes);
++}
++EXPORT_SYMBOL_GPL(kvm_exit_protected_memory);
++
++static int adjust_direct_mapping_pte_range(pmd_t *pmd, unsigned long addr,
++					   unsigned long end,
++					   struct mm_walk *walk)
++{
++	bool protect = (bool)walk->private;
++	pte_t *pte;
++	struct page *page;
++
++	if (pmd_trans_huge(*pmd)) {
++		page = pmd_page(*pmd);
++		if (is_huge_zero_page(page))
++			return 0;
++		VM_BUG_ON_PAGE(total_mapcount(page) != 1, page);
++		/* XXX: Would it fail with direct device assignment? */
++		VM_BUG_ON_PAGE(page_count(page) != 1, page);
++		kernel_map_pages(page, HPAGE_PMD_NR, !protect);
++		return 0;
++	}
++
++	pte = pte_offset_map(pmd, addr);
++	for (; addr != end; pte++, addr += PAGE_SIZE) {
++		pte_t entry = *pte;
++
++		if (!pte_present(entry))
++			continue;
++
++		if (is_zero_pfn(pte_pfn(entry)))
++			continue;
++
++		page = pte_page(entry);
++
++		VM_BUG_ON_PAGE(page_mapcount(page) != 1, page);
++		kernel_map_pages(page, 1, !protect);
++	}
++
++	return 0;
++}
++
++static const struct mm_walk_ops adjust_direct_mapping_ops = {
++	.pmd_entry      = adjust_direct_mapping_pte_range,
++};
++
+ int __kvm_protect_memory(unsigned long start, unsigned long end, bool protect)
+ {
+ 	struct mm_struct *mm = current->mm;
+@@ -50,6 +144,13 @@ int __kvm_protect_memory(unsigned long start, unsigned long end, bool protect)
+ 		if (ret)
+ 			goto out;
+ 
++		if (vma_is_anonymous(vma)) {
++			ret = walk_page_range_novma(mm, start, tmp,
++						    &adjust_direct_mapping_ops, NULL,
++						    (void *) protect);
++			if (ret)
++				goto out;
++		}
+ next:
+ 		start = tmp;
+ 		if (start < prev->vm_end)
 -- 
 2.26.2
 
