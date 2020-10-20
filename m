@@ -2,46 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8FFE293C49
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 14:55:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31997293D36
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 15:20:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406765AbgJTMzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 08:55:11 -0400
-Received: from mga11.intel.com ([192.55.52.93]:61136 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406738AbgJTMzL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 08:55:11 -0400
-IronPort-SDR: w+m/A2IeWqp688OOwvjSQlOtEB7rj1cLQ5ibziZfDWkRZjQo4RMyjriw24GJXVANHAiRuOqsJK
- eL2kKpwFk+bQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9779"; a="163710334"
-X-IronPort-AV: E=Sophos;i="5.77,397,1596524400"; 
-   d="scan'208";a="163710334"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2020 05:55:10 -0700
-IronPort-SDR: +Rp7LwkLyTNLzcyhE2PJNGsy/abJyagxG3IK4vs2o5FUnk/MOk9aslHpAM01l3mg4LXtKhsFZU
- oWAEHocBHarQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,397,1596524400"; 
-   d="scan'208";a="301719903"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga007.fm.intel.com with ESMTP; 20 Oct 2020 05:55:05 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id B87B6377; Tue, 20 Oct 2020 15:55:04 +0300 (EEST)
-Date:   Tue, 20 Oct 2020 15:55:04 +0300
-From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        id S2407438AbgJTNU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 09:20:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22653 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2407064AbgJTNU1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 09:20:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603200026;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hjGhG7pQFy3+PaQQQ6jOV7FVy3IgvsbvzMpmnkAsMLo=;
+        b=RWSFtrIeegewprED9lhkCu8WcpW+R5JeA6/MTINjtOLcxKxByHdvdgMqCCGGwEuyLTHCj6
+        N+Fr1KmQw8FBj4CrTGMMG66CeZjWQKTyVY7YJMguLq/zPbX8GAdxxuNbd4vVnOX53eY0vA
+        mQ9SW2UFLpONvwvPMECUrAzPd+sgxW0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-568-6nnLZCC-MlSWKvHuC5o9ew-1; Tue, 20 Oct 2020 09:20:22 -0400
+X-MC-Unique: 6nnLZCC-MlSWKvHuC5o9ew-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7754B803F49;
+        Tue, 20 Oct 2020 13:20:19 +0000 (UTC)
+Received: from [10.36.114.141] (ovpn-114-141.ams2.redhat.com [10.36.114.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B6AA61002C0E;
+        Tue, 20 Oct 2020 13:20:14 +0000 (UTC)
+Subject: Re: [RFCv2 15/16] KVM: Unmap protected pages from direct mapping
+From:   David Hildenbrand <david@redhat.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        David Rientjes <rientjes@google.com>,
+        Mike Rapoport <rppt@linux.ibm.com>
+Cc:     David Rientjes <rientjes@google.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Kees Cook <keescook@chromium.org>,
         Will Drewry <wad@chromium.org>,
@@ -50,94 +55,60 @@ Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
         Liran Alon <liran.alon@oracle.com>,
         Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
         kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFCv2 11/16] KVM: Protected memory extension
-Message-ID: <20201020125504.xadmnhpf3pu4uva7@black.fi.intel.com>
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
- <20201020061859.18385-12-kirill.shutemov@linux.intel.com>
- <20201020071701.GV2611@hirez.programming.kicks-ass.net>
+ <20201020061859.18385-16-kirill.shutemov@linux.intel.com>
+ <f153ef1a-a758-dec7-b39c-9990aac9d653@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <2759b4bf-e1e3-d006-7d86-78a40348269d@redhat.com>
+Date:   Tue, 20 Oct 2020 15:20:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201020071701.GV2611@hirez.programming.kicks-ass.net>
+In-Reply-To: <f153ef1a-a758-dec7-b39c-9990aac9d653@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 20, 2020 at 09:17:01AM +0200, Peter Zijlstra wrote:
-> On Tue, Oct 20, 2020 at 09:18:54AM +0300, Kirill A. Shutemov wrote:
-> > +int __kvm_protect_memory(unsigned long start, unsigned long end, bool protect)
-> > +{
-> > +	struct mm_struct *mm = current->mm;
-> > +	struct vm_area_struct *vma, *prev;
-> > +	int ret;
-> > +
-> > +	if (mmap_write_lock_killable(mm))
-> > +		return -EINTR;
-> > +
-> > +	ret = -ENOMEM;
-> > +	vma = find_vma(current->mm, start);
-> > +	if (!vma)
-> > +		goto out;
-> > +
-> > +	ret = -EINVAL;
-> > +	if (vma->vm_start > start)
-> > +		goto out;
-> > +
-> > +	if (start > vma->vm_start)
-> > +		prev = vma;
-> > +	else
-> > +		prev = vma->vm_prev;
-> > +
-> > +	ret = 0;
-> > +	while (true) {
-> > +		unsigned long newflags, tmp;
-> > +
-> > +		tmp = vma->vm_end;
-> > +		if (tmp > end)
-> > +			tmp = end;
-> > +
-> > +		newflags = vma->vm_flags;
-> > +		if (protect)
-> > +			newflags |= VM_KVM_PROTECTED;
-> > +		else
-> > +			newflags &= ~VM_KVM_PROTECTED;
-> > +
-> > +		/* The VMA has been handled as part of other memslot */
-> > +		if (newflags == vma->vm_flags)
-> > +			goto next;
-> > +
-> > +		ret = mprotect_fixup(vma, &prev, start, tmp, newflags);
-> > +		if (ret)
-> > +			goto out;
-> > +
-> > +next:
-> > +		start = tmp;
-> > +		if (start < prev->vm_end)
-> > +			start = prev->vm_end;
-> > +
-> > +		if (start >= end)
-> > +			goto out;
-> > +
-> > +		vma = prev->vm_next;
-> > +		if (!vma || vma->vm_start != start) {
-> > +			ret = -ENOMEM;
-> > +			goto out;
-> > +		}
-> > +	}
-> > +out:
-> > +	mmap_write_unlock(mm);
-> > +	return ret;
-> > +}
-> > +EXPORT_SYMBOL_GPL(__kvm_protect_memory);
+On 20.10.20 14:18, David Hildenbrand wrote:
+> On 20.10.20 08:18, Kirill A. Shutemov wrote:
+>> If the protected memory feature enabled, unmap guest memory from
+>> kernel's direct mappings.
 > 
-> Since migration will be disabled after this; should the above not (at
-> the very least) force compaction before proceeding to lock the pages in?
+> Gah, ugly. I guess this also defeats compaction, swapping, ... oh gosh.
+> As if all of the encrypted VM implementations didn't bring us enough
+> ugliness already (SEV extensions also don't support reboots, but can at
+> least kexec() IIRC).
+> 
+> Something similar is done with secretmem [1]. And people don't seem to
+> like fragmenting the direct mapping (including me).
+> 
+> [1] https://lkml.kernel.org/r/20200924132904.1391-1-rppt@kernel.org
+> 
 
-Migration has to be implemented instead, before we hit upstream.
+I just thought "hey, we might have to replace pud/pmd mappings by page
+tables when calling kernel_map_pages", this can fail with -ENOMEM, why
+isn't there proper error handling.
 
-BTW, VMs with direct device assignment pins all guest memory today. So
-it's not something new in the virtualization world.
+Then I dived into __kernel_map_pages() which states:
+
+"The return value is ignored as the calls cannot fail. Large pages for
+identity mappings are not used at boot time and hence no memory
+allocations during large page split."
+
+I am probably missing something important, but how is calling
+kernel_map_pages() safe *after* booting?! I know we use it for
+debug_pagealloc(), but using it in a production-ready feature feels
+completely irresponsible. What am I missing?
+
 
 -- 
- Kirill A. Shutemov
+Thanks,
+
+David / dhildenb
+
