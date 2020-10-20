@@ -2,154 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6A642934C3
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 08:19:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D90522934E9
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 08:23:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403952AbgJTGTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 02:19:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48590 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403895AbgJTGTO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 02:19:14 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C825C0613D1
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:14 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id m20so746980ljj.5
-        for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=P1ZYdJ+48hESkuHQ/ZsaZHpWMaHGaWqk6TiKgGiH9uk=;
-        b=d2jXg+GKr/U9ky+di6Pjj65rEOr97pO3dwozUnliTUnv1Qv9Q2TuAgC8IEHLG/EQuw
-         DKuDYgSdeHQq8jTcfxrBKvbvkxwxjRrJq52cWR0Ir5bIH8OSpPK5LJmwPA7McOQwyCzV
-         NDh+ERmP7yjlgXPEJgE/9Feow0m/be5I7IM+IsuJCjiMYomnibh63f9Yxm1vQafnbBAZ
-         BcjvCzWRgWWr+i2/FDzXt0Mh46L9UL9hcL2QLTqh7wNOk6YCuKFryCJfrne2iiMTwj7u
-         feCZU1reswc+eprlM23CpudlU/4fEiqdOYZSNVIh9qV2uyktYuq6LDH4AvTI1bQwcB40
-         e4Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=P1ZYdJ+48hESkuHQ/ZsaZHpWMaHGaWqk6TiKgGiH9uk=;
-        b=fOUG5zvE3zaUJHV2dDAKddpQ9ij9zAEBlxd+JcfXfE6XgI1ZMVbLwwLkJlHCHsYCGH
-         acCjzZJGa0eapzn+uN9YtegSMCtEfc+GInAsXY/c7Y9OvhJr99bh+qCVmbnBaKc/VoNQ
-         u/R5Y56lYmAerY7vEZ5ZOSXkayjBVs7hOgzRNLtP8VLpqNw5u+ivZQE8XxO8w+pwbh7D
-         iOFEdBtmyuXTFbdfGrVf2N37Cy0mgWdRW957bjoIerJqwJdfeXQVM+yixm8joNDIqR7N
-         q9ay50lW5Qrjt+Icqfsj6T9IjJM7WQ9fKHnAnY58C+BV8r6aX1mA9wKtOCmrnra9L+9i
-         CBNA==
-X-Gm-Message-State: AOAM533Kw4Ry/06WnulH2sNUZsqcSODh28Clayn2zL3zqVW0X8dhibG9
-        VTvlOApkglxOoD7l1U5WwgF5PA==
-X-Google-Smtp-Source: ABdhPJx4OTPXoR7QAQvHaAogNS+nSnlzEId+sAo8GQE1S8lBt0CtaocrLea19BD5ZB7UVB4nJWmOzw==
-X-Received: by 2002:a2e:b5d7:: with SMTP id g23mr535144ljn.61.1603174752853;
-        Mon, 19 Oct 2020 23:19:12 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id a7sm139248lfl.2.2020.10.19.23.19.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2020 23:19:09 -0700 (PDT)
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 3C9F0102F6F; Tue, 20 Oct 2020 09:19:02 +0300 (+03)
-To:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
+        id S2403931AbgJTGXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 02:23:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46071 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727772AbgJTGXb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 02:23:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603175009;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SYBBFaywtQ+WHSPP8mqHtlCXgzq0Xbm6CyO640a+IUg=;
+        b=ZgYnZwNHN5zFaq8R/fEilz6BTb9ik2PsSD+6T8sEx//L7IlAi26gcLNbmCBqyfuMobcGjG
+        AmXF+22fZ/iHpTIersjFke7I3u/X+DPecTAngdgSE7fPRk/bO4YMowybu/rlIchtBFibqZ
+        S3i6nZjJ2GxrF1CjrpCEq9HOmdw3Jm8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-589-v9xI-lB8Obado3FWNetisw-1; Tue, 20 Oct 2020 02:23:27 -0400
+X-MC-Unique: v9xI-lB8Obado3FWNetisw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E63D85EE94;
+        Tue, 20 Oct 2020 06:23:24 +0000 (UTC)
+Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A389461983;
+        Tue, 20 Oct 2020 06:23:16 +0000 (UTC)
+Subject: Re: [PATCH 1/2] KVM: not register a IRQ bypass producer if
+ unsupported or disabled
+To:     Zhenzhong Duan <zhenzhong.duan@gmail.com>,
         linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFCv2 16/16] mm: Do not use zero page for VM_KVM_PROTECTED VMAs
-Date:   Tue, 20 Oct 2020 09:18:59 +0300
-Message-Id: <20201020061859.18385-17-kirill.shutemov@linux.intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
-References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Cc:     netdev@vger.kernel.org, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, mst@redhat.com
+References: <20201019090657.131-1-zhenzhong.duan@gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <7ef3b498-bdc5-4a3d-d23b-ad58205ae1b7@redhat.com>
+Date:   Tue, 20 Oct 2020 14:23:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20201019090657.131-1-zhenzhong.duan@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Presence of zero pages in the mapping would disclose content of the
-mapping. Don't use them if KVM memory protection is enabled.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- arch/s390/include/asm/pgtable.h | 2 +-
- include/linux/mm.h              | 4 ++--
- mm/huge_memory.c                | 3 +--
- mm/memory.c                     | 3 +--
- 4 files changed, 5 insertions(+), 7 deletions(-)
+On 2020/10/19 下午5:06, Zhenzhong Duan wrote:
+> If Post interrupt is disabled due to hardware limit or forcely disabled
+> by "intremap=nopost" parameter, return -EINVAL so that the legacy mode IRQ
+> isn't registered as IRQ bypass producer.
 
-diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
-index b55561cc8786..72ca3b3f04cb 100644
---- a/arch/s390/include/asm/pgtable.h
-+++ b/arch/s390/include/asm/pgtable.h
-@@ -543,7 +543,7 @@ static inline int mm_alloc_pgste(struct mm_struct *mm)
-  * In the case that a guest uses storage keys
-  * faults should no longer be backed by zero pages
-  */
--#define mm_forbids_zeropage mm_has_pgste
-+#define vma_forbids_zeropage(vma) mm_has_pgste(vma->vm_mm)
- static inline int mm_uses_skeys(struct mm_struct *mm)
- {
- #ifdef CONFIG_PGSTE
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 74efc51e63f0..ee713b7c2819 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -130,8 +130,8 @@ extern int mmap_rnd_compat_bits __read_mostly;
-  * s390 does this to prevent multiplexing of hardware bits
-  * related to the physical page in case of virtualization.
-  */
--#ifndef mm_forbids_zeropage
--#define mm_forbids_zeropage(X)	(0)
-+#ifndef vma_forbids_zeropage
-+#define vma_forbids_zeropage(vma) vma_is_kvm_protected(vma)
- #endif
- 
- /*
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 40974656cb43..383614b24c4f 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -709,8 +709,7 @@ vm_fault_t do_huge_pmd_anonymous_page(struct vm_fault *vmf)
- 		return VM_FAULT_OOM;
- 	if (unlikely(khugepaged_enter(vma, vma->vm_flags)))
- 		return VM_FAULT_OOM;
--	if (!(vmf->flags & FAULT_FLAG_WRITE) &&
--			!mm_forbids_zeropage(vma->vm_mm) &&
-+	if (!(vmf->flags & FAULT_FLAG_WRITE) && !vma_forbids_zeropage(vma) &&
- 			transparent_hugepage_use_zero_page()) {
- 		pgtable_t pgtable;
- 		struct page *zero_page;
-diff --git a/mm/memory.c b/mm/memory.c
-index e28bd5f902a7..9907ffe00490 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -3495,8 +3495,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
- 		return 0;
- 
- 	/* Use the zero-page for reads */
--	if (!(vmf->flags & FAULT_FLAG_WRITE) &&
--			!mm_forbids_zeropage(vma->vm_mm)) {
-+	if (!(vmf->flags & FAULT_FLAG_WRITE) && !vma_forbids_zeropage(vma)) {
- 		entry = pte_mkspecial(pfn_pte(my_zero_pfn(vmf->address),
- 						vma->vm_page_prot));
- 		vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd,
--- 
-2.26.2
+
+Is there any side effect if it was still registered?
+
+
+>
+> With this change, below message is printed:
+> "vfio-pci 0000:db:00.0: irq bypass producer (token 0000000060c8cda5) registration fails: -22"
+
+
+I may miss something, but the patch only touches vhost-vDPA instead of VFIO?
+
+Thanks
+
+
+>
+> ..which also hints us if a vfio or vdpa device works in PI mode or legacy
+> remapping mode.
+>
+> Add a print to vdpa code just like what vfio_msi_set_vector_signal() does.
+>
+> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@gmail.com>
+> ---
+>   arch/x86/kvm/svm/avic.c | 3 +--
+>   arch/x86/kvm/vmx/vmx.c  | 5 ++---
+>   drivers/vhost/vdpa.c    | 5 +++++
+>   3 files changed, 8 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index ac830cd..316142a 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -814,7 +814,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>   
+>   	if (!kvm_arch_has_assigned_device(kvm) ||
+>   	    !irq_remapping_cap(IRQ_POSTING_CAP))
+> -		return 0;
+> +		return ret;
+>   
+>   	pr_debug("SVM: %s: host_irq=%#x, guest_irq=%#x, set=%#x\n",
+>   		 __func__, host_irq, guest_irq, set);
+> @@ -899,7 +899,6 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>   		}
+>   	}
+>   
+> -	ret = 0;
+>   out:
+>   	srcu_read_unlock(&kvm->irq_srcu, idx);
+>   	return ret;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f0a9954..1fed6d6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7716,12 +7716,12 @@ static int vmx_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>   	struct kvm_lapic_irq irq;
+>   	struct kvm_vcpu *vcpu;
+>   	struct vcpu_data vcpu_info;
+> -	int idx, ret = 0;
+> +	int idx, ret = -EINVAL;
+>   
+>   	if (!kvm_arch_has_assigned_device(kvm) ||
+>   		!irq_remapping_cap(IRQ_POSTING_CAP) ||
+>   		!kvm_vcpu_apicv_active(kvm->vcpus[0]))
+> -		return 0;
+> +		return ret;
+>   
+>   	idx = srcu_read_lock(&kvm->irq_srcu);
+>   	irq_rt = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
+> @@ -7787,7 +7787,6 @@ static int vmx_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>   		}
+>   	}
+>   
+> -	ret = 0;
+>   out:
+>   	srcu_read_unlock(&kvm->irq_srcu, idx);
+>   	return ret;
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 62a9bb0..b20060a 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -107,6 +107,11 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
+>   	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+>   	vq->call_ctx.producer.irq = irq;
+>   	ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+> +	if (unlikely(ret))
+> +		dev_info(&vdpa->dev,
+> +		"irq bypass producer (token %p) registration fails: %d\n",
+> +		vq->call_ctx.producer.token, ret);
+> +
+>   	spin_unlock(&vq->call_ctx.ctx_lock);
+>   }
+>   
 
