@@ -2,120 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BC712937B9
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 11:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68ADC2937E5
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 11:20:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392609AbgJTJNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 05:13:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32563 "EHLO
+        id S2392750AbgJTJUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 05:20:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42735 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392601AbgJTJNO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 05:13:14 -0400
+        by vger.kernel.org with ESMTP id S1730684AbgJTJUk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Oct 2020 05:20:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603185193;
+        s=mimecast20190719; t=1603185639;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oOEy9aT9NtMMFJrshH7arUKD1nGqLIA4h6tvbyg+cCQ=;
-        b=LCJZi89OrGNkFFIHRJT7lbuv04P3ML8t+Pe2kekJ6UiDtw25zVTe9Wnp2HJdXqTMxbcXQ+
-        v+9O7rZBg/SQlEbJLiimyh3BrThehMSkK/Pj/uZdvnYowHMxJ4mYMRWtH0RAkkKC+gAZh0
-        yvvUK+JEpzoh06eIeLINPyUXFwDjcB8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-gBl5e1fWNqGKDgmv08LG4g-1; Tue, 20 Oct 2020 05:13:11 -0400
-X-MC-Unique: gBl5e1fWNqGKDgmv08LG4g-1
-Received: by mail-wr1-f70.google.com with SMTP id k14so554397wrd.6
-        for <kvm@vger.kernel.org>; Tue, 20 Oct 2020 02:13:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oOEy9aT9NtMMFJrshH7arUKD1nGqLIA4h6tvbyg+cCQ=;
-        b=XObg3QxAJ9XDVfvfMAVsGRZe0yUk7Di9/SX9UwS6PeLwy/f2rNR3D+hrlv12/FR/hN
-         pn4vPo40VQPma799Xw5iVygNhq8NtNVZrfsLXZ5Mp3qFv/GzfNAP55R0qN3gBeH7E7um
-         uIFHBJ195X1ckCRNGr7Ww+ocUgg//TRJ7j0WVEOiBTtmaS4XnN0A/lwtnwLa2WZJxJvc
-         QmmdNIIlztKyx8XIbfmESppN5GYiyc7fv++hscRmhloGu2BD4kGsvu/bam9RD8PEf0Fb
-         iTybSJ8SDmriozQWNvDyEXkAVGY+pNIU67QXcFtLdBPuO+rEkRxqlGZA5Q6MbPr4oJ9P
-         e6lA==
-X-Gm-Message-State: AOAM530YShJjr5QD1PMZo2X+VxkSOqc4dc7W02HEdpge6j0EDH3yveph
-        VSaKu9i1rKUp7pbnFZUHvRZNx0wPSHMh8BaJGyirbGe7dZcP0MwhHQcK7taD3vhNEvw4FlcYGta
-        OZMu8bt3/Mzom
-X-Received: by 2002:a1c:7f14:: with SMTP id a20mr1869314wmd.95.1603185190639;
-        Tue, 20 Oct 2020 02:13:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYLeXYXKL0aEWIz3HPFIHkZmIWRXrsEo41r73AgTQ1N4YxYXVrI7Ur44rryYm+YqVyWuwqUA==
-X-Received: by 2002:a1c:7f14:: with SMTP id a20mr1869301wmd.95.1603185190434;
-        Tue, 20 Oct 2020 02:13:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id j7sm1942145wrn.81.2020.10.20.02.13.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Oct 2020 02:13:09 -0700 (PDT)
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>
-References: <20200930041659.28181-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 0/5] KVM: x86: Handle reserved CR4 bit interception in VMX
-Message-ID: <8bf5e849-3a7d-a30a-061b-0a67a57de865@redhat.com>
-Date:   Tue, 20 Oct 2020 11:13:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        bh=HZrTt3RPheBVTMDXVvDc/OXdQNtnIu9P2NzODgtsSV0=;
+        b=OfvaBT0PZZS7/kQrFN4iChq5kmUH/pPQbdz0rKlhmKq0whLVC25jFl3fNSEVplNh+KwJ4P
+        YQu3P6NZcKExLx38gEFPwuKRk0IfYT54YnxW6NG9kQQR+dL/Ec4ttzsq/lkwwKb5wPi3Un
+        /E6ZHyi57an3e+LwX4HNUGnBSHuJkP0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-570-aRgYslQlN8CC3xuq29C9PA-1; Tue, 20 Oct 2020 05:20:35 -0400
+X-MC-Unique: aRgYslQlN8CC3xuq29C9PA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 436289CC1C;
+        Tue, 20 Oct 2020 09:20:33 +0000 (UTC)
+Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 05AEC6EF6E;
+        Tue, 20 Oct 2020 09:19:57 +0000 (UTC)
+Subject: Re: (proposal) RE: [PATCH v7 00/16] vfio: expose virtual Shared
+ Virtual Addressing to VMs
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+Cc:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <MWHPR11MB1645CFB0C594933E92A844AC8C070@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <45faf89a-0a40-2a7a-0a76-d7ba76d0813b@redhat.com>
+ <MWHPR11MB1645CF252CF3493F4A9487508C050@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <9c10b681-dd7e-2e66-d501-7fcc3ff1207a@redhat.com>
+ <MWHPR11MB164501E77BDB0D5AABA8487F8C020@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <21a66a96-4263-7df2-3bec-320e6f38a9de@redhat.com>
+ <DM5PR11MB143531293E4D65028801FDA1C3020@DM5PR11MB1435.namprd11.prod.outlook.com>
+ <a43d47f5-320b-ef60-e2be-a797942ea9f2@redhat.com>
+ <DM5PR11MB1435D55CAE858CC8EC2AFA47C31F0@DM5PR11MB1435.namprd11.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <6e478a9e-2051-c0cd-b6fd-624ff5ef0f53@redhat.com>
+Date:   Tue, 20 Oct 2020 17:19:55 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200930041659.28181-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <DM5PR11MB1435D55CAE858CC8EC2AFA47C31F0@DM5PR11MB1435.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/20 06:16, Sean Christopherson wrote:
-> This series stems from Lai's RFC patches to intercept LA57 and let the
-> guest own FSGSBASE[*].  Discussion and inspection revealed that KVM does
-> not handle the case where LA57 is supported in hardware but not exposed to
-> the guest.  This is actually true for all CR4 bits, but LA57 is currently
-> the only bit that can be reserved and also owned by the guest.  I have
-> a unit test for this that I'll post separately.
-> 
-> Intercepting LA57 was by far the easiest fix for the immedidate bug, and
-> is likely the right change in the long term as there's no justification
-> for letting the guest own LA57.
-> 
-> The middle three patches adjust VMX's CR4 guest/host mask to intercept
-> reserved bits.  This required reworking CPUID updates to also refresh said
-> mask at the correct time.
-> 
-> The last past is Lai's, which let's the guest own FSGSBASE.  This depends
-> on the reserved bit handling being in place.
-> 
-> Ran everything through unit tests, and ran the kernel's FSGSBASE selftests
-> in a VM.
-> 
-> [*] https://lkml.kernel.org/r/20200928083047.3349-1-jiangshanlai@gmail.com
-> 
-> Lai Jiangshan (2):
->   KVM: x86: Intercept LA57 to inject #GP fault when it's reserved
->   KVM: x86: Let the guest own CR4.FSGSBASE
-> 
-> Sean Christopherson (3):
->   KVM: x86: Invoke vendor's vcpu_after_set_cpuid() after all common
->     updates
->   KVM: x86: Move call to update_exception_bitmap() into VMX code
->   KVM: VMX: Intercept guest reserved CR4 bits to inject #GP fault
-> 
->  arch/x86/kvm/cpuid.c          |  6 +++---
->  arch/x86/kvm/kvm_cache_regs.h |  2 +-
->  arch/x86/kvm/vmx/vmx.c        | 18 +++++++++++++-----
->  3 files changed, 17 insertions(+), 9 deletions(-)
-> 
+Hi Yi:
 
-Queued, thanks.
+On 2020/10/20 下午4:19, Liu, Yi L wrote:
+>> Yes, but since PASID is a global identifier now, I think kernel should
+>> track the a device list per PASID?
+> We have such track. It's done in iommu driver. You can refer to the
+> struct intel_svm. PASID is a global identifier, but it doesn’t affect that
+> the PASID table is per-device.
+>
+>> So for such binding, PASID should be
+>> sufficient for uAPI.
+> not quite get it. PASID may be bound to multiple devices, how do
+> you figure out the target device if you don’t provide such info.
 
-Paolo
+
+I may miss soemthing but is there any reason that userspace need to 
+figure out the target device? PASID is about address space not a 
+specific device I think.
+
+
+>
+>>>>> The binding request is initiated by the virtual IOMMU, when capturing
+>>>>> guest attempt of binding page table to a virtual PASID entry for a
+>>>>> given device.
+>>>> And for L2 page table programming, if PASID is use by both e.g VFIO and
+>>>> vDPA, user need to choose one of uAPI to build l2 mappings?
+>>> for L2 page table mappings, it's done by VFIO MAP/UNMAP. for vdpa, I guess
+>>> it is tlb flush. so you are right. Keeping L1/L2 page table management in
+>>> a single uAPI set is also a reason for my current series which extends VFIO
+>>> for L1 management.
+>> I'm afraid that would introduce confusing to userspace. E.g:
+>>
+>> 1) when having only vDPA device, it uses vDPA uAPI to do l2 management
+>> 2) when vDPA shares PASID with VFIO, it will use VFIO uAPI to do the l2
+>> management?
+> I think vDPA will still use its own l2 for the l2 mappings. not sure why you
+> need vDPA use VFIO's l2 management. I don't think it is the case.
+
+
+See previous discussion with Kevin. If I understand correctly, you 
+expect a shared L2 table if vDPA and VFIO device are using the same PASID.
+
+In this case, if l2 is still managed separately, there will be 
+duplicated request of map and unmap.
+
+Thanks
+
+
+>
+> Regards,
+> Yi Liu
+>
 
