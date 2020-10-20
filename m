@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B84C2934C4
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 08:19:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CA0C2934C8
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 08:19:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403935AbgJTGTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 02:19:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
+        id S2403916AbgJTGTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 02:19:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403885AbgJTGTN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 02:19:13 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 290F4C061755
+        with ESMTP id S2403899AbgJTGTP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Oct 2020 02:19:15 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A79C0613D6
         for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:13 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id l28so649951lfp.10
+Received: by mail-lj1-x242.google.com with SMTP id m16so739600ljo.6
         for <kvm@vger.kernel.org>; Mon, 19 Oct 2020 23:19:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=YqXoyWzrpggXifhp2ZZvkYQN13pzHcgcJE84Cdo/0fA=;
-        b=OvuEbAZWg3vpu8+LZy777g08/QYkrpy0M/C3pJJUVn5405klpLJKvddwUm/X8YG7sp
-         GyOX+PH1FyvsxFbYCY9z84kfL6l126OrW4VmCKmakO3y1HTg9VEyY02PYG1PEge7/Q8r
-         z2j50GS5eoRh2cLyya1+OFS64Xwz8sEdMr3uN1ZnQBxMTBotnH7o/PoKd8pHThWyvsn+
-         uRCnDYRMb9t5l1XcGamPtITidQt8bkWtkHpL0SGaWPxfwx4Wwu0AkhnmRi2RXvyTfx5A
-         MJ9bSUBb3CHAqNR0w2ov2Jg1ExbFBpFv7W9z60KdpSn3fpPMRxCujKX9CYht0WBYmcls
-         MjlA==
+        bh=PNKc4RJ1Oy7aH+IpRJ4FjlsZeZXXYZyCX4/DKrWCkeg=;
+        b=z9xv6k6sZbLfbo5Th3nyLshepFClZRI0+N5oprtMQmWqhnSeoh90hc68/VX1S+scUd
+         GVZs5ClxNa+3LIz6eS1vgrrEdz0o6bOJdOy1QkBv0kFX+Ewh5FpCDJ+5QIrL2UKh6kxW
+         Wz4XxkSFG3/2Q66q6sm5t5N8x2+E8Pv7J7+Ut6XPcq7kMKGrQMXbO28evVleAOLaQkcX
+         TP2BV3yE+oXe59sGq4UF5BTuVTLfV/uJ25VWM00A+TQrxA1Ts7lhKOQLetxJzOU9UNzC
+         SrpBMhLqFFvnQbKe/Do66wd3KStwZaWiWW14qfqtN649MM1RCLVDfAM8C/ch4Ptwyfsx
+         +PSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=YqXoyWzrpggXifhp2ZZvkYQN13pzHcgcJE84Cdo/0fA=;
-        b=btsLz0ujQQburydyGrxi+fwFoxdySKFRkhsJ8LkaLJd5jwq2/c3dZHAy/D6ipQfbFx
-         xTp7JpDkLAJwB++6iLWL5pYVfhb8nZ5+fnjv8d8cUAH0YaZ7dzxQ6Uftnsnf/5Bcdv/S
-         tS4HEDrh6/hI/bwODAKg4HE+L7Idp2XyfjTprFZmSeXyjy4UBbIgnvOQYbUl6ShIJnjZ
-         JVeguHz40J5LtaRZ2ScdWceCaxDKFQYjly39a9x0eT1daLZ2DGzg52BdfSsQnGvY3EkA
-         y4z4PHXSwxPKLPDZliKO3k0NLCydVqSCFoWN0x6wp+8HV9L9C0gJBE7DLAKOYZvFk4L5
-         cZjA==
-X-Gm-Message-State: AOAM532GqlsRlK/05GQH3LcZosXdUE3iqJwy5znhx7XhdG3wZzzi9n9W
-        +Cu5U+uOHm5DIIFcSZszkYj4xg==
-X-Google-Smtp-Source: ABdhPJx1Za/f8n8gS2Lf4tVPWSC9ysXQk4V29HtHvIrTK/S7VXXVqCjMAeIH20fbfqK12CcIlnQacA==
-X-Received: by 2002:a19:4cd:: with SMTP id 196mr374025lfe.484.1603174751608;
-        Mon, 19 Oct 2020 23:19:11 -0700 (PDT)
+        bh=PNKc4RJ1Oy7aH+IpRJ4FjlsZeZXXYZyCX4/DKrWCkeg=;
+        b=qbbEHdw0HMzdzksPBwEsM7chj14LJ2vlQfsXtB5d14K99+tbhhGWF9Vl7AtfbUenRw
+         lI9JtAh7tCkcU+4XK9qVq7Vzxnw2zkBafRD8jxszoAtR8XZjkIDKHPOlDK/v2/KC+/sh
+         l8lOQNiyGYM5KMnBuJZHQ37vQng6nUSN0XOZbKxPnDLp0YOqHjXkb11VXvQLuUwSBdsr
+         cfUpWeMynRcx3fchJUzmVVJulaeMq7LMmIL0feEpStfWdSQjcq+j5tnohloZ6aXU7EKI
+         SvJQTBHdEispBuU4TK4knWENs/jrGQUfrgJuzQLzQALa2vbBaeoYRaH9nVtOiEa+76Po
+         vPtA==
+X-Gm-Message-State: AOAM532igQpB+j5XaUrgI95+uRcu/a1VIWp8nyK4jx9smCX1fKEOAfRa
+        4oE8WGQKEx99C6+qbL1xeCaZDQ==
+X-Google-Smtp-Source: ABdhPJzcLWyJrdYvk3jPu4M19U2PUZGr+x4SGEcbncAnbwFbLzZv2JMatoIbShM+kdIpd+z7iI19OA==
+X-Received: by 2002:a05:651c:102a:: with SMTP id w10mr471257ljm.64.1603174752041;
+        Mon, 19 Oct 2020 23:19:12 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id o14sm136989lfc.29.2020.10.19.23.19.07
+        by smtp.gmail.com with ESMTPSA id u28sm136394lfi.182.2020.10.19.23.19.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 19 Oct 2020 23:19:09 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 24A6D102F6C; Tue, 20 Oct 2020 09:19:02 +0300 (+03)
+        id 2CAED102F6D; Tue, 20 Oct 2020 09:19:02 +0300 (+03)
 To:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -71,9 +71,9 @@ Cc:     David Rientjes <rientjes@google.com>,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFCv2 13/16] KVM: Rework copy_to/from_guest() to avoid direct mapping
-Date:   Tue, 20 Oct 2020 09:18:56 +0300
-Message-Id: <20201020061859.18385-14-kirill.shutemov@linux.intel.com>
+Subject: [RFCv2 14/16] KVM: Handle protected memory in __kvm_map_gfn()/__kvm_unmap_gfn()
+Date:   Tue, 20 Oct 2020 09:18:57 +0300
+Message-Id: <20201020061859.18385-15-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
 References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
@@ -83,229 +83,339 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We are going unmap guest pages from direct mapping and cannot rely on it
-for guest memory access. Use temporary kmap_atomic()-style mapping to
-access guest memory.
+We cannot access protected pages directly. Use ioremap() to
+create a temporary mapping of the page. The mapping is destroyed
+on __kvm_unmap_gfn().
+
+The new interface gfn_to_pfn_memslot_protected() is used to detect if
+the page is protected.
+
+ioremap_cache_force() is a hack to bypass IORES_MAP_SYSTEM_RAM check in
+the x86 ioremap code. We need a better solution.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- virt/kvm/kvm_main.c      |  27 ++++++++++-
- virt/lib/mem_protected.c | 101 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 126 insertions(+), 2 deletions(-)
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+ arch/x86/include/asm/io.h              |  2 +
+ arch/x86/include/asm/pgtable_types.h   |  1 +
+ arch/x86/kvm/mmu/mmu.c                 |  6 ++-
+ arch/x86/mm/ioremap.c                  | 16 ++++++--
+ include/linux/kvm_host.h               |  3 +-
+ include/linux/kvm_types.h              |  1 +
+ virt/kvm/kvm_main.c                    | 52 +++++++++++++++++++-------
+ 9 files changed, 63 insertions(+), 22 deletions(-)
 
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 38ea396a23d6..8e06cd3f759c 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -590,7 +590,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
+ 	} else {
+ 		/* Call KVM generic code to do the slow-path check */
+ 		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
+-					   writing, &write_ok);
++					   writing, &write_ok, NULL);
+ 		if (is_error_noslot_pfn(pfn))
+ 			return -EFAULT;
+ 		page = NULL;
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 22a677b18695..6fd4e3f9b66a 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -822,7 +822,7 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
+ 
+ 		/* Call KVM generic code to do the slow-path check */
+ 		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
+-					   writing, upgrade_p);
++					   writing, upgrade_p, NULL);
+ 		if (is_error_noslot_pfn(pfn))
+ 			return -EFAULT;
+ 		page = NULL;
+diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
+index c58d52fd7bf2..a3e1bfad1026 100644
+--- a/arch/x86/include/asm/io.h
++++ b/arch/x86/include/asm/io.h
+@@ -184,6 +184,8 @@ extern void __iomem *ioremap_uc(resource_size_t offset, unsigned long size);
+ #define ioremap_uc ioremap_uc
+ extern void __iomem *ioremap_cache(resource_size_t offset, unsigned long size);
+ #define ioremap_cache ioremap_cache
++extern void __iomem *ioremap_cache_force(resource_size_t offset, unsigned long size);
++#define ioremap_cache_force ioremap_cache_force
+ extern void __iomem *ioremap_prot(resource_size_t offset, unsigned long size, unsigned long prot_val);
+ #define ioremap_prot ioremap_prot
+ extern void __iomem *ioremap_encrypted(resource_size_t phys_addr, unsigned long size);
+diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
+index 816b31c68550..4c16a9583786 100644
+--- a/arch/x86/include/asm/pgtable_types.h
++++ b/arch/x86/include/asm/pgtable_types.h
+@@ -147,6 +147,7 @@ enum page_cache_mode {
+ 	_PAGE_CACHE_MODE_UC       = 3,
+ 	_PAGE_CACHE_MODE_WT       = 4,
+ 	_PAGE_CACHE_MODE_WP       = 5,
++	_PAGE_CACHE_MODE_WB_FORCE = 6,
+ 
+ 	_PAGE_CACHE_MODE_NUM      = 8
+ };
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 71aa3da2a0b7..162cb285b87b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4058,7 +4058,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+ 	}
+ 
+ 	async = false;
+-	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable);
++	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable,
++				    NULL);
+ 	if (!async)
+ 		return false; /* *pfn has correct page already */
+ 
+@@ -4072,7 +4073,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+ 			return true;
+ 	}
+ 
+-	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable);
++	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable,
++				    NULL);
+ 	return false;
+ }
+ 
+diff --git a/arch/x86/mm/ioremap.c b/arch/x86/mm/ioremap.c
+index 9e5ccc56f8e0..4409785e294c 100644
+--- a/arch/x86/mm/ioremap.c
++++ b/arch/x86/mm/ioremap.c
+@@ -202,9 +202,12 @@ __ioremap_caller(resource_size_t phys_addr, unsigned long size,
+ 	__ioremap_check_mem(phys_addr, size, &io_desc);
+ 
+ 	/*
+-	 * Don't allow anybody to remap normal RAM that we're using..
++	 * Don't allow anybody to remap normal RAM that we're using, unless
++	 * _PAGE_CACHE_MODE_WB_FORCE is used.
+ 	 */
+-	if (io_desc.flags & IORES_MAP_SYSTEM_RAM) {
++	if (pcm == _PAGE_CACHE_MODE_WB_FORCE) {
++	    pcm = _PAGE_CACHE_MODE_WB;
++	} else if (io_desc.flags & IORES_MAP_SYSTEM_RAM) {
+ 		WARN_ONCE(1, "ioremap on RAM at %pa - %pa\n",
+ 			  &phys_addr, &last_addr);
+ 		return NULL;
+@@ -419,6 +422,13 @@ void __iomem *ioremap_cache(resource_size_t phys_addr, unsigned long size)
+ }
+ EXPORT_SYMBOL(ioremap_cache);
+ 
++void __iomem *ioremap_cache_force(resource_size_t phys_addr, unsigned long size)
++{
++	return __ioremap_caller(phys_addr, size, _PAGE_CACHE_MODE_WB_FORCE,
++				__builtin_return_address(0), false);
++}
++EXPORT_SYMBOL(ioremap_cache_force);
++
+ void __iomem *ioremap_prot(resource_size_t phys_addr, unsigned long size,
+ 				unsigned long prot_val)
+ {
+@@ -467,7 +477,7 @@ void iounmap(volatile void __iomem *addr)
+ 	p = find_vm_area((void __force *)addr);
+ 
+ 	if (!p) {
+-		printk(KERN_ERR "iounmap: bad address %p\n", addr);
++		printk(KERN_ERR "iounmap: bad address %px\n", addr);
+ 		dump_stack();
+ 		return;
+ 	}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 6655e8da4555..0d5f3885747b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -238,6 +238,7 @@ struct kvm_host_map {
+ 	void *hva;
+ 	kvm_pfn_t pfn;
+ 	kvm_pfn_t gfn;
++	bool protected;
+ };
+ 
+ /*
+@@ -725,7 +726,7 @@ kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn);
+ kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn);
+ kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
+ 			       bool atomic, bool *async, bool write_fault,
+-			       bool *writable);
++			       bool *writable, bool *protected);
+ 
+ void kvm_release_pfn_clean(kvm_pfn_t pfn);
+ void kvm_release_pfn_dirty(kvm_pfn_t pfn);
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index a7580f69dda0..0a8c6426b4f4 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -58,6 +58,7 @@ struct gfn_to_pfn_cache {
+ 	gfn_t gfn;
+ 	kvm_pfn_t pfn;
+ 	bool dirty;
++	bool protected;
+ };
+ 
+ #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4c008c7b4974..9b569b78874a 100644
+index 9b569b78874a..7c2c764c28c5 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -51,6 +51,7 @@
- #include <linux/io.h>
- #include <linux/lockdep.h>
- #include <linux/kthread.h>
-+#include <linux/pagewalk.h>
- 
- #include <asm/processor.h>
- #include <asm/ioctl.h>
-@@ -154,6 +155,12 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm);
- static unsigned long long kvm_createvm_count;
- static unsigned long long kvm_active_vms;
- 
-+void *kvm_map_page_atomic(struct page *page);
-+void kvm_unmap_page_atomic(void *vaddr);
-+
-+int kvm_init_protected_memory(void);
-+void kvm_exit_protected_memory(void);
-+
- int __kvm_protect_memory(unsigned long start, unsigned long end, bool protect);
- 
- __weak void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
-@@ -2329,6 +2336,7 @@ int copy_from_guest(void *data, unsigned long hva, int len, bool protected)
- 	int offset = offset_in_page(hva);
+@@ -1852,9 +1852,10 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+  * 1 indicates success, -errno is returned if error is detected.
+  */
+ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+-			   bool *writable, kvm_pfn_t *pfn)
++			   bool *writable, bool *protected, kvm_pfn_t *pfn)
+ {
+ 	unsigned int flags = FOLL_HWPOISON | FOLL_KVM;
++	struct vm_area_struct *vma;
  	struct page *page;
- 	int npages, seg;
-+	void *vaddr;
+ 	int npages = 0;
  
- 	if (!protected)
- 		return __copy_from_user(data, (void __user *)hva, len);
-@@ -2341,7 +2349,11 @@ int copy_from_guest(void *data, unsigned long hva, int len, bool protected)
- 		npages = get_user_pages_unlocked(hva, 1, &page, FOLL_KVM);
- 		if (npages != 1)
- 			return -EFAULT;
--		memcpy(data, page_address(page) + offset, seg);
-+
-+		vaddr = kvm_map_page_atomic(page);
-+		memcpy(data, vaddr + offset, seg);
-+		kvm_unmap_page_atomic(vaddr);
-+
- 		put_page(page);
- 		len -= seg;
- 		hva += seg;
-@@ -2356,6 +2368,7 @@ int copy_to_guest(unsigned long hva, const void *data, int len, bool protected)
- 	int offset = offset_in_page(hva);
- 	struct page *page;
- 	int npages, seg;
-+	void *vaddr;
+@@ -1868,9 +1869,15 @@ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+ 	if (async)
+ 		flags |= FOLL_NOWAIT;
  
- 	if (!protected)
- 		return __copy_to_user((void __user *)hva, data, len);
-@@ -2369,7 +2382,11 @@ int copy_to_guest(unsigned long hva, const void *data, int len, bool protected)
- 						 FOLL_WRITE | FOLL_KVM);
- 		if (npages != 1)
- 			return -EFAULT;
--		memcpy(page_address(page) + offset, data, seg);
-+
-+		vaddr = kvm_map_page_atomic(page);
-+		memcpy(vaddr + offset, data, seg);
-+		kvm_unmap_page_atomic(vaddr);
-+
- 		put_page(page);
- 		len -= seg;
- 		hva += seg;
-@@ -4945,6 +4962,10 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 	if (r)
- 		goto out_free;
+-	npages = get_user_pages_unlocked(addr, 1, &page, flags);
+-	if (npages != 1)
++	mmap_read_lock(current->mm);
++	npages = get_user_pages(addr, 1, flags, &page, &vma);
++	if (npages != 1) {
++		mmap_read_unlock(current->mm);
+ 		return npages;
++	}
++	if (protected)
++		*protected = vma_is_kvm_protected(vma);
++	mmap_read_unlock(current->mm);
  
-+	if (IS_ENABLED(CONFIG_HAVE_KVM_PROTECTED_MEMORY) &&
-+	    kvm_init_protected_memory())
-+		goto out_unreg;
+ 	/* map read fault as writable if possible */
+ 	if (unlikely(!write_fault) && writable) {
+@@ -1961,7 +1968,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+  *     whether the mapping is writable.
+  */
+ static kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
+-			bool write_fault, bool *writable)
++			bool write_fault, bool *writable, bool *protected)
+ {
+ 	struct vm_area_struct *vma;
+ 	kvm_pfn_t pfn = 0;
+@@ -1976,7 +1983,8 @@ static kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
+ 	if (atomic)
+ 		return KVM_PFN_ERR_FAULT;
+ 
+-	npages = hva_to_pfn_slow(addr, async, write_fault, writable, &pfn);
++	npages = hva_to_pfn_slow(addr, async, write_fault, writable, protected,
++				 &pfn);
+ 	if (npages == 1)
+ 		return pfn;
+ 
+@@ -2010,7 +2018,7 @@ static kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
+ 
+ kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
+ 			       bool atomic, bool *async, bool write_fault,
+-			       bool *writable)
++			       bool *writable, bool *protected)
+ {
+ 	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
+ 
+@@ -2033,7 +2041,7 @@ kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
+ 	}
+ 
+ 	return hva_to_pfn(addr, atomic, async, write_fault,
+-			  writable);
++			  writable, protected);
+ }
+ EXPORT_SYMBOL_GPL(__gfn_to_pfn_memslot);
+ 
+@@ -2041,19 +2049,26 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+ 		      bool *writable)
+ {
+ 	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, NULL,
+-				    write_fault, writable);
++				    write_fault, writable, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
+ 
+ kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+-	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL);
++	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
+ 
++static kvm_pfn_t gfn_to_pfn_memslot_protected(struct kvm_memory_slot *slot,
++					      gfn_t gfn, bool *protected)
++{
++	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL,
++				    protected);
++}
 +
- 	kvm_chardev_ops.owner = module;
- 	kvm_vm_fops.owner = module;
- 	kvm_vcpu_fops.owner = module;
-@@ -4968,6 +4989,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+-	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL);
++	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
+ 
+@@ -2134,7 +2149,7 @@ static void kvm_cache_gfn_to_pfn(struct kvm_memory_slot *slot, gfn_t gfn,
+ {
+ 	kvm_release_pfn(cache->pfn, cache->dirty, cache);
+ 
+-	cache->pfn = gfn_to_pfn_memslot(slot, gfn);
++	cache->pfn = gfn_to_pfn_memslot_protected(slot, gfn, &cache->protected);
+ 	cache->gfn = gfn;
+ 	cache->dirty = false;
+ 	cache->generation = gen;
+@@ -2149,6 +2164,7 @@ static int __kvm_map_gfn(struct kvm_memslots *slots, gfn_t gfn,
+ 	void *hva = NULL;
+ 	struct page *page = KVM_UNMAPPED_PAGE;
+ 	struct kvm_memory_slot *slot = __gfn_to_memslot(slots, gfn);
++	bool protected;
+ 	u64 gen = slots->generation;
+ 
+ 	if (!map)
+@@ -2162,15 +2178,20 @@ static int __kvm_map_gfn(struct kvm_memslots *slots, gfn_t gfn,
+ 			kvm_cache_gfn_to_pfn(slot, gfn, cache, gen);
+ 		}
+ 		pfn = cache->pfn;
++		protected = cache->protected;
+ 	} else {
+ 		if (atomic)
+ 			return -EAGAIN;
+-		pfn = gfn_to_pfn_memslot(slot, gfn);
++		pfn = gfn_to_pfn_memslot_protected(slot, gfn, &protected);
+ 	}
+ 	if (is_error_noslot_pfn(pfn))
+ 		return -EINVAL;
+ 
+-	if (pfn_valid(pfn)) {
++	if (protected) {
++		if (atomic)
++			return -EAGAIN;
++		hva = ioremap_cache_force(pfn_to_hpa(pfn), PAGE_SIZE);
++	} else if (pfn_valid(pfn)) {
+ 		page = pfn_to_page(pfn);
+ 		if (atomic)
+ 			hva = kmap_atomic(page);
+@@ -2191,6 +2212,7 @@ static int __kvm_map_gfn(struct kvm_memslots *slots, gfn_t gfn,
+ 	map->hva = hva;
+ 	map->pfn = pfn;
+ 	map->gfn = gfn;
++	map->protected = protected;
+ 
  	return 0;
+ }
+@@ -2221,7 +2243,9 @@ static void __kvm_unmap_gfn(struct kvm_memory_slot *memslot,
+ 	if (!map->hva)
+ 		return;
  
- out_unreg:
-+	kvm_exit_protected_memory();
- 	kvm_async_pf_deinit();
- out_free:
- 	kmem_cache_destroy(kvm_vcpu_cache);
-@@ -4989,6 +5011,7 @@ EXPORT_SYMBOL_GPL(kvm_init);
- 
- void kvm_exit(void)
- {
-+	kvm_exit_protected_memory();
- 	debugfs_remove_recursive(kvm_debugfs_dir);
- 	misc_deregister(&kvm_dev);
- 	kmem_cache_destroy(kvm_vcpu_cache);
-diff --git a/virt/lib/mem_protected.c b/virt/lib/mem_protected.c
-index 0b01dd74f29c..1dfe82534242 100644
---- a/virt/lib/mem_protected.c
-+++ b/virt/lib/mem_protected.c
-@@ -5,6 +5,100 @@
- #include <linux/vmalloc.h>
- #include <asm/tlbflush.h>
- 
-+static pte_t **guest_map_ptes;
-+static struct vm_struct *guest_map_area;
-+
-+void *kvm_map_page_atomic(struct page *page)
-+{
-+	pte_t *pte;
-+	void *vaddr;
-+
-+	preempt_disable();
-+	pte = guest_map_ptes[smp_processor_id()];
-+	vaddr = guest_map_area->addr + smp_processor_id() * PAGE_SIZE;
-+	set_pte(pte, mk_pte(page, PAGE_KERNEL));
-+	return vaddr;
-+}
-+EXPORT_SYMBOL_GPL(kvm_map_page_atomic);
-+
-+void kvm_unmap_page_atomic(void *vaddr)
-+{
-+	pte_t *pte = guest_map_ptes[smp_processor_id()];
-+	set_pte(pte, __pte(0));
-+	flush_tlb_one_kernel((unsigned long)vaddr);
-+	preempt_enable();
-+}
-+EXPORT_SYMBOL_GPL(kvm_unmap_page_atomic);
-+
-+int kvm_init_protected_memory(void)
-+{
-+	guest_map_ptes = kmalloc_array(num_possible_cpus(),
-+				       sizeof(pte_t *), GFP_KERNEL);
-+	if (!guest_map_ptes)
-+		return -ENOMEM;
-+
-+	guest_map_area = alloc_vm_area(PAGE_SIZE * num_possible_cpus(),
-+				       guest_map_ptes);
-+	if (!guest_map_ptes) {
-+		kfree(guest_map_ptes);
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(kvm_init_protected_memory);
-+
-+void kvm_exit_protected_memory(void)
-+{
-+	if (guest_map_area)
-+		free_vm_area(guest_map_area);
-+	if (guest_map_ptes)
-+		kfree(guest_map_ptes);
-+}
-+EXPORT_SYMBOL_GPL(kvm_exit_protected_memory);
-+
-+static int adjust_direct_mapping_pte_range(pmd_t *pmd, unsigned long addr,
-+					   unsigned long end,
-+					   struct mm_walk *walk)
-+{
-+	bool protect = (bool)walk->private;
-+	pte_t *pte;
-+	struct page *page;
-+
-+	if (pmd_trans_huge(*pmd)) {
-+		page = pmd_page(*pmd);
-+		if (is_huge_zero_page(page))
-+			return 0;
-+		VM_BUG_ON_PAGE(total_mapcount(page) != 1, page);
-+		/* XXX: Would it fail with direct device assignment? */
-+		VM_BUG_ON_PAGE(page_count(page) != 1, page);
-+		kernel_map_pages(page, HPAGE_PMD_NR, !protect);
-+		return 0;
-+	}
-+
-+	pte = pte_offset_map(pmd, addr);
-+	for (; addr != end; pte++, addr += PAGE_SIZE) {
-+		pte_t entry = *pte;
-+
-+		if (!pte_present(entry))
-+			continue;
-+
-+		if (is_zero_pfn(pte_pfn(entry)))
-+			continue;
-+
-+		page = pte_page(entry);
-+
-+		VM_BUG_ON_PAGE(page_mapcount(page) != 1, page);
-+		kernel_map_pages(page, 1, !protect);
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct mm_walk_ops adjust_direct_mapping_ops = {
-+	.pmd_entry      = adjust_direct_mapping_pte_range,
-+};
-+
- int __kvm_protect_memory(unsigned long start, unsigned long end, bool protect)
- {
- 	struct mm_struct *mm = current->mm;
-@@ -50,6 +144,13 @@ int __kvm_protect_memory(unsigned long start, unsigned long end, bool protect)
- 		if (ret)
- 			goto out;
- 
-+		if (vma_is_anonymous(vma)) {
-+			ret = walk_page_range_novma(mm, start, tmp,
-+						    &adjust_direct_mapping_ops, NULL,
-+						    (void *) protect);
-+			if (ret)
-+				goto out;
-+		}
- next:
- 		start = tmp;
- 		if (start < prev->vm_end)
+-	if (map->page != KVM_UNMAPPED_PAGE) {
++	if (map->protected) {
++		iounmap(map->hva);
++	} else if (map->page != KVM_UNMAPPED_PAGE) {
+ 		if (atomic)
+ 			kunmap_atomic(map->hva);
+ 		else
 -- 
 2.26.2
 
