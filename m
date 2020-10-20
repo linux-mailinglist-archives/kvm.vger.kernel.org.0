@@ -2,118 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0A4F2940DE
-	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 18:54:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75B392940FD
+	for <lists+kvm@lfdr.de>; Tue, 20 Oct 2020 19:01:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394971AbgJTQyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Oct 2020 12:54:40 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:16471 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394963AbgJTQyk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Oct 2020 12:54:40 -0400
+        id S2395092AbgJTRBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Oct 2020 13:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35584 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389544AbgJTRBE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Oct 2020 13:01:04 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB08C0613CE
+        for <kvm@vger.kernel.org>; Tue, 20 Oct 2020 10:01:03 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id a17so1207774pju.1
+        for <kvm@vger.kernel.org>; Tue, 20 Oct 2020 10:01:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1603212879; x=1634748879;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=+bj8U8RezaG268JdXw29LicrkbrnImce7j6a9Ka41Fw=;
-  b=ZPRFjJRUS0ey1SJkwjcnoBSqFUpFZH5TLbUExrBdQ3smj1wVb+4FjoMm
-   tUPyTGaNoYpVk3gqj8zF2WWD26kDAVUi36tdF2thV8etn3Rzkun3cs0bM
-   r4CkE/0De86W2KZto9Fm/Xt2yWdN/PLoKbfIFXvafPI6FQreIOuTe6wH8
-   A=;
-X-IronPort-AV: E=Sophos;i="5.77,397,1596499200"; 
-   d="scan'208";a="60147548"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 20 Oct 2020 16:54:33 +0000
-Received: from EX13D07EUB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com (Postfix) with ESMTPS id 1185CA18F0;
-        Tue, 20 Oct 2020 16:54:25 +0000 (UTC)
-Received: from EX13D08EUB004.ant.amazon.com (10.43.166.158) by
- EX13D07EUB001.ant.amazon.com (10.43.166.214) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 20 Oct 2020 16:54:24 +0000
-Received: from EX13D08EUB004.ant.amazon.com ([10.43.166.158]) by
- EX13D08EUB004.ant.amazon.com ([10.43.166.158]) with mapi id 15.00.1497.006;
- Tue, 20 Oct 2020 16:54:24 +0000
-From:   "Catangiu, Adrian Costin" <acatan@amazon.com>
-To:     "Graf (AWS), Alexander" <graf@amazon.de>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jann Horn <jannh@google.com>
-CC:     Willy Tarreau <w@1wt.eu>,
-        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
-        "Andy Lutomirski" <luto@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        "Eric Biggers" <ebiggers@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "open list:VIRTIO GPU DRIVER" 
-        <virtualization@lists.linux-foundation.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "bonzini@gnu.org" <bonzini@gnu.org>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        "oridgar@gmail.com" <oridgar@gmail.com>,
-        "ghammer@redhat.com" <ghammer@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Qemu Developers" <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>,
-        "Michal Hocko" <mhocko@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Pavel Machek" <pavel@ucw.cz>,
-        Linux API <linux-api@vger.kernel.org>,
-        "Christian Borntraeger" <borntraeger@de.ibm.com>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "Mathiske, Bernd" <mathiske@amazon.com>,
-        "Hohensee, Paul" <hohensee@amazon.com>
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-Thread-Topic: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-Thread-Index: AQHWpLCgyRz7zwEeX0C0PpiPp4JTxamg7DuA
-Date:   Tue, 20 Oct 2020 16:54:24 +0000
-Message-ID: <9CB99FC7-3EDF-488E-B52C-DE0368A4BC81@amazon.com>
-References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
- <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
- <20201017033606.GA14014@1wt.eu>
- <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
- <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
- <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
- <20201017053712.GA14105@1wt.eu>
- <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
- <20201017064442.GA14117@1wt.eu>
- <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
- <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
- <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
-In-Reply-To: <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.164.78]
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SLjiq3pW5LVJISD8gSWpF8UZ/0csQIwTmjFHfpB8KGQ=;
+        b=dDcwSXCOzydk78Lztu+93aKWlVV++2x4fn6ADurjE0nmYUMY3OTsi8b/HGLbIvHHmR
+         wGE+3kYadp+qsRdmbCX2qV8gLCpVlHGHoXbOrt9JzPOXo/rqoTZbwIjlKsgNASxlBTHb
+         tl/YfgqmLAVupq0bf6Vk4CNoyFAsaDl5e57P6gB5WdTagLSb1RT6rbsMhXQcz0jWjtLZ
+         jQn94KeXoj+UuTv2hgguVyoARgOULZ2pvnzwuYNBLdlqxRCJxv9uPShEUKKbFVtaW+zw
+         4S4g87U3K8T0Ps3LLJrhtIf84mk5BLXDsbNwEbcGs/RDJqyFGrEdi366TLCyxptCVrat
+         ab8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SLjiq3pW5LVJISD8gSWpF8UZ/0csQIwTmjFHfpB8KGQ=;
+        b=Z27593FB7fgBcrKZtwHbrPx6IWUb6zDtwUeE048sHDljcdTmETI3YC14ZSi8ttA2io
+         Ghp/w5f8/K7i0tzHOtkY+RMHQ3MelCRvtIM37k70kvyH/J6opQr2f+FQST6P1FH/jjp4
+         c35UkG/CxUWkgMdPLRePMJyPrRLE/uxfA2gEi93P18ZL68WqYeJr0HjJR2P6bbw0PnMk
+         CjgLSY4OZ37+2fHYyAkHgPwFvsavWRXv0nAtlWv0n0cdYZXRUG429d+pbTRAr++AgkFP
+         ntvwLJ9cJuGZ0x+yv8AIzUiq1SRD8GjphZHvRz6sjhqlwckpPwPn/8olsh9fBuESjyBV
+         CPRQ==
+X-Gm-Message-State: AOAM531aQ3TN3zom9KB7aketgzzDzFJvZXnkqEmQz7Py8bPmU6baPvkC
+        RvFNesf5AhH7rM6S00EWyfq+OPOYMFw=
+X-Google-Smtp-Source: ABdhPJzXgH2W//CCXKxe46Ozb57JxmILIjseYynzoQ2X2SC2duR/Vzet5uVuIs+T4bHdhfZIYOLR9Q==
+X-Received: by 2002:a17:90a:f0d7:: with SMTP id fa23mr3634676pjb.108.1603213263248;
+        Tue, 20 Oct 2020 10:01:03 -0700 (PDT)
+Received: from localhost.localdomain ([103.248.31.132])
+        by smtp.googlemail.com with ESMTPSA id x29sm2766161pfp.152.2020.10.20.10.01.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Oct 2020 10:01:02 -0700 (PDT)
+From:   Amey Narkhede <ameynarkhede03@gmail.com>
+To:     qemu-devel@nongnu.org, ameynarkhede03@gmail.com
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 0/2] KVM: Introduce ioeventfd read support
+Date:   Tue, 20 Oct 2020 22:30:54 +0530
+Message-Id: <20201020170056.433528-1-ameynarkhede03@gmail.com>
+X-Mailer: git-send-email 2.28.0
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <D222EABD850A32409B803CF44A854938@amazon.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgYWxsLA0KDQrvu79PbiAxNy8xMC8yMDIwLCAyMTowOSwgIkdyYWYgKEFXUyksIEFsZXhhbmRl
-ciIgPGdyYWZAYW1hem9uLmRlPiB3cm90ZToNCiAgICANCiAgICBPbiAxNy4xMC4yMCAxNToyNCwg
-SmFzb24gQS4gRG9uZW5mZWxkIHdyb3RlOg0KICAgID4gDQogICAgPiBBZnRlciBkaXNjdXNzaW5n
-IHRoaXMgb2ZmbGluZSB3aXRoIEphbm4gYSBiaXQsIEkgaGF2ZSBhIGZldyBnZW5lcmFsDQogICAg
-PiBjb21tZW50cyBvbiB0aGUgZGVzaWduIG9mIHRoaXMuDQogICAgPiANCiAgICA+IEZpcnN0LCB0
-aGUgVVVJRCBjb21tdW5pY2F0ZWQgYnkgdGhlIGh5cGVydmlzb3Igc2hvdWxkIGJlIGNvbnN1bWVk
-IGJ5DQogICAgPiB0aGUga2VybmVsIC0tIGFkZGVkIGFzIGFub3RoZXIgaW5wdXQgdG8gdGhlIHJu
-ZyAtLSBhbmQgdGhlbiB1c2Vyc3BhY2UNCiAgICANCiAgICBXZSBkZWZpbml0ZWx5IHdhbnQgYSBr
-ZXJuZWwgaW50ZXJuYWwgbm90aWZpZXIgYXMgd2VsbCwgeWVzIDopLg0KDQpXaGF0IHdvdWxkIGJl
-IGEgZ2VuZXJpYyBldmVudCB0cmlnZ2VyIG1lY2hhbmlzbSB3ZSBjb3VsZCB1c2UgZnJvbSBhIGtl
-cm5lbA0KbW9kdWxlL2RyaXZlciBmb3IgdHJpZ2dlcmluZyBybmcgcmVzZWVkIChwb3NzaWJseSBh
-ZGRpbmcgdGhlIHV1aWQgdG8gdGhlIG1peA0KYXMgd2VsbCk/DQoNCiAgDQoNCgoKCkFtYXpvbiBE
-ZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiByZWdpc3RlcmVkIG9mZmljZTogMjdB
-IFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElhc2ksIElhc2kgQ291bnR5LCA3MDAw
-NDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4gUmVnaXN0cmF0aW9uIG51bWJlciBK
-MjIvMjYyMS8yMDA1Lgo=
-
+The first patch updates linux headers to=0D
+add ioeventfd read support while the=0D
+second patch can be used to test the=0D
+ioeventfd read feature with kvm-unit-test=0D
+which reads from specified guest addres.=0D
+Make sure the address provided in=0D
+kvm_set_ioeventfd_read matches with address=0D
+in x86/ioeventfd_read test in kvm-unit-tests.=0D
+=0D
+Amey Narkhede (2):=0D
+  linux-headers: Add support for reads in ioeventfd=0D
+  kvm: Add ioeventfd read test code=0D
+=0D
+ accel/kvm/kvm-all.c       | 55 +++++++++++++++++++++++++++++++++++++++=0D
+ linux-headers/linux/kvm.h |  5 +++-=0D
+ 2 files changed, 59 insertions(+), 1 deletion(-)=0D
+=0D
+-- =0D
+2.28.0=0D
+=0D
