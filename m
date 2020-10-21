@@ -2,117 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AC31294C12
-	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 13:59:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86C9D294C1C
+	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 14:00:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2439853AbgJUL7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 07:59:42 -0400
-Received: from nat-hk.nvidia.com ([203.18.50.4]:39122 "EHLO nat-hk.nvidia.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2439708AbgJUL7m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Oct 2020 07:59:42 -0400
-Received: from HKMAIL104.nvidia.com (Not Verified[10.18.92.100]) by nat-hk.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f9022ac0000>; Wed, 21 Oct 2020 19:59:40 +0800
-Received: from HKMAIL103.nvidia.com (10.18.16.12) by HKMAIL104.nvidia.com
- (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 21 Oct
- 2020 11:59:37 +0000
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.105)
- by HKMAIL103.nvidia.com (10.18.16.12) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Wed, 21 Oct 2020 11:59:37 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CZESJMpycdnJIL6YqafdDVOygA0Ft/SbSDYTMZ5TSNOoHy+T34z9CFNZtP581x4ppBf2NbSxYgbkxjAsWICs3AfLXXjuLHK/thsVu53udmyvdpq80sucLN/1IYLLlw5E5rgyuV1af9Dbd2ubRMdTHSbghYjcH9aBPNjXpLMG9kNIzucZuTBmBGI8tb7xnlqhUbmRt407No3b0X5+msomptk80x4OGuW+0B+PMtbfL8MCBC3rl6/0UV3PCXESH8MUEXi5jutx9cQCRJM3YR4YQcx89fbu5iRyF3/9iNMRX1VAPyXnqdEolPmHNCydUSDvuctLB/oCqvmEB/SJH46K4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MSxuzY8mRCeGGk4B7dZgaFlLp9Sygp3sC0Z94j1H5hg=;
- b=QqRoY2rzWStrMR1Mgr5YaNaPJWDzVUiWh2PE/jR/5aqggMBx0YOMfxUzAkEtf+2G6lZvB99R8ItuCa7qsh8sVjagxOnO58S3K9j7rrkXenJ9jLfZa+DSHaWiD2ZABsdEV3EyDtZgFYeruUI1HRcawriSoCyc7CmacLTj6dsG/ked6t3gGQnWZktS19QFkQyYKyMpDWdNEZY2ZxW9+oqMAaLKXoNHE0egC5eTHVjmDP+1YovHIpK5nlXizWbYcFx/App0mjvHfQGmrO2M7aIlrEp/BC0OT4ib3ZnaGn9bvpZQ7T6q2lXfkBHgGF8zXav0i93X4yxXcI8yzXn2zjC6IA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB3306.namprd12.prod.outlook.com (2603:10b6:5:186::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.25; Wed, 21 Oct
- 2020 11:59:34 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3477.028; Wed, 21 Oct 2020
- 11:59:34 +0000
-Date:   Wed, 21 Oct 2020 08:59:33 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-CC:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arch@vger.kernel.org>, <linux-mm@kvack.org>,
-        <kvm@vger.kernel.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Matt Fleming <matt@codeblueprint.co.uk>,
-        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "Andy Lutomirski" <luto@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Potapenko <glider@google.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        "Rik van Riel" <riel@redhat.com>,
-        Larry Woodman <lwoodman@redhat.com>,
-        Dave Young <dyoung@redhat.com>,
-        Toshimitsu Kani <toshi.kani@hpe.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: AMD SME encrpytion and PCI BAR pages to user space
-Message-ID: <20201021115933.GS6219@nvidia.com>
-References: <20201019152556.GA560082@nvidia.com>
- <4b9f13bf-3f82-1aed-c7be-0eaecebc5d82@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <4b9f13bf-3f82-1aed-c7be-0eaecebc5d82@amd.com>
-X-ClientProxiedBy: BL1PR13CA0258.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::23) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S2442155AbgJUMAR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 08:00:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42774 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2442137AbgJUMAN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Oct 2020 08:00:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603281611;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FEqXz7G12+BmHZNYqLH7P68s5dXdeke9n26KkMvS1JY=;
+        b=MMLv2eACuOpw5++KX1+KNDzyq0Qr9sNXQFnpgHKhdJUdzURIIm6WhqThrGjvO/tJZN+pi0
+        1QTalElMZdn2tqOejLsfTtxcb3318dORun1thh1qxnkbF3iTPhRhaMe+HN4IQmP8cyQtoA
+        PNa3OwjYpLvmHYDfGMOijMxRZPoPURY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-582-cKoifXvrPQiP1NczkwQeEQ-1; Wed, 21 Oct 2020 08:00:08 -0400
+X-MC-Unique: cKoifXvrPQiP1NczkwQeEQ-1
+Received: by mail-wm1-f70.google.com with SMTP id c204so1305415wmd.5
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 05:00:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=FEqXz7G12+BmHZNYqLH7P68s5dXdeke9n26KkMvS1JY=;
+        b=fF6x/IlZg3WMT7E/wthiEnIwpUK701Z01nIMhsf0YqsaRjWFmUXJCQpYFqzR8QZzGA
+         bAQUAYF0ajNYtvfKNd0804ed85Y4nIYb5nZwQJ8TbxTFMj9BAwV1QI2Qdo02Q7isj06U
+         J2fhtNiIYDSl7gW546R8eQZl6/f+6YzmAJDMJL54DFXjUK3oZ7NgKSdh7RqKdqB2lEH0
+         BG+YJY1R4T62yIB4Wm6QqfVqdG5C8ELw3OJIr79kQtruuEixmxg5supy4gojsvG5OsZ5
+         2255UzWgWcMH5Xz0v1WLNcEsxwo5TMgZIp54a+EIdBEaMLOxEHWs4qi6k2nuHq1D0l2b
+         ivMA==
+X-Gm-Message-State: AOAM5300NCDqeXBHVG3etHi/pB9hEa8578IMg7RQxTybr0eBGE8Moi6G
+        MmK10S5G/cF+jfJgaOG2rBMCibFh4HoSb5M3q8HaaJMwLPQZKVQM7c89MlxALKygmJeO4Xby589
+        407SdWLqkS/3H
+X-Received: by 2002:a1c:f30d:: with SMTP id q13mr3126690wmq.36.1603281606804;
+        Wed, 21 Oct 2020 05:00:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxHhHdy2ZltzmZpn86eWLCHMlwJ/xFHhZ81m7k3oEdPSWZPH4DPgsohX7uVZ9pypeXKMWfgUg==
+X-Received: by 2002:a1c:f30d:: with SMTP id q13mr3126664wmq.36.1603281606572;
+        Wed, 21 Oct 2020 05:00:06 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id d30sm3601490wrc.19.2020.10.21.05.00.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Oct 2020 05:00:05 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 02/10] KVM: VMX: Stash kvm_vmx in a local variable for Hyper-V paravirt TLB flush
+In-Reply-To: <20201020215613.8972-3-sean.j.christopherson@intel.com>
+References: <20201020215613.8972-1-sean.j.christopherson@intel.com> <20201020215613.8972-3-sean.j.christopherson@intel.com>
+Date:   Wed, 21 Oct 2020 14:00:04 +0200
+Message-ID: <875z736b7f.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by BL1PR13CA0258.namprd13.prod.outlook.com (2603:10b6:208:2ba::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.11 via Frontend Transport; Wed, 21 Oct 2020 11:59:34 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kVCmD-003Szc-77; Wed, 21 Oct 2020 08:59:33 -0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1603281580; bh=MSxuzY8mRCeGGk4B7dZgaFlLp9Sygp3sC0Z94j1H5hg=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType;
-        b=IrA7CaLTHVGX0oWXirOHZZc3xlLWh6yRMqhBGqbVOxHxlgalGGuLBjNk2xRQGsi2H
-         z8RNubckHE6YOATdhjHsHSV+AtJEB/+gQ1+EqEj84vw2uXojvl08UhqAtcLp4wkrTL
-         UEJMPUnRnXOAx064aHiGUaqYlNYIM/254Jr7PQnPr/onSwHwr75hBAXppQ7sMc8/D9
-         N2+HxcBWbZQ6IQmRWYY1cQdL1RNeoxvz/OmthOMKrdSHw2MNGYuMQCj4Ow6QsRF9B7
-         kBaN3sVbmDSBCziZCKNA1DAIuiJfSGhUd9XIGPn62EjVUd9arhZvG/sR4EnEIcfyjy
-         H6hHwnpXXsBxQ==
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 19, 2020 at 11:36:16AM -0500, Tom Lendacky wrote:
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> > io_remap_pfn_range()? Is there use cases where a caller actually wants
-> > encrypted io memory?
-> 
-> As long as you never have physical memory / ram being mapped in this path,
-> it seems that applying pgprot_decrypted() would be ok.
+> Capture kvm_vmx in a local variable instead of polluting
+> hv_remote_flush_tlb_with_range() with to_kvm_vmx(kvm).
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 6d53bcc4a1a9..6d41c99c70c4 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -516,26 +516,27 @@ static inline int hv_remote_flush_eptp(u64 eptp, struct kvm_tlb_range *range)
+>  static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
+>  		struct kvm_tlb_range *range)
+>  {
+> +	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
+>  	struct kvm_vcpu *vcpu;
+>  	int ret = 0, i;
+>  
+> -	spin_lock(&to_kvm_vmx(kvm)->ept_pointer_lock);
+> +	spin_lock(&kvm_vmx->ept_pointer_lock);
+>  
+> -	if (to_kvm_vmx(kvm)->ept_pointers_match == EPT_POINTERS_CHECK)
+> +	if (kvm_vmx->ept_pointers_match == EPT_POINTERS_CHECK)
+>  		check_ept_pointer_match(kvm);
+>  
+> -	if (to_kvm_vmx(kvm)->ept_pointers_match != EPT_POINTERS_MATCH) {
+> +	if (kvm_vmx->ept_pointers_match != EPT_POINTERS_MATCH) {
+>  		kvm_for_each_vcpu(i, vcpu, kvm) {
+>  			/* If ept_pointer is invalid pointer, bypass flush request. */
+>  			if (VALID_PAGE(to_vmx(vcpu)->ept_pointer))
+>  				ret |= hv_remote_flush_eptp(to_vmx(vcpu)->ept_pointer,
+>  							    range);
+>  		}
+> -	} else if (VALID_PAGE(to_kvm_vmx(kvm)->hv_tlb_eptp)) {
+> -		ret = hv_remote_flush_eptp(to_kvm_vmx(kvm)->hv_tlb_eptp, range);
+> +	} else if (VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
+> +		ret = hv_remote_flush_eptp(kvm_vmx->hv_tlb_eptp, range);
+>  	}
+>  
+> -	spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
+> +	spin_unlock(&kvm_vmx->ept_pointer_lock);
+>  	return ret;
+>  }
+>  static int hv_remote_flush_tlb(struct kvm *kvm)
 
-I made a patch along these lines:
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-https://github.com/jgunthorpe/linux/commits/amd_sme_fix
+-- 
+Vitaly
 
-Just waiting for the 0-day bots to check it
-
-I now have a report that SME works OK but when the same test is done
-inside a VM with SEV it fails again - is there something else needed
-for the SEV case?
-
-This would be using VFIO with qemu and KVM to assign the PCI device to
-the guest, it seems the guest kernel driver is able to use the device
-but the guest userspace fails.
-
-Regards,
-Jason
