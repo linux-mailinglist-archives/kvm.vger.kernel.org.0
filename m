@@ -2,123 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87D7E295090
-	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 18:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AEBD2950DC
+	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 18:37:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2444399AbgJUQRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 12:17:20 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:15283 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2408854AbgJUQRU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Oct 2020 12:17:20 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f905ee00001>; Wed, 21 Oct 2020 09:16:32 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 21 Oct
- 2020 16:17:17 +0000
-Received: from santosh-System-Product-Name.nvidia.com (10.124.1.5) by
- mail.nvidia.com (172.20.187.12) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Wed, 21 Oct 2020 16:17:13 +0000
-From:   Santosh Shukla <sashukla@nvidia.com>
-To:     <maz@kernel.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>
-CC:     <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
-        <suzuki.poulose@arm.com>, <linux-arm-kernel@lists.infradead.org>,
-        <cjia@nvidia.com>, Santosh Shukla <sashukla@nvidia.com>
-Subject: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-Date:   Wed, 21 Oct 2020 21:46:50 +0530
-Message-ID: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
-X-Mailer: git-send-email 2.7.4
+        id S2502990AbgJUQhH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 12:37:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56760 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502980AbgJUQhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Oct 2020 12:37:07 -0400
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7755C0613D6
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 09:37:04 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id x20so3156645qkn.1
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 09:37:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BzRdHxhoEjnpcVyZTB9k2I2+fkzcE70kBpksBajHHPg=;
+        b=c06LmWtB/eBV/fSiYmdEtL9GPYUkBEwiw6eScZ5dk4Sur880r0RUDUdOasWQ2KsUGe
+         bZgM/0p8jMLFa+ikbb0dWN5Ow5CevA+xGmpM9sZNHVumRdO1Tl6lKH78eEdBiQO/7MSc
+         SyBxogrPHboOf7N/zRQinZbDgCQncGQf+B3tCHdeRI6jhJnIAAoc2n5M0i1ORD3y+prI
+         vtMVVV6QAXuny3nyioqppKj86tWO1HhufpTOjkK/v2RsEfqLugKDikZxGHBEJZrzkhBg
+         lGNMu1/vnxQxiUuVEAydazAgNl/YziHidKE+BchWShczAu98wiVxpsNR+uw83dVIq+/q
+         VdCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BzRdHxhoEjnpcVyZTB9k2I2+fkzcE70kBpksBajHHPg=;
+        b=m1C2K7dxYGkGgxEzflNjbGLae1GqqBtdU0bi+cuwwpgCwMQ5WMTH8GcOOccqNmsmm5
+         14WN0p5v9dQoFH9Hm38dtFibWOSwnYtDpN6EDy1i2XYhK2t+pw9iouXe6plVjEsVIVFD
+         YEAKlALVqBpupMLUDjIdVeoeOc6Z3B7+X6N+9xojp6LzN79xEZOzkfjiMPyrJhG8JeW+
+         4PnLB7QCtHTzsVufsVBmVHpScGQlbVMlrRjy8WijbtLiyXnV1PaRZUq3JTwnZYj06KcQ
+         80FVPbvtj2wexr3xBraWPlwOk3Sh2tVUv00KOyJzEYv8HySLHWAzz7DjjZ6lwcV6PIJq
+         De1A==
+X-Gm-Message-State: AOAM532K5ZAcrXD9UdXWMF7JPmP/BeVQy+iUDxTdh9he+9HLub7DeSBF
+        bwDW17T8Ft64Nx6QI3x9Zd1FAQ==
+X-Google-Smtp-Source: ABdhPJzGADmR3Upv87Rf5RxP6nvmSwt5ZnM0S0wnKL/4oE2AOzzQDQjF/MbwQajcSGEwpbzdpDuubQ==
+X-Received: by 2002:a37:4244:: with SMTP id p65mr3998477qka.141.1603298223560;
+        Wed, 21 Oct 2020 09:37:03 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id r58sm1532749qte.94.2020.10.21.09.37.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Oct 2020 09:37:02 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kVH6k-003YkE-3P; Wed, 21 Oct 2020 13:37:02 -0300
+Date:   Wed, 21 Oct 2020 13:37:02 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@ffwll.com>
+Subject: Re: [PATCH v3 12/16] PCI: Obey iomem restrictions for procfs mmap
+Message-ID: <20201021163702.GM36674@ziepe.ca>
+References: <20201021085655.1192025-1-daniel.vetter@ffwll.ch>
+ <20201021085655.1192025-13-daniel.vetter@ffwll.ch>
+ <20201021125030.GK36674@ziepe.ca>
+ <CAKMK7uEWe8CaT7zjcZ6dJAKHxtxtqzjVB35fCFviwhcnqksDfw@mail.gmail.com>
+ <20201021151352.GL36674@ziepe.ca>
+ <CAKMK7uGq0=ks7Zj1Et44k7x9FwE9u_ua4zANSqrLRri0v01V+Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1603296992; bh=/pCPC1opPh5gWz/GYqPevuPPTN8cDasp68thhdStyhk=;
-        h=From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-         Content-Type;
-        b=Ye4yQZfVInpCS04DCvMYTSXJpuahcba6/U6nidiQxMqNQssOMZ4g2VJEwQroKxvqQ
-         Yf2nDIGV9EivhJ8ySh9oQj3ftFP1xLtMEkYltiFs0AcRGtmDVhXZhKMJGfYYKiJqC7
-         QsFZY63fdcNO4HdLlWW8rlE7rZSbCrxpiLc90tb9jzWauzHT8lx4QIUFUzzddIbTvV
-         5eywN+ChvIu7lfUACARqOxZhxyVlcGPpzJ7B/CG4lScZLgkDU8TS0aIWEqxhPrewLE
-         01j7i219Z64zo7BaP7DM6krxjAm21dTya5l2q63zF2ur7l1K3VxIEeEIhe+4jn9tTT
-         YWmH+jNo3/byw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKMK7uGq0=ks7Zj1Et44k7x9FwE9u_ua4zANSqrLRri0v01V+Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Commit:6d674e28 introduces a notion to detect and handle the
-device mapping. The commit checks for the VM_PFNMAP flag is set
-in vma->flags and if set then marks force_pte to true such that
-if force_pte is true then ignore the THP function check
-(/transparent_hugepage_adjust()).
+On Wed, Oct 21, 2020 at 05:54:54PM +0200, Daniel Vetter wrote:
 
-There could be an issue with the VM_PFNMAP flag setting and checking.
-For example consider a case where the mdev vendor driver register's
-the vma_fault handler named vma_mmio_fault(), which maps the
-host MMIO region in-turn calls remap_pfn_range() and maps
-the MMIO's vma space. Where, remap_pfn_range implicitly sets
-the VM_PFNMAP flag into vma->flags.
+> The trouble is that io_remap_pfn adjust vma->pgoff, so we'd need to
+> split that. So ideally ->mmap would never set up any ptes.
 
-Now lets assume a mmio fault handing flow where guest first access
-the MMIO region whose 2nd stage translation is not present.
-So that results to arm64-kvm hypervisor executing guest abort handler,
-like below:
+/dev/mem makes pgoff == pfn so it doesn't get changed by remap.
 
-kvm_handle_guest_abort() -->
- user_mem_abort()--> {
+pgoff doesn't get touched for MAP_SHARED either, so there are other
+users that could work like this - eg anyone mmaping IO memory is
+probably OK.
 
-    ...
-    0. checks the vma->flags for the VM_PFNMAP.
-    1. Since VM_PFNMAP flag is not yet set so force_pte _is_ false;
-    2. gfn_to_pfn_prot() -->
-        __gfn_to_pfn_memslot() -->
-            fixup_user_fault() -->
-                handle_mm_fault()-->
-                    __do_fault() -->
-                       vma_mmio_fault() --> // vendor's mdev fault handler
-                        remap_pfn_range()--> // Here sets the VM_PFNMAP
-						flag into vma->flags.
-    3. Now that force_pte is set to false in step-2),
-       will execute transparent_hugepage_adjust() func and
-       that lead to Oops [4].
- }
+> I guess one option would be if remap_pfn_range would steal the
+> vma->vm_ops pointer for itself, then it could set up the correct
+> ->install_ptes hook. But there's tons of callers for that, so not sure
+> that's a bright idea.
 
-The proposition is to check is_iomap flag before executing the THP
-function transparent_hugepage_adjust().
+The caller has to check that the mapping is still live, and I think
+hold a lock across the remap? Auto-defering it doesn't seem feasible.
 
-[4] THP Oops:
-> pc: kvm_is_transparent_hugepage+0x18/0xb0
-> ...
-> ...
-> user_mem_abort+0x340/0x9b8
-> kvm_handle_guest_abort+0x248/0x468
-> handle_exit+0x150/0x1b0
-> kvm_arch_vcpu_ioctl_run+0x4d4/0x778
-> kvm_vcpu_ioctl+0x3c0/0x858
-> ksys_ioctl+0x84/0xb8
-> __arm64_sys_ioctl+0x28/0x38
-
-Tested on Huawei Kunpeng Taishan-200 arm64 server, Using VFIO-mdev device.
-Linux tip: 583090b1
-
-Fixes: 6d674e28 ("KVM: arm/arm64: Properly handle faulting of device mappings")
-Signed-off-by: Santosh Shukla <sashukla@nvidia.com>
----
- arch/arm64/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 3d26b47..ff15357 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1947,7 +1947,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * If we are not forced to use page mapping, check if we are
- 	 * backed by a THP and thus use block mapping if possible.
- 	 */
--	if (vma_pagesize == PAGE_SIZE && !force_pte)
-+	if (vma_pagesize == PAGE_SIZE && !force_pte && !is_iomap(flags))
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
- 	if (writable)
--- 
-2.7.4
-
+Jason
