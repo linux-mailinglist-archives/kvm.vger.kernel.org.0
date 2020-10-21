@@ -2,215 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 02AA02950EB
-	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 18:38:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41B2829516B
+	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 19:20:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503008AbgJUQiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 12:38:50 -0400
-Received: from mga02.intel.com ([134.134.136.20]:23791 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391406AbgJUQit (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Oct 2020 12:38:49 -0400
-IronPort-SDR: OY8Ws834KFk6XGWFECr9i8ng2RwCqBSFyTwcL30fczwJE3hWwPpFTO6cCgeuU31h/CjnGSd+Uk
- pWPmAHErCsQw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9780"; a="154349687"
-X-IronPort-AV: E=Sophos;i="5.77,401,1596524400"; 
-   d="scan'208";a="154349687"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2020 09:38:48 -0700
-IronPort-SDR: EuRiUVnPh2wb6SfRJE+J3dGuxPBSNoG4pjdWbxbiKLEqAkg7ot1iMfdF/rFPm+mtNtWf32OUCS
- +IfYRVS5Slug==
-X-IronPort-AV: E=Sophos;i="5.77,401,1596524400"; 
-   d="scan'208";a="358946764"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2020 09:38:47 -0700
-Date:   Wed, 21 Oct 2020 09:38:46 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S2503407AbgJURUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 13:20:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57374 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2443297AbgJURUV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Oct 2020 13:20:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603300820;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QyI41PRL+WxaH1Fvui6MNjfCggVmcgscFdVMrkl76BI=;
+        b=YPs3Z2Io+2S54qQVlNsYAH+4AeBWvsCh7BIr2PAg5UwGHLG5PqSmEYpwRlmXJv7kOQJrQ3
+        O187u1SEhOUMQxePfAW4ZN9sogmQOJaRQ7j99FTdHdqNWqE3dnvSHldzbQjEFoXBVUsNo0
+        iW64TerBbtxmtz6DW9+n4o5F8EvA6ao=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-d78TK3_FP7Cu0t3UiJW05A-1; Wed, 21 Oct 2020 13:20:18 -0400
+X-MC-Unique: d78TK3_FP7Cu0t3UiJW05A-1
+Received: by mail-wm1-f71.google.com with SMTP id f2so1812041wml.6
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 10:20:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QyI41PRL+WxaH1Fvui6MNjfCggVmcgscFdVMrkl76BI=;
+        b=lembusWzWYDP5SfRC2ZDYMUGfGIZBU6psZhsIBYiAhJ90QA5kW4kUdlXtknF/ZWvBA
+         0SgQlj5I6l6Apim4rh8PVn/RGld4tqnkW3BmSn7Cs3mE1GdHzsq0dSvvouRONF0k1PCf
+         PlIZHLFsAlnGi8a+Q5oEYxNKnBvBg0P60R6TxPtOoVxb4SkWQe3PK6R0WfGps23Tdqob
+         HuqdYAY+3GvtD/nRdK7LOUDtKr+nVIjSc6FhRG7BCI+1J9mXqyuksUbIQddtZ5TjBwDn
+         Nv4qBfw4RejYnixhAXtcCo9cJYAvKWrXXr6o5cqy3StuGgnC1IdtakNZYKO2aagr42kb
+         bzFg==
+X-Gm-Message-State: AOAM533l3vVWM3iqjBVkzQA3oY3PG3yTfALm1MNY2cLLpLgFNrbxXQQD
+        Has9k5GjJf0UR/kP2XmcmeqIUm1juzsCV4FTI8eOiU4E3ac9+rLYnh+Koeru7sj/U5w2VXKhCPn
+        AYepHvZY+7s9c
+X-Received: by 2002:adf:8b15:: with SMTP id n21mr6165894wra.313.1603300817381;
+        Wed, 21 Oct 2020 10:20:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwHrzCaWtJG3CGGML8HAUgVZrIalLo2t+pU+pjNP9Ao5LODt12Kp4C+mRMglqdpQWXgae4p9w==
+X-Received: by 2002:adf:8b15:: with SMTP id n21mr6165883wra.313.1603300817122;
+        Wed, 21 Oct 2020 10:20:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id s185sm4402213wmf.3.2020.10.21.10.20.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Oct 2020 10:20:16 -0700 (PDT)
+Subject: Re: [PATCH v2 07/20] kvm: x86/mmu: Support zapping SPTEs in the TDP
+ MMU
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 05/10] KVM: VMX: Invalidate hv_tlb_eptp to denote an
- EPTP mismatch
-Message-ID: <20201021163843.GC14155@linux.intel.com>
-References: <20201020215613.8972-1-sean.j.christopherson@intel.com>
- <20201020215613.8972-6-sean.j.christopherson@intel.com>
- <87wnzj4utj.fsf@vitty.brq.redhat.com>
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20201014182700.2888246-1-bgardon@google.com>
+ <20201014182700.2888246-8-bgardon@google.com>
+ <20201021150225.2eeriqlffqnsm4b3@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6985f630-3b2a-75f5-5b55-bd76cf32f20b@redhat.com>
+Date:   Wed, 21 Oct 2020 19:20:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wnzj4utj.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20201021150225.2eeriqlffqnsm4b3@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 21, 2020 at 02:39:20PM +0200, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 21/10/20 17:02, Yu Zhang wrote:
+>>  void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root)
+>>  {
+>> +	gfn_t max_gfn = 1ULL << (boot_cpu_data.x86_phys_bits - PAGE_SHIFT);
+>> +
+> boot_cpu_data.x86_phys_bits is the host address width. Value of the guest's
+> may vary. So maybe we should just traverse the memslots and zap the gfn ranges
+> in each of them?
 > 
-> > Drop the dedicated 'ept_pointers_match' field in favor of stuffing
-> > 'hv_tlb_eptp' with INVALID_PAGE to mark it as invalid, i.e. to denote
-> > that there is at least one EPTP mismatch.  Use a local variable to
-> > track whether or not a mismatch is detected so that hv_tlb_eptp can be
-> > used to skip redundant flushes.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 16 ++++++++--------
-> >  arch/x86/kvm/vmx/vmx.h |  7 -------
-> >  2 files changed, 8 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 52cb9eec1db3..4dfde8b64750 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -498,13 +498,13 @@ static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
-> >  	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-> >  	struct kvm_vcpu *vcpu;
-> >  	int ret = 0, i;
-> > +	bool mismatch;
-> >  	u64 tmp_eptp;
-> >  
-> >  	spin_lock(&kvm_vmx->ept_pointer_lock);
-> >  
-> > -	if (kvm_vmx->ept_pointers_match != EPT_POINTERS_MATCH) {
-> > -		kvm_vmx->ept_pointers_match = EPT_POINTERS_MATCH;
-> > -		kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
-> > +	if (!VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
-> > +		mismatch = false;
-> >  
-> >  		kvm_for_each_vcpu(i, vcpu, kvm) {
-> >  			tmp_eptp = to_vmx(vcpu)->ept_pointer;
-> > @@ -515,12 +515,13 @@ static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
-> >  			if (!VALID_PAGE(kvm_vmx->hv_tlb_eptp))
-> >  				kvm_vmx->hv_tlb_eptp = tmp_eptp;
-> >  			else
-> > -				kvm_vmx->ept_pointers_match
-> > -					= EPT_POINTERS_MISMATCH;
-> > +				mismatch = true;
-> >  
-> >  			ret |= hv_remote_flush_eptp(tmp_eptp, range);
-> >  		}
-> > -	} else if (VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
-> > +		if (mismatch)
-> > +			kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
-> > +	} else {
-> >  		ret = hv_remote_flush_eptp(kvm_vmx->hv_tlb_eptp, range);
-> >  	}
-> 
-> Personally, I find double negations like 'mismatch = false' hard to read
-> :-).
 
-Paolo also dislikes double negatives (I just wasted a minute of my life trying
-to work a double negative into that sentence).
+It must be smaller than the host value for two-dimensional paging, though.
 
-> What if we write this all like 
-> 
-> if (!VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
-> 	kvm_vmx->hv_tlb_eptp = to_vmx(vcpu0)->ept_pointer;
-> 	kvm_for_each_vcpu() {
-> 		tmp_eptp = to_vmx(vcpu)->ept_pointer;
-> 		if (!VALID_PAGE(tmp_eptp) || tmp_eptp != kvm_vmx->hv_tlb_eptp)
-> 			kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
-> 		if (VALID_PAGE(tmp_eptp))
-> 			ret |= hv_remote_flush_eptp(tmp_eptp, range);
-> 	}
-> } else {
-> 	ret = hv_remote_flush_eptp(kvm_vmx->hv_tlb_eptp, range);
-> }
-> 
-> (not tested and I've probably missed something)
+Paolo
 
-It works, but doesn't optimize the case where one or more vCPUs has an invalid
-EPTP.  E.g. if vcpuN->ept_pointer is INVALID_PAGE, vcpuN+1..vcpuZ will flush,
-even if they all match.  Now, whether or not it's worth optimizing that case...
-
-This is also why I named it "mismatch", i.e. it tracks whether or not there was
-a mismatch between valid EPTPs, not that all EPTPs matched.
-
-What about replacing "mismatch" with a counter that tracks the number of unique,
-valid PGDs that are encountered?
-
-	if (!VALID_PAGE(kvm_vmx->hv_tlb_pgd)) {
-		unique_valid_pgd_cnt = 0;
-
-		kvm_for_each_vcpu(i, vcpu, kvm) {
-			tmp_pgd = to_vmx(vcpu)->hv_tlb_pgd;
-			if (!VALID_PAGE(tmp_pgd) ||
-			    tmp_pgd == kvm_vmx->hv_tlb_pgd)
-				continue;
-
-			unique_valid_pgd_cnt++;
-
-			if (!VALID_PAGE(kvm_vmx->hv_tlb_pgd))
-				kvm_vmx->hv_tlb_pgd = tmp_pgd;
-
-			if (!ret)
-				ret = hv_remote_flush_pgd(tmp_pgd, range);
-
-			if (ret && unique_valid_pgd_cnt > 1)
-				break;
-		}
-		if (unique_valid_pgd_cnt > 1)
-			kvm_vmx->hv_tlb_pgd = INVALID_PAGE;
-	} else {
-		ret = hv_remote_flush_pgd(kvm_vmx->hv_tlb_pgd, range);
-	}
-
-
-Alternatively, the pgd_cnt adjustment could be used to update hv_tlb_pgd, e.g.
-
-			if (++unique_valid_pgd_cnt == 1)
-				kvm_vmx->hv_tlb_pgd = tmp_pgd;
-
-I think I like this last one the most.  It self-documents what we're tracking
-as well as the relationship between the number of valid PGDs and hv_tlb_pgd.
-
-I'll also add a few comments to explain how kvm_vmx->hv_tlb_pgd is used.
-
-Thoughts?
- 
-> > @@ -3042,8 +3043,7 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
-> >  		if (kvm_x86_ops.tlb_remote_flush) {
-> >  			spin_lock(&to_kvm_vmx(kvm)->ept_pointer_lock);
-> >  			to_vmx(vcpu)->ept_pointer = eptp;
-> > -			to_kvm_vmx(kvm)->ept_pointers_match
-> > -				= EPT_POINTERS_CHECK;
-> > +			to_kvm_vmx(kvm)->hv_tlb_eptp = INVALID_PAGE;
-> >  			spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
-> >  		}
-> >  
-> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> > index 3d557a065c01..e8d7d07b2020 100644
-> > --- a/arch/x86/kvm/vmx/vmx.h
-> > +++ b/arch/x86/kvm/vmx/vmx.h
-> > @@ -288,12 +288,6 @@ struct vcpu_vmx {
-> >  	} shadow_msr_intercept;
-> >  };
-> >  
-> > -enum ept_pointers_status {
-> > -	EPT_POINTERS_CHECK = 0,
-> > -	EPT_POINTERS_MATCH = 1,
-> > -	EPT_POINTERS_MISMATCH = 2
-> > -};
-> > -
-> >  struct kvm_vmx {
-> >  	struct kvm kvm;
-> >  
-> > @@ -302,7 +296,6 @@ struct kvm_vmx {
-> >  	gpa_t ept_identity_map_addr;
-> >  
-> >  	hpa_t hv_tlb_eptp;
-> > -	enum ept_pointers_status ept_pointers_match;
-> >  	spinlock_t ept_pointer_lock;
-> >  };
-> 
-> -- 
-> Vitaly
-> 
