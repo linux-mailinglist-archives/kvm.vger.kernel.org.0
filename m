@@ -2,143 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86F23294D07
-	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 14:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 146DA294D0B
+	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 14:51:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2442617AbgJUMue (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 08:50:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49822 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2442621AbgJUMud (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Oct 2020 08:50:33 -0400
-Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A82C0613CE
-        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 05:50:32 -0700 (PDT)
-Received: by mail-qv1-xf44.google.com with SMTP id s1so965988qvm.13
-        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 05:50:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=VkhhJyafoy36fds4PnCfWF9LNV9fC1i6gyayD/bdTsE=;
-        b=Bjric0h8k3E5nVSnyA3y8syn5qJbzN5IRzuOHR0d7uEDz69w1rKEdQtJjX2klnSD2f
-         HQcTpKD5D3V7kWLlToHxrM8UOfbUsM4NGMyxmaL4cJNWPBOlwy7SSVlgAu3fXQNgW/tm
-         E/Z154bHNIDfOdfpW4c0/FAD/DUsAoEBg7tdzOhHMjGwZ1srI5ZzmyHw1kqTbOA20Zsr
-         6FkTvbFUFtQy26Mpkg7JM8b/jc3WZ4zNCmcMh6GqroRxUEuzzQjwRRq/1rm+GvI0lwIa
-         yqkLIFnQ0gQqj71OpMsdVbj1j0y2lESP0Xm+nHN0pfprmhEnmw6kFUQw4XnnGYDmJyHR
-         D1HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=VkhhJyafoy36fds4PnCfWF9LNV9fC1i6gyayD/bdTsE=;
-        b=udMEfykBMM1dH+A61urnTFvaYN80TEN5fjivlMBZ6eECFJiaOJnNDB1A08T9u+KAzs
-         5d6T1Vd6KB4OFpc1RD4f8wp78Gd39NH9qfLecFQKnEI2spSJ8SwvrcnNCGMDp7Mk+Phl
-         AUq9QYp5IFe7faKnwItzAlZ735/I1MGNL0jINQW/al5+Bg1Fdj3mGUsAdg3oie6sG2h7
-         rKaM+z7fGBlOgRj7J6IelROlwOmQiQHNpSmXDO4ou6jstJKDyxKwV7DJ5u5H6gziAEGt
-         0kIpucN+xOzV1RYbZLFIny75aaTKpVRpX/CfvKsPrZum5jhKyYM238XCGVJvxnfLDmxC
-         v3rA==
-X-Gm-Message-State: AOAM532jc2GbtbTcuUF72x8g3ItBqiT86qfW9voBB7cwlqQnknZz8Bbu
-        1C5WW5+O4zXxNo+Ro7dFjfLTQA==
-X-Google-Smtp-Source: ABdhPJylgNYamo6kqGCWkyezTruGMIXv95IBuM/bFST1jOCSfo3IMWIRoN2J3LwPyBiAPIKaTroxlw==
-X-Received: by 2002:ad4:52c6:: with SMTP id p6mr2781869qvs.38.1603284631882;
-        Wed, 21 Oct 2020 05:50:31 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id r11sm1016060qtw.47.2020.10.21.05.50.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2020 05:50:31 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kVDZW-003UAg-0q; Wed, 21 Oct 2020 09:50:30 -0300
-Date:   Wed, 21 Oct 2020 09:50:30 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
+        id S2442662AbgJUMvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 08:51:31 -0400
+Received: from nat-hk.nvidia.com ([203.18.50.4]:32157 "EHLO nat-hk.nvidia.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2442652AbgJUMva (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Oct 2020 08:51:30 -0400
+Received: from HKMAIL104.nvidia.com (Not Verified[10.18.92.77]) by nat-hk.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f902ed00001>; Wed, 21 Oct 2020 20:51:28 +0800
+Received: from HKMAIL102.nvidia.com (10.18.16.11) by HKMAIL104.nvidia.com
+ (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 21 Oct
+ 2020 12:51:28 +0000
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ by HKMAIL102.nvidia.com (10.18.16.11) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Wed, 21 Oct 2020 12:51:28 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FRw8/EytkfcUBldJuP/BUuxxIDH9Cjfkp7Nmm09svP82seUUZfOU/ahD2Ulz4L2wWbcVan/0CdFMo6RobnpIzM27wU2MFgf3UZNaFMDAqPgUzu2xEisqqJiXSZxE4/RdsmqwQcsSpZ8B1Rd/qPPrQ5JuL/7rotO1Z38dlgYW0XBnhzqD02IOt67LgNrMdo07HikgJ298nvGqMcHoDGbwSDMF6E54RLYQnEjjTeGkeYscYrmTL2ImCgq3KPEZx6eOpBYeBO1VO73nlTHK3vTTcwDa+vjSVtO8l3Obv+UKChkK7HgpAhty9SbHgUzvWKb9ijXIetg/l+t9+zATfsE6Zg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yh/1ZhTxXHD1YXbmPcINfY1BXvQtNEnRPtNoRP9PEH4=;
+ b=MeXBi/FsegQ4Ozc+o9nqHqApf9xo37Zq7fkpRtw8dnhIsQf/36ff6syWd4R3od1pGpPh/H3vP/RuPutpklaZoDu3aBKB8c2rys5z9vLqvptYiP63DDyWBOjniy46NJjGgep0pKrZ3QyLnxznLFlDP/PqxAs1iGAME1qzEQqfVJra/s8urs/k+BUxQp+uLasxIQjPMPRm+bciVVfol61EgyKjQOkBPk0GLtsTvHaz0GXmnD/T9n54Eeor/x+Qprk0olGD2IK2LFtyCdXevIy4b8X05lIdUSJroNjV49dy81c/1pyr9TtkkrEwEr1Ra/rlitUC0mY3whPauKPOIqSrag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4498.namprd12.prod.outlook.com (2603:10b6:5:2a2::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Wed, 21 Oct
+ 2020 12:51:26 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3477.028; Wed, 21 Oct 2020
+ 12:51:26 +0000
+Date:   Wed, 21 Oct 2020 09:51:24 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
-        linux-pci@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.com>
-Subject: Re: [PATCH v3 12/16] PCI: Obey iomem restrictions for procfs mmap
-Message-ID: <20201021125030.GK36674@ziepe.ca>
+CC:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-mm@kvack.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-media@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>
+Subject: Re: [PATCH v3 00/16] follow_pfn and other iomap races
+Message-ID: <20201021125124.GA827089@nvidia.com>
 References: <20201021085655.1192025-1-daniel.vetter@ffwll.ch>
- <20201021085655.1192025-13-daniel.vetter@ffwll.ch>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201021085655.1192025-13-daniel.vetter@ffwll.ch>
+In-Reply-To: <20201021085655.1192025-1-daniel.vetter@ffwll.ch>
+X-ClientProxiedBy: MN2PR08CA0025.namprd08.prod.outlook.com
+ (2603:10b6:208:239::30) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR08CA0025.namprd08.prod.outlook.com (2603:10b6:208:239::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24 via Frontend Transport; Wed, 21 Oct 2020 12:51:25 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kVDaO-003UBS-Qb; Wed, 21 Oct 2020 09:51:24 -0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1603284689; bh=yh/1ZhTxXHD1YXbmPcINfY1BXvQtNEnRPtNoRP9PEH4=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType;
+        b=C7xYU0fDsha18ThIXlmRE40GkYuRAFPxCvdB3o1nMvhmU+vNu/rWItr/hyVsI9JH9
+         fOswYgLrZ1ZCdIq3o74WRdiiwn36I+f089K2bd5TwpCAN88YO70quRsJez5AumELr1
+         rUSxhC1RAFOXp/GeUnJ89506tos7uvcJw1UAIv6ruwvgDQgeI9UdjilJv1BO6pVzHs
+         voW1qRPuxMuaDc5hOEpSvzFbPi+5E52IQsBge0a0DfxAsa6VhbITJG8CQ4ZD4w6A0O
+         0U0LE7MYwwqgIITuqPz4Q6uMmb+s1eOV3pscqtu/o7GoBFJpxWCQpWJhazPnrKwrXa
+         XsZ5x/vGm+/Rg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 21, 2020 at 10:56:51AM +0200, Daniel Vetter wrote:
-> There's three ways to access PCI BARs from userspace: /dev/mem, sysfs
-> files, and the old proc interface. Two check against
-> iomem_is_exclusive, proc never did. And with CONFIG_IO_STRICT_DEVMEM,
-> this starts to matter, since we don't want random userspace having
-> access to PCI BARs while a driver is loaded and using it.
+On Wed, Oct 21, 2020 at 10:56:39AM +0200, Daniel Vetter wrote:
+> Hi all,
 > 
-> Fix this by adding the same iomem_is_exclusive() check we already have
-> on the sysfs side in pci_mmap_resource().
+> Round 3 of my patch series to clamp down a bunch of races and gaps
+> around follow_pfn and other access to iomem mmaps. Previous version:
 > 
-> References: 90a545e98126 ("restrict /dev/mem to idle io memory ranges")
-> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: John Hubbard <jhubbard@nvidia.com>
-> Cc: Jérôme Glisse <jglisse@redhat.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: linux-mm@kvack.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-samsung-soc@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: Bjorn Helgaas <bhelgaas@google.com>
-> Cc: linux-pci@vger.kernel.org
-> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.com>
+> v1: https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
+> v2: https://lore.kernel.org/dri-devel/20201009075934.3509076-1-daniel.vetter@ffwll.ch
+> 
+> And the discussion that sparked this journey:
+> 
+> https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
+> 
+> I was waiting for the testing result for habanalabs from Oded, but I guess
+> Oded was waiting for my v3.
+> 
+> Changes in v3:
+> - Bunch of polish all over, no functional changes aside from one barrier
+>   in the resource code, for consistency.
+> - A few more r-b tags.
+> 
+> Changes in v2:
+> - tons of small polish&fixes all over, thanks to all the reviewers who
+>   spotted issues
+> - I managed to test at least the generic_access_phys and pci mmap revoke
+>   stuff with a few gdb sessions using our i915 debug tools (hence now also
+>   the drm/i915 patch to properly request all the pci bar regions)
+> - reworked approach for the pci mmap revoke: Infrastructure moved into
+>   kernel/resource.c, address_space mapping is now set up at open time for
+>   everyone (which required some sysfs changes). Does indeed look a lot
+>   cleaner and a lot less invasive than I feared at first.
+> 
+> The big thing I can't test are all the frame_vector changes in habanalbas,
+> exynos and media. Gerald has given the s390 patch a spin already.
+> 
+> Review, testing, feedback all very much welcome.
+> 
+> Daniel Vetter (16):
+>   drm/exynos: Stop using frame_vector helpers
+>   drm/exynos: Use FOLL_LONGTERM for g2d cmdlists
+>   misc/habana: Stop using frame_vector helpers
+>   misc/habana: Use FOLL_LONGTERM for userptr
+>   mm/frame-vector: Use FOLL_LONGTERM
+>   media: videobuf2: Move frame_vector into media subsystem
+>   mm: Close race in generic_access_phys
+>   s390/pci: Remove races against pte updates
+>   mm: Add unsafe_follow_pfn
+>   media/videbuf1|2: Mark follow_pfn usage as unsafe
+>   vfio/type1: Mark follow_pfn as unsafe
+>   PCI: Obey iomem restrictions for procfs mmap
+>   /dev/mem: Only set filp->f_mapping
+>   resource: Move devmem revoke code to resource framework
+>   sysfs: Support zapping of binary attr mmaps
+>   PCI: Revoke mappings like devmem
 
-Maybe not for fixing in this series, but this access to
-IORESOURCE_BUSY doesn't have any locking.
+The whole thing looks like a great improvement!
 
-The write side holds the resource_lock at least..
-
->  	ret = pci_mmap_page_range(dev, i, vma,
->  				  fpriv->mmap_state, write_combine);
-
-At this point the vma isn't linked into the address space, so doesn't
-this happen?
-
-     CPU 0                                  CPU1
- mmap_region()
-   vma = vm_area_alloc
-   proc_bus_pci_mmap
-    iomem_is_exclusive
-    pci_mmap_page_range
-                                            revoke_devmem
-                                             unmap_mapping_range()
-     // vma is not linked to the address space here,
-     // unmap doesn't find it
-  vma_link() 
-  !!! The VMA gets mapped with the revoked PTEs
-
-I couldn't find anything that prevents it at least, no mmap_sem on the
-unmap side, just the i_mmap_lock
-
-Not seeing how address space and pre-populating during mmap work
-together? Did I miss locking someplace?
-
-Not something to be fixed for this series, this is clearly an
-improvement, but seems like another problem to tackle?
-
+Thanks,
 Jason
