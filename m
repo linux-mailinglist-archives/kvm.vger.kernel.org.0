@@ -2,146 +2,323 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A56E294A5B
-	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 11:18:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D5BB294AA9
+	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 11:38:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437864AbgJUJSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 05:18:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31838 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437714AbgJUJSc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Oct 2020 05:18:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603271910;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BuwkUAjLlfFrMB6xaXRKIQfvGDBRzOXmT/8rwImt4Tc=;
-        b=XGDROQ2b9LP9Auj2eouSrz4DmFP7lvxWAc+sQybxzUzXLsry73PzfpnsUX1m26f43VwqgJ
-        AnQ06kPP1Yc6sKmNQeDRo3JPTFcujNgY+HLm+jtKuTjQR322AS/2JRSEhy6cANeV2mJjEH
-        80jkP5cJLyKuVSIG0EzUmcGbxMvz5y4=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-LP2fBE9LNASSG_OoPYnzMQ-1; Wed, 21 Oct 2020 05:18:28 -0400
-X-MC-Unique: LP2fBE9LNASSG_OoPYnzMQ-1
-Received: by mail-ej1-f72.google.com with SMTP id x12so1507898eju.22
-        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 02:18:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=BuwkUAjLlfFrMB6xaXRKIQfvGDBRzOXmT/8rwImt4Tc=;
-        b=Np6FD8wrszC39WZTSavQD6Hzv58qnNsJmXZZDnGeJEhAxrA+SOW3R0KHx/4GdD2XRZ
-         9Y7NEof2dvTEoSI7OjyIEKVipsmYc41Y0OPvsfoi+6TCTsyjjg/x+e1SPJN00mDHGeM+
-         ePw9PgtB3yW1QvI/thrDSCFk4a41tGAHxX3Q2CZO7Wvqk3U/j8uOrqqG6UZ5EKb/uTsn
-         R0KiSpJS+rqiLb/tkSR3/ZbenpUbHo7+Bo6W3VQvydIt/xQsKZMmW1RZGh8vpTT7cnV/
-         cn3pSog8Flth10g+HiQ+IjaslYlKo68FYhiV3ZJUnGaX6jQSDxqjNHVUqzBZBmcwB/Up
-         OkKQ==
-X-Gm-Message-State: AOAM531pUKFofMQ1gXLe+rTIBtZOWwXd1P+OU1OOOjRsq09WmUrB6H4f
-        Nba7WVo5Tp1tGDrLvgX5YYxILFbMjotO54BGtCysVYgmZoKvCkmXEGR+1IzjWcm+j6I8yOThkB9
-        GIo7xmj7ZHJez
-X-Received: by 2002:a17:906:395a:: with SMTP id g26mr2442209eje.147.1603271907185;
-        Wed, 21 Oct 2020 02:18:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz1RxSS64rCEGcYTuA52gSqVnQYMuyREEUaL2hSk8fLqQi1kllGDBnahWJqHS7C19HXqY1pOg==
-X-Received: by 2002:a17:906:395a:: with SMTP id g26mr2442191eje.147.1603271906947;
-        Wed, 21 Oct 2020 02:18:26 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id e17sm1886517ejh.64.2020.10.21.02.18.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2020 02:18:26 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 00/10] KVM: VMX: Clean up Hyper-V PV TLB flush
-In-Reply-To: <20201020215613.8972-1-sean.j.christopherson@intel.com>
-References: <20201020215613.8972-1-sean.j.christopherson@intel.com>
-Date:   Wed, 21 Oct 2020 11:18:25 +0200
-Message-ID: <87d01c544e.fsf@vitty.brq.redhat.com>
+        id S2438224AbgJUJiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 05:38:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64908 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2438199AbgJUJiX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Oct 2020 05:38:23 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09L9WhUY147226;
+        Wed, 21 Oct 2020 05:38:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FF3fA7nLB7tEoc/Bpi1wO3c3onxYGCD7h+eKUEZz8Ds=;
+ b=GU19uR9VrIZUkWixwDdd2C6AIvRqolByCaTwMMTWcmCYKO7AgYedqynyhDlnTPDXUobj
+ obN8ZDoRsCyk8QhvkW4uGXaIqkm0kwmnZSChXPiMK5JJ6+a61EoVBv2U+ywwz0sq6XAe
+ ytvECirmku7p7gJeMFPgZIXWEDzzeyawm4ylkVlTZ+kYVg1RQxDJbEv0x011QGv1vpnH
+ ICO8dScC+4ShEjz5rVugDaZLm1gQizm0NgvRE5LMbwEpvM2dSLn8KFq+rakciWBQmVoJ
+ Y+aViePfZ2dJln+53juX2SZOj+VsbrfsHcaTm1Z9nvG3YWmLoEWdn/wxqwUvNvovWRzh XQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34ahef248p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Oct 2020 05:38:05 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09L9WomS147554;
+        Wed, 21 Oct 2020 05:38:04 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34ahef247v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Oct 2020 05:38:04 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09L9QviX015741;
+        Wed, 21 Oct 2020 09:38:02 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 348d5quabg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Oct 2020 09:38:02 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09L9bx5v35979708
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Oct 2020 09:37:59 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7D537AE05A;
+        Wed, 21 Oct 2020 09:37:59 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A14D5AE055;
+        Wed, 21 Oct 2020 09:37:58 +0000 (GMT)
+Received: from [9.145.178.173] (unknown [9.145.178.173])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Oct 2020 09:37:58 +0000 (GMT)
+Subject: Re: [PATCH v3 08/16] s390/pci: Remove races against pte updates
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20201021085655.1192025-1-daniel.vetter@ffwll.ch>
+ <20201021085655.1192025-9-daniel.vetter@ffwll.ch>
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+Message-ID: <07557af4-32b5-7610-292c-9fd3bbfe9229@linux.ibm.com>
+Date:   Wed, 21 Oct 2020 11:37:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
+In-Reply-To: <20201021085655.1192025-9-daniel.vetter@ffwll.ch>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.737
+ definitions=2020-10-21_03:2020-10-20,2020-10-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ bulkscore=0 spamscore=0 lowpriorityscore=0 suspectscore=2 mlxlogscore=999
+ clxscore=1015 mlxscore=0 priorityscore=1501 impostorscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010210074
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> Clean up KVM's PV TLB flushing when running with EPT on Hyper-V, i.e. as
-> a nested VMM.  
 
-The terminology we use is a bit confusing and I'd like to use the
-opportunity to enlighten myself on how to call "PV TLB flushing"
-properly :-)
+On 10/21/20 10:56 AM, Daniel Vetter wrote:
+> Way back it was a reasonable assumptions that iomem mappings never
+> change the pfn range they point at. But this has changed:
+> 
+> - gpu drivers dynamically manage their memory nowadays, invalidating
+> ptes with unmap_mapping_range when buffers get moved
+> 
+> - contiguous dma allocations have moved from dedicated carvetouts to
+> cma regions. This means if we miss the unmap the pfn might contain
+> pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
+> 
+> - even /dev/mem now invalidates mappings when the kernel requests that
+> iomem region when CONFIG_IO_STRICT_DEVMEM is set, see commit
+> 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims the
+> region")
+> 
+> Accessing pfns obtained from ptes without holding all the locks is
+> therefore no longer a good idea. Fix this.
+> 
+> Since zpci_memcpy_from|toio seems to not do anything nefarious with
+> locks we just need to open code get_pfn and follow_pfn and make sure
+> we drop the locks only after we're done. The write function also needs
+> the copy_from_user move, since we can't take userspace faults while
+> holding the mmap sem.
+> 
+> v2: Move VM_IO | VM_PFNMAP checks around so they keep returning EINVAL
+> like before (Gerard)
+> 
+> v3: Polish commit message (Niklas)
+> 
+> Reviewed-by: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: John Hubbard <jhubbard@nvidia.com>
+> Cc: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: linux-mm@kvack.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-samsung-soc@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+> Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+> Cc: linux-s390@vger.kernel.org
+> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.com>
+                                                   ^^^^
+This should be ".ch", but since this is clearly a typo and you also send from @ffwll.ch,
+I took the liberty and fixed it for this commit and applied your patch to our internal
+branch, Heiko or Vasily will then pick it up for the s390 tree.
 
-Hyper-V supports two types of 'PV TLB flushing':
+Thanks!
 
-HvFlushVirtualAddressSpace/HvFlushVirtualAddressList[,Ex] which is
-described in TLFS as ".. hypercall invalidates ... virtual TLB entries
-that belong to a specified address space."
-
-HvFlushGuestPhysicalAddressSpace/HvFlushGuestPhysicalAddressList which
-in TLFS is referred to as "... hypercall invalidates cached L2 GPA to
-GPA mappings within a second level address space... hypercall is like
-the execution of an INVEPT instruction with type “single-context” on all
-processors" and INVEPT is defined in SDM as "Invalidates mappings in the
-translation lookaside buffers (TLBs) and paging-structure caches that
-were derived from extended page tables (EPT)." (and that's what this
-series is about)
-
-and every time I see e.g. 'hv_remote_flush_tlb.*' it takes me some time
-to recall which flushing is this related to. Do you by any chance have
-any suggestions on how things can be improved?
-
-> No real goal in mind other than the sole patch in v1, which
-> is a minor change to avoid a future mixup when TDX also wants to define
-> .remote_flush_tlb.  Everything else is opportunistic clean up.
->
-
-Looks like a nice cleanup, thanks!
-
-> Ran Hyper-V KVM unit tests (if those are even relevant?)
-
-No, they aren't. KVM doesn't currently implement
-HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST so we can't test this feature
-outside of a real Hyper-V environment. We also don't yet test KVM-on-KVM
-with Enlightened VMCS ...
-
-> but haven't actually tested on top of Hyper-V.
-
-Just in case you are interested in doing so and there's no Hyper-V
-server around, you can either search for a Win10 desktop around or just
-spin an Azure VM where modern instance types (e.g. Dv3/v4, Ev3/v4
-families, Intel only - so no Ea/Da/...) have VMX and PV Hyper-V features
-exposed.
-
-I'm going to give this a try today and I will also try to review
-individual patches, thanks again!
-
->
-> v2: Rewrite everything.
->
-> Sean Christopherson (10):
->   KVM: VMX: Track common EPTP for Hyper-V's paravirt TLB flush
->   KVM: VMX: Stash kvm_vmx in a local variable for Hyper-V paravirt TLB
->     flush
->   KVM: VMX: Fold Hyper-V EPTP checking into it's only caller
->   KVM: VMX: Do Hyper-V TLB flush iff vCPU's EPTP hasn't been flushed
->   KVM: VMX: Invalidate hv_tlb_eptp to denote an EPTP mismatch
->   KVM: VMX: Don't invalidate hv_tlb_eptp if the new EPTP matches
->   KVM: VMX: Explicitly check for hv_remote_flush_tlb when loading pgd
->   KVM: VMX: Define Hyper-V paravirt TLB flush fields iff Hyper-V is
->     enabled
->   KVM: VMX: Skip additional Hyper-V TLB EPTP flushes if one fails
->   KVM: VMX: Track PGD instead of EPTP for paravirt Hyper-V TLB flush
->
->  arch/x86/kvm/vmx/vmx.c | 102 ++++++++++++++++++++---------------------
->  arch/x86/kvm/vmx/vmx.h |  16 +++----
->  2 files changed, 57 insertions(+), 61 deletions(-)
-
--- 
-Vitaly
-
+> ---
+>  arch/s390/pci/pci_mmio.c | 98 +++++++++++++++++++++++-----------------
+>  1 file changed, 57 insertions(+), 41 deletions(-)
+> 
+> diff --git a/arch/s390/pci/pci_mmio.c b/arch/s390/pci/pci_mmio.c
+> index 401cf670a243..1a6adbc68ee8 100644
+> --- a/arch/s390/pci/pci_mmio.c
+> +++ b/arch/s390/pci/pci_mmio.c
+> @@ -119,33 +119,15 @@ static inline int __memcpy_toio_inuser(void __iomem *dst,
+>  	return rc;
+>  }
+>  
+> -static long get_pfn(unsigned long user_addr, unsigned long access,
+> -		    unsigned long *pfn)
+> -{
+> -	struct vm_area_struct *vma;
+> -	long ret;
+> -
+> -	mmap_read_lock(current->mm);
+> -	ret = -EINVAL;
+> -	vma = find_vma(current->mm, user_addr);
+> -	if (!vma)
+> -		goto out;
+> -	ret = -EACCES;
+> -	if (!(vma->vm_flags & access))
+> -		goto out;
+> -	ret = follow_pfn(vma, user_addr, pfn);
+> -out:
+> -	mmap_read_unlock(current->mm);
+> -	return ret;
+> -}
+> -
+>  SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
+>  		const void __user *, user_buffer, size_t, length)
+>  {
+>  	u8 local_buf[64];
+>  	void __iomem *io_addr;
+>  	void *buf;
+> -	unsigned long pfn;
+> +	struct vm_area_struct *vma;
+> +	pte_t *ptep;
+> +	spinlock_t *ptl;
+>  	long ret;
+>  
+>  	if (!zpci_is_enabled())
+> @@ -158,7 +140,7 @@ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
+>  	 * We only support write access to MIO capable devices if we are on
+>  	 * a MIO enabled system. Otherwise we would have to check for every
+>  	 * address if it is a special ZPCI_ADDR and would have to do
+> -	 * a get_pfn() which we don't need for MIO capable devices.  Currently
+> +	 * a pfn lookup which we don't need for MIO capable devices.  Currently
+>  	 * ISM devices are the only devices without MIO support and there is no
+>  	 * known need for accessing these from userspace.
+>  	 */
+> @@ -176,21 +158,37 @@ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
+>  	} else
+>  		buf = local_buf;
+>  
+> -	ret = get_pfn(mmio_addr, VM_WRITE, &pfn);
+> +	ret = -EFAULT;
+> +	if (copy_from_user(buf, user_buffer, length))
+> +		goto out_free;
+> +
+> +	mmap_read_lock(current->mm);
+> +	ret = -EINVAL;
+> +	vma = find_vma(current->mm, mmio_addr);
+> +	if (!vma)
+> +		goto out_unlock_mmap;
+> +	if (!(vma->vm_flags & (VM_IO | VM_PFNMAP)))
+> +		goto out_unlock_mmap;
+> +	ret = -EACCES;
+> +	if (!(vma->vm_flags & VM_WRITE))
+> +		goto out_unlock_mmap;
+> +
+> +	ret = follow_pte_pmd(vma->vm_mm, mmio_addr, NULL, &ptep, NULL, &ptl);
+>  	if (ret)
+> -		goto out;
+> -	io_addr = (void __iomem *)((pfn << PAGE_SHIFT) |
+> +		goto out_unlock_mmap;
+> +
+> +	io_addr = (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
+>  			(mmio_addr & ~PAGE_MASK));
+>  
+> -	ret = -EFAULT;
+>  	if ((unsigned long) io_addr < ZPCI_IOMAP_ADDR_BASE)
+> -		goto out;
+> -
+> -	if (copy_from_user(buf, user_buffer, length))
+> -		goto out;
+> +		goto out_unlock_pt;
+>  
+>  	ret = zpci_memcpy_toio(io_addr, buf, length);
+> -out:
+> +out_unlock_pt:
+> +	pte_unmap_unlock(ptep, ptl);
+> +out_unlock_mmap:
+> +	mmap_read_unlock(current->mm);
+> +out_free:
+>  	if (buf != local_buf)
+>  		kfree(buf);
+>  	return ret;
+> @@ -274,7 +272,9 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
+>  	u8 local_buf[64];
+>  	void __iomem *io_addr;
+>  	void *buf;
+> -	unsigned long pfn;
+> +	struct vm_area_struct *vma;
+> +	pte_t *ptep;
+> +	spinlock_t *ptl;
+>  	long ret;
+>  
+>  	if (!zpci_is_enabled())
+> @@ -287,7 +287,7 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
+>  	 * We only support read access to MIO capable devices if we are on
+>  	 * a MIO enabled system. Otherwise we would have to check for every
+>  	 * address if it is a special ZPCI_ADDR and would have to do
+> -	 * a get_pfn() which we don't need for MIO capable devices.  Currently
+> +	 * a pfn lookup which we don't need for MIO capable devices.  Currently
+>  	 * ISM devices are the only devices without MIO support and there is no
+>  	 * known need for accessing these from userspace.
+>  	 */
+> @@ -306,22 +306,38 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
+>  		buf = local_buf;
+>  	}
+>  
+> -	ret = get_pfn(mmio_addr, VM_READ, &pfn);
+> +	mmap_read_lock(current->mm);
+> +	ret = -EINVAL;
+> +	vma = find_vma(current->mm, mmio_addr);
+> +	if (!vma)
+> +		goto out_unlock_mmap;
+> +	if (!(vma->vm_flags & (VM_IO | VM_PFNMAP)))
+> +		goto out_unlock_mmap;
+> +	ret = -EACCES;
+> +	if (!(vma->vm_flags & VM_WRITE))
+> +		goto out_unlock_mmap;
+> +
+> +	ret = follow_pte_pmd(vma->vm_mm, mmio_addr, NULL, &ptep, NULL, &ptl);
+>  	if (ret)
+> -		goto out;
+> -	io_addr = (void __iomem *)((pfn << PAGE_SHIFT) | (mmio_addr & ~PAGE_MASK));
+> +		goto out_unlock_mmap;
+> +
+> +	io_addr = (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
+> +			(mmio_addr & ~PAGE_MASK));
+>  
+>  	if ((unsigned long) io_addr < ZPCI_IOMAP_ADDR_BASE) {
+>  		ret = -EFAULT;
+> -		goto out;
+> +		goto out_unlock_pt;
+>  	}
+>  	ret = zpci_memcpy_fromio(buf, io_addr, length);
+> -	if (ret)
+> -		goto out;
+> -	if (copy_to_user(user_buffer, buf, length))
+> +
+> +out_unlock_pt:
+> +	pte_unmap_unlock(ptep, ptl);
+> +out_unlock_mmap:
+> +	mmap_read_unlock(current->mm);
+> +
+> +	if (!ret && copy_to_user(user_buffer, buf, length))
+>  		ret = -EFAULT;
+>  
+> -out:
+>  	if (buf != local_buf)
+>  		kfree(buf);
+>  	return ret;
+> 
