@@ -2,374 +2,415 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86755295272
-	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 20:50:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED89729529F
+	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 21:00:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2504444AbgJUSul (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 14:50:41 -0400
-Received: from mga07.intel.com ([134.134.136.100]:52152 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2503511AbgJUSuk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Oct 2020 14:50:40 -0400
-IronPort-SDR: GpaOruF3X0TbO6F2cjBEdQWihLAJQejThSoHl1V8bHLmWc1Q0ObPOXhzCL33Lqyj0tI4XP3Zx+
- GhoZF8fkhvzw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9781"; a="231610924"
-X-IronPort-AV: E=Sophos;i="5.77,401,1596524400"; 
-   d="scan'208";a="231610924"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2020 11:50:39 -0700
-IronPort-SDR: CXaju4mgJML3ACWBKJ0zD0PfXXlQjpABeGaHl1AFdcO0QgbovNdC92dnjTqP4dnA3AfBIxiVtU
- zTOgktXcd+4Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,401,1596524400"; 
-   d="scan'208";a="348636132"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga008.jf.intel.com with ESMTP; 21 Oct 2020 11:50:38 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 21 Oct 2020 11:50:38 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 21 Oct 2020 11:50:37 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 21 Oct 2020 11:50:37 -0700
-Received: from NAM04-BN3-obe.outbound.protection.outlook.com (104.47.46.57) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Wed, 21 Oct 2020 11:50:32 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Tj4qFgv9BK9gMg6dpDHF/ffSfMjusqauY7XRFBDQ/Cbv6U1YMlnqyr7TfkN1GGtURFWY4DuCi5rO+eXwsKO7FbuBFZqwGIG1fDN6mjFXVy9ryvJsdZ3d0VQN/J6fI7sdcyR35k3Tr/dhjMWrrk4KI37n5KFPTRNpse+YI5vkSCMhB2zFBZqzniExjUaGKJknzadsQm+rGagK4NHD9wuZhicPJfVHMCUhte9j3L3giNyLbm4PzpBRrH8fxBjcwWlPrKcGvSy5E7ekfbFWg7fKBWfiuts8rgOUodX/AFf53+FEbKHEAosXUJFmYB+MYccuhycJI4S8EJsBOWVEK7m4Eg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mzNxOqrY87iWEJ5Ghq+XKUY61HOlPyp31Gi7dGkZDY4=;
- b=gaLaPNIUfiYT1sy5OoUkz3KWRcX+eue9GxAKvjkeY7BdVN076ddrShnnEdetFFGlFUAN6j05Pd9A/LUOMhi7jM/h/HyOB+Ir9lBxWKM/anko3+WHZNI0SuznKlIIpEzOnSVSGCtuftc6GpZcCauSKLcSTHyw1DgnoaK8QlxfrA7z2WUcOINMfZmW0lCI9JnOXVlXVG0iDs8IU3UXjYWZQbGKETY2u1GvVeJEz+Mr5BlwLYoWOVIWN3f+1A8ezI3WIW/j45S728+QzmF9HHa4p77yPGKQ3zqAp2B+lEHAfs45oTWrhb757mpg88xXkWdgPKZJdQ9ptVADyj8vS6EfLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mzNxOqrY87iWEJ5Ghq+XKUY61HOlPyp31Gi7dGkZDY4=;
- b=wJKexu0u9MF1GLB9wgy72j55de394jJOv0vCg3cHvQi95iWVaLohsDV6Z2EFbbaqhJXGY4p2Cw0MQWkU201GlxKM4aR00cY7spK+aYzilP7ldpQIIXSsJk+fMirG0OuuOCoaCPMOUM8Kwakxxr4mTqxFTGEbYyODcqZRV2zcbwo=
-Received: from SN6PR11MB3184.namprd11.prod.outlook.com (2603:10b6:805:bd::17)
- by SA0PR11MB4752.namprd11.prod.outlook.com (2603:10b6:806:99::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Wed, 21 Oct
- 2020 18:50:29 +0000
-Received: from SN6PR11MB3184.namprd11.prod.outlook.com
- ([fe80::b901:8e07:4340:6704]) by SN6PR11MB3184.namprd11.prod.outlook.com
- ([fe80::b901:8e07:4340:6704%7]) with mapi id 15.20.3477.028; Wed, 21 Oct 2020
- 18:50:29 +0000
-From:   "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To:     "peterz@infradead.org" <peterz@infradead.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "wad@chromium.org" <wad@chromium.org>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>
-Subject: Re: [RFCv2 14/16] KVM: Handle protected memory in
- __kvm_map_gfn()/__kvm_unmap_gfn()
-Thread-Topic: [RFCv2 14/16] KVM: Handle protected memory in
- __kvm_map_gfn()/__kvm_unmap_gfn()
-Thread-Index: AQHWpqj4ToecU9lBzE+dZx9c9zC6jKmiaMOA
-Date:   Wed, 21 Oct 2020 18:50:28 +0000
-Message-ID: <8404a8802dbdbf81c8f75249039580f9e6942095.camel@intel.com>
-References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
-         <20201020061859.18385-15-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20201020061859.18385-15-kirill.shutemov@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.30.1 (3.30.1-1.fc29) 
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [134.134.137.79]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 735a596e-dfc2-4391-6527-08d875f22e42
-x-ms-traffictypediagnostic: SA0PR11MB4752:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SA0PR11MB47520CF38E196242AD17451DC91C0@SA0PR11MB4752.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3968;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: B0TPHczpRIWDOxPLcQYi4XK5iPJV3ZixYNuO3gYvlbYfl75kD04BwVvD1sItJqxRS/bqm3PA/YznCt0Uw4Z2amGljv307fRxM2SGalbRgtkzKcM6qGEKjTxw7uh1bFmX+KGrweFHgFCUQWcWJruQsIcEuf6wulXkzNEFwPFaM9gTojccs6zWKtX0axK5HbABIFBnwtmfKPOY/LHEXthoeHMIX8Ng/uh1cM8EAVgVob3joRkNlRAwzTQnWgxsKAw3VPwZf67qC3/wwjhlz2sh47+HjsmBkrfxeY/4DkmXP1pq49B5RgugEbOWWAEyMSmhmusOL+jambbMlhfO1ASF9Z4m/T1AaFW5j6xnEcSkHlU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB3184.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(39860400002)(366004)(396003)(2616005)(6512007)(66446008)(316002)(66946007)(30864003)(2906002)(6486002)(5660300002)(8676002)(64756008)(66476007)(8936002)(110136005)(66556008)(54906003)(26005)(7416002)(478600001)(71200400001)(4001150100001)(186003)(4326008)(83380400001)(91956017)(76116006)(86362001)(6506007)(36756003)(921003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: yT2N0P1mIMIhQxEPL2GE5lWLK9jD6gOvvSoW57R3iDxXBwkdqxaoe194U5HPMGzrZJU+b25j54aVTtIJOfOueohlVV0fxup0YAz4VQgXKwbkXob/YrSsmivUOmTSdhrDVWrPQiun0sTdIcDyR2JhA+OgRlZjHAc6seMlCV9fE57EZbF99mspORADg6utX4i3BaLQjH2cLJwoRxG583QCXW+45yj4SoTEzWqFso2vKpKvCh/SVtazMvoRYV6pgx1WfOfCB0yWl8HjEKlT7Kt8/0dDaqxvEU1cOhoPedOiAbN30bzjZ1UadaAfuP0rqd9/xAQUD8xxGGDFO8A0f4wGddxK6hse2bIMFE9x1sjWvrs96PuSpsqMBbnijW+sS6AyRJonyzGo0ZN5see4ofJJ8I8SN4eD5RdH9KUQIah6VMyA1IKBjM6JFr6dcASIr30VKqTThzX9DEMKbV+IoH4KyVabY0dXHGOY5SZLhyAAeR789SOTq30vXWs4cf+OKnQkVdIqk8DvM3h3X0NsjF7oNCIcK0jYvyXaViRC/w5Hx4i9tiT+FBj8oEQwk5kJeToKse7xAGx0ylNjy16kmVe/Deiw4vUrckHZaTvQKDrg7p3Y5i5Zjgrcxx+KRpUvqckYe2qlkIP293Y8x6iMjxBccg==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CE0AC200ACFDA546883416EE10528526@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S2504599AbgJUS7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 14:59:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50688 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2504596AbgJUS7v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Oct 2020 14:59:51 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A504C0613D5
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 11:59:50 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id w23so3002492edl.0
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 11:59:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=GDRf8ABUu+TZaWK0lYE+MAlDPbiqs8UpaJTToDFItts=;
+        b=LlHb740UPxtxMP1zvZIGPA/lPoD9hh7cNYpX8bNSMxy2cki0zar6/kZRNh0S/E0qPa
+         ZpW4b/leM0+bY946rUTzSmq/7g3ri2RkNzbtHgOg4PsM+KUBcOCcVeKNeanRm84wcu/W
+         XOLQ77AHYidJJUWKsJxnqTUekRBiQRbwXSBG2jlE4qdoEJfy409qyTvxRYnPU5bIQb+U
+         bf906IePyxRHDp6qAfLZ/tVAqrc0wSIsu+4XCZIej2gYYhK1Kj6IeIArk+F37RNo6Hm5
+         mBLTs8l1AL21QQMBFirH7aP1YUylC1F8+nuxuBwX/Huc7Cd864psezEXx9wpo6JKELw9
+         5LxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=GDRf8ABUu+TZaWK0lYE+MAlDPbiqs8UpaJTToDFItts=;
+        b=FBsS7n8CHEnUf75Y/NCz1kVujTbvolkd8D1UPEqoVFZSwBLXW0KZuUEyKLsAzyJgnW
+         3ov40aFSyMangcZzyATuGs43jF680rQIaE330Z56KoGJZ212ctJ3v3voRI6qNxcuLg+2
+         78yC007hk6P8q6LAgNYHh4hqLKxsk5KJA5CyHdAY+j4e/AGCnG1j2Z8wfKQ3tOwF9zGP
+         D19O+Ge1ajpWZ5eTpcFO3o5caiyPq7tv4ayM10CC2e5btpYZeEKgO6J1gRCqsg36znv1
+         8IAi7ecgdOvKp0uNY0V/A5zoZB4x3EFmzs3KudT3dKMSfRLVtg9VQiXApYritcLjoMd7
+         Z0zg==
+X-Gm-Message-State: AOAM531xzwvmJ7zH20qCdJTzJ4sAqPtkEchNl3MyUOS7aPLfBQOBetr8
+        k4mesCaoP3cRaYRQUs+hsDVvetDL9MFrI5KCrdpL6Q==
+X-Google-Smtp-Source: ABdhPJxkwinHUuUKpXZZrs2mV0S9ZFr8FhcGow++fntkKzEh91M9Md+jRtPcnjhtSGe98DL/L2wAwzmghcS9V3WHrNo=
+X-Received: by 2002:aa7:cd1a:: with SMTP id b26mr4390509edw.97.1603306788939;
+ Wed, 21 Oct 2020 11:59:48 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB3184.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 735a596e-dfc2-4391-6527-08d875f22e42
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2020 18:50:28.9814
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iV0yPwQ9dv2ZMWZdnWMEZ7fYcXwjTnEOEsnrGYcLBAHre3rONyUfHqNtPD5fDH8/xGlzgqRjHXh4hhSgsaPPPwLVFspdFk0/BGDuZBXTyn4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4752
-X-OriginatorOrg: intel.com
+References: <20201021085655.1192025-1-daniel.vetter@ffwll.ch> <20201021085655.1192025-15-daniel.vetter@ffwll.ch>
+In-Reply-To: <20201021085655.1192025-15-daniel.vetter@ffwll.ch>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 21 Oct 2020 11:59:37 -0700
+Message-ID: <CAPcyv4gj=+SkL9LKPf1XixQkNmygp3X45n-QpxajZyM8TqKv1w@mail.gmail.com>
+Subject: Re: [PATCH v3 14/16] resource: Move devmem revoke code to resource framework
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
+        David Hildenbrand <david@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Daniel Vetter <daniel.vetter@ffwll.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVHVlLCAyMDIwLTEwLTIwIGF0IDA5OjE4ICswMzAwLCBLaXJpbGwgQS4gU2h1dGVtb3Ygd3Jv
-dGU6DQo+IFdlIGNhbm5vdCBhY2Nlc3MgcHJvdGVjdGVkIHBhZ2VzIGRpcmVjdGx5LiBVc2UgaW9y
-ZW1hcCgpIHRvDQo+IGNyZWF0ZSBhIHRlbXBvcmFyeSBtYXBwaW5nIG9mIHRoZSBwYWdlLiBUaGUg
-bWFwcGluZyBpcyBkZXN0cm95ZWQNCj4gb24gX19rdm1fdW5tYXBfZ2ZuKCkuDQo+IA0KPiBUaGUg
-bmV3IGludGVyZmFjZSBnZm5fdG9fcGZuX21lbXNsb3RfcHJvdGVjdGVkKCkgaXMgdXNlZCB0byBk
-ZXRlY3QgaWYNCj4gdGhlIHBhZ2UgaXMgcHJvdGVjdGVkLg0KPiANCj4gaW9yZW1hcF9jYWNoZV9m
-b3JjZSgpIGlzIGEgaGFjayB0byBieXBhc3MgSU9SRVNfTUFQX1NZU1RFTV9SQU0gY2hlY2sNCj4g
-aW4NCj4gdGhlIHg4NiBpb3JlbWFwIGNvZGUuIFdlIG5lZWQgYSBiZXR0ZXIgc29sdXRpb24uDQo+
-IA0KPiBTaWduZWQtb2ZmLWJ5OiBLaXJpbGwgQS4gU2h1dGVtb3YgPGtpcmlsbC5zaHV0ZW1vdkBs
-aW51eC5pbnRlbC5jb20+DQo+IC0tLQ0KPiAgYXJjaC9wb3dlcnBjL2t2bS9ib29rM3NfNjRfbW11
-X2h2LmMgICAgfCAgMiArLQ0KPiAgYXJjaC9wb3dlcnBjL2t2bS9ib29rM3NfNjRfbW11X3JhZGl4
-LmMgfCAgMiArLQ0KPiAgYXJjaC94ODYvaW5jbHVkZS9hc20vaW8uaCAgICAgICAgICAgICAgfCAg
-MiArDQo+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9wZ3RhYmxlX3R5cGVzLmggICB8ICAxICsNCj4g
-IGFyY2gveDg2L2t2bS9tbXUvbW11LmMgICAgICAgICAgICAgICAgIHwgIDYgKystDQo+ICBhcmNo
-L3g4Ni9tbS9pb3JlbWFwLmMgICAgICAgICAgICAgICAgICB8IDE2ICsrKysrKy0tDQo+ICBpbmNs
-dWRlL2xpbnV4L2t2bV9ob3N0LmggICAgICAgICAgICAgICB8ICAzICstDQo+ICBpbmNsdWRlL2xp
-bnV4L2t2bV90eXBlcy5oICAgICAgICAgICAgICB8ICAxICsNCj4gIHZpcnQva3ZtL2t2bV9tYWlu
-LmMgICAgICAgICAgICAgICAgICAgIHwgNTIgKysrKysrKysrKysrKysrKysrKy0tLS0tDQo+IC0t
-DQo+ICA5IGZpbGVzIGNoYW5nZWQsIDYzIGluc2VydGlvbnMoKyksIDIyIGRlbGV0aW9ucygtKQ0K
-PiANCj4gZGlmZiAtLWdpdCBhL2FyY2gvcG93ZXJwYy9rdm0vYm9vazNzXzY0X21tdV9odi5jDQo+
-IGIvYXJjaC9wb3dlcnBjL2t2bS9ib29rM3NfNjRfbW11X2h2LmMNCj4gaW5kZXggMzhlYTM5NmEy
-M2Q2Li44ZTA2Y2QzZjc1OWMgMTAwNjQ0DQo+IC0tLSBhL2FyY2gvcG93ZXJwYy9rdm0vYm9vazNz
-XzY0X21tdV9odi5jDQo+ICsrKyBiL2FyY2gvcG93ZXJwYy9rdm0vYm9vazNzXzY0X21tdV9odi5j
-DQo+IEBAIC01OTAsNyArNTkwLDcgQEAgaW50IGt2bXBwY19ib29rM3NfaHZfcGFnZV9mYXVsdChz
-dHJ1Y3Qga3ZtX3ZjcHUNCj4gKnZjcHUsDQo+ICAJfSBlbHNlIHsNCj4gIAkJLyogQ2FsbCBLVk0g
-Z2VuZXJpYyBjb2RlIHRvIGRvIHRoZSBzbG93LXBhdGggY2hlY2sgKi8NCj4gIAkJcGZuID0gX19n
-Zm5fdG9fcGZuX21lbXNsb3QobWVtc2xvdCwgZ2ZuLCBmYWxzZSwgTlVMTCwNCj4gLQkJCQkJICAg
-d3JpdGluZywgJndyaXRlX29rKTsNCj4gKwkJCQkJICAgd3JpdGluZywgJndyaXRlX29rLCBOVUxM
-KTsNCj4gIAkJaWYgKGlzX2Vycm9yX25vc2xvdF9wZm4ocGZuKSkNCj4gIAkJCXJldHVybiAtRUZB
-VUxUOw0KPiAgCQlwYWdlID0gTlVMTDsNCj4gZGlmZiAtLWdpdCBhL2FyY2gvcG93ZXJwYy9rdm0v
-Ym9vazNzXzY0X21tdV9yYWRpeC5jDQo+IGIvYXJjaC9wb3dlcnBjL2t2bS9ib29rM3NfNjRfbW11
-X3JhZGl4LmMNCj4gaW5kZXggMjJhNjc3YjE4Njk1Li42ZmQ0ZTNmOWI2NmEgMTAwNjQ0DQo+IC0t
-LSBhL2FyY2gvcG93ZXJwYy9rdm0vYm9vazNzXzY0X21tdV9yYWRpeC5jDQo+ICsrKyBiL2FyY2gv
-cG93ZXJwYy9rdm0vYm9vazNzXzY0X21tdV9yYWRpeC5jDQo+IEBAIC04MjIsNyArODIyLDcgQEAg
-aW50IGt2bXBwY19ib29rM3NfaW5zdGFudGlhdGVfcGFnZShzdHJ1Y3QNCj4ga3ZtX3ZjcHUgKnZj
-cHUsDQo+ICANCj4gIAkJLyogQ2FsbCBLVk0gZ2VuZXJpYyBjb2RlIHRvIGRvIHRoZSBzbG93LXBh
-dGggY2hlY2sgKi8NCj4gIAkJcGZuID0gX19nZm5fdG9fcGZuX21lbXNsb3QobWVtc2xvdCwgZ2Zu
-LCBmYWxzZSwgTlVMTCwNCj4gLQkJCQkJICAgd3JpdGluZywgdXBncmFkZV9wKTsNCj4gKwkJCQkJ
-ICAgd3JpdGluZywgdXBncmFkZV9wLCBOVUxMKTsNCj4gIAkJaWYgKGlzX2Vycm9yX25vc2xvdF9w
-Zm4ocGZuKSkNCj4gIAkJCXJldHVybiAtRUZBVUxUOw0KPiAgCQlwYWdlID0gTlVMTDsNCj4gZGlm
-ZiAtLWdpdCBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2lvLmggYi9hcmNoL3g4Ni9pbmNsdWRlL2Fz
-bS9pby5oDQo+IGluZGV4IGM1OGQ1MmZkN2JmMi4uYTNlMWJmYWQxMDI2IDEwMDY0NA0KPiAtLS0g
-YS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9pby5oDQo+ICsrKyBiL2FyY2gveDg2L2luY2x1ZGUvYXNt
-L2lvLmgNCj4gQEAgLTE4NCw2ICsxODQsOCBAQCBleHRlcm4gdm9pZCBfX2lvbWVtICppb3JlbWFw
-X3VjKHJlc291cmNlX3NpemVfdA0KPiBvZmZzZXQsIHVuc2lnbmVkIGxvbmcgc2l6ZSk7DQo+ICAj
-ZGVmaW5lIGlvcmVtYXBfdWMgaW9yZW1hcF91Yw0KPiAgZXh0ZXJuIHZvaWQgX19pb21lbSAqaW9y
-ZW1hcF9jYWNoZShyZXNvdXJjZV9zaXplX3Qgb2Zmc2V0LCB1bnNpZ25lZA0KPiBsb25nIHNpemUp
-Ow0KPiAgI2RlZmluZSBpb3JlbWFwX2NhY2hlIGlvcmVtYXBfY2FjaGUNCj4gK2V4dGVybiB2b2lk
-IF9faW9tZW0gKmlvcmVtYXBfY2FjaGVfZm9yY2UocmVzb3VyY2Vfc2l6ZV90IG9mZnNldCwNCj4g
-dW5zaWduZWQgbG9uZyBzaXplKTsNCj4gKyNkZWZpbmUgaW9yZW1hcF9jYWNoZV9mb3JjZSBpb3Jl
-bWFwX2NhY2hlX2ZvcmNlDQo+ICBleHRlcm4gdm9pZCBfX2lvbWVtICppb3JlbWFwX3Byb3QocmVz
-b3VyY2Vfc2l6ZV90IG9mZnNldCwgdW5zaWduZWQNCj4gbG9uZyBzaXplLCB1bnNpZ25lZCBsb25n
-IHByb3RfdmFsKTsNCj4gICNkZWZpbmUgaW9yZW1hcF9wcm90IGlvcmVtYXBfcHJvdA0KPiAgZXh0
-ZXJuIHZvaWQgX19pb21lbSAqaW9yZW1hcF9lbmNyeXB0ZWQocmVzb3VyY2Vfc2l6ZV90IHBoeXNf
-YWRkciwNCj4gdW5zaWduZWQgbG9uZyBzaXplKTsNCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2lu
-Y2x1ZGUvYXNtL3BndGFibGVfdHlwZXMuaA0KPiBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL3BndGFi
-bGVfdHlwZXMuaA0KPiBpbmRleCA4MTZiMzFjNjg1NTAuLjRjMTZhOTU4Mzc4NiAxMDA2NDQNCj4g
-LS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20vcGd0YWJsZV90eXBlcy5oDQo+ICsrKyBiL2FyY2gv
-eDg2L2luY2x1ZGUvYXNtL3BndGFibGVfdHlwZXMuaA0KPiBAQCAtMTQ3LDYgKzE0Nyw3IEBAIGVu
-dW0gcGFnZV9jYWNoZV9tb2RlIHsNCj4gIAlfUEFHRV9DQUNIRV9NT0RFX1VDICAgICAgID0gMywN
-Cj4gIAlfUEFHRV9DQUNIRV9NT0RFX1dUICAgICAgID0gNCwNCj4gIAlfUEFHRV9DQUNIRV9NT0RF
-X1dQICAgICAgID0gNSwNCj4gKwlfUEFHRV9DQUNIRV9NT0RFX1dCX0ZPUkNFID0gNiwNCj4gIA0K
-PiAgCV9QQUdFX0NBQ0hFX01PREVfTlVNICAgICAgPSA4DQo+ICB9Ow0KPiBkaWZmIC0tZ2l0IGEv
-YXJjaC94ODYva3ZtL21tdS9tbXUuYyBiL2FyY2gveDg2L2t2bS9tbXUvbW11LmMNCj4gaW5kZXgg
-NzFhYTNkYTJhMGI3Li4xNjJjYjI4NWI4N2IgMTAwNjQ0DQo+IC0tLSBhL2FyY2gveDg2L2t2bS9t
-bXUvbW11LmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL21tdS9tbXUuYw0KPiBAQCAtNDA1OCw3ICs0
-MDU4LDggQEAgc3RhdGljIGJvb2wgdHJ5X2FzeW5jX3BmKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwN
-Cj4gYm9vbCBwcmVmYXVsdCwgZ2ZuX3QgZ2ZuLA0KPiAgCX0NCj4gIA0KPiAgCWFzeW5jID0gZmFs
-c2U7DQo+IC0JKnBmbiA9IF9fZ2ZuX3RvX3Bmbl9tZW1zbG90KHNsb3QsIGdmbiwgZmFsc2UsICZh
-c3luYywgd3JpdGUsDQo+IHdyaXRhYmxlKTsNCj4gKwkqcGZuID0gX19nZm5fdG9fcGZuX21lbXNs
-b3Qoc2xvdCwgZ2ZuLCBmYWxzZSwgJmFzeW5jLCB3cml0ZSwNCj4gd3JpdGFibGUsDQo+ICsJCQkJ
-ICAgIE5VTEwpOw0KPiAgCWlmICghYXN5bmMpDQo+ICAJCXJldHVybiBmYWxzZTsgLyogKnBmbiBo
-YXMgY29ycmVjdCBwYWdlIGFscmVhZHkgKi8NCj4gIA0KPiBAQCAtNDA3Miw3ICs0MDczLDggQEAg
-c3RhdGljIGJvb2wgdHJ5X2FzeW5jX3BmKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwNCj4gYm9vbCBw
-cmVmYXVsdCwgZ2ZuX3QgZ2ZuLA0KPiAgCQkJcmV0dXJuIHRydWU7DQo+ICAJfQ0KPiAgDQo+IC0J
-KnBmbiA9IF9fZ2ZuX3RvX3Bmbl9tZW1zbG90KHNsb3QsIGdmbiwgZmFsc2UsIE5VTEwsIHdyaXRl
-LA0KPiB3cml0YWJsZSk7DQo+ICsJKnBmbiA9IF9fZ2ZuX3RvX3Bmbl9tZW1zbG90KHNsb3QsIGdm
-biwgZmFsc2UsIE5VTEwsIHdyaXRlLA0KPiB3cml0YWJsZSwNCj4gKwkJCQkgICAgTlVMTCk7DQo+
-ICAJcmV0dXJuIGZhbHNlOw0KPiAgfQ0KPiAgDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9tbS9p
-b3JlbWFwLmMgYi9hcmNoL3g4Ni9tbS9pb3JlbWFwLmMNCj4gaW5kZXggOWU1Y2NjNTZmOGUwLi40
-NDA5Nzg1ZTI5NGMgMTAwNjQ0DQo+IC0tLSBhL2FyY2gveDg2L21tL2lvcmVtYXAuYw0KPiArKysg
-Yi9hcmNoL3g4Ni9tbS9pb3JlbWFwLmMNCj4gQEAgLTIwMiw5ICsyMDIsMTIgQEAgX19pb3JlbWFw
-X2NhbGxlcihyZXNvdXJjZV9zaXplX3QgcGh5c19hZGRyLA0KPiB1bnNpZ25lZCBsb25nIHNpemUs
-DQo+ICAJX19pb3JlbWFwX2NoZWNrX21lbShwaHlzX2FkZHIsIHNpemUsICZpb19kZXNjKTsNCj4g
-IA0KPiAgCS8qDQo+IC0JICogRG9uJ3QgYWxsb3cgYW55Ym9keSB0byByZW1hcCBub3JtYWwgUkFN
-IHRoYXQgd2UncmUgdXNpbmcuLg0KPiArCSAqIERvbid0IGFsbG93IGFueWJvZHkgdG8gcmVtYXAg
-bm9ybWFsIFJBTSB0aGF0IHdlJ3JlIHVzaW5nLA0KPiB1bmxlc3MNCj4gKwkgKiBfUEFHRV9DQUNI
-RV9NT0RFX1dCX0ZPUkNFIGlzIHVzZWQuDQo+ICAJICovDQo+IC0JaWYgKGlvX2Rlc2MuZmxhZ3Mg
-JiBJT1JFU19NQVBfU1lTVEVNX1JBTSkgew0KPiArCWlmIChwY20gPT0gX1BBR0VfQ0FDSEVfTU9E
-RV9XQl9GT1JDRSkgew0KPiArCSAgICBwY20gPSBfUEFHRV9DQUNIRV9NT0RFX1dCOw0KPiArCX0g
-ZWxzZSBpZiAoaW9fZGVzYy5mbGFncyAmIElPUkVTX01BUF9TWVNURU1fUkFNKSB7DQo+ICAJCVdB
-Uk5fT05DRSgxLCAiaW9yZW1hcCBvbiBSQU0gYXQgJXBhIC0gJXBhXG4iLA0KPiAgCQkJICAmcGh5
-c19hZGRyLCAmbGFzdF9hZGRyKTsNCj4gIAkJcmV0dXJuIE5VTEw7DQo+IEBAIC00MTksNiArNDIy
-LDEzIEBAIHZvaWQgX19pb21lbSAqaW9yZW1hcF9jYWNoZShyZXNvdXJjZV9zaXplX3QNCj4gcGh5
-c19hZGRyLCB1bnNpZ25lZCBsb25nIHNpemUpDQo+ICB9DQo+ICBFWFBPUlRfU1lNQk9MKGlvcmVt
-YXBfY2FjaGUpOw0KPiAgDQo+ICt2b2lkIF9faW9tZW0gKmlvcmVtYXBfY2FjaGVfZm9yY2UocmVz
-b3VyY2Vfc2l6ZV90IHBoeXNfYWRkciwNCj4gdW5zaWduZWQgbG9uZyBzaXplKQ0KPiArew0KPiAr
-CXJldHVybiBfX2lvcmVtYXBfY2FsbGVyKHBoeXNfYWRkciwgc2l6ZSwNCj4gX1BBR0VfQ0FDSEVf
-TU9ERV9XQl9GT1JDRSwNCj4gKwkJCQlfX2J1aWx0aW5fcmV0dXJuX2FkZHJlc3MoMCksIGZhbHNl
-KTsNCj4gK30NCj4gK0VYUE9SVF9TWU1CT0woaW9yZW1hcF9jYWNoZV9mb3JjZSk7DQo+ICsNCj4g
-IHZvaWQgX19pb21lbSAqaW9yZW1hcF9wcm90KHJlc291cmNlX3NpemVfdCBwaHlzX2FkZHIsIHVu
-c2lnbmVkIGxvbmcNCj4gc2l6ZSwNCj4gIAkJCQl1bnNpZ25lZCBsb25nIHByb3RfdmFsKQ0KPiAg
-ew0KPiBAQCAtNDY3LDcgKzQ3Nyw3IEBAIHZvaWQgaW91bm1hcCh2b2xhdGlsZSB2b2lkIF9faW9t
-ZW0gKmFkZHIpDQo+ICAJcCA9IGZpbmRfdm1fYXJlYSgodm9pZCBfX2ZvcmNlICopYWRkcik7DQo+
-ICANCj4gIAlpZiAoIXApIHsNCj4gLQkJcHJpbnRrKEtFUk5fRVJSICJpb3VubWFwOiBiYWQgYWRk
-cmVzcyAlcFxuIiwgYWRkcik7DQo+ICsJCXByaW50ayhLRVJOX0VSUiAiaW91bm1hcDogYmFkIGFk
-ZHJlc3MgJXB4XG4iLCBhZGRyKTsNCg0KVW5pbnRlbnRpb25hbD8NCg0KPiAgCQlkdW1wX3N0YWNr
-KCk7DQo+ICAJCXJldHVybjsNCj4gIAl9DQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2t2
-bV9ob3N0LmggYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgNCj4gaW5kZXggNjY1NWU4ZGE0NTU1
-Li4wZDVmMzg4NTc0N2IgMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaA0K
-PiArKysgYi9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmgNCj4gQEAgLTIzOCw2ICsyMzgsNyBAQCBz
-dHJ1Y3Qga3ZtX2hvc3RfbWFwIHsNCj4gIAl2b2lkICpodmE7DQo+ICAJa3ZtX3Bmbl90IHBmbjsN
-Cj4gIAlrdm1fcGZuX3QgZ2ZuOw0KPiArCWJvb2wgcHJvdGVjdGVkOw0KPiAgfTsNCj4gIA0KPiAg
-LyoNCj4gQEAgLTcyNSw3ICs3MjYsNyBAQCBrdm1fcGZuX3QgZ2ZuX3RvX3Bmbl9tZW1zbG90KHN0
-cnVjdA0KPiBrdm1fbWVtb3J5X3Nsb3QgKnNsb3QsIGdmbl90IGdmbik7DQo+ICBrdm1fcGZuX3Qg
-Z2ZuX3RvX3Bmbl9tZW1zbG90X2F0b21pYyhzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpzbG90LA0K
-PiBnZm5fdCBnZm4pOw0KPiAga3ZtX3Bmbl90IF9fZ2ZuX3RvX3Bmbl9tZW1zbG90KHN0cnVjdCBr
-dm1fbWVtb3J5X3Nsb3QgKnNsb3QsIGdmbl90DQo+IGdmbiwNCj4gIAkJCSAgICAgICBib29sIGF0
-b21pYywgYm9vbCAqYXN5bmMsIGJvb2wNCj4gd3JpdGVfZmF1bHQsDQo+IC0JCQkgICAgICAgYm9v
-bCAqd3JpdGFibGUpOw0KPiArCQkJICAgICAgIGJvb2wgKndyaXRhYmxlLCBib29sICpwcm90ZWN0
-ZWQpOw0KPiAgDQo+ICB2b2lkIGt2bV9yZWxlYXNlX3Bmbl9jbGVhbihrdm1fcGZuX3QgcGZuKTsN
-Cj4gIHZvaWQga3ZtX3JlbGVhc2VfcGZuX2RpcnR5KGt2bV9wZm5fdCBwZm4pOw0KPiBkaWZmIC0t
-Z2l0IGEvaW5jbHVkZS9saW51eC9rdm1fdHlwZXMuaCBiL2luY2x1ZGUvbGludXgva3ZtX3R5cGVz
-LmgNCj4gaW5kZXggYTc1ODBmNjlkZGEwLi4wYThjNjQyNmI0ZjQgMTAwNjQ0DQo+IC0tLSBhL2lu
-Y2x1ZGUvbGludXgva3ZtX3R5cGVzLmgNCj4gKysrIGIvaW5jbHVkZS9saW51eC9rdm1fdHlwZXMu
-aA0KPiBAQCAtNTgsNiArNTgsNyBAQCBzdHJ1Y3QgZ2ZuX3RvX3Bmbl9jYWNoZSB7DQo+ICAJZ2Zu
-X3QgZ2ZuOw0KPiAgCWt2bV9wZm5fdCBwZm47DQo+ICAJYm9vbCBkaXJ0eTsNCj4gKwlib29sIHBy
-b3RlY3RlZDsNCj4gIH07DQo+ICANCj4gICNpZmRlZiBLVk1fQVJDSF9OUl9PQkpTX1BFUl9NRU1P
-UllfQ0FDSEUNCj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2t2bV9tYWluLmMgYi92aXJ0L2t2bS9r
-dm1fbWFpbi5jDQo+IGluZGV4IDliNTY5Yjc4ODc0YS4uN2MyYzc2NGMyOGM1IDEwMDY0NA0KPiAt
-LS0gYS92aXJ0L2t2bS9rdm1fbWFpbi5jDQo+ICsrKyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMNCj4g
-QEAgLTE4NTIsOSArMTg1MiwxMCBAQCBzdGF0aWMgYm9vbCBodmFfdG9fcGZuX2Zhc3QodW5zaWdu
-ZWQgbG9uZw0KPiBhZGRyLCBib29sIHdyaXRlX2ZhdWx0LA0KPiAgICogMSBpbmRpY2F0ZXMgc3Vj
-Y2VzcywgLWVycm5vIGlzIHJldHVybmVkIGlmIGVycm9yIGlzIGRldGVjdGVkLg0KPiAgICovDQo+
-ICBzdGF0aWMgaW50IGh2YV90b19wZm5fc2xvdyh1bnNpZ25lZCBsb25nIGFkZHIsIGJvb2wgKmFz
-eW5jLCBib29sDQo+IHdyaXRlX2ZhdWx0LA0KPiAtCQkJICAgYm9vbCAqd3JpdGFibGUsIGt2bV9w
-Zm5fdCAqcGZuKQ0KPiArCQkJICAgYm9vbCAqd3JpdGFibGUsIGJvb2wgKnByb3RlY3RlZCwga3Zt
-X3Bmbl90DQo+ICpwZm4pDQo+ICB7DQo+ICAJdW5zaWduZWQgaW50IGZsYWdzID0gRk9MTF9IV1BP
-SVNPTiB8IEZPTExfS1ZNOw0KPiArCXN0cnVjdCB2bV9hcmVhX3N0cnVjdCAqdm1hOw0KPiAgCXN0
-cnVjdCBwYWdlICpwYWdlOw0KPiAgCWludCBucGFnZXMgPSAwOw0KPiAgDQo+IEBAIC0xODY4LDkg
-KzE4NjksMTUgQEAgc3RhdGljIGludCBodmFfdG9fcGZuX3Nsb3codW5zaWduZWQgbG9uZyBhZGRy
-LA0KPiBib29sICphc3luYywgYm9vbCB3cml0ZV9mYXVsdCwNCj4gIAlpZiAoYXN5bmMpDQo+ICAJ
-CWZsYWdzIHw9IEZPTExfTk9XQUlUOw0KPiAgDQo+IC0JbnBhZ2VzID0gZ2V0X3VzZXJfcGFnZXNf
-dW5sb2NrZWQoYWRkciwgMSwgJnBhZ2UsIGZsYWdzKTsNCj4gLQlpZiAobnBhZ2VzICE9IDEpDQo+
-ICsJbW1hcF9yZWFkX2xvY2soY3VycmVudC0+bW0pOw0KPiArCW5wYWdlcyA9IGdldF91c2VyX3Bh
-Z2VzKGFkZHIsIDEsIGZsYWdzLCAmcGFnZSwgJnZtYSk7DQo+ICsJaWYgKG5wYWdlcyAhPSAxKSB7
-DQo+ICsJCW1tYXBfcmVhZF91bmxvY2soY3VycmVudC0+bW0pOw0KPiAgCQlyZXR1cm4gbnBhZ2Vz
-Ow0KPiArCX0NCj4gKwlpZiAocHJvdGVjdGVkKQ0KPiArCQkqcHJvdGVjdGVkID0gdm1hX2lzX2t2
-bV9wcm90ZWN0ZWQodm1hKTsNCj4gKwltbWFwX3JlYWRfdW5sb2NrKGN1cnJlbnQtPm1tKTsNCj4g
-IA0KPiAgCS8qIG1hcCByZWFkIGZhdWx0IGFzIHdyaXRhYmxlIGlmIHBvc3NpYmxlICovDQo+ICAJ
-aWYgKHVubGlrZWx5KCF3cml0ZV9mYXVsdCkgJiYgd3JpdGFibGUpIHsNCj4gQEAgLTE5NjEsNyAr
-MTk2OCw3IEBAIHN0YXRpYyBpbnQgaHZhX3RvX3Bmbl9yZW1hcHBlZChzdHJ1Y3QNCj4gdm1fYXJl
-YV9zdHJ1Y3QgKnZtYSwNCj4gICAqICAgICB3aGV0aGVyIHRoZSBtYXBwaW5nIGlzIHdyaXRhYmxl
-Lg0KPiAgICovDQo+ICBzdGF0aWMga3ZtX3Bmbl90IGh2YV90b19wZm4odW5zaWduZWQgbG9uZyBh
-ZGRyLCBib29sIGF0b21pYywgYm9vbA0KPiAqYXN5bmMsDQo+IC0JCQlib29sIHdyaXRlX2ZhdWx0
-LCBib29sICp3cml0YWJsZSkNCj4gKwkJCWJvb2wgd3JpdGVfZmF1bHQsIGJvb2wgKndyaXRhYmxl
-LCBib29sDQo+ICpwcm90ZWN0ZWQpDQo+ICB7DQo+ICAJc3RydWN0IHZtX2FyZWFfc3RydWN0ICp2
-bWE7DQo+ICAJa3ZtX3Bmbl90IHBmbiA9IDA7DQo+IEBAIC0xOTc2LDcgKzE5ODMsOCBAQCBzdGF0
-aWMga3ZtX3Bmbl90IGh2YV90b19wZm4odW5zaWduZWQgbG9uZyBhZGRyLA0KPiBib29sIGF0b21p
-YywgYm9vbCAqYXN5bmMsDQo+ICAJaWYgKGF0b21pYykNCj4gIAkJcmV0dXJuIEtWTV9QRk5fRVJS
-X0ZBVUxUOw0KPiAgDQo+IC0JbnBhZ2VzID0gaHZhX3RvX3Bmbl9zbG93KGFkZHIsIGFzeW5jLCB3
-cml0ZV9mYXVsdCwgd3JpdGFibGUsDQo+ICZwZm4pOw0KPiArCW5wYWdlcyA9IGh2YV90b19wZm5f
-c2xvdyhhZGRyLCBhc3luYywgd3JpdGVfZmF1bHQsIHdyaXRhYmxlLA0KPiBwcm90ZWN0ZWQsDQo+
-ICsJCQkJICZwZm4pOw0KPiAgCWlmIChucGFnZXMgPT0gMSkNCj4gIAkJcmV0dXJuIHBmbjsNCj4g
-IA0KPiBAQCAtMjAxMCw3ICsyMDE4LDcgQEAgc3RhdGljIGt2bV9wZm5fdCBodmFfdG9fcGZuKHVu
-c2lnbmVkIGxvbmcgYWRkciwNCj4gYm9vbCBhdG9taWMsIGJvb2wgKmFzeW5jLA0KPiAgDQo+ICBr
-dm1fcGZuX3QgX19nZm5fdG9fcGZuX21lbXNsb3Qoc3RydWN0IGt2bV9tZW1vcnlfc2xvdCAqc2xv
-dCwgZ2ZuX3QNCj4gZ2ZuLA0KPiAgCQkJICAgICAgIGJvb2wgYXRvbWljLCBib29sICphc3luYywg
-Ym9vbA0KPiB3cml0ZV9mYXVsdCwNCj4gLQkJCSAgICAgICBib29sICp3cml0YWJsZSkNCj4gKwkJ
-CSAgICAgICBib29sICp3cml0YWJsZSwgYm9vbCAqcHJvdGVjdGVkKQ0KPiAgew0KPiAgCXVuc2ln
-bmVkIGxvbmcgYWRkciA9IF9fZ2ZuX3RvX2h2YV9tYW55KHNsb3QsIGdmbiwgTlVMTCwNCj4gd3Jp
-dGVfZmF1bHQpOw0KPiAgDQo+IEBAIC0yMDMzLDcgKzIwNDEsNyBAQCBrdm1fcGZuX3QgX19nZm5f
-dG9fcGZuX21lbXNsb3Qoc3RydWN0DQo+IGt2bV9tZW1vcnlfc2xvdCAqc2xvdCwgZ2ZuX3QgZ2Zu
-LA0KPiAgCX0NCj4gIA0KPiAgCXJldHVybiBodmFfdG9fcGZuKGFkZHIsIGF0b21pYywgYXN5bmMs
-IHdyaXRlX2ZhdWx0LA0KPiAtCQkJICB3cml0YWJsZSk7DQo+ICsJCQkgIHdyaXRhYmxlLCBwcm90
-ZWN0ZWQpOw0KPiAgfQ0KPiAgRVhQT1JUX1NZTUJPTF9HUEwoX19nZm5fdG9fcGZuX21lbXNsb3Qp
-Ow0KPiAgDQo+IEBAIC0yMDQxLDE5ICsyMDQ5LDI2IEBAIGt2bV9wZm5fdCBnZm5fdG9fcGZuX3By
-b3Qoc3RydWN0IGt2bSAqa3ZtLA0KPiBnZm5fdCBnZm4sIGJvb2wgd3JpdGVfZmF1bHQsDQo+ICAJ
-CSAgICAgIGJvb2wgKndyaXRhYmxlKQ0KPiAgew0KPiAgCXJldHVybiBfX2dmbl90b19wZm5fbWVt
-c2xvdChnZm5fdG9fbWVtc2xvdChrdm0sIGdmbiksIGdmbiwNCj4gZmFsc2UsIE5VTEwsDQo+IC0J
-CQkJICAgIHdyaXRlX2ZhdWx0LCB3cml0YWJsZSk7DQo+ICsJCQkJICAgIHdyaXRlX2ZhdWx0LCB3
-cml0YWJsZSwgTlVMTCk7DQo+ICB9DQo+ICBFWFBPUlRfU1lNQk9MX0dQTChnZm5fdG9fcGZuX3By
-b3QpOw0KPiAgDQo+ICBrdm1fcGZuX3QgZ2ZuX3RvX3Bmbl9tZW1zbG90KHN0cnVjdCBrdm1fbWVt
-b3J5X3Nsb3QgKnNsb3QsIGdmbl90DQo+IGdmbikNCj4gIHsNCj4gLQlyZXR1cm4gX19nZm5fdG9f
-cGZuX21lbXNsb3Qoc2xvdCwgZ2ZuLCBmYWxzZSwgTlVMTCwgdHJ1ZSwNCj4gTlVMTCk7DQo+ICsJ
-cmV0dXJuIF9fZ2ZuX3RvX3Bmbl9tZW1zbG90KHNsb3QsIGdmbiwgZmFsc2UsIE5VTEwsIHRydWUs
-IE5VTEwsDQo+IE5VTEwpOw0KPiAgfQ0KPiAgRVhQT1JUX1NZTUJPTF9HUEwoZ2ZuX3RvX3Bmbl9t
-ZW1zbG90KTsNCj4gIA0KPiArc3RhdGljIGt2bV9wZm5fdCBnZm5fdG9fcGZuX21lbXNsb3RfcHJv
-dGVjdGVkKHN0cnVjdCBrdm1fbWVtb3J5X3Nsb3QNCj4gKnNsb3QsDQo+ICsJCQkJCSAgICAgIGdm
-bl90IGdmbiwgYm9vbA0KPiAqcHJvdGVjdGVkKQ0KPiArew0KPiArCXJldHVybiBfX2dmbl90b19w
-Zm5fbWVtc2xvdChzbG90LCBnZm4sIGZhbHNlLCBOVUxMLCB0cnVlLCBOVUxMLA0KPiArCQkJCSAg
-ICBwcm90ZWN0ZWQpOw0KPiArfQ0KPiArDQo+ICBrdm1fcGZuX3QgZ2ZuX3RvX3Bmbl9tZW1zbG90
-X2F0b21pYyhzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpzbG90LA0KPiBnZm5fdCBnZm4pDQo+ICB7
-DQo+IC0JcmV0dXJuIF9fZ2ZuX3RvX3Bmbl9tZW1zbG90KHNsb3QsIGdmbiwgdHJ1ZSwgTlVMTCwg
-dHJ1ZSwgTlVMTCk7DQo+ICsJcmV0dXJuIF9fZ2ZuX3RvX3Bmbl9tZW1zbG90KHNsb3QsIGdmbiwg
-dHJ1ZSwgTlVMTCwgdHJ1ZSwgTlVMTCwNCj4gTlVMTCk7DQo+ICB9DQo+ICBFWFBPUlRfU1lNQk9M
-X0dQTChnZm5fdG9fcGZuX21lbXNsb3RfYXRvbWljKTsNCj4gIA0KPiBAQCAtMjEzNCw3ICsyMTQ5
-LDcgQEAgc3RhdGljIHZvaWQga3ZtX2NhY2hlX2dmbl90b19wZm4oc3RydWN0DQo+IGt2bV9tZW1v
-cnlfc2xvdCAqc2xvdCwgZ2ZuX3QgZ2ZuLA0KPiAgew0KPiAgCWt2bV9yZWxlYXNlX3BmbihjYWNo
-ZS0+cGZuLCBjYWNoZS0+ZGlydHksIGNhY2hlKTsNCj4gIA0KPiAtCWNhY2hlLT5wZm4gPSBnZm5f
-dG9fcGZuX21lbXNsb3Qoc2xvdCwgZ2ZuKTsNCj4gKwljYWNoZS0+cGZuID0gZ2ZuX3RvX3Bmbl9t
-ZW1zbG90X3Byb3RlY3RlZChzbG90LCBnZm4sICZjYWNoZS0NCj4gPnByb3RlY3RlZCk7DQo+ICAJ
-Y2FjaGUtPmdmbiA9IGdmbjsNCj4gIAljYWNoZS0+ZGlydHkgPSBmYWxzZTsNCj4gIAljYWNoZS0+
-Z2VuZXJhdGlvbiA9IGdlbjsNCj4gQEAgLTIxNDksNiArMjE2NCw3IEBAIHN0YXRpYyBpbnQgX19r
-dm1fbWFwX2dmbihzdHJ1Y3Qga3ZtX21lbXNsb3RzDQo+ICpzbG90cywgZ2ZuX3QgZ2ZuLA0KPiAg
-CXZvaWQgKmh2YSA9IE5VTEw7DQo+ICAJc3RydWN0IHBhZ2UgKnBhZ2UgPSBLVk1fVU5NQVBQRURf
-UEFHRTsNCj4gIAlzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpzbG90ID0gX19nZm5fdG9fbWVtc2xv
-dChzbG90cywgZ2ZuKTsNCj4gKwlib29sIHByb3RlY3RlZDsNCj4gIAl1NjQgZ2VuID0gc2xvdHMt
-PmdlbmVyYXRpb247DQo+ICANCj4gIAlpZiAoIW1hcCkNCj4gQEAgLTIxNjIsMTUgKzIxNzgsMjAg
-QEAgc3RhdGljIGludCBfX2t2bV9tYXBfZ2ZuKHN0cnVjdCBrdm1fbWVtc2xvdHMNCj4gKnNsb3Rz
-LCBnZm5fdCBnZm4sDQo+ICAJCQlrdm1fY2FjaGVfZ2ZuX3RvX3BmbihzbG90LCBnZm4sIGNhY2hl
-LCBnZW4pOw0KPiAgCQl9DQo+ICAJCXBmbiA9IGNhY2hlLT5wZm47DQo+ICsJCXByb3RlY3RlZCA9
-IGNhY2hlLT5wcm90ZWN0ZWQ7DQo+ICAJfSBlbHNlIHsNCj4gIAkJaWYgKGF0b21pYykNCj4gIAkJ
-CXJldHVybiAtRUFHQUlOOw0KPiAtCQlwZm4gPSBnZm5fdG9fcGZuX21lbXNsb3Qoc2xvdCwgZ2Zu
-KTsNCj4gKwkJcGZuID0gZ2ZuX3RvX3Bmbl9tZW1zbG90X3Byb3RlY3RlZChzbG90LCBnZm4sDQo+
-ICZwcm90ZWN0ZWQpOw0KPiAgCX0NCj4gIAlpZiAoaXNfZXJyb3Jfbm9zbG90X3BmbihwZm4pKQ0K
-PiAgCQlyZXR1cm4gLUVJTlZBTDsNCj4gIA0KPiAtCWlmIChwZm5fdmFsaWQocGZuKSkgew0KPiAr
-CWlmIChwcm90ZWN0ZWQpIHsNCj4gKwkJaWYgKGF0b21pYykNCj4gKwkJCXJldHVybiAtRUFHQUlO
-Ow0KPiArCQlodmEgPSBpb3JlbWFwX2NhY2hlX2ZvcmNlKHBmbl90b19ocGEocGZuKSwgUEFHRV9T
-SVpFKTsNCj4gKwl9IGVsc2UgaWYgKHBmbl92YWxpZChwZm4pKSB7DQo+ICAJCXBhZ2UgPSBwZm5f
-dG9fcGFnZShwZm4pOw0KPiAgCQlpZiAoYXRvbWljKQ0KPiAgCQkJaHZhID0ga21hcF9hdG9taWMo
-cGFnZSk7DQoNCkkgdGhpbmsgdGhlIHBhZ2UgY291bGQgaGF2ZSBnb3QgdW5tYXBwZWQgc2luY2Ug
-dGhlIGd1cCB2aWEgdGhlDQpoeXBlcmNhbGwgb24gYW5vdGhlciBDUFUuIEl0IGNvdWxkIGJlIGFu
-IGF2ZW51ZSBmb3IgdGhlIGd1ZXN0IHRvIGNyYXNoDQp0aGUgaG9zdC4NCg0KPiBAQCAtMjE5MSw2
-ICsyMjEyLDcgQEAgc3RhdGljIGludCBfX2t2bV9tYXBfZ2ZuKHN0cnVjdCBrdm1fbWVtc2xvdHMN
-Cj4gKnNsb3RzLCBnZm5fdCBnZm4sDQo+ICAJbWFwLT5odmEgPSBodmE7DQo+ICAJbWFwLT5wZm4g
-PSBwZm47DQo+ICAJbWFwLT5nZm4gPSBnZm47DQo+ICsJbWFwLT5wcm90ZWN0ZWQgPSBwcm90ZWN0
-ZWQ7DQo+ICANCj4gIAlyZXR1cm4gMDsNCj4gIH0NCj4gQEAgLTIyMjEsNyArMjI0Myw5IEBAIHN0
-YXRpYyB2b2lkIF9fa3ZtX3VubWFwX2dmbihzdHJ1Y3QNCj4ga3ZtX21lbW9yeV9zbG90ICptZW1z
-bG90LA0KPiAgCWlmICghbWFwLT5odmEpDQo+ICAJCXJldHVybjsNCj4gIA0KPiAtCWlmIChtYXAt
-PnBhZ2UgIT0gS1ZNX1VOTUFQUEVEX1BBR0UpIHsNCj4gKwlpZiAobWFwLT5wcm90ZWN0ZWQpIHsN
-Cj4gKwkJaW91bm1hcChtYXAtPmh2YSk7DQo+ICsJfSBlbHNlIGlmIChtYXAtPnBhZ2UgIT0gS1ZN
-X1VOTUFQUEVEX1BBR0UpIHsNCj4gIAkJaWYgKGF0b21pYykNCj4gIAkJCWt1bm1hcF9hdG9taWMo
-bWFwLT5odmEpOw0KPiAgCQllbHNlDQoNCg==
+On Wed, Oct 21, 2020 at 1:57 AM Daniel Vetter <daniel.vetter@ffwll.ch> wrot=
+e:
+>
+> We want all iomem mmaps to consistently revoke ptes when the kernel
+> takes over and CONFIG_IO_STRICT_DEVMEM is enabled. This includes the
+> pci bar mmaps available through procfs and sysfs, which currently do
+> not revoke mappings.
+>
+> To prepare for this, move the code from the /dev/kmem driver to
+> kernel/resource.c.
+>
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: John Hubbard <jhubbard@nvidia.com>
+> Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: linux-mm@kvack.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-samsung-soc@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.com>
+> --
+> v3:
+> - add barrier for consistency and document why we don't have to check
+>   for NULL (Jason)
+> ---
+>  drivers/char/mem.c     |  85 +---------------------------------
+>  include/linux/ioport.h |   6 +--
+>  kernel/resource.c      | 101 ++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 102 insertions(+), 90 deletions(-)
+>
+> diff --git a/drivers/char/mem.c b/drivers/char/mem.c
+> index 5502f56f3655..53338aad8d28 100644
+> --- a/drivers/char/mem.c
+> +++ b/drivers/char/mem.c
+> @@ -31,9 +31,6 @@
+>  #include <linux/uio.h>
+>  #include <linux/uaccess.h>
+>  #include <linux/security.h>
+> -#include <linux/pseudo_fs.h>
+> -#include <uapi/linux/magic.h>
+> -#include <linux/mount.h>
+>
+>  #ifdef CONFIG_IA64
+>  # include <linux/efi.h>
+> @@ -809,42 +806,6 @@ static loff_t memory_lseek(struct file *file, loff_t=
+ offset, int orig)
+>         return ret;
+>  }
+>
+> -static struct inode *devmem_inode;
+> -
+> -#ifdef CONFIG_IO_STRICT_DEVMEM
+> -void revoke_devmem(struct resource *res)
+> -{
+> -       /* pairs with smp_store_release() in devmem_init_inode() */
+> -       struct inode *inode =3D smp_load_acquire(&devmem_inode);
+> -
+> -       /*
+> -        * Check that the initialization has completed. Losing the race
+> -        * is ok because it means drivers are claiming resources before
+> -        * the fs_initcall level of init and prevent /dev/mem from
+> -        * establishing mappings.
+> -        */
+> -       if (!inode)
+> -               return;
+> -
+> -       /*
+> -        * The expectation is that the driver has successfully marked
+> -        * the resource busy by this point, so devmem_is_allowed()
+> -        * should start returning false, however for performance this
+> -        * does not iterate the entire resource range.
+> -        */
+> -       if (devmem_is_allowed(PHYS_PFN(res->start)) &&
+> -           devmem_is_allowed(PHYS_PFN(res->end))) {
+> -               /*
+> -                * *cringe* iomem=3Drelaxed says "go ahead, what's the
+> -                * worst that can happen?"
+> -                */
+> -               return;
+> -       }
+> -
+> -       unmap_mapping_range(inode->i_mapping, res->start, resource_size(r=
+es), 1);
+> -}
+> -#endif
+> -
+>  static int open_port(struct inode *inode, struct file *filp)
+>  {
+>         int rc;
+> @@ -864,7 +825,7 @@ static int open_port(struct inode *inode, struct file=
+ *filp)
+>          * revocations when drivers want to take over a /dev/mem mapped
+>          * range.
+>          */
+> -       filp->f_mapping =3D inode->i_mapping;
+> +       filp->f_mapping =3D iomem_get_mapping();
+>
+>         return 0;
+>  }
+> @@ -995,48 +956,6 @@ static char *mem_devnode(struct device *dev, umode_t=
+ *mode)
+>
+>  static struct class *mem_class;
+>
+> -static int devmem_fs_init_fs_context(struct fs_context *fc)
+> -{
+> -       return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
+> -}
+> -
+> -static struct file_system_type devmem_fs_type =3D {
+> -       .name           =3D "devmem",
+> -       .owner          =3D THIS_MODULE,
+> -       .init_fs_context =3D devmem_fs_init_fs_context,
+> -       .kill_sb        =3D kill_anon_super,
+> -};
+> -
+> -static int devmem_init_inode(void)
+> -{
+> -       static struct vfsmount *devmem_vfs_mount;
+> -       static int devmem_fs_cnt;
+> -       struct inode *inode;
+> -       int rc;
+> -
+> -       rc =3D simple_pin_fs(&devmem_fs_type, &devmem_vfs_mount, &devmem_=
+fs_cnt);
+> -       if (rc < 0) {
+> -               pr_err("Cannot mount /dev/mem pseudo filesystem: %d\n", r=
+c);
+> -               return rc;
+> -       }
+> -
+> -       inode =3D alloc_anon_inode(devmem_vfs_mount->mnt_sb);
+> -       if (IS_ERR(inode)) {
+> -               rc =3D PTR_ERR(inode);
+> -               pr_err("Cannot allocate inode for /dev/mem: %d\n", rc);
+> -               simple_release_fs(&devmem_vfs_mount, &devmem_fs_cnt);
+> -               return rc;
+> -       }
+> -
+> -       /*
+> -        * Publish /dev/mem initialized.
+> -        * Pairs with smp_load_acquire() in revoke_devmem().
+> -        */
+> -       smp_store_release(&devmem_inode, inode);
+> -
+> -       return 0;
+> -}
+> -
+>  static int __init chr_dev_init(void)
+>  {
+>         int minor;
+> @@ -1058,8 +977,6 @@ static int __init chr_dev_init(void)
+>                  */
+>                 if ((minor =3D=3D DEVPORT_MINOR) && !arch_has_dev_port())
+>                         continue;
+> -               if ((minor =3D=3D DEVMEM_MINOR) && devmem_init_inode() !=
+=3D 0)
+> -                       continue;
+>
+>                 device_create(mem_class, NULL, MKDEV(MEM_MAJOR, minor),
+>                               NULL, devlist[minor].name);
+> diff --git a/include/linux/ioport.h b/include/linux/ioport.h
+> index 6c2b06fe8beb..8ffb61b36606 100644
+> --- a/include/linux/ioport.h
+> +++ b/include/linux/ioport.h
+> @@ -302,11 +302,7 @@ struct resource *devm_request_free_mem_region(struct=
+ device *dev,
+>  struct resource *request_free_mem_region(struct resource *base,
+>                 unsigned long size, const char *name);
+>
+> -#ifdef CONFIG_IO_STRICT_DEVMEM
+> -void revoke_devmem(struct resource *res);
+> -#else
+> -static inline void revoke_devmem(struct resource *res) { };
+> -#endif
+> +extern struct address_space *iomem_get_mapping(void);
+>
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* _LINUX_IOPORT_H */
+> diff --git a/kernel/resource.c b/kernel/resource.c
+> index 841737bbda9e..a92fed5b9997 100644
+> --- a/kernel/resource.c
+> +++ b/kernel/resource.c
+> @@ -18,12 +18,15 @@
+>  #include <linux/spinlock.h>
+>  #include <linux/fs.h>
+>  #include <linux/proc_fs.h>
+> +#include <linux/pseudo_fs.h>
+>  #include <linux/sched.h>
+>  #include <linux/seq_file.h>
+>  #include <linux/device.h>
+>  #include <linux/pfn.h>
+>  #include <linux/mm.h>
+> +#include <linux/mount.h>
+>  #include <linux/resource_ext.h>
+> +#include <uapi/linux/magic.h>
+>  #include <asm/io.h>
+>
+>
+> @@ -1112,6 +1115,58 @@ resource_size_t resource_alignment(struct resource=
+ *res)
+>
+>  static DECLARE_WAIT_QUEUE_HEAD(muxed_resource_wait);
+>
+> +static struct inode *iomem_inode;
+> +
+> +#ifdef CONFIG_IO_STRICT_DEVMEM
+> +static void revoke_iomem(struct resource *res)
+> +{
+> +       /* pairs with smp_store_release() in iomem_init_inode() */
+> +       struct inode *inode =3D smp_load_acquire(&iomem_inode);
+> +
+> +       /*
+> +        * Check that the initialization has completed. Losing the race
+> +        * is ok because it means drivers are claiming resources before
+> +        * the fs_initcall level of init and prevent /dev/mem from
+
+How about:
+
+s,/dev/mem,iomem_get_mapping() users,
+
+...now that this facility is generalized?
+
+> +        * establishing mappings.
+> +        */
+> +       if (!inode)
+> +               return;
+> +
+> +       /*
+> +        * The expectation is that the driver has successfully marked
+> +        * the resource busy by this point, so devmem_is_allowed()
+> +        * should start returning false, however for performance this
+> +        * does not iterate the entire resource range.
+> +        */
+> +       if (devmem_is_allowed(PHYS_PFN(res->start)) &&
+> +           devmem_is_allowed(PHYS_PFN(res->end))) {
+> +               /*
+> +                * *cringe* iomem=3Drelaxed says "go ahead, what's the
+> +                * worst that can happen?"
+> +                */
+> +               return;
+> +       }
+> +
+> +       unmap_mapping_range(inode->i_mapping, res->start, resource_size(r=
+es), 1);
+> +}
+> +struct address_space *iomem_get_mapping(void)
+> +{
+> +       /*
+> +        * This function is only called from file open paths, hence guara=
+nteed
+> +        * that fs_initcalls have completed and no need to check for NULL=
+. But
+> +        * since revoke_iomem can be called before the initcall we still =
+need
+> +        * the barrier to appease checkers.
+> +        */
+> +       return smp_load_acquire(&iomem_inode)->i_mapping;
+> +}
+> +#else
+> +static void revoke_iomem(struct resource *res) {}
+> +struct address_space *iomem_get_mapping(void)
+> +{
+> +       return NULL;
+> +}
+> +#endif
+> +
+>  /**
+>   * __request_region - create a new busy resource region
+>   * @parent: parent resource descriptor
+> @@ -1179,7 +1234,7 @@ struct resource * __request_region(struct resource =
+*parent,
+>         write_unlock(&resource_lock);
+>
+>         if (res && orig_parent =3D=3D &iomem_resource)
+> -               revoke_devmem(res);
+> +               revoke_iomem(res);
+>
+>         return res;
+>  }
+> @@ -1713,4 +1768,48 @@ static int __init strict_iomem(char *str)
+>         return 1;
+>  }
+>
+> +static int iomem_fs_init_fs_context(struct fs_context *fc)
+> +{
+> +       return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
+> +}
+> +
+> +static struct file_system_type iomem_fs_type =3D {
+> +       .name           =3D "iomem",
+> +       .owner          =3D THIS_MODULE,
+> +       .init_fs_context =3D iomem_fs_init_fs_context,
+> +       .kill_sb        =3D kill_anon_super,
+> +};
+> +
+> +static int __init iomem_init_inode(void)
+> +{
+> +       static struct vfsmount *iomem_vfs_mount;
+> +       static int iomem_fs_cnt;
+> +       struct inode *inode;
+> +       int rc;
+> +
+> +       rc =3D simple_pin_fs(&iomem_fs_type, &iomem_vfs_mount, &iomem_fs_=
+cnt);
+> +       if (rc < 0) {
+> +               pr_err("Cannot mount iomem pseudo filesystem: %d\n", rc);
+> +               return rc;
+> +       }
+> +
+> +       inode =3D alloc_anon_inode(iomem_vfs_mount->mnt_sb);
+> +       if (IS_ERR(inode)) {
+> +               rc =3D PTR_ERR(inode);
+> +               pr_err("Cannot allocate inode for iomem: %d\n", rc);
+> +               simple_release_fs(&iomem_vfs_mount, &iomem_fs_cnt);
+> +               return rc;
+> +       }
+> +
+> +       /*
+> +        * Publish /dev/mem initialized.
+
+Similar potential fixup:
+
+"Publish iomem revocation inode initialized"
+
+Other than that:
+
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
