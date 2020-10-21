@@ -2,181 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7A3294CD9
-	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 14:39:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86F23294D07
+	for <lists+kvm@lfdr.de>; Wed, 21 Oct 2020 14:50:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408511AbgJUMj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 08:39:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37884 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2394282AbgJUMj2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Oct 2020 08:39:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603283966;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=c7EH/NJ6Fg/m8L/HBnnaHt/LKhGAw4sqP6ejYqOggwk=;
-        b=NG1etoduHcNIeW34UfO2+wD+wtD2UHDfImhZ0dSyGioL2LLXcKDBbzOrX2oS8OE5DXj6Lw
-        fp72OSCdWKaXTTGPmk3T9dUoODaMsc0cpicKUlMU2+MfTbhWbTZDe0BFBG1+uFRAVAyXCM
-        cpkh8lmSJvYn6yUuaBh2pljDewSR/g8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-Lc9EdbC8PyW8-av8SDIOlw-1; Wed, 21 Oct 2020 08:39:24 -0400
-X-MC-Unique: Lc9EdbC8PyW8-av8SDIOlw-1
-Received: by mail-wr1-f70.google.com with SMTP id n14so2555746wrp.1
-        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 05:39:23 -0700 (PDT)
+        id S2442617AbgJUMue (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 08:50:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49822 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2442621AbgJUMud (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Oct 2020 08:50:33 -0400
+Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A82C0613CE
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 05:50:32 -0700 (PDT)
+Received: by mail-qv1-xf44.google.com with SMTP id s1so965988qvm.13
+        for <kvm@vger.kernel.org>; Wed, 21 Oct 2020 05:50:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=VkhhJyafoy36fds4PnCfWF9LNV9fC1i6gyayD/bdTsE=;
+        b=Bjric0h8k3E5nVSnyA3y8syn5qJbzN5IRzuOHR0d7uEDz69w1rKEdQtJjX2klnSD2f
+         HQcTpKD5D3V7kWLlToHxrM8UOfbUsM4NGMyxmaL4cJNWPBOlwy7SSVlgAu3fXQNgW/tm
+         E/Z154bHNIDfOdfpW4c0/FAD/DUsAoEBg7tdzOhHMjGwZ1srI5ZzmyHw1kqTbOA20Zsr
+         6FkTvbFUFtQy26Mpkg7JM8b/jc3WZ4zNCmcMh6GqroRxUEuzzQjwRRq/1rm+GvI0lwIa
+         yqkLIFnQ0gQqj71OpMsdVbj1j0y2lESP0Xm+nHN0pfprmhEnmw6kFUQw4XnnGYDmJyHR
+         D1HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=c7EH/NJ6Fg/m8L/HBnnaHt/LKhGAw4sqP6ejYqOggwk=;
-        b=kp+RBMN2lskMolG+tcT6Bd686fYwQUlJ5N7lx2r6M7vE3csXZT7YuNIMDDQP4EmcZV
-         24rka1wx9nmudCtQeAGWc1BShfA8unCtTi3C+TdFshclFyNibiSU4b3ZZEvkQwvppxOE
-         XzXDVHM46SVG8nDGSD4XfCJWZNC2QglJM0FU+9QFTyj3t37MTDxWYuABD3jnom/V19/5
-         j/jiVkWoE+RB3Ggpn5i1btS8H6BCoKUWj53qLWKOF6TI8b7QjRuMR3XJpn85tsc75r8b
-         bptyFwryfsZNHTd7hXtnSCXbfnwOwZwD+c6nu1KwSqLI64LVg2s1X5iBjj4NVdcYqC3c
-         ZjOQ==
-X-Gm-Message-State: AOAM532/66gldlVKqSe6D3EH1tKJIsbVaWSDh1Rw2YdOxWeRtYNYfDL4
-        mzV78KFJz9Y4YxrcSPNLPldI3QSntDHlBTZs+tSG4UHvQqb9XGTuELSdPwrHtyo9wl9wPcrxnPy
-        89uULdwwSHfrU
-X-Received: by 2002:adf:80c8:: with SMTP id 66mr4650723wrl.415.1603283962840;
-        Wed, 21 Oct 2020 05:39:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwpiPbbJK4AX5vO6QZtccwjQuHYrMpWSENlh7dEYIreZ7TRkNyQ+Z5nk41eW0foiBgy0TF1oQ==
-X-Received: by 2002:adf:80c8:: with SMTP id 66mr4650696wrl.415.1603283962631;
-        Wed, 21 Oct 2020 05:39:22 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id x64sm3593660wmg.33.2020.10.21.05.39.21
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=VkhhJyafoy36fds4PnCfWF9LNV9fC1i6gyayD/bdTsE=;
+        b=udMEfykBMM1dH+A61urnTFvaYN80TEN5fjivlMBZ6eECFJiaOJnNDB1A08T9u+KAzs
+         5d6T1Vd6KB4OFpc1RD4f8wp78Gd39NH9qfLecFQKnEI2spSJ8SwvrcnNCGMDp7Mk+Phl
+         AUq9QYp5IFe7faKnwItzAlZ735/I1MGNL0jINQW/al5+Bg1Fdj3mGUsAdg3oie6sG2h7
+         rKaM+z7fGBlOgRj7J6IelROlwOmQiQHNpSmXDO4ou6jstJKDyxKwV7DJ5u5H6gziAEGt
+         0kIpucN+xOzV1RYbZLFIny75aaTKpVRpX/CfvKsPrZum5jhKyYM238XCGVJvxnfLDmxC
+         v3rA==
+X-Gm-Message-State: AOAM532jc2GbtbTcuUF72x8g3ItBqiT86qfW9voBB7cwlqQnknZz8Bbu
+        1C5WW5+O4zXxNo+Ro7dFjfLTQA==
+X-Google-Smtp-Source: ABdhPJylgNYamo6kqGCWkyezTruGMIXv95IBuM/bFST1jOCSfo3IMWIRoN2J3LwPyBiAPIKaTroxlw==
+X-Received: by 2002:ad4:52c6:: with SMTP id p6mr2781869qvs.38.1603284631882;
+        Wed, 21 Oct 2020 05:50:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id r11sm1016060qtw.47.2020.10.21.05.50.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2020 05:39:21 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 05/10] KVM: VMX: Invalidate hv_tlb_eptp to denote an EPTP mismatch
-In-Reply-To: <20201020215613.8972-6-sean.j.christopherson@intel.com>
-References: <20201020215613.8972-1-sean.j.christopherson@intel.com> <20201020215613.8972-6-sean.j.christopherson@intel.com>
-Date:   Wed, 21 Oct 2020 14:39:20 +0200
-Message-ID: <87wnzj4utj.fsf@vitty.brq.redhat.com>
+        Wed, 21 Oct 2020 05:50:31 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kVDZW-003UAg-0q; Wed, 21 Oct 2020 09:50:30 -0300
+Date:   Wed, 21 Oct 2020 09:50:30 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        linux-pci@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.com>
+Subject: Re: [PATCH v3 12/16] PCI: Obey iomem restrictions for procfs mmap
+Message-ID: <20201021125030.GK36674@ziepe.ca>
+References: <20201021085655.1192025-1-daniel.vetter@ffwll.ch>
+ <20201021085655.1192025-13-daniel.vetter@ffwll.ch>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201021085655.1192025-13-daniel.vetter@ffwll.ch>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Wed, Oct 21, 2020 at 10:56:51AM +0200, Daniel Vetter wrote:
+> There's three ways to access PCI BARs from userspace: /dev/mem, sysfs
+> files, and the old proc interface. Two check against
+> iomem_is_exclusive, proc never did. And with CONFIG_IO_STRICT_DEVMEM,
+> this starts to matter, since we don't want random userspace having
+> access to PCI BARs while a driver is loaded and using it.
+> 
+> Fix this by adding the same iomem_is_exclusive() check we already have
+> on the sysfs side in pci_mmap_resource().
+> 
+> References: 90a545e98126 ("restrict /dev/mem to idle io memory ranges")
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: John Hubbard <jhubbard@nvidia.com>
+> Cc: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: linux-mm@kvack.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-samsung-soc@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: Bjorn Helgaas <bhelgaas@google.com>
+> Cc: linux-pci@vger.kernel.org
+> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.com>
 
-> Drop the dedicated 'ept_pointers_match' field in favor of stuffing
-> 'hv_tlb_eptp' with INVALID_PAGE to mark it as invalid, i.e. to denote
-> that there is at least one EPTP mismatch.  Use a local variable to
-> track whether or not a mismatch is detected so that hv_tlb_eptp can be
-> used to skip redundant flushes.
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 16 ++++++++--------
->  arch/x86/kvm/vmx/vmx.h |  7 -------
->  2 files changed, 8 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 52cb9eec1db3..4dfde8b64750 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -498,13 +498,13 @@ static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
->  	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
->  	struct kvm_vcpu *vcpu;
->  	int ret = 0, i;
-> +	bool mismatch;
->  	u64 tmp_eptp;
->  
->  	spin_lock(&kvm_vmx->ept_pointer_lock);
->  
-> -	if (kvm_vmx->ept_pointers_match != EPT_POINTERS_MATCH) {
-> -		kvm_vmx->ept_pointers_match = EPT_POINTERS_MATCH;
-> -		kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
-> +	if (!VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
-> +		mismatch = false;
->  
->  		kvm_for_each_vcpu(i, vcpu, kvm) {
->  			tmp_eptp = to_vmx(vcpu)->ept_pointer;
-> @@ -515,12 +515,13 @@ static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
->  			if (!VALID_PAGE(kvm_vmx->hv_tlb_eptp))
->  				kvm_vmx->hv_tlb_eptp = tmp_eptp;
->  			else
-> -				kvm_vmx->ept_pointers_match
-> -					= EPT_POINTERS_MISMATCH;
-> +				mismatch = true;
->  
->  			ret |= hv_remote_flush_eptp(tmp_eptp, range);
->  		}
-> -	} else if (VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
-> +		if (mismatch)
-> +			kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
-> +	} else {
->  		ret = hv_remote_flush_eptp(kvm_vmx->hv_tlb_eptp, range);
->  	}
+Maybe not for fixing in this series, but this access to
+IORESOURCE_BUSY doesn't have any locking.
 
-Personally, I find double negations like 'mismatch = false' hard to read
-:-). What if we write this all like 
+The write side holds the resource_lock at least..
 
-if (!VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
-	kvm_vmx->hv_tlb_eptp = to_vmx(vcpu0)->ept_pointer;
-	kvm_for_each_vcpu() {
-		tmp_eptp = to_vmx(vcpu)->ept_pointer;
-		if (!VALID_PAGE(tmp_eptp) || tmp_eptp != kvm_vmx->hv_tlb_eptp)
-			kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
+>  	ret = pci_mmap_page_range(dev, i, vma,
+>  				  fpriv->mmap_state, write_combine);
 
-		if (VALID_PAGE(tmp_eptp))
-			ret |= hv_remote_flush_eptp(tmp_eptp, range);
-	}
-} else {
-	ret = hv_remote_flush_eptp(kvm_vmx->hv_tlb_eptp, range);
-}
+At this point the vma isn't linked into the address space, so doesn't
+this happen?
 
-(not tested and I've probably missed something)
+     CPU 0                                  CPU1
+ mmap_region()
+   vma = vm_area_alloc
+   proc_bus_pci_mmap
+    iomem_is_exclusive
+    pci_mmap_page_range
+                                            revoke_devmem
+                                             unmap_mapping_range()
+     // vma is not linked to the address space here,
+     // unmap doesn't find it
+  vma_link() 
+  !!! The VMA gets mapped with the revoked PTEs
 
->  
-> @@ -3042,8 +3043,7 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
->  		if (kvm_x86_ops.tlb_remote_flush) {
->  			spin_lock(&to_kvm_vmx(kvm)->ept_pointer_lock);
->  			to_vmx(vcpu)->ept_pointer = eptp;
-> -			to_kvm_vmx(kvm)->ept_pointers_match
-> -				= EPT_POINTERS_CHECK;
-> +			to_kvm_vmx(kvm)->hv_tlb_eptp = INVALID_PAGE;
->  			spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
->  		}
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 3d557a065c01..e8d7d07b2020 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -288,12 +288,6 @@ struct vcpu_vmx {
->  	} shadow_msr_intercept;
->  };
->  
-> -enum ept_pointers_status {
-> -	EPT_POINTERS_CHECK = 0,
-> -	EPT_POINTERS_MATCH = 1,
-> -	EPT_POINTERS_MISMATCH = 2
-> -};
-> -
->  struct kvm_vmx {
->  	struct kvm kvm;
->  
-> @@ -302,7 +296,6 @@ struct kvm_vmx {
->  	gpa_t ept_identity_map_addr;
->  
->  	hpa_t hv_tlb_eptp;
-> -	enum ept_pointers_status ept_pointers_match;
->  	spinlock_t ept_pointer_lock;
->  };
+I couldn't find anything that prevents it at least, no mmap_sem on the
+unmap side, just the i_mmap_lock
 
--- 
-Vitaly
+Not seeing how address space and pre-populating during mmap work
+together? Did I miss locking someplace?
 
+Not something to be fixed for this series, this is clearly an
+improvement, but seems like another problem to tackle?
+
+Jason
