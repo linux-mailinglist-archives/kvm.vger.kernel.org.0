@@ -2,92 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C17E2966C0
-	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 23:44:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5BE8296704
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 00:10:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S372437AbgJVVnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Oct 2020 17:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44228 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S372432AbgJVVnz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Oct 2020 17:43:55 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 244AFC0613CE;
-        Thu, 22 Oct 2020 14:43:55 -0700 (PDT)
+        id S372736AbgJVWKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Oct 2020 18:10:38 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:49994 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S370028AbgJVWKh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Oct 2020 18:10:37 -0400
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1603403033;
+        s=2020; t=1603404635;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=c32SKqD2QPPmQRkKDG5IckFogmrBjrqnOlEPJ34GffQ=;
-        b=djSQMJvu88coa4ZnaK9g69LibWRWkd0bVkrazf5TGY3ku/NnliEgV5RIYQqddSS5O41bSB
-        8MVMUf50eEzJTpgoHepJz9F05yw/FfLg5J6YFUzWf0Px/R8Az29hFA6lo9qCJPMyNZdntF
-        rhlqunO69v/B/SaawC/2YQEiAW7qyQfxu5aG/cspUC8Vads5EXLlBP6Xlj/XwecshHQWzq
-        eIo4vfglKAsQyQO9nRvSyMrLHptLFF3Fxm2J5NIFHc9xKQlSWp8lEH5ew/t3TvmpI+rK5P
-        lT3kN4bVzZefwVb2oLeI4u2DytHlyA5FVxGxLMp1TAzuCE+tgzrs1ff5v2hwcw==
+         in-reply-to:in-reply-to:references:references;
+        bh=MvN0PZcC1LUdr+xhWQX/PywlAVCnw/qFd8HerpuaJjU=;
+        b=KdmmgfEMYQPX3gnHsmGI0RFxcGG45vVDNq6dm1XXwwyYp05viid6K68JmwV3LO7dzeFezv
+        ZWyF7Ge+U9J+rK4GEcd0tFwYleqEJhBzfzC74riy16r0Bu3gZj0bYf2n5E1YjrFFb873r6
+        GnrVJ2KkD5QXzZ6X/G8bs9q0Nz1vE7imO/Ss09B8fdwL1UXCqu/T7sSCezoiCi4lUtM8d5
+        K0XHP2fXnFrV0Pmhoa1oS4GglSzbqPCk2Hao2nI539QPDnTN9wO+iYxmxXFXLKdIGJcQ7Y
+        +5UG0gBvoydbyiERX9Sh0DoQDJvZ2fPC4FScIjAU+fD7BA2I17SJ636bUTDeqA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1603403033;
+        s=2020e; t=1603404635;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=c32SKqD2QPPmQRkKDG5IckFogmrBjrqnOlEPJ34GffQ=;
-        b=xlNKFG/FRxX90888QEwo+jxnoVhskeS5SmseJy0OSOtvwYdaHTEmVrfehSvAP8GHBdt9E9
-        1CouFj602bGhAPDg==
+         in-reply-to:in-reply-to:references:references;
+        bh=MvN0PZcC1LUdr+xhWQX/PywlAVCnw/qFd8HerpuaJjU=;
+        b=3e4TbHegA5nWCISA9Baz7hJnQ+ZqGUL6K/dux7vuU/UBKa2eizznt8BtrgtCGwcHneSjMA
+        PRF6BfgQjtaihxDQ==
 To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
 Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         linux-hyperv@vger.kernel.org
 Subject: Re: [PATCH v2 8/8] x86/ioapic: Generate RTE directly from parent irqchip's MSI message
-In-Reply-To: <20201009104616.1314746-9-dwmw2@infradead.org>
-Date:   Thu, 22 Oct 2020 23:43:52 +0200
-Message-ID: <87y2jy542v.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <87y2jy542v.fsf@nanos.tec.linutronix.de>
+References: <87y2jy542v.fsf@nanos.tec.linutronix.de>
+Date:   Fri, 23 Oct 2020 00:10:35 +0200
+Message-ID: <87sga56hes.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 09 2020 at 11:46, David Woodhouse wrote:
+On Thu, Oct 22 2020 at 23:43, Thomas Gleixner wrote:
+> On Fri, Oct 09 2020 at 11:46, David Woodhouse wrote:
+> Aside of that it works magically because polarity,trigger and mask bit
+> have been set up before. But of course a comment about this is
+> completely overrated.
 
-@@ -45,12 +45,11 @@ enum irq_alloc_type {
- };
+Also this part:
 
-> +static void mp_swizzle_msi_dest_bits(struct irq_data *irq_data, void *_entry)
-> +{
-> +	struct msi_msg msg;
-> +	u32 *entry = _entry;
-
-Why is this a void * argument and then converting it to a u32 *? Just to
-make that function completely unreadable?
-
+> -static void mp_setup_entry(struct irq_cfg *cfg, struct mp_chip_data *data,
+> -			   struct IO_APIC_route_entry *entry)
+> +static void mp_setup_entry(struct irq_data *irq_data, struct mp_chip_data *data)
+>  {
+> +	struct IO_APIC_route_entry *entry = &data->entry;
 > +
-> +	irq_chip_compose_msi_msg(irq_data, &msg);
-
-Lacks a comment. Also mp_swizzle... is a misnomer as this invokes the
-msi compose function which is not what the function name suggests.
-
-> +	/*
-> +	 * They're in a bit of a random order for historical reasons, but
-> +	 * the IO/APIC is just a device for turning interrupt lines into
-> +	 * MSIs, and various bits of the MSI addr/data are just swizzled
-> +	 * into/from the bits of Redirection Table Entry.
-> +	 */
-> +	entry[0] &= 0xfffff000;
-> +	entry[0] |= (msg.data & (MSI_DATA_DELIVERY_MODE_MASK |
-> +				 MSI_DATA_VECTOR_MASK));
-> +	entry[0] |= (msg.address_lo & MSI_ADDR_DEST_MODE_MASK) << 9;
+>  	memset(entry, 0, sizeof(*entry));
+> -	entry->delivery_mode = apic->irq_delivery_mode;
+> -	entry->dest_mode     = apic->irq_dest_mode;
+> -	entry->dest	     = cfg->dest_apicid & 0xff;
+> -	entry->virt_ext_dest = cfg->dest_apicid >> 8;
+> -	entry->vector	     = cfg->vector;
 > +
-> +	entry[1] &= 0xffff;
-> +	entry[1] |= (msg.address_lo & MSI_ADDR_DEST_ID_MASK) << 12;
+> +	mp_swizzle_msi_dest_bits(irq_data, entry);
+> +
+>  	entry->trigger	     = data->trigger;
+>  	entry->polarity	     = data->polarity;
+>  	/*
 
-Sorry, but this is unreviewable gunk. The whole msi_msg setup sucks with
-this unholy macro maze. I have a half finished series which allows
-architectures to provide shadow members for data, address_* so this can
-be done proper with bitfields.
+does not make sense. It did not make sense before either, but now it
+does even make less sense.
 
-Aside of that it works magically because polarity,trigger and mask bit
-have been set up before. But of course a comment about this is
-completely overrated.
+During allocation this only needs to setup the I/O-APIC specific bits
+(trigger, polarity, mask). The rest is filled in when the actual
+activation happens. Nothing writes that entry _before_ activation.
 
-Thanks,
+/me goes to mop up more
 
-        tglx
