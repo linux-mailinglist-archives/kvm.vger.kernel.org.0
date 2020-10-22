@@ -2,157 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04932295D7A
-	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 13:37:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0AAE295DA1
+	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 13:43:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2897362AbgJVLhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Oct 2020 07:37:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
+        id S2897497AbgJVLnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Oct 2020 07:43:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2444409AbgJVLhi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Oct 2020 07:37:38 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D252BC0613CE
-        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 04:37:37 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id 184so1829454lfd.6
-        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 04:37:37 -0700 (PDT)
+        with ESMTP id S2897494AbgJVLnr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Oct 2020 07:43:47 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 728C0C0613CE
+        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 04:43:47 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id g13so665207qvu.1
+        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 04:43:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=kV3B9d4XnVSsmv3sKzzsVoproWEhDGgfHQIXbtHyc80=;
-        b=0vJSIpfHLs5Q3hF3srtH+miWg1YG4sQZe68J2f1r5Tj19mY8+VnxDOcKJKS/hXBj3h
-         bEl6lwmsj7gyfoev3md9cI5h2iSLBNI2MRSRUkseK5n3SiJzDkKq4Efk6mqL6alfcBHu
-         7IKMuzGUediaJOB8gVnlN1UcPjLsVk/E0n2pLGJl3TUqDGXJ/yQxKy2KVvh+TrFLAex1
-         cy5kPIduOWsSLKvnp5yU9uGeKGla9JPNFgXU8O0al97cMMG41BvYZXrSZurVRuut9cF7
-         jD0RJeopeBAG+CcZ8JG/xtGZPkEjRNiqGgtiOvExPLy90MMUYxy5zxM79t/9HZJdcLhu
-         3YQQ==
+        bh=Tn5VStmyr19eg0AHWkg65WyZIMHvKO6plAVuAqOgPDQ=;
+        b=W2W63+Km46WNPYtkSR3igfnV7TEUq5madmsiNOsLljJ4hXhwY+tNpYNU0U98RMc/Ra
+         N/OqT1bclh4ytLL1rVRfHDNQXuCClycUHEstVDTB13O2SeX7rcenP16ZDtQZwB1W1jcc
+         qY+V9dfylqzLN5PiDQabSjcYMeIPMV8H3MvDBIvqP9uVDzx0l3+DGSbt51z70fKAGBps
+         MOgHN8p+THySDXKSzKDRAxFER+JAglmr7hGRyvf9N5t7jpnIarxCymOKiSFfwhwoQKR+
+         3E88SiMtx1h9HdY+LUkd3T5LmcI1LTVNdrFdFYFYlKXO0Wntp7OMh6vxttQFR1tsYI0Q
+         kJBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=kV3B9d4XnVSsmv3sKzzsVoproWEhDGgfHQIXbtHyc80=;
-        b=dh/EgeQDzjwI4ybEjm7c0Mmxw3DGUhhATfs+OXz6ig0GTjT7XV3ZsDJayJ0PICalrB
-         V4xwhqqXpz1tJApQAYQqcJ9PpCYV7wdb/rxrCaK4rviGhoA0TTRoQON6JDlNtz66EBWC
-         dHyiNlCDLE4wMJfp4xwD3UaABdYyP9zNi7QXxKBKr/djNW4cigQsFFyYUM1hRNQAu5nH
-         XUSKWgCM92wZp/7nxHZtSVcRERPE2V6thORZ48aTxubPizuYdoG7pdwt8ZGz4qhITEH1
-         yF4bxddl/R1KIb3/2vuRf9Pfdo1GkMem0q15HT9yQ1kgDq6miDrmAUMU9/34eVma0JsU
-         SCgQ==
-X-Gm-Message-State: AOAM530XLdbsrOd8zOjoXDpjQVtyGkb08QdCmGLbJcwMeNNLgxZkXiWc
-        k8lLGsuvsIKXVgfTrqtxtE1xInhWAsiShA==
-X-Google-Smtp-Source: ABdhPJwK+q9Ggo3sWp7d7crIXcWK5khXZu2whyTJi45nk9HdyQyARtPNihFKY0DeLGdZVdJa6l+4DQ==
-X-Received: by 2002:ac2:5e6c:: with SMTP id a12mr767940lfr.568.1603366656278;
-        Thu, 22 Oct 2020 04:37:36 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id l16sm230972lfg.155.2020.10.22.04.37.35
+        bh=Tn5VStmyr19eg0AHWkg65WyZIMHvKO6plAVuAqOgPDQ=;
+        b=FUrDT91q7ddvauF1PYy5r5slbvCqfbtmNyWNHVOcVVr7wvwx7mR58tSZWAirmnk42L
+         Sn4qpueNnFqL6CLGilG46lZvMGbbjX/GR0qGUnLngR6umGMUT60w80RRK5S7nRbUZI2H
+         WyIlKyN/bHQtAqCUPh7YRThJ/1DcH5bsUsHwaXPbiQnvjfQv6akuyW2n9YfWTEH2ZoCQ
+         qI3jlqXavlwaKGG1vr9CC0bxVqLzraS2rlGiFfoNeV1ikURUKL0NX3LOIaQ4pWBJQQoK
+         EVtYtHSqYj1VoHnvHawdn5IG7ZH2QOeGW7u8J1yQOF1BU7HOpRl5Cumua6bZ1w/W4Sv/
+         +6Og==
+X-Gm-Message-State: AOAM530yNUMdywODnqEffM1+1OM32uKnKcsZ0gqEh2/fe0JGGSes2196
+        HY9nLG7E1KZb/O8gUwQgrqsrZA==
+X-Google-Smtp-Source: ABdhPJw6OYYGIWsKIpwZGlvXqWx4K8ij3H0LBJb/eEFtxBXIO8uo2emBiN1PSKDxC0xVD0g026FmxA==
+X-Received: by 2002:ad4:45a5:: with SMTP id y5mr1935405qvu.40.1603367026713;
+        Thu, 22 Oct 2020 04:43:46 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id l25sm820821qtf.18.2020.10.22.04.43.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2020 04:37:35 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 299A5102F6D; Thu, 22 Oct 2020 14:37:35 +0300 (+03)
-Date:   Thu, 22 Oct 2020 14:37:35 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
+        Thu, 22 Oct 2020 04:43:45 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kVZ0T-0040bW-1W; Thu, 22 Oct 2020 08:43:45 -0300
+Date:   Thu, 22 Oct 2020 08:43:45 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
         Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFCv2 08/16] KVM: Use GUP instead of copy_from/to_user() to
- access guest memory
-Message-ID: <20201022113735.ugfe6haxrd22oqjh@box>
-References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
- <20201020061859.18385-9-kirill.shutemov@linux.intel.com>
- <20201020172944.GA165907@iweiny-DESK2.sc.intel.com>
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@ffwll.com>
+Subject: Re: [PATCH v3 12/16] PCI: Obey iomem restrictions for procfs mmap
+Message-ID: <20201022114345.GO36674@ziepe.ca>
+References: <20201021085655.1192025-1-daniel.vetter@ffwll.ch>
+ <20201021085655.1192025-13-daniel.vetter@ffwll.ch>
+ <20201021125030.GK36674@ziepe.ca>
+ <CAKMK7uEWe8CaT7zjcZ6dJAKHxtxtqzjVB35fCFviwhcnqksDfw@mail.gmail.com>
+ <20201021151352.GL36674@ziepe.ca>
+ <CAKMK7uGq0=ks7Zj1Et44k7x9FwE9u_ua4zANSqrLRri0v01V+Q@mail.gmail.com>
+ <20201021163702.GM36674@ziepe.ca>
+ <CAKMK7uEjE5sHUq0hV_bnYjPKRxYyBnty0sLre+owANGZjLJg9Q@mail.gmail.com>
+ <20201021232022.GN36674@ziepe.ca>
+ <CAKMK7uEkAK42+19KRo06XzJFuMCVriEEg0jxqXq8oAdt2ExLsQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201020172944.GA165907@iweiny-DESK2.sc.intel.com>
+In-Reply-To: <CAKMK7uEkAK42+19KRo06XzJFuMCVriEEg0jxqXq8oAdt2ExLsQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 20, 2020 at 10:29:44AM -0700, Ira Weiny wrote:
-> On Tue, Oct 20, 2020 at 09:18:51AM +0300, Kirill A. Shutemov wrote:
-> > New helpers copy_from_guest()/copy_to_guest() to be used if KVM memory
-> > protection feature is enabled.
-> > 
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> > ---
-> >  include/linux/kvm_host.h |  4 ++
-> >  virt/kvm/kvm_main.c      | 90 +++++++++++++++++++++++++++++++---------
-> >  2 files changed, 75 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 05e3c2fb3ef7..380a64613880 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -504,6 +504,7 @@ struct kvm {
-> >  	struct srcu_struct irq_srcu;
-> >  	pid_t userspace_pid;
-> >  	unsigned int max_halt_poll_ns;
-> > +	bool mem_protected;
-> >  };
-> >  
-> >  #define kvm_err(fmt, ...) \
-> > @@ -728,6 +729,9 @@ void kvm_set_pfn_dirty(kvm_pfn_t pfn);
-> >  void kvm_set_pfn_accessed(kvm_pfn_t pfn);
-> >  void kvm_get_pfn(kvm_pfn_t pfn);
-> >  
-> > +int copy_from_guest(void *data, unsigned long hva, int len, bool protected);
-> > +int copy_to_guest(unsigned long hva, const void *data, int len, bool protected);
-> > +
-> >  void kvm_release_pfn(kvm_pfn_t pfn, bool dirty, struct gfn_to_pfn_cache *cache);
-> >  int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
-> >  			int len);
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index cf88233b819a..a9884cb8c867 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2313,19 +2313,70 @@ static int next_segment(unsigned long len, int offset)
-> >  		return len;
-> >  }
-> >  
-> > +int copy_from_guest(void *data, unsigned long hva, int len, bool protected)
-> > +{
-> > +	int offset = offset_in_page(hva);
-> > +	struct page *page;
-> > +	int npages, seg;
-> > +
-> > +	if (!protected)
-> > +		return __copy_from_user(data, (void __user *)hva, len);
-> > +
-> > +	might_fault();
-> > +	kasan_check_write(data, len);
-> > +	check_object_size(data, len, false);
-> > +
-> > +	while ((seg = next_segment(len, offset)) != 0) {
-> > +		npages = get_user_pages_unlocked(hva, 1, &page, 0);
-> > +		if (npages != 1)
-> > +			return -EFAULT;
-> > +		memcpy(data, page_address(page) + offset, seg);
-> > +		put_page(page);
-> > +		len -= seg;
-> > +		hva += seg;
-> > +		offset = 0;
+On Thu, Oct 22, 2020 at 09:00:44AM +0200, Daniel Vetter wrote:
+> On Thu, Oct 22, 2020 at 1:20 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >
+> > On Wed, Oct 21, 2020 at 09:24:08PM +0200, Daniel Vetter wrote:
+> > > On Wed, Oct 21, 2020 at 6:37 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > > >
+> > > > On Wed, Oct 21, 2020 at 05:54:54PM +0200, Daniel Vetter wrote:
+> > > >
+> > > > > The trouble is that io_remap_pfn adjust vma->pgoff, so we'd need to
+> > > > > split that. So ideally ->mmap would never set up any ptes.
+> > > >
+> > > > /dev/mem makes pgoff == pfn so it doesn't get changed by remap.
+> > > >
+> > > > pgoff doesn't get touched for MAP_SHARED either, so there are other
+> > > > users that could work like this - eg anyone mmaping IO memory is
+> > > > probably OK.
+> > >
+> > > I was more generally thinking for io_remap_pfn_users because of the
+> > > mkwrite use-case we might have in fbdev emulation in drm.
+> >
+> > You have a use case for MAP_PRIVATE and io_remap_pfn_range()??
 > 
-> Why is data not updated on each iteration?
+> Uh no :-)
 
-Ouch. I guess no caller actually steps over page boundary. Will fix.
+So it is fine, the pgoff mangling only happens for MAP_PRIVATE
 
--- 
- Kirill A. Shutemov
+Jason
