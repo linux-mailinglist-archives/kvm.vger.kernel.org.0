@@ -2,136 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07D39295DFE
-	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 14:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1649D295E02
+	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 14:07:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2897846AbgJVMGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Oct 2020 08:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39448 "EHLO
+        id S2897860AbgJVMHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Oct 2020 08:07:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2897841AbgJVMGs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Oct 2020 08:06:48 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5B5C0613CF
-        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 05:06:48 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id a4so1623307lji.12
-        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 05:06:48 -0700 (PDT)
+        with ESMTP id S2897854AbgJVMHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Oct 2020 08:07:47 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35078C0613CE
+        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 05:07:47 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id a7so1930943lfk.9
+        for <kvm@vger.kernel.org>; Thu, 22 Oct 2020 05:07:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=VKJlaic7DNxFEvXPjwxg38aEC5FAN/PkBBIN9e6QrXw=;
-        b=FAoTPilUR+FAnKd0OhFEOG+djamc+uOm7EfZfnqCFzVg+HPqejkiPb77RR2pW4vfaK
-         PtywIAp2g4udgVl2lrkawa447f3LiDLO3tgViO8vWCLIc+GVhTBc5xJhTdqQqyQoN/WS
-         ZNQGKcnzy913BymaoHrONk2Cm3DUm/H+M66FbTE56pRWZAL1izkoswHnvDkO++9Dj3sY
-         p3okGbHS+8XafoOWQEv/M7uEbl0EGo+JpQAeI2lNrXXEAB6bNVN3FmVpIh8bkhr3muPR
-         R/Dr/Zqz6vgvGu9+MNe7d8BGRvUwnS08+882xuRwfP13nkINCHlZ+trFhMpJhPaJAxuG
-         i1RA==
+        bh=ZA39m5B4lfhB7qi65Cq382t5m8SNmLhvXePaPr7AO4w=;
+        b=ag1A3+hDk6wBaHU7tVEqAGouGpo8ukJV++f6+bRpXuby9BfbKDoEexFJBA/cf+y2qp
+         /IS9F7M0Iyubb8pI64mgjCbtpwWeprftcbIWFdchDE0IKQxzVnZt3TN7lBO9FNBZF23A
+         /BqNhvrshCX6I/s4oatmngPWfTHgnKjatSCAHF6bloJOdoTi2TqyOrGZVjiTk2s0XJIB
+         g9LK6pwxhhNyHuVF7kGYgniPzaV6lrBuEWp6CaEata+zn0ZB2rWyow7wfe693xA7l2Yo
+         Q1vAxB6k4HKhq/cmLdhyvFVG6dgL9i6crSL8SQtHCNdTr6kuTg2rFzeB5/O6QpqO+Y+s
+         GTiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=VKJlaic7DNxFEvXPjwxg38aEC5FAN/PkBBIN9e6QrXw=;
-        b=WhKi2ixDhjVBrVIjv+uuNvR/vhhQqjLaxDXhkihXKDR6i1pS7SaZ38Pfq7jvcFvZ2n
-         SrMkpTjBIHjt4TVHAncRI+AGRcDqwAgMKC95VeEjnfABY/zo9b3N64k0eXsST/2imPwY
-         QOVxTtouR+gnXgWxQzAdG5fV2pCODSpdNAtejFSVNJW6xIuylVXo6G3u1oZFeRKBLF94
-         GVHfvvfh3h9S7PuaQzLyg+vXQ+CRM/yZFFemB3INTbENXe7+jVxwS5U8iid/W3FteL/4
-         zebv0JG76qaD33232eATNHnqCobTkgl0Lr/JZRKRRXgw0Ervtpr12FHDN5o1HGJBELva
-         0tNw==
-X-Gm-Message-State: AOAM531nijkh2ZQ0NPvWO42f+tlruyeK+hjkix9mNEhkOZNImoBs6kkg
-        szcwf+GBu/cFJ5FLGmQ2P6htfg==
-X-Google-Smtp-Source: ABdhPJxa+yGQU8bmkk4mUNmRB457D2NmD4IUrHk4Zlb7inEaAmVoDkF6fw+Wmro9EuJKmKmMPbLCdg==
-X-Received: by 2002:a2e:9dd1:: with SMTP id x17mr778531ljj.219.1603368406779;
-        Thu, 22 Oct 2020 05:06:46 -0700 (PDT)
+        bh=ZA39m5B4lfhB7qi65Cq382t5m8SNmLhvXePaPr7AO4w=;
+        b=ED4koFL8pB+1TN/ZNOjLTBNiBePNl8gKixMfm2MmwDPhnbcGow0vIOur30II9d0Cog
+         YfvuOHRg4T6v/GYBQJNPJQO0zj6D0Rryr1Q4dR32KHMHmt0+mvk9PVoQTUak1oqrsbEB
+         /Ar91b3DdyKPnfkMYXh6PrpAfuPbJke0R5cbO37ZKcQJvdnPDKwgC7DQUF9uIA+EqVia
+         DxuDVcpW+tr5LlbPiXihl4E9I0V0KYKkDZPCLrutIDR1Vbh+mnIjKHpfMdR7vavpBmhO
+         nb8yp0etEpCZl/30B79yA3q26YOk1QNRQ2+3G6sbYPew+qIfwRGmAatvPpSfRBTj/btH
+         a9UQ==
+X-Gm-Message-State: AOAM532b4lDLsvbBnkkCnzF8If8lvYRBtY+wkP15VuOmqknFCmtVtN+M
+        57bGvb0ZPlHpuwXF0ANf3uMGUg==
+X-Google-Smtp-Source: ABdhPJzv4cMC9f5whc1/8PrlqdKus3Ypn6OTbtFMlq/llXt/prAe3CBMuvyqIY+7JRXyBV1qXMs+hw==
+X-Received: by 2002:a05:6512:2098:: with SMTP id t24mr809068lfr.116.1603368465669;
+        Thu, 22 Oct 2020 05:07:45 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id x18sm241582lfe.158.2020.10.22.05.06.45
+        by smtp.gmail.com with ESMTPSA id f129sm238766lfd.201.2020.10.22.05.07.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2020 05:06:45 -0700 (PDT)
+        Thu, 22 Oct 2020 05:07:44 -0700 (PDT)
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 83BC7102F6D; Thu, 22 Oct 2020 15:06:45 +0300 (+03)
-Date:   Thu, 22 Oct 2020 15:06:45 +0300
+        id 70D33102F6D; Thu, 22 Oct 2020 15:07:44 +0300 (+03)
+Date:   Thu, 22 Oct 2020 15:07:44 +0300
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc:     "peterz@infradead.org" <peterz@infradead.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "wad@chromium.org" <wad@chromium.org>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Subject: Re: [RFCv2 14/16] KVM: Handle protected memory in
  __kvm_map_gfn()/__kvm_unmap_gfn()
-Message-ID: <20201022120645.vdmytvcmdoku73os@box>
+Message-ID: <20201022120744.t5ap3f6maeuspkd3@box>
 References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
  <20201020061859.18385-15-kirill.shutemov@linux.intel.com>
- <8404a8802dbdbf81c8f75249039580f9e6942095.camel@intel.com>
+ <20201022052647.6a4d7e0b.pasic@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8404a8802dbdbf81c8f75249039580f9e6942095.camel@intel.com>
+In-Reply-To: <20201022052647.6a4d7e0b.pasic@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 21, 2020 at 06:50:28PM +0000, Edgecombe, Rick P wrote:
-> On Tue, 2020-10-20 at 09:18 +0300, Kirill A. Shutemov wrote:
-> > @@ -467,7 +477,7 @@ void iounmap(volatile void __iomem *addr)
-> >  	p = find_vm_area((void __force *)addr);
-> >  
-> >  	if (!p) {
-> > -		printk(KERN_ERR "iounmap: bad address %p\n", addr);
-> > +		printk(KERN_ERR "iounmap: bad address %px\n", addr);
+On Thu, Oct 22, 2020 at 05:26:47AM +0200, Halil Pasic wrote:
+> On Tue, 20 Oct 2020 09:18:57 +0300
+> "Kirill A. Shutemov" <kirill@shutemov.name> wrote:
 > 
-> Unintentional?
-
-Yep. Will fix.
-
-> > @@ -2162,15 +2178,20 @@ static int __kvm_map_gfn(struct kvm_memslots
-> > *slots, gfn_t gfn,
-> >  			kvm_cache_gfn_to_pfn(slot, gfn, cache, gen);
-> >  		}
-> >  		pfn = cache->pfn;
-> > +		protected = cache->protected;
-> >  	} else {
-> >  		if (atomic)
-> >  			return -EAGAIN;
-> > -		pfn = gfn_to_pfn_memslot(slot, gfn);
-> > +		pfn = gfn_to_pfn_memslot_protected(slot, gfn,
-> > &protected);
-> >  	}
-> >  	if (is_error_noslot_pfn(pfn))
-> >  		return -EINVAL;
-> >  
-> > -	if (pfn_valid(pfn)) {
-> > +	if (protected) {
-> > +		if (atomic)
-> > +			return -EAGAIN;
-> > +		hva = ioremap_cache_force(pfn_to_hpa(pfn), PAGE_SIZE);
-> > +	} else if (pfn_valid(pfn)) {
-> >  		page = pfn_to_page(pfn);
-> >  		if (atomic)
-> >  			hva = kmap_atomic(page);
+> > We cannot access protected pages directly. Use ioremap() to
+> > create a temporary mapping of the page. The mapping is destroyed
+> > on __kvm_unmap_gfn().
+> > 
+> > The new interface gfn_to_pfn_memslot_protected() is used to detect if
+> > the page is protected.
+> > 
+> > ioremap_cache_force() is a hack to bypass IORES_MAP_SYSTEM_RAM check in
+> > the x86 ioremap code. We need a better solution.
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > ---
+> >  arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+> >  arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+> >  arch/x86/include/asm/io.h              |  2 +
+> >  arch/x86/include/asm/pgtable_types.h   |  1 +
+> >  arch/x86/kvm/mmu/mmu.c                 |  6 ++-
+> >  arch/x86/mm/ioremap.c                  | 16 ++++++--
+> >  include/linux/kvm_host.h               |  3 +-
+> >  include/linux/kvm_types.h              |  1 +
+> >  virt/kvm/kvm_main.c                    | 52 +++++++++++++++++++-------
+> >  9 files changed, 63 insertions(+), 22 deletions(-)
+> > 
 > 
-> I think the page could have got unmapped since the gup via the
-> hypercall on another CPU. It could be an avenue for the guest to crash
-> the host.
+> You declare ioremap_cache_force() arch/x86/include/asm/io.h  in and
+> define it in arch/x86/mm/ioremap.c which is architecture specific code,
+> but use it in __kvm_map_gfn() in virt/kvm/kvm_main.c which is common
+> code.
+> 
+> Thus your series breaks the build for the s390 architecture. Have you
+> tried to (cross) compile for s390?
 
-Hm.. I'm not sure I follow. Could you elaborate on what scenario you have
-in mind?
+Obviously not. I've got reports already from 0day and going to fix it.
+
+Thanks.
 
 -- 
  Kirill A. Shutemov
