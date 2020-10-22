@@ -2,83 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5BE8296704
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 00:10:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 436CC296727
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 00:26:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S372736AbgJVWKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Oct 2020 18:10:38 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:49994 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S370028AbgJVWKh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Oct 2020 18:10:37 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1603404635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MvN0PZcC1LUdr+xhWQX/PywlAVCnw/qFd8HerpuaJjU=;
-        b=KdmmgfEMYQPX3gnHsmGI0RFxcGG45vVDNq6dm1XXwwyYp05viid6K68JmwV3LO7dzeFezv
-        ZWyF7Ge+U9J+rK4GEcd0tFwYleqEJhBzfzC74riy16r0Bu3gZj0bYf2n5E1YjrFFb873r6
-        GnrVJ2KkD5QXzZ6X/G8bs9q0Nz1vE7imO/Ss09B8fdwL1UXCqu/T7sSCezoiCi4lUtM8d5
-        K0XHP2fXnFrV0Pmhoa1oS4GglSzbqPCk2Hao2nI539QPDnTN9wO+iYxmxXFXLKdIGJcQ7Y
-        +5UG0gBvoydbyiERX9Sh0DoQDJvZ2fPC4FScIjAU+fD7BA2I17SJ636bUTDeqA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1603404635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MvN0PZcC1LUdr+xhWQX/PywlAVCnw/qFd8HerpuaJjU=;
-        b=3e4TbHegA5nWCISA9Baz7hJnQ+ZqGUL6K/dux7vuU/UBKa2eizznt8BtrgtCGwcHneSjMA
-        PRF6BfgQjtaihxDQ==
-To:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v2 8/8] x86/ioapic: Generate RTE directly from parent irqchip's MSI message
-In-Reply-To: <87y2jy542v.fsf@nanos.tec.linutronix.de>
-References: <87y2jy542v.fsf@nanos.tec.linutronix.de>
-Date:   Fri, 23 Oct 2020 00:10:35 +0200
-Message-ID: <87sga56hes.fsf@nanos.tec.linutronix.de>
+        id S372781AbgJVW0e convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 22 Oct 2020 18:26:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51666 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S372778AbgJVW0d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Oct 2020 18:26:33 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 209253] Loss of connectivity on guest after important host <->
+ guest traffic
+Date:   Thu, 22 Oct 2020 22:26:32 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: arequipeno@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-209253-28872-Pp1pYjHhVO@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209253-28872@https.bugzilla.kernel.org/>
+References: <bug-209253-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 22 2020 at 23:43, Thomas Gleixner wrote:
-> On Fri, Oct 09 2020 at 11:46, David Woodhouse wrote:
-> Aside of that it works magically because polarity,trigger and mask bit
-> have been set up before. But of course a comment about this is
-> completely overrated.
+https://bugzilla.kernel.org/show_bug.cgi?id=209253
 
-Also this part:
+--- Comment #5 from Ian Pilcher (arequipeno@gmail.com) ---
+Based on my git bisect, it looks like this commit is triggering the WARNING.
 
-> -static void mp_setup_entry(struct irq_cfg *cfg, struct mp_chip_data *data,
-> -			   struct IO_APIC_route_entry *entry)
-> +static void mp_setup_entry(struct irq_data *irq_data, struct mp_chip_data *data)
->  {
-> +	struct IO_APIC_route_entry *entry = &data->entry;
-> +
->  	memset(entry, 0, sizeof(*entry));
-> -	entry->delivery_mode = apic->irq_delivery_mode;
-> -	entry->dest_mode     = apic->irq_dest_mode;
-> -	entry->dest	     = cfg->dest_apicid & 0xff;
-> -	entry->virt_ext_dest = cfg->dest_apicid >> 8;
-> -	entry->vector	     = cfg->vector;
-> +
-> +	mp_swizzle_msi_dest_bits(irq_data, entry);
-> +
->  	entry->trigger	     = data->trigger;
->  	entry->polarity	     = data->polarity;
->  	/*
+commit c49fa6397b6d29ce10c0ae5b2528bb004a14691f
+Author: Alex Williamson <alex.williamson@redhat.com>
+Date:   Mon Aug 17 11:08:18 2020 -0600
 
-does not make sense. It did not make sense before either, but now it
-does even make less sense.
+    vfio-pci: Avoid recursive read-lock usage
 
-During allocation this only needs to setup the I/O-APIC specific bits
-(trigger, polarity, mask). The rest is filled in when the actual
-activation happens. Nothing writes that entry _before_ activation.
+    [ Upstream commit bc93b9ae0151ae5ad5b8504cdc598428ea99570b ]
 
-/me goes to mop up more
+    A down_read on memory_lock is held when performing read/write accesses
+    to MMIO BAR space, including across the copy_to/from_user() callouts
+    which may fault.  If the user buffer for these copies resides in an
+    mmap of device MMIO space, the mmap fault handler will acquire a
+    recursive read-lock on memory_lock.  Avoid this by reducing the lock
+    granularity.  Sequential accesses requiring multiple ioread/iowrite
+    cycles are expected to be rare, therefore typical accesses should not
+    see additional overhead.
 
+    VGA MMIO accesses are expected to be non-fatal regardless of the PCI
+    memory enable bit to allow legacy probing, this behavior remains with
+    a comment added.  ioeventfds are now included in memory access testing,
+    with writes dropped while memory space is disabled.
+
+    Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on
+disabled memory")
+    Reported-by: Zhiyi Guo <zhguo@redhat.com>
+    Tested-by: Zhiyi Guo <zhguo@redhat.com>
+    Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+    Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+ drivers/vfio/pci/vfio_pci_private.h |   2 +
+ drivers/vfio/pci/vfio_pci_rdwr.c    | 120 ++++++++++++++++++++++++++++--------
+ 2 files changed, 98 insertions(+), 24 deletions(-)
+
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=bc93b9ae0151ae5ad5b8504cdc598428ea99570b
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
