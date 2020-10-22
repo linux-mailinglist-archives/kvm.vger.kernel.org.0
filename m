@@ -2,59 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 442FE2956BE
-	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 05:28:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D8FE2956D4
+	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 05:32:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2443881AbgJVD16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Oct 2020 23:27:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34778 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2443726AbgJVD16 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Oct 2020 23:27:58 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09M3FOBd096976;
-        Wed, 21 Oct 2020 23:27:06 -0400
+        id S2895443AbgJVDcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Oct 2020 23:32:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57330 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2443991AbgJVDcV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Oct 2020 23:32:21 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09M32495004160;
+        Wed, 21 Oct 2020 23:31:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=QXA5PKcnbXyplcamDabU6tKWRH41Fg2TXtPcQnoL6SA=;
- b=l7iRMHXLXBsIC7yFar8Y8bmeVc7ZPxRaA4FQmUgBfilhQYzo6ACYrGmyF7x3OJ8dyJZj
- +r1Fu9hWq9qTluuQyMRQCVSmaO8CbsUDDrStSlAkUhxwyqqQ6jQ9KyNmFT02cMc5CFyY
- EmCT9QJuPdW6leVHT06o06V5blq7EKrVG3nQYPQ8c9fzF7fnfCwiZrq3X/RLGVRgK1ST
- zEUzTAsV2Z/QIRyuMVsiH/4bcUoSzD9XMEVpXOKAWDT1F2uBjl6RWnD55AZdKf1JdJJe
- Z2fKD2oGHn62Jq+FwOGVk1ue5FVjI5VA0ZAXzVhNttu1A5o3itJl1cE+OxbRMN69IW4o WA== 
+ bh=1xQi+7W2T2Fbkdb8+KC5oD8knUZ7IHDxT/Z8e4Qn+3w=;
+ b=ailI8hnI8owHkREsCd4YRLsVO9iu/CHqO9F+SgxH2J33g2bDG9XOPF98kEWJIemsiMAq
+ lhaRiFjGq52S+iF/bN/hBhBdFWKIfmiAnDHDC0JXHdDmVkLluyHybS125NYro9g8k8Db
+ xU8NoIxk+rExi2tis3SOXI53MOeITHtup5O2qaUClMK+vvVS5K1p5YaIJJFkDhrWZGPe
+ S8hQsK6fPtWyScAFUM8lcEQE9WRHwNc/aUj4Mhddj0Gz4cjF6rJyE7YGdBooOWWIFl63
+ xMjaLuukrOtThJBcAWPl25AxX15ntrJ7YIDaEFB+Wmy6wlVsk2m+hgScUeWsh6OKYYmp 2w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34b0b529y7-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34b00db2qc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Oct 2020 23:27:06 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09M3NsTT121870;
-        Wed, 21 Oct 2020 23:27:05 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34b0b529x9-1
+        Wed, 21 Oct 2020 23:31:26 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09M3QCQ6067016;
+        Wed, 21 Oct 2020 23:31:26 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34b00db2ps-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Oct 2020 23:27:05 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09M3R2JJ031794;
-        Thu, 22 Oct 2020 03:27:02 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 348d5qv42u-1
+        Wed, 21 Oct 2020 23:31:26 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09M3TR5p000756;
+        Thu, 22 Oct 2020 03:31:24 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 347r882jfe-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Oct 2020 03:27:02 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09M3R0fV32244158
+        Thu, 22 Oct 2020 03:31:24 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09M3VLhR20250884
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Oct 2020 03:27:00 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 830484C04A;
-        Thu, 22 Oct 2020 03:27:00 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72B624C040;
-        Thu, 22 Oct 2020 03:26:59 +0000 (GMT)
+        Thu, 22 Oct 2020 03:31:21 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 849BC5206C;
+        Thu, 22 Oct 2020 03:31:21 +0000 (GMT)
 Received: from oc2783563651 (unknown [9.145.57.168])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 22 Oct 2020 03:26:59 +0000 (GMT)
-Date:   Thu, 22 Oct 2020 05:26:47 +0200
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 70A2452057;
+        Thu, 22 Oct 2020 03:31:20 +0000 (GMT)
+Date:   Thu, 22 Oct 2020 05:31:18 +0200
 From:   Halil Pasic <pasic@linux.ibm.com>
 To:     "Kirill A. Shutemov" <kirill@shutemov.name>
 Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
@@ -77,12 +74,11 @@ Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFCv2 14/16] KVM: Handle protected memory in
- __kvm_map_gfn()/__kvm_unmap_gfn()
-Message-ID: <20201022052647.6a4d7e0b.pasic@linux.ibm.com>
-In-Reply-To: <20201020061859.18385-15-kirill.shutemov@linux.intel.com>
+Subject: Re: [RFCv2 05/16] x86/kvm: Make VirtIO use DMA API in KVM guest
+Message-ID: <20201022053118.76be12bb.pasic@linux.ibm.com>
+In-Reply-To: <20201020061859.18385-6-kirill.shutemov@linux.intel.com>
 References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
-        <20201020061859.18385-15-kirill.shutemov@linux.intel.com>
+        <20201020061859.18385-6-kirill.shutemov@linux.intel.com>
 Organization: IBM
 X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
@@ -91,49 +87,56 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.737
  definitions=2020-10-22_01:2020-10-20,2020-10-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 clxscore=1011 spamscore=0 lowpriorityscore=0 suspectscore=0
- malwarescore=0 adultscore=0 bulkscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=655 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010220019
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 mlxscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0
+ impostorscore=0 suspectscore=0 spamscore=0 clxscore=1015
+ priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2010220015
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 20 Oct 2020 09:18:57 +0300
+On Tue, 20 Oct 2020 09:18:48 +0300
 "Kirill A. Shutemov" <kirill@shutemov.name> wrote:
 
-> We cannot access protected pages directly. Use ioremap() to
-> create a temporary mapping of the page. The mapping is destroyed
-> on __kvm_unmap_gfn().
+> VirtIO for KVM is a primary way to provide IO. All memory that used for
+> communication with the host has to be marked as shared.
 > 
-> The new interface gfn_to_pfn_memslot_protected() is used to detect if
-> the page is protected.
-> 
-> ioremap_cache_force() is a hack to bypass IORES_MAP_SYSTEM_RAM check in
-> the x86 ioremap code. We need a better solution.
+> The easiest way to archive that is to use DMA API that already knows how
+> to deal with shared memory.
 > 
 > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 > ---
->  arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
->  arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
->  arch/x86/include/asm/io.h              |  2 +
->  arch/x86/include/asm/pgtable_types.h   |  1 +
->  arch/x86/kvm/mmu/mmu.c                 |  6 ++-
->  arch/x86/mm/ioremap.c                  | 16 ++++++--
->  include/linux/kvm_host.h               |  3 +-
->  include/linux/kvm_types.h              |  1 +
->  virt/kvm/kvm_main.c                    | 52 +++++++++++++++++++-------
->  9 files changed, 63 insertions(+), 22 deletions(-)
+>  drivers/virtio/virtio_ring.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index becc77697960..ace733845d5d 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -12,6 +12,7 @@
+>  #include <linux/hrtimer.h>
+>  #include <linux/dma-mapping.h>
+>  #include <xen/xen.h>
+> +#include <asm/kvm_para.h>
+>  
+>  #ifdef DEBUG
+>  /* For development, we want to crash whenever the ring is screwed. */
+> @@ -255,6 +256,9 @@ static bool vring_use_dma_api(struct virtio_device *vdev)
+>  	if (xen_domain())
+>  		return true;
+>  
+> +	if (kvm_mem_protected())
+> +		return true;
+> +
 
-You declare ioremap_cache_force() arch/x86/include/asm/io.h  in and
-define it in arch/x86/mm/ioremap.c which is architecture specific code,
-but use it in __kvm_map_gfn() in virt/kvm/kvm_main.c which is common
-code.
-
-Thus your series breaks the build for the s390 architecture. Have you
-tried to (cross) compile for s390?
+I guess it does not matter because Christophs comment, but this breaks
+the build for s390, because there is no kvm_mem_protected() for s390.
 
 Regards,
 Halil
+
+>  	return false;
+>  }
+>  
+
