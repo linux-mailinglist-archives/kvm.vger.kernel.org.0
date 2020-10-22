@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 483F22965FE
-	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 22:31:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8F1429666B
+	for <lists+kvm@lfdr.de>; Thu, 22 Oct 2020 23:17:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2901386AbgJVUbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Oct 2020 16:31:41 -0400
-Received: from mga18.intel.com ([134.134.136.126]:44646 "EHLO mga18.intel.com"
+        id S372226AbgJVVR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Oct 2020 17:17:56 -0400
+Received: from mga06.intel.com ([134.134.136.31]:39132 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2897070AbgJVUbl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Oct 2020 16:31:41 -0400
-IronPort-SDR: s2ZaKa6+28t5pTI1wnmj5UUbL2LR9pc3GSHlBQ47iz9zSwyGaew5OyDBQteDRLSCLNduefNJLU
- f2RRuiORwCPA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9782"; a="155374937"
+        id S372220AbgJVVRz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Oct 2020 17:17:55 -0400
+IronPort-SDR: TfljHQ7z5Ht5SlVN29ES73zrtvfjdBmKmiASyBEvIOefenZVt4HMblv0DmqTCnXLdEqOLTm/CL
+ yxvRepPewPyg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9782"; a="229230041"
 X-IronPort-AV: E=Sophos;i="5.77,404,1596524400"; 
-   d="gz'50?scan'50,208,50";a="155374937"
+   d="gz'50?scan'50,208,50";a="229230041"
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2020 13:31:36 -0700
-IronPort-SDR: IDXr0c9O+ZKmQN7ZI1jtUNOAfFpuEosgGGG+MZgIRhObvYz1owK7DuAb+o3MH/iOHsk88lItqw
- 6+zLXhmBUzlw==
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2020 14:17:49 -0700
+IronPort-SDR: kcDd8PesVzjebuipXV6aioUo9fsuVBP7KzZc2YX8fFk12fg5I776f/jcsLGbIvf2h0NhOA2da+
+ ui34NJt/HHtA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,404,1596524400"; 
-   d="gz'50?scan'50,208,50";a="302543181"
+   d="gz'50?scan'50,208,50";a="359988831"
 Received: from lkp-server01.sh.intel.com (HELO 56e21eaf2661) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 22 Oct 2020 13:31:32 -0700
+  by orsmga007.jf.intel.com with ESMTP; 22 Oct 2020 14:17:46 -0700
 Received: from kbuild by 56e21eaf2661 with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1kVhFD-00005L-Uq; Thu, 22 Oct 2020 20:31:31 +0000
-Date:   Fri, 23 Oct 2020 04:30:39 +0800
+        id 1kVhxx-000061-IZ; Thu, 22 Oct 2020 21:17:45 +0000
+Date:   Fri, 23 Oct 2020 05:17:34 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -39,21 +39,21 @@ Cc:     kbuild-all@lists.01.org, freude@linux.ibm.com,
         borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
         pasic@linux.ibm.com, alex.williamson@redhat.com,
         kwankhede@nvidia.com
-Subject: Re: [PATCH v11 08/14] s390/vfio-ap: hot plug/unplug queues on
- bind/unbind of queue device
-Message-ID: <202010230422.zcNkhr2n-lkp@intel.com>
-References: <20201022171209.19494-9-akrowiak@linux.ibm.com>
+Subject: Re: [PATCH v11 12/14] s390/vfio-ap: handle host AP config change
+ notification
+Message-ID: <202010230508.bSSV3BvM-lkp@intel.com>
+References: <20201022171209.19494-13-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="PEIAKu/WMn1b1Hv9"
+Content-Type: multipart/mixed; boundary="ZPt4rx8FFjLCG7dd"
 Content-Disposition: inline
-In-Reply-To: <20201022171209.19494-9-akrowiak@linux.ibm.com>
+In-Reply-To: <20201022171209.19494-13-akrowiak@linux.ibm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---PEIAKu/WMn1b1Hv9
+--ZPt4rx8FFjLCG7dd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -62,7 +62,8 @@ Hi Tony,
 I love your patch! Perhaps something to improve:
 
 [auto build test WARNING on s390/features]
-[also build test WARNING on linus/master kvms390/next linux/master v5.9 next-20201022]
+[also build test WARNING on linus/master next-20201022]
+[cannot apply to kvms390/next linux/master v5.9]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch]
@@ -74,10 +75,10 @@ compiler: s390-linux-gcc (GCC) 9.3.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/aea9ab29b77facc3bb09415ebe464fd6a22ec22e
+        # https://github.com/0day-ci/linux/commit/32786ef6d4ba3703d993a8894ea1d763785fd3a4
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Tony-Krowiak/s390-vfio-ap-dynamic-configuration-support/20201023-011543
-        git checkout aea9ab29b77facc3bb09415ebe464fd6a22ec22e
+        git checkout 32786ef6d4ba3703d993a8894ea1d763785fd3a4
         # save the attached .config to linux build tree
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=s390 
 
@@ -86,51 +87,95 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
-   drivers/s390/crypto/vfio_ap_ops.c:1370:5: warning: no previous prototype for 'vfio_ap_mdev_reset_queue' [-Wmissing-prototypes]
-    1370 | int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+   drivers/s390/crypto/vfio_ap_ops.c:1316:5: warning: no previous prototype for 'vfio_ap_mdev_reset_queue' [-Wmissing-prototypes]
+    1316 | int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
          |     ^~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/s390/crypto/vfio_ap_ops.c:1617:6: warning: no previous prototype for 'vfio_ap_mdev_hot_unplug_queue' [-Wmissing-prototypes]
-    1617 | void vfio_ap_mdev_hot_unplug_queue(struct vfio_ap_queue *q)
+   drivers/s390/crypto/vfio_ap_ops.c:1568:6: warning: no previous prototype for 'vfio_ap_mdev_hot_unplug_queue' [-Wmissing-prototypes]
+    1568 | void vfio_ap_mdev_hot_unplug_queue(struct vfio_ap_queue *q)
          |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/s390/crypto/vfio_ap_ops.c: In function 'vfio_ap_mdev_on_cfg_remove':
+>> drivers/s390/crypto/vfio_ap_ops.c:1777:7: warning: variable 'unassigned' set but not used [-Wunused-but-set-variable]
+    1777 |  bool unassigned = false;
+         |       ^~~~~~~~~~
+   drivers/s390/crypto/vfio_ap_ops.c: At top level:
+>> drivers/s390/crypto/vfio_ap_ops.c:1813:6: warning: no previous prototype for 'vfio_ap_mdev_on_cfg_add' [-Wmissing-prototypes]
+    1813 | void vfio_ap_mdev_on_cfg_add(void)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~
+   In file included from drivers/s390/crypto/vfio_ap_ops.c:11:
+   In function 'memcpy',
+       inlined from 'vfio_ap_mdev_unassign_apids' at drivers/s390/crypto/vfio_ap_ops.c:1655:3,
+       inlined from 'vfio_ap_mdev_on_cfg_remove' at drivers/s390/crypto/vfio_ap_ops.c:1800:8,
+       inlined from 'vfio_ap_on_cfg_changed' at drivers/s390/crypto/vfio_ap_ops.c:1836:2:
+   include/linux/string.h:402:4: error: call to '__read_overflow2' declared with attribute error: detected read beyond size of object passed as 2nd parameter
+     402 |    __read_overflow2();
+         |    ^~~~~~~~~~~~~~~~~~
 
-vim +/vfio_ap_mdev_hot_unplug_queue +1617 drivers/s390/crypto/vfio_ap_ops.c
+vim +/unassigned +1777 drivers/s390/crypto/vfio_ap_ops.c
 
-  1616	
-> 1617	void vfio_ap_mdev_hot_unplug_queue(struct vfio_ap_queue *q)
-  1618	{
-  1619		unsigned long apid = AP_QID_CARD(q->apqn);
-  1620	
-  1621		if ((q->matrix_mdev == NULL) || !vfio_ap_mdev_has_crycb(q->matrix_mdev))
-  1622			return;
-  1623	
-  1624		/*
-  1625		 * If the APID is assigned to the guest, then let's
-  1626		 * go ahead and unplug the adapter since the
-  1627		 * architecture does not provide a means to unplug
-  1628		 * an individual queue.
-  1629		 */
-  1630		if (test_bit_inv(apid, q->matrix_mdev->shadow_apcb.apm)) {
-  1631			clear_bit_inv(apid, q->matrix_mdev->shadow_apcb.apm);
-  1632	
-  1633			if (bitmap_empty(q->matrix_mdev->shadow_apcb.apm, AP_DEVICES))
-  1634				bitmap_clear(q->matrix_mdev->shadow_apcb.aqm, 0,
-  1635					     AP_DOMAINS);
-  1636	
-  1637			vfio_ap_mdev_commit_shadow_apcb(q->matrix_mdev);
-  1638		}
-  1639	}
-  1640	
+  1774	
+  1775	static void vfio_ap_mdev_on_cfg_remove(void)
+  1776	{
+> 1777		bool unassigned = false;
+  1778		int ap_remove, aq_remove;
+  1779		struct ap_matrix_mdev *matrix_mdev;
+  1780		DECLARE_BITMAP(apid_rem, AP_DEVICES);
+  1781		DECLARE_BITMAP(apqi_rem, AP_DOMAINS);
+  1782		unsigned long *cur_apm, *cur_aqm, *prev_apm, *prev_aqm;
+  1783	
+  1784		cur_apm = (unsigned long *)matrix_dev->config_info.apm;
+  1785		cur_aqm = (unsigned long *)matrix_dev->config_info.aqm;
+  1786		prev_apm = (unsigned long *)matrix_dev->config_info_prev.apm;
+  1787		prev_aqm = (unsigned long *)matrix_dev->config_info_prev.aqm;
+  1788	
+  1789		ap_remove = bitmap_andnot(apid_rem, prev_apm, cur_apm, AP_DEVICES);
+  1790		aq_remove = bitmap_andnot(apqi_rem, prev_aqm, cur_aqm, AP_DOMAINS);
+  1791	
+  1792		if (!ap_remove && !aq_remove)
+  1793			return;
+  1794	
+  1795		list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
+  1796			if (!vfio_ap_mdev_has_crycb(matrix_mdev))
+  1797				continue;
+  1798	
+  1799			if (ap_remove) {
+  1800				if (vfio_ap_mdev_unassign_apids(matrix_mdev, apid_rem))
+  1801					unassigned = true;
+  1802				vfio_ap_mdev_unlink_apids(matrix_mdev, apid_rem);
+  1803			}
+  1804	
+  1805			if (aq_remove) {
+  1806				if (vfio_ap_mdev_unassign_apqis(matrix_mdev, apqi_rem))
+  1807					unassigned = true;
+  1808				vfio_ap_mdev_unlink_apqis(matrix_mdev, apqi_rem);
+  1809			}
+  1810		}
+  1811	}
+  1812	
+> 1813	void vfio_ap_mdev_on_cfg_add(void)
+  1814	{
+  1815		unsigned long *cur_apm, *cur_aqm, *prev_apm, *prev_aqm;
+  1816	
+  1817		cur_apm = (unsigned long *)matrix_dev->config_info.apm;
+  1818		cur_aqm = (unsigned long *)matrix_dev->config_info.aqm;
+  1819	
+  1820		prev_apm = (unsigned long *)matrix_dev->config_info_prev.apm;
+  1821		prev_aqm = (unsigned long *)matrix_dev->config_info_prev.aqm;
+  1822	
+  1823		bitmap_andnot(matrix_dev->ap_add, cur_apm, prev_apm, AP_DEVICES);
+  1824		bitmap_andnot(matrix_dev->aq_add, cur_aqm, prev_aqm, AP_DOMAINS);
+  1825	}
+  1826	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---PEIAKu/WMn1b1Hv9
+--ZPt4rx8FFjLCG7dd
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICPHhkV8AAy5jb25maWcAlFxLc9y2st7nV0wpm3MWcfSwdey6pQVIgjPIkARNgDMabViy
+H4sICLfskV8AAy5jb25maWcAlFxLc9y2st7nV0wpm3MWcfSwdey6pQVIgjPIkARNgDMabViy
 PHZUkSWXHvfG+fW3G3x1g+DIJ4tY/LoBNhpAvwDOr7/8uhAvzw/frp9vb67v7n4svu7v94/X
 z/vPiy+3d/v/WSR6UWi7kImyb4A5u71/+fv3p7MPx4t3bz68Of7t8eZ0sd4/3u/vFvHD/Zfb
 ry/Q+vbh/pdff4l1kaplE8fNRlZG6aKx8tJeHGHr3+6wo9++3tws/rWM438vPrw5e3N8RNoo
@@ -1303,4 +1348,4 @@ Y8O3RcezLw62J3Ic1S+mtJM9kUS5kgiap24KfVC+O9K0tSZk6FUF8LvWRY7sNBEeyvz2ynNj
 NeslEENUOf6TWkKmwnr1dkaQduynDYV5rS+yIhIQeq0A7ViOlzTZxaW+ZOXs8la/zRDPcRJn
 3seZc1Atz2pOrp6ODw9uF6zPYXQ4QnTlUIRazOF8+n8PclJ/vREEAA==
 
---PEIAKu/WMn1b1Hv9--
+--ZPt4rx8FFjLCG7dd--
