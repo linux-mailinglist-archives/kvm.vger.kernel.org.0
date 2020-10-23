@@ -2,111 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9750296E22
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 14:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A94D4296E38
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 14:09:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S370068AbgJWMCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 08:02:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32256 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S369960AbgJWMCA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 08:02:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603454519;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+T8I0jNVBNJFOZTug7Hno1Fe0JWTKHlCqa4g8/dHMVc=;
-        b=VV8g+69vCT4IlKZxVXhO9HjnDixG5e44ULb/AadU1z8GOBvPHtt09DFFXZ/U3XhOimY55Z
-        iM8dZQc9o69FUKUuiWjnNF5SUL8ZCnd2rznfSj1PG1JbLRIr0KxfKarqYGfpB02/XcHvPf
-        P9fiE0Zf+M6/LgDg+JKoao5yoaUzkYk=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-XxFH7Q-ePlSnQtDWtRPRdQ-1; Fri, 23 Oct 2020 08:01:57 -0400
-X-MC-Unique: XxFH7Q-ePlSnQtDWtRPRdQ-1
-Received: by mail-ed1-f70.google.com with SMTP id b16so469436edn.6
-        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 05:01:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=+T8I0jNVBNJFOZTug7Hno1Fe0JWTKHlCqa4g8/dHMVc=;
-        b=C2hlnIyYt55DApKoIKNUChoov+9SpkPDVVWP8jt5HCis2ZOtOBvk/7H2uKuXEaYM5j
-         fGcjhNnXlYNQPHdJH+siFp5Ox1+cwqOkv1eAhm0pVgcdQZcqWqCo3v9rNGkSiPADhWCw
-         FxSxfVpWZ2dd6Z9l6P9TurHvKQyMlJMGlWvM5to+D+t2pqN00EUNdQIXaIpZC7Tn+DUQ
-         JrrfeoHzZzA3FFzQI117yr9sqAYNibsRgbgx4lAtcCNmpnDdNR/yP9OAkPzTr5F9GB+m
-         hJGulTnKRD9ZzrpdLiNTFvwKI0tHMJn84AbqpE4VearfI16CkJxE6gbRjzVT0fj5yIGT
-         XCmg==
-X-Gm-Message-State: AOAM533fw8JDgxa2EBJvltVuvf+LVKFL2ltEt2X2UEqDj4OlxEvD4rAY
-        6xDFRo7apXx2w6MCyaWHKdNnBeGf4FJkCKKWYGPrSn4AuM4p0IX/Y2bv2IJKygChQnDLNG27LFF
-        ptdGBxDVIgWNe
-X-Received: by 2002:a17:906:51d0:: with SMTP id v16mr1613515ejk.493.1603454515431;
-        Fri, 23 Oct 2020 05:01:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWj/IH2qG1/G46kgLoOFSkW0cPWu+PRxOBTYjbHxfBibpdohWghdzXq1cXPRl/OHFLo79U9g==
-X-Received: by 2002:a17:906:51d0:: with SMTP id v16mr1613476ejk.493.1603454515155;
-        Fri, 23 Oct 2020 05:01:55 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id k25sm723342ejz.93.2020.10.23.05.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Oct 2020 05:01:54 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe\, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen\, Andi" <andi.kleen@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [RFCv2 00/16] KVM protected memory extension
-In-Reply-To: <20201023113517.j543e77hmqenjvgw@box>
-References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com> <87ft6949x8.fsf@vitty.brq.redhat.com> <20201020134924.2i4z4kp6bkiheqws@box> <87eelr4ox3.fsf@vitty.brq.redhat.com> <20201023113517.j543e77hmqenjvgw@box>
-Date:   Fri, 23 Oct 2020 14:01:53 +0200
-Message-ID: <87sga52lse.fsf@vitty.brq.redhat.com>
+        id S463451AbgJWMJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 08:09:07 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:46530 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S463180AbgJWMJH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Oct 2020 08:09:07 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09NC5Au7095975;
+        Fri, 23 Oct 2020 12:09:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=3u747VZC52iNeeNmOWRTKOGyZ8opg2btTPcZQUCsvGw=;
+ b=g/GRiX9jjXejYbgaoQuSWf8mDKwf1QHkoc/k3V5GOM3mCrZ6r+su6cuS6jETcHwiCNdy
+ T5lClorzd8RKcR0ifgboclLHVtg9aevcQqyI704DhbSq3Z6jH6H4jf9nSTa435BePGfK
+ GKPsQivycYyys7T5j+4VixT+JP7JKgJ7MHFAJwv4LezfTxxPfb06pDDbar2Lp5dPHqDO
+ 1CLFnXX31cIlaqUVNLRxBQFGjy1P9wY6hYwfDvLLVQwtq+eVz6fbZuu388iTknY3lnY5
+ c0nxcgHMCi4vaKMhyKDU/B74Xs2psh1yLMyP+gPOlNNnntABNohMFXcOYy9SP0JnjGPe qg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2130.oracle.com with ESMTP id 347p4bavxq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 23 Oct 2020 12:09:03 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09NC558Y104567;
+        Fri, 23 Oct 2020 12:09:02 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 348aj0wyb3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Oct 2020 12:09:02 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09NC9099026344;
+        Fri, 23 Oct 2020 12:09:01 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 23 Oct 2020 05:08:59 -0700
+Date:   Fri, 23 Oct 2020 15:08:53 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] vhost_vdpa: Return -EFUALT if copy_from_user() fails
+Message-ID: <20201023120853.GI282278@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9782 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010230086
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9782 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 priorityscore=1501
+ clxscore=1015 malwarescore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 mlxlogscore=999 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010230086
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"Kirill A. Shutemov" <kirill@shutemov.name> writes:
+The copy_to/from_user() functions return the number of bytes which we
+weren't able to copy but the ioctl should return -EFAULT if they fail.
 
-> On Wed, Oct 21, 2020 at 04:46:48PM +0200, Vitaly Kuznetsov wrote:
->> "Kirill A. Shutemov" <kirill@shutemov.name> writes:
->> 
->> > Maybe it would be cleaner to handle reboot in userspace? If we got the VM
->> > rebooted, just reconstruct it from scratch as if it would be new boot.
->> 
->> We are definitely not trying to protect against malicious KVM so maybe
->> we can do the cleanup there (when protection was enabled) so we can
->> unprotect everything without risk of a leak?
->
-> Do you have any particular codepath in mind? I didn't find anything
-> suitable so far.
+Fixes: a127c5bbb6a8 ("vhost-vdpa: fix backend feature ioctls")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+ drivers/vhost/vdpa.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-I didn't put much thought in it but e.g. on x86, what if we put this to
-kvm_vcpu_reset() under 'if (kvm_vcpu_is_bsp())' condition? 
-
-The main problem I see is that we can't clean up *all* memory,
-e.g. firmware related stuff should stay intact and this contraducts your
-KVM_HC_ENABLE_MEM_PROTECTED which protects everything. We can, probably,
-get rid of it leaving KVM_HC_MEM_SHARE/KVM_HC_MEM_UNSHARE only shifting
-responsibility to define what can be cleaned up on the guest kernel
-(stating in the doc that all protected memory will get whiped out on
-reboot).
-
--- 
-Vitaly
-
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 62a9bb0efc55..c94a97b6bd6d 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -428,12 +428,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+ 	void __user *argp = (void __user *)arg;
+ 	u64 __user *featurep = argp;
+ 	u64 features;
+-	long r;
++	long r = 0;
+ 
+ 	if (cmd == VHOST_SET_BACKEND_FEATURES) {
+-		r = copy_from_user(&features, featurep, sizeof(features));
+-		if (r)
+-			return r;
++		if (copy_from_user(&features, featurep, sizeof(features)))
++			return -EFAULT;
+ 		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+ 			return -EOPNOTSUPP;
+ 		vhost_set_backend_features(&v->vdev, features);
+@@ -476,7 +475,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+ 		break;
+ 	case VHOST_GET_BACKEND_FEATURES:
+ 		features = VHOST_VDPA_BACKEND_FEATURES;
+-		r = copy_to_user(featurep, &features, sizeof(features));
++		if (copy_to_user(featurep, &features, sizeof(features)))
++			r = -EFAULT;
+ 		break;
+ 	default:
+ 		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
