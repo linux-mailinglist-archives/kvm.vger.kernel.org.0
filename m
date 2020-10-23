@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 493562973C2
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:30:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 343202973E5
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:32:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1751593AbgJWQao (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 12:30:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32667 "EHLO
+        id S1751535AbgJWQae (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 12:30:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54642 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751576AbgJWQam (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:42 -0400
+        by vger.kernel.org with ESMTP id S1751518AbgJWQad (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603470641;
+        s=mimecast20190719; t=1603470632;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Emf4QJ3bhXaHVmzs09mmYMKc8xfp1s/70FDmcTsiE+U=;
-        b=aD3g/YJ8c5cWilOpOpiegIO9+MDP/H2yJKXRG0xns0uIlJYQ+a/j/Y8peK9s9eCM8xGNen
-        xYtOjcQqGjVmDs6a1Ruw95C+cr2yp3X/swqsqpMvEXQ46Z+HLCjYv7LD2ROuDfewXZUawg
-        SwVo68YYwx4em4U28DlxNkmw3MKb9+E=
+        bh=E+3IRJB6Q1/p5CmMrxkT9gnBU657hxEY63DzKc8Vg14=;
+        b=Lmzy0GO/R7Qab7QilElPTjk/UEqjwbNlV/9BqFPIO8DeXTFXNw8Lb9XB+y9mj/bLAs38vJ
+        qZ83oLECwN8Ds93Af/XVXhXSzMHNegwdbKqBLG/ZpOiZwOKiZ0qRxeEmd26hkZ8ws55OEI
+        d+msXIyLsZwA0AJI76wcnzSyNMQ3euo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-JmtyH64bM-iJWS4dDMCruQ-1; Fri, 23 Oct 2020 12:30:39 -0400
-X-MC-Unique: JmtyH64bM-iJWS4dDMCruQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-532-E-Q0nn2iM_atWqcOb2snhw-1; Fri, 23 Oct 2020 12:30:26 -0400
+X-MC-Unique: E-Q0nn2iM_atWqcOb2snhw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B110805F15;
-        Fri, 23 Oct 2020 16:30:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66C39ADC3A;
+        Fri, 23 Oct 2020 16:30:25 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 025DC59;
-        Fri, 23 Oct 2020 16:30:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 05FEF5DA78;
+        Fri, 23 Oct 2020 16:30:24 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     bgardon@google.com
-Subject: [PATCH 13/22] kvm: x86/mmu: Allocate struct kvm_mmu_pages for all pages in TDP MMU
-Date:   Fri, 23 Oct 2020 12:30:15 -0400
-Message-Id: <20201023163024.2765558-14-pbonzini@redhat.com>
+Subject: [PATCH 01/22] kvm: mmu: Separate making non-leaf sptes from link_shadow_page
+Date:   Fri, 23 Oct 2020 12:30:03 -0400
+Message-Id: <20201023163024.2765558-2-pbonzini@redhat.com>
 In-Reply-To: <20201023163024.2765558-1-pbonzini@redhat.com>
 References: <20201023163024.2765558-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Ben Gardon <bgardon@google.com>
 
-Attach struct kvm_mmu_pages to every page in the TDP MMU to track
-metadata, facilitate NX reclaim, and enable inproved parallelism of MMU
-operations in future patches.
+The TDP MMU page fault handler will need to be able to create non-leaf
+SPTEs to build up the paging structures. Rather than re-implementing the
+function, factor the SPTE creation out of link_shadow_page.
 
 Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
 machine. This series introduced no new failures.
@@ -61,88 +61,53 @@ This series can be viewed in Gerrit at:
 	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2538
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
-Message-Id: <20201014182700.2888246-12-bgardon@google.com>
+Message-Id: <20200925212302.3979661-9-bgardon@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  4 ++++
- arch/x86/kvm/mmu/tdp_mmu.c      | 13 ++++++++++---
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 082684ce2d1b..d44858b69353 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1004,7 +1004,11 @@ struct kvm_arch {
- 	 * operations.
- 	 */
- 	bool tdp_mmu_enabled;
-+
-+	/* List of struct tdp_mmu_pages being used as roots */
- 	struct list_head tdp_mmu_roots;
-+	/* List of struct tdp_mmu_pages not being used as roots */
-+	struct list_head tdp_mmu_pages;
- };
- 
- struct kvm_vm_stat {
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index ae8ac15b5623..f06802289c1f 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -28,6 +28,7 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
- 	kvm->arch.tdp_mmu_enabled = true;
- 
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
-+	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 08c5fb60fcce..60103fd07bd2 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2573,21 +2573,30 @@ static void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
+ 	__shadow_walk_next(iterator, *iterator->sptep);
  }
  
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
-@@ -169,6 +170,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 	bool is_leaf = is_present && is_last_spte(new_spte, level);
- 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
- 	u64 *pt;
-+	struct kvm_mmu_page *sp;
- 	u64 old_child_spte;
- 	int i;
+-static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+-			     struct kvm_mmu_page *sp)
++static u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled)
+ {
+ 	u64 spte;
  
-@@ -234,6 +236,9 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 	 */
- 	if (was_present && !was_leaf && (pfn_changed || !is_present)) {
- 		pt = spte_to_child_pt(old_spte, level);
-+		sp = sptep_to_sp(pt);
+-	BUILD_BUG_ON(VMX_EPT_WRITABLE_MASK != PT_WRITABLE_MASK);
+-
+-	spte = __pa(sp->spt) | shadow_present_mask | PT_WRITABLE_MASK |
++	spte = __pa(child_pt) | shadow_present_mask | PT_WRITABLE_MASK |
+ 	       shadow_user_mask | shadow_x_mask | shadow_me_mask;
+ 
+-	if (sp_ad_disabled(sp))
++	if (ad_disabled)
+ 		spte |= SPTE_AD_DISABLED_MASK;
+ 	else
+ 		spte |= shadow_accessed_mask;
+ 
++	return spte;
++}
 +
-+		list_del(&sp->link);
++static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
++			     struct kvm_mmu_page *sp)
++{
++	u64 spte;
++
++	BUILD_BUG_ON(VMX_EPT_WRITABLE_MASK != PT_WRITABLE_MASK);
++
++	spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
++
+ 	mmu_spte_set(sptep, spte);
  
- 		for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
- 			old_child_spte = READ_ONCE(*(pt + i));
-@@ -247,6 +252,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 						   KVM_PAGES_PER_HPAGE(level));
- 
- 		free_page((unsigned long)pt);
-+		kmem_cache_free(mmu_page_header_cache, sp);
- 	}
- }
- 
-@@ -424,8 +430,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	bool huge_page_disallowed = exec && nx_huge_page_workaround_enabled;
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	struct tdp_iter iter;
--	struct kvm_mmu_memory_cache *pf_pt_cache =
--			&vcpu->arch.mmu_shadow_page_cache;
-+	struct kvm_mmu_page *sp;
- 	u64 *child_pt;
- 	u64 new_spte;
- 	int ret;
-@@ -471,7 +476,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 		}
- 
- 		if (!is_shadow_present_pte(iter.old_spte)) {
--			child_pt = kvm_mmu_memory_cache_alloc(pf_pt_cache);
-+			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
-+			list_add(&sp->link, &vcpu->kvm->arch.tdp_mmu_pages);
-+			child_pt = sp->spt;
- 			clear_page(child_pt);
- 			new_spte = make_nonleaf_spte(child_pt,
- 						     !shadow_accessed_mask);
+ 	mmu_page_add_parent_pte(vcpu, sp, sptep);
 -- 
 2.26.2
 
