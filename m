@@ -2,106 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD7462975F1
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 19:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C88C297616
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 19:49:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S464148AbgJWRnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 13:43:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60870 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S462067AbgJWRnY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 13:43:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603475002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+Zu0LYwVSmEJWNT4NqggQbfAbgnLBnqlkd3v5H5H25w=;
-        b=KIE4pJRHNWCgVK+SvyR8zeX5o5CYiOjapBmdiPtSJLMMLWZ81ugZ2JvYtTPH3XrdsxkIQR
-        5L4/PbiyKaX0wyZoW0EThoVGZcSAcaE8apCiOO66Ifr+fnkBILnG6W1UbfjRGSU0Ue/Yhr
-        ZzbrKe+vwbU7u2SQvMb3drTY9zdGibA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-dBW7116xNg2Ruek-s-AjHA-1; Fri, 23 Oct 2020 13:43:20 -0400
-X-MC-Unique: dBW7116xNg2Ruek-s-AjHA-1
-Received: by mail-wr1-f72.google.com with SMTP id 47so845685wrc.19
-        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 10:43:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+Zu0LYwVSmEJWNT4NqggQbfAbgnLBnqlkd3v5H5H25w=;
-        b=SptBsfGY/DTeGTvz8EcfNlhqsP/buvWa/LlSb+QGOEYHeVRoQgS9+UOC64WdxsjvQv
-         cqZfXgGeZUoyMnchQwr5kV/lHTVzNGurmZfDZjpdVQmIbyddCWj8Ljwmy8IQ816V2e9p
-         P8ZAuLed4koHky9uldq5yMYlCaILqNhhw6CkpKrogo8Z6yVWSUrn56Do/NLtI1WIjN6m
-         KvcJbMJteUmcuaY8NFVC7XvJ56wnviR3avZzyQ44HgG28VkLYDGEnnPDyGWxeJzzosCm
-         JdJz5+zA0h0CpnfoMjvw1AEdBh8YSJJNJHb2eRVfm9n34C+lUVk8dbNoX7OsMLf604Cr
-         5w1A==
-X-Gm-Message-State: AOAM531kDBJhomquvn0Ry5DWXKHUjNQZGBN4mmAsmyKA/Ue+iLUZf6z9
-        AhGiZ9rB9xCuHnLtBDDDm6815rS0H3zK7Bd/Uz1A0XsnQzLxm812o+1GedlsZXB11jnEtY7dEwu
-        7CXkEKIWqgwf4
-X-Received: by 2002:a1c:f719:: with SMTP id v25mr3424366wmh.186.1603474999601;
-        Fri, 23 Oct 2020 10:43:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxzwLsjkrDGdSh7CSlvmu3j7iiAz0uw3JwPZ5xYVRGX9FuRPgyfsFUeWf1AGU9SEtDN9fpA5w==
-X-Received: by 2002:a1c:f719:: with SMTP id v25mr3424358wmh.186.1603474999410;
-        Fri, 23 Oct 2020 10:43:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p21sm4586588wmc.28.2020.10.23.10.43.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Oct 2020 10:43:18 -0700 (PDT)
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Mohammed Gamal <mgamal@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20200710154811.418214-1-mgamal@redhat.com>
- <20200710154811.418214-8-mgamal@redhat.com>
- <CALMp9eSbY6FjZAXt7ojQrX_SC_Lyg24dTGFZdKZK7fARGA=3hg@mail.gmail.com>
- <CALMp9eTFzQMpsrGhN4uJxyUHMKd5=yFwxLoBy==2BTHwmv_UGQ@mail.gmail.com>
- <20201023031433.GF23681@linux.intel.com>
- <498cfe12-f3e4-c4a2-f36b-159ccc10cdc4@redhat.com>
- <CALMp9eQ8C0pp5yP4tLsckVWq=j3Xb=e4M7UVZz67+pngaXJJUw@mail.gmail.com>
- <f40e5d23-88b6-01c0-60f9-5419dac703a2@redhat.com>
- <CALMp9eRGBiQDPr1wpAY34V=T6Jjij_iuHOX+_-QQPP=5SEw3GQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 7/9] KVM: VMX: Add guest physical address check in EPT
- violation and misconfig
-Message-ID: <4463f391-0a25-017e-f913-69c297e13c5e@redhat.com>
-Date:   Fri, 23 Oct 2020 19:43:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S1753809AbgJWRs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 13:48:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39740 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S462375AbgJWRs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Oct 2020 13:48:56 -0400
+Received: from kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net (unknown [163.114.132.6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2E2A021582;
+        Fri, 23 Oct 2020 17:48:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603475335;
+        bh=yB/s/IuPvxvA/D6puPVcHV6lCpGyQvaLhZjmJ20tayI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=k9fHBrAYM+wp3NSCtKkRtPQhXi4dbODGDL1e5+yrI0yvizi07AfTLwsncPus7fsq3
+         PgzedNtYAq/z8dABaFdKA5m0OuRfVF24Yw3iSKjqeu+QWxiEWHLtB6J+olk3nzZOzR
+         okJSUOlRqfDaLjGwcw8+aGODIQel3BFuv/X1NEiQ=
+Date:   Fri, 23 Oct 2020 10:48:53 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Josh Don <joshdon@google.com>
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, Xi Wang <xii@google.com>
+Subject: Re: [PATCH 1/3] sched: better handling for busy polling loops
+Message-ID: <20201023104853.55ef1c20@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <20201023032944.399861-1-joshdon@google.com>
+References: <20201023032944.399861-1-joshdon@google.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eRGBiQDPr1wpAY34V=T6Jjij_iuHOX+_-QQPP=5SEw3GQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/10/20 19:23, Jim Mattson wrote:
->> The information that we need is _not_ that provided by the advanced
->> VM-exit information (or by a page walk).  If a page is neither writable
->> nor executable, the advanced information doesn't say if the injected #PF
->> should be a W=1 or a F=1 fault.  We need the information in bits 0..2 of
->> the exit qualification for the final access, which however is not
->> available for the paging-structure access.
->>
-> Are you planning to extend the emulator, then, to support all
-> instructions? I'm not sure where you are going with this.
+On Thu, 22 Oct 2020 20:29:42 -0700 Josh Don wrote:
+> Busy polling loops in the kernel such as network socket poll and kvm
+> halt polling have performance problems related to process scheduler load
+> accounting.
+> 
+> Both of the busy polling examples are opportunistic - they relinquish
+> the cpu if another thread is ready to run.
 
-I'm going to fix the bit 8=1 case, but for bit 8=0 there's not much that
-you can do.  In all likelihood the guest is buggy anyway.
+That makes it sound like the busy poll code is trying to behave like an
+idle task. I thought need_resched() meant we leave when we run out of
+slice, or kernel needs to go through a resched for internal reasons. No?
 
-It would be possible to only do the decode part of the emulator to get
-the PFEC (matching the GVA from the vmexit to the memory operand, for
-example, and retrying if the instruction is unexpected).  Then one would
-only need enough VEX/EVEX parsing to process the decoding.
+> This design, however, doesn't
+> extend to multiprocessor load balancing very well. The scheduler still
+> sees the busy polling cpu as 100% busy and will be less likely to put
+> another thread on that cpu. In other words, if all cores are 100%
+> utilized and some of them are running real workloads and some others are
+> running busy polling loops, newly woken up threads will not prefer the
+> busy polling cpus. System wide throughput and latency may suffer.
 
-Paolo
+IDK how well this extends to networking. Busy polling in networking is
+a conscious trade-off of CPU for latency, if application chooses to
+busy poll (which isn't the default) we should respect that.
 
+Is your use case primarily kvm?
