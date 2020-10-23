@@ -2,107 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 327A8296DC5
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 13:35:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0EAF296DC3
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 13:35:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S463085AbgJWLfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 07:35:37 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:44820 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S463005AbgJWLfh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Oct 2020 07:35:37 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09NBZBam038615;
-        Fri, 23 Oct 2020 11:35:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=MZC7JzA0X48T2AyIDafeWsyEuoX/erVd04kR6+/WI6w=;
- b=ycyNbGIShAyaP6gtNubm3VeF9kduIaWjCbMRE9WBE7ZybGeVm8EEKEIIa3gvPpm/6JpR
- yS3fpNRcrpbu9hV0tieqMBwE+oHOTrzFpdVS1/+AuR9q2lsEuyR8AXvk2gzeCzpiqdLr
- 3Z38ov1i8L/M6rmbPULb1anQdPZ1RqyeaCksO+hnjzGYxA+QuaP9mZZpbr8N79io7dG1
- Jqkke4Cay4weLjCoyOByzctch60yXSvP2z28v7FZl/Ao68bgmQXBqjG7H+O1tOJQuT/U
- EsN10ULx5ID0FMUUYDF+TZ4KF8dOEbCOvj6UwvlbqFz5d53JMnl58+PVzbiqnW97V4ep Og== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 347p4bas0r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 23 Oct 2020 11:35:23 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09NBPlEm123836;
-        Fri, 23 Oct 2020 11:35:22 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 348ah1we9w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Oct 2020 11:35:22 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09NBZLCU011502;
-        Fri, 23 Oct 2020 11:35:21 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 23 Oct 2020 04:34:57 -0700
-Date:   Fri, 23 Oct 2020 14:34:50 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Diana Craciun <diana.craciun@oss.nxp.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Bharat Bhushan <Bharat.Bhushan@nxp.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH 1/2] vfio/fsl-mc: return -EFAULT if copy_to_user() fails
-Message-ID: <20201023113450.GH282278@mwanda>
+        id S463075AbgJWLfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 07:35:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58822 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S463070AbgJWLfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Oct 2020 07:35:21 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D4CC0613D2
+        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 04:35:20 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id a9so1672297lfc.7
+        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 04:35:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=n+nJGJpzd/W8n16INkSYqQkDUkF/oTotGcxcg7bvZAY=;
+        b=jU38f+iKMoloRKjrc7spG6UqSiMifftqZ1SZbQrtNvaY7eLmGeolflJh2zjUJkfjpB
+         pbtGnihnHQ8QEoGtqlfDer54+Lb8yBXDqz+bNUOMlfGjbD5X74YO6zEmvaYbR5Cud2qd
+         Jg7dFHyU0w5YkOSgfSgaN6qpiOp00meBrK7coYuDFGvNMR19c/Q4g+U1ELXlpLXn2kLC
+         9eXFgPg66ep/wQgjZBQ9MCAMPcVJvOyOmrb0ix6lBQo6zTPu7OXUgVaUCcgPDYBW0up3
+         Q58s6/rzP4gF9rbMqcb5z2I+PhG3uWgO/kQa7rjUWDM7gRNmSLp0rgT7Emh+MTZLoGg+
+         k9RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=n+nJGJpzd/W8n16INkSYqQkDUkF/oTotGcxcg7bvZAY=;
+        b=adqDvx5ZpjMT269T3sm6s4YG2QMNmpQagi98XKg7emr3Jg2vYUSv9gjtF6wf19Isw2
+         R3d1qnZsim4v61Po0SI3mPAbcv/9G+4QSmbOn7XV9clMpa1A9lU3U+VaH3QH1nOWe5HA
+         hNXhW+MrLsmBSGX+j5IKKEElzaGoCErGSodmLQXkD5K0hZw55xL3r4d5QasGMJBAlA6J
+         +AH6RZMJ3yShaOcD3/9PZAX35+iFfTECF1zcco9e8SOzAxxk6J65lLPNOdcjR9Sjuw9u
+         E5pNysXlBo+VInfaSjW7+H5hMOcIk6/dX9ubD5iORZIMulSLnUoDk+ZgZ1tUeZ1h9cwd
+         BtLg==
+X-Gm-Message-State: AOAM532bDUiCGmcAcs/bftjWI7hikwBobRUi5yaNecv11ComlDeCvq0q
+        H5B1q5mufR6jXfse7AZB14P1uA==
+X-Google-Smtp-Source: ABdhPJyJ6oDU73XCxB3tcKhbB2wd+k8K27VwNAKkjtzm8Jer9V8/Rt7fN8o46ChfDM0kd+lShSU6VA==
+X-Received: by 2002:a19:ed16:: with SMTP id y22mr668637lfy.66.1603452918708;
+        Fri, 23 Oct 2020 04:35:18 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id r19sm111450lfm.301.2020.10.23.04.35.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Oct 2020 04:35:17 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id C4899102F98; Fri, 23 Oct 2020 14:35:17 +0300 (+03)
+Date:   Fri, 23 Oct 2020 14:35:17 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [RFCv2 00/16] KVM protected memory extension
+Message-ID: <20201023113517.j543e77hmqenjvgw@box>
+References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
+ <87ft6949x8.fsf@vitty.brq.redhat.com>
+ <20201020134924.2i4z4kp6bkiheqws@box>
+ <87eelr4ox3.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9782 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 phishscore=0
- malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010230081
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9782 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 priorityscore=1501
- clxscore=1011 malwarescore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0
- phishscore=0 adultscore=0 mlxlogscore=999 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010230082
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87eelr4ox3.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The copy_to_user() function returns the number of bytes remaining to be
-copied, but this code should return -EFAULT.
+On Wed, Oct 21, 2020 at 04:46:48PM +0200, Vitaly Kuznetsov wrote:
+> "Kirill A. Shutemov" <kirill@shutemov.name> writes:
+> 
+> > On Tue, Oct 20, 2020 at 09:46:11AM +0200, Vitaly Kuznetsov wrote:
+> >> "Kirill A. Shutemov" <kirill@shutemov.name> writes:
+> >> 
+> >> > == Background / Problem ==
+> >> >
+> >> > There are a number of hardware features (MKTME, SEV) which protect guest
+> >> > memory from some unauthorized host access. The patchset proposes a purely
+> >> > software feature that mitigates some of the same host-side read-only
+> >> > attacks.
+> >> >
+> >> >
+> >> > == What does this set mitigate? ==
+> >> >
+> >> >  - Host kernel ”accidental” access to guest data (think speculation)
+> >> >
+> >> >  - Host kernel induced access to guest data (write(fd, &guest_data_ptr, len))
+> >> >
+> >> >  - Host userspace access to guest data (compromised qemu)
+> >> >
+> >> >  - Guest privilege escalation via compromised QEMU device emulation
+> >> >
+> >> > == What does this set NOT mitigate? ==
+> >> >
+> >> >  - Full host kernel compromise.  Kernel will just map the pages again.
+> >> >
+> >> >  - Hardware attacks
+> >> >
+> >> >
+> >> > The second RFC revision addresses /most/ of the feedback.
+> >> >
+> >> > I still didn't found a good solution to reboot and kexec. Unprotect all
+> >> > the memory on such operations defeat the goal of the feature. Clearing up
+> >> > most of the memory before unprotecting what is required for reboot (or
+> >> > kexec) is tedious and error-prone.
+> >> > Maybe we should just declare them unsupported?
+> >> 
+> >> Making reboot unsupported is a hard sell. Could you please elaborate on
+> >> why you think that "unprotect all" hypercall (or rather a single
+> >> hypercall supporting both protecting/unprotecting) defeats the purpose
+> >> of the feature?
+> >
+> > If guest has some data that it prefers not to leak to the host and use the
+> > feature for the purpose, share all the memory to get through reboot is a
+> > very weak point.
+> >
+> 
+> My point that if it knows that there's something sensitive in its
+> memory it should clean it up even today without your feature before
+> rebooting to an unknown target.
 
-Fixes: df747bcd5b21 ("vfio/fsl-mc: Implement VFIO_DEVICE_GET_REGION_INFO ioctl call")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- drivers/vfio/fsl-mc/vfio_fsl_mc.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+It's unrealistic to expect everybody to do the right thing.
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index 0113a980f974..21f22e3da11f 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -248,7 +248,9 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
- 		info.size = vdev->regions[info.index].size;
- 		info.flags = vdev->regions[info.index].flags;
- 
--		return copy_to_user((void __user *)arg, &info, minsz);
-+		if (copy_to_user((void __user *)arg, &info, minsz))
-+			return -EFAULT;
-+		return 0;
- 	}
- 	case VFIO_DEVICE_GET_IRQ_INFO:
- 	{
-@@ -267,7 +269,9 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
- 		info.flags = VFIO_IRQ_INFO_EVENTFD;
- 		info.count = 1;
- 
--		return copy_to_user((void __user *)arg, &info, minsz);
-+		if (copy_to_user((void __user *)arg, &info, minsz))
-+			return -EFAULT;
-+		return 0;
- 	}
- 	case VFIO_DEVICE_SET_IRQS:
- 	{
+> >> clean up *all* its memory upon reboot, however:
+> >> - It may only clean up the most sensitive parts. This should probably be
+> >> done even without this new feature and even on bare metal (think about
+> >> next boot target being malicious).
+> >> - The attack window shrinks significantly. "Speculative" bugs require
+> >> time to exploit and it will only remain open until it boots up again
+> >> (few seconds).
+> >
+> > Maybe it would be cleaner to handle reboot in userspace? If we got the VM
+> > rebooted, just reconstruct it from scratch as if it would be new boot.
+> 
+> We are definitely not trying to protect against malicious KVM so maybe
+> we can do the cleanup there (when protection was enabled) so we can
+> unprotect everything without risk of a leak?
+
+Do you have any particular codepath in mind? I didn't find anything
+suitable so far.
+
 -- 
-2.28.0
-
+ Kirill A. Shutemov
