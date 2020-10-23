@@ -2,74 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0C48296864
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 03:58:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41CD22968AD
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 05:14:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S374442AbgJWB6G convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 22 Oct 2020 21:58:06 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:47894 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S374108AbgJWB6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Oct 2020 21:58:06 -0400
-Received: from BC-Mail-Ex16.internal.baidu.com (unknown [172.31.51.56])
-        by Forcepoint Email with ESMTPS id 120A4E0366D95B1BB427;
-        Fri, 23 Oct 2020 09:58:00 +0800 (CST)
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BC-Mail-Ex16.internal.baidu.com (172.31.51.56) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1979.3; Fri, 23 Oct 2020 09:57:59 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.1979.006; Fri, 23 Oct 2020 09:57:59 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: RE: [PATCH][v3] KVM: x86/mmu: fix counting of rmap entries in
- pte_list_add
-Thread-Topic: [PATCH][v3] KVM: x86/mmu: fix counting of rmap entries in
- pte_list_add
-Thread-Index: AQHWlKp6GOVVttHQQEisdQbuk7+UL6mklifQ
-Date:   Fri, 23 Oct 2020 01:57:59 +0000
-Message-ID: <5acfbee6941e46118eb4479b79233368@baidu.com>
-References: <1601196297-24104-1-git-send-email-lirongqing@baidu.com>
-In-Reply-To: <1601196297-24104-1-git-send-email-lirongqing@baidu.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.198.38]
-Content-Type: text/plain; charset="utf-7"
-Content-Transfer-Encoding: 8BIT
+        id S460308AbgJWDOf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Oct 2020 23:14:35 -0400
+Received: from mga02.intel.com ([134.134.136.20]:51179 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S460302AbgJWDOf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Oct 2020 23:14:35 -0400
+IronPort-SDR: EFAI8MCFg+t12VBxkwHO32IQyiNnshOvbdHAVw3YiYThD4ozuGMIYp4BmqFm2ZtVXfzRgH5Qhy
+ 57CAHeo44Wnw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9782"; a="154580356"
+X-IronPort-AV: E=Sophos;i="5.77,404,1596524400"; 
+   d="scan'208";a="154580356"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2020 20:14:34 -0700
+IronPort-SDR: p6CNCd4eagDKxkiyiJUCnAaQSYO7wabCEomHDn0v6o2bn2PGWZ1H+d3+sl7Ry+WMHRhglaIf66
+ +BgrA/HDlJYg==
+X-IronPort-AV: E=Sophos;i="5.77,404,1596524400"; 
+   d="scan'208";a="316944216"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2020 20:14:34 -0700
+Date:   Thu, 22 Oct 2020 20:14:33 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Mohammed Gamal <mgamal@redhat.com>, kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH v3 7/9] KVM: VMX: Add guest physical address check in EPT
+ violation and misconfig
+Message-ID: <20201023031433.GF23681@linux.intel.com>
+References: <20200710154811.418214-1-mgamal@redhat.com>
+ <20200710154811.418214-8-mgamal@redhat.com>
+ <CALMp9eSbY6FjZAXt7ojQrX_SC_Lyg24dTGFZdKZK7fARGA=3hg@mail.gmail.com>
+ <CALMp9eTFzQMpsrGhN4uJxyUHMKd5=yFwxLoBy==2BTHwmv_UGQ@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eTFzQMpsrGhN4uJxyUHMKd5=yFwxLoBy==2BTHwmv_UGQ@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Oct 14, 2020 at 04:44:57PM -0700, Jim Mattson wrote:
+> On Fri, Oct 9, 2020 at 9:17 AM Jim Mattson <jmattson@google.com> wrote:
+> >
+> > On Fri, Jul 10, 2020 at 8:48 AM Mohammed Gamal <mgamal@redhat.com> wrote:
+> > > @@ -5308,6 +5314,18 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+> > >                PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+> > >
+> > >         vcpu->arch.exit_qualification = exit_qualification;
+> > > +
+> > > +       /*
+> > > +        * Check that the GPA doesn't exceed physical memory limits, as that is
+> > > +        * a guest page fault.  We have to emulate the instruction here, because
+> > > +        * if the illegal address is that of a paging structure, then
+> > > +        * EPT_VIOLATION_ACC_WRITE bit is set.  Alternatively, if supported we
+> > > +        * would also use advanced VM-exit information for EPT violations to
+> > > +        * reconstruct the page fault error code.
+> > > +        */
+> > > +       if (unlikely(kvm_mmu_is_illegal_gpa(vcpu, gpa)))
+> > > +               return kvm_emulate_instruction(vcpu, 0);
+> > > +
+> >
+> > Is kvm's in-kernel emulator up to the task? What if the instruction in
+> > question is AVX-512, or one of the myriad instructions that the
+> > in-kernel emulator can't handle? Ice Lake must support the advanced
+> > VM-exit information for EPT violations, so that would seem like a
+> > better choice.
+> >
+> Anyone?
 
-
-+AD4- -----Original Message-----
-+AD4- From: Li,Rongqing
-+AD4- Sent: Sunday, September 27, 2020 4:45 PM
-+AD4- To: Li,Rongqing +ADw-lirongqing+AEA-baidu.com+AD4AOw- kvm+AEA-vger.kernel.org+ADs-
-+AD4- x86+AEA-kernel.org+ADs- sean.j.christopherson+AEA-intel.com
-+AD4- Subject: +AFs-PATCH+AF0AWw-v3+AF0- KVM: x86/mmu: fix counting of rmap entries in
-+AD4- pte+AF8-list+AF8-add
-+AD4- 
-+AD4- Fix an off-by-one style bug in pte+AF8-list+AF8-add() where it failed to account the last
-+AD4- full set of SPTEs, i.e. when desc-+AD4-sptes is full and desc-+AD4-more is NULL.
-+AD4- 
-+AD4- Merge the two +ACI-PTE+AF8-LIST+AF8-EXT-1+ACI- checks as part of the fix to avoid an extra
-+AD4- comparison.
-+AD4- 
-+AD4- Signed-off-by: Li RongQing +ADw-lirongqing+AEA-baidu.com+AD4-
-+AD4- Reviewed-by: Sean Christopherson +ADw-sean.j.christopherson+AEA-intel.com+AD4-
-
-
-Ping 
-
-
-Thanks
-
--Li
+Using "advanced info" if it's supported seems like the way to go.  Outright
+requiring it is probably overkill; if userspace wants to risk having to kill a
+(likely broken) guest, so be it.
