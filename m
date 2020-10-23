@@ -2,153 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BF912973CC
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:31:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28E262973EA
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:32:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1751659AbgJWQbD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 12:31:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21722 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751438AbgJWQas (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603470647;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2r6z2eq2n8RapzH3Hc0CANhd1X+6+VQ1WVVzaGN7U3M=;
-        b=i2pDy0AXIXNYKUTI6fMUKa9+dq9sbzTWBlKjEdXf56YqHO7c5UGe8ypdpBM5WZ/q65r1Uz
-        2Hi5zibR4owGMn7hRrV04xbAsDYVFVFKBnh02fKFTZarnjPMmtw0KIFIl7YlbPTxLv+VIj
-        28NlC+ENe7cdOslUj2yoffvDb7GqSko=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-RCsahkEeOdaZ4_LF-Vm3WA-1; Fri, 23 Oct 2020 12:30:44 -0400
-X-MC-Unique: RCsahkEeOdaZ4_LF-Vm3WA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3608C10309BB;
-        Fri, 23 Oct 2020 16:30:43 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C6CE09CBC8;
-        Fri, 23 Oct 2020 16:30:42 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     bgardon@google.com
-Subject: [PATCH 22/22] kvm: x86/mmu: NX largepage recovery for TDP MMU
-Date:   Fri, 23 Oct 2020 12:30:24 -0400
-Message-Id: <20201023163024.2765558-23-pbonzini@redhat.com>
-In-Reply-To: <20201023163024.2765558-1-pbonzini@redhat.com>
-References: <20201023163024.2765558-1-pbonzini@redhat.com>
+        id S1750745AbgJWQcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 12:32:15 -0400
+Received: from mga02.intel.com ([134.134.136.20]:44372 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S376033AbgJWQcO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Oct 2020 12:32:14 -0400
+IronPort-SDR: B0NU0EdIFd/RS0sZ8Q7p9UpfG9VtccGqZSfeHnf2sMlw5LshKFAzM6mXeARf1dsFX7jAj70jzY
+ 88ON6Fpm1xjg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9782"; a="154658378"
+X-IronPort-AV: E=Sophos;i="5.77,409,1596524400"; 
+   d="scan'208";a="154658378"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2020 09:32:02 -0700
+IronPort-SDR: 71aJvcrUnpatw20KEuhZ3rsuXf7oGTND3XZXVxTlK40kSHCdl/N440+ISf1WSgAX+bfXg19DUl
+ JcldFVkia1+Q==
+X-IronPort-AV: E=Sophos;i="5.77,409,1596524400"; 
+   d="scan'208";a="524731467"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2020 09:32:01 -0700
+Date:   Fri, 23 Oct 2020 09:32:00 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Mike Rapoport <rppt@kernel.org>
+Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        Liran Alon <liran.alon@oracle.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFCv2 15/16] KVM: Unmap protected pages from direct mapping
+Message-ID: <20201023163158.GB5580@linux.intel.com>
+References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
+ <20201020061859.18385-16-kirill.shutemov@linux.intel.com>
+ <20201023123712.GC392079@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201023123712.GC392079@kernel.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ben Gardon <bgardon@google.com>
+On Fri, Oct 23, 2020 at 03:37:12PM +0300, Mike Rapoport wrote:
+> On Tue, Oct 20, 2020 at 09:18:58AM +0300, Kirill A. Shutemov wrote:
+> > If the protected memory feature enabled, unmap guest memory from
+> > kernel's direct mappings.
+> > 
+> > Migration and KSM is disabled for protected memory as it would require a
+> > special treatment.
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > ---
+> >  include/linux/mm.h       |  3 +++
+> >  mm/huge_memory.c         |  8 ++++++++
+> >  mm/ksm.c                 |  2 ++
+> >  mm/memory.c              | 12 ++++++++++++
+> >  mm/rmap.c                |  4 ++++
+> >  virt/lib/mem_protected.c | 21 +++++++++++++++++++++
+> >  6 files changed, 50 insertions(+)
+> > 
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index ee274d27e764..74efc51e63f0 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -671,6 +671,9 @@ static inline bool vma_is_kvm_protected(struct vm_area_struct *vma)
+> >  	return vma->vm_flags & VM_KVM_PROTECTED;
+> >  }
+> >  
+> > +void kvm_map_page(struct page *page, int nr_pages);
+> > +void kvm_unmap_page(struct page *page, int nr_pages);
+> 
+> This still does not seem right ;-)
+> 
+> And I still think that map/unmap primitives shoud be a part of the
+> generic mm rather than exported by KVM.
 
-When KVM maps a largepage backed region at a lower level in order to
-make it executable (i.e. NX large page shattering), it reduces the TLB
-performance of that region. In order to avoid making this degradation
-permanent, KVM must periodically reclaim shattered NX largepages by
-zapping them and allowing them to be rebuilt in the page fault handler.
-
-With this patch, the TDP MMU does not respect KVM's rate limiting on
-reclaim. It traverses the entire TDP structure every time. This will be
-addressed in a future patch.
-
-Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
-machine. This series introduced no new failures.
-
-This series can be viewed in Gerrit at:
-	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2538
-
-Signed-off-by: Ben Gardon <bgardon@google.com>
-Message-Id: <20201014182700.2888246-21-bgardon@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c          | 13 +++++++++----
- arch/x86/kvm/mmu/mmu_internal.h |  3 +++
- arch/x86/kvm/mmu/tdp_mmu.c      |  6 ++++++
- 3 files changed, 18 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7b52fa1f01b0..17587f496ec7 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -776,7 +776,7 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	kvm_mmu_gfn_disallow_lpage(slot, gfn);
- }
- 
--static void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-+void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
- 	if (sp->lpage_disallowed)
- 		return;
-@@ -804,7 +804,7 @@ static void unaccount_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	kvm_mmu_gfn_allow_lpage(slot, gfn);
- }
- 
--static void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-+void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
- 	--kvm->stat.nx_lpage_splits;
- 	sp->lpage_disallowed = false;
-@@ -5988,8 +5988,13 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
- 				      struct kvm_mmu_page,
- 				      lpage_disallowed_link);
- 		WARN_ON_ONCE(!sp->lpage_disallowed);
--		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
--		WARN_ON_ONCE(sp->lpage_disallowed);
-+		if (sp->tdp_mmu_page)
-+			kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn,
-+				sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level));
-+		else {
-+			kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
-+			WARN_ON_ONCE(sp->lpage_disallowed);
-+		}
- 
- 		if (need_resched() || spin_needbreak(&kvm->mmu_lock)) {
- 			kvm_mmu_commit_zap_page(kvm, &invalid_list);
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 6db40ea85974..bfc6389edc28 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -143,4 +143,7 @@ bool is_nx_huge_page_enabled(void);
- 
- void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
- 
-+void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-+void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-+
- #endif /* __KVM_X86_MMU_INTERNAL_H */
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 5158d02b8925..e246d71b8ea2 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -273,6 +273,9 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 
- 		list_del(&sp->link);
- 
-+		if (sp->lpage_disallowed)
-+			unaccount_huge_nx_page(kvm, sp);
-+
- 		for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
- 			old_child_spte = READ_ONCE(*(pt + i));
- 			WRITE_ONCE(*(pt + i), 0);
-@@ -571,6 +574,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 						     !shadow_accessed_mask);
- 
- 			trace_kvm_mmu_get_page(sp, true);
-+			if (huge_page_disallowed && req_level >= iter.level)
-+				account_huge_nx_page(vcpu->kvm, sp);
-+
- 			tdp_mmu_set_spte(vcpu->kvm, &iter, new_spte);
- 		}
- 	}
--- 
-2.26.2
-
+Ya, and going a step further, I suspect it will be cleaner in the long run if
+the kernel does not automatically map or unmap when converting between private
+and shared/public memory.  Conversions will be rare in a well behaved guest, so
+exiting to userspace and forcing userspace to do the unmap->map would not be a
+performance bottleneck.  In theory, userspace could also maintain separate
+pools for private vs. public mappings, though I doubt any VMM will do that in
+practice.
