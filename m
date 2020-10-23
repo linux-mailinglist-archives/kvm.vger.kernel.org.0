@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62C142973C0
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:30:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 904592973C4
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:30:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1751563AbgJWQai (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 12:30:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60325 "EHLO
+        id S1751600AbgJWQap (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 12:30:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49841 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751526AbgJWQaf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:35 -0400
+        by vger.kernel.org with ESMTP id S1751547AbgJWQah (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603470633;
+        s=mimecast20190719; t=1603470635;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lsLhAdly5U2eWUcP2dCo+xi2v1YCTz+iQrZ0M6kEMk8=;
-        b=U+5ygtaokpu+uiK9/x8u57SxD2cq6dMtaNNOTtYiiFx/J7Fa1RKQic7YpyR+E02EDJcP1B
-        /Hkno3MS3/6rwoJrRuS7F2LzgVnHSv+hth3Rwehhnkl2Ix1+JN5jW3n03DktCDDLL3RT9c
-        8RwATzPVUmxA1h4pwl9F2L1u4YBFjCU=
+        bh=bvBa2lKKk81VHS9Ew+tuuP4bWoHVeVZHGHp/bxf4ZPI=;
+        b=GHQGaClpoVBJ5TEQFPowxPY+iMS0LmSfzP2RfbfoGn1T/1pMHuCLLFwJAfWNS7IogY2cdh
+        iLcD/RqQaxDNnMeC32E03mHYnMhhZgrFDRs1w2y+TGlTE0ttfLWaBlGrrhJ8j3jAQqPARb
+        unL+69iIlxynA7asPG+9QqBfw6iE23U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-6CrHKrZbMu-y6OCyWBreEw-1; Fri, 23 Oct 2020 12:30:29 -0400
-X-MC-Unique: 6CrHKrZbMu-y6OCyWBreEw-1
+ us-mta-376-5ouCjrRtPfqk-bqDqFIQoQ-1; Fri, 23 Oct 2020 12:30:29 -0400
+X-MC-Unique: 5ouCjrRtPfqk-bqDqFIQoQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 359231891E83;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B70B886ABDE;
         Fri, 23 Oct 2020 16:30:28 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA06B5D9E2;
-        Fri, 23 Oct 2020 16:30:27 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 576F25D9E2;
+        Fri, 23 Oct 2020 16:30:28 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     bgardon@google.com
-Subject: [PATCH 06/22] kvm: x86/mmu: Init / Uninit the TDP MMU
-Date:   Fri, 23 Oct 2020 12:30:08 -0400
-Message-Id: <20201023163024.2765558-7-pbonzini@redhat.com>
+Subject: [PATCH 07/22] kvm: x86/mmu: Allocate and free TDP MMU roots
+Date:   Fri, 23 Oct 2020 12:30:09 -0400
+Message-Id: <20201023163024.2765558-8-pbonzini@redhat.com>
 In-Reply-To: <20201023163024.2765558-1-pbonzini@redhat.com>
 References: <20201023163024.2765558-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -50,13 +50,12 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Ben Gardon <bgardon@google.com>
 
-The TDP MMU offers an alternative mode of operation to the x86 shadow
-paging based MMU, optimized for running an L1 guest with TDP. The TDP MMU
-will require new fields that need to be initialized and torn down. Add
-hooks into the existing KVM MMU initialization process to do that
-initialization / cleanup. Currently the initialization and cleanup
-fucntions do not do very much, however more operations will be added in
-future patches.
+The TDP MMU must be able to allocate paging structure root pages and track
+the usage of those pages. Implement a similar, but separate system for root
+page allocation to that of the x86 shadow paging implementation. When
+future patches add synchronization model changes to allow for parallel
+page faults, these pages will need to be handled differently from the
+x86 shadow paging based MMU's root pages.
 
 Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
 machine. This series introduced no new failures.
@@ -65,133 +64,252 @@ This series can be viewed in Gerrit at:
 	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2538
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
-Message-Id: <20201014182700.2888246-4-bgardon@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  9 +++++++++
- arch/x86/kvm/Makefile           |  2 +-
- arch/x86/kvm/mmu/mmu.c          |  5 +++++
- arch/x86/kvm/mmu/tdp_mmu.c      | 30 ++++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.h      | 10 ++++++++++
- 5 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kvm/mmu/tdp_mmu.c
- create mode 100644 arch/x86/kvm/mmu/tdp_mmu.h
+ arch/x86/include/asm/kvm_host.h |   1 +
+ arch/x86/kvm/mmu/mmu.c          |  24 ++++++--
+ arch/x86/kvm/mmu/mmu_internal.h |  20 +++++++
+ arch/x86/kvm/mmu/tdp_mmu.c      | 102 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.h      |   5 ++
+ 5 files changed, 146 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 8233991386a3..f6d47ac74a52 100644
+index f6d47ac74a52..082684ce2d1b 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -995,6 +995,15 @@ struct kvm_arch {
- 
- 	struct kvm_pmu_event_filter *pmu_event_filter;
- 	struct task_struct *nx_lpage_recovery_thread;
-+
-+	/*
-+	 * Whether the TDP MMU is enabled for this VM. This contains a
-+	 * snapshot of the TDP MMU module parameter from when the VM was
-+	 * created and remains unchanged for the life of the VM. If this is
-+	 * true, TDP MMU handler functions will run for various MMU
-+	 * operations.
-+	 */
-+	bool tdp_mmu_enabled;
+@@ -1004,6 +1004,7 @@ struct kvm_arch {
+ 	 * operations.
+ 	 */
+ 	bool tdp_mmu_enabled;
++	struct list_head tdp_mmu_roots;
  };
  
  struct kvm_vm_stat {
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index a5dd4e5970f8..b804444e16d4 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -16,7 +16,7 @@ kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
- kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
- 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
- 			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
--			   mmu/spte.o mmu/tdp_iter.o
-+			   mmu/spte.o mmu/tdp_iter.o mmu/tdp_mmu.o
- 
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 02af304c168a..2afaf17284bb 100644
+index 2afaf17284bb..017d37b19cf3 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -19,6 +19,7 @@
- #include "ioapic.h"
- #include "mmu.h"
- #include "mmu_internal.h"
-+#include "tdp_mmu.h"
- #include "x86.h"
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
-@@ -5377,6 +5378,8 @@ void kvm_mmu_init_vm(struct kvm *kvm)
+@@ -185,7 +185,7 @@ struct kvm_shadow_walk_iterator {
+ 	     __shadow_walk_next(&(_walker), spte))
+ 
+ static struct kmem_cache *pte_list_desc_cache;
+-static struct kmem_cache *mmu_page_header_cache;
++struct kmem_cache *mmu_page_header_cache;
+ static struct percpu_counter kvm_total_used_mmu_pages;
+ 
+ static void mmu_spte_set(u64 *sptep, u64 spte);
+@@ -3132,9 +3132,13 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ 		return;
+ 
+ 	sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
+-	--sp->root_count;
+-	if (!sp->root_count && sp->role.invalid)
+-		kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
++
++	if (kvm_mmu_put_root(kvm, sp)) {
++		if (sp->tdp_mmu_page)
++			kvm_tdp_mmu_free_root(kvm, sp);
++		else if (sp->role.invalid)
++			kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
++	}
+ 
+ 	*root_hpa = INVALID_PAGE;
+ }
+@@ -3224,8 +3228,16 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+ 	hpa_t root;
+ 	unsigned i;
+ 
+-	if (shadow_root_level >= PT64_ROOT_4LEVEL) {
+-		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level, true);
++	if (vcpu->kvm->arch.tdp_mmu_enabled) {
++		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
++
++		if (!VALID_PAGE(root))
++			return -ENOSPC;
++		vcpu->arch.mmu->root_hpa = root;
++	} else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
++		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level,
++				      true);
++
+ 		if (!VALID_PAGE(root))
+ 			return -ENOSPC;
+ 		vcpu->arch.mmu->root_hpa = root;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index fc72f199eaa6..6665b10288ce 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -55,8 +55,12 @@ struct kvm_mmu_page {
+ 
+ 	/* Number of writes since the last time traversal visited this page.  */
+ 	atomic_t write_flooding_count;
++
++	bool tdp_mmu_page;
+ };
+ 
++extern struct kmem_cache *mmu_page_header_cache;
++
+ static inline struct kvm_mmu_page *to_shadow_page(hpa_t shadow_page)
  {
- 	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
+ 	struct page *page = pfn_to_page(shadow_page >> PAGE_SHIFT);
+@@ -89,4 +93,20 @@ void kvm_mmu_gfn_allow_lpage(struct kvm_memory_slot *slot, gfn_t gfn);
+ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 				    struct kvm_memory_slot *slot, u64 gfn);
  
-+	kvm_mmu_init_tdp_mmu(kvm);
++static inline void kvm_mmu_get_root(struct kvm *kvm, struct kvm_mmu_page *sp)
++{
++	BUG_ON(!sp->root_count);
++	lockdep_assert_held(&kvm->mmu_lock);
 +
- 	node->track_write = kvm_mmu_pte_write;
- 	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
- 	kvm_page_track_register_notifier(kvm, node);
-@@ -5387,6 +5390,8 @@ void kvm_mmu_uninit_vm(struct kvm *kvm)
- 	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
++	++sp->root_count;
++}
++
++static inline bool kvm_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *sp)
++{
++	lockdep_assert_held(&kvm->mmu_lock);
++	--sp->root_count;
++
++	return !sp->root_count;
++}
++
+ #endif /* __KVM_X86_MMU_INTERNAL_H */
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index e567e8aa61a1..76ebb5898dd7 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1,6 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0
  
- 	kvm_page_track_unregister_notifier(kvm, node);
++#include "mmu.h"
++#include "mmu_internal.h"
+ #include "tdp_mmu.h"
++#include "spte.h"
+ 
+ static bool __read_mostly tdp_mmu_enabled = false;
+ 
+@@ -21,10 +24,109 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+ 
+ 	/* This should not be changed for the lifetime of the VM. */
+ 	kvm->arch.tdp_mmu_enabled = true;
 +
-+	kvm_mmu_uninit_tdp_mmu(kvm);
++	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
  }
  
- void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-new file mode 100644
-index 000000000000..e567e8aa61a1
---- /dev/null
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -0,0 +1,30 @@
-+// SPDX-License-Identifier: GPL-2.0
+ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+ {
+ 	if (!kvm->arch.tdp_mmu_enabled)
+ 		return;
 +
-+#include "tdp_mmu.h"
-+
-+static bool __read_mostly tdp_mmu_enabled = false;
-+
-+static bool is_tdp_mmu_enabled(void)
-+{
-+#ifdef CONFIG_X86_64
-+	return tdp_enabled && READ_ONCE(tdp_mmu_enabled);
-+#else
-+	return false;
-+#endif /* CONFIG_X86_64 */
++	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
 +}
 +
-+/* Initializes the TDP MMU for the VM, if enabled. */
-+void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
-+{
-+	if (!is_tdp_mmu_enabled())
-+		return;
++#define for_each_tdp_mmu_root(_kvm, _root)			    \
++	list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)
 +
-+	/* This should not be changed for the lifetime of the VM. */
-+	kvm->arch.tdp_mmu_enabled = true;
++bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
++{
++	struct kvm_mmu_page *sp;
++
++	sp = to_shadow_page(hpa);
++
++	return sp->tdp_mmu_page && sp->root_count;
 +}
 +
-+void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
++void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root)
 +{
-+	if (!kvm->arch.tdp_mmu_enabled)
-+		return;
++	lockdep_assert_held(&kvm->mmu_lock);
++
++	WARN_ON(root->root_count);
++	WARN_ON(!root->tdp_mmu_page);
++
++	list_del(&root->link);
++
++	free_page((unsigned long)root->spt);
++	kmem_cache_free(mmu_page_header_cache, root);
 +}
++
++static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
++						   int level)
++{
++	union kvm_mmu_page_role role;
++
++	role = vcpu->arch.mmu->mmu_role.base;
++	role.level = level;
++	role.direct = true;
++	role.gpte_is_8_bytes = true;
++	role.access = ACC_ALL;
++
++	return role;
++}
++
++static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
++					       int level)
++{
++	struct kvm_mmu_page *sp;
++
++	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
++	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
++	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
++
++	sp->role.word = page_role_for_level(vcpu, level).word;
++	sp->gfn = gfn;
++	sp->tdp_mmu_page = true;
++
++	return sp;
++}
++
++static struct kvm_mmu_page *get_tdp_mmu_vcpu_root(struct kvm_vcpu *vcpu)
++{
++	union kvm_mmu_page_role role;
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_mmu_page *root;
++
++	role = page_role_for_level(vcpu, vcpu->arch.mmu->shadow_root_level);
++
++	spin_lock(&kvm->mmu_lock);
++
++	/* Check for an existing root before allocating a new one. */
++	for_each_tdp_mmu_root(kvm, root) {
++		if (root->role.word == role.word) {
++			kvm_mmu_get_root(kvm, root);
++			spin_unlock(&kvm->mmu_lock);
++			return root;
++		}
++	}
++
++	root = alloc_tdp_mmu_page(vcpu, 0, vcpu->arch.mmu->shadow_root_level);
++	root->root_count = 1;
++
++	list_add(&root->link, &kvm->arch.tdp_mmu_roots);
++
++	spin_unlock(&kvm->mmu_lock);
++
++	return root;
++}
++
++hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
++{
++	struct kvm_mmu_page *root;
++
++	root = get_tdp_mmu_vcpu_root(vcpu);
++	if (!root)
++		return INVALID_PAGE;
++
++	return __pa(root->spt);
+ }
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-new file mode 100644
-index 000000000000..cd4a562a70e9
---- /dev/null
+index cd4a562a70e9..ac0ef9129442 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
 +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -0,0 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0
+@@ -7,4 +7,9 @@
+ 
+ void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
+ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
 +
-+#ifndef __KVM_X86_MMU_TDP_MMU_H
-+#define __KVM_X86_MMU_TDP_MMU_H
++bool is_tdp_mmu_root(struct kvm *kvm, hpa_t root);
++hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
++void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root);
 +
-+#include <linux/kvm_host.h>
-+
-+void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
-+void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
-+#endif /* __KVM_X86_MMU_TDP_MMU_H */
+ #endif /* __KVM_X86_MMU_TDP_MMU_H */
 -- 
 2.26.2
 
