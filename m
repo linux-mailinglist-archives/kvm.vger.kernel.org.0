@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B45A2973BE
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:30:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62C142973C0
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:30:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1751542AbgJWQaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 12:30:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39074 "EHLO
+        id S1751563AbgJWQai (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 12:30:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60325 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751516AbgJWQae (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:34 -0400
+        by vger.kernel.org with ESMTP id S1751526AbgJWQaf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603470632;
+        s=mimecast20190719; t=1603470633;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r0u+Is6JwRmmXFJMLeCPF6/HpKU+rnLQL1ih5VNFzJI=;
-        b=OywPTgum9W6QTHy+stt66irplj7v7ZSmZs8XTPF59llWhGQtl0yBmg9SHX0ePAcMXqubR8
-        cqDyxF5TnQ99BTugRYP9B+tlOzYL0g3eKiLzRk0HWG0goWuv8G7M5dQJbq7SNEcV5+7rM5
-        dV+ZTp6OsjvCckV9y5y3I66qGb4xUmI=
+        bh=lsLhAdly5U2eWUcP2dCo+xi2v1YCTz+iQrZ0M6kEMk8=;
+        b=U+5ygtaokpu+uiK9/x8u57SxD2cq6dMtaNNOTtYiiFx/J7Fa1RKQic7YpyR+E02EDJcP1B
+        /Hkno3MS3/6rwoJrRuS7F2LzgVnHSv+hth3Rwehhnkl2Ix1+JN5jW3n03DktCDDLL3RT9c
+        8RwATzPVUmxA1h4pwl9F2L1u4YBFjCU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-ws4dslFJOmq9yo_MsSRQwQ-1; Fri, 23 Oct 2020 12:30:29 -0400
-X-MC-Unique: ws4dslFJOmq9yo_MsSRQwQ-1
+ us-mta-332-6CrHKrZbMu-y6OCyWBreEw-1; Fri, 23 Oct 2020 12:30:29 -0400
+X-MC-Unique: 6CrHKrZbMu-y6OCyWBreEw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7E67CF983;
-        Fri, 23 Oct 2020 16:30:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 359231891E83;
+        Fri, 23 Oct 2020 16:30:28 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4842A5D9E2;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA06B5D9E2;
         Fri, 23 Oct 2020 16:30:27 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     bgardon@google.com
-Subject: [PATCH 05/22] kvm: x86/mmu: Introduce tdp_iter
-Date:   Fri, 23 Oct 2020 12:30:07 -0400
-Message-Id: <20201023163024.2765558-6-pbonzini@redhat.com>
+Subject: [PATCH 06/22] kvm: x86/mmu: Init / Uninit the TDP MMU
+Date:   Fri, 23 Oct 2020 12:30:08 -0400
+Message-Id: <20201023163024.2765558-7-pbonzini@redhat.com>
 In-Reply-To: <20201023163024.2765558-1-pbonzini@redhat.com>
 References: <20201023163024.2765558-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -50,9 +50,13 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Ben Gardon <bgardon@google.com>
 
-The TDP iterator implements a pre-order traversal of a TDP paging
-structure. This iterator will be used in future patches to create
-an efficient implementation of the KVM MMU for the TDP case.
+The TDP MMU offers an alternative mode of operation to the x86 shadow
+paging based MMU, optimized for running an L1 guest with TDP. The TDP MMU
+will require new fields that need to be initialized and torn down. Add
+hooks into the existing KVM MMU initialization process to do that
+initialization / cleanup. Currently the initialization and cleanup
+fucntions do not do very much, however more operations will be added in
+future patches.
 
 Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
 machine. This series introduced no new failures.
@@ -61,273 +65,133 @@ This series can be viewed in Gerrit at:
 	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2538
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
+Message-Id: <20201014182700.2888246-4-bgardon@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/Makefile       |   2 +-
- arch/x86/kvm/mmu/tdp_iter.c | 177 ++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_iter.h |  56 ++++++++++++
- 3 files changed, 234 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kvm/mmu/tdp_iter.c
- create mode 100644 arch/x86/kvm/mmu/tdp_iter.h
+ arch/x86/include/asm/kvm_host.h |  9 +++++++++
+ arch/x86/kvm/Makefile           |  2 +-
+ arch/x86/kvm/mmu/mmu.c          |  5 +++++
+ arch/x86/kvm/mmu/tdp_mmu.c      | 30 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.h      | 10 ++++++++++
+ 5 files changed, 55 insertions(+), 1 deletion(-)
+ create mode 100644 arch/x86/kvm/mmu/tdp_mmu.c
+ create mode 100644 arch/x86/kvm/mmu/tdp_mmu.h
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 8233991386a3..f6d47ac74a52 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -995,6 +995,15 @@ struct kvm_arch {
+ 
+ 	struct kvm_pmu_event_filter *pmu_event_filter;
+ 	struct task_struct *nx_lpage_recovery_thread;
++
++	/*
++	 * Whether the TDP MMU is enabled for this VM. This contains a
++	 * snapshot of the TDP MMU module parameter from when the VM was
++	 * created and remains unchanged for the life of the VM. If this is
++	 * true, TDP MMU handler functions will run for various MMU
++	 * operations.
++	 */
++	bool tdp_mmu_enabled;
+ };
+ 
+ struct kvm_vm_stat {
 diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 66aa24f5e2db..a5dd4e5970f8 100644
+index a5dd4e5970f8..b804444e16d4 100644
 --- a/arch/x86/kvm/Makefile
 +++ b/arch/x86/kvm/Makefile
 @@ -16,7 +16,7 @@ kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
  kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
  			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
--			   mmu/spte.o
-+			   mmu/spte.o mmu/tdp_iter.o
+-			   mmu/spte.o mmu/tdp_iter.o
++			   mmu/spte.o mmu/tdp_iter.o mmu/tdp_mmu.o
  
  kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
  			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
-diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 02af304c168a..2afaf17284bb 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -19,6 +19,7 @@
+ #include "ioapic.h"
+ #include "mmu.h"
+ #include "mmu_internal.h"
++#include "tdp_mmu.h"
+ #include "x86.h"
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+@@ -5377,6 +5378,8 @@ void kvm_mmu_init_vm(struct kvm *kvm)
+ {
+ 	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
+ 
++	kvm_mmu_init_tdp_mmu(kvm);
++
+ 	node->track_write = kvm_mmu_pte_write;
+ 	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+ 	kvm_page_track_register_notifier(kvm, node);
+@@ -5387,6 +5390,8 @@ void kvm_mmu_uninit_vm(struct kvm *kvm)
+ 	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
+ 
+ 	kvm_page_track_unregister_notifier(kvm, node);
++
++	kvm_mmu_uninit_tdp_mmu(kvm);
+ }
+ 
+ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
 new file mode 100644
-index 000000000000..ad2184cb054c
+index 000000000000..e567e8aa61a1
 --- /dev/null
-+++ b/arch/x86/kvm/mmu/tdp_iter.c
-@@ -0,0 +1,177 @@
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -0,0 +1,30 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+#include "mmu_internal.h"
-+#include "tdp_iter.h"
-+#include "spte.h"
++#include "tdp_mmu.h"
 +
-+/*
-+ * Recalculates the pointer to the SPTE for the current GFN and level and
-+ * reread the SPTE.
-+ */
-+static void tdp_iter_refresh_sptep(struct tdp_iter *iter)
++static bool __read_mostly tdp_mmu_enabled = false;
++
++static bool is_tdp_mmu_enabled(void)
 +{
-+	iter->sptep = iter->pt_path[iter->level - 1] +
-+		SHADOW_PT_INDEX(iter->gfn << PAGE_SHIFT, iter->level);
-+	iter->old_spte = READ_ONCE(*iter->sptep);
++#ifdef CONFIG_X86_64
++	return tdp_enabled && READ_ONCE(tdp_mmu_enabled);
++#else
++	return false;
++#endif /* CONFIG_X86_64 */
 +}
 +
-+static gfn_t round_gfn_for_level(gfn_t gfn, int level)
++/* Initializes the TDP MMU for the VM, if enabled. */
++void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
 +{
-+	return gfn & -KVM_PAGES_PER_HPAGE(level);
-+}
-+
-+/*
-+ * Sets a TDP iterator to walk a pre-order traversal of the paging structure
-+ * rooted at root_pt, starting with the walk to translate goal_gfn.
-+ */
-+void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
-+		    int min_level, gfn_t goal_gfn)
-+{
-+	WARN_ON(root_level < 1);
-+	WARN_ON(root_level > PT64_ROOT_MAX_LEVEL);
-+
-+	iter->goal_gfn = goal_gfn;
-+	iter->root_level = root_level;
-+	iter->min_level = min_level;
-+	iter->level = root_level;
-+	iter->pt_path[iter->level - 1] = root_pt;
-+
-+	iter->gfn = round_gfn_for_level(iter->goal_gfn, iter->level);
-+	tdp_iter_refresh_sptep(iter);
-+
-+	iter->valid = true;
-+}
-+
-+/*
-+ * Given an SPTE and its level, returns a pointer containing the host virtual
-+ * address of the child page table referenced by the SPTE. Returns null if
-+ * there is no such entry.
-+ */
-+u64 *spte_to_child_pt(u64 spte, int level)
-+{
-+	/*
-+	 * There's no child entry if this entry isn't present or is a
-+	 * last-level entry.
-+	 */
-+	if (!is_shadow_present_pte(spte) || is_last_spte(spte, level))
-+		return NULL;
-+
-+	return __va(spte_to_pfn(spte) << PAGE_SHIFT);
-+}
-+
-+/*
-+ * Steps down one level in the paging structure towards the goal GFN. Returns
-+ * true if the iterator was able to step down a level, false otherwise.
-+ */
-+static bool try_step_down(struct tdp_iter *iter)
-+{
-+	u64 *child_pt;
-+
-+	if (iter->level == iter->min_level)
-+		return false;
-+
-+	/*
-+	 * Reread the SPTE before stepping down to avoid traversing into page
-+	 * tables that are no longer linked from this entry.
-+	 */
-+	iter->old_spte = READ_ONCE(*iter->sptep);
-+
-+	child_pt = spte_to_child_pt(iter->old_spte, iter->level);
-+	if (!child_pt)
-+		return false;
-+
-+	iter->level--;
-+	iter->pt_path[iter->level - 1] = child_pt;
-+	iter->gfn = round_gfn_for_level(iter->goal_gfn, iter->level);
-+	tdp_iter_refresh_sptep(iter);
-+
-+	return true;
-+}
-+
-+/*
-+ * Steps to the next entry in the current page table, at the current page table
-+ * level. The next entry could point to a page backing guest memory or another
-+ * page table, or it could be non-present. Returns true if the iterator was
-+ * able to step to the next entry in the page table, false if the iterator was
-+ * already at the end of the current page table.
-+ */
-+static bool try_step_side(struct tdp_iter *iter)
-+{
-+	/*
-+	 * Check if the iterator is already at the end of the current page
-+	 * table.
-+	 */
-+	if (SHADOW_PT_INDEX(iter->gfn << PAGE_SHIFT, iter->level) ==
-+            (PT64_ENT_PER_PAGE - 1))
-+		return false;
-+
-+	iter->gfn += KVM_PAGES_PER_HPAGE(iter->level);
-+	iter->goal_gfn = iter->gfn;
-+	iter->sptep++;
-+	iter->old_spte = READ_ONCE(*iter->sptep);
-+
-+	return true;
-+}
-+
-+/*
-+ * Tries to traverse back up a level in the paging structure so that the walk
-+ * can continue from the next entry in the parent page table. Returns true on a
-+ * successful step up, false if already in the root page.
-+ */
-+static bool try_step_up(struct tdp_iter *iter)
-+{
-+	if (iter->level == iter->root_level)
-+		return false;
-+
-+	iter->level++;
-+	iter->gfn = round_gfn_for_level(iter->gfn, iter->level);
-+	tdp_iter_refresh_sptep(iter);
-+
-+	return true;
-+}
-+
-+/*
-+ * Step to the next SPTE in a pre-order traversal of the paging structure.
-+ * To get to the next SPTE, the iterator either steps down towards the goal
-+ * GFN, if at a present, non-last-level SPTE, or over to a SPTE mapping a
-+ * highter GFN.
-+ *
-+ * The basic algorithm is as follows:
-+ * 1. If the current SPTE is a non-last-level SPTE, step down into the page
-+ *    table it points to.
-+ * 2. If the iterator cannot step down, it will try to step to the next SPTE
-+ *    in the current page of the paging structure.
-+ * 3. If the iterator cannot step to the next entry in the current page, it will
-+ *    try to step up to the parent paging structure page. In this case, that
-+ *    SPTE will have already been visited, and so the iterator must also step
-+ *    to the side again.
-+ */
-+void tdp_iter_next(struct tdp_iter *iter)
-+{
-+	if (try_step_down(iter))
++	if (!is_tdp_mmu_enabled())
 +		return;
 +
-+	do {
-+		if (try_step_side(iter))
-+			return;
-+	} while (try_step_up(iter));
-+	iter->valid = false;
++	/* This should not be changed for the lifetime of the VM. */
++	kvm->arch.tdp_mmu_enabled = true;
 +}
 +
-+/*
-+ * Restart the walk over the paging structure from the root, starting from the
-+ * highest gfn the iterator had previously reached. Assumes that the entire
-+ * paging structure, except the root page, may have been completely torn down
-+ * and rebuilt.
-+ */
-+void tdp_iter_refresh_walk(struct tdp_iter *iter)
++void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
 +{
-+	gfn_t goal_gfn = iter->goal_gfn;
-+
-+	if (iter->gfn > goal_gfn)
-+		goal_gfn = iter->gfn;
-+
-+	tdp_iter_start(iter, iter->pt_path[iter->root_level - 1],
-+		       iter->root_level, iter->min_level, goal_gfn);
++	if (!kvm->arch.tdp_mmu_enabled)
++		return;
 +}
-+
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
 new file mode 100644
-index 000000000000..d629a53e1b73
+index 000000000000..cd4a562a70e9
 --- /dev/null
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -0,0 +1,56 @@
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -0,0 +1,10 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+#ifndef __KVM_X86_MMU_TDP_ITER_H
-+#define __KVM_X86_MMU_TDP_ITER_H
++#ifndef __KVM_X86_MMU_TDP_MMU_H
++#define __KVM_X86_MMU_TDP_MMU_H
 +
 +#include <linux/kvm_host.h>
 +
-+#include "mmu.h"
-+
-+/*
-+ * A TDP iterator performs a pre-order walk over a TDP paging structure.
-+ */
-+struct tdp_iter {
-+	/*
-+	 * The iterator will traverse the paging structure towards the mapping
-+	 * for this GFN.
-+	 */
-+	gfn_t goal_gfn;
-+	/* Pointers to the page tables traversed to reach the current SPTE */
-+	u64 *pt_path[PT64_ROOT_MAX_LEVEL];
-+	/* A pointer to the current SPTE */
-+	u64 *sptep;
-+	/* The lowest GFN mapped by the current SPTE */
-+	gfn_t gfn;
-+	/* The level of the root page given to the iterator */
-+	int root_level;
-+	/* The lowest level the iterator should traverse to */
-+	int min_level;
-+	/* The iterator's current level within the paging structure */
-+	int level;
-+	/* A snapshot of the value at sptep */
-+	u64 old_spte;
-+	/*
-+	 * Whether the iterator has a valid state. This will be false if the
-+	 * iterator walks off the end of the paging structure.
-+	 */
-+	bool valid;
-+};
-+
-+/*
-+ * Iterates over every SPTE mapping the GFN range [start, end) in a
-+ * preorder traversal.
-+ */
-+#define for_each_tdp_pte(iter, root, root_level, start, end) \
-+	for (tdp_iter_start(&iter, root, root_level, PG_LEVEL_4K, start); \
-+	     iter.valid && iter.gfn < end;		     \
-+	     tdp_iter_next(&iter))
-+
-+u64 *spte_to_child_pt(u64 pte, int level);
-+
-+void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
-+		    int min_level, gfn_t goal_gfn);
-+void tdp_iter_next(struct tdp_iter *iter);
-+void tdp_iter_refresh_walk(struct tdp_iter *iter);
-+
-+#endif /* __KVM_X86_MMU_TDP_ITER_H */
++void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
++void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
++#endif /* __KVM_X86_MMU_TDP_MMU_H */
 -- 
 2.26.2
 
