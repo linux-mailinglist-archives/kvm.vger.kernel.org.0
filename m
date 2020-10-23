@@ -2,75 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C88C297616
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 19:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F8332976E0
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 20:24:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1753809AbgJWRs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 13:48:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39740 "EHLO mail.kernel.org"
+        id S1754652AbgJWSXw convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 23 Oct 2020 14:23:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52328 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S462375AbgJWRs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Oct 2020 13:48:56 -0400
-Received: from kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net (unknown [163.114.132.6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2E2A021582;
-        Fri, 23 Oct 2020 17:48:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603475335;
-        bh=yB/s/IuPvxvA/D6puPVcHV6lCpGyQvaLhZjmJ20tayI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=k9fHBrAYM+wp3NSCtKkRtPQhXi4dbODGDL1e5+yrI0yvizi07AfTLwsncPus7fsq3
-         PgzedNtYAq/z8dABaFdKA5m0OuRfVF24Yw3iSKjqeu+QWxiEWHLtB6J+olk3nzZOzR
-         okJSUOlRqfDaLjGwcw8+aGODIQel3BFuv/X1NEiQ=
-Date:   Fri, 23 Oct 2020 10:48:53 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Josh Don <joshdon@google.com>
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, Xi Wang <xii@google.com>
-Subject: Re: [PATCH 1/3] sched: better handling for busy polling loops
-Message-ID: <20201023104853.55ef1c20@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20201023032944.399861-1-joshdon@google.com>
-References: <20201023032944.399861-1-joshdon@google.com>
+        id S462161AbgJWSXw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Oct 2020 14:23:52 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 209253] Loss of connectivity on guest after important host <->
+ guest traffic
+Date:   Fri, 23 Oct 2020 18:23:51 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: alex.williamson@redhat.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-209253-28872-GxxLUvoYEs@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209253-28872@https.bugzilla.kernel.org/>
+References: <bug-209253-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Oct 2020 20:29:42 -0700 Josh Don wrote:
-> Busy polling loops in the kernel such as network socket poll and kvm
-> halt polling have performance problems related to process scheduler load
-> accounting.
-> 
-> Both of the busy polling examples are opportunistic - they relinquish
-> the cpu if another thread is ready to run.
+https://bugzilla.kernel.org/show_bug.cgi?id=209253
 
-That makes it sound like the busy poll code is trying to behave like an
-idle task. I thought need_resched() meant we leave when we run out of
-slice, or kernel needs to go through a resched for internal reasons. No?
+--- Comment #7 from Alex Williamson (alex.williamson@redhat.com) ---
+Color me suspicious, but there are backtraces from two configurations in the
+comments here that have no vfio devices, the original post and Justin's second
+trace.  The identified commit can only affect vfio configurations.
 
-> This design, however, doesn't
-> extend to multiprocessor load balancing very well. The scheduler still
-> sees the busy polling cpu as 100% busy and will be less likely to put
-> another thread on that cpu. In other words, if all cores are 100%
-> utilized and some of them are running real workloads and some others are
-> running busy polling loops, newly woken up threads will not prefer the
-> busy polling cpus. System wide throughput and latency may suffer.
+All of the backtraces seem to be from triggering this warning:
 
-IDK how well this extends to networking. Busy polling in networking is
-a conscious trade-off of CPU for latency, if application chooses to
-busy poll (which isn't the default) we should respect that.
+__u64 eventfd_signal(struct eventfd_ctx *ctx, __u64 n)
+{
+        unsigned long flags;
 
-Is your use case primarily kvm?
+        /*
+         * Deadlock or stack overflow issues can happen if we recurse here
+         * through waitqueue wakeup handlers. If the caller users potentially
+         * nested waitqueues with custom wakeup handlers, then it should
+         * check eventfd_signal_count() before calling this function. If
+         * it returns true, the eventfd_signal() call should be deferred to a
+         * safe context.
+         */
+        if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count)))
+                return 0;
+
+This cpu-local counter is only incremented while holding a spinlock with IRQs
+disabled while handling the wait queue.
+
+It's not obvious to me how the backtraces shown can lead to recursive eventfd
+signals.  I've setup a configuration for stress testing, but any detailed
+description of a reliable reproducer would be appreciated.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
