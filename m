@@ -2,164 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E455F2971D9
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 17:02:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93E06297262
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 17:34:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S465500AbgJWPB7 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 23 Oct 2020 11:01:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42580 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S461452AbgJWPB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Oct 2020 11:01:59 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209831] New: Time spent on behalf of vcpu is not accounted as
- guest time
-Date:   Fri, 23 Oct 2020 15:01:57 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: mkoutny@suse.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-209831-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S465911AbgJWPei (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 11:34:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50615 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S465827AbgJWPeh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 11:34:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603467276;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ADAkD04qBn0B56sR0AT6lBpOwDqugN8IZrafwTxz76g=;
+        b=eG88lGXGygBi0iqfHOorbRDDY27yfRke7h7SuhIx5J+3s3D7Sj9XcAYe5KWu3lZexvsPg1
+        gjI+61y10+4t4AVLL0rHMU/bK572E41XqhIcZC+N0oDWmlKPs2JEBNVHLFbJpdhTu1oxx+
+        kF9kabttyc4w2LA//lLWoFi5h1FAl4M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-6fLU9xqyN5Wrrt4Zl_bywg-1; Fri, 23 Oct 2020 11:34:33 -0400
+X-MC-Unique: 6fLU9xqyN5Wrrt4Zl_bywg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB22818B9F09;
+        Fri, 23 Oct 2020 15:34:31 +0000 (UTC)
+Received: from redhat.com (ovpn-113-117.ams2.redhat.com [10.36.113.117])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C41070597;
+        Fri, 23 Oct 2020 15:34:28 +0000 (UTC)
+Date:   Fri, 23 Oct 2020 11:34:25 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, kuba@kernel.org
+Subject: Re: [PATCH net] vhost_vdpa: Return -EFUALT if copy_from_user() fails
+Message-ID: <20201023113326-mutt-send-email-mst@kernel.org>
+References: <20201023120853.GI282278@mwanda>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201023120853.GI282278@mwanda>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209831
+On Fri, Oct 23, 2020 at 03:08:53PM +0300, Dan Carpenter wrote:
+> The copy_to/from_user() functions return the number of bytes which we
+> weren't able to copy but the ioctl should return -EFAULT if they fail.
+> 
+> Fixes: a127c5bbb6a8 ("vhost-vdpa: fix backend feature ioctls")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-            Bug ID: 209831
-           Summary: Time spent on behalf of vcpu is not accounted as guest
-                    time
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.9.0-2.gb1f22f7-default
-          Hardware: x86-64
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: mkoutny@suse.com
-        Regression: No
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Needed for stable I guess.
 
-## Reproduction steps
+> ---
+>  drivers/vhost/vdpa.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 62a9bb0efc55..c94a97b6bd6d 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -428,12 +428,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+>  	void __user *argp = (void __user *)arg;
+>  	u64 __user *featurep = argp;
+>  	u64 features;
+> -	long r;
+> +	long r = 0;
+>  
+>  	if (cmd == VHOST_SET_BACKEND_FEATURES) {
+> -		r = copy_from_user(&features, featurep, sizeof(features));
+> -		if (r)
+> -			return r;
+> +		if (copy_from_user(&features, featurep, sizeof(features)))
+> +			return -EFAULT;
+>  		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+>  			return -EOPNOTSUPP;
+>  		vhost_set_backend_features(&v->vdev, features);
+> @@ -476,7 +475,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+>  		break;
+>  	case VHOST_GET_BACKEND_FEATURES:
+>  		features = VHOST_VDPA_BACKEND_FEATURES;
+> -		r = copy_to_user(featurep, &features, sizeof(features));
+> +		if (copy_to_user(featurep, &features, sizeof(features)))
+> +			r = -EFAULT;
+>  		break;
+>  	default:
+>  		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
 
-1) Start a Qemu/KVM guest
-2) On the host, start watching /proc/stat
-
-> while sleep 1 ; do date +"%s.%N%t" | tr -d "\n" ; grep "cpu " /proc/stat |
-> sed 's/cpu//' ; done | \
->         awk '    {for (i=1; i < 12; ++i) {diff[i] = $i-prev[i]; prev[i]=$i;
->         printf("%.2f\t", diff[i]/diff[1]);} print ""; }'
-
-3) In the guest, keep a vcpu busy, `while true ; do true ; done`
-
-4) Watch fields of /proc/stat grow
-
-## Expected behavior
-
-The cpu field (9) guest time grows at ~USER_HZ/s (typically 100). Possibly,
-field (10) guest_nice grows. (Not sure about other fields.)
-
-## Actual behavior
-
-The cpu fields (9) guest and (10) guest_nice time remain 0.
-
-## Additional information
-
-host kernel: 5.9.0-2.gb1f22f7-default
-guest kernel: 5.3.12-1
-host config:
-  CONFIG_VIRT_CPU_ACCOUNTING=y
-  CONFIG_VIRT_CPU_ACCOUNTING_GEN=y
-  CONFIG_HAVE_VIRT_CPU_ACCOUNTING_GEN=y
-Qemu: qemu-x86-5.1.0-7.1.x86_64
-Qemu command: 
-> qemu       19144  1.9 10.0 4590592 808196 ?      Sl   14:55   2:01
-> /usr/bin/qemu-system-x86_64 ... -machine
-> pc-q35-4.0,accel=kvm,usb=off,vmport=off,dump-guest-core=off
-Qemu full command: 
-> qemu       19144  1.9 10.0 4590592 808196 ?      Sl   14:55   2:01
-> /usr/bin/qemu-system-x86_64 -name
-> guest=opensusetumbleweed-01,debug-threads=on -S -object
-> secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-1-opensusetumbleweed-0/master-key.aes
-> -machine pc-q35-4.0,accel=kvm,usb=off,vmport=off,dump-guest-core=off -cpu
-> Broadwell-IBRS,vme=on,ss=on,vmx=on,pdcm=on,f16c=on,rdrand=on,hypervisor=on,arat=on,tsc-adjust=on,umip=on,md-clear=on,stibp=on,arch-capabilities=on,ssbd=on,xsaveopt=on,pdpe1gb=on,abm=on,ibpb=on,amd-stibp=on,amd-ssbd=on,skip-l1dfl-vmentry=on,pschange-mc-no=on
-> -m 2048 -overcommit mem-lock=off -smp 2,sockets=2,cores=1,threads=1 -uuid
-> 16e8e5b8-7ce1-44b1-9a5a-4fabfc274d8d -no-user-config -nodefaults -chardev
-> socket,id=charmonitor,fd=31,server,nowait -mon
-> chardev=charmonitor,id=monitor,mode=control -rtc base=utc,driftfix=slew
-> -global kvm-pit.lost_tick_policy=delay -no-hpet -no-shutdown -global
-> ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 -boot strict=on -device
-> pcie-root-port,port=0x10,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x2
-> -device pcie-root-port,port=0x11,chassis=2,id=pci.2,bus=pcie.0,addr=0x2.0x1
-> -device pcie-root-port,port=0x12,chassis=3,id=pci.3,bus=pcie.0,addr=0x2.0x2
-> -device pcie-root-port,port=0x13,chassis=4,id=pci.4,bus=pcie.0,addr=0x2.0x3
-> -device pcie-root-port,port=0x14,chassis=5,id=pci.5,bus=pcie.0,addr=0x2.0x4
-> -device pcie-root-port,port=0x15,chassis=6,id=pci.6,bus=pcie.0,addr=0x2.0x5
-> -device pcie-root-port,port=0x16,chassis=7,id=pci.7,bus=pcie.0,addr=0x2.0x6
-> -device qemu-xhci,p2=15,p3=15,id=usb,bus=pci.2,addr=0x0 -device
-> virtio-serial-pci,id=virtio-serial0,bus=pci.3,addr=0x0 -blockdev
-> {"driver":"file","filename":"/images/opensusetumbleweed.qcow2","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"unmap"}
-> -blockdev
-> {"node-name":"libvirt-2-format","read-only":false,"driver":"qcow2","file":"libvirt-2-storage","backing":null}
-> -device
-> virtio-blk-pci,bus=pci.4,addr=0x0,drive=libvirt-2-format,id=virtio-disk0,bootindex=1
-> -blockdev
-> {"driver":"file","filename":"/images/opensusetumbleweed-01-swap.img","node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"}
-> -blockdev
-> {"node-name":"libvirt-1-format","read-only":false,"driver":"raw","file":"libvirt-1-storage"}
-> -device
-> virtio-blk-pci,bus=pci.7,addr=0x0,drive=libvirt-1-format,id=virtio-disk1
-> -netdev tap,fd=33,id=hostnet0,vhost=on,vhostfd=34 -device
-> virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:34:40:b9,bus=pci.1,addr=0x0
-> -chardev pty,id=charserial0 -device isa-serial,chardev=charserial0,id=serial0
-> -chardev socket,id=charchannel0,fd=35,server,nowait -device
-> virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=org.qemu.guest_agent.0
-> -chardev spicevmc,id=charchannel1,name=vdagent -device
-> virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=com.redhat.spice.0
-> -device usb-tablet,id=input0,bus=usb.0,port=1 -spice
-> port=5900,addr=127.0.0.1,disable-ticketing,image-compression=off,seamless-migration=on
-> -device
-> qxl-vga,id=video0,ram_size=67108864,vram_size=67108864,vram64_size_mb=0,vgamem_mb=16,max_outputs=1,bus=pcie.0,addr=0x1
-> -device ich9-intel-hda,id=sound0,bus=pcie.0,addr=0x1b -device
-> hda-duplex,id=sound0-codec0,bus=sound0.0,cad=0 -chardev
-> spicevmc,id=charredir0,name=usbredir -device
-> usb-redir,chardev=charredir0,id=redir0,bus=usb.0,port=2 -chardev
-> spicevmc,id=charredir1,name=usbredir -device
-> usb-redir,chardev=charredir1,id=redir1,bus=usb.0,port=3 -device
-> virtio-balloon-pci,id=balloon0,bus=pci.5,addr=0x0 -object
-> rng-random,id=objrng0,filename=/dev/urandom -device
-> virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.6,addr=0x0 -sandbox
-> on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny -msg
-> timestamp=on                                                                  
-
-## Past information
-
-I saw similar mismatch with v5.5-based kernel where the KVM vcpu time was
-accounted both to user (1) and guest (9) components.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
