@@ -2,132 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56B0C296EA5
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 14:23:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1DE296F76
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 14:37:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S463656AbgJWMXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 08:23:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38062 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S463684AbgJWMXL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Oct 2020 08:23:11 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6B1C0613D5
-        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 05:23:09 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id w23so143699wmi.4
-        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 05:23:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=hp7lChw6Uow+58XPniSHemIeAoNErbB/sdK6im80Iug=;
-        b=URbjYqZvij6vMp6zpIk/3WlniapSCelkh8qPhM9XSJmSi3JP0Pkq6JfYZq+gC0V2Ja
-         Jq8vCQ4Ho/GAm6SQXrzJhiajzuA2XAwJXKB1Cll6tMyrVwJYz4NCmG2PdfE0KkUS7bh0
-         l5/AnqPDLrJU4JyaIv3jCsFac60g5JtxDcFVQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=hp7lChw6Uow+58XPniSHemIeAoNErbB/sdK6im80Iug=;
-        b=UDfLGuZIm+rEuav9S7wAb8ozt1Pzuyw94nq4qFZ4V4A5z56D+dCM/bmTpt3LRzIQ1O
-         nBNyPmZnsHs/xtMre+t3CxBbIr8OtKs+sHXJWoi7wJlckxjHKrVhMN6RIiOQNGAKdIrC
-         Gaua9fDIsHvqfp7ZIpPBgeBFxRTIFZYXyXKG3Fsb6yPz9Go0YwnfxkAUv4tv2Ru8VbIM
-         +KD9s9WlchChBU/CclfX57kBaYpoKVVr4LR7wy+z38aRMFi04dATo+2zPTXYj/lIHguM
-         n+1zyFUQV2BmLmyYRHKgRJzeSm7oNLm6TFcwFNmVDJwhlo8jVyMkr5Y+FiOFAhzfVeGv
-         qbAg==
-X-Gm-Message-State: AOAM5319xPSTNfmpOuTeXmhCPdDhdftL5ldZ8GPsWfyReWPtmIl5wjhY
-        l2d4wAZJzTDA4Vo3FQ1p7XL5yg==
-X-Google-Smtp-Source: ABdhPJwqZWBmXRQ8vY8ZKJrjdPXGP2WILf15a1TrVl8Pgis8iT7Odd2hX51Nk7fKP5ClvyukHiQ2vg==
-X-Received: by 2002:a1c:4d05:: with SMTP id o5mr1994877wmh.94.1603455788583;
-        Fri, 23 Oct 2020 05:23:08 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id y4sm3056484wrp.74.2020.10.23.05.23.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Oct 2020 05:23:08 -0700 (PDT)
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-To:     DRI Development <dri-devel@lists.freedesktop.org>
-Cc:     Intel Graphics Development <intel-gfx@lists.freedesktop.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
+        id S463941AbgJWMhZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 08:37:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59184 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S372958AbgJWMhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Oct 2020 08:37:25 -0400
+Received: from kernel.org (unknown [87.70.96.83])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0709E2085B;
+        Fri, 23 Oct 2020 12:37:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603456644;
+        bh=6bYTWe4ruS8+LB8nHf1nJspiMoagfv9P4NHAjSqQuV0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=yQDZVDnq7DkgFwnpnRIYjaxLg96l7qBfzqLCRkSwWprLsiscmOLA9f8qTbncBhiat
+         vmM8FdlrJrjlEfGNU3iw7mFWERgPpl7r3ak+h40UUiXk7upNByy7433tMNYYo2EN4E
+         WhAsTsr6WqadQX3pKMtlTdCf4QpzPdJLLYg8+Qa8=
+Date:   Fri, 23 Oct 2020 15:37:12 +0300
+From:   Mike Rapoport <rppt@kernel.org>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
         Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, linux-mm@kvack.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH 39/65] vfio/type1: Mark follow_pfn as unsafe
-Date:   Fri, 23 Oct 2020 14:21:50 +0200
-Message-Id: <20201023122216.2373294-39-daniel.vetter@ffwll.ch>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201023122216.2373294-1-daniel.vetter@ffwll.ch>
-References: <20201021163242.1458885-1-daniel.vetter@ffwll.ch>
- <20201023122216.2373294-1-daniel.vetter@ffwll.ch>
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        Liran Alon <liran.alon@oracle.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFCv2 15/16] KVM: Unmap protected pages from direct mapping
+Message-ID: <20201023123712.GC392079@kernel.org>
+References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
+ <20201020061859.18385-16-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201020061859.18385-16-kirill.shutemov@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The code seems to stuff these pfns into iommu pts (or something like
-that, I didn't follow), but there's no mmu_notifier to ensure that
-access is synchronized with pte updates.
+On Tue, Oct 20, 2020 at 09:18:58AM +0300, Kirill A. Shutemov wrote:
+> If the protected memory feature enabled, unmap guest memory from
+> kernel's direct mappings.
+> 
+> Migration and KSM is disabled for protected memory as it would require a
+> special treatment.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> ---
+>  include/linux/mm.h       |  3 +++
+>  mm/huge_memory.c         |  8 ++++++++
+>  mm/ksm.c                 |  2 ++
+>  mm/memory.c              | 12 ++++++++++++
+>  mm/rmap.c                |  4 ++++
+>  virt/lib/mem_protected.c | 21 +++++++++++++++++++++
+>  6 files changed, 50 insertions(+)
+> 
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index ee274d27e764..74efc51e63f0 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -671,6 +671,9 @@ static inline bool vma_is_kvm_protected(struct vm_area_struct *vma)
+>  	return vma->vm_flags & VM_KVM_PROTECTED;
+>  }
+>  
+> +void kvm_map_page(struct page *page, int nr_pages);
+> +void kvm_unmap_page(struct page *page, int nr_pages);
 
-Hence mark these as unsafe. This means that with
-CONFIG_STRICT_FOLLOW_PFN, these will be rejected.
+This still does not seem right ;-)
 
-Real fix is to wire up an mmu_notifier ... somehow. Probably means any
-invalidate is a fatal fault for this vfio device, but then this
-shouldn't ever happen if userspace is reasonable.
+And I still think that map/unmap primitives shoud be a part of the
+generic mm rather than exported by KVM.
 
-Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: John Hubbard <jhubbard@nvidia.com>
-Cc: Jérôme Glisse <jglisse@redhat.com>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: linux-mm@kvack.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-samsung-soc@vger.kernel.org
-Cc: linux-media@vger.kernel.org
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: kvm@vger.kernel.org
-Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
----
- drivers/vfio/vfio_iommu_type1.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> +
+>  #ifdef CONFIG_SHMEM
+>  /*
+>   * The vma_is_shmem is not inline because it is used only by slow
+> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+> index ec8cf9a40cfd..40974656cb43 100644
+> --- a/mm/huge_memory.c
+> +++ b/mm/huge_memory.c
+> @@ -627,6 +627,10 @@ static vm_fault_t __do_huge_pmd_anonymous_page(struct vm_fault *vmf,
+>  		spin_unlock(vmf->ptl);
+>  		count_vm_event(THP_FAULT_ALLOC);
+>  		count_memcg_event_mm(vma->vm_mm, THP_FAULT_ALLOC);
+> +
+> +		/* Unmap page from direct mapping */
+> +		if (vma_is_kvm_protected(vma))
+> +			kvm_unmap_page(page, HPAGE_PMD_NR);
+>  	}
+>  
+>  	return 0;
+> @@ -1689,6 +1693,10 @@ int zap_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
+>  			page_remove_rmap(page, true);
+>  			VM_BUG_ON_PAGE(page_mapcount(page) < 0, page);
+>  			VM_BUG_ON_PAGE(!PageHead(page), page);
+> +
+> +			/* Map the page back to the direct mapping */
+> +			if (vma_is_kvm_protected(vma))
+> +				kvm_map_page(page, HPAGE_PMD_NR);
+>  		} else if (thp_migration_supported()) {
+>  			swp_entry_t entry;
+>  
+> diff --git a/mm/ksm.c b/mm/ksm.c
+> index 9afccc36dbd2..c720e271448f 100644
+> --- a/mm/ksm.c
+> +++ b/mm/ksm.c
+> @@ -528,6 +528,8 @@ static struct vm_area_struct *find_mergeable_vma(struct mm_struct *mm,
+>  		return NULL;
+>  	if (!(vma->vm_flags & VM_MERGEABLE) || !vma->anon_vma)
+>  		return NULL;
+> +	if (vma_is_kvm_protected(vma))
+> +		return NULL;
+>  	return vma;
+>  }
+>  
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 2c9756b4e52f..e28bd5f902a7 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -1245,6 +1245,11 @@ static unsigned long zap_pte_range(struct mmu_gather *tlb,
+>  				    likely(!(vma->vm_flags & VM_SEQ_READ)))
+>  					mark_page_accessed(page);
+>  			}
+> +
+> +			/* Map the page back to the direct mapping */
+> +			if (vma_is_anonymous(vma) && vma_is_kvm_protected(vma))
+> +				kvm_map_page(page, 1);
+> +
+>  			rss[mm_counter(page)]--;
+>  			page_remove_rmap(page, false);
+>  			if (unlikely(page_mapcount(page) < 0))
+> @@ -3466,6 +3471,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
+>  	struct page *page;
+>  	vm_fault_t ret = 0;
+>  	pte_t entry;
+> +	bool set = false;
+>  
+>  	/* File mapping without ->vm_ops ? */
+>  	if (vma->vm_flags & VM_SHARED)
+> @@ -3554,6 +3560,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
+>  	inc_mm_counter_fast(vma->vm_mm, MM_ANONPAGES);
+>  	page_add_new_anon_rmap(page, vma, vmf->address, false);
+>  	lru_cache_add_inactive_or_unevictable(page, vma);
+> +	set = true;
+>  setpte:
+>  	set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);
+>  
+> @@ -3561,6 +3568,11 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
+>  	update_mmu_cache(vma, vmf->address, vmf->pte);
+>  unlock:
+>  	pte_unmap_unlock(vmf->pte, vmf->ptl);
+> +
+> +	/* Unmap page from direct mapping */
+> +	if (vma_is_kvm_protected(vma) && set)
+> +		kvm_unmap_page(page, 1);
+> +
+>  	return ret;
+>  release:
+>  	put_page(page);
+> diff --git a/mm/rmap.c b/mm/rmap.c
+> index 9425260774a1..247548d6d24b 100644
+> --- a/mm/rmap.c
+> +++ b/mm/rmap.c
+> @@ -1725,6 +1725,10 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
+>  
+>  static bool invalid_migration_vma(struct vm_area_struct *vma, void *arg)
+>  {
+> +	/* TODO */
+> +	if (vma_is_kvm_protected(vma))
+> +		return true;
+> +
+>  	return vma_is_temporary_stack(vma);
+>  }
+>  
+> diff --git a/virt/lib/mem_protected.c b/virt/lib/mem_protected.c
+> index 1dfe82534242..9d2ef99285e5 100644
+> --- a/virt/lib/mem_protected.c
+> +++ b/virt/lib/mem_protected.c
+> @@ -30,6 +30,27 @@ void kvm_unmap_page_atomic(void *vaddr)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_unmap_page_atomic);
+>  
+> +void kvm_map_page(struct page *page, int nr_pages)
+> +{
+> +	int i;
+> +
+> +	/* Clear page before returning it to the direct mapping */
+> +	for (i = 0; i < nr_pages; i++) {
+> +		void *p = kvm_map_page_atomic(page + i);
+> +		memset(p, 0, PAGE_SIZE);
+> +		kvm_unmap_page_atomic(p);
+> +	}
+> +
+> +	kernel_map_pages(page, nr_pages, 1);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_map_page);
+> +
+> +void kvm_unmap_page(struct page *page, int nr_pages)
+> +{
+> +	kernel_map_pages(page, nr_pages, 0);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_unmap_page);
+> +
+>  int kvm_init_protected_memory(void)
+>  {
+>  	guest_map_ptes = kmalloc_array(num_possible_cpus(),
+> -- 
+> 2.26.2
+> 
+> 
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 5fbf0c1f7433..a4d53f3d0a35 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -421,7 +421,7 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
- {
- 	int ret;
- 
--	ret = follow_pfn(vma, vaddr, pfn);
-+	ret = unsafe_follow_pfn(vma, vaddr, pfn);
- 	if (ret) {
- 		bool unlocked = false;
- 
-@@ -435,7 +435,7 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
- 		if (ret)
- 			return ret;
- 
--		ret = follow_pfn(vma, vaddr, pfn);
-+		ret = unsafe_follow_pfn(vma, vaddr, pfn);
- 	}
- 
- 	return ret;
 -- 
-2.28.0
-
+Sincerely yours,
+Mike.
