@@ -2,42 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D0752973B9
-	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:30:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 368332973BC
+	for <lists+kvm@lfdr.de>; Fri, 23 Oct 2020 18:30:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1750701AbgJWQa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 12:30:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54738 "EHLO
+        id S1751509AbgJWQab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Oct 2020 12:30:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35711 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750673AbgJWQa3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:29 -0400
+        by vger.kernel.org with ESMTP id S1750702AbgJWQab (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Oct 2020 12:30:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603470628;
+        s=mimecast20190719; t=1603470630;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=nWSnZNE5AMsZ/SnxNthTx2FSlmT82qW0XTqjQ2uPf6k=;
-        b=SCQw1gyjHlIIw+ORYcT9BjLC9cECIyadlZ20GmDT+HzknKrGs29n+9D23+2G98ZzkJHf1E
-        01uQZrcL67XlePHbyjTVdhJL6uHbkcaecGz68IfbaS/JipwEpSJplybs/RolEjo0opywr8
-        1VygyiM7ozt038zZFYi1YCrPcavRFjk=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pu5pTTwDQG7Y2LlVE/UD0j9Vgozx1GRFAEtYr8veM/0=;
+        b=Xr7yPuHWva8hBXl5mlTSd7L4lOKHNlb75oa7WaMeH/kTT9qJTdNislYmjVotBn8pOqhPET
+        NGXeoChcRv0O/CRswHDLBDPFZBu+gzyG2/0EXmUibOFCQQy/fZnUomX9hW+GRhVL2ggnjb
+        qr342/01Gk1XOnknwgRYrkI3VFwFkTQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-K6-NilGUNFiSFSA-qQXypQ-1; Fri, 23 Oct 2020 12:30:26 -0400
-X-MC-Unique: K6-NilGUNFiSFSA-qQXypQ-1
+ us-mta-593-25jy23OHOsm_xqWT5wge5w-1; Fri, 23 Oct 2020 12:30:27 -0400
+X-MC-Unique: 25jy23OHOsm_xqWT5wge5w-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8ADB804B7E;
-        Fri, 23 Oct 2020 16:30:24 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 866A21891E92;
+        Fri, 23 Oct 2020 16:30:26 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 722F25DA78;
-        Fri, 23 Oct 2020 16:30:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 266EF5D9E2;
+        Fri, 23 Oct 2020 16:30:26 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     bgardon@google.com
-Subject: [PATCH 00/22] Introduce the TDP MMU
-Date:   Fri, 23 Oct 2020 12:30:02 -0400
-Message-Id: <20201023163024.2765558-1-pbonzini@redhat.com>
+Subject: [PATCH 03/22] KVM: mmu: Separate updating a PTE from kvm_set_pte_rmapp
+Date:   Fri, 23 Oct 2020 12:30:05 -0400
+Message-Id: <20201023163024.2765558-4-pbonzini@redhat.com>
+In-Reply-To: <20201023163024.2765558-1-pbonzini@redhat.com>
+References: <20201023163024.2765558-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
@@ -45,65 +48,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I will just leave a link to Ben's detailed explanation
+The TDP MMU's own function for the changed-PTE notifier will need to be
+update a PTE in the exact same way as the shadow MMU.  Rather than
+re-implementing this logic, factor the SPTE creation out of kvm_set_pte_rmapp.
 
-https://lore.kernel.org/kvm/20201014182700.2888246-1-bgardon@google.com/>
+Extracted out of a patch by Ben Gardon. <bgardon@google.com>
 
-This series puts together all the small changes that were pointed out
-on list; the only additions on my part are tracepoints and the introduction
-of two source files spte.c and spte.h for code common to mmu.c and tdp_mmu.c.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-Ben Gardon (19):
-  kvm: mmu: Separate making non-leaf sptes from link_shadow_page
-  kvm: x86/mmu: Separate making SPTEs from set_spte
-  kvm: x86/mmu: Introduce tdp_iter
-  kvm: x86/mmu: Init / Uninit the TDP MMU
-  kvm: x86/mmu: Allocate and free TDP MMU roots
-  kvm: x86/mmu: Add functions to handle changed TDP SPTEs
-  kvm: x86/mmu: Support zapping SPTEs in the TDP MMU
-  kvm: x86/mmu: Remove disallowed_hugepage_adjust shadow_walk_iterator
-    arg
-  kvm: x86/mmu: Add TDP MMU PF handler
-  kvm: x86/mmu: Allocate struct kvm_mmu_pages for all pages in TDP MMU
-  kvm: x86/mmu: Support invalidate range MMU notifier for TDP MMU
-  kvm: x86/mmu: Add access tracking for tdp_mmu
-  kvm: x86/mmu: Support changed pte notifier in tdp MMU
-  kvm: x86/mmu: Support dirty logging for the TDP MMU
-  kvm: x86/mmu: Support disabling dirty logging for the tdp MMU
-  kvm: x86/mmu: Support write protection for nesting in tdp MMU
-  kvm: x86/mmu: Support MMIO in the TDP MMU
-  kvm: x86/mmu: Don't clear write flooding count for direct roots
-  kvm: x86/mmu: NX largepage recovery for TDP MMU
-
-Paolo Bonzini (2):
-  KVM: mmu: Separate updating a PTE from kvm_set_pte_rmapp
-  KVM: mmu: extract spte.h and spte.c
-
-Peter Xu (1):
-  KVM: Cache as_id in kvm_memory_slot
-
- arch/x86/include/asm/kvm_host.h |   14 +
- arch/x86/kvm/Makefile           |    3 +-
- arch/x86/kvm/mmu/mmu.c          |  785 ++++++---------------
- arch/x86/kvm/mmu/mmu_internal.h |   88 ++-
- arch/x86/kvm/mmu/mmutrace.h     |    8 +-
- arch/x86/kvm/mmu/paging_tmpl.h  |    3 +-
- arch/x86/kvm/mmu/spte.c         |  318 +++++++++
- arch/x86/kvm/mmu/spte.h         |  252 +++++++
- arch/x86/kvm/mmu/tdp_iter.c     |  182 +++++
- arch/x86/kvm/mmu/tdp_iter.h     |   60 ++
- arch/x86/kvm/mmu/tdp_mmu.c      | 1157 +++++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.h      |   48 ++
- include/linux/kvm_host.h        |    2 +
- virt/kvm/kvm_main.c             |   12 +-
- 14 files changed, 2329 insertions(+), 603 deletions(-)
- create mode 100644 arch/x86/kvm/mmu/spte.c
- create mode 100644 arch/x86/kvm/mmu/spte.h
- create mode 100644 arch/x86/kvm/mmu/tdp_iter.c
- create mode 100644 arch/x86/kvm/mmu/tdp_iter.h
- create mode 100644 arch/x86/kvm/mmu/tdp_mmu.c
- create mode 100644 arch/x86/kvm/mmu/tdp_mmu.h
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ef4a63af8fce..3dec4744ab9c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1747,6 +1747,21 @@ static int kvm_unmap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 	return kvm_zap_rmapp(kvm, rmap_head);
+ }
+ 
++static u64 kvm_mmu_changed_pte_notifier_make_spte(u64 old_spte, kvm_pfn_t new_pfn)
++{
++	u64 new_spte;
++
++	new_spte = old_spte & ~PT64_BASE_ADDR_MASK;
++	new_spte |= (u64)new_pfn << PAGE_SHIFT;
++
++	new_spte &= ~PT_WRITABLE_MASK;
++	new_spte &= ~SPTE_HOST_WRITEABLE;
++
++	new_spte = mark_spte_for_access_track(new_spte);
++
++	return new_spte;
++}
++
+ static int kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 			     struct kvm_memory_slot *slot, gfn_t gfn, int level,
+ 			     unsigned long data)
+@@ -1772,13 +1787,8 @@ static int kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 			pte_list_remove(rmap_head, sptep);
+ 			goto restart;
+ 		} else {
+-			new_spte = *sptep & ~PT64_BASE_ADDR_MASK;
+-			new_spte |= (u64)new_pfn << PAGE_SHIFT;
+-
+-			new_spte &= ~PT_WRITABLE_MASK;
+-			new_spte &= ~SPTE_HOST_WRITEABLE;
+-
+-			new_spte = mark_spte_for_access_track(new_spte);
++			new_spte = kvm_mmu_changed_pte_notifier_make_spte(
++					*sptep, new_pfn);
+ 
+ 			mmu_spte_clear_track_bits(sptep);
+ 			mmu_spte_set(sptep, new_spte);
 -- 
 2.26.2
+
 
