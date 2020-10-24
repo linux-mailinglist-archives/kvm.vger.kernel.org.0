@@ -2,96 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 566E2297B0D
-	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 08:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5E8A297B66
+	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 10:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1759762AbgJXG3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Oct 2020 02:29:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50216 "EHLO
+        id S1759993AbgJXINd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Oct 2020 04:13:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34089 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1759756AbgJXG3N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 24 Oct 2020 02:29:13 -0400
+        by vger.kernel.org with ESMTP id S1759987AbgJXIKd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 24 Oct 2020 04:10:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603520952;
+        s=mimecast20190719; t=1603527029;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zNm+Nqq4sdY9gKwTOr5dT8TgTjmTU4f3Y+OcGbCbZdk=;
-        b=RnxRY8V1P4GAz1AXfO1NtIcByKz3sJhkUBydK890UZbUuCzTyufcYy+Iv2cz9LV4NmEk67
-        CIGFYyTz0PCA2gmdUG8TE/9ZykBspB8aXY1HDlogAR7PKS//g4EAdUU1fKMVWZ28zRMwYQ
-        WNW9pjPzBCX77hgJ1SFMNiSEp58HUKc=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-qQzzKMVeODm6qGCUYMaB_A-1; Sat, 24 Oct 2020 02:29:09 -0400
-X-MC-Unique: qQzzKMVeODm6qGCUYMaB_A-1
-Received: by mail-ed1-f72.google.com with SMTP id dn20so1448257edb.14
-        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 23:29:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zNm+Nqq4sdY9gKwTOr5dT8TgTjmTU4f3Y+OcGbCbZdk=;
-        b=rTIOUwYmFXLzuTVIkYSVYPvIBBUniswD1qhmDmaX+tA2IqYVvw01jQzogrneWlatB8
-         rqxao6ELYIucW4Inolf+RyU5sWd5tw4AmaXXhrHhXIcDgT6eNtj57HCeBqmSivT0T6H+
-         GlYjO94yd8wSBoH/coq+XAL6knnYbXUnWo0Zd4vNkZl2VBVbOCzuCWWiYGn19XJOdAXb
-         pLczhxItjLj005D4IbzrGTCxMmqFa1We3dLM8bjSe9UB/MhuVtp5s+sKL2oFOtNZe6Al
-         zmjoe1agwFJqt+zwWXn/w/NuE+Z3eNVU8VfjaG+rh01Zh5yq7OiAsH8Uqio20IKLoE6N
-         rr5g==
-X-Gm-Message-State: AOAM530mETB6W6IbvLID013cVIJd1IIh20WaBBlBZINX+xy1KFH0r5NM
-        157V443Aaa+4M9h5I0sYux8lGU6Z3ZFOGt86gwYvrbZzZDpBVppkmMDK/BlIe6ZBW3NvwSM8V7z
-        Lc0y0M5AiN/pU
-X-Received: by 2002:aa7:cacb:: with SMTP id l11mr5720783edt.332.1603520948272;
-        Fri, 23 Oct 2020 23:29:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxmuFu2/00OKrqJC7TpA1YpX8QYyZQZ1yN6UWIlIYuqj9OHVCBu8bLxjDr12UlhMYizflbQdg==
-X-Received: by 2002:aa7:cacb:: with SMTP id l11mr5720763edt.332.1603520948007;
-        Fri, 23 Oct 2020 23:29:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id i22sm1810746ejv.8.2020.10.23.23.29.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Oct 2020 23:29:07 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/mmu: Avoid modulo operator on 64-bit value to
- fix i386 build
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?Daniel_D=c3=adaz?= <daniel.diaz@linaro.org>
-References: <20201024031150.9318-1-sean.j.christopherson@intel.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MxP14utHMULsl3WXK0dJ6zVnCUZr6qoeodCunclasgs=;
+        b=fNT5fTGOhUPuPL2XrMp8Ii2z8qmB+Sic+g/rNl+0w6Sl+TnJufasAP1uG+WwmewsB/KTHj
+        GKDQVSMeelZ3C0YjbEgUvuDwtnlheVgBvBAhhb1sMXHhN7hCSXx9IW4xYzrqAShuu7Tk9v
+        Go1U2aQoETR35koGkHGhuh8MITH1+lU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-485-yLgipaYwOY2OHFz0_xmqIg-1; Sat, 24 Oct 2020 04:10:27 -0400
+X-MC-Unique: yLgipaYwOY2OHFz0_xmqIg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9A95186DD23;
+        Sat, 24 Oct 2020 08:10:25 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5CE025578A;
+        Sat, 24 Oct 2020 08:10:25 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <94427d37-03af-6d78-2039-cd326710904b@redhat.com>
-Date:   Sat, 24 Oct 2020 08:29:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] KVM: vmx: rename pi_init to avoid conflict with paride
+Date:   Sat, 24 Oct 2020 04:10:24 -0400
+Message-Id: <20201024081024.2798990-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201024031150.9318-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/10/20 05:11, Sean Christopherson wrote:
-> Replace a modulo operator with the more common pattern for computing the
-> gfn "offset" of a huge page to fix an i386 build error.
-> 
->   arch/x86/kvm/mmu/tdp_mmu.c:212: undefined reference to `__umoddi3'
-> 
-> Fixes: 2f2fad0897cb ("kvm: x86/mmu: Add functions to handle changed TDP SPTEs")
-> Reported-by: Daniel Díaz <daniel.diaz@linaro.org>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
-> 
-> Linus, do you want to take this directly so that it's in rc1?  I don't
-> know whether Paolo will be checking mail before then
+allyesconfig results in:
 
-Yes, I am.  I also have another bugfix, I was going to wait a couple
-days for any -rc1 issues to pop up but they came up faster than that.
+ld: drivers/block/paride/paride.o: in function `pi_init':
+(.text+0x1340): multiple definition of `pi_init'; arch/x86/kvm/vmx/posted_intr.o:posted_intr.c:(.init.text+0x0): first defined here
+make: *** [Makefile:1164: vmlinux] Error 1
 
-Paolo
+because commit:
+
+commit 8888cdd0996c2d51cd417f9a60a282c034f3fa28
+Author: Xiaoyao Li <xiaoyao.li@intel.com>
+Date:   Wed Sep 23 11:31:11 2020 -0700
+
+    KVM: VMX: Extract posted interrupt support to separate files
+
+added another pi_init(), though one already existed in the paride code.
+
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/posted_intr.c | 2 +-
+ arch/x86/kvm/vmx/posted_intr.h | 4 ++--
+ arch/x86/kvm/vmx/vmx.c         | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index e4e7adff818c..f02962dcc72c 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -222,7 +222,7 @@ void pi_wakeup_handler(void)
+ 	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+ }
+ 
+-void __init pi_init(int cpu)
++void __init pi_init_cpu(int cpu)
+ {
+ 	INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
+ 	spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
+index e53b97f82097..0bdc41391c5b 100644
+--- a/arch/x86/kvm/vmx/posted_intr.h
++++ b/arch/x86/kvm/vmx/posted_intr.h
+@@ -91,9 +91,9 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu);
+ int pi_pre_block(struct kvm_vcpu *vcpu);
+ void pi_post_block(struct kvm_vcpu *vcpu);
+ void pi_wakeup_handler(void);
+-void __init pi_init(int cpu);
++void __init pi_init_cpu(int cpu);
+ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
+ 		   bool set);
+ 
+-#endif /* __KVM_X86_VMX_POSTED_INTR_H */
+\ No newline at end of file
++#endif /* __KVM_X86_VMX_POSTED_INTR_H */
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 755896797a81..281c405c7ea3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8004,7 +8004,7 @@ static int __init vmx_init(void)
+ 	for_each_possible_cpu(cpu) {
+ 		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
+ 
+-		pi_init(cpu);
++		pi_init_cpu(cpu);
+ 	}
+ 
+ #ifdef CONFIG_KEXEC_CORE
+-- 
+2.26.2
 
