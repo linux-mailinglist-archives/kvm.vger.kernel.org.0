@@ -2,81 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DBA7297A79
-	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 05:12:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 566E2297B0D
+	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 08:29:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1759315AbgJXDMI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Oct 2020 23:12:08 -0400
-Received: from mga06.intel.com ([134.134.136.31]:38867 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759309AbgJXDMH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Oct 2020 23:12:07 -0400
-IronPort-SDR: D5OXP6KpamIb9aVNOSFKkZTTJQT7tLUkUDHFFUhlJuDOi3uzpsPSYjD3vlYiti0N+VOhBuitJp
- /2r60hwkENaA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9783"; a="229389569"
-X-IronPort-AV: E=Sophos;i="5.77,410,1596524400"; 
-   d="scan'208";a="229389569"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2020 20:11:59 -0700
-IronPort-SDR: bIZ2xj+aw96+Sk1yGTWgbb5Ogmaor9oKaSj9duSyedbvH1saqltNxrA9rOPpS3/YmqrJibpRFZ
- nKVX7ZkXQj6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,410,1596524400"; 
-   d="scan'208";a="354637310"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by fmsmga002.fm.intel.com with ESMTP; 23 Oct 2020 20:11:59 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S1759762AbgJXG3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Oct 2020 02:29:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50216 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1759756AbgJXG3N (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 24 Oct 2020 02:29:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603520952;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zNm+Nqq4sdY9gKwTOr5dT8TgTjmTU4f3Y+OcGbCbZdk=;
+        b=RnxRY8V1P4GAz1AXfO1NtIcByKz3sJhkUBydK890UZbUuCzTyufcYy+Iv2cz9LV4NmEk67
+        CIGFYyTz0PCA2gmdUG8TE/9ZykBspB8aXY1HDlogAR7PKS//g4EAdUU1fKMVWZ28zRMwYQ
+        WNW9pjPzBCX77hgJ1SFMNiSEp58HUKc=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-496-qQzzKMVeODm6qGCUYMaB_A-1; Sat, 24 Oct 2020 02:29:09 -0400
+X-MC-Unique: qQzzKMVeODm6qGCUYMaB_A-1
+Received: by mail-ed1-f72.google.com with SMTP id dn20so1448257edb.14
+        for <kvm@vger.kernel.org>; Fri, 23 Oct 2020 23:29:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zNm+Nqq4sdY9gKwTOr5dT8TgTjmTU4f3Y+OcGbCbZdk=;
+        b=rTIOUwYmFXLzuTVIkYSVYPvIBBUniswD1qhmDmaX+tA2IqYVvw01jQzogrneWlatB8
+         rqxao6ELYIucW4Inolf+RyU5sWd5tw4AmaXXhrHhXIcDgT6eNtj57HCeBqmSivT0T6H+
+         GlYjO94yd8wSBoH/coq+XAL6knnYbXUnWo0Zd4vNkZl2VBVbOCzuCWWiYGn19XJOdAXb
+         pLczhxItjLj005D4IbzrGTCxMmqFa1We3dLM8bjSe9UB/MhuVtp5s+sKL2oFOtNZe6Al
+         zmjoe1agwFJqt+zwWXn/w/NuE+Z3eNVU8VfjaG+rh01Zh5yq7OiAsH8Uqio20IKLoE6N
+         rr5g==
+X-Gm-Message-State: AOAM530mETB6W6IbvLID013cVIJd1IIh20WaBBlBZINX+xy1KFH0r5NM
+        157V443Aaa+4M9h5I0sYux8lGU6Z3ZFOGt86gwYvrbZzZDpBVppkmMDK/BlIe6ZBW3NvwSM8V7z
+        Lc0y0M5AiN/pU
+X-Received: by 2002:aa7:cacb:: with SMTP id l11mr5720783edt.332.1603520948272;
+        Fri, 23 Oct 2020 23:29:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxmuFu2/00OKrqJC7TpA1YpX8QYyZQZ1yN6UWIlIYuqj9OHVCBu8bLxjDr12UlhMYizflbQdg==
+X-Received: by 2002:aa7:cacb:: with SMTP id l11mr5720763edt.332.1603520948007;
+        Fri, 23 Oct 2020 23:29:08 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id i22sm1810746ejv.8.2020.10.23.23.29.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Oct 2020 23:29:07 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/mmu: Avoid modulo operator on 64-bit value to
+ fix i386 build
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
-Subject: [PATCH] KVM: x86/mmu: Avoid modulo operator on 64-bit value to fix i386 build
-Date:   Fri, 23 Oct 2020 20:11:50 -0700
-Message-Id: <20201024031150.9318-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.28.0
+        =?UTF-8?Q?Daniel_D=c3=adaz?= <daniel.diaz@linaro.org>
+References: <20201024031150.9318-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <94427d37-03af-6d78-2039-cd326710904b@redhat.com>
+Date:   Sat, 24 Oct 2020 08:29:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20201024031150.9318-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace a modulo operator with the more common pattern for computing the
-gfn "offset" of a huge page to fix an i386 build error.
+On 24/10/20 05:11, Sean Christopherson wrote:
+> Replace a modulo operator with the more common pattern for computing the
+> gfn "offset" of a huge page to fix an i386 build error.
+> 
+>   arch/x86/kvm/mmu/tdp_mmu.c:212: undefined reference to `__umoddi3'
+> 
+> Fixes: 2f2fad0897cb ("kvm: x86/mmu: Add functions to handle changed TDP SPTEs")
+> Reported-by: Daniel Díaz <daniel.diaz@linaro.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+> 
+> Linus, do you want to take this directly so that it's in rc1?  I don't
+> know whether Paolo will be checking mail before then
 
-  arch/x86/kvm/mmu/tdp_mmu.c:212: undefined reference to `__umoddi3'
+Yes, I am.  I also have another bugfix, I was going to wait a couple
+days for any -rc1 issues to pop up but they came up faster than that.
 
-Fixes: 2f2fad0897cb ("kvm: x86/mmu: Add functions to handle changed TDP SPTEs")
-Reported-by: Daniel Díaz <daniel.diaz@linaro.org>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-Linus, do you want to take this directly so that it's in rc1?  I don't
-know whether Paolo will be checking mail before then.
-
- arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index e246d71b8ea2..27e381c9da6c 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -209,7 +209,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 
- 	WARN_ON(level > PT64_ROOT_MAX_LEVEL);
- 	WARN_ON(level < PG_LEVEL_4K);
--	WARN_ON(gfn % KVM_PAGES_PER_HPAGE(level));
-+	WARN_ON(gfn & (KVM_PAGES_PER_HPAGE(level) - 1));
- 
- 	/*
- 	 * If this warning were to trigger it would indicate that there was a
--- 
-2.28.0
+Paolo
 
