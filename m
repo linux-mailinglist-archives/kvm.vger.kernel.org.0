@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F1AB297B76
-	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 10:33:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6397B297B81
+	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 10:41:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1760054AbgJXI0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Oct 2020 04:26:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54528 "EHLO
+        id S1760087AbgJXIlL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Oct 2020 04:41:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1759993AbgJXI0X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Oct 2020 04:26:23 -0400
+        with ESMTP id S1756126AbgJXIlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Oct 2020 04:41:10 -0400
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B26C0613CE;
-        Sat, 24 Oct 2020 01:26:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0F0C0613CE;
+        Sat, 24 Oct 2020 01:41:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=QMDrw5Rd1WyYd+89WQH0nJz4+3+13jSc3foFQHRzoaY=; b=j8/f7zSFKdXWKs8hiYMkcyTJ5t
-        CkDz0EmOYrQCUYAT/ZOGdFOgRmFsDbmoBWxCLlOQx5da1hrAiktjSrrk3RHqdEVCZ0ju/VyYJc7Yo
-        68brl+Eok/SaB1Q4FviYYWgSYStKvP57kZATPuDBU9zOM6PSXi3RqVw/ymSjlNm35yfnJ/Cln9wev
-        iGmFAD8OR0fJ1KSlmH6TKDvmpxkYpngsv9xf3TS+Gm/KSL4qFWx2G4M3OfxE/iCMDaPPXrHuEmwXM
-        MJYuZWOZhEJ7boNXLN/C3D/5wjXQ3rzybU4s7oc4jQh3hQnQ4T8om7eqldsvqL5OW3/u5KJRM/mbD
-        qBHOIGnw==;
+        bh=Glo513Rt1TutAD9+Db21F6sf59k7lWOgV38lbr8hHkQ=; b=f0NFPSQ45gFkBqfEsFSaLXtzfr
+        Uo+HMLyjXi0iMps8y60aumY1VDY4ISIhkMCV18edUzxwRyeUdsnjKeOlBfzeB1qR5xdE91Xd0Jzax
+        2P5f5vYr/skTCZ3b4yVFJ4pvHzg62PqCKvqqMpOdPeDtlR8HFJauxGBd779JIR9YZ/AkiEAZ2H6fE
+        X3nAbXhmIHeoXflpnaHS0mS6yC4JD7ZA1ZnU9B+Co6ePmmHvuS1p0GxE+z4XLA5S+NB56OlDNAgGz
+        i4qonaJmeYchZzEJK8lR7JuTeSERiY7cum1cCst4a5k6nybEam2AzHEw83uYxgTj3MM9a0dOODJWH
+        Wy0s/ypw==;
 Received: from [54.239.6.185] (helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kWEsR-00038o-KI; Sat, 24 Oct 2020 08:26:16 +0000
-Message-ID: <be564fccc341efa730b8cdfe18ef4d7e709ebf50.camel@infradead.org>
+        id 1kWF6n-0003tF-9f; Sat, 24 Oct 2020 08:41:05 +0000
+Message-ID: <e0c40a70894359c6782b01e48730e6ecae9e5692.camel@infradead.org>
 Subject: Re: [PATCH v2 8/8] x86/ioapic: Generate RTE directly from parent
  irqchip's MSI message
 From:   David Woodhouse <dwmw2@infradead.org>
@@ -35,14 +35,15 @@ To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
 Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>
-Date:   Sat, 24 Oct 2020 09:26:13 +0100
-In-Reply-To: <87d01863a2.fsf@nanos.tec.linutronix.de>
+Date:   Sat, 24 Oct 2020 09:41:02 +0100
+In-Reply-To: <be564fccc341efa730b8cdfe18ef4d7e709ebf50.camel@infradead.org>
 References: <87y2jy542v.fsf@nanos.tec.linutronix.de>
          <C53CAD52-38F8-47D7-A5BE-4F470532EF20@infradead.org>
          <87d01863a2.fsf@nanos.tec.linutronix.de>
+         <be564fccc341efa730b8cdfe18ef4d7e709ebf50.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-mUO5fenvrU340O1S27vI"
+        boundary="=-HfD9PLau02EfLv4aVH5c"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -51,101 +52,83 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-mUO5fenvrU340O1S27vI
+--=-HfD9PLau02EfLv4aVH5c
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2020-10-23 at 23:28 +0200, Thomas Gleixner wrote:
-> On Fri, Oct 23 2020 at 11:10, David Woodhouse wrote:
-> > On 22 October 2020 22:43:52 BST, Thomas Gleixner <tglx@linutronix.de> w=
-rote:
-> > It makes the callers slightly more readable, not having to cast to uint=
-32_t* from the struct.
-> >=20
-> > I did ponder defining a new struct with bitfields named along the
-> > lines of 'msi_addr_bits_19_to_4', but that seemed like overkill.
+On Sat, 2020-10-24 at 09:26 +0100, David Woodhouse wrote:
 >=20
-> I did something like this in the meantime, because all of this just
-> sucks.
->=20
->   git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git x86/apic
->=20
-> Hot of the press and completely untested.
+> And now I wish it was just a simple shift instead of an unholy maze of
+> overlapping unions of bitfields. But I'll make more coffee and stare at
+> it harder...
 
-Hm, your struct IO_APIC_route_entry isn't actually a union; you've
-defined a 128-bit structure with the IR fields *following* the non-IR
-fields. But there *is* a union in io_apic.c, of that 128-bit structure
-and two uint32_ts. Suspect that wasn't quite what you intended. I'll
-prod at it this morning and turn it into a single union of the three,
-and give it some testing.
+Hah, it really *was* unions of the bitfields. This boots...
 
-Also, my "Move MSI support into hpet.c" patch=C2=B9 got updated to
-s/CONFIG_PCI_MSI/CONFIG_GENERIC_MSI_IRQ/ at about line 53 for the MSI-
-related variable declarations, which was going to be in the next
-version I posted.
+diff --git a/arch/x86/include/asm/io_apic.h b/arch/x86/include/asm/io_apic.=
+h
+index c65e89bedc93..3e14adba34ba 100644
+--- a/arch/x86/include/asm/io_apic.h
++++ b/arch/x86/include/asm/io_apic.h
+@@ -65,6 +65,8 @@ union IO_APIC_reg_03 {
+ };
+=20
+ struct IO_APIC_route_entry {
++  union {
++    struct {
+ 	u64	vector			:  8,
+ 		delivery_mode		:  3,
+ 		dest_mode_logical	:  1,
+@@ -77,7 +79,8 @@ struct IO_APIC_route_entry {
+ 		reserved_1		: 17,
+ 		virt_destid_8_14	:  7,
+ 		destid_0_7		:  8;
+-
++    };
++    struct {
+ 	u64	ir_shared_0		:  8,
+ 		ir_zero			:  3,
+ 		ir_index_15		:  1,
+@@ -85,6 +88,8 @@ struct IO_APIC_route_entry {
+ 		ir_reserved_0		: 31,
+ 		ir_format		:  1,
+ 		ir_index_0_14		: 15;
++    };
++  };
+ } __attribute__ ((packed));
+=20
+ struct irq_alloc_info;
+diff --git a/arch/x86/include/asm/msi.h b/arch/x86/include/asm/msi.h
+index 8cf82d134b78..ef9dfaa4603f 100644
+--- a/arch/x86/include/asm/msi.h
++++ b/arch/x86/include/asm/msi.h
+@@ -25,6 +25,7 @@ typedef struct x86_msi_data {
+=20
+ typedef struct x86_msi_addr_lo {
+ 	union {
++		struct {
+ 		u32	reserved_0		:  2,
+ 			dest_mode_logical	:  1,
+ 			redirect_hint		:  1,
+@@ -32,13 +33,15 @@ typedef struct x86_msi_addr_lo {
+ 			virt_destid_8_14	:  7,
+ 			destid_0_7		:  8,
+ 			base_address		: 12;
+-
++		};
++		struct {
+ 		u32	dmar_reserved_0		:  2,
+ 			dmar_index_15		:  1,
+ 			dmar_subhandle_valid	:  1,
+ 			dmar_format		:  1,
+ 			dmar_index_0_14		: 15,
+ 			dmar_base_address	: 12;
++		};
+ 	};
+ } __attribute__ ((packed)) arch_msi_msg_addr_lo_t;
+ #define arch_msi_msg_addr_lo	x86_msi_addr_lo
 
-I was also hoping Paolo was going to take the patch which just defines
-the KVM_FEATURE_MSI_EXT_DEST_ID bit=C2=B2 ASAP, so that we end up with a
-second patch=C2=B3 that *just* wires it up to x86_init.msi_ext_dest_id() fo=
-r
-KVM.
 
-=C2=B9 https://git.infradead.org/users/dwmw2/linux.git/commitdiff/734719c1f=
-4
-=C2=B2 https://git.infradead.org/users/dwmw2/linux.git/commitdiff/3f371d674=
-9
-=C2=B3 https://git.infradead.org/users/dwmw2/linux.git/commitdiff/8399e14eb=
-5
-
-> Yes, we can't avoid the bit swizzling at all. But it can be made more
-> readable.
-
-Hm, I was about to concede that your version is a bit more readable.
-
-But then I got to your new __ipi_msi_compose_msg() and realised that it
-isn't working because it's setting the 0xFEE base address in the _low_
-bits, somehow...
-
-	msg->arch_addr_lo.base_address =3D X86_MSI_BASE_ADDRESS_LOW;
-	printk("1 Compose MSI message %x/%x\n", msg->address_lo, msg->data);
-	msg->arch_addr_lo.dest_mode_logical =3D apic->dest_mode_logical;
-	printk("2 Compose MSI message %x/%x\n", msg->address_lo, msg->data);
-	msg->arch_addr_lo.destid_0_7 =3D cfg->dest_apicid & 0xFF;
-	printk("3 Compose MSI message %x/%x\n", msg->address_lo, msg->data);
-
-[    1.793874] 1 Compose MSI message fee/0
-[    1.794310] 2 Compose MSI message fee/0
-[    1.794768] 3 Compose MSI message f02/0
-
-And now I wish it was just a simple shift instead of an unholy maze of
-overlapping unions of bitfields. But I'll make more coffee and stare at
-it harder...
-
-> Yes, that code is horrid, but adding a comment to that effect when
-> changing it is not asked too much, right?
-
-Sure. I just actually hadn't noticed that setting the dest/vector bits
-right there was entirely redundant in the first place.
-
-> I'm still wrapping my head around getting rid of this thing completely
-> because now it's just a subset of your KVM case with the only
-> restriction that I/O-APIC cannot be affined to any CPU with a APIC id
-> greater than 255.
-
-It was only ever that restriction anyway, wasn't it? Hyper-V PCI has
-its own MSI handling, and there's no HPET so it was only ever the
-I/OAPIC which was problematic there.
-
-There are Hyper-V VM sizes with 416 vCPUs which depend on this today,
-and which don't have the 15-bit MSI extension. Removing hyperv-iommu
-would prevent us from using all the vCPUs on those. You *could* make
-hyperv-iommu decline to initialise if x86_init.msi_ext_dest_id()
-returns true though=E2=81=B4.
-
-=E2=81=B4 https://git.infradead.org/users/dwmw2/linux.git/commitdiff/633ccf=
-0d42
-
---=-mUO5fenvrU340O1S27vI
+--=-HfD9PLau02EfLv4aVH5c
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -228,20 +211,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MDI0MDgyNjEzWjAvBgkqhkiG9w0BCQQxIgQgtg2WGv+KX03NZjOIj4JsUyYNpo7OkxyzdzTpFfsQ
-icUwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MDI0MDg0MTAyWjAvBgkqhkiG9w0BCQQxIgQgjHn0yoBFLML2PHRgqInAM+Z0hCb8oQOPoWd00FiR
+pT0wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAGdK3Nninar9Jh087PiliC4z6hZtpneXQ4vjTdJv9t0hgmNYEl78eVddxHBMwlcW
-mc4oeQrOyq8qxbHijqujGYxxBm5Pf+2uz535Wcupq2KHo8uBQyoCa6oPeuJyIucmSD5iB9W5kS/z
-hLZ2yBzEeIwF3fMZcGkTsepxvXBuqjeb0uHUPATQYAC45ZRMWaavxZ4YgFOz0XSyKAV5QiZV2sdv
-i1p0oW5wKBe107Zd7huC++Y/WpzByH4ylLBifI1vItJlVwkCPU8lk6rLyw491VTNElr4NtgXgxCV
-Ofh2RSdIBNgSoadlTn7+X9fermnY04nLaAbRlRV9omKcxLOJWBcAAAAAAAA=
+DQEBAQUABIIBAIwiUDpLw9sOA9pQ3M8E2Yw8L9guz4UGLnMQefSBkWIdrp6FCEx3Ye9IgZVRHxb1
+XFj9zZv66MBsI9oXOOlwZuPWhkHpZDf0wRfmtztQCRIb9kNxPMAkg1uh5xoIpZ4/94j5QB/u3JWr
+B1qqWuMVNboZGjivbEWoEqkJxyyaxduiep17KpDxISnTALh0soxEubf28jHjUwY3uR5HuL+H3VjK
+xNLZDZypslByAaAaPjCb+RyKALol0c/Cbn2HM5tPg3lLUvu2uUf5NJZtWv7hJAjSRgt/ElXINZlG
+ND3pAWeHQG9n0D+lBNlnOxSLWU7vvL/iDes6l+50FDO30bZJjQIAAAAAAAA=
 
 
---=-mUO5fenvrU340O1S27vI--
+--=-HfD9PLau02EfLv4aVH5c--
 
