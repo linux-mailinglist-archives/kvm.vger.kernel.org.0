@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1EDA297EF9
-	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 23:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9931C297F00
+	for <lists+kvm@lfdr.de>; Sat, 24 Oct 2020 23:36:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1764840AbgJXVgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Oct 2020 17:36:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33930 "EHLO
+        id S1764860AbgJXVgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Oct 2020 17:36:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1764747AbgJXVfx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1764735AbgJXVfx (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 24 Oct 2020 17:35:53 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA09C0613A5;
-        Sat, 24 Oct 2020 14:35:50 -0700 (PDT)
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAAF6C0613DE;
+        Sat, 24 Oct 2020 14:35:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=merlin.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=65EqOIAei8UNtoCihXT6EwVwA/KCxAd2clo88kBuGxI=; b=VgPDO8FWx821f1Wut/TvJI3OT/
-        3M/kPBD5FR3Sl/rcZ+2fHIETtIhaJaz6fHNKjWln2uPvEpZ9LExkZNQdEMSZQAPi/PnmTLBEs93hH
-        HkBDmHutd+85DAv8kNJ8Odz+LA8dGQuIQAOreXNE1sxFdsCemI9GmVNhIRRiPKJyY6unPjkjEJWOG
-        5BbXi89MpRrPZR7ffhGxqNiHLnGUS+bTIVs9xR1JXfFChm26KGPwbT0eWK8do5Qbqgs6svnFuno2n
-        UkZO6qTvztXDSPbJUptf9MweAxXxF6cXAi/z/sFF0433t5wdj8Ze2nD1Qz3PfdAeuKilsdy853GRh
-        oTsroTSw==;
+        bh=qsCHCzuqbKzUc8Q7JnSzQDu1Xg9LlTdgdmmLOdJmYNU=; b=j4Q4IgyEkH1lWUFhdm6C8eJMUn
+        OFEaJT8blY7NObghJXoc6JCzIEYZKOGTW0ofNPWJVqpqS+DmdXluznbvRmDqPO/NTVp3EaofxjYsc
+        aB29SVBgcZwa7GlyM9GPAO7BgNjA90fnI9BTsYCOP2yHbTCsWuqfR5MJojxodsO1QFYpAr27DFxLB
+        lffdDptE5B0CgxZa1UHal0wibSUuDcEmwT+aoo2rtfhNXGtZUrIO5yv2BhY2WyJlugTBzfqx4Awbk
+        D0RQnf+QjUebj7wLZnyFwlKN9XPvpzvhCh3rTIyA+Id0u5VDBx7rr/PyoYCPu4/yyuQQDUJ3AZvqE
+        bXGyxQDA==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kWRCS-0006HF-IL; Sat, 24 Oct 2020 21:35:47 +0000
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kWRCT-0008Bb-7b; Sat, 24 Oct 2020 21:35:45 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.93 #3 (Red Hat Linux))
-        id 1kWRCN-001rOs-49; Sat, 24 Oct 2020 22:35:39 +0100
+        id 1kWRCN-001rOw-5P; Sat, 24 Oct 2020 22:35:39 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     x86@kernel.org
 Cc:     kvm <kvm@vger.kernel.org>, iommu@lists.linux-foundation.org,
@@ -37,9 +37,9 @@ Cc:     kvm <kvm@vger.kernel.org>, iommu@lists.linux-foundation.org,
         linux-kernel <linux-kernel@vger.kernel.org>,
         linux-hyperv@vger.kernel.org, maz@misterjones.org,
         Dexuan Cui <decui@microsoft.com>
-Subject: [PATCH v3 20/35] x86/ioapic: Cleanup IO/APIC route entry structs
-Date:   Sat, 24 Oct 2020 22:35:20 +0100
-Message-Id: <20201024213535.443185-21-dwmw2@infradead.org>
+Subject: [PATCH v3 21/35] x86/ioapic: Generate RTE directly from parent irqchip's MSI message
+Date:   Sat, 24 Oct 2020 22:35:21 +0100
+Message-Id: <20201024213535.443185-22-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201024213535.443185-1-dwmw2@infradead.org>
 References: <e6601ff691afb3266e365a91e8b221179daf22c2.camel@infradead.org>
@@ -47,543 +47,395 @@ References: <e6601ff691afb3266e365a91e8b221179daf22c2.camel@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Thomas Gleixner <tglx@linutronix.de>
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Having two seperate structs for the I/O-APIC RTE entries (non-remapped and
-DMAR remapped) requires type casts and makes it hard to map.
+The I/O-APIC generates an MSI cycle with address/data bits taken from its
+Redirection Table Entry in some combination which used to make sense, but
+now is just a bunch of bits which get passed through in some seemingly
+arbitrary order.
 
-Combine them in IO_APIC_routing_entry by defining a union of two 64bit
-bitfields. Use naming which reflects which bits are shared and which bits
-are actually different for the operating modes.
+Instead of making IRQ remapping drivers directly frob the I/OA-PIC RTE, let
+them just do their job and generate an MSI message. The bit swizzling to
+turn that MSI message into the I/O-APIC's RTE is the same in all cases,
+since it's a function of the I/O-APIC hardware. The IRQ remappers have no
+real need to get involved with that.
 
-[dwmw2: Fix it up and finish the job, pulling the 32-bit w1,w2 words for
-        register access into the same union and eliminating a few more
-        places where bits were accessed through masks and shifts.]
+The only slight caveat is that the I/OAPIC is interpreting some of those
+fields too, and it does want the 'vector' field to be unique to make EOI
+work. The AMD IOMMU happens to put its IRTE index in the bits that the
+I/O-APIC thinks are the vector field, and accommodates this requirement by
+reserving the first 32 indices for the I/O-APIC.  The Intel IOMMU doesn't
+actually use the bits that the I/O-APIC thinks are the vector field, so it
+fills in the 'pin' value there instead.
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+[ tglx: Replaced the unreadably macro maze with the cleaned up RTE/msi_msg
+  	bitfields and added commentry to explain the mapping magic ]
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/x86/include/asm/io_apic.h      |  78 ++++++---------
- arch/x86/kernel/apic/io_apic.c      | 144 +++++++++++++---------------
- drivers/iommu/amd/iommu.c           |   8 +-
- drivers/iommu/hyperv-iommu.c        |   4 +-
- drivers/iommu/intel/irq_remapping.c |  19 ++--
- 5 files changed, 108 insertions(+), 145 deletions(-)
+ arch/x86/include/asm/hw_irq.h       |  11 ++-
+ arch/x86/kernel/apic/io_apic.c      | 103 +++++++++++++++++++---------
+ drivers/iommu/amd/iommu.c           |  12 ----
+ drivers/iommu/hyperv-iommu.c        |  31 ---------
+ drivers/iommu/intel/irq_remapping.c |  31 ++-------
+ 5 files changed, 83 insertions(+), 105 deletions(-)
 
-diff --git a/arch/x86/include/asm/io_apic.h b/arch/x86/include/asm/io_apic.h
-index a1a26f6d3aa4..73da644b2f0d 100644
---- a/arch/x86/include/asm/io_apic.h
-+++ b/arch/x86/include/asm/io_apic.h
-@@ -13,15 +13,6 @@
-  * Copyright (C) 1997, 1998, 1999, 2000 Ingo Molnar
-  */
- 
--/* I/O Unit Redirection Table */
--#define IO_APIC_REDIR_VECTOR_MASK	0x000FF
--#define IO_APIC_REDIR_DEST_LOGICAL	0x00800
--#define IO_APIC_REDIR_DEST_PHYSICAL	0x00000
--#define IO_APIC_REDIR_SEND_PENDING	(1 << 12)
--#define IO_APIC_REDIR_REMOTE_IRR	(1 << 14)
--#define IO_APIC_REDIR_LEVEL_TRIGGER	(1 << 15)
--#define IO_APIC_REDIR_MASKED		(1 << 16)
--
- /*
-  * The structure of the IO-APIC:
-  */
-@@ -65,52 +56,39 @@ union IO_APIC_reg_03 {
+diff --git a/arch/x86/include/asm/hw_irq.h b/arch/x86/include/asm/hw_irq.h
+index 517847a94dbe..83a69f62637e 100644
+--- a/arch/x86/include/asm/hw_irq.h
++++ b/arch/x86/include/asm/hw_irq.h
+@@ -45,12 +45,11 @@ enum irq_alloc_type {
  };
  
- struct IO_APIC_route_entry {
--	__u32	vector		:  8,
--		delivery_mode	:  3,	/* 000: FIXED
--					 * 001: lowest prio
--					 * 111: ExtINT
--					 */
--		dest_mode	:  1,	/* 0: physical, 1: logical */
--		delivery_status	:  1,
--		polarity	:  1,
--		irr		:  1,
--		trigger		:  1,	/* 0: edge, 1: level */
--		mask		:  1,	/* 0: enabled, 1: disabled */
--		__reserved_2	: 15;
--
--	__u32	__reserved_3	: 24,
--		dest		:  8;
--} __attribute__ ((packed));
--
--struct IR_IO_APIC_route_entry {
--	__u64	vector		: 8,
--		zero		: 3,
--		index2		: 1,
--		delivery_status : 1,
--		polarity	: 1,
--		irr		: 1,
--		trigger		: 1,
--		mask		: 1,
--		reserved	: 31,
--		format		: 1,
--		index		: 15;
-+	union {
-+		struct {
-+			u64	vector			:  8,
-+				delivery_mode		:  3,
-+				dest_mode_logical	:  1,
-+				delivery_status		:  1,
-+				active_low		:  1,
-+				irr			:  1,
-+				is_level		:  1,
-+				masked			:  1,
-+				reserved_0		: 15,
-+				reserved_1		: 24,
-+				destid_0_7		:  8;
-+		};
-+		struct {
-+			u64	ir_shared_0		:  8,
-+				ir_zero			:  3,
-+				ir_index_15		:  1,
-+				ir_shared_1		:  5,
-+				ir_reserved_0		: 31,
-+				ir_format		:  1,
-+				ir_index_0_14		: 15;
-+		};
-+		struct {
-+			u64	w1			: 32,
-+				w2			: 32;
-+		};
-+	};
- } __attribute__ ((packed));
+ struct ioapic_alloc_info {
+-	int				pin;
+-	int				node;
+-	u32				is_level	: 1;
+-	u32				active_low	: 1;
+-	u32				valid		: 1;
+-	struct IO_APIC_route_entry	*entry;
++	int		pin;
++	int		node;
++	u32		is_level	: 1;
++	u32		active_low	: 1;
++	u32		valid		: 1;
+ };
  
- struct irq_alloc_info;
- struct ioapic_domain_cfg;
- 
--#define IOAPIC_EDGE			0
--#define IOAPIC_LEVEL			1
--
--#define IOAPIC_MASKED			1
--#define IOAPIC_UNMASKED			0
--
--#define IOAPIC_POL_HIGH			0
--#define IOAPIC_POL_LOW			1
--
--#define IOAPIC_DEST_MODE_PHYSICAL	0
--#define IOAPIC_DEST_MODE_LOGICAL	1
--
- #define	IOAPIC_MAP_ALLOC		0x1
- #define	IOAPIC_MAP_CHECK		0x2
- 
+ struct uv_alloc_info {
 diff --git a/arch/x86/kernel/apic/io_apic.c b/arch/x86/kernel/apic/io_apic.c
-index 24a7bba7cbf4..07e754131854 100644
+index 07e754131854..ea983da1a57f 100644
 --- a/arch/x86/kernel/apic/io_apic.c
 +++ b/arch/x86/kernel/apic/io_apic.c
-@@ -286,31 +286,26 @@ static void io_apic_write(unsigned int apic, unsigned int reg,
- 	writel(value, &io_apic->data);
- }
+@@ -48,6 +48,7 @@
+ #include <linux/jiffies.h>	/* time_after() */
+ #include <linux/slab.h>
+ #include <linux/memblock.h>
++#include <linux/msi.h>
  
--union entry_union {
--	struct { u32 w1, w2; };
--	struct IO_APIC_route_entry entry;
--};
+ #include <asm/irqdomain.h>
+ #include <asm/io.h>
+@@ -63,7 +64,6 @@
+ #include <asm/setup.h>
+ #include <asm/irq_remapping.h>
+ #include <asm/hw_irq.h>
 -
- static struct IO_APIC_route_entry __ioapic_read_entry(int apic, int pin)
- {
--	union entry_union eu;
-+	struct IO_APIC_route_entry entry;
+ #include <asm/apic.h>
  
--	eu.w1 = io_apic_read(apic, 0x10 + 2 * pin);
--	eu.w2 = io_apic_read(apic, 0x11 + 2 * pin);
-+	entry.w1 = io_apic_read(apic, 0x10 + 2 * pin);
-+	entry.w2 = io_apic_read(apic, 0x11 + 2 * pin);
- 
--	return eu.entry;
-+	return entry;
+ #define	for_each_ioapic(idx)		\
+@@ -1848,21 +1848,58 @@ static void ioapic_ir_ack_level(struct irq_data *irq_data)
+ 	eoi_ioapic_pin(data->entry.vector, data);
  }
  
- static struct IO_APIC_route_entry ioapic_read_entry(int apic, int pin)
++/*
++ * The I/OAPIC is just a device for generating MSI messages from legacy
++ * interrupt pins. Various fields of the RTE translate into bits of the
++ * resulting MSI which had a historical meaning.
++ *
++ * With interrupt remapping, many of those bits have different meanings
++ * in the underlying MSI, but the way that the I/OAPIC transforms them
++ * from its RTE to the MSI message is the same. This function allows
++ * the parent IRQ domain to compose the MSI message, then takes the
++ * relevant bits to put them in the appropriate places in the RTE in
++ * order to generate that message when the IRQ happens.
++ *
++ * The setup here relies on a preconfigured route entry (is_level,
++ * active_low, masked) because the parent domain is merely composing the
++ * generic message routing information which is used for the MSI.
++ */
++static void ioapic_setup_msg_from_msi(struct irq_data *irq_data,
++				      struct IO_APIC_route_entry *entry)
++{
++	struct msi_msg msg;
++
++	/* Let the parent domain compose the MSI message */
++	irq_chip_compose_msi_msg(irq_data, &msg);
++
++	/*
++	 * - Real vector
++	 * - DMAR/IR: 8bit subhandle (ioapic.pin)
++	 * - AMD/IR:  8bit IRTE index
++	 */
++	entry->vector			= msg.arch_data.vector;
++	/* Delivery mode (for DMAR/IR all 0) */
++	entry->delivery_mode		= msg.arch_data.delivery_mode;
++	/* Destination mode or DMAR/IR index bit 15 */
++	entry->dest_mode_logical	= msg.arch_addr_lo.dest_mode_logical;
++	/* DMAR/IR: 1, 0 for all other modes */
++	entry->ir_format		= msg.arch_addr_lo.dmar_format;
++	/*
++	 * DMAR/IR: index bit 0-14.
++	 *
++	 * All other modes have bit 0-6 of dmar_index_0_14 cleared and the
++	 * topmost 8 bits are destination id bit 0-7 (entry::destid_0_7).
++	 */
++	entry->ir_index_0_14		= msg.arch_addr_lo.dmar_index_0_14;
++}
++
+ static void ioapic_configure_entry(struct irq_data *irqd)
  {
--	union entry_union eu;
-+	struct IO_APIC_route_entry entry;
- 	unsigned long flags;
- 
- 	raw_spin_lock_irqsave(&ioapic_lock, flags);
--	eu.entry = __ioapic_read_entry(apic, pin);
-+	entry = __ioapic_read_entry(apic, pin);
- 	raw_spin_unlock_irqrestore(&ioapic_lock, flags);
- 
--	return eu.entry;
-+	return entry;
- }
- 
- /*
-@@ -321,11 +316,8 @@ static struct IO_APIC_route_entry ioapic_read_entry(int apic, int pin)
-  */
- static void __ioapic_write_entry(int apic, int pin, struct IO_APIC_route_entry e)
- {
--	union entry_union eu = {{0, 0}};
--
--	eu.entry = e;
--	io_apic_write(apic, 0x11 + 2*pin, eu.w2);
--	io_apic_write(apic, 0x10 + 2*pin, eu.w1);
-+	io_apic_write(apic, 0x11 + 2*pin, e.w2);
-+	io_apic_write(apic, 0x10 + 2*pin, e.w1);
- }
- 
- static void ioapic_write_entry(int apic, int pin, struct IO_APIC_route_entry e)
-@@ -344,12 +336,12 @@ static void ioapic_write_entry(int apic, int pin, struct IO_APIC_route_entry e)
-  */
- static void ioapic_mask_entry(int apic, int pin)
- {
-+	struct IO_APIC_route_entry e = { .masked = true };
- 	unsigned long flags;
--	union entry_union eu = { .entry.mask = IOAPIC_MASKED };
- 
- 	raw_spin_lock_irqsave(&ioapic_lock, flags);
--	io_apic_write(apic, 0x10 + 2*pin, eu.w1);
--	io_apic_write(apic, 0x11 + 2*pin, eu.w2);
-+	io_apic_write(apic, 0x10 + 2*pin, e.w1);
-+	io_apic_write(apic, 0x11 + 2*pin, e.w2);
- 	raw_spin_unlock_irqrestore(&ioapic_lock, flags);
- }
- 
-@@ -422,20 +414,15 @@ static void __init replace_pin_at_irq_node(struct mp_chip_data *data, int node,
- 	add_pin_to_irq_node(data, node, newapic, newpin);
- }
- 
--static void io_apic_modify_irq(struct mp_chip_data *data,
--			       int mask_and, int mask_or,
-+static void io_apic_modify_irq(struct mp_chip_data *data, bool masked,
- 			       void (*final)(struct irq_pin_list *entry))
- {
--	union entry_union eu;
+ 	struct mp_chip_data *mpd = irqd->chip_data;
+-	struct irq_cfg *cfg = irqd_cfg(irqd);
  	struct irq_pin_list *entry;
  
--	eu.entry = data->entry;
--	eu.w1 &= mask_and;
--	eu.w1 |= mask_or;
--	data->entry = eu.entry;
-+	data->entry.masked = masked;
- 
- 	for_each_irq_pin(entry, data->irq_2_pin) {
--		io_apic_write(entry->apic, 0x10 + 2 * entry->pin, eu.w1);
-+		io_apic_write(entry->apic, 0x10 + 2 * entry->pin, data->entry.w1);
- 		if (final)
- 			final(entry);
+-	/*
+-	 * Only update when the parent is the vector domain, don't touch it
+-	 * if the parent is the remapping domain. Check the installed
+-	 * ioapic chip to verify that.
+-	 */
+-	if (irqd->chip == &ioapic_chip) {
+-		mpd->entry.destid_0_7 = cfg->dest_apicid;
+-		mpd->entry.vector = cfg->vector;
+-	}
++	ioapic_setup_msg_from_msi(irqd, &mpd->entry);
++
+ 	for_each_irq_pin(entry, mpd->irq_2_pin)
+ 		__ioapic_write_entry(entry->apic, entry->pin, mpd->entry);
+ }
+@@ -2919,14 +2956,23 @@ static void mp_irqdomain_get_attr(u32 gsi, struct mp_chip_data *data,
  	}
-@@ -459,13 +446,13 @@ static void mask_ioapic_irq(struct irq_data *irq_data)
+ }
+ 
+-static void mp_setup_entry(struct irq_cfg *cfg, struct mp_chip_data *data,
+-			   struct IO_APIC_route_entry *entry)
++/*
++ * Configure the I/O-APIC specific fields in the routing entry.
++ *
++ * This is important to setup the I/O-APIC specific bits (is_level,
++ * active_low, masked) because the underlying parent domain will only
++ * provide the routing information and is oblivious of the I/O-APIC
++ * specific bits.
++ *
++ * The entry is just preconfigured at this point and not written into the
++ * RTE. This happens later during activation which will fill in the actual
++ * routing information.
++ */
++static void mp_preconfigure_entry(struct mp_chip_data *data)
+ {
++	struct IO_APIC_route_entry *entry = &data->entry;
++
+ 	memset(entry, 0, sizeof(*entry));
+-	entry->delivery_mode	 = apic->delivery_mode;
+-	entry->dest_mode_logical = apic->dest_mode_logical;
+-	entry->destid_0_7	 = cfg->dest_apicid;
+-	entry->vector		 = cfg->vector;
+ 	entry->is_level		 = data->is_level;
+ 	entry->active_low	 = data->active_low;
+ 	/*
+@@ -2939,11 +2985,10 @@ static void mp_setup_entry(struct irq_cfg *cfg, struct mp_chip_data *data,
+ int mp_irqdomain_alloc(struct irq_domain *domain, unsigned int virq,
+ 		       unsigned int nr_irqs, void *arg)
+ {
+-	int ret, ioapic, pin;
+-	struct irq_cfg *cfg;
+-	struct irq_data *irq_data;
+-	struct mp_chip_data *data;
+ 	struct irq_alloc_info *info = arg;
++	struct mp_chip_data *data;
++	struct irq_data *irq_data;
++	int ret, ioapic, pin;
  	unsigned long flags;
  
- 	raw_spin_lock_irqsave(&ioapic_lock, flags);
--	io_apic_modify_irq(data, ~0, IO_APIC_REDIR_MASKED, &io_apic_sync);
-+	io_apic_modify_irq(data, true, &io_apic_sync);
- 	raw_spin_unlock_irqrestore(&ioapic_lock, flags);
+ 	if (!info || nr_irqs > 1)
+@@ -2961,7 +3006,6 @@ int mp_irqdomain_alloc(struct irq_domain *domain, unsigned int virq,
+ 	if (!data)
+ 		return -ENOMEM;
+ 
+-	info->ioapic.entry = &data->entry;
+ 	ret = irq_domain_alloc_irqs_parent(domain, virq, nr_irqs, info);
+ 	if (ret < 0) {
+ 		kfree(data);
+@@ -2975,23 +3019,20 @@ int mp_irqdomain_alloc(struct irq_domain *domain, unsigned int virq,
+ 	irq_data->chip_data = data;
+ 	mp_irqdomain_get_attr(mp_pin_to_gsi(ioapic, pin), data, info);
+ 
+-	cfg = irqd_cfg(irq_data);
+ 	add_pin_to_irq_node(data, ioapic_alloc_attr_node(info), ioapic, pin);
+ 
+-	local_irq_save(flags);
+-	if (info->ioapic.entry)
+-		mp_setup_entry(cfg, data, info->ioapic.entry);
++	mp_preconfigure_entry(data);
+ 	mp_register_handler(virq, data->is_level);
++
++	local_irq_save(flags);
+ 	if (virq < nr_legacy_irqs())
+ 		legacy_pic->mask(virq);
+ 	local_irq_restore(flags);
+ 
+ 	apic_printk(APIC_VERBOSE, KERN_DEBUG
+-		    "IOAPIC[%d]: Set routing entry (%d-%d -> 0x%x -> IRQ %d Mode:%i Active:%i Dest:%d)\n",
+-		    ioapic, mpc_ioapic_id(ioapic), pin, cfg->vector,
+-		    virq, data->is_level, data->active_low,
+-		    cfg->dest_apicid);
+-
++		    "IOAPIC[%d]: Preconfigured routing entry (%d-%d -> IRQ %d Level:%i ActiveLow:%i)\n",
++		    ioapic, mpc_ioapic_id(ioapic), pin, virq,
++		    data->is_level, data->active_low);
+ 	return 0;
  }
  
- static void __unmask_ioapic(struct mp_chip_data *data)
- {
--	io_apic_modify_irq(data, ~IO_APIC_REDIR_MASKED, 0, NULL);
-+	io_apic_modify_irq(data, false, NULL);
- }
- 
- static void unmask_ioapic_irq(struct irq_data *irq_data)
-@@ -506,8 +493,8 @@ static void __eoi_ioapic_pin(int apic, int pin, int vector)
- 		/*
- 		 * Mask the entry and change the trigger mode to edge.
- 		 */
--		entry1.mask = IOAPIC_MASKED;
--		entry1.trigger = IOAPIC_EDGE;
-+		entry1.masked = true;
-+		entry1.is_level = false;
- 
- 		__ioapic_write_entry(apic, pin, entry1);
- 
-@@ -542,8 +529,8 @@ static void clear_IO_APIC_pin(unsigned int apic, unsigned int pin)
- 	 * Make sure the entry is masked and re-read the contents to check
- 	 * if it is a level triggered pin and if the remote-IRR is set.
- 	 */
--	if (entry.mask == IOAPIC_UNMASKED) {
--		entry.mask = IOAPIC_MASKED;
-+	if (!entry.masked) {
-+		entry.masked = true;
- 		ioapic_write_entry(apic, pin, entry);
- 		entry = ioapic_read_entry(apic, pin);
- 	}
-@@ -556,8 +543,8 @@ static void clear_IO_APIC_pin(unsigned int apic, unsigned int pin)
- 		 * doesn't clear the remote-IRR if the trigger mode is not
- 		 * set to level.
- 		 */
--		if (entry.trigger == IOAPIC_EDGE) {
--			entry.trigger = IOAPIC_LEVEL;
-+		if (!entry.is_level) {
-+			entry.is_level = true;
- 			ioapic_write_entry(apic, pin, entry);
- 		}
- 		raw_spin_lock_irqsave(&ioapic_lock, flags);
-@@ -659,8 +646,8 @@ void mask_ioapic_entries(void)
- 			struct IO_APIC_route_entry entry;
- 
- 			entry = ioapics[apic].saved_registers[pin];
--			if (entry.mask == IOAPIC_UNMASKED) {
--				entry.mask = IOAPIC_MASKED;
-+			if (!entry.masked) {
-+				entry.masked = true;
- 				ioapic_write_entry(apic, pin, entry);
- 			}
- 		}
-@@ -947,8 +934,8 @@ static bool mp_check_pin_attr(int irq, struct irq_alloc_info *info)
- 	if (irq < nr_legacy_irqs() && data->count == 1) {
- 		if (info->ioapic.is_level != data->is_level)
- 			mp_register_handler(irq, info->ioapic.is_level);
--		data->entry.trigger = data->is_level = info->ioapic.is_level;
--		data->entry.polarity = data->active_low = info->ioapic.active_low;
-+		data->entry.is_level = data->is_level = info->ioapic.is_level;
-+		data->entry.active_low = data->active_low = info->ioapic.active_low;
- 	}
- 
- 	return data->is_level == info->ioapic.is_level &&
-@@ -1231,10 +1218,9 @@ void ioapic_zap_locks(void)
- 
- static void io_apic_print_entries(unsigned int apic, unsigned int nr_entries)
- {
--	int i;
--	char buf[256];
- 	struct IO_APIC_route_entry entry;
--	struct IR_IO_APIC_route_entry *ir_entry = (void *)&entry;
-+	char buf[256];
-+	int i;
- 
- 	printk(KERN_DEBUG "IOAPIC %d:\n", apic);
- 	for (i = 0; i <= nr_entries; i++) {
-@@ -1242,20 +1228,20 @@ static void io_apic_print_entries(unsigned int apic, unsigned int nr_entries)
- 		snprintf(buf, sizeof(buf),
- 			 " pin%02x, %s, %s, %s, V(%02X), IRR(%1d), S(%1d)",
- 			 i,
--			 entry.mask == IOAPIC_MASKED ? "disabled" : "enabled ",
--			 entry.trigger == IOAPIC_LEVEL ? "level" : "edge ",
--			 entry.polarity == IOAPIC_POL_LOW ? "low " : "high",
-+			 entry.masked ? "disabled" : "enabled ",
-+			 entry.is_level ? "level" : "edge ",
-+			 entry.active_low ? "low " : "high",
- 			 entry.vector, entry.irr, entry.delivery_status);
--		if (ir_entry->format)
-+		if (entry.ir_format) {
- 			printk(KERN_DEBUG "%s, remapped, I(%04X),  Z(%X)\n",
--			       buf, (ir_entry->index2 << 15) | ir_entry->index,
--			       ir_entry->zero);
--		else
--			printk(KERN_DEBUG "%s, %s, D(%02X), M(%1d)\n",
- 			       buf,
--			       entry.dest_mode == IOAPIC_DEST_MODE_LOGICAL ?
--			       "logical " : "physical",
--			       entry.dest, entry.delivery_mode);
-+			       (entry.ir_index_15 << 15) | entry.ir_index_0_14,
-+				entry.ir_zero);
-+		} else {
-+			printk(KERN_DEBUG "%s, %s, D(%02X), M(%1d)\n", buf,
-+			       entry.dest_mode_logical ? "logical " : "physical",
-+			       entry.destid_0_7, entry.delivery_mode);
-+		}
- 	}
- }
- 
-@@ -1380,8 +1366,8 @@ void __init enable_IO_APIC(void)
- 		/* If the interrupt line is enabled and in ExtInt mode
- 		 * I have found the pin where the i8259 is connected.
- 		 */
--		if ((entry.mask == 0) &&
--		    (entry.delivery_mode == APIC_DELIVERY_MODE_EXTINT)) {
-+		if (!entry.masked &&
-+		    entry.delivery_mode == APIC_DELIVERY_MODE_EXTINT) {
- 			ioapic_i8259.apic = apic;
- 			ioapic_i8259.pin  = pin;
- 			goto found_i8259;
-@@ -1425,12 +1411,12 @@ void native_restore_boot_irq_mode(void)
- 		struct IO_APIC_route_entry entry;
- 
- 		memset(&entry, 0, sizeof(entry));
--		entry.mask		= IOAPIC_UNMASKED;
--		entry.trigger		= IOAPIC_EDGE;
--		entry.polarity		= IOAPIC_POL_HIGH;
--		entry.dest_mode		= IOAPIC_DEST_MODE_PHYSICAL;
-+		entry.masked		= false;
-+		entry.is_level		= false;
-+		entry.active_low	= false;
-+		entry.dest_mode_logical	= false;
- 		entry.delivery_mode	= APIC_DELIVERY_MODE_EXTINT;
--		entry.dest		= read_apic_id();
-+		entry.destid_0_7	= read_apic_id();
- 
- 		/*
- 		 * Add it to the IO-APIC irq-routing table:
-@@ -1709,13 +1695,13 @@ static bool io_apic_level_ack_pending(struct mp_chip_data *data)
- 
- 	raw_spin_lock_irqsave(&ioapic_lock, flags);
- 	for_each_irq_pin(entry, data->irq_2_pin) {
--		unsigned int reg;
-+		struct IO_APIC_route_entry e;
- 		int pin;
- 
- 		pin = entry->pin;
--		reg = io_apic_read(entry->apic, 0x10 + pin*2);
-+		e.w1 = io_apic_read(entry->apic, 0x10 + pin*2);
- 		/* Is the remote IRR bit set? */
--		if (reg & IO_APIC_REDIR_REMOTE_IRR) {
-+		if (e.irr) {
- 			raw_spin_unlock_irqrestore(&ioapic_lock, flags);
- 			return true;
- 		}
-@@ -1874,7 +1860,7 @@ static void ioapic_configure_entry(struct irq_data *irqd)
- 	 * ioapic chip to verify that.
- 	 */
- 	if (irqd->chip == &ioapic_chip) {
--		mpd->entry.dest = cfg->dest_apicid;
-+		mpd->entry.destid_0_7 = cfg->dest_apicid;
- 		mpd->entry.vector = cfg->vector;
- 	}
- 	for_each_irq_pin(entry, mpd->irq_2_pin)
-@@ -1932,7 +1918,7 @@ static int ioapic_irq_get_chip_state(struct irq_data *irqd,
- 		 * irrelevant because the IO-APIC treats them as fire and
- 		 * forget.
- 		 */
--		if (rentry.irr && rentry.trigger) {
-+		if (rentry.irr && rentry.is_level) {
- 			*state = true;
- 			break;
- 		}
-@@ -2057,12 +2043,12 @@ static inline void __init unlock_ExtINT_logic(void)
- 
- 	memset(&entry1, 0, sizeof(entry1));
- 
--	entry1.dest_mode = IOAPIC_DEST_MODE_PHYSICAL;
--	entry1.mask = IOAPIC_UNMASKED;
--	entry1.dest = hard_smp_processor_id();
--	entry1.delivery_mode = APIC_DELIVERY_MODE_EXTINT;
--	entry1.polarity = entry0.polarity;
--	entry1.trigger = IOAPIC_EDGE;
-+	entry1.dest_mode_logical	= true;
-+	entry1.masked			= false;
-+	entry1.destid_0_7		= hard_smp_processor_id();
-+	entry1.delivery_mode		= APIC_DELIVERY_MODE_EXTINT;
-+	entry1.active_low		= entry0.active_low;
-+	entry1.is_level			= false;
- 	entry1.vector = 0;
- 
- 	ioapic_write_entry(apic, pin, entry1);
-@@ -2937,17 +2923,17 @@ static void mp_setup_entry(struct irq_cfg *cfg, struct mp_chip_data *data,
- 			   struct IO_APIC_route_entry *entry)
- {
- 	memset(entry, 0, sizeof(*entry));
--	entry->delivery_mode = apic->delivery_mode;
--	entry->dest_mode     = apic->dest_mode_logical;
--	entry->dest	     = cfg->dest_apicid;
--	entry->vector	     = cfg->vector;
--	entry->trigger	     = data->is_level;
--	entry->polarity	     = data->active_low;
-+	entry->delivery_mode	 = apic->delivery_mode;
-+	entry->dest_mode_logical = apic->dest_mode_logical;
-+	entry->destid_0_7	 = cfg->dest_apicid;
-+	entry->vector		 = cfg->vector;
-+	entry->is_level		 = data->is_level;
-+	entry->active_low	 = data->active_low;
- 	/*
- 	 * Mask level triggered irqs. Edge triggered irqs are masked
- 	 * by the irq core code in case they fire.
- 	 */
--	entry->mask = data->is_level;
-+	entry->masked		= data->is_level;
- }
- 
- int mp_irqdomain_alloc(struct irq_domain *domain, unsigned int virq,
 diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index b0e5210e53b2..3d72ec7bbbf8 100644
+index 3d72ec7bbbf8..9744cdbefd88 100644
 --- a/drivers/iommu/amd/iommu.c
 +++ b/drivers/iommu/amd/iommu.c
-@@ -3687,11 +3687,11 @@ static void irq_remapping_prepare_irte(struct amd_ir_data *data,
- 		entry = info->ioapic.entry;
- 		info->ioapic.entry = NULL;
- 		memset(entry, 0, sizeof(*entry));
--		entry->vector	= index;
--		entry->trigger	= info->ioapic.is_level;
--		entry->polarity	= info->ioapic.active_low;
-+		entry->vector		= index;
-+		entry->is_level		= info->ioapic.is_level;
-+		entry->active_low	= info->ioapic.active_low;
- 		/* Mask level triggered irqs. */
--		entry->mask	= info->ioapic.is_level;
-+		entry->masked		= info->ioapic.is_level;
- 		break;
+@@ -3669,7 +3669,6 @@ static void irq_remapping_prepare_irte(struct amd_ir_data *data,
+ 				       int devid, int index, int sub_handle)
+ {
+ 	struct irq_2_irte *irte_info = &data->irq_2_irte;
+-	struct IO_APIC_route_entry *entry;
+ 	struct amd_iommu *iommu = amd_iommu_rlookup_table[devid];
  
+ 	if (!iommu)
+@@ -3683,17 +3682,6 @@ static void irq_remapping_prepare_irte(struct amd_ir_data *data,
+ 
+ 	switch (info->type) {
+ 	case X86_IRQ_ALLOC_TYPE_IOAPIC:
+-		/* Setup IOAPIC entry */
+-		entry = info->ioapic.entry;
+-		info->ioapic.entry = NULL;
+-		memset(entry, 0, sizeof(*entry));
+-		entry->vector		= index;
+-		entry->is_level		= info->ioapic.is_level;
+-		entry->active_low	= info->ioapic.active_low;
+-		/* Mask level triggered irqs. */
+-		entry->masked		= info->ioapic.is_level;
+-		break;
+-
  	case X86_IRQ_ALLOC_TYPE_HPET:
+ 	case X86_IRQ_ALLOC_TYPE_PCI_MSI:
+ 	case X86_IRQ_ALLOC_TYPE_PCI_MSIX:
 diff --git a/drivers/iommu/hyperv-iommu.c b/drivers/iommu/hyperv-iommu.c
-index e09e2d734c57..1ab7eb918a5c 100644
+index 1ab7eb918a5c..37dd485a5640 100644
 --- a/drivers/iommu/hyperv-iommu.c
 +++ b/drivers/iommu/hyperv-iommu.c
-@@ -52,7 +52,7 @@ static int hyperv_ir_set_affinity(struct irq_data *data,
+@@ -40,7 +40,6 @@ static int hyperv_ir_set_affinity(struct irq_data *data,
+ {
+ 	struct irq_data *parent = data->parent_data;
+ 	struct irq_cfg *cfg = irqd_cfg(data);
+-	struct IO_APIC_route_entry *entry;
+ 	int ret;
+ 
+ 	/* Return error If new irq affinity is out of ioapic_max_cpumask. */
+@@ -51,9 +50,6 @@ static int hyperv_ir_set_affinity(struct irq_data *data,
+ 	if (ret < 0 || ret == IRQ_SET_MASK_OK_DONE)
  		return ret;
  
- 	entry = data->chip_data;
--	entry->dest = cfg->dest_apicid;
-+	entry->destid_0_7 = cfg->dest_apicid;
- 	entry->vector = cfg->vector;
+-	entry = data->chip_data;
+-	entry->destid_0_7 = cfg->dest_apicid;
+-	entry->vector = cfg->vector;
  	send_cleanup_vector(cfg);
  
-@@ -125,7 +125,7 @@ static int hyperv_irq_remapping_activate(struct irq_domain *domain,
- 	struct irq_cfg *cfg = irqd_cfg(irq_data);
- 	struct IO_APIC_route_entry *entry = irq_data->chip_data;
- 
--	entry->dest = cfg->dest_apicid;
-+	entry->destid_0_7 = cfg->dest_apicid;
- 	entry->vector = cfg->vector;
- 
  	return 0;
+@@ -89,20 +85,6 @@ static int hyperv_irq_remapping_alloc(struct irq_domain *domain,
+ 
+ 	irq_data->chip = &hyperv_ir_chip;
+ 
+-	/*
+-	 * If there is interrupt remapping function of IOMMU, setting irq
+-	 * affinity only needs to change IRTE of IOMMU. But Hyper-V doesn't
+-	 * support interrupt remapping function, setting irq affinity of IO-APIC
+-	 * interrupts still needs to change IO-APIC registers. But ioapic_
+-	 * configure_entry() will ignore value of cfg->vector and cfg->
+-	 * dest_apicid when IO-APIC's parent irq domain is not the vector
+-	 * domain.(See ioapic_configure_entry()) In order to setting vector
+-	 * and dest_apicid to IO-APIC register, IO-APIC entry pointer is saved
+-	 * in the chip_data and hyperv_irq_remapping_activate()/hyperv_ir_set_
+-	 * affinity() set vector and dest_apicid directly into IO-APIC entry.
+-	 */
+-	irq_data->chip_data = info->ioapic.entry;
+-
+ 	/*
+ 	 * Hypver-V IO APIC irq affinity should be in the scope of
+ 	 * ioapic_max_cpumask because no irq remapping support.
+@@ -119,22 +101,9 @@ static void hyperv_irq_remapping_free(struct irq_domain *domain,
+ 	irq_domain_free_irqs_common(domain, virq, nr_irqs);
+ }
+ 
+-static int hyperv_irq_remapping_activate(struct irq_domain *domain,
+-			  struct irq_data *irq_data, bool reserve)
+-{
+-	struct irq_cfg *cfg = irqd_cfg(irq_data);
+-	struct IO_APIC_route_entry *entry = irq_data->chip_data;
+-
+-	entry->destid_0_7 = cfg->dest_apicid;
+-	entry->vector = cfg->vector;
+-
+-	return 0;
+-}
+-
+ static const struct irq_domain_ops hyperv_ir_domain_ops = {
+ 	.alloc = hyperv_irq_remapping_alloc,
+ 	.free = hyperv_irq_remapping_free,
+-	.activate = hyperv_irq_remapping_activate,
+ };
+ 
+ static int __init hyperv_prepare_irq_remapping(void)
 diff --git a/drivers/iommu/intel/irq_remapping.c b/drivers/iommu/intel/irq_remapping.c
-index 54ca69333445..625bdb9f1627 100644
+index 625bdb9f1627..96c84b19940e 100644
 --- a/drivers/iommu/intel/irq_remapping.c
 +++ b/drivers/iommu/intel/irq_remapping.c
-@@ -1279,8 +1279,8 @@ static void intel_irq_remapping_prepare_irte(struct intel_ir_data *data,
- 					     struct irq_alloc_info *info,
+@@ -1280,9 +1280,9 @@ static void intel_irq_remapping_prepare_irte(struct intel_ir_data *data,
  					     int index, int sub_handle)
  {
--	struct IR_IO_APIC_route_entry *entry;
  	struct irte *irte = &data->irte_entry;
-+	struct IO_APIC_route_entry *entry;
+-	struct IO_APIC_route_entry *entry;
  
  	prepare_irte(irte, irq_cfg->vector, irq_cfg->dest_apicid);
++
  	switch (info->type) {
-@@ -1294,22 +1294,21 @@ static void intel_irq_remapping_prepare_irte(struct intel_ir_data *data,
+ 	case X86_IRQ_ALLOC_TYPE_IOAPIC:
+ 		/* Set source-id of interrupt request */
+@@ -1293,39 +1293,20 @@ static void intel_irq_remapping_prepare_irte(struct intel_ir_data *data,
+ 			irte->trigger_mode, irte->dlvry_mode,
  			irte->avail, irte->vector, irte->dest_id,
  			irte->sid, irte->sq, irte->svt);
- 
--		entry = (struct IR_IO_APIC_route_entry *)info->ioapic.entry;
-+		entry = info->ioapic.entry;
- 		info->ioapic.entry = NULL;
- 		memset(entry, 0, sizeof(*entry));
--		entry->index2	= (index >> 15) & 0x1;
--		entry->zero	= 0;
--		entry->format	= 1;
--		entry->index	= (index & 0x7fff);
-+		entry->ir_index_15	= !!(index & 0x8000);
-+		entry->ir_format	= true;
-+		entry->ir_index_0_14	= index & 0x7fff;
- 		/*
- 		 * IO-APIC RTE will be configured with virtual vector.
- 		 * irq handler will do the explicit EOI to the io-apic.
- 		 */
--		entry->vector	= info->ioapic.pin;
--		entry->trigger	= info->ioapic.is_level;
--		entry->polarity	= info->ioapic.active_low;
-+		entry->vector		= info->ioapic.pin;
-+		entry->is_level		= info->ioapic.is_level;
-+		entry->active_low	= info->ioapic.active_low;
- 		/* Mask level triggered irqs. */
--		entry->mask	= info->ioapic.is_level;
-+		entry->masked		= info->ioapic.is_level;
+-
+-		entry = info->ioapic.entry;
+-		info->ioapic.entry = NULL;
+-		memset(entry, 0, sizeof(*entry));
+-		entry->ir_index_15	= !!(index & 0x8000);
+-		entry->ir_format	= true;
+-		entry->ir_index_0_14	= index & 0x7fff;
+-		/*
+-		 * IO-APIC RTE will be configured with virtual vector.
+-		 * irq handler will do the explicit EOI to the io-apic.
+-		 */
+-		entry->vector		= info->ioapic.pin;
+-		entry->is_level		= info->ioapic.is_level;
+-		entry->active_low	= info->ioapic.active_low;
+-		/* Mask level triggered irqs. */
+-		entry->masked		= info->ioapic.is_level;
++		sub_handle = info->ioapic.pin;
  		break;
- 
+-
  	case X86_IRQ_ALLOC_TYPE_HPET:
++		set_hpet_sid(irte, info->devid);
++		break;
+ 	case X86_IRQ_ALLOC_TYPE_PCI_MSI:
+ 	case X86_IRQ_ALLOC_TYPE_PCI_MSIX:
+-		if (info->type == X86_IRQ_ALLOC_TYPE_HPET)
+-			set_hpet_sid(irte, info->devid);
+-		else
+-			set_msi_sid(irte, msi_desc_to_pci_dev(info->desc));
+-
+-		fill_msi_msg(&data->msi_entry, index, sub_handle);
++		set_msi_sid(irte, msi_desc_to_pci_dev(info->desc));
+ 		break;
+-
+ 	default:
+ 		BUG_ON(1);
+ 		break;
+ 	}
++	fill_msi_msg(&data->msi_entry, index, sub_handle);
+ }
+ 
+ static void intel_free_irq_resources(struct irq_domain *domain,
 -- 
 2.26.2
 
