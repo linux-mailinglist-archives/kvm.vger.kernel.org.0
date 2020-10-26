@@ -2,74 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2F5A298922
-	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 10:08:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1683C2989D0
+	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 10:51:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1772611AbgJZJIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Oct 2020 05:08:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28229 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2502310AbgJZJIk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Oct 2020 05:08:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603703319;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pOBGZ5+A7L2rnaWgcxvogJM7iw4FNPt7uW+XKHPm+GM=;
-        b=DYtcZtIp6F1Z3/QVAAWE7do+zpqRmzLUY2HDpzWdg9W6lLrKDnY1fX6J4PTRg0G1yJ5CGP
-        OVRMGRH+9ENTV6yLJHRA5iUqZA+nhj1qfZ6v9vF1WkwnXV6sUHX/rHCEHboB1m0riyRfuE
-        gdBxfcFxDFyDq1UfB2P9fFNo/TlXCQE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-NhFTAwbvNemABcpc2XymHA-1; Mon, 26 Oct 2020 05:08:35 -0400
-X-MC-Unique: NhFTAwbvNemABcpc2XymHA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1768646AbgJZJvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Oct 2020 05:51:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44100 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1737069AbgJZJvc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Oct 2020 05:51:32 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9918564ACA;
-        Mon, 26 Oct 2020 09:08:34 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1755B5D9E4;
-        Mon, 26 Oct 2020 09:08:29 +0000 (UTC)
-Date:   Mon, 26 Oct 2020 10:08:27 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: selftests: Add get featured msrs test case
-Message-ID: <20201026090827.muchi7h5dcvh5c2r@kamzik.brq.redhat.com>
-References: <20201025185334.389061-1-peterx@redhat.com>
- <20201025185334.389061-2-peterx@redhat.com>
- <874kmh2wj5.fsf@vitty.brq.redhat.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 9AB82222EC;
+        Mon, 26 Oct 2020 09:51:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603705891;
+        bh=M9e70BEFvF5FajpDUL4748IzzfhwguzKhvy5dXrsgVY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=vROdnfbQxI4Ju2iB6xoCt7CemBetIOumxE1d+KQqxDvEdVsJnhGCsSIb2cfp+IrKt
+         4asYcTyiMm1cYQIk95FWa4uF7WlLY8FflURgUu+ArxLtXpX68VgL5n65f4aZ2VSVim
+         NhcyLDWCyx2LKy2f+gKC3uOIDnTuflgQBp3P5A2w=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kWzA1-004HZn-Qc; Mon, 26 Oct 2020 09:51:29 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, kernel-team@android.com
+Subject: [PATCH 1/8] KVM: arm64: Don't corrupt tpidr_el2 on failed HVC call
+Date:   Mon, 26 Oct 2020 09:51:09 +0000
+Message-Id: <20201026095116.72051-2-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201026095116.72051-1-maz@kernel.org>
+References: <20201026095116.72051-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874kmh2wj5.fsf@vitty.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, will@kernel.org, qperret@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 26, 2020 at 09:58:54AM +0100, Vitaly Kuznetsov wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> > +int kvm_vm_get_feature_msrs(struct kvm_vm *vm, struct kvm_msrs *msrs)
-> > +{
-> > +	return ioctl(vm->kvm_fd, KVM_GET_MSRS, msrs);
-> > +}
-> 
-> I *think* that the non-written rule for kvm selftests is that functions
-> without '_' prefix check ioctl return value with TEST_ASSERT() and
-> functions with it don't (e.g. _vcpu_run()/vcpu_run()) but maybe it's
-> just me.
->
+The hyp-init code starts by stashing a register in TPIDR_EL2
+in in order to free a register. This happens no matter if the
+HVC call is legal or not.
 
-Yes, that's the pattern I've been trying to implement. If we want to be
-strict about it, then we should do a quick scan of the code to ensure
-its currently consistent. I have it feeling it isn't.
+Although nothing wrong seems to come out of it, it feels odd
+to alter the EL2 state for something that eventually returns
+an error.
 
-Thanks,
-drew
+Instead, use the fact that we know exactly which bits of the
+__kvm_hyp_init call are non-zero to perform the check with
+a series of EOR/ROR instructions, combined with a build-time
+check that the value is the one we expect.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 47224dc62c51..b11a9d7db677 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -57,16 +57,25 @@ __do_hyp_init:
+ 	cmp	x0, #HVC_STUB_HCALL_NR
+ 	b.lo	__kvm_handle_stub_hvc
+ 
+-	/* Set tpidr_el2 for use by HYP to free a register */
+-	msr	tpidr_el2, x2
+-
+-	mov	x2, #KVM_HOST_SMCCC_FUNC(__kvm_hyp_init)
+-	cmp	x0, x2
+-	b.eq	1f
++	// We only actively check bits [24:31], and everything
++	// else has to be zero, which we check at build time.
++#if (KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) & 0xFFFFFFFF00FFFFFF)
++#error Unexpected __KVM_HOST_SMCCC_FUNC___kvm_hyp_init value
++#endif
++
++	ror	x0, x0, #24
++	eor	x0, x0, #((KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) >> 24) & 0xF)
++	ror	x0, x0, #4
++	eor	x0, x0, #((KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) >> 28) & 0xF)
++	cbz	x0, 1f
+ 	mov	x0, #SMCCC_RET_NOT_SUPPORTED
+ 	eret
+ 
+-1:	phys_to_ttbr x0, x1
++1:
++	/* Set tpidr_el2 for use by HYP to free a register */
++	msr	tpidr_el2, x2
++
++	phys_to_ttbr x0, x1
+ alternative_if ARM64_HAS_CNP
+ 	orr	x0, x0, #TTBR_CNP_BIT
+ alternative_else_nop_endif
+-- 
+2.28.0
 
