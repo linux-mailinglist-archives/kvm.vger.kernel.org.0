@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65CAC298E09
-	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 14:35:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B2A298E05
+	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 14:35:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1780212AbgJZNfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Oct 2020 09:35:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37858 "EHLO mail.kernel.org"
+        id S1780219AbgJZNfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Oct 2020 09:35:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37786 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1780186AbgJZNfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Oct 2020 09:35:09 -0400
+        id S1780184AbgJZNfK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Oct 2020 09:35:10 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7FC702463C;
-        Mon, 26 Oct 2020 13:35:07 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7E3B62465D;
+        Mon, 26 Oct 2020 13:35:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603719307;
-        bh=2FHKT6bmCwz6MJKHlgH1EU3SgK7cCO25g6M2mX9WN2A=;
+        s=default; t=1603719308;
+        bh=gdX7E6xLMzfjP0pnhMlmC9cLjbp06QgwkPw2QUb+A44=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YEYfUwZacYVK6O24SbUrLJ6e68Zaya1wocpZTWx3NoYYLGFJ5pmuyJ9tOertueaXx
-         GhCfuMQK7kaUfGWPPtiWu0CAtgU15nFpUncYn3QBrmWuWQoa+3/USHM0TeZRRIkko5
-         0uBPpw1n214x2sHGDK9jISPq4ZdmJyoS3NNVk/Rs=
+        b=tq5njhu8efZXMYul7OTAwzGZPy1adwOCo6F8SsMnFbRiHwDn/GwBV+s53vIsrSWO1
+         9qY/EsDI0nec9ynd1BLDr3Hnc7DZrS3GXXGY6hzD3w7XG8JZit+x6rETntVsxH6O5W
+         EHKJL0WploN+/IFU80DpKpk2BDKN2PNlEmF1+Ynk=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1kX2eP-004Kjh-Os; Mon, 26 Oct 2020 13:35:05 +0000
+        id 1kX2eQ-004Kjh-Kx; Mon, 26 Oct 2020 13:35:06 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -38,9 +38,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Will Deacon <will@kernel.org>,
         Quentin Perret <qperret@google.com>,
         David Brazdil <dbrazdil@google.com>, kernel-team@android.com
-Subject: [PATCH 07/11] KVM: arm64: Inject AArch64 exceptions from HYP
-Date:   Mon, 26 Oct 2020 13:34:46 +0000
-Message-Id: <20201026133450.73304-8-maz@kernel.org>
+Subject: [PATCH 08/11] KVM: arm64: Inject AArch32 exceptions from HYP
+Date:   Mon, 26 Oct 2020 13:34:47 +0000
+Message-Id: <20201026133450.73304-9-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201026133450.73304-1-maz@kernel.org>
 References: <20201026133450.73304-1-maz@kernel.org>
@@ -54,350 +54,463 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the AArch64 exception injection code from EL1 to HYP, leaving
-only the ESR_EL1 updates to EL1. In order to come with the differences
-between VHE and nVHE, two set of system register accessors are provided.
+Similarily to what has been done for AArch64, move the AArch32 exception
+inhjection to HYP.
 
-SPSR, ELR, PC and PSTATE are now completely handled in the hypervisor.
+In order to not use the regmap selection code at EL2, simplify the code
+populating the target mode's LR register by harcoding the two possible
+LR registers (LR_abt in X20, LR_und in X22).
+
+We also introduce new accessors for SPSR and CP15 registers.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  12 ++
- arch/arm64/kvm/hyp/exception.c       | 160 +++++++++++++++++++++++++++
- arch/arm64/kvm/inject_fault.c        | 112 +------------------
- 3 files changed, 176 insertions(+), 108 deletions(-)
+ arch/arm64/kvm/aarch32.c       | 149 +---------------------
+ arch/arm64/kvm/hyp/exception.c | 221 ++++++++++++++++++++++++++++++---
+ 2 files changed, 212 insertions(+), 158 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 6d2b5d1aa7b3..736a342dadf7 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -21,6 +21,18 @@
- #include <asm/cputype.h>
- #include <asm/virt.h>
+diff --git a/arch/arm64/kvm/aarch32.c b/arch/arm64/kvm/aarch32.c
+index 40a62a99fbf8..ad453b47c517 100644
+--- a/arch/arm64/kvm/aarch32.c
++++ b/arch/arm64/kvm/aarch32.c
+@@ -19,20 +19,6 @@
+ #define DFSR_FSC_EXTABT_nLPAE	0x08
+ #define DFSR_LPAE		BIT(9)
  
-+#define CURRENT_EL_SP_EL0_VECTOR	0x0
-+#define CURRENT_EL_SP_ELx_VECTOR	0x200
-+#define LOWER_EL_AArch64_VECTOR		0x400
-+#define LOWER_EL_AArch32_VECTOR		0x600
-+
-+enum exception_type {
-+	except_type_sync	= 0,
-+	except_type_irq		= 0x80,
-+	except_type_fiq		= 0x100,
-+	except_type_serror	= 0x180,
-+};
-+
- unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
- unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu);
- void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v);
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 6533a9270850..cd6e643639e8 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -11,7 +11,167 @@
-  */
- 
- #include <hyp/adjust_pc.h>
-+#include <linux/kvm_host.h>
-+#include <asm/kvm_emulate.h>
-+
-+#if defined (__KVM_NVHE_HYPERVISOR__)
-+/*
-+ * System registers are never loaded on the CPU until we actually
-+ * restore them.
-+ */
-+static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
-+{
-+	return __vcpu_sys_reg(vcpu, reg);
-+}
-+
-+static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
-+{
-+	 __vcpu_sys_reg(vcpu, reg) = val;
-+}
-+
-+static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
-+{
-+	write_sysreg_el1(val, SYS_SPSR);
-+}
-+#elif defined (__KVM_VHE_HYPERVISOR__)
-+/* On VHE, all the registers are already loaded on the CPU */
-+static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
-+{
-+	u64 val;
-+
-+	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
-+		return val;
-+
-+	return __vcpu_sys_reg(vcpu, reg);
-+}
-+
-+static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
-+{
-+	if (__vcpu_write_sys_reg_to_cpu(val, reg))
-+		return;
-+
-+	 __vcpu_sys_reg(vcpu, reg) = val;
-+}
-+
-+static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
-+{
-+	write_sysreg_el1(val, SYS_SPSR);
-+}
-+#else
-+#error Hypervisor code only!
-+#endif
-+
-+/*
-+ * This performs the exception entry at a given EL (@target_mode), stashing PC
-+ * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-+ * The EL passed to this function *must* be a non-secure, privileged mode with
-+ * bit 0 being set (PSTATE.SP == 1).
-+ *
-+ * When an exception is taken, most PSTATE fields are left unchanged in the
-+ * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
-+ * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-+ * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
-+ *
-+ * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
-+ * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
-+ *
-+ * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
-+ * MSB to LSB.
-+ */
-+static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
-+			      enum exception_type type)
-+{
-+	unsigned long sctlr, vbar, old, new, mode;
-+	u64 exc_offset;
-+
-+	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	if      (mode == target_mode)
-+		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-+	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
-+		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-+	else if (!(mode & PSR_MODE32_BIT))
-+		exc_offset = LOWER_EL_AArch64_VECTOR;
-+	else
-+		exc_offset = LOWER_EL_AArch32_VECTOR;
-+
-+	switch (target_mode) {
-+	case PSR_MODE_EL1h:
-+		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL1);
-+		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
-+		break;
-+	default:
-+		/* Don't do that */
-+		BUG();
-+	}
-+
-+	*vcpu_pc(vcpu) = vbar + exc_offset + type;
-+
-+	old = *vcpu_cpsr(vcpu);
-+	new = 0;
-+
-+	new |= (old & PSR_N_BIT);
-+	new |= (old & PSR_Z_BIT);
-+	new |= (old & PSR_C_BIT);
-+	new |= (old & PSR_V_BIT);
-+
-+	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
-+
-+	new |= (old & PSR_DIT_BIT);
-+
-+	// PSTATE.UAO is set to zero upon any exception to AArch64
-+	// See ARM DDI 0487E.a, page D5-2579.
-+
-+	// PSTATE.PAN is unchanged unless SCTLR_ELx.SPAN == 0b0
-+	// SCTLR_ELx.SPAN is RES1 when ARMv8.1-PAN is not implemented
-+	// See ARM DDI 0487E.a, page D5-2578.
-+	new |= (old & PSR_PAN_BIT);
-+	if (!(sctlr & SCTLR_EL1_SPAN))
-+		new |= PSR_PAN_BIT;
-+
-+	// PSTATE.SS is set to zero upon any exception to AArch64
-+	// See ARM DDI 0487E.a, page D2-2452.
-+
-+	// PSTATE.IL is set to zero upon any exception to AArch64
-+	// See ARM DDI 0487E.a, page D1-2306.
-+
-+	// PSTATE.SSBS is set to SCTLR_ELx.DSSBS upon any exception to AArch64
-+	// See ARM DDI 0487E.a, page D13-3258
-+	if (sctlr & SCTLR_ELx_DSSBS)
-+		new |= PSR_SSBS_BIT;
-+
-+	// PSTATE.BTYPE is set to zero upon any exception to AArch64
-+	// See ARM DDI 0487E.a, pages D1-2293 to D1-2294.
-+
-+	new |= PSR_D_BIT;
-+	new |= PSR_A_BIT;
-+	new |= PSR_I_BIT;
-+	new |= PSR_F_BIT;
-+
-+	new |= target_mode;
-+
-+	*vcpu_cpsr(vcpu) = new;
-+	__vcpu_write_spsr(vcpu, old);
-+}
- 
- void kvm_inject_exception(struct kvm_vcpu *vcpu)
- {
-+	switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
-+	case KVM_ARM64_EXCEPT_AA64_EL1_SYNC:
-+		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-+		break;
-+	case KVM_ARM64_EXCEPT_AA64_EL1_IRQ:
-+		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_irq);
-+		break;
-+	case KVM_ARM64_EXCEPT_AA64_EL1_FIQ:
-+		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_fiq);
-+		break;
-+	case KVM_ARM64_EXCEPT_AA64_EL1_SERR:
-+		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_serror);
-+		break;
-+	default:
-+		/* EL2 are unimplemented until we get NV. One day. */
-+		break;
-+	}
- }
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 34a96ab244fa..7a1b5ccb1363 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -14,119 +14,14 @@
- #include <asm/kvm_emulate.h>
- #include <asm/esr.h>
- 
--#define CURRENT_EL_SP_EL0_VECTOR	0x0
--#define CURRENT_EL_SP_ELx_VECTOR	0x200
--#define LOWER_EL_AArch64_VECTOR		0x400
--#define LOWER_EL_AArch32_VECTOR		0x600
--
--enum exception_type {
--	except_type_sync	= 0,
--	except_type_irq		= 0x80,
--	except_type_fiq		= 0x100,
--	except_type_serror	= 0x180,
+-/*
+- * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
+- */
+-static const u8 return_offsets[8][2] = {
+-	[0] = { 0, 0 },		/* Reset, unused */
+-	[1] = { 4, 2 },		/* Undefined */
+-	[2] = { 0, 0 },		/* SVC, unused */
+-	[3] = { 4, 4 },		/* Prefetch abort */
+-	[4] = { 8, 8 },		/* Data abort */
+-	[5] = { 0, 0 },		/* HVC, unused */
+-	[6] = { 4, 4 },		/* IRQ, unused */
+-	[7] = { 4, 4 },		/* FIQ, unused */
 -};
 -
+ static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
+ {
+ 	preempt_disable();
+@@ -53,132 +39,10 @@ static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
+ 	}
+ }
+ 
 -/*
-- * This performs the exception entry at a given EL (@target_mode), stashing PC
-- * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-- * The EL passed to this function *must* be a non-secure, privileged mode with
-- * bit 0 being set (PSTATE.SP == 1).
+- * When an exception is taken, most CPSR fields are left unchanged in the
+- * handler. However, some are explicitly overridden (e.g. M[4:0]).
 - *
-- * When an exception is taken, most PSTATE fields are left unchanged in the
-- * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
-- * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-- * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
+- * The SPSR/SPSR_ELx layouts differ, and the below is intended to work with
+- * either format. Note: SPSR.J bit doesn't exist in SPSR_ELx, but this bit was
+- * obsoleted by the ARMv7 virtualization extensions and is RES0.
 - *
-- * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
-- * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
+- * For the SPSR layout seen from AArch32, see:
+- * - ARM DDI 0406C.d, page B1-1148
+- * - ARM DDI 0487E.a, page G8-6264
 - *
-- * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
+- * For the SPSR_ELx layout for AArch32 seen from AArch64, see:
+- * - ARM DDI 0487E.a, page C5-426
+- *
+- * Here we manipulate the fields in order of the AArch32 SPSR_ELx layout, from
 - * MSB to LSB.
 - */
--static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
--			      enum exception_type type)
+-static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
 -{
--	unsigned long sctlr, vbar, old, new, mode;
--	u64 exc_offset;
--
--	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
--
--	if      (mode == target_mode)
--		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
--	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
--		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
--	else if (!(mode & PSR_MODE32_BIT))
--		exc_offset = LOWER_EL_AArch64_VECTOR;
--	else
--		exc_offset = LOWER_EL_AArch32_VECTOR;
--
--	switch (target_mode) {
--	case PSR_MODE_EL1h:
--		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
--		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
--		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
--		break;
--	default:
--		/* Don't do that */
--		BUG();
--	}
--
--	*vcpu_pc(vcpu) = vbar + exc_offset + type;
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+-	unsigned long old, new;
 -
 -	old = *vcpu_cpsr(vcpu);
 -	new = 0;
 -
--	new |= (old & PSR_N_BIT);
--	new |= (old & PSR_Z_BIT);
--	new |= (old & PSR_C_BIT);
--	new |= (old & PSR_V_BIT);
+-	new |= (old & PSR_AA32_N_BIT);
+-	new |= (old & PSR_AA32_Z_BIT);
+-	new |= (old & PSR_AA32_C_BIT);
+-	new |= (old & PSR_AA32_V_BIT);
+-	new |= (old & PSR_AA32_Q_BIT);
 -
--	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
+-	// CPSR.IT[7:0] are set to zero upon any exception
+-	// See ARM DDI 0487E.a, section G1.12.3
+-	// See ARM DDI 0406C.d, section B1.8.3
 -
--	new |= (old & PSR_DIT_BIT);
+-	new |= (old & PSR_AA32_DIT_BIT);
 -
--	// PSTATE.UAO is set to zero upon any exception to AArch64
--	// See ARM DDI 0487E.a, page D5-2579.
+-	// CPSR.SSBS is set to SCTLR.DSSBS upon any exception
+-	// See ARM DDI 0487E.a, page G8-6244
+-	if (sctlr & BIT(31))
+-		new |= PSR_AA32_SSBS_BIT;
 -
--	// PSTATE.PAN is unchanged unless SCTLR_ELx.SPAN == 0b0
--	// SCTLR_ELx.SPAN is RES1 when ARMv8.1-PAN is not implemented
--	// See ARM DDI 0487E.a, page D5-2578.
--	new |= (old & PSR_PAN_BIT);
--	if (!(sctlr & SCTLR_EL1_SPAN))
--		new |= PSR_PAN_BIT;
+-	// CPSR.PAN is unchanged unless SCTLR.SPAN == 0b0
+-	// SCTLR.SPAN is RES1 when ARMv8.1-PAN is not implemented
+-	// See ARM DDI 0487E.a, page G8-6246
+-	new |= (old & PSR_AA32_PAN_BIT);
+-	if (!(sctlr & BIT(23)))
+-		new |= PSR_AA32_PAN_BIT;
 -
--	// PSTATE.SS is set to zero upon any exception to AArch64
--	// See ARM DDI 0487E.a, page D2-2452.
+-	// SS does not exist in AArch32, so ignore
 -
--	// PSTATE.IL is set to zero upon any exception to AArch64
--	// See ARM DDI 0487E.a, page D1-2306.
+-	// CPSR.IL is set to zero upon any exception
+-	// See ARM DDI 0487E.a, page G1-5527
 -
--	// PSTATE.SSBS is set to SCTLR_ELx.DSSBS upon any exception to AArch64
--	// See ARM DDI 0487E.a, page D13-3258
--	if (sctlr & SCTLR_ELx_DSSBS)
--		new |= PSR_SSBS_BIT;
+-	new |= (old & PSR_AA32_GE_MASK);
 -
--	// PSTATE.BTYPE is set to zero upon any exception to AArch64
--	// See ARM DDI 0487E.a, pages D1-2293 to D1-2294.
+-	// CPSR.IT[7:0] are set to zero upon any exception
+-	// See prior comment above
 -
--	new |= PSR_D_BIT;
--	new |= PSR_A_BIT;
--	new |= PSR_I_BIT;
--	new |= PSR_F_BIT;
+-	// CPSR.E is set to SCTLR.EE upon any exception
+-	// See ARM DDI 0487E.a, page G8-6245
+-	// See ARM DDI 0406C.d, page B4-1701
+-	if (sctlr & BIT(25))
+-		new |= PSR_AA32_E_BIT;
 -
--	new |= target_mode;
+-	// CPSR.A is unchanged upon an exception to Undefined, Supervisor
+-	// CPSR.A is set upon an exception to other modes
+-	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
+-	// See ARM DDI 0406C.d, page B1-1182
+-	new |= (old & PSR_AA32_A_BIT);
+-	if (mode != PSR_AA32_MODE_UND && mode != PSR_AA32_MODE_SVC)
+-		new |= PSR_AA32_A_BIT;
 -
--	*vcpu_cpsr(vcpu) = new;
--	vcpu_write_spsr(vcpu, old);
+-	// CPSR.I is set upon any exception
+-	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
+-	// See ARM DDI 0406C.d, page B1-1182
+-	new |= PSR_AA32_I_BIT;
+-
+-	// CPSR.F is set upon an exception to FIQ
+-	// CPSR.F is unchanged upon an exception to other modes
+-	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
+-	// See ARM DDI 0406C.d, page B1-1182
+-	new |= (old & PSR_AA32_F_BIT);
+-	if (mode == PSR_AA32_MODE_FIQ)
+-		new |= PSR_AA32_F_BIT;
+-
+-	// CPSR.T is set to SCTLR.TE upon any exception
+-	// See ARM DDI 0487E.a, page G8-5514
+-	// See ARM DDI 0406C.d, page B1-1181
+-	if (sctlr & BIT(30))
+-		new |= PSR_AA32_T_BIT;
+-
+-	new |= mode;
+-
+-	return new;
 -}
 -
- static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+-static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+-{
+-	unsigned long spsr = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (spsr & PSR_AA32_T_BIT);
+-	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
+-	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
+-
+-	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
+-
+-	/* Note: These now point to the banked copies */
+-	vcpu_write_spsr(vcpu, host_spsr_to_spsr32(spsr));
+-	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+-
+-	/* Branch to exception vector */
+-	if (sctlr & (1 << 13))
+-		vect_offset += 0xffff0000;
+-	else /* always have security exceptions */
+-		vect_offset += vcpu_cp15(vcpu, c12_VBAR);
+-
+-	*vcpu_pc(vcpu) = vect_offset;
+-}
+-
+ void kvm_inject_undef32(struct kvm_vcpu *vcpu)
  {
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
- 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
- 	u32 esr = 0;
- 
--	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-+	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1_SYNC |
+-	bool loaded = pre_fault_synchronize(vcpu);
+-
+-	prepare_fault32(vcpu, PSR_AA32_MODE_UND, 4);
+-	post_fault_synchronize(vcpu, loaded);
++	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_UND |
 +			     KVM_ARM64_PENDING_EXCEPTION);
+ }
  
- 	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
- 
-@@ -156,7 +51,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ /*
+@@ -188,7 +52,6 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu)
+ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 			 unsigned long addr)
  {
- 	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+-	u32 vect_offset;
+ 	u32 *far, *fsr;
+ 	bool is_lpae;
+ 	bool loaded;
+@@ -196,17 +59,17 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 	loaded = pre_fault_synchronize(vcpu);
  
--	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-+	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1_SYNC |
-+			     KVM_ARM64_PENDING_EXCEPTION);
+ 	if (is_pabt) {
+-		vect_offset = 12;
++		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IABT |
++				     KVM_ARM64_PENDING_EXCEPTION);
+ 		far = &vcpu_cp15(vcpu, c6_IFAR);
+ 		fsr = &vcpu_cp15(vcpu, c5_IFSR);
+ 	} else { /* !iabt */
+-		vect_offset = 16;
++		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_DABT |
++				     KVM_ARM64_PENDING_EXCEPTION);
+ 		far = &vcpu_cp15(vcpu, c6_DFAR);
+ 		fsr = &vcpu_cp15(vcpu, c5_DFSR);
+ 	}
  
- 	/*
- 	 * Build an unknown exception, depending on the instruction
+-	prepare_fault32(vcpu, PSR_AA32_MODE_ABT, vect_offset);
+-
+ 	*far = addr;
+ 
+ 	/* Give the guest an IMPLEMENTATION DEFINED exception */
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index cd6e643639e8..8d1d1bcd9e69 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -33,6 +33,16 @@ static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
+ {
+ 	write_sysreg_el1(val, SYS_SPSR);
+ }
++
++static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
++{
++	vcpu->arch.ctxt.spsr_abt = val;
++}
++
++static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
++{
++	vcpu->arch.ctxt.spsr_und = val;
++}
+ #elif defined (__KVM_VHE_HYPERVISOR__)
+ /* On VHE, all the registers are already loaded on the CPU */
+ static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+@@ -57,10 +67,25 @@ static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
+ {
+ 	write_sysreg_el1(val, SYS_SPSR);
+ }
++
++static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
++{
++	write_sysreg(val, spsr_abt);
++}
++
++static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
++{
++	write_sysreg(val, spsr_und);
++}
+ #else
+ #error Hypervisor code only!
+ #endif
+ 
++static inline u32 __vcpu_read_cp15(const struct kvm_vcpu *vcpu, int reg)
++{
++	return __vcpu_read_sys_reg(vcpu, reg / 2);
++}
++
+ /*
+  * This performs the exception entry at a given EL (@target_mode), stashing PC
+  * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
+@@ -155,23 +180,189 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+ 	__vcpu_write_spsr(vcpu, old);
+ }
+ 
+-void kvm_inject_exception(struct kvm_vcpu *vcpu)
++/*
++ * When an exception is taken, most CPSR fields are left unchanged in the
++ * handler. However, some are explicitly overridden (e.g. M[4:0]).
++ *
++ * The SPSR/SPSR_ELx layouts differ, and the below is intended to work with
++ * either format. Note: SPSR.J bit doesn't exist in SPSR_ELx, but this bit was
++ * obsoleted by the ARMv7 virtualization extensions and is RES0.
++ *
++ * For the SPSR layout seen from AArch32, see:
++ * - ARM DDI 0406C.d, page B1-1148
++ * - ARM DDI 0487E.a, page G8-6264
++ *
++ * For the SPSR_ELx layout for AArch32 seen from AArch64, see:
++ * - ARM DDI 0487E.a, page C5-426
++ *
++ * Here we manipulate the fields in order of the AArch32 SPSR_ELx layout, from
++ * MSB to LSB.
++ */
++static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
+ {
+-	switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
+-	case KVM_ARM64_EXCEPT_AA64_EL1_SYNC:
+-		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+-		break;
+-	case KVM_ARM64_EXCEPT_AA64_EL1_IRQ:
+-		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_irq);
+-		break;
+-	case KVM_ARM64_EXCEPT_AA64_EL1_FIQ:
+-		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_fiq);
+-		break;
+-	case KVM_ARM64_EXCEPT_AA64_EL1_SERR:
+-		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_serror);
++	u32 sctlr = __vcpu_read_cp15(vcpu, c1_SCTLR);
++	unsigned long old, new;
++
++	old = *vcpu_cpsr(vcpu);
++	new = 0;
++
++	new |= (old & PSR_AA32_N_BIT);
++	new |= (old & PSR_AA32_Z_BIT);
++	new |= (old & PSR_AA32_C_BIT);
++	new |= (old & PSR_AA32_V_BIT);
++	new |= (old & PSR_AA32_Q_BIT);
++
++	// CPSR.IT[7:0] are set to zero upon any exception
++	// See ARM DDI 0487E.a, section G1.12.3
++	// See ARM DDI 0406C.d, section B1.8.3
++
++	new |= (old & PSR_AA32_DIT_BIT);
++
++	// CPSR.SSBS is set to SCTLR.DSSBS upon any exception
++	// See ARM DDI 0487E.a, page G8-6244
++	if (sctlr & BIT(31))
++		new |= PSR_AA32_SSBS_BIT;
++
++	// CPSR.PAN is unchanged unless SCTLR.SPAN == 0b0
++	// SCTLR.SPAN is RES1 when ARMv8.1-PAN is not implemented
++	// See ARM DDI 0487E.a, page G8-6246
++	new |= (old & PSR_AA32_PAN_BIT);
++	if (!(sctlr & BIT(23)))
++		new |= PSR_AA32_PAN_BIT;
++
++	// SS does not exist in AArch32, so ignore
++
++	// CPSR.IL is set to zero upon any exception
++	// See ARM DDI 0487E.a, page G1-5527
++
++	new |= (old & PSR_AA32_GE_MASK);
++
++	// CPSR.IT[7:0] are set to zero upon any exception
++	// See prior comment above
++
++	// CPSR.E is set to SCTLR.EE upon any exception
++	// See ARM DDI 0487E.a, page G8-6245
++	// See ARM DDI 0406C.d, page B4-1701
++	if (sctlr & BIT(25))
++		new |= PSR_AA32_E_BIT;
++
++	// CPSR.A is unchanged upon an exception to Undefined, Supervisor
++	// CPSR.A is set upon an exception to other modes
++	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
++	// See ARM DDI 0406C.d, page B1-1182
++	new |= (old & PSR_AA32_A_BIT);
++	if (mode != PSR_AA32_MODE_UND && mode != PSR_AA32_MODE_SVC)
++		new |= PSR_AA32_A_BIT;
++
++	// CPSR.I is set upon any exception
++	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
++	// See ARM DDI 0406C.d, page B1-1182
++	new |= PSR_AA32_I_BIT;
++
++	// CPSR.F is set upon an exception to FIQ
++	// CPSR.F is unchanged upon an exception to other modes
++	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
++	// See ARM DDI 0406C.d, page B1-1182
++	new |= (old & PSR_AA32_F_BIT);
++	if (mode == PSR_AA32_MODE_FIQ)
++		new |= PSR_AA32_F_BIT;
++
++	// CPSR.T is set to SCTLR.TE upon any exception
++	// See ARM DDI 0487E.a, page G8-5514
++	// See ARM DDI 0406C.d, page B1-1181
++	if (sctlr & BIT(30))
++		new |= PSR_AA32_T_BIT;
++
++	new |= mode;
++
++	return new;
++}
++
++/*
++ * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
++ */
++static const u8 return_offsets[8][2] = {
++	[0] = { 0, 0 },		/* Reset, unused */
++	[1] = { 4, 2 },		/* Undefined */
++	[2] = { 0, 0 },		/* SVC, unused */
++	[3] = { 4, 4 },		/* Prefetch abort */
++	[4] = { 8, 8 },		/* Data abort */
++	[5] = { 0, 0 },		/* HVC, unused */
++	[6] = { 4, 4 },		/* IRQ, unused */
++	[7] = { 4, 4 },		/* FIQ, unused */
++};
++
++static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
++{
++	unsigned long spsr = *vcpu_cpsr(vcpu);
++	bool is_thumb = (spsr & PSR_AA32_T_BIT);
++	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
++	u32 sctlr = __vcpu_read_cp15(vcpu, c1_SCTLR);
++	int lr;
++
++	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
++
++	/*
++	 * Table D1-27 of DDI 0487F.c shows the GPR mapping between
++	 * AArch32 and AArch64. We only deal with ABT/UND.
++	 */
++	switch(mode) {
++	case PSR_AA32_MODE_ABT:
++		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
++		lr = 20;
+ 		break;
+-	default:
+-		/* EL2 are unimplemented until we get NV. One day. */
++		
++	case PSR_AA32_MODE_UND:
++		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
++		lr = 22;
+ 		break;
+ 	}
++
++	vcpu_set_reg(vcpu, lr, *vcpu_pc(vcpu) + return_offset);
++
++	/* Branch to exception vector */
++	if (sctlr & (1 << 13))
++		vect_offset += 0xffff0000;
++	else /* always have security exceptions */
++		vect_offset += __vcpu_read_cp15(vcpu, c12_VBAR);
++
++	*vcpu_pc(vcpu) = vect_offset;
++}
++
++void kvm_inject_exception(struct kvm_vcpu *vcpu)
++{
++	if (vcpu_el1_is_32bit(vcpu)) {
++		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
++		case KVM_ARM64_EXCEPT_AA32_UND:
++			enter_exception32(vcpu, PSR_AA32_MODE_UND, 4);
++			break;
++		case KVM_ARM64_EXCEPT_AA32_IABT:
++			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 12);
++			break;
++		case KVM_ARM64_EXCEPT_AA32_DABT:
++			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 16);
++			break;
++		default:
++			/* Err... */
++			break;
++		}
++	} else {
++		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
++		case KVM_ARM64_EXCEPT_AA64_EL1_SYNC:
++			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
++			break;
++		case KVM_ARM64_EXCEPT_AA64_EL1_IRQ:
++			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_irq);
++			break;
++		case KVM_ARM64_EXCEPT_AA64_EL1_FIQ:
++			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_fiq);
++			break;
++		case KVM_ARM64_EXCEPT_AA64_EL1_SERR:
++			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_serror);
++			break;
++		default:
++			/* EL2 are unimplemented until we get NV. One day. */
++			break;
++		}
++	}
+ }
 -- 
 2.28.0
 
