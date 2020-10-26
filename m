@@ -2,133 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1970298C17
-	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 12:25:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D33FF298CC5
+	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 13:14:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1773768AbgJZLZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Oct 2020 07:25:24 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:19654 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1773761AbgJZLZY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Oct 2020 07:25:24 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f96b22a0001>; Mon, 26 Oct 2020 04:25:30 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
- 2020 11:25:19 +0000
-Received: from santosh-System-Product-Name.nvidia.com (172.20.13.39) by
- mail.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Mon, 26 Oct 2020 11:25:15 +0000
-From:   Santosh Shukla <sashukla@nvidia.com>
-To:     <maz@kernel.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>
-CC:     <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
-        <suzuki.poulose@arm.com>, <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <cjia@nvidia.com>,
-        <kwankhede@nvidia.com>, <mcrossley@nvidia.com>,
-        Santosh Shukla <sashukla@nvidia.com>
-Subject: [PATCH v2 1/1] KVM: arm64: Correctly handle the mmio faulting
-Date:   Mon, 26 Oct 2020 16:54:07 +0530
-Message-ID: <1603711447-11998-2-git-send-email-sashukla@nvidia.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1603711447-11998-1-git-send-email-sashukla@nvidia.com>
-References: <1603711447-11998-1-git-send-email-sashukla@nvidia.com>
-X-NVConfidentiality: public
+        id S1774881AbgJZMOS convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 26 Oct 2020 08:14:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49292 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1774855AbgJZMN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Oct 2020 08:13:56 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 209867] New: CPU soft lockup/stall with nested KVM and SMP
+Date:   Mon, 26 Oct 2020 12:13:54 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: frantisek@sumsal.cz
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-209867-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1603711530; bh=yL8eU53Ye6VwNxBHiLcoNd9MJdU5fRUmThif3Tv1W5E=;
-        h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-         References:X-NVConfidentiality:MIME-Version:Content-Type;
-        b=XHOm2+pIlpG4E5U3euIlDKC7pqJpjQrTdWZNwMuV5fK+D1fWDqg43ADwB1Xu2LbtP
-         PcSt2zKuF67PMIt8PVUe4QY9jz3IYwOK5R9XN6PhKvscGRc7gZQ6HV1uC8cL4mPw2e
-         aNGvp8U0Rf1SZtD/z4U0yyCgu5t+LPHp3tTMpGow64ZDGzDaKeW/d1r2iFvV24yyix
-         R4xkNTgwHRaebjq57PGGqXjk+dH6XGfqgDwvUS6N+btaS4brB8qtNnqEb9c3vwS9Kg
-         hQh1BPVujC4zSGWjH88B/aN9riXCJRJC2T6wD+KgCWgepHGZq2YgJ+op77gQmWCuEh
-         6X2VPFK4B7yJA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Commit:6d674e28 introduces a notion to detect and handle the
-device mapping. The commit checks for the VM_PFNMAP flag is set
-in vma->flags and if set then marks force_pte to true such that
-if force_pte is true then ignore the THP function check
-(/transparent_hugepage_adjust()).
+https://bugzilla.kernel.org/show_bug.cgi?id=209867
 
-There could be an issue with the VM_PFNMAP flag setting and checking.
-For example consider a case where the mdev vendor driver register's
-the vma_fault handler named vma_mmio_fault(), which maps the
-host MMIO region in-turn calls remap_pfn_range() and maps
-the MMIO's vma space. Where, remap_pfn_range implicitly sets
-the VM_PFNMAP flag into vma->flags.
+            Bug ID: 209867
+           Summary: CPU soft lockup/stall with nested KVM and SMP
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.9.1-arch1-1
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: frantisek@sumsal.cz
+        Regression: No
 
-Now lets assume a mmio fault handing flow where guest first access
-the MMIO region whose 2nd stage translation is not present.
-So that results to arm64-kvm hypervisor executing guest abort handler,
-like below:
+Hello,
 
-kvm_handle_guest_abort() -->
- user_mem_abort()--> {
+During my systemd CI adventures I've encountered an issue with kernel 5.9.x
+where the boot freezes at completely random moments because of a CPU soft
+lockup. From my testing it seems to be reproducible with nested KVM & SMP > 1
+(it does happen with SMP == 1 as well, but not always) - see[0].
 
-    ...
-    0. checks the vma->flags for the VM_PFNMAP.
-    1. Since VM_PFNMAP flag is not yet set so force_pte _is_ false;
-    2. gfn_to_pfn_prot() -->
-        __gfn_to_pfn_memslot() -->
-            fixup_user_fault() -->
-                handle_mm_fault()-->
-                    __do_fault() -->
-                       vma_mmio_fault() --> // vendor's mdev fault handler
-                        remap_pfn_range()--> // Here sets the VM_PFNMAP
-                                                flag into vma->flags.
-    3. Now that force_pte is set to false in step-2),
-       will execute transparent_hugepage_adjust() func and
-       that lead to Oops [4].
- }
+Reproducer is quite straightforward - enable nested KVM on the host, create a
+VM, and create a nested KVM VM in that VM. During my testing I used Vagrant[1]
+(with libvirt backend) for the outer VM, and an image generated by mkosi[2] for
+the inner VM. Both VMs run the same kernel version.
 
-The proposition is to set force_pte=true if kvm_is_device_pfn is true.
+Hosts:
+ * several AMD & Intel servers with RHEL 8.2 (4.18.0-193.19.1.el8_2)
+ * AMD desktop with Fedora 32 (5.6.2-300.fc32.x86_64)
 
-[4] THP Oops:
-> pc: kvm_is_transparent_hugepage+0x18/0xb0
-> ...
-> ...
-> user_mem_abort+0x340/0x9b8
-> kvm_handle_guest_abort+0x248/0x468
-> handle_exit+0x150/0x1b0
-> kvm_arch_vcpu_ioctl_run+0x4d4/0x778
-> kvm_vcpu_ioctl+0x3c0/0x858
-> ksys_ioctl+0x84/0xb8
-> __arm64_sys_ioctl+0x28/0x38
+The behavior was consistent on all hosts.
 
-Tested on Huawei Kunpeng Taishan-200 arm64 server, Using VFIO-mdev device.
-Linux-5.10-rc1 tip: 3650b228
+Desktop results:
+# qemu-system-x86_64 -net none -smp 2 -m 512 -nographic -machine accel=kvm
+-enable-kvm -cpu host -kernel /boot/vmlinuz-linux -initrd
+/boot/initramfs-linux.img -append 'debug rw console=ttyS0 root=/dev/sda1'
+-drive format=raw,file=image.raw
+...
+[    4.602193] random: dbus-daemon: uninitialized urandom read (12 bytes read)
+[    5.538763] random: crng init done
+[   28.635398] watchdog: BUG: soft lockup - CPU#2 stuck for 22s! [systemd:1]
+[   28.638215] Modules linked in: drm agpgart ip_tables x_tables ext4
+crc32c_generic crc16 mbcache jbd2 sr_mod cdrom ata_generic pata_acpi
+crc32_pclmul crc32c_intel serio_raw atkbd libps2 aesni_intel glue_helper
+crypto_simd cryptd ata_piix floppy i8042 serio
+[   28.642668] CPU: 2 PID: 1 Comm: systemd Not tainted 5.9.1-arch1-1 #1
+[   28.648865] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+ArchLinux 1.14.0-1 04/01/2014
+[   28.648865] RIP: 0010:smp_call_function_many_cond+0x2a3/0x2f0
+[   28.655420] Code: c3 0d 3d 00 3b 05 61 0a 83 01 89 c7 0f 83 f4 fd ff ff 48
+63 c7 49 8b 55 00 48 03 14 c5 00 19 81 8b 8b 42 08 a8 01 74 09 f3 90 <8b> 42 08
+a8 01 75 f7 eb c9 48 c7 c2 60 45 d7 8b 48 89 ee 44 89 ff
+[   28.655420] RSP: 0018:ffffacf800013b18 EFLAGS: 00000202
+[   28.668750] RAX: 0000000000000011 RBX: 0000000000000000 RCX:
+0000000000000000
+[   28.668750] RDX: ffff91c39da333e0 RSI: 0000000000000000 RDI:
+0000000000000000
+[   28.668750] RBP: 0000000000000003 R08: 0000000000000000 R09:
+0000000000000000
+[   28.668750] R10: 0000000000000140 R11: 0000000000000002 R12:
+0000000000000000
+[   28.682088] R13: ffff91c39db2d340 R14: 0000000000000140 R15:
+ffff91c39db2d348
+[   28.682088] FS:  00007fd4cbc04340(0000) GS:ffff91c39db00000(0000)
+knlGS:0000000000000000
+[   28.682088] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   28.682088] CR2: 00007fd4cc9e8520 CR3: 000000001fa8e000 CR4:
+0000000000350ee0
+[   28.695419] Call Trace:
+[   28.695419]  ? __flush_tlb_all+0x30/0x30
+[   28.695419]  ? __flush_tlb_all+0x30/0x30
+[   28.695419]  on_each_cpu+0x43/0xb0
+[   28.695419]  __purge_vmap_area_lazy+0x5d/0x670
+[   28.695419]  ? do_jit+0xbdf/0x1cd0
+[   28.708758]  ? purge_fragmented_blocks+0xbd/0x1a0
+[   28.708758]  _vm_unmap_aliases.part.0+0x110/0x140
+[   28.708758]  change_page_attr_set_clr+0xb9/0x1c0
+[   28.708758]  set_memory_ro+0x26/0x30
+[   28.708758]  bpf_int_jit_compile+0x407/0x42b
+[   28.708758]  bpf_prog_select_runtime+0x101/0x1a0
+[   28.708758]  bpf_prog_load+0x49a/0x8e0
+[   28.722089]  __do_sys_bpf+0x2dd/0x1ea0
+[   28.722089]  do_syscall_64+0x33/0x40
+[   28.722089]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[   28.722089] RIP: 0033:0x7fd4cc91ed5d
+[   28.722089] Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89
+f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01
+f0 ff ff 73 01 c3 48 8b 0d e3 70 0c 00 f7 d8 64 89 01 48
+[   28.735427] RSP: 002b:00007ffe18ec4218 EFLAGS: 00000246 ORIG_RAX:
+0000000000000141
+[   28.735427] RAX: ffffffffffffffda RBX: 000055cea99a9ab0 RCX:
+00007fd4cc91ed5d
+[   28.735427] RDX: 0000000000000070 RSI: 00007ffe18ec4220 RDI:
+0000000000000005
+[   28.748752] RBP: 0000000000000000 R08: 0070756f7267632f R09:
+0000000800000008
+[   28.748752] R10: 0000000000000000 R11: 0000000000000246 R12:
+000055cea999fb20
+[   28.748752] R13: 0000000000000001 R14: 0000000000000001 R15:
+000055cea99836a0
+[   56.635397] watchdog: BUG: soft lockup - CPU#2 stuck for 22s! [systemd:1]
+[   56.638254] Modules linked in: drm agpgart ip_tables x_tables ext4
+crc32c_generic crc16 mbcache jbd2 sr_mod cdrom ata_generic pata_acpi
+crc32_pclmul crc32c_intel serio_raw atkbd libps2 aesni_intel glue_helper
+crypto_simd cryptd ata_piix floppy i8042 serio
+[   56.642094] CPU: 2 PID: 1 Comm: systemd Tainted: G             L   
+5.9.1-arch1-1 #1
+[   56.648798] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+ArchLinux 1.14.0-1 04/01/2014
+[   56.648798] RIP: 0010:smp_call_function_many_cond+0x2a3/0x2f0
+[   56.655444] Code: c3 0d 3d 00 3b 05 61 0a 83 01 89 c7 0f 83 f4 fd ff ff 48
+63 c7 49 8b 55 00 48 03 14 c5 00 19 81 8b 8b 42 08 a8 01 74 09 f3 90 <8b> 42 08
+a8 01 75 f7 eb c9 48 c7 c2 60 45 d7 8b 48 89 ee 44 89 ff
+[   56.655444] RSP: 0018:ffffacf800013b18 EFLAGS: 00000202
+[   56.655444] RAX: 0000000000000011 RBX: 0000000000000000 RCX:
+0000000000000000
+[   56.668871] RDX: ffff91c39da333e0 RSI: 0000000000000000 RDI:
+0000000000000000
+[   56.668871] RBP: 0000000000000003 R08: 0000000000000000 R09:
+0000000000000000
+[   56.668871] R10: 0000000000000140 R11: 0000000000000002 R12:
+0000000000000000
+[   56.668871] R13: ffff91c39db2d340 R14: 0000000000000140 R15:
+ffff91c39db2d348
+[   56.668871] FS:  00007fd4cbc04340(0000) GS:ffff91c39db00000(0000)
+knlGS:0000000000000000
+[   56.682244] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   56.682244] CR2: 00007fd4cc9e8520 CR3: 000000001fa8e000 CR4:
+0000000000350ee0
+[   56.682244] Call Trace:
+[   56.682244]  ? __flush_tlb_all+0x30/0x30
+[   56.682244]  ? __flush_tlb_all+0x30/0x30
+[   56.682244]  on_each_cpu+0x43/0xb0
+[   56.682244]  __purge_vmap_area_lazy+0x5d/0x670
+[   56.695525]  ? do_jit+0xbdf/0x1cd0
+[   56.695525]  ? purge_fragmented_blocks+0xbd/0x1a0
+[   56.695525]  _vm_unmap_aliases.part.0+0x110/0x140
+[   56.695525]  change_page_attr_set_clr+0xb9/0x1c0
+[   56.695525]  set_memory_ro+0x26/0x30
+[   56.695525]  bpf_int_jit_compile+0x407/0x42b
+[   56.695525]  bpf_prog_select_runtime+0x101/0x1a0
+[   56.708855]  bpf_prog_load+0x49a/0x8e0
+[   56.708855]  __do_sys_bpf+0x2dd/0x1ea0
+[   56.708855]  do_syscall_64+0x33/0x40
+[   56.708855]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[   56.708855] RIP: 0033:0x7fd4cc91ed5d
+[   56.708855] Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89
+f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01
+f0 ff ff 73 01 c3 48 8b 0d e3 70 0c 00 f7 d8 64 89 01 48
+[   56.722223] RSP: 002b:00007ffe18ec4218 EFLAGS: 00000246 ORIG_RAX:
+0000000000000141
+[   56.722223] RAX: ffffffffffffffda RBX: 000055cea99a9ab0 RCX:
+00007fd4cc91ed5d
+[   56.722223] RDX: 0000000000000070 RSI: 00007ffe18ec4220 RDI:
+0000000000000005
+[   56.722223] RBP: 0000000000000000 R08: 0070756f7267632f R09:
+0000000800000008
+[   56.735526] R10: 0000000000000000 R11: 0000000000000246 R12:
+000055cea999fb20
+[   56.735526] R13: 0000000000000001 R14: 0000000000000001 R15:
+000055cea99836a0
+...
+[   64.578716] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[   64.578716]  (detected by 2, t=18002 jiffies, g=-207, q=1973)
+[   64.578716] rcu: All QSes seen, last rcu_preempt kthread activity 18002
+(4294896513-4294878511), jiffies_till_next_fqs=2, root ->qsmask 0x0
+[   64.578716] rcu: rcu_preempt kthread starved for 18002 jiffies! g-207 f0x2
+RCU_GP_WAIT_FQS(5) ->state=0x200 ->cpu=0
+[   64.588745] rcu:     Unless rcu_preempt kthread gets sufficient CPU time,
+OOM is now expected behavior.
+[   64.588745] rcu: RCU grace-period kthread stack dump:
+[   64.588745] task:rcu_preempt     state:R stack:    0 pid:   11 ppid:     2
+flags:0x00004000
+[   64.602163] Call Trace:
+[   64.602163]  __schedule+0x292/0x830
+[   64.602163]  schedule+0x46/0xf0
+[   64.602163]  schedule_timeout+0x99/0x170
+[   64.602163]  ? __next_timer_interrupt+0x100/0x100
+[   64.602163]  rcu_gp_kthread+0x5a4/0xbe0
+[   64.602163]  ? __note_gp_changes+0x190/0x190
+[   64.602163]  kthread+0x142/0x160
+[   64.602163]  ? __kthread_bind_mask+0x60/0x60
+[   64.615482]  ret_from_fork+0x22/0x30
+...
 
-Fixes: 6d674e28 ("KVM: arm/arm64: Properly handle faulting of device mappings")
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Santosh Shukla <sashukla@nvidia.com>
----
-v2:
-- Per Marc's suggestion - setting force_pte=true.
-- Rebased and tested for 5.10-rc1 commit: 3650b228
+Server results:
+...
+[   32.051205] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [swapper/0:1]
+[   32.051237] Modules linked in:
+[   32.051237] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.9.1-arch1-1 #1
+[   32.051237] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+ArchLinux 1.14.0-1 04/01/2014
+[   32.051237] RIP: 0010:smp_call_function_many_cond+0x2a3/0x2f0
+[   32.051237] Code: c3 0d 3d 00 3b 05 61 0a 83 01 89 c7 0f 83 f4 fd ff ff 48
+63 c7 49 8b 55 00 48 03 14 c5 00 19 41 bb 8b 42 08 a8 01 74 09 f3 90 <8b> 42 08
+a8 01 75 f7 eb c9 48 c7 c2 60 45 97 bb 48 89 ee 44 89 ff
+[   32.051237] RSP: 0018:ffffa661c0013d98 EFLAGS: 00000202
+[   32.051237] RAX: 0000000000000011 RBX: 0000000000000000 RCX:
+0000000000000004
+[   32.051237] RDX: ffff9e955db320a0 RSI: 0000000000000000 RDI:
+0000000000000004
+[   32.051237] RBP: 0000000000000007 R08: 0000000000000000 R09:
+0000000000000004
+[   32.051237] R10: 0000000000000005 R11: 0000000000000005 R12:
+0000000000000000
+[   32.051237] R13: ffff9e955da2d340 R14: 0000000000000140 R15:
+ffff9e955da2d348
+[   32.051237] FS:  0000000000000000(0000) GS:ffff9e955da00000(0000)
+knlGS:0000000000000000
+[   32.051237] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   32.051237] CR2: 0000000000000000 CR3: 000000001840e000 CR4:
+00000000000406f0
+[   32.051237] Call Trace:
+[   32.051237]  ? _raw_spin_unlock+0x16/0x30
+[   32.051237]  ? text_poke_loc_init+0x160/0x160
+[   32.051237]  ? text_poke_loc_init+0x160/0x160
+[   32.051237]  on_each_cpu+0x43/0xb0
+[   32.051237]  text_poke_bp_batch+0x1d7/0x200
+[   32.051237]  text_poke_finish+0x1b/0x26
+[   32.051237]  arch_jump_label_transform_apply+0x16/0x30
+[   32.051237]  static_key_slow_inc_cpuslocked+0x7a/0x90
+[   32.051237]  static_key_slow_inc+0x16/0x20
+[   32.051237]  ? kvm_init_platform+0x16/0x16
+[   32.051237]  activate_jump_labels+0x2f/0x32
+[   32.051237]  do_one_initcall+0x59/0x234
+[   32.051237]  kernel_init_freeable+0x1b0/0x1f5
+[   32.051237]  ? rest_init+0xbf/0xbf
+[   32.051237]  kernel_init+0xa/0x111
+[   32.051237]  ret_from_fork+0x22/0x30
+...
 
-v1: https://lkml.org/lkml/2020/10/21/460
 
-arch/arm64/kvm/mmu.c | 1 +
- 1 file changed, 1 insertion(+)
+Frankly, I'm at wits' end, as I've been noticing similar issues since kernel
+5.8.x and still can pinpoint what's going on (again, see [0]), thus my aplogies
+if I filed this under a wrong component.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 19aacc7..d4cd253 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -839,6 +839,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	if (kvm_is_device_pfn(pfn)) {
- 		device = true;
-+		force_pte = true;
- 	} else if (logging_active && !write_fault) {
- 		/*
- 		 * Only actually map the page as writable if this was a write
+Thank you.
+
+
+[0]
+https://github.com/systemd/systemd-centos-ci/pull/295#issuecomment-682519585
+[1]
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/arch"
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.cpus = 4
+    libvirt.memory = "2048"
+    libvirt.driver = "kvm"
+    libvirt.nested = true
+    libvirt.cpu_mode = "host-model"
+    libvirt.random :model => "random"
+  end
+end
+
+[2] # mkosi -b -d arch --qemu-headless -t gpt_ext4
+
 -- 
-2.7.4
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
