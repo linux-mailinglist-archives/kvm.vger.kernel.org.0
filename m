@@ -2,56 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59F59298B44
-	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 12:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CCA5298B3E
+	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 12:01:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1772355AbgJZK62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Oct 2020 06:58:28 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34995 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1771906AbgJZK61 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Oct 2020 06:58:27 -0400
-Received: by mail-wm1-f65.google.com with SMTP id h22so878680wmb.0
-        for <kvm@vger.kernel.org>; Mon, 26 Oct 2020 03:58:25 -0700 (PDT)
+        id S1773029AbgJZLAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Oct 2020 07:00:54 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37617 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1772362AbgJZK6a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Oct 2020 06:58:30 -0400
+Received: by mail-wr1-f67.google.com with SMTP id h7so11902554wre.4
+        for <kvm@vger.kernel.org>; Mon, 26 Oct 2020 03:58:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ffwll.ch; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FLkPK/wakWgPcP2XtBGkyHk3/K5f5jOPCyDZpBtuyVA=;
-        b=UWVGBGjyj6MIRYbUDiITJq5L6QqEg6/q2/NHckpyd8RPSBh26b0bPaluvTWItOuYKc
-         uaoPMBpxALWoXXsF90NCYVWJoITCFikSp8O7FpqdOPDdJXFgIlHFG/TgfvpItfUwxafp
-         6wW5he4gsgXTW7dkqWJgYLc8PHDC8/A2/zOmc=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=VujIMeu4s9glQHD7csuDCyNoNKl6Zu7MMMJFOASMnXs=;
+        b=Ghd448QeH/JpCHvVE51pHD/gv1aq9xL/1owNFBCiwBZSBWw36ulRGro2rbjavW8HCm
+         tpvgHYSA74mCT5+uyBNL8JCAIV8+TSzuSAdovyibD14KcIKytMRX6O8hoK25tjhehc2D
+         7GZJatk+wlASdgpbFnGrN0Wke1bO/fVz4YTuI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FLkPK/wakWgPcP2XtBGkyHk3/K5f5jOPCyDZpBtuyVA=;
-        b=V9ixA2N5dQSvmw+9wgCEYE0gOIxtkWOekOmHRKvE9+kHzpBeCllQJMdaYKJMMvzuX4
-         U1WluKG/Q3Sm9FByAQkATRY5P0fhNt4FP4ePc7oWX0gElkshPVGLQznbc5X0bn/3FthV
-         lItmk8CalLF3HAUhtu0PH5DPNrnQaXj0YiK2qctpTNiIQx9/56WTP04TKou9hZaWZR08
-         /W8BXHR9X2kmCe9+RxpweiPtcC/Tn9M7+JMxfHtagorOyBLQtk/2IuFc25jylWcj7E6R
-         euniknmj/yrwS/A1Gi71Nf7nn3QJC5O6yf6C6C/KNnocAcNQkABr2KxoYJOP6Nyc1tb2
-         MaGQ==
-X-Gm-Message-State: AOAM532cOWSOH5LTNq2FGy93WuCR1UM4eQkwQqV2xgyA8j1TOz2x3165
-        D3tFfGpSK9qD9X2ZOBAe4VwuPWHpWb4q1yS2
-X-Google-Smtp-Source: ABdhPJxesVax0WQRMCyO4OuQvYno6G/x4zHb3UoXArN6uKT0KIo/6VWoGjLr6p0ejXLAy+E8fDIECg==
-X-Received: by 2002:a1c:3243:: with SMTP id y64mr15267147wmy.175.1603709905111;
-        Mon, 26 Oct 2020 03:58:25 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=VujIMeu4s9glQHD7csuDCyNoNKl6Zu7MMMJFOASMnXs=;
+        b=sAID8ALZVrrc86xAS+ueAKnevdas9HGCXuTafFKDLogGVoGFRbCvLdWaQqqRsKG8yr
+         9iN8bjY+/Z7nJGcC7fmqregFELRj9YK3Uiz1UfBS6aBWKKCwvLwGW6JKAGWukTLy8vPh
+         t3mvtuhy4KQH+Kc1/1dX9Ee/LYcjHzj3MpW8tpw6ybx7KkiaQz9KygvATwfMFLTXtHqE
+         CCCulETdinMSsGMmPcF0wxlHoGLqtPy/pH14I66WqIN6rk7s7bgG9aj3IPykGUb+shtA
+         lzMlRErWcmUeU3YB3L5CQ1KcC1gxg6ijF0nSQI9mPXwHOikNGvITaSDqLxeCgT1Nzumu
+         ewVw==
+X-Gm-Message-State: AOAM532R61s23lYqJ7EcYYxoRDW39QbimIP6CX+MoY7ATtdK6fcSkTfe
+        X/Bd2j7HfD6c/cSiYSAXwor/TA==
+X-Google-Smtp-Source: ABdhPJypi/6Cbees0NGq1yum4JVfOyvtLJ54ljnHY5mG0+HM7dRuCdSdcl5NsPm+FmtB0NGqEYAv1Q==
+X-Received: by 2002:adf:f3cb:: with SMTP id g11mr18176883wrp.210.1603709908008;
+        Mon, 26 Oct 2020 03:58:28 -0700 (PDT)
 Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id w83sm21165156wmg.48.2020.10.26.03.58.23
+        by smtp.gmail.com with ESMTPSA id w83sm21165156wmg.48.2020.10.26.03.58.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2020 03:58:24 -0700 (PDT)
+        Mon, 26 Oct 2020 03:58:27 -0700 (PDT)
 From:   Daniel Vetter <daniel.vetter@ffwll.ch>
 To:     DRI Development <dri-devel@lists.freedesktop.org>,
         LKML <linux-kernel@vger.kernel.org>
 Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-arm-kernel@lists.infradead.org,
         linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-s390@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>
-Subject: [PATCH v4 00/15] follow_pfn and other iomap races
-Date:   Mon, 26 Oct 2020 11:58:03 +0100
-Message-Id: <20201026105818.2585306-1-daniel.vetter@ffwll.ch>
+        linux-s390@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Inki Dae <inki.dae@samsung.com>,
+        Joonyoung Shim <jy0922.shim@samsung.com>,
+        Seung-Woo Kim <sw0312.kim@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>
+Subject: [PATCH v4 02/15] drm/exynos: Use FOLL_LONGTERM for g2d cmdlists
+Date:   Mon, 26 Oct 2020 11:58:05 +0100
+Message-Id: <20201026105818.2585306-3-daniel.vetter@ffwll.ch>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201026105818.2585306-1-daniel.vetter@ffwll.ch>
+References: <20201026105818.2585306-1-daniel.vetter@ffwll.ch>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -59,92 +74,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all
+The exynos g2d interface is very unusual, but it looks like the
+userptr objects are persistent. Hence they need FOLL_LONGTERM.
 
-Round 3 of my patch series to clamp down a bunch of races and gaps
-around follow_pfn and other access to iomem mmaps. Previous version:
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Inki Dae <inki.dae@samsung.com>
+Cc: Joonyoung Shim <jy0922.shim@samsung.com>
+Cc: Seung-Woo Kim <sw0312.kim@samsung.com>
+Cc: Kyungmin Park <kyungmin.park@samsung.com>
+Cc: Kukjin Kim <kgene@kernel.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Jérôme Glisse <jglisse@redhat.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: linux-mm@kvack.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-samsung-soc@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+---
+ drivers/gpu/drm/exynos/exynos_drm_g2d.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-v1: https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
-v2: https://lore.kernel.org/dri-devel/20201009075934.3509076-1-daniel.vetter@ffwll.ch
-v3: https://lore.kernel.org/dri-devel/20201021085655.1192025-1-daniel.vetter@ffwll.ch/
-
-And the discussion that sparked this journey:
-
-https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
-
-Changes in v4:
-- Drop the s390 patch, that was very stand-alone and now queued up to land
-  through s390 trees.
-- Comment polish per Dan's review.
-
-Changes in v3:
-- Bunch of polish all over, no functional changes aside from one barrier
-  in the resource code, for consistency.
-- A few more r-b tags.
-
-Changes in v2:
-- tons of small polish&fixes all over, thanks to all the reviewers who
-  spotted issues
-- I managed to test at least the generic_access_phys and pci mmap revoke
-  stuff with a few gdb sessions using our i915 debug tools (hence now also
-  the drm/i915 patch to properly request all the pci bar regions)
-- reworked approach for the pci mmap revoke: Infrastructure moved into
-  kernel/resource.c, address_space mapping is now set up at open time for
-  everyone (which required some sysfs changes). Does indeed look a lot
-  cleaner and a lot less invasive than I feared at first.
-
-I feel like this is ready for some wider soaking. Since the remaining bits
-are all kinda connnected probably simplest if it all goes through -mm.
-
-Cheers, Daniel
-
-Daniel Vetter (15):
-  drm/exynos: Stop using frame_vector helpers
-  drm/exynos: Use FOLL_LONGTERM for g2d cmdlists
-  misc/habana: Stop using frame_vector helpers
-  misc/habana: Use FOLL_LONGTERM for userptr
-  mm/frame-vector: Use FOLL_LONGTERM
-  media: videobuf2: Move frame_vector into media subsystem
-  mm: Close race in generic_access_phys
-  mm: Add unsafe_follow_pfn
-  media/videbuf1|2: Mark follow_pfn usage as unsafe
-  vfio/type1: Mark follow_pfn as unsafe
-  PCI: Obey iomem restrictions for procfs mmap
-  /dev/mem: Only set filp->f_mapping
-  resource: Move devmem revoke code to resource framework
-  sysfs: Support zapping of binary attr mmaps
-  PCI: Revoke mappings like devmem
-
- drivers/char/mem.c                            |  86 +--------------
- drivers/gpu/drm/exynos/Kconfig                |   1 -
- drivers/gpu/drm/exynos/exynos_drm_g2d.c       |  48 ++++-----
- drivers/media/common/videobuf2/Kconfig        |   1 -
- drivers/media/common/videobuf2/Makefile       |   1 +
- .../media/common/videobuf2}/frame_vector.c    |  54 ++++------
- drivers/media/platform/omap/Kconfig           |   1 -
- drivers/media/v4l2-core/videobuf-dma-contig.c |   2 +-
- drivers/misc/habanalabs/Kconfig               |   1 -
- drivers/misc/habanalabs/common/habanalabs.h   |   6 +-
- drivers/misc/habanalabs/common/memory.c       |  50 ++++-----
- drivers/pci/pci-sysfs.c                       |   4 +
- drivers/pci/proc.c                            |   6 ++
- drivers/vfio/vfio_iommu_type1.c               |   4 +-
- fs/sysfs/file.c                               |  11 ++
- include/linux/ioport.h                        |   6 +-
- include/linux/mm.h                            |  47 +-------
- include/linux/sysfs.h                         |   2 +
- include/media/frame_vector.h                  |  47 ++++++++
- include/media/videobuf2-core.h                |   1 +
- kernel/resource.c                             | 101 +++++++++++++++++-
- mm/Kconfig                                    |   3 -
- mm/Makefile                                   |   1 -
- mm/memory.c                                   |  78 +++++++++++++-
- mm/nommu.c                                    |  17 +++
- security/Kconfig                              |  13 +++
- 26 files changed, 347 insertions(+), 245 deletions(-)
- rename {mm => drivers/media/common/videobuf2}/frame_vector.c (85%)
- create mode 100644 include/media/frame_vector.h
-
+diff --git a/drivers/gpu/drm/exynos/exynos_drm_g2d.c b/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+index ecede41af9b9..1e0c5a7f206e 100644
+--- a/drivers/gpu/drm/exynos/exynos_drm_g2d.c
++++ b/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+@@ -475,7 +475,8 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struct g2d_data *g2d,
+ 		goto err_free;
+ 	}
+ 
+-	ret = pin_user_pages_fast(start, npages, FOLL_FORCE | FOLL_WRITE,
++	ret = pin_user_pages_fast(start, npages,
++				  FOLL_FORCE | FOLL_WRITE | FOLL_LONGTERM,
+ 				  g2d_userptr->pages);
+ 	if (ret != npages) {
+ 		DRM_DEV_ERROR(g2d->dev,
 -- 
 2.28.0
 
