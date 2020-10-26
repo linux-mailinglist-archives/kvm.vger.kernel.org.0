@@ -2,91 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B233D298DDE
-	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 14:29:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 445CF298DF9
+	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 14:35:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1774855AbgJZN3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Oct 2020 09:29:15 -0400
-Received: from casper.infradead.org ([90.155.50.34]:39728 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1774827AbgJZN3P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Oct 2020 09:29:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=34Y6r4GAweG7Mt/E2/mBFuI95NWQikkATWq3rx/SY8E=; b=ibm1wh4V//Ao40finn9v+c/DR0
-        WKib4xCrTtJVXIcaYUSJ1zU9hxgEEylo/MOwv+q5ZiA8y+g2DZLWIzl8wDZgPrphU363e/eovSkbe
-        wa8+Q/VSuBNCwj2sFg7XcOvhFS/EE0Svh1QiUwmtbID0haANDZN3FPixUgMNfP2TKAwyB7du+BqX3
-        57Zm9kGjWCqnlE1u6dMQSnpHdc1Q3QeMZ4MsfZ5NFLADi86YvqhE8PZsiwcstdJ9d6eQLLgTALS2D
-        qTsGz1vLwcBqGa+R08Uhn6VTC1hgBXjQz19Ryi4baKdQnioISiyXvnUwX4F1y7aH0k8+ydR8NXeyq
-        T3YFjdTQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kX2Y2-000704-4d; Mon, 26 Oct 2020 13:28:30 +0000
-Date:   Mon, 26 Oct 2020 13:28:30 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Mike Rapoport <rppt@kernel.org>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFCv2 08/16] KVM: Use GUP instead of copy_from/to_user() to
- access guest memory
-Message-ID: <20201026132830.GQ20115@casper.infradead.org>
-References: <20201020061859.18385-1-kirill.shutemov@linux.intel.com>
- <20201020061859.18385-9-kirill.shutemov@linux.intel.com>
- <c8b0405f-14ed-a1bb-3a91-586a30bdf39b@nvidia.com>
- <20201022114946.GR20115@casper.infradead.org>
- <30ce6691-fd70-76a2-8b61-86d207c88713@nvidia.com>
- <20201026042158.GN20115@casper.infradead.org>
- <ee308d1d-8762-6bcf-193e-85fea29743c3@nvidia.com>
+        id S1769829AbgJZNfE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Oct 2020 09:35:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37642 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1769388AbgJZNfD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Oct 2020 09:35:03 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D07C022284;
+        Mon, 26 Oct 2020 13:35:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603719302;
+        bh=/7647TEuJSHw4E0GvVdhCJh7X525DLpULuJ4YUPi0HA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=P2JyzTfwMKv3olGS4DmfWIGe7kgr9IT+Qx8REIzDOqD3kshQn02RYYPtNwEOKijPs
+         K2Ef+WDySF7y/YaNNapyu4bbg8zXFbhnSWPloNGBQXG4rFqUVxPWwDzn4bHRiBRLWG
+         mD5lZCio6b9mgniKGuDUBbH6hgpfq0Kj/wjfHn68=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kX2eJ-004Kjh-Nx; Mon, 26 Oct 2020 13:34:59 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        David Brazdil <dbrazdil@google.com>, kernel-team@android.com
+Subject: [PATCH 00/11] KVM: arm64: Move PC/ELR/SPSR/PSTATE updatess to EL2
+Date:   Mon, 26 Oct 2020 13:34:39 +0000
+Message-Id: <20201026133450.73304-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ee308d1d-8762-6bcf-193e-85fea29743c3@nvidia.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, will@kernel.org, qperret@google.com, dbrazdil@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 25, 2020 at 09:44:07PM -0700, John Hubbard wrote:
-> On 10/25/20 9:21 PM, Matthew Wilcox wrote:
-> > I don't think the page pinning approach is ever valid.  For file
-> 
-> Could you qualify that? Surely you don't mean that the entire pin_user_pages
-> story is a waste of time--I would have expected you to make more noise
-> earlier if you thought that, yes?
+As we progress towards being able to keep the guest state private to
+the nVHE hypervisor, this series aims at moving anything that touches
+the registers involved into an exception to EL2.
 
-I do think page pinning is the wrong approach for everything.  I did say
-so at the time, and I continue to say so when the opportunity presents
-itself.  But shouting about it constantly only annoys people, so I don't
-generally bother.  I have other things to work on, and they're productive,
-so I don't need to spend my time arguing.
+The general idea is that any update to these registers is driven by a
+set of flags passed from EL1 to EL2, and EL2 will deal with the
+register update itself, removing the need for EL1 to see the guest
+state. It also results in a bunch of cleanup, mostly in the 32bit
+department (negative diffstat, yay!).
 
-> > It's been five years since DAX was merged, and page pinning still
-> > doesn't work.  How much longer before the people who are pushing it
-> > realise that it's fundamentally flawed?
-> 
-> Is this a separate rant about *only* DAX, or is general RDMA in your sights
-> too? :)
+Of course, none of that has any real effect on security yet. It is
+only once we start having a private VCPU structure at EL2 that we can
+enforce the isolation. Similarly, there is no policy enforcement, and
+a malicious EL1 can still inject exceptions at random points. It can
+also give bogus ESR values to the guest. Baby steps.
 
-This is a case where it's not RDMA's _fault_ that there's no good API
-for it to do what it needs to do.  There's a lot of work needed to wean
-Linux device drivers off their assumption that there's a struct page
-for every byte of memory.
+        M.
+
+Marc Zyngier (11):
+  KVM: arm64: Don't adjust PC on SError during SMC trap
+  KVM: arm64: Move kvm_vcpu_trap_il_is32bit into kvm_skip_instr32()
+  KVM: arm64: Make kvm_skip_instr() and co private to HYP
+  KVM: arm64: Move PC rollback on SError to HYP
+  KVM: arm64: Move VHE direct sysreg accessors into kvm_host.h
+  KVM: arm64: Add basic hooks for injecting exceptions from EL2
+  KVM: arm64: Inject AArch64 exceptions from HYP
+  KVM: arm64: Inject AArch32 exceptions from HYP
+  KVM: arm64: Remove SPSR manipulation primitives
+  KVM: arm64: Consolidate exception injection
+  KVM: arm64: Get rid of the AArch32 register mapping code
+
+ arch/arm64/include/asm/kvm_emulate.h       |  70 +---
+ arch/arm64/include/asm/kvm_host.h          | 115 ++++++-
+ arch/arm64/kvm/Makefile                    |   4 +-
+ arch/arm64/kvm/aarch32.c                   | 232 -------------
+ arch/arm64/kvm/guest.c                     |  28 +-
+ arch/arm64/kvm/handle_exit.c               |  23 +-
+ arch/arm64/kvm/hyp/aarch32.c               |   4 +-
+ arch/arm64/kvm/hyp/exception.c             | 368 +++++++++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  62 ++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h    |  17 +
+ arch/arm64/kvm/hyp/nvhe/Makefile           |   2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c           |   3 +
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c   |   2 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c            |   2 +
+ arch/arm64/kvm/hyp/vhe/Makefile            |   2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c            |   3 +
+ arch/arm64/kvm/inject_fault.c              | 187 +++++------
+ arch/arm64/kvm/mmio.c                      |   2 +-
+ arch/arm64/kvm/mmu.c                       |   2 +-
+ arch/arm64/kvm/regmap.c                    | 224 -------------
+ arch/arm64/kvm/sys_regs.c                  |  83 +----
+ 21 files changed, 698 insertions(+), 737 deletions(-)
+ delete mode 100644 arch/arm64/kvm/aarch32.c
+ create mode 100644 arch/arm64/kvm/hyp/exception.c
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+ delete mode 100644 arch/arm64/kvm/regmap.c
+
+-- 
+2.28.0
+
