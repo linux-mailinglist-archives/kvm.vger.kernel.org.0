@@ -2,280 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF94299271
-	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 17:30:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC6DF29929C
+	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 17:38:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1785993AbgJZQaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Oct 2020 12:30:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51369 "EHLO
+        id S1786168AbgJZQik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Oct 2020 12:38:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45884 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1785959AbgJZQa0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Oct 2020 12:30:26 -0400
+        by vger.kernel.org with ESMTP id S1775370AbgJZQik (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Oct 2020 12:38:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603729824;
+        s=mimecast20190719; t=1603730318;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GQY/TDx5VDPwtvi1ueBk5n9nYxAtGXDK6XBdjXRtePc=;
-        b=bpwxy8MMs40u62qTbmkLmJ4j7fZo1MgpuNGz5+30S32twS56qbYn8cGlejlkTCkz2RNkDB
-        DPGRFMk++uSVPYM4XAgeFSemdSUeeC18B1MEApA7XlJvGDTjC3wbakcJnkf3UOqkfLhVv6
-        MJ2Ch7KibmUs1NehrcYKM+m3Ca2ulNg=
+        bh=PjqOY2lI1bbJHURgd2W0lGLQ9gRC4wy7ubmSk6DrJuk=;
+        b=Tg7rUkyW7WDQYmMxuRf4ahvlnG0us/f+i9ykLlXh84/yidLA0BCX1522ANRBOOf+4Y1huY
+        zA41Og4x1oDwlqDMTOaCGj37Rik8LqfKWMgpjPieOegjhIk1kmK4S4Wk2x5qpe+1rNGDCv
+        4J3+h8cTH5h1z+SIhH1S0mF6kSS0xMg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-wVb4Er4OPWOa3dpk1pX9Lw-1; Mon, 26 Oct 2020 12:30:22 -0400
-X-MC-Unique: wVb4Er4OPWOa3dpk1pX9Lw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-48-kKHeZ6X_Pre5bTvOG9HC8Q-1; Mon, 26 Oct 2020 12:38:37 -0400
+X-MC-Unique: kKHeZ6X_Pre5bTvOG9HC8Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CD2F803F4D;
-        Mon, 26 Oct 2020 16:30:21 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F8C95B4AC;
-        Mon, 26 Oct 2020 16:30:19 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Jon Doron <arilou@gmail.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 2/2] KVM: selftests: test KVM_GET_SUPPORTED_HV_CPUID as a system ioctl
-Date:   Mon, 26 Oct 2020 17:30:13 +0100
-Message-Id: <20201026163013.3164236-3-vkuznets@redhat.com>
-In-Reply-To: <20201026163013.3164236-1-vkuznets@redhat.com>
-References: <20201026163013.3164236-1-vkuznets@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A50E885EE94;
+        Mon, 26 Oct 2020 16:38:35 +0000 (UTC)
+Received: from gondolin (ovpn-113-108.ams2.redhat.com [10.36.113.108])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E5A535C1BB;
+        Mon, 26 Oct 2020 16:38:23 +0000 (UTC)
+Date:   Mon, 26 Oct 2020 17:38:21 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     thuth@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
+        rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, mst@redhat.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, philmd@redhat.com,
+        qemu-s390x@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 13/13] s390x/pci: get zPCI function info from host
+Message-ID: <20201026173821.0bda1606.cohuck@redhat.com>
+In-Reply-To: <1603726481-31824-14-git-send-email-mjrosato@linux.ibm.com>
+References: <1603726481-31824-1-git-send-email-mjrosato@linux.ibm.com>
+        <1603726481-31824-14-git-send-email-mjrosato@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_GET_SUPPORTED_HV_CPUID is now supported as both vCPU and VM ioctl,
-test that.
+On Mon, 26 Oct 2020 11:34:41 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../testing/selftests/kvm/include/kvm_util.h  |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    | 26 ++++++
- .../selftests/kvm/x86_64/hyperv_cpuid.c       | 87 +++++++++++--------
- 3 files changed, 77 insertions(+), 38 deletions(-)
+> We use the capability chains of the VFIO_DEVICE_GET_INFO ioctl to retrieve
+> the CLP information that the kernel exports.
+> 
+> To be compatible with previous kernel versions we fall back on previous
+> predefined values, same as the emulation values, when the ioctl is found
+> to not support capability chains. If individual CLP capabilities are not
+> found, we fall back on default values for only those capabilities missing
+> from the chain.
+> 
+> This patch is based on work previously done by Pierre Morel.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c          |   9 +-
+>  hw/s390x/s390-pci-vfio.c         | 180 +++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/trace-events            |   6 ++
+>  include/hw/s390x/s390-pci-bus.h  |   1 +
+>  include/hw/s390x/s390-pci-clp.h  |  12 ++-
+>  include/hw/s390x/s390-pci-vfio.h |   1 +
+>  6 files changed, 202 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 919e161dd289..59482e4eb308 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -112,6 +112,8 @@ void vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
- int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
- 		void *arg);
- void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
-+void kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
-+int _kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
- void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
- void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
- void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 74776ee228f2..d49e24a15836 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1518,6 +1518,32 @@ void vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
- 		cmd, ret, errno, strerror(errno));
- }
- 
-+/*
-+ * KVM system ioctl
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   cmd - Ioctl number
-+ *   arg - Argument to pass to the ioctl
-+ *
-+ * Return: None
-+ *
-+ * Issues an arbitrary ioctl on a KVM fd.
-+ */
-+void kvm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
-+{
-+	int ret;
-+
-+	ret = ioctl(vm->kvm_fd, cmd, arg);
-+	TEST_ASSERT(ret == 0, "KVM ioctl %lu failed, rc: %i errno: %i (%s)",
-+		cmd, ret, errno, strerror(errno));
-+}
-+
-+int _kvm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
-+{
-+	return ioctl(vm->kvm_fd, cmd, arg);
-+}
-+
- /*
-  * VM Dump
-  *
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-index 745b708c2d3b..88a595b7fbdd 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-@@ -46,19 +46,19 @@ static bool smt_possible(void)
- }
- 
- static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
--			  bool evmcs_enabled)
-+			  bool evmcs_expected)
- {
- 	int i;
- 	int nent = 9;
- 	u32 test_val;
- 
--	if (evmcs_enabled)
-+	if (evmcs_expected)
- 		nent += 1; /* 0x4000000A */
- 
- 	TEST_ASSERT(hv_cpuid_entries->nent == nent,
- 		    "KVM_GET_SUPPORTED_HV_CPUID should return %d entries"
- 		    " with evmcs=%d (returned %d)",
--		    nent, evmcs_enabled, hv_cpuid_entries->nent);
-+		    nent, evmcs_expected, hv_cpuid_entries->nent);
- 
- 	for (i = 0; i < hv_cpuid_entries->nent; i++) {
- 		struct kvm_cpuid_entry2 *entry = &hv_cpuid_entries->entries[i];
-@@ -68,7 +68,7 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
- 			    "function %x is our of supported range",
- 			    entry->function);
- 
--		TEST_ASSERT(evmcs_enabled || (entry->function != 0x4000000A),
-+		TEST_ASSERT(evmcs_expected || (entry->function != 0x4000000A),
- 			    "0x4000000A leaf should not be reported");
- 
- 		TEST_ASSERT(entry->index == 0,
-@@ -87,7 +87,7 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
- 			TEST_ASSERT(entry->eax == test_val,
- 				    "Wrong max leaf report in 0x40000000.EAX: %x"
- 				    " (evmcs=%d)",
--				    entry->eax, evmcs_enabled
-+				    entry->eax, evmcs_expected
- 				);
- 			break;
- 		case 0x40000004:
-@@ -110,20 +110,23 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
- 
- }
- 
--void test_hv_cpuid_e2big(struct kvm_vm *vm)
-+void test_hv_cpuid_e2big(struct kvm_vm *vm, bool system)
- {
- 	static struct kvm_cpuid2 cpuid = {.nent = 0};
- 	int ret;
- 
--	ret = _vcpu_ioctl(vm, VCPU_ID, KVM_GET_SUPPORTED_HV_CPUID, &cpuid);
-+	if (!system)
-+		ret = _vcpu_ioctl(vm, VCPU_ID, KVM_GET_SUPPORTED_HV_CPUID, &cpuid);
-+	else
-+		ret = _kvm_ioctl(vm, KVM_GET_SUPPORTED_HV_CPUID, &cpuid);
- 
- 	TEST_ASSERT(ret == -1 && errno == E2BIG,
--		    "KVM_GET_SUPPORTED_HV_CPUID didn't fail with -E2BIG when"
--		    " it should have: %d %d", ret, errno);
-+		    "%s KVM_GET_SUPPORTED_HV_CPUID didn't fail with -E2BIG when"
-+		    " it should have: %d %d", system ? "KVM" : "vCPU", ret, errno);
- }
- 
- 
--struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm)
-+struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm, bool system)
- {
- 	int nent = 20; /* should be enough */
- 	static struct kvm_cpuid2 *cpuid;
-@@ -137,7 +140,10 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm)
- 
- 	cpuid->nent = nent;
- 
--	vcpu_ioctl(vm, VCPU_ID, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
-+	if (!system)
-+		vcpu_ioctl(vm, VCPU_ID, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
-+	else
-+		kvm_ioctl(vm, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
- 
- 	return cpuid;
- }
-@@ -146,45 +152,50 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm)
- int main(int argc, char *argv[])
- {
- 	struct kvm_vm *vm;
--	int rv, stage;
- 	struct kvm_cpuid2 *hv_cpuid_entries;
--	bool evmcs_enabled;
- 
- 	/* Tell stdout not to buffer its content */
- 	setbuf(stdout, NULL);
- 
--	rv = kvm_check_cap(KVM_CAP_HYPERV_CPUID);
--	if (!rv) {
-+	if (!kvm_check_cap(KVM_CAP_HYPERV_CPUID)) {
- 		print_skip("KVM_CAP_HYPERV_CPUID not supported");
- 		exit(KSFT_SKIP);
- 	}
- 
--	for (stage = 0; stage < 3; stage++) {
--		evmcs_enabled = false;
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
- 
--		vm = vm_create_default(VCPU_ID, 0, guest_code);
--		switch (stage) {
--		case 0:
--			test_hv_cpuid_e2big(vm);
--			continue;
--		case 1:
--			break;
--		case 2:
--			if (!nested_vmx_supported() ||
--			    !kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
--				print_skip("Enlightened VMCS is unsupported");
--				continue;
--			}
--			vcpu_enable_evmcs(vm, VCPU_ID);
--			evmcs_enabled = true;
--			break;
--		}
-+	/* Test vCPU ioctl version */
-+	test_hv_cpuid_e2big(vm, false);
-+
-+	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm, false);
-+	test_hv_cpuid(hv_cpuid_entries, false);
-+	free(hv_cpuid_entries);
- 
--		hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
--		test_hv_cpuid(hv_cpuid_entries, evmcs_enabled);
--		free(hv_cpuid_entries);
--		kvm_vm_free(vm);
-+	if (!nested_vmx_supported() ||
-+	    !kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
-+		print_skip("Enlightened VMCS is unsupported");
-+		goto do_sys;
- 	}
-+	vcpu_enable_evmcs(vm, VCPU_ID);
-+	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm, false);
-+	test_hv_cpuid(hv_cpuid_entries, true);
-+	free(hv_cpuid_entries);
-+
-+do_sys:
-+	/* Test system ioctl version */
-+	if (!kvm_check_cap(KVM_CAP_SYS_HYPERV_CPUID)) {
-+		print_skip("KVM_CAP_SYS_HYPERV_CPUID not supported");
-+		goto out;
-+	}
-+
-+	test_hv_cpuid_e2big(vm, true);
-+
-+	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm, true);
-+	test_hv_cpuid(hv_cpuid_entries, nested_vmx_supported());
-+	free(hv_cpuid_entries);
-+
-+out:
-+	kvm_vm_free(vm);
- 
- 	return 0;
- }
--- 
-2.25.4
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
