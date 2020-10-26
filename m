@@ -2,99 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4F37298336
-	for <lists+kvm@lfdr.de>; Sun, 25 Oct 2020 19:54:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A64D2985BB
+	for <lists+kvm@lfdr.de>; Mon, 26 Oct 2020 04:00:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1418323AbgJYSxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Oct 2020 14:53:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56503 "EHLO
+        id S1421654AbgJZC7w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Oct 2020 22:59:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41637 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1418311AbgJYSxn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 25 Oct 2020 14:53:43 -0400
+        by vger.kernel.org with ESMTP id S2389452AbgJZC7v (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 25 Oct 2020 22:59:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603652023;
+        s=mimecast20190719; t=1603681189;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zm0y/NgV1CA3qc6DHTxR8W397xZffPB2LchwQHAbN7M=;
-        b=dGfpNcA+RrUIIDWBz23tZ30VjJ0lEW8OfU2DQumODvkEOQtn6y3NoTsU/ZlLBUUmqiE/1v
-        HWsWyfXkLbosYfhS0BKlHOi1HsMIgMjK/GKhtm/cvM9xbkGIDH5ynM5byqeOiHuptdTsGP
-        iTulOBVKd0m1Jkhx1ErjWHeg+DQbrKE=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-fbrYhVQ9N3-7zSrB5FUIiQ-1; Sun, 25 Oct 2020 14:53:41 -0400
-X-MC-Unique: fbrYhVQ9N3-7zSrB5FUIiQ-1
-Received: by mail-qt1-f199.google.com with SMTP id f10so4893943qtv.6
-        for <kvm@vger.kernel.org>; Sun, 25 Oct 2020 11:53:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zm0y/NgV1CA3qc6DHTxR8W397xZffPB2LchwQHAbN7M=;
-        b=Th778N8IhkivVSyncmm3p+pB7qV1lIL7Xr/hlh9JHoeCA7H0X5iTlGNuk4W525Qqne
-         4OeTam79dCiu/bL8XxzY0ZPUdHS1IO3VY5VhLmk18BVnaRfX1Hly8bUTg1b+iOn3yoaE
-         /Ndd+2EzzErFWY/WsY8eByYzlMr9GcRt7VUiqw5CvwUmGWq6D2lZICC4+P5c/79RF6iF
-         nQuc5tIIGoho1nsxqnBPew5eyg8WiQaz3dgmTwqnHruB86LOPX3jjUwRGnGryr8LWBSA
-         KwYiVlSMqqaJop5qIo6tcHbqgc6gxMirfCVfkcvzljJAoH9rDzKHwG3hTGLZAeapQgLg
-         TGNg==
-X-Gm-Message-State: AOAM530qEpcznsI7HRJyjd3VXoj6VM8m5vrKDkfpcj+654txC+YDypNg
-        uNYUukdLVXOGefwjCUiljNO59bk9bJz+naeqi7K1+/8dmIoVaMqtyTzFJEG6Ta6bevZ9saiyJfe
-        m5cHZxjoqbsX3
-X-Received: by 2002:a37:a5d4:: with SMTP id o203mr13829917qke.40.1603652020634;
-        Sun, 25 Oct 2020 11:53:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzyWNSYqgjU/lO0p0UapTK2q5MU0iTqDM8Kql9oXtrbn3a+VgKT8IStndVitg5xOQZJ2pUuRw==
-X-Received: by 2002:a37:a5d4:: with SMTP id o203mr13829901qke.40.1603652020413;
-        Sun, 25 Oct 2020 11:53:40 -0700 (PDT)
-Received: from xz-x1.redhat.com (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca. [174.95.215.133])
-        by smtp.gmail.com with ESMTPSA id y3sm5305224qto.2.2020.10.25.11.53.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Oct 2020 11:53:39 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, peterx@redhat.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Steffen Dirkwinkel <kernel-bugs@steffen.cc>
-Subject: [PATCH 2/2] KVM: X86: Fix null pointer reference for KVM_GET_MSRS
-Date:   Sun, 25 Oct 2020 14:53:34 -0400
-Message-Id: <20201025185334.389061-3-peterx@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201025185334.389061-1-peterx@redhat.com>
-References: <20201025185334.389061-1-peterx@redhat.com>
+        bh=Wj4XKzYinjtinYOa4SEH9Db7ssmjPWw3m5dgQvIRbIo=;
+        b=DN2DvN2/q/8SZgl+WQvYdyEb2nQlzmwyRfNKArBsXcnLqJjHF5SQDrdIEmALNEqZqz8zw8
+        Xo32n7rHHp1z9kGGP08q1cKg4r3f+g3n0B4eYC+OXDyC66xd7lXo/uP39u+Sh6x8TBgSB/
+        lipjut511fqZrHUPBmAKduRNZWVBkmM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-SsQjknsqOSaucbGw5t__FQ-1; Sun, 25 Oct 2020 22:59:45 -0400
+X-MC-Unique: SsQjknsqOSaucbGw5t__FQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E8121006C81;
+        Mon, 26 Oct 2020 02:59:44 +0000 (UTC)
+Received: from [10.72.13.201] (ovpn-13-201.pek2.redhat.com [10.72.13.201])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F012E55769;
+        Mon, 26 Oct 2020 02:59:38 +0000 (UTC)
+Subject: Re: [PATCH net] vhost_vdpa: Return -EFUALT if copy_from_user() fails
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        kuba@kernel.org
+References: <20201023120853.GI282278@mwanda>
+ <20201023113326-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4485cc8d-ac69-c725-8493-eda120e29c41@redhat.com>
+Date:   Mon, 26 Oct 2020 10:59:37 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20201023113326-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_msr_ignored_check() could trigger a null pointer reference if ignore_msrs=Y
-and report_ignore_msrs=Y when try to fetch an invalid feature msr using the
-global KVM_GET_MSRS.  Degrade the error report to not rely on vcpu since that
-information (index, rip) is not as important as msr index/data after all.
 
-Fixes: 12bc2132b15e0a96
-Reported-by: Steffen Dirkwinkel <kernel-bugs@steffen.cc>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- arch/x86/kvm/x86.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 2020/10/23 下午11:34, Michael S. Tsirkin wrote:
+> On Fri, Oct 23, 2020 at 03:08:53PM +0300, Dan Carpenter wrote:
+>> The copy_to/from_user() functions return the number of bytes which we
+>> weren't able to copy but the ioctl should return -EFAULT if they fail.
+>>
+>> Fixes: a127c5bbb6a8 ("vhost-vdpa: fix backend feature ioctls")
+>> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Needed for stable I guess.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ce856e0ece84..5993fbd6d2c5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -259,8 +259,8 @@ static int kvm_msr_ignored_check(struct kvm_vcpu *vcpu, u32 msr,
- 
- 	if (ignore_msrs) {
- 		if (report_ignored_msrs)
--			vcpu_unimpl(vcpu, "ignored %s: 0x%x data 0x%llx\n",
--				    op, msr, data);
-+			kvm_pr_unimpl("ignored %s: 0x%x data 0x%llx\n",
-+				      op, msr, data);
- 		/* Mask the error */
- 		return 0;
- 	} else {
--- 
-2.26.2
+
+Agree.
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+
+>> ---
+>>   drivers/vhost/vdpa.c | 10 +++++-----
+>>   1 file changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>> index 62a9bb0efc55..c94a97b6bd6d 100644
+>> --- a/drivers/vhost/vdpa.c
+>> +++ b/drivers/vhost/vdpa.c
+>> @@ -428,12 +428,11 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+>>   	void __user *argp = (void __user *)arg;
+>>   	u64 __user *featurep = argp;
+>>   	u64 features;
+>> -	long r;
+>> +	long r = 0;
+>>   
+>>   	if (cmd == VHOST_SET_BACKEND_FEATURES) {
+>> -		r = copy_from_user(&features, featurep, sizeof(features));
+>> -		if (r)
+>> -			return r;
+>> +		if (copy_from_user(&features, featurep, sizeof(features)))
+>> +			return -EFAULT;
+>>   		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+>>   			return -EOPNOTSUPP;
+>>   		vhost_set_backend_features(&v->vdev, features);
+>> @@ -476,7 +475,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+>>   		break;
+>>   	case VHOST_GET_BACKEND_FEATURES:
+>>   		features = VHOST_VDPA_BACKEND_FEATURES;
+>> -		r = copy_to_user(featurep, &features, sizeof(features));
+>> +		if (copy_to_user(featurep, &features, sizeof(features)))
+>> +			r = -EFAULT;
+>>   		break;
+>>   	default:
+>>   		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
 
