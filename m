@@ -2,110 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 598D429CA35
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 21:31:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 16F7929CA37
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 21:32:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S372927AbgJ0UbD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 16:31:03 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:60486 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S372920AbgJ0UbD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 16:31:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=137mCpEB0hOOtQ/3RTr3rm5+WNlXz/CS75p2YxOAgxk=; b=Ej/5Tw0LddYjI33JHic/eybIFz
-        OmNwO6zfN8JOnkap/hbC90EY8OjQxj5+EKTIv3VoUmKckhOyomQhehjNLaJBD4ELr5m8qDgtkvl69
-        1ewQss6VuJw9UrgSIGjhx0ylL3rLrz2srK1cfdBsPa7lmOvI35mUl4w0XsXAWnsV2KkETw4RR6Veb
-        NUWLvUAd7zZMM9pd65l5YbMaXGEKX4Iq5+bi5IlYV8SZ2z0eDwA45wHazAVyEfqW+1NFiwBaLk31r
-        gsFdpe0+VlGm7O+9Gx2uYRvgKyiADxpJ6bNFRUqll1Nw+Mg/L8WcD92aznyPbKSJmYlYj94S/BY8R
-        QfEKkuSg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kXVcC-0002kG-Mh; Tue, 27 Oct 2020 20:30:44 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3A7C030411F;
-        Tue, 27 Oct 2020 21:30:42 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id F36A1203D0A43; Tue, 27 Oct 2020 21:30:41 +0100 (CET)
-Date:   Tue, 27 Oct 2020 21:30:41 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Oleg Nesterov <oleg@redhat.com>
-Subject: Re: [PATCH v2 1/2] sched/wait: Add add_wait_queue_priority()
-Message-ID: <20201027203041.GS2628@hirez.programming.kicks-ass.net>
-References: <20201026175325.585623-1-dwmw2@infradead.org>
- <20201027143944.648769-1-dwmw2@infradead.org>
- <20201027143944.648769-2-dwmw2@infradead.org>
- <20201027190919.GO2628@hirez.programming.kicks-ass.net>
- <220a7b090d27ffc8f3d00253c289ddd964a8462b.camel@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <220a7b090d27ffc8f3d00253c289ddd964a8462b.camel@infradead.org>
+        id S372950AbgJ0Ubh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 16:31:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52476 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S372938AbgJ0Ubg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Oct 2020 16:31:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603830695;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2jw2I23iwBY99w0/c3MnXeZh6i5zZp8WwMZqR6Jv0Uw=;
+        b=eUOElFqm2VeCd5um4jI8pbtsQuynjgO/DwyV9U5+fTeEzErRgZVGJb1tL2Au8lsanRu6ji
+        R7lfi5fJ7SjUb82hJuJH9ZlEpc8MMPm5+ox1s5u6NKwnlsZlGuE3BDnIQHHnra9yRYnR1W
+        lNhu2BIEbVEMLdSBrATmc1g1v73vvJo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-132-pEKfTLzFM5CZIQZ1fdHpcA-1; Tue, 27 Oct 2020 16:31:33 -0400
+X-MC-Unique: pEKfTLzFM5CZIQZ1fdHpcA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB33D1868434;
+        Tue, 27 Oct 2020 20:31:31 +0000 (UTC)
+Received: from ovpn-66-71.rdu2.redhat.com (ovpn-66-71.rdu2.redhat.com [10.10.66.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 00B8F60C07;
+        Tue, 27 Oct 2020 20:31:27 +0000 (UTC)
+Message-ID: <c0d5290b9e2dfc7692ed5575babf73092156ca90.camel@redhat.com>
+Subject: Re: [PATCH v6 2/4] KVM: x86: report negative values from wrmsr
+ emulation to userspace
+From:   Qian Cai <cai@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 27 Oct 2020 16:31:26 -0400
+In-Reply-To: <849d7acb00b3dadc3fc7db1e574c03dc74a06270.camel@redhat.com>
+References: <20200922211025.175547-1-mlevitsk@redhat.com>
+         <20200922211025.175547-3-mlevitsk@redhat.com>
+         <849d7acb00b3dadc3fc7db1e574c03dc74a06270.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 07:27:59PM +0000, David Woodhouse wrote:
+On Mon, 2020-10-26 at 15:40 -0400, Qian Cai wrote:
+> On Wed, 2020-09-23 at 00:10 +0300, Maxim Levitsky wrote:
+> > This will allow the KVM to report such errors (e.g -ENOMEM)
+> > to the userspace.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Reverting this and its dependency:
+> 
+> 72f211ecaa80 KVM: x86: allow kvm_x86_ops.set_efer to return an error value
+> 
+> on the top of linux-next (they have also unfortunately merged into the
+> mainline
+> at the same time) fixed an issue that a simple Intel KVM guest is unable to
+> boot
+> below.
 
-> > While looking at this I found that weird __add_wait_queue_exclusive()
-> > which is used by fs/eventpoll.c and does something similar, except it
-> > doesn't keep the FIFO order.
->=20
-> It does, doesn't it? Except those so-called "exclusive" entries end up
-> in FIFO order amongst themselves at the *tail* of the queue, to be
-> woken up only after all the other entries before them *haven't* been
-> excluded.
+So I debug this a bit more. This also breaks nested virt (VMX). We have here:
 
-__add_wait_queue_exclusive() uses __add_wait_queue() which does
-list_add(). It does _not_ add at the tail like normal exclusive users,
-and there is exactly _1_ user in tree that does this.
+[  345.504403] kvm [1491]: vcpu0 unhandled rdmsr: 0x4e data 0x0
+[  345.758560] kvm [1491]: vcpu0 unhandled rdmsr: 0x1c9 data 0x0
+[  345.758594] kvm [1491]: vcpu0 unhandled rdmsr: 0x1a6 data 0x0
+[  345.758619] kvm [1491]: vcpu0 unhandled rdmsr: 0x1a7 data 0x0
+[  345.758644] kvm [1491]: vcpu0 unhandled rdmsr: 0x3f6 data 0x0
+[  345.951601] kvm [1493]: vcpu1 unhandled rdmsr: 0x4e data 0x0
+[  351.857036] kvm [1493]: vcpu1 unhandled wrmsr: 0xc90 data 0xfffff
 
-I'm not exactly sure how this happened, but:
+After this commit, -ENOENT is returned to vcpu_enter_guest() causes the
+userspace to abort.
 
-  add_wait_queue_exclusive()
+kvm_msr_ignored_check()
+  kvm_set_msr()
+    kvm_emulate_wrmsr()
+      vmx_handle_exit()
+        vcpu_enter_guest()
 
-and
+Something like below will unbreak the userspace, but does anyone has a better
+idea?
 
-  __add_wait_queue_exclusive()
-
-are not related :-(
-
-> > The Changelog doesn't state how important this property is to you.
->=20
-> Because it isn't :)
->=20
-> The ordering is:
->=20
->  { PRIORITY }*  { NON-EXCLUSIVE }* { EXCLUSIVE(sic) }*
->=20
-> I care that PRIORITY comes before the others, because I want to
-> actually exclude the others. Especially the "non-exclusive" ones, which
-> the 'exclusive' ones don't actually exclude.
->=20
-> I absolutely don't care about ordering *within* the set of PRIORITY
-> entries, since as I said I expect there to be only one.
-
-Then you could arguably do something like:
-
-	spin_lock_irqsave(&wq_head->lock, flags);
-	__add_wait_queue_exclusive(wq_head, wq_entry);
-	spin_unlock_irqrestore(&wq_head->lock, flags);
-
-and leave it at that.
-
-But now I'm itching to fix that horrible naming... tomorrow perhaps.
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1748,7 +1748,7 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+                return 0;
+ 
+        /* Signal all other negative errors to userspace */
+-       if (r < 0)
++       if (r < 0 && r != -ENOENT)
+                return r;
+ 
+        /* MSR write failed? Inject a #GP */
 
