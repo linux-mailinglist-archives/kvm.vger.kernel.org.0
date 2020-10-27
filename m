@@ -2,113 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 977FE29C882
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 20:17:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5B1C29C8B5
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 20:24:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1829580AbgJ0TR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 15:17:28 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:55048 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1818516AbgJ0TRU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 15:17:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=p1hEPodUXDXuSQzasXYwrS2God+lcKGnVUZasxbSQxY=; b=cdxDu3oxrBK4H243uvi9iaApqN
-        OHvlk6JIrx3YcHGxzINSmqLO7PVWeLJHMV3OtLPc2ojslPnjipWNQCWRMQQalw+icSFCM4pRO8uTg
-        aOizBQcGY7focMzkxdS44gU+M8acA2ZcOmRH1P1WyEMjSQaJ3VleyvXRczD6iq7BXw5mDmXNBMn8+
-        zFm1f48f56RhOKszhZ3Ubq1PIQU6a8j7vmFt+JCkBAfM+ekMIrn+Y4iCanRtmhtH7u0OyhzLI8VSi
-        9JgcSpuMC4/GN+wL2sHd/HFguHZyJXkxrvrWZsUSL/XcJnTbVYpPIqvPnOlm/ICapBcfkMyJasbnB
-        /0BZYQQA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kXUT2-0003P2-OC; Tue, 27 Oct 2020 19:17:12 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4A92C307A7F;
-        Tue, 27 Oct 2020 20:17:11 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 32968203C2679; Tue, 27 Oct 2020 20:17:11 +0100 (CET)
-Date:   Tue, 27 Oct 2020 20:17:11 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Waiman Long <longman@redhat.com>,
-        Davidlohr Bueso <dave@stgolabs.net>
-Subject: Re: [PATCH 3/3] sched: Add cond_resched_rwlock
-Message-ID: <20201027191711.GP2628@hirez.programming.kicks-ass.net>
-References: <20201027164950.1057601-1-bgardon@google.com>
- <20201027164950.1057601-3-bgardon@google.com>
- <20201027175634.GI1021@linux.intel.com>
+        id S1829789AbgJ0TUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 15:20:43 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39983 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1829628AbgJ0TTf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 15:19:35 -0400
+Received: by mail-wr1-f68.google.com with SMTP id h5so3173093wrv.7
+        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 12:19:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=94FVc/lhmQBJbpQ0I0StwCkg4DMhTbsduFiN4bjClk4=;
+        b=Sld6hciHThDqeso8S8+jXbwutFt+C8GMsFv9uR38kkL9A2ymfTua46NMT/Q9ZBn3uh
+         noluYBIeHRwknPmU94BZzwh6l7DE4uJbJLLOru2dF0iDS5wDVUIl89TAYeWKJJDtgD9J
+         qGm+daZidj774s7wADWav2trLrU+zVLJfeX5A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to;
+        bh=94FVc/lhmQBJbpQ0I0StwCkg4DMhTbsduFiN4bjClk4=;
+        b=iiHyx1SFpEWbv6M9lMTtPWvF6QBrHBta2d5DYLr8SYzkN5gjUiQ+NUgmjbbB9MfnD8
+         Uw5obtrg2+BsQIk0z1HZZn7iULHHUd166SGvpg+2HxLjlXVqeiSELDX2upp33luAxtG5
+         BkI1QqJjyE2kiIqFYwvro1Q6Q6w84lJWRhjCYjiVnXTQqE5PQhAyDkvP0FIIHlFxOwDx
+         +m2PiXcZHTBkfzlQCle8M4MYGxy3gS51dUCYaFzFvjPdz1xOvNufIW2qXgwdSxHst7PU
+         VKfTaklRlCv0eIyIu1Ebm02ExaCgjiJ8tLBoRKRkh5AGwmmrQxzEx7tU1NOXz+OE9sUm
+         pmdA==
+X-Gm-Message-State: AOAM531MqbAnb7bwmXhRBCaDEJc6XfXiUkPNde3+yyzfET6Vmn4pwCPc
+        +Q1HH1Ezp89owGst5O3hmMA4kg==
+X-Google-Smtp-Source: ABdhPJxSeCImtuoOwiJ2SgVqpZLT/QAEeRHxQ9b1eMNAwd7xtGe8jna3O2uLNWNIxJE6aH3a1ktGnQ==
+X-Received: by 2002:a5d:4dc7:: with SMTP id f7mr4027819wru.375.1603826373382;
+        Tue, 27 Oct 2020 12:19:33 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id h206sm3012251wmf.47.2020.10.27.12.19.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Oct 2020 12:19:32 -0700 (PDT)
+Date:   Tue, 27 Oct 2020 20:19:30 +0100
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     Bartosz Golaszewski <brgl@bgdev.pl>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-media@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-gpio@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, alsa-devel@alsa-project.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Subject: Re: [PATCH 6/8] drm: atomic: use krealloc_array()
+Message-ID: <20201027191930.GQ401619@phenom.ffwll.local>
+Mail-Followup-To: Bartosz Golaszewski <brgl@bgdev.pl>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>, Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        alsa-devel@alsa-project.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+References: <20201027121725.24660-1-brgl@bgdev.pl>
+ <20201027121725.24660-7-brgl@bgdev.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201027175634.GI1021@linux.intel.com>
+In-Reply-To: <20201027121725.24660-7-brgl@bgdev.pl>
+X-Operating-System: Linux phenom 5.7.0-1-amd64 
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 10:56:36AM -0700, Sean Christopherson wrote:
-> On Tue, Oct 27, 2020 at 09:49:50AM -0700, Ben Gardon wrote:
-> > Rescheduling while holding a spin lock is essential for keeping long
-> > running kernel operations running smoothly. Add the facility to
-> > cond_resched rwlocks.
+On Tue, Oct 27, 2020 at 01:17:23PM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 > 
-> This adds two new exports and two new macros without any in-tree users, which
-> is generally frowned upon.  You and I know these will be used by KVM's new
-> TDP MMU, but the non-KVM folks, and more importantly the maintainers of this
-> code, are undoubtedly going to ask "why".  I.e. these patches probably belong
-> in the KVM series to switch to a rwlock for the TDP MMU.
-
-I was informed about this ;-)
-
-> Regarding the code, it's all copy-pasted from the spinlock code and darn near
-> identical.  It might be worth adding builder macros for these.
-
-I considered mentioning them; I'm typically a fan of them, but I'm not
-quite sure it's worth the effort here.
-
-> > +int __cond_resched_rwlock_read(rwlock_t *lock)
-> > +{
-> > +	int resched = should_resched(PREEMPT_LOCK_OFFSET);
-> > +	int ret = 0;
-> > +
-> > +	lockdep_assert_held(lock);
-> > +
-> > +	if (rwlock_needbreak(lock) || resched) {
-> > +		read_unlock(lock);
-> > +		if (resched)
-> > +			preempt_schedule_common();
-> > +		else
-> > +			cpu_relax();
-> > +		ret = 1;
+> Use the helper that checks for overflows internally instead of manually
+> calculating the size of the new array.
 > 
-> AFAICT, this rather odd code flow from __cond_resched_lock() is an artifact of
-> code changes over the years and not intentionally weird.  IMO, it would be
-> cleaner and easier to read as:
-> 
-> 	int resched = should_resched(PREEMPT_LOCK_OFFSET);
-> 
-> 	lockdep_assert_held(lock);
+> Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
-lockdep_assert_held_read() :-)
+Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
 
+I don't expect conflicts with this going through some other tree, so
+please make that happen. Or resend once I can apply this to drm trees.
+
+Thanks, Daniel
+
+> ---
+>  drivers/gpu/drm/drm_atomic.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> 	if (!rwlock_needbreak(lock) && !resched)
-> 		return 0;
-> 
-> 	read_unlock(lock);
-> 	if (resched)
-> 		preempt_schedule_common();
-> 	else
-> 		cpu_relax();
-> 	read_lock(lock)
-> 	return 1;
+> diff --git a/drivers/gpu/drm/drm_atomic.c b/drivers/gpu/drm/drm_atomic.c
+> index 58527f151984..09ad6a2ec17b 100644
+> --- a/drivers/gpu/drm/drm_atomic.c
+> +++ b/drivers/gpu/drm/drm_atomic.c
+> @@ -960,7 +960,8 @@ drm_atomic_get_connector_state(struct drm_atomic_state *state,
+>  		struct __drm_connnectors_state *c;
+>  		int alloc = max(index + 1, config->num_connector);
+>  
+> -		c = krealloc(state->connectors, alloc * sizeof(*state->connectors), GFP_KERNEL);
+> +		c = krealloc_array(state->connectors, alloc,
+> +				   sizeof(*state->connectors), GFP_KERNEL);
+>  		if (!c)
+>  			return ERR_PTR(-ENOMEM);
+>  
+> -- 
+> 2.29.1
 > 
 
-I suppose that works, but then also change the existing one.
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
