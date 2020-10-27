@@ -2,480 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE81D29A7F2
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 10:34:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B57929A950
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 11:16:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2895639AbgJ0Jdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 05:33:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33242 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2409223AbgJ0Jdy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Oct 2020 05:33:54 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09R9WPKU163796;
-        Tue, 27 Oct 2020 05:33:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=UE9t9Hj6fBVK3jf54L4o+YnyCIcBxjtyc5Vgo7nppRI=;
- b=N4iYzldxLEL7N307wntdXzs5A12Jc/IwhWcB4OjK8T+Q5wXUF7yGTQ+EUGlEoiiTw/Kb
- d/DCd10nC1W6kSyEeYXWf0+kr7lFvJ1DGcomaW3WHDyDTKvGJqq7r5+XBur35gtKWtOh
- v0O4vhQx6FQ/Q3pPhiY/pBt0kZtzZ/ltGAOt269z1Rvnq2mLjDpHAr7DrBEO+lme7Was
- dtdJwbOOJu8dxRveVDNFlHopOpa4WyqsH/KmGU1eWRvAsxChpKyWF7BmkDkGvbau6Vdo
- kUqfMkdEBzZg4pCGPHjVj1oIxZwe8QKUOV3OA3vYhOgBTsVm330GvMhTRoqWHs0VRepv EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34d97gdnmk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Oct 2020 05:33:46 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09R9WOGi163741;
-        Tue, 27 Oct 2020 05:33:44 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34d97gdngx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Oct 2020 05:33:41 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09R9X2aa024206;
-        Tue, 27 Oct 2020 09:33:34 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 34cbhh35xu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Oct 2020 09:33:34 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09R9XVeS32440712
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 27 Oct 2020 09:33:31 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A58CA4054;
-        Tue, 27 Oct 2020 09:33:31 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8EFEEA405F;
-        Tue, 27 Oct 2020 09:33:30 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.77.212])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 27 Oct 2020 09:33:30 +0000 (GMT)
-Date:   Tue, 27 Oct 2020 10:33:28 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 03/14] s390/vfio-ap: manage link between queue
- struct and matrix mdev
-Message-ID: <20201027103328.6411353b.pasic@linux.ibm.com>
-In-Reply-To: <20201022171209.19494-4-akrowiak@linux.ibm.com>
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
-        <20201022171209.19494-4-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.737
- definitions=2020-10-27_03:2020-10-26,2020-10-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- suspectscore=2 lowpriorityscore=0 clxscore=1015 bulkscore=0
- priorityscore=1501 malwarescore=0 phishscore=0 mlxlogscore=999
- adultscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2010270061
+        id S2897663AbgJ0KPt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 06:15:49 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:44160 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2897649AbgJ0KPt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 06:15:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
+        In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=qb563W1vqZmMkjF7LlJizia7QGOlYAmbTQbfPRbAxSs=; b=i9NPGKG5pPdHLsQU4MAZ7TBomx
+        zn9hcnR5Rr1q1txsQT4Ugp7ejTgciSBAYv3MFaJskLHbAA05Hc677KecFv85F7KbFCbaqX+K3x6mx
+        fNMkElSIB22meYAu72I69x7FT1glNyufY6U8nVwCSuaWs0TL5SOvcJ5WvpFbI2CfD4Uwiw+gV/2QH
+        eQk/XFnYY3lak4oAs9GSQr4AdD1pgdKEsjpt2Ti7n63FdP3jhpZonA8V12OA6d1TX636puTImQvgw
+        tejYun1P8VBL9vsSLsNSOE/6ig+YmQ+Qm/9MvRfOla+oZ+D/s6Trj3vNK2M3VYfWKPtQDkL6d3iWd
+        e+QCZMiQ==;
+Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=edge-m3-r3-171.e-iad51.amazon.com)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kXM0l-0003DU-Cl; Tue, 27 Oct 2020 10:15:27 +0000
+Message-ID: <e7f2c2e6e4adf0b70503e7ade05d1113514c6b3d.camel@infradead.org>
+Subject: Re: [RFC PATCH 2/2] kvm/eventfd: Use priority waitqueue to catch
+ events before userspace
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Tue, 27 Oct 2020 10:15:24 +0000
+In-Reply-To: <1faa5405-3640-f4ad-5cd9-89a9e5e834e9@redhat.com>
+References: <20201026175325.585623-1-dwmw2@infradead.org>
+         <20201026175325.585623-2-dwmw2@infradead.org>
+         <1faa5405-3640-f4ad-5cd9-89a9e5e834e9@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256";
+        protocol="application/x-pkcs7-signature";
+        boundary="=-Jgd4iQZKFZLBFQGP2AoD"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Oct 2020 13:11:58 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-> Let's create links between each queue device bound to the vfio_ap device
-> driver and the matrix mdev to which the queue is assigned. The idea is to
-> facilitate efficient retrieval of the objects representing the queue
-> devices and matrix mdevs as well as to verify that a queue assigned to
-> a matrix mdev is bound to the driver.
-> 
-> The links will be created as follows:
-> 
->    * When the queue device is probed, if its APQN is assigned to a matrix
->      mdev, the structures representing the queue device and the matrix mdev
->      will be linked.
-> 
->    * When an adapter or domain is assigned to a matrix mdev, for each new
->      APQN assigned that references a queue device bound to the vfio_ap
->      device driver, the structures representing the queue device and the
->      matrix mdev will be linked.
-> 
-> The links will be removed as follows:
-> 
->    * When the queue device is removed, if its APQN is assigned to a matrix
->      mdev, the structures representing the queue device and the matrix mdev
->      will be unlinked.
-> 
->    * When an adapter or domain is unassigned from a matrix mdev, for each
->      APQN unassigned that references a queue device bound to the vfio_ap
->      device driver, the structures representing the queue device and the
->      matrix mdev will be unlinked.
-> 
+--=-Jgd4iQZKFZLBFQGP2AoD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I would prefer if the changes to the q->matrix_mdev link were restricted
-to this patch. Patches 1 and 2 do some of that stuff as well. See my
-comments at the code. 
+On Tue, 2020-10-27 at 09:01 +0100, Paolo Bonzini wrote:
+> On 26/10/20 18:53, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > As far as I can tell, when we use posted interrupts we silently cut off
+> > the events from userspace, if it's listening on the same eventfd that
+> > feeds the irqfd.
+> >=20
+> > I like that behaviour. Let's do it all the time, even without posted
+> > interrupts. It makes it much easier to handle IRQ remapping invalidatio=
+n
+> > without having to constantly add/remove the fd from the userspace poll
+> > set. We can just leave userspace polling on it, and the bypass will...
+> > well... bypass it.
+>=20
+> This looks good, though of course it depends on the somewhat hackish
+> patch 1.
 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c     | 146 +++++++++++++++++++++++---
->  drivers/s390/crypto/vfio_ap_private.h |   3 +
->  2 files changed, 135 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 049b97d7444c..1357f8f8b7e4 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -28,7 +28,6 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
->  
->  /**
->   * vfio_ap_get_queue: Retrieve a queue with a specific APQN.
-> - * @matrix_mdev: the associated mediated matrix
->   * @apqn: The queue APQN
->   *
->   * Retrieve a queue with a specific APQN from the AP queue devices attached to
-> @@ -36,18 +35,11 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
->   *
->   * Returns the pointer to the vfio_ap_queue with the specified APQN, or NULL.
->   */
-> -static struct vfio_ap_queue *vfio_ap_get_queue(
-> -					struct ap_matrix_mdev *matrix_mdev,
-> -					unsigned long apqn)
-> +static struct vfio_ap_queue *vfio_ap_get_queue(unsigned long apqn)
->  {
->  	struct ap_queue *queue;
->  	struct vfio_ap_queue *q = NULL;
->  
-> -	if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
-> -		return NULL;
-> -	if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
-> -		return NULL;
-> -
->  	queue = ap_get_qdev(apqn);
->  	if (!queue)
->  		return NULL;
+I thought it was quite neat :)
 
-Patch 2 removed
-	q->matrix_mdev = matrix_mdev;
-because patch 1 make it redundant. But patch 1 should not have made it
-redundant in the first place.
+>  However don't you need to read the eventfd as well, since
+> userspace will never be able to do so?
 
-It should be removed in this patch.
+Yes. Although that's a separate cleanup as it was already true before
+my patch. Right now, userspace needs to explicitly stop polling on the
+VFIO eventfd while it's assigned as KVM IRQFD (to avoid injecting
+duplicate interrupts when the kernel isn't using PI and allows events
+to leak). So it isn't going to consume the events in that case either.
+Nothing's really changed.
 
-> @@ -60,6 +52,19 @@ static struct vfio_ap_queue *vfio_ap_get_queue(
->  	return q;
->  }
->  
-> +static struct vfio_ap_queue *
-> +vfio_ap_mdev_get_queue(struct ap_matrix_mdev *matrix_mdev, unsigned long apqn)
-> +{
-> +	struct vfio_ap_queue *q;
-> +
-> +	hash_for_each_possible(matrix_mdev->qtable, q, mdev_qnode, apqn) {
-> +		if (q && (q->apqn == apqn))
-> +			return q;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
->  /**
->   * vfio_ap_wait_for_irqclear
->   * @apqn: The AP Queue number
-> @@ -171,7 +176,6 @@ static struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q)
->  		  status.response_code);
->  end_free:
->  	vfio_ap_free_aqic_resources(q);
-> -	q->matrix_mdev = NULL;
->  	return status;
->  }
->  
-> @@ -284,14 +288,14 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
->  
->  	if (!vcpu->kvm->arch.crypto.pqap_hook)
->  		goto out_unlock;
-> +
->  	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
->  				   struct ap_matrix_mdev, pqap_hook);
->  
-> -	q = vfio_ap_get_queue(matrix_mdev, apqn);
-> +	q = vfio_ap_mdev_get_queue(matrix_mdev, apqn);
->  	if (!q)
->  		goto out_unlock;
->  
-> -	q->matrix_mdev = matrix_mdev;
+The VFIO virqfd is just the same. The count just builds up when the
+kernel handles the events, and is eventually cleared by
+eventfd_ctx_remove_wait_queue().
 
-This was unnecessarily added in patch 1, now it's removed.
+In both cases, that actually works fine because in practice the events
+are raised by eventfd_signal() in the kernel, and that works even if
+the count reaches ULLONG_MAX. It's just that sending further events
+from *userspace* would block in that case.
 
->  	status = vcpu->run->s.regs.gprs[1];
->  
->  	/* If IR bit(16) is set we enable the interrupt */
-> @@ -331,6 +335,7 @@ static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
->  
->  	matrix_mdev->mdev = mdev;
->  	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
-> +	hash_init(matrix_mdev->qtable);
->  	mdev_set_drvdata(mdev, matrix_mdev);
->  	matrix_mdev->pqap_hook.hook = handle_pqap;
->  	matrix_mdev->pqap_hook.owner = THIS_MODULE;
-> @@ -559,6 +564,87 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
->  	return 0;
->  }
->  
-> +enum qlink_type {
-> +	LINK_APID,
-> +	LINK_APQI,
-> +	UNLINK_APID,
-> +	UNLINK_APQI,
-> +};
-> +
-> +static void vfio_ap_mdev_link_queue(struct ap_matrix_mdev *matrix_mdev,
-> +				    unsigned long apid, unsigned long apqi)
-> +{
-> +	struct vfio_ap_queue *q;
-> +
-> +	q = vfio_ap_get_queue(AP_MKQID(apid, apqi));
-> +	if (q) {
-> +		q->matrix_mdev = matrix_mdev;
-> +		hash_add(matrix_mdev->qtable,
-> +			 &q->mdev_qnode, q->apqn);
-> +	}
-> +}
-> +
-> +static void vfio_ap_mdev_unlink_queue(unsigned long apid, unsigned long apqi)
-> +{
-> +	struct vfio_ap_queue *q;
-> +
-> +	q = vfio_ap_get_queue(AP_MKQID(apid, apqi));
-> +	if (q) {
-> +		q->matrix_mdev = NULL;
-> +		hash_del(&q->mdev_qnode);
-> +	}
-> +}
-> +
-> +/**
-> + * vfio_ap_mdev_link_queues
-> + *
-> + * @matrix_mdev: The matrix mdev to link.
-> + * @type:	 The type of @qlink_id.
-> + * @qlink_id:	 The APID or APQI of the queues to link.
-> + *
-> + * Sets or clears the links between the queues with the specified @qlink_id
-> + * and the @matrix_mdev:
-> + *     @type == LINK_APID: Set the links between the @matrix_mdev and the
-> + *                         queues with the specified @qlink_id (APID)
-> + *     @type == LINK_APQI: Set the links between the @matrix_mdev and the
-> + *                         queues with the specified @qlink_id (APQI)
-> + *     @type == UNLINK_APID: Clear the links between the @matrix_mdev and the
-> + *                           queues with the specified @qlink_id (APID)
-> + *     @type == UNLINK_APQI: Clear the links between the @matrix_mdev and the
-> + *                           queues with the specified @qlink_id (APQI)
-> + */
-> +static void vfio_ap_mdev_link_queues(struct ap_matrix_mdev *matrix_mdev,
-> +				     enum qlink_type type,
-> +				     unsigned long qlink_id)
+Both of them theoretically want fixing =E2=80=94 regardless of the priority
+patch.
 
-I believe Connie wanted this changed, and IMHO she is right, this does
-not specify the type of link, the type of the link is always the same,
-but determines what action needs to be taken. The enum name qlink_type
-reads like it's the type of the qlink, but as your doc says it just tells
-you what qlink_id is. 
-
-If apids and apqis had their own type-checked distinct type, the type of qlink_id
-would be the union of those two...
-
-> +{
-> +	unsigned long id;
-> +
-> +	switch (type) {
-
-Since each of these cases is used at exactly one place, maybe it would
-be simpler to just inline them where they are needed. Or are these going
-to be used in other situations as well?
-
-> +	case LINK_APID:
-
-assign_adapter
-
-> +		for_each_set_bit_inv(id, matrix_mdev->matrix.aqm,
-> +				     matrix_mdev->matrix.aqm_max + 1)
-> +			vfio_ap_mdev_link_queue(matrix_mdev, qlink_id, id);
-> +		break;
-> +	case UNLINK_APID:
-
-unassign_adapter
-
-> +		for_each_set_bit_inv(id, matrix_mdev->matrix.aqm,
-> +				     matrix_mdev->matrix.aqm_max + 1)
-> +			vfio_ap_mdev_unlink_queue(qlink_id, id);
-> +		break;
-> +	case LINK_APQI:
-
-assign_domain
-
-> +		for_each_set_bit_inv(id, matrix_mdev->matrix.apm,
-> +				     matrix_mdev->matrix.apm_max + 1)
-> +			vfio_ap_mdev_link_queue(matrix_mdev, id, qlink_id);
-> +		break;
-> +	case UNLINK_APQI:
-
-unassign_domain
-
-> +		for_each_set_bit_inv(id, matrix_mdev->matrix.apm,
-> +				     matrix_mdev->matrix.apm_max + 1)
-> +			vfio_ap_mdev_link_queue(matrix_mdev, id, qlink_id);
-> +		break;
-> +	default:
-> +		WARN_ON_ONCE(1);
-> +	}
-> +}
-> +
->  /**
->   * assign_adapter_store
->   *
-> @@ -628,6 +714,7 @@ static ssize_t assign_adapter_store(struct device *dev,
->  	if (ret)
->  		goto share_err;
->  
-> +	vfio_ap_mdev_link_queues(matrix_mdev, LINK_APID, apid);
->  	ret = count;
->  	goto done;
->  
-> @@ -679,6 +766,7 @@ static ssize_t unassign_adapter_store(struct device *dev,
->  
->  	mutex_lock(&matrix_dev->lock);
->  	clear_bit_inv((unsigned long)apid, matrix_mdev->matrix.apm);
-> +	vfio_ap_mdev_link_queues(matrix_mdev, UNLINK_APID, apid);
->  	mutex_unlock(&matrix_dev->lock);
->  
->  	return count;
-> @@ -769,6 +857,7 @@ static ssize_t assign_domain_store(struct device *dev,
->  	if (ret)
->  		goto share_err;
->  
-> +	vfio_ap_mdev_link_queues(matrix_mdev, LINK_APQI, apqi);
->  	ret = count;
->  	goto done;
->  
-> @@ -821,6 +910,7 @@ static ssize_t unassign_domain_store(struct device *dev,
->  
->  	mutex_lock(&matrix_dev->lock);
->  	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
-> +	vfio_ap_mdev_link_queues(matrix_mdev, UNLINK_APQI, apqi);
->  	mutex_unlock(&matrix_dev->lock);
->  
->  	return count;
-> @@ -1159,8 +1249,8 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
->  			 */
->  			if (ret)
->  				rc = ret;
-> -			q = vfio_ap_get_queue(matrix_mdev,
-> -					      AP_MKQID(apid, apqi));
-> +			q = vfio_ap_mdev_get_queue(matrix_mdev,
-> +						   AP_MKQID(apid, apqi));
->  			if (q)
->  				vfio_ap_free_aqic_resources(q);
->  		}
-> @@ -1288,6 +1378,29 @@ void vfio_ap_mdev_unregister(void)
->  	mdev_unregister_device(&matrix_dev->device);
->  }
->  
-> +/**
-> + * vfio_ap_queue_link_mdev
-> + *
-> + * @q: The queue to link with the matrix mdev.
-> + *
-> + * Links @q with the matrix mdev to which the queue's APQN is assigned.
-> + */
-> +static void vfio_ap_queue_link_mdev(struct vfio_ap_queue *q)
-> +{
-> +	unsigned long apid = AP_QID_CARD(q->apqn);
-> +	unsigned long apqi = AP_QID_QUEUE(q->apqn);
-> +	struct ap_matrix_mdev *matrix_mdev;
-> +
-> +	list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
-> +		if (test_bit_inv(apid, matrix_mdev->matrix.apm) &&
-> +		    test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
-> +			q->matrix_mdev = matrix_mdev;
-> +			hash_add(matrix_mdev->qtable, &q->mdev_qnode, q->apqn);
-> +			break;
-> +		}
-> +	}
-> +}
-> +
->  int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
->  {
->  	struct vfio_ap_queue *q;
-> @@ -1299,9 +1412,12 @@ int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
->  	if (!q)
->  		return -ENOMEM;
->  
-> +	mutex_lock(&matrix_dev->lock);
->  	dev_set_drvdata(&queue->ap_dev.device, q);
->  	q->apqn = queue->qid;
->  	q->saved_isc = VFIO_AP_ISC_INVALID;
-> +	vfio_ap_queue_link_mdev(q);
-> +	mutex_unlock(&matrix_dev->lock);
->  
->  	return 0;
->  }
-> @@ -1321,6 +1437,8 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
->  	apqi = AP_QID_QUEUE(q->apqn);
->  	vfio_ap_mdev_reset_queue(apid, apqi, 1);
->  	vfio_ap_free_aqic_resources(q);
-> +	if (q->matrix_mdev)
-> +		hash_del(&q->mdev_qnode);
->  	kfree(q);
->  	mutex_unlock(&matrix_dev->lock);
->  }
-> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-> index d9003de4fbad..4e5cc72fc0db 100644
-> --- a/drivers/s390/crypto/vfio_ap_private.h
-> +++ b/drivers/s390/crypto/vfio_ap_private.h
-> @@ -18,6 +18,7 @@
->  #include <linux/delay.h>
->  #include <linux/mutex.h>
->  #include <linux/kvm_host.h>
-> +#include <linux/hashtable.h>
->  
->  #include "ap_bus.h"
->  
-> @@ -86,6 +87,7 @@ struct ap_matrix_mdev {
->  	struct kvm *kvm;
->  	struct kvm_s390_module_hook pqap_hook;
->  	struct mdev_device *mdev;
-> +	DECLARE_HASHTABLE(qtable, 8);
-
-I'm not sure about the benefit of this hashtable if the bus is supposed
-to give us O(1) queue lookup based on APQN. I guess it's also easier to
-right-size the hashtable in the bus than for each mdev.
-
-Don't get me wrong, I'm willing to accept these hashtables.
-
-Another thing I'm thinking about is how do we want to deal later with
-resources filtered because one of the required queues is missing. Does
-it make sense to maintain the link for those? I will have to study the
-following patches and return to this one later.
-
-Regards,
-Halil
+Since the wq lock is held while the wakeup function (virqfd_wakeup or=20
+irqfd_wakeup for VFIO/KVM respectively) run, all they really need to do
+is call eventfd_ctx_do_read() to consume the events. I'll look at
+whether I can find a nicer option than just exporting that.
 
 
->  };
->  
->  extern int vfio_ap_mdev_register(void);
-> @@ -97,6 +99,7 @@ struct vfio_ap_queue {
->  	int	apqn;
->  #define VFIO_AP_ISC_INVALID 0xff
->  	unsigned char saved_isc;
-> +	struct hlist_node mdev_qnode;
->  };
->  
->  int vfio_ap_mdev_probe_queue(struct ap_device *queue);
+--=-Jgd4iQZKFZLBFQGP2AoD
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
+MDI3MTAxNTI0WjAvBgkqhkiG9w0BCQQxIgQgDiHqMBSBX+iiwDRC7w+bRZd+ooVjiUBvFzLVy6jt
+fF0wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBACPCSgdhjA4BGNbxcQL0I7TARsN53cd4ZKMCBuvRsB7HIpWarClRHaWJqnaS/5rP
+3/iSLErSn7S4/PdQcCtCE3Cu+4XdjhjKq0CdF1nSpBpdlksydGey0eLz60fdwl6WmJEGgCZqyhXX
+67uYL8rfLHaN8wubYABJWOy6eSvinRoQAt24tuxn77PJ+4ONPFyiqFfeOkj2FkjjDY7VoWgQWbMI
+VEwDvbGIK/+zuPHP2Mkej8H4ojhh5XK6MYtrmfegLZTC1wmLCnfy5HrRDtEgmF+Du9jrLwrDJttI
+5ycqiWnSY0ZFJmylONKO+6BQotV/8+amlFSH/e0CeLPrFk0UdF0AAAAAAAA=
+
+
+--=-Jgd4iQZKFZLBFQGP2AoD--
 
