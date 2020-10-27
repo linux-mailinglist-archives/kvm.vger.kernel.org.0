@@ -2,164 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44FDC29C7C4
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 19:49:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC0E629C7D0
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 19:53:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1829131AbgJ0St3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 14:49:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35478 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1829120AbgJ0StS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 14:49:18 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0140E207DE;
-        Tue, 27 Oct 2020 18:49:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603824558;
-        bh=LLymolsV5F+QRaC0FUrOgoIM2iN9acO1HLn3U7GULqo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S0kIH8+bpUOP2U6vMAP5XdSfhj8o1rc//xLX5Ob5XSAF320XeyJzGX52t+s111mcV
-         nQTHeLiSyu1Jt1UNSKkOCEsI8RLquSH9Stc5m1f1SpqZOaCCo5B9KyRjPzrkvdyULp
-         GYe/SGjoB0u3P7NwdvBHl/qEbEq2sBSWAY2D1jlo=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kXU1z-004ueD-PK; Tue, 27 Oct 2020 18:49:15 +0000
+        id S1829164AbgJ0Suo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 14:50:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50881 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1829135AbgJ0Sui (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Oct 2020 14:50:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603824619;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+0Ba8mUgAE+0hU6zaMSaF5/fsLeGgzIX1yGstr4Luok=;
+        b=cMHw1ZhaC3EVWWK9skZpX8RQGnGjXJpxEcinu9q9LtnoL8Ezs+duv9HmVpbg+8pRB0RfZI
+        sntLomqSyI9iff5aM53stx/ghIELancR1D2DXZ1+oxc3uGgjt5t8OH3yzrbv19k0Gpp3bz
+        IZYBWpI4MqNPTE4G752y34YU7xh2iLU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-wwBd8CnNOMSxPaMeJRWSeg-1; Tue, 27 Oct 2020 14:50:17 -0400
+X-MC-Unique: wwBd8CnNOMSxPaMeJRWSeg-1
+Received: by mail-wr1-f72.google.com with SMTP id 31so1088966wrg.12
+        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 11:50:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+0Ba8mUgAE+0hU6zaMSaF5/fsLeGgzIX1yGstr4Luok=;
+        b=jyEVAYjxQQ1tF6A0Mxrkw9KXd8bp4mlJ1Fvq12VJf80oCILmRpWVISP00LFL4d07A5
+         rDjUOu27D/WB8uwf+DxUK/F+6vgjeRAj/KjJqghXhSeKBpBWpp4F421Fw4+CJ8GUsfhy
+         JU11xkGQfrV7s1/ygBy4oZyZvNuvL1T0BLZeITZsEijD2OzTHB3FXn0/OxrVNlgN6JZj
+         MGqb0a0UGIzNWdu1EbHjaFXC3Gl28BgqVCiwBM0MM7TwXBc0PnJfXBw7AokXFDl6t0aC
+         xCi+TJnu7yBVLOeURUZN15shdjBtGhXmRJuRh6GWDrZqoQzdODbKsUv/ceW6b6uhDBLj
+         fiuw==
+X-Gm-Message-State: AOAM530M5ZSteiJwqcTAqD8inEWilgCJ9oqjKwTftsh4rQEUWNyAKh91
+        AB1WjwkiewRJlsI/vK1b7HP8nTrXxYc+IaJmCjw9lcNX9q3ip/FkiymLaMz+ROWXb/ht/vuQpbs
+        L3a9PVR7f8q3u
+X-Received: by 2002:adf:ce12:: with SMTP id p18mr4432349wrn.52.1603824615605;
+        Tue, 27 Oct 2020 11:50:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz1G9oFzSvrpOHbfb2BWS1dQWrwHlZzXL2MnGZ5QN/1YxSdA1cwYTpx8mRXDExt+HsekkIKpQ==
+X-Received: by 2002:adf:ce12:: with SMTP id p18mr4432325wrn.52.1603824615356;
+        Tue, 27 Oct 2020 11:50:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id x81sm2920137wmb.11.2020.10.27.11.50.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Oct 2020 11:50:14 -0700 (PDT)
+Subject: Re: [PATCH 3/3] sched: Add cond_resched_rwlock
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Davidlohr Bueso <dave@stgolabs.net>
+References: <20201027164950.1057601-1-bgardon@google.com>
+ <20201027164950.1057601-3-bgardon@google.com>
+ <20201027184440.GN2628@hirez.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <31db67e0-bd9f-ff6d-2cee-b60ad52f71b2@redhat.com>
+Date:   Tue, 27 Oct 2020 19:50:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20201027184440.GN2628@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 27 Oct 2020 18:49:15 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     James Morse <james.morse@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        David Brazdil <dbrazdil@google.com>, kernel-team@android.com
-Subject: Re: [PATCH 07/11] KVM: arm64: Inject AArch64 exceptions from HYP
-In-Reply-To: <cf4dc11c-fb9f-ee01-a93a-c1c0a721aa19@arm.com>
-References: <20201026133450.73304-1-maz@kernel.org>
- <20201026133450.73304-8-maz@kernel.org>
- <cf4dc11c-fb9f-ee01-a93a-c1c0a721aa19@arm.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <6ce42c66606e3d41a30fafbf66aa49a5@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, will@kernel.org, qperret@google.com, dbrazdil@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi James,
-
-On 2020-10-27 17:41, James Morse wrote:
-> Hi Marc,
+On 27/10/20 19:44, Peter Zijlstra wrote:
+> On Tue, Oct 27, 2020 at 09:49:50AM -0700, Ben Gardon wrote:
 > 
-> On 26/10/2020 13:34, Marc Zyngier wrote:
->> Move the AArch64 exception injection code from EL1 to HYP, leaving
->> only the ESR_EL1 updates to EL1. In order to come with the differences
-> 
-> (cope with the differences?)
-
-Yes, much better!
-
->> between VHE and nVHE, two set of system register accessors are 
->> provided.
->> 
->> SPSR, ELR, PC and PSTATE are now completely handled in the hypervisor.
-> 
-> 
->> diff --git a/arch/arm64/kvm/hyp/exception.c 
->> b/arch/arm64/kvm/hyp/exception.c
->> index 6533a9270850..cd6e643639e8 100644
->> --- a/arch/arm64/kvm/hyp/exception.c
->> +++ b/arch/arm64/kvm/hyp/exception.c
->> @@ -11,7 +11,167 @@
->>   */
->> 
->>  #include <hyp/adjust_pc.h>
->> +#include <linux/kvm_host.h>
->> +#include <asm/kvm_emulate.h>
+>> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+>> index d2003a7d5ab55..ac58e7829a063 100644
+>> --- a/kernel/sched/core.c
+>> +++ b/kernel/sched/core.c
+>> @@ -6152,6 +6152,46 @@ int __cond_resched_lock(spinlock_t *lock)
+>>  }
+>>  EXPORT_SYMBOL(__cond_resched_lock);
+>>  
+>> +int __cond_resched_rwlock_read(rwlock_t *lock)
+>> +{
+>> +	int resched = should_resched(PREEMPT_LOCK_OFFSET);
+>> +	int ret = 0;
 >> +
->> +#if defined (__KVM_NVHE_HYPERVISOR__)
->> +/*
->> + * System registers are never loaded on the CPU until we actually
->> + * restore them.
->> + */
->> +static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, 
->> int reg)
->> +{
->> +	return __vcpu_sys_reg(vcpu, reg);
->> +}
+>> +	lockdep_assert_held(lock);
+> 
+> 	lockdep_assert_held_read(lock);
+> 
 >> +
->> +static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 
->> val, int reg)
->> +{
->> +	 __vcpu_sys_reg(vcpu, reg) = val;
+>> +	if (rwlock_needbreak(lock) || resched) {
+>> +		read_unlock(lock);
+>> +		if (resched)
+>> +			preempt_schedule_common();
+>> +		else
+>> +			cpu_relax();
+>> +		ret = 1;
+>> +		read_lock(lock);
+>> +	}
+>> +	return ret;
 >> +}
+>> +EXPORT_SYMBOL(__cond_resched_rwlock_read);
 >> +
->> +static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
+>> +int __cond_resched_rwlock_write(rwlock_t *lock)
 >> +{
->> +	write_sysreg_el1(val, SYS_SPSR);
->> +}
->> +#elif defined (__KVM_VHE_HYPERVISOR__)
->> +/* On VHE, all the registers are already loaded on the CPU */
->> +static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, 
->> int reg)
->> +{
->> +	u64 val;
-> 
->> +	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
->> +		return val;
-> 
-> As has_vhe()'s behaviour changes based on these KVM preprocessor 
-> symbols, would:
-> |	if (has_vhe() && __vcpu_read_sys_reg_from_cpu(reg, &val))
-> |		return val;
-> 
-> let you do both of these with only one copy of the function?
-
-Indeed that's better. Even better, let's move the has_vhe() into
-__vcpu_read_sys_reg_from_cpu(), as that's the only case this is
-used for.
-
-Further cleanup could involve a new helper that would gate the
-test of vcpu->sysregs_loaded_on_cpu with has_vhe() too, as this
-definitely is a VHE-only feature.
-
-> 
-> 
->> +	return __vcpu_sys_reg(vcpu, reg);
->> +}
+>> +	int resched = should_resched(PREEMPT_LOCK_OFFSET);
+>> +	int ret = 0;
 >> +
->> +static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 
->> val, int reg)
->> +{
->> +	if (__vcpu_write_sys_reg_to_cpu(val, reg))
->> +		return;
+>> +	lockdep_assert_held(lock);
+> 
+> 	lockdep_assert_held_write(lock);
+> 
 >> +
->> +	 __vcpu_sys_reg(vcpu, reg) = val;
+>> +	if (rwlock_needbreak(lock) || resched) {
+>> +		write_unlock(lock);
+>> +		if (resched)
+>> +			preempt_schedule_common();
+>> +		else
+>> +			cpu_relax();
+>> +		ret = 1;
+>> +		write_lock(lock);
+>> +	}
+>> +	return ret;
 >> +}
+>> +EXPORT_SYMBOL(__cond_resched_rwlock_write);
 > 
+> If this is the only feedback (the patches look fine to me), don't bother
+> resending, I'll edit them when applying.
 > 
->> +static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
->> +{
->> +	write_sysreg_el1(val, SYS_SPSR);
->> +}
-> 
-> This one doesn't look like it needs duplicating.
 
-Spot on again, thanks!
+If that is an Acked-by, I'll merge them through the KVM tree when time
+comes.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Paolo
+
