@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB34329CB37
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 22:25:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 149BC29CB3D
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 22:25:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S373775AbgJ0VXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 17:23:52 -0400
+        id S374004AbgJ0VZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 17:25:29 -0400
 Received: from mga02.intel.com ([134.134.136.20]:56181 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S373764AbgJ0VXv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 17:23:51 -0400
-IronPort-SDR: mm42A7NBYWv2Xzhp4YMkm6L1GrrN+XED0/Q9qnxPDgGBpitaE3zVLjjxAwnSEo/fSn7hRcGuvt
- yPKBc+RsiFIA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9787"; a="155133697"
+        id S373767AbgJ0VXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 17:23:53 -0400
+IronPort-SDR: v7dvIGVwOkSq59LDxxMSfjrtdKgfvpeAOojNrSaM/O1jCD0+d6UGvAazJeVjnCO6EfZqQV6Ljr
+ VUlLVjlqT+Gw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9787"; a="155133698"
 X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
-   d="scan'208";a="155133697"
+   d="scan'208";a="155133698"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2020 14:23:50 -0700
-IronPort-SDR: wAVat0Mh0B7MCeJOzTOZ1b2tBkCUoIzYgffFSRKrmNkkPqBwRMplUWMpcW6Ax+thT4qbW2FPTC
- FQC6YwdZ96lQ==
+IronPort-SDR: RfwQ6NaYvaDPLuW8O5i3P4kMqOe3xLBXkmptCtlN7HyRuXl5fw6nq+oPiqKpL0zYB4Ta7Z/i10
+ nJDsr6nhz5kg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
-   d="scan'208";a="524886372"
+   d="scan'208";a="524886376"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
   by fmsmga006.fm.intel.com with ESMTP; 27 Oct 2020 14:23:50 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -35,58 +35,154 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 00/11] KVM: VMX: Clean up Hyper-V PV TLB flush
-Date:   Tue, 27 Oct 2020 14:23:35 -0700
-Message-Id: <20201027212346.23409-1-sean.j.christopherson@intel.com>
+Subject: [PATCH v3 01/11] KVM: x86: Get active PCID only when writing a CR3 value
+Date:   Tue, 27 Oct 2020 14:23:36 -0700
+Message-Id: <20201027212346.23409-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201027212346.23409-1-sean.j.christopherson@intel.com>
+References: <20201027212346.23409-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clean up KVM's PV TLB flushing when running with EPT on Hyper-V, i.e. as
-a nested VMM.  No real goal in mind other than the sole patch in v1, which
-is a minor change to avoid a future mixup when TDX also wants to define
-.remote_flush_tlb.  Everything else is opportunistic clean up.
+Retrieve the active PCID only when writing a guest CR3 value, i.e. don't
+get the PCID when using EPT.  The PCID is not used when EPT is enabled,
+and must be manually stripped, which is annoying and unnecessary.
+And on VMX, getting the active PCID also involves reading the guest's
+CR3 and CR4.PCIDE, i.e. may add pointless VMREADs.
 
-Patch 1 legitimately tested on VMX (no SVM), everything else effectively
-build tested only.
+Opportunistically rename the pgd/pgd_level params to root_hpa and
+root_level to better reflect their new roles.  Keep the function names,
+as "load the guest PGD" is still accurate/correct.
 
-v3:
-  - Add a patch to pass the root_hpa instead of pgd to vmx_load_mmu_pgd()
-    and retrieve the active PCID only when necessary.  [Vitaly]
-  - Selectively collects reviews (skipped a few due to changes). [Vitaly]
-  - Explicitly invalidate hv_tlb_eptp instead of leaving it valid when
-    the mismatch tracker "knows" it's invalid. [Vitaly]
-  - Change the last patch to use "hv_root_ept" instead of "hv_tlb_pgd"
-    to better reflect what is actually being tracked.
+Last, and probably least, pass root_hpa as a hpa_t/u64 instead of an
+unsigned long.  The EPTP holds a 64-bit value, even in 32-bit mode, so
+in theory EPT could support HIGHMEM for 32-bit KVM.  Never mind that
+doing so would require changing the MMU page allocators and reworking
+the MMU to use kmap().
 
-v2: Rewrite everything.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  4 ++--
+ arch/x86/kvm/mmu.h              |  2 +-
+ arch/x86/kvm/svm/svm.c          |  4 ++--
+ arch/x86/kvm/vmx/vmx.c          | 13 ++++++-------
+ arch/x86/kvm/vmx/vmx.h          |  3 +--
+ 5 files changed, 12 insertions(+), 14 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index d44858b69353..33b2acfd7869 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1181,8 +1181,8 @@ struct kvm_x86_ops {
+ 	int (*set_identity_map_addr)(struct kvm *kvm, u64 ident_addr);
+ 	u64 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
  
-Sean Christopherson (11):
-  KVM: x86: Get active PCID only when writing a CR3 value
-  KVM: VMX: Track common EPTP for Hyper-V's paravirt TLB flush
-  KVM: VMX: Stash kvm_vmx in a local variable for Hyper-V paravirt TLB
-    flush
-  KVM: VMX: Fold Hyper-V EPTP checking into it's only caller
-  KVM: VMX: Do Hyper-V TLB flush iff vCPU's EPTP hasn't been flushed
-  KVM: VMX: Invalidate hv_tlb_eptp to denote an EPTP mismatch
-  KVM: VMX: Don't invalidate hv_tlb_eptp if the new EPTP matches
-  KVM: VMX: Explicitly check for hv_remote_flush_tlb when loading pgd
-  KVM: VMX: Define Hyper-V paravirt TLB flush fields iff Hyper-V is
-    enabled
-  KVM: VMX: Skip additional Hyper-V TLB EPTP flushes if one fails
-  KVM: VMX: Track root HPA instead of EPTP for paravirt Hyper-V TLB
-    flush
-
- arch/x86/include/asm/kvm_host.h |   4 +-
- arch/x86/kvm/mmu.h              |   2 +-
- arch/x86/kvm/svm/svm.c          |   4 +-
- arch/x86/kvm/vmx/vmx.c          | 134 ++++++++++++++++++--------------
- arch/x86/kvm/vmx/vmx.h          |  19 ++---
- 5 files changed, 87 insertions(+), 76 deletions(-)
-
+-	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, unsigned long pgd,
+-			     int pgd_level);
++	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
++			     int root_level);
+ 
+ 	bool (*has_wbinvd_exit)(void);
+ 
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 9c4a9c8e43d9..add537a39177 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -95,7 +95,7 @@ static inline void kvm_mmu_load_pgd(struct kvm_vcpu *vcpu)
+ 	if (!VALID_PAGE(root_hpa))
+ 		return;
+ 
+-	kvm_x86_ops.load_mmu_pgd(vcpu, root_hpa | kvm_get_active_pcid(vcpu),
++	kvm_x86_ops.load_mmu_pgd(vcpu, root_hpa,
+ 				 vcpu->arch.mmu->shadow_root_level);
+ }
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index cf951e588dd1..4a6a5a3dc963 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3667,13 +3667,13 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	return svm_exit_handlers_fastpath(vcpu);
+ }
+ 
+-static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root,
++static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			     int root_level)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	unsigned long cr3;
+ 
+-	cr3 = __sme_set(root);
++	cr3 = __sme_set(root_hpa) | kvm_get_active_pcid(vcpu);
+ 	if (npt_enabled) {
+ 		svm->vmcb->control.nested_cr3 = cr3;
+ 		vmcb_mark_dirty(svm->vmcb, VMCB_NPT);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 281c405c7ea3..273a3206cef7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3043,8 +3043,7 @@ static int vmx_get_max_tdp_level(void)
+ 	return 4;
+ }
+ 
+-u64 construct_eptp(struct kvm_vcpu *vcpu, unsigned long root_hpa,
+-		   int root_level)
++u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level)
+ {
+ 	u64 eptp = VMX_EPTP_MT_WB;
+ 
+@@ -3053,13 +3052,13 @@ u64 construct_eptp(struct kvm_vcpu *vcpu, unsigned long root_hpa,
+ 	if (enable_ept_ad_bits &&
+ 	    (!is_guest_mode(vcpu) || nested_ept_ad_enabled(vcpu)))
+ 		eptp |= VMX_EPTP_AD_ENABLE_BIT;
+-	eptp |= (root_hpa & PAGE_MASK);
++	eptp |= root_hpa;
+ 
+ 	return eptp;
+ }
+ 
+-static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
+-			     int pgd_level)
++static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
++			     int root_level)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	bool update_guest_cr3 = true;
+@@ -3067,7 +3066,7 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
+ 	u64 eptp;
+ 
+ 	if (enable_ept) {
+-		eptp = construct_eptp(vcpu, pgd, pgd_level);
++		eptp = construct_eptp(vcpu, root_hpa, root_level);
+ 		vmcs_write64(EPT_POINTER, eptp);
+ 
+ 		if (kvm_x86_ops.tlb_remote_flush) {
+@@ -3086,7 +3085,7 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
+ 			update_guest_cr3 = false;
+ 		vmx_ept_load_pdptrs(vcpu);
+ 	} else {
+-		guest_cr3 = pgd;
++		guest_cr3 = root_hpa | kvm_get_active_pcid(vcpu);
+ 	}
+ 
+ 	if (update_guest_cr3)
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index f6f66e5c6510..a2d143276603 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -326,8 +326,7 @@ void set_cr4_guest_host_mask(struct vcpu_vmx *vmx);
+ void ept_save_pdptrs(struct kvm_vcpu *vcpu);
+ void vmx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+ void vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+-u64 construct_eptp(struct kvm_vcpu *vcpu, unsigned long root_hpa,
+-		   int root_level);
++u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+ 
+ void update_exception_bitmap(struct kvm_vcpu *vcpu);
+ void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu);
 -- 
 2.28.0
 
