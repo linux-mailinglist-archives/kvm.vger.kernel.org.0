@@ -2,127 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D367B29AB50
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 12:58:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FAC129ABE1
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 13:19:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1750376AbgJ0L6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 07:58:19 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:6260 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750371AbgJ0L6T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 07:58:19 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f980b450001>; Tue, 27 Oct 2020 04:57:57 -0700
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 27 Oct
- 2020 11:58:14 +0000
-Received: from NAM02-BL2-obe.outbound.protection.outlook.com (104.47.38.56) by
- HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Tue, 27 Oct 2020 11:58:14 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OpJwEAhW/1o7e3SryeXWsqfxPV9ry9R8Iu6j5got1koMLs3EWQz+SdSBuRtz3YC6MCZbL/9WyP/5f+ymZaA9tvqGraI4yjhhLYzRkttiAPnirLuLgelN913a+vWBfdDitbaLNZtHZCu9dIf+NF7I3YAMBvtF5n2A0KQCPqkMnQdr4m78b/B5ILgrxShdMIO1UFd3g+5x/VHwOaV52uy/BydgCIdSobOn1NQsXmjbJ4eYChI8uonUy8hHRdLnTg3KkzIg2jFY8d23mTA+hJL44/T9y89j9V0Eaew/6AC40NFbabLqz/UcQEay21k5j80Dd4VRVRYJUYZqgpQfF4pTIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=euyUCc7Fc3m9fZe0HlaXBdvVYHYAC98vLn14YMvbS+Q=;
- b=BfUaY4Da/TOLKZYTvOuBL7hhaolcLrILnlbcnBfgzbEoyj2QrTlDKDKTp64eX2A+tEkzIB4y3pEsYgsfjCZWVY2fsQmqroIVtj2u5eRQb50lICIU1PPG1TwSsZiI+9HqgmiGpagCwGyViKKW5LZEp6Xc8vZqTxgMGJm1/vAFw+9/gBCqN5JUoPozTFiGXS1Sib3GcY1WevMGNLX00/CgV9beYB80pm6Prfqm4oCyHIrCh2yc/sfFEIPDfuOHeSjl67NWJicepcl4GNRQ1fNB7alKWEzbMSFrOoseQZaSxyoM4N1ms69LxhY3cjbxwcbdwxDyPfdbVLyznpKoLQ3kow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR1201MB0201.namprd12.prod.outlook.com (2603:10b6:4:5b::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Tue, 27 Oct
- 2020 11:58:12 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3477.028; Tue, 27 Oct 2020
- 11:58:12 +0000
-Date:   Tue, 27 Oct 2020 08:58:10 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     Tom Lendacky <thomas.lendacky@amd.com>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linux-mm@kvack.org>, <kvm@vger.kernel.org>,
-        Radim Kr??m???? <rkrcmar@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Matt Fleming <matt@codeblueprint.co.uk>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Alexander Potapenko" <glider@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Dmitry Vyukov" <dvyukov@google.com>,
-        Rik van Riel <riel@redhat.com>,
-        Larry Woodman <lwoodman@redhat.com>,
-        Dave Young <dyoung@redhat.com>,
-        Toshimitsu Kani <toshi.kani@hpe.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: AMD SME encrpytion and PCI BAR pages to user space
-Message-ID: <20201027115810.GH1523783@nvidia.com>
-References: <20201019152556.GA560082@nvidia.com>
- <4b9f13bf-3f82-1aed-c7be-0eaecebc5d82@amd.com>
- <20201021115933.GS6219@nvidia.com>
- <f9c50e3a-c5de-8c85-4d6c-0e8a90729420@amd.com>
- <20201021160322.GT6219@nvidia.com> <20201027084357.GA10053@infradead.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20201027084357.GA10053@infradead.org>
-X-ClientProxiedBy: MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22)
- To DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+        id S2899641AbgJ0MRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 08:17:40 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:35596 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2408777AbgJ0MRi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 08:17:38 -0400
+Received: by mail-wm1-f65.google.com with SMTP id h22so1204769wmb.0
+        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 05:17:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LJP6zUa9eBmdV8bx1jdaWyKmaK9MsWkK16il5Qo0OrM=;
+        b=P+3tCIHOjCZAx0wmilW2GDFvIGyFUKkJ6kMCnuzTaqTK/WVy0FTiGFvqMSEeEaTSDi
+         lidtNcACGQa4FsZTJSv/WM+PJAWcMBZ84eqrsFS5cBt5SmJFi36Zt8P8jQqLDmjkvqeW
+         khRH3E+peGeaQTCIY3Vt2p8gYCX0QOu5toB/kJmHKtw/28SJ6BKumTSSq2MJytdIAdgp
+         oJxR5uAJUIN5EhwIO49GT3ZmC5B5ob3NU85YWSk0gy8yt2me9ot389ODzNeNzE1g7isf
+         BjKSBXgUK2OMn2MduiDvTrDfwsn8XX/eMtY9lahl6HLlIYN8j7wdAJNYVoPtfuaoSs+h
+         PRUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LJP6zUa9eBmdV8bx1jdaWyKmaK9MsWkK16il5Qo0OrM=;
+        b=C1fSO2uCPiqLXXSjjqryCasF1TZPbJhAXJmKgNIrMTpN5q7zx/rQXUkI317ocOrB6O
+         4LFbe4AFx5aTnsL7zfFi/G60ydfZJdFJITiOeNgLPKyZR7DZF+Y3HnDW6NaDfSDp32o7
+         Gibiv8syo3visN5X3gcwusgvPUKaqm/lVZ0HSFylW1QWXuoRv0g1MCyTq73fy2jzfU2a
+         SehsxXO6kviKtnba2ac7D0cc9OhJ68hHrYO++MJjETvLZrUW69BdTf4BavywShArnUOo
+         0iJ+ehLxFE2adyQlBYPOYjhov58OFjaxnnkGhKhzUUhxWQG4HcwuNfJC5FEaByF8Wayd
+         fc8A==
+X-Gm-Message-State: AOAM530tuLyssAN/cTKAzUoCE8JphujD2ZjdM9PL/NslUO7aZM3vGEa0
+        ozsugGGKNqCyYt7phitMLsZwYg==
+X-Google-Smtp-Source: ABdhPJxUDPfM7/G4w39/lM3kfVBbiG37Et7vUzW73qIzYGjUaK5vAjNfvCioGZotPrXrgX+P7fvBjA==
+X-Received: by 2002:a1c:8087:: with SMTP id b129mr2477389wmd.10.1603801056147;
+        Tue, 27 Oct 2020 05:17:36 -0700 (PDT)
+Received: from debian-brgl.home (amarseille-656-1-4-167.w90-8.abo.wanadoo.fr. [90.8.158.167])
+        by smtp.gmail.com with ESMTPSA id a2sm1731908wrs.55.2020.10.27.05.17.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Oct 2020 05:17:35 -0700 (PDT)
+From:   Bartosz Golaszewski <brgl@bgdev.pl>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc:     linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        alsa-devel@alsa-project.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Subject: [PATCH 0/8] slab: provide and use krealloc_array()
+Date:   Tue, 27 Oct 2020 13:17:17 +0100
+Message-Id: <20201027121725.24660-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.29.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.22 via Frontend Transport; Tue, 27 Oct 2020 11:58:11 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kXNcA-009G0X-VP; Tue, 27 Oct 2020 08:58:10 -0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1603799877; bh=euyUCc7Fc3m9fZe0HlaXBdvVYHYAC98vLn14YMvbS+Q=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType;
-        b=BsYyMkxO11+8dWhoE/1vd3jsm0B6LncaeEWQKojoA35WglK4IsBwotwYx4xtqNKea
-         uL8QNdyijE1QZJ9kJholMyuVB1Lte6sT0SQqajJyv9QRAZM9bBBeEa2qjJahuNWvLk
-         QuqcuS0vCGDr5pdBJyrKYRp7oiBJcBY5gR005wAdfIIVOgv7IcQzuOD21nb+wjeU27
-         6udevM5BbAL2qONyjEgKegW9fW7NDH88t0hVIpDJOBjhoY7CejmCsbC6S5eDMmDDNy
-         6GJ7er886vRNiOU3NX0xiqogIEMjlKdXFlXFPhs8FGk1E1J8VKmgyBBxhr/ROs1y+C
-         7VzehGWJ5W9Tg==
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 08:43:57AM +0000, Christoph Hellwig wrote:
-> On Wed, Oct 21, 2020 at 01:03:22PM -0300, Jason Gunthorpe wrote:
-> > Oh, interesting.. Yes the issue is no userspace DMA stuff uses the DMA
-> > API correctly (because it is in userspace)
-> > 
-> > So SWIOTLB tricks don't work, I wish the dma_map could fail for these
-> > situations
-> 
-> Userspace DMA by definition also does not use dma_map..
+From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
-? Sure it does, ib_dma_map_sg_attrs() is what RDMA uses
+Andy brought to my attention the fact that users allocating an array of
+equally sized elements should check if the size multiplication doesn't
+overflow. This is why we have helpers like kmalloc_array().
 
-What all the userspace users skip is the dma_sync*() - that would
-require a kernel call which defeats the point.
+However we don't have krealloc_array() equivalent and there are many
+users who do their own multiplication when calling krealloc() for arrays.
 
-So, my desire is some flag to dma_map_sg() that says
-  'user space mapping no dma_sync_*'
+This series provides krealloc_array() and uses it in a couple places.
 
-ie dma_sync_* is a NOP
+A separate series will follow adding devm_krealloc_array() which is
+needed in the xilinx adc driver.
 
-Then things like SWIOTLB on the SEV system can fail with an error code
-instead of malfunctioning
+Bartosz Golaszewski (8):
+  mm: slab: provide krealloc_array()
+  ALSA: pcm: use krealloc_array()
+  vhost: vringh: use krealloc_array()
+  pinctrl: use krealloc_array()
+  edac: ghes: use krealloc_array()
+  drm: atomic: use krealloc_array()
+  hwtracing: intel: use krealloc_array()
+  dma-buf: use krealloc_array()
 
-If FOLL_LONGERM is some estimate of this pattern then we have these users:
- - drivers/infiniband
- - v4l
- - vdpa
- - xdp
- - rds
- - habana labs
+ drivers/dma-buf/sync_file.c      |  4 ++--
+ drivers/edac/ghes_edac.c         |  4 ++--
+ drivers/gpu/drm/drm_atomic.c     |  3 ++-
+ drivers/hwtracing/intel_th/msu.c |  2 +-
+ drivers/pinctrl/pinctrl-utils.c  |  2 +-
+ drivers/vhost/vringh.c           |  3 ++-
+ include/linux/slab.h             | 11 +++++++++++
+ sound/core/pcm_lib.c             |  4 ++--
+ 8 files changed, 23 insertions(+), 10 deletions(-)
 
-Jason
+-- 
+2.29.1
+
