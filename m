@@ -2,123 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5799729C2F0
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 18:42:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 492D929C4F1
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 19:08:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1821237AbgJ0Rlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 13:41:32 -0400
-Received: from foss.arm.com ([217.140.110.172]:48704 "EHLO foss.arm.com"
+        id S1823202AbgJ0SBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 14:01:02 -0400
+Received: from mga05.intel.com ([192.55.52.43]:34792 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1821232AbgJ0Rla (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 13:41:30 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D58D139F;
-        Tue, 27 Oct 2020 10:41:30 -0700 (PDT)
-Received: from [172.16.1.113] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B55DF3F719;
-        Tue, 27 Oct 2020 10:41:28 -0700 (PDT)
-Subject: Re: [PATCH 08/11] KVM: arm64: Inject AArch32 exceptions from HYP
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        David Brazdil <dbrazdil@google.com>, kernel-team@android.com
-References: <20201026133450.73304-1-maz@kernel.org>
- <20201026133450.73304-9-maz@kernel.org>
-From:   James Morse <james.morse@arm.com>
-Message-ID: <b4ef5e3e-a1a4-948f-bc9d-4bd297cb26a6@arm.com>
-Date:   Tue, 27 Oct 2020 17:41:27 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1822989AbgJ0R4k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 13:56:40 -0400
+IronPort-SDR: vjvgGDD0NGIX6UEjoszQzqOGx3E0qf1DChzA0NXw6cXKA8L51J6LTXqNKVzcsYaws5LVjayE5g
+ 5RAZLLZiorKg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9787"; a="252832121"
+X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
+   d="scan'208";a="252832121"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2020 10:56:37 -0700
+IronPort-SDR: lhTXJjKMMe48W2fw2kvkLvMa4ud3oSkNemMMiUpDzw41G6iO737oAPFrG3kaxHY1ElO1pPQi2d
+ Ogpi0hhlimQA==
+X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
+   d="scan'208";a="350682053"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2020 10:56:37 -0700
+Date:   Tue, 27 Oct 2020 10:56:36 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Davidlohr Bueso <dave@stgolabs.net>
+Subject: Re: [PATCH 3/3] sched: Add cond_resched_rwlock
+Message-ID: <20201027175634.GI1021@linux.intel.com>
+References: <20201027164950.1057601-1-bgardon@google.com>
+ <20201027164950.1057601-3-bgardon@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20201026133450.73304-9-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201027164950.1057601-3-bgardon@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Tue, Oct 27, 2020 at 09:49:50AM -0700, Ben Gardon wrote:
+> Rescheduling while holding a spin lock is essential for keeping long
+> running kernel operations running smoothly. Add the facility to
+> cond_resched rwlocks.
 
-On 26/10/2020 13:34, Marc Zyngier wrote:
-> Similarily to what has been done for AArch64, move the AArch32 exception
-> inhjection to HYP.
+This adds two new exports and two new macros without any in-tree users, which
+is generally frowned upon.  You and I know these will be used by KVM's new
+TDP MMU, but the non-KVM folks, and more importantly the maintainers of this
+code, are undoubtedly going to ask "why".  I.e. these patches probably belong
+in the KVM series to switch to a rwlock for the TDP MMU.
+
+Regarding the code, it's all copy-pasted from the spinlock code and darn near
+identical.  It might be worth adding builder macros for these.
+
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  include/linux/sched.h | 12 ++++++++++++
+>  kernel/sched/core.c   | 40 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 52 insertions(+)
 > 
-> In order to not use the regmap selection code at EL2, simplify the code
-> populating the target mode's LR register by harcoding the two possible
-> LR registers (LR_abt in X20, LR_und in X22).
-
-
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index cd6e643639e8..8d1d1bcd9e69 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -57,10 +67,25 @@ static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
-
-> +static inline u32 __vcpu_read_cp15(const struct kvm_vcpu *vcpu, int reg)
+> diff --git a/include/linux/sched.h b/include/linux/sched.h
+> index 77179160ec3ab..2eb0c53fce115 100644
+> --- a/include/linux/sched.h
+> +++ b/include/linux/sched.h
+> @@ -1841,12 +1841,24 @@ static inline int _cond_resched(void) { return 0; }
+>  })
+>  
+>  extern int __cond_resched_lock(spinlock_t *lock);
+> +extern int __cond_resched_rwlock_read(rwlock_t *lock);
+> +extern int __cond_resched_rwlock_write(rwlock_t *lock);
+>  
+>  #define cond_resched_lock(lock) ({				\
+>  	___might_sleep(__FILE__, __LINE__, PREEMPT_LOCK_OFFSET);\
+>  	__cond_resched_lock(lock);				\
+>  })
+>  
+> +#define cond_resched_rwlock_read(lock) ({			\
+> +	__might_sleep(__FILE__, __LINE__, PREEMPT_LOCK_OFFSET);	\
+> +	__cond_resched_rwlock_read(lock);			\
+> +})
+> +
+> +#define cond_resched_rwlock_write(lock) ({			\
+> +	__might_sleep(__FILE__, __LINE__, PREEMPT_LOCK_OFFSET);	\
+> +	__cond_resched_rwlock_write(lock);			\
+> +})
+> +
+>  static inline void cond_resched_rcu(void)
+>  {
+>  #if defined(CONFIG_DEBUG_ATOMIC_SLEEP) || !defined(CONFIG_PREEMPT_RCU)
+> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> index d2003a7d5ab55..ac58e7829a063 100644
+> --- a/kernel/sched/core.c
+> +++ b/kernel/sched/core.c
+> @@ -6152,6 +6152,46 @@ int __cond_resched_lock(spinlock_t *lock)
+>  }
+>  EXPORT_SYMBOL(__cond_resched_lock);
+>  
+> +int __cond_resched_rwlock_read(rwlock_t *lock)
 > +{
-> +	return __vcpu_read_sys_reg(vcpu, reg / 2);
+> +	int resched = should_resched(PREEMPT_LOCK_OFFSET);
+> +	int ret = 0;
+> +
+> +	lockdep_assert_held(lock);
+> +
+> +	if (rwlock_needbreak(lock) || resched) {
+> +		read_unlock(lock);
+> +		if (resched)
+> +			preempt_schedule_common();
+> +		else
+> +			cpu_relax();
+> +		ret = 1;
+
+AFAICT, this rather odd code flow from __cond_resched_lock() is an artifact of
+code changes over the years and not intentionally weird.  IMO, it would be
+cleaner and easier to read as:
+
+	int resched = should_resched(PREEMPT_LOCK_OFFSET);
+
+	lockdep_assert_held(lock);
+
+	if (!rwlock_needbreak(lock) && !resched)
+		return 0;
+
+	read_unlock(lock);
+	if (resched)
+		preempt_schedule_common();
+	else
+		cpu_relax();
+	read_lock(lock)
+	return 1;
+
+
+> +		read_lock(lock);
+> +	}
+> +	return ret;
 > +}
-
-Doesn't this re-implement the issue 3204be4109ad biased?
-
-
-> @@ -155,23 +180,189 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
-
-> +static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+> +EXPORT_SYMBOL(__cond_resched_rwlock_read);
+> +
+> +int __cond_resched_rwlock_write(rwlock_t *lock)
 > +{
+> +	int resched = should_resched(PREEMPT_LOCK_OFFSET);
+> +	int ret = 0;
+> +
+> +	lockdep_assert_held(lock);
 
-> +	/*
-> +	 * Table D1-27 of DDI 0487F.c shows the GPR mapping between
-> +	 * AArch32 and AArch64. We only deal with ABT/UND.
+This shoulid be lockdep_assert_held_write.
 
-(to check I understand : because these are the only two KVM ever injects?)
-
-
-> +	 */
-> +	switch(mode) {
-> +	case PSR_AA32_MODE_ABT:
-> +		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
-> +		lr = 20;
->  		break;
-> +		
-
-(two bonus tabs!)
-
-
-> +	case PSR_AA32_MODE_UND:
-> +		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
-> +		lr = 22;
->  		break;
->  	}> +
-> +	vcpu_set_reg(vcpu, lr, *vcpu_pc(vcpu) + return_offset);
-
-
-Can we, abuse, the compat_lr_abt definitions to do something like:
-
-|	u32 return_address = *vcpu_pc(vcpu) + return_offset;
-[..]
-|	switch(mode) {
-|	case PSR_AA32_MODE_ABT:>
-|		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
-|		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
-|		break;
-|	case PSR_AA32_MODE_UND:
-|		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
-|		vcpu_gp_regs(vcpu)->compat_lr_und = return_address;
-|		break;
-
-...as someone who has no clue about 32bit, this hides all the worrying magic-14==magic-22!
-
-
-
-Thanks,
-
-James
-
+> +
+> +	if (rwlock_needbreak(lock) || resched) {
+> +		write_unlock(lock);
+> +		if (resched)
+> +			preempt_schedule_common();
+> +		else
+> +			cpu_relax();
+> +		ret = 1;
+> +		write_lock(lock);
+> +	}
+> +	return ret;
 > +}
+> +EXPORT_SYMBOL(__cond_resched_rwlock_write);
+> +
+>  /**
+>   * yield - yield the current processor to other threads.
+>   *
+> -- 
+> 2.29.0.rc2.309.g374f81d7ae-goog
+> 
