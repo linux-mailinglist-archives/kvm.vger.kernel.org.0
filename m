@@ -2,124 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0A5E29ACA5
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 14:02:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BAB0929ACB4
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 14:04:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1751616AbgJ0NCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 09:02:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43151 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2440804AbgJ0NCJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Oct 2020 09:02:09 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09RCWY9m031569;
-        Tue, 27 Oct 2020 09:02:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=I7hN7Mkba9hz/hGA8vrbyFka7uQHZS+0zCPEM2EfoLI=;
- b=s7Ab4SnCzJFYn2h1vSKU+gcynCWGc8s8QiG5/CN9rjR/YZQGXbfOlOSC5tAwVoeHZfdA
- DCZS1VsrbF5/y1dI18Lnr114jnAhBz1sZAZ5esBY/isax3Hk1/XBasz9gCYickbN1Ytw
- 57Sn5EXg+wBKOC1rCvETRQmtrlMoUoxq5Xh2mN7oJbAiif7IvGEJ2qG+TA6qy169e6QN
- KQH9gCeWZb23zVFyNwSRX1LXBIu7wkAkiPM4PJwPgb6OWMVWjjtA4e7hR93q/eC/Unzi
- iL2ltDqrC3CT5/z9moDPh9Hn68Ja33a2NQIeoXxBvUmHlREIC50Bj5BW8cw6vt0lNiIx +A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34ejb6bejv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Oct 2020 09:02:06 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09RCWcHo031954;
-        Tue, 27 Oct 2020 09:02:06 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34ejb6bega-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Oct 2020 09:02:06 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09RCmIg5030384;
-        Tue, 27 Oct 2020 13:02:03 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 34e56qrruy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Oct 2020 13:02:03 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09RD20la33817030
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 27 Oct 2020 13:02:00 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9205052051;
-        Tue, 27 Oct 2020 13:02:00 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.77.212])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D039652054;
-        Tue, 27 Oct 2020 13:01:59 +0000 (GMT)
-Date:   Tue, 27 Oct 2020 14:01:57 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 04/14] s390/zcrypt: driver callback to indicate
- resource in use
-Message-ID: <20201027140157.0b510450.pasic@linux.ibm.com>
-In-Reply-To: <20201022171209.19494-5-akrowiak@linux.ibm.com>
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
-        <20201022171209.19494-5-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1751683AbgJ0NEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 09:04:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54403 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751668AbgJ0NEV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Oct 2020 09:04:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603803860;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eXXpUz3VnsL2Xy70mrZp5D4eUU9pHEsl4U/A+ZeUZVA=;
+        b=LciIeeqabotGVFGb+lRk9WBcSPSVRAo86949gd5sxHajHAeHEKYMlZoaTuFgyiIwc4ZZaP
+        N6B76vGPx4wdV3xZT21m7RmUwPNDhdwEreMQSckamZlzD8Kcd+iL2dTCjl5upfhs7OXAqp
+        G6tnbfI6uMIDef2+Bxff1oYJrN0ZNHs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-6ACk6zq5PEK2TZ_Z7S-pwA-1; Tue, 27 Oct 2020 09:04:15 -0400
+X-MC-Unique: 6ACk6zq5PEK2TZ_Z7S-pwA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D744FEC505;
+        Tue, 27 Oct 2020 13:04:12 +0000 (UTC)
+Received: from [10.36.112.194] (ovpn-112-194.ams2.redhat.com [10.36.112.194])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3446F5B4A4;
+        Tue, 27 Oct 2020 13:04:06 +0000 (UTC)
+Subject: Re: [PATCH v10 01/11] vfio: VFIO_IOMMU_SET_PASID_TABLE
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+References: <20200320161911.27494-1-eric.auger@redhat.com>
+ <20200320161911.27494-2-eric.auger@redhat.com>
+ <2fba23af-9cd7-147d-6202-01c13fff92e5@huawei.com>
+ <d3a302bb-34e8-762f-a11f-717b3bc83a2b@redhat.com>
+ <cb5835e79b474e30af6702dbee0d46df@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <cde28d6d-c6cf-ef23-b293-f9959aba0a18@redhat.com>
+Date:   Tue, 27 Oct 2020 14:04:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-10-27_05:2020-10-26,2020-10-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- mlxscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0 impostorscore=0
- spamscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010270080
+In-Reply-To: <cb5835e79b474e30af6702dbee0d46df@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Oct 2020 13:11:59 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+Hi Shameer,
 
-> Introduces a new driver callback to prevent a root user from unbinding
-> an AP queue from its device driver if the queue is in use. The callback
-> will be invoked whenever a change to the AP bus's sysfs apmask or aqmask
-> attributes would result in one or more AP queues being removed from its
-> driver. If the callback responds in the affirmative for any driver
-> queried, the change to the apmask or aqmask will be rejected with a device
-> in use error.
-
-Like discussed last time, there seems to be nothing, that would prevent
-a resource becoming in use between the in_use() callback returned false
-and the resource being removed as a result of ap_bus_revise_bindings().
-
-Another thing that may be of interest, is that now we hold the
-ap_perms_mutex for the in_use() checks. The ap_perms_mutex is used
-in ap_device_probe() and I don't quite understand some
-usages of in zcrypt_api.c My feeling is that the extra pressure on that
-lock should not be a problem, except if in_use() were to not return
-because of some deadlock.
-
-With all that said if Harald is fine with it, so am I.
-
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
-
+On 10/27/20 1:20 PM, Shameerali Kolothum Thodi wrote:
+> Hi Eric,
 > 
-> For this patch, only non-default drivers will be queried. Currently,
-> there is only one non-default driver, the vfio_ap device driver. The
-> vfio_ap device driver facilitates pass-through of an AP queue to a
-> guest. The idea here is that a guest may be administered by a different
-> sysadmin than the host and we don't want AP resources to unexpectedly
-> disappear from a guest's AP configuration (i.e., adapters and domains
-> assigned to the matrix mdev). This will enforce the proper procedure for
-> removing AP resources intended for guest usage which is to
-> first unassign them from the matrix mdev, then unbind them from the
-> vfio_ap device driver.
+>> -----Original Message-----
+>> From: iommu [mailto:iommu-bounces@lists.linux-foundation.org] On Behalf Of
+>> Auger Eric
+>> Sent: 23 September 2020 12:47
+>> To: yuzenghui <yuzenghui@huawei.com>; eric.auger.pro@gmail.com;
+>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; joro@8bytes.org;
+>> alex.williamson@redhat.com; jacob.jun.pan@linux.intel.com;
+>> yi.l.liu@intel.com; robin.murphy@arm.com
+>> Subject: Re: [PATCH v10 01/11] vfio: VFIO_IOMMU_SET_PASID_TABLE
 > 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->
+> ...
+> 
+>>> Besides, before going through the whole series [1][2], I'd like to
+>>> know if this is the latest version of your Nested-Stage-Setup work in
+>>> case I had missed something.
+>>>
+>>> [1]
+>>> https://lore.kernel.org/r/20200320161911.27494-1-eric.auger@redhat.com
+>>> [2]
+>>> https://lore.kernel.org/r/20200414150607.28488-1-eric.auger@redhat.com
+>>
+>> yes those 2 series are the last ones. Thank you for reviewing.
+>>
+>> FYI, I intend to respin within a week or 2 on top of Jacob's  [PATCH v10 0/7]
+>> IOMMU user API enhancement. 
+> 
+> Thanks for that. Also is there any plan to respin the related Qemu series as well?
+> I know dual stage interface proposals are still under discussion, but it would be
+> nice to have a testable solution based on new interfaces for ARM64 as well.
+> Happy to help with any tests or verifications.
+
+Yes the QEMU series will be respinned as well. That's on the top of my
+todo list right now.
+
+Thanks
+
+Eric
+> 
+> Please let me know.
+> 
+> Thanks,
+> Shameer
+>   
+> 
+
