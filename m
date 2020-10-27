@@ -2,159 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5B1C29C8B5
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 20:24:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B597729C8A4
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 20:22:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1829789AbgJ0TUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 15:20:43 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39983 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1829628AbgJ0TTf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 15:19:35 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h5so3173093wrv.7
-        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 12:19:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=94FVc/lhmQBJbpQ0I0StwCkg4DMhTbsduFiN4bjClk4=;
-        b=Sld6hciHThDqeso8S8+jXbwutFt+C8GMsFv9uR38kkL9A2ymfTua46NMT/Q9ZBn3uh
-         noluYBIeHRwknPmU94BZzwh6l7DE4uJbJLLOru2dF0iDS5wDVUIl89TAYeWKJJDtgD9J
-         qGm+daZidj774s7wADWav2trLrU+zVLJfeX5A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to;
-        bh=94FVc/lhmQBJbpQ0I0StwCkg4DMhTbsduFiN4bjClk4=;
-        b=iiHyx1SFpEWbv6M9lMTtPWvF6QBrHBta2d5DYLr8SYzkN5gjUiQ+NUgmjbbB9MfnD8
-         Uw5obtrg2+BsQIk0z1HZZn7iULHHUd166SGvpg+2HxLjlXVqeiSELDX2upp33luAxtG5
-         BkI1QqJjyE2kiIqFYwvro1Q6Q6w84lJWRhjCYjiVnXTQqE5PQhAyDkvP0FIIHlFxOwDx
-         +m2PiXcZHTBkfzlQCle8M4MYGxy3gS51dUCYaFzFvjPdz1xOvNufIW2qXgwdSxHst7PU
-         VKfTaklRlCv0eIyIu1Ebm02ExaCgjiJ8tLBoRKRkh5AGwmmrQxzEx7tU1NOXz+OE9sUm
-         pmdA==
-X-Gm-Message-State: AOAM531MqbAnb7bwmXhRBCaDEJc6XfXiUkPNde3+yyzfET6Vmn4pwCPc
-        +Q1HH1Ezp89owGst5O3hmMA4kg==
-X-Google-Smtp-Source: ABdhPJxSeCImtuoOwiJ2SgVqpZLT/QAEeRHxQ9b1eMNAwd7xtGe8jna3O2uLNWNIxJE6aH3a1ktGnQ==
-X-Received: by 2002:a5d:4dc7:: with SMTP id f7mr4027819wru.375.1603826373382;
-        Tue, 27 Oct 2020 12:19:33 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id h206sm3012251wmf.47.2020.10.27.12.19.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2020 12:19:32 -0700 (PDT)
-Date:   Tue, 27 Oct 2020 20:19:30 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     Bartosz Golaszewski <brgl@bgdev.pl>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Tony Luck <tony.luck@intel.com>,
-        James Morse <james.morse@arm.com>,
-        Robert Richter <rric@kernel.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-media@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-gpio@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, alsa-devel@alsa-project.org,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Subject: Re: [PATCH 6/8] drm: atomic: use krealloc_array()
-Message-ID: <20201027191930.GQ401619@phenom.ffwll.local>
-Mail-Followup-To: Bartosz Golaszewski <brgl@bgdev.pl>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>,
-        James Morse <james.morse@arm.com>, Robert Richter <rric@kernel.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@linux.ie>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        alsa-devel@alsa-project.org,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>
-References: <20201027121725.24660-1-brgl@bgdev.pl>
- <20201027121725.24660-7-brgl@bgdev.pl>
+        id S1829825AbgJ0TWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 15:22:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45466 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2501930AbgJ0TV6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 15:21:58 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4584D21556;
+        Tue, 27 Oct 2020 19:21:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603826518;
+        bh=0SBAd77pYFm4BteTna4tfs0VK/M8k+tKtAPPJZdQJ9w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=AAFZkytz4Jdvx7ZpoxhVd7U0RcfoqiQfQ3Z8Pa0zUaE0GFOorH9qnBTo80s+A7wyN
+         lRwE668TgEo7iYF4GsveFgqiID6tQeTLS77K0c9GIgaTtD4Pco9ZQCHfqoABqdGaD5
+         Yz4bondg0X0w5cSOt82Hl5IyECJRW9OkDiq8a4q0=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kXUXc-004v5X-25; Tue, 27 Oct 2020 19:21:56 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201027121725.24660-7-brgl@bgdev.pl>
-X-Operating-System: Linux phenom 5.7.0-1-amd64 
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 27 Oct 2020 19:21:55 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        David Brazdil <dbrazdil@google.com>, kernel-team@android.com
+Subject: Re: [PATCH 08/11] KVM: arm64: Inject AArch32 exceptions from HYP
+In-Reply-To: <b4ef5e3e-a1a4-948f-bc9d-4bd297cb26a6@arm.com>
+References: <20201026133450.73304-1-maz@kernel.org>
+ <20201026133450.73304-9-maz@kernel.org>
+ <b4ef5e3e-a1a4-948f-bc9d-4bd297cb26a6@arm.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <6b30a9c9d082aeabc6cb81aca97b5398@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, will@kernel.org, qperret@google.com, dbrazdil@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 01:17:23PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+On 2020-10-27 17:41, James Morse wrote:
+> Hi Marc,
 > 
-> Use the helper that checks for overflows internally instead of manually
-> calculating the size of the new array.
+> On 26/10/2020 13:34, Marc Zyngier wrote:
+>> Similarily to what has been done for AArch64, move the AArch32 
+>> exception
+>> inhjection to HYP.
+>> 
+>> In order to not use the regmap selection code at EL2, simplify the 
+>> code
+>> populating the target mode's LR register by harcoding the two possible
+>> LR registers (LR_abt in X20, LR_und in X22).
 > 
-> Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-
-Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-
-I don't expect conflicts with this going through some other tree, so
-please make that happen. Or resend once I can apply this to drm trees.
-
-Thanks, Daniel
-
-> ---
->  drivers/gpu/drm/drm_atomic.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/gpu/drm/drm_atomic.c b/drivers/gpu/drm/drm_atomic.c
-> index 58527f151984..09ad6a2ec17b 100644
-> --- a/drivers/gpu/drm/drm_atomic.c
-> +++ b/drivers/gpu/drm/drm_atomic.c
-> @@ -960,7 +960,8 @@ drm_atomic_get_connector_state(struct drm_atomic_state *state,
->  		struct __drm_connnectors_state *c;
->  		int alloc = max(index + 1, config->num_connector);
->  
-> -		c = krealloc(state->connectors, alloc * sizeof(*state->connectors), GFP_KERNEL);
-> +		c = krealloc_array(state->connectors, alloc,
-> +				   sizeof(*state->connectors), GFP_KERNEL);
->  		if (!c)
->  			return ERR_PTR(-ENOMEM);
->  
-> -- 
-> 2.29.1
+>> diff --git a/arch/arm64/kvm/hyp/exception.c 
+>> b/arch/arm64/kvm/hyp/exception.c
+>> index cd6e643639e8..8d1d1bcd9e69 100644
+>> --- a/arch/arm64/kvm/hyp/exception.c
+>> +++ b/arch/arm64/kvm/hyp/exception.c
+>> @@ -57,10 +67,25 @@ static void __vcpu_write_spsr(struct kvm_vcpu 
+>> *vcpu, u64 val)
 > 
+>> +static inline u32 __vcpu_read_cp15(const struct kvm_vcpu *vcpu, int 
+>> reg)
+>> +{
+>> +	return __vcpu_read_sys_reg(vcpu, reg / 2);
+>> +}
+> 
+> Doesn't this re-implement the issue 3204be4109ad biased?
 
+I don't think it does. The issue existed when accessing the 32bit 
+shadow,
+and we had to pick which side of the 64bit register had our 32bit value.
+Here, we directly access the 64bit file, which is safe.
+
+But thinking of it, we may as well change the call sites to directly
+use the 64bit enum, rather than playing games (we used to use the
+32bit definition for the sake of the defunct 32bit port).
+
+> 
+> 
+>> @@ -155,23 +180,189 @@ static void enter_exception64(struct kvm_vcpu 
+>> *vcpu, unsigned long target_mode,
+> 
+>> +static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 
+>> vect_offset)
+>> +{
+> 
+>> +	/*
+>> +	 * Table D1-27 of DDI 0487F.c shows the GPR mapping between
+>> +	 * AArch32 and AArch64. We only deal with ABT/UND.
+> 
+> (to check I understand : because these are the only two KVM ever 
+> injects?)
+
+Yes, that's indeed the reason. I'll try to clarify.
+
+> 
+> 
+>> +	 */
+>> +	switch(mode) {
+>> +	case PSR_AA32_MODE_ABT:
+>> +		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
+>> +		lr = 20;
+>>  		break;
+>> +
+> 
+> (two bonus tabs!)
+> 
+> 
+>> +	case PSR_AA32_MODE_UND:
+>> +		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
+>> +		lr = 22;
+>>  		break;
+>>  	}> +
+>> +	vcpu_set_reg(vcpu, lr, *vcpu_pc(vcpu) + return_offset);
+> 
+> 
+> Can we, abuse, the compat_lr_abt definitions to do something like:
+> 
+> |	u32 return_address = *vcpu_pc(vcpu) + return_offset;
+> [..]
+> |	switch(mode) {
+> |	case PSR_AA32_MODE_ABT:>
+> |		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
+> |		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
+> |		break;
+> |	case PSR_AA32_MODE_UND:
+> |		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
+> |		vcpu_gp_regs(vcpu)->compat_lr_und = return_address;
+> |		break;
+> 
+> ...as someone who has no clue about 32bit, this hides all the worrying
+> magic-14==magic-22!
+
+Ah, I totally forgot about them (the only use was in the file I delete
+two patches later...)!
+
+Thanks,
+
+         M.
 -- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Jazz is not dead. It just smells funny...
