@@ -2,100 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DB5A29CC2E
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 23:47:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8322E29CD6D
+	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 02:49:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1757411AbgJ0Wqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 18:46:54 -0400
-Received: from mga14.intel.com ([192.55.52.115]:61049 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757005AbgJ0Wqy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 18:46:54 -0400
-IronPort-SDR: aHjAdtHLbS3vskDut7odSVwp+STR+1m1m0A+bOXr/rhxfsJQG95qa/64fvjk2qQHXe636tMlf/
- CTtIOFlT2VQg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9787"; a="167394579"
-X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
-   d="scan'208";a="167394579"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2020 15:46:53 -0700
-IronPort-SDR: 8z6ByX/oX8TRbo3l/vwgrZtSk6jRDG9uCION1zqZAuCf13rRqSvpf2x6JlC0jW99l4kfhLJ5st
- VD+5ATXxREHw==
-X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
-   d="scan'208";a="355715662"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2020 15:46:53 -0700
-Date:   Tue, 27 Oct 2020 15:46:52 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Ben Gardon <bgardon@google.com>
+        id S1725783AbgJ1BiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 21:38:17 -0400
+Received: from mail-qt1-f202.google.com ([209.85.160.202]:45255 "EHLO
+        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1832968AbgJ0XKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 19:10:50 -0400
+Received: by mail-qt1-f202.google.com with SMTP id d1so1786917qtq.12
+        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 16:10:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=uVAAxKGJ44GQm3v30eEW5qbX5guH3UCpsLTIfZxxtQY=;
+        b=JRHJXLuBj+LDLo6Q2/72KrMf25WUa/E7TLphQprRGfUPBe8sWa700mwqtq4VS7CQbt
+         aFeV3o7ZdZxxKwnemWG1gFtqSo0OvKvdW4yeAsvdb4lYHROMaCkQc/eFDHiHTK9gXXOh
+         V374M7ALafSs95G70oV2/5LMdpx7m1Ww6T5dquiuxBEJWEdrunpCL4G0Xf9tagr4o1LV
+         ALLGIxTRV03sCuSkV6HJTZHbLbP+ucgPoN2mYTEdQpgbHmQEzge/OFDdQmU4Q1kGMaWL
+         qr+wW9OaZeF30c4lfF1yq7gGKLNZvErNHhxf80qQsGPNB47GZefraObQ+pgdbQQBVzR0
+         RP0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=uVAAxKGJ44GQm3v30eEW5qbX5guH3UCpsLTIfZxxtQY=;
+        b=nKHXiPJX3i74sLDt73ntCp/o/2tydYWDTAfUweMoDcNli5S/wjWuwOGsMEom35+hML
+         vA97k8zlwwLzuYwr8XBo37E6M5oZlZAdODRCr3jG1SzkVCO1jRgpU6/3wIYY5JO6biAJ
+         6drsExVgJPdpVZta46roQ0Vr1ST88EzL7MZLns5q2X3IhciCq054SYsloyixz4xXl5Hx
+         n5dcQ948LXVFschwRvUKJj+iV5lGRfd0Up8NEpq1wXHCuGMjUESU3J7jqARd3yowrOau
+         Y4eGpvxgbO2wimIvpkQ6jUikW9NiXwu7vwzLDUS2pQwEt3bOjfIoY7n2asVIqt+Cn3U0
+         vb7w==
+X-Gm-Message-State: AOAM531fXSYUKfGwrkf7Kh3wDBd+Xsc6YdrtyAyf+P+njdL/hJysLd19
+        WpCQ7PmtZv7gE/uJKyjJxwj9SccLJvJsB80VrV+LaBgMUPlnySAJtDl97YR7dQp2x+e+KSrf/YM
+        UmW1S9gmHUlj6AnOco4SpLMYEfT1B06md6ButPsiBtmFFknwr7dODBrlawQ==
+X-Google-Smtp-Source: ABdhPJwPzKC+hfIYYBnir3+51Cmml4y9HuMtFMH9mI9B/RyTufG7gwNGJX/UpKausFhYMPU7ih3WhxMCN3E=
+Sender: "oupton via sendgmr" <oupton@oupton.sea.corp.google.com>
+X-Received: from oupton.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef5:7be1])
+ (user=oupton job=sendgmr) by 2002:a0c:c612:: with SMTP id v18mr4719294qvi.61.1603840248708;
+ Tue, 27 Oct 2020 16:10:48 -0700 (PDT)
+Date:   Tue, 27 Oct 2020 16:10:38 -0700
+Message-Id: <20201027231044.655110-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.0.rc2.309.g374f81d7ae-goog
+Subject: [PATCH 0/6] Some fixes and a test for KVM_CAP_ENFORCE_PV_CPUID
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/3] KVM: x86/mmu: Add helper macro for computing
- hugepage GFN mask
-Message-ID: <20201027224652.GB2011@linux.intel.com>
-References: <20201027214300.1342-1-sean.j.christopherson@intel.com>
- <20201027214300.1342-2-sean.j.christopherson@intel.com>
- <CANgfPd9eZp6pzSZceWD10EZw1mSef+6PSZj=d7g=YzQi-cJt0A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANgfPd9eZp6pzSZceWD10EZw1mSef+6PSZj=d7g=YzQi-cJt0A@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 03:17:40PM -0700, Ben Gardon wrote:
-> On Tue, Oct 27, 2020 at 2:43 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > Add a helper to compute the GFN mask given a hugepage level, KVM is
-> > accumulating quite a few users with the addition of the TDP MMU.
-> >
-> > Note, gcc is clever enough to use a single NEG instruction instead of
-> > SUB+NOT, i.e. use the more common "~(level -1)" pattern instead of
-> > round_gfn_for_level()'s direct two's complement trickery.
-> 
-> As far as I can tell this patch has no functional changes intended.
-> Please correct me if that's not correct.
+Patches 1-2 address some small issues with documentation and the kvm selftests,
+unrelated to the overall intent of this series.
 
-Correct. :-)
+Patch 3 applies the same PV MSR filtering mechanism to guest reads of KVM
+paravirt msrs.
 
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> 
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 1 +
-> >  arch/x86/kvm/mmu/mmu.c          | 2 +-
-> >  arch/x86/kvm/mmu/paging_tmpl.h  | 4 ++--
-> >  arch/x86/kvm/mmu/tdp_iter.c     | 2 +-
-> >  4 files changed, 5 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index d44858b69353..6ea046415f29 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -119,6 +119,7 @@
-> >  #define KVM_HPAGE_SIZE(x)      (1UL << KVM_HPAGE_SHIFT(x))
-> >  #define KVM_HPAGE_MASK(x)      (~(KVM_HPAGE_SIZE(x) - 1))
-> >  #define KVM_PAGES_PER_HPAGE(x) (KVM_HPAGE_SIZE(x) / PAGE_SIZE)
-> > +#define KVM_HPAGE_GFN_MASK(x)  (~(KVM_PAGES_PER_HPAGE(x) - 1))
-> 
-> NIT: I know x follows the convention on adjacent macros, but this
-> would be clearer to me if x was changed to level. (Probably for all
-> the macros in this block)
+Patch 4 makes enabling KVM_CAP_ENFORCE_PV_FEATURE_CPUID idempotent with regards
+to when userspace sets the guest's CPUID, ensuring that the cached copy of
+KVM_CPUID_FEATURES.EAX is always current.
 
-Agreed.  I'll spin a v2 and opportunistically change them all to "level"
-in this patch.  I'll also add "No function change intended™." to patches
-1 and 3.
+Patch 5 fixes a regression introduced with KVM_CAP_ENFORCE_PV_CPUID, wherein
+the kvm masterclock isn't updated every time the guest uses a different system
+time msr than before.
 
-> >  static inline gfn_t gfn_to_index(gfn_t gfn, gfn_t base_gfn, int level)
-> >  {
+Lastly, Patch 6 introduces a test for the overall paravirtual restriction
+mechanism, verifying that guests GP when touching MSRs they shouldn't and
+get -KVM_ENOSYS when using restricted kvm hypercalls. Please note that this test
+is dependent upon patches 1-3 of Aaron's userspace MSR test, which add support
+for guest handling of the IDT in KVM selftests [1].
+
+This series (along with Aaron's aforementioned changes) applies to
+commit 77377064c3a9 ("KVM: ioapic: break infinite recursion on lazy
+EOI").
+
+[1] http://lore.kernel.org/r/20201012194716.3950330-1-aaronlewis@google.com
+
+Oliver Upton (6):
+  selftests: kvm: add tsc_msrs_test binary to gitignore
+  Documentation: kvm: fix ordering of msr filter, pv documentation
+  kvm: x86: reads of restricted pv msrs should also result in #GP
+  kvm: x86: ensure pv_cpuid.features is initialized when enabling cap
+  kvm: x86: request masterclock update any time guest uses different msr
+  selftests: kvm: test enforcement of paravirtual cpuid features
+
+ Documentation/virt/kvm/api.rst                |   4 +-
+ arch/x86/kvm/cpuid.c                          |  23 +-
+ arch/x86/kvm/cpuid.h                          |   1 +
+ arch/x86/kvm/x86.c                            |  38 ++-
+ tools/testing/selftests/kvm/.gitignore        |   2 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   2 +
+ .../selftests/kvm/include/x86_64/processor.h  |  12 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  28 +++
+ .../selftests/kvm/lib/x86_64/processor.c      |  29 +++
+ .../selftests/kvm/x86_64/kvm_pv_test.c        | 234 ++++++++++++++++++
+ 11 files changed, 364 insertions(+), 10 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+
+-- 
+2.29.0.rc2.309.g374f81d7ae-goog
+
