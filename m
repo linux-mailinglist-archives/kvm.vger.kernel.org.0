@@ -2,137 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53E1D29C4EF
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 19:08:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B393429C4FF
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 19:08:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1823945AbgJ0SBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 14:01:00 -0400
-Received: from mail-qk1-f201.google.com ([209.85.222.201]:48887 "EHLO
-        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1823725AbgJ0R7w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 13:59:52 -0400
-Received: by mail-qk1-f201.google.com with SMTP id z16so1309913qkg.15
-        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 10:59:50 -0700 (PDT)
+        id S1824042AbgJ0SCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 14:02:00 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:42167 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1775716AbgJ0SA6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 14:00:58 -0400
+Received: by mail-io1-f66.google.com with SMTP id k21so2509143ioa.9
+        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 11:00:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=pOTcENHU6wqJJ3cPGXaUEXXcmuzILdwS9IUGREQEYLU=;
-        b=AVgaJ/v4KywVIrgTz57lMlfjx3jDjDwAYJ6aYsfyb2gTP1Endgev6TCUT6NK3dVO5c
-         9vlF0AfnyBKeqndCJVCcvnGjqblnfDahVldKiOBsM6O1aSUZ/wucJ21H956cTu0o5py8
-         p9LWSHkquW05lQbYO61oW0VxGH3gdW+yu0gxSNcQBDt76xRUT3oChrv2fl1JL+UHtSe3
-         ng2sehmakCgFytvf2alnQjipxnQC/c8QFaPsvwYwc+FlogWLd4vuiN+EDi2jo5TlTN8o
-         kcyJaVBtKeNGoutAl31mvIemzV5GGS/QHTKSSRZzYJ453UY3DjQNTn/9OxFAqTn2Avfl
-         xXng==
+        d=bgdev-pl.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ed3AIF7qFllVghkuMSpgY+e4IbkAvQfdceeKpQaUdxk=;
+        b=UoiZn2ejgC7wXGBMzC5P1HZYY0nl6Wa3KE0/4S9Ciuieo7WYMXpDS0Iaqpc4XiAPdO
+         qMSPbldaS4qotDJxt10RTbnG9MLtwWkVWivTQZrOtp1ibfKEiirPfM/hcYKscWcE5G9+
+         hdA0OqGIyHCG+6wpH2Tcj5TcpWPTkljgGKnbGOzRrgHXz7X+jipA9gLH6g8zN/Jx0l4s
+         /OKkLzKstGxFD2CYIuU1B33wI1K0Ml8+qKW5x8c0LoZzpt+1zSKoX87G79JYtOSZ/rG6
+         gJ+d5QJ1DFf7m/UdqRG6MK7XEwKpEIVQ7cBBbC41y7jJlAMtCPK8jhzSkqrf6tO37h92
+         JCSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=pOTcENHU6wqJJ3cPGXaUEXXcmuzILdwS9IUGREQEYLU=;
-        b=TeuYWuou7pzeMHBTsjdEGRfjkYQJSc9othdvwtHhAmsJM77NnVnU6TvbbxEKz2tGhm
-         ekTkTcoffltiySJOwwJfkwipJOtsMOENbMnyeCE8p8TE5DEk3j7nL4Ar1fGFFdA1QVRh
-         oBAvJi+vdEle6EUg06lYvKU7xp0mlM6CJECe2+jM//4HmmSp5ibe+C3roLAXGmeV/NP1
-         F4DlPjr1ozy5IvnrMAAITXh0N/2IM651/yKLuxohZI9en9fV5C/X8Trmq70uEXhKkMta
-         GxrGK7+Tz0q36rbOeQyIp32c3Hp5V6/h6/f2gdkSWk4cxH4NtqzvwCxRCoAoQVJ+Y6Vh
-         LcKw==
-X-Gm-Message-State: AOAM531hywQrFdxd28UAAy4NFGzqGspGiyTTePo4cGOMMpvBJo9U+Z3J
-        u5bCUO8ZeEmefVbeHQFQX2Ic/XGAFuod
-X-Google-Smtp-Source: ABdhPJxXP3MCaof8IMN7lQHYqo/fDn4xCqd6YNisdN1pPMqUmwwr3qGS47G3JTeiSwOHNBj3loLOA/XHaVDc
-Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a0c:e054:: with SMTP id
- y20mr3875558qvk.30.1603821589510; Tue, 27 Oct 2020 10:59:49 -0700 (PDT)
-Date:   Tue, 27 Oct 2020 10:59:44 -0700
-In-Reply-To: <20201027175944.1183301-1-bgardon@google.com>
-Message-Id: <20201027175944.1183301-2-bgardon@google.com>
-Mime-Version: 1.0
-References: <20201027175944.1183301-1-bgardon@google.com>
-X-Mailer: git-send-email 2.29.0.rc2.309.g374f81d7ae-goog
-Subject: [PATCH 2/2] kvm: x86/mmu: Add TDP MMU SPTE changed trace point
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Ben Gardon <bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ed3AIF7qFllVghkuMSpgY+e4IbkAvQfdceeKpQaUdxk=;
+        b=bCyn/Nz7eSnzU4TpdbpZSj/xNej6vvL3joE3HltWEoEJZ11ACHO27IcqB3KvbU48ce
+         Xkoskza8J88sd1oo5ljjSzVLcUtxrZbvfeB/0NZltrRSpb6FLOGGfvoK9QYO4QmCoj/y
+         NRSp2kKtXab0viyEfRpkO4dfqoA5wE1w2sZ0vjuOm7qfMImhFQNA6D10tEqqHZawULV/
+         Wto4hup00NZbLIbISp9foutZdDtcaITsCOi7bWgS/vmGrZ5ejzrXutmoeFq77L4QNsuh
+         v3sp011+eukSV9Ab6hfwFUEZRNojRCfU4lCXYQsKGgNgLYwm3RvwNdoq+DC/+w31yIKc
+         8cGA==
+X-Gm-Message-State: AOAM533KhnLQ/LuKC0yzyd1SjG3kW4/bdPJ7YSdfzM2T5/ZA4U3DkzKE
+        tOjYa0B+3oLSKOUZtV5iOoL0hNwBXvKF2jrDADHBjw==
+X-Google-Smtp-Source: ABdhPJwN08N0ZyzhoITVdnvB4ryeaKood+3vq0iIUYgCE2JJfuXumCj2bIDB2qD60OdiaWwDhRbGH3iAIo+DCc+ziro=
+X-Received: by 2002:a6b:f401:: with SMTP id i1mr3323522iog.130.1603821657825;
+ Tue, 27 Oct 2020 11:00:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <20201027121725.24660-1-brgl@bgdev.pl> <20201027121725.24660-4-brgl@bgdev.pl>
+ <20201027112607-mutt-send-email-mst@kernel.org> <685d850347a1191bba8ba7766fc409b140d18f03.camel@perches.com>
+ <CAMpxmJU0C84DjPmqmWvPgv0zwgGLhkpKLRDuKkZHAa=wi+LvBA@mail.gmail.com> <2767969b94fd66db1fb0fc13b5783ae65b7deb2f.camel@perches.com>
+In-Reply-To: <2767969b94fd66db1fb0fc13b5783ae65b7deb2f.camel@perches.com>
+From:   Bartosz Golaszewski <brgl@bgdev.pl>
+Date:   Tue, 27 Oct 2020 19:00:46 +0100
+Message-ID: <CAMRc=McvW_E0aE2Ep=3aZvb=kNDMz6=ZH-EQzARAD-tyJG5Rrg@mail.gmail.com>
+Subject: Re: [PATCH 3/8] vhost: vringh: use krealloc_array()
+To:     Joe Perches <joe@perches.com>
+Cc:     Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        linux-media <linux-media@vger.kernel.org>,
+        linux-drm <dri-devel@lists.freedesktop.org>,
+        linaro-mm-sig@lists.linaro.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
+        linux-gpio <linux-gpio@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        netdev <netdev@vger.kernel.org>, linux-mm@kvack.org,
+        Linux-ALSA <alsa-devel@alsa-project.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add an extremely verbose trace point to the TDP MMU to log all SPTE
-changes, regardless of callstack / motivation. This is useful when a
-complete picture of the paging structure is needed or a change cannot be
-explained with the other, existing trace points.
+On Tue, Oct 27, 2020 at 6:08 PM Joe Perches <joe@perches.com> wrote:
+>
+> On Tue, 2020-10-27 at 17:58 +0100, Bartosz Golaszewski wrote:
+> > On Tue, Oct 27, 2020 at 5:50 PM Joe Perches <joe@perches.com> wrote:
+> > >
+> > > On Tue, 2020-10-27 at 11:28 -0400, Michael S. Tsirkin wrote:
+> > > > On Tue, Oct 27, 2020 at 01:17:20PM +0100, Bartosz Golaszewski wrote:
+> > > > > From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> > > > >
+> > > > > Use the helper that checks for overflows internally instead of manually
+> > > > > calculating the size of the new array.
+> > > > >
+> > > > > Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> > > >
+> > > > No problem with the patch, it does introduce some symmetry in the code.
+> > >
+> > > Perhaps more symmetry by using kmemdup
+> > > ---
+> > >  drivers/vhost/vringh.c | 23 ++++++++++-------------
+> > >  1 file changed, 10 insertions(+), 13 deletions(-)
+> > >
+> > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > > index 8bd8b403f087..99222a3651cd 100644
+> > > --- a/drivers/vhost/vringh.c
+> > > +++ b/drivers/vhost/vringh.c
+> > > @@ -191,26 +191,23 @@ static int move_to_indirect(const struct vringh *vrh,
+> > >  static int resize_iovec(struct vringh_kiov *iov, gfp_t gfp)
+> > >  {
+> > >         struct kvec *new;
+> > > -       unsigned int flag, new_num = (iov->max_num & ~VRINGH_IOV_ALLOCATED) * 2;
+> > > +       size_t new_num = (iov->max_num & ~VRINGH_IOV_ALLOCATED) * 2;
+> > > +       size_t size;
+> > >
+> > >         if (new_num < 8)
+> > >                 new_num = 8;
+> > >
+> > > -       flag = (iov->max_num & VRINGH_IOV_ALLOCATED);
+> > > -       if (flag)
+> > > -               new = krealloc(iov->iov, new_num * sizeof(struct iovec), gfp);
+> > > -       else {
+> > > -               new = kmalloc_array(new_num, sizeof(struct iovec), gfp);
+> > > -               if (new) {
+> > > -                       memcpy(new, iov->iov,
+> > > -                              iov->max_num * sizeof(struct iovec));
+> > > -                       flag = VRINGH_IOV_ALLOCATED;
+> > > -               }
+> > > -       }
+> > > +       if (unlikely(check_mul_overflow(new_num, sizeof(struct iovec), &size)))
+> > > +               return -ENOMEM;
+> > > +
+> >
+> > The whole point of using helpers such as kmalloc_array() is not doing
+> > these checks manually.
+>
+> Tradeoffs for in readability for overflow and not mistyping or doing
+> the multiplication of iov->max_num * sizeof(struct iovec) twice.
+>
 
-Tested: ran the demand paging selftest on an Intel Skylake machine with
-	all the trace points used by the TDP MMU enabled and observed
-	them firing with expected values.
+It's out of scope for this series - I want to add users for
+krealloc_array(), not refactor code I don't really know. If the
+maintainer of this bit objects, it can be dropped.
 
-This patch can be viewed in Gerrit at:
-https://linux-review.googlesource.com/c/virt/kvm/kvm/+/3813
+> Just fyi:
+>
+> the realloc doesn't do a multiplication overflow test as written so the
+> suggestion is slightly more resistant to defect.
+>
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/mmutrace.h | 29 +++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.c  |  2 ++
- 2 files changed, 31 insertions(+)
+I'm not sure what your point is. I used krealloc_array() exactly for
+this reason - to add the overflow test.
 
-diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-index 213699b27b448..e798489b56b55 100644
---- a/arch/x86/kvm/mmu/mmutrace.h
-+++ b/arch/x86/kvm/mmu/mmutrace.h
-@@ -381,6 +381,35 @@ TRACE_EVENT(
- 	)
- );
- 
-+TRACE_EVENT(
-+	kvm_tdp_mmu_spte_changed,
-+	TP_PROTO(int as_id, gfn_t gfn, int level, u64 old_spte, u64 new_spte),
-+	TP_ARGS(as_id, gfn, level, old_spte, new_spte),
-+
-+	TP_STRUCT__entry(
-+		__field(u64, gfn)
-+		__field(u64, old_spte)
-+		__field(u64, new_spte)
-+		/* Level cannot be larger than 5 on x86, so it fits in a u8. */
-+		__field(u8, level)
-+		/* as_id can only be 0 or 1 x86, so it fits in a u8. */
-+		__field(u8, as_id)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->gfn = gfn;
-+		__entry->old_spte = old_spte;
-+		__entry->new_spte = new_spte;
-+		__entry->level = level;
-+		__entry->as_id = as_id;
-+	),
-+
-+	TP_printk("as id %d gfn %llx level %d old_spte %llx new_spte %llx",
-+		  __entry->as_id, __entry->gfn, __entry->level,
-+		  __entry->old_spte, __entry->new_spte
-+	)
-+);
-+
- #endif /* _TRACE_KVMMMU_H */
- 
- #undef TRACE_INCLUDE_PATH
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 047e2d966abef..5820c36ccfdca 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -241,6 +241,8 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 	if (old_spte == new_spte)
- 		return;
- 
-+	trace_kvm_tdp_mmu_spte_changed(as_id, gfn, level, old_spte, new_spte);
-+
- 	/*
- 	 * The only times a SPTE should be changed from a non-present to
- 	 * non-present state is when an MMIO entry is installed/modified/
--- 
-2.29.0.rc2.309.g374f81d7ae-goog
+BTW I suppose kmalloc_array() here can be replaced with
+krealloc_array() if the original pointer is NULL the first time it's
+called.
 
+Bartosz
