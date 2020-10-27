@@ -2,106 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8699529AA4A
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 12:08:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D367B29AB50
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 12:58:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2898980AbgJ0LIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 07:08:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39792 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2898975AbgJ0LIS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 07:08:18 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8589021655;
-        Tue, 27 Oct 2020 11:08:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603796897;
-        bh=hN0qy1y7mET6+8oBNyv6KDyBxf+wqltkkA89flTvk2g=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=RMlyud2QvQfcVq+rDgM86g3QNRieFI/7Rw11vGogACyi2THdd68p5C5TfD92/QQN6
-         m5OTG9uyCFeOf0korrVWCqoBEWA8zoij9zbHBkggbW922lqwYcnvafLSTHtJPZ2bH0
-         jO9D82+RWqGYQBV11sRc7SMMODdHYlhozByn0+74=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kXMpr-004fCh-7M; Tue, 27 Oct 2020 11:08:15 +0000
+        id S1750376AbgJ0L6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 07:58:19 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:6260 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750371AbgJ0L6T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 07:58:19 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f980b450001>; Tue, 27 Oct 2020 04:57:57 -0700
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 27 Oct
+ 2020 11:58:14 +0000
+Received: from NAM02-BL2-obe.outbound.protection.outlook.com (104.47.38.56) by
+ HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 27 Oct 2020 11:58:14 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OpJwEAhW/1o7e3SryeXWsqfxPV9ry9R8Iu6j5got1koMLs3EWQz+SdSBuRtz3YC6MCZbL/9WyP/5f+ymZaA9tvqGraI4yjhhLYzRkttiAPnirLuLgelN913a+vWBfdDitbaLNZtHZCu9dIf+NF7I3YAMBvtF5n2A0KQCPqkMnQdr4m78b/B5ILgrxShdMIO1UFd3g+5x/VHwOaV52uy/BydgCIdSobOn1NQsXmjbJ4eYChI8uonUy8hHRdLnTg3KkzIg2jFY8d23mTA+hJL44/T9y89j9V0Eaew/6AC40NFbabLqz/UcQEay21k5j80Dd4VRVRYJUYZqgpQfF4pTIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=euyUCc7Fc3m9fZe0HlaXBdvVYHYAC98vLn14YMvbS+Q=;
+ b=BfUaY4Da/TOLKZYTvOuBL7hhaolcLrILnlbcnBfgzbEoyj2QrTlDKDKTp64eX2A+tEkzIB4y3pEsYgsfjCZWVY2fsQmqroIVtj2u5eRQb50lICIU1PPG1TwSsZiI+9HqgmiGpagCwGyViKKW5LZEp6Xc8vZqTxgMGJm1/vAFw+9/gBCqN5JUoPozTFiGXS1Sib3GcY1WevMGNLX00/CgV9beYB80pm6Prfqm4oCyHIrCh2yc/sfFEIPDfuOHeSjl67NWJicepcl4GNRQ1fNB7alKWEzbMSFrOoseQZaSxyoM4N1ms69LxhY3cjbxwcbdwxDyPfdbVLyznpKoLQ3kow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR1201MB0201.namprd12.prod.outlook.com (2603:10b6:4:5b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Tue, 27 Oct
+ 2020 11:58:12 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3477.028; Tue, 27 Oct 2020
+ 11:58:12 +0000
+Date:   Tue, 27 Oct 2020 08:58:10 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     Tom Lendacky <thomas.lendacky@amd.com>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+        <linux-mm@kvack.org>, <kvm@vger.kernel.org>,
+        Radim Kr??m???? <rkrcmar@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Matt Fleming <matt@codeblueprint.co.uk>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Alexander Potapenko" <glider@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Dmitry Vyukov" <dvyukov@google.com>,
+        Rik van Riel <riel@redhat.com>,
+        Larry Woodman <lwoodman@redhat.com>,
+        Dave Young <dyoung@redhat.com>,
+        Toshimitsu Kani <toshi.kani@hpe.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: AMD SME encrpytion and PCI BAR pages to user space
+Message-ID: <20201027115810.GH1523783@nvidia.com>
+References: <20201019152556.GA560082@nvidia.com>
+ <4b9f13bf-3f82-1aed-c7be-0eaecebc5d82@amd.com>
+ <20201021115933.GS6219@nvidia.com>
+ <f9c50e3a-c5de-8c85-4d6c-0e8a90729420@amd.com>
+ <20201021160322.GT6219@nvidia.com> <20201027084357.GA10053@infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20201027084357.GA10053@infradead.org>
+X-ClientProxiedBy: MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22)
+ To DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 27 Oct 2020 11:08:15 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        David Brazdil <dbrazdil@google.com>, kernel-team@android.com
-Subject: Re: [PATCH 03/11] KVM: arm64: Make kvm_skip_instr() and co private to
- HYP
-In-Reply-To: <a2b942e5-651b-4733-4332-98b33fc6689b@arm.com>
-References: <20201026133450.73304-1-maz@kernel.org>
- <20201026133450.73304-4-maz@kernel.org>
- <a2b942e5-651b-4733-4332-98b33fc6689b@arm.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <3ae9d792ea381ba42874ebe5f7c08347@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, ascull@google.com, will@kernel.org, qperret@google.com, dbrazdil@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.22 via Frontend Transport; Tue, 27 Oct 2020 11:58:11 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kXNcA-009G0X-VP; Tue, 27 Oct 2020 08:58:10 -0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1603799877; bh=euyUCc7Fc3m9fZe0HlaXBdvVYHYAC98vLn14YMvbS+Q=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType;
+        b=BsYyMkxO11+8dWhoE/1vd3jsm0B6LncaeEWQKojoA35WglK4IsBwotwYx4xtqNKea
+         uL8QNdyijE1QZJ9kJholMyuVB1Lte6sT0SQqajJyv9QRAZM9bBBeEa2qjJahuNWvLk
+         QuqcuS0vCGDr5pdBJyrKYRp7oiBJcBY5gR005wAdfIIVOgv7IcQzuOD21nb+wjeU27
+         6udevM5BbAL2qONyjEgKegW9fW7NDH88t0hVIpDJOBjhoY7CejmCsbC6S5eDMmDDNy
+         6GJ7er886vRNiOU3NX0xiqogIEMjlKdXFlXFPhs8FGk1E1J8VKmgyBBxhr/ROs1y+C
+         7VzehGWJ5W9Tg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-10-27 10:55, Suzuki K Poulose wrote:
-> On 10/26/20 1:34 PM, Marc Zyngier wrote:
->> In an effort to remove the vcpu PC manipulations from EL1 on nVHE
->> systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
->> to increment PC post emulation is now signalled via a flag in the
->> vcpu structure.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-[...]
-
->> +static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
->> +{
->> +	if (vcpu_mode_is_32bit(vcpu)) {
->> +		kvm_skip_instr32(vcpu);
->> +	} else {
->> +		*vcpu_pc(vcpu) += 4;
->> +		*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
->> +	}
->> +
->> +	/* advance the singlestep state machine */
->> +	*vcpu_cpsr(vcpu) &= ~DBG_SPSR_SS;
->> +}
->> +
->> +/*
->> + * Skip an instruction which has been emulated at hyp while most 
->> guest sysregs
->> + * are live.
->> + */
->> +static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
->> +{
->> +	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
->> +	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
->> +
->> +	__kvm_skip_instr(vcpu);
+On Tue, Oct 27, 2020 at 08:43:57AM +0000, Christoph Hellwig wrote:
+> On Wed, Oct 21, 2020 at 01:03:22PM -0300, Jason Gunthorpe wrote:
+> > Oh, interesting.. Yes the issue is no userspace DMA stuff uses the DMA
+> > API correctly (because it is in userspace)
+> > 
+> > So SWIOTLB tricks don't work, I wish the dma_map could fail for these
+> > situations
 > 
-> Did you mean kvm_skip_instr() instead ?
+> Userspace DMA by definition also does not use dma_map..
 
-Damn. How embarrassing! Yes, of course. I should have thrown my TX1 at 
-it!
+? Sure it does, ib_dma_map_sg_attrs() is what RDMA uses
 
-Thanks,
+What all the userspace users skip is the dma_sync*() - that would
+require a kernel call which defeats the point.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+So, my desire is some flag to dma_map_sg() that says
+  'user space mapping no dma_sync_*'
+
+ie dma_sync_* is a NOP
+
+Then things like SWIOTLB on the SEV system can fail with an error code
+instead of malfunctioning
+
+If FOLL_LONGERM is some estimate of this pattern then we have these users:
+ - drivers/infiniband
+ - v4l
+ - vdpa
+ - xdp
+ - rds
+ - habana labs
+
+Jason
