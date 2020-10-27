@@ -2,112 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84F8F29C045
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 18:13:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 177F229BFDD
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 18:10:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1817123AbgJ0RNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 13:13:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60892 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1784592AbgJ0O7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 10:59:17 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5D27921527;
-        Tue, 27 Oct 2020 14:59:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603810756;
-        bh=KPDhQ2eC+hxI1es67zSQER6Oyh7tou/MgdkaJjDBDL8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ridBwbprwzCFa4wXIdwtXZVVKi1mGH8VqkUUTTXXSqR7UrtScoEKRIle+aKYuYPHL
-         2vQ8dVOZcHXd3PlnG02Q6EsT2WNKYfP5N6BPTLuICkH/5EdF2cERPlNSHof9RaAlKx
-         z2f+tg5T2ahGYsctfyn48UXBCZKU7LvYteIZ4D0s=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kXQRO-004l60-7t; Tue, 27 Oct 2020 14:59:14 +0000
+        id S1816651AbgJ0RIQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 13:08:16 -0400
+Received: from smtprelay0063.hostedemail.com ([216.40.44.63]:47840 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1816629AbgJ0RIO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Oct 2020 13:08:14 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay08.hostedemail.com (Postfix) with ESMTP id 45489182CED2A;
+        Tue, 27 Oct 2020 17:08:10 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Spam-Summary: 2,0,0,,d41d8cd98f00b204,joe@perches.com,,RULES_HIT:41:69:355:379:599:800:960:973:988:989:1260:1277:1311:1313:1314:1345:1359:1437:1515:1516:1518:1534:1542:1593:1594:1711:1730:1747:1777:1792:1801:2393:2553:2559:2562:2828:3138:3139:3140:3141:3142:3354:3622:3865:3866:3867:3868:3870:3871:3872:3874:4321:4605:5007:6742:6743:7576:7903:8603:10004:10400:10848:11026:11232:11473:11658:11783:11914:12043:12296:12297:12438:12555:12679:12740:12895:12986:13161:13229:13439:13894:14096:14097:14181:14659:14721:21080:21451:21627:21990:30012:30054:30090:30091,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:2,LUA_SUMMARY:none
+X-HE-Tag: rake71_590ddfb2727d
+X-Filterd-Recvd-Size: 4916
+Received: from XPS-9350.home (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf05.hostedemail.com (Postfix) with ESMTPA;
+        Tue, 27 Oct 2020 17:08:04 +0000 (UTC)
+Message-ID: <2767969b94fd66db1fb0fc13b5783ae65b7deb2f.camel@perches.com>
+Subject: Re: [PATCH 3/8] vhost: vringh: use krealloc_array()
+From:   Joe Perches <joe@perches.com>
+To:     Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        linux-media <linux-media@vger.kernel.org>,
+        linux-drm <dri-devel@lists.freedesktop.org>,
+        linaro-mm-sig@lists.linaro.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
+        linux-gpio <linux-gpio@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        netdev <netdev@vger.kernel.org>, linux-mm@kvack.org,
+        Linux-ALSA <alsa-devel@alsa-project.org>
+Date:   Tue, 27 Oct 2020 10:08:02 -0700
+In-Reply-To: <CAMpxmJU0C84DjPmqmWvPgv0zwgGLhkpKLRDuKkZHAa=wi+LvBA@mail.gmail.com>
+References: <20201027121725.24660-1-brgl@bgdev.pl>
+         <20201027121725.24660-4-brgl@bgdev.pl>
+         <20201027112607-mutt-send-email-mst@kernel.org>
+         <685d850347a1191bba8ba7766fc409b140d18f03.camel@perches.com>
+         <CAMpxmJU0C84DjPmqmWvPgv0zwgGLhkpKLRDuKkZHAa=wi+LvBA@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.38.1-1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 27 Oct 2020 14:59:14 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     James Morse <james.morse@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        David Brazdil <dbrazdil@google.com>, kernel-team@android.com
-Subject: Re: [PATCH 04/11] KVM: arm64: Move PC rollback on SError to HYP
-In-Reply-To: <e2487f06-3f2f-1a0b-49d8-a72ea9288bb2@arm.com>
-References: <20201026133450.73304-1-maz@kernel.org>
- <20201026133450.73304-5-maz@kernel.org>
- <e2487f06-3f2f-1a0b-49d8-a72ea9288bb2@arm.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <cd5527f7308f1db09268efd7c83e51c5@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, will@kernel.org, qperret@google.com, dbrazdil@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-10-27 14:56, James Morse wrote:
-> Hi Marc,
+On Tue, 2020-10-27 at 17:58 +0100, Bartosz Golaszewski wrote:
+> On Tue, Oct 27, 2020 at 5:50 PM Joe Perches <joe@perches.com> wrote:
+> > 
+> > On Tue, 2020-10-27 at 11:28 -0400, Michael S. Tsirkin wrote:
+> > > On Tue, Oct 27, 2020 at 01:17:20PM +0100, Bartosz Golaszewski wrote:
+> > > > From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> > > > 
+> > > > Use the helper that checks for overflows internally instead of manually
+> > > > calculating the size of the new array.
+> > > > 
+> > > > Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> > > 
+> > > No problem with the patch, it does introduce some symmetry in the code.
+> > 
+> > Perhaps more symmetry by using kmemdup
+> > ---
+> >  drivers/vhost/vringh.c | 23 ++++++++++-------------
+> >  1 file changed, 10 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > index 8bd8b403f087..99222a3651cd 100644
+> > --- a/drivers/vhost/vringh.c
+> > +++ b/drivers/vhost/vringh.c
+> > @@ -191,26 +191,23 @@ static int move_to_indirect(const struct vringh *vrh,
+> >  static int resize_iovec(struct vringh_kiov *iov, gfp_t gfp)
+> >  {
+> >         struct kvec *new;
+> > -       unsigned int flag, new_num = (iov->max_num & ~VRINGH_IOV_ALLOCATED) * 2;
+> > +       size_t new_num = (iov->max_num & ~VRINGH_IOV_ALLOCATED) * 2;
+> > +       size_t size;
+> > 
+> >         if (new_num < 8)
+> >                 new_num = 8;
+> > 
+> > -       flag = (iov->max_num & VRINGH_IOV_ALLOCATED);
+> > -       if (flag)
+> > -               new = krealloc(iov->iov, new_num * sizeof(struct iovec), gfp);
+> > -       else {
+> > -               new = kmalloc_array(new_num, sizeof(struct iovec), gfp);
+> > -               if (new) {
+> > -                       memcpy(new, iov->iov,
+> > -                              iov->max_num * sizeof(struct iovec));
+> > -                       flag = VRINGH_IOV_ALLOCATED;
+> > -               }
+> > -       }
+> > +       if (unlikely(check_mul_overflow(new_num, sizeof(struct iovec), &size)))
+> > +               return -ENOMEM;
+> > +
 > 
-> On 26/10/2020 13:34, Marc Zyngier wrote:
->> Instead of handling the "PC rollback on SError during HVC" at EL1 
->> (which
->> requires disclosing PC to a potentially untrusted kernel), let's move
->> this fixup to ... fixup_guest_exit(), which is where we do all fixups.
-> 
->> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h 
->> b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> index d687e574cde5..668f02c7b0b3 100644
->> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
->> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> @@ -411,6 +411,21 @@ static inline bool fixup_guest_exit(struct 
->> kvm_vcpu *vcpu, u64 *exit_code)
->>  	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
->>  		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
->> 
->> +	if (ARM_SERROR_PENDING(*exit_code)) {
->> +		u8 esr_ec = kvm_vcpu_trap_get_class(vcpu);
->> +
->> +		/*
->> +		 * HVC already have an adjusted PC, which we need to
->> +		 * correct in order to return to after having injected
->> +		 * the SError.
->> +		 *
->> +		 * SMC, on the other hand, is *trapped*, meaning its
->> +		 * preferred return address is the SMC itself.
->> +		 */
->> +		if (esr_ec == ESR_ELx_EC_HVC32 || esr_ec == ESR_ELx_EC_HVC64)
->> +			*vcpu_pc(vcpu) -= 4;
-> 
-> Isn't *vcpu_pc(vcpu) the PC of the previous entry for this vcpu?....
-> its not the PC of the
-> exit until __sysreg_save_el2_return_state() saves it, which happens 
-> just after
-> fixup_guest_exit().
+> The whole point of using helpers such as kmalloc_array() is not doing
+> these checks manually.
 
-Hmmm. Good point. The move was obviously done in haste, thank you for 
-pointing
-this blatant bug.
+Tradeoffs for in readability for overflow and not mistyping or doing
+the multiplication of iov->max_num * sizeof(struct iovec) twice.
 
-> Mess with ELR_EL2 directly?
+Just fyi:
 
-Yes, that's the best course of action. We never run this code anyway.
+the realloc doesn't do a multiplication overflow test as written so the
+suggestion is slightly more resistant to defect.
 
-Thanks,
+   
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
