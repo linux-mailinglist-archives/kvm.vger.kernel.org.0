@@ -2,465 +2,375 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D2E829C0C7
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 18:19:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EDA429C207
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 18:32:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1818347AbgJ0RTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 13:19:10 -0400
-Received: from foss.arm.com ([217.140.110.172]:47688 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1818337AbgJ0RTJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 13:19:09 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5199715AB;
-        Tue, 27 Oct 2020 10:19:07 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A72AA3F719;
-        Tue, 27 Oct 2020 10:19:04 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     drjones@redhat.com, pbonzini@redhat.com
-Subject: [kvm-unit-tests RFC PATCH v2 5/5] am64: spe: Add buffer test
-Date:   Tue, 27 Oct 2020 17:19:44 +0000
-Message-Id: <20201027171944.13933-6-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.29.1
-In-Reply-To: <20201027171944.13933-1-alexandru.elisei@arm.com>
-References: <20201027171944.13933-1-alexandru.elisei@arm.com>
+        id S1819282AbgJ0R3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 13:29:10 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56858 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1813555AbgJ0R3J (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Oct 2020 13:29:09 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09RH32KN089417;
+        Tue, 27 Oct 2020 13:29:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=A8vltgMzDMVKywTjvwlC1Xdu1O2yd4axe54PJpEzWSE=;
+ b=eKqvVqSab2i7L1AoNOVpeZihGkVMnKe32XvVtvM6qcVALcR4L9n3uSCxQLjtGLo7fUjy
+ n9d3SxbATY2xa4ZZr1cKGwzNUkRATt/e0yr2w1U6eT6UB44NeMUmU4S4dSiTymbdR+MB
+ Rii9IjOBKB0Bi1S3wV37l2mrYYobGlxGhyoUrKMtzryjARQE+2eMqeNdTOx5/E9+aBtV
+ 9e08jIbEFuv4POKMqXZ8lH2xj2WcaHB/PnIODJwRyNYJ2VzyQNFgvw3CbSyBbyw9VyEJ
+ xH4B1KNnuqKJTueKwZ0pQMKlOXG9uoe+bLpx363RkxSkOZ01ZaJsBsaGSnBCwMUkEtlM aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34ejb6n558-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Oct 2020 13:29:00 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09RH3iBb092704;
+        Tue, 27 Oct 2020 13:28:58 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34ejb6n54e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Oct 2020 13:28:57 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09RHHICr011794;
+        Tue, 27 Oct 2020 17:28:56 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 34cbw89uuf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Oct 2020 17:28:56 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09RHSrgj34669036
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Oct 2020 17:28:53 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 354274203F;
+        Tue, 27 Oct 2020 17:28:53 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2FDBD42045;
+        Tue, 27 Oct 2020 17:28:52 +0000 (GMT)
+Received: from funtu.home (unknown [9.171.1.97])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 27 Oct 2020 17:28:52 +0000 (GMT)
+Subject: Re: [PATCH v11 11/14] s390/zcrypt: Notify driver on config changed
+ and scan complete callbacks
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com
+References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
+ <20201022171209.19494-12-akrowiak@linux.ibm.com>
+From:   Harald Freudenberger <freude@linux.ibm.com>
+Message-ID: <8b3c6a0a-2411-96a8-11a3-d9bf36d42c82@linux.ibm.com>
+Date:   Tue, 27 Oct 2020 18:28:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201022171209.19494-12-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-10-27_10:2020-10-26,2020-10-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ mlxscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0 impostorscore=0
+ spamscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010270099
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to ARM DDI 0487F.b, a profiling buffer management event occurs:
+On 22.10.20 19:12, Tony Krowiak wrote:
+> This patch intruduces an extension to the ap bus to notify device drivers
+> when the host AP configuration changes - i.e., adapters, domains or
+> control domains are added or removed. To that end, two new callbacks are
+> introduced for AP device drivers:
+>
+>   void (*on_config_changed)(struct ap_config_info *new_config_info,
+>                             struct ap_config_info *old_config_info);
+>
+>      This callback is invoked at the start of the AP bus scan
+>      function when it determines that the host AP configuration information
+>      has changed since the previous scan. This is done by storing
+>      an old and current QCI info struct and comparing them. If there is any
+>      difference, the callback is invoked.
+>
+>      Note that when the AP bus scan detects that AP adapters, domains or
+>      control domains have been removed from the host's AP configuration, it
+>      will remove the associated devices from the AP bus subsystem's device
+>      model. This callback gives the device driver a chance to respond to
+>      the removal of the AP devices from the host configuration prior to
+>      calling the device driver's remove callback. The primary purpose of
+>      this callback is to allow the vfio_ap driver to do a bulk unplug of
+>      all affected adapters, domains and control domains from affected
+>      guests rather than unplugging them one at a time when the remove
+>      callback is invoked.
+>
+>   void (*on_scan_complete)(struct ap_config_info *new_config_info,
+>                            struct ap_config_info *old_config_info);
+>
+>      The on_scan_complete callback is invoked after the ap bus scan is
+>      complete if the host AP configuration data has changed.
+>
+>      Note that when the AP bus scan detects that adapters, domains or
+>      control domains have been added to the host's configuration, it will
+>      create new devices in the AP bus subsystem's device model. The primary
+>      purpose of this callback is to allow the vfio_ap driver to do a bulk
+>      plug of all affected adapters, domains and control domains into
+>      affected guests rather than plugging them one at a time when the
+>      probe callback is invoked.
+>
+> Please note that changes to the apmask and aqmask do not trigger
+> these two callbacks since the bus scan function is not invoked by changes
+> to those masks.
+>
+> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+Did I really sign-off this ? I know, I saw this code but ...
+First of all, please separate the ap bus changes from the vfio_ap driver changes.
+This makes backports and code change history much easier.
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/ap_bus.c          | 88 ++++++++++++++++++++++++++-
+>  drivers/s390/crypto/ap_bus.h          | 12 ++++
+>  drivers/s390/crypto/vfio_ap_drv.c     |  2 +-
+>  drivers/s390/crypto/vfio_ap_ops.c     | 11 ++--
+>  drivers/s390/crypto/vfio_ap_private.h |  2 +-
+>  5 files changed, 106 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
+> index 998e61cd86d9..5b94956ef6bc 100644
+> --- a/drivers/s390/crypto/ap_bus.c
+> +++ b/drivers/s390/crypto/ap_bus.c
+> @@ -73,8 +73,10 @@ struct ap_perms ap_perms;
+>  EXPORT_SYMBOL(ap_perms);
+>  DEFINE_MUTEX(ap_perms_mutex);
+>  EXPORT_SYMBOL(ap_perms_mutex);
+> +DEFINE_MUTEX(ap_config_lock);
+This mutes is unnecessary, but see details below.
+>  
+>  static struct ap_config_info *ap_qci_info;
+> +static struct ap_config_info *ap_qci_info_old;
+>  
+>  /*
+>   * AP bus related debug feature things.
+> @@ -1420,6 +1422,52 @@ static int __match_queue_device_with_queue_id(struct device *dev, const void *da
+>  		&& AP_QID_QUEUE(to_ap_queue(dev)->qid) == (int)(long) data;
+>  }
+>  
+> +/* Helper function for notify_config_changed */
+> +static int __drv_notify_config_changed(struct device_driver *drv, void *data)
+> +{
+> +	struct ap_driver *ap_drv = to_ap_drv(drv);
+> +
+> +	if (try_module_get(drv->owner)) {
+> +		if (ap_drv->on_config_changed)
+> +			ap_drv->on_config_changed(ap_qci_info,
+> +						  ap_qci_info_old);
+> +		module_put(drv->owner);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/* Notify all drivers about an qci config change */
+> +static inline void notify_config_changed(void)
+> +{
+> +	bus_for_each_drv(&ap_bus_type, NULL, NULL,
+> +			 __drv_notify_config_changed);
+> +}
+> +
+> +/* Helper function for notify_scan_complete */
+> +static int __drv_notify_scan_complete(struct device_driver *drv, void *data)
+> +{
+> +	struct ap_driver *ap_drv = to_ap_drv(drv);
+> +
+> +	if (try_module_get(drv->owner)) {
+> +		if (ap_drv->on_scan_complete)
+> +			ap_drv->on_scan_complete(ap_qci_info,
+> +						 ap_qci_info_old);
+> +		module_put(drv->owner);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/* Notify all drivers about bus scan complete */
+> +static inline void notify_scan_complete(void)
+> +{
+> +	bus_for_each_drv(&ap_bus_type, NULL, NULL,
+> +			 __drv_notify_scan_complete);
+> +}
+> +
+> +
+> +
+>  /*
+>   * Helper function for ap_scan_bus().
+>   * Remove card device and associated queue devices.
+> @@ -1696,15 +1744,45 @@ static inline void ap_scan_adapter(int ap)
+>  	put_device(&ac->ap_dev.device);
+>  }
+>  
+> +static int ap_config_changed(void)
+I don't like the name here. This function is effectively fetching the qci info
+and then comparing the new with the prev. qci info. So it is the new
+ap_get_configuration() which returns bool true (config changed) or
+false (old and current config are the very same).
+> +{
+> +	int cfg_chg = 0;
+> +
+> +	if (ap_qci_info) {
+> +		if (!ap_qci_info_old) {
+> +			ap_qci_info_old = kzalloc(sizeof(*ap_qci_info_old),
+> +						  GFP_KERNEL);
+> +			if (!ap_qci_info_old)
+> +				return 0;
+> +		} else {
+> +			memcpy(ap_qci_info_old, ap_qci_info,
+> +			       sizeof(struct ap_config_info));
+> +		}
+> +		ap_fetch_qci_info(ap_qci_info);
+> +		cfg_chg = memcmp(ap_qci_info,
+> +				 ap_qci_info_old,
+> +				 sizeof(struct ap_config_info)) != 0;
+> +	}
+> +
+> +	return cfg_chg;
+> +}
+> +
+>  /**
+>   * ap_scan_bus(): Scan the AP bus for new devices
+>   * Runs periodically, workqueue timer (ap_config_time)
+>   */
+>  static void ap_scan_bus(struct work_struct *unused)
+>  {
+> -	int ap;
+> +	int ap, config_changed = 0;
+> +
+> +	mutex_lock(&ap_config_lock);
+This mutex is more or less surrrounding the ap_scan_bus function.
+The ap_scan_bus function is only called via a workqueue which is
+making sure there is only one invocation at a point in time. So it
+is not needed.
+>  
+> -	ap_fetch_qci_info(ap_qci_info);
+> +	/* config change notify */
+> +	config_changed = ap_config_changed();
+> +	if (config_changed)
+> +		notify_config_changed();
+> +	memcpy(ap_qci_info_old, ap_qci_info,
+> +	       sizeof(struct ap_config_info));
+>  	ap_select_domain();
+>  
+>  	AP_DBF_DBG("%s running\n", __func__);
+> @@ -1713,6 +1791,12 @@ static void ap_scan_bus(struct work_struct *unused)
+>  	for (ap = 0; ap <= ap_max_adapter_id; ap++)
+>  		ap_scan_adapter(ap);
+>  
+> +	/* scan complete notify */
+> +	if (config_changed)
+> +		notify_scan_complete();
+> +
+> +	mutex_unlock(&ap_config_lock);
+> +
+>  	/* check if there is at least one queue available with default domain */
+>  	if (ap_domain_index >= 0) {
+>  		struct device *dev =
+> diff --git a/drivers/s390/crypto/ap_bus.h b/drivers/s390/crypto/ap_bus.h
+> index 6ce154d924d3..c021ea5121a9 100644
+> --- a/drivers/s390/crypto/ap_bus.h
+> +++ b/drivers/s390/crypto/ap_bus.h
+> @@ -146,6 +146,18 @@ struct ap_driver {
+>  	int (*probe)(struct ap_device *);
+>  	void (*remove)(struct ap_device *);
+>  	bool (*in_use)(unsigned long *apm, unsigned long *aqm);
+> +	/*
+> +	 * Called at the start of the ap bus scan function when
+> +	 * the crypto config information (qci) has changed.
+> +	 */
+> +	void (*on_config_changed)(struct ap_config_info *new_config_info,
+> +				  struct ap_config_info *old_config_info);
+> +	/*
+> +	 * Called at the end of the ap bus scan function when
+> +	 * the crypto config information (qci) has changed.
+> +	 */
+> +	void (*on_scan_complete)(struct ap_config_info *new_config_info,
+> +				 struct ap_config_info *old_config_info);
+>  };
+>  
+>  #define to_ap_drv(x) container_of((x), struct ap_driver, driver)
 
-* On a fault.
-* On an external abort.
-* When the buffer fills.
-* When software sets the service bit, PMBSR_EL1.S.
+Rest of this patch is vfio related and should be in a separate patch.
 
-Set up the buffer to trigger the events and check that they are reported
-correctly.
+Please note: The ap bus scan function does actively destroy card and associated queue
+devices when the TAPQ invocation tells that the function bits have changed (e.g. from
+EP11 mode to CCA mode) or the type has changed (e.g. from CEX6 to CEX7).
+This does not come with an change in the qci apm or adm bitfields !
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/spe.c         | 342 +++++++++++++++++++++++++++++++++++++++++++++-
- arm/unittests.cfg |   8 ++
- 2 files changed, 346 insertions(+), 4 deletions(-)
-
-diff --git a/arm/spe.c b/arm/spe.c
-index c199cd239194..c185883d079a 100644
---- a/arm/spe.c
-+++ b/arm/spe.c
-@@ -15,8 +15,10 @@
- #include <bitops.h>
- #include <devicetree.h>
- #include <libcflat.h>
-+#include <vmalloc.h>
- 
- #include <asm/gic.h>
-+#include <asm/mmu.h>
- #include <asm/processor.h>
- #include <asm/sysreg.h>
- 
-@@ -41,6 +43,44 @@
- #define SYS_PMSIDR_EL1_COUNTSIZE_SHIFT	16
- #define SYS_PMSIDR_EL1_COUNTSIZE_MASK	0xfUL
- 
-+#define SYS_PMSCR_EL1			sys_reg(3, 0, 9, 9, 0)
-+#define SYS_PMSCR_EL1_E1SPE_SHIFT	1
-+#define SYS_PMSCR_EL1_PA_SHIFT		4
-+#define SYS_PMSCR_EL1_TS_SHIFT		5
-+
-+#define SYS_PMSICR_EL1			sys_reg(3, 0, 9, 9, 2)
-+
-+#define SYS_PMSIRR_EL1			sys_reg(3, 0, 9, 9, 3)
-+#define SYS_PMSIRR_EL1_INTERVAL_SHIFT	8
-+#define SYS_PMSIRR_EL1_INTERVAL_MASK	0xffffffUL
-+
-+#define SYS_PMSFCR_EL1			sys_reg(3, 0, 9, 9, 4)
-+#define SYS_PMSFCR_EL1_FE_SHIFT		0
-+#define SYS_PMSFCR_EL1_FT_SHIFT		1
-+#define SYS_PMSFCR_EL1_FL_SHIFT		2
-+#define SYS_PMSFCR_EL1_B_SHIFT		16
-+#define SYS_PMSFCR_EL1_LD_SHIFT		17
-+#define SYS_PMSFCR_EL1_ST_SHIFT		18
-+
-+#define SYS_PMSEVFR_EL1			sys_reg(3, 0, 9, 9, 5)
-+#define SYS_PMSLATFR_EL1		sys_reg(3, 0, 9, 9, 6)
-+
-+#define SYS_PMBLIMITR_EL1		sys_reg(3, 0, 9, 10, 0)
-+#define SYS_PMBLIMITR_EL1_E_SHIFT	0
-+
-+#define SYS_PMBPTR_EL1			sys_reg(3, 0, 9, 10, 1)
-+
-+#define SYS_PMBSR_EL1			sys_reg(3, 0, 9, 10, 3)
-+#define SYS_PMBSR_EL1_S_SHIFT		17
-+#define SYS_PMBSR_EL1_EA_SHIFT		18
-+#define SYS_PMBSR_EL1_BSC_BUF_FULL	1
-+#define SYS_PMBSR_EL1_EC_SHIFT		26
-+#define SYS_PMBSR_EL1_EC_MASK		0x3fUL
-+#define SYS_PMBSR_EL1_EC_FAULT_S1	0x24
-+#define SYS_PMBSR_EL1_RES0		0x00000000fc0fffffUL
-+
-+#define psb_csync()			asm volatile("hint #17" : : : "memory")
-+
- struct spe {
- 	uint32_t intid;
- 	int min_interval;
-@@ -53,6 +93,15 @@ struct spe {
- };
- static struct spe spe;
- 
-+struct spe_buffer {
-+	uint64_t base;
-+	uint64_t limit;
-+};
-+static struct spe_buffer buffer;
-+
-+static volatile bool pmbirq_asserted, reassert_irq;
-+static volatile uint64_t irq_pmbsr;
-+
- static int spe_min_interval(uint8_t interval)
- {
- 	switch (interval) {
-@@ -131,6 +180,273 @@ static bool spe_probe(void)
- 	return true;
- }
- 
-+/*
-+ * Resets and starts a profiling session. Must be called with sampling and
-+ * buffer disabled.
-+ */
-+static void spe_reset_and_start(struct spe_buffer *spe_buffer)
-+{
-+	uint64_t pmscr;
-+
-+	assert(spe_buffer->base);
-+	assert(spe_buffer->limit > spe_buffer->base);
-+
-+	write_sysreg_s(spe_buffer->base, SYS_PMBPTR_EL1);
-+	/* Change the buffer pointer before PMBLIMITR_EL1. */
-+	isb();
-+
-+	write_sysreg_s(spe_buffer->limit | BIT(SYS_PMBLIMITR_EL1_E_SHIFT),
-+		       SYS_PMBLIMITR_EL1);
-+	write_sysreg_s(0, SYS_PMBSR_EL1);
-+	write_sysreg_s(0, SYS_PMSICR_EL1);
-+	/* PMSICR_EL1 must be written to zero before a new sampling session. */
-+	isb();
-+
-+	pmscr = BIT(SYS_PMSCR_EL1_E1SPE_SHIFT) |
-+		BIT(SYS_PMSCR_EL1_PA_SHIFT) |
-+		BIT(SYS_PMSCR_EL1_TS_SHIFT);
-+	write_sysreg_s(pmscr, SYS_PMSCR_EL1);
-+	isb();
-+}
-+
-+static void spe_stop_and_drain(void)
-+{
-+	write_sysreg_s(0, SYS_PMSCR_EL1);
-+	isb();
-+
-+	psb_csync();
-+	dsb(nsh);
-+	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
-+	isb();
-+}
-+
-+static void spe_irq_handler(struct pt_regs *regs)
-+{
-+	uint32_t intid = gic_read_iar();
-+
-+	spe_stop_and_drain();
-+
-+	irq_pmbsr = read_sysreg_s(SYS_PMBSR_EL1);
-+
-+	if (intid != PPI(spe.intid)) {
-+		report_info("Unexpected interrupt: %u", intid);
-+		/*
-+		 * When we get the interrupt, at least one bit, PMBSR_EL1.S,
-+		 * will be set. We can the value zero for an error.
-+		 */
-+		irq_pmbsr = 0;
-+		goto out;
-+	}
-+
-+	if (irq_pmbsr && reassert_irq) {
-+		/*
-+		 * Don't clear the service bit now, but ack the interrupt so it
-+		 * can be handled again.
-+		 */
-+		gic_write_eoir(intid);
-+		reassert_irq = false;
-+		irq_pmbsr = 0;
-+		return;
-+	}
-+
-+out:
-+	write_sysreg_s(0, SYS_PMBSR_EL1);
-+	/* Clear PMBSR_EL1 before EOI'ing the interrupt */
-+	isb();
-+	gic_write_eoir(intid);
-+
-+	pmbirq_asserted = true;
-+}
-+
-+static void spe_enable_interrupt(void)
-+{
-+	void *gic_isenabler;
-+
-+	switch (gic_version()) {
-+	case 2:
-+		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-+		break;
-+	case 3:
-+		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
-+		break;
-+	default:
-+		report_abort("Unknown GIC version %d", gic_version());
-+	}
-+
-+	writel(1 << PPI(spe.intid), gic_isenabler);
-+}
-+
-+static void spe_init(void)
-+{
-+	uint64_t pmsfcr, pmsirr;
-+
-+	/*
-+	 * PMSCR_EL1.E1SPE resets to UNKNOWN value, make sure sampling is
-+	 * disabled.
-+	 */
-+	write_sysreg_s(0, SYS_PMSCR_EL1);
-+	isb();
-+
-+	install_irq_handler(EL1H_IRQ, spe_irq_handler);
-+
-+	gic_enable_defaults();
-+	spe_enable_interrupt();
-+	local_irq_enable();
-+
-+	buffer.base = (u64)memalign(PAGE_SIZE, PAGE_SIZE);
-+	assert_msg(buffer.base, "Cannot allocate profiling buffer");
-+	buffer.limit = buffer.base + PAGE_SIZE;
-+
-+	/* Select all operations for sampling */
-+	pmsfcr = BIT(SYS_PMSFCR_EL1_FT_SHIFT) |
-+		 BIT(SYS_PMSFCR_EL1_B_SHIFT) |
-+		 BIT(SYS_PMSFCR_EL1_LD_SHIFT) |
-+		 BIT(SYS_PMSFCR_EL1_ST_SHIFT);
-+	write_sysreg_s(pmsfcr, SYS_PMSFCR_EL1);
-+
-+	/*
-+	 * From ARM DDI 0487F.b: "[..] Software should set this to a value
-+	 * greater than the minimum indicated by PMSIDR_EL1.Interval"
-+	 */
-+	pmsirr = (spe.min_interval + 1) & SYS_PMSIRR_EL1_INTERVAL_MASK;
-+	pmsirr <<= SYS_PMSIRR_EL1_INTERVAL_SHIFT;
-+	write_sysreg_s(pmsirr, SYS_PMSIRR_EL1);
-+	isb();
-+}
-+
-+static bool spe_test_buffer_service(void)
-+{
-+	uint64_t expected_pmbsr;
-+	int i;
-+
-+	spe_stop_and_drain();
-+
-+	reassert_irq = true;
-+	pmbirq_asserted = false;
-+
-+	expected_pmbsr = 0x12345678 | BIT(SYS_PMBSR_EL1_S_SHIFT);
-+	expected_pmbsr &= SYS_PMBSR_EL1_RES0;
-+
-+	/*
-+	 * ARM DDI 0487F.b, page D9-2803:
-+	 *
-+	 * "PMBIRQ is a level-sensitive interrupt request driven by PMBSR_EL1.S.
-+	 * This means that a direct write that sets PMBSR_EL1.S to 1 causes the
-+	 * interrupt to be asserted, and PMBIRQ remains asserted until software
-+	 * clears PMBSR_EL1.S to 0."
-+	 */
-+	 write_sysreg_s(expected_pmbsr, SYS_PMBSR_EL1);
-+	 isb();
-+
-+	/* Wait for up to 1 second for the GIC to assert the interrupt. */
-+	for (i = 0; i < 10; i++) {
-+		if (pmbirq_asserted)
-+			break;
-+		mdelay(100);
-+	}
-+	reassert_irq = false;
-+
-+	return irq_pmbsr == expected_pmbsr;
-+}
-+
-+static bool spe_test_buffer_full(void)
-+{
-+	volatile uint64_t cnt = 0;
-+	uint64_t expected_pmbsr, pmbptr;
-+
-+	spe_stop_and_drain();
-+
-+	pmbirq_asserted = false;
-+	expected_pmbsr = BIT(SYS_PMBSR_EL1_S_SHIFT) | SYS_PMBSR_EL1_BSC_BUF_FULL;
-+
-+	spe_reset_and_start(&buffer);
-+	for (;;) {
-+		cnt++;
-+		if (pmbirq_asserted)
-+			break;
-+	}
-+
-+	pmbptr = read_sysreg_s(SYS_PMBPTR_EL1);
-+	/*
-+	 * ARM DDI 0487F.b, page D9-2804:
-+	 *
-+	 * "[..] the Profiling Buffer management event is generated when the PE
-+	 * writes past the write limit pointer minus 2^(PMSIDR_EL1.MaxSize)."
-+	 */
-+	return (pmbptr >= buffer.limit - spe.max_record_size) &&
-+		(irq_pmbsr == expected_pmbsr);
-+}
-+
-+static bool spe_test_buffer_stage1_dabt(void)
-+{
-+	volatile uint64_t cnt = 0;
-+	struct spe_buffer dabt_buffer;
-+	uint8_t pmbsr_ec;
-+
-+	spe_stop_and_drain();
-+
-+	dabt_buffer.base = (u64)memalign(PAGE_SIZE, PAGE_SIZE);
-+	assert_msg(dabt_buffer.base, "Cannot allocate profiling buffer");
-+	dabt_buffer.limit = dabt_buffer.base + PAGE_SIZE;
-+	mmu_unmap_page(current_thread_info()->pgtable, dabt_buffer.base);
-+
-+	pmbirq_asserted = false;
-+
-+	spe_reset_and_start(&dabt_buffer);
-+	for (;;) {
-+		cnt++;
-+		if (pmbirq_asserted)
-+			break;
-+	}
-+
-+	pmbsr_ec = (irq_pmbsr >> SYS_PMBSR_EL1_EC_SHIFT) & SYS_PMBSR_EL1_EC_MASK;
-+	return (irq_pmbsr & BIT(SYS_PMBSR_EL1_S_SHIFT)) &&
-+		(pmbsr_ec == SYS_PMBSR_EL1_EC_FAULT_S1);
-+}
-+
-+static bool spe_test_buffer_extabt(void)
-+{
-+	struct spe_buffer extabt_buffer;
-+	volatile uint64_t cnt = 0;
-+	phys_addr_t highest_end = 0;
-+	struct mem_region *r;
-+
-+	spe_stop_and_drain();
-+
-+	/*
-+	 * Find a physical address most likely to be absent from the stage 2
-+	 * tables. Full explanation in arm/selftest.c, in check_pabt_init().
-+	 */
-+	for (r = mem_regions; r->end; r++) {
-+		if (r->flags & MR_F_IO)
-+			continue;
-+		if (r->end > highest_end)
-+			highest_end = PAGE_ALIGN(r->end);
-+	}
-+
-+	if (mem_region_get_flags(highest_end) != MR_F_UNKNOWN)
-+		return false;
-+
-+	extabt_buffer.base = (u64)vmap(highest_end, PAGE_SIZE);
-+	extabt_buffer.limit = extabt_buffer.base + PAGE_SIZE;
-+
-+	pmbirq_asserted = false;
-+
-+	report_info("Expecting KVM Stage 2 Data Abort at pmbptr=0x%lx",
-+			extabt_buffer.base);
-+
-+	spe_reset_and_start(&extabt_buffer);
-+	for (;;) {
-+		cnt++;
-+		if (pmbirq_asserted)
-+			break;
-+	}
-+
-+	return (irq_pmbsr & BIT(SYS_PMBSR_EL1_S_SHIFT)) &&
-+		(irq_pmbsr & BIT(SYS_PMBSR_EL1_EA_SHIFT));
-+
-+}
-+
- static void spe_test_introspection(void)
- {
- 	report_prefix_push("spe-introspection");
-@@ -146,8 +462,22 @@ static void spe_test_introspection(void)
- 	report_prefix_pop();
- }
- 
-+static void spe_test_buffer(void)
-+{
-+	report_prefix_push("spe-buffer");
-+
-+	report(spe_test_buffer_service(), "Service management event");
-+	report(spe_test_buffer_full(), "Buffer full management event");
-+	report(spe_test_buffer_stage1_dabt(), "Stage 1 data abort management event");
-+	report(spe_test_buffer_extabt(), "Buffer external abort management event");
-+
-+	report_prefix_pop();
-+}
-+
- int main(int argc, char *argv[])
- {
-+	int i;
-+
- 	if (!spe_probe()) {
- 		report_skip("SPE not supported");
- 		return report_summary();
-@@ -161,12 +491,16 @@ int main(int argc, char *argv[])
- 	if (argc < 2)
- 		report_abort("no test specified");
- 
-+	spe_init();
-+
- 	report_prefix_push("spe");
- 
--	if (strcmp(argv[1], "spe-introspection") == 0)
--		spe_test_introspection();
--	else
--		report_abort("Unknown subtest '%s'", argv[1]);
-+	for (i = 1; i < argc; i++) {
-+		if (strcmp(argv[i], "spe-introspection") == 0)
-+			spe_test_introspection();
-+		if (strcmp(argv[i], "spe-buffer") == 0)
-+			spe_test_buffer();
-+	}
- 
- 	return report_summary();
- }
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index ad10be123774..ba21421e81aa 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -141,6 +141,14 @@ arch = arm64
- accel = kvm
- extra_params = -append 'spe-introspection'
- 
-+[spe-buffer]
-+file = spe.flat
-+groups = spe
-+arch = arm64
-+timeout = 10s
-+accel = kvm
-+extra_params = -append 'spe-buffer'
-+
- # Test GIC emulation
- [gicv2-ipi]
- file = gic.flat
--- 
-2.29.1
-
+> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> index 8934471b7944..f06e19754de3 100644
+> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> @@ -87,7 +87,7 @@ static int vfio_ap_matrix_dev_create(void)
+>  
+>  	/* Fill in config info via PQAP(QCI), if available */
+>  	if (test_facility(12)) {
+> -		ret = ap_qci(&matrix_dev->info);
+> +		ret = ap_qci(&matrix_dev->config_info);
+>  		if (ret)
+>  			goto matrix_alloc_err;
+>  	}
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index dae1fba41941..c4ea80ec8599 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -354,8 +354,9 @@ static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>  	}
+>  
+>  	matrix_mdev->mdev = mdev;
+> -	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
+> -	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_apcb);
+> +	vfio_ap_matrix_init(&matrix_dev->config_info, &matrix_mdev->matrix);
+> +	vfio_ap_matrix_init(&matrix_dev->config_info,
+> +			    &matrix_mdev->shadow_apcb);
+>  	hash_init(matrix_mdev->qtable);
+>  	mdev_set_drvdata(mdev, matrix_mdev);
+>  	matrix_mdev->pqap_hook.hook = handle_pqap;
+> @@ -540,8 +541,8 @@ static int vfio_ap_mdev_filter_guest_matrix(struct ap_matrix_mdev *matrix_mdev,
+>  		 * If the APID is not assigned to the host AP configuration,
+>  		 * we can not assign it to the guest's AP configuration
+>  		 */
+> -		if (!test_bit_inv(apid,
+> -				  (unsigned long *)matrix_dev->info.apm)) {
+> +		if (!test_bit_inv(apid, (unsigned long *)
+> +				  matrix_dev->config_info.apm)) {
+>  			clear_bit_inv(apid, shadow_apcb.apm);
+>  			continue;
+>  		}
+> @@ -554,7 +555,7 @@ static int vfio_ap_mdev_filter_guest_matrix(struct ap_matrix_mdev *matrix_mdev,
+>  			 * guest's AP configuration
+>  			 */
+>  			if (!test_bit_inv(apqi, (unsigned long *)
+> -					  matrix_dev->info.aqm)) {
+> +					  matrix_dev->config_info.aqm)) {
+>  				clear_bit_inv(apqi, shadow_apcb.aqm);
+>  				continue;
+>  			}
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index fc8634cee485..5065f0367ea2 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -40,7 +40,7 @@
+>  struct ap_matrix_dev {
+>  	struct device device;
+>  	atomic_t available_instances;
+> -	struct ap_config_info info;
+> +	struct ap_config_info config_info;
+>  	struct list_head mdev_list;
+>  	struct mutex lock;
+>  	struct ap_driver  *vfio_ap_drv;
