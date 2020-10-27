@@ -2,50 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CC1929BE90
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 17:57:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1034029BDF6
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 17:50:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1813379AbgJ0Qvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 12:51:31 -0400
-Received: from mail-qv1-f74.google.com ([209.85.219.74]:45665 "EHLO
-        mail-qv1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1813381AbgJ0Qtz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 12:49:55 -0400
-Received: by mail-qv1-f74.google.com with SMTP id eh4so1152267qvb.12
-        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 09:49:54 -0700 (PDT)
+        id S1813402AbgJ0QuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 12:50:00 -0400
+Received: from mail-pf1-f201.google.com ([209.85.210.201]:56178 "EHLO
+        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1813387AbgJ0Qt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 12:49:56 -0400
+Received: by mail-pf1-f201.google.com with SMTP id z12so1236574pfa.22
+        for <kvm@vger.kernel.org>; Tue, 27 Oct 2020 09:49:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=U+Sl1viisZnw2P5KbSyNcmWeiRs170Jsspt/5pdErgI=;
-        b=DubVR4RdHZixj/MazoAiQa7LsELMe7q1j1wcRQtxAhIt8M0+qeroeNmHD6iw8d0SoT
-         Vn9FoAs+W07E50WA9CmV1mSfGy6K9ZbVSsWhc83TFGc3jV6w53F2n366neyttweh3dMC
-         mFbA15X775tTR+yX4VtaX4HIjQy7TPDPbadAdDGwC3hLD7enHNYSVpcF2PTrNXgWk2lm
-         YRXwQNnH9+wgtv0BUvufXORocXPacbXMEaWP8I8UYasrW2d4p/OMRlKVZ+owH6CUStUz
-         C3PQ+xNz7nbT91DarInhuvcueeYKu2UhcJtdSRJdvblc8c8upj4QCiB3TNx3oHKD7atD
-         DakA==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=nuxxs/Px/9QpRIlm7J+PyL0HWcASsbcWXqWCTDpjZLY=;
+        b=SGQLLWiB+LUjaqR1TSdlpCpxrsi+POAiH2xjFLEZiQ/Wy8axJ7MQAwv6yJG4RQFjVH
+         2Bde6HUbl3/5tLJBqO2GGocfLTNhD4piiEGuFcTE3tNlCR/vOkEweNCcRo8i7U2fOu0+
+         UigavmfeQIAdOyfoCOq2wOlrR79bpk/B9bpd91hzS8apgFhVrwDZTlzlp/XoK5RIrc7U
+         EgtcREjXUgluwLgZ/dBJ5fEwwxTQeMMERb5hdHFyDyg3jdX/f8TcLnKuVuBqHWDSO/Vf
+         KMxOlowmn6ogA67Z+poRwIIIfbhDDnFdxm80hDvd3shtA5cXQWT1psAvvLBLUm4epcsX
+         KbqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=U+Sl1viisZnw2P5KbSyNcmWeiRs170Jsspt/5pdErgI=;
-        b=C+Itt6qiaXulR5+NOD9oCOFbyh/pxBcrsTO7BOscY/WhgIznnMHlYP8/DaA/b7KLGj
-         BQCNmt4+msmHXSh5hZz3jKFJDE/N2F4AU7tBUvf8jWqBMyl4gRtn64METwkJeHEVhcFy
-         y7SB61tGT0a13zu8VJg+cnVpoB3dmahhOOULRNIXUku0TsTXNtErPlHYiKH+r/sTi/E0
-         St13ehhTCQDkHfB1Oxa2E2I1bkqlJPhCQrF9/8DAufAymSHzTIpy1K1O0h5lvAk+D89b
-         ZhwJBaAtfAh9QCFJx3m1IM+znM/IImHyz4X9DV4aT3+nkR2JYpSjNaMtOD3LxNm4LFLr
-         LQqA==
-X-Gm-Message-State: AOAM532HtOC3ArlFBgB7WUeDaQM/cESpm3tZy1l7nxoqMD1vADPNC6s7
-        8MgocIOR3wS3jezI72BNThjXysGD23oC
-X-Google-Smtp-Source: ABdhPJy7jmfOQfx/bywu9bX0ELil5fzyHmKvy6d8QjRjocYnZAR09IfqYu76mv2cNBj5hnzjZWSZp9IUjefG
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=nuxxs/Px/9QpRIlm7J+PyL0HWcASsbcWXqWCTDpjZLY=;
+        b=fKmZDW1FcbmHankkzPpMfkuI4i/VlE/z/YcGk5QDJdXIdHnygfsv8g3rDhzsOa8NLh
+         0QZVqgtJA5J14CjmEBWTabQ/3VD3grEJySzeoGBN8QHIaNjqGEb/Tgk/e37mKbK7M5QZ
+         w5fpfSafRx6uVZmm9zKPhmToZW/gLXIe7F+ik6nWmqEokjENcLCVaiRno40Txc2dNLIx
+         xMJe4dc2FU55J8IZ2IqAU7HEqszMVD7xqKdULMKU4kfeLh0MoqZwspUbdQ4vFxgnoqZd
+         jcDvxNUTQQDHnrZH7fNQF5wKdyfiLZ1RjiEISbh2bB8xKY35Fhwl2Z6LEgU8a32CUo2b
+         6ohQ==
+X-Gm-Message-State: AOAM530+bycxUJcG7NQglh6GCeMp64KVx/Ui5/R+7eZFuSzKG0/LCGlV
+        scvnHdgrWvmuVxCCIOMVvceZNcto37Rn
+X-Google-Smtp-Source: ABdhPJzT7GGtUaXKyrFhHPKMnptHgg3JCdWq1CQfBl6a05IhJ1AanAbFiyvdLmOm1ZktrH0sdKOH1g5fzZjb
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a0c:aa98:: with SMTP id
- f24mr3241618qvb.62.1603817394270; Tue, 27 Oct 2020 09:49:54 -0700 (PDT)
-Date:   Tue, 27 Oct 2020 09:49:48 -0700
-Message-Id: <20201027164950.1057601-1-bgardon@google.com>
+ (user=bgardon job=sendgmr) by 2002:a62:8097:0:b029:153:ce1d:c46 with SMTP id
+ j145-20020a6280970000b0290153ce1d0c46mr3179460pfd.68.1603817395887; Tue, 27
+ Oct 2020 09:49:55 -0700 (PDT)
+Date:   Tue, 27 Oct 2020 09:49:49 -0700
+In-Reply-To: <20201027164950.1057601-1-bgardon@google.com>
+Message-Id: <20201027164950.1057601-2-bgardon@google.com>
 Mime-Version: 1.0
+References: <20201027164950.1057601-1-bgardon@google.com>
 X-Mailer: git-send-email 2.29.0.rc2.309.g374f81d7ae-goog
-Subject: [PATCH 1/3] locking/rwlocks: Add contention detection for rwlocks
+Subject: [PATCH 2/3] sched: Add needbreak for rwlocks
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -61,69 +65,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-rwlocks do not currently have any facility to detect contention
-like spinlocks do. In order to allow users of rwlocks to better manage
-latency, add contention detection for queued rwlocks.
+Contention awareness while holding a spin lock is essential for reducing
+latency when long running kernel operations can hold that lock. Add the
+same contention detection interface for read/write spin locks.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- include/asm-generic/qrwlock.h | 23 +++++++++++++++++------
- include/linux/rwlock.h        |  7 +++++++
- 2 files changed, 24 insertions(+), 6 deletions(-)
+ include/linux/sched.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/include/asm-generic/qrwlock.h b/include/asm-generic/qrwlock.h
-index 3aefde23dceab..c4be4673a6ab2 100644
---- a/include/asm-generic/qrwlock.h
-+++ b/include/asm-generic/qrwlock.h
-@@ -116,15 +116,26 @@ static inline void queued_write_unlock(struct qrwlock *lock)
- 	smp_store_release(&lock->wlocked, 0);
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 063cd120b4593..77179160ec3ab 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1870,6 +1870,23 @@ static inline int spin_needbreak(spinlock_t *lock)
+ #endif
  }
  
-+/**
-+ * queued_rwlock_is_contended - check if the lock is contended
-+ * @lock : Pointer to queue rwlock structure
-+ * Return: 1 if lock contended, 0 otherwise
++/*
++ * Check if a rwlock is contended.
++ * Returns non-zero if there is another task waiting on the rwlock.
++ * Returns zero if the lock is not contended or the system / underlying
++ * rwlock implementation does not support contention detection.
++ * Technically does not depend on CONFIG_PREEMPTION, but a general need
++ * for low latency.
 + */
-+static inline int queued_rwlock_is_contended(struct qrwlock *lock)
++static inline int rwlock_needbreak(rwlock_t *lock)
 +{
-+	return arch_spin_is_locked(&lock->wait_lock);
++#ifdef CONFIG_PREEMPTION
++	return rwlock_is_contended(lock);
++#else
++	return 0;
++#endif
 +}
 +
- /*
-  * Remapping rwlock architecture specific functions to the corresponding
-  * queue rwlock functions.
-  */
--#define arch_read_lock(l)	queued_read_lock(l)
--#define arch_write_lock(l)	queued_write_lock(l)
--#define arch_read_trylock(l)	queued_read_trylock(l)
--#define arch_write_trylock(l)	queued_write_trylock(l)
--#define arch_read_unlock(l)	queued_read_unlock(l)
--#define arch_write_unlock(l)	queued_write_unlock(l)
-+#define arch_read_lock(l)		queued_read_lock(l)
-+#define arch_write_lock(l)		queued_write_lock(l)
-+#define arch_read_trylock(l)		queued_read_trylock(l)
-+#define arch_write_trylock(l)		queued_write_trylock(l)
-+#define arch_read_unlock(l)		queued_read_unlock(l)
-+#define arch_write_unlock(l)		queued_write_unlock(l)
-+#define arch_rwlock_is_contended(l)	queued_rwlock_is_contended(l)
- 
- #endif /* __ASM_GENERIC_QRWLOCK_H */
-diff --git a/include/linux/rwlock.h b/include/linux/rwlock.h
-index 3dcd617e65ae9..7ce9a51ae5c04 100644
---- a/include/linux/rwlock.h
-+++ b/include/linux/rwlock.h
-@@ -128,4 +128,11 @@ do {								\
- 	1 : ({ local_irq_restore(flags); 0; }); \
- })
- 
-+#ifdef arch_rwlock_is_contended
-+#define rwlock_is_contended(lock) \
-+	 arch_rwlock_is_contended(&(lock)->raw_lock)
-+#else
-+#define rwlock_is_contended(lock)	((void)(lock), 0)
-+#endif /* arch_rwlock_is_contended */
-+
- #endif /* __LINUX_RWLOCK_H */
+ static __always_inline bool need_resched(void)
+ {
+ 	return unlikely(tif_need_resched());
 -- 
 2.29.0.rc2.309.g374f81d7ae-goog
 
