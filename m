@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A37AE29CB24
-	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 22:23:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EFA929CB25
+	for <lists+kvm@lfdr.de>; Tue, 27 Oct 2020 22:23:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S373787AbgJ0VXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Oct 2020 17:23:53 -0400
-Received: from mga02.intel.com ([134.134.136.20]:56183 "EHLO mga02.intel.com"
+        id S373810AbgJ0VXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Oct 2020 17:23:55 -0400
+Received: from mga02.intel.com ([134.134.136.20]:56181 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S373768AbgJ0VXw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Oct 2020 17:23:52 -0400
-IronPort-SDR: MjnUB3EqW/biV6+XQZAVlgUgfzJCSMlWuMBiYh+7SKOsubFq4iD8kywFH96SoJNFNAtzixva6O
- BKGmfpSYjrYw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9787"; a="155133700"
+        id S373785AbgJ0VXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Oct 2020 17:23:53 -0400
+IronPort-SDR: RZibVdc4dnmYffmCUifUdVynpU9G8w2Vry/M3x+RjFsBYyqRci39UU1TKWcskdUWxyPPI2DOEk
+ sNOzQWXiLqzw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9787"; a="155133702"
 X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
-   d="scan'208";a="155133700"
+   d="scan'208";a="155133702"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2020 14:23:50 -0700
-IronPort-SDR: 3UozLD4kj4WnCWtLJ7DqPUL0Cpp8zQELJIy/Gr/IV75Ox6lYLnHHhqYtpMhw50iNRpXhqWMM6l
- 8UsKHQmoMRiA==
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2020 14:23:51 -0700
+IronPort-SDR: HuWIfKBYzUUNIzP4fzVRUsi67CoH9FVWx458ywP6L2Tx4VKKlA78Llt08h2KTbSqwbMfDUFCy1
+ uJAcxh3LDWMA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,424,1596524400"; 
-   d="scan'208";a="524886379"
+   d="scan'208";a="524886386"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
   by fmsmga006.fm.intel.com with ESMTP; 27 Oct 2020 14:23:50 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -35,9 +35,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 02/11] KVM: VMX: Track common EPTP for Hyper-V's paravirt TLB flush
-Date:   Tue, 27 Oct 2020 14:23:37 -0700
-Message-Id: <20201027212346.23409-3-sean.j.christopherson@intel.com>
+Subject: [PATCH v3 04/11] KVM: VMX: Fold Hyper-V EPTP checking into it's only caller
+Date:   Tue, 27 Oct 2020 14:23:39 -0700
+Message-Id: <20201027212346.23409-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201027212346.23409-1-sean.j.christopherson@intel.com>
 References: <20201027212346.23409-1-sean.j.christopherson@intel.com>
@@ -47,96 +47,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Explicitly track the EPTP that is common to all vCPUs instead of
-grabbing vCPU0's EPTP when invoking Hyper-V's paravirt TLB flush.
-Tracking the EPTP will allow optimizing the checks when loading a new
-EPTP and will also allow dropping ept_pointer_match, e.g. by marking
-the common EPTP as invalid.
+Fold check_ept_pointer_match() into hv_remote_flush_tlb_with_range() in
+preparation for combining the kvm_for_each_vcpu loops of the ==CHECK and
+!=MATCH statements.
 
-This also technically fixes a bug where KVM could theoretically flush an
-invalid GPA if all vCPUs have an invalid root.  In practice, it's likely
-impossible to trigger a remote TLB flush in such a scenario.  In any
-case, the superfluous flush is completely benign.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 20 +++++++++-----------
- arch/x86/kvm/vmx/vmx.h |  1 +
- 2 files changed, 10 insertions(+), 11 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 44 +++++++++++++++++++-----------------------
+ 1 file changed, 20 insertions(+), 24 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 273a3206cef7..ebc87df4da4d 100644
+index a6442a861ffc..f5e9e2f61e10 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -483,12 +483,14 @@ static void check_ept_pointer_match(struct kvm *kvm)
- 		if (!VALID_PAGE(tmp_eptp)) {
- 			tmp_eptp = to_vmx(vcpu)->ept_pointer;
- 		} else if (tmp_eptp != to_vmx(vcpu)->ept_pointer) {
-+			to_kvm_vmx(kvm)->hv_tlb_eptp = INVALID_PAGE;
- 			to_kvm_vmx(kvm)->ept_pointers_match
- 				= EPT_POINTERS_MISMATCH;
- 			return;
- 		}
- 	}
+@@ -472,28 +472,6 @@ static const u32 vmx_uret_msrs_list[] = {
+ static bool __read_mostly enlightened_vmcs = true;
+ module_param(enlightened_vmcs, bool, 0444);
  
-+	to_kvm_vmx(kvm)->hv_tlb_eptp = tmp_eptp;
- 	to_kvm_vmx(kvm)->ept_pointers_match = EPT_POINTERS_MATCH;
- }
- 
-@@ -501,21 +503,18 @@ static int kvm_fill_hv_flush_list_func(struct hv_guest_mapping_flush_list *flush
- 			range->pages);
- }
- 
--static inline int __hv_remote_flush_tlb_with_range(struct kvm *kvm,
--		struct kvm_vcpu *vcpu, struct kvm_tlb_range *range)
-+static inline int hv_remote_flush_eptp(u64 eptp, struct kvm_tlb_range *range)
- {
--	u64 ept_pointer = to_vmx(vcpu)->ept_pointer;
+-/* check_ept_pointer() should be under protection of ept_pointer_lock. */
+-static void check_ept_pointer_match(struct kvm *kvm)
+-{
+-	struct kvm_vcpu *vcpu;
+-	u64 tmp_eptp = INVALID_PAGE;
+-	int i;
 -
- 	/*
- 	 * FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE hypercall needs address
- 	 * of the base of EPT PML4 table, strip off EPT configuration
- 	 * information.
- 	 */
- 	if (range)
--		return hyperv_flush_guest_mapping_range(ept_pointer & PAGE_MASK,
-+		return hyperv_flush_guest_mapping_range(eptp & PAGE_MASK,
- 				kvm_fill_hv_flush_list_func, (void *)range);
- 	else
--		return hyperv_flush_guest_mapping(ept_pointer & PAGE_MASK);
-+		return hyperv_flush_guest_mapping(eptp & PAGE_MASK);
- }
+-	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		if (!VALID_PAGE(tmp_eptp)) {
+-			tmp_eptp = to_vmx(vcpu)->ept_pointer;
+-		} else if (tmp_eptp != to_vmx(vcpu)->ept_pointer) {
+-			to_kvm_vmx(kvm)->hv_tlb_eptp = INVALID_PAGE;
+-			to_kvm_vmx(kvm)->ept_pointers_match
+-				= EPT_POINTERS_MISMATCH;
+-			return;
+-		}
+-	}
+-
+-	to_kvm_vmx(kvm)->hv_tlb_eptp = tmp_eptp;
+-	to_kvm_vmx(kvm)->ept_pointers_match = EPT_POINTERS_MATCH;
+-}
+-
+ static int kvm_fill_hv_flush_list_func(struct hv_guest_mapping_flush_list *flush,
+ 		void *data)
+ {
+@@ -523,11 +501,29 @@ static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
+ 	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
+ 	struct kvm_vcpu *vcpu;
+ 	int ret = 0, i;
++	u64 tmp_eptp;
  
- static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
-@@ -533,12 +532,11 @@ static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
+ 	spin_lock(&kvm_vmx->ept_pointer_lock);
+ 
+-	if (kvm_vmx->ept_pointers_match == EPT_POINTERS_CHECK)
+-		check_ept_pointer_match(kvm);
++	if (kvm_vmx->ept_pointers_match == EPT_POINTERS_CHECK) {
++		kvm_vmx->ept_pointers_match = EPT_POINTERS_MATCH;
++		kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
++
++		kvm_for_each_vcpu(i, vcpu, kvm) {
++			tmp_eptp = to_vmx(vcpu)->ept_pointer;
++			if (!VALID_PAGE(tmp_eptp))
++				continue;
++
++			if (!VALID_PAGE(kvm_vmx->hv_tlb_eptp)) {
++				kvm_vmx->hv_tlb_eptp = tmp_eptp;
++			} else if (kvm_vmx->hv_tlb_eptp != tmp_eptp) {
++				kvm_vmx->hv_tlb_eptp = INVALID_PAGE;
++				kvm_vmx->ept_pointers_match
++					= EPT_POINTERS_MISMATCH;
++				break;
++			}
++		}
++	}
+ 
+ 	if (kvm_vmx->ept_pointers_match != EPT_POINTERS_MATCH) {
  		kvm_for_each_vcpu(i, vcpu, kvm) {
- 			/* If ept_pointer is invalid pointer, bypass flush request. */
- 			if (VALID_PAGE(to_vmx(vcpu)->ept_pointer))
--				ret |= __hv_remote_flush_tlb_with_range(
--					kvm, vcpu, range);
-+				ret |= hv_remote_flush_eptp(to_vmx(vcpu)->ept_pointer,
-+							    range);
- 		}
--	} else {
--		ret = __hv_remote_flush_tlb_with_range(kvm,
--				kvm_get_vcpu(kvm, 0), range);
-+	} else if (VALID_PAGE(to_kvm_vmx(kvm)->hv_tlb_eptp)) {
-+		ret = hv_remote_flush_eptp(to_kvm_vmx(kvm)->hv_tlb_eptp, range);
- 	}
- 
- 	spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index a2d143276603..9a25e83f8b96 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -301,6 +301,7 @@ struct kvm_vmx {
- 	bool ept_identity_pagetable_done;
- 	gpa_t ept_identity_map_addr;
- 
-+	hpa_t hv_tlb_eptp;
- 	enum ept_pointers_status ept_pointers_match;
- 	spinlock_t ept_pointer_lock;
- };
 -- 
 2.28.0
 
