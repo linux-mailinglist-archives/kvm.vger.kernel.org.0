@@ -2,122 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77EF429D849
-	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 23:31:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 550B129DA76
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 00:23:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387848AbgJ1WbI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Oct 2020 18:31:08 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:6922 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387840AbgJ1WbI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:31:08 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CLfrb6RKpz6yy4;
-        Wed, 28 Oct 2020 15:11:43 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 28 Oct 2020 15:11:30 +0800
-Message-ID: <5F9919A2.9080205@huawei.com>
-Date:   Wed, 28 Oct 2020 15:11:30 +0800
-From:   AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+        id S2390312AbgJ1XXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Oct 2020 19:23:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36190 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390165AbgJ1XWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Oct 2020 19:22:16 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF17C0613D1
+        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 16:22:15 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id e15so743693pfh.6
+        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 16:22:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XZwWBaJ1YP4eUG0jbcZ/VfZJQEUP/FvDuE+Dcr6WVrA=;
+        b=gkFHJe+kUFXAxf/8vOsy2x4sDIItYYYD9odc8xSFN7m2g8lYwKR38kgfTf8zfvYvs7
+         yBKIMBqXPuX18tqVHBX3qCSclcuf06y4SGir3XllY4gvU+rJ7oabXjMnWHBu3qRHCt+g
+         XDQ0BDU+YDLpbohWX+lRIQe1zsidFRDvJAehw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XZwWBaJ1YP4eUG0jbcZ/VfZJQEUP/FvDuE+Dcr6WVrA=;
+        b=QKvxe30WOPdcuGFgAb7T8s/8qj9Jk0Kuy2EsVofW7NWipr4ZXnymrFfPaAP6qPlUwn
+         Z1/S+nJuAC0ZKB8r2Cr3vZM3NVFNguaF2AfqlVZe29qdGnwoLAQAlu2mNwopghpo4LqV
+         YQWDvfTatEBKQMZI74MQ5gb58UX3Vgg0dVxDx8yBNWr3PKBH1ztR7gAcQVe1VN+L60mP
+         r4Nv3t+xwBFrqcR+OQDOrjzfoHN8xNAgj7EXE5bEyWOa4lvC1TQySDlWVVjioZIq6rHA
+         ukv3RfBV7FKq3iu9GknONzLAPB7HbkwAq0HZARm659c/UMuLNV46LuIWBOLlDI+nesbQ
+         4r9Q==
+X-Gm-Message-State: AOAM5336D8nZCASoULoC8mN4lsgrTXNW9S3tgV2TlEV6wybBrmezG9hM
+        DuqyyzH9Zhc0UNop3k3qKTJB+Q==
+X-Google-Smtp-Source: ABdhPJzIxT8kqv3hOAn/eutFdfJq4DAebLsNkfJ0qK4xV8rTZ+MoJFaBn7qxZgXgYmjQNvnQLalLqg==
+X-Received: by 2002:a62:e104:0:b029:152:4f37:99da with SMTP id q4-20020a62e1040000b02901524f3799damr1294359pfh.17.1603927335230;
+        Wed, 28 Oct 2020 16:22:15 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id 16sm457419pjf.36.2020.10.28.16.22.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2020 16:22:14 -0700 (PDT)
+Date:   Wed, 28 Oct 2020 16:22:13 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org,
+        kvm <kvm@vger.kernel.org>, iommu@lists.linux-foundation.org,
+        joro@8bytes.org, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-hyperv@vger.kernel.org, maz@misterjones.org,
+        Dexuan Cui <decui@microsoft.com>
+Subject: Re: [PATCH v3 15/35] PCI: vmd: Use msi_msg shadow structs
+Message-ID: <202010281622.40CB2D87@keescook>
+References: <e6601ff691afb3266e365a91e8b221179daf22c2.camel@infradead.org>
+ <20201024213535.443185-1-dwmw2@infradead.org>
+ <20201024213535.443185-16-dwmw2@infradead.org>
+ <202010281347.2943F5B7@keescook>
+ <87blgmf3zj.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-To:     <pbonzini@redhat.com>, <chenhc@lemote.com>, <pasic@linux.ibm.com>,
-        <borntraeger@de.ibm.com>, <mtosatti@redhat.com>,
-        <cohuck@redhat.com>
-CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-s390x@nongnu.org>, <zhengchuan@huawei.com>,
-        <zhang.zhanghailiang@huawei.com>
-Subject: [PATCH 2/4] kvm: Replace DEBUG_KVM with CONFIG_DEBUG_KVM
-References: <5F97FD61.4060804@huawei.com> <5F991331.4020604@huawei.com>
-In-Reply-To: <5F991331.4020604@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.138]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87blgmf3zj.fsf@nanos.tec.linutronix.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now we can control the definition of DPRINTF by CONFIG_DEBUG_KVM,
-so let's replace DEBUG_KVM with CONFIG_DEBUG_KVM.
+On Wed, Oct 28, 2020 at 10:13:52PM +0100, Thomas Gleixner wrote:
+> On Wed, Oct 28 2020 at 13:49, Kees Cook wrote:
+> > On Sat, Oct 24, 2020 at 10:35:15PM +0100, David Woodhouse wrote:
+> >> +	memset(&msg, 0, sizeof(*msg);
+> >
+> > This should be:
+> >
+> > +	memset(msg, 0, sizeof(*msg);
+> 
+>         memset(msg, 0, sizeof(*msg));
+> 
+> Then it compiles _and_ is correct :)
 
-Signed-off-by: AlexChen <alex.chen@huawei.com>
----
- accel/kvm/kvm-all.c | 3 +--
- target/i386/kvm.c   | 4 +---
- target/mips/kvm.c   | 6 ++++--
- target/s390x/kvm.c  | 6 +++---
- 4 files changed, 9 insertions(+), 10 deletions(-)
+\o/ ;)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9ef5daf4c5..fc6d99a731 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -60,9 +60,8 @@
-  */
- #define PAGE_SIZE qemu_real_host_page_size
-
--//#define DEBUG_KVM
-
--#ifdef DEBUG_KVM
-+#ifdef CONFIG_DEBUG_KVM
- #define DPRINTF(fmt, ...) \
-     do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
- #else
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index cf46259534..3e9344aed5 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -50,9 +50,7 @@
- #include "exec/memattrs.h"
- #include "trace.h"
-
--//#define DEBUG_KVM
--
--#ifdef DEBUG_KVM
-+#ifdef CONFIG_DEBUG_KVM
- #define DPRINTF(fmt, ...) \
-     do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
- #else
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index 72637a1e02..a0b979e6d2 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -28,10 +28,12 @@
- #include "exec/memattrs.h"
- #include "hw/boards.h"
-
--#define DEBUG_KVM 0
-+#ifndef CONFIG_DEBUG_KVM
-+#define CONFIG_DEBUG_KVM 0
-+#endif
-
- #define DPRINTF(fmt, ...) \
--    do { if (DEBUG_KVM) { fprintf(stderr, fmt, ## __VA_ARGS__); } } while (0)
-+    do { if (CONFIG_DEBUG_KVM) { fprintf(stderr, fmt, ## __VA_ARGS__); } } while (0)
-
- static int kvm_mips_fpu_cap;
- static int kvm_mips_msa_cap;
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index f13eff688c..8bc9e1e468 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -52,12 +52,12 @@
- #include "hw/s390x/s390-virtio-hcall.h"
- #include "hw/s390x/pv.h"
-
--#ifndef DEBUG_KVM
--#define DEBUG_KVM  0
-+#ifndef CONFIG_DEBUG_KVM
-+#define CONFIG_DEBUG_KVM  0
- #endif
-
- #define DPRINTF(fmt, ...) do {                \
--    if (DEBUG_KVM) {                          \
-+    if (CONFIG_DEBUG_KVM) {                          \
-         fprintf(stderr, fmt, ## __VA_ARGS__); \
-     }                                         \
- } while (0)
 -- 
-2.19.1
+Kees Cook
