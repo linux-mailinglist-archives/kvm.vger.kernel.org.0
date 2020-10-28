@@ -2,160 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 903C929D61E
-	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 23:12:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F42C29D581
+	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 23:03:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730779AbgJ1WL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Oct 2020 18:11:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52526 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730772AbgJ1WL5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:11:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAC3CC0613CF
-        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 15:11:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gmaljy7F6ECuR3F7Zpuoh7pRrSA3j6H2aGjtYQFPTrY=; b=j5CPMfabwizF9GOBRDkgmiho10
-        H/DAzADvPKgp6xxTybZDiMS34ElgQ1v+4KNHz2t2qWConG1Y0yhuMfBpz5gKe2wh7/wQdRTW71ggg
-        Iaj1Jb59dzpVLTBZfxzwFGgr7+bmJVFr+lUe903F0CC9t+6Nx6NSh+P3yBxH5T70JGJoWha+UM8Ig
-        RYyEcPVI2yvuMI7rUyBvlCCeQVA/tdIIdvCX7YgXGrZkOgVAKfYE55fj0FCSyFkCI36eHQrNRNHyC
-        WIGY0wFD/CNide+xbqkIr2Fs1+HjCcvgwmxYUTSMQC8qZYDky1ncWiEtWKchxdG01Bz2Po5/g89/Y
-        dZd6inNw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kXmXf-0004UW-FM; Wed, 28 Oct 2020 14:35:11 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4E8993006D0;
-        Wed, 28 Oct 2020 15:35:09 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 326342B064B32; Wed, 28 Oct 2020 15:35:09 +0100 (CET)
-Date:   Wed, 28 Oct 2020 15:35:09 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] sched/wait: Add add_wait_queue_priority()
-Message-ID: <20201028143509.GA2628@hirez.programming.kicks-ass.net>
-References: <20201026175325.585623-1-dwmw2@infradead.org>
- <20201027143944.648769-1-dwmw2@infradead.org>
- <20201027143944.648769-2-dwmw2@infradead.org>
+        id S1728588AbgJ1WD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Oct 2020 18:03:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41726 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729710AbgJ1WDS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Oct 2020 18:03:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603922597;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ridPRJ1LvRFxYHi2gAnRyeYeQZqM7yJdqJ8GPHQDCTI=;
+        b=CN7sfmCYMnxtavRid1H7OcIWmtEpf807DvlopzL0LL8smmVKlDbpzvEYtzeIAP7cA6HSSW
+        dCgFGrNF6Hw6CDkxvBFfjqZ7IQpYdFWT1cs4BUQiqcuVGLURCV0exh25r4U60ovTGEq8NX
+        BDJLUwGGCWSpVbm4hsig9v2Y/rilYuk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-6lH31mr0Pui8VUjGUEAxVw-1; Wed, 28 Oct 2020 11:01:23 -0400
+X-MC-Unique: 6lH31mr0Pui8VUjGUEAxVw-1
+Received: by mail-wm1-f71.google.com with SMTP id l23so1041754wmg.6
+        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 08:01:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ridPRJ1LvRFxYHi2gAnRyeYeQZqM7yJdqJ8GPHQDCTI=;
+        b=Xpq9pcoCzgqo34KCbM1Gm209/tbAV3gBsyk9NDF8YPMPBRRIHUKdw+p9Q/E5rxZWcZ
+         RNW+b35qAYYwgCrnIZqw65q4ivauLDcghIy2ErC/9w/21Aczu3N/NfNdQ4ApuD0XYE/P
+         TogLbWU1jc1UWyGh/+/F0k6W+XSrYffZ+5Z+PGIN6VWJZZH0vFMteXfOfTkJlfkmSUA+
+         M53dm/Q9WxBlBEtdb9pzYsOEd3u6HnlUiToBQ4v+KpMLkKbm4MlfPT0RsMJkBDmM2cWg
+         94n34UCtRISxAdGWlpmyk3LlA7swCHPMLTmqCiK4ZPs1RB6fGw/QCYg63N1dWCanWACb
+         Mjjg==
+X-Gm-Message-State: AOAM533YDlfHyvypRmpi+X559w3GSC8xV1uGa08/wX6EDFhiU2lzCXT4
+        QvBwdIg3XwMfX/D8tNv1oDRLQb9WMK0zptj37m0RiwuF1Dm+HpfveQob13DXMV9UKvR/RMSF9GR
+        xl+baoSzwoa6V
+X-Received: by 2002:a5d:424a:: with SMTP id s10mr3438440wrr.130.1603897281940;
+        Wed, 28 Oct 2020 08:01:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzK/CHIYjwACBHBt8dKepNyg7eUiEF/T5Ab2GPWm3ISZvo7NlhetD8d0Q6ozwqy2ck3A63AzQ==
+X-Received: by 2002:a5d:424a:: with SMTP id s10mr3437925wrr.130.1603897276850;
+        Wed, 28 Oct 2020 08:01:16 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id 30sm7374221wrs.84.2020.10.28.08.01.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Oct 2020 08:01:16 -0700 (PDT)
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+References: <20201027214300.1342-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 0/3] KVM: x86/mmu: Add macro for hugepage GFN mask
+Message-ID: <80038ae1-d603-dc22-1997-1ad7da0a936d@redhat.com>
+Date:   Wed, 28 Oct 2020 16:01:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201027143944.648769-2-dwmw2@infradead.org>
+In-Reply-To: <20201027214300.1342-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 02:39:43PM +0000, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> This allows an exclusive wait_queue_entry to be added at the head of the
-> queue, instead of the tail as normal. Thus, it gets to consume events
-> first without allowing non-exclusive waiters to be woken at all.
-> 
-> The (first) intended use is for KVM IRQFD, which currently has
-> inconsistent behaviour depending on whether posted interrupts are
-> available or not. If they are, KVM will bypass the eventfd completely
-> and deliver interrupts directly to the appropriate vCPU. If not, events
-> are delivered through the eventfd and userspace will receive them when
-> polling on the eventfd.
-> 
-> By using add_wait_queue_priority(), KVM will be able to consistently
-> consume events within the kernel without accidentally exposing them
-> to userspace when they're supposed to be bypassed. This, in turn, means
-> that userspace doesn't have to jump through hoops to avoid listening
-> on the erroneously noisy eventfd and injecting duplicate interrupts.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+On 27/10/20 22:42, Sean Christopherson wrote:
+> Add a macro, which is probably long overdue, to replace open coded
+> variants of "~(KVM_PAGES_PER_HPAGE(level) - 1)".  The straw that broke the
+> camel's back is the TDP MMU's round_gfn_for_level(), which goes straight
+> for the optimized approach of using NEG instead of SUB+NOT (gcc uses NEG
+> for both).  The use of '-(...)' made me do a double take (more like a
+> quadrupal take) when reading the TDP MMU code as my eyes/brain have been
+> heavily trained to look for the more common '~(... - 1)'.
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+The upside is that a "how many" macro such as KVM_PAGES_PER_HPAGE will
+have only one definition that makes sense.  With a "mask" macro you
+never know if the 1s are to the left or to the right.  That is, does
+"gfn & KVM_HPAGE_GFN_MASK(x)" return the first gfn within the huge page
+or the index of the page within the huge page?
 
-> ---
->  include/linux/wait.h | 12 +++++++++++-
->  kernel/sched/wait.c  | 17 ++++++++++++++++-
->  2 files changed, 27 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/wait.h b/include/linux/wait.h
-> index 27fb99cfeb02..fe10e8570a52 100644
-> --- a/include/linux/wait.h
-> +++ b/include/linux/wait.h
-> @@ -22,6 +22,7 @@ int default_wake_function(struct wait_queue_entry *wq_entry, unsigned mode, int
->  #define WQ_FLAG_BOOKMARK	0x04
->  #define WQ_FLAG_CUSTOM		0x08
->  #define WQ_FLAG_DONE		0x10
-> +#define WQ_FLAG_PRIORITY	0x20
->  
->  /*
->   * A single wait-queue entry structure:
-> @@ -164,11 +165,20 @@ static inline bool wq_has_sleeper(struct wait_queue_head *wq_head)
->  
->  extern void add_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry);
->  extern void add_wait_queue_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry);
-> +extern void add_wait_queue_priority(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry);
->  extern void remove_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry);
->  
->  static inline void __add_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
->  {
-> -	list_add(&wq_entry->entry, &wq_head->head);
-> +	struct list_head *head = &wq_head->head;
-> +	struct wait_queue_entry *wq;
-> +
-> +	list_for_each_entry(wq, &wq_head->head, entry) {
-> +		if (!(wq->flags & WQ_FLAG_PRIORITY))
-> +			break;
-> +		head = &wq->entry;
-> +	}
-> +	list_add(&wq_entry->entry, head);
->  }
->  
->  /*
-> diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
-> index 01f5d3020589..183cc6ae68a6 100644
-> --- a/kernel/sched/wait.c
-> +++ b/kernel/sched/wait.c
-> @@ -37,6 +37,17 @@ void add_wait_queue_exclusive(struct wait_queue_head *wq_head, struct wait_queue
->  }
->  EXPORT_SYMBOL(add_wait_queue_exclusive);
->  
-> +void add_wait_queue_priority(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
-> +{
-> +	unsigned long flags;
-> +
-> +	wq_entry->flags |= WQ_FLAG_EXCLUSIVE | WQ_FLAG_PRIORITY;
-> +	spin_lock_irqsave(&wq_head->lock, flags);
-> +	__add_wait_queue(wq_head, wq_entry);
-> +	spin_unlock_irqrestore(&wq_head->lock, flags);
-> +}
-> +EXPORT_SYMBOL_GPL(add_wait_queue_priority);
-> +
->  void remove_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
->  {
->  	unsigned long flags;
-> @@ -57,7 +68,11 @@ EXPORT_SYMBOL(remove_wait_queue);
->  /*
->   * The core wakeup function. Non-exclusive wakeups (nr_exclusive == 0) just
->   * wake everything up. If it's an exclusive wakeup (nr_exclusive == small +ve
-> - * number) then we wake all the non-exclusive tasks and one exclusive task.
-> + * number) then we wake that number of exclusive tasks, and potentially all
-> + * the non-exclusive tasks. Normally, exclusive tasks will be at the end of
-> + * the list and any non-exclusive tasks will be woken first. A priority task
-> + * may be at the head of the list, and can consume the event without any other
-> + * tasks being woken.
->   *
->   * There are circumstances in which we can try to wake a task which has already
->   * started to run but is not in state TASK_RUNNING. try_to_wake_up() returns
-> -- 
-> 2.26.2
-> 
+This is actually a problem with this series; see this line in patch 3:
+
+-	mask = KVM_PAGES_PER_HPAGE(level) - 1;
++	mask = ~KVM_HPAGE_GFN_MASK(level);
+        ^^^^                  ^^^^
+
+So it's a mask, but not _that_ mask, _another_ mask. :)  That's why I
+don't really like "mask" macros, now the other question is how to
+express bit masking with "how many" macros.
+
+First of all, I think we all agree that when reading "x & how_many()" we
+assume (or we check first thing of all) that the right side is a power
+of two.  I like "x & -y" because---even if your eyes have trouble
+distinguishing "-" from "~"---it's clearly not "x & (y-1)" and therefore
+the only sensible operation that the AND can do "clear everything to the
+right".
+
+Now I realize that maybe my obsession for bit twiddling tricks is not
+shared with everyone, and of course if you're debugging it you have to
+look closer and check if it's really "x & -y" or "x & ~y", but at least
+in normal cursory code reading that's how it works for me.
+
+
+Paolo
+
