@@ -2,185 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F054D29D43B
-	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 22:50:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C81929D3A0
+	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 22:45:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728056AbgJ1Vug (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Oct 2020 17:50:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49776 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728049AbgJ1Vud (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Oct 2020 17:50:33 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09S81Je7034609;
-        Wed, 28 Oct 2020 04:11:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Xjcl4QL6d3IFw54Qeh5O0ngW2PwMHNTczq+fLXfbPrM=;
- b=XKG7ly6tRPOq/Zl7A1Gb6/t6fRybHwfDsSH9+lyHNJ9tmfq73Y3NdeHu1RvbDZ4s0G9H
- gbXNGtgISqJVl1pncZuteh+Q6HwhnpOAShw0AMXOObSFeVc73Hi/Fr8cwJOaXgh+lzCI
- 5HUka4GVKozziDWUW8mQ75e86W/US33l2Of4iUw4qbXNOHShFixcKJKUCgZuBzyYat/A
- qShbKidpcHum2xDenMvHX/CAs2oX7RK0TJg9iAEL2Hf42zWHR6pu6SJ2d6dPgfihE52P
- JRo2LGd15yuE1xr2BmkBDt03TITGFDuuapR6hsv59Fn0fdDjT10ufOKUWvrmxU1h6xSK 5Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34ejc2d5tu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 04:11:29 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09S81jsQ037896;
-        Wed, 28 Oct 2020 04:11:28 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34ejc2d5rv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 04:11:28 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09S877n3001765;
-        Wed, 28 Oct 2020 08:11:26 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 34cbw7v7sj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 08:11:26 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09S8BNQt27918754
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Oct 2020 08:11:24 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D45464C040;
-        Wed, 28 Oct 2020 08:11:23 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1FBE54C046;
-        Wed, 28 Oct 2020 08:11:23 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.18.81])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Oct 2020 08:11:23 +0000 (GMT)
-Date:   Wed, 28 Oct 2020 09:11:21 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 06/14] s390/vfio-ap: introduce shadow APCB
-Message-ID: <20201028091121.0db418cf.pasic@linux.ibm.com>
-In-Reply-To: <20201022171209.19494-7-akrowiak@linux.ibm.com>
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
-        <20201022171209.19494-7-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726214AbgJ1Vph (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Oct 2020 17:45:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40799 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726097AbgJ1Vpg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Oct 2020 17:45:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603921534;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=66nQyac2hxeaBQvnu3KghvLtDJPnPJ2NCil3q6sKCIg=;
+        b=X55rUPVa8g84zR5hz81o8vq1lmxxTYqY30A5JK8z6nq/TNkNygwfofsxXruKKDXnPyXAQO
+        MJC74S41atNbPVurwfNUc4B6DTOhIUnAyDT3UFLRgnfxdhsSHv1kZe41VQtbq85oExnmzu
+        cqpZ+xwu3S8MlScPBmGOndLXVVjp5Jg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-8azooClHMwyNfkceA9PlLw-1; Wed, 28 Oct 2020 10:44:55 -0400
+X-MC-Unique: 8azooClHMwyNfkceA9PlLw-1
+Received: by mail-wr1-f70.google.com with SMTP id w1so401934wrr.5
+        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 07:44:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=66nQyac2hxeaBQvnu3KghvLtDJPnPJ2NCil3q6sKCIg=;
+        b=nwUfwGpQTPwvhCeVImYbHhymzssF8++UTNruyDdZOmsIQecKGlNop8cU+GWYbF7FrC
+         viwZJ8DoKyZJNXJek19i0Pu2DH60ZXu4KuNLNe11JRhJw034+TZdFFc0crYmNcSQ8lxw
+         38Me2M3r2M2OkX9eFH3AmNmhPMpibKRUdgv4dPKzHmbjCWBkf0RdiUtkDd/p8STtfjV1
+         7ao+C52pnJ3nVkH3w8By0JUFeluRBGBxBtNT6JjYssrACAEhPCoy4/Hnbc/6sW/uZZLr
+         X1/XUf91R8p5yBnGiVRmsTHOtIYMRfZ1a4S/NZfUZhqkS/TbRccb2KvNn7ZMF1Oo5Fuz
+         4hmQ==
+X-Gm-Message-State: AOAM532/QF6E1d/zI4Yq+lGCng1DdduRkqUtHFywiApXlUfm/mNNZcg6
+        IVPh0kKkM07iTchuQhQZYkFia7+aImuCsFdvo2HeQropW/1oZ05SOnOTXmzE9+y5B+3JzaU2j3g
+        zXV5mw/CgOjsN
+X-Received: by 2002:a1c:6302:: with SMTP id x2mr9139059wmb.121.1603896293884;
+        Wed, 28 Oct 2020 07:44:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyVZ1pMlnMRV9XQp7ynV1e5d9Un1RCNyFC9GqQDtizxI9AAulK2o6sKxWadGDvbXi+JMtVvKg==
+X-Received: by 2002:a1c:6302:: with SMTP id x2mr9139042wmb.121.1603896293696;
+        Wed, 28 Oct 2020 07:44:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k81sm1492901wma.2.2020.10.28.07.44.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Oct 2020 07:44:53 -0700 (PDT)
+Subject: Re: [PATCH v2 1/2] sched/wait: Add add_wait_queue_priority()
+To:     Peter Zijlstra <peterz@infradead.org>,
+        David Woodhouse <dwmw2@infradead.org>
+Cc:     Davide Libenzi <davidel@xmailserver.org>,
+        "Davi E. M. Arnaut" <davi@haxent.com.br>, davi@verdesmares.com,
+        linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        kvm@vger.kernel.org, Oleg Nesterov <oleg@redhat.com>
+References: <20201026175325.585623-1-dwmw2@infradead.org>
+ <20201027143944.648769-1-dwmw2@infradead.org>
+ <20201027143944.648769-2-dwmw2@infradead.org>
+ <20201027190919.GO2628@hirez.programming.kicks-ass.net>
+ <220a7b090d27ffc8f3d00253c289ddd964a8462b.camel@infradead.org>
+ <20201027203041.GS2628@hirez.programming.kicks-ass.net>
+ <0bc19d43229d73c0fcd5bda1987e3dbb9d62a7e0.camel@infradead.org>
+ <20201028142031.GZ2628@hirez.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c2d63dd8-4f31-df23-2834-979a261f7653@redhat.com>
+Date:   Wed, 28 Oct 2020 15:44:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-10-28_01:2020-10-26,2020-10-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 malwarescore=0 impostorscore=0 lowpriorityscore=0
- clxscore=1015 adultscore=0 suspectscore=0 bulkscore=0 phishscore=0
- mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010280049
+In-Reply-To: <20201028142031.GZ2628@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Oct 2020 13:12:01 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 28/10/20 15:20, Peter Zijlstra wrote:
+> Shall I take the waitqueue thing and stick it in a topic branch for
+> Paolo so he can then merge that and the kvm bits on top into the KVM
+> tree?
 
-> The APCB is a field within the CRYCB that provides the AP configuration
-> to a KVM guest. Let's introduce a shadow copy of the KVM guest's APCB and
-> maintain it for the lifespan of the guest.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c     | 24 +++++++++++++++++++-----
->  drivers/s390/crypto/vfio_ap_private.h |  2 ++
->  2 files changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 9e9fad560859..9791761aa7fd 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -320,6 +320,19 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
->  	matrix->adm_max = info->apxa ? info->Nd : 15;
->  }
->  
-> +static bool vfio_ap_mdev_has_crycb(struct ap_matrix_mdev *matrix_mdev)
-> +{
-> +	return (matrix_mdev->kvm && matrix_mdev->kvm->arch.crypto.crycbd);
-> +}
-> +
-> +static void vfio_ap_mdev_commit_shadow_apcb(struct ap_matrix_mdev *matrix_mdev)
-> +{
-> +	kvm_arch_crypto_set_masks(matrix_mdev->kvm,
-> +				  matrix_mdev->shadow_apcb.apm,
-> +				  matrix_mdev->shadow_apcb.aqm,
-> +				  matrix_mdev->shadow_apcb.adm);
-> +}
-> +
->  static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
->  {
->  	struct ap_matrix_mdev *matrix_mdev;
-> @@ -335,6 +348,7 @@ static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
->  
->  	matrix_mdev->mdev = mdev;
->  	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
-> +	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_apcb);
->  	hash_init(matrix_mdev->qtable);
->  	mdev_set_drvdata(mdev, matrix_mdev);
->  	matrix_mdev->pqap_hook.hook = handle_pqap;
-> @@ -1213,13 +1227,12 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
->  	if (ret)
->  		return NOTIFY_DONE;
->  
-> -	/* If there is no CRYCB pointer, then we can't copy the masks */
-> -	if (!matrix_mdev->kvm->arch.crypto.crycbd)
-> +	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
->  		return NOTIFY_DONE;
->  
-> -	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
-> -				  matrix_mdev->matrix.aqm,
-> -				  matrix_mdev->matrix.adm);
-> +	memcpy(&matrix_mdev->shadow_apcb, &matrix_mdev->matrix,
-> +	       sizeof(matrix_mdev->shadow_apcb));
-> +	vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
->  
->  	return NOTIFY_OK;
->  }
-> @@ -1329,6 +1342,7 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
->  		kvm_put_kvm(matrix_mdev->kvm);
->  		matrix_mdev->kvm = NULL;
->  	}
-> +
+Topic branches are always the best solution. :)
 
-Unrelated change.
-
-Otherwise patch looks OK.
-
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-
->  	mutex_unlock(&matrix_dev->lock);
->  
->  	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
-> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-> index c1d8b5507610..fc8634cee485 100644
-> --- a/drivers/s390/crypto/vfio_ap_private.h
-> +++ b/drivers/s390/crypto/vfio_ap_private.h
-> @@ -75,6 +75,7 @@ struct ap_matrix {
->   * @list:	allows the ap_matrix_mdev struct to be added to a list
->   * @matrix:	the adapters, usage domains and control domains assigned to the
->   *		mediated matrix device.
-> + * @shadow_apcb:    the shadow copy of the APCB field of the KVM guest's CRYCB
->   * @group_notifier: notifier block used for specifying callback function for
->   *		    handling the VFIO_GROUP_NOTIFY_SET_KVM event
->   * @kvm:	the struct holding guest's state
-> @@ -82,6 +83,7 @@ struct ap_matrix {
->  struct ap_matrix_mdev {
->  	struct list_head node;
->  	struct ap_matrix matrix;
-> +	struct ap_matrix shadow_apcb;
->  	struct notifier_block group_notifier;
->  	struct notifier_block iommu_notifier;
->  	struct kvm *kvm;
+Paolo
 
