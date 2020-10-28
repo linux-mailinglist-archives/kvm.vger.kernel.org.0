@@ -2,76 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 283C329D7D3
-	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 23:28:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8280029D6FE
+	for <lists+kvm@lfdr.de>; Wed, 28 Oct 2020 23:20:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733217AbgJ1W1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Oct 2020 18:27:14 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7082 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733218AbgJ1W1N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:27:13 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CLfrr5jxGzLqcG;
-        Wed, 28 Oct 2020 15:11:56 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 28 Oct 2020 15:11:47 +0800
-Message-ID: <5F9919B3.9070605@huawei.com>
-Date:   Wed, 28 Oct 2020 15:11:47 +0800
-From:   AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+        id S1731955AbgJ1WT3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Oct 2020 18:19:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60504 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731664AbgJ1WRk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Oct 2020 18:17:40 -0400
+Received: from kernel.org (unknown [87.70.96.83])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 50EBD2465E;
+        Wed, 28 Oct 2020 08:47:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603874836;
+        bh=QEXxMmSUj2Vd+E59vReAFx2mSILQlDhT0GF7L4nT79k=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qaRJrHspISAML2s3M6ow+As8fnofPQBijjHMbHMdR+I3658FQOTlnTwjnXNz0MlyX
+         aAw8A460MACJ1IDHW1x+02Uv9Atn0b3fP/Jb97ArZSIbrkmzQ92h9/ls1ePhoOhjJH
+         6jiwMskK6vWDnhTMrSRMXIc62N90Wg6wJ7a8TvRg=
+Date:   Wed, 28 Oct 2020 10:47:03 +0200
+From:   Mike Rapoport <rppt@kernel.org>
+To:     Bartosz Golaszewski <brgl@bgdev.pl>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-media@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-gpio@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, alsa-devel@alsa-project.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Subject: Re: [PATCH 1/8] mm: slab: provide krealloc_array()
+Message-ID: <20201028084703.GC1428094@kernel.org>
+References: <20201027121725.24660-1-brgl@bgdev.pl>
+ <20201027121725.24660-2-brgl@bgdev.pl>
 MIME-Version: 1.0
-To:     <pbonzini@redhat.com>, <chenhc@lemote.com>, <pasic@linux.ibm.com>,
-        <borntraeger@de.ibm.com>, <mtosatti@redhat.com>,
-        <cohuck@redhat.com>
-CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-s390x@nongnu.org>, <zhengchuan@huawei.com>,
-        <zhang.zhanghailiang@huawei.com>
-Subject: [PATCH 4/4] i386/kvm: make printf always compile in debug output
-References: <5F97FD61.4060804@huawei.com> <5F991331.4020604@huawei.com> <5F9914EE.8050209@huawei.com> <5F991641.4050606@huawei.com>
-In-Reply-To: <5F991641.4050606@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.138]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201027121725.24660-2-brgl@bgdev.pl>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wrapped printf calls inside debug macros (DPRINTF) in `if` statement.
-This will ensure that printf function will always compile even if debug
-output is turned off and, in turn, will prevent bitrot of the format
-strings.
+On Tue, Oct 27, 2020 at 01:17:18PM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> 
+> When allocating an array of elements, users should check for
+> multiplication overflow or preferably use one of the provided helpers
+> like: kmalloc_array().
+> 
+> There's no krealloc_array() counterpart but there are many users who use
+> regular krealloc() to reallocate arrays. Let's provide an actual
+> krealloc_array() implementation.
+> 
+> Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> ---
+>  include/linux/slab.h | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/include/linux/slab.h b/include/linux/slab.h
+> index dd6897f62010..0e6683affee7 100644
+> --- a/include/linux/slab.h
+> +++ b/include/linux/slab.h
+> @@ -592,6 +592,17 @@ static inline void *kmalloc_array(size_t n, size_t size, gfp_t flags)
+>  	return __kmalloc(bytes, flags);
+>  }
+>  
 
-Signed-off-by: AlexChen <alex.chen@huawei.com>
----
- target/i386/kvm.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+Can you please add kernel-doc here and a word or two about this function
+to Documentation/core-api/memory-allocation.rst?
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 3e9344aed5..64492cb851 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -50,14 +50,13 @@
- #include "exec/memattrs.h"
- #include "trace.h"
+> +static __must_check inline void *
+> +krealloc_array(void *p, size_t new_n, size_t new_size, gfp_t flags)
+> +{
+> +	size_t bytes;
+> +
+> +	if (unlikely(check_mul_overflow(new_n, new_size, &bytes)))
+> +		return NULL;
+> +
+> +	return krealloc(p, bytes, flags);
+> +}
+> +
+>  /**
+>   * kcalloc - allocate memory for an array. The memory is set to zero.
+>   * @n: number of elements.
+> -- 
+> 2.29.1
+> 
+> 
 
--#ifdef CONFIG_DEBUG_KVM
--#define DPRINTF(fmt, ...) \
--    do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...) \
--    do { } while (0)
-+#ifndef CONFIG_DEBUG_KVM
-+#define CONFIG_DEBUG_KVM  0
- #endif
-
-+#define DPRINTF(fmt, ...) \
-+    do { if (CONFIG_DEBUG_KVM) { fprintf(stderr, fmt, ## __VA_ARGS__); } } while (0)
-+
- /* From arch/x86/kvm/lapic.h */
- #define KVM_APIC_BUS_CYCLE_NS       1
- #define KVM_APIC_BUS_FREQUENCY      (1000000000ULL / KVM_APIC_BUS_CYCLE_NS)
 -- 
-2.19.1
+Sincerely yours,
+Mike.
