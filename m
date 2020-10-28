@@ -2,86 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 550B129DA76
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 00:23:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71CE429DB43
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 00:48:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390312AbgJ1XXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Oct 2020 19:23:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390165AbgJ1XWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Oct 2020 19:22:16 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF17C0613D1
-        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 16:22:15 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id e15so743693pfh.6
-        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 16:22:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XZwWBaJ1YP4eUG0jbcZ/VfZJQEUP/FvDuE+Dcr6WVrA=;
-        b=gkFHJe+kUFXAxf/8vOsy2x4sDIItYYYD9odc8xSFN7m2g8lYwKR38kgfTf8zfvYvs7
-         yBKIMBqXPuX18tqVHBX3qCSclcuf06y4SGir3XllY4gvU+rJ7oabXjMnWHBu3qRHCt+g
-         XDQ0BDU+YDLpbohWX+lRIQe1zsidFRDvJAehw=
+        id S2389622AbgJ1XsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Oct 2020 19:48:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28741 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727534AbgJ1XsD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Oct 2020 19:48:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603928881;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IT/EThefC3oSO/BW+27Fa6cj0opkp2OAAvr9i7UvIII=;
+        b=IIFJyLlra7LL0kbjnTBMif6dSpDejXLKRK1Ovv8C1Jdu78KmMu4MUKmq7rhvP7tGMcaukW
+        OnyaOzoBuPYRjY417zMwifKxbQLqC+DqZ16o7f3Wg9856Z/26ymyFrQd0sqGQrJRQNj1BZ
+        GvxGBc4dOA8o6e79WbhPOFcvODxjrcg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-tl_HIlPUPpy86sYq5HwMhQ-1; Wed, 28 Oct 2020 03:45:03 -0400
+X-MC-Unique: tl_HIlPUPpy86sYq5HwMhQ-1
+Received: by mail-wr1-f72.google.com with SMTP id x16so1765221wrg.7
+        for <kvm@vger.kernel.org>; Wed, 28 Oct 2020 00:45:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XZwWBaJ1YP4eUG0jbcZ/VfZJQEUP/FvDuE+Dcr6WVrA=;
-        b=QKvxe30WOPdcuGFgAb7T8s/8qj9Jk0Kuy2EsVofW7NWipr4ZXnymrFfPaAP6qPlUwn
-         Z1/S+nJuAC0ZKB8r2Cr3vZM3NVFNguaF2AfqlVZe29qdGnwoLAQAlu2mNwopghpo4LqV
-         YQWDvfTatEBKQMZI74MQ5gb58UX3Vgg0dVxDx8yBNWr3PKBH1ztR7gAcQVe1VN+L60mP
-         r4Nv3t+xwBFrqcR+OQDOrjzfoHN8xNAgj7EXE5bEyWOa4lvC1TQySDlWVVjioZIq6rHA
-         ukv3RfBV7FKq3iu9GknONzLAPB7HbkwAq0HZARm659c/UMuLNV46LuIWBOLlDI+nesbQ
-         4r9Q==
-X-Gm-Message-State: AOAM5336D8nZCASoULoC8mN4lsgrTXNW9S3tgV2TlEV6wybBrmezG9hM
-        DuqyyzH9Zhc0UNop3k3qKTJB+Q==
-X-Google-Smtp-Source: ABdhPJzIxT8kqv3hOAn/eutFdfJq4DAebLsNkfJ0qK4xV8rTZ+MoJFaBn7qxZgXgYmjQNvnQLalLqg==
-X-Received: by 2002:a62:e104:0:b029:152:4f37:99da with SMTP id q4-20020a62e1040000b02901524f3799damr1294359pfh.17.1603927335230;
-        Wed, 28 Oct 2020 16:22:15 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 16sm457419pjf.36.2020.10.28.16.22.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2020 16:22:14 -0700 (PDT)
-Date:   Wed, 28 Oct 2020 16:22:13 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     David Woodhouse <dwmw2@infradead.org>, x86@kernel.org,
-        kvm <kvm@vger.kernel.org>, iommu@lists.linux-foundation.org,
-        joro@8bytes.org, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org, maz@misterjones.org,
-        Dexuan Cui <decui@microsoft.com>
-Subject: Re: [PATCH v3 15/35] PCI: vmd: Use msi_msg shadow structs
-Message-ID: <202010281622.40CB2D87@keescook>
-References: <e6601ff691afb3266e365a91e8b221179daf22c2.camel@infradead.org>
- <20201024213535.443185-1-dwmw2@infradead.org>
- <20201024213535.443185-16-dwmw2@infradead.org>
- <202010281347.2943F5B7@keescook>
- <87blgmf3zj.fsf@nanos.tec.linutronix.de>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IT/EThefC3oSO/BW+27Fa6cj0opkp2OAAvr9i7UvIII=;
+        b=Om1g8jXRwAs2P8l9Z3dldZOq7tsxAccHouzqY270HH4SXDZBGYPV+kaWs1PL3uqoBx
+         2Ii39bPyTJmyNgBOFDtz1ntaA5VImYTxu+tOOcodwgBododTIci23LGUYY3Z3q+gCxTG
+         8ZhJjSkFXAbmpK5V5Psq+yQsSO/gG8LzbkW02HF6oY/dGH6M1TC3dXn2GUjpkGj31sxq
+         ZanDbwhmQUa0AjuUF3n9U/SR843DVp+RGxrGu16EDZhzVz2yaQG2xbQnnwzodxAdEm8z
+         ujsRx7GXyFa1GRnOjrxa8QDfwJEKvKTPX50qBBAegv4et1W34glNEnHT4A6KsBf6cofp
+         Fu0A==
+X-Gm-Message-State: AOAM530DNsSHsiz8CR4hcPfqwyojBADwu9vwRUTx3muFkyWumqWPOyUV
+        gzFUpZpTl4LBH+NYKvJf3jMiH4ElVBbNRHcEgo6Pcd9k6NBhNcn3OwJLu0NWx2o4hiLt3QLTnim
+        n39vb7xa+sHTD
+X-Received: by 2002:a1c:7f95:: with SMTP id a143mr6367156wmd.167.1603871102516;
+        Wed, 28 Oct 2020 00:45:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxXP6hBNa4ddKsUSErcQcq4TcuG91nufkWLxAmGUkxfPMp4IVoxgSQqj+h6pX9jcaScm9ztXA==
+X-Received: by 2002:a1c:7f95:: with SMTP id a143mr6367139wmd.167.1603871102319;
+        Wed, 28 Oct 2020 00:45:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id u6sm4885576wmj.40.2020.10.28.00.45.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Oct 2020 00:45:01 -0700 (PDT)
+Subject: Re: [PATCH 0/4] kvm: Add a --enable-debug-kvm option to configure
+To:     AlexChen <alex.chen@huawei.com>, chenhc@lemote.com,
+        pasic@linux.ibm.com, borntraeger@de.ibm.com, mtosatti@redhat.com,
+        cohuck@redhat.com
+Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
+        zhengchuan@huawei.com, zhang.zhanghailiang@huawei.com
+References: <5F97FD61.4060804@huawei.com> <5F991998.2020108@huawei.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <404f58a5-180d-f3d7-dbcc-b533a29e6a94@redhat.com>
+Date:   Wed, 28 Oct 2020 08:44:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87blgmf3zj.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <5F991998.2020108@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 28, 2020 at 10:13:52PM +0100, Thomas Gleixner wrote:
-> On Wed, Oct 28 2020 at 13:49, Kees Cook wrote:
-> > On Sat, Oct 24, 2020 at 10:35:15PM +0100, David Woodhouse wrote:
-> >> +	memset(&msg, 0, sizeof(*msg);
-> >
-> > This should be:
-> >
-> > +	memset(msg, 0, sizeof(*msg);
-> 
->         memset(msg, 0, sizeof(*msg));
-> 
-> Then it compiles _and_ is correct :)
+On 28/10/20 08:11, AlexChen wrote:
+> The current 'DEBUG_KVM' macro is defined in many files, and turning on
+> the debug switch requires code modification, which is very inconvenient,
+> so this series add an option to configure to support the definition of
+> the 'DEBUG_KVM' macro.
+> In addition, patches 3 and 4 also make printf always compile in debug output
+> which will prevent bitrot of the format strings by referring to the
+> commit(08564ecd: s390x/kvm: make printf always compile in debug output).
 
-\o/ ;)
+Mostly we should use tracepoints, but the usefulness of these printf
+statements is often limited (except for s390 that maybe could make them
+unconditional error_reports).  I would leave this as is, maintainers can
+decide which tracepoints they like to have.
 
--- 
-Kees Cook
+Paolo
+
