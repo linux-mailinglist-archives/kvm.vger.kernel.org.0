@@ -2,180 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32AC929F28A
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 18:07:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8352929F2A9
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 18:10:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727344AbgJ2RHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Oct 2020 13:07:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
+        id S1727344AbgJ2RKd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 13:10:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727324AbgJ2RHB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Oct 2020 13:07:01 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4004C0613CF
-        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 10:07:00 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id x9so2485761pll.2
-        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 10:07:00 -0700 (PDT)
+        with ESMTP id S1725957AbgJ2RKc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Oct 2020 13:10:32 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 979E3C0613CF
+        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 10:10:32 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 189so3274867ybp.12
+        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 10:10:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=3KRaFeCn8cu3srAmF4IqkMbqw53L1XtWTUY3QLwzm8A=;
-        b=t20WR8sbbc0t+hHqP0qvWHo0kcugXLSSIbgMij7zHAdObBFxCOrZS7wMjsh8SjzAEb
-         A5Ao8fR9DuTUL535/I7Ze9/amqAJnrRqT0oNP7yhcvA9ZIpgAHlu0JSBHiGs1lxRc7xL
-         Ces2Br8g37lUCaoPk+V4hDXhkvEYBdn3mju0c/Nvw2eB9KeSRrC/ZwA84JLLXw8/JFSn
-         LemE+nsNBMndPGfuBfcFJ4XjWnXVbRQou2ckzZiceJhOgCyjfBvT3QVWh42sOHsdmBmR
-         Dgucjd1lGPxCppc1ANudQMSLcBRFXzogAEprxJwJQ4Wb9nCDwaxzY52tDUUSOZX7Q2dc
-         g06A==
+        bh=l8eIoaaUnZd6d2xO5UkZkCplg4SEHOvTFFZSknr9hKw=;
+        b=YgaPoj/XrpsdPD7VRiwTVLQf2cSGa65dkmUuHrmnobnDUgJfRP71xV5RtV/nvJymuq
+         olBm5ifdxU/tr1tQOL7aj5Pr0n7u6RO4RUuZOGliuyKEtWjIRklDbjNaOqGJVhvwsiPN
+         fLePFdlmA/WP1mI8iLSoaLMCwJOFN1e3RpFCx52mvYdgcEqHkE07jGtmAiUagkasLpuW
+         8DByqdKa0oSJQe8CoDOkidtuOSf1I5LbIWls20/1l6CCwqx4ig7v08D5lMSuE3LTe8lj
+         cSpkN3pc7EqRhYcy5A13dngfOMZm/9pudMxToAaqsxOWRCBLvj3ScboMwZSUWOeqzPG1
+         t4sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
          :to:cc;
-        bh=3KRaFeCn8cu3srAmF4IqkMbqw53L1XtWTUY3QLwzm8A=;
-        b=MCDXOrxskRbNb1ZFkWIt87TSza/8ZwKgNSPPtY62wHSJcgfYd5LsycCYQna07SFi3u
-         N4CN6uRQ9qz8Jgh5FbN3pIi4OXqaTNhnZI3rmLZYaAjF27CV3N4p62q2GEKr5HUfWbHj
-         7q1zhJD4ccMLpfMQ0ExGN/HyEVsbbekehqen8Fq5AVDWVd4h9IPQHLSl6LJt9SAJIXKx
-         jbSqd6IvGmE6WrktrjT8ogR37H5/429iusX6Pxx+ykJD2Ra83U2ZPHxLbJQH/gUXElNC
-         D9Xd7qBh00Af1UbcDJWkXVlcNifp7k6/AgofP/5rKGwGeZz1p7YYBSGUdebqsZMolnGR
-         rlGA==
-X-Gm-Message-State: AOAM5301hXZB4z+Esig7YJ/MMGB/OQNgPmXu4A40GL3ogZJR7QtsVTYW
-        F6yCaLGsJgBjxlvzo8NgqbMvPBc8xEgsGYNep0XTlRBzop7oTgGZqr8k4fU3UZTJneaX6anLon0
-        K1GiMPGCWrBp8y9A0sshEVwc6EGZFVpYQmuDo9Ik8OOrPhiSuFpCSZD09ZPFKxHA=
-X-Google-Smtp-Source: ABdhPJzdyBN0vZRnYTUtU26tvuqbi86yZG9jcd8CaZWXaoCe2HyeE+Po353hIfl1Zu2xtw1wBwUAIToKGay+Ww==
+        bh=l8eIoaaUnZd6d2xO5UkZkCplg4SEHOvTFFZSknr9hKw=;
+        b=tNFKoYbA2fEPz0XZJAuq0MIWP4Id8jsx7IV1yqJufbfriT0MnYAdtxMU/Gyfn9dgrA
+         EdoP6iYd0mnIHZ0ZPzKooPyc+Srg7UtwlO2/WNtsRdZCA9YjaZdFW8sq5KGDw3ty4YRZ
+         Sz5IXaBthaTAYCDhuCzOwimeQPSiLvE7QThfTNP9zXz4rIvwdaQfT+gM34G8Gb9s+vA1
+         QZOa4G61k8Z8KvVuhbDJSk6zOqIir3vRN1RUam/AULCmjVv1YsHb0/mKbhNLE7ONeyri
+         QXcnmYE1QKaBJFOcSJfWsOge0FPV0hGK1d3MYBS2O4DB90ANUPCniC/d81gh5aim4zCO
+         Ry9g==
+X-Gm-Message-State: AOAM532Qsfa8k+Jzz4448McvYak+LsO6NUnNw0Mf1oh1SyzW9phJyB8W
+        Aw0rKk6QmzaSoF3S4jAZ/E6EdwhYcCss5mTDUh+qeLmuF+WOx9w+NP7nKG++Lb8onP/JvH5+jb9
+        oxg7uZjeeZGiuiUr7oxD+nOZ+d0yVgUylKyVYAGaR+m2icFAbKzJieMlBuM7JaWQ=
+X-Google-Smtp-Source: ABdhPJxxovbfs/W4E5Fg9eCPn1dymlqPWtmG/deCMqhh3eaQJguiLOfXNdGn3knHNelJ4xRMSclrjJRtzBbtGg==
 Sender: "jmattson via sendgmr" <jmattson@turtle.sea.corp.google.com>
 X-Received: from turtle.sea.corp.google.com ([2620:15c:100:202:725a:fff:fe43:64b1])
- (user=jmattson job=sendgmr) by 2002:a17:90a:3fcb:: with SMTP id
- u11mr735876pjm.128.1603991220167; Thu, 29 Oct 2020 10:07:00 -0700 (PDT)
-Date:   Thu, 29 Oct 2020 10:06:48 -0700
-Message-Id: <20201029170648.483210-1-jmattson@google.com>
+ (user=jmattson job=sendgmr) by 2002:a25:d345:: with SMTP id
+ e66mr7065387ybf.307.1603991431788; Thu, 29 Oct 2020 10:10:31 -0700 (PDT)
+Date:   Thu, 29 Oct 2020 10:10:23 -0700
+Message-Id: <20201029171024.486256-1-jmattson@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [PATCH] kvm: x86: Sink cpuid update into vendor-specific set_cr4 functions
+Subject: [kvm-unit-tests PATCH 1/2] x86: vmx: Add test for L2 change of CR4.OSXSAVE
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>,
-        Abhiroop Dabral <adabral@paloaltonetworks.com>,
         Ricardo Koller <ricarkol@google.com>,
-        Peter Shier <pshier@google.com>,
-        Haozhong Zhang <haozhong.zhang@intel.com>,
-        Dexuan Cui <dexuan.cui@intel.com>,
-        Huaitong Han <huaitong.han@intel.com>
+        Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On emulated VM-entry and VM-exit, update the CPUID bits that reflect
-CR4.OSXSAVE and CR4.PKE.
+If L1 allows L2 to modify CR4.OSXSAVE, then L0 kvm recalculates the
+guest's CPUID.01H:ECX.OSXSAVE bit when the L2 guest changes
+CR4.OSXSAVE via MOV-to-CR4. Verify that kvm also recalculates this
+CPUID bit when loading L1's CR4 from the "host CR4" field of the
+VMCS12.
 
-This fixes a bug where the CPUID bits could continue to reflect L2 CR4
-values after emulated VM-exit to L1. It also fixes a related bug where
-the CPUID bits could continue to reflect L1 CR4 values after emulated
-VM-entry to L2. The latter bug is mainly relevant to SVM, wherein
-CPUID is not a required intercept. However, it could also be relevant
-to VMX, because the code to conditionally update these CPUID bits
-assumes that the guest CPUID and the guest CR4 are always in sync.
-
-Fixes: 8eb3f87d903168 ("KVM: nVMX: fix guest CR4 loading when emulating L2 to L1 exit")
-Fixes: 2acf923e38fb6a ("KVM: VMX: Enable XSAVE/XRSTOR for guest")
-Fixes: b9baba86148904 ("KVM, pkeys: expose CPUID/CR4 to guest")
-Reported-by: Abhiroop Dabral <adabral@paloaltonetworks.com>
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Ricardo Koller <ricarkol@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: Dexuan Cui <dexuan.cui@intel.com>
-Cc: Huaitong Han <huaitong.han@intel.com>
 ---
- arch/x86/kvm/cpuid.c   | 1 +
- arch/x86/kvm/svm/svm.c | 4 ++++
- arch/x86/kvm/vmx/vmx.c | 5 +++++
- arch/x86/kvm/x86.c     | 8 --------
- 4 files changed, 10 insertions(+), 8 deletions(-)
+ lib/x86/processor.h | 52 +++++++++++++++++++++++++--------------------
+ x86/vmx_tests.c     | 34 +++++++++++++++++++++++++++++
+ 2 files changed, 63 insertions(+), 23 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 06a278b3701d..661732be33f5 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -139,6 +139,7 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
- 					   MSR_IA32_MISC_ENABLE_MWAIT);
- 	}
- }
-+EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index c2c487c..79ebbd1 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -26,30 +26,31 @@
+ #define PF_VECTOR 14
+ #define AC_VECTOR 17
  
- static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+-#define X86_CR0_PE     0x00000001
+-#define X86_CR0_MP     0x00000002
+-#define X86_CR0_EM     0x00000004
+-#define X86_CR0_TS     0x00000008
+-#define X86_CR0_WP     0x00010000
+-#define X86_CR0_AM     0x00040000
+-#define X86_CR0_NW     0x20000000
+-#define X86_CR0_CD     0x40000000
+-#define X86_CR0_PG     0x80000000
++#define X86_CR0_PE	0x00000001
++#define X86_CR0_MP	0x00000002
++#define X86_CR0_EM	0x00000004
++#define X86_CR0_TS	0x00000008
++#define X86_CR0_WP	0x00010000
++#define X86_CR0_AM	0x00040000
++#define X86_CR0_NW	0x20000000
++#define X86_CR0_CD	0x40000000
++#define X86_CR0_PG	0x80000000
+ #define X86_CR3_PCID_MASK 0x00000fff
+-#define X86_CR4_TSD    0x00000004
+-#define X86_CR4_DE     0x00000008
+-#define X86_CR4_PSE    0x00000010
+-#define X86_CR4_PAE    0x00000020
+-#define X86_CR4_MCE    0x00000040
+-#define X86_CR4_PGE    0x00000080
+-#define X86_CR4_PCE    0x00000100
+-#define X86_CR4_UMIP   0x00000800
+-#define X86_CR4_LA57   0x00001000
+-#define X86_CR4_VMXE   0x00002000
+-#define X86_CR4_PCIDE  0x00020000
+-#define X86_CR4_SMEP   0x00100000
+-#define X86_CR4_SMAP   0x00200000
+-#define X86_CR4_PKE    0x00400000
++#define X86_CR4_TSD	0x00000004
++#define X86_CR4_DE	0x00000008
++#define X86_CR4_PSE	0x00000010
++#define X86_CR4_PAE	0x00000020
++#define X86_CR4_MCE	0x00000040
++#define X86_CR4_PGE	0x00000080
++#define X86_CR4_PCE	0x00000100
++#define X86_CR4_UMIP	0x00000800
++#define X86_CR4_LA57	0x00001000
++#define X86_CR4_VMXE	0x00002000
++#define X86_CR4_PCIDE	0x00020000
++#define X86_CR4_OSXSAVE	0x00040000
++#define X86_CR4_SMEP	0x00100000
++#define X86_CR4_SMAP	0x00200000
++#define X86_CR4_PKE	0x00400000
+ 
+ #define X86_EFLAGS_CF    0x00000001
+ #define X86_EFLAGS_FIXED 0x00000002
+@@ -609,4 +610,9 @@ static inline int cpu_has_efer_nx(void)
+ 	return !!(this_cpu_has(X86_FEATURE_NX));
+ }
+ 
++static inline bool cpuid_osxsave(void)
++{
++	return cpuid(1).c & (1 << (X86_FEATURE_OSXSAVE % 32));
++}
++
+ #endif
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index d2084ae..301ca85 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -8416,6 +8416,39 @@ static void vmx_cr_load_test(void)
+ 	TEST_ASSERT(!write_cr4_checking(orig_cr4));
+ }
+ 
++static void vmx_cr4_osxsave_test_guest(void)
++{
++	write_cr4(read_cr4() & ~X86_CR4_OSXSAVE);
++}
++
++/*
++ * Ensure that kvm recalculates the L1 guest's CPUID.01H:ECX.OSXSAVE
++ * after VM-exit from an L2 guest that sets CR4.OSXSAVE to a different
++ * value than in L1.
++ */
++static void vmx_cr4_osxsave_test(void)
++{
++	if (!this_cpu_has(X86_FEATURE_XSAVE)) {
++		report_skip("XSAVE not detected");
++		return;
++	}
++
++	if (!(read_cr4() & X86_CR4_OSXSAVE)) {
++		unsigned long cr4 = read_cr4() | X86_CR4_OSXSAVE;
++
++		write_cr4(cr4);
++		vmcs_write(GUEST_CR4, cr4);
++		vmcs_write(HOST_CR4, cr4);
++	}
++
++	TEST_ASSERT(cpuid_osxsave());
++
++	test_set_guest(vmx_cr4_osxsave_test_guest);
++	enter_guest();
++
++	TEST_ASSERT(cpuid_osxsave());
++}
++
+ static void vmx_nm_test_guest(void)
  {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2f32fd09e259..78163e345e84 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1699,6 +1699,10 @@ int svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 	cr4 |= host_cr4_mce;
- 	to_svm(vcpu)->vmcb->save.cr4 = cr4;
- 	vmcb_mark_dirty(to_svm(vcpu)->vmcb, VMCB_CR);
-+
-+	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
-+		kvm_update_cpuid_runtime(vcpu);
-+
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d14c94d0aff1..bd2cb47f113b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3095,6 +3095,7 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
- 
- int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- {
-+	unsigned long old_cr4 = vcpu->arch.cr4;
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	/*
- 	 * Pass through host's Machine Check Enable value to hw_cr4, which
-@@ -3166,6 +3167,10 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 
- 	vmcs_writel(CR4_READ_SHADOW, cr4);
- 	vmcs_writel(GUEST_CR4, hw_cr4);
-+
-+	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
-+		kvm_update_cpuid_runtime(vcpu);
-+
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 397f599b20e5..e95c333724c2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1014,9 +1014,6 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 	    (!(cr4 & X86_CR4_PCIDE) && (old_cr4 & X86_CR4_PCIDE)))
- 		kvm_mmu_reset_context(vcpu);
- 
--	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
--		kvm_update_cpuid_runtime(vcpu);
--
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(kvm_set_cr4);
-@@ -9522,7 +9519,6 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- {
- 	struct msr_data apic_base_msr;
- 	int mmu_reset_needed = 0;
--	int cpuid_update_needed = 0;
- 	int pending_vec, max_bits, idx;
- 	struct desc_ptr dt;
- 	int ret = -EINVAL;
-@@ -9557,11 +9553,7 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	vcpu->arch.cr0 = sregs->cr0;
- 
- 	mmu_reset_needed |= kvm_read_cr4(vcpu) != sregs->cr4;
--	cpuid_update_needed |= ((kvm_read_cr4(vcpu) ^ sregs->cr4) &
--				(X86_CR4_OSXSAVE | X86_CR4_PKE));
- 	kvm_x86_ops.set_cr4(vcpu, sregs->cr4);
--	if (cpuid_update_needed)
--		kvm_update_cpuid_runtime(vcpu);
- 
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 	if (is_pae_paging(vcpu)) {
+ 	write_cr0(read_cr0() | X86_CR0_TS);
+@@ -10496,6 +10529,7 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(vmx_vmcs_shadow_test),
+ 	/* Regression tests */
+ 	TEST(vmx_cr_load_test),
++	TEST(vmx_cr4_osxsave_test),
+ 	TEST(vmx_nm_test),
+ 	TEST(vmx_db_test),
+ 	TEST(vmx_nmi_window_test),
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
