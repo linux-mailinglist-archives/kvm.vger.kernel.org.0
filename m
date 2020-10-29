@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A21E529EDB4
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 14:56:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94DFF29EDD4
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 15:05:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727614AbgJ2N4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Oct 2020 09:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59968 "EHLO
+        id S1725848AbgJ2OFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 10:05:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726184AbgJ2N4G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Oct 2020 09:56:06 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1CF2C0613CF
-        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 06:56:05 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id t25so3879314ejd.13
-        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 06:56:05 -0700 (PDT)
+        with ESMTP id S1725710AbgJ2OFE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Oct 2020 10:05:04 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247A0C0613D3
+        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 07:05:04 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id l24so3140840edj.8
+        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 07:05:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=0c1+bR9T+IplOpKDV6RvsAZ3ZFdVzQUrH0NfTUm42po=;
-        b=vXEhrLtERJ9KdvJrljvr86XAWaPWGWu/mpmmOiBfg29cKmexUAH9RuzLZOZrvy+Wm8
-         Jw3qPzVBGH/6jSVWIRq9cHNIJ1yCBiVPEjzwqqKw/SjFoCZjcyGZGTUsUGOTRMIeWylW
-         nUt60iBERHk8ZrVY4t2ABYkEUQkc8Fi3qFu5tTnxwS/ZxHh4LNbDcYXuV7S51To2sY4t
-         SFZuLc4ROkO+GH5tqattr0nhu5jmzi8OIVXB0Sku3YSzvHpGMo9mueuzpwEDu/uvvpnF
-         i5Jcsa7p5wiRyzhcJXRX0ksFQB/Tmq7fWZV4iAmJcs3KuV8Tqtr0+zwLC/4xhC3S/GYz
-         15tg==
+        bh=/zaI+f/txWOZ0xKOmo7GdxyYlTLY1JVfc3R7UeR/0Es=;
+        b=NUtVMLv4Bw7ze5Ck+7us9te0gtcg1z4NRTZNEWPgyk/T2jMCyV9AUI9YICZITwZxxa
+         DZCM/DQum2kGGYx33N9OA3m5cVXOLukr9kIsetNG3I5duYRuOsXVHkooHjCQMQMZpb6S
+         QPkgTI8WqqSJEU4Oit1abBpgv4Sp700qQd0df/zuLN2VL4wEOhIOZPe/8M0FduGQlHJA
+         Yu3D7Fhke592NYsAxHlsKNDyFMaQVNrEdMcw/PCVr5fmMMt79nBeW47sixhNSgCZ335A
+         9KLETq/nTN9Z6AiBWV0D80IjXDkubykVmZXT2+t/GcpMu81ANSQN3i0MnbLrdaHn4bVl
+         MZ+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=0c1+bR9T+IplOpKDV6RvsAZ3ZFdVzQUrH0NfTUm42po=;
-        b=BLSdHI8akYC8q5YCVjtTqWJGwnehT96D0oZOHMeZzN0wH4e7poJ/QnObzxBxRkge1j
-         nf21gViwA6SX+3/KfTQVdRmTpSziqJrspRsZalt5XddDOV88HpKwQi5ujevwzVcCuh1Q
-         /AaPhSxwdTz9oM6QoRnB1hpLXGd2KX628PFgww8WHowt9hXLWb+lgd7DGSAfvUM8NbQl
-         MQScHQOSUsdH5hQ0BlZyyt143s3844xSx1e6+8kgCX+iHA3i6lZ+uivRUuoDI5WFr/xP
-         Mb0sPaOSL5yUGXe6wz91XKy+6zUySR9SiW2x+JlxAGmnEwbDLiuGXIFhg1+vOunDALse
-         QDaw==
-X-Gm-Message-State: AOAM533y2JNXrFIL5y4WGobQ33aaCgW/CJgr+JIyc3SgBf7tE5jFJxNU
-        KzEzIpJuEEBH+onrFYMBKZPdrM8+XQ5CYw==
-X-Google-Smtp-Source: ABdhPJxZ2KNY34o2P1qMFC7JpDPTt0TXSskEiJdDyPhiBdzaOQAT1QkjlkGegDZ4uxVw2/hcjVZqkQ==
-X-Received: by 2002:a17:906:fca:: with SMTP id c10mr4346402ejk.128.1603979763889;
-        Thu, 29 Oct 2020 06:56:03 -0700 (PDT)
+        bh=/zaI+f/txWOZ0xKOmo7GdxyYlTLY1JVfc3R7UeR/0Es=;
+        b=btWhCh14fq2nkK8WUPXXF30WsJ47G4V0qALoY7ze+C2ffa/rBvBkGhac/GEeeHucr9
+         qENMBrfpryhMpai8FOMwq2u4EsQ6fYiJRPTD+QcZpyrlplbDEu/KWBmpkPu4fHP5nRVl
+         37Gp2FSZEHP593uhjmB7euJlxPDh8L0NLU+4efCZRoejdPkeSPBrRJQ+PCOToZxR1iSh
+         swJY+y9SvVoblLVdpTOIbLkK19PJI/jk+uB8YXGsdP/xqr39jTIU8Ow1uHNLM8DS0/Ld
+         9xOp5zWD4geP2gGcWPo7rcTuiP6fCBOfb7Jt4i+KQu/N/a7tNguh1co9yubk4ww6f+5/
+         PLJQ==
+X-Gm-Message-State: AOAM533ZY7C5JN6vTuFetD36Je/FZgp0HcGDqeepzCOCgQxeld0FEBj/
+        Lh5815xC9y9nQB5BSgyCrg9OKmxviCZ2eQ==
+X-Google-Smtp-Source: ABdhPJxwb7oKIvHT9vRy1RoHHsA6AkMv8uH5TUVNJM0gxmq1bUNDVbeL243iCPUrY6wPUDId2h7F8g==
+X-Received: by 2002:a05:6402:207c:: with SMTP id bd28mr4016747edb.316.1603980302527;
+        Thu, 29 Oct 2020 07:05:02 -0700 (PDT)
 Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id j20sm1591453edt.4.2020.10.29.06.56.02
+        by smtp.gmail.com with ESMTPSA id u23sm1531809ejy.87.2020.10.29.07.05.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2020 06:56:03 -0700 (PDT)
+        Thu, 29 Oct 2020 07:05:01 -0700 (PDT)
 From:   Uros Bizjak <ubizjak@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     Uros Bizjak <ubizjak@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH] KVM/VMX/SVM: Move kvm_machine_check function to x86.h
-Date:   Thu, 29 Oct 2020 14:56:00 +0100
-Message-Id: <20201029135600.122392-1-ubizjak@gmail.com>
+Subject: [PATCH] KVM/VMX: Use TEST %REG,%REG instead of CMP $0,%REG in vmenter.S
+Date:   Thu, 29 Oct 2020 15:04:57 +0100
+Message-Id: <20201029140457.126965-1-ubizjak@gmail.com>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -62,132 +62,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move kvm_machine_check to x86.h to avoid two exact copies
-of the same function in kvm.c and svm.c.
+Saves one byte in __vmx_vcpu_run for the same functionality.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 ---
- arch/x86/kvm/svm/svm.c | 20 --------------------
- arch/x86/kvm/vmx/vmx.c | 20 --------------------
- arch/x86/kvm/x86.h     | 20 ++++++++++++++++++++
- 3 files changed, 20 insertions(+), 40 deletions(-)
+ arch/x86/kvm/vmx/vmenter.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2f32fd09e259..f2ad59d19040 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -33,7 +33,6 @@
- #include <asm/debugreg.h>
- #include <asm/kvm_para.h>
- #include <asm/irq_remapping.h>
--#include <asm/mce.h>
- #include <asm/spec-ctrl.h>
- #include <asm/cpu_device_id.h>
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 90ad7a6246e3..e85aa5faa22d 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -132,7 +132,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	mov (%_ASM_SP), %_ASM_AX
  
-@@ -1929,25 +1928,6 @@ static bool is_erratum_383(void)
- 	return true;
- }
+ 	/* Check if vmlaunch or vmresume is needed */
+-	cmpb $0, %bl
++	testb %bl, %bl
  
--/*
-- * Trigger machine check on the host. We assume all the MSRs are already set up
-- * by the CPU and that we still run on the same CPU as the MCE occurred on.
-- * We pass a fake environment to the machine check handler because we want
-- * the guest to be always treated like user space, no matter what context
-- * it used internally.
-- */
--static void kvm_machine_check(void)
--{
--#if defined(CONFIG_X86_MCE)
--	struct pt_regs regs = {
--		.cs = 3, /* Fake ring 3 no matter what the guest ran on */
--		.flags = X86_EFLAGS_IF,
--	};
--
--	do_machine_check(&regs);
--#endif
--}
--
- static void svm_handle_mce(struct vcpu_svm *svm)
- {
- 	if (is_erratum_383()) {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0f390c748b18..0329f09a2ca6 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -40,7 +40,6 @@
- #include <asm/irq_remapping.h>
- #include <asm/kexec.h>
- #include <asm/perf_event.h>
--#include <asm/mce.h>
- #include <asm/mmu_context.h>
- #include <asm/mshyperv.h>
- #include <asm/mwait.h>
-@@ -4714,25 +4713,6 @@ static int handle_rmode_exception(struct kvm_vcpu *vcpu,
- 	return 1;
- }
- 
--/*
-- * Trigger machine check on the host. We assume all the MSRs are already set up
-- * by the CPU and that we still run on the same CPU as the MCE occurred on.
-- * We pass a fake environment to the machine check handler because we want
-- * the guest to be always treated like user space, no matter what context
-- * it used internally.
-- */
--static void kvm_machine_check(void)
--{
--#if defined(CONFIG_X86_MCE)
--	struct pt_regs regs = {
--		.cs = 3, /* Fake ring 3 no matter what the guest ran on */
--		.flags = X86_EFLAGS_IF,
--	};
--
--	do_machine_check(&regs);
--#endif
--}
--
- static int handle_machine_check(struct kvm_vcpu *vcpu)
- {
- 	/* handled by vmx_vcpu_run() */
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 3900ab0c6004..e1bde3f3f2d5 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -3,6 +3,7 @@
- #define ARCH_X86_KVM_X86_H
- 
- #include <linux/kvm_host.h>
-+#include <asm/mce.h>
- #include <asm/pvclock.h>
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
-@@ -366,6 +367,25 @@ static inline bool kvm_dr6_valid(u64 data)
- 	return !(data >> 32);
- }
- 
-+/*
-+ * Trigger machine check on the host. We assume all the MSRs are already set up
-+ * by the CPU and that we still run on the same CPU as the MCE occurred on.
-+ * We pass a fake environment to the machine check handler because we want
-+ * the guest to be always treated like user space, no matter what context
-+ * it used internally.
-+ */
-+static inline void kvm_machine_check(void)
-+{
-+#if defined(CONFIG_X86_MCE)
-+	struct pt_regs regs = {
-+		.cs = 3, /* Fake ring 3 no matter what the guest ran on */
-+		.flags = X86_EFLAGS_IF,
-+	};
-+
-+	do_machine_check(&regs);
-+#endif
-+}
-+
- void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
- void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
- int kvm_spec_ctrl_test_value(u64 value);
+ 	/* Load guest registers.  Don't clobber flags. */
+ 	mov VCPU_RCX(%_ASM_AX), %_ASM_CX
 -- 
 2.26.2
 
