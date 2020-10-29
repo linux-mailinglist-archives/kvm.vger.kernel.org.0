@@ -2,75 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFF9229F6AA
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 22:09:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6975E29F6F7
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 22:35:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726581AbgJ2VJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Oct 2020 17:09:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53064 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726200AbgJ2VJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Oct 2020 17:09:28 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 233742087D;
-        Thu, 29 Oct 2020 21:09:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604005767;
-        bh=md/yxiXBCp+bY6aWAkEWs1aEmMQAJ/pIyKT56uFmYnQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=B9CtSTBIWxKLYc6r46/Jz1kFl1zGDRzNZOCAxl5fxVJm6IMfP9jm9pgd/ZZP+HX2w
-         GZx7fKhXj2vVhCqi0gFhqfG+FfzAGuFwE4HadWrUFyk76Ob26MCXD/o4GIuw7Ce6Au
-         CIVnNVbty5Fz/6o6TG9C13zmI2YakIQzPKfe65fA=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kYFAj-005YNy-90; Thu, 29 Oct 2020 21:09:25 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, Gavin Shan <gshan@redhat.com>,
-        Santosh Shukla <sashukla@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     shan.gavin@gmail.com, will@kernel.org, suzuki.poulose@arm.com,
-        mcrossley@nvidia.com, kwankhede@nvidia.com, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, cjia@nvidia.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 0/1] KVM: arm64: fix the mmio faulting
-Date:   Thu, 29 Oct 2020 21:09:16 +0000
-Message-Id: <160400571841.9348.6030696223991954457.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <1603711447-11998-1-git-send-email-sashukla@nvidia.com>
-References: <1603711447-11998-1-git-send-email-sashukla@nvidia.com>
+        id S1725778AbgJ2VfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 17:35:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47134 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725379AbgJ2VfS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Oct 2020 17:35:18 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78F8C0613CF;
+        Thu, 29 Oct 2020 14:35:16 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id u62so5270256iod.8;
+        Thu, 29 Oct 2020 14:35:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=o/fZRhurDRoh3x2KXwZGFT2Yi8JsbQLcBDCy2LAivAY=;
+        b=gGuTqV/6UjMeGtDxjXYhwQPHTl/X7tzC8nyDkopIigNmkrO3mCPbuH/1MhlZEXs368
+         ilsmPmjF8/8PcamJS4tzXcIssUUJKuowmvAaZpvnATyfAuLpyzByye2ob5V27GVE8qIT
+         KZP17N/xFAWoIKkVe0RuMkFayeP8BWuJYRQfihoxN9IcITuyVnsNMyFFHot0k3ChkDxn
+         nFZSLwwceJfQxsoqw1O2SZk7WDZNX5WeTFIk5dkyBtO3OtvmEbw8mG/eVrbi8eoLhfOn
+         0GZOx0BOnNgBQieydv87h3zVPKI0C/CSIt6VEOi3C7rjEkzw5bkznPJoY5+aGh/Uu3xA
+         /g8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=o/fZRhurDRoh3x2KXwZGFT2Yi8JsbQLcBDCy2LAivAY=;
+        b=KinZ6hrbkXJ3h3DclDuBAp8Nhpaw739QgjhpYXN2kOq16mF6EKn8Ncz8nxq1cB+RdC
+         loTEqq5lPm4snNchDLwNgIUKdnDY5cHv1ycThuX+/LrmKeNpMBzlZD88dUtS8DRtT0fS
+         O1WK6EcWuJg5q8WjYvucVAqpNoOV23EL3FR22XeNqy3YpSc45KlMYLS6anuZH/AbWyao
+         HIC/o+eJgLkW6NEezx/TYHyDJpi9pUkGguel+AXgTrEL14OcltJbt+1MeSDaBytRBaLM
+         2Og8NWATW8Ty1bf4EMJL9uBGBpDN6puw4xlIk1fX0FCDL3Y3UVJeo0WcBT3Ak+eGyphi
+         48Uw==
+X-Gm-Message-State: AOAM530rBehHEPLKdCyAg69CswAyeQ1Lz1y2STmerKwBdnO3UkUCVFrP
+        9pbUYcrhb5F1jAkIq7T++vY=
+X-Google-Smtp-Source: ABdhPJyTkgnuu9ypsiIO3xCkmwdOh4o3IIPvbsxF62gfZSdk4g2zCe1B1vFwKdXsPs4FzLAVBSR7HA==
+X-Received: by 2002:a05:6602:22cf:: with SMTP id e15mr5087695ioe.1.1604007316212;
+        Thu, 29 Oct 2020 14:35:16 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id r3sm3065346iog.55.2020.10.29.14.35.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Oct 2020 14:35:15 -0700 (PDT)
+Sender: Arvind Sankar <niveditas98@gmail.com>
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Thu, 29 Oct 2020 17:35:12 -0400
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        David Laight <David.Laight@ACULAB.COM>,
+        'Arnd Bergmann' <arnd@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "x86@kernel.org" <x86@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "platform-driver-x86@vger.kernel.org" 
+        <platform-driver-x86@vger.kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
+Subject: Re: [PATCH] [v2] x86: apic: avoid -Wshadow warning in header
+Message-ID: <20201029213512.GA34524@rani.riverdale.lan>
+References: <20201028212417.3715575-1-arnd@kernel.org>
+ <38b11ed3fec64ebd82d6a92834a4bebe@AcuMS.aculab.com>
+ <20201029165611.GA2557691@rani.riverdale.lan>
+ <93180c2d-268c-3c33-7c54-4221dfe0d7ad@redhat.com>
+ <87v9esojdi.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, gshan@redhat.com, sashukla@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, shan.gavin@gmail.com, will@kernel.org, suzuki.poulose@arm.com, mcrossley@nvidia.com, kwankhede@nvidia.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, cjia@nvidia.com, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87v9esojdi.fsf@nanos.tec.linutronix.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 26 Oct 2020 16:54:06 +0530, Santosh Shukla wrote:
-> Description of the Reproducer scenario as asked in the thread [1].
+On Thu, Oct 29, 2020 at 09:41:13PM +0100, Thomas Gleixner wrote:
+> On Thu, Oct 29 2020 at 17:59, Paolo Bonzini wrote:
+> > On 29/10/20 17:56, Arvind Sankar wrote:
+> >>> For those two just add:
+> >>> 	struct apic *apic = x86_system_apic;
+> >>> before all the assignments.
+> >>> Less churn and much better code.
+> >>>
+> >> Why would it be better code?
+> >> 
+> >
+> > I think he means the compiler produces better code, because it won't
+> > read the global variable repeatedly.  Not sure if that's true,(*) but I
+> > think I do prefer that version if Arnd wants to do that tweak.
 > 
-> Tried to create the reproducer scenario with vfio-pci driver using
-> nvidia GPU in PT mode, As because vfio-pci driver now supports
-> vma faulting (/vfio_pci_mmap_fault) so could create a crude reproducer
-> situation with that.
+> It's not true.
 > 
-> [...]
+>      foo *p = bar;
+> 
+>      p->a = 1;
+>      p->b = 2;
+> 
+> The compiler is free to reload bar after accessing p->a and with
+> 
+>     bar->a = 1;
+>     bar->b = 1;
+> 
+> it can either cache bar in a register or reread it after bar->a
+> 
+> The generated code is the same as long as there is no reason to reload,
+> e.g. register pressure.
+> 
+> Thanks,
+> 
+>         tglx
 
-Applied to next, thanks!
+It's not quite the same.
 
-[1/1] KVM: arm64: Force PTE mapping on fault resulting in a device mapping
-      commit: 91a2c34b7d6fadc9c5d9433c620ea4c32ee7cae8
+https://godbolt.org/z/4dzPbM
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+With -fno-strict-aliasing, the compiler reloads the pointer if you write
+to the start of what it points to, but not if you write to later
+elements.
