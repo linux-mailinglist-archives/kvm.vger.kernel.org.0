@@ -2,104 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 100FB29E780
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 10:38:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C595E29E82F
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 11:04:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725982AbgJ2Ji2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Oct 2020 05:38:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48132 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725925AbgJ2Ji1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Oct 2020 05:38:27 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF51C0613D4
-        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 02:38:27 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id o14so1708187otj.6
-        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 02:38:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Egb29gKTqFSxWvJdyyI+gXsFyuWERrGbUzIe36GvMh0=;
-        b=WN/T3qojfZLOiwWrcArWiy5sVDza4QAlNXW9uwA8epIyHde70y+LwP9IzcHYl+6ykJ
-         TAk8UrMTzmau/HOuQondzD4ErZSwoLwV9gqj9wxMlA+Nc7EpAQq6Kw0NuRKGuGv3z2Q3
-         wXk6V662Zo5+uF5oqJou8URYRaL/kPvUOFj5E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Egb29gKTqFSxWvJdyyI+gXsFyuWERrGbUzIe36GvMh0=;
-        b=RAnQ8VoDxjLaFeQSrbPJNcm/2HKWnZCdIAGG+zaEaxsEdNqNxEHJ2G8Tg9NK9yNpgq
-         2VQgcYKGgbpFh7IjRxv1WUa6aRjqz3xvCzpY4T+alHZwxnD7Uj1HcvWeIhvqLojvgTeO
-         rpuhu+TZqFog4TexXluyIrto1NNiB/aeBGHETITwi8vugVfaFB+xx34lxFXOHU05qagO
-         kij+A270kj1bJ+afN75gfbpuyYDEp40T1A/VaWjjDc7fiDrf9Es1mQsYpFbZ1gKAeuig
-         NdLdcoV5mM20bQXeYE9tlXEPhv+uJWpq0ev7FOly8+V/OSv34j7VRqLzSQhRg/Et2Bm/
-         xnEg==
-X-Gm-Message-State: AOAM533C1nbAivoG2ilfI5Iwb0/unOhTc2tl6l9QrEPy3lAbFTp0cbNX
-        94XX0Pm3re6d2DmM3pfslFirROaKZP4iTjOywUwtpg==
-X-Google-Smtp-Source: ABdhPJx7W4rK7T8Tetk1+e1/J1/olWsPDBEjgbzX/L+3bK6RKH7lBWpMwtzMdyCSKSKNvm+bdKwtPXqJrc1sPDUR5+Q=
-X-Received: by 2002:a05:6830:1c3c:: with SMTP id f28mr2715883ote.188.1603964307018;
- Thu, 29 Oct 2020 02:38:27 -0700 (PDT)
+        id S1725919AbgJ2KCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 06:02:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44760 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725890AbgJ2KCX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Oct 2020 06:02:23 -0400
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6DB54215A4;
+        Thu, 29 Oct 2020 09:51:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603965098;
+        bh=9kcfotFFJ47rYdLC6ZxzdCDBa1k7PeFD878Gh2iRMYw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=vMd1WTw46NmbdjDfGERZXE49CkIxTu62Lo98SE3sftOXo2ak1wjE9ZykA5QSCJ4f6
+         RDyWIZLY0FUMnquHbcpT2wuFgnwMWGJcElPYN/dCVDOBDKjwtw6POjOBjpvi7Bxxzs
+         IPD7rWkW0qA5Zp3lwpn5CoP9SOsl9SQ1SBIW0R2s=
+Received: by mail-qv1-f54.google.com with SMTP id b11so1072516qvr.9;
+        Thu, 29 Oct 2020 02:51:38 -0700 (PDT)
+X-Gm-Message-State: AOAM531iPFjBDH77Fzh6gQbCnPxvw2RSjiH09W81ktIs33bDifYtZd2Z
+        iZ9fVclvnvl4DqzGCkdGa0d2BHxI6WBsCG1nBpw=
+X-Google-Smtp-Source: ABdhPJxaZEntygitIVQOXS85Gb8nGw1osAMMJulsU6ZeD1uTGkc5sotJk4c97dNCIKL6ORL8v2BjlIfOh3rRL6d2/zw=
+X-Received: by 2002:ad4:4203:: with SMTP id k3mr2986180qvp.8.1603965097361;
+ Thu, 29 Oct 2020 02:51:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201026105818.2585306-1-daniel.vetter@ffwll.ch>
- <20201029085749.GB25658@infradead.org> <CAKMK7uEV7sQ48w1Dd=WCY1r6LrY+aEq3ASnouOebQoo=Zr=CTQ@mail.gmail.com>
- <20201029092800.GA494@infradead.org>
-In-Reply-To: <20201029092800.GA494@infradead.org>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Thu, 29 Oct 2020 10:38:16 +0100
-Message-ID: <CAKMK7uG=R2372bVTK1Zh+P7uRd2QJSw5EgcJ6JJwVtNyJ7SJtQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/15] follow_pfn and other iomap races
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>
+References: <20201028212417.3715575-1-arnd@kernel.org> <ea34f1d3-ed54-a2de-79d9-5cc8decc0ab3@redhat.com>
+In-Reply-To: <ea34f1d3-ed54-a2de-79d9-5cc8decc0ab3@redhat.com>
+From:   Arnd Bergmann <arnd@kernel.org>
+Date:   Thu, 29 Oct 2020 10:51:21 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a0e0YAkh_9S1ZG5FW3QozZnp1CwXUfWx9VHWkY=h+FVxw@mail.gmail.com>
+Message-ID: <CAK8P3a0e0YAkh_9S1ZG5FW3QozZnp1CwXUfWx9VHWkY=h+FVxw@mail.gmail.com>
+Subject: Re: [PATCH] [v2] x86: apic: avoid -Wshadow warning in header
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-hyperv@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        xen-devel <xen-devel@lists.xenproject.org>,
+        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 29, 2020 at 10:28 AM Christoph Hellwig <hch@infradead.org> wrote:
+On Thu, Oct 29, 2020 at 8:04 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On Thu, Oct 29, 2020 at 10:25:16AM +0100, Daniel Vetter wrote:
-> > On Thu, Oct 29, 2020 at 9:57 AM Christoph Hellwig <hch@infradead.org> wrote:
-> > >
-> > > Maybe I'm missing something, but shouldn't follow_pfn be unexported
-> > > at the end of the series?
-> >
-> > kvm is a legit user and modular afaict. But since you can't use this
-> > without an mmu_notifier anyway (or digging around in pagetable
-> > locking), maybe it should be EXPORT_SYMBOL_GPL now at least?
+> On 28/10/20 22:20, Arnd Bergmann wrote:
+> > Avoid this by renaming the global 'apic' variable to the more descriptive
+> > 'x86_system_apic'. It was originally called 'genapic', but both that
+> > and the current 'apic' seem to be a little overly generic for a global
+> > variable.
 >
-> I think it should then take the notifier as an argument even if it isn't
-> diretly used as a safety check, and get a new name describing it.
+> The 'apic' affects only the current CPU, so one of 'x86_local_apic',
+> 'x86_lapic' or 'x86_apic' is probably preferrable.
 
-Hm so Jason and me discussed this, but e.g. the s390 is safe with with
-just the pagetable locks. So we'd need two versions.
+Ok, I'll change it to x86_local_apic then, unless someone else has
+a preference between them.
 
-The more practical problem is that I haven't found a reasonable way to
-check that a passed in mmu_notifier is registered against the mm we're
-working on, and without that check it feels a bit silly. But if you
-see how to do that I think we can do an EXPORT_SYMBOL_GPL follow_pfn
-which takes the notifier, and an __follow_pfn for s390 and similar
-internal code which isn't exported.
+> I don't have huge objections to renaming 'apic' variables and arguments
+> in KVM to 'lapic'.  I do agree with Sean however that it's going to
+> break again very soon.
 
-> EXPORT_SYMBOL_GPL is probably ok for now, but I'm drafting a new
-> EXPORT_SYMBOL_FOR_MODULE() which will export symbols that can only be
-> used by one specific module, with kvm being a prime user due to all
-> the odd exports it requires that aren't really the kernel interface by
-> any normal means.
+I think ideally there would be no global variable, withall accesses
+encapsulated in function calls, possibly using static_call() optimizations
+if any of them are performance critical.
 
-Hm yeah that's another one. There's also some virt stuff that's
-currently on unsafe_follow_pfn and needs to be switched over, and I
-think that would also need an mmu notifier of some sorts to close the
-gaps.
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+It doesn't seem hard to do, but I'd rather leave that change to
+an x86 person ;-)
+
+      Arnd
