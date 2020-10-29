@@ -2,161 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1DBC29E2F4
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 03:45:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D584B29E3CC
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 08:23:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgJ1Vdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Oct 2020 17:33:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9868 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726220AbgJ1Vdn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Oct 2020 17:33:43 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09SF1hXV121541;
-        Wed, 28 Oct 2020 11:03:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=qCy8VkwqyRNJffBI5KoK7JXyLGP0Hef+xRP8C6iyofQ=;
- b=elCbb15cO4x7L0JtC7602ZuV0IOh/v27yQwD9GtwiiPUgpkYG3yp0WoVFDO5DjIlOGj+
- 6cS5biyXQttT1u8CStsUezD7mO1nBfJ3D04p4/PxUvK8PrMrhnh2BdxoSLBtpXFWibcM
- ROcHoD8fQGWmWgkvLAefzyo7snAKaIvliu54vMOVYacbk4GunlBOliTfemj+rICOCNsp
- fVeS5CJIofaNvv440zGQyqmXmnfyBRMkrssuS/SvCS8cyd2+f5sG6jHFb62rufJglv+K
- nwWItBjvPXWC8pSiILI1JGJ6o98+pSLTLOnWKcGyQuwEq8yxgskz6xSl5hitfYtx6qWA tA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34ey1xdwqu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 11:03:39 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09SF2Dhu125140;
-        Wed, 28 Oct 2020 11:03:38 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34ey1xdwpd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 11:03:38 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09SEqgGa026590;
-        Wed, 28 Oct 2020 15:03:36 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 34cbw8acae-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 15:03:35 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09SF3Xks20251132
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Oct 2020 15:03:33 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D56AC52052;
-        Wed, 28 Oct 2020 15:03:32 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.18.81])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 260995204F;
-        Wed, 28 Oct 2020 15:03:32 +0000 (GMT)
-Date:   Wed, 28 Oct 2020 16:03:30 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 09/14] s390/vfio-ap: allow assignment of unavailable
- AP queues to mdev device
-Message-ID: <20201028160330.55df0068.pasic@linux.ibm.com>
-In-Reply-To: <20201022171209.19494-10-akrowiak@linux.ibm.com>
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
-        <20201022171209.19494-10-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726212AbgJ2HV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 03:21:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57434 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726076AbgJ2HVJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Oct 2020 03:21:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603956067;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k+MySIa0GO5sAsedbOJklvkP1JxXrpHRlnL4dRpsf/4=;
+        b=G4hu6+LPzLZiY1zNpGWejRN1iRAMp2Q2GNLdqbmT257sRo+Bf1ysqV76lin2NVdC+gC5Sh
+        No6beNH6NsXdi/Tmmh9Ux0nYYZnj2F4Rw8fbM6NpyN+MWhCDkE15FY8CvZIP3Z7h8kTUP9
+        /Nafq0HQkbH7z+N7kfT/JkJvMux6zjQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-BCJTrzTLMXyVmLaaU3O0Fg-1; Thu, 29 Oct 2020 03:04:35 -0400
+X-MC-Unique: BCJTrzTLMXyVmLaaU3O0Fg-1
+Received: by mail-wm1-f72.google.com with SMTP id t201so560740wmt.1
+        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 00:04:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=k+MySIa0GO5sAsedbOJklvkP1JxXrpHRlnL4dRpsf/4=;
+        b=aCURdgmfGlegiX2oexTEomUDLU8L10msI4auDZGqa7RRTBnXKS24+aVXcOvbruEfUb
+         1oaa5hLSnz/LZUsJK6K8cR/RtCU1UnJMkprR3IQH5zPDOtt0S8qTQ21SAWzu+R8+tjCX
+         YranLHzN/KsqovcaNPk0gE+ArxMLKqDyxUmSv9UwBn/eWWpEsj6GKtJNPD4tddkiKKHk
+         F37hsBk7gP6jUVxS+zwDRSZe7yOeWGJkR94D/FoY3iPOF+DaLtRPyqkw2SVZClM52sNa
+         t/wob018YUOjdCaWZnlgJEKN/9Lj2QbnMPWlFRFjvpDOEXF60lQqah9buIGtlP8dxR7X
+         tfTg==
+X-Gm-Message-State: AOAM5301t+F4hUI7EKYgDiXdKW5s3Smda22QPXmvFwTbgxABC8yDyLo5
+        r1lZwgz0o8Q3tS7B767q2Dv+NVqh05zAdcTWuSeX351+wr7LfC3E7xMcFdHA+lK447y/PaHY6Hy
+        bIu+7AwD3NEy2
+X-Received: by 2002:adf:e4ca:: with SMTP id v10mr3780271wrm.53.1603955073919;
+        Thu, 29 Oct 2020 00:04:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjtd7rX2GzPMeGPldc12GMpi5saPCqNeQJ2ZCa70evuRQIB96hYYOHQ+JlKqMs5entrVHldQ==
+X-Received: by 2002:adf:e4ca:: with SMTP id v10mr3780234wrm.53.1603955073729;
+        Thu, 29 Oct 2020 00:04:33 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id 3sm2825527wmd.19.2020.10.29.00.04.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Oct 2020 00:04:33 -0700 (PDT)
+Subject: Re: [PATCH] [v2] x86: apic: avoid -Wshadow warning in header
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        xen-devel@lists.xenproject.org, iommu@lists.linux-foundation.org
+References: <20201028212417.3715575-1-arnd@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea34f1d3-ed54-a2de-79d9-5cc8decc0ab3@redhat.com>
+Date:   Thu, 29 Oct 2020 08:04:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-10-28_06:2020-10-28,2020-10-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 spamscore=0 lowpriorityscore=0 clxscore=1015 bulkscore=0
- priorityscore=1501 adultscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010280100
+In-Reply-To: <20201028212417.3715575-1-arnd@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Oct 2020 13:12:04 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 28/10/20 22:20, Arnd Bergmann wrote:
+> Avoid this by renaming the global 'apic' variable to the more descriptive
+> 'x86_system_apic'. It was originally called 'genapic', but both that
+> and the current 'apic' seem to be a little overly generic for a global
+> variable.
 
-> +static int vfio_ap_mdev_validate_masks(struct ap_matrix_mdev *matrix_mdev,
-> +				       unsigned long *mdev_apm,
-> +				       unsigned long *mdev_aqm)
-> +{
-> +	if (ap_apqn_in_matrix_owned_by_def_drv(mdev_apm, mdev_aqm))
-> +		return -EADDRNOTAVAIL;
-> +
-> +	return vfio_ap_mdev_verify_no_sharing(matrix_mdev, mdev_apm, mdev_aqm);
-> +}
-> +
->  static bool vfio_ap_mdev_matrixes_equal(struct ap_matrix *matrix1,
->  					struct ap_matrix *matrix2)
->  {
-> @@ -840,33 +734,21 @@ static ssize_t assign_adapter_store(struct device *dev,
->  	if (apid > matrix_mdev->matrix.apm_max)
->  		return -ENODEV;
->  
-> -	/*
-> -	 * Set the bit in the AP mask (APM) corresponding to the AP adapter
-> -	 * number (APID). The bits in the mask, from most significant to least
-> -	 * significant bit, correspond to APIDs 0-255.
-> -	 */
-> -	mutex_lock(&matrix_dev->lock);
-> -
-> -	ret = vfio_ap_mdev_verify_queues_reserved_for_apid(matrix_mdev, apid);
-> -	if (ret)
-> -		goto done;
-> -
->  	memset(apm, 0, sizeof(apm));
->  	set_bit_inv(apid, apm);
->  
-> -	ret = vfio_ap_mdev_verify_no_sharing(matrix_mdev, apm,
-> -					     matrix_mdev->matrix.aqm);
-> -	if (ret)
-> -		goto done;
-> -
-> +	mutex_lock(&matrix_dev->lock);
-> +	ret = vfio_ap_mdev_validate_masks(matrix_mdev, apm,
-> +					  matrix_mdev->matrix.aqm);
+The 'apic' affects only the current CPU, so one of 'x86_local_apic',
+'x86_lapic' or 'x86_apic' is probably preferrable.
 
-Is this a potential deadlock?
+I don't have huge objections to renaming 'apic' variables and arguments
+in KVM to 'lapic'.  I do agree with Sean however that it's going to
+break again very soon.
 
-Consider following scenario 
-1) apmask_store() takes ap_perms_mutex
-2) assign_adapter_store() takes matrix_dev->lock
-3) apmask_store() calls vfio_ap_mdev_resource_in_use() which tries
-   to take matrix_dev->lock
-4) assign_adapter_store() calls ap_apqn_in_matrix_owned_by_def_drv
-   which tries to take ap_perms_mutex
+Paolo
 
-BANG!
-
-I think using mutex_trylock(&matrix_dev->lock) and bailing out with busy
-if we don't manage to acquire the lock would be a good idea anyway, to
-prevent a bunch of mdev management operations piling up on the mutex
-and starving in_use().
-
-Regards,
-Halil
-
- 
-> +	if (ret) {
-> +		mutex_unlock(&matrix_dev->lock);
-> +		return ret;
-> +	}
->  	set_bit_inv(apid, matrix_mdev->matrix.apm);
->  	vfio_ap_mdev_link_queues(matrix_mdev, LINK_APID, apid);
-> -	ret = count;
-> -
-> -done:
->  	mutex_unlock(&matrix_dev->lock);
->  
-> -	return ret;
-> +	return count;
