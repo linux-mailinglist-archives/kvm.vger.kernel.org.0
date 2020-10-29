@@ -2,104 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 704D429F305
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 18:24:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A82829F36D
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 18:37:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726960AbgJ2RY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Oct 2020 13:24:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42790 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726591AbgJ2RY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Oct 2020 13:24:27 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727277AbgJ2Rhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 13:37:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58751 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726391AbgJ2Rhj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Oct 2020 13:37:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603993058;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XPgEEQsRiRhTcN1s3Q9RFlbNEdiaM1Nb8MMIVQVxnTg=;
+        b=aaZXoTcy7TbO7whN1Fw661FFHXekdSSVR6Tmhv9HZOd7TwM9yDZXczcmx9VPOVZ59nsBak
+        BpN63bciBFzXTfKb/LtBK2MxavygIDY5mD6M3TqYvrQHgAR1ULrBNwEX02RpLpHgAUu8U4
+        /Q7lMMoEBHnvlPGdYk3mssEkVYnVPi0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-bJ2990sgMAWgomy-p8ml7Q-1; Thu, 29 Oct 2020 13:37:34 -0400
+X-MC-Unique: bJ2990sgMAWgomy-p8ml7Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 30652206CB;
-        Thu, 29 Oct 2020 17:24:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603992266;
-        bh=gfxtWHBGo7NtfP7tLPK6RFZyeD7tCsd/8WBmZ+nR6YY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Qz0o8Qs612ufqKClnWj5umhRrwTci7gM4hnRQjVEiEngEZTKd1kT2bJkOJZTZnmRd
-         cYpPPMcTZPPWQ8qifnSDSbJRDyBlL4iufRqh/FGZPu0aLgFdpXkFMz2igZQPLDc+bi
-         2kvULfEEvoSwm5EV7cccDt4jDS//UDtakQZfcIcc=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kYBex-005VVb-Py; Thu, 29 Oct 2020 17:24:23 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Fix AArch32 handling of DBGD{CCINT,SCRext} and DBGVCR
-Date:   Thu, 29 Oct 2020 17:24:09 +0000
-Message-Id: <20201029172409.2768336-1-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D24681882FBB;
+        Thu, 29 Oct 2020 17:37:32 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.219])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C8255B4B5;
+        Thu, 29 Oct 2020 17:37:30 +0000 (UTC)
+Date:   Thu, 29 Oct 2020 18:37:27 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, mark.rutland@arm.com, jade.alglave@arm.com,
+        luc.maranget@inria.fr, andre.przywara@arm.com, nd@arm.com,
+        alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH] arm64: Add support for configuring the
+ translation granule
+Message-ID: <20201029173727.3mj2gel7r4ievjsn@kamzik.brq.redhat.com>
+References: <20201029155229.7518-1-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201029155229.7518-1-nikos.nikoleris@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The DBGD{CCINT,SCRext} and DBGVCR register entries in the cp14 array
-are missing their target register, resulting in all accesses being
-targetted at the guard sysreg (indexed by __INVALID_SYSREG__).
+On Thu, Oct 29, 2020 at 03:52:29PM +0000, Nikos Nikoleris wrote:
+> Make the translation granule configurable for arm64. arm64 supports
+> page sizes of 4K, 16K and 64K. By default, arm64 is configured with
+> 64K pages. configure has been extended with a new argument:
+> 
+>  --page-shift=(12|14|16)
+> 
+> which allows the user to set the page shift and therefore the page
+> size for arm64. Using the --page-shift for any other architecture
+> results an error message.
+> 
+> To allow for smaller page sizes and 42b VA, this change adds support
+> for 4-level and 3-level page tables. At compile time, we determine how
+> many levels in the page tables we needed.
+> 
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
-Point the emulation code at the actual register entries.
+Thanks for this Nikos! It looks good to me and I'll give it a test
+drive soon.
 
-Cc: stable@vger.kernel.org
-Fixes: bdfb4b389c8d ("arm64: KVM: add trap handlers for AArch32 debug registers")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 1 +
- arch/arm64/kvm/sys_regs.c         | 6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0fdd3e4fe60e..993cbc616ea2 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -239,6 +239,7 @@ enum vcpu_sysreg {
- #define cp14_DBGWCR0	(DBGWCR0_EL1 * 2)
- #define cp14_DBGWVR0	(DBGWVR0_EL1 * 2)
- #define cp14_DBGDCCINT	(MDCCINT_EL1 * 2)
-+#define cp14_DBGVCR	(DBGVCR32_EL2 * 2)
- 
- #define NR_COPRO_REGS	(NR_SYS_REGS * 2)
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f7415c9dbcd9..26c7c25f8a6d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1816,9 +1816,9 @@ static const struct sys_reg_desc cp14_regs[] = {
- 	{ Op1( 0), CRn( 0), CRm( 1), Op2( 0), trap_raz_wi },
- 	DBG_BCR_BVR_WCR_WVR(1),
- 	/* DBGDCCINT */
--	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), trap_debug32 },
-+	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), trap_debug32, NULL, cp14_DBGDCCINT },
- 	/* DBGDSCRext */
--	{ Op1( 0), CRn( 0), CRm( 2), Op2( 2), trap_debug32 },
-+	{ Op1( 0), CRn( 0), CRm( 2), Op2( 2), trap_debug32, NULL, cp14_DBGDSCRext },
- 	DBG_BCR_BVR_WCR_WVR(2),
- 	/* DBGDTR[RT]Xint */
- 	{ Op1( 0), CRn( 0), CRm( 3), Op2( 0), trap_raz_wi },
-@@ -1833,7 +1833,7 @@ static const struct sys_reg_desc cp14_regs[] = {
- 	{ Op1( 0), CRn( 0), CRm( 6), Op2( 2), trap_raz_wi },
- 	DBG_BCR_BVR_WCR_WVR(6),
- 	/* DBGVCR */
--	{ Op1( 0), CRn( 0), CRm( 7), Op2( 0), trap_debug32 },
-+	{ Op1( 0), CRn( 0), CRm( 7), Op2( 0), trap_debug32, NULL, cp14_DBGVCR },
- 	DBG_BCR_BVR_WCR_WVR(7),
- 	DBG_BCR_BVR_WCR_WVR(8),
- 	DBG_BCR_BVR_WCR_WVR(9),
--- 
-2.28.0
+drew
 
