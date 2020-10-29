@@ -2,109 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3222529F26E
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 18:00:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32AC929F28A
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 18:07:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727075AbgJ2RAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Oct 2020 13:00:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46568 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725968AbgJ2RAC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Oct 2020 13:00:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603990800;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LFIk1KDbaI+imFseS7EgKO+PMROEHyYFYHvDyMX5vJs=;
-        b=dSWCbKpj2w6DFFmHob56gvbFpNw5b2wuB7FI2aaN0gcPaWz67Xsjhd029zbGGIsAkH1DOL
-        nrgPEx8hTWdobVXvAKIn2j9+E0w3+9yhrQV3MGVouJolKdnLKLMTUf47z6tOcMYN/3FVcP
-        7M4GYkPPTuWbrqcApUVZhcQLZGTI3M4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-jeQIGK2GP-yDNyW0vSArQw-1; Thu, 29 Oct 2020 12:59:59 -0400
-X-MC-Unique: jeQIGK2GP-yDNyW0vSArQw-1
-Received: by mail-wr1-f72.google.com with SMTP id t14so1540830wrs.2
-        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 09:59:58 -0700 (PDT)
+        id S1727344AbgJ2RHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 13:07:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727324AbgJ2RHB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Oct 2020 13:07:01 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4004C0613CF
+        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 10:07:00 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id x9so2485761pll.2
+        for <kvm@vger.kernel.org>; Thu, 29 Oct 2020 10:07:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=3KRaFeCn8cu3srAmF4IqkMbqw53L1XtWTUY3QLwzm8A=;
+        b=t20WR8sbbc0t+hHqP0qvWHo0kcugXLSSIbgMij7zHAdObBFxCOrZS7wMjsh8SjzAEb
+         A5Ao8fR9DuTUL535/I7Ze9/amqAJnrRqT0oNP7yhcvA9ZIpgAHlu0JSBHiGs1lxRc7xL
+         Ces2Br8g37lUCaoPk+V4hDXhkvEYBdn3mju0c/Nvw2eB9KeSRrC/ZwA84JLLXw8/JFSn
+         LemE+nsNBMndPGfuBfcFJ4XjWnXVbRQou2ckzZiceJhOgCyjfBvT3QVWh42sOHsdmBmR
+         Dgucjd1lGPxCppc1ANudQMSLcBRFXzogAEprxJwJQ4Wb9nCDwaxzY52tDUUSOZX7Q2dc
+         g06A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LFIk1KDbaI+imFseS7EgKO+PMROEHyYFYHvDyMX5vJs=;
-        b=QZBWRCqEqCC/2pnTReUkjxBWP2a7QMuwcd3B9MvwbMSU0H0KNkF+0KaxY7NznFot64
-         aR8uHVGmF1ZIkqN9VV+7+SS88HvFqdra/S3tNF8rG5dhAwCBdgQMqcIF/VOoU4HOuxzz
-         6IhTs/vPo2JvfU9qPWzdM/Z/QDILJ2RfvfmjAVDFXx0Pi2eL6RPQhJEtPH+kMygHf3GW
-         b4igDfDjyph3Cj3v85euMgdqXJ/StmSqaU6wQYOkgHFt+6UsObQonScagrlpKQo5MROW
-         C4QLRU8QA9D4SuwpElan6HGuEpAkM3Xl5u4wW8yKz/rCcyqLhup2eYGJ1ctUup3eBVpt
-         kHzQ==
-X-Gm-Message-State: AOAM5335NdGqpxCHQT4am8tXKmecG1JGPIp92iFTsCatjccTKLuBloRK
-        Xsoda3E6qmc294kMZlwlMdIexSXbvIS4tQJATw24MRYtNwPfXvgOx4AmWdfFNPW1sPrgqbJWJdF
-        rX1K4aaDMMNqH
-X-Received: by 2002:a5d:4e8d:: with SMTP id e13mr6897931wru.368.1603990797492;
-        Thu, 29 Oct 2020 09:59:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIJpY7s5tS16KM1jeRqPRytnQIFiA4jNhSDraUoIgQqWjC9ew8fh0YJ62Gxk2fkrYU/ZAcRw==
-X-Received: by 2002:a5d:4e8d:: with SMTP id e13mr6897898wru.368.1603990797308;
-        Thu, 29 Oct 2020 09:59:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f17sm6577560wrm.27.2020.10.29.09.59.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Oct 2020 09:59:56 -0700 (PDT)
-Subject: Re: [PATCH] [v2] x86: apic: avoid -Wshadow warning in header
-To:     Arvind Sankar <nivedita@alum.mit.edu>,
-        David Laight <David.Laight@ACULAB.COM>
-Cc:     'Arnd Bergmann' <arnd@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "x86@kernel.org" <x86@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "platform-driver-x86@vger.kernel.org" 
-        <platform-driver-x86@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
-References: <20201028212417.3715575-1-arnd@kernel.org>
- <38b11ed3fec64ebd82d6a92834a4bebe@AcuMS.aculab.com>
- <20201029165611.GA2557691@rani.riverdale.lan>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <93180c2d-268c-3c33-7c54-4221dfe0d7ad@redhat.com>
-Date:   Thu, 29 Oct 2020 17:59:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <20201029165611.GA2557691@rani.riverdale.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=3KRaFeCn8cu3srAmF4IqkMbqw53L1XtWTUY3QLwzm8A=;
+        b=MCDXOrxskRbNb1ZFkWIt87TSza/8ZwKgNSPPtY62wHSJcgfYd5LsycCYQna07SFi3u
+         N4CN6uRQ9qz8Jgh5FbN3pIi4OXqaTNhnZI3rmLZYaAjF27CV3N4p62q2GEKr5HUfWbHj
+         7q1zhJD4ccMLpfMQ0ExGN/HyEVsbbekehqen8Fq5AVDWVd4h9IPQHLSl6LJt9SAJIXKx
+         jbSqd6IvGmE6WrktrjT8ogR37H5/429iusX6Pxx+ykJD2Ra83U2ZPHxLbJQH/gUXElNC
+         D9Xd7qBh00Af1UbcDJWkXVlcNifp7k6/AgofP/5rKGwGeZz1p7YYBSGUdebqsZMolnGR
+         rlGA==
+X-Gm-Message-State: AOAM5301hXZB4z+Esig7YJ/MMGB/OQNgPmXu4A40GL3ogZJR7QtsVTYW
+        F6yCaLGsJgBjxlvzo8NgqbMvPBc8xEgsGYNep0XTlRBzop7oTgGZqr8k4fU3UZTJneaX6anLon0
+        K1GiMPGCWrBp8y9A0sshEVwc6EGZFVpYQmuDo9Ik8OOrPhiSuFpCSZD09ZPFKxHA=
+X-Google-Smtp-Source: ABdhPJzdyBN0vZRnYTUtU26tvuqbi86yZG9jcd8CaZWXaoCe2HyeE+Po353hIfl1Zu2xtw1wBwUAIToKGay+Ww==
+Sender: "jmattson via sendgmr" <jmattson@turtle.sea.corp.google.com>
+X-Received: from turtle.sea.corp.google.com ([2620:15c:100:202:725a:fff:fe43:64b1])
+ (user=jmattson job=sendgmr) by 2002:a17:90a:3fcb:: with SMTP id
+ u11mr735876pjm.128.1603991220167; Thu, 29 Oct 2020 10:07:00 -0700 (PDT)
+Date:   Thu, 29 Oct 2020 10:06:48 -0700
+Message-Id: <20201029170648.483210-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
+Subject: [PATCH] kvm: x86: Sink cpuid update into vendor-specific set_cr4 functions
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Abhiroop Dabral <adabral@paloaltonetworks.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Peter Shier <pshier@google.com>,
+        Haozhong Zhang <haozhong.zhang@intel.com>,
+        Dexuan Cui <dexuan.cui@intel.com>,
+        Huaitong Han <huaitong.han@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/10/20 17:56, Arvind Sankar wrote:
->> For those two just add:
->> 	struct apic *apic = x86_system_apic;
->> before all the assignments.
->> Less churn and much better code.
->>
-> Why would it be better code?
-> 
+On emulated VM-entry and VM-exit, update the CPUID bits that reflect
+CR4.OSXSAVE and CR4.PKE.
 
-I think he means the compiler produces better code, because it won't
-read the global variable repeatedly.  Not sure if that's true,(*) but I
-think I do prefer that version if Arnd wants to do that tweak.
+This fixes a bug where the CPUID bits could continue to reflect L2 CR4
+values after emulated VM-exit to L1. It also fixes a related bug where
+the CPUID bits could continue to reflect L1 CR4 values after emulated
+VM-entry to L2. The latter bug is mainly relevant to SVM, wherein
+CPUID is not a required intercept. However, it could also be relevant
+to VMX, because the code to conditionally update these CPUID bits
+assumes that the guest CPUID and the guest CR4 are always in sync.
 
-Paolo
+Fixes: 8eb3f87d903168 ("KVM: nVMX: fix guest CR4 loading when emulating L2 to L1 exit")
+Fixes: 2acf923e38fb6a ("KVM: VMX: Enable XSAVE/XRSTOR for guest")
+Fixes: b9baba86148904 ("KVM, pkeys: expose CPUID/CR4 to guest")
+Reported-by: Abhiroop Dabral <adabral@paloaltonetworks.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: Dexuan Cui <dexuan.cui@intel.com>
+Cc: Huaitong Han <huaitong.han@intel.com>
+---
+ arch/x86/kvm/cpuid.c   | 1 +
+ arch/x86/kvm/svm/svm.c | 4 ++++
+ arch/x86/kvm/vmx/vmx.c | 5 +++++
+ arch/x86/kvm/x86.c     | 8 --------
+ 4 files changed, 10 insertions(+), 8 deletions(-)
 
-(*) if it is, it might also be due to Linux using -fno-strict-aliasing
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 06a278b3701d..661732be33f5 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -139,6 +139,7 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+ 					   MSR_IA32_MISC_ENABLE_MWAIT);
+ 	}
+ }
++EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+ 
+ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 2f32fd09e259..78163e345e84 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1699,6 +1699,10 @@ int svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 	cr4 |= host_cr4_mce;
+ 	to_svm(vcpu)->vmcb->save.cr4 = cr4;
+ 	vmcb_mark_dirty(to_svm(vcpu)->vmcb, VMCB_CR);
++
++	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
++		kvm_update_cpuid_runtime(vcpu);
++
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d14c94d0aff1..bd2cb47f113b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3095,6 +3095,7 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
+ 
+ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ {
++	unsigned long old_cr4 = vcpu->arch.cr4;
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	/*
+ 	 * Pass through host's Machine Check Enable value to hw_cr4, which
+@@ -3166,6 +3167,10 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 
+ 	vmcs_writel(CR4_READ_SHADOW, cr4);
+ 	vmcs_writel(GUEST_CR4, hw_cr4);
++
++	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
++		kvm_update_cpuid_runtime(vcpu);
++
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 397f599b20e5..e95c333724c2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1014,9 +1014,6 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 	    (!(cr4 & X86_CR4_PCIDE) && (old_cr4 & X86_CR4_PCIDE)))
+ 		kvm_mmu_reset_context(vcpu);
+ 
+-	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
+-		kvm_update_cpuid_runtime(vcpu);
+-
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_cr4);
+@@ -9522,7 +9519,6 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+ {
+ 	struct msr_data apic_base_msr;
+ 	int mmu_reset_needed = 0;
+-	int cpuid_update_needed = 0;
+ 	int pending_vec, max_bits, idx;
+ 	struct desc_ptr dt;
+ 	int ret = -EINVAL;
+@@ -9557,11 +9553,7 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+ 	vcpu->arch.cr0 = sregs->cr0;
+ 
+ 	mmu_reset_needed |= kvm_read_cr4(vcpu) != sregs->cr4;
+-	cpuid_update_needed |= ((kvm_read_cr4(vcpu) ^ sregs->cr4) &
+-				(X86_CR4_OSXSAVE | X86_CR4_PKE));
+ 	kvm_x86_ops.set_cr4(vcpu, sregs->cr4);
+-	if (cpuid_update_needed)
+-		kvm_update_cpuid_runtime(vcpu);
+ 
+ 	idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 	if (is_pae_paging(vcpu)) {
+-- 
+2.29.1.341.ge80a0c044ae-goog
 
