@@ -2,61 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43BD529E697
-	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 09:42:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1805229E6BD
+	for <lists+kvm@lfdr.de>; Thu, 29 Oct 2020 10:00:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726291AbgJ2ImV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Oct 2020 04:42:21 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7096 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbgJ2ImR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Oct 2020 04:42:17 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CMFW34pjhzLr1d;
-        Thu, 29 Oct 2020 14:13:35 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 29 Oct 2020 14:13:24 +0800
-Message-ID: <5F9A5D84.6000707@huawei.com>
-Date:   Thu, 29 Oct 2020 14:13:24 +0800
-From:   AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+        id S1726166AbgJ2I6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Oct 2020 04:58:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41608 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725991AbgJ2I4w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Oct 2020 04:56:52 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDB0C0613D2;
+        Thu, 29 Oct 2020 01:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zoaWQCaukT2MSre+YOCy8lPWvGILO48toajhUZfqRO8=; b=qhQ4YkyVtUdCF+9/SxF+KkMnE/
+        D3OoH/RsujOjBjImJs3j7wsc+18+EhiCdslrW+7UAfcF/3Lpk99bGShz5x8vvO7NhRDvD/3/jIF/U
+        sxjKHuC9kaCmjIQSe39nGdSprah7mG+Z3Qat31XoyHOzlVqjf1/QS7I84ZB/yiztmTbIZ9tig9v0X
+        f2yLG+zhB53m3eNdAToBlpu4RWg/tOhEL5fYpqSM8QjSZe/Ra+mMDoJYV20tgz1OUmmI9HvfC/hqJ
+        Iucc/rIbeuYDkc44YiTbpdM2F7LW26KSdHCYp3Ov/mUwi9UI3WMsbmPjsLva53P4rrTMzDSlxoDzk
+        s6zrIsQQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kY3jh-0006wc-3k; Thu, 29 Oct 2020 08:56:45 +0000
+Date:   Thu, 29 Oct 2020 08:56:44 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        J??r??me Glisse <jglisse@redhat.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v4 08/15] mm: Add unsafe_follow_pfn
+Message-ID: <20201029085644.GA25658@infradead.org>
+References: <20201026105818.2585306-1-daniel.vetter@ffwll.ch>
+ <20201026105818.2585306-9-daniel.vetter@ffwll.ch>
 MIME-Version: 1.0
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     <chenhc@lemote.com>, <pasic@linux.ibm.com>,
-        <borntraeger@de.ibm.com>, <mtosatti@redhat.com>,
-        <cohuck@redhat.com>, <zhengchuan@huawei.com>,
-        <qemu-s390x@nongnu.org>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>, <zhang.zhanghailiang@huawei.com>
-Subject: Re: [PATCH 0/4] kvm: Add a --enable-debug-kvm option to configure
-References: <5F97FD61.4060804@huawei.com> <5F991998.2020108@huawei.com> <404f58a5-180d-f3d7-dbcc-b533a29e6a94@redhat.com>
-In-Reply-To: <404f58a5-180d-f3d7-dbcc-b533a29e6a94@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.138]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201026105818.2585306-9-daniel.vetter@ffwll.ch>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/10/28 15:44, Paolo Bonzini wrote:
-> On 28/10/20 08:11, AlexChen wrote:
->> The current 'DEBUG_KVM' macro is defined in many files, and turning on
->> the debug switch requires code modification, which is very inconvenient,
->> so this series add an option to configure to support the definition of
->> the 'DEBUG_KVM' macro.
->> In addition, patches 3 and 4 also make printf always compile in debug output
->> which will prevent bitrot of the format strings by referring to the
->> commit(08564ecd: s390x/kvm: make printf always compile in debug output).
-> 
-> Mostly we should use tracepoints, but the usefulness of these printf
-> statements is often limited (except for s390 that maybe could make them
-> unconditional error_reports).  I would leave this as is, maintainers can
-> decide which tracepoints they like to have.
-> 
-Thanks for your review, I agree with you to leave 'DEBUG_KVM' as is.
-In addition, patches 3 and 4 resolved the potential risk of bitrot of the format strings,
-could you help review these two patches?
+> +int unsafe_follow_pfn(struct vm_area_struct *vma, unsigned long address,
+> +	unsigned long *pfn)
 
-Thanks,
-Alex
+The one tab indent here looks weird, normally tis would be two tabs
+or aligned aftetthe opening brace.
+
+> +{
+> +#ifdef CONFIG_STRICT_FOLLOW_PFN
+> +	pr_info("unsafe follow_pfn usage rejected, see CONFIG_STRICT_FOLLOW_PFN\n");
+> +	return -EINVAL;
+> +#else
+> +	WARN_ONCE(1, "unsafe follow_pfn usage\n");
+> +	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
+> +
+> +	return follow_pfn(vma, address, pfn);
+> +#endif
+
+Woudn't this be a pretty good use case of "if (IS_ENABLED(...)))"?
+
+Also I'd expect the inverse polarity of the config option, that is
+a USAFE_FOLLOW_PFN option to enable to unsafe behavior.
+
+> +/**
+> + * unsafe_follow_pfn - look up PFN at a user virtual address
+> + * @vma: memory mapping
+> + * @address: user virtual address
+> + * @pfn: location to store found PFN
+> + *
+> + * Only IO mappings and raw PFN mappings are allowed.
+> + *
+> + * Returns zero and the pfn at @pfn on success, -ve otherwise.
+> + */
+> +int unsafe_follow_pfn(struct vm_area_struct *vma, unsigned long address,
+> +	unsigned long *pfn)
+> +{
+> +	return follow_pfn(vma, address, pfn);
+> +}
+> +EXPORT_SYMBOL(unsafe_follow_pfn);
+
+Any reason this doesn't use the warn and disable logic?
