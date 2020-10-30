@@ -2,133 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4012A2A0AFB
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 17:20:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 088712A0B5B
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 17:40:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726920AbgJ3QUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 12:20:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27876 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725948AbgJ3QUB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 12:20:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604074785;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OcrYeen7idQg6fj59+qOuiD8Ij+RF++6T9svNJR2I70=;
-        b=WFoIKu8bEgawaKpofPfpt75m424pwi8tumYuYah7rS1nkdbDkWlkA8KddGEXr/QQ5Xedum
-        n+Ex1/aV7OWMViQvkjss2ByTB13kk49aMObzWY40/3jrF+ZMaBYqbOyrdoyOHbeihTvync
-        cYJpC8APtle7r2TmC3DvVR2BlBlUOa8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-RbX_oa6vPeySjnkK4knKgw-1; Fri, 30 Oct 2020 12:19:43 -0400
-X-MC-Unique: RbX_oa6vPeySjnkK4knKgw-1
-Received: by mail-wm1-f71.google.com with SMTP id l23so789362wmg.6
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 09:19:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=OcrYeen7idQg6fj59+qOuiD8Ij+RF++6T9svNJR2I70=;
-        b=fDY137SYtDd6C2xbK+4B5vbyDKkue0uGtmwoN+NDmcQo/5ZpCATbPwfdDGGztzk6qg
-         mA7QPC8lf/aKN2OljiIM/28Kf5jXcQ6Lk6nrSEO/Cni0c0zCcGxOauf1RIE7VO+nLwa6
-         M7NRP5OBYtrCVonu6M10XxR9y+e6FqLRPfPn6CdW6dshxQi2uyxVA9B4duiMELQ27u9k
-         0e9230K7EBqloMMRTPnsOdViovmbXse7iJrfdR6MhvpD9uOZgQnqKz/9WUF/MC4mKkWh
-         g032g0VGalCmOycdK7kiM5/CA1eCAX2Uq/Snf/yb+0TuSa1PJEuTDyBRu4uFeFzU2+nx
-         DPBw==
-X-Gm-Message-State: AOAM532dOYYayPw/WdaVtBmALn7aKmFsArnvK6nBAzSl9Lwi+OqCYQ8z
-        JnsmSz/Azf4ub9v2TiNDqlNP9VbOWPFWQRaCP/6dkJl7jPYe8A8Ykki30KbxmDXQceNCh0Z6utB
-        14C3ijuFASd3m
-X-Received: by 2002:a5d:420d:: with SMTP id n13mr4159697wrq.196.1604074781982;
-        Fri, 30 Oct 2020 09:19:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz+DKWtX/KpuvIKWLXpz4cbRsYAjyJQ2MhSo5RnPibttiUk+A4yTfvDUDF0AaH/EFGWlo/yNg==
-X-Received: by 2002:a5d:420d:: with SMTP id n13mr4159679wrq.196.1604074781780;
-        Fri, 30 Oct 2020 09:19:41 -0700 (PDT)
-Received: from steredhat (host-79-22-200-33.retail.telecomitalia.it. [79.22.200.33])
-        by smtp.gmail.com with ESMTPSA id o4sm11021368wrv.8.2020.10.30.09.19.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2020 09:19:41 -0700 (PDT)
-Date:   Fri, 30 Oct 2020 17:19:38 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, netdev@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: add IOTLB API support
-Message-ID: <20201030161938.n7xqeu557dmsqpzv@steredhat>
-References: <20201029174351.134173-1-sgarzare@redhat.com>
- <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
- <20201030105422.ju2aj2bmwsckdufh@steredhat>
- <278f4732-e561-2b4f-03ee-b26455760b01@redhat.com>
+        id S1727115AbgJ3Qk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 12:40:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56020 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726920AbgJ3Qk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 12:40:26 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 692BA20756;
+        Fri, 30 Oct 2020 16:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604076025;
+        bh=5IdJB+vSy9WtqFoTUhuMK/Ne2TdAtmbDZodcpICYmnU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=mY2QczB+bo87U8fMn7qv4VHllqSccKIUuhsW02/aX4Yuj8hqMHxzWIpI/pbvM9juv
+         TIJ34uxNPzi5eMZdtSGLXP7Rq5BKtOojZdB/xkk1SA9Aoe32WIxPEu2mkS0OK998DC
+         PcLczwkdcqVxVXvgyHHQBRK9HdIjhMRqE5f0cSfs=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kYXRu-005noK-96; Fri, 30 Oct 2020 16:40:22 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Brazdil <dbrazdil@google.com>, Gavin Shan <gshan@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Qais Yousef <qais.yousef@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Santosh Shukla <sashukla@nvidia.com>,
+        Vladimir Murzin <vladimir.murzin@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.10, take #1
+Date:   Fri, 30 Oct 2020 16:40:05 +0000
+Message-Id: <20201030164017.244287-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <278f4732-e561-2b4f-03ee-b26455760b01@redhat.com>
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dbrazdil@google.com, gshan@redhat.com, james.morse@arm.com, mark.rutland@arm.com, qais.yousef@arm.com, qperret@google.com, sashukla@nvidia.com, vladimir.murzin@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 30, 2020 at 07:44:43PM +0800, Jason Wang wrote:
->
->On 2020/10/30 下午6:54, Stefano Garzarella wrote:
->>On Fri, Oct 30, 2020 at 06:02:18PM +0800, Jason Wang wrote:
->>>
->>>On 2020/10/30 上午1:43, Stefano Garzarella wrote:
->>>>This patch enables the IOTLB API support for vhost-vsock devices,
->>>>allowing the userspace to emulate an IOMMU for the guest.
->>>>
->>>>These changes were made following vhost-net, in details this patch:
->>>>- exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
->>>>  device if the feature is acked
->>>>- implements VHOST_GET_BACKEND_FEATURES and
->>>>  VHOST_SET_BACKEND_FEATURES ioctls
->>>>- calls vq_meta_prefetch() before vq processing to prefetch vq
->>>>  metadata address in IOTLB
->>>>- provides .read_iter, .write_iter, and .poll callbacks for the
->>>>  chardev; they are used by the userspace to exchange IOTLB messages
->>>>
->>>>This patch was tested with QEMU and a patch applied [1] to fix a
->>>>simple issue:
->>>>    $ qemu -M q35,accel=kvm,kernel-irqchip=split \
->>>>           -drive file=fedora.qcow2,format=qcow2,if=virtio \
->>>>           -device intel-iommu,intremap=on \
->>>>           -device vhost-vsock-pci,guest-cid=3,iommu_platform=on
->>>
->>>
->>>Patch looks good, but a question:
->>>
->>>It looks to me you don't enable ATS which means vhost won't get 
->>>any invalidation request or did I miss anything?
->>>
->>
->>You're right, I didn't see invalidation requests, only miss and updates.
->>Now I have tried to enable 'ats' and 'device-iotlb' but I still 
->>don't see any invalidation.
->>
->>How can I test it? (Sorry but I don't have much experience yet with 
->>vIOMMU)
->
->
->I guess it's because the batched unmap. Maybe you can try to use 
->"intel_iommu=strict" in guest kernel command line to see if it works.
->
->Btw, make sure the qemu contains the patch [1]. Otherwise ATS won't be 
->enabled for recent Linux Kernel in the guest.
->
+[Apologies for the spam, I appear to have forgotten to Cc the lists in
+ my initial posting]
 
-I tried with "intel_iommu=strict" in the guest kernel and QEMU patch 
-applied, but I didn't see any invalidation.
+Hi Paolo,
 
-Maybe I did something wrong, you know it is friday, KVM Forum is ending, 
-etc... ;-)
+It was good to see you (and everyone else) at KVM Forum this week!
 
-I'll investigate better next week.
+And to celebrate, here's a first batch of fixes for KVM/arm64. A bunch
+of them are addressing issues introduced by the invasive changes that
+took place in the 5.10 merge window (MM, nVHE host entry). A few
+others are addressing some older bugs (VFIO PTE mappings, AArch32
+debug, composite huge pages), and a couple of improvements
+(HYP-visible capabilities are made more robust).
 
-Thanks for the useful info,
-Stefano
+Please pull,
 
+	M.
+
+The following changes since commit 4e5dc64c43192b4fd4c96ac150a8f013065f5f5b:
+
+  Merge branches 'kvm-arm64/pt-new' and 'kvm-arm64/pmu-5.9' into kvmarm-master/next (2020-10-02 09:25:55 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.10-1
+
+for you to fetch changes up to 22f553842b14a1289c088a79a67fb479d3fa2a4e:
+
+  KVM: arm64: Handle Asymmetric AArch32 systems (2020-10-30 16:06:22 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.10, take #1
+
+- Force PTE mapping on device pages provided via VFIO
+- Fix detection of cacheable mapping at S2
+- Fallback to PMD/PTE mappings for composite huge pages
+- Fix accounting of Stage-2 PGD allocation
+- Fix AArch32 handling of some of the debug registers
+- Simplify host HYP entry
+- Fix stray pointer conversion on nVHE TLB invalidation
+- Fix initialization of the nVHE code
+- Simplify handling of capabilities exposed to HYP
+- Nuke VCPUs caught using a forbidden AArch32 EL0
+
+----------------------------------------------------------------
+Gavin Shan (1):
+      KVM: arm64: Use fallback mapping sizes for contiguous huge page sizes
+
+Marc Zyngier (4):
+      KVM: arm64: Don't corrupt tpidr_el2 on failed HVC call
+      KVM: arm64: Remove leftover kern_hyp_va() in nVHE TLB invalidation
+      KVM: arm64: Drop useless PAN setting on host EL1 to EL2 transition
+      KVM: arm64: Fix AArch32 handling of DBGD{CCINT,SCRext} and DBGVCR
+
+Mark Rutland (3):
+      KVM: arm64: Factor out is_{vhe,nvhe}_hyp_code()
+      arm64: cpufeature: reorder cpus_have_{const, final}_cap()
+      arm64: cpufeature: upgrade hyp caps to final
+
+Qais Yousef (1):
+      KVM: arm64: Handle Asymmetric AArch32 systems
+
+Santosh Shukla (1):
+      KVM: arm64: Force PTE mapping on fault resulting in a device mapping
+
+Will Deacon (2):
+      KVM: arm64: Allocate stage-2 pgd pages with GFP_KERNEL_ACCOUNT
+      KVM: arm64: Fix masks in stage2_pte_cacheable()
+
+ arch/arm64/include/asm/cpufeature.h | 40 ++++++++++++++++++++++++++++---------
+ arch/arm64/include/asm/kvm_host.h   |  1 +
+ arch/arm64/include/asm/virt.h       |  9 ++++-----
+ arch/arm64/kernel/image-vars.h      |  1 -
+ arch/arm64/kvm/arm.c                | 19 ++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/host.S      |  2 --
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S  | 23 ++++++++++++++-------
+ arch/arm64/kvm/hyp/nvhe/tlb.c       |  1 -
+ arch/arm64/kvm/hyp/pgtable.c        |  4 ++--
+ arch/arm64/kvm/mmu.c                | 27 ++++++++++++++++++-------
+ arch/arm64/kvm/sys_regs.c           |  6 +++---
+ 11 files changed, 96 insertions(+), 37 deletions(-)
