@@ -2,59 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 524D12A0224
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:08:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 165952A0285
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:11:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726171AbgJ3KIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 06:08:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
+        id S1726540AbgJ3KK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 06:10:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbgJ3KIi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 06:08:38 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B1FC0613D4
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:38 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id w1so5808402wrm.4
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:38 -0700 (PDT)
+        with ESMTP id S1726198AbgJ3KIk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 06:08:40 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E45AAC0613D4
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:39 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id d3so2388971wma.4
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ffwll.ch; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oyVNIJTztKiRHheNSQoUfnLRDya4SJw9IE1Vxl86s7c=;
-        b=Ghb99UprNaKvFH2nWksoxxcjJMtuQ7UBnEvdaqQ2Xt27pEUza+n/3VR0T/qCjTsgrw
-         pnOgvc7R/Us4ABF8mAoJmL0AdohhbtFrlQIZHCXvlxhr3ShQwZsUCHMdPOY4nT2sPNV2
-         3n2sDDQkLekRqiTyUq6gRYR6GdNDanQomtL14=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=5HSDx6z2iUpxgLk7STJ2LBrJWLho+Vrj3pPui9pXoI8=;
+        b=aKlzbno033YLitqk2cu6P3GxwmA6KJS6TWty9sQ9M/iPUxDJOU1RZXpRtUUIGF7xnO
+         Swv3BBEn+EDEZ2SaP7J2IxU1yLczM6UZuRRDl5xraJR6v6/wOJB5FFwkxWAxwAC34NZq
+         IyAPMBXZG3141RKZo4/lB3rcCDQNXkL02GSOs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oyVNIJTztKiRHheNSQoUfnLRDya4SJw9IE1Vxl86s7c=;
-        b=Zg4aU0me6MVSMuMDj0oO9uYBc1qTZ1JndeuC7y/olMwamCd424zhIm9WNKCZKZ88f3
-         VLQtTcnv8zwtHAemNJQbGHCceFV2mCqA97QkmMAfQ2XpEwa43yr7tFyT2bGeNPKs/lt2
-         X25sP99UFsoKZeUU2M2ZOA34bdPWVtsDFU8oBuYQniNV7L5U9lv6XdfiyLxYeTM1+3UW
-         SdjAFdMbfkcuThpoo4diGDCiryCTZZgP2cYL6PwJTQQqFHry/xfR2bkXcB7Im6cLj4Q5
-         lo+5lkFCMR3byy8YBL0ypvfKPjLSYReJ9j7/t6RwVCo52QOI/MHIgV/EWeVNvOCarlsL
-         /DCg==
-X-Gm-Message-State: AOAM533Tu/3mLMGO0GcTSWbndnHJst7wXIlzj0bUwyEqoBJY26WiD8tM
-        k2vRWXA6sfcLeXWExTHtWJi9dw==
-X-Google-Smtp-Source: ABdhPJw0H9VR4VRiDyzFX/cH5pwaV8XuDt6bBdU2cQb4UZ7RdbthoCu2zTbDyFJZiy6ZQIc6vY++Ww==
-X-Received: by 2002:adf:f80a:: with SMTP id s10mr2082685wrp.275.1604052517093;
-        Fri, 30 Oct 2020 03:08:37 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5HSDx6z2iUpxgLk7STJ2LBrJWLho+Vrj3pPui9pXoI8=;
+        b=EahtumprvL3rsl0SC+CCWHJq8qdyPQC5TODamysa/yEelIN6CbnPYL7u9TbN0B+rWV
+         g+UGmWwKqOtPLjXPIG7BwVAaWiygYqXjYWel14YYpQYiCMJXfAxVM8ko/rkb/9w8pzJY
+         DMbJ1QhGdcnepDMQR0jQeLjIU3IXv8pKWrhF2laZriNXVNC5Lw8SOQMuWrx74wktQYeb
+         TcLjmrOHHDko4qb/t/uHtB0lP5wVLLQCs/Q8vGhOgu6Q/99S670wLoUGjNJeRHoZNZYD
+         CmKrpvcDgvzTor76f2uloi0KhItWiR/wcmxt+w/rVvZKpo8+oaTv2YyFa0adbF7Cnh8w
+         xkCQ==
+X-Gm-Message-State: AOAM533bQYUg2zIoH+45BoqSvQaXBwSda/I39NeUccP/ZgF9l8hDg+Zq
+        RYkKEMyioFKBETb2Nor8UhfGDg==
+X-Google-Smtp-Source: ABdhPJylI0KOMbymdWD4o/sLacOvb/pRDxaSEXtH+RKYbEbEetFTaDUFpNXr6iZ7QCn2hD5tBOFSzw==
+X-Received: by 2002:a1c:b486:: with SMTP id d128mr1694999wmf.164.1604052518673;
+        Fri, 30 Oct 2020 03:08:38 -0700 (PDT)
 Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id v189sm4430947wmg.14.2020.10.30.03.08.35
+        by smtp.gmail.com with ESMTPSA id v189sm4430947wmg.14.2020.10.30.03.08.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2020 03:08:35 -0700 (PDT)
+        Fri, 30 Oct 2020 03:08:37 -0700 (PDT)
 From:   Daniel Vetter <daniel.vetter@ffwll.ch>
 To:     DRI Development <dri-devel@lists.freedesktop.org>,
         LKML <linux-kernel@vger.kernel.org>
 Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-arm-kernel@lists.infradead.org,
         linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@ffwll.ch>
-Subject: [PATCH v5 00/15] follow_pfn and other iomap races
-Date:   Fri, 30 Oct 2020 11:08:00 +0100
-Message-Id: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Inki Dae <inki.dae@samsung.com>,
+        Joonyoung Shim <jy0922.shim@samsung.com>,
+        Seung-Woo Kim <sw0312.kim@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>
+Subject: [PATCH v5 01/15] drm/exynos: Stop using frame_vector helpers
+Date:   Fri, 30 Oct 2020 11:08:01 +0100
+Message-Id: <20201030100815.2269-2-daniel.vetter@ffwll.ch>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
+References: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -62,98 +77,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all
+All we need are a pages array, pin_user_pages_fast can give us that
+directly. Plus this avoids the entire raw pfn side of get_vaddr_frames.
 
-Another update of my patch series to clamp down a bunch of races and gaps
-around follow_pfn and other access to iomem mmaps. Previous version:
+Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Inki Dae <inki.dae@samsung.com>
+Cc: Joonyoung Shim <jy0922.shim@samsung.com>
+Cc: Seung-Woo Kim <sw0312.kim@samsung.com>
+Cc: Kyungmin Park <kyungmin.park@samsung.com>
+Cc: Kukjin Kim <kgene@kernel.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Jérôme Glisse <jglisse@redhat.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: linux-mm@kvack.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-samsung-soc@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+--
+v2: Use unpin_user_pages_dirty_lock (John)
+---
+ drivers/gpu/drm/exynos/Kconfig          |  1 -
+ drivers/gpu/drm/exynos/exynos_drm_g2d.c | 47 +++++++++++--------------
+ 2 files changed, 20 insertions(+), 28 deletions(-)
 
-v1: https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
-v2: https://lore.kernel.org/dri-devel/20201009075934.3509076-1-daniel.vetter@ffwll.ch
-v3: https://lore.kernel.org/dri-devel/20201021085655.1192025-1-daniel.vetter@ffwll.ch/
-v4: https://lore.kernel.org/dri-devel/20201026105818.2585306-1-daniel.vetter@ffwll.ch/
-
-And the discussion that sparked this journey:
-
-https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
-
-Changes in v5:
-- Tomasz found some issues in the media patches
-- Polish suggested by Christoph for the unsafe_follow_pfn patch
-
-Changes in v4:
-- Drop the s390 patch, that was very stand-alone and now queued up to land
-  through s390 trees.
-- Comment polish per Dan's review.
-
-Changes in v3:
-- Bunch of polish all over, no functional changes aside from one barrier
-  in the resource code, for consistency.
-- A few more r-b tags.
-
-Changes in v2:
-- tons of small polish&fixes all over, thanks to all the reviewers who
-  spotted issues
-- I managed to test at least the generic_access_phys and pci mmap revoke
-  stuff with a few gdb sessions using our i915 debug tools (hence now also
-  the drm/i915 patch to properly request all the pci bar regions)
-- reworked approach for the pci mmap revoke: Infrastructure moved into
-  kernel/resource.c, address_space mapping is now set up at open time for
-  everyone (which required some sysfs changes). Does indeed look a lot
-  cleaner and a lot less invasive than I feared at first.
-
-I feel like this is ready for some wider soaking. Since the remaining bits
-are all kinda connnected probably simplest if it all goes through -mm.
-
-Cheers, Daniel
-
-Daniel Vetter (15):
-  drm/exynos: Stop using frame_vector helpers
-  drm/exynos: Use FOLL_LONGTERM for g2d cmdlists
-  misc/habana: Stop using frame_vector helpers
-  misc/habana: Use FOLL_LONGTERM for userptr
-  mm/frame-vector: Use FOLL_LONGTERM
-  media: videobuf2: Move frame_vector into media subsystem
-  mm: Close race in generic_access_phys
-  mm: Add unsafe_follow_pfn
-  media/videbuf1|2: Mark follow_pfn usage as unsafe
-  vfio/type1: Mark follow_pfn as unsafe
-  PCI: Obey iomem restrictions for procfs mmap
-  /dev/mem: Only set filp->f_mapping
-  resource: Move devmem revoke code to resource framework
-  sysfs: Support zapping of binary attr mmaps
-  PCI: Revoke mappings like devmem
-
- drivers/char/mem.c                            |  86 +--------------
- drivers/gpu/drm/exynos/Kconfig                |   1 -
- drivers/gpu/drm/exynos/exynos_drm_g2d.c       |  48 ++++-----
- drivers/media/common/videobuf2/Kconfig        |   1 -
- drivers/media/common/videobuf2/Makefile       |   1 +
- .../media/common/videobuf2}/frame_vector.c    |  57 ++++------
- .../media/common/videobuf2/videobuf2-memops.c |   3 +-
- drivers/media/platform/omap/Kconfig           |   1 -
- drivers/media/v4l2-core/videobuf-dma-contig.c |   2 +-
- drivers/misc/habanalabs/Kconfig               |   1 -
- drivers/misc/habanalabs/common/habanalabs.h   |   6 +-
- drivers/misc/habanalabs/common/memory.c       |  50 ++++-----
- drivers/pci/pci-sysfs.c                       |   4 +
- drivers/pci/proc.c                            |   6 ++
- drivers/vfio/vfio_iommu_type1.c               |   4 +-
- fs/sysfs/file.c                               |  11 ++
- include/linux/ioport.h                        |   6 +-
- include/linux/mm.h                            |  47 +-------
- include/linux/sysfs.h                         |   2 +
- include/media/frame_vector.h                  |  47 ++++++++
- include/media/videobuf2-core.h                |   1 +
- kernel/resource.c                             | 101 +++++++++++++++++-
- mm/Kconfig                                    |   3 -
- mm/Makefile                                   |   1 -
- mm/memory.c                                   |  80 +++++++++++++-
- mm/nommu.c                                    |  27 ++++-
- security/Kconfig                              |  13 +++
- 27 files changed, 360 insertions(+), 250 deletions(-)
- rename {mm => drivers/media/common/videobuf2}/frame_vector.c (84%)
- create mode 100644 include/media/frame_vector.h
-
+diff --git a/drivers/gpu/drm/exynos/Kconfig b/drivers/gpu/drm/exynos/Kconfig
+index 6417f374b923..43257ef3c09d 100644
+--- a/drivers/gpu/drm/exynos/Kconfig
++++ b/drivers/gpu/drm/exynos/Kconfig
+@@ -88,7 +88,6 @@ comment "Sub-drivers"
+ config DRM_EXYNOS_G2D
+ 	bool "G2D"
+ 	depends on VIDEO_SAMSUNG_S5P_G2D=n || COMPILE_TEST
+-	select FRAME_VECTOR
+ 	help
+ 	  Choose this option if you want to use Exynos G2D for DRM.
+ 
+diff --git a/drivers/gpu/drm/exynos/exynos_drm_g2d.c b/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+index 967a5cdc120e..ecede41af9b9 100644
+--- a/drivers/gpu/drm/exynos/exynos_drm_g2d.c
++++ b/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+@@ -205,7 +205,8 @@ struct g2d_cmdlist_userptr {
+ 	dma_addr_t		dma_addr;
+ 	unsigned long		userptr;
+ 	unsigned long		size;
+-	struct frame_vector	*vec;
++	struct page		**pages;
++	unsigned int		npages;
+ 	struct sg_table		*sgt;
+ 	atomic_t		refcount;
+ 	bool			in_pool;
+@@ -378,7 +379,6 @@ static void g2d_userptr_put_dma_addr(struct g2d_data *g2d,
+ 					bool force)
+ {
+ 	struct g2d_cmdlist_userptr *g2d_userptr = obj;
+-	struct page **pages;
+ 
+ 	if (!obj)
+ 		return;
+@@ -398,15 +398,9 @@ static void g2d_userptr_put_dma_addr(struct g2d_data *g2d,
+ 	dma_unmap_sgtable(to_dma_dev(g2d->drm_dev), g2d_userptr->sgt,
+ 			  DMA_BIDIRECTIONAL, 0);
+ 
+-	pages = frame_vector_pages(g2d_userptr->vec);
+-	if (!IS_ERR(pages)) {
+-		int i;
+-
+-		for (i = 0; i < frame_vector_count(g2d_userptr->vec); i++)
+-			set_page_dirty_lock(pages[i]);
+-	}
+-	put_vaddr_frames(g2d_userptr->vec);
+-	frame_vector_destroy(g2d_userptr->vec);
++	unpin_user_pages_dirty_lock(g2d_userptr->pages, g2d_userptr->npages,
++				    true);
++	kvfree(g2d_userptr->pages);
+ 
+ 	if (!g2d_userptr->out_of_list)
+ 		list_del_init(&g2d_userptr->list);
+@@ -474,35 +468,34 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struct g2d_data *g2d,
+ 	offset = userptr & ~PAGE_MASK;
+ 	end = PAGE_ALIGN(userptr + size);
+ 	npages = (end - start) >> PAGE_SHIFT;
+-	g2d_userptr->vec = frame_vector_create(npages);
+-	if (!g2d_userptr->vec) {
++	g2d_userptr->pages = kvmalloc_array(npages, sizeof(*g2d_userptr->pages),
++					    GFP_KERNEL);
++	if (!g2d_userptr->pages) {
+ 		ret = -ENOMEM;
+ 		goto err_free;
+ 	}
+ 
+-	ret = get_vaddr_frames(start, npages, FOLL_FORCE | FOLL_WRITE,
+-		g2d_userptr->vec);
++	ret = pin_user_pages_fast(start, npages, FOLL_FORCE | FOLL_WRITE,
++				  g2d_userptr->pages);
+ 	if (ret != npages) {
+ 		DRM_DEV_ERROR(g2d->dev,
+ 			      "failed to get user pages from userptr.\n");
+ 		if (ret < 0)
+-			goto err_destroy_framevec;
+-		ret = -EFAULT;
+-		goto err_put_framevec;
+-	}
+-	if (frame_vector_to_pages(g2d_userptr->vec) < 0) {
++			goto err_destroy_pages;
++		npages = ret;
+ 		ret = -EFAULT;
+-		goto err_put_framevec;
++		goto err_unpin_pages;
+ 	}
++	g2d_userptr->npages = npages;
+ 
+ 	sgt = kzalloc(sizeof(*sgt), GFP_KERNEL);
+ 	if (!sgt) {
+ 		ret = -ENOMEM;
+-		goto err_put_framevec;
++		goto err_unpin_pages;
+ 	}
+ 
+ 	ret = sg_alloc_table_from_pages(sgt,
+-					frame_vector_pages(g2d_userptr->vec),
++					g2d_userptr->pages,
+ 					npages, offset, size, GFP_KERNEL);
+ 	if (ret < 0) {
+ 		DRM_DEV_ERROR(g2d->dev, "failed to get sgt from pages.\n");
+@@ -538,11 +531,11 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struct g2d_data *g2d,
+ err_free_sgt:
+ 	kfree(sgt);
+ 
+-err_put_framevec:
+-	put_vaddr_frames(g2d_userptr->vec);
++err_unpin_pages:
++	unpin_user_pages(g2d_userptr->pages, npages);
+ 
+-err_destroy_framevec:
+-	frame_vector_destroy(g2d_userptr->vec);
++err_destroy_pages:
++	kvfree(g2d_userptr->pages);
+ 
+ err_free:
+ 	kfree(g2d_userptr);
 -- 
 2.28.0
 
