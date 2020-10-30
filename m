@@ -2,32 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FFEA2A0DDD
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:53:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6E112A0DE2
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:53:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727520AbgJ3Swx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 14:52:53 -0400
-Received: from mga04.intel.com ([192.55.52.120]:61948 "EHLO mga04.intel.com"
+        id S1727562AbgJ3SxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 14:53:02 -0400
+Received: from mga06.intel.com ([134.134.136.31]:65477 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727505AbgJ3Swv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 14:52:51 -0400
-IronPort-SDR: qUq5UuUwNWRp0yWAnOUDA13SnZc+I+UmRLFD5B0U2YXORa/Smi64685QrgEgLyzjNJTHIK2p0i
- rcdk2q2FSYpw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="166066326"
+        id S1727553AbgJ3SxA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 14:53:00 -0400
+IronPort-SDR: AXD8hg3gcAa468sDxByC0AX/0b3l+NaLWHHz6rZiXFYunomrDE8r7rs/EAY0nrz6HhYwoe/jL5
+ p0rLDGDdDrbQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="230287761"
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="166066326"
+   d="scan'208";a="230287761"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:50:50 -0700
-IronPort-SDR: yb4iy1MnaDk/HvorLTTuD3ECBRP0QWvp9P+d/Do+P/MfQ+bmR55vk7WABr5Jx6EaDWiD6l33ds
- UX5W9rT18q/A==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:50:56 -0700
+IronPort-SDR: P/EszHGZMS3LYCtTJeIVgFGLl03yO2IZ+VGXlypcKQUAJNJmboelDzpeQyf2D7wTrVKdPF3TOC
+ YCDdP23muVzw==
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="469608019"
+   d="scan'208";a="527209865"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:50:48 -0700
-Subject: [PATCH v4 00/17] Add VFIO mediated device support and DEV-MSI support
- for the idxd driver
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:50:55 -0700
+Subject: [PATCH v4 01/17] irqchip: Add IMS (Interrupt Message Store) driver
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         bhelgaas@google.com, tglx@linutronix.de,
@@ -39,232 +38,448 @@ To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         jgg@mellanox.com, rafael@kernel.org, netanelg@mellanox.com,
         shahafs@mellanox.com, yan.y.zhao@linux.intel.com,
         pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
-Cc:     Megha Dey <megha.dey@linux.intel.com>, dmaengine@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org
-Date:   Fri, 30 Oct 2020 11:50:47 -0700
-Message-ID: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
+Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org
+Date:   Fri, 30 Oct 2020 11:50:54 -0700
+Message-ID: <160408385476.912050.16205225207591080075.stgit@djiang5-desk3.ch.intel.com>
+In-Reply-To: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
+References: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-- Would like to acquire Reviewed-by tags from Thomas for MSI and IMS related bits.
-- Would like to acquire for Reviewed-by tags from Alex and/or Kirti for the VFIO mdev driver bits.
-- Would like to acquire for Reviewed-by tag from Bjorn for PCI common bits
-- Would like to acquire 5.11 kernel acceptance through dmaengine (Vinod) with the review tags. 
+From: Thomas Gleixner <tglx@linutronix.de>
 
-v4:
-dev-msi:
-- Make interrupt remapping code more readable (Thomas)
-- Add flush writes to unmask/write and reset ims slots (Thomas)
-- Interrupt Message Storm-> Interrupt Message Store (Thomas)
-- Merge in pasid programming code. (Thomas)
+Generic IMS(Interrupt Message Store) irq chips and irq domain
+implementations for IMS based devices which store the interrupt
+messages in an array in device memory.
 
-mdev:
-- Fixed up domain assignment (Thomas)
-- Define magic numbers (Thomas)
-- Move siov detection code to PCI common (Thomas)
-- Remove duplicated MSI entry info (Thomas)
-- Convert code to use ims_slot (Thomas)
-- Add explanation of pasid programming for IMS entry (Thomas)
-- Add release int handle release support due to DSA spec 1.1 update.
+Allocation and freeing of interrupts happens via the generic
+msi_domain_alloc/free_irqs() interface. No special purpose IMS magic
+required as long as the interrupt domain is stored in the underlying
+device struct.
 
-v3:
-Dev-msi:
-- No need to add support for 2 different dev-msi irq domains, a common
-  once can be used for both the cases(with IR enabled/disabled)
-- Add arch specific function to specify additions to msi_prepare callback
-  instead of making the callback a weak function
-- Call platform ops directly instead of a wrapper function
-- Make mask/unmask callbacks as void functions
-  dev->msi_domain should be updated at the device driver level before
-  calling dev_msi_alloc_irqs()
-  dev_msi_alloc/free_irqs() cannot be used for PCI devices
-  Followed the generic layering scheme: infrastructure bits->arch bits->enabling bits
+Provide storage and a setter for an Address Space Identifier. The
+identifier is stored in the top level irq_data and it only can be
+modified when the interrupt is not active. Add the necessary storage
+and helper functions and validate that interrupts which require an
+ASID have one assigned.
 
-Mdev:
-- Remove set kvm group notifier (Yan Zhao)
-- Fix VFIO irq trigger removal (Yan Zhao)
-- Add mmio read flush to ims mask (Jason)
+[Megha : Fixed compile time errors
+         Added necessary dependencies to IMS_MSI_ARRAY config
+         Fixed polarity of IMS_VECTOR_CTRL
+         Added reads after writes to flush writes to device
+         Tested the IMS infrastructure with the IDXD driver]
 
-v2:
-IMS (now dev-msi):
-- With recommendations from Jason/Thomas/Dan on making IMS more generic:
-- Pass a non-pci generic device(struct device) for IMS management instead of mdev
-- Remove all references to mdev and symbol_get/put
-- Remove all references to IMS in common code and replace with dev-msi
-- Remove dynamic allocation of platform-msi interrupts: no groups,no
-  new msi list or list helpers
-- Create a generic dev-msi domain with and without interrupt remapping enabled.
-- Introduce dev_msi_domain_alloc_irqs and dev_msi_domain_free_irqs apis
-
-mdev: 
-- Removing unrelated bits from SVA enabling that’s not necessary for
-  the submission. (Kevin)
-- Restructured entire mdev driver series to make reviewing easier (Kevin)
-- Made rw emulation more robust (Kevin)
-- Removed uuid wq type and added single dedicated wq type (Kevin)
-- Locking fixes for vdev (Yan Zhao)
-- VFIO MSIX trigger fixes (Yan Zhao)
-
-This code series will match the support of the 5.6 kernel (stage 1) driver but on guest.
-
-The code has dependency on Thomas’s MSI restructuring patch series:
-https://lore.kernel.org/lkml/20200826111628.794979401@linutronix.de/
-
-The code has dependency on Baolu’s mdev domain patches:
-https://lore.kernel.org/lkml/20201030045809.957927-1-baolu.lu@linux.intel.com/
-
-The code has dependency on David Box’s dvsec definition patch:
-https://lore.kernel.org/linux-pci/bc5f059c5bae957daebde699945c80808286bf45.camel@linux.intel.com/T/#m1d0dc12e3b2c739e2c37106a45f325bb8f001774
-
-Stage 1 of the driver has been accepted in v5.6 kernel. It supports dedicated workqueue (wq)
-without Shared Virtual Memory (SVM) support. 
-
-Stage 2 of the driver supports shared wq and SVM. It should be pending for 5.11 and in
-dmaengine/next.
-
-VFIO mediated device framework allows vendor drivers to wrap a portion of
-device resources into virtual devices (mdev). Each mdev can be assigned
-to different guest using the same set of VFIO uAPIs as assigning a
-physical device. Accessing to the mdev resource is served with mixed
-policies. For example, vendor drivers typically mark data-path interface
-as pass-through for fast guest operations, and then trap-and-mediate the
-control-path interface to avoid undesired interference between mdevs. Some
-level of emulation is necessary behind vfio mdev to compose the virtual
-device interface.
-
-This series brings mdev to idxd driver to enable Intel Scalable IOV
-(SIOV), a hardware-assisted mediated pass-through technology. SIOV makes
-each DSA wq independently assignable through PASID-granular resource/DMA
-isolation. It helps improve scalability and reduces mediation complexity
-against purely software-based mdev implementations. Each assigned wq is
-configured by host and exposed to the guest in a read-only configuration
-mode, which allows the guest to use the wq w/o additional setup. This
-design greatly reduces the emulation bits to focus on handling commands
-from guests.
-
-There are two possible avenues to support virtual device composition:
-1. VFIO mediated device (mdev) or 2. User space DMA through char device
-(or UACCE). Given the small portion of emulation to satisfy our needs
-and VFIO mdev having the infrastructure already to support the device
-passthrough, we feel that VFIO mdev is the better route. For more in depth
-explanation, see documentation in Documents/driver-api/vfio/mdev-idxd.rst.
-
-Introducing mdev types “1dwq-v1” type. This mdev type allows
-allocation of a single dedicated wq from available dedicated wqs. After
-a workqueue (wq) is enabled, the user will generate an uuid. On mdev
-creation, the mdev driver code will find a dwq depending on the mdev
-type. When the create operation is successful, the user generated uuid
-can be passed to qemu. When the guest boots up, it should discover a
-DSA device when doing PCI discovery.
-
-For example of “1dwq-v1” type:
-1. Enable wq with “mdev” wq type
-2. A user generated uuid.
-3. The uuid is written to the mdev class sysfs path:
-echo $UUID > /sys/class/mdev_bus/0000\:00\:0a.0/mdev_supported_types/idxd-1dwq-v1/create
-4. Pass the following parameter to qemu:
-"-device vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:0a.0/$UUID"
- 
-The wq exported through mdev will have the read only config bit set
-for configuration. This means that the device does not require the
-typical configuration. After enabling the device, the user must set the
-WQ type and name. That is all is necessary to enable the WQ and start
-using it. The single wq configuration is not the only way to create the
-mdev. Multi wqs support for mdev will be in the future works.
- 
-The mdev utilizes Interrupt Message Store or IMS[3], a device-specific
-MSI implementation, instead of MSIX for interrupts for the guest. This
-preserves MSIX for host usages and also allows a significantly larger
-number of interrupt vectors for guest usage.
-
-The idxd driver implements IMS as on-device memory mapped unified
-storage. Each interrupt message is stored as a DWORD size data payload
-and a 64-bit address (same as MSI-X). Access to the IMS is through the
-host idxd driver.
-
-The idxd driver makes use of the generic IMS irq chip and domain which
-stores the interrupt messages as an array in device memory. Allocation and
-freeing of interrupts happens via the generic msi_domain_alloc/free_irqs()
-interface. One only needs to ensure the interrupt domain is stored in
-the underlying device struct.
-
-[1]: https://lore.kernel.org/lkml/157965011794.73301.15960052071729101309.stgit@djiang5-desk3.ch.intel.com/
-[2]: https://software.intel.com/en-us/articles/intel-sdm
-[3]: https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
-[4]: https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
-[5]: https://01.org/blogs/2019/introducing-intel-data-streaming-accelerator
-[6]: https://intel.github.io/idxd/
-[7]: https://github.com/intel/idxd-driver idxd-stage2.5
-
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Megha Dey <megha.dey@intel.com>
+Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
+ drivers/irqchip/Kconfig             |   14 ++
+ drivers/irqchip/Makefile            |    1 
+ drivers/irqchip/irq-ims-msi.c       |  204 +++++++++++++++++++++++++++++++++++
+ include/linux/interrupt.h           |    2 
+ include/linux/irq.h                 |    4 +
+ include/linux/irqchip/irq-ims-msi.h |   68 ++++++++++++
+ kernel/irq/manage.c                 |   32 +++++
+ 7 files changed, 325 insertions(+)
+ create mode 100644 drivers/irqchip/irq-ims-msi.c
+ create mode 100644 include/linux/irqchip/irq-ims-msi.h
 
-Dave Jiang (15):
-      dmaengine: idxd: add theory of operation documentation for idxd mdev
-      dmaengine: idxd: add support for readonly config devices
-      dmaengine: idxd: add interrupt handle request support
-      PCI: add SIOV and IMS capability detection
-      dmaengine: idxd: add IMS support in base driver
-      dmaengine: idxd: add device support functions in prep for mdev
-      dmaengine: idxd: add basic mdev registration and helper functions
-      dmaengine: idxd: add emulation rw routines
-      dmaengine: idxd: prep for virtual device commands
-      dmaengine: idxd: virtual device commands emulation
-      dmaengine: idxd: ims setup for the vdcm
-      dmaengine: idxd: add mdev type as a new wq type
-      dmaengine: idxd: add dedicated wq mdev type
-      dmaengine: idxd: add new wq state for mdev
-      dmaengine: idxd: add error notification from host driver to mediated device
+diff --git a/drivers/irqchip/Kconfig b/drivers/irqchip/Kconfig
+index c6098eee0c7c..862ea81a69a0 100644
+--- a/drivers/irqchip/Kconfig
++++ b/drivers/irqchip/Kconfig
+@@ -597,4 +597,18 @@ config MST_IRQ
+ 	help
+ 	  Support MStar Interrupt Controller.
+ 
++config IMS_MSI
++	depends on PCI
++	select DEVICE_MSI
++	bool
++
++config IMS_MSI_ARRAY
++	bool "IMS Interrupt Message Store MSI controller for device memory storage arrays"
++	depends on PCI
++	select IMS_MSI
++	select GENERIC_MSI_IRQ_DOMAIN
++	help
++	  Support for IMS Interrupt Message Store MSI controller
++	  with IMS slot storage in a slot array in device memory
++
+ endmenu
+diff --git a/drivers/irqchip/Makefile b/drivers/irqchip/Makefile
+index 94c2885882ee..a7d54605060a 100644
+--- a/drivers/irqchip/Makefile
++++ b/drivers/irqchip/Makefile
+@@ -114,3 +114,4 @@ obj-$(CONFIG_LOONGSON_PCH_PIC)		+= irq-loongson-pch-pic.o
+ obj-$(CONFIG_LOONGSON_PCH_MSI)		+= irq-loongson-pch-msi.o
+ obj-$(CONFIG_MST_IRQ)			+= irq-mst-intc.o
+ obj-$(CONFIG_SL28CPLD_INTC)		+= irq-sl28cpld.o
++obj-$(CONFIG_IMS_MSI)			+= irq-ims-msi.o
+diff --git a/drivers/irqchip/irq-ims-msi.c b/drivers/irqchip/irq-ims-msi.c
+new file mode 100644
+index 000000000000..d54a54f5fdcc
+--- /dev/null
++++ b/drivers/irqchip/irq-ims-msi.c
+@@ -0,0 +1,204 @@
++// SPDX-License-Identifier: GPL-2.0
++// (C) Copyright 2020 Thomas Gleixner <tglx@linutronix.de>
++/*
++ * Shared interrupt chips and irq domains for IMS devices
++ */
++#include <linux/device.h>
++#include <linux/slab.h>
++#include <linux/msi.h>
++#include <linux/irq.h>
++#include <linux/irqdomain.h>
++
++#include <linux/irqchip/irq-ims-msi.h>
++
++#ifdef CONFIG_IMS_MSI_ARRAY
++
++struct ims_array_data {
++	struct ims_array_info	info;
++	unsigned long		map[0];
++};
++
++static inline void iowrite32_and_flush(u32 value, void __iomem *addr)
++{
++	iowrite32(value, addr);
++	ioread32(addr);
++}
++
++static void ims_array_mask_irq(struct irq_data *data)
++{
++	struct msi_desc *desc = irq_data_get_msi_desc(data);
++	struct ims_slot __iomem *slot = desc->device_msi.priv_iomem;
++	u32 __iomem *ctrl = &slot->ctrl;
++
++	iowrite32_and_flush(ioread32(ctrl) | IMS_CTRL_VECTOR_MASKBIT, ctrl);
++}
++
++static void ims_array_unmask_irq(struct irq_data *data)
++{
++	struct msi_desc *desc = irq_data_get_msi_desc(data);
++	struct ims_slot __iomem *slot = desc->device_msi.priv_iomem;
++	u32 __iomem *ctrl = &slot->ctrl;
++
++	iowrite32_and_flush(ioread32(ctrl) & ~IMS_CTRL_VECTOR_MASKBIT, ctrl);
++}
++
++static void ims_array_write_msi_msg(struct irq_data *data, struct msi_msg *msg)
++{
++	struct msi_desc *desc = irq_data_get_msi_desc(data);
++	struct ims_slot __iomem *slot = desc->device_msi.priv_iomem;
++
++	iowrite32(msg->address_lo, &slot->address_lo);
++	iowrite32(msg->address_hi, &slot->address_hi);
++	iowrite32_and_flush(msg->data, &slot->data);
++}
++
++static int ims_array_set_auxdata(struct irq_data *data, unsigned int which,
++				 u64 auxval)
++{
++	struct msi_desc *desc = irq_data_get_msi_desc(data);
++	struct ims_slot __iomem *slot = desc->device_msi.priv_iomem;
++	u32 val, __iomem *ctrl = &slot->ctrl;
++
++	if (which != IMS_AUXDATA_CONTROL_WORD)
++		return -EINVAL;
++	if (auxval & ~(u64)IMS_CONTROL_WORD_AUXMASK)
++		return -EINVAL;
++
++	val = ioread32(ctrl) & IMS_CONTROL_WORD_IRQMASK;
++	iowrite32_and_flush(val | (u32) auxval, ctrl);
++	return 0;
++}
++
++static const struct irq_chip ims_array_msi_controller = {
++	.name			= "IMS",
++	.irq_mask		= ims_array_mask_irq,
++	.irq_unmask		= ims_array_unmask_irq,
++	.irq_write_msi_msg	= ims_array_write_msi_msg,
++	.irq_set_auxdata	= ims_array_set_auxdata,
++	.irq_retrigger		= irq_chip_retrigger_hierarchy,
++	.flags			= IRQCHIP_SKIP_SET_WAKE,
++};
++
++static void ims_array_reset_slot(struct ims_slot __iomem *slot)
++{
++	iowrite32(0, &slot->address_lo);
++	iowrite32(0, &slot->address_hi);
++	iowrite32(0, &slot->data);
++	iowrite32_and_flush(IMS_CTRL_VECTOR_MASKBIT, &slot->ctrl);
++}
++
++static void ims_array_free_msi_store(struct irq_domain *domain,
++				     struct device *dev)
++{
++	struct msi_domain_info *info = domain->host_data;
++	struct ims_array_data *ims = info->data;
++	struct msi_desc *entry;
++
++	for_each_msi_entry(entry, dev) {
++		if (entry->device_msi.priv_iomem) {
++			clear_bit(entry->device_msi.hwirq, ims->map);
++			ims_array_reset_slot(entry->device_msi.priv_iomem);
++			entry->device_msi.priv_iomem = NULL;
++			entry->device_msi.hwirq = 0;
++		}
++	}
++}
++
++static int ims_array_alloc_msi_store(struct irq_domain *domain,
++				     struct device *dev, int nvec)
++{
++	struct msi_domain_info *info = domain->host_data;
++	struct ims_array_data *ims = info->data;
++	struct msi_desc *entry;
++
++	for_each_msi_entry(entry, dev) {
++		unsigned int idx;
++
++		idx = find_first_zero_bit(ims->map, ims->info.max_slots);
++		if (idx >= ims->info.max_slots)
++			goto fail;
++		set_bit(idx, ims->map);
++		entry->device_msi.priv_iomem = &ims->info.slots[idx];
++		ims_array_reset_slot(entry->device_msi.priv_iomem);
++		entry->device_msi.hwirq = idx;
++	}
++	return 0;
++
++fail:
++	ims_array_free_msi_store(domain, dev);
++	return -ENOSPC;
++}
++
++struct ims_array_domain_template {
++	struct msi_domain_ops	ops;
++	struct msi_domain_info	info;
++};
++
++static const struct ims_array_domain_template ims_array_domain_template = {
++	.ops = {
++		.msi_alloc_store	= ims_array_alloc_msi_store,
++		.msi_free_store		= ims_array_free_msi_store,
++	},
++	.info = {
++		.flags		= MSI_FLAG_USE_DEF_DOM_OPS |
++				  MSI_FLAG_USE_DEF_CHIP_OPS,
++		.handler	= handle_edge_irq,
++		.handler_name	= "edge",
++	},
++};
++
++struct irq_domain *
++pci_ims_array_create_msi_irq_domain(struct pci_dev *pdev,
++				    struct ims_array_info *ims_info)
++{
++	struct ims_array_domain_template *info;
++	struct ims_array_data *data;
++	struct irq_domain *domain;
++	struct irq_chip *chip;
++	unsigned int size;
++
++	/* Allocate new domain storage */
++	info = kmemdup(&ims_array_domain_template,
++		       sizeof(ims_array_domain_template), GFP_KERNEL);
++	if (!info)
++		return NULL;
++	/* Link the ops */
++	info->info.ops = &info->ops;
++
++	/* Allocate ims_info along with the bitmap */
++	size = sizeof(*data);
++	size += BITS_TO_LONGS(ims_info->max_slots) * sizeof(unsigned long);
++	data = kzalloc(size, GFP_KERNEL);
++	if (!data)
++		goto err_info;
++
++	data->info = *ims_info;
++	info->info.data = data;
++
++	/*
++	 * Allocate an interrupt chip because the core needs to be able to
++	 * update it with default callbacks.
++	 */
++	chip = kmemdup(&ims_array_msi_controller,
++		       sizeof(ims_array_msi_controller), GFP_KERNEL);
++	if (!chip)
++		goto err_data;
++	info->info.chip = chip;
++
++	domain = pci_subdevice_msi_create_irq_domain(pdev, &info->info);
++	if (!domain)
++		goto err_chip;
++
++	return domain;
++
++err_chip:
++	kfree(chip);
++err_data:
++	kfree(data);
++err_info:
++	kfree(info);
++	return NULL;
++}
++EXPORT_SYMBOL_GPL(pci_ims_array_create_msi_irq_domain);
++
++#endif /* CONFIG_IMS_MSI_ARRAY */
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index ee8299eb1f52..43a8d1e9647e 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -487,6 +487,8 @@ extern int irq_get_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
+ extern int irq_set_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
+ 				 bool state);
+ 
++int irq_set_auxdata(unsigned int irq, unsigned int which, u64 val);
++
+ #ifdef CONFIG_IRQ_FORCED_THREADING
+ # ifdef CONFIG_PREEMPT_RT
+ #  define force_irqthreads	(true)
+diff --git a/include/linux/irq.h b/include/linux/irq.h
+index c54365309e97..fd162aea0c3f 100644
+--- a/include/linux/irq.h
++++ b/include/linux/irq.h
+@@ -491,6 +491,8 @@ static inline irq_hw_number_t irqd_to_hwirq(struct irq_data *d)
+  *				irq_request_resources
+  * @irq_compose_msi_msg:	optional to compose message content for MSI
+  * @irq_write_msi_msg:	optional to write message content for MSI
++ * @irq_set_auxdata:	Optional function to update auxiliary data e.g. in
++ *			shared registers
+  * @irq_get_irqchip_state:	return the internal state of an interrupt
+  * @irq_set_irqchip_state:	set the internal state of a interrupt
+  * @irq_set_vcpu_affinity:	optional to target a vCPU in a virtual machine
+@@ -538,6 +540,8 @@ struct irq_chip {
+ 	void		(*irq_compose_msi_msg)(struct irq_data *data, struct msi_msg *msg);
+ 	void		(*irq_write_msi_msg)(struct irq_data *data, struct msi_msg *msg);
+ 
++	int		(*irq_set_auxdata)(struct irq_data *data, unsigned int which, u64 auxval);
++
+ 	int		(*irq_get_irqchip_state)(struct irq_data *data, enum irqchip_irq_state which, bool *state);
+ 	int		(*irq_set_irqchip_state)(struct irq_data *data, enum irqchip_irq_state which, bool state);
+ 
+diff --git a/include/linux/irqchip/irq-ims-msi.h b/include/linux/irqchip/irq-ims-msi.h
+new file mode 100644
+index 000000000000..a9e43e1f7890
+--- /dev/null
++++ b/include/linux/irqchip/irq-ims-msi.h
+@@ -0,0 +1,68 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* (C) Copyright 2020 Thomas Gleixner <tglx@linutronix.de> */
++
++#ifndef _LINUX_IRQCHIP_IRQ_IMS_MSI_H
++#define _LINUX_IRQCHIP_IRQ_IMS_MSI_H
++
++#include <linux/types.h>
++#include <linux/bits.h>
++
++/**
++ * ims_hw_slot - The hardware layout of an IMS based MSI message
++ * @address_lo:	Lower 32bit address
++ * @address_hi:	Upper 32bit address
++ * @data:	Message data
++ * @ctrl:	Control word
++ *
++ * This structure is used by both the device memory array and the queue
++ * memory variants of IMS.
++ */
++struct ims_slot {
++	u32	address_lo;
++	u32	address_hi;
++	u32	data;
++	u32	ctrl;
++} __packed;
++
++/*
++ * The IMS control word utilizes bit 0-2 for interrupt control. The remaining
++ * bits can contain auxiliary data.
++ */
++#define IMS_CONTROL_WORD_IRQMASK	GENMASK(2, 0)
++#define IMS_CONTROL_WORD_AUXMASK	GENMASK(31, 3)
++
++/* Bit to mask the interrupt in ims_hw_slot::ctrl */
++#define IMS_CTRL_VECTOR_MASKBIT		BIT(0)
++
++/* Auxiliary control word data related defines */
++enum {
++	IMS_AUXDATA_CONTROL_WORD,
++};
++
++#define IMS_CTRL_PASID_ENABLE		BIT(3)
++#define IMS_CTRL_PASID_SHIFT		12
++
++static inline u32 ims_ctrl_pasid_aux(unsigned int pasid, bool enable)
++{
++	u32 auxval = pasid << IMS_CTRL_PASID_SHIFT;
++
++	return enable ? auxval | IMS_CTRL_PASID_ENABLE : auxval;
++}
++
++/**
++ * struct ims_array_info - Information to create an IMS array domain
++ * @slots:	Pointer to the start of the array
++ * @max_slots:	Maximum number of slots in the array
++ */
++struct ims_array_info {
++	struct ims_slot		__iomem *slots;
++	unsigned int		max_slots;
++};
++
++struct pci_dev;
++struct irq_domain;
++
++struct irq_domain *pci_ims_array_create_msi_irq_domain(struct pci_dev *pdev,
++						       struct ims_array_info *ims_info);
++
++#endif
+diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+index dc65d90108db..d7bf2ae67170 100644
+--- a/kernel/irq/manage.c
++++ b/kernel/irq/manage.c
+@@ -2752,3 +2752,35 @@ int irq_set_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(irq_set_irqchip_state);
++
++/**
++ * irq_set_auxdata - Set auxiliary data
++ * @irq:	Interrupt to update
++ * @which:	Selector which data to update
++ * @auxval:	Auxiliary data value
++ *
++ * Function to update auxiliary data for an interrupt, e.g. to update data
++ * which is stored in a shared register or data storage (e.g. IMS).
++ */
++int irq_set_auxdata(unsigned int irq, unsigned int which, u64 val)
++{
++	struct irq_desc *desc;
++	struct irq_data *data;
++	unsigned long flags;
++	int res = -ENODEV;
++
++	desc = irq_get_desc_buslock(irq, &flags, 0);
++	if (!desc)
++		return -EINVAL;
++
++	for (data = &desc->irq_data; data; data = irqd_get_parent_data(data)) {
++		if (data->chip->irq_set_auxdata) {
++			res = data->chip->irq_set_auxdata(data, which, val);
++			break;
++		}
++	}
++
++	irq_put_desc_busunlock(desc, flags);
++	return res;
++}
++EXPORT_SYMBOL_GPL(irq_set_auxdata);
 
-Megha Dey (1):
-      iommu/vt-d: Add DEV-MSI support
-
-Thomas Gleixner (1):
-      irqchip: Add IMS (Interrupt Message Store) driver
-
-
- .../ABI/stable/sysfs-driver-dma-idxd          |    6 +
- Documentation/driver-api/vfio/mdev-idxd.rst   |  404 ++++++
- MAINTAINERS                                   |    1 +
- drivers/dma/Kconfig                           |    9 +
- drivers/dma/idxd/Makefile                     |    2 +
- drivers/dma/idxd/cdev.c                       |    6 +-
- drivers/dma/idxd/device.c                     |  294 ++++-
- drivers/dma/idxd/idxd.h                       |   67 +-
- drivers/dma/idxd/init.c                       |   86 ++
- drivers/dma/idxd/irq.c                        |    6 +-
- drivers/dma/idxd/mdev.c                       | 1121 +++++++++++++++++
- drivers/dma/idxd/mdev.h                       |  116 ++
- drivers/dma/idxd/registers.h                  |   38 +-
- drivers/dma/idxd/submit.c                     |   37 +-
- drivers/dma/idxd/sysfs.c                      |   52 +-
- drivers/dma/idxd/vdev.c                       |  976 ++++++++++++++
- drivers/dma/idxd/vdev.h                       |   28 +
- drivers/iommu/intel/iommu.c                   |   31 +-
- drivers/iommu/intel/irq_remapping.c           |   34 +-
- drivers/pci/Kconfig                           |   15 +
- drivers/pci/Makefile                          |    2 +
- drivers/pci/dvsec.c                           |   40 +
- drivers/pci/siov.c                            |   50 +
- include/linux/pci-siov.h                      |   18 +
- include/linux/pci.h                           |    3 +
- include/uapi/linux/idxd.h                     |    2 +
- include/uapi/linux/pci_regs.h                 |    4 +
- kernel/irq/msi.c                              |    2 +
- 28 files changed, 3352 insertions(+), 98 deletions(-)
- create mode 100644 Documentation/driver-api/vfio/mdev-idxd.rst
- create mode 100644 drivers/dma/idxd/mdev.c
- create mode 100644 drivers/dma/idxd/mdev.h
- create mode 100644 drivers/dma/idxd/vdev.c
- create mode 100644 drivers/dma/idxd/vdev.h
- create mode 100644 drivers/pci/dvsec.c
- create mode 100644 drivers/pci/siov.c
- create mode 100644 include/linux/pci-siov.h
-
---
 
