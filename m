@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 812482A0E13
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E9992A0DD2
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:52:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727368AbgJ3Swc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 14:52:32 -0400
-Received: from mga12.intel.com ([192.55.52.136]:35177 "EHLO mga12.intel.com"
+        id S1727389AbgJ3Swd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 14:52:33 -0400
+Received: from mga12.intel.com ([192.55.52.136]:35185 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726061AbgJ3Swa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726297AbgJ3Swa (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 30 Oct 2020 14:52:30 -0400
-IronPort-SDR: Ytvwh/SkQwsTC6yjIfIOxlKUeESPHrt9NJQCnSxUoT1uS10PmFThfmVwgbKe8Vfak9ZKUNscti
- zPlzuT8vuqNQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="147936850"
+IronPort-SDR: c8C4y+7gdM2Wn+cFte6Js/0UEpgIcZyKUS0rg6Rp5cJL2QKjhhmhCYMGn7xdXU/MTK3GCcqQo6
+ L1pI79aH1pvQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="147936863"
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="147936850"
+   d="scan'208";a="147936863"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:33 -0700
-IronPort-SDR: 9U/h/5H6+ey8Jh7kJdRLLy7240505xw+hKhlUkFhE0eePhaDPi1zHyK3SJuIJpn7uN3e/3LkqQ
- yVWOw30R+9GA==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:39 -0700
+IronPort-SDR: CCoamM27cI/mm2k/OA1RJJpAX7t21eMH6nG1FMiRF9gZSd7zTfdtQ858C9hTnAeNnrVT0Ot6qh
+ q4t4dS8FVDSw==
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="525974696"
+   d="scan'208";a="527210084"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:32 -0700
-Subject: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:38 -0700
+Subject: [PATCH v4 07/17] dmaengine: idxd: add IMS support in base driver
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         bhelgaas@google.com, tglx@linutronix.de,
@@ -40,8 +40,8 @@ To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Fri, 30 Oct 2020 11:51:32 -0700
-Message-ID: <160408389228.912050.10790556040702698268.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 30 Oct 2020 11:51:38 -0700
+Message-ID: <160408389855.912050.5169538738792960557.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
 References: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
@@ -52,292 +52,216 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Intel Scalable I/O Virtualization (SIOV) enables sharing of I/O devices
-across isolated domains through PASID based sub-device partitioning.
-Interrupt Message Storage (IMS) enables devices to store the interrupt
-messages in a device-specific optimized manner without the scalability
-restrictions of the PCIe defined MSI-X capability. IMS is one of the
-features supported under SIOV.
+In preparation for support of VFIO mediated device for idxd driver, the
+enabling for Interrupt Message Store (IMS) interrupts is added for the idxd
+With IMS support the idxd driver can dynamically allocate interrupts on a
+per mdev basis based on how many IMS vectors that are mapped to the mdev
+device. This commit only provides the support functions in the base driver
+and not the VFIO mdev code utilization.
 
-Move SIOV detection code from Intel iommu driver code to common PCI. Making
-the detection code common allows supported accelerator drivers to query the
-PCI core for SIOV and IMS capabilities. The support code will add the
-ability to query the PCI DVSEC capabilities for the SIOV cap.
+The commit has some portal related changes. A "portal" is a special
+location within the MMIO BAR2 of the DSA device where descriptors are
+submitted via the CPU command MOVDIR64B or ENQCMD(S). The offset for the
+portal address determines whether the submitted descriptor is for MSI-X
+or IMS notification.
 
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Baolu Lu <baolu.lu@intel.com>
+See Intel SIOV spec for more details:
+https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
+
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
-Reviewed-by: Ashok Raj <ashok.raj@intel.com>
 ---
- drivers/iommu/intel/iommu.c   |   31 ++-----------------------
- drivers/pci/Kconfig           |   15 ++++++++++++
- drivers/pci/Makefile          |    2 ++
- drivers/pci/dvsec.c           |   40 +++++++++++++++++++++++++++++++++
- drivers/pci/siov.c            |   50 +++++++++++++++++++++++++++++++++++++++++
- include/linux/pci-siov.h      |   18 +++++++++++++++
- include/linux/pci.h           |    3 ++
- include/uapi/linux/pci_regs.h |    4 +++
- 8 files changed, 134 insertions(+), 29 deletions(-)
- create mode 100644 drivers/pci/dvsec.c
- create mode 100644 drivers/pci/siov.c
- create mode 100644 include/linux/pci-siov.h
+ Documentation/ABI/stable/sysfs-driver-dma-idxd |    6 ++++++
+ drivers/dma/idxd/cdev.c                        |    4 ++--
+ drivers/dma/idxd/idxd.h                        |   13 +++++++++----
+ drivers/dma/idxd/init.c                        |   19 +++++++++++++++++++
+ drivers/dma/idxd/submit.c                      |   10 ++++++++--
+ drivers/dma/idxd/sysfs.c                       |    9 +++++++++
+ 6 files changed, 53 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 3e77a88b236c..d9335f590b42 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -36,6 +36,7 @@
- #include <linux/tboot.h>
- #include <linux/dmi.h>
- #include <linux/pci-ats.h>
-+#include <linux/pci-siov.h>
- #include <linux/memblock.h>
- #include <linux/dma-map-ops.h>
- #include <linux/dma-direct.h>
-@@ -5883,34 +5884,6 @@ static int intel_iommu_disable_auxd(struct device *dev)
- 	return 0;
+diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+index 5ea81ffd3c1a..ed5aeecf7015 100644
+--- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
++++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+@@ -129,6 +129,12 @@ KernelVersion:	5.10.0
+ Contact:	dmaengine@vger.kernel.org
+ Description:	The last executed device administrative command's status/error.
+ 
++What:		/sys/bus/dsa/devices/dsa<m>/ims_size
++Date:		Oct 15, 2020
++KernelVersion:	5.11.0
++Contact:	dmaengine@vger.kernel.org
++Description:	The total number of vectors available for Interrupt Message Store.
++
+ What:		/sys/bus/dsa/devices/wq<m>.<n>/block_on_fault
+ Date:		Oct 27, 2020
+ KernelVersion:	5.11.0
+diff --git a/drivers/dma/idxd/cdev.c b/drivers/dma/idxd/cdev.c
+index 010b820d8f74..b774bf336347 100644
+--- a/drivers/dma/idxd/cdev.c
++++ b/drivers/dma/idxd/cdev.c
+@@ -204,8 +204,8 @@ static int idxd_cdev_mmap(struct file *filp, struct vm_area_struct *vma)
+ 		return rc;
+ 
+ 	vma->vm_flags |= VM_DONTCOPY;
+-	pfn = (base + idxd_get_wq_portal_full_offset(wq->id,
+-				IDXD_PORTAL_LIMITED)) >> PAGE_SHIFT;
++	pfn = (base + idxd_get_wq_portal_full_offset(wq->id, IDXD_PORTAL_LIMITED,
++						     IDXD_IRQ_MSIX)) >> PAGE_SHIFT;
+ 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+ 	vma->vm_private_data = ctx;
+ 
+diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
+index a506a16c83ee..549426bfb443 100644
+--- a/drivers/dma/idxd/idxd.h
++++ b/drivers/dma/idxd/idxd.h
+@@ -154,6 +154,7 @@ enum idxd_device_flag {
+ 	IDXD_FLAG_CONFIGURABLE = 0,
+ 	IDXD_FLAG_CMD_RUNNING,
+ 	IDXD_FLAG_PASID_ENABLED,
++	IDXD_FLAG_SIOV_SUPPORTED,
+ };
+ 
+ struct idxd_device {
+@@ -181,6 +182,7 @@ struct idxd_device {
+ 
+ 	int num_groups;
+ 
++	u32 ims_offset;
+ 	u32 msix_perm_offset;
+ 	u32 wqcfg_offset;
+ 	u32 grpcfg_offset;
+@@ -188,6 +190,7 @@ struct idxd_device {
+ 
+ 	u64 max_xfer_bytes;
+ 	u32 max_batch_size;
++	int ims_size;
+ 	int max_groups;
+ 	int max_engines;
+ 	int max_tokens;
+@@ -262,15 +265,17 @@ enum idxd_interrupt_type {
+ 	IDXD_IRQ_IMS,
+ };
+ 
+-static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot)
++static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot,
++					    enum idxd_interrupt_type irq_type)
+ {
+-	return prot * 0x1000;
++	return prot * 0x1000 + irq_type * 0x2000;
  }
  
--/*
-- * A PCI express designated vendor specific extended capability is defined
-- * in the section 3.7 of Intel scalable I/O virtualization technical spec
-- * for system software and tools to detect endpoint devices supporting the
-- * Intel scalable IO virtualization without host driver dependency.
-- *
-- * Returns the address of the matching extended capability structure within
-- * the device's PCI configuration space or 0 if the device does not support
-- * it.
-- */
--static int siov_find_pci_dvsec(struct pci_dev *pdev)
--{
--	int pos;
--	u16 vendor, id;
--
--	pos = pci_find_next_ext_capability(pdev, 0, 0x23);
--	while (pos) {
--		pci_read_config_word(pdev, pos + 4, &vendor);
--		pci_read_config_word(pdev, pos + 8, &id);
--		if (vendor == PCI_VENDOR_ID_INTEL && id == 5)
--			return pos;
--
--		pos = pci_find_next_ext_capability(pdev, pos, 0x23);
--	}
--
--	return 0;
--}
--
- static bool
- intel_iommu_dev_has_feat(struct device *dev, enum iommu_dev_features feat)
+ static inline int idxd_get_wq_portal_full_offset(int wq_id,
+-						 enum idxd_portal_prot prot)
++						 enum idxd_portal_prot prot,
++						 enum idxd_interrupt_type irq_type)
  {
-@@ -5925,7 +5898,7 @@ intel_iommu_dev_has_feat(struct device *dev, enum iommu_dev_features feat)
- 		if (ret < 0)
- 			return false;
+-	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot);
++	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot, irq_type);
+ }
  
--		return !!siov_find_pci_dvsec(to_pci_dev(dev));
-+		return pci_siov_supported(to_pci_dev(dev));
- 	}
+ static inline void idxd_set_type(struct idxd_device *idxd)
+diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
+index c136216e19e8..4a21c2a17a62 100644
+--- a/drivers/dma/idxd/init.c
++++ b/drivers/dma/idxd/init.c
+@@ -16,6 +16,7 @@
+ #include <linux/idr.h>
+ #include <linux/intel-svm.h>
+ #include <linux/iommu.h>
++#include <linux/pci-siov.h>
+ #include <uapi/linux/idxd.h>
+ #include <linux/dmaengine.h>
+ #include "../dmaengine.h"
+@@ -244,10 +245,27 @@ static void idxd_read_table_offsets(struct idxd_device *idxd)
+ 	dev_dbg(dev, "IDXD Work Queue Config Offset: %#x\n", idxd->wqcfg_offset);
+ 	idxd->msix_perm_offset = offsets.msix_perm * IDXD_TABLE_MULT;
+ 	dev_dbg(dev, "IDXD MSIX Permission Offset: %#x\n", idxd->msix_perm_offset);
++	idxd->ims_offset = offsets.ims * IDXD_TABLE_MULT;
++	dev_dbg(dev, "IDXD IMS Offset: %#x\n", idxd->ims_offset);
+ 	idxd->perfmon_offset = offsets.perfmon * IDXD_TABLE_MULT;
+ 	dev_dbg(dev, "IDXD Perfmon Offset: %#x\n", idxd->perfmon_offset);
+ }
  
- 	if (feat == IOMMU_DEV_FEAT_SVA) {
-diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-index 0c473d75e625..cf7f4d17d8cc 100644
---- a/drivers/pci/Kconfig
-+++ b/drivers/pci/Kconfig
-@@ -161,6 +161,21 @@ config PCI_PASID
- 
- 	  If unsure, say N.
- 
-+config PCI_DVSEC
-+	bool
-+
-+config PCI_SIOV
-+	select PCI_PASID
-+	select PCI_DVSEC
-+	bool "PCI SIOV support"
-+	help
-+	  Scalable I/O Virtualzation enables sharing of I/O devices across isolated
-+	  domains through PASID based sub-device partitioning. One of the sub features
-+	  supported by SIOV is Inetrrupt Message Storage (IMS). Select this option if
-+	  you want to compile the support into your kernel.
-+
-+	  If unsure, say N.
-+
- config PCI_P2PDMA
- 	bool "PCI peer-to-peer transfer support"
- 	depends on ZONE_DEVICE
-diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
-index 522d2b974e91..653a1d69b0fc 100644
---- a/drivers/pci/Makefile
-+++ b/drivers/pci/Makefile
-@@ -20,6 +20,8 @@ obj-$(CONFIG_PCI_QUIRKS)	+= quirks.o
- obj-$(CONFIG_HOTPLUG_PCI)	+= hotplug/
- obj-$(CONFIG_PCI_MSI)		+= msi.o
- obj-$(CONFIG_PCI_ATS)		+= ats.o
-+obj-$(CONFIG_PCI_DVSEC)		+= dvsec.o
-+obj-$(CONFIG_PCI_SIOV)		+= siov.o
- obj-$(CONFIG_PCI_IOV)		+= iov.o
- obj-$(CONFIG_PCI_BRIDGE_EMUL)	+= pci-bridge-emul.o
- obj-$(CONFIG_PCI_LABEL)		+= pci-label.o
-diff --git a/drivers/pci/dvsec.c b/drivers/pci/dvsec.c
-new file mode 100644
-index 000000000000..e49b079f0717
---- /dev/null
-+++ b/drivers/pci/dvsec.c
-@@ -0,0 +1,40 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * PCI DVSEC helper functions
-+ * Copyright (C) 2020 Intel Corp.
-+ */
-+
-+#include <linux/export.h>
-+#include <linux/pci.h>
-+#include <uapi/linux/pci_regs.h>
-+#include "pci.h"
-+
-+/**
-+ * pci_find_dvsec - return position of DVSEC with provided vendor and dvsec id
-+ * @dev: the PCI device
-+ * @vendor: Vendor for the DVSEC
-+ * @id: the DVSEC cap id
-+ *
-+ * Return the offset of DVSEC on success or -ENOTSUPP if not found
-+ */
-+int pci_find_dvsec(struct pci_dev *dev, u16 vendor, u16 id)
++static void idxd_check_siov(struct idxd_device *idxd)
 +{
-+	u16 dev_vendor, dev_id;
-+	int pos;
++	struct pci_dev *pdev = idxd->pdev;
 +
-+	pos = pci_find_ext_capability(dev, PCI_EXT_CAP_ID_DVSEC);
-+	if (!pos)
-+		return -ENOTSUPP;
-+
-+	while (pos) {
-+		pci_read_config_word(dev, pos + PCI_DVSEC_HEADER1, &dev_vendor);
-+		pci_read_config_word(dev, pos + PCI_DVSEC_HEADER2, &dev_id);
-+		if (dev_vendor == vendor && dev_id == id)
-+			return pos;
-+
-+		pos = pci_find_next_ext_capability(dev, pos, PCI_EXT_CAP_ID_DVSEC);
++	if (pci_ims_supported(idxd->pdev) && idxd->hw.gen_cap.max_ims_mult) {
++		idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
++		dev_dbg(&pdev->dev, "IMS size: %u\n", idxd->ims_size);
++		set_bit(IDXD_FLAG_SIOV_SUPPORTED, &idxd->flags);
++		dev_dbg(&pdev->dev, "IMS supported for device\n");
++		return;
 +	}
 +
-+	return -ENOTSUPP;
++	dev_dbg(&pdev->dev, "SIOV unsupported for device\n");
 +}
-+EXPORT_SYMBOL_GPL(pci_find_dvsec);
-diff --git a/drivers/pci/siov.c b/drivers/pci/siov.c
-new file mode 100644
-index 000000000000..6147e6ae5832
---- /dev/null
-+++ b/drivers/pci/siov.c
-@@ -0,0 +1,50 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Intel Scalable I/O Virtualization support
-+ * Copyright (C) 2020 Intel Corp.
-+ */
 +
-+#include <linux/export.h>
-+#include <linux/pci.h>
-+#include <linux/pci-siov.h>
-+#include <uapi/linux/pci_regs.h>
-+#include "pci.h"
-+
-+/*
-+ * A PCI express designated vendor specific extended capability is defined
-+ * in the section 3.7 of Intel scalable I/O virtualization technical spec
-+ * for system software and tools to detect endpoint devices supporting the
-+ * Intel scalable IO virtualization without host driver dependency.
-+ */
-+
-+/**
-+ * pci_siov_supported - check if the device can use SIOV
-+ * @dev: the PCI device
-+ *
-+ * Returns true if the device supports SIOV,  false otherwise.
-+ */
-+bool pci_siov_supported(struct pci_dev *dev)
+ static void idxd_read_caps(struct idxd_device *idxd)
+ {
+ 	struct device *dev = &idxd->pdev->dev;
+@@ -266,6 +284,7 @@ static void idxd_read_caps(struct idxd_device *idxd)
+ 	dev_dbg(dev, "max xfer size: %llu bytes\n", idxd->max_xfer_bytes);
+ 	idxd->max_batch_size = 1U << idxd->hw.gen_cap.max_batch_shift;
+ 	dev_dbg(dev, "max batch size: %u\n", idxd->max_batch_size);
++	idxd_check_siov(idxd);
+ 	if (idxd->hw.gen_cap.config_en)
+ 		set_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags);
+ 
+diff --git a/drivers/dma/idxd/submit.c b/drivers/dma/idxd/submit.c
+index cdea5d37ef24..f76d154d1dbd 100644
+--- a/drivers/dma/idxd/submit.c
++++ b/drivers/dma/idxd/submit.c
+@@ -30,7 +30,13 @@ static struct idxd_desc *__get_desc(struct idxd_wq *wq, int idx, int cpu)
+ 		desc->hw->int_handle = wq->vec_ptr;
+ 	} else {
+ 		desc->vector = wq->vec_ptr;
+-		desc->hw->int_handle = idxd->int_handles[desc->vector];
++		/*
++		 * int_handles are only for descriptor completion. However for device
++		 * MSIX enumeration, vec 0 is used for misc interrupts. Therefore even
++		 * though we are rotating through 1...N for descriptor interrupts, we
++		 * need to acqurie the int_handles from 0..N-1.
++		 */
++		desc->hw->int_handle = idxd->int_handles[desc->vector - 1];
+ 	}
+ 
+ 	return desc;
+@@ -91,7 +97,7 @@ int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc)
+ 	if (idxd->state != IDXD_DEV_ENABLED)
+ 		return -EIO;
+ 
+-	portal = wq->portal + idxd_get_wq_portal_offset(IDXD_PORTAL_LIMITED);
++	portal = wq->portal + idxd_get_wq_portal_offset(IDXD_PORTAL_LIMITED, IDXD_IRQ_MSIX);
+ 
+ 	/*
+ 	 * The wmb() flushes writes to coherent DMA data before
+diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
+index 304eb2cf532e..17f13ebae028 100644
+--- a/drivers/dma/idxd/sysfs.c
++++ b/drivers/dma/idxd/sysfs.c
+@@ -1353,6 +1353,14 @@ static ssize_t numa_node_show(struct device *dev,
+ }
+ static DEVICE_ATTR_RO(numa_node);
+ 
++static ssize_t ims_size_show(struct device *dev, struct device_attribute *attr, char *buf)
 +{
-+	return pci_find_dvsec(dev, PCI_VENDOR_ID_INTEL, PCI_DVSEC_ID_INTEL_SIOV) < 0 ? false : true;
++	struct idxd_device *idxd = container_of(dev, struct idxd_device, conf_dev);
++
++	return sprintf(buf, "%u\n", idxd->ims_size);
 +}
-+EXPORT_SYMBOL_GPL(pci_siov_supported);
++static DEVICE_ATTR_RO(ims_size);
 +
-+/**
-+ * pci_ims_supported - check if the device can use IMS
-+ * @dev: the PCI device
-+ *
-+ * Returns true if the device supports IMS, false otherwise.
-+ */
-+bool pci_ims_supported(struct pci_dev *dev)
-+{
-+	int pos;
-+	u32 caps;
-+
-+	pos = pci_find_dvsec(dev, PCI_VENDOR_ID_INTEL, PCI_DVSEC_ID_INTEL_SIOV);
-+	if (pos < 0)
-+		return false;
-+
-+	pci_read_config_dword(dev, pos + PCI_DVSEC_INTEL_SIOV_CAP, &caps);
-+	return (caps & PCI_DVSEC_INTEL_SIOV_CAP_IMS) ? true : false;
-+}
-+EXPORT_SYMBOL_GPL(pci_ims_supported);
-diff --git a/include/linux/pci-siov.h b/include/linux/pci-siov.h
-new file mode 100644
-index 000000000000..a8a4eb5f4634
---- /dev/null
-+++ b/include/linux/pci-siov.h
-@@ -0,0 +1,18 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef LINUX_PCI_SIOV_H
-+#define LINUX_PCI_SIOV_H
-+
-+#include <linux/pci.h>
-+
-+#ifdef CONFIG_PCI_SIOV
-+/* Scalable I/O Virtualization */
-+bool pci_siov_supported(struct pci_dev *dev);
-+bool pci_ims_supported(struct pci_dev *dev);
-+#else /* CONFIG_PCI_SIOV */
-+static inline bool pci_siov_supported(struct pci_dev *d)
-+{ return false; }
-+static inline bool pci_ims_supported(struct pci_dev *d)
-+{ return false; }
-+#endif /* CONFIG_PCI_SIOV */
-+
-+#endif /* LINUX_PCI_SIOV_H */
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 22207a79762c..4710f09b43b1 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -1070,6 +1070,7 @@ int pci_find_next_ext_capability(struct pci_dev *dev, int pos, int cap);
- int pci_find_ht_capability(struct pci_dev *dev, int ht_cap);
- int pci_find_next_ht_capability(struct pci_dev *dev, int pos, int ht_cap);
- struct pci_bus *pci_find_next_bus(const struct pci_bus *from);
-+int pci_find_dvsec(struct pci_dev *dev, u16 vendor, u16 id);
- 
- u64 pci_get_dsn(struct pci_dev *dev);
- 
-@@ -1726,6 +1727,8 @@ static inline int pci_find_next_capability(struct pci_dev *dev, u8 post,
- { return 0; }
- static inline int pci_find_ext_capability(struct pci_dev *dev, int cap)
- { return 0; }
-+static inline int pci_find_dvsec(struct pci_dev *dev, u16 vendor, u16 id)
-+{ return 0; }
- 
- static inline u64 pci_get_dsn(struct pci_dev *dev)
- { return 0; }
-diff --git a/include/uapi/linux/pci_regs.h b/include/uapi/linux/pci_regs.h
-index 8f8bd2318c6c..3532528441ef 100644
---- a/include/uapi/linux/pci_regs.h
-+++ b/include/uapi/linux/pci_regs.h
-@@ -1071,6 +1071,10 @@
- #define PCI_DVSEC_HEADER1		0x4 /* Designated Vendor-Specific Header1 */
- #define PCI_DVSEC_HEADER2		0x8 /* Designated Vendor-Specific Header2 */
- 
-+#define PCI_DVSEC_ID_INTEL_SIOV		0x5
-+#define PCI_DVSEC_INTEL_SIOV_CAP	0x14
-+#define PCI_DVSEC_INTEL_SIOV_CAP_IMS	0x1
-+
- /* Data Link Feature */
- #define PCI_DLF_CAP		0x04	/* Capabilities Register */
- #define  PCI_DLF_EXCHANGE_ENABLE	0x80000000  /* Data Link Feature Exchange Enable */
+ static ssize_t max_batch_size_show(struct device *dev,
+ 				   struct device_attribute *attr, char *buf)
+ {
+@@ -1548,6 +1556,7 @@ static struct attribute *idxd_device_attributes[] = {
+ 	&dev_attr_max_work_queues_size.attr,
+ 	&dev_attr_max_engines.attr,
+ 	&dev_attr_numa_node.attr,
++	&dev_attr_ims_size.attr,
+ 	&dev_attr_max_batch_size.attr,
+ 	&dev_attr_max_transfer_size.attr,
+ 	&dev_attr_op_cap.attr,
 
 
