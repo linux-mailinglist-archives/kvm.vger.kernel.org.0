@@ -2,158 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E67D2A07E4
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 15:31:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F8D2A0818
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 15:38:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbgJ3ObK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 10:31:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52572 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725975AbgJ3ObJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 10:31:09 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09UE2Swq034756;
-        Fri, 30 Oct 2020 10:31:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ohl5SYtmqEqbnAQIUMNmpkUrg6xu5xgKTdULuJLlh8g=;
- b=S7YnYdHIQt0M96DsYxpZLjV6kabTz1hS4Z5a1ei7f6c/rHZ+Ph9C4JnsB0CQo/nrm+f6
- V+/YRVaL9Alz//VktSP4rE0QXb8GmKZ+2Mpa1I1ESkWjwm3A3plDvf8bg0hz3t/h/HKq
- zsTkuc7Et+YTgwTM0gxSydJGO5aG2D2zuHcGSjateZrjEsiBARUHzzpeB+X3qkzGaGMu
- EJMtzBJU6XWKglF2AapaoilC+3sGjErKCawB7ICXpBKjdNlHg8dBHAsPpLpsyaPTWcVd
- yDth075oimsVqBxI95x2AoG7Psrwyw3CpApdbfjLJbppR3Ht0o9o+QaRMAZjOx5EihAh ng== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34gghjg6me-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Oct 2020 10:31:09 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09UEGZhp106043;
-        Fri, 30 Oct 2020 10:31:08 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34gghjg6jd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Oct 2020 10:31:08 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09UELr5k014936;
-        Fri, 30 Oct 2020 14:31:06 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 34f7s3s6kx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Oct 2020 14:31:05 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09UEV3Rm23855504
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 30 Oct 2020 14:31:03 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DEA775204F;
-        Fri, 30 Oct 2020 14:31:02 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.23.31])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8620852050;
-        Fri, 30 Oct 2020 14:31:02 +0000 (GMT)
-Subject: Re: [PATCH] kvm: s390: pv: Mark mm as protected after the set secure
- parameters and improve cleanup
-To:     Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
-References: <20201030140141.106641-1-frankja@linux.ibm.com>
- <7461fd5d-4a44-51ad-bb7b-0bea8737b6e1@de.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <616a50f1-85f2-3286-7385-ead45256c6b5@linux.ibm.com>
-Date:   Fri, 30 Oct 2020 15:31:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S1726869AbgJ3OiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 10:38:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35892 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbgJ3OiE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 10:38:04 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9C0BC0613D5
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 07:38:03 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id f7so6869149oib.4
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 07:38:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=SFdgvNNkKFB8SPaNCIOCQJISIgDBDMbDzScVAH9EDMM=;
+        b=koZdGXG+Ed4ZrGS9gYktSh+x1QwMrt0hVdgtd4bIPF04LbzITd0kgGqgPUBl5FakP+
+         0IPlU3GsFBiis2BGBWZ8Etau8IP6JGUudreHosPpOTayfP42rljDrS9OOvm9gkIsYPvS
+         XRK9qJaWRojvBDDnG6hf9KUPyRba0rCKMXbVM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=SFdgvNNkKFB8SPaNCIOCQJISIgDBDMbDzScVAH9EDMM=;
+        b=Q9UMgB+PIER+pOQa/dvhAK6rgD48NM459beB3bhmFZphGp6bN+uL8g2spbk9VjLYfd
+         BR0eVUWm/sTcQmB0kqj7vYSovRaygvsnDRChVBQ+gAnmdVNYmsp5Up0P+m5YFm6qQUVU
+         00w+RnddFH5hFqGgNv8o9oHbRfpM0sCKnXoDLysKtb0dmac2E/SVH64mlT0SEMkHSvfQ
+         3DTVfkI8/53C4+Czucg9CfQLEOIBX41KohwmA5YhJT7GKuTy4wChPGI6O7zgHG+GQLo+
+         Vq5+I1HlfRytws1J34sjMrX6xiGNgvIZpvpMhxS0BPhBb5va8FbqJXRTcn3tAqs05Li3
+         zgcQ==
+X-Gm-Message-State: AOAM531pSHqwOTsJNaEm9/m/20DTt7X40COE7AeabqzPkcHLLaRpm693
+        Etm8s8n7kN6GYY0R00dBn6aJaASfVkm8yaoPoq5a/Q==
+X-Google-Smtp-Source: ABdhPJzRmIwZAJG+16lc3hpTwK/eoorAnaJg+RPUJ77L79AwZKhT5ZuLVu9x7ItY0hWudsBOQUnGYhpPZBYn26IA3Eg=
+X-Received: by 2002:aca:b141:: with SMTP id a62mr1673007oif.101.1604068683122;
+ Fri, 30 Oct 2020 07:38:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7461fd5d-4a44-51ad-bb7b-0bea8737b6e1@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-10-30_04:2020-10-30,2020-10-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- priorityscore=1501 impostorscore=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010300102
+References: <20201030100815.2269-1-daniel.vetter@ffwll.ch> <20201030100815.2269-6-daniel.vetter@ffwll.ch>
+ <CAAFQd5ANOAzVf+tC1iYKXeY0ALahtYrG7xtKHXHmvv1xh7si3g@mail.gmail.com>
+In-Reply-To: <CAAFQd5ANOAzVf+tC1iYKXeY0ALahtYrG7xtKHXHmvv1xh7si3g@mail.gmail.com>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Fri, 30 Oct 2020 15:37:52 +0100
+Message-ID: <CAKMK7uFFNNXtWh5CyDVGnXo+GYdhc-CgZN1pZSmYAhnyrDhXaQ@mail.gmail.com>
+Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
+To:     Tomasz Figa <tfiga@chromium.org>
+Cc:     =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
+        kvm <kvm@vger.kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "list@263.net:IOMMU DRIVERS <iommu@lists.linux-foundation.org>, Joerg
+        Roedel <joro@8bytes.org>," <linux-arm-kernel@lists.infradead.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/30/20 3:25 PM, Christian Borntraeger wrote:
-> On 30.10.20 15:01, Janosch Frank wrote:
->> We can only have protected guest pages after a successful set secure
->> parameters call as only then the UV allows imports and unpacks.
->>
->> By moving the test we can now also check for it in s390_reset_acc()
->> and do an early return if it is 0.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> 
-> Looks sane.
-> 
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+On Fri, Oct 30, 2020 at 3:11 PM Tomasz Figa <tfiga@chromium.org> wrote:
+>
+> On Fri, Oct 30, 2020 at 11:08 AM Daniel Vetter <daniel.vetter@ffwll.ch> w=
+rote:
+> >
+> > This is used by media/videbuf2 for persistent dma mappings, not just
+> > for a single dma operation and then freed again, so needs
+> > FOLL_LONGTERM.
+> >
+> > Unfortunately current pup_locked doesn't support FOLL_LONGTERM due to
+> > locking issues. Rework the code to pull the pup path out from the
+> > mmap_sem critical section as suggested by Jason.
+> >
+> > By relying entirely on the vma checks in pin_user_pages and follow_pfn
+> > (for vm_flags and vma_is_fsdax) we can also streamline the code a lot.
+> >
+> > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> > Cc: Pawel Osciak <pawel@osciak.com>
+> > Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+> > Cc: Kyungmin Park <kyungmin.park@samsung.com>
+> > Cc: Tomasz Figa <tfiga@chromium.org>
+> > Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > Cc: John Hubbard <jhubbard@nvidia.com>
+> > Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > Cc: Jan Kara <jack@suse.cz>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: linux-mm@kvack.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: linux-samsung-soc@vger.kernel.org
+> > Cc: linux-media@vger.kernel.org
+> > Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> > --
+> > v2: Streamline the code and further simplify the loop checks (Jason)
+> >
+> > v5: Review from Tomasz:
+> > - fix page counting for the follow_pfn case by resetting ret
+> > - drop gup_flags paramater, now unused
+> > ---
+> >  .../media/common/videobuf2/videobuf2-memops.c |  3 +-
+> >  include/linux/mm.h                            |  2 +-
+> >  mm/frame_vector.c                             | 53 ++++++-------------
+> >  3 files changed, 19 insertions(+), 39 deletions(-)
+> >
+>
+> Thanks, looks good to me now.
+>
+> Acked-by: Tomasz Figa <tfiga@chromium.org>
+>
+> From reading the code, this is quite unlikely to introduce any
+> behavior changes, but just to be safe, did you have a chance to test
+> this with some V4L2 driver?
 
-Thanks
+Nah, unfortunately not.
+-Daniel
 
-> 
-> As said in my other mail lets give it some days for the CI to test this.
+>
+> Best regards,
+> Tomasz
+>
+> > diff --git a/drivers/media/common/videobuf2/videobuf2-memops.c b/driver=
+s/media/common/videobuf2/videobuf2-memops.c
+> > index 6e9e05153f4e..9dd6c27162f4 100644
+> > --- a/drivers/media/common/videobuf2/videobuf2-memops.c
+> > +++ b/drivers/media/common/videobuf2/videobuf2-memops.c
+> > @@ -40,7 +40,6 @@ struct frame_vector *vb2_create_framevec(unsigned lon=
+g start,
+> >         unsigned long first, last;
+> >         unsigned long nr;
+> >         struct frame_vector *vec;
+> > -       unsigned int flags =3D FOLL_FORCE | FOLL_WRITE;
+> >
+> >         first =3D start >> PAGE_SHIFT;
+> >         last =3D (start + length - 1) >> PAGE_SHIFT;
+> > @@ -48,7 +47,7 @@ struct frame_vector *vb2_create_framevec(unsigned lon=
+g start,
+> >         vec =3D frame_vector_create(nr);
+> >         if (!vec)
+> >                 return ERR_PTR(-ENOMEM);
+> > -       ret =3D get_vaddr_frames(start & PAGE_MASK, nr, flags, vec);
+> > +       ret =3D get_vaddr_frames(start & PAGE_MASK, nr, vec);
+> >         if (ret < 0)
+> >                 goto out_destroy;
+> >         /* We accept only complete set of PFNs */
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index ef360fe70aaf..d6b8e30dce2e 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -1765,7 +1765,7 @@ struct frame_vector {
+> >  struct frame_vector *frame_vector_create(unsigned int nr_frames);
+> >  void frame_vector_destroy(struct frame_vector *vec);
+> >  int get_vaddr_frames(unsigned long start, unsigned int nr_pfns,
+> > -                    unsigned int gup_flags, struct frame_vector *vec);
+> > +                    struct frame_vector *vec);
+> >  void put_vaddr_frames(struct frame_vector *vec);
+> >  int frame_vector_to_pages(struct frame_vector *vec);
+> >  void frame_vector_to_pfns(struct frame_vector *vec);
+> > diff --git a/mm/frame_vector.c b/mm/frame_vector.c
+> > index 10f82d5643b6..f8c34b895c76 100644
+> > --- a/mm/frame_vector.c
+> > +++ b/mm/frame_vector.c
+> > @@ -32,13 +32,12 @@
+> >   * This function takes care of grabbing mmap_lock as necessary.
+> >   */
+> >  int get_vaddr_frames(unsigned long start, unsigned int nr_frames,
+> > -                    unsigned int gup_flags, struct frame_vector *vec)
+> > +                    struct frame_vector *vec)
+> >  {
+> >         struct mm_struct *mm =3D current->mm;
+> >         struct vm_area_struct *vma;
+> >         int ret =3D 0;
+> >         int err;
+> > -       int locked;
+> >
+> >         if (nr_frames =3D=3D 0)
+> >                 return 0;
+> > @@ -48,40 +47,26 @@ int get_vaddr_frames(unsigned long start, unsigned =
+int nr_frames,
+> >
+> >         start =3D untagged_addr(start);
+> >
+> > -       mmap_read_lock(mm);
+> > -       locked =3D 1;
+> > -       vma =3D find_vma_intersection(mm, start, start + 1);
+> > -       if (!vma) {
+> > -               ret =3D -EFAULT;
+> > -               goto out;
+> > -       }
+> > -
+> > -       /*
+> > -        * While get_vaddr_frames() could be used for transient (kernel
+> > -        * controlled lifetime) pinning of memory pages all current
+> > -        * users establish long term (userspace controlled lifetime)
+> > -        * page pinning. Treat get_vaddr_frames() like
+> > -        * get_user_pages_longterm() and disallow it for filesystem-dax
+> > -        * mappings.
+> > -        */
+> > -       if (vma_is_fsdax(vma)) {
+> > -               ret =3D -EOPNOTSUPP;
+> > -               goto out;
+> > -       }
+> > -
+> > -       if (!(vma->vm_flags & (VM_IO | VM_PFNMAP))) {
+> > +       ret =3D pin_user_pages_fast(start, nr_frames,
+> > +                                 FOLL_FORCE | FOLL_WRITE | FOLL_LONGTE=
+RM,
+> > +                                 (struct page **)(vec->ptrs));
+> > +       if (ret > 0) {
+> >                 vec->got_ref =3D true;
+> >                 vec->is_pfns =3D false;
+> > -               ret =3D pin_user_pages_locked(start, nr_frames,
+> > -                       gup_flags, (struct page **)(vec->ptrs), &locked=
+);
+> > -               goto out;
+> > +               goto out_unlocked;
+> >         }
+> >
+> > +       mmap_read_lock(mm);
+> >         vec->got_ref =3D false;
+> >         vec->is_pfns =3D true;
+> > +       ret =3D 0;
+> >         do {
+> >                 unsigned long *nums =3D frame_vector_pfns(vec);
+> >
+> > +               vma =3D find_vma_intersection(mm, start, start + 1);
+> > +               if (!vma)
+> > +                       break;
+> > +
+> >                 while (ret < nr_frames && start + PAGE_SIZE <=3D vma->v=
+m_end) {
+> >                         err =3D follow_pfn(vma, start, &nums[ret]);
+> >                         if (err) {
+> > @@ -92,17 +77,13 @@ int get_vaddr_frames(unsigned long start, unsigned =
+int nr_frames,
+> >                         start +=3D PAGE_SIZE;
+> >                         ret++;
+> >                 }
+> > -               /*
+> > -                * We stop if we have enough pages or if VMA doesn't co=
+mpletely
+> > -                * cover the tail page.
+> > -                */
+> > -               if (ret >=3D nr_frames || start < vma->vm_end)
+> > +               /* Bail out if VMA doesn't completely cover the tail pa=
+ge. */
+> > +               if (start < vma->vm_end)
+> >                         break;
+> > -               vma =3D find_vma_intersection(mm, start, start + 1);
+> > -       } while (vma && vma->vm_flags & (VM_IO | VM_PFNMAP));
+> > +       } while (ret < nr_frames);
+> >  out:
+> > -       if (locked)
+> > -               mmap_read_unlock(mm);
+> > +       mmap_read_unlock(mm);
+> > +out_unlocked:
+> >         if (!ret)
+> >                 ret =3D -EFAULT;
+> >         if (ret > 0)
+> > --
+> > 2.28.0
+> >
+> _______________________________________________
+> dri-devel mailing list
+> dri-devel@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/dri-devel
 
-Sure, I'll push it in a minute
 
-> 
->> ---
->>  arch/s390/kvm/kvm-s390.c | 2 +-
->>  arch/s390/kvm/pv.c       | 3 ++-
->>  arch/s390/mm/gmap.c      | 2 ++
->>  3 files changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 6b74b92c1a58..08ea6c4735cd 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2312,7 +2312,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->>  		struct kvm_s390_pv_unp unp = {};
->>
->>  		r = -EINVAL;
->> -		if (!kvm_s390_pv_is_protected(kvm))
->> +		if (!kvm_s390_pv_is_protected(kvm) || !mm_is_protected(kvm->mm))
->>  			break;
->>
->>  		r = -EFAULT;
->> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
->> index eb99e2f95ebe..f5847f9dec7c 100644
->> --- a/arch/s390/kvm/pv.c
->> +++ b/arch/s390/kvm/pv.c
->> @@ -208,7 +208,6 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
->>  		return -EIO;
->>  	}
->>  	kvm->arch.gmap->guest_handle = uvcb.guest_handle;
->> -	atomic_set(&kvm->mm->context.is_protected, 1);
->>  	return 0;
->>  }
->>
->> @@ -228,6 +227,8 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
->>  	*rrc = uvcb.header.rrc;
->>  	KVM_UV_EVENT(kvm, 3, "PROTVIRT VM SET PARMS: rc %x rrc %x",
->>  		     *rc, *rrc);
->> +	if (!cc)
->> +		atomic_set(&kvm->mm->context.is_protected, 1);
->>  	return cc ? -EINVAL : 0;
->>  }
->>
->> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
->> index cfb0017f33a7..64795d034926 100644
->> --- a/arch/s390/mm/gmap.c
->> +++ b/arch/s390/mm/gmap.c
->> @@ -2690,6 +2690,8 @@ static const struct mm_walk_ops reset_acc_walk_ops = {
->>  #include <linux/sched/mm.h>
->>  void s390_reset_acc(struct mm_struct *mm)
->>  {
->> +	if (!mm_is_protected(mm))
->> +		return;
->>  	/*
->>  	 * we might be called during
->>  	 * reset:                             we walk the pages and clear
->>
 
+--=20
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
