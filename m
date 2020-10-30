@@ -2,139 +2,386 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 850BF2A0EC9
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 20:37:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59A982A0EE1
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 20:52:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727307AbgJ3ThS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 15:37:18 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15807 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726564AbgJ3Tgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 15:36:50 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5f9c69ef0000>; Fri, 30 Oct 2020 12:30:55 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 30 Oct
- 2020 19:30:48 +0000
-Received: from NAM02-BL2-obe.outbound.protection.outlook.com (104.47.38.54) by
- HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Fri, 30 Oct 2020 19:30:48 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l4AKETfHltvM5cJR5QBe7f/awedGbny+rjw9tanHbfggDTgLuBdPd04a8jmfmBcJfMYrgIshmOjDBKbGaNfyGrXWGLq8yG5n0YlCzScjWx/p0GIbitXsSS0jAWSJl+sez9WkJFsyYZI7xXVMXzonDyLdo/sWcwd92qY0Dp+Gzi4PsZ6y9Uq4OaZkaGyV3d1EwwXnaenrK4t9WRx/3YfzgPME0VPTZG8XDdhOq6FnkPZTQBK6mQK2MMXdfd09Ak8cRLStpMdNNQcxPZ0QXxJBFb5ohP3fu0fGgCqqOCG1Q+xfjdcd6v1E60vEe16UOJ8K8VvCwziBU+6MD/rXOGVcmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nXGcabxM4TF673Hc+y0JtIYJigmuqhYBGOF4c8gH4m4=;
- b=iW0aYCOrqnlgFF4luvwAfhLa2rfvicu9aEtUsgTI/LVeTpuECo4ekhLEfhpTm6k4ou0Kx/HsJt/VaRh3/o+9AVwsj6aalK9/obJ/9HhxIBuA5zyV7iClLw28C+Gf4kld1VPm3NpPQPFrwXLHr5vqye1q1nWyMiQFrrHY+PdUL6ASMcv01BxS8Ex5OtLE3SX0p2c8+SYTvQ/n38/p9EK0VxSWm8g1kbx5oemUhRLXQ5EIcMEhDjLAJSV1mLFvBm2aLh1EfK3/scxKO7QZFPd7hY/x1S1lA3WpmbDgJxnBf9lZJYSPGpA0fBQNBjAtdiZupkuHha+0WCS8mpKfA7ow1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB3307.namprd12.prod.outlook.com (2603:10b6:5:15d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Fri, 30 Oct
- 2020 19:30:47 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.027; Fri, 30 Oct 2020
- 19:30:46 +0000
-Date:   Fri, 30 Oct 2020 16:30:45 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Raj, Ashok" <ashok.raj@intel.com>
-CC:     Dave Jiang <dave.jiang@intel.com>, <vkoul@kernel.org>,
-        <megha.dey@intel.com>, <maz@kernel.org>, <bhelgaas@google.com>,
-        <tglx@linutronix.de>, <alex.williamson@redhat.com>,
-        <jacob.jun.pan@intel.com>, <yi.l.liu@intel.com>,
-        <baolu.lu@intel.com>, <kevin.tian@intel.com>,
-        <sanjay.k.kumar@intel.com>, <tony.luck@intel.com>,
-        <jing.lin@intel.com>, <dan.j.williams@intel.com>,
-        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
-        <parav@mellanox.com>, <rafael@kernel.org>, <netanelg@mellanox.com>,
-        <shahafs@mellanox.com>, <yan.y.zhao@linux.intel.com>,
-        <pbonzini@redhat.com>, <samuel.ortiz@intel.com>,
-        <mona.hossain@intel.com>, Megha Dey <megha.dey@linux.intel.com>,
-        <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 00/17] Add VFIO mediated device support and DEV-MSI
- support for the idxd driver
-Message-ID: <20201030193045.GM2620339@nvidia.com>
-References: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
- <20201030185858.GI2620339@nvidia.com>
- <c9303df4-3e57-6959-a89c-5fc98397ac70@intel.com>
- <20201030191706.GK2620339@nvidia.com> <20201030192325.GA105832@otc-nc-03>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20201030192325.GA105832@otc-nc-03>
-X-ClientProxiedBy: BL1PR13CA0188.namprd13.prod.outlook.com
- (2603:10b6:208:2be::13) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1727318AbgJ3Twc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 15:52:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41312 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726072AbgJ3Twb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 15:52:31 -0400
+Received: from localhost (230.sub-72-107-127.myvzw.com [72.107.127.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0FFB820739;
+        Fri, 30 Oct 2020 19:52:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604087521;
+        bh=kLM+efOKzPKOdGqOClSnKRzTuUWwXKtMduTWAg00VrE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=zBGfA6OWyKKw5QHPo0hu8JKpPwYvcSdZLnuP2OLqU5JZwT0wxn+7XbNsikIaDhIn1
+         E4hW5iAqEh/Pq3bK3m4z8RNNdzcuAKsDD0HXFWN+6r3ybxFmQGjynuQswUulrncjx/
+         LdybMrlaoRMoP2QZo8IZrJXtef0nNg2aa0XCmikk=
+Date:   Fri, 30 Oct 2020 14:51:59 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Dave Jiang <dave.jiang@intel.com>
+Cc:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
+        bhelgaas@google.com, tglx@linutronix.de,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        ashok.raj@intel.com, jgg@mellanox.com, yi.l.liu@intel.com,
+        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        rafael@kernel.org, netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+Message-ID: <20201030195159.GA589138@bjorn-Precision-5520>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by BL1PR13CA0188.namprd13.prod.outlook.com (2603:10b6:208:2be::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.4 via Frontend Transport; Fri, 30 Oct 2020 19:30:46 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kYa6n-00DrjC-44; Fri, 30 Oct 2020 16:30:45 -0300
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1604086255; bh=nXGcabxM4TF673Hc+y0JtIYJigmuqhYBGOF4c8gH4m4=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
-        b=O3vdNejcbH6Q9qGDSK2O7GXowNenLe0FH4k84VN6Jaer6Y4J+Rhr+SdNR7WDbjuwl
-         xImOJq1Ndn53XeWLKl06WysI9/zPBKr3UhZRCy4o82QCt3xUcPbLIPRhMaXwm6bI+x
-         1CpNbiz5bj2pQzdUAuaradW5jsX0ky3HAneT0fmAzXmBy1oYZQz5rsRfX0ikOHmzrV
-         Ug6Dzd73Lz/EEMyRDQzShhD8l2V8zPM6EUCkZ+/KIGSkNoC6hkYBQjrG0WZW+2maWM
-         SE46pLSch7acP7b7U6sQZfdNvsbPaJ4JMleB7D0TYGJjdY4LG2pMfUzJ2/F6TOe/bH
-         NUvTlcJDZBXMQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <160408389228.912050.10790556040702698268.stgit@djiang5-desk3.ch.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 30, 2020 at 12:23:25PM -0700, Raj, Ashok wrote:
-> On Fri, Oct 30, 2020 at 04:17:06PM -0300, Jason Gunthorpe wrote:
-> > On Fri, Oct 30, 2020 at 12:13:48PM -0700, Dave Jiang wrote:
-> > > 
-> > > 
-> > > On 10/30/2020 11:58 AM, Jason Gunthorpe wrote:
-> > > > On Fri, Oct 30, 2020 at 11:50:47AM -0700, Dave Jiang wrote:
-> > > > >   .../ABI/stable/sysfs-driver-dma-idxd          |    6 +
-> > > > >   Documentation/driver-api/vfio/mdev-idxd.rst   |  404 ++++++
-> > > > >   MAINTAINERS                                   |    1 +
-> > > > >   drivers/dma/Kconfig                           |    9 +
-> > > > >   drivers/dma/idxd/Makefile                     |    2 +
-> > > > >   drivers/dma/idxd/cdev.c                       |    6 +-
-> > > > >   drivers/dma/idxd/device.c                     |  294 ++++-
-> > > > >   drivers/dma/idxd/idxd.h                       |   67 +-
-> > > > >   drivers/dma/idxd/init.c                       |   86 ++
-> > > > >   drivers/dma/idxd/irq.c                        |    6 +-
-> > > > >   drivers/dma/idxd/mdev.c                       | 1121 +++++++++++++++++
-> > > > >   drivers/dma/idxd/mdev.h                       |  116 ++
-> > > > 
-> > > > Again, a subsytem driver belongs in the directory hierarchy of the
-> > > > subsystem, not in other random places. All this mdev stuff belongs
-> > > > under drivers/vfio
-> > > 
-> > > Alex seems to have disagreed last time....
-> > > https://lore.kernel.org/dmaengine/20200917113016.425dcde7@x1.home/
-> > 
-> > Nobody else in the kernel is splitting subsystems up anymore
-> >  
-> > > And I do agree with his perspective. The mdev is an extension of the PF
-> > > driver. It's a bit awkward to be a stand alone mdev driver under vfio/mdev/.
-> > 
-> > By this logic we'd have giagantic drivers under drivers/ethernet
-> > touching netdev, rdma, scsi, vdpa, etc just because that is where the
-> > PF driver came from.
+On Fri, Oct 30, 2020 at 11:51:32AM -0700, Dave Jiang wrote:
+> Intel Scalable I/O Virtualization (SIOV) enables sharing of I/O devices
+> across isolated domains through PASID based sub-device partitioning.
+> Interrupt Message Storage (IMS) enables devices to store the interrupt
+> messages in a device-specific optimized manner without the scalability
+> restrictions of the PCIe defined MSI-X capability. IMS is one of the
+> features supported under SIOV.
+>
+> Move SIOV detection code from Intel iommu driver code to common PCI. Making
+> the detection code common allows supported accelerator drivers to query the
+> PCI core for SIOV and IMS capabilities. The support code will add the
+> ability to query the PCI DVSEC capabilities for the SIOV cap.
+
+This patch really does not include anything related to SIOV other than
+adding a little code to *find* the capability.  It doesn't add
+anything that actually *uses* it.  I think this patch should simply
+add pci_find_dvsec(), and it doesn't need any of this SIOV or IMS
+description.
+
+> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Baolu Lu <baolu.lu@intel.com>
+> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+> Reviewed-by: Ashok Raj <ashok.raj@intel.com>
+> ---
+>  drivers/iommu/intel/iommu.c   |   31 ++-----------------------
+>  drivers/pci/Kconfig           |   15 ++++++++++++
+>  drivers/pci/Makefile          |    2 ++
+>  drivers/pci/dvsec.c           |   40 +++++++++++++++++++++++++++++++++
+>  drivers/pci/siov.c            |   50 +++++++++++++++++++++++++++++++++++++++++
+>  include/linux/pci-siov.h      |   18 +++++++++++++++
+>  include/linux/pci.h           |    3 ++
+>  include/uapi/linux/pci_regs.h |    4 +++
+>  8 files changed, 134 insertions(+), 29 deletions(-)
+>  create mode 100644 drivers/pci/dvsec.c
+>  create mode 100644 drivers/pci/siov.c
+>  create mode 100644 include/linux/pci-siov.h
 > 
-> What makes you think this is providing services like scsi/rdma/vdpa etc.. ?
+> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+> index 3e77a88b236c..d9335f590b42 100644
+> --- a/drivers/iommu/intel/iommu.c
+> +++ b/drivers/iommu/intel/iommu.c
+> @@ -36,6 +36,7 @@
+>  #include <linux/tboot.h>
+>  #include <linux/dmi.h>
+>  #include <linux/pci-ats.h>
+> +#include <linux/pci-siov.h>
+>  #include <linux/memblock.h>
+>  #include <linux/dma-map-ops.h>
+>  #include <linux/dma-direct.h>
+> @@ -5883,34 +5884,6 @@ static int intel_iommu_disable_auxd(struct device *dev)
+>  	return 0;
+>  }
+>  
+> -/*
+> - * A PCI express designated vendor specific extended capability is defined
+> - * in the section 3.7 of Intel scalable I/O virtualization technical spec
+> - * for system software and tools to detect endpoint devices supporting the
+> - * Intel scalable IO virtualization without host driver dependency.
+> - *
+> - * Returns the address of the matching extended capability structure within
+> - * the device's PCI configuration space or 0 if the device does not support
+> - * it.
+> - */
+> -static int siov_find_pci_dvsec(struct pci_dev *pdev)
+> -{
+> -	int pos;
+> -	u16 vendor, id;
+> -
+> -	pos = pci_find_next_ext_capability(pdev, 0, 0x23);
+> -	while (pos) {
+> -		pci_read_config_word(pdev, pos + 4, &vendor);
+> -		pci_read_config_word(pdev, pos + 8, &id);
+> -		if (vendor == PCI_VENDOR_ID_INTEL && id == 5)
+> -			return pos;
+> -
+> -		pos = pci_find_next_ext_capability(pdev, pos, 0x23);
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+>  static bool
+>  intel_iommu_dev_has_feat(struct device *dev, enum iommu_dev_features feat)
+>  {
+> @@ -5925,7 +5898,7 @@ intel_iommu_dev_has_feat(struct device *dev, enum iommu_dev_features feat)
+>  		if (ret < 0)
+>  			return false;
+>  
+> -		return !!siov_find_pci_dvsec(to_pci_dev(dev));
+> +		return pci_siov_supported(to_pci_dev(dev));
+>  	}
+>  
+>  	if (feat == IOMMU_DEV_FEAT_SVA) {
+> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+> index 0c473d75e625..cf7f4d17d8cc 100644
+> --- a/drivers/pci/Kconfig
+> +++ b/drivers/pci/Kconfig
+> @@ -161,6 +161,21 @@ config PCI_PASID
+>  
+>  	  If unsure, say N.
+>  
+> +config PCI_DVSEC
+> +	bool
+> +
+> +config PCI_SIOV
+> +	select PCI_PASID
+
+This patch has nothing to do with PCI_PASID.  If you want to add this
+select later in a patch that *does* add something that requires
+PCI_PASID, that's OK.
+
+> +	select PCI_DVSEC
+> +	bool "PCI SIOV support"
+> +	help
+> +	  Scalable I/O Virtualzation enables sharing of I/O devices across isolated
+> +	  domains through PASID based sub-device partitioning. One of the sub features
+> +	  supported by SIOV is Inetrrupt Message Storage (IMS). Select this option if
+> +	  you want to compile the support into your kernel.
+> +	  If unsure, say N.
+> +
+>  config PCI_P2PDMA
+>  	bool "PCI peer-to-peer transfer support"
+>  	depends on ZONE_DEVICE
+> diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
+> index 522d2b974e91..653a1d69b0fc 100644
+> --- a/drivers/pci/Makefile
+> +++ b/drivers/pci/Makefile
+> @@ -20,6 +20,8 @@ obj-$(CONFIG_PCI_QUIRKS)	+= quirks.o
+>  obj-$(CONFIG_HOTPLUG_PCI)	+= hotplug/
+>  obj-$(CONFIG_PCI_MSI)		+= msi.o
+>  obj-$(CONFIG_PCI_ATS)		+= ats.o
+> +obj-$(CONFIG_PCI_DVSEC)		+= dvsec.o
+> +obj-$(CONFIG_PCI_SIOV)		+= siov.o
+>  obj-$(CONFIG_PCI_IOV)		+= iov.o
+>  obj-$(CONFIG_PCI_BRIDGE_EMUL)	+= pci-bridge-emul.o
+>  obj-$(CONFIG_PCI_LABEL)		+= pci-label.o
+> diff --git a/drivers/pci/dvsec.c b/drivers/pci/dvsec.c
+> new file mode 100644
+> index 000000000000..e49b079f0717
+> --- /dev/null
+> +++ b/drivers/pci/dvsec.c
+> @@ -0,0 +1,40 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * PCI DVSEC helper functions
+> + * Copyright (C) 2020 Intel Corp.
+> + */
+> +
+> +#include <linux/export.h>
+> +#include <linux/pci.h>
+> +#include <uapi/linux/pci_regs.h>
+> +#include "pci.h"
+> +
+> +/**
+> + * pci_find_dvsec - return position of DVSEC with provided vendor and dvsec id
+> + * @dev: the PCI device
+> + * @vendor: Vendor for the DVSEC
+> + * @id: the DVSEC cap id
+> + *
+> + * Return the offset of DVSEC on success or -ENOTSUPP if not found
+
+s/vendor/Vendor/
+s/dvsec/DVSEC/
+s/id/ID/ twice above
+
+Please put this function in drivers/pci/pci.c next to
+pci_find_ext_capability().  I don't think it's worth making a new file
+just for this.
+
+> + */
+> +int pci_find_dvsec(struct pci_dev *dev, u16 vendor, u16 id)
+> +{
+> +	u16 dev_vendor, dev_id;
+> +	int pos;
+> +
+> +	pos = pci_find_ext_capability(dev, PCI_EXT_CAP_ID_DVSEC);
+> +	if (!pos)
+> +		return -ENOTSUPP;
+> +
+> +	while (pos) {
+> +		pci_read_config_word(dev, pos + PCI_DVSEC_HEADER1, &dev_vendor);
+> +		pci_read_config_word(dev, pos + PCI_DVSEC_HEADER2, &dev_id);
+> +		if (dev_vendor == vendor && dev_id == id)
+> +			return pos;
+> +
+> +		pos = pci_find_next_ext_capability(dev, pos, PCI_EXT_CAP_ID_DVSEC);
+> +	}
+> +
+> +	return -ENOTSUPP;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_find_dvsec);
+> diff --git a/drivers/pci/siov.c b/drivers/pci/siov.c
+> new file mode 100644
+> index 000000000000..6147e6ae5832
+> --- /dev/null
+> +++ b/drivers/pci/siov.c
+> @@ -0,0 +1,50 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Intel Scalable I/O Virtualization support
+> + * Copyright (C) 2020 Intel Corp.
+> + */
+> +
+> +#include <linux/export.h>
+> +#include <linux/pci.h>
+> +#include <linux/pci-siov.h>
+> +#include <uapi/linux/pci_regs.h>
+> +#include "pci.h"
+> +
+> +/*
+> + * A PCI express designated vendor specific extended capability is defined
+> + * in the section 3.7 of Intel scalable I/O virtualization technical spec
+> + * for system software and tools to detect endpoint devices supporting the
+> + * Intel scalable IO virtualization without host driver dependency.
+> + */
+> +
+> +/**
+> + * pci_siov_supported - check if the device can use SIOV
+> + * @dev: the PCI device
+> + *
+> + * Returns true if the device supports SIOV,  false otherwise.
+> + */
+> +bool pci_siov_supported(struct pci_dev *dev)
+> +{
+> +	return pci_find_dvsec(dev, PCI_VENDOR_ID_INTEL, PCI_DVSEC_ID_INTEL_SIOV) < 0 ? false : true;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_siov_supported);
+> +
+> +/**
+> + * pci_ims_supported - check if the device can use IMS
+> + * @dev: the PCI device
+> + *
+> + * Returns true if the device supports IMS, false otherwise.
+> + */
+> +bool pci_ims_supported(struct pci_dev *dev)
+> +{
+> +	int pos;
+> +	u32 caps;
+> +
+> +	pos = pci_find_dvsec(dev, PCI_VENDOR_ID_INTEL, PCI_DVSEC_ID_INTEL_SIOV);
+> +	if (pos < 0)
+> +		return false;
+> +
+> +	pci_read_config_dword(dev, pos + PCI_DVSEC_INTEL_SIOV_CAP, &caps);
+> +	return (caps & PCI_DVSEC_INTEL_SIOV_CAP_IMS) ? true : false;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_ims_supported);
+
+I don't really see the point of these *_supported() functions.  If the
+caller wants to use them, I would expect it to call
+pci_find_dvsec(PCI_DVSEC_ID_INTEL_SIOV) itself anyway.
+
+But there *are* no calls to pci_find_dvsec(PCI_DVSEC_ID_INTEL_SIOV).
+So apparently all you care about is whether the capability *exists*,
+and you don't need any information at all from the capability
+registers except PCI_DVSEC_INTEL_SIOV_CAP_IMS?  That seems a little
+weird.
+
+I don't think it's worth adding a whole new file just for this.  The
+only value the PCI core is adding here is a way to locate the
+PCI_DVSEC_ID_INTEL_SIOV capability.
+
+> diff --git a/include/linux/pci-siov.h b/include/linux/pci-siov.h
+> new file mode 100644
+> index 000000000000..a8a4eb5f4634
+> --- /dev/null
+> +++ b/include/linux/pci-siov.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef LINUX_PCI_SIOV_H
+> +#define LINUX_PCI_SIOV_H
+> +
+> +#include <linux/pci.h>
+> +
+> +#ifdef CONFIG_PCI_SIOV
+> +/* Scalable I/O Virtualization */
+> +bool pci_siov_supported(struct pci_dev *dev);
+> +bool pci_ims_supported(struct pci_dev *dev);
+> +#else /* CONFIG_PCI_SIOV */
+> +static inline bool pci_siov_supported(struct pci_dev *d)
+> +{ return false; }
+> +static inline bool pci_ims_supported(struct pci_dev *d)
+> +{ return false; }
+> +#endif /* CONFIG_PCI_SIOV */
+> +
+> +#endif /* LINUX_PCI_SIOV_H */
+
+What's the benefit to putting these declarations in a separate
+pci-siov.h as opposed to putting them in pci.h itself?  That's what we
+do for things like MSI, IOV, etc.
+
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 22207a79762c..4710f09b43b1 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -1070,6 +1070,7 @@ int pci_find_next_ext_capability(struct pci_dev *dev, int pos, int cap);
+>  int pci_find_ht_capability(struct pci_dev *dev, int ht_cap);
+>  int pci_find_next_ht_capability(struct pci_dev *dev, int pos, int ht_cap);
+>  struct pci_bus *pci_find_next_bus(const struct pci_bus *from);
+> +int pci_find_dvsec(struct pci_dev *dev, u16 vendor, u16 id);
+>  
+>  u64 pci_get_dsn(struct pci_dev *dev);
+>  
+> @@ -1726,6 +1727,8 @@ static inline int pci_find_next_capability(struct pci_dev *dev, u8 post,
+>  { return 0; }
+>  static inline int pci_find_ext_capability(struct pci_dev *dev, int cap)
+>  { return 0; }
+> +static inline int pci_find_dvsec(struct pci_dev *dev, u16 vendor, u16 id)
+> +{ return 0; }
+>  
+>  static inline u64 pci_get_dsn(struct pci_dev *dev)
+>  { return 0; }
+> diff --git a/include/uapi/linux/pci_regs.h b/include/uapi/linux/pci_regs.h
+> index 8f8bd2318c6c..3532528441ef 100644
+> --- a/include/uapi/linux/pci_regs.h
+> +++ b/include/uapi/linux/pci_regs.h
+> @@ -1071,6 +1071,10 @@
+>  #define PCI_DVSEC_HEADER1		0x4 /* Designated Vendor-Specific Header1 */
+>  #define PCI_DVSEC_HEADER2		0x8 /* Designated Vendor-Specific Header2 */
+>  
+> +#define PCI_DVSEC_ID_INTEL_SIOV		0x5
+> +#define PCI_DVSEC_INTEL_SIOV_CAP	0x14
+> +#define PCI_DVSEC_INTEL_SIOV_CAP_IMS	0x1
+
+Convention in this file is to write constants in the register width,
+e.g.,
+
+  #define PCI_DVSEC_ID_INTEL_SIOV		0x0005
+  #define PCI_DVSEC_INTEL_SIOV_CAP_IMS	0x00000001
+
+You can learn this by looking at the surrounding definitions.
+
+>  /* Data Link Feature */
+>  #define PCI_DLF_CAP		0x04	/* Capabilities Register */
+>  #define  PCI_DLF_EXCHANGE_ENABLE	0x80000000  /* Data Link Feature Exchange Enable */
 > 
-> for DSA this playes the exact same role, not a different function 
-> as you highlight above. these mdev's are creating DSA for virtualization
-> use. They aren't providing a completely different role or subsystem per-se.
-
-It is a different subsystem, different maintainer, and different
-reviewers.
-
-It is a development process problem, it doesn't matter what it is
-doing.
-
-Jason
+> 
