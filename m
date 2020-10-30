@@ -2,181 +2,526 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0D3B2A0245
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:09:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2B972A031F
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:45:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726541AbgJ3KJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 06:09:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726508AbgJ3KJB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 06:09:01 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 443FAC0613D4
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:09:01 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id y12so5799134wrp.6
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:09:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=uyz54q5dHhyERRD5YHe2pc1kjOtZTM8dS6wbdOtR09U=;
-        b=ZmeqJABf5IZy8178YdO3vLrv7Dev0oZlicQtRQJAFyuKorSjRs1ohgpdokuxCePQP6
-         AT9c2k/9qgd7FJGrvFkPmF2kMNAeIzqUTlcHa8Ui3wx+pyZXo2f2gYQ4p0iG0np3YRGb
-         DBDTmpFDif+PZ1J5huaMsN92sw96Ft3EEblkM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=uyz54q5dHhyERRD5YHe2pc1kjOtZTM8dS6wbdOtR09U=;
-        b=ffAmCj/JJZSZUFWIV5jn6FKLM4UYJcykKGIdAPjczEJBIrcocz6EB0J66G7eOubEJ3
-         CcK2Xk4Qbt/ZkBChA5PPwIpURYUq/bUugM0A+n/8dfaiy1aPKSYA9gWXupy802H5BOXQ
-         HETz0Lb+0gLT9gdx0ZRbdiNN1UeZ0T5RsS62n3M14ydz+UfBBhZRLF3dulbyUyHrlMCW
-         3R8+PHZwuPfgFgq8tm1fNOUS72gGuVs8WuYJ+Ox6l40kHsEWfQ/ZKYfuO4R57uDBb/qr
-         I/RruU4ZbTc8Tjlayu1Pjs6nNjV2N7Q9sMaYTNbpkxSyVE16XZrvqW9qbLwF07kjCh1q
-         awXQ==
-X-Gm-Message-State: AOAM531LIdiRbD2gHI+3W0nDdpa0cD6ZoPbVVupY2etRltvpiXE/TbMP
-        iXqpHYZtowx56EeWCK5gtxsCkw==
-X-Google-Smtp-Source: ABdhPJxxiq57gNvMtaTh3ZESySC4gGe0ysNC/70ulYRhZee43lOQKGAF6EOP+2m6lhkPckGzWLncBg==
-X-Received: by 2002:a5d:6287:: with SMTP id k7mr2062794wru.402.1604052540040;
-        Fri, 30 Oct 2020 03:09:00 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id v189sm4430947wmg.14.2020.10.30.03.08.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2020 03:08:58 -0700 (PDT)
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-To:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
-Subject: [PATCH v5 15/15] PCI: Revoke mappings like devmem
-Date:   Fri, 30 Oct 2020 11:08:15 +0100
-Message-Id: <20201030100815.2269-16-daniel.vetter@ffwll.ch>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
-References: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
+        id S1726380AbgJ3Kpq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 06:45:46 -0400
+Received: from foss.arm.com ([217.140.110.172]:59360 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725948AbgJ3Kpp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 06:45:45 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19CCE143D;
+        Fri, 30 Oct 2020 03:45:43 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E97513F719;
+        Fri, 30 Oct 2020 03:45:41 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] arm64: Add support for configuring the
+ translation granule
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
+Cc:     mark.rutland@arm.com, jade.alglave@arm.com, luc.maranget@inria.fr,
+        andre.przywara@arm.com, nd@arm.com, drjones@redhat.com
+References: <20201029155229.7518-1-nikos.nikoleris@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <368532ad-b9eb-98f5-ecd6-ac5b8117cf77@arm.com>
+Date:   Fri, 30 Oct 2020 10:46:42 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201029155229.7518-1-nikos.nikoleris@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims
-the region") /dev/kmem zaps ptes when the kernel requests exclusive
-acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, this is
-the default for all driver uses.
+Hi Nikos,
 
-Except there's two more ways to access PCI BARs: sysfs and proc mmap
-support. Let's plug that hole.
+I scanned the patches, will try to do a proper review next week. Some suggestions
+below.
 
-For revoke_devmem() to work we need to link our vma into the same
-address_space, with consistent vma->vm_pgoff. ->pgoff is already
-adjusted, because that's how (io_)remap_pfn_range works, but for the
-mapping we need to adjust vma->vm_file->f_mapping. The cleanest way is
-to adjust this at at ->open time:
+On 10/29/20 3:52 PM, Nikos Nikoleris wrote:
+> Make the translation granule configurable for arm64. arm64 supports
+> page sizes of 4K, 16K and 64K. By default, arm64 is configured with
+> 64K pages. configure has been extended with a new argument:
+>
+>  --page-shift=(12|14|16)
 
-- for sysfs this is easy, now that binary attributes support this. We
-  just set bin_attr->mapping when mmap is supported
-- for procfs it's a bit more tricky, since procfs pci access has only
-  one file per device, and access to a specific resources first needs
-  to be set up with some ioctl calls. But mmap is only supported for
-  the same resources as sysfs exposes with mmap support, and otherwise
-  rejected, so we can set the mapping unconditionally at open time
-  without harm.
+How about --page-size=4K/16K/64K, which accepts lower and upper case 'k'?
 
-A special consideration is for arch_can_pci_mmap_io() - we need to
-make sure that the ->f_mapping doesn't alias between ioport and iomem
-space. There's only 2 ways in-tree to support mmap of ioports: generic
-pci mmap (ARCH_GENERIC_PCI_MMAP_RESOURCE), and sparc as the single
-architecture hand-rolling. Both approach support ioport mmap through a
-special pfn range and not through magic pte attributes. Aliasing is
-therefore not a problem.
+It might be just me, because I'm not familiar with memory management, but each
+time I see page-shift I need to do the math in my head to get to the page size. I
+think page-size is more intuitive. It's also somewhat similar to the kernel config
+(CONFIG_ARM64_4K_PAGES, for example, and not CONFIG_ARM64_PAGE_SHIFT_12).
 
-The only difference in access checks left is that sysfs PCI mmap does
-not check for CAP_RAWIO. I'm not really sure whether that should be
-added or not.
+I might have missed it in the patch, how about printing an error message when the
+configured page size is not supported by the hardware? kvm-unit-tests runs C code
+before creating the page tables, and the UART is available very early, so it
+shouldn't be too hard. We can put the check in setup_mmu().
 
-Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: John Hubbard <jhubbard@nvidia.com>
-Cc: Jérôme Glisse <jglisse@redhat.com>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-mm@kvack.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-samsung-soc@vger.kernel.org
-Cc: linux-media@vger.kernel.org
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Cc: linux-pci@vger.kernel.org
-Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
---
-v2:
-- Totally new approach: Adjust filp->f_mapping at open time. Note that
-  this now works on all architectures, not just those support
-  ARCH_GENERIC_PCI_MMAP_RESOURCE
----
- drivers/pci/pci-sysfs.c | 4 ++++
- drivers/pci/proc.c      | 1 +
- 2 files changed, 5 insertions(+)
-
-diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
-index d15c881e2e7e..3f1c31bc0b7c 100644
---- a/drivers/pci/pci-sysfs.c
-+++ b/drivers/pci/pci-sysfs.c
-@@ -929,6 +929,7 @@ void pci_create_legacy_files(struct pci_bus *b)
- 	b->legacy_io->read = pci_read_legacy_io;
- 	b->legacy_io->write = pci_write_legacy_io;
- 	b->legacy_io->mmap = pci_mmap_legacy_io;
-+	b->legacy_io->mapping = iomem_get_mapping();
- 	pci_adjust_legacy_attr(b, pci_mmap_io);
- 	error = device_create_bin_file(&b->dev, b->legacy_io);
- 	if (error)
-@@ -941,6 +942,7 @@ void pci_create_legacy_files(struct pci_bus *b)
- 	b->legacy_mem->size = 1024*1024;
- 	b->legacy_mem->attr.mode = 0600;
- 	b->legacy_mem->mmap = pci_mmap_legacy_mem;
-+	b->legacy_io->mapping = iomem_get_mapping();
- 	pci_adjust_legacy_attr(b, pci_mmap_mem);
- 	error = device_create_bin_file(&b->dev, b->legacy_mem);
- 	if (error)
-@@ -1156,6 +1158,8 @@ static int pci_create_attr(struct pci_dev *pdev, int num, int write_combine)
- 			res_attr->mmap = pci_mmap_resource_uc;
- 		}
- 	}
-+	if (res_attr->mmap)
-+		res_attr->mapping = iomem_get_mapping();
- 	res_attr->attr.name = res_attr_name;
- 	res_attr->attr.mode = 0600;
- 	res_attr->size = pci_resource_len(pdev, num);
-diff --git a/drivers/pci/proc.c b/drivers/pci/proc.c
-index 3a2f90beb4cb..9bab07302bbf 100644
---- a/drivers/pci/proc.c
-+++ b/drivers/pci/proc.c
-@@ -298,6 +298,7 @@ static int proc_bus_pci_open(struct inode *inode, struct file *file)
- 	fpriv->write_combine = 0;
- 
- 	file->private_data = fpriv;
-+	file->f_mapping = iomem_get_mapping();
- 
- 	return 0;
- }
--- 
-2.28.0
-
+Thanks,
+Alex
+>
+> which allows the user to set the page shift and therefore the page
+> size for arm64. Using the --page-shift for any other architecture
+> results an error message.
+>
+> To allow for smaller page sizes and 42b VA, this change adds support
+> for 4-level and 3-level page tables. At compile time, we determine how
+> many levels in the page tables we needed.
+>
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  configure                     | 21 +++++++++++
+>  lib/arm/asm/page.h            |  4 ++
+>  lib/arm/asm/pgtable-hwdef.h   |  4 ++
+>  lib/arm/asm/pgtable.h         |  6 +++
+>  lib/arm/asm/thread_info.h     |  4 +-
+>  lib/arm64/asm/page.h          | 17 ++++++---
+>  lib/arm64/asm/pgtable-hwdef.h | 38 +++++++++++++------
+>  lib/arm64/asm/pgtable.h       | 69 +++++++++++++++++++++++++++++++++--
+>  lib/arm/mmu.c                 | 26 ++++++++-----
+>  arm/cstart64.S                | 12 +++++-
+>  10 files changed, 169 insertions(+), 32 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 706aab5..94637ec 100755
+> --- a/configure
+> +++ b/configure
+> @@ -25,6 +25,7 @@ vmm="qemu"
+>  errata_force=0
+>  erratatxt="$srcdir/errata.txt"
+>  host_key_document=
+> +page_shift=
+>  
+>  usage() {
+>      cat <<-EOF
+> @@ -105,6 +106,9 @@ while [[ "$1" = -* ]]; do
+>  	--host-key-document)
+>  	    host_key_document="$arg"
+>  	    ;;
+> +        --page-shift)
+> +            page_shift="$arg"
+> +            ;;
+>  	--help)
+>  	    usage
+>  	    ;;
+> @@ -123,6 +127,22 @@ arch_name=$arch
+>  [ "$arch" = "aarch64" ] && arch="arm64"
+>  [ "$arch_name" = "arm64" ] && arch_name="aarch64"
+>  
+> +if [ -z "$page_shift" ]; then
+> +    [ "$arch" = "arm64" ] && page_shift="16"
+> +    [ "$arch" = "arm" ] && page_shift="12"
+> +else
+> +    if [ "$arch" != "arm64" ]; then
+> +        echo "--page-shift is not supported for $arch"
+> +        usage
+> +    fi
+> +
+> +    if [ "$page_shift" != "12" ] && [ "$page_shift" != "14" ] &&
+> +           [ "$page_shift" != "16" ]; then
+> +        echo "Page shift of $page_shift not supported for arm64"
+> +        usage
+> +    fi
+> +fi
+> +
+>  [ -z "$processor" ] && processor="$arch"
+>  
+>  if [ "$processor" = "arm64" ]; then
+> @@ -254,6 +274,7 @@ cat <<EOF >> lib/config.h
+>  
+>  #define CONFIG_UART_EARLY_BASE ${arm_uart_early_addr}
+>  #define CONFIG_ERRATA_FORCE ${errata_force}
+> +#define CONFIG_PAGE_SHIFT ${page_shift}
+>  
+>  EOF
+>  fi
+> diff --git a/lib/arm/asm/page.h b/lib/arm/asm/page.h
+> index 039c9f7..ae0ac2c 100644
+> --- a/lib/arm/asm/page.h
+> +++ b/lib/arm/asm/page.h
+> @@ -29,6 +29,10 @@ typedef struct { pteval_t pgprot; } pgprot_t;
+>  #define pgd_val(x)		((x).pgd)
+>  #define pgprot_val(x)		((x).pgprot)
+>  
+> +/* For compatibility with arm64 page tables */
+> +#define pud_t pgd_t
+> +#define pud_val(x) pgd_val(x)
+> +
+>  #define __pte(x)		((pte_t) { (x) } )
+>  #define __pmd(x)		((pmd_t) { (x) } )
+>  #define __pgd(x)		((pgd_t) { (x) } )
+> diff --git a/lib/arm/asm/pgtable-hwdef.h b/lib/arm/asm/pgtable-hwdef.h
+> index 4107e18..fe1d854 100644
+> --- a/lib/arm/asm/pgtable-hwdef.h
+> +++ b/lib/arm/asm/pgtable-hwdef.h
+> @@ -19,6 +19,10 @@
+>  #define PTRS_PER_PTE		512
+>  #define PTRS_PER_PMD		512
+>  
+> +/* For compatibility with arm64 page tables */
+> +#define PUD_SIZE		PGDIR_SIZE
+> +#define PUD_MASK		PGDIR_MASK
+> +
+>  #define PMD_SHIFT		21
+>  #define PMD_SIZE		(_AC(1,UL) << PMD_SHIFT)
+>  #define PMD_MASK		(~((1 << PMD_SHIFT) - 1))
+> diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
+> index 078dd16..4759d82 100644
+> --- a/lib/arm/asm/pgtable.h
+> +++ b/lib/arm/asm/pgtable.h
+> @@ -53,6 +53,12 @@ static inline pmd_t *pgd_page_vaddr(pgd_t pgd)
+>  	return pgtable_va(pgd_val(pgd) & PHYS_MASK & (s32)PAGE_MASK);
+>  }
+>  
+> +/* For compatibility with arm64 page tables */
+> +#define pud_valid(pud)		pgd_valid(pud)
+> +#define pud_offset(pgd, addr)  ((pud_t *)pgd)
+> +#define pud_free(pud)
+> +#define pud_alloc(pgd, addr)   pud_offset(pgd, addr)
+> +
+>  #define pmd_index(addr) \
+>  	(((addr) >> PMD_SHIFT) & (PTRS_PER_PMD - 1))
+>  #define pmd_offset(pgd, addr) \
+> diff --git a/lib/arm/asm/thread_info.h b/lib/arm/asm/thread_info.h
+> index 80ab395..eaa7258 100644
+> --- a/lib/arm/asm/thread_info.h
+> +++ b/lib/arm/asm/thread_info.h
+> @@ -14,10 +14,12 @@
+>  #define THREAD_SHIFT		PAGE_SHIFT
+>  #define THREAD_SIZE		PAGE_SIZE
+>  #define THREAD_MASK		PAGE_MASK
+> +#define THREAD_ALIGNMENT	PAGE_SIZE
+>  #else
+>  #define THREAD_SHIFT		MIN_THREAD_SHIFT
+>  #define THREAD_SIZE		(_AC(1,UL) << THREAD_SHIFT)
+>  #define THREAD_MASK		(~(THREAD_SIZE-1))
+> +#define THREAD_ALIGNMENT	THREAD_SIZE
+>  #endif
+>  
+>  #ifndef __ASSEMBLY__
+> @@ -38,7 +40,7 @@
+>  
+>  static inline void *thread_stack_alloc(void)
+>  {
+> -	void *sp = memalign(PAGE_SIZE, THREAD_SIZE);
+> +	void *sp = memalign(THREAD_ALIGNMENT, THREAD_SIZE);
+>  	return sp + THREAD_START_SP;
+>  }
+>  
+> diff --git a/lib/arm64/asm/page.h b/lib/arm64/asm/page.h
+> index 46af552..726a0c0 100644
+> --- a/lib/arm64/asm/page.h
+> +++ b/lib/arm64/asm/page.h
+> @@ -10,38 +10,43 @@
+>   * This work is licensed under the terms of the GNU GPL, version 2.
+>   */
+>  
+> +#include <config.h>
+>  #include <linux/const.h>
+>  
+> -#define PGTABLE_LEVELS		2
+>  #define VA_BITS			42
+>  
+> -#define PAGE_SHIFT		16
+> +#define PAGE_SHIFT		CONFIG_PAGE_SHIFT
+>  #define PAGE_SIZE		(_AC(1,UL) << PAGE_SHIFT)
+>  #define PAGE_MASK		(~(PAGE_SIZE-1))
+>  
+> +#define PGTABLE_LEVELS		(((VA_BITS) - 4) / (PAGE_SHIFT - 3))
+> +
+>  #ifndef __ASSEMBLY__
+>  
+>  #define PAGE_ALIGN(addr)	ALIGN(addr, PAGE_SIZE)
+>  
+>  typedef u64 pteval_t;
+>  typedef u64 pmdval_t;
+> +typedef u64 pudval_t;
+>  typedef u64 pgdval_t;
+>  typedef struct { pteval_t pte; } pte_t;
+> +typedef struct { pmdval_t pmd; } pmd_t;
+> +typedef struct { pudval_t pud; } pud_t;
+>  typedef struct { pgdval_t pgd; } pgd_t;
+>  typedef struct { pteval_t pgprot; } pgprot_t;
+>  
+>  #define pte_val(x)		((x).pte)
+> +#define pmd_val(x)		((x).pmd)
+> +#define pud_val(x)		((x).pud)
+>  #define pgd_val(x)		((x).pgd)
+>  #define pgprot_val(x)		((x).pgprot)
+>  
+>  #define __pte(x)		((pte_t) { (x) } )
+> +#define __pmd(x)		((pmd_t) { (x) } )
+> +#define __pud(x)		((pud_t) { (x) } )
+>  #define __pgd(x)		((pgd_t) { (x) } )
+>  #define __pgprot(x)		((pgprot_t) { (x) } )
+>  
+> -typedef struct { pgd_t pgd; } pmd_t;
+> -#define pmd_val(x)		(pgd_val((x).pgd))
+> -#define __pmd(x)		((pmd_t) { __pgd(x) } )
+> -
+>  #define __va(x)			((void *)__phys_to_virt((phys_addr_t)(x)))
+>  #define __pa(x)			__virt_to_phys((unsigned long)(x))
+>  
+> diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
+> index 3352489..f9110e1 100644
+> --- a/lib/arm64/asm/pgtable-hwdef.h
+> +++ b/lib/arm64/asm/pgtable-hwdef.h
+> @@ -9,38 +9,54 @@
+>   * This work is licensed under the terms of the GNU GPL, version 2.
+>   */
+>  
+> +#include <asm/page.h>
+> +
+>  #define UL(x) _AC(x, UL)
+>  
+> +#define PGTABLE_LEVEL_SHIFT(n)	((PAGE_SHIFT - 3) * (4 - (n)) + 3)
+>  #define PTRS_PER_PTE		(1 << (PAGE_SHIFT - 3))
+>  
+> +#if PGTABLE_LEVELS > 2
+> +#define PMD_SHIFT		PGTABLE_LEVEL_SHIFT(2)
+> +#define PTRS_PER_PMD		PTRS_PER_PTE
+> +#define PMD_SIZE		(UL(1) << PMD_SHIFT)
+> +#define PMD_MASK		(~(PMD_SIZE-1))
+> +#endif
+> +
+> +#if PGTABLE_LEVELS > 3
+> +#define PUD_SHIFT		PGTABLE_LEVEL_SHIFT(1)
+> +#define PTRS_PER_PUD		PTRS_PER_PTE
+> +#define PUD_SIZE		(UL(1) << PUD_SHIFT)
+> +#define PUD_MASK		(~(PUD_SIZE-1))
+> +#else
+> +#define PUD_SIZE                PGDIR_SIZE
+> +#define PUD_MASK                PGDIR_MASK
+> +#endif
+> +
+> +#define PUD_VALID		(_AT(pudval_t, 1) << 0)
+> +
+>  /*
+>   * PGDIR_SHIFT determines the size a top-level page table entry can map
+>   * (depending on the configuration, this level can be 0, 1 or 2).
+>   */
+> -#define PGDIR_SHIFT		((PAGE_SHIFT - 3) * PGTABLE_LEVELS + 3)
+> +#define PGDIR_SHIFT		PGTABLE_LEVEL_SHIFT(4 - PGTABLE_LEVELS)
+>  #define PGDIR_SIZE		(_AC(1, UL) << PGDIR_SHIFT)
+>  #define PGDIR_MASK		(~(PGDIR_SIZE-1))
+>  #define PTRS_PER_PGD		(1 << (VA_BITS - PGDIR_SHIFT))
+>  
+>  #define PGD_VALID		(_AT(pgdval_t, 1) << 0)
+>  
+> -/* From include/asm-generic/pgtable-nopmd.h */
+> -#define PMD_SHIFT		PGDIR_SHIFT
+> -#define PTRS_PER_PMD		1
+> -#define PMD_SIZE		(UL(1) << PMD_SHIFT)
+> -#define PMD_MASK		(~(PMD_SIZE-1))
+> -
+>  /*
+>   * Section address mask and size definitions.
+>   */
+> -#define SECTION_SHIFT		PMD_SHIFT
+> -#define SECTION_SIZE		(_AC(1, UL) << SECTION_SHIFT)
+> -#define SECTION_MASK		(~(SECTION_SIZE-1))
+> +#define SECTION_SHIFT          PMD_SHIFT
+> +#define SECTION_SIZE           (_AC(1, UL) << SECTION_SHIFT)
+> +#define SECTION_MASK           (~(SECTION_SIZE-1))
+>  
+>  /*
+>   * Hardware page table definitions.
+>   *
+> - * Level 1 descriptor (PMD).
+> + * Level 0,1,2 descriptor (PGG, PUD and PMD).
+>   */
+>  #define PMD_TYPE_MASK		(_AT(pmdval_t, 3) << 0)
+>  #define PMD_TYPE_FAULT		(_AT(pmdval_t, 0) << 0)
+> diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
+> index e577d9c..c7632ae 100644
+> --- a/lib/arm64/asm/pgtable.h
+> +++ b/lib/arm64/asm/pgtable.h
+> @@ -30,10 +30,12 @@
+>  #define pgtable_pa(x)		((unsigned long)(x))
+>  
+>  #define pgd_none(pgd)		(!pgd_val(pgd))
+> +#define pud_none(pud)		(!pud_val(pud))
+>  #define pmd_none(pmd)		(!pmd_val(pmd))
+>  #define pte_none(pte)		(!pte_val(pte))
+>  
+>  #define pgd_valid(pgd)		(pgd_val(pgd) & PGD_VALID)
+> +#define pud_valid(pud)		(pud_val(pud) & PUD_VALID)
+>  #define pmd_valid(pmd)		(pmd_val(pmd) & PMD_SECT_VALID)
+>  #define pte_valid(pte)		(pte_val(pte) & PTE_VALID)
+>  
+> @@ -52,15 +54,76 @@ static inline pgd_t *pgd_alloc(void)
+>  	return pgd;
+>  }
+>  
+> -#define pmd_offset(pgd, addr)	((pmd_t *)pgd)
+> -#define pmd_free(pmd)
+> -#define pmd_alloc(pgd, addr)	pmd_offset(pgd, addr)
+> +static inline pud_t *pgd_page_vaddr(pgd_t pgd)
+> +{
+> +	return pgtable_va(pgd_val(pgd) & PHYS_MASK & (s32)PAGE_MASK);
+> +}
+> +
+> +static inline pmd_t *pud_page_vaddr(pud_t pud)
+> +{
+> +	return pgtable_va(pud_val(pud) & PHYS_MASK & (s32)PAGE_MASK);
+> +}
+> +
+>  
+>  static inline pte_t *pmd_page_vaddr(pmd_t pmd)
+>  {
+>  	return pgtable_va(pmd_val(pmd) & PHYS_MASK & (s32)PAGE_MASK);
+>  }
+>  
+> +#if PGTABLE_LEVELS > 2
+> +#define pmd_index(addr)					\
+> +	(((addr) >> PMD_SHIFT) & (PTRS_PER_PMD - 1))
+> +#define pmd_offset(pud, addr)				\
+> +	(pud_page_vaddr(*(pud)) + pmd_index(addr))
+> +#define pmd_free(pmd) free_page(pmd)
+> +static inline pmd_t *pmd_alloc_one(void)
+> +{
+> +	assert(PTRS_PER_PMD * sizeof(pmd_t) == PAGE_SIZE);
+> +	pmd_t *pmd = alloc_page();
+> +	return pmd;
+> +}
+> +static inline pmd_t *pmd_alloc(pud_t *pud, unsigned long addr)
+> +{
+> +        if (pud_none(*pud)) {
+> +		pud_t entry;
+> +		pud_val(entry) = pgtable_pa(pmd_alloc_one()) | PMD_TYPE_TABLE;
+> +		WRITE_ONCE(*pud, entry);
+> +	}
+> +	return pmd_offset(pud, addr);
+> +}
+> +#else
+> +#define pmd_offset(pud, addr)  ((pmd_t *)pud)
+> +#define pmd_free(pmd)
+> +#define pmd_alloc(pud, addr)   pmd_offset(pud, addr)
+> +#endif
+> +
+> +#if PGTABLE_LEVELS > 3
+> +#define pud_index(addr)                                 \
+> +	(((addr) >> PUD_SHIFT) & (PTRS_PER_PUD - 1))
+> +#define pud_offset(pgd, addr)                           \
+> +	(pgd_page_vaddr(*(pgd)) + pud_index(addr))
+> +#define pud_free(pud) free_page(pud)
+> +static inline pud_t *pud_alloc_one(void)
+> +{
+> +	assert(PTRS_PER_PMD * sizeof(pud_t) == PAGE_SIZE);
+> +	pud_t *pud = alloc_page();
+> +	return pud;
+> +}
+> +static inline pud_t *pud_alloc(pgd_t *pgd, unsigned long addr)
+> +{
+> +	if (pgd_none(*pgd)) {
+> +		pgd_t entry;
+> +		pgd_val(entry) = pgtable_pa(pud_alloc_one()) | PMD_TYPE_TABLE;
+> +		WRITE_ONCE(*pgd, entry);
+> +	}
+> +	return pud_offset(pgd, addr);
+> +}
+> +#else
+> +#define pud_offset(pgd, addr)  ((pud_t *)pgd)
+> +#define pud_free(pud)
+> +#define pud_alloc(pgd, addr)   pud_offset(pgd, addr)
+> +#endif
+> +
+>  #define pte_index(addr) \
+>  	(((addr) >> PAGE_SHIFT) & (PTRS_PER_PTE - 1))
+>  #define pte_offset(pmd, addr) \
+> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> index 540a1e8..6d1c75b 100644
+> --- a/lib/arm/mmu.c
+> +++ b/lib/arm/mmu.c
+> @@ -81,7 +81,8 @@ void mmu_disable(void)
+>  static pteval_t *get_pte(pgd_t *pgtable, uintptr_t vaddr)
+>  {
+>  	pgd_t *pgd = pgd_offset(pgtable, vaddr);
+> -	pmd_t *pmd = pmd_alloc(pgd, vaddr);
+> +	pud_t *pud = pud_alloc(pgd, vaddr);
+> +	pmd_t *pmd = pmd_alloc(pud, vaddr);
+>  	pte_t *pte = pte_alloc(pmd, vaddr);
+>  
+>  	return &pte_val(*pte);
+> @@ -133,18 +134,20 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
+>  			phys_addr_t phys_start, phys_addr_t phys_end,
+>  			pgprot_t prot)
+>  {
+> -	phys_addr_t paddr = phys_start & PGDIR_MASK;
+> -	uintptr_t vaddr = virt_offset & PGDIR_MASK;
+> +	phys_addr_t paddr = phys_start & PUD_MASK;
+> +	uintptr_t vaddr = virt_offset & PUD_MASK;
+>  	uintptr_t virt_end = phys_end - paddr + vaddr;
+>  	pgd_t *pgd;
+> -	pgd_t entry;
+> +	pud_t *pud;
+> +	pud_t entry;
+>  
+> -	for (; vaddr < virt_end; vaddr += PGDIR_SIZE, paddr += PGDIR_SIZE) {
+> -		pgd_val(entry) = paddr;
+> -		pgd_val(entry) |= PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
+> -		pgd_val(entry) |= pgprot_val(prot);
+> +	for (; vaddr < virt_end; vaddr += PUD_SIZE, paddr += PUD_SIZE) {
+> +		pud_val(entry) = paddr;
+> +		pud_val(entry) |= PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
+> +		pud_val(entry) |= pgprot_val(prot);
+>  		pgd = pgd_offset(pgtable, vaddr);
+> -		WRITE_ONCE(*pgd, entry);
+> +		pud = pud_alloc(pgd, vaddr);
+> +		WRITE_ONCE(*pud, entry);
+>  		flush_tlb_page(vaddr);
+>  	}
+>  }
+> @@ -207,6 +210,7 @@ unsigned long __phys_to_virt(phys_addr_t addr)
+>  void mmu_clear_user(pgd_t *pgtable, unsigned long vaddr)
+>  {
+>  	pgd_t *pgd;
+> +	pud_t *pud;
+>  	pmd_t *pmd;
+>  	pte_t *pte;
+>  
+> @@ -215,7 +219,9 @@ void mmu_clear_user(pgd_t *pgtable, unsigned long vaddr)
+>  
+>  	pgd = pgd_offset(pgtable, vaddr);
+>  	assert(pgd_valid(*pgd));
+> -	pmd = pmd_offset(pgd, vaddr);
+> +	pud = pud_offset(pgd, vaddr);
+> +	assert(pud_valid(*pud));
+> +	pmd = pmd_offset(pud, vaddr);
+>  	assert(pmd_valid(*pmd));
+>  
+>  	if (pmd_huge(*pmd)) {
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index ffdd49f..530ffb6 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -157,6 +157,16 @@ halt:
+>   */
+>  #define MAIR(attr, mt) ((attr) << ((mt) * 8))
+>  
+> +#if PAGE_SHIFT == 16
+> +#define TCR_TG_FLAGS	TCR_TG0_64K | TCR_TG1_64K
+> +#elif PAGE_SHIFT == 14
+> +#define TCR_TG_FLAGS	TCR_TG0_16K | TCR_TG1_16K
+> +#elif PAGE_SHIFT == 12
+> +#define TCR_TG_FLAGS	TCR_TG0_4K | TCR_TG1_4K
+> +#else
+> +#error Unsupported PAGE_SHIFT
+> +#endif
+> +
+>  .globl asm_mmu_enable
+>  asm_mmu_enable:
+>  	tlbi	vmalle1			// invalidate I + D TLBs
+> @@ -164,7 +174,7 @@ asm_mmu_enable:
+>  
+>  	/* TCR */
+>  	ldr	x1, =TCR_TxSZ(VA_BITS) |		\
+> -		     TCR_TG0_64K | TCR_TG1_64K |	\
+> +		     TCR_TG_FLAGS  |			\
+>  		     TCR_IRGN_WBWA | TCR_ORGN_WBWA |	\
+>  		     TCR_SHARED
+>  	mrs	x2, id_aa64mmfr0_el1
