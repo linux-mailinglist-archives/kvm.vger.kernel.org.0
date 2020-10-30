@@ -2,115 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B97482A0CDC
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 18:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76C062A0CE2
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 18:54:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbgJ3RxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 13:53:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49185 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726061AbgJ3RxC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 13:53:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604080340;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0FU3xcVw/tCjOujHkebRL7DZ5Z6n1GJwYGiBCXs4HDk=;
-        b=Y2UtKWAE/eBSeXYS+0xGYzIy+pfvibtPrN3c1f1/KkEyTPxZwvgeJXMmPe+DOqpd9a/kdH
-        hnN5eXX2Uqy4AmGU8506HTiTGPiEn7jDOhEOQe4bPvY2a8j0MbW2BieRQGH5G3c9tk9I52
-        T8FowM8V7AXricbZhSMmq7p7TQhswUc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-q7IxCAUYOg6sYhrR9OGljQ-1; Fri, 30 Oct 2020 13:52:18 -0400
-X-MC-Unique: q7IxCAUYOg6sYhrR9OGljQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30BFE802B7A;
-        Fri, 30 Oct 2020 17:52:17 +0000 (UTC)
-Received: from [10.36.114.125] (ovpn-114-125.ams2.redhat.com [10.36.114.125])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B03DD5C22D;
-        Fri, 30 Oct 2020 17:52:10 +0000 (UTC)
-Subject: Re: [kvm-unit-tests RFC PATCH v2 3/5] arm64: spe: Add introspection
- test
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     drjones@redhat.com, pbonzini@redhat.com
-References: <20201027171944.13933-1-alexandru.elisei@arm.com>
- <20201027171944.13933-4-alexandru.elisei@arm.com>
- <5745ad18-be1a-da91-7289-a48682ad59a5@redhat.com>
- <66ff5a16-1771-9423-9205-5aabb4635c1b@arm.com>
- <c78da5aa-f429-d651-c460-b6cc46d6f188@redhat.com>
- <96204ef8-7afc-2dd4-f226-8efcbacaa564@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <7963b995-78f4-d1cd-54d1-64df42dd26e3@redhat.com>
-Date:   Fri, 30 Oct 2020 18:52:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726758AbgJ3RyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 13:54:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61024 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726061AbgJ3RyT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 13:54:19 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09UHVbO4115974;
+        Fri, 30 Oct 2020 13:54:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=hQ9GXhTjWObrlTROl5RhWZO9DgdbO9lvN76ob0g41pw=;
+ b=NYrLVd/atGE6GExxexNNiWKrExV4LXm/xSAU5ApiDrivKJAxypU+2qmhZegqbnixQNc5
+ Sdr8IjmWpWMjfWLupXXGpOo1hdZYkebjXv0yeRKD/zdNmkVQBB8fnswrDerYRlxzZ1kH
+ J/t4b8Xe5aAgfVPYZ8PRXXJxXamSzEZKVtxCNdeTAwVKKJEYE/czCgOlVjSzQU9pw/Ne
+ bErX55hJHSTorqaKQ/yl6dNyV5ZvhPSAXITdJYx7T/uAtDc631RXYMhBl4e6p6JBj+f+
+ 4mHnMT8voeoZ+M4q67DekaDT1fAGInt4k0a/OZPVxRW4RZBQ39DM8iHI3pzZTApf+JKj 7w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34gq9arp2b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Oct 2020 13:54:14 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09UHVh8j116383;
+        Fri, 30 Oct 2020 13:54:13 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34gq9arp1k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Oct 2020 13:54:13 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09UHqLYQ015819;
+        Fri, 30 Oct 2020 17:54:11 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 34f8craa5v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Oct 2020 17:54:11 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09UHs8rV17760698
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Oct 2020 17:54:08 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A04CBA405B;
+        Fri, 30 Oct 2020 17:54:08 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA14EA4051;
+        Fri, 30 Oct 2020 17:54:07 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.172.93])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 30 Oct 2020 17:54:07 +0000 (GMT)
+Date:   Fri, 30 Oct 2020 18:54:06 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v11 01/14] s390/vfio-ap: No need to disable IRQ after
+ queue reset
+Message-ID: <20201030185406.7fa13fbe.pasic@linux.ibm.com>
+In-Reply-To: <7a2c5930-9c37-8763-7e5d-c08a3638e6a1@linux.ibm.com>
+References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
+        <20201022171209.19494-2-akrowiak@linux.ibm.com>
+        <20201027074846.30ee0ddc.pasic@linux.ibm.com>
+        <7a2c5930-9c37-8763-7e5d-c08a3638e6a1@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <96204ef8-7afc-2dd4-f226-8efcbacaa564@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-10-30_07:2020-10-30,2020-10-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ priorityscore=1501 suspectscore=2 adultscore=0 mlxlogscore=924 spamscore=0
+ bulkscore=0 malwarescore=0 impostorscore=0 phishscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010300127
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru,
+On Thu, 29 Oct 2020 19:29:35 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-On 10/30/20 6:50 PM, Alexandru Elisei wrote:
-> Hi Eric,
-> 
-> On 10/30/20 5:09 PM, Auger Eric wrote:
->> Hi Alexandru,
->>
->> On 10/30/20 4:59 PM, Alexandru Elisei wrote:
->> [..]
->>>>> +	spe.align = 1 << spe.align;
->>>>> +
->>>>> +	pmsidr = read_sysreg_s(SYS_PMSIDR_EL1);
->>>>> +
->>>>> +	interval = (pmsidr >> SYS_PMSIDR_EL1_INTERVAL_SHIFT) & SYS_PMSIDR_EL1_INTERVAL_MASK;
->>>>> +	spe.min_interval = spe_min_interval(interval);
->>>>> +
->>>>> +	spe.max_record_size = (pmsidr >> SYS_PMSIDR_EL1_MAXSIZE_SHIFT) & \
->>>>> +		      SYS_PMSIDR_EL1_MAXSIZE_MASK;
->>>>> +	spe.max_record_size = 1 << spe.max_record_size;
->>>>> +
->>>>> +	spe.countsize = (pmsidr >> SYS_PMSIDR_EL1_COUNTSIZE_SHIFT) & \
->>>>> +			SYS_PMSIDR_EL1_COUNTSIZE_MASK;
->>>>> +
->>>>> +	spe.fl_cap = pmsidr & BIT(SYS_PMSIDR_EL1_FL_SHIFT);
->>>>> +	spe.ft_cap = pmsidr & BIT(SYS_PMSIDR_EL1_FT_SHIFT);
->>>>> +	spe.fe_cap = pmsidr & BIT(SYS_PMSIDR_EL1_FE_SHIFT);
->>>> Why did you remove the report_info() section? I think those human
->>>> readable info can be useful.
->>> I made them part of the test. Since the architecture says they are 1, I think
->>> making sure their value matches is more useful than printing something that the
->>> architecture guarantees.
->> OK for those caps which are always 1 anyway but I was more thinking about
->>
->> report_info("Align= %d bytes, Min Interval=%d Single record Max Size =
->> %d bytes", spe.align, spe.min_interval, spe.maxsize);
->>
->> I'd prefer to keep it.
-> 
-> Oh, I think I see what you mean, I chose to print them using printf in main().
-> This is very similar to what the timer test does, only it does it directly in
-> main(), instead of calling another function (print_timer_info(), in the case of
-> the timer test). I can move the printfs to spe_probe() if that's what you prefer.
-Ah OK I did not notice. Whatever the place if those traces are there I
-am fine.
+> >> @@ -1177,7 +1166,10 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
+> >>   			 */
+> >>   			if (ret)
+> >>   				rc = ret;
+> >> -			vfio_ap_irq_disable_apqn(AP_MKQID(apid, apqi));
+> >> +			q = vfio_ap_get_queue(matrix_mdev,
+> >> +					      AP_MKQID(apid, apqi));
+> >> +			if (q)
+> >> +				vfio_ap_free_aqic_resources(q);  
 
-Thanks
+[..]
 
-Eric
+> >
+> > Under what circumstances do we expect !q? If we don't, then we need to
+> > complain one way or another.  
 > 
-> Thanks,
-> 
-> Alex
-> 
+> In the current code (i.e., prior to introducing the subsequent hot
+> plug patches), an APQN can not be assigned to an mdev unless it
+> references a queue device bound to the vfio_ap device driver; however,
+> there is nothing preventing a queue device from getting unbound
+> while the guest is running (one of the problems mostly resolved by this
+> series). In that case, q would be NULL.
+
+But if the queue does not belong to us any more it does not make sense
+call vfio_ap_mdev_reset_queue() on it's APQN, or?
+
+I think we should have 
+
+if(!q)
+	continue; 
+at the very beginning of the loop body, or we want to be sure that q is
+not null. 
 
