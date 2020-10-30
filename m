@@ -2,31 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06FC72A0DFB
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:53:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 203632A0DD8
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:53:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727499AbgJ3Swv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 14:52:51 -0400
-Received: from mga06.intel.com ([134.134.136.31]:65456 "EHLO mga06.intel.com"
+        id S1727484AbgJ3Swu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 14:52:50 -0400
+Received: from mga12.intel.com ([192.55.52.136]:35263 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727457AbgJ3Swn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 14:52:43 -0400
-IronPort-SDR: r/uik6O+cL/PotGwbyf43M4mKE3wubuCyiRmVRXwecL88iakbE5GFWiIVLg0Ueyyd71CeIEZtE
- j5YTqEOmwQ6Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="230287931"
+        id S1727482AbgJ3Sws (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 14:52:48 -0400
+IronPort-SDR: yBzCYjpCKjaKTHOtDgB2KJWFsscKfdS+ibukx1R1m/ObbBrUNmkZtk+bV/pE2xiYWCux35AXUF
+ qQXrwdubE3lQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="147937020"
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="230287931"
+   d="scan'208";a="147937020"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:52:42 -0700
-IronPort-SDR: yi6ih3tbmuV2vdf2jorI4qWEUeO2gw83dlmTJAuOwlUFIwikNDtbviJIfE4Wzek81sfINS5KOo
- uJ+q3CtMGdYw==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:52:48 -0700
+IronPort-SDR: CcqNTyjW675Bk6IYiyG6bHH0TCiyjC2KDKMqn8JT90vViBpjuOXPbj7xnLKUA1Q/aTu4zPtSY3
+ 2gdOHBnsw49Q==
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="324168355"
+   d="scan'208";a="469608487"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:52:39 -0700
-Subject: [PATCH v4 16/17] dmaengine: idxd: add new wq state for mdev
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:52:47 -0700
+Subject: [PATCH v4 17/17] dmaengine: idxd: add error notification from host
+ driver to mediated device
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         bhelgaas@google.com, tglx@linutronix.de,
@@ -40,8 +41,8 @@ To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Fri, 30 Oct 2020 11:52:39 -0700
-Message-ID: <160408395903.912050.14092194237099902168.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 30 Oct 2020 11:52:46 -0700
+Message-ID: <160408396666.912050.13272769874427386756.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
 References: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
@@ -52,61 +53,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a dedicated wq is enabled as mdev, we must disable the wq on the
-device in order to program the pasid to the wq. Introduce a wq state
-IDXD_WQ_LOCKED that is software state only in order to prevent the user
-from modifying the configuration while mdev wq is in this state. While
-in this state, the wq is not in DISABLED state and will prevent any
-modifications to the configuration. It is also not in the ENABLED state
-and therefore prevents any actions allowed in the ENABLED state.
+When a device error occurs, the mediated device need to be notified in
+order to notify the guest of device error. Add support to notify the
+specific mdev when an error is wq specific and broadcast errors to all mdev
+when it's a generic device error.
 
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- drivers/dma/idxd/idxd.h  |    1 +
- drivers/dma/idxd/mdev.c  |    4 +++-
- drivers/dma/idxd/sysfs.c |    2 ++
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/dma/idxd/idxd.h |   12 ++++++++++++
+ drivers/dma/idxd/irq.c  |    4 ++++
+ drivers/dma/idxd/vdev.c |   32 ++++++++++++++++++++++++++++++++
+ drivers/dma/idxd/vdev.h |    1 +
+ 4 files changed, 49 insertions(+)
 
 diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 4e583fdd15d2..03275ad9e849 100644
+index 03275ad9e849..2f9e44bcd436 100644
 --- a/drivers/dma/idxd/idxd.h
 +++ b/drivers/dma/idxd/idxd.h
-@@ -61,6 +61,7 @@ struct idxd_group {
- enum idxd_wq_state {
- 	IDXD_WQ_DISABLED = 0,
- 	IDXD_WQ_ENABLED,
-+	IDXD_WQ_LOCKED,
- };
+@@ -393,4 +393,16 @@ int idxd_mdev_host_init(struct idxd_device *idxd);
+ void idxd_mdev_host_release(struct idxd_device *idxd);
+ int idxd_mdev_get_pasid(struct mdev_device *mdev);
  
- enum idxd_wq_flag {
-diff --git a/drivers/dma/idxd/mdev.c b/drivers/dma/idxd/mdev.c
-index 16b56f8f7fc1..3db7717a10c0 100644
---- a/drivers/dma/idxd/mdev.c
-+++ b/drivers/dma/idxd/mdev.c
-@@ -84,8 +84,10 @@ static void idxd_vdcm_init(struct vdcm_idxd *vidxd)
++#ifdef CONFIG_INTEL_IDXD_MDEV
++void idxd_vidxd_send_errors(struct idxd_device *idxd);
++void idxd_wq_vidxd_send_errors(struct idxd_wq *wq);
++#else
++static inline void idxd_vidxd_send_errors(struct idxd_device *idxd)
++{
++}
++static inline void idxd_wq_vidxd_send_errors(struct idxd_wq *wq)
++{
++}
++#endif /* CONFIG_INTEL_IDXD_MDEV */
++
+ #endif
+diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
+index a94fce00767b..9219dcf0a34d 100644
+--- a/drivers/dma/idxd/irq.c
++++ b/drivers/dma/idxd/irq.c
+@@ -137,6 +137,8 @@ irqreturn_t idxd_misc_thread(int vec, void *data)
  
- 	vidxd_mmio_init(vidxd);
+ 			if (wq->type == IDXD_WQT_USER)
+ 				wake_up_interruptible(&wq->idxd_cdev.err_queue);
++			else if (wq->type == IDXD_WQT_MDEV)
++				idxd_wq_vidxd_send_errors(wq);
+ 		} else {
+ 			int i;
  
--	if (wq_dedicated(wq) && wq->state == IDXD_WQ_ENABLED)
-+	if (wq_dedicated(wq) && wq->state == IDXD_WQ_ENABLED) {
- 		idxd_wq_disable(wq, NULL);
-+		wq->state = IDXD_WQ_LOCKED;
-+	}
- }
+@@ -145,6 +147,8 @@ irqreturn_t idxd_misc_thread(int vec, void *data)
  
- static void idxd_vdcm_release(struct mdev_device *mdev)
-diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
-index 5b79d9019f2e..3bbbd413980e 100644
---- a/drivers/dma/idxd/sysfs.c
-+++ b/drivers/dma/idxd/sysfs.c
-@@ -821,6 +821,8 @@ static ssize_t wq_state_show(struct device *dev,
- 		return sprintf(buf, "disabled\n");
- 	case IDXD_WQ_ENABLED:
- 		return sprintf(buf, "enabled\n");
-+	case IDXD_WQ_LOCKED:
-+		return sprintf(buf, "locked\n");
+ 				if (wq->type == IDXD_WQT_USER)
+ 					wake_up_interruptible(&wq->idxd_cdev.err_queue);
++				else if (wq->type == IDXD_WQT_MDEV)
++					idxd_wq_vidxd_send_errors(wq);
+ 			}
+ 		}
+ 
+diff --git a/drivers/dma/idxd/vdev.c b/drivers/dma/idxd/vdev.c
+index d61bc17624b9..fd42674490d6 100644
+--- a/drivers/dma/idxd/vdev.c
++++ b/drivers/dma/idxd/vdev.c
+@@ -942,3 +942,35 @@ void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val)
+ 		break;
  	}
+ }
++
++static void vidxd_send_errors(struct vdcm_idxd *vidxd)
++{
++	struct idxd_device *idxd = vidxd->idxd;
++	u8 *bar0 = vidxd->bar0;
++	union sw_err_reg *swerr = (union sw_err_reg *)(bar0 + IDXD_SWERR_OFFSET);
++	union genctrl_reg *genctrl = (union genctrl_reg *)(bar0 + IDXD_GENCTRL_OFFSET);
++	int i;
++
++	if (swerr->valid) {
++		if (!swerr->overflow)
++			swerr->overflow = 1;
++		return;
++	}
++
++	lockdep_assert_held(&idxd->dev_lock);
++	for (i = 0; i < 4; i++) {
++		swerr->bits[i] = idxd->sw_err.bits[i];
++		swerr++;
++	}
++
++	if (genctrl->softerr_int_en)
++		vidxd_send_interrupt(vidxd, 0);
++}
++
++void idxd_wq_vidxd_send_errors(struct idxd_wq *wq)
++{
++	struct vdcm_idxd *vidxd;
++
++	list_for_each_entry(vidxd, &wq->vdcm_list, list)
++		vidxd_send_errors(vidxd);
++}
+diff --git a/drivers/dma/idxd/vdev.h b/drivers/dma/idxd/vdev.h
+index d23e63eb7f43..98810ae95782 100644
+--- a/drivers/dma/idxd/vdev.h
++++ b/drivers/dma/idxd/vdev.h
+@@ -23,5 +23,6 @@ int vidxd_send_interrupt(struct vdcm_idxd *vidxd, int msix_idx);
+ int vidxd_setup_ims_entries(struct vdcm_idxd *vidxd);
+ void vidxd_free_ims_entries(struct vdcm_idxd *vidxd);
+ void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val);
++void idxd_wq_vidxd_send_errors(struct idxd_wq *wq);
  
- 	return sprintf(buf, "unknown\n");
+ #endif
 
 
