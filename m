@@ -2,100 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F7282A0333
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:47:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDA6D2A0361
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:54:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726461AbgJ3Krn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 06:47:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726402AbgJ3Krn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 06:47:43 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9DA2C0613CF
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:47:42 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id y12so5927807wrp.6
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:47:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jQiudrT92RoT4MnO8l4PixRWHyCh7YwN2t6t0NWCl8I=;
-        b=VFde5+mzL3XrpwutQuptYgGfpVk1egIssR+s26ty3ekZpYibBDTiuQV5zFapNyE8xz
-         6v3A8xMfNiFzLTb2cZNXwVhfFARk+bgSkdGbO1edAjpGrdx5RQU69IAKu6NNVcwyG0PF
-         womXcacbz9uNGUZOOgJZcSMSXlgQGCd9OLAmd/A0MLaIjmlAyAXznwmASzALVIyF50wC
-         84Aa6i3GxiZKW4MuYqFzR9Synue4zXdlcG6itsZ2CxWa7iREgT0xl/I6wTenPtbWqOAZ
-         9u++nR0d94pEaUBIH7tjNuyvVXlbrmkmFI2i4mOunI1OiwJyZvA9yxzHRXONpj+854wX
-         DXcA==
+        id S1726353AbgJ3Kye (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 06:54:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21253 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726240AbgJ3Kye (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 06:54:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604055272;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eNcsDz2cy5Yr+LEYgMRQaMYGAlPoileX7l+cMy1V2mc=;
+        b=JcV45RN+NwNFMLQ2vPQbUP8pMqFMofswjVPBdRz+pllSkLpwIGG9uA6pCQjCbBMZShSQD/
+        bu8a/DyXB4gRzkV1TTuVVOdI8PztvU3S6caamFSMtjehTwi3u86wV4XBbx9qMV6QyZ12uN
+        2Rw+n9EwJpXm5BWWpZHa1FOd5k2yxMU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-6lg78MlgPR6J2HCzv6jENw-1; Fri, 30 Oct 2020 06:54:31 -0400
+X-MC-Unique: 6lg78MlgPR6J2HCzv6jENw-1
+Received: by mail-wr1-f69.google.com with SMTP id i1so2496729wrb.18
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:54:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jQiudrT92RoT4MnO8l4PixRWHyCh7YwN2t6t0NWCl8I=;
-        b=p2SHSaayKk4j9kpnLxgqY0qG7WDqUvJueNLf69ZWKbp3dtS1T60PbcydR2KpPMpmM4
-         y59u7HT9XbGt++RIVDYEYzMwagFN+VzCKDCOFf4E8DvzzDLqpneJP7z9ZUg3texZhqI3
-         WA7obx6/uUVIwPWraWn85tNN42NW2Qb01ugFEyW+Nut93yQExc7jhD54e16UgGmXU/ki
-         ZZSgc8mPzYTcmWMfkm8AKJPxmmRUQ8i1SpHruPXC1szZOSmIepYiUyVFapAGyZYGw0yR
-         dEnxP0wbC4TxODfZIsRsRzZzn4ETUxpg1BlHIxiqn9FJbv/nO8Bf0/XxXlx8h2W5BMWS
-         k3vg==
-X-Gm-Message-State: AOAM532itrrbBLWVmOds5noz0uAZV+dTfdxlWFb19S0XgU/yiyS/GtXI
-        pOFlWXrvT+yaJlzuh18y1tVmyF7y//el2A==
-X-Google-Smtp-Source: ABdhPJxoOQE0u2uOynQXeMQt4bBcTiACvEfnnakK42gV/IE5dKn3Hyesd2ExbFDOliawRXDUP6bYow==
-X-Received: by 2002:adf:df02:: with SMTP id y2mr2428311wrl.403.1604054861343;
-        Fri, 30 Oct 2020 03:47:41 -0700 (PDT)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id y201sm4495303wmd.27.2020.10.30.03.47.40
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=eNcsDz2cy5Yr+LEYgMRQaMYGAlPoileX7l+cMy1V2mc=;
+        b=L77qPhORJ8wHA6NBnY2lVJiSxqVumM21limcn43Pk+4R7BWhYXHsHUOChN5PiUMAGx
+         rUT8kCZPMKc1+VCoNgKnyT1TfZwcZGgWZhkpUPM7v5NA0dXGD1RXQ+WYBCmddgyFEgPr
+         ho0rqRqmaoE5MHtRe0sLRCEu2gEMRqYQ79BSQrU2sKhblc/U5fkgeujaRKA7f7sDJUw9
+         U+3c9ypLnUPVg/UkaPkPv9K2vUTfGyGpoCvan7n/4h6yPZPW/I98hEjdeTweB30LOTNU
+         BZzUf2/g4yugQp+zAo1rtOTh8SJNhQCqyupK1Uzj6rWN2lWRALMabq3bGcGZ04ncDcoC
+         48lA==
+X-Gm-Message-State: AOAM532jFFqJd3EX0jI9jkCUBH9RfldoIG+KP+4u/lLYUMefTqDrBiv4
+        hvOAf4swoMl7yrClPOTP2jY9VzgifL0ujK48iPt9lWl+zyQnHzcrV8XtRSKBbnWFvtsohdxB1Gv
+        c6ApxWByR0rL/
+X-Received: by 2002:a7b:c4d6:: with SMTP id g22mr2069444wmk.106.1604055269704;
+        Fri, 30 Oct 2020 03:54:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzY5s4HQ3sHRjqMi8kZt0VprXDyGubGokKC7oZxhjQ9kRgwiCSE61bhqv62SbSqffXe8fXikA==
+X-Received: by 2002:a7b:c4d6:: with SMTP id g22mr2069422wmk.106.1604055269495;
+        Fri, 30 Oct 2020 03:54:29 -0700 (PDT)
+Received: from steredhat (host-79-22-200-33.retail.telecomitalia.it. [79.22.200.33])
+        by smtp.gmail.com with ESMTPSA id x65sm4178936wmg.1.2020.10.30.03.54.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2020 03:47:40 -0700 (PDT)
-Date:   Fri, 30 Oct 2020 11:47:20 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jordan Crouse <jcrouse@codeaurora.org>
-Subject: Re: [PATCH v6 2/5] iommu: Use bus iommu ops for aux related callback
-Message-ID: <20201030104720.GA294997@myrica>
-References: <20201030045809.957927-1-baolu.lu@linux.intel.com>
- <20201030045809.957927-3-baolu.lu@linux.intel.com>
- <MWHPR11MB1645D795F7851F5894CB58D88C150@MWHPR11MB1645.namprd11.prod.outlook.com>
+        Fri, 30 Oct 2020 03:54:28 -0700 (PDT)
+Date:   Fri, 30 Oct 2020 11:54:22 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, netdev@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost/vsock: add IOTLB API support
+Message-ID: <20201030105422.ju2aj2bmwsckdufh@steredhat>
+References: <20201029174351.134173-1-sgarzare@redhat.com>
+ <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1645D795F7851F5894CB58D88C150@MWHPR11MB1645.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 30, 2020 at 05:55:53AM +0000, Tian, Kevin wrote:
-> > From: Lu Baolu <baolu.lu@linux.intel.com>
-> > Sent: Friday, October 30, 2020 12:58 PM
-> > 
-> > The aux-domain apis were designed for macro driver where the subdevices
-> > are created and used inside a device driver. Use the device's bus iommu
-> > ops instead of that in iommu domain for various callbacks.
-> 
-> IIRC there are only two users on these apis. One is VFIO, and the other
-> is on the ARM side (not checked in yet). Jean, can you help confirm 
-> whether ARM-side usage still relies on aux apis even with this change?
+On Fri, Oct 30, 2020 at 06:02:18PM +0800, Jason Wang wrote:
+>
+>On 2020/10/30 上午1:43, Stefano Garzarella wrote:
+>>This patch enables the IOTLB API support for vhost-vsock devices,
+>>allowing the userspace to emulate an IOMMU for the guest.
+>>
+>>These changes were made following vhost-net, in details this patch:
+>>- exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
+>>   device if the feature is acked
+>>- implements VHOST_GET_BACKEND_FEATURES and
+>>   VHOST_SET_BACKEND_FEATURES ioctls
+>>- calls vq_meta_prefetch() before vq processing to prefetch vq
+>>   metadata address in IOTLB
+>>- provides .read_iter, .write_iter, and .poll callbacks for the
+>>   chardev; they are used by the userspace to exchange IOTLB messages
+>>
+>>This patch was tested with QEMU and a patch applied [1] to fix a
+>>simple issue:
+>>     $ qemu -M q35,accel=kvm,kernel-irqchip=split \
+>>            -drive file=fedora.qcow2,format=qcow2,if=virtio \
+>>            -device intel-iommu,intremap=on \
+>>            -device vhost-vsock-pci,guest-cid=3,iommu_platform=on
+>
+>
+>Patch looks good, but a question:
+>
+>It looks to me you don't enable ATS which means vhost won't get any 
+>invalidation request or did I miss anything?
+>
 
-No, I have something out of tree but no plan to upstream it anymore, and
-the SMMUv2 implementation is out as well:
+You're right, I didn't see invalidation requests, only miss and updates.
+Now I have tried to enable 'ats' and 'device-iotlb' but I still don't 
+see any invalidation.
 
-https://lore.kernel.org/linux-iommu/20200713173556.GC3815@jcrouse1-lnx.qualcomm.com/
-
-> If no, possibly they can be removed completely?
-
-No objection from me. They can be added back later (I still belive adding
-PASID to the DMA API would be nice to have once more HW implements it).
+How can I test it? (Sorry but I don't have much experience yet with 
+vIOMMU)
 
 Thanks,
-Jean
+Stefano
+
