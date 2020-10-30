@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 088712A0B5B
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 17:40:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C076A2A0B59
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 17:40:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727115AbgJ3Qk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 12:40:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56020 "EHLO mail.kernel.org"
+        id S1727055AbgJ3QkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 12:40:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55982 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726920AbgJ3Qk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 12:40:26 -0400
+        id S1726072AbgJ3QkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 12:40:25 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 692BA20756;
-        Fri, 30 Oct 2020 16:40:25 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E4E4520724;
+        Fri, 30 Oct 2020 16:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1604076025;
-        bh=5IdJB+vSy9WtqFoTUhuMK/Ne2TdAtmbDZodcpICYmnU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=mY2QczB+bo87U8fMn7qv4VHllqSccKIUuhsW02/aX4Yuj8hqMHxzWIpI/pbvM9juv
-         TIJ34uxNPzi5eMZdtSGLXP7Rq5BKtOojZdB/xkk1SA9Aoe32WIxPEu2mkS0OK998DC
-         PcLczwkdcqVxVXvgyHHQBRK9HdIjhMRqE5f0cSfs=
+        bh=146kMw0dp/xuQdySBVEx7K+SEqVKrXEjw85Z2vaNF6o=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=zuDSqvuWyEvS7ReTqUSkBV+8dFmeMhjNtlAUubTcoPCHo7tJNzTNkHVrUZ/Op6q65
+         mtUaJ8LywIFrooTFNyhk04NJFVos0/ZtILwTyVsKjcwQIzb1ugnS7O8y8mSkJIgDjG
+         G0j4/ZOBQiN4UX63n2kX3b5u1w6WcxPVWKW/vuAI=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1kYXRu-005noK-96; Fri, 30 Oct 2020 16:40:22 +0000
+        id 1kYXRv-005noK-1z; Fri, 30 Oct 2020 16:40:23 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     David Brazdil <dbrazdil@google.com>, Gavin Shan <gshan@redhat.com>,
@@ -42,10 +42,12 @@ Cc:     David Brazdil <dbrazdil@google.com>, Gavin Shan <gshan@redhat.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 5.10, take #1
-Date:   Fri, 30 Oct 2020 16:40:05 +0000
-Message-Id: <20201030164017.244287-1-maz@kernel.org>
+Subject: [PATCH 01/12] KVM: arm64: Don't corrupt tpidr_el2 on failed HVC call
+Date:   Fri, 30 Oct 2020 16:40:06 +0000
+Message-Id: <20201030164017.244287-2-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201030164017.244287-1-maz@kernel.org>
+References: <20201030164017.244287-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -56,84 +58,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[Apologies for the spam, I appear to have forgotten to Cc the lists in
- my initial posting]
+The hyp-init code starts by stashing a register in TPIDR_EL2
+in in order to free a register. This happens no matter if the
+HVC call is legal or not.
 
-Hi Paolo,
+Although nothing wrong seems to come out of it, it feels odd
+to alter the EL2 state for something that eventually returns
+an error.
 
-It was good to see you (and everyone else) at KVM Forum this week!
+Instead, use the fact that we know exactly which bits of the
+__kvm_hyp_init call are non-zero to perform the check with
+a series of EOR/ROR instructions, combined with a build-time
+check that the value is the one we expect.
 
-And to celebrate, here's a first batch of fixes for KVM/arm64. A bunch
-of them are addressing issues introduced by the invasive changes that
-took place in the 5.10 merge window (MM, nVHE host entry). A few
-others are addressing some older bugs (VFIO PTE mappings, AArch32
-debug, composite huge pages), and a couple of improvements
-(HYP-visible capabilities are made more robust).
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20201026095116.72051-2-maz@kernel.org
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-Please pull,
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 47224dc62c51..b11a9d7db677 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -57,16 +57,25 @@ __do_hyp_init:
+ 	cmp	x0, #HVC_STUB_HCALL_NR
+ 	b.lo	__kvm_handle_stub_hvc
+ 
+-	/* Set tpidr_el2 for use by HYP to free a register */
+-	msr	tpidr_el2, x2
+-
+-	mov	x2, #KVM_HOST_SMCCC_FUNC(__kvm_hyp_init)
+-	cmp	x0, x2
+-	b.eq	1f
++	// We only actively check bits [24:31], and everything
++	// else has to be zero, which we check at build time.
++#if (KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) & 0xFFFFFFFF00FFFFFF)
++#error Unexpected __KVM_HOST_SMCCC_FUNC___kvm_hyp_init value
++#endif
++
++	ror	x0, x0, #24
++	eor	x0, x0, #((KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) >> 24) & 0xF)
++	ror	x0, x0, #4
++	eor	x0, x0, #((KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) >> 28) & 0xF)
++	cbz	x0, 1f
+ 	mov	x0, #SMCCC_RET_NOT_SUPPORTED
+ 	eret
+ 
+-1:	phys_to_ttbr x0, x1
++1:
++	/* Set tpidr_el2 for use by HYP to free a register */
++	msr	tpidr_el2, x2
++
++	phys_to_ttbr x0, x1
+ alternative_if ARM64_HAS_CNP
+ 	orr	x0, x0, #TTBR_CNP_BIT
+ alternative_else_nop_endif
+-- 
+2.28.0
 
-	M.
-
-The following changes since commit 4e5dc64c43192b4fd4c96ac150a8f013065f5f5b:
-
-  Merge branches 'kvm-arm64/pt-new' and 'kvm-arm64/pmu-5.9' into kvmarm-master/next (2020-10-02 09:25:55 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.10-1
-
-for you to fetch changes up to 22f553842b14a1289c088a79a67fb479d3fa2a4e:
-
-  KVM: arm64: Handle Asymmetric AArch32 systems (2020-10-30 16:06:22 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.10, take #1
-
-- Force PTE mapping on device pages provided via VFIO
-- Fix detection of cacheable mapping at S2
-- Fallback to PMD/PTE mappings for composite huge pages
-- Fix accounting of Stage-2 PGD allocation
-- Fix AArch32 handling of some of the debug registers
-- Simplify host HYP entry
-- Fix stray pointer conversion on nVHE TLB invalidation
-- Fix initialization of the nVHE code
-- Simplify handling of capabilities exposed to HYP
-- Nuke VCPUs caught using a forbidden AArch32 EL0
-
-----------------------------------------------------------------
-Gavin Shan (1):
-      KVM: arm64: Use fallback mapping sizes for contiguous huge page sizes
-
-Marc Zyngier (4):
-      KVM: arm64: Don't corrupt tpidr_el2 on failed HVC call
-      KVM: arm64: Remove leftover kern_hyp_va() in nVHE TLB invalidation
-      KVM: arm64: Drop useless PAN setting on host EL1 to EL2 transition
-      KVM: arm64: Fix AArch32 handling of DBGD{CCINT,SCRext} and DBGVCR
-
-Mark Rutland (3):
-      KVM: arm64: Factor out is_{vhe,nvhe}_hyp_code()
-      arm64: cpufeature: reorder cpus_have_{const, final}_cap()
-      arm64: cpufeature: upgrade hyp caps to final
-
-Qais Yousef (1):
-      KVM: arm64: Handle Asymmetric AArch32 systems
-
-Santosh Shukla (1):
-      KVM: arm64: Force PTE mapping on fault resulting in a device mapping
-
-Will Deacon (2):
-      KVM: arm64: Allocate stage-2 pgd pages with GFP_KERNEL_ACCOUNT
-      KVM: arm64: Fix masks in stage2_pte_cacheable()
-
- arch/arm64/include/asm/cpufeature.h | 40 ++++++++++++++++++++++++++++---------
- arch/arm64/include/asm/kvm_host.h   |  1 +
- arch/arm64/include/asm/virt.h       |  9 ++++-----
- arch/arm64/kernel/image-vars.h      |  1 -
- arch/arm64/kvm/arm.c                | 19 ++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/host.S      |  2 --
- arch/arm64/kvm/hyp/nvhe/hyp-init.S  | 23 ++++++++++++++-------
- arch/arm64/kvm/hyp/nvhe/tlb.c       |  1 -
- arch/arm64/kvm/hyp/pgtable.c        |  4 ++--
- arch/arm64/kvm/mmu.c                | 27 ++++++++++++++++++-------
- arch/arm64/kvm/sys_regs.c           |  6 +++---
- 11 files changed, 96 insertions(+), 37 deletions(-)
