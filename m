@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E3EE2A0251
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:09:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 772082A0249
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:09:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbgJ3KJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 06:09:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50416 "EHLO
+        id S1726565AbgJ3KJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 06:09:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726469AbgJ3KI6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 06:08:58 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB854C0613D6
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:57 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id d3so2389810wma.4
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:57 -0700 (PDT)
+        with ESMTP id S1726483AbgJ3KI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 06:08:59 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B25AC0613CF
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:59 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id y12so5799039wrp.6
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ffwll.ch; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=bLRenZ+k6OnrWeyL17PS5vv24685dEitAu61SyAKZwA=;
-        b=GXHxO1RP7TK95Adu5+iOnFzwfvM1BylUWHit0kEyTRTLVttqP1P3S95IoPuxbcmlFB
-         5Ozb+6/u63pPnXm1hxcZRtaICRTk3yz0dsT7WEHo9xO0nj24N6aRdnRJ88svYaFT4zH1
-         M/1kNldB+IOH+DlAmBexn1ek5RHkrsQQkz1dU=
+        bh=x64Pdy8p+ZGL0slSw+rtx7HFhuDJqqnGsdIVDlQDjdQ=;
+        b=dMXZgQQ4GInuf9jrQbek8Tp4TJwmqWcWzEoGzN+XnEIIgNSKSXrrzWsVgCIz1j4mbw
+         c+B42LT5fsWsIB7y68aybpNVUX+JyN3Td0Ws9EA48SWBfWCaf3zgE6G6thggoKs//hX0
+         Upru27GCrw83TFd3ijeyNjhXKU4N04Gf2K5U4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=bLRenZ+k6OnrWeyL17PS5vv24685dEitAu61SyAKZwA=;
-        b=Ai3SybZzgmaUyvJxiLeV6jk5PGoaWCSMSMjwto37/CJHcWpCRedWTG/PV6HMJVaxoR
-         RvK9kbHRvkWKjvfGcOjKlW1e3araa62+gijxKpWK+S65JpBdijldmQ+IdvlASMoBzCNb
-         Grh9cEQaSDug3GY5Mgy3ITsfIfT+onkXmiLjSg6AlbYbMlNSBPVC0F5L9UfI066I92kA
-         m9d5jvjlNnQDvCod3UvPhovov49Z2mL83dtQC8aUIoIxFq3Jfkj035mpX/KYW7Matqa8
-         iBZkEMi4MzEi4x6XcfA3Im4Sg5vwVhdIGWtixZLg9SNEzTsczc+NDolqIr8jyy0jVSZH
-         yrhQ==
-X-Gm-Message-State: AOAM532/Ox7cLMmc71+mRReMuTUQMV2hnCvurlCOXXIywM/H28j1Ys+v
-        lEV6HWp54Z7ENBRQKF3Gokp5Zw==
-X-Google-Smtp-Source: ABdhPJz/i1hJloa86kniLQRB2Ym3mXkp18H0V5ZxOvETtprEDfWEpkrDMUxmmStycaPdhj+fBSAIzQ==
-X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr1715102wmk.65.1604052536620;
-        Fri, 30 Oct 2020 03:08:56 -0700 (PDT)
+        bh=x64Pdy8p+ZGL0slSw+rtx7HFhuDJqqnGsdIVDlQDjdQ=;
+        b=WjFR5XgWH6h74aQEyPwdmdLj3bOCAY8awFxalDLtXjgg2Hp0PpHU9bI3xbTOg+/b7x
+         6FYFyjxaB/j/eer5F/7vcOeNt489tIxTZrKHLhlQQM063gJHWYOS4hsMcrvDV5CxhSDG
+         YXYzxDvdi45KQbPsZOAOtw6H/6ngcTwwWLQSrv0KsQhuISVLNReQW/9wxaU2gvaDukx8
+         CRqU1C+OxCghaUYjGyA6RdL/Kald9Cc/QR97vJU69bA1Pwm00pRRJwDwNXowOOv3hYlp
+         puK9+3YsdV+T281GZBCGkyo+EuNpUHXN0vUErA53oYR7ROxZynNXqwhj+S1IWF5aa0uP
+         hOfA==
+X-Gm-Message-State: AOAM531QndtlpzzFvMS/XAS2AiaJBJNjxR9rwqZI30nXutzsmwsx4nx9
+        qFIQAdqHgeez/c8y+xHIPRIxZA==
+X-Google-Smtp-Source: ABdhPJzxGFYoPzMG5L1cos4pmye64LCF8H+vRnUg6QzaFISM5lCoumobRT1BRbCyB6uhYpZ60pR1/g==
+X-Received: by 2002:a5d:4b12:: with SMTP id v18mr2021446wrq.259.1604052538157;
+        Fri, 30 Oct 2020 03:08:58 -0700 (PDT)
 Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id v189sm4430947wmg.14.2020.10.30.03.08.55
+        by smtp.gmail.com with ESMTPSA id v189sm4430947wmg.14.2020.10.30.03.08.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2020 03:08:55 -0700 (PDT)
+        Fri, 30 Oct 2020 03:08:57 -0700 (PDT)
 From:   Daniel Vetter <daniel.vetter@ffwll.ch>
 To:     DRI Development <dri-devel@lists.freedesktop.org>,
         LKML <linux-kernel@vger.kernel.org>
@@ -59,12 +59,17 @@ Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
         Andrew Morton <akpm@linux-foundation.org>,
         John Hubbard <jhubbard@nvidia.com>,
         =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
-        David Hildenbrand <david@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Subject: [PATCH v5 13/15] resource: Move devmem revoke code to resource framework
-Date:   Fri, 30 Oct 2020 11:08:13 +0100
-Message-Id: <20201030100815.2269-14-daniel.vetter@ffwll.ch>
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        linux-pci@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sourabh Jain <sourabhjain@linux.ibm.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Nayna Jain <nayna@linux.ibm.com>
+Subject: [PATCH v5 14/15] sysfs: Support zapping of binary attr mmaps
+Date:   Fri, 30 Oct 2020 11:08:14 +0100
+Message-Id: <20201030100815.2269-15-daniel.vetter@ffwll.ch>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
 References: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
@@ -75,13 +80,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We want all iomem mmaps to consistently revoke ptes when the kernel
-takes over and CONFIG_IO_STRICT_DEVMEM is enabled. This includes the
-pci bar mmaps available through procfs and sysfs, which currently do
-not revoke mappings.
+We want to be able to revoke pci mmaps so that the same access rules
+applies as for /dev/kmem. Revoke support for devmem was added in
+3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims the
+region").
 
-To prepare for this, move the code from the /dev/kmem driver to
-kernel/resource.c.
+The simplest way to achieve this is by having the same filp->f_mapping
+for all mappings, so that unmap_mapping_range can find them all, no
+matter through which file they've been created. Since this must be set
+at open time we need sysfs support for this.
+
+Add an optional mapping parameter bin_attr, which is only consulted
+when there's also an mmap callback, since without mmap support
+allowing to adjust the ->f_mapping makes no sense.
 
 Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
@@ -97,303 +108,70 @@ Cc: linux-mm@kvack.org
 Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-samsung-soc@vger.kernel.org
 Cc: linux-media@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Bjorn Helgaas <bhelgaas@google.com>
+Cc: linux-pci@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Christian Brauner <christian.brauner@ubuntu.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Sourabh Jain <sourabhjain@linux.ibm.com>
 Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Nayna Jain <nayna@linux.ibm.com>
 Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
---
-v3:
-- add barrier for consistency and document why we don't have to check
-  for NULL (Jason)
-v4
-- Adjust comments to reflect the general nature of this iomem revoke
-  code now (Dan)
 ---
- drivers/char/mem.c     |  85 +---------------------------------
- include/linux/ioport.h |   6 +--
- kernel/resource.c      | 101 ++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 102 insertions(+), 90 deletions(-)
+ fs/sysfs/file.c       | 11 +++++++++++
+ include/linux/sysfs.h |  2 ++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/drivers/char/mem.c b/drivers/char/mem.c
-index 7dcf9e4ea79d..43c871dc7477 100644
---- a/drivers/char/mem.c
-+++ b/drivers/char/mem.c
-@@ -31,9 +31,6 @@
- #include <linux/uio.h>
- #include <linux/uaccess.h>
- #include <linux/security.h>
--#include <linux/pseudo_fs.h>
--#include <uapi/linux/magic.h>
--#include <linux/mount.h>
- 
- #ifdef CONFIG_IA64
- # include <linux/efi.h>
-@@ -836,42 +833,6 @@ static loff_t memory_lseek(struct file *file, loff_t offset, int orig)
- 	return ret;
+diff --git a/fs/sysfs/file.c b/fs/sysfs/file.c
+index 96d0da65e088..9aefa7779b29 100644
+--- a/fs/sysfs/file.c
++++ b/fs/sysfs/file.c
+@@ -170,6 +170,16 @@ static int sysfs_kf_bin_mmap(struct kernfs_open_file *of,
+ 	return battr->mmap(of->file, kobj, battr, vma);
  }
  
--static struct inode *devmem_inode;
--
--#ifdef CONFIG_IO_STRICT_DEVMEM
--void revoke_devmem(struct resource *res)
--{
--	/* pairs with smp_store_release() in devmem_init_inode() */
--	struct inode *inode = smp_load_acquire(&devmem_inode);
--
--	/*
--	 * Check that the initialization has completed. Losing the race
--	 * is ok because it means drivers are claiming resources before
--	 * the fs_initcall level of init and prevent /dev/mem from
--	 * establishing mappings.
--	 */
--	if (!inode)
--		return;
--
--	/*
--	 * The expectation is that the driver has successfully marked
--	 * the resource busy by this point, so devmem_is_allowed()
--	 * should start returning false, however for performance this
--	 * does not iterate the entire resource range.
--	 */
--	if (devmem_is_allowed(PHYS_PFN(res->start)) &&
--	    devmem_is_allowed(PHYS_PFN(res->end))) {
--		/*
--		 * *cringe* iomem=relaxed says "go ahead, what's the
--		 * worst that can happen?"
--		 */
--		return;
--	}
--
--	unmap_mapping_range(inode->i_mapping, res->start, resource_size(res), 1);
--}
--#endif
--
- static int open_port(struct inode *inode, struct file *filp)
- {
- 	int rc;
-@@ -891,7 +852,7 @@ static int open_port(struct inode *inode, struct file *filp)
- 	 * revocations when drivers want to take over a /dev/mem mapped
- 	 * range.
- 	 */
--	filp->f_mapping = inode->i_mapping;
-+	filp->f_mapping = iomem_get_mapping();
- 
- 	return 0;
- }
-@@ -1023,48 +984,6 @@ static char *mem_devnode(struct device *dev, umode_t *mode)
- 
- static struct class *mem_class;
- 
--static int devmem_fs_init_fs_context(struct fs_context *fc)
--{
--	return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
--}
--
--static struct file_system_type devmem_fs_type = {
--	.name		= "devmem",
--	.owner		= THIS_MODULE,
--	.init_fs_context = devmem_fs_init_fs_context,
--	.kill_sb	= kill_anon_super,
--};
--
--static int devmem_init_inode(void)
--{
--	static struct vfsmount *devmem_vfs_mount;
--	static int devmem_fs_cnt;
--	struct inode *inode;
--	int rc;
--
--	rc = simple_pin_fs(&devmem_fs_type, &devmem_vfs_mount, &devmem_fs_cnt);
--	if (rc < 0) {
--		pr_err("Cannot mount /dev/mem pseudo filesystem: %d\n", rc);
--		return rc;
--	}
--
--	inode = alloc_anon_inode(devmem_vfs_mount->mnt_sb);
--	if (IS_ERR(inode)) {
--		rc = PTR_ERR(inode);
--		pr_err("Cannot allocate inode for /dev/mem: %d\n", rc);
--		simple_release_fs(&devmem_vfs_mount, &devmem_fs_cnt);
--		return rc;
--	}
--
--	/*
--	 * Publish /dev/mem initialized.
--	 * Pairs with smp_load_acquire() in revoke_devmem().
--	 */
--	smp_store_release(&devmem_inode, inode);
--
--	return 0;
--}
--
- static int __init chr_dev_init(void)
- {
- 	int minor;
-@@ -1086,8 +1005,6 @@ static int __init chr_dev_init(void)
- 		 */
- 		if ((minor == DEVPORT_MINOR) && !arch_has_dev_port())
- 			continue;
--		if ((minor == DEVMEM_MINOR) && devmem_init_inode() != 0)
--			continue;
- 
- 		device_create(mem_class, NULL, MKDEV(MEM_MAJOR, minor),
- 			      NULL, devlist[minor].name);
-diff --git a/include/linux/ioport.h b/include/linux/ioport.h
-index 5135d4b86cd6..02a5466245c0 100644
---- a/include/linux/ioport.h
-+++ b/include/linux/ioport.h
-@@ -307,11 +307,7 @@ struct resource *devm_request_free_mem_region(struct device *dev,
- struct resource *request_free_mem_region(struct resource *base,
- 		unsigned long size, const char *name);
- 
--#ifdef CONFIG_IO_STRICT_DEVMEM
--void revoke_devmem(struct resource *res);
--#else
--static inline void revoke_devmem(struct resource *res) { };
--#endif
-+extern struct address_space *iomem_get_mapping(void);
- 
- #endif /* __ASSEMBLY__ */
- #endif	/* _LINUX_IOPORT_H */
-diff --git a/kernel/resource.c b/kernel/resource.c
-index 3ae2f56cc79d..5ecc3187fe2d 100644
---- a/kernel/resource.c
-+++ b/kernel/resource.c
-@@ -18,12 +18,15 @@
- #include <linux/spinlock.h>
- #include <linux/fs.h>
- #include <linux/proc_fs.h>
-+#include <linux/pseudo_fs.h>
- #include <linux/sched.h>
- #include <linux/seq_file.h>
- #include <linux/device.h>
- #include <linux/pfn.h>
- #include <linux/mm.h>
-+#include <linux/mount.h>
- #include <linux/resource_ext.h>
-+#include <uapi/linux/magic.h>
- #include <asm/io.h>
- 
- 
-@@ -1115,6 +1118,58 @@ resource_size_t resource_alignment(struct resource *res)
- 
- static DECLARE_WAIT_QUEUE_HEAD(muxed_resource_wait);
- 
-+static struct inode *iomem_inode;
-+
-+#ifdef CONFIG_IO_STRICT_DEVMEM
-+static void revoke_iomem(struct resource *res)
++static int sysfs_kf_bin_open(struct kernfs_open_file *of)
 +{
-+	/* pairs with smp_store_release() in iomem_init_inode() */
-+	struct inode *inode = smp_load_acquire(&iomem_inode);
++	struct bin_attribute *battr = of->kn->priv;
 +
-+	/*
-+	 * Check that the initialization has completed. Losing the race
-+	 * is ok because it means drivers are claiming resources before
-+	 * the fs_initcall level of init and prevent iomem_get_mapping users
-+	 * from establishing mappings.
-+	 */
-+	if (!inode)
-+		return;
-+
-+	/*
-+	 * The expectation is that the driver has successfully marked
-+	 * the resource busy by this point, so devmem_is_allowed()
-+	 * should start returning false, however for performance this
-+	 * does not iterate the entire resource range.
-+	 */
-+	if (devmem_is_allowed(PHYS_PFN(res->start)) &&
-+	    devmem_is_allowed(PHYS_PFN(res->end))) {
-+		/*
-+		 * *cringe* iomem=relaxed says "go ahead, what's the
-+		 * worst that can happen?"
-+		 */
-+		return;
-+	}
-+
-+	unmap_mapping_range(inode->i_mapping, res->start, resource_size(res), 1);
-+}
-+struct address_space *iomem_get_mapping(void)
-+{
-+	/*
-+	 * This function is only called from file open paths, hence guaranteed
-+	 * that fs_initcalls have completed and no need to check for NULL. But
-+	 * since revoke_iomem can be called before the initcall we still need
-+	 * the barrier to appease checkers.
-+	 */
-+	return smp_load_acquire(&iomem_inode)->i_mapping;
-+}
-+#else
-+static void revoke_iomem(struct resource *res) {}
-+struct address_space *iomem_get_mapping(void)
-+{
-+	return NULL;
-+}
-+#endif
-+
- /**
-  * __request_region - create a new busy resource region
-  * @parent: parent resource descriptor
-@@ -1182,7 +1237,7 @@ struct resource * __request_region(struct resource *parent,
- 	write_unlock(&resource_lock);
- 
- 	if (res && orig_parent == &iomem_resource)
--		revoke_devmem(res);
-+		revoke_iomem(res);
- 
- 	return res;
- }
-@@ -1782,4 +1837,48 @@ static int __init strict_iomem(char *str)
- 	return 1;
- }
- 
-+static int iomem_fs_init_fs_context(struct fs_context *fc)
-+{
-+	return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
-+}
-+
-+static struct file_system_type iomem_fs_type = {
-+	.name		= "iomem",
-+	.owner		= THIS_MODULE,
-+	.init_fs_context = iomem_fs_init_fs_context,
-+	.kill_sb	= kill_anon_super,
-+};
-+
-+static int __init iomem_init_inode(void)
-+{
-+	static struct vfsmount *iomem_vfs_mount;
-+	static int iomem_fs_cnt;
-+	struct inode *inode;
-+	int rc;
-+
-+	rc = simple_pin_fs(&iomem_fs_type, &iomem_vfs_mount, &iomem_fs_cnt);
-+	if (rc < 0) {
-+		pr_err("Cannot mount iomem pseudo filesystem: %d\n", rc);
-+		return rc;
-+	}
-+
-+	inode = alloc_anon_inode(iomem_vfs_mount->mnt_sb);
-+	if (IS_ERR(inode)) {
-+		rc = PTR_ERR(inode);
-+		pr_err("Cannot allocate inode for iomem: %d\n", rc);
-+		simple_release_fs(&iomem_vfs_mount, &iomem_fs_cnt);
-+		return rc;
-+	}
-+
-+	/*
-+	 * Publish iomem revocation inode initialized.
-+	 * Pairs with smp_load_acquire() in revoke_iomem().
-+	 */
-+	smp_store_release(&iomem_inode, inode);
++	if (battr->mapping)
++		of->file->f_mapping = battr->mapping;
 +
 +	return 0;
 +}
 +
-+fs_initcall(iomem_init_inode);
-+
- __setup("iomem=", strict_iomem);
+ void sysfs_notify(struct kobject *kobj, const char *dir, const char *attr)
+ {
+ 	struct kernfs_node *kn = kobj->sd, *tmp;
+@@ -241,6 +251,7 @@ static const struct kernfs_ops sysfs_bin_kfops_mmap = {
+ 	.read		= sysfs_kf_bin_read,
+ 	.write		= sysfs_kf_bin_write,
+ 	.mmap		= sysfs_kf_bin_mmap,
++	.open		= sysfs_kf_bin_open,
+ };
+ 
+ int sysfs_add_file_mode_ns(struct kernfs_node *parent,
+diff --git a/include/linux/sysfs.h b/include/linux/sysfs.h
+index 2caa34c1ca1a..d76a1ddf83a3 100644
+--- a/include/linux/sysfs.h
++++ b/include/linux/sysfs.h
+@@ -164,11 +164,13 @@ __ATTRIBUTE_GROUPS(_name)
+ 
+ struct file;
+ struct vm_area_struct;
++struct address_space;
+ 
+ struct bin_attribute {
+ 	struct attribute	attr;
+ 	size_t			size;
+ 	void			*private;
++	struct address_space	*mapping;
+ 	ssize_t (*read)(struct file *, struct kobject *, struct bin_attribute *,
+ 			char *, loff_t, size_t);
+ 	ssize_t (*write)(struct file *, struct kobject *, struct bin_attribute *,
 -- 
 2.28.0
 
