@@ -2,82 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 528E52A0892
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 15:57:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B0A2A0906
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 16:02:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726624AbgJ3O5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 10:57:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38984 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726178AbgJ3O5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 10:57:41 -0400
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4BCC0613D2
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 07:57:41 -0700 (PDT)
-Received: by mail-ej1-x642.google.com with SMTP id s15so8990128ejf.8
-        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 07:57:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=9fkQXWnoPSypfyxvIrXWSyd1r4Ua0eeDJczOBpIf/BU=;
-        b=AyHr+e/wCRXSgY9lho9sIx2rgsfzJkk1JlYyBFxVz3Caij6Qrcu3MgToy+RwXsliMc
-         aBtcIugtTyagwASFanrc6ciGUMRJj9Q8BSWF2oLZ7mqBIrcLLdes3O6PIIRKX3lkthms
-         ShLXQbKgDROir5yK4rHCTP5AetsQsGEkNupp7ZDhOZi4kU5qm7lsHH8a7UyVS6YdcN/4
-         0uC3RQjH1HTa5BKuQ4fKODTYVSeJqJxxhh2zzsog3PIUlhclrcJZyZ0kUpgesSdQNgRa
-         BgtKrOZ+8AbuLgCJUtSDrKoZFGj8ucPqSn1TzsI6PSwwzfBEIOQ+PaJmMuofC0J4Z+jo
-         XUPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=9fkQXWnoPSypfyxvIrXWSyd1r4Ua0eeDJczOBpIf/BU=;
-        b=BhJbL2L6lg1xGWyZ67qLxK+4BA/PP7S9xxXxlXCY2c2hQ5/i62ZfmJxGpbQnXo1zA8
-         UsstkeaeTi9Q0AAQujaJ2W5YaC7PWqgZpHP3Er0XdDsabUbOyxuq4c84ft/5G7UaafTA
-         2zoD5hbaq2/nv+wyKND3VtWrnGypW84Br4ETSdqNUK1B+rA9SERdkmDFpYpZ/rDkFaLK
-         OZvxxQ+jXmYbjD03rGk/iYQTTxViwcelG8H95WLGWvHJj95D5616KUnPUB9lxc/H2551
-         IchkG5GBhhhHXhmdlBPckpiNcDQ97MAfO6FINVjWsM6p55YDZWFh/cmhA9szyKZKVItr
-         5qMg==
-X-Gm-Message-State: AOAM532PTj3NkgWdA8C9mGOUq6guficuU9iO/QjbeSB3f54D6t8m9aoD
-        8vTkzTe1gp46SkY2jIx6sb7bro9MoUZe7Cve9g==
-X-Google-Smtp-Source: ABdhPJz+2jUZ++rCgdSRpN5VnLxeoFAijez8n+I7DIXhpZMGnBt8cQzSktjyyAw/XiAuwQeR1aY4QsNyMPaswA3/CQs=
-X-Received: by 2002:a17:907:40eb:: with SMTP id nn19mr2969489ejb.240.1604069860009;
- Fri, 30 Oct 2020 07:57:40 -0700 (PDT)
+        id S1727031AbgJ3PB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 11:01:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22093 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726880AbgJ3PB6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 11:01:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604070117;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=HRlXzgPlOlTLzlZheP17qFCHXA+/zGO9eoSgNLbBfiQ=;
+        b=PrGxf9XtP+6ElXABX5fH6t+gLlIISJrU5BIyrq1db0lbNhqvZ/47zSLt5wjrTlUE+R+oD4
+        O8KQ6A2wsr3oOBxwAFBh1atzg8M9cAbdxQeuJAsyjeLjqg9//tE1jjLCv1ShhVzfyUpT4I
+        vEHOWfWWJ4fsxTx8JQhmfenxKN4lOrM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-373-skMTrk0COkScOKr7YEaIdA-1; Fri, 30 Oct 2020 11:01:55 -0400
+X-MC-Unique: skMTrk0COkScOKr7YEaIdA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E375787950C;
+        Fri, 30 Oct 2020 15:01:53 +0000 (UTC)
+Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8C6205B4AA;
+        Fri, 30 Oct 2020 15:01:50 +0000 (UTC)
+Subject: [PATCH] vfio/pci: Implement ioeventfd thread handler for contended
+ memory lock
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     alex.williamson@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        cohuck@redhat.com
+Date:   Fri, 30 Oct 2020 09:01:50 -0600
+Message-ID: <160407008986.9986.83949368176304529.stgit@gimli.home>
+User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-Received: by 2002:a50:f14c:0:0:0:0:0 with HTTP; Fri, 30 Oct 2020 07:57:39
- -0700 (PDT)
-Reply-To: li.anable85@gmail.com
-From:   Liliane Abel <k.griest04@gmail.com>
-Date:   Fri, 30 Oct 2020 15:57:39 +0100
-Message-ID: <CABAZL7nmxsK5sBsi_js8DjnmNJb17UgirGUs5jHLPOpOZkXwXg@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dearest
+The ioeventfd is called under spinlock with interrupts disabled,
+therefore if the memory lock is contended defer code that might
+sleep to a thread context.
 
-Greeting my dear, I am Liliane Abel by name, The only daughter of late
-Mr.Benson Abel. My father is one of the top Politician in our country
-and my mother is a farmers and cocoa merchant when they were both
-alive. After the death of my mother, long ago, my father was
-controlling their business until he was poisoned by his business
-associates which he suffered and died.
+Fixes: bc93b9ae0151 ("vfio-pci: Avoid recursive read-lock usage")
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=209253#c1
+Reported-by: Ian Pilcher <arequipeno@gmail.com>
+Tested-by: Ian Pilcher <arequipeno@gmail.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ drivers/vfio/pci/vfio_pci_rdwr.c |   43 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 35 insertions(+), 8 deletions(-)
 
-Before the death of my father, He told me about (two million five
-hundred thousand united states dollars) which he deposited in the bank
-in Lome-Togo, It was the money he intended to transfer overseas for
-investment before he was poisoned. He also instructed me that I should
-seek for foreign partners in any country of my choice who will assist
-me transfer this money in overseas account where the money will be
-wisely invested.
-I am seeking for your kind assistance in the following ways:  (1) to
-provide a safe bank account into where the money will be transferred
-for investment. (2) To serve as a guardian of this fund since I am a
-girl of 19 years old. (3) To make arrangement for me to come over to
-your country to further my education. This is my reason for writing to
-you. Please if you are willing to assist me I will offer you 25% of
-the total money. Reply if  you are interested
-Best regards.
-Liliane Abel.
+diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+index 9e353c484ace..a0b5fc8e46f4 100644
+--- a/drivers/vfio/pci/vfio_pci_rdwr.c
++++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+@@ -356,34 +356,60 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+ 	return done;
+ }
+ 
+-static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
++static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
++					bool test_mem)
+ {
+-	struct vfio_pci_ioeventfd *ioeventfd = opaque;
+-
+ 	switch (ioeventfd->count) {
+ 	case 1:
+-		vfio_pci_iowrite8(ioeventfd->vdev, ioeventfd->test_mem,
++		vfio_pci_iowrite8(ioeventfd->vdev, test_mem,
+ 				  ioeventfd->data, ioeventfd->addr);
+ 		break;
+ 	case 2:
+-		vfio_pci_iowrite16(ioeventfd->vdev, ioeventfd->test_mem,
++		vfio_pci_iowrite16(ioeventfd->vdev, test_mem,
+ 				   ioeventfd->data, ioeventfd->addr);
+ 		break;
+ 	case 4:
+-		vfio_pci_iowrite32(ioeventfd->vdev, ioeventfd->test_mem,
++		vfio_pci_iowrite32(ioeventfd->vdev, test_mem,
+ 				   ioeventfd->data, ioeventfd->addr);
+ 		break;
+ #ifdef iowrite64
+ 	case 8:
+-		vfio_pci_iowrite64(ioeventfd->vdev, ioeventfd->test_mem,
++		vfio_pci_iowrite64(ioeventfd->vdev, test_mem,
+ 				   ioeventfd->data, ioeventfd->addr);
+ 		break;
+ #endif
+ 	}
++}
++
++static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
++{
++	struct vfio_pci_ioeventfd *ioeventfd = opaque;
++	struct vfio_pci_device *vdev = ioeventfd->vdev;
++
++	if (ioeventfd->test_mem) {
++		if (!down_read_trylock(&vdev->memory_lock))
++			return 1; /* Lock contended, use thread */
++		if (!__vfio_pci_memory_enabled(vdev)) {
++			up_read(&vdev->memory_lock);
++			return 0;
++		}
++	}
++
++	vfio_pci_ioeventfd_do_write(ioeventfd, false);
++
++	if (ioeventfd->test_mem)
++		up_read(&vdev->memory_lock);
+ 
+ 	return 0;
+ }
+ 
++static void vfio_pci_ioeventfd_thread(void *opaque, void *unused)
++{
++	struct vfio_pci_ioeventfd *ioeventfd = opaque;
++
++	vfio_pci_ioeventfd_do_write(ioeventfd, ioeventfd->test_mem);
++}
++
+ long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+ 			uint64_t data, int count, int fd)
+ {
+@@ -457,7 +483,8 @@ long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+ 	ioeventfd->test_mem = vdev->pdev->resource[bar].flags & IORESOURCE_MEM;
+ 
+ 	ret = vfio_virqfd_enable(ioeventfd, vfio_pci_ioeventfd_handler,
+-				 NULL, NULL, &ioeventfd->virqfd, fd);
++				 vfio_pci_ioeventfd_thread, NULL,
++				 &ioeventfd->virqfd, fd);
+ 	if (ret) {
+ 		kfree(ioeventfd);
+ 		goto out_unlock;
+
