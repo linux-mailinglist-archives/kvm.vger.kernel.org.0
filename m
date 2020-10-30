@@ -2,223 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C76D12A020E
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:02:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 524D12A0224
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 11:08:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726318AbgJ3KCg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 06:02:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55072 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725948AbgJ3KCe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 06:02:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604052152;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vu4Swj5ZddyZ5LlCNkDJhXHFRPfGcHPYwnlBLFF6NdI=;
-        b=DifxDmPZHJut5xU6zinPBd6uto8qENjep7gqFPS0+S0ZN5suKivR6s6osTbDEcDM8iNdUo
-        g0HpzIgaO9Cm6RbSReROdOrIJz6QC1++yZyKzwkFjrvYTcqus7vTeSCyUeNw5EqgEhSc2N
-        7rciaWhEu7XghRjDOLO1iXEdQIeBbBg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-HAqy5cglN9SlsxddpB3cEQ-1; Fri, 30 Oct 2020 06:02:29 -0400
-X-MC-Unique: HAqy5cglN9SlsxddpB3cEQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42B53803620;
-        Fri, 30 Oct 2020 10:02:28 +0000 (UTC)
-Received: from [10.72.12.248] (ovpn-12-248.pek2.redhat.com [10.72.12.248])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E34325B4A1;
-        Fri, 30 Oct 2020 10:02:19 +0000 (UTC)
-Subject: Re: [PATCH] vhost/vsock: add IOTLB API support
-To:     Stefano Garzarella <sgarzare@redhat.com>, mst@redhat.com
-Cc:     netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org
-References: <20201029174351.134173-1-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
-Date:   Fri, 30 Oct 2020 18:02:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726171AbgJ3KIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 06:08:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725876AbgJ3KIi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 06:08:38 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B1FC0613D4
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:38 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id w1so5808402wrm.4
+        for <kvm@vger.kernel.org>; Fri, 30 Oct 2020 03:08:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oyVNIJTztKiRHheNSQoUfnLRDya4SJw9IE1Vxl86s7c=;
+        b=Ghb99UprNaKvFH2nWksoxxcjJMtuQ7UBnEvdaqQ2Xt27pEUza+n/3VR0T/qCjTsgrw
+         pnOgvc7R/Us4ABF8mAoJmL0AdohhbtFrlQIZHCXvlxhr3ShQwZsUCHMdPOY4nT2sPNV2
+         3n2sDDQkLekRqiTyUq6gRYR6GdNDanQomtL14=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oyVNIJTztKiRHheNSQoUfnLRDya4SJw9IE1Vxl86s7c=;
+        b=Zg4aU0me6MVSMuMDj0oO9uYBc1qTZ1JndeuC7y/olMwamCd424zhIm9WNKCZKZ88f3
+         VLQtTcnv8zwtHAemNJQbGHCceFV2mCqA97QkmMAfQ2XpEwa43yr7tFyT2bGeNPKs/lt2
+         X25sP99UFsoKZeUU2M2ZOA34bdPWVtsDFU8oBuYQniNV7L5U9lv6XdfiyLxYeTM1+3UW
+         SdjAFdMbfkcuThpoo4diGDCiryCTZZgP2cYL6PwJTQQqFHry/xfR2bkXcB7Im6cLj4Q5
+         lo+5lkFCMR3byy8YBL0ypvfKPjLSYReJ9j7/t6RwVCo52QOI/MHIgV/EWeVNvOCarlsL
+         /DCg==
+X-Gm-Message-State: AOAM533Tu/3mLMGO0GcTSWbndnHJst7wXIlzj0bUwyEqoBJY26WiD8tM
+        k2vRWXA6sfcLeXWExTHtWJi9dw==
+X-Google-Smtp-Source: ABdhPJw0H9VR4VRiDyzFX/cH5pwaV8XuDt6bBdU2cQb4UZ7RdbthoCu2zTbDyFJZiy6ZQIc6vY++Ww==
+X-Received: by 2002:adf:f80a:: with SMTP id s10mr2082685wrp.275.1604052517093;
+        Fri, 30 Oct 2020 03:08:37 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id v189sm4430947wmg.14.2020.10.30.03.08.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Oct 2020 03:08:35 -0700 (PDT)
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+To:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@ffwll.ch>
+Subject: [PATCH v5 00/15] follow_pfn and other iomap races
+Date:   Fri, 30 Oct 2020 11:08:00 +0100
+Message-Id: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20201029174351.134173-1-sgarzare@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi all
 
-On 2020/10/30 上午1:43, Stefano Garzarella wrote:
-> This patch enables the IOTLB API support for vhost-vsock devices,
-> allowing the userspace to emulate an IOMMU for the guest.
->
-> These changes were made following vhost-net, in details this patch:
-> - exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
->    device if the feature is acked
-> - implements VHOST_GET_BACKEND_FEATURES and
->    VHOST_SET_BACKEND_FEATURES ioctls
-> - calls vq_meta_prefetch() before vq processing to prefetch vq
->    metadata address in IOTLB
-> - provides .read_iter, .write_iter, and .poll callbacks for the
->    chardev; they are used by the userspace to exchange IOTLB messages
->
-> This patch was tested with QEMU and a patch applied [1] to fix a
-> simple issue:
->      $ qemu -M q35,accel=kvm,kernel-irqchip=split \
->             -drive file=fedora.qcow2,format=qcow2,if=virtio \
->             -device intel-iommu,intremap=on \
->             -device vhost-vsock-pci,guest-cid=3,iommu_platform=on
+Another update of my patch series to clamp down a bunch of races and gaps
+around follow_pfn and other access to iomem mmaps. Previous version:
 
+v1: https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
+v2: https://lore.kernel.org/dri-devel/20201009075934.3509076-1-daniel.vetter@ffwll.ch
+v3: https://lore.kernel.org/dri-devel/20201021085655.1192025-1-daniel.vetter@ffwll.ch/
+v4: https://lore.kernel.org/dri-devel/20201026105818.2585306-1-daniel.vetter@ffwll.ch/
 
-Patch looks good, but a question:
+And the discussion that sparked this journey:
 
-It looks to me you don't enable ATS which means vhost won't get any 
-invalidation request or did I miss anything?
+https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
 
-Thanks
+Changes in v5:
+- Tomasz found some issues in the media patches
+- Polish suggested by Christoph for the unsafe_follow_pfn patch
 
+Changes in v4:
+- Drop the s390 patch, that was very stand-alone and now queued up to land
+  through s390 trees.
+- Comment polish per Dan's review.
 
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg09077.html
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->   drivers/vhost/vsock.c | 68 +++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 65 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index a483cec31d5c..5e78fb719602 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -30,7 +30,12 @@
->   #define VHOST_VSOCK_PKT_WEIGHT 256
->   
->   enum {
-> -	VHOST_VSOCK_FEATURES = VHOST_FEATURES,
-> +	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
-> +			       (1ULL << VIRTIO_F_ACCESS_PLATFORM)
-> +};
-> +
-> +enum {
-> +	VHOST_VSOCK_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
->   };
->   
->   /* Used to track all the vhost_vsock instances on the system. */
-> @@ -94,6 +99,9 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->   	if (!vhost_vq_get_backend(vq))
->   		goto out;
->   
-> +	if (!vq_meta_prefetch(vq))
-> +		goto out;
-> +
->   	/* Avoid further vmexits, we're already processing the virtqueue */
->   	vhost_disable_notify(&vsock->dev, vq);
->   
-> @@ -449,6 +457,9 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
->   	if (!vhost_vq_get_backend(vq))
->   		goto out;
->   
-> +	if (!vq_meta_prefetch(vq))
-> +		goto out;
-> +
->   	vhost_disable_notify(&vsock->dev, vq);
->   	do {
->   		u32 len;
-> @@ -766,8 +777,12 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
->   	mutex_lock(&vsock->dev.mutex);
->   	if ((features & (1 << VHOST_F_LOG_ALL)) &&
->   	    !vhost_log_access_ok(&vsock->dev)) {
-> -		mutex_unlock(&vsock->dev.mutex);
-> -		return -EFAULT;
-> +		goto err;
-> +	}
-> +
-> +	if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
-> +		if (vhost_init_device_iotlb(&vsock->dev, true))
-> +			goto err;
->   	}
->   
->   	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
-> @@ -778,6 +793,10 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
->   	}
->   	mutex_unlock(&vsock->dev.mutex);
->   	return 0;
-> +
-> +err:
-> +	mutex_unlock(&vsock->dev.mutex);
-> +	return -EFAULT;
->   }
->   
->   static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
-> @@ -811,6 +830,18 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
->   		if (copy_from_user(&features, argp, sizeof(features)))
->   			return -EFAULT;
->   		return vhost_vsock_set_features(vsock, features);
-> +	case VHOST_GET_BACKEND_FEATURES:
-> +		features = VHOST_VSOCK_BACKEND_FEATURES;
-> +		if (copy_to_user(argp, &features, sizeof(features)))
-> +			return -EFAULT;
-> +		return 0;
-> +	case VHOST_SET_BACKEND_FEATURES:
-> +		if (copy_from_user(&features, argp, sizeof(features)))
-> +			return -EFAULT;
-> +		if (features & ~VHOST_VSOCK_BACKEND_FEATURES)
-> +			return -EOPNOTSUPP;
-> +		vhost_set_backend_features(&vsock->dev, features);
-> +		return 0;
->   	default:
->   		mutex_lock(&vsock->dev.mutex);
->   		r = vhost_dev_ioctl(&vsock->dev, ioctl, argp);
-> @@ -823,6 +854,34 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
->   	}
->   }
->   
-> +static ssize_t vhost_vsock_chr_read_iter(struct kiocb *iocb, struct iov_iter *to)
-> +{
-> +	struct file *file = iocb->ki_filp;
-> +	struct vhost_vsock *vsock = file->private_data;
-> +	struct vhost_dev *dev = &vsock->dev;
-> +	int noblock = file->f_flags & O_NONBLOCK;
-> +
-> +	return vhost_chr_read_iter(dev, to, noblock);
-> +}
-> +
-> +static ssize_t vhost_vsock_chr_write_iter(struct kiocb *iocb,
-> +					struct iov_iter *from)
-> +{
-> +	struct file *file = iocb->ki_filp;
-> +	struct vhost_vsock *vsock = file->private_data;
-> +	struct vhost_dev *dev = &vsock->dev;
-> +
-> +	return vhost_chr_write_iter(dev, from);
-> +}
-> +
-> +static __poll_t vhost_vsock_chr_poll(struct file *file, poll_table *wait)
-> +{
-> +	struct vhost_vsock *vsock = file->private_data;
-> +	struct vhost_dev *dev = &vsock->dev;
-> +
-> +	return vhost_chr_poll(file, dev, wait);
-> +}
-> +
->   static const struct file_operations vhost_vsock_fops = {
->   	.owner          = THIS_MODULE,
->   	.open           = vhost_vsock_dev_open,
-> @@ -830,6 +889,9 @@ static const struct file_operations vhost_vsock_fops = {
->   	.llseek		= noop_llseek,
->   	.unlocked_ioctl = vhost_vsock_dev_ioctl,
->   	.compat_ioctl   = compat_ptr_ioctl,
-> +	.read_iter      = vhost_vsock_chr_read_iter,
-> +	.write_iter     = vhost_vsock_chr_write_iter,
-> +	.poll           = vhost_vsock_chr_poll,
->   };
->   
->   static struct miscdevice vhost_vsock_misc = {
+Changes in v3:
+- Bunch of polish all over, no functional changes aside from one barrier
+  in the resource code, for consistency.
+- A few more r-b tags.
+
+Changes in v2:
+- tons of small polish&fixes all over, thanks to all the reviewers who
+  spotted issues
+- I managed to test at least the generic_access_phys and pci mmap revoke
+  stuff with a few gdb sessions using our i915 debug tools (hence now also
+  the drm/i915 patch to properly request all the pci bar regions)
+- reworked approach for the pci mmap revoke: Infrastructure moved into
+  kernel/resource.c, address_space mapping is now set up at open time for
+  everyone (which required some sysfs changes). Does indeed look a lot
+  cleaner and a lot less invasive than I feared at first.
+
+I feel like this is ready for some wider soaking. Since the remaining bits
+are all kinda connnected probably simplest if it all goes through -mm.
+
+Cheers, Daniel
+
+Daniel Vetter (15):
+  drm/exynos: Stop using frame_vector helpers
+  drm/exynos: Use FOLL_LONGTERM for g2d cmdlists
+  misc/habana: Stop using frame_vector helpers
+  misc/habana: Use FOLL_LONGTERM for userptr
+  mm/frame-vector: Use FOLL_LONGTERM
+  media: videobuf2: Move frame_vector into media subsystem
+  mm: Close race in generic_access_phys
+  mm: Add unsafe_follow_pfn
+  media/videbuf1|2: Mark follow_pfn usage as unsafe
+  vfio/type1: Mark follow_pfn as unsafe
+  PCI: Obey iomem restrictions for procfs mmap
+  /dev/mem: Only set filp->f_mapping
+  resource: Move devmem revoke code to resource framework
+  sysfs: Support zapping of binary attr mmaps
+  PCI: Revoke mappings like devmem
+
+ drivers/char/mem.c                            |  86 +--------------
+ drivers/gpu/drm/exynos/Kconfig                |   1 -
+ drivers/gpu/drm/exynos/exynos_drm_g2d.c       |  48 ++++-----
+ drivers/media/common/videobuf2/Kconfig        |   1 -
+ drivers/media/common/videobuf2/Makefile       |   1 +
+ .../media/common/videobuf2}/frame_vector.c    |  57 ++++------
+ .../media/common/videobuf2/videobuf2-memops.c |   3 +-
+ drivers/media/platform/omap/Kconfig           |   1 -
+ drivers/media/v4l2-core/videobuf-dma-contig.c |   2 +-
+ drivers/misc/habanalabs/Kconfig               |   1 -
+ drivers/misc/habanalabs/common/habanalabs.h   |   6 +-
+ drivers/misc/habanalabs/common/memory.c       |  50 ++++-----
+ drivers/pci/pci-sysfs.c                       |   4 +
+ drivers/pci/proc.c                            |   6 ++
+ drivers/vfio/vfio_iommu_type1.c               |   4 +-
+ fs/sysfs/file.c                               |  11 ++
+ include/linux/ioport.h                        |   6 +-
+ include/linux/mm.h                            |  47 +-------
+ include/linux/sysfs.h                         |   2 +
+ include/media/frame_vector.h                  |  47 ++++++++
+ include/media/videobuf2-core.h                |   1 +
+ kernel/resource.c                             | 101 +++++++++++++++++-
+ mm/Kconfig                                    |   3 -
+ mm/Makefile                                   |   1 -
+ mm/memory.c                                   |  80 +++++++++++++-
+ mm/nommu.c                                    |  27 ++++-
+ security/Kconfig                              |  13 +++
+ 27 files changed, 360 insertions(+), 250 deletions(-)
+ rename {mm => drivers/media/common/videobuf2}/frame_vector.c (84%)
+ create mode 100644 include/media/frame_vector.h
+
+-- 
+2.28.0
 
