@@ -2,31 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E9992A0DD2
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:52:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32B042A0E1B
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 19:54:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727389AbgJ3Swd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 14:52:33 -0400
-Received: from mga12.intel.com ([192.55.52.136]:35185 "EHLO mga12.intel.com"
+        id S1727307AbgJ3Swb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 14:52:31 -0400
+Received: from mga14.intel.com ([192.55.52.115]:56189 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726297AbgJ3Swa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726317AbgJ3Swa (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 30 Oct 2020 14:52:30 -0400
-IronPort-SDR: c8C4y+7gdM2Wn+cFte6Js/0UEpgIcZyKUS0rg6Rp5cJL2QKjhhmhCYMGn7xdXU/MTK3GCcqQo6
- L1pI79aH1pvQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="147936863"
+IronPort-SDR: 7DLXuMND1a8Kh351f0+mk051JOcQ/Pcitxa90weE01mjgO3WvOvqUIxxwy4nWQV/BiFpB81qko
+ 8H5dOyoDS0Gg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9790"; a="167868421"
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="147936863"
+   d="scan'208";a="167868421"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:39 -0700
-IronPort-SDR: CCoamM27cI/mm2k/OA1RJJpAX7t21eMH6nG1FMiRF9gZSd7zTfdtQ858C9hTnAeNnrVT0Ot6qh
- q4t4dS8FVDSw==
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:46 -0700
+IronPort-SDR: wljAkm/RmAi+ReQrhytFmoF1qSKrwyD+ShKtCFX8Ps6kt5OZmxQcsvbZ2SQ0yBJsdAQQOYlZo2
+ Cr65KqZ3lwvA==
 X-IronPort-AV: E=Sophos;i="5.77,434,1596524400"; 
-   d="scan'208";a="527210084"
+   d="scan'208";a="361933604"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:38 -0700
-Subject: [PATCH v4 07/17] dmaengine: idxd: add IMS support in base driver
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2020 11:51:45 -0700
+Subject: [PATCH v4 08/17] dmaengine: idxd: add device support functions in
+ prep for mdev
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         bhelgaas@google.com, tglx@linutronix.de,
@@ -40,8 +41,8 @@ To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Fri, 30 Oct 2020 11:51:38 -0700
-Message-ID: <160408389855.912050.5169538738792960557.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 30 Oct 2020 11:51:44 -0700
+Message-ID: <160408390489.912050.13504232395876662339.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
 References: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
@@ -52,216 +53,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation for support of VFIO mediated device for idxd driver, the
-enabling for Interrupt Message Store (IMS) interrupts is added for the idxd
-With IMS support the idxd driver can dynamically allocate interrupts on a
-per mdev basis based on how many IMS vectors that are mapped to the mdev
-device. This commit only provides the support functions in the base driver
-and not the VFIO mdev code utilization.
-
-The commit has some portal related changes. A "portal" is a special
-location within the MMIO BAR2 of the DSA device where descriptors are
-submitted via the CPU command MOVDIR64B or ENQCMD(S). The offset for the
-portal address determines whether the submitted descriptor is for MSI-X
-or IMS notification.
-
-See Intel SIOV spec for more details:
-https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
+Add device support helper functions in preparation of adding VFIO
+mdev support.
 
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- Documentation/ABI/stable/sysfs-driver-dma-idxd |    6 ++++++
- drivers/dma/idxd/cdev.c                        |    4 ++--
- drivers/dma/idxd/idxd.h                        |   13 +++++++++----
- drivers/dma/idxd/init.c                        |   19 +++++++++++++++++++
- drivers/dma/idxd/submit.c                      |   10 ++++++++--
- drivers/dma/idxd/sysfs.c                       |    9 +++++++++
- 6 files changed, 53 insertions(+), 8 deletions(-)
+ drivers/dma/idxd/device.c    |   61 ++++++++++++++++++++++++++++++++++++++++++
+ drivers/dma/idxd/idxd.h      |    4 +++
+ drivers/dma/idxd/registers.h |    3 +-
+ 3 files changed, 67 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
-index 5ea81ffd3c1a..ed5aeecf7015 100644
---- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
-+++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
-@@ -129,6 +129,12 @@ KernelVersion:	5.10.0
- Contact:	dmaengine@vger.kernel.org
- Description:	The last executed device administrative command's status/error.
- 
-+What:		/sys/bus/dsa/devices/dsa<m>/ims_size
-+Date:		Oct 15, 2020
-+KernelVersion:	5.11.0
-+Contact:	dmaengine@vger.kernel.org
-+Description:	The total number of vectors available for Interrupt Message Store.
-+
- What:		/sys/bus/dsa/devices/wq<m>.<n>/block_on_fault
- Date:		Oct 27, 2020
- KernelVersion:	5.11.0
-diff --git a/drivers/dma/idxd/cdev.c b/drivers/dma/idxd/cdev.c
-index 010b820d8f74..b774bf336347 100644
---- a/drivers/dma/idxd/cdev.c
-+++ b/drivers/dma/idxd/cdev.c
-@@ -204,8 +204,8 @@ static int idxd_cdev_mmap(struct file *filp, struct vm_area_struct *vma)
- 		return rc;
- 
- 	vma->vm_flags |= VM_DONTCOPY;
--	pfn = (base + idxd_get_wq_portal_full_offset(wq->id,
--				IDXD_PORTAL_LIMITED)) >> PAGE_SHIFT;
-+	pfn = (base + idxd_get_wq_portal_full_offset(wq->id, IDXD_PORTAL_LIMITED,
-+						     IDXD_IRQ_MSIX)) >> PAGE_SHIFT;
- 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
- 	vma->vm_private_data = ctx;
- 
-diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index a506a16c83ee..549426bfb443 100644
---- a/drivers/dma/idxd/idxd.h
-+++ b/drivers/dma/idxd/idxd.h
-@@ -154,6 +154,7 @@ enum idxd_device_flag {
- 	IDXD_FLAG_CONFIGURABLE = 0,
- 	IDXD_FLAG_CMD_RUNNING,
- 	IDXD_FLAG_PASID_ENABLED,
-+	IDXD_FLAG_SIOV_SUPPORTED,
- };
- 
- struct idxd_device {
-@@ -181,6 +182,7 @@ struct idxd_device {
- 
- 	int num_groups;
- 
-+	u32 ims_offset;
- 	u32 msix_perm_offset;
- 	u32 wqcfg_offset;
- 	u32 grpcfg_offset;
-@@ -188,6 +190,7 @@ struct idxd_device {
- 
- 	u64 max_xfer_bytes;
- 	u32 max_batch_size;
-+	int ims_size;
- 	int max_groups;
- 	int max_engines;
- 	int max_tokens;
-@@ -262,15 +265,17 @@ enum idxd_interrupt_type {
- 	IDXD_IRQ_IMS,
- };
- 
--static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot)
-+static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot,
-+					    enum idxd_interrupt_type irq_type)
- {
--	return prot * 0x1000;
-+	return prot * 0x1000 + irq_type * 0x2000;
+diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
+index a9ae970db0a4..8aff07b1acb4 100644
+--- a/drivers/dma/idxd/device.c
++++ b/drivers/dma/idxd/device.c
+@@ -287,6 +287,30 @@ void idxd_wq_unmap_portal(struct idxd_wq *wq)
+ 	devm_iounmap(dev, wq->portal);
  }
  
- static inline int idxd_get_wq_portal_full_offset(int wq_id,
--						 enum idxd_portal_prot prot)
-+						 enum idxd_portal_prot prot,
-+						 enum idxd_interrupt_type irq_type)
- {
--	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot);
-+	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot, irq_type);
- }
- 
- static inline void idxd_set_type(struct idxd_device *idxd)
-diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
-index c136216e19e8..4a21c2a17a62 100644
---- a/drivers/dma/idxd/init.c
-+++ b/drivers/dma/idxd/init.c
-@@ -16,6 +16,7 @@
- #include <linux/idr.h>
- #include <linux/intel-svm.h>
- #include <linux/iommu.h>
-+#include <linux/pci-siov.h>
- #include <uapi/linux/idxd.h>
- #include <linux/dmaengine.h>
- #include "../dmaengine.h"
-@@ -244,10 +245,27 @@ static void idxd_read_table_offsets(struct idxd_device *idxd)
- 	dev_dbg(dev, "IDXD Work Queue Config Offset: %#x\n", idxd->wqcfg_offset);
- 	idxd->msix_perm_offset = offsets.msix_perm * IDXD_TABLE_MULT;
- 	dev_dbg(dev, "IDXD MSIX Permission Offset: %#x\n", idxd->msix_perm_offset);
-+	idxd->ims_offset = offsets.ims * IDXD_TABLE_MULT;
-+	dev_dbg(dev, "IDXD IMS Offset: %#x\n", idxd->ims_offset);
- 	idxd->perfmon_offset = offsets.perfmon * IDXD_TABLE_MULT;
- 	dev_dbg(dev, "IDXD Perfmon Offset: %#x\n", idxd->perfmon_offset);
- }
- 
-+static void idxd_check_siov(struct idxd_device *idxd)
++int idxd_wq_abort(struct idxd_wq *wq)
 +{
-+	struct pci_dev *pdev = idxd->pdev;
++	struct idxd_device *idxd = wq->idxd;
++	struct device *dev = &idxd->pdev->dev;
++	u32 operand, status;
 +
-+	if (pci_ims_supported(idxd->pdev) && idxd->hw.gen_cap.max_ims_mult) {
-+		idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
-+		dev_dbg(&pdev->dev, "IMS size: %u\n", idxd->ims_size);
-+		set_bit(IDXD_FLAG_SIOV_SUPPORTED, &idxd->flags);
-+		dev_dbg(&pdev->dev, "IMS supported for device\n");
-+		return;
++	dev_dbg(dev, "Abort WQ %d\n", wq->id);
++	if (wq->state != IDXD_WQ_ENABLED) {
++		dev_dbg(dev, "WQ %d not active\n", wq->id);
++		return -ENXIO;
 +	}
 +
-+	dev_dbg(&pdev->dev, "SIOV unsupported for device\n");
++	operand = BIT(wq->id % 16) | ((wq->id / 16) << 16);
++	dev_dbg(dev, "cmd: %u operand: %#x\n", IDXD_CMD_ABORT_WQ, operand);
++	idxd_cmd_exec(idxd, IDXD_CMD_ABORT_WQ, operand, &status);
++	if (status != IDXD_CMDSTS_SUCCESS) {
++		dev_dbg(dev, "WQ abort failed: %#x\n", status);
++		return -ENXIO;
++	}
++
++	dev_dbg(dev, "WQ %d aborted\n", wq->id);
++	return 0;
 +}
 +
- static void idxd_read_caps(struct idxd_device *idxd)
+ int idxd_wq_set_pasid(struct idxd_wq *wq, int pasid)
  {
- 	struct device *dev = &idxd->pdev->dev;
-@@ -266,6 +284,7 @@ static void idxd_read_caps(struct idxd_device *idxd)
- 	dev_dbg(dev, "max xfer size: %llu bytes\n", idxd->max_xfer_bytes);
- 	idxd->max_batch_size = 1U << idxd->hw.gen_cap.max_batch_shift;
- 	dev_dbg(dev, "max batch size: %u\n", idxd->max_batch_size);
-+	idxd_check_siov(idxd);
- 	if (idxd->hw.gen_cap.config_en)
- 		set_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags);
- 
-diff --git a/drivers/dma/idxd/submit.c b/drivers/dma/idxd/submit.c
-index cdea5d37ef24..f76d154d1dbd 100644
---- a/drivers/dma/idxd/submit.c
-+++ b/drivers/dma/idxd/submit.c
-@@ -30,7 +30,13 @@ static struct idxd_desc *__get_desc(struct idxd_wq *wq, int idx, int cpu)
- 		desc->hw->int_handle = wq->vec_ptr;
- 	} else {
- 		desc->vector = wq->vec_ptr;
--		desc->hw->int_handle = idxd->int_handles[desc->vector];
-+		/*
-+		 * int_handles are only for descriptor completion. However for device
-+		 * MSIX enumeration, vec 0 is used for misc interrupts. Therefore even
-+		 * though we are rotating through 1...N for descriptor interrupts, we
-+		 * need to acqurie the int_handles from 0..N-1.
-+		 */
-+		desc->hw->int_handle = idxd->int_handles[desc->vector - 1];
+ 	struct idxd_device *idxd = wq->idxd;
+@@ -366,6 +390,32 @@ void idxd_wq_disable_cleanup(struct idxd_wq *wq)
  	}
- 
- 	return desc;
-@@ -91,7 +97,7 @@ int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc)
- 	if (idxd->state != IDXD_DEV_ENABLED)
- 		return -EIO;
- 
--	portal = wq->portal + idxd_get_wq_portal_offset(IDXD_PORTAL_LIMITED);
-+	portal = wq->portal + idxd_get_wq_portal_offset(IDXD_PORTAL_LIMITED, IDXD_IRQ_MSIX);
- 
- 	/*
- 	 * The wmb() flushes writes to coherent DMA data before
-diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
-index 304eb2cf532e..17f13ebae028 100644
---- a/drivers/dma/idxd/sysfs.c
-+++ b/drivers/dma/idxd/sysfs.c
-@@ -1353,6 +1353,14 @@ static ssize_t numa_node_show(struct device *dev,
  }
- static DEVICE_ATTR_RO(numa_node);
  
-+static ssize_t ims_size_show(struct device *dev, struct device_attribute *attr, char *buf)
++void idxd_wq_setup_pasid(struct idxd_wq *wq, int pasid)
 +{
-+	struct idxd_device *idxd = container_of(dev, struct idxd_device, conf_dev);
++	struct idxd_device *idxd = wq->idxd;
++	int offset;
 +
-+	return sprintf(buf, "%u\n", idxd->ims_size);
++	lockdep_assert_held(&idxd->dev_lock);
++
++	/* PASID fields are 8 bytes into the WQCFG register */
++	offset = WQCFG_OFFSET(idxd, wq->id, WQCFG_PASID_IDX);
++	wq->wqcfg->pasid = pasid;
++	iowrite32(wq->wqcfg->bits[WQCFG_PASID_IDX], idxd->reg_base + offset);
 +}
-+static DEVICE_ATTR_RO(ims_size);
 +
- static ssize_t max_batch_size_show(struct device *dev,
- 				   struct device_attribute *attr, char *buf)
++void idxd_wq_setup_priv(struct idxd_wq *wq, int priv)
++{
++	struct idxd_device *idxd = wq->idxd;
++	int offset;
++
++	lockdep_assert_held(&idxd->dev_lock);
++
++	/* priv field is 8 bytes into the WQCFG register */
++	offset = WQCFG_OFFSET(idxd, wq->id, WQCFG_PRIV_IDX);
++	wq->wqcfg->priv = !!priv;
++	iowrite32(wq->wqcfg->bits[WQCFG_PRIV_IDX], idxd->reg_base + offset);
++}
++
+ /* Device control bits */
+ static inline bool idxd_is_enabled(struct idxd_device *idxd)
  {
-@@ -1548,6 +1556,7 @@ static struct attribute *idxd_device_attributes[] = {
- 	&dev_attr_max_work_queues_size.attr,
- 	&dev_attr_max_engines.attr,
- 	&dev_attr_numa_node.attr,
-+	&dev_attr_ims_size.attr,
- 	&dev_attr_max_batch_size.attr,
- 	&dev_attr_max_transfer_size.attr,
- 	&dev_attr_op_cap.attr,
+@@ -532,6 +582,17 @@ void idxd_device_drain_pasid(struct idxd_device *idxd, int pasid)
+ 	dev_dbg(dev, "pasid %d drained\n", pasid);
+ }
+ 
++void idxd_device_abort_pasid(struct idxd_device *idxd, int pasid)
++{
++	struct device *dev = &idxd->pdev->dev;
++	u32 operand;
++
++	operand = pasid;
++	dev_dbg(dev, "cmd: %u operand: %#x\n", IDXD_CMD_ABORT_PASID, operand);
++	idxd_cmd_exec(idxd, IDXD_CMD_ABORT_PASID, operand, NULL);
++	dev_dbg(dev, "pasid %d aborted\n", pasid);
++}
++
+ int idxd_device_request_int_handle(struct idxd_device *idxd, int idx, int *handle,
+ 				   enum idxd_interrupt_type irq_type)
+ {
+diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
+index 549426bfb443..eb8552d32a0a 100644
+--- a/drivers/dma/idxd/idxd.h
++++ b/drivers/dma/idxd/idxd.h
+@@ -331,6 +331,7 @@ void idxd_device_cleanup(struct idxd_device *idxd);
+ int idxd_device_config(struct idxd_device *idxd);
+ void idxd_device_wqs_clear_state(struct idxd_device *idxd);
+ void idxd_device_drain_pasid(struct idxd_device *idxd, int pasid);
++void idxd_device_abort_pasid(struct idxd_device *idxd, int pasid);
+ int idxd_device_load_config(struct idxd_device *idxd);
+ int idxd_device_request_int_handle(struct idxd_device *idxd, int idx, int *handle,
+ 				   enum idxd_interrupt_type irq_type);
+@@ -348,6 +349,9 @@ void idxd_wq_unmap_portal(struct idxd_wq *wq);
+ void idxd_wq_disable_cleanup(struct idxd_wq *wq);
+ int idxd_wq_set_pasid(struct idxd_wq *wq, int pasid);
+ int idxd_wq_disable_pasid(struct idxd_wq *wq);
++int idxd_wq_abort(struct idxd_wq *wq);
++void idxd_wq_setup_pasid(struct idxd_wq *wq, int pasid);
++void idxd_wq_setup_priv(struct idxd_wq *wq, int priv);
+ 
+ /* submission */
+ int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc);
+diff --git a/drivers/dma/idxd/registers.h b/drivers/dma/idxd/registers.h
+index d02fd59a8e39..acc071df48eb 100644
+--- a/drivers/dma/idxd/registers.h
++++ b/drivers/dma/idxd/registers.h
+@@ -345,7 +345,8 @@ union wqcfg {
+ 	u32 bits[8];
+ } __packed;
+ 
+-#define WQCFG_PASID_IDX                2
++#define WQCFG_PASID_IDX		2
++#define WQCFG_PRIV_IDX		2
+ 
+ /*
+  * This macro calculates the offset into the WQCFG register
 
 
