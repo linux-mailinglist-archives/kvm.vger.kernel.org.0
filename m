@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C076A2A0B59
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 17:40:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 638AA2A0B5A
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 17:40:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727055AbgJ3QkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 12:40:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55982 "EHLO mail.kernel.org"
+        id S1727086AbgJ3Qk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 12:40:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56040 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726072AbgJ3QkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 12:40:25 -0400
+        id S1726072AbgJ3Qk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 12:40:26 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E4E4520724;
-        Fri, 30 Oct 2020 16:40:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9F2922075E;
+        Fri, 30 Oct 2020 16:40:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1604076025;
-        bh=146kMw0dp/xuQdySBVEx7K+SEqVKrXEjw85Z2vaNF6o=;
+        bh=FdAucMQjtKAFDFTUjWlGgj+oR3wWcmsUGvauZ/aCLXI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=zuDSqvuWyEvS7ReTqUSkBV+8dFmeMhjNtlAUubTcoPCHo7tJNzTNkHVrUZ/Op6q65
-         mtUaJ8LywIFrooTFNyhk04NJFVos0/ZtILwTyVsKjcwQIzb1ugnS7O8y8mSkJIgDjG
-         G0j4/ZOBQiN4UX63n2kX3b5u1w6WcxPVWKW/vuAI=
+        b=vNUiX9jU9UztYq5wLUe6zn2MN5nLk0yeP/8ipFoFw1zVxMOrygf15l2IOMLWaVI4L
+         fBFj13z2VYBAxprsTDd+1S2k3kvbKQ3RjeelPPathZusPRrA2BgT2FmDipr+SDzkfO
+         ww+Pzj/t2jJtf0WWc49XNnaiUiop/E+m723XE/l4=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1kYXRv-005noK-1z; Fri, 30 Oct 2020 16:40:23 +0000
+        id 1kYXRv-005noK-QG; Fri, 30 Oct 2020 16:40:23 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     David Brazdil <dbrazdil@google.com>, Gavin Shan <gshan@redhat.com>,
@@ -42,9 +42,9 @@ Cc:     David Brazdil <dbrazdil@google.com>, Gavin Shan <gshan@redhat.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 01/12] KVM: arm64: Don't corrupt tpidr_el2 on failed HVC call
-Date:   Fri, 30 Oct 2020 16:40:06 +0000
-Message-Id: <20201030164017.244287-2-maz@kernel.org>
+Subject: [PATCH 02/12] KVM: arm64: Remove leftover kern_hyp_va() in nVHE TLB invalidation
+Date:   Fri, 30 Oct 2020 16:40:07 +0000
+Message-Id: <20201030164017.244287-3-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201030164017.244287-1-maz@kernel.org>
 References: <20201030164017.244287-1-maz@kernel.org>
@@ -58,62 +58,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The hyp-init code starts by stashing a register in TPIDR_EL2
-in in order to free a register. This happens no matter if the
-HVC call is legal or not.
+The new calling convention says that pointers coming from the SMCCC
+interface are turned into their HYP version in the host HVC handler.
+However, there is still a stray kern_hyp_va() in the TLB invalidation
+code, which could result in a corrupted pointer.
 
-Although nothing wrong seems to come out of it, it feels odd
-to alter the EL2 state for something that eventually returns
-an error.
+Drop the spurious conversion.
 
-Instead, use the fact that we know exactly which bits of the
-__kvm_hyp_init call are non-zero to perform the check with
-a series of EOR/ROR instructions, combined with a build-time
-check that the value is the one we expect.
-
+Fixes: a071261d9318 ("KVM: arm64: nVHE: Fix pointers during SMCCC convertion")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20201026095116.72051-2-maz@kernel.org
+Link: https://lore.kernel.org/r/20201026095116.72051-3-maz@kernel.org
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-init.S | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/tlb.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 47224dc62c51..b11a9d7db677 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -57,16 +57,25 @@ __do_hyp_init:
- 	cmp	x0, #HVC_STUB_HCALL_NR
- 	b.lo	__kvm_handle_stub_hvc
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index 544bca3072b7..ad212d8fa417 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -121,7 +121,6 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	struct tlb_inv_context cxt;
  
--	/* Set tpidr_el2 for use by HYP to free a register */
--	msr	tpidr_el2, x2
--
--	mov	x2, #KVM_HOST_SMCCC_FUNC(__kvm_hyp_init)
--	cmp	x0, x2
--	b.eq	1f
-+	// We only actively check bits [24:31], and everything
-+	// else has to be zero, which we check at build time.
-+#if (KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) & 0xFFFFFFFF00FFFFFF)
-+#error Unexpected __KVM_HOST_SMCCC_FUNC___kvm_hyp_init value
-+#endif
-+
-+	ror	x0, x0, #24
-+	eor	x0, x0, #((KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) >> 24) & 0xF)
-+	ror	x0, x0, #4
-+	eor	x0, x0, #((KVM_HOST_SMCCC_FUNC(__kvm_hyp_init) >> 28) & 0xF)
-+	cbz	x0, 1f
- 	mov	x0, #SMCCC_RET_NOT_SUPPORTED
- 	eret
+ 	/* Switch to requested VMID */
+-	mmu = kern_hyp_va(mmu);
+ 	__tlb_switch_to_guest(mmu, &cxt);
  
--1:	phys_to_ttbr x0, x1
-+1:
-+	/* Set tpidr_el2 for use by HYP to free a register */
-+	msr	tpidr_el2, x2
-+
-+	phys_to_ttbr x0, x1
- alternative_if ARM64_HAS_CNP
- 	orr	x0, x0, #TTBR_CNP_BIT
- alternative_else_nop_endif
+ 	__tlbi(vmalle1);
 -- 
 2.28.0
 
