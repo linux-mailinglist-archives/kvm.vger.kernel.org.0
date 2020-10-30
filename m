@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B59C52A07C0
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 15:23:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A58AE2A07CF
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 15:27:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbgJ3OXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 10:23:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32990 "EHLO
+        id S1726604AbgJ3O1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 10:27:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4780 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726703AbgJ3OXe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 10:23:34 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09UE3QG7181274;
-        Fri, 30 Oct 2020 10:23:34 -0400
+        by vger.kernel.org with ESMTP id S1725939AbgJ3O1A (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 10:27:00 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09UE2RJf034729;
+        Fri, 30 Oct 2020 10:26:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=PszvS7NwmYlMCBP+5OgD0wEfXFMY6qIrPhAYLnGneWk=;
- b=Muq+GbNvOXaP0b8fqhFHt0K1rvver+CNo1yBX2rd141ixrBcgEI5LFPQG6Nn0ZhpKJaK
- 4KszB/YpIP3GTOSsZp97VHs183O0G5bXQHUwNezr4HSr6VpqlB379ECLXhbSXRZK66UZ
- 4L7cTMVom1aOZSY/QK2Tqr+F45YcDvKHslyrF8siJ7M7UZFeSUBkHpNMIkqrXF9Zy+kq
- 4hk7HqBBfBsjbSpJqT7vVrfRYfrxJGIGRpBjTaOQkArkI8kQPU5XYeSim6mSO/K+li1A
- JUmc1Hvw7xbHcJ9gpZ69tyRZS/4jLuWm0nAVbm6mBpuLCw9TQXxZ0BNwRG1LmnL8FLGo 8A== 
+ bh=pv0cWqsUqp/obQWTxV1C8MmuRZM38vPedviF9C7ye64=;
+ b=pNR6JQMOXJ96Mdu4ev1SBTPbsqnW8cwaUECdz5+D0MiZYfS8/7si3sr5G1fW/KEZsg1p
+ 7JJGVnoF8ZdoYALE0XgbBYDNXQnFvNHR5upO0vdbFQ45IbuDjfbaRbLZqSGwLe1ZY9ZZ
+ GLAWBsYLvgpxQcrkq8Hd7ULreW5yBtlmmvm3xjPcei1KuP/MX6BDD+B0vsZmyQPOsHZA
+ Ce2FYTSuihG83FND5sT3bNZdam6f1XkIqYzq2icKKNNiUT9AyZVQbL6p5XhRd6REr7HT
+ Jadrw2jJLez2qCuOjrpHs7gcYhiPdmOCKWCHcA6bUn7N/JoEZDwvAVNeAOiIrAZngrZR AQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34g31dpwqw-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34gghjg1bw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Oct 2020 10:23:33 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09UE3nRq183273;
-        Fri, 30 Oct 2020 10:23:33 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34g31dpwps-1
+        Fri, 30 Oct 2020 10:26:02 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09UEGZhh106043;
+        Fri, 30 Oct 2020 10:26:02 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34gghjg1ab-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Oct 2020 10:23:33 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09UELlET014592;
-        Fri, 30 Oct 2020 14:23:30 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04fra.de.ibm.com with ESMTP id 34f7s3s6ga-1
+        Fri, 30 Oct 2020 10:26:01 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09UEMlwa011426;
+        Fri, 30 Oct 2020 14:25:59 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 34e56qv4x7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Oct 2020 14:23:30 +0000
+        Fri, 30 Oct 2020 14:25:58 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09UENRIH27525388
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09UEPuji32899552
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 30 Oct 2020 14:23:27 GMT
+        Fri, 30 Oct 2020 14:25:56 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A50EAE053;
-        Fri, 30 Oct 2020 14:23:27 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0AF6BAE045;
+        Fri, 30 Oct 2020 14:25:56 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1EE3FAE056;
-        Fri, 30 Oct 2020 14:23:27 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C54BAAE055;
+        Fri, 30 Oct 2020 14:25:55 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.123])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 30 Oct 2020 14:23:27 +0000 (GMT)
+        Fri, 30 Oct 2020 14:25:55 +0000 (GMT)
 Subject: Re: [PATCH] kvm: s390: pv: Mark mm as protected after the set secure
  parameters and improve cleanup
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
@@ -104,8 +104,8 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <f4381509-bf28-2159-b5a6-7dd9e9ee4816@de.ibm.com>
-Date:   Fri, 30 Oct 2020 15:23:26 +0100
+Message-ID: <7461fd5d-4a44-51ad-bb7b-0bea8737b6e1@de.ibm.com>
+Date:   Fri, 30 Oct 2020 15:25:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
@@ -116,10 +116,10 @@ Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
  definitions=2020-10-30_04:2020-10-30,2020-10-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 clxscore=1015 suspectscore=0 adultscore=0 malwarescore=0
- mlxscore=0 mlxlogscore=999 lowpriorityscore=0 spamscore=0 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ priorityscore=1501 impostorscore=0 adultscore=0 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2009150000 definitions=main-2010300102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -134,7 +134,11 @@ On 30.10.20 15:01, Janosch Frank wrote:
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-Can we check this into devel to give it some test coverage?
+Looks sane.
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+As said in my other mail lets give it some days for the CI to test this.
 
 > ---
 >  arch/s390/kvm/kvm-s390.c | 2 +-
@@ -148,12 +152,12 @@ Can we check this into devel to give it some test coverage?
 > +++ b/arch/s390/kvm/kvm-s390.c
 > @@ -2312,7 +2312,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
 >  		struct kvm_s390_pv_unp unp = {};
->  
+> 
 >  		r = -EINVAL;
 > -		if (!kvm_s390_pv_is_protected(kvm))
 > +		if (!kvm_s390_pv_is_protected(kvm) || !mm_is_protected(kvm->mm))
 >  			break;
->  
+> 
 >  		r = -EFAULT;
 > diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
 > index eb99e2f95ebe..f5847f9dec7c 100644
@@ -166,7 +170,7 @@ Can we check this into devel to give it some test coverage?
 > -	atomic_set(&kvm->mm->context.is_protected, 1);
 >  	return 0;
 >  }
->  
+> 
 > @@ -228,6 +227,8 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
 >  	*rrc = uvcb.header.rrc;
 >  	KVM_UV_EVENT(kvm, 3, "PROTVIRT VM SET PARMS: rc %x rrc %x",
@@ -175,7 +179,7 @@ Can we check this into devel to give it some test coverage?
 > +		atomic_set(&kvm->mm->context.is_protected, 1);
 >  	return cc ? -EINVAL : 0;
 >  }
->  
+> 
 > diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
 > index cfb0017f33a7..64795d034926 100644
 > --- a/arch/s390/mm/gmap.c
