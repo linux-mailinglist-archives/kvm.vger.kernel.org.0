@@ -2,113 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04B912A049D
-	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 12:45:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BB032A04FC
+	for <lists+kvm@lfdr.de>; Fri, 30 Oct 2020 13:07:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbgJ3LpH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 07:45:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33244 "EHLO
+        id S1726240AbgJ3MHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 08:07:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29197 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726601AbgJ3LpA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 07:45:00 -0400
+        by vger.kernel.org with ESMTP id S1725355AbgJ3MHa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Oct 2020 08:07:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604058299;
+        s=mimecast20190719; t=1604059602;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rMzfcfElqXmYjTtD+miGi6l1YpfMLIM07gwUkJW1Ka4=;
-        b=GOhZ4L3I8OHAurXU+KwMhFexmhGievQCzWQWcjnJsMs9gvmt4t6JHD3G7bgdB7EIWSO1wL
-        RQUEGoh+BpW6PJhZuM3/M4mAEicJXNXy/WCFLaxEs+7Uy6vlrCoV1AHdzUR6wUM4epL9Ki
-        c2vmHEvTAJQwPNRJkxzNgUy9rTxhQ30=
+        bh=dCy0R4WBzBwMlHPUHr9Zz+5Uhtrk4oJxTBMJenFrdaE=;
+        b=VZ8xNNsBEiTDnoGgnvIdS8a1iC9gHem3IUKwVSHzkRt6gwsnGNoA+H89jcGz2RLKvvG/9y
+        j2qe0js+4izvodtH+i/yzT1N2Mbu2ThEcLDeOP+oyOwfA2eINubYcR725hdP18uxgKFdrU
+        +OI5DlORJSyJz3LmRXbfPYgtFCWcbas=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-584-3sQS_sVaMLePpUqD5ntZlw-1; Fri, 30 Oct 2020 07:44:55 -0400
-X-MC-Unique: 3sQS_sVaMLePpUqD5ntZlw-1
+ us-mta-33-Sy5gUsywP36n0sjQVtDfrA-1; Fri, 30 Oct 2020 08:06:38 -0400
+X-MC-Unique: Sy5gUsywP36n0sjQVtDfrA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B6F01017DD0;
-        Fri, 30 Oct 2020 11:44:54 +0000 (UTC)
-Received: from [10.72.12.248] (ovpn-12-248.pek2.redhat.com [10.72.12.248])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 820275CC26;
-        Fri, 30 Oct 2020 11:44:45 +0000 (UTC)
-Subject: Re: [PATCH] vhost/vsock: add IOTLB API support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     mst@redhat.com, netdev@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org
-References: <20201029174351.134173-1-sgarzare@redhat.com>
- <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
- <20201030105422.ju2aj2bmwsckdufh@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <278f4732-e561-2b4f-03ee-b26455760b01@redhat.com>
-Date:   Fri, 30 Oct 2020 19:44:43 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58D9C188C135;
+        Fri, 30 Oct 2020 12:06:37 +0000 (UTC)
+Received: from localhost (ovpn-113-41.ams2.redhat.com [10.36.113.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D8E4860BFA;
+        Fri, 30 Oct 2020 12:06:36 +0000 (UTC)
+Date:   Fri, 30 Oct 2020 12:06:35 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Wu, Hao" <hao.wu@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>
+Subject: Re: ENQCMD
+Message-ID: <20201030120635.GA320132@stefanha-x1.localdomain>
+References: <20201030075046.GA307361@stefanha-x1.localdomain>
+ <MWHPR11MB164567FA998B13128EB284D48C150@MWHPR11MB1645.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20201030105422.ju2aj2bmwsckdufh@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <MWHPR11MB164567FA998B13128EB284D48C150@MWHPR11MB1645.namprd11.prod.outlook.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ibTvN161/egqYuK8"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--ibTvN161/egqYuK8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2020/10/30 下午6:54, Stefano Garzarella wrote:
-> On Fri, Oct 30, 2020 at 06:02:18PM +0800, Jason Wang wrote:
->>
->> On 2020/10/30 上午1:43, Stefano Garzarella wrote:
->>> This patch enables the IOTLB API support for vhost-vsock devices,
->>> allowing the userspace to emulate an IOMMU for the guest.
->>>
->>> These changes were made following vhost-net, in details this patch:
->>> - exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
->>>   device if the feature is acked
->>> - implements VHOST_GET_BACKEND_FEATURES and
->>>   VHOST_SET_BACKEND_FEATURES ioctls
->>> - calls vq_meta_prefetch() before vq processing to prefetch vq
->>>   metadata address in IOTLB
->>> - provides .read_iter, .write_iter, and .poll callbacks for the
->>>   chardev; they are used by the userspace to exchange IOTLB messages
->>>
->>> This patch was tested with QEMU and a patch applied [1] to fix a
->>> simple issue:
->>>     $ qemu -M q35,accel=kvm,kernel-irqchip=split \
->>>            -drive file=fedora.qcow2,format=qcow2,if=virtio \
->>>            -device intel-iommu,intremap=on \
->>>            -device vhost-vsock-pci,guest-cid=3,iommu_platform=on
->>
->>
->> Patch looks good, but a question:
->>
->> It looks to me you don't enable ATS which means vhost won't get any 
->> invalidation request or did I miss anything?
->>
->
-> You're right, I didn't see invalidation requests, only miss and updates.
-> Now I have tried to enable 'ats' and 'device-iotlb' but I still don't 
-> see any invalidation.
->
-> How can I test it? (Sorry but I don't have much experience yet with 
-> vIOMMU)
+On Fri, Oct 30, 2020 at 08:04:54AM +0000, Tian, Kevin wrote:
+> > From: Stefan Hajnoczi <stefanha@redhat.com>
+> > Sent: Friday, October 30, 2020 3:51 PM
+> >=20
+> > Hi,
+> > The "Scalable Work Submission in Device Virtualization" talk at KVM
+> > Forum 2020 was interesting and I have some beginner questions about
+> > ENQCMD:
+> > https://static.sched.com/hosted_files/kvmforum2020/22/Scalable_Work_Su
+> > bmission_In_Device_Virtualization.pdf
+> >=20
+> > Security
+> > --------
+> > If the ENQCMD instruction is allowed for userspace applications, how ca=
+n
+> > they be prevented from writing to the MMIO address directly (without th=
+e
+> > ENQCMD instruction) and faking the 64-byte enqueue register data format=
+?
+> > For example, they could set the PRIV bit or an arbitrary PASID.
+>=20
+> ENQCMD payload is transmitted through DMWr transactions (slide 10), which
+> cannot be triggered through other memory instructions. The device portal
+> only handles DMWr transactions.
 
+Thanks, that explains it! I was wondering the a regular write
+transaction could fool the device :).
 
-I guess it's because the batched unmap. Maybe you can try to use 
-"intel_iommu=strict" in guest kernel command line to see if it works.
+Stefan
 
-Btw, make sure the qemu contains the patch [1]. Otherwise ATS won't be 
-enabled for recent Linux Kernel in the guest.
+--ibTvN161/egqYuK8
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks
+-----BEGIN PGP SIGNATURE-----
 
-[1] https://patchew.org/QEMU/20200909081731.24688-1-jasowang@redhat.com/
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+cAcsACgkQnKSrs4Gr
+c8gjUQf8Cz3bnmtojBjngXBB9jhNbNZcFMUrJd0zUQdPmGboSR1VG/hikQHxNA+s
+gKIB8CHRB1G70P/V4xwowc6efSzB60utJwJLOwoMLnawSrYpCYcoYNKEcyzCxH/M
+NmTSjFgPgyx/bCvXw7oIeZT9q+rqRWXyRV7xJIXyH/WVwj96pEwFXSlAwVBAMPIT
+UNICGLq49/HiQ0v1nX/+VAGJVr6NErO/AF5/cIcI39q1sU7tVRA2xTb3wP5SZR+b
+Yr9nKQLjcUjmI1hWRqjS4eFS7BwWkM3BVcoyEwLQPEKa763R6j3OCUPlMLFoikBJ
+abWmPnKEE6dDcBftgM05J6ZMyKoz5w==
+=In8c
+-----END PGP SIGNATURE-----
 
->
-> Thanks,
-> Stefano
->
+--ibTvN161/egqYuK8--
 
