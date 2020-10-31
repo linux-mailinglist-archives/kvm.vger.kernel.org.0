@@ -2,162 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32B1E2A1897
-	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 16:34:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AADDB2A1A28
+	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 19:54:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728045AbgJaPeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 31 Oct 2020 11:34:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59983 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727355AbgJaPeM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 31 Oct 2020 11:34:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604158450;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GPtRky/4dhnp2uurQVRkXKC6EfMKsv9ZysUWkjiVSAw=;
-        b=FJ8q5Aw+96JvN2Hj6NuuzihVDtmnSliWaI8g0X1rIojs3c79rxgtGB2u/0ddcCDJtZrBQX
-        w5Mmi+QSLKX8oEYqY0U/7e0oYg10wZc8eMPUn0t5jupUNkt/souxFt6JC93knk/Ciekq24
-        ZxaZlH1imPwPBEep0FDZ9Zd5WqAS1Z4=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-xQH3GBLWMei4azlickcpUw-1; Sat, 31 Oct 2020 11:34:06 -0400
-X-MC-Unique: xQH3GBLWMei4azlickcpUw-1
-Received: by mail-qk1-f200.google.com with SMTP id t70so5755293qka.11
-        for <kvm@vger.kernel.org>; Sat, 31 Oct 2020 08:34:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GPtRky/4dhnp2uurQVRkXKC6EfMKsv9ZysUWkjiVSAw=;
-        b=oMGxQBOt+rXqs/1U6egM8Zi+3NHyPd//Knc7t5o0Em7FAlPB1Av1GNT5XJj2+SSidm
-         IESlHlYBPH+v8zShjEzXq0LkiilUafrBP3fNwKeB6XstZz79fknCvfXdQdlgXKWyvYm1
-         1YNcxgY2pJHugOYjgLZa5Jhusz20subJ9t2DiDAditfUp5atCP70ddScNzQ7JnEfQgWJ
-         AnFubXBzGy14QbfA1uzRgV8+futwT1KYhB9+p+nxZdzuvkUe0lmb5V43JBPDvp4VlObT
-         oBG8tJLw0BBCiS0CeK7Jnk4bBbxA3Yg/XkVEas3NX0/fNwW4ozf5NUX531tu/DVOgO5R
-         TjSA==
-X-Gm-Message-State: AOAM530rOwhnSsaMry1g73vAQ5v0gNyV0uDFcOWwTt3uHJcoDQE6gpdC
-        trCDRhJdCfNNtY3d6wbnDGp7Ockgb1R/J3WbZYRORp6ouCE7WpcxhFsxVRTA7kKKroyCm6KlN+i
-        Vx+r9ptz1e5Rx
-X-Received: by 2002:a05:6214:a0f:: with SMTP id dw15mr13992311qvb.44.1604158446258;
-        Sat, 31 Oct 2020 08:34:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyKaXsMQ0TLZpWWYvPhZCkc4+m2u6T8RValElCHgJmDII7TxS2VUmQxhbdrW97JpomevJL5Tg==
-X-Received: by 2002:a05:6214:a0f:: with SMTP id dw15mr13992304qvb.44.1604158446037;
-        Sat, 31 Oct 2020 08:34:06 -0700 (PDT)
-Received: from xz-x1 (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca. [174.95.215.133])
-        by smtp.gmail.com with ESMTPSA id o2sm4444255qkk.121.2020.10.31.08.34.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Oct 2020 08:34:05 -0700 (PDT)
-Date:   Sat, 31 Oct 2020 11:34:03 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: selftests: Add get featured msrs test case
-Message-ID: <20201031153403.GF6357@xz-x1>
-References: <20201025185334.389061-1-peterx@redhat.com>
- <20201025185334.389061-2-peterx@redhat.com>
- <874kmh2wj5.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <874kmh2wj5.fsf@vitty.brq.redhat.com>
+        id S1728397AbgJaSyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 31 Oct 2020 14:54:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36932 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728360AbgJaSx7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 31 Oct 2020 14:53:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 782A5205ED;
+        Sat, 31 Oct 2020 18:53:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604170439;
+        bh=HvDtIcBTZHfDsPAUi0HpgUv6w8RVXhfLSLkNClG2LZE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=wn/RcwW3+g7WQtgl/Qkzckxgw27QWa6gX8garulc+M8QnqMIKuxBMyHSQdAHGTB5T
+         Aax0Ia6pERZzkNQpQ3uyTLMGIvOwbpn/bU4lkl/zWGAcm/mzxyYDBWUz1pHAjKv1+P
+         he5Nxx8CX0hjTHs03RGV4Q97PLc2Rt6pqDURpjgs=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kYw0j-0069TJ-G0; Sat, 31 Oct 2020 18:53:57 +0000
+Date:   Sat, 31 Oct 2020 18:53:56 +0000
+Message-ID: <875z6qdy63.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, Dave.Martin@arm.com, peter.maydell@linaro.org,
+        eric.auger@redhat.com
+Subject: Re: [PATCH 3/4] KVM: selftests: Update aarch64 get-reg-list blessed list
+In-Reply-To: <20201029201703.102716-4-drjones@redhat.com>
+References: <20201029201703.102716-1-drjones@redhat.com>
+        <20201029201703.102716-4-drjones@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, Dave.Martin@arm.com, peter.maydell@linaro.org, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 26, 2020 at 09:58:54AM +0100, Vitaly Kuznetsov wrote:
-> Peter Xu <peterx@redhat.com> writes:
+On Thu, 29 Oct 2020 20:17:02 +0000,
+Andrew Jones <drjones@redhat.com> wrote:
 > 
-> > Try to fetch any supported featured msr.  Currently it won't fail, so at least
-> > we can check against valid ones (which should be >0).
-> >
-> > This reproduces [1] too by trying to fetch one invalid msr there.
-> >
-> > [1] https://bugzilla.kernel.org/show_bug.cgi?id=209845
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  .../testing/selftests/kvm/include/kvm_util.h  |  3 +
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 14 +++++
-> >  .../testing/selftests/kvm/x86_64/state_test.c | 58 +++++++++++++++++++
-> >  3 files changed, 75 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > index 919e161dd289..e34cf263b20a 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > @@ -66,6 +66,9 @@ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
-> >  
-> >  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-> >  struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-> > +void kvm_vm_get_msr_feature_index_list(struct kvm_vm *vm,
-> > +				       struct kvm_msr_list *list);
-> > +int kvm_vm_get_feature_msrs(struct kvm_vm *vm, struct kvm_msrs *msrs);
-> >  void kvm_vm_free(struct kvm_vm *vmp);
-> >  void kvm_vm_restart(struct kvm_vm *vmp, int perm);
-> >  void kvm_vm_release(struct kvm_vm *vmp);
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index 74776ee228f2..3c16fa044335 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -132,6 +132,20 @@ static const struct vm_guest_mode_params vm_guest_mode_params[] = {
-> >  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
-> >  	       "Missing new mode params?");
-> >  
-> > +void kvm_vm_get_msr_feature_index_list(struct kvm_vm *vm,
-> > +				       struct kvm_msr_list *list)
-> > +{
-> > +	int r = ioctl(vm->kvm_fd, KVM_GET_MSR_FEATURE_INDEX_LIST, list);
-> > +
-> > +	TEST_ASSERT(r == 0, "KVM_GET_MSR_FEATURE_INDEX_LIST failed: %d\n",
-> > +		    -errno);
-> > +}
-> > +
-> > +int kvm_vm_get_feature_msrs(struct kvm_vm *vm, struct kvm_msrs *msrs)
-> > +{
-> > +	return ioctl(vm->kvm_fd, KVM_GET_MSRS, msrs);
-> > +}
+> The new registers come from the following commits:
 > 
-> I *think* that the non-written rule for kvm selftests is that functions
-> without '_' prefix check ioctl return value with TEST_ASSERT() and
-> functions with it don't (e.g. _vcpu_run()/vcpu_run()) but maybe it's
-> just me.
+> commit 99adb567632b ("KVM: arm/arm64: Add save/restore support for
+> firmware workaround state")
+> 
+> commit c773ae2b3476 ("KVM: arm64: Save/Restore guest DISR_EL1")
+> 
+> commit 03fdfb269009 ("KVM: arm64: Don't write junk to sysregs on reset")
+> 
+> The last commit, which adds ARM64_SYS_REG(3, 3, 9, 12, 0) (PMCR_EL0),
+> and was committed for v5.3, doesn't indicate in its commit message that
+> enumerating it for save/restore was the plan, so doing so may have
+> been by accident.
 
-Sure, will fix it up.
+It definitely was.
+
+> It's a good idea anyway, though, since the other PMU registers have
+> been enumerated since v4.10.
+
+Quite. The state of the PMU is pretty much unknown on restore until then.
 
 > 
-> > +
-> >  /*
-> >   * VM Create
-> >   *
-> > diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
-> > index f6c8b9042f8a..7ce9920e526a 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/state_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> I would not overload state_test with this new check and create a new
-> one. The benefit is that when one of these tests fail we still get the
-> result of the other one so it's not 'everything works' vs 'everything is
-> broken' type of log.
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index 3aeb3de780a1..3ff097f6886e 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -352,7 +352,8 @@ int main(int ac, char **av)
+>  }
+>  
+>  /*
+> - * The current blessed list comes from kernel version v4.15 with --core-reg-fixup
+> + * The current blessed list was primed with the output of kernel version
+> + * v4.15 with --core-reg-fixup and then later updated with new registers.
 
-IMHO it's not extremely important on knowingg which binary failed - afaiu,
-kernel selftests are really for an "all pass", so if anything fails, we dig.
-
-Another thing, state_test.c has a comment (at the top):
-
-/*
- * KVM_GET/SET_* tests
- *
- * Copyright (C) 2018, Red Hat, Inc.
- ...
-
-Shouldn't KVM_GET_MSRS suites here? :)
+Maybe have a reference to the last kernel version this was checked
+against? Either here or in the commit message?
 
 Thanks,
 
--- 
-Peter Xu
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
