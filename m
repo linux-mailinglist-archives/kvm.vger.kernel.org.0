@@ -2,81 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD9E52A12CE
-	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 03:20:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D8D22A1323
+	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 03:50:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726158AbgJaCUZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Oct 2020 22:20:25 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2422 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725536AbgJaCUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Oct 2020 22:20:25 -0400
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CNNF35fNhz4wjS;
-        Sat, 31 Oct 2020 10:20:23 +0800 (CST)
-Received: from dggema757-chm.china.huawei.com (10.1.198.199) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Sat, 31 Oct 2020 10:20:22 +0800
-Received: from dggema755-chm.china.huawei.com (10.1.198.197) by
- dggema757-chm.china.huawei.com (10.1.198.199) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Sat, 31 Oct 2020 10:20:22 +0800
-Received: from dggema755-chm.china.huawei.com ([10.1.198.197]) by
- dggema755-chm.china.huawei.com ([10.1.198.197]) with mapi id 15.01.1913.007;
- Sat, 31 Oct 2020 10:20:22 +0800
-From:   zhangqilong <zhangqilong3@huawei.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIHZmaW86IHBsYXRmb3JtOiBmaXggcmVmZXJlbmNl?=
- =?utf-8?B?IGxlYWsgaW4gdmZpb19wbGF0Zm9ybV9vcGVu?=
-Thread-Topic: [PATCH] vfio: platform: fix reference leak in vfio_platform_open
-Thread-Index: AQHWrtSwcdQJsuLJmkC2ly2HJv4yZ6mw9I4A
-Date:   Sat, 31 Oct 2020 02:20:22 +0000
-Message-ID: <df107e9bf9784e239cbf7e2b1b1c659f@huawei.com>
-References: <20201030154754.99431-1-zhangqilong3@huawei.com>
- <8260f3ed-1b0a-d6d9-f058-9580949bf34e@redhat.com>
-In-Reply-To: <8260f3ed-1b0a-d6d9-f058-9580949bf34e@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.179.28]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726286AbgJaCur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Oct 2020 22:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36998 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725536AbgJaCuq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Oct 2020 22:50:46 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98468C0613D5;
+        Fri, 30 Oct 2020 19:50:46 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1604112643;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uApMClh8LgUA9+nJd9aotz4iVU4rrDChpNyqFIsKvVA=;
+        b=BTy3lFhBX7sA4VCntMKiVzzwk15jABSRHtryuyJx0+un+EmAEDlvBnsxWJN/WlLwW0AZtf
+        dgIPedgj2GGEjgGyhDuEhVmXnVNwJ6R2nQaqLpM2oQSdZsNeRblLHWV1fRJeXgirvSE5Cz
+        M/U9x6HLsQuAd7grINFE+wXsybNOiFGqeZ4aI6wY5qOnfcZanCDX3DbFOa8b/cHiCtwGnJ
+        QEbUT+UuCjF76GX1Eku7Ndj/2ocNBLRt5PYkolws6PuXIWsQylQzhlESmrDBr3VijobWxB
+        NSMTVPCrpbQzkdGGnAWLN4CHPuD1EQy3J/h0xxtVJ008KaTYvoCn0wcg1FwESA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1604112643;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uApMClh8LgUA9+nJd9aotz4iVU4rrDChpNyqFIsKvVA=;
+        b=A819AejM97rPxCwoMXgGJd+KHw/MTmbonbj8ZqfBkpxDATgoUcgnpq0ENP6nnXI3x/A5+P
+        UiUnecA3TerRblAA==
+To:     "Raj\, Ashok" <ashok.raj@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
+        megha.dey@intel.com, maz@kernel.org, bhelgaas@google.com,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com,
+        sanjay.k.kumar@intel.com, tony.luck@intel.com, jing.lin@intel.com,
+        dan.j.williams@intel.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, parav@mellanox.com, rafael@kernel.org,
+        netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com,
+        Megha Dey <megha.dey@linux.intel.com>,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Ashok Raj <ashok.raj@intel.com>
+Subject: Re: [PATCH v4 00/17] Add VFIO mediated device support and DEV-MSI support for the idxd driver
+In-Reply-To: <20201030204307.GA683@otc-nc-03>
+References: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com> <20201030185858.GI2620339@nvidia.com> <c9303df4-3e57-6959-a89c-5fc98397ac70@intel.com> <20201030191706.GK2620339@nvidia.com> <20201030192325.GA105832@otc-nc-03> <20201030193045.GM2620339@nvidia.com> <20201030204307.GA683@otc-nc-03>
+Date:   Sat, 31 Oct 2020 03:50:43 +0100
+Message-ID: <87h7qbkt18.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGksIEF1Z2VyDQoNCj4gT24gMTAvMzAvMjAgNDo0NyBQTSwgWmhhbmcgUWlsb25nIHdyb3RlOg0K
-PiA+IHBtX3J1bnRpbWVfZ2V0X3N5bmMoKSB3aWxsIGluY3JlbWVudCBwbSB1c2FnZSBjb3VudGVy
-IGV2ZW4gaXQgZmFpbGVkLg0KPiA+IEZvcmdldHRpbmcgdG8gY2FsbCBwbV9ydW50aW1lX3B1dF9u
-b2lkbGUgd2lsbCByZXN1bHQgaW4gcmVmZXJlbmNlIGxlYWsNCj4gPiBpbiB2ZmlvX3BsYXRmb3Jt
-X29wZW4sIHNvIHdlIHNob3VsZCBmaXggaXQuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBaaGFu
-ZyBRaWxvbmcgPHpoYW5ncWlsb25nM0BodWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJz
-L3ZmaW8vcGxhdGZvcm0vdmZpb19wbGF0Zm9ybV9jb21tb24uYyB8IDQgKysrLQ0KPiA+ICAxIGZp
-bGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+ID4NCj4gPiBkaWZm
-IC0tZ2l0IGEvZHJpdmVycy92ZmlvL3BsYXRmb3JtL3ZmaW9fcGxhdGZvcm1fY29tbW9uLmMNCj4g
-PiBiL2RyaXZlcnMvdmZpby9wbGF0Zm9ybS92ZmlvX3BsYXRmb3JtX2NvbW1vbi5jDQo+ID4gaW5k
-ZXggYzA3NzFhOTU2N2ZiLi5hYTk3ZjE2Nzg5ODEgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy92
-ZmlvL3BsYXRmb3JtL3ZmaW9fcGxhdGZvcm1fY29tbW9uLmMNCj4gPiArKysgYi9kcml2ZXJzL3Zm
-aW8vcGxhdGZvcm0vdmZpb19wbGF0Zm9ybV9jb21tb24uYw0KPiA+IEBAIC0yNjYsOCArMjY2LDEw
-IEBAIHN0YXRpYyBpbnQgdmZpb19wbGF0Zm9ybV9vcGVuKHZvaWQgKmRldmljZV9kYXRhKQ0KPiA+
-ICAJCQlnb3RvIGVycl9pcnE7DQo+ID4NCj4gPiAgCQlyZXQgPSBwbV9ydW50aW1lX2dldF9zeW5j
-KHZkZXYtPmRldmljZSk7DQo+ID4gLQkJaWYgKHJldCA8IDApDQo+ID4gKwkJaWYgKHJldCA8IDAp
-IHsNCj4gPiArCQkJcG1fcnVudGltZV9wdXRfbm9pZGxlKHZkZXYtPmRldmljZSk7DQo+IGNhbid0
-IHdlIGp1bXAgdG8gZXJyX3JzdCB0aGVuPw0KDQpXZSBjb3VsZCBqdW1wIHRvIGVycl9yc3QgaGVy
-ZS4gVGhlIGRpZmZlcmVuY2UgaXMgdGhhdCBwbV9ydW50aW1lX3B1dCB3aWxsIGxlYXZlIHRoaXMN
-CmRldmljZSBpZGxlIHN0YXRlIGlmIHdlIGRlY3JlYXNlIHVzYWdlIGNvdW50IGZhaWxlZCB0aGF0
-IGlzIG1lYW5sZXNzLiBCZWNhdXNlIHRoaXMNCm1vZHVsZSB3aWxsIGJlIHB1dC4gR2VuZXJhbGx5
-IHNwZWFraW5nLCB0aGUgYWN0aW9uIG9mIHBtX3J1bnRpbWVfcHV0IGFuZA0KcG1fcnVudGltZV9w
-dXRfbm9pZGxlIGlzIHRoZSBzYW1lIGhlcmUgdGhhdCBvbmx5IGRlY3JlYXNlcyB1c2FnZSBjb3Vu
-dC4gSnVtcGluZyB0bw0KZXJyX3JzdCBjb3VsZCBiZSBtb3JlIGJldHRlciBmb3IgcmVhZCB2aWV3
-LiBJJ2xsIGltcHJvdmUgaXQgaW4gcGF0Y2ggVjIuDQoNClRoYW5rcw0KDQpaaGFuZyBRaWxvbmcN
-Cj4gDQo+IFRoYW5rcw0KPiANCj4gRXJpYw0KPiA+ICAJCQlnb3RvIGVycl9wbTsNCj4gPiArCQl9
-DQo+ID4NCj4gPiAgCQlyZXQgPSB2ZmlvX3BsYXRmb3JtX2NhbGxfcmVzZXQodmRldiwgJmV4dHJh
-X2RiZyk7DQo+ID4gIAkJaWYgKHJldCAmJiB2ZGV2LT5yZXNldF9yZXF1aXJlZCkgew0KPiA+DQoN
-Cg==
+Ashok,
+
+On Fri, Oct 30 2020 at 13:43, Ashok Raj wrote:
+> On Fri, Oct 30, 2020 at 04:30:45PM -0300, Jason Gunthorpe wrote:
+>> On Fri, Oct 30, 2020 at 12:23:25PM -0700, Raj, Ashok wrote:
+>> It is a different subsystem, different maintainer, and different
+>> reviewers.
+>> 
+>> It is a development process problem, it doesn't matter what it is
+>> doing.
+
+< skip a lot of non-sensical arguments>
+
+> I know you aren't going to give up, but there is little we can do. I want
+> the maintainers to make that call and I'm not add more noise to this.
+
+Jason is absolutely right.
+
+Just because there is historical precendence which does not care about
+the differentiation of subsystems is not an argument at all to make the
+same mistakes which have been made years ago.
+
+IDXD is just infrastructure which provides the base for a variety of
+different functionalities. Very similar to what multi function devices
+provide. In fact IDXD is pretty much a MFD facility.
+
+Sticking all of it into dmaengine is sloppy at best. The dma engine
+related part of IDXD is only a part of the overall functionality.
+
+I'm well aware that it is conveniant to just throw everything into
+drivers/myturf/ but that does neither make it reviewable nor
+maintainable.
+
+What's the problem with restructuring your code in a way which makes it
+fit into existing subsystems?
+
+The whole thing - as I pointed out to Dave earlier - is based on 'works
+for me' wishful thinking with a blissful ignorance of the development
+process and the requirement to split a large problem into the proper
+bits and pieces aka. engineering 101.
+
+Thanks,
+
+        tglx
