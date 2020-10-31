@@ -2,376 +2,465 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 760D82A183D
-	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 15:37:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB45C2A183E
+	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 15:40:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727355AbgJaOhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 31 Oct 2020 10:37:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44943 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726089AbgJaOhl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 31 Oct 2020 10:37:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604155058;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=81OeoFgvj7jGYk9lp3ONcJOadZLtJIkMKBE3/aF6Srs=;
-        b=YJPs8NyPPFBpnn9pRwNNLe7RK7WEIRXyYeL++b2m+ZHUuQpXw3X1/6nNmAO6TGmgGsUqkK
-        ObDeZUcMmeJkKteKBJWHO2TVR8HZlDzgTJAG7fX3eeKaeu28lac6Z3ttWV7UkdiUMIu+RK
-        XWJlayYprummHovYYRHiaMBpYAzDGfY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-ddml4gSdP4mNQO7LtineEA-1; Sat, 31 Oct 2020 10:37:31 -0400
-X-MC-Unique: ddml4gSdP4mNQO7LtineEA-1
-Received: by mail-wr1-f71.google.com with SMTP id 11so2965310wrc.3
-        for <kvm@vger.kernel.org>; Sat, 31 Oct 2020 07:37:30 -0700 (PDT)
+        id S1726217AbgJaOks (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 31 Oct 2020 10:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726089AbgJaOkr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 31 Oct 2020 10:40:47 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47897C061A47
+        for <kvm@vger.kernel.org>; Sat, 31 Oct 2020 07:40:47 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id n11so8361478ota.2
+        for <kvm@vger.kernel.org>; Sat, 31 Oct 2020 07:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=JtO7Nja6RcTtOeq2s1LZwcLE76uoTTnCv1bvoi/jbRQ=;
+        b=O6NovDNrkmvyLeMFHQ9kK6wUcbzNTFA80tHkHLx4K1Rl1FiZWxl43rYqA2paTDUoG9
+         Xw8tEEg3vp7olCb3fkGN5R505BIXt9Vj5gLohBUOiYfhXy8e4m1xQZzJucvcpAOVyKpG
+         MKCmjLVQE+563SqK3v/+2eMm0Mi9X2tcHiKvE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=81OeoFgvj7jGYk9lp3ONcJOadZLtJIkMKBE3/aF6Srs=;
-        b=qdCiLnROBUf+zXpx74G3uciVF/Nlbv50B1O11Rbi8den1qzKDVuzQEovQZyKm/Lxeh
-         ZQJGltIQdTjC8kLNd86g9UitYOMlPXMk+WdcSNLbbtSZEjaNy5BjfbVQXRrW86+0Cs7X
-         PV5TpWTMDN9AT9jYIAV8OeJIH3P7xAvjl1naZpIWcDpMWOXvengmZL5z1e57obmEtpO1
-         BDr1VoYc7LYdOm3fAUWNfUD5oNHYlYDLvVzYDrFz4rUj5yz2jG42HUhM9LTLXf0VxN+F
-         ndwmBPR2USVMy2YcHLSSjDt/efZp71IPCyTFsEtk/XRyK3FdvJqp0L1OYu8jxgJAiHE8
-         R8+A==
-X-Gm-Message-State: AOAM531rDU2eu9sFy3EImWiztSoVzEPPFHh7OMTCcIEIoY4tOPyO5le6
-        zDNAG0MzN4+N++5j2lLgvhrS/rOZT9wNV1/tIXmG6/Yf5EoNO9yE4djCYzN9YYIOcWSHwmHA3Gf
-        +bbnglKfrIHXB
-X-Received: by 2002:a1c:4054:: with SMTP id n81mr3176832wma.48.1604155047416;
-        Sat, 31 Oct 2020 07:37:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyQSBf4yApDIZM8VxbrMOl7OZfX2U9sGk18a7zdfi4wuSTTDdsB6pa7iwh5jfIIVLP/y4ukpg==
-X-Received: by 2002:a1c:4054:: with SMTP id n81mr3176817wma.48.1604155047142;
-        Sat, 31 Oct 2020 07:37:27 -0700 (PDT)
-Received: from [192.168.178.64] ([151.20.250.56])
-        by smtp.gmail.com with ESMTPSA id y4sm14670058wrp.74.2020.10.31.07.37.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 31 Oct 2020 07:37:26 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2] x86: vmx: Add test for SIPI signal
- processing
-To:     yadong.qi@intel.com, kvm@vger.kernel.org
-Cc:     nadav.amit@gmail.com
-References: <20201013052845.249113-1-yadong.qi@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8180e042-44e1-9925-d11d-a88d83baa378@redhat.com>
-Date:   Sat, 31 Oct 2020 15:37:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JtO7Nja6RcTtOeq2s1LZwcLE76uoTTnCv1bvoi/jbRQ=;
+        b=fW38cBocQKlwStC//InmjNtVnpzs4bkMb1wlSUjXbCFp8aOxkRqn+zSONDfCjQcmJn
+         xyj/bbZMNPN0zJO+lIaW6FalwSler0v4UfrmmnHuAwcMqCjbSgdU0/zslodSrvlU290X
+         LrRiLb0h79rSrHNEx7orTD/YQcYtENHCU6JOMz8WxeDmQSK0RX4FhDeDPRXmI/BBsbHH
+         soGqerE+cpehFK2cedrw6tJSJJKcnU2//JgxHyzuPCfbyQGIToiu4yC3pH7Ehcliu4nC
+         OHIDgB+l2P9lSkEu94AXKWNSi689bb4MrBcVvkROzRahZyGNqsoFdtDEtcyXU3TzZACF
+         uKQg==
+X-Gm-Message-State: AOAM5319mNwcH5uuIoDqvLjBA3GDelC4s4TOaFYLKVTjRpEATlUBbdRq
+        NuX4qM15alAzq01NBRo3iLp/huRcYlTVdhl+4e/gUw==
+X-Google-Smtp-Source: ABdhPJxqtsn7W7oKGTLHfMVhN6VELBcHyLa3p2v0hx77IIgGpAhWCkDOrTaCDOywAg1QbtLmxm3odFb5zBu4pEEm8pA=
+X-Received: by 2002:a9d:6e81:: with SMTP id a1mr5364593otr.303.1604155246273;
+ Sat, 31 Oct 2020 07:40:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201013052845.249113-1-yadong.qi@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20201030100815.2269-1-daniel.vetter@ffwll.ch> <20201030100815.2269-14-daniel.vetter@ffwll.ch>
+ <787f2914-5777-4703-4bee-68c4c3742817@nvidia.com>
+In-Reply-To: <787f2914-5777-4703-4bee-68c4c3742817@nvidia.com>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Sat, 31 Oct 2020 15:40:35 +0100
+Message-ID: <CAKMK7uF=N1hGSnFscaX0PGxWVkrUoYK-H+gnBhYkG1KU_KvVEg@mail.gmail.com>
+Subject: Re: [PATCH v5 13/15] resource: Move devmem revoke code to resource framework
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
+        David Hildenbrand <david@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/10/20 07:28, yadong.qi@intel.com wrote:
-> From: Yadong Qi <yadong.qi@intel.com>
-> 
-> The test verifies the following functionality:
-> A SIPI signal received when CPU is in VMX non-root mode:
->     if ACTIVITY_STATE == WAIT_SIPI
->         VMExit with (reason == 4)
->     else
->         SIPI signal is ignored
-> 
-> The test cases depends on IA32_VMX_MISC:bit(8), if this bit is 1
-> then the test cases would be executed, otherwise the test cases
-> would be skiped.
-> 
-> Signed-off-by: Yadong Qi <yadong.qi@intel.com>
-> ---
-> v1->v2:
->  * update CR3 on AP
-> 
-> ---
->  lib/x86/msr.h       |   1 +
->  lib/x86/processor.h |   5 ++
->  x86/apic.c          |   5 --
->  x86/ioapic.c        |   5 --
->  x86/unittests.cfg   |   8 +++
->  x86/vmx.c           |   2 +-
->  x86/vmx.h           |   3 +
->  x86/vmx_tests.c     | 138 ++++++++++++++++++++++++++++++++++++++++++++
->  8 files changed, 156 insertions(+), 11 deletions(-)
-> 
-> diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-> index 6ef5502..29e3947 100644
-> --- a/lib/x86/msr.h
-> +++ b/lib/x86/msr.h
-> @@ -421,6 +421,7 @@
->  #define MSR_IA32_VMX_TRUE_ENTRY		0x00000490
->  
->  /* MSR_IA32_VMX_MISC bits */
-> +#define MSR_IA32_VMX_MISC_ACTIVITY_WAIT_SIPI		(1ULL << 8)
->  #define MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS	(1ULL << 29)
->  
->  #define MSR_IA32_TSCDEADLINE		0x000006e0
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index c2c487c..849554f 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -359,6 +359,11 @@ static inline ulong read_cr3(void)
->      return val;
->  }
->  
-> +static inline void update_cr3(void *cr3)
-> +{
-> +    write_cr3((ulong)cr3);
-> +}
-> +
->  static inline void write_cr4(ulong val)
->  {
->      asm volatile ("mov %0, %%cr4" : : "r"(val) : "memory");
-> diff --git a/x86/apic.c b/x86/apic.c
-> index a7681fe..b57345b 100644
-> --- a/x86/apic.c
-> +++ b/x86/apic.c
-> @@ -318,11 +318,6 @@ static void nmi_handler(isr_regs_t *regs)
->      nmi_hlt_counter += regs->rip == (ulong)post_sti;
->  }
->  
-> -static void update_cr3(void *cr3)
-> -{
-> -    write_cr3((ulong)cr3);
-> -}
-> -
->  static void test_sti_nmi(void)
->  {
->      unsigned old_counter;
-> diff --git a/x86/ioapic.c b/x86/ioapic.c
-> index b9f6dd2..7cbccd7 100644
-> --- a/x86/ioapic.c
-> +++ b/x86/ioapic.c
-> @@ -463,11 +463,6 @@ static void test_ioapic_logical_destination_mode(void)
->  	report(g_isr_86 == nr_vcpus, "ioapic logical destination mode");
->  }
->  
-> -static void update_cr3(void *cr3)
-> -{
-> -	write_cr3((ulong)cr3);
-> -}
-> -
->  int main(void)
->  {
->  	setup_vm();
-> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-> index 872d679..c035c79 100644
-> --- a/x86/unittests.cfg
-> +++ b/x86/unittests.cfg
-> @@ -305,6 +305,14 @@ arch = x86_64
->  groups = vmx
->  timeout = 10
->  
-> +[vmx_sipi_signal_test]
-> +file = vmx.flat
-> +smp = 2
-> +extra_params = -cpu host,+vmx -m 2048 -append vmx_sipi_signal_test
-> +arch = x86_64
-> +groups = vmx
-> +timeout = 10
-> +
->  [vmx_apic_passthrough_tpr_threshold_test]
->  file = vmx.flat
->  extra_params = -cpu host,+vmx -m 2048 -append vmx_apic_passthrough_tpr_threshold_test
-> diff --git a/x86/vmx.c b/x86/vmx.c
-> index 1a84a74..f0b853a 100644
-> --- a/x86/vmx.c
-> +++ b/x86/vmx.c
-> @@ -1369,7 +1369,7 @@ static void init_vmcs_guest(void)
->  	vmcs_write(GUEST_INTR_STATE, 0);
->  }
->  
-> -static int init_vmcs(struct vmcs **vmcs)
-> +int init_vmcs(struct vmcs **vmcs)
->  {
->  	*vmcs = alloc_page();
->  	(*vmcs)->hdr.revision_id = basic.revision;
-> diff --git a/x86/vmx.h b/x86/vmx.h
-> index e29301e..7e39b84 100644
-> --- a/x86/vmx.h
-> +++ b/x86/vmx.h
-> @@ -697,6 +697,8 @@ enum vm_entry_failure_code {
->  
->  #define ACTV_ACTIVE		0
->  #define ACTV_HLT		1
-> +#define ACTV_SHUTDOWN		2
-> +#define ACTV_WAIT_SIPI		3
->  
->  /*
->   * VMCS field encoding:
-> @@ -856,6 +858,7 @@ static inline bool invvpid(unsigned long type, u64 vpid, u64 gla)
->  
->  void enable_vmx(void);
->  void init_vmx(u64 *vmxon_region);
-> +int init_vmcs(struct vmcs **vmcs);
->  
->  const char *exit_reason_description(u64 reason);
->  void print_vmexit_info(union exit_reason exit_reason);
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index d2084ae..4e8215e 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -9855,6 +9855,143 @@ static void vmx_init_signal_test(void)
->  	 */
->  }
->  
-> +#define SIPI_SIGNAL_TEST_DELAY	100000000ULL
-> +
-> +static void vmx_sipi_test_guest(void)
-> +{
-> +	if (apic_id() == 0) {
-> +		/* wait AP enter guest with activity=WAIT_SIPI */
-> +		while (vmx_get_test_stage() != 1)
-> +			;
-> +		delay(SIPI_SIGNAL_TEST_DELAY);
-> +
-> +		/* First SIPI signal */
-> +		apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
-> +		report(1, "BSP(L2): Send first SIPI to cpu[%d]", id_map[1]);
-> +
-> +		/* wait AP enter guest */
-> +		while (vmx_get_test_stage() != 2)
-> +			;
-> +		delay(SIPI_SIGNAL_TEST_DELAY);
-> +
-> +		/* Second SIPI signal should be ignored since AP is not in WAIT_SIPI state */
-> +		apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
-> +		report(1, "BSP(L2): Send second SIPI to cpu[%d]", id_map[1]);
-> +
-> +		/* Delay a while to check whether second SIPI would cause VMExit */
-> +		delay(SIPI_SIGNAL_TEST_DELAY);
-> +
-> +		/* Test is done, notify AP to exit test */
-> +		vmx_set_test_stage(3);
-> +
-> +		/* wait AP exit non-root mode */
-> +		while (vmx_get_test_stage() != 5)
-> +			;
-> +	} else {
-> +		/* wait BSP notify test is done */
-> +		while (vmx_get_test_stage() != 3)
-> +			;
-> +
-> +		/* AP exit guest */
-> +		vmx_set_test_stage(4);
-> +	}
-> +}
-> +
-> +static void sipi_test_ap_thread(void *data)
-> +{
-> +	struct vmcs *ap_vmcs;
-> +	u64 *ap_vmxon_region;
-> +	void *ap_stack, *ap_syscall_stack;
-> +	u64 cpu_ctrl_0 = CPU_SECONDARY;
-> +	u64 cpu_ctrl_1 = 0;
-> +
-> +	/* Enter VMX operation (i.e. exec VMXON) */
-> +	ap_vmxon_region = alloc_page();
-> +	enable_vmx();
-> +	init_vmx(ap_vmxon_region);
-> +	_vmx_on(ap_vmxon_region);
-> +	init_vmcs(&ap_vmcs);
-> +	make_vmcs_current(ap_vmcs);
-> +
-> +	/* Set stack for AP */
-> +	ap_stack = alloc_page();
-> +	ap_syscall_stack = alloc_page();
-> +	vmcs_write(GUEST_RSP, (u64)(ap_stack + PAGE_SIZE - 1));
-> +	vmcs_write(GUEST_SYSENTER_ESP, (u64)(ap_syscall_stack + PAGE_SIZE - 1));
-> +
-> +	/* passthrough lapic to L2 */
-> +	disable_intercept_for_x2apic_msrs();
-> +	vmcs_write(PIN_CONTROLS, vmcs_read(PIN_CONTROLS) & ~PIN_EXTINT);
-> +	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) | cpu_ctrl_0);
-> +	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | cpu_ctrl_1);
-> +
-> +	/* Set guest activity state to wait-for-SIPI state */
-> +	vmcs_write(GUEST_ACTV_STATE, ACTV_WAIT_SIPI);
-> +
-> +	vmx_set_test_stage(1);
-> +
-> +	/* AP enter guest */
-> +	enter_guest();
-> +
-> +	if (vmcs_read(EXI_REASON) == VMX_SIPI) {
-> +		report(1, "AP: Handle SIPI VMExit");
-> +		vmcs_write(GUEST_ACTV_STATE, ACTV_ACTIVE);
-> +		vmx_set_test_stage(2);
-> +	} else {
-> +		report(0, "AP: Unexpected VMExit, reason=%ld", vmcs_read(EXI_REASON));
-> +		vmx_off();
-> +		return;
-> +	}
-> +
-> +	/* AP enter guest */
-> +	enter_guest();
-> +
-> +	report(vmcs_read(EXI_REASON) != VMX_SIPI,
-> +		"AP: should no SIPI VMExit since activity is not in WAIT_SIPI state");
-> +
-> +	/* notify BSP that AP is already exit from non-root mode */
-> +	vmx_set_test_stage(5);
-> +
-> +	/* Leave VMX operation */
-> +	vmx_off();
-> +}
-> +
-> +static void vmx_sipi_signal_test(void)
-> +{
-> +	if (!(rdmsr(MSR_IA32_VMX_MISC) & MSR_IA32_VMX_MISC_ACTIVITY_WAIT_SIPI)) {
-> +		printf("\tACTIVITY_WAIT_SIPI state is not supported.\n");
-> +		return;
-> +	}
-> +
-> +	if (cpu_count() < 2) {
-> +		report_skip(__func__);
-> +		return;
-> +	}
-> +
-> +	u64 cpu_ctrl_0 = CPU_SECONDARY;
-> +	u64 cpu_ctrl_1 = 0;
-> +
-> +	/* passthrough lapic to L2 */
-> +	disable_intercept_for_x2apic_msrs();
-> +	vmcs_write(PIN_CONTROLS, vmcs_read(PIN_CONTROLS) & ~PIN_EXTINT);
-> +	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) | cpu_ctrl_0);
-> +	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | cpu_ctrl_1);
-> +
-> +	test_set_guest(vmx_sipi_test_guest);
-> +
-> +	/* update CR3 on AP */
-> +	on_cpu(1, update_cr3, (void *)read_cr3());
-> +
-> +	/* start AP */
-> +	on_cpu_async(1, sipi_test_ap_thread, NULL);
-> +
-> +	vmx_set_test_stage(0);
-> +
-> +	/* BSP enter guest */
-> +	enter_guest();
-> +}
-> +
-> +
->  enum vmcs_access {
->  	ACCESS_VMREAD,
->  	ACCESS_VMWRITE,
-> @@ -10492,6 +10629,7 @@ struct vmx_test vmx_tests[] = {
->  	TEST(vmx_apic_passthrough_thread_test),
->  	TEST(vmx_apic_passthrough_tpr_threshold_test),
->  	TEST(vmx_init_signal_test),
-> +	TEST(vmx_sipi_signal_test),
->  	/* VMCS Shadowing tests */
->  	TEST(vmx_vmcs_shadow_test),
->  	/* Regression tests */
-> 
+On Sat, Oct 31, 2020 at 7:36 AM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> On 10/30/20 3:08 AM, Daniel Vetter wrote:
+> > We want all iomem mmaps to consistently revoke ptes when the kernel
+> > takes over and CONFIG_IO_STRICT_DEVMEM is enabled. This includes the
+> > pci bar mmaps available through procfs and sysfs, which currently do
+> > not revoke mappings.
+> >
+> > To prepare for this, move the code from the /dev/kmem driver to
+> > kernel/resource.c.
+>
+> This seems like it's doing a lot more than just code movement, right?
+> Should we list some of that here?
 
-Queued, thanks.
+It was meant to be just moving code, but then the inevitable bikeshed
+showed up and I forgot to update the commit message properly. Will fix
+that.
 
-Paolo
+> Also, I'm seeing a crash due to this commit. More below:
 
+Uh that's not good.
+>
+> >
+> > Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> > Cc: Kees Cook <keescook@chromium.org>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > Cc: John Hubbard <jhubbard@nvidia.com>
+> > Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > Cc: Jan Kara <jack@suse.cz>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: linux-mm@kvack.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: linux-samsung-soc@vger.kernel.org
+> > Cc: linux-media@vger.kernel.org
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
+> > Cc: David Hildenbrand <david@redhat.com>
+> > Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+> > Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> > --
+> > v3:
+> > - add barrier for consistency and document why we don't have to check
+> >    for NULL (Jason)
+> > v4
+> > - Adjust comments to reflect the general nature of this iomem revoke
+> >    code now (Dan)
+> > ---
+> >   drivers/char/mem.c     |  85 +---------------------------------
+> >   include/linux/ioport.h |   6 +--
+> >   kernel/resource.c      | 101 ++++++++++++++++++++++++++++++++++++++++=
+-
+> >   3 files changed, 102 insertions(+), 90 deletions(-)
+> >
+> > diff --git a/drivers/char/mem.c b/drivers/char/mem.c
+> > index 7dcf9e4ea79d..43c871dc7477 100644
+> > --- a/drivers/char/mem.c
+> > +++ b/drivers/char/mem.c
+> > @@ -31,9 +31,6 @@
+> >   #include <linux/uio.h>
+> >   #include <linux/uaccess.h>
+> >   #include <linux/security.h>
+> > -#include <linux/pseudo_fs.h>
+> > -#include <uapi/linux/magic.h>
+> > -#include <linux/mount.h>
+> >
+> >   #ifdef CONFIG_IA64
+> >   # include <linux/efi.h>
+> > @@ -836,42 +833,6 @@ static loff_t memory_lseek(struct file *file, loff=
+_t offset, int orig)
+> >       return ret;
+> >   }
+> >
+> > -static struct inode *devmem_inode;
+> > -
+> > -#ifdef CONFIG_IO_STRICT_DEVMEM
+> > -void revoke_devmem(struct resource *res)
+> > -{
+> > -     /* pairs with smp_store_release() in devmem_init_inode() */
+> > -     struct inode *inode =3D smp_load_acquire(&devmem_inode);
+> > -
+> > -     /*
+> > -      * Check that the initialization has completed. Losing the race
+> > -      * is ok because it means drivers are claiming resources before
+> > -      * the fs_initcall level of init and prevent /dev/mem from
+> > -      * establishing mappings.
+> > -      */
+> > -     if (!inode)
+> > -             return;
+> > -
+> > -     /*
+> > -      * The expectation is that the driver has successfully marked
+> > -      * the resource busy by this point, so devmem_is_allowed()
+> > -      * should start returning false, however for performance this
+> > -      * does not iterate the entire resource range.
+> > -      */
+> > -     if (devmem_is_allowed(PHYS_PFN(res->start)) &&
+> > -         devmem_is_allowed(PHYS_PFN(res->end))) {
+> > -             /*
+> > -              * *cringe* iomem=3Drelaxed says "go ahead, what's the
+> > -              * worst that can happen?"
+> > -              */
+> > -             return;
+> > -     }
+> > -
+> > -     unmap_mapping_range(inode->i_mapping, res->start, resource_size(r=
+es), 1);
+> > -}
+> > -#endif
+> > -
+> >   static int open_port(struct inode *inode, struct file *filp)
+> >   {
+> >       int rc;
+> > @@ -891,7 +852,7 @@ static int open_port(struct inode *inode, struct fi=
+le *filp)
+> >        * revocations when drivers want to take over a /dev/mem mapped
+> >        * range.
+> >        */
+> > -     filp->f_mapping =3D inode->i_mapping;
+> > +     filp->f_mapping =3D iomem_get_mapping();
+>
+>
+> The problem is that iomem_get_mapping() returns NULL for the !CONFIG_IO_S=
+TRICT_DEVMEM
+> case. And then we have pre-existing fs code that expects to go "up and ov=
+er", like this:
+>
+>
+> static int do_dentry_open(struct file *f,
+>                           struct inode *inode,
+>                           int (*open)(struct inode *, struct file *))
+> {
+> ...
+>
+>         file_ra_state_init(&f->f_ra, f->f_mapping->host->i_mapping);
+>
+> ...and it crashes on that line fairly early in bootup.
+>
+> Not sure what to suggest for this patch, but wanted to get this report ou=
+t at least.
+
+Old code seems to have worked by always setting up the inode (we still
+do that) and always setting it (we don't do that anymore), just not
+revoking the ptes when the Kconfig is not set. I'll fix that up and
+remove the behaviour change here.
+-Daniel
+
+> thanks,
+> --
+> John Hubbard
+> NVIDIA
+>
+> >
+> >       return 0;
+> >   }
+> > @@ -1023,48 +984,6 @@ static char *mem_devnode(struct device *dev, umod=
+e_t *mode)
+> >
+> >   static struct class *mem_class;
+> >
+> > -static int devmem_fs_init_fs_context(struct fs_context *fc)
+> > -{
+> > -     return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
+> > -}
+> > -
+> > -static struct file_system_type devmem_fs_type =3D {
+> > -     .name           =3D "devmem",
+> > -     .owner          =3D THIS_MODULE,
+> > -     .init_fs_context =3D devmem_fs_init_fs_context,
+> > -     .kill_sb        =3D kill_anon_super,
+> > -};
+> > -
+> > -static int devmem_init_inode(void)
+> > -{
+> > -     static struct vfsmount *devmem_vfs_mount;
+> > -     static int devmem_fs_cnt;
+> > -     struct inode *inode;
+> > -     int rc;
+> > -
+> > -     rc =3D simple_pin_fs(&devmem_fs_type, &devmem_vfs_mount, &devmem_=
+fs_cnt);
+> > -     if (rc < 0) {
+> > -             pr_err("Cannot mount /dev/mem pseudo filesystem: %d\n", r=
+c);
+> > -             return rc;
+> > -     }
+> > -
+> > -     inode =3D alloc_anon_inode(devmem_vfs_mount->mnt_sb);
+> > -     if (IS_ERR(inode)) {
+> > -             rc =3D PTR_ERR(inode);
+> > -             pr_err("Cannot allocate inode for /dev/mem: %d\n", rc);
+> > -             simple_release_fs(&devmem_vfs_mount, &devmem_fs_cnt);
+> > -             return rc;
+> > -     }
+> > -
+> > -     /*
+> > -      * Publish /dev/mem initialized.
+> > -      * Pairs with smp_load_acquire() in revoke_devmem().
+> > -      */
+> > -     smp_store_release(&devmem_inode, inode);
+> > -
+> > -     return 0;
+> > -}
+> > -
+> >   static int __init chr_dev_init(void)
+> >   {
+> >       int minor;
+> > @@ -1086,8 +1005,6 @@ static int __init chr_dev_init(void)
+> >                */
+> >               if ((minor =3D=3D DEVPORT_MINOR) && !arch_has_dev_port())
+> >                       continue;
+> > -             if ((minor =3D=3D DEVMEM_MINOR) && devmem_init_inode() !=
+=3D 0)
+> > -                     continue;
+> >
+> >               device_create(mem_class, NULL, MKDEV(MEM_MAJOR, minor),
+> >                             NULL, devlist[minor].name);
+> > diff --git a/include/linux/ioport.h b/include/linux/ioport.h
+> > index 5135d4b86cd6..02a5466245c0 100644
+> > --- a/include/linux/ioport.h
+> > +++ b/include/linux/ioport.h
+> > @@ -307,11 +307,7 @@ struct resource *devm_request_free_mem_region(stru=
+ct device *dev,
+> >   struct resource *request_free_mem_region(struct resource *base,
+> >               unsigned long size, const char *name);
+> >
+> > -#ifdef CONFIG_IO_STRICT_DEVMEM
+> > -void revoke_devmem(struct resource *res);
+> > -#else
+> > -static inline void revoke_devmem(struct resource *res) { };
+> > -#endif
+> > +extern struct address_space *iomem_get_mapping(void);
+> >
+> >   #endif /* __ASSEMBLY__ */
+> >   #endif      /* _LINUX_IOPORT_H */
+> > diff --git a/kernel/resource.c b/kernel/resource.c
+> > index 3ae2f56cc79d..5ecc3187fe2d 100644
+> > --- a/kernel/resource.c
+> > +++ b/kernel/resource.c
+> > @@ -18,12 +18,15 @@
+> >   #include <linux/spinlock.h>
+> >   #include <linux/fs.h>
+> >   #include <linux/proc_fs.h>
+> > +#include <linux/pseudo_fs.h>
+> >   #include <linux/sched.h>
+> >   #include <linux/seq_file.h>
+> >   #include <linux/device.h>
+> >   #include <linux/pfn.h>
+> >   #include <linux/mm.h>
+> > +#include <linux/mount.h>
+> >   #include <linux/resource_ext.h>
+> > +#include <uapi/linux/magic.h>
+> >   #include <asm/io.h>
+> >
+> >
+> > @@ -1115,6 +1118,58 @@ resource_size_t resource_alignment(struct resour=
+ce *res)
+> >
+> >   static DECLARE_WAIT_QUEUE_HEAD(muxed_resource_wait);
+> >
+> > +static struct inode *iomem_inode;
+> > +
+> > +#ifdef CONFIG_IO_STRICT_DEVMEM
+> > +static void revoke_iomem(struct resource *res)
+> > +{
+> > +     /* pairs with smp_store_release() in iomem_init_inode() */
+> > +     struct inode *inode =3D smp_load_acquire(&iomem_inode);
+> > +
+> > +     /*
+> > +      * Check that the initialization has completed. Losing the race
+> > +      * is ok because it means drivers are claiming resources before
+> > +      * the fs_initcall level of init and prevent iomem_get_mapping us=
+ers
+> > +      * from establishing mappings.
+> > +      */
+> > +     if (!inode)
+> > +             return;
+> > +
+> > +     /*
+> > +      * The expectation is that the driver has successfully marked
+> > +      * the resource busy by this point, so devmem_is_allowed()
+> > +      * should start returning false, however for performance this
+> > +      * does not iterate the entire resource range.
+> > +      */
+> > +     if (devmem_is_allowed(PHYS_PFN(res->start)) &&
+> > +         devmem_is_allowed(PHYS_PFN(res->end))) {
+> > +             /*
+> > +              * *cringe* iomem=3Drelaxed says "go ahead, what's the
+> > +              * worst that can happen?"
+> > +              */
+> > +             return;
+> > +     }
+> > +
+> > +     unmap_mapping_range(inode->i_mapping, res->start, resource_size(r=
+es), 1);
+> > +}
+> > +struct address_space *iomem_get_mapping(void)
+> > +{
+> > +     /*
+> > +      * This function is only called from file open paths, hence guara=
+nteed
+> > +      * that fs_initcalls have completed and no need to check for NULL=
+. But
+> > +      * since revoke_iomem can be called before the initcall we still =
+need
+> > +      * the barrier to appease checkers.
+> > +      */
+> > +     return smp_load_acquire(&iomem_inode)->i_mapping;
+> > +}
+> > +#else
+> > +static void revoke_iomem(struct resource *res) {}
+> > +struct address_space *iomem_get_mapping(void)
+> > +{
+> > +     return NULL;
+> > +}
+> > +#endif
+> > +
+> >   /**
+> >    * __request_region - create a new busy resource region
+> >    * @parent: parent resource descriptor
+> > @@ -1182,7 +1237,7 @@ struct resource * __request_region(struct resourc=
+e *parent,
+> >       write_unlock(&resource_lock);
+> >
+> >       if (res && orig_parent =3D=3D &iomem_resource)
+> > -             revoke_devmem(res);
+> > +             revoke_iomem(res);
+> >
+> >       return res;
+> >   }
+> > @@ -1782,4 +1837,48 @@ static int __init strict_iomem(char *str)
+> >       return 1;
+> >   }
+> >
+> > +static int iomem_fs_init_fs_context(struct fs_context *fc)
+> > +{
+> > +     return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
+> > +}
+> > +
+> > +static struct file_system_type iomem_fs_type =3D {
+> > +     .name           =3D "iomem",
+> > +     .owner          =3D THIS_MODULE,
+> > +     .init_fs_context =3D iomem_fs_init_fs_context,
+> > +     .kill_sb        =3D kill_anon_super,
+> > +};
+> > +
+> > +static int __init iomem_init_inode(void)
+> > +{
+> > +     static struct vfsmount *iomem_vfs_mount;
+> > +     static int iomem_fs_cnt;
+> > +     struct inode *inode;
+> > +     int rc;
+> > +
+> > +     rc =3D simple_pin_fs(&iomem_fs_type, &iomem_vfs_mount, &iomem_fs_=
+cnt);
+> > +     if (rc < 0) {
+> > +             pr_err("Cannot mount iomem pseudo filesystem: %d\n", rc);
+> > +             return rc;
+> > +     }
+> > +
+> > +     inode =3D alloc_anon_inode(iomem_vfs_mount->mnt_sb);
+> > +     if (IS_ERR(inode)) {
+> > +             rc =3D PTR_ERR(inode);
+> > +             pr_err("Cannot allocate inode for iomem: %d\n", rc);
+> > +             simple_release_fs(&iomem_vfs_mount, &iomem_fs_cnt);
+> > +             return rc;
+> > +     }
+> > +
+> > +     /*
+> > +      * Publish iomem revocation inode initialized.
+> > +      * Pairs with smp_load_acquire() in revoke_iomem().
+> > +      */
+> > +     smp_store_release(&iomem_inode, inode);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +fs_initcall(iomem_init_inode);
+> > +
+> >   __setup("iomem=3D", strict_iomem);
+> >
+>
+>
+
+
+--=20
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
