@@ -2,153 +2,429 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B18982A1365
-	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 05:09:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C88C2A13DF
+	for <lists+kvm@lfdr.de>; Sat, 31 Oct 2020 07:36:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726156AbgJaEI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 31 Oct 2020 00:08:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15682 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725536AbgJaEI7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 31 Oct 2020 00:08:59 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09V42Jkr014246;
-        Sat, 31 Oct 2020 00:08:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=BZIc8kJ0AecLKZdXA3Z8SLdD4CpID6za1Fp/oxLvaOg=;
- b=MgzMrochXg4uhOPvghZzbGEsHOPvKGw4EDAJcK/ThV2UsGKI3O9UFXUgubCTmO/Q/NeW
- HPBLSUDjTP7/wDA/ZAnLVkQ6qkD91R2B3ZVzj7GK98k6+EijQa7SEkEFuezQEURJj7a1
- 4v2FUcmfY9M9QwQJhx9ur5htsxM7fNEyGc0/M3Gk51QYZ03qOnzmYmqXfxyGSjUBnGYv
- vhhlmiB8Cbp2kGubTq7tC3MjuB3L/83j4GcTcua2jum790MJpTetd0a6dusi2UIvlvhl
- K3jrDk8ejQJyA3JIO12zROlm536v3tYkI/UGlyvT0MIuKk8qcJ/Ttv4pWy3EPnAzu9SK RA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34h0am8d4s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 31 Oct 2020 00:08:54 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09V42Lfx014993;
-        Sat, 31 Oct 2020 00:08:54 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34h0am8d2g-6
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 31 Oct 2020 00:08:54 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09V3hLSL029632;
-        Sat, 31 Oct 2020 03:43:35 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 34gy6h01de-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 31 Oct 2020 03:43:35 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09V3hW5T36831528
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 31 Oct 2020 03:43:32 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8D09B11C058;
-        Sat, 31 Oct 2020 03:43:32 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C6C7711C052;
-        Sat, 31 Oct 2020 03:43:31 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.172.93])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sat, 31 Oct 2020 03:43:31 +0000 (GMT)
-Date:   Sat, 31 Oct 2020 04:43:29 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 01/14] s390/vfio-ap: No need to disable IRQ after
- queue reset
-Message-ID: <20201031044329.77b5a249.pasic@linux.ibm.com>
-In-Reply-To: <cb40a506-4a17-3562-728c-cbb57cd99817@linux.ibm.com>
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
-        <20201022171209.19494-2-akrowiak@linux.ibm.com>
-        <20201027074846.30ee0ddc.pasic@linux.ibm.com>
-        <7a2c5930-9c37-8763-7e5d-c08a3638e6a1@linux.ibm.com>
-        <20201030184242.3bceee09.pasic@linux.ibm.com>
-        <cb40a506-4a17-3562-728c-cbb57cd99817@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726407AbgJaGgn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 31 Oct 2020 02:36:43 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15757 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726395AbgJaGgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 31 Oct 2020 02:36:42 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f9d05fe0000>; Fri, 30 Oct 2020 23:36:46 -0700
+Received: from [10.2.58.85] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 31 Oct
+ 2020 06:36:35 +0000
+Subject: Re: [PATCH v5 13/15] resource: Move devmem revoke code to resource
+ framework
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>
+CC:     <kvm@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-media@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        "Jason Gunthorpe" <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
+        David Hildenbrand <david@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+References: <20201030100815.2269-1-daniel.vetter@ffwll.ch>
+ <20201030100815.2269-14-daniel.vetter@ffwll.ch>
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <787f2914-5777-4703-4bee-68c4c3742817@nvidia.com>
+Date:   Fri, 30 Oct 2020 23:36:35 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-10-31_01:2020-10-30,2020-10-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=952
- spamscore=0 priorityscore=1501 mlxscore=0 clxscore=1015 impostorscore=0
- lowpriorityscore=0 malwarescore=0 phishscore=0 bulkscore=0 suspectscore=2
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010310028
+In-Reply-To: <20201030100815.2269-14-daniel.vetter@ffwll.ch>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1604126206; bh=L4oBpwCPTK9i7x4n5WL1+chs0FMLfmAUGEi3yv+lcuI=;
+        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
+         MIME-Version:In-Reply-To:Content-Type:Content-Language:
+         Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
+        b=WZ7JBVVRAPxiUhUbHLrJz0ng6xWLVDFeI5F6t0NFEaUVKBf+9PQvDG50Ry3rfAkoV
+         LCvgXreq14KEkWnyFwiWU6fhUy1pBU/tx3Y4n+H12ax6Vn/AI7dMOQlVka1J5axAmQ
+         ocGvRj8CCCcnlhfxrDC76O0NA599zPER+hsSybBVQNFmPrhutABz9O+oUUocpw1Bgi
+         UeaBzWWZinoy5iSTQbDBuT1sHQxYmf6zLDEcCkcPhgiwj46WT/4vb7yV6fQbpsMxel
+         8PQPHmJpI57U3vhLB/4+Yqh4oJ5Js25Wz10SIfxnTiBGVwEwX8Pb6agDUQK411NqHd
+         rlpQsthsPHk3A==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 30 Oct 2020 16:37:04 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 10/30/20 3:08 AM, Daniel Vetter wrote:
+> We want all iomem mmaps to consistently revoke ptes when the kernel
+> takes over and CONFIG_IO_STRICT_DEVMEM is enabled. This includes the
+> pci bar mmaps available through procfs and sysfs, which currently do
+> not revoke mappings.
+>=20
+> To prepare for this, move the code from the /dev/kmem driver to
+> kernel/resource.c.
 
-> On 10/30/20 1:42 PM, Halil Pasic wrote:
-> > On Thu, 29 Oct 2020 19:29:35 -0400
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >  
-> >>>> @@ -1177,7 +1166,10 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
-> >>>>    			 */
-> >>>>    			if (ret)
-> >>>>    				rc = ret;
-> >>>> -			vfio_ap_irq_disable_apqn(AP_MKQID(apid, apqi));
-> >>>> +			q = vfio_ap_get_queue(matrix_mdev,
-> >>>> +					      AP_MKQID(apid, apqi));
-> >>>> +			if (q)
-> >>>> +				vfio_ap_free_aqic_resources(q);  
-> >>> Is it safe to do vfio_ap_free_aqic_resources() at this point? I don't
-> >>> think so. I mean does the current code (and vfio_ap_mdev_reset_queue()
-> >>> in particular guarantee that the reset is actually done when we arrive
-> >>> here)? BTW, I think we have a similar problem with the current code as
-> >>> well.  
-> >> If the return code from the vfio_ap_mdev_reset_queue() function
-> >> is zero, then yes, we are guaranteed the reset was done and the
-> >> queue is empty.  
-> > I've read up on this and I disagree. We should discuss this offline.  
-> 
-> Maybe you are confusing things here; my statement is specific to the return
-> code from the vfio_ap_mdev_reset_queue() function, not the response code
-> from the PQAP(ZAPQ) instruction. The vfio_ap_mdev_reset_queue()
-> function issues the PQAP(ZAPQ) instruction and if the status response code
-> is 0 indicating the reset was successfully initiated, it waits for the
-> queue to empty. When the queue is empty, it returns 0 to indicate
-> the queue is reset. 
-> If the queue does not become empty after a period of 
-> time,
-> it will issue a warning (WARN_ON_ONCE) and return 0. In that case, I suppose
-> there is no guarantee the reset was done, so maybe a change needs to be
-> made there such as a non-zero return code.
->
+This seems like it's doing a lot more than just code movement, right?
+Should we list some of that here?
 
-I've overlooked the wait for empty. Maybe that return 0 had a part in
-it. I now remember me insisting on having the wait code added when the
-interrupt support was in the make. Sorry!
+Also, I'm seeing a crash due to this commit. More below:
 
-If we have given up on out of retries retries, we are in trouble anyway.
- 
-> >  
-> >>    The function returns a non-zero return code if
-> >> the reset fails or the queue the reset did not complete within a given
-> >> amount of time, so maybe we shouldn't free AQIC resources when
-> >> we get a non-zero return code from the reset function?
-> >>  
-> > If the queue is gone, or broken, it won't produce interrupts or poke the
-> > notifier bit, and we should clean up the AQIC resources.  
-> 
-> True, which is what the code provided by this patch does; however,
-> the AQIC resources should be cleaned up only if the KVM pointer is
-> not NULL for reasons discussed elsewhere.
+>=20
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: John Hubbard <jhubbard@nvidia.com>
+> Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: linux-mm@kvack.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-samsung-soc@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> --
+> v3:
+> - add barrier for consistency and document why we don't have to check
+>    for NULL (Jason)
+> v4
+> - Adjust comments to reflect the general nature of this iomem revoke
+>    code now (Dan)
+> ---
+>   drivers/char/mem.c     |  85 +---------------------------------
+>   include/linux/ioport.h |   6 +--
+>   kernel/resource.c      | 101 ++++++++++++++++++++++++++++++++++++++++-
+>   3 files changed, 102 insertions(+), 90 deletions(-)
+>=20
+> diff --git a/drivers/char/mem.c b/drivers/char/mem.c
+> index 7dcf9e4ea79d..43c871dc7477 100644
+> --- a/drivers/char/mem.c
+> +++ b/drivers/char/mem.c
+> @@ -31,9 +31,6 @@
+>   #include <linux/uio.h>
+>   #include <linux/uaccess.h>
+>   #include <linux/security.h>
+> -#include <linux/pseudo_fs.h>
+> -#include <uapi/linux/magic.h>
+> -#include <linux/mount.h>
+>  =20
+>   #ifdef CONFIG_IA64
+>   # include <linux/efi.h>
+> @@ -836,42 +833,6 @@ static loff_t memory_lseek(struct file *file, loff_t=
+ offset, int orig)
+>   	return ret;
+>   }
+>  =20
+> -static struct inode *devmem_inode;
+> -
+> -#ifdef CONFIG_IO_STRICT_DEVMEM
+> -void revoke_devmem(struct resource *res)
+> -{
+> -	/* pairs with smp_store_release() in devmem_init_inode() */
+> -	struct inode *inode =3D smp_load_acquire(&devmem_inode);
+> -
+> -	/*
+> -	 * Check that the initialization has completed. Losing the race
+> -	 * is ok because it means drivers are claiming resources before
+> -	 * the fs_initcall level of init and prevent /dev/mem from
+> -	 * establishing mappings.
+> -	 */
+> -	if (!inode)
+> -		return;
+> -
+> -	/*
+> -	 * The expectation is that the driver has successfully marked
+> -	 * the resource busy by this point, so devmem_is_allowed()
+> -	 * should start returning false, however for performance this
+> -	 * does not iterate the entire resource range.
+> -	 */
+> -	if (devmem_is_allowed(PHYS_PFN(res->start)) &&
+> -	    devmem_is_allowed(PHYS_PFN(res->end))) {
+> -		/*
+> -		 * *cringe* iomem=3Drelaxed says "go ahead, what's the
+> -		 * worst that can happen?"
+> -		 */
+> -		return;
+> -	}
+> -
+> -	unmap_mapping_range(inode->i_mapping, res->start, resource_size(res), 1=
+);
+> -}
+> -#endif
+> -
+>   static int open_port(struct inode *inode, struct file *filp)
+>   {
+>   	int rc;
+> @@ -891,7 +852,7 @@ static int open_port(struct inode *inode, struct file=
+ *filp)
+>   	 * revocations when drivers want to take over a /dev/mem mapped
+>   	 * range.
+>   	 */
+> -	filp->f_mapping =3D inode->i_mapping;
+> +	filp->f_mapping =3D iomem_get_mapping();
 
-Yes, but these should be cleaned up before the KVM pointer becomes
-null. We don't want to keep the page with the notifier byte pinned
-forever, or?
+
+The problem is that iomem_get_mapping() returns NULL for the !CONFIG_IO_STR=
+ICT_DEVMEM
+case. And then we have pre-existing fs code that expects to go "up and over=
+", like this:
+
+
+static int do_dentry_open(struct file *f,
+			  struct inode *inode,
+			  int (*open)(struct inode *, struct file *))
+{
+...
+
+	file_ra_state_init(&f->f_ra, f->f_mapping->host->i_mapping);
+
+...and it crashes on that line fairly early in bootup.
+
+Not sure what to suggest for this patch, but wanted to get this report out =
+at least.
+
+thanks,
+--=20
+John Hubbard
+NVIDIA
+
+>  =20
+>   	return 0;
+>   }
+> @@ -1023,48 +984,6 @@ static char *mem_devnode(struct device *dev, umode_=
+t *mode)
+>  =20
+>   static struct class *mem_class;
+>  =20
+> -static int devmem_fs_init_fs_context(struct fs_context *fc)
+> -{
+> -	return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
+> -}
+> -
+> -static struct file_system_type devmem_fs_type =3D {
+> -	.name		=3D "devmem",
+> -	.owner		=3D THIS_MODULE,
+> -	.init_fs_context =3D devmem_fs_init_fs_context,
+> -	.kill_sb	=3D kill_anon_super,
+> -};
+> -
+> -static int devmem_init_inode(void)
+> -{
+> -	static struct vfsmount *devmem_vfs_mount;
+> -	static int devmem_fs_cnt;
+> -	struct inode *inode;
+> -	int rc;
+> -
+> -	rc =3D simple_pin_fs(&devmem_fs_type, &devmem_vfs_mount, &devmem_fs_cnt=
+);
+> -	if (rc < 0) {
+> -		pr_err("Cannot mount /dev/mem pseudo filesystem: %d\n", rc);
+> -		return rc;
+> -	}
+> -
+> -	inode =3D alloc_anon_inode(devmem_vfs_mount->mnt_sb);
+> -	if (IS_ERR(inode)) {
+> -		rc =3D PTR_ERR(inode);
+> -		pr_err("Cannot allocate inode for /dev/mem: %d\n", rc);
+> -		simple_release_fs(&devmem_vfs_mount, &devmem_fs_cnt);
+> -		return rc;
+> -	}
+> -
+> -	/*
+> -	 * Publish /dev/mem initialized.
+> -	 * Pairs with smp_load_acquire() in revoke_devmem().
+> -	 */
+> -	smp_store_release(&devmem_inode, inode);
+> -
+> -	return 0;
+> -}
+> -
+>   static int __init chr_dev_init(void)
+>   {
+>   	int minor;
+> @@ -1086,8 +1005,6 @@ static int __init chr_dev_init(void)
+>   		 */
+>   		if ((minor =3D=3D DEVPORT_MINOR) && !arch_has_dev_port())
+>   			continue;
+> -		if ((minor =3D=3D DEVMEM_MINOR) && devmem_init_inode() !=3D 0)
+> -			continue;
+>  =20
+>   		device_create(mem_class, NULL, MKDEV(MEM_MAJOR, minor),
+>   			      NULL, devlist[minor].name);
+> diff --git a/include/linux/ioport.h b/include/linux/ioport.h
+> index 5135d4b86cd6..02a5466245c0 100644
+> --- a/include/linux/ioport.h
+> +++ b/include/linux/ioport.h
+> @@ -307,11 +307,7 @@ struct resource *devm_request_free_mem_region(struct=
+ device *dev,
+>   struct resource *request_free_mem_region(struct resource *base,
+>   		unsigned long size, const char *name);
+>  =20
+> -#ifdef CONFIG_IO_STRICT_DEVMEM
+> -void revoke_devmem(struct resource *res);
+> -#else
+> -static inline void revoke_devmem(struct resource *res) { };
+> -#endif
+> +extern struct address_space *iomem_get_mapping(void);
+>  =20
+>   #endif /* __ASSEMBLY__ */
+>   #endif	/* _LINUX_IOPORT_H */
+> diff --git a/kernel/resource.c b/kernel/resource.c
+> index 3ae2f56cc79d..5ecc3187fe2d 100644
+> --- a/kernel/resource.c
+> +++ b/kernel/resource.c
+> @@ -18,12 +18,15 @@
+>   #include <linux/spinlock.h>
+>   #include <linux/fs.h>
+>   #include <linux/proc_fs.h>
+> +#include <linux/pseudo_fs.h>
+>   #include <linux/sched.h>
+>   #include <linux/seq_file.h>
+>   #include <linux/device.h>
+>   #include <linux/pfn.h>
+>   #include <linux/mm.h>
+> +#include <linux/mount.h>
+>   #include <linux/resource_ext.h>
+> +#include <uapi/linux/magic.h>
+>   #include <asm/io.h>
+>  =20
+>  =20
+> @@ -1115,6 +1118,58 @@ resource_size_t resource_alignment(struct resource=
+ *res)
+>  =20
+>   static DECLARE_WAIT_QUEUE_HEAD(muxed_resource_wait);
+>  =20
+> +static struct inode *iomem_inode;
+> +
+> +#ifdef CONFIG_IO_STRICT_DEVMEM
+> +static void revoke_iomem(struct resource *res)
+> +{
+> +	/* pairs with smp_store_release() in iomem_init_inode() */
+> +	struct inode *inode =3D smp_load_acquire(&iomem_inode);
+> +
+> +	/*
+> +	 * Check that the initialization has completed. Losing the race
+> +	 * is ok because it means drivers are claiming resources before
+> +	 * the fs_initcall level of init and prevent iomem_get_mapping users
+> +	 * from establishing mappings.
+> +	 */
+> +	if (!inode)
+> +		return;
+> +
+> +	/*
+> +	 * The expectation is that the driver has successfully marked
+> +	 * the resource busy by this point, so devmem_is_allowed()
+> +	 * should start returning false, however for performance this
+> +	 * does not iterate the entire resource range.
+> +	 */
+> +	if (devmem_is_allowed(PHYS_PFN(res->start)) &&
+> +	    devmem_is_allowed(PHYS_PFN(res->end))) {
+> +		/*
+> +		 * *cringe* iomem=3Drelaxed says "go ahead, what's the
+> +		 * worst that can happen?"
+> +		 */
+> +		return;
+> +	}
+> +
+> +	unmap_mapping_range(inode->i_mapping, res->start, resource_size(res), 1=
+);
+> +}
+> +struct address_space *iomem_get_mapping(void)
+> +{
+> +	/*
+> +	 * This function is only called from file open paths, hence guaranteed
+> +	 * that fs_initcalls have completed and no need to check for NULL. But
+> +	 * since revoke_iomem can be called before the initcall we still need
+> +	 * the barrier to appease checkers.
+> +	 */
+> +	return smp_load_acquire(&iomem_inode)->i_mapping;
+> +}
+> +#else
+> +static void revoke_iomem(struct resource *res) {}
+> +struct address_space *iomem_get_mapping(void)
+> +{
+> +	return NULL;
+> +}
+> +#endif
+> +
+>   /**
+>    * __request_region - create a new busy resource region
+>    * @parent: parent resource descriptor
+> @@ -1182,7 +1237,7 @@ struct resource * __request_region(struct resource =
+*parent,
+>   	write_unlock(&resource_lock);
+>  =20
+>   	if (res && orig_parent =3D=3D &iomem_resource)
+> -		revoke_devmem(res);
+> +		revoke_iomem(res);
+>  =20
+>   	return res;
+>   }
+> @@ -1782,4 +1837,48 @@ static int __init strict_iomem(char *str)
+>   	return 1;
+>   }
+>  =20
+> +static int iomem_fs_init_fs_context(struct fs_context *fc)
+> +{
+> +	return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
+> +}
+> +
+> +static struct file_system_type iomem_fs_type =3D {
+> +	.name		=3D "iomem",
+> +	.owner		=3D THIS_MODULE,
+> +	.init_fs_context =3D iomem_fs_init_fs_context,
+> +	.kill_sb	=3D kill_anon_super,
+> +};
+> +
+> +static int __init iomem_init_inode(void)
+> +{
+> +	static struct vfsmount *iomem_vfs_mount;
+> +	static int iomem_fs_cnt;
+> +	struct inode *inode;
+> +	int rc;
+> +
+> +	rc =3D simple_pin_fs(&iomem_fs_type, &iomem_vfs_mount, &iomem_fs_cnt);
+> +	if (rc < 0) {
+> +		pr_err("Cannot mount iomem pseudo filesystem: %d\n", rc);
+> +		return rc;
+> +	}
+> +
+> +	inode =3D alloc_anon_inode(iomem_vfs_mount->mnt_sb);
+> +	if (IS_ERR(inode)) {
+> +		rc =3D PTR_ERR(inode);
+> +		pr_err("Cannot allocate inode for iomem: %d\n", rc);
+> +		simple_release_fs(&iomem_vfs_mount, &iomem_fs_cnt);
+> +		return rc;
+> +	}
+> +
+> +	/*
+> +	 * Publish iomem revocation inode initialized.
+> +	 * Pairs with smp_load_acquire() in revoke_iomem().
+> +	 */
+> +	smp_store_release(&iomem_inode, inode);
+> +
+> +	return 0;
+> +}
+> +
+> +fs_initcall(iomem_init_inode);
+> +
+>   __setup("iomem=3D", strict_iomem);
+>=20
+
+
