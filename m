@@ -2,71 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61EE92A1D11
-	for <lists+kvm@lfdr.de>; Sun,  1 Nov 2020 11:11:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CB5A2A1D49
+	for <lists+kvm@lfdr.de>; Sun,  1 Nov 2020 11:31:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726154AbgKAKLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 Nov 2020 05:11:09 -0500
-Received: from mail-il1-f198.google.com ([209.85.166.198]:38721 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726122AbgKAKLI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 1 Nov 2020 05:11:08 -0500
-Received: by mail-il1-f198.google.com with SMTP id p17so8196935ilb.5
-        for <kvm@vger.kernel.org>; Sun, 01 Nov 2020 02:11:07 -0800 (PST)
+        id S1726397AbgKAKbD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 1 Nov 2020 05:31:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726138AbgKAKbC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 1 Nov 2020 05:31:02 -0500
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A860C061A47
+        for <kvm@vger.kernel.org>; Sun,  1 Nov 2020 02:31:01 -0800 (PST)
+Received: by mail-ot1-x342.google.com with SMTP id f37so9830969otf.12
+        for <kvm@vger.kernel.org>; Sun, 01 Nov 2020 02:31:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cMohUdqA3mHu1aHkJyF+q3c+LPomnH+bJbyOS5Pjj34=;
+        b=PXdr311jw4o1TK1cA/6mrlvkDVtMBlyy1XYbMpIt3vJC7ClXj7DZJYo+vKllfO49H/
+         YgcjzcGc1VpCnfRMFbloI4quCQ5ndPF+idmxEJoWrUJWkpgS76TUc1DHlMSxRDqofJvd
+         l2sKUL2WW0wKA2NYOf2SZx1Y6sFEl/LXBFDeg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=DNT5DJaDDfNyecwyRLYDgxpqveMo4JQlWpmg6tKju2w=;
-        b=Wpk505DQTmU03qWDclYpyS0Cu6uQZaaw/5MFZ0QZJ43Bbk6R+sUk23d/SkbvEDAX0c
-         Hfwh2QDimwHFecl7otUVS0BmpqjOH1HBCZMgUEh2XOU5IuF+S7tddsdAlwz0jHK0fBRT
-         KOyaWsYS7+oa0Zs9+BlMDf0ntZZgLtpYJZ6Xr2WAx+x70oJbFJsiVUyWVcVhkf7ShqbK
-         ecpipJLBkDc6KqdIzaRXzIOoDt2OYMkthOBHLAMWXNaTR+lImIVippEkUuelLd5+W9sY
-         lEpW4tUVzGXs23/5yN6gwr7oRq2BjMU8GG+/f/NmJeUMDyl2ImkvHPN4a0iA3aL6s3yp
-         KhdQ==
-X-Gm-Message-State: AOAM533MKon4HjCkEzB7Amd1M04dRhrCXBWfV1s9L80W5BUO9MqOU6xq
-        WvAL9jJp9LKU8JXdTcUYCZ3sv6/YzVbaPVm33Der/to2RzLZ
-X-Google-Smtp-Source: ABdhPJxctS2I+L3olPckb3hh9hZfKdD6yTrHGSqPX4hCaO2tFQcVdPn7k0R/QGO6z2nDrR9NItqN/DEwl64WRNQKAKC4+6c8m+GR
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cMohUdqA3mHu1aHkJyF+q3c+LPomnH+bJbyOS5Pjj34=;
+        b=cKFKWmC2wkNb4eZczAxfYM2tEB01Jn5N9lP6mtnr7htn4CyRZE71yfycnrKl30W7py
+         0Zjun3Llp7SCyZaQwKMHA7Ff1IRAhHIdhguGv/ydbGjWKsU3fELWdYBR1OmO2p+Eeczt
+         fvzevdLROyYc2q+2lCrwo1/9MNob7aM780RWIPzJm/zF78Mpgpw4iUgpS6IWkXA92Rpv
+         UdqKxK6IB2GyjTDOFAUmx/t5BzlP+fTO5BBOoKpQh2puIggK7ntA9OFbxGKRchokcbjM
+         IoSmEdDNaVgnUJjL2ns03dB/AuzSdx2ijWHHHzB5ChoJUDIZq5cysIzzQwL4HW8mwLpH
+         FcDg==
+X-Gm-Message-State: AOAM533oekUTeqQ0IgKaT6hMQhbsEzYSX4UMtCUO9knA2n7E5U2vzcEP
+        4DdkXpgZ5f85txMUroFsGoiwcF9+QAtXA4/0g0PR0A==
+X-Google-Smtp-Source: ABdhPJxxfl/j7Y56O7SvvjDInbgd1Huz0SnDjNzTDNqX3oHxJ8qJKEvsr7nAV6GfCrUUP0r8bqY++IYBOL0aDpBKvjo=
+X-Received: by 2002:a05:6830:1647:: with SMTP id h7mr8739299otr.281.1604226660644;
+ Sun, 01 Nov 2020 02:31:00 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:3f1:: with SMTP id s17mr7616578jaq.102.1604225467601;
- Sun, 01 Nov 2020 02:11:07 -0800 (PST)
-Date:   Sun, 01 Nov 2020 02:11:07 -0800
-In-Reply-To: <00000000000052792305af1c7614@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000022d95405b308d905@google.com>
-Subject: Re: BUG: unable to handle kernel paging request in pvclock_gtod_notify
-From:   syzbot <syzbot+815c663e220da75b02b6@syzkaller.appspotmail.com>
-To:     b.zolnierkie@samsung.com, bp@alien8.de, dan.carpenter@oracle.com,
-        george.kennedy@oracle.com, hpa@zytor.com, jmattson@google.com,
-        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
+References: <20201030100815.2269-1-daniel.vetter@ffwll.ch> <20201030100815.2269-6-daniel.vetter@ffwll.ch>
+ <446b2d5b-a1a1-a408-f884-f17a04b72c18@nvidia.com> <CAKMK7uGDW2f0oOvwgryCHxQFHyh3Tsk6ENsMGmtZ-EnH57tMSA@mail.gmail.com>
+ <1f7cf690-35e2-c56f-6d3f-94400633edd2@nvidia.com>
+In-Reply-To: <1f7cf690-35e2-c56f-6d3f-94400633edd2@nvidia.com>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Sun, 1 Nov 2020 11:30:49 +0100
+Message-ID: <CAKMK7uFYDSqnNp_xpohzCEidw_iLufNSoX4v55sNZj-nwTckSg@mail.gmail.com>
+Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Pawel Osciak <pawel@osciak.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Tomasz Figa <tfiga@chromium.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On Sun, Nov 1, 2020 at 6:22 AM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> On 10/31/20 7:45 AM, Daniel Vetter wrote:
+> > On Sat, Oct 31, 2020 at 3:55 AM John Hubbard <jhubbard@nvidia.com> wrote:
+> >> On 10/30/20 3:08 AM, Daniel Vetter wrote:
+> ...
+> >> By removing this check from this location, and changing from
+> >> pin_user_pages_locked() to pin_user_pages_fast(), I *think* we end up
+> >> losing the check entirely. Is that intended? If so it could use a comment
+> >> somewhere to explain why.
+> >
+> > Yeah this wasn't intentional. I think I needed to drop the _locked
+> > version to prep for FOLL_LONGTERM, and figured _fast is always better.
+> > But I didn't realize that _fast doesn't have the vma checks, gup.c got
+> > me a bit confused.
+>
+> Actually, I thought that the change to _fast was a very nice touch, btw.
+>
+> >
+> > I'll remedy this in all the patches where this applies (because a
+> > VM_IO | VM_PFNMAP can point at struct page backed memory, and that
+> > exact use-case is what we want to stop with the unsafe_follow_pfn work
+> > since it wreaks things like cma or security).
+> >
+> > Aside: I do wonder whether the lack for that check isn't a problem.
+> > VM_IO | VM_PFNMAP generally means driver managed, which means the
+> > driver isn't going to consult the page pin count or anything like that
+> > (at least not necessarily) when revoking or moving that memory, since
+> > we're assuming it's totally under driver control. So if pup_fast can
+> > get into such a mapping, we might have a problem.
+> > -Daniel
+> >
+>
+> Yes. I don't know why that check is missing from the _fast path.
+> Probably just an oversight, seeing as how it's in the slow path. Maybe
+> the appropriate response here is to add a separate patch that adds the
+> check.
+>
+> I wonder if I'm overlooking something, but it certainly seems correct to
+> do that.
 
-commit a49145acfb975d921464b84fe00279f99827d816
-Author: George Kennedy <george.kennedy@oracle.com>
-Date:   Tue Jul 7 19:26:03 2020 +0000
+You'll need the mmap_sem to get at the vma to be able to do this
+check. If you add that to _fast, you made it as fast as the slow one.
+Plus there's _fast_only due to locking recurion issues in fast-paths
+(I assume, I didn't check all the callers).
 
-    fbmem: add margin check to fb_check_caps()
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17499724500000
-start commit:   60e72093 Merge tag 'clk-fixes-for-linus' of git://git.kern..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=89ab6a0c48f30b49
-dashboard link: https://syzkaller.appspot.com/bug?extid=815c663e220da75b02b6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1162b04d900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=135e7383900000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: fbmem: add margin check to fb_check_caps()
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+I'm just wondering whether we have a bug somewhere with device
+drivers. For CMA regions we always check in try_grab_page, but for dax
+I'm not seeing where the checks in the _fast fastpaths are, and that
+all still leaves random device driver mappings behind which aren't
+backed by CMA but still point to something with a struct page behind
+it. I'm probably just missing something, but no idea what.
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
