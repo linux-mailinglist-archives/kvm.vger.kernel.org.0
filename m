@@ -2,154 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E688C2A1CD5
-	for <lists+kvm@lfdr.de>; Sun,  1 Nov 2020 10:24:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61EE92A1D11
+	for <lists+kvm@lfdr.de>; Sun,  1 Nov 2020 11:11:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726282AbgKAJYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 Nov 2020 04:24:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30397 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726152AbgKAJYd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 1 Nov 2020 04:24:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604222671;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=WlKpkrMPpM4b9Gdg8EmfsYDmclv1MRjoL1qgiPjBPKo=;
-        b=e7JbKM9SxP9gEFxp37GA5626sZNr0E1cz7gBkMGXGO7i1y2AE1AjmbUtVLRmxIK8ZM38RV
-        UHR5QuZE4aPuPvLGFfAed1YIY20nvbaxAcPLwo2z4v2I0ncBKNXuIEL8iI5PKNY6aJEFc1
-        N9URnAOzi/Y6Zs5NcnLvreC21l1br6o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-3DjQcdowMcu3IqaopbTLDg-1; Sun, 01 Nov 2020 04:24:29 -0500
-X-MC-Unique: 3DjQcdowMcu3IqaopbTLDg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7EF01006C88;
-        Sun,  1 Nov 2020 09:24:28 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 554D56EF77;
-        Sun,  1 Nov 2020 09:24:28 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for 5.10-rc2
-Date:   Sun,  1 Nov 2020 04:24:27 -0500
-Message-Id: <20201101092427.3999755-1-pbonzini@redhat.com>
+        id S1726154AbgKAKLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 1 Nov 2020 05:11:09 -0500
+Received: from mail-il1-f198.google.com ([209.85.166.198]:38721 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726122AbgKAKLI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 1 Nov 2020 05:11:08 -0500
+Received: by mail-il1-f198.google.com with SMTP id p17so8196935ilb.5
+        for <kvm@vger.kernel.org>; Sun, 01 Nov 2020 02:11:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=DNT5DJaDDfNyecwyRLYDgxpqveMo4JQlWpmg6tKju2w=;
+        b=Wpk505DQTmU03qWDclYpyS0Cu6uQZaaw/5MFZ0QZJ43Bbk6R+sUk23d/SkbvEDAX0c
+         Hfwh2QDimwHFecl7otUVS0BmpqjOH1HBCZMgUEh2XOU5IuF+S7tddsdAlwz0jHK0fBRT
+         KOyaWsYS7+oa0Zs9+BlMDf0ntZZgLtpYJZ6Xr2WAx+x70oJbFJsiVUyWVcVhkf7ShqbK
+         ecpipJLBkDc6KqdIzaRXzIOoDt2OYMkthOBHLAMWXNaTR+lImIVippEkUuelLd5+W9sY
+         lEpW4tUVzGXs23/5yN6gwr7oRq2BjMU8GG+/f/NmJeUMDyl2ImkvHPN4a0iA3aL6s3yp
+         KhdQ==
+X-Gm-Message-State: AOAM533MKon4HjCkEzB7Amd1M04dRhrCXBWfV1s9L80W5BUO9MqOU6xq
+        WvAL9jJp9LKU8JXdTcUYCZ3sv6/YzVbaPVm33Der/to2RzLZ
+X-Google-Smtp-Source: ABdhPJxctS2I+L3olPckb3hh9hZfKdD6yTrHGSqPX4hCaO2tFQcVdPn7k0R/QGO6z2nDrR9NItqN/DEwl64WRNQKAKC4+6c8m+GR
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Received: by 2002:a05:6638:3f1:: with SMTP id s17mr7616578jaq.102.1604225467601;
+ Sun, 01 Nov 2020 02:11:07 -0800 (PST)
+Date:   Sun, 01 Nov 2020 02:11:07 -0800
+In-Reply-To: <00000000000052792305af1c7614@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000022d95405b308d905@google.com>
+Subject: Re: BUG: unable to handle kernel paging request in pvclock_gtod_notify
+From:   syzbot <syzbot+815c663e220da75b02b6@syzkaller.appspotmail.com>
+To:     b.zolnierkie@samsung.com, bp@alien8.de, dan.carpenter@oracle.com,
+        george.kennedy@oracle.com, hpa@zytor.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+syzbot suspects this issue was fixed by commit:
 
-The following changes since commit 3650b228f83adda7e5ee532e2b90429c03f7b9ec:
+commit a49145acfb975d921464b84fe00279f99827d816
+Author: George Kennedy <george.kennedy@oracle.com>
+Date:   Tue Jul 7 19:26:03 2020 +0000
 
-  Linux 5.10-rc1 (2020-10-25 15:14:11 -0700)
+    fbmem: add margin check to fb_check_caps()
 
-are available in the Git repository at:
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17499724500000
+start commit:   60e72093 Merge tag 'clk-fixes-for-linus' of git://git.kern..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=89ab6a0c48f30b49
+dashboard link: https://syzkaller.appspot.com/bug?extid=815c663e220da75b02b6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1162b04d900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=135e7383900000
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+If the result looks correct, please mark the issue as fixed by replying with:
 
-for you to fetch changes up to 9478dec3b5e79a1431e2e2b911e32e52a11c6320:
+#syz fix: fbmem: add margin check to fb_check_caps()
 
-  KVM: vmx: remove unused variable (2020-10-31 11:38:43 -0400)
-
-----------------------------------------------------------------
-ARM:
-* selftest fix
-* Force PTE mapping on device pages provided via VFIO
-* Fix detection of cacheable mapping at S2
-* Fallback to PMD/PTE mappings for composite huge pages
-* Fix accounting of Stage-2 PGD allocation
-* Fix AArch32 handling of some of the debug registers
-* Simplify host HYP entry
-* Fix stray pointer conversion on nVHE TLB invalidation
-* Fix initialization of the nVHE code
-* Simplify handling of capabilities exposed to HYP
-* Nuke VCPUs caught using a forbidden AArch32 EL0
-
-x86:
-* new nested virtualization selftest
-* Miscellaneous fixes
-* make W=1 fixes
-* Reserve new CPUID bit in the KVM leaves
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: selftests: Don't require THP to run tests
-
-David Woodhouse (1):
-      x86/kvm: Reserve KVM_FEATURE_MSI_EXT_DEST_ID
-
-Gavin Shan (1):
-      KVM: arm64: Use fallback mapping sizes for contiguous huge page sizes
-
-Jim Mattson (1):
-      KVM: selftests: test behavior of unmapped L2 APIC-access address
-
-Marc Zyngier (4):
-      KVM: arm64: Don't corrupt tpidr_el2 on failed HVC call
-      KVM: arm64: Remove leftover kern_hyp_va() in nVHE TLB invalidation
-      KVM: arm64: Drop useless PAN setting on host EL1 to EL2 transition
-      KVM: arm64: Fix AArch32 handling of DBGD{CCINT,SCRext} and DBGVCR
-
-Mark Rutland (3):
-      KVM: arm64: Factor out is_{vhe,nvhe}_hyp_code()
-      arm64: cpufeature: reorder cpus_have_{const, final}_cap()
-      arm64: cpufeature: upgrade hyp caps to final
-
-Paolo Bonzini (3):
-      Merge tag 'kvmarm-fixes-5.10-1' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
-      KVM: x86: replace static const variables with macros
-      KVM: vmx: remove unused variable
-
-Qais Yousef (1):
-      KVM: arm64: Handle Asymmetric AArch32 systems
-
-Santosh Shukla (1):
-      KVM: arm64: Force PTE mapping on fault resulting in a device mapping
-
-Takashi Iwai (1):
-      KVM: x86: Fix NULL dereference at kvm_msr_ignored_check()
-
-Vitaly Kuznetsov (1):
-      KVM: VMX: eVMCS: make evmcs_sanitize_exec_ctrls() work again
-
-Will Deacon (2):
-      KVM: arm64: Allocate stage-2 pgd pages with GFP_KERNEL_ACCOUNT
-      KVM: arm64: Fix masks in stage2_pte_cacheable()
-
- Documentation/virt/kvm/cpuid.rst                   |   4 +
- arch/arm64/include/asm/cpufeature.h                |  40 ++++--
- arch/arm64/include/asm/kvm_host.h                  |   1 +
- arch/arm64/include/asm/virt.h                      |   9 +-
- arch/arm64/kernel/image-vars.h                     |   1 -
- arch/arm64/kvm/arm.c                               |  19 +++
- arch/arm64/kvm/hyp/nvhe/host.S                     |   2 -
- arch/arm64/kvm/hyp/nvhe/hyp-init.S                 |  23 +++-
- arch/arm64/kvm/hyp/nvhe/tlb.c                      |   1 -
- arch/arm64/kvm/hyp/pgtable.c                       |   4 +-
- arch/arm64/kvm/mmu.c                               |  27 +++-
- arch/arm64/kvm/sys_regs.c                          |   6 +-
- arch/x86/include/uapi/asm/kvm_para.h               |   1 +
- arch/x86/kvm/mmu/mmu.c                             |  10 +-
- arch/x86/kvm/mmu/spte.c                            |  16 +--
- arch/x86/kvm/mmu/spte.h                            |  16 +--
- arch/x86/kvm/vmx/evmcs.c                           |   3 +-
- arch/x86/kvm/vmx/evmcs.h                           |   3 +-
- arch/x86/kvm/vmx/vmx.c                             |   6 +-
- arch/x86/kvm/x86.c                                 |   8 +-
- tools/testing/selftests/kvm/.gitignore             |   1 +
- tools/testing/selftests/kvm/Makefile               |   1 +
- tools/testing/selftests/kvm/include/x86_64/vmx.h   |   6 +
- tools/testing/selftests/kvm/lib/kvm_util.c         |  23 +++-
- tools/testing/selftests/kvm/lib/x86_64/vmx.c       |   9 ++
- .../selftests/kvm/x86_64/vmx_apic_access_test.c    | 142 +++++++++++++++++++++
- 26 files changed, 306 insertions(+), 76 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
