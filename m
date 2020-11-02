@@ -2,128 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B863D2A2B5B
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 14:22:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1175C2A2B6C
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 14:24:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728745AbgKBNWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 08:22:06 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13440 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725809AbgKBNWF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 08:22:05 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5fa008010000>; Mon, 02 Nov 2020 05:22:09 -0800
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 2 Nov
- 2020 13:22:02 +0000
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
- by HQMAIL109.nvidia.com (172.20.187.15) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Mon, 2 Nov 2020 13:22:02 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EED55EXPmd+OphiJQWGeESG8yUm/V2Xq5TJJitYUsM/mGlRql1cDzMr6La+LFFuh18Meazfxiz1LZchffzP3BQL4QPp3gHaNmCdEJg7lySXCtPB0QE9rdNDo7kxYirDgSn97BaMSVnSMy4z9H07rYLE9c5MYQy3aaIEjS7MaveYTa/rv3qRgWUZk9VdNXCFwkuHp5Hw0DaaiwypFQ/ueNnnntY3OYh6wchR/EzJVODa+NTV0w4ZlduVRbPCwLpkC+3nn7Au7tYvcVsoGq73xFaCv6am4i1ItNU4/0rQs+mjxBbql46lemksjeDkUpeV6ZXcOH4nb5nybqoSYidhkxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GUYoVtIU02fFt28vDH50Q7a6CyGVgq4MIbit569l2sY=;
- b=EkyAvPDHYuM6MIliPGEvJuvaHLA86JCJHCu82N3HyXcnHreTdA93kfy+4OI+lHhcPxRfR91X2SQGsrmmM/uYhQ1gzvEh2+xk1NJOCEIrZ4322jEYYIdrcFwjW2F/vQ+smhjOEbDflyfIeQLd8XzRHz/W+KwOL60fJnPIPOP3NYL7DGt9qsnFphM2Ih/uGJQog1qRLLr7Pc9D/FEzMnOx+/sYgrk2/z2H+r0VrmyVpBeCc3LSAjhwmC9urqMBinkzDLD+ZokZILpHYK+qOT+M3eSH02Oj0QI/vIsAqS8DC2jgu/FRl54AWi0PbFzOsvXIpounjCwv3m2ibAvekCjn0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4810.namprd12.prod.outlook.com (2603:10b6:5:1f7::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Mon, 2 Nov
- 2020 13:22:01 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.030; Mon, 2 Nov 2020
- 13:22:01 +0000
-Date:   Mon, 2 Nov 2020 09:21:58 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Dave Jiang <dave.jiang@intel.com>
-CC:     Bjorn Helgaas <helgaas@kernel.org>, <vkoul@kernel.org>,
-        <megha.dey@intel.com>, <maz@kernel.org>, <bhelgaas@google.com>,
-        <tglx@linutronix.de>, <alex.williamson@redhat.com>,
-        <jacob.jun.pan@intel.com>, <ashok.raj@intel.com>,
-        <yi.l.liu@intel.com>, <baolu.lu@intel.com>, <kevin.tian@intel.com>,
-        <sanjay.k.kumar@intel.com>, <tony.luck@intel.com>,
-        <jing.lin@intel.com>, <dan.j.williams@intel.com>,
-        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
-        <parav@mellanox.com>, <rafael@kernel.org>, <netanelg@mellanox.com>,
-        <shahafs@mellanox.com>, <yan.y.zhao@linux.intel.com>,
-        <pbonzini@redhat.com>, <samuel.ortiz@intel.com>,
-        <mona.hossain@intel.com>, <dmaengine@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-Message-ID: <20201102132158.GA3352700@nvidia.com>
-References: <20201030195159.GA589138@bjorn-Precision-5520>
- <71da5f66-e929-bab1-a1c6-a9ac9627a141@intel.com>
- <20201030224534.GN2620339@nvidia.com>
- <ec52cedf-3a99-5ca1-ffbb-d8f8c4f62395@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ec52cedf-3a99-5ca1-ffbb-d8f8c4f62395@intel.com>
-X-ClientProxiedBy: BL0PR0102CA0068.prod.exchangelabs.com
- (2603:10b6:208:25::45) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1728614AbgKBNYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 08:24:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38530 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725809AbgKBNYK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 08:24:10 -0500
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F7DC0617A6
+        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 05:24:09 -0800 (PST)
+Received: by mail-oi1-x242.google.com with SMTP id l62so8974384oig.1
+        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 05:24:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JGM5iJVe1/YS3RI7Ox6P0c/NeEFHo7I8woI64ttdcHw=;
+        b=Redsc76//XOqhmrR47LrRhhRKZfVgrPgcKjaj3flUUV05IMeYYgYI96W5nS3FoZvN7
+         n0yN3r95mirzqxFiZdIGicTdRpE+APj1YYPKDXlNxKd2lAM4+mMT2WniX47hjE9Yln3I
+         Y2p0Ua++jSUdgHYquFbAF5VAHeKUIvWvGxWx4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JGM5iJVe1/YS3RI7Ox6P0c/NeEFHo7I8woI64ttdcHw=;
+        b=n74jJ4tOcaf3pGFOIsfLvL2fs3OZTf4Td5bJ+MvIGS8XSNl7++js6sOc6gflQRPx04
+         Bh4tl3IR/Q7LJJiCWegUfNzbMd31m0S5DwKVK9Mj3Nt1zXbIY+l38w2MIFZUXlgPY72s
+         l5Gob5lFl4jQHMu+f5MlCzZGTiedp2qv3S1ZRdl7d6Z1MYr/yFWIgeinRHj3532b3snu
+         zlKlXTAt8TvRQ0eir0VAb7sRLSTy3ye5LqZvZv4yEfGN471u6xkhwVlXD5o7sGZapVS8
+         Rnu66QsLRkpgpXXX1s8kFnxXR0V3ZC8p5mTbE2OvVNw+oO1okpZyIF8/Ee72y92jzkHb
+         zDOg==
+X-Gm-Message-State: AOAM5300JQ5hp+g2RiRl5pfgIfacoNjeDNIn9iWbQ++w9SrtpiPFYBbC
+        TWzOPDaKEo94WPJrsiNbaFngcr+D9YIBoeqwLNRFzw==
+X-Google-Smtp-Source: ABdhPJz6z2w7hj9FcAzqiJvVAZYDEwQ1hz51TSyVs1UuhBMkzKJELH0Nji35ZsSbH8nvJRYlHjcaT+TvGc3KsVWMNe0=
+X-Received: by 2002:aca:b141:: with SMTP id a62mr9289032oif.101.1604323449305;
+ Mon, 02 Nov 2020 05:24:09 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by BL0PR0102CA0068.prod.exchangelabs.com (2603:10b6:208:25::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend Transport; Mon, 2 Nov 2020 13:22:00 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kZZmY-00F5qE-UL; Mon, 02 Nov 2020 09:21:58 -0400
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1604323329; bh=GUYoVtIU02fFt28vDH50Q7a6CyGVgq4MIbit569l2sY=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
-        b=qtCgIBia4z+8te/t6cLhiw4Vw5DGlpCmodklokxK+k/9ri92A5AAg9zPE9pqNzAh2
-         7DJNDrNBRcQeknp+MS6eS4QTFpC9GkSJ495g7s/tumJb3FjYcmp4K4Bapo9LbO3HwB
-         mvyExe7k893RzIdSb4SfKI8QgDsqEjd/7OUp86bhaIDWQZ/Jq2dXAAqfA8g6WcPzja
-         nkh4ddFhVqkMzI4TlVKQ/lQwFMJp3OfqzEsxr+TGPL1lSyyUC2oCVeJuCMz0cxF1AV
-         kBlDmt4fiS0H4yz/WIH8nWeMmuRrN4iyXHKYbR3ngUz8r0JXgl+HmR7X82EmO99tPC
-         PcQvLnQPmFXig==
+References: <20201030100815.2269-1-daniel.vetter@ffwll.ch> <20201030100815.2269-9-daniel.vetter@ffwll.ch>
+ <20201102072931.GA16419@infradead.org> <CAKMK7uEe5FQuukYU7RhL90ttC9XyWw6wvdQrZ2JpP0jpbYTO6g@mail.gmail.com>
+ <20201102130115.GC36674@ziepe.ca>
+In-Reply-To: <20201102130115.GC36674@ziepe.ca>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Mon, 2 Nov 2020 14:23:58 +0100
+Message-ID: <CAKMK7uHeL=w7GoBaY4XrbRcpJabR9UWnP+oQ9Fg51OzL7=KxiA@mail.gmail.com>
+Subject: Re: [PATCH v5 08/15] mm: Add unsafe_follow_pfn
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        "J??r??me Glisse" <jglisse@redhat.com>, Jan Kara <jack@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 30, 2020 at 03:49:22PM -0700, Dave Jiang wrote:
-> 
-> 
-> On 10/30/2020 3:45 PM, Jason Gunthorpe wrote:
-> > On Fri, Oct 30, 2020 at 02:20:03PM -0700, Dave Jiang wrote:
-> > > So the intel-iommu driver checks for the SIOV cap. And the idxd driver
-> > > checks for SIOV and IMS cap. There will be other upcoming drivers that will
-> > > check for such cap too. It is Intel vendor specific right now, but SIOV is
-> > > public and other vendors may implement to the spec. Is there a good place to
-> > > put the common capability check for that?
-> > 
-> > I'm still really unhappy with these SIOV caps. It was explained this
-> > is just a hack to make up for pci_ims_array_create_msi_irq_domain()
-> > succeeding in VM cases when it doesn't actually work.
-> > 
-> > Someday this is likely to get fixed, so tying platform behavior to PCI
-> > caps is completely wrong.
-> > 
-> > This needs to be solved in the platform code,
-> > pci_ims_array_create_msi_irq_domain() should not succeed in these
-> > cases.
-> 
-> That sounds reasonable. Are you asking that the IMS cap check should gate
-> the success/failure of pci_ims_array_create_msi_irq_domain() rather than the
-> driver?
+On Mon, Nov 2, 2020 at 2:01 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Mon, Nov 02, 2020 at 01:56:10PM +0100, Daniel Vetter wrote:
+> > On Mon, Nov 2, 2020 at 8:29 AM Christoph Hellwig <hch@infradead.org> wrote:
+> > >
+> > > On Fri, Oct 30, 2020 at 11:08:08AM +0100, Daniel Vetter wrote:
+> > > > Also mark up follow_pfn as EXPORT_SYMBOL_GPL. The only safe way to use
+> > > > that by drivers/modules is together with an mmu_notifier, and that's
+> > > > all _GPL stuff.
+> > >
+> > > I also think it also needs to be renamed to explicitly break any existing
+> > > users out of tree or int the submission queue.
+> >
+> > Ok I looked at the mmu notifier locking again and noticed that
+> > mm->subscriptions has its own spinlock. Since there usually shouldn't
+> > be a huge pile of these I think it's feasible to check for the mmu
+> > notifier in follow_pfn. And that would stuff this gap for good. I'll
+> > throw that on top as a final patch and see what people think.
+>
+> Probably the simplest is to just check mm_has_notifiers() when in
+> lockdep or something very simple like that
 
-There shouldn't be an IMS cap at all
-
-As I understand, the problem here is the only way to establish new
-VT-d IRQ routing is by trapping and emulating MSI/MSI-X related
-activities and triggering routing of the vectors into the guest.
-
-There is a missing hypercall to allow the guest to do this on its own,
-presumably it will someday be fixed so IMS can work in guests.
-
-Until the hypercall is added pci_ims_array_create_msi_irq_domain()
-should simply fail in guests. No PCI cap check required.
-
-Jason
+lockdep feels wrong, was locking more at CONFIG_DEBUG_VM. And since
+generally you only have 1 mmu notifier (especially for kvm) I think we
+can also pay the 2nd cacheline miss and actually check the right mmu
+notifier is registered.
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
