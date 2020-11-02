@@ -2,123 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 382F82A3020
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 17:42:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F164F2A3029
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 17:43:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727346AbgKBQmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 11:42:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41488 "EHLO
+        id S1727144AbgKBQnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 11:43:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727337AbgKBQmd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 11:42:33 -0500
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC3ABC061A48
-        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 08:42:32 -0800 (PST)
-Received: by mail-ot1-x343.google.com with SMTP id h62so13160047oth.9
-        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 08:42:32 -0800 (PST)
+        with ESMTP id S1726913AbgKBQnn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 11:43:43 -0500
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E626FC0617A6
+        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 08:43:42 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id c9so8513428wml.5
+        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 08:43:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=LkcPNNpMLX6kEqUed20/jhdzhJZXy+qPlqOir1Z4UWg=;
-        b=DejrOT1ET977KzMedOZFf/nvESeZd35VW615DHzfUVNv/jtr5S39tQRR1rkXRrNQsS
-         8e7QakA0NQZajazNYknFTyPn7wzCTD0MaLh6LD79vAKy5J2WjkyqZwU1hUMlTMpcVTcY
-         aRcqJL/19jZSjJmXa+xeFfRoO2oW4s/0IBZV8=
+        bh=Z+d818YUCcbVlR/JysJp1RAmAEoaBLjpuG8D8U7SqKQ=;
+        b=1Hqt4xIZOLZwyC8O6kYf7k/TFdaN+YLxie4zOSb3Kfz619j9++lDs8+YyskxeHCuVX
+         YQpy8FXElZEO13ZXFGmJqPlntw0YuvD6V1gIIHIb62HTf4JyqtmezUJAKXR5JsfPEJ6A
+         3cMVkS9NWl1B78Ci3com5rTqA7Izg1vIYtKgZ0R/R/qr+hMJPfu6md2WRoQqYwMWs0ED
+         i0ly/SkwfL222dQS6QWV6njxuIfo49TJG8B/xEebzssMx6+2Jn5iaGpcZLwQQjEkACOQ
+         IRYAkl/D8ZuWQP3s/mcDVdH490+5d2qhPW1Vio6rY4Va5z6vCeLaJVYm/tKvSW1GB+JL
+         y3rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=LkcPNNpMLX6kEqUed20/jhdzhJZXy+qPlqOir1Z4UWg=;
-        b=jv2U1dPhLeBCzEK4+/RX7nKXNLspg46DRbvCHBMvY58iCxUSCzUR2Ft8HDrjHUCEQO
-         dzhwqUMivgZOoNyRRAokf9Yzkj7JAOPk/wqB16i0jagXHW8aPV/EBZMifPrP6kWz0GBt
-         Ha7g72c/K9us3TDTPTkIlLXPwAUWKiGwhMRh0unQeixzl1CiNUZutw8a7vvyIa3O9ghq
-         MjEOb++BetphzRdWiRd+RI3oiBAVmcgt4FGB6xxL3DP8OKZ1i5kSxbVaU6EpGymvwPIw
-         toHOmzxpbkoP6WjzGMBklQ2CwwY1Nvc0geFB7IYtyEh7FLTT42tc21o+vS7WDw2EaBki
-         BM9g==
-X-Gm-Message-State: AOAM531IC7+3rK2yd/pBl4DympL83sGYtWqE8gKL5y6y7PAaYhSIc5S9
-        2Awv4wjS0kPHweoH1UZIYZvMDsCCpa8aMFX0L/IdVg==
-X-Google-Smtp-Source: ABdhPJw6fgeaE8WrMv6/yjTLi0nLsEgIsTJGq7lnieyfjRKsxeZQjFjVvPlXPA1vJ6n1s7o3wIRvF8cXTGM5e/OE7rM=
-X-Received: by 2002:a05:6830:1647:: with SMTP id h7mr13325941otr.281.1604335352341;
- Mon, 02 Nov 2020 08:42:32 -0800 (PST)
+        bh=Z+d818YUCcbVlR/JysJp1RAmAEoaBLjpuG8D8U7SqKQ=;
+        b=VXzvIX0Yeij+GL9DFkEzeM3eZXYQHlR9bZgR6NE4RcVcx45KMG20N6hjVfcyVM/1vl
+         aF4zZDDMr9jUiJ/d59AyWH9tzggMkTuo8gd9xGf08uWLon9S01v47VszxJHuXtQUesBv
+         TMs4MshgtsopthjvKqFOysUBRKK1PnNAsdEEaxQ2TZQ5MopwvoF9trKiueAbx/C2RPfi
+         6j4kOz8iGcN0omtt77RG/M7g8MZSez4SAL8gL/FMFVObdtAcerRLgN0uxziajuwy0ru6
+         cQuhCcyp+F+NWpx+mnTaOkhp+uu3WhPG23t2H1/atrEAnE9AFoR8UndKD/PjcZ10zU+m
+         9RAA==
+X-Gm-Message-State: AOAM531vHikD+SIo+6n8jYtfPAuG5SVoYVpb/Or0nsByyIHLKSeesAcs
+        Jqm67HPPJlaBKYcDRIwKzCA6sXipjsSU8wrTfpEeRA==
+X-Google-Smtp-Source: ABdhPJxjeUxDOHDsKgP6AlKH+uqmmUrG2sadDyDN0C4gxRiCaUwNX+0kUmVfTFyDwxdxAfnUxRbbn9lNLGN9VAuwcUc=
+X-Received: by 2002:a1c:20ce:: with SMTP id g197mr2496715wmg.49.1604335421664;
+ Mon, 02 Nov 2020 08:43:41 -0800 (PST)
 MIME-Version: 1.0
-References: <20201030100815.2269-1-daniel.vetter@ffwll.ch> <20201030100815.2269-9-daniel.vetter@ffwll.ch>
- <20201102072931.GA16419@infradead.org> <CAKMK7uEe5FQuukYU7RhL90ttC9XyWw6wvdQrZ2JpP0jpbYTO6g@mail.gmail.com>
- <20201102130115.GC36674@ziepe.ca> <CAKMK7uHeL=w7GoBaY4XrbRcpJabR9UWnP+oQ9Fg51OzL7=KxiA@mail.gmail.com>
- <20201102155256.GG36674@ziepe.ca>
-In-Reply-To: <20201102155256.GG36674@ziepe.ca>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Mon, 2 Nov 2020 17:42:20 +0100
-Message-ID: <CAKMK7uFqkieBAXEmoeoBfnJBXcuHaNwrsaVyPsLQaXnrJo=scg@mail.gmail.com>
-Subject: Re: [PATCH v5 08/15] mm: Add unsafe_follow_pfn
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
+References: <20201102061445.191638-1-tao3.xu@intel.com>
+In-Reply-To: <20201102061445.191638-1-tao3.xu@intel.com>
+From:   Andy Lutomirski <luto@amacapital.net>
+Date:   Mon, 2 Nov 2020 08:43:30 -0800
+Message-ID: <CALCETrVqdq4zw=Dcd6dZzSmUZTMXHP50d=SRSaY2AV5sauUzOw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Enable Notify VM exit
+To:     Tao Xu <tao3.xu@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        "J??r??me Glisse" <jglisse@redhat.com>, Jan Kara <jack@suse.cz>
+        Xiaoyao Li <xiaoyao.li@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 2, 2020 at 4:52 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Sun, Nov 1, 2020 at 10:14 PM Tao Xu <tao3.xu@intel.com> wrote:
 >
-> On Mon, Nov 02, 2020 at 02:23:58PM +0100, Daniel Vetter wrote:
-> > On Mon, Nov 2, 2020 at 2:01 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > >
-> > > On Mon, Nov 02, 2020 at 01:56:10PM +0100, Daniel Vetter wrote:
-> > > > On Mon, Nov 2, 2020 at 8:29 AM Christoph Hellwig <hch@infradead.org> wrote:
-> > > > >
-> > > > > On Fri, Oct 30, 2020 at 11:08:08AM +0100, Daniel Vetter wrote:
-> > > > > > Also mark up follow_pfn as EXPORT_SYMBOL_GPL. The only safe way to use
-> > > > > > that by drivers/modules is together with an mmu_notifier, and that's
-> > > > > > all _GPL stuff.
-> > > > >
-> > > > > I also think it also needs to be renamed to explicitly break any existing
-> > > > > users out of tree or int the submission queue.
-> > > >
-> > > > Ok I looked at the mmu notifier locking again and noticed that
-> > > > mm->subscriptions has its own spinlock. Since there usually shouldn't
-> > > > be a huge pile of these I think it's feasible to check for the mmu
-> > > > notifier in follow_pfn. And that would stuff this gap for good. I'll
-> > > > throw that on top as a final patch and see what people think.
-> > >
-> > > Probably the simplest is to just check mm_has_notifiers() when in
-> > > lockdep or something very simple like that
-> >
-> > lockdep feels wrong, was locking more at CONFIG_DEBUG_VM. And since
-> > generally you only have 1 mmu notifier (especially for kvm) I think we
-> > can also pay the 2nd cacheline miss and actually check the right mmu
-> > notifier is registered.
+> There are some cases that malicious virtual machines can cause CPU stuck
+> (event windows don't open up), e.g., infinite loop in microcode when
+> nested #AC (CVE-2015-5307). No event window obviously means no events,
+> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
+> hardware CPU can't be used by host or other VM.
 >
-> Need to hold the lock to check that and there are two ways to register
-> notifiers these days, so it feels to expensive to me.
-
-Uh I mixed stuff up all along, struct mmu_notifier *subcription that
-all the mmu notifier users use has the ->mm pointer we want right
-there. That's good enough I think.
-
-Now I'm kinda lost in kvm code trying to wire it through, but it's
-looking ok-ish thus far :-)
--Daniel
-
-> CH's 'export symbol only for kvm' really does seem the most robust way
-> to handle this though.
+> To resolve those cases, it can enable a notify VM exit if no
+> event window occur in VMX non-root mode for a specified amount of
+> time (notify window).
 >
-> Jason
+> Expose a module param for setting notify window, default setting it to
+> the time as 1/10 of periodic tick, and user can set it to 0 to disable
+> this feature.
+>
+> TODO:
+> 1. The appropriate value of notify window.
+> 2. Another patch to disable interception of #DB and #AC when notify
+> VM-Exiting is enabled.
 
+Whoa there.
 
+A VM control that says "hey, CPU, if you messed up and livelocked for
+a long time, please break out of the loop" is not a substitute for
+fixing the livelocks.  So I don't think you get do disable
+interception of #DB and #AC.  I also think you should print a loud
+warning and have some intelligent handling when this new exit
+triggers.
 
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+> +static int handle_notify(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
+> +
+> +       /*
+> +        * Notify VM exit happened while executing iret from NMI,
+> +        * "blocked by NMI" bit has to be set before next VM entry.
+> +        */
+> +       if (exit_qualification & NOTIFY_VM_CONTEXT_VALID) {
+> +               if (enable_vnmi &&
+> +                   (exit_qualification & INTR_INFO_UNBLOCK_NMI))
+> +                       vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO,
+> +                                     GUEST_INTR_STATE_NMI);
+
+This needs actual documentation in the SDM or at least ISE please.
