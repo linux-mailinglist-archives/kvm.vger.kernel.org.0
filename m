@@ -2,183 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F14B2A3630
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 22:57:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABA932A3663
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 23:21:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725929AbgKBV5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 16:57:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37314 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725766AbgKBV5S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 16:57:18 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A2LVTGo013877;
-        Mon, 2 Nov 2020 16:57:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3BYDWM2X8bA/8icKlwIc+LiPD/uR6yMp6m/1i4e4jXg=;
- b=EKDVxfmKEto3bD3dRbWgWQFUqhq4c9rDzU0wthgZcpj2uP5cVRzldDYc9PdBaIlDq992
- Mm3khN901ZgTFpZnT2oTURBeTtqw3Py6QEwieTdWktmxpHXkc9huXCKdYXBHCU+qjvra
- 3BYHhtSd4z6X7EzgXP34HK+z6GfTcMtakmQxKfJWk/wJFGgDVK/CR1YA8maU1vZP7NAp
- OvEKqgJ0MoIZuEMeK4ZVEgcEpIQeUPN29V1CYXdOblO0jnWGAY25PlkFL+JFiH+qrSg2
- jn3/VlQYiAsAsL9oebdrTt/HfGYxXVxdAnbDuUWC0/c1nNPCrN2tHnufrBTa2KQdOlJT JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34jrxkhrnc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 Nov 2020 16:57:12 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A2LVf7D014395;
-        Mon, 2 Nov 2020 16:57:11 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34jrxkhrn3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 Nov 2020 16:57:11 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A2LvBhH006885;
-        Mon, 2 Nov 2020 21:57:11 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03wdc.us.ibm.com with ESMTP id 34h0fjg8s4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 Nov 2020 21:57:11 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A2Lv9BI9241274
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 2 Nov 2020 21:57:09 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66CE22805C;
-        Mon,  2 Nov 2020 21:57:09 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5BD028058;
-        Mon,  2 Nov 2020 21:57:08 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.162.174])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  2 Nov 2020 21:57:08 +0000 (GMT)
-Subject: Re: [PATCH v11 02/14] 390/vfio-ap: use new AP bus interface to search
- for queue devices
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
- <20201022171209.19494-3-akrowiak@linux.ibm.com>
- <20201027080158.0a4fa6b2.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <c81abca5-9831-0e50-fb29-00e841c843d8@linux.ibm.com>
-Date:   Mon, 2 Nov 2020 16:57:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726560AbgKBWVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 17:21:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50078 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725829AbgKBWVI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 17:21:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604355667;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6pKs70k0LTWEUZx/agbV0FZqBJNjhpxBo6XcxlUy3Cg=;
+        b=FPeyz5Xa86Fp9hHQbgYLd0wH5IG6gC7sEcVkC5qUWJjtZMgbkqzZa4uA6ApZvT/kiA2sgQ
+        B9wSiEJGjtu7uVVZxPgQRPnAkg1eeqeesu+KJv9KIjbhcxyHc6iKZJd1ih84Om3OKYjHhZ
+        A4wctU/Xx+bhINpnWeC6X0DQ9xcPfB8=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-435-Pv5xqCUzOfmqe95oqaKrTA-1; Mon, 02 Nov 2020 17:21:05 -0500
+X-MC-Unique: Pv5xqCUzOfmqe95oqaKrTA-1
+Received: by mail-qv1-f71.google.com with SMTP id j17so6007986qvi.21
+        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 14:21:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6pKs70k0LTWEUZx/agbV0FZqBJNjhpxBo6XcxlUy3Cg=;
+        b=r4hNYUYxYylI70wllcduw4iUMfw73y9QJxfmJfrRurHr4t0Uc+4CoQQzELytr/J7Mt
+         HkoxeMyIevE5whsit7lPgcAmiA3Mxx8YoIRx37pNDls1YwhINcZIyAz4tJvoOhpQI/v7
+         Rqq2spXa3UIr1h4yZLOSPj57D8tljuigkKObM5VgWCj8Bl5viXTI9zl5zn+3nGnWjRY8
+         oLe+VJWylMBsUuBuwkMuTyCLE971x0CoH9+XLtg9tPGqnqWytvY3U6x5hJLfmx0auHe4
+         E9jW9+MgSpcCCiWAX1B3Ics6+g4Zj1uvGeXEfsKlvNmnaXj3pwvl/O720anlv2/mSHxm
+         nIag==
+X-Gm-Message-State: AOAM531mjOLEeJK5hOBw31/WoKp83zzIuT1pyQqEg7HRdE71S1clqm0/
+        Z726sNxtABCMHTLj9ei3t6ovlIHfXDQ+j6bH0MCFR4Ls53GBiFmrusG+z4DOAcISoMqIua0v7GX
+        ZifcSsz6ViWxK
+X-Received: by 2002:a37:6311:: with SMTP id x17mr16848460qkb.323.1604355665145;
+        Mon, 02 Nov 2020 14:21:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwjl9A/td6lT7MKwdVzrv1Waaf1gt+ws8gz0KJFGXQE7ykpl45WfI/aQQXC4f/dmiMfuhqTig==
+X-Received: by 2002:a37:6311:: with SMTP id x17mr16848439qkb.323.1604355664876;
+        Mon, 02 Nov 2020 14:21:04 -0800 (PST)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
+        by smtp.gmail.com with ESMTPSA id 8sm7268919qkk.90.2020.11.02.14.21.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2020 14:21:04 -0800 (PST)
+Date:   Mon, 2 Nov 2020 17:21:02 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH 5/5] KVM: selftests: Introduce the dirty log perf test
+Message-ID: <20201102222102.GE20600@xz-x1>
+References: <20201027233733.1484855-1-bgardon@google.com>
+ <20201027233733.1484855-6-bgardon@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20201027080158.0a4fa6b2.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-02_15:2020-11-02,2020-11-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 malwarescore=0 phishscore=0 impostorscore=0 bulkscore=0
- clxscore=1015 mlxscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0
- suspectscore=3 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011020161
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20201027233733.1484855-6-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Oct 27, 2020 at 04:37:33PM -0700, Ben Gardon wrote:
+> The dirty log perf test will time verious dirty logging operations
+> (enabling dirty logging, dirtying memory, getting the dirty log,
+> clearing the dirty log, and disabling dirty logging) in order to
+> quantify dirty logging performance. This test can be used to inform
+> future performance improvements to KVM's dirty logging infrastructure.
 
+One thing to mention is that there're a few patches in the kvm dirty ring
+series that reworked the dirty log test quite a bit (to add similar test for
+dirty ring).  For example:
 
-On 10/27/20 3:01 AM, Halil Pasic wrote:
-> On Thu, 22 Oct 2020 13:11:57 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> This patch refactors the vfio_ap device driver to use the AP bus's
->> ap_get_qdev() function to retrieve the vfio_ap_queue struct containing
->> information about a queue that is bound to the vfio_ap device driver.
->> The bus's ap_get_qdev() function retrieves the queue device from a
->> hashtable keyed by APQN. This is much more efficient than looping over
->> the list of devices attached to the AP bus by several orders of
->> magnitude.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+  https://lore.kernel.org/kvm/20201023183358.50607-11-peterx@redhat.com/
 
-Thank you for your review.
+Just a FYI if we're going to use separate test programs.  Merging this tests
+should benefit in many ways, of course (e.g., dirty ring may directly runnable
+with the perf tests too; so we can manually enable this "perf mode" as a new
+parameter in dirty_log_test, if possible?), however I don't know how hard -
+maybe there's some good reason to keep them separate...
 
->
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 35 +++++++++++++------------------
->>   1 file changed, 14 insertions(+), 21 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
->> index c471832f0a30..049b97d7444c 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -26,43 +26,36 @@
->>   
->>   static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
->>   
->> -static int match_apqn(struct device *dev, const void *data)
->> -{
->> -	struct vfio_ap_queue *q = dev_get_drvdata(dev);
->> -
->> -	return (q->apqn == *(int *)(data)) ? 1 : 0;
->> -}
->> -
->>   /**
->> - * vfio_ap_get_queue: Retrieve a queue with a specific APQN from a list
->> + * vfio_ap_get_queue: Retrieve a queue with a specific APQN.
->>    * @matrix_mdev: the associated mediated matrix
->>    * @apqn: The queue APQN
->>    *
->> - * Retrieve a queue with a specific APQN from the list of the
->> - * devices of the vfio_ap_drv.
->> - * Verify that the APID and the APQI are set in the matrix.
->> + * Retrieve a queue with a specific APQN from the AP queue devices attached to
->> + * the AP bus.
->>    *
->> - * Returns the pointer to the associated vfio_ap_queue
->> + * Returns the pointer to the vfio_ap_queue with the specified APQN, or NULL.
->>    */
->>   static struct vfio_ap_queue *vfio_ap_get_queue(
->>   					struct ap_matrix_mdev *matrix_mdev,
->> -					int apqn)
->> +					unsigned long apqn)
->>   {
->> -	struct vfio_ap_queue *q;
->> -	struct device *dev;
->> +	struct ap_queue *queue;
->> +	struct vfio_ap_queue *q = NULL;
->>   
->>   	if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
->>   		return NULL;
->>   	if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
->>   		return NULL;
->>   
->> -	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
->> -				 &apqn, match_apqn);
->> -	if (!dev)
->> +	queue = ap_get_qdev(apqn);
->> +	if (!queue)
->>   		return NULL;
->> -	q = dev_get_drvdata(dev);
->> -	q->matrix_mdev = matrix_mdev;
->> -	put_device(dev);
->> +
->> +	if (queue->ap_dev.device.driver == &matrix_dev->vfio_ap_drv->driver)
->> +		q = dev_get_drvdata(&queue->ap_dev.device);
->> +
-> Needs to be called with the vfio_ap lock held, right? Otherwise the queue could
-> get unbound while we are working with it as a vfio_ap_queue... Noting
-> new, but might we worth documenting.
+[...]
 
-This is always called with the vfio_ap lock held.
+> +static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+> +		     uint64_t phys_offset, int vcpus,
+> +		     uint64_t vcpu_memory_bytes, int wr_fract)
+> +{
 
->
->> +	put_device(&queue->ap_dev.device);
->>   
->>   	return q;
->>   }
+[...]
+
+> +	/* Start the iterations */
+> +	iteration = 0;
+> +	host_quit = false;
+> +
+> +	clock_gettime(CLOCK_MONOTONIC, &start);
+> +	for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
+> +		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
+> +			       &perf_test_args.vcpu_args[vcpu_id]);
+> +	}
+> +
+> +	/* Allow the vCPU to populate memory */
+> +	pr_debug("Starting iteration %lu - Populating\n", iteration);
+> +	while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id]) != iteration)
+> +		pr_debug("Waiting for vcpu_last_completed_iteration == %lu\n",
+> +			iteration);
+
+Isn't array vcpu_last_completed_iteration[] initialized to all zeros?  If so, I
+feel like this "while" won't run as expected to wait for populating mem.
+
+The flooding pr_debug() seems a bit scary too if the mem size is huge..  How
+about a pr_debug() after the loop (so if we don't see that it means it hanged)?
+
+(There's another similar pr_debug() after this point too within a loop)
+
+Thanks,
+
+-- 
+Peter Xu
 
