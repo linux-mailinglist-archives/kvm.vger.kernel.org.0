@@ -2,442 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E83612A338B
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 20:03:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7CE02A33CD
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 20:16:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726162AbgKBTD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 14:03:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55314 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725789AbgKBTD2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 14:03:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604343806;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C63jy3hqdadYKSteR0FEPZe7aVUDW7HgDsq8q1jdpHQ=;
-        b=B1TTiBFiu8EXTTwVjnqK9GuEkB/IzY6DYVQcEZXhtdddivM64YdxkhNfwSltrOIZQALGzm
-        SR265pz3jup7k/vQpovr3/gC+5u89vL2UXnXYOs/PGIn2aS4Yi+StAN4hJlVljSdTfKGFx
-        B1yP8O3CZypI6lKocP2KCpvz4MUk7dI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-p85GC5u6NTK494Bqtwfs-Q-1; Mon, 02 Nov 2020 14:03:21 -0500
-X-MC-Unique: p85GC5u6NTK494Bqtwfs-Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726429AbgKBTQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 14:16:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60354 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725929AbgKBTQR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 14:16:17 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 836AD188C136;
-        Mon,  2 Nov 2020 19:03:20 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ED81A5B4A1;
-        Mon,  2 Nov 2020 19:03:14 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     pbonzini@redhat.com, maz@kernel.org, Dave.Martin@arm.com,
-        peter.maydell@linaro.org, eric.auger@redhat.com
-Subject: [PATCH v2 3/3] KVM: selftests: Add blessed SVE registers to get-reg-list
-Date:   Mon,  2 Nov 2020 20:02:53 +0100
-Message-Id: <20201102190253.50575-4-drjones@redhat.com>
-In-Reply-To: <20201102190253.50575-1-drjones@redhat.com>
-References: <20201102190253.50575-1-drjones@redhat.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 8853422280;
+        Mon,  2 Nov 2020 19:16:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604344576;
+        bh=KaBxJjv3YFcRADE2Fb61WsHODS72mdq+Zd3tO6gwFuY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=F6G5LI7TVR4qwUpzdpSGCqSMwzpczvA+k2UyTbrKWn/WcKbBt3sCELDKAvVuQ32bD
+         lFE/wIiB6Y9eKt3htBkEB+ex7jCuzDzQOSsupiyzo5K0Rghgg9vjcFbZ8dxmrp1+bK
+         EQ8wn9YHhNsPfSWHoe8SvEUfyiEKrMWo0bAq9I5Y=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kZfJN-006nxn-6F; Mon, 02 Nov 2020 19:16:13 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: [PATCH 0/8] KVM: arm64: Kill the copro array
+Date:   Mon,  2 Nov 2020 19:16:01 +0000
+Message-Id: <20201102191609.265711-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for the SVE registers to get-reg-list and create a
-new test, get-reg-list-sve, which tests them when running on a
-machine with SVE support.
+Since the very beginning of KVM/arm64, we represented the system
+register file using a dual view: on one side the AArch64 state, on the
+other a bizarre mapping of the AArch64 state onto the Aarch64
+registers.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 +
- .../selftests/kvm/aarch64/get-reg-list.c      | 254 +++++++++++++++---
- 4 files changed, 217 insertions(+), 42 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+It was nice at the time as it allowed us to share some code with the
+32bit port, and to come up with some creative bugs. But is was always
+a hack, and we are now in a position to simplify the whole thing.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index b2fc44bf8c3c..795535a33312 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /aarch64/get-reg-list
-+/aarch64/get-reg-list-sve
- /s390x/memop
- /s390x/resets
- /s390x/sync_regs_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 54c931e70089..48c28129f78c 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -66,6 +66,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-+TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c b/tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
-new file mode 100644
-index 000000000000..efba76682b4b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
-@@ -0,0 +1,3 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define REG_LIST_SVE
-+#include "get-reg-list.c"
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index db97001f37f7..6ca27beb6a5f 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -29,6 +29,13 @@
- #include <string.h>
- #include "kvm_util.h"
- #include "test_util.h"
-+#include "processor.h"
-+
-+#ifdef REG_LIST_SVE
-+#define reg_list_sve() (true)
-+#else
-+#define reg_list_sve() (false)
-+#endif
- 
- #define REG_MASK (KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_COPROC_MASK)
- 
-@@ -46,8 +53,9 @@
- 
- static struct kvm_reg_list *reg_list;
- 
--static __u64 blessed_reg[];
--static __u64 blessed_n;
-+static __u64 base_regs[], vregs[], sve_regs[], rejects_set[];
-+static __u64 base_regs_n, vregs_n, sve_regs_n, rejects_set_n;
-+static __u64 *blessed_reg, blessed_n;
- 
- static bool find_reg(__u64 regs[], __u64 nr_regs, __u64 reg)
- {
-@@ -119,6 +127,40 @@ static const char *core_id_to_str(__u64 id)
- 	return NULL;
- }
- 
-+static const char *sve_id_to_str(__u64 id)
-+{
-+	__u64 sve_off, n, i;
-+
-+	if (id == KVM_REG_ARM64_SVE_VLS)
-+		return "KVM_REG_ARM64_SVE_VLS";
-+
-+	sve_off = id & ~(REG_MASK | ((1ULL << 5) - 1));
-+	i = id & (KVM_ARM64_SVE_MAX_SLICES - 1);
-+
-+	TEST_ASSERT(i == 0, "Currently we don't expect slice > 0, reg id 0x%llx", id);
-+
-+	switch (sve_off) {
-+	case KVM_REG_ARM64_SVE_ZREG_BASE ...
-+	     KVM_REG_ARM64_SVE_ZREG_BASE + (1ULL << 5) * KVM_ARM64_SVE_NUM_ZREGS - 1:
-+		n = (id >> 5) & (KVM_ARM64_SVE_NUM_ZREGS - 1);
-+		TEST_ASSERT(id == KVM_REG_ARM64_SVE_ZREG(n, 0),
-+			    "Unexpected bits set in SVE ZREG id: 0x%llx", id);
-+		return str_with_index("KVM_REG_ARM64_SVE_ZREG(##, 0)", n);
-+	case KVM_REG_ARM64_SVE_PREG_BASE ...
-+	     KVM_REG_ARM64_SVE_PREG_BASE + (1ULL << 5) * KVM_ARM64_SVE_NUM_PREGS - 1:
-+		n = (id >> 5) & (KVM_ARM64_SVE_NUM_PREGS - 1);
-+		TEST_ASSERT(id == KVM_REG_ARM64_SVE_PREG(n, 0),
-+			    "Unexpected bits set in SVE PREG id: 0x%llx", id);
-+		return str_with_index("KVM_REG_ARM64_SVE_PREG(##, 0)", n);
-+	case KVM_REG_ARM64_SVE_FFR_BASE:
-+		TEST_ASSERT(id == KVM_REG_ARM64_SVE_FFR(0),
-+			    "Unexpected bits set in SVE FFR id: 0x%llx", id);
-+		return "KVM_REG_ARM64_SVE_FFR(0)";
-+	}
-+
-+	return NULL;
-+}
-+
- static void print_reg(__u64 id)
- {
- 	unsigned op0, op1, crn, crm, op2;
-@@ -186,7 +228,10 @@ static void print_reg(__u64 id)
- 		printf("\tKVM_REG_ARM_FW_REG(%lld),\n", id & 0xffff);
- 		break;
- 	case KVM_REG_ARM64_SVE:
--		TEST_FAIL("KVM_REG_ARM64_SVE is an unexpected coproc type in reg id: 0x%llx", id);
-+		if (reg_list_sve())
-+			printf("\t%s,\n", sve_id_to_str(id));
-+		else
-+			TEST_FAIL("KVM_REG_ARM64_SVE is an unexpected coproc type in reg id: 0x%llx", id);
- 		break;
- 	default:
- 		TEST_FAIL("Unexpected coproc type: 0x%llx in reg id: 0x%llx",
-@@ -251,12 +296,40 @@ static void core_reg_fixup(void)
- 	reg_list = tmp;
- }
- 
-+static void prepare_vcpu_init(struct kvm_vcpu_init *init)
-+{
-+	if (reg_list_sve())
-+		init->features[0] |= 1 << KVM_ARM_VCPU_SVE;
-+}
-+
-+static void finalize_vcpu(struct kvm_vm *vm, uint32_t vcpuid)
-+{
-+	int feature;
-+
-+	if (reg_list_sve()) {
-+		feature = KVM_ARM_VCPU_SVE;
-+		vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_FINALIZE, &feature);
-+	}
-+}
-+
-+static void check_supported(void)
-+{
-+	if (reg_list_sve() && !kvm_check_cap(KVM_CAP_ARM_SVE)) {
-+		fprintf(stderr, "SVE not available, skipping tests\n");
-+		exit(KSFT_SKIP);
-+	}
-+}
-+
- int main(int ac, char **av)
- {
-+	struct kvm_vcpu_init init = { .target = -1, };
- 	int new_regs = 0, missing_regs = 0, i;
--	int failed_get = 0, failed_set = 0;
-+	int failed_get = 0, failed_set = 0, failed_reject = 0;
- 	bool print_list = false, fixup_core_regs = false;
- 	struct kvm_vm *vm;
-+	__u64 *vec_regs;
-+
-+	check_supported();
- 
- 	for (i = 1; i < ac; ++i) {
- 		if (strcmp(av[i], "--core-reg-fixup") == 0)
-@@ -267,7 +340,11 @@ int main(int ac, char **av)
- 			TEST_FAIL("Unknown option: %s\n", av[i]);
- 	}
- 
--	vm = vm_create_default(0, 0, NULL);
-+	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-+	prepare_vcpu_init(&init);
-+	aarch64_vcpu_add_default(vm, 0, &init, NULL);
-+	finalize_vcpu(vm, 0);
-+
- 	reg_list = vcpu_get_reg_list(vm, 0);
- 
- 	if (fixup_core_regs)
-@@ -307,6 +384,18 @@ int main(int ac, char **av)
- 			++failed_get;
- 		}
- 
-+		/* rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE */
-+		if (find_reg(rejects_set, rejects_set_n, reg.id)) {
-+			ret = _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
-+			if (ret != -1 || errno != EPERM) {
-+				printf("Failed to reject (ret=%d, errno=%d) ", ret, errno);
-+				print_reg(reg.id);
-+				putchar('\n');
-+				++failed_reject;
-+			}
-+			continue;
-+		}
-+
- 		ret = _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
- 		if (ret) {
- 			puts("Failed to set ");
-@@ -316,6 +405,20 @@ int main(int ac, char **av)
- 		}
- 	}
- 
-+	if (reg_list_sve()) {
-+		blessed_n = base_regs_n + sve_regs_n;
-+		vec_regs = sve_regs;
-+	} else {
-+		blessed_n = base_regs_n + vregs_n;
-+		vec_regs = vregs;
-+	}
-+
-+	blessed_reg = calloc(blessed_n, sizeof(__u64));
-+	for (i = 0; i < base_regs_n; ++i)
-+		blessed_reg[i] = base_regs[i];
-+	for (i = 0; i < blessed_n - base_regs_n; ++i)
-+		blessed_reg[base_regs_n + i] = vec_regs[i];
-+
- 	for_each_new_reg(i)
- 		++new_regs;
- 
-@@ -344,9 +447,10 @@ int main(int ac, char **av)
- 		putchar('\n');
- 	}
- 
--	TEST_ASSERT(!missing_regs && !failed_get && !failed_set,
--		    "There are %d missing registers; %d registers failed get; %d registers failed set",
--		    missing_regs, failed_get, failed_set);
-+	TEST_ASSERT(!missing_regs && !failed_get && !failed_set && !failed_reject,
-+		    "There are %d missing registers; "
-+		    "%d registers failed get; %d registers failed set; %d registers failed reject",
-+		    missing_regs, failed_get, failed_set, failed_reject);
- 
- 	return 0;
- }
-@@ -357,7 +461,7 @@ int main(int ac, char **av)
-  *
-  * The blessed list is up to date with kernel version v5.10-rc2
-  */
--static __u64 blessed_reg[] = {
-+static __u64 base_regs[] = {
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[1]),
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[2]),
-@@ -399,38 +503,6 @@ static __u64 blessed_reg[] = {
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(spsr[2]),
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(spsr[3]),
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(spsr[4]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[1]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[2]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[3]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[4]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[5]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[6]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[7]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[8]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[9]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[10]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[11]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[12]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[13]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[14]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[15]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[16]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[17]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[18]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[19]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[20]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[21]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[22]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[23]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[24]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[25]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[26]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[27]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[28]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[29]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[30]),
--	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]),
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.fpsr),
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.fpcr),
- 	KVM_REG_ARM_FW_REG(0),
-@@ -670,4 +742,102 @@ static __u64 blessed_reg[] = {
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | 1,
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | 2,
- };
--static __u64 blessed_n = ARRAY_SIZE(blessed_reg);
-+static __u64 base_regs_n = ARRAY_SIZE(base_regs);
-+
-+static __u64 vregs[] = {
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[1]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[2]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[3]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[4]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[5]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[6]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[7]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[8]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[9]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[10]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[11]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[12]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[13]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[14]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[15]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[16]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[17]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[18]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[19]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[20]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[21]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[22]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[23]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[24]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[25]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[26]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[27]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[28]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[29]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[30]),
-+	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]),
-+};
-+static __u64 vregs_n = ARRAY_SIZE(vregs);
-+
-+static __u64 sve_regs[] = {
-+	KVM_REG_ARM64_SVE_VLS,
-+	KVM_REG_ARM64_SVE_ZREG(0, 0),
-+	KVM_REG_ARM64_SVE_ZREG(1, 0),
-+	KVM_REG_ARM64_SVE_ZREG(2, 0),
-+	KVM_REG_ARM64_SVE_ZREG(3, 0),
-+	KVM_REG_ARM64_SVE_ZREG(4, 0),
-+	KVM_REG_ARM64_SVE_ZREG(5, 0),
-+	KVM_REG_ARM64_SVE_ZREG(6, 0),
-+	KVM_REG_ARM64_SVE_ZREG(7, 0),
-+	KVM_REG_ARM64_SVE_ZREG(8, 0),
-+	KVM_REG_ARM64_SVE_ZREG(9, 0),
-+	KVM_REG_ARM64_SVE_ZREG(10, 0),
-+	KVM_REG_ARM64_SVE_ZREG(11, 0),
-+	KVM_REG_ARM64_SVE_ZREG(12, 0),
-+	KVM_REG_ARM64_SVE_ZREG(13, 0),
-+	KVM_REG_ARM64_SVE_ZREG(14, 0),
-+	KVM_REG_ARM64_SVE_ZREG(15, 0),
-+	KVM_REG_ARM64_SVE_ZREG(16, 0),
-+	KVM_REG_ARM64_SVE_ZREG(17, 0),
-+	KVM_REG_ARM64_SVE_ZREG(18, 0),
-+	KVM_REG_ARM64_SVE_ZREG(19, 0),
-+	KVM_REG_ARM64_SVE_ZREG(20, 0),
-+	KVM_REG_ARM64_SVE_ZREG(21, 0),
-+	KVM_REG_ARM64_SVE_ZREG(22, 0),
-+	KVM_REG_ARM64_SVE_ZREG(23, 0),
-+	KVM_REG_ARM64_SVE_ZREG(24, 0),
-+	KVM_REG_ARM64_SVE_ZREG(25, 0),
-+	KVM_REG_ARM64_SVE_ZREG(26, 0),
-+	KVM_REG_ARM64_SVE_ZREG(27, 0),
-+	KVM_REG_ARM64_SVE_ZREG(28, 0),
-+	KVM_REG_ARM64_SVE_ZREG(29, 0),
-+	KVM_REG_ARM64_SVE_ZREG(30, 0),
-+	KVM_REG_ARM64_SVE_ZREG(31, 0),
-+	KVM_REG_ARM64_SVE_PREG(0, 0),
-+	KVM_REG_ARM64_SVE_PREG(1, 0),
-+	KVM_REG_ARM64_SVE_PREG(2, 0),
-+	KVM_REG_ARM64_SVE_PREG(3, 0),
-+	KVM_REG_ARM64_SVE_PREG(4, 0),
-+	KVM_REG_ARM64_SVE_PREG(5, 0),
-+	KVM_REG_ARM64_SVE_PREG(6, 0),
-+	KVM_REG_ARM64_SVE_PREG(7, 0),
-+	KVM_REG_ARM64_SVE_PREG(8, 0),
-+	KVM_REG_ARM64_SVE_PREG(9, 0),
-+	KVM_REG_ARM64_SVE_PREG(10, 0),
-+	KVM_REG_ARM64_SVE_PREG(11, 0),
-+	KVM_REG_ARM64_SVE_PREG(12, 0),
-+	KVM_REG_ARM64_SVE_PREG(13, 0),
-+	KVM_REG_ARM64_SVE_PREG(14, 0),
-+	KVM_REG_ARM64_SVE_PREG(15, 0),
-+	KVM_REG_ARM64_SVE_FFR(0),
-+	ARM64_SYS_REG(3, 0, 1, 2, 0),   /* ZCR_EL1 */
-+};
-+static __u64 sve_regs_n = ARRAY_SIZE(sve_regs);
-+
-+static __u64 rejects_set[] = {
-+#ifdef REG_LIST_SVE
-+	KVM_REG_ARM64_SVE_VLS,
-+#endif
-+};
-+static __u64 rejects_set_n = ARRAY_SIZE(rejects_set);
+This series goes through the whole of the AArch32 cp14/15 register
+file, and point each of them directly at their 64bit equivalent. For
+the few cases where two 32bit registers share a 64bit counterpart, we
+define which half of the register they map.
+
+Finally, we drop a large number of definitions and state that have
+become useless.
+
+This series applies on top of the exception injection rework
+previously posted [1].
+
+	   M.
+
+[1] https://lore.kernel.org/r/20201102164045.264512-1-maz@kernel.org
+
+Marc Zyngier (8):
+  KVM: arm64: Move AArch32 exceptions over to AArch64 sysregs
+  KVM: arm64: Add AArch32 mapping annotation
+  KVM: arm64: Map AArch32 cp15 register to AArch64 sysregs
+  KVM: arm64: Map AArch32 cp14 register to AArch64 sysregs
+  KVM: arm64: Drop is_32bit trap attribute
+  KVM: arm64: Drop is_aarch32 trap attribute
+  KVM: arm64: Drop legacy copro shadow register
+  KVM: arm64: Drop kvm_coproc.h
+
+ arch/arm64/include/asm/kvm_coproc.h |  38 -----
+ arch/arm64/include/asm/kvm_host.h   |  73 +++------
+ arch/arm64/kvm/arm.c                |   3 +-
+ arch/arm64/kvm/guest.c              |   1 -
+ arch/arm64/kvm/handle_exit.c        |   1 -
+ arch/arm64/kvm/inject_fault.c       |  62 +++-----
+ arch/arm64/kvm/reset.c              |   1 -
+ arch/arm64/kvm/sys_regs.c           | 231 ++++++++++++----------------
+ arch/arm64/kvm/sys_regs.h           |   9 +-
+ arch/arm64/kvm/vgic-sys-reg-v3.c    |   4 -
+ 10 files changed, 146 insertions(+), 277 deletions(-)
+ delete mode 100644 arch/arm64/include/asm/kvm_coproc.h
+
 -- 
-2.26.2
+2.28.0
 
