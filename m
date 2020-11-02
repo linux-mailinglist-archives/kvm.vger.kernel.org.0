@@ -2,220 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FA632A33DA
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 20:16:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28F902A3406
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 20:26:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726625AbgKBTQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 14:16:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60364 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725824AbgKBTQT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 14:16:19 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 51900223FB;
-        Mon,  2 Nov 2020 19:16:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604344578;
-        bh=C4GctCoQeP0UtgS9icsWKNG04r7fIKZ7Rd5moRwXfkI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=07vQGTmM/Yfvg+MJtrk/bz29xMyZBYg4qoMIU60b2Mg1QH4V94y7gVWCqjLu8bJhe
-         zz2p0wfLXUdkwzo5ZMg0TFUzAo7nDnE6Gm9b+MnErFbfCAjoETYVhlO9Dy7e/AnSAW
-         d/QYpZ/jiinJ3d4JEfLlWU3V9ZSaqilJ4gRFNECQ=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kZfJQ-006nxn-Il; Mon, 02 Nov 2020 19:16:16 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH 8/8] KVM: arm64: Drop kvm_coproc.h
-Date:   Mon,  2 Nov 2020 19:16:09 +0000
-Message-Id: <20201102191609.265711-9-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201102191609.265711-1-maz@kernel.org>
-References: <20201102191609.265711-1-maz@kernel.org>
+        id S1726647AbgKBT0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 14:26:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726638AbgKBT0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 14:26:16 -0500
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E3AC061A48
+        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 11:26:15 -0800 (PST)
+Received: by mail-ed1-x541.google.com with SMTP id t11so15412686edj.13
+        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 11:26:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dDQNhKPGqjVJkXRCCnTVmPBDzTBDoFvxQkjWFChUq7c=;
+        b=aMgw8zK7rCA1KVq/MU6bOhsU0tEut11yFI1PHpIrmQ1GvsyRa9VonG09yyX73f6HFX
+         HvILR0dwvJqrEQPwXRQSeL3U7QrGrbMngjrUVa87Dl0gNjHxwt63h/kA5UhJa4e9aPmx
+         de83lguI6lttJSqM1C9UXADtdbhALyf3QFFwmqKS9RE4j7QL536YGCM34TLz9gabbXcL
+         27liIuYANcsTRoln+q4tcxnnRxBRpUhaWSv1/MfeMVEgTZTOkJty4FQZm9fXjZO/bwu3
+         H1y+cFvspb6VrYE5RXH/oJC61UtBIo3YJxKJAKjRE6RmwOm2fP/dgV4XRsHhfmh7lzNJ
+         BD4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dDQNhKPGqjVJkXRCCnTVmPBDzTBDoFvxQkjWFChUq7c=;
+        b=cmIDuygy4D/YoPXFXB8hDRNEA8uGvU6oVvsdYmTK8B3BhTVTIVpakzxb6JNab+v+Ze
+         7K9Al8OXt38SIkq5HR2J8JPGjDPHvdkbJHhguwrhEyk2xffQpXyFUw19KcGmcJOJdV8H
+         5hnysRetL4uhuN4z39jj0Xs6YRYVCKTrimYg8v+bwNc92HAR3Oq182PnbU7uAJprpBvH
+         wJDe7x41Fcitmz5APN2ZoNptEz5IB4sbsBvUjFYSW3KLImwueerxJ95VKreNnnjaNcOo
+         MuNkcg/DCUHE1znXYdhi3nHxzduVzBO6CgmmVVp3PZNr4DoPWK5XL3iMSquhSvNXEPo3
+         uRUQ==
+X-Gm-Message-State: AOAM533+qe0NxqyGk9rWsgtZVAO608m2JESPe78McVppD7dii6yFdHjU
+        pGCPOCMKDqcvjlNI1tcIoHkjGbEvqGUykwP4OMW59w==
+X-Google-Smtp-Source: ABdhPJw7aq66qJvui6hJLPrXF7b2G+hIyn689UWesfAkpS5Y1kYqfJinaHs863DkeMqRZOD0NON5Ehn/1jAOw7ApiTY=
+X-Received: by 2002:aa7:cc84:: with SMTP id p4mr17722087edt.97.1604345174437;
+ Mon, 02 Nov 2020 11:26:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20201030193045.GM2620339@nvidia.com> <20201030204307.GA683@otc-nc-03>
+ <87h7qbkt18.fsf@nanos.tec.linutronix.de> <20201031235359.GA23878@araj-mobl1.jf.intel.com>
+ <20201102132036.GX2620339@nvidia.com> <20201102162043.GB20783@otc-nc-03>
+ <20201102171909.GF2620339@nvidia.com> <20d7c5fc-91b0-d673-d41a-335d91ca2dce@intel.com>
+ <20201102182632.GH2620339@nvidia.com> <CAPcyv4h8O+boTo-MpGRSC8RpjrsvU-P3AU7_kwbrfDkEp8bH1w@mail.gmail.com>
+ <20201102185130.GB3600342@nvidia.com>
+In-Reply-To: <20201102185130.GB3600342@nvidia.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Mon, 2 Nov 2020 11:26:01 -0800
+Message-ID: <CAPcyv4jGrvkwjZG+qiu0VGU9ifj95t0Yi7ripJEtZr+_kVrWog@mail.gmail.com>
+Subject: Re: [PATCH v4 00/17] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Dave Jiang <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vinod Koul <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>, maz@kernel.org,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Yi L Liu <yi.l.liu@intel.com>, Baolu Lu <baolu.lu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Sanjay K Kumar <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>, Jing Lin <jing.lin@intel.com>,
+        kwankhede@nvidia.com, eric.auger@redhat.com,
+        Parav Pandit <parav@mellanox.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, netanelg@mellanox.com,
+        shahafs@mellanox.com, yan.y.zhao@linux.intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Samuel Ortiz <samuel.ortiz@intel.com>,
+        Mona Hossain <mona.hossain@intel.com>,
+        Megha Dey <megha.dey@linux.intel.com>,
+        dmaengine@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux PCI <linux-pci@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_coproc.h used to serve as a compatibility layer for the files
-shared between the 32 and 64 bit ports.
+On Mon, Nov 2, 2020 at 10:52 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> On Mon, Nov 02, 2020 at 10:38:28AM -0800, Dan Williams wrote:
+>
+> > > I think you will be the first to use the namespace stuff for this, it
+> > > seems like a good idea and others should probably do so as well.
+> >
+> > I was thinking either EXPORT_SYMBOL_NS, or auxiliary bus, because you
+> > should be able to export an ops structure with all the necessary
+> > callbacks.
+>
+> 'or'?
+>
+> Auxiliary bus should not be used with huge arrays of function
+> pointers... The module providing the device should export a normal
+> linkable function interface. Putting that in a namespace makes a lot
+> of sense.
 
-Another one bites the dust...
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_coproc.h | 38 -----------------------------
- arch/arm64/include/asm/kvm_host.h   | 17 +++++++++++++
- arch/arm64/kvm/arm.c                |  3 +--
- arch/arm64/kvm/guest.c              |  1 -
- arch/arm64/kvm/handle_exit.c        |  1 -
- arch/arm64/kvm/reset.c              |  1 -
- arch/arm64/kvm/sys_regs.c           |  1 -
- 7 files changed, 18 insertions(+), 44 deletions(-)
- delete mode 100644 arch/arm64/include/asm/kvm_coproc.h
-
-diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
-deleted file mode 100644
-index d6bb40122fdb..000000000000
---- a/arch/arm64/include/asm/kvm_coproc.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) 2012,2013 - ARM Ltd
-- * Author: Marc Zyngier <marc.zyngier@arm.com>
-- *
-- * Derived from arch/arm/include/asm/kvm_coproc.h
-- * Copyright (C) 2012 Rusty Russell IBM Corporation
-- */
--
--#ifndef __ARM64_KVM_COPROC_H__
--#define __ARM64_KVM_COPROC_H__
--
--#include <linux/kvm_host.h>
--
--void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
--
--struct kvm_sys_reg_table {
--	const struct sys_reg_desc *table;
--	size_t num;
--};
--
--int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
--int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
--
--#define kvm_coproc_table_init kvm_sys_reg_table_init
--void kvm_sys_reg_table_init(void);
--
--struct kvm_one_reg;
--int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
--int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
--
--#endif /* __ARM64_KVM_COPROC_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c527f9567713..709f892f7a14 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -533,6 +533,12 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+
-+unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
-+int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-+int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+
- int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
- 
-@@ -595,6 +601,17 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
- int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
- 
-+int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
-+
-+void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
-+
-+void kvm_sys_reg_table_init(void);
-+
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5750ec34960e..9d69d2bf6943 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -35,7 +35,6 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sections.h>
- 
- #include <kvm/arm_hypercalls.h>
-@@ -1525,7 +1524,7 @@ static int init_subsystems(void)
- 		goto out;
- 
- 	kvm_perf_init();
--	kvm_coproc_table_init();
-+	kvm_sys_reg_table_init();
- 
- out:
- 	on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3f23f7478d2a..9bbd30e62799 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -24,7 +24,6 @@
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sigcontext.h>
- 
- #include "trace.h"
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index f79137ee4274..cebe39f3b1b6 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -14,7 +14,6 @@
- #include <asm/esr.h>
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/debug-monitors.h>
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f32490229a4c..74ce92a4988c 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -25,7 +25,6 @@
- #include <asm/ptrace.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/virt.h>
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2048e7e7bd7c..ed7d8d35c2d9 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -20,7 +20,6 @@
- #include <asm/debug-monitors.h>
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
--- 
-2.28.0
-
+True, probably needs to be a mixture of both.
