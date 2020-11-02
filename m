@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D30B2A33D1
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 20:16:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 385BB2A33CC
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 20:16:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbgKBTQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 14:16:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60272 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725791AbgKBTQR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726236AbgKBTQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 2 Nov 2020 14:16:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60292 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725809AbgKBTQQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 14:16:16 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9C5642225E;
+        by mail.kernel.org (Postfix) with ESMTPSA id D25C022268;
         Mon,  2 Nov 2020 19:16:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604344575;
-        bh=ArWFBoK0fRQku7Ixro39jAGqWAPrMQvy0PpraNIOiA0=;
+        s=default; t=1604344576;
+        bh=/vSypgHV3ppGf3VM+3b9Uw3XIcZP+Wgme9h2xxf4rZk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aTalKTQOzsoIcqJTNcdFWelDURIMQRP2hAwYF5ArRJ22GTesagAqw/3Kocidf0mhv
-         eLhC745L7k0MGSpIflzdaY3KuAwcoo+9U94/qEug+/Ig5e6G13qwrkxJnnxm8K5vtq
-         BwmIkKpNbsDkmdlfFc6IDS26QgppZHZeca+j8rNk=
+        b=Jeit1NMHhX4xxwzPds+AWo/WCs7knZm/wlcZzqEKKmDomnYeQkAHx89yAyZOvJgOh
+         A9QTftl8eyR8VgstIFAL7SFsnPGmQ0Z0R1Oz8Dpiy2/T1LWSuzSCX8JzumwiaUuAmr
+         roc9B0thDHMJ0rj+myJXbYJKk1+F1RUBByRuP1lI=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1kZfJN-006nxn-Ls; Mon, 02 Nov 2020 19:16:13 +0000
+        id 1kZfJO-006nxn-2w; Mon, 02 Nov 2020 19:16:14 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
@@ -35,9 +35,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kernel-team@android.com
-Subject: [PATCH 1/8] KVM: arm64: Move AArch32 exceptions over to AArch64 sysregs
-Date:   Mon,  2 Nov 2020 19:16:02 +0000
-Message-Id: <20201102191609.265711-2-maz@kernel.org>
+Subject: [PATCH 2/8] KVM: arm64: Add AArch32 mapping annotation
+Date:   Mon,  2 Nov 2020 19:16:03 +0000
+Message-Id: <20201102191609.265711-3-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201102191609.265711-1-maz@kernel.org>
 References: <20201102191609.265711-1-maz@kernel.org>
@@ -51,123 +51,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The use of the AArch32-specific accessors have always been a bit
-annoying on 64bit, and it is time for a change.
+In order to deal with the few AArch32 system registers that map to
+only a particular half of their AArch64 counterpart (such as DFAR
+and IFAR being colocated in FAR_EL1), let's add an optional annotation
+to the sysreg descriptor structure, indicating whether a register
+maps to the upper or lower 32bits of a register.
 
-Let's move the AArch32 exception injection over to the AArch64 encoding,
-which requires us to split the two halves of FAR_EL1 into DFAR and IFAR.
-This enables us to drop the preempt_disable() games on VHE, and to kill
-the last user of the vcpu_cp15() macro.
+Nothing is using these annotation yet.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 -
- arch/arm64/kvm/inject_fault.c     | 62 ++++++++++---------------------
- 2 files changed, 20 insertions(+), 43 deletions(-)
+ arch/arm64/kvm/sys_regs.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7a1faf917f3c..a6778c39157d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -561,7 +561,6 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
- #define CPx_BIAS		IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 5a6fc30f5989..259864c3c76b 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -27,6 +27,12 @@ struct sys_reg_desc {
+ 	/* Sysreg string for debug */
+ 	const char *name;
  
- #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
--#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
- 
- struct kvm_vm_stat {
- 	ulong remote_tlb_flush;
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index e2a2e48ca371..975f65ba6a8b 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -69,26 +69,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- #define DFSR_FSC_EXTABT_LPAE	0x10
- #define DFSR_FSC_EXTABT_nLPAE	0x08
- #define DFSR_LPAE		BIT(9)
--
--static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
--{
--	preempt_disable();
--	if (vcpu->arch.sysregs_loaded_on_cpu) {
--		kvm_arch_vcpu_put(vcpu);
--		return true;
--	}
--
--	preempt_enable();
--	return false;
--}
--
--static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
--{
--	if (loaded) {
--		kvm_arch_vcpu_load(vcpu, smp_processor_id());
--		preempt_enable();
--	}
--}
-+#define TTBCR_EAE		BIT(31)
- 
- static void inject_undef32(struct kvm_vcpu *vcpu)
- {
-@@ -100,39 +81,36 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
-  * Modelled after TakeDataAbortException() and TakePrefetchAbortException
-  * pseudocode.
-  */
--static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
--			 unsigned long addr)
-+static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
- {
--	u32 *far, *fsr;
--	bool is_lpae;
--	bool loaded;
-+	u64 far;
-+	u32 fsr;
++	enum {
++		AA32_ZEROHIGH,
++		AA32_LO,
++		AA32_HI,
++	} aarch32_map;
 +
-+	/* Give the guest an IMPLEMENTATION DEFINED exception */
-+	if (__vcpu_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
-+		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
-+	} else {
-+		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
-+		fsr = DFSR_FSC_EXTABT_nLPAE;
-+	}
+ 	/* MRS/MSR instruction which accesses it. */
+ 	u8	Op0;
+ 	u8	Op1;
+@@ -153,6 +159,7 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+ 					  const struct sys_reg_desc table[],
+ 					  unsigned int num);
  
--	loaded = pre_fault_synchronize(vcpu);
-+	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
- 
- 	if (is_pabt) {
- 		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IABT |
- 				     KVM_ARM64_PENDING_EXCEPTION);
--		far = &vcpu_cp15(vcpu, c6_IFAR);
--		fsr = &vcpu_cp15(vcpu, c5_IFSR);
-+		far &= GENMASK(31, 0);
-+		far |= (u64)addr << 32;
-+		vcpu_write_sys_reg(vcpu, fsr, IFSR32_EL2);
- 	} else { /* !iabt */
- 		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_DABT |
- 				     KVM_ARM64_PENDING_EXCEPTION);
--		far = &vcpu_cp15(vcpu, c6_DFAR);
--		fsr = &vcpu_cp15(vcpu, c5_DFSR);
--	}
--
--	*far = addr;
--
--	/* Give the guest an IMPLEMENTATION DEFINED exception */
--	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
--	if (is_lpae) {
--		*fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
--	} else {
--		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
--		*fsr = DFSR_FSC_EXTABT_nLPAE;
-+		far &= GENMASK(63, 32);
-+		far |= addr;
-+		vcpu_write_sys_reg(vcpu, fsr, ESR_EL1);
- 	}
- 
--	post_fault_synchronize(vcpu, loaded);
-+	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
- }
- 
- /**
++#define AA32(_x)	.aarch32_map = AA32_##_x
+ #define Op0(_x) 	.Op0 = _x
+ #define Op1(_x) 	.Op1 = _x
+ #define CRn(_x)		.CRn = _x
 -- 
 2.28.0
 
