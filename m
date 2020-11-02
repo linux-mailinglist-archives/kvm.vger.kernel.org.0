@@ -2,146 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FEE92A3277
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 19:02:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 639DD2A3273
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 19:01:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725977AbgKBSCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 13:02:24 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:20926 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725791AbgKBSCY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 13:02:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1604340144; x=1635876144;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=+XbFpuHNO9eDIUZm/3GLfucKC/WQVlQ6KyOzhtsxWVs=;
-  b=LIkTqlgq4+fwXnLP/o2kYeM6KS+7Qgt1aZakEgLKxKp+fePcaT5sLgIu
-   wLkrA5ZMmFIgqp30pDw+IYfktFuupfgQSTY0gY3MkoA4rEDZlHAe56Dk5
-   w0lkcPQZgFUuVNQaI6SK+ecwy/AG1W6c1LZvnEH4k4F/tD6DIc0LlabdY
-   g=;
-X-IronPort-AV: E=Sophos;i="5.77,445,1596499200"; 
-   d="scan'208";a="89791576"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 02 Nov 2020 17:51:00 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id 3CC0EA1D33;
-        Mon,  2 Nov 2020 17:50:58 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 2 Nov 2020 17:50:57 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.160.27) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 2 Nov 2020 17:50:52 +0000
-Subject: Re: [PATCH v2] nitro_enclaves: Fixup type and simplify logic of the
- poll mask setup
-To:     Andra Paraschiv <andraprs@amazon.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "David Duncan" <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Karen Noel <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20201102173622.32169-1-andraprs@amazon.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <405f71a6-9699-759d-2398-a17120d3fb96@amazon.de>
-Date:   Mon, 2 Nov 2020 18:50:51 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.4.0
+        id S1726108AbgKBSBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 13:01:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38542 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725806AbgKBSBa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 13:01:30 -0500
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 97BE3223B0
+        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 18:01:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604340089;
+        bh=Lu2awJXBNnFGXdwNkoMmBcrestweRIqVSRAv+UFn8UU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=vcIv/F0bRxbMe9GLXTcLzUL8Cks48Z/SkPGRo+er28CTkL/CiTLby9oihAEvDTclh
+         jg14ZgzV4tKtRdEJa0N71mgyjPX5KwE1lEFymgs9uLv/5ZgVNR6GFTBW378Czq7PmC
+         yg2cQ6YW/MXj99bOlIN2WXH8+uzPGlbVDE1W1jho=
+Received: by mail-wm1-f50.google.com with SMTP id c18so10301484wme.2
+        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 10:01:29 -0800 (PST)
+X-Gm-Message-State: AOAM531GX3a8076zwHRoqfziuy+lroxO3QWihwQZ39EXzrG1uUUzKWDs
+        tesRmWyUOFJLHCdp0KYcgY31E5JMB4Mu2KZarQErNw==
+X-Google-Smtp-Source: ABdhPJyln63jWXsy5MlOw0cHUi34pZw5XKqEPGLGprBb8+oOXIyCAX0XVcUwGjLfWdWXCBK8fKbgfIT+KYJJrTdQqng=
+X-Received: by 2002:a1c:7213:: with SMTP id n19mr11246737wmc.36.1604340087908;
+ Mon, 02 Nov 2020 10:01:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201102173622.32169-1-andraprs@amazon.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.27]
-X-ClientProxiedBy: EX13D25UWC001.ant.amazon.com (10.43.162.44) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+References: <20201102061445.191638-1-tao3.xu@intel.com> <CALCETrVqdq4zw=Dcd6dZzSmUZTMXHP50d=SRSaY2AV5sauUzOw@mail.gmail.com>
+ <20201102173130.GC21563@linux.intel.com>
+In-Reply-To: <20201102173130.GC21563@linux.intel.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 2 Nov 2020 10:01:16 -0800
+X-Gmail-Original-Message-ID: <CALCETrV0ZsTcQKVCPPSKHnuVgERMC0x86G5y_6E5Rhf=h5JzsA@mail.gmail.com>
+Message-ID: <CALCETrV0ZsTcQKVCPPSKHnuVgERMC0x86G5y_6E5Rhf=h5JzsA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Enable Notify VM exit
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Tao Xu <tao3.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 2, 2020 at 9:31 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Mon, Nov 02, 2020 at 08:43:30AM -0800, Andy Lutomirski wrote:
+> > On Sun, Nov 1, 2020 at 10:14 PM Tao Xu <tao3.xu@intel.com> wrote:
+> > > 2. Another patch to disable interception of #DB and #AC when notify
+> > > VM-Exiting is enabled.
+> >
+> > Whoa there.
+> >
+> > A VM control that says "hey, CPU, if you messed up and livelocked for
+> > a long time, please break out of the loop" is not a substitute for
+> > fixing the livelocks.  So I don't think you get do disable
+> > interception of #DB and #AC.
+>
+> I think that can be incorporated into a module param, i.e. let the platform
+> owner decide which tool(s) they want to use to mitigate the legacy architecture
+> flaws.
 
+What's the point?  Surely the kernel should reliably mitigate the
+flaw, and the kernel should decide how to do so.
 
-On 02.11.20 18:36, Andra Paraschiv wrote:
-> Update the assigned value of the poll result to be EPOLLHUP instead of
-> POLLHUP to match the __poll_t type.
-> =
+>
+> > I also think you should print a loud warning
+>
+> I'm not so sure on this one, e.g. userspace could just spin up a new instance
+> if its malicious guest and spam the kernel log.
 
-> While at it, simplify the logic of setting the mask result of the poll
-> function.
-> =
+pr_warn_once()?  If this triggers, it's a *bug*, right?  Kernel or CPU.
 
-> Changelog
-> =
+>
+> > and have some intelligent handling when this new exit triggers.
+>
+> We discussed something similar in the context of the new bus lock VM-Exit.  I
+> don't know that it makes sense to try and add intelligence into the kernel.
+> In many use cases, e.g. clouds, the userspace VMM is trusted (inasmuch as
+> userspace can be trusted), while the guest is completely untrusted.  Reporting
+> the error to userspace and letting the userspace stack take action is likely
+> preferable to doing something fancy in the kernel.
+>
+>
+> Tao, this patch should probably be tagged RFC, at least until we can experiment
+> with the threshold on real silicon.  KVM and kernel behavior may depend on the
+> accuracy of detecting actual attacks, e.g. if we can set a threshold that has
+> zero false negatives and near-zero false postives, then it probably makes sense
+> to be more assertive in how such VM-Exits are reported and logged.
 
-> v1 -> v2
-> =
-
-> * Simplify the mask setting logic from the poll function.
-> =
-
-> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-
-Reviewed-by: Alexander Graf <graf@amazon.com>
-
-
-Alex
-
-> ---
->   drivers/virt/nitro_enclaves/ne_misc_dev.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> =
-
-> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nit=
-ro_enclaves/ne_misc_dev.c
-> index f06622b48d695..f1964ea4b8269 100644
-> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> @@ -1505,10 +1505,8 @@ static __poll_t ne_enclave_poll(struct file *file,=
- poll_table *wait)
->   =
-
->   	poll_wait(file, &ne_enclave->eventq, wait);
->   =
-
-> -	if (!ne_enclave->has_event)
-> -		return mask;
-> -
-> -	mask =3D POLLHUP;
-> +	if (ne_enclave->has_event)
-> +		mask |=3D EPOLLHUP;
->   =
-
->   	return mask;
->   }
-> =
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+If you can actually find a threshold that reliably mitigates the bug
+and does not allow a guest to cause undesirably large latency in the
+host, then fine.  1/10 if a tick is way too long, I think.
