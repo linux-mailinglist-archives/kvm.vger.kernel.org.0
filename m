@@ -2,123 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7EF42A2E4F
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 16:29:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DB982A2E82
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 16:42:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725929AbgKBP3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 10:29:16 -0500
-Received: from foss.arm.com ([217.140.110.172]:60994 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725791AbgKBP3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 10:29:16 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF6F430E;
-        Mon,  2 Nov 2020 07:29:15 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06A583F66E;
-        Mon,  2 Nov 2020 07:29:14 -0800 (PST)
-Subject: Re: [PATCH 7/8] KVM: arm64: Simplify __kvm_enable_ssbs()
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     kernel-team@android.com, Will Deacon <will@kernel.org>
-References: <20201026095116.72051-1-maz@kernel.org>
- <20201026095116.72051-8-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <efe49392-b8ae-76fa-b581-d7ec8db2cac7@arm.com>
-Date:   Mon, 2 Nov 2020 15:30:29 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1726541AbgKBPli (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 10:41:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60056 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725791AbgKBPlh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 10:41:37 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B58C0617A6;
+        Mon,  2 Nov 2020 07:41:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=UmWNoo+0jio1rsbpATbpnTKOP6YpDT2+8aHnhsn1BNQ=; b=cf1MSWB7BC+d/XGfBcQ2kzWTKP
+        Peh8sMqwcaL1avawa0skij5vzCJuMhLjyf5+3duC9LV64xK5h7mYlExaCNl16g5xIgy0XYatg9Kkf
+        8MzQdAQ7nqnViyK6PC8RcELKGC+j9GZJ7ckJm169iVg6QlV5ggKqdv+lcQqqbrPMl+FlSrL0fJtVH
+        h3aIS4VO2YSOq9iZcZt7+s5WtKwHYRjz80MESyljeOHnTABAzm0KwnO67EhkQGqAYQ3ow0H2PyBl3
+        OZ6Wcz1eC4cFYhDOYdlGwsV1WdJGKy68/ZW9RvzSJwxRicr1Ax69ZJI0224mH0dP7B11Lada3H09n
+        ylAgZRSA==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kZbx7-0002Pe-5d; Mon, 02 Nov 2020 15:41:01 +0000
+Date:   Mon, 2 Nov 2020 15:41:01 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Bartosz Golaszewski <brgl@bgdev.pl>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-media@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-gpio@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, alsa-devel@alsa-project.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH v2 1/8] mm: slab: provide krealloc_array()
+Message-ID: <20201102154101.GO27442@casper.infradead.org>
+References: <20201102152037.963-1-brgl@bgdev.pl>
+ <20201102152037.963-2-brgl@bgdev.pl>
 MIME-Version: 1.0
-In-Reply-To: <20201026095116.72051-8-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201102152037.963-2-brgl@bgdev.pl>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Nov 02, 2020 at 04:20:30PM +0100, Bartosz Golaszewski wrote:
+> +Chunks allocated with `kmalloc` can be resized with `krealloc`. Similarly
+> +to `kmalloc_array`: a helper for resising arrays is provided in the form of
+> +`krealloc_array`.
 
-On 10/26/20 9:51 AM, Marc Zyngier wrote:
-> Move the setting of SSBS directly into the HVC handler, using
-> the C helpers rather than the inline asssembly code.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_asm.h    |  2 --
->  arch/arm64/include/asm/sysreg.h     |  1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c  |  6 +++++-
->  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c | 11 -----------
->  4 files changed, 6 insertions(+), 14 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 54387ccd1ab2..a542c422a036 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -189,8 +189,6 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
->  
->  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
->  
-> -extern void __kvm_enable_ssbs(void);
-> -
->  extern u64 __vgic_v3_get_ich_vtr_el2(void);
->  extern u64 __vgic_v3_read_vmcr(void);
->  extern void __vgic_v3_write_vmcr(u32 vmcr);
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index d52c1b3ce589..c9423f36e05c 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -461,6 +461,7 @@
->  
->  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
->  
-> +#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
->  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
->  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
->  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 2af8a5e902af..5125e934da22 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -58,7 +58,11 @@ static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
->  
->  static void handle___kvm_enable_ssbs(struct kvm_cpu_context *host_ctxt)
->  {
-> -	__kvm_enable_ssbs();
-> +	u64 tmp;
-> +
-> +	tmp = read_sysreg_el2(SYS_SCTLR);
-> +	tmp |= SCTLR_ELx_DSSBS;
-> +	write_sysreg_el2(tmp, SYS_SCTLR);
+Is there any reason you chose to `do_this` instead of do_this()?  The
+automarkup script turns do_this() into a nice link to the documentation
+which you're adding below.
 
-This looks identical to me to the inline assembly version:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-
-Alex
-
->  }
->  
->  static void handle___vgic_v3_get_ich_vtr_el2(struct kvm_cpu_context *host_ctxt)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> index 88a25fc8fcd3..29305022bc04 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> @@ -33,14 +33,3 @@ void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
->  	__sysreg_restore_user_state(ctxt);
->  	__sysreg_restore_el2_return_state(ctxt);
->  }
-> -
-> -void __kvm_enable_ssbs(void)
-> -{
-> -	u64 tmp;
-> -
-> -	asm volatile(
-> -	"mrs	%0, sctlr_el2\n"
-> -	"orr	%0, %0, %1\n"
-> -	"msr	sctlr_el2, %0"
-> -	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
-> -}
+Typo 'resising' resizing.
