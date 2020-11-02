@@ -2,106 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 730A02A2552
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 08:36:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F2612A263A
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 09:38:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727806AbgKBHgp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 02:36:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41026 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726819AbgKBHgo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 02:36:44 -0500
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1496C0617A6
-        for <kvm@vger.kernel.org>; Sun,  1 Nov 2020 23:36:44 -0800 (PST)
-Received: by mail-pl1-x643.google.com with SMTP id j5so6410142plk.7
-        for <kvm@vger.kernel.org>; Sun, 01 Nov 2020 23:36:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=BYhYUhRJ3iwbx5RvkgDxhY0ZIfAUwuAVrsbzhkyOflE=;
-        b=PD+Mh3Lw4fmhuj1QOQe/uALNBzuSp9GfPWJyK2Ucufyoyr7ymTckzQ54BtaZ4FwCkZ
-         SuarZpKON4OIIoU1XqAJYweSZUMuGR5EI+4fXWddA8Kle8kU8xRLT75pMZz2sT+vDiWZ
-         w1NAnRix9ZEeQ60opTqaIVgbWh2BaM0jaIpUGebqSv+byIB4/irTO9fbQYsRuJ7b0MUt
-         3LGiyT80mhNjr9Z+9099WDRpWwxRoyvDyyEGkfLAj0HxeBLGd6mLGEZBZ6a4XUo8Ra58
-         QUthTq2YvCKGCOTj8UFkoquCndTvhK2bEkPHSA4MBb5v3h6iWF5rZsS44cL533dZwdgT
-         R5pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=BYhYUhRJ3iwbx5RvkgDxhY0ZIfAUwuAVrsbzhkyOflE=;
-        b=VEMsCWTNm34LXLzSIx2nGNEnyMigQD61l1SzTo7DhdmP5iao9QHfahn835KD1UDrqF
-         vpOObqdXS+haZU+m0crLjImncUhWogStynRheHksBrT4nsnMZiuVbPS1Pm97xpmCkofX
-         /zv36mKgeEeLO1h/gsXXZ1hvNQPuS5pnuzzFjwTTzDV53r2V+8DwRUe8U23ahyRY/sXj
-         5QW3b6gF+23yQMbh88IJ2188b470rP1CTYHm73lqhcbAre8z1DQvwz3TjSHKLQEqVRft
-         KAhT9w7TLkewH2NOi77Rg7EiQMqX1AEXQUiepvH3yyv/t6ny+ApJPGDJy4VVqBUmsWSP
-         4J7g==
-X-Gm-Message-State: AOAM5316L7UCnH18BoEgVRhwP7Tg/6qJtQ4OHZbVPXHGq2T0vvDSEjw/
-        Tx12KvsU/PLiCR5vvIKrc/cuPj6mQL1Oy+53bbs=
-X-Google-Smtp-Source: ABdhPJyKMbodVNfUEosay4dOY5/tXseT48MSRlt4izgCIrZG9KmfYOklejWbG56zvFUfJl0IjldgbqZknwmJQ949pTc=
-X-Received: by 2002:a17:902:b90c:b029:d6:868d:f566 with SMTP id
- bf12-20020a170902b90cb02900d6868df566mr20014813plb.2.1604302604344; Sun, 01
- Nov 2020 23:36:44 -0800 (PST)
+        id S1728230AbgKBIip (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 03:38:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29621 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727953AbgKBIip (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 03:38:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604306324;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iKprBlRGMj1c6o4rrrCoX/rFjaOYaPOS8vcmwCUOrZI=;
+        b=fDolofl1Da3dJwYOYpCkKQzHoKb5my5163AoRjvaPuDzmSUd3Tl1DM+bBsyu6faYuoDVpT
+        hffV9kcoH3EphqCWX7LWZ99DqDA0+H7COaD3eVJWEI8WQq9oSJaYxb4QG4bFMn8EsMu8yF
+        B8sqhnIj4x6KMmElvPzC8q77Lz+Hzy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-129-p-ZdT5QJPvGRJvwdzpI1sg-1; Mon, 02 Nov 2020 03:38:43 -0500
+X-MC-Unique: p-ZdT5QJPvGRJvwdzpI1sg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB8B66414D;
+        Mon,  2 Nov 2020 08:38:41 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B8D1E1002C13;
+        Mon,  2 Nov 2020 08:38:36 +0000 (UTC)
+Date:   Mon, 2 Nov 2020 09:38:33 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, Dave.Martin@arm.com, peter.maydell@linaro.org,
+        eric.auger@redhat.com
+Subject: Re: [PATCH 3/4] KVM: selftests: Update aarch64 get-reg-list blessed
+ list
+Message-ID: <20201102083833.zjqrlmyvwfir2du4@kamzik.brq.redhat.com>
+References: <20201029201703.102716-1-drjones@redhat.com>
+ <20201029201703.102716-4-drjones@redhat.com>
+ <875z6qdy63.wl-maz@kernel.org>
 MIME-Version: 1.0
-Reply-To: mrsmayaoliver686@gmail.com
-Sender: washburnmonica2@gmail.com
-Received: by 2002:a17:90b:4ad1:0:0:0:0 with HTTP; Sun, 1 Nov 2020 23:36:44
- -0800 (PST)
-From:   "Mrs. Maya Oliver" <mrsmayaoliver686@gmail.com>
-Date:   Sun, 1 Nov 2020 23:36:44 -0800
-X-Google-Sender-Auth: GJ_6SNYCgDZG_eZYCNfocElx794
-Message-ID: <CAHic_XL=1TWUOJK8Z5Rn8CVvaYekMTkj4dS9Rxk4u+aCGDAjyA@mail.gmail.com>
-Subject: My Greetings
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875z6qdy63.wl-maz@kernel.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-My Dear
+On Sat, Oct 31, 2020 at 06:53:56PM +0000, Marc Zyngier wrote:
+> On Thu, 29 Oct 2020 20:17:02 +0000,
+> Andrew Jones <drjones@redhat.com> wrote:
+> > 
+> > The new registers come from the following commits:
+> > 
+> > commit 99adb567632b ("KVM: arm/arm64: Add save/restore support for
+> > firmware workaround state")
+> > 
+> > commit c773ae2b3476 ("KVM: arm64: Save/Restore guest DISR_EL1")
+> > 
+> > commit 03fdfb269009 ("KVM: arm64: Don't write junk to sysregs on reset")
+> > 
+> > The last commit, which adds ARM64_SYS_REG(3, 3, 9, 12, 0) (PMCR_EL0),
+> > and was committed for v5.3, doesn't indicate in its commit message that
+> > enumerating it for save/restore was the plan, so doing so may have
+> > been by accident.
+> 
+> It definitely was.
+> 
+> > It's a good idea anyway, though, since the other PMU registers have
+> > been enumerated since v4.10.
+> 
+> Quite. The state of the PMU is pretty much unknown on restore until then.
+> 
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > index 3aeb3de780a1..3ff097f6886e 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > @@ -352,7 +352,8 @@ int main(int ac, char **av)
+> >  }
+> >  
+> >  /*
+> > - * The current blessed list comes from kernel version v4.15 with --core-reg-fixup
+> > + * The current blessed list was primed with the output of kernel version
+> > + * v4.15 with --core-reg-fixup and then later updated with new registers.
+> 
+> Maybe have a reference to the last kernel version this was checked
+> against? Either here or in the commit message?
 
-My Name is Mrs. Maya Oliver, from Norway. I know that this message
-will be a surprise to you. Firstly, I am married to Mr. Patrick
-Oliver, A gold merchant who owns a small gold Mine in Burkina Faso; He
-died of Cardiovascular Disease in mid-March 2011. During his life time
-he deposited the sum of =E2=82=AC 8.5 Million Euro) Eight million, Five
-hundred thousand Euros in a bank in Ouagadougou the capital city of
-Burkina Faso. The deposited money was from the sale of the shares,
-death benefits payment and entitlements of my deceased husband by his
-company.
+Good idea. I'll put it in the comment in list form, encouraging the list
+to be continued as we add more.
 
-I am sending this message to you praying that it will reach you in
-good health, since I am not in good health condition in which I sleep
-every night without knowing if I may be alive to see the next day. I
-am suffering from long time cancer and presently i am partially
-suffering from a stroke illness which has become almost impossible for
-me to move around. I am married to my late husband for over 4 years
-before he died and is unfortunately that we don't have a child, my
-doctor confided in me that i have less chance to live. Having known my
-health condition, I decided to contact you to claim the fund since I
-don't have any relation I grew up from the orphanage home,
+Thanks,
+drew
 
-I have decided to donate what I have to you for the support of helping
-Motherless babies/Less privileged/Widows' because I am dying and
-diagnosed of cancer for about 2 years ago. I have been touched by God
-Almighty to donate from what I have inherited from my late husband to
-you for good work of God Almighty. I have asked Almighty God to
-forgive me and believe he has, because He is a Merciful God I will be
-going in for an operation surgery soon
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+> 
 
-This is the reason i need your services to stand as my next of kin or
-an executor to claim the funds for charity purposes. If this money
-remains unclaimed after my death, the bank executives or the
-government will take the money as unclaimed fund and maybe use it for
-selfish and worthless ventures, I need a very honest person who can
-claim this money and use it for Charity works, for orphanages, widows
-and also build schools for less privilege that will be named after my
-late husband and my name; I need your urgent answer to know if you
-will be able to execute this project, and I will give you more
-Information on how the fund will be transferred to your bank account.
-
-Thanks
-Mrs. Maya
