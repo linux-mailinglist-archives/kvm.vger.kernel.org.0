@@ -2,91 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 623FD2A35F8
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 22:27:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A6612A3622
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 22:45:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725980AbgKBV1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 16:27:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60279 "EHLO
+        id S1725871AbgKBVps (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 16:45:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39438 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725921AbgKBV1V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 16:27:21 -0500
+        by vger.kernel.org with ESMTP id S1725766AbgKBVpr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 16:45:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604352440;
+        s=mimecast20190719; t=1604353546;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=AcZsDHqiU0z9govFV78wlNAx19ATsA9/xILzMrob+9I=;
-        b=NL36DgANBl7bthatcKwu2QJSXovwZegzL0O90/1V0QU0KCJX3JGbwaGXoHnuSIkb3HC6FS
-        b+YA1RccLqrIHkhaokgva7tQzB7z1WBKOpZNFaVDy+n3lYfde7hDZmWKUHxJmkJaFjWZ+8
-        U+LjyFStQZHFi6ONhuhYTTbwWOZoAs4=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-N2U18WkTMN2xVQFCUi3iwg-1; Mon, 02 Nov 2020 16:27:18 -0500
-X-MC-Unique: N2U18WkTMN2xVQFCUi3iwg-1
-Received: by mail-qt1-f197.google.com with SMTP id h31so8895553qtd.14
-        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 13:27:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AcZsDHqiU0z9govFV78wlNAx19ATsA9/xILzMrob+9I=;
-        b=H6LM7gtlJl//1dswa6W7lD4Tw9WfVTeXd1+T6/ZRMN4Qj2ivaYtHcg0JVmDqNT2Kmh
-         RdAIWNTIlm4CDVJnEFJSozlI5toHZHO77mLHitrbUA0ELf5f/gtLDisnK8w0GUjIsHir
-         FGZZdnWey/6d+EowgXPpdgmQpPp1u+q1RF0EsRi4BZ5o+rVRLJ4HAcaHj/Lt3ifvyaNS
-         UY6tOUoU9s/bHNK1gnz1NMQsLgPhpyEzUvWkckzX2MzJxgVjW4UQzYmYprB45waIfe5H
-         mHqz879fdTBjmv2kvuZEXpA7QBSKgScUGttsALW/21+scjt920mKjhg6tjynfRlUmOLD
-         grKA==
-X-Gm-Message-State: AOAM531OCUNgSB2cafici/KiVCJO3erMLH5siu5vX/lIx/KW1bz7wu/q
-        GNF4xAnlDZbQcSl11q8JwKp5N2kJgkMOWkSjYewP1/f9dDZKDZL5I88Rh7VigeFdSsTU4t6P417
-        ssKFbsMKbOvGl
-X-Received: by 2002:a37:6149:: with SMTP id v70mr16390914qkb.188.1604352438283;
-        Mon, 02 Nov 2020 13:27:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx1BX1HFiblt+dhs6jzM4c/cLeLDSoTUTDjBFSoL2oLT5fjFR9ZaovZujpYbCENwpT9VuNZRQ==
-X-Received: by 2002:a37:6149:: with SMTP id v70mr16390897qkb.188.1604352438101;
-        Mon, 02 Nov 2020 13:27:18 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
-        by smtp.gmail.com with ESMTPSA id f21sm5206440qkl.131.2020.11.02.13.27.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2020 13:27:17 -0800 (PST)
-Date:   Mon, 2 Nov 2020 16:27:15 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH 3/5] KVM: selftests: Simplify demand_paging_test with
- timespec_diff_now
-Message-ID: <20201102212715.GD20600@xz-x1>
-References: <20201027233733.1484855-1-bgardon@google.com>
- <20201027233733.1484855-4-bgardon@google.com>
+        bh=cTFZ8lzIl2cNFfLo0OSYv8YB3iqFe9fcgW+Rx9EOOi4=;
+        b=EZXJYvqS9u4JsSQYfelCKqJXM3uqmhXUbur8pOAdoKalo+UP/qPIXXqqbl3KWQeAk2Oez+
+        7v8YmcDzW6HJnAP0pytaNbFmBsKURwZcFaxAtHJI3Ntmjg+BsvrOwufwtutuEDyoaN/GkP
+        Sd3585ZaGErsvVSjarwrINCnWbnVhqc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-511-20h8hIN2MDemDpI5kdMj1Q-1; Mon, 02 Nov 2020 16:45:42 -0500
+X-MC-Unique: 20h8hIN2MDemDpI5kdMj1Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C123D802B61;
+        Mon,  2 Nov 2020 21:45:40 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 49A0C68433;
+        Mon,  2 Nov 2020 21:45:37 +0000 (UTC)
+Date:   Mon, 2 Nov 2020 14:45:36 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Diana Craciun <diana.craciun@oss.nxp.com>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Bharat Bhushan <Bharat.Bhushan@nxp.com>,
+        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH 1/2] vfio/fsl-mc: return -EFAULT if copy_to_user() fails
+Message-ID: <20201102144536.42a0e066@w520.home>
+In-Reply-To: <20201023113450.GH282278@mwanda>
+References: <20201023113450.GH282278@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201027233733.1484855-4-bgardon@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 04:37:31PM -0700, Ben Gardon wrote:
-> Add a helper function to get the current time and return the time since
-> a given start time. Use that function to simplify the timekeeping in the
-> demand paging test.
 
-Nit: timespec_diff_now() sounds less charming than timespec_elapsed() to
-me... "diff_now" is longer, and it also does not show positive/negative of the
-results (which in this case should always be end-start). "elapsed" should
-always mean something positive.
+Thanks, Dan.
 
-With/Without the change above:
+Diana, can I get an ack for this?  Thanks,
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Alex
 
--- 
-Peter Xu
+On Fri, 23 Oct 2020 14:34:50 +0300
+Dan Carpenter <dan.carpenter@oracle.com> wrote:
+
+> The copy_to_user() function returns the number of bytes remaining to be
+> copied, but this code should return -EFAULT.
+> 
+> Fixes: df747bcd5b21 ("vfio/fsl-mc: Implement VFIO_DEVICE_GET_REGION_INFO ioctl call")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> index 0113a980f974..21f22e3da11f 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -248,7 +248,9 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
+>  		info.size = vdev->regions[info.index].size;
+>  		info.flags = vdev->regions[info.index].flags;
+>  
+> -		return copy_to_user((void __user *)arg, &info, minsz);
+> +		if (copy_to_user((void __user *)arg, &info, minsz))
+> +			return -EFAULT;
+> +		return 0;
+>  	}
+>  	case VFIO_DEVICE_GET_IRQ_INFO:
+>  	{
+> @@ -267,7 +269,9 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
+>  		info.flags = VFIO_IRQ_INFO_EVENTFD;
+>  		info.count = 1;
+>  
+> -		return copy_to_user((void __user *)arg, &info, minsz);
+> +		if (copy_to_user((void __user *)arg, &info, minsz))
+> +			return -EFAULT;
+> +		return 0;
+>  	}
+>  	case VFIO_DEVICE_SET_IRQS:
+>  	{
 
