@@ -2,95 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A5912A36CB
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 23:54:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3A2F2A36D5
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 23:57:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725913AbgKBWyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 17:54:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43298 "EHLO
+        id S1725942AbgKBW5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 17:57:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725818AbgKBWyA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 17:54:00 -0500
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF98C061A47
-        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 14:54:00 -0800 (PST)
-Received: by mail-oi1-x243.google.com with SMTP id t143so4824748oif.10
-        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 14:54:00 -0800 (PST)
+        with ESMTP id S1725864AbgKBW5N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 17:57:13 -0500
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB33C0617A6
+        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 14:57:13 -0800 (PST)
+Received: by mail-il1-x144.google.com with SMTP id g7so14444808ilr.12
+        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 14:57:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gxMXOaWOcX7RWi2XohG/kNHvSy7AhpsjgRQW4jBaDgc=;
-        b=P6ng53EdpuHBLplB221LcjZTmll1OcBSb7Gf0ID8ii2ONguufw8ilLp97H3Cgzxq+s
-         WaeE7NEBHU8CEqXAQeVIjCGxqBgw+EzNDwnpEiloncZJrkHQ3V/gPqRvyMcVLJXtaFqN
-         cEGBZGuow+HoX77Q/NJTmWor7xIJJIy0mTpLHUmGWDCuCxd8mHge6SGZJIbEmtTntV0Z
-         tJaFzQrCJ9su2MsqE66AIkQb37McPrsPDjMjpU9Nez+liy0XYHmuvEc7drt3ilOsDTG5
-         2neXrfP+P9zYpBmkjez3Es+JgesMX93j8fo8GgKfRIDm3WTI9ziNayKZbsFuap5FOVlH
-         ovCA==
+        bh=Hs0Us9Z/+TOb7bbHM2aFgqzh1cMhIoWjcZOjSZ5zWSk=;
+        b=iedrl1z00k+9lh8fyTbrdFSKDBISSS7oXJpz6IXy2JAzvvnyCsqf8hk5/OPEu11sIP
+         lyIRgD9vfQrZo1YMsWoFm1wNPvwBch1LrSvxgJUpSHUutusnzxbniPpcx0HD4DcvTUbz
+         f8IHc30ExhJfNgMB13itTyp9U1tdNvLf7c0HTQ5WrAaCTh8V9ZQISuq6n4R2s/Hmd6Ye
+         31jsWnHXfI35LzLYC0wcNdsZsAwNMFoQU3sNTR8gr1P944kLwvyVZM2VP1jEyzKCYNjk
+         vjepaDhcLRknwVF7HbkJLtscqRjNZrp27yg6FYUjsRg8330fyDPfkcNFo3en4lH/MDF3
+         IJ7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gxMXOaWOcX7RWi2XohG/kNHvSy7AhpsjgRQW4jBaDgc=;
-        b=kDJ5l25nXkPP9sMMZQLrFgusGoQWrIqHARC+2HNTJS+GJbge0mLs3h0Pl/uZFJtkDs
-         OFK8r14BZ6imIOlPauSmNg5lVJ5uYjshYabzxOottLOiFniri36zdjwzxySArhCVXd4L
-         wizXn9ZLQ9eeOn4sxgOlRydvkGxMllZSAlbkqGmwWlpGhyWa6ahxphEOaearZrugk0YR
-         LmD6FQI7XZmBcBSzLubRaKO75UJ5mrAOIJvXdZO2GGplvGhjuP737YUC0DZnR6VOaDpz
-         HmquqkoGHyXo9EY4xn34gcmfHYOZ4kKijliBW+YnDJ0Udq3VfV6ZttAEhrQiyeXBAN9+
-         r0cw==
-X-Gm-Message-State: AOAM533Q3eYVBfAIm+IR8nH+HwnLclmfDNbXKJcqvPLiSCcUZnSZXLpF
-        t7RmAvuK3L1mUZC5yPEgiaxO+Vv98iR1K7897WQ2/w==
-X-Google-Smtp-Source: ABdhPJwiBRkyEJmNyWELvRc7Bv1J3jMYpYigUmhylzmxppC6VnYz3LwIszJXigYZDmgDvhshF0EBhX0xnHRT2G218gw=
-X-Received: by 2002:a54:4016:: with SMTP id x22mr283781oie.28.1604357639327;
- Mon, 02 Nov 2020 14:53:59 -0800 (PST)
+        bh=Hs0Us9Z/+TOb7bbHM2aFgqzh1cMhIoWjcZOjSZ5zWSk=;
+        b=OyYNVetIdrPs6D2ytNBGyaesbsySxrxzsvKVnNP8BY23dn5KKj2yRCHZ1PcJAtOlTB
+         mrVY7rA6UvUUGUd91nrYvkdkNFrNK3KvtdEHFAkZ1dGnq6YLmKLmBJEPEa+zVWId/2AM
+         hd5y0jba8mmkbrjtCSLK9tTsc7kj2TwIb0IkXXabxAMSP5kY0nGbR2Nx5JEuxWIOJvYI
+         C24LwgPkKpzdobD1A91cOv6d4hb4x10YkruggO0YYR/tjJXVMJpnSTypE3cnysDiCymN
+         L5wVpf0ywRL/Tg3jlniAKP1jv+6k8RXNXzBP+tVGsFWSbboF+KxECb1HURNT2QPJVaXK
+         f0zA==
+X-Gm-Message-State: AOAM530Nxf9tM1v/FOe0qksMl0a+ho7qX2HuisN/qrMCcA3t3ZX7LQyt
+        Bd+1J2RCtG89rp4L4movU2XObIp9Rq0EMYKG6rv0VRgz3FOitA==
+X-Google-Smtp-Source: ABdhPJyncfHHjmSOovj/7PcxKm7V8ID6ihZUdQi8S7WvMtbcILzGbwtcPQ9Ms0kcr8PyDXRvv5RWik2pzkaRiMay8JQ=
+X-Received: by 2002:a05:6e02:bcb:: with SMTP id c11mr12118588ilu.285.1604357832569;
+ Mon, 02 Nov 2020 14:57:12 -0800 (PST)
 MIME-Version: 1.0
-References: <20201102061445.191638-1-tao3.xu@intel.com>
-In-Reply-To: <20201102061445.191638-1-tao3.xu@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 2 Nov 2020 14:53:48 -0800
-Message-ID: <CALMp9eTrsz4fq19HXGjfQF3GmsQ7oqGW9GXVnMYXtwnPmJcsOA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Enable Notify VM exit
-To:     Tao Xu <tao3.xu@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+References: <20201027233733.1484855-1-bgardon@google.com> <20201027233733.1484855-2-bgardon@google.com>
+ <20201102212358.GB20600@xz-x1>
+In-Reply-To: <20201102212358.GB20600@xz-x1>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 2 Nov 2020 14:57:01 -0800
+Message-ID: <CANgfPd9OYMRUMtLah7pQCqFVgCi8RQS_whbTHN3tgK+hxB_3gw@mail.gmail.com>
+Subject: Re: [PATCH 1/5] KVM: selftests: Factor code out of demand_paging_test
+To:     Peter Xu <peterx@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
+        Thomas Huth <thuth@redhat.com>,
+        Peter Feiner <pfeiner@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 1, 2020 at 10:14 PM Tao Xu <tao3.xu@intel.com> wrote:
+On Mon, Nov 2, 2020 at 1:24 PM Peter Xu <peterx@redhat.com> wrote:
 >
-> There are some cases that malicious virtual machines can cause CPU stuck
-> (event windows don't open up), e.g., infinite loop in microcode when
-> nested #AC (CVE-2015-5307). No event window obviously means no events,
-> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
-> hardware CPU can't be used by host or other VM.
+> On Tue, Oct 27, 2020 at 04:37:29PM -0700, Ben Gardon wrote:
+> > Much of the code in demand_paging_test can be reused by other, similar
+> > multi-vCPU-memory-touching-perfromance-tests. Factor that common code
+> > out for reuse.
+> >
+> > No functional change expected.
 >
-> To resolve those cases, it can enable a notify VM exit if no
-> event window occur in VMX non-root mode for a specified amount of
-> time (notify window).
+> Is there explicit reason to put the common code in a header rather than
+> perf_test_util.c?  No strong opinion on this especially this is test code,
+> just curious.  Since iiuc .c file is still preferred for things like this.
 >
-> Expose a module param for setting notify window, default setting it to
-> the time as 1/10 of periodic tick, and user can set it to 0 to disable
-> this feature.
->
-> TODO:
-> 1. The appropriate value of notify window.
-> 2. Another patch to disable interception of #DB and #AC when notify
-> VM-Exiting is enabled.
->
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Do you have test cases?
+I don't have a compelling reason not to put the common code in a .c
+file, and I agree that would probably be a better place for it. I'll
+do that in a v2.
+
+> >
+> > This series was tested by running the following invocations on an Intel
+> > Skylake machine:
+> > dirty_log_perf_test -b 20m -i 100 -v 64
+> > dirty_log_perf_test -b 20g -i 5 -v 4
+> > dirty_log_perf_test -b 4g -i 5 -v 32
+> > demand_paging_test -b 20m -v 64
+> > demand_paging_test -b 20g -v 4
+> > demand_paging_test -b 4g -v 32
+> > All behaved as expected.
+>
+> May move this chunk to the cover letter to avoid keeping it in every commit
+> (btw, you mentioned "this series" but I feel like you meant "you verified that
+> after applying each of the commits").
+
+I can move the testing description to the cover letter. I can only
+definitively say I ran those tests at the last commit in the series,
+so I'll amend the description to specify that the commits were tested
+all together and not one by one.
+
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
