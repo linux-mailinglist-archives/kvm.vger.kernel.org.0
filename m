@@ -2,122 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CF692A2E21
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 16:22:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7EF42A2E4F
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 16:29:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbgKBPVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 10:21:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56794 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726711AbgKBPU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 10:20:59 -0500
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D74C061A47
-        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 07:20:58 -0800 (PST)
-Received: by mail-wm1-x343.google.com with SMTP id v5so9760417wmh.1
-        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 07:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=T2w+mckzOvrR699h8x/Xo77oVyHlYkQYkZ/tcGlQNKA=;
-        b=s1X5Rn6M3uEqYAtmP0kMjZBhh9+T3p5FrLN+EMPkAgjibT+uR/uD2Ngl5VYCdQB9ij
-         cQ6fxK8h+9iDfacQPynKZ5VyW7F6bKG7h/Mn2H7upcsowgEdGzkDXW0ZeoKAxWlZFX5x
-         pqI6X7Y1SxJBUvvLsIqozUVcIl4kjDlk/82AQ/NKJkAUAZxchqqk6ZD/i9gwMOE04t7b
-         WEkSas1VOVRvcMuWMty1ScX6mRMpJB2pYQQLO7hPytPI/lP2lQ51TXcmMAV2jxgLlrYn
-         9vORg+bb2oQsagTOeapcQPmylm4ykQl2cpkCX5KomC0i7s4Qx+hD5CK4/4R0xv0vDrV1
-         0OBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=T2w+mckzOvrR699h8x/Xo77oVyHlYkQYkZ/tcGlQNKA=;
-        b=bvDVMKDmSOXkRDEtfEwY1Mq6j+h54zaWn+bxSlVmNUvnhrPSi5d0DKJD4uRFPL2CSC
-         1pLb4olDLZa5aflYmO3u7BSORl8x+XW0CWnvdWPK/txU5ohLRwZy3d3vHRWLwEBUfAKu
-         jd1C6GnL2Whr1N0Rp/CoeJ5XN6Vzog56PN6CP3lcQqEXFvFkJqQIXhy3xV8N22q2Tk+M
-         AOP3oPOE5JeDLUKo16J0qo6UAQR1N9T0PM9BcsmENLlepX/yXqD0yGdAClQJAMshh2N1
-         UaFbtHhDYuTjdnrB+ZYkFJf8pMoRP/iFVOm5upwOcsD+pl659OfKtW6sZHkd9H9sJ7NU
-         sjTw==
-X-Gm-Message-State: AOAM5335wq2G3DCyHzU9XXHOkBEg06Y9zJFWg5tM2/Vb3IUILHKIDDyR
-        5tFMqlPh6auns2vlactycB+aUA==
-X-Google-Smtp-Source: ABdhPJyD2xFNQ0mA6fkAF0MmLHKBRwPoEVnTSJcs4kw8eo3aVlf+gVmqgA5IOaVwyXiBRsxgcVYV4w==
-X-Received: by 2002:a1c:68c1:: with SMTP id d184mr17928489wmc.74.1604330457481;
-        Mon, 02 Nov 2020 07:20:57 -0800 (PST)
-Received: from debian-brgl.home (amarseille-656-1-4-167.w90-8.abo.wanadoo.fr. [90.8.158.167])
-        by smtp.gmail.com with ESMTPSA id b18sm15138014wmj.41.2020.11.02.07.20.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2020 07:20:56 -0800 (PST)
-From:   Bartosz Golaszewski <brgl@bgdev.pl>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Tony Luck <tony.luck@intel.com>,
-        James Morse <james.morse@arm.com>,
-        Robert Richter <rric@kernel.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc:     linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        alsa-devel@alsa-project.org,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Subject: [PATCH v2 8/8] dma-buf: use krealloc_array()
-Date:   Mon,  2 Nov 2020 16:20:37 +0100
-Message-Id: <20201102152037.963-9-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.29.1
-In-Reply-To: <20201102152037.963-1-brgl@bgdev.pl>
-References: <20201102152037.963-1-brgl@bgdev.pl>
+        id S1725929AbgKBP3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 10:29:16 -0500
+Received: from foss.arm.com ([217.140.110.172]:60994 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725791AbgKBP3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 10:29:16 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF6F430E;
+        Mon,  2 Nov 2020 07:29:15 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06A583F66E;
+        Mon,  2 Nov 2020 07:29:14 -0800 (PST)
+Subject: Re: [PATCH 7/8] KVM: arm64: Simplify __kvm_enable_ssbs()
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     kernel-team@android.com, Will Deacon <will@kernel.org>
+References: <20201026095116.72051-1-maz@kernel.org>
+ <20201026095116.72051-8-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <efe49392-b8ae-76fa-b581-d7ec8db2cac7@arm.com>
+Date:   Mon, 2 Nov 2020 15:30:29 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201026095116.72051-8-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Hi Marc,
 
-Use the helper that checks for overflows internally instead of manually
-calculating the size of the new array.
+On 10/26/20 9:51 AM, Marc Zyngier wrote:
+> Move the setting of SSBS directly into the HVC handler, using
+> the C helpers rather than the inline asssembly code.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h    |  2 --
+>  arch/arm64/include/asm/sysreg.h     |  1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c  |  6 +++++-
+>  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c | 11 -----------
+>  4 files changed, 6 insertions(+), 14 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 54387ccd1ab2..a542c422a036 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -189,8 +189,6 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+>  
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+> -extern void __kvm_enable_ssbs(void);
+> -
+>  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+>  extern u64 __vgic_v3_read_vmcr(void);
+>  extern void __vgic_v3_write_vmcr(u32 vmcr);
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index d52c1b3ce589..c9423f36e05c 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -461,6 +461,7 @@
+>  
+>  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+>  
+> +#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+>  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+>  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 2af8a5e902af..5125e934da22 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -58,7 +58,11 @@ static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
+>  
+>  static void handle___kvm_enable_ssbs(struct kvm_cpu_context *host_ctxt)
+>  {
+> -	__kvm_enable_ssbs();
+> +	u64 tmp;
+> +
+> +	tmp = read_sysreg_el2(SYS_SCTLR);
+> +	tmp |= SCTLR_ELx_DSSBS;
+> +	write_sysreg_el2(tmp, SYS_SCTLR);
 
-Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Acked-by: Christian König <christian.koenig@amd.com>
----
- drivers/dma-buf/sync_file.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This looks identical to me to the inline assembly version:
 
-diff --git a/drivers/dma-buf/sync_file.c b/drivers/dma-buf/sync_file.c
-index 5a5a1da01a00..2925ea03eef0 100644
---- a/drivers/dma-buf/sync_file.c
-+++ b/drivers/dma-buf/sync_file.c
-@@ -270,8 +270,8 @@ static struct sync_file *sync_file_merge(const char *name, struct sync_file *a,
- 		fences[i++] = dma_fence_get(a_fences[0]);
- 
- 	if (num_fences > i) {
--		nfences = krealloc(fences, i * sizeof(*fences),
--				  GFP_KERNEL);
-+		nfences = krealloc_array(fences, i,
-+					 sizeof(*fences), GFP_KERNEL);
- 		if (!nfences)
- 			goto err;
- 
--- 
-2.29.1
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
+Thanks,
+
+Alex
+
+>  }
+>  
+>  static void handle___vgic_v3_get_ich_vtr_el2(struct kvm_cpu_context *host_ctxt)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> index 88a25fc8fcd3..29305022bc04 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> @@ -33,14 +33,3 @@ void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+>  	__sysreg_restore_user_state(ctxt);
+>  	__sysreg_restore_el2_return_state(ctxt);
+>  }
+> -
+> -void __kvm_enable_ssbs(void)
+> -{
+> -	u64 tmp;
+> -
+> -	asm volatile(
+> -	"mrs	%0, sctlr_el2\n"
+> -	"orr	%0, %0, %1\n"
+> -	"msr	sctlr_el2, %0"
+> -	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
+> -}
