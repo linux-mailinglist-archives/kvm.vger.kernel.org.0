@@ -2,103 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11A732A32ED
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 19:25:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CCF02A32F3
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 19:26:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbgKBSZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 13:25:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56583 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725797AbgKBSZp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 13:25:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604341543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+o/bB9EP07YOL4dqgg9GwgZ3GO1LsoTAhQkD4mTfT5A=;
-        b=FZzvZq0HKTOXP6Wh/h3qOJFoVtMiP4rRof+MVq9Vzisf1BeHcrtJ92j1x8mR+ztVRSpygy
-        yjbIGY2EwJbSWxBXK6UdSyIvqwYcE9scVAMS6WhheGtCoyE0v9cTnzDXmaF0vCRc6FtSnH
-        j/tQI7fxKqw/fNSVQyw47QIGoEltV0U=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-EJm2rP9OOxK84GN-nGwv2w-1; Mon, 02 Nov 2020 13:25:41 -0500
-X-MC-Unique: EJm2rP9OOxK84GN-nGwv2w-1
-Received: by mail-wm1-f69.google.com with SMTP id 8so777759wmg.6
-        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 10:25:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+o/bB9EP07YOL4dqgg9GwgZ3GO1LsoTAhQkD4mTfT5A=;
-        b=mU+qUwWCJbI87sjDsbfF7+3fiumrzAJ2A9GoqwQriiSrcA8S2BxoUhWJSbdGB8ny5Q
-         ePmFfoMIxVC3KG7p4GZUeUfv8wQefTsg4nIkB3ClB5TzMGSFPi2R1fUCEPXVdgTTs/q8
-         nOTzw/7zgR5cDlySFJV8FjdMgYGEtB0J2tBBWGk2wMc+7SCKZUn5XVH7RoJnfZ4FJcdq
-         FhmoHiOSIS93TTPW+lFuY1Wiv0pR2uEi8XhRNFj+lI9E4mSpd8rus/AcnKSHLI1Tz4h2
-         DwJafXWkXcmIEEl8pLLuqwvcXSczjbn+p+COoE3BjDY9BKasaD2tPq333/QPKJEwMrSm
-         GE3w==
-X-Gm-Message-State: AOAM530TVQB5BeWFi1wvfhZGaihVEAH6kT3QXAWK0wF1z8T3WButE9LB
-        eMXqxM1XSK79f/gdmFC0jFYDtGvZl/w/4MAOEeZkqlkoLz3jyL+hUD6024qisBbguUch/f1C3AQ
-        c9GG9wKE7up3T
-X-Received: by 2002:a5d:694b:: with SMTP id r11mr22204585wrw.104.1604341539803;
-        Mon, 02 Nov 2020 10:25:39 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxXSdpsi5ZQDQAJrHzAL1GoYnCn54fkwAMr0C9bNDP+Wp//4+zuKH8Xx1x2vK2B9vH2SqxnqQ==
-X-Received: by 2002:a5d:694b:: with SMTP id r11mr22204561wrw.104.1604341539641;
-        Mon, 02 Nov 2020 10:25:39 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y20sm279284wma.15.2020.11.02.10.25.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Nov 2020 10:25:38 -0800 (PST)
-Subject: Re: [PATCH] KVM: VMX: Enable Notify VM exit
-To:     Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Tao Xu <tao3.xu@intel.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20201102061445.191638-1-tao3.xu@intel.com>
- <CALCETrVqdq4zw=Dcd6dZzSmUZTMXHP50d=SRSaY2AV5sauUzOw@mail.gmail.com>
- <20201102173130.GC21563@linux.intel.com>
- <CALCETrV0ZsTcQKVCPPSKHnuVgERMC0x86G5y_6E5Rhf=h5JzsA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8e41101c-6278-3773-8754-ffe0763eaeea@redhat.com>
-Date:   Mon, 2 Nov 2020 19:25:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S1726157AbgKBS0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 13:26:43 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:12562 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725817AbgKBS0n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 13:26:43 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5fa04f660000>; Mon, 02 Nov 2020 10:26:46 -0800
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 2 Nov
+ 2020 18:26:37 +0000
+Received: from NAM04-CO1-obe.outbound.protection.outlook.com (104.47.45.50) by
+ HQMAIL109.nvidia.com (172.20.187.15) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Mon, 2 Nov 2020 18:26:37 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uqb+EmyWzvsTBt+xlVoKVfhcWNsUGWD7xXUWb4cqMnGi5ia8eZrtOxXU1fDNtrbVcdTNugYxroA7ZpUqhSDEVHYhgmRM1TKaTD5PTrBUQew9s8/LvrJTqcmajuIusIBPHdAG+isS4uQk7/92qVuUEWVHaTbJZ7nwx79zx9CBK4yOHktUqZ9vFHE3b2EbTlGlaVI65eCtSe8969ieeV3VIcCDyVL4ooNzhC8SMJLRafQFVmvvqx4CUUx6Ai43DQOa1iTX+7TpwC5OoDTVPpNjTHOwy766bevJPeee+0rmpE8MSqXuRWv9I3hky6Zwz5LXROO1wWDkmFWu7D6W7HZ/4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EWdPexYAEXDv4lVqDjs93kChknugzk9wJ0qNPi4NJzw=;
+ b=Y876if0aoaqywSd5nD3dVumAOCJCfz/8HvKD3yJfp2xKc8zR8AcsuOhkIDkd6jM5JdqqVCtBL1xAs2ub8zGuPx58k8cDkDhTkpT01hCCz1X8WFBaxT1JsBvVp69OJfBaGRmOaPpPjEVsG43wCQHOy8lbDVvBw1mQSU83re6YuZEbmavVtPezhEHqMDVuLuGlOOznQ48h+LXwVFt6QowFwHJDqJM7KysSnp3qFq2zFDvU9HLS+R6Lg3rr03yU7lb3RmOWVMHlZrLS8QOomZxigOC/CY1uw4UaQniyH4tzU+q0RSC3Bkdt5vz/NxqAqDNOmRHGHee1aHT8EDfkJs/zhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4943.namprd12.prod.outlook.com (2603:10b6:5:1bc::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Mon, 2 Nov
+ 2020 18:26:34 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.030; Mon, 2 Nov 2020
+ 18:26:33 +0000
+Date:   Mon, 2 Nov 2020 14:26:32 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Dave Jiang <dave.jiang@intel.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>, <vkoul@kernel.org>,
+        <megha.dey@intel.com>, <maz@kernel.org>, <bhelgaas@google.com>,
+        <alex.williamson@redhat.com>, <jacob.jun.pan@intel.com>,
+        <yi.l.liu@intel.com>, <baolu.lu@intel.com>, <kevin.tian@intel.com>,
+        <sanjay.k.kumar@intel.com>, <tony.luck@intel.com>,
+        <jing.lin@intel.com>, <dan.j.williams@intel.com>,
+        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
+        <parav@mellanox.com>, <rafael@kernel.org>, <netanelg@mellanox.com>,
+        <shahafs@mellanox.com>, <yan.y.zhao@linux.intel.com>,
+        <pbonzini@redhat.com>, <samuel.ortiz@intel.com>,
+        <mona.hossain@intel.com>, Megha Dey <megha.dey@linux.intel.com>,
+        <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 00/17] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+Message-ID: <20201102182632.GH2620339@nvidia.com>
+References: <20201030191706.GK2620339@nvidia.com>
+ <20201030192325.GA105832@otc-nc-03> <20201030193045.GM2620339@nvidia.com>
+ <20201030204307.GA683@otc-nc-03> <87h7qbkt18.fsf@nanos.tec.linutronix.de>
+ <20201031235359.GA23878@araj-mobl1.jf.intel.com>
+ <20201102132036.GX2620339@nvidia.com> <20201102162043.GB20783@otc-nc-03>
+ <20201102171909.GF2620339@nvidia.com>
+ <20d7c5fc-91b0-d673-d41a-335d91ca2dce@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20d7c5fc-91b0-d673-d41a-335d91ca2dce@intel.com>
+X-ClientProxiedBy: BL0PR0102CA0056.prod.exchangelabs.com
+ (2603:10b6:208:25::33) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <CALCETrV0ZsTcQKVCPPSKHnuVgERMC0x86G5y_6E5Rhf=h5JzsA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by BL0PR0102CA0056.prod.exchangelabs.com (2603:10b6:208:25::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.19 via Frontend Transport; Mon, 2 Nov 2020 18:26:33 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kZeXI-00FQnu-9z; Mon, 02 Nov 2020 14:26:32 -0400
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1604341606; bh=EWdPexYAEXDv4lVqDjs93kChknugzk9wJ0qNPi4NJzw=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
+        b=hUeQpQS6gEQacOJnYbVdGxkLhFsJbuqND3/FHeADKkc42ADhBN8FFXw15dZ1iQek3
+         XWhYi+BQCc1rjfk2ovqcmYUk+C8Rxvd+ljAttpzG58YlLfmueJYEgTyRR9lR7DAZiZ
+         LdompiBAjNWLkQSK0OpHoqjzVEO2zTcZQnQXi9UhHJK+WdUb4Vi2cn5kPMDaisHjSD
+         XBm19CWU3q6wWzaYNNF2DPuvwT+UINSBZ3LmSFqJ7OhkFwZlaP/IqblMgleC3UGS2/
+         b88TY1f+sTnN04jmvXR7xSTDVFRUBbud3p93YEyIPimJWym/8zc2KmgATERuuc85c0
+         zu/J+30i7gNlg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/11/20 19:01, Andy Lutomirski wrote:
-> What's the point?  Surely the kernel should reliably mitigate the
-> flaw, and the kernel should decide how to do so.
-
-There is some slowdown in trapping #DB and #AC unconditionally.  Though
-for these two cases nobody should care so I agree with keeping the code
-simple and keeping the workaround.
-
-Also, why would this trigger after more than a few hundred cycles,
-something like the length of the longest microcode loop?  HZ*10 seems
-like a very generous estimate already.
-
-Paolo
-
->>> I also think you should print a loud warning
->> I'm not so sure on this one, e.g. userspace could just spin up a new instance
->> if its malicious guest and spam the kernel log.
-> pr_warn_once()?  If this triggers, it's a *bug*, right?  Kernel or CPU.
+On Mon, Nov 02, 2020 at 11:18:33AM -0700, Dave Jiang wrote:
 > 
+> 
+> On 11/2/2020 10:19 AM, Jason Gunthorpe wrote:
+> > On Mon, Nov 02, 2020 at 08:20:43AM -0800, Raj, Ashok wrote:
+> > > Creating these private interfaces for intra-module are just 1-1 and not
+> > > general purpose and every accelerator needs to create these instances.
+> > 
+> > This is where we are going, auxillary bus should be merged soon which
+> > is specifically to connect these kinds of devices across subsystems
+> 
+> I think this resolves the aux device probe/remove issue via a common bus.
+> But it does not help with the mdev device needing a lot of the device
+> handling calls from the parent driver as it share the same handling as the
+> parent device.
 
+The intention of auxiliary bus is that the two parts will tightly
+couple across some exported function interface.
+
+> My plan is to export all the needed call via EXPORT_SYMBOL_NS() so
+> the calls can be shared in its own namespace between the modules. Do
+> you have any objection with that?
+
+I think you will be the first to use the namespace stuff for this, it
+seems like a good idea and others should probably do so as well.
+
+Jason
