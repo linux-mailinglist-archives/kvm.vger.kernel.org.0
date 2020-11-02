@@ -2,130 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABA932A3663
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 23:21:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A5912A36CB
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 23:54:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbgKBWVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 17:21:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50078 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725829AbgKBWVI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 17:21:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604355667;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6pKs70k0LTWEUZx/agbV0FZqBJNjhpxBo6XcxlUy3Cg=;
-        b=FPeyz5Xa86Fp9hHQbgYLd0wH5IG6gC7sEcVkC5qUWJjtZMgbkqzZa4uA6ApZvT/kiA2sgQ
-        B9wSiEJGjtu7uVVZxPgQRPnAkg1eeqeesu+KJv9KIjbhcxyHc6iKZJd1ih84Om3OKYjHhZ
-        A4wctU/Xx+bhINpnWeC6X0DQ9xcPfB8=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-Pv5xqCUzOfmqe95oqaKrTA-1; Mon, 02 Nov 2020 17:21:05 -0500
-X-MC-Unique: Pv5xqCUzOfmqe95oqaKrTA-1
-Received: by mail-qv1-f71.google.com with SMTP id j17so6007986qvi.21
-        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 14:21:05 -0800 (PST)
+        id S1725913AbgKBWyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 17:54:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43298 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725818AbgKBWyA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 17:54:00 -0500
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF98C061A47
+        for <kvm@vger.kernel.org>; Mon,  2 Nov 2020 14:54:00 -0800 (PST)
+Received: by mail-oi1-x243.google.com with SMTP id t143so4824748oif.10
+        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 14:54:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gxMXOaWOcX7RWi2XohG/kNHvSy7AhpsjgRQW4jBaDgc=;
+        b=P6ng53EdpuHBLplB221LcjZTmll1OcBSb7Gf0ID8ii2ONguufw8ilLp97H3Cgzxq+s
+         WaeE7NEBHU8CEqXAQeVIjCGxqBgw+EzNDwnpEiloncZJrkHQ3V/gPqRvyMcVLJXtaFqN
+         cEGBZGuow+HoX77Q/NJTmWor7xIJJIy0mTpLHUmGWDCuCxd8mHge6SGZJIbEmtTntV0Z
+         tJaFzQrCJ9su2MsqE66AIkQb37McPrsPDjMjpU9Nez+liy0XYHmuvEc7drt3ilOsDTG5
+         2neXrfP+P9zYpBmkjez3Es+JgesMX93j8fo8GgKfRIDm3WTI9ziNayKZbsFuap5FOVlH
+         ovCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6pKs70k0LTWEUZx/agbV0FZqBJNjhpxBo6XcxlUy3Cg=;
-        b=r4hNYUYxYylI70wllcduw4iUMfw73y9QJxfmJfrRurHr4t0Uc+4CoQQzELytr/J7Mt
-         HkoxeMyIevE5whsit7lPgcAmiA3Mxx8YoIRx37pNDls1YwhINcZIyAz4tJvoOhpQI/v7
-         Rqq2spXa3UIr1h4yZLOSPj57D8tljuigkKObM5VgWCj8Bl5viXTI9zl5zn+3nGnWjRY8
-         oLe+VJWylMBsUuBuwkMuTyCLE971x0CoH9+XLtg9tPGqnqWytvY3U6x5hJLfmx0auHe4
-         E9jW9+MgSpcCCiWAX1B3Ics6+g4Zj1uvGeXEfsKlvNmnaXj3pwvl/O720anlv2/mSHxm
-         nIag==
-X-Gm-Message-State: AOAM531mjOLEeJK5hOBw31/WoKp83zzIuT1pyQqEg7HRdE71S1clqm0/
-        Z726sNxtABCMHTLj9ei3t6ovlIHfXDQ+j6bH0MCFR4Ls53GBiFmrusG+z4DOAcISoMqIua0v7GX
-        ZifcSsz6ViWxK
-X-Received: by 2002:a37:6311:: with SMTP id x17mr16848460qkb.323.1604355665145;
-        Mon, 02 Nov 2020 14:21:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwjl9A/td6lT7MKwdVzrv1Waaf1gt+ws8gz0KJFGXQE7ykpl45WfI/aQQXC4f/dmiMfuhqTig==
-X-Received: by 2002:a37:6311:: with SMTP id x17mr16848439qkb.323.1604355664876;
-        Mon, 02 Nov 2020 14:21:04 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
-        by smtp.gmail.com with ESMTPSA id 8sm7268919qkk.90.2020.11.02.14.21.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2020 14:21:04 -0800 (PST)
-Date:   Mon, 2 Nov 2020 17:21:02 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH 5/5] KVM: selftests: Introduce the dirty log perf test
-Message-ID: <20201102222102.GE20600@xz-x1>
-References: <20201027233733.1484855-1-bgardon@google.com>
- <20201027233733.1484855-6-bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gxMXOaWOcX7RWi2XohG/kNHvSy7AhpsjgRQW4jBaDgc=;
+        b=kDJ5l25nXkPP9sMMZQLrFgusGoQWrIqHARC+2HNTJS+GJbge0mLs3h0Pl/uZFJtkDs
+         OFK8r14BZ6imIOlPauSmNg5lVJ5uYjshYabzxOottLOiFniri36zdjwzxySArhCVXd4L
+         wizXn9ZLQ9eeOn4sxgOlRydvkGxMllZSAlbkqGmwWlpGhyWa6ahxphEOaearZrugk0YR
+         LmD6FQI7XZmBcBSzLubRaKO75UJ5mrAOIJvXdZO2GGplvGhjuP737YUC0DZnR6VOaDpz
+         HmquqkoGHyXo9EY4xn34gcmfHYOZ4kKijliBW+YnDJ0Udq3VfV6ZttAEhrQiyeXBAN9+
+         r0cw==
+X-Gm-Message-State: AOAM533Q3eYVBfAIm+IR8nH+HwnLclmfDNbXKJcqvPLiSCcUZnSZXLpF
+        t7RmAvuK3L1mUZC5yPEgiaxO+Vv98iR1K7897WQ2/w==
+X-Google-Smtp-Source: ABdhPJwiBRkyEJmNyWELvRc7Bv1J3jMYpYigUmhylzmxppC6VnYz3LwIszJXigYZDmgDvhshF0EBhX0xnHRT2G218gw=
+X-Received: by 2002:a54:4016:: with SMTP id x22mr283781oie.28.1604357639327;
+ Mon, 02 Nov 2020 14:53:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201027233733.1484855-6-bgardon@google.com>
+References: <20201102061445.191638-1-tao3.xu@intel.com>
+In-Reply-To: <20201102061445.191638-1-tao3.xu@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 2 Nov 2020 14:53:48 -0800
+Message-ID: <CALMp9eTrsz4fq19HXGjfQF3GmsQ7oqGW9GXVnMYXtwnPmJcsOA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Enable Notify VM exit
+To:     Tao Xu <tao3.xu@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 04:37:33PM -0700, Ben Gardon wrote:
-> The dirty log perf test will time verious dirty logging operations
-> (enabling dirty logging, dirtying memory, getting the dirty log,
-> clearing the dirty log, and disabling dirty logging) in order to
-> quantify dirty logging performance. This test can be used to inform
-> future performance improvements to KVM's dirty logging infrastructure.
+On Sun, Nov 1, 2020 at 10:14 PM Tao Xu <tao3.xu@intel.com> wrote:
+>
+> There are some cases that malicious virtual machines can cause CPU stuck
+> (event windows don't open up), e.g., infinite loop in microcode when
+> nested #AC (CVE-2015-5307). No event window obviously means no events,
+> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
+> hardware CPU can't be used by host or other VM.
+>
+> To resolve those cases, it can enable a notify VM exit if no
+> event window occur in VMX non-root mode for a specified amount of
+> time (notify window).
+>
+> Expose a module param for setting notify window, default setting it to
+> the time as 1/10 of periodic tick, and user can set it to 0 to disable
+> this feature.
+>
+> TODO:
+> 1. The appropriate value of notify window.
+> 2. Another patch to disable interception of #DB and #AC when notify
+> VM-Exiting is enabled.
+>
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-One thing to mention is that there're a few patches in the kvm dirty ring
-series that reworked the dirty log test quite a bit (to add similar test for
-dirty ring).  For example:
-
-  https://lore.kernel.org/kvm/20201023183358.50607-11-peterx@redhat.com/
-
-Just a FYI if we're going to use separate test programs.  Merging this tests
-should benefit in many ways, of course (e.g., dirty ring may directly runnable
-with the perf tests too; so we can manually enable this "perf mode" as a new
-parameter in dirty_log_test, if possible?), however I don't know how hard -
-maybe there's some good reason to keep them separate...
-
-[...]
-
-> +static void run_test(enum vm_guest_mode mode, unsigned long iterations,
-> +		     uint64_t phys_offset, int vcpus,
-> +		     uint64_t vcpu_memory_bytes, int wr_fract)
-> +{
-
-[...]
-
-> +	/* Start the iterations */
-> +	iteration = 0;
-> +	host_quit = false;
-> +
-> +	clock_gettime(CLOCK_MONOTONIC, &start);
-> +	for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
-> +		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
-> +			       &perf_test_args.vcpu_args[vcpu_id]);
-> +	}
-> +
-> +	/* Allow the vCPU to populate memory */
-> +	pr_debug("Starting iteration %lu - Populating\n", iteration);
-> +	while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id]) != iteration)
-> +		pr_debug("Waiting for vcpu_last_completed_iteration == %lu\n",
-> +			iteration);
-
-Isn't array vcpu_last_completed_iteration[] initialized to all zeros?  If so, I
-feel like this "while" won't run as expected to wait for populating mem.
-
-The flooding pr_debug() seems a bit scary too if the mem size is huge..  How
-about a pr_debug() after the loop (so if we don't see that it means it hanged)?
-
-(There's another similar pr_debug() after this point too within a loop)
-
-Thanks,
-
--- 
-Peter Xu
-
+Do you have test cases?
