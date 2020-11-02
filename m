@@ -2,145 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D50F22A2F80
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 17:17:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E38CF2A2F9A
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 17:20:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726998AbgKBQR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 11:17:27 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:52182 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726587AbgKBQR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 11:17:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1604333845; x=1635869845;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=5ebmZkZ6EssFRGEyPn1Qc4ealUOtSh6Bj6ocigTKgzA=;
-  b=R0UgwtL5Dva0sSmDYtQ1Xai5HY0lrg+1U70NAS8Q2f4bAVbfGi+GSgy0
-   OikazPFTly3a3stOeFvUMDyDKAxeRZWlW9NCUhsGLvKJznlTvgW/fBMoH
-   kC6x51zOgC8Ugwwk5K8gMcNRkunKe0KLy6PCi4jUgmwv7lSQl1QXTgC30
-   w=;
-X-IronPort-AV: E=Sophos;i="5.77,445,1596499200"; 
-   d="scan'208";a="89754479"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-98acfc19.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 02 Nov 2020 16:17:01 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1d-98acfc19.us-east-1.amazon.com (Postfix) with ESMTPS id 52CA9A1DFF;
-        Mon,  2 Nov 2020 16:16:59 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 2 Nov 2020 16:16:58 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.160.22) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 2 Nov 2020 16:16:53 +0000
-Subject: Re: [PATCH v1] nitro_enclaves: Fixup type of the poll result assigned
- value
-To:     Andra Paraschiv <andraprs@amazon.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "David Duncan" <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Karen Noel <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20201014090500.75678-1-andraprs@amazon.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <e4a34429-1b25-00d5-9bf1-045ca49acb8d@amazon.de>
-Date:   Mon, 2 Nov 2020 17:16:51 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.4.0
+        id S1726949AbgKBQUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 11:20:46 -0500
+Received: from mga17.intel.com ([192.55.52.151]:56260 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726653AbgKBQUp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 11:20:45 -0500
+IronPort-SDR: lBPOiCOVeRd/4N3PiNLiIfEHemN80QXUlojNGFIPaMbr2Yv3lTB6DOLpSXCgoUE9DV0PHyJvW5
+ Iw7QA2ATFgTw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9793"; a="148764681"
+X-IronPort-AV: E=Sophos;i="5.77,445,1596524400"; 
+   d="scan'208";a="148764681"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2020 08:20:44 -0800
+IronPort-SDR: zqX9YTIdbIUuRjrHSgJ5WAS4q9uZjfybMh7HfV9dDWpTM16Kd68N/112AcMLsn1ugcJrOe3hmx
+ xsSUf8dJ5zrA==
+X-IronPort-AV: E=Sophos;i="5.77,445,1596524400"; 
+   d="scan'208";a="324908109"
+Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.36])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2020 08:20:44 -0800
+Date:   Mon, 2 Nov 2020 08:20:43 -0800
+From:   "Raj, Ashok" <ashok.raj@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
+        megha.dey@intel.com, maz@kernel.org, bhelgaas@google.com,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com,
+        sanjay.k.kumar@intel.com, tony.luck@intel.com, jing.lin@intel.com,
+        dan.j.williams@intel.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, parav@mellanox.com, rafael@kernel.org,
+        netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com,
+        Megha Dey <megha.dey@linux.intel.com>,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Ashok Raj <ashok.raj@intel.com>
+Subject: Re: [PATCH v4 00/17] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+Message-ID: <20201102162043.GB20783@otc-nc-03>
+References: <160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com>
+ <20201030185858.GI2620339@nvidia.com>
+ <c9303df4-3e57-6959-a89c-5fc98397ac70@intel.com>
+ <20201030191706.GK2620339@nvidia.com>
+ <20201030192325.GA105832@otc-nc-03>
+ <20201030193045.GM2620339@nvidia.com>
+ <20201030204307.GA683@otc-nc-03>
+ <87h7qbkt18.fsf@nanos.tec.linutronix.de>
+ <20201031235359.GA23878@araj-mobl1.jf.intel.com>
+ <20201102132036.GX2620339@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20201014090500.75678-1-andraprs@amazon.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.22]
-X-ClientProxiedBy: EX13D35UWC004.ant.amazon.com (10.43.162.180) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201102132036.GX2620339@nvidia.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Jason
 
+On Mon, Nov 02, 2020 at 09:20:36AM -0400, Jason Gunthorpe wrote:
 
-On 14.10.20 11:05, Andra Paraschiv wrote:
-> Update the assigned value of the poll result to be EPOLLHUP instead of
-> POLLHUP to match the __poll_t type.
-> =
+> > of IDXD for guest drivers. These look and feel like IDXD, not another device 
+> > interface. In that sense if we move PF/VF mailboxes as
+> > separate drivers i thought it feels a bit odd.
+> 
+> You need this split anyhow, putting VFIO calls into the main idxd
+> module is not OK.
+> 
+> Plugging in a PCI device should not auto-load VFIO modules.
 
-> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> ---
->   drivers/virt/nitro_enclaves/ne_misc_dev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> =
+Yes, I agree that would be a good reason to separate them completely and
+glue functionality with private APIs between the 2 modules.
 
-> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nit=
-ro_enclaves/ne_misc_dev.c
-> index f06622b48d69..9148566455e8 100644
-> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> @@ -1508,7 +1508,7 @@ static __poll_t ne_enclave_poll(struct file *file, =
-poll_table *wait)
->   	if (!ne_enclave->has_event)
->   		return mask;
->   =
+- Separate mdev code from base idxd.
+- Separate maintainers, so its easy to review and include. (But remember
+  they are heavily inter-dependent. They have to move to-gether)
 
-> -	mask =3D POLLHUP;
-> +	mask =3D EPOLLHUP;
+Almost all SRIOV drivers today are just configured with some form of Kconfig
+and those relevant files are compiled into the same module.
 
-That whole function looks a bit ... convoluted? How about this? I guess =
+I think in *most* applications idxd would be operating in that mode, where
+you have the base driver and mdev parts (like VF) compiled in if configured
+such.
 
-you could trim it down even further, but this looks quite readable to me:
+Creating these private interfaces for intra-module are just 1-1 and not
+general purpose and every accelerator needs to create these instances.
 
-diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
+I wasn't sure focibly creating this firewall between the PF/VF interfaces
+is actually worth the work every driver is going to require. I can see
+where this is required when they offer separate functional interfaces
+when we talk about multi-function in a more confined definition today.
 
-b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-index f06622b48d69..5b7f45e2eb4c 100644
---- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
-+++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-@@ -1505,10 +1505,8 @@ static __poll_t ne_enclave_poll(struct file =
+idxd mdev's are purely a VF extension. It doesn't provide any different
+function. For e.g. like an RDMA device that can provide iWarp, ipoib or
+even multiplexing storage over IB. IDXD is a fixed function interface.
 
-*file, poll_table *wait)
+Sure having separate modules helps with that isolation. But I'm not
+convinced if this simplifies, or complicates things more than what is
+required for these device types.
 
-  	poll_wait(file, &ne_enclave->eventq, wait);
-
--	if (!ne_enclave->has_event)
--		return mask;
--
--	mask =3D POLLHUP;
-+	if (ne_enclave->has_event)
-+		mask |=3D POLLHUP;
-
-  	return mask;
-  }
-
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Cheers,
+Ashok
