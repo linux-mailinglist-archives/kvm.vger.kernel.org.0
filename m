@@ -2,38 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45DB82A324D
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 18:53:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FEE92A3277
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 19:02:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726097AbgKBRxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 12:53:07 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:18058 "EHLO
+        id S1725977AbgKBSCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 13:02:24 -0500
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:20926 "EHLO
         smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725817AbgKBRxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Nov 2020 12:53:07 -0500
+        with ESMTP id S1725791AbgKBSCY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 13:02:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1604339587; x=1635875587;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1604340144; x=1635876144;
   h=subject:to:cc:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=vt6Hn24mtkMCKwofJ0jwQ4BLGvIOVVWmcLAhyM7iPJQ=;
-  b=FZ/rzQwCmFQ4d8HfyoxsH5+hkkAU5cw0Z/cuEaoY4TRhSmxrg+NRDuyc
-   gteGYz47rpjkBhNocbXjKze/MOlcie0MGqAgGaAk3Y2iOW0ap191rG9N5
-   u8tlKvWNM7tUYLufay221HnC4kGL3tIEOj7vp6qcUEpKm2/uvK9iXLS3q
-   s=;
+  bh=+XbFpuHNO9eDIUZm/3GLfucKC/WQVlQ6KyOzhtsxWVs=;
+  b=LIkTqlgq4+fwXnLP/o2kYeM6KS+7Qgt1aZakEgLKxKp+fePcaT5sLgIu
+   wLkrA5ZMmFIgqp30pDw+IYfktFuupfgQSTY0gY3MkoA4rEDZlHAe56Dk5
+   w0lkcPQZgFUuVNQaI6SK+ecwy/AG1W6c1LZvnEH4k4F/tD6DIc0LlabdY
+   g=;
 X-IronPort-AV: E=Sophos;i="5.77,445,1596499200"; 
-   d="scan'208";a="89788432"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-456ef9c9.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 02 Nov 2020 17:42:31 +0000
-Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2c-456ef9c9.us-west-2.amazon.com (Postfix) with ESMTPS id 99959B390C;
-        Mon,  2 Nov 2020 17:42:30 +0000 (UTC)
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.241) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 2 Nov 2020 17:42:20 +0000
-Subject: Re: [PATCH v1] nitro_enclaves: Fixup type of the poll result assigned
- value
-To:     Alexander Graf <graf@amazon.de>,
+   d="scan'208";a="89791576"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 02 Nov 2020 17:51:00 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id 3CC0EA1D33;
+        Mon,  2 Nov 2020 17:50:58 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 2 Nov 2020 17:50:57 +0000
+Received: from Alexanders-MacBook-Air.local (10.43.160.27) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 2 Nov 2020 17:50:52 +0000
+Subject: Re: [PATCH v2] nitro_enclaves: Fixup type and simplify logic of the
+ poll mask setup
+To:     Andra Paraschiv <andraprs@amazon.com>,
         linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
@@ -54,19 +57,18 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20201014090500.75678-1-andraprs@amazon.com>
- <e4a34429-1b25-00d5-9bf1-045ca49acb8d@amazon.de>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <1ca4cd54-5ffd-621d-acb1-925bccb06066@amazon.com>
-Date:   Mon, 2 Nov 2020 19:42:09 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+References: <20201102173622.32169-1-andraprs@amazon.com>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <405f71a6-9699-759d-2398-a17120d3fb96@amazon.de>
+Date:   Mon, 2 Nov 2020 18:50:51 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
  Gecko/20100101 Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <e4a34429-1b25-00d5-9bf1-045ca49acb8d@amazon.de>
+In-Reply-To: <20201102173622.32169-1-andraprs@amazon.com>
 Content-Language: en-US
-X-Originating-IP: [10.43.162.241]
-X-ClientProxiedBy: EX13D22UWB003.ant.amazon.com (10.43.161.76) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
+X-Originating-IP: [10.43.160.27]
+X-ClientProxiedBy: EX13D25UWC001.ant.amazon.com (10.43.162.44) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -75,74 +77,71 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 02/11/2020 18:16, Alexander Graf wrote:
->
->
-> On 14.10.20 11:05, Andra Paraschiv wrote:
->> Update the assigned value of the poll result to be EPOLLHUP instead of
->> POLLHUP to match the __poll_t type.
->>
->> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
->> Reported-by: kernel test robot <lkp@intel.com>
->> ---
->> =A0 drivers/virt/nitro_enclaves/ne_misc_dev.c | 2 +-
->> =A0 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
+On 02.11.20 18:36, Andra Paraschiv wrote:
+> Update the assigned value of the poll result to be EPOLLHUP instead of
+> POLLHUP to match the __poll_t type.
+> =
 
->> b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> index f06622b48d69..9148566455e8 100644
->> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> @@ -1508,7 +1508,7 @@ static __poll_t ne_enclave_poll(struct file =
+> While at it, simplify the logic of setting the mask result of the poll
+> function.
+> =
 
->> *file, poll_table *wait)
->> =A0=A0=A0=A0=A0 if (!ne_enclave->has_event)
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return mask;
->> =A0 -=A0=A0=A0 mask =3D POLLHUP;
->> +=A0=A0=A0 mask =3D EPOLLHUP;
->
-> That whole function looks a bit ... convoluted? How about this? I =
+> Changelog
+> =
 
-> guess you could trim it down even further, but this looks quite =
+> v1 -> v2
+> =
 
-> readable to me:
->
-> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
+> * Simplify the mask setting logic from the poll function.
+> =
 
-> b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> index f06622b48d69..5b7f45e2eb4c 100644
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+
+Reviewed-by: Alexander Graf <graf@amazon.com>
+
+
+Alex
+
+> ---
+>   drivers/virt/nitro_enclaves/ne_misc_dev.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> =
+
+> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nit=
+ro_enclaves/ne_misc_dev.c
+> index f06622b48d695..f1964ea4b8269 100644
 > --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
 > +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-> @@ -1505,10 +1505,8 @@ static __poll_t ne_enclave_poll(struct file =
+> @@ -1505,10 +1505,8 @@ static __poll_t ne_enclave_poll(struct file *file,=
+ poll_table *wait)
+>   =
 
-> *file, poll_table *wait)
->
-> =A0=A0=A0=A0 poll_wait(file, &ne_enclave->eventq, wait);
->
-> -=A0=A0=A0 if (!ne_enclave->has_event)
-> -=A0=A0=A0=A0=A0=A0=A0 return mask;
+>   	poll_wait(file, &ne_enclave->eventq, wait);
+>   =
+
+> -	if (!ne_enclave->has_event)
+> -		return mask;
 > -
-> -=A0=A0=A0 mask =3D POLLHUP;
-> +=A0=A0=A0 if (ne_enclave->has_event)
-> +=A0=A0=A0=A0=A0=A0=A0 mask |=3D POLLHUP;
->
-> =A0=A0=A0=A0 return mask;
-> =A0}
->
+> -	mask =3D POLLHUP;
+> +	if (ne_enclave->has_event)
+> +		mask |=3D EPOLLHUP;
+>   =
 
-Good point, I updated the logic and sent the v2 of the patch.
-
-https://lore.kernel.org/lkml/20201102173622.32169-1-andraprs@amazon.com/
-
-Thank you.
-
-Andra
+>   	return mask;
+>   }
+> =
 
 
 
 
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
