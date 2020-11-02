@@ -2,202 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAE862A32F9
-	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 19:28:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BE982A333F
+	for <lists+kvm@lfdr.de>; Mon,  2 Nov 2020 19:44:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725882AbgKBS2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Nov 2020 13:28:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47814 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725805AbgKBS2j (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Nov 2020 13:28:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604341718;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=9YpQmMFcKiBaEPkaIebjDurDXYdtTD2oSKBxgB9b1i0=;
-        b=gqjUNsFDvAFWMDP9+hMgNmw5sIhhMdgIQ3sSyzH1v61Tq01BZmyOiyOWPPeULQjFnUAT29
-        aMpWOsWgOLlbK8Nolw2VKLJuT0hliZjOHW6gZZVEhoLVFJ33TkIvOS6UsdWykCV4Tzm6lE
-        Vn/6bn2OKriP7LtBKo6LRK2jgd5lFvw=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-I2owJLAKP0GPDzrz9uvRiQ-1; Mon, 02 Nov 2020 13:28:36 -0500
-X-MC-Unique: I2owJLAKP0GPDzrz9uvRiQ-1
-Received: by mail-qt1-f197.google.com with SMTP id i15so8535983qti.7
-        for <kvm@vger.kernel.org>; Mon, 02 Nov 2020 10:28:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9YpQmMFcKiBaEPkaIebjDurDXYdtTD2oSKBxgB9b1i0=;
-        b=dSQty4x1blZTWLv5jGD9uJHjP6YBKLYaISBfDfATFCroN/9wm65V/0P02AF3H0zdG/
-         UfDvuzzFtf86F/2q3gmoOZtq+/Vc0x0c8ERHSXD6J/2YBMiECtJMyA2fqwCjaX3e+Vqf
-         UYk3TbYkpAlsftmKApZjj4xnZ6GX3beG08ZKl/PknA0pVAdqf3BVRxwYSCuwNXjTFy3y
-         mX/pMdWGUHdrAyDJBIi1mmp7SOerN4oZ0Y835IzALc4ewIQbdO+AbkD5sxOSclGPq9x4
-         +vgEJlhJNaCI2f+LLi0nX7xAjxyI+HGuXZTLd5edW9s0CGWgkuLFfL7vHoDQrEC/xWfn
-         3kOw==
-X-Gm-Message-State: AOAM532JA1WAXqKVCjJy7DdLO3PbE02I2vZMidzBCYvGUy4EnUe9oxjv
-        jmnG3BOECbHZR1J/V3sr2LBvaYwZCW0MIY2ruV3k2RiguPNGauG7D2fFk+u6/zHSxqB6DJc2N5F
-        CZuk32qT6svLA
-X-Received: by 2002:a0c:9004:: with SMTP id o4mr23573397qvo.17.1604341715647;
-        Mon, 02 Nov 2020 10:28:35 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx9bRiuM9PVcEQYq1Cr0KOflbD/zGBnxCe9k1OD7WGCmbl7jWVYzc6pAAHo4SsxfUxMRmUNWQ==
-X-Received: by 2002:a0c:9004:: with SMTP id o4mr23573371qvo.17.1604341715392;
-        Mon, 02 Nov 2020 10:28:35 -0800 (PST)
-Received: from xz-x1.redhat.com (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
-        by smtp.gmail.com with ESMTPSA id p13sm8431476qkj.58.2020.11.02.10.28.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2020 10:28:34 -0800 (PST)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2] KVM: selftests: Add get featured msrs test case
-Date:   Mon,  2 Nov 2020 13:28:33 -0500
-Message-Id: <20201102182833.20382-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.26.2
+        id S1726579AbgKBSn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Nov 2020 13:43:59 -0500
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:14767 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725805AbgKBSn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Nov 2020 13:43:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1604342637; x=1635878637;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=m9xa0Q50hB51kyL00HPQc1iIAciQpiHFcfPK31KVln8=;
+  b=j31NjeJHPsVjZ1xtVHgliwmaw2efQko798QSGRamXpLvlsROkDMCKUVs
+   GBFKTxV/WKBCTVb/G/3/ghXYq5nLBLqemGoa35QgkapEEAPjsDeyGgfDD
+   okeJ+IRu2KvZWOrUYgh6vRrYmLeMTYnBewE4M7qENSH8rlsx9bPCKvn0I
+   M=;
+X-IronPort-AV: E=Sophos;i="5.77,445,1596499200"; 
+   d="scan'208";a="82850716"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 02 Nov 2020 18:34:02 +0000
+Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com (Postfix) with ESMTPS id D1F23C0696;
+        Mon,  2 Nov 2020 18:29:40 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.229) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 2 Nov 2020 18:29:31 +0000
+Subject: Re: [PATCH v2] nitro_enclaves: Fixup type and simplify logic of the
+ poll mask setup
+To:     Alexander Graf <graf@amazon.de>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "David Duncan" <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        "Matt Wilson" <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Stefano Garzarella" <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20201102173622.32169-1-andraprs@amazon.com>
+ <405f71a6-9699-759d-2398-a17120d3fb96@amazon.de>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <e78692ac-9133-055c-05aa-0cfd213fd5d8@amazon.com>
+Date:   Mon, 2 Nov 2020 20:29:20 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <405f71a6-9699-759d-2398-a17120d3fb96@amazon.de>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.229]
+X-ClientProxiedBy: EX13P01UWA003.ant.amazon.com (10.43.160.197) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Try to fetch any supported featured msr.  Currently it won't fail, so at least
-we can check against valid ones (which should be >0).
 
-This reproduces the issue [1] too by trying to fetch one invalid msr there.
 
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=209845
+On 02/11/2020 19:50, Alexander Graf wrote:
+>
+>
+> On 02.11.20 18:36, Andra Paraschiv wrote:
+>> Update the assigned value of the poll result to be EPOLLHUP instead of
+>> POLLHUP to match the __poll_t type.
+>>
+>> While at it, simplify the logic of setting the mask result of the poll
+>> function.
+>>
+>> Changelog
+>>
+>> v1 -> v2
+>>
+>> * Simplify the mask setting logic from the poll function.
+>>
+>> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>
+> Reviewed-by: Alexander Graf <graf@amazon.com>
+>
+>
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
---
-v2:
-- rename kvm_vm_get_feature_msrs to be prefixed with "_" [Vitaly, Drew]
-- drop the fix patch since queued with a better version
----
- .../testing/selftests/kvm/include/kvm_util.h  |  3 +
- tools/testing/selftests/kvm/lib/kvm_util.c    | 14 +++++
- .../testing/selftests/kvm/x86_64/state_test.c | 58 +++++++++++++++++++
- 3 files changed, 75 insertions(+)
+Greg, let me know if there is anything remaining to be done for this =
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 919e161dd289..1199f2003bee 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -66,6 +66,9 @@ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
- 
- struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
- struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-+void kvm_vm_get_msr_feature_index_list(struct kvm_vm *vm,
-+				       struct kvm_msr_list *list);
-+int _kvm_vm_get_feature_msrs(struct kvm_vm *vm, struct kvm_msrs *msrs);
- void kvm_vm_free(struct kvm_vm *vmp);
- void kvm_vm_restart(struct kvm_vm *vmp, int perm);
- void kvm_vm_release(struct kvm_vm *vmp);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 74776ee228f2..ad81d51fcf53 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -132,6 +132,20 @@ static const struct vm_guest_mode_params vm_guest_mode_params[] = {
- _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
- 	       "Missing new mode params?");
- 
-+void kvm_vm_get_msr_feature_index_list(struct kvm_vm *vm,
-+				       struct kvm_msr_list *list)
-+{
-+	int r = ioctl(vm->kvm_fd, KVM_GET_MSR_FEATURE_INDEX_LIST, list);
-+
-+	TEST_ASSERT(r == 0, "KVM_GET_MSR_FEATURE_INDEX_LIST failed: %d\n",
-+		    -errno);
-+}
-+
-+int _kvm_vm_get_feature_msrs(struct kvm_vm *vm, struct kvm_msrs *msrs)
-+{
-+	return ioctl(vm->kvm_fd, KVM_GET_MSRS, msrs);
-+}
-+
- /*
-  * VM Create
-  *
-diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
-index f6c8b9042f8a..2d61dc5c2dcc 100644
---- a/tools/testing/selftests/kvm/x86_64/state_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/state_test.c
-@@ -152,6 +152,61 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
- 	GUEST_DONE();
- }
- 
-+#define  KVM_MSR_FEATURE_N  64
-+
-+static int test_kvm_get_feature_msr_one(struct kvm_vm *vm, __u32 index,
-+					struct kvm_msrs *msrs)
-+{
-+	msrs->nmsrs = 1;
-+	msrs->entries[0].index = index;
-+	return _kvm_vm_get_feature_msrs(vm, msrs);
-+}
-+
-+static void test_kvm_get_msr_features(struct kvm_vm *vm)
-+{
-+	struct kvm_msr_list *msr_list;
-+	struct kvm_msrs *msrs;
-+	int i, ret, sum;
-+
-+	if (!kvm_check_cap(KVM_CAP_GET_MSR_FEATURES)) {
-+		pr_info("skipping kvm get msr features test\n");
-+		return;
-+	}
-+
-+	msr_list = calloc(1, sizeof(struct kvm_msr_list) +
-+			  sizeof(__u32) * KVM_MSR_FEATURE_N);
-+	msr_list->nmsrs = KVM_MSR_FEATURE_N;
-+
-+	TEST_ASSERT(msr_list, "msr_list allocation failed\n");
-+
-+	kvm_vm_get_msr_feature_index_list(vm, msr_list);
-+
-+	msrs = calloc(1, sizeof(struct kvm_msrs) +
-+		      sizeof(struct kvm_msr_entry));
-+
-+	TEST_ASSERT(msrs, "msr entries allocation failed\n");
-+
-+	sum = 0;
-+	for (i = 0; i < msr_list->nmsrs; i++) {
-+		ret = test_kvm_get_feature_msr_one(vm, msr_list->indices[i],
-+						    msrs);
-+		TEST_ASSERT(ret >= 0, "KVM_GET_MSR failed: %d\n", ret);
-+		sum += ret;
-+	}
-+	TEST_ASSERT(sum > 0, "KVM_GET_MSR has no feature msr\n");
-+
-+	/*
-+	 * Test invalid msr.  Note the retcode can be either 0 or 1 depending
-+	 * on kvm.ignore_msrs
-+	 */
-+	ret = test_kvm_get_feature_msr_one(vm, (__u32)-1, msrs);
-+	TEST_ASSERT(ret >= 0 && ret <= 1,
-+		    "KVM_GET_MSR on invalid msr error: %d\n", ret);
-+
-+	free(msrs);
-+	free(msr_list);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	vm_vaddr_t nested_gva = 0;
-@@ -168,6 +223,9 @@ int main(int argc, char *argv[])
- 	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
- 	run = vcpu_state(vm, VCPU_ID);
- 
-+	/* Test KVM_GET_MSR for VM */
-+	test_kvm_get_msr_features(vm);
-+
- 	vcpu_regs_get(vm, VCPU_ID, &regs1);
- 
- 	if (kvm_check_cap(KVM_CAP_NESTED_STATE)) {
--- 
-2.26.2
+patch. Otherwise, can you please add the patch to the char-misc tree.
+
+Thanks,
+Andra
+
+>
+>> ---
+>> =A0 drivers/virt/nitro_enclaves/ne_misc_dev.c | 6 ++----
+>> =A0 1 file changed, 2 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
+
+>> b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+>> index f06622b48d695..f1964ea4b8269 100644
+>> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
+>> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+>> @@ -1505,10 +1505,8 @@ static __poll_t ne_enclave_poll(struct file =
+
+>> *file, poll_table *wait)
+>> =A0 =A0=A0=A0=A0=A0 poll_wait(file, &ne_enclave->eventq, wait);
+>> =A0 -=A0=A0=A0 if (!ne_enclave->has_event)
+>> -=A0=A0=A0=A0=A0=A0=A0 return mask;
+>> -
+>> -=A0=A0=A0 mask =3D POLLHUP;
+>> +=A0=A0=A0 if (ne_enclave->has_event)
+>> +=A0=A0=A0=A0=A0=A0=A0 mask |=3D EPOLLHUP;
+>> =A0 =A0=A0=A0=A0=A0 return mask;
+>> =A0 }
+>>
+
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
 
