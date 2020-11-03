@@ -2,73 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E71402A40B3
-	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 10:52:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F26EB2A40FB
+	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 10:59:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727998AbgKCJwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 04:52:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60102 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726013AbgKCJwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Nov 2020 04:52:16 -0500
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3488EC0613D1
-        for <kvm@vger.kernel.org>; Tue,  3 Nov 2020 01:52:16 -0800 (PST)
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 6BEAF3D9; Tue,  3 Nov 2020 10:52:12 +0100 (CET)
-Date:   Tue, 3 Nov 2020 10:52:09 +0100
-From:   "joro@8bytes.org" <joro@8bytes.org>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: (proposal) RE: [PATCH v7 00/16] vfio: expose virtual Shared
- Virtual Addressing to VMs
-Message-ID: <20201103095208.GA22888@8bytes.org>
-References: <MWHPR11MB1645CFB0C594933E92A844AC8C070@MWHPR11MB1645.namprd11.prod.outlook.com>
+        id S1728254AbgKCJ7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 04:59:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39912 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728130AbgKCJ7o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Nov 2020 04:59:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604397582;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/Hng8FF8rYKgUR62gX4zrbElssxECvV9gtRRJaSTRys=;
+        b=dD8GMgvfZLwU4hyR88WmVmsPXXktdnMZw+I9uhhLFfs8Zj9zNwwxfuwblsdkq34ZOhYksJ
+        z7agkuYsMY9pobipFuL14CB5Va+wwxVHpztTWl1gcZai+iGQTBykseLCgKFXoeGHFGJ3kb
+        FjO8IWGedD5A+8z3ptJr4eqcz+ox4Pg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-ayXy8H-_OKCHGs11E6V6HA-1; Tue, 03 Nov 2020 04:59:40 -0500
+X-MC-Unique: ayXy8H-_OKCHGs11E6V6HA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 751B71009E23;
+        Tue,  3 Nov 2020 09:59:39 +0000 (UTC)
+Received: from paraplu.localdomain (ovpn-115-14.ams2.redhat.com [10.36.115.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EEA9D2CFC6;
+        Tue,  3 Nov 2020 09:59:35 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+        id AE19B3E0488; Tue,  3 Nov 2020 10:59:34 +0100 (CET)
+Date:   Tue, 3 Nov 2020 10:59:34 +0100
+From:   Kashyap Chamarthy <kchamart@redhat.com>
+To:     qemu-devel@nongnu.org, libvir-list@redhat.com, kvm@vger.kernel.org
+Subject: Re: Call for Volunteers: Summaries of a few KVMForum-2020 talks for
+ an LWN article
+Message-ID: <20201103095934.cqktlrq3zwxfewzj@paraplu>
+References: <20201029142707.eyjimaffcwkbrwcw@paraplu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1645CFB0C594933E92A844AC8C070@MWHPR11MB1645.namprd11.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201029142707.eyjimaffcwkbrwcw@paraplu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 12, 2020 at 08:38:54AM +0000, Tian, Kevin wrote:
-> > From: Jason Wang <jasowang@redhat.com>
+On Thu, Oct 29, 2020 at 03:27:07PM +0100, Kashyap Chamarthy wrote:
+> Hi, folks
+> 
+> Like last year[1], we're aiming to submit a KVM Forum 2020 "recap"
+> article for LWN.
+> 
+> This won't be a comprehensive summary of a lot of talks — LWN normally
+> aims for 1500 words; they say "fewer can sometimes work, and more is
+> generally OK too".  Given that, the write-up can cover about four
+> topics, similar to previous year's recap.
+> 
+> So I'm looking for a couple of volunteers.  Meanwhile, I'll write LWN
+> folks an email to see if they're amenable to this.  If they can't accept
+> it for some reason, Plan-B is qemu.org blog articles.
 
-> > Jason suggest something like /dev/sva. There will be a lot of other
-> > subsystems that could benefit from this (e.g vDPA).
+Hi, it's me again.
 
-Honestly, I fail to see the benefit of offloading these IOMMU specific
-setup tasks to user-space.
+LWN said they're open for a summary article and/or a couple of in-depth
+talks -- if there are volunteers.  Generally LWN audience prefers fewer
+talks that go deeper.
 
-The ways PASID and the device partitioning it allows are used are very
-device specific. A GPU will be partitioned completly different than a
-network card. So the device drivers should use the (v)SVA APIs to setup
-the partitioning in a way which makes sense for the device.
+For an in-depth article, I'm more comfortable doing Eric Blake's "NBD
+and Bitmaps: Building Blocks of Change Block Tracking" talk, as I'm
+somewhat familar with the topic.
 
-And VFIO is of course a user by itself, as it allows assigning device
-partitions to guests. Or even allow assigning complete devices and allow
-the guests to partition it themselfes.
+Let us know if anyone else wants to do an in-depth article on any of the
+other KVM Forum talks.
 
-So having said this, what is the benefit of exposing those SVA internals
-to user-space?
+[...]
 
-Regards,
 
-	Joerg
+-- 
+/kashyap
+
