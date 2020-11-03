@@ -2,122 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A61012A4B35
-	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 17:24:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAA822A4BE0
+	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 17:48:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727787AbgKCQYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 11:24:02 -0500
-Received: from foss.arm.com ([217.140.110.172]:51616 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726018AbgKCQYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Nov 2020 11:24:01 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B1B0139F;
-        Tue,  3 Nov 2020 08:24:01 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2AC663F66E;
-        Tue,  3 Nov 2020 08:24:00 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 1/2] arm64: Add support for configuring the
- translation granule
-To:     Andrew Jones <drjones@redhat.com>,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, mark.rutland@arm.com, jade.alglave@arm.com,
-        luc.maranget@inria.fr, andre.przywara@arm.com
-References: <20201102113444.103536-1-nikos.nikoleris@arm.com>
- <20201102113444.103536-2-nikos.nikoleris@arm.com>
- <20201103130443.d7zt2zdzbg6hgq7c@kamzik.brq.redhat.com>
- <938dd93e-653b-492d-e8d9-d19fc54cb1f5@arm.com>
- <20201103161038.32orgisio5xy5cn2@kamzik.brq.redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <2f2a6f1a-2893-2a45-8145-8c013237025e@arm.com>
-Date:   Tue, 3 Nov 2020 16:25:15 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1728364AbgKCQsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 11:48:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40858 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725997AbgKCQsT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Nov 2020 11:48:19 -0500
+X-Greylist: delayed 543 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 03 Nov 2020 08:48:19 PST
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B18EC0613D1;
+        Tue,  3 Nov 2020 08:48:19 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id C69BA128003B;
+        Tue,  3 Nov 2020 08:39:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1604421554;
+        bh=HGUTyhqFV7T0x144FbiJ+dIW4PRgOPfbbL2emrIeZSI=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=JV5wydhVcXN14b9so+1nEsuOqf/5654vfvCb3lKpcdvyNBGgNCjRZKR10SdqBr0zJ
+         ZWHyYISVZXNaOIX7U/vHlBX3vhZn1ppqUUUAemdXH7gs1LjXrGnB4mcr1mhjCIX2BQ
+         xIdn8A920w3BZhKsFhf9SsMnD1NHOkCYO8XZe3os=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id q32PP5ReTDhX; Tue,  3 Nov 2020 08:39:14 -0800 (PST)
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::527])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 9FFF5128002F;
+        Tue,  3 Nov 2020 08:39:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1604421554;
+        bh=HGUTyhqFV7T0x144FbiJ+dIW4PRgOPfbbL2emrIeZSI=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=JV5wydhVcXN14b9so+1nEsuOqf/5654vfvCb3lKpcdvyNBGgNCjRZKR10SdqBr0zJ
+         ZWHyYISVZXNaOIX7U/vHlBX3vhZn1ppqUUUAemdXH7gs1LjXrGnB4mcr1mhjCIX2BQ
+         xIdn8A920w3BZhKsFhf9SsMnD1NHOkCYO8XZe3os=
+Message-ID: <c0ee04a93a8d679f5e9ee7eea6467b32bb7063d6.camel@HansenPartnership.com>
+Subject: Re: [RFC Patch 1/2] KVM: SVM: Create SEV cgroup controller.
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+Cc:     Vipin Sharma <vipinsh@google.com>, thomas.lendacky@amd.com,
+        pbonzini@redhat.com, tj@kernel.org, lizefan@huawei.com,
+        joro@8bytes.org, corbet@lwn.net, brijesh.singh@amd.com,
+        jon.grimm@amd.com, eric.vantassell@amd.com, gingell@google.com,
+        rientjes@google.com, kvm@vger.kernel.org, x86@kernel.org,
+        cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Erdem Aktas <erdemaktas@google.com>
+Date:   Tue, 03 Nov 2020 08:39:12 -0800
+In-Reply-To: <20200922012227.GA26483@linux.intel.com>
+References: <20200922004024.3699923-1-vipinsh@google.com>
+         <20200922004024.3699923-2-vipinsh@google.com>
+         <94c3407d-07ca-8eaf-4073-4a5e2a3fb7b8@infradead.org>
+         <20200922012227.GA26483@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-In-Reply-To: <20201103161038.32orgisio5xy5cn2@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, 2020-09-21 at 18:22 -0700, Sean Christopherson wrote:
+> On Mon, Sep 21, 2020 at 06:04:04PM -0700, Randy Dunlap wrote:
+> > Hi,
+> > 
+> > On 9/21/20 5:40 PM, Vipin Sharma wrote:
+> > > diff --git a/init/Kconfig b/init/Kconfig
+> > > index d6a0b31b13dc..1a57c362b803 100644
+> > > --- a/init/Kconfig
+> > > +++ b/init/Kconfig
+> > > @@ -1101,6 +1101,20 @@ config CGROUP_BPF
+> > >  	  BPF_CGROUP_INET_INGRESS will be executed on the ingress path
+> > > of
+> > >  	  inet sockets.
+> > >  
+> > > +config CGROUP_SEV
+> > > +	bool "SEV ASID controller"
+> > > +	depends on KVM_AMD_SEV
+> > > +	default n
+> > > +	help
+> > > +	  Provides a controller for AMD SEV ASIDs. This controller
+> > > limits and
+> > > +	  shows the total usage of SEV ASIDs used in encrypted VMs on
+> > > AMD
+> > > +	  processors. Whenever a new encrypted VM is created using SEV
+> > > on an
+> > > +	  AMD processor, this controller will check the current limit
+> > > in the
+> > > +	  cgroup to which the task belongs and will deny the SEV ASID
+> > > if the
+> > > +	  cgroup has already reached its limit.
+> > > +
+> > > +	  Say N if unsure.
+> > 
+> > Something here (either in the bool prompt string or the help text)
+> > should let a reader know w.t.h. SEV means.
+> > 
+> > Without having to look in other places...
+> 
+> ASIDs too.  I'd also love to see more info in the docs and/or cover
+> letter to explain why ASID management on SEV requires a cgroup.  I
+> know what an ASID is, and have a decent idea of how KVM manages ASIDs
+> for legacy VMs, but I know nothing about why ASIDs are limited for
+> SEV and not legacy VMs.
 
-On 11/3/20 4:10 PM, Andrew Jones wrote:
-> On Tue, Nov 03, 2020 at 03:49:32PM +0000, Nikos Nikoleris wrote:
->>>> diff --git a/lib/arm64/asm/page.h b/lib/arm64/asm/page.h
->>>> index 46af552..2a06207 100644
->>>> --- a/lib/arm64/asm/page.h
->>>> +++ b/lib/arm64/asm/page.h
->>>> @@ -10,38 +10,51 @@
->>>>    * This work is licensed under the terms of the GNU GPL, version 2.
->>>>    */
->>>> +#include <config.h>
->>>>   #include <linux/const.h>
->>>> -#define PGTABLE_LEVELS		2
->>>>   #define VA_BITS			42
->>> Let's bump VA_BITS to 48 while we're at it.
-> I tried my suggestion to go to 48 VA bits, but it seems to break
-> things for 64K pages.
+Well, also, why would we only have a cgroup for ASIDs but not MSIDs?
 
-I believe that is because we end up with PGTABLE_LEVELS=3 and in
-mmu_set_ranges_sect() we try to install a block mapping at the PUD level, which is
-forbidden by the architecture.
+For the reader at home a Space ID (SID) is simply a tag that can be
+placed on a cache line to control things like flushing.  Intel and AMD
+use MSIDs which are allocated per process to allow fast context
+switching by flushing all the process pages using a flush by SID. 
+ASIDs are also used by both Intel and AMD to control nested/extended
+paging of virtual machines, so ASIDs are allocated per VM.  So far it's
+universal.
 
-I think the easiest fix for that is to always try to install block mapping at the
-pmd level. The diff below fixed all errors (with 16k and 64k pages):
+AMD invented a mechanism for tying their memory encryption technology
+to the ASID asserted on the memory bus, so now they can do encrypted
+virtual machines since each VM is tagged by ASID which the memory
+encryptor sees.  It is suspected that the forthcoming intel TDX
+technology to encrypt VMs will operate in the same way as well.  This
+isn't everything you have to do to get an encrypted VM, but it's a core
+part of it.
 
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 6d1c75b00eaa..d33948a8a06a 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -134,20 +134,22 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
-                        phys_addr_t phys_start, phys_addr_t phys_end,
-                        pgprot_t prot)
- {
--       phys_addr_t paddr = phys_start & PUD_MASK;
--       uintptr_t vaddr = virt_offset & PUD_MASK;
-+       phys_addr_t paddr = phys_start & PMD_MASK;
-+       uintptr_t vaddr = virt_offset & PMD_MASK;
-        uintptr_t virt_end = phys_end - paddr + vaddr;
-        pgd_t *pgd;
-        pud_t *pud;
--       pud_t entry;
-+       pmd_t *pmd;
-+       pmd_t entry;
- 
--       for (; vaddr < virt_end; vaddr += PUD_SIZE, paddr += PUD_SIZE) {
--               pud_val(entry) = paddr;
--               pud_val(entry) |= PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
--               pud_val(entry) |= pgprot_val(prot);
-+       for (; vaddr < virt_end; vaddr += PMD_SIZE, paddr += PMD_SIZE) {
-+               pmd_val(entry) = paddr;
-+               pmd_val(entry) |= PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
-+               pmd_val(entry) |= pgprot_val(prot);
-                pgd = pgd_offset(pgtable, vaddr);
-                pud = pud_alloc(pgd, vaddr);
--               WRITE_ONCE(*pud, entry);
-+               pmd = pmd_alloc(pud, vaddr);
-+               WRITE_ONCE(*pmd, entry);
-                flush_tlb_page(vaddr);
-        }
- }
-diff --git a/lib/arm64/asm/page.h b/lib/arm64/asm/page.h
-index 2a06207444aa..f649f56bf16f 100644
---- a/lib/arm64/asm/page.h
-+++ b/lib/arm64/asm/page.h
-@@ -13,7 +13,7 @@
- #include <config.h>
- #include <linux/const.h>
- 
--#define VA_BITS                        42
-+#define VA_BITS                        46
- 
- #define PAGE_SIZE              CONFIG_PAGE_SIZE
- #if PAGE_SIZE == 65536
+The problem with SIDs (both A and M) is that they get crammed into
+spare bits in the CPU (like the upper bits of %CR3 for MSID) so we
+don't have enough of them to do a 1:1 mapping of MSID to process or
+ASID to VM.  Thus we have to ration them somewhat, which is what I
+assume this patch is about?
 
-Thanks,
+James
 
-Alex
 
