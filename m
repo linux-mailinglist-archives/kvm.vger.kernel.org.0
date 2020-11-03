@@ -2,221 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E8DE2A3F54
-	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 09:53:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D9AB2A3F99
+	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 10:05:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727529AbgKCIwm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 03:52:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50858 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725968AbgKCIwm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Nov 2020 03:52:42 -0500
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD001C0613D1;
-        Tue,  3 Nov 2020 00:52:41 -0800 (PST)
-Received: by mail-pg1-x542.google.com with SMTP id i7so11214671pgh.6;
-        Tue, 03 Nov 2020 00:52:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=x0V9Eqsw0P/c1uqnmbZIL7sQkwkXO9ZRETLMblzJ8gw=;
-        b=mmHGeeOfpKkGy9BXLSA5CXBvj1YkjRIcKTdmituqmoxcsQkc/MaSlOf2gMGlU/PADh
-         z0P4HpgvC3s9CIiP3T8sJuahEWTNB3j9eogiQo+kqAMCK58eQDF80XcGc0o3vY3Jj3y+
-         cuBt8QUScSQu1vfWOef6m8SDoDvgfh7WbsKKIY01sRy56WhFWXMHqMjtIPeV88DCUHiU
-         ky5y36SyCraqGgjwSfb+c4mhqWQPOJsGNLzV30NYpqON3PeK9eSuDZKPkoWK+4bXmFUF
-         sF4GIKawTEPZ/wik8JHK/wxWqBJGVGa5SnHu0D7MzPKtJJVU4rj4O76awq5f5ZxTB0wG
-         6o2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=x0V9Eqsw0P/c1uqnmbZIL7sQkwkXO9ZRETLMblzJ8gw=;
-        b=eBRFSecLlF0uA8qKiuRvuBjed0gcev6/bnb62WQuR7jWHWIcAJbHaDbK9ey8fxAQ8r
-         OF5IcYcLrarvZ1B5M+H9f44CDMn2MeAL6mAxKCkqqEYvjjnv5XqX7JZllBXSMOeiYgpY
-         o7HfTIotObCaxudTjJPtm3+XJY2RYiHDPNELC1n9m3+oCfnkyX5gkLkqIUurZ/K2a6qk
-         Z/5bAVgWJYW63IFRATqQAHdlUiyTvJQ7ba+b7ODzns2XyDIGqqDMWP1rGV8zrMYYxs5i
-         pAdne5sYkZHfo4RMxE3O68TZwBsE83/gg5PnqBQ5xDN3zVx9MYOQs6KynOeFZJkEZUhT
-         ahvQ==
-X-Gm-Message-State: AOAM533bEsYdmlL8gA+bV002B8IE+L+jgXoYZV1ZvPM3MnqwxahjVl1O
-        LIbzRRsbERvkn6iF6FWj8gHDQlKHsanFN8s=
-X-Google-Smtp-Source: ABdhPJxcq5b+6l9ITRsWB1Ya1KrxYn9ZW+9/FYoZ0RkoB4msCHH1juevPLTgR45sRW2PGWSk75YCkg==
-X-Received: by 2002:a17:90b:384b:: with SMTP id nl11mr2799496pjb.126.1604393560956;
-        Tue, 03 Nov 2020 00:52:40 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id q13sm15978340pfg.3.2020.11.03.00.52.37
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Nov 2020 00:52:40 -0800 (PST)
-From:   lihaiwei.kernel@gmail.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, Haiwei Li <lihaiwei@tencent.com>
-Subject: [PATCH v5] KVM: Check the allocation of pv cpu mask
-Date:   Tue,  3 Nov 2020 16:52:27 +0800
-Message-Id: <20201103085227.25098-1-lihaiwei.kernel@gmail.com>
-X-Mailer: git-send-email 2.28.0
+        id S1727165AbgKCJFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 04:05:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59095 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726013AbgKCJFO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Nov 2020 04:05:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604394312;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NCLuRFwSBz7lCHK9Xxh7qpGQtAw7uNBdQ5Y4F/GcLRE=;
+        b=d8PdvZrwMnI4pZm4SxbUhTosGou6pqV+AmCUYDPNtSFuGGMvaoroa34w5Lx4pkF5Zl5Aq4
+        K7bv1w3YBkViM+x9OU4fubHwRdiiwY8MXTAPhpJoM+hDhmXcnlk0NRFbHROivCGyQKQ2nm
+        X0Gu4jb5ozi8o6dZE6uffpfha1lwtwc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-QnBW_FxePh-2eshNLH4Rrw-1; Tue, 03 Nov 2020 04:05:09 -0500
+X-MC-Unique: QnBW_FxePh-2eshNLH4Rrw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23D0C106B816;
+        Tue,  3 Nov 2020 09:05:08 +0000 (UTC)
+Received: from [10.72.13.208] (ovpn-13-208.pek2.redhat.com [10.72.13.208])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F47D21E97;
+        Tue,  3 Nov 2020 09:04:32 +0000 (UTC)
+Subject: Re: [PATCH] vhost/vsock: add IOTLB API support
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     mst@redhat.com, netdev@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
+References: <20201029174351.134173-1-sgarzare@redhat.com>
+ <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
+ <20201030105422.ju2aj2bmwsckdufh@steredhat>
+ <278f4732-e561-2b4f-03ee-b26455760b01@redhat.com>
+ <20201102171104.eiovmkj23fle5ioj@steredhat>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <8648a2e3-1052-3b5b-11ce-87628ac8dd33@redhat.com>
+Date:   Tue, 3 Nov 2020 17:04:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20201102171104.eiovmkj23fle5ioj@steredhat>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Haiwei Li <lihaiwei@tencent.com>
 
-Both 'kvm_send_ipi_mask_allbutself' and 'kvm_flush_tlb_others' are using
-per-cpu __pv_cpu_mask. Init pv ipi ops only if the allocation succeeds and
-check the cpumask in 'kvm_flush_tlb_others'.
+On 2020/11/3 上午1:11, Stefano Garzarella wrote:
+> On Fri, Oct 30, 2020 at 07:44:43PM +0800, Jason Wang wrote:
+>>
+>> On 2020/10/30 下午6:54, Stefano Garzarella wrote:
+>>> On Fri, Oct 30, 2020 at 06:02:18PM +0800, Jason Wang wrote:
+>>>>
+>>>> On 2020/10/30 上午1:43, Stefano Garzarella wrote:
+>>>>> This patch enables the IOTLB API support for vhost-vsock devices,
+>>>>> allowing the userspace to emulate an IOMMU for the guest.
+>>>>>
+>>>>> These changes were made following vhost-net, in details this patch:
+>>>>> - exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
+>>>>>   device if the feature is acked
+>>>>> - implements VHOST_GET_BACKEND_FEATURES and
+>>>>>   VHOST_SET_BACKEND_FEATURES ioctls
+>>>>> - calls vq_meta_prefetch() before vq processing to prefetch vq
+>>>>>   metadata address in IOTLB
+>>>>> - provides .read_iter, .write_iter, and .poll callbacks for the
+>>>>>   chardev; they are used by the userspace to exchange IOTLB messages
+>>>>>
+>>>>> This patch was tested with QEMU and a patch applied [1] to fix a
+>>>>> simple issue:
+>>>>>     $ qemu -M q35,accel=kvm,kernel-irqchip=split \
+>>>>>            -drive file=fedora.qcow2,format=qcow2,if=virtio \
+>>>>>            -device intel-iommu,intremap=on \
+>>>>>            -device vhost-vsock-pci,guest-cid=3,iommu_platform=on
+>>>>
+>>>>
+>>>> Patch looks good, but a question:
+>>>>
+>>>> It looks to me you don't enable ATS which means vhost won't get any 
+>>>> invalidation request or did I miss anything?
+>>>>
+>>>
+>>> You're right, I didn't see invalidation requests, only miss and 
+>>> updates.
+>>> Now I have tried to enable 'ats' and 'device-iotlb' but I still 
+>>> don't see any invalidation.
+>>>
+>>> How can I test it? (Sorry but I don't have much experience yet with 
+>>> vIOMMU)
+>>
+>>
+>> I guess it's because the batched unmap. Maybe you can try to use 
+>> "intel_iommu=strict" in guest kernel command line to see if it works.
+>>
+>> Btw, make sure the qemu contains the patch [1]. Otherwise ATS won't 
+>> be enabled for recent Linux Kernel in the guest.
+>
+> The problem was my kernel, it was built with a tiny configuration.
+> Using fedora stock kernel I can see the 'invalidate' requests, but I 
+> also had the following issues.
+>
+> Do they make you ring any bells?
+>
+> $ ./qemu -m 4G -smp 4 -M q35,accel=kvm,kernel-irqchip=split \
+>     -drive file=fedora.qcow2,format=qcow2,if=virtio \
+>     -device intel-iommu,intremap=on,device-iotlb=on \
+>     -device vhost-vsock-pci,guest-cid=6,iommu_platform=on,ats=on,id=v1
+>
+>     qemu-system-x86_64: vtd_iova_to_slpte: detected IOVA overflow     
+> (iova=0x1d40000030c0)
 
-Thanks to Vitaly Kuznetsov's tireless advice.
 
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
----
-v1 -> v2:
- * add CONFIG_SMP for kvm_send_ipi_mask_allbutself to prevent build error
-v2 -> v3:
- * always check the allocation of __pv_cpu_mask in kvm_flush_tlb_others
-v3 -> v4:
- * mov kvm_setup_pv_ipi to kvm_alloc_cpumask and get rid of kvm_apic_init
-v4 -> v5:
- * remove kvm_apic_init as an empty function
- * define pv_ipi_supported() in !CONFIG_SMP case as 'false' to get rid of
- 'alloc' variable
- * move kvm_setup_pv_ipi and define the implementation in CONFIG_SMP
+It's a hint that IOVA exceeds the AW. It might be worth to check whether 
+the missed IOVA reported from IOTLB is legal.
 
- arch/x86/kernel/kvm.c | 75 +++++++++++++++++++++++++------------------
- 1 file changed, 44 insertions(+), 31 deletions(-)
+Thanks
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 42c6e0deff9e..2f2cc25d5078 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -547,16 +547,6 @@ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
- 	__send_ipi_mask(local_mask, vector);
- }
- 
--/*
-- * Set the IPI entry points
-- */
--static void kvm_setup_pv_ipi(void)
--{
--	apic->send_IPI_mask = kvm_send_ipi_mask;
--	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
--	pr_info("setup PV IPIs\n");
--}
--
- static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
- {
- 	int cpu;
-@@ -609,7 +599,24 @@ static int kvm_cpu_down_prepare(unsigned int cpu)
- 	local_irq_enable();
- 	return 0;
- }
-+#else
-+static bool pv_ipi_supported(void)
-+{
-+	return false;
-+}
-+#endif
-+
-+/*
-+ * Set the IPI entry points
-+ */
-+static void kvm_setup_pv_ipi(void)
-+{
-+#if defined(CONFIG_SMP)
-+	apic->send_IPI_mask = kvm_send_ipi_mask;
-+	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
-+	pr_info("setup PV IPIs\n");
- #endif
-+}
- 
- static void kvm_flush_tlb_others(const struct cpumask *cpumask,
- 			const struct flush_tlb_info *info)
-@@ -619,6 +626,11 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
- 	struct kvm_steal_time *src;
- 	struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
- 
-+	if (unlikely(!flushmask)) {
-+		native_flush_tlb_others(cpumask, info);
-+		return;
-+	}
-+
- 	cpumask_copy(flushmask, cpumask);
- 	/*
- 	 * We have to call flush only on online vCPUs. And
-@@ -730,18 +742,9 @@ static uint32_t __init kvm_detect(void)
- 	return kvm_cpuid_base();
- }
- 
--static void __init kvm_apic_init(void)
--{
--#if defined(CONFIG_SMP)
--	if (pv_ipi_supported())
--		kvm_setup_pv_ipi();
--#endif
--}
--
- static void __init kvm_init_platform(void)
- {
- 	kvmclock_init();
--	x86_platform.apic_post_init = kvm_apic_init;
- }
- 
- const __initconst struct hypervisor_x86 x86_hyper_kvm = {
-@@ -765,29 +768,39 @@ static __init int activate_jump_labels(void)
- }
- arch_initcall(activate_jump_labels);
- 
-+static void kvm_free_cpumask(void)
-+{
-+	unsigned int cpu;
-+
-+	for_each_possible_cpu(cpu)
-+		free_cpumask_var(per_cpu(__pv_cpu_mask, cpu));
-+}
-+
- static __init int kvm_alloc_cpumask(void)
- {
- 	int cpu;
--	bool alloc = false;
- 
- 	if (!kvm_para_available() || nopv)
- 		return 0;
- 
--	if (pv_tlb_flush_supported())
--		alloc = true;
--
--#if defined(CONFIG_SMP)
--	if (pv_ipi_supported())
--		alloc = true;
--#endif
--
--	if (alloc)
-+	if (pv_tlb_flush_supported() || pv_ipi_supported()) {
- 		for_each_possible_cpu(cpu) {
--			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
--				GFP_KERNEL, cpu_to_node(cpu));
-+			if (!zalloc_cpumask_var_node(
-+				per_cpu_ptr(&__pv_cpu_mask, cpu),
-+				GFP_KERNEL, cpu_to_node(cpu))) {
-+				goto zalloc_cpumask_fail;
-+			}
- 		}
-+	}
-+
-+	if (pv_ipi_supported())
-+		kvm_setup_pv_ipi();
- 
- 	return 0;
-+
-+zalloc_cpumask_fail:
-+	kvm_free_cpumask();
-+	return -ENOMEM;
- }
- arch_initcall(kvm_alloc_cpumask);
- 
--- 
-2.18.4
+
+> qemu-system-x86_64: vtd_iommu_translate: detected translation failure 
+> (dev=00:03:00, iova=0x1d40000030c0)
+>     qemu-system-x86_64: New fault is not recorded due to compression 
+> of     faults
+>
+> Guest kernel messages:
+>     [   44.940872] DMAR: DRHD: handling fault status reg 2
+>     [   44.941989] DMAR: [DMA Read] Request device [00:03.0] PASID     
+> ffffffff fault addr ffff88W
+>     [   49.785884] DMAR: DRHD: handling fault status reg 2
+>     [   49.788874] DMAR: [DMA Read] Request device [00:03.0] PASID     
+> ffffffff fault addr ffff88W
+>
+>
+> QEMU: b149dea55c Merge remote-tracking branch 
+> 'remotes/cschoenebeck/tags/pull-9p-20201102' into staging
+>
+> Linux guest: 5.8.16-200.fc32.x86_64
+>
+>
+> Thanks,
+> Stefano
+>
 
