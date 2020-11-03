@@ -2,148 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 936FB2A4C99
-	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 18:20:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C29F62A4D25
+	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 18:36:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728743AbgKCRTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 12:19:55 -0500
-Received: from mail-eopbgr80078.outbound.protection.outlook.com ([40.107.8.78]:47584
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726581AbgKCRTz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Nov 2020 12:19:55 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AePvTX30jkWUlhPpF45+NAmzoCO/pATCvYI8SjN75tilkQXVrFzJX1Q66cMU0bOLTEkZX8XFEBdlnjgvoD35dBjPKRV74x4CHPYUyfrnG90T4QzpQKHgb5s3Q+PXqPkGJ8zcAOfoSbXNlJMEkDhT5NQ9UjhAE454WkU0kCXU8xhOPd/3WK22phOW6McPtt8x1+45Yps8XOmkyTmveT8L2ZJ9GmvVsXjg6+a7dHPCDz0DopZmU4PUnsPdGA/qa/o/RA19mlUIGy8WEV+SAI3KgjYWs56N7p1m3nSq4BqBYfaRGjKdIK+hXGZllRtxY+CYZtwxNwBHA8YGy2WCtVHpeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2Cs2g/pkBry+XCb8x1KZJkwslZHxwuyzgQIJHgg9ImY=;
- b=XcPlCWhvL+NQpRqsH7DdWxfEjfbtKq2jT+tLlXNAtKO1xSj2HWwVosyc80QatdyJ6xtdkPCK12SQkMFyPLVfmLXgF6EntwW87p4And4PvYeB9oM3za1DGGmJvr+DKn8PEUPIAKgy1uii35CMZF+w41p+TzdgCTN338s5Bi0KcubvfwYUkgMkM4vGs21ewooqimSI59rPc0QkpHlf36fLSmNcjSg1WrTjZ61CubudBrshZqAn7QfoQA34Qt6SK0UqJ3foQpigMsqEA3XU8Wmrj67ruDFJhu201Sj4qG6Lx25MbZZcF2aHiPvQfTWKb9k4hxibqaLiUwcsugEL/l7GXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2Cs2g/pkBry+XCb8x1KZJkwslZHxwuyzgQIJHgg9ImY=;
- b=CHywD4vd1eTYYseduQScwBOTmwiEQDNp6jKs6sHfdjRtni8HR3IvqCMy+Xfgj3rKwQuuqRX05iqrN+Q89mJ+iZCTzTbsMGrhd6JtfkvBK8OmSHCCOPwHZhW5MXWFqedzfGfERWzpbIBcK5ALkWMY+PHAkNTtEUzL/e3Oo9Og320=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none
- header.from=oss.nxp.com;
-Received: from VI1PR0402MB2815.eurprd04.prod.outlook.com
- (2603:10a6:800:ae::16) by VI1PR0402MB3790.eurprd04.prod.outlook.com
- (2603:10a6:803:24::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.28; Tue, 3 Nov
- 2020 17:19:51 +0000
-Received: from VI1PR0402MB2815.eurprd04.prod.outlook.com
- ([fe80::6cf3:a10a:8242:602f]) by VI1PR0402MB2815.eurprd04.prod.outlook.com
- ([fe80::6cf3:a10a:8242:602f%11]) with mapi id 15.20.3499.032; Tue, 3 Nov 2020
- 17:19:51 +0000
-Subject: Re: [PATCH 1/2] vfio/fsl-mc: return -EFAULT if copy_to_user() fails
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Bharat Bhushan <Bharat.Bhushan@nxp.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <20201023113450.GH282278@mwanda>
- <20201102144536.42a0e066@w520.home>
-From:   Diana Craciun OSS <diana.craciun@oss.nxp.com>
-Message-ID: <28a51535-5f4f-6a06-254e-29ef3dc999ba@oss.nxp.com>
-Date:   Tue, 3 Nov 2020 19:19:44 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101
- Thunderbird/83.0
-In-Reply-To: <20201102144536.42a0e066@w520.home>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [86.121.79.46]
-X-ClientProxiedBy: AM0PR03CA0104.eurprd03.prod.outlook.com
- (2603:10a6:208:69::45) To VI1PR0402MB2815.eurprd04.prod.outlook.com
- (2603:10a6:800:ae::16)
+        id S1728550AbgKCRgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 12:36:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39720 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726581AbgKCRgR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Nov 2020 12:36:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604424974;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LhAEL1RVfZ0rVNJRIJIHYZ/LEPnqf6QDuwRHl6aY6M0=;
+        b=SSpX3hosVffGRcZU+0EPi8uTSifRuJPAVli9I0iwhP1fbSFFugE0LeGpnQmG7t+IacX+bm
+        bdU9YYRT656/LHRliykCF81LR/zygsp1/u3QQA5cEYyAc6Ixz5GuhMY4WfAtsxOVymCtXc
+        Z0IPhXR57vgT6o/NfRwFUlDnmqPHr4c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-581-Qk0ItVSAP72csxal9VxIOA-1; Tue, 03 Nov 2020 12:36:10 -0500
+X-MC-Unique: Qk0ItVSAP72csxal9VxIOA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14FF187951E;
+        Tue,  3 Nov 2020 17:36:09 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.252])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B39C73664;
+        Tue,  3 Nov 2020 17:36:06 +0000 (UTC)
+Date:   Tue, 3 Nov 2020 18:36:04 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
+        mark.rutland@arm.com, jade.alglave@arm.com, luc.maranget@inria.fr,
+        andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH 2/2] arm64: Check if the configured
+ translation granule is supported
+Message-ID: <20201103173604.az5ymaw576uz6645@kamzik.brq.redhat.com>
+References: <20201102113444.103536-1-nikos.nikoleris@arm.com>
+ <20201102113444.103536-3-nikos.nikoleris@arm.com>
+ <20201103100222.dpryytbkdjaryehr@kamzik.brq.redhat.com>
+ <f9ea19cc-b325-2a7f-1b7c-e7da3d99bfca@arm.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.122] (86.121.79.46) by AM0PR03CA0104.eurprd03.prod.outlook.com (2603:10a6:208:69::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.22 via Frontend Transport; Tue, 3 Nov 2020 17:19:50 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 00e771a0-ad58-4464-8811-08d8801cac29
-X-MS-TrafficTypeDiagnostic: VI1PR0402MB3790:
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB3790757D7D009B94FA2E25FCBE110@VI1PR0402MB3790.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bJ1xcqpW39e0/PL/3mRgeoEczOX7OBSqjPp8UKSq5eRLW29evrmxKCOOXWiOe3mNoADh6pwJR3TmUot6rc291hSqHiOD2h8b5fv7IJnDuLj0gFzILStVAdUkOSTFRQEiDjv+mtixoYKcQhzvJl87anTPmxV80XwZbM3EK59liDl0tyaSzPoa6ZuIZWlFgP0nKGxR89LtwzM+gtCKNdbtQD4HMMMfKO1yf4a8xm48dYYqWcIqb/14vMqUoxMiS2J2pkL3PULGPpMDA6biJ7YZVjf4p7CHta/ODFRHoXeic2c8Ivh4ijgSgYh8zKPh0VkczWYdgVpn8v5bC7HIBIh3iAPkk91WK8jeqOp9LR2nITaJDEZxng527Hmkwbl9Dd83
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB2815.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(396003)(39850400004)(366004)(6666004)(83380400001)(5660300002)(66556008)(66476007)(66946007)(8676002)(6916009)(16526019)(2906002)(2616005)(956004)(6486002)(86362001)(31696002)(53546011)(52116002)(26005)(4326008)(478600001)(186003)(16576012)(316002)(54906003)(31686004)(8936002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: BTGu7LJ2tD1EI2UP59gggAcRpSVYqUwxuhWcSrBWOT+YQ70LWBFWJsuu4eGK32WaMKdxWECnmtL0JqUbCZv8nbdx1aeHo8icscO8H9ABr7DIbzVWs1Ec+HXv9HxgiV8RfPYINNwthvYAZY4wMfHkW/r0ynyophk8BFQSpYnniCKj202Wfg/qDOCmSTZSJU92HVqTQqrgAU5Ez7W0VQYcaS7axt53BscrB5zWZAyTQnIfDdlq3AJFKmPZSiRWTm65977Rgw+XdALeFINsPknMg/IKI39EmKPIuyrF6jJxX9XiPYeg7ZidDMnGCy3rqX0V18bnL6YDw1M8wEdNXL3SWKNWts+YTbylBMnhVZa3fi5c/y3S+WrxLzJQLEPOZv6/j2VaFJlfKZvW2aAh6CiMl71iUfWoY0HfIVbVSfFTT8E44CGF7wN+/NqEtg/+80EgEH+y9QPDoTACsvHgCsBrvOaMtJGEgJ3SNaRh+GJquOnR09L08Ug/rqlYJRWBj4vHELi1hBGEVrW5tc6aNCdt11VeuZXfnXpqN9eZm0cEN6AwwCQs2xJU4W+TujTTYlhLXwpF3Mu7hc2PzR9/uSIqyUsXGhgmedP051zECvqdRvrVrw0evys9IFA5QNn3gKKZr5PoHdDhBqbJFgUUdB4p0Q==
-X-MS-Exchange-Transport-Forked: True
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00e771a0-ad58-4464-8811-08d8801cac29
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB2815.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2020 17:19:51.1684
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pKrl5Nhy/cOGkyZ+lBVCoRRBrn6DqmdeYMk2TqjnThSYfbXIe2WvExR61UG/M8JuYh7TJuOnx6Atdvo3dg53uw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3790
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9ea19cc-b325-2a7f-1b7c-e7da3d99bfca@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/2/2020 11:45 PM, Alex Williamson wrote:
+On Tue, Nov 03, 2020 at 05:03:15PM +0000, Alexandru Elisei wrote:
+> Hi,
 > 
-> Thanks, Dan.
+> On 11/3/20 10:02 AM, Andrew Jones wrote:
+> > On Mon, Nov 02, 2020 at 11:34:44AM +0000, Nikos Nikoleris wrote:
+> >> Now that we can change the translation granule at will, and since
+> >> arm64 implementations can support a subset of the architecturally
+> >> defined granules, we need to check and warn the user if the configured
+> >> granule is not supported.
+> > nit: it'd be better for this patch to come before the last patch.
+> >
+> >> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> >> ---
+> >>  lib/arm64/asm/processor.h | 65 +++++++++++++++++++++++++++++++++++++++
+> >>  lib/arm/mmu.c             |  3 ++
+> >>  2 files changed, 68 insertions(+)
+> >>
+> >> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> >> index 02665b8..0eac928 100644
+> >> --- a/lib/arm64/asm/processor.h
+> >> +++ b/lib/arm64/asm/processor.h
+> >> @@ -117,5 +117,70 @@ static inline u64 get_ctr(void)
+> >>  
+> >>  extern u32 dcache_line_size;
+> >>  
+> >> +static inline unsigned long get_id_aa64mmfr0_el1(void)
+> >> +{
+> >> +	unsigned long mmfr0;
+> >> +	asm volatile("mrs %0, id_aa64mmfr0_el1" : "=r" (mmfr0));
+> >> +	return mmfr0;
+> >> +}
+> >> +
+> >> +/* From arch/arm64/include/asm/cpufeature.h */
+> >> +static inline unsigned int
+> >> +cpuid_feature_extract_unsigned_field_width(u64 features, int field, int width)
+> >> +{
+> >> +	return (u64)(features << (64 - width - field)) >> (64 - width);
+> >> +}
+> >> +
+> >> +#define ID_AA64MMFR0_TGRAN4_SHIFT	28
+> >> +#define ID_AA64MMFR0_TGRAN64_SHIFT	24
+> >> +#define ID_AA64MMFR0_TGRAN16_SHIFT	20
+> >> +#define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
+> >> +#define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
+> >> +#define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
+> >> +
+> >> +static inline bool system_supports_64kb_granule(void)
+> >> +{
+> >> +	u64 mmfr0;
+> >> +	u32 val;
+> >> +
+> >> +	mmfr0 = get_id_aa64mmfr0_el1();
+> >> +	val = cpuid_feature_extract_unsigned_field_width(
+> >> +		mmfr0, ID_AA64MMFR0_TGRAN4_SHIFT,4);
+> >> +
+> >> +	return val == ID_AA64MMFR0_TGRAN64_SUPPORTED;
+> >> +}
+> >> +
+> >> +static inline bool system_supports_16kb_granule(void)
+> >> +{
+> >> +	u64 mmfr0;
+> >> +	u32 val;
+> >> +
+> >> +	mmfr0 = get_id_aa64mmfr0_el1();
+> >> +	val = cpuid_feature_extract_unsigned_field_width(
+> >> +		mmfr0, ID_AA64MMFR0_TGRAN16_SHIFT, 4);
+> >> +
+> >> +	return val == ID_AA64MMFR0_TGRAN16_SUPPORTED;
+> >> +}
+> >> +
+> >> +static inline bool system_supports_4kb_granule(void)
+> >> +{
+> >> +	u64 mmfr0;
+> >> +	u32 val;
+> >> +
+> >> +	mmfr0 = get_id_aa64mmfr0_el1();
+> >> +	val = cpuid_feature_extract_unsigned_field_width(
+> >> +		mmfr0, ID_AA64MMFR0_TGRAN4_SHIFT, 4);
+> >> +
+> >> +	return val == ID_AA64MMFR0_TGRAN4_SUPPORTED;
+> >> +}
+> >> +
+> >> +#if PAGE_SIZE == 65536
+> >> +#define system_supports_configured_granule system_supports_64kb_granule
+> >> +#elif PAGE_SIZE == 16384
+> >> +#define system_supports_configured_granule system_supports_16kb_granule
+> >> +#elif PAGE_SIZE == 4096
+> >> +#define system_supports_configured_granule system_supports_4kb_granule
+> >> +#endif
+> >> +
+> >>  #endif /* !__ASSEMBLY__ */
+> >>  #endif /* _ASMARM64_PROCESSOR_H_ */
+> >> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> >> index 6d1c75b..51fa745 100644
+> >> --- a/lib/arm/mmu.c
+> >> +++ b/lib/arm/mmu.c
+> >> @@ -163,6 +163,9 @@ void *setup_mmu(phys_addr_t phys_end)
+> >>  
+> >>  #ifdef __aarch64__
+> >>  	init_alloc_vpage((void*)(4ul << 30));
+> >> +
+> >> +	assert_msg(system_supports_configured_granule(),
+> >> +		   "Unsupported translation granule %d\n", PAGE_SIZE);
+> >                                                      ^
+> >                                               needs '%ld' to compile
+> >>  #endif
+> >>  
+> >>  	mmu_idmap = alloc_page();
+> >> -- 
+> >> 2.17.1
+> >>
+> > I don't think we need the three separate functions. How about just
+> > doing the following diff?
+> >
+> > Thanks,
+> > drew
+> >
+> >
+> > diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> > index 540a1e842d5b..fef62f5a9866 100644
+> > --- a/lib/arm/mmu.c
+> > +++ b/lib/arm/mmu.c
+> > @@ -160,6 +160,9 @@ void *setup_mmu(phys_addr_t phys_end)
+> >  
+> >  #ifdef __aarch64__
+> >  	init_alloc_vpage((void*)(4ul << 30));
+> > +
+> > +	assert_msg(system_supports_granule(PAGE_SIZE),
+> > +		   "Unsupported translation granule: %ld\n", PAGE_SIZE);
+> >  #endif
+> >  
+> >  	mmu_idmap = alloc_page();
+> > diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> > index 02665b84cc7e..dc493d1686bc 100644
+> > --- a/lib/arm64/asm/processor.h
+> > +++ b/lib/arm64/asm/processor.h
+> > @@ -117,5 +117,21 @@ static inline u64 get_ctr(void)
+> >  
+> >  extern u32 dcache_line_size;
+> >  
+> > +static inline unsigned long get_id_aa64mmfr0_el1(void)
+> > +{
+> > +	unsigned long mmfr0;
+> > +	asm volatile("mrs %0, id_aa64mmfr0_el1" : "=r" (mmfr0));
+> > +	return mmfr0;
 > 
-> Diana, can I get an ack for this?  Thanks,
+> I think we can safely use read_sysreg here, the other functions in this file do.
 
+Agreed
 
-Yes, sure, I apologize for not doing it earlier.
+> 
+> > +}
+> > +
+> > +static inline bool system_supports_granule(size_t granule)
+> > +{
+> > +	u64 mmfr0 = get_id_aa64mmfr0_el1();
+> > +
+> > +	return ((granule == SZ_4K && ((mmfr0 >> 28) & 0xf) == 0) ||
+> > +		(granule == SZ_64K && ((mmfr0 >> 24) & 0xf) == 0) ||
+> > +		(granule == SZ_16K && ((mmfr0 >> 20) & 0xf) == 1));
+> > +}
+> 
+> Or we can turn it into a switch statement and keep all the field defines. Either
+> way looks good to me (funny how tgran16 stands out).
+>
+
+Keeping the defines is probably a good idea. Whether the function uses
+a switch or an expression like above doesn't matter to me much. Keeping
+LOC down in the lib/ code is a goal of kvm-unit-tests, but so is
+readabilty. If the switch looks better, then let's go that way.
 
 Thanks,
-Diana
-
-> 
-> Alex
-> 
-> On Fri, 23 Oct 2020 14:34:50 +0300
-> Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> 
->> The copy_to_user() function returns the number of bytes remaining to be
->> copied, but this code should return -EFAULT.
->>
->> Fixes: df747bcd5b21 ("vfio/fsl-mc: Implement VFIO_DEVICE_GET_REGION_INFO ioctl call")
->> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
->> ---
->>   drivers/vfio/fsl-mc/vfio_fsl_mc.c | 8 ++++++--
->>   1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
->> index 0113a980f974..21f22e3da11f 100644
->> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
->> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
->> @@ -248,7 +248,9 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
->>   		info.size = vdev->regions[info.index].size;
->>   		info.flags = vdev->regions[info.index].flags;
->>   
->> -		return copy_to_user((void __user *)arg, &info, minsz);
->> +		if (copy_to_user((void __user *)arg, &info, minsz))
->> +			return -EFAULT;
->> +		return 0;
->>   	}
->>   	case VFIO_DEVICE_GET_IRQ_INFO:
->>   	{
->> @@ -267,7 +269,9 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
->>   		info.flags = VFIO_IRQ_INFO_EVENTFD;
->>   		info.count = 1;
->>   
->> -		return copy_to_user((void __user *)arg, &info, minsz);
->> +		if (copy_to_user((void __user *)arg, &info, minsz))
->> +			return -EFAULT;
->> +		return 0;
->>   	}
->>   	case VFIO_DEVICE_SET_IRQS:
->>   	{
-> 
+drew
 
