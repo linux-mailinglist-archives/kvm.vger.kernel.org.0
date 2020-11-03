@@ -2,47 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0ADB2A3C04
-	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 06:36:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A939B2A3C9F
+	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 07:09:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbgKCFg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 00:36:27 -0500
-Received: from mga02.intel.com ([134.134.136.20]:50015 "EHLO mga02.intel.com"
+        id S1727468AbgKCGJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 01:09:04 -0500
+Received: from mga02.intel.com ([134.134.136.20]:52366 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725980AbgKCFg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Nov 2020 00:36:27 -0500
-IronPort-SDR: MYp7U9pZXSVy6xlP0yKBXYMKQ1RkknhfFm6lrrxcIY9NsQJt8zlJrvAxlQ5mDCGZX0kqH9NnKA
- MVK7wHHnsILw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9793"; a="155989880"
+        id S1725958AbgKCGJE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Nov 2020 01:09:04 -0500
+IronPort-SDR: ggwdjie/9LDoMciHG+juR5HTGhOuf7bDPd2GmzyIonu+BBgVWJwz7Nxv5x/a/SQjaNQW4e7U6g
+ oPSuzuAmrKwQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9793"; a="155992441"
 X-IronPort-AV: E=Sophos;i="5.77,447,1596524400"; 
-   d="scan'208";a="155989880"
+   d="scan'208";a="155992441"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2020 21:36:25 -0800
-IronPort-SDR: X6u1oR2wAu1++657bT/db7CSkzbjkXMGxusSlH9mmpyr4mSLmulnYxsuDL8ICqK3rqNQH0YTEh
- VbI8/qCm3fWQ==
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2020 22:09:03 -0800
+IronPort-SDR: ibJSAcIICb1zvAAFmRkFWQJgwkG/GIRz518Zx/VvRMV+DBH0LeWqzjlwyhD8CIKyOq6pLpo9hn
+ W7Uodn9f0c1w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,447,1596524400"; 
-   d="scan'208";a="353085351"
-Received: from unknown (HELO [0.0.0.0]) ([10.109.19.69])
-  by fmsmga004.fm.intel.com with ESMTP; 02 Nov 2020 21:36:22 -0800
+   d="scan'208";a="353093840"
+Received: from shzintpr01.sh.intel.com (HELO [0.0.0.0]) ([10.239.4.80])
+  by fmsmga004.fm.intel.com with ESMTP; 02 Nov 2020 22:09:00 -0800
 Subject: Re: [PATCH] KVM: VMX: Enable Notify VM exit
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         Xiaoyao Li <xiaoyao.li@intel.com>
 References: <20201102061445.191638-1-tao3.xu@intel.com>
- <20201102173236.GD21563@linux.intel.com>
+ <CALCETrVqdq4zw=Dcd6dZzSmUZTMXHP50d=SRSaY2AV5sauUzOw@mail.gmail.com>
 From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <31218420-f20c-aa7f-089d-54e9fecf35aa@intel.com>
-Date:   Tue, 3 Nov 2020 13:36:22 +0800
+Message-ID: <a5f500ee-51f8-54a7-d927-0e8eee644e26@intel.com>
+Date:   Tue, 3 Nov 2020 14:08:59 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201102173236.GD21563@linux.intel.com>
+In-Reply-To: <CALCETrVqdq4zw=Dcd6dZzSmUZTMXHP50d=SRSaY2AV5sauUzOw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -51,8 +58,10 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 11/3/20 1:32 AM, Sean Christopherson wrote:
-> On Mon, Nov 02, 2020 at 02:14:45PM +0800, Tao Xu wrote:
+
+On 11/3/20 12:43 AM, Andy Lutomirski wrote:
+> On Sun, Nov 1, 2020 at 10:14 PM Tao Xu <tao3.xu@intel.com> wrote:
+>>
 >> There are some cases that malicious virtual machines can cause CPU stuck
 >> (event windows don't open up), e.g., infinite loop in microcode when
 >> nested #AC (CVE-2015-5307). No event window obviously means no events,
@@ -71,16 +80,33 @@ On 11/3/20 1:32 AM, Sean Christopherson wrote:
 >> 1. The appropriate value of notify window.
 >> 2. Another patch to disable interception of #DB and #AC when notify
 >> VM-Exiting is enabled.
->>
->> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > 
-> Incorrect ordering, since you're sending the patch, you "handled" it last,
-> therefore your SOB should come last, i.e.:
+> Whoa there.
 > 
->    Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
->    Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->    Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> A VM control that says "hey, CPU, if you messed up and livelocked for
+> a long time, please break out of the loop" is not a substitute for
+> fixing the livelocks.  So I don't think you get do disable
+> interception of #DB and #AC.  I also think you should print a loud
+> warning and have some intelligent handling when this new exit
+> triggers.
 > 
-OK, I will correct this.
+>> +static int handle_notify(struct kvm_vcpu *vcpu)
+>> +{
+>> +       unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
+>> +
+>> +       /*
+>> +        * Notify VM exit happened while executing iret from NMI,
+>> +        * "blocked by NMI" bit has to be set before next VM entry.
+>> +        */
+>> +       if (exit_qualification & NOTIFY_VM_CONTEXT_VALID) {
+>> +               if (enable_vnmi &&
+>> +                   (exit_qualification & INTR_INFO_UNBLOCK_NMI))
+>> +                       vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO,
+>> +                                     GUEST_INTR_STATE_NMI);
+> 
+> This needs actual documentation in the SDM or at least ISE please.
+> 
+Notify VM-Exit is defined in ISE, chapter 9.2:
+https://software.intel.com/content/dam/develop/external/us/en/documents/architecture-instruction-set-extensions-programming-reference.pdf
+
+I will add this information into commit message. Thank you for reminding me.
