@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B34762A5AC1
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 00:50:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 059BC2A5AC3
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 00:50:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729830AbgKCXuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 18:50:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50186 "EHLO
+        id S1729778AbgKCXt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 18:49:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729540AbgKCXt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1729662AbgKCXt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 3 Nov 2020 18:49:57 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5922C0613D1
-        for <kvm@vger.kernel.org>; Tue,  3 Nov 2020 15:49:55 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id y11so19747869ybm.22
-        for <kvm@vger.kernel.org>; Tue, 03 Nov 2020 15:49:55 -0800 (PST)
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC63C061A47
+        for <kvm@vger.kernel.org>; Tue,  3 Nov 2020 15:49:57 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id q18so8756036qke.9
+        for <kvm@vger.kernel.org>; Tue, 03 Nov 2020 15:49:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=/cu3FeQS2O8Lz6S9sSrj78vp3KVX+NcuSsdaqJSggY0=;
-        b=Fwu2+C4Dx+f+IXf8ZA+5sH1P84M8IsACzDvcYafsQmNlINACCTvKfdKZi5taVl8dzv
-         DEBQVHuJuEgJZ+MKct2TG0UikfzzjTdF6DPGjitVOaIGrOzAE0Kf1vpS4tuyc3jKXvyF
-         eDRvJ+p8FQwo9MgQ5Y8iiDFCQmRGJrL8iXvPVrqCYckzJhg2/5GMBL0QrP7RQVMz/Gi3
-         WGrVui3l6/W2zOz0KYpdUpN1seLRzjFwBpzge5PihPaeZHwxzr9wOWle1yCnHAPkB7NI
-         RUyBrH0mPhZWFhr8v51xci0DBhuvo6MApT0WbWeak1kTUfnh29Zt5niTXpdU2JQEp7Du
-         8KmQ==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=98B4SMJScchAYm+B6VeRF0sz9ED0V6CnMu0GP5al+Qc=;
+        b=exOaqDLOfoClAUwauo3IbRppRPEo5nM49bRF28fseKhJJm/Vr3lG5gwejDPIqnACdI
+         vlaci54e+uabnSxBoIcyaRAZhnPv9xAXUqvD1IM/YWC2If8fAZqvhzoowRuwx0IMVopx
+         vERacFX486czDrnuUGzzdYild34lX77YJgfWSjHn1o7GPm5AO4hZyCzXb2CiWLEoNLhp
+         1UWPt3mJZwIIqL3RbbPrrO6Dm9aqHm/RLtEQUyvNu0woSNOOQ6vZwLFLs7/KhIm30rIu
+         lMtXwQCV62ac2oRaZeVvlxGZSqYcxFMsvIZBGoNjhe3w43lm75hbSQFpeAVj7kHUbcrs
+         xwcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=/cu3FeQS2O8Lz6S9sSrj78vp3KVX+NcuSsdaqJSggY0=;
-        b=UUDk1NlgcOtgYuFnbLLlGX828yRCp8bv7ln8mRncmOrw0K9ljwi/YZAFKHPV1TseWw
-         dzhkMgGRwW/vYOu4eseQXk2Bz71b5AvWeRRQGOGlqX18KczOe2vmZFhbHhI8UsXdebCm
-         BchawuVSsaSSqPgV07hv/bn3tBbwcJIBtfDuBbKSCZkIELYV5yXPw3puMRcVENtPLtfX
-         iAM+rDZBXULLNJCaEmV6Ta4Sgnh3tLzywAQapfOUZENuAF09DXxvtPdt9XE0A1xCiItS
-         8WhUGMpKRfYwJHItGrAUxtAfXXd81QtIZlMJyOSMyKA9EhumKPj1oryGCSndl0B2DZL6
-         4tqA==
-X-Gm-Message-State: AOAM532ZrZvKNRkF5MglUJkjxxFqQykyxqVda5lQbYxg2+EmmoEz7yzP
-        NNDV148VarrB8o0mdyR17r2jlF6I+R1e
-X-Google-Smtp-Source: ABdhPJxeFN2tpViTDExAnXIdBh+gL3Mrr/FOyn4zOu32Uoy29GCFiuUTwYsUmqKOIyRxFyG53sKXWnB1dai2
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=98B4SMJScchAYm+B6VeRF0sz9ED0V6CnMu0GP5al+Qc=;
+        b=bfZdivXNZmS0L2kryFjBXzDCQCTFIRP/C0ct2HbYGioYMJJLd9BU1AB00Jl4lnUC4h
+         knXuDnqYXdmQTgffIX0VLHJ4DdmeVPEur8PzOmYoUuvOyzHXqlrRKcSf0mmEp7kC5FNk
+         2ZygDtHr8GVqbF7kbXnb2dL0ewlJgON6lI3w4j2rBVQcSsEn0NI+cqsYTkW3OXe2Gp52
+         Dzt8310ps1aZaAR31DQ84A7MOVWrhR5I1uMgPzK3E+L4coYaPs9I+8WjDVswnoCdzlJF
+         VoP5ui23zwazeYtBUEWXHaylHFtfj16P2pJ5ANxm9xIq41HFH5wAvASfuaxqas4qRCoU
+         CTsA==
+X-Gm-Message-State: AOAM533NFNbQcL/RNXoy4lF6GJP+m03JmhPhbzwHcuM1ek9wNsS1tQn+
+        I275Ne6O9pEkH0ihBSMR5lEygtqrvy39
+X-Google-Smtp-Source: ABdhPJwdPlntaN4XG640esGJzdQigZ7OVKF00zfcBH1ziXGQ9hFnDsNIjLMsak1eZpUdbPEV6qSE2lSBfYJz
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a25:d081:: with SMTP id
- h123mr33023214ybg.160.1604447394920; Tue, 03 Nov 2020 15:49:54 -0800 (PST)
-Date:   Tue,  3 Nov 2020 15:49:47 -0800
-Message-Id: <20201103234952.1626730-1-bgardon@google.com>
+ (user=bgardon job=sendgmr) by 2002:a05:6214:951:: with SMTP id
+ dn17mr30174501qvb.9.1604447396571; Tue, 03 Nov 2020 15:49:56 -0800 (PST)
+Date:   Tue,  3 Nov 2020 15:49:48 -0800
+In-Reply-To: <20201103234952.1626730-1-bgardon@google.com>
+Message-Id: <20201103234952.1626730-2-bgardon@google.com>
 Mime-Version: 1.0
+References: <20201103234952.1626730-1-bgardon@google.com>
 X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [PATCH v2 0/5] Add a dirty logging performance test
+Subject: [PATCH v2 1/5] KVM: selftests: Remove address rounding in guest code
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -64,59 +67,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently KVM lacks a simple, userspace agnostic, performance benchmark for
-dirty logging. Such a benchmark will be beneficial for ensuring that dirty
-logging performance does not regress, and to give a common baseline for
-validating performance improvements. The dirty log perf test introduced in
-this series builds on aspects of the existing demand paging perf test and
-provides time-based performance metrics for enabling and disabling dirty
-logging, getting the dirty log, and dirtying memory.
+Rounding the address the guest writes to a host page boundary
+will only have an effect if the host page size is larger than the guest
+page size, but in that case the guest write would still go to the same
+host page. There's no reason to round the address down, so remove the
+rounding to simplify the demand paging test.
 
-While the test currently only has a build target for x86, I expect it will
-work on, or be easily modified to support other architectures.
+Signed-off-by: Ben Gardon <bgardon@google.com>
+---
+ tools/testing/selftests/kvm/demand_paging_test.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-This series was tested by running the following invocations on an Intel
-Skylake machine after apply all commits in the series:
-dirty_log_perf_test -b 20m -i 100 -v 64
-dirty_log_perf_test -b 20g -i 5 -v 4
-dirty_log_perf_test -b 4g -i 5 -v 32
-demand_paging_test -b 20m -v 64
-demand_paging_test -b 20g -v 4
-demand_paging_test -b 4g -v 32
-All behaved as expected.
-
-v1 -> v2 changes:
-(in response to comments from Peter Xu)
-- Removed pr_debugs from main test thread while waiting on vCPUs to reduce
-  log spam
-- Fixed a bug in iteration counting that caused the population stage to be
-  counted as part of the first dirty logging pass
-- Fixed a bug in which the test failed to wait for the population stage for all
-  but the first vCPU.
-- Refactored the common code in perf_test_util.c/h
-- Moved testing description to cover letter
-- Renamed timespec_diff_now to timespec_elapsed
-
-Ben Gardon (5):
-  KVM: selftests: Remove address rounding in guest code
-  KVM: selftests: Factor code out of demand_paging_test
-  KVM: selftests: Simplify demand_paging_test with timespec_diff_now
-  KVM: selftests: Add wrfract to common guest code
-  KVM: selftests: Introduce the dirty log perf test
-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   7 +-
- .../selftests/kvm/demand_paging_test.c        | 231 ++---------
- .../selftests/kvm/dirty_log_perf_test.c       | 381 ++++++++++++++++++
- .../selftests/kvm/include/perf_test_util.h    |  51 +++
- .../testing/selftests/kvm/include/test_util.h |   2 +
- .../selftests/kvm/lib/perf_test_util.c        | 166 ++++++++
- tools/testing/selftests/kvm/lib/test_util.c   |  22 +-
- 8 files changed, 661 insertions(+), 200 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/dirty_log_perf_test.c
- create mode 100644 tools/testing/selftests/kvm/include/perf_test_util.h
- create mode 100644 tools/testing/selftests/kvm/lib/perf_test_util.c
-
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 360cd3ea4cd67..32a42eafc6b5c 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -103,7 +103,6 @@ static void guest_code(uint32_t vcpu_id)
+ 	for (i = 0; i < pages; i++) {
+ 		uint64_t addr = gva + (i * guest_page_size);
+ 
+-		addr &= ~(host_page_size - 1);
+ 		*(uint64_t *)addr = 0x0123456789ABCDEF;
+ 	}
+ 
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
