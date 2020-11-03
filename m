@@ -2,226 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2918E2A4148
-	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 11:10:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 169D22A415B
+	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 11:12:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727906AbgKCKKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 05:10:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34816 "EHLO
+        id S1728065AbgKCKMT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 05:12:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726312AbgKCKKj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Nov 2020 05:10:39 -0500
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54601C061A47
-        for <kvm@vger.kernel.org>; Tue,  3 Nov 2020 02:10:39 -0800 (PST)
-Received: by mail-wm1-x341.google.com with SMTP id h22so12194429wmb.0
-        for <kvm@vger.kernel.org>; Tue, 03 Nov 2020 02:10:39 -0800 (PST)
+        with ESMTP id S1728066AbgKCKMO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Nov 2020 05:12:14 -0500
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C2ADC0617A6
+        for <kvm@vger.kernel.org>; Tue,  3 Nov 2020 02:12:14 -0800 (PST)
+Received: by mail-il1-x141.google.com with SMTP id g7so15601601ilr.12
+        for <kvm@vger.kernel.org>; Tue, 03 Nov 2020 02:12:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Q2iVGDvwbSqChDq0/dkBgvJIDSId9+GFlKdyib2L0EU=;
-        b=K24Si8Uc6vQVSy2wlsndOGZEAW8lic4H3kV0FS3sCzoC3jFlNL0S24fbajY9u6/nxD
-         Luku4EoBis5RU0AmT8SRcPZZc5CnfDngM4g/vp/C91xUrNYDvT12+5vlX1NlPjqhF5rB
-         TmCMcIbL6x+h3tHMFhL+6PI9Shhb3BavQyU3I=
+        d=bgdev-pl.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=b9Ktpm35fisVuHEhjhohgaqyboE8BmrrMoCITk9vnK8=;
+        b=0kZJ8Rb9+0/H3MVDUevyCTWAc1pKYDKmZzYacQKCMmC/UQ66qmBgifq30qeC2iVztI
+         ATPY1knKGSXDzJ6+Nm3tm3Ffn81WkUy/sBCmPfD94FibScrq8/Ui+9TUYldHJ7pcnk1t
+         gx+nhhl2zwwSRNNGE6X3g+mK8ICIfWN15TzWFBAm2Ac+Fnp/Nc7mvMvQxol3TgeHLuHe
+         fB2HlcDfVoQUKXEDUTDlyUi1MwQ1IJbHWYhRPhxFdctoJ/ps1THqNVawMwUkgd/uHgQv
+         AYOBJizY9XV1L84dWspkXE7W+jTkhJPV/Ws9WaUAfWMNJujPYu+ExPkpZXByTNBy8wKU
+         VaOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to;
-        bh=Q2iVGDvwbSqChDq0/dkBgvJIDSId9+GFlKdyib2L0EU=;
-        b=N2xDhbshgf7G6wyIt/3CGazQrykKN8/AzyDpBbGUtOZ7cv+KM2Ac3OOrZ8ORyS/FQ9
-         CE5U2YscQNw3Bh+J7/8HCxjvatVezOYFS8KYeS37HGGyHFgpRnnIqB/v1Js0wrbECyLW
-         52bSjlsYDR2P9/Wfar511aXujB3FJxAdL4Myhzls3Gvyc3tmAkP7C1xj7yFrv7OiIpj4
-         4mghtAXAgIVaRU31e7LF9IoSinw0ueclW/Wu6hMdrywJ8jv+QuAGlhGBcztb7anR6KOa
-         y9rJexAR3Frc3PWdEajdKA1eczQJCF3wUOQ64wBktP5fl6Gc8zFvZYPGVQOvAcA9jwgS
-         OiHA==
-X-Gm-Message-State: AOAM533s8STZJs5YKNj7jjvNLoFXylUuXEeS9xNdSlSS3Qr6r9Tqaba3
-        /NQZqi1qwNps9mWTtkGi9Y/1IA==
-X-Google-Smtp-Source: ABdhPJycR/JZ1/gOnvBPq07Mwf/ndUJhwgkvn6thQFrHMA/88c0D6XAXjSnHPMiTxsU1QZfQKO6neA==
-X-Received: by 2002:a1c:1d51:: with SMTP id d78mr2690418wmd.60.1604398237863;
-        Tue, 03 Nov 2020 02:10:37 -0800 (PST)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id f13sm26122520wrp.12.2020.11.03.02.10.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2020 02:10:37 -0800 (PST)
-Date:   Tue, 3 Nov 2020 11:10:35 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     lkp <lkp@intel.com>, Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
-        David Hildenbrand <david@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, lkp@lists.01.org
-Subject: Re: [resource] 22b17dc667: Kernel panic - not syncing: Fatal
- exception
-Message-ID: <20201103101035.GY401619@phenom.ffwll.local>
-Mail-Followup-To: John Hubbard <jhubbard@nvidia.com>, lkp <lkp@intel.com>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
-        David Hildenbrand <david@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, lkp@lists.01.org
-References: <20201103060649.GA30210@xsang-OptiPlex-9020>
- <1ec0dee9-e1bb-9cf1-a8c2-ad1e294c5acf@nvidia.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=b9Ktpm35fisVuHEhjhohgaqyboE8BmrrMoCITk9vnK8=;
+        b=GwEUcPLw8YgZcycLhWnXAA708HfvOffpPzMe7TGilJbA7HKyFWQLTHp6srDR9OHdlj
+         pXyIsyyKLAx2uL3shYzdw/5C3VGtwt16BEDcBJq1BdFW70Jug3WxMcfCAz7aEX+T49Bk
+         ff4CQ4RRCPO10KaHVkRWlDUKwELjU7F7FxEB5AO6ZXa5uZxij0l/s3aanU0by93Lm5OK
+         edCIhakP5mvqdFvHQJSyYzW0YnUI7j9hjxGafBP0d5AxVvIDK8HxzmAo9XDKcUjMWpj0
+         a0HqDRDUXItu4tD1hCVZgApa9q9ZkvO7waoB+JK1RxY6npj0VhPX6fI7mPS/qfygpinN
+         1BJw==
+X-Gm-Message-State: AOAM530LTKGOzXL6tPMj39zvB7hm82DeISL0O/Dy7hHak/61ya612LQA
+        R8Q/pTItro5PHwNSWKtFmp8VWu5JPFDAdJkvQY83HQ==
+X-Google-Smtp-Source: ABdhPJxXaKRnidyqbx6iUG254lVJzvxaSAJ3Y8t7tBOtYCNJcNKDXTe4r/tIo6bcU8qIdoqImm6tntmYdwdU1LT5yRY=
+X-Received: by 2002:a05:6e02:926:: with SMTP id o6mr14285653ilt.287.1604398333472;
+ Tue, 03 Nov 2020 02:12:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1ec0dee9-e1bb-9cf1-a8c2-ad1e294c5acf@nvidia.com>
-X-Operating-System: Linux phenom 5.7.0-1-amd64 
+References: <20201102152037.963-1-brgl@bgdev.pl> <21d80265fccfcb5d76851c84d1c2d88e0421ab85.camel@perches.com>
+In-Reply-To: <21d80265fccfcb5d76851c84d1c2d88e0421ab85.camel@perches.com>
+From:   Bartosz Golaszewski <brgl@bgdev.pl>
+Date:   Tue, 3 Nov 2020 11:12:02 +0100
+Message-ID: <CAMRc=Me4-4Cmoq3UdpYEEhERP6fvt97bEJsZYhrcFSQf+a_voA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] slab: provide and use krealloc_array()
+To:     Joe Perches <joe@perches.com>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        "open list:DRM PANEL DRIVERS" <dri-devel@lists.freedesktop.org>,
+        linaro-mm-sig@lists.linaro.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-edac@vger.kernel.org,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev <netdev@vger.kernel.org>, linux-mm@kvack.org,
+        Linux-ALSA <alsa-devel@alsa-project.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 02, 2020 at 10:15:40PM -0800, John Hubbard wrote:
-> On 11/2/20 10:06 PM, lkp wrote:
-> > Greeting,
-> > 
-> > FYI, we noticed the following commit (built with gcc-9):
-> > 
-> > commit: 22b17dc667d36418ccabb9c668c4b489185fb40a ("[PATCH v5 13/15] resource: Move devmem revoke code to resource framework")
-> > url: https://github.com/0day-ci/linux/commits/Daniel-Vetter/follow_pfn-and-other-iomap-races/20201030-181112
-> > base: git://linuxtv.org/media_tree.git master
-> > 
-> > in testcase: fsmark
-> > version: fsmark-x86_64-3.3-1_20201007
-> > with following parameters:
-> > 
-> > 	iterations: 1x
-> > 	nr_threads: 1t
-> > 	disk: 1BRD_48G
-> > 	fs: f2fs
-> > 	fs2: nfsv4
-> > 	filesize: 4M
-> > 	test_size: 40G
-> > 	sync_method: NoSync
-> > 	cpufreq_governor: performance
-> > 	ucode: 0x5002f01
-> > 
-> > test-description: The fsmark is a file system benchmark to test synchronous write workloads, for example, mail servers workload.
-> > test-url: https://sourceforge.net/projects/fsmark/
-> > 
-> > 
-> > on test machine: 192 threads Intel(R) Xeon(R) Platinum 9242 CPU @ 2.30GHz with 192G memory
-> > 
-> > caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
-> > 
-> > 
-> 
-> Yep, this is the same crash that I saw. And the .config also has
-> 
->   # CONFIG_IO_STRICT_DEVMEM is not set
-> 
-> so it all makes sense.
+On Tue, Nov 3, 2020 at 5:14 AM Joe Perches <joe@perches.com> wrote:
+>
+> On Mon, 2020-11-02 at 16:20 +0100, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> >
+> > Andy brought to my attention the fact that users allocating an array of
+> > equally sized elements should check if the size multiplication doesn't
+> > overflow. This is why we have helpers like kmalloc_array().
+> >
+> > However we don't have krealloc_array() equivalent and there are many
+> > users who do their own multiplication when calling krealloc() for arrays.
+> >
+> > This series provides krealloc_array() and uses it in a couple places.
+>
+> My concern about this is a possible assumption that __GFP_ZERO will
+> work, and as far as I know, it will not.
+>
 
-New version is on its way, I "just" need to setup ppc cross compiler for
-the kvm part and figure out how to test the media side with the sketch
-tfiga provided ...
--Daniel
+Yeah so I had this concern for devm_krealloc() and even sent a patch
+that extended it to honor __GFP_ZERO before I noticed that regular
+krealloc() silently ignores __GFP_ZERO. I'm not sure if this is on
+purpose. Maybe we should either make krealloc() honor __GFP_ZERO or
+explicitly state in its documentation that it ignores it?
 
-> 
-> 
-> > If you fix the issue, kindly add following tag
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > 
-> > 
-> > [   28.644165] systemd[1]: RTC configured in localtime, applying delta of 0 minutes to system time.
-> > 
-> > [   28.699473] #PF: supervisor read access in kernel mode
-> > [   28.704611] #PF: error_code(0x0000) - not-present page
-> > [   28.709749] PGD 0 P4D 0
-> > [   28.712291] Oops: 0000 [#1] SMP NOPTI
-> > [   28.715956] CPU: 0 PID: 1 Comm: systemd Not tainted 5.10.0-rc1-00015-g22b17dc667d3 #1
-> > [   28.723793] RIP: 0010:do_dentry_open+0x1c9/0x360
-> > [   28.728410] Code: 84 82 01 00 00 81 ca 00 00 04 00 89 53 44 48 8b 83 f0 00 00 00 81 63 40 3f fc ff ff 48 8d bb 98 00 00 00 c7 43 34 00 00 00 00 <48> 8b 00 48 8b 70 30 e8 2b cb f4 ff f6 43 41 40 74 5a 48 8b 83 f0
-> > [   28.747157] RSP: 0018:ffffc9000006fcc8 EFLAGS: 00010206
-> > [   28.752380] RAX: 0000000000000000 RBX: ffff8881502ad400 RCX: 0000000000000000
-> > [   28.759506] RDX: 00000000000a201d RSI: ffffffff8284d260 RDI: ffff8881502ad498
-> > [   28.766639] RBP: ffff88a485a06490 R08: 0000000000000000 R09: ffffffff8284d260
-> > [   28.773769] R10: ffffc9000006fcc8 R11: 756c6176006d656d R12: 0000000000000000
-> > [   28.780895] R13: ffffffff8133ddc0 R14: ffff8881502ad410 R15: ffff8881502ad400
-> > [   28.788028] FS:  00007ff54afa1940(0000) GS:ffff888c4f600000(0000) knlGS:0000000000000000
-> > [   28.796113] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [   28.801858] CR2: 0000000000000000 CR3: 0000000100120003 CR4: 00000000007706f0
-> > [   28.808983] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [   28.816114] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [   28.823239] PKRU: 55555554
-> > [   28.825952] Call Trace:
-> > [   28.828412]  path_openat+0xaa8/0x10a0
-> > [   28.832073]  do_filp_open+0x91/0x100
-> > [   28.835653]  ? acpi_os_wait_semaphore+0x48/0x80
-> > [   28.840186]  ? __check_object_size+0x136/0x160
-> > [   28.844631]  do_sys_openat2+0x20d/0x2e0
-> > [   28.848470]  do_sys_open+0x44/0x80
-> > [   28.851878]  do_syscall_64+0x33/0x40
-> > [   28.855457]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [   28.860509] RIP: 0033:0x7ff54c1521ae
-> > [   28.864086] Code: 25 00 00 41 00 3d 00 00 41 00 74 48 48 8d 05 59 65 0d 00 8b 00 85 c0 75 69 89 f2 b8 01 01 00 00 48 89 fe bf 9c ff ff ff 0f 05 <48> 3d 00 f0 ff ff 0f 87 a6 00 00 00 48 8b 4c 24 28 64 48 33 0c 25
-> > [   28.882833] RSP: 002b:00007ffd1c9586d0 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-> > [   28.890399] RAX: ffffffffffffffda RBX: 00007ffd1c9587d0 RCX: 00007ff54c1521ae
-> > [   28.897531] RDX: 0000000000080000 RSI: 00007ff54bfa0e5a RDI: 00000000ffffff9c
-> > [   28.904662] RBP: 00007ffd1c9587d8 R08: 000000000000021f R09: 000055f837cf4290
-> > [   28.911796] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000056dd9000
-> > [   28.918927] R13: 00000000ffffffff R14: 00007ffd1c9587d0 R15: 0000000000000002
-> > [   28.926060] Modules linked in: ip_tables
-> > [   28.929986] CR2: 0000000000000000
-> > mDebian GNU/Linu
-> > [   28.933416] ---[ end trace 94e4f9aa3df66098 ]---
-> > [   28.939355] RIP: 0010:do_dentry_open+0x1c9/0x360
-> > [   28.943975] Code: 84 82 01 00 00 81 ca 00 00 04 00 89 53 44 48 8b 83 f0 00 00 00 81 63 40 3f fc ff ff 48 8d bb 98 00 00 00 c7 43 34 00 00 00 00 <48> 8b 00 48 8b 70 30 e8 2b cb f4 ff f6 43 41 40 74 5a 48 8b 83 f0
-> > [   28.962721] RSP: 0018:ffffc9000006fcc8 EFLAGS: 00010206
-> > [   28.967948] RAX: 0000000000000000 RBX: ffff8881502ad400 RCX: 0000000000000000
-> > [   28.975079] RDX: 00000000000a201d RSI: ffffffff8284d260 RDI: ffff8881502ad498
-> > [   28.982211] RBP: ffff88a485a06490 R08: 0000000000000000 R09: ffffffff8284d260
-> > [   28.989337] R10: ffffc9000006fcc8 R11: 756c6176006d656d R12: 0000000000000000
-> > [   28.996467] R13: ffffffff8133ddc0 R14: ffff8881502ad410 R15: ffff8881502ad400
-> > [   29.003592] FS:  00007ff54afa1940(0000) GS:ffff888c4f600000(0000) knlGS:0000000000000000
-> > [   29.011668] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [   29.017409] CR2: 0000000000000000 CR3: 0000000100120003 CR4: 00000000007706f0
-> > [   29.024539] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [   29.031671] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [   29.038804] PKRU: 55555554
-> > [   29.041508] Kernel panic - not syncing: Fatal exception
-> > ACPI MEMORY or I/O RESET_REG.
-> > 
-> > 
-> > To reproduce:
-> > 
-> >          git clone https://github.com/intel/lkp-tests.git
-> >          cd lkp-tests
-> >          bin/lkp install job.yaml  # job file is attached in this email
-> >          bin/lkp run     job.yaml
-> > 
-> > 
-> > 
-> > Thanks,
-> > oliver.sang@intel.com
-> > 
-> 
-> thanks,
-> -- 
-> John Hubbard
-> NVIDIA
+This concern isn't really related to this patch as such - it's more of
+a general krealloc() inconsistency.
 
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Bartosz
