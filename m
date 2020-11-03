@@ -2,120 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 169D22A415B
-	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 11:12:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 861C72A4195
+	for <lists+kvm@lfdr.de>; Tue,  3 Nov 2020 11:21:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728065AbgKCKMT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Nov 2020 05:12:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35070 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728066AbgKCKMO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Nov 2020 05:12:14 -0500
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C2ADC0617A6
-        for <kvm@vger.kernel.org>; Tue,  3 Nov 2020 02:12:14 -0800 (PST)
-Received: by mail-il1-x141.google.com with SMTP id g7so15601601ilr.12
-        for <kvm@vger.kernel.org>; Tue, 03 Nov 2020 02:12:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=b9Ktpm35fisVuHEhjhohgaqyboE8BmrrMoCITk9vnK8=;
-        b=0kZJ8Rb9+0/H3MVDUevyCTWAc1pKYDKmZzYacQKCMmC/UQ66qmBgifq30qeC2iVztI
-         ATPY1knKGSXDzJ6+Nm3tm3Ffn81WkUy/sBCmPfD94FibScrq8/Ui+9TUYldHJ7pcnk1t
-         gx+nhhl2zwwSRNNGE6X3g+mK8ICIfWN15TzWFBAm2Ac+Fnp/Nc7mvMvQxol3TgeHLuHe
-         fB2HlcDfVoQUKXEDUTDlyUi1MwQ1IJbHWYhRPhxFdctoJ/ps1THqNVawMwUkgd/uHgQv
-         AYOBJizY9XV1L84dWspkXE7W+jTkhJPV/Ws9WaUAfWMNJujPYu+ExPkpZXByTNBy8wKU
-         VaOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=b9Ktpm35fisVuHEhjhohgaqyboE8BmrrMoCITk9vnK8=;
-        b=GwEUcPLw8YgZcycLhWnXAA708HfvOffpPzMe7TGilJbA7HKyFWQLTHp6srDR9OHdlj
-         pXyIsyyKLAx2uL3shYzdw/5C3VGtwt16BEDcBJq1BdFW70Jug3WxMcfCAz7aEX+T49Bk
-         ff4CQ4RRCPO10KaHVkRWlDUKwELjU7F7FxEB5AO6ZXa5uZxij0l/s3aanU0by93Lm5OK
-         edCIhakP5mvqdFvHQJSyYzW0YnUI7j9hjxGafBP0d5AxVvIDK8HxzmAo9XDKcUjMWpj0
-         a0HqDRDUXItu4tD1hCVZgApa9q9ZkvO7waoB+JK1RxY6npj0VhPX6fI7mPS/qfygpinN
-         1BJw==
-X-Gm-Message-State: AOAM530LTKGOzXL6tPMj39zvB7hm82DeISL0O/Dy7hHak/61ya612LQA
-        R8Q/pTItro5PHwNSWKtFmp8VWu5JPFDAdJkvQY83HQ==
-X-Google-Smtp-Source: ABdhPJxXaKRnidyqbx6iUG254lVJzvxaSAJ3Y8t7tBOtYCNJcNKDXTe4r/tIo6bcU8qIdoqImm6tntmYdwdU1LT5yRY=
-X-Received: by 2002:a05:6e02:926:: with SMTP id o6mr14285653ilt.287.1604398333472;
- Tue, 03 Nov 2020 02:12:13 -0800 (PST)
+        id S1727186AbgKCKV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Nov 2020 05:21:28 -0500
+Received: from foss.arm.com ([217.140.110.172]:45896 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726058AbgKCKV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Nov 2020 05:21:28 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF045139F;
+        Tue,  3 Nov 2020 02:21:27 -0800 (PST)
+Received: from C02W217MHV2R.local (unknown [10.57.19.65])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B99803F66E;
+        Tue,  3 Nov 2020 02:21:26 -0800 (PST)
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] arm64: Check if the configured
+ translation granule is supported
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, mark.rutland@arm.com, jade.alglave@arm.com,
+        luc.maranget@inria.fr, andre.przywara@arm.com,
+        alexandru.elisei@arm.com
+References: <20201102113444.103536-1-nikos.nikoleris@arm.com>
+ <20201102113444.103536-3-nikos.nikoleris@arm.com>
+ <20201103100222.dpryytbkdjaryehr@kamzik.brq.redhat.com>
+Message-ID: <fb339936-e034-b138-fc14-e115965d3cf5@arm.com>
+Date:   Tue, 3 Nov 2020 10:21:25 +0000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20201102152037.963-1-brgl@bgdev.pl> <21d80265fccfcb5d76851c84d1c2d88e0421ab85.camel@perches.com>
-In-Reply-To: <21d80265fccfcb5d76851c84d1c2d88e0421ab85.camel@perches.com>
-From:   Bartosz Golaszewski <brgl@bgdev.pl>
-Date:   Tue, 3 Nov 2020 11:12:02 +0100
-Message-ID: <CAMRc=Me4-4Cmoq3UdpYEEhERP6fvt97bEJsZYhrcFSQf+a_voA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] slab: provide and use krealloc_array()
-To:     Joe Perches <joe@perches.com>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Tony Luck <tony.luck@intel.com>,
-        James Morse <james.morse@arm.com>,
-        Robert Richter <rric@kernel.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        "open list:DRM PANEL DRIVERS" <dri-devel@lists.freedesktop.org>,
-        linaro-mm-sig@lists.linaro.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-edac@vger.kernel.org,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>, linux-mm@kvack.org,
-        Linux-ALSA <alsa-devel@alsa-project.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201103100222.dpryytbkdjaryehr@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 3, 2020 at 5:14 AM Joe Perches <joe@perches.com> wrote:
->
-> On Mon, 2020-11-02 at 16:20 +0100, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-> >
-> > Andy brought to my attention the fact that users allocating an array of
-> > equally sized elements should check if the size multiplication doesn't
-> > overflow. This is why we have helpers like kmalloc_array().
-> >
-> > However we don't have krealloc_array() equivalent and there are many
-> > users who do their own multiplication when calling krealloc() for arrays.
-> >
-> > This series provides krealloc_array() and uses it in a couple places.
->
-> My concern about this is a possible assumption that __GFP_ZERO will
-> work, and as far as I know, it will not.
+Hi Drew,
+
+On 03/11/2020 10:02, Andrew Jones wrote:
+> On Mon, Nov 02, 2020 at 11:34:44AM +0000, Nikos Nikoleris wrote:
+>> Now that we can change the translation granule at will, and since
+>> arm64 implementations can support a subset of the architecturally
+>> defined granules, we need to check and warn the user if the configured
+>> granule is not supported.
+> 
+> nit: it'd be better for this patch to come before the last patch.
 >
 
-Yeah so I had this concern for devm_krealloc() and even sent a patch
-that extended it to honor __GFP_ZERO before I noticed that regular
-krealloc() silently ignores __GFP_ZERO. I'm not sure if this is on
-purpose. Maybe we should either make krealloc() honor __GFP_ZERO or
-explicitly state in its documentation that it ignores it?
+Ack, I will re-order them.
 
-This concern isn't really related to this patch as such - it's more of
-a general krealloc() inconsistency.
+>>
+>> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+>> ---
+>>   lib/arm64/asm/processor.h | 65 +++++++++++++++++++++++++++++++++++++++
+>>   lib/arm/mmu.c             |  3 ++
+>>   2 files changed, 68 insertions(+)
+>>
+>> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+>> index 02665b8..0eac928 100644
+>> --- a/lib/arm64/asm/processor.h
+>> +++ b/lib/arm64/asm/processor.h
+>> @@ -117,5 +117,70 @@ static inline u64 get_ctr(void)
+>>   
+>>   extern u32 dcache_line_size;
+>>   
+>> +static inline unsigned long get_id_aa64mmfr0_el1(void)
+>> +{
+>> +	unsigned long mmfr0;
+>> +	asm volatile("mrs %0, id_aa64mmfr0_el1" : "=r" (mmfr0));
+>> +	return mmfr0;
+>> +}
+>> +
+>> +/* From arch/arm64/include/asm/cpufeature.h */
+>> +static inline unsigned int
+>> +cpuid_feature_extract_unsigned_field_width(u64 features, int field, int width)
+>> +{
+>> +	return (u64)(features << (64 - width - field)) >> (64 - width);
+>> +}
+>> +
+>> +#define ID_AA64MMFR0_TGRAN4_SHIFT	28
+>> +#define ID_AA64MMFR0_TGRAN64_SHIFT	24
+>> +#define ID_AA64MMFR0_TGRAN16_SHIFT	20
+>> +#define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
+>> +#define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
+>> +#define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
+>> +
+>> +static inline bool system_supports_64kb_granule(void)
+>> +{
+>> +	u64 mmfr0;
+>> +	u32 val;
+>> +
+>> +	mmfr0 = get_id_aa64mmfr0_el1();
+>> +	val = cpuid_feature_extract_unsigned_field_width(
+>> +		mmfr0, ID_AA64MMFR0_TGRAN4_SHIFT,4);
+>> +
+>> +	return val == ID_AA64MMFR0_TGRAN64_SUPPORTED;
+>> +}
+>> +
+>> +static inline bool system_supports_16kb_granule(void)
+>> +{
+>> +	u64 mmfr0;
+>> +	u32 val;
+>> +
+>> +	mmfr0 = get_id_aa64mmfr0_el1();
+>> +	val = cpuid_feature_extract_unsigned_field_width(
+>> +		mmfr0, ID_AA64MMFR0_TGRAN16_SHIFT, 4);
+>> +
+>> +	return val == ID_AA64MMFR0_TGRAN16_SUPPORTED;
+>> +}
+>> +
+>> +static inline bool system_supports_4kb_granule(void)
+>> +{
+>> +	u64 mmfr0;
+>> +	u32 val;
+>> +
+>> +	mmfr0 = get_id_aa64mmfr0_el1();
+>> +	val = cpuid_feature_extract_unsigned_field_width(
+>> +		mmfr0, ID_AA64MMFR0_TGRAN4_SHIFT, 4);
+>> +
+>> +	return val == ID_AA64MMFR0_TGRAN4_SUPPORTED;
+>> +}
+>> +
+>> +#if PAGE_SIZE == 65536
+>> +#define system_supports_configured_granule system_supports_64kb_granule
+>> +#elif PAGE_SIZE == 16384
+>> +#define system_supports_configured_granule system_supports_16kb_granule
+>> +#elif PAGE_SIZE == 4096
+>> +#define system_supports_configured_granule system_supports_4kb_granule
+>> +#endif
+>> +
+>>   #endif /* !__ASSEMBLY__ */
+>>   #endif /* _ASMARM64_PROCESSOR_H_ */
+>> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+>> index 6d1c75b..51fa745 100644
+>> --- a/lib/arm/mmu.c
+>> +++ b/lib/arm/mmu.c
+>> @@ -163,6 +163,9 @@ void *setup_mmu(phys_addr_t phys_end)
+>>   
+>>   #ifdef __aarch64__
+>>   	init_alloc_vpage((void*)(4ul << 30));
+>> +
+>> +	assert_msg(system_supports_configured_granule(),
+>> +		   "Unsupported translation granule %d\n", PAGE_SIZE);
+>                                                       ^
+>                                                needs '%ld' to compile
+>>   #endif
+>>   
+>>   	mmu_idmap = alloc_page();
+>> -- 
+>> 2.17.1
+>>
+> 
+> I don't think we need the three separate functions. How about just
+> doing the following diff?
+>
 
-Bartosz
+Makes sense, I was looking at how we do it in the kernel and got carried 
+away. We don't need to do that much at compile time.
+
+Thanks for the review, I will included your suggestions in v3.
+
+Thanks,
+
+Nikos
+
+> Thanks,
+> drew
+> 
+> 
+> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> index 540a1e842d5b..fef62f5a9866 100644
+> --- a/lib/arm/mmu.c
+> +++ b/lib/arm/mmu.c
+> @@ -160,6 +160,9 @@ void *setup_mmu(phys_addr_t phys_end)
+>   
+>   #ifdef __aarch64__
+>   	init_alloc_vpage((void*)(4ul << 30));
+> +
+> +	assert_msg(system_supports_granule(PAGE_SIZE),
+> +		   "Unsupported translation granule: %ld\n", PAGE_SIZE);
+>   #endif
+>   
+>   	mmu_idmap = alloc_page();
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 02665b84cc7e..dc493d1686bc 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -117,5 +117,21 @@ static inline u64 get_ctr(void)
+>   
+>   extern u32 dcache_line_size;
+>   
+> +static inline unsigned long get_id_aa64mmfr0_el1(void)
+> +{
+> +	unsigned long mmfr0;
+> +	asm volatile("mrs %0, id_aa64mmfr0_el1" : "=r" (mmfr0));
+> +	return mmfr0;
+> +}
+> +
+> +static inline bool system_supports_granule(size_t granule)
+> +{
+> +	u64 mmfr0 = get_id_aa64mmfr0_el1();
+> +
+> +	return ((granule == SZ_4K && ((mmfr0 >> 28) & 0xf) == 0) ||
+> +		(granule == SZ_64K && ((mmfr0 >> 24) & 0xf) == 0) ||
+> +		(granule == SZ_16K && ((mmfr0 >> 20) & 0xf) == 1));
+> +}
+> +
+>   #endif /* !__ASSEMBLY__ */
+>   #endif /* _ASMARM64_PROCESSOR_H_ */
+> 
