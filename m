@@ -2,90 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E5342A67A0
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 16:28:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A25D62A687E
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 16:54:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729975AbgKDP2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 10:28:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55787 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727013AbgKDP2k (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 10:28:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604503718;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OzvLPilVuFx00ghPxfGHTtJOpDXHfZFvWBiD6OmUMv8=;
-        b=dcQnQrggJHE/Zm8D5/A/DLKfgv88OrNvTuSIlcbJZDpRqTp38Z2dS56/gtnkbE7HFxBprG
-        XMpBesVjK7YYo54IPXKP+K9BtUt08zT11n8nmuUj13tqGuDGkW+L9ruGzeGx2fhHHmTntI
-        ozBYpdQF2wACrjz3sSbeOILjlBHBLgo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-3YsTLM5uMWGiO6aEmwJwCg-1; Wed, 04 Nov 2020 10:28:36 -0500
-X-MC-Unique: 3YsTLM5uMWGiO6aEmwJwCg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A32D710A0B83;
-        Wed,  4 Nov 2020 15:28:34 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.66])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E00719650;
-        Wed,  4 Nov 2020 15:28:26 +0000 (UTC)
-Date:   Wed, 4 Nov 2020 16:28:23 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Peter Feiner <pfeiner@google.com>
-Subject: Re: [PATCH v2 2/5] KVM: selftests: Factor code out of
- demand_paging_test
-Message-ID: <20201104152823.qxdlbygza7ykn5x2@kamzik.brq.redhat.com>
-References: <20201103234952.1626730-1-bgardon@google.com>
- <20201103234952.1626730-3-bgardon@google.com>
- <20201104121631.wvodsw7agsrdhje4@kamzik.brq.redhat.com>
- <20201104150017.GN20600@xz-x1>
+        id S1730898AbgKDPyd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 10:54:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59132 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731255AbgKDPyb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Nov 2020 10:54:31 -0500
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3767BC061A4C
+        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 07:54:31 -0800 (PST)
+Received: by mail-ot1-x342.google.com with SMTP id y22so9233986oti.10
+        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 07:54:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=y5iSM0n3L7+OTVROVCVTwu3uWAzU5mN6qUkDTEIh4do=;
+        b=PitcG0uAHrmeOMZWf07+5nFovh7kr7Adgn3pV0IjFTvWK31RX96qNAX9Ks5Dh/x/M1
+         BTJhllHwgJtYkqu+DoGQVr+zvfuKEAes8E2EKiqu7lnWd/wgVh9ipY9g1P/exu8Ll0XH
+         MlM5Nev4kEpw3fiAkWDQeeOa/AbBbn0nfEjrM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=y5iSM0n3L7+OTVROVCVTwu3uWAzU5mN6qUkDTEIh4do=;
+        b=PGr7xnvNxBjkFM2GcynceeUgNbhgub9K9Ko3r+HDxbj9Mwf93tt0PciIguYoSojJbD
+         fVzizYd7WYwC7jEPS3hYR+JCQZwmni/OUjMR39MfrnOfePi74eX9AR+mJixZIZdwoPpF
+         TS3B/C3fYfr3z5HlErJmb3GKebUlJLC1wwihJwqYE9YJQyqWekvm5nTz+kVda1bYHo8K
+         31uNIcADK5IWfEAdhW7oIZ7y6hTeboTn+C4EbIroaD/vdKVYnOrGmEs67DBiD10cy9hz
+         BNyIxiA7sjSpq9EZWllMfwBQ9l/50xMsjK2DITLdIPoolhIB3m2dggdZ7tsbmuiAQuUl
+         OZtw==
+X-Gm-Message-State: AOAM531DIBu3QFw7zIRhFqrXtRoXCaOILfsE83wO9RRzmISN+WG7eveq
+        xeBcg+lsLhlSka8dTz9xjJl00vEXnQQ07BZRrVSaAQ==
+X-Google-Smtp-Source: ABdhPJwFTZ6h8d4LZSz0ZdASZtc67ts9b22F6yGqx4swNCRA+uz1tGrz0fV1z6m2B8vN3lXuyoPJEYkFgolkB9M18jE=
+X-Received: by 2002:a9d:3b4:: with SMTP id f49mr18846565otf.188.1604505270511;
+ Wed, 04 Nov 2020 07:54:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201104150017.GN20600@xz-x1>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20201030100815.2269-1-daniel.vetter@ffwll.ch> <20201030100815.2269-6-daniel.vetter@ffwll.ch>
+ <446b2d5b-a1a1-a408-f884-f17a04b72c18@nvidia.com> <CAKMK7uGDW2f0oOvwgryCHxQFHyh3Tsk6ENsMGmtZ-EnH57tMSA@mail.gmail.com>
+ <1f7cf690-35e2-c56f-6d3f-94400633edd2@nvidia.com> <CAKMK7uFYDSqnNp_xpohzCEidw_iLufNSoX4v55sNZj-nwTckSg@mail.gmail.com>
+ <7f29a42a-c408-525d-90b7-ef3c12b5826c@nvidia.com> <CAKMK7uEw701AWXNJbRNM8Z+FkyUB5FbWegmSzyWPy9cG4W7OLA@mail.gmail.com>
+ <20201104140023.GQ36674@ziepe.ca>
+In-Reply-To: <20201104140023.GQ36674@ziepe.ca>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Wed, 4 Nov 2020 16:54:19 +0100
+Message-ID: <CAKMK7uH69hsFjYUkjg1aTh5f=q_3eswMSS5feFs6+ovz586+0A@mail.gmail.com>
+Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Pawel Osciak <pawel@osciak.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Tomasz Figa <tfiga@chromium.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 04, 2020 at 10:00:17AM -0500, Peter Xu wrote:
-> On Wed, Nov 04, 2020 at 01:16:31PM +0100, Andrew Jones wrote:
-> > If you don't mind I'd like to try and cleanup / generalize / refactor
-> > demand_paging_test.c and dirty_log_test.c with a few patches first for
-> > you to base this work on. I can probably get something posted today
-> > or tomorrow.
-> 
-> Drew,
-> 
-> Would you consider picking up the two patches below in the dirty ring series if
-> you plan to rework the dirty log tests?  I got your r-b so I am making bold to
-> think I'm ok to ask this; I just want to avoid another potential conflict
-> within the series.
+On Wed, Nov 4, 2020 at 3:00 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Sun, Nov 01, 2020 at 11:50:39PM +0100, Daniel Vetter wrote:
+>
+> > It's not device drivers, but everyone else. At least my understanding
+> > is that VM_IO | VM_PFNMAP means "even if it happens to be backed by a
+> > struct page, do not treat it like normal memory". And gup/pup_fast
+> > happily break that. I tried to chase the history of that test, didn't
+> > turn up anything I understood much:
+>
+> VM_IO isn't suppose do thave struct pages, so how can gup_fast return
+> them?
+>
+> I thought some magic in the PTE flags excluded this?
 
-Sure, no problem.
+I don't really have a box here, but dma_mmap_attrs() and friends to
+mmap dma_alloc_coherent memory is set up as VM_IO | VM_PFNMAP (it's
+actually enforced since underneath it uses remap_pfn_range), and
+usually (except if it's pre-cma carveout) that's just normal struct
+page backed memory. Sometimes from a cma region (so will be caught by
+the cma page check), but if you have an iommu to make it
+device-contiguous, that's not needed.
 
-I'll go ahead and get that cleanup / refactor series out.
+I think only some architectures have a special io pte flag, and those
+are only used for real mmio access. And I think the popular ones all
+don't. But that stuff is really not my expertise, just some drive-by
+reading I've done to understand how the pci mmap stuff works (which is
+special in yet other ways I think).
 
-Thanks,
-drew
-
-> 
-> Thanks!
-> 
-> [1] https://lore.kernel.org/kvm/20201023183358.50607-11-peterx@redhat.com/
-> [2] https://lore.kernel.org/kvm/20201023183358.50607-12-peterx@redhat.com/
-> 
-> -- 
-> Peter Xu
-> 
-
+So probably I'm missing something, but I'm not seeing anything that
+prevents this from coming out of a  pup/gup_fast.
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
