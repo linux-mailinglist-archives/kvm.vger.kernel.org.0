@@ -2,119 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16E1A2A6CAA
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 19:29:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 519D22A6D0C
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 19:45:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732368AbgKDS3b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 13:29:31 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22788 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726801AbgKDS3b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 13:29:31 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A4ICSt9006764
-        for <kvm@vger.kernel.org>; Wed, 4 Nov 2020 13:29:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=JyVFIhZrj3CiXNEKWRFfus+6K26LOcHvX2hU+zqwL9I=;
- b=Xb4ka38VOFjjZnX1sW4XYW1BjVP09WFK9cMRIUMdaX83OtMh92QFNIa/1+JGGgM1WDVz
- Q7JDP1KGA+4pgrBP3u+KdcF1BBVajBjTbTm7zdUMnoi7op4/Ed2yeLypgWfF4QDeTBek
- mgK+7yR1fIYJ/nMUCKQKgF1Tbn0gkg8vgxqZn0ZZHXU/PF968AYtD/5M0cGsblWwtIm2
- E0pGMuG6nwGj1PuamoommFE04olEvzv8yhZyxvpLii48SVygQrJmRYZRdq3obXsCwUEo
- OWiMJ8gL3MqQvQpMVbF4e8Rak68JgYhu30bs+Ie7O+6yW+6U8nKcT1eHEFwSloPF8Vyd 7w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34m0qchnnj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 13:29:30 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A4ICcge007196
-        for <kvm@vger.kernel.org>; Wed, 4 Nov 2020 13:29:30 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34m0qchngx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Nov 2020 13:29:29 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A4ISeBa002333;
-        Wed, 4 Nov 2020 18:29:19 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 34h0f6tc1q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Nov 2020 18:29:19 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A4ITG6263308278
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Nov 2020 18:29:16 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B97AAE04D;
-        Wed,  4 Nov 2020 18:29:16 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9EFBFAE045;
-        Wed,  4 Nov 2020 18:29:15 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.56.249])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  4 Nov 2020 18:29:15 +0000 (GMT)
-Subject: Re: [PATCH] s390/kvm: remove diag318 reset code
-To:     Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, david@redhat.com, frankja@linux.ibm.com
-References: <20201104181032.109800-1-walling@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <246ca4c9-2b46-f4c3-3fde-6308b08543bc@de.ibm.com>
-Date:   Wed, 4 Nov 2020 19:29:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S1730950AbgKDSpF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 13:45:05 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:18264 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726737AbgKDSpF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Nov 2020 13:45:05 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5fa2f6af0005>; Wed, 04 Nov 2020 10:45:03 -0800
+Received: from [10.2.49.167] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 4 Nov
+ 2020 18:44:57 +0000
+Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>
+CC:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        J??r??me Glisse <jglisse@redhat.com>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        Tomasz Figa <tfiga@chromium.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        "Daniel Vetter" <daniel.vetter@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>
+References: <1f7cf690-35e2-c56f-6d3f-94400633edd2@nvidia.com>
+ <CAKMK7uFYDSqnNp_xpohzCEidw_iLufNSoX4v55sNZj-nwTckSg@mail.gmail.com>
+ <7f29a42a-c408-525d-90b7-ef3c12b5826c@nvidia.com>
+ <CAKMK7uEw701AWXNJbRNM8Z+FkyUB5FbWegmSzyWPy9cG4W7OLA@mail.gmail.com>
+ <20201104140023.GQ36674@ziepe.ca>
+ <CAKMK7uH69hsFjYUkjg1aTh5f=q_3eswMSS5feFs6+ovz586+0A@mail.gmail.com>
+ <20201104162125.GA13007@infradead.org>
+ <CAKMK7uH=0+3FSR4LxP7bJUB4BsCcnCzfK2=D+2Am9QNmfZEmfw@mail.gmail.com>
+ <20201104163758.GA17425@infradead.org> <20201104164119.GA18218@infradead.org>
+ <20201104181708.GU36674@ziepe.ca>
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <d3497583-2338-596e-c764-8c571b7d22cf@nvidia.com>
+Date:   Wed, 4 Nov 2020 10:44:56 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201104181032.109800-1-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20201104181708.GU36674@ziepe.ca>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-04_12:2020-11-04,2020-11-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- phishscore=0 lowpriorityscore=0 adultscore=0 priorityscore=1501 mlxscore=0
- spamscore=0 clxscore=1015 mlxlogscore=999 impostorscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011040130
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1604515503; bh=8Ugq3MVZhAulHFLpXWMZRWPLhPny25VZOQYdcq4TO0Y=;
+        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
+         MIME-Version:In-Reply-To:Content-Type:Content-Language:
+         Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
+        b=LevZOWfSVNFRWN4kR3miaQt5LJlNcyeB9Ghugs0ySBdOh/MQLGl5DRy1UnBuawKGN
+         MsfMPuReQvwD80mrwk72YzJgprfaPEzy1iWCw2bcBIdepgHc2yIb1Z3tSbNtmEzOtU
+         74pXxKH+MYaO7mcOVRHUIJlaJ+S6YdrrRiDmU5IgDOTF2gsFbVWNUGDqZmjLUVrBs+
+         KGS2R/Zsa7bMMbNrwo9WMhxZao/dnX05W1Igj+s1NtoEdpZL8MR5Y+v8eG6ulR90ea
+         VKoKDEiFK4daZpfXrySmcBWNIL6VlfFacFRqV7CsvPsOFqcDAR/c16xbI63Eet0A3q
+         CwJJD0KoyL0qA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 04.11.20 19:10, Collin Walling wrote:
-> The diag318 data must be set to 0 by VM-wide reset events
-> triggered by diag308. As such, KVM should not handle
-> resetting this data via the VCPU ioctls.
+On 11/4/20 10:17 AM, Jason Gunthorpe wrote:
+> On Wed, Nov 04, 2020 at 04:41:19PM +0000, Christoph Hellwig wrote:
+>> On Wed, Nov 04, 2020 at 04:37:58PM +0000, Christoph Hellwig wrote:
+>>> On Wed, Nov 04, 2020 at 05:26:58PM +0100, Daniel Vetter wrote:
+>>>> What we're discussing is whether gup_fast and pup_fast also obey this,
+>>>> or fall over and can give you the struct page that's backing the
+>>>> dma_mmap_* memory. Since the _fast variant doesn't check for
+>>>> vma->vm_flags, and afaict that's the only thing which closes this gap.
+>>>> And like you restate, that would be a bit a problem. So where's that
+>>>> check which Jason&me aren't spotting?
+>>>
+>>> remap_pte_range uses pte_mkspecial to set up the PTEs, and gup_pte_range
+>>> errors out on pte_special.  Of course this only works for the
+>>> CONFIG_ARCH_HAS_PTE_SPECIAL case, for other architectures we do have
+>>> a real problem.
+>>
+>> Except that we don't really support pte-level gup-fast without
+>> CONFIG_ARCH_HAS_PTE_SPECIAL, and in fact all architectures selecting
+>> HAVE_FAST_GUP also select ARCH_HAS_PTE_SPECIAL, so we should be fine.
 > 
-> Fixes: 23a60f834406 (s390/kvm: diagnose 0x318 sync and reset)
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-> ---
->  arch/s390/kvm/kvm-s390.c | 2 --
->  1 file changed, 2 deletions(-)
+> Mm, I thought it was probably the special flag..
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 6b74b92c1a58..f9e118a0e113 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -3564,7 +3564,6 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
->  		vcpu->arch.sie_block->pp = 0;
->  		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
->  		vcpu->arch.sie_block->todpr = 0;
-> -		vcpu->arch.sie_block->cpnc = 0;
->  	}
->  }
->  
-> @@ -3582,7 +3581,6 @@ static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
->  
->  	regs->etoken = 0;
->  	regs->etoken_extension = 0;
-> -	regs->diag318 = 0;
->  }
->  
->  int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+> Knowing that CONFIG_HAVE_FAST_GUP can't be set without
+> CONFIG_ARCH_HAS_PTE_SPECIAL is pretty insightful, can we put that in
+> the Kconfig?
 > 
+> config HAVE_FAST_GUP
+>          depends on MMU
+>          depends on ARCH_HAS_PTE_SPECIAL
+>          bool
+> 
+Well, the !CONFIG_ARCH_HAS_PTE_SPECIAL case points out in a comment that
+gup-fast is not *completely* unavailable there, so I don't think you want
+to shut it off like that:
+
+/*
+  * If we can't determine whether or not a pte is special, then fail immediately
+  * for ptes. Note, we can still pin HugeTLB and THP as these are guaranteed not
+  * to be special.
+  *
+  * For a futex to be placed on a THP tail page, get_futex_key requires a
+  * get_user_pages_fast_only implementation that can pin pages. Thus it's still
+  * useful to have gup_huge_pmd even if we can't operate on ptes.
+  */
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
