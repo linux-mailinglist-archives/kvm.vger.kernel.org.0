@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F9FC2A6769
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 16:21:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34F292A676B
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 16:21:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730709AbgKDPUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 10:20:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26620 "EHLO
+        id S1730676AbgKDPU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 10:20:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43631 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730663AbgKDPUt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 10:20:49 -0500
+        by vger.kernel.org with ESMTP id S1729457AbgKDPU6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 10:20:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604503248;
+        s=mimecast20190719; t=1604503257;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kiVtIXdwQ9KVMu0FHvAuY0DkhOuVMD1KuqG5i65tga4=;
-        b=cdURSxvFeXWHgEyH1evML0JNMxwd4dpPcW/Gq2G44xxA2gi35Qe7dDGaFC7DwPzIEnHVwP
-        4qP54wb2p2f6qus65hCTDLbvyRkjoGHx2AssTfH94KHkH6aSZKCNpmnh1iu1v0bhCN6DAu
-        vOnaH4BsXvPakqpF2fac06D+QeYJ7mM=
+        bh=dHvoV2B3WQz+lxhYN6O++y+eS6CLPSgx/ZnTCxfcSRc=;
+        b=AqkvnK0uOfdLSpHBJEboev0a46sCgxtNMmrzGbnqtyMkrqfR82zda08/79D0jL09NDVJ1t
+        CRann+98mBQ+XSdA/vSMI2d2hF0lDy3760ffTJUsLe7ij410dJ2yz/uz44g03erIP+A1vt
+        RwSOodwWDZqY8dNKCiP1ZssvNRQllQc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-578-MoXFsoAfPsShyPViThmXOg-1; Wed, 04 Nov 2020 10:20:46 -0500
-X-MC-Unique: MoXFsoAfPsShyPViThmXOg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-251-01OgfL0VPa6UVujx8NoT_w-1; Wed, 04 Nov 2020 10:20:53 -0500
+X-MC-Unique: 01OgfL0VPa6UVujx8NoT_w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 598428030A8;
-        Wed,  4 Nov 2020 15:20:44 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D41C16D58E;
+        Wed,  4 Nov 2020 15:20:51 +0000 (UTC)
 Received: from localhost (ovpn-115-145.ams2.redhat.com [10.36.115.145])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EED9D5D9CC;
-        Wed,  4 Nov 2020 15:20:43 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D0B161177;
+        Wed,  4 Nov 2020 15:20:45 +0000 (UTC)
 From:   Stefan Hajnoczi <stefanha@redhat.com>
 To:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc:     kvm@vger.kernel.org,
@@ -49,39 +49,39 @@ Cc:     kvm@vger.kernel.org,
         Klaus Jensen <its@irrelevant.dk>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
         Eric Auger <eric.auger@redhat.com>
-Subject: [PULL 19/33] block/nvme: Set request_alignment at initialization
-Date:   Wed,  4 Nov 2020 15:18:14 +0000
-Message-Id: <20201104151828.405824-20-stefanha@redhat.com>
+Subject: [PULL 20/33] block/nvme: Correct minimum device page size
+Date:   Wed,  4 Nov 2020 15:18:15 +0000
+Message-Id: <20201104151828.405824-21-stefanha@redhat.com>
 In-Reply-To: <20201104151828.405824-1-stefanha@redhat.com>
 References: <20201104151828.405824-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: base64
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RnJvbTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPgoKQ29tbWl0
-IGJkZDZhOTBhOWU1ICgiYmxvY2s6IEFkZCBWRklPIGJhc2VkIE5WTWUgZHJpdmVyIikKc2V0cyB0
-aGUgcmVxdWVzdF9hbGlnbm1lbnQgaW4gbnZtZV9yZWZyZXNoX2xpbWl0cygpLgpGb3IgY29uc2lz
-dGVuY3ksIGFsc28gc2V0IGl0IGR1cmluZyBpbml0aWFsaXphdGlvbi4KClJlcG9ydGVkLWJ5OiBT
-dGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+ClJldmlld2VkLWJ5OiBFcmljIEF1
-Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+ClJldmlld2VkLWJ5OiBTdGVmYW4gSGFqbm9jemkg
-PHN0ZWZhbmhhQHJlZGhhdC5jb20+ClRlc3RlZC1ieTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckBy
-ZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8cGhpbG1k
-QHJlZGhhdC5jb20+Ck1lc3NhZ2UtaWQ6IDIwMjAxMDI5MDkzMzA2LjEwNjM4NzktMTgtcGhpbG1k
-QHJlZGhhdC5jb20KU2lnbmVkLW9mZi1ieTogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUByZWRo
-YXQuY29tPgpUZXN0ZWQtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KLS0t
-CiBibG9jay9udm1lLmMgfCAxICsKIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQoKZGlm
-ZiAtLWdpdCBhL2Jsb2NrL252bWUuYyBiL2Jsb2NrL252bWUuYwppbmRleCBjZDg3NTU1NWNhLi5i
-Yjc1NDQ4YTA5IDEwMDY0NAotLS0gYS9ibG9jay9udm1lLmMKKysrIGIvYmxvY2svbnZtZS5jCkBA
-IC03NTgsNiArNzU4LDcgQEAgc3RhdGljIGludCBudm1lX2luaXQoQmxvY2tEcml2ZXJTdGF0ZSAq
-YnMsIGNvbnN0IGNoYXIgKmRldmljZSwgaW50IG5hbWVzcGFjZSwKICAgICBzLT5wYWdlX3NpemUg
-PSBNQVgoNDA5NiwgMSA8PCBOVk1FX0NBUF9NUFNNSU4oY2FwKSk7CiAgICAgcy0+ZG9vcmJlbGxf
-c2NhbGUgPSAoNCA8PCBOVk1FX0NBUF9EU1RSRChjYXApKSAvIHNpemVvZih1aW50MzJfdCk7CiAg
-ICAgYnMtPmJsLm9wdF9tZW1fYWxpZ25tZW50ID0gcy0+cGFnZV9zaXplOworICAgIGJzLT5ibC5y
-ZXF1ZXN0X2FsaWdubWVudCA9IHMtPnBhZ2Vfc2l6ZTsKICAgICB0aW1lb3V0X21zID0gTUlOKDUw
-MCAqIE5WTUVfQ0FQX1RPKGNhcCksIDMwMDAwKTsKIAogICAgIC8qIFJlc2V0IGRldmljZSB0byBn
-ZXQgYSBjbGVhbiBzdGF0ZS4gKi8KLS0gCjIuMjguMAoK
+RnJvbTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPgoKV2hpbGUg
+dHJ5aW5nIHRvIHNpbXBsaWZ5IHRoZSBjb2RlIHVzaW5nIGEgbWFjcm8sIHdlIGZvcmdvdAp0aGUg
+MTItYml0IHNoaWZ0Li4uIENvcnJlY3QgdGhhdC4KCkZpeGVzOiBmYWQxZWI2ODg2MiAoImJsb2Nr
+L252bWU6IFVzZSByZWdpc3RlciBkZWZpbml0aW9ucyBmcm9tICdibG9jay9udm1lLmgnIikKUmVw
+b3J0ZWQtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KUmV2aWV3ZWQtYnk6
+IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KUmV2aWV3ZWQtYnk6IEVyaWMg
+QXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KVGVzdGVkLWJ5OiBFcmljIEF1Z2VyIDxlcmlj
+LmF1Z2VyQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOp
+IDxwaGlsbWRAcmVkaGF0LmNvbT4KTWVzc2FnZS1pZDogMjAyMDEwMjkwOTMzMDYuMTA2Mzg3OS0x
+OS1waGlsbWRAcmVkaGF0LmNvbQpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZh
+bmhhQHJlZGhhdC5jb20+ClRlc3RlZC1ieTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQu
+Y29tPgotLS0KIGJsb2NrL252bWUuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlv
+bigrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2Jsb2NrL252bWUuYyBiL2Jsb2NrL252
+bWUuYwppbmRleCBiYjc1NDQ4YTA5Li5iZDM4NjBhYzRlIDEwMDY0NAotLS0gYS9ibG9jay9udm1l
+LmMKKysrIGIvYmxvY2svbnZtZS5jCkBAIC03NTUsNyArNzU1LDcgQEAgc3RhdGljIGludCBudm1l
+X2luaXQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGNvbnN0IGNoYXIgKmRldmljZSwgaW50IG5hbWVz
+cGFjZSwKICAgICAgICAgZ290byBvdXQ7CiAgICAgfQogCi0gICAgcy0+cGFnZV9zaXplID0gTUFY
+KDQwOTYsIDEgPDwgTlZNRV9DQVBfTVBTTUlOKGNhcCkpOworICAgIHMtPnBhZ2Vfc2l6ZSA9IDF1
+IDw8ICgxMiArIE5WTUVfQ0FQX01QU01JTihjYXApKTsKICAgICBzLT5kb29yYmVsbF9zY2FsZSA9
+ICg0IDw8IE5WTUVfQ0FQX0RTVFJEKGNhcCkpIC8gc2l6ZW9mKHVpbnQzMl90KTsKICAgICBicy0+
+Ymwub3B0X21lbV9hbGlnbm1lbnQgPSBzLT5wYWdlX3NpemU7CiAgICAgYnMtPmJsLnJlcXVlc3Rf
+YWxpZ25tZW50ID0gcy0+cGFnZV9zaXplOwotLSAKMi4yOC4wCgo=
 
