@@ -2,103 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 892502A6B4D
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 18:02:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F26312A6C84
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 19:11:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731668AbgKDRB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 12:01:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41760 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731553AbgKDRB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Nov 2020 12:01:59 -0500
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C5CC061A4A
-        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 09:01:59 -0800 (PST)
-Received: by mail-io1-xd44.google.com with SMTP id r9so22902853ioo.7
-        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 09:01:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lKt/7khf/p0FBH94EgBjgYowDupQdP5eOw+aVFWnIE4=;
-        b=Qif5C86YMdm2wITkiOw1A3DHnWkrj5BznSur9w6S9h05s4uEH0tpfJfwkirw+OCsIa
-         5ZUWAUw2Xr0Y+yBcfMul3p6BrzjIdeyVKYTObdOQpXyGA8Jc0onI0PLPZPkY5rWtjuiX
-         KwvEwFnF1QCroLya8QNYKLFqbYxlf+Oxcuhsj/2kUx3aX6FlLQP70+THTejWseON5vTZ
-         ZBsnYJ71IQEmS3ODRZggk7Qxw4OUAzqErw5JjwSmPxCbg1lvm9Mw5zPS9hKeCh8j+tNk
-         3UZEnuPFiAywWXQTW9+s4q/6AGurkFrhGK7OBOjl186bChjLK2Wf5LPfStOaQNQY70ht
-         MXEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lKt/7khf/p0FBH94EgBjgYowDupQdP5eOw+aVFWnIE4=;
-        b=coUuIuFy4RqPlboc/HGxbjnaCAX7aozBqfkKCkaCpx1U6NNnj4eqVAD32AFGqDe3Lh
-         nfrxmpA9nOElzhxliCARe7bjrL3rQU47BH+mr51GlCHojeyAmAfpEj09h0VAocXRK72R
-         5NrfmbAWQOt5dUIMEf2qd0HTtaPgtKvH81BNh+SxXVk66sMmTSsBrfEEjhbtR5SWyTF6
-         R0UUi7LaZUPGBrhIVtxzSNHFZUqvC2z82Dnhh76LLugQQkTAOl7aZagvy6qbpafEJUhs
-         k9PVzpOj8TWpmXTSQOFm12K5YYFhgPDHo6+PgOfBfuLwCfTdd0LE0IYKMuEk6sBNOpj9
-         GbjA==
-X-Gm-Message-State: AOAM532bYuo/XFgpmiLhpyOd+8MqxvP+vc+1OWWB0haiyZMKUtkDe0jk
-        eBm9zUnVkdV8M5VOOYWK7hSX6DQqJI4GN6X6xMrxTA==
-X-Google-Smtp-Source: ABdhPJzL1QewBuecQ3Wuja+O1RDK1wskv/Oq/mAWRQpKntRVQ3pfff2m+nGSvCw8+CkfpP3zR3jF0Ttk0JEAXEi4DgY=
-X-Received: by 2002:a6b:e012:: with SMTP id z18mr14242690iog.157.1604509318295;
- Wed, 04 Nov 2020 09:01:58 -0800 (PST)
+        id S1732306AbgKDSLW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 13:11:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5600 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730052AbgKDSLU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 13:11:20 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A4IBIbm126539
+        for <kvm@vger.kernel.org>; Wed, 4 Nov 2020 13:11:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=G8xuG92S8oL8aT+HGs+EKJ6b+qEWT49kDAyWabJeKmA=;
+ b=AMAcMxAbWWwSZqpvYBEXSMUIMFyQBL32pFDksa1uhBr6UmCVAJ3vPKhJ/OjPxzdrQ4Zd
+ lbBd9N5JJ+InZLz1WFxUuMzTWoMqbtyl8pUy38sa0p4DIYCHO/bbTAQzfL36WJZE0qUK
+ 4smaat17OjNL9mx18DIV+kezSYNcHR2QMVcEIuKnElZCci04f/X4Rt52RT/eV4bD7zXI
+ 5XfI2M2iShSlv2VRECtlk6/FDtLaIaNTrHefcOJZaf8C6hfkDmYTm5/RmhvmBNk2rk/q
+ XO/i1SWEQdSuSrA8ZiSrlERKeRPIFOBfRE/gg5549FYb68yxjzGp0ysvGGMPc/Fe9rSW 8Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34ksrurfgx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 13:11:19 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A4IBIik126536
+        for <kvm@vger.kernel.org>; Wed, 4 Nov 2020 13:11:18 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34ksrurfcc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Nov 2020 13:11:18 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A4I7rPp021911;
+        Wed, 4 Nov 2020 18:11:04 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04wdc.us.ibm.com with ESMTP id 34h0ej0bag-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Nov 2020 18:11:04 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A4IB0KU66584996
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 4 Nov 2020 18:11:01 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E161EC6055;
+        Wed,  4 Nov 2020 18:11:00 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2E515C6057;
+        Wed,  4 Nov 2020 18:11:00 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.157.224])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  4 Nov 2020 18:11:00 +0000 (GMT)
+From:   Collin Walling <walling@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     gor@linux.ibm.com, hca@linux.ibm.com, imbrenda@linux.ibm.com,
+        cohuck@redhat.com, david@redhat.com, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com
+Subject: [PATCH] s390/kvm: remove diag318 reset code
+Date:   Wed,  4 Nov 2020 13:10:32 -0500
+Message-Id: <20201104181032.109800-1-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20201103234952.1626730-1-bgardon@google.com> <20201103234952.1626730-3-bgardon@google.com>
- <20201104121631.wvodsw7agsrdhje4@kamzik.brq.redhat.com> <20201104150017.GN20600@xz-x1>
- <20201104152823.qxdlbygza7ykn5x2@kamzik.brq.redhat.com>
-In-Reply-To: <20201104152823.qxdlbygza7ykn5x2@kamzik.brq.redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 4 Nov 2020 09:01:47 -0800
-Message-ID: <CANgfPd9RPiyX9BeYpWLHGyqfO83uWZKKynfP4vkbvSbzBK9syg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] KVM: selftests: Factor code out of demand_paging_test
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Peter Feiner <pfeiner@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-04_12:2020-11-04,2020-11-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=948 mlxscore=0
+ bulkscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=13 adultscore=0
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011040128
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 4, 2020 at 7:28 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Wed, Nov 04, 2020 at 10:00:17AM -0500, Peter Xu wrote:
-> > On Wed, Nov 04, 2020 at 01:16:31PM +0100, Andrew Jones wrote:
-> > > If you don't mind I'd like to try and cleanup / generalize / refactor
-> > > demand_paging_test.c and dirty_log_test.c with a few patches first for
-> > > you to base this work on. I can probably get something posted today
-> > > or tomorrow.
-> >
-> > Drew,
-> >
-> > Would you consider picking up the two patches below in the dirty ring series if
-> > you plan to rework the dirty log tests?  I got your r-b so I am making bold to
-> > think I'm ok to ask this; I just want to avoid another potential conflict
-> > within the series.
->
-> Sure, no problem.
->
-> I'll go ahead and get that cleanup / refactor series out.
+The diag318 data must be set to 0 by VM-wide reset events
+triggered by diag308. As such, KVM should not handle
+resetting this data via the VCPU ioctls.
 
-Thanks Drew! I agree this will all be a lot cleaner when refactored
-for multi-vcpu tests generally.
+Fixes: 23a60f834406 (s390/kvm: diagnose 0x318 sync and reset)
+Signed-off-by: Collin Walling <walling@linux.ibm.com>
+---
+ arch/s390/kvm/kvm-s390.c | 2 --
+ 1 file changed, 2 deletions(-)
 
->
-> Thanks,
-> drew
->
-> >
-> > Thanks!
-> >
-> > [1] https://lore.kernel.org/kvm/20201023183358.50607-11-peterx@redhat.com/
-> > [2] https://lore.kernel.org/kvm/20201023183358.50607-12-peterx@redhat.com/
-> >
-> > --
-> > Peter Xu
-> >
->
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 6b74b92c1a58..f9e118a0e113 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3564,7 +3564,6 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.sie_block->pp = 0;
+ 		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+ 		vcpu->arch.sie_block->todpr = 0;
+-		vcpu->arch.sie_block->cpnc = 0;
+ 	}
+ }
+ 
+@@ -3582,7 +3581,6 @@ static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
+ 
+ 	regs->etoken = 0;
+ 	regs->etoken_extension = 0;
+-	regs->diag318 = 0;
+ }
+ 
+ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+-- 
+2.26.2
+
