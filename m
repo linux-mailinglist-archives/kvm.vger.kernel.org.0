@@ -2,167 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 915442A608F
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 10:33:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42DC02A6098
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 10:35:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728218AbgKDJdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 04:33:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43664 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726564AbgKDJdp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 04:33:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604482423;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S67mblvp8BDDbDS1GLfHleJupRJCu9AfMSH9PH8i7Jg=;
-        b=Gybab4cNh+GmsIr7HARA67O3RgU5pgb4coY7m5TxZbFL154G8Vz1ZPx8WI1nGQz4pbTMim
-        jXNgR0wNR8S7GoVZ9o+fley2r1I0Lf57CkIabc3gLr3ZUDr0kZyz0t6n5E79FBLu87hTHK
-        yPiB1FzbtASO4TT83FzFlT1uXbHNjq8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-JLDZ8eU-Mf2X0MuoN646Wg-1; Wed, 04 Nov 2020 04:33:42 -0500
-X-MC-Unique: JLDZ8eU-Mf2X0MuoN646Wg-1
-Received: by mail-wm1-f72.google.com with SMTP id o81so451207wma.0
-        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 01:33:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=S67mblvp8BDDbDS1GLfHleJupRJCu9AfMSH9PH8i7Jg=;
-        b=Gz9ILOs/xsC+KRw2AOqI9FIDSffpIl7rFLx8ZFeL2I9Wh4JaCWsySqJztfWdI5cmKh
-         +H842FZ1KFO2EsVGugG+SAqjy+eQuxVsUfv23sh26XWQ68Fpogn/Q/rw4e1BOfps+NZW
-         1evaJkRURX0vZQgZHRvb5IHH/NUJMBpUlIX4Km81qbJxeH9igpV2V+7dn3RJdTavYobk
-         mTaQ+en9fufQOsE7U+R6K41NQnyphEyMWN52yt9p3uTKGPKv48xYoqCaUWNnV6yR3GpL
-         CRvCmYqF9xG/LBBnAUjPePfUIouySHR/yYDXaNqrtWTXhh84FgN012YBrCn+4sCDUm2J
-         Gaxg==
-X-Gm-Message-State: AOAM532sq9QOl3yrGabnXZh4VIOVErE5nWvSN1y2iS9qzJsXaGBTkOL4
-        XK4PHjJ+ltAifvIYVJr68ZaUVJhcfIiEkOEG/+W3KuydyP0anrggDiXRPCnOUz73tyDUgmuGmYX
-        kFasYhbqd6Uew
-X-Received: by 2002:adf:9b95:: with SMTP id d21mr5997460wrc.335.1604482420757;
-        Wed, 04 Nov 2020 01:33:40 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxLnqhRSqhTc7S9kSWg6N6gWOKIWH0uIfnUrQUkHUqik23WMt5c8lft5ls5BYqlcfZ+saqWZQ==
-X-Received: by 2002:adf:9b95:: with SMTP id d21mr5997433wrc.335.1604482420530;
-        Wed, 04 Nov 2020 01:33:40 -0800 (PST)
-Received: from steredhat (host-79-22-200-33.retail.telecomitalia.it. [79.22.200.33])
-        by smtp.gmail.com with ESMTPSA id q2sm1690836wrw.40.2020.11.04.01.33.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2020 01:33:39 -0800 (PST)
-Date:   Wed, 4 Nov 2020 10:33:37 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: add IOTLB API support
-Message-ID: <20201104093337.ge3qtlfhkjjkx4ax@steredhat>
-References: <20201029174351.134173-1-sgarzare@redhat.com>
- <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
- <20201030105422.ju2aj2bmwsckdufh@steredhat>
- <278f4732-e561-2b4f-03ee-b26455760b01@redhat.com>
- <20201102171104.eiovmkj23fle5ioj@steredhat>
- <8648a2e3-1052-3b5b-11ce-87628ac8dd33@redhat.com>
- <20201103194613.GK20600@xz-x1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201103194613.GK20600@xz-x1>
+        id S1728387AbgKDJfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 04:35:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55652 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726691AbgKDJfn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Nov 2020 04:35:43 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D1FC0613D3;
+        Wed,  4 Nov 2020 01:35:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=PgocQ7GiOOLpogLWmYicmur/hjgncbUmRV6ANwaJr1c=; b=XhHgJv3yYB0qDLBxJm0YRFjzz4
+        MEGAtGhYMkApEDNUKO9NDkMbRD2M6jOpkXLfAniv+VsxXip9fFRvXtoWCprFc+WysimVDBnYPd2nm
+        Q8VAUopfw1we7QH0ppRTUPcYkgA4tg82XcdbHxUJ+qEAqnZGBhYC+FE9rEYnvdT/1EPktDLMgMy82
+        o8Yt22f7CUqveC/RlfOyWgXyBpQvaMgszciKGu2V8Y5k9ftgv/gTTREMfcusnnpmdGOwv8+q5Ail4
+        DXbwm0ZeDfbSIxlThevwgjQlPUup6zqnveu3QPchPYmfhdifeS6dpdmKilkXxZ+zRXnFfxrwyt4Dd
+        oYls0YeQ==;
+Received: from 54-240-197-230.amazon.com ([54.240.197.230] helo=edge-cache-127.e-maa3.amazon.com)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kaFCd-0001vB-SG; Wed, 04 Nov 2020 09:35:40 +0000
+Message-ID: <ef4660dba8135ca5a1dc7e854babcf65d8cef46f.camel@infradead.org>
+Subject: Re: [PATCH v2 1/2] sched/wait: Add add_wait_queue_priority()
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Date:   Wed, 04 Nov 2020 09:35:37 +0000
+In-Reply-To: <20201028143509.GA2628@hirez.programming.kicks-ass.net>
+References: <20201026175325.585623-1-dwmw2@infradead.org>
+         <20201027143944.648769-1-dwmw2@infradead.org>
+         <20201027143944.648769-2-dwmw2@infradead.org>
+         <20201028143509.GA2628@hirez.programming.kicks-ass.net>
+Content-Type: multipart/signed; micalg="sha-256";
+        protocol="application/x-pkcs7-signature";
+        boundary="=-3+1J5mr73iDK5ZVYir+8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 03, 2020 at 02:46:13PM -0500, Peter Xu wrote:
->On Tue, Nov 03, 2020 at 05:04:23PM +0800, Jason Wang wrote:
->>
->> On 2020/11/3 上午1:11, Stefano Garzarella wrote:
->> > On Fri, Oct 30, 2020 at 07:44:43PM +0800, Jason Wang wrote:
->> > >
->> > > On 2020/10/30 下午6:54, Stefano Garzarella wrote:
->> > > > On Fri, Oct 30, 2020 at 06:02:18PM +0800, Jason Wang wrote:
->> > > > >
->> > > > > On 2020/10/30 上午1:43, Stefano Garzarella wrote:
->> > > > > > This patch enables the IOTLB API support for vhost-vsock devices,
->> > > > > > allowing the userspace to emulate an IOMMU for the guest.
->> > > > > >
->> > > > > > These changes were made following vhost-net, in details this patch:
->> > > > > > - exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
->> > > > > >   device if the feature is acked
->> > > > > > - implements VHOST_GET_BACKEND_FEATURES and
->> > > > > >   VHOST_SET_BACKEND_FEATURES ioctls
->> > > > > > - calls vq_meta_prefetch() before vq processing to prefetch vq
->> > > > > >   metadata address in IOTLB
->> > > > > > - provides .read_iter, .write_iter, and .poll callbacks for the
->> > > > > >   chardev; they are used by the userspace to exchange IOTLB messages
->> > > > > >
->> > > > > > This patch was tested with QEMU and a patch applied [1] to fix a
->> > > > > > simple issue:
->> > > > > >     $ qemu -M q35,accel=kvm,kernel-irqchip=split \
->> > > > > >            -drive file=fedora.qcow2,format=qcow2,if=virtio \
->> > > > > >            -device intel-iommu,intremap=on \
->> > > > > >            -device vhost-vsock-pci,guest-cid=3,iommu_platform=on
->> > > > >
->> > > > >
->> > > > > Patch looks good, but a question:
->> > > > >
->> > > > > It looks to me you don't enable ATS which means vhost won't
->> > > > > get any invalidation request or did I miss anything?
->> > > > >
->> > > >
->> > > > You're right, I didn't see invalidation requests, only miss and
->> > > > updates.
->> > > > Now I have tried to enable 'ats' and 'device-iotlb' but I still
->> > > > don't see any invalidation.
->> > > >
->> > > > How can I test it? (Sorry but I don't have much experience yet
->> > > > with vIOMMU)
->> > >
->> > >
->> > > I guess it's because the batched unmap. Maybe you can try to use
->> > > "intel_iommu=strict" in guest kernel command line to see if it
->> > > works.
->> > >
->> > > Btw, make sure the qemu contains the patch [1]. Otherwise ATS won't
->> > > be enabled for recent Linux Kernel in the guest.
->> >
->> > The problem was my kernel, it was built with a tiny configuration.
->> > Using fedora stock kernel I can see the 'invalidate' requests, but I
->> > also had the following issues.
->> >
->> > Do they make you ring any bells?
->> >
->> > $ ./qemu -m 4G -smp 4 -M q35,accel=kvm,kernel-irqchip=split \
->> >     -drive file=fedora.qcow2,format=qcow2,if=virtio \
->> >     -device intel-iommu,intremap=on,device-iotlb=on \
->> >     -device vhost-vsock-pci,guest-cid=6,iommu_platform=on,ats=on,id=v1
->> >
->> >     qemu-system-x86_64: vtd_iova_to_slpte: detected IOVA overflow    
->> > (iova=0x1d40000030c0)
->>
->>
->> It's a hint that IOVA exceeds the AW. It might be worth to check whether the
->> missed IOVA reported from IOTLB is legal.
->
->Yeah.  By default the QEMU vIOMMU should only support 39bits width for guest
->iova address space.  To extend it, we can use:
->
->  -device intel-iommu,aw-bits=48
->
->So we'll enable 4-level iommu pgtable.
->
->Here the iova is obvious longer than this, so it'll be interesting to know why
->that iova is allocated in the guest driver since the driver should know somehow
->that this iova is beyond what's supported (guest iommu driver should be able to
->probe viommu capability on this width information too).
->
 
-Peter, Jason, thanks for the hints!
+--=-3+1J5mr73iDK5ZVYir+8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I'll try to understand what is going on in the guest driver.
+On Wed, 2020-10-28 at 15:35 +0100, Peter Zijlstra wrote:
+> On Tue, Oct 27, 2020 at 02:39:43PM +0000, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > This allows an exclusive wait_queue_entry to be added at the head of th=
+e
+> > queue, instead of the tail as normal. Thus, it gets to consume events
+> > first without allowing non-exclusive waiters to be woken at all.
+> >=20
+> > The (first) intended use is for KVM IRQFD, which currently has
+> > inconsistent behaviour depending on whether posted interrupts are
+> > available or not. If they are, KVM will bypass the eventfd completely
+> > and deliver interrupts directly to the appropriate vCPU. If not, events
+> > are delivered through the eventfd and userspace will receive them when
+> > polling on the eventfd.
+> >=20
+> > By using add_wait_queue_priority(), KVM will be able to consistently
+> > consume events within the kernel without accidentally exposing them
+> > to userspace when they're supposed to be bypassed. This, in turn, means
+> > that userspace doesn't have to jump through hoops to avoid listening
+> > on the erroneously noisy eventfd and injecting duplicate interrupts.
+> >=20
+> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+>=20
+> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-Stefano
+Thanks. Paolo, the conclusion was that you were going to take this set
+through the KVM tree, wasn't it?
+
+
+--=-3+1J5mr73iDK5ZVYir+8
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
+MTA0MDkzNTM3WjAvBgkqhkiG9w0BCQQxIgQgePrX2MYfN7N9SBGp0PSpcl4mKRHU/sePnReJTqLu
+xlUwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAFX3NDktlYLwtls4nBM+W/MFDZW3r2PiK1IEB0ZpmHv+k5OR3PEdpesYyn3G6tyW
+8BQQMnCvwfbS5eX0RODRGUAEdFQzaWVqfdIuwLG5QHmP7KyrWDrrTk9kHmDnUSfWWzj8Tn02pl9w
+QRdSCyVdbex9odhYLyJM3tRbsxRtINibKSEDmVb/ufYEXt46vPqZ18HBt2umniJoeh0MekZBrdM7
+QlHDM84wMzi5CIq2HODKgWz/XA0kuhEcts6p/hXYDt0M0+TWKPB4P3GjslPLuQoSRuX5cPMHjmYw
+fPcHN/BwxFuWbq89SUxr/c7KYm//7TuP6paPMw8FgBtRWkzXmboAAAAAAAA=
+
+
+--=-3+1J5mr73iDK5ZVYir+8--
 
