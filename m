@@ -2,118 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 302932A6DD3
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 20:29:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8C262A6E90
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 21:12:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730143AbgKDT3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 14:29:23 -0500
-Received: from nat-hk.nvidia.com ([203.18.50.4]:34340 "EHLO nat-hk.nvidia.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725889AbgKDT3X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Nov 2020 14:29:23 -0500
-Received: from HKMAIL104.nvidia.com (Not Verified[10.18.92.9]) by nat-hk.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5fa301120000>; Thu, 05 Nov 2020 03:29:22 +0800
-Received: from HKMAIL104.nvidia.com (10.18.16.13) by HKMAIL104.nvidia.com
- (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 4 Nov
- 2020 19:29:20 +0000
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
- by HKMAIL104.nvidia.com (10.18.16.13) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Wed, 4 Nov 2020 19:29:20 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TLGEYBtm0Y2yv/0z7+BtLa5Yf+aVTF/vAGrn9KrN+ijEFScF0w30YLbVwRNBZ0pYRWjp1QtDWKul0uZUuN7FcvOBZsZAa77g0rDE6YYuzlTj8auuWRQm9Suu02wnJz/3dYxWqlrMBKSiB+x7qaJyBgJIByItzGeIAUpmZkG9DOVFiLtveT4k/aBAoM1aOgC8vx8PZ209J5MP7cLWoG+f/zPfchoPZ6MY/ko2rNN90yUe1zbsvSc5I8JLq1De11uvDTZUCsu6BnC1ynZG+HVacM0DSHg+FAh8xE0PkaVS91qctvk07mBMhsLjO3cMAAY8SZWJ+c43SmiRxGJha1KRtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JdxZRNQhQlxGudrAcPA0I9RD12/9fB2ddJQAbN4pwhA=;
- b=U4AT4MqnYh5ewQ3vRSgc/bxqtjTWfGYvpod+7QkAubAhs31j4HtQy5PNLSNziK6JqCIZyok8emYx/oi+6F+XdTmarlGVeqthfXKCBgv6+WOAySvn0PCxZ1+AhVtD0g7wVbzUQ/kvm1UEDqFf5QlthMRa6ts+a/UJ0GcGn1cIeTuaVLJ9SEi6fVo6UpIpQRgyhzMoMNaUjqEduMx2ilJy0rMfNQiqIkplVtE4ZrILk42e4F6sMCby/AHY7BYjM4yo8PPYZAe4LuJcGpaK7PVYMEpCZqVjykmDC08m46xzgC3wNond8dP7yO67HvN+vJq2PrZ7W8WDJNrhZdrgcGhH5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB3212.namprd12.prod.outlook.com (2603:10b6:5:186::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.24; Wed, 4 Nov
- 2020 19:29:18 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.032; Wed, 4 Nov 2020
- 19:29:18 +0000
-Date:   Wed, 4 Nov 2020 15:29:16 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "joro@8bytes.org" <joro@8bytes.org>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: (proposal) RE: [PATCH v7 00/16] vfio: expose virtual Shared
- Virtual Addressing to VMs
-Message-ID: <20201104192916.GA2620339@nvidia.com>
-References: <20201103125643.GN2620339@nvidia.com>
- <20201103131852.GE22888@8bytes.org> <20201103132335.GO2620339@nvidia.com>
- <20201103140318.GL22888@8bytes.org> <20201103140642.GQ2620339@nvidia.com>
- <20201103143532.GM22888@8bytes.org> <20201103152223.GR2620339@nvidia.com>
- <20201103165539.GN22888@8bytes.org> <20201103174851.GS2620339@nvidia.com>
- <20201103191429.GO22888@8bytes.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20201103191429.GO22888@8bytes.org>
-X-ClientProxiedBy: BL0PR02CA0065.namprd02.prod.outlook.com
- (2603:10b6:207:3d::42) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1731390AbgKDUM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 15:12:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43156 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730515AbgKDUM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Nov 2020 15:12:29 -0500
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C53C061A4A
+        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 12:12:28 -0800 (PST)
+Received: by mail-qt1-x841.google.com with SMTP id p12so5799229qtp.7
+        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 12:12:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rEEEXt1os4uvlr5FpRnmuBcc7L7msKpqjcsUXwjQF/c=;
+        b=DLnfeD9J1ORdQ1bfs5+3AntXSfjpW/03OlgMKpfMczcb0Yo31gAQmfKmU/MxwQ17Tz
+         p8ZagfXHFsC1dHS6FW5fSkhChMKNOPBoZuaf0P1ssilDHMYkmfYcvMK/N4bu0vQXK3wy
+         c2tGk1nId5n4tetbAX3T+IoXKixnSiRJU2P+RgF0i9/MzM9vLJQC4pR4SHkQIDhJjOCm
+         nI9uYdoL8DUDIOHzXzueS+XUGj/Xv/0E4OLEq6oqPKUHmkx/sfooqnKn5e06EiNpsCvu
+         pIeS4Ja9kfYHVEpTmDFGZ6rRJqSaQZ+CUMbWPT9DrPeXAPhB8c08+nN3zrd9Xy424Dsr
+         vK5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rEEEXt1os4uvlr5FpRnmuBcc7L7msKpqjcsUXwjQF/c=;
+        b=DWlZvNQh6CjlVmrMAi83qWqck3zIT03oJ2zetWdbG54UQwi7A2deLPJ4CL12Wsd3MM
+         08khId9+qPXpy69mRzG+D4xQnhqJD7AsljYUkm9vdLX0trXoplIvnDxCQUbibhm+aIuw
+         /UX3Mx7edsWKzNuXSwus/0/FzDtOgZ4LHK51JMPmuqyLz6gAwuQ8x5G/YtLAHFIubYVI
+         BI10QwOwBNsEtZKooBkNPe4VTy0R/pj30gR4QirNqXSBU/+NDcVmVsDIGvkZNaozFfSj
+         jq5yUkLc+OJskHLVJ8cgXNR15PbGTF+yn4yL+CsPcDARq8dlfJEq4IbkDiqNyvedTxbc
+         j1VQ==
+X-Gm-Message-State: AOAM531FBN0pkDPf0kfVlx6qVgt/cSeQqv99Dbqm9ETHBnEcPoaivwnh
+        QjvGdSRDta2Mo3T5u70CB5cgGk/Xw80d7/+KScvl4A==
+X-Google-Smtp-Source: ABdhPJyImQ0VMkgJ13gDdAbq5pEtNIjA5jffxfB/P+jRlJioL0jIF2z8jDtJ1zF31+FQiHcdLBXSWIzDRip6n19HrNg=
+X-Received: by 2002:ac8:4b79:: with SMTP id g25mr21823130qts.19.1604520747497;
+ Wed, 04 Nov 2020 12:12:27 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by BL0PR02CA0065.namprd02.prod.outlook.com (2603:10b6:207:3d::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend Transport; Wed, 4 Nov 2020 19:29:17 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kaOT6-00Gc7u-N1; Wed, 04 Nov 2020 15:29:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1604518162; bh=JdxZRNQhQlxGudrAcPA0I9RD12/9fB2ddJQAbN4pwhA=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType;
-        b=HdmRXl6JdBphMAbaFSoGIrKDLSjKvXeUzi6bCwTNDjrDtRdwNu6nFl3IcmiD81NFo
-         +aBiKdc9j+fzoj1ooeiaUIdNkw3UgqoQ1PwOriDo5XxcQiVsAC7XYBEUe6HhPOh4ZQ
-         F8UbKY5Vs2n5vJja/S0r6vOsxSfGbxdPr6qutr0Rg+fo/7P6/qf9L709VIMn5H5qWQ
-         VWkNGOTIe0/Qc/dtE6AvUuHHvdKi4wqxAoAZ4b4OP7zMKLWuZ5FVB/mUnssUgmAfvc
-         tqnQ5c8vRcMFRyFqyvscj07R53H2MkJnwSJUc+sSqs0QPvU3FlZaFFX8U+rX8Wb1yP
-         3qL2eSC3Z3lvA==
+References: <CAKMK7uF0QjesaNs97N-G8cZkXuAmFgcmTfHvoCP94br_WVcV6Q@mail.gmail.com>
+ <20201104165017.GA352206@bjorn-Precision-5520>
+In-Reply-To: <20201104165017.GA352206@bjorn-Precision-5520>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 4 Nov 2020 12:12:15 -0800
+Message-ID: <CAPcyv4idORJzHVD2vCOnO3REqWHKVn_-otOzTBf0HhcWq4iJRQ@mail.gmail.com>
+Subject: Re: [PATCH v5 11/15] PCI: Obey iomem restrictions for procfs mmap
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 03, 2020 at 08:14:29PM +0100, joro@8bytes.org wrote:
-> On Tue, Nov 03, 2020 at 01:48:51PM -0400, Jason Gunthorpe wrote:
-> > I think the same PCI driver with a small flag to support the PF or
-> > VF is not the same as two completely different drivers in different
-> > subsystems
-> 
-> There are counter-examples: ixgbe vs. ixgbevf.
+On Wed, Nov 4, 2020 at 8:50 AM Bjorn Helgaas <helgaas@kernel.org> wrote:
 >
-> Note that also a single driver can support both, an SVA device and an
-> mdev device, sharing code for accessing parts of the device like queues
-> and handling interrupts.
+> On Wed, Nov 04, 2020 at 09:44:04AM +0100, Daniel Vetter wrote:
+> > On Tue, Nov 3, 2020 at 11:09 PM Dan Williams <dan.j.williams@intel.com> wrote:
+> > > On Tue, Nov 3, 2020 at 1:28 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
+> > > > On Fri, Oct 30, 2020 at 11:08:11AM +0100, Daniel Vetter wrote:
+> > > > > There's three ways to access PCI BARs from userspace: /dev/mem, sysfs
+> > > > > files, and the old proc interface. Two check against
+> > > > > iomem_is_exclusive, proc never did. And with CONFIG_IO_STRICT_DEVMEM,
+> > > > > this starts to matter, since we don't want random userspace having
+> > > > > access to PCI BARs while a driver is loaded and using it.
+> > > > >
+> > > > > Fix this by adding the same iomem_is_exclusive() check we already have
+> > > > > on the sysfs side in pci_mmap_resource().
+> > > > >
+> > > > > References: 90a545e98126 ("restrict /dev/mem to idle io memory ranges")
+> > > > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > > >
+> > > > This is OK with me but it looks like IORESOURCE_EXCLUSIVE is currently
+> > > > only used in a few places:
+> > > >
+> > > >   e1000_probe() calls pci_request_selected_regions_exclusive(),
+> > > >   ne_pci_probe() calls pci_request_regions_exclusive(),
+> > > >   vmbus_allocate_mmio() calls request_mem_region_exclusive()
+> > > >
+> > > > which raises the question of whether it's worth keeping
+> > > > IORESOURCE_EXCLUSIVE at all.  I'm totally fine with removing it
+> > > > completely.
+> > >
+> > > Now that CONFIG_IO_STRICT_DEVMEM upgrades IORESOURCE_BUSY to
+> > > IORESOURCE_EXCLUSIVE semantics the latter has lost its meaning so I'd
+> > > be in favor of removing it as well.
+> >
+> > Still has some value since it enforces exclusive access even if the
+> > config isn't enabled, and iirc e1000 had some fun with userspace tools
+> > clobbering the firmware and bricking the chip.
+>
+> There's *some* value; I'm just skeptical since only three drivers use
+> it.
+>
+> IORESOURCE_EXCLUSIVE is from e8de1481fd71 ("resource: allow MMIO
+> exclusivity for device drivers"), and the commit message says this is
+> only active when CONFIG_STRICT_DEVMEM is set.  I didn't check to see
+> whether that's still true.
+>
+> That commit adds a bunch of wrappers and "__"-prefixed functions to
+> pass the IORESOURCE_EXCLUSIVE flag around.  That's a fair bit of
+> uglification for three drivers.
+>
+> > Another thing I kinda wondered, since pci maintainer is here: At least
+> > in drivers/gpu I see very few drivers explicitly requestion regions
+> > (this might be a historical artifact due to the shadow attach stuff
+> > before we had real modesetting drivers). And pci core doesn't do that
+> > either, even when a driver is bound. Is this intentional, or
+> > should/could we do better? Since drivers work happily without
+> > reserving regions I don't think "the drivers need to remember to do
+> > this" will ever really work out well.
+>
+> You're right, many drivers don't call pci_request_regions().  Maybe we
+> could do better, but I haven't looked into that recently.  There is a
+> related note in Documentation/PCI/pci.rst that's been there for a long
+> time (it refers to "pci_request_resources()", which has never existed
+> AFAICT).  I'm certainly open to proposals.
 
-Needing a mdev device at all is the larger issue, mdev means the
-kernel must carry a lot of emulation code depending on how the SVA
-device is designed. Eg creating queues may require an emulated BAR.
-
-Shifting that code to userspace and having a single clean 'SVA'
-interface from the kernel for the device makes a lot more sense,
-esepcially from a security perspective.
-
-Forcing all vIOMMU stuff to only use VFIO permanently closes this as
-an option.
-
-Jason
+It seems a bug that the kernel permits MMIO regions with side effects
+to be ioremap()'ed without request_mem_region() on the resource. I
+wonder how much log spam would happen if ioremap() reported whenever a
+non-IORESOURE_BUSY range was passed to it? The current state of
+affairs to trust *remap users to have claimed their remap target seems
+too ingrained to unwind now.
