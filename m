@@ -2,140 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 273782A648F
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 13:40:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 857522A64B0
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 13:52:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729827AbgKDMk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 07:40:27 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:17461 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729089AbgKDMk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Nov 2020 07:40:26 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5fa2a13d0002>; Wed, 04 Nov 2020 04:40:29 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 4 Nov
- 2020 12:40:22 +0000
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
- by HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Wed, 4 Nov 2020 12:40:22 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cmYAVJO2QrUxvwSNB19uV80Hi88BnFcjbTNHj0sLwe5IpaUJIg207TunnEz00GO/Lv9id6/cu08pPZH7WTE5vFnNGvRDoeMEw1J5ZgMRKOIkz9F8BAggDCDzXArq5b2kNvLW9Ihi00jrUdwrJsobhfoWPCHcRFH5DCmptZbzBUNineEp3pLpKnL0s0RN05+HHBPit4KbruW6G/11iIQZboNcl9s6HqtbEr9c1o+6V9aClv8fKZpYOwBkgOg5He0aT661WhWhrjRwRZdR4D8Bc393NTG90aIQrmP+1QH6HZaXflLwWEVMr72wMc5tMXMqR2VWT0cmkqwdaW9xhZZesA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ly2oeyLHt+9xgCf6InlNFupONQhHnN+seyBdY1snqFM=;
- b=odlSa3ap+GvgJ5VD0+NueY8IyQVMLmhW8cDIN+TvMnn6YiyxUEXw0uVwDyv0/6LC6kirk9yfbExq3n8kmIYsWfX4qf16/CQAh4cJmnGq/ohh+jfjlEhsemAOHlE1K16HPXyPQLnNMEuFNuEKPnVDqT+m0x+cWp8FILeNIC4sFngfoFKsNY5gkGUuOPes2GEDc5sLnfc6wy6o6Ljz5xjPGbSo/+yrU6LQ/SQ0wLfzH7ZRDUiQ76xbzd/nc6GdurQHy9cwBnMWRfn3BrS1G090nZIntiuLScaO6UdKW3W+2eT0Yj+pmQXsj6SeZDnbhtmIE9e/wZbVdQnIBLdM5Cu7gA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB2439.namprd12.prod.outlook.com (2603:10b6:4:b4::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Wed, 4 Nov
- 2020 12:40:19 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.032; Wed, 4 Nov 2020
- 12:40:19 +0000
-Date:   Wed, 4 Nov 2020 08:40:17 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "Jiang, Dave" <dave.jiang@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "jing.lin@intel.com" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-Message-ID: <20201104124017.GW2620339@nvidia.com>
-References: <20201030195159.GA589138@bjorn-Precision-5520>
- <71da5f66-e929-bab1-a1c6-a9ac9627a141@intel.com>
- <20201030224534.GN2620339@nvidia.com>
- <ec52cedf-3a99-5ca1-ffbb-d8f8c4f62395@intel.com>
- <20201102132158.GA3352700@nvidia.com>
- <MWHPR11MB1645675ED03E23674A705DF68C110@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20201103124351.GM2620339@nvidia.com>
- <MWHPR11MB164544C9CFCC3F162C1C6FC18CEF0@MWHPR11MB1645.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <MWHPR11MB164544C9CFCC3F162C1C6FC18CEF0@MWHPR11MB1645.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR22CA0003.namprd22.prod.outlook.com
- (2603:10b6:208:238::8) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1729918AbgKDMwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 07:52:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56680 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729883AbgKDMwn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 07:52:43 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A4CZHBq027519;
+        Wed, 4 Nov 2020 07:52:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MJ8JH3Lh2MoqiSZUwItPTOOt9VGV38gmyhUirsIf31k=;
+ b=SECxPRzbNfxFnIo9QsT5CnXrs7tdADKFodAjhRI3Tv9qUe46/diM+it2TJsLHEfjYz8B
+ OLaj7LFsUJql4V18QhvfBEMAQyTitnEMDRLhZxtCqO0xsI7EGEvZc7br9vJU/ESX0g1I
+ ksnVl4TIMWSc6jhCLsUBx1USlCC79llait2baY/VOZS1eLxbfLfrcEBMlDoz4Bq7r1Q1
+ R7ZkRI4meciVNgfJpFcaWUDjftaHc274VqXAIx1pvmQ3RxQ8N/ljphbJahcXOLZmgYcJ
+ Z4qxcgdOJ/LlOaDtVNMBATKTX7+fl7R3R9VgwuxZpv0yWaAdeQlOp2lWuRUi6VU3qJV7 qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34krkqgckn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Nov 2020 07:52:40 -0500
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A4Ck1Pf066012;
+        Wed, 4 Nov 2020 07:52:40 -0500
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34krkqgcjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Nov 2020 07:52:39 -0500
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A4CqZv3002830;
+        Wed, 4 Nov 2020 12:52:38 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 34jbytsand-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Nov 2020 12:52:38 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A4CqZH24391498
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 4 Nov 2020 12:52:35 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5DFF8A4053;
+        Wed,  4 Nov 2020 12:52:35 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9E53DA4040;
+        Wed,  4 Nov 2020 12:52:34 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.60.144])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  4 Nov 2020 12:52:34 +0000 (GMT)
+Date:   Wed, 4 Nov 2020 13:52:18 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v11 08/14] s390/vfio-ap: hot plug/unplug queues on
+ bind/unbind of queue device
+Message-ID: <20201104135218.666bf0f5.pasic@linux.ibm.com>
+In-Reply-To: <055284df-87d8-507a-d7d7-05a73459322d@linux.ibm.com>
+References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
+        <20201022171209.19494-9-akrowiak@linux.ibm.com>
+        <20201028145725.1a81c5cf.pasic@linux.ibm.com>
+        <055284df-87d8-507a-d7d7-05a73459322d@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR22CA0003.namprd22.prod.outlook.com (2603:10b6:208:238::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend Transport; Wed, 4 Nov 2020 12:40:18 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kaI5J-00GU44-LN; Wed, 04 Nov 2020 08:40:17 -0400
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1604493629; bh=ly2oeyLHt+9xgCf6InlNFupONQhHnN+seyBdY1snqFM=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
-        b=Fodb48BRizFtyLLl2nCM6FAknIzBy0v3MMHEJlFDmeQJ7Rtru0ycAtDwJX/1RS688
-         H3EQrsy4oQQtO9OPvoO230V97TPEYgWwHlr2PMnDcXCD6Z8XvsALcnuMh6hWKm1YgO
-         Wa/lad7AY3njLf81mp1fVFjaJ6BjucLUhowWxGAaxyZLJzVDj1QjlQTN65ZTQeYILP
-         JCZmC92zcdbMXDxpeZB6I6k/5SRBBSNtVX10O6lPLizqit+kMBx+NUtZYFzCwCkkXO
-         VFxuEOHN/l3lSa8SWiVsyzV9kO6V4X0blymDK65UmdUoPGKfTw5DelnufLrUfeV0na
-         CHmR8JyLD9/RA==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-04_08:2020-11-04,2020-11-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 adultscore=0 suspectscore=0 spamscore=0 mlxscore=0
+ phishscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011040094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 04, 2020 at 03:41:33AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Tuesday, November 3, 2020 8:44 PM
-> > 
-> > On Tue, Nov 03, 2020 at 02:49:27AM +0000, Tian, Kevin wrote:
-> > 
-> > > > There is a missing hypercall to allow the guest to do this on its own,
-> > > > presumably it will someday be fixed so IMS can work in guests.
-> > >
-> > > Hypercall is VMM specific, while IMS cap provides a VMM-agnostic
-> > > interface so any guest driver (if following the spec) can seamlessly
-> > > work on all hypervisors.
-> > 
-> > It is a *VMM* issue, not PCI. Adding a PCI cap to describe a VMM issue
-> > is architecturally wrong.
-> > 
-> > IMS *can not work* in any hypervsior without some special
-> > hypercall. Just block it in the platform code and forget about the PCI
-> > cap.
-> > 
+On Tue, 3 Nov 2020 17:49:21 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> >>   
+> >> +void vfio_ap_mdev_hot_unplug_queue(struct vfio_ap_queue *q)
+> >> +{
+> >> +	unsigned long apid = AP_QID_CARD(q->apqn);
+> >> +
+> >> +	if ((q->matrix_mdev == NULL) || !vfio_ap_mdev_has_crycb(q->matrix_mdev))
+> >> +		return;
+> >> +
+> >> +	/*
+> >> +	 * If the APID is assigned to the guest, then let's
+> >> +	 * go ahead and unplug the adapter since the
+> >> +	 * architecture does not provide a means to unplug
+> >> +	 * an individual queue.
+> >> +	 */
+> >> +	if (test_bit_inv(apid, q->matrix_mdev->shadow_apcb.apm)) {
+> >> +		clear_bit_inv(apid, q->matrix_mdev->shadow_apcb.apm);  
+> > Shouldn't we check aqm as well? I mean it may be clear at this point
+> > bacause of info->aqm. If the bit is clear, we don't have to remove
+> > the apm bit.  
 > 
-> It's per-device thing instead of platform thing. If the VMM understands
-> the IMS format of a specific device and virtualize it to the guest,
+> The rule we agreed upon is that if a queue is removed, we unplug
+> the card because we can't unplug an individual queue, so this code
+> is consistent with the stated rule.
 
-Please no! Adding device specific emulation is just going down deeper
-into this bad architecture.
+All I'm asking for is to verify that the queue is actually plugged. The
+queue is actually plugged iff 
+test_bit_inv(apid, q->matrix_mdev->shadow_apcb.apm) && test_bit_inv(apqi,
+q->matrix_mdev->shadow_apcb.aqm).
 
-Interrupts is a platform issue. Using emulation of MSI to dynamically
-insert vectors to a VM was a reasonable, but hacky thing. Now it needs
-proper platform support.
+There is no point in unplugging the whole card, if the queue removed is
+unplugged in the first place.
 
-Jason
+> Typically, a queue is unplugged
+> because the adapter has been deconfigured or is broken which means
+> that all queues for that adapter will be removed in succession. On the
+> other hand, that situation would be handled when the last queue is
+> removed if we check the AQM, so I'm not adverse to making that
+> check if you insist. 
+
+I don't agree. Let's detail your scenario. We have a nicely
+operating card which is as a whole passed trough to our guest. It
+goes broken, and the ap bus decides to deconstruct the queues.
+Already the first queue removed would unplug the the card, because
+both the apm and the aqm bits are set at this point. Subsequent removals
+then see that the apm bit is removed. Actually IMHO everything works
+like without the extra check on aqm (in this scenario).
+
+Would make reasoning about the code much easier to me, so sorry I do
+insist.
+
+> Of course, if the queue is manually unbound from
+> the vfio driver, what you are asking for makes sense I suppose. I'll have
+> to think about this one some more, but feel free to respond to this.
+
+I'm not sure the situation where the queues ->mdev_matrix pointer is set
+but the apqi is not in the shadow_apcb can actually happen (races not
+considered). But I'm sure the code is suggesting it can, because 
+vfio_ap_mdev_filter_guest_matrix() has a third parameter called filter_apid,
+which governs whether the apm or the aqm bit should be removed. And
+vfio_ap_mdev_filter_guest_matrix() does get called with filter_apid=false in
+assign_domain_store() and I don't see subsequent unlink operations that would
+severe q->mdev_matrix.
+
+Another case where the aqm may get filtered in
+vfio_ap_mdev_filter_guest_matrix() is the info->aqm bit not set, as I've
+mentioned in my previous mail. If that can not happen, we should turn
+that into an assert.
+
+Actually if you are convinced that apqi bit is always set in the
+q->matrix_mdev->shadow_apcb.aqm, I would agree to turning that into an
+assertion instead of condition. Then if not completely convinced, I
+could at least try to trigger the assert :).
+
+Regards,
+Halil
