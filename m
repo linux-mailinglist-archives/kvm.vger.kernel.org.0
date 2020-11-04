@@ -2,143 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8C262A6E90
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 21:12:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B1892A6F4F
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 22:00:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731390AbgKDUM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 15:12:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43156 "EHLO
+        id S1731103AbgKDVAL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 16:00:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730515AbgKDUM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Nov 2020 15:12:29 -0500
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C53C061A4A
-        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 12:12:28 -0800 (PST)
-Received: by mail-qt1-x841.google.com with SMTP id p12so5799229qtp.7
-        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 12:12:28 -0800 (PST)
+        with ESMTP id S1726969AbgKDVAL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Nov 2020 16:00:11 -0500
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11846C0613D3
+        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 13:00:09 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id p5so31814879ejj.2
+        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 13:00:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rEEEXt1os4uvlr5FpRnmuBcc7L7msKpqjcsUXwjQF/c=;
-        b=DLnfeD9J1ORdQ1bfs5+3AntXSfjpW/03OlgMKpfMczcb0Yo31gAQmfKmU/MxwQ17Tz
-         p8ZagfXHFsC1dHS6FW5fSkhChMKNOPBoZuaf0P1ssilDHMYkmfYcvMK/N4bu0vQXK3wy
-         c2tGk1nId5n4tetbAX3T+IoXKixnSiRJU2P+RgF0i9/MzM9vLJQC4pR4SHkQIDhJjOCm
-         nI9uYdoL8DUDIOHzXzueS+XUGj/Xv/0E4OLEq6oqPKUHmkx/sfooqnKn5e06EiNpsCvu
-         pIeS4Ja9kfYHVEpTmDFGZ6rRJqSaQZ+CUMbWPT9DrPeXAPhB8c08+nN3zrd9Xy424Dsr
-         vK5Q==
+        bh=E4WjwvX76hWxO/jjnNrz+gLq3En9lQGeWplxRyxXQHg=;
+        b=j/1V9bssxmEIreRGcTEqx+rkllCy0rb8iB/heFAS6Kx3kHYt/HjNn06hQ3gTiUZeO6
+         OKFsujIpjX5Qo391FcbJBHDvVxnpp4oAU+Vhq+iLeLg4wu77loaiVvYYFgz63D+me5ZI
+         lL3JwsImAVvnw20KMqZO6fxf5DpJEScEJ/edT4RoYCVAJ0WPf5OS+6dadl28Pp0/O+DV
+         KicnqQg/bENuJ0y537NtKFL421LKSSW4t0ZVBqhULvmBJ9Cjkv6BQaVVKfWKAA2c89Op
+         b5b/4eJjxFs8YB4GUSIM98Js1jp3A5Q/YUy4RqQA5gMrIHQ+lWnmCJVLTv2Lf/qKHYfn
+         XaZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rEEEXt1os4uvlr5FpRnmuBcc7L7msKpqjcsUXwjQF/c=;
-        b=DWlZvNQh6CjlVmrMAi83qWqck3zIT03oJ2zetWdbG54UQwi7A2deLPJ4CL12Wsd3MM
-         08khId9+qPXpy69mRzG+D4xQnhqJD7AsljYUkm9vdLX0trXoplIvnDxCQUbibhm+aIuw
-         /UX3Mx7edsWKzNuXSwus/0/FzDtOgZ4LHK51JMPmuqyLz6gAwuQ8x5G/YtLAHFIubYVI
-         BI10QwOwBNsEtZKooBkNPe4VTy0R/pj30gR4QirNqXSBU/+NDcVmVsDIGvkZNaozFfSj
-         jq5yUkLc+OJskHLVJ8cgXNR15PbGTF+yn4yL+CsPcDARq8dlfJEq4IbkDiqNyvedTxbc
-         j1VQ==
-X-Gm-Message-State: AOAM531FBN0pkDPf0kfVlx6qVgt/cSeQqv99Dbqm9ETHBnEcPoaivwnh
-        QjvGdSRDta2Mo3T5u70CB5cgGk/Xw80d7/+KScvl4A==
-X-Google-Smtp-Source: ABdhPJyImQ0VMkgJ13gDdAbq5pEtNIjA5jffxfB/P+jRlJioL0jIF2z8jDtJ1zF31+FQiHcdLBXSWIzDRip6n19HrNg=
-X-Received: by 2002:ac8:4b79:: with SMTP id g25mr21823130qts.19.1604520747497;
- Wed, 04 Nov 2020 12:12:27 -0800 (PST)
+        bh=E4WjwvX76hWxO/jjnNrz+gLq3En9lQGeWplxRyxXQHg=;
+        b=E9bny9VvvDyPDuiXKAmtxnbFhmhOfgDfNbBKHDY+SQ6DlkhtQBd6F9xlqFFKn5dQnB
+         X41tBQI/Wr/Zxc5CThDUxMnDtF60gMOommFjvu2w8FFEKOG5LEnyXMO8u8G1UbJVBgZu
+         gy1f8VwD/MSyw68H0zUaD53ZpA4VDBsBlrZyOJkGeRdukaiV7rQ/GJEOoIrlPXdbuhbM
+         AYg9dyiJfdyWk2dkVxK9zLLMw5xSjSBGj3/xEN1l1RV2Nohu8HgGr3MIJR/crl7GI6h4
+         mpGNGLq7Etg1WAdNDlY3EZL2I+qu2JY2vInrRMS2CcRBzhtviVqQHQrttdV0la21v5/O
+         WGzQ==
+X-Gm-Message-State: AOAM53082hzTYBfEYAoG7U6AKrr3pEfiuP6PU/fVLk2pDHUeHVkh9vZ0
+        cvkOiPQBm5ebdiJTkNVlhWTZodj0diUnCYMx6BgilA==
+X-Google-Smtp-Source: ABdhPJzTp3ZvGYQkhhsdlGrNNSN9lhK9dRQ4wLobyY1Aeai2n/vmogGkkpRzAx2U+4v/8JmtF2QZ9zlKDATyYySlwnM=
+X-Received: by 2002:a17:906:af8c:: with SMTP id mj12mr25926268ejb.85.1604523607720;
+ Wed, 04 Nov 2020 13:00:07 -0800 (PST)
 MIME-Version: 1.0
-References: <CAKMK7uF0QjesaNs97N-G8cZkXuAmFgcmTfHvoCP94br_WVcV6Q@mail.gmail.com>
- <20201104165017.GA352206@bjorn-Precision-5520>
-In-Reply-To: <20201104165017.GA352206@bjorn-Precision-5520>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Wed, 4 Nov 2020 12:12:15 -0800
-Message-ID: <CAPcyv4idORJzHVD2vCOnO3REqWHKVn_-otOzTBf0HhcWq4iJRQ@mail.gmail.com>
-Subject: Re: [PATCH v5 11/15] PCI: Obey iomem restrictions for procfs mmap
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
-        Linux PCI <linux-pci@vger.kernel.org>
+References: <20201104151828.405824-1-stefanha@redhat.com>
+In-Reply-To: <20201104151828.405824-1-stefanha@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Wed, 4 Nov 2020 20:59:56 +0000
+Message-ID: <CAFEAcA_fer-r6tJLRgQwQ+X1bAe0ODSA5UNWxZbSCtS1VHDO9A@mail.gmail.com>
+Subject: Re: [PULL 00/33] Block patches
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Eric Blake <eblake@redhat.com>, Fam Zheng <fam@euphon.net>,
+        Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>,
+        Qemu-block <qemu-block@nongnu.org>,
+        Kevin Wolf <kwolf@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Klaus Jensen <its@irrelevant.dk>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 4, 2020 at 8:50 AM Bjorn Helgaas <helgaas@kernel.org> wrote:
+On Wed, 4 Nov 2020 at 15:18, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> On Wed, Nov 04, 2020 at 09:44:04AM +0100, Daniel Vetter wrote:
-> > On Tue, Nov 3, 2020 at 11:09 PM Dan Williams <dan.j.williams@intel.com> wrote:
-> > > On Tue, Nov 3, 2020 at 1:28 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> > > > On Fri, Oct 30, 2020 at 11:08:11AM +0100, Daniel Vetter wrote:
-> > > > > There's three ways to access PCI BARs from userspace: /dev/mem, sysfs
-> > > > > files, and the old proc interface. Two check against
-> > > > > iomem_is_exclusive, proc never did. And with CONFIG_IO_STRICT_DEVMEM,
-> > > > > this starts to matter, since we don't want random userspace having
-> > > > > access to PCI BARs while a driver is loaded and using it.
-> > > > >
-> > > > > Fix this by adding the same iomem_is_exclusive() check we already have
-> > > > > on the sysfs side in pci_mmap_resource().
-> > > > >
-> > > > > References: 90a545e98126 ("restrict /dev/mem to idle io memory ranges")
-> > > > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> > > >
-> > > > This is OK with me but it looks like IORESOURCE_EXCLUSIVE is currently
-> > > > only used in a few places:
-> > > >
-> > > >   e1000_probe() calls pci_request_selected_regions_exclusive(),
-> > > >   ne_pci_probe() calls pci_request_regions_exclusive(),
-> > > >   vmbus_allocate_mmio() calls request_mem_region_exclusive()
-> > > >
-> > > > which raises the question of whether it's worth keeping
-> > > > IORESOURCE_EXCLUSIVE at all.  I'm totally fine with removing it
-> > > > completely.
-> > >
-> > > Now that CONFIG_IO_STRICT_DEVMEM upgrades IORESOURCE_BUSY to
-> > > IORESOURCE_EXCLUSIVE semantics the latter has lost its meaning so I'd
-> > > be in favor of removing it as well.
-> >
-> > Still has some value since it enforces exclusive access even if the
-> > config isn't enabled, and iirc e1000 had some fun with userspace tools
-> > clobbering the firmware and bricking the chip.
+> The following changes since commit 8507c9d5c9a62de2a0e281b640f995e26eac46af:
 >
-> There's *some* value; I'm just skeptical since only three drivers use
-> it.
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2020-11-03 15:59:44 +0000)
 >
-> IORESOURCE_EXCLUSIVE is from e8de1481fd71 ("resource: allow MMIO
-> exclusivity for device drivers"), and the commit message says this is
-> only active when CONFIG_STRICT_DEVMEM is set.  I didn't check to see
-> whether that's still true.
+> are available in the Git repository at:
 >
-> That commit adds a bunch of wrappers and "__"-prefixed functions to
-> pass the IORESOURCE_EXCLUSIVE flag around.  That's a fair bit of
-> uglification for three drivers.
+>   https://gitlab.com/stefanha/qemu.git tags/block-pull-request
 >
-> > Another thing I kinda wondered, since pci maintainer is here: At least
-> > in drivers/gpu I see very few drivers explicitly requestion regions
-> > (this might be a historical artifact due to the shadow attach stuff
-> > before we had real modesetting drivers). And pci core doesn't do that
-> > either, even when a driver is bound. Is this intentional, or
-> > should/could we do better? Since drivers work happily without
-> > reserving regions I don't think "the drivers need to remember to do
-> > this" will ever really work out well.
+> for you to fetch changes up to fc107d86840b3364e922c26cf7631b7fd38ce523:
 >
-> You're right, many drivers don't call pci_request_regions().  Maybe we
-> could do better, but I haven't looked into that recently.  There is a
-> related note in Documentation/PCI/pci.rst that's been there for a long
-> time (it refers to "pci_request_resources()", which has never existed
-> AFAICT).  I'm certainly open to proposals.
+>   util/vfio-helpers: Assert offset is aligned to page size (2020-11-03 19:06:23 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request for 5.2
+>
+> NVMe fixes to solve IOMMU issues on non-x86 and error message/tracing
+> improvements. Elena Afanasova's ioeventfd fixes are also included.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>
 
-It seems a bug that the kernel permits MMIO regions with side effects
-to be ioremap()'ed without request_mem_region() on the resource. I
-wonder how much log spam would happen if ioremap() reported whenever a
-non-IORESOURE_BUSY range was passed to it? The current state of
-affairs to trust *remap users to have claimed their remap target seems
-too ingrained to unwind now.
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
