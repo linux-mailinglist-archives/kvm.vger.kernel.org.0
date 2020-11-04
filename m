@@ -2,113 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E35392A6A91
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 17:51:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 892502A6B4D
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 18:02:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731872AbgKDQvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 11:51:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47120 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731683AbgKDQuU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Nov 2020 11:50:20 -0500
-Received: from localhost (230.sub-72-107-127.myvzw.com [72.107.127.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 01712206CA;
-        Wed,  4 Nov 2020 16:50:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604508619;
-        bh=KzXcQsv6oXQiPT6pQbTFR35Ks2A09AmGg4NdOMxDZU4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=C3pX6cmo6q8mwyEj5GO30o1K3DmrMhjsd197OHFiySwAIRZVIm3gcmWDrE+eCPQYz
-         sPh4rcY/+zTADvqe8t10fQKgN6B/uva7r/Rm33jjbBhTlqD9gCI3SGCFFhZSFec0de
-         QvdkQtLCYpZ8r9E77lkRpGYf+6s0+xBDMYsFK0NQ=
-Date:   Wed, 4 Nov 2020 10:50:17 -0600
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
-        Linux PCI <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH v5 11/15] PCI: Obey iomem restrictions for procfs mmap
-Message-ID: <20201104165017.GA352206@bjorn-Precision-5520>
+        id S1731668AbgKDRB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 12:01:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41760 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731553AbgKDRB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Nov 2020 12:01:59 -0500
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C5CC061A4A
+        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 09:01:59 -0800 (PST)
+Received: by mail-io1-xd44.google.com with SMTP id r9so22902853ioo.7
+        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 09:01:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lKt/7khf/p0FBH94EgBjgYowDupQdP5eOw+aVFWnIE4=;
+        b=Qif5C86YMdm2wITkiOw1A3DHnWkrj5BznSur9w6S9h05s4uEH0tpfJfwkirw+OCsIa
+         5ZUWAUw2Xr0Y+yBcfMul3p6BrzjIdeyVKYTObdOQpXyGA8Jc0onI0PLPZPkY5rWtjuiX
+         KwvEwFnF1QCroLya8QNYKLFqbYxlf+Oxcuhsj/2kUx3aX6FlLQP70+THTejWseON5vTZ
+         ZBsnYJ71IQEmS3ODRZggk7Qxw4OUAzqErw5JjwSmPxCbg1lvm9Mw5zPS9hKeCh8j+tNk
+         3UZEnuPFiAywWXQTW9+s4q/6AGurkFrhGK7OBOjl186bChjLK2Wf5LPfStOaQNQY70ht
+         MXEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lKt/7khf/p0FBH94EgBjgYowDupQdP5eOw+aVFWnIE4=;
+        b=coUuIuFy4RqPlboc/HGxbjnaCAX7aozBqfkKCkaCpx1U6NNnj4eqVAD32AFGqDe3Lh
+         nfrxmpA9nOElzhxliCARe7bjrL3rQU47BH+mr51GlCHojeyAmAfpEj09h0VAocXRK72R
+         5NrfmbAWQOt5dUIMEf2qd0HTtaPgtKvH81BNh+SxXVk66sMmTSsBrfEEjhbtR5SWyTF6
+         R0UUi7LaZUPGBrhIVtxzSNHFZUqvC2z82Dnhh76LLugQQkTAOl7aZagvy6qbpafEJUhs
+         k9PVzpOj8TWpmXTSQOFm12K5YYFhgPDHo6+PgOfBfuLwCfTdd0LE0IYKMuEk6sBNOpj9
+         GbjA==
+X-Gm-Message-State: AOAM532bYuo/XFgpmiLhpyOd+8MqxvP+vc+1OWWB0haiyZMKUtkDe0jk
+        eBm9zUnVkdV8M5VOOYWK7hSX6DQqJI4GN6X6xMrxTA==
+X-Google-Smtp-Source: ABdhPJzL1QewBuecQ3Wuja+O1RDK1wskv/Oq/mAWRQpKntRVQ3pfff2m+nGSvCw8+CkfpP3zR3jF0Ttk0JEAXEi4DgY=
+X-Received: by 2002:a6b:e012:: with SMTP id z18mr14242690iog.157.1604509318295;
+ Wed, 04 Nov 2020 09:01:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKMK7uF0QjesaNs97N-G8cZkXuAmFgcmTfHvoCP94br_WVcV6Q@mail.gmail.com>
+References: <20201103234952.1626730-1-bgardon@google.com> <20201103234952.1626730-3-bgardon@google.com>
+ <20201104121631.wvodsw7agsrdhje4@kamzik.brq.redhat.com> <20201104150017.GN20600@xz-x1>
+ <20201104152823.qxdlbygza7ykn5x2@kamzik.brq.redhat.com>
+In-Reply-To: <20201104152823.qxdlbygza7ykn5x2@kamzik.brq.redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 4 Nov 2020 09:01:47 -0800
+Message-ID: <CANgfPd9RPiyX9BeYpWLHGyqfO83uWZKKynfP4vkbvSbzBK9syg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/5] KVM: selftests: Factor code out of demand_paging_test
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Peter Feiner <pfeiner@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 04, 2020 at 09:44:04AM +0100, Daniel Vetter wrote:
-> On Tue, Nov 3, 2020 at 11:09 PM Dan Williams <dan.j.williams@intel.com> wrote:
-> > On Tue, Nov 3, 2020 at 1:28 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> > > On Fri, Oct 30, 2020 at 11:08:11AM +0100, Daniel Vetter wrote:
-> > > > There's three ways to access PCI BARs from userspace: /dev/mem, sysfs
-> > > > files, and the old proc interface. Two check against
-> > > > iomem_is_exclusive, proc never did. And with CONFIG_IO_STRICT_DEVMEM,
-> > > > this starts to matter, since we don't want random userspace having
-> > > > access to PCI BARs while a driver is loaded and using it.
-> > > >
-> > > > Fix this by adding the same iomem_is_exclusive() check we already have
-> > > > on the sysfs side in pci_mmap_resource().
-> > > >
-> > > > References: 90a545e98126 ("restrict /dev/mem to idle io memory ranges")
-> > > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> > >
-> > > This is OK with me but it looks like IORESOURCE_EXCLUSIVE is currently
-> > > only used in a few places:
-> > >
-> > >   e1000_probe() calls pci_request_selected_regions_exclusive(),
-> > >   ne_pci_probe() calls pci_request_regions_exclusive(),
-> > >   vmbus_allocate_mmio() calls request_mem_region_exclusive()
-> > >
-> > > which raises the question of whether it's worth keeping
-> > > IORESOURCE_EXCLUSIVE at all.  I'm totally fine with removing it
-> > > completely.
+On Wed, Nov 4, 2020 at 7:28 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Wed, Nov 04, 2020 at 10:00:17AM -0500, Peter Xu wrote:
+> > On Wed, Nov 04, 2020 at 01:16:31PM +0100, Andrew Jones wrote:
+> > > If you don't mind I'd like to try and cleanup / generalize / refactor
+> > > demand_paging_test.c and dirty_log_test.c with a few patches first for
+> > > you to base this work on. I can probably get something posted today
+> > > or tomorrow.
 > >
-> > Now that CONFIG_IO_STRICT_DEVMEM upgrades IORESOURCE_BUSY to
-> > IORESOURCE_EXCLUSIVE semantics the latter has lost its meaning so I'd
-> > be in favor of removing it as well.
-> 
-> Still has some value since it enforces exclusive access even if the
-> config isn't enabled, and iirc e1000 had some fun with userspace tools
-> clobbering the firmware and bricking the chip.
+> > Drew,
+> >
+> > Would you consider picking up the two patches below in the dirty ring series if
+> > you plan to rework the dirty log tests?  I got your r-b so I am making bold to
+> > think I'm ok to ask this; I just want to avoid another potential conflict
+> > within the series.
+>
+> Sure, no problem.
+>
+> I'll go ahead and get that cleanup / refactor series out.
 
-There's *some* value; I'm just skeptical since only three drivers use
-it.
+Thanks Drew! I agree this will all be a lot cleaner when refactored
+for multi-vcpu tests generally.
 
-IORESOURCE_EXCLUSIVE is from e8de1481fd71 ("resource: allow MMIO
-exclusivity for device drivers"), and the commit message says this is
-only active when CONFIG_STRICT_DEVMEM is set.  I didn't check to see
-whether that's still true.
-
-That commit adds a bunch of wrappers and "__"-prefixed functions to
-pass the IORESOURCE_EXCLUSIVE flag around.  That's a fair bit of
-uglification for three drivers.
-
-> Another thing I kinda wondered, since pci maintainer is here: At least
-> in drivers/gpu I see very few drivers explicitly requestion regions
-> (this might be a historical artifact due to the shadow attach stuff
-> before we had real modesetting drivers). And pci core doesn't do that
-> either, even when a driver is bound. Is this intentional, or
-> should/could we do better? Since drivers work happily without
-> reserving regions I don't think "the drivers need to remember to do
-> this" will ever really work out well.
-
-You're right, many drivers don't call pci_request_regions().  Maybe we
-could do better, but I haven't looked into that recently.  There is a
-related note in Documentation/PCI/pci.rst that's been there for a long
-time (it refers to "pci_request_resources()", which has never existed
-AFAICT).  I'm certainly open to proposals.
+>
+> Thanks,
+> drew
+>
+> >
+> > Thanks!
+> >
+> > [1] https://lore.kernel.org/kvm/20201023183358.50607-11-peterx@redhat.com/
+> > [2] https://lore.kernel.org/kvm/20201023183358.50607-12-peterx@redhat.com/
+> >
+> > --
+> > Peter Xu
+> >
+>
