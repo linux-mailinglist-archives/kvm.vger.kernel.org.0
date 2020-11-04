@@ -2,117 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B19C32A5FC9
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 09:44:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 915442A608F
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 10:33:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726564AbgKDIoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 03:44:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47700 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725812AbgKDIoS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Nov 2020 03:44:18 -0500
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB586C0401C1
-        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 00:44:15 -0800 (PST)
-Received: by mail-oi1-x241.google.com with SMTP id t16so4045286oie.11
-        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 00:44:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ycqoIkcF9lPtiJBVMgjq7zwCX8Gyu6JCtVXT12jKTV8=;
-        b=SO6a9eIH6r+EzFThZ6MTARjwHEtx6LFHOpOvFgwKmnw7LjZXHcgycyhZfUmdSwXoni
-         9VPCbgc6ODqmZSPJVN4eXwn3IqpRr3uXKNjrMKGfBOBHLutZLHhso+mS3OiPqxM7Q6/l
-         K5a5NNqZWoxju2yJSN+OURI61y0XID3dk0Roo=
+        id S1728218AbgKDJdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 04:33:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43664 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726564AbgKDJdp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Nov 2020 04:33:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604482423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S67mblvp8BDDbDS1GLfHleJupRJCu9AfMSH9PH8i7Jg=;
+        b=Gybab4cNh+GmsIr7HARA67O3RgU5pgb4coY7m5TxZbFL154G8Vz1ZPx8WI1nGQz4pbTMim
+        jXNgR0wNR8S7GoVZ9o+fley2r1I0Lf57CkIabc3gLr3ZUDr0kZyz0t6n5E79FBLu87hTHK
+        yPiB1FzbtASO4TT83FzFlT1uXbHNjq8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-JLDZ8eU-Mf2X0MuoN646Wg-1; Wed, 04 Nov 2020 04:33:42 -0500
+X-MC-Unique: JLDZ8eU-Mf2X0MuoN646Wg-1
+Received: by mail-wm1-f72.google.com with SMTP id o81so451207wma.0
+        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 01:33:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ycqoIkcF9lPtiJBVMgjq7zwCX8Gyu6JCtVXT12jKTV8=;
-        b=ewJeitFBpUpy4+ObkDP9s9/ExTEi0rXH/OstUj3n2BdLv6j8NmeAltVl2fTnzm8nGo
-         dSa2zpihEuwfmC3AEiJmwTpw9rMGejv/4pj+PABQafb5xOgdt0EwAdYFfKq1JUQ6JhfJ
-         iJD3D9EDjYTuGQCW6y3Qfql//c3WCo1nUFGJyGnwwW77h69iptc3AYxzN9rJ3TZrw08e
-         TMXGEiJ9xzX86tQQkrqNObhR81Hn3LjSjUuYD25Ubq/9giTP4lxToPUTaajd/1naT+Wm
-         RYgpi4SrxEczjKiSviXYetPI6rgOG3JH6Cozja5R+0ejlm6R9dNc584xoKY4F3Cp+bqt
-         N7Rw==
-X-Gm-Message-State: AOAM532Bg20eeQIFO2oPKm83pqhQeW/YEPJCsFfT6TxICgPgS2kB5KMm
-        B4tUEfx2HI0xvygDXqebN9bhqHpNZCTGK8bdLw7/TA==
-X-Google-Smtp-Source: ABdhPJzFeuCQlV5NJZ+3HUxdvXgtCAFGX/0rEF7qnn1uI6qUI3Z5/MsHqFAcH2CxUPAQE20CBPAAF7SeJ5phPHzYaRc=
-X-Received: by 2002:aca:b141:: with SMTP id a62mr1813813oif.101.1604479455139;
- Wed, 04 Nov 2020 00:44:15 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=S67mblvp8BDDbDS1GLfHleJupRJCu9AfMSH9PH8i7Jg=;
+        b=Gz9ILOs/xsC+KRw2AOqI9FIDSffpIl7rFLx8ZFeL2I9Wh4JaCWsySqJztfWdI5cmKh
+         +H842FZ1KFO2EsVGugG+SAqjy+eQuxVsUfv23sh26XWQ68Fpogn/Q/rw4e1BOfps+NZW
+         1evaJkRURX0vZQgZHRvb5IHH/NUJMBpUlIX4Km81qbJxeH9igpV2V+7dn3RJdTavYobk
+         mTaQ+en9fufQOsE7U+R6K41NQnyphEyMWN52yt9p3uTKGPKv48xYoqCaUWNnV6yR3GpL
+         CRvCmYqF9xG/LBBnAUjPePfUIouySHR/yYDXaNqrtWTXhh84FgN012YBrCn+4sCDUm2J
+         Gaxg==
+X-Gm-Message-State: AOAM532sq9QOl3yrGabnXZh4VIOVErE5nWvSN1y2iS9qzJsXaGBTkOL4
+        XK4PHjJ+ltAifvIYVJr68ZaUVJhcfIiEkOEG/+W3KuydyP0anrggDiXRPCnOUz73tyDUgmuGmYX
+        kFasYhbqd6Uew
+X-Received: by 2002:adf:9b95:: with SMTP id d21mr5997460wrc.335.1604482420757;
+        Wed, 04 Nov 2020 01:33:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxLnqhRSqhTc7S9kSWg6N6gWOKIWH0uIfnUrQUkHUqik23WMt5c8lft5ls5BYqlcfZ+saqWZQ==
+X-Received: by 2002:adf:9b95:: with SMTP id d21mr5997433wrc.335.1604482420530;
+        Wed, 04 Nov 2020 01:33:40 -0800 (PST)
+Received: from steredhat (host-79-22-200-33.retail.telecomitalia.it. [79.22.200.33])
+        by smtp.gmail.com with ESMTPSA id q2sm1690836wrw.40.2020.11.04.01.33.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2020 01:33:39 -0800 (PST)
+Date:   Wed, 4 Nov 2020 10:33:37 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
+        netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost/vsock: add IOTLB API support
+Message-ID: <20201104093337.ge3qtlfhkjjkx4ax@steredhat>
+References: <20201029174351.134173-1-sgarzare@redhat.com>
+ <751cc074-ae68-72c8-71de-a42458058761@redhat.com>
+ <20201030105422.ju2aj2bmwsckdufh@steredhat>
+ <278f4732-e561-2b4f-03ee-b26455760b01@redhat.com>
+ <20201102171104.eiovmkj23fle5ioj@steredhat>
+ <8648a2e3-1052-3b5b-11ce-87628ac8dd33@redhat.com>
+ <20201103194613.GK20600@xz-x1>
 MIME-Version: 1.0
-References: <20201030100815.2269-12-daniel.vetter@ffwll.ch>
- <20201103212840.GA266427@bjorn-Precision-5520> <CAPcyv4jCGxWG0opLv4VzBRk5iLwu6CRse4DwF-otWkfXoGWe6A@mail.gmail.com>
-In-Reply-To: <CAPcyv4jCGxWG0opLv4VzBRk5iLwu6CRse4DwF-otWkfXoGWe6A@mail.gmail.com>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Wed, 4 Nov 2020 09:44:04 +0100
-Message-ID: <CAKMK7uF0QjesaNs97N-G8cZkXuAmFgcmTfHvoCP94br_WVcV6Q@mail.gmail.com>
-Subject: Re: [PATCH v5 11/15] PCI: Obey iomem restrictions for procfs mmap
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
-        Linux PCI <linux-pci@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201103194613.GK20600@xz-x1>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 3, 2020 at 11:09 PM Dan Williams <dan.j.williams@intel.com> wrote:
-> On Tue, Nov 3, 2020 at 1:28 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> > On Fri, Oct 30, 2020 at 11:08:11AM +0100, Daniel Vetter wrote:
-> > > There's three ways to access PCI BARs from userspace: /dev/mem, sysfs
-> > > files, and the old proc interface. Two check against
-> > > iomem_is_exclusive, proc never did. And with CONFIG_IO_STRICT_DEVMEM,
-> > > this starts to matter, since we don't want random userspace having
-> > > access to PCI BARs while a driver is loaded and using it.
-> > >
-> > > Fix this by adding the same iomem_is_exclusive() check we already have
-> > > on the sysfs side in pci_mmap_resource().
-> > >
-> > > References: 90a545e98126 ("restrict /dev/mem to idle io memory ranges")
-> > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> >
-> > This is OK with me but it looks like IORESOURCE_EXCLUSIVE is currently
-> > only used in a few places:
-> >
-> >   e1000_probe() calls pci_request_selected_regions_exclusive(),
-> >   ne_pci_probe() calls pci_request_regions_exclusive(),
-> >   vmbus_allocate_mmio() calls request_mem_region_exclusive()
-> >
-> > which raises the question of whether it's worth keeping
-> > IORESOURCE_EXCLUSIVE at all.  I'm totally fine with removing it
-> > completely.
+On Tue, Nov 03, 2020 at 02:46:13PM -0500, Peter Xu wrote:
+>On Tue, Nov 03, 2020 at 05:04:23PM +0800, Jason Wang wrote:
+>>
+>> On 2020/11/3 上午1:11, Stefano Garzarella wrote:
+>> > On Fri, Oct 30, 2020 at 07:44:43PM +0800, Jason Wang wrote:
+>> > >
+>> > > On 2020/10/30 下午6:54, Stefano Garzarella wrote:
+>> > > > On Fri, Oct 30, 2020 at 06:02:18PM +0800, Jason Wang wrote:
+>> > > > >
+>> > > > > On 2020/10/30 上午1:43, Stefano Garzarella wrote:
+>> > > > > > This patch enables the IOTLB API support for vhost-vsock devices,
+>> > > > > > allowing the userspace to emulate an IOMMU for the guest.
+>> > > > > >
+>> > > > > > These changes were made following vhost-net, in details this patch:
+>> > > > > > - exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
+>> > > > > >   device if the feature is acked
+>> > > > > > - implements VHOST_GET_BACKEND_FEATURES and
+>> > > > > >   VHOST_SET_BACKEND_FEATURES ioctls
+>> > > > > > - calls vq_meta_prefetch() before vq processing to prefetch vq
+>> > > > > >   metadata address in IOTLB
+>> > > > > > - provides .read_iter, .write_iter, and .poll callbacks for the
+>> > > > > >   chardev; they are used by the userspace to exchange IOTLB messages
+>> > > > > >
+>> > > > > > This patch was tested with QEMU and a patch applied [1] to fix a
+>> > > > > > simple issue:
+>> > > > > >     $ qemu -M q35,accel=kvm,kernel-irqchip=split \
+>> > > > > >            -drive file=fedora.qcow2,format=qcow2,if=virtio \
+>> > > > > >            -device intel-iommu,intremap=on \
+>> > > > > >            -device vhost-vsock-pci,guest-cid=3,iommu_platform=on
+>> > > > >
+>> > > > >
+>> > > > > Patch looks good, but a question:
+>> > > > >
+>> > > > > It looks to me you don't enable ATS which means vhost won't
+>> > > > > get any invalidation request or did I miss anything?
+>> > > > >
+>> > > >
+>> > > > You're right, I didn't see invalidation requests, only miss and
+>> > > > updates.
+>> > > > Now I have tried to enable 'ats' and 'device-iotlb' but I still
+>> > > > don't see any invalidation.
+>> > > >
+>> > > > How can I test it? (Sorry but I don't have much experience yet
+>> > > > with vIOMMU)
+>> > >
+>> > >
+>> > > I guess it's because the batched unmap. Maybe you can try to use
+>> > > "intel_iommu=strict" in guest kernel command line to see if it
+>> > > works.
+>> > >
+>> > > Btw, make sure the qemu contains the patch [1]. Otherwise ATS won't
+>> > > be enabled for recent Linux Kernel in the guest.
+>> >
+>> > The problem was my kernel, it was built with a tiny configuration.
+>> > Using fedora stock kernel I can see the 'invalidate' requests, but I
+>> > also had the following issues.
+>> >
+>> > Do they make you ring any bells?
+>> >
+>> > $ ./qemu -m 4G -smp 4 -M q35,accel=kvm,kernel-irqchip=split \
+>> >     -drive file=fedora.qcow2,format=qcow2,if=virtio \
+>> >     -device intel-iommu,intremap=on,device-iotlb=on \
+>> >     -device vhost-vsock-pci,guest-cid=6,iommu_platform=on,ats=on,id=v1
+>> >
+>> >     qemu-system-x86_64: vtd_iova_to_slpte: detected IOVA overflow    
+>> > (iova=0x1d40000030c0)
+>>
+>>
+>> It's a hint that IOVA exceeds the AW. It might be worth to check whether the
+>> missed IOVA reported from IOTLB is legal.
 >
-> Now that CONFIG_IO_STRICT_DEVMEM upgrades IORESOURCE_BUSY to
-> IORESOURCE_EXCLUSIVE semantics the latter has lost its meaning so I'd
-> be in favor of removing it as well.
+>Yeah.  By default the QEMU vIOMMU should only support 39bits width for guest
+>iova address space.  To extend it, we can use:
+>
+>  -device intel-iommu,aw-bits=48
+>
+>So we'll enable 4-level iommu pgtable.
+>
+>Here the iova is obvious longer than this, so it'll be interesting to know why
+>that iova is allocated in the guest driver since the driver should know somehow
+>that this iova is beyond what's supported (guest iommu driver should be able to
+>probe viommu capability on this width information too).
+>
 
-Still has some value since it enforces exclusive access even if the
-config isn't enabled, and iirc e1000 had some fun with userspace tools
-clobbering the firmware and bricking the chip.
+Peter, Jason, thanks for the hints!
 
-Another thing I kinda wondered, since pci maintainer is here: At least
-in drivers/gpu I see very few drivers explicitly requestion regions
-(this might be a historical artifact due to the shadow attach stuff
-before we had real modesetting drivers). And pci core doesn't do that
-either, even when a driver is bound. Is this intentional, or
-should/could we do better? Since drivers work happily without
-reserving regions I don't think "the drivers need to remember to do
-this" will ever really work out well.
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+I'll try to understand what is going on in the guest driver.
+
+Stefano
+
