@@ -2,88 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE7602A6A08
-	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 17:41:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E35392A6A91
+	for <lists+kvm@lfdr.de>; Wed,  4 Nov 2020 17:51:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731124AbgKDQlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Nov 2020 11:41:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38352 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730971AbgKDQlV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Nov 2020 11:41:21 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2FC6C0613D3;
-        Wed,  4 Nov 2020 08:41:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=N+PdC8aIRIGAg2FR28I1P/4kBIo6jnmN4QhPRmCU08A=; b=Y1htN0aBJKelZ9PF10bOpkfzNm
-        AbdmBX7uwg/dy8j86ohk0c2kPpXPZzG0w5faSlS/dCeaixKVHRJuLcLLQ7dQcHXbInbLBAAwWbgY2
-        0+jbViIJWH+PzBiBQWi2s9Jrmk/I8R62cvYgsYWRhrqxOhT5cze01WusTw+gBleoPF6GUkV4wguSf
-        GN2jz0PJcmRTFJ9I/UNw0GwSXF3aEF7PE7twMLwlKVN5jr+K8DmA/zIiIGLLHLjPRHUvfri1ifWkQ
-        lhzs6zF6PkoS5rz5oqYfTnpenyuB+ufAq0MXJl0XWojaqOVac3o65QNUxwOqel58DO/Tkmn/n4Rzl
-        T1oYFK8w==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kaLqZ-0004uc-8m; Wed, 04 Nov 2020 16:41:19 +0000
-Date:   Wed, 4 Nov 2020 16:41:19 +0000
-From:   Christoph Hellwig <hch@infradead.org>
+        id S1731872AbgKDQvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Nov 2020 11:51:36 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47120 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731683AbgKDQuU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Nov 2020 11:50:20 -0500
+Received: from localhost (230.sub-72-107-127.myvzw.com [72.107.127.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 01712206CA;
+        Wed,  4 Nov 2020 16:50:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604508619;
+        bh=KzXcQsv6oXQiPT6pQbTFR35Ks2A09AmGg4NdOMxDZU4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=C3pX6cmo6q8mwyEj5GO30o1K3DmrMhjsd197OHFiySwAIRZVIm3gcmWDrE+eCPQYz
+         sPh4rcY/+zTADvqe8t10fQKgN6B/uva7r/Rm33jjbBhTlqD9gCI3SGCFFhZSFec0de
+         QvdkQtLCYpZ8r9E77lkRpGYf+6s0+xBDMYsFK0NQ=
+Date:   Wed, 4 Nov 2020 10:50:17 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
 To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        J??r??me Glisse <jglisse@redhat.com>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
-        KVM list <kvm@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+Cc:     Dan Williams <dan.j.williams@intel.com>,
         DRI Development <dri-devel@lists.freedesktop.org>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Dan Williams <dan.j.williams@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>
-Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
-Message-ID: <20201104164119.GA18218@infradead.org>
-References: <CAKMK7uGDW2f0oOvwgryCHxQFHyh3Tsk6ENsMGmtZ-EnH57tMSA@mail.gmail.com>
- <1f7cf690-35e2-c56f-6d3f-94400633edd2@nvidia.com>
- <CAKMK7uFYDSqnNp_xpohzCEidw_iLufNSoX4v55sNZj-nwTckSg@mail.gmail.com>
- <7f29a42a-c408-525d-90b7-ef3c12b5826c@nvidia.com>
- <CAKMK7uEw701AWXNJbRNM8Z+FkyUB5FbWegmSzyWPy9cG4W7OLA@mail.gmail.com>
- <20201104140023.GQ36674@ziepe.ca>
- <CAKMK7uH69hsFjYUkjg1aTh5f=q_3eswMSS5feFs6+ovz586+0A@mail.gmail.com>
- <20201104162125.GA13007@infradead.org>
- <CAKMK7uH=0+3FSR4LxP7bJUB4BsCcnCzfK2=D+2Am9QNmfZEmfw@mail.gmail.com>
- <20201104163758.GA17425@infradead.org>
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Bjorn Helgaas <bhelgaas@google.com>,
+        Linux PCI <linux-pci@vger.kernel.org>
+Subject: Re: [PATCH v5 11/15] PCI: Obey iomem restrictions for procfs mmap
+Message-ID: <20201104165017.GA352206@bjorn-Precision-5520>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201104163758.GA17425@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CAKMK7uF0QjesaNs97N-G8cZkXuAmFgcmTfHvoCP94br_WVcV6Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 04, 2020 at 04:37:58PM +0000, Christoph Hellwig wrote:
-> On Wed, Nov 04, 2020 at 05:26:58PM +0100, Daniel Vetter wrote:
-> > What we're discussing is whether gup_fast and pup_fast also obey this,
-> > or fall over and can give you the struct page that's backing the
-> > dma_mmap_* memory. Since the _fast variant doesn't check for
-> > vma->vm_flags, and afaict that's the only thing which closes this gap.
-> > And like you restate, that would be a bit a problem. So where's that
-> > check which Jason&me aren't spotting?
+On Wed, Nov 04, 2020 at 09:44:04AM +0100, Daniel Vetter wrote:
+> On Tue, Nov 3, 2020 at 11:09 PM Dan Williams <dan.j.williams@intel.com> wrote:
+> > On Tue, Nov 3, 2020 at 1:28 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
+> > > On Fri, Oct 30, 2020 at 11:08:11AM +0100, Daniel Vetter wrote:
+> > > > There's three ways to access PCI BARs from userspace: /dev/mem, sysfs
+> > > > files, and the old proc interface. Two check against
+> > > > iomem_is_exclusive, proc never did. And with CONFIG_IO_STRICT_DEVMEM,
+> > > > this starts to matter, since we don't want random userspace having
+> > > > access to PCI BARs while a driver is loaded and using it.
+> > > >
+> > > > Fix this by adding the same iomem_is_exclusive() check we already have
+> > > > on the sysfs side in pci_mmap_resource().
+> > > >
+> > > > References: 90a545e98126 ("restrict /dev/mem to idle io memory ranges")
+> > > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > >
+> > > This is OK with me but it looks like IORESOURCE_EXCLUSIVE is currently
+> > > only used in a few places:
+> > >
+> > >   e1000_probe() calls pci_request_selected_regions_exclusive(),
+> > >   ne_pci_probe() calls pci_request_regions_exclusive(),
+> > >   vmbus_allocate_mmio() calls request_mem_region_exclusive()
+> > >
+> > > which raises the question of whether it's worth keeping
+> > > IORESOURCE_EXCLUSIVE at all.  I'm totally fine with removing it
+> > > completely.
+> >
+> > Now that CONFIG_IO_STRICT_DEVMEM upgrades IORESOURCE_BUSY to
+> > IORESOURCE_EXCLUSIVE semantics the latter has lost its meaning so I'd
+> > be in favor of removing it as well.
 > 
-> remap_pte_range uses pte_mkspecial to set up the PTEs, and gup_pte_range
-> errors out on pte_special.  Of course this only works for the
-> CONFIG_ARCH_HAS_PTE_SPECIAL case, for other architectures we do have
-> a real problem.
+> Still has some value since it enforces exclusive access even if the
+> config isn't enabled, and iirc e1000 had some fun with userspace tools
+> clobbering the firmware and bricking the chip.
 
-Except that we don't really support pte-level gup-fast without
-CONFIG_ARCH_HAS_PTE_SPECIAL, and in fact all architectures selecting
-HAVE_FAST_GUP also select ARCH_HAS_PTE_SPECIAL, so we should be fine.
+There's *some* value; I'm just skeptical since only three drivers use
+it.
+
+IORESOURCE_EXCLUSIVE is from e8de1481fd71 ("resource: allow MMIO
+exclusivity for device drivers"), and the commit message says this is
+only active when CONFIG_STRICT_DEVMEM is set.  I didn't check to see
+whether that's still true.
+
+That commit adds a bunch of wrappers and "__"-prefixed functions to
+pass the IORESOURCE_EXCLUSIVE flag around.  That's a fair bit of
+uglification for three drivers.
+
+> Another thing I kinda wondered, since pci maintainer is here: At least
+> in drivers/gpu I see very few drivers explicitly requestion regions
+> (this might be a historical artifact due to the shadow attach stuff
+> before we had real modesetting drivers). And pci core doesn't do that
+> either, even when a driver is bound. Is this intentional, or
+> should/could we do better? Since drivers work happily without
+> reserving regions I don't think "the drivers need to remember to do
+> this" will ever really work out well.
+
+You're right, many drivers don't call pci_request_regions().  Maybe we
+could do better, but I haven't looked into that recently.  There is a
+related note in Documentation/PCI/pci.rst that's been there for a long
+time (it refers to "pci_request_resources()", which has never existed
+AFAICT).  I'm certainly open to proposals.
