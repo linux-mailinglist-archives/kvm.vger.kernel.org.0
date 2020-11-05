@@ -2,222 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE3ED2A8030
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 14:58:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83E9E2A8097
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 15:15:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730465AbgKEN6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 08:58:30 -0500
-Received: from foss.arm.com ([217.140.110.172]:33196 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727275AbgKEN63 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Nov 2020 08:58:29 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4025A14BF;
-        Thu,  5 Nov 2020 05:58:28 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E0C13F719;
-        Thu,  5 Nov 2020 05:58:27 -0800 (PST)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     drjones@redhat.com, pbonzini@redhat.com,
-        Eric Auger <eric.auger@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andre Przywara <andre.przywara@arm.com>
-Subject: [kvm-unit-tests PATCH] arm: Fix compilation errors
-Date:   Thu,  5 Nov 2020 13:59:36 +0000
-Message-Id: <20201105135936.55088-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.29.2
+        id S1731073AbgKEOPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 09:15:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19046 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730922AbgKEOPy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Nov 2020 09:15:54 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A5E4ZnT145736;
+        Thu, 5 Nov 2020 09:15:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ks5ml82JtwEIeSkr25ZGskMY1W9FRlN45G1r5YiKSBk=;
+ b=eb+WWLp1nvcRLRclVHb6n9caF3r1L7lvZJaVwLzSYSn/SN2mGWGyvXsqZwKs6h1oQGtl
+ Q6m9G93fwkstHUezfN66pIVj9xf5B+K4kXCPN8Ip/P1gxzvyccnUKdIpHHzk1CepsxOV
+ yjX6dmTmZjH+D93se/44dQfbRcTEDUV/Wz/0kaUIqIlJ2TSOaTm8ULT0qzSXKOS6Rl/z
+ YlFWVbHjteta9QZa1sccs4k1HYRM+Rc1ga+KHBRAp9uHNQXW3QLXoh5B8wfHX+0nkzdr
+ R6tEHgAHPWJnyxn/2hVgV48FYfz0WbJAIL/XLi2wtX7Cb3olTAWUhHi+8YAUWxbE85k5 DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34m34y4tk3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Nov 2020 09:15:54 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A5E5wkk151086;
+        Thu, 5 Nov 2020 09:15:53 -0500
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34m34y4tht-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Nov 2020 09:15:53 -0500
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5E956K030136;
+        Thu, 5 Nov 2020 14:15:51 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06fra.de.ibm.com with ESMTP id 34h01kjtv3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Nov 2020 14:15:51 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A5EFmiC56688960
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 5 Nov 2020 14:15:48 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 800C65204F;
+        Thu,  5 Nov 2020 14:15:48 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.90.189])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1EC1352050;
+        Thu,  5 Nov 2020 14:15:48 +0000 (GMT)
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
+ <1601303017-8176-2-git-send-email-pmorel@linux.ibm.com>
+ <20200928173147.750e7358.cohuck@redhat.com>
+ <136e1860-ddbc-edc0-7e67-fdbd8112a01e@linux.ibm.com>
+ <f2ff3ddd-c70e-b2cc-b58f-bbcb1e4684d6@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 1/4] memory: allocation in low memory
+Message-ID: <63ac15b1-b4fe-b1b5-700f-ae403ce7fb85@linux.ibm.com>
+Date:   Thu, 5 Nov 2020 15:15:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
+In-Reply-To: <f2ff3ddd-c70e-b2cc-b58f-bbcb1e4684d6@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-05_07:2020-11-05,2020-11-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 adultscore=0 malwarescore=0 mlxscore=0 phishscore=0
+ bulkscore=0 mlxlogscore=999 lowpriorityscore=0 clxscore=1015
+ priorityscore=1501 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2011050092
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using arm-none-eabi-gcc triggers the following compilation errors:
+On 11/5/20 1:16 PM, Pierre Morel wrote:
+> 
+> 
+> On 9/29/20 9:19 AM, Janosch Frank wrote:
+>> On 9/28/20 5:31 PM, Cornelia Huck wrote:
+>>> On Mon, 28 Sep 2020 16:23:34 +0200
+>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>
+>>>> Some architectures need allocations to be done under a
+>>>> specific address limit to allow DMA from I/O.
+>>>>
+>>>> We propose here a very simple page allocator to get
+>>>> pages allocated under this specific limit.
+>>>>
+>>>> The DMA page allocator will only use part of the available memory
+>>>> under the DMA address limit to let room for the standard allocator.
+>>>>
+> 
+> ...snip...
+> 
+>>
+>> Before we start any other discussion on this patch we should clear up if
+>> this is still necessary after Claudio's alloc revamp.
+>>
+>> I think he added options to request special types of memory.
+> 
+> Isn't it possible to go on with this patch series.
+> It can be adapted later to the changes that will be introduced by 
+> Claudio when it is final.
+> 
+> 
 
-$ ./configure --arch=arm --cross-prefix=arm-none-eabi-
-$ make clean
-$ make -j8
-[..]
-arm/pmu.c: In function 'pmu_probe':
-arm/pmu.c:1000:47: error: format '%c' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
- 1000 |  report_info("PMU implementer/ID code: %#x(\"%c\")/%#x",
-      |                                              ~^
-      |                                               |
-      |                                               int
-      |                                              %ld
- 1001 |       (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
- 1002 |       ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
-      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                                                            |
-      |                                                            long unsigned int
-[..]
-arm/gic.c: In function 'test_byte_access':
-arm/gic.c:460:31: error: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'u32' {aka 'long unsigned int'} [-Werror=format=]
-  460 |   report_info("byte 1 of 0x%08x => 0x%02x", pattern & mask, reg);
-      |                            ~~~^             ~~~~~~~~~~~~~~
-      |                               |                     |
-      |                               unsigned int          u32 {aka long unsigned int}
-      |                            %08lx
-[..]
-arm/pl031.c: In function 'irq_handler':
-arm/pl031.c:153:39: error: format '%d' expects argument of type 'int', but argument 2 has type 'u32' {aka 'long unsigned int'} [-Werror=format=]
-  153 |   report_info("Unexpected interrupt: %d\n", irqnr);
-      |                                      ~^     ~~~~~
-      |                                       |     |
-      |                                       int   u32 {aka long unsigned int}
-      |                                      %ld
+Pierre, that's outside of my jurisdiction, you're adding code to the
+common code library.
 
-The errors were observed when using arm-none-eabi-gcc versions 10.2.0 and
-9.2.0. No errors were found when using arm-linux-gnu-gcc version 10.2.1.
-
-Replace the offending printf format specifiers with their PRIxxx
-counterparts defined by C99 and available in libcflat.h. Also remove the
-unnecessary call to get_pmcr() in pmu_probe(), as the pmcr value hasn't
-changed since initialization.
-
-Nu functional changes intended by this patch.
-
-CC: Eric Auger <eric.auger@redhat.com>
-CC: Alexander Graf <graf@amazon.com>
-CC: Andre Przywara <andre.przywara@arm.com>
-CC: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-
-Andre suggested that we drop using gcc's stdint.h and implement our own to avoid
-such errors in the future. The distro that I'm using on my desktop doesn't have
-the arm-linux-gnu toolchain in the default repos, so I figured I should send
-this fix to get things compiling again.
-
-I have no preference for, or against, implementing our own types.h header file.
-I imagine it's not going to be easy to change the code to use it (possibly for
-all architectures), and it should be worth it in the long run.
-
- arm/gic.c   | 14 +++++++-------
- arm/pl031.c | 10 +++++-----
- arm/pmu.c   |  7 ++++---
- 3 files changed, 16 insertions(+), 15 deletions(-)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index dc1e88c67a9c..acb060585fae 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -457,7 +457,7 @@ static void test_byte_access(void *base_addr, u32 pattern, u32 mask)
- 	res = (reg == (BYTE(pattern, 1) & (mask >> 8)));
- 	report(res, "byte reads successful");
- 	if (!res)
--		report_info("byte 1 of 0x%08x => 0x%02x", pattern & mask, reg);
-+		report_info("byte 1 of 0x%08"PRIx32" => 0x%02"PRIx32, pattern & mask, reg);
- 
- 	pattern = REPLACE_BYTE(pattern, 2, 0x1f);
- 	writeb(BYTE(pattern, 2), base_addr + 2);
-@@ -465,7 +465,7 @@ static void test_byte_access(void *base_addr, u32 pattern, u32 mask)
- 	res = (reg == (pattern & mask));
- 	report(res, "byte writes successful");
- 	if (!res)
--		report_info("writing 0x%02x into bytes 2 => 0x%08x",
-+		report_info("writing 0x%02"PRIx32" into bytes 2 => 0x%08"PRIx32,
- 			    BYTE(pattern, 2), reg);
- }
- 
-@@ -489,13 +489,13 @@ static void test_priorities(int nr_irqs, void *priptr)
- 	report((((reg >> 16) == (reg & 0xffff)) &&
- 	        ((reg & 0xff) == ((reg >> 8) & 0xff))),
- 	       "consistent priority masking");
--	report_info("priority mask is 0x%08x", pri_mask);
-+	report_info("priority mask is 0x%08"PRIx32, pri_mask);
- 
- 	reg = reg & 0xff;
- 	for (pri_bits = 8; reg & 1; reg >>= 1, pri_bits--)
- 		;
- 	report(pri_bits >= 4, "implements at least 4 priority bits");
--	report_info("%d priority bits implemented", pri_bits);
-+	report_info("%"PRIu32" priority bits implemented", pri_bits);
- 
- 	pattern = 0;
- 	writel(pattern, first_spi);
-@@ -555,7 +555,7 @@ static void test_targets(int nr_irqs)
- 	reg = readl(targetsptr + GIC_FIRST_SPI);
- 	report(reg == (pattern & cpu_mask), "register content preserved");
- 	if (reg != (pattern & cpu_mask))
--		report_info("writing %08x reads back as %08x",
-+		report_info("writing %08"PRIx32" reads back as %08"PRIx32,
- 			    pattern & cpu_mask, reg);
- 
- 	/* The TARGETS registers are byte accessible. */
-@@ -589,7 +589,7 @@ static void gic_test_mmio(void)
- 
- 	test_typer_v2(reg);
- 
--	report_info("IIDR: 0x%08x", readl(gic_dist_base + GICD_IIDR));
-+	report_info("IIDR: 0x%08"PRIx32, readl(gic_dist_base + GICD_IIDR));
- 
- 	report(test_readonly_32(gic_dist_base + GICD_TYPER, false),
-                "GICD_TYPER is read-only");
-@@ -598,7 +598,7 @@ static void gic_test_mmio(void)
- 
- 	reg = readl(idreg);
- 	report(test_readonly_32(idreg, false), "ICPIDR2 is read-only");
--	report_info("value of ICPIDR2: 0x%08x", reg);
-+	report_info("value of ICPIDR2: 0x%08"PRIx32, reg);
- 
- 	test_priorities(nr_irqs, gic_dist_base + GICD_IPRIORITYR);
- 
-diff --git a/arm/pl031.c b/arm/pl031.c
-index 86035fa407e6..452fe0f3e36c 100644
---- a/arm/pl031.c
-+++ b/arm/pl031.c
-@@ -150,7 +150,7 @@ static void irq_handler(struct pt_regs *regs)
- 		report(readl(&pl031->mis) == 0, "  RTC MIS == 0");
- 		irq_triggered = true;
- 	} else {
--		report_info("Unexpected interrupt: %d\n", irqnr);
-+		report_info("Unexpected interrupt: %"PRIu32"\n", irqnr);
- 		return;
- 	}
- }
-@@ -191,10 +191,10 @@ static int check_rtc_irq(void)
- 	report(irq_triggered, "  IRQ triggered");
- 	report(!gic_irq_pending(), "  RTC IRQ not pending anymore");
- 	if (!irq_triggered) {
--		report_info("  RTC RIS: %x", readl(&pl031->ris));
--		report_info("  RTC MIS: %x", readl(&pl031->mis));
--		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
--		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
-+		report_info("  RTC RIS: %"PRIx32, readl(&pl031->ris));
-+		report_info("  RTC MIS: %"PRIx32, readl(&pl031->mis));
-+		report_info("  RTC IMSC: %"PRIx32, readl(&pl031->imsc));
-+		report_info("  GIC IRQs pending: %08"PRIx32" %08"PRIx32, readl(gic_ispendr), readl(gic_ispendr + 4));
- 	}
- 
- 	local_irq_disable();
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 831fb6618279..cc959e6a5c76 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -989,6 +989,7 @@ static void pmccntr64_test(void)
- static bool pmu_probe(void)
- {
- 	uint32_t pmcr = get_pmcr();
-+	uint8_t implementer;
- 
- 	pmu.version = get_pmu_version();
- 	if (pmu.version == ID_DFR0_PMU_NOTIMPL || pmu.version == ID_DFR0_PMU_IMPDEF)
-@@ -996,10 +997,10 @@ static bool pmu_probe(void)
- 
- 	report_info("PMU version: 0x%x", pmu.version);
- 
--	pmcr = get_pmcr();
--	report_info("PMU implementer/ID code: %#x(\"%c\")/%#x",
-+	implementer = (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK;
-+	report_info("PMU implementer/ID code: %#"PRIx32"(\"%c\")/%#"PRIx32,
- 		    (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
--		    ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
-+		    implementer ? implementer : ' ',
- 		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK);
- 
- 	/* store read-only and RES0 fields of the PMCR bottom-half*/
--- 
-2.29.2
-
+I've set Paolo CC, let's see if he finds this thread :)
