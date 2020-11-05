@@ -2,103 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AA412A7B83
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 11:20:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DBCCA2A7C4B
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 11:52:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727018AbgKEKUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 05:20:44 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:52002 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726884AbgKEKUn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Nov 2020 05:20:43 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0A5A9Fws119053;
-        Thu, 5 Nov 2020 10:20:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- in-reply-to : references : sender : from : date : message-id :
- mime-version : content-type : content-transfer-encoding;
- s=corp-2020-01-29; bh=aqKs7bL6crrEU/SvkXnc2GkG3VBgTtKGbGCoiTNEG64=;
- b=CKHoGz4sATL0jvvfHxEuzo8SBAOEJgkXQgIq2yH96QZrzi9viCw9BtYf0V2QBHqU2tES
- 1gt2esrr9FR9MpfM33OKk+d9fsd9RNjVxabLKRRJr81S1qGFPbkrUBgp2YAzgFhiOxxY
- /uh2DohXnyubCDMIGCllTC8OLztSz0tqjvk7s7LMwNBGsBL+8s0YDY3F2/JfCOhd6IYK
- jGs1v6nS+pYq0EiNobNhkW2sHf4+0iWcTom87HZxOANQM1Fy5WQpsoO7yQKQKtrJW8N+
- 4BbDe/RqHTCWgqnu+BGCZxCNzbeeEdrnC/SyDwJI169DOzdDJFomS8JIrtgCSRHCJUD7 /g== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 34hhw2u5dm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 05 Nov 2020 10:20:41 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0A5A4sHA011236;
-        Thu, 5 Nov 2020 10:20:40 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 34jf4bxn3m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 05 Nov 2020 10:20:40 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0A5AKeMa021055;
-        Thu, 5 Nov 2020 10:20:40 GMT
-Received: from disaster-area.hh.sledj.net (/81.187.26.238)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 05 Nov 2020 02:20:39 -0800
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 82890ae1;
-        Thu, 5 Nov 2020 10:20:37 +0000 (UTC)
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     KVM <kvm@vger.kernel.org>, Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: check that clflushopt of an MMIO address succeeds
-In-Reply-To: <D92A2CAA-584C-48FE-A071-682DB287432A@gmail.com>
-References: <20201103160855.261881-1-david.edmondson@oracle.com> <D92A2CAA-584C-48FE-A071-682DB287432A@gmail.com>
-X-HGTTG: vroomfondel
-Sender: david.edmondson@oracle.com
-From:   David Edmondson <david.edmondson@oracle.com>
-Date:   Thu, 05 Nov 2020 10:20:37 +0000
-Message-ID: <cun1rh82jgq.fsf@vroomfondel.hh.sledj.net>
+        id S1730099AbgKEKwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 05:52:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730114AbgKEKwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Nov 2020 05:52:43 -0500
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8144EC061A4A
+        for <kvm@vger.kernel.org>; Thu,  5 Nov 2020 02:52:42 -0800 (PST)
+Received: by mail-lj1-x244.google.com with SMTP id 11so1100654ljf.2
+        for <kvm@vger.kernel.org>; Thu, 05 Nov 2020 02:52:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IbC7h6sutytvBKVgRkW8YBm4v4oQThhwvuIz3XlFJpw=;
+        b=d/RC4QlHsEU0Pk+87b5hebgQR1nvUbGfz+KWgyYPw8avJty+oHtYWwRBfI9ZwNnjQk
+         6x1f9VNEkjxS+WacQizm9QFnRFRoNTRgXz7J8hUL7gDHTr1r0B4CDTIH++hxOUWPbRHA
+         faB9Z1G3wfURCCb570cPMFzwdpYsz5NNLR9grwb6NletLAXur80zPGuj6TnPTgqIsI6W
+         73tvdQLbSeHs/ZIHScGvMbbglljfvtEcmDpRr1SmCjt0Cs2115AxcxEJIltrAcsJpAIs
+         i7f4CKXDgFTYIlx2Oia+shgKsQ9vbBqcm5RZnKYsE+6tO+5eUkPHBV9yZoGBsu8zWwxP
+         sFlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IbC7h6sutytvBKVgRkW8YBm4v4oQThhwvuIz3XlFJpw=;
+        b=NZW9p2S1DqfPZgcj710MfJAEOAFwTKWRaTl+YVwKiPAIEeY7DDS7CrqumhJ18Nabw6
+         qkGBLpRvYGCapDDhd/si5k4z+HKjZAkBxOmBpQYIadnODm0UUakw2BFh2ePuGRRi4wx5
+         h+2oi8CBLpl/YnxMljFrlESCD412Tmi18MFyH7iVBrhGizwGopjLk4s2efx93xosMJhV
+         PglC2cJcyIU5jbvYuH3E82l54uV6e3QtXqOkU36f172ldHV83skK9MSqsm84QOdUQEtY
+         ULpnLaIaKDJxN+WgtnXUU5+TBat6w/zGa8SxJbI7N6jDvh/8YI+++plquVv3MwdmHvdP
+         nNLg==
+X-Gm-Message-State: AOAM533QBaw2oF8K+4ywV/Nw0UiBlk6puluT+E66T5otaWhuUFqVMDMo
+        G8oNu9qSPcuiFS2PHJCWIJU529kOAOgGFLZqVZr45w==
+X-Google-Smtp-Source: ABdhPJwMZsQSFYx3yHXvvtRlVkabm7C64j8LuP2+XUU2+XVFwAx/DWoa4YDvNPprZ43yAgspd5XcguY3mqI1O9Ir5Vs=
+X-Received: by 2002:a05:651c:1205:: with SMTP id i5mr726163lja.283.1604573560846;
+ Thu, 05 Nov 2020 02:52:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9795 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=1 mlxscore=0
- bulkscore=0 malwarescore=0 mlxlogscore=999 phishscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011050071
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9795 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 mlxscore=0
- suspectscore=1 clxscore=1011 priorityscore=1501 impostorscore=0
- spamscore=0 lowpriorityscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011050071
+References: <20201027121725.24660-1-brgl@bgdev.pl>
+In-Reply-To: <20201027121725.24660-1-brgl@bgdev.pl>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Thu, 5 Nov 2020 11:52:30 +0100
+Message-ID: <CACRpkdYbpOZGmWONeOQFY7DE+t2ev30DQQ-8cxrJNoK9fVVunA@mail.gmail.com>
+Subject: Re: [PATCH 0/8] slab: provide and use krealloc_array()
+To:     Bartosz Golaszewski <brgl@bgdev.pl>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        "open list:DRM PANEL DRIVERS" <dri-devel@lists.freedesktop.org>,
+        linaro-mm-sig@lists.linaro.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-edac@vger.kernel.org,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev <netdev@vger.kernel.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        "moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." 
+        <alsa-devel@alsa-project.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wednesday, 2020-11-04 at 23:53:01 -08, Nadav Amit wrote:
+On Tue, Oct 27, 2020 at 1:17 PM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
 
->> On Nov 3, 2020, at 8:08 AM, David Edmondson <david.edmondson@oracle.com>=
- wrote:
->>=20
->> Verify that the clflushopt instruction succeeds when applied to an
->> MMIO address at both cpl0 and cpl3.
->>=20
->> Suggested-by: Joao Martins <joao.m.martins@oracle.com>
->> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
->>=20
+> From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 >
-> [snip]
+> Andy brought to my attention the fact that users allocating an array of
+> equally sized elements should check if the size multiplication doesn't
+> overflow. This is why we have helpers like kmalloc_array().
 >
->> +	ret =3D pci_find_dev(PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_TEST);
->> +	if (ret !=3D PCIDEVADDR_INVALID) {
->> +		pci_dev_init(&pcidev, ret);
+> However we don't have krealloc_array() equivalent and there are many
+> users who do their own multiplication when calling krealloc() for arrays.
 >
-> Just wondering, and perhaps this question is more general: does this test
-> really need the Red-Hat test device?
+> This series provides krealloc_array() and uses it in a couple places.
 >
-> I know it is an emulated device, but can=E2=80=99t we use some other MMIO=
- address
-> (e.g., PIT) that is also available on bare-metal?
+> A separate series will follow adding devm_krealloc_array() which is
+> needed in the xilinx adc driver.
 
-If it's acceptable to assume that HPET is present and at 0xfed00000,
-then it could be used.
+The series:
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-dme.
---=20
-Does everyone stare the way I do?
+I really like this.
+
+Yours,
+Linus Walleij
