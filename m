@@ -2,84 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 898D32A867F
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 19:56:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A41142A8696
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 19:58:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731821AbgKES4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 13:56:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51656 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731799AbgKES4B (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Nov 2020 13:56:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604602560;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mmFXjTQW8k98jRyPd67FItQJTOEKBm9sgl7KN/g7W/Q=;
-        b=MKim6JO15S+YMRd3QeSIddWtdMPl1mCpKn3jiBkeSUnxlD3VyeLdio8Wln6GzVJLvtR91w
-        kWUqrC2c5SCBuox64sjVLkVewpf+WFUvpwF4rHT05TasZNFYm2zuRaAFQfASECt5k0uU7+
-        28DgsiHZJrcxeOQMDFNbVhA7/skrl5s=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-kDknGU4IN3uqygQWpKcWfw-1; Thu, 05 Nov 2020 13:55:56 -0500
-X-MC-Unique: kDknGU4IN3uqygQWpKcWfw-1
-Received: by mail-qk1-f200.google.com with SMTP id 141so1526408qkh.18
-        for <kvm@vger.kernel.org>; Thu, 05 Nov 2020 10:55:56 -0800 (PST)
+        id S1729783AbgKES6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 13:58:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58786 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726996AbgKES6n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Nov 2020 13:58:43 -0500
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD7D3C0613CF
+        for <kvm@vger.kernel.org>; Thu,  5 Nov 2020 10:58:43 -0800 (PST)
+Received: by mail-io1-xd43.google.com with SMTP id p7so2875365ioo.6
+        for <kvm@vger.kernel.org>; Thu, 05 Nov 2020 10:58:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sUpNCmLEocsd06ea6TUgBYF5Lti0y6kySFHe+L+lO2M=;
+        b=ocZ0o2bW/2g+lKR2aAj2qtLyojA9TDvBTA1wO0qu1HGrLT39SlqtLSPOdR4hVOzrpm
+         n0RNxB2eejpk2X9jAkNJWHrob0aJbxw33RrZ21z+29/1w/x9wGDq8Bw7NGRaGVQm4xKT
+         0qH1D0O+JGiomKFvQ31i9FvsSjFPhG3OQnT6z4s1nk7GJ24wi+Tp6QmZdCq8YFIIyyhW
+         a9vWeo/AnwVwB29PJX9zs4CymQiNlAWXQOG0PNEoFThRNvl0lFDQuA7S9HNqtqh/2JEc
+         g6bRg7GFjDCrU2dG5ri1uBYwqTCTVb0eaRWVbnE9fETx+QH5sZO8DEsHJE8HvacWRvXY
+         vbMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mmFXjTQW8k98jRyPd67FItQJTOEKBm9sgl7KN/g7W/Q=;
-        b=uagA/nH7XhKAkssbgmrsybj5LLzsWpZMcRlp3VvVjrXtGOdeZGR4ncjmzUQKddfABK
-         eleIwM2TmYJtJiIU1l1fNXmypzBQ5r+gvLOQaxecN3HiOYpbOt0Of13NLCWnWz9dxSmZ
-         bGM1tLIGZLpvBFqIM8wE/p2wdjD+Dc1JPRoh/fbBTQ4Vbr3jGfQQYg0Lfxc52BfsNaaM
-         Bx5/Ya3VfBI9JMkiL4MgLlLC9cE1jrhW6p9CSuZTo+94SSqQWhEzCjQ/Xfb39xuLY6dJ
-         qritTGNJkV0r6LxnhGAzuVbu8M2ogemZesIFP93HLkWGUec6kRcNU06uw13CX1Nvl6So
-         dBsA==
-X-Gm-Message-State: AOAM530XJhFG4m+qx/DKQJnG5XobC/UiKxsmgUiakajtwBoNlkHr8tnq
-        lNnJOA8varYUys6/Y9gWJLvG+cuBitslcioPpnkWFzQQzVTVjGJazmOtwXtyvKK6u3Z6qak7qLP
-        PIvGgCpEQL0Gn
-X-Received: by 2002:a0c:ef02:: with SMTP id t2mr3387182qvr.7.1604602556368;
-        Thu, 05 Nov 2020 10:55:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxF2FV9uUkY8Prkrm2ddge89imC169aGPdU6LYnHIgcOOj2ekGSNQnw9N1Xs220Sgnd204tUw==
-X-Received: by 2002:a0c:ef02:: with SMTP id t2mr3387168qvr.7.1604602556206;
-        Thu, 05 Nov 2020 10:55:56 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
-        by smtp.gmail.com with ESMTPSA id e186sm1175318qkd.117.2020.11.05.10.55.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2020 10:55:55 -0800 (PST)
-Date:   Thu, 5 Nov 2020 13:55:54 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, bgardon@google.com
-Subject: Re: [PATCH 00/11] KVM: selftests: Cleanups
-Message-ID: <20201105185554.GD106309@xz-x1>
-References: <20201104212357.171559-1-drjones@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sUpNCmLEocsd06ea6TUgBYF5Lti0y6kySFHe+L+lO2M=;
+        b=ZUIP3JUnWm5wLh5Qs1/67eboy6XDFErfGWqMtJ62jIs4Cdx7XF8wWdAtzzpBt0YFSi
+         Lrjwr45P8VdxTQPTxODYMHilU66vvHIPgoXC+w6ibMrtHvWx8xWUwFXUymPrjhfuBiFb
+         HQ2BFZdLaKVmQr7x33owSpP5s8gecO4ioey04x7/WrV/EmwPCMQwH2eA1T5vCutF1AoD
+         qbQed6+azHkW2dr5zIQ1hvWqyIeemmSJNAUhlmlJn8C6ItL3MDGCteATru8lxotzFC+z
+         SEnrMlMfFqUoEmcsJPYJVFCdiy1h0qNHd9c1uRFx1tD+jzIGoR3AP+uz4JZQftCqRngj
+         Aliw==
+X-Gm-Message-State: AOAM531n4RjLUyVJe6uCiXUY6mDpxjtAkOXSPNN+hsT5UiI1rElqvShk
+        IbuoYv+65wn4nibHlTs1+1KKtIj12oZA8lXBnFo=
+X-Google-Smtp-Source: ABdhPJxCQ3jDAXdKn+XUT4VT9AOWKCxitIeJyRADvNle5a6uYrdM11Gx+rCzpmjvsZE79tgS0pusSQU3vVuWGdpy5as=
+X-Received: by 2002:a6b:5f05:: with SMTP id t5mr2892929iob.67.1604602723137;
+ Thu, 05 Nov 2020 10:58:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201104212357.171559-1-drjones@redhat.com>
+References: <20201105153932.24316-1-pankaj.gupta.linux@gmail.com> <36be2860-9ef9-db0f-ad8b-1089bd258dbc@redhat.com>
+In-Reply-To: <36be2860-9ef9-db0f-ad8b-1089bd258dbc@redhat.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Thu, 5 Nov 2020 19:58:31 +0100
+Message-ID: <CAM9Jb+igM6Pp=Mx3WAqQJBsVqmVhfaYmkspFvDq1Y93Dihdp8w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: handle MSR_IA32_DEBUGCTLMSR with report_ignored_msrs
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>, oro@8bytes.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 04, 2020 at 10:23:46PM +0100, Andrew Jones wrote:
-> This series attempts to clean up demand_paging_test and dirty_log_test
-> by factoring out common code, creating some new API along the way. It's
-> main goal is to prepare for even more factoring that Ben and Peter want
-> to do. The series would have a nice negative diff stat, but it also
-> picks up a few of Peter's patches for his new dirty log test. So, the
-> +/- diff stat is close to equal. It's not as close as an electoral vote
-> count, but it's close.
-> 
-> I've tested on x86 and AArch64 (one config each), but not s390x.
+> >   Guest tries to enable LBR (last branch/interrupt/exception) repeatedly,
+> >   thus spamming the host kernel logs. As MSR_IA32_DEBUGCTLMSR is not emulated by
+> >   KVM, its better to add the error log only with "report_ignored_msrs".
+> >
+> > Signed-off-by: Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+> > ---
+> >   arch/x86/kvm/x86.c | 6 +++---
+> >   1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index f5ede41bf9e6..99c69ae43c69 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -3063,9 +3063,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >                       /* Values other than LBR and BTF are vendor-specific,
+> >                          thus reserved and should throw a #GP */
+> >                       return 1;
+> > -             }
+> > -             vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
+> > -                         __func__, data);
+> > +             } else if (report_ignored_msrs)
+> > +                     vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
+> > +                                 __func__, data);
+> >               break;
+> >       case 0x200 ... 0x2ff:
+> >               return kvm_mtrr_set_msr(vcpu, msr, data);
+> >
+>
+> Which guest it is?  (Patch queued, but I'd like to have a better
+> description).
 
-The whole series looks good to me (probably except the PTRS_PER_PAGE one; but
-that's not hurting much anyways, I think).  Thanks for picking up the other
-patches, even if they made the diff stat much less pretty..
+How about this?
 
--- 
-Peter Xu
+Windows2016 guest tries to enable LBR (last
+branch/interrupt/exception) by setting
+MSR_IA32_DEBUGCTLMSR. KVM does not emulate MSR_IA32_DEBUGCTLMSR and
+spams the host kernel logs with the below error messages.This patch
+fixes this by enabling
+error logging only with 'report_ignored_msrs'.
 
+"kvm []: vcpu1, guest rIP: 0xfffff800a8b687d3 kvm_set_msr_common:
+MSR_IA32_DEBUGCTLMSR 0x1, nop"
+
+Thanks,
+Pankaj
+
+
+
+
+
+
+>
+> Paolo
+>
