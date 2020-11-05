@@ -2,286 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C208B2A7751
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 07:05:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B92F2A7766
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 07:15:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730325AbgKEGF2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 01:05:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50172 "EHLO
+        id S1730623AbgKEGO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 01:14:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729441AbgKEGDU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Nov 2020 01:03:20 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8870AC0613CF
-        for <kvm@vger.kernel.org>; Wed,  4 Nov 2020 22:03:20 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id g7so262813pfc.2
-        for <kvm@vger.kernel.org>; Wed, 04 Nov 2020 22:03:20 -0800 (PST)
+        with ESMTP id S1728841AbgKEGOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Nov 2020 01:14:52 -0500
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315FBC0613D2;
+        Wed,  4 Nov 2020 22:14:52 -0800 (PST)
+Received: by mail-io1-xd43.google.com with SMTP id n129so658426iod.5;
+        Wed, 04 Nov 2020 22:14:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=hPgNHvStTWr1J+u4pTfpRenx3MEJF8tcCz/DN7RsHww=;
-        b=CeFNSveWkqX95J77hL8osfOt9KziRWVk5bIbnd0J6301rq7t+VrRqtPUbwMlDwoADF
-         uxzi1kctVnilAff1/9pUPSNW4F1hVk85qhDiLI/x8JyQmnuSekC7sch+Zoe2nDF1feak
-         fQE0kWi6Mq2AtOielk4gIXiORPs5RWXx4c8H0=
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=effOrioQNE1vajsHCexkvnssUb5VjgqMIBeIbqbweW0=;
+        b=reLLABWv8oBwgzXdQvGaPjfoWs0iLQHMy8Lmvd50vLavFYVxBbIOKw+/rudOj31OFM
+         k/0XneJcXCxdc37THbeUCv8SWWkNxwsea7YVLBJVcBax4axSHMytbLspNOkFZV7h0ta2
+         UIy4b7SGVokWDhBmKx1GvV7cEyK6xW2DCqR2e5oCb7Ow6v1CAjPWsorRcK02JY//r3C+
+         KaEJWxCdcrRaxP3ZDh5g/k9SAThESgMdxiCMSo907gVGxcnpHbGrmw7YjFVGn2TUdgZ4
+         3+iht6MiwPKnALkkVDeSIcPXVmx7VlZz11HgfrOL/A3FQqlklfxKbqRP+ZIX5wS46a/N
+         s8ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=hPgNHvStTWr1J+u4pTfpRenx3MEJF8tcCz/DN7RsHww=;
-        b=frWwcDb1GBMZFOLoFSf+bKq532Kc8SIxiWno4l8mIFKRFAWu+YNRN066LbUtAmrYd6
-         95BeXDTZEWU+Kd+s9hAo+aI3uuaMRmLoHDHLkAgiqKrq2/Yupv22xL62GVBe6H1550g1
-         ZA3omQ3ls4wZh2U4cJ49kkU1lWDO5RDz3YJSC2e1IOPJBxb4jfbjigYVq/3J630013K0
-         W0GfNjVyELdUyPb4TRsjmRjVrfwQNmdTTapivjQ3W5TBg+bGkMzn8RvgwWtVH5Rbw3tz
-         jne4Nmikhrw7XWppXOa3ljTEF9vtxby5Yrn00UUwZ953DK9IfYDLwj6ZjlJPXIMs5qdN
-         rYuA==
-X-Gm-Message-State: AOAM532Tdx3LqBWZYcsHcpZj7MFuzbpZDk1gzOLzUmL8kgz+5AQRVC2l
-        J1piqeZ8VB2iBjTd6KI0qfyk/w==
-X-Google-Smtp-Source: ABdhPJw8QgrtTD8DYkA1XjYJ7s1r+wYmyMI6G7EbSjQ+D6S3VYxFIJ5Gp8XoMedSLci0ffAnepeGeA==
-X-Received: by 2002:a17:90a:5c82:: with SMTP id r2mr844405pji.69.1604556200062;
-        Wed, 04 Nov 2020 22:03:20 -0800 (PST)
-Received: from rahul_yocto_ubuntu18.ibn.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id e201sm834241pfh.73.2020.11.04.22.03.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2020 22:03:19 -0800 (PST)
-From:   Vikas Gupta <vikas.gupta@broadcom.com>
-To:     eric.auger@redhat.com, alex.williamson@redhat.com,
-        cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     vikram.prakash@broadcom.com, Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [RFC, v0 3/3] vfio/platform: add Broadcom msi module
-Date:   Thu,  5 Nov 2020 11:32:57 +0530
-Message-Id: <20201105060257.35269-4-vikas.gupta@broadcom.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201105060257.35269-1-vikas.gupta@broadcom.com>
-References: <20201105060257.35269-1-vikas.gupta@broadcom.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000580b0f05b355da6c"
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=effOrioQNE1vajsHCexkvnssUb5VjgqMIBeIbqbweW0=;
+        b=LA1PUEKjFlj6bg6oCuwUOmOQZpAnhyhN21QWfgkq3Ipfukm/UyQp1wQq5iEqomLUZg
+         OJPtKcnCq7VT3wjGQ4C46DOi/S3+ErxVcMkxxe2NHHNB5BIb0czLOAyXfh23HHrt8m+Y
+         kI7v6mpfJkANeimeH5z7ULn4slxZ4cr33ZlMFRqzkDwJn736DGj0F9IoHVsUO5os0YIR
+         vsfYaa49G5z+t+Da45Y1d8jL/FEXgnCT6zOfARPSncPSLPZq5dkSgFZHBIkOH3mBnkGZ
+         /piU1lpLW9SEmpYiexlwZ3sc/U4/BdFCDrHxRsrVYQgYLUFA/LP1wKCdo8p4pVIoQ2VC
+         mxwg==
+X-Gm-Message-State: AOAM530N4ZYSXVynlYbWcWx8YJ8S7ppiunXVTk/CwlTu/qmRxqnM7DJa
+        jHquW3f5nwTSGl62NPpAEB0+BYw+Q0WXlAe6KHI=
+X-Google-Smtp-Source: ABdhPJxuT/21iy+We+9FUZuZafk4UqfzPqItuvnr3wqiwYFj/17TCCDMk+NpsTv9/XG5o0XP531PZW7dSoKjAqpjVSs=
+X-Received: by 2002:a02:5b09:: with SMTP id g9mr847501jab.89.1604556891487;
+ Wed, 04 Nov 2020 22:14:51 -0800 (PST)
+MIME-Version: 1.0
+References: <20201101115523.115780-1-mlevitsk@redhat.com>
+In-Reply-To: <20201101115523.115780-1-mlevitsk@redhat.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Thu, 5 Nov 2020 07:14:40 +0100
+Message-ID: <CAM9Jb+ivbM-_8ht9w2JptoHH-64=J_TvdLvm0Re+KAAuPeeGfg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: use positive error values for msr emulation
+ that causes #GP
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Ingo Molnar <mingo@redhat.com>, Qian Cai <cai@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---000000000000580b0f05b355da6c
+> Recent introduction of the userspace msr filtering added code that uses
+> negative error codes for cases that result in either #GP delivery to
+> the guest, or handled by the userspace msr filtering.
+>
+> This breaks an assumption that a negative error code returned from the
+> msr emulation code is a semi-fatal error which should be returned
+> to userspace via KVM_RUN ioctl and usually kill the guest.
+>
+> Fix this by reusing the already existing KVM_MSR_RET_INVALID error code,
+> and by adding a new KVM_MSR_RET_FILTERED error code for the
+> userspace filtered msrs.
+>
+> Fixes: 291f35fb2c1d1 ("KVM: x86: report negative values from wrmsr emulation to userspace")
+> Reported-by: Qian Cai <cai@redhat.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 29 +++++++++++++++--------------
+>  arch/x86/kvm/x86.h |  8 +++++++-
+>  2 files changed, 22 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 397f599b20e5a..537130d78b2af 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -255,11 +255,10 @@ static struct kmem_cache *x86_emulator_cache;
+>
+>  /*
+>   * When called, it means the previous get/set msr reached an invalid msr.
+> - * Return 0 if we want to ignore/silent this failed msr access, or 1 if we want
+> - * to fail the caller.
+> + * Return true if we want to ignore/silent this failed msr access.
+>   */
+> -static int kvm_msr_ignored_check(struct kvm_vcpu *vcpu, u32 msr,
+> -                                u64 data, bool write)
+> +static bool kvm_msr_ignored_check(struct kvm_vcpu *vcpu, u32 msr,
+> +                                 u64 data, bool write)
+>  {
+>         const char *op = write ? "wrmsr" : "rdmsr";
+>
+> @@ -267,12 +266,11 @@ static int kvm_msr_ignored_check(struct kvm_vcpu *vcpu, u32 msr,
+>                 if (report_ignored_msrs)
+>                         vcpu_unimpl(vcpu, "ignored %s: 0x%x data 0x%llx\n",
+>                                     op, msr, data);
+> -               /* Mask the error */
+> -               return 0;
+> +               return true;
+>         } else {
+>                 vcpu_debug_ratelimited(vcpu, "unhandled %s: 0x%x data 0x%llx\n",
+>                                        op, msr, data);
+> -               return -ENOENT;
+> +               return false;
+>         }
+>  }
+>
+> @@ -1416,7 +1414,8 @@ static int do_get_msr_feature(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+>         if (r == KVM_MSR_RET_INVALID) {
+>                 /* Unconditionally clear the output for simplicity */
+>                 *data = 0;
+> -               r = kvm_msr_ignored_check(vcpu, index, 0, false);
+> +               if (kvm_msr_ignored_check(vcpu, index, 0, false))
+> +                       r = 0;
+>         }
+>
+>         if (r)
+> @@ -1540,7 +1539,7 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+>         struct msr_data msr;
+>
+>         if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_WRITE))
+> -               return -EPERM;
+> +               return KVM_MSR_RET_FILTERED;
+>
+>         switch (index) {
+>         case MSR_FS_BASE:
+> @@ -1581,7 +1580,8 @@ static int kvm_set_msr_ignored_check(struct kvm_vcpu *vcpu,
+>         int ret = __kvm_set_msr(vcpu, index, data, host_initiated);
+>
+>         if (ret == KVM_MSR_RET_INVALID)
+> -               ret = kvm_msr_ignored_check(vcpu, index, data, true);
+> +               if (kvm_msr_ignored_check(vcpu, index, data, true))
+> +                       ret = 0;
+>
+>         return ret;
+>  }
+> @@ -1599,7 +1599,7 @@ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
+>         int ret;
+>
+>         if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
+> -               return -EPERM;
+> +               return KVM_MSR_RET_FILTERED;
+>
+>         msr.index = index;
+>         msr.host_initiated = host_initiated;
+> @@ -1618,7 +1618,8 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
+>         if (ret == KVM_MSR_RET_INVALID) {
+>                 /* Unconditionally clear *data for simplicity */
+>                 *data = 0;
+> -               ret = kvm_msr_ignored_check(vcpu, index, 0, false);
+> +               if (kvm_msr_ignored_check(vcpu, index, 0, false))
+> +                       ret = 0;
+>         }
+>
+>         return ret;
+> @@ -1662,9 +1663,9 @@ static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
+>  static u64 kvm_msr_reason(int r)
+>  {
+>         switch (r) {
+> -       case -ENOENT:
+> +       case KVM_MSR_RET_INVALID:
+>                 return KVM_MSR_EXIT_REASON_UNKNOWN;
+> -       case -EPERM:
+> +       case KVM_MSR_RET_FILTERED:
+>                 return KVM_MSR_EXIT_REASON_FILTER;
+>         default:
+>                 return KVM_MSR_EXIT_REASON_INVAL;
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 3900ab0c6004d..e7ca622a468f5 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -376,7 +376,13 @@ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
+>  int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva);
+>  bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+>
+> -#define  KVM_MSR_RET_INVALID  2
+> +/*
+> + * Internal error codes that are used to indicate that MSR emulation encountered
+> + * an error that should result in #GP in the guest, unless userspace
+> + * handles it.
+> + */
+> +#define  KVM_MSR_RET_INVALID   2       /* in-kernel MSR emulation #GP condition */
+> +#define  KVM_MSR_RET_FILTERED  3       /* #GP due to userspace MSR filter */
+>
+>  #define __cr4_reserved_bits(__cpu_has, __c)             \
+>  ({                                                      \
 
-Add Broadcom msi module for platform devices.
+This looks good to me. This should solve "-EPERM" return by "__kvm_set_msr" .
 
-Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
----
- drivers/vfio/platform/Kconfig                 |  1 +
- drivers/vfio/platform/Makefile                |  1 +
- drivers/vfio/platform/msi/Kconfig             |  9 +++
- drivers/vfio/platform/msi/Makefile            |  2 +
- .../vfio/platform/msi/vfio_platform_bcmplt.c  | 74 +++++++++++++++++++
- 5 files changed, 87 insertions(+)
- create mode 100644 drivers/vfio/platform/msi/Kconfig
- create mode 100644 drivers/vfio/platform/msi/Makefile
- create mode 100644 drivers/vfio/platform/msi/vfio_platform_bcmplt.c
+A question I have, In the case of "kvm_emulate_rdmsr()",  for "r" we
+are injecting #GP.
+Is there any possibility of this check to be hit and still result in #GP?
 
-diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
-index dc1a3c44f2c6..7b8696febe61 100644
---- a/drivers/vfio/platform/Kconfig
-+++ b/drivers/vfio/platform/Kconfig
-@@ -21,3 +21,4 @@ config VFIO_AMBA
- 	  If you don't know what to do here, say N.
- 
- source "drivers/vfio/platform/reset/Kconfig"
-+source "drivers/vfio/platform/msi/Kconfig"
-diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
-index 3f3a24e7c4ef..9ccdcdbf0e7e 100644
---- a/drivers/vfio/platform/Makefile
-+++ b/drivers/vfio/platform/Makefile
-@@ -5,6 +5,7 @@ vfio-platform-y := vfio_platform.o
- obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
- obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform-base.o
- obj-$(CONFIG_VFIO_PLATFORM) += reset/
-+obj-$(CONFIG_VFIO_PLATFORM) += msi/
- 
- vfio-amba-y := vfio_amba.o
- 
-diff --git a/drivers/vfio/platform/msi/Kconfig b/drivers/vfio/platform/msi/Kconfig
-new file mode 100644
-index 000000000000..54d6b70e1e32
---- /dev/null
-+++ b/drivers/vfio/platform/msi/Kconfig
-@@ -0,0 +1,9 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config VFIO_PLATFORM_BCMPLT_MSI
-+	tristate "MSI support for Broadcom platform devices"
-+	depends on VFIO_PLATFORM && (ARCH_BCM_IPROC || COMPILE_TEST)
-+	default ARCH_BCM_IPROC
-+	help
-+	  Enables the VFIO platform driver to handle msi for Broadcom devices
-+
-+	  If you don't know what to do here, say N.
-diff --git a/drivers/vfio/platform/msi/Makefile b/drivers/vfio/platform/msi/Makefile
-new file mode 100644
-index 000000000000..27422d45cecb
---- /dev/null
-+++ b/drivers/vfio/platform/msi/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0
-+obj-$(CONFIG_VFIO_PLATFORM_BCMPLT_MSI) += vfio_platform_bcmplt.o
-diff --git a/drivers/vfio/platform/msi/vfio_platform_bcmplt.c b/drivers/vfio/platform/msi/vfio_platform_bcmplt.c
-new file mode 100644
-index 000000000000..b97a571e90a9
---- /dev/null
-+++ b/drivers/vfio/platform/msi/vfio_platform_bcmplt.c
-@@ -0,0 +1,74 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright 2020 Broadcom.
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/device.h>
-+#include <linux/interrupt.h>
-+#include <linux/msi.h>
-+#include <linux/vfio.h>
-+
-+#include "../vfio_platform_private.h"
-+
-+#define RING_SIZE	(64 << 10)
-+
-+#define RING_MSI_ADDR_LS	0x03c
-+#define RING_MSI_ADDR_MS	0x040
-+#define RING_MSI_DATA_VALUE	0x064
-+
-+static u32 bcm_num_msi(struct vfio_platform_device *vdev)
-+{
-+	struct vfio_platform_region *reg = &vdev->regions[0];
-+
-+	return (reg->size / RING_SIZE);
-+}
-+
-+static int bcm_write_msi(struct vfio_platform_device *vdev,
-+			 struct msi_desc *desc,
-+			 struct msi_msg *msg)
-+{
-+	void __iomem *ring;
-+	u32 msi_off = vdev->num_irqs - vdev->num_msis;
-+	int ring_num = desc->irq - vdev->irqs[msi_off].hwirq;
-+	struct vfio_platform_region *reg = &vdev->regions[0];
-+
-+	if (!reg->ioaddr) {
-+		reg->ioaddr = ioremap(reg->addr, reg->size);
-+		if (!reg->ioaddr)
-+			return -ENOMEM;
-+	}
-+
-+	ring = reg->ioaddr + ring_num * RING_SIZE;
-+
-+	writel_relaxed(msg->address_lo, ring + RING_MSI_ADDR_LS);
-+	writel_relaxed(msg->address_hi, ring + RING_MSI_ADDR_MS);
-+	writel_relaxed(msg->data, ring + RING_MSI_DATA_VALUE);
-+
-+	return 0;
-+}
-+
-+static struct vfio_platform_msi_node vfio_platform_bcmflexrm_msi_node = {
-+	.owner = THIS_MODULE,
-+	.compat = "brcm,iproc-flexrm-mbox",
-+	.of_get_msi = bcm_num_msi,
-+	.of_msi_write = bcm_write_msi
-+};
-+
-+static int __init vfio_platform_bcmflexrm_msi_module_init(void)
-+{
-+	__vfio_platform_register_msi(&vfio_platform_bcmflexrm_msi_node);
-+
-+	return 0;
-+}
-+
-+static void __exit vfio_platform_bcmflexrm_msi_module_exit(void)
-+{
-+	vfio_platform_unregister_msi("brcm,iproc-flexrm-mbox");
-+}
-+
-+module_init(vfio_platform_bcmflexrm_msi_module_init);
-+module_exit(vfio_platform_bcmflexrm_msi_module_exit);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR("Broadcom");
--- 
-2.17.1
+int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+{
+       ....
+        r = kvm_get_msr(vcpu, ecx, &data);
 
+        /* MSR read failed? See if we should ask user space */
+        if (r && kvm_get_msr_user_space(vcpu, ecx, r)) {
+                /* Bounce to user space */
+                return 0;
+        }
 
---000000000000580b0f05b355da6c
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+        /* MSR read failed? Inject a #GP */
+        if (r) {
+                trace_kvm_msr_read_ex(ecx);
+                kvm_inject_gp(vcpu, 0);
+                return 1;
+        }
+    ....
+}
 
-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
-2lQ6rFUP408r38ha7ieLj9GoHHitwSmKYwUIGObe2Y57xYNj855BF4wx44Z80uM2ugKCZwIDAQAB
-o4IBzzCCAcswDgYDVR0PAQH/BAQDAgWgMIGeBggrBgEFBQcBAQSBkTCBjjBNBggrBgEFBQcwAoZB
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NwZXJzb25hbHNpZ24yc2hhMmcz
-b2NzcC5jcnQwPQYIKwYBBQUHMAGGMWh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9nc3BlcnNv
-bmFsc2lnbjJzaGEyZzMwTQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0
-dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwRAYDVR0fBD0w
-OzA5oDegNYYzaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc3BlcnNvbmFsc2lnbjJzaGEyZzMu
-Y3JsMCMGA1UdEQQcMBqBGHZpa2FzLmd1cHRhQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEF
-BQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQUnmgVV8btvFtO
-FD3kFjPWxD/aB8MwDQYJKoZIhvcNAQELBQADggEBAGCcuBN7G3mbQ7xMF8g8Lpz6WE+UFmkSSqU3
-FZLC2I92SA5lRIthcdz4AEgte6ywnef3+2mG7HWMoQ1wriSG5qLppAD02Uku6yRD52Sn67DB2Ozk
-yhBJayurzUxN1+R5E/YZtj2fkNajS5+i85e83PZPvVJ8/WnseIADGvDoouWqK7mxU/p8hELdb3PW
-JH2nMg39SpVAwmRqfs6mYtenpMwKtQd9goGkIFXqdSvOPATkbS1YIGtU2byLK+/1rIWPoKNmRddj
-WOu/loxldI1sJa1tOHgtb93YpIe0HEmgxLGS0KEnbM+rn9vXNKCe+9n0PhxJIfqcf6rAtK0prRwr
-Y2MxggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNh
-MTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMCDDTZ
-lyNZkGMqSi5xbzANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQg+E3Uvq7WXjZ+ynRM
-OkqI6b5U9bAgtUjoJHcrHd5W6VQwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMjAxMTA1MDYwMzIwWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjALBglghkgB
-ZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG9w0BAQcw
-CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBABlhSU+7fhIRuV/w9QmEp3XWcnhNa7yFP0C3
-G+mf9qYdd0pfN19JXvjSpBnlI6QPkzcV93rbWQQHi+W6lTsYZ3OQPNGd/01NbdjNM7dPsOAfCj3e
-UV0BLQTYexiAadp1SKTd4U54pL2Gk2BjZ54dIXko2Ii8efZx6G47aWO94S5lP2PxU7QQOTSY0SuS
-1Uklt4KYHMRxrc84+XZNmZj8oa9y4jIdgr+PKKQd18mncuykRMA8XbXH1Aw+GcQQI9Me7GeiCZ8N
-PRKEnX7bGVEvYJYOkP9w6rBcHN9mRb4t8WHn6HU/vzWh+8yoWWTR9MVMJ45xrKlWuq1QDrDNDIa9
-b7Q=
---000000000000580b0f05b355da6c--
+Apart from the question above, feel free to add:
+Reviewed-by: Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
