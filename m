@@ -2,135 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3A272A7FE5
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 14:48:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE3ED2A8030
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 14:58:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727275AbgKENsR convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 5 Nov 2020 08:48:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60550 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725468AbgKENsQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Nov 2020 08:48:16 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A5DljqF176172;
-        Thu, 5 Nov 2020 08:47:53 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34m5ftekvw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Nov 2020 08:47:52 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5DiBvH006410;
-        Thu, 5 Nov 2020 13:47:26 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04fra.de.ibm.com with ESMTP id 34h0f6tt1m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Nov 2020 13:47:26 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A5DlNMp64487700
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Nov 2020 13:47:23 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CDF76A4054;
-        Thu,  5 Nov 2020 13:47:23 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7CFFBA405B;
-        Thu,  5 Nov 2020 13:47:23 +0000 (GMT)
-Received: from smtp.tlslab.ibm.com (unknown [9.101.4.1])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu,  5 Nov 2020 13:47:23 +0000 (GMT)
-Received: from yukon.ibmuc.com (sig-9-145-56-119.uk.ibm.com [9.145.56.119])
-        by smtp.tlslab.ibm.com (Postfix) with ESMTP id 3776422006B;
-        Thu,  5 Nov 2020 14:47:22 +0100 (CET)
-From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To:     Paul Mackerras <paulus@samba.org>
-Cc:     linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, Greg Kurz <groug@kaod.org>,
-        Gustavo Romero <gromero@linux.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH] KVM: PPC: Book3S HV: XIVE: Fix possible oops when accessing ESB page
-Date:   Thu,  5 Nov 2020 14:47:13 +0100
-Message-Id: <20201105134713.656160-1-clg@kaod.org>
-X-Mailer: git-send-email 2.26.2
+        id S1730465AbgKEN6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 08:58:30 -0500
+Received: from foss.arm.com ([217.140.110.172]:33196 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727275AbgKEN63 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Nov 2020 08:58:29 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4025A14BF;
+        Thu,  5 Nov 2020 05:58:28 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E0C13F719;
+        Thu,  5 Nov 2020 05:58:27 -0800 (PST)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     drjones@redhat.com, pbonzini@redhat.com,
+        Eric Auger <eric.auger@redhat.com>,
+        Alexander Graf <graf@amazon.com>,
+        Andre Przywara <andre.przywara@arm.com>
+Subject: [kvm-unit-tests PATCH] arm: Fix compilation errors
+Date:   Thu,  5 Nov 2020 13:59:36 +0000
+Message-Id: <20201105135936.55088-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-05_07:2020-11-05,2020-11-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- mlxscore=0 phishscore=0 suspectscore=0 clxscore=1034 bulkscore=0
- priorityscore=1501 mlxlogscore=648 adultscore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011050088
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When accessing the ESB page of a source interrupt, the fault handler
-will retrieve the page address from the XIVE interrupt 'xive_irq_data'
-structure. If the associated KVM XIVE interrupt is not valid, that is
-not allocated at the HW level for some reason, the fault handler will
-dereference a NULL pointer leading to the oops below :
+Using arm-none-eabi-gcc triggers the following compilation errors:
 
-    WARNING: CPU: 40 PID: 59101 at arch/powerpc/kvm/book3s_xive_native.c:259 xive_native_esb_fault+0xe4/0x240 [kvm]
-    CPU: 40 PID: 59101 Comm: qemu-system-ppc Kdump: loaded Tainted: G        W        --------- -  - 4.18.0-240.el8.ppc64le #1
-    NIP:  c00800000e949fac LR: c00000000044b164 CTR: c00800000e949ec8
-    REGS: c000001f69617840 TRAP: 0700   Tainted: G        W        --------- -  -  (4.18.0-240.el8.ppc64le)
-    MSR:  9000000000029033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 44044282  XER: 00000000
-    CFAR: c00000000044b160 IRQMASK: 0
-    GPR00: c00000000044b164 c000001f69617ac0 c00800000e96e000 c000001f69617c10
-    GPR04: 05faa2b21e000080 0000000000000000 0000000000000005 ffffffffffffffff
-    GPR08: 0000000000000000 0000000000000001 0000000000000000 0000000000000001
-    GPR12: c00800000e949ec8 c000001ffffd3400 0000000000000000 0000000000000000
-    GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-    GPR20: 0000000000000000 0000000000000000 c000001f5c065160 c000000001c76f90
-    GPR24: c000001f06f20000 c000001f5c065100 0000000000000008 c000001f0eb98c78
-    GPR28: c000001dcab40000 c000001dcab403d8 c000001f69617c10 0000000000000011
-    NIP [c00800000e949fac] xive_native_esb_fault+0xe4/0x240 [kvm]
-    LR [c00000000044b164] __do_fault+0x64/0x220
-    Call Trace:
-    [c000001f69617ac0] [0000000137a5dc20] 0x137a5dc20 (unreliable)
-    [c000001f69617b50] [c00000000044b164] __do_fault+0x64/0x220
-    [c000001f69617b90] [c000000000453838] do_fault+0x218/0x930
-    [c000001f69617bf0] [c000000000456f50] __handle_mm_fault+0x350/0xdf0
-    [c000001f69617cd0] [c000000000457b1c] handle_mm_fault+0x12c/0x310
-    [c000001f69617d10] [c00000000007ef44] __do_page_fault+0x264/0xbb0
-    [c000001f69617df0] [c00000000007f8c8] do_page_fault+0x38/0xd0
-    [c000001f69617e30] [c00000000000a714] handle_page_fault+0x18/0x38
-    Instruction dump:
-    40c2fff0 7c2004ac 2fa90000 409e0118 73e90001 41820080 e8bd0008 7c2004ac
-    7ca90074 39400000 915c0000 7929d182 <0b090000> 2fa50000 419e0080 e89e0018
-    ---[ end trace 66c6ff034c53f64f ]---
-    xive-kvm: xive_native_esb_fault: accessing invalid ESB page for source 8 !
+$ ./configure --arch=arm --cross-prefix=arm-none-eabi-
+$ make clean
+$ make -j8
+[..]
+arm/pmu.c: In function 'pmu_probe':
+arm/pmu.c:1000:47: error: format '%c' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
+ 1000 |  report_info("PMU implementer/ID code: %#x(\"%c\")/%#x",
+      |                                              ~^
+      |                                               |
+      |                                               int
+      |                                              %ld
+ 1001 |       (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
+ 1002 |       ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                            |
+      |                                                            long unsigned int
+[..]
+arm/gic.c: In function 'test_byte_access':
+arm/gic.c:460:31: error: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'u32' {aka 'long unsigned int'} [-Werror=format=]
+  460 |   report_info("byte 1 of 0x%08x => 0x%02x", pattern & mask, reg);
+      |                            ~~~^             ~~~~~~~~~~~~~~
+      |                               |                     |
+      |                               unsigned int          u32 {aka long unsigned int}
+      |                            %08lx
+[..]
+arm/pl031.c: In function 'irq_handler':
+arm/pl031.c:153:39: error: format '%d' expects argument of type 'int', but argument 2 has type 'u32' {aka 'long unsigned int'} [-Werror=format=]
+  153 |   report_info("Unexpected interrupt: %d\n", irqnr);
+      |                                      ~^     ~~~~~
+      |                                       |     |
+      |                                       int   u32 {aka long unsigned int}
+      |                                      %ld
 
-Fix that by checking the validity of the KVM XIVE interrupt structure.
+The errors were observed when using arm-none-eabi-gcc versions 10.2.0 and
+9.2.0. No errors were found when using arm-linux-gnu-gcc version 10.2.1.
 
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Replace the offending printf format specifiers with their PRIxxx
+counterparts defined by C99 and available in libcflat.h. Also remove the
+unnecessary call to get_pmcr() in pmu_probe(), as the pmcr value hasn't
+changed since initialization.
+
+Nu functional changes intended by this patch.
+
+CC: Eric Auger <eric.auger@redhat.com>
+CC: Alexander Graf <graf@amazon.com>
+CC: Andre Przywara <andre.przywara@arm.com>
+CC: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/powerpc/kvm/book3s_xive_native.c | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index d0c2db0e07fa..a59a94f02733 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -251,6 +251,13 @@ static vm_fault_t xive_native_esb_fault(struct vm_fault *vmf)
+Andre suggested that we drop using gcc's stdint.h and implement our own to avoid
+such errors in the future. The distro that I'm using on my desktop doesn't have
+the arm-linux-gnu toolchain in the default repos, so I figured I should send
+this fix to get things compiling again.
+
+I have no preference for, or against, implementing our own types.h header file.
+I imagine it's not going to be easy to change the code to use it (possibly for
+all architectures), and it should be worth it in the long run.
+
+ arm/gic.c   | 14 +++++++-------
+ arm/pl031.c | 10 +++++-----
+ arm/pmu.c   |  7 ++++---
+ 3 files changed, 16 insertions(+), 15 deletions(-)
+
+diff --git a/arm/gic.c b/arm/gic.c
+index dc1e88c67a9c..acb060585fae 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -457,7 +457,7 @@ static void test_byte_access(void *base_addr, u32 pattern, u32 mask)
+ 	res = (reg == (BYTE(pattern, 1) & (mask >> 8)));
+ 	report(res, "byte reads successful");
+ 	if (!res)
+-		report_info("byte 1 of 0x%08x => 0x%02x", pattern & mask, reg);
++		report_info("byte 1 of 0x%08"PRIx32" => 0x%02"PRIx32, pattern & mask, reg);
+ 
+ 	pattern = REPLACE_BYTE(pattern, 2, 0x1f);
+ 	writeb(BYTE(pattern, 2), base_addr + 2);
+@@ -465,7 +465,7 @@ static void test_byte_access(void *base_addr, u32 pattern, u32 mask)
+ 	res = (reg == (pattern & mask));
+ 	report(res, "byte writes successful");
+ 	if (!res)
+-		report_info("writing 0x%02x into bytes 2 => 0x%08x",
++		report_info("writing 0x%02"PRIx32" into bytes 2 => 0x%08"PRIx32,
+ 			    BYTE(pattern, 2), reg);
+ }
+ 
+@@ -489,13 +489,13 @@ static void test_priorities(int nr_irqs, void *priptr)
+ 	report((((reg >> 16) == (reg & 0xffff)) &&
+ 	        ((reg & 0xff) == ((reg >> 8) & 0xff))),
+ 	       "consistent priority masking");
+-	report_info("priority mask is 0x%08x", pri_mask);
++	report_info("priority mask is 0x%08"PRIx32, pri_mask);
+ 
+ 	reg = reg & 0xff;
+ 	for (pri_bits = 8; reg & 1; reg >>= 1, pri_bits--)
+ 		;
+ 	report(pri_bits >= 4, "implements at least 4 priority bits");
+-	report_info("%d priority bits implemented", pri_bits);
++	report_info("%"PRIu32" priority bits implemented", pri_bits);
+ 
+ 	pattern = 0;
+ 	writel(pattern, first_spi);
+@@ -555,7 +555,7 @@ static void test_targets(int nr_irqs)
+ 	reg = readl(targetsptr + GIC_FIRST_SPI);
+ 	report(reg == (pattern & cpu_mask), "register content preserved");
+ 	if (reg != (pattern & cpu_mask))
+-		report_info("writing %08x reads back as %08x",
++		report_info("writing %08"PRIx32" reads back as %08"PRIx32,
+ 			    pattern & cpu_mask, reg);
+ 
+ 	/* The TARGETS registers are byte accessible. */
+@@ -589,7 +589,7 @@ static void gic_test_mmio(void)
+ 
+ 	test_typer_v2(reg);
+ 
+-	report_info("IIDR: 0x%08x", readl(gic_dist_base + GICD_IIDR));
++	report_info("IIDR: 0x%08"PRIx32, readl(gic_dist_base + GICD_IIDR));
+ 
+ 	report(test_readonly_32(gic_dist_base + GICD_TYPER, false),
+                "GICD_TYPER is read-only");
+@@ -598,7 +598,7 @@ static void gic_test_mmio(void)
+ 
+ 	reg = readl(idreg);
+ 	report(test_readonly_32(idreg, false), "ICPIDR2 is read-only");
+-	report_info("value of ICPIDR2: 0x%08x", reg);
++	report_info("value of ICPIDR2: 0x%08"PRIx32, reg);
+ 
+ 	test_priorities(nr_irqs, gic_dist_base + GICD_IPRIORITYR);
+ 
+diff --git a/arm/pl031.c b/arm/pl031.c
+index 86035fa407e6..452fe0f3e36c 100644
+--- a/arm/pl031.c
++++ b/arm/pl031.c
+@@ -150,7 +150,7 @@ static void irq_handler(struct pt_regs *regs)
+ 		report(readl(&pl031->mis) == 0, "  RTC MIS == 0");
+ 		irq_triggered = true;
+ 	} else {
+-		report_info("Unexpected interrupt: %d\n", irqnr);
++		report_info("Unexpected interrupt: %"PRIu32"\n", irqnr);
+ 		return;
+ 	}
+ }
+@@ -191,10 +191,10 @@ static int check_rtc_irq(void)
+ 	report(irq_triggered, "  IRQ triggered");
+ 	report(!gic_irq_pending(), "  RTC IRQ not pending anymore");
+ 	if (!irq_triggered) {
+-		report_info("  RTC RIS: %x", readl(&pl031->ris));
+-		report_info("  RTC MIS: %x", readl(&pl031->mis));
+-		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
+-		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
++		report_info("  RTC RIS: %"PRIx32, readl(&pl031->ris));
++		report_info("  RTC MIS: %"PRIx32, readl(&pl031->mis));
++		report_info("  RTC IMSC: %"PRIx32, readl(&pl031->imsc));
++		report_info("  GIC IRQs pending: %08"PRIx32" %08"PRIx32, readl(gic_ispendr), readl(gic_ispendr + 4));
  	}
  
- 	state = &sb->irq_state[src];
-+
-+	/* Some sanity checking */
-+	if (!state->valid) {
-+		pr_devel("%s: source %lx invalid !\n", __func__, irq);
-+		return VM_FAULT_SIGBUS;
-+	}
-+
- 	kvmppc_xive_select_irq(state, &hw_num, &xd);
+ 	local_irq_disable();
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 831fb6618279..cc959e6a5c76 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -989,6 +989,7 @@ static void pmccntr64_test(void)
+ static bool pmu_probe(void)
+ {
+ 	uint32_t pmcr = get_pmcr();
++	uint8_t implementer;
  
- 	arch_spin_lock(&sb->lock);
+ 	pmu.version = get_pmu_version();
+ 	if (pmu.version == ID_DFR0_PMU_NOTIMPL || pmu.version == ID_DFR0_PMU_IMPDEF)
+@@ -996,10 +997,10 @@ static bool pmu_probe(void)
+ 
+ 	report_info("PMU version: 0x%x", pmu.version);
+ 
+-	pmcr = get_pmcr();
+-	report_info("PMU implementer/ID code: %#x(\"%c\")/%#x",
++	implementer = (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK;
++	report_info("PMU implementer/ID code: %#"PRIx32"(\"%c\")/%#"PRIx32,
+ 		    (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
+-		    ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
++		    implementer ? implementer : ' ',
+ 		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK);
+ 
+ 	/* store read-only and RES0 fields of the PMCR bottom-half*/
 -- 
-2.26.2
+2.29.2
 
