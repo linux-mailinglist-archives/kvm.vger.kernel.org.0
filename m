@@ -2,114 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE2F22A8396
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 17:35:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2097E2A8399
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 17:35:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730898AbgKEQfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 11:35:09 -0500
-Received: from nat-hk.nvidia.com ([203.18.50.4]:60132 "EHLO nat-hk.nvidia.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726996AbgKEQfI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Nov 2020 11:35:08 -0500
-Received: from HKMAIL103.nvidia.com (Not Verified[10.18.92.9]) by nat-hk.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5fa429bb0001>; Fri, 06 Nov 2020 00:35:07 +0800
-Received: from HKMAIL103.nvidia.com (10.18.16.12) by HKMAIL103.nvidia.com
- (10.18.16.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 5 Nov
- 2020 16:35:04 +0000
-Received: from NAM02-CY1-obe.outbound.protection.outlook.com (104.47.37.52) by
- HKMAIL103.nvidia.com (10.18.16.12) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Thu, 5 Nov 2020 16:35:03 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bf1kMxXfh2Yy4t35nnp0T1OCvCqz9P+qc1GBpWd7jHbZF9+9Yn7LXYZxbrjcma+SeGxMU1tZUDMQxIYPT+pn4dBBoPrZJJOnelQQGQ3xjna/TnVfaCazT/WL6ZbhQYwKfnmGCmceOlE71GgVEH6vlrMwIJgb0qDdRAq8NJrryzUkgNo57BghvNmrUP7ChYVxv9f+rzsqV0LSjPzYxzStE1i15ivSzjBF4H79QoLxQzcZU3UdJkxDFXpg0Lcrp5nOEsTLFzaOVAN83vfNw8Q3I7msqLdczZk/isMRh6EnaPNr7wrnNviBTalbn2YygBNOQdMGnqr48nlRcRCmWZqOHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=19KNU0NlsVP11D30t0pYvdo1bGwqR8kLRleMcR1iEcQ=;
- b=ByN5RSjYw6ghExhMXsj1u8rrWmwMD3fog6jaTyNJVVFa/RPnFNsJ5sJqpdUm9rXqx/yc92+klKAN5uHwdb8z6Bbq3whjPIjf/6ry02tKtLFjm/1gbk9kUH+QPs0Wo6/01iCMkDqza6bujMt3ZAOf5IdLZ1g25ZI0qlETpIEP0lAuhkijY4cTcfLr0TyQ+9ak8mBpyQqn/Ho2MxjFMOq99xgWMZ7W/siYtD7gaX9RsUh0KI4WC/gCwkXVa3U/S7vX/uApCqnPuxH9XFT4moBX+idwtfujYydu7E1qvZSY8mO/tzHeZ8jSYZ6YGJWY5tfgT134jIPwSj1kV9/zNCgdHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR1201MB2488.namprd12.prod.outlook.com (2603:10b6:3:e1::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Thu, 5 Nov
- 2020 16:35:00 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.032; Thu, 5 Nov 2020
- 16:35:00 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: [PATCH] vfio-pci: Use io_remap_pfn_range() for PCI IO memory
-Date:   Thu, 5 Nov 2020 12:34:58 -0400
-Message-ID: <0-v1-331b76591255+552-vfio_sme_jgg@nvidia.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: BL0PR02CA0065.namprd02.prod.outlook.com
- (2603:10b6:207:3d::42) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1727836AbgKEQfp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 11:35:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38526 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726557AbgKEQfp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Nov 2020 11:35:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604594142;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=riIzeKzbBvZLTplx3374YuEYSNo82MKeQbx6CVPcZl8=;
+        b=GujPXbps07Kc79nuhjIFqaYeQcNtGtpnhcMXJMHpAR7kexAh3bFUlvfRLIe3eibzzhL+Qf
+        99j8AKSrVu7tLMMGKsSAKzh9HOC4UHWgvJpDcQlEAlU5IoFcYMahuyX92gJUHlbCDPJohw
+        0cdX3+PDRMQu5mx9emJhI1ErbUQt/T8=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-ZyLoQ9ZCN-62KaqwSxs5Wg-1; Thu, 05 Nov 2020 11:35:40 -0500
+X-MC-Unique: ZyLoQ9ZCN-62KaqwSxs5Wg-1
+Received: by mail-qk1-f199.google.com with SMTP id d5so1247986qkg.16
+        for <kvm@vger.kernel.org>; Thu, 05 Nov 2020 08:35:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=riIzeKzbBvZLTplx3374YuEYSNo82MKeQbx6CVPcZl8=;
+        b=KLyjGhOhVp/Qwm6UcQd+hPi9CqLhkFSZo5ixr5TcqWjKWlvjoB+5SUcEJVk/CW+ad7
+         iE7VkHUcE/Yx0OZ1KM8dhB5IHjw4FLAblJ9o3mPZkrkVcB4ueMs7vDeIqjcuUSwoCHA6
+         VJ8FZtS9gSFscX0t8gINuNGM7A4NUKIznHVQ5PdjMahL1g9o9FSE8Cnr9YZT1cpk2ekP
+         xzLl/OLuEeSyeaeZRDiCmiD+sTEUkAKN7g2wda/4PirA6eiPuPS/R1EVn7K+4JM/Ta/B
+         VvSZBgMCZehunVdR98TnoI71XZYkKUCarGT1CfM3ibW8plk6K7GrXTJG/4Wf7uxSv0EK
+         sinA==
+X-Gm-Message-State: AOAM5305pFYB0dvOqy/rBP8lS7xn4mAUEgbM7wDi1iP65nug2pkVzPRR
+        Ib8ymP5p2Q6b3EfhxGud8H06wL7kOakeTiyoUBZ0IgNXILWeJBaI8YkW4h0VOcg4b4kLQxsjiFV
+        bR0dTaN/X/V5B
+X-Received: by 2002:a0c:fdcb:: with SMTP id g11mr2868800qvs.58.1604594139626;
+        Thu, 05 Nov 2020 08:35:39 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyHn/oHboyF9QHNL0QRMP5tGjxHqn5/YU49t8mEJVWLZw8j2KveGbcR6EBIzu+WNI5aRPzUbQ==
+X-Received: by 2002:a0c:fdcb:: with SMTP id g11mr2868755qvs.58.1604594139159;
+        Thu, 05 Nov 2020 08:35:39 -0800 (PST)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
+        by smtp.gmail.com with ESMTPSA id d20sm1341994qkj.49.2020.11.05.08.35.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Nov 2020 08:35:38 -0800 (PST)
+Date:   Thu, 5 Nov 2020 11:35:36 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH RFC] memory: pause all vCPUs for the duration of memory
+ transactions
+Message-ID: <20201105163536.GB106309@xz-x1>
+References: <20201026084916.3103221-1-vkuznets@redhat.com>
+ <20201102195729.GA20600@xz-x1>
+ <87v9emy4g2.fsf@vitty.brq.redhat.com>
+ <20201103163718.GH20600@xz-x1>
+ <f7cd01b0-086c-307e-f995-d4c3c4729bd6@redhat.com>
+ <20201104192322.GA96645@xz-x1>
+ <87r1p7yfwj.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by BL0PR02CA0065.namprd02.prod.outlook.com (2603:10b6:207:3d::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21 via Frontend Transport; Thu, 5 Nov 2020 16:34:59 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kaiDy-0007Jy-HG; Thu, 05 Nov 2020 12:34:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1604594107; bh=+zGzODOJ2QtI/XplZ/FtWd1GSBYZ5b8sbNAEsPsN/DE=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:From:To:
-         CC:Subject:Date:Message-ID:Content-Transfer-Encoding:Content-Type:
-         X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType;
-        b=IjB7z+pVH5X4Puv+tF9kLMeXs2fWGCg9+RC2YoApCH88V62QVLbeaZHi/1gm2XOuQ
-         QySw6eX1LNqckupwGQLf9xFk9MUx03dcWbMeSd4TmTLof4SVMrA8CN4dNW1U5D+2Pi
-         Gv9zCyXWWBbSWZp1Uhipp2Roc57AghHOBtnSsX8MZcBVlSNPK4tgyFVj0x844l9oOj
-         JepoJbvpCLsUy+n2dewZgcxTeWqXOrdzOgvSQvDNhEaCuwTwFf08FOXdCTs/xj15D6
-         XFCP85Ck4UhCCNnNDul774VOorjvT93w75xhmrrTkSGjURtDdsZc+fEnSjP8VLYh6H
-         DqL8/CyoPWMwA==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87r1p7yfwj.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-commit f8f6ae5d077a ("mm: always have io_remap_pfn_range() set
-pgprot_decrypted()") allows drivers using mmap to put PCI memory mapped
-BAR space into userspace to work correctly on AMD SME systems that default
-to all memory encrypted.
+Hi, Vitaly,
 
-Since vfio_pci_mmap_fault() is working with PCI memory mapped BAR space it
-should be calling io_remap_pfn_range() otherwise it will not work on SME
-systems.
+On Thu, Nov 05, 2020 at 04:36:28PM +0100, Vitaly Kuznetsov wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > On Wed, Nov 04, 2020 at 07:09:02PM +0100, Laszlo Ersek wrote:
+> >> On 11/03/20 17:37, Peter Xu wrote:
+> >> > On Tue, Nov 03, 2020 at 02:07:09PM +0100, Vitaly Kuznetsov wrote:
+> >> >> In case it is a normal access from the guest, yes, but AFAIR here
+> >> >> guest's CR3 is pointing to non existent memory and when KVM detects that
+> >> >> it injects #PF by itself without a loop through userspace.
+> >> > 
+> >> > I see, thanks Vitaly.  I think this kind of answered my previous confusion on
+> >> > why we can't just bounce all these to QEMU since I thought QEMU should try to
+> >> > take the bql if it's mmio access - probably because there're quite a lot of
+> >> > references to guest memslots in kernel that cannot be naturally treated as
+> >> > guest MMIO access (especially for nested, maybe?) so that maybe it's very hard
+> >> > to cover all of them.  Paolo has mentioned quite a few times that he'd prefer a
+> >> > kernel solution for this; I feel like I understand better on the reason now..
+> >> > 
+> >> > Have any of us tried to collect the requirements on this new kernel interface
+> >> > (if to be proposed)?  I'm kind of thinking how it would look like to solve all
+> >> > the pains we have right now.
+> >> > 
+> >> > Firstly, I think we'd likely want to have the capability to handle "holes" in
+> >> > memslots, either to punch a hole, which iiuc is the problem behind this patch.
+> >> > Or the reversed operation, which is to fill up a whole that we've just punched.
+> >> > The other major one could be virtio-mem who would like to extend or shrink an
+> >> > existing memslot.  However IIUC that's also doable with the "hole" idea in that
+> >> > we can create the memslot with the maximum supported size, then "punch a hole"
+> >> > at the end of the memslot just like it shrinked.  When extend, we shrink the
+> >> > hole instead rather than the memslot.
+> >> > 
+> >> > Then there's the other case where we want to keep the dirty bitmap when
+> >> > punching a hole on existing ram.  If with the "hole" idea in the kernel, it
+> >> > seems easy too - when we punch the hole, we drop dirty bitmaps only for the
+> >> > range covered by the hole.  Then we won't lose the rest bitmaps that where the
+> >> > RAM still makes sense, since the memslot will use the same bitmap before/after
+> >> > punching a hole.
+> >> > 
+> >> > So now an simple idea comes to my mind (I think we can have even more better,
+> >> > or more complicated ideas, e.g., to make kvm memslot a tree? But I'll start
+> >> > with the simple): maybe we just need to teach each kvm memslot to take "holes"
+> >> > within itself.  By default, there's no holes with KVM_SET_USER_MEMORY_REGION
+> >> > configured kvm memslots, then we can configure holes for each memslot using a
+> >> > new flag (assuming, KVM_MEM_SET_HOLE) of the same ioctl (after LOG_DIRTY_PAGES
+> >> > and READ_ONLY).  Initially we may add a restriction on how many holes we need,
+> >> > so the holes can also be an array.
+> >> > 
+> >> > Thoughts?
+> >> 
+> >> My only one (and completely unwashed / uneducated) thought is that this
+> >> resembles the fact (?) that VMAs are represented as rbtrees. So maybe
+> >> don't turn a single KVM memslot into a tree, but represent the full set
+> >> of KVM memslots as an rbtree?
+> >> 
+> >> My understanding is that "interval tree" is one of the most efficient
+> >> data structures for tracking a set of (discontiguous) memory regions,
+> >> and that an rbtree can be generalized into an interval tree. I'm super
+> >> rusty on the theory (after having contributed a genuine rbtree impl to
+> >> edk2 in 2014, sic transit gloria mundi :/), but I think that's what the
+> >> VMA stuff in the kernel does, effectively.
+> >> 
+> >> Perhaps it could apply to KVM memslots too.
+> >> 
+> >> Sorry if I'm making no sense, of course. (I'm going out on a limb with
+> >> posting this email, but whatever...)
+> >
+> > Appreciate your input, Laszlo.
+> >
+> > I agree that in most cases tree is more efficient.  Though, I feel like
+> > there're two issues, while the structure itself is the less important one.
+> >
+> > Firstly, about the "tree or array" question: I'm not sure whether it's urgently
+> > needed for kvm.  Here imho slot lookup should be the major critical operation
+> > for kvm memslots, while crrent array impl of kvm memslot has already achieved
+> > something similar of a tree (O(logn)) by keeping the array ordered (can refer
+> > to search_memslots()).  That's why I think it's still ok.
+> >
+> > The other issue is about the "atomic update" of memslots that we're trying to
+> > look for a solution that can address all the issues we've seen.  IMHO it's a
+> > different problem to solve.  For example, even if we start to use tree
+> > structure, we'll still face the same issue when we want to punch a hole in an
+> > existing memslot - we'll still need to remove the tree node before adding the
+> > new one.  AFAICT, same failure could happen on CR3.
+> >
+> > So IMHO the more important question is how to make these operations atomic.
+> >
+> > To make things clearer, I'll also try to expand a bit more on the "hole" idea
+> > proposed above.
+> >
+> > Firstly, I believe there's also other solutions for these problems.
+> >
+> > Assuming we would like to remove slot X (range 0-4G), and add back slots X1
+> > (range 0-1G) and X2 (range 2G-4G), with range 1G-2G as new MMIO region.
+> >
+> > One example is, we can introduce another new ioctl to contain a few operations
+> > of KVM_SET_USER_MEMORY_REGION, then we can put three items in:
+> >
+> >   - Remove memslot X
+> >   - Add memslot X1
+> >   - Add memslot X2
+> >
+> > So that the container update will be atomic.  I think it works too at least for
+> > the issue that this patch wants to address.  However I think it's not ideal.
+> > The thing is, the memslot ID could change before/after the new ioctl even if
+> > it's backing mostly the same thing.  Meanwhile, we'll need to destroy a memslot
+> > that is destined to be added back with just some range information changed.
+> > E.g., if we have dirty bitmap, we need to drop it and reallocate again.  That's
+> > a waste, imho.
+> >
+> > So I'm thinking, how about we teach kvm similar things as what QEMU has already
+> > know with those memory regions?  That means kvm would start to know "ok this
+> > memslot is always that one, it never changed, however we want to mask some of
+> > it and bounce to QEMU for whatever reason".  The simplest way to implement this
+> > is to introduce a "hole" idea to kvm.  And as I mentioned, I believe an array
+> > would work too similar to memslots, but that's another story.
+> >
+> > One thing intersting about the "hole" idea is that, we don't need containers to
+> > keep a bunch of KVM_SET_USER_MEMORY_REGION ioctls any more!  Because our
+> > operation is naturally atomic when represented as "holes": when we add a new
+> > MMIO region within a RAM range, we simply add a new hole element to the
+> > existing holes of this kvm memslot (note! adding the hole does _not_ change
+> > slot ID and everything of the slot itself; e.g. dirty bitmaps do not need to be
+> > re-allocate when we operate on the holes).  As a summary, in the new world: A
+> > memslot should present something more close to ramblock in QEMU.  It means
+> > "this range will be used by the guest", but it does not mean that guest can
+> > access all of it.  When the access reaches a hole, we bounce to QEMU as if the
+> > memslot is missing.
+> >
+> > (Since this is really more kvm-specific, cc kvm list too)
+> 
+> Thank you for the write up Peter!
+> 
+> My first reaction to the 'hole' idea was that it's rather redundant and
+> sticking to the current concept where 'everything missing is a hole' is
+> sufficient. I, however, didn't think about dirty bitmap at all so maybe
+> it is worth considering.
 
-Fixes: 11c4cd07ba11 ("vfio-pci: Fault mmaps to enable vma tracking")
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/vfio/pci/vfio_pci.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+You're definitely right here that at least it seems redundant at the first
+glance that it kind of duplicated the idea of existing memslot, but just in a
+reversed way.  However I'd like to emphasize just in case:
 
-The io_remap_pfn_range() commit is in Linus's tree and will be in rc3, but
-there is no cross dependency here.
+  - The "hole" idea I tried to introduce is not in the same level of current
+    memslot, instead it's a property of one existing memslot.
 
-Tom says VFIO device assignment works OK with KVM, so I expect only things
-like DPDK to be broken.
+  - The "hole" idea can help us achieve atomicity, and imho that's the most
+    important thing that I think this idea brings.  We would like atomicity of
+    every single memslot update, however current kvm memslot layout cannot
+    solve atomicity of cases like "punching MMIO holes within an existing
+    memslot".
 
-Don't have SME hardware, can't test.
+By introducing this extra layer of "hole" idea within memslot, we can make
+everything atomic now, by either atomically operating on memslot or on a hole
+of it.  When punching the MMIO hole, we insert a hole (or expand an existing
+hole!  We're still free to define the "hole" scemantics) into the existing
+memslot.  That replaces all the previous 3 activities and it's naturally
+atomic.
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index fbd2b3404184ba..1853cc2548c966 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -1635,8 +1635,8 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault=
- *vmf)
-=20
- 	mutex_unlock(&vdev->vma_lock);
-=20
--	if (remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
--			    vma->vm_end - vma->vm_start, vma->vm_page_prot))
-+	if (io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
-+			       vma->vm_end - vma->vm_start, vma->vm_page_prot))
- 		ret =3D VM_FAULT_SIGBUS;
-=20
- up_out:
---=20
-2.29.2
+Dirty bitmap is another extra benefit out of the atomicity that we can get.
+IMHO kvm memslot would be really more efficient when it represents the qemu
+ramblocks.  It also does not really make sense to change slot ids if what we
+did is simply punch a 1-byte hole onto a 4G range - the backing ram never
+changed, so should the dirty bitmap and the slot id..  KVM memslot tried to
+emulate these complexity of QEMU using a single layer of kvm memslot, hence
+we'll face these atomicity problems.  So I'm thinking whether we should provide
+extra abstraction (the "hole" idea is the 2nd layer, that's under kvm memslots;
+we can also think about some other ways to represent this, anyway I really feel
+like that should a new layer of abstraction) to kvm memslots to know better
+about guest rams.
+
+> 
+> As an in-KVM solution to the problem I could suggest an enhanced version
+> of KVM_SET_USER_MEMORY_REGION taking multiple regions (or even the whole
+> memmap for the guest) and we would process it in one shot. We can either
+> do it in an incremental form (add this, remove that) or require to
+> supply the full set so KVM will start with dropping everything. We can
+> also exploit Paolo's idea and make the call return dirty bitmaps of the
+> removed slots, however, this complicates things from both API (like if I
+> want to remove two slots and add three -- where would the dirty bitmap
+> go?) and QEMU PoV (as we don't necessarily want to consume dirty bitmap
+> when we do the update). So I'd stick with the 'incremental' idea.
+
+I'm not very sure about what's the "incremental idea" that you mentioned here.
+However I agree with you on above and I think that's also why I think we may
+consider to go the other way to add that extra layer to kvm memslot so that we
+don't need to have these issues you mentioned.  It seems to bring unnecessary
+complexity on the interface and it seems not as clean as the "hole" idea to me.
+
+> 
+> Honestly, I'm not fully convinced we need an in-KVM idea. We'll still
+> have to kick all vCPUs out to do the update (for shorter period compared
+> to in-QEMU solution but still) so in case we are concerned about e.g. RT
+> workloads we should be as I don't see a way out: latency spikes are
+> inevitable.
+
+Yes it would be perfect if there's an userspace solution. I'd be fine to stop
+all the vcpus as long as we haven't released the BQL during that period -
+that'll be quite simple and efficient if doable.  I actually proposed similar
+things during working on the qemu dirty ring series when I wanted to flush vcpu
+dirty bitmaps, but I encountered the same issue of incorrect BQL releasing and
+I got nasty coredumps.  I also questioned about "why we need to release BQL"
+during pausing all vcpus but I didn't dig deeper yet (on the icount and
+record/replay stuff, I think, Paolo or Alex may know better).  I'm just afraid
+there's no one good solution there to solve all the similar problems.
+
+In all cases, this is still my very unmature understanding.  I really hope
+Paolo could chim in to share his thoughts on this too, or especially on why we
+need to release bql during vcpu pausing and its necessity.
+
+Regarding RT - I never worried about RT on this. :)
+
+IMHO, "real-time host" does not mean that this RT host must guarantee
+determinism across the whole lifecycle of the system.  There're plenty of stuff
+that we can't do to guarantee that determinsm afaict, e.g., cpu hotplug.  I
+don't think "changing guest mem layout" is a good thing to do during the guest
+running RT workload.  It should be easier just to avoid it (e.g., make sure it
+only happens before the RT workload starts; and forbidden during RT app
+running) rather than trying to make that opeartion determinstic as well.
+
+Thanks,
+
+-- 
+Peter Xu
 
