@@ -2,225 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 639DD2A8494
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 18:15:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17ADF2A84B3
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 18:17:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731763AbgKERPf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 12:15:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48784 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731736AbgKERPe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Nov 2020 12:15:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604596532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SNvhLe4ZO1acx0vkrmzM1482cyKjNHogPIf4jsxyGo0=;
-        b=CrEqdHoQ9GOfI4678m57x7Qm8KgymcdkZj07ueE9gotgoxtxplJleqJHHpH/pIMQdIkntF
-        oaHQgTBuC+gJZA2O+JOiNqy4MA1VS/M8b7fubnapgaIfTw4JfuhKSexmSAmmCZ/rNTpMUD
-        oieBPrWvJZ3tvxALwJB2hXkT5t+3KhA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-PrXAJncrMqSBPDYaDF4Z1g-1; Thu, 05 Nov 2020 12:15:27 -0500
-X-MC-Unique: PrXAJncrMqSBPDYaDF4Z1g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 461416D584;
-        Thu,  5 Nov 2020 17:15:26 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DF7916CE4F;
-        Thu,  5 Nov 2020 17:15:25 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     yadong.qi@intel.com
-Subject: [PATCH 2/2] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
-Date:   Thu,  5 Nov 2020 12:15:24 -0500
-Message-Id: <20201105171524.650693-3-pbonzini@redhat.com>
-In-Reply-To: <20201105171524.650693-1-pbonzini@redhat.com>
-References: <20201105171524.650693-1-pbonzini@redhat.com>
+        id S1732013AbgKERRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 12:17:10 -0500
+Received: from mail-il1-f198.google.com ([209.85.166.198]:45103 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731535AbgKERRK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Nov 2020 12:17:10 -0500
+Received: by mail-il1-f198.google.com with SMTP id z18so1632336ilb.12
+        for <kvm@vger.kernel.org>; Thu, 05 Nov 2020 09:17:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=Rfdp0/IC9VqRIhN/SmK7/bJW5Cqy/A/9wt6SQdrC/so=;
+        b=NrqdWMQnRVbHLgedF30tdwDBsnYnaniYyU1CIDKD4prcvYkjYNmr6LAM889ChPqi2A
+         bYSo8G+o3c470P2vKGmFs7w1gwjxhe4RXnFmnUe6gPrnDYewEQrMDq3ulvwxOcNkQSty
+         PzB+oODHZMEEGZOei0iahTgLAHYZaYMrybKPGKaMjJsp2MfVDPwO95MCXAABjSx6LiT7
+         hrRXyKG8ctjO0iCfZya4cfqRB0lyXBXP2RNuWcixMLBCbYs+qPkv1NstfzLzRio6pYII
+         PXZhWBviB6igZMLWZpRMnOBOmySxgTb4i3hcYtIJOCZY+v7emyjlhhph3A7FfPnTBDMf
+         2J7w==
+X-Gm-Message-State: AOAM531Mi7K6o65J75QFWoXTRMVXTAGv2umHyTXeXPuoFW51Il5t49J6
+        /FS6H+KCxmC6oftlA2Wbj3p+B5khN5nw674C/wcgjrygBUzX
+X-Google-Smtp-Source: ABdhPJz6aE++DpR5GB57XSRgnn/AejK0OmDlD9JNlHk2Cn/tHZAQrZtFP17BXU3YjRc+tzy/tebsQtaCi4N/l2rop3tvXbzsLPOf
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Received: by 2002:a92:7a0c:: with SMTP id v12mr2249529ilc.37.1604596628995;
+ Thu, 05 Nov 2020 09:17:08 -0800 (PST)
+Date:   Thu, 05 Nov 2020 09:17:08 -0800
+In-Reply-To: <000000000000dd392b05b0a1b7ac@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000014484705b35f4414@google.com>
+Subject: Re: WARNING in handle_exception_nmi
+From:   syzbot <syzbot+4e78ae6b12b00b9d1042@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        will@kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Yadong Qi <yadong.qi@intel.com>
+syzbot suspects this issue was fixed by commit:
 
-Background: We have a lightweight HV, it needs INIT-VMExit and
-SIPI-VMExit to wake-up APs for guests since it do not monitor
-the Local APIC. But currently virtual wait-for-SIPI(WFS) state
-is not supported in nVMX, so when running on top of KVM, the L1
-HV cannot receive the INIT-VMExit and SIPI-VMExit which cause
-the L2 guest cannot wake up the APs.
+commit f8e48a3dca060e80f672d398d181db1298fbc86c
+Author: Peter Zijlstra <peterz@infradead.org>
+Date:   Thu Oct 22 10:23:02 2020 +0000
 
-According to Intel SDM Chapter 25.2 Other Causes of VM Exits,
-SIPIs cause VM exits when a logical processor is in
-wait-for-SIPI state.
+    lockdep: Fix preemption WARN for spurious IRQ-enable
 
-In this patch:
-    1. introduce SIPI exit reason,
-    2. introduce wait-for-SIPI state for nVMX,
-    3. advertise wait-for-SIPI support to guest.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17bbfa8a500000
+start commit:   d3d45f82 Merge tag 'pinctrl-v5.9-2' of git://git.kernel.or..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=89ab6a0c48f30b49
+dashboard link: https://syzkaller.appspot.com/bug?extid=4e78ae6b12b00b9d1042
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12f24a0b900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=167b838f900000
 
-When L1 hypervisor is not monitoring Local APIC, L0 need to emulate
-INIT-VMExit and SIPI-VMExit to L1 to emulate INIT-SIPI-SIPI for
-L2. L2 LAPIC write would be traped by L0 Hypervisor(KVM), L0 should
-emulate the INIT/SIPI vmexit to L1 hypervisor to set proper state
-for L2's vcpu state.
+If the result looks correct, please mark the issue as fixed by replying with:
 
-Handle procdure:
-Source vCPU:
-    L2 write LAPIC.ICR(INIT).
-    L0 trap LAPIC.ICR write(INIT): inject a latched INIT event to target
-       vCPU.
-Target vCPU:
-    L0 emulate an INIT VMExit to L1 if is guest mode.
-    L1 set guest VMCS, guest_activity_state=WAIT_SIPI, vmresume.
-    L0 set vcpu.mp_state to INIT_RECEIVED if (vmcs12.guest_activity_state
-       == WAIT_SIPI).
+#syz fix: lockdep: Fix preemption WARN for spurious IRQ-enable
 
-Source vCPU:
-    L2 write LAPIC.ICR(SIPI).
-    L0 trap LAPIC.ICR write(INIT): inject a latched SIPI event to traget
-       vCPU.
-Target vCPU:
-    L0 emulate an SIPI VMExit to L1 if (vcpu.mp_state == INIT_RECEIVED).
-    L1 set CS:IP, guest_activity_state=ACTIVE, vmresume.
-    L0 resume to L2.
-    L2 start-up.
-
-Signed-off-by: Yadong Qi <yadong.qi@intel.com>
-Message-Id: <20200922052343.84388-1-yadong.qi@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/vmx.h      |  1 +
- arch/x86/include/uapi/asm/vmx.h |  2 ++
- arch/x86/kvm/vmx/nested.c       | 53 ++++++++++++++++++++++++---------
- 3 files changed, 42 insertions(+), 14 deletions(-)
-
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index f8ba5289ecb0..38ca445a8429 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -113,6 +113,7 @@
- #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
- #define VMX_MISC_SAVE_EFER_LMA			0x00000020
- #define VMX_MISC_ACTIVITY_HLT			0x00000040
-+#define VMX_MISC_ACTIVITY_WAIT_SIPI		0x00000100
- #define VMX_MISC_ZERO_LEN_INS			0x40000000
- #define VMX_MISC_MSR_LIST_MULTIPLIER		512
- 
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index b8ff9e8ac0d5..ada955c5ebb6 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -32,6 +32,7 @@
- #define EXIT_REASON_EXTERNAL_INTERRUPT  1
- #define EXIT_REASON_TRIPLE_FAULT        2
- #define EXIT_REASON_INIT_SIGNAL			3
-+#define EXIT_REASON_SIPI_SIGNAL         4
- 
- #define EXIT_REASON_INTERRUPT_WINDOW    7
- #define EXIT_REASON_NMI_WINDOW          8
-@@ -94,6 +95,7 @@
- 	{ EXIT_REASON_EXTERNAL_INTERRUPT,    "EXTERNAL_INTERRUPT" }, \
- 	{ EXIT_REASON_TRIPLE_FAULT,          "TRIPLE_FAULT" }, \
- 	{ EXIT_REASON_INIT_SIGNAL,           "INIT_SIGNAL" }, \
-+	{ EXIT_REASON_SIPI_SIGNAL,           "SIPI_SIGNAL" }, \
- 	{ EXIT_REASON_INTERRUPT_WINDOW,      "INTERRUPT_WINDOW" }, \
- 	{ EXIT_REASON_NMI_WINDOW,            "NMI_WINDOW" }, \
- 	{ EXIT_REASON_TASK_SWITCH,           "TASK_SWITCH" }, \
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 89af692deb7e..c35eec55b2c6 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2952,7 +2952,8 @@ static int nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
- static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
- {
- 	if (CC(vmcs12->guest_activity_state != GUEST_ACTIVITY_ACTIVE &&
--	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT))
-+	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT &&
-+	       vmcs12->guest_activity_state != GUEST_ACTIVITY_WAIT_SIPI))
- 		return -EINVAL;
- 
- 	return 0;
-@@ -3559,19 +3560,29 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 	 */
- 	nested_cache_shadow_vmcs12(vcpu, vmcs12);
- 
--	/*
--	 * If we're entering a halted L2 vcpu and the L2 vcpu won't be
--	 * awakened by event injection or by an NMI-window VM-exit or
--	 * by an interrupt-window VM-exit, halt the vcpu.
--	 */
--	if ((vmcs12->guest_activity_state == GUEST_ACTIVITY_HLT) &&
--	    !(vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK) &&
--	    !(vmcs12->cpu_based_vm_exec_control & CPU_BASED_NMI_WINDOW_EXITING) &&
--	    !((vmcs12->cpu_based_vm_exec_control & CPU_BASED_INTR_WINDOW_EXITING) &&
--	      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
-+	switch (vmcs12->guest_activity_state) {
-+	case GUEST_ACTIVITY_HLT:
-+		/*
-+		 * If we're entering a halted L2 vcpu and the L2 vcpu won't be
-+		 * awakened by event injection or by an NMI-window VM-exit or
-+		 * by an interrupt-window VM-exit, halt the vcpu.
-+		 */
-+		if (!(vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK) &&
-+		    !nested_cpu_has(vmcs12, CPU_BASED_NMI_WINDOW_EXITING) &&
-+		    !(nested_cpu_has(vmcs12, CPU_BASED_INTR_WINDOW_EXITING) &&
-+		      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
-+			vmx->nested.nested_run_pending = 0;
-+			return kvm_vcpu_halt(vcpu);
-+		}
-+		break;
-+	case GUEST_ACTIVITY_WAIT_SIPI:
- 		vmx->nested.nested_run_pending = 0;
--		return kvm_vcpu_halt(vcpu);
-+		vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
-+		break;
-+	default:
-+		break;
- 	}
-+
- 	return 1;
- 
- vmentry_failed:
-@@ -3797,7 +3808,20 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
- 			return -EBUSY;
- 		nested_vmx_update_pending_dbg(vcpu);
- 		clear_bit(KVM_APIC_INIT, &apic->pending_events);
--		nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
-+		if (vcpu->arch.mp_state != KVM_MP_STATE_INIT_RECEIVED)
-+			nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
-+		return 0;
-+	}
-+
-+	if (lapic_in_kernel(vcpu) &&
-+	    test_bit(KVM_APIC_SIPI, &apic->pending_events)) {
-+		if (block_nested_events)
-+			return -EBUSY;
-+
-+		clear_bit(KVM_APIC_SIPI, &apic->pending_events);
-+		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED)
-+			nested_vmx_vmexit(vcpu, EXIT_REASON_SIPI_SIGNAL, 0,
-+						apic->sipi_vector & 0xFFUL);
- 		return 0;
- 	}
- 
-@@ -6483,7 +6507,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 	msrs->misc_low |=
- 		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
- 		VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE |
--		VMX_MISC_ACTIVITY_HLT;
-+		VMX_MISC_ACTIVITY_HLT |
-+		VMX_MISC_ACTIVITY_WAIT_SIPI;
- 	msrs->misc_high = 0;
- 
- 	/*
--- 
-2.26.2
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
