@@ -2,121 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A41142A8696
-	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 19:58:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D6AE2A86AB
+	for <lists+kvm@lfdr.de>; Thu,  5 Nov 2020 20:03:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729783AbgKES6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 13:58:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58786 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726996AbgKES6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Nov 2020 13:58:43 -0500
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD7D3C0613CF
-        for <kvm@vger.kernel.org>; Thu,  5 Nov 2020 10:58:43 -0800 (PST)
-Received: by mail-io1-xd43.google.com with SMTP id p7so2875365ioo.6
-        for <kvm@vger.kernel.org>; Thu, 05 Nov 2020 10:58:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sUpNCmLEocsd06ea6TUgBYF5Lti0y6kySFHe+L+lO2M=;
-        b=ocZ0o2bW/2g+lKR2aAj2qtLyojA9TDvBTA1wO0qu1HGrLT39SlqtLSPOdR4hVOzrpm
-         n0RNxB2eejpk2X9jAkNJWHrob0aJbxw33RrZ21z+29/1w/x9wGDq8Bw7NGRaGVQm4xKT
-         0qH1D0O+JGiomKFvQ31i9FvsSjFPhG3OQnT6z4s1nk7GJ24wi+Tp6QmZdCq8YFIIyyhW
-         a9vWeo/AnwVwB29PJX9zs4CymQiNlAWXQOG0PNEoFThRNvl0lFDQuA7S9HNqtqh/2JEc
-         g6bRg7GFjDCrU2dG5ri1uBYwqTCTVb0eaRWVbnE9fETx+QH5sZO8DEsHJE8HvacWRvXY
-         vbMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sUpNCmLEocsd06ea6TUgBYF5Lti0y6kySFHe+L+lO2M=;
-        b=ZUIP3JUnWm5wLh5Qs1/67eboy6XDFErfGWqMtJ62jIs4Cdx7XF8wWdAtzzpBt0YFSi
-         Lrjwr45P8VdxTQPTxODYMHilU66vvHIPgoXC+w6ibMrtHvWx8xWUwFXUymPrjhfuBiFb
-         HQ2BFZdLaKVmQr7x33owSpP5s8gecO4ioey04x7/WrV/EmwPCMQwH2eA1T5vCutF1AoD
-         qbQed6+azHkW2dr5zIQ1hvWqyIeemmSJNAUhlmlJn8C6ItL3MDGCteATru8lxotzFC+z
-         SEnrMlMfFqUoEmcsJPYJVFCdiy1h0qNHd9c1uRFx1tD+jzIGoR3AP+uz4JZQftCqRngj
-         Aliw==
-X-Gm-Message-State: AOAM531n4RjLUyVJe6uCiXUY6mDpxjtAkOXSPNN+hsT5UiI1rElqvShk
-        IbuoYv+65wn4nibHlTs1+1KKtIj12oZA8lXBnFo=
-X-Google-Smtp-Source: ABdhPJxCQ3jDAXdKn+XUT4VT9AOWKCxitIeJyRADvNle5a6uYrdM11Gx+rCzpmjvsZE79tgS0pusSQU3vVuWGdpy5as=
-X-Received: by 2002:a6b:5f05:: with SMTP id t5mr2892929iob.67.1604602723137;
- Thu, 05 Nov 2020 10:58:43 -0800 (PST)
+        id S1729783AbgKETD2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 14:03:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38398 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727851AbgKETD1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Nov 2020 14:03:27 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A5IXUT1116986
+        for <kvm@vger.kernel.org>; Thu, 5 Nov 2020 14:03:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/GgNsaiPDfiqCPaPc0HcyUnFNqPXIst/Dy8hSK2KLno=;
+ b=Q6rOoAzYv/qAP8GWw7j1+vbM0W64pSmsrZU9sUCahzrRYzkQc40vdf7a+hGzAWyjCHh8
+ iqsBCksbpLfnYSK+11fXTO2a84qzCcgin+A+XsXFSoLe8b5C03/2rrulzqsYW29AnRFS
+ 3/SgQohDlgLSbQ/zJO1Vy8TuBDAtU40MR3Yi7kMqsbCoqKaLmx3d+kjw+zW+tZ//WqIB
+ e9pTc737VfHSY87m6rAIQ1fOBIPqYILLVGMArdp5pUesviOPsggFzVuHvRqUMn/vX7YN
+ jvEa+xKuqbSCtMnh8cpg2DK6SkW86B4BPnbaA3mVL2BONzc5fmti5LNlf8aiW6qW5ReO 6w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34mhxjn90q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 05 Nov 2020 14:03:25 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A5IXasf117338
+        for <kvm@vger.kernel.org>; Thu, 5 Nov 2020 14:03:25 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34mhxjn8ys-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Nov 2020 14:03:25 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5IllkJ007306;
+        Thu, 5 Nov 2020 18:54:28 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 34hm6hd0sv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Nov 2020 18:54:28 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A5IsQq78454870
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 5 Nov 2020 18:54:26 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C757A4054;
+        Thu,  5 Nov 2020 18:54:26 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 10A2DA405F;
+        Thu,  5 Nov 2020 18:54:26 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.167.78])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  5 Nov 2020 18:54:25 +0000 (GMT)
+Subject: Re: [PATCH 09/11] KVM: selftests: Make vm_create_default common
+To:     Peter Xu <peterx@redhat.com>, Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, frankja@linux.ibm.com,
+        bgardon@google.com
+References: <20201104212357.171559-1-drjones@redhat.com>
+ <20201104212357.171559-10-drjones@redhat.com>
+ <20201104213612.rjykwe7pozcoqbcb@kamzik.brq.redhat.com>
+ <c2c57735-2d1c-5abf-c2c0-ed04a19db5a0@de.ibm.com>
+ <20201105095930.nofg64qyuf4qertu@kamzik.brq.redhat.com>
+ <20201105184511.GC106309@xz-x1>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <c27eb25a-3e4d-7812-3534-22a557443419@de.ibm.com>
+Date:   Thu, 5 Nov 2020 19:54:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201105153932.24316-1-pankaj.gupta.linux@gmail.com> <36be2860-9ef9-db0f-ad8b-1089bd258dbc@redhat.com>
-In-Reply-To: <36be2860-9ef9-db0f-ad8b-1089bd258dbc@redhat.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Thu, 5 Nov 2020 19:58:31 +0100
-Message-ID: <CAM9Jb+igM6Pp=Mx3WAqQJBsVqmVhfaYmkspFvDq1Y93Dihdp8w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: handle MSR_IA32_DEBUGCTLMSR with report_ignored_msrs
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, oro@8bytes.org,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201105184511.GC106309@xz-x1>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-05_11:2020-11-05,2020-11-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=999
+ clxscore=1015 adultscore=0 impostorscore=0 bulkscore=0 spamscore=0
+ mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011050121
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> >   Guest tries to enable LBR (last branch/interrupt/exception) repeatedly,
-> >   thus spamming the host kernel logs. As MSR_IA32_DEBUGCTLMSR is not emulated by
-> >   KVM, its better to add the error log only with "report_ignored_msrs".
-> >
-> > Signed-off-by: Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-> > ---
-> >   arch/x86/kvm/x86.c | 6 +++---
-> >   1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index f5ede41bf9e6..99c69ae43c69 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3063,9 +3063,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >                       /* Values other than LBR and BTF are vendor-specific,
-> >                          thus reserved and should throw a #GP */
-> >                       return 1;
-> > -             }
-> > -             vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
-> > -                         __func__, data);
-> > +             } else if (report_ignored_msrs)
-> > +                     vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
-> > +                                 __func__, data);
-> >               break;
-> >       case 0x200 ... 0x2ff:
-> >               return kvm_mtrr_set_msr(vcpu, msr, data);
-> >
->
-> Which guest it is?  (Patch queued, but I'd like to have a better
-> description).
-
-How about this?
-
-Windows2016 guest tries to enable LBR (last
-branch/interrupt/exception) by setting
-MSR_IA32_DEBUGCTLMSR. KVM does not emulate MSR_IA32_DEBUGCTLMSR and
-spams the host kernel logs with the below error messages.This patch
-fixes this by enabling
-error logging only with 'report_ignored_msrs'.
-
-"kvm []: vcpu1, guest rIP: 0xfffff800a8b687d3 kvm_set_msr_common:
-MSR_IA32_DEBUGCTLMSR 0x1, nop"
-
-Thanks,
-Pankaj
 
 
+On 05.11.20 19:45, Peter Xu wrote:
+> On Thu, Nov 05, 2020 at 10:59:30AM +0100, Andrew Jones wrote:
+>>>>> +#define PTRS_PER_PAGE(page_size)	((page_size) / 8)
+>>>>
+>>>> Doh. I think this 8 is supposed to be a 16 for s390x, considering it
+>>>> was dividing by 256 in its version of vm_create_default. I need
+>>>> guidance from s390x gurus as to whether or not I should respin though.
+>>>>
+>>>> Thanks,
+>>>> drew
+>>>>
+>>>
+>>> This is kind of tricky. The last level page table is only 2kb (256 entries = 1MB range).
+>>> Depending on whether the page table allocation is clever or not (you can have 2 page
+>>> tables in one page) this means that indeed 16 might be better. But then you actually 
+>>> want to change the macro name to PTES_PER_PAGE?
+>>
+>> Thanks Christian,
+>>
+>> I'll respin with the macro name change and 16 for s390.
+> 
+> Maybe it can also be moved to common header, but instead define PTR_SIZE for
+> per-arch?  I'm also curious whether PTR_SIZE will equals to "sizeof(void *)",
+> but seems not for s390x..  Thanks,
 
+Thats why I want to change the name. It is not about the ptr size. It is about
+number of page table entries in a page. And as a page table is just 2kb on s390
+there is a mismatch. So instead of
 
+#define PTRS_PER_PAGE(page_size)	((page_size) / 8)
 
-
->
-> Paolo
->
+let us just to
+#define PTES_PER_PAGETABLE 256
+for s390
+and
+#define PTES_PER_PAGETABLE 512
+for the others
