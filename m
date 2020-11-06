@@ -2,74 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E1732A93EC
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:18:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AD492A93FB
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:19:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726812AbgKFKSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 05:18:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44420 "EHLO
+        id S1726953AbgKFKTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 05:19:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39507 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726820AbgKFKSH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 05:18:07 -0500
+        by vger.kernel.org with ESMTP id S1725868AbgKFKTe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 05:19:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604657886;
+        s=mimecast20190719; t=1604657973;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Yzk7p3eTaQyL5wtsKR5oklwe+xjCN3EJ0U6A47oK3k0=;
-        b=ay0gAqPfz58kmDtkHJKxDfPArR5S2iXYLOjL1opgd/CEv5becI8hVHGj2LJmbQVNVRyX86
-        lynlBRfTqPE7lzybxs0VoFyBeypFcKEIP3nbUtK7pkDRTmBmXod0z6nSHdnHJ6tAwQGCnn
-        Cq4y70OrnmqhjVR04DGf9Tzstx2KTY4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-eh4mIotxM8SC23KOSh1fDg-1; Fri, 06 Nov 2020 05:18:04 -0500
-X-MC-Unique: eh4mIotxM8SC23KOSh1fDg-1
-Received: by mail-wm1-f71.google.com with SMTP id c10so252066wmh.6
-        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:18:04 -0800 (PST)
+        bh=IEESCUKmdhXLSA4iMxhPM1Tip0ntZzoWBSXPRJnNCdE=;
+        b=QoIiAsZJ8p8RngiQZOrhD0Sf4VAvgHYZG1d/rtzvcgiTFQQyievTNPC98v3yDFqudh6Uhd
+        XvtheOy8foAHDnnF4twsSWVhcXN5MhClyZgexLNtYFumxrO2H0ovlL/nqhjDMiLv7SDtsm
+        u82nHfL+cRBNxqCd2/FzbL2NApAI240=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-7QrF_Xb5PT2F343EJt4SPg-1; Fri, 06 Nov 2020 05:19:31 -0500
+X-MC-Unique: 7QrF_Xb5PT2F343EJt4SPg-1
+Received: by mail-wm1-f69.google.com with SMTP id o19so254617wme.2
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:19:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Yzk7p3eTaQyL5wtsKR5oklwe+xjCN3EJ0U6A47oK3k0=;
-        b=IxgMo9vcoIHULhuFzInX/+yHuZ7PjuM+h3eoUAWR37o+/2n96pbawcuh0JblwhoQhY
-         gPXQ8slAfqgtZwdfqwqZC5/K8OZR5pzVHE2z4i90PAlHilIf6TerqXo1OlFN7SomJGtj
-         9Ji2EHl+/N6RDg5XOnt4AXFwo4QETH7zRNiw+nQ1muv29kavMKbykcVAPHRLKit3n5l0
-         3ZcXlYvRKSywr0wxEDjASFUiaDtxPHQm1RCr25zkcJrWg4yDK98QAgiKQVPWE7XDc5/F
-         vtaYQdhaV6AoQtzDjhhLIzh1HRRDYqe4aZGvaKi9gjLWchr8ocVHieLFsQFt/stFGahp
-         u9lA==
-X-Gm-Message-State: AOAM530P8ewlvxJU5/xqvs5l2+MPmkgNFMlKryd+j8/LJ7OvOpfz9Elc
-        fxlx7fr9lpy6VKKOa5S3NDxcA0aIfrFXNrqdcU+xzMLGeTOgqhu+mzJ22Uck1omF3D5zcDSVXuC
-        lsQVKiZwt6mXA
-X-Received: by 2002:a5d:4104:: with SMTP id l4mr76526wrp.276.1604657883307;
-        Fri, 06 Nov 2020 02:18:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxB2u9mosiunWtpr+aCXh7Ej3eCO/BmFfUkhzOjK2rINBlvPD+3Osb4sZK4nnIZVF5p75slog==
-X-Received: by 2002:a5d:4104:: with SMTP id l4mr76504wrp.276.1604657883127;
-        Fri, 06 Nov 2020 02:18:03 -0800 (PST)
+        bh=IEESCUKmdhXLSA4iMxhPM1Tip0ntZzoWBSXPRJnNCdE=;
+        b=he43VhcRzhSyyxcnpX3sD9tQRDf0jAB7aTExaA24D2oFG3erN9mE9MUMgdwWOlGzPV
+         wh2oOLnpY1i/g9dhIM6x9JehoA1xBlTMI9CvWvGuLa9AjSlg25qL9+a8eZ4HjCDXhcKP
+         KSGonv+9g3O1qbYsE5flgaN69prdKieG7w3jLPe2szRyY0iz58qu3hA00vsJ4qPBBNSf
+         CTbpRE//LeKeH0POcvNnEsrHO05LHxYzdn1B6Y0DgsI/Mhg4nDQqcWc8D0os7W1Rnvis
+         uDNLRX/vfQ5+pAmtwp1vLRRCxul/Exu/KI+RXoPM3NxEpUmKWU4tsLCr9Bp5XUCfonc/
+         Vcrw==
+X-Gm-Message-State: AOAM533mYcBHYZ740bKfGfs9o0kv5pyuMcabTx7Knt6c0DBF3m+PYaNn
+        G5CQ/1NtYlQZQLHlRnKwrkttXNBHVTpS5rOmwNrYBCyZp6ZSl+J1NVj4iAVO5pKbITAypfObo8m
+        7J1cbNPWHewDf
+X-Received: by 2002:a1c:9916:: with SMTP id b22mr1707709wme.105.1604657967386;
+        Fri, 06 Nov 2020 02:19:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy4URoqcAcxLQZAfyqtAhP6FNfx4EsvO4UCAIcFJw0o3isANYzys7GBSVGJ0h8McO+dB+9NNw==
+X-Received: by 2002:a1c:9916:: with SMTP id b22mr1707690wme.105.1604657967179;
+        Fri, 06 Nov 2020 02:19:27 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id e25sm1449631wra.71.2020.11.06.02.18.01
+        by smtp.gmail.com with ESMTPSA id h7sm1313311wrt.45.2020.11.06.02.19.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Nov 2020 02:18:02 -0800 (PST)
-Subject: Re: [PATCH] x86/kvm/hyper-v: Don't deactivate APICv unconditionally
- when Hyper-V SynIC enabled
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, junjiehua0xff@gmail.com
+        Fri, 06 Nov 2020 02:19:26 -0800 (PST)
+Subject: Re: [PATCH v3 0/2] KVM: x86: hyper-v: make KVM_GET_SUPPORTED_HV_CPUID
+ more useful
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andrey Smetanin <asmetanin@virtuozzo.com>,
-        Junjie Hua <junjiehua@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1604567537-909-1-git-send-email-junjiehua@tencent.com>
- <87sg9n3ilt.fsf@vitty.brq.redhat.com>
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jon Doron <arilou@gmail.com>, linux-kernel@vger.kernel.org
+References: <20200929150944.1235688-1-vkuznets@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <348f8763-3842-0dda-2c01-6c5d510fe630@redhat.com>
-Date:   Fri, 6 Nov 2020 11:18:01 +0100
+Message-ID: <dbe90b3a-bf0d-cced-5f96-c38a29ebd6a9@redhat.com>
+Date:   Fri, 6 Nov 2020 11:19:25 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <87sg9n3ilt.fsf@vitty.brq.redhat.com>
+In-Reply-To: <20200929150944.1235688-1-vkuznets@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,24 +74,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/11/20 16:53, Vitaly Kuznetsov wrote:
->> The current implementation of Hyper-V SynIC[1] request to deactivate
->> APICv when SynIC is enabled, since the AutoEOI feature of SynIC is not
->> compatible with APICv[2].
->>
->> Actually, windows doesn't use AutoEOI if deprecating AutoEOI bit is set
->> (CPUID.40000004H:EAX[bit 9], HyperV-TLFS v6.0b section 2.4.5), we don't
->> need to disable APICv in this case.
->>
-> Thank you for the patch, the fact that we disable APICv every time we
-> enable SynIC is nothing to be proud of. I'm, however, not sure we can
-> treat 'Recommend deprecating AutoEOI' as 'AutoEOI must not be
-> used.'. Could you please clarify which Windows versions you've tested
-> with with?
+On 29/09/20 17:09, Vitaly Kuznetsov wrote:
+> Changes since v2:
+> - Keep vCPU version of the ioctl intact but make it 'deprecated' in
+>    api.rst [Paolo Bonzini]
+> - First two patches of v2 series already made it to kvm/queue
+> 
+> QEMU series using the feature:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg02017.html
+> 
+> Original description:
+> 
+> KVM_GET_SUPPORTED_HV_CPUID was initially implemented as a vCPU ioctl but
+> this is not very useful when VMM is just trying to query which Hyper-V
+> features are supported by the host prior to creating VM/vCPUs. The data
+> in KVM_GET_SUPPORTED_HV_CPUID is mostly static with a few exceptions but
+> it seems we can change this. Add support for KVM_GET_SUPPORTED_HV_CPUID as
+> a system ioctl as well.
+> 
+> QEMU specific description:
+> In some cases QEMU needs to collect the information about which Hyper-V
+> features are supported by KVM and pass it up the stack. For non-hyper-v
+> features this is done with system-wide KVM_GET_SUPPORTED_CPUID/
+> KVM_GET_MSRS ioctls but Hyper-V specific features don't get in the output
+> (as Hyper-V CPUIDs intersect with KVM's). In QEMU, CPU feature expansion
+> happens before any KVM vcpus are created so KVM_GET_SUPPORTED_HV_CPUID
+> can't be used in its current shape.
+> 
+> Vitaly Kuznetsov (2):
+>    KVM: x86: hyper-v: allow KVM_GET_SUPPORTED_HV_CPUID as a system ioctl
+>    KVM: selftests: test KVM_GET_SUPPORTED_HV_CPUID as a system ioctl
+> 
+>   Documentation/virt/kvm/api.rst                | 16 ++--
+>   arch/x86/kvm/hyperv.c                         |  6 +-
+>   arch/x86/kvm/hyperv.h                         |  4 +-
+>   arch/x86/kvm/vmx/evmcs.c                      |  3 +-
+>   arch/x86/kvm/x86.c                            | 45 ++++++----
+>   include/uapi/linux/kvm.h                      |  3 +-
+>   .../testing/selftests/kvm/include/kvm_util.h  |  2 +
+>   tools/testing/selftests/kvm/lib/kvm_util.c    | 26 ++++++
+>   .../selftests/kvm/x86_64/hyperv_cpuid.c       | 87 +++++++++++--------
+>   9 files changed, 123 insertions(+), 69 deletions(-)
 > 
 
-Indeed---older versions of Windows that predate the deprecation will 
-continue using AutoEOI.
+Queued, thanks.
 
 Paolo
 
