@@ -2,118 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B8ED2A92D6
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 10:35:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 071632A9309
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 10:45:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726423AbgKFJfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 04:35:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41907 "EHLO
+        id S1726190AbgKFJpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 04:45:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32289 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725868AbgKFJfy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 04:35:54 -0500
+        by vger.kernel.org with ESMTP id S1725868AbgKFJpZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 04:45:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604655353;
+        s=mimecast20190719; t=1604655924;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=COh7322GhHnYTfoWCK648pPK1F4ogcTwn4taOORgpuE=;
-        b=et0SjcajHDnLWQ5Ahrgq3OERkzsd39oadJrTn8X/+7OIXeEGLxJujWmhfT0L6jYX2g8fZi
-        uWB3FolYu6lm61rOLjaEQnXiecov1nzoC1lLitUslhZy6TIpQVj/patGTIpkgcF10g1GU0
-        Wsjp1QDxltA7hexvrqPIauO+HQTR8Qc=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-00P6dVgWM4-VvR_4QpxmJg-1; Fri, 06 Nov 2020 04:35:51 -0500
-X-MC-Unique: 00P6dVgWM4-VvR_4QpxmJg-1
-Received: by mail-ed1-f69.google.com with SMTP id f20so300432edx.23
-        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 01:35:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=COh7322GhHnYTfoWCK648pPK1F4ogcTwn4taOORgpuE=;
-        b=szi4ieIbgZpgNcj4qkDcS1GdIRUy8IiH7zDdZBc/Wa1ZlxCgVxs4QHvByXIRMTMp8X
-         XZn6OkhfMr3w5HHtcrEXm4tHoLfmmi8mto/YKGevHdcT/aaGfrjRZRsFQp65KtWvKJ8W
-         0YPuvpl/RIenOtQRJFcJzzRq5oSVjBoi771WDJ7YC8aWp26RLWDyNNQiI/3Ve9QZsM5C
-         I4wBMc4cpVQaLIvSf2sZDXnqJUyBedbwotIrFVEEWIuyZoO5CApg3RS340ZhPOILObuD
-         722gG7w82HDZU0jqzNURwjKsAZFZdTfGwXL3q1c0MjK/TbhuUPG/EGb/mbdLKxl4m9dy
-         sbAg==
-X-Gm-Message-State: AOAM530A8XlHtFaEy3axjhYs5kMpqeDIsNzVJ93Rmw3G8X6evTVIyzyX
-        is4yBPsWUjZKUQj7cvHH9HuWBV1aEBSLZCmwwRgIKwx2Qppv9aMFyh6pJHhjRvgEYN6obG1IqR8
-        T3EuQbEH3Iw+4
-X-Received: by 2002:aa7:c40b:: with SMTP id j11mr1052202edq.151.1604655350420;
-        Fri, 06 Nov 2020 01:35:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxCyBjacm4/sWb+AyM7ztQpZR/p9PyzAKj5KqdlXmlv9S87IqV7wnB9RlzqOueD7Gf0frb6xQ==
-X-Received: by 2002:aa7:c40b:: with SMTP id j11mr1052185edq.151.1604655350213;
-        Fri, 06 Nov 2020 01:35:50 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i13sm485679ejv.84.2020.11.06.01.35.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2020 01:35:49 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Alex Shi <alex.shi@linux.alibaba.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hpa@zytor.com
-Subject: Re: [PATCH] x86/kvm: remove unused macro HV_CLOCK_SIZE
-In-Reply-To: <1604651963-10067-1-git-send-email-alex.shi@linux.alibaba.com>
-References: <1604651963-10067-1-git-send-email-alex.shi@linux.alibaba.com>
-Date:   Fri, 06 Nov 2020 10:35:48 +0100
-Message-ID: <87o8ka3k0b.fsf@vitty.brq.redhat.com>
+        bh=fJ7sAstwlEzjVqpCmCx9AOq8F4RCIaELE3f6EU6QGdA=;
+        b=LjFDEVNLlyOW6YU2o0RQaxnqKsoxCNoeXCaRBM1P9gpG2ko/PPdUCcrbf28yNFq46CYcxV
+        3RnZF2ssx15bf/z4BB4lMGKw2KHR/c5wRKCtKvoExh/K40iAkG1l2VzwS4/V5DBshMlW24
+        PPYHmBIVqu/Qg0pXOC39Ktq6zY97UKQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-q7D_GGfyP7i7VmchIUomjQ-1; Fri, 06 Nov 2020 04:45:22 -0500
+X-MC-Unique: q7D_GGfyP7i7VmchIUomjQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0D461074644;
+        Fri,  6 Nov 2020 09:45:20 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.153])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 67E495C5FD;
+        Fri,  6 Nov 2020 09:45:14 +0000 (UTC)
+Date:   Fri, 6 Nov 2020 10:45:11 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Peter Xu <peterx@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 00/11] KVM: selftests: Cleanups
+Message-ID: <20201106094511.s4dj2a7n32dawt7m@kamzik.brq.redhat.com>
+References: <20201104212357.171559-1-drjones@redhat.com>
+ <20201105185554.GD106309@xz-x1>
+ <CANgfPd_97QGP+q8-_VAzhJxw_kdiHcFukAZ-dSp4cNrvKdNEpg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd_97QGP+q8-_VAzhJxw_kdiHcFukAZ-dSp4cNrvKdNEpg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alex Shi <alex.shi@linux.alibaba.com> writes:
-
-> This macro is useless, and could cause gcc warning:
-> arch/x86/kernel/kvmclock.c:47:0: warning: macro "HV_CLOCK_SIZE" is not
-> used [-Wunused-macros]
-> Let's remove it.
+On Thu, Nov 05, 2020 at 11:41:24AM -0800, Ben Gardon wrote:
+> On Thu, Nov 5, 2020 at 10:56 AM Peter Xu <peterx@redhat.com> wrote:
+> >
+> > On Wed, Nov 04, 2020 at 10:23:46PM +0100, Andrew Jones wrote:
+> > > This series attempts to clean up demand_paging_test and dirty_log_test
+> > > by factoring out common code, creating some new API along the way. It's
+> > > main goal is to prepare for even more factoring that Ben and Peter want
+> > > to do. The series would have a nice negative diff stat, but it also
+> > > picks up a few of Peter's patches for his new dirty log test. So, the
+> > > +/- diff stat is close to equal. It's not as close as an electoral vote
+> > > count, but it's close.
+> > >
+> > > I've tested on x86 and AArch64 (one config each), but not s390x.
+> >
+> > The whole series looks good to me (probably except the PTRS_PER_PAGE one; but
+> > that's not hurting much anyways, I think).  Thanks for picking up the other
+> > patches, even if they made the diff stat much less pretty..
+> 
+> This series looks good to me too. Thanks for doing this Drew!
+> 
+> Sorry I'm later than I wanted to be in reviewing this series. I
+> learned I was exposed to someone with COVID yesterday, so I've been a
+> bit scattered. The dirty log perf test series v3 might be delayed a
+> bit as a result, but I'll send it out as soon as I can after this
+> series is merged.
 >
-> Signed-off-by: Alex Shi <alex.shi@linux.alibaba.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com> 
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com> 
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com> 
-> Cc: Wanpeng Li <wanpengli@tencent.com> 
-> Cc: Jim Mattson <jmattson@google.com> 
-> Cc: Joerg Roedel <joro@8bytes.org> 
-> Cc: Thomas Gleixner <tglx@linutronix.de> 
-> Cc: Ingo Molnar <mingo@redhat.com> 
-> Cc: Borislav Petkov <bp@alien8.de> 
-> Cc: x86@kernel.org 
-> Cc: "H. Peter Anvin" <hpa@zytor.com> 
-> Cc: kvm@vger.kernel.org 
-> Cc: linux-kernel@vger.kernel.org 
-> ---
->  arch/x86/kernel/kvmclock.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> index 34b18f6eeb2c..aa593743acf6 100644
-> --- a/arch/x86/kernel/kvmclock.c
-> +++ b/arch/x86/kernel/kvmclock.c
-> @@ -44,7 +44,6 @@ static int __init parse_no_kvmclock_vsyscall(char *arg)
->  early_param("no-kvmclock-vsyscall", parse_no_kvmclock_vsyscall);
->  
->  /* Aligned to page sizes to match whats mapped via vsyscalls to userspace */
-> -#define HV_CLOCK_SIZE	(sizeof(struct pvclock_vsyscall_time_info) * NR_CPUS)
->  #define HVC_BOOT_ARRAY_SIZE \
->  	(PAGE_SIZE / sizeof(struct pvclock_vsyscall_time_info))
 
-Fixes: 95a3d4454bb1 ("x86/kvmclock: Switch kvmclock data to a PER_CPU variable")
+Yikes! Don't worry about KVM selftests then. Except for one more question?
+Can I translate your "looks good to me" into a r-b for the series? And,
+same question for Peter. I'll be respinning witht eh PTES_PER_PAGE change
+and can add your guys' r-b's if you want to give them.
 
-where the last and the only user was removed.
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+Thanks,
+drew
 
