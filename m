@@ -2,78 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F2FC2A93E9
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:17:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E1732A93EC
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:18:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbgKFKR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 05:17:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23458 "EHLO
+        id S1726812AbgKFKSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 05:18:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44420 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726124AbgKFKR2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 05:17:28 -0500
+        by vger.kernel.org with ESMTP id S1726820AbgKFKSH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 05:18:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604657847;
+        s=mimecast20190719; t=1604657886;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c98dQk0zLTrCO2oJzlMdSO4XNM0SU0ansCker4yytFo=;
-        b=ZWHrp7TNa0iuaxhzjaD00CUYWLsT5VjYAuM5qlDtLTi4OCkapqUYR4LJLsm1fV4pKZUulT
-        rBCRqlmOa82nN+P7RtDT+Bk6G2oG/2K9ryqhsPWgBu78i+88Z0OxCDOb/9vKkTFWNvwSRH
-        92dGbo9b/RzPkx2mZLJU8O0UTlhboRc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-fvr_DNVMOaOIkoDOkcwX1g-1; Fri, 06 Nov 2020 05:17:25 -0500
-X-MC-Unique: fvr_DNVMOaOIkoDOkcwX1g-1
-Received: by mail-wm1-f70.google.com with SMTP id z62so378184wmb.1
-        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:17:25 -0800 (PST)
+        bh=Yzk7p3eTaQyL5wtsKR5oklwe+xjCN3EJ0U6A47oK3k0=;
+        b=ay0gAqPfz58kmDtkHJKxDfPArR5S2iXYLOjL1opgd/CEv5becI8hVHGj2LJmbQVNVRyX86
+        lynlBRfTqPE7lzybxs0VoFyBeypFcKEIP3nbUtK7pkDRTmBmXod0z6nSHdnHJ6tAwQGCnn
+        Cq4y70OrnmqhjVR04DGf9Tzstx2KTY4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-eh4mIotxM8SC23KOSh1fDg-1; Fri, 06 Nov 2020 05:18:04 -0500
+X-MC-Unique: eh4mIotxM8SC23KOSh1fDg-1
+Received: by mail-wm1-f71.google.com with SMTP id c10so252066wmh.6
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:18:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=c98dQk0zLTrCO2oJzlMdSO4XNM0SU0ansCker4yytFo=;
-        b=N9eCxNlqvrS3XxCWKJk4dO2gSMopN7Ly6tO3ODJ0tm3x1djrs3LUuydqBEDfbBgPbz
-         WjSjhcW9lxounus0HkgBVQj7YoNROrM/7jtZ5kf1X28JkIWXvXNe55Ka0pOJDQ2edySn
-         0FGw62cvcNhPtwmX3ZFM/tpvDqzvpYW+9HY5nQ/RT0P8MkdOQxrgZuYI1OybGdh/6ViX
-         EUXaIU4UgJqWLfzN9ePZbAidI6FgUFMrUdJ+E+a7LS3nTtp8ZvuL3TSXRqasm0w/HZTP
-         CdYnPU/RE+3gPCpUy5YZdi6TNcEL+rQ/cuHEVK2k1neG10JDQl1nGzIE8Gf9jt6SE2Kr
-         xAsw==
-X-Gm-Message-State: AOAM530lk4ATqHXu04ZLN27QYK8950eSANVGrgPAarQ9Aa3Ap7KpwxyT
-        FrQvPDbb0Ne/OV99VixwysdUb03APhX3e5CpuUKSpfhlLnAi5+u1aKtpFcgG5wJAgxVXHmQkLFL
-        NBRDfzHXBPhAq
-X-Received: by 2002:adf:f643:: with SMTP id x3mr1943817wrp.180.1604657844088;
-        Fri, 06 Nov 2020 02:17:24 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwG3yefM6iYrAHyW3FdeRueDAy5/yBY0Kpc+zqzk+vfI5Ny0ljW2fbQMUCzV0oL7AHKxkNJ1A==
-X-Received: by 2002:adf:f643:: with SMTP id x3mr1943794wrp.180.1604657843907;
-        Fri, 06 Nov 2020 02:17:23 -0800 (PST)
+        bh=Yzk7p3eTaQyL5wtsKR5oklwe+xjCN3EJ0U6A47oK3k0=;
+        b=IxgMo9vcoIHULhuFzInX/+yHuZ7PjuM+h3eoUAWR37o+/2n96pbawcuh0JblwhoQhY
+         gPXQ8slAfqgtZwdfqwqZC5/K8OZR5pzVHE2z4i90PAlHilIf6TerqXo1OlFN7SomJGtj
+         9Ji2EHl+/N6RDg5XOnt4AXFwo4QETH7zRNiw+nQ1muv29kavMKbykcVAPHRLKit3n5l0
+         3ZcXlYvRKSywr0wxEDjASFUiaDtxPHQm1RCr25zkcJrWg4yDK98QAgiKQVPWE7XDc5/F
+         vtaYQdhaV6AoQtzDjhhLIzh1HRRDYqe4aZGvaKi9gjLWchr8ocVHieLFsQFt/stFGahp
+         u9lA==
+X-Gm-Message-State: AOAM530P8ewlvxJU5/xqvs5l2+MPmkgNFMlKryd+j8/LJ7OvOpfz9Elc
+        fxlx7fr9lpy6VKKOa5S3NDxcA0aIfrFXNrqdcU+xzMLGeTOgqhu+mzJ22Uck1omF3D5zcDSVXuC
+        lsQVKiZwt6mXA
+X-Received: by 2002:a5d:4104:: with SMTP id l4mr76526wrp.276.1604657883307;
+        Fri, 06 Nov 2020 02:18:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxB2u9mosiunWtpr+aCXh7Ej3eCO/BmFfUkhzOjK2rINBlvPD+3Osb4sZK4nnIZVF5p75slog==
+X-Received: by 2002:a5d:4104:: with SMTP id l4mr76504wrp.276.1604657883127;
+        Fri, 06 Nov 2020 02:18:03 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id g23sm1535168wmh.21.2020.11.06.02.17.22
+        by smtp.gmail.com with ESMTPSA id e25sm1449631wra.71.2020.11.06.02.18.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Nov 2020 02:17:23 -0800 (PST)
-Subject: Re: [PATCH v2 1/2] sched/wait: Add add_wait_queue_priority()
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>
-References: <20201026175325.585623-1-dwmw2@infradead.org>
- <20201027143944.648769-1-dwmw2@infradead.org>
- <20201027143944.648769-2-dwmw2@infradead.org>
- <20201028143509.GA2628@hirez.programming.kicks-ass.net>
- <ef4660dba8135ca5a1dc7e854babcf65d8cef46f.camel@infradead.org>
+        Fri, 06 Nov 2020 02:18:02 -0800 (PST)
+Subject: Re: [PATCH] x86/kvm/hyper-v: Don't deactivate APICv unconditionally
+ when Hyper-V SynIC enabled
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, junjiehua0xff@gmail.com
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andrey Smetanin <asmetanin@virtuozzo.com>,
+        Junjie Hua <junjiehua@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1604567537-909-1-git-send-email-junjiehua@tencent.com>
+ <87sg9n3ilt.fsf@vitty.brq.redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f0901be7-1526-5b6a-90cb-6489e53cb92f@redhat.com>
-Date:   Fri, 6 Nov 2020 11:17:21 +0100
+Message-ID: <348f8763-3842-0dda-2c01-6c5d510fe630@redhat.com>
+Date:   Fri, 6 Nov 2020 11:18:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <ef4660dba8135ca5a1dc7e854babcf65d8cef46f.camel@infradead.org>
+In-Reply-To: <87sg9n3ilt.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,38 +77,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/11/20 10:35, David Woodhouse wrote:
-> On Wed, 2020-10-28 at 15:35 +0100, Peter Zijlstra wrote:
->> On Tue, Oct 27, 2020 at 02:39:43PM +0000, David Woodhouse wrote:
->>> From: David Woodhouse <dwmw@amazon.co.uk>
->>>
->>> This allows an exclusive wait_queue_entry to be added at the head of the
->>> queue, instead of the tail as normal. Thus, it gets to consume events
->>> first without allowing non-exclusive waiters to be woken at all.
->>>
->>> The (first) intended use is for KVM IRQFD, which currently has
->>> inconsistent behaviour depending on whether posted interrupts are
->>> available or not. If they are, KVM will bypass the eventfd completely
->>> and deliver interrupts directly to the appropriate vCPU. If not, events
->>> are delivered through the eventfd and userspace will receive them when
->>> polling on the eventfd.
->>>
->>> By using add_wait_queue_priority(), KVM will be able to consistently
->>> consume events within the kernel without accidentally exposing them
->>> to userspace when they're supposed to be bypassed. This, in turn, means
->>> that userspace doesn't have to jump through hoops to avoid listening
->>> on the erroneously noisy eventfd and injecting duplicate interrupts.
->>>
->>> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+On 05/11/20 16:53, Vitaly Kuznetsov wrote:
+>> The current implementation of Hyper-V SynIC[1] request to deactivate
+>> APICv when SynIC is enabled, since the AutoEOI feature of SynIC is not
+>> compatible with APICv[2].
 >>
->> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> 
-> Thanks. Paolo, the conclusion was that you were going to take this set
-> through the KVM tree, wasn't it?
+>> Actually, windows doesn't use AutoEOI if deprecating AutoEOI bit is set
+>> (CPUID.40000004H:EAX[bit 9], HyperV-TLFS v6.0b section 2.4.5), we don't
+>> need to disable APICv in this case.
+>>
+> Thank you for the patch, the fact that we disable APICv every time we
+> enable SynIC is nothing to be proud of. I'm, however, not sure we can
+> treat 'Recommend deprecating AutoEOI' as 'AutoEOI must not be
+> used.'. Could you please clarify which Windows versions you've tested
+> with with?
 > 
 
-Queued, except for patch 2/3 in the eventfd series which Alex hasn't 
-reviewed/acked yet.
+Indeed---older versions of Windows that predate the deprecation will 
+continue using AutoEOI.
 
 Paolo
 
