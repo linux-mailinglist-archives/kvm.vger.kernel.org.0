@@ -2,74 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADF742A93C1
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:09:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACAEC2A93C5
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:10:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbgKFKJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 05:09:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59434 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbgKFKJh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Nov 2020 05:09:37 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D943EC0613CF;
-        Fri,  6 Nov 2020 02:09:36 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id z3so876270pfz.6;
-        Fri, 06 Nov 2020 02:09:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=7oxBE7G3KdNo8V3DlQixQTNnTK096vj3MYEkKh/2CDY=;
-        b=uCquK5wR7b3Q3HrX48s5xeH4JyLCKFZe0iR04nZ1WCFCtSqboVUG58LVKkrRO2EfGt
-         O/8gt2kWtsea3jaVzqaGdPupjyraKnBa/pWXwalT4V/EGWCRiHjUXOxrH+Q8vihlKPVr
-         DS+taIBHyZsy/Vq3lgTgyRBXIoF71eDRr4nlESHozpnh9N0PRzRRGILt1T7/P21/KpZi
-         EYIPZ1ZHF173vyiW58JBLY0JMghS2qI+2bekYy1nKIpd2M3sH8fAD/3kZp60XL7r+FIQ
-         HMOCu5cUd1d1tLTM02GvMPzKS1kYJ2lMpI4xNnff6uj2+WBKR0fh+5fsVhoNtp3zhMDG
-         TRxw==
+        id S1726795AbgKFKKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 05:10:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59383 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726242AbgKFKKM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 05:10:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604657411;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=W/uaQ+ciO8/RfcKxsgCor1/p7DcJNB2wEujPSnKBSz8=;
+        b=WI9Oxe6AmM09YLWg1hs3skgsaHP+jXenEtWDmi27SgI+vLCaX+gorl/lDFBABM+TmltLS+
+        8NeYldEVBY1KJFbj1uwW9I5Wy0U587RdKpNJQJ9tkfZ72Cwde5vnc1c8Mc+QrxT+xl3lEH
+        sHbKLfmwJGkuEp4p6U+HYsCyBumsTHI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-Isai8td0N766mDEmzONM8A-1; Fri, 06 Nov 2020 05:10:10 -0500
+X-MC-Unique: Isai8td0N766mDEmzONM8A-1
+Received: by mail-wm1-f72.google.com with SMTP id 3so243496wms.9
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:10:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=7oxBE7G3KdNo8V3DlQixQTNnTK096vj3MYEkKh/2CDY=;
-        b=M3ZIdl4mmDPzjJEvLY89i+NEqUt03lhke3J3FItpyAhzkPfB3XYqB/rrnhNIS38S/3
-         adDrj1i3Pfv6liigR7AALjNItVAr5KR3ftBF1bl9alOiZSlb+7g3nj4pw3u7Z76rqtER
-         BNJdZa/rG3FrVY7JRf6ZEtsDIwODrMfolDp+MfURmU5DdCEa4GNkDDHUUWWWWoEbO8Z2
-         gVDCZiBJj8ox8eUapLLqk4RkdEgCWbXbJk2nmmYIw2EB9WTiqEB6aEfFVkjgVTpqsoYE
-         fpkZdSAjJtivXWR+J9Dg444oWZt8zNrFiXxi33Dk7WDFVNOriRXJ9yUSHGatSvSbIVCN
-         SuXQ==
-X-Gm-Message-State: AOAM532dc1go9+nBK2gNTQo44t/NxTbAJj238IZ8dg8khA6lUJWcNz1G
-        ORxIwgM5L4PoryzczrVzwD4=
-X-Google-Smtp-Source: ABdhPJzJM3j6lsDf77K+QOGo1bUayGKTY5lAo5kbRUZfR0myUfQOG324lr3gWaHWSyhIFLA0WjTYlA==
-X-Received: by 2002:a63:934c:: with SMTP id w12mr1139016pgm.114.1604657376456;
-        Fri, 06 Nov 2020 02:09:36 -0800 (PST)
-Received: from localhost ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id e14sm1194384pga.61.2020.11.06.02.09.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2020 02:09:35 -0800 (PST)
-Date:   Fri, 6 Nov 2020 18:09:29 +0800
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-To:     Gavin Shan <gshan@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc:     linux-next@vger.kernel.org
-Subject: linux-next arm64 kvm build error
-Message-ID: <20201106100929.pllgrxcdj3xjx47a@xzhoux.usersys.redhat.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=W/uaQ+ciO8/RfcKxsgCor1/p7DcJNB2wEujPSnKBSz8=;
+        b=ufNbXJFu5PHGX887wacmI3isZgN6eaa8dZ04gMeTQRCMvaq0cUBrZVdd0v+CngxIgm
+         5nFyvkYpzck9Q1ccr4NunklBx+VhhpdI/RJR1zYCBN7wEHaozLD26JBQyqooLG2VgA5k
+         seCTTqJRrk+O7X/VfbuSfFVU/D3l+pdfaHO6bcVtFz2pzh2uoDD7BxmWmS0jMEvGZ/SQ
+         XkPFSxrsnA3X8mBuYG3tZ1CTVXpL7+q2zTqWAzupu8A3TV32D1O9W7w70xgMZ/DDPlCF
+         R7KX8VRV0/YRbK7dZxRJPcdN1Rw/PdXBhMeOFskfj5WP7O20gpjUNUVChP9XthYfg9jG
+         eliQ==
+X-Gm-Message-State: AOAM532VYTRiwzWXOtMiDXrUxoWi/fqbv9oSJcRDoRrYSE+8PszMQrsP
+        A7cqe8r9qt2cNT87pgZA2aCpjYdgSr/4igdeOu1PngY/ze7KwLl+hSzrCr/Stq+boSwMhGMql4y
+        eKZqXPBBnivLz
+X-Received: by 2002:a1c:6484:: with SMTP id y126mr1511522wmb.141.1604657408338;
+        Fri, 06 Nov 2020 02:10:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyPhPkVRuFuerZB14L4+UH5k2bN4LoZqc13UQUmyxQLeHQ2h9vhRQEAWQyFzPA1g4J2AmjJfw==
+X-Received: by 2002:a1c:6484:: with SMTP id y126mr1511504wmb.141.1604657408176;
+        Fri, 06 Nov 2020 02:10:08 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id q7sm455306wrg.95.2020.11.06.02.10.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Nov 2020 02:10:07 -0800 (PST)
+Subject: Re: [PATCH v2 2/2] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
+To:     yadong.qi@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20201106065122.403183-1-yadong.qi@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a5c0071c-101a-a2ff-4ced-2f5ec8b38896@redhat.com>
+Date:   Fri, 6 Nov 2020 11:10:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20201106065122.403183-1-yadong.qi@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On 06/11/20 07:51, yadong.qi@intel.com wrote:
+> @@ -4036,6 +4060,8 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+>   
+>   	if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
+>   		vmcs12->guest_activity_state = GUEST_ACTIVITY_HLT;
+> +	else if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED)
+> +		vmcs12->guest_activity_state = GUEST_ACTIVITY_WAIT_SIPI;
+>   	else
+>   		vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
+>   
 
-It's introduced by this commit:
-    KVM: arm64: Use fallback mapping sizes for contiguous huge page sizes
-and blocking further test.
+Updated, thanks.
 
-arch/arm64/kvm/mmu.c:798:2: error: duplicate case value
-  case PMD_SHIFT:
-  ^~~~
+Paolo
 
-Thanks,
--- 
-Murphy
