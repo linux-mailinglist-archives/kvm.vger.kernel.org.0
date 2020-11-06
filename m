@@ -2,173 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B4302A8FA4
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 07:48:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BDA42A8FB0
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 07:51:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726128AbgKFGrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 01:47:53 -0500
-Received: from mga07.intel.com ([134.134.136.100]:38619 "EHLO mga07.intel.com"
+        id S1726339AbgKFGvn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 01:51:43 -0500
+Received: from mga09.intel.com ([134.134.136.24]:59061 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725830AbgKFGrw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Nov 2020 01:47:52 -0500
-IronPort-SDR: y4gW5Nq0IJoooRt8Fg0U/1vBCino8kmaPeojtFae9jQlsi2HqIE5xkaQUyNyGVpUr7exVNRKTa
- x6nmaoGNM1Og==
-X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="233675855"
+        id S1725842AbgKFGvm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Nov 2020 01:51:42 -0500
+IronPort-SDR: A9dVzy4xvPfkOip7KLYns/KWOiW5+FWnwhY/BYirUta3N8VajjT/+NVLz9zosyKRVEmoD6H2e9
+ mJI6Lj7oc6lw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="169659862"
 X-IronPort-AV: E=Sophos;i="5.77,455,1596524400"; 
-   d="scan'208";a="233675855"
+   d="scan'208";a="169659862"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2020 22:47:52 -0800
-IronPort-SDR: Ym44kh/QNX7vY1YjoNWyb08Gd+1msysBH2GbijL7QaNdyA+e4rfGYAnGdRAuFgaeY8iZAHeNy4
- lHbfr+zdA3UA==
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2020 22:51:41 -0800
+IronPort-SDR: d0svsbFeVXli8MM2DmxpPXMh5BrJfU0WnQ5OPni4sTnq33S0tq8mnxCVYzD6CGFzUVphqZ8mMz
+ HMtOVySzfOcw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,455,1596524400"; 
-   d="scan'208";a="354597517"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga004.fm.intel.com with ESMTP; 05 Nov 2020 22:47:51 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 5 Nov 2020 22:47:51 -0800
-Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 5 Nov 2020 22:47:50 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 5 Nov 2020 22:47:50 -0800
-Received: from NAM02-CY1-obe.outbound.protection.outlook.com (104.47.37.53) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Thu, 5 Nov 2020 22:47:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=To5OX9bSNhSawJzWolxTMBbfCxDouEMtoX4BC3sl1PjonfiW/dzIxRqjzdqD/7CmX1mG9zJJ5y7xNRXEK73NIt8KWMk+PxfKvvCQIr6D6IV12IMaxc3M0KP5j4I4ET38+p4nh2x7OjtadK4SvpwlbtiQ8uqWDXCINsxGr29zlElS/+FMUPRS41Te+t8vvF+1//zZ5onIM6CPrGwBvK9QN3gzKrgW8b3g/T3rdbU6Gqjh7UKGzGjsQRqZBCYGASxUPYgwUHl27H+FOW+JtIRtUi4jfQjnVErdfCQ4yYGtyfUiYvvw24mDADg2VCwHhJlmlmmqfIMf0w9b6PalYT1X/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FBrYDwGTeOSvhgGFavAIhgl1bH1ZdRCCG0gpquPzPno=;
- b=jmxxzZtUlpZmy6z1rIYqLqD32GauPBErG2d1P6Ix0Tq4a21Xx5ur2hZroe5Ag+KhNX7Eqa/fTX0VBajODGMU3ste8/6+Z9P3TtGmyFdY9E0lmLuHvvBlqm1CDSbAPDAPlv43se5S+eapuF+atj5ZcKDfwSBVzppztBAUNvmcgSyOqMue/ZI3yfbfUBpS2LSaVa9gNl4+wWIGYKU9JQ+AtGaeyzcn0HkinPp6fJ43su+FM2FJwcDZ4eA8k3YuF4Dt2bSpBEO8xO3kgyeI7ISb9RuGgGppl7sThPbIx93kznuBXf5CS/3AFm+zi/Sopy4Cc6MPSPFT6f5U83G/q7gnaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FBrYDwGTeOSvhgGFavAIhgl1bH1ZdRCCG0gpquPzPno=;
- b=K2sy0aB98OY6coyk7knZTHfzJISzj18ZgBSxe0Bts4RuZFh7o7EBJpcqw2UI5O2i9+81jESq0op1387yzA3qnoyUfgx8hEYO32o2b7p8qOQpx5wSNuRj2qjgAlZ/SzpfY5VAVq2y24Xv2Nlc1C8i5E9dhvwU1sVznpQc+dJO9wA=
-Received: from CY4PR11MB1957.namprd11.prod.outlook.com (2603:10b6:903:120::15)
- by CY4PR11MB1303.namprd11.prod.outlook.com (2603:10b6:903:29::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.28; Fri, 6 Nov
- 2020 06:47:48 +0000
-Received: from CY4PR11MB1957.namprd11.prod.outlook.com
- ([fe80::807:d5ba:5158:e2f3]) by CY4PR11MB1957.namprd11.prod.outlook.com
- ([fe80::807:d5ba:5158:e2f3%11]) with mapi id 15.20.3499.032; Fri, 6 Nov 2020
- 06:47:48 +0000
-From:   "Qi, Yadong" <yadong.qi@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-CC:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "nikita.leshchenko@oracle.com" <nikita.leshchenko@oracle.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Chen, Luhai" <luhai.chen@intel.com>,
-        "Zhu, Bing" <bing.zhu@intel.com>,
-        "Wang, Kai Z" <kai.z.wang@intel.com>
-Subject: RE: [PATCH] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
-Thread-Topic: [PATCH] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
-Thread-Index: AQHWkKDXpbo0akWSWkKXeJbWVxPoT6m5+qKAgADw/1A=
-Date:   Fri, 6 Nov 2020 06:47:48 +0000
-Message-ID: <CY4PR11MB195721D5477F548C1FC56E83E3ED0@CY4PR11MB1957.namprd11.prod.outlook.com>
-References: <20200922052343.84388-1-yadong.qi@intel.com>
- <187635d0-7786-5d8f-a41a-45a6abd9d001@redhat.com>
-In-Reply-To: <187635d0-7786-5d8f-a41a-45a6abd9d001@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.102.204.38]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d94ed433-b5ca-4833-cec8-08d8821fdfce
-x-ms-traffictypediagnostic: CY4PR11MB1303:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR11MB13039115B74998FE6EED50A8E3ED0@CY4PR11MB1303.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: W0xWTiE8ozJl8SGwaq5tcXSZmtWGgxWcY8h7vzt4vEveVHYxSIXHeFYbTEZ4poTrl8e5nBzYF7DjlqpAeAq53mLTbExe5wpLP83YcKZhu1p+qZ4ZPnaptigKB74vfF/mO4g7qRHWtRhln3ovG9yT3Fyb3ZjB3AtFS4iKfNBJrXl9oOlS+cavmBjLWDQFqzANlKvuMBrfWd5AB7ZOr7raLODYDGSw8zvHxXrAwF9KxCPozsJS2TQ8uDe655HkitdBa+kxhf7hl5ZlKMRcWXQz+KOU7yRLJY1BCZRCHwZqoHPXXT9vC6CBIfTGnxaNgTyxsHlquvPpxU36dVhm/P8tvQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR11MB1957.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(136003)(396003)(366004)(39860400002)(26005)(83380400001)(5660300002)(54906003)(8936002)(55016002)(316002)(52536014)(110136005)(186003)(107886003)(7696005)(8676002)(71200400001)(9686003)(64756008)(4326008)(7416002)(2906002)(66946007)(76116006)(6506007)(66556008)(478600001)(86362001)(66476007)(66446008)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: 7lZgE+gDA+Q7wXZ7dm7aM9dXViEp3kwAwNX2V33CqQPEd4lOR1Af9FytDLjrhXP/ARDJ1lmuTei4/9DvtiFTgUNB+dX3CMd2T3V5yAZlH2mvgolUJjeF2VcJaUHit2qXcxhCANJzaOV18EW9QXODHJ8t+IO5FW/zO+wjBlAJ4wt42H/FWUKXJrjdc3dHXaQdnYOZ1BFs/sir4u3+gVu1utMfwmQmUPMGkvZ5N52Ztgwy5xUukDiLbrDTz0CqZMdfQpbMo+hWZtM9lEu1/wmME9MJn9GTdpU+y3LKKncDeRLypK/wg4TWSJSC/vhUqBkSt///kFs0lxM+u8/BWLLhkFxaWRSproiyxvv35snVHa1cIpWexqZVKSTHS5sKHKfHs787jGXAb2pvTubHjivBF8ll7Fq5EdL7cM+o9ZFD4/rP8sJ7TR0Kgc+/bIA/wZxzlKbm4kYX3zVUsSGR5CH5XJ+gLTGddpDdvoan5HdJE0fhAMCzPCFNNFmKPncpmk2KAna4IYITzRSE7OuYT6v/uuzZxwMM+1tHVIxCOLnxDqvFrkttOoIAPFmwAO3xTULE+jwt+MoS5c0ACQPXkoGiBjeo+f8heaZAqvtenRZEjFgL3lPR6z12JbiZr0Kn/E2rrduCk/CtupT1WidB1la1FA==
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="364087368"
+Received: from yadong-antec.sh.intel.com ([10.239.158.61])
+  by FMSMGA003.fm.intel.com with ESMTP; 05 Nov 2020 22:51:40 -0800
+From:   yadong.qi@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, yadong.qi@intel.com
+Subject: [PATCH v2 2/2] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
+Date:   Fri,  6 Nov 2020 14:51:22 +0800
+Message-Id: <20201106065122.403183-1-yadong.qi@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR11MB1957.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d94ed433-b5ca-4833-cec8-08d8821fdfce
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Nov 2020 06:47:48.0945
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9GjGlYIaLbBtMvhFFtUtuo1BunMc5d2KzNSULYYoFJqpV5jyh3IcsgS95EUg+Uv8ZbM+JJwpZywoa/fRtNQN7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1303
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBUaGVyZSBpcyBhIHByb2JsZW0gaW4gdGhpcyBwYXRjaCwgaW4gdGhhdCB0aGlzIGNoYW5nZSBp
-cyBpbmNvcnJlY3Q6DQo+IA0KPiA+DQo+ID4gQEAgLTI4NDcsNyArMjg0Nyw4IEBAIHZvaWQga3Zt
-X2FwaWNfYWNjZXB0X2V2ZW50cyhzdHJ1Y3Qga3ZtX3ZjcHUNCj4gKnZjcHUpDQo+ID4gIAkgKi8N
-Cj4gPiAgCWlmIChrdm1fdmNwdV9sYXRjaF9pbml0KHZjcHUpKSB7DQo+ID4gIAkJV0FSTl9PTl9P
-TkNFKHZjcHUtPmFyY2gubXBfc3RhdGUgPT0NCj4gS1ZNX01QX1NUQVRFX0lOSVRfUkVDRUlWRUQp
-Ow0KPiA+IC0JCWlmICh0ZXN0X2JpdChLVk1fQVBJQ19TSVBJLCAmYXBpYy0+cGVuZGluZ19ldmVu
-dHMpKQ0KPiA+ICsJCWlmICh0ZXN0X2JpdChLVk1fQVBJQ19TSVBJLCAmYXBpYy0+cGVuZGluZ19l
-dmVudHMpICYmDQo+ID4gKwkJICAgICFpc19ndWVzdF9tb2RlKHZjcHUpKQ0KPiA+ICAJCQljbGVh
-cl9iaXQoS1ZNX0FQSUNfU0lQSSwgJmFwaWMtPnBlbmRpbmdfZXZlbnRzKTsNCj4gPiAgCQlyZXR1
-cm47DQo+ID4gIAl9DQo+IA0KPiBIZXJlIHlvdSdyZSBub3QgdHJ5aW5nIHRvIHByb2Nlc3MgYSBs
-YXRjaGVkIElOSVQ7IHlvdSBqdXN0IHdhbnQgdG8gZGVsYXkgdGhlDQo+IHByb2Nlc3Npbmcgb2Yg
-dGhlIFNJUEkgdW50aWwgY2hlY2tfbmVzdGVkX2V2ZW50cy4NCj4gDQo+IFRoZSBjaGFuZ2UgZG9l
-cyBoYXZlIGEgY29ycmVjdCBwYXJ0IGluIGl0LiAgSW4gcGFydGljdWxhciwNCj4gdm14X2FwaWNf
-aW5pdF9zaWduYWxfYmxvY2tlZCBzaG91bGQgaGF2ZSBiZWVuDQo+IA0KPiBkaWZmIC0tZ2l0IGEv
-YXJjaC94ODYva3ZtL3ZteC92bXguYyBiL2FyY2gveDg2L2t2bS92bXgvdm14LmMgaW5kZXgNCj4g
-NDdiODM1N2I5NzUxLi42NDMzOTEyMWE0ZjAgMTAwNjQ0DQo+IC0tLSBhL2FyY2gveDg2L2t2bS92
-bXgvdm14LmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL3ZteC92bXguYw0KPiBAQCAtNzU1OCw3ICs3
-NTU4LDcgQEAgc3RhdGljIHZvaWQgZW5hYmxlX3NtaV93aW5kb3coc3RydWN0IGt2bV92Y3B1DQo+
-ICp2Y3B1KQ0KPiANCj4gICBzdGF0aWMgYm9vbCB2bXhfYXBpY19pbml0X3NpZ25hbF9ibG9ja2Vk
-KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4gICB7DQo+IC0JcmV0dXJuIHRvX3ZteCh2Y3B1KS0+
-bmVzdGVkLnZteG9uOw0KPiArCXJldHVybiB0b192bXgodmNwdSktPm5lc3RlZC52bXhvbiAmJiAh
-aXNfZ3Vlc3RfbW9kZSh2Y3B1KTsNCj4gICB9DQo+IA0KPiAgIHN0YXRpYyB2b2lkIHZteF9taWdy
-YXRlX3RpbWVycyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+IA0KPiB0byBvbmx5IGxhdGNoIElO
-SVQgc2lnbmFscyBpbiByb290IG1vZGUuICBIb3dldmVyLCBTSVBJIG11c3QgYmUgY2xlYXJlZA0K
-PiB1bmNvbmRpdGlvbmFsbHkgb24gU1ZNOyB0aGUgIiFpc19ndWVzdF9tb2RlIiB0ZXN0IGluIHRo
-YXQgY2FzZSBpcyBpbmNvcnJlY3QuDQo+IA0KPiBUaGUgcmlnaHQgd2F5IHRvIGRvIGl0IGlzIHRv
-IGNhbGwgY2hlY2tfbmVzdGVkX2V2ZW50cyBmcm9tDQo+IGt2bV9hcGljX2FjY2VwdF9ldmVudHMu
-ICBUaGlzIHdpbGwgY2F1c2UgYW4gSU5JVCBvciBTSVBJIHZtZXhpdCwgYXMgcmVxdWlyZWQuDQo+
-IFRoZXJlIGlzIHNvbWUgZXh0cmEgY29tcGxpY2F0aW9uIHRvIHJlYWQgcGVuZGluZ19ldmVudHMN
-Cj4gKmJlZm9yZSoga3ZtX2FwaWNfYWNjZXB0X2V2ZW50cyBhbmQgbm90IHN0ZWFsIGZyb20gdGhl
-IGd1ZXN0IGFueSBJTklUIG9yIFNJUEkNCj4gdGhhdCBpcyBzZW50IGFmdGVyIGt2bV9hcGljX2Fj
-Y2VwdF9ldmVudHMgcmV0dXJucy4NCj4gDQo+IFRoYW5rcyB0byB5b3VyIHRlc3QgY2FzZSwgSSB3
-aWxsIHRlc3QgYSBwYXRjaCBhbmQgc2VuZCBpdC4NCj4gDQpUaGFua3MgdmVyeSBtdWNoLCBQYW9s
-by4NCkJUVywgSSBub3RpY2VkIGFub3RoZXIgaXNzdWUgaW4gc3luY192bWNzMDJfdG9fdm1jczEy
-KCk6DQp2bWNzMTItPmd1ZXN0X2FjdGl2aXR5X3N0YXRlIGlzIG5vdCBzZXQgcHJvcGVybHkgd2hl
-biBtcF9zdGF0ZSBpcyBJTklUX1JFQ0VJVkVELg0KSSB3aWxsIGNvcnJlY3QgaXQgYW5kIHNlbmQg
-djIgb2YgUGF0Y2ggMi8yLg0K
+From: Yadong Qi <yadong.qi@intel.com>
+
+Background: We have a lightweight HV, it needs INIT-VMExit and
+SIPI-VMExit to wake-up APs for guests since it do not monitor
+the Local APIC. But currently virtual wait-for-SIPI(WFS) state
+is not supported in nVMX, so when running on top of KVM, the L1
+HV cannot receive the INIT-VMExit and SIPI-VMExit which cause
+the L2 guest cannot wake up the APs.
+
+According to Intel SDM Chapter 25.2 Other Causes of VM Exits,
+SIPIs cause VM exits when a logical processor is in
+wait-for-SIPI state.
+
+In this patch:
+    1. introduce SIPI exit reason,
+    2. introduce wait-for-SIPI state for nVMX,
+    3. advertise wait-for-SIPI support to guest.
+
+When L1 hypervisor is not monitoring Local APIC, L0 need to emulate
+INIT-VMExit and SIPI-VMExit to L1 to emulate INIT-SIPI-SIPI for
+L2. L2 LAPIC write would be traped by L0 Hypervisor(KVM), L0 should
+emulate the INIT/SIPI vmexit to L1 hypervisor to set proper state
+for L2's vcpu state.
+
+Handle procdure:
+Source vCPU:
+    L2 write LAPIC.ICR(INIT).
+    L0 trap LAPIC.ICR write(INIT): inject a latched INIT event to target
+       vCPU.
+Target vCPU:
+    L0 emulate an INIT VMExit to L1 if is guest mode.
+    L1 set guest VMCS, guest_activity_state=WAIT_SIPI, vmresume.
+    L0 set vcpu.mp_state to INIT_RECEIVED if (vmcs12.guest_activity_state
+       == WAIT_SIPI).
+
+Source vCPU:
+    L2 write LAPIC.ICR(SIPI).
+    L0 trap LAPIC.ICR write(INIT): inject a latched SIPI event to traget
+       vCPU.
+Target vCPU:
+    L0 emulate an SIPI VMExit to L1 if (vcpu.mp_state == INIT_RECEIVED).
+    L1 set CS:IP, guest_activity_state=ACTIVE, vmresume.
+    L0 resume to L2.
+    L2 start-up.
+
+Signed-off-by: Yadong Qi <yadong.qi@intel.com>
+Message-Id: <20200922052343.84388-1-yadong.qi@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+v1->v2:
+ * sync_vmcs02_to_vmcs12(): set vmcs12->guest_activity_state to WAIT_SIPI
+   if vcpu's mp_state is INIT_RECEIVED state.
+---
+ arch/x86/include/asm/vmx.h      |  1 +
+ arch/x86/include/uapi/asm/vmx.h |  2 ++
+ arch/x86/kvm/vmx/nested.c       | 55 ++++++++++++++++++++++++---------
+ 3 files changed, 44 insertions(+), 14 deletions(-)
+
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index f8ba5289ecb0..38ca445a8429 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -113,6 +113,7 @@
+ #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
+ #define VMX_MISC_SAVE_EFER_LMA			0x00000020
+ #define VMX_MISC_ACTIVITY_HLT			0x00000040
++#define VMX_MISC_ACTIVITY_WAIT_SIPI		0x00000100
+ #define VMX_MISC_ZERO_LEN_INS			0x40000000
+ #define VMX_MISC_MSR_LIST_MULTIPLIER		512
+ 
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index b8ff9e8ac0d5..ada955c5ebb6 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -32,6 +32,7 @@
+ #define EXIT_REASON_EXTERNAL_INTERRUPT  1
+ #define EXIT_REASON_TRIPLE_FAULT        2
+ #define EXIT_REASON_INIT_SIGNAL			3
++#define EXIT_REASON_SIPI_SIGNAL         4
+ 
+ #define EXIT_REASON_INTERRUPT_WINDOW    7
+ #define EXIT_REASON_NMI_WINDOW          8
+@@ -94,6 +95,7 @@
+ 	{ EXIT_REASON_EXTERNAL_INTERRUPT,    "EXTERNAL_INTERRUPT" }, \
+ 	{ EXIT_REASON_TRIPLE_FAULT,          "TRIPLE_FAULT" }, \
+ 	{ EXIT_REASON_INIT_SIGNAL,           "INIT_SIGNAL" }, \
++	{ EXIT_REASON_SIPI_SIGNAL,           "SIPI_SIGNAL" }, \
+ 	{ EXIT_REASON_INTERRUPT_WINDOW,      "INTERRUPT_WINDOW" }, \
+ 	{ EXIT_REASON_NMI_WINDOW,            "NMI_WINDOW" }, \
+ 	{ EXIT_REASON_TASK_SWITCH,           "TASK_SWITCH" }, \
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 89af692deb7e..6dc9017289ba 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2952,7 +2952,8 @@ static int nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
+ static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
+ {
+ 	if (CC(vmcs12->guest_activity_state != GUEST_ACTIVITY_ACTIVE &&
+-	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT))
++	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT &&
++	       vmcs12->guest_activity_state != GUEST_ACTIVITY_WAIT_SIPI))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -3559,19 +3560,29 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 	 */
+ 	nested_cache_shadow_vmcs12(vcpu, vmcs12);
+ 
+-	/*
+-	 * If we're entering a halted L2 vcpu and the L2 vcpu won't be
+-	 * awakened by event injection or by an NMI-window VM-exit or
+-	 * by an interrupt-window VM-exit, halt the vcpu.
+-	 */
+-	if ((vmcs12->guest_activity_state == GUEST_ACTIVITY_HLT) &&
+-	    !(vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK) &&
+-	    !(vmcs12->cpu_based_vm_exec_control & CPU_BASED_NMI_WINDOW_EXITING) &&
+-	    !((vmcs12->cpu_based_vm_exec_control & CPU_BASED_INTR_WINDOW_EXITING) &&
+-	      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
++	switch (vmcs12->guest_activity_state) {
++	case GUEST_ACTIVITY_HLT:
++		/*
++		 * If we're entering a halted L2 vcpu and the L2 vcpu won't be
++		 * awakened by event injection or by an NMI-window VM-exit or
++		 * by an interrupt-window VM-exit, halt the vcpu.
++		 */
++		if (!(vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK) &&
++		    !nested_cpu_has(vmcs12, CPU_BASED_NMI_WINDOW_EXITING) &&
++		    !(nested_cpu_has(vmcs12, CPU_BASED_INTR_WINDOW_EXITING) &&
++		      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
++			vmx->nested.nested_run_pending = 0;
++			return kvm_vcpu_halt(vcpu);
++		}
++		break;
++	case GUEST_ACTIVITY_WAIT_SIPI:
+ 		vmx->nested.nested_run_pending = 0;
+-		return kvm_vcpu_halt(vcpu);
++		vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
++		break;
++	default:
++		break;
+ 	}
++
+ 	return 1;
+ 
+ vmentry_failed:
+@@ -3797,7 +3808,20 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+ 			return -EBUSY;
+ 		nested_vmx_update_pending_dbg(vcpu);
+ 		clear_bit(KVM_APIC_INIT, &apic->pending_events);
+-		nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
++		if (vcpu->arch.mp_state != KVM_MP_STATE_INIT_RECEIVED)
++			nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
++		return 0;
++	}
++
++	if (lapic_in_kernel(vcpu) &&
++	    test_bit(KVM_APIC_SIPI, &apic->pending_events)) {
++		if (block_nested_events)
++			return -EBUSY;
++
++		clear_bit(KVM_APIC_SIPI, &apic->pending_events);
++		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED)
++			nested_vmx_vmexit(vcpu, EXIT_REASON_SIPI_SIGNAL, 0,
++						apic->sipi_vector & 0xFFUL);
+ 		return 0;
+ 	}
+ 
+@@ -4036,6 +4060,8 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+ 
+ 	if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
+ 		vmcs12->guest_activity_state = GUEST_ACTIVITY_HLT;
++	else if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED)
++		vmcs12->guest_activity_state = GUEST_ACTIVITY_WAIT_SIPI;
+ 	else
+ 		vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
+ 
+@@ -6483,7 +6509,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 	msrs->misc_low |=
+ 		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
+ 		VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE |
+-		VMX_MISC_ACTIVITY_HLT;
++		VMX_MISC_ACTIVITY_HLT |
++		VMX_MISC_ACTIVITY_WAIT_SIPI;
+ 	msrs->misc_high = 0;
+ 
+ 	/*
+-- 
+2.25.1
+
