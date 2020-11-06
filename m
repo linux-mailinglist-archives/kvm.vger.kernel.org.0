@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97A692A8BE7
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 02:07:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFF722A8BD6
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 02:06:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733139AbgKFBG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Nov 2020 20:06:26 -0500
+        id S1733163AbgKFBGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Nov 2020 20:06:30 -0500
 Received: from mga18.intel.com ([134.134.136.126]:38191 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733109AbgKFBGZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Nov 2020 20:06:25 -0500
-IronPort-SDR: L10PPhAzhW2FHb7UYIxNs/uAeEiqmMc+gXMJZNMz/oqvier7D18zzkE/HhLt67xKt1HVRuTNkN
- A4PkgQoGlXbA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="157264689"
+        id S1733072AbgKFBG3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Nov 2020 20:06:29 -0500
+IronPort-SDR: ZicaO5qdlZqfiE1OM22QIo4f8RESe/4HYDqX2k5M+d16DZ+jJST+WxLAbG+tdRtckcHN5/btec
+ urK1Cm4eZSZg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="157264700"
 X-IronPort-AV: E=Sophos;i="5.77,454,1596524400"; 
-   d="scan'208";a="157264689"
+   d="scan'208";a="157264700"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2020 17:06:24 -0800
-IronPort-SDR: RZaPzcy5WY8uihHD3lffneYXEMAvzjFTpTnXGZTN9o2YCWm8VH2rPaBju5fWe/ScJyU/zvzdEP
- o6BLvmiAf1yA==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2020 17:06:28 -0800
+IronPort-SDR: 7ScEavtQZnmvzchfgxl69/h7dA0cgyuuULnzEcP+BwNFJTXgWpznkRXnBzzvHkxgyYo28hIUdn
+ lKw337bec8WQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,454,1596524400"; 
-   d="scan'208";a="471874502"
+   d="scan'208";a="471874508"
 Received: from local-michael-cet-test.sh.intel.com ([10.239.159.156])
-  by orsmga004.jf.intel.com with ESMTP; 05 Nov 2020 17:06:22 -0800
+  by orsmga004.jf.intel.com with ESMTP; 05 Nov 2020 17:06:24 -0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         pbonzini@redhat.com, sean.j.christopherson@intel.com,
         jmattson@google.com
 Cc:     yu.c.zhang@linux.intel.com, Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v14 06/13] KVM: x86: Load guest fpu state when accessing MSRs managed by XSAVES
-Date:   Fri,  6 Nov 2020 09:16:30 +0800
-Message-Id: <20201106011637.14289-7-weijiang.yang@intel.com>
+Subject: [PATCH v14 07/13] KVM: VMX: Emulate reads and writes to CET MSRs
+Date:   Fri,  6 Nov 2020 09:16:31 +0800
+Message-Id: <20201106011637.14289-8-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20201106011637.14289-1-weijiang.yang@intel.com>
 References: <20201106011637.14289-1-weijiang.yang@intel.com>
@@ -42,81 +42,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+Add support for emulating read and write accesses to CET MSRs.  CET MSRs
+are universally "special" as they are either context switched via
+dedicated VMCS fields or via XSAVES, i.e. no additional in-memory
+tracking is needed, but emulated reads/writes are more expensive.
 
-A handful of CET MSRs are not context switched through "traditional"
-methods, e.g. VMCS or manual switching, but rather are passed through
-to the guest and are saved and restored by XSAVES/XRSTORS, i.e. in the
-guest's FPU state.
+MSRs that are switched through XSAVES are especially annoying due to the
+possibility of the kernel's FPU being used in IRQ context.  Disable IRQs
+and ensure the guest's FPU state is loaded when accessing such MSRs.
 
-Load the guest's FPU state if userspace is accessing MSRs whose values
-are managed by XSAVES so that the MSR helper, e.g. vmx_{get,set}_msr(),
-can simply do {RD,WR}MSR to access the guest's value.
-
-Because is also used for the KVM_GET_MSRS device ioctl(), explicitly
-check that @vcpu is non-null before attempting to load guest state.  The
-CET MSRs cannot be retrieved via the device ioctl() without loading
-guest FPU state (which doesn't exist).
-
-Note that guest_cpuid_has() is not queried as host userspace is allowed
-to access MSRs that have not been exposed to the guest, e.g. it might do
-KVM_SET_MSRS prior to KVM_SET_CPUID2.
-
+Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/x86.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 105 +++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h     |   5 ++
+ 2 files changed, 110 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8c9d631d7842..751b62e871e5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -109,6 +109,8 @@ static void enter_smm(struct kvm_vcpu *vcpu);
- static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
- static void store_regs(struct kvm_vcpu *vcpu);
- static int sync_regs(struct kvm_vcpu *vcpu);
-+static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
-+static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
- 
- struct kvm_x86_ops kvm_x86_ops __read_mostly;
- EXPORT_SYMBOL_GPL(kvm_x86_ops);
-@@ -3582,6 +3584,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index aef73dd3de4f..dd78d3a79e79 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1788,6 +1788,66 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+ 	}
  }
- EXPORT_SYMBOL_GPL(kvm_get_msr_common);
  
-+static bool is_xsaves_msr(u32 index)
++static void vmx_get_xsave_msr(struct msr_data *msr_info)
 +{
-+	return index == MSR_IA32_U_CET ||
-+	       (index >= MSR_IA32_PL0_SSP && index <= MSR_IA32_PL3_SSP);
++	local_irq_disable();
++	if (test_thread_flag(TIF_NEED_FPU_LOAD))
++		switch_fpu_return();
++	rdmsrl(msr_info->index, msr_info->data);
++	local_irq_enable();
++}
++
++static void vmx_set_xsave_msr(struct msr_data *msr_info)
++{
++	local_irq_disable();
++	if (test_thread_flag(TIF_NEED_FPU_LOAD))
++		switch_fpu_return();
++	wrmsrl(msr_info->index, msr_info->data);
++	local_irq_enable();
++}
++
++static bool cet_is_ssp_msr_accessible(struct kvm_vcpu *vcpu,
++				      struct msr_data *msr)
++{
++	u64 mask;
++
++	if (!kvm_cet_supported())
++		return false;
++
++	if (msr->host_initiated)
++		return true;
++
++	if (!guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
++		return false;
++
++	if (msr->index == MSR_IA32_INT_SSP_TAB)
++		return false;
++
++	mask = (msr->index == MSR_IA32_PL3_SSP) ? XFEATURE_MASK_CET_USER :
++						  XFEATURE_MASK_CET_KERNEL;
++	return !!(vcpu->arch.guest_supported_xss & mask);
++}
++
++static bool cet_is_control_msr_accessible(struct kvm_vcpu *vcpu,
++					  struct msr_data *msr)
++{
++	u64 mask;
++
++	if (!kvm_cet_supported())
++		return false;
++
++	if (msr->host_initiated)
++		return true;
++
++	if (!guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
++	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
++		return false;
++
++	mask = (msr->index == MSR_IA32_U_CET) ? XFEATURE_MASK_CET_USER :
++						XFEATURE_MASK_CET_KERNEL;
++	return !!(vcpu->arch.guest_supported_xss & mask);
 +}
 +
  /*
-  * Read or write a bunch of msrs. All parameters are kernel addresses.
-  *
-@@ -3592,11 +3600,20 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
- 		    int (*do_msr)(struct kvm_vcpu *vcpu,
- 				  unsigned index, u64 *data))
- {
-+	bool fpu_loaded = false;
- 	int i;
- 
--	for (i = 0; i < msrs->nmsrs; ++i)
-+	for (i = 0; i < msrs->nmsrs; ++i) {
-+		if (vcpu && !fpu_loaded && supported_xss &&
-+		    is_xsaves_msr(entries[i].index)) {
-+			kvm_load_guest_fpu(vcpu);
-+			fpu_loaded = true;
-+		}
- 		if (do_msr(vcpu, entries[i].index, &entries[i].data))
- 			break;
-+	}
-+	if (fpu_loaded)
-+		kvm_put_guest_fpu(vcpu);
- 
- 	return i;
+  * Reads an msr value (of 'msr_index') into 'pdata'.
+  * Returns 0 on success, non-0 otherwise.
+@@ -1920,6 +1980,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		else
+ 			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+ 		break;
++	case MSR_IA32_S_CET:
++		if (!cet_is_control_msr_accessible(vcpu, msr_info))
++			return 1;
++		msr_info->data = vmcs_readl(GUEST_S_CET);
++		break;
++	case MSR_IA32_U_CET:
++		if (!cet_is_control_msr_accessible(vcpu, msr_info))
++			return 1;
++		vmx_get_xsave_msr(msr_info);
++		break;
++	case MSR_IA32_INT_SSP_TAB:
++		if (!cet_is_ssp_msr_accessible(vcpu, msr_info))
++			return 1;
++		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
++		break;
++	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
++		if (!cet_is_ssp_msr_accessible(vcpu, msr_info))
++			return 1;
++		vmx_get_xsave_msr(msr_info);
++		break;
+ 	case MSR_TSC_AUX:
+ 		if (!msr_info->host_initiated &&
+ 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+@@ -2189,6 +2269,31 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		else
+ 			vmx->pt_desc.guest.addr_a[index / 2] = data;
+ 		break;
++	case MSR_IA32_S_CET:
++	case MSR_IA32_U_CET:
++		if (!cet_is_control_msr_accessible(vcpu, msr_info))
++			return 1;
++		if (data & GENMASK(9, 6))
++			return 1;
++		if (msr_index == MSR_IA32_S_CET)
++			vmcs_writel(GUEST_S_CET, data);
++		else
++			vmx_set_xsave_msr(msr_info);
++		break;
++	case MSR_IA32_INT_SSP_TAB:
++		if (!cet_is_control_msr_accessible(vcpu, msr_info))
++			return 1;
++		if (is_noncanonical_address(data, vcpu))
++			return 1;
++		vmcs_writel(GUEST_INTR_SSP_TABLE, data);
++		break;
++	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
++		if (!cet_is_ssp_msr_accessible(vcpu, msr_info))
++			return 1;
++		if ((data & GENMASK(2, 0)) || is_noncanonical_address(data, vcpu))
++			return 1;
++		vmx_set_xsave_msr(msr_info);
++		break;
+ 	case MSR_TSC_AUX:
+ 		if (!msr_info->host_initiated &&
+ 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 50386318a382..d05c3d11161e 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -286,6 +286,11 @@ static inline bool kvm_mpx_supported(void)
+ 		== (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
  }
+ 
++static inline bool kvm_cet_supported(void)
++{
++	return supported_xss & XFEATURE_MASK_CET_USER;
++}
++
+ extern unsigned int min_timer_period_us;
+ 
+ extern bool enable_vmware_backdoor;
 -- 
 2.17.2
 
