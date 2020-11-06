@@ -2,118 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D31492A9397
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:02:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 726522A93B3
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:08:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbgKFKCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 05:02:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58268 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726321AbgKFKCL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Nov 2020 05:02:11 -0500
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CBB1C0613D3
-        for <kvm@vger.kernel.org>; Fri,  6 Nov 2020 02:02:09 -0800 (PST)
-Received: by mail-ot1-x344.google.com with SMTP id g19so730360otp.13
-        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:02:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Pk2kOuIDyNkJ29R6DHQ3ZwTfwhAfAev58wxOeRlEcVQ=;
-        b=JxYI6LDoYBIyKAFkO0mmU5GO0vKXW+XCgfB3nhMPB/96K75h8XEzFsF5vfwoI9o4Aa
-         YXO5ScRni4mdNnVG7TEPzZnkXGbky0dU2v6WgMTgqxnDpBRtAtlXHbhIcZNyR+EoGosa
-         88KCvZizdR0CJdRqQAGfzd4+9xfkExbEg2qoA=
+        id S1726646AbgKFKIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 05:08:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42658 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725868AbgKFKIm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 05:08:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604657321;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/zFWQauZB9Jb1vvi72pwbusWJtyLmY5VTZrvuC3s4RU=;
+        b=bBtM5K2fEV5AGKBvKR7pZC3tvHfMGYR6eYa/JSaQGFWh1WUo5NAY82ZfSf4HntM5mKrgDX
+        HnBhEH2Vt7y3yX/ePsLFa06UgnKbt7tNF2Hjf9/AQ5sEEuNO5dcDiS0t8GIORysVoIst7Y
+        8T3YWIumYpKzdPasVibY20Ouef7Qcww=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-571-Q2Xkq_rxOs-VMXbuIZePnA-1; Fri, 06 Nov 2020 05:08:39 -0500
+X-MC-Unique: Q2Xkq_rxOs-VMXbuIZePnA-1
+Received: by mail-wm1-f71.google.com with SMTP id s85so244968wme.3
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:08:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Pk2kOuIDyNkJ29R6DHQ3ZwTfwhAfAev58wxOeRlEcVQ=;
-        b=q094GrC/a0/8KjTfJMMBiLSDDN7QN5w+6Czde8NQkNaaKutD8qNdPqbNfUhA06o6p8
-         IK6LyesgdeLMvf2DjYqN2N75nGiTEcpZNI49LmX/afQlGHUJGjOi6Bqj7A7pEGJsHlr5
-         i70ji32YlG/pSQmwCuvNOWAK52meKyXax0vGOo4Wr52aCUeJ3W7LqHKCv//pnY5YjtkX
-         HaI0uzFDQzPTghtFknaEt00aLwIl3Hpl7TRrpl2GeIQiinPf+PjjeqSmaVHeJDzk8nJv
-         ZFN83S8/7ZpHZCJu49GucJL4mfqzTJsLrfvfxlpxelmWjojnFTy3ZmEg5Zgzw+XQf2L4
-         +TPw==
-X-Gm-Message-State: AOAM5334tsA/QD8O2zk75A3kDCiOcRZqnQTHihs5oGzteX5M81MTtM04
-        QCChAE07gpr+RvDTcFEuIe44zD6Ybem6KwvCYDAgzQ==
-X-Google-Smtp-Source: ABdhPJy9+JOeNi7tvqFhbCecRqz/u5D2Qj576z0eBlCGtTEM4NmQBII1FIZeWz8GCbRUxBcA/Ididy+MZpD88l6oJcg=
-X-Received: by 2002:a9d:6a19:: with SMTP id g25mr586779otn.303.1604656928858;
- Fri, 06 Nov 2020 02:02:08 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/zFWQauZB9Jb1vvi72pwbusWJtyLmY5VTZrvuC3s4RU=;
+        b=jhTRvxKJS/n/9qtAA2sgVi5YPO6oRAcEcqcuCZpI705ONRfRNs9D4JZlbrOvdZWbaN
+         ks5OTRZWNFIj5Gc4I9q6LkCcFgim3sbz+X3ZOGU1JEZvgec6zZSjRR4zlyDud4OmtrUm
+         hVmZvB/JNX+DeP0wm9kICHYvkvF+JdD5MWlwX1xeaYvMf4mjeUFZ4uEYces4hjRMMuTD
+         5iabITGKzHLY3p0k5ELlf81/7f9KfyqzBqLc74E8iFSiV2ZAzdsahhQvSWIFD2KEhMb2
+         tzJGP8Fwv3prs1jMyHGZrx6omCJ8bMvuuE3iPeN4xZlyj/FsoFkVnUr69geEtJLPH016
+         dyQw==
+X-Gm-Message-State: AOAM533R4ccN/9QUB4mEQgVLQQ3qBx2uUhHlbWdoJIHNNgnBvBUfE1R9
+        bx/lUYcx8kmaLtm0hP5FgXvjT4SxpuZqI7U7+O4heiCTzSHtsKtRdpJzYsP1x8yxvSzZ5dHrnOZ
+        sj40C4FzCHkkP
+X-Received: by 2002:a1c:5946:: with SMTP id n67mr1536303wmb.162.1604657318384;
+        Fri, 06 Nov 2020 02:08:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx9igtEtChE6ux/KRrMYki2O+eSBRULpatbRYPhKVZ8EhtQD35zmOPT8mRBC+PnTw+rpJneaQ==
+X-Received: by 2002:a1c:5946:: with SMTP id n67mr1536280wmb.162.1604657318153;
+        Fri, 06 Nov 2020 02:08:38 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id b14sm1256478wrx.35.2020.11.06.02.08.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Nov 2020 02:08:37 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: handle MSR_IA32_DEBUGCTLMSR with
+ report_ignored_msrs
+To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc:     kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>, oro@8bytes.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+References: <20201105153932.24316-1-pankaj.gupta.linux@gmail.com>
+ <36be2860-9ef9-db0f-ad8b-1089bd258dbc@redhat.com>
+ <CAM9Jb+igM6Pp=Mx3WAqQJBsVqmVhfaYmkspFvDq1Y93Dihdp8w@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8ec4e9eb-763e-d16b-4938-2d463f63bc23@redhat.com>
+Date:   Fri, 6 Nov 2020 11:08:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <CAKMK7uEw701AWXNJbRNM8Z+FkyUB5FbWegmSzyWPy9cG4W7OLA@mail.gmail.com>
- <20201104140023.GQ36674@ziepe.ca> <CAKMK7uH69hsFjYUkjg1aTh5f=q_3eswMSS5feFs6+ovz586+0A@mail.gmail.com>
- <20201104162125.GA13007@infradead.org> <CAKMK7uH=0+3FSR4LxP7bJUB4BsCcnCzfK2=D+2Am9QNmfZEmfw@mail.gmail.com>
- <20201104163758.GA17425@infradead.org> <20201104164119.GA18218@infradead.org>
- <20201104181708.GU36674@ziepe.ca> <d3497583-2338-596e-c764-8c571b7d22cf@nvidia.com>
- <20201105092524.GQ401619@phenom.ffwll.local> <20201105124950.GZ36674@ziepe.ca>
- <7ae3486d-095e-cf4e-6b0f-339d99709996@nvidia.com>
-In-Reply-To: <7ae3486d-095e-cf4e-6b0f-339d99709996@nvidia.com>
-From:   Daniel Vetter <daniel@ffwll.ch>
-Date:   Fri, 6 Nov 2020 11:01:57 +0100
-Message-ID: <CAKMK7uGRw=xXE+D=JJsNeRav9+hdO4tcDSvDbAuWfc3T4VkoJw@mail.gmail.com>
-Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        "J??r??me Glisse" <jglisse@redhat.com>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAM9Jb+igM6Pp=Mx3WAqQJBsVqmVhfaYmkspFvDq1Y93Dihdp8w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 6, 2020 at 5:08 AM John Hubbard <jhubbard@nvidia.com> wrote:
->
-> On 11/5/20 4:49 AM, Jason Gunthorpe wrote:
-> > On Thu, Nov 05, 2020 at 10:25:24AM +0100, Daniel Vetter wrote:
-> >>> /*
-> >>>   * If we can't determine whether or not a pte is special, then fail immediately
-> >>>   * for ptes. Note, we can still pin HugeTLB and THP as these are guaranteed not
-> >>>   * to be special.
-> >>>   *
-> >>>   * For a futex to be placed on a THP tail page, get_futex_key requires a
-> >>>   * get_user_pages_fast_only implementation that can pin pages. Thus it's still
-> >>>   * useful to have gup_huge_pmd even if we can't operate on ptes.
-> >>>   */
-> >>
-> >> We support hugepage faults in gpu drivers since recently, and I'm not
-> >> seeing a pud_mkhugespecial anywhere. So not sure this works, but probably
-> >> just me missing something again.
-> >
-> > It means ioremap can't create an IO page PUD, it has to be broken up.
-> >
-> > Does ioremap even create anything larger than PTEs?
+On 05/11/20 19:58, Pankaj Gupta wrote:
+> Windows2016 guest tries to enable LBR (last
+> branch/interrupt/exception) by setting
+> MSR_IA32_DEBUGCTLMSR. KVM does not emulate MSR_IA32_DEBUGCTLMSR and
+> spams the host kernel logs with the below error messages.This patch
+> fixes this by enabling
+> error logging only with 'report_ignored_msrs'.
+> 
+> "kvm []: vcpu1, guest rIP: 0xfffff800a8b687d3 kvm_set_msr_common:
+> MSR_IA32_DEBUGCTLMSR 0x1, nop"
 
-gpu drivers also tend to use vmf_insert_pfn* directly, so we can do
-on-demand paging and move buffers around. From what I glanced for
-lowest level we to the pte_mkspecial correctly (I think I convinced
-myself that vm_insert_pfn does that), but for pud/pmd levels it seems
-just yolo.
+Sounds good, thanks.
 
-remap_pfn_range seems to indeed split down to pte level always.
+Paolo
 
->  From my reading, yes. See ioremap_try_huge_pmd().
-
-The ioremap here shouldn't matter, since this is for kernel-internal
-mappings. So that's all fine I think.
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
