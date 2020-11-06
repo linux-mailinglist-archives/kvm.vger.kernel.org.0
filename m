@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 916A32A99B4
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 17:44:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9086B2A99BE
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 17:44:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727270AbgKFQok (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 11:44:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51592 "EHLO mail.kernel.org"
+        id S1727494AbgKFQon (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 11:44:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51624 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726415AbgKFQoj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Nov 2020 11:44:39 -0500
+        id S1726074AbgKFQok (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Nov 2020 11:44:40 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8B5F9217A0;
-        Fri,  6 Nov 2020 16:44:38 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3036522202;
+        Fri,  6 Nov 2020 16:44:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604681078;
-        bh=t0K1Uzu+49PExG7zsJdALxOgNu8sv7rz5YDcQXoVCJY=;
+        s=default; t=1604681079;
+        bh=4nxo98F1ri7FBCul54hzxH5bJE7AoVp784/dlvDWj18=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=y0Knw6SXwkuIvEg2uWUQ/PrrwXU0Cup7lBqjLmSlH3uf72/RKpQZ9dOI4ig17Uf4E
-         NF9jRnOkkDZgCzsf1c4qRUJIXZQfhuFdoWmvBf85dshrgexy8qMYW6oFU70shSl1hx
-         13TGB/J7sIsA7MVpBxI3o7/48OIJ/3RYjg/9oYjs=
+        b=QfH1oejjMxWbH7yFeFEqfBF+e5gKfG76n3Py3NRJUBH10OhtfdlKZAn+ffkQApYNj
+         yqfZKVl0eCyScIiBEFEBvUk2rcDbpMocIq83q1MyhrQX8AR57hzjf+ilkolQpe3umw
+         Cpe1Ac30yhi0O3Zoe0ObN90+CwqPGUXPs81X0mJk=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1kb4qq-008FYW-NV; Fri, 06 Nov 2020 16:44:36 +0000
+        id 1kb4qr-008FYW-CK; Fri, 06 Nov 2020 16:44:37 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Andrew Jones <drjones@redhat.com>,
@@ -38,18 +38,17 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: [PATCH 2/5] KVM: arm64: Don't hide ID registers from userspace
-Date:   Fri,  6 Nov 2020 16:44:13 +0000
-Message-Id: <20201106164416.326787-3-maz@kernel.org>
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 3/5] KVM: arm64: Consolidate REG_HIDDEN_GUEST/USER
+Date:   Fri,  6 Nov 2020 16:44:14 +0000
+Message-Id: <20201106164416.326787-4-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201106164416.326787-1-maz@kernel.org>
 References: <20201106164416.326787-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com, eric.auger@redhat.com, gshan@redhat.com, xu910121@sina.com, dave.martin@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com, eric.auger@redhat.com, gshan@redhat.com, xu910121@sina.com, dave.martin@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
@@ -58,77 +57,119 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Andrew Jones <drjones@redhat.com>
 
-ID registers are RAZ until they've been allocated a purpose, but
-that doesn't mean they should be removed from the KVM_GET_REG_LIST
-list. So far we only have one register, SYS_ID_AA64ZFR0_EL1, that
-is hidden from userspace when its function, SVE, is not present.
+REG_HIDDEN_GUEST and REG_HIDDEN_USER are always used together.
+Consolidate them into a single REG_HIDDEN flag. We can always
+add another flag later if some register needs to expose itself
+differently to the guest than it does to userspace.
 
-Expose SYS_ID_AA64ZFR0_EL1 to userspace as RAZ when SVE is not
-implemented. Removing the userspace visibility checks is enough
-to reexpose it, as it will already return zero to userspace when
-SVE is not present. The register already behaves as RAZ for the
-guest when SVE is not present.
+No functional change intended.
 
-Fixes: 73433762fcae ("KVM: arm64/sve: System register context switch and access support")
-Reported-by: 张东旭 <xu910121@sina.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org#v5.2+
-Link: https://lore.kernel.org/r/20201105091022.15373-2-drjones@redhat.com
+Link: https://lore.kernel.org/r/20201105091022.15373-3-drjones@redhat.com
 ---
- arch/arm64/kvm/sys_regs.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 12 ++++++------
+ arch/arm64/kvm/sys_regs.h | 18 ++++--------------
+ 2 files changed, 10 insertions(+), 20 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 983994f01a63..3af306e6b9cd 100644
+index 3af306e6b9cd..26a285127620 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1193,16 +1193,6 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
+@@ -1069,7 +1069,7 @@ static bool trap_ptrauth(struct kvm_vcpu *vcpu,
+ static unsigned int ptrauth_visibility(const struct kvm_vcpu *vcpu,
+ 			const struct sys_reg_desc *rd)
+ {
+-	return vcpu_has_ptrauth(vcpu) ? 0 : REG_HIDDEN_USER | REG_HIDDEN_GUEST;
++	return vcpu_has_ptrauth(vcpu) ? 0 : REG_HIDDEN;
  }
  
--/* Visibility overrides for SVE-specific ID registers */
--static unsigned int sve_id_visibility(const struct kvm_vcpu *vcpu,
--				      const struct sys_reg_desc *rd)
+ #define __PTRAUTH_KEY(k)						\
+@@ -1190,7 +1190,7 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+ 	if (vcpu_has_sve(vcpu))
+ 		return 0;
+ 
+-	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
++	return REG_HIDDEN;
+ }
+ 
+ /* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
+@@ -2153,7 +2153,7 @@ static void perform_access(struct kvm_vcpu *vcpu,
+ 	trace_kvm_sys_access(*vcpu_pc(vcpu), params, r);
+ 
+ 	/* Check for regs disabled by runtime config */
+-	if (sysreg_hidden_from_guest(vcpu, r)) {
++	if (sysreg_hidden(vcpu, r)) {
+ 		kvm_inject_undefined(vcpu);
+ 		return;
+ 	}
+@@ -2652,7 +2652,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 		return get_invariant_sys_reg(reg->id, uaddr);
+ 
+ 	/* Check for regs disabled by runtime config */
+-	if (sysreg_hidden_from_user(vcpu, r))
++	if (sysreg_hidden(vcpu, r))
+ 		return -ENOENT;
+ 
+ 	if (r->get_user)
+@@ -2677,7 +2677,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 		return set_invariant_sys_reg(reg->id, uaddr);
+ 
+ 	/* Check for regs disabled by runtime config */
+-	if (sysreg_hidden_from_user(vcpu, r))
++	if (sysreg_hidden(vcpu, r))
+ 		return -ENOENT;
+ 
+ 	if (r->set_user)
+@@ -2748,7 +2748,7 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+ 	if (!(rd->reg || rd->get_user))
+ 		return 0;
+ 
+-	if (sysreg_hidden_from_user(vcpu, rd))
++	if (sysreg_hidden(vcpu, rd))
+ 		return 0;
+ 
+ 	if (!copy_reg_to_user(rd, uind))
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 5a6fc30f5989..2641b2ee6a91 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -59,8 +59,7 @@ struct sys_reg_desc {
+ 				   const struct sys_reg_desc *rd);
+ };
+ 
+-#define REG_HIDDEN_USER		(1 << 0) /* hidden from userspace ioctls */
+-#define REG_HIDDEN_GUEST	(1 << 1) /* hidden from guest */
++#define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
+ 
+ static __printf(2, 3)
+ inline void print_sys_reg_msg(const struct sys_reg_params *p,
+@@ -111,22 +110,13 @@ static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r
+ 	__vcpu_sys_reg(vcpu, r->reg) = r->val;
+ }
+ 
+-static inline bool sysreg_hidden_from_guest(const struct kvm_vcpu *vcpu,
+-					    const struct sys_reg_desc *r)
 -{
--	if (vcpu_has_sve(vcpu))
--		return 0;
+-	if (likely(!r->visibility))
+-		return false;
 -
--	return REG_HIDDEN_USER;
+-	return r->visibility(vcpu, r) & REG_HIDDEN_GUEST;
 -}
 -
- /* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
- static u64 guest_id_aa64zfr0_el1(const struct kvm_vcpu *vcpu)
+-static inline bool sysreg_hidden_from_user(const struct kvm_vcpu *vcpu,
+-					   const struct sys_reg_desc *r)
++static inline bool sysreg_hidden(const struct kvm_vcpu *vcpu,
++				 const struct sys_reg_desc *r)
  {
-@@ -1229,9 +1219,6 @@ static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
- {
- 	u64 val;
+ 	if (likely(!r->visibility))
+ 		return false;
  
--	if (WARN_ON(!vcpu_has_sve(vcpu)))
--		return -ENOENT;
--
- 	val = guest_id_aa64zfr0_el1(vcpu);
- 	return reg_to_user(uaddr, &val, reg->id);
+-	return r->visibility(vcpu, r) & REG_HIDDEN_USER;
++	return r->visibility(vcpu, r) & REG_HIDDEN;
  }
-@@ -1244,9 +1231,6 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
- 	int err;
- 	u64 val;
  
--	if (WARN_ON(!vcpu_has_sve(vcpu)))
--		return -ENOENT;
--
- 	err = reg_from_user(&val, uaddr, id);
- 	if (err)
- 		return err;
-@@ -1509,7 +1493,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	ID_SANITISED(ID_AA64PFR1_EL1),
- 	ID_UNALLOCATED(4,2),
- 	ID_UNALLOCATED(4,3),
--	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, .visibility = sve_id_visibility },
-+	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, },
- 	ID_UNALLOCATED(4,5),
- 	ID_UNALLOCATED(4,6),
- 	ID_UNALLOCATED(4,7),
+ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
 -- 
 2.28.0
 
