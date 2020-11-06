@@ -2,96 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D8D22A94CE
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:54:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AC612A94EB
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 11:56:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727050AbgKFKye (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 05:54:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37530 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726642AbgKFKye (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Nov 2020 05:54:34 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EF03D20724;
-        Fri,  6 Nov 2020 10:54:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604660074;
-        bh=OnTmyL0jGfWHius5cIOnjkdLCJl2+U5PH7ORvDNG+NI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=WThvWAsgUak++vYWiIrwyBjo77fcNOCS3jrGoXZwUy6qsIWOTyVJJMS276U59Wjs0
-         VR1pwkfN1pl3eFwHQhg6po8IiZmYDpMMcuBkgTPkI68ZsAJpnmQS64hb8vzaiFB54F
-         kF16b9KRsHShzdtWQ39eVnBwwZtIJSJj65MJneTs=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kazO3-008A1C-D0; Fri, 06 Nov 2020 10:54:31 +0000
+        id S1727169AbgKFK4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 05:56:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36574 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727205AbgKFK4u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 05:56:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604660209;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pjlo5JUIOTDUV4ZXiqwdy+qZTg/eMHp+BKLRgYqZ8mE=;
+        b=YKbDNetRgbdn2vcwhW+MuEfQwcfmWXMrj2pCeY4aOXhU5efkY6FGhkdkc1vgJzXx8gMJQo
+        N01atffNGOVWyoO6Pc98BxSV5UzowOv8h8IRwB3FB//HyWdeAZX99p+qrwg/yXPSXszjpm
+        fxk7+N6Khv2vi6sF/VQJDLmp+F1uFpg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-509-6ZpK2RyeP2ed1_BHIqDB1g-1; Fri, 06 Nov 2020 05:56:45 -0500
+X-MC-Unique: 6ZpK2RyeP2ed1_BHIqDB1g-1
+Received: by mail-wm1-f69.google.com with SMTP id e15so290398wme.4
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 02:56:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Pjlo5JUIOTDUV4ZXiqwdy+qZTg/eMHp+BKLRgYqZ8mE=;
+        b=hc3PMfp52fgwt7pSu/NNvFHwc4ryW2uksQ7nudBWgTorHlcGV17R6+bV73+BwYGv9z
+         2MGK3X4z3azbuXGJ3k/JXhUiFtttGVvZ9u+mT49TEMActm+n3KHC6cmtrh8ZsSmhG9Ul
+         A0xmVut+OtLLQBkGfwce1C7QmqPpxjbZdaqKieToTcrrSYe1n6cvOMFsyQytpSCKnJSs
+         TIiMnn5odgyxxN5B2K6qwJvoha45668EkV+dzdwnv9m9ekpVeh57HElwamunor3Iuzjh
+         HxyB/vKhYIWYpdPo7jNhjHekyVUwvzzJSWB4GQ734LmFTKAk4zonU8hhaNu0A2G69XrJ
+         h0yA==
+X-Gm-Message-State: AOAM53177XjA1NeWR1q/UgsmL/laziv7OKzMOd9vdS+xlII6p/pP0qlr
+        IEouy1jIYPxsXizfplodOFsJxc7iCcDefPrPeloSP1NGXY3cNqLM712g9LcOMJgzhma04QfH7yg
+        UAZB7H3jtg87t
+X-Received: by 2002:adf:e8d0:: with SMTP id k16mr1971721wrn.362.1604660203951;
+        Fri, 06 Nov 2020 02:56:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxLhEYbJDRRuZZgGWT3qR8WnLrV1z/VwRATvbIzR/qs/MGtS5CJWD0uCE9tv38R2N1EHXwZLw==
+X-Received: by 2002:adf:e8d0:: with SMTP id k16mr1971707wrn.362.1604660203733;
+        Fri, 06 Nov 2020 02:56:43 -0800 (PST)
+Received: from [192.168.10.118] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id b8sm1655312wmj.9.2020.11.06.02.56.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Nov 2020 02:56:42 -0800 (PST)
+Subject: Re: [PATCH v13 05/14] KVM: X86: Implement ring-based dirty memory
+ tracking
+To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Lei Cao <lei.cao@stratus.com>
+References: <20201001012044.5151-1-peterx@redhat.com>
+ <20201001012222.5767-1-peterx@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a03b7cf0-8847-2a60-ea2b-b83f5d82939a@redhat.com>
+Date:   Fri, 6 Nov 2020 11:56:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20201001012222.5767-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Fri, 06 Nov 2020 10:54:31 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
-        Peng Liang <liangpeng10@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH 2/3] KVM: arm64: Rename access_amu() to undef_access()
-In-Reply-To: <20201105225020.GE8842@willie-the-truck>
-References: <20201103171445.271195-1-maz@kernel.org>
- <20201103171445.271195-3-maz@kernel.org>
- <20201105225020.GE8842@willie-the-truck>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <48655b6266c39555edc614274d1d9877@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: will@kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, liangpeng10@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-11-05 22:50, Will Deacon wrote:
-> On Tue, Nov 03, 2020 at 05:14:44PM +0000, Marc Zyngier wrote:
->> The only thing that access_amu() does is to inject an UNDEF exception,
->> so let's rename it to the clearer undef_access(). We'll reuse that
->> for some other system registers.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 28 ++++++++++++++--------------
->>  1 file changed, 14 insertions(+), 14 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 61789027b92b..fafaa81bf1f6 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1038,8 +1038,8 @@ static bool access_pmuserenr(struct kvm_vcpu 
->> *vcpu, struct sys_reg_params *p,
->>  	{ SYS_DESC(SYS_PMEVTYPERn_EL0(n)),					\
->>  	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
->> 
->> -static bool access_amu(struct kvm_vcpu *vcpu, struct sys_reg_params 
->> *p,
->> -			     const struct sys_reg_desc *r)
->> +static bool undef_access(struct kvm_vcpu *vcpu, struct sys_reg_params 
->> *p,
->> +			 const struct sys_reg_desc *r)
->>  {
->>  	kvm_inject_undefined(vcpu);
-> 
-> This seems to be identical to trap_ptrauth(). Shall we give it the same
-> treatment?
+Just very few changes:
 
-Yes. MTE is also doing the same thing, so let's grind them all.
+On 01/10/20 03:22, Peter Xu wrote:
+> @@ -6373,3 +6386,107 @@ ranges that KVM should reject access to.
+>   In combination with KVM_CAP_X86_USER_SPACE_MSR, this allows user space to
+>   trap and emulate MSRs that are outside of the scope of KVM as well as
+>   limit the attack surface on KVM's MSR emulation code.
+> +
+> +8.28 KVM_CAP_DIRTY_LOG_RING
+> +---------------------------
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Here I made a few edits, but nothing major.  Throughout the patch I 
+replaced "collected" with "harvested" since the documentation was using 
+it already and it's a bit more unique ("collect" reminds me too much of 
+garbage collection and perhaps could be confused with the kernel's 
+operation for the reset ioctl).
+
+> +#ifdef CONFIG_X86
+> +		return KVM_DIRTY_RING_MAX_ENTRIES * sizeof(struct kvm_dirty_gfn);
+> +#else
+> +		return 0;
+> +#endif
+
+And this can be "#if KVM_DIRTY_LOG_PAGE_OFFSET > 0" instead.
+
+Paolo
+
