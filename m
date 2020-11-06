@@ -2,94 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62C642A96F5
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 14:25:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D4142A9805
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 16:04:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727408AbgKFNZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 08:25:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37412 "EHLO
+        id S1727494AbgKFPEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 10:04:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42071 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727287AbgKFNZG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 08:25:06 -0500
+        by vger.kernel.org with ESMTP id S1727055AbgKFPEJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 10:04:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604669105;
+        s=mimecast20190719; t=1604675047;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qkuxbR4G3FNGPeIH1SPkdjbNDS2i/SsFPcilaKLEB9Q=;
-        b=gZEkjVsSzhM8PF05CrbOGIy06LlaieFn/sYgy9tSHt21u0jdYqPMssih9wvjV8wvX25O/7
-        ty6XoYEr1HiV1SrdFghHSo85OcKiNVDnSX4DBxMTH7a8JlRihZXwBZ2IxAoIYU4oreMDhW
-        NNQ/ABEsjn4V9V5itTFxrkP9jQ8+BRI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-DeMIhcz7PV60qa6O0bFwjw-1; Fri, 06 Nov 2020 08:25:03 -0500
-X-MC-Unique: DeMIhcz7PV60qa6O0bFwjw-1
-Received: by mail-wr1-f72.google.com with SMTP id q15so469168wrw.8
-        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 05:25:03 -0800 (PST)
+        bh=CzgmSukU+JJ0kZAYj3W3oD7+hdMHa/WgIF1zrVhCvus=;
+        b=VLEhA+/6qu5P/NJ/Dnhl8GPF5bIao8MjV6XKeFOUBooatjq7wkqf+G6sqpN+Z9KvZk58H/
+        C9zVs5qH4RaBxeufJezl1q/FRjR6ZEeo+RzqSahuJ94eqFGNYhQiV9Ijit6FlE2E2uIHwh
+        0FJWVo5Biy5qjzCrvUGNph5HgTcOD8Y=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-61hDS0YkNFyoLcKqAerkhA-1; Fri, 06 Nov 2020 10:04:04 -0500
+X-MC-Unique: 61hDS0YkNFyoLcKqAerkhA-1
+Received: by mail-qk1-f199.google.com with SMTP id x5so894770qkn.2
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 07:04:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qkuxbR4G3FNGPeIH1SPkdjbNDS2i/SsFPcilaKLEB9Q=;
-        b=N9nZ5+lOC2n3jsiV4EO1ZZ12vtOGogQSxABW/fmyiXwEZnGomWkYWnJu5EgNu4rqfM
-         OspC6nj/LIyVma7lF4nU3KC8XMDQoE0l+KC14dnEpdA413wPtJh0IySqrKRWJ/YWEPI5
-         BrROAZ6r1W582CKchxUnnv/leVG56OfkctmOakXmnBpoWzjlM2UKemw/SXAm8enj9Z1W
-         uOD66t1DsxZZ40ZuvN2TTAs7WV5C1ndWkPAt9uS0fGr4378Ha9VVSEgYH60xFU/UZaix
-         b1mmvArhjwCH18D58Q/Az70pYo30Fu3uARwRkHrDU5h1C4ravHm7RytaruTk0p40ybJq
-         v9UA==
-X-Gm-Message-State: AOAM531f9e4VBrc4awfa895ddN4/iXzo03I9rGZsUBVPQ3rJpsEmFtM6
-        4COUWKyX7IAY5Z+tOqWQAvqxILJDdERi4ZzweP87DBdWxNpw2lB3WYe0itR79tMyf4pNuORlrTL
-        naOFpvQ8FZOW2
-X-Received: by 2002:a7b:c772:: with SMTP id x18mr2613307wmk.185.1604669102569;
-        Fri, 06 Nov 2020 05:25:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyZ/2LRBRmoiShw0UuRFze9ZSUcWJNrDk2w76ayt2tZ+sF8mfL6vVrdwS624jyuuwMWXfuf+A==
-X-Received: by 2002:a7b:c772:: with SMTP id x18mr2613286wmk.185.1604669102362;
-        Fri, 06 Nov 2020 05:25:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:48f9:bea:a04c:3dfe? ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
-        by smtp.gmail.com with ESMTPSA id z6sm2385713wmi.1.2020.11.06.05.25.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Nov 2020 05:25:01 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 1/4] memory: allocation in low memory
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-References: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
- <1601303017-8176-2-git-send-email-pmorel@linux.ibm.com>
- <20200928173147.750e7358.cohuck@redhat.com>
- <136e1860-ddbc-edc0-7e67-fdbd8112a01e@linux.ibm.com>
- <f2ff3ddd-c70e-b2cc-b58f-bbcb1e4684d6@linux.ibm.com>
- <63ac15b1-b4fe-b1b5-700f-ae403ce7fb85@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fc553f1a-8ddd-59b0-9dec-8bdddfb5483d@redhat.com>
-Date:   Fri, 6 Nov 2020 14:25:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CzgmSukU+JJ0kZAYj3W3oD7+hdMHa/WgIF1zrVhCvus=;
+        b=EZYFh30Kp3915QlUfIW3A+FguJvmkH7vhWl+KwYSYmg5goU3PuC7RPImW0rhOgZmrM
+         Bh9RVCsCPjgUJVlnFdxxL/eJAMQBiby0fDSXFK3qSI2Te0ss5AoTwEh6OqVP8VM4GJHz
+         AwriaM/dRDS4ZUYHlUHPNUNtA3X/CTswW+/iQZlO9FjOVgId+j0T0+b+SE2TiQwzI9cW
+         Azmsi33hlTCh6jw4psm1E+kXvr44i/NSD9G4bTKumflj/PTTvyL6h10OM108qO8+2j4S
+         4If4g9+KY0G6Siyoh9iCqF4whh7uHfLrxGuZsdL446j202BJze95qDNZPAK6lLXdF3Ie
+         Q41g==
+X-Gm-Message-State: AOAM530kbwb+7JbAWDVkZA59x6YrXYYHo4/100GUq0rsuoXvHdM8XWpL
+        3o3mEiwH2sZ40UnDm9ZxFRUmyz4GvP2dG/8k7kcLRyIeYUsJ7b8aX9cpcoYkzo/jDJsX3rDga6F
+        Ins0jbFM9zE/L
+X-Received: by 2002:a37:99c2:: with SMTP id b185mr1722563qke.81.1604675043782;
+        Fri, 06 Nov 2020 07:04:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwYA8HjUTGFsF9FYbarx9dJ/KgkVCzzhLWdsVB8rhWPOZ7UHJju5a++qohgpKh78SN4ICf4DQ==
+X-Received: by 2002:a37:99c2:: with SMTP id b185mr1722542qke.81.1604675043530;
+        Fri, 06 Nov 2020 07:04:03 -0800 (PST)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
+        by smtp.gmail.com with ESMTPSA id k11sm681742qtu.45.2020.11.06.07.04.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2020 07:04:02 -0800 (PST)
+Date:   Fri, 6 Nov 2020 10:04:01 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Ben Gardon <bgardon@google.com>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 00/11] KVM: selftests: Cleanups
+Message-ID: <20201106150401.GB138364@xz-x1>
+References: <20201104212357.171559-1-drjones@redhat.com>
+ <20201105185554.GD106309@xz-x1>
+ <CANgfPd_97QGP+q8-_VAzhJxw_kdiHcFukAZ-dSp4cNrvKdNEpg@mail.gmail.com>
+ <20201106094511.s4dj2a7n32dawt7m@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <63ac15b1-b4fe-b1b5-700f-ae403ce7fb85@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20201106094511.s4dj2a7n32dawt7m@kamzik.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/11/20 15:15, Janosch Frank wrote:
->> Isn't it possible to go on with this patch series.
->> It can be adapted later to the changes that will be introduced by
->> Claudio when it is final.
->>
->>
-> Pierre, that's outside of my jurisdiction, you're adding code to the
-> common code library.
-> 
-> I've set Paolo CC, let's see if he finds this thread:)
-> 
+On Fri, Nov 06, 2020 at 10:45:11AM +0100, Andrew Jones wrote:
+> Yikes! Don't worry about KVM selftests then. Except for one more question?
+> Can I translate your "looks good to me" into a r-b for the series? And,
+> same question for Peter. I'll be respinning witht eh PTES_PER_PAGE change
+> and can add your guys' r-b's if you want to give them.
 
-I have queued Claudio's series already, so let's start from there.
+Yes, please feel free to add with mine (if there's a repost).  Though I see
+that Paolo has queued the series already, so maybe it's even easier to directly
+work on top.
 
-Paolo
+Thanks!
+
+-- 
+Peter Xu
 
