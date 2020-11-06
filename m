@@ -2,141 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F14E02A968E
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 13:58:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A7012A9691
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 13:58:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727384AbgKFM6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 07:58:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53924 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727383AbgKFM6i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 07:58:38 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A6CXwu0006826
-        for <kvm@vger.kernel.org>; Fri, 6 Nov 2020 07:58:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=QwUdF02VgFC3vwxTGPJuIgFxdK9zF8DsUrJRIO1uzQc=;
- b=H+Luxwuu+AJ/hDolMYf5CYLGs3K/LSKh1ra+uomj/V+kQCv7UNmRMTLv88+UEPMFilCE
- 6kRx+KFtqSTqjmy/fF5cqOB4Wxr3UlrxLvuhOE/DY8VLpHvhaLdNqsRRSCusLgexg1su
- ugkDqpdMKj4A0jO5FK+SfbFv9lahRPeNWFoj2x49YCf1O8RMWXKclfDjlfNWBIOjCqU9
- uLsQ0qUcQx5McYKm99BiF1Y13y5znbxj4ZJGaBU743vRxyPbX71tKkg71U4s6D+Te6va
- RcPlQI5sb3rc9QR1iZm8XZluV/4pFsdJDldKj9wBGtXjPTLG/5Eo/JwVUdmrnJ0HFw7z aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34ms00f8bc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 07:58:37 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A6CtW0M102721
-        for <kvm@vger.kernel.org>; Fri, 6 Nov 2020 07:58:37 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34ms00f8at-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Nov 2020 07:58:37 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A6CqAgE026067;
-        Fri, 6 Nov 2020 12:58:35 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 34h0f6ubdf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Nov 2020 12:58:35 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A6CwW6g1770222
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 6 Nov 2020 12:58:33 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C473211C058;
-        Fri,  6 Nov 2020 12:58:32 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 666CE11C04A;
-        Fri,  6 Nov 2020 12:58:32 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.1.188])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  6 Nov 2020 12:58:32 +0000 (GMT)
-Date:   Fri, 6 Nov 2020 13:58:30 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com, lvivier@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 3/7] lib/asm: Add definitions of
- memory areas
-Message-ID: <20201106135830.53f027b5@ibm-vm>
-In-Reply-To: <1429868e-2348-e7a3-0668-4fc2439052f2@redhat.com>
-References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
-        <20201002154420.292134-4-imbrenda@linux.ibm.com>
-        <1429868e-2348-e7a3-0668-4fc2439052f2@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727416AbgKFM6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 07:58:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727390AbgKFM6m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Nov 2020 07:58:42 -0500
+Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92F63C0613D2
+        for <kvm@vger.kernel.org>; Fri,  6 Nov 2020 04:58:42 -0800 (PST)
+Received: by mail-qt1-x843.google.com with SMTP id g17so636494qts.5
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 04:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=LDmpY5Q3jeo13aLjq8mpu4vGc1arJjADg5EChwDGndg=;
+        b=SpM7chHfdZV7h7CKnja31DtYMLYzvOBfAlRtmJ/n/nmTfwC0/x656sMJMRCmtcchj/
+         ZyUoXciqxn2yvqmwaFJGHZpzSVxZGn6Ze+JMY7srqI9JIuOIozv+IXpP8Z+LAF7g6ch/
+         geDIF/iCN2g4ZH9VZGIJGVBqjOuzBGBXOfBZNRG4f137xGwffeFnYlpuanA0eFi1/Rzl
+         pE4g37GMMac8kgjZ4ctH1Noi6iDIudZDIDNiFDVJFDqddViW7d1FfR7i1JICWyRJ9Ug1
+         S57hfmUNM5E/OZ/BlY/n0jaRZ1v6nFt9MTt+r5sEgovuILshM1zaV3phLFg35dveDz2Q
+         NHAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=LDmpY5Q3jeo13aLjq8mpu4vGc1arJjADg5EChwDGndg=;
+        b=O/A8Z5xKlACd7gSZRjm86RNAAENobqAUrzbxU/wcK+pbRiuk+k89AC2QNWMJNq9+K7
+         RuNCd4BZQvf7ugiXWn23BRsGK1YAn7r1PtiFjUJmdgTGAEQWdN2jfSaegzHZnt5ZPgFu
+         XaD9T4BkH6jmJFX++ArGD64nZv6pN121pPpnQRzaDyXQdoO4WJ/B6eHoD7AKqpSk4rip
+         mbTn5m3a9TwnEUSeAFfpiol1TnapiLAOwbH2FPuRo3dYG/zLjqO/v2T5t3e3O/70QZil
+         KRdBJoReQ5PzvK3ALXgXI47kMJzDfTLWvcSvJ18rzrNgg49J/mRv4BuyuPQKw6SqVRMK
+         o00Q==
+X-Gm-Message-State: AOAM532L3Tm4LA1CTWtDzZQVKthO/hO7WtU54pKbrBh2HwYp7TTrxpFQ
+        IcxxJtP8QPBKwMEedOqpcDHh5w==
+X-Google-Smtp-Source: ABdhPJw+rwYTMNOCDOtELAS3ZURAM14wn0+raNRbu4MJsphc7No8hlqtgP1VZD/3115+BJAOILEwww==
+X-Received: by 2002:ac8:74c:: with SMTP id k12mr1292900qth.32.1604667521864;
+        Fri, 06 Nov 2020 04:58:41 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id o63sm432040qkd.96.2020.11.06.04.58.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2020 04:58:41 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kb1KC-000leP-L9; Fri, 06 Nov 2020 08:58:40 -0400
+Date:   Fri, 6 Nov 2020 08:58:40 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Daniel Vetter <daniel@ffwll.ch>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        J??r??me Glisse <jglisse@redhat.com>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        Tomasz Figa <tfiga@chromium.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>
+Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
+Message-ID: <20201106125840.GP36674@ziepe.ca>
+References: <20201104162125.GA13007@infradead.org>
+ <CAKMK7uH=0+3FSR4LxP7bJUB4BsCcnCzfK2=D+2Am9QNmfZEmfw@mail.gmail.com>
+ <20201104163758.GA17425@infradead.org>
+ <20201104164119.GA18218@infradead.org>
+ <20201104181708.GU36674@ziepe.ca>
+ <d3497583-2338-596e-c764-8c571b7d22cf@nvidia.com>
+ <20201105092524.GQ401619@phenom.ffwll.local>
+ <20201105124950.GZ36674@ziepe.ca>
+ <7ae3486d-095e-cf4e-6b0f-339d99709996@nvidia.com>
+ <CAKMK7uGRw=xXE+D=JJsNeRav9+hdO4tcDSvDbAuWfc3T4VkoJw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-06_04:2020-11-05,2020-11-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- clxscore=1015 priorityscore=1501 bulkscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 spamscore=0 suspectscore=0 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011060088
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKMK7uGRw=xXE+D=JJsNeRav9+hdO4tcDSvDbAuWfc3T4VkoJw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 6 Nov 2020 12:34:10 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Fri, Nov 06, 2020 at 11:01:57AM +0100, Daniel Vetter wrote:
 
-> On 02/10/20 17:44, Claudio Imbrenda wrote:
-> > x86 gets
-> > * lowest area (24-bit addresses)
-> > * low area (32-bit addresses)
-> > * the rest  
+> gpu drivers also tend to use vmf_insert_pfn* directly, so we can do
+> on-demand paging and move buffers around. From what I glanced for
+> lowest level we to the pte_mkspecial correctly (I think I convinced
+> myself that vm_insert_pfn does that), but for pud/pmd levels it seems
+> just yolo.
 > 
-> x86 if anything could use a 36-bit area; the 24-bit one is out of
-> scope for what kvm-unit-tests does.
+> remap_pfn_range seems to indeed split down to pte level always.
 
-sure... I went with what I remembered about the x86 architecture, but
-I'm not an expert
+Thats what it looked like to me too.
+ 
+> >  From my reading, yes. See ioremap_try_huge_pmd().
+> 
+> The ioremap here shouldn't matter, since this is for kernel-internal
+> mappings. So that's all fine I think.
 
-my patch was meant to be some "sensible defaults" that people with
-more knowledge should override anyway :)
+Right, sorry to be unclear, we are talking about io_remap_pfn_range()
+which is for userspace mappings in VMAs
 
-> So something like this:
-> 
-> diff --git a/lib/x86/asm/memory_areas.h b/lib/x86/asm/memory_areas.h
-> index d704df3..952f5bd 100644
-> --- a/lib/x86/asm/memory_areas.h
-> +++ b/lib/x86/asm/memory_areas.h
-> @@ -1,20 +1,19 @@
->   #ifndef MEMORY_AREAS_H
->   #define MEMORY_AREAS_H
-> 
-> -#define AREA_NORMAL_PFN BIT(32-12)
-> +#define AREA_NORMAL_PFN BIT(36-12)
->   #define AREA_NORMAL_NUMBER 0
->   #define AREA_NORMAL 1
-> 
-> -#define AREA_LOW_PFN BIT(24-12)
-> -#define AREA_LOW_NUMBER 1
-> -#define AREA_LOW 2
-> +#define AREA_PAE_HIGH_PFN BIT(32-12)
-> +#define AREA_PAE_HIGH_NUMBER 1
-> +#define AREA_PAE_HIGH 2
-> 
-> -#define AREA_LOWEST_PFN 0
-> -#define AREA_LOWEST_NUMBER 2
-> -#define AREA_LOWEST 4
-> +#define AREA_LOW_PFN 0
-> +#define AREA_LOW_NUMBER 2
-> +#define AREA_LOW 4
-> 
-> -#define AREA_DMA24 AREA_LOWEST
-> -#define AREA_DMA32 (AREA_LOWEST | AREA_LOW)
-> +#define AREA_PAE (AREA_PAE | AREA_LOW)
-> 
->   #define AREA_ANY -1
->   #define AREA_ANY_NUMBER 0xff
-> 
-> Paolo
-> 
-
+Jason
