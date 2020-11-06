@@ -2,114 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A7012A9691
-	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 13:58:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9941C2A9696
+	for <lists+kvm@lfdr.de>; Fri,  6 Nov 2020 14:01:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727416AbgKFM6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Nov 2020 07:58:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57750 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727390AbgKFM6m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Nov 2020 07:58:42 -0500
-Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92F63C0613D2
-        for <kvm@vger.kernel.org>; Fri,  6 Nov 2020 04:58:42 -0800 (PST)
-Received: by mail-qt1-x843.google.com with SMTP id g17so636494qts.5
-        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 04:58:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=LDmpY5Q3jeo13aLjq8mpu4vGc1arJjADg5EChwDGndg=;
-        b=SpM7chHfdZV7h7CKnja31DtYMLYzvOBfAlRtmJ/n/nmTfwC0/x656sMJMRCmtcchj/
-         ZyUoXciqxn2yvqmwaFJGHZpzSVxZGn6Ze+JMY7srqI9JIuOIozv+IXpP8Z+LAF7g6ch/
-         geDIF/iCN2g4ZH9VZGIJGVBqjOuzBGBXOfBZNRG4f137xGwffeFnYlpuanA0eFi1/Rzl
-         pE4g37GMMac8kgjZ4ctH1Noi6iDIudZDIDNiFDVJFDqddViW7d1FfR7i1JICWyRJ9Ug1
-         S57hfmUNM5E/OZ/BlY/n0jaRZ1v6nFt9MTt+r5sEgovuILshM1zaV3phLFg35dveDz2Q
-         NHAw==
+        id S1727287AbgKFNBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Nov 2020 08:01:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40915 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727209AbgKFNBU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Nov 2020 08:01:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604667678;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C6JSXY/MmF+pAWBPILzq77dsC/lcfN8QzPGDztLP/ZE=;
+        b=XV1qYC1ewXGlkkOXt+ahlKKmO/njAsaIGpeiVmTtY17Jv0IYi1AwAsUiXj9vnqzqE5zQtU
+        5PcR3/iz09KqjWUSy4/sXXrZH+mghsveTimlOlx6y5mOepSCrxa/xiJ/qo4u/tvXE5HFi3
+        0NH26WphbfWvsUU/c3odKFkHDzBXPbQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-xFsj4Z7tO8ixdXjb5ADlnA-1; Fri, 06 Nov 2020 08:01:17 -0500
+X-MC-Unique: xFsj4Z7tO8ixdXjb5ADlnA-1
+Received: by mail-wr1-f69.google.com with SMTP id q15so445498wrw.8
+        for <kvm@vger.kernel.org>; Fri, 06 Nov 2020 05:01:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LDmpY5Q3jeo13aLjq8mpu4vGc1arJjADg5EChwDGndg=;
-        b=O/A8Z5xKlACd7gSZRjm86RNAAENobqAUrzbxU/wcK+pbRiuk+k89AC2QNWMJNq9+K7
-         RuNCd4BZQvf7ugiXWn23BRsGK1YAn7r1PtiFjUJmdgTGAEQWdN2jfSaegzHZnt5ZPgFu
-         XaD9T4BkH6jmJFX++ArGD64nZv6pN121pPpnQRzaDyXQdoO4WJ/B6eHoD7AKqpSk4rip
-         mbTn5m3a9TwnEUSeAFfpiol1TnapiLAOwbH2FPuRo3dYG/zLjqO/v2T5t3e3O/70QZil
-         KRdBJoReQ5PzvK3ALXgXI47kMJzDfTLWvcSvJ18rzrNgg49J/mRv4BuyuPQKw6SqVRMK
-         o00Q==
-X-Gm-Message-State: AOAM532L3Tm4LA1CTWtDzZQVKthO/hO7WtU54pKbrBh2HwYp7TTrxpFQ
-        IcxxJtP8QPBKwMEedOqpcDHh5w==
-X-Google-Smtp-Source: ABdhPJw+rwYTMNOCDOtELAS3ZURAM14wn0+raNRbu4MJsphc7No8hlqtgP1VZD/3115+BJAOILEwww==
-X-Received: by 2002:ac8:74c:: with SMTP id k12mr1292900qth.32.1604667521864;
-        Fri, 06 Nov 2020 04:58:41 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id o63sm432040qkd.96.2020.11.06.04.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2020 04:58:41 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kb1KC-000leP-L9; Fri, 06 Nov 2020 08:58:40 -0400
-Date:   Fri, 6 Nov 2020 08:58:40 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Daniel Vetter <daniel@ffwll.ch>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        J??r??me Glisse <jglisse@redhat.com>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>
-Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
-Message-ID: <20201106125840.GP36674@ziepe.ca>
-References: <20201104162125.GA13007@infradead.org>
- <CAKMK7uH=0+3FSR4LxP7bJUB4BsCcnCzfK2=D+2Am9QNmfZEmfw@mail.gmail.com>
- <20201104163758.GA17425@infradead.org>
- <20201104164119.GA18218@infradead.org>
- <20201104181708.GU36674@ziepe.ca>
- <d3497583-2338-596e-c764-8c571b7d22cf@nvidia.com>
- <20201105092524.GQ401619@phenom.ffwll.local>
- <20201105124950.GZ36674@ziepe.ca>
- <7ae3486d-095e-cf4e-6b0f-339d99709996@nvidia.com>
- <CAKMK7uGRw=xXE+D=JJsNeRav9+hdO4tcDSvDbAuWfc3T4VkoJw@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=C6JSXY/MmF+pAWBPILzq77dsC/lcfN8QzPGDztLP/ZE=;
+        b=AAEdOj8g69C5zS8ci4u0WoYVal80LKjj6moQNJYFIFWDEJ9oMcf1Pz/kSQ4ZEL46oW
+         pRZq3Ri42/f8RVdMtdHQoopyzDRlUXMeq2VwTVq4FF0kNnIjwyKTSdJpN2qkphuc5Osv
+         9N37q40eA2WiaKAQ0JtQb6Srcn5WBooKSHLeFk0ypzgMkHqRhnebZSfOgo2fDRxuIFRP
+         azGpSD4LJo4VcD1KsO68vbv5+ixxXp3B8bKIGMegPVo9JRHVRZ6i03d9xGpCaScOLsI4
+         c0C7BjYnSZNzmfpwaDWrWqbCFsfk5Ekj1btRBjzzLodtaJ6jfFejw65yiRGpBBP+xPNh
+         gFZg==
+X-Gm-Message-State: AOAM533ojcbviVJ1fjRhmOushBUwFbRrBmNIIGORT6PK1YQPixTIhb11
+        50pp2xPkAx7UFlfGHvUAMNd8q55PTvk+6+MgeVcF8ycryToAxFjCNNaSPDGFNORCFrjmmDKaAgi
+        iN97KJ4KcspmR
+X-Received: by 2002:a5d:62cf:: with SMTP id o15mr2477854wrv.49.1604667675053;
+        Fri, 06 Nov 2020 05:01:15 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy52XHN4u/uSbUXzcodIK/a3JMVVtek62+m3Eyj+zfcjU/y3aFwxM31TE1/xxKMTWwVtEbJDA==
+X-Received: by 2002:a5d:62cf:: with SMTP id o15mr2477834wrv.49.1604667674877;
+        Fri, 06 Nov 2020 05:01:14 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id u81sm2473132wmb.27.2020.11.06.05.01.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Nov 2020 05:01:14 -0800 (PST)
+Subject: Re: [PATCH 00/11] KVM: selftests: Cleanups
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, bgardon@google.com,
+        peterx@redhat.com
+References: <20201104212357.171559-1-drjones@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3975bb56-3af2-6387-3b45-a3cac4787829@redhat.com>
+Date:   Fri, 6 Nov 2020 14:01:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKMK7uGRw=xXE+D=JJsNeRav9+hdO4tcDSvDbAuWfc3T4VkoJw@mail.gmail.com>
+In-Reply-To: <20201104212357.171559-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 06, 2020 at 11:01:57AM +0100, Daniel Vetter wrote:
-
-> gpu drivers also tend to use vmf_insert_pfn* directly, so we can do
-> on-demand paging and move buffers around. From what I glanced for
-> lowest level we to the pte_mkspecial correctly (I think I convinced
-> myself that vm_insert_pfn does that), but for pud/pmd levels it seems
-> just yolo.
+On 04/11/20 22:23, Andrew Jones wrote:
+> This series attempts to clean up demand_paging_test and dirty_log_test
+> by factoring out common code, creating some new API along the way. It's
+> main goal is to prepare for even more factoring that Ben and Peter want
+> to do. The series would have a nice negative diff stat, but it also
+> picks up a few of Peter's patches for his new dirty log test. So, the
+> +/- diff stat is close to equal. It's not as close as an electoral vote
+> count, but it's close.
 > 
-> remap_pfn_range seems to indeed split down to pte level always.
-
-Thats what it looked like to me too.
- 
-> >  From my reading, yes. See ioremap_try_huge_pmd().
+> I've tested on x86 and AArch64 (one config each), but not s390x.
 > 
-> The ioremap here shouldn't matter, since this is for kernel-internal
-> mappings. So that's all fine I think.
+> Thanks,
+> drew
+> 
+> 
+> Andrew Jones (8):
+>    KVM: selftests: Add x86_64/tsc_msrs_test to .gitignore
+>    KVM: selftests: Drop pointless vm_create wrapper
+>    KVM: selftests: Make the per vcpu memory size global
+>    KVM: selftests: Make the number of vcpus global
+>    KVM: selftests: Factor out guest mode code
+>    KVM: selftests: Make vm_create_default common
+>    KVM: selftests: Introduce vm_create_[default_]vcpus
+>    KVM: selftests: Remove create_vm
+> 
+> Peter Xu (3):
+>    KVM: selftests: Always clear dirty bitmap after iteration
+>    KVM: selftests: Use a single binary for dirty/clear log test
+>    KVM: selftests: Introduce after_vcpu_run hook for dirty log test
+> 
+>   tools/testing/selftests/kvm/.gitignore        |   2 +-
+>   tools/testing/selftests/kvm/Makefile          |   4 +-
+>   .../selftests/kvm/clear_dirty_log_test.c      |   6 -
+>   .../selftests/kvm/demand_paging_test.c        | 213 +++-------
+>   tools/testing/selftests/kvm/dirty_log_test.c  | 372 ++++++++++--------
+>   .../selftests/kvm/include/aarch64/processor.h |   3 +
+>   .../selftests/kvm/include/guest_modes.h       |  21 +
+>   .../testing/selftests/kvm/include/kvm_util.h  |  20 +-
+>   .../selftests/kvm/include/s390x/processor.h   |   4 +
+>   .../selftests/kvm/include/x86_64/processor.h  |   4 +
+>   .../selftests/kvm/lib/aarch64/processor.c     |  17 -
+>   tools/testing/selftests/kvm/lib/guest_modes.c |  70 ++++
+>   tools/testing/selftests/kvm/lib/kvm_util.c    |  62 ++-
+>   .../selftests/kvm/lib/s390x/processor.c       |  22 --
+>   .../selftests/kvm/lib/x86_64/processor.c      |  32 --
+>   15 files changed, 445 insertions(+), 407 deletions(-)
+>   delete mode 100644 tools/testing/selftests/kvm/clear_dirty_log_test.c
+>   create mode 100644 tools/testing/selftests/kvm/include/guest_modes.h
+>   create mode 100644 tools/testing/selftests/kvm/lib/guest_modes.c
+> 
 
-Right, sorry to be unclear, we are talking about io_remap_pfn_range()
-which is for userspace mappings in VMAs
+Queued (or overridden by patches already in queue) patches 1-8, thanks.
 
-Jason
