@@ -2,92 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD79E2AAD95
-	for <lists+kvm@lfdr.de>; Sun,  8 Nov 2020 22:15:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7253F2AADA0
+	for <lists+kvm@lfdr.de>; Sun,  8 Nov 2020 22:18:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728950AbgKHVOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Nov 2020 16:14:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43844 "EHLO
+        id S1728593AbgKHVSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Nov 2020 16:18:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728802AbgKHVOs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Nov 2020 16:14:48 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610DAC0613D2;
-        Sun,  8 Nov 2020 13:14:48 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CTn2F2Lkzz9sSf;
-        Mon,  9 Nov 2020 08:14:45 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1604870085;
-        bh=sHsrdtyoApORSTh9XibjncKZH6ivK8wvvlGihkLcXLc=;
-        h=Date:From:To:Cc:Subject:From;
-        b=jjTiDwENYuF+XznT6insmSbkGOX25UaHfj7Wwvm28BeuUnnRHb6QSZIbcJU3OCUEb
-         RZm5N7lF33cP6eim93otkK+0DT+yD7uJz3wRMJ0yHvVq1SEoROSBGWiwz1H4eqJNk4
-         K47Noy5ey/uM+iHANUdj4OMcSK5lTljpJGlnyTmoZrx0pqe4ldcGT+f3cso6l+sAwh
-         f623vS1tudhAd8O25JkqzHKX9nr5iAOAOJuVx5qEjTTa9iycRZqKImz4388Hp8eLQa
-         zBc0FWK7o0XxVET89M9yj+WyZlonzU0vVS1DrxxmyioY9rEvwI0NjdlcNPqHwPzvjD
-         f0h2IftbE0Khg==
-Date:   Mon, 9 Nov 2020 08:14:44 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
-Message-ID: <20201109081444.6f15fca2@canb.auug.org.au>
+        with ESMTP id S1727570AbgKHVSP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Nov 2020 16:18:15 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31E4BC0613CF;
+        Sun,  8 Nov 2020 13:18:15 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1604870291;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WLr6jSvCYWuNA0ltbN0LGAoOd+LlXioZ9NtNTF1g6Q8=;
+        b=LsVEhYlyqxlkC9Fj/a5ogNdP4GBaq7NgJaRBgD+F8LKyL/eUXB24hoEoRXxcfp8yJH3xl+
+        y3kgvoAUAxmMAj0o4uNN1bf3dP7NsTBzZx6+wAtqkOLf9GFxZj8q0tlgnWOvA85AgZUOSF
+        eBNeYPr5/SO45fI74YNQvKurKx45i2EuqOm+epEl6Wn2x50RCuc0tyv23+v1TkAkO/mImM
+        Q+lIILRqqC7gFlcrAj7wP9JNtc9BQY3A/+eoaQmE+6IqoLDdfGXVT9WnI+QjtccfSvK1qa
+        xVbwYJezU4UwPGLFtICxpvq0CccXhvP/H/837ckI3XbCMjvMpLrRC/DxYGashw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1604870291;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WLr6jSvCYWuNA0ltbN0LGAoOd+LlXioZ9NtNTF1g6Q8=;
+        b=iXtAMBL5+7mmU80vLPpJBjYUaK92bfGd8UDxruSkd6KVFY2LsbxjTWXRf7eNk6v11hLS3c
+        sZs/oIqKTY4RRuAg==
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Tian\, Kevin" <kevin.tian@intel.com>
+Cc:     "Jiang\, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul\@kernel.org" <vkoul@kernel.org>,
+        "Dey\, Megha" <megha.dey@intel.com>,
+        "maz\@kernel.org" <maz@kernel.org>,
+        "bhelgaas\@google.com" <bhelgaas@google.com>,
+        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj\, Ashok" <ashok.raj@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "jing.lin\@intel.com" <jing.lin@intel.com>,
+        "Williams\, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
+        "parav\@mellanox.com" <parav@mellanox.com>,
+        "rafael\@kernel.org" <rafael@kernel.org>,
+        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain\, Mona" <mona.hossain@intel.com>,
+        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+In-Reply-To: <20201106131415.GT2620339@nvidia.com>
+References: <20201030224534.GN2620339@nvidia.com> <ec52cedf-3a99-5ca1-ffbb-d8f8c4f62395@intel.com> <20201102132158.GA3352700@nvidia.com> <MWHPR11MB1645675ED03E23674A705DF68C110@MWHPR11MB1645.namprd11.prod.outlook.com> <20201103124351.GM2620339@nvidia.com> <MWHPR11MB164544C9CFCC3F162C1C6FC18CEF0@MWHPR11MB1645.namprd11.prod.outlook.com> <20201104124017.GW2620339@nvidia.com> <MWHPR11MB1645862A8F7CF7FB8DD011778CEF0@MWHPR11MB1645.namprd11.prod.outlook.com> <20201104135415.GX2620339@nvidia.com> <MWHPR11MB1645524BDEDF8899914F32AE8CED0@MWHPR11MB1645.namprd11.prod.outlook.com> <20201106131415.GT2620339@nvidia.com>
+Date:   Sun, 08 Nov 2020 22:18:11 +0100
+Message-ID: <87k0uvk0oc.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/g8Dq2eqNirQlOfxeCnJhU41";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/g8Dq2eqNirQlOfxeCnJhU41
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, Nov 06 2020 at 09:14, Jason Gunthorpe wrote:
+> On Fri, Nov 06, 2020 at 09:48:34AM +0000, Tian, Kevin wrote:
+> For instance you could put a "disable IMS" flag in the ACPI tables, in
+> the config space of the emuulated root port, or any other areas that
+> clearly belong to the platform.
+>
+> The OS logic would be
+>  - If no IMS information found then use IMS (Bare metal)
+>  - If the IMS disable flag is found then
+>    - If (future) hypercall available and the OS knows how to use it
+>      then use IMS
+>    - If no hypercall found, or no OS knowledge, fail IMS
 
-Hi all,
+That does not work because an older hypervisor would not have that
+disable flag and the guest kernel would assume to be on bare metal (if
+no other indicators are there).
 
-In commit
+Thanks
 
-  cc4cb017678a ("KVM: x86: use positive error values for msr emulation that=
- causes #GP")
-
-Fixes tag
-
-  Fixes: 291f35fb2c1d1 ("KVM: x86: report negative values from wrmsr emulat=
-ion to userspace")
-
-has these problem(s):
-
-  - Target SHA1 does not exist
-
-Maybe you meant
-
-Fixes: 7dffecaf4eab ("KVM: x86: report negative values from wrmsr emulation=
- to userspace")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/g8Dq2eqNirQlOfxeCnJhU41
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl+oX8QACgkQAVBC80lX
-0GyZAgf6Ay84tPkGhklJprzRbMEiZvxmNS0kj3J350wpFh4hELk6YmbSo/3wwL9W
-Qbgt5Dhrgm4afuYnVOk4wkNrJbM+K98sVaW584KenEX09MLbGXGjsjHJxei6CmA/
-QSiQwhjE4/XMAjkSXlcymyhYT0MqKSf/f708ZOSFTuZry7cy6A7I0sxwCkzAPzLa
-j4ZHttoDEjHdlb5RUtQlIfuJQigNO3OmxFPoTHeR+qpdfjlamRK8ROF/jAlfNHN6
-A3OyGb1sZRnegHIdSySvPl2E05CG3OYZCK69HVEeasC31OWQ27YgjozOo+uhe8kr
-l4cFAGYxgpKEApcC77NqBLWw62fBIA==
-=z+mH
------END PGP SIGNATURE-----
-
---Sig_/g8Dq2eqNirQlOfxeCnJhU41--
+        tglx
