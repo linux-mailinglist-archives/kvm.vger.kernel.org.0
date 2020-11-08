@@ -2,101 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0AE22AAAAE
-	for <lists+kvm@lfdr.de>; Sun,  8 Nov 2020 12:23:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6868C2AACBF
+	for <lists+kvm@lfdr.de>; Sun,  8 Nov 2020 19:11:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728395AbgKHLXg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Nov 2020 06:23:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21828 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727348AbgKHLXe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 8 Nov 2020 06:23:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604834613;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kK7wQQ53oSka40mp7QzYkAA57zy/9qtuGomTT4kIpYI=;
-        b=fmmcRIJrGZNYp2Qta9V7lrjDbf7kmp/9JpkRXKeGDP0+Nqn4iVUskIlMiNH1itKHYSUfTO
-        NP0bDmXfXs2xJ/CACPc3npUsmCbRYtaGuca7y7NUBeAUwmBdORX2zL9qFcWTTTxziYN1/T
-        I8BJkETw0+c0jmj6yLD90YDQOsKjC9s=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-585-p2xU-qNcPCK_hZi_18fTZg-1; Sun, 08 Nov 2020 06:23:30 -0500
-X-MC-Unique: p2xU-qNcPCK_hZi_18fTZg-1
-Received: by mail-ej1-f72.google.com with SMTP id p19so2551343ejy.11
-        for <kvm@vger.kernel.org>; Sun, 08 Nov 2020 03:23:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kK7wQQ53oSka40mp7QzYkAA57zy/9qtuGomTT4kIpYI=;
-        b=A6z6Ja/qlpo8IPmNEq5EDIfGcpWbe9iM1ZdrHGNNNHHbAy+WibVJChBf+7W12t52BS
-         91mo2DGOHs8CTykjghE4pSr7qjFoYAXQRBLZ80mYN95/LhcjzBWbhbDDjvVccSvP8yUQ
-         DYMZJeAcqX7p+taKS10prmCsBzPFkwxyO+V5xj6GCFHH9pO0avl2t6bwB1GhH0kGJ7ox
-         nY6JhVmnW6R6oQKgyzq4VhhqvDikZCH27DTTFbgU5xUobIu9BEsqnR2VE9mgvSzWZGkV
-         rRsw0Hj0qwKKhuuDX+q3La6Y0kXZ+J6QdTqnuuTr8vO5I6jBcNw5slWmZf0TEH/eZ9zn
-         6r5A==
-X-Gm-Message-State: AOAM5333VYkDLaL0Mkdp8tna3QTUitji2/WZlJ1YEYuImhOdEt56jjwG
-        yEp30I8QiDxmaVxvi8t7PD3Q97SDU+F9qQW4YdNGl0YZt1tNCayO+ayJfDy/xOELgIqE8qskimR
-        w8fj8Du343Bag
-X-Received: by 2002:a05:6402:3d9:: with SMTP id t25mr10598155edw.338.1604834609358;
-        Sun, 08 Nov 2020 03:23:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw+DAcudGnhBWkKul66N68aDAIJeVrpT00S+qFBU5inTk55z2YADV4bsEFbGYyF+z6bk2xYyQ==
-X-Received: by 2002:a05:6402:3d9:: with SMTP id t25mr10598144edw.338.1604834609191;
-        Sun, 08 Nov 2020 03:23:29 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:73b1:3acc:3ebd:4fd4? ([2001:b07:6468:f312:73b1:3acc:3ebd:4fd4])
-        by smtp.gmail.com with ESMTPSA id l8sm5819902ejk.67.2020.11.08.03.23.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 08 Nov 2020 03:23:28 -0800 (PST)
-Subject: Re: [PATCH] mm, kvm: account kvm_vcpu_mmap to kmemcg
-To:     Roman Gushchin <guro@fb.com>, Shakeel Butt <shakeelb@google.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20201106202923.2087414-1-shakeelb@google.com>
- <20201106205245.GB2285866@carbon.dhcp.thefacebook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <67c2912d-e861-d660-61f0-912a72eff01d@redhat.com>
-Date:   Sun, 8 Nov 2020 12:23:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1728689AbgKHSL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Nov 2020 13:11:28 -0500
+Received: from mga07.intel.com ([134.134.136.100]:18592 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727844AbgKHSL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Nov 2020 13:11:27 -0500
+IronPort-SDR: EfPVu36ysq5Td0Tw1dAV9JFnxGXOFNeaWA6OyyvGcDpXC7CR05Wjt8iZoi4ZlHH/+PAoQnRXLO
+ 73O9kyxOx6HQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="233885667"
+X-IronPort-AV: E=Sophos;i="5.77,461,1596524400"; 
+   d="scan'208";a="233885667"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 10:11:26 -0800
+IronPort-SDR: snAiSoKHM3lhdxi1hfsMQwzD4qjdTA45HE9GgUWWWz/q17iHgOpfCIVe/1ipo2pqbu4ZCeT06B
+ +LY+WfYWpHXQ==
+X-IronPort-AV: E=Sophos;i="5.77,461,1596524400"; 
+   d="scan'208";a="338134689"
+Received: from araj-mobl1.jf.intel.com ([10.255.230.111])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 10:11:25 -0800
+Date:   Sun, 8 Nov 2020 10:11:24 -0800
+From:   "Raj, Ashok" <ashok.raj@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "jing.lin@intel.com" <jing.lin@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Ashok Raj <ashok.raj@intel.com>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+Message-ID: <20201108181124.GA28173@araj-mobl1.jf.intel.com>
+References: <MWHPR11MB164544C9CFCC3F162C1C6FC18CEF0@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20201104124017.GW2620339@nvidia.com>
+ <MWHPR11MB1645862A8F7CF7FB8DD011778CEF0@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20201104135415.GX2620339@nvidia.com>
+ <MWHPR11MB1645524BDEDF8899914F32AE8CED0@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20201106131415.GT2620339@nvidia.com>
+ <20201106164850.GA85879@otc-nc-03>
+ <20201106175131.GW2620339@nvidia.com>
+ <CAPcyv4iYHA1acfo=+fTk+U_TrLbSWJjA6v4oeTXgVYDTrnCoGw@mail.gmail.com>
+ <20201107001207.GA2620339@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20201106205245.GB2285866@carbon.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201107001207.GA2620339@nvidia.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/11/20 21:52, Roman Gushchin wrote:
-> On Fri, Nov 06, 2020 at 12:29:23PM -0800, Shakeel Butt wrote:
->> A VCPU of a VM can allocate couple of pages which can be mmap'ed by the
->> user space application. At the moment this memory is not charged to the
->> memcg of the VMM. On a large machine running large number of VMs or
->> small number of VMs having large number of VCPUs, this unaccounted
->> memory can be very significant. So, charge this memory to the memcg of
->> the VMM. Please note that lifetime of these allocations corresponds to
->> the lifetime of the VMM.
->>
->> Signed-off-by: Shakeel Butt <shakeelb@google.com>
->> ---
+Hi Jason
+
+Thanks, its now clear what you had mentioned earlier.
+
+I had couple questions/clarifications below. Thanks for working 
+through this.
+
+On Fri, Nov 06, 2020 at 08:12:07PM -0400, Jason Gunthorpe wrote:
+> On Fri, Nov 06, 2020 at 03:47:00PM -0800, Dan Williams wrote:
 > 
-> Acked-by: Roman Gushchin <guro@fb.com>
+> > Also feel free to straighten me out (Jason or Ashok) if I've botched
+> > the understanding of this.
 > 
-> Thanks, Shakeel!
+> It is pretty simple when you get down to it.
+> 
+> We have a new kernel API that Thomas added:
+> 
+>   pci_subdevice_msi_create_irq_domain()
+> 
+> This creates an IRQ domain that hands out addr/data pairs that
+> trigger interrupts.
+> 
+> On bare metal the addr/data pairs from the IRQ domain are programmed
+> into the HW in some HW specific way by the device driver that calls
+> the above function.
+> 
+> On (kvm) virtualization the addr/data pair the IRQ domain hands out
+> doesn't work. It is some fake thing.
+
+Is it really some fake thing? I thought the vCPU and vector are real
+for a guest, and VMM ensures when interrupts are delivered they are either.
+
+1. Handled by VMM first and then injected to guest
+2. Handled in a Posted Interrupt manner, and injected to guest
+   when it resumes. It can be delivered directly if guest was running
+   when the interrupt arrived.
+
+> 
+> To make this work on normal MSI/MSI-X the VMM implements emulation of
+> the standard MSI/MSI-X programming and swaps the fake addr/data pair
+> for a real one obtained from the hypervisor IRQ domain.
+> 
+> To "deal" with this issue the SIOV spec suggests to add a per-device
+> PCI Capability that says "IMS works". Which means either:
+>  - This is bare metal, so of course it works
+>  - The VMM is trapping and emulating whatever the device specific IMS
+>    programming is.
+> 
+> The idea being that a VMM can never advertise the IMS cap flag to the
+> guest unles the VMM provides a device specific driver that does device
+> specific emulation to capture the addr/data pair. Remeber IMS doesn't
+> say how to program the addr/data pair! Every device is unique!
+> 
+> On something like IDXD this emulation is not so hard, on something
+> like mlx5 this is completely unworkable. Further we never do
+> emulation on our devices, they always pass native hardware through,
+> even for SIOV-like cases.
+
+So is that true for interrupts too? Possibly you have the interrupt
+entries sitting in memory resident on the device? Don't we need the 
+VMM to ensure they are brokered by VMM in either one of the two ways 
+above? What if the guest creates some addr in the 0xfee... range
+how do we take care of interrupt remapping and such without any VMM 
+assist?
+
+Its probably a gap in my understanding. 
+
+> 
+> In the end pci_subdevice_msi_create_irq_domain() is a platform
+> function. Either it should work completely on every device with no
+> device-specific emulation required in the VMM, or it should not work
+> at all and return -EOPNOTSUPP.
+> 
+> The only sane way to implement this generically is for the VMM to
+> provide a hypercall to obtain a real *working* addr/data pair(s) and
+> then have the platform hand those out from
+> pci_subdevice_msi_create_irq_domain(). 
+> 
+> All IMS device drivers will work correctly. No VMM device emulation is
+> ever needed to translate addr/data pairs.
 > 
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+That's true. Probably this can work the same even for MSIx types too then?
 
-If this patch is not merged via -mm, please ping me again once its 
-dependency is part of Linus's tree.
+When we do interrupt remapping support in guest which would be required 
+if we support x2apic in guest, I think this is something we should look into more 
+carefully to make this work.
 
-Thanks,
+One criteria that we generally tried to follow is driver that runs in host
+and guest are the same, and if needed they need some functionality make it
+work around some capability  detection so the alternate path can be plummed in
+a generic way. 
 
-Paolo
+I agree with the overall idea and we should certainly take that into consideration
+when we need IMS in guest support and in context of interrupt remapping.
 
+Hopefully I understood the overall concept. If I mis-understood any of this
+please let me know.
+
+Cheers,
+Ashok
