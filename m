@@ -2,105 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4AF2AB561
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 11:50:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D15A22AB562
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 11:50:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727774AbgKIKuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 05:50:06 -0500
-Received: from mga06.intel.com ([134.134.136.31]:14726 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727183AbgKIKuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 05:50:06 -0500
-IronPort-SDR: h4vSZ50VRU06ou2V0efcjioKhylYvXkacJKSIy8eHbhp1trWpPnr260Ecf9XhzWezPV3IP5sT1
- +EJqY1ndJuBw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="231414470"
-X-IronPort-AV: E=Sophos;i="5.77,463,1596524400"; 
-   d="scan'208";a="231414470"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 02:50:05 -0800
-IronPort-SDR: V9IQokZaV3BmJAerm00exXl37ZQ/x8K5Gug15Dz3+V7cIGY0nM4nO/gJNDpjnpcNx6/oBdr7zZ
- h6F7xXyGmLxg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,463,1596524400"; 
-   d="scan'208";a="359604402"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Nov 2020 02:50:03 -0800
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org
-Cc:     robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
-Subject: [PATCH] KVM: VMX: Extract vmx_update_secondary_exec_control()
-Date:   Mon,  9 Nov 2020 18:49:48 +0800
-Message-Id: <1604918988-26884-1-git-send-email-robert.hu@linux.intel.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1729049AbgKIKuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 05:50:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22015 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727183AbgKIKuL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Nov 2020 05:50:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604919010;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1JkKnqwVg26tdRfbOTNiNdCvhxKi+BcdeTFW1kdQQK0=;
+        b=PRFeppw+P88Q23mogow9C1QgjwGBuvqUjC5G52NRTROSk0JcuhyyCg+yGJjqJYKgP8Zvu6
+        B0koZu2r28RAx3WxNUHSLfsoTvDsLdaMijrpu/MS5Vw+5yBiu0zN3R+i9FIdKaZdZOjiuH
+        eb0YENpJzVjDy8LCHVwtTIsOFTEUpwM=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-8sebPPJ3OTKktICURC2Kqw-1; Mon, 09 Nov 2020 05:50:05 -0500
+X-MC-Unique: 8sebPPJ3OTKktICURC2Kqw-1
+Received: by mail-ej1-f71.google.com with SMTP id nt22so3274498ejb.17
+        for <kvm@vger.kernel.org>; Mon, 09 Nov 2020 02:50:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1JkKnqwVg26tdRfbOTNiNdCvhxKi+BcdeTFW1kdQQK0=;
+        b=ZTf1ZtsQ4Rv30v8BxJWAqf+wWDXxn7EKDiiS66YsV4lcIjYuQonBi9HpYQuxKp0xiQ
+         aDwdUbXvBj+EzxoRRrhVOunn8n3l2l1FfzWJ7KNN/1/HcKduIJvvJPJtif+xKY/98KaQ
+         Gy4EJTJUth3Y8mr9K2P1aOtosqAAh4OJuOrOjnsxodE6FvPNBsaTyFSIRL+nBMON94Sj
+         J7++gwsmCh59cYB+i90CmhjANeM+erjsAd5gdBstqwHZb/HFIMSTKX8HP4VgVc3YzsUv
+         t6ZbgIfowwWzPTE3PposlxRa0sl+obsAQGvjHiMvPp8Ec2UGCyO8xrcRuTkln+p0O/m7
+         VsNA==
+X-Gm-Message-State: AOAM530Q/AmGzFIWltWzs2C2VrbjfaqmvoKnBTLYVZpz+nagpQZMv5cL
+        FjrYhDmT1VN2DhPc0cYhc4NPqvjLKDOvePXyEoxP7u4TBfTMeYDxdrfBxoGSBrwtjoF/cnSw1iK
+        cyhZfncj2oL5V
+X-Received: by 2002:aa7:d8c4:: with SMTP id k4mr12872978eds.248.1604919004325;
+        Mon, 09 Nov 2020 02:50:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxj4ZnBg84h5mUpIlStBaF/pAYCu+53RGnsC/exeSfkxuckPXhhLjS5t1Q+tLs1FfD9SaCeFA==
+X-Received: by 2002:aa7:d8c4:: with SMTP id k4mr12872973eds.248.1604919004160;
+        Mon, 09 Nov 2020 02:50:04 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id e1sm8477571edy.8.2020.11.09.02.50.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Nov 2020 02:50:03 -0800 (PST)
+Subject: Re: [PATCH 0/3] accel: Remove system-mode stubs from user-mode builds
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Laurent Vivier <laurent@vivier.eu>, kvm@vger.kernel.org
+References: <20201109094547.2456385-1-f4bug@amsat.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c5d2bedf-20f7-c5ae-4c64-5ac8e4706949@redhat.com>
+Date:   Mon, 9 Nov 2020 11:50:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+MIME-Version: 1.0
+In-Reply-To: <20201109094547.2456385-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, vmx_compute_secondary_exec_control() is invoked by init_vmcs()
-and vmx_vcpu_after_set_cpuid().
-init_vmcs() is called when creating vcpu and vmx_vcpu_after_set_cpuid() is
-called when guest cpuid is settled.
+On 09/11/20 10:45, Philippe Mathieu-Daudé wrote:
+> It is pointless to build/link these stubs into user-mode binaries.
+> 
+> Philippe Mathieu-Daudé (3):
+>    accel: Only include TCG stubs in user-mode only builds
+>    accel/stubs: Restrict system-mode emulation stubs
+>    accel/stubs: Simplify kvm-stub.c
+> 
+>   accel/stubs/kvm-stub.c  |  5 -----
+>   accel/meson.build       | 10 ++++++----
+>   accel/stubs/meson.build | 12 ++++++++----
+>   3 files changed, 14 insertions(+), 13 deletions(-)
+> 
 
-vmx_compute_secondary_exec_control() can be divided into 2 parts: 1)
-compute guest's effective secondary_exec_control = vmcs_config + guest
-settings. 2) further update effective secondary_exec_control on those
-fields related to guest's cpuid.
+The series makes sense.  It probably also shows that it makes sense to 
+have a "specific_softmmu_ss" sourceset in meson.build.  Let's review 
+Alex Bennée's patches and then get back to this one.
 
-When vmx_create_vcpu() --> init_vmcs() -->
-vmx_compute_secondary_exec_control(), guest cpuid is actually blank, so
-doing part 2 is non sense; and futher, part 2 involves
-vmx.nested.msrs updates, which later, will be overwritten by
-copying vmcs_config.nested. This doesn't cause trouble now is because
-vmx_vcpu_after_set_cpuid() --> vmx_compute_secondary_exec_control() later
-will update again, but it is wrong in essence.
-
-This patch is to extract part 2 into vmx_update_secondary_exec_control(),
-which is called only by vmx_vcpu_after_set_cpuid(), when guest cpuid is
-settled. And vmx_vcpu_after_set_cpuid() doesn't need to redo part 1, which
-has been done by init_vmcs() earlier.
-
-
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
----
- arch/x86/kvm/vmx/vmx.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 47b8357..995cb4c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4239,6 +4239,19 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
- 	if (!enable_pml)
- 		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
- 
-+	vmx->secondary_exec_control = exec_control;
-+}
-+
-+/*
-+ * Some features/exits of Secondary VM-Exec control depend on guest cpuid,
-+ * update them when guest cpuid settles/changes.
-+ * In nested case, these updates also spread to nVMX control msrs.
-+ */
-+static void vmx_update_secondary_exec_control(struct vcpu_vmx *vmx)
-+{
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
-+	u32 exec_control = vmx->secondary_exec_control;
-+
- 	if (cpu_has_vmx_xsaves()) {
- 		/* Exposing XSAVES only when XSAVE is exposed */
- 		bool xsaves_enabled =
-@@ -7227,7 +7240,7 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	vcpu->arch.xsaves_enabled = false;
- 
- 	if (cpu_has_secondary_exec_ctrls()) {
--		vmx_compute_secondary_exec_control(vmx);
-+		vmx_update_secondary_exec_control(vmx);
- 		vmcs_set_secondary_exec_control(vmx);
- 	}
- 
--- 
-1.8.3.1
+Paolo
 
