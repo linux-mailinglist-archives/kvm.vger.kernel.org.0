@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0841F2AAF65
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 03:18:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12D6A2AAF69
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 03:18:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729342AbgKICRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Nov 2020 21:17:25 -0500
-Received: from mga01.intel.com ([192.55.52.88]:64930 "EHLO mga01.intel.com"
+        id S1729466AbgKICSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Nov 2020 21:18:35 -0500
+Received: from mga01.intel.com ([192.55.52.88]:64927 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729239AbgKICRY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729326AbgKICRY (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 8 Nov 2020 21:17:24 -0500
-IronPort-SDR: IPK7K8iRctX+kHWgb4Iuz7Wnp0KLl53arCbwYnxMLVfXYpTCOrb7FYGMUZwtMiAS84Z6nYjN5s
- stABFcNqI+2Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="187684614"
+IronPort-SDR: xQDrwB4vsTVdaTx/6HD9Ulw+VQ7N40YU1iZVt7T2odoY56OA+ueF3kxdlUqI1OEizujYiMIvx0
+ nqXjGOcgvgDg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="187684616"
 X-IronPort-AV: E=Sophos;i="5.77,462,1596524400"; 
-   d="scan'208";a="187684614"
+   d="scan'208";a="187684616"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 18:17:17 -0800
-IronPort-SDR: MI9INPfgghH52Tsb41AaWPyqiy2EFIiQNvtoq6sRGJT8PXDeSvACifAch6473+QIP2dEJ9DNpD
- 3RHG7rLf+4zA==
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 18:17:21 -0800
+IronPort-SDR: E2u03y63PR4mWWT1E2hvROWom5Pfp0w1ZzmLge2oetn347bNVKGXQ2blM58TIyPr5gXH7FE7Dp
+ DcYN1+wxPJfw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,462,1596524400"; 
-   d="scan'208";a="540646195"
+   d="scan'208";a="540646215"
 Received: from e5-2699-v4-likexu.sh.intel.com ([10.239.48.39])
-  by orsmga005.jf.intel.com with ESMTP; 08 Nov 2020 18:17:13 -0800
+  by orsmga005.jf.intel.com with ESMTP; 08 Nov 2020 18:17:17 -0800
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
@@ -42,9 +42,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Mark Gross <mgross@linux.intel.com>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 07/17] KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to manage guest DS buffer
-Date:   Mon,  9 Nov 2020 10:12:44 +0800
-Message-Id: <20201109021254.79755-8-like.xu@linux.intel.com>
+Subject: [PATCH v2 08/17] KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+Date:   Mon,  9 Nov 2020 10:12:45 +0800
+Message-Id: <20201109021254.79755-9-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201109021254.79755-1-like.xu@linux.intel.com>
 References: <20201109021254.79755-1-like.xu@linux.intel.com>
@@ -54,144 +54,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When CPUID.01H:EDX.DS[21] is set, the IA32_DS_AREA MSR exists and
-points to the linear address of the first byte of the DS buffer
-management area, which is used to manage the PEBS records.
+If IA32_PERF_CAPABILITIES.PEBS_BASELINE [bit 14] is set, the adaptive
+PEBS is supported. The PEBS_DATA_CFG MSR and adaptive record enable
+bits (IA32_PERFEVTSELx.Adaptive_Record and IA32_FIXED_CTR_CTRL.
+FCx_Adaptive_Record) are also supported.
 
-When guest PEBS is enabled and the value is different from the
-host, KVM will add the IA32_DS_AREA MSR to the msr-switch list.
-The guest's DS value can be loaded to the real HW before VM-entry,
-and will be removed when guest PEBS is disabled.
+Adaptive PEBS provides software the capability to configure the PEBS
+records to capture only the data of interest, keeping the record size
+compact. An overflow of PMCx results in generation of an adaptive PEBS
+record with state information based on the selections specified in
+MSR_PEBS_DATA_CFG (Memory Info [bit 0], GPRs [bit 1], XMMs [bit 2],
+and LBRs [bit 3], LBR Entries [bit 31:24]). By default, the PEBS record
+will only contain the Basic group.
 
-The WRMSR to IA32_DS_AREA MSR brings a #GP(0) if the source register
-contains a non-canonical address. The switch of IA32_DS_AREA MSR would
-also, setup a quiescent period to write the host PEBS records (if any)
-to host DS area rather than guest DS area.
+When guest adaptive PEBS is enabled, the IA32_PEBS_ENABLE MSR will
+be added to the perf_guest_switch_msr() and switched during the VMX
+transitions just like CORE_PERF_GLOBAL_CTRL MSR.
 
-When guest PEBS is enabled, the MSR_IA32_DS_AREA MSR will be
-added to the perf_guest_switch_msr() and switched during the
-VMX transitions just like CORE_PERF_GLOBAL_CTRL MSR.
-
-Originally-by: Andi Kleen <ak@linux.intel.com>
-Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+Co-developed-by: Luwei Kang <luwei.kang@intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/events/intel/core.c    | 13 +++++++++++++
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/pmu_intel.c    | 11 +++++++++++
- arch/x86/kvm/vmx/vmx.c          |  6 ++++++
- 4 files changed, 31 insertions(+)
+ arch/x86/events/intel/core.c    | 12 ++++++++++++
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/vmx/pmu_intel.c    | 16 ++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c          |  5 ++++-
+ 4 files changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index d824c7156d34..71b45376ee1f 100644
+index 71b45376ee1f..1a0c026955bf 100644
 --- a/arch/x86/events/intel/core.c
 +++ b/arch/x86/events/intel/core.c
-@@ -3394,6 +3394,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
- {
- 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
- 	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
-+	struct debug_store *ds = __this_cpu_read(cpu_hw_events.ds);
- 
- 	arr[0].msr = MSR_CORE_PERF_GLOBAL_CTRL;
- 	arr[0].host = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
-@@ -3440,6 +3441,18 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
- 		*nr = 2;
+@@ -3453,6 +3453,18 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
+ 		*nr = 3;
  	}
  
-+	if (arr[1].guest) {
-+		arr[2].msr = MSR_IA32_DS_AREA;
-+		arr[2].host = (unsigned long)ds;
-+		/* KVM will update MSR_IA32_DS_AREA with the trapped guest value. */
-+		arr[2].guest = 0ull;
-+		*nr = 3;
-+	} else if (*nr == 2) {
-+		arr[2].msr = MSR_IA32_DS_AREA;
-+		arr[2].host = arr[2].guest = 0;
-+		*nr = 3;
++	if (arr[1].guest && x86_pmu.intel_cap.pebs_baseline) {
++		arr[3].msr = MSR_PEBS_DATA_CFG;
++		arr[3].host = cpuc->pebs_data_cfg;
++		/* KVM will update MSR_PEBS_DATA_CFG with the trapped guest value. */
++		arr[3].guest = 0ull;
++		*nr = 4;
++	} else if (*nr == 3) {
++		arr[3].msr = MSR_PEBS_DATA_CFG;
++		arr[3].host = arr[3].guest = 0;
++		*nr = 4;
 +	}
 +
  	return arr;
  }
  
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6d7e895ae535..eb24c4796f8b 100644
+index eb24c4796f8b..37df29061a4d 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -449,6 +449,7 @@ struct kvm_pmu {
- 	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
- 	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
- 
-+	u64 ds_area;
+@@ -452,6 +452,8 @@ struct kvm_pmu {
+ 	u64 ds_area;
  	u64 pebs_enable;
  	u64 pebs_enable_mask;
++	u64 pebs_data_cfg;
++	u64 pebs_data_cfg_mask;
  
+ 	/*
+ 	 * The gate to release perf_events not marked in
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 2f10587bda19..ff5fc405703f 100644
+index ff5fc405703f..c04e12812797 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -183,6 +183,9 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
- 	case MSR_IA32_PEBS_ENABLE:
- 		ret = vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT;
+@@ -186,6 +186,9 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 	case MSR_IA32_DS_AREA:
+ 		ret = guest_cpuid_has(vcpu, X86_FEATURE_DS);
  		break;
-+	case MSR_IA32_DS_AREA:
-+		ret = guest_cpuid_has(vcpu, X86_FEATURE_DS);
++	case MSR_PEBS_DATA_CFG:
++		ret = vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE;
 +		break;
  	default:
  		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
  			get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0) ||
-@@ -227,6 +230,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_PEBS_ENABLE:
- 		msr_info->data = pmu->pebs_enable;
+@@ -233,6 +236,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_DS_AREA:
+ 		msr_info->data = pmu->ds_area;
  		return 0;
-+	case MSR_IA32_DS_AREA:
-+		msr_info->data = pmu->ds_area;
++	case MSR_PEBS_DATA_CFG:
++		msr_info->data = pmu->pebs_data_cfg;
 +		return 0;
  	default:
  		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
  		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-@@ -294,6 +300,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 0;
- 		}
- 		break;
-+	case MSR_IA32_DS_AREA:
-+		if (is_noncanonical_address(data, vcpu))
-+			return 1;
-+		pmu->ds_area = data;
-+		return 0;
+@@ -305,6 +311,14 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
+ 		pmu->ds_area = data;
+ 		return 0;
++	case MSR_PEBS_DATA_CFG:
++		if (pmu->pebs_data_cfg == data)
++			return 0;
++		if (!(data & pmu->pebs_data_cfg_mask)) {
++			pmu->pebs_data_cfg = data;
++			return 0;
++		}
++		break;
  	default:
  		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
  		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+@@ -355,6 +369,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	pmu->reserved_bits = 0xffffffff00200000ull;
+ 	pmu->fixed_ctr_ctrl_mask = ~0ull;
+ 	pmu->pebs_enable_mask = ~0ull;
++	pmu->pebs_data_cfg_mask = ~0ull;
+ 
+ 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
+ 	if (!entry)
+@@ -417,6 +432,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 			for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
+ 				pmu->fixed_ctr_ctrl_mask &=
+ 					~(1ULL << (INTEL_PMC_IDX_FIXED + i * 4));
++			pmu->pebs_data_cfg_mask = ~0xff00000full;
+ 		} else
+ 			pmu->pebs_enable_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
+ 	} else {
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 83a16ae04b4e..94dbd79a8582 100644
+index 94dbd79a8582..954c15fb9b00 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -975,6 +975,7 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
- 			return;
- 		}
- 		break;
-+	case MSR_IA32_DS_AREA:
- 	case MSR_IA32_PEBS_ENABLE:
- 		/* PEBS needs a quiescent period after being disabled (to write
- 		 * a record).  Disabling PEBS through VMX MSR swapping doesn't
-@@ -6536,12 +6537,17 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
- {
- 	int i, nr_msrs;
- 	struct perf_guest_switch_msr *msrs;
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 
- 	msrs = perf_guest_get_msrs(&nr_msrs);
- 
+@@ -6545,8 +6545,11 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
  	if (!msrs)
  		return;
  
-+	if (nr_msrs > 2 && msrs[1].guest)
-+		msrs[2].guest = pmu->ds_area;
-+
+-	if (nr_msrs > 2 && msrs[1].guest)
++	if (nr_msrs > 2 && msrs[1].guest) {
+ 		msrs[2].guest = pmu->ds_area;
++		if (nr_msrs > 3)
++			msrs[3].guest = pmu->pebs_data_cfg;
++	}
+ 
  	for (i = 0; i < nr_msrs; i++)
  		if (msrs[i].host == msrs[i].guest)
- 			clear_atomic_switch_msr(vmx, msrs[i].msr);
 -- 
 2.21.3
 
