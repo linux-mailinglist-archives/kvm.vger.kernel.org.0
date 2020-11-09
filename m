@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D072E2AAF6D
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 03:18:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CD1C2AAF4D
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 03:17:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729200AbgKICRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Nov 2020 21:17:23 -0500
+        id S1729316AbgKICRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Nov 2020 21:17:24 -0500
 Received: from mga01.intel.com ([192.55.52.88]:64927 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729119AbgKICRW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Nov 2020 21:17:22 -0500
-IronPort-SDR: +gQz6LNq3ym8PMpF1rbKBXCy8XE79EWjJ2hQiYqP+Nk9A0b1bu/VnP3vWFgQDQToRurVYIkihg
- 4wrpoJ5UMISw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="187684601"
+        id S1729119AbgKICRX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Nov 2020 21:17:23 -0500
+IronPort-SDR: PGEmqCHIPVBjzs1qNmjYSszxz1J+hEH0RYuPfg3YagHkgpdeZq6E2KInsXFQQYzSSBb7aSo1fC
+ rHknhz0y5SnQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="187684607"
 X-IronPort-AV: E=Sophos;i="5.77,462,1596524400"; 
-   d="scan'208";a="187684601"
+   d="scan'208";a="187684607"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 18:17:05 -0800
-IronPort-SDR: 5xcBZ083ilWFnTu4+0og/HCYlvl4Jhj0dtxK1tMnQ4dXgFY7aAu6rTeIpeJDpHZt26ozxvqStb
- QoGqJIJLieaw==
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 18:17:09 -0800
+IronPort-SDR: PDWCVRH/QjBAccniIohJaf05T3OLrWAzeNpkQx/uqJlac55iP0l1jSh0MS4tKRC0g5Ur417Ksw
+ Z12u9HZ2wZNQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,462,1596524400"; 
-   d="scan'208";a="540646153"
+   d="scan'208";a="540646163"
 Received: from e5-2699-v4-likexu.sh.intel.com ([10.239.48.39])
-  by orsmga005.jf.intel.com with ESMTP; 08 Nov 2020 18:17:01 -0800
+  by orsmga005.jf.intel.com with ESMTP; 08 Nov 2020 18:17:05 -0800
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
@@ -42,9 +42,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Mark Gross <mgross@linux.intel.com>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 04/17] perf: x86/ds: Handle guest PEBS overflow PMI and inject it to guest
-Date:   Mon,  9 Nov 2020 10:12:41 +0800
-Message-Id: <20201109021254.79755-5-like.xu@linux.intel.com>
+Subject: [PATCH v2 05/17] KVM: x86/pmu: Reprogram guest PEBS event to emulate guest PEBS counter
+Date:   Mon,  9 Nov 2020 10:12:42 +0800
+Message-Id: <20201109021254.79755-6-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201109021254.79755-1-like.xu@linux.intel.com>
 References: <20201109021254.79755-1-like.xu@linux.intel.com>
@@ -54,117 +54,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With PEBS virtualization, the PEBS records get delivered to the guest,
-and host still sees the PEBS overflow PMI from guest PEBS counters.
-This would normally result in a spurious host PMI and we needs to inject
-that PEBS overflow PMI into the guest, so that the guest PMI handler
-can handle the PEBS records.
+When a guest counter is configured as a PEBS counter through
+IA32_PEBS_ENABLE, a guest PEBS event will be reprogrammed by
+configuring a non-zero precision level in the perf_event_attr.
 
-Check for this case in the host perf PEBS handler. If a PEBS overflow
-PMI occurs and it's not generated from host side (via check host DS),
-a fake event will be triggered. The fake event causes the KVM PMI callback
-to be called, thereby injecting the PEBS overflow PMI into the guest.
+The guest PEBS overflow PMI bit would be set in the guest
+GLOBAL_STATUS MSR when PEBS facility generates a PEBS
+overflow PMI based on guest IA32_DS_AREA MSR.
 
-No matter how many guest PEBS counters are overflowed, only triggering
-one fake event is enough. The guest PEBS handler would retrieve the
-correct information from its own PEBS records buffer.
+The attr.precise_ip would be adjusted to a special precision
+level when the new PEBS-PDIR feature is supported later which
+would affect the host counters scheduling.
 
-If the counter_freezing is disabled on the host, a guest PEBS overflow
-PMI would be missed when a PEBS counter is enabled on the host side
-and coincidentally a host PEBS overflow PMI based on host DS_AREA is
-also triggered right after vm-exit due to the guest PEBS overflow PMI
-based on guest DS_AREA. In that case, KVM will disable guest PEBS before
-vm-entry once there's a host PEBS counter enabled on the same CPU.
+The guest PEBS event would not be reused for non-PEBS
+guest event even with the same guest counter index.
 
 Originally-by: Andi Kleen <ak@linux.intel.com>
 Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
 Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/events/intel/ds.c | 64 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/pmu.c              | 28 ++++++++++++++++++++++++++--
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
-index 86848c57b55e..1e759c74bffd 100644
---- a/arch/x86/events/intel/ds.c
-+++ b/arch/x86/events/intel/ds.c
-@@ -1721,6 +1721,67 @@ intel_pmu_save_and_restart_reload(struct perf_event *event, int count)
- 	return 0;
- }
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 505f9b39c423..eb0d73a095a3 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -449,6 +449,8 @@ struct kvm_pmu {
+ 	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
+ 	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
  
-+/*
-+ * We may be running with guest PEBS events created by KVM, and the
-+ * PEBS records are logged into the guest's DS and invisible to host.
-+ *
-+ * In the case of guest PEBS overflow, we only trigger a fake event
-+ * to emulate the PEBS overflow PMI for guest PBES counters in KVM.
-+ * The guest will then vm-entry and check the guest DS area to read
-+ * the guest PEBS records.
-+ *
-+ * Without counter_freezing support on the host, the guest PEBS overflow
-+ * PMI may be dropped when both the guest and the host use PEBS.
-+ * Therefore, KVM will not enable guest PEBS once the host PEBS is enabled
-+ * without counter_freezing since it may bring a confused unknown NMI.
-+ *
-+ * The contents and other behavior of the guest event do not matter.
-+ */
-+static int intel_pmu_handle_guest_pebs(struct cpu_hw_events *cpuc,
-+				       struct pt_regs *iregs,
-+				       struct debug_store *ds)
-+{
-+	struct perf_sample_data data;
-+	struct perf_event *event = NULL;
-+	u64 guest_pebs_idxs = cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask;
-+	int bit;
++	u64 pebs_enable;
 +
-+	/*
-+	 * Ideally, we should check guest DS to understand if it's
-+	 * a guest PEBS overflow PMI from guest PEBS counters.
-+	 * However, it brings high overhead to retrieve guest DS in host.
-+	 * So we check host DS instead for performance.
-+	 *
-+	 * If PEBS interrupt threshold on host is not exceeded in a NMI, there
-+	 * must be a PEBS overflow PMI generated from the guest PEBS counters.
-+	 * There is no ambiguity since the reported event in the PMI is guest
-+	 * only. It gets handled correctly on a case by case base for each event.
-+	 *
-+	 * Note: This is based on the assumption that counter_freezing is enabled,
-+	 * or KVM disables the co-existence of guest PEBS and host PEBS.
-+	 */
-+	if (!guest_pebs_idxs || !in_nmi() ||
-+		ds->pebs_index >= ds->pebs_interrupt_threshold)
-+		return 0;
-+
-+	for_each_set_bit(bit, (unsigned long *)&guest_pebs_idxs,
-+			INTEL_PMC_IDX_FIXED + x86_pmu.num_counters_fixed) {
-+
-+		event = cpuc->events[bit];
-+		if (!event->attr.precise_ip)
-+			continue;
-+
-+		perf_sample_data_init(&data, 0, event->hw.last_period);
-+		if (perf_event_overflow(event, &data, iregs))
-+			x86_pmu_stop(event, 0);
-+
-+		/* Inject one fake event is enough. */
-+		return 1;
+ 	/*
+ 	 * The gate to release perf_events not marked in
+ 	 * pmc_in_use only once in a vcpu time slice.
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 67741d2a0308..c6208234e007 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -76,7 +76,11 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 
+ 	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
+-		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
++		if (perf_event->attr.precise_ip) {
++			/* Indicate PEBS overflow PMI to guest. */
++			__set_bit(62, (unsigned long *)&pmu->global_status);
++		} else
++			__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+ 		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+ 
+ 		/*
+@@ -99,6 +103,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+ 				  bool exclude_kernel, bool intr,
+ 				  bool in_tx, bool in_tx_cp)
+ {
++	struct kvm_pmu *pmu = vcpu_to_pmu(pmc->vcpu);
+ 	struct perf_event *event;
+ 	struct perf_event_attr attr = {
+ 		.type = type,
+@@ -110,6 +115,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+ 		.exclude_kernel = exclude_kernel,
+ 		.config = config,
+ 	};
++	bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
+ 
+ 	attr.sample_period = get_sample_period(pmc, pmc->counter);
+ 
+@@ -124,9 +130,23 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+ 		attr.sample_period = 0;
+ 		attr.config |= HSW_IN_TX_CHECKPOINTED;
+ 	}
++	if (pebs) {
++		/*
++		 * The non-zero precision level of guest event makes the ordinary
++		 * guest event becomes a guest PEBS event and triggers the host
++		 * PEBS PMI handler to determine whether the PEBS overflow PMI
++		 * comes from the host counters or the guest.
++		 *
++		 * For most PEBS hardware events, the difference in the software
++		 * precision levels of guest and host PEBS events will not affect
++		 * the accuracy of the PEBS profiling result, because the "event IP"
++		 * in the PEBS record is calibrated on the guest side.
++		 */
++		attr.precise_ip = 1;
 +	}
-+
-+	return 0;
-+}
-+
- static void __intel_pmu_pebs_event(struct perf_event *event,
- 				   struct pt_regs *iregs,
- 				   void *base, void *top,
-@@ -1954,6 +2015,9 @@ static void intel_pmu_drain_pebs_icl(struct pt_regs *iregs)
- 	if (!x86_pmu.pebs_active)
- 		return;
  
-+	if (intel_pmu_handle_guest_pebs(cpuc, iregs, ds))
-+		return;
+ 	event = perf_event_create_kernel_counter(&attr, -1, current,
+-						 intr ? kvm_perf_overflow_intr :
++						 (intr || pebs) ? kvm_perf_overflow_intr :
+ 						 kvm_perf_overflow, pmc);
+ 	if (IS_ERR(event)) {
+ 		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
+@@ -161,6 +181,10 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+ 			      get_sample_period(pmc, pmc->counter)))
+ 		return false;
+ 
++	if (!test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) &&
++	    pmc->perf_event->attr.precise_ip)
++		return false;
 +
- 	base = (struct pebs_basic *)(unsigned long)ds->pebs_buffer_base;
- 	top = (struct pebs_basic *)(unsigned long)ds->pebs_index;
+ 	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
+ 	perf_event_enable(pmc->perf_event);
  
 -- 
 2.21.3
