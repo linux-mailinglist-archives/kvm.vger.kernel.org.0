@@ -2,126 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D49752AC05D
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 17:00:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DD072AC09A
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 17:14:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729978AbgKIQAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 11:00:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30426 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726410AbgKIQAg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Nov 2020 11:00:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604937634;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9x2i9FhJ3FEdl0CuO9z7pB7e6HrDm7nT6Y35uAhzyuQ=;
-        b=XZbNww9dfEEEgaD/9khfOjrn2rQTXAODAt52tSiV/M+f0VUyg0+7Je252tF8jInszmnrjc
-        jZRINbEOj8N21tOfyhVYchvmAswwPiEcqT2QeCQE38QV5AUFYgplyRwY7IzebFE9DKRexW
-        aLVoZ/b5YSdJPNs5KOW7Pb7PRMmCZGA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-ji2dBrXoOme5FwMdlQUdSQ-1; Mon, 09 Nov 2020 11:00:31 -0500
-X-MC-Unique: ji2dBrXoOme5FwMdlQUdSQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5430CCE642;
-        Mon,  9 Nov 2020 16:00:30 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.176])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E219E5DA82;
-        Mon,  9 Nov 2020 16:00:23 +0000 (UTC)
-Date:   Mon, 9 Nov 2020 17:00:20 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, Eric Auger <eric.auger@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [kvm-unit-tests PATCH] arm: Fix compilation errors
-Message-ID: <20201109160020.atjjurkh3mwteork@kamzik.brq.redhat.com>
-References: <20201105135936.55088-1-alexandru.elisei@arm.com>
+        id S1730109AbgKIQOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 11:14:54 -0500
+Received: from foss.arm.com ([217.140.110.172]:42390 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730096AbgKIQOx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 11:14:53 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C45031B;
+        Mon,  9 Nov 2020 08:14:53 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 18EDD3F719;
+        Mon,  9 Nov 2020 08:14:51 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v3 0/2] arm64: Add support for configuring
+ the translation granule
+To:     Andrew Jones <drjones@redhat.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, mark.rutland@arm.com, jade.alglave@arm.com,
+        luc.maranget@inria.fr, andre.przywara@arm.com
+References: <20201104130352.17633-1-nikos.nikoleris@arm.com>
+ <20201109154103.j3zewa2sndw2veda@kamzik.brq.redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <a4a3e3fe-2090-955a-f1d3-48591806b213@arm.com>
+Date:   Mon, 9 Nov 2020 16:16:08 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201105135936.55088-1-alexandru.elisei@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201109154103.j3zewa2sndw2veda@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 05, 2020 at 01:59:36PM +0000, Alexandru Elisei wrote:
-> Using arm-none-eabi-gcc triggers the following compilation errors:
-> 
-> $ ./configure --arch=arm --cross-prefix=arm-none-eabi-
-> $ make clean
-> $ make -j8
-> [..]
-> arm/pmu.c: In function 'pmu_probe':
-> arm/pmu.c:1000:47: error: format '%c' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
->  1000 |  report_info("PMU implementer/ID code: %#x(\"%c\")/%#x",
->       |                                              ~^
->       |                                               |
->       |                                               int
->       |                                              %ld
->  1001 |       (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
->  1002 |       ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
->       |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->       |                                                            |
->       |                                                            long unsigned int
-> [..]
-> arm/gic.c: In function 'test_byte_access':
-> arm/gic.c:460:31: error: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'u32' {aka 'long unsigned int'} [-Werror=format=]
->   460 |   report_info("byte 1 of 0x%08x => 0x%02x", pattern & mask, reg);
->       |                            ~~~^             ~~~~~~~~~~~~~~
->       |                               |                     |
->       |                               unsigned int          u32 {aka long unsigned int}
->       |                            %08lx
-> [..]
-> arm/pl031.c: In function 'irq_handler':
-> arm/pl031.c:153:39: error: format '%d' expects argument of type 'int', but argument 2 has type 'u32' {aka 'long unsigned int'} [-Werror=format=]
->   153 |   report_info("Unexpected interrupt: %d\n", irqnr);
->       |                                      ~^     ~~~~~
->       |                                       |     |
->       |                                       int   u32 {aka long unsigned int}
->       |                                      %ld
-> 
-> The errors were observed when using arm-none-eabi-gcc versions 10.2.0 and
-> 9.2.0. No errors were found when using arm-linux-gnu-gcc version 10.2.1.
-> 
-> Replace the offending printf format specifiers with their PRIxxx
-> counterparts defined by C99 and available in libcflat.h. Also remove the
-> unnecessary call to get_pmcr() in pmu_probe(), as the pmcr value hasn't
-> changed since initialization.
-> 
-> Nu functional changes intended by this patch.
+Hi Andrew,
 
-  ^ I've fixed this typo
+On 11/9/20 3:41 PM, Andrew Jones wrote:
+> On Wed, Nov 04, 2020 at 01:03:50PM +0000, Nikos Nikoleris wrote:
+>> Hi all,
+>>
+>> One more update to the series that allows us to configure the
+>> translation granule in arm64. Again, thanks to Drew and Alex for
+>> their reviews and their suggestions.
+>>
+>> v1: 
+>> https://lore.kernel.org/kvm/006a19c0-cdf7-e76c-8335-03034bea9c7e@arm.com/T
+>> v2: 
+>> https://lore.kernel.org/kvm/20201102113444.103536-1-nikos.nikoleris@arm.com/
+>>
+>>
+>> Changes in v3:
+>>   - Re-ordered the two changes in the series
+>>   - Moved much of the code to check the configured granule from the C
+>>     preprocessor to run time.
+>>   - Avoid block mappings at the PUD level (Thanks Alex!)
+>>   - Formatting changes
+>>
+>> Changes in v2:
+>>   - Change the configure option from page-shift to page-size
+>>   - Check and warn if the configured granule is not supported
+>>
+>> Thanks,
+>>
+>> Nikos
+>>
+>>
+>> Nikos Nikoleris (2):
+>>   arm64: Check if the configured translation granule is supported
+>>   arm64: Add support for configuring the translation granule
+>>
+>>  configure                     | 27 ++++++++++++++
+>>  lib/arm/asm/page.h            |  4 +++
+>>  lib/arm/asm/pgtable-hwdef.h   |  4 +++
+>>  lib/arm/asm/pgtable.h         |  6 ++++
+>>  lib/arm/asm/thread_info.h     |  4 ++-
+>>  lib/arm64/asm/page.h          | 35 ++++++++++++++----
+>>  lib/arm64/asm/pgtable-hwdef.h | 42 +++++++++++++++++-----
+>>  lib/arm64/asm/pgtable.h       | 68 +++++++++++++++++++++++++++++++++--
+>>  lib/arm64/asm/processor.h     | 36 +++++++++++++++++++
+>>  lib/libcflat.h                | 20 ++++++-----
+>>  lib/arm/mmu.c                 | 31 ++++++++++------
+>>  arm/cstart64.S                | 10 +++++-
+>>  12 files changed, 249 insertions(+), 38 deletions(-)
+>>
+>> -- 
+>> 2.17.1
+>>
+> Looks good to me.
+>
+> Alex, did you plan to review again?
 
-> 
-> CC: Eric Auger <eric.auger@redhat.com>
-> CC: Alexander Graf <graf@amazon.com>
-> CC: Andre Przywara <andre.przywara@arm.com>
-> CC: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-
-Thanks Alex. I've queued this for the next Arm pull request.
-
-> 
-> Andre suggested that we drop using gcc's stdint.h and implement our own to avoid
-> such errors in the future. The distro that I'm using on my desktop doesn't have
-> the arm-linux-gnu toolchain in the default repos, so I figured I should send
-> this fix to get things compiling again.
-> 
-> I have no preference for, or against, implementing our own types.h header file.
-> I imagine it's not going to be easy to change the code to use it (possibly for
-> all architectures), and it should be worth it in the long run.
-
-I'd keep gcc's stdint.h for now, but it might be a good idea to post a
-travis patch that tests compiling with your preferred toolchain.
+Yes, I forgot about it, sorry. I'll review them as soon as possible (tomorrow most
+likely).
 
 Thanks,
-drew
-
+Alex
