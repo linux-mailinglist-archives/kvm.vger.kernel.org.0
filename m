@@ -2,33 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CDD32AC946
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 00:24:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 106E92AC951
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 00:26:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731355AbgKIXYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 18:24:05 -0500
-Received: from mga09.intel.com ([134.134.136.24]:7001 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729740AbgKIXYE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 18:24:04 -0500
-IronPort-SDR: ID0Hd7zq6ENP88mZc7V0tz9D0YDzA4YLVkszv6mgrxKfpJX+Js0e0v4Qy5pox5+D3lPx/5SCan
- PazxTL9ggC5Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9800"; a="170038978"
-X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
-   d="scan'208";a="170038978"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 15:24:03 -0800
-IronPort-SDR: GpZbytWzBTV4P7UoNJU0CtTmo7uvwa2hvA0jdHPZGeGaba7dR/GNinokcc8VgiKXTCs/iFFDHk
- g3eGxblBjDOQ==
-X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
-   d="scan'208";a="473180423"
-Received: from agluck-desk2.sc.intel.com (HELO agluck-desk2.amr.corp.intel.com) ([10.3.52.68])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 15:24:03 -0800
-Date:   Mon, 9 Nov 2020 15:24:02 -0800
-From:   "Luck, Tony" <tony.luck@intel.com>
-To:     Borislav Petkov <bp@alien8.de>, Jim Mattson <jmattson@google.com>
+        id S1730966AbgKIX0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 18:26:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730684AbgKIX0P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 18:26:15 -0500
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FD2DC0613D3
+        for <kvm@vger.kernel.org>; Mon,  9 Nov 2020 15:26:15 -0800 (PST)
+Received: by mail-oi1-x22a.google.com with SMTP id w145so12171232oie.9
+        for <kvm@vger.kernel.org>; Mon, 09 Nov 2020 15:26:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=38DeofOFUIYkLHO9imZX1OTrjAgZGAGUoTcq8TI1vbI=;
+        b=mPXtDnpUWNsQDQKU4BEqEb6c+IKqIlLrne9ZlTQSv44suRs0UqF/YUjFdlHDtAjMs1
+         RmYGq+keKmTrlrYEuEclEQfb2G/lvHqtTA9FuxUhMqU3BDrJHzmm5M3YdxYCauA1xBr4
+         gtILKmrT1UgfmYGzsf4NaQUa5F4PAkylF2fQSexEdt9ZZ1k87Iw5onaGdbtAhGlzGgej
+         aZQu8shSDccyRce7ufVFqQcd6j0bieruHqbOPvWPTLLdyCBkxW9B70n6psBiLinZz+5k
+         W1EDXWHJsd7h/UOKG32Kv5ZYSUB8dyaWBhkHfBd/VMkfy1lbASGoD0qDdseQS/ghNn1k
+         ZmbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=38DeofOFUIYkLHO9imZX1OTrjAgZGAGUoTcq8TI1vbI=;
+        b=UaNlkPThaZKR0pB1A/X0FvNquInrQUSoieKCf38eO3OKJ85GotL0aX5fn3J7udfvoN
+         y/sfhCU6ODuAEDkh2WoK6R3Zggq7StvTYAbqi4b3ohKAqN2VOQkuAyf7LorFFJoenNUM
+         i1vG9EU0ZcZ0xa5/IfWdD5HsKnHFDtJir/8TQHXArs5jY3+xaIwN3bslD6pp9337wpdN
+         P+EYq/0hwT8GgxE5SwVok/mjskGuq2aVYBmccr2dqwbKCS9SGDcvvQ1inhU0snfceO6J
+         Etj8GkqPgBASI19O8C4LXCZZ7egdqaD1qu6zRrHDrDdBjO8ruVEGqb8eLXnzUf8NhACh
+         sGyw==
+X-Gm-Message-State: AOAM533yglzMAH+8I4vK/fdgQ/46KHCWo0PDm45IOYqPWHm7azHfsP+I
+        oZTIKCtkuYujbmDracnTpcjb/POTcJ5S4RyYYmWMzw==
+X-Google-Smtp-Source: ABdhPJzPGvNiGQt38mG6elvI4UW6ZTgvh7re8iq8Ub9xo68tgHOVP7tdGXalhNBroZjoV4oXYZYvIP66JnOFv8geHnk=
+X-Received: by 2002:aca:5505:: with SMTP id j5mr1012865oib.6.1604964374323;
+ Mon, 09 Nov 2020 15:26:14 -0800 (PST)
+MIME-Version: 1.0
+References: <20201030190807.GA13884@agluck-desk2.amr.corp.intel.com>
+ <160431588828.397.16468104725047768957.tip-bot2@tip-bot2> <3f863634cd75824907e8ccf8164548c2ef036f20.camel@redhat.com>
+ <bfc274fc27724ea39ecac1e7ac834ed8@intel.com> <CALMp9eTFaiYkTnVe8xKzg40E4nZ3rAOii0O06bTy0+oLNjyKhA@mail.gmail.com>
+ <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
+In-Reply-To: <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 9 Nov 2020 15:26:02 -0800
+Message-ID: <CALMp9eS+SYmPP3OzdK0-Bs1wSBJ4MU_POZe3i5fi3Fd+FTshYw@mail.gmail.com>
+Subject: Re: [tip: ras/core] x86/mce: Enable additional error logging on
+ certain Intel CPUs
+To:     "Luck, Tony" <tony.luck@intel.com>
 Cc:     Qian Cai <cai@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-tip-commits@vger.kernel.org" 
@@ -36,54 +62,31 @@ Cc:     Qian Cai <cai@redhat.com>,
         Borislav Petkov <bp@suse.de>, x86 <x86@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [PATCH] x86/mce: Check for hypervisor before enabling additional
- error logging
-Message-ID: <20201109232402.GA25492@agluck-desk2.amr.corp.intel.com>
-References: <20201030190807.GA13884@agluck-desk2.amr.corp.intel.com>
- <160431588828.397.16468104725047768957.tip-bot2@tip-bot2>
- <3f863634cd75824907e8ccf8164548c2ef036f20.camel@redhat.com>
- <bfc274fc27724ea39ecac1e7ac834ed8@intel.com>
- <CALMp9eTFaiYkTnVe8xKzg40E4nZ3rAOii0O06bTy0+oLNjyKhA@mail.gmail.com>
- <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Booting as a guest under KVM results in error messages about
-unchecked MSR access:
+On Mon, Nov 9, 2020 at 2:57 PM Luck, Tony <tony.luck@intel.com> wrote:
+>
+> > I thought Linux had long ago gone the route of turning rdmsr/wrmsr
+> > into rdmsr_safe/wrmsr_safe, so that the guest would ignore the #GPs on
+> > writes and return zero to the caller for #GPs on reads.
+>
+> Linux just switched that around for the machine check banks ... if they #GP
+> fault, then something is seriously wrong.
+>
+> Maybe that isn't a general change of direction though. Perhaps I
+> should either use rdmsrl_safe() in this code. Or (better?) add
+>
+>         if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
+>                 return;
+>
+> to the start of intel_imc_init().
 
-[    6.814328][    T0] unchecked MSR access error: RDMSR from 0x17f at rIP: 0xffffffff84483f16 (mce_intel_feature_init+0x156/0x270)
-
-because KVM doesn't provide emulation for random model specific registers.
-
-Check for X86_FEATURE_HYPERVISOR and skip trying to enable the mode (a
-guest shouldn't be concerned with corrected errors anyway).
-
-Reported-by: Qian Cai <cai@redhat.com>
-Fixes: 68299a42f842 ("x86/mce: Enable additional error logging on certain Intel CPUs")
-Signed-off-by: Tony Luck <tony.luck@intel.com>
----
- arch/x86/kernel/cpu/mce/intel.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/x86/kernel/cpu/mce/intel.c b/arch/x86/kernel/cpu/mce/intel.c
-index b47883e364b4..7f7d863400b7 100644
---- a/arch/x86/kernel/cpu/mce/intel.c
-+++ b/arch/x86/kernel/cpu/mce/intel.c
-@@ -517,6 +517,9 @@ static void intel_imc_init(struct cpuinfo_x86 *c)
- {
- 	u64 error_control;
- 
-+	if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-+		return;
-+
- 	switch (c->x86_model) {
- 	case INTEL_FAM6_SANDYBRIDGE_X:
- 	case INTEL_FAM6_IVYBRIDGE_X:
--- 
-2.21.1
-
+I wouldn't expect all hypervisors to necessarily set CPUID.01H:ECX[bit
+31]. Architecturally, on Intel CPUs, that bit is simply defined as
+"not used." There is no documented contract between Intel and
+hypervisor vendors regarding the use of that bit. (AMD, on the other
+hand, *does* document that bit as "reserved for use by hypervisor to
+indicate guest status.")
