@@ -2,117 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 222482AAE79
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 01:06:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D13E22AAF43
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 03:16:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728104AbgKIAFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Nov 2020 19:05:54 -0500
-Received: from mga11.intel.com ([192.55.52.93]:42925 "EHLO mga11.intel.com"
+        id S1729080AbgKICQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Nov 2020 21:16:50 -0500
+Received: from mga01.intel.com ([192.55.52.88]:64875 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727929AbgKIAFy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Nov 2020 19:05:54 -0500
-IronPort-SDR: 1PNKp56QX7RR0CChtw+IQvOeSdMGsp3PNdkPWD/g5+BkJIpowLaD+kGHSrShBl6uQQpKpHSk9O
- fMhoO2+GysMA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="166223084"
+        id S1728006AbgKICQu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Nov 2020 21:16:50 -0500
+IronPort-SDR: cydSXvtAB7ITKVZ3/N01yR4Ub1rjyqMlmi0LCWhzT6oCJyXKhjqX22EfXxg6FXwkEgL9e/JJx4
+ 5JnvKXFsSmpw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="187684535"
 X-IronPort-AV: E=Sophos;i="5.77,462,1596524400"; 
-   d="scan'208";a="166223084"
+   d="scan'208";a="187684535"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 16:05:54 -0800
-IronPort-SDR: URKh91De8z8i9pU2NLA5haELAPH1gMBPE2wkq+dJOcFLNi2+xpsHt4aZiWgjHUNdthDm2aS59n
- kSvgbnkNGRKw==
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 18:16:49 -0800
+IronPort-SDR: 0isBKzzx4pbgmXS6CNxAlimbfIJmLVm3/pD/NOnTEAG5/wgQbLuX7BUMI+2mQtqsjNNKGYXWII
+ CBxqjP5wc+Lw==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,462,1596524400"; 
-   d="scan'208";a="530506850"
-Received: from araj-mobl1.jf.intel.com ([10.255.228.179])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2020 16:05:52 -0800
-Date:   Sun, 8 Nov 2020 16:05:50 -0800
-From:   "Raj, Ashok" <ashok.raj@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Ashok Raj <ashok.raj@intel.com>
-Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-Message-ID: <20201109000550.GD32074@araj-mobl1.jf.intel.com>
-References: <MWHPR11MB1645862A8F7CF7FB8DD011778CEF0@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20201104135415.GX2620339@nvidia.com>
- <MWHPR11MB1645524BDEDF8899914F32AE8CED0@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20201106131415.GT2620339@nvidia.com>
- <20201106164850.GA85879@otc-nc-03>
- <20201106175131.GW2620339@nvidia.com>
- <CAPcyv4iYHA1acfo=+fTk+U_TrLbSWJjA6v4oeTXgVYDTrnCoGw@mail.gmail.com>
- <20201107001207.GA2620339@nvidia.com>
- <20201108181124.GA28173@araj-mobl1.jf.intel.com>
- <20201108234142.GD2620339@nvidia.com>
+   d="scan'208";a="540646088"
+Received: from e5-2699-v4-likexu.sh.intel.com ([10.239.48.39])
+  by orsmga005.jf.intel.com with ESMTP; 08 Nov 2020 18:16:45 -0800
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
+        Thomas Gleixner <tglx@linutronix.de>, wei.w.wang@intel.com,
+        Tony Luck <tony.luck@intel.com>,
+        Stephane Eranian <eranian@google.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH RFC v2 00/17] KVM: x86/pmu: Add support to enable Guest PEBS via DS 
+Date:   Mon,  9 Nov 2020 10:12:37 +0800
+Message-Id: <20201109021254.79755-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201108234142.GD2620339@nvidia.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason
+The Precise Event Based Sampling(PEBS) supported on Intel Ice Lake server
+platforms can provide an architectural state of the instruction executed
+after the instruction that caused the event. This patch set enables the
+the PEBS via DS feature for KVM (also non) Linux guest on the Ice Lake.
+The Linux guest can use PEBS feature like native:
 
-On Sun, Nov 08, 2020 at 07:41:42PM -0400, Jason Gunthorpe wrote:
-> On Sun, Nov 08, 2020 at 10:11:24AM -0800, Raj, Ashok wrote:
-> 
-> > > On (kvm) virtualization the addr/data pair the IRQ domain hands out
-> > > doesn't work. It is some fake thing.
-> > 
-> > Is it really some fake thing? I thought the vCPU and vector are real
-> > for a guest, and VMM ensures when interrupts are delivered they are either.
-> 
-> It is fake in the sense it is programmed into no hardware.
->  
-> It is real in the sense it is an ABI contract with the VMM.
+  # perf record -e instructions:ppp ./br_instr a
+  # perf record -c 100000 -e instructions:pp ./br_instr a
 
-Ah.. its clear now. That clears up my question below as well.
+If the counter_freezing is not enabled on the host, the guest PEBS will
+be disabled on purpose when host is using PEBS facility. By default,
+KVM disables the co-existence of guest PEBS and host PEBS.
 
-> 
-> Yes, no matter what the VMM has to know the guest wants an interrupt
-> routed in and setup the VMM part of the equation. With SRIOV this is
-> all done with the MSI trapping.
-> 
-> > What if the guest creates some addr in the 0xfee... range how do we
-> > take care of interrupt remapping and such without any VMM assist?
-> 
-> Not sure I understand this?
-> 
+The whole patch set could be divided into three parts and the first two
+parts enables the basic PEBS via DS feature which could be considered
+to be merged and no regression about host perf is expected.
 
-My question was based on mis-conception that interrupt entries are directly
-written by guest OS for mlx*. My concern was about security isolation if guest OS
-has full control of device interrupt store. 
+- part 1: patch 0001-0003: preparation and minor fixes for vPMU overall;
+- part 2: patch 0004-0012: enable guest PEBS when the guest PEBS counters
+are not cross-mapped, which is the most usual case in practice;
+- part 3: patch 0012-0017: enable guest PEBS when cross-mapping happens;
 
-I think you clarified it, that interrupts still are marshalled by the VMM
-and not in direct control of guest OS. That makes my question moot.
+Compared to the first version, an important change here is the removal
+of the forced 1-1 mapping of the virtual to physical PMC and we handle
+the cross-mapping issue carefully in the part 3 which may address
+artificial competition concern from PeterZ.
 
-Cheers,
-Ashok
+In general, there are 2 code paths to emulate guest PEBS facility.
+
+1) Fast path (part 2)
+
+This is when the host assigned physical PMC has an identical index as
+the virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+It works as the 1-1 mapping that we did in the first version.
+
+2) Slow path (part 3)
+
+This is when the host assigned physical PMC has a different index
+from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
+In this case, KVM needs to rewrite the PEBS records to change the
+applicable counter indexes to the virtual PMC indexes, which would
+otherwise contain the physical counter index written by PEBS facility,
+and switch the counter reset values to the offset corresponding to
+the physical counter indexes in the DS data structure. Large PEBS
+needs to be disabled by KVM rewriting the pebs_interrupt_threshold
+filed in DS to only one record in the slow path. 
+
+This is because a guest may implicitly drain PEBS buffer, e.g.,
+context switch. KVM doesn't get a chance to update the PEBS buffer.
+The physical PMC index will confuse the guest. The difficulty comes
+when multiple events get rescheduled inside the guest.
+
+Hence disabling large PEBS in this case might be an easy and safe way
+to keep it corrects as an initial step here. 
+
+We don't expect this to break any guest code, which can generally tolerate
+earlier PMIs. In the fast path with 1:1 mapping this is not needed.
+
+The rewriting work is performed before delivering a vPMI to the guest to
+notify the guest to read the record (before entering the guest, where
+interrupt has been disabled so no counter reschedule would happen
+at that point on the host).
+
+In summary, this patch set enables the guest PEBS to retrieve the correct
+information from its own PEBS records on the Ice Lake server platforms
+when host is not using PEBS facility at the same time. And we expect it
+should work when migrating to another Ice Lake.
+
+Here are the results of pebs test from guest/host for same workload:
+
+perf report on guest:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250
+# Overhead  Command   Shared Object      Symbol
+  57.74%  br_instr  br_instr           [.] lfsr_cond
+  41.40%  br_instr  br_instr           [.] cmp_end
+   0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+
+perf report on host:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386
+# Overhead  Command   Shared Object     Symbol
+  57.90%  br_instr  br_instr          [.] lfsr_cond
+  41.95%  br_instr  br_instr          [.] cmp_end
+   0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+   
+Conclusion: the profiling results on the guest are similar to that on the host.
+
+Please check more details in each commit and feel free to comment.
+
+v1->v2 Changelog:
+- drop the 1:1 counter mapping proposal for PeterZ;
+- *add the guest PEBS records rewrite proposal* (new patch 0013 - 0017);
+- drop the co-existence of guest PEBS and host PEBS w/o counter_freezing;
+- drop the auto-reload configuration for guest PEBS event;
+- use attr.precise_ip = 3 for guest PEBS PDIR counter;
+- move msr-switch code to perf_guest_get_msrs();
+- new user interface to dis/enable guest PEBS via IA32_PERF_CAPABILITIES;
+- general vPMU related fixup patches (patch 0001 - 0003);
+- rebased to the latest kvm-queue;
+
+Previous:
+https://lore.kernel.org/kvm/1583431025-19802-1-git-send-email-luwei.kang@intel.com
+
+Like Xu (17):
+  KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+  KVM: vmx/pmu: Use IA32_PERF_CAPABILITIES to adjust features visibility
+  KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+  perf: x86/ds: Handle guest PEBS overflow PMI and inject it to guest
+  KVM: x86/pmu: Reprogram guest PEBS event to emulate guest PEBS counter
+  KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+  KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to manage guest DS buffer
+  KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+  KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+  KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+  KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+  KVM: x86/pmu: Disable guest PEBS when counters are cross-mapped
+  KVM: x86/pmu: Add hook to emulate pebs for cross-mapped counters
+  KVM: vmx/pmu: Limit pebs_interrupt_threshold in the guest DS area
+  KVM: vmx/pmu: Rewrite applicable_counters field in the guest PEBS record
+  KVM: x86/pmu: Save guest pebs reset value when a pebs counter is configured
+  KVM: x86/pmu: Adjust guest DS pebs reset counter values for mapped counter
+
+ arch/x86/events/intel/core.c     |  46 +++++
+ arch/x86/events/intel/ds.c       |  64 +++++++
+ arch/x86/include/asm/kvm_host.h  |  15 ++
+ arch/x86/include/asm/msr-index.h |   6 +
+ arch/x86/kvm/pmu.c               |  91 +++++++--
+ arch/x86/kvm/pmu.h               |  20 ++
+ arch/x86/kvm/vmx/capabilities.h  |  17 +-
+ arch/x86/kvm/vmx/pmu_intel.c     | 313 ++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.c           |  29 +++
+ arch/x86/kvm/x86.c               |  12 +-
+ 10 files changed, 594 insertions(+), 19 deletions(-)
+
+-- 
+2.21.3
+
