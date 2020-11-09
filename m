@@ -2,99 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0A212AC305
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 18:59:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C74082AC352
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 19:11:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730367AbgKIR7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 12:59:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47330 "EHLO mail.kernel.org"
+        id S1730289AbgKISKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 13:10:47 -0500
+Received: from mga11.intel.com ([192.55.52.93]:20845 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730269AbgKIR7c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 12:59:32 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 650B820809;
-        Mon,  9 Nov 2020 17:59:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604944772;
-        bh=CvlpepUleGE92S4Hy7ecNff+HZV8FbvvzRSLVzB5XVA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iBKUSi0NyN0DsyawPKfhWMx/yU2o8IGxYh7bT9yco3OsXC4PRFKQ92zySp730oowm
-         ClZXLOGHe6edWxMRe37Bg6+6iNVCJ204Jxulrzd6AFqTx2rQcbcziqxxYlmLgELaW/
-         TM6YsK8RmoOjwltJwnzO/nPGUMuLzch2Wtxu2+Ig=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kcBRy-009BQs-Jc; Mon, 09 Nov 2020 17:59:30 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>, ndesaulniers@google.com,
-        dbrazdil@google.com, kernel-team@android.com
-Subject: [PATCH v2 5/5] KVM: arm64: Avoid repetitive stack access on host EL1 to EL2 exception
-Date:   Mon,  9 Nov 2020 17:59:23 +0000
-Message-Id: <20201109175923.445945-6-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201109175923.445945-1-maz@kernel.org>
-References: <20201109175923.445945-1-maz@kernel.org>
+        id S1729426AbgKISKo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 13:10:44 -0500
+IronPort-SDR: jliq5B+3ehTwhREM/Mn/PpRYCDSFMOkdT49LbDCg0u0rM7x5CblXbqcMaXwXKf09g0OThMdGy+
+ qRJ+LiXI+NPQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9800"; a="166337354"
+X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
+   d="scan'208";a="166337354"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 10:10:41 -0800
+IronPort-SDR: tuCvzS3iY3cpdxhXWsvyXZgcwAFdYuomVJ3Zu2pC/uILoxhmsT+axEq93WFuPDPjeW0G5GEjd+
+ BZOWkmWRC4Cw==
+X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
+   d="scan'208";a="327354691"
+Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.36])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 10:10:41 -0800
+Date:   Mon, 9 Nov 2020 10:10:39 -0800
+From:   "Raj, Ashok" <ashok.raj@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Ashok Raj <ashok.raj@intel.com>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+Message-ID: <20201109181039.GA15472@otc-nc-03>
+References: <draft-875z6ekcj5.fsf@nanos.tec.linutronix.de>
+ <87y2jaipwu.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, ascull@google.com, will@kernel.org, qperret@google.com, ndesaulniers@google.com, dbrazdil@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87y2jaipwu.fsf@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Registers x0/x1 get repeateadly pushed and poped during a host
-HVC call. Instead, leave the registers on the stack, trading
-a store instruction on the fast path for an add on the slow path.
+On Mon, Nov 09, 2020 at 03:08:17PM +0100, Thomas Gleixner wrote:
+> On Mon, Nov 09 2020 at 12:14, Thomas Gleixner wrote:
+> > On Sun, Nov 08 2020 at 15:58, Ashok Raj wrote:
+> >> On Sun, Nov 08, 2020 at 07:47:24PM +0100, Thomas Gleixner wrote:
+> >> But for SIOV devices there is no PASID filtering at the remap level since
+> >> interrupt messages don't carry PASID in the TLP.
+> >
+> > Why do we need PASID for VMM integrity?
+> >
+> > If the device sends a message then the remap unit will see the requester
+> > ID of the device and if the message it sends is not 
+> 
+> That made me look at patch 4/17 which adds DEVMSI support to the
+> remap code:
+> 
+> > +       case X86_IRQ_ALLOC_TYPE_DEV_MSI:
+> > +              irte_prepare_msg(msg, index, sub_handle);
+> >                break;
+> 
+> It does not setup any requester-id filter in IRTE. How is that supposed
+> to be correct?
+> 
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/host.S | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 4e207c1c5126..fe2740b224cf 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -13,8 +13,6 @@
- 	.text
- 
- SYM_FUNC_START(__host_exit)
--	stp	x0, x1, [sp, #-16]!
--
- 	get_host_ctxt	x0, x1
- 
- 	/* Store the host regs x2 and x3 */
-@@ -99,13 +97,15 @@ SYM_FUNC_END(__hyp_do_panic)
- 	mrs	x0, esr_el2
- 	lsr	x0, x0, #ESR_ELx_EC_SHIFT
- 	cmp	x0, #ESR_ELx_EC_HVC64
--	ldp	x0, x1, [sp], #16
- 	b.ne	__host_exit
- 
-+	ldp	x0, x1, [sp]		// Don't fixup the stack yet
-+
- 	/* Check for a stub HVC call */
- 	cmp	x0, #HVC_STUB_HCALL_NR
- 	b.hs	__host_exit
- 
-+	add	sp, sp, #16
- 	/*
- 	 * Compute the idmap address of __kvm_handle_stub_hvc and
- 	 * jump there. Since we use kimage_voffset, do not use the
--- 
-2.28.0
-
+Its missing a set_msi_sid() equivalent for the DEV_MSI type.
