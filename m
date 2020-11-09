@@ -2,78 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCFAC2AB5A1
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 11:59:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DDCB2AB621
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 12:08:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728462AbgKIK72 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Nov 2020 05:59:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47774 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726535AbgKIK72 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 05:59:28 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209867] CPU soft lockup/stall with nested KVM and SMP
-Date:   Mon, 09 Nov 2020 10:59:27 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: frantisek@sumsal.cz
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-209867-28872-ieYd39Vshs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209867-28872@https.bugzilla.kernel.org/>
-References: <bug-209867-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1729472AbgKILHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 06:07:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729243AbgKILHB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 06:07:01 -0500
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1C24C0613D3
+        for <kvm@vger.kernel.org>; Mon,  9 Nov 2020 03:07:00 -0800 (PST)
+Received: by mail-wr1-x444.google.com with SMTP id s8so1124264wrw.10
+        for <kvm@vger.kernel.org>; Mon, 09 Nov 2020 03:07:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/BZufo5GeZBBjJpVBhVfUUqf7bDRhIufHOC+GeAXTjw=;
+        b=h63NN6JIr7BPg/L5K4tALUY+/tMHu7b/AohNm+Sq0AHtLr7C775RNCqPF5N91xMyBI
+         MOiY+0CB7+nr/djuF77eQh2JjzNwZIgYaGZcGaavyRIGIDOMtNAYYoguPo3Q8xFlwx6L
+         QddH+S2xNU+tvs03WMAyY063pe678sUddwGJwNwh+sGNbGg5ToLYxAiebC7qHygj5JKC
+         wX/om83DYWGS2MTV/IcOR6891AOSOJx6pnI6tFAZh8FUdpFrpM+edanMCufFGJCkBefi
+         wPu7sueEx5oa9fOWdtBQSKZ4a7oTEsuZvbf1jYwrHa9aigN1cKpCLLxVES7TkXXM96mf
+         VUKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/BZufo5GeZBBjJpVBhVfUUqf7bDRhIufHOC+GeAXTjw=;
+        b=P7DL/V8GuVoyzm/Yve5wz1G94H7pJvax97lNemTSdzEb0BRpHQcOlmDZe8Ggw97uSX
+         1qqTmDM2o1QV7u3SGgSA2CMXbKxwI1K5bsrBcSzUUsjvoMwRiEkscFDMrQCbWPijSmZs
+         +xKhESbCe3sj6IJA5ADShcaza750RCnzHzyE3nPsxV2q2wfl/lp/Y9/QGiEe8Hrazj7o
+         0/R89ns0WtWZG1UP917U0KbGrUEDeZmneogKxMVpT8ltmaHnrHk9I8s9qL4zGEdClxNu
+         +lMGlqOAsjTy32Nu+/11E3PuHYkJXboKoOIDopHX61ectbOs5h+qz+ngpLf9lPyO7kKb
+         m+Vw==
+X-Gm-Message-State: AOAM531TKBOgDAAuYNCVmJA/Cs5CWU6c5iGhzMQDbI14FrWpbqDrcbAf
+        17ubBOjNxCmzf9s6VkRdcmfWyw==
+X-Google-Smtp-Source: ABdhPJyoLN1aG0XKVyv+yWfCk24OCLDvJjyIFGdAfhV/HDRuWRPPB2x0i9RWfrD3NWEqtPTk5g+kWQ==
+X-Received: by 2002:adf:9066:: with SMTP id h93mr18252220wrh.166.1604920019608;
+        Mon, 09 Nov 2020 03:06:59 -0800 (PST)
+Received: from localhost.localdomain (lfbn-nic-1-190-206.w2-15.abo.wanadoo.fr. [2.15.39.206])
+        by smtp.gmail.com with ESMTPSA id d3sm12815582wre.91.2020.11.09.03.06.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2020 03:06:58 -0800 (PST)
+From:   Bartosz Golaszewski <brgl@bgdev.pl>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc:     linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        alsa-devel@alsa-project.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Subject: [PATCH v3 0/9] slab: provide and use krealloc_array()
+Date:   Mon,  9 Nov 2020 12:06:45 +0100
+Message-Id: <20201109110654.12547-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.29.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209867
+From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
-Frantisek Sumsal (frantisek@sumsal.cz) changed:
+Andy brought to my attention the fact that users allocating an array of
+equally sized elements should check if the size multiplication doesn't
+overflow. This is why we have helpers like kmalloc_array().
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|5.9.3-arch1-1               |5.9.6-arch1-1
+However we don't have krealloc_array() equivalent and there are many
+users who do their own multiplication when calling krealloc() for arrays.
 
---- Comment #4 from Frantisek Sumsal (frantisek@sumsal.cz) ---
-Results with kernel 5.9.6:
+This series provides krealloc_array() and uses it in a couple places.
 
-[    4.353614] PCI: Using configuration type 1 for extended access
-[    4.361708] HugeTLB registered 1.00 GiB page size, pre-allocated 0 pages
-[    4.363625] HugeTLB registered 2.00 MiB page size, pre-allocated 0 pages
-[   64.373614] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-[   64.376918] rcu:     3-...0: (0 ticks this GP) idle=95a/1/0x4000000000000000
-softirq=18/18 fqs=6000 last_accelerate: 0000/e77e dyntick_enabled: 0
-[   64.376918]  (detected by 0, t=18002 jiffies, g=-1123, q=62)
-[   64.376918] Sending NMI from CPU 0 to CPUs 3:
-[  244.390281] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-[  244.393584] rcu:     3-...0: (0 ticks this GP) idle=95a/1/0x4000000000000000
-softirq=18/18 fqs=24002 last_accelerate: 0000/ba73 dyntick_enabled: 0
-[  244.393584]  (detected by 0, t=72007 jiffies, g=-1123, q=62)
-[  244.393584] Sending NMI from CPU 0 to CPUs 3:
-[  424.406947] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-[  424.410251] rcu:     3-...0: (0 ticks this GP) idle=95a/1/0x4000000000000000
-softirq=18/18 fqs=42004 last_accelerate: 0000/8d68 dyntick_enabled: 0
-[  424.410251]  (detected by 0, t=126012 jiffies, g=-1123, q=62)
-[  424.410251] Sending NMI from CPU 0 to CPUs 3:
-qemu-system-x86_64: terminating on signal 15 from pid 31982 (timeout)
+A separate series will follow adding devm_krealloc_array() which is
+needed in the xilinx adc driver.
+
+v1 -> v2:
+- added a kernel doc for krealloc_array()
+- mentioned krealloc et al in the docs
+- collected review tags
+
+v2 -> v3:
+- add a patch improving krealloc()'s kerneldoc
+- fix a typo
+- improve .rst doc
+- tweak line breaks
+
+Bartosz Golaszewski (9):
+  mm: slab: clarify krealloc()'s behavior with __GFP_ZERO
+  mm: slab: provide krealloc_array()
+  ALSA: pcm: use krealloc_array()
+  vhost: vringh: use krealloc_array()
+  pinctrl: use krealloc_array()
+  edac: ghes: use krealloc_array()
+  drm: atomic: use krealloc_array()
+  hwtracing: intel: use krealloc_array()
+  dma-buf: use krealloc_array()
+
+ Documentation/core-api/memory-allocation.rst |  4 ++++
+ drivers/dma-buf/sync_file.c                  |  3 +--
+ drivers/edac/ghes_edac.c                     |  4 ++--
+ drivers/gpu/drm/drm_atomic.c                 |  3 ++-
+ drivers/hwtracing/intel_th/msu.c             |  2 +-
+ drivers/pinctrl/pinctrl-utils.c              |  2 +-
+ drivers/vhost/vringh.c                       |  3 ++-
+ include/linux/slab.h                         | 18 ++++++++++++++++++
+ mm/slab_common.c                             |  6 +++---
+ sound/core/pcm_lib.c                         |  4 ++--
+ 10 files changed, 36 insertions(+), 13 deletions(-)
 
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+2.29.1
+
