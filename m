@@ -2,117 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8033E2AB351
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 10:14:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DAC52AB357
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 10:14:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728462AbgKIJOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 04:14:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27462 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726482AbgKIJOD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Nov 2020 04:14:03 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A992TQG007524;
-        Mon, 9 Nov 2020 04:14:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=wxdt/yKAtHEfPrCv8biItrCI1V4rQsjdX3/IyrpZhSM=;
- b=WePHTeDaBxA4Vx0E5DUSzqDvDdUVJuZH5LYb4SKQC0wLrPHEg/ov77HU8tvfiiBRPxDY
- jvUzzOwGbBoOE8W88ovBmI63PxAwQ4hSXOh+SCQCQQqbkVPwcpJlFXRAy2Ubf+nqnsYd
- pb0JVC+PylhZM46Q2recwMpqraO9YbD18Y0SZEvAqO1sEauFjtXP45+DEHiwWTriC4uj
- PH9ylZEeRVUKHxqmErn1InOorcQF52QNbYfZv6NermAckEzgB78o2FyLwkRFOC58oiBG
- B8w07KPak7zzsqW8p8a9O3gRjGDr8ktaAT4fT+UxzF6hWXr3FKi578enNmnrIS3kyt3W aQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34p9qj2r5y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Nov 2020 04:14:01 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A992Ze7008109;
-        Mon, 9 Nov 2020 04:14:01 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34p9qj2r5e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Nov 2020 04:14:01 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A99BlU1014914;
-        Mon, 9 Nov 2020 09:13:59 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 34p26ph9m4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Nov 2020 09:13:59 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A99DujG8913600
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Nov 2020 09:13:57 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C53E911C052;
-        Mon,  9 Nov 2020 09:13:56 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A67E11C050;
-        Mon,  9 Nov 2020 09:13:56 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.151.243])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Nov 2020 09:13:56 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 1/4] memory: allocation in low memory
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-References: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
- <1601303017-8176-2-git-send-email-pmorel@linux.ibm.com>
- <20200928173147.750e7358.cohuck@redhat.com>
- <136e1860-ddbc-edc0-7e67-fdbd8112a01e@linux.ibm.com>
- <f2ff3ddd-c70e-b2cc-b58f-bbcb1e4684d6@linux.ibm.com>
- <63ac15b1-b4fe-b1b5-700f-ae403ce7fb85@linux.ibm.com>
- <fc553f1a-8ddd-59b0-9dec-8bdddfb5483d@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <9dc9da3b-45de-7cb2-68ed-e5f7ada6c8b0@linux.ibm.com>
-Date:   Mon, 9 Nov 2020 10:13:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S1729881AbgKIJOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 04:14:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50564 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727920AbgKIJOe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Nov 2020 04:14:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1604913273;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KihTEpPcQ9L598DE5g+gOSNJvgiBXCjZmgQm64yE1sM=;
+        b=eyxTZQy6kVXp1XPi6O0b8+s6CPM/2WmcSvC5oB2n2VDfGBnstM7NMBCX/4Wpi8DP+eV+tx
+        o4+dwwjEdx1Qt2VFsD6PH9/i85B7so2RckfPonItP0LE2hY3U5jiBibTp2OnEn4XA/3d25
+        jKWWHuF1VhgC6tdWYRbAkDCTCZ7y3Es=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-131-j2dZGLI5P1KQahwIHa-MKg-1; Mon, 09 Nov 2020 04:14:29 -0500
+X-MC-Unique: j2dZGLI5P1KQahwIHa-MKg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C3931868416;
+        Mon,  9 Nov 2020 09:14:28 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.176])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E70845D9D2;
+        Mon,  9 Nov 2020 09:14:22 +0000 (UTC)
+Date:   Mon, 9 Nov 2020 10:14:20 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, Dave.Martin@arm.com,
+        peter.maydell@linaro.org, eric.auger@redhat.com
+Subject: Re: [PATCH 0/4] KVM: selftests: Add get-reg-list regression test
+Message-ID: <20201109091420.s2ie4ae3ffsvupx2@kamzik.brq.redhat.com>
+References: <20201029201703.102716-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <fc553f1a-8ddd-59b0-9dec-8bdddfb5483d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-09_02:2020-11-05,2020-11-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 adultscore=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 suspectscore=0
- phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011090055
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201029201703.102716-1-drjones@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 11/6/20 2:25 PM, Paolo Bonzini wrote:
-> On 05/11/20 15:15, Janosch Frank wrote:
->>> Isn't it possible to go on with this patch series.
->>> It can be adapted later to the changes that will be introduced by
->>> Claudio when it is final.
->>>
->>>
->> Pierre, that's outside of my jurisdiction, you're adding code to the
->> common code library.
->>
->> I've set Paolo CC, let's see if he finds this thread:)
->>
+On Thu, Oct 29, 2020 at 09:16:59PM +0100, Andrew Jones wrote:
+> Since Eric complained in his KVM Forum talk that there weren't any
+> aarch64-specific KVM selftests, now he gets to review one. This test
+> was inspired by recent regression report about get-reg-list losing
+> a register between an old kernel version and a new one.
 > 
-> I have queued Claudio's series already, so let's start from there.
+> Thanks,
+> drew
 > 
-> Paolo
 > 
+> Andrew Jones (4):
+>   KVM: selftests: Don't require THP to run tests
+>   KVM: selftests: Add aarch64 get-reg-list test
+>   KVM: selftests: Update aarch64 get-reg-list blessed list
+>   KVM: selftests: Add blessed SVE registers to get-reg-list
+>
 
-OK, thanks
+Paolo,
 
-Pierre
+I see you silently applied this series to kvm/master, but there's a
+v2 of the series on the list which incorporates Marc's comments. And,
+the application of the series is bad, because you've squashed "Update
+aarch64 get-reg-list blessed list" into "Add aarch64 get-reg-list test".
+Those were created as separate patches on purpose in order for the
+commit message of "Add aarch64 get-reg-list test" to reflect the kernel
+version from which the blessed reg list was primed and the commit
+message of "Update aarch64 get-reg-list blessed list" to explicitly
+point out the new commits that introduce the new registers since the
+priming kernel version up to the current kernel version. The division
+was also done to ensure the same pattern is used for future updates of
+the list.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Thanks,
+drew
+
