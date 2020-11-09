@@ -2,51 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72D1C2AC7EE
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 23:01:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 291C82AC80D
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 23:09:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730554AbgKIWBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 17:01:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50548 "EHLO mail.kernel.org"
+        id S1730324AbgKIWJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 17:09:11 -0500
+Received: from mga12.intel.com ([192.55.52.136]:40676 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730284AbgKIWBn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 17:01:43 -0500
-Subject: Re: [GIT PULL] KVM fixes and selftests for 5.10-rc4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604959302;
-        bh=9LVHdOL5dfNlFej2f8TcrAjDTNDnRNbp51CcPp1jZR0=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=iAfiUzHQ64fuRgB2Kn1QXgg16S5NLFzIjkGI4sTQsDt0IDF1ClrDVN8w6UjlkOvBS
-         YOZMBQZmQatsL2kUAqygaHZj4o0pXlZd8qYygV94inEhHbltHzDlOjXZ9I08GgobTT
-         5APEV5KJu2c7g0u7I2i7atxe2GJmMYg6wzDzISxk=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20201109194739.1035120-1-pbonzini@redhat.com>
-References: <20201109194739.1035120-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20201109194739.1035120-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 6d6a18fdde8b86b919b740ad629153de432d12a8
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 407ab579637ced6dc32cfb2295afb7259cca4b22
-Message-Id: <160495930279.30617.9344510389814115164.pr-tracker-bot@kernel.org>
-Date:   Mon, 09 Nov 2020 22:01:42 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        id S1725946AbgKIWJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 17:09:11 -0500
+IronPort-SDR: E8wx47jbtfJISQnehsPbhwGJn+DzpDUdCX0tIeQcBwPs7NhduHOiI/LxHRhktQ+5Gx2exe7fis
+ D8GNTn8fWv1Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9800"; a="149159709"
+X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
+   d="scan'208";a="149159709"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 14:09:10 -0800
+IronPort-SDR: mQI2yGa2ahYt3jSSfoD/vi3GJ9vubhkdb2KQNDBoeq5tjBMQ+1SshO3mRbUOCncxzufnOC5v6o
+ SO9Af1mVf5eQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
+   d="scan'208";a="398432646"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga001.jf.intel.com with ESMTP; 09 Nov 2020 14:09:10 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 9 Nov 2020 14:09:09 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 9 Nov 2020 14:09:09 -0800
+Received: from fmsmsx610.amr.corp.intel.com ([10.18.126.90]) by
+ fmsmsx610.amr.corp.intel.com ([10.18.126.90]) with mapi id 15.01.1713.004;
+ Mon, 9 Nov 2020 14:09:09 -0800
+From:   "Luck, Tony" <tony.luck@intel.com>
+To:     Qian Cai <cai@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-tip-commits@vger.kernel.org" 
+        <linux-tip-commits@vger.kernel.org>
+CC:     Boris Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
+        x86 <x86@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [tip: ras/core] x86/mce: Enable additional error logging on
+ certain Intel CPUs
+Thread-Topic: [tip: ras/core] x86/mce: Enable additional error logging on
+ certain Intel CPUs
+Thread-Index: AQHWsQncdZGZz6bl20aw0A24zT9Gy6nA6f4A//98jeA=
+Date:   Mon, 9 Nov 2020 22:09:08 +0000
+Message-ID: <bfc274fc27724ea39ecac1e7ac834ed8@intel.com>
+References: <20201030190807.GA13884@agluck-desk2.amr.corp.intel.com>
+         <160431588828.397.16468104725047768957.tip-bot2@tip-bot2>
+ <3f863634cd75824907e8ccf8164548c2ef036f20.camel@redhat.com>
+In-Reply-To: <3f863634cd75824907e8ccf8164548c2ef036f20.camel@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.5.1.3
+x-originating-ip: [10.22.254.132]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Mon,  9 Nov 2020 14:47:39 -0500:
-
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/407ab579637ced6dc32cfb2295afb7259cca4b22
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+V2hhdCBkb2VzIEtWTSBkbyB3aXRoIG1vZGVsIHNwZWNpZmljIE1TUnM/DQoNCkxvb2tzIGxpa2Ug
+eW91IGxldCB0aGUgZ3Vlc3QgYmVsaWV2ZSBpdCB3YXMgcnVubmluZyBvbiBvbmUgb2YgU2FuZHkg
+QnJpZGdlLCBJdnkgQnJpZGdlLCBIYXN3ZWxsIChYZW9uKS4NCg0KU28sIHRoZSBjb3JlIE1DRSBj
+b2RlIHRyaWVkIHRvIGVuYWJsZSBleHRlbmRlZCBlcnJvciByZXBvcnRpbmcuDQoNCklmIHRoZXJl
+IGlzIGEgbW9kZSB0byBoYXZlIEtWTSBsZXQgdGhlIGd1ZXN0IHRoaW5rIHRoYXQgaXQgcmVhZC93
+cm90ZSBNU1IgMHgxN0YsDQpidXQgYWN0dWFsbHksIGRvZXNuJ3QgZG8gaXQgLi4uIHRoYXQgd291
+bGQgc2VlbSB0byBiZSBhIHJlYXNvbmFibGUgdGhpbmcgdG8gZG8gaGVyZS4NCg0KLVRvbnkNCg==
