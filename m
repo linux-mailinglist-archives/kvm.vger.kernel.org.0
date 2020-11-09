@@ -2,186 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD51C2AB2A8
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 09:44:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8033E2AB351
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 10:14:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729770AbgKIIoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 03:44:46 -0500
-Received: from mga06.intel.com ([134.134.136.31]:5481 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726127AbgKIIop (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 03:44:45 -0500
-IronPort-SDR: Qs8cHwYvmGnic3fcikFX1xyYzk+48O3hIDKyyHuMP/R7n6yYh3j7A6Y/9L2c1W6sMXAXbBUBl+
- fosXP9MpGzrA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9799"; a="231401659"
-X-IronPort-AV: E=Sophos;i="5.77,463,1596524400"; 
-   d="scan'208";a="231401659"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 00:44:45 -0800
-IronPort-SDR: IfG8q/sA5EMlyMjSvfUVNc+EaAlzDVZgRGJpX0K7ztOK0lomesX1KEuchnWCGhkYW9POxwry58
- wHJVsBh0G9fA==
-X-IronPort-AV: E=Sophos;i="5.77,463,1596524400"; 
-   d="scan'208";a="540750920"
-Received: from sfhansen-mobl.ger.corp.intel.com ([10.249.254.141])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 00:44:40 -0800
-Message-ID: <504d77b87c81b7027157e0c7b5286e17123c59d9.camel@linux.intel.com>
-Subject: Re: [PATCH v5 05/15] mm/frame-vector: Use FOLL_LONGTERM
-From:   Thomas =?ISO-8859-1?Q?Hellstr=F6m?= 
-        <thomas.hellstrom@linux.intel.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>, Daniel Vetter <daniel@ffwll.ch>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        J??r??me Glisse <jglisse@redhat.com>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>
-Date:   Mon, 09 Nov 2020 09:44:02 +0100
-In-Reply-To: <20201106125505.GO36674@ziepe.ca>
-References: <CAKMK7uH=0+3FSR4LxP7bJUB4BsCcnCzfK2=D+2Am9QNmfZEmfw@mail.gmail.com>
-         <20201104163758.GA17425@infradead.org>
-         <20201104164119.GA18218@infradead.org> <20201104181708.GU36674@ziepe.ca>
-         <d3497583-2338-596e-c764-8c571b7d22cf@nvidia.com>
-         <20201105092524.GQ401619@phenom.ffwll.local>
-         <20201105124950.GZ36674@ziepe.ca>
-         <7ae3486d-095e-cf4e-6b0f-339d99709996@nvidia.com>
-         <CAKMK7uGRw=xXE+D=JJsNeRav9+hdO4tcDSvDbAuWfc3T4VkoJw@mail.gmail.com>
-         <CAKMK7uFb2uhfRCwe1y5Kafd-WWqE_F3_FfpHR9f8-X-aHhgjOQ@mail.gmail.com>
-         <20201106125505.GO36674@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        id S1728462AbgKIJOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 04:14:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27462 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726482AbgKIJOD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Nov 2020 04:14:03 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A992TQG007524;
+        Mon, 9 Nov 2020 04:14:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wxdt/yKAtHEfPrCv8biItrCI1V4rQsjdX3/IyrpZhSM=;
+ b=WePHTeDaBxA4Vx0E5DUSzqDvDdUVJuZH5LYb4SKQC0wLrPHEg/ov77HU8tvfiiBRPxDY
+ jvUzzOwGbBoOE8W88ovBmI63PxAwQ4hSXOh+SCQCQQqbkVPwcpJlFXRAy2Ubf+nqnsYd
+ pb0JVC+PylhZM46Q2recwMpqraO9YbD18Y0SZEvAqO1sEauFjtXP45+DEHiwWTriC4uj
+ PH9ylZEeRVUKHxqmErn1InOorcQF52QNbYfZv6NermAckEzgB78o2FyLwkRFOC58oiBG
+ B8w07KPak7zzsqW8p8a9O3gRjGDr8ktaAT4fT+UxzF6hWXr3FKi578enNmnrIS3kyt3W aQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34p9qj2r5y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Nov 2020 04:14:01 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A992Ze7008109;
+        Mon, 9 Nov 2020 04:14:01 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34p9qj2r5e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Nov 2020 04:14:01 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A99BlU1014914;
+        Mon, 9 Nov 2020 09:13:59 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 34p26ph9m4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Nov 2020 09:13:59 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0A99DujG8913600
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 Nov 2020 09:13:57 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C53E911C052;
+        Mon,  9 Nov 2020 09:13:56 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5A67E11C050;
+        Mon,  9 Nov 2020 09:13:56 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.151.243])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  9 Nov 2020 09:13:56 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 1/4] memory: allocation in low memory
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com
+References: <1601303017-8176-1-git-send-email-pmorel@linux.ibm.com>
+ <1601303017-8176-2-git-send-email-pmorel@linux.ibm.com>
+ <20200928173147.750e7358.cohuck@redhat.com>
+ <136e1860-ddbc-edc0-7e67-fdbd8112a01e@linux.ibm.com>
+ <f2ff3ddd-c70e-b2cc-b58f-bbcb1e4684d6@linux.ibm.com>
+ <63ac15b1-b4fe-b1b5-700f-ae403ce7fb85@linux.ibm.com>
+ <fc553f1a-8ddd-59b0-9dec-8bdddfb5483d@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <9dc9da3b-45de-7cb2-68ed-e5f7ada6c8b0@linux.ibm.com>
+Date:   Mon, 9 Nov 2020 10:13:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
+In-Reply-To: <fc553f1a-8ddd-59b0-9dec-8bdddfb5483d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-09_02:2020-11-05,2020-11-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011090055
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2020-11-06 at 08:55 -0400, Jason Gunthorpe wrote:
-> On Fri, Nov 06, 2020 at 11:27:59AM +0100, Daniel Vetter wrote:
-> > On Fri, Nov 6, 2020 at 11:01 AM Daniel Vetter <daniel@ffwll.ch>
-> > wrote:
-> > > On Fri, Nov 6, 2020 at 5:08 AM John Hubbard <jhubbard@nvidia.com>
-> > > wrote:
-> > > > On 11/5/20 4:49 AM, Jason Gunthorpe wrote:
-> > > > > On Thu, Nov 05, 2020 at 10:25:24AM +0100, Daniel Vetter
-> > > > > wrote:
-> > > > > > > /*
-> > > > > > >   * If we can't determine whether or not a pte is
-> > > > > > > special, then fail immediately
-> > > > > > >   * for ptes. Note, we can still pin HugeTLB and THP as
-> > > > > > > these are guaranteed not
-> > > > > > >   * to be special.
-> > > > > > >   *
-> > > > > > >   * For a futex to be placed on a THP tail page,
-> > > > > > > get_futex_key requires a
-> > > > > > >   * get_user_pages_fast_only implementation that can pin
-> > > > > > > pages. Thus it's still
-> > > > > > >   * useful to have gup_huge_pmd even if we can't operate
-> > > > > > > on ptes.
-> > > > > > >   */
-> > > > > > 
-> > > > > > We support hugepage faults in gpu drivers since recently,
-> > > > > > and I'm not
-> > > > > > seeing a pud_mkhugespecial anywhere. So not sure this
-> > > > > > works, but probably
-> > > > > > just me missing something again.
-> > > > > 
-> > > > > It means ioremap can't create an IO page PUD, it has to be
-> > > > > broken up.
-> > > > > 
-> > > > > Does ioremap even create anything larger than PTEs?
-> > > 
-> > > gpu drivers also tend to use vmf_insert_pfn* directly, so we can
-> > > do
-> > > on-demand paging and move buffers around. From what I glanced for
-> > > lowest level we to the pte_mkspecial correctly (I think I
-> > > convinced
-> > > myself that vm_insert_pfn does that), but for pud/pmd levels it
-> > > seems
-> > > just yolo.
-> > 
-> > So I dug around a bit more and ttm sets PFN_DEV | PFN_MAP to get
-> > past
-> > the various pft_t_devmap checks (see e.g.
-> > vmf_insert_pfn_pmd_prot()).
-> > x86-64 has ARCH_HAS_PTE_DEVMAP, and gup.c seems to handle these
-> > specially, but frankly I got totally lost in what this does.
+
+
+On 11/6/20 2:25 PM, Paolo Bonzini wrote:
+> On 05/11/20 15:15, Janosch Frank wrote:
+>>> Isn't it possible to go on with this patch series.
+>>> It can be adapted later to the changes that will be introduced by
+>>> Claudio when it is final.
+>>>
+>>>
+>> Pierre, that's outside of my jurisdiction, you're adding code to the
+>> common code library.
+>>
+>> I've set Paolo CC, let's see if he finds this thread:)
+>>
 > 
-> The fact vmf_insert_pfn_pmd_prot() has all those BUG_ON's to prevent
-> putting VM_PFNMAP pages into the page tables seems like a big red
-> flag.
+> I have queued Claudio's series already, so let's start from there.
 > 
-> The comment seems to confirm what we are talking about here:
+> Paolo
 > 
-> 	/*
-> 	 * If we had pmd_special, we could avoid all these
-> restrictions,
-> 	 * but we need to be consistent with PTEs and architectures
-> that
-> 	 * can't support a 'special' bit.
-> 	 */
-> 
-> ie without the ability to mark special we can't block fast gup and
-> anyone who does O_DIRECT on these ranges will crash the kernel when
-> it
-> tries to convert a IO page into a struct page.
-> 
-> Should be easy enough to directly test?
-> 
-> Putting non-struct page PTEs into a VMA without setting VM_PFNMAP
-> just
-> seems horribly wrong to me.
 
-Although core mm special huge-page support is currently quite limited,
-some time ago, I extended the pre-existing vma_is_dax() to
-vma_is_special_huge():
+OK, thanks
 
-/**
- * vma_is_special_huge - Are transhuge page-table entries considered
-special?
- * @vma: Pointer to the struct vm_area_struct to consider
- *
- * Whether transhuge page-table entries are considered "special"
-following
- * the definition in vm_normal_page().
- *
- * Return: true if transhuge page-table entries should be considered
-special,
- * false otherwise.
- */
-static inline bool vma_is_special_huge(const struct vm_area_struct
-*vma)
-{
-	return vma_is_dax(vma) || (vma->vm_file &&
-				   (vma->vm_flags & (VM_PFNMAP |
-VM_MIXEDMAP)));
-}
+Pierre
 
-meaning that currently all transhuge page-table-entries in a PFNMAP or
-MIXEDMAP vma are considered "special". The number of calls to this
-function (mainly in the page-splitting code) is quite limited so
-replacing it with a more elaborate per-page-table-entry scheme would, I
-guess, definitely be possible. Although all functions using it would
-need to require a fallback path for architectures not supporting it.
-
-/Thomas
-
-
-
-> 
-> Jason
-
+-- 
+Pierre Morel
+IBM Lab Boeblingen
