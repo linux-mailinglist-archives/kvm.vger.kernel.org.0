@@ -2,83 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 495DE2AC1E2
-	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 18:11:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7C052AC24B
+	for <lists+kvm@lfdr.de>; Mon,  9 Nov 2020 18:30:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730208AbgKIRLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 12:11:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60108 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729432AbgKIRLf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 12:11:35 -0500
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BACAC0613CF
-        for <kvm@vger.kernel.org>; Mon,  9 Nov 2020 09:11:34 -0800 (PST)
-Received: by mail-io1-xd42.google.com with SMTP id k21so10549177ioa.9
-        for <kvm@vger.kernel.org>; Mon, 09 Nov 2020 09:11:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P7u70PYKGiI0eRkh5NpQgC8KQUNro+UyZhli4N8InKI=;
-        b=Amqlrsz2wodJrKO/6JXvJI9HlqosYhqO3IVvLHsRxO8wMdjRlXjxEl+o6fj+Mi/2Fc
-         RQW8h4N3KlKNegU/PSpfUST87iI80n+NFR0ywnW1I62Q8yyxLR8fc0uC+r0xGhxpQRCG
-         GYOI1hCWh4C/C11UNvVgRdvIJIAbg/jTjxLKPfuSieCQ0J96+9AwJkaHKAYwPlOH6mwP
-         uu7UZ4gFv+wnehMQMLmkPgFjS0jFLEoMHSvIq0Nn839e98ZvYV5OrSqkcDY1TVpkT8ni
-         n3lEK8YCsnuvux/fne0lIXzfcwDs5awkzvH6r2fOfTABaZ3ITVDHVRBNDtYgnozRfLmt
-         YlyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P7u70PYKGiI0eRkh5NpQgC8KQUNro+UyZhli4N8InKI=;
-        b=EWKrTF3lWxBISReqpC1Z0JPulgshNog2qXuH8fLZxCnVtnyAX2+clDt40esfVRumbi
-         JKbPiGdQAM5yulmjDRaPCcz1zHcjISB3ylWezlhSzrxPBSZ7mxLxjzE18/lMIVp1beV5
-         jR5VxuvUtO5BfSiVZk4aEksH54QOgCeApP+L9vd7ABcXhuPFAlQT6gG+n1t7JxmF4Fdh
-         lojW8CIec+VYno5vYYECDfcCBpFKLgt1MG0AqjfKuh9FO1Uqjsj4fkysUle4CpZIKVEJ
-         qWrFon2P5oyL9yEbjP2PdxZKjlCcIHTeB+uACPVmv9Q5RT7U68wWhVDd7Ha41Et3o+BC
-         7FCg==
-X-Gm-Message-State: AOAM531qcwDv96BSN6tMcxk7e0AvMvoE4mhQ8okkDpVHKVCz9SBDdm6L
-        QvNDpdzbsOsZ825kzkre2IuQE3VkQV/HiS8tzpeoYw==
-X-Google-Smtp-Source: ABdhPJxB1JicA1FOsZGDfygi1wkeDEPeYwPrKW03KNbXOSJhs/y3w7IhHTqQcWD4ygD1upsT2TLeLiIjCthW0xkhLNU=
-X-Received: by 2002:a05:6638:124f:: with SMTP id o15mr11618258jas.40.1604941893375;
- Mon, 09 Nov 2020 09:11:33 -0800 (PST)
+        id S1732005AbgKIRar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 12:30:47 -0500
+Received: from nat-hk.nvidia.com ([203.18.50.4]:44483 "EHLO nat-hk.nvidia.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730827AbgKIRaq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 12:30:46 -0500
+Received: from HKMAIL101.nvidia.com (Not Verified[10.18.92.77]) by nat-hk.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5fa97cc50000>; Tue, 10 Nov 2020 01:30:45 +0800
+Received: from HKMAIL102.nvidia.com (10.18.16.11) by HKMAIL101.nvidia.com
+ (10.18.16.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 9 Nov
+ 2020 17:30:42 +0000
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by HKMAIL102.nvidia.com (10.18.16.11) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Mon, 9 Nov 2020 17:30:42 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SUDuqGUh4jwTr8MJovYxIRlVGT1rUbf0F20d4sa1VAnNqzM+006kjcbkS+9ljlOZYHXYDpUpMiR1b+KRzMN6yTm6NBRqkR+aHJf/aryROApAJrxnK4HoGtO/MjQbZDyrckwqUb7MZLWoUBtdn7JYDUzdzE3uwN5Nho69ZG3+SeuBiZR6IJ95oGQsn7ZZANvat+4Oj5XJ/kHgVKDl/rH869jXZnRqCmjHL5+gZCPoXVFTb0ZyG9ln4V1lFaIXch9sVVJT2mdLgLnaSC0n7L2WWQ8QX7hNpLqitSfZaYiKRVHgobrIO4d8FtQSVERo05LDIYzUQiORDjUw6me+3Kl2BA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0OOhT3z29bMPnKfH6ci/B4Z/dybfwXtgbGNCrwV+kgg=;
+ b=mNG/vzYafn4qBGDjiX67SiI8ymbrWEj2UcqsUhWOvgx+GgZfu1AP1iuP5r8YnOnjFYznbTFo6xqeTGBJ5TLrIcngDpkl7/Gfn9GVbOgbZ3ZWVkJnP1OUNHfxL1FFPSRVU8RKNw92kpzF0F65dAr90f6mLbVN6KN0TeW4IrxrVmfrC+t8M2sge+6zsB865udp7JPcQG/UwxIcO6mzl/dyT6B1mg8T9ExL6S27Oj3L/pk+bWuIlvVmAYjwrJyQ25lNmWOVLlhU2tmSCfjt61NsMT8d947HzJHAdOGoaRCWclz+HXS45aXWLmxk9QWnrTNxOZ2Dl4onB4dTq/MB2pxAzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB3307.namprd12.prod.outlook.com (2603:10b6:5:15d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.24; Mon, 9 Nov
+ 2020 17:30:36 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.032; Mon, 9 Nov 2020
+ 17:30:36 +0000
+Date:   Mon, 9 Nov 2020 13:30:34 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+Message-ID: <20201109173034.GG2620339@nvidia.com>
+References: <20201104135415.GX2620339@nvidia.com>
+ <MWHPR11MB1645524BDEDF8899914F32AE8CED0@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20201106131415.GT2620339@nvidia.com> <20201106164850.GA85879@otc-nc-03>
+ <20201106175131.GW2620339@nvidia.com>
+ <CAPcyv4iYHA1acfo=+fTk+U_TrLbSWJjA6v4oeTXgVYDTrnCoGw@mail.gmail.com>
+ <20201107001207.GA2620339@nvidia.com>
+ <87pn4nk7nn.fsf@nanos.tec.linutronix.de>
+ <20201108235852.GC32074@araj-mobl1.jf.intel.com>
+ <874klykc7h.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <874klykc7h.fsf@nanos.tec.linutronix.de>
+X-ClientProxiedBy: BL0PR01CA0028.prod.exchangelabs.com (2603:10b6:208:71::41)
+ To DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-References: <20201104212357.171559-1-drjones@redhat.com> <20201105185554.GD106309@xz-x1>
- <CANgfPd_97QGP+q8-_VAzhJxw_kdiHcFukAZ-dSp4cNrvKdNEpg@mail.gmail.com>
- <20201106094511.s4dj2a7n32dawt7m@kamzik.brq.redhat.com> <20201106150401.GB138364@xz-x1>
-In-Reply-To: <20201106150401.GB138364@xz-x1>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 9 Nov 2020 09:11:22 -0800
-Message-ID: <CANgfPd-GGqqH6eJoitSsOsJMGPxFusDOTrOZNtGEJiHzHSLHZA@mail.gmail.com>
-Subject: Re: [PATCH 00/11] KVM: selftests: Cleanups
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by BL0PR01CA0028.prod.exchangelabs.com (2603:10b6:208:71::41) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21 via Frontend Transport; Mon, 9 Nov 2020 17:30:35 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kcAzy-0020eX-2p; Mon, 09 Nov 2020 13:30:34 -0400
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1604943045; bh=0OOhT3z29bMPnKfH6ci/B4Z/dybfwXtgbGNCrwV+kgg=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
+        b=DVCYdcX9eTQs7bknwYVC62MXUw+VWAiH7QP0ejvm58/+wMVDN0K3kxOo8ArHl5AZk
+         9j/V2dg4OyglIeBrwOkHwsykBzJX884Kmv8jxVRhp7cfmxyNpdRSaLDWA5ljHpjXDO
+         6ZviwZntmKGI5F2xc7BNCyYzVtKRnZpR9E3yVZvAb3xmyX8X8JWkimJMcdbSM5oXVm
+         nUHd1sCYu8UtUoOeU4qFWe0pJJr3liOoKyb+se9Tb4VZUo+GVkhbRIHdcGIrgIS8a3
+         X/s+/fX6Tj9nswENmaLYSeOrMRhI1/KntZN7brU6qeDaVRkWbpBjUou6uJAppDQlHf
+         rMFkpQ4dyIZgw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 6, 2020 at 7:04 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Fri, Nov 06, 2020 at 10:45:11AM +0100, Andrew Jones wrote:
-> > Yikes! Don't worry about KVM selftests then. Except for one more question?
-> > Can I translate your "looks good to me" into a r-b for the series? And,
-> > same question for Peter. I'll be respinning witht eh PTES_PER_PAGE change
-> > and can add your guys' r-b's if you want to give them.
+On Mon, Nov 09, 2020 at 12:21:22PM +0100, Thomas Gleixner wrote:
 
-Ah yes, please add my reviewed-by as well, sorry that wasn't clear.
+> >> Is the IOMMU/Interrupt remapping unit able to catch such messages which
+> >> go outside the space to which the guest is allowed to signal to? If yes,
+> >> problem solved. If no, then IMS storage in guest memory can't ever work.
+> >
+> > This can probably work for SRIOV devices where guest owns the entire device.
+> > interrupt remap does have RID checks if interrupt arrives at an Interrupt handle
+> > not allocated for that BDF.
+> >
+> > But for SIOV devices there is no PASID filtering at the remap level since
+> > interrupt messages don't carry PASID in the TLP.
+> 
+> PASID is irrelevant here.
+> 
+> If the device sends a message then the remap unit will see the requester
+> ID of the device and if the message it sends is not matching the remap
+> tables then it's caught and the guest is terminated. At least that's how
+> it should be.
 
->
-> Yes, please feel free to add with mine (if there's a repost).  Though I see
-> that Paolo has queued the series already, so maybe it's even easier to directly
-> work on top.
->
-> Thanks!
->
-> --
-> Peter Xu
->
+The SIOV case is to take a single RID and split it to multiple
+VMs and also to the hypervisor. All these things concurrently use the
+same RID, and the IOMMU can't tell them apart.
+
+The hypervisor security domain owns TLPs with no PASID. Each PASID is
+assigned to a VM.
+
+For interrupts, today, they are all generated, with no PASID, to the
+same RID. There is no way for remapping to protect against a guest
+without checking also PASID.
+
+The relavance of PASID is this:
+
+> Again, trap emulate does not work for IMS when the IMS store is software
+> managed guest memory and not part of the device. And that's the whole
+> reason why we are discussing this.
+
+With PASID tagged interrupts and a IOMMU interrupt remapping
+capability that can trigger on PASID, then the platform can provide
+the same level of security as SRIOV - the above is no problem.
+
+The device ensures that all DMAs and all interrupts program by the
+guest are PASID tagged and the platform provides security by checking
+the PASID when delivering the interrupt. Intel IOMMU doesn't work this
+way today, but it makes alot of design sense.
+
+Otherwise the interrupt is effectively delivered to the hypervisor. A
+secure device can *never* allow a guest to specify an addr/data pair
+for a non-PASID tagged TLP, so the device cannot offer IMS to the
+guest.
+
+Jason
