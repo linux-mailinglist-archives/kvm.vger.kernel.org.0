@@ -2,220 +2,331 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50A912AD7B7
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 14:36:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63CD42AD7E0
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 14:42:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731962AbgKJNgp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 08:36:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49120 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730750AbgKJNgf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 08:36:35 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD8B620809;
-        Tue, 10 Nov 2020 13:36:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605015394;
-        bh=2eV54eTlv+uuoGYKqX4qrJwamNweELI+6T+g/GLxlC0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=O6qbaBQ8vM6K283bJ1c6a47YjptftEey1kzn0LEGjagjtEOeQkpWkB/V79EbbaKqT
-         SQwcCZd+hViS4I/dt/sGA/qE0xcSWtircuKQgLXETv4lhkpXw1E5hrUVu4+pfb1ca1
-         B1dV5HOJuoD1IcpAB/Wv/N92gDAGzGhOQUUbmRCM=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kcTp2-009SZy-Qv; Tue, 10 Nov 2020 13:36:33 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH v2 9/9] KVM: arm64: Drop kvm_coproc.h
-Date:   Tue, 10 Nov 2020 13:36:19 +0000
-Message-Id: <20201110133619.451157-10-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201110133619.451157-1-maz@kernel.org>
-References: <20201110133619.451157-1-maz@kernel.org>
+        id S1731018AbgKJNmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 08:42:38 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2492 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729832AbgKJNmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 08:42:37 -0500
+Received: from dggeme753-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CVpvR6PX3zQppv;
+        Tue, 10 Nov 2020 21:42:27 +0800 (CST)
+Received: from [10.174.184.120] (10.174.184.120) by
+ dggeme753-chm.china.huawei.com (10.3.19.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Tue, 10 Nov 2020 21:42:33 +0800
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <alex.williamson@redhat.com>
+CC:     <kwankhede@nvidia.com>, <wu.wubin@huawei.com>,
+        <maoming.maoming@huawei.com>, <xieyingtai@huawei.com>,
+        <lizhengui@huawei.com>, <wubinfeng@huawei.com>,
+        <xuxiaoyang2@huawei.com>
+From:   "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>
+Subject: [PATCH] vfio iommu type1: Improve vfio_iommu_type1_pin_pages
+ performance
+Message-ID: <2553f102-de17-b23b-4cd8-fefaf2a04f24@huawei.com>
+Date:   Tue, 10 Nov 2020 21:42:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.120]
+X-ClientProxiedBy: dggeme710-chm.china.huawei.com (10.1.199.106) To
+ dggeme753-chm.china.huawei.com (10.3.19.99)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_coproc.h used to serve as a compatibility layer for the files
-shared between the 32 and 64 bit ports.
+vfio_iommu_type1_pin_pages is very inefficient because
+it is processed page by page when calling vfio_pin_page_external.
+Added contiguous_vaddr_get_pfn to process continuous pages
+to reduce the number of loops, thereby improving performance.
 
-Another one bites the dust...
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Xiaoyang Xu <xuxiaoyang2@huawei.com>
 ---
- arch/arm64/include/asm/kvm_coproc.h | 38 -----------------------------
- arch/arm64/include/asm/kvm_host.h   | 17 +++++++++++++
- arch/arm64/kvm/arm.c                |  3 +--
- arch/arm64/kvm/guest.c              |  1 -
- arch/arm64/kvm/handle_exit.c        |  1 -
- arch/arm64/kvm/reset.c              |  1 -
- arch/arm64/kvm/sys_regs.c           |  1 -
- 7 files changed, 18 insertions(+), 44 deletions(-)
- delete mode 100644 arch/arm64/include/asm/kvm_coproc.h
+ drivers/vfio/vfio_iommu_type1.c | 241 ++++++++++++++++++++++++++++----
+ 1 file changed, 214 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
-deleted file mode 100644
-index d6bb40122fdb..000000000000
---- a/arch/arm64/include/asm/kvm_coproc.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) 2012,2013 - ARM Ltd
-- * Author: Marc Zyngier <marc.zyngier@arm.com>
-- *
-- * Derived from arch/arm/include/asm/kvm_coproc.h
-- * Copyright (C) 2012 Rusty Russell IBM Corporation
-- */
--
--#ifndef __ARM64_KVM_COPROC_H__
--#define __ARM64_KVM_COPROC_H__
--
--#include <linux/kvm_host.h>
--
--void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
--
--struct kvm_sys_reg_table {
--	const struct sys_reg_desc *table;
--	size_t num;
--};
--
--int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
--int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
--
--#define kvm_coproc_table_init kvm_sys_reg_table_init
--void kvm_sys_reg_table_init(void);
--
--struct kvm_one_reg;
--int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
--int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
--
--#endif /* __ARM64_KVM_COPROC_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c527f9567713..709f892f7a14 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -533,6 +533,12 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+
-+unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
-+int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-+int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+
- int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
- 
-@@ -595,6 +601,17 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
- int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
- 
-+int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
-+
-+void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
-+
-+void kvm_sys_reg_table_init(void);
-+
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5750ec34960e..9d69d2bf6943 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -35,7 +35,6 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sections.h>
- 
- #include <kvm/arm_hypercalls.h>
-@@ -1525,7 +1524,7 @@ static int init_subsystems(void)
- 		goto out;
- 
- 	kvm_perf_init();
--	kvm_coproc_table_init();
-+	kvm_sys_reg_table_init();
- 
- out:
- 	on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3f23f7478d2a..9bbd30e62799 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -24,7 +24,6 @@
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sigcontext.h>
- 
- #include "trace.h"
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index f79137ee4274..cebe39f3b1b6 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -14,7 +14,6 @@
- #include <asm/esr.h>
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/debug-monitors.h>
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f32490229a4c..74ce92a4988c 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -25,7 +25,6 @@
- #include <asm/ptrace.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/virt.h>
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 64fdfb64d791..d2e1d745f067 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -20,7 +20,6 @@
- #include <asm/debug-monitors.h>
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
--- 
-2.28.0
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 67e827638995..935f80807527 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -628,6 +628,206 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+ 	return unlocked;
+ }
 
++static int contiguous_vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
++				    int prot, long npage, unsigned long *phys_pfn)
++{
++	struct page **pages = NULL;
++	unsigned int flags = 0;
++	int i, ret;
++
++	pages = kvmalloc_array(npage, sizeof(struct page *), GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
++
++	if (prot & IOMMU_WRITE)
++		flags |= FOLL_WRITE;
++
++	mmap_read_lock(mm);
++	ret = pin_user_pages_remote(mm, vaddr, npage, flags | FOLL_LONGTERM,
++				    pages, NULL, NULL);
++	mmap_read_unlock(mm);
++
++	for (i = 0; i < ret; i++)
++		*(phys_pfn + i) = page_to_pfn(pages[i]);
++
++	kvfree(pages);
++
++	return ret;
++}
++
++static int vfio_pin_contiguous_pages_external(struct vfio_iommu *iommu,
++				    struct vfio_dma *dma,
++				    unsigned long *user_pfn,
++				    int npage, unsigned long *phys_pfn,
++				    bool do_accounting)
++{
++	int ret, i, j, lock_acct = 0;
++	unsigned long remote_vaddr;
++	dma_addr_t iova;
++	struct mm_struct *mm;
++	struct vfio_pfn *vpfn;
++
++	mm = get_task_mm(dma->task);
++	if (!mm)
++		return -ENODEV;
++
++	iova = user_pfn[0] << PAGE_SHIFT;
++	remote_vaddr = dma->vaddr + iova - dma->iova;
++	ret = contiguous_vaddr_get_pfn(mm, remote_vaddr, dma->prot,
++					    npage, phys_pfn);
++	mmput(mm);
++	if (ret <= 0)
++		return ret;
++
++	npage = ret;
++	for (i = 0; i < npage; i++) {
++		iova = user_pfn[i] << PAGE_SHIFT;
++		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
++		if (ret)
++			goto unwind;
++
++		if (!is_invalid_reserved_pfn(phys_pfn[i]))
++			lock_acct++;
++
++		if (iommu->dirty_page_tracking) {
++			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
++
++			/*
++			 * Bitmap populated with the smallest supported page
++			 * size
++			 */
++			bitmap_set(dma->bitmap,
++				   (iova - dma->iova) >> pgshift, 1);
++		}
++	}
++
++	if (do_accounting) {
++		ret = vfio_lock_acct(dma, lock_acct, true);
++		if (ret) {
++			if (ret == -ENOMEM)
++				pr_warn("%s: Task %s (%d) RLIMIT_MEMLOCK (%ld) exceeded\n",
++					__func__, dma->task->comm, task_pid_nr(dma->task),
++					task_rlimit(dma->task, RLIMIT_MEMLOCK));
++			goto unwind;
++		}
++	}
++
++	return i;
++unwind:
++	for (j = 0; j < npage; j++) {
++		put_pfn(phys_pfn[j], dma->prot);
++		phys_pfn[j] = 0;
++	}
++
++	for (j = 0; j < i; j++) {
++		iova = user_pfn[j] << PAGE_SHIFT;
++		vpfn = vfio_find_vpfn(dma, iova);
++		if (vpfn)
++			vfio_remove_from_pfn_list(dma, vpfn);
++	}
++
++	return ret;
++}
++
++static int vfio_iommu_type1_pin_contiguous_pages(struct vfio_iommu *iommu,
++					    struct vfio_dma *dma,
++					    unsigned long *user_pfn,
++					    int npage, unsigned long *phys_pfn,
++					    bool do_accounting)
++{
++	int ret, i, j;
++	unsigned long remote_vaddr;
++	dma_addr_t iova;
++
++	ret = vfio_pin_contiguous_pages_external(iommu, dma, user_pfn, npage,
++				phys_pfn, do_accounting);
++	if (ret == npage)
++		return ret;
++
++	if (ret < 0)
++		ret = 0;
++
++	for (i = ret; i < npage; i++) {
++		iova = user_pfn[i] << PAGE_SHIFT;
++		remote_vaddr = dma->vaddr + iova - dma->iova;
++
++		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
++			    do_accounting);
++		if (ret)
++			goto pin_unwind;
++
++		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
++		if (ret) {
++			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
++				vfio_lock_acct(dma, -1, true);
++			goto pin_unwind;
++		}
++
++		if (iommu->dirty_page_tracking) {
++			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
++
++			/*
++			 * Bitmap populated with the smallest supported page
++			 * size
++			 */
++			bitmap_set(dma->bitmap,
++					   (iova - dma->iova) >> pgshift, 1);
++		}
++	}
++
++	return i;
++
++pin_unwind:
++	phys_pfn[i] = 0;
++	for (j = 0; j < i; j++) {
++		dma_addr_t iova;
++
++		iova = user_pfn[j] << PAGE_SHIFT;
++		vfio_unpin_page_external(dma, iova, do_accounting);
++		phys_pfn[j] = 0;
++	}
++
++	return ret;
++}
++
++static int vfio_iommu_type1_get_contiguous_pages_length(struct vfio_iommu *iommu,
++				    unsigned long *user_pfn, int npage, int prot)
++{
++	struct vfio_dma *dma_base;
++	int i;
++	dma_addr_t iova;
++	struct vfio_pfn *vpfn;
++
++	if (npage <= 1)
++		return npage;
++
++	iova = user_pfn[0] << PAGE_SHIFT;
++	dma_base = vfio_find_dma(iommu, iova, PAGE_SIZE);
++	if (!dma_base)
++		return -EINVAL;
++
++	if ((dma_base->prot & prot) != prot)
++		return -EPERM;
++
++	for (i = 1; i < npage; i++) {
++		iova = user_pfn[i] << PAGE_SHIFT;
++
++		if (iova >= dma_base->iova + dma_base->size ||
++				iova + PAGE_SIZE <= dma_base->iova)
++			break;
++
++		vpfn = vfio_iova_get_vfio_pfn(dma_base, iova);
++		if (vpfn) {
++			vfio_iova_put_vfio_pfn(dma_base, vpfn);
++			break;
++		}
++
++		if (user_pfn[i] != user_pfn[0] + i)
++			break;
++	}
++	return i;
++}
++
+ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 				      struct iommu_group *iommu_group,
+ 				      unsigned long *user_pfn,
+@@ -637,9 +837,9 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 	struct vfio_iommu *iommu = iommu_data;
+ 	struct vfio_group *group;
+ 	int i, j, ret;
+-	unsigned long remote_vaddr;
+ 	struct vfio_dma *dma;
+ 	bool do_accounting;
++	int contiguous_npage;
+
+ 	if (!iommu || !user_pfn || !phys_pfn)
+ 		return -EINVAL;
+@@ -663,7 +863,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 	 */
+ 	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
+
+-	for (i = 0; i < npage; i++) {
++	for (i = 0; i < npage; i += contiguous_npage) {
+ 		dma_addr_t iova;
+ 		struct vfio_pfn *vpfn;
+
+@@ -682,31 +882,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+ 		if (vpfn) {
+ 			phys_pfn[i] = vpfn->pfn;
+-			continue;
+-		}
+-
+-		remote_vaddr = dma->vaddr + (iova - dma->iova);
+-		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
+-					     do_accounting);
+-		if (ret)
+-			goto pin_unwind;
+-
+-		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+-		if (ret) {
+-			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
+-				vfio_lock_acct(dma, -1, true);
+-			goto pin_unwind;
+-		}
+-
+-		if (iommu->dirty_page_tracking) {
+-			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+-
+-			/*
+-			 * Bitmap populated with the smallest supported page
+-			 * size
+-			 */
+-			bitmap_set(dma->bitmap,
+-				   (iova - dma->iova) >> pgshift, 1);
++			contiguous_npage = 1;
++		} else {
++			ret = vfio_iommu_type1_get_contiguous_pages_length(iommu,
++					&user_pfn[i], npage - i, prot);
++			if (ret < 0)
++				goto pin_unwind;
++
++			ret = vfio_iommu_type1_pin_contiguous_pages(iommu,
++					dma, &user_pfn[i], ret, &phys_pfn[i], do_accounting);
++			if (ret < 0)
++				goto pin_unwind;
++			contiguous_npage = ret;
+ 		}
+ 	}
+ 	ret = i;
+--
+2.19.1
