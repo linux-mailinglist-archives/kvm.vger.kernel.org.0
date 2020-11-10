@@ -2,85 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20C4D2B7625
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 07:08:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A7FF2B76F6
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 08:30:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726174AbgKRGIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 01:08:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37791 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725355AbgKRGIa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 01:08:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605679709;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Sz/m+8Uq0tqcNbVPs1/yM0jQdLFpgRv+8LG/piLjalw=;
-        b=jSlhP82l3fXKFkkP74kkVecSu2Diz1QpgENJyB+aADsJ11n1Aw7ATCRu/Ms4JgrTgGc/hs
-        viOOFm+n4JL7QbwhZRJe8gwbri5vNNtosugX64DuOP9BcDVGOZy443BaXmUBxipfxQTOPT
-        7/VZGZ3ctM/iQKERugOVCSOC+F42Niw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-512-eUvEClr4PgO9a3DPlib2SQ-1; Wed, 18 Nov 2020 01:08:26 -0500
-X-MC-Unique: eUvEClr4PgO9a3DPlib2SQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E287764082;
-        Wed, 18 Nov 2020 06:08:24 +0000 (UTC)
-Received: from [10.72.13.172] (ovpn-13-172.pek2.redhat.com [10.72.13.172])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 72A7D19C59;
-        Wed, 18 Nov 2020 06:08:19 +0000 (UTC)
-Subject: Re: [PATCH net] vhost_vdpa: Return -EFUALT if copy_from_user() fails
-From:   Jason Wang <jasowang@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        kuba@kernel.org
-References: <20201023120853.GI282278@mwanda>
- <20201023113326-mutt-send-email-mst@kernel.org>
- <4485cc8d-ac69-c725-8493-eda120e29c41@redhat.com>
-Message-ID: <e7242333-b364-c2d8-53f5-1f688fc4d0b5@redhat.com>
-Date:   Wed, 18 Nov 2020 14:08:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726188AbgKRHaQ convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 18 Nov 2020 02:30:16 -0500
+Received: from sw73-70-41.adsl.seed.net.tw ([203.73.70.41]:46651 "EHLO
+        oa.trendtek.com.tw" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+        with ESMTP id S1725794AbgKRHaQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Nov 2020 02:30:16 -0500
+Received: from [156.96.44.214] ([156.96.44.214])
+        (authenticated bits=0)
+        by oa.trendtek.com.tw (8.13.8/8.13.1) with ESMTP id 0AACIBs8004816
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 20:18:15 +0800
+Message-Id: <202011101218.0AACIBs8004816@oa.trendtek.com.tw>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <4485cc8d-ac69-c725-8493-eda120e29c41@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Corporate and Personal Loan+
+To:     kvm@vger.kernel.org
+From:   "Investment  Corporate" <financialcapability6@gmail.com>
+Date:   Tue, 10 Nov 2020 04:18:10 -0800
+Reply-To: hmurrah39@gmail.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/10/26 上午10:59, Jason Wang wrote:
->
-> On 2020/10/23 下午11:34, Michael S. Tsirkin wrote:
->> On Fri, Oct 23, 2020 at 03:08:53PM +0300, Dan Carpenter wrote:
->>> The copy_to/from_user() functions return the number of bytes which we
->>> weren't able to copy but the ioctl should return -EFAULT if they fail.
->>>
->>> Fixes: a127c5bbb6a8 ("vhost-vdpa: fix backend feature ioctls")
->>> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
->> Acked-by: Michael S. Tsirkin <mst@redhat.com>
->> Needed for stable I guess.
->
->
-> Agree.
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
+Hello kvm@vger.kernel.org
 
 
-Hi Michael.
-
-I don't see this in your tree, please consider to merge.
-
-Thanks
+We are Base Investment Company offering Corporate and Personal Loan at 3% Interest Rate for a duration of 10Years.
 
 
+We also pay 1% commission to brokers, who introduce project owners for finance or other opportunities.
 
+
+Please get back to me if you are interested for more
+
+details.
+
+
+Yours faithfully,
+
+Hashim Murrah
