@@ -2,42 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38D782ACC76
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 04:55:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1F712ACC92
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 04:56:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730684AbgKJDz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 22:55:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56812 "EHLO mail.kernel.org"
+        id S2387493AbgKJD4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 22:56:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57822 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731402AbgKJDz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 22:55:26 -0500
+        id S2387474AbgKJD4D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 22:56:03 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 90A1C21534;
-        Tue, 10 Nov 2020 03:55:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DA54621534;
+        Tue, 10 Nov 2020 03:56:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604980525;
-        bh=imKwv/Fb3tX8Sf2PNoVY7wcaiXIi4oQ+RdrROR2vnxo=;
+        s=default; t=1604980562;
+        bh=cpf2rMftQf7xL/9QBBlS7qxPonhitPWGCCg9v88FIY8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aBHjt5PlamRb8rPRQ9/KPWGfBK76H/luNgBDTBk+vEw3DSZRgvlAN1rL0SkhTIRUw
-         6hIEMsEY9oESsyM4BPwRAbkAbcg5qk/CAFPn3DiB5j+2fZaHbmLViLg1STujofD0Lw
-         t86RkI8XEj2uE/IuY7FxFahyT6P4H/z4M3wUWOWU=
+        b=CPri1TYuekaEBImqXVZsZjAVC88uFXjSuCsjitrGPcnrsvGjg0p+cuShxheI0BZX7
+         hDNniijIwH3nBq/s1QWk+RyQo7pQby5YFEe3+AwuSyBjSFsejZu6NsqEz5+diqojlQ
+         gO0Sn810t0XCoLm+etaNQ48HmeDwCQUv1Sab9UDE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Fred Gao <fred.gao@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Xiong Zhang <xiong.y.zhang@intel.com>,
-        Hang Yuan <hang.yuan@linux.intel.com>,
-        Stuart Summers <stuart.summers@intel.com>,
+Cc:     Zhang Qilong <zhangqilong3@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 32/42] vfio/pci: Bypass IGD init in case of -ENODEV
-Date:   Mon,  9 Nov 2020 22:54:30 -0500
-Message-Id: <20201110035440.424258-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 16/21] vfio: platform: fix reference leak in vfio_platform_open
+Date:   Mon,  9 Nov 2020 22:55:36 -0500
+Message-Id: <20201110035541.424648-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201110035440.424258-1-sashal@kernel.org>
-References: <20201110035440.424258-1-sashal@kernel.org>
+In-Reply-To: <20201110035541.424648-1-sashal@kernel.org>
+References: <20201110035541.424648-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -46,43 +43,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Fred Gao <fred.gao@intel.com>
+From: Zhang Qilong <zhangqilong3@huawei.com>
 
-[ Upstream commit e4eccb853664de7bcf9518fb658f35e748bf1f68 ]
+[ Upstream commit bb742ad01961a3b9d1f9d19375487b879668b6b2 ]
 
-Bypass the IGD initialization when -ENODEV returns,
-that should be the case if opregion is not available for IGD
-or within discrete graphics device's option ROM,
-or host/lpc bridge is not found.
+pm_runtime_get_sync() will increment pm usage counter even it
+failed. Forgetting to call pm_runtime_put will result in
+reference leak in vfio_platform_open, so we should fix it.
 
-Then use of -ENODEV here means no special device resources found
-which needs special care for VFIO, but we still allow other normal
-device resource access.
-
-Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-Cc: Xiong Zhang <xiong.y.zhang@intel.com>
-Cc: Hang Yuan <hang.yuan@linux.intel.com>
-Cc: Stuart Summers <stuart.summers@intel.com>
-Signed-off-by: Fred Gao <fred.gao@intel.com>
+Signed-off-by: Zhang Qilong <zhangqilong3@huawei.com>
+Acked-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/vfio/platform/vfio_platform_common.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index a72fd5309b09f..443a35dde7f52 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -334,7 +334,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
- 	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
- 	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
- 		ret = vfio_pci_igd_init(vdev);
--		if (ret) {
-+		if (ret && ret != -ENODEV) {
- 			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
- 			goto disable_exit;
- 		}
+diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+index c0cd824be2b76..460760d0becfe 100644
+--- a/drivers/vfio/platform/vfio_platform_common.c
++++ b/drivers/vfio/platform/vfio_platform_common.c
+@@ -273,7 +273,7 @@ static int vfio_platform_open(void *device_data)
+ 
+ 		ret = pm_runtime_get_sync(vdev->device);
+ 		if (ret < 0)
+-			goto err_pm;
++			goto err_rst;
+ 
+ 		ret = vfio_platform_call_reset(vdev, &extra_dbg);
+ 		if (ret && vdev->reset_required) {
+@@ -290,7 +290,6 @@ static int vfio_platform_open(void *device_data)
+ 
+ err_rst:
+ 	pm_runtime_put(vdev->device);
+-err_pm:
+ 	vfio_platform_irq_cleanup(vdev);
+ err_irq:
+ 	vfio_platform_regions_cleanup(vdev);
 -- 
 2.27.0
 
