@@ -2,80 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B8962AD90D
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 15:42:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91CAF2AD931
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 15:48:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731038AbgKJOml (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 09:42:41 -0500
-Received: from foss.arm.com ([217.140.110.172]:56840 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730968AbgKJOml (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 09:42:41 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2534C1063;
-        Tue, 10 Nov 2020 06:42:41 -0800 (PST)
-Received: from camtx2.cambridge.arm.com (camtx2.cambridge.arm.com [10.1.7.22])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1EFE63F718;
-        Tue, 10 Nov 2020 06:42:40 -0800 (PST)
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-To:     kvm@vger.kernel.org
-Cc:     mark.rutland@arm.com, jade.alglave@arm.com, luc.maranget@inria.fr,
-        andre.przywara@arm.com, alexandru.elisei@arm.com,
-        drjones@redhat.com
-Subject: [kvm-unit-tests PATCH v2 2/2] arm: Add support for the DEVICE_nGRE and NORMAL_WT memory types
-Date:   Tue, 10 Nov 2020 14:42:06 +0000
-Message-Id: <20201110144207.90693-3-nikos.nikoleris@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201110144207.90693-1-nikos.nikoleris@arm.com>
-References: <20201110144207.90693-1-nikos.nikoleris@arm.com>
-X-ARM-No-Footer: FoSSMail
+        id S1730968AbgKJOso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 09:48:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35460 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730099AbgKJOsn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 09:48:43 -0500
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64387C0613D4
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 06:48:43 -0800 (PST)
+Received: by mail-lf1-x144.google.com with SMTP id w142so10951428lff.8
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 06:48:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TRtX8baRaCtbeDJjWA3IRYfdgtIW44Wdj4Sdz3HfZMA=;
+        b=An/Ddk0HLR+91xPRpInCFnfZ9o+5szjLSy+NtnyMq7UJRY1S3pi1mcTpeSPq8yWGO7
+         +hYo5dzW6PHxmv0YE0x63sDphTthBePQ7rc/OdTTaSn1XaXPVNTS2Qj572/59VtqdnSE
+         ADq1kQeLGgCPetyHlz4LQ8E+f4lA+tewwA3JqwJikM3iaVmfqn+lcqYRQW/wE7ooEhJ+
+         bUglFTYdPjIL+R6utnbfqDb4IhOZ5rx4bucFlRBZmrj8DrD8Mjij9VzBx0YIKOoIC2Nb
+         AA/x0kRUOLLFfqW7r0bkOIMPkR+YoHRBgD+4KlQ2b15e9/I5sO+IMBiDslv4L69nF3h/
+         5YMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TRtX8baRaCtbeDJjWA3IRYfdgtIW44Wdj4Sdz3HfZMA=;
+        b=nu0mf8Y2EsJ3Rb0aVfu5sCOtgulpmBO0tvhqaN5zDpMyCZzcCqIqQ7yAeK+jGiksT9
+         dxnoV5VNQjTK8s/xuvi2j0bIDK6RhguV+93qaveiHZ30miiIJqInRTGsfH4VIEiNZtS7
+         8fHIQqFC3SknwPwwn67MKfjRnQoBtuFLmNx0iCTwmoOyk+GBn3pCpp6H5yqJI2G/kCPm
+         szfpUfH6kOA/r4BjC4Ka9cmPEWJG7yAla5aCr5utnM2yeWOiMGLs0v1CmgX2upcKkrVc
+         IUoSAYfsZLJ/4wxjcrN2q4nGTeWzWRYuVvkwogyYMfH/mXFjgfxAymKqU13izjAyvRyy
+         G3CA==
+X-Gm-Message-State: AOAM532yzrR2BYVsIi7iZmFMOj8TQtdKWivPoeAe8Ue0IOw0V5/VfA5O
+        AHmGuKrTZiSjsSYbMHiPH0eN2i8rvRsF4vqtYRDxnQ==
+X-Google-Smtp-Source: ABdhPJw46ud/uUkcZJ6tSOXJvAqor8Mj5zSR0l7JClGYT9/b+K2wIXlkgMzo8k4v5SokXVFThmMVRoGjQRQOqS4C810=
+X-Received: by 2002:ac2:4ac7:: with SMTP id m7mr5517480lfp.572.1605019721579;
+ Tue, 10 Nov 2020 06:48:41 -0800 (PST)
+MIME-Version: 1.0
+References: <20201109110654.12547-1-brgl@bgdev.pl> <20201109110654.12547-6-brgl@bgdev.pl>
+In-Reply-To: <20201109110654.12547-6-brgl@bgdev.pl>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Tue, 10 Nov 2020 15:48:30 +0100
+Message-ID: <CACRpkdZ9tRHFS51pnQg_TgKGed3pD_hRE_rGP_9tiFNcGrb1bQ@mail.gmail.com>
+Subject: Re: [PATCH v3 5/9] pinctrl: use krealloc_array()
+To:     Bartosz Golaszewski <brgl@bgdev.pl>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Tony Luck <tony.luck@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Robert Richter <rric@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        "open list:DRM PANEL DRIVERS" <dri-devel@lists.freedesktop.org>,
+        linaro-mm-sig@lists.linaro.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-edac@vger.kernel.org,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev <netdev@vger.kernel.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        "moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." 
+        <alsa-devel@alsa-project.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- lib/arm64/asm/pgtable-hwdef.h | 2 ++
- arm/cstart64.S                | 6 +++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+On Mon, Nov 9, 2020 at 12:07 PM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
 
-diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
-index c31bc11..48a1d1a 100644
---- a/lib/arm64/asm/pgtable-hwdef.h
-+++ b/lib/arm64/asm/pgtable-hwdef.h
-@@ -153,5 +153,7 @@
- #define MT_DEVICE_GRE		2
- #define MT_NORMAL_NC		3	/* writecombine */
- #define MT_NORMAL		4
-+#define MT_NORMAL_WT		5
-+#define MT_DEVICE_nGRE		6
- 
- #endif /* _ASMARM64_PGTABLE_HWDEF_H_ */
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 6610779..0428014 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -154,6 +154,8 @@ halt:
-  *   DEVICE_GRE         010     00001100
-  *   NORMAL_NC          011     01000100
-  *   NORMAL             100     11111111
-+ *   NORMAL_WT          101     10111011
-+ *   DEVICE_nGRE        110     00001000
-  */
- #define MAIR(attr, mt) ((attr) << ((mt) * 8))
- 
-@@ -184,7 +186,9 @@ asm_mmu_enable:
- 		     MAIR(0x04, MT_DEVICE_nGnRE) |	\
- 		     MAIR(0x0c, MT_DEVICE_GRE) |	\
- 		     MAIR(0x44, MT_NORMAL_NC) |		\
--		     MAIR(0xff, MT_NORMAL)
-+		     MAIR(0xff, MT_NORMAL) |	        \
-+		     MAIR(0xbb, MT_NORMAL_WT) |         \
-+		     MAIR(0x08, MT_DEVICE_nGRE)
- 	msr	mair_el1, x1
- 
- 	/* TTBR0 */
--- 
-2.17.1
+> From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+>
+> Use the helper that checks for overflows internally instead of manually
+> calculating the size of the new array.
+>
+> Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
