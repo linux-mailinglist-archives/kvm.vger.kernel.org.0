@@ -2,171 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E550D2AD225
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 10:10:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABCB92AD2ED
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 10:56:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731831AbgKJJKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 04:10:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26251 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729981AbgKJJKN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Nov 2020 04:10:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1604999411;
+        id S1730234AbgKJJ4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 04:56:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46198 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726219AbgKJJ4Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 04:56:24 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C81AC0613CF;
+        Tue, 10 Nov 2020 01:56:24 -0800 (PST)
+Received: from nazgul.tnic (unknown [78.130.214.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7DC091EC036C;
+        Tue, 10 Nov 2020 10:56:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1605002181;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+55BzpmQdaW+9dk/S8pTQyoYyuBDmPULs813Spez7Dk=;
-        b=fvLEc1XkvSr7jobAFrfrekMZATvGeyU7hc/xpy8g1Q5t/uIFUP/inOx2UDyvsFtss8sPPQ
-        KUIYbO1NSyrvXI/BGq/MWqUHAhdelJg00bEyFRu34AHosoJuw/SybW4DYPHIXwy7v0R41Z
-        zYfAfZVPw8abc0jzbBzaG6UeIGy8Y0M=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-0Adw_uD6OcedKV-DzOIXMA-1; Tue, 10 Nov 2020 04:10:07 -0500
-X-MC-Unique: 0Adw_uD6OcedKV-DzOIXMA-1
-Received: by mail-ej1-f70.google.com with SMTP id dx19so4461238ejb.7
-        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 01:10:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+55BzpmQdaW+9dk/S8pTQyoYyuBDmPULs813Spez7Dk=;
-        b=h4CtXMkQguxh5dnLrL1OwDsG8QFmGUwuTPYr+KU9gyvWSzucEd2G4XaG3jcvpAqGRi
-         iUU7OBhxoAN+Z203t7dI/AMsBAC7Hb35XhrLuFF8afzkh21Qj1cYiuQ5jwf96f78rqIY
-         8KSDxHFzgfHkbIRvFxIMb12GmrZv6eC8RNjjRr6XadbLLgFmreMq9I1764+D+ce+q8jn
-         NWRtxzEG1WrW+9uoWDAQJrsi+AUzzJ84Ox45Oio5hh9gMt4ZDvsbsF5ORp+Lf1SXo8W9
-         A3wJ7znmqi0qaaVJHhk3lyK5zfg49XzmAFHsH9qyRTEHw5bhqAaC2/cfwMcTevIlGYDe
-         SYyw==
-X-Gm-Message-State: AOAM530eNKRR4uT4SqWCME+Faxw4nwE3H/CuYt4XWWyXxuX7edMmYvar
-        MHlxH2NGg0zkKiuG4kM7AcssLXxOKzxNE04yxvhifg/l29FV/Q9ky/EGfGsaBe4In5Ndy9XdhFz
-        wHWTjdWwiLC1VHkRF7TDIGX3Fuo+12mVfEc+lW/gB3DHerxuU7XV7TaR+Gslfp//P
-X-Received: by 2002:a17:906:4145:: with SMTP id l5mr18623725ejk.317.1604999405830;
-        Tue, 10 Nov 2020 01:10:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx/+w8n2wbjnx32/4llcLMexaLP6alYitnqhFSTv2Dgca7bmGE28PeBxrSq2lRzJ92id0/3Sw==
-X-Received: by 2002:a17:906:4145:: with SMTP id l5mr18623695ejk.317.1604999405498;
-        Tue, 10 Nov 2020 01:10:05 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g25sm9998041ejh.61.2020.11.10.01.10.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2020 01:10:04 -0800 (PST)
-To:     "Luck, Tony" <tony.luck@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Qian Cai <cai@redhat.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=O9Bf9QLEbMBCh3z4FMbn5eGBAmMtLb75UrKmj7Nq7SI=;
+        b=m+RDHKP/Ex24UiFTamOj49F4H2/hL8AXpVG75G8sd3WsutOCUJ0Mx2NvCwySCSJjS4Gbv+
+        jF6ih5lAXSJYigPn7StVpu05cXsuuNplokLLvLoheG2aKh6nLn655620aoSzj7rr4LSXcU
+        hiCX2L5O7hP3q1FNM53MDHKW5G440tM=
+Date:   Tue, 10 Nov 2020 10:56:15 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Luck, Tony" <tony.luck@intel.com>,
+        Jim Mattson <jmattson@google.com>, Qian Cai <cai@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-tip-commits@vger.kernel.org" 
-        <linux-tip-commits@vger.kernel.org>, Boris Petkov <bp@alien8.de>,
-        Borislav Petkov <bp@suse.de>, x86 <x86@kernel.org>,
+        <linux-tip-commits@vger.kernel.org>, x86 <x86@kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] x86/mce: Check for hypervisor before enabling additional
+ error logging
+Message-ID: <20201110095615.GB9450@nazgul.tnic>
 References: <20201030190807.GA13884@agluck-desk2.amr.corp.intel.com>
  <160431588828.397.16468104725047768957.tip-bot2@tip-bot2>
  <3f863634cd75824907e8ccf8164548c2ef036f20.camel@redhat.com>
  <bfc274fc27724ea39ecac1e7ac834ed8@intel.com>
  <CALMp9eTFaiYkTnVe8xKzg40E4nZ3rAOii0O06bTy0+oLNjyKhA@mail.gmail.com>
  <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
- <CALMp9eS+SYmPP3OzdK0-Bs1wSBJ4MU_POZe3i5fi3Fd+FTshYw@mail.gmail.com>
- <bece344ae6944368bf5a9a60e9145bd4@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [tip: ras/core] x86/mce: Enable additional error logging on
- certain Intel CPUs
-Message-ID: <03cfc157-efac-ac4a-2924-d455f29e6ecd@redhat.com>
-Date:   Tue, 10 Nov 2020 10:10:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ <20201109232402.GA25492@agluck-desk2.amr.corp.intel.com>
+ <20201110063151.GB7290@nazgul.tnic>
+ <094c2395-b1b3-d908-657c-9bd4144e40ac@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bece344ae6944368bf5a9a60e9145bd4@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <094c2395-b1b3-d908-657c-9bd4144e40ac@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Maybe no contract ... but a bunch of places (many of them in Intel
-> specific code) that check for it
+On Tue, Nov 10, 2020 at 09:50:43AM +0100, Paolo Bonzini wrote:
+> 1) ignore_msrs _cannot_ be on by default.  You cannot know in advance that
+> for all non-architectural MSRs it's okay for them to read as zero and eat
+> writes.  For some non-architectural MSR which never reads as zero on real
+> hardware, who knows that there isn't some code using the contents of the MSR
+> as a divisor, and causing a division by zero exception with ignore_msrs=1?
 
-Interestingly, quite a few of them are actually checking for HYPERVISOR 
-not because of missing hypervisor features, but rather because 
-hypervisors don't have to work around certain errata. :)
+So if you're emulating a certain type of hardware - say a certain CPU
+model - then what are you saying? That you're emulating it but not
+really all of it, just some bits?
 
-Full analysis after my sig, but tl;dr: the only case of using HYPERVISOR 
-before using MSRs are in arch/x86/events/intel/cstate.c and 
-arch/x86/events/intel/uncore.c.  There are some workarounds in 
-drivers/gpu that might fall into a similar bucket.  But as far as MSRs 
-go, the way to go  overwhelmingly seems to be {rd,wr}msrl_safe.
+Because this is what happens - the kernel checks that it runs on a
+certain CPU type and this tells it that those MSRs are there. But then
+comes virt and throws all assumptions out.
 
-Thanks,
+So if it emulates a CPU model and the kernel tries to access those MSRs,
+then the HV should ignore those MSR accesses if it doesn't know about
+them. Why should the kernel change everytime some tool or virtualization
+has shortcomings?
 
-Paolo
+> 2) it's not just KVM.  _Any_ hypervisor is bound to have this issue for some
+> non-architectural MSRs.  KVM just gets the flak because Linux CI
+> environments (for obvious reasons) use it more than they use Hyper-V or ESXi
+> or VirtualBox.
 
-On 10/11/20 00:36, Luck, Tony wrote:
-> arch/x86/events/core.c: if (boot_cpu_has(X86_FEATURE_HYPERVISOR)) {
+It's not flak - I'm trying to find a solution which is workable for
+both. The kernel is not at fault here.
 
-Print a slightly less frightening warning.
+> 3) because of (1) and (2), the solution is very simple.  If the MSR is
+> architectural, its absence is a KVM bug and we'll fix it in all stable
+> versions.  If the MSR is not architectural (and 17Fh isn't; not only it's
+> not mentioned in the SDM,
 
-> arch/x86/events/intel/core.c:   if (!boot_cpu_has(X86_FEATURE_HYPERVISOR))
+It is mentioned in the SDM.
 
-Working around KVM's ignore_msrs=1 option (and quite ugly; shows that 
-the option shouldn't be enabled by default).
+> even Google is failing me), never ever assume that the CPUID
+> family/model/stepping implies a given MSR is there, and just use
+> rdmsr_safe/wrmsr_safe.
 
-> arch/x86/events/intel/core.c:           int assume = 3 * !boot_cpu_has(X86_FEATURE_HYPERVISOR);
+Yes, we don't have a choice, as always. ;-\
 
-Seems unnecessary.
+But maybe we should have a choice and maybe qemu/kvm should have a way
+to ignore certain MSRs for certain CPU types, regardless of them being
+architectural or not.
 
-> arch/x86/events/intel/cstate.c: if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-> arch/x86/events/intel/uncore.c: if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
+Thx.
 
-Too complicated. :)
+-- 
+Regards/Gruss,
+    Boris.
 
-> arch/x86/kernel/apic/apic.c:    if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-
-Hypervisors don't have errata.
-
-> arch/x86/kernel/cpu/bugs.c:     if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-> arch/x86/kernel/cpu/bugs.c:     else if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-> arch/x86/kernel/cpu/bugs.c:     if (boot_cpu_has(X86_FEATURE_HYPERVISOR)) {
-> arch/x86/kernel/cpu/bugs.c:     if (boot_cpu_has(X86_FEATURE_HYPERVISOR)) {
-> arch/x86/kernel/cpu/intel.c:    if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-
-Print different vulnerability status in sysfs.
-
-> arch/x86/kernel/cpu/mshyperv.c: if (!boot_cpu_has(X86_FEATURE_HYPERVISOR))
-> arch/x86/kernel/cpu/vmware.c: * If !boot_cpu_has(X86_FEATURE_HYPERVISOR), vmware_hypercall_mode
-> arch/x86/kernel/cpu/vmware.c:   if (boot_cpu_has(X86_FEATURE_HYPERVISOR)) {
-> arch/x86/kernel/jailhouse.c:        !boot_cpu_has(X86_FEATURE_HYPERVISOR))
-> arch/x86/kernel/kvm.c:  if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-> arch/x86/kernel/paravirt.c:     if (!boot_cpu_has(X86_FEATURE_HYPERVISOR))
-
-Obviously needed before using paravirt features of the hypervisor.
-
-> arch/x86/kernel/tsc.c:  if (boot_cpu_has(X86_FEATURE_HYPERVISOR) ||
-
-Disables ART in VMs.  Probably the idea is that ART does not have an 
-offset field similar to the TSC's, but it's not necessary.  Looking at 
-the hypervisor-provided CPUID should be enough.
-
-> arch/x86/mm/init_64.c:  if (!boot_cpu_has(X86_FEATURE_HYPERVISOR)) {
-
-Tweaks hotplug heuristics, no MSRs involved.
-
-> drivers/acpi/processor_idle.c:  if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
-
-Avoids pointless hypervisor exit on idle (i.e. just an optimization).
-
-> drivers/gpu/drm/amd/amdgpu/amdgpu_virt.h:       return boot_cpu_has(X86_FEATURE_HYPERVISOR);
-
-Work around SR-IOV bugs.
-
-> drivers/gpu/drm/i915/i915_memcpy.c:         !boot_cpu_has(X86_FEATURE_HYPERVISOR))
-
-Work around KVM deficiency.
-
-> drivers/gpu/drm/radeon/radeon_device.c: return boot_cpu_has(X86_FEATURE_HYPERVISOR);
-
-Work around SR-IOV bugs.
-
-> drivers/visorbus/visorchipset.c:        if (boot_cpu_has(X86_FEATURE_HYPERVISOR)) {
-
-Needed before using paravirt features of the hypervisor.
-
+https://people.kernel.org/tglx/notes-about-netiquette
