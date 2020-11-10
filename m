@@ -2,34 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 383E12AD869
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 15:13:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F2A32AD887
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 15:19:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732299AbgKJON2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 09:13:28 -0500
-Received: from mga07.intel.com ([134.134.136.100]:31730 "EHLO mga07.intel.com"
+        id S1730760AbgKJOTN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 09:19:13 -0500
+Received: from nat-hk.nvidia.com ([203.18.50.4]:3819 "EHLO nat-hk.nvidia.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730880AbgKJON1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 09:13:27 -0500
-IronPort-SDR: sDxNWZ6Dcnc2hqF4qrmyvkHo7hcRftbQTh7g6Kl0D5XDSSg4f0sQrCJPt0yMXFeJErtz9Mrbrb
- Czd8Rj0nwlBw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9800"; a="234142628"
-X-IronPort-AV: E=Sophos;i="5.77,466,1596524400"; 
-   d="scan'208";a="234142628"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 06:13:25 -0800
-IronPort-SDR: jTy2oEcYHeqTR/PuPMFNJsuA1QGjArnEfzapc4ZoNFRvHno4UWo8YNp+R+4SMsBonNTOhF4qwE
- 4QqFJu17y4OQ==
-X-IronPort-AV: E=Sophos;i="5.77,466,1596524400"; 
-   d="scan'208";a="308050541"
-Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.36])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 06:13:24 -0800
-Date:   Tue, 10 Nov 2020 06:13:23 -0800
-From:   "Raj, Ashok" <ashok.raj@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        id S1730070AbgKJOTM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 09:19:12 -0500
+Received: from HKMAIL103.nvidia.com (Not Verified[10.18.92.100]) by nat-hk.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5faaa15e0000>; Tue, 10 Nov 2020 22:19:10 +0800
+Received: from HKMAIL103.nvidia.com (10.18.16.12) by HKMAIL103.nvidia.com
+ (10.18.16.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 10 Nov
+ 2020 14:19:09 +0000
+Received: from NAM04-BN3-obe.outbound.protection.outlook.com (104.47.46.57) by
+ HKMAIL103.nvidia.com (10.18.16.12) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 10 Nov 2020 14:19:09 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hWcsI0YFJtTgaz6My2DD1yOWPMb2UV4HRe5f8yWyK/KJZOCDLY9e9Y/u8ZBRzXXcxIsf7gpEnwS/+barDXiG8HHM9RUXEwYpYh6z7eLGXs3ygu3KuJWg5fUrh6ud1+PHHrPjNWrNcf4zfGK6ScZe0ck98YMKPJUWLcvEWfDO4WS03jmQmQmUtrsvY3i/gDwuMh6BxnN7mg+az1lU8rOPSGh8LaMekh9DefaLJvys8NooggoTsg44j0wDMNuITCpdZNx3ynyXypsrpPqTcIQGECRoIZvfpe+9GAzW229JgajRV4vIjzv54WlxiK1nnErjUmBuu0likgd1NRamMsImAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EuC9e2e4SYCsCPrdGYOup6bsNVeR1tqITIEOBMGl+KU=;
+ b=MKb0JFcsFdpkJ7kJtE4BUSfwDXVW2KY+SETLJw27/EJyYcl5cTD3gAgwV+yx5YqiFaAhCcrmpNnvucagU/571ftyT/tn2fZBp0FOBjE5M9SHs74mSYuCQ//y1mPzLfyGlraPn2pyhgmqFoClaPri7VO98HYd+ItTP9J6xz0/68kWmnG9RteQjsq+82/O5cZGJniPiYgoIomZpxXVYN4bFIQAVHuJL4CQDn5T4juKIAyvuy0sEIaHa+oTC/uHcUTfsUOSmfaOKGJrl0jX5BOPNNjULCGWNaaQuUsAmwB7M5+BsgFyFnaugfT2o3qhbHeTyWYB31LqjyZx023VF6NqJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4402.namprd12.prod.outlook.com (2603:10b6:5:2a5::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21; Tue, 10 Nov
+ 2020 14:19:02 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3499.032; Tue, 10 Nov 2020
+ 14:19:02 +0000
+Date:   Tue, 10 Nov 2020 10:19:00 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Raj, Ashok" <ashok.raj@intel.com>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
         Dan Williams <dan.j.williams@intel.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         "Jiang, Dave" <dave.jiang@intel.com>,
@@ -56,87 +68,85 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Ashok Raj <ashok.raj@intel.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-Message-ID: <20201110141323.GB22336@otc-nc-03>
-References: <20201106175131.GW2620339@nvidia.com>
+Message-ID: <20201110141900.GO2620339@nvidia.com>
+References: <20201106164850.GA85879@otc-nc-03>
+ <20201106175131.GW2620339@nvidia.com>
  <CAPcyv4iYHA1acfo=+fTk+U_TrLbSWJjA6v4oeTXgVYDTrnCoGw@mail.gmail.com>
  <20201107001207.GA2620339@nvidia.com>
  <87pn4nk7nn.fsf@nanos.tec.linutronix.de>
  <20201108235852.GC32074@araj-mobl1.jf.intel.com>
  <874klykc7h.fsf@nanos.tec.linutronix.de>
  <20201109173034.GG2620339@nvidia.com>
- <87pn4mi23u.fsf@nanos.tec.linutronix.de>
- <20201110051412.GA20147@otc-nc-03>
- <875z6dik1a.fsf@nanos.tec.linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+ <87pn4mi23u.fsf@nanos.tec.linutronix.de> <20201110051412.GA20147@otc-nc-03>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <875z6dik1a.fsf@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20201110051412.GA20147@otc-nc-03>
+X-ClientProxiedBy: BL0PR02CA0098.namprd02.prod.outlook.com
+ (2603:10b6:208:51::39) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (156.34.48.30) by BL0PR02CA0098.namprd02.prod.outlook.com (2603:10b6:208:51::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21 via Frontend Transport; Tue, 10 Nov 2020 14:19:02 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kcUU8-002Qnu-Td; Tue, 10 Nov 2020 10:19:00 -0400
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1605017950; bh=EuC9e2e4SYCsCPrdGYOup6bsNVeR1tqITIEOBMGl+KU=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-LD-Processed;
+        b=SxDagDE0Unw/qz1cnDO1zMo0f4i3z1qe7entKgzoKNYBQlMwhFwo49w0SrnP7LUfJ
+         xu3hXlSX8Qu1KX46W9aBRp1gQmO8wBLWsOuCd4bSnbEPGgjU+t8pIeUGUMs8OIyVpt
+         xhvwwwwPHTmsDGkyI8GwmKtEyJHL/9z8IzA89vRLDdzzqVjjwGqHBAyUzmVjPiTyYO
+         ApkN17Q3dODZqClS8vwd8pqZ9HPFU7tHpd/mAzs4TWNLeJcFsguo/gIG0tLsrKIRVf
+         0cz+GZF04PVY2dd1lJLav/xB/yT0pxCXn3bbDlgT1fJtnQDC8iWN4ZQs8xq+VUT+dE
+         gv5AHHWwXhRJg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thomas,
+On Mon, Nov 09, 2020 at 09:14:12PM -0800, Raj, Ashok wrote:
 
-With all these interrupt message storms ;-), I'm missing how to move towards
-an end goal.
+> There are multiple tools (such as logic analyzers) and OEM test validation 
+> harnesses that depend on such DWORD sized DMA writes with no PASID as interrupt
+> messages. One of the feedback we had received in the development of the
+> specification was to avoid impacting such tools irrespective of
+> MSI-X or IMS
 
-On Tue, Nov 10, 2020 at 11:27:29AM +0100, Thomas Gleixner wrote:
-> Ashok,
-> 
-> On Mon, Nov 09 2020 at 21:14, Ashok Raj wrote:
-> > On Mon, Nov 09, 2020 at 11:42:29PM +0100, Thomas Gleixner wrote:
-> >> On Mon, Nov 09 2020 at 13:30, Jason Gunthorpe wrote:
-> > Approach to IMS is more of a phased approach. 
-> >
-> > #1 Allow physical device to scale beyond limits of PCIe MSIx
-> >    Follows current methodology for guest interrupt programming and
-> >    evolutionary changes rather than drastic.
-> 
-> Trapping MSI[X] writes is there because it allows to hand a device to an
-> unmodified guest OS and to handle the case where the MSI[X] entries
-> storage cannot be mapped exclusively to the guest.
-> 
-> But aside of this, it's not required if the storage can be mapped
-> exclusively, the guest is hypervisor aware and can get a host composed
-> message via a hypercall. That works for physical functions and SRIOV,
-> but not for SIOV.
+This is a really bad reason to make a poor decision for system
+security. Relying on trapping/emulation increases the attack surface
+and complexity of the VMM and the device which now have to create this
+artificial split, which does not exist in SRIOV.
 
-It would greatly help if you can put down what you see is blocking 
-to move forward in the following areas.
+Hopefully we won't see devices get this wrong, but any path that
+allows the guest to cause the device to create TLPs outside its IOMMU
+containment is security worrysome.
 
-Address Gaps in Spec: 
+> was used for interrupt message storage (on the wire they follow the
+> same format), and also to ensure interoperability of devices
+> supporting IMS across CPU vendors (who may not support PASID TLP
+> prefix).  This is one reason that led to interrupts from IMS to not
+> use PASID (and match the wire format of MSI/MSI-X generated
+> interrupts).  The other problem was disambiguation between DMA to
+> SVM v/s interrupts.
 
-Specs can accomodate change after review, as the number of ECN's that go on
-with PCIe ;-). Please add what you like to see in the spec if you beleive
-is a gap today.
+This is a defect in the IOMMU, not something fundamental.
 
-Hardware Gaps?
-- PASID tagged Interrupts.
-- IOMMU Support for PASID based IR.
+The IOMMU needs to know if the interrupt range is active or not for
+each PASID. Process based SVA will, of course, not enable interrupts
+on the PASID, VM Guest based PASID will.
 
-As i had called out, there are a lot of moving parts, and requires more
-attention.
+> Intel had published the specification almost 2 years back and have
+> comprehended all the feedback received from the ecosystem 
+> (both open-source and others), along with offering the specification 
+> to be implemented by any vendors (both device and CPU vendors). 
+> There are few device vendors who are implementing to the spec already and 
+> are being explored for support by other CPU vendors
 
-OS Gaps?
-- Lack of ability to identify if platform can use IMS.
-- Lack of hypercall.
+Which is why it is such a shame that including PASID in the MSI was
+deliberately skipped in the document, the ecosystem could have been
+much aligned to this solution by now :(
 
-We will always have devices that have more interrupts but their use doesn't
-need IMS to be directly manipulated by the guest, or the fact those usages
-require more than what is allowed by PCIe in a guest. These devices can 
-scale by adding another sub-device and you get another block of 2048 if needed.
-
-This isn't just for idxd, as I mentioned earlier, there are vendors other
-than Intel already working on this. In all cases the need for guest direct
-manipulation of interrupt store hasn't come up. From the discussion, it
-seems like there are devices today or in future that will require direct
-manipulation of interrupt store in the guest. This needs additional work
-in both the device hardware providing the right plumbing and OS work to
-comprehend those.
-
-Cheers,
-Ashok
+Jason
