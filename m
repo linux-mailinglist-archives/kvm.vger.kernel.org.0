@@ -2,107 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91CAF2AD931
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 15:48:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6C622AD9E2
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 16:13:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730968AbgKJOso (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 09:48:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35460 "EHLO
+        id S1731961AbgKJPNe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 10:13:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730099AbgKJOsn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 09:48:43 -0500
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64387C0613D4
-        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 06:48:43 -0800 (PST)
-Received: by mail-lf1-x144.google.com with SMTP id w142so10951428lff.8
-        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 06:48:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TRtX8baRaCtbeDJjWA3IRYfdgtIW44Wdj4Sdz3HfZMA=;
-        b=An/Ddk0HLR+91xPRpInCFnfZ9o+5szjLSy+NtnyMq7UJRY1S3pi1mcTpeSPq8yWGO7
-         +hYo5dzW6PHxmv0YE0x63sDphTthBePQ7rc/OdTTaSn1XaXPVNTS2Qj572/59VtqdnSE
-         ADq1kQeLGgCPetyHlz4LQ8E+f4lA+tewwA3JqwJikM3iaVmfqn+lcqYRQW/wE7ooEhJ+
-         bUglFTYdPjIL+R6utnbfqDb4IhOZ5rx4bucFlRBZmrj8DrD8Mjij9VzBx0YIKOoIC2Nb
-         AA/x0kRUOLLFfqW7r0bkOIMPkR+YoHRBgD+4KlQ2b15e9/I5sO+IMBiDslv4L69nF3h/
-         5YMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TRtX8baRaCtbeDJjWA3IRYfdgtIW44Wdj4Sdz3HfZMA=;
-        b=nu0mf8Y2EsJ3Rb0aVfu5sCOtgulpmBO0tvhqaN5zDpMyCZzcCqIqQ7yAeK+jGiksT9
-         dxnoV5VNQjTK8s/xuvi2j0bIDK6RhguV+93qaveiHZ30miiIJqInRTGsfH4VIEiNZtS7
-         8fHIQqFC3SknwPwwn67MKfjRnQoBtuFLmNx0iCTwmoOyk+GBn3pCpp6H5yqJI2G/kCPm
-         szfpUfH6kOA/r4BjC4Ka9cmPEWJG7yAla5aCr5utnM2yeWOiMGLs0v1CmgX2upcKkrVc
-         IUoSAYfsZLJ/4wxjcrN2q4nGTeWzWRYuVvkwogyYMfH/mXFjgfxAymKqU13izjAyvRyy
-         G3CA==
-X-Gm-Message-State: AOAM532yzrR2BYVsIi7iZmFMOj8TQtdKWivPoeAe8Ue0IOw0V5/VfA5O
-        AHmGuKrTZiSjsSYbMHiPH0eN2i8rvRsF4vqtYRDxnQ==
-X-Google-Smtp-Source: ABdhPJw46ud/uUkcZJ6tSOXJvAqor8Mj5zSR0l7JClGYT9/b+K2wIXlkgMzo8k4v5SokXVFThmMVRoGjQRQOqS4C810=
-X-Received: by 2002:ac2:4ac7:: with SMTP id m7mr5517480lfp.572.1605019721579;
- Tue, 10 Nov 2020 06:48:41 -0800 (PST)
-MIME-Version: 1.0
-References: <20201109110654.12547-1-brgl@bgdev.pl> <20201109110654.12547-6-brgl@bgdev.pl>
-In-Reply-To: <20201109110654.12547-6-brgl@bgdev.pl>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Tue, 10 Nov 2020 15:48:30 +0100
-Message-ID: <CACRpkdZ9tRHFS51pnQg_TgKGed3pD_hRE_rGP_9tiFNcGrb1bQ@mail.gmail.com>
-Subject: Re: [PATCH v3 5/9] pinctrl: use krealloc_array()
-To:     Bartosz Golaszewski <brgl@bgdev.pl>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
+        with ESMTP id S1730981AbgKJPNe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 10:13:34 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B16C0613CF;
+        Tue, 10 Nov 2020 07:13:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=yfbAAv9z74vMPfwpK6dKFLRG/wgLDIDQH7gNqCp74iM=; b=X/P7RGRFOzuHDkfSWhHrq0oxGU
+        a4SpAv+nTkiRzo1hMZ6JbF/TxR0o3K7jPnjwja3ywnq25LMYqArUclBG/EjYHBlIMfc6oGtg3Wbwk
+        G6Ul3i3sNWw7cyTNjE86U3KtFq0FLG3FulaFLveDm8rgk/kka2L/zXCgmpa7H46K/FYHwu8XcAywp
+        /FYsD0RUE/NuD+DxxfzdrzaWkm1dWexiGL3YQ/vEGF4nI9+c+4BzyoBd8aJcp1ClrwHPPaOPyplL9
+        z2CxWO2G8ZzL1ZBoijg3CPMH0yZs5yIAzSZ/pZXBFaNkneeYl0XqnrR50NOLmRQwE8iCr/IRbSwwJ
+        venWvckA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kcVKO-0006L3-9E; Tue, 10 Nov 2020 15:13:00 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 32FC5301E02;
+        Tue, 10 Nov 2020 16:12:57 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 19AE920289CB5; Tue, 10 Nov 2020 16:12:57 +0100 (CET)
+Date:   Tue, 10 Nov 2020 16:12:57 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
+        Thomas Gleixner <tglx@linutronix.de>, wei.w.wang@intel.com,
         Tony Luck <tony.luck@intel.com>,
-        James Morse <james.morse@arm.com>,
-        Robert Richter <rric@kernel.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        "open list:DRM PANEL DRIVERS" <dri-devel@lists.freedesktop.org>,
-        linaro-mm-sig@lists.linaro.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-edac@vger.kernel.org,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        "moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." 
-        <alsa-devel@alsa-project.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Content-Type: text/plain; charset="UTF-8"
+        Stephane Eranian <eranian@google.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v2 00/17] KVM: x86/pmu: Add support to enable Guest
+ PEBS via DS
+Message-ID: <20201110151257.GP2611@hirez.programming.kicks-ass.net>
+References: <20201109021254.79755-1-like.xu@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201109021254.79755-1-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 9, 2020 at 12:07 PM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+On Mon, Nov 09, 2020 at 10:12:37AM +0800, Like Xu wrote:
+> The Precise Event Based Sampling(PEBS) supported on Intel Ice Lake server
+> platforms can provide an architectural state of the instruction executed
+> after the instruction that caused the event. This patch set enables the
+> the PEBS via DS feature for KVM (also non) Linux guest on the Ice Lake.
+> The Linux guest can use PEBS feature like native:
+> 
+>   # perf record -e instructions:ppp ./br_instr a
+>   # perf record -c 100000 -e instructions:pp ./br_instr a
+> 
+> If the counter_freezing is not enabled on the host, the guest PEBS will
+> be disabled on purpose when host is using PEBS facility. By default,
+> KVM disables the co-existence of guest PEBS and host PEBS.
 
-> From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
->
-> Use the helper that checks for overflows internally instead of manually
-> calculating the size of the new array.
->
-> Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+Uuhh, what?!? counter_freezing should never be enabled, its broken. Let
+me go delete all that code.
