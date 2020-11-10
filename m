@@ -2,105 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61F4A2ACAE1
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 03:06:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3903F2ACC4B
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 04:54:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730565AbgKJCGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 21:06:33 -0500
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:35504 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729648AbgKJCGd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Nov 2020 21:06:33 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=zelin.deng@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UEqEC99_1604973988;
-Received: from rs3a04324.et2sqa(mailfrom:zelin.deng@linux.alibaba.com fp:SMTPD_---0UEqEC99_1604973988)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 10 Nov 2020 10:06:29 +0800
-Date:   Tue, 10 Nov 2020 10:06:28 +0800
-From:   Zelin Deng <zelin.deng@linux.alibaba.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Fix vCPUs >= 64 can't be online and hotplugged
- in some scenarios
-Message-ID: <20201110020628.GA19666@rs3a04324.et2sqa>
-References: <1600066825-15461-1-git-send-email-zelin.deng@linux.alibaba.com>
- <098e95f3-9f8d-e9df-bc9f-fc1ae2124e24@amd.com>
+        id S1732539AbgKJDyS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 22:54:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55054 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732492AbgKJDyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 22:54:16 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 89B9D2080A;
+        Tue, 10 Nov 2020 03:54:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604980455;
+        bh=ppERrehELOu1hQh6t1jCbm+AqyYz5ABoxm7pF4UNWcY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WRbjc1mKLtsa01FuIBKtnIigjN9N8o2+ofm+/dsb/9hYReGYYJZYCb7Zr1+2iuWfE
+         zfJLP4gDSVbwOIuIUYvCoGHMFVrT6aK1Cxme33eXCW9J6hO39ADYMBYhk5QCUextYk
+         jP3MFkjwr+ebrHhO8jyHJ5Erbg3qlZ/7TW9p8rPI=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Fred Gao <fred.gao@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Xiong Zhang <xiong.y.zhang@intel.com>,
+        Hang Yuan <hang.yuan@linux.intel.com>,
+        Stuart Summers <stuart.summers@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.9 40/55] vfio/pci: Bypass IGD init in case of -ENODEV
+Date:   Mon,  9 Nov 2020 22:53:03 -0500
+Message-Id: <20201110035318.423757-40-sashal@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20201110035318.423757-1-sashal@kernel.org>
+References: <20201110035318.423757-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <098e95f3-9f8d-e9df-bc9f-fc1ae2124e24@amd.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 09, 2020 at 07:19:44AM -0600, Brijesh Singh wrote:
-> 
-> On 9/14/20 2:00 AM, Zelin Deng wrote:
-> > pvclock data pointers of vCPUs >= HVC_BOOT_ARRAY_SIZE (64) are stored in
-> > hvclock_mem wihch is initialized in kvmclock_init_mem().
-> > Here're 3 scenarios in current implementation:
-> >     - no-kvmclock is set in cmdline. kvm pv clock driver is disabled,
-> >       no impact.
-> >     - no-kvmclock-vsyscall is set in cmdline. kvmclock_init_mem() won't
-> >       be called. No memory for storing pvclock data of vCPUs >= 64, vCPUs
-> >       >= 64 can not be online or hotpluged.
-> >     - tsc unstable. kvmclock_init_mem() won't be called. vCPUs >= 64 can
-> >       not be online or hotpluged.
-> > It's not reasonable that vCPUs hotplug have been impacted by last 2
-> > scenarios. Hence move kvmclock_init_mem() to front, in case hvclock_mem
-> > can not be initialized unexpectedly.
-> >
-> > Fixes: 6a1cac56f41f9 (x86/kvm: Use __bss_decrypted attribute in shared variables)
-> > Cc: <stable@vger.kernel.org>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Brijesh Singh <brijesh.singh@amd.com>
-> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Zelin Deng <zelin.deng@linux.alibaba.com>
-> > ---
-> >  arch/x86/kernel/kvmclock.c | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> > index 34b18f6eeb2c..1abbda25e037 100644
-> > --- a/arch/x86/kernel/kvmclock.c
-> > +++ b/arch/x86/kernel/kvmclock.c
-> > @@ -271,7 +271,14 @@ static int __init kvm_setup_vsyscall_timeinfo(void)
-> >  {
-> >  #ifdef CONFIG_X86_64
-> >  	u8 flags;
-> > +#endif
-> > +
-> > +	if (!kvmclock)
-> > +		return 0;
-> 
-> 
-> Overall, I agree with the fix to move the kvmclock_init_mem() in the
-> beginning of the function so that memory hvclock_mem is allocated. But
-> curious, why do we need this check? The if (kvmclock) did not exist in
-> original function and I don't think kvmclock_init_mem() has any
-> dependency with it, am I missing something ?
-> 
-> 
-Per my under standing if "no-kvmclock" is set in cmdline, pvclock will
-be disabled in guest kernel kvmclock_init() just returns without doing
-anything right? However in this scenarios, this function still will be
-executed as it is a early_initcall. To avoid a waste of memory, is it
-reasonable to do this check?
-> > +
-> > +	kvmclock_init_mem();
-> >  
-> > +#ifdef CONFIG_X86_64
-> >  	if (!per_cpu(hv_clock_per_cpu, 0) || !kvmclock_vsyscall)
-> >  		return 0;
-> >  
-> > @@ -282,8 +289,6 @@ static int __init kvm_setup_vsyscall_timeinfo(void)
-> >  	kvm_clock.vdso_clock_mode = VDSO_CLOCKMODE_PVCLOCK;
-> >  #endif
-> >  
-> > -	kvmclock_init_mem();
-> > -
-> >  	return 0;
-> >  }
-> >  early_initcall(kvm_setup_vsyscall_timeinfo);
+From: Fred Gao <fred.gao@intel.com>
+
+[ Upstream commit e4eccb853664de7bcf9518fb658f35e748bf1f68 ]
+
+Bypass the IGD initialization when -ENODEV returns,
+that should be the case if opregion is not available for IGD
+or within discrete graphics device's option ROM,
+or host/lpc bridge is not found.
+
+Then use of -ENODEV here means no special device resources found
+which needs special care for VFIO, but we still allow other normal
+device resource access.
+
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: Xiong Zhang <xiong.y.zhang@intel.com>
+Cc: Hang Yuan <hang.yuan@linux.intel.com>
+Cc: Stuart Summers <stuart.summers@intel.com>
+Signed-off-by: Fred Gao <fred.gao@intel.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vfio/pci/vfio_pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 1ab1f5cda4ac2..bfdc010a6b043 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -385,7 +385,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+ 	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
+ 	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
+ 		ret = vfio_pci_igd_init(vdev);
+-		if (ret) {
++		if (ret && ret != -ENODEV) {
+ 			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
+ 			goto disable_exit;
+ 		}
+-- 
+2.27.0
+
