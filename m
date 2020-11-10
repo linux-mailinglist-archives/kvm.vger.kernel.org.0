@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3903F2ACC4B
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 04:54:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38D782ACC76
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 04:55:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732539AbgKJDyS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 22:54:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55054 "EHLO mail.kernel.org"
+        id S1730684AbgKJDz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 22:55:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56812 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732492AbgKJDyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 22:54:16 -0500
+        id S1731402AbgKJDz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 22:55:26 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 89B9D2080A;
-        Tue, 10 Nov 2020 03:54:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 90A1C21534;
+        Tue, 10 Nov 2020 03:55:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604980455;
-        bh=ppERrehELOu1hQh6t1jCbm+AqyYz5ABoxm7pF4UNWcY=;
+        s=default; t=1604980525;
+        bh=imKwv/Fb3tX8Sf2PNoVY7wcaiXIi4oQ+RdrROR2vnxo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WRbjc1mKLtsa01FuIBKtnIigjN9N8o2+ofm+/dsb/9hYReGYYJZYCb7Zr1+2iuWfE
-         zfJLP4gDSVbwOIuIUYvCoGHMFVrT6aK1Cxme33eXCW9J6hO39ADYMBYhk5QCUextYk
-         jP3MFkjwr+ebrHhO8jyHJ5Erbg3qlZ/7TW9p8rPI=
+        b=aBHjt5PlamRb8rPRQ9/KPWGfBK76H/luNgBDTBk+vEw3DSZRgvlAN1rL0SkhTIRUw
+         6hIEMsEY9oESsyM4BPwRAbkAbcg5qk/CAFPn3DiB5j+2fZaHbmLViLg1STujofD0Lw
+         t86RkI8XEj2uE/IuY7FxFahyT6P4H/z4M3wUWOWU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Fred Gao <fred.gao@intel.com>,
@@ -32,12 +32,12 @@ Cc:     Fred Gao <fred.gao@intel.com>,
         Stuart Summers <stuart.summers@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.9 40/55] vfio/pci: Bypass IGD init in case of -ENODEV
-Date:   Mon,  9 Nov 2020 22:53:03 -0500
-Message-Id: <20201110035318.423757-40-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 32/42] vfio/pci: Bypass IGD init in case of -ENODEV
+Date:   Mon,  9 Nov 2020 22:54:30 -0500
+Message-Id: <20201110035440.424258-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201110035318.423757-1-sashal@kernel.org>
-References: <20201110035318.423757-1-sashal@kernel.org>
+In-Reply-To: <20201110035440.424258-1-sashal@kernel.org>
+References: <20201110035440.424258-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -71,10 +71,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 1ab1f5cda4ac2..bfdc010a6b043 100644
+index a72fd5309b09f..443a35dde7f52 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -385,7 +385,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+@@ -334,7 +334,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
  	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
  	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
  		ret = vfio_pci_igd_init(vdev);
