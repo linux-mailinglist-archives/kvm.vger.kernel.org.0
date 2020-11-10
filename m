@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1F712ACC92
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 04:56:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7B722ACDC3
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 05:05:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387493AbgKJD4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 22:56:05 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57822 "EHLO mail.kernel.org"
+        id S1732513AbgKJDyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 22:54:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55028 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387474AbgKJD4D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 22:56:03 -0500
+        id S1732472AbgKJDyP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 22:54:15 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DA54621534;
-        Tue, 10 Nov 2020 03:56:01 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3EA0920829;
+        Tue, 10 Nov 2020 03:54:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604980562;
-        bh=cpf2rMftQf7xL/9QBBlS7qxPonhitPWGCCg9v88FIY8=;
+        s=default; t=1604980454;
+        bh=344KYCt8JlqhsBDq1b3hVsvLmu/FPHqauM+mTbm2F80=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=CPri1TYuekaEBImqXVZsZjAVC88uFXjSuCsjitrGPcnrsvGjg0p+cuShxheI0BZX7
-         hDNniijIwH3nBq/s1QWk+RyQo7pQby5YFEe3+AwuSyBjSFsejZu6NsqEz5+diqojlQ
-         gO0Sn810t0XCoLm+etaNQ48HmeDwCQUv1Sab9UDE=
+        b=UWEb8rgrFHl36MzI6EbJySdXTyh8OWu7HNBkd46WwBeyFsF7t00rzRjdbs9GJlJc0
+         X84S6sbopSqfpAdQWVK2R6WYrxarSTw0LyjFLoyNkDzFIf137v+/QzpErpjxNx/gHq
+         w9D8DsI/DYmrk/wx4HmEmpE9T35FB9SFdEqYAKr8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zhang Qilong <zhangqilong3@huawei.com>,
         Eric Auger <eric.auger@redhat.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 16/21] vfio: platform: fix reference leak in vfio_platform_open
-Date:   Mon,  9 Nov 2020 22:55:36 -0500
-Message-Id: <20201110035541.424648-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.9 39/55] vfio: platform: fix reference leak in vfio_platform_open
+Date:   Mon,  9 Nov 2020 22:53:02 -0500
+Message-Id: <20201110035318.423757-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201110035541.424648-1-sashal@kernel.org>
-References: <20201110035541.424648-1-sashal@kernel.org>
+In-Reply-To: <20201110035318.423757-1-sashal@kernel.org>
+References: <20201110035318.423757-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,10 +60,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index c0cd824be2b76..460760d0becfe 100644
+index c0771a9567fb5..fb4b385191f28 100644
 --- a/drivers/vfio/platform/vfio_platform_common.c
 +++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -273,7 +273,7 @@ static int vfio_platform_open(void *device_data)
+@@ -267,7 +267,7 @@ static int vfio_platform_open(void *device_data)
  
  		ret = pm_runtime_get_sync(vdev->device);
  		if (ret < 0)
@@ -72,7 +72,7 @@ index c0cd824be2b76..460760d0becfe 100644
  
  		ret = vfio_platform_call_reset(vdev, &extra_dbg);
  		if (ret && vdev->reset_required) {
-@@ -290,7 +290,6 @@ static int vfio_platform_open(void *device_data)
+@@ -284,7 +284,6 @@ static int vfio_platform_open(void *device_data)
  
  err_rst:
  	pm_runtime_put(vdev->device);
