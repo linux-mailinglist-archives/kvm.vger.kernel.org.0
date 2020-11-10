@@ -2,494 +2,378 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85C3E2AE101
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:49:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BBBF2AE113
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:52:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731666AbgKJUt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 15:49:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57161 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726467AbgKJUt1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Nov 2020 15:49:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605041365;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q2SzaBfaoYeqh/VnZkbGu2YLE2YIulzGjCtwxIay7D8=;
-        b=KDx5IMW2Hno6+gUiuzWqI3Rewd1WZlLOVCfRqyEjiugcOplD0tGPfeOgK9JsCAMpR2h/PD
-        G/Al780AfFes4o0rZCYKaArS0gtPxXUdG08xXQ0PhCt+EZRaoMwn18xPuiD8N1BBQOYh/z
-        KXsGrC641z6fxbKcyUWMZgCcUXjFQO4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-CESXzAO-NxKxS3Y7qQd9Zw-1; Tue, 10 Nov 2020 15:49:23 -0500
-X-MC-Unique: CESXzAO-NxKxS3Y7qQd9Zw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 191218C89A1;
-        Tue, 10 Nov 2020 20:49:05 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DD123100763D;
-        Tue, 10 Nov 2020 20:49:02 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        bgardon@google.com, peterx@redhat.com
-Subject: [PATCH 8/8] KVM: selftests: Implement perf_test_util more conventionally
-Date:   Tue, 10 Nov 2020 21:48:02 +0100
-Message-Id: <20201110204802.417521-9-drjones@redhat.com>
-In-Reply-To: <20201110204802.417521-1-drjones@redhat.com>
-References: <20201110204802.417521-1-drjones@redhat.com>
+        id S1729862AbgKJUwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 15:52:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35924 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725862AbgKJUwS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 15:52:18 -0500
+Received: from mail-yb1-xb43.google.com (mail-yb1-xb43.google.com [IPv6:2607:f8b0:4864:20::b43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FB6C0613D1
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 12:52:16 -0800 (PST)
+Received: by mail-yb1-xb43.google.com with SMTP id c129so12987634yba.8
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 12:52:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ac0VM0dcPTqx37kRHqfKzIT7iqCUTygIk3BYJ8irkmI=;
+        b=JTyj4rtordrueuHgkRvdME7gUYeUTCkqogHaxc6bBhVlibTpEnwnZBjuQcZtyD79Z5
+         CLc7fA0/gYX9LlScauGCt1LDeUYhs0MkaXLD1XZLy/rwpjLvBn4FPZIt5l5gaGanH7pM
+         SD6RWa43QvncETp12N7ewpeQlLU+t0cx9nGG7V/kSTJkGt7jFuO55Y1W1c1yOrFhw/ZF
+         KeQiLShdIZgjNxLbheUKxXTNRP8X8rEfYenc9tfXgXP1Sr80PcMArkm8WySoPg2hol2p
+         mjp0Y2ctrE/2HVl4rh0pQd6avSY3nYFrJAcijlztRRZ5qmt4xrIHK9BbQw4sRRXLqzte
+         Tlrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ac0VM0dcPTqx37kRHqfKzIT7iqCUTygIk3BYJ8irkmI=;
+        b=nvkJxovWPmk7xzQlrqxKqPRCAOgMR6wiARwUxQbcH9KEBMYZ41dRmZARarPmjk9Oei
+         QAgsw1DXFjhJEUrK0yGuKysgY4WG9h/KH9ryv+og8e4vH8Iexs7JYLyflH4A7unVdd/N
+         K+PbHlpif5Z78kPYgKR89prMYU1+PWDnYJJNpvHyLhkLHXHBl2YOuGJiNfsyIlWnSvJJ
+         a3FDqsMHRA2LqGg83ASKKkqtcAmJW1wtO7/ofHCdw2jgnIXR+M8ROZmIshOyEB1x7SQs
+         buDu80S/UgYCqiJFLf3ZOIS1yH8xbMXqeVl2Re3SDwezcnbGkn6zirZgDatq2troNUhV
+         LndQ==
+X-Gm-Message-State: AOAM531Eih+KD93VNuoAlZ7VBTOPnOrWasZ1o0l31wCJOQVFpF0DJTub
+        4xIDZ1PdSAlwpaDjmaod+DgDSZQ0AWzLv+gq+dJlZQ==
+X-Google-Smtp-Source: ABdhPJxQ51yNlwcvddLkpDpNIjNRYR4y4akzEfTZ9y3nYZfaGF2M633znvjCHMsrA7XkkkHdcxn9e9OzazWC8K43VIE=
+X-Received: by 2002:a25:a567:: with SMTP id h94mr27245703ybi.211.1605041535584;
+ Tue, 10 Nov 2020 12:52:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20201109021254.79755-1-like.xu@linux.intel.com>
+ <20201110151257.GP2611@hirez.programming.kicks-ass.net> <20201110153721.GQ2651@hirez.programming.kicks-ass.net>
+In-Reply-To: <20201110153721.GQ2651@hirez.programming.kicks-ass.net>
+From:   Stephane Eranian <eranian@google.com>
+Date:   Tue, 10 Nov 2020 12:52:04 -0800
+Message-ID: <CABPqkBS+-g0qbsruAMfOJf-Zfac8nz9v2LCWfrrvVd+ptoLxZg@mail.gmail.com>
+Subject: Re: [PATCH] perf/intel: Remove Perfmon-v4 counter_freezing support
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Like Xu <like.xu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's not conventional C to put non-inline functions in header
-files. Create a source file for the functions instead. Also
-reduce the amount of globals and rename the functions to
-something less generic.
+On Tue, Nov 10, 2020 at 7:37 AM Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> On Tue, Nov 10, 2020 at 04:12:57PM +0100, Peter Zijlstra wrote:
+> > On Mon, Nov 09, 2020 at 10:12:37AM +0800, Like Xu wrote:
+> > > The Precise Event Based Sampling(PEBS) supported on Intel Ice Lake server
+> > > platforms can provide an architectural state of the instruction executed
+> > > after the instruction that caused the event. This patch set enables the
+> > > the PEBS via DS feature for KVM (also non) Linux guest on the Ice Lake.
+> > > The Linux guest can use PEBS feature like native:
+> > >
+> > >   # perf record -e instructions:ppp ./br_instr a
+> > >   # perf record -c 100000 -e instructions:pp ./br_instr a
+> > >
+> > > If the counter_freezing is not enabled on the host, the guest PEBS will
+> > > be disabled on purpose when host is using PEBS facility. By default,
+> > > KVM disables the co-existence of guest PEBS and host PEBS.
+> >
+> > Uuhh, what?!? counter_freezing should never be enabled, its broken. Let
+> > me go delete all that code.
+>
+> ---
+> Subject: perf/intel: Remove Perfmon-v4 counter_freezing support
+>
+> Perfmon-v4 counter freezing is fundamentally broken; remove this default
+> disabled code to make sure nobody uses it.
+>
+> The feature is called Freeze-on-PMI in the SDM, and if it would do that,
+> there wouldn't actually be a problem, *however* it does something subtly
+> different. It globally disables the whole PMU when it raises the PMI,
+> not when the PMI hits.
+>
+> This means there's a window between the PMI getting raised and the PMI
+> actually getting served where we loose events and this violates the
+> perf counter independence. That is, a counting event should not result
+> in a different event count when there is a sampling event co-scheduled.
+>
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/Makefile          |   2 +-
- .../selftests/kvm/demand_paging_test.c        |   8 +-
- .../selftests/kvm/dirty_log_perf_test.c       |  13 +-
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- .../selftests/kvm/include/perf_test_util.h    | 145 ++----------------
- .../selftests/kvm/lib/perf_test_util.c        | 134 ++++++++++++++++
- 6 files changed, 160 insertions(+), 143 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/lib/perf_test_util.c
+What is implemented is Freeze-on-Overflow, yet it is described as Freeze-on-PMI.
+That, in itself, is a problem. I agree with you on that point.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index ca6b64d9ab64..120b02bf3f1e 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -33,7 +33,7 @@ ifeq ($(ARCH),s390)
- 	UNAME_M := s390x
- endif
- 
--LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c
-+LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
- LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
- LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
- LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index 946161a9ce2d..b3c994aa4965 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -36,12 +36,14 @@
- #define PER_VCPU_DEBUG(...) _no_printf(__VA_ARGS__)
- #endif
- 
-+static int nr_vcpus = 1;
-+static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
- static char *guest_data_prototype;
- 
- static void *vcpu_worker(void *data)
- {
- 	int ret;
--	struct vcpu_args *vcpu_args = (struct vcpu_args *)data;
-+	struct perf_test_vcpu_args *vcpu_args = (struct perf_test_vcpu_args *)data;
- 	int vcpu_id = vcpu_args->vcpu_id;
- 	struct kvm_vm *vm = perf_test_args.vm;
- 	struct kvm_run *run;
-@@ -263,7 +265,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	int vcpu_id;
- 	int r;
- 
--	vm = create_vm(mode, nr_vcpus, guest_percpu_mem_size);
-+	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size);
- 
- 	perf_test_args.wr_fract = 1;
- 
-@@ -275,7 +277,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
- 	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
- 
--	add_vcpus(vm, nr_vcpus, guest_percpu_mem_size);
-+	perf_test_add_vcpus(vm, nr_vcpus, guest_percpu_mem_size);
- 
- 	if (p->use_uffd) {
- 		uffd_handler_threads =
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index b448c17bd7aa..df1e0b144c34 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -24,10 +24,15 @@
- /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
- #define TEST_HOST_LOOP_N		2UL
- 
-+#define TEST_MEM_SLOT_INDEX		1
-+
-+static int nr_vcpus = 1;
-+static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
-+
- /* Host variables */
- static bool host_quit;
- static uint64_t iteration;
--static uint64_t vcpu_last_completed_iteration[MAX_VCPUS];
-+static uint64_t vcpu_last_completed_iteration[KVM_MAX_VCPUS];
- 
- static void *vcpu_worker(void *data)
- {
-@@ -39,7 +44,7 @@ static void *vcpu_worker(void *data)
- 	struct timespec ts_diff;
- 	struct timespec total = (struct timespec){0};
- 	struct timespec avg;
--	struct vcpu_args *vcpu_args = (struct vcpu_args *)data;
-+	struct perf_test_vcpu_args *vcpu_args = (struct perf_test_vcpu_args *)data;
- 	int vcpu_id = vcpu_args->vcpu_id;
- 
- 	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
-@@ -107,7 +112,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	struct timespec vcpu_dirty_total = (struct timespec){0};
- 	struct timespec avg;
- 
--	vm = create_vm(mode, nr_vcpus, guest_percpu_mem_size);
-+	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size);
- 
- 	perf_test_args.wr_fract = p->wr_fract;
- 
-@@ -119,7 +124,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
- 	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
- 
--	add_vcpus(vm, nr_vcpus, guest_percpu_mem_size);
-+	perf_test_add_vcpus(vm, nr_vcpus, guest_percpu_mem_size);
- 
- 	sync_global_to_guest(vm, perf_test_args);
- 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 011e8c6b4600..99fa84ed2db9 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -16,6 +16,7 @@
- 
- #include "sparsebit.h"
- 
-+#define KVM_MAX_VCPUS 512
- 
- /*
-  * Callers of kvm_util only have an incomplete/opaque description of the
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index 0bd4407fb662..65e8abaf75f7 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -9,35 +9,13 @@
- #define SELFTEST_KVM_PERF_TEST_UTIL_H
- 
- #include "kvm_util.h"
--#include "processor.h"
--
--#define MAX_VCPUS 512
--
--#define TEST_MEM_SLOT_INDEX		1
- 
- /* Default guest test virtual memory offset */
- #define DEFAULT_GUEST_TEST_MEM		0xc0000000
- 
- #define DEFAULT_PER_VCPU_MEM_SIZE	(1 << 30) /* 1G */
- 
--/*
-- * Guest physical memory offset of the testing memory slot.
-- * This will be set to the topmost valid physical address minus
-- * the test memory size.
-- */
--static uint64_t guest_test_phys_mem;
--
--/*
-- * Guest virtual memory offset of the testing memory slot.
-- * Must not conflict with identity mapped test code.
-- */
--static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
--static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
--
--/* Number of VCPUs for the test */
--static int nr_vcpus = 1;
--
--struct vcpu_args {
-+struct perf_test_vcpu_args {
- 	uint64_t gva;
- 	uint64_t pages;
- 
-@@ -51,123 +29,20 @@ struct perf_test_args {
- 	uint64_t guest_page_size;
- 	int wr_fract;
- 
--	struct vcpu_args vcpu_args[MAX_VCPUS];
-+	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
- 
--static struct perf_test_args perf_test_args;
-+extern struct perf_test_args perf_test_args;
- 
- /*
-- * Continuously write to the first 8 bytes of each page in the
-- * specified region.
-+ * Guest physical memory offset of the testing memory slot.
-+ * This will be set to the topmost valid physical address minus
-+ * the test memory size.
-  */
--static void guest_code(uint32_t vcpu_id)
--{
--	struct vcpu_args *vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
--	uint64_t gva;
--	uint64_t pages;
--	int i;
--
--	/* Make sure vCPU args data structure is not corrupt. */
--	GUEST_ASSERT(vcpu_args->vcpu_id == vcpu_id);
--
--	gva = vcpu_args->gva;
--	pages = vcpu_args->pages;
--
--	while (true) {
--		for (i = 0; i < pages; i++) {
--			uint64_t addr = gva + (i * perf_test_args.guest_page_size);
--
--			if (i % perf_test_args.wr_fract == 0)
--				*(uint64_t *)addr = 0x0123456789ABCDEF;
--			else
--				READ_ONCE(*(uint64_t *)addr);
--		}
--
--		GUEST_SYNC(1);
--	}
--}
--
--static struct kvm_vm *create_vm(enum vm_guest_mode mode, int vcpus,
--				uint64_t vcpu_memory_bytes)
--{
--	struct kvm_vm *vm;
--	uint64_t guest_num_pages;
--
--	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
--
--	perf_test_args.host_page_size = getpagesize();
--	perf_test_args.guest_page_size = vm_guest_mode_params[mode].page_size;
--
--	guest_num_pages = vm_adjust_num_guest_pages(mode,
--				(vcpus * vcpu_memory_bytes) / perf_test_args.guest_page_size);
--
--	TEST_ASSERT(vcpu_memory_bytes % perf_test_args.host_page_size == 0,
--		    "Guest memory size is not host page size aligned.");
--	TEST_ASSERT(vcpu_memory_bytes % perf_test_args.guest_page_size == 0,
--		    "Guest memory size is not guest page size aligned.");
--
--	vm = vm_create_with_vcpus(mode, vcpus, 0,
--				  vcpu_memory_bytes / perf_test_args.guest_page_size,
--				  guest_code, NULL);
--
--	perf_test_args.vm = vm;
--
--	/*
--	 * If there should be more memory in the guest test region than there
--	 * can be pages in the guest, it will definitely cause problems.
--	 */
--	TEST_ASSERT(guest_num_pages < vm_get_max_gfn(vm),
--		    "Requested more guest memory than address space allows.\n"
--		    "    guest pages: %lx max gfn: %x vcpus: %d wss: %lx]\n",
--		    guest_num_pages, vm_get_max_gfn(vm), vcpus,
--		    vcpu_memory_bytes);
--
--	guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
--			      perf_test_args.guest_page_size;
--	guest_test_phys_mem &= ~(perf_test_args.host_page_size - 1);
--#ifdef __s390x__
--	/* Align to 1M (segment size) */
--	guest_test_phys_mem &= ~((1 << 20) - 1);
--#endif
--	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
--
--	/* Add an extra memory slot for testing */
--	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
--				    guest_test_phys_mem,
--				    TEST_MEM_SLOT_INDEX,
--				    guest_num_pages, 0);
--
--	/* Do mapping for the demand paging memory slot */
--	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages, 0);
--
--	ucall_init(vm, NULL);
--
--	return vm;
--}
--
--static void add_vcpus(struct kvm_vm *vm, int vcpus, uint64_t vcpu_memory_bytes)
--{
--	vm_paddr_t vcpu_gpa;
--	struct vcpu_args *vcpu_args;
--	int vcpu_id;
--
--	for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
--		vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
--
--#ifdef __x86_64__
--		vcpu_set_cpuid(vm, vcpu_id, kvm_get_supported_cpuid());
--#endif
--
--		vcpu_args->vcpu_id = vcpu_id;
--		vcpu_args->gva = guest_test_virt_mem +
--				 (vcpu_id * vcpu_memory_bytes);
--		vcpu_args->pages = vcpu_memory_bytes /
--				   perf_test_args.guest_page_size;
-+extern uint64_t guest_test_phys_mem;
- 
--		vcpu_gpa = guest_test_phys_mem + (vcpu_id * vcpu_memory_bytes);
--		pr_debug("Added VCPU %d with test mem gpa [%lx, %lx)\n",
--			 vcpu_id, vcpu_gpa, vcpu_gpa + vcpu_memory_bytes);
--	}
--}
-+struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
-+				uint64_t vcpu_memory_bytes);
-+void perf_test_add_vcpus(struct kvm_vm *vm, int vcpus, uint64_t vcpu_memory_bytes);
- 
- #endif /* SELFTEST_KVM_PERF_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-new file mode 100644
-index 000000000000..e89d0c5a6917
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -0,0 +1,134 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2020, Google LLC.
-+ */
-+
-+#include "kvm_util.h"
-+#include "perf_test_util.h"
-+#include "processor.h"
-+
-+struct perf_test_args perf_test_args;
-+
-+uint64_t guest_test_phys_mem;
-+
-+/*
-+ * Guest virtual memory offset of the testing memory slot.
-+ * Must not conflict with identity mapped test code.
-+ */
-+static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
-+
-+/*
-+ * Continuously write to the first 8 bytes of each page in the
-+ * specified region.
-+ */
-+static void guest_code(uint32_t vcpu_id)
-+{
-+	struct perf_test_vcpu_args *vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
-+	uint64_t gva;
-+	uint64_t pages;
-+	int i;
-+
-+	/* Make sure vCPU args data structure is not corrupt. */
-+	GUEST_ASSERT(vcpu_args->vcpu_id == vcpu_id);
-+
-+	gva = vcpu_args->gva;
-+	pages = vcpu_args->pages;
-+
-+	while (true) {
-+		for (i = 0; i < pages; i++) {
-+			uint64_t addr = gva + (i * perf_test_args.guest_page_size);
-+
-+			if (i % perf_test_args.wr_fract == 0)
-+				*(uint64_t *)addr = 0x0123456789ABCDEF;
-+			else
-+				READ_ONCE(*(uint64_t *)addr);
-+		}
-+
-+		GUEST_SYNC(1);
-+	}
-+}
-+
-+#define TEST_MEM_SLOT_INDEX 1
-+
-+struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
-+				   uint64_t vcpu_memory_bytes)
-+{
-+	struct kvm_vm *vm;
-+	uint64_t guest_num_pages;
-+
-+	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-+
-+	perf_test_args.host_page_size = getpagesize();
-+	perf_test_args.guest_page_size = vm_guest_mode_params[mode].page_size;
-+
-+	guest_num_pages = vm_adjust_num_guest_pages(mode,
-+				(vcpus * vcpu_memory_bytes) / perf_test_args.guest_page_size);
-+
-+	TEST_ASSERT(vcpu_memory_bytes % perf_test_args.host_page_size == 0,
-+		    "Guest memory size is not host page size aligned.");
-+	TEST_ASSERT(vcpu_memory_bytes % perf_test_args.guest_page_size == 0,
-+		    "Guest memory size is not guest page size aligned.");
-+
-+	vm = vm_create_with_vcpus(mode, vcpus, 0,
-+				  vcpu_memory_bytes / perf_test_args.guest_page_size,
-+				  guest_code, NULL);
-+
-+	perf_test_args.vm = vm;
-+
-+	/*
-+	 * If there should be more memory in the guest test region than there
-+	 * can be pages in the guest, it will definitely cause problems.
-+	 */
-+	TEST_ASSERT(guest_num_pages < vm_get_max_gfn(vm),
-+		    "Requested more guest memory than address space allows.\n"
-+		    "    guest pages: %lx max gfn: %x vcpus: %d wss: %lx]\n",
-+		    guest_num_pages, vm_get_max_gfn(vm), vcpus,
-+		    vcpu_memory_bytes);
-+
-+	guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
-+			      perf_test_args.guest_page_size;
-+	guest_test_phys_mem &= ~(perf_test_args.host_page_size - 1);
-+#ifdef __s390x__
-+	/* Align to 1M (segment size) */
-+	guest_test_phys_mem &= ~((1 << 20) - 1);
-+#endif
-+	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
-+
-+	/* Add an extra memory slot for testing */
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    guest_test_phys_mem,
-+				    TEST_MEM_SLOT_INDEX,
-+				    guest_num_pages, 0);
-+
-+	/* Do mapping for the demand paging memory slot */
-+	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages, 0);
-+
-+	ucall_init(vm, NULL);
-+
-+	return vm;
-+}
-+
-+void perf_test_add_vcpus(struct kvm_vm *vm, int vcpus, uint64_t vcpu_memory_bytes)
-+{
-+	vm_paddr_t vcpu_gpa;
-+	struct perf_test_vcpu_args *vcpu_args;
-+	int vcpu_id;
-+
-+	for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
-+		vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
-+
-+#ifdef __x86_64__
-+		vcpu_set_cpuid(vm, vcpu_id, kvm_get_supported_cpuid());
-+#endif
-+
-+		vcpu_args->vcpu_id = vcpu_id;
-+		vcpu_args->gva = guest_test_virt_mem +
-+				 (vcpu_id * vcpu_memory_bytes);
-+		vcpu_args->pages = vcpu_memory_bytes /
-+				   perf_test_args.guest_page_size;
-+
-+		vcpu_gpa = guest_test_phys_mem + (vcpu_id * vcpu_memory_bytes);
-+		pr_debug("Added VCPU %d with test mem gpa [%lx, %lx)\n",
-+			 vcpu_id, vcpu_gpa, vcpu_gpa + vcpu_memory_bytes);
-+	}
-+}
--- 
-2.26.2
+However, there are use cases for both modes.
 
+I can sample on event A and count on B, C and when A overflows, I want
+to snapshot B, C.
+For that I want B, C at the moment of the overflow, not at the moment
+the PMI is delivered. Thus, youd
+would want the Freeze-on-overflow behavior. You can collect in this
+mode with the perf tool,
+IIRC: perf record -e '{cycles,instructions,branches:S}' ....
+
+The other usage model is that of the replay-debugger (rr) which you are alluding
+to, which needs precise count of an event including during the skid
+window. For that, you need
+Freeze-on-PMI (delivered). Note that this tool likely only cares about
+user level occurrences of events.
+
+As for counter independence, I am not sure it holds in all cases. If
+the events are setup for user+kernel
+then, as soon as you co-schedule a sampling event, you will likely get
+more counts on the counting
+event due to the additional kernel entries/exits caused by
+interrupt-based profiling. Even if you were to
+restrict to user level only, I would expect to see a few more counts.
+
+
+> This is known to break existing software.
+>
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
+>  arch/x86/events/intel/core.c | 152 -------------------------------------------
+>  arch/x86/events/perf_event.h |   3 +-
+>  2 files changed, 1 insertion(+), 154 deletions(-)
+>
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index c79748f6921d..9909dfa6fb12 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -2121,18 +2121,6 @@ static void intel_tfa_pmu_enable_all(int added)
+>         intel_pmu_enable_all(added);
+>  }
+>
+> -static void enable_counter_freeze(void)
+> -{
+> -       update_debugctlmsr(get_debugctlmsr() |
+> -                       DEBUGCTLMSR_FREEZE_PERFMON_ON_PMI);
+> -}
+> -
+> -static void disable_counter_freeze(void)
+> -{
+> -       update_debugctlmsr(get_debugctlmsr() &
+> -                       ~DEBUGCTLMSR_FREEZE_PERFMON_ON_PMI);
+> -}
+> -
+>  static inline u64 intel_pmu_get_status(void)
+>  {
+>         u64 status;
+> @@ -2696,95 +2684,6 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+>         return handled;
+>  }
+>
+> -static bool disable_counter_freezing = true;
+> -static int __init intel_perf_counter_freezing_setup(char *s)
+> -{
+> -       bool res;
+> -
+> -       if (kstrtobool(s, &res))
+> -               return -EINVAL;
+> -
+> -       disable_counter_freezing = !res;
+> -       return 1;
+> -}
+> -__setup("perf_v4_pmi=", intel_perf_counter_freezing_setup);
+> -
+> -/*
+> - * Simplified handler for Arch Perfmon v4:
+> - * - We rely on counter freezing/unfreezing to enable/disable the PMU.
+> - * This is done automatically on PMU ack.
+> - * - Ack the PMU only after the APIC.
+> - */
+> -
+> -static int intel_pmu_handle_irq_v4(struct pt_regs *regs)
+> -{
+> -       struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+> -       int handled = 0;
+> -       bool bts = false;
+> -       u64 status;
+> -       int pmu_enabled = cpuc->enabled;
+> -       int loops = 0;
+> -
+> -       /* PMU has been disabled because of counter freezing */
+> -       cpuc->enabled = 0;
+> -       if (test_bit(INTEL_PMC_IDX_FIXED_BTS, cpuc->active_mask)) {
+> -               bts = true;
+> -               intel_bts_disable_local();
+> -               handled = intel_pmu_drain_bts_buffer();
+> -               handled += intel_bts_interrupt();
+> -       }
+> -       status = intel_pmu_get_status();
+> -       if (!status)
+> -               goto done;
+> -again:
+> -       intel_pmu_lbr_read();
+> -       if (++loops > 100) {
+> -               static bool warned;
+> -
+> -               if (!warned) {
+> -                       WARN(1, "perfevents: irq loop stuck!\n");
+> -                       perf_event_print_debug();
+> -                       warned = true;
+> -               }
+> -               intel_pmu_reset();
+> -               goto done;
+> -       }
+> -
+> -
+> -       handled += handle_pmi_common(regs, status);
+> -done:
+> -       /* Ack the PMI in the APIC */
+> -       apic_write(APIC_LVTPC, APIC_DM_NMI);
+> -
+> -       /*
+> -        * The counters start counting immediately while ack the status.
+> -        * Make it as close as possible to IRET. This avoids bogus
+> -        * freezing on Skylake CPUs.
+> -        */
+> -       if (status) {
+> -               intel_pmu_ack_status(status);
+> -       } else {
+> -               /*
+> -                * CPU may issues two PMIs very close to each other.
+> -                * When the PMI handler services the first one, the
+> -                * GLOBAL_STATUS is already updated to reflect both.
+> -                * When it IRETs, the second PMI is immediately
+> -                * handled and it sees clear status. At the meantime,
+> -                * there may be a third PMI, because the freezing bit
+> -                * isn't set since the ack in first PMI handlers.
+> -                * Double check if there is more work to be done.
+> -                */
+> -               status = intel_pmu_get_status();
+> -               if (status)
+> -                       goto again;
+> -       }
+> -
+> -       if (bts)
+> -               intel_bts_enable_local();
+> -       cpuc->enabled = pmu_enabled;
+> -       return handled;
+> -}
+> -
+>  /*
+>   * This handler is triggered by the local APIC, so the APIC IRQ handling
+>   * rules apply:
+> @@ -4081,9 +3980,6 @@ static void intel_pmu_cpu_starting(int cpu)
+>         if (x86_pmu.version > 1)
+>                 flip_smm_bit(&x86_pmu.attr_freeze_on_smi);
+>
+> -       if (x86_pmu.counter_freezing)
+> -               enable_counter_freeze();
+> -
+>         /* Disable perf metrics if any added CPU doesn't support it. */
+>         if (x86_pmu.intel_cap.perf_metrics) {
+>                 union perf_capabilities perf_cap;
+> @@ -4154,9 +4050,6 @@ static void free_excl_cntrs(struct cpu_hw_events *cpuc)
+>  static void intel_pmu_cpu_dying(int cpu)
+>  {
+>         fini_debug_store_on_cpu(cpu);
+> -
+> -       if (x86_pmu.counter_freezing)
+> -               disable_counter_freeze();
+>  }
+>
+>  void intel_cpuc_finish(struct cpu_hw_events *cpuc)
+> @@ -4548,39 +4441,6 @@ static __init void intel_nehalem_quirk(void)
+>         }
+>  }
+>
+> -static const struct x86_cpu_desc counter_freezing_ucodes[] = {
+> -       INTEL_CPU_DESC(INTEL_FAM6_ATOM_GOLDMONT,         2, 0x0000000e),
+> -       INTEL_CPU_DESC(INTEL_FAM6_ATOM_GOLDMONT,         9, 0x0000002e),
+> -       INTEL_CPU_DESC(INTEL_FAM6_ATOM_GOLDMONT,        10, 0x00000008),
+> -       INTEL_CPU_DESC(INTEL_FAM6_ATOM_GOLDMONT_D,       1, 0x00000028),
+> -       INTEL_CPU_DESC(INTEL_FAM6_ATOM_GOLDMONT_PLUS,    1, 0x00000028),
+> -       INTEL_CPU_DESC(INTEL_FAM6_ATOM_GOLDMONT_PLUS,    8, 0x00000006),
+> -       {}
+> -};
+> -
+> -static bool intel_counter_freezing_broken(void)
+> -{
+> -       return !x86_cpu_has_min_microcode_rev(counter_freezing_ucodes);
+> -}
+> -
+> -static __init void intel_counter_freezing_quirk(void)
+> -{
+> -       /* Check if it's already disabled */
+> -       if (disable_counter_freezing)
+> -               return;
+> -
+> -       /*
+> -        * If the system starts with the wrong ucode, leave the
+> -        * counter-freezing feature permanently disabled.
+> -        */
+> -       if (intel_counter_freezing_broken()) {
+> -               pr_info("PMU counter freezing disabled due to CPU errata,"
+> -                       "please upgrade microcode\n");
+> -               x86_pmu.counter_freezing = false;
+> -               x86_pmu.handle_irq = intel_pmu_handle_irq;
+> -       }
+> -}
+> -
+>  /*
+>   * enable software workaround for errata:
+>   * SNB: BJ122
+> @@ -4966,9 +4826,6 @@ __init int intel_pmu_init(void)
+>                         max((int)edx.split.num_counters_fixed, assume);
+>         }
+>
+> -       if (version >= 4)
+> -               x86_pmu.counter_freezing = !disable_counter_freezing;
+> -
+>         if (boot_cpu_has(X86_FEATURE_PDCM)) {
+>                 u64 capabilities;
+>
+> @@ -5090,7 +4947,6 @@ __init int intel_pmu_init(void)
+>
+>         case INTEL_FAM6_ATOM_GOLDMONT:
+>         case INTEL_FAM6_ATOM_GOLDMONT_D:
+> -               x86_add_quirk(intel_counter_freezing_quirk);
+>                 memcpy(hw_cache_event_ids, glm_hw_cache_event_ids,
+>                        sizeof(hw_cache_event_ids));
+>                 memcpy(hw_cache_extra_regs, glm_hw_cache_extra_regs,
+> @@ -5117,7 +4973,6 @@ __init int intel_pmu_init(void)
+>                 break;
+>
+>         case INTEL_FAM6_ATOM_GOLDMONT_PLUS:
+> -               x86_add_quirk(intel_counter_freezing_quirk);
+>                 memcpy(hw_cache_event_ids, glp_hw_cache_event_ids,
+>                        sizeof(hw_cache_event_ids));
+>                 memcpy(hw_cache_extra_regs, glp_hw_cache_extra_regs,
+> @@ -5577,13 +5432,6 @@ __init int intel_pmu_init(void)
+>                 pr_cont("full-width counters, ");
+>         }
+>
+> -       /*
+> -        * For arch perfmon 4 use counter freezing to avoid
+> -        * several MSR accesses in the PMI.
+> -        */
+> -       if (x86_pmu.counter_freezing)
+> -               x86_pmu.handle_irq = intel_pmu_handle_irq_v4;
+> -
+>         if (x86_pmu.intel_cap.perf_metrics)
+>                 x86_pmu.intel_ctrl |= 1ULL << GLOBAL_CTRL_EN_PERF_METRICS;
+>
+> diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+> index 10032f023fcc..4084fa31cc21 100644
+> --- a/arch/x86/events/perf_event.h
+> +++ b/arch/x86/events/perf_event.h
+> @@ -681,8 +681,7 @@ struct x86_pmu {
+>
+>         /* PMI handler bits */
+>         unsigned int    late_ack                :1,
+> -                       enabled_ack             :1,
+> -                       counter_freezing        :1;
+> +                       enabled_ack             :1;
+>         /*
+>          * sysfs attrs
+>          */
