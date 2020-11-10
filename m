@@ -2,149 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3138D2ACA3E
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 02:14:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BB792ACA61
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 02:23:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731802AbgKJBOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 20:14:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50386 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731267AbgKJBOA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 20:14:00 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE2DC0613CF;
-        Mon,  9 Nov 2020 17:13:59 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1604970836;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UkwosGD4CNwpr5O4mn7FToWEjHCGounmVIqa5vjwzhQ=;
-        b=DRjXCHfaWTV+37wSriT1BjBgrVPE6jdQ5QSgYOIapfxJkFIwaFOAyxB9axkmnF7jwFoYyj
-        IwVALzvZ0PuA7RxNph9leDCS6B9rTa4rL3nKcIBy/Am24PTMh01e/A2SQWp6LTkOQfBaj6
-        TPNYDFf29DCqNiv3sgD8nE6enYeIlsYkCGyKDzwB1FGN01/Y3vKoJQtpchwkYWrvNb9W70
-        4PCnBA8S0oYM/XwkwwZotKzR9vmT9oC6FdGvh5lMI1bLUaS0qdB+ZPTGprUeJSBjnvH0Xv
-        xyRk7zOTS6b0OUuDBNt+X1xYcMB1KSB7gGowiPoSA5hPR5omsqQ5g20Kt4+uKg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1604970836;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UkwosGD4CNwpr5O4mn7FToWEjHCGounmVIqa5vjwzhQ=;
-        b=acv/dHWHYYmtT1/z0brDNSAmBtlvEk8c07ItXmS/RUDap25yEm8biO9jTMWItRsTlNRTeF
-        x/KI3sqvslL8SkDg==
-To:     ira.weiny@intel.com, Andrew Morton <akpm@linux-foundation.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Ira Weiny <ira.weiny@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>, x86@kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-        kexec@lists.infradead.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, devel@driverdev.osuosl.org,
-        linux-efi@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-um@lists.infradead.org, linux-ntfs-dev@lists.sourceforge.net,
-        reiserfs-devel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
-        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-rdma@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
-        samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH RFC PKS/PMEM 05/58] kmap: Introduce k[un]map_thread
-In-Reply-To: <20201009195033.3208459-6-ira.weiny@intel.com>
-References: <20201009195033.3208459-1-ira.weiny@intel.com> <20201009195033.3208459-6-ira.weiny@intel.com>
-Date:   Tue, 10 Nov 2020 02:13:56 +0100
-Message-ID: <87h7pyhv3f.fsf@nanos.tec.linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S1731645AbgKJBXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 20:23:50 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:37818 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731581AbgKJBXr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 20:23:47 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AA1KDRY138928;
+        Tue, 10 Nov 2020 01:23:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=u3ugKtb/hD7qDBm+r+haai4+xBCusqnBiUb7VIooum0=;
+ b=D5Tpu6M2VphEkHQWxNQ3HNfTL8BvPmGYCy//QKq4MwiSK7NAyG7wHbPHaw+RbtZi02aW
+ d2XxgkkPMDIJpdT4PBE8LtQu0pqoNtAgvvhHGIeKPUJhrz4sgQb8STJGCISGl3xNsi28
+ /eehGagtlPhzOwx+PDRqmcbOaIqMNq0YSCgciBX/OuGUPMoo7ivzjTK49Gtr8gdSu9Yw
+ 07TaHpOcuKWD32hbQOCBFy7qgbl4TgQyuWIFM3y3f1EoiQnenXY2uhI0BOkT1GPgEHtT
+ +5eLJVYKQaZ1Hk2AxZQWbBSmWtmgDOjMbUvh2fNekT93WpBaIgBZT7MAk4VIoyHG7TYL Kw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2130.oracle.com with ESMTP id 34nh3asa70-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 10 Nov 2020 01:23:33 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AA1K5A8023810;
+        Tue, 10 Nov 2020 01:23:32 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 34p5gw4a00-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Nov 2020 01:23:32 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AA1NVpG005460;
+        Tue, 10 Nov 2020 01:23:31 GMT
+Received: from nsvm-sadhukhan-1.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 09 Nov 2020 17:23:31 -0800
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, qemu-devel@nongnu.org
+Subject: [PATCH 0/5 v4] KVM: x86: Fill in conforming {vmx|svm}_x86_ops and {vmx|svm}_nested_ops via macros
+Date:   Tue, 10 Nov 2020 01:23:07 +0000
+Message-Id: <20201110012312.20820-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.18.4
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9800 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=621 mlxscore=0
+ spamscore=0 phishscore=0 adultscore=0 malwarescore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011100008
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9800 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 priorityscore=1501
+ clxscore=1011 malwarescore=0 mlxscore=0 spamscore=0 suspectscore=1
+ mlxlogscore=635 impostorscore=0 phishscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011100008
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ira,
+v3 -> v4:
+	1. v3 did not include a few x86_ops and x86_nested_ops in the macro
+	   expansion process of function names. This set has covered all those
+	   left-out ops.
+	2. Patch# 6 from v3 has been dropped as those changes already exist in
+	   QEMU source.
 
-On Fri, Oct 09 2020 at 12:49, ira weiny wrote:
-> From: Ira Weiny <ira.weiny@intel.com>
->
-> To correctly support the semantics of kmap() with Kernel protection keys
-> (PKS), kmap() may be required to set the protections on multiple
-> processors (globally).  Enabling PKS globally can be very expensive
-> depending on the requested operation.  Furthermore, enabling a domain
-> globally reduces the protection afforded by PKS.
->
-> Most kmap() (Aprox 209 of 229) callers use the map within a single thread and
-> have no need for the protection domain to be enabled globally.  However, the
-> remaining callers do not follow this pattern and, as best I can tell, expect
-> the mapping to be 'global' and available to any thread who may access the
-> mapping.[1]
->
-> We don't anticipate global mappings to pmem, however in general there is a
-> danger in changing the semantics of kmap().  Effectively, this would cause an
-> unresolved page fault with little to no information about why the failure
-> occurred.
->
-> To resolve this a number of options were considered.
->
-> 1) Attempt to change all the thread local kmap() calls to kmap_atomic()[2]
-> 2) Introduce a flags parameter to kmap() to indicate if the mapping should be
->    global or not
-> 3) Change ~20 call sites to 'kmap_global()' to indicate that they require a
->    global enablement of the pages.
-> 4) Change ~209 call sites to 'kmap_thread()' to indicate that the mapping is to
->    be used within that thread of execution only
->
-> Option 1 is simply not feasible.  Option 2 would require all of the call sites
-> of kmap() to change.  Option 3 seems like a good minimal change but there is a
-> danger that new code may miss the semantic change of kmap() and not get the
-> behavior the developer intended.  Therefore, #4 was chosen.
 
-There is Option #5:
+[PATCH 1/5 v4] KVM: x86: Change names of some of the kvm_x86_ops
+[PATCH 2/5 v4] KVM: SVM: Fill in conforming svm_x86_ops via macro
+[PATCH 3/5 v4] KVM: nSVM: Fill in conforming svm_nested_ops via macro
+[PATCH 4/5 v4] KVM: VMX: Fill in conforming vmx_x86_ops via macro
+[PATCH 5/5 v4] KVM: nVMX: Fill in conforming vmx_nested_ops via macro
 
-Convert the thread local kmap() invocations to the proposed kmap_local()
-interface which is coming along [1].
+ arch/arm64/include/asm/kvm_host.h   |   2 +-
+ arch/mips/include/asm/kvm_host.h    |   2 +-
+ arch/powerpc/include/asm/kvm_host.h |   2 +-
+ arch/s390/kvm/kvm-s390.c            |   2 +-
+ arch/x86/include/asm/kvm_host.h     |  16 +-
+ arch/x86/kvm/lapic.c                |   2 +-
+ arch/x86/kvm/pmu.h                  |   4 +-
+ arch/x86/kvm/svm/avic.c             |  11 +-
+ arch/x86/kvm/svm/nested.c           |  20 +--
+ arch/x86/kvm/svm/pmu.c              |   2 +-
+ arch/x86/kvm/svm/sev.c              |   4 +-
+ arch/x86/kvm/svm/svm.c              | 296 ++++++++++++++++++++----------------
+ arch/x86/kvm/svm/svm.h              |  15 +-
+ arch/x86/kvm/vmx/evmcs.c            |   6 +-
+ arch/x86/kvm/vmx/evmcs.h            |   4 +-
+ arch/x86/kvm/vmx/nested.c           |  39 +++--
+ arch/x86/kvm/vmx/pmu_intel.c        |   2 +-
+ arch/x86/kvm/vmx/posted_intr.c      |   6 +-
+ arch/x86/kvm/vmx/posted_intr.h      |   4 +-
+ arch/x86/kvm/vmx/vmx.c              | 262 +++++++++++++++----------------
+ arch/x86/kvm/vmx/vmx.h              |   4 +-
+ arch/x86/kvm/x86.c                  |  41 ++---
+ include/linux/kvm_host.h            |   2 +-
+ include/uapi/linux/kvm.h            |   6 +-
+ tools/include/uapi/linux/kvm.h      |   6 +-
+ virt/kvm/kvm_main.c                 |   4 +-
+ 26 files changed, 405 insertions(+), 359 deletions(-)
 
-That solves a couple of issues:
-
- 1) It relieves the current kmap_atomic() usage sites from the implict
-    pagefault/preempt disable semantics which apply even when
-    CONFIG_HIGHMEM is disabled. kmap_local() still can be invoked from
-    atomic context.
-
- 2) Due to #1 it allows to replace the conditional usage of kmap() and
-    kmap_atomic() for purely thread local mappings.
-
- 3) It puts the burden on the HIGHMEM inflicted systems
-
- 4) It is actually more efficient for most of the pure thread local use
-    cases on HIGHMEM inflicted systems because it avoids the overhead of
-    the global lock and the potential kmap slot exhaustion. A potential
-    preemption will be more expensive, but that's not really the case we
-    want to optimize for.
-
- 5) It solves the RT issue vs. kmap_atomic()
-
-So instead of creating yet another variety of kmap() which is just
-scratching the particular PKRS itch, can we please consolidate all of
-that on the wider reaching kmap_local() approach?
-
-Thanks,
-
-        tglx
-     
-[1] https://lore.kernel.org/lkml/20201103092712.714480842@linutronix.de/
+Krish Sadhukhan (5):
+      KVM: x86: Change names of some of the kvm_x86_ops functions to make them more semantical and readable
+      KVM: SVM: Fill in conforming svm_x86_ops via macro
+      KVM: nSVM: Fill in conforming svm_nested_ops via macro
+      KVM: VMX: Fill in conforming vmx_x86_ops via macro
+      KVM: nVMX: Fill in conforming vmx_nested_ops via macro
 
