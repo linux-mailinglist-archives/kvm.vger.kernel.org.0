@@ -2,111 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B9F12AE0C8
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:37:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B7052AE0F7
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:48:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730894AbgKJUhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 15:37:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41003 "EHLO
+        id S1727851AbgKJUsO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 15:48:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24032 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726400AbgKJUhl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Nov 2020 15:37:41 -0500
+        by vger.kernel.org with ESMTP id S1725862AbgKJUsN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Nov 2020 15:48:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605040659;
+        s=mimecast20190719; t=1605041292;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=86E1PiwpTATAQtderrQWGZYhJziSfrLmfv7s2P36MyY=;
-        b=EatpexV/NwS2/g4QcIp62FdQTYoYh+2mXkQrBnPDlRGJkGM4tG3RhJJ/UMfHWYcKI8k6rs
-        uzwqRzATJ7CigCcIK1YuqzQUptg1NKQ4DKkSH+ib4nyedePQ8iFmZjIkl4vv0tikCrSo63
-        z016iJnGvQZ9l2qygKMNoGVTLer8KVY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-usJEOh08N8S0qFc7IOy46A-1; Tue, 10 Nov 2020 15:37:38 -0500
-X-MC-Unique: usJEOh08N8S0qFc7IOy46A-1
-Received: by mail-wr1-f72.google.com with SMTP id w17so5372971wrp.11
-        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 12:37:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=86E1PiwpTATAQtderrQWGZYhJziSfrLmfv7s2P36MyY=;
-        b=aOXBX5VdUBRmNSvvOgWJV0XVQgSj7UwbsbKcDvdqtC7/2VE8nbpPdkA3f6RnATbknX
-         H1shyLhv4Ded/cjNGy8lkGi6lTcmnTvKjPQl/saPvg0koE6Vj3VNMIk2l/LEgPr3QpAG
-         xXOue6ouq29wiulx55BXpIaktoEcffsn89DVgWmwvEZQeIy81LnAYpCCELOJsLEPQKk3
-         1g0E3TZoZRQ5tKMPX7NZuX3xlmEsgCdUYDqx6mzSwVEOZurOlHecfPmjHIRICKrbsBHB
-         xlPItZmkhk6kkNTMAAx7dE/rDVHS/wJG5g/3qx9m8d3AhHfy/uhrMzoz4QmxsPsAW+kD
-         0hCQ==
-X-Gm-Message-State: AOAM530BAHXvpdJvbYtLImdDAPsKSiv8TUhPwHvifjTlFIGmdOSkBNB+
-        6uEtyfdZcxgusPozPPwoQW0IvZ7Rlz6uWUggZZ0mpzBq/A3+3NvnigrMM5n2nMCnRyWgOp+oCRq
-        8Br/KOLrAjq5tFph5+jiEayJnTFUxgPSd8YPcgHo6FzYgDCLJjgGRs5OjTLBhMDxQ
-X-Received: by 2002:a5d:6744:: with SMTP id l4mr24886223wrw.378.1605040656898;
-        Tue, 10 Nov 2020 12:37:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw1TcLE86QgwB8CSzyVPHmo0gyCUPTPLnWMfxW3NiNpbb9kz55y3L1GCvdcftAsFMgZJiLBMg==
-X-Received: by 2002:a5d:6744:: with SMTP id l4mr24886197wrw.378.1605040656635;
-        Tue, 10 Nov 2020 12:37:36 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id g131sm4181864wma.35.2020.11.10.12.37.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2020 12:37:35 -0800 (PST)
-To:     "Luck, Tony" <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>
-Cc:     Jim Mattson <jmattson@google.com>, Qian Cai <cai@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-tip-commits@vger.kernel.org" 
-        <linux-tip-commits@vger.kernel.org>, x86 <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <160431588828.397.16468104725047768957.tip-bot2@tip-bot2>
- <3f863634cd75824907e8ccf8164548c2ef036f20.camel@redhat.com>
- <bfc274fc27724ea39ecac1e7ac834ed8@intel.com>
- <CALMp9eTFaiYkTnVe8xKzg40E4nZ3rAOii0O06bTy0+oLNjyKhA@mail.gmail.com>
- <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
- <20201109232402.GA25492@agluck-desk2.amr.corp.intel.com>
- <20201110063151.GB7290@nazgul.tnic>
- <094c2395-b1b3-d908-657c-9bd4144e40ac@redhat.com>
- <20201110095615.GB9450@nazgul.tnic>
- <b8de7f7b-7aa1-d98b-74be-62d7c055542b@redhat.com>
- <20201110155013.GE9857@nazgul.tnic>
- <1b587b45-a5a8-2147-ae53-06d1b284ea11@redhat.com>
- <cacd1cd272e94213a0c82c9871086cf5@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] x86/mce: Check for hypervisor before enabling additional
- error logging
-Message-ID: <7bd98718-f800-02ef-037a-4dfc5a7d1a54@redhat.com>
-Date:   Tue, 10 Nov 2020 21:37:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=yD3ERpKzQDHedcF9/ZJkd6ntCshIVv0hhLeGQJV6/wY=;
+        b=cd4kUI1dlARe3wIz5VFYmGdsbfLxkGDf71kD+wVY2eOnhVEEDN8Uh5nA7fYomMvSAVD1Rb
+        73wXUygxn5Cei38INtQ2R61gIXoE3WDbY0cdfqaHnt+CWogmNc1EHLjcsOa+R9/oAmOWV8
+        yfupPSVXIicujgLejeC8rgQxNZftM4U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-JNHkX94HMd-txTqm1rwpxA-1; Tue, 10 Nov 2020 15:48:10 -0500
+X-MC-Unique: JNHkX94HMd-txTqm1rwpxA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A73CA87951F;
+        Tue, 10 Nov 2020 20:48:09 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.179])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B82910016DA;
+        Tue, 10 Nov 2020 20:48:04 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        bgardon@google.com, peterx@redhat.com
+Subject: [PATCH 0/8] KVM: selftests: Cleanups, take 2
+Date:   Tue, 10 Nov 2020 21:47:54 +0100
+Message-Id: <20201110204802.417521-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cacd1cd272e94213a0c82c9871086cf5@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/11/20 18:52, Luck, Tony wrote:
-> Look at what it is trying to do ... change the behavior of the platform w.r.t. logging
-> of memory errors.  How does that make any sense for a guest ...
+This series attempts to clean up demand_paging_test, dirty_log_perf_test,
+and dirty_log_test by factoring out common code, creating some new API
+along the way.  It also splits include/perf_test_util.h into a more
+conventional header and source pair. There's still some stuff I don't
+like, for example the unbalanced ucall_uninit we now get for tests using
+the perf_test API, but I'll maybe revisit that stuff again some other day.
 
-Logging of memory errors certainly makes sense for a guest, KVM already 
-does MCE forwarding as you probably know.
+I've tested on x86 and AArch64 (one config each), but not s390x.
 
-The exact set of information that MSR_ERROR_CONTROL[1] adds may not make 
-much sense in the case of KVM, but it may make sense for other 
-hypervisors that do nothing but partition the host.  (Difficult for me 
-to say since the relevant part of the SDM might as well be written in 
-Klingon :)).
+Thanks,
+drew
 
-In any case, checking HYPERVISOR is not enough because having it clear 
-is a valid configuration.  So you would still have to switch to 
-{rd,wr}msrl_safe, and then checking HYPERVISOR is pointless.
 
-Paolo
+Andrew Jones (8):
+  KVM: selftests: Update .gitignore
+  KVM: selftests: Remove deadcode
+  KVM: selftests: Factor out guest mode code
+  KVM: selftests: Make vm_create_default common
+  KVM: selftests: Introduce vm_create_[default_]_with_vcpus
+  KVM: selftests: dirty_log_test: Remove create_vm
+  KVM: selftests: Use vm_create_with_vcpus in create_vm
+  KVM: selftests: Implement perf_test_util more conventionally
 
-> that doesn't even
-> know what memory is present on the platform. Or have guarantees that what it sees
-> as memory address 0x12345678 maps to the same set of cells in a DRAM from one
-> second to the next?
+ tools/testing/selftests/kvm/.gitignore        |   2 +-
+ tools/testing/selftests/kvm/Makefile          |   2 +-
+ .../selftests/kvm/demand_paging_test.c        | 115 +++--------
+ .../selftests/kvm/dirty_log_perf_test.c       | 174 ++++-------------
+ tools/testing/selftests/kvm/dirty_log_test.c  | 179 +++++-------------
+ .../selftests/kvm/include/guest_modes.h       |  21 ++
+ .../testing/selftests/kvm/include/kvm_util.h  |  42 +++-
+ .../selftests/kvm/include/perf_test_util.h    | 170 +----------------
+ .../selftests/kvm/lib/aarch64/processor.c     |  17 --
+ tools/testing/selftests/kvm/lib/guest_modes.c |  70 +++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  60 +++++-
+ .../selftests/kvm/lib/perf_test_util.c        | 134 +++++++++++++
+ .../selftests/kvm/lib/s390x/processor.c       |  22 ---
+ .../selftests/kvm/lib/x86_64/processor.c      |  32 ----
+ 14 files changed, 451 insertions(+), 589 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/guest_modes.h
+ create mode 100644 tools/testing/selftests/kvm/lib/guest_modes.c
+ create mode 100644 tools/testing/selftests/kvm/lib/perf_test_util.c
+
+-- 
+2.26.2
 
