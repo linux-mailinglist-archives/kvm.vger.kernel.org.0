@@ -2,524 +2,675 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 510ED2ACA68
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 02:25:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE802ACA69
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 02:25:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730460AbgKJBZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Nov 2020 20:25:45 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:43094 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729452AbgKJBZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Nov 2020 20:25:45 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AA1JlM2134847;
-        Tue, 10 Nov 2020 01:25:33 GMT
+        id S1730911AbgKJBZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Nov 2020 20:25:49 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:52710 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727311AbgKJBZs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Nov 2020 20:25:48 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AA1Jr0F025191;
+        Tue, 10 Nov 2020 01:25:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=RfTNumpSEEH4ytP1ibwXcPjCeqUMXJxiPwdNHiSal3U=;
- b=gZ5wLe5saf2k7EbE8uUEKhE06l46KygDUU9fXF9kssqyPCyDgASshoMmY+c0yR9mKZmV
- uzbMp8KbVJITe+yDTaTPDo4wHVQFRJ6s8aYnPwEAB9qBJJ0H7nyHfs3KgyVwU/OCbaSJ
- NS9aofs3oqhsah0GZZ6urhi0UCmwZRkr5/cs6k1QM48AEoX9Kmr/6QbzFlZ4rubkqYXP
- KDGMgT9Jjj3Cns3jcYUK0SowTiOQCfSqwYgaJ74mV0zkRlSfY62WdvqAT1u5s1RzJDWp
- IOj7mRMm2kTxDIvT6R8QMdJjFXyYPJdHEqCqjz5DwGWplf56NFxbaTFWEx/k4st0X8eU nw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 34p72ef9na-1
+ bh=ITo9wgcThV5ahMuogfGJOCrxdCaS2YmK9gmdexWnxjA=;
+ b=deb3k1O/iP0xtEvwwcD1ebIIgk0kIJQAh42bosbdKJMkO7MNqaLEaVRwZr/w8Aknp0Mj
+ kd7FatsJwHXW8PZCOZGRzVB4jzK1fjggzS8RemFD6VmXOL+qZpr3dujuHX9KlCIYiX6F
+ lOT9lnaSL+QgGqtLvnXglCLIZdZS33Olxn/R+KqV8Z9JgfERwKwMuP3S0A0UIQgKhOoL
+ QM53Uggycg4MZPClHDWwnW1KAxnv6YYrojWbDWZSV8buOWK3Tll9jCpdTp+nlkuC+9/X
+ 9q7YZhiK5XzFo8XHREGtx6Sj4ZfxZRr73o11bNijX2vqsUsZFXwllH5El7bhETwnCnER lA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 34nkhks3ef-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 10 Nov 2020 01:25:33 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AA1K7V3024070;
+        Tue, 10 Nov 2020 01:25:34 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AA1L1aQ162047;
         Tue, 10 Nov 2020 01:23:33 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 34p5gw4a0r-1
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 34qgp610j0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 10 Nov 2020 01:23:33 +0000
 Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0AA1NWjf014143;
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AA1NWej019784;
         Tue, 10 Nov 2020 01:23:32 GMT
 Received: from nsvm-sadhukhan-1.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 09 Nov 2020 17:23:31 -0800
+        with ESMTP ; Mon, 09 Nov 2020 17:23:32 -0800
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
 To:     kvm@vger.kernel.org
 Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
         pbonzini@redhat.com, vkuznets@redhat.com, qemu-devel@nongnu.org
-Subject: [PATCH 1/5 v4] KVM: x86: Change names of some of the kvm_x86_ops functions to make them more semantical and readable
-Date:   Tue, 10 Nov 2020 01:23:08 +0000
-Message-Id: <20201110012312.20820-2-krish.sadhukhan@oracle.com>
+Subject: [PATCH 2/5 v4] KVM: SVM: Fill in conforming svm_x86_ops via macro
+Date:   Tue, 10 Nov 2020 01:23:09 +0000
+Message-Id: <20201110012312.20820-3-krish.sadhukhan@oracle.com>
 X-Mailer: git-send-email 2.18.4
 In-Reply-To: <20201110012312.20820-1-krish.sadhukhan@oracle.com>
 References: <20201110012312.20820-1-krish.sadhukhan@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9800 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 phishscore=0 adultscore=0 malwarescore=0 suspectscore=4
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011100008
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ adultscore=0 mlxscore=0 malwarescore=0 suspectscore=3 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011100008
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9800 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- malwarescore=0 suspectscore=4 lowpriorityscore=0 adultscore=0 phishscore=0
- priorityscore=1501 spamscore=0 impostorscore=0 clxscore=1015
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 priorityscore=1501
+ mlxscore=0 suspectscore=3 mlxlogscore=999 lowpriorityscore=0 spamscore=0
+ malwarescore=0 adultscore=0 clxscore=1015 bulkscore=0 impostorscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
  definitions=main-2011100008
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The names of some of the svm_x86_ops functions do not have a corresponding
+'svm_' prefix. Generate the names using a macro so that the names are
+conformant. Fixing the naming will help in better readability and
+maintenance of the code.
+
 Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 ---
- arch/arm64/include/asm/kvm_host.h   |  2 +-
- arch/mips/include/asm/kvm_host.h    |  2 +-
- arch/powerpc/include/asm/kvm_host.h |  2 +-
- arch/s390/kvm/kvm-s390.c            |  2 +-
- arch/x86/include/asm/kvm_host.h     | 16 +++++++--------
- arch/x86/kvm/lapic.c                |  2 +-
- arch/x86/kvm/svm/nested.c           |  2 +-
- arch/x86/kvm/svm/svm.c              | 14 +++++++-------
- arch/x86/kvm/vmx/nested.c           |  2 +-
- arch/x86/kvm/vmx/vmx.c              | 10 +++++-----
- arch/x86/kvm/x86.c                  | 30 ++++++++++++++---------------
- include/linux/kvm_host.h            |  2 +-
- include/uapi/linux/kvm.h            |  6 +++---
- tools/include/uapi/linux/kvm.h      |  6 +++---
- virt/kvm/kvm_main.c                 |  4 ++--
- 15 files changed, 51 insertions(+), 51 deletions(-)
+ arch/x86/kvm/pmu.h      |   2 +-
+ arch/x86/kvm/svm/avic.c |  11 +-
+ arch/x86/kvm/svm/pmu.c  |   2 +-
+ arch/x86/kvm/svm/sev.c  |   4 +-
+ arch/x86/kvm/svm/svm.c  | 296 ++++++++++++++++++++++------------------
+ arch/x86/kvm/svm/svm.h  |  15 +-
+ arch/x86/kvm/x86.c      |  11 +-
+ 7 files changed, 187 insertions(+), 154 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 781d029b8aa8..50d0768f3aef 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -592,7 +592,7 @@ static inline bool kvm_arch_requires_vhe(void)
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 067fef51760c..a7f1f048c6a8 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -161,5 +161,5 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
+ bool is_vmware_backdoor_pmc(u32 pmc_idx);
  
- void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
- 
--static inline void kvm_arch_hardware_unsetup(void) {}
-+static inline void kvm_arch_hardware_teardown(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 24f3d0f9996b..88ec47f7a56a 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -1145,7 +1145,7 @@ extern unsigned long kvm_mips_get_ramsize(struct kvm *kvm);
- extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 			     struct kvm_mips_interrupt *irq);
- 
--static inline void kvm_arch_hardware_unsetup(void) {}
-+static inline void kvm_arch_hardware_teardown(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot) {}
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index d67a470e95a3..5a702ce6398a 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -860,7 +860,7 @@ struct kvm_vcpu_arch {
- #define __KVM_HAVE_CREATE_DEVICE
- 
- static inline void kvm_arch_hardware_disable(void) {}
--static inline void kvm_arch_hardware_unsetup(void) {}
-+static inline void kvm_arch_hardware_teardown(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 6b74b92c1a58..e503263a0ef7 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -312,7 +312,7 @@ int kvm_arch_hardware_setup(void *opaque)
- 	return 0;
+ extern struct kvm_pmu_ops intel_pmu_ops;
+-extern struct kvm_pmu_ops amd_pmu_ops;
++extern struct kvm_pmu_ops svm_pmu_ops;
+ #endif /* __KVM_X86_PMU_H */
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 8c550999ace0..1e709237a77f 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -577,7 +577,12 @@ int avic_init_vcpu(struct vcpu_svm *svm)
+ 	return ret;
  }
  
--void kvm_arch_hardware_unsetup(void)
-+void kvm_arch_hardware_teardown(void)
+-void avic_post_state_restore(struct kvm_vcpu *vcpu)
++int svm_sync_pir_to_irr(struct kvm_vcpu *vcpu)
++{
++	return kvm_lapic_find_highest_irr(vcpu);
++}
++
++void svm_apicv_post_state_restore(struct kvm_vcpu *vcpu)
  {
- 	gmap_unregister_pte_notifier(&gmap_notifier);
- 	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d44858b69353..3f3948f08440 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1085,7 +1085,7 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
- struct kvm_x86_ops {
- 	int (*hardware_enable)(void);
- 	void (*hardware_disable)(void);
--	void (*hardware_unsetup)(void);
-+	void (*hardware_teardown)(void);
- 	bool (*cpu_has_accelerated_tpr)(void);
- 	bool (*has_emulated_msr)(u32 index);
- 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
-@@ -1146,7 +1146,7 @@ struct kvm_x86_ops {
- 	 */
- 	void (*tlb_flush_guest)(struct kvm_vcpu *vcpu);
+ 	if (avic_handle_apic_id_update(vcpu) != 0)
+ 		return;
+@@ -658,7 +663,7 @@ void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+ 		 * we need to check and update the AVIC logical APIC ID table
+ 		 * accordingly before re-activating.
+ 		 */
+-		avic_post_state_restore(vcpu);
++		svm_apicv_post_state_restore(vcpu);
+ 		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
+ 	} else {
+ 		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
+@@ -673,7 +678,7 @@ void svm_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+ 	return;
+ }
  
--	enum exit_fastpath_completion (*run)(struct kvm_vcpu *vcpu);
-+	enum exit_fastpath_completion (*vcpu_run)(struct kvm_vcpu *vcpu);
- 	int (*handle_exit)(struct kvm_vcpu *vcpu,
- 		enum exit_fastpath_completion exit_fastpath);
- 	int (*skip_emulated_instruction)(struct kvm_vcpu *vcpu);
-@@ -1155,8 +1155,8 @@ struct kvm_x86_ops {
- 	u32 (*get_interrupt_shadow)(struct kvm_vcpu *vcpu);
- 	void (*patch_hypercall)(struct kvm_vcpu *vcpu,
- 				unsigned char *hypercall_addr);
--	void (*set_irq)(struct kvm_vcpu *vcpu);
--	void (*set_nmi)(struct kvm_vcpu *vcpu);
-+	void (*inject_irq)(struct kvm_vcpu *vcpu);
-+	void (*inject_nmi)(struct kvm_vcpu *vcpu);
- 	void (*queue_exception)(struct kvm_vcpu *vcpu);
- 	void (*cancel_injection)(struct kvm_vcpu *vcpu);
- 	int (*interrupt_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
-@@ -1175,7 +1175,7 @@ struct kvm_x86_ops {
- 	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
- 	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
- 	void (*set_apic_access_page_addr)(struct kvm_vcpu *vcpu);
--	int (*deliver_posted_interrupt)(struct kvm_vcpu *vcpu, int vector);
-+	int (*deliver_interrupt)(struct kvm_vcpu *vcpu, int vector);
- 	int (*sync_pir_to_irr)(struct kvm_vcpu *vcpu);
- 	int (*set_tss_addr)(struct kvm *kvm, unsigned int addr);
- 	int (*set_identity_map_addr)(struct kvm *kvm, u64 ident_addr);
-@@ -1267,8 +1267,8 @@ struct kvm_x86_ops {
- 	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
+-int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
++int svm_deliver_interrupt(struct kvm_vcpu *vcpu, int vec)
+ {
+ 	if (!vcpu->arch.apicv_active)
+ 		return -1;
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index 035da07500e8..e518372ab292 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -311,7 +311,7 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- 	int (*mem_enc_op)(struct kvm *kvm, void __user *argp);
--	int (*mem_enc_reg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
--	int (*mem_enc_unreg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
-+	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
-+	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+-struct kvm_pmu_ops amd_pmu_ops = {
++struct kvm_pmu_ops svm_pmu_ops = {
+ 	.find_arch_event = amd_find_arch_event,
+ 	.find_fixed_event = amd_find_fixed_event,
+ 	.pmc_is_enabled = amd_pmc_is_enabled,
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index c0b14106258a..53d8a6fbaf8e 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -984,7 +984,7 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	return r;
+ }
  
- 	int (*get_msr_feature)(struct kvm_msr_entry *entry);
+-int svm_register_enc_region(struct kvm *kvm,
++int svm_mem_enc_register_region(struct kvm *kvm,
+ 			    struct kvm_enc_region *range)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+@@ -1053,7 +1053,7 @@ static void __unregister_enc_region_locked(struct kvm *kvm,
+ 	kfree(region);
+ }
  
-@@ -1290,7 +1290,7 @@ struct kvm_x86_nested_ops {
- 	int (*set_state)(struct kvm_vcpu *vcpu,
- 			 struct kvm_nested_state __user *user_kvm_nested_state,
- 			 struct kvm_nested_state *kvm_state);
--	bool (*get_nested_state_pages)(struct kvm_vcpu *vcpu);
-+	bool (*get_pages)(struct kvm_vcpu *vcpu);
- 	int (*write_log_dirty)(struct kvm_vcpu *vcpu, gpa_t l2_gpa);
- 
- 	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 105e7859d1f2..aa839724fe94 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1090,7 +1090,7 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
- 						       apic->regs + APIC_TMR);
- 		}
- 
--		if (kvm_x86_ops.deliver_posted_interrupt(vcpu, vector)) {
-+		if (kvm_x86_ops.deliver_interrupt(vcpu, vector)) {
- 			kvm_lapic_set_irr(vector, apic);
- 			kvm_make_request(KVM_REQ_EVENT, vcpu);
- 			kvm_vcpu_kick(vcpu);
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 9e4c226dbf7d..200674190449 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1211,7 +1211,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 
- struct kvm_x86_nested_ops svm_nested_ops = {
- 	.check_events = svm_check_nested_events,
--	.get_nested_state_pages = svm_get_nested_state_pages,
-+	.get_pages = svm_get_nested_state_pages,
- 	.get_state = svm_get_nested_state,
- 	.set_state = svm_set_nested_state,
- };
+-int svm_unregister_enc_region(struct kvm *kvm,
++int svm_mem_enc_unregister_region(struct kvm *kvm,
+ 			      struct kvm_enc_region *range)
+ {
+ 	struct enc_region *region;
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2f32fd09e259..5ee8eef1905a 100644
+index 5ee8eef1905a..6a845c9625ad 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -4177,7 +4177,7 @@ static int svm_vm_init(struct kvm *kvm)
+@@ -332,7 +332,7 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
+ 
  }
  
- static struct kvm_x86_ops svm_x86_ops __initdata = {
--	.hardware_unsetup = svm_hardware_teardown,
-+	.hardware_teardown = svm_hardware_teardown,
- 	.hardware_enable = svm_hardware_enable,
- 	.hardware_disable = svm_hardware_disable,
- 	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
-@@ -4224,15 +4224,15 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.tlb_flush_gva = svm_flush_tlb_gva,
- 	.tlb_flush_guest = svm_flush_tlb,
+-static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
++static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
--	.run = svm_vcpu_run,
-+	.vcpu_run = svm_vcpu_run,
- 	.handle_exit = handle_exit,
- 	.skip_emulated_instruction = skip_emulated_instruction,
- 	.update_emulated_instruction = NULL,
- 	.set_interrupt_shadow = svm_set_interrupt_shadow,
- 	.get_interrupt_shadow = svm_get_interrupt_shadow,
- 	.patch_hypercall = svm_patch_hypercall,
--	.set_irq = svm_set_irq,
--	.set_nmi = svm_inject_nmi,
-+	.inject_irq = svm_set_irq,
-+	.inject_nmi = svm_inject_nmi,
- 	.queue_exception = svm_queue_exception,
- 	.cancel_injection = svm_cancel_injection,
- 	.interrupt_allowed = svm_interrupt_allowed,
-@@ -4276,7 +4276,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.pmu_ops = &amd_pmu_ops,
- 	.nested_ops = &svm_nested_ops,
- 
--	.deliver_posted_interrupt = svm_deliver_avic_intr,
-+	.deliver_interrupt = svm_deliver_avic_intr,
- 	.dy_apicv_has_pending_interrupt = svm_dy_apicv_has_pending_interrupt,
- 	.update_pi_irte = svm_update_pi_irte,
- 	.setup_mce = svm_setup_mce,
-@@ -4287,8 +4287,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.enable_smi_window = enable_smi_window,
- 
- 	.mem_enc_op = svm_mem_enc_op,
--	.mem_enc_reg_region = svm_register_enc_region,
--	.mem_enc_unreg_region = svm_unregister_enc_region,
-+	.mem_enc_register_region = svm_register_enc_region,
-+	.mem_enc_unregister_region = svm_unregister_enc_region,
- 
- 	.can_emulate_instruction = svm_can_emulate_instruction,
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 89af692deb7e..6c32f73cffd5 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6573,7 +6573,7 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
- 	.hv_timer_pending = nested_vmx_preemption_timer_pending,
- 	.get_state = vmx_get_nested_state,
- 	.set_state = vmx_set_nested_state,
--	.get_nested_state_pages = nested_get_vmcs12_pages,
-+	.get_pages = nested_get_vmcs12_pages,
- 	.write_log_dirty = nested_vmx_write_pml_buffer,
- 	.enable_evmcs = nested_enable_evmcs,
- 	.get_evmcs_version = nested_get_evmcs_version,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 47b8357b9751..ddfc127d5c4f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7588,7 +7588,7 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
+@@ -371,7 +371,7 @@ static void svm_queue_exception(struct kvm_vcpu *vcpu)
+ 		 * raises a fault that is not intercepted. Still better than
+ 		 * failing in all cases.
+ 		 */
+-		(void)skip_emulated_instruction(&svm->vcpu);
++		(void)svm_skip_emulated_instruction(&svm->vcpu);
+ 		rip = kvm_rip_read(&svm->vcpu);
+ 		svm->int3_rip = rip + svm->vmcb->save.cs.base;
+ 		svm->int3_injected = rip - old_rip;
+@@ -1284,7 +1284,7 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 		avic_update_vapic_bar(svm, APIC_DEFAULT_PHYS_BASE);
  }
  
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
--	.hardware_unsetup = hardware_unsetup,
-+	.hardware_teardown = hardware_unsetup,
+-static int svm_create_vcpu(struct kvm_vcpu *vcpu)
++static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm;
+ 	struct page *vmcb_page;
+@@ -1338,7 +1338,7 @@ static void svm_clear_current_vmcb(struct vmcb *vmcb)
+ 		cmpxchg(&per_cpu(svm_data, i)->current_vmcb, vmcb, NULL);
+ }
  
- 	.hardware_enable = hardware_enable,
- 	.hardware_disable = hardware_disable,
-@@ -7633,15 +7633,15 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.tlb_flush_gva = vmx_flush_tlb_gva,
- 	.tlb_flush_guest = vmx_flush_tlb_guest,
+-static void svm_free_vcpu(struct kvm_vcpu *vcpu)
++static void svm_vcpu_free(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
--	.run = vmx_vcpu_run,
-+	.vcpu_run = vmx_vcpu_run,
- 	.handle_exit = vmx_handle_exit,
- 	.skip_emulated_instruction = vmx_skip_emulated_instruction,
- 	.update_emulated_instruction = vmx_update_emulated_instruction,
- 	.set_interrupt_shadow = vmx_set_interrupt_shadow,
- 	.get_interrupt_shadow = vmx_get_interrupt_shadow,
- 	.patch_hypercall = vmx_patch_hypercall,
--	.set_irq = vmx_inject_irq,
--	.set_nmi = vmx_inject_nmi,
-+	.inject_irq = vmx_inject_irq,
-+	.inject_nmi = vmx_inject_nmi,
- 	.queue_exception = vmx_queue_exception,
- 	.cancel_injection = vmx_cancel_injection,
- 	.interrupt_allowed = vmx_interrupt_allowed,
-@@ -7661,7 +7661,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.hwapic_isr_update = vmx_hwapic_isr_update,
- 	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
- 	.sync_pir_to_irr = vmx_sync_pir_to_irr,
--	.deliver_posted_interrupt = vmx_deliver_posted_interrupt,
-+	.deliver_interrupt = vmx_deliver_posted_interrupt,
- 	.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
- 
- 	.set_tss_addr = vmx_set_tss_addr,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f5ede41bf9e6..b86e5b01cfcc 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5607,13 +5607,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = 0;
- 		break;
+@@ -1648,6 +1648,15 @@ static void update_cr0_intercept(struct vcpu_svm *svm)
  	}
--	case KVM_MEMORY_ENCRYPT_OP: {
-+	case KVM_MEM_ENC_OP: {
- 		r = -ENOTTY;
- 		if (kvm_x86_ops.mem_enc_op)
- 			r = kvm_x86_ops.mem_enc_op(kvm, argp);
- 		break;
- 	}
--	case KVM_MEMORY_ENCRYPT_REG_REGION: {
-+	case KVM_MEM_ENC_REGISTER_REGION: {
- 		struct kvm_enc_region region;
+ }
  
- 		r = -EFAULT;
-@@ -5621,11 +5621,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			goto out;
++void svm_get_cs_db_l_bits(struct kvm_vcpu *vcpu, int *db, int *l)
++{
++        struct kvm_segment cs;
++
++	kvm_get_segment(vcpu, &cs, VCPU_SREG_CS);
++        *db = cs.db;
++        *l = cs.l;
++}
++
+ void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -1691,7 +1700,7 @@ int svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 		return 1;
  
- 		r = -ENOTTY;
--		if (kvm_x86_ops.mem_enc_reg_region)
--			r = kvm_x86_ops.mem_enc_reg_region(kvm, &region);
-+		if (kvm_x86_ops.mem_enc_register_region)
-+			r = kvm_x86_ops.mem_enc_register_region(kvm, &region);
- 		break;
- 	}
--	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
-+	case KVM_MEM_ENC_UNREGISTER_REGION: {
- 		struct kvm_enc_region region;
+ 	if (npt_enabled && ((old_cr4 ^ cr4) & X86_CR4_PGE))
+-		svm_flush_tlb(vcpu);
++		svm_tlb_flush(vcpu);
  
- 		r = -EFAULT;
-@@ -5633,8 +5633,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			goto out;
+ 	vcpu->arch.cr4 = cr4;
+ 	if (!npt_enabled)
+@@ -1733,7 +1742,7 @@ static void svm_set_segment(struct kvm_vcpu *vcpu,
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_SEG);
+ }
  
- 		r = -ENOTTY;
--		if (kvm_x86_ops.mem_enc_unreg_region)
--			r = kvm_x86_ops.mem_enc_unreg_region(kvm, &region);
-+		if (kvm_x86_ops.mem_enc_unregister_region)
-+			r = kvm_x86_ops.mem_enc_unregister_region(kvm, &region);
- 		break;
- 	}
- 	case KVM_HYPERV_EVENTFD: {
-@@ -8180,10 +8180,10 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 	 */
- 	else if (!vcpu->arch.exception.pending) {
- 		if (vcpu->arch.nmi_injected) {
--			kvm_x86_ops.set_nmi(vcpu);
-+			kvm_x86_ops.inject_nmi(vcpu);
- 			can_inject = false;
- 		} else if (vcpu->arch.interrupt.injected) {
--			kvm_x86_ops.set_irq(vcpu);
-+			kvm_x86_ops.inject_irq(vcpu);
- 			can_inject = false;
- 		}
- 	}
-@@ -8259,7 +8259,7 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 		if (r) {
- 			--vcpu->arch.nmi_pending;
- 			vcpu->arch.nmi_injected = true;
--			kvm_x86_ops.set_nmi(vcpu);
-+			kvm_x86_ops.inject_nmi(vcpu);
- 			can_inject = false;
- 			WARN_ON(kvm_x86_ops.nmi_allowed(vcpu, true) < 0);
- 		}
-@@ -8273,7 +8273,7 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 			goto busy;
- 		if (r) {
- 			kvm_queue_interrupt(vcpu, kvm_cpu_get_interrupt(vcpu), false);
--			kvm_x86_ops.set_irq(vcpu);
-+			kvm_x86_ops.inject_irq(vcpu);
- 			WARN_ON(kvm_x86_ops.interrupt_allowed(vcpu, true) < 0);
- 		}
- 		if (kvm_cpu_has_injectable_intr(vcpu))
-@@ -8710,7 +8710,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+-static void update_exception_bitmap(struct kvm_vcpu *vcpu)
++static void svm_update_exception_bitmap(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
- 	if (kvm_request_pending(vcpu)) {
- 		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
--			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
-+			if (unlikely(!kvm_x86_ops.nested_ops->get_pages(vcpu))) {
- 				r = 0;
- 				goto out;
- 			}
-@@ -8910,7 +8910,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
+@@ -2248,7 +2257,7 @@ static int task_switch_interception(struct vcpu_svm *svm)
+ 	    int_type == SVM_EXITINTINFO_TYPE_SOFT ||
+ 	    (int_type == SVM_EXITINTINFO_TYPE_EXEPT &&
+ 	     (int_vec == OF_VECTOR || int_vec == BP_VECTOR))) {
+-		if (!skip_emulated_instruction(&svm->vcpu))
++		if (!svm_skip_emulated_instruction(&svm->vcpu))
+ 			return 0;
  	}
  
--	exit_fastpath = kvm_x86_ops.run(vcpu);
-+	exit_fastpath = kvm_x86_ops.vcpu_run(vcpu);
+@@ -3058,7 +3067,7 @@ static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2,
+ 		*error_code = 0;
+ }
  
- 	/*
- 	 * Do this here before restoring debug registers on the host.  And
-@@ -10178,9 +10178,9 @@ int kvm_arch_hardware_setup(void *opaque)
+-static int handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
++static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct kvm_run *kvm_run = vcpu->run;
+@@ -3164,7 +3173,7 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
+ 	++vcpu->stat.nmi_injections;
+ }
+ 
+-static void svm_set_irq(struct kvm_vcpu *vcpu)
++static void svm_inject_irq(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3177,7 +3186,7 @@ static void svm_set_irq(struct kvm_vcpu *vcpu)
+ 		SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_INTR;
+ }
+ 
+-static void update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
++static void svm_update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3286,7 +3295,7 @@ static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ 	return !svm_interrupt_blocked(vcpu);
+ }
+ 
+-static void enable_irq_window(struct kvm_vcpu *vcpu)
++static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3310,7 +3319,7 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-static void enable_nmi_window(struct kvm_vcpu *vcpu)
++static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3343,7 +3352,7 @@ static int svm_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
  	return 0;
  }
  
--void kvm_arch_hardware_unsetup(void)
-+void kvm_arch_hardware_teardown(void)
+-void svm_flush_tlb(struct kvm_vcpu *vcpu)
++void svm_tlb_flush(struct kvm_vcpu *vcpu)
  {
--	kvm_x86_ops.hardware_unsetup();
-+	kvm_x86_ops.hardware_teardown();
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -3360,7 +3369,22 @@ void svm_flush_tlb(struct kvm_vcpu *vcpu)
+ 		svm->asid_generation--;
  }
  
- int kvm_arch_check_processor_compat(void *opaque)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 7f2e2a09ebbd..b087488cf5fc 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -925,7 +925,7 @@ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_
- int kvm_arch_hardware_enable(void);
- void kvm_arch_hardware_disable(void);
- int kvm_arch_hardware_setup(void *opaque);
--void kvm_arch_hardware_unsetup(void);
-+void kvm_arch_hardware_teardown(void);
- int kvm_arch_check_processor_compat(void *opaque);
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ca41220b40b8..91239a6c8818 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1491,15 +1491,15 @@ struct kvm_s390_ucas_mapping {
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
- /* Memory Encryption Commands */
--#define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
-+#define KVM_MEM_ENC_OP      _IOWR(KVMIO, 0xba, unsigned long)
+-static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
++void svm_tlb_flush_all(struct kvm_vcpu *vcpu)
++{
++	svm_tlb_flush(vcpu);
++}
++
++void svm_tlb_flush_current(struct kvm_vcpu *vcpu)
++{
++	svm_tlb_flush(vcpu);
++}
++
++void svm_tlb_flush_guest(struct kvm_vcpu *vcpu)
++{
++	svm_tlb_flush(vcpu);
++}
++
++static void svm_tlb_flush_gva(struct kvm_vcpu *vcpu, gva_t gva)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
- struct kvm_enc_region {
- 	__u64 addr;
- 	__u64 size;
+@@ -3962,6 +3986,11 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++static void svm_request_immediate_exit(struct kvm_vcpu *vcpu)
++{
++	__kvm_request_immediate_exit(vcpu);
++}
++
+ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ {
+ }
+@@ -4057,7 +4086,7 @@ static int svm_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+ 	return ret;
+ }
+ 
+-static void enable_smi_window(struct kvm_vcpu *vcpu)
++static void svm_enable_smi_window(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+@@ -4176,125 +4205,132 @@ static int svm_vm_init(struct kvm *kvm)
+ 	return 0;
+ }
+ 
++#define KVM_X86_OP_NAME(name) .name = svm_##name
++#define KVM_X86_OP_PTR(ptr) .ptr = &svm_##ptr
++
+ static struct kvm_x86_ops svm_x86_ops __initdata = {
+-	.hardware_teardown = svm_hardware_teardown,
+-	.hardware_enable = svm_hardware_enable,
+-	.hardware_disable = svm_hardware_disable,
+-	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
+-	.has_emulated_msr = svm_has_emulated_msr,
++	KVM_X86_OP_NAME(hardware_teardown),
++	KVM_X86_OP_NAME(hardware_enable),
++	KVM_X86_OP_NAME(hardware_disable),
++	KVM_X86_OP_NAME(cpu_has_accelerated_tpr),
++	KVM_X86_OP_NAME(has_emulated_msr),
+ 
+-	.vcpu_create = svm_create_vcpu,
+-	.vcpu_free = svm_free_vcpu,
+-	.vcpu_reset = svm_vcpu_reset,
++	KVM_X86_OP_NAME(vcpu_create),
++	KVM_X86_OP_NAME(vcpu_free),
++	KVM_X86_OP_NAME(vcpu_reset),
+ 
+ 	.vm_size = sizeof(struct kvm_svm),
+-	.vm_init = svm_vm_init,
+-	.vm_destroy = svm_vm_destroy,
+-
+-	.prepare_guest_switch = svm_prepare_guest_switch,
+-	.vcpu_load = svm_vcpu_load,
+-	.vcpu_put = svm_vcpu_put,
+-	.vcpu_blocking = svm_vcpu_blocking,
+-	.vcpu_unblocking = svm_vcpu_unblocking,
+-
+-	.update_exception_bitmap = update_exception_bitmap,
+-	.get_msr_feature = svm_get_msr_feature,
+-	.get_msr = svm_get_msr,
+-	.set_msr = svm_set_msr,
+-	.get_segment_base = svm_get_segment_base,
+-	.get_segment = svm_get_segment,
+-	.set_segment = svm_set_segment,
+-	.get_cpl = svm_get_cpl,
+-	.get_cs_db_l_bits = kvm_get_cs_db_l_bits,
+-	.set_cr0 = svm_set_cr0,
+-	.set_cr4 = svm_set_cr4,
+-	.set_efer = svm_set_efer,
+-	.get_idt = svm_get_idt,
+-	.set_idt = svm_set_idt,
+-	.get_gdt = svm_get_gdt,
+-	.set_gdt = svm_set_gdt,
+-	.set_dr7 = svm_set_dr7,
+-	.sync_dirty_debug_regs = svm_sync_dirty_debug_regs,
+-	.cache_reg = svm_cache_reg,
+-	.get_rflags = svm_get_rflags,
+-	.set_rflags = svm_set_rflags,
+-
+-	.tlb_flush_all = svm_flush_tlb,
+-	.tlb_flush_current = svm_flush_tlb,
+-	.tlb_flush_gva = svm_flush_tlb_gva,
+-	.tlb_flush_guest = svm_flush_tlb,
+-
+-	.vcpu_run = svm_vcpu_run,
+-	.handle_exit = handle_exit,
+-	.skip_emulated_instruction = skip_emulated_instruction,
+-	.update_emulated_instruction = NULL,
+-	.set_interrupt_shadow = svm_set_interrupt_shadow,
+-	.get_interrupt_shadow = svm_get_interrupt_shadow,
+-	.patch_hypercall = svm_patch_hypercall,
+-	.inject_irq = svm_set_irq,
+-	.inject_nmi = svm_inject_nmi,
+-	.queue_exception = svm_queue_exception,
+-	.cancel_injection = svm_cancel_injection,
+-	.interrupt_allowed = svm_interrupt_allowed,
+-	.nmi_allowed = svm_nmi_allowed,
+-	.get_nmi_mask = svm_get_nmi_mask,
+-	.set_nmi_mask = svm_set_nmi_mask,
+-	.enable_nmi_window = enable_nmi_window,
+-	.enable_irq_window = enable_irq_window,
+-	.update_cr8_intercept = update_cr8_intercept,
+-	.set_virtual_apic_mode = svm_set_virtual_apic_mode,
+-	.refresh_apicv_exec_ctrl = svm_refresh_apicv_exec_ctrl,
+-	.check_apicv_inhibit_reasons = svm_check_apicv_inhibit_reasons,
+-	.pre_update_apicv_exec_ctrl = svm_pre_update_apicv_exec_ctrl,
+-	.load_eoi_exitmap = svm_load_eoi_exitmap,
+-	.hwapic_irr_update = svm_hwapic_irr_update,
+-	.hwapic_isr_update = svm_hwapic_isr_update,
+-	.sync_pir_to_irr = kvm_lapic_find_highest_irr,
+-	.apicv_post_state_restore = avic_post_state_restore,
+-
+-	.set_tss_addr = svm_set_tss_addr,
+-	.set_identity_map_addr = svm_set_identity_map_addr,
+-	.get_mt_mask = svm_get_mt_mask,
+-
+-	.get_exit_info = svm_get_exit_info,
+-
+-	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
+-
+-	.has_wbinvd_exit = svm_has_wbinvd_exit,
+-
+-	.write_l1_tsc_offset = svm_write_l1_tsc_offset,
+-
+-	.load_mmu_pgd = svm_load_mmu_pgd,
+-
+-	.check_intercept = svm_check_intercept,
+-	.handle_exit_irqoff = svm_handle_exit_irqoff,
+-
+-	.request_immediate_exit = __kvm_request_immediate_exit,
+-
+-	.sched_in = svm_sched_in,
+-
+-	.pmu_ops = &amd_pmu_ops,
+-	.nested_ops = &svm_nested_ops,
+-
+-	.deliver_interrupt = svm_deliver_avic_intr,
+-	.dy_apicv_has_pending_interrupt = svm_dy_apicv_has_pending_interrupt,
+-	.update_pi_irte = svm_update_pi_irte,
+-	.setup_mce = svm_setup_mce,
+-
+-	.smi_allowed = svm_smi_allowed,
+-	.pre_enter_smm = svm_pre_enter_smm,
+-	.pre_leave_smm = svm_pre_leave_smm,
+-	.enable_smi_window = enable_smi_window,
+-
+-	.mem_enc_op = svm_mem_enc_op,
+-	.mem_enc_register_region = svm_register_enc_region,
+-	.mem_enc_unregister_region = svm_unregister_enc_region,
+-
+-	.can_emulate_instruction = svm_can_emulate_instruction,
+-
+-	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
+-
+-	.msr_filter_changed = svm_msr_filter_changed,
++
++	KVM_X86_OP_NAME(vm_init),
++	KVM_X86_OP_NAME(vm_destroy),
++
++	KVM_X86_OP_NAME(prepare_guest_switch),
++	KVM_X86_OP_NAME(vcpu_load),
++	KVM_X86_OP_NAME(vcpu_put),
++	KVM_X86_OP_NAME(vcpu_blocking),
++	KVM_X86_OP_NAME(vcpu_unblocking),
++
++	KVM_X86_OP_NAME(update_exception_bitmap),
++	KVM_X86_OP_NAME(get_msr_feature),
++	KVM_X86_OP_NAME(get_msr),
++	KVM_X86_OP_NAME(set_msr),
++	KVM_X86_OP_NAME(get_segment_base),
++	KVM_X86_OP_NAME(get_segment),
++	KVM_X86_OP_NAME(set_segment),
++	KVM_X86_OP_NAME(get_cpl),
++
++	KVM_X86_OP_NAME(get_cs_db_l_bits),
++
++	KVM_X86_OP_NAME(set_cr0),
++	KVM_X86_OP_NAME(set_cr4),
++	KVM_X86_OP_NAME(set_efer),
++	KVM_X86_OP_NAME(get_idt),
++	KVM_X86_OP_NAME(set_idt),
++	KVM_X86_OP_NAME(get_gdt),
++	KVM_X86_OP_NAME(set_gdt),
++	KVM_X86_OP_NAME(set_dr7),
++	KVM_X86_OP_NAME(sync_dirty_debug_regs),
++	KVM_X86_OP_NAME(cache_reg),
++	KVM_X86_OP_NAME(get_rflags),
++	KVM_X86_OP_NAME(set_rflags),
++
++	KVM_X86_OP_NAME(tlb_flush_all),
++	KVM_X86_OP_NAME(tlb_flush_current),
++	KVM_X86_OP_NAME(tlb_flush_gva),
++	KVM_X86_OP_NAME(tlb_flush_guest),
++
++	KVM_X86_OP_NAME(vcpu_run),
++	KVM_X86_OP_NAME(handle_exit),
++	KVM_X86_OP_NAME(skip_emulated_instruction),
++
++	KVM_X86_OP_NAME(set_interrupt_shadow),
++	KVM_X86_OP_NAME(get_interrupt_shadow),
++	KVM_X86_OP_NAME(patch_hypercall),
++	KVM_X86_OP_NAME(inject_irq),
++	KVM_X86_OP_NAME(inject_nmi),
++	KVM_X86_OP_NAME(queue_exception),
++	KVM_X86_OP_NAME(cancel_injection),
++	KVM_X86_OP_NAME(interrupt_allowed),
++	KVM_X86_OP_NAME(nmi_allowed),
++	KVM_X86_OP_NAME(get_nmi_mask),
++	KVM_X86_OP_NAME(set_nmi_mask),
++	KVM_X86_OP_NAME(enable_nmi_window),
++	KVM_X86_OP_NAME(enable_irq_window),
++	KVM_X86_OP_NAME(update_cr8_intercept),
++	KVM_X86_OP_NAME(set_virtual_apic_mode),
++	KVM_X86_OP_NAME(refresh_apicv_exec_ctrl),
++	KVM_X86_OP_NAME(check_apicv_inhibit_reasons),
++	KVM_X86_OP_NAME(pre_update_apicv_exec_ctrl),
++	KVM_X86_OP_NAME(load_eoi_exitmap),
++	KVM_X86_OP_NAME(hwapic_irr_update),
++	KVM_X86_OP_NAME(hwapic_isr_update),
++
++	KVM_X86_OP_NAME(sync_pir_to_irr),
++	KVM_X86_OP_NAME(apicv_post_state_restore),
++
++	KVM_X86_OP_NAME(set_tss_addr),
++	KVM_X86_OP_NAME(set_identity_map_addr),
++	KVM_X86_OP_NAME(get_mt_mask),
++
++	KVM_X86_OP_NAME(get_exit_info),
++
++	KVM_X86_OP_NAME(vcpu_after_set_cpuid),
++
++	KVM_X86_OP_NAME(has_wbinvd_exit),
++
++	KVM_X86_OP_NAME(write_l1_tsc_offset),
++
++	KVM_X86_OP_NAME(load_mmu_pgd),
++
++	KVM_X86_OP_NAME(check_intercept),
++	KVM_X86_OP_NAME(handle_exit_irqoff),
++
++	KVM_X86_OP_NAME(request_immediate_exit),
++
++	KVM_X86_OP_NAME(sched_in),
++
++	KVM_X86_OP_PTR(pmu_ops),
++	KVM_X86_OP_PTR(nested_ops),
++
++	KVM_X86_OP_NAME(deliver_interrupt),
++	KVM_X86_OP_NAME(dy_apicv_has_pending_interrupt),
++	KVM_X86_OP_NAME(update_pi_irte),
++	KVM_X86_OP_NAME(setup_mce),
++
++	KVM_X86_OP_NAME(smi_allowed),
++	KVM_X86_OP_NAME(pre_enter_smm),
++	KVM_X86_OP_NAME(pre_leave_smm),
++	KVM_X86_OP_NAME(enable_smi_window),
++
++	KVM_X86_OP_NAME(mem_enc_op),
++	KVM_X86_OP_NAME(mem_enc_register_region),
++	KVM_X86_OP_NAME(mem_enc_unregister_region),
++
++	KVM_X86_OP_NAME(can_emulate_instruction),
++
++	KVM_X86_OP_NAME(apic_init_signal_blocked),
++
++	KVM_X86_OP_NAME(msr_filter_changed),
  };
  
--#define KVM_MEMORY_ENCRYPT_REG_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
--#define KVM_MEMORY_ENCRYPT_UNREG_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
-+#define KVM_MEM_ENC_REGISTER_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
-+#define KVM_MEM_ENC_UNREGISTER_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
+ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 1d853fe4c778..de535a2d59a3 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -359,7 +359,7 @@ void svm_vcpu_free_msrpm(u32 *msrpm);
+ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer);
+ void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
+ int svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
+-void svm_flush_tlb(struct kvm_vcpu *vcpu);
++void svm_tlb_flush(struct kvm_vcpu *vcpu);
+ void disable_nmi_singlestep(struct vcpu_svm *svm);
+ bool svm_smi_blocked(struct kvm_vcpu *vcpu);
+ bool svm_nmi_blocked(struct kvm_vcpu *vcpu);
+@@ -453,7 +453,8 @@ int avic_unaccelerated_access_interception(struct vcpu_svm *svm);
+ int avic_init_vcpu(struct vcpu_svm *svm);
+ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+ void avic_vcpu_put(struct kvm_vcpu *vcpu);
+-void avic_post_state_restore(struct kvm_vcpu *vcpu);
++int svm_sync_pir_to_irr(struct kvm_vcpu *vcpu);
++void svm_apicv_post_state_restore(struct kvm_vcpu *vcpu);
+ void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu);
+ bool svm_check_apicv_inhibit_reasons(ulong bit);
+@@ -461,7 +462,7 @@ void svm_pre_update_apicv_exec_ctrl(struct kvm *kvm, bool activate);
+ void svm_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
+ void svm_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr);
+ void svm_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr);
+-int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec);
++int svm_deliver_interrupt(struct kvm_vcpu *vcpu, int vec);
+ bool svm_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+ 		       uint32_t guest_irq, bool set);
+@@ -490,10 +491,10 @@ static inline bool svm_sev_enabled(void)
  
- /* Available with KVM_CAP_HYPERV_EVENTFD */
- #define KVM_HYPERV_EVENTFD        _IOW(KVMIO,  0xbd, struct kvm_hyperv_eventfd)
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 7d8eced6f459..ab651099d0c4 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -1475,15 +1475,15 @@ struct kvm_s390_ucas_mapping {
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
- /* Memory Encryption Commands */
--#define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
-+#define KVM_MEM_ENC_OP      _IOWR(KVMIO, 0xba, unsigned long)
+ void sev_vm_destroy(struct kvm *kvm);
+ int svm_mem_enc_op(struct kvm *kvm, void __user *argp);
+-int svm_register_enc_region(struct kvm *kvm,
+-			    struct kvm_enc_region *range);
+-int svm_unregister_enc_region(struct kvm *kvm,
+-			      struct kvm_enc_region *range);
++int svm_mem_enc_register_region(struct kvm *kvm,
++                            struct kvm_enc_region *range);
++int svm_mem_enc_unregister_region(struct kvm *kvm,
++                            struct kvm_enc_region *range);
+ void pre_sev_run(struct vcpu_svm *svm, int cpu);
+ int __init sev_hardware_setup(void);
+ void sev_hardware_teardown(void);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b86e5b01cfcc..68619865e6e4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5807,6 +5807,7 @@ void kvm_get_segment(struct kvm_vcpu *vcpu,
+ {
+ 	kvm_x86_ops.get_segment(vcpu, var, seg);
+ }
++EXPORT_SYMBOL_GPL(kvm_get_segment);
  
- struct kvm_enc_region {
- 	__u64 addr;
- 	__u64 size;
- };
+ gpa_t translate_nested_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, u32 access,
+ 			   struct x86_exception *exception)
+@@ -9363,16 +9364,6 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ 	return 0;
+ }
  
--#define KVM_MEMORY_ENCRYPT_REG_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
--#define KVM_MEMORY_ENCRYPT_UNREG_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
-+#define KVM_MEM_ENC_REGISTER_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
-+#define KVM_MEM_ENC_UNREGISTER_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
- 
- /* Available with KVM_CAP_HYPERV_EVENTFD */
- #define KVM_HYPERV_EVENTFD        _IOW(KVMIO,  0xbd, struct kvm_hyperv_eventfd)
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2541a17ff1c4..309f027b8b72 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4858,7 +4858,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 	unregister_reboot_notifier(&kvm_reboot_notifier);
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
- out_free_2:
--	kvm_arch_hardware_unsetup();
-+	kvm_arch_hardware_teardown();
- out_free_1:
- 	free_cpumask_var(cpus_hardware_enabled);
- out_free_0:
-@@ -4880,7 +4880,7 @@ void kvm_exit(void)
- 	unregister_reboot_notifier(&kvm_reboot_notifier);
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
- 	on_each_cpu(hardware_disable_nolock, NULL, 1);
--	kvm_arch_hardware_unsetup();
-+	kvm_arch_hardware_teardown();
- 	kvm_arch_exit();
- 	kvm_irqfd_exit();
- 	free_cpumask_var(cpus_hardware_enabled);
+-void kvm_get_cs_db_l_bits(struct kvm_vcpu *vcpu, int *db, int *l)
+-{
+-	struct kvm_segment cs;
+-
+-	kvm_get_segment(vcpu, &cs, VCPU_SREG_CS);
+-	*db = cs.db;
+-	*l = cs.l;
+-}
+-EXPORT_SYMBOL_GPL(kvm_get_cs_db_l_bits);
+-
+ static void __get_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+ {
+ 	struct desc_ptr dt;
 -- 
 2.18.4
 
