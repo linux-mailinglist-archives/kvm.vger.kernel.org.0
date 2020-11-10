@@ -2,131 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C5D52AE067
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:04:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B9F12AE0C8
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:37:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730894AbgKJUEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 15:04:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726861AbgKJUEo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 15:04:44 -0500
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BF1C0613D1;
-        Tue, 10 Nov 2020 12:04:43 -0800 (PST)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kcZsB-0031DR-RH; Tue, 10 Nov 2020 20:04:11 +0000
-Date:   Tue, 10 Nov 2020 20:04:11 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     yulei.kernel@gmail.com
-Cc:     akpm@linux-foundation.org, naoya.horiguchi@nec.com,
-        pbonzini@redhat.com, linux-fsdevel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xiaoguangrong.eric@gmail.com, kernellwp@gmail.com,
-        lihaiwei.kernel@gmail.com, Yulei Zhang <yuleixzhang@tencent.com>,
-        Xiao Guangrong <gloryxiao@tencent.com>
-Subject: Re: [PATCH 01/35] fs: introduce dmemfs module
-Message-ID: <20201110200411.GU3576660@ZenIV.linux.org.uk>
-References: <cover.1602093760.git.yuleixzhang@tencent.com>
- <aa553faf9e97ee9306ecd5a67d3324a34f9ed4be.1602093760.git.yuleixzhang@tencent.com>
+        id S1730894AbgKJUhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 15:37:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41003 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726400AbgKJUhl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Nov 2020 15:37:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605040659;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=86E1PiwpTATAQtderrQWGZYhJziSfrLmfv7s2P36MyY=;
+        b=EatpexV/NwS2/g4QcIp62FdQTYoYh+2mXkQrBnPDlRGJkGM4tG3RhJJ/UMfHWYcKI8k6rs
+        uzwqRzATJ7CigCcIK1YuqzQUptg1NKQ4DKkSH+ib4nyedePQ8iFmZjIkl4vv0tikCrSo63
+        z016iJnGvQZ9l2qygKMNoGVTLer8KVY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-usJEOh08N8S0qFc7IOy46A-1; Tue, 10 Nov 2020 15:37:38 -0500
+X-MC-Unique: usJEOh08N8S0qFc7IOy46A-1
+Received: by mail-wr1-f72.google.com with SMTP id w17so5372971wrp.11
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 12:37:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=86E1PiwpTATAQtderrQWGZYhJziSfrLmfv7s2P36MyY=;
+        b=aOXBX5VdUBRmNSvvOgWJV0XVQgSj7UwbsbKcDvdqtC7/2VE8nbpPdkA3f6RnATbknX
+         H1shyLhv4Ded/cjNGy8lkGi6lTcmnTvKjPQl/saPvg0koE6Vj3VNMIk2l/LEgPr3QpAG
+         xXOue6ouq29wiulx55BXpIaktoEcffsn89DVgWmwvEZQeIy81LnAYpCCELOJsLEPQKk3
+         1g0E3TZoZRQ5tKMPX7NZuX3xlmEsgCdUYDqx6mzSwVEOZurOlHecfPmjHIRICKrbsBHB
+         xlPItZmkhk6kkNTMAAx7dE/rDVHS/wJG5g/3qx9m8d3AhHfy/uhrMzoz4QmxsPsAW+kD
+         0hCQ==
+X-Gm-Message-State: AOAM530BAHXvpdJvbYtLImdDAPsKSiv8TUhPwHvifjTlFIGmdOSkBNB+
+        6uEtyfdZcxgusPozPPwoQW0IvZ7Rlz6uWUggZZ0mpzBq/A3+3NvnigrMM5n2nMCnRyWgOp+oCRq
+        8Br/KOLrAjq5tFph5+jiEayJnTFUxgPSd8YPcgHo6FzYgDCLJjgGRs5OjTLBhMDxQ
+X-Received: by 2002:a5d:6744:: with SMTP id l4mr24886223wrw.378.1605040656898;
+        Tue, 10 Nov 2020 12:37:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw1TcLE86QgwB8CSzyVPHmo0gyCUPTPLnWMfxW3NiNpbb9kz55y3L1GCvdcftAsFMgZJiLBMg==
+X-Received: by 2002:a5d:6744:: with SMTP id l4mr24886197wrw.378.1605040656635;
+        Tue, 10 Nov 2020 12:37:36 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id g131sm4181864wma.35.2020.11.10.12.37.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Nov 2020 12:37:35 -0800 (PST)
+To:     "Luck, Tony" <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>
+Cc:     Jim Mattson <jmattson@google.com>, Qian Cai <cai@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-tip-commits@vger.kernel.org" 
+        <linux-tip-commits@vger.kernel.org>, x86 <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <160431588828.397.16468104725047768957.tip-bot2@tip-bot2>
+ <3f863634cd75824907e8ccf8164548c2ef036f20.camel@redhat.com>
+ <bfc274fc27724ea39ecac1e7ac834ed8@intel.com>
+ <CALMp9eTFaiYkTnVe8xKzg40E4nZ3rAOii0O06bTy0+oLNjyKhA@mail.gmail.com>
+ <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
+ <20201109232402.GA25492@agluck-desk2.amr.corp.intel.com>
+ <20201110063151.GB7290@nazgul.tnic>
+ <094c2395-b1b3-d908-657c-9bd4144e40ac@redhat.com>
+ <20201110095615.GB9450@nazgul.tnic>
+ <b8de7f7b-7aa1-d98b-74be-62d7c055542b@redhat.com>
+ <20201110155013.GE9857@nazgul.tnic>
+ <1b587b45-a5a8-2147-ae53-06d1b284ea11@redhat.com>
+ <cacd1cd272e94213a0c82c9871086cf5@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] x86/mce: Check for hypervisor before enabling additional
+ error logging
+Message-ID: <7bd98718-f800-02ef-037a-4dfc5a7d1a54@redhat.com>
+Date:   Tue, 10 Nov 2020 21:37:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa553faf9e97ee9306ecd5a67d3324a34f9ed4be.1602093760.git.yuleixzhang@tencent.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <cacd1cd272e94213a0c82c9871086cf5@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 08, 2020 at 03:53:51PM +0800, yulei.kernel@gmail.com wrote:
+On 10/11/20 18:52, Luck, Tony wrote:
+> Look at what it is trying to do ... change the behavior of the platform w.r.t. logging
+> of memory errors.  How does that make any sense for a guest ...
 
-> +static struct inode *
-> +dmemfs_get_inode(struct super_block *sb, const struct inode *dir, umode_t mode,
-> +		 dev_t dev);
+Logging of memory errors certainly makes sense for a guest, KVM already 
+does MCE forwarding as you probably know.
 
-WTF is 'dev' for?
+The exact set of information that MSR_ERROR_CONTROL[1] adds may not make 
+much sense in the case of KVM, but it may make sense for other 
+hypervisors that do nothing but partition the host.  (Difficult for me 
+to say since the relevant part of the SDM might as well be written in 
+Klingon :)).
 
-> +static int
-> +dmemfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
-> +{
-> +	struct inode *inode = dmemfs_get_inode(dir->i_sb, dir, mode, dev);
-> +	int error = -ENOSPC;
-> +
-> +	if (inode) {
-> +		d_instantiate(dentry, inode);
-> +		dget(dentry);	/* Extra count - pin the dentry in core */
-> +		error = 0;
-> +		dir->i_mtime = dir->i_ctime = current_time(inode);
-> +	}
-> +	return error;
-> +}
+In any case, checking HYPERVISOR is not enough because having it clear 
+is a valid configuration.  So you would still have to switch to 
+{rd,wr}msrl_safe, and then checking HYPERVISOR is pointless.
 
-... same here, seeing that you only call that thing from the next two functions
-and you do *not* provide ->mknod() as a method (unsurprisingly - what would
-device nodes do there?)
+Paolo
 
-> +static int dmemfs_create(struct inode *dir, struct dentry *dentry,
-> +			 umode_t mode, bool excl)
-> +{
-> +	return dmemfs_mknod(dir, dentry, mode | S_IFREG, 0);
-> +}
-> +
-> +static int dmemfs_mkdir(struct inode *dir, struct dentry *dentry,
-> +			umode_t mode)
-> +{
-> +	int retval = dmemfs_mknod(dir, dentry, mode | S_IFDIR, 0);
-> +
-> +	if (!retval)
-> +		inc_nlink(dir);
-> +	return retval;
-> +}
+> that doesn't even
+> know what memory is present on the platform. Or have guarantees that what it sees
+> as memory address 0x12345678 maps to the same set of cells in a DRAM from one
+> second to the next?
 
-> +int dmemfs_file_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +	return 0;
-> +}
-> +
-> +static const struct file_operations dmemfs_file_operations = {
-> +	.mmap = dmemfs_file_mmap,
-> +};
-
-Er...  Is that a placeholder for later in the series?  Because as it is,
-it makes no sense whatsoever - "it can be mmapped, but any access to the
-mapped area will segfault".
-
-> +struct inode *dmemfs_get_inode(struct super_block *sb,
-> +			       const struct inode *dir, umode_t mode, dev_t dev)
-> +{
-> +	struct inode *inode = new_inode(sb);
-> +
-> +	if (inode) {
-> +		inode->i_ino = get_next_ino();
-> +		inode_init_owner(inode, dir, mode);
-> +		inode->i_mapping->a_ops = &empty_aops;
-> +		mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-> +		mapping_set_unevictable(inode->i_mapping);
-> +		inode->i_atime = inode->i_mtime = inode->i_ctime = current_time(inode);
-> +		switch (mode & S_IFMT) {
-> +		default:
-> +			init_special_inode(inode, mode, dev);
-> +			break;
-> +		case S_IFREG:
-> +			inode->i_op = &dmemfs_file_inode_operations;
-> +			inode->i_fop = &dmemfs_file_operations;
-> +			break;
-> +		case S_IFDIR:
-> +			inode->i_op = &dmemfs_dir_inode_operations;
-> +			inode->i_fop = &simple_dir_operations;
-> +
-> +			/*
-> +			 * directory inodes start off with i_nlink == 2
-> +			 * (for "." entry)
-> +			 */
-> +			inc_nlink(inode);
-> +			break;
-> +		case S_IFLNK:
-> +			inode->i_op = &page_symlink_inode_operations;
-> +			break;
-
-Where would symlinks come from?  Or anything other than regular files and
-directories, for that matter...
