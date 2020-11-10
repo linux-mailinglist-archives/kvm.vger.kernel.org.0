@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1084C2AE0FD
-	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:48:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D0862AE0FF
+	for <lists+kvm@lfdr.de>; Tue, 10 Nov 2020 21:48:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731716AbgKJUs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 15:48:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51681 "EHLO
+        id S1726400AbgKJUso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 15:48:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34200 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731630AbgKJUsZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Nov 2020 15:48:25 -0500
+        by vger.kernel.org with ESMTP id S1731696AbgKJUsg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Nov 2020 15:48:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605041304;
+        s=mimecast20190719; t=1605041315;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oa1uehe/tFycTDpQnCA93GWOEsL3FG1yhbdqmQRr4r0=;
-        b=gb0eeGW6mjGZaBr+0nMO9sXBEOdtSPgoHURNRFKhphFVqWK+KVzmHmfAnHyjRAVSkAdzam
-        DqkhHu2hSZbjd8OU3nZpyxtcy5PzcgB+DVSVxwnbQnSZILt+ikoqOfRpNNzS9LxnrAIxrP
-        tS122gKBJl+vtO+W2ZqB/KZQmQkdKhc=
+        bh=I4kBWefGLmHDX26EApVEWDyVEAim2VaKPsFVtTF5ano=;
+        b=QuazOqzBVYwpVLhynQBC4rOxVMGnVSzJeukEqIyPC0iXbH5QbUqEE2yqT+f4BtlpD+40xn
+        WyLtXoHsxl2PLiLS58M+ZFZ5pkm4g9PEe8g8RUY65BVYE7EawHzipII5j19tWSpKSfIWDI
+        OaR92cCo/S+N7BdSZjia+wDfj5qcY1U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-wfLsatXOOcmTC9EYTP9c9A-1; Tue, 10 Nov 2020 15:48:22 -0500
-X-MC-Unique: wfLsatXOOcmTC9EYTP9c9A-1
+ us-mta-546-3gZpD50zN7qeLvYM_8zGTg-1; Tue, 10 Nov 2020 15:48:33 -0500
+X-MC-Unique: 3gZpD50zN7qeLvYM_8zGTg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24AFA1882FAB;
-        Tue, 10 Nov 2020 20:48:21 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C9C31074655;
+        Tue, 10 Nov 2020 20:48:32 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.193.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 45E901002C2B;
-        Tue, 10 Nov 2020 20:48:19 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82B2D1002C32;
+        Tue, 10 Nov 2020 20:48:21 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
         bgardon@google.com, peterx@redhat.com
-Subject: [PATCH 5/8] KVM: selftests: Introduce vm_create_[default_]_with_vcpus
-Date:   Tue, 10 Nov 2020 21:47:59 +0100
-Message-Id: <20201110204802.417521-6-drjones@redhat.com>
+Subject: [PATCH 6/8] KVM: selftests: dirty_log_test: Remove create_vm
+Date:   Tue, 10 Nov 2020 21:48:00 +0100
+Message-Id: <20201110204802.417521-7-drjones@redhat.com>
 In-Reply-To: <20201110204802.417521-1-drjones@redhat.com>
 References: <20201110204802.417521-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -49,108 +49,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce new vm_create variants that also takes a number of vcpus,
-an amount of per-vcpu pages, and optionally a list of vcpuids. These
-variants will create default VMs with enough additional pages to
-cover the vcpu stacks, per-vcpu pages, and pagetable pages for all.
-The new 'default' variant uses VM_MODE_DEFAULT, whereas the other
-new variant accepts the mode as a parameter.
+Use vm_create_with_vcpus instead of create_vm and do
+some minor cleanups around it.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  | 10 ++++++
- tools/testing/selftests/kvm/lib/kvm_util.c    | 35 ++++++++++++++++---
- 2 files changed, 40 insertions(+), 5 deletions(-)
+ tools/testing/selftests/kvm/dirty_log_test.c | 56 ++++++--------------
+ 1 file changed, 16 insertions(+), 40 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 48b48a0014e2..bc8db80309f5 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -261,6 +261,16 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
- struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
- 				 void *guest_code);
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 1b7375d2acea..2e0dcd453ef0 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -5,8 +5,6 @@
+  * Copyright (C) 2018, Red Hat, Inc.
+  */
  
-+/* Same as vm_create_default, but can be used for more than one vcpu */
-+struct kvm_vm *vm_create_default_with_vcpus(uint32_t nr_vcpus, uint64_t extra_mem_pages,
-+					    uint32_t num_percpu_pages, void *guest_code,
-+					    uint32_t vcpuids[]);
+-#define _GNU_SOURCE /* for program_invocation_name */
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <pthread.h>
+@@ -20,6 +18,9 @@
+ 
+ #define VCPU_ID				1
+ 
++#define DIRTY_MEM_BITS			30 /* 1G */
++#define DIRTY_MEM_SIZE			(1UL << 30)
 +
-+/* Like vm_create_default_with_vcpus, but accepts mode as a parameter */
-+struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
-+				    uint64_t extra_mem_pages, uint32_t num_percpu_pages,
-+				    void *guest_code, uint32_t vcpuids[]);
-+
- /*
-  * Adds a vCPU with reasonable defaults (e.g. a stack)
-  *
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index a7e28e33fc3b..b31a4e988a5d 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -272,8 +272,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
- 	return vm;
+ /* The memory slot index to track dirty pages */
+ #define TEST_MEM_SLOT_INDEX		1
+ 
+@@ -353,27 +354,6 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
+ 	}
  }
  
--struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
--				 void *guest_code)
-+struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
-+				    uint64_t extra_mem_pages, uint32_t num_percpu_pages,
-+				    void *guest_code, uint32_t vcpuids[])
- {
- 	/* The maximum page table size for a memory region will be when the
- 	 * smallest pages are used. Considering each page contains x page
-@@ -281,10 +282,18 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
- 	 * N pages) will be: N/x+N/x^2+N/x^3+... which is definitely smaller
- 	 * than N/x*2.
- 	 */
--	uint64_t extra_pg_pages = (extra_mem_pages / PTES_PER_MIN_PAGE) * 2;
-+	uint64_t vcpu_pages = (DEFAULT_STACK_PGS + num_percpu_pages) * nr_vcpus;
-+	uint64_t extra_pg_pages = (extra_mem_pages + vcpu_pages) / PTES_PER_MIN_PAGE * 2;
-+	uint64_t pages = DEFAULT_GUEST_PHY_PAGES + vcpu_pages + extra_pg_pages;
- 	struct kvm_vm *vm;
-+	int i;
-+
-+	TEST_ASSERT(nr_vcpus <= kvm_check_cap(KVM_CAP_MAX_VCPUS),
-+		    "nr_vcpus = %d too large for host, max-vcpus = %d",
-+		    nr_vcpus, kvm_check_cap(KVM_CAP_MAX_VCPUS));
- 
--	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
-+	pages = vm_adjust_num_guest_pages(mode, pages);
-+	vm = vm_create(mode, pages, O_RDWR);
- 
- 	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
- 
-@@ -292,11 +301,27 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
- 	vm_create_irqchip(vm);
- #endif
- 
+-static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
+-				uint64_t extra_mem_pages, void *guest_code)
+-{
+-	struct kvm_vm *vm;
+-	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
+-
+-	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+-
+-	vm = vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
+-	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
+-#ifdef __x86_64__
+-	vm_create_irqchip(vm);
+-#endif
+-	log_mode_create_vm_done(vm);
 -	vm_vcpu_add_default(vm, vcpuid, guest_code);
-+	for (i = 0; i < nr_vcpus; ++i)
-+		vm_vcpu_add_default(vm, vcpuids ? vcpuids[i] : i, guest_code);
+-	return vm;
+-}
+-
+-#define DIRTY_MEM_BITS 30 /* 1G */
+-#define PAGE_SHIFT_4K  12
+-
+ struct test_params {
+ 	unsigned long iterations;
+ 	unsigned long interval;
+@@ -393,43 +373,39 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		return;
+ 	}
  
- 	return vm;
- }
++	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
++
+ 	/*
+ 	 * We reserve page table for 2 times of extra dirty mem which
+-	 * will definitely cover the original (1G+) test range.  Here
+-	 * we do the calculation with 4K page size which is the
+-	 * smallest so the page number will be enough for all archs
+-	 * (e.g., 64K page size guest will need even less memory for
+-	 * page tables).
++	 * will definitely cover the original (1G+) test range.
+ 	 */
+-	vm = create_vm(mode, VCPU_ID,
+-		       2ul << (DIRTY_MEM_BITS - PAGE_SHIFT_4K),
+-		       guest_code);
++	vm = vm_create_with_vcpus(mode, 1,
++			vm_calc_num_guest_pages(mode, DIRTY_MEM_SIZE * 2),
++			0, guest_code, (uint32_t []){ VCPU_ID });
++
++	log_mode_create_vm_done(vm);
  
-+struct kvm_vm *vm_create_default_with_vcpus(uint32_t nr_vcpus, uint64_t extra_mem_pages,
-+					    uint32_t num_percpu_pages, void *guest_code,
-+					    uint32_t vcpuids[])
-+{
-+	return vm_create_with_vcpus(VM_MODE_DEFAULT, nr_vcpus, extra_mem_pages,
-+				    num_percpu_pages, guest_code, vcpuids);
-+}
+ 	guest_page_size = vm_get_page_size(vm);
++	host_page_size = getpagesize();
 +
-+struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
-+				 void *guest_code)
-+{
-+	return vm_create_default_with_vcpus(1, extra_mem_pages, 0, guest_code,
-+					    (uint32_t []){ vcpuid });
-+}
-+
- /*
-  * VM Restart
-  *
+ 	/*
+ 	 * A little more than 1G of guest page sized pages.  Cover the
+ 	 * case where the size is not aligned to 64 pages.
+ 	 */
+-	guest_num_pages = (1ul << (DIRTY_MEM_BITS -
+-				   vm_get_page_shift(vm))) + 3;
+-	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
+-
+-	host_page_size = getpagesize();
++	guest_num_pages = vm_adjust_num_guest_pages(mode,
++				(1ul << (DIRTY_MEM_BITS - vm_get_page_shift(vm))) + 3);
+ 	host_num_pages = vm_num_host_pages(mode, guest_num_pages);
+ 
+ 	if (!p->phys_offset) {
+-		guest_test_phys_mem = (vm_get_max_gfn(vm) -
+-				       guest_num_pages) * guest_page_size;
++		guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) * guest_page_size;
+ 		guest_test_phys_mem &= ~(host_page_size - 1);
+ 	} else {
+ 		guest_test_phys_mem = p->phys_offset;
+ 	}
+-
+ #ifdef __s390x__
+ 	/* Align to 1M (segment size) */
+ 	guest_test_phys_mem &= ~((1 << 20) - 1);
+ #endif
+-
+ 	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
+ 
+ 	bmap = bitmap_alloc(host_num_pages);
 -- 
 2.26.2
 
