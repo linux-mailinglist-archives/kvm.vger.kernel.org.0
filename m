@@ -2,104 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5FC52AF898
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 19:53:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A86422AFA93
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 22:37:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727635AbgKKSxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Nov 2020 13:53:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47316 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725949AbgKKSxm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Nov 2020 13:53:42 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A6FC0613D1
-        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 10:53:42 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id t15so1260096pja.7
-        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 10:53:42 -0800 (PST)
+        id S1726670AbgKKVgT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Nov 2020 16:36:19 -0500
+Received: from mail-co1nam11on2071.outbound.protection.outlook.com ([40.107.220.71]:13633
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725959AbgKKVgS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Nov 2020 16:36:18 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Cdp6pYWd91RiTOmA01ZgLnWYD2suGYIOBVq/u64LGOiJwbZmtM6qypvcjS3Lg+2pVFWbOdi0v6tIjZcsWwfwBKN6LEh/wT2GoNSvDEm7Yga41kmsxB4oQFh0aKmx+d24qje+kWC+fFmvOlc7TDryImdIGMEyzLGj06leatNYBR5OcJlZ/m2h+klXbgdRl0xjnr+4FlNeF+F+xSVpl2xGYrHEc6h7HNUE28Hf56q2SIeYXQXKnXJIHpwadi/IbPXLU1tD8d3cAipvbyjBqmuqVo42fs731NjsTc8ceMDUiPpOCvCWQ5zg/lueG1ypgveYl5v1jc4ifhnMigmDAoo/fA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rqJwHCEmVZnpxtQr3Yn2jQOk8owns8XmwjiBoH3RPEg=;
+ b=LreClDNE82fYVFmhLDIjbm0ind0OYX20389pOBeZZBpyZkMt8jKOy8uPT7c2ArWj2OnL7uxIB9zS4Fg9rSg2iB5bBGQKg8Oo3a8GC3q+gr4C6k2yAJtLSV58zjIGIW+BUHMw9vgFKZ0bDmHlnCxPjRWIJJUFSIZDdRdcGTj13Ck8PrN/kE8WadxLhaf02Qx0VlVfINxEYRkeV0URT1JpnHLZv57fFZwvtNsoXOlZNoWSO8pP2UKcpsOmPem9GkKzKF23EDVKDBWgd3K+p8jcT+OrzSPGMboPNPjgekZdVbICf50wn4HD9Ho3RRTdGb7m0JXY6BbVTsMZHbgY77+AZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=93R4ztQrLrDF9Ja7P3toIKUvpq9Mkw15Zf+bh5c6Tqo=;
-        b=kK51WkYoFHiSWND2/+N+C4Ova1zafjAVM+MPR0hpWwVY8W6VovOfLNmIiMynognenH
-         lbj/HnGi8LUypoLkUvvq6ifdmaKSM7Qs5KY8OLvuNSHqi93xn9P6OKqDth56mfLf7TmS
-         eTy6XVOeyZYgAtmx4jHnLmdF44tZnyR7Y37vDyXD8JbUe+YWpWxdIFOY2Nm8WnVKjlrZ
-         mxOlGUs7o2Q964Dlth1cEweUi0t1TPbzd6pUE+KsV14NikSdbNfPu+/9c1+67WbwQh0t
-         up5tbY5R9KY1/3ZqfWU+oDjfpEZZf3nt8OrukS3kW8t8SAHkHMKBe8JkEeeJE8heHb7y
-         6zVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=93R4ztQrLrDF9Ja7P3toIKUvpq9Mkw15Zf+bh5c6Tqo=;
-        b=eFh7sMLcpSfXgMWWZ+nxA2n85HEoh2RYfmx/19TENlVneVZ404eC0QMqp6ZkrU/I5C
-         HVTeQCUQ0M+hQ8/of+IX2GcpPLNC3AZGVKu3LyJg/y04WQSkq3akz8dUXomRfaQSQhyN
-         stQ57MhpiJbijYyPnB8yUNv/tUamw+sFqr7t70IZsSdb5GnpiBdfMMb3vifhwAf5nKKa
-         TtjLhQKz+adt5rGMPaNpVgi376qZaoCLr3IG+AmQn/kowIU61dTB4HcSiBfI5sjntwJn
-         z5EoU2FPp7AS7Dl0GE1vrKCOOGWzJpLFmkNkG/0qn1FHg2KLSaW4oLCXolEbb8VXQvrv
-         vOmg==
-X-Gm-Message-State: AOAM532tyXEJs0sIuKlEcjxpKFPTARk2fqWGqV76q9x/4a1KtCx1oh6T
-        nOMOaf53wDzKskvTbLHWkTqW9ePc5v9t
-X-Google-Smtp-Source: ABdhPJyl7J/4ZMYI6a1D98WFOkbXOBJ8G/8pul2PYv3oklRs7dNvgDUFi0coDy0Z5skyieCqVo68nE6HtM2h
-Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a17:902:bc46:b029:d6:d98a:1a68 with SMTP
- id t6-20020a170902bc46b02900d6d98a1a68mr10718919plz.63.1605120821929; Wed, 11
- Nov 2020 10:53:41 -0800 (PST)
-Date:   Wed, 11 Nov 2020 10:53:37 -0800
-Message-Id: <20201111185337.1237383-1-bgardon@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.29.2.222.g5d2a92d10f8-goog
-Subject: [PATCH] kvm: x86/mmu: Fix is_tdp_mmu_check when using PAE
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Zdenek Kaspar <zkaspar82@gmail.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rqJwHCEmVZnpxtQr3Yn2jQOk8owns8XmwjiBoH3RPEg=;
+ b=G0HGo/HeUAEd2GteMnqBJS8YMwaWJ4CfM3LDbAkkt8JB0vHaNpIe+Oy0ucDRIX90Ct8HJ3I80zV2G544uuTLPXAzVSQMLVfJU9B/iWdr2j313gJ4LzTqZNSyhq57XDXpJgu57cuQLwCGjIYW5cUvdyyFhP9CM3OTS2LdD/Fpe4w=
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2462.namprd12.prod.outlook.com (2603:10b6:802:28::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21; Wed, 11 Nov
+ 2020 21:36:16 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::d877:baf6:9425:ece]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::d877:baf6:9425:ece%3]) with mapi id 15.20.3541.025; Wed, 11 Nov 2020
+ 21:36:16 +0000
+Subject: RE: [PATCH v3 0/2] KVM: SVM: Create separate vmcbs for L1 and L2
+To:     Cathy Avery <cavery@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc:     "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "Huang2, Wei" <Wei.Huang2@amd.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>
+References: <20201026174222.21811-1-cavery@redhat.com>
+From:   Babu Moger <babu.moger@amd.com>
+Message-ID: <75b85cc7-96d9-eab9-9748-715ed951034d@amd.com>
+Date:   Wed, 11 Nov 2020 15:35:49 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20201026174222.21811-1-cavery@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: DM3PR12CA0074.namprd12.prod.outlook.com
+ (2603:10b6:0:57::18) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.136] (165.204.77.1) by DM3PR12CA0074.namprd12.prod.outlook.com (2603:10b6:0:57::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21 via Frontend Transport; Wed, 11 Nov 2020 21:36:15 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: c88fc693-b791-4638-83b3-08d88689d1ca
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2462:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2462C1556BD149094AF8FC5395E80@SN1PR12MB2462.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Q7PBpv1M6rL4F9j+/8rxOU+do0FejtfbNXz/XBOr7CbzvjgJlk2bYBhZAjXi1BdvAjxe8tKBT0gTYZb+FZiJe/192YjM+MBDl9k3Z0zveb3z3bEnEjEZgEtx8l1lKxy2+ifQAa3ncUCoO8rw0blDme99oedeIx4MAYUUpj3qxVyfKJVyaoCwXNhLTqLOgWphVUOzvI1F1NZDpkFAPhiOhzhe4h6qoBfnBQkI00OKGv5IPTb7mW4pHNRG7ImK6SJyQ+Tx3nlwHNkVTbYaptSV4joMJFrizZRhD5nDhqKOEE0XJDRw/i3Kgt7fqqW/2Hv6pdyYivSlqnqYf+9YoXYwGIypgLha/YRAoGUnX40NQJV5iWRtonvjOH/+dtfc2vEBlZss8/r4AEVcWbjypsIuQDmbkT2c8paEW3omjuFWBfsJHO4vS0aToTuwTUHTEeNxYQDPsE2oUA6rMajN08cgDQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(136003)(376002)(396003)(346002)(26005)(66946007)(66476007)(66556008)(6666004)(4326008)(44832011)(52116002)(8676002)(316002)(478600001)(53546011)(54906003)(16576012)(110136005)(86362001)(8936002)(956004)(16526019)(2906002)(5660300002)(2616005)(31686004)(36756003)(186003)(83380400001)(6486002)(31696002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: lINqzttXy7T9yypWJ2vOIGZBXCeTxrsdimG5XTizTrVmKbAHq6mKSYGpHv7LagOPe6L8JNFCk61rOVN2mnNLxROMPeMmbT7Lpo9gMwgXe/AUiYOi/ZKq9+EpgUOgbW6Gxm2X68JQMvoccFZZ0m3sRTVZCUGHwYezKeF0ofAKQuSLL45L2Y+LEYZPp8SzStmHx5kVAWZWQgOB6zI0FmH3TioLgpws34QHubi8VBVdgmFYLViO2FWX1iL0no1n9y73E++eZCeAFMS/VB+55zKhrBwHefGJXQ0frhMfDZcM0QozFYFYAbJz9lm91e1e7yuaoWajtPMG8o+aZ+QNUXCOQClULzrqxunS4B71IXUl7i82BRuWLFYNOPT80q4HxK0eybtD66HKzOvSuuzoGzuL90Dj517hFRbUPUV22dMCn9ReYEaww5fkMHlHzDcOIk+NLHqa0zd3vKAbHBhRo8D35pNf3MhtvbWtig2zvxAlGl7G2p9kP9N5llJimBw+tpUhzOAnX5vDYNhKNvnro4MYN2crKHXYNzd/PH729NzGIr3YS5qFkYN7wbTAHmmXpNyvlxUiWyGTHKt96OloQ/teCdSNOSkWRpY8IyOn3NcbP1Zo/EO30xHSVWlEepAYVOWIXhw4cz53H6OAD1YJ8Ryu9w==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c88fc693-b791-4638-83b3-08d88689d1ca
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2020 21:36:16.2586
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HPfD1uFiHwyBx6/PARciJEAx2/bzpN0A8rOa8Xww3f1MSFarbImXBbkeKdRcUf7L
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2462
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When PAE is in use, the root_hpa will not have a shadow page assoicated
-with it. In this case the kernel will crash with a NULL pointer
-dereference. Add checks to ensure is_tdp_mmu_root works as intended even
-when using PAE.
+Hi Cathy,
+I was going to test these patches. But it did not apply on my tree.
+Tried on kvm(https://git.kernel.org/pub/scm/virt/kvm/kvm.git) and
+Mainline
+(https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git). What
+is your base tree?
+thanks
+Babu
 
-Tested: compiles
-
-Fixes: 02c00b3a2f7e ("kvm: x86/mmu: Allocate and free TDP MMU roots")
-Reported-by: Zdenek Kaspar <zkaspar82@gmail.com>
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 27e381c9da6c..13013f4d98ad 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -49,8 +49,18 @@ bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
- {
- 	struct kvm_mmu_page *sp;
- 
-+	if (WARN_ON(!VALID_PAGE(hpa)))
-+		return false;
-+
- 	sp = to_shadow_page(hpa);
- 
-+	/*
-+	 * If this VM is being run with PAE, the TDP MMU will not be enabled
-+	 * and the root HPA will not have a shadow page associated with it.
-+	 */
-+	if (!sp)
-+		return false;
-+
- 	return sp->tdp_mmu_page && sp->root_count;
- }
- 
--- 
-2.29.2.222.g5d2a92d10f8-goog
+> -----Original Message-----
+> From: Cathy Avery <cavery@redhat.com>
+> Sent: Monday, October 26, 2020 12:42 PM
+> To: linux-kernel@vger.kernel.org; kvm@vger.kernel.org; pbonzini@redhat.com
+> Cc: vkuznets@redhat.com; Huang2, Wei <Wei.Huang2@amd.com>;
+> mlevitsk@redhat.com; sean.j.christopherson@intel.com
+> Subject: [PATCH v3 0/2] KVM: SVM: Create separate vmcbs for L1 and L2
+> 
+> svm->vmcb will now point to either a separate vmcb L1 ( not nested ) or L2 vmcb
+> ( nested ).
+> 
+> Changes:
+> v2 -> v3
+>  - Added vmcb switching helper.
+>  - svm_set_nested_state always forces to L1 before determining state
+>    to set. This is more like vmx and covers any potential L2 to L2 nested state
+> switch.
+>  - Moved svm->asid tracking to pre_svm_run and added ASID set dirty bit
+>    checking.
+> 
+> v1 -> v2
+>  - Removed unnecessary update check of L1 save.cr3 during nested_svm_vmexit.
+>  - Moved vmcb01_pa to svm.
+>  - Removed get_host_vmcb() function.
+>  - Updated vmsave/vmload corresponding vmcb state during L2
+>    enter and exit which fixed the L2 load issue.
+>  - Moved asid workaround to a new patch which adds asid to svm.
+>  - Init previously uninitialized L2 vmcb save.gpat and save.cr4
+> 
+> Tested:
+> kvm-unit-tests
+> kvm self tests
+> Loaded fedora nested guest on fedora
+> 
+> Cathy Avery (2):
+>   KVM: SVM: Track asid from vcpu_svm
+>   KVM: SVM: Use a separate vmcb for the nested L2 guest
+> 
+>  arch/x86/kvm/svm/nested.c | 125 ++++++++++++++++++--------------------
+>  arch/x86/kvm/svm/svm.c    |  58 +++++++++++-------
+>  arch/x86/kvm/svm/svm.h    |  51 +++++-----------
+>  3 files changed, 110 insertions(+), 124 deletions(-)
+> 
+> --
+> 2.20.1
 
