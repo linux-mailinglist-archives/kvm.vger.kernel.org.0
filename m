@@ -2,77 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43EE62AE8DC
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 07:24:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5482E2AE8F1
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 07:31:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726237AbgKKGXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Nov 2020 01:23:49 -0500
-Received: from foss.arm.com ([217.140.110.172]:41922 "EHLO foss.arm.com"
+        id S1725925AbgKKGb1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Nov 2020 01:31:27 -0500
+Received: from mga17.intel.com ([192.55.52.151]:43536 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726231AbgKKGXi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Nov 2020 01:23:38 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9F8F514BF;
-        Tue, 10 Nov 2020 22:23:37 -0800 (PST)
-Received: from localhost.localdomain (entos-thunderx2-desktop.shanghai.arm.com [10.169.212.215])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 48D123F6CF;
-        Tue, 10 Nov 2020 22:23:31 -0800 (PST)
-From:   Jianyong Wu <jianyong.wu@arm.com>
-To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, Andre.Przywara@arm.com,
-        steven.price@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
-        nd@arm.com
-Subject: [PATCH v15 9/9] arm64: Add kvm capability check extension for ptp_kvm
-Date:   Wed, 11 Nov 2020 14:22:11 +0800
-Message-Id: <20201111062211.33144-10-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201111062211.33144-1-jianyong.wu@arm.com>
-References: <20201111062211.33144-1-jianyong.wu@arm.com>
+        id S1725867AbgKKGb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Nov 2020 01:31:26 -0500
+IronPort-SDR: UYNH1Sofp/fadFCUhHXR3Az/xoiNxZj6JYiMe35rf/vX08CWEHMOIJ0r1yfob2NwWJShw/4DGT
+ WhCa+xnv6OMA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9801"; a="149951492"
+X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
+   d="scan'208";a="149951492"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 22:31:25 -0800
+IronPort-SDR: R095N3SAab1vQKKPDMgSJRzioTZQanof05ufeePtVKJRu1W+vHAiNc6IN+nYtbs5J2L5ZcJcUq
+ Vnx6t3emNE0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
+   d="scan'208";a="323167572"
+Received: from local-michael-cet-test.sh.intel.com ([10.239.159.156])
+  by orsmga003.jf.intel.com with ESMTP; 10 Nov 2020 22:31:23 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        jmattson@google.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [RFC PATCH 0/3] Get supported_xss ready for XSS dependent
+Date:   Wed, 11 Nov 2020 14:41:48 +0800
+Message-Id: <20201111064151.1090-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let userspace check if there is kvm ptp service in host.
-Before VMs migrate to another host, VMM may check if this
-cap is available to determine the next behavior.
+Although supported_xss was added long time ago, yet it doesn't get ready for
+XSS dependent new features usage, e.g., when guest update XSS MSRs, it's
+necessary to update guest CPUID to reflect the correct info. So post this
+patchset to get things ready, or at least as a hint to maintainers that
+there're still a few things left before support feature bits in XSS.
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c     | 1 +
- include/uapi/linux/kvm.h | 1 +
- 2 files changed, 2 insertions(+)
+Also added a few helpers to facilitate new features development. This part
+of code originates from CET KVM patchset, with more and more new features
+dependent on this part, post this patchset ahead of them.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5750ec34960e..c05279de507d 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -182,6 +182,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
- 	case KVM_CAP_ARM_NISV_TO_USER:
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
-+	case KVM_CAP_PTP_KVM:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ca41220b40b8..797c40bbc31f 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_USER_SPACE_MSR 188
- #define KVM_CAP_X86_MSR_FILTER 189
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-+#define KVM_CAP_PTP_KVM 191
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+Sean Christopherson (2):
+  KVM: x86: Add helpers for {set|clear} bits in supported_xss
+  KVM: x86: Load guest fpu state when accessing MSRs managed by XSAVES
+
+Yang Weijiang (1):
+  KVM: x86: Refresh CPUID when guest modifies MSR_IA32_XSS
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            | 21 ++++++++++++--
+ arch/x86/kvm/vmx/vmx.c          | 22 +++++++++++++++
+ arch/x86/kvm/x86.c              | 50 +++++++++++++++++++++++++++++++--
+ 4 files changed, 88 insertions(+), 6 deletions(-)
+
 -- 
-2.17.1
+2.17.2
 
