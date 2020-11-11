@@ -2,169 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18C462AFB33
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 23:16:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B32802AFD59
+	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 02:55:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbgKKWQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Nov 2020 17:16:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50432 "EHLO
+        id S1726826AbgKLBbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Nov 2020 20:31:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726287AbgKKWQl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Nov 2020 17:16:41 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D13B0C0613D1
-        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 14:16:40 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id e18so3986275edy.6
-        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 14:16:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=zD5WzEzQRngl9dmlFqU/zwILd5JYydu2RfHlYM1G/mk=;
-        b=KEXyRfGqX7W5BHJoEFj5E0fBY6xIgCFIZneSQbw9Q8ueXS2RhB8LRVk/5lo4LGcGpD
-         Lb7xLWbZf0kFXtGJm6Ny85F8NlYlAa0UfslSXaKPzfxoBhYolHYjQxfxXVGmnRSPAw8I
-         1UYdE1kVAK2+oGsis+MU3XI798k3p2h7ugO1DcCGre55jNWgaFQTVAp8rilQtH080dIC
-         /t3TkzulRQ0/8re0nmV68qsNU2AD/SFfGVqhXTF1yc/BrScncD9N13MGSzoCZnuZSUgj
-         pwKAK7vsUiKMxtZrW7LXo9LUWLoEWGgDJOWn1zOKQt6qSxh59se/ZeQUnScAuvYNOz8t
-         IIwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zD5WzEzQRngl9dmlFqU/zwILd5JYydu2RfHlYM1G/mk=;
-        b=uKB07mQKg3YYyuexYGwTGyAsc4Q2eClXuK2pZ8hgPdzHRxKSE6bmYmv1V+TPfox8uZ
-         lThVu1PZhZKJC1C4C4WtPMwKbUhnl3dYPWxu+wewNxcQUE/BVgH84a6oxwU5hHO1bpR2
-         g1IiqnWWYl4UOvkKSwTKzFu/lAa7hRidjVasPQVuupUoEdRw0Ipx+ybBAKLkdTf2ifLt
-         qHHqOOaZQZip7HAIrmei4s4snSlkXQv2aMyxZYhNMkON6+ICruN+QFO2GYZ3Q+AuRYWQ
-         tPp8mNm1HoaEX4FCM9qnC1zYmIxhfHXwKoRJ7FZwuBM/ci3Jtjk7okmdJCoS38ZJMp1S
-         tvQA==
-X-Gm-Message-State: AOAM5318sEP6kcbBsX5+nL1L/btcQp5i5RgG1iLBPhcADUzduxTXnmLa
-        6Rj/d5iHq0P45nzDD/U/3Zo0Rupm4QeLoA==
-X-Google-Smtp-Source: ABdhPJyx0hx/1kQz0J6BHwHFhb3Pm1sG5YOFcUvNgQO4h+ujmXh6g/wRfo2gvIej5dEXdLbx8Wqeow==
-X-Received: by 2002:a05:6402:143:: with SMTP id s3mr1766345edu.267.1605132999608;
-        Wed, 11 Nov 2020 14:16:39 -0800 (PST)
-Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
-        by smtp.gmail.com with ESMTPSA id a17sm1454479eda.45.2020.11.11.14.16.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2020 14:16:39 -0800 (PST)
-Date:   Wed, 11 Nov 2020 23:16:36 +0100
-From:   Zdenek Kaspar <zkaspar82@gmail.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: Unable to start VM with 5.10-rc3
-Message-ID: <20201111231636.453c01c8.zkaspar82@gmail.com>
-In-Reply-To: <CANgfPd_qouM3h-3i=kqZvmpz53_qcj5G8eUbn0L75ZKmtZVtvQ@mail.gmail.com>
-References: <20201110162344.152663d5.zkaspar82@gmail.com>
-        <CANgfPd-gaDhmwPm5CC=cAFn8mBczbUjs7u3KucAGdKmU81Vbeg@mail.gmail.com>
-        <20201111120939.54929a50.zkaspar82@gmail.com>
-        <CANgfPd_qouM3h-3i=kqZvmpz53_qcj5G8eUbn0L75ZKmtZVtvQ@mail.gmail.com>
+        with ESMTP id S1727054AbgKKWqp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Nov 2020 17:46:45 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E12C061A04;
+        Wed, 11 Nov 2020 14:27:30 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1605133648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/AJjHM4RdDlSJrBc4hxI1WObRemgRGA65few9eI9qhY=;
+        b=Yz4kBo6iYpJ8A4VQHynSbh4zW33QX2TNKzEpF1vlJPbmL+ZOD/van513qYoQjUoLfiANkU
+        /UcMuwr8ewQcOHJeACUHCPyaL/pQoU2Ye8qx5txQ5T1oPPOkUX8vJvzXHi6g0kwY67Itxa
+        zGBFaWBV6dWK7StOKa/6l5Nbqbq4uAESoYqm4i6BqxlZlwB+jx6IrPz3+6zW+VvZltQnya
+        H6MVzg9fXch2mIZ35bjtmv0EZ7F+FreuENigEmTzM8YVaGUms1dhyAjDYnVCbB2zUPKVcn
+        mhXkmwtjeC83I8oiQUHByMZkWQELU+8MltibUfrWk7rdaAe3ViEru5/B5/33mA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1605133648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/AJjHM4RdDlSJrBc4hxI1WObRemgRGA65few9eI9qhY=;
+        b=0e9+v4yPq7Pamk3s9B1ZMn8Y1Q6geVARcMOWJtapXhxL5QALz7ZL4IJuvemVn9hGu0f1QI
+        Xasc43FTcv++sKCQ==
+To:     "Raj\, Ashok" <ashok.raj@intel.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "Tian\, Kevin" <kevin.tian@intel.com>,
+        "Jiang\, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul\@kernel.org" <vkoul@kernel.org>,
+        "Dey\, Megha" <megha.dey@intel.com>,
+        "maz\@kernel.org" <maz@kernel.org>,
+        "bhelgaas\@google.com" <bhelgaas@google.com>,
+        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "jing.lin\@intel.com" <jing.lin@intel.com>,
+        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
+        "parav\@mellanox.com" <parav@mellanox.com>,
+        "rafael\@kernel.org" <rafael@kernel.org>,
+        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain\, Mona" <mona.hossain@intel.com>,
+        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
+        Ashok Raj <ashok.raj@intel.com>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+In-Reply-To: <20201111160922.GA83266@otc-nc-03>
+References: <20201104135415.GX2620339@nvidia.com> <MWHPR11MB1645524BDEDF8899914F32AE8CED0@MWHPR11MB1645.namprd11.prod.outlook.com> <20201106131415.GT2620339@nvidia.com> <20201106164850.GA85879@otc-nc-03> <20201106175131.GW2620339@nvidia.com> <CAPcyv4iYHA1acfo=+fTk+U_TrLbSWJjA6v4oeTXgVYDTrnCoGw@mail.gmail.com> <20201107001207.GA2620339@nvidia.com> <87pn4nk7nn.fsf@nanos.tec.linutronix.de> <d69953378bd1fdcdda54a2fbe285f6c0b1484e8a.camel@infradead.org> <20201111154159.GA24059@infradead.org> <20201111160922.GA83266@otc-nc-03>
+Date:   Wed, 11 Nov 2020 23:27:28 +0100
+Message-ID: <87k0uro7fz.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ben,
+On Wed, Nov 11 2020 at 08:09, Ashok Raj wrote:
+> On Wed, Nov 11, 2020 at 03:41:59PM +0000, Christoph Hellwig wrote:
+>> On Sun, Nov 08, 2020 at 07:36:34PM +0000, David Woodhouse wrote:
+>> > So it does look like we're going to need a hypercall interface to
+>> > compose an MSI message on behalf of the guest, for IMS to use. In fact
+>> > PCI devices assigned to a guest could use that too, and then we'd only
+>> > need to trap-and-remap any attempt to write a Compatibility Format MSI
+>> > to the device's MSI table, while letting Remappable Format messages get
+>> > written directly.
+>> > 
+>> > We'd also need a way for an OS running on bare metal to *know* that
+>> > it's on bare metal and can just compose MSI messages for itself. Since
+>> > we do expect bare metal to have an IOMMU, perhaps that is just a
+>> > feature flag on the IOMMU?
+>> 
+>> Have the platform firmware advertise if it needs native or virtualized
+>> IMS handling.  If it advertises neither don't support IMS?
+>
+> The platform hint can be easily accomplished via DMAR table flags. We could
+> have an IMS_OPTOUT(similart to x2apic optout flag) flag, when 0 its native 
+> and IMS is supported.
+>
+> When vIOMMU is presented to guest, virtual DMAR table will have this flag
+> set to 1. Indicates to GuestOS, native IMS isn't supported.
 
-[PATCH] kvm: x86/mmu: Fix is_tdp_mmu_check when using PAE
+These opt-out bits suck by definition. It comes all back to the fact
+that the whole virt thing didn't have a hardware defined way to tell
+that the OS runs in a VM and not on bare metal. It wouldn't have been
+rocket science to do so.
 
-fixes is_tdp_mmu_root NULL pointer dereference,
-tested on: Intel(R) Core(TM)2 CPU 6600  @ 2.40GHz
+And because that does not exist, we need magic opt-out bits for every
+other piece of functionality which gets added. Can we please stop this
+and provide a well defined way to tell the OS whether it runs on bare
+metal or not?
 
-Thanks, Z.
+The point is that you really want opt-in bits so that decisions come
+down to
 
-On Wed, 11 Nov 2020 10:37:49 -0800
-Ben Gardon <bgardon@google.com> wrote:
+     if (!virt || virt->supports_X)
 
-> Hi Zdenek,
-> 
-> I'm working on reproducing the issue. I don't have access to a CPU
-> without EPT, but I tried turning off EPT on a Skylake and I think I
-> reproduced the issue, but wasn't able to confirm in the logs.
-> 
-> If you were operating without EPT I assume the guest was in non-paging
-> mode to get into direct_page_fault in the first place. I would still
-> have expected the root HPA to be valid unless...
-> 
-> Ah, if you're operating with PAE, then the root hpa will be valid but
-> not have a shadow page associated with it, as it is set to
-> __pa(vcpu->arch.mmu->pae_root) in mmu_alloc_direct_roots.
-> In that case, I can see why we get a NULL pointer dereference in
-> is_tdp_mmu_root.
-> 
-> I will send out a patch that should fix this if the issue is as
-> described above. I don't have hardware to test this on, but if you
-> don't mind applying the patch and checking it, that would be awesome.
-> 
-> Ben
-> 
-> On Wed, Nov 11, 2020 at 3:09 AM Zdenek Kaspar <zkaspar82@gmail.com>
-> wrote:
-> >
-> > Hi, I'm sure my bisect has nothing to do with KVM,
-> > because it was quick shot between -rc1 and previous release.
-> >
-> > This old CPU doesn't have EPT (see attached file)
-> >
-> > ./run_tests.sh
-> > FAIL apic-split (timeout; duration=90s)
-> > FAIL ioapic-split (timeout; duration=90s)
-> > FAIL apic (timeout; duration=30)
-> > ... ^C
-> > few RIP is_tdp_mmu_root observed in dmesg
-> >
-> > Z.
-> >
-> > On Tue, 10 Nov 2020 17:13:21 -0800
-> > Ben Gardon <bgardon@google.com> wrote:
-> >
-> > > Hi Zdenek,
-> > >
-> > > That crash is most likely the result of a missing check for an
-> > > invalid root HPA or NULL shadow page in is_tdp_mmu_root, which
-> > > could have prevented the NULL pointer dereference.
-> > > However, I'm not sure how a vCPU got to that point in the page
-> > > fault handler with a bad EPT root page.
-> > >
-> > > I see VMX in your list of flags, is your machine 64 bit with EPT
-> > > or some other configuration?
-> > >
-> > > I'm surprised you are finding your machine unable to boot for
-> > > bisecting. Do you know if it's crashing in the same spot or
-> > > somewhere else? I wouldn't expect the KVM page fault handler to
-> > > run as part of boot.
-> > >
-> > > I will send out a patch first thing tomorrow morning (PST) to WARN
-> > > instead of crashing with a NULL pointer dereference. Are you able
-> > > to reproduce the issue with any KVM selftest?
-> > >
-> > > Ben
-> > >
-> > >
-> > > On Tue, Nov 10, 2020 at 7:24 AM Zdenek Kaspar
-> > > <zkaspar82@gmail.com> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > attached file is result from today's linux-master (with fixes
-> > > > for 5.10-rc4) when I try to start VM on older machine:
-> > > >
-> > > > model name      : Intel(R) Core(TM)2 CPU          6600  @
-> > > > 2.40GHz flags           : fpu vme de pse tsc msr pae mce cx8
-> > > > apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr
-> > > > sse sse2 ht tm pbe syscall nx lm constant_tsc arch_perfmon pebs
-> > > > bts rep_good nopl cpuid aperfmperf pni dtes64 monitor ds_cpl
-> > > > vmx est tm2 ssse3 cx16 xtpr pdcm lahf_lm pti tpr_shadow dtherm
-> > > > vmx flags       : tsc_offset vtpr
-> > > >
-> > > > I did quick check with 5.9 (distro kernel) and it works,
-> > > > but VM performance seems extremely impacted. 5.8 works fine.
-> > > >
-> > > > Back to 5.10 issue: it's problematic since 5.10-rc1 and I have
-> > > > no luck with bisecting (machine doesn't boot).
-> > > >
-> > > > TIA, Z.
-> >
+which is the obvious sane and safe logic. But sure, why am I asking for
+sane and safe in the context of virtualization?
 
+Thanks,
+
+        tglx
