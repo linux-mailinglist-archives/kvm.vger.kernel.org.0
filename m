@@ -2,140 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 753732AEE9F
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 11:16:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B77F2AEEFD
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 11:50:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727362AbgKKKQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Nov 2020 05:16:57 -0500
-Received: from foss.arm.com ([217.140.110.172]:46384 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727109AbgKKKQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Nov 2020 05:16:56 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 069AB101E;
-        Wed, 11 Nov 2020 02:16:56 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 147A33F6CF;
-        Wed, 11 Nov 2020 02:16:54 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v3 1/2] arm: Add mmu_get_pte() to the MMU
- API
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
-Cc:     mark.rutland@arm.com, jade.alglave@arm.com, luc.maranget@inria.fr,
-        andre.przywara@arm.com, drjones@redhat.com
-References: <20201110180924.95106-1-nikos.nikoleris@arm.com>
- <20201110180924.95106-2-nikos.nikoleris@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <3641d1f0-7d82-e001-dcde-6d00261923d6@arm.com>
-Date:   Wed, 11 Nov 2020 10:18:05 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1725977AbgKKKum (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Nov 2020 05:50:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42312 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725925AbgKKKuj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Nov 2020 05:50:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605091838;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mnA7XsiGSJFXhW6YNgCg1O0O0+tMAkowMzr0RmATALo=;
+        b=ZnvTuVK5FsVtsj2ls3L/0j1BBP2vJyBJjMhgaPFm6y6lcyHGhJ2JGCo0xgQ+RR4vcgHZdq
+        wB/sdqf4X/BbGI5m4qwy+vBkYecNF0kf9GjMQaiA9cHHtY4ne8deTWlDNNHHgzkIaCPiPg
+        gF1Z1MWx7XWKB0d/hyLmtOyppTGU6NE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-qQq5v6yaNU-mbvOPFDX2dg-1; Wed, 11 Nov 2020 05:50:36 -0500
+X-MC-Unique: qQq5v6yaNU-mbvOPFDX2dg-1
+Received: by mail-wr1-f69.google.com with SMTP id w17so455815wrp.11
+        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 02:50:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mnA7XsiGSJFXhW6YNgCg1O0O0+tMAkowMzr0RmATALo=;
+        b=XY12h40khY76kHrm1dc07fBn0NbCRx0M3jxoipkSyW3F0mC/cnwvutB3kERMlFNvTm
+         zssy9q/zY11gAPyEENZV7hhODJtrTgNbCbknF/doj1V0aN7miknd37errGyJQrDg+HID
+         I9yP9L/sh48DaX5k84OyzWjLxbX3Z1+mC9Mb0NXgxjCwKM2WL8NePYmLW++wRXzR+Fkr
+         hPrSuIgSIU46XktXHW1uhQJ+fdyke/rX3/xOiet4gdrM7VBWYgbYuv5ZAdtecx6mfYB2
+         oXE/El1/rbYrA0CcyIL5f3kyHUSURhLlaim5fdi67wikVEWzd+Gv3pLxxOOcGtDKuqh9
+         vqPQ==
+X-Gm-Message-State: AOAM530i/rTswc6iyHn8I3UWiVIzNZuvb7KcK2kkTougHRigK0rtttt/
+        kRqAqUalIUYCCzMpHIr6p0CgTrDC7rfbUftU7r8zWOIyfkXtcLIOSYMOCiZV6Q8raIm+Fr5r4XC
+        MvEGZYt4yvj9+
+X-Received: by 2002:adf:eeca:: with SMTP id a10mr24970192wrp.186.1605091835504;
+        Wed, 11 Nov 2020 02:50:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxz4TPJxgCHN7vv+R3d7jzN9KDvG9vgiS4za2+hlcdJRS27vg4GofYWp6iFMLk0C1lnkV/R+w==
+X-Received: by 2002:adf:eeca:: with SMTP id a10mr24970172wrp.186.1605091835295;
+        Wed, 11 Nov 2020 02:50:35 -0800 (PST)
+Received: from steredhat (host-79-47-126-226.retail.telecomitalia.it. [79.47.126.226])
+        by smtp.gmail.com with ESMTPSA id p4sm2017826wrm.51.2020.11.11.02.50.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2020 02:50:34 -0800 (PST)
+Date:   Wed, 11 Nov 2020 11:50:31 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Tian Tao <tiantao6@hisilicon.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost_vdpa: switch to vmemdup_user()
+Message-ID: <20201111105031.mtdbvt7grkxeuwn4@steredhat>
+References: <1605057288-60400-1-git-send-email-tiantao6@hisilicon.com>
 MIME-Version: 1.0
-In-Reply-To: <20201110180924.95106-2-nikos.nikoleris@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <1605057288-60400-1-git-send-email-tiantao6@hisilicon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nikos,
-
-I tried to apply it on top of master just to make sure everything is correct and I
-got a conflict in mmu.c. The line numbers were different, and mmu_clear_user() had
-a pud_t *pud local variable, which isn't present in master, but is added by your
-series to enable configurable translation granule. Applying on top of that series
-worked without any conflicts. Just a heads-up to Drew when it picks them up.
-
-Just to be on the safe side, I ran the tests on a Cortex-A53 and Cortex-A72, with
-4k and 64k pages, nothing unexpected. The patch looks good to me.
-
-Thanks,
-
-Alex
-
-On 11/10/20 6:09 PM, Nikos Nikoleris wrote:
-> From: Luc Maranget <Luc.Maranget@inria.fr>
+On Wed, Nov 11, 2020 at 09:14:48AM +0800, Tian Tao wrote:
+>Replace opencoded alloc and copy with vmemdup_user()
 >
-> Add the mmu_get_pte() function that allows a test to get a pointer to
-> the PTE for a valid virtual address. Return NULL if the MMU is off.
+>Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+>---
+> drivers/vhost/vdpa.c | 10 +++-------
+> 1 file changed, 3 insertions(+), 7 deletions(-)
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
 >
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Signed-off-by: Luc Maranget <Luc.Maranget@inria.fr>
-> Co-Developed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  lib/arm/asm/mmu-api.h |  1 +
->  lib/arm/mmu.c         | 32 +++++++++++++++++++++-----------
->  2 files changed, 22 insertions(+), 11 deletions(-)
+>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>index 2754f30..4c39583 100644
+>--- a/drivers/vhost/vdpa.c
+>+++ b/drivers/vhost/vdpa.c
+>@@ -245,14 +245,10 @@ static long vhost_vdpa_set_config(struct vhost_vdpa *v,
+> 		return -EFAULT;
+> 	if (vhost_vdpa_config_validate(v, &config))
+> 		return -EINVAL;
+>-	buf = kvzalloc(config.len, GFP_KERNEL);
+>-	if (!buf)
+>-		return -ENOMEM;
 >
-> diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
-> index 2bbe1fa..3d04d03 100644
-> --- a/lib/arm/asm/mmu-api.h
-> +++ b/lib/arm/asm/mmu-api.h
-> @@ -22,5 +22,6 @@ extern void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
->  extern void mmu_set_range_ptes(pgd_t *pgtable, uintptr_t virt_offset,
->  			       phys_addr_t phys_start, phys_addr_t phys_end,
->  			       pgprot_t prot);
-> +extern pteval_t *mmu_get_pte(pgd_t *pgtable, uintptr_t vaddr);
->  extern void mmu_clear_user(pgd_t *pgtable, unsigned long vaddr);
->  #endif
-> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-> index d937f20..a1862a5 100644
-> --- a/lib/arm/mmu.c
-> +++ b/lib/arm/mmu.c
-> @@ -212,7 +212,13 @@ unsigned long __phys_to_virt(phys_addr_t addr)
->  	return addr;
->  }
->  
-> -void mmu_clear_user(pgd_t *pgtable, unsigned long vaddr)
-> +/*
-> + * NOTE: The Arm architecture might require the use of a
-> + * break-before-make sequence before making changes to a PTE and
-> + * certain conditions are met (see Arm ARM D5-2669 for AArch64 and
-> + * B3-1378 for AArch32 for more details).
-> + */
-> +pteval_t *mmu_get_pte(pgd_t *pgtable, uintptr_t vaddr)
->  {
->  	pgd_t *pgd;
->  	pud_t *pud;
-> @@ -220,7 +226,7 @@ void mmu_clear_user(pgd_t *pgtable, unsigned long vaddr)
->  	pte_t *pte;
->  
->  	if (!mmu_enabled())
-> -		return;
-> +		return NULL;
->  
->  	pgd = pgd_offset(pgtable, vaddr);
->  	assert(pgd_valid(*pgd));
-> @@ -229,17 +235,21 @@ void mmu_clear_user(pgd_t *pgtable, unsigned long vaddr)
->  	pmd = pmd_offset(pud, vaddr);
->  	assert(pmd_valid(*pmd));
->  
-> -	if (pmd_huge(*pmd)) {
-> -		pmd_t entry = __pmd(pmd_val(*pmd) & ~PMD_SECT_USER);
-> -		WRITE_ONCE(*pmd, entry);
-> -		goto out_flush_tlb;
-> -	}
-> +	if (pmd_huge(*pmd))
-> +		return &pmd_val(*pmd);
->  
->  	pte = pte_offset(pmd, vaddr);
->  	assert(pte_valid(*pte));
-> -	pte_t entry = __pte(pte_val(*pte) & ~PTE_USER);
-> -	WRITE_ONCE(*pte, entry);
->  
-> -out_flush_tlb:
-> -	flush_tlb_page(vaddr);
-> +        return &pte_val(*pte);
-> +}
-> +
-> +void mmu_clear_user(pgd_t *pgtable, unsigned long vaddr)
-> +{
-> +	pteval_t *p_pte = mmu_get_pte(pgtable, vaddr);
-> +	if (p_pte) {
-> +		pteval_t entry = *p_pte & ~PTE_USER;
-> +		WRITE_ONCE(*p_pte, entry);
-> +		flush_tlb_page(vaddr);
-> +	}
->  }
+>-	if (copy_from_user(buf, c->buf, config.len)) {
+>-		kvfree(buf);
+>-		return -EFAULT;
+>-	}
+>+	buf = vmemdup_user(c->buf, config.len);
+>+	if (IS_ERR(buf))
+>+		return PTR_ERR(buf);
+>
+> 	ops->set_config(vdpa, config.off, buf, config.len);
+>
+>-- 
+>2.7.4
+>
+
