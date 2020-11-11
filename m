@@ -2,93 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1525C2AE4FA
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 01:40:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40CD82AE55D
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 02:13:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732090AbgKKAj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 19:39:59 -0500
-Received: from mga04.intel.com ([192.55.52.120]:12588 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727275AbgKKAj7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 19:39:59 -0500
-IronPort-SDR: pfxbqvZBzCS9LxdlzFXr1gnXMzqCfGtrBmiAOeht8KeiN2C9HYOYsWwJEmv0pesSolnRdvnbeD
- dSmxwayl4qFQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9801"; a="167489223"
-X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="167489223"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 16:39:57 -0800
-IronPort-SDR: yxsyaDteDfcShgJDHe25SY8PLDJkrEfTHmRI7swP+/uvKoOvYh33CH3Zx0r8pzvBKXTdO1wOly
- JUW3MbeEmqxw==
-X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="356389564"
-Received: from agluck-desk2.sc.intel.com (HELO agluck-desk2.amr.corp.intel.com) ([10.3.52.68])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 16:39:56 -0800
-Date:   Tue, 10 Nov 2020 16:39:54 -0800
-From:   "Luck, Tony" <tony.luck@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Borislav Petkov <bp@alien8.de>, Jim Mattson <jmattson@google.com>,
-        Qian Cai <cai@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-tip-commits@vger.kernel.org" 
-        <linux-tip-commits@vger.kernel.org>, x86 <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [PATCH v2] x86/mce: Use "safe" MSR functions when enabling
- additional error logging
-Message-ID: <20201111003954.GA11878@agluck-desk2.amr.corp.intel.com>
-References: <a22b5468e1c94906b72c4d8bc83c0f64@intel.com>
- <20201109232402.GA25492@agluck-desk2.amr.corp.intel.com>
- <20201110063151.GB7290@nazgul.tnic>
- <094c2395-b1b3-d908-657c-9bd4144e40ac@redhat.com>
- <20201110095615.GB9450@nazgul.tnic>
- <b8de7f7b-7aa1-d98b-74be-62d7c055542b@redhat.com>
- <20201110155013.GE9857@nazgul.tnic>
- <1b587b45-a5a8-2147-ae53-06d1b284ea11@redhat.com>
- <cacd1cd272e94213a0c82c9871086cf5@intel.com>
- <7bd98718-f800-02ef-037a-4dfc5a7d1a54@redhat.com>
+        id S1732567AbgKKBNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 20:13:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48422 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732209AbgKKBNf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 20:13:35 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 155F2C0613D1
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 17:13:33 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id e17so467334ili.5
+        for <kvm@vger.kernel.org>; Tue, 10 Nov 2020 17:13:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=8aqAhNt9hNU+Zv61azJhzWGFkODldV4KV7123K3jE6E=;
+        b=tkabmCrfLHtxowF7PEJ/2/ur0EPEwniM1qthOJjQLfFvAi3I59Ueha9TjR3SS5bKk0
+         zSOMs4QoS7Xd5UR9ncwCuFc4y/Alcb+m+LYTc3ceORZT2tEAeW1hYOXQZ6i/90VYfDt8
+         MrAngzz/Ybw3wBjRbgiwJvqUMJpASRepIxAol/TvuUi+R4A5io6xpNq21yzOfAJPKzhv
+         mObTxm5DESLJeXapUxXrarTcRhfYSofLFurX6HDaJTVV81DOitSMGoF16jB3DSt0RFGd
+         XFy7HxT5ZAFdeMWe8r4Cg/Pb0FM/Okj9Gg1tbAIkBXzeFBq2GMAoSlI0UVBqrxAHMdcD
+         vN0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=8aqAhNt9hNU+Zv61azJhzWGFkODldV4KV7123K3jE6E=;
+        b=Wd7E2fPn/rMwePrwS9vHc9pVHTmBfDo7EVPgg98tYYNR81IO182a+UQBcAhZaHFZoN
+         /CSMHqoFx+kfnaGbOsqAbmHbJ4PUOUZksfXVgeOhj1CWSYrMO7cpcDgM8GgThRsq8W+H
+         Nh8ORJYWLSzT4gYw40oiqoT6FbEmBEFFV09jm9mxo8dW3JIB7vMlhrpdraqKS8wj6i0r
+         Nkf5dPbIBedwIGyOCTDMJSm4cHQsxbMKWw0IH9ghzK3ansXzi98jPRHGw+Z+qa9xDTxj
+         dnPxO7cuTZkvKDrRTHvIyusR7Qxswm2Q+ipept0nGeHne/HGcMveu9hf9t4tS+b07ziZ
+         SFBg==
+X-Gm-Message-State: AOAM530WsYioUt0SbxCu7hw1N1BHpGm2Xh+JAIfxwOsgAmNIqYQGesL2
+        E3cM3C/xjWQTUxf6+fBIDeo2L445aqxSpSHzXl/jXA==
+X-Google-Smtp-Source: ABdhPJyYFFqXz7LHNUxqt/obO4IZceZuCZhBIj9ty6VWJP8C6nUwc/dkvtKZieZftjYU2iDBveS7p3RJ3Ohfo9Qwdu4=
+X-Received: by 2002:a92:d5c4:: with SMTP id d4mr15001227ilq.154.1605057212072;
+ Tue, 10 Nov 2020 17:13:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7bd98718-f800-02ef-037a-4dfc5a7d1a54@redhat.com>
+References: <20201110162344.152663d5.zkaspar82@gmail.com>
+In-Reply-To: <20201110162344.152663d5.zkaspar82@gmail.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 10 Nov 2020 17:13:21 -0800
+Message-ID: <CANgfPd-gaDhmwPm5CC=cAFn8mBczbUjs7u3KucAGdKmU81Vbeg@mail.gmail.com>
+Subject: Re: Unable to start VM with 5.10-rc3
+To:     Zdenek Kaspar <zkaspar82@gmail.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Booting as a guest under KVM results in error messages about
-unchecked MSR access:
+Hi Zdenek,
 
-[    6.814328][    T0] unchecked MSR access error: RDMSR from 0x17f at rIP: 0xffffffff84483f16 (mce_intel_feature_init+0x156/0x270)
+That crash is most likely the result of a missing check for an invalid
+root HPA or NULL shadow page in is_tdp_mmu_root, which could have
+prevented the NULL pointer dereference.
+However, I'm not sure how a vCPU got to that point in the page fault
+handler with a bad EPT root page.
 
-because KVM doesn't provide emulation for random model specific registers.
+I see VMX in your list of flags, is your machine 64 bit with EPT or
+some other configuration?
 
-Switch to using rdmsrl_safe()/wrmsrl_safe() to avoid the message.
+I'm surprised you are finding your machine unable to boot for
+bisecting. Do you know if it's crashing in the same spot or somewhere
+else? I wouldn't expect the KVM page fault handler to run as part of
+boot.
 
-Reported-by: Qian Cai <cai@redhat.com>
-Fixes: 68299a42f842 ("x86/mce: Enable additional error logging on certain Intel CPUs")
-Signed-off-by: Tony Luck <tony.luck@intel.com>
----
- arch/x86/kernel/cpu/mce/intel.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+I will send out a patch first thing tomorrow morning (PST) to WARN
+instead of crashing with a NULL pointer dereference. Are you able to
+reproduce the issue with any KVM selftest?
 
-diff --git a/arch/x86/kernel/cpu/mce/intel.c b/arch/x86/kernel/cpu/mce/intel.c
-index b47883e364b4..42e60ef16c3a 100644
---- a/arch/x86/kernel/cpu/mce/intel.c
-+++ b/arch/x86/kernel/cpu/mce/intel.c
-@@ -521,9 +521,10 @@ static void intel_imc_init(struct cpuinfo_x86 *c)
- 	case INTEL_FAM6_SANDYBRIDGE_X:
- 	case INTEL_FAM6_IVYBRIDGE_X:
- 	case INTEL_FAM6_HASWELL_X:
--		rdmsrl(MSR_ERROR_CONTROL, error_control);
-+		if (rdmsrl_safe(MSR_ERROR_CONTROL, &error_control))
-+			return;
- 		error_control |= 2;
--		wrmsrl(MSR_ERROR_CONTROL, error_control);
-+		wrmsrl_safe(MSR_ERROR_CONTROL, error_control);
- 		break;
- 	}
- }
--- 
-2.21.1
+Ben
 
+
+On Tue, Nov 10, 2020 at 7:24 AM Zdenek Kaspar <zkaspar82@gmail.com> wrote:
+>
+> Hi,
+>
+> attached file is result from today's linux-master (with fixes
+> for 5.10-rc4) when I try to start VM on older machine:
+>
+> model name      : Intel(R) Core(TM)2 CPU          6600  @ 2.40GHz
+> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ht tm pbe syscall nx lm=
+ constant_tsc arch_perfmon pebs bts rep_good nopl cpuid aperfmperf pni dtes=
+64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm lahf_lm pti tpr_shadow d=
+therm
+> vmx flags       : tsc_offset vtpr
+>
+> I did quick check with 5.9 (distro kernel) and it works,
+> but VM performance seems extremely impacted. 5.8 works fine.
+>
+> Back to 5.10 issue: it's problematic since 5.10-rc1 and I have no luck
+> with bisecting (machine doesn't boot).
+>
+> TIA, Z.
