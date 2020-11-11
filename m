@@ -2,85 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4CA12AE63C
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 03:14:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E0602AE639
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 03:14:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732506AbgKKCOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 21:14:09 -0500
-Received: from mga05.intel.com ([192.55.52.43]:11142 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731810AbgKKCOI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 21:14:08 -0500
-IronPort-SDR: nHVZEGs2bRPUx5xcWSx+9a/ECaBZtVqIgd2gzyXxTPZL8uUX3bn1LfA7grhJgBvzp1jVebjaig
- l3LwXJINrURw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9801"; a="254790992"
-X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="254790992"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 18:14:08 -0800
-IronPort-SDR: cMZtNvtN+8jSY8QwAHBtnpgpwlRODUadsCEbQXv8bBbstUNfw7kQj5BQ6o+50nP4z3C7T8JufN
- XakrnU77TVtg==
-X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="541589258"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.107]) ([10.238.4.107])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 18:14:04 -0800
-Subject: Re: [PATCH v12 01/11] perf/x86: Fix variable types for LBR registers
-To:     Andi Kleen <ak@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stephane Eranian <eranian@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20200613080958.132489-1-like.xu@linux.intel.com>
- <20200613080958.132489-2-like.xu@linux.intel.com>
- <20201109063446.GM466880@tassilo.jf.intel.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <f5847034-e720-b8ce-905b-04e2cfb7661b@intel.com>
-Date:   Wed, 11 Nov 2020 10:14:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.2
+        id S1732372AbgKKCNy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 21:13:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57806 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731900AbgKKCNx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 21:13:53 -0500
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D308C0613D1;
+        Tue, 10 Nov 2020 18:13:51 -0800 (PST)
+Received: by mail-ej1-x643.google.com with SMTP id za3so619181ejb.5;
+        Tue, 10 Nov 2020 18:13:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rxYZ9ij9kz13Mmo6auDPO8kEtOhkdmx8dZzpJsXD4Jg=;
+        b=B6ZHVGSi7837kTT70rP4JTjmc3alSRGfUi7P/t7UiHuapGBrRX6tRU+m/xVRFaYVxt
+         jn5uosbAMkIy9DLCRFCsNvbeAmDlXbhC2PvUaMKHV6+Egize5H9nGHfMO+GIwn2BO51Z
+         0X4FeMB8xdpbR8B81KtspR8kyAlqHsvMQFy35pSLCBiZx4oc8GWllj36llVCwhh4iKmS
+         8noN9jNpEp5JvOITHfVm/Gwm0U9AFWK0uC5V1uiVtViU/hE0l6UH835/txFoup9z4eJl
+         s0o46cg5s334YWXedyoAzhlZ20oLBj9nd95yNmuXT86xP5oowSzF2s3/xRhYat9jbW1f
+         9eEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rxYZ9ij9kz13Mmo6auDPO8kEtOhkdmx8dZzpJsXD4Jg=;
+        b=uBV5WEmmV4peSCb3rQryeHiSzGZH/nyQVfETzTY5ZpHGqLvQKvnHOidjAdcnIY/PmZ
+         8Cni40zgPo1z/cND63jHRYU6Pj9zR/mFFv2IbkOvetiu4O3zTvWa4KK6ubfc67MJq/ml
+         VyGc8VvHlUD9fRXMBvGBN49rK2JfkoaicHQ9jXwIRyWpw6nIiJRlQSkAMSD0YejWIgTX
+         kunUEPpBWwT4txXOWRAWLwIwjz6MYH3tgVrj5wSf2QjAHnl7dsP8Fq7bAnG4zVxSAFDb
+         8EaZoluVZbHL6v4KUILDQocLv0V2wPNY1MNdhvpjzIw5NHnyBC0c3rUkbcQm7Mmln9G4
+         kEJA==
+X-Gm-Message-State: AOAM533CHhfAN17y8+hhcpdE7FwGr3zYHUWA+i52GVcMs3liYg+f/qnw
+        SA7mGSNHJfY9M2eiNb5IH/HYuv5t1XPQ6tBBA5M=
+X-Google-Smtp-Source: ABdhPJwd5sBe0bmjZnVNPsMg5EVeO1YOek595I4xP99wn5E/JmcGKgvDPBN7d90OEZDIxeAudn1ucnT7NPbKxzoUO9A=
+X-Received: by 2002:a17:906:680c:: with SMTP id k12mr24218421ejr.368.1605060830285;
+ Tue, 10 Nov 2020 18:13:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201109063446.GM466880@tassilo.jf.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <160311419702.25406.2436004222669241097.stgit@gimli.home>
+In-Reply-To: <160311419702.25406.2436004222669241097.stgit@gimli.home>
+From:   gchen chen <gchen.guomin@gmail.com>
+Date:   Wed, 11 Nov 2020 10:15:04 +0800
+Message-ID: <CAEEwsfR_4pm9mZ81rAYPZ6dY_avfW=xuBx3mOKFD5uoUTOd_uQ@mail.gmail.com>
+Subject: Re: [PATCH] vfio/pci: Clear token on bypass registration failure
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        guomin_chen@sina.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Thanks a lot.
 
-As you may know, we have got host perf support in Linus' tree
-which provides a clear path for enabling guest LBR,
-
-will we merge the remaining LBR KVM patch set?
-
----
-
-[PATCH RESEND v13 00/10] Guest Last Branch Recording Enabling
-https://lore.kernel.org/kvm/20201030035220.102403-1-like.xu@linux.intel.com/
-
-Thanks,
-Like Xu
-
-On 2020/11/9 14:34, Andi Kleen wrote:
-> Hi,
+Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2020=E5=B9=B410=E6=9C=
+=8819=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=889:30=E5=86=99=E9=81=93=
+=EF=BC=9A
 >
-> What's the status of this patchkit? It would be quite useful to me (and
-> various other people) to use LBRs in guest. I reviewed it earlier and the
-> patches all looked good to me.  But i don't see it in any -next tree.
+> The eventfd context is used as our irqbypass token, therefore if an
+> eventfd is re-used, our token is the same.  The irqbypass code will
+> return an -EBUSY in this case, but we'll still attempt to unregister
+> the producer, where if that duplicate token still exists, results in
+> removing the wrong object.  Clear the token of failed producers so
+> that they harmlessly fall out when unregistered.
 >
-> Reviewed-by: Andi Kleen<ak@linux.intel.com>
+> Fixes: 6d7425f109d2 ("vfio: Register/unregister irq_bypass_producer")
+> Reported-by: guomin chen <guomin_chen@sina.com>
+> Tested-by: guomin chen <guomin_chen@sina.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_intrs.c |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
-> Could it please be merged?
+> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pc=
+i_intrs.c
+> index 1d9fb2592945..869dce5f134d 100644
+> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> @@ -352,11 +352,13 @@ static int vfio_msi_set_vector_signal(struct vfio_p=
+ci_device *vdev,
+>         vdev->ctx[vector].producer.token =3D trigger;
+>         vdev->ctx[vector].producer.irq =3D irq;
+>         ret =3D irq_bypass_register_producer(&vdev->ctx[vector].producer)=
+;
+> -       if (unlikely(ret))
+> +       if (unlikely(ret)) {
+>                 dev_info(&pdev->dev,
+>                 "irq bypass producer (token %p) registration fails: %d\n"=
+,
+>                 vdev->ctx[vector].producer.token, ret);
 >
-> Thanks,
+> +               vdev->ctx[vector].producer.token =3D NULL;
+> +       }
+>         vdev->ctx[vector].trigger =3D trigger;
 >
-> -Andi
-
+>         return 0;
+>
