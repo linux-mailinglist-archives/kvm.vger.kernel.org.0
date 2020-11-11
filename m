@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78F782AE644
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 03:17:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AEEF2AE676
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 03:35:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731713AbgKKCR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 21:17:57 -0500
-Received: from mga11.intel.com ([192.55.52.93]:26905 "EHLO mga11.intel.com"
+        id S1726605AbgKKCfm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Nov 2020 21:35:42 -0500
+Received: from mga07.intel.com ([134.134.136.100]:30167 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726143AbgKKCR4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 21:17:56 -0500
-IronPort-SDR: gvJa1vqc+gsVH60QlIsJ3xgucy0EXELrmtV7yohZ631lehLpHwNZfuvm5L2OdqRcjxQ/dbb3Jl
- czO2lrebquuw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9801"; a="166573332"
+        id S1725898AbgKKCfm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Nov 2020 21:35:42 -0500
+IronPort-SDR: Ap8vW5Umid5jZwBF+t+Hy4hQpCtaAJKzxPb3Io656Iy3jVb444cqLE8Jj5fRvnOe7QnKsRr1ny
+ JQ6Wk/uDzoZw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9801"; a="234248852"
 X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="166573332"
+   d="scan'208";a="234248852"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 18:17:54 -0800
-IronPort-SDR: knA9b7EIO06nGNpERojkFkQmBdCZfFO8v09ss5gcb8M6+30Bs3DLzw//tILvREhjDgxSMCsyNG
- /nzWJIoOzRPA==
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 18:35:40 -0800
+IronPort-SDR: +FJvNCiHpYYVbP0yCKuJ/Wk2vKDNRI4mNCYxCWHJpvdXyEhpF51Vpq5OTIHHAemPqdKnn79Yj9
+ necyQ9gnMHlg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="356428338"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Nov 2020 18:17:53 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+   d="scan'208";a="356433438"
+Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
+  by fmsmga004.fm.intel.com with ESMTP; 10 Nov 2020 18:35:39 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 10 Nov 2020 18:17:53 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ 15.1.1713.5; Tue, 10 Nov 2020 18:35:39 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 10 Nov 2020 18:17:53 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.103)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ via Frontend Transport; Tue, 10 Nov 2020 18:35:39 -0800
+Received: from NAM02-CY1-obe.outbound.protection.outlook.com (104.47.37.53) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Tue, 10 Nov 2020 18:17:53 -0800
+ 15.1.1713.5; Tue, 10 Nov 2020 18:35:38 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=noM2Qt1sd0oQSQmMl1yZTKrGy4jJB/s1H3hqHwjey/c+a0Mg8IsHGjpy00JMJVpQAEIpnE56mn4yVFaEE946tMGlOk0HyC2adID4oBYEttfzF3ArUykXqNlWofyunfNMmNNJtHFRe8iPN5wMb9kMdroC5CtPV/2QudKwsi5t18F2/wRAgwcOYrRVg+TXS2j1wZtvjQf08IopsdNyJa1qFXRyT2tN/ry4nbR5NXos0e9OFlAlBZPAH5gX42oKsE4hIG0/TG73BTCcAnSl93sYdo3quDSVXzB/0k/6cXqWPq81gOyLMCuhtoC/rvF82oBVqDBQ6pm4dUxiATKDJuSUOA==
+ b=XBJRJGo2kcK9Jkh87hmwQiPb58DzN0nYAm8dYLZ6WAOp0Kic4cciUSdkNyOYXuYyhVnlFg6ByYV0sjueUivuwnAJUUvWzkto4xMF5uR/5VOPDcDW7JDeqFltdvk9zti9mM4/Z8t1O5FTovrVka9NrBxu0BINYDroow0V8f0tdL8kXe5WzretAExkqXXLytYkXWxSe8VFQlHutjM7JfGiw+VRHCGw/Fms7f/66YkVohAGYO8CO3W1rCg+gMcieUVg0Yv8bk5/jVrUWKlVlaC5+TOmIezC9pPZLBI3rWT3jiD2Beh9FIkVacQURknal9dvHy9wByhSnZ/qpgiK0ua0mA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=592p6QdDSo2xgCQtZT+LKKqRbmRDfn7+FD4hXWYI/Lo=;
- b=V3KMAc5r8rOmRCKzW9a41iiudStOuavYgvy50f5HbpqbSNeRVs+fTegSLv+hy5OUqeZJKLmB9ZhGsXywqylrHMd9LJ0esaIDaPZDFWww3joAocsP2l4yaEVJ3k0NQFf7zsRA5AxU/P2GXEIHv7fWDYFADf7PwDsDyeateR4jkKDuuD60mRpNgwa8K3eIviGdBrmcQfabp/buBjNfu+heZh7Quiu2tqunTzG1WCjaEnfAeOjkFo9tUTpdPY7kFrc0BiIsVwIVaeZfHerklT9ji/AqNHAbt+vRf18P7JGtQX/+09tLzDEGITnfADXzUORmfW2eNJBmDyE9HAJGw4rBHg==
+ bh=CdBoeaRmm/EmoNEsg55QgLbnXaW6ask0zBh19c0zNwA=;
+ b=Yx2sKmxfAFpZLLnuxNbCgjuG/GF0yYLizH60cWbDmWwJBhhkskuYv3NVoWaQMPe0Q+POWl0978kLnw3lQhP0SvaMVYmLXYKkiTcRajeu6sX21rLGQM8CvYIgJ3oEibin4CI0yqjC36tWB7FdiwBsUHlhreynPGgEiaoCwp/gYB+MZC/1WiziLWNfz1IjazhLvTQSVnSXAkiK8wAMD4JlNmuTvpNVecNgtCfKeBozJ4MVyP6RQL+hrM7+g0NvdKaORSBo4+GpLR6AxPAm57TkyfkkJnb8LZQqJ87oVd9B3KeUhXtzd4WZSNB6TAUDH6Umup2WLu9PtN93zhv+Hivdjg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=592p6QdDSo2xgCQtZT+LKKqRbmRDfn7+FD4hXWYI/Lo=;
- b=Oak9p5vGMOsOspkz6weMXuaIA2NOSlCWpchzetP2x1Ud8gKlCWMeqC+FRVfsOtwyPHWsXP6fiyXqM6eGGNnc4RDxrHBdM5z5W0g1CMjCjbzKuhG/Bp6eeIb9suw5db1WVK3KGm18zHr1OaCN1BKafrnTUw6JxP015c/h5kw74dM=
+ bh=CdBoeaRmm/EmoNEsg55QgLbnXaW6ask0zBh19c0zNwA=;
+ b=Zq7A/2k5p9bzBfHYB+ZqwFbA1WmyHxXvtGjLFuJjB3Hcu7uptKWvUJVJj6q9l7i/siSMeCrLi+t5rdutim37qmsV9iu1spfMxVEwMoxcyd6qY3CjRXuSIqaWTakYxJZQ1Zu8HVm0EwPWBPg8lONekMAC8iKjmyfXJBGYBr2ioMc=
 Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
- by MWHPR1101MB2094.namprd11.prod.outlook.com (2603:10b6:301:4e::10) with
+ by MWHPR11MB1247.namprd11.prod.outlook.com (2603:10b6:300:2a::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.19; Wed, 11 Nov
- 2020 02:17:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21; Wed, 11 Nov
+ 2020 02:35:25 +0000
 Received: from MWHPR11MB1645.namprd11.prod.outlook.com
  ([fe80::7ccb:c84d:5042:b50e]) by MWHPR11MB1645.namprd11.prod.outlook.com
  ([fe80::7ccb:c84d:5042:b50e%10]) with mapi id 15.20.3541.025; Wed, 11 Nov
- 2020 02:17:48 +0000
+ 2020 02:35:25 +0000
 From:   "Tian, Kevin" <kevin.tian@intel.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>,
         "Raj, Ashok" <ashok.raj@intel.com>
@@ -95,19 +95,20 @@ CC:     Thomas Gleixner <tglx@linutronix.de>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Subject: RE: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
 Thread-Topic: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-Thread-Index: AQHWru26nCdjGLbk80+ZhPfx8iZ806mwjmaAgAAYm4CAABfkAIAAARAAgAQYdwCAAOAGcIAAp6mAgAD1diCAAJvfgIAADi9AgAAGfICAArW6cIAAY8KAgAA79QCAABGDgIAAY1IAgAAHBYCAAsnwAIAAVwYAgAC+sACAAGcnAIAAVyaAgABtcgCAAFeIgIAAPx2AgAAC4ACAAMRZYA==
-Date:   Wed, 11 Nov 2020 02:17:48 +0000
-Message-ID: <MWHPR11MB16459716A1897F79E860AB4D8CE80@MWHPR11MB1645.namprd11.prod.outlook.com>
-References: <CAPcyv4iYHA1acfo=+fTk+U_TrLbSWJjA6v4oeTXgVYDTrnCoGw@mail.gmail.com>
+Thread-Index: AQHWru26nCdjGLbk80+ZhPfx8iZ806mwjmaAgAAYm4CAABfkAIAAARAAgAQYdwCAAOAGcIAAp6mAgAD1diCAAJvfgIAADi9AgAAGfICAArW6cIAAY8KAgAA79QCAABGDgIAAY1IAgAAHBYCAAsnwAIAAVwYAgAC+sACAAGcnAIAAVyaAgABtcgCAAJg3AIAAy40Q
+Date:   Wed, 11 Nov 2020 02:35:25 +0000
+Message-ID: <MWHPR11MB1645F8914071A5A98BA89F358CE80@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <20201106164850.GA85879@otc-nc-03>
+ <20201106175131.GW2620339@nvidia.com>
+ <CAPcyv4iYHA1acfo=+fTk+U_TrLbSWJjA6v4oeTXgVYDTrnCoGw@mail.gmail.com>
  <20201107001207.GA2620339@nvidia.com>
  <87pn4nk7nn.fsf@nanos.tec.linutronix.de>
  <20201108235852.GC32074@araj-mobl1.jf.intel.com>
  <874klykc7h.fsf@nanos.tec.linutronix.de>
  <20201109173034.GG2620339@nvidia.com>
  <87pn4mi23u.fsf@nanos.tec.linutronix.de> <20201110051412.GA20147@otc-nc-03>
- <875z6dik1a.fsf@nanos.tec.linutronix.de> <20201110141323.GB22336@otc-nc-03>
- <20201110142340.GP2620339@nvidia.com>
-In-Reply-To: <20201110142340.GP2620339@nvidia.com>
+ <20201110141900.GO2620339@nvidia.com>
+In-Reply-To: <20201110141900.GO2620339@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -119,74 +120,62 @@ authentication-results: nvidia.com; dkim=none (message not signed)
  header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
 x-originating-ip: [192.198.147.194]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 51fd4889-6bd7-4014-1769-08d885e7fc4c
-x-ms-traffictypediagnostic: MWHPR1101MB2094:
+x-ms-office365-filtering-correlation-id: 9d73c8ce-1e9e-4632-9657-08d885ea7200
+x-ms-traffictypediagnostic: MWHPR11MB1247:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR1101MB2094E0B33804776B3A5707F48CE80@MWHPR1101MB2094.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-microsoft-antispam-prvs: <MWHPR11MB124747FCE4F7BA9F3DDAC1C18CE80@MWHPR11MB1247.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: syV29+0M0ZgcQnm10gZ1NsXla6a98ym34SsZx8Df4Y9uoZy/kJqJRXB/16NzMzPH4LbApg1ymtLv0IDOR+J8esLimF+KMqfwxXURrHT+xDOhqrfRNQTLvbmSAlmoeo2h1vGS73QO+7laVb1xGW/xWOSU9FBTC+5eEBSvuzN2XgzMQza7y0esVIm/J2CEAjcl6UZmupdwcQR3yyH0d1hp5FIhJtxoyPhVillSdspfHVdd17WrYkGB5uTcW6hUprL1EqlwFWQPICLulidfwVlFviSQrJujaDUzMn+pbMMPGXt7riCKb+EKp4iRqWd4Namhi6LgKudY+eHCXBfnQ5U9oA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1645.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(366004)(346002)(376002)(396003)(66946007)(52536014)(66446008)(66556008)(71200400001)(76116006)(186003)(6506007)(9686003)(33656002)(55016002)(5660300002)(478600001)(86362001)(7416002)(7696005)(66476007)(316002)(110136005)(83380400001)(26005)(8936002)(2906002)(6636002)(54906003)(4326008)(64756008)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: POQu/ggoqUHLBKX2tnm6XkhK54g+s/qH2U5oAwWqCkkm7jsPoByjTAHnbqjLGmFFhp6oirRXpz5Y442cqaFpJIzaz+k00WqncjsYcTVtycyJkQxUlJBTgQpcUgsX9fb4nXCC0Dlkwo9fQgjeEN4TBE/5XhADoW/0iUo5SJ8QCmTg04y9spjHCCd7JQgE/Ei+lySvZpbuusfmrVS3MwCXX8VykiR7NyPnI7NhkjuJg+dZuXk36t8qsgvfD8cQt//vPtQQy7d4b+TUtgLBki3L2K+gBNwerylUIVOQUxJkpfN6RUnm1dJemlspNpJq5IwMuE0UoUqX4RmDr+2WqkaWBdZKtWTYoMPds1FXPMKczCr0L04g0QbXe4pnnp6BJdH/jAyWy6wrHpmkdTeONYopBjMbXxswQWrsRK3ok+tHRMixPmaF+tDxPhHXo2I0qYWf27CGFK4vwPNk49S7NWATEWw8CFwkoPX0/lBl8kAJ+nJCukdZlRP/sNvu/iI4jxr1ev3nUagXL/vsBLWIi8a/Yf2d9iSyDLcsm+lkkvVbSrhX0b6dmxhlwEYiA2EvbsXp+3oqrNRsgrXQn5uRvHLCgYp8rhC4vTlHZunnckTbnPSgGUf1bhuAXRh4cB/PCPpMsH20xpXReyuG0BqOEqMUSQ==
+x-microsoft-antispam-message-info: 5lQlXMNkUFhlwBEmMQAWJzB/8mG7uMc4jtob9QDF4by7KfH9NYygUXDNZu4jMwnwyGr1p1syngKKmSdGRhG+GD/RqfWBnoYmqmkLrDFmesRwk02NFigRkf1zdGsghyozlEey+MAeGsRWVfWYp1WVaqwl9loH4PwAJMe1dgWZoZ/ywVeieBEAiJSMgkQTffw6USm9/b8EHGteOqIxWKzHKEWd+Zk0olJCoBD6g1rJivD7w40mqgcDf18K3EU4euTA79VBppbkhOjfmI5U8q6a0ST7wEjRs4klL7whafjM76nUrx6Uloi9Qm58eW58sed9sg1E+yaqU2Zr0E63lOnEGQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1645.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(366004)(346002)(376002)(39860400002)(2906002)(66476007)(66946007)(8676002)(66446008)(33656002)(83380400001)(478600001)(52536014)(5660300002)(76116006)(7696005)(54906003)(64756008)(86362001)(110136005)(8936002)(4326008)(66556008)(71200400001)(186003)(316002)(26005)(6636002)(55016002)(7416002)(6506007)(9686003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: 9f4X22qoU1Wop6+EOuKIUGIXk6IwgqGbl0VNJ4I6N1sXc5RsWDLPkd2sx3b8HyliNDBSoLGjyeNxowFoHCjPQCv4W77T1dAozt6C/fPECoKb98Q8Or5XKJ8/53WEtgsZlALtfc35OG7ui60QiT9YdQ4Dm1fvv0yJi/qwv17vwntA2co0+3ZsESXVpBXRcRhy56e6vGzymiIK75H7cFIDvyj0bCVRnIbYz93OsimfDsdZMjDUfDcs59XLXCTohlmmbvm6yFeM2d0rrNsbmFE9Pmtl8YbvxR3KrItBr/w6XZdkMgtFaNdF/f+nDq0QD9SPKcx4uBYFhd0Ja/gyCWdq1MAWCNE3JxrMkm4o+TFcSxwuJ/WXP5dA3wPEAo75DN5Ahm4JzTQVPjEm+F6U/htWzX8UEmVKWL9ebpMOzGvxDXZPDWQ6KjurvXm3lLxd6/hLoKqdMEhO62otuqS8YdztT1O8PXBjck7vDkcXmsFG3J/ggCoR8xb8JskYU0lVHi5ruJO3PpdlZwU+i0PzqF9uVVv2Ok+P6viDU8TE8i4tv+lyqomsluxl4UNNb8MlJ0xFZjf2AqsSB7zVuEOdPRJ8gFmIDNvSlI0e6BV4AxekUPV5QVPkkHALejL8Zv+Lssl6I+ZF9wUm9yecrnJJI+Y49A==
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51fd4889-6bd7-4014-1769-08d885e7fc4c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2020 02:17:48.8750
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d73c8ce-1e9e-4632-9657-08d885ea7200
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2020 02:35:25.2848
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: k3K5WZAzwWwoPVCF5yn035BDrrwigpNSIsDP/7xQCC8dOyf1hkgTlT/O5t3ZzEbdAQQUyYBcnw7Nvyiijzh50g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2094
+X-MS-Exchange-CrossTenant-userprincipalname: jCKT3OZv4n5jA6bc+feHyuGMVmTC+jD6eQ3azJB4u7bIftHSk6//i6z1gmggQL1cBcxrIYJ4ZUPO8l6GJzstLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1247
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 > From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Tuesday, November 10, 2020 10:24 PM
+> Sent: Tuesday, November 10, 2020 10:19 PM
+> On Mon, Nov 09, 2020 at 09:14:12PM -0800, Raj, Ashok wrote:
 >=20
-> On Tue, Nov 10, 2020 at 06:13:23AM -0800, Raj, Ashok wrote:
+> > was used for interrupt message storage (on the wire they follow the
+> > same format), and also to ensure interoperability of devices
+> > supporting IMS across CPU vendors (who may not support PASID TLP
+> > prefix).  This is one reason that led to interrupts from IMS to not
+> > use PASID (and match the wire format of MSI/MSI-X generated
+> > interrupts).  The other problem was disambiguation between DMA to
+> > SVM v/s interrupts.
 >=20
-> > This isn't just for idxd, as I mentioned earlier, there are vendors oth=
-er
-> > than Intel already working on this. In all cases the need for guest dir=
-ect
-> > manipulation of interrupt store hasn't come up. From the discussion, it
-> > seems like there are devices today or in future that will require direc=
-t
-> > manipulation of interrupt store in the guest. This needs additional wor=
-k
-> > in both the device hardware providing the right plumbing and OS work to
-> > comprehend those.
+> This is a defect in the IOMMU, not something fundamental.
 >=20
-> We'd want to see SRIOV's assigned to guests to be able to use
-> IMS. This allows a SRIOV instance in a guest to spawn SIOV's which is
-> useful.
-
-Does your VF support both MSI/IMS or IMS only? If it is the former can't
-we adopt a phased approach or parallel effort between forcing guest
-to use MSI and adding hypercall to enable IMS on VF? Finding a way
-to disable IMS is anyway required per earlier discussion when hypercall
-is not available, and it could still provide a functional though suboptimal
-model for such VFs.
-
->=20
-> SIOV's assigned to guests could use IMS, but the use cases we see in
-> the short term can be handled by using SRIOV instead.
->=20
-> I would expect in general for SIOV to use MSI-X emulation to expose
-> interrupts - it would be really weird for a SIOV emulator to do
-> something else and we should probably discourage that.
+> The IOMMU needs to know if the interrupt range is active or not for
+> each PASID. Process based SVA will, of course, not enable interrupts
+> on the PASID, VM Guest based PASID will.
 >=20
 
-I agree with this point. This leaves hardware gaps in IOMMU and root
-complex less an immediate blocker and to be addressed in the long term.
+Unfortunately it's more than that. The interrupt message is firstly recogni=
+zed
+at root complex today and then routed to the IOMMU, unlike other DMA
+requests. I'm not saying it's an unsolvable limitation, but just wants to p=
+oint
+out that to achieve such goal there are more things to be considered beyond=
+=20
+the IOMMU.
 
 Thanks
 Kevin
