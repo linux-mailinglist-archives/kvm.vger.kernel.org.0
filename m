@@ -2,152 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 02A722AE680
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 03:43:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23BA32AE8C1
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 07:22:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726605AbgKKCmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Nov 2020 21:42:53 -0500
-Received: from mga04.intel.com ([192.55.52.120]:21465 "EHLO mga04.intel.com"
+        id S1725975AbgKKGWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Nov 2020 01:22:38 -0500
+Received: from foss.arm.com ([217.140.110.172]:41674 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725867AbgKKCmx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Nov 2020 21:42:53 -0500
-IronPort-SDR: Y8U+Arf3LcVopHzLHPawZh2c5lTtB3RPS+xzw4xf6h9I2SmwyzyLnH/UnqVFsNcoBeMqSddyR1
- BhWnlMj4ZQWQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9801"; a="167500828"
-X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="167500828"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 18:42:52 -0800
-IronPort-SDR: jqmCJWUE7ySg9gl14UBrhIBZymWPQqwMQnLWztYZeD2pTKfwUhT5cRKTLcKMahURDd/I8rkEjI
- 3s1W4aNJsG0w==
-X-IronPort-AV: E=Sophos;i="5.77,468,1596524400"; 
-   d="scan'208";a="541595472"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.107]) ([10.238.4.107])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2020 18:42:48 -0800
-Subject: Re: [PATCH] perf/intel: Remove Perfmon-v4 counter_freezing support
-To:     Stephane Eranian <eranian@google.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20201109021254.79755-1-like.xu@linux.intel.com>
- <20201110151257.GP2611@hirez.programming.kicks-ass.net>
- <20201110153721.GQ2651@hirez.programming.kicks-ass.net>
- <CABPqkBS+-g0qbsruAMfOJf-Zfac8nz9v2LCWfrrvVd+ptoLxZg@mail.gmail.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <2ce24056-0711-26b3-a62c-3bedc88d7aa7@intel.com>
-Date:   Wed, 11 Nov 2020 10:42:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.2
-MIME-Version: 1.0
-In-Reply-To: <CABPqkBS+-g0qbsruAMfOJf-Zfac8nz9v2LCWfrrvVd+ptoLxZg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S1725867AbgKKGWh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Nov 2020 01:22:37 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C44BB31B;
+        Tue, 10 Nov 2020 22:22:35 -0800 (PST)
+Received: from localhost.localdomain (entos-thunderx2-desktop.shanghai.arm.com [10.169.212.215])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 703063F6CF;
+        Tue, 10 Nov 2020 22:22:29 -0800 (PST)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+        steven.price@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
+        nd@arm.com
+Subject: [PATCH v15 0/9] Enable ptp_kvm for arm/arm64
+Date:   Wed, 11 Nov 2020 14:22:02 +0800
+Message-Id: <20201111062211.33144-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+Currently, we offen use ntp (sync time with remote network clock)
+to sync time in VM. But the precision of ntp is subject to network delay
+so it's difficult to sync time in a high precision.
 
-On 2020/11/11 4:52, Stephane Eranian wrote:
-> On Tue, Nov 10, 2020 at 7:37 AM Peter Zijlstra<peterz@infradead.org>  wrote:
->> On Tue, Nov 10, 2020 at 04:12:57PM +0100, Peter Zijlstra wrote:
->>> On Mon, Nov 09, 2020 at 10:12:37AM +0800, Like Xu wrote:
->>>> The Precise Event Based Sampling(PEBS) supported on Intel Ice Lake server
->>>> platforms can provide an architectural state of the instruction executed
->>>> after the instruction that caused the event. This patch set enables the
->>>> the PEBS via DS feature for KVM (also non) Linux guest on the Ice Lake.
->>>> The Linux guest can use PEBS feature like native:
->>>>
->>>>    # perf record -e instructions:ppp ./br_instr a
->>>>    # perf record -c 100000 -e instructions:pp ./br_instr a
->>>>
->>>> If the counter_freezing is not enabled on the host, the guest PEBS will
->>>> be disabled on purpose when host is using PEBS facility. By default,
->>>> KVM disables the co-existence of guest PEBS and host PEBS.
-Thanks Stephane for clarifying the use cases for Freeze-on-[PMI|Overflow].
+kvm virtual ptp clock (ptp_kvm) offers another way to sync time in VM,
+as the remote clock locates in the host instead of remote network clock.
+It targets to sync time between guest and host in virtualization
+environment and in this way, we can keep the time of all the VMs running
+in the same host in sync. In general, the delay of communication between
+host and guest is quiet small, so ptp_kvm can offer time sync precision
+up to in order of nanosecond. Please keep in mind that ptp_kvm just
+limits itself to be a channel which transmit the remote clock from
+host to guest and leaves the time sync jobs to an application, eg. chrony,
+in usersapce in VM.
 
-Please let me express it more clearly.
+How ptp_kvm works:
+After ptp_kvm initialized, there will be a new device node under
+/dev called ptp%d. A guest userspace service, like chrony, can use this
+device to get host walltime, sometimes also counter cycle, which depends
+on the service it calls. Then this guest userspace service can use those
+data to do the time sync for guest.
+here is a rough sketch to show how kvm ptp clock works.
 
-The goal of the whole patch set is to enable guest PEBS, regardless of
-whether the counter_freezing is frozen or not. By default, it will not
-support both the guest and the host to use PEBS at the same time.
+|----------------------------|              |--------------------------|
+|       guest userspace      |              |          host            |
+|ioctl -> /dev/ptp%d         |              |                          |
+|       ^   |                |              |                          |
+|----------------------------|              |                          |
+|       |   | guest kernel   |              |                          |
+|       |   V      (get host walltime/counter cycle)                   |
+|      ptp_kvm -> hypercall - - - - - - - - - - ->hypercall service    |
+|                         <- - - - - - - - - - - -                     |
+|----------------------------|              |--------------------------|
 
-Please continue reviewing the patch set, especially for the slow path
-we proposed this time and related host perf changes:
+1. time sync service in guest userspace call ptp device through /dev/ptp%d.
+2. ptp_kvm module in guest recive this request then invoke hypercall to route
+into host kernel to request host walltime/counter cycle.
+3. ptp_kvm hypercall service in host response to the request and send data back.
+4. ptp (not ptp_kvm) in guest copy the data to userspace.
 
-- add intel_pmu_handle_guest_pebs() to __intel_pmu_pebs_event();
-- add switch MSRs (PEBS_ENABLE, DS_AREA, DATA_CFG) to intel_guest_get_msrs();
-- the construction of incoming parameters for 
-perf_event_create_kernel_counter();
+This ptp_kvm implementation focuses itself to step 2 and 3 and step 2 works
+in guest comparing step 3 works in host kernel.
 
-I believe if you understand the general idea, the comments will be very 
-valuable.
+change log:
 
-Thanks,
-Like Xu
+from v14 to v15
+        (1) enable ptp_kvm on arm32 guest, also ptp_kvm has been tested
+on both arm64 and arm32 guest running on arm64 kvm host.
+        (2) move arch-agnostic part of ptp_kvm.rst into timekeeping.rst.
+        (3) rename KVM_CAP_ARM_PTP_KVM to KVM_CAP_PTP_KVM as it should be
+arch agnostic.
+        (4) add description for KVM_CAP_PTP_KVM in Documentation/virt/kvm/api.rst.
+        (5) adjust dependency in Kconfig for ptp_kvm.
+        (6) refine multi-arch process in driver/ptp/Makefile.
+        (7) fix make pdfdocs htmldocs issue for ptp_kvm doc.
+        (8) address other issues from comments in v14.
+        (9) fold hypercall service of ptp_kvm as a function.
+        (10) rebase to 5.10-rc3.
 
->>> Uuhh, what?!? counter_freezing should never be enabled, its broken. Let
->>> me go delete all that code.
->> ---
->> Subject: perf/intel: Remove Perfmon-v4 counter_freezing support
->>
->> Perfmon-v4 counter freezing is fundamentally broken; remove this default
->> disabled code to make sure nobody uses it.
->>
->> The feature is called Freeze-on-PMI in the SDM, and if it would do that,
->> there wouldn't actually be a problem,*however*  it does something subtly
->> different. It globally disables the whole PMU when it raises the PMI,
->> not when the PMI hits.
->>
->> This means there's a window between the PMI getting raised and the PMI
->> actually getting served where we loose events and this violates the
->> perf counter independence. That is, a counting event should not result
->> in a different event count when there is a sampling event co-scheduled.
->>
-> What is implemented is Freeze-on-Overflow, yet it is described as Freeze-on-PMI.
-> That, in itself, is a problem. I agree with you on that point.
->
-> However, there are use cases for both modes.
->
-> I can sample on event A and count on B, C and when A overflows, I want
-> to snapshot B, C.
-> For that I want B, C at the moment of the overflow, not at the moment
-> the PMI is delivered. Thus, youd
-> would want the Freeze-on-overflow behavior. You can collect in this
-> mode with the perf tool,
-> IIRC: perf record -e '{cycles,instructions,branches:S}' ....
->
-> The other usage model is that of the replay-debugger (rr) which you are alluding
-> to, which needs precise count of an event including during the skid
-> window. For that, you need
-> Freeze-on-PMI (delivered). Note that this tool likely only cares about
-> user level occurrences of events.
->
-> As for counter independence, I am not sure it holds in all cases. If
-> the events are setup for user+kernel
-> then, as soon as you co-schedule a sampling event, you will likely get
-> more counts on the counting
-> event due to the additional kernel entries/exits caused by
-> interrupt-based profiling. Even if you were to
-> restrict to user level only, I would expect to see a few more counts.
->
->
->> This is known to break existing software.
->>
->> Signed-off-by: Peter Zijlstra (Intel)<peterz@infradead.org>
+from v13 to v14
+        (1) rebase code on 5.9-rc3.
+        (2) add a document to introduce implementation of PTP_KVM on
+arm64.
+        (3) fix comments issue in hypercall.c.
+        (4) export arm_smccc_1_1_get_conduit using EXPORT_SYMBOL_GPL.
+        (5) fix make issue on x86 reported by kernel test robot.
+
+from v12 to v13:
+        (1) rebase code on 5.8-rc1.
+        (2) this patch set base on 2 patches of 1/8 and 2/8 from Will Decon.
+        (3) remove the change to ptp device code of extend getcrosststamp.
+        (4) remove the mechanism of letting user choose the counter type in
+ptp_kvm for arm64.
+        (5) add virtual counter option in ptp_kvm service to let user choose
+the specific counter explicitly.
+
+from v11 to v12:
+        (1) rebase code on 5.7-rc6 and rebase 2 patches from Will Decon
+including 1/11 and 2/11. as these patches introduce discover mechanism of
+vendor smccc service.
+        (2) rebase ptp_kvm hypercall service from standard smccc to vendor
+smccc and add ptp_kvm to vendor smccc service discover mechanism.
+        (3) add detail of why we need ptp_kvm and how ptp_kvm works in cover
+letter.
+
+from v10 to v11:
+        (1) rebase code on 5.7-rc2.
+        (2) remove support for arm32, as kvm support for arm32 will be
+removed [1]
+        (3) add error report in ptp_kvm initialization.
+
+from v9 to v10:
+        (1) change code base to v5.5.
+        (2) enable ptp_kvm both for arm32 and arm64.
+        (3) let user choose which of virtual counter or physical counter
+should return when using crosstimestamp mode of ptp_kvm for arm/arm64.
+        (4) extend input argument for getcrosstimestamp API.
+
+from v8 to v9:
+        (1) move ptp_kvm.h to driver/ptp/
+        (2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
+
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
+
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
+
+from v4 to v5:
+        (1) remove hvc delay compensasion as it should leave to userspace.
+        (2) check current clocksource in hvc call service.
+        (3) expose current clocksource by adding it to
+system_time_snapshot.
+        (4) add helper to check if clocksource is arm_arch_counter.
+        (5) rename kvm_ptp.c to ptp_kvm_common.c
+
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1] https://patchwork.kernel.org/cover/11373351/
+
+
+Jianyong Wu (6):
+  ptp: Reorganize ptp_kvm module to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  arm64/kvm: Add hypercall service for kvm ptp.
+  ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+  doc: add ptp_kvm introduction for arm64 support
+  arm64: Add kvm capability check extension for ptp_kvm
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Will Deacon (2):
+  arm64: Probe for the presence of KVM hypervisor
+  arm/arm64: KVM: Advertise KVM UID to guests via SMCCC
+
+ Documentation/virt/kvm/api.rst              |  9 ++
+ Documentation/virt/kvm/arm/index.rst        |  1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst      | 29 +++++++
+ Documentation/virt/kvm/timekeeping.rst      | 35 ++++++++
+ arch/arm/kernel/setup.c                     |  1 +
+ arch/arm64/kernel/setup.c                   |  1 +
+ arch/arm64/kvm/arm.c                        |  1 +
+ arch/arm64/kvm/hypercalls.c                 | 88 +++++++++++++++++--
+ drivers/clocksource/arm_arch_timer.c        | 30 +++++++
+ drivers/firmware/smccc/smccc.c              | 37 ++++++++
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  2 +
+ drivers/ptp/ptp_kvm.h                       | 11 +++
+ drivers/ptp/ptp_kvm_arm.c                   | 44 ++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 85 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 95 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 60 +++++++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  2 +
+ kernel/time/timekeeping.c                   |  1 +
+ 23 files changed, 488 insertions(+), 77 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+ create mode 100644 drivers/ptp/ptp_kvm.h
+ create mode 100644 drivers/ptp/ptp_kvm_arm.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+
+-- 
+2.17.1
 
