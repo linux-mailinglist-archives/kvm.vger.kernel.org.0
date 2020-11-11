@@ -2,148 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B21B32AF849
-	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 19:38:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5FC52AF898
+	for <lists+kvm@lfdr.de>; Wed, 11 Nov 2020 19:53:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726570AbgKKSiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Nov 2020 13:38:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44892 "EHLO
+        id S1727635AbgKKSxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Nov 2020 13:53:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726460AbgKKSiB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Nov 2020 13:38:01 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE654C0613D1
-        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 10:38:01 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id t13so2897387ilp.2
-        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 10:38:01 -0800 (PST)
+        with ESMTP id S1725949AbgKKSxm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Nov 2020 13:53:42 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A6FC0613D1
+        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 10:53:42 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id t15so1260096pja.7
+        for <kvm@vger.kernel.org>; Wed, 11 Nov 2020 10:53:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=itPRVLen1rowP5zk81nvH9kq7jIr58useVqCdLSQLXk=;
-        b=KgjBqqhPJeuufYEs1HO3OuJg47rvVReykHPTC8gAaSYEKGbN/TiiSi1r4YBVDq2GAD
-         +tmsXbpRKvpSNp2Iyxp824P7lagWUcVHVhMpHri3JQN1FZSLDBWgxJMTuDLl8GNtXjJb
-         aoL6SqwFcFkaQopoUQzcTsJPWXfNwSA+/UfB1Qw2sBjLo/hoAmt0zhaHNMAWTVZ+oDSn
-         ZeIknAjYcb0Kvqb2t7oxwbTrhBAacHU5cCoI4oHALq0TQnFpNZBBl3nTsLM/Rso+wyVQ
-         R1/dZ751N7cLC9G02GlMWmbe40ZJUZ1kriou1dr6pPHXyPpJEMGtGFO9cXTibAxKR7nD
-         jTyw==
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=93R4ztQrLrDF9Ja7P3toIKUvpq9Mkw15Zf+bh5c6Tqo=;
+        b=kK51WkYoFHiSWND2/+N+C4Ova1zafjAVM+MPR0hpWwVY8W6VovOfLNmIiMynognenH
+         lbj/HnGi8LUypoLkUvvq6ifdmaKSM7Qs5KY8OLvuNSHqi93xn9P6OKqDth56mfLf7TmS
+         eTy6XVOeyZYgAtmx4jHnLmdF44tZnyR7Y37vDyXD8JbUe+YWpWxdIFOY2Nm8WnVKjlrZ
+         mxOlGUs7o2Q964Dlth1cEweUi0t1TPbzd6pUE+KsV14NikSdbNfPu+/9c1+67WbwQh0t
+         up5tbY5R9KY1/3ZqfWU+oDjfpEZZf3nt8OrukS3kW8t8SAHkHMKBe8JkEeeJE8heHb7y
+         6zVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=itPRVLen1rowP5zk81nvH9kq7jIr58useVqCdLSQLXk=;
-        b=XfK4DW4zWjGLyzRj+I4LjHGuqb1OO1dDbHipd221Dmxmyzw0d3DoKqA0YkaxIR6cAp
-         KYhFSPBSVnnjm/SkHXUMzjGzmkD6GZns0o5O1Btiw3Ob+UbQt3bJr6nzQ9IX2N+KWose
-         w1NmThH3YKO1GFyNURe/x/rRYdi51Nfn8Ffa2yNdU8vAFwyjEwe2zwJ87/WiwD6AXpyS
-         XSrumYg1oxvq+IpLMHx82xlUNWI8TmQaQ2v77EK3WAwTJgK5z6aCP57jLuVjEB9f6wH8
-         /asVzMRobrRJtUylQ7NwVCwt/VjTM904UhvOFY0aQUiJ0ltWcKTWiitrMmI2SHT4j/DY
-         FDKg==
-X-Gm-Message-State: AOAM532AQyM7xFdE2RGkzbKnNU3JvMd6GtTEoLSpEjUitEuDdD+ZVvum
-        NLgzwOCzA9vVxFXadVmsFSFSR/GpZ2o53wATxZkeH0hvR0nTUg==
-X-Google-Smtp-Source: ABdhPJzn6MDHCz3X7qJ+dfFh27Cb89Vr1zhjylWI01o6pZa7vKKlyra6WnfIJAP3a6uLqvWFPvr5igpZEbHz1bZWMpk=
-X-Received: by 2002:a05:6e02:bcb:: with SMTP id c11mr18956284ilu.285.1605119880758;
- Wed, 11 Nov 2020 10:38:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20201110162344.152663d5.zkaspar82@gmail.com> <CANgfPd-gaDhmwPm5CC=cAFn8mBczbUjs7u3KucAGdKmU81Vbeg@mail.gmail.com>
- <20201111120939.54929a50.zkaspar82@gmail.com>
-In-Reply-To: <20201111120939.54929a50.zkaspar82@gmail.com>
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=93R4ztQrLrDF9Ja7P3toIKUvpq9Mkw15Zf+bh5c6Tqo=;
+        b=eFh7sMLcpSfXgMWWZ+nxA2n85HEoh2RYfmx/19TENlVneVZ404eC0QMqp6ZkrU/I5C
+         HVTeQCUQ0M+hQ8/of+IX2GcpPLNC3AZGVKu3LyJg/y04WQSkq3akz8dUXomRfaQSQhyN
+         stQ57MhpiJbijYyPnB8yUNv/tUamw+sFqr7t70IZsSdb5GnpiBdfMMb3vifhwAf5nKKa
+         TtjLhQKz+adt5rGMPaNpVgi376qZaoCLr3IG+AmQn/kowIU61dTB4HcSiBfI5sjntwJn
+         z5EoU2FPp7AS7Dl0GE1vrKCOOGWzJpLFmkNkG/0qn1FHg2KLSaW4oLCXolEbb8VXQvrv
+         vOmg==
+X-Gm-Message-State: AOAM532tyXEJs0sIuKlEcjxpKFPTARk2fqWGqV76q9x/4a1KtCx1oh6T
+        nOMOaf53wDzKskvTbLHWkTqW9ePc5v9t
+X-Google-Smtp-Source: ABdhPJyl7J/4ZMYI6a1D98WFOkbXOBJ8G/8pul2PYv3oklRs7dNvgDUFi0coDy0Z5skyieCqVo68nE6HtM2h
+Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
+ (user=bgardon job=sendgmr) by 2002:a17:902:bc46:b029:d6:d98a:1a68 with SMTP
+ id t6-20020a170902bc46b02900d6d98a1a68mr10718919plz.63.1605120821929; Wed, 11
+ Nov 2020 10:53:41 -0800 (PST)
+Date:   Wed, 11 Nov 2020 10:53:37 -0800
+Message-Id: <20201111185337.1237383-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.2.222.g5d2a92d10f8-goog
+Subject: [PATCH] kvm: x86/mmu: Fix is_tdp_mmu_check when using PAE
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 11 Nov 2020 10:37:49 -0800
-Message-ID: <CANgfPd_qouM3h-3i=kqZvmpz53_qcj5G8eUbn0L75ZKmtZVtvQ@mail.gmail.com>
-Subject: Re: Unable to start VM with 5.10-rc3
-To:     Zdenek Kaspar <zkaspar82@gmail.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Zdenek Kaspar <zkaspar82@gmail.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zdenek,
+When PAE is in use, the root_hpa will not have a shadow page assoicated
+with it. In this case the kernel will crash with a NULL pointer
+dereference. Add checks to ensure is_tdp_mmu_root works as intended even
+when using PAE.
 
-I'm working on reproducing the issue. I don't have access to a CPU
-without EPT, but I tried turning off EPT on a Skylake and I think I
-reproduced the issue, but wasn't able to confirm in the logs.
+Tested: compiles
 
-If you were operating without EPT I assume the guest was in non-paging
-mode to get into direct_page_fault in the first place. I would still
-have expected the root HPA to be valid unless...
+Fixes: 02c00b3a2f7e ("kvm: x86/mmu: Allocate and free TDP MMU roots")
+Reported-by: Zdenek Kaspar <zkaspar82@gmail.com>
+Signed-off-by: Ben Gardon <bgardon@google.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Ah, if you're operating with PAE, then the root hpa will be valid but
-not have a shadow page associated with it, as it is set to
-__pa(vcpu->arch.mmu->pae_root) in mmu_alloc_direct_roots.
-In that case, I can see why we get a NULL pointer dereference in
-is_tdp_mmu_root.
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 27e381c9da6c..13013f4d98ad 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -49,8 +49,18 @@ bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
+ {
+ 	struct kvm_mmu_page *sp;
+ 
++	if (WARN_ON(!VALID_PAGE(hpa)))
++		return false;
++
+ 	sp = to_shadow_page(hpa);
+ 
++	/*
++	 * If this VM is being run with PAE, the TDP MMU will not be enabled
++	 * and the root HPA will not have a shadow page associated with it.
++	 */
++	if (!sp)
++		return false;
++
+ 	return sp->tdp_mmu_page && sp->root_count;
+ }
+ 
+-- 
+2.29.2.222.g5d2a92d10f8-goog
 
-I will send out a patch that should fix this if the issue is as
-described above. I don't have hardware to test this on, but if you
-don't mind applying the patch and checking it, that would be awesome.
-
-Ben
-
-On Wed, Nov 11, 2020 at 3:09 AM Zdenek Kaspar <zkaspar82@gmail.com> wrote:
->
-> Hi, I'm sure my bisect has nothing to do with KVM,
-> because it was quick shot between -rc1 and previous release.
->
-> This old CPU doesn't have EPT (see attached file)
->
-> ./run_tests.sh
-> FAIL apic-split (timeout; duration=90s)
-> FAIL ioapic-split (timeout; duration=90s)
-> FAIL apic (timeout; duration=30)
-> ... ^C
-> few RIP is_tdp_mmu_root observed in dmesg
->
-> Z.
->
-> On Tue, 10 Nov 2020 17:13:21 -0800
-> Ben Gardon <bgardon@google.com> wrote:
->
-> > Hi Zdenek,
-> >
-> > That crash is most likely the result of a missing check for an invalid
-> > root HPA or NULL shadow page in is_tdp_mmu_root, which could have
-> > prevented the NULL pointer dereference.
-> > However, I'm not sure how a vCPU got to that point in the page fault
-> > handler with a bad EPT root page.
-> >
-> > I see VMX in your list of flags, is your machine 64 bit with EPT or
-> > some other configuration?
-> >
-> > I'm surprised you are finding your machine unable to boot for
-> > bisecting. Do you know if it's crashing in the same spot or somewhere
-> > else? I wouldn't expect the KVM page fault handler to run as part of
-> > boot.
-> >
-> > I will send out a patch first thing tomorrow morning (PST) to WARN
-> > instead of crashing with a NULL pointer dereference. Are you able to
-> > reproduce the issue with any KVM selftest?
-> >
-> > Ben
-> >
-> >
-> > On Tue, Nov 10, 2020 at 7:24 AM Zdenek Kaspar <zkaspar82@gmail.com>
-> > wrote:
-> > >
-> > > Hi,
-> > >
-> > > attached file is result from today's linux-master (with fixes
-> > > for 5.10-rc4) when I try to start VM on older machine:
-> > >
-> > > model name      : Intel(R) Core(TM)2 CPU          6600  @ 2.40GHz
-> > > flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
-> > > pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ht tm pbe
-> > > syscall nx lm constant_tsc arch_perfmon pebs bts rep_good nopl
-> > > cpuid aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16
-> > > xtpr pdcm lahf_lm pti tpr_shadow dtherm vmx flags       :
-> > > tsc_offset vtpr
-> > >
-> > > I did quick check with 5.9 (distro kernel) and it works,
-> > > but VM performance seems extremely impacted. 5.8 works fine.
-> > >
-> > > Back to 5.10 issue: it's problematic since 5.10-rc1 and I have no
-> > > luck with bisecting (machine doesn't boot).
-> > >
-> > > TIA, Z.
->
