@@ -2,79 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A0612AFC06
-	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 02:31:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 876732AFD49
+	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 02:54:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727888AbgKLBbr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Nov 2020 20:31:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58316 "EHLO
+        id S1727945AbgKLBbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Nov 2020 20:31:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727813AbgKKXJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Nov 2020 18:09:28 -0500
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1A7C0613D4;
-        Wed, 11 Nov 2020 15:09:28 -0800 (PST)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kczEi-003t2b-3Z; Wed, 11 Nov 2020 23:09:08 +0000
-Date:   Wed, 11 Nov 2020 23:09:08 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     yulei zhang <yulei.kernel@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        with ESMTP id S1727973AbgKKXqL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Nov 2020 18:46:11 -0500
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295BDC0613D1;
+        Wed, 11 Nov 2020 15:46:11 -0800 (PST)
+Received: by mail-ej1-x643.google.com with SMTP id oq3so5119036ejb.7;
+        Wed, 11 Nov 2020 15:46:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=3KAP3Nl0z4nLvFD3AoJReAEabMF3qVl2uypc3vIJttw=;
+        b=c4NkUVrsn9E3aTeaXZbM0J7Mk69TCF+R/fSMurkCEc3X2Y9z1hbYlWFv0odwy3JX0R
+         2MnXZdFkx1H2KlCQOnkWa6hzaXPJYIvjpNTTI9PHYQFI5qnEnSzWJbS3kvRpsv6p5erf
+         fLbSvCYNVKZbAHkL0PGT4eFy/7l78YRJkErbAld1aDkfadxk//54ZW/AP1IOjllgeudR
+         SkcYijNE+5V+RMh+Q/zrl+DyCN3SJlTpmbFoSKcE//PYeMnDt9zMFC8R3ous+KoUU2vW
+         nb+R6f3jmJXtpfDEqQVunhEuXpdn9j9nTE4VB9XicXxA9f4qxZWQSQFxsQkSE6FfxHy4
+         +zFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3KAP3Nl0z4nLvFD3AoJReAEabMF3qVl2uypc3vIJttw=;
+        b=KC6XOi3mC0V6o3T3eh7MPqs7C4BgJuVHsKRC3ggkzV/uuo+IvTIdjaoGn/FAoTQMT1
+         lhU9K2ksN0XUCRsmyMQ9fZ00C278Cvdm0PWenPEosCn8Ofw2Y5y2MwMDHJWco8XdAfCl
+         SUH307dzYLn1tbnTFoalP01KGr56BcTe6CQbmyhVWUgAuZNAIMWCOZ1ba3uwXBBV19Jx
+         hH9VCrZVTeZGMcsGx1BmIAR7C4E5agw+eKcFai5Bh+CYumDie1bKZBeWwkDnpUZ6vWPk
+         wf7jo5YPwq0QXV5o5zhO9rW+Fpczyun2xNWR8VKiqqwoJUs00xakHa1opZGvxCz/6FRp
+         VZeA==
+X-Gm-Message-State: AOAM531UriWndvFk7mHoxsb4vgY+Tqg2/bySHubHkGsBTre3SpSYO5A9
+        sInzx7+V7HcNCfMfVTEH5Hw=
+X-Google-Smtp-Source: ABdhPJzfPG9wCJ4mv/E9+Pl7jafxDs6JwoDjkGTK9sYmwz0pPmrG8j9qirZt9TCI9v90zbv5bO5xLg==
+X-Received: by 2002:a17:906:519e:: with SMTP id y30mr26828559ejk.186.1605138369835;
+        Wed, 11 Nov 2020 15:46:09 -0800 (PST)
+Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
+        by smtp.gmail.com with ESMTPSA id a1sm1557208edk.52.2020.11.11.15.46.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2020 15:46:09 -0800 (PST)
+Date:   Thu, 12 Nov 2020 00:46:06 +0100
+From:   Zdenek Kaspar <zkaspar82@gmail.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Haiwei Li <lihaiwei.kernel@gmail.com>,
-        Yulei Zhang <yuleixzhang@tencent.com>,
-        Xiao Guangrong <gloryxiao@tencent.com>
-Subject: Re: [PATCH 01/35] fs: introduce dmemfs module
-Message-ID: <20201111230908.GC3576660@ZenIV.linux.org.uk>
-References: <cover.1602093760.git.yuleixzhang@tencent.com>
- <aa553faf9e97ee9306ecd5a67d3324a34f9ed4be.1602093760.git.yuleixzhang@tencent.com>
- <20201110200411.GU3576660@ZenIV.linux.org.uk>
- <CACZOiM1L2W+neaF-rd=k9cJTnQfNBLx2k9GLZydYuQiJqr=iXg@mail.gmail.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] kvm: x86/mmu: Fix is_tdp_mmu_check when using PAE
+Message-ID: <20201112004606.48c339a6.zkaspar82@gmail.com>
+In-Reply-To: <20201111185337.1237383-1-bgardon@google.com>
+References: <20201111185337.1237383-1-bgardon@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACZOiM1L2W+neaF-rd=k9cJTnQfNBLx2k9GLZydYuQiJqr=iXg@mail.gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 11, 2020 at 04:53:00PM +0800, yulei zhang wrote:
+On Wed, 11 Nov 2020 10:53:37 -0800
+Ben Gardon <bgardon@google.com> wrote:
 
-> > ... same here, seeing that you only call that thing from the next two functions
-> > and you do *not* provide ->mknod() as a method (unsurprisingly - what would
-> > device nodes do there?)
-> >
+> When PAE is in use, the root_hpa will not have a shadow page
+> assoicated with it. In this case the kernel will crash with a NULL
+> pointer dereference. Add checks to ensure is_tdp_mmu_root works as
+> intended even when using PAE.
 > 
-> Thanks for pointing this out. we may need support the mknod method, otherwise
-> the dev is redundant  and need to be removed.
+> Tested: compiles
+> 
+> Fixes: 02c00b3a2f7e ("kvm: x86/mmu: Allocate and free TDP MMU roots")
+> Reported-by: Zdenek Kaspar <zkaspar82@gmail.com>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 27e381c9da6c..13013f4d98ad 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -49,8 +49,18 @@ bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
+>  {
+>  	struct kvm_mmu_page *sp;
+>  
+> +	if (WARN_ON(!VALID_PAGE(hpa)))
+> +		return false;
+> +
+>  	sp = to_shadow_page(hpa);
+>  
+> +	/*
+> +	 * If this VM is being run with PAE, the TDP MMU will not be
+> enabled
+> +	 * and the root HPA will not have a shadow page associated
+> with it.
+> +	 */
+> +	if (!sp)
+> +		return false;
+> +
+>  	return sp->tdp_mmu_page && sp->root_count;
+>  }
+>  
 
-I'd suggest turning that into (static) __create_file(....) with
+Fixes is_tdp_mmu_root NULL pointer dereference
+Tested on: Intel(R) Core(TM)2 CPU 6600 @ 2.40GHz
 
-static int dmemfs_create(struct inode *dir, struct dentry *dentry,
-			 umode_t mode, bool excl)
-{
-	return __create_file(dir, dentry, mode | S_IFREG);
-}
-
-static int dmemfs_mkdir(struct inode *dir, struct dentry *dentry,
-			 umode_t mode)
-{
-	return __create_file(dir, dentry, mode | S_IFDIR);
-}
-
-(i.e. even inc_nlink() of parent folded into that).
-
-[snip]
-
-> Yes, we seperate the full implementation for dmemfs_file_mmap into
-> patch 05/35, it
-> will assign the interfaces to handle the page fault.
-
-It would be less confusing to move the introduction of ->mmap() to that patch,
-then.
+Tested-by: Zdenek Kaspar <zkaspar82@gmail.com>
