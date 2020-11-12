@@ -2,154 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 660CA2B013D
-	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 09:32:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CDB42B019F
+	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 10:07:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726101AbgKLIcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Nov 2020 03:32:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26043 "EHLO
+        id S1727892AbgKLJHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Nov 2020 04:07:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50406 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725898AbgKLIcq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Nov 2020 03:32:46 -0500
+        by vger.kernel.org with ESMTP id S1727863AbgKLJHN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Nov 2020 04:07:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605169964;
+        s=mimecast20190719; t=1605172029;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=up1lOrEugzLW07KRiPo8mFDChEY+WGuuuWj0cewxi6M=;
-        b=UJDrZoFbghO30s+CY+uo94YXGA0cR2k4zP0/tzbBpsxv833whvfY4XRIbuPzka9Ywlrros
-        cJmGnAC5ecf7bHqeGUjGubhO+WmKyCCGUg27gg4Hc5vr0LQUWOyedC9oDvqRIUwuvUjhAl
-        mh55B204z+pY87YrqChKoRXdXmNQwd8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-8z6hN33ZPXqE9F6TN0GXtQ-1; Thu, 12 Nov 2020 03:32:42 -0500
-X-MC-Unique: 8z6hN33ZPXqE9F6TN0GXtQ-1
-Received: by mail-wr1-f71.google.com with SMTP id p16so1616422wrx.4
-        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 00:32:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=up1lOrEugzLW07KRiPo8mFDChEY+WGuuuWj0cewxi6M=;
-        b=X7V5EddCPc65XDzfTQ14749SrX1auDb1RH0P73bHhNjD6bb3KTqtsxGwHfwk3HhAAO
-         HkZptWpYs1PBFk9Jw/8tlexJ7H8MFN2atWCVlFYM5QRDGR7xzXc0SiMkYVSAfpaG8S9U
-         yO4y9WAv7MuIlokgtklneSah7CWWdkrySKdeduKq7lY5qYoXQb/TKbYiJ7aJwUolRvY2
-         x3aqugdfpifhXvWoAVfNMvlvUJvH1+Ce3rgwrwE4F3/Nmt1wmbSondxv3t8jXq8+ztMv
-         RakdB691yoBPRuw+ILlxYlIlcMFJRhQOBT84DnNxQDgW0K6OBCd6cNmr5t4MuxDPwNCA
-         DQxQ==
-X-Gm-Message-State: AOAM532ntjcPdrXc+Y6EC3tiKuDJJV066LYZBoxzne5s/8alHturknM3
-        JbHG5eNkcHSYRHC7KJYEJSfQDH3OeQLTDcYhexQOTggXo53j7oqkp8UkWUh7gk/rACWCbiL9jVE
-        mTMJ5kUTs4UHq
-X-Received: by 2002:a7b:cb09:: with SMTP id u9mr8351255wmj.109.1605169961547;
-        Thu, 12 Nov 2020 00:32:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzzWU8fZ9HRoVIS5lwVjtIkmc2UzdjOOXNZfQk70jewC7qS3zZSD9YvBvQ7DGMOuoPTMNDM2g==
-X-Received: by 2002:a7b:cb09:: with SMTP id u9mr8351219wmj.109.1605169961257;
-        Thu, 12 Nov 2020 00:32:41 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id k1sm1937588wrp.23.2020.11.12.00.32.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Nov 2020 00:32:40 -0800 (PST)
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     junaids@google.com, wanpengli@tencent.com, kvm@vger.kernel.org,
-        joro@8bytes.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        sean.j.christopherson@intel.com, mingo@redhat.com, bp@alien8.de,
-        hpa@zytor.com, tglx@linutronix.de, vkuznets@redhat.com,
-        jmattson@google.com
-References: <160514082171.31583.9995411273370528911.stgit@bmoger-ubuntu>
- <160514090654.31583.12433653224184517852.stgit@bmoger-ubuntu>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 2/2] KVM:SVM: Mask SEV encryption bit from CR3 reserved
- bits
-Message-ID: <09c5a083-a841-7d0e-f315-1d480e929957@redhat.com>
-Date:   Thu, 12 Nov 2020 09:32:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        bh=6vBnRXhtUZgvBjyOFeGNMppAU2xGHGRxN/O7fO2Hu3Q=;
+        b=cc3Aax8uAQkFOCOAR6rOvWZnrUT2/lfgxRW4G99xLE930K4hR2/kEv2g4x3wMxkl7kO3tT
+        zBH3RYqzXwkex3+LX9a70vCNeo4rXyKFXWmSKxaKitXbCFOhxLjsk4w8STwPSFhtL9cVei
+        DsTkdwghEBuBapZZswulUu38Sqvoais=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-wgavTCQEPreRrTAV_Wdfag-1; Thu, 12 Nov 2020 04:07:08 -0500
+X-MC-Unique: wgavTCQEPreRrTAV_Wdfag-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5D9487951F;
+        Thu, 12 Nov 2020 09:07:06 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.0])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 393775DA7E;
+        Thu, 12 Nov 2020 09:07:02 +0000 (UTC)
+Date:   Thu, 12 Nov 2020 10:06:59 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v2 08/11] KVM: selftests: Implement perf_test_util more
+ conventionally
+Message-ID: <20201112090659.oqavzaevaz4dbthr@kamzik.brq.redhat.com>
+References: <20201111122636.73346-1-drjones@redhat.com>
+ <20201111122636.73346-9-drjones@redhat.com>
+ <CANgfPd_F5BAzs8p58QuqPS7HpxdfKzMUZF1XR_vwR90_97E7BQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <160514090654.31583.12433653224184517852.stgit@bmoger-ubuntu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd_F5BAzs8p58QuqPS7HpxdfKzMUZF1XR_vwR90_97E7BQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/11/20 01:28, Babu Moger wrote:
-> Add support to the mask_cr3_rsvd_bits() callback to mask the
-> encryption bit from the CR3 value when SEV is enabled.
+On Wed, Nov 11, 2020 at 03:08:59PM -0800, Ben Gardon wrote:
+> On Wed, Nov 11, 2020 at 4:27 AM Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > It's not conventional C to put non-inline functions in header
+> > files. Create a source file for the functions instead. Also
+> > reduce the amount of globals and rename the functions to
+> > something less generic.
+> >
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > 
-> Additionally, cache the encryption mask for quick access during
-> the check.
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+
+Thanks!
+
+> > +
+> > +void perf_test_add_vcpus(struct kvm_vm *vm, int vcpus, uint64_t vcpu_memory_bytes)
 > 
-> Fixes: a780a3ea628268b2 ("KVM: X86: Fix reserved bits check for MOV to CR3")
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->   arch/x86/kvm/svm/svm.c |   11 ++++++++++-
->   arch/x86/kvm/svm/svm.h |    3 +++
->   2 files changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index a491a47d7f5c..c2b1e52810c6 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3741,6 +3741,7 @@ static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
->   static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct kvm_cpuid_entry2 *best;
->   
->   	vcpu->arch.xsaves_enabled = guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
->   				    boot_cpu_has(X86_FEATURE_XSAVE) &&
-> @@ -3771,6 +3772,12 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->   	if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
->   		kvm_request_apicv_update(vcpu->kvm, false,
->   					 APICV_INHIBIT_REASON_NESTED);
-> +
-> +	best = kvm_find_cpuid_entry(vcpu, 0x8000001F, 0);
-> +	if (best)
-> +		svm->sev_enc_mask = ~(1UL << (best->ebx & 0x3f));
-> +	else
-> +		svm->sev_enc_mask = ~0UL;
->   }
->   
->   static bool svm_has_wbinvd_exit(void)
-> @@ -4072,7 +4079,9 @@ static void enable_smi_window(struct kvm_vcpu *vcpu)
->   
->   static unsigned long svm_mask_cr3_rsvd_bits(struct kvm_vcpu *vcpu, unsigned long cr3)
->   {
-> -	return cr3;
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	return sev_guest(vcpu->kvm) ? (cr3 & svm->sev_enc_mask) : cr3;
->   }
->   
->   static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int insn_len)
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 1d853fe4c778..57a36645a0e4 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -152,6 +152,9 @@ struct vcpu_svm {
->   	u64 *avic_physical_id_cache;
->   	bool avic_is_running;
->   
-> +	/* SEV Memory encryption mask */
-> +	unsigned long sev_enc_mask;
-> +
->   	/*
->   	 * Per-vcpu list of struct amd_svm_iommu_ir:
->   	 * This is used mainly to store interrupt remapping information used
-> 
+> NIT: Since we're actually creating the vcpus in vm_create_with_vcpus,
+> and renaming functions anyway, it might make sense to change this to
+> perf_test_setup_vcpus or similar here.
+> This could also be called from perf_test_create_vm and made static,
+> but that might be outside the scope of this commit. Either way works.
+>
 
-Instead of adding a new callback, you can add a field to struct 
-kvm_vcpu_arch:
+Yup, I agree there's still room for some more cleanup / renaming.
+I'll be happy to review the patches ;-)
 
-  	if (is_long_mode(vcpu) &&
--	    (cr3 & rsvd_bits(cpuid_maxphyaddr(vcpu), 63)))
-+	    (cr3 & vcpu->arch.cr3_lm_rsvd_bits))
-
-Set it in kvm_vcpu_after_set_cpuid, and clear the memory encryption bit 
-in kvm_x86_ops.vcpu_after_set_cpuid.
-
-Paolo
+Thanks,
+drew
 
