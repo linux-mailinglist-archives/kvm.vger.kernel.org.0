@@ -2,106 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7909C2B0CB3
-	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 19:34:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E8E32B0CDA
+	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 19:40:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726315AbgKLSeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Nov 2020 13:34:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40716 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726148AbgKLSeX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Nov 2020 13:34:23 -0500
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957BCC0613D1
-        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 10:34:23 -0800 (PST)
-Received: by mail-io1-xd44.google.com with SMTP id u21so7055152iol.12
-        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 10:34:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xLlRyBYj/EC+kUvkMq1QT1Bh0c0KMjvvUSKRvyp9xSE=;
-        b=MZSJXL6MyFjuAbqtjCMCnOlKDLyklin7LSdUZUtvTCT9sHPL3vDeHfpDRwOronaAog
-         5JVdcvGhncbp+c70ol556MtnJsMVwtehOgyLVWOZTUOZy3BQEYVG+1pD1gqysZz9/XZm
-         4tCat2GrF+cRHAWjpufh/RzFdcz+Hc11roTAnJzaQzM/GbE6wl3aqL/CXs1K1LUQwzHS
-         geohbEgTXRVaOjMssLmDKZ0vNDmgyeBO+bBJSX3jc/ZsvULTX9dohLutR5TA9NtKn80f
-         /EB+GsKqSlpn9gYA6ePf/UMa/+7CAOvJlXNyQPg9IUGov+aSNCcU/1kXrgvH1M+/USlm
-         A6wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xLlRyBYj/EC+kUvkMq1QT1Bh0c0KMjvvUSKRvyp9xSE=;
-        b=O9ZEsqtp5D0pjaqrh/RCws57cJFV+xSv+6yUQrOWrKhtAlFPOEMy1YzaRO5DsBoKpm
-         GORT5yN9bKHMiutpIW6E2/LGggv4tNgLRV+R94C39wT0TeP6D4pp395YXGUfJIQDm0rZ
-         0XNYtDHPnQjiUITMGzocLsl+pVGxJzzW3wsA6VXTnSF6dH7hEtpT25mlYNt0UHCczMJW
-         zthuRn+NYazC6FLu8Yht4SwXCZJGoQyn/f4+xro3eDXRb4nnVuLH4O6xZMlwIUwevKkr
-         bZolHaWROoOlordFJwZAR4sn3tOXfxp6BudqjKgpB55uhGouLm2PfLmwib5TJSnSQvEg
-         eOJg==
-X-Gm-Message-State: AOAM5308t2ik6gRg91EeImqWrLL8QAgjdvJAgYgkOHLdn9p5adZ7cuQt
-        IGvkgss082ROlVLn9ixQOtotVwtom8wrtG5V5GQcRg==
-X-Google-Smtp-Source: ABdhPJyJEXBLt0SBR1np36V/jLTMr/EIoBAG89zkFtp5ElSPTF4Yl/oYeNhNV6Q157Uf6Suo8hArLbD9R5tKQTsVKoI=
-X-Received: by 2002:a5e:d515:: with SMTP id e21mr342869iom.9.1605206062740;
- Thu, 12 Nov 2020 10:34:22 -0800 (PST)
+        id S1726547AbgKLSk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Nov 2020 13:40:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32937 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726295AbgKLSk0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Nov 2020 13:40:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605206424;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eU0sx65Xhrwpk0w9nqSXAGfCb3bS7nAytTmglkTYuU0=;
+        b=OEKbOkM5O4OYHTAxjDVgCQs6QNSZ/uLTFrTtL4zlc85kZLm668ZBegtyvonluth7uu+TC1
+        ZK63lrQUs3sozZp0aW/XPQpMRh43bdVafND5HHFMGPvwVZxlq5Pgy2GF/2I0xYPRBNE0Sx
+        FrIw9zDb3h/Vlgl8D0J8zcnCCc6VLno=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-578-ex_GIJXzO4eFUW8k1i1C_A-1; Thu, 12 Nov 2020 13:40:23 -0500
+X-MC-Unique: ex_GIJXzO4eFUW8k1i1C_A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0373101F00C;
+        Thu, 12 Nov 2020 18:40:21 +0000 (UTC)
+Received: from [10.36.114.125] (ovpn-114-125.ams2.redhat.com [10.36.114.125])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EAFAA5C1A3;
+        Thu, 12 Nov 2020 18:40:16 +0000 (UTC)
+Subject: Re: [RFC, v1 0/3] msi support for platform devices
+To:     Vikas Gupta <vikas.gupta@broadcom.com>, alex.williamson@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     vikram.prakash@broadcom.com, srinath.mannam@broadcom.com
+References: <20201105060257.35269-1-vikas.gupta@broadcom.com>
+ <20201112175852.21572-1-vikas.gupta@broadcom.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <96436cba-88e3-ddb6-36d6-000929b86979@redhat.com>
+Date:   Thu, 12 Nov 2020 19:40:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20201111122636.73346-1-drjones@redhat.com> <20201111122636.73346-3-drjones@redhat.com>
- <20201112181921.GS26342@xz-x1>
-In-Reply-To: <20201112181921.GS26342@xz-x1>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 12 Nov 2020 10:34:11 -0800
-Message-ID: <CANgfPd_R_Rjn+QT_yiUwpCUK3TUfmhSN6XpZ5=L17mhrtMi7Zw@mail.gmail.com>
-Subject: Re: [PATCH v2 02/11] KVM: selftests: Remove deadcode
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201112175852.21572-1-vikas.gupta@broadcom.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 12, 2020 at 10:19 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Wed, Nov 11, 2020 at 01:26:27PM +0100, Andrew Jones wrote:
-> > Nothing sets USE_CLEAR_DIRTY_LOG anymore, so anything it surrounds
-> > is dead code.
-> >
-> > Reviewed-by: Ben Gardon <bgardon@google.com>
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
->
-> It's kind of a pity that there seem to a few valid measurements for clear dirty
-> log from Ben. I'm just thinking whether clear dirty log should be even more
-> important since imho that should be the right way to use KVM_GET_DIRTY_LOG on a
-> kernel new enough, since it's a total win (not like dirty ring, which depends).
+Hi Vikas,
 
-I didn't review this patch closely enough, and assumed the clear dirty
-log was still being done because of
-afdb19600719 KVM: selftests: Use a single binary for dirty/clear log test
+On 11/12/20 6:58 PM, Vikas Gupta wrote:
+> This RFC adds support for MSI for platform devices.
+> a) MSI(s) is/are added in addition to the normal interrupts.
+> b) The vendor specific MSI configuration can be done using
+>    callbacks which is implemented as msi module.
+> c) Adds a msi handling module for the Broadcom platform devices.
+> 
+> Changes from:
+> -------------
+>  v0 to v1:
+>    i)  Removed MSI device flag VFIO_DEVICE_FLAGS_MSI.
+>    ii) Add MSI(s) at the end of the irq list of platform IRQs.
+>        MSI(s) with first entry of MSI block has count and flag
+>        information.
+>        IRQ list: Allocation for IRQs + MSIs are allocated as below
+>        Example: if there are 'n' IRQs and 'k' MSIs
+>        -------------------------------------------------------
+>        |IRQ-0|IRQ-1|....|IRQ-n|MSI-0|MSI-1|MSI-2|......|MSI-k|
+>        -------------------------------------------------------
+I have not taken time yet to look at your series, but to me you should have
+|IRQ-0|IRQ-1|....|IRQ-n|MSI|MSIX
+then for setting a given MSIX (i) you would select the MSIx index and
+then set start=i count=1.
+to me individual MSIs are encoded in the subindex and not in the index.
+The index just selects the "type" of interrupt.
 
-Looking back now, I see that that is not the case.
+For PCI you just have:
+        VFIO_PCI_INTX_IRQ_INDEX,
+        VFIO_PCI_MSI_IRQ_INDEX, -> MSI index and then you play with
+start/count
+        VFIO_PCI_MSIX_IRQ_INDEX,
+        VFIO_PCI_ERR_IRQ_INDEX,
+        VFIO_PCI_REQ_IRQ_INDEX,
 
-I'd like to retract my endorsement in that case. I'd prefer to leave
-the dead code in and I'll send another series to actually use it once
-this series is merged. I've already written the code to use it and
-time the clearing, so it seems a pity to remove it now.
+(include/uapi/linux/vfio.h)
 
-Alternatively I could just revert this commit in that future series,
-though I suspect not removing the dead code would reduce the chances
-of merge conflicts. Either way works.
+Thanks
 
-I can extend the dirty log mode functions from dirty_log_test for
-dirty_log_perf_test in that series too.
+Eric
+>        MSI-0 will have count=k set and flags set accordingly.
+> 
+> Vikas Gupta (3):
+>   vfio/platform: add support for msi
+>   vfio/platform: change cleanup order
+>   vfio/platform: add Broadcom msi module
+> 
+>  drivers/vfio/platform/Kconfig                 |   1 +
+>  drivers/vfio/platform/Makefile                |   1 +
+>  drivers/vfio/platform/msi/Kconfig             |   9 +
+>  drivers/vfio/platform/msi/Makefile            |   2 +
+>  .../vfio/platform/msi/vfio_platform_bcmplt.c  |  74 ++++++
+>  drivers/vfio/platform/vfio_platform_common.c  |  86 ++++++-
+>  drivers/vfio/platform/vfio_platform_irq.c     | 238 +++++++++++++++++-
+>  drivers/vfio/platform/vfio_platform_private.h |  23 ++
+>  8 files changed, 419 insertions(+), 15 deletions(-)
+>  create mode 100644 drivers/vfio/platform/msi/Kconfig
+>  create mode 100644 drivers/vfio/platform/msi/Makefile
+>  create mode 100644 drivers/vfio/platform/msi/vfio_platform_bcmplt.c
+> 
 
-
->
-> So far, the statement is definitely true above, since we can always work on
-> top.  So:
->
-> Reviewed-by: Peter Xu <peterx@redhat.com>
->
-> Thanks,
->
-> --
-> Peter Xu
->
