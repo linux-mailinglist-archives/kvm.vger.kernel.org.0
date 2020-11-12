@@ -2,113 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5DDC2B1159
-	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 23:22:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C6522B11F3
+	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 23:42:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727512AbgKLWWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Nov 2020 17:22:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57788 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727240AbgKLWWk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Nov 2020 17:22:40 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0671722227;
-        Thu, 12 Nov 2020 22:22:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605219759;
-        bh=omvvQ8b8DvjI5QLF0vRZjv0ONXw4PTX4Tdzt12ev5A0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Krsyc7GxXJYidMfTYD7DbvBADHsqydRQqEERVzNcsvZScyluSjAmKjUTGyW2Ybp0p
-         LeTew3/ElDzcaT/SYc2yfbTkwJzbmWkzGtYg4iLtYwsyOb/l1eHUzzXOmHe7nFyfX+
-         AiOugvNo7UvzV2cpcZq5DQG4d8tL5PPNa8SRxeRo=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kdKzF-00ABHn-6y; Thu, 12 Nov 2020 22:22:37 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peng Liang <liangpeng10@huawei.com>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 3/3] KVM: arm64: Handle SCXTNUM_ELx traps
-Date:   Thu, 12 Nov 2020 22:21:39 +0000
-Message-Id: <20201112222139.466204-4-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201112222139.466204-1-maz@kernel.org>
-References: <20201112222139.466204-1-maz@kernel.org>
+        id S1727007AbgKLWmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Nov 2020 17:42:50 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:47642 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725965AbgKLWmt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Nov 2020 17:42:49 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1605220967;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PtB9NAxfiQap1pp3nxZvuOoDIPTo5gMSqFn75f0MaeA=;
+        b=CaP8VQrefkrhEsMv82YyMOkLUQLnQrgjnx+zJ0mgvuj2W68b+aHj4w6Uaodv2sbISHhEas
+        EKY0yrf/JpGwK2hS1KWrZDW6Xp5dqVNjjTeyUNvss4YGrBdQiJqqE37DCm7/K8oAoQLzBr
+        Pd9ohCrwCnEXl/ESMTycYl5A6wVkmXKpVqs/Xh1LB0ogHanr+wrfYxihrXxqucTvPhRA/5
+        VInbRhmTNOqRVCsxUnSgp1/MGYf5JkOozUpZq/b9FGw6fTPVgVhvLK6DTEM8nvL7jH946M
+        Km8pSZ2DHX1318zKHZie9/q1ZW3ZZXLZar/hLTI1KgwRp8i5S1JhNeWVNbn/2A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1605220967;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PtB9NAxfiQap1pp3nxZvuOoDIPTo5gMSqFn75f0MaeA=;
+        b=Qf1JSP13w9S5KLD1yG48HF9wSR15pf//4+ooA3P81lwVidKykHYNwB9SX6zA8aqo5txh44
+        pJNl5CB8Ar/IsRBQ==
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "Tian\, Kevin" <kevin.tian@intel.com>
+Cc:     "Raj\, Ashok" <ashok.raj@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "Williams\, Dan J" <dan.j.williams@intel.com>,
+        "Jiang\, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul\@kernel.org" <vkoul@kernel.org>,
+        "Dey\, Megha" <megha.dey@intel.com>,
+        "maz\@kernel.org" <maz@kernel.org>,
+        "bhelgaas\@google.com" <bhelgaas@google.com>,
+        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
+        "parav\@mellanox.com" <parav@mellanox.com>,
+        "rafael\@kernel.org" <rafael@kernel.org>,
+        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain\, Mona" <mona.hossain@intel.com>,
+        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+In-Reply-To: <20201112193253.GG19638@char.us.oracle.com>
+References: <20201107001207.GA2620339@nvidia.com> <87pn4nk7nn.fsf@nanos.tec.linutronix.de> <20201108235852.GC32074@araj-mobl1.jf.intel.com> <874klykc7h.fsf@nanos.tec.linutronix.de> <20201109173034.GG2620339@nvidia.com> <87pn4mi23u.fsf@nanos.tec.linutronix.de> <20201110051412.GA20147@otc-nc-03> <875z6dik1a.fsf@nanos.tec.linutronix.de> <20201110141323.GB22336@otc-nc-03> <MWHPR11MB16455B594B1B48B6E3C97C108CE80@MWHPR11MB1645.namprd11.prod.outlook.com> <20201112193253.GG19638@char.us.oracle.com>
+Date:   Thu, 12 Nov 2020 23:42:46 +0100
+Message-ID: <877dqqmc2h.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, liangpeng10@huawei.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As the kernel never sets HCR_EL2.EnSCXT, accesses to SCXTNUM_ELx
-will trap to EL2. Let's handle that as gracefully as possible
-by injecting an UNDEF exception into the guest. This is consistent
-with the guest's view of ID_AA64PFR0_EL1.CSV2 being at most 1.
+On Thu, Nov 12 2020 at 14:32, Konrad Rzeszutek Wilk wrote:
+>> 4. Using CPUID to detect running as guest. But as Thomas pointed out, this
+>> approach is less reliable as not all hypervisors do this way.
+>
+> Is that truly true? It is the first time I see the argument that extra
+> steps are needed and that checking for X86_FEATURE_HYPERVISOR is not enough.
+>
+> Or is it more "Some hypervisor probably forgot about it, so lets make sure we patch
+> over that possible hole?"
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Acked-by: Will Deacon <will@kernel.org>
-Link: https://lore.kernel.org/r/20201110141308.451654-4-maz@kernel.org
----
- arch/arm64/include/asm/sysreg.h | 4 ++++
- arch/arm64/kvm/sys_regs.c       | 4 ++++
- 2 files changed, 8 insertions(+)
+Nothing enforces that bit to be set. The bit is a pure software
+convention and was proposed by VMWare in 2008 with the following
+changelog:
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index d52c1b3ce589..a427a5653369 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -372,6 +372,8 @@
- #define SYS_CONTEXTIDR_EL1		sys_reg(3, 0, 13, 0, 1)
- #define SYS_TPIDR_EL1			sys_reg(3, 0, 13, 0, 4)
- 
-+#define SYS_SCXTNUM_EL1			sys_reg(3, 0, 13, 0, 7)
-+
- #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
- 
- #define SYS_CCSIDR_EL1			sys_reg(3, 1, 0, 0, 0)
-@@ -404,6 +406,8 @@
- #define SYS_TPIDR_EL0			sys_reg(3, 3, 13, 0, 2)
- #define SYS_TPIDRRO_EL0			sys_reg(3, 3, 13, 0, 3)
- 
-+#define SYS_SCXTNUM_EL0			sys_reg(3, 3, 13, 0, 7)
-+
- /* Definitions for system register interface to AMU for ARMv8.4 onwards */
- #define SYS_AM_EL0(crm, op2)		sys_reg(3, 3, 13, (crm), (op2))
- #define SYS_AMCR_EL0			SYS_AM_EL0(2, 0)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b0022f37c8f1..c1726fb7f3d9 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1598,6 +1598,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
- 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
- 
-+	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
-+
- 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
- 
- 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
-@@ -1626,6 +1628,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
- 	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
- 
-+	{ SYS_DESC(SYS_SCXTNUM_EL0), undef_access },
-+
- 	{ SYS_DESC(SYS_AMCR_EL0), undef_access },
- 	{ SYS_DESC(SYS_AMCFGR_EL0), undef_access },
- 	{ SYS_DESC(SYS_AMCGCR_EL0), undef_access },
--- 
-2.28.0
+ "This patch proposes to use a cpuid interface to detect if we are
+  running on an hypervisor.
 
+  The discovery of a hypervisor is determined by bit 31 of CPUID#1_ECX,
+  which is defined to be "hypervisor present bit". For a VM, the bit is
+  1, otherwise it is set to 0. This bit is not officially documented by
+  either Intel/AMD yet, but they plan to do so some time soon, in the
+  meanwhile they have promised to keep it reserved for virtualization."
+
+The reserved promise seems to hold. AMDs APM has it documented. The
+Intel SDM not so.
+
+Also the kernel side of KVM does not enforce that bit, it's up to the user
+space management to set it.
+
+And yes, I've tripped over this with some hypervisors and even qemu KVM
+failed to set it in the early days because it was masked with host CPUID
+trimming as there the bit is obviously 0.
+
+DMI vendor name is pretty good final check when the bit is 0. The
+strings I'm aware of are:
+
+QEMU, Bochs, KVM, Xen, VMware, VMW, VMware Inc., innotek GmbH, Oracle
+Corporation, Parallels, BHYVE, Microsoft Corporation
+
+which is not complete but better than nothing ;)
+
+Thanks,
+
+        tglx
