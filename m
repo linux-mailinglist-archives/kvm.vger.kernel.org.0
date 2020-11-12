@@ -2,75 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC4582B0C82
-	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 19:23:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7909C2B0CB3
+	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 19:34:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726629AbgKLSX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Nov 2020 13:23:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58290 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726221AbgKLSXX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Nov 2020 13:23:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605205402;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QWByVSqR+09ObdKY5uGyCp/I3vWyhbVdQY+MRTdKDvU=;
-        b=CPh0iHs4m8ZKvGhhz6pvtweE9kUd0IqxxXeXqo9oH6sgNOxiV8j7RZIAh8R+QVgYpCOnnk
-        w6mxnXKx90WQ7dXpWStM0lKuhUyD3IDQ29ZZ98X92Pyedk8qK2LCPUr2HGQB4XWzJW+i0w
-        8q5rcHvC5rhTWSUbB9pHFVYeMzKSFWk=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-50uNzzS1P3iRyH8JUVNMBw-1; Thu, 12 Nov 2020 13:23:20 -0500
-X-MC-Unique: 50uNzzS1P3iRyH8JUVNMBw-1
-Received: by mail-qk1-f197.google.com with SMTP id x2so4832026qkd.23
-        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 10:23:20 -0800 (PST)
+        id S1726315AbgKLSeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Nov 2020 13:34:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40716 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726148AbgKLSeX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Nov 2020 13:34:23 -0500
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957BCC0613D1
+        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 10:34:23 -0800 (PST)
+Received: by mail-io1-xd44.google.com with SMTP id u21so7055152iol.12
+        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 10:34:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xLlRyBYj/EC+kUvkMq1QT1Bh0c0KMjvvUSKRvyp9xSE=;
+        b=MZSJXL6MyFjuAbqtjCMCnOlKDLyklin7LSdUZUtvTCT9sHPL3vDeHfpDRwOronaAog
+         5JVdcvGhncbp+c70ol556MtnJsMVwtehOgyLVWOZTUOZy3BQEYVG+1pD1gqysZz9/XZm
+         4tCat2GrF+cRHAWjpufh/RzFdcz+Hc11roTAnJzaQzM/GbE6wl3aqL/CXs1K1LUQwzHS
+         geohbEgTXRVaOjMssLmDKZ0vNDmgyeBO+bBJSX3jc/ZsvULTX9dohLutR5TA9NtKn80f
+         /EB+GsKqSlpn9gYA6ePf/UMa/+7CAOvJlXNyQPg9IUGov+aSNCcU/1kXrgvH1M+/USlm
+         A6wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QWByVSqR+09ObdKY5uGyCp/I3vWyhbVdQY+MRTdKDvU=;
-        b=kdLgJvuMuM7fPuNW7x852UT8ZPcGtw5hCc5KIMe4qWtvtWc9yGycZXxTGiJ2PZ3Upk
-         2eu5FrRjn7Yb2bM8VglUbtbJjg0jY0GgntvJjqCrqPCI92Q0HThzlL2GkS/zJrHuht5z
-         3UNg7ZdjOY4n5cqJNRmsRiRCR6LK8eTbYhoAH1vNBcdglEHV3ngqLatZegAZNIn0Kuva
-         p2QjPI/lYNiDHg+1TQP7hGGojS9JgLcZKBDw8kIfMXM0Xz5zjq7DmY870r6PZD2muCYY
-         Sc5SlPpOLCrXIUOqTitAvbYyAs3OLyfj8Byc/4XJwIY6dyzJlvXYANG6b+kuiZroJnBI
-         X91Q==
-X-Gm-Message-State: AOAM530KeM6wt2CGMv0/WDqbE616/egrEf2PziMhdN+f0JfdnfU3iYAy
-        NCjHbME7OluujXtmozAf8gYUp9+9bw+28MQFGcxlK4BHxVz3IE5ehhA29wcrZGBc7pYyXvSe/BM
-        ccr5mxPPOERR5
-X-Received: by 2002:ac8:4d99:: with SMTP id a25mr476681qtw.122.1605205400401;
-        Thu, 12 Nov 2020 10:23:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwQXcggqCKAmnR/nKj+cCnYUqoCLdbh/Y+ZFrSrgLgkp6d0+OzZ7a6EQmdyrMBfq9xn+8udpg==
-X-Received: by 2002:ac8:4d99:: with SMTP id a25mr476667qtw.122.1605205400222;
-        Thu, 12 Nov 2020 10:23:20 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
-        by smtp.gmail.com with ESMTPSA id r19sm5010921qtm.4.2020.11.12.10.23.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2020 10:23:19 -0800 (PST)
-Date:   Thu, 12 Nov 2020 13:23:18 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, bgardon@google.com
-Subject: Re: [PATCH v2 11/11] KVM: selftests: Make test skipping consistent
-Message-ID: <20201112182318.GX26342@xz-x1>
-References: <20201111122636.73346-1-drjones@redhat.com>
- <20201111122636.73346-12-drjones@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xLlRyBYj/EC+kUvkMq1QT1Bh0c0KMjvvUSKRvyp9xSE=;
+        b=O9ZEsqtp5D0pjaqrh/RCws57cJFV+xSv+6yUQrOWrKhtAlFPOEMy1YzaRO5DsBoKpm
+         GORT5yN9bKHMiutpIW6E2/LGggv4tNgLRV+R94C39wT0TeP6D4pp395YXGUfJIQDm0rZ
+         0XNYtDHPnQjiUITMGzocLsl+pVGxJzzW3wsA6VXTnSF6dH7hEtpT25mlYNt0UHCczMJW
+         zthuRn+NYazC6FLu8Yht4SwXCZJGoQyn/f4+xro3eDXRb4nnVuLH4O6xZMlwIUwevKkr
+         bZolHaWROoOlordFJwZAR4sn3tOXfxp6BudqjKgpB55uhGouLm2PfLmwib5TJSnSQvEg
+         eOJg==
+X-Gm-Message-State: AOAM5308t2ik6gRg91EeImqWrLL8QAgjdvJAgYgkOHLdn9p5adZ7cuQt
+        IGvkgss082ROlVLn9ixQOtotVwtom8wrtG5V5GQcRg==
+X-Google-Smtp-Source: ABdhPJyJEXBLt0SBR1np36V/jLTMr/EIoBAG89zkFtp5ElSPTF4Yl/oYeNhNV6Q157Uf6Suo8hArLbD9R5tKQTsVKoI=
+X-Received: by 2002:a5e:d515:: with SMTP id e21mr342869iom.9.1605206062740;
+ Thu, 12 Nov 2020 10:34:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201111122636.73346-12-drjones@redhat.com>
+References: <20201111122636.73346-1-drjones@redhat.com> <20201111122636.73346-3-drjones@redhat.com>
+ <20201112181921.GS26342@xz-x1>
+In-Reply-To: <20201112181921.GS26342@xz-x1>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 12 Nov 2020 10:34:11 -0800
+Message-ID: <CANgfPd_R_Rjn+QT_yiUwpCUK3TUfmhSN6XpZ5=L17mhrtMi7Zw@mail.gmail.com>
+Subject: Re: [PATCH v2 02/11] KVM: selftests: Remove deadcode
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Andrew Jones <drjones@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 11, 2020 at 01:26:36PM +0100, Andrew Jones wrote:
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+On Thu, Nov 12, 2020 at 10:19 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Wed, Nov 11, 2020 at 01:26:27PM +0100, Andrew Jones wrote:
+> > Nothing sets USE_CLEAR_DIRTY_LOG anymore, so anything it surrounds
+> > is dead code.
+> >
+> > Reviewed-by: Ben Gardon <bgardon@google.com>
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+>
+> It's kind of a pity that there seem to a few valid measurements for clear dirty
+> log from Ben. I'm just thinking whether clear dirty log should be even more
+> important since imho that should be the right way to use KVM_GET_DIRTY_LOG on a
+> kernel new enough, since it's a total win (not like dirty ring, which depends).
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+I didn't review this patch closely enough, and assumed the clear dirty
+log was still being done because of
+afdb19600719 KVM: selftests: Use a single binary for dirty/clear log test
 
--- 
-Peter Xu
+Looking back now, I see that that is not the case.
 
+I'd like to retract my endorsement in that case. I'd prefer to leave
+the dead code in and I'll send another series to actually use it once
+this series is merged. I've already written the code to use it and
+time the clearing, so it seems a pity to remove it now.
+
+Alternatively I could just revert this commit in that future series,
+though I suspect not removing the dead code would reduce the chances
+of merge conflicts. Either way works.
+
+I can extend the dirty log mode functions from dirty_log_test for
+dirty_log_perf_test in that series too.
+
+
+>
+> So far, the statement is definitely true above, since we can always work on
+> top.  So:
+>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
