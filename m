@@ -2,173 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 493762B09BC
-	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 17:19:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 709022B0BD4
+	for <lists+kvm@lfdr.de>; Thu, 12 Nov 2020 18:59:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728842AbgKLQTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Nov 2020 11:19:47 -0500
-Received: from mail-dm6nam10on2081.outbound.protection.outlook.com ([40.107.93.81]:3200
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728414AbgKLQTq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Nov 2020 11:19:46 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iRz2xdWxgRFRZCcaw2uprGTqk05jWY2HixsUUAH2uUM9Knlp2FsKvmNWKJaxjDFRlj8G/Kw6X/aCRbAC1U2CgWb6XYWmQGrLdYAQcNVhYUzORgeuyBKMemF9SWPbeUANKwR2cNleZBdrrI5gKzxlRM3MEuFwcrsmAqVJltzMm4D6JfDuJ8ireZGfkbm5mPVhyYFyuf8LrQWX6DhqZs9E8oNMws9QOZ6tv/5GxhycSoTy3iNKxb0zIjvGFwUAttj7nXEgAFMz4iyhtRUcvv8MpHxCzFtrencgqkP9M7bpL11+YXCHpdPtYe6WYWXKyWHQPYBzmyUm2fW5D1GPIgH58A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YobjNSdPsEcGAKoX3tYRjhRKMSXIPRFxtpLF2YUItvw=;
- b=hkAxFLNPw0UL4KBA+ZRYCoNpEUyzpqFxVRXruEG/uM0fg02wq1KijqdHr1U4KJa7w5zgxPm+j6uhYL19JFl0XkFfIVWlWktErCcgDEFabGQC/ahdVErSCao4IuM5YGjBAoOuM0EmI65JB2hw3jxcDq/dm6rE+sWJD9T/19bqPUJAxW4pmsJGRiADot4KWMmwu5gYGQw+V4Wotj1PLEWs7oPGxz6bDoHJN1pfEMOPpZQ6Ge2welJS5DiGbsyJsnM/+InUPReIGU+ps/jWp1cWrMGmnm41CtU/flh32gRnJxKxzabk1Gy7Cz53/TfaXd6KvM7lW5OT7MVVdP8mFSgcAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1726202AbgKLR7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Nov 2020 12:59:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35088 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726056AbgKLR7G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Nov 2020 12:59:06 -0500
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 432FEC0613D4
+        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 09:59:06 -0800 (PST)
+Received: by mail-pf1-x441.google.com with SMTP id 10so5256519pfp.5
+        for <kvm@vger.kernel.org>; Thu, 12 Nov 2020 09:59:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YobjNSdPsEcGAKoX3tYRjhRKMSXIPRFxtpLF2YUItvw=;
- b=i7XDUMxcWNxrm4pj2b8oyL7zXIAWSEz2+4CZt3KeWzhwp2S/FMKwWeYzXn7eCLutlP1+Vz4ZRn3oLfpsQQw7OkbBNoBGa8X/vqimhkrDJHdA3PpNAFllIm6FwVveoZ3moIjw9FD3B9QSBXxM1zF9GxRUkSu4WAaR92xnTI/WpNc=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN6PR12MB4702.namprd12.prod.outlook.com (2603:10b6:805:e4::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.24; Thu, 12 Nov
- 2020 16:19:43 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::d877:baf6:9425:ece]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::d877:baf6:9425:ece%3]) with mapi id 15.20.3541.026; Thu, 12 Nov 2020
- 16:19:43 +0000
-Subject: Re: [PATCH 2/2] KVM:SVM: Mask SEV encryption bit from CR3 reserved
- bits
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     junaids@google.com, wanpengli@tencent.com, kvm@vger.kernel.org,
-        joro@8bytes.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        sean.j.christopherson@intel.com, mingo@redhat.com, bp@alien8.de,
-        hpa@zytor.com, tglx@linutronix.de, vkuznets@redhat.com,
-        jmattson@google.com
-References: <160514082171.31583.9995411273370528911.stgit@bmoger-ubuntu>
- <160514090654.31583.12433653224184517852.stgit@bmoger-ubuntu>
- <09c5a083-a841-7d0e-f315-1d480e929957@redhat.com>
-From:   Babu Moger <babu.moger@amd.com>
-Message-ID: <48cd9218-cc30-65b6-343c-804dea427e30@amd.com>
-Date:   Thu, 12 Nov 2020 10:19:40 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <09c5a083-a841-7d0e-f315-1d480e929957@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: DM5PR20CA0039.namprd20.prod.outlook.com
- (2603:10b6:3:13d::25) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.136] (165.204.77.1) by DM5PR20CA0039.namprd20.prod.outlook.com (2603:10b6:3:13d::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.25 via Frontend Transport; Thu, 12 Nov 2020 16:19:42 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 051bbb14-0d78-4a80-935a-08d88726c356
-X-MS-TrafficTypeDiagnostic: SN6PR12MB4702:
-X-Microsoft-Antispam-PRVS: <SN6PR12MB47021348066CDC24B41944A495E70@SN6PR12MB4702.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FiHY5PhOLssPd3n9VkyNJoo2RxnxD/zvwypHgBF1B/Noe024cQgqyQ8QkGTwWOxlZz0+/wznkEQiIwhMDaZCjRs+eN0sY6WUrXD0By52CVRFc0qx1LFdhFhdzzmyVm+FoQCaQagb2oFpIax6VWjpZt2omjRaQPqbIR03bNC6gLWiHOoktW/+fHOTpcmRCuKuYMgATUkyzIH4MrVEdaJSTqpcVgHrnNY85wNScuqrYP3gA+HPICqLNWrMECJhaauZP7kGUwOJgjU1gVMS7kpm6+hPBgXFIz2BK5df6UuaPUrs+aDjch5TGzEoflYp2YGWJU7d0GekTXqZVFmuxH6X41F+SBkdWqHT2ShOs6SW4Gwxz1UUmI5CvrU470hMGEHF
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(136003)(39860400002)(376002)(366004)(66946007)(66556008)(66476007)(7416002)(4326008)(5660300002)(86362001)(6916009)(52116002)(478600001)(36756003)(53546011)(316002)(44832011)(16576012)(26005)(8936002)(186003)(956004)(2616005)(83380400001)(31696002)(8676002)(16526019)(6486002)(2906002)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: MCJPFRescswFgFGSOifpn1oNL5K0FxkGIBAlfyjWGJbK+dBTdxEc9uHh4vYr5NNNyw1rosZudWScoXwyWJ5gNg7qWHzK6QoXDuzMP+Zm3tFTdyt+71b1GqnMx9cCns89N9uAtXsT7MGkj78hNaC+8aWMqPWKVmdZLbKIblE2om+WiiFep74kwRV57qSY4aCXWTwcoTfLW2S2bq1ZGih/5lDHL02qU6/OWDt8LSFfnutYQdryjyad5vKlHYXffG7vKJd+rXeCoMwrcONg6GMcvCRuZGX7LygefjFF5ekxKpAjW6aXZ7g2ywbIG9dJt9JED59XwUDkBCEHskL4sBvx4ISHjVTN8kuqOiSbMY2D+a4gO55oVmR84zC/+eHK1TRkn3XUehUxYeoUkxYQfX3k/rfqJVX65zLWbPeX2nFaesqgFaeqAilSoswTZYU+5d3gFIfXd7zgM436r6RX2ic5TR4aWhSiS3xHFLMey0PHiKrY59KFa2gPoI7I0YEe5AXxLZKh1Bkalt/GojsWWKFtxkNDL/+bMMuhVeeIjV3zRx7rjAfcovJMm6yC+HIVD1UfqOgyKHKAJORzG9DSB+d4Esqgz+Y7rQilLGxjpq06m3Ltp4a11OQ+lxqFxEa5SOmed+oysCrY5j4hX+JzDXDdFw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 051bbb14-0d78-4a80-935a-08d88726c356
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2020 16:19:43.3910
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LrBEt6akSJq04gulwL2byJWlsVg+t5AuX4lW/B0PJzzbg23vUyfDkj+br2OGUMpZ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4702
+        d=broadcom.com; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=ajmDYabH23aBLCR+xrziDwXJacB4LEpUdXmD+mNaoo8=;
+        b=NhhC82fJbKFZ/yayxgDIrcJ5afJoa9p7QnmlAtl/JapM89GKN3jAezhs2/IyQRbwz3
+         Fp7H7JFn6sAqnJr0a6SHo/FCYWv3PvoKbbl7aMdoXVlvfm0kc2Rgot7Cnsj/uoUPg/rX
+         DHKOoZjVx9/2kd4roEg1G8mn/5cuH3GWh/LD0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=ajmDYabH23aBLCR+xrziDwXJacB4LEpUdXmD+mNaoo8=;
+        b=YcRZ58urM/1fTm/qlQIQwGbhSfJLIrBnhwFWOCsQzZw+n96BYRjr/sJNI9jeSA3p/s
+         v5c7RWbWpZBl61+kBpIw2nF8wb4cRvwaeT2zAwv87GSXmkBtV/6F6f6i7wJzA7ki7bZD
+         15RbZyk1dUW2p4RWjvKuqDzzha4uFmr6w99ELoHhGT3RU/R6g6IaMavT0grixe2EzTpE
+         EgJg7k9n4yrO39dxt4syvxQsLocItBICOsV16Oa3Z0kYtbGMVxSvfUJu/MdufFqxkMBD
+         q2qKfCn9crlhltWU6tB1DMw7kizO5h/egYF1KMFrC9YJ55I9pIaR7gqaR1p8gVPejuYu
+         62lw==
+X-Gm-Message-State: AOAM532lVLygCrqN/chFNJruwDOFNIwlGVwz3lCxYeSVxffJDNizW4wU
+        KVEkZ3HZGj7O3AHtfboxKp6aiw==
+X-Google-Smtp-Source: ABdhPJzMcfsWlwV+Yl+Ju6UrSqt7j5dSMFXgh+3u4AQBf/P0A0F+06wx72FnY/z55UZ2PBMWLBWJyA==
+X-Received: by 2002:a65:4483:: with SMTP id l3mr575455pgq.96.1605203945461;
+        Thu, 12 Nov 2020 09:59:05 -0800 (PST)
+Received: from rahul_yocto_ubuntu18.ibn.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id r6sm7237894pjd.39.2020.11.12.09.59.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Nov 2020 09:59:04 -0800 (PST)
+From:   Vikas Gupta <vikas.gupta@broadcom.com>
+To:     eric.auger@redhat.com, alex.williamson@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     vikram.prakash@broadcom.com, srinath.mannam@broadcom.com,
+        Vikas Gupta <vikas.gupta@broadcom.com>
+Subject: [RFC, v1 0/3] msi support for platform devices
+Date:   Thu, 12 Nov 2020 23:28:49 +0530
+Message-Id: <20201112175852.21572-1-vikas.gupta@broadcom.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201105060257.35269-1-vikas.gupta@broadcom.com>
+References: <20201105060257.35269-1-vikas.gupta@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="000000000000fe845205b3ecaa4c"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--000000000000fe845205b3ecaa4c
+
+This RFC adds support for MSI for platform devices.
+a) MSI(s) is/are added in addition to the normal interrupts.
+b) The vendor specific MSI configuration can be done using
+   callbacks which is implemented as msi module.
+c) Adds a msi handling module for the Broadcom platform devices.
+
+Changes from:
+-------------
+ v0 to v1:
+   i)  Removed MSI device flag VFIO_DEVICE_FLAGS_MSI.
+   ii) Add MSI(s) at the end of the irq list of platform IRQs.
+       MSI(s) with first entry of MSI block has count and flag
+       information.
+       IRQ list: Allocation for IRQs + MSIs are allocated as below
+       Example: if there are 'n' IRQs and 'k' MSIs
+       -------------------------------------------------------
+       |IRQ-0|IRQ-1|....|IRQ-n|MSI-0|MSI-1|MSI-2|......|MSI-k|
+       -------------------------------------------------------
+       MSI-0 will have count=k set and flags set accordingly.
+
+Vikas Gupta (3):
+  vfio/platform: add support for msi
+  vfio/platform: change cleanup order
+  vfio/platform: add Broadcom msi module
+
+ drivers/vfio/platform/Kconfig                 |   1 +
+ drivers/vfio/platform/Makefile                |   1 +
+ drivers/vfio/platform/msi/Kconfig             |   9 +
+ drivers/vfio/platform/msi/Makefile            |   2 +
+ .../vfio/platform/msi/vfio_platform_bcmplt.c  |  74 ++++++
+ drivers/vfio/platform/vfio_platform_common.c  |  86 ++++++-
+ drivers/vfio/platform/vfio_platform_irq.c     | 238 +++++++++++++++++-
+ drivers/vfio/platform/vfio_platform_private.h |  23 ++
+ 8 files changed, 419 insertions(+), 15 deletions(-)
+ create mode 100644 drivers/vfio/platform/msi/Kconfig
+ create mode 100644 drivers/vfio/platform/msi/Makefile
+ create mode 100644 drivers/vfio/platform/msi/vfio_platform_bcmplt.c
+
+-- 
+2.17.1
 
 
-On 11/12/20 2:32 AM, Paolo Bonzini wrote:
-> On 12/11/20 01:28, Babu Moger wrote:
->> Add support to the mask_cr3_rsvd_bits() callback to mask the
->> encryption bit from the CR3 value when SEV is enabled.
->>
->> Additionally, cache the encryption mask for quick access during
->> the check.
->>
->> Fixes: a780a3ea628268b2 ("KVM: X86: Fix reserved bits check for MOV to
->> CR3")
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> ---
->>   arch/x86/kvm/svm/svm.c |   11 ++++++++++-
->>   arch/x86/kvm/svm/svm.h |    3 +++
->>   2 files changed, 13 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index a491a47d7f5c..c2b1e52810c6 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -3741,6 +3741,7 @@ static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu,
->> gfn_t gfn, bool is_mmio)
->>   static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->>   {
->>       struct vcpu_svm *svm = to_svm(vcpu);
->> +    struct kvm_cpuid_entry2 *best;
->>         vcpu->arch.xsaves_enabled = guest_cpuid_has(vcpu,
->> X86_FEATURE_XSAVE) &&
->>                       boot_cpu_has(X86_FEATURE_XSAVE) &&
->> @@ -3771,6 +3772,12 @@ static void svm_vcpu_after_set_cpuid(struct
->> kvm_vcpu *vcpu)
->>       if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
->>           kvm_request_apicv_update(vcpu->kvm, false,
->>                        APICV_INHIBIT_REASON_NESTED);
->> +
->> +    best = kvm_find_cpuid_entry(vcpu, 0x8000001F, 0);
->> +    if (best)
->> +        svm->sev_enc_mask = ~(1UL << (best->ebx & 0x3f));
->> +    else
->> +        svm->sev_enc_mask = ~0UL;
->>   }
->>     static bool svm_has_wbinvd_exit(void)
->> @@ -4072,7 +4079,9 @@ static void enable_smi_window(struct kvm_vcpu *vcpu)
->>     static unsigned long svm_mask_cr3_rsvd_bits(struct kvm_vcpu *vcpu,
->> unsigned long cr3)
->>   {
->> -    return cr3;
->> +    struct vcpu_svm *svm = to_svm(vcpu);
->> +
->> +    return sev_guest(vcpu->kvm) ? (cr3 & svm->sev_enc_mask) : cr3;
->>   }
->>     static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, void
->> *insn, int insn_len)
->> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
->> index 1d853fe4c778..57a36645a0e4 100644
->> --- a/arch/x86/kvm/svm/svm.h
->> +++ b/arch/x86/kvm/svm/svm.h
->> @@ -152,6 +152,9 @@ struct vcpu_svm {
->>       u64 *avic_physical_id_cache;
->>       bool avic_is_running;
->>   +    /* SEV Memory encryption mask */
->> +    unsigned long sev_enc_mask;
->> +
->>       /*
->>        * Per-vcpu list of struct amd_svm_iommu_ir:
->>        * This is used mainly to store interrupt remapping information used
->>
-> 
-> Instead of adding a new callback, you can add a field to struct
-> kvm_vcpu_arch:
-> 
->      if (is_long_mode(vcpu) &&
-> -        (cr3 & rsvd_bits(cpuid_maxphyaddr(vcpu), 63)))
-> +        (cr3 & vcpu->arch.cr3_lm_rsvd_bits))
-> 
-> Set it in kvm_vcpu_after_set_cpuid, and clear the memory encryption bit in
-> kvm_x86_ops.vcpu_after_set_cpuid.
+--000000000000fe845205b3ecaa4c
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Yes. That should work. Will resubmit the patches. Thanks
+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
+2lQ6rFUP408r38ha7ieLj9GoHHitwSmKYwUIGObe2Y57xYNj855BF4wx44Z80uM2ugKCZwIDAQAB
+o4IBzzCCAcswDgYDVR0PAQH/BAQDAgWgMIGeBggrBgEFBQcBAQSBkTCBjjBNBggrBgEFBQcwAoZB
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NwZXJzb25hbHNpZ24yc2hhMmcz
+b2NzcC5jcnQwPQYIKwYBBQUHMAGGMWh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9nc3BlcnNv
+bmFsc2lnbjJzaGEyZzMwTQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0
+dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwRAYDVR0fBD0w
+OzA5oDegNYYzaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc3BlcnNvbmFsc2lnbjJzaGEyZzMu
+Y3JsMCMGA1UdEQQcMBqBGHZpa2FzLmd1cHRhQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEF
+BQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQUnmgVV8btvFtO
+FD3kFjPWxD/aB8MwDQYJKoZIhvcNAQELBQADggEBAGCcuBN7G3mbQ7xMF8g8Lpz6WE+UFmkSSqU3
+FZLC2I92SA5lRIthcdz4AEgte6ywnef3+2mG7HWMoQ1wriSG5qLppAD02Uku6yRD52Sn67DB2Ozk
+yhBJayurzUxN1+R5E/YZtj2fkNajS5+i85e83PZPvVJ8/WnseIADGvDoouWqK7mxU/p8hELdb3PW
+JH2nMg39SpVAwmRqfs6mYtenpMwKtQd9goGkIFXqdSvOPATkbS1YIGtU2byLK+/1rIWPoKNmRddj
+WOu/loxldI1sJa1tOHgtb93YpIe0HEmgxLGS0KEnbM+rn9vXNKCe+9n0PhxJIfqcf6rAtK0prRwr
+Y2MxggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNh
+MTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMCDDTZ
+lyNZkGMqSi5xbzANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgefd5Rm/9D0XwkLVN
+3l3ra+rBXSkr601WKuK52CGbJbQwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMjAxMTEyMTc1OTA2WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjALBglghkgB
+ZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG9w0BAQcw
+CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBABzGTCkqK29Hf8g4J6BvDhoAxWwNwjXN/OiB
+xkNiPlNRo2a42i8HoHrFYg/81tKlOB9k4ls3UiJC+AKMj6fl49PFcS5Isvxe6aG7LPqiu3Vq1nhc
+q++aCnLmOvGM8gItgRQQSs+j5WimBxcI7kPre2cQJTdy9hrvPfiEjhEbsl5/FCMM4IPfQS5Xn/H1
+q6VsgdOf0cxxTZYb0F8s6qhWEiVaGz8UePD78gRJvyGtnBWeTl5X2ad1+Wb1z0qZSNCSTkbSZc4r
+cFedlcpQzSBqv9QpPvfIzmEJhW2+3s6Ht+rcSzTv/tOEWi9epxiQuXZeOsmEVZBu4NkcOjF6iaTm
+T/E=
+--000000000000fe845205b3ecaa4c--
