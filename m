@@ -2,94 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E3AB2B16C6
-	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 08:57:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 178D22B19AE
+	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 12:11:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726172AbgKMH5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 02:57:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47515 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726147AbgKMH5T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 02:57:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605254237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MlQGsyq2bCGnymTW4K+HmwkU7Tbj8htCqx1DYSzCAfs=;
-        b=SU7yzjSsdaDCTIOPmzPX/Z7mvTk2GC3rVyLp8Go9iTXnKNEA7QmGp8n5N7VMbbJ+D2ZLlP
-        s2SAaPDEEM+ji4xSAZIoPFuaqLcfNGxxgdN1G57bl5M0rD1TyQPi5IpHdtJNE3am2T8q3u
-        map5rqsqmv9Zmu2JHT+0ht/D5NJPe24=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-7nE15YLKPGCh4xzMKLoISw-1; Fri, 13 Nov 2020 02:57:15 -0500
-X-MC-Unique: 7nE15YLKPGCh4xzMKLoISw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8563257245;
-        Fri, 13 Nov 2020 07:57:14 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C964E73660;
-        Fri, 13 Nov 2020 07:57:09 +0000 (UTC)
-Date:   Fri, 13 Nov 2020 08:57:06 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>, kvm <kvm@vger.kernel.org>,
+        id S1726591AbgKMLLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 06:11:17 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:38494 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726573AbgKMLJX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Nov 2020 06:09:23 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0ADB4tWw102474;
+        Fri, 13 Nov 2020 11:07:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
+ cc : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ExnlqPB2s2k0Bn6NwVn/D1kZ0VcR8wU+sL7wRM7sAbU=;
+ b=JpxBzXS4oSxAgKcDaPe+x7mCf1uKaG52fA/XVR7jT4niX4knB6vCS870jxZxljCSt0mN
+ 0tGoIDZkZh4tTrfgq+zLhxx0qMC94N7dEqXo3025pG3mP8351VtEOyXBQxuyDh/b6XFD
+ k6hvqTj+t1UqcE4YP1ZFLT/JBx3TnFTdabuJ/PvOiFAWLvjzfP1d923PjuQOklJd7eaI
+ uEC/Pi7swzyzo4UV4yryidCJnRRWmC5/p1pdSnMrer0z9ydd9R8QXj06KdnFmwK63CGO
+ I/RMv+t87SJKpr8NCFXefPpK0Y4+ANyEBxivHBLDesFYR5uDhUrxoYRBX+Sx3TyxFkzh Wg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 34nkhm9wq6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 13 Nov 2020 11:07:44 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0ADB6J4t132163;
+        Fri, 13 Nov 2020 11:07:43 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 34rtktdyxs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Nov 2020 11:07:43 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0ADB7aET021686;
+        Fri, 13 Nov 2020 11:07:36 GMT
+Received: from [10.175.169.218] (/10.175.169.218)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 13 Nov 2020 03:07:36 -0800
+From:   Joao Martins <joao.m.martins@oracle.com>
+Subject: Re: [PATCH] KVM: x86: clflushopt should be treated as a no-op by
+ emulation
+To:     David Edmondson <david.edmondson@oracle.com>, kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Nadav Amit <namit@cs.technion.ac.il>, x86@kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 02/11] KVM: selftests: Remove deadcode
-Message-ID: <20201113075706.6lteawooppchxsda@kamzik.brq.redhat.com>
-References: <20201111122636.73346-1-drjones@redhat.com>
- <20201111122636.73346-3-drjones@redhat.com>
- <20201112181921.GS26342@xz-x1>
- <CANgfPd_R_Rjn+QT_yiUwpCUK3TUfmhSN6XpZ5=L17mhrtMi7Zw@mail.gmail.com>
- <20201112185006.GY26342@xz-x1>
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        linux-kernel@vger.kernel.org
+References: <20201103120400.240882-1-david.edmondson@oracle.com>
+Message-ID: <2f1e370f-2dbf-2935-ba26-b6dacf6eec0d@oracle.com>
+Date:   Fri, 13 Nov 2020 11:07:31 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201112185006.GY26342@xz-x1>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201103120400.240882-1-david.edmondson@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9803 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 phishscore=0
+ suspectscore=1 bulkscore=0 malwarescore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011130068
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9803 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 priorityscore=1501
+ mlxscore=0 suspectscore=1 mlxlogscore=999 lowpriorityscore=0 spamscore=0
+ malwarescore=0 adultscore=0 clxscore=1011 bulkscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011130068
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 12, 2020 at 01:50:06PM -0500, Peter Xu wrote:
-> On Thu, Nov 12, 2020 at 10:34:11AM -0800, Ben Gardon wrote:
-> > I didn't review this patch closely enough, and assumed the clear dirty
-> > log was still being done because of
-> > afdb19600719 KVM: selftests: Use a single binary for dirty/clear log test
-> > 
-> > Looking back now, I see that that is not the case.
-> > 
-> > I'd like to retract my endorsement in that case. I'd prefer to leave
-> > the dead code in and I'll send another series to actually use it once
-> > this series is merged. I've already written the code to use it and
-> > time the clearing, so it seems a pity to remove it now.
-> > 
-> > Alternatively I could just revert this commit in that future series,
-> > though I suspect not removing the dead code would reduce the chances
-> > of merge conflicts. Either way works.
-> > 
-> > I can extend the dirty log mode functions from dirty_log_test for
-> > dirty_log_perf_test in that series too.
+On 11/3/20 12:04 PM, David Edmondson wrote:
+> The instruction emulator ignores clflush instructions, yet fails to
+> support clflushopt. Treat both similarly.
 > 
-> Or... we can just remove all the "#ifdef" lines but assuming clear dirty log is
-> always there? :) Assuming that is still acceptable as long as the test is
-> matching latest kernel which definitely has the clear dirty log capability.
+> Fixes: 13e457e0eebf ("KVM: x86: Emulator does not decode clflush well")
+> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+
+FWIW,
+
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+
+> ---
+>  arch/x86/kvm/emulate.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> It's kind of weird to test get-dirty-log perf without clear dirty log, since
-> again if anyone really cares about the perf of that, then imho they should
-> first switch to a new kernel with clear dirty log, rather than measuring the
-> world without clear dirty log..
->
-
-I have no opinion on this other than I'd prefer KVM selftests to not have
-deadcode. If it makes more sense to fix the deadcode by bringing it back
-to life than to drop the code, then please send patches to do that, at
-which point I'd be happy to recommend dropping this patch.
-
-Thanks,
-drew
-
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 0d917eb70319..56cae1ff9e3f 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -4046,6 +4046,12 @@ static int em_clflush(struct x86_emulate_ctxt *ctxt)
+>  	return X86EMUL_CONTINUE;
+>  }
+>  
+> +static int em_clflushopt(struct x86_emulate_ctxt *ctxt)
+> +{
+> +	/* emulating clflushopt regardless of cpuid */
+> +	return X86EMUL_CONTINUE;
+> +}
+> +
+>  static int em_movsxd(struct x86_emulate_ctxt *ctxt)
+>  {
+>  	ctxt->dst.val = (s32) ctxt->src.val;
+> @@ -4585,7 +4591,7 @@ static const struct opcode group11[] = {
+>  };
+>  
+>  static const struct gprefix pfx_0f_ae_7 = {
+> -	I(SrcMem | ByteOp, em_clflush), N, N, N,
+> +	I(SrcMem | ByteOp, em_clflush), I(SrcMem | ByteOp, em_clflushopt), N, N,
+>  };
+>  
+>  static const struct group_dual group15 = { {
+> 
