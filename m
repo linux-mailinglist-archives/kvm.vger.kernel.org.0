@@ -2,110 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A01D2B158C
-	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 06:31:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D3622B16BC
+	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 08:52:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726163AbgKMFbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 00:31:25 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61976 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726071AbgKMFbZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 00:31:25 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AD5VCGe098813;
-        Fri, 13 Nov 2020 00:31:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=M83UjsrNDgeM2HZvDszm+vdvsRyoGiWYM9osyiwugQA=;
- b=sk160YL77C/CndwEDpzwIpanWLqHmjuG8cyp26+NU0IYyBY95RHYPhmuUCyZmxw5rJGW
- l28IM5RKy48Biv9axGNMeuZtYdx/YUYd2lpafZeOoLFUv4MKr4LNt/fQB995O+fbE31r
- 3EcwsvkbNGdZUsNMXzlK3AIC4pTzRfCPwidpGYjWA5mleGLr3YCbiNwI+kUjROel5e8j
- 4Ukqtcix8k1XEDEFosPcCbBGG3RpToehbbQ2lOv6o0bHRN9I62caIP7Av8BNuh/GDbMX
- 8oKmBOD5rRZcfLz5EAfD8TS9ijOricTPG6VkQdiU9+h+mbkpWD9QrCL/7CnQ04CkTMEh HQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34skwg85s2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Nov 2020 00:31:14 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AD5VDsq098936;
-        Fri, 13 Nov 2020 00:31:13 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34skwg85q1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Nov 2020 00:31:13 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AD5RPst015068;
-        Fri, 13 Nov 2020 05:31:02 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 34nk78b8vq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Nov 2020 05:31:02 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AD5Uxn136110832
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Nov 2020 05:31:00 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1FF14C04E;
-        Fri, 13 Nov 2020 05:30:59 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8F38B4C044;
-        Fri, 13 Nov 2020 05:30:59 +0000 (GMT)
-Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Nov 2020 05:30:59 +0000 (GMT)
-Received: from [9.81.218.112] (unknown [9.81.218.112])
-        (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+        id S1726172AbgKMHwe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 02:52:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25251 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725866AbgKMHwe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 02:52:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605253952;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=T2tLd9EHV9oYJEl4B/bjBLxpB/1xyR4rLIQOw+DQNAc=;
+        b=fbwevVqy7ufMmkbJgNC0GgkesVAfbmOs+klNF0nztn1txqRdn5bbkQdGCjv7zpEnz56qwP
+        VZVuWUfrjH4T46fn4+5CjQTy8ikxQ3+kEUyE8lvVFTpfR+QxWFpZWWEcz4sZPmegDG+sMe
+        TR4HxWEYWqR+mOkYHcnCMgUSIHo0R0U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-373-5NU3Dyk4OCGNlV5K7zZDYg-1; Fri, 13 Nov 2020 02:52:30 -0500
+X-MC-Unique: 5NU3Dyk4OCGNlV5K7zZDYg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 4953AA0114;
-        Fri, 13 Nov 2020 16:30:57 +1100 (AEDT)
-Subject: Re: [PATCH kernel] vfio_pci_nvlink2: Do not attempt NPU2 setup on old
- P8's NPU
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        David Gibson <david@gibson.dropbear.id.au>
-References: <20201113050632.74124-1-aik@ozlabs.ru>
-From:   Andrew Donnellan <ajd@linux.ibm.com>
-Message-ID: <0b8ceab2-e304-809f-be3c-512b28b25852@linux.ibm.com>
-Date:   Fri, 13 Nov 2020 16:30:56 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6B8518CB73C;
+        Fri, 13 Nov 2020 07:52:28 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 40A9F1C4;
+        Fri, 13 Nov 2020 07:52:26 +0000 (UTC)
+Date:   Fri, 13 Nov 2020 08:52:23 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, bgardon@google.com
+Subject: Re: [PATCH v2 01/11] KVM: selftests: Update .gitignore
+Message-ID: <20201113075223.6y3u77jjl3syupvf@kamzik.brq.redhat.com>
+References: <20201111122636.73346-1-drjones@redhat.com>
+ <20201111122636.73346-2-drjones@redhat.com>
+ <20201112181201.GR26342@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20201113050632.74124-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-13_03:2020-11-12,2020-11-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 spamscore=0 clxscore=1011 mlxlogscore=793 mlxscore=0
- malwarescore=0 suspectscore=8 phishscore=0 priorityscore=1501
- impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2011130029
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201112181201.GR26342@xz-x1>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/11/20 4:06 pm, Alexey Kardashevskiy wrote:
-> We execute certain NPU2 setup code (such as mapping an LPID to a device
-> in NPU2) unconditionally if an Nvlink bridge is detected. However this
-> cannot succeed on P8+ machines as the init helpers return an error other
-> than ENODEV which means the device is there is and setup failed so
-> vfio_pci_enable() fails and pass through is not possible.
+On Thu, Nov 12, 2020 at 01:12:01PM -0500, Peter Xu wrote:
+> On Wed, Nov 11, 2020 at 01:26:26PM +0100, Andrew Jones wrote:
+> > Add x86_64/tsc_msrs_test and remove clear_dirty_log_test.
+> > 
+> > Reviewed-by: Ben Gardon <bgardon@google.com>
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  tools/testing/selftests/kvm/.gitignore | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> > index 7a2c242b7152..ceff9f4c1781 100644
+> > --- a/tools/testing/selftests/kvm/.gitignore
+> > +++ b/tools/testing/selftests/kvm/.gitignore
+> > @@ -18,13 +18,13 @@
+> >  /x86_64/vmx_preemption_timer_test
+> >  /x86_64/svm_vmcall_test
+> >  /x86_64/sync_regs_test
+> > +/x86_64/tsc_msrs_test
+> >  /x86_64/vmx_apic_access_test
+> >  /x86_64/vmx_close_while_nested_test
+> >  /x86_64/vmx_dirty_log_test
+> >  /x86_64/vmx_set_nested_state_test
+> >  /x86_64/vmx_tsc_adjust_test
+> >  /x86_64/xss_msr_test
+> > -/clear_dirty_log_test
+> >  /demand_paging_test
+> >  /dirty_log_test
+> >  /dirty_log_perf_test
 > 
-> This changes the two NPU2 related init helpers to return -ENODEV if
-> there is no "memory-region" device tree property as this is
-> the distinction between NPU and NPU2.
-> 
-> Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] subdriver")
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> This seems to conflict with another patch that are already on kvm/queue, so
+> this series may need a rebase (and, seems this is not the only conflict)...
+>
 
-Should this be Cc: stable?
+It looks like Paolo added "selftests: kvm: keep .gitignore add to date",
+which does what this patch does plus re-alphabetizes everything.
 
+So this patch can be dropped.
 
-Andrew
+Thanks,
+drew
 
--- 
-Andrew Donnellan              OzLabs, ADL Canberra
-ajd@linux.ibm.com             IBM Australia Limited
