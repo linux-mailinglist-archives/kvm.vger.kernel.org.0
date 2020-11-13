@@ -2,195 +2,398 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FB5A2B20A8
-	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 17:42:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E756C2B20AF
+	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 17:44:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726301AbgKMQmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 11:42:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53299 "EHLO
+        id S1726327AbgKMQo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 11:44:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42385 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726184AbgKMQmS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 11:42:18 -0500
+        by vger.kernel.org with ESMTP id S1726248AbgKMQo3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 11:44:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605285736;
+        s=mimecast20190719; t=1605285866;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zvvxVXyjIX2eJdSXRCk44IL0iumUPpGs0fcNEGOV2cM=;
-        b=S56dXqKAqjUG3WQSgOZa7ZXv2rLz49ie00szGGTEzCycv3M4jLHR0K2eNGjstm2eXIbTbK
-        0d9ePDt8gQ2NoZEyFp/PCUfyhj2DOO6yo9EtxJqxZLHswAhjBDHkwKgxg43+42XDQ6KHRK
-        CpXjEA+iZB8tMbT+13lekFvbCSKKSoU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-x9tUmGaXMv-YAMp5G1QU5w-1; Fri, 13 Nov 2020 11:42:15 -0500
-X-MC-Unique: x9tUmGaXMv-YAMp5G1QU5w-1
-Received: by mail-wm1-f69.google.com with SMTP id j62so2648551wma.4
-        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 08:42:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zvvxVXyjIX2eJdSXRCk44IL0iumUPpGs0fcNEGOV2cM=;
-        b=GEOq/LaeBY/0nGBW485LYpVLutVJfuMyfGVN/6qQcFOxB76SrswIhhclWpZIglq9pS
-         +WTdYNDelkDuKhhkfSO4JTQ4F9htpAM2+cj3Xky6NtMwSk3BVKpETInx1NLEtHYz2pJG
-         a0pQvPePWDrgMxJJLR9S60B2oyfH7ee2uffhQPbiL40fVV6++ZFTMu3UAlsxtYH5lG8L
-         ORNajs6hNPtDvoEq905GBD8A4mfnn6hb3eIHQGkXZ7XdrmXrPbmPx5stSBTBkLP0CPPO
-         Rxcxi27Jj7SgqjISugZV2boBtjStGB9VlcXNo4YLiBB6z+uT4wVvsxrWn5e73s57eC+3
-         i3mQ==
-X-Gm-Message-State: AOAM5302I4eEfy7TBg/eNMv7UjKw289dHhEq0XDpviG4q92tRKIJF0D4
-        ggahtqWiL66FEMkYoiKkj28CXec693zarWRF3S4yAMxYQVs18VMz/DLUwPBF7VbbAmd5FgctAyh
-        B/3pzE46s/WtU
-X-Received: by 2002:a05:6000:4c:: with SMTP id k12mr4606635wrx.59.1605285728803;
-        Fri, 13 Nov 2020 08:42:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz10oycC8puBQI1QGnBTreDK7VTSJduLIIbz2lFtfHyIeeLfngPchj8I/uQYXFyynI3PnHujw==
-X-Received: by 2002:a05:6000:4c:: with SMTP id k12mr4606220wrx.59.1605285723669;
-        Fri, 13 Nov 2020 08:42:03 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p3sm5435093wrs.50.2020.11.13.08.42.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Nov 2020 08:42:02 -0800 (PST)
-Subject: Re: [PATCH v2 06/11] KVM: selftests: dirty_log_test: Remove create_vm
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, bgardon@google.com,
-        peterx@redhat.com
-References: <20201111122636.73346-1-drjones@redhat.com>
- <20201111122636.73346-7-drjones@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5a580018-21ea-1222-b3aa-a6de284596ea@redhat.com>
-Date:   Fri, 13 Nov 2020 17:42:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        bh=uqhZbVq8cFl7dTSge6GZgDoRr5VLrSDa1e6v6Le4CpY=;
+        b=ZUsSM/9enNAv85OEYMHjquxXua694kr7hgyovN+hcc0w2TtGWL+WueUaQNHkH6Sw069iO8
+        rAj/antYWcPR+lw7DuMGYx9x3Yx0oIGNw2f0ZR5rvTLjB/vZfLQWi5ORpUdoFzc7bdTuKS
+        Zcwhcha8tZCAbY5RVXF6m+v4MXA8Bps=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-v4jzLLaTOu667vcNCpidtw-1; Fri, 13 Nov 2020 11:44:22 -0500
+X-MC-Unique: v4jzLLaTOu667vcNCpidtw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ABD1803F6A;
+        Fri, 13 Nov 2020 16:44:20 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA71F5B4C3;
+        Fri, 13 Nov 2020 16:44:19 +0000 (UTC)
+Date:   Fri, 13 Nov 2020 09:44:17 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <kwankhede@nvidia.com>, <wu.wubin@huawei.com>,
+        <maoming.maoming@huawei.com>, <xieyingtai@huawei.com>,
+        <lizhengui@huawei.com>, <wubinfeng@huawei.com>
+Subject: Re: [PATCH] vfio iommu type1: Improve vfio_iommu_type1_pin_pages
+ performance
+Message-ID: <20201113094417.51d73615@w520.home>
+In-Reply-To: <2553f102-de17-b23b-4cd8-fefaf2a04f24@huawei.com>
+References: <2553f102-de17-b23b-4cd8-fefaf2a04f24@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201111122636.73346-7-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/20 13:26, Andrew Jones wrote:
-> Use vm_create_with_vcpus instead of create_vm and do
-> some minor cleanups around it.
+On Tue, 10 Nov 2020 21:42:33 +0800
+"xuxiaoyang (C)" <xuxiaoyang2@huawei.com> wrote:
+
+> vfio_iommu_type1_pin_pages is very inefficient because
+> it is processed page by page when calling vfio_pin_page_external.
+> Added contiguous_vaddr_get_pfn to process continuous pages
+> to reduce the number of loops, thereby improving performance.
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Xiaoyang Xu <xuxiaoyang2@huawei.com>
 > ---
->   tools/testing/selftests/kvm/dirty_log_test.c | 56 ++++++--------------
->   1 file changed, 16 insertions(+), 40 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> index 1b7375d2acea..2e0dcd453ef0 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -5,8 +5,6 @@
->    * Copyright (C) 2018, Red Hat, Inc.
->    */
->   
-> -#define _GNU_SOURCE /* for program_invocation_name */
-> -
->   #include <stdio.h>
->   #include <stdlib.h>
->   #include <pthread.h>
-> @@ -20,6 +18,9 @@
->   
->   #define VCPU_ID				1
->   
-> +#define DIRTY_MEM_BITS			30 /* 1G */
-> +#define DIRTY_MEM_SIZE			(1UL << 30)
-> +
->   /* The memory slot index to track dirty pages */
->   #define TEST_MEM_SLOT_INDEX		1
->   
-> @@ -353,27 +354,6 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
->   	}
->   }
->   
-> -static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
-> -				uint64_t extra_mem_pages, void *guest_code)
-> -{
-> -	struct kvm_vm *vm;
-> -	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
-> -
-> -	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-> -
-> -	vm = vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
-> -	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
-> -#ifdef __x86_64__
-> -	vm_create_irqchip(vm);
-> -#endif
-> -	log_mode_create_vm_done(vm);
-> -	vm_vcpu_add_default(vm, vcpuid, guest_code);
-> -	return vm;
-> -}
-> -
-> -#define DIRTY_MEM_BITS 30 /* 1G */
-> -#define PAGE_SHIFT_4K  12
-> -
->   struct test_params {
->   	unsigned long iterations;
->   	unsigned long interval;
-> @@ -393,43 +373,39 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   		return;
->   	}
->   
-> +	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-> +
->   	/*
->   	 * We reserve page table for 2 times of extra dirty mem which
-> -	 * will definitely cover the original (1G+) test range.  Here
-> -	 * we do the calculation with 4K page size which is the
-> -	 * smallest so the page number will be enough for all archs
-> -	 * (e.g., 64K page size guest will need even less memory for
-> -	 * page tables).
-> +	 * will definitely cover the original (1G+) test range.
->   	 */
-> -	vm = create_vm(mode, VCPU_ID,
-> -		       2ul << (DIRTY_MEM_BITS - PAGE_SHIFT_4K),
-> -		       guest_code);
-> +	vm = vm_create_with_vcpus(mode, 1,
-> +			vm_calc_num_guest_pages(mode, DIRTY_MEM_SIZE * 2),
-> +			0, guest_code, (uint32_t []){ VCPU_ID });
-> +
-> +	log_mode_create_vm_done(vm);
->   
->   	guest_page_size = vm_get_page_size(vm);
-> +	host_page_size = getpagesize();
-> +
->   	/*
->   	 * A little more than 1G of guest page sized pages.  Cover the
->   	 * case where the size is not aligned to 64 pages.
->   	 */
-> -	guest_num_pages = (1ul << (DIRTY_MEM_BITS -
-> -				   vm_get_page_shift(vm))) + 3;
-> -	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
-> -
-> -	host_page_size = getpagesize();
-> +	guest_num_pages = vm_adjust_num_guest_pages(mode,
-> +				(1ul << (DIRTY_MEM_BITS - vm_get_page_shift(vm))) + 3);
->   	host_num_pages = vm_num_host_pages(mode, guest_num_pages);
->   
->   	if (!p->phys_offset) {
-> -		guest_test_phys_mem = (vm_get_max_gfn(vm) -
-> -				       guest_num_pages) * guest_page_size;
-> +		guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) * guest_page_size;
->   		guest_test_phys_mem &= ~(host_page_size - 1);
->   	} else {
->   		guest_test_phys_mem = p->phys_offset;
->   	}
-> -
->   #ifdef __s390x__
->   	/* Align to 1M (segment size) */
->   	guest_test_phys_mem &= ~((1 << 20) - 1);
->   #endif
-> -
->   	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
->   
->   	bmap = bitmap_alloc(host_num_pages);
-> 
+>  drivers/vfio/vfio_iommu_type1.c | 241 ++++++++++++++++++++++++++++----
+>  1 file changed, 214 insertions(+), 27 deletions(-)
 
-This one (even after fixing conflicts) breaks the dirty ring test.
+Sorry for my previous misunderstanding of the logic here.  Still, this
+adds a lot of complexity, can you quantify the performance improvement
+you're seeing?  Would it instead be more worthwhile to support an
+interface that pins based on an iova and range?  Further comments below.
 
-Paolo
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 67e827638995..935f80807527 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -628,6 +628,206 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+>  	return unlocked;
+>  }
+> 
+> +static int contiguous_vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+> +				    int prot, long npage, unsigned long *phys_pfn)
+> +{
+> +	struct page **pages = NULL;
+> +	unsigned int flags = 0;
+> +	int i, ret;
+> +
+> +	pages = kvmalloc_array(npage, sizeof(struct page *), GFP_KERNEL);
+> +	if (!pages)
+> +		return -ENOMEM;
+> +
+> +	if (prot & IOMMU_WRITE)
+> +		flags |= FOLL_WRITE;
+> +
+> +	mmap_read_lock(mm);
+> +	ret = pin_user_pages_remote(mm, vaddr, npage, flags | FOLL_LONGTERM,
+> +				    pages, NULL, NULL);
+
+This is essentially the root of the performance improvement claim,
+right?  ie. we're pinning a range of pages rather than individually.
+Unfortunately it means we also add a dynamic memory allocation even
+when npage=1.
+
+
+> +	mmap_read_unlock(mm);
+> +
+> +	for (i = 0; i < ret; i++)
+> +		*(phys_pfn + i) = page_to_pfn(pages[i]);
+> +
+> +	kvfree(pages);
+> +
+> +	return ret;
+> +}
+> +
+> +static int vfio_pin_contiguous_pages_external(struct vfio_iommu *iommu,
+> +				    struct vfio_dma *dma,
+> +				    unsigned long *user_pfn,
+> +				    int npage, unsigned long *phys_pfn,
+> +				    bool do_accounting)
+> +{
+> +	int ret, i, j, lock_acct = 0;
+> +	unsigned long remote_vaddr;
+> +	dma_addr_t iova;
+> +	struct mm_struct *mm;
+> +	struct vfio_pfn *vpfn;
+> +
+> +	mm = get_task_mm(dma->task);
+> +	if (!mm)
+> +		return -ENODEV;
+> +
+> +	iova = user_pfn[0] << PAGE_SHIFT;
+> +	remote_vaddr = dma->vaddr + iova - dma->iova;
+> +	ret = contiguous_vaddr_get_pfn(mm, remote_vaddr, dma->prot,
+> +					    npage, phys_pfn);
+> +	mmput(mm);
+> +	if (ret <= 0)
+> +		return ret;
+> +
+> +	npage = ret;
+> +	for (i = 0; i < npage; i++) {
+> +		iova = user_pfn[i] << PAGE_SHIFT;
+> +		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> +		if (ret)
+> +			goto unwind;
+> +
+> +		if (!is_invalid_reserved_pfn(phys_pfn[i]))
+> +			lock_acct++;
+> +
+> +		if (iommu->dirty_page_tracking) {
+> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+> +
+> +			/*
+> +			 * Bitmap populated with the smallest supported page
+> +			 * size
+> +			 */
+> +			bitmap_set(dma->bitmap,
+> +				   (iova - dma->iova) >> pgshift, 1);
+> +		}
+
+It doesn't make sense that we wouldn't also optimize this to simply set
+npage bits.  There's also no unwind for this.
+
+> +	}
+> +
+> +	if (do_accounting) {
+> +		ret = vfio_lock_acct(dma, lock_acct, true);
+> +		if (ret) {
+> +			if (ret == -ENOMEM)
+> +				pr_warn("%s: Task %s (%d) RLIMIT_MEMLOCK (%ld) exceeded\n",
+> +					__func__, dma->task->comm, task_pid_nr(dma->task),
+> +					task_rlimit(dma->task, RLIMIT_MEMLOCK));
+> +			goto unwind;
+> +		}
+> +	}
+
+This algorithm allows pinning many more pages in advance of testing
+whether we've exceeded the task locked memory limit than the per page
+approach.
+
+
+> +
+> +	return i;
+> +unwind:
+> +	for (j = 0; j < npage; j++) {
+> +		put_pfn(phys_pfn[j], dma->prot);
+> +		phys_pfn[j] = 0;
+> +	}
+> +
+> +	for (j = 0; j < i; j++) {
+> +		iova = user_pfn[j] << PAGE_SHIFT;
+> +		vpfn = vfio_find_vpfn(dma, iova);
+> +		if (vpfn)
+
+Seems like not finding a vpfn would be an error.
+
+> +			vfio_remove_from_pfn_list(dma, vpfn);
+
+It seems poor form not to use vfio_iova_put_vfio_pfn() here even if we
+know we hold the only reference.
+
+
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int vfio_iommu_type1_pin_contiguous_pages(struct vfio_iommu *iommu,
+> +					    struct vfio_dma *dma,
+> +					    unsigned long *user_pfn,
+> +					    int npage, unsigned long *phys_pfn,
+> +					    bool do_accounting)
+> +{
+> +	int ret, i, j;
+> +	unsigned long remote_vaddr;
+> +	dma_addr_t iova;
+> +
+> +	ret = vfio_pin_contiguous_pages_external(iommu, dma, user_pfn, npage,
+> +				phys_pfn, do_accounting);
+> +	if (ret == npage)
+> +		return ret;
+> +
+> +	if (ret < 0)
+> +		ret = 0;
+
+
+I'm lost, why do we need the single page iteration below??
+
+> +	for (i = ret; i < npage; i++) {
+> +		iova = user_pfn[i] << PAGE_SHIFT;
+> +		remote_vaddr = dma->vaddr + iova - dma->iova;
+> +
+> +		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
+> +			    do_accounting);
+> +		if (ret)
+> +			goto pin_unwind;
+> +
+> +		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> +		if (ret) {
+> +			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
+> +				vfio_lock_acct(dma, -1, true);
+> +			goto pin_unwind;
+> +		}
+> +
+> +		if (iommu->dirty_page_tracking) {
+> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+> +
+> +			/*
+> +			 * Bitmap populated with the smallest supported page
+> +			 * size
+> +			 */
+> +			bitmap_set(dma->bitmap,
+> +					   (iova - dma->iova) >> pgshift, 1);
+> +		}
+> +	}
+> +
+> +	return i;
+> +
+> +pin_unwind:
+> +	phys_pfn[i] = 0;
+> +	for (j = 0; j < i; j++) {
+> +		dma_addr_t iova;
+> +
+> +		iova = user_pfn[j] << PAGE_SHIFT;
+> +		vfio_unpin_page_external(dma, iova, do_accounting);
+> +		phys_pfn[j] = 0;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int vfio_iommu_type1_get_contiguous_pages_length(struct vfio_iommu *iommu,
+> +				    unsigned long *user_pfn, int npage, int prot)
+> +{
+> +	struct vfio_dma *dma_base;
+> +	int i;
+> +	dma_addr_t iova;
+> +	struct vfio_pfn *vpfn;
+> +
+> +	if (npage <= 1)
+> +		return npage;
+> +
+> +	iova = user_pfn[0] << PAGE_SHIFT;
+> +	dma_base = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> +	if (!dma_base)
+> +		return -EINVAL;
+> +
+> +	if ((dma_base->prot & prot) != prot)
+> +		return -EPERM;
+> +
+> +	for (i = 1; i < npage; i++) {
+> +		iova = user_pfn[i] << PAGE_SHIFT;
+> +
+> +		if (iova >= dma_base->iova + dma_base->size ||
+> +				iova + PAGE_SIZE <= dma_base->iova)
+> +			break;
+> +
+> +		vpfn = vfio_iova_get_vfio_pfn(dma_base, iova);
+> +		if (vpfn) {
+> +			vfio_iova_put_vfio_pfn(dma_base, vpfn);
+
+Why not just use vfio_find_vpfn() rather than get+put?
+
+> +			break;
+> +		}
+> +
+> +		if (user_pfn[i] != user_pfn[0] + i)
+
+Shouldn't this be the first test?
+
+> +			break;
+> +	}
+> +	return i;
+> +}
+> +
+>  static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  				      struct iommu_group *iommu_group,
+>  				      unsigned long *user_pfn,
+> @@ -637,9 +837,9 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  	struct vfio_iommu *iommu = iommu_data;
+>  	struct vfio_group *group;
+>  	int i, j, ret;
+> -	unsigned long remote_vaddr;
+>  	struct vfio_dma *dma;
+>  	bool do_accounting;
+> +	int contiguous_npage;
+> 
+>  	if (!iommu || !user_pfn || !phys_pfn)
+>  		return -EINVAL;
+> @@ -663,7 +863,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  	 */
+>  	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
+> 
+> -	for (i = 0; i < npage; i++) {
+> +	for (i = 0; i < npage; i += contiguous_npage) {
+>  		dma_addr_t iova;
+>  		struct vfio_pfn *vpfn;
+> 
+> @@ -682,31 +882,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+>  		if (vpfn) {
+>  			phys_pfn[i] = vpfn->pfn;
+> -			continue;
+> -		}
+> -
+> -		remote_vaddr = dma->vaddr + (iova - dma->iova);
+> -		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
+> -					     do_accounting);
+> -		if (ret)
+> -			goto pin_unwind;
+> -
+> -		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> -		if (ret) {
+> -			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
+> -				vfio_lock_acct(dma, -1, true);
+> -			goto pin_unwind;
+> -		}
+> -
+> -		if (iommu->dirty_page_tracking) {
+> -			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+> -
+> -			/*
+> -			 * Bitmap populated with the smallest supported page
+> -			 * size
+> -			 */
+> -			bitmap_set(dma->bitmap,
+> -				   (iova - dma->iova) >> pgshift, 1);
+> +			contiguous_npage = 1;
+> +		} else {
+> +			ret = vfio_iommu_type1_get_contiguous_pages_length(iommu,
+> +					&user_pfn[i], npage - i, prot);
+
+
+It doesn't make a lot of sense to me that this isn't more integrated
+into the base function.  For example, we're passing &user_pfn[i] for
+which we've already converted to an iova, found the vfio_dma associated
+to that iova, and checked the protection.  This callout does all of
+that again on the same.
+
+> +			if (ret < 0)
+> +				goto pin_unwind;
+> +
+> +			ret = vfio_iommu_type1_pin_contiguous_pages(iommu,
+> +					dma, &user_pfn[i], ret, &phys_pfn[i], do_accounting);
+> +			if (ret < 0)
+> +				goto pin_unwind;
+> +			contiguous_npage = ret;
+>  		}
+>  	}
+>  	ret = i;
+
+
+This all seems _way_ more complicated than it needs to be, there are
+too many different ways to flow through this code and claims of a
+performance improvement are not substantiated with evidence.  The type1
+code is already too fragile.  Please simplify and justify.  Thanks,
+
+Alex
 
