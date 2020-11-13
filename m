@@ -2,94 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 757BD2B1BEC
-	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 14:32:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1C3A2B1D98
+	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 15:39:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726487AbgKMNcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 08:32:43 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:51944 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726324AbgKMNcn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Nov 2020 08:32:43 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1605274360;
+        id S1726587AbgKMOjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 09:39:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33837 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726324AbgKMOjp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 09:39:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605278383;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TYrlC4Z3oyV9cVDb0VElXHBAri5cQqzUS+x0zq654No=;
-        b=o45t2GadHfP+M9w7dgKn+A/+UbJfJNms1E8KxSAdpKBG0H3tUgOgUHIvOYmdKQNiini+GQ
-        7YQWs+FtCEUfl3gR3FJW39t/T1MG5y4dCkpHowGjmOfhp6iw/1isx1HIkM1P6UXHu/43Oo
-        R34U5hV5hnDSNgBFbfvuP1zeEpbSSeNcX7yV4fx6MCXk+58KxU3nmbLkJJA+iDNBt+La3n
-        RVZIxcUw8NfGsR9egcUY0L0Al7wX7UzM6MrVSaR+cqf2TpXwIB+bynFT9Zf0zSlaH4zJCV
-        WBjIYE2YT+fer10iN2qfLrD4o+0QZI6Y+3BI1wzV1Ib5g2IAy5IkDrLAlQxGzA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1605274360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TYrlC4Z3oyV9cVDb0VElXHBAri5cQqzUS+x0zq654No=;
-        b=W/ejevJwovY97xrykdBV3K7LOG7irV5AjqOSvAym9IboHr6RFmx8bfXzYHsf3rSe3y5Gud
-        eRVbzLgsOsaeYRAg==
-To:     "Tian\, Kevin" <kevin.tian@intel.com>,
-        "Wilk\, Konrad" <konrad.wilk@oracle.com>
-Cc:     "Raj\, Ashok" <ashok.raj@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Williams\, Dan J" <dan.j.williams@intel.com>,
-        "Jiang\, Dave" <dave.jiang@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        "vkoul\@kernel.org" <vkoul@kernel.org>,
-        "Dey\, Megha" <megha.dey@intel.com>,
-        "maz\@kernel.org" <maz@kernel.org>,
-        "bhelgaas\@google.com" <bhelgaas@google.com>,
-        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
-        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu\, Yi L" <yi.l.liu@intel.com>,
-        "Lu\, Baolu" <baolu.lu@intel.com>,
-        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck\, Tony" <tony.luck@intel.com>,
-        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
-        "parav\@mellanox.com" <parav@mellanox.com>,
-        "rafael\@kernel.org" <rafael@kernel.org>,
-        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain\, Mona" <mona.hossain@intel.com>,
-        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>
-Subject: RE: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-In-Reply-To: <MWHPR11MB1645F27808F1F5E79646A3A88CE60@MWHPR11MB1645.namprd11.prod.outlook.com>
-References: <20201107001207.GA2620339@nvidia.com> <87pn4nk7nn.fsf@nanos.tec.linutronix.de> <20201108235852.GC32074@araj-mobl1.jf.intel.com> <874klykc7h.fsf@nanos.tec.linutronix.de> <20201109173034.GG2620339@nvidia.com> <87pn4mi23u.fsf@nanos.tec.linutronix.de> <20201110051412.GA20147@otc-nc-03> <875z6dik1a.fsf@nanos.tec.linutronix.de> <20201110141323.GB22336@otc-nc-03> <MWHPR11MB16455B594B1B48B6E3C97C108CE80@MWHPR11MB1645.namprd11.prod.outlook.com> <20201112193253.GG19638@char.us.oracle.com> <877dqqmc2h.fsf@nanos.tec.linutronix.de> <MWHPR11MB1645F27808F1F5E79646A3A88CE60@MWHPR11MB1645.namprd11.prod.outlook.com>
-Date:   Fri, 13 Nov 2020 14:32:40 +0100
-Message-ID: <874kltmlfr.fsf@nanos.tec.linutronix.de>
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=2hSIc4NCwTfXqPZCANFvroqBUVVU/829trViCkGb+q8=;
+        b=MRkGO6+oPuzfqyTelONQmMPs8VLRcxOgxK8jIECifnWZ2r/PRWFYmj/GAqWgt7NLJ+iODd
+        wxdZpiqH0F3/DTD5iBrmJu7pvZwHTFpYwnB3qmyIIQ/KnvtYycpXWuiObmMHaCks/UGg+z
+        Q+JVxX5qIM3hr5GH9fda3WudZNCWG8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-5k4SgpMwM1mmUUke_j-e8w-1; Fri, 13 Nov 2020 09:39:41 -0500
+X-MC-Unique: 5k4SgpMwM1mmUUke_j-e8w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 759FB1030988
+        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 14:39:39 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3643460C11
+        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 14:39:39 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] x86: svm: clean up CR3 tests
+Date:   Fri, 13 Nov 2020 09:39:38 -0500
+Message-Id: <20201113143938.1050040-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 13 2020 at 02:42, Kevin Tian wrote:
->> From: Thomas Gleixner <tglx@linutronix.de>
-> CPUID#1_ECX is a x86 thing. Do we need to figure out probably_on_
-> bare_metal for every architecture altogether, or is it OK to just
-> handle it for x86 arch at this stage? Based on previous discussions 
-> ims is just one piece of multiple technologies to enable SIOV-like
-> scalability. Ideally arch-specific enablement beyond ims (e.g. the 
-> IOMMU part) will be required for such scaled usage thus we 
-> may just leave ims disabled for non-x86 and wait until that time to 
-> figure out arch specific probably_on_bare_metal?
+Do not execute the same test repeatedly, and run PCIDE=0 test
+even if the PCID bit is set in CPUID.  Note which CR4 configuration
+is in use for each test.
 
-Of course is this not only an x86 problem. Every architecture which
-supports virtualization has the same issue. ARM(64) has no way to tell
-for sure whether the machine runs bare metal either. No idea about the
-other architectures.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/svm_tests.c | 41 +++++++++++++++++------------------------
+ 1 file changed, 17 insertions(+), 24 deletions(-)
 
-Thanks,
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 2ad09b1..dc86efd 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -2065,7 +2065,7 @@ static void basic_guest_main(struct svm_test *test)
+ }
+ 
+ #define SVM_TEST_CR_RESERVED_BITS(start, end, inc, cr, val, resv_mask,	\
+-				  exit_code)				\
++				  exit_code, test_name)			\
+ {									\
+ 	u64 tmp, mask;							\
+ 	int i;								\
+@@ -2085,7 +2085,7 @@ static void basic_guest_main(struct svm_test *test)
+ 		case 4:							\
+ 			vmcb->save.cr4 = tmp;				\
+ 		}							\
+-		report(svm_vmrun() == exit_code, "Test CR%d %d:%d: %lx",\
++		report(svm_vmrun() == exit_code, "Test CR%d " test_name "%d:%d: %lx",\
+ 		    cr, end, start, tmp);				\
+ 	}								\
+ }
+@@ -2208,7 +2208,7 @@ static void test_cr3(void)
+ 	u64 cr3_saved = vmcb->save.cr3;
+ 
+ 	SVM_TEST_CR_RESERVED_BITS(0, 63, 1, 3, cr3_saved,
+-	    SVM_CR3_LONG_MBZ_MASK, SVM_EXIT_ERR);
++	    SVM_CR3_LONG_MBZ_MASK, SVM_EXIT_ERR, "");
+ 
+ 	vmcb->save.cr3 = cr3_saved & ~SVM_CR3_LONG_MBZ_MASK;
+ 	report(svm_vmrun() == SVM_EXIT_VMMCALL, "Test CR3 63:0: %lx",
+@@ -2216,7 +2216,7 @@ static void test_cr3(void)
+ 
+ 	/*
+ 	 * CR3 non-MBZ reserved bits based on different modes:
+-	 *   [11:5] [2:0] - long mode
++	 *   [11:5] [2:0] - long mode (PCIDE=0)
+ 	 *          [2:0] - PAE legacy mode
+ 	 */
+ 	u64 cr4_saved = vmcb->save.cr4;
+@@ -2228,26 +2228,23 @@ static void test_cr3(void)
+ 	if (this_cpu_has(X86_FEATURE_PCID)) {
+ 		vmcb->save.cr4 = cr4_saved | X86_CR4_PCIDE;
+ 		SVM_TEST_CR_RESERVED_BITS(0, 11, 1, 3, cr3_saved,
+-		    SVM_CR3_LONG_RESERVED_MASK, SVM_EXIT_VMMCALL);
++		    SVM_CR3_LONG_RESERVED_MASK, SVM_EXIT_VMMCALL, "(PCIDE=1) ");
+ 
+ 		vmcb->save.cr3 = cr3_saved & ~SVM_CR3_LONG_RESERVED_MASK;
+ 		report(svm_vmrun() == SVM_EXIT_VMMCALL, "Test CR3 63:0: %lx",
+ 		    vmcb->save.cr3);
+-	} else {
++	}
+ 
+-		vmcb->save.cr4 = cr4_saved & ~X86_CR4_PCIDE;
++	vmcb->save.cr4 = cr4_saved & ~X86_CR4_PCIDE;
+ 
+-		/* Clear P (Present) bit in NPT in order to trigger #NPF */
+-		pdpe[0] &= ~1ULL;
++	/* Clear P (Present) bit in NPT in order to trigger #NPF */
++	pdpe[0] &= ~1ULL;
+ 
+-		SVM_TEST_CR_RESERVED_BITS(0, 11, 1, 3, cr3_saved,
+-		    SVM_CR3_LONG_RESERVED_MASK, SVM_EXIT_NPF);
++	SVM_TEST_CR_RESERVED_BITS(0, 11, 1, 3, cr3_saved,
++	    SVM_CR3_LONG_RESERVED_MASK, SVM_EXIT_NPF, "(PCIDE=0) ");
+ 
+-		pdpe[0] |= 1ULL;
+-		vmcb->save.cr3 = cr3_saved & ~SVM_CR3_LONG_RESERVED_MASK;
+-		report(svm_vmrun() == SVM_EXIT_VMMCALL, "Test CR3 63:0: %lx",
+-		    vmcb->save.cr3);
+-	}
++	pdpe[0] |= 1ULL;
++	vmcb->save.cr3 = cr3_saved;
+ 
+ 	/*
+ 	 * PAE legacy
+@@ -2255,13 +2252,9 @@ static void test_cr3(void)
+ 	pdpe[0] &= ~1ULL;
+ 	vmcb->save.cr4 = cr4_saved | X86_CR4_PAE;
+ 	SVM_TEST_CR_RESERVED_BITS(0, 2, 1, 3, cr3_saved,
+-	    SVM_CR3_PAE_LEGACY_RESERVED_MASK, SVM_EXIT_NPF);
++	    SVM_CR3_PAE_LEGACY_RESERVED_MASK, SVM_EXIT_NPF, "(PAE) ");
+ 
+ 	pdpe[0] |= 1ULL;
+-	vmcb->save.cr3 = cr3_saved & ~SVM_CR3_PAE_LEGACY_RESERVED_MASK;
+-	report(svm_vmrun() == SVM_EXIT_VMMCALL, "Test CR3 63:0: %lx",
+-	    vmcb->save.cr3);
+-
+ 	vmcb->save.cr3 = cr3_saved;
+ 	vmcb->save.cr4 = cr4_saved;
+ }
+@@ -2280,14 +2273,14 @@ static void test_cr4(void)
+ 	efer &= ~EFER_LME;
+ 	vmcb->save.efer = efer;
+ 	SVM_TEST_CR_RESERVED_BITS(12, 31, 1, 4, cr4_saved,
+-	    SVM_CR4_LEGACY_RESERVED_MASK, SVM_EXIT_ERR);
++	    SVM_CR4_LEGACY_RESERVED_MASK, SVM_EXIT_ERR, "");
+ 
+ 	efer |= EFER_LME;
+ 	vmcb->save.efer = efer;
+ 	SVM_TEST_CR_RESERVED_BITS(12, 31, 1, 4, cr4_saved,
+-	    SVM_CR4_RESERVED_MASK, SVM_EXIT_ERR);
++	    SVM_CR4_RESERVED_MASK, SVM_EXIT_ERR, "");
+ 	SVM_TEST_CR_RESERVED_BITS(32, 63, 4, 4, cr4_saved,
+-	    SVM_CR4_RESERVED_MASK, SVM_EXIT_ERR);
++	    SVM_CR4_RESERVED_MASK, SVM_EXIT_ERR, "");
+ 
+ 	vmcb->save.cr4 = cr4_saved;
+ 	vmcb->save.efer = efer_saved;
+-- 
+2.26.2
 
-        tglx
