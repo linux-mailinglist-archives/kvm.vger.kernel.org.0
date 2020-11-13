@@ -2,117 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AADEE2B1FC7
-	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 17:12:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F06AD2B2094
+	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 17:36:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726918AbgKMQMm convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 13 Nov 2020 11:12:42 -0500
-Received: from mga09.intel.com ([134.134.136.24]:9889 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726701AbgKMQMl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Nov 2020 11:12:41 -0500
-IronPort-SDR: 2JCoDOsGs5Ui6G3G+2dCVYHCJkBW34L6tlE2HLqKIt8tbtLiyYg+QVNQqkf6Und6ltFjiCHhtu
- 65kK4cz9bgYA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9804"; a="170663097"
-X-IronPort-AV: E=Sophos;i="5.77,475,1596524400"; 
-   d="scan'208";a="170663097"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2020 08:12:40 -0800
-IronPort-SDR: /EpiTz+ObiUYe2Tt61ei7Ih9ue4JXLvOFzFoszIGlTLqqqn3EIvramoTCldkoiD6eB957e0ac+
- RaNWbkQmbfHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,475,1596524400"; 
-   d="scan'208";a="309655009"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
-  by fmsmga007.fm.intel.com with ESMTP; 13 Nov 2020 08:12:40 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 13 Nov 2020 08:12:39 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 13 Nov 2020 08:12:39 -0800
-Received: from fmsmsx610.amr.corp.intel.com ([10.18.126.90]) by
- fmsmsx610.amr.corp.intel.com ([10.18.126.90]) with mapi id 15.01.1713.004;
- Fri, 13 Nov 2020 08:12:39 -0800
-From:   "Luck, Tony" <tony.luck@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Wilk, Konrad" <konrad.wilk@oracle.com>
-CC:     "Raj, Ashok" <ashok.raj@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>
-Subject: RE: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-Thread-Topic: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
-Thread-Index: AQHWru2wVqYDq8zCAUGd/W1dOZWHUKmxA7+AgAAYm4CAABfkAIAAARAAgAQpOgCAAOGcgIAAphOAgAD60ICAAJaGgIAADwsAgAAFn4CAAuAFAIAAOXiAgAA79ACAABGDgIAAY1MAgAAHBICAAsnwAIAAVwYAgAC+sACAAGcnAIAAVyaAgABtcgCAAFeIgIAAPx6AgAEdLoCAAmDAgIAANQ0AgABC2gCAALXJAP//pWBA
-Date:   Fri, 13 Nov 2020 16:12:39 +0000
-Message-ID: <30928722afe64104b5abba09de4f74dd@intel.com>
-References: <20201107001207.GA2620339@nvidia.com>
- <87pn4nk7nn.fsf@nanos.tec.linutronix.de>
- <20201108235852.GC32074@araj-mobl1.jf.intel.com>
- <874klykc7h.fsf@nanos.tec.linutronix.de>
- <20201109173034.GG2620339@nvidia.com>
- <87pn4mi23u.fsf@nanos.tec.linutronix.de> <20201110051412.GA20147@otc-nc-03>
- <875z6dik1a.fsf@nanos.tec.linutronix.de> <20201110141323.GB22336@otc-nc-03>
- <MWHPR11MB16455B594B1B48B6E3C97C108CE80@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20201112193253.GG19638@char.us.oracle.com>
- <877dqqmc2h.fsf@nanos.tec.linutronix.de>
- <MWHPR11MB1645F27808F1F5E79646A3A88CE60@MWHPR11MB1645.namprd11.prod.outlook.com>
- <874kltmlfr.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <874kltmlfr.fsf@nanos.tec.linutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-x-originating-ip: [10.22.254.132]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726547AbgKMQgp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 11:36:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53972 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726156AbgKMQgp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 11:36:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605285402;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DXM+YNcOD8if4Hqk/gCshYNZ43vDbXR5Ny0EBkdoibE=;
+        b=i5qTPbhPIoQmc01jsxmsji/UDtlaZuh7ZRW7VzB9UT3tjttcupIUBRX2aASlyIVueJ2WRt
+        40ljsZG7cURJpyudAxF0bxnL4ifckUYCxa8LW/MMf6JgHK19Z7vt9dXCMCUN+OvbVUjZKi
+        xTalVRCMzgsDFSctGZiv+bCGvilE5Ds=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-69-sFKjeBWxPfm57u8B69JoFg-1; Fri, 13 Nov 2020 11:36:41 -0500
+X-MC-Unique: sFKjeBWxPfm57u8B69JoFg-1
+Received: by mail-wr1-f71.google.com with SMTP id y2so4138496wrl.3
+        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 08:36:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DXM+YNcOD8if4Hqk/gCshYNZ43vDbXR5Ny0EBkdoibE=;
+        b=QssDv1YFnVkIsHfTT9qppdjz0NrD9oggfDbfvxUFquhRYY5NQuumpFG2IPaQXDZuws
+         +e0XhXppSgCNmjbLf9xkD95u5hJdYzqMLiZnTShnaC6DRJHfukOPMpeLK3fhgZ4ne6IU
+         o/zds+R1fOyhj7jLyoQAvN6gxO3C4uGqNdUSU+rJa40gaG2R2IXRmpw8/2u4Nvjbohj0
+         nvsNebQ32jKbytg54+Id7ortoXPCMWVg6N8ibmGzzTgMN6DnGrNzRjTcAQ7YE1IcPpVC
+         XtV4lMEW86pp4y/IqbWyCgPaaTOhZTZ1+pUvUD6qNb0+B63cSGyyqBShzfCZoGEwaBZB
+         9yJg==
+X-Gm-Message-State: AOAM531hmwpc6sJHTA+GJOLO4JmF2zTmSqO9EDCl3NJH4chgHGZ/DT4z
+        EETysXZJKpFihqKE1Z7rnIJTaoS6RWbSgjbW/O3r9a9KOQ/MIhvxQxCxMiKJef1dXjmMEmFB2dS
+        sYRM9xvbcx6L7
+X-Received: by 2002:a7b:c24b:: with SMTP id b11mr3220837wmj.109.1605285394864;
+        Fri, 13 Nov 2020 08:36:34 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwLKBSCtz7wrKpxOjeU5076QwW05LR6c0u8x1KksyZXDYHDbaDtBz98RhVXL34slseJXL6kbQ==
+X-Received: by 2002:a7b:c24b:: with SMTP id b11mr3220520wmj.109.1605285389698;
+        Fri, 13 Nov 2020 08:36:29 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b14sm11369728wrs.46.2020.11.13.08.36.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Nov 2020 08:36:28 -0800 (PST)
+Subject: Re: [PATCH v2 02/11] KVM: selftests: Remove deadcode
+To:     Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>
+Cc:     Andrew Jones <drjones@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20201111122636.73346-1-drjones@redhat.com>
+ <20201111122636.73346-3-drjones@redhat.com> <20201112181921.GS26342@xz-x1>
+ <CANgfPd_R_Rjn+QT_yiUwpCUK3TUfmhSN6XpZ5=L17mhrtMi7Zw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7dc78143-2a99-d268-09ba-9db7b2fb1104@redhat.com>
+Date:   Fri, 13 Nov 2020 17:36:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
+In-Reply-To: <CANgfPd_R_Rjn+QT_yiUwpCUK3TUfmhSN6XpZ5=L17mhrtMi7Zw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Of course is this not only an x86 problem. Every architecture which
-> supports virtualization has the same issue. ARM(64) has no way to tell
-> for sure whether the machine runs bare metal either. No idea about the
-> other architectures.
+On 12/11/20 19:34, Ben Gardon wrote:
+> I didn't review this patch closely enough, and assumed the clear dirty
+> log was still being done because of
+> afdb19600719 KVM: selftests: Use a single binary for dirty/clear log test
+> 
+> Looking back now, I see that that is not the case.
+> 
+> I'd like to retract my endorsement in that case. I'd prefer to leave
+> the dead code in and I'll send another series to actually use it once
+> this series is merged. I've already written the code to use it and
+> time the clearing, so it seems a pity to remove it now.
+> 
+> Alternatively I could just revert this commit in that future series,
+> though I suspect not removing the dead code would reduce the chances
+> of merge conflicts. Either way works.
+> 
+> I can extend the dirty log mode functions from dirty_log_test for
+> dirty_log_perf_test in that series too.
 
-Sounds like a hypervisor problem. If the VMM provides perfect emulation
-of every weird quirk of h/w, then it is OK to let the guest believe that it is
-running on bare metal.
+For now I'll follow Peter's suggestion to always test manual clear:
 
-If it isn't perfect, then it should make sure the guest knows *for sure*, so that
-the guest can take appropriate actions to avoid the sharp edges.
+-------------- 8< ------------
+Subject: [PATCH] KVM: selftests: always use manual clear in 
+dirty_log_perf_test
 
--Tony
+Nothing sets USE_CLEAR_DIRTY_LOG anymore, so anything it surrounds
+is dead code.
+
+However, it is the recommended way to use the dirty page bitmap
+for new enough kernel, so use it whenever KVM has the
+KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 capability.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c 
+b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index 85c9b8f73142..9c6a7be31e03 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -27,6 +27,7 @@
+  #define TEST_HOST_LOOP_N		2UL
+
+  /* Host variables */
++static u64 dirty_log_manual_caps;
+  static bool host_quit;
+  static uint64_t iteration;
+  static uint64_t vcpu_last_completed_iteration[MAX_VCPUS];
+@@ -88,10 +89,6 @@ static void *vcpu_worker(void *data)
+  	return NULL;
+  }
+
+-#ifdef USE_CLEAR_DIRTY_LOG
+-static u64 dirty_log_manual_caps;
+-#endif
+-
+  static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+  		     uint64_t phys_offset, int wr_fract)
+  {
+@@ -106,10 +103,8 @@ static void run_test(enum vm_guest_mode mode, 
+unsigned long iterations,
+  	struct timespec get_dirty_log_total = (struct timespec){0};
+  	struct timespec vcpu_dirty_total = (struct timespec){0};
+  	struct timespec avg;
+-#ifdef USE_CLEAR_DIRTY_LOG
+  	struct kvm_enable_cap cap = {};
+  	struct timespec clear_dirty_log_total = (struct timespec){0};
+-#endif
+
+  	vm = create_vm(mode, nr_vcpus, guest_percpu_mem_size);
+
+@@ -120,11 +115,11 @@ static void run_test(enum vm_guest_mode mode, 
+unsigned long iterations,
+  	host_num_pages = vm_num_host_pages(mode, guest_num_pages);
+  	bmap = bitmap_alloc(host_num_pages);
+
+-#ifdef USE_CLEAR_DIRTY_LOG
+-	cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
+-	cap.args[0] = dirty_log_manual_caps;
+-	vm_enable_cap(vm, &cap);
+-#endif
++	if (dirty_log_manual_caps) {
++		cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
++		cap.args[0] = dirty_log_manual_caps;
++		vm_enable_cap(vm, &cap);
++	}
+
+  	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
+  	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
+@@ -190,17 +185,17 @@ static void run_test(enum vm_guest_mode mode, 
+unsigned long iterations,
+  		pr_info("Iteration %lu get dirty log time: %ld.%.9lds\n",
+  			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
+
+-#ifdef USE_CLEAR_DIRTY_LOG
+-		clock_gettime(CLOCK_MONOTONIC, &start);
+-		kvm_vm_clear_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap, 0,
+-				       host_num_pages);
++		if (dirty_log_manual_caps) {
++			clock_gettime(CLOCK_MONOTONIC, &start);
++			kvm_vm_clear_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap, 0,
++					       host_num_pages);
+
+-		ts_diff = timespec_diff_now(start);
+-		clear_dirty_log_total = timespec_add(clear_dirty_log_total,
+-						     ts_diff);
+-		pr_info("Iteration %lu clear dirty log time: %ld.%.9lds\n",
+-			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
+-#endif
++			ts_diff = timespec_diff_now(start);
++			clear_dirty_log_total = timespec_add(clear_dirty_log_total,
++							     ts_diff);
++			pr_info("Iteration %lu clear dirty log time: %ld.%.9lds\n",
++				iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
++		}
+  	}
+
+  	/* Tell the vcpu thread to quit */
+@@ -220,12 +215,12 @@ static void run_test(enum vm_guest_mode mode, 
+unsigned long iterations,
+  		iterations, get_dirty_log_total.tv_sec,
+  		get_dirty_log_total.tv_nsec, avg.tv_sec, avg.tv_nsec);
+
+-#ifdef USE_CLEAR_DIRTY_LOG
+-	avg = timespec_div(clear_dirty_log_total, iterations);
+-	pr_info("Clear dirty log over %lu iterations took %ld.%.9lds. (Avg 
+%ld.%.9lds/iteration)\n",
+-		iterations, clear_dirty_log_total.tv_sec,
+-		clear_dirty_log_total.tv_nsec, avg.tv_sec, avg.tv_nsec);
+-#endif
++	if (dirty_log_manual_caps) {
++		avg = timespec_div(clear_dirty_log_total, iterations);
++		pr_info("Clear dirty log over %lu iterations took %ld.%.9lds. (Avg 
+%ld.%.9lds/iteration)\n",
++			iterations, clear_dirty_log_total.tv_sec,
++			clear_dirty_log_total.tv_nsec, avg.tv_sec, avg.tv_nsec);
++	}
+
+  	free(bmap);
+  	free(vcpu_threads);
+@@ -284,16 +279,10 @@ int main(int argc, char *argv[])
+  	int opt, i;
+  	int wr_fract = 1;
+
+-#ifdef USE_CLEAR_DIRTY_LOG
+  	dirty_log_manual_caps =
+  		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
+-	if (!dirty_log_manual_caps) {
+-		print_skip("KVM_CLEAR_DIRTY_LOG not available");
+-		exit(KSFT_SKIP);
+-	}
+  	dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
+  				  KVM_DIRTY_LOG_INITIALLY_SET);
+-#endif
+
+  #ifdef __x86_64__
+  	guest_mode_init(VM_MODE_PXXV48_4K, true, true);
+
