@@ -2,156 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF7D42B231F
-	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 18:58:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2644B2B23B1
+	for <lists+kvm@lfdr.de>; Fri, 13 Nov 2020 19:26:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgKMR6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 12:58:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50634 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726301AbgKMR6z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 12:58:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605290333;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O5BKgRlDzjTzAb+liqgxWnaX18EKLrQ791MVleM/3MA=;
-        b=UfkZzEqyN96wa0zr14TX4Jv8f4M/ocxC2rc0ZDLinTMZTGAk4CO6wblnvSsm7bFfslvRu6
-        9FCaoyl0+ZDvK2ZtZYd+B2Trt4MXyEIqlxvjZO3PNDNG7P2u9LltCw5zV7fs9EOSZhSkz8
-        GF7Fp7WKlVIN2yM7vtibUCSDed/22II=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-zO8hS7oWMD6uQBK3tiV3fQ-1; Fri, 13 Nov 2020 12:58:52 -0500
-X-MC-Unique: zO8hS7oWMD6uQBK3tiV3fQ-1
-Received: by mail-wm1-f70.google.com with SMTP id a134so3591623wmd.8
-        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 09:58:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=O5BKgRlDzjTzAb+liqgxWnaX18EKLrQ791MVleM/3MA=;
-        b=e2ofTjgcKF7LL0OOgpZfiKvXCkiu9HdS/5YVK7Squ4BoN06XEBY5uL6dR+l0bsLUQH
-         kXahy/BUZy9jr/O4ykdZ3Y6zUMbqv041AIkjJvNB2D5QyA/c2zHE1oIC2HPDZgr5QLx2
-         kIlw0ubgdjPB7WTO7FilExLu7WQ8n5Ti/S95LjGLvwgcKs5Q88JFG++l2ldsQHHI3ywr
-         g/5pnRPpzQWHz/ZCa3ippIUdDy1P0iXBVENZvUU5haAD/B6ShuACYk803tz0a/CbfVL4
-         70h6iahJkWy9tSjmeG5+UjIUEMI1X9zoOdcOeenfyxNq43PjjH8MSmQYSNP+f4KXutBh
-         rQpA==
-X-Gm-Message-State: AOAM533hb9CO1MUGDpeDOX5/kUr/52GQGF5RLZ2INTr27TteBoPcfsHA
-        2Vdcuo72nB0qynDrWcXyjWKVf6BXEwmYPa9zK/6T7Wdy46nsSlffFNcHsFBuNS+xVyTeu5qogg1
-        KNHtps0yJfuTl
-X-Received: by 2002:adf:9461:: with SMTP id 88mr4739031wrq.171.1605290329060;
-        Fri, 13 Nov 2020 09:58:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzpyEBuynksW6JDjBXyrJxyes9a4eVuRyvimJYtDo9Ih9P76sqjzmzYU6u4WzI7g3NBf01hXQ==
-X-Received: by 2002:adf:9461:: with SMTP id 88mr4738692wrq.171.1605290323999;
-        Fri, 13 Nov 2020 09:58:43 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i11sm12198292wro.85.2020.11.13.09.58.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Nov 2020 09:58:43 -0800 (PST)
-To:     Cathy Avery <cavery@redhat.com>, linux-kernel@vger.kernel.org,
+        id S1726240AbgKMS0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 13:26:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59716 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726182AbgKMS0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Nov 2020 13:26:18 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9A75F206E0;
+        Fri, 13 Nov 2020 18:26:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1605291977;
+        bh=jlcEFEJGWUtl3jyEnzWstVetGJnJb4qzKEp/RBIjfR0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=fTp+FPKBhZbEnNNXp+fFOqY3/7ZOuxtKaaJ++58xIcapq8qTdltfZSFYQFcj8iAbB
+         TdTkCIedJoPJUOIhMynCmga2jABe9buSfJJlUf7toPa3a3rd6I5mvWSWX85+hXigQN
+         9vttp+qV7K3E30vp8KObdHr5lXgbp2BDfaTw6FBE=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kddm3-00APrY-AI; Fri, 13 Nov 2020 18:26:15 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, wei.huang2@amd.com, mlevitsk@redhat.com
-References: <20201011184818.3609-1-cavery@redhat.com>
- <20201011184818.3609-3-cavery@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 2/2] KVM: SVM: Use a separate vmcb for the nested L2
- guest
-Message-ID: <80b02c13-dc69-783a-9431-41b4a5188c0b@redhat.com>
-Date:   Fri, 13 Nov 2020 18:58:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
+Subject: [PATCH 0/8] KVM: arm64: Disabled PMU handling
+Date:   Fri, 13 Nov 2020 18:25:54 +0000
+Message-Id: <20201113182602.471776-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20201011184818.3609-3-cavery@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/10/20 20:48, Cathy Avery wrote:
-> @@ -432,6 +432,16 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
->   	int ret;
->   
->   	svm->nested.vmcb = vmcb_gpa;
-> +
-> +	WARN_ON(svm->vmcb == svm->nested.vmcb02);
-> +
-> +	svm->nested.vmcb02->control = svm->vmcb01->control;
+It recently dawned on me that the way we handle PMU traps when the PMU
+is disabled is plain wrong. We consider that handling the registers as
+RAZ/WI is a fine thing to do, while the ARMv8 ARM is pretty clear that
+that's not OK and that such registers should UNDEF when FEAT_PMUv3
+doesn't exist. I went all the way back to the first public version of
+the spec, and it turns out we were *always* wrong.
 
-This assignment of the control area should be in 
-nested_prepare_vmcb_control, which is already filling in most of 
-vmcb02->control.
+It probably comes from the fact that we used not to trap the ID
+registers, and thus were unable to advertise the lack of PMU, but
+that's hardly an excuse. So let's fix the damned thing.
 
-Right now, we save a copy_vmcb_control-area in nested_svm_vmexit so it 
-evens out.
+This series adds an extra check in the helpers that check for the
+validity of the PMU access (most of the registers have to checked
+against some enable flags and/or the accessing exception level), and
+rids us of the RAZ/WI behaviour.
 
-Later, it should be possible to remove most of the assignments from 
-nested_prepare_vmcb_control.
+This enables us to make additional cleanups, to the point where we can
+remove the PMU "ready" state that always had very bizarre semantics.
+All in all, a negative diffstat, and spec compliant behaviours. What's
+not to like?
 
-> +	svm->nested.vmcb02->save.cr4 = svm->vmcb01->save.cr4;
+I've run a few guests with and without PMUs as well as KUT, and
+nothing caught fire. The patches are on top of kvmarm/queue.
 
-I cannot understand this statement.
+Marc Zyngier (8):
+  KVM: arm64: Add kvm_vcpu_has_pmu() helper
+  KVM: arm64: Set ID_AA64DFR0_EL1.PMUVer to 0 when no PMU support
+  KVM: arm64: Refuse illegal KVM_ARM_VCPU_PMU_V3 at reset time
+  KVM: arm64: Inject UNDEF on PMU access when no PMU configured
+  KVM: arm64: Remove PMU RAZ/WI handling
+  KVM: arm64: Remove dead PMU sysreg decoding code
+  KVM: arm64: Gate kvm_pmu_update_state() on the PMU feature
+  KVM: arm64: Get rid of the PMU ready state
 
-> +	nested_svm_vmloadsave(svm->vmcb01, svm->nested.vmcb02);
+ arch/arm64/include/asm/kvm_host.h |  3 ++
+ arch/arm64/kvm/pmu-emul.c         | 11 +++----
+ arch/arm64/kvm/reset.c            |  4 +++
+ arch/arm64/kvm/sys_regs.c         | 51 ++++++++-----------------------
+ include/kvm/arm_pmu.h             |  3 --
+ 5 files changed, 24 insertions(+), 48 deletions(-)
 
-This is because the vmsave just after the vmexit has moved the 
-vmloadsave registers from vmcb12 to vmcb01, but the next vmload will use 
-vmcb02.
-
-> +	svm->vmcb = svm->nested.vmcb02;
-> +	svm->vmcb_pa = svm->nested.vmcb02_pa;
->   	load_nested_vmcb_control(svm, &nested_vmcb->control);
->   	nested_prepare_vmcb_save(svm, nested_vmcb);
->   	nested_prepare_vmcb_control(svm);
-
-
-> @@ -628,8 +620,10 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->   	nested_vmcb->control.pause_filter_thresh =
->   		svm->vmcb->control.pause_filter_thresh;
->   
-> -	/* Restore the original control entries */
-> -	copy_vmcb_control_area(&vmcb->control, &hsave->control);
-> +	nested_svm_vmloadsave(svm->nested.vmcb02, svm->vmcb01);
-
-Same here: the next vmentry's vmload will move the vmloadsave registers 
-from vmcb01 to vmcb12, but for now they are in vmcb02.
-
-It's 16+16 memory-to-memory u64 copies.  They mostly even out with the 
-14+14 copies that we don't have to do anymore on registers handled by 
-VMRUN (es/cs/ss/ds/gdt/idt/rsp/rax---they don't have to be stashed away 
-in hsave anymore).  Also, we are able to reuse nested_svm_vmloadsave, 
-which makes it overall a fair tradeoff... but it would have been worth a 
-comment or two. :)
-
-> +	svm->nested.vmcb02->control = svm->vmcb01->control;
-> +	svm->nested.vmcb02->save = svm->vmcb01->save;
-> +	svm->vmcb01->save = save;
-
-I would have moved these after the comment, matching the existing 
-copy_vmcb_control_area and save-area assignment.
-
-Also, the first save-area assignment should be (because the WARN_ON 
-below must be removed)
-
-	svm->nested.vmcb02->save = svm->vmcb->save;
-
-or
-
-	if (svm->vmcb == svm->vmcb01)
-		svm->nested.vmcb02->save = svm->vmcb01->save;
-
-I have applied the patch and fixed the conflicts, so when I have some 
-time I will play a bit more with it and/or pass the updated version back 
-to you.
-
-In the meanwhile, perhaps you could write a new selftests testcase that 
-tries to do KVM_SET_NESTED_STATE while in L2.  It can be a simplified 
-version of state-test that invokes KVM_GET_NESTED_STATE + 
-KVM_SET_NESTED_STATE when it gets back to L0.
-
-Paolo
+-- 
+2.28.0
 
