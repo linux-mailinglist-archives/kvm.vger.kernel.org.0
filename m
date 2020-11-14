@@ -2,217 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41EDC2B2AA3
-	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 02:50:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2778A2B2B4C
+	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 05:17:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726184AbgKNBuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 20:50:23 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:44222 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725981AbgKNBuW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Nov 2020 20:50:22 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AE1nnO2026863;
-        Sat, 14 Nov 2020 01:50:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=ISfln+HaDRfa94Trku7ZBKLGbuFAluUA4VyQ8Coqkqo=;
- b=TPiM7nEzK6CBEmb2m6p6Uq56TPLX8VZeLCkbVxxArru8tdYzp+RRUmLIUQ8syfHHk004
- dv4loWU9e62wyZYSQI9dMGluz2rcTtJkz5/8S55fqP6G4pKKqF7AjBhROECgvee/grh7
- FRsxxBBQN+REav/v62B90yE77nlHSL/P6zbqDca4meNn7rmocPWUzUw8VegdPGbCGdyn
- zoHZ+f4noWFKFQlCHIcYTEmT9PKzVTAA6QdO7J4sQh5ViEVuueGCokWVSwAO7ZYjezRH
- EWOesPgxMeh0yXIldIoLZ5zKqS1pLTD8TXhspWqMqCCJ8T+M/KeZm2iger06CsuNIDY/ 2Q== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 34p72f31cr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 14 Nov 2020 01:50:09 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AE1jHqZ167743;
-        Sat, 14 Nov 2020 01:50:09 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 34rt58vky9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 14 Nov 2020 01:50:09 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AE1o8rS009507;
-        Sat, 14 Nov 2020 01:50:08 GMT
-Received: from nsvm-sadhukhan.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 13 Nov 2020 17:50:07 -0800
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, qemu-devel@nongnu.org
-Subject: [PATCH 5/5 v5] KVM: nVMX: Fill in conforming vmx_nested_ops via macro
-Date:   Sat, 14 Nov 2020 01:49:55 +0000
-Message-Id: <20201114014955.19749-6-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201114014955.19749-1-krish.sadhukhan@oracle.com>
-References: <20201114014955.19749-1-krish.sadhukhan@oracle.com>
+        id S1726479AbgKNEQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 23:16:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47188 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726473AbgKNEQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Nov 2020 23:16:36 -0500
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88540C0613D1
+        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 20:16:36 -0800 (PST)
+Received: by mail-pg1-x541.google.com with SMTP id h6so8684996pgk.4
+        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 20:16:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=A9pg18TbAKGWThbDZV/lSnw6ECunYCQj34w2OxbsD28=;
+        b=PF9ft6fMnlNP/6Zsbu25kflNnmBKfJOO/H4rjrJ+ql33V44LVFpAQuQmFtilVhoNGy
+         Y9ZrE3vibDv+WkakZbF/0ztWkgwwMeb61WAEri4qAVRQx9t+j+QtLF3SwSbU92l005We
+         sDSN4NvszMB3KMpUcgrPvhc81wtKtX7FQllX/xYsrejaiM2AiGmJFBU5MuS1Mqpgoy9/
+         WuBtiYmAeihC5b5j2t+sfKl50CluaCCsjKzYiOPXOz/p3MjL4IctEhyHyX/DbOlO45wl
+         xj0iaBbrOfI0gI4BiCwzg5d3EgRXQ79eVt3vzi2h9kdepcB6fZFSPQ/Y6SyUS+NB3shM
+         djsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=A9pg18TbAKGWThbDZV/lSnw6ECunYCQj34w2OxbsD28=;
+        b=VlpQRvivNax0TWPlINMgliGaoLeeWHRNyyeTakeqYIiMyyAPQ2180F8cGJ8R7wiADI
+         oqsJvRT43WXJSHmKltqLZFIhZl3rnSXZV+hjSGyggVDaxKC7duqihxXhSQrf7H52HouJ
+         IDl0XqSZzxD9P4OtX4VG88FCJhLiKMwLE+tKCMq1a/Kkg3Od5CYxNkqpLF9RipzZnx/o
+         jRbXbFosOAIo45YaCMj8J9leDCsas5BdDKszb4aDFSMlmycfE7RF/1/ZvZi6T5yY9yC8
+         EL/MuEyeZom5H93xvEfWgLI9qJ9p6wRPWrB9EWozb1GHMmybfdeaW3620UoLpyG5oNDQ
+         rKwg==
+X-Gm-Message-State: AOAM533Je4lAjC5EobP/WU4Kx+Cs0p0ZIhlAn+Y96vPA4wHlgC/6Z7m+
+        r+DhJZoHipD8tRW5cNEREtJukQ==
+X-Google-Smtp-Source: ABdhPJxdtnYpfXnid7lmGwIEALBV3sGEAC/R8OHL5K5BnBiuttodEwRQNcVdi17epQTlF0c/PWefpw==
+X-Received: by 2002:a62:768e:0:b029:18a:d54d:3921 with SMTP id r136-20020a62768e0000b029018ad54d3921mr4922461pfc.31.1605327396070;
+        Fri, 13 Nov 2020 20:16:36 -0800 (PST)
+Received: from [192.168.10.85] (124-171-134-245.dyn.iinet.net.au. [124.171.134.245])
+        by smtp.gmail.com with UTF8SMTPSA id 3sm11338509pfv.92.2020.11.13.20.16.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Nov 2020 20:16:35 -0800 (PST)
+Subject: Re: [PATCH kernel] vfio_pci_nvlink2: Do not attempt NPU2 setup on old
+ P8's NPU
+To:     Andrew Donnellan <ajd@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Leonardo Augusto Guimaraes Garcia <lagarcia@br.ibm.com>
+References: <20201113050632.74124-1-aik@ozlabs.ru>
+ <0b8ceab2-e304-809f-be3c-512b28b25852@linux.ibm.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <1f2be6b0-d53a-aa58-9c4f-d55a6a5b1c79@ozlabs.ru>
+Date:   Sat, 14 Nov 2020 15:16:30 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:83.0) Gecko/20100101
+ Thunderbird/83.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9804 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 mlxscore=0
- mlxlogscore=999 suspectscore=3 adultscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011140009
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9804 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- malwarescore=0 suspectscore=3 lowpriorityscore=0 adultscore=0 phishscore=0
- priorityscore=1501 spamscore=0 impostorscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011140009
+In-Reply-To: <0b8ceab2-e304-809f-be3c-512b28b25852@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The names of some of the vmx_nested_ops functions do not have a corresponding
-'nested_vmx_' prefix. Generate the names using a macro so that the names are
-conformant. Fixing the naming will help in better readability and
-maintenance of the code.
 
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- arch/x86/kvm/vmx/evmcs.c  |  6 +++---
- arch/x86/kvm/vmx/evmcs.h  |  4 ++--
- arch/x86/kvm/vmx/nested.c | 35 +++++++++++++++++++++--------------
- 3 files changed, 26 insertions(+), 19 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-index f3199bb02f22..e54b366ea114 100644
---- a/arch/x86/kvm/vmx/evmcs.c
-+++ b/arch/x86/kvm/vmx/evmcs.c
-@@ -324,7 +324,7 @@ bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa)
- 	return true;
- }
- 
--uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
-+uint16_t nested_vmx_get_evmcs_version(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	/*
-@@ -418,7 +418,7 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
- 	return ret;
- }
- 
--int nested_enable_evmcs(struct kvm_vcpu *vcpu,
-+int nested_vmx_enable_evmcs(struct kvm_vcpu *vcpu,
- 			uint16_t *vmcs_version)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -426,7 +426,7 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
- 	vmx->nested.enlightened_vmcs_enabled = true;
- 
- 	if (vmcs_version)
--		*vmcs_version = nested_get_evmcs_version(vcpu);
-+		*vmcs_version = nested_vmx_get_evmcs_version(vcpu);
- 
- 	return 0;
- }
-diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-index bd41d9462355..150e7921b5fd 100644
---- a/arch/x86/kvm/vmx/evmcs.h
-+++ b/arch/x86/kvm/vmx/evmcs.h
-@@ -205,8 +205,8 @@ enum nested_evmptrld_status {
- };
- 
- bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa);
--uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
--int nested_enable_evmcs(struct kvm_vcpu *vcpu,
-+uint16_t nested_vmx_get_evmcs_version(struct kvm_vcpu *vcpu);
-+int nested_vmx_enable_evmcs(struct kvm_vcpu *vcpu,
- 			uint16_t *vmcs_version);
- void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata);
- int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 104d6782ddc3..ecff1117f598 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3223,7 +3223,12 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
-+static bool nested_vmx_get_pages(struct kvm_vcpu *vcpu)
-+{
-+	return nested_get_vmcs12_pages(vcpu);
-+}
-+
-+static int nested_vmx_write_log_dirty(struct kvm_vcpu *vcpu, gpa_t gpa)
- {
- 	struct vmcs12 *vmcs12;
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -3769,13 +3774,13 @@ static void nested_vmx_update_pending_dbg(struct kvm_vcpu *vcpu)
- 			    vcpu->arch.exception.payload);
- }
- 
--static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
-+static bool nested_vmx_hv_timer_pending(struct kvm_vcpu *vcpu)
- {
- 	return nested_cpu_has_preemption_timer(get_vmcs12(vcpu)) &&
- 	       to_vmx(vcpu)->nested.preemption_timer_expired;
- }
- 
--static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-+static int nested_vmx_check_events(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long exit_qual;
-@@ -3830,7 +3835,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
- 		return 0;
- 	}
- 
--	if (nested_vmx_preemption_timer_pending(vcpu)) {
-+	if (nested_vmx_hv_timer_pending(vcpu)) {
- 		if (block_nested_events)
- 			return -EBUSY;
- 		nested_vmx_vmexit(vcpu, EXIT_REASON_PREEMPTION_TIMER, 0, 0);
-@@ -5964,7 +5969,7 @@ bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
-+static int nested_vmx_get_state(struct kvm_vcpu *vcpu,
- 				struct kvm_nested_state __user *user_kvm_nested_state,
- 				u32 user_data_size)
- {
-@@ -6088,7 +6093,7 @@ void vmx_leave_nested(struct kvm_vcpu *vcpu)
- 	free_nested(vcpu);
- }
- 
--static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
-+static int nested_vmx_set_state(struct kvm_vcpu *vcpu,
- 				struct kvm_nested_state __user *user_kvm_nested_state,
- 				struct kvm_nested_state *kvm_state)
- {
-@@ -6568,13 +6573,15 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
- 	return 0;
- }
- 
-+#define KVM_X86_NESTED_OP_NAME(name) .name = nested_vmx_##name
-+
- struct kvm_x86_nested_ops vmx_nested_ops = {
--	.check_events = vmx_check_nested_events,
--	.hv_timer_pending = nested_vmx_preemption_timer_pending,
--	.get_state = vmx_get_nested_state,
--	.set_state = vmx_set_nested_state,
--	.get_pages = nested_get_vmcs12_pages,
--	.write_log_dirty = nested_vmx_write_pml_buffer,
--	.enable_evmcs = nested_enable_evmcs,
--	.get_evmcs_version = nested_get_evmcs_version,
-+	KVM_X86_NESTED_OP_NAME(check_events),
-+	KVM_X86_NESTED_OP_NAME(hv_timer_pending),
-+	KVM_X86_NESTED_OP_NAME(get_state),
-+	KVM_X86_NESTED_OP_NAME(set_state),
-+	KVM_X86_NESTED_OP_NAME(get_pages),
-+	KVM_X86_NESTED_OP_NAME(write_log_dirty),
-+	KVM_X86_NESTED_OP_NAME(enable_evmcs),
-+	KVM_X86_NESTED_OP_NAME(get_evmcs_version),
- };
+On 13/11/2020 16:30, Andrew Donnellan wrote:
+> On 13/11/20 4:06 pm, Alexey Kardashevskiy wrote:
+>> We execute certain NPU2 setup code (such as mapping an LPID to a device
+>> in NPU2) unconditionally if an Nvlink bridge is detected. However this
+>> cannot succeed on P8+ machines as the init helpers return an error other
+>> than ENODEV which means the device is there is and setup failed so
+>> vfio_pci_enable() fails and pass through is not possible.
+>>
+>> This changes the two NPU2 related init helpers to return -ENODEV if
+>> there is no "memory-region" device tree property as this is
+>> the distinction between NPU and NPU2.
+>>
+>> Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] 
+>> subdriver")
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> Should this be Cc: stable?
+
+This depends on whether P8+ + NVLink was ever a  product (hi Leonardo) 
+and had actual customers who still rely on upstream kernels to work as 
+after many years only the last week I heard form some Redhat test 
+engineer that it does not work. May be cc: stable...
+
+
 -- 
-2.27.0
-
+Alexey
