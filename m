@@ -2,88 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4B802B2BFB
-	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 08:35:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9E7E2B2CBC
+	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 11:34:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726524AbgKNHe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Nov 2020 02:34:28 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:36186 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726080AbgKNHe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Nov 2020 02:34:28 -0500
-Received: by mail-il1-f194.google.com with SMTP id p10so10588660ile.3;
-        Fri, 13 Nov 2020 23:34:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rGTFAKzr23qDU0X05TSfUL7Ef9EPpKQTkZuX7avWNY0=;
-        b=qjaL2len/pBlvlBKxaECcsCOpcFy/p2M53HKRjLMlERdAFDk7PzNmL3tAXhyygg059
-         fPIP7zbwLP89/+tpF3lOLxXPim7oi/jczS8/RG3mcqFqswEaIKIbG7oynyuYRfRjCpy2
-         XxpMJUqzephdf9CdI+z5Y8UZMbG+OJxp3g4QukYcLuY0uiTqiw0MYEhZNMIPMRtLo9ax
-         cVbrA5dXinw8mgly71juJku1h8axcfxkNv7kDn6ZftRwGrnAbMlgR9BGlpUugVKUJ5xv
-         UAeBWrI6kpUOlYKD0DlvDnGKj2feKWxq+smzjHTvpGBLvNDgKfBOJkWE/lMQClx09JDU
-         EK5A==
-X-Gm-Message-State: AOAM532f8tH9diTn5prLHznRMouhO4ChXP40cm120hJGRBo/lTs1mkM3
-        BVu1wRU4zftAFFytLjsuKZ1ETSyJ5GarIwfTMfA=
-X-Google-Smtp-Source: ABdhPJzVBbLJ/Nn/dVtepqiEEKhi3aevey/mPf8XVsqyzlMYBTaTPwIErnDrGxPrHYmDLN8HdOLJzkTDFBAEI7XbIyY=
-X-Received: by 2002:a92:85c5:: with SMTP id f188mr2697987ilh.173.1605339266125;
- Fri, 13 Nov 2020 23:34:26 -0800 (PST)
+        id S1726586AbgKNKex (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Nov 2020 05:34:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726113AbgKNKex (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Nov 2020 05:34:53 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF967C0613D1;
+        Sat, 14 Nov 2020 02:34:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0hO+ohxPFig28LmimZnxfVLjXY8uLImJhPLPYl8JZZY=; b=qAPdnN4Bzx0J7JHwtNQo0kHxh7
+        HOdDpzofAB76DNnzWgvY7n/d8g7L5+lKP4FwdEXj7NhLFlvT2SQp5lvemvza+5dUAJKvdYr1QfNv5
+        NEv66wT1SaGmu4/B6RWYHYtlWF6VjQl7nwAyRADph6/UdKsMfXnqsHMwuRNRiLZoezFpvyzRsV3p6
+        mP31cBOoMKlgT+nexv3m6pd9m07av3/4tGXODiXU9f5fr/BOKZWzVE0JDpRr35AQ1oPy3elmqLP1v
+        nnbL3lbrOOLwQgASpraNn5mDxoap10740ElNRuCQknqK0oE2h1m1uMYkcZOfRIc0fmOqVZOUGXBT5
+        n+G0qhjw==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kdst4-0002gd-Di; Sat, 14 Nov 2020 10:34:30 +0000
+Date:   Sat, 14 Nov 2020 10:34:30 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+Message-ID: <20201114103430.GA9810@infradead.org>
+References: <20201108235852.GC32074@araj-mobl1.jf.intel.com>
+ <874klykc7h.fsf@nanos.tec.linutronix.de>
+ <20201109173034.GG2620339@nvidia.com>
+ <87pn4mi23u.fsf@nanos.tec.linutronix.de>
+ <20201110051412.GA20147@otc-nc-03>
+ <875z6dik1a.fsf@nanos.tec.linutronix.de>
+ <20201110141323.GB22336@otc-nc-03>
+ <MWHPR11MB16455B594B1B48B6E3C97C108CE80@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20201112193253.GG19638@char.us.oracle.com>
+ <877dqqmc2h.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-References: <20201113110952.68086-1-tsbogend@alpha.franken.de> <20201113110952.68086-2-tsbogend@alpha.franken.de>
-In-Reply-To: <20201113110952.68086-2-tsbogend@alpha.franken.de>
-From:   Huacai Chen <chenhc@lemote.com>
-Date:   Sat, 14 Nov 2020 15:34:14 +0800
-Message-ID: <CAAhV-H7Sc6tmsfRcxOkx3rPk85Ey6XtxqhDB0RWokk+XSGVJ9A@mail.gmail.com>
-Subject: Re: [PATCH 2/4] MIPS: kvm: Use vm_get_page_prot to get protection bits
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877dqqmc2h.fsf@nanos.tec.linutronix.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Thomas,
+On Thu, Nov 12, 2020 at 11:42:46PM +0100, Thomas Gleixner wrote:
+> DMI vendor name is pretty good final check when the bit is 0. The
+> strings I'm aware of are:
+> 
+> QEMU, Bochs, KVM, Xen, VMware, VMW, VMware Inc., innotek GmbH, Oracle
+> Corporation, Parallels, BHYVE, Microsoft Corporation
+> 
+> which is not complete but better than nothing ;)
 
-On Fri, Nov 13, 2020 at 7:13 PM Thomas Bogendoerfer
-<tsbogend@alpha.franken.de> wrote:
->
-> MIPS protection bits are setup during runtime so using defines like
-> PAGE_SHARED ignores this runtime changes. Using vm_get_page_prot
-> to get correct page protection fixes this.
-Is there some visible bugs if without this fix?
-
-Huacai
->
-> Signed-off-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-> ---
->  arch/mips/kvm/mmu.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-> index 28c366d307e7..3dabeda82458 100644
-> --- a/arch/mips/kvm/mmu.c
-> +++ b/arch/mips/kvm/mmu.c
-> @@ -1074,6 +1074,7 @@ int kvm_mips_handle_commpage_tlb_fault(unsigned long badvaddr,
->  {
->         kvm_pfn_t pfn;
->         pte_t *ptep;
-> +       pgprot_t prot;
->
->         ptep = kvm_trap_emul_pte_for_gva(vcpu, badvaddr);
->         if (!ptep) {
-> @@ -1083,7 +1084,8 @@ int kvm_mips_handle_commpage_tlb_fault(unsigned long badvaddr,
->
->         pfn = PFN_DOWN(virt_to_phys(vcpu->arch.kseg0_commpage));
->         /* Also set valid and dirty, so refill handler doesn't have to */
-> -       *ptep = pte_mkyoung(pte_mkdirty(pfn_pte(pfn, PAGE_SHARED)));
-> +       prot = vm_get_page_prot(VM_READ|VM_WRITE|VM_SHARED);
-> +       *ptep = pte_mkyoung(pte_mkdirty(pfn_pte(pfn, prot)));
->
->         /* Invalidate this entry in the TLB, guest kernel ASID only */
->         kvm_mips_host_tlb_inv(vcpu, badvaddr, false, true);
-> --
-> 2.16.4
->
+Which is why I really think we need explicit opt-ins for "native"
+SIOV handling and for paravirtualized SIOV handling, with the kernel
+not offering support at all without either or a manual override on
+the command line.
