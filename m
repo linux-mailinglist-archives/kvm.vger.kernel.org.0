@@ -2,106 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A24E2B296E
-	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 01:00:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB6CF2B29DA
+	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 01:27:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726094AbgKNAAe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 19:00:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34552 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725885AbgKNAAd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Nov 2020 19:00:33 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0ADNXUgl102002;
-        Fri, 13 Nov 2020 19:00:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=KbDra3b4iMFEa4HfdicQdCImsu4ywafeeEhug4M4Rcg=;
- b=lFSc3YW6DPz5SFos/vuyX/ollqiiXHpeexQ5wPA31EBkS7xBYbHF84YcefX07BaPta1X
- 6E2hOJ0wrodtLfLDk3lDMdvLIMgZDM9cpeZEnYMy3tY4EzIG8pANKvS4MWxFm7ECzjGZ
- Y1oNrUh0NucCgJgpW7kBh6zucIDFgXsKsc0a/W6LvHkZsS/lE2Yz6OH230iNsGXZpXGO
- om20eVNCsvaxeZN0bCN3kbg4YH3iVWfND+eOuaRJ8j1wUegMHS8eVzSSoUOrI0dXekKj
- Y78Xv1eI7UScRKHrppZMGNpLq/9nXoz8r6lBnywGVxoQsCXRgjQWgQ5N3oxeSLxspsWv fA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34sxt519wp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Nov 2020 19:00:28 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0ADNkNaf146020;
-        Fri, 13 Nov 2020 19:00:28 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34sxt519v1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Nov 2020 19:00:28 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0ADNuYBA005583;
-        Sat, 14 Nov 2020 00:00:26 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 34nk78q789-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 14 Nov 2020 00:00:26 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AE00NSW5964370
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 14 Nov 2020 00:00:23 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E2DFE42041;
-        Sat, 14 Nov 2020 00:00:22 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3032D4204F;
-        Sat, 14 Nov 2020 00:00:22 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.46.164])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Sat, 14 Nov 2020 00:00:22 +0000 (GMT)
-Date:   Sat, 14 Nov 2020 01:00:20 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     Harald Freudenberger <freude@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 04/14] s390/zcrypt: driver callback to indicate
- resource in use
-Message-ID: <20201114010020.381277c2.pasic@linux.ibm.com>
-In-Reply-To: <dcdb9c78-daf8-1f25-f59a-903f0db96ada@linux.ibm.com>
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
-        <20201022171209.19494-5-akrowiak@linux.ibm.com>
-        <42f3f4f9-6263-cb1e-d882-30b62236a594@linux.ibm.com>
-        <dcdb9c78-daf8-1f25-f59a-903f0db96ada@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726094AbgKNA0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Nov 2020 19:26:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40196 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726042AbgKNA0M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Nov 2020 19:26:12 -0500
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775E5C061A04
+        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 16:26:12 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id b3so5316152pls.11
+        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 16:26:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=Eyi3ibuvYWMCo7i6ODa9MSLY3tsErf7jEpym/+H+ah4=;
+        b=bHZo0ee3XBP9p4M+ZN66+nahhWFE7yUfvbiG5bA6o1mruvmC3Yww3mynB3xOxEvtZM
+         dXMICkYjdvO2ADU7o7Cgg6Ittbb0fNtX2JmKSb9Zews8kBA2YRq3+H3PMffKmJy8R98Z
+         b9I43agtiQZjKyzPjHkpenN1Mc2Bf3LvlxVMk54MoRm5RnQYy/oAKsvpqbfWjMimZRib
+         Ua2BZf3WMCDbmFyGy8BFT6X24fM1a7+f9f/v5F50CZGeyanXn+znzPjnizEY1N9Hh1sn
+         cgBzOe2WIZiAC7+98J0+loMccJvGk4jxhzYg9JAw8HD0lURkU29EyqHZBaF2uf+/1P4O
+         SlNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=Eyi3ibuvYWMCo7i6ODa9MSLY3tsErf7jEpym/+H+ah4=;
+        b=bJNWnxNFRKqj6ak7CA3HS+ExQvDZ8cNXbqooo5oP/obvUtXc+q6UHfSHeRi+konJhO
+         YoTnm4NSm73/eOWoe7HKPMd2eKDwemKHFme1SO5Nq6Y7N4BDUzqA3J+SFh1V3plCdOm2
+         oJtIJ5N9BuhpvKBg5XQZnw6KVZ4hAJXQXy5x3ACWC2/FDMY5WIrR2CaHfFgi47eppTPF
+         FI+18OILY9GEzEpCdBYs6r/YzkrXkGU3BfHzatba9JPDx9Pm3F5EXpUNBUQB9sj8foNW
+         eOlsNSwxWHqtd8T1MDqZHV5WCeAVhWbxA1XL8GoCosGcZabqphHzJFGw06CrrKe+z+ZQ
+         45hQ==
+X-Gm-Message-State: AOAM5324zlSPmJr8hKeRFRF+philAqqLeczCrd9pN5+1ZJR6HKd6Qtzq
+        PACJOW6NJYNkO4QPoKcpqWkFng==
+X-Google-Smtp-Source: ABdhPJywVAaDqs9IyJIDm5Sl7H77CxDksVRaFSoKiKT8KoxP5BJQn/Gqp6ooi5bqKBGdE2M/Av1EOw==
+X-Received: by 2002:a17:902:8341:b029:d8:d123:2297 with SMTP id z1-20020a1709028341b02900d8d1232297mr3991532pln.65.1605313571693;
+        Fri, 13 Nov 2020 16:26:11 -0800 (PST)
+Received: from [2620:15c:17:3:4a0f:cfff:fe51:6667] ([2620:15c:17:3:4a0f:cfff:fe51:6667])
+        by smtp.gmail.com with ESMTPSA id n9sm4436027pjk.1.2020.11.13.16.26.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Nov 2020 16:26:10 -0800 (PST)
+Date:   Fri, 13 Nov 2020 16:26:09 -0800 (PST)
+From:   David Rientjes <rientjes@google.com>
+X-X-Sender: rientjes@chino.kir.corp.google.com
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+cc:     Vipin Sharma <vipinsh@google.com>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>, pbonzini@redhat.com,
+        tj@kernel.org, lizefan@huawei.com, joro@8bytes.org, corbet@lwn.net,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Grimm, Jon" <jon.grimm@amd.com>,
+        "Van Tassell, Eric" <eric.vantassell@amd.com>, gingell@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC Patch 0/2] KVM: SVM: Cgroup support for SVM SEV ASIDs
+In-Reply-To: <20201103020623.GJ21563@linux.intel.com>
+Message-ID: <alpine.DEB.2.23.453.2011131615510.333518@chino.kir.corp.google.com>
+References: <20200922004024.3699923-1-vipinsh@google.com> <20200922014836.GA26507@linux.intel.com> <20200922211404.GA4141897@google.com> <20200924192116.GC9649@linux.intel.com> <cb592c59-a50e-5901-71fe-19e43bc9e37e@amd.com> <20200925222220.GA977797@google.com>
+ <20201002204810.GA3179405@google.com> <20201103020623.GJ21563@linux.intel.com>
+User-Agent: Alpine 2.23 (DEB 453 2020-06-18)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-13_21:2020-11-13,2020-11-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- spamscore=0 malwarescore=0 priorityscore=1501 adultscore=0 impostorscore=0
- mlxlogscore=999 clxscore=1015 suspectscore=0 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011130151
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 Nov 2020 16:30:31 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Mon, 2 Nov 2020, Sean Christopherson wrote:
 
-> We will be using the mutex_trylock() function in our sysfs 
-> assignment
-> interfaces which make the call to the AP bus to check permissions (which 
-> also
-> locks ap_perms). If the mutex_trylock() fails, we return from the assignment
-> function with -EBUSY. This should resolve that potential deadlock issue.
+> On Fri, Oct 02, 2020 at 01:48:10PM -0700, Vipin Sharma wrote:
+> > On Fri, Sep 25, 2020 at 03:22:20PM -0700, Vipin Sharma wrote:
+> > > I agree with you that the abstract name is better than the concrete
+> > > name, I also feel that we must provide HW extensions. Here is one
+> > > approach:
+> > > 
+> > > Cgroup name: cpu_encryption, encryption_slots, or memcrypt (open to
+> > > suggestions)
+> > > 
+> > > Control files: slots.{max, current, events}
+> 
+> I don't particularly like the "slots" name, mostly because it could be confused
+> with KVM's memslots.  Maybe encryption_ids.ids.{max, current, events}?  I don't
+> love those names either, but "encryption" and "IDs" are the two obvious
+> commonalities betwee TDX's encryption key IDs and SEV's encryption address
+> space IDs.
+> 
 
-It resolves the deadlock issue only if in_use() is also doing
-mutex_trylock(), but the if in_use doesn't take the lock it
-needs to back off (and so does it's client code) i.e. a boolean as
-return value won't do.
+Looping Janosch and Christian back into the thread.
 
-Regards,
-Halil
+I interpret this suggestion as
+encryption.{sev,sev_es,keyids}.{max,current,events} for AMD and Intel 
+offerings, which was my thought on this as well.
+
+Certainly the kernel could provide a single interface for all of these and 
+key value pairs depending on the underlying encryption technology but it 
+seems to only introduce additional complexity in the kernel in string 
+parsing that can otherwise be avoided.  I think we all agree that a single 
+interface for all encryption keys or one-value-per-file could be done in 
+the kernel and handled by any userspace agent that is configuring these 
+values.
+
+I think Vipin is adding a root level file that describes how many keys we 
+have available on the platform for each technology.  So I think this comes 
+down to, for example, a single encryption.max file vs 
+encryption.{sev,sev_es,keyid}.max.  SEV and SEV-ES ASIDs are provisioned 
+separately so we treat them as their own resource here.
+
+So which is easier?
+
+$ cat encryption.sev.max
+10
+$ echo -n 15 > encryption.sev.max
+
+or
+
+$ cat encryption.max
+sev 10
+sev_es 10
+keyid 0
+$ echo -n "sev 10" > encryption.max
+
+I would argue the former is simplest (always preferring 
+one-value-per-file) and avoids any string parsing or resource controller 
+lookups that need to match on that string in the kernel.
+
+The set of encryption.{sev,sev_es,keyid} files that exist would depend on
+CONFIG_CGROUP_ENCRYPTION and whether CONFIG_AMD_MEM_ENCRYPT or 
+CONFIG_INTEL_TDX is configured.  Both can be configured so we have all 
+three files, but the root file will obviously indicate 0 keys available 
+for one of them (can't run on AMD and Intel at the same time :).
+
+So I'm inclined to suggest that the one-value-per-file format is the ideal 
+way to go unless there are objections to it.
