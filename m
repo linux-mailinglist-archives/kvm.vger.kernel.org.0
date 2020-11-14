@@ -2,99 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2778A2B2B4C
-	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 05:17:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B802B2BFB
+	for <lists+kvm@lfdr.de>; Sat, 14 Nov 2020 08:35:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726479AbgKNEQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Nov 2020 23:16:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47188 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726473AbgKNEQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Nov 2020 23:16:36 -0500
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88540C0613D1
-        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 20:16:36 -0800 (PST)
-Received: by mail-pg1-x541.google.com with SMTP id h6so8684996pgk.4
-        for <kvm@vger.kernel.org>; Fri, 13 Nov 2020 20:16:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=A9pg18TbAKGWThbDZV/lSnw6ECunYCQj34w2OxbsD28=;
-        b=PF9ft6fMnlNP/6Zsbu25kflNnmBKfJOO/H4rjrJ+ql33V44LVFpAQuQmFtilVhoNGy
-         Y9ZrE3vibDv+WkakZbF/0ztWkgwwMeb61WAEri4qAVRQx9t+j+QtLF3SwSbU92l005We
-         sDSN4NvszMB3KMpUcgrPvhc81wtKtX7FQllX/xYsrejaiM2AiGmJFBU5MuS1Mqpgoy9/
-         WuBtiYmAeihC5b5j2t+sfKl50CluaCCsjKzYiOPXOz/p3MjL4IctEhyHyX/DbOlO45wl
-         xj0iaBbrOfI0gI4BiCwzg5d3EgRXQ79eVt3vzi2h9kdepcB6fZFSPQ/Y6SyUS+NB3shM
-         djsQ==
+        id S1726524AbgKNHe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Nov 2020 02:34:28 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:36186 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726080AbgKNHe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Nov 2020 02:34:28 -0500
+Received: by mail-il1-f194.google.com with SMTP id p10so10588660ile.3;
+        Fri, 13 Nov 2020 23:34:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=A9pg18TbAKGWThbDZV/lSnw6ECunYCQj34w2OxbsD28=;
-        b=VlpQRvivNax0TWPlINMgliGaoLeeWHRNyyeTakeqYIiMyyAPQ2180F8cGJ8R7wiADI
-         oqsJvRT43WXJSHmKltqLZFIhZl3rnSXZV+hjSGyggVDaxKC7duqihxXhSQrf7H52HouJ
-         IDl0XqSZzxD9P4OtX4VG88FCJhLiKMwLE+tKCMq1a/Kkg3Od5CYxNkqpLF9RipzZnx/o
-         jRbXbFosOAIo45YaCMj8J9leDCsas5BdDKszb4aDFSMlmycfE7RF/1/ZvZi6T5yY9yC8
-         EL/MuEyeZom5H93xvEfWgLI9qJ9p6wRPWrB9EWozb1GHMmybfdeaW3620UoLpyG5oNDQ
-         rKwg==
-X-Gm-Message-State: AOAM533Je4lAjC5EobP/WU4Kx+Cs0p0ZIhlAn+Y96vPA4wHlgC/6Z7m+
-        r+DhJZoHipD8tRW5cNEREtJukQ==
-X-Google-Smtp-Source: ABdhPJxdtnYpfXnid7lmGwIEALBV3sGEAC/R8OHL5K5BnBiuttodEwRQNcVdi17epQTlF0c/PWefpw==
-X-Received: by 2002:a62:768e:0:b029:18a:d54d:3921 with SMTP id r136-20020a62768e0000b029018ad54d3921mr4922461pfc.31.1605327396070;
-        Fri, 13 Nov 2020 20:16:36 -0800 (PST)
-Received: from [192.168.10.85] (124-171-134-245.dyn.iinet.net.au. [124.171.134.245])
-        by smtp.gmail.com with UTF8SMTPSA id 3sm11338509pfv.92.2020.11.13.20.16.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Nov 2020 20:16:35 -0800 (PST)
-Subject: Re: [PATCH kernel] vfio_pci_nvlink2: Do not attempt NPU2 setup on old
- P8's NPU
-To:     Andrew Donnellan <ajd@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Leonardo Augusto Guimaraes Garcia <lagarcia@br.ibm.com>
-References: <20201113050632.74124-1-aik@ozlabs.ru>
- <0b8ceab2-e304-809f-be3c-512b28b25852@linux.ibm.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <1f2be6b0-d53a-aa58-9c4f-d55a6a5b1c79@ozlabs.ru>
-Date:   Sat, 14 Nov 2020 15:16:30 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:83.0) Gecko/20100101
- Thunderbird/83.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rGTFAKzr23qDU0X05TSfUL7Ef9EPpKQTkZuX7avWNY0=;
+        b=qjaL2len/pBlvlBKxaECcsCOpcFy/p2M53HKRjLMlERdAFDk7PzNmL3tAXhyygg059
+         fPIP7zbwLP89/+tpF3lOLxXPim7oi/jczS8/RG3mcqFqswEaIKIbG7oynyuYRfRjCpy2
+         XxpMJUqzephdf9CdI+z5Y8UZMbG+OJxp3g4QukYcLuY0uiTqiw0MYEhZNMIPMRtLo9ax
+         cVbrA5dXinw8mgly71juJku1h8axcfxkNv7kDn6ZftRwGrnAbMlgR9BGlpUugVKUJ5xv
+         UAeBWrI6kpUOlYKD0DlvDnGKj2feKWxq+smzjHTvpGBLvNDgKfBOJkWE/lMQClx09JDU
+         EK5A==
+X-Gm-Message-State: AOAM532f8tH9diTn5prLHznRMouhO4ChXP40cm120hJGRBo/lTs1mkM3
+        BVu1wRU4zftAFFytLjsuKZ1ETSyJ5GarIwfTMfA=
+X-Google-Smtp-Source: ABdhPJzVBbLJ/Nn/dVtepqiEEKhi3aevey/mPf8XVsqyzlMYBTaTPwIErnDrGxPrHYmDLN8HdOLJzkTDFBAEI7XbIyY=
+X-Received: by 2002:a92:85c5:: with SMTP id f188mr2697987ilh.173.1605339266125;
+ Fri, 13 Nov 2020 23:34:26 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <0b8ceab2-e304-809f-be3c-512b28b25852@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20201113110952.68086-1-tsbogend@alpha.franken.de> <20201113110952.68086-2-tsbogend@alpha.franken.de>
+In-Reply-To: <20201113110952.68086-2-tsbogend@alpha.franken.de>
+From:   Huacai Chen <chenhc@lemote.com>
+Date:   Sat, 14 Nov 2020 15:34:14 +0800
+Message-ID: <CAAhV-H7Sc6tmsfRcxOkx3rPk85Ey6XtxqhDB0RWokk+XSGVJ9A@mail.gmail.com>
+Subject: Re: [PATCH 2/4] MIPS: kvm: Use vm_get_page_prot to get protection bits
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi, Thomas,
 
+On Fri, Nov 13, 2020 at 7:13 PM Thomas Bogendoerfer
+<tsbogend@alpha.franken.de> wrote:
+>
+> MIPS protection bits are setup during runtime so using defines like
+> PAGE_SHARED ignores this runtime changes. Using vm_get_page_prot
+> to get correct page protection fixes this.
+Is there some visible bugs if without this fix?
 
-On 13/11/2020 16:30, Andrew Donnellan wrote:
-> On 13/11/20 4:06 pm, Alexey Kardashevskiy wrote:
->> We execute certain NPU2 setup code (such as mapping an LPID to a device
->> in NPU2) unconditionally if an Nvlink bridge is detected. However this
->> cannot succeed on P8+ machines as the init helpers return an error other
->> than ENODEV which means the device is there is and setup failed so
->> vfio_pci_enable() fails and pass through is not possible.
->>
->> This changes the two NPU2 related init helpers to return -ENODEV if
->> there is no "memory-region" device tree property as this is
->> the distinction between NPU and NPU2.
->>
->> Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] 
->> subdriver")
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> Should this be Cc: stable?
-
-This depends on whether P8+ + NVLink was ever a  product (hi Leonardo) 
-and had actual customers who still rely on upstream kernels to work as 
-after many years only the last week I heard form some Redhat test 
-engineer that it does not work. May be cc: stable...
-
-
--- 
-Alexey
+Huacai
+>
+> Signed-off-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> ---
+>  arch/mips/kvm/mmu.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
+> index 28c366d307e7..3dabeda82458 100644
+> --- a/arch/mips/kvm/mmu.c
+> +++ b/arch/mips/kvm/mmu.c
+> @@ -1074,6 +1074,7 @@ int kvm_mips_handle_commpage_tlb_fault(unsigned long badvaddr,
+>  {
+>         kvm_pfn_t pfn;
+>         pte_t *ptep;
+> +       pgprot_t prot;
+>
+>         ptep = kvm_trap_emul_pte_for_gva(vcpu, badvaddr);
+>         if (!ptep) {
+> @@ -1083,7 +1084,8 @@ int kvm_mips_handle_commpage_tlb_fault(unsigned long badvaddr,
+>
+>         pfn = PFN_DOWN(virt_to_phys(vcpu->arch.kseg0_commpage));
+>         /* Also set valid and dirty, so refill handler doesn't have to */
+> -       *ptep = pte_mkyoung(pte_mkdirty(pfn_pte(pfn, PAGE_SHARED)));
+> +       prot = vm_get_page_prot(VM_READ|VM_WRITE|VM_SHARED);
+> +       *ptep = pte_mkyoung(pte_mkdirty(pfn_pte(pfn, prot)));
+>
+>         /* Invalidate this entry in the TLB, guest kernel ASID only */
+>         kvm_mips_host_tlb_inv(vcpu, badvaddr, false, true);
+> --
+> 2.16.4
+>
