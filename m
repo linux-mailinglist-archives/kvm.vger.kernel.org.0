@@ -2,82 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16C7C2B35BF
-	for <lists+kvm@lfdr.de>; Sun, 15 Nov 2020 16:29:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C0D52B35C0
+	for <lists+kvm@lfdr.de>; Sun, 15 Nov 2020 16:30:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbgKOP16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Nov 2020 10:27:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38314 "EHLO
+        id S1727084AbgKOP3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Nov 2020 10:29:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43127 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727042AbgKOP16 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 15 Nov 2020 10:27:58 -0500
+        by vger.kernel.org with ESMTP id S1727070AbgKOP3M (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 15 Nov 2020 10:29:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605454077;
+        s=mimecast20190719; t=1605454151;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=tEILAmOv/3vnRK3BL1tBNlRIN1HW0Lh9cIAmXOTwRHs=;
-        b=LAqSXJo7MhCNZGYUZyif28vjHj9Hd6cppfAWB2qR41sM07h5mukQenaAW0Fosf+3OJdWD/
-        7xnKfirys4/TslPi4gdy9tpsHieXiWirDo9ebd0VJE5IbW8e0jVcD/j9BEJT09kiESd58V
-        mftxMQZw5VVqXHMHKV1m2Bu7Imz5r5s=
+        bh=rgstLvewQswHzH1bYuEdWL4wJXi1Onb1Pbf/B2GM9RA=;
+        b=AT3+GmxZQk3AyC/8+r2CQoib26lpQUeWZoqz5FiOAiDzUlunteI4N2JJZCFQ/gL3Pz7lDb
+        /pCK3cHOp0U6BCYOTdWraVIZ2Ud0eaHFU+OrgrxMQWGDc+HgdcUER2eUcBA6MLh98Kq0EA
+        FaeNH+sLH3gGWY081srvny4I394WGlQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-dVX9a26FOB2wCnB7W9j7mQ-1; Sun, 15 Nov 2020 10:27:54 -0500
-X-MC-Unique: dVX9a26FOB2wCnB7W9j7mQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-571-sz4OOuA7O1KRgI6x5Vr_Aw-1; Sun, 15 Nov 2020 10:29:09 -0500
+X-MC-Unique: sz4OOuA7O1KRgI6x5Vr_Aw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82240427C7;
-        Sun, 15 Nov 2020 15:27:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4B198049C1;
+        Sun, 15 Nov 2020 15:29:07 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A39321E78;
-        Sun, 15 Nov 2020 15:27:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 856C65B4BB;
+        Sun, 15 Nov 2020 15:29:07 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Ben Gardon <bgardon@google.com>
-Subject: [PATCH] kvm: mmu: fix is_tdp_mmu_check when the TDP MMU is not in use
-Date:   Sun, 15 Nov 2020 10:27:52 -0500
-Message-Id: <20201115152752.1625224-1-pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] More KVM fixes for 5.10-rc4
+Date:   Sun, 15 Nov 2020 10:29:07 -0500
+Message-Id: <20201115152907.1625371-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In some cases where shadow paging is in use, the root page will
-be either mmu->pae_root or vcpu->arch.mmu->lm_root.  Then it will
-not have an associated struct kvm_mmu_page, because it is allocated
-with alloc_page instead of kvm_mmu_alloc_page.
+Linus,
 
-Just return false quickly from is_tdp_mmu_root if the TDP MMU is
-not in use, which also includes the case where shadow paging is
-enabled.
+The following changes since commit 585e5b17b92dead8a3aca4e3c9876fbca5f7e0ba:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+  Merge tag 'fscrypt-for-linus' of git://git.kernel.org/pub/scm/fs/fscrypt/fscrypt (2020-11-12 16:39:58 -0800)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 27e381c9da6c..ff28a5c6abd6 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -49,7 +49,14 @@ bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
- {
- 	struct kvm_mmu_page *sp;
- 
-+	if (!kvm->arch.tdp_mmu_enabled)
-+		return false;
-+	if (WARN_ON(!VALID_PAGE(hpa)))
-+		return false;
-+
- 	sp = to_shadow_page(hpa);
-+	if (WARN_ON(!sp))
-+		return false;
- 
- 	return sp->tdp_mmu_page && sp->root_count;
- }
--- 
-2.26.2
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to c887c9b9ca62c051d339b1c7b796edf2724029ed:
+
+  kvm: mmu: fix is_tdp_mmu_check when the TDP MMU is not in use (2020-11-15 08:55:43 -0500)
+
+----------------------------------------------------------------
+Fixes for ARM and x86, the latter especially for old processors
+without two-dimensional paging (EPT/NPT).
+
+----------------------------------------------------------------
+Babu Moger (2):
+      KVM: x86: Introduce cr3_lm_rsvd_bits in kvm_vcpu_arch
+      KVM: SVM: Update cr3_lm_rsvd_bits for AMD SEV guests
+
+David Edmondson (1):
+      KVM: x86: clflushopt should be treated as a no-op by emulation
+
+Marc Zyngier (4):
+      Merge tag 'v5.10-rc1' into kvmarm-master/next
+      KVM: arm64: Allow setting of ID_AA64PFR0_EL1.CSV2 from userspace
+      KVM: arm64: Unify trap handlers injecting an UNDEF
+      KVM: arm64: Handle SCXTNUM_ELx traps
+
+Paolo Bonzini (2):
+      Merge tag 'kvmarm-fixes-5.10-3' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
+      kvm: mmu: fix is_tdp_mmu_check when the TDP MMU is not in use
+
+ arch/arm64/include/asm/kvm_host.h |   2 +
+ arch/arm64/include/asm/sysreg.h   |   4 ++
+ arch/arm64/kvm/arm.c              |  16 ++++++
+ arch/arm64/kvm/sys_regs.c         | 111 +++++++++++++++++++++++---------------
+ arch/x86/include/asm/kvm_host.h   |   1 +
+ arch/x86/kvm/cpuid.c              |   2 +
+ arch/x86/kvm/emulate.c            |   8 ++-
+ arch/x86/kvm/mmu/tdp_mmu.c        |   7 +++
+ arch/x86/kvm/svm/svm.c            |   8 +++
+ arch/x86/kvm/x86.c                |   2 +-
+ 10 files changed, 115 insertions(+), 46 deletions(-)
 
