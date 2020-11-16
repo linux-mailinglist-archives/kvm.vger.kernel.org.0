@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A81F32B4FD3
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:35:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E2762B4FD7
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:35:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732864AbgKPSd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 13:33:58 -0500
-Received: from mga06.intel.com ([134.134.136.31]:20622 "EHLO mga06.intel.com"
+        id S2388316AbgKPSeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 13:34:06 -0500
+Received: from mga06.intel.com ([134.134.136.31]:20621 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732785AbgKPS16 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1732812AbgKPS16 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 16 Nov 2020 13:27:58 -0500
-IronPort-SDR: yhg1fiw3CbmMNVHaBEu2VK2zkh3FB7sjxF2YOUXqi/gSB4x9WMbyeijou1D/F8tDHHlclbDibo
- tvBkzWczsxWw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232410006"
+IronPort-SDR: jcX0cotuB5DQ5I8DdzFEE0nFNLgHdTEhch9ldXNgnstGJ2gVYBKXo/erB5Jt4Hzc8WZCRD4Fj1
+ pG6+8cqkjmJg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232410007"
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="232410006"
+   d="scan'208";a="232410007"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
   by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:27:57 -0800
-IronPort-SDR: FDxCEs86/sddN4PTr74F/9WjZ2LYpH7tc8hfsQk0wh4Eq34vCxhMuTua4zNzMvpsBe80j78bOX
- rFOrWcE62biw==
+IronPort-SDR: kC8KfD5uJvEgMJtpQZuTeRjmkn+Gk271FtRgtnGPztFCTZd/U8DIXuVlnpow33FCaCP2p+uUUw
+ x3BKuxLRC+nA==
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="400527831"
+   d="scan'208";a="400527840"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:27:56 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:27:57 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -38,9 +38,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH 10/67] KVM: Export kvm_make_all_cpus_request() for use in marking VMs as bugged
-Date:   Mon, 16 Nov 2020 10:25:55 -0800
-Message-Id: <9f779ee86c4c69f806616bc05e8f865628c538eb.1605232743.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 11/67] KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the VM
+Date:   Mon, 16 Nov 2020 10:25:56 -0800
+Message-Id: <57c00ce15fbf83118ebcc476f9728ebca6326178.1605232743.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1605232743.git.isaku.yamahata@intel.com>
 References: <cover.1605232743.git.isaku.yamahata@intel.com>
@@ -52,69 +52,121 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Export kvm_make_all_cpus_request() and hoist the request helper
-declarations of request up to the KVM_REQ_* definitions in preparation
-for adding a "VM bugged" framework.  The framework will add KVM_BUG()
-and KVM_BUG_ON() as alternatives to full BUG()/BUG_ON() for cases where
-KVM has definitely hit a bug (in itself or in silicon) and the VM is all
-but guaranteed to be hosed.  Marking a VM bugged will trigger a request
-to all vCPUs to allow arch code to forcefully evict each vCPU from its
-run loop.
-
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- include/linux/kvm_host.h | 18 +++++++++---------
- virt/kvm/kvm_main.c      |  1 +
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ arch/x86/kvm/svm/svm.c |  2 +-
+ arch/x86/kvm/vmx/vmx.c | 23 ++++++++++++++---------
+ arch/x86/kvm/x86.c     |  4 ++++
+ 3 files changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 03c016ff1715..ad9b6963d19d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -155,6 +155,15 @@ static inline bool is_error_page(struct page *page)
- })
- #define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
- 
-+bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
-+				 struct kvm_vcpu *except,
-+				 unsigned long *vcpu_bitmap, cpumask_var_t tmp);
-+bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
-+bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
-+				      struct kvm_vcpu *except);
-+bool kvm_make_cpus_request_mask(struct kvm *kvm, unsigned int req,
-+				unsigned long *vcpu_bitmap);
-+
- #define KVM_USERSPACE_IRQ_SOURCE_ID		0
- #define KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID	1
- 
-@@ -874,15 +883,6 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
- void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
- #endif
- 
--bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
--				 struct kvm_vcpu *except,
--				 unsigned long *vcpu_bitmap, cpumask_var_t tmp);
--bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
--bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
--				      struct kvm_vcpu *except);
--bool kvm_make_cpus_request_mask(struct kvm *kvm, unsigned int req,
--				unsigned long *vcpu_bitmap);
--
- long kvm_arch_dev_ioctl(struct file *filp,
- 			unsigned int ioctl, unsigned long arg);
- long kvm_arch_vcpu_ioctl(struct file *filp,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 21af4f083674..b29b6c3484dd 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -304,6 +304,7 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
- {
- 	return kvm_make_all_cpus_request_except(kvm, req, NULL);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 2f32fd09e259..e001e3c9e4bc 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1452,7 +1452,7 @@ static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+ 		load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
+ 		break;
+ 	default:
+-		WARN_ON_ONCE(1);
++		KVM_BUG_ON(1, vcpu->kvm);
+ 	}
  }
-+EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
  
- #ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
- void kvm_flush_remote_tlbs(struct kvm *kvm)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 47b8357b9751..1c9ad3103c87 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2245,7 +2245,7 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+ 		vcpu->arch.cr4 |= vmcs_readl(GUEST_CR4) & guest_owned_bits;
+ 		break;
+ 	default:
+-		WARN_ON_ONCE(1);
++		KVM_BUG_ON(1, vcpu->kvm);
+ 		break;
+ 	}
+ }
+@@ -5006,6 +5006,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+ 			return kvm_complete_insn_gp(vcpu, err);
+ 		case 3:
+ 			WARN_ON_ONCE(enable_unrestricted_guest);
++
+ 			err = kvm_set_cr3(vcpu, val);
+ 			return kvm_complete_insn_gp(vcpu, err);
+ 		case 4:
+@@ -5031,14 +5032,13 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+ 		}
+ 		break;
+ 	case 2: /* clts */
+-		WARN_ONCE(1, "Guest should always own CR0.TS");
+-		vmx_set_cr0(vcpu, kvm_read_cr0_bits(vcpu, ~X86_CR0_TS));
+-		trace_kvm_cr_write(0, kvm_read_cr0(vcpu));
+-		return kvm_skip_emulated_instruction(vcpu);
++		KVM_BUG(1, vcpu->kvm, "Guest always owns CR0.TS");
++		return -EIO;
+ 	case 1: /*mov from cr*/
+ 		switch (cr) {
+ 		case 3:
+ 			WARN_ON_ONCE(enable_unrestricted_guest);
++
+ 			val = kvm_read_cr3(vcpu);
+ 			kvm_register_write(vcpu, reg, val);
+ 			trace_kvm_cr_read(cr, val);
+@@ -5377,7 +5377,9 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+ 
+ static int handle_nmi_window(struct kvm_vcpu *vcpu)
+ {
+-	WARN_ON_ONCE(!enable_vnmi);
++	if (KVM_BUG_ON(!enable_vnmi, vcpu->kvm))
++		return -EIO;
++
+ 	exec_controls_clearbit(to_vmx(vcpu), CPU_BASED_NMI_WINDOW_EXITING);
+ 	++vcpu->stat.nmi_window_exits;
+ 	kvm_make_request(KVM_REQ_EVENT, vcpu);
+@@ -5950,7 +5952,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	 * below) should never happen as that means we incorrectly allowed a
+ 	 * nested VM-Enter with an invalid vmcs12.
+ 	 */
+-	WARN_ON_ONCE(vmx->nested.nested_run_pending);
++	if (KVM_BUG_ON(vmx->nested.nested_run_pending, vcpu->kvm))
++		return -EIO;
+ 
+ 	/* If guest state is invalid, start emulating */
+ 	if (vmx->emulation_required)
+@@ -6300,7 +6303,9 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+ 	int max_irr;
+ 	bool max_irr_updated;
+ 
+-	WARN_ON(!vcpu->arch.apicv_active);
++	if (KVM_BUG_ON(!vcpu->arch.apicv_active, vcpu->kvm))
++		return -EIO;
++
+ 	if (pi_test_on(&vmx->pi_desc)) {
+ 		pi_clear_on(&vmx->pi_desc);
+ 		/*
+@@ -6382,7 +6387,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+ {
+ 	u32 intr_info = vmx_get_intr_info(vcpu);
+ 
+-	if (WARN_ONCE(!is_external_intr(intr_info),
++	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
+ 	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
+ 		return;
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1d999b57f21a..19b53aedc6c8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8722,6 +8722,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	bool req_immediate_exit = false;
+ 
+ 	if (kvm_request_pending(vcpu)) {
++		if (kvm_check_request(KVM_REQ_VM_BUGGED, vcpu)) {
++			r = -EIO;
++			goto out;
++		}
+ 		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+ 			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
+ 				r = 0;
 -- 
 2.17.1
 
