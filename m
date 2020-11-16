@@ -2,74 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12A4E2B4EEF
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47BD32B4F01
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:17:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731100AbgKPSLd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 13:11:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25972 "EHLO
+        id S1731942AbgKPSQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 13:16:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53744 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730775AbgKPSLc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Nov 2020 13:11:32 -0500
+        by vger.kernel.org with ESMTP id S1731241AbgKPSQ5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Nov 2020 13:16:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605550292;
+        s=mimecast20190719; t=1605550616;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=xf1LJn8hGte4D+k0k0YeB9oW653XA/c4TK7Y8k7TCcw=;
-        b=OXpaTSlRQlisd2LLVGYNkbeTRarapVHiGg/pwK38QgipXP71zdcFTDtZc/3PLvX+/sIZZj
-        8iPX0xPwG15wdyITpNphcCjrCv4mUcMHVlE0Z1egLNAuoLNN7d8IRPOpjNbaSmTQTgz20p
-        zgw6J0zz5uA+Rv3Hy848f5/Xd8b+Myg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-VP9hCMv8MP6yJjyKGGRZHw-1; Mon, 16 Nov 2020 13:11:28 -0500
-X-MC-Unique: VP9hCMv8MP6yJjyKGGRZHw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C8571084D72;
-        Mon, 16 Nov 2020 18:11:27 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0D8A5C1CF;
-        Mon, 16 Nov 2020 18:11:26 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LlH3UjmNamylT5Q+nF61tpNDy+5E9OgBm35jVziY94U=;
+        b=TBa8unayLSWx19pUy+fcCbRLs++o86FUwOdpOkyzTfKScvipjRHAV7nfirERGG6RhYu4Kq
+        t4TPai7EZ8ok3wu/aPojq++Lt2anp1faAgYiB868XZagewLbl0cuqYY/MkYvwiA1cIQ6hO
+        CpJioYSL1rhe4fFyMsySeNCfxLZsM1Q=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-up2ldFyOPOKMJsXSJZu9mg-1; Mon, 16 Nov 2020 13:16:53 -0500
+X-MC-Unique: up2ldFyOPOKMJsXSJZu9mg-1
+Received: by mail-wr1-f70.google.com with SMTP id h11so11358759wrq.20
+        for <kvm@vger.kernel.org>; Mon, 16 Nov 2020 10:16:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LlH3UjmNamylT5Q+nF61tpNDy+5E9OgBm35jVziY94U=;
+        b=QR27FIf3ZmkN6AFvjO95cC6rfNM/d1NSUHG3qUhA2m5OMMbhJqbR9GvZgCopmQJ6Tw
+         +huK9PKlrcxEszIYUcqnjO50APxJGB+ET0wf/Hm93iOCPMlQUjT/TT3M7jL061al1Dwf
+         RBo/EM71sH1Jhb9PzuD2ABxq6AWOhZewBxfrRgZGjw6uPI6q7XZYxGprOiIxAMH6HPDQ
+         8Ct/QPcPZNi7DQP8G6/JFyQx9rdw5MgF7UJMzJLhAEjD6FUhiNIQ4ZdK1jqIYEs/hjvt
+         BlT9NM0/LE3pE0l3MyvurYkPxbsSo2MobHwcdWh2QXn1Zr6wzcGDXZLKoTIShFmoxGFB
+         pzYg==
+X-Gm-Message-State: AOAM533r0aPy8oZpSwCwI9qRjYwk837ALe5Fqq8RXob/ue5HIvE2gQ0g
+        iR7ao0OYPQtCuXwT4SKAZQqCC4BEpcJVwfNlq8IMYVSbhi9nPdpCAfKf2B/xQIh0xD0qfy3ZDNU
+        z523+tjorAyab
+X-Received: by 2002:a1c:98cd:: with SMTP id a196mr190364wme.42.1605550612344;
+        Mon, 16 Nov 2020 10:16:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwvEb+8Q7NBfnuNr3VVO9wYDcbPMxflAIM1/H15nQAAOv8HQ3UpiE1iIgsid7gqf9XbgA42WQ==
+X-Received: by 2002:a1c:98cd:: with SMTP id a196mr190344wme.42.1605550612086;
+        Mon, 16 Nov 2020 10:16:52 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id a14sm105072wmj.40.2020.11.16.10.16.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Nov 2020 10:16:51 -0800 (PST)
+Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, bgardon@google.com,
+        peterx@redhat.com
+References: <20201116121942.55031-1-drjones@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>
-Subject: [PATCH] KVM: SVM: check CR4 changes against vcpu->arch
-Date:   Mon, 16 Nov 2020 13:11:26 -0500
-Message-Id: <20201116181126.2008838-1-pbonzini@redhat.com>
+Message-ID: <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
+Date:   Mon, 16 Nov 2020 19:16:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201116121942.55031-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Similarly to what vmx/vmx.c does, use vcpu->arch.cr4 to check if CR4
-bits PGE, PKE and OSXSAVE have changed.  When switching between VMCB01
-and VMCB02, CPUID has to be adjusted every time if CR4.PKE or CR4.OSXSAVE
-change; without this patch, instead, CR4 would be checked against the
-previous value for L2 on vmentry, and against the previous value for
-L1 on vmexit, and CPUID would not be updated.
+On 16/11/20 13:19, Andrew Jones wrote:
+> This series attempts to clean up demand_paging_test, dirty_log_perf_test,
+> and dirty_log_test by factoring out common code, creating some new API
+> along the way. It also splits include/perf_test_util.h into a more
+> conventional header and source pair.
+> 
+> I've tested on x86 and AArch64 (one config each), but not s390x.
+> 
+> v3:
+>   - Rebased remaining four patches from v2 onto kvm/queue
+>   - Picked up r-b's from Peter and Ben
+> 
+> v2: https://www.spinics.net/lists/kvm/msg228711.html
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Unfortunately patch 2 is still broken:
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3b53a7ead04b..6dc337b9c231 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1691,7 +1691,7 @@ static bool svm_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- void svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- {
- 	unsigned long host_cr4_mce = cr4_read_shadow() & X86_CR4_MCE;
--	unsigned long old_cr4 = to_svm(vcpu)->vmcb->save.cr4;
-+	unsigned long old_cr4 = vcpu->arch.cr4;
- 
- 	if (npt_enabled && ((old_cr4 ^ cr4) & X86_CR4_PGE))
- 		svm_flush_tlb(vcpu);
--- 
-2.26.2
+$ ./dirty_log_test -M dirty-ring
+Setting log mode to: 'dirty-ring'
+Test iterations: 32, interval: 10 (ms)
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+==== Test Assertion Failure ====
+   lib/kvm_util.c:85: ret == 0
+   pid=2010122 tid=2010122 - Invalid argument
+      1	0x0000000000402ee7: vm_enable_cap at kvm_util.c:84
+      2	0x0000000000403004: vm_enable_dirty_ring at kvm_util.c:124
+      3	0x00000000004021a5: log_mode_create_vm_done at dirty_log_test.c:453
+      4	 (inlined by) run_test at dirty_log_test.c:683
+      5	0x000000000040b643: for_each_guest_mode at guest_modes.c:37
+      6	0x00000000004019c2: main at dirty_log_test.c:864
+      7	0x00007fe3f48207b2: ?? ??:0
+      8	0x0000000000401aad: _start at ??:?
+   KVM_ENABLE_CAP IOCTL failed,
+   rc: -1 errno: 22
+
+(Also fails without -M).
+
+Paolo
+
+> 
+> Thanks,
+> drew
+> 
+> 
+> Andrew Jones (4):
+>    KVM: selftests: Factor out guest mode code
+>    KVM: selftests: dirty_log_test: Remove create_vm
+>    KVM: selftests: Use vm_create_with_vcpus in create_vm
+>    KVM: selftests: Implement perf_test_util more conventionally
+> 
+>   tools/testing/selftests/kvm/Makefile          |   2 +-
+>   .../selftests/kvm/demand_paging_test.c        | 118 ++++--------
+>   .../selftests/kvm/dirty_log_perf_test.c       | 145 +++++---------
+>   tools/testing/selftests/kvm/dirty_log_test.c  | 179 +++++-------------
+>   .../selftests/kvm/include/guest_modes.h       |  21 ++
+>   .../testing/selftests/kvm/include/kvm_util.h  |   9 +
+>   .../selftests/kvm/include/perf_test_util.h    | 167 ++--------------
+>   tools/testing/selftests/kvm/lib/guest_modes.c |  70 +++++++
+>   tools/testing/selftests/kvm/lib/kvm_util.c    |   9 +-
+>   .../selftests/kvm/lib/perf_test_util.c        | 134 +++++++++++++
+>   10 files changed, 378 insertions(+), 476 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/include/guest_modes.h
+>   create mode 100644 tools/testing/selftests/kvm/lib/guest_modes.c
+>   create mode 100644 tools/testing/selftests/kvm/lib/perf_test_util.c
+> 
 
