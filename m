@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2A462B4F9C
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:34:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F08C2B4FBF
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:35:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388081AbgKPS2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 13:28:03 -0500
+        id S1732897AbgKPScm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 13:32:42 -0500
 Received: from mga06.intel.com ([134.134.136.31]:20632 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388071AbgKPS2D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S2387771AbgKPS2D (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 16 Nov 2020 13:28:03 -0500
-IronPort-SDR: 1HLzF5QyXCIhTflP7BoYF0IM5uel07NygjZgy/oL+3osIbj1WpIQA1LODk9QztwP7l64BV238I
- jmBh+hWm4U6Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232410025"
+IronPort-SDR: ZXajAuBrZ2koRQ28pD2moigbziGlX5TanRdDgllmNqAhUC1OpEKmBDabfHhaqe2DB2jd3nW74q
+ oL90CDntHhzw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232410028"
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="232410025"
+   d="scan'208";a="232410028"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
   by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:28:02 -0800
-IronPort-SDR: PlpzYBcZGbVAeGL9Uy62ntD/c2SVXtPqBExV8eNBaqm+leIhHAEegXnSXPZ6MTCybggcemF5OU
- q9zjMBYs+l/Q==
+IronPort-SDR: HSmSmve9NahGtLT9P0ekBHeZ+ETPGer5F6hFhlc8Q5AxThCCdr1jMH67bHx+ERS18CDjE7zU2t
+ i7x5r3Jy1dHw==
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="400527961"
+   d="scan'208";a="400527973"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:28:01 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:28:02 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -38,9 +38,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH 21/67] KVM: x86: Add flag to mark TSC as immutable (for TDX)
-Date:   Mon, 16 Nov 2020 10:26:06 -0800
-Message-Id: <7db8eb4687c539bbecb3a725e5fb345dd8560ae0.1605232743.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 22/67] KVM: Add per-VM flag to mark read-only memory as unsupported
+Date:   Mon, 16 Nov 2020 10:26:07 -0800
+Message-Id: <499bf4c92e07de7e27745cf8d266a1932d18d85f.1605232743.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1605232743.git.isaku.yamahata@intel.com>
 References: <cover.1605232743.git.isaku.yamahata@intel.com>
@@ -50,129 +50,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-The TSC for TDX1 guests is fixed at TD creation time.  Add tsc_immutable
-to reflect that the TSC of the guest cannot be changed in any way, and
-use it to short circuit all paths that lead to one of the myriad TSC
-adjustment flows.
+Add a flag for TDX to flag RO memory as unsupported and propagate it to
+KVM_MEM_READONLY to allow reporting RO memory as unsupported on a per-VM
+basis.  TDX1 doesn't expose permission bits to the VMM in the SEPT
+tables, i.e. doesn't support read-only private memory.
 
-Suggested-by: Kai Huang <kai.huang@linux.intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/x86.c              | 35 +++++++++++++++++++++++++--------
- 2 files changed, 28 insertions(+), 8 deletions(-)
+ arch/x86/kvm/x86.c       | 4 +++-
+ include/linux/kvm_host.h | 4 ++++
+ virt/kvm/kvm_main.c      | 8 +++++---
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 00b34d8f038b..e5b706889d09 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -968,6 +968,7 @@ struct kvm_arch {
- 	int audit_point;
- 	#endif
- 
-+	bool tsc_immutable;
- 	bool backwards_tsc_observed;
- 	bool boot_vcpu_runs_old_kvmclock;
- 	u32 bsp_vcpu_id;
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2f4b226d5b89..01380f057d9f 100644
+index 01380f057d9f..4060f3d91f74 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2040,7 +2040,9 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
- 	u64 ratio;
- 
- 	/* Guest TSC same frequency as host TSC? */
--	if (!scale) {
-+	if (!scale || vcpu->kvm->arch.tsc_immutable) {
-+		if (scale)
-+			pr_warn_ratelimited("Guest TSC immutable, scaling not supported\n");
- 		vcpu->arch.tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
- 		return 0;
- 	}
-@@ -2216,6 +2218,9 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
- 	bool already_matched;
- 	bool synchronizing = false;
- 
-+	if (WARN_ON_ONCE(vcpu->kvm->arch.tsc_immutable))
-+		return;
-+
- 	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
- 	offset = kvm_compute_tsc_offset(vcpu, data);
- 	ns = get_kvmclock_base_ns();
-@@ -2641,6 +2646,10 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 	u8 pvclock_flags;
- 	bool use_master_clock;
- 
-+	/* Unable to update guest time if the TSC is immutable. */
-+	if (ka->tsc_immutable)
-+		return 0;
-+
- 	kernel_ns = 0;
- 	host_tsc = 0;
- 
-@@ -3915,7 +3924,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		if (tsc_delta < 0)
- 			mark_tsc_unstable("KVM discovered backwards TSC");
- 
--		if (kvm_check_tsc_unstable()) {
-+		if (kvm_check_tsc_unstable() &&
-+		    !vcpu->kvm->arch.tsc_immutable) {
- 			u64 offset = kvm_compute_tsc_offset(vcpu,
- 						vcpu->arch.last_guest_tsc);
- 			kvm_vcpu_write_tsc_offset(vcpu, offset);
-@@ -3929,7 +3939,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		 * On a host with synchronized TSC, there is no need to update
- 		 * kvmclock on vcpu->cpu migration
- 		 */
--		if (!vcpu->kvm->arch.use_master_clock || vcpu->cpu == -1)
-+		if ((!vcpu->kvm->arch.use_master_clock || vcpu->cpu == -1) &&
-+		    !vcpu->kvm->arch.tsc_immutable)
- 			kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
- 		if (vcpu->cpu != cpu)
- 			kvm_make_request(KVM_REQ_MIGRATE_TIMER, vcpu);
-@@ -4888,10 +4899,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+@@ -3695,7 +3695,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ASYNC_PF_INT:
+ 	case KVM_CAP_GET_TSC_KHZ:
+ 	case KVM_CAP_KVMCLOCK_CTRL:
+-	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_HYPERV_TIME:
+ 	case KVM_CAP_IOAPIC_POLARITY_IGNORED:
+ 	case KVM_CAP_TSC_DEADLINE_TIMER:
+@@ -3785,6 +3784,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		if (kvm_x86_ops.is_vm_type_supported(KVM_X86_TDX_VM))
+ 			r |= BIT(KVM_X86_TDX_VM);
+ 		break;
++	case KVM_CAP_READONLY_MEM:
++		r = kvm && kvm->readonly_mem_unsupported ? 0 : 1;
++		break;
+ 	default:
  		break;
  	}
- 	case KVM_SET_TSC_KHZ: {
--		u32 user_tsc_khz;
-+		u32 user_tsc_khz = (u32)arg;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 95371750c23f..1a0df7b83fd0 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -517,6 +517,10 @@ struct kvm {
+ 	pid_t userspace_pid;
+ 	unsigned int max_halt_poll_ns;
  
- 		r = -EINVAL;
--		user_tsc_khz = (u32)arg;
-+		if (vcpu->kvm->arch.tsc_immutable)
-+			goto out;
- 
- 		if (kvm_has_tsc_control &&
- 		    user_tsc_khz >= kvm_max_guest_tsc_khz)
-@@ -10013,9 +10025,12 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- 
- 	if (mutex_lock_killable(&vcpu->mutex))
- 		return;
--	vcpu_load(vcpu);
--	kvm_synchronize_tsc(vcpu, 0);
--	vcpu_put(vcpu);
++#ifdef __KVM_HAVE_READONLY_MEM
++	bool readonly_mem_unsupported;
++#endif
 +
-+	if (!kvm->arch.tsc_immutable) {
-+		vcpu_load(vcpu);
-+		kvm_synchronize_tsc(vcpu, 0);
-+		vcpu_put(vcpu);
-+	}
+ 	bool vm_bugged;
+ };
  
- 	/* poll control enabled by default */
- 	vcpu->arch.msr_kvm_poll_control = 1;
-@@ -10209,6 +10224,10 @@ int kvm_arch_hardware_enable(void)
- 	if (backwards_tsc) {
- 		u64 delta_cyc = max_tsc - local_tsc;
- 		list_for_each_entry(kvm, &vm_list, vm_list) {
-+			if (vcpu->kvm->arch.tsc_immutable) {
-+				pr_warn_ratelimited("Backwards TSC observed and guest with immutable TSC active\n");
-+				continue;
-+			}
- 			kvm->arch.backwards_tsc_observed = true;
- 			kvm_for_each_vcpu(i, vcpu, kvm) {
- 				vcpu->arch.tsc_offset_adjustment += delta_cyc;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3dc41b6e12a0..572a66a61c29 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1100,12 +1100,14 @@ static void update_memslots(struct kvm_memslots *slots,
+ 	}
+ }
+ 
+-static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
++static int check_memory_region_flags(struct kvm *kvm,
++				     const struct kvm_userspace_memory_region *mem)
+ {
+ 	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+ 
+ #ifdef __KVM_HAVE_READONLY_MEM
+-	valid_flags |= KVM_MEM_READONLY;
++	if (!kvm->readonly_mem_unsupported)
++		valid_flags |= KVM_MEM_READONLY;
+ #endif
+ 
+ 	if (mem->flags & ~valid_flags)
+@@ -1278,7 +1280,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	int as_id, id;
+ 	int r;
+ 
+-	r = check_memory_region_flags(mem);
++	r = check_memory_region_flags(kvm, mem);
+ 	if (r)
+ 		return r;
+ 
 -- 
 2.17.1
 
