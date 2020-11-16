@@ -2,208 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CEEC42B4BE3
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 17:59:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5459E2B4C0C
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 18:04:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732353AbgKPQ60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 11:58:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53658 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730972AbgKPQ60 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Nov 2020 11:58:26 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AGGWuhp157360;
-        Mon, 16 Nov 2020 11:58:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3R5bS2vafexITrshh0F0yPt+8kiKgCE+0A96OagB+Mk=;
- b=E12EJbKW5GvEsIo0EyF5NCn+b4/ddbZHuQtn0y7c6P9gvSXbHb+nwBpnpWQHwKzTAL83
- roeOKHpmIJ0arFlob5udEpUOTvvgAsu+y3JQdZisK3nhPti4qLGt0uLgd8E4mt8q9xeA
- PbxTl8bHxAU1CqfvkdFEv/p7xCGngtsQglhSHObLNw0gmUwLyEEg9AGSUYHwibmLwpnW
- QM0zwP3/r78ZZ3Lfwp/NptXI/uItXaaYFKcU0jBJ2NV5v1cQsOEO/RTRXMt04dgZMire
- nuxciSlNXzLewigU18YFHritc1zf8MZtG1B+zcVP3b6GWKbIiKtATX0HDnd5tBzOUkAu +A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34uvwxgtn7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Nov 2020 11:58:24 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AGGrQVZ102861;
-        Mon, 16 Nov 2020 11:58:24 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34uvwxgtmh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Nov 2020 11:58:24 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AGGsbfP019187;
-        Mon, 16 Nov 2020 16:58:23 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma02wdc.us.ibm.com with ESMTP id 34t6v905ut-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Nov 2020 16:58:23 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AGGwEm08520238
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Nov 2020 16:58:14 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 093456E050;
-        Mon, 16 Nov 2020 16:58:20 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 893B96E04E;
-        Mon, 16 Nov 2020 16:58:18 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.152.80])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 16 Nov 2020 16:58:18 +0000 (GMT)
-Subject: Re: [PATCH v11 05/14] s390/vfio-ap: implement in-use callback for
- vfio_ap driver
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
- <20201022171209.19494-6-akrowiak@linux.ibm.com>
- <20201027142711.1b57825e.pasic@linux.ibm.com>
- <6a5feb16-46b5-9dca-7e85-7d344b0ffa24@linux.ibm.com>
- <20201114004722.76c999e0.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <cfa19823-5e75-1d4e-d174-eabaf9541788@linux.ibm.com>
-Date:   Mon, 16 Nov 2020 11:58:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20201114004722.76c999e0.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1732517AbgKPRCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 12:02:34 -0500
+Received: from mail-dm6nam11on2051.outbound.protection.outlook.com ([40.107.223.51]:16737
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732502AbgKPRCe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 12:02:34 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XEil32iAGq+WuwvOY8EzR5lTZHzVQrpndhhU00DffZsIsoYIvPMug7YF3+u3gjQyoOYx1wDIho49YZW7zqR2KZZNaoBxZ1GiVkTINhmVXdjyxEDrI0vqyvFWQAoGEHIhdwivpiPEUhPLS4G/fnRqDHmmmgxSXO/6L1VbzES4ejI9fEVQzCZAZfgQv+piX6E7CmBb1SpNWxlFBGWuNyv9elSnbFJCHL5kTlIRLP9Z6rgaCCV6P1XRrwlGWM0AakvXk3+G637GmiA1gxED2QfMGPbZCgGaJ5OHr6ag3MUvGp87zw9XKCKCX90gzw4Zqbdo7H49ufMV3gy7NiAfatuiQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5HwLxd1NROFUCuu7wqamBzkODr/KJ5H+JQDwMutOx44=;
+ b=RGoKdAtso+Ihiv2d9bJnN8cH3+TIjueNmuSoYdTXg34lRG457SvUlH+skFG9KdrX8KVjxVmMJ4ZBgxk59BDnMpGzD2Yzu9ajMs4tEn6U1yfmKp+HkrwTx0fbr/KYWdcnYtkTs8DfZqwWEVi6DOUFLB4a9QydJnv6g86zGMC114/Y5gimnkAICgk8VCtMd0ZvsBXOee0Y+bPE7SkkO1qYKwOP5WiSm3F+JsVZZ4OF0TVzaJxu8pgFTvE8YMXzs8s9ryjKdrKNn62X1jKT7NowDdM+zn4bZ2Uve0wz36QnRDjQEALeb6HivItO73nKDhYRso5RicwfpqiuYmHKJ3TTxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5HwLxd1NROFUCuu7wqamBzkODr/KJ5H+JQDwMutOx44=;
+ b=ER0ESuLF5uHqI/RNTM3O+lHYg+yhhGHL6bARCEBoMLStilAmuk/65ND3xnpOazOKh61H670AO6aycdVGZLkKZVzRt5FQFEBj9JNTYULgQGE4KyHxOMRizJfoC+egqu2PwfiXsihb1+ocVHBR1Cupj2Ply6j3LPwZp+GVXZX+IMk=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB4603.namprd12.prod.outlook.com (2603:10b6:5:166::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3564.28; Mon, 16 Nov 2020 17:02:31 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::dcda:c3e8:2386:e7fe]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::dcda:c3e8:2386:e7fe%12]) with mapi id 15.20.3564.028; Mon, 16 Nov
+ 2020 17:02:31 +0000
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Subject: [PATCH] kvm/i386: Set proper nested state format for SVM
+Date:   Mon, 16 Nov 2020 11:02:20 -0600
+Message-Id: <fe53d00fe0d884e812960781284cd48ae9206acc.1605546140.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.28.0
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-16_08:2020-11-13,2020-11-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 phishscore=0 clxscore=1015 suspectscore=3 malwarescore=0
- impostorscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011160099
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: DM5PR10CA0021.namprd10.prod.outlook.com (2603:10b6:4:2::31)
+ To DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from tlendack-t1.amd.com (165.204.77.1) by DM5PR10CA0021.namprd10.prod.outlook.com (2603:10b6:4:2::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.28 via Frontend Transport; Mon, 16 Nov 2020 17:02:30 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 875cb946-18a7-4e67-76ee-08d88a5167cf
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4603:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB460391EDD637742E792ADBF9ECE30@DM6PR12MB4603.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fPKmZAgwSpKl6m6q8IK5TGQNMQSgMW0LIC3Pvh/PxLcqOJ11JrMRZkcwqzXunSeEYbbjC6TAqPQf5rFFP3A9HDHzz7oxCFKjoeuyIU1mu8rfj6sV3r1Vv3OErJEORhwsct6GpzuUtQlGpdFN52wc6UMT9euzq3QQyqKwr0YXrSWgHcfPKap1f1aPLeuXBSP0gyY6PesvlLNi52W6npcxJcHQCkt8632A7vSj27+W6eJvJhG0pgk45+xowJ767AAgbe4jijgq39F550GCmVIKXUrCRtyNIPnLxKacT47UutBDHF25yue/q9D+wh9YDRIT
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(376002)(366004)(39860400002)(2906002)(16526019)(26005)(86362001)(478600001)(7696005)(2616005)(956004)(186003)(54906003)(5660300002)(66476007)(36756003)(83380400001)(52116002)(6486002)(8936002)(66556008)(316002)(66946007)(6666004)(4326008)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: Ama0HmYMx3TxCYmLVioRy6yghQrO8Xn+frrRoeIIvot4SCaE7tZdfnn/kc6IVw8hCGRRSoX2S8H2sjo7sYLwnJgEOEc62zbhWXKs6DJE1HPfRQrrpEKEChn5EkYAh4Op/dTo6E8EFoTW9uqAgsooN695xMknaqQ9GjaaYGf29Zg+dZQHOVcbSDbTM7mhF5ubwN74uPHI4IdM2TlvjwWcblQN6jMFTr+/6GE/7ArgiS7flktBBiNFlCm0gUh/iISo1nvcrHlgrNhXG0Rqin++/6ypeYorggYLbDLCcNtE6AvKlgyTRTp864Ngjs8BWIiGN5VCF8x4zIRrkSnzb6OixlmLQMhNb2TDdePN3BkKkbcAXHAKacKOEMuCunC5UxGM4ritZvoWW49pXuFwrMaHB4Etyw8cT9CojG8r4CYOp144Fjr89pB0Qp8a6GcL+A2JQNTeIrIFOAFBpkDgQRyNQXKXPnyOzWjDPuqq1NNs9kX7wqEs3hQoJ0Byy+WNWDaH6ssjU9gy/QDXB1lOT1iqqtc4BD9H676SSU24eNNkfzH4hmqhwG1pk7BLLkAMkrzms1yqOIYwcAYwM4ZrJKiSfvCrwG+wTy0ygdPj/QvKwSAfDOmMNLsuLVj7I+dM4nudzwMtkeRkCPxDEp4N+6igCQ==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 875cb946-18a7-4e67-76ee-08d88a5167cf
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2020 17:02:31.3787
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tvA3bHV6Q6lZsRygMJmsxMSl702ZKa5vXFedCxONPDJAOeAEJQonPOQI/2ikTLyv2blqiX3S2DudHGeiAoaLgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4603
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
+Currently, the nested state format is hardcoded to VMX. This will result
+in kvm_put_nested_state() returning an error because the KVM SVM support
+checks for the nested state to be KVM_STATE_NESTED_FORMAT_SVM. As a
+result, kvm_arch_put_registers() errors out early.
 
-On 11/13/20 6:47 PM, Halil Pasic wrote:
-> On Fri, 13 Nov 2020 12:14:22 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> [..]
->>>>    }
->>>>    
->>>> +#define MDEV_SHARING_ERR "Userspace may not re-assign queue %02lx.%04lx " \
->>>> +			 "already assigned to %s"
->>>> +
->>>> +static void vfio_ap_mdev_log_sharing_err(const char *mdev_name,
->>>> +					 unsigned long *apm,
->>>> +					 unsigned long *aqm)
->>>> +{
->>>> +	unsigned long apid, apqi;
->>>> +
->>>> +	for_each_set_bit_inv(apid, apm, AP_DEVICES)
->>>> +		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS)
->>>> +			pr_err(MDEV_SHARING_ERR, apid, apqi, mdev_name);
->>> Isn't error rather severe for this? For my taste even warning would be
->>> severe for this.
->> The user only sees a EADDRINUSE returned from the sysfs interface,
->> so Conny asked if I could log a message to indicate which APQNs are
->> in use by which mdev. I can change this to an info message, but it
->> will be missed if the log level is set higher. Maybe Conny can put in
->> her two cents here since she asked for this.
->>
-> I'm looking forward to Conny's opinion. :)
->
-> [..]
->>>>    
->>>> @@ -708,18 +732,18 @@ static ssize_t assign_adapter_store(struct device *dev,
->>>>    	if (ret)
->>>>    		goto done;
->>>>    
->>>> -	set_bit_inv(apid, matrix_mdev->matrix.apm);
->>>> +	memset(apm, 0, sizeof(apm));
->>>> +	set_bit_inv(apid, apm);
->>>>    
->>>> -	ret = vfio_ap_mdev_verify_no_sharing(matrix_mdev);
->>>> +	ret = vfio_ap_mdev_verify_no_sharing(matrix_mdev, apm,
->>>> +					     matrix_mdev->matrix.aqm);
->>> What is the benefit of using a copy here? I mean we have the vfio_ap lock
->>> so nobody can see the bit we speculatively flipped.
->> The vfio_ap_mdev_verify_no_sharing() function definition was changed
->> so that it can also be re-used by the vfio_ap_mdev_resource_in_use()
->> function rather than duplicating that code for the in_use callback. The
->> in-use callback is invoked by the AP bus which has no concept of
->> a mediated device, so I made this change to accommodate that fact.
-> Seems I was not clear enough with my question. Here you pass a local
-> apm which has the every bit 0 except the one corresponding to the
-> adapter we are trying to assign. The matrix.apm actually may have
-> more apm bits set. What we used to do, is set the matrix.apm bit,
-> verify, and clear it if verification fails. I think that
-> would still work.
->
-> The computational complexity is currently the same. For
-> some reason unknown to me ap_apqn_in_matrix_owned_by_def_drv() uses loops
-> instead of using bitmap operations. But it won't do any less work
-> if the apm argument is sparse. Same is true bitmap ops are used.
->
-> What you do here is not wrong, because if the invariants, which should
-> be maintained, are maintained, performing the check with the other
-> bits set in the apm is superfluous. But as I said before, actually
-> it ain't extra work, and if there was a bug, it could help us detect
-> it (because the assignment, that should have worked would fail).
->
-> Preparing the local apm isn't much extra work either, but I still
-> don't understand the change. Why can't you pass in matrix.apm
-> after set_bit_inv(apid, ...) like we use to do before?
->
-> Again, no big deal, but I just prefer to understand the whys.
+Update the setting of the format based on the virtualization feature:
+  VMX - KVM_STATE_NESTED_FORMAT_VMX
+  SVM - KVM_STATE_NESTED_FORMAT_SVM
 
-I think you misunderstood what I was saying, probably because
-I didn't explain it very thoroughly or clearly. The change was not
-made to reduce the amount of work done in the
-vfio_ap_mdev_verify_no_sharing() function.
+Also, fix the code formatting while at it.
 
+Fixes: b16c0e20c7 ("KVM: add support for AMD nested live migration")
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ target/i386/kvm.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-If the assignment functions were the only ones to call the
-vfio_ap_mdev_verify_no_sharing() function, then you'd be correct;
-there would be no good reason not to set the apid in the
-matrix_mdev->matrix.apm/aqm as we used to. The modification
-was made to accommodate the vfio_ap_mdev_resource_in_use() function.
-
-The vfio_ap_mdev_resource_in_use() function is invoked by the
-AP bus when a change is made to the apmask/aqmask that
-will result in taking queues away from vfio_ap. This function
-needs to verify that the affected APQNs are not assigned to
-any matrix mdev. Rather than write a new function that duplicates
-the logic in the vfio_ap_mdev_verify_no_sharing() function, I merely
-changed the signature to take the apm/aqm specifying the APQNs to
-verify rather than obtaining them from the matrix_mdev. The
-reason for this is because the bitmaps passed to the in_use
-callback are not specific to a particular matrix_mdev as is the
-case with the assignment interfaces. Making this change allowed the
-vfio_ap_mdev_verify_no_sharing() function to be used by both the
-assignment functions as well as the in_use callback.
-
-I suppose another option
-would have been to create a phony matrix_mdev in the in_use
-callback and copy the masks passed in to the function to the
-phony matrix_mdev's apm/aqm. That would have eliminated
-the need to change the signature of the vfio_ap_mdev_verify_no_sharing()
-function, but I'm not sure it is worth the effort at this point.
-
->>> I've also pointed out in the previous patch that in_use() isn't
->>> perfectly reliable (at least in theory) because of a race.
->> We discussed that privately and determined that the sysfs assignment
->> interfaces will use mutex_trylock() to avoid races.
-> I don't think, what we discussed is going to fix the race I'm referring
-> to here. But I do look forward to v12.
->
-> Regards,
-> Halil
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index cf46259534..a2934dda02 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1820,12 +1820,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+ 
+             env->nested_state = g_malloc0(max_nested_state_len);
+             env->nested_state->size = max_nested_state_len;
+-            env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
+ 
+             if (cpu_has_vmx(env)) {
+-                    vmx_hdr = &env->nested_state->hdr.vmx;
+-                    vmx_hdr->vmxon_pa = -1ull;
+-                    vmx_hdr->vmcs12_pa = -1ull;
++                env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
++                vmx_hdr = &env->nested_state->hdr.vmx;
++                vmx_hdr->vmxon_pa = -1ull;
++                vmx_hdr->vmcs12_pa = -1ull;
++            } else {
++                env->nested_state->format = KVM_STATE_NESTED_FORMAT_SVM;
+             }
+         }
+     }
+-- 
+2.28.0
 
