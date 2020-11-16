@@ -2,107 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 825722B5066
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:59:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D79122B509D
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 20:16:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726925AbgKPS7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 13:59:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40575 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726812AbgKPS7M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Nov 2020 13:59:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605553150;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+osUxqYK5cMud4zaRL15T6XoOjxtXYWHGiOY4btD6Ao=;
-        b=dQh236w+OgnBV24EnKLtUiLjpxpj/OcZXedJdMKQGv8GnMJ9M0lTjqjCax3pVHe+cyBFEB
-        tVW42x5VERwAbYZhwpT820E01bvQQ7+Uy9BbWbY6eXtelsjCWPD4eJ2/J2NuVyjBZ4t/dN
-        HlrgXULP4/4zz2mBQImlMW0lZ5U5Vbk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-zKlrDqYqOV6sylApfgrkuQ-1; Mon, 16 Nov 2020 13:59:08 -0500
-X-MC-Unique: zKlrDqYqOV6sylApfgrkuQ-1
-Received: by mail-wr1-f71.google.com with SMTP id w5so9346664wrm.22
-        for <kvm@vger.kernel.org>; Mon, 16 Nov 2020 10:59:08 -0800 (PST)
+        id S1728923AbgKPTPt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 14:15:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725379AbgKPTPr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 14:15:47 -0500
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733D8C0613CF
+        for <kvm@vger.kernel.org>; Mon, 16 Nov 2020 11:15:46 -0800 (PST)
+Received: by mail-io1-xd44.google.com with SMTP id r12so18598058iot.4
+        for <kvm@vger.kernel.org>; Mon, 16 Nov 2020 11:15:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=99NQEfWpebH0JZaPShV/ZqMQjroijwm6vQAuryLgtTY=;
+        b=pUz0P3tVeQ1RUtxaQlmVb7n2wzh5gwNgAG6ufxYyL5uE4Nl8s3pqivW4DjCtE8gLyA
+         zoY5brm2mBYemwf6Rl2FjcICOM1eTAbq1MZcPwUFrQyKDuLwAOp1VqwVxKmGoeTdg+m8
+         ZG4D8jMOq3McrUDezA8IMEaTL4OTBluEg4CmunOW0/sZJll1jO/FyCBkQfKSaMhh83jl
+         NWa6XfKs4dRFSG9Ybz/o11Xsua/MZEwJJtsJcyQSgSwEVZ8sQkHRyBe9jKUcgQHeNMSQ
+         lRMiLKkhN7NtLYcMPHRMqi3907PYnn/7meP2Jgagx1nOcEnv1sGS5plhsILl3Q3J+1iK
+         c5mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+osUxqYK5cMud4zaRL15T6XoOjxtXYWHGiOY4btD6Ao=;
-        b=QH6MQfLXwTXm0nkaJerzpyH4MsT9i/p+S8ihVeFRPVreXMiz70PGGRlpn0/A+rwN8F
-         v7Blt3tMdPTXXaitwPCRhcoh+hsNUPDJZMzcyZDVv+ITRMJFYUea/9nlOTk+9J2Ud5Fa
-         nae18UYx2gTZGjDWdZmzOOL6VzeXbJIhQEO9rrQTXRd5taaMbaujfh/tvKqJdDBwuANr
-         92QLBkpQGPSPYKpZ1iFDzEX779CQScugGnig9I3aDrYkzjgYAUoTx/z1DeoASexjf5rn
-         bPsVqxbH93TeGYm5PBx7r0iZS5qvUBjjrleUSH3YgiQHSSxwmdaZvTjdy47MNfHO6wTN
-         U1dw==
-X-Gm-Message-State: AOAM532/b9xzocuNdgffxNasYWItr2sQfqppfMzEcHK731fB53GaLVLN
-        wxJItBD+Uf3OgcVLGjI2X+dvBNXFg3uZxq+gniz76MJXHmtY7ndCYD9mTlYhc4c0OrPO4mgxdt+
-        uirHgyUAMOmXF
-X-Received: by 2002:a5d:50d1:: with SMTP id f17mr21166385wrt.264.1605553147565;
-        Mon, 16 Nov 2020 10:59:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy5OouAvYgD5YfXOJI3Yx8ts7SI9ylIaP0bb7awCuHIwZEeVY5tubf9YQwkgtoE1B6+Cguqyg==
-X-Received: by 2002:a5d:50d1:: with SMTP id f17mr21166370wrt.264.1605553147396;
-        Mon, 16 Nov 2020 10:59:07 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m18sm22450471wru.37.2020.11.16.10.59.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Nov 2020 10:59:06 -0800 (PST)
-Subject: Re: [PATCH] KVM: SVM: Fix offset computation bug in
- __sev_dbg_decrypt().
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        Brijesh.Singh@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ssg.sos.patches@amd.com
-References: <20201110224205.29444-1-Ashish.Kalra@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d9f6ac9b-0655-6403-aa4e-4dc70f519b28@redhat.com>
-Date:   Mon, 16 Nov 2020 19:59:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=99NQEfWpebH0JZaPShV/ZqMQjroijwm6vQAuryLgtTY=;
+        b=fAcANcx5rfgKPOxtlmVM+aEmh5V9I9g4Q52faWqB48rjTH/BA83H4Jb1RQTyk/tq7A
+         In/73EW92A7Jkj1WLSvE0aPsQE6G+KTCMCHiRVorwxQA0H6ZE2q1raJ7sHRtBMSowX3Q
+         tyojaYy3BxGvDU6SyE588f5V1dEEJD0BXtnHvmjA6h1eb4QpnkDoZjKfTEF9frfptZmt
+         h1qit9GhLYIT0HjZKSWPp9pP5128MO36l04T7n6bNMRobK3OqYZskYT6KfK/OYOV+X7f
+         8uGu3ksUjGmKWBMuXFMHKzQiJcTQYFYzFvLig14IilA3hddq2jN+ubTI/b/9csrP1iw0
+         2Z+g==
+X-Gm-Message-State: AOAM531DXd7etqlNvY+UcWjewY4WWwZpQqOlaSsfZaal+CuNwHSpVCRV
+        HVHnymeB0eV3WpzLp+0+4AFMnH6dajweJZ9+zqQdkQ==
+X-Google-Smtp-Source: ABdhPJx/15tWi7ORQegPRDAQikpetJZdcJfF01Qlcy+OPS9EkZLyFeQeAqafT6ivv4CFc/4Air1TOe3iFPRl4jK2Ms4=
+X-Received: by 2002:a05:6638:159:: with SMTP id y25mr889816jao.4.1605554145510;
+ Mon, 16 Nov 2020 11:15:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201110224205.29444-1-Ashish.Kalra@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20201027175944.1183301-1-bgardon@google.com>
+In-Reply-To: <20201027175944.1183301-1-bgardon@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 16 Nov 2020 11:15:34 -0800
+Message-ID: <CANgfPd8FkNL-05P7us6sPq8pXPJ1jedXGMPkR2OrvTtg8+WSLg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kvm: x86/mmu: Add existing trace points to TDP MMU
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Peter Feiner <pfeiner@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/11/20 23:42, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> Fix offset computation in __sev_dbg_decrypt() to include the
-> source paddr before it is rounded down to be aligned to 16 bytes
-> as required by SEV API. This fixes incorrect guest memory dumps
-> observed when using qemu monitor.
-> 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+On Tue, Oct 27, 2020 at 10:59 AM Ben Gardon <bgardon@google.com> wrote:
+>
+> The TDP MMU was initially implemented without some of the usual
+> tracepoints found in mmu.c. Correct this discrepancy by adding the
+> missing trace points to the TDP MMU.
+>
+> Tested: ran the demand paging selftest on an Intel Skylake machine with
+>         all the trace points used by the TDP MMU enabled and observed
+>         them firing with expected values.
+>
+> This patch can be viewed in Gerrit at:
+> https://linux-review.googlesource.com/c/virt/kvm/kvm/+/3812
+>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
->   arch/x86/kvm/svm/sev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index c0b14106258a..566f4d18185b 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -642,8 +642,8 @@ static int __sev_dbg_decrypt(struct kvm *kvm, unsigned long src_paddr,
->   	 * Its safe to read more than we are asked, caller should ensure that
->   	 * destination has enough space.
->   	 */
-> -	src_paddr = round_down(src_paddr, 16);
->   	offset = src_paddr & 15;
-> +	src_paddr = round_down(src_paddr, 16);
->   	sz = round_up(sz + offset, 16);
->   
->   	return __sev_issue_dbg_cmd(kvm, src_paddr, dst_paddr, sz, err, false);
-> 
+>  arch/x86/kvm/mmu/tdp_mmu.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 27e381c9da6c2..047e2d966abef 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -7,6 +7,8 @@
+>  #include "tdp_mmu.h"
+>  #include "spte.h"
+>
+> +#include <trace/events/kvm.h>
+> +
+>  #ifdef CONFIG_X86_64
+>  static bool __read_mostly tdp_mmu_enabled = false;
+>  module_param_named(tdp_mmu, tdp_mmu_enabled, bool, 0644);
+> @@ -101,6 +103,8 @@ static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+>         sp->gfn = gfn;
+>         sp->tdp_mmu_page = true;
+>
+> +       trace_kvm_mmu_get_page(sp, true);
+> +
+>         return sp;
+>  }
+>
+> @@ -271,6 +275,8 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>                 pt = spte_to_child_pt(old_spte, level);
+>                 sp = sptep_to_sp(pt);
+>
+> +               trace_kvm_mmu_prepare_zap_page(sp);
+> +
+>                 list_del(&sp->link);
+>
+>                 if (sp->lpage_disallowed)
+> @@ -473,11 +479,13 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
+>         if (unlikely(is_noslot_pfn(pfn))) {
+>                 new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+>                 trace_mark_mmio_spte(iter->sptep, iter->gfn, new_spte);
+> -       } else
+> +       } else {
+>                 make_spte_ret = make_spte(vcpu, ACC_ALL, iter->level, iter->gfn,
+>                                          pfn, iter->old_spte, prefault, true,
+>                                          map_writable, !shadow_accessed_mask,
+>                                          &new_spte);
+> +               trace_kvm_mmu_set_spte(iter->level, iter->gfn, iter->sptep);
+> +       }
+>
+>         if (new_spte == iter->old_spte)
+>                 ret = RET_PF_SPURIOUS;
+> @@ -691,6 +699,8 @@ static int age_gfn_range(struct kvm *kvm, struct kvm_memory_slot *slot,
+>
+>                 tdp_mmu_set_spte_no_acc_track(kvm, &iter, new_spte);
+>                 young = 1;
+> +
+> +               trace_kvm_age_page(iter.gfn, iter.level, slot, young);
+>         }
+>
+>         return young;
+> --
+> 2.29.0.rc2.309.g374f81d7ae-goog
+>
 
-I just missed it.  Queued now, thanks.
-
-Paolo
-
+If anyone has time to review this short series, I'd appreciate it. I
+don't want these to get lost in the shuffle.
+Thanks!
