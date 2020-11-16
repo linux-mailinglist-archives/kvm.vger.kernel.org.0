@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11D582B5034
+	by mail.lfdr.de (Postfix) with ESMTP id 7DC172B5035
 	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:51:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbgKPSuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 13:50:50 -0500
-Received: from mail-dm6nam12on2079.outbound.protection.outlook.com ([40.107.243.79]:54881
+        id S1726732AbgKPSv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 13:51:28 -0500
+Received: from mail-dm6nam12on2069.outbound.protection.outlook.com ([40.107.243.69]:55515
         "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725879AbgKPSut (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Nov 2020 13:50:49 -0500
+        id S1726536AbgKPSv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 13:51:28 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NHDcIJTyDQojriknzaZJqNg/iHq1Z/EKpf2e4oxZvSartXvRjvy3tE0KcfOUv4LolDAQ+ke17tQPbA2U7h0pR/z8okmPzXJLYmGSrDZnq4WQuehB2ho12az51lN09sH5ZvbA81ox5O9iSIr2G1I9tZzfkcVQ6MblcfDhKl3TIRW5VSTTz1GrVxq8//H4YdOc/RMzaj+4FR5RdcrR4Yo82xuxhaebIh9ncYz8yAIlB4e7sGPD1TGNcR/6TwU1vQNneFKGZIR0p5lAnm9MryK8iAS0sLOkXianLRKCdOBzp4SU+mEjRzuJEkvPLXXL9bzBx998nloSc167UDXlo/j1HA==
+ b=dZAZR4igKNeP/yQQjSkGUV3l+SP8wfALoL+Q89wFc5fnKiT7VxSBDz2dVqQvwUgRbC6q8sRhi9705VwBlhft154iX6clCZNmR+odzt3Srlybp20QALWGds85un99qfMJS7kXAFGDKZxA+gN66RNjiP5Z9xFXiNR7JK1cR/Q34tPmxNRYWHFh10IFN3g7RDvN5YyYKcWA3TXwZ0PNnAJ9LXRB0no6v00cLdvyuOgMpqfCHKVeVE6aS1SoVrYslXSuJficbI0H6poqOOIoF3sBAGSDLvdor6ukhr/ziyv38qw1vDwn0t0w7dhaZ2jq6YLWGmuZNpPp3SeQPse3JqsNHw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5mMhshu5C713c2SyfmmeXo3sS+iM6PeuvtkF4Ik78Nw=;
- b=NYl1IJQsr9swsj+h6zOBkLcsTk/U0POmRGor67/26+czejhrZz+Zxa7O8z24N9virMnCbDB9l55Y059Xgxy4BSAbWxH5HRcm2fZA4VdgOfaZU9zPwCQMvbffb9N99pqh16EZMriHAiPC+H1dLO2wZTvut97sFolmjobulG9p+qMRc9c+mvQeM19E25EV4g/e3a/rn1TXfp59gnWeL56Pj6S4oREO8w+77ztHWtcQCc4Vmq1WxGeXuN1PZjpr7NkFrVgrHe6wKMrZe/6nH/0wWumketgNhlRD3CCJ+e7jWIVcs4hVsWfPqRVzKyHtFPT6tz+BgIfSWoJpBC0zMYd7RA==
+ bh=1tGD5kFPp5vT4bC1fLGw54p0iU6u5g1fzK1AuT4DFdM=;
+ b=e/awd9Q6tvQ03TkDqwxx1QF6h2VPlczWjE3Nq+RSdN+tK9E9O3+60nOFBqjQwBT6hPSJH6W6YzHeaYjmko3UzsufMzXaJpUoL7rBwqwgukvD7u+aX2gO92rwEQZCE7sDy1vUnkIqq9pMKcJnOlZ6hCJ77FCqoFTCV8yv6FtcA36q79KZ9Z5Nvt380w7Ny1LvywZQCFJITVCcpkBP+cCMRyLydlhbvzkQZqiIhEkEWdLo7ww14OkoYgz6NDWElNA/Qa19VrCqU9YLLZaHUqQHg40E0eb2ka60PJDXaUAYG4WRpIKR7a6m5uDBvy6xU4s+BC7HnDhmhnSQfJ+ZsM+rkw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5mMhshu5C713c2SyfmmeXo3sS+iM6PeuvtkF4Ik78Nw=;
- b=XWu+ORTbUouUgALD3w7nAZ29bymNs4Vf7vMRfbPN9qYMBbVwHd93qPpXn0GELfBycd0i3+hX+xaTbPsyr9aagL7eZzD6Qd8dLtqVTDQ3t/wpm+MmafX4A4X7uPM1Qbnme6P9rpGd7eqp5dv/KyZaMkppDoJEk5lxPykZYXfd/x4=
+ bh=1tGD5kFPp5vT4bC1fLGw54p0iU6u5g1fzK1AuT4DFdM=;
+ b=KvpbuLbdCr8ZuxwwYUdN1DKMZihAB/Oq6aWNr9kr3JfFb0NtHPovfVfW1f9A4QEEf8PseoYqhSUWMQxCeRaQqx+FNKaRBSX+zS7oTBfp1qQCK6CaBCRHHHP6by7pD8JR4mlQo1XL2gFVCeuKvg94BEBrtDho04LYSKuXDVo+vM0=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2782.namprd12.prod.outlook.com (2603:10b6:805:73::19) with
+ by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.19; Mon, 16 Nov
- 2020 18:50:46 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.25; Mon, 16 Nov
+ 2020 18:51:26 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3541.025; Mon, 16 Nov 2020
- 18:50:46 +0000
+ 18:51:26 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     qemu-devel@nongnu.org, rth@twiddle.net, armbru@redhat.com,
@@ -45,175 +45,151 @@ Cc:     qemu-devel@nongnu.org, rth@twiddle.net, armbru@redhat.com,
         mst@redhat.com, marcel.apfelbaum@gmail.com, mtosatti@redhat.com,
         Thomas.Lendacky@amd.com, brijesh.singh@amd.com,
         ssg.sos.patches@amd.com
-Subject: [PATCH 04/11] exec: Add address_space_read and address_space_write debug helpers.
-Date:   Mon, 16 Nov 2020 18:50:34 +0000
-Message-Id: <36cda6f0d2f7e58dd7fae518e943653d8a6a559d.1605316268.git.ashish.kalra@amd.com>
+Subject: [PATCH 05/11] exec: add debug version of physical memory read and write API
+Date:   Mon, 16 Nov 2020 18:51:14 +0000
+Message-Id: <7f254436d56679b27ba0112c16472831a6a66b49.1605316268.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1605316268.git.ashish.kalra@amd.com>
 References: <cover.1605316268.git.ashish.kalra@amd.com>
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: DM6PR07CA0090.namprd07.prod.outlook.com
- (2603:10b6:5:337::23) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM5PR19CA0069.namprd19.prod.outlook.com
+ (2603:10b6:3:116::31) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM6PR07CA0090.namprd07.prod.outlook.com (2603:10b6:5:337::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.21 via Frontend Transport; Mon, 16 Nov 2020 18:50:45 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM5PR19CA0069.namprd19.prod.outlook.com (2603:10b6:3:116::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.25 via Frontend Transport; Mon, 16 Nov 2020 18:51:24 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 596d3351-6689-4114-1440-08d88a60871f
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2782:
+X-MS-Office365-Filtering-Correlation-Id: cca836d4-a569-446e-3b4f-08d88a609eb0
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB2782B13A84E31007DA8BAF7F8EE30@SN6PR12MB2782.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:247;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4557B1563D21D40512A1FC008EE30@SA0PR12MB4557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3173;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2DbaXhHFZz1vXTuHfUBJwC5cCTGvPe4NY3qKi8VtrRTe7jRjjquZfPwqCcs5wYw9jkKW8huAIrxBLl6CxncOvuP9gAbuSsr04FUgjrvEQ/Xi/RG+fHHY3/cp50umFlsQ/sdjXR8t1OkJXplNqTlvu4mak6ahcPM2j07xFl17gcO7v0YNwRl5wElm0W6y8lXfV9Nf7Qkt8mnLafB0/MNIi4wMn5pM4HQGeaM7r8vIs7IdCJhu4Rypp0kdKzKG3yoBPTF5qE2YIDXYgnsWrzKxNKl6h2aQ5YYSDEvdQFTsq9jIzh6lTzZe2HJWEyJgjxki
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(39860400002)(366004)(396003)(346002)(7416002)(6666004)(186003)(83380400001)(478600001)(4326008)(5660300002)(8936002)(2616005)(66556008)(8676002)(66476007)(6916009)(16526019)(66946007)(86362001)(316002)(7696005)(36756003)(52116002)(2906002)(26005)(6486002)(956004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: rcYfFRDiGWGks1g2BM254n3c4JPkV2mPDQK+MZUg9FoH2PFTy1bbw884FtlF4Yi2BEf5/JNJoMV6BlOUTAH2LLfgxgsrDemgTSmi8M+Gi2ijGWwL7aQEmz0xbQD4b4snrhmLXtzlaVWVfAAeEH0zb9nvOXWXFN6TIOWycTfRE7S31mESDKjk4k+LBcAWKH0DiXDaCihbc9ndBKlnCfGmBjb56/bDBet60Be78M6Hi88SmjP9LbS09Zif0MaeJRD4UIXrBOSHyRGy3scI0dYUOu/gyDDf/XNOc28zMB4StJGkWMdLvRSo2NSSuGSRdTJwVfRsLnZ56XPtfytWq1tlk62hhYDwN00s3IuKFe7KCDHqSJLnpDxq96+7RGFy8R3hHgtLgfT1RwrxPEMz4PssFysy0ozI3iEPFjxAUqeotkpiUrdELZfyC5oMgR7j9M9LCEmlXrgexjVbg3PY9D+6MH/N8vR4ZFkQWh5LhcJ8IC7vSFuWlrJNO1cNSDC6oI1018mkWo4iqiULuE1SR/dDHZhk/7rqOpIY/Fy1yObEi2KbcPABvV89QmjLI0bu5bhAyB5ynzdLqSXDFoCvNFgDWlGu1QaNyH2Xowbxi63kyJSZoj5oqSBqrTXcugHOM0/OzlPBRcxlhe1b776mRpQD8DHvCuAPytfRAgaAVLaANxurwRkz3Buo54dJta3pPjFpkEWsDQlb2Yunx6t1ZhZLQ1DxUv4e/0Eo7uhyZgNjWaTZ/Ozm4XgljwnXZ1WuHFuCl3zY8Ft83DdEjGNKfx8MgLxPl6SAzPurICHQvVOY2AO21UHrIeAIWgx/tj34khd4OY3vlHhDIGZzx/ZI8xcoMRBmHLnbf2bj5sKH3w84HCHaDjqBuvteRDsG3/A9IuAoe6N3dst8D+gPis5y6QdTtw==
+X-Microsoft-Antispam-Message-Info: yK7fS3EJw6dpc5S6dIgbfyTb2jYKFb4WhhAtrZPqbswgoE5CEuIetmHNIYiHFfHG+ccdSSekxmyFMzhADhM1hIX8OYlyY4NDuPLoVtn3cqmgxerCTjkqY9WVGmtWfpbuby/+oVTTs2ToFl6iL8vbBWGYgxlwx9drVBmFM17AU2zHJZiBvscqBA2dl46R+JAFj00D2x3WHob9CpLYY/QVedFDPxgjtjOfVut8HFEMKbqZZQKxxDs5o0BEl006eRx/cXMiW6jGUC9q7lYOzxHXHQ8owt4ENwRTxHcXz5yF3lY/OVw7SYz0NY0yV286Dl3d
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(136003)(346002)(376002)(39860400002)(66946007)(36756003)(86362001)(2616005)(956004)(8936002)(83380400001)(66476007)(66556008)(5660300002)(6666004)(2906002)(6486002)(478600001)(7696005)(8676002)(6916009)(16526019)(186003)(26005)(52116002)(316002)(7416002)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: UoqikJvmvP8ijThA2cJYm9Sa7wP61P0XBJsVqjfThTUzYHI68yAQZ93YTnN8A6njOpP7N0n9ic+6dDI9CPiCxbhduQ3z/DRXlguLa2bqRA9AuP+6I/xjW5SFzMigY2r2bH8Q9xvzM/BXy6PYYgGmUdtJWQCQ0yRIknVImVszQaf56eroMkWJpoI+ai68lFhVe8FEStFdUsVEFwH9y3c4LI3ekDuUBxefsg3lvEn6aboJvOnYrJF1mT5z5xCUebNXl5X9ZfXPxOlt3naM1ulqebHhyAZcTaRYTkrxgNJTBtG8DN161mQMXkECKdDnRY0PUXFEE1LOuc53BLiuNvHTVGlE8tYQEUZNMLYVgXCpUaTcSkAKSIQhQxqxSNrAO2liiMI3jXdHlDk5w0GD6Eh+auTq2ySXANIVCUfJyllcbPeRVwZa6GxmHd4TJ54li+fKxpf/U23QcIDvCGPbqOIZ9Ior1z9jqgdQEvRHNVGx61wBjbLTh2xWpPd2MdD/cKWygpnwL4FUQvDhqh0qWKuhPy0wHYe18fHTooRRM4KUk9fi9PC+iK2ad69sUFa+kXqLSrR3+gzCrY/Z207+h82FOjLpdShwHhj6wDiN93YSiqDnShgbGu2rmcGIPIUJKYXTGfsNVO0nDvGw73i/4g6Upj4ks+mbE6PpeTt8k4uYgGhIiUl9gyJmCuMtfgFDEABmrkQF5NspjX2EzALdKrcx8P6lv5xOgeNtcbIPIWQbuqv3QGEoN1aVqS0TvMqa2Iswt2x3tWMLdaP4lT90/22Rj8iCOcpNLxSl2SpzJ8iyXpr8/gOPyxGymMDL7Tk3JEmOfCPwLb2CezSRz4RjvdZwhzODSp4hYsuMr7iG1GTwJfh3oXoK+C1CkPDCykdMW19FT/dPDV4ycz2vmYXxebv8bg==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 596d3351-6689-4114-1440-08d88a60871f
+X-MS-Exchange-CrossTenant-Network-Message-Id: cca836d4-a569-446e-3b4f-08d88a609eb0
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2020 18:50:46.3018
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2020 18:51:25.8877
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7nk8Dt/TYuE9V4RBkLv5p0liucLyUOk5IM1T2vWgce2FtyEYH3nD8jRgt4hcRIT8vIzyGvGW635kG1zHtqw2Lg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2782
+X-MS-Exchange-CrossTenant-UserPrincipalName: MjoUQG9v3SyFuAYOxob8DVrMDBTwjp/ckvTnGRFDf9rLrqCcOB+De0WqLQAkfGHzS74XHNOaHDZtAwGDS8S9rg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-Add new address_space_read and address_space_write debug helper
-interfaces which can be invoked by vendor specific guest memory
-debug assist/hooks to do guest RAM memory accesses using the
-added MemoryRegion callbacks.
+Adds the following new APIs
+- cpu_physical_memory_read_debug
+- cpu_physical_memory_write_debug
+- cpu_physical_memory_rw_debug
+- ldl_phys_debug
+- ldq_phys_debug
 
+The subsequent patch will make use of the API introduced, to ensure
+that the page table walks are handled correctly when debugging an
+SEV guest.
+
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- include/exec/memory.h | 10 +++++
- softmmu/physmem.c     | 88 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 98 insertions(+)
+ include/exec/cpu-common.h | 15 +++++++++++++
+ softmmu/physmem.c         | 47 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 2fb4193358..74f2dcec00 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -2432,6 +2432,16 @@ typedef struct MemoryDebugOps {
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 19805ed6db..d2089e6873 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -71,11 +71,26 @@ size_t qemu_ram_pagesize_largest(void);
  
- void address_space_set_debug_ops(const MemoryDebugOps *ops);
- 
-+MemTxResult address_space_write_rom_debug(AddressSpace *as,
-+                                          hwaddr addr,
-+                                          MemTxAttrs attrs,
-+                                          const void *ptr,
-+                                          hwaddr len);
-+
-+MemTxResult address_space_read_debug(AddressSpace *as, hwaddr addr,
-+                                     MemTxAttrs attrs, void *buf,
-+                                     hwaddr len);
-+
- static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+ void cpu_physical_memory_rw(hwaddr addr, void *buf,
+                             hwaddr len, bool is_write);
++void cpu_physical_memory_rw_debug(hwaddr addr, uint8_t *buf,
++                                  int len, int is_write);
+ static inline void cpu_physical_memory_read(hwaddr addr,
+                                             void *buf, hwaddr len)
  {
-     if (is_write) {
+     cpu_physical_memory_rw(addr, buf, len, false);
+ }
++static inline void cpu_physical_memory_read_debug(hwaddr addr,
++                                                  void *buf, int len)
++{
++    cpu_physical_memory_rw_debug(addr, buf, len, false);
++}
++static inline void cpu_physical_memory_write_debug(hwaddr addr,
++                                                   const void *buf, int len)
++{
++    cpu_physical_memory_rw_debug(addr, (void *)buf, len, true);
++}
++uint32_t ldl_phys_debug(CPUState *cpu, hwaddr addr);
++uint64_t ldq_phys_debug(CPUState *cpu, hwaddr addr);
++
+ static inline void cpu_physical_memory_write(hwaddr addr,
+                                              const void *buf, hwaddr len)
+ {
 diff --git a/softmmu/physmem.c b/softmmu/physmem.c
-index 057d6d4ce1..2c08624ca8 100644
+index 2c08624ca8..6945bd5efe 100644
 --- a/softmmu/physmem.c
 +++ b/softmmu/physmem.c
-@@ -3266,6 +3266,94 @@ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
- #define RCU_READ_UNLOCK(...)     rcu_read_unlock()
- #include "memory_ldst.c.inc"
+@@ -3354,6 +3354,53 @@ inline MemTxResult address_space_write_rom_debug(AddressSpace *as,
+     return MEMTX_OK;
+ }
  
-+MemTxResult address_space_read_debug(AddressSpace *as, hwaddr addr,
-+                                     MemTxAttrs attrs, void *ptr,
-+                                     hwaddr len)
++uint32_t ldl_phys_debug(CPUState *cpu, hwaddr addr)
 +{
-+    uint64_t val;
-+    MemoryRegion *mr;
-+    hwaddr l = len;
-+    hwaddr addr1;
-+    MemTxResult result = MEMTX_OK;
-+    bool release_lock = false;
-+    uint8_t *buf = ptr;
-+    uint8_t *ram_ptr;
++    MemTxAttrs attrs;
++    int asidx = cpu_asidx_from_attrs(cpu, attrs);
++    uint32_t val;
 +
-+    for (;;) {
-+        RCU_READ_LOCK_GUARD();
-+        mr = address_space_translate(as, addr, &addr1, &l, false, attrs);
-+        if (!memory_access_is_direct(mr, false)) {
-+            /* I/O case */
-+            release_lock |= prepare_mmio_access(mr);
-+            l = memory_access_size(mr, l, addr1);
-+            result |= memory_region_dispatch_read(mr, addr1, &val,
-+                                                  size_memop(l), attrs);
-+            stn_he_p(buf, l, val);
-+        } else {
-+            /* RAM case */
-+            fuzz_dma_read_cb(addr, l, mr, false);
-+            ram_ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
-+            if (attrs.debug && mr->ram_debug_ops) {
-+                mr->ram_debug_ops->read(buf, ram_ptr, l, attrs);
-+            } else {
-+                memcpy(buf, ram_ptr, l);
-+            }
-+            result = MEMTX_OK;
-+        }
-+        if (release_lock) {
-+            qemu_mutex_unlock_iothread();
-+            release_lock = false;
-+        }
++    /* set debug attrs to indicate memory access is from the debugger */
++    attrs.debug = 1;
 +
-+        len -= l;
-+        buf += l;
-+        addr += l;
++    debug_ops->read(cpu->cpu_ases[asidx].as, addr, attrs,
++                    (void *) &val, 4);
 +
-+        if (!len) {
-+            break;
-+        }
-+        l = len;
-+    }
-+    return result;
++    return tswap32(val);
 +}
 +
-+inline MemTxResult address_space_write_rom_debug(AddressSpace *as,
-+                                                 hwaddr addr,
-+                                                 MemTxAttrs attrs,
-+                                                 const void *ptr,
-+                                                 hwaddr len)
++uint64_t ldq_phys_debug(CPUState *cpu, hwaddr addr)
 +{
-+    hwaddr l;
-+    uint8_t *ram_ptr;
-+    hwaddr addr1;
-+    MemoryRegion *mr;
-+    const uint8_t *buf = ptr;
++    MemTxAttrs attrs;
++    int asidx = cpu_asidx_from_attrs(cpu, attrs);
++    uint64_t val;
 +
-+    RCU_READ_LOCK_GUARD();
-+    while (len > 0) {
-+        l = len;
-+        mr = address_space_translate(as, addr, &addr1, &l, true, attrs);
++    /* set debug attrs to indicate memory access is from the debugger */
++    attrs.debug = 1;
 +
-+        if (!(memory_region_is_ram(mr) ||
-+              memory_region_is_romd(mr))) {
-+            l = memory_access_size(mr, l, addr1);
++    debug_ops->read(cpu->cpu_ases[asidx].as, addr, attrs,
++                    (void *) &val, 8);
++    return val;
++}
++
++void cpu_physical_memory_rw_debug(hwaddr addr, uint8_t *buf,
++                                  int len, int is_write)
++{
++    MemTxAttrs attrs;
++
++    /* set debug attrs to indicate memory access is from the debugger */
++    attrs.debug = 1;
++
++    if (is_write) {
++                debug_ops->write(&address_space_memory, addr,
++                                 attrs, buf, len);
 +        } else {
-+            /* ROM/RAM case */
-+            ram_ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-+            if (attrs.debug && mr->ram_debug_ops) {
-+                mr->ram_debug_ops->write(ram_ptr, buf, l, attrs);
-+            } else {
-+                memcpy(ram_ptr, buf, l);
-+            }
-+            invalidate_and_set_dirty(mr, addr1, l);
++                debug_ops->read(&address_space_memory, addr,
++                                attrs, buf, len);
 +        }
-+        len -= l;
-+        buf += l;
-+        addr += l;
-+    }
-+    return MEMTX_OK;
++
 +}
 +
  int64_t address_space_cache_init(MemoryRegionCache *cache,
