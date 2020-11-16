@@ -2,99 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 596522B4C86
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 18:20:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 562BD2B4EAC
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 18:59:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732716AbgKPRTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 12:19:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42954 "EHLO
+        id S2387759AbgKPR4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 12:56:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732710AbgKPRTy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Nov 2020 12:19:54 -0500
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA34C0613D1
-        for <kvm@vger.kernel.org>; Mon, 16 Nov 2020 09:19:53 -0800 (PST)
-Received: by mail-il1-x142.google.com with SMTP id h6so12324723ilj.8
-        for <kvm@vger.kernel.org>; Mon, 16 Nov 2020 09:19:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2cDMST3loBmPEvX019dbwyMNULGzjxVtVrkk6taLCiY=;
-        b=I2/AEI+J2uOrdL+VzQ+YLHqurMISMWwy90/fFJ399bYZ9AWrHzW0BJ50tC2tJoO6nJ
-         tE8aEuMCgORkymYeamzS9okalmgb/rXqVhznQO9otzGxGf83vwc6wKOV+4APJqe8Tjx7
-         bfBg5W3djzGz9/7U9hcjeypuQ39BD+CbVjPFPaJg5uPiPfkAQT3E9ZN1skSa6oG6m/qk
-         h+YNVyepPqtiXr99rpziwhQvbOAJsxlugtuKvDzrzhMoV0YBj/smHw1CqVVy+UlzqotY
-         MOyNYuAFtyn8w/uKg0/7sMfs/oEDhEi3cThm1RGWJr9SIAXru5jPaj7lMlntQFQcYrEf
-         zqcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2cDMST3loBmPEvX019dbwyMNULGzjxVtVrkk6taLCiY=;
-        b=s2qUweb/q35RxhYGPlAeH7I008dkU/M6UlCUxuc72z0ZOX/PoXKfCT5PJzzlTE1SJm
-         Sb83FEXpixWjPLNWGTtK0jAtQORTVu6/S9k2PuQjBRKAnzHH/O4GQijaZYPY8/XTw5UE
-         oGaPlrWwu8jeYaf+Uws3lMyEP5UJtTFLzw2541Xvo9ya+PKb25nktM1DgdS8yu1TJSOw
-         8uckyFAZCr1xnknIPKF3iUxbiq3jLWIf6n3R3V4iWlIz5q3uMyNnPYCtUdiUZ6lH7tuY
-         YkUONo6j4WVcZhj95w+w4BCSxHXE8pxp6fh+fQOJ9YV7qKQDdI2CJa3wImwf7zQw7O3w
-         m7Lg==
-X-Gm-Message-State: AOAM532qHIwbJvxQaMGaxRJx+iB5IJFvaOSMbl4plBXSkHjgqcET0S5a
-        s4yXE2/xks8aP0tnU2bsCYBhU/3nf4aTSEFCDsaY/PfbR5c=
-X-Google-Smtp-Source: ABdhPJzElPUJjtskrFleP7E3SdPQRsAoyT1yuPaEsbXdGdP+ZaGwNiERgoW0cL+yKMh7Fz49XPtfiKOQapoAEGTRmVE=
-X-Received: by 2002:a92:7914:: with SMTP id u20mr9039534ilc.203.1605547192238;
- Mon, 16 Nov 2020 09:19:52 -0800 (PST)
+        with ESMTP id S2387513AbgKPR4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 12:56:34 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC33AC0613CF;
+        Mon, 16 Nov 2020 09:56:34 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1605549393;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/4Dj4H4h07T3HAdVoU3L0DmQaoeq12MkqX6wjjZOegA=;
+        b=nBGp3JNgdM2ohDkTTKJk3iDoHDePjcC35N1cE/kHdVkfINkXyyDrvHUtP/WpveXZe5BFgW
+        C5NsffljQAIk3bx4ZPB/QKt2B4n1PKGZKDwVLMr80B07vhBNNrdSvcTDRLVhip02c2EykS
+        C0yJ+BbYBfpc97IFvpks8xyZ1Pl+VSIwJvHj3MlZ7I0177vAtCom12kyEH/h0JvOHu7a+F
+        SpOl07nr6kv/+P47LGoE9cSZehjaOGqrtUYgzL7D9GJIZxO2ZPtalnUvv72o09gWFKqLXZ
+        yrFK5EgLGLYWCWQGi27BLzkhXCdD/dU3CUM4lu/7psDSHvE6jPhvBylg5/a1yQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1605549393;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/4Dj4H4h07T3HAdVoU3L0DmQaoeq12MkqX6wjjZOegA=;
+        b=xxLH7da1/bbkHaKVfEDfUOMlDxTKQrHyxLLt/pKG4NijVWYaDvU4EIFGsiDWcmWfVFWpqV
+        OMKDOAshoXel6PDg==
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Tian\, Kevin" <kevin.tian@intel.com>
+Cc:     "Raj\, Ashok" <ashok.raj@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Wilk\, Konrad" <konrad.wilk@oracle.com>,
+        "Williams\, Dan J" <dan.j.williams@intel.com>,
+        "Jiang\, Dave" <dave.jiang@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "vkoul\@kernel.org" <vkoul@kernel.org>,
+        "Dey\, Megha" <megha.dey@intel.com>,
+        "maz\@kernel.org" <maz@kernel.org>,
+        "bhelgaas\@google.com" <bhelgaas@google.com>,
+        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
+        "parav\@mellanox.com" <parav@mellanox.com>,
+        "rafael\@kernel.org" <rafael@kernel.org>,
+        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain\, Mona" <mona.hossain@intel.com>,
+        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 06/17] PCI: add SIOV and IMS capability detection
+In-Reply-To: <20201116154635.GK917484@nvidia.com>
+References: <MWHPR11MB16455B594B1B48B6E3C97C108CE80@MWHPR11MB1645.namprd11.prod.outlook.com> <20201112193253.GG19638@char.us.oracle.com> <877dqqmc2h.fsf@nanos.tec.linutronix.de> <20201114103430.GA9810@infradead.org> <20201114211837.GB12197@araj-mobl1.jf.intel.com> <877dqmamjl.fsf@nanos.tec.linutronix.de> <20201115193156.GB14750@araj-mobl1.jf.intel.com> <875z665kz4.fsf@nanos.tec.linutronix.de> <20201116002232.GA2440@araj-mobl1.jf.intel.com> <MWHPR11MB164539B8FDE63D5CBDA300E18CE30@MWHPR11MB1645.namprd11.prod.outlook.com> <20201116154635.GK917484@nvidia.com>
+Date:   Mon, 16 Nov 2020 18:56:33 +0100
+Message-ID: <87y2j1xk1a.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-References: <20201115152752.1625224-1-pbonzini@redhat.com>
-In-Reply-To: <20201115152752.1625224-1-pbonzini@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 16 Nov 2020 09:19:41 -0800
-Message-ID: <CANgfPd8QjQEpSrNXxYUztOZ=+_Vp6KwbS7PyPwH-MxT906Aa8Q@mail.gmail.com>
-Subject: Re: [PATCH] kvm: mmu: fix is_tdp_mmu_check when the TDP MMU is not in use
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 15, 2020 at 7:27 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> In some cases where shadow paging is in use, the root page will
-> be either mmu->pae_root or vcpu->arch.mmu->lm_root.  Then it will
-> not have an associated struct kvm_mmu_page, because it is allocated
-> with alloc_page instead of kvm_mmu_alloc_page.
->
-> Just return false quickly from is_tdp_mmu_root if the TDP MMU is
-> not in use, which also includes the case where shadow paging is
-> enabled.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Mon, Nov 16 2020 at 11:46, Jason Gunthorpe wrote:
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+> On Mon, Nov 16, 2020 at 07:31:49AM +0000, Tian, Kevin wrote:
+>
+>> > The subdevices require PASID & IOMMU in native, but inside the guest there
+>> > is no
+>> > need for IOMMU unless you want to build SVM on top. subdevices work
+>> > without
+>> > any vIOMMU or hypercall in the guest. Only because they look like normal
+>> > PCI devices we could map interrupts to legacy MSIx.
+>> 
+>> Guest managed subdevices on PF/VF requires vIOMMU. 
+>
+> Why? I've never heard we need vIOMMU for our existing SRIOV flows in
+> VMs??
 
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 27e381c9da6c..ff28a5c6abd6 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -49,7 +49,14 @@ bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
->  {
->         struct kvm_mmu_page *sp;
->
-> +       if (!kvm->arch.tdp_mmu_enabled)
-> +               return false;
-> +       if (WARN_ON(!VALID_PAGE(hpa)))
-> +               return false;
-> +
->         sp = to_shadow_page(hpa);
-> +       if (WARN_ON(!sp))
-> +               return false;
->
->         return sp->tdp_mmu_page && sp->root_count;
->  }
-> --
-> 2.26.2
->
+Handing PF/VF into the guest does not require it.
+
+But if the PF/VF driver in the guest wants to create and manage the
+magic mdev subdevices which require PASID support then you surely need
+it.
+
+Thanks,
+
+        tglx
