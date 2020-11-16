@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4ACD2B5038
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:52:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91E0A2B5044
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:52:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728496AbgKPSwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 13:52:09 -0500
-Received: from mail-mw2nam12on2049.outbound.protection.outlook.com ([40.107.244.49]:2104
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        id S1728697AbgKPSw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 13:52:27 -0500
+Received: from mail-bn8nam11on2066.outbound.protection.outlook.com ([40.107.236.66]:41057
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725710AbgKPSwI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Nov 2020 13:52:08 -0500
+        id S1728620AbgKPSw1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 13:52:27 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jxRVo0MwzcujQBzSG7fHzJ3WYoVJMiKUz3ISxNzINx5xFqIVn8XXkRZ/vAAOCWvse6rzXF/SaCnG5QkUBvMhvUb8JOqRs39qS8bitUDP97gxVaU4JfHProACD9bohicZ5eyR+AL6Rx159b5La0B4tpPEj26pX3psEUlOGPJ5D+EUwRzGHwnP9ZcGvPrKOTF9ZdeV0b4OB0TQDulGsGr5Ax4cxDxQ/jKkm8qc8udgPzfLAiWadKDDmlXtZXld/DbpNAhL4QWK/m6TLo+ojin9B9RhpwX77EuxOPIiyheBpOcUZsSIf/PexH4GtHRTq5SwSJMUDVuZUZsxwSTX2+AbJg==
+ b=l+2+J86PaLHjP0Ed7rZ4M0I24jPBgc5vOaUn1DeEbJPm+F5i6St90+G2rqmhZ35KyMeHMA72UvdXIg5lanjYLYR6gUeT67hWykUDxja+8wFPZMw50HU2NIbZ+b7IIlp/Y4WHJI+3RHZ4f5siJArkY7y0v/XRGxk25MxXmDjMgoOcJkSegLOb3EopKxJSM3Z+ixUwJ4vsPh42Q4iOwZqGo8Sf3CLxi6NoHBJek6IcGOYVndMWuH1QlNnikZp1N4RygnY1lU3ZGqhzUkzjwmdwbYUJdxS54MmkDaPxEQNfaZNG4aF2Utn1hr/O5fv88KP5bsfu3V5BhH5dP8/sBnx7tQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q9k4kbe67Kn7PTnF0XlHPgduarMJ8ewLGQjj2pr4Wok=;
- b=Vr6URqplTMGFH89gXMbtYDKCPXdGC+GtugNq5+YU/f0Ie4bFBFmwU7ZtfLHYVQPiaFnXklnusUqwSBMT81OJq+rjD1/CRpHt69Ij+yy+p7fhAGR7lKU1JgYZrcy88DMQzUtpRcstsnY92Hebm2QHi0Nk2U+2ZlGd7cnLAl8eDcV0OyWd9MCsAViNKyyTDTlaItuP61GYQxaCDiK41Oqd0bPttuBd2Huliu6EqHBetdpHp9o3o67w4lqsurv8R4MPCsC0PA9CunpNJ8W2+6ifv+WHYhYT5P8kZ165MOcZEl8qOSHCbUAenjDrDexZ368oDgfqczbQb6KY6sKzWI2w6Q==
+ bh=8wkX8dNPf0psqgmvvnMdCQVb1LlTkn3M//y8xpnxIFc=;
+ b=I2avH1Evw2LxfgzguT0hzgWuNOdq1+mLga+pPlNxxrHjOiENtfyfEGteiz10+th5yjNWL5L6U/DkJvDrH+76gDUOOg/HdfgdVieAjqaqttXMkhs8qJH3yrAmxUOzoRsV/y2qeXFBIGoY3wuUaVrRPvc+V822bqzC7OCrRb+U6W+ysMrJg7e7Enm5n8m5F5XueekORlVwtUxUoD13xrZPOLcspIo/BwjNczi9SgjYmzG2Je3qwoEO/4VfZ9cRDtmHnCWy4H6rN+mgqOIp1k93rp+gcLtRe1TiKL0JrOHbHNABrWPCRetCj03p+ZDQuXnYpMbsL8n0gF9VEuS0blUIwQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q9k4kbe67Kn7PTnF0XlHPgduarMJ8ewLGQjj2pr4Wok=;
- b=AuPqXiZGiNz32zVBXzQC3Fmyg3OJf6Vwkf+FhV+JOWKNIPiTauwa1lGEdwyLFrYNzBBAAuD+DdZ9k1bor+wDtRIWzPd7nvt/Oz/Cy+/29m3cjTLFGa2TiKuFZNrTt+G5oiPrdopefi5DE4C1NkVARCRhp/Vu41ddVvvxtFCU5xE=
+ bh=8wkX8dNPf0psqgmvvnMdCQVb1LlTkn3M//y8xpnxIFc=;
+ b=jPWrRQ9m56rsxOneMlJB6ZDSdqBeXuZ/MBoMHDYWGclnT3DIeYAZqddfaDM0TJT8m1vAKucIxPBHt+GWdTXd8REWeA+dE43yuM/SHOFXPfhoRQvVsP5qOHbsQxLUZHWmX6vSIlU46G/xSSHcp3NJlA31uDFVlElW4PAUqm8R1XA=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
+ by SN6PR12MB4670.namprd12.prod.outlook.com (2603:10b6:805:11::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.25; Mon, 16 Nov
- 2020 18:52:05 +0000
+ 2020 18:52:22 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3541.025; Mon, 16 Nov 2020
- 18:52:05 +0000
+ 18:52:22 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     qemu-devel@nongnu.org, rth@twiddle.net, armbru@redhat.com,
@@ -45,146 +45,193 @@ Cc:     qemu-devel@nongnu.org, rth@twiddle.net, armbru@redhat.com,
         mst@redhat.com, marcel.apfelbaum@gmail.com, mtosatti@redhat.com,
         Thomas.Lendacky@amd.com, brijesh.singh@amd.com,
         ssg.sos.patches@amd.com
-Subject: [PATCH 07/11] kvm: introduce debug memory encryption API
-Date:   Mon, 16 Nov 2020 18:51:54 +0000
-Message-Id: <090d8c96ed71108ac34ce48dc84bdfba09df7686.1605316268.git.ashish.kalra@amd.com>
+Subject: [PATCH 08/11] sev/i386: add debug encrypt and decrypt commands
+Date:   Mon, 16 Nov 2020 18:52:11 +0000
+Message-Id: <5b68e77ddb2ea8877f02b9256d34fc8532d8f44b.1605316268.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1605316268.git.ashish.kalra@amd.com>
 References: <cover.1605316268.git.ashish.kalra@amd.com>
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: DM3PR11CA0015.namprd11.prod.outlook.com
- (2603:10b6:0:54::25) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM5PR07CA0073.namprd07.prod.outlook.com
+ (2603:10b6:4:ad::38) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM3PR11CA0015.namprd11.prod.outlook.com (2603:10b6:0:54::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.28 via Frontend Transport; Mon, 16 Nov 2020 18:52:04 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM5PR07CA0073.namprd07.prod.outlook.com (2603:10b6:4:ad::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.25 via Frontend Transport; Mon, 16 Nov 2020 18:52:21 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 799bfd96-0ce7-4c34-41b6-08d88a60b661
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
+X-MS-Office365-Filtering-Correlation-Id: 8d890182-dd0a-4d68-0320-08d88a60c09e
+X-MS-TrafficTypeDiagnostic: SN6PR12MB4670:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB45575E0718D8F90DFDBD994D8EE30@SA0PR12MB4557.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:142;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB467064956E462BC6F1A16E4C8EE30@SN6PR12MB4670.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:826;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0zXajTYxlnD3XHhOZAvoVh5glJS/9dy353fHFMCjY2bCZudWDx22SQUxMBqLe8mLY5JfBZLtpYaRvBHei1dbaCCev7flnNCwkZFGqzQOYFQadgAnvbGEyN77FkPNT2IKV9aBSfk6FemDCRrL48E5h9imiR0m/898j0O9zMKYoaUs34FJfYbZmqb9fMTEP3y7ddMAdKaiEp3Fk5m3Xrx4ExiAzc/VYqx5si4UMS5P4ilA2WPwz0tl/+MvrDXI6afPNCz0cdt+XURrJiG96Pb+hUGLLrN19a/v/xHlv+Juom9FYdaCIrwX9KFe0NlPhfHqYLFyDBXvKMxr/VwsRmKZEQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(136003)(346002)(376002)(39860400002)(66946007)(36756003)(86362001)(2616005)(956004)(8936002)(83380400001)(66476007)(66556008)(5660300002)(6666004)(2906002)(6486002)(478600001)(7696005)(8676002)(6916009)(16526019)(186003)(26005)(52116002)(316002)(7416002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: k+WnJDUK8cb5aRKLe5cmZt62xH4mSybijPK/cKOvN5ePsfOcf/qwvT/SSLR72iSI2R6uwp4CxQnTSMoKv0fcYy6gRT9HaDNZQImUCP4T2uxMJk6Jd/2EiOu0+BXV/jJ3Z5t0pJojmfq0r9m2uRb6HzT2WH78kHh8X5Hk3sQWR521C0121mZHmV4MNvFFxPKie2q3RWnrCDyVn6B04vwF+WBUTBOG3QjkWhinLb0gcgHvHXp2o8VKl8wmah0QzBb+SMJ2rgjw3xPhAQWxq8oEtrFNAbnpbHkZ5z0QCf+nxRsPprw+FtzHQ4CMNOLAc7RrLzvkdIl5gcSfkhN45++7JABgr5aWdhh2wPkQv42++HHxnNW3y58X4AqjW4hqrjPYqlnF+1knDU5Qb4f273Q4khQiO3Z7hl2q6j8zb88Pgo26+L8+fDxX9VN0Sr5oqftpwlivP7lvWfC9FzXP/253DVO05ZIDekgQx4u9/CfYpb92Qw6VOk5617GxyKUXUtq3N1UefoQS6ULCE5ZPUEc9i2G2QztfhaeGHzIPrpcd4CPsf7whqT344zACd2ef09B0Lhbza1+HjSgRG8fhq5hNRKy1DXVTEOnuX0VGzqNMVUwaYBtfDuYeC5PYorvKTNZKCKc7TlkgLn3yr2owjPc1GXQb4JC8NJsqy+At97P7NOAreV9tkeW8GNE3R37nlk/bxX4EOLQSEdWUlq6x/C34+EW/r56wHiy8v0rfg0iB5Q8iV2obxln5rQXbxGYydgH36I1iBLVnIYZ7a7cRlNovdzP0SPyJicc21JIk0DUvg9LZBI+/8NdGOm9iZ04Lg3B1WmIexgBpGeLu/Onstl9OAzLo1Yha04tuJ1aSGHTE++4IV1gCIxbDf30JqMfZQ5960Z1djVtLxDBS6Iiro/tm8w==
+X-Microsoft-Antispam-Message-Info: MIWkNaKLSiwyTwSAERtfyLHEqUkllT3PNrBmj6rkdlVi5/Te5AOAvDwbcj+3JQXBtI9nyHdWPly2HBpXzW9tnXiMXcgBg6ueT/eA1i5IcHSPu6MIrsNk1XhDtpxMzkD0Qar1Pwld+tleK/d7c2TcVtYLR9lk9TyjqdS8LTbet36fmfdHHnMTRW0HUxgPYG0c2jutsWfnrs4IRlFgD+xv4stX13BhEduqQTXKvmORLWkCLfgzu7UGbmVb5G7umLGEFrfhcTF5s7xu1hEqsAJsCyUPFtupPh1cf/Il5xel6FctMHltpe6Lb32MRFUGZehS6yVeQy507RWlLsxETfYrGA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(396003)(366004)(376002)(136003)(36756003)(8676002)(8936002)(86362001)(6486002)(6666004)(316002)(83380400001)(2616005)(956004)(4326008)(5660300002)(478600001)(7416002)(6916009)(186003)(7696005)(66556008)(16526019)(52116002)(26005)(66946007)(2906002)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: tgTqTzq6K7oxeKulKxcN64SxPbGHISayg/gdSF7kg7F5i4znHiQXQt8Ks40BeYt5XKLLicETDBbX5GdgnJWJSrGYtrnICwVbgM7wnQ9p+mdNErZCbSJ+HuH/B34hkSSUxL6Q3JCGtgaMckEidTjlybkpK5TUQXuVyJSy0RDb2Tbt7IEOsylx2g48AE7FdOWZvxjL+fvo37YSyq663dfZo1GJfSFLMdm3JWLDv/3id//1TBeT2lE0MNE+AxLLFU62Vawldai5bcUiuIbtaif532uGzfhGRSFAM1BgH9lEzAm6OvgD4zwp77uMNU+ESVTIQIPDb3xoWfTpki/xh3HfOjeCu2HhBSk+wpJLQrnRorRSC+mf6KZxgIPy/XzW7PxIE2Yu9le9T8C7ADUt0yUth3YP6AIiEk4mUuhOKqeyTdwmlT8CJ5yT4EdNvqL5x8NGbrUmnjSqEOJdS8ZodD0cqX0WDMuWVzSySZmZztF+vjtuLRvyOQHoAasaweyLLxzkSamRzNAxRvpN6n8KWdwmq0z7LzCkElbYgW69G0gbiKmRUJOTdl7xZ1Mdm/Odr8Z1rQCs2wYqarl1gKG0oThqgc4oOMw8l8dM4PzmXPBqBvWDMHFLB+3z9/gWJgdXcLtwisgaFcudz3M4b5q62tP0u1w6D4Ka3TD+q1I34/8gzVWCd9YCz8DkpuCEkzMGO6hYpOmCF7zXuf4q5M9Kc5uJ759KvctdS+Bd3EHlMsn31ZyNOdgP0cLmPO1Pk1sOZzNWV2HtWokZnYbaN8aB0c+iaY8jBr8X/Faq+vF9bq5UzWgKQ72L5+H1VoyS2w8SijUU1g0a5woNKVnGx+RIJ1KmjaU8DcIfQCrnNqcgpnEH7eF3XryQfL+Jp7bKt1qtmbFlDPRRBOoXI4JPEJdSp42KMQ==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 799bfd96-0ce7-4c34-41b6-08d88a60b661
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d890182-dd0a-4d68-0320-08d88a60c09e
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2020 18:52:05.6454
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2020 18:52:22.8088
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Z4xeT5NDT6q0cQ3YhIbva6dcNwV/L4GxNT33UBzq3rb/DK0it0DWjEnMd5cKpdJ3uYU2hQfWh3/PammGOUu+zg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
+X-MS-Exchange-CrossTenant-UserPrincipalName: gTJiRt4wIc/dsmC+2/QjQin4sx8t+kMWcvSEqtL1Av341cRDDn2jWQVOipj26DLPyf8HR2a3J04iN/FLo5waNw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4670
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-In order to support debugging with Secure Encrypted Virtualization (SEV),
-add a high-level memory encryption API.
-
-Also add a new API interface to override any CPU class specific callbacks
-for supporting debugging with SEV, for example, overriding the guest MMU/
-page-table walker callback.
+The KVM_SEV_DBG_DECRYPT and KVM_SEV_DBG_ENCRYPT commands are used for
+decrypting and encrypting guest memory. The command works only if the
+guest policy allows the debugging.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- accel/kvm/kvm-all.c    | 19 +++++++++++++++++++
- accel/stubs/kvm-stub.c |  8 ++++++++
- include/sysemu/kvm.h   | 15 +++++++++++++++
- 3 files changed, 42 insertions(+)
+ accel/kvm/kvm-all.c      |  2 ++
+ accel/kvm/sev-stub.c     |  4 +++
+ include/sysemu/sev.h     |  1 +
+ target/i386/sev.c        | 58 ++++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events |  1 +
+ 5 files changed, 66 insertions(+)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9ef5daf4c5..ae85f53e7d 100644
+index ae85f53e7d..042205e3e1 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -123,6 +123,8 @@ struct KVMState
-     /* memory encryption */
-     void *memcrypt_handle;
-     int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
-+    void (*memcrypt_debug_ops_memory_region)(void *handle, MemoryRegion *mr);
-+    void (*memcrypt_debug_ops_cpu_state)(void *handle, CPUState *cpu);
+@@ -2232,6 +2232,8 @@ static int kvm_init(MachineState *ms)
+         }
  
-     /* For "info mtree -f" to tell if an MR is registered in KVM */
-     int nr_as;
-@@ -222,6 +224,23 @@ int kvm_get_max_memslots(void)
-     return s->nr_slots;
+         kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
++        kvm_state->memcrypt_debug_ops_memory_region =
++            sev_set_debug_ops_memory_region;
+     }
+ 
+     ret = kvm_arch_init(ms, s);
+diff --git a/accel/kvm/sev-stub.c b/accel/kvm/sev-stub.c
+index 4f97452585..3f1f0ef217 100644
+--- a/accel/kvm/sev-stub.c
++++ b/accel/kvm/sev-stub.c
+@@ -15,6 +15,10 @@
+ #include "qemu-common.h"
+ #include "sysemu/sev.h"
+ 
++void sev_set_debug_ops_memory_region(void *handle, MemoryRegion *mr)
++{
++}
++
+ int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
+ {
+     abort();
+diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+index 98c1ec8d38..6c37247915 100644
+--- a/include/sysemu/sev.h
++++ b/include/sysemu/sev.h
+@@ -18,4 +18,5 @@
+ 
+ void *sev_guest_init(const char *id);
+ int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
++void sev_set_debug_ops_memory_region(void *handle, MemoryRegion *mr);
+ #endif
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 93c4d60b82..3036fb3e43 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -72,6 +72,8 @@ struct SevGuestState {
+ static SevGuestState *sev_guest;
+ static Error *sev_mig_blocker;
+ 
++static MemoryRegionRAMReadWriteOps sev_ops;
++
+ static const char *const sev_fw_errlist[] = {
+     "",
+     "Platform state is invalid",
+@@ -679,6 +681,46 @@ sev_vm_state_change(void *opaque, int running, RunState state)
+     }
  }
  
-+void kvm_memcrypt_set_debug_ops_memory_region(MemoryRegion *mr)
++static int
++sev_dbg_enc_dec(uint8_t *dst, const uint8_t *src, uint32_t len, bool write)
 +{
-+    if (kvm_state->memcrypt_handle &&
-+        kvm_state->memcrypt_debug_ops_memory_region) {
-+        kvm_state->memcrypt_debug_ops_memory_region(kvm_state->memcrypt_handle,
-+                                                    mr);
++    int ret, error;
++    struct kvm_sev_dbg dbg;
++
++    dbg.src_uaddr = (unsigned long)src;
++    dbg.dst_uaddr = (unsigned long)dst;
++    dbg.len = len;
++
++    trace_kvm_sev_debug(write ? "encrypt" : "decrypt", src, dst, len);
++    ret = sev_ioctl(sev_guest->sev_fd,
++                    write ? KVM_SEV_DBG_ENCRYPT : KVM_SEV_DBG_DECRYPT,
++                    &dbg, &error);
++    if (ret) {
++        error_report("%s (%s) 0x%llx->0x%llx+0x%x ret=%d fw_error=%d '%s'",
++                     __func__, write ? "write" : "read", dbg.src_uaddr,
++                     dbg.dst_uaddr, dbg.len, ret, error,
++                     fw_error_to_str(error));
 +    }
++
++    return ret;
 +}
 +
-+void kvm_memcrypt_set_debug_ops_cpu_state(CPUState *cs)
++static int
++sev_mem_read(uint8_t *dst, const uint8_t *src, uint32_t len, MemTxAttrs attrs)
 +{
-+    if (kvm_state->memcrypt_handle &&
-+        kvm_state->memcrypt_debug_ops_cpu_state) {
-+        kvm_state->memcrypt_debug_ops_cpu_state(kvm_state->memcrypt_handle, cs);
-+    }
++    assert(attrs.debug);
++
++    return sev_dbg_enc_dec(dst, src, len, false);
 +}
 +
- bool kvm_memcrypt_enabled(void)
++static int
++sev_mem_write(uint8_t *dst, const uint8_t *src, uint32_t len, MemTxAttrs attrs)
++{
++    assert(attrs.debug);
++
++    return sev_dbg_enc_dec(dst, src, len, true);
++}
++
+ void *
+ sev_guest_init(const char *id)
  {
-     if (kvm_state && kvm_state->memcrypt_handle) {
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 680e099463..bf93431e46 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -91,6 +91,14 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
-   return 1;
+@@ -785,6 +827,22 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
+     return 0;
  }
  
-+void kvm_memcrypt_set_debug_ops_memory_region(MemoryRegion *mr)
++void
++sev_set_debug_ops_memory_region(void *handle, MemoryRegion *mr)
 +{
++    SevGuestState *s = handle;
++
++    /* If policy does not allow debug then no need to register ops */
++    if (s->policy & SEV_POLICY_NODBG) {
++        return;
++    }
++
++    sev_ops.read = sev_mem_read;
++    sev_ops.write = sev_mem_write;
++
++    memory_region_set_ram_debug_ops(mr, &sev_ops);
 +}
 +
-+void kvm_memcrypt_set_debug_ops_cpu_state(CPUState *cs)
-+{
-+}
-+
- #ifndef CONFIG_USER_ONLY
- int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+ static void
+ sev_register_types(void)
  {
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index bb5d5cf497..1bde2e3d71 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -470,6 +470,21 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
-                                       uint32_t index, int reg);
- uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
- 
-+/**
-+ * kvm_memcrypt_set_debug_ram_ops: set debug_ram_ops callback
-+ *
-+ * When debug_ram_ops is set, debug access to this memory region will use
-+ * memory encryption APIs.
-+ */
-+void kvm_memcrypt_set_debug_ops_memory_region(MemoryRegion *mr);
-+
-+/**
-+ * kvm_memcrypt_set_debug_ops_cpu_state: override cpu_class callbacks
-+ *
-+ * This interface allows vendor specific debug ops to override any
-+ * cpu_class callbacks.
-+ */
-+void kvm_memcrypt_set_debug_ops_cpu_state(CPUState *cs);
- 
- void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
- 
+diff --git a/target/i386/trace-events b/target/i386/trace-events
+index 789c700d4a..f91213c5e9 100644
+--- a/target/i386/trace-events
++++ b/target/i386/trace-events
+@@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session
+ kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
+ kvm_sev_launch_measurement(const char *value) "data %s"
+ kvm_sev_launch_finish(void) ""
++kvm_sev_debug(const char *op, const uint8_t *src, uint8_t *dst, int len) "(%s) src %p dst %p len %d"
 -- 
 2.17.1
 
