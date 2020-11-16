@@ -2,101 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55D742B3BCE
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 04:23:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A5E92B3BD3
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 04:28:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726265AbgKPDWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Nov 2020 22:22:37 -0500
-Received: from mga02.intel.com ([134.134.136.20]:59623 "EHLO mga02.intel.com"
+        id S1726203AbgKPD1i convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 15 Nov 2020 22:27:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52052 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726016AbgKPDWg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Nov 2020 22:22:36 -0500
-IronPort-SDR: dVvUgWlIefuJFpK1Fgqg0gdbEe0zOxlojTnNNY/X/viOTeyzSxvDW7k5F+DMI7ma119GO/dZqE
- tvXd9rInwckA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9806"; a="157720988"
-X-IronPort-AV: E=Sophos;i="5.77,481,1596524400"; 
-   d="scan'208";a="157720988"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2020 19:22:30 -0800
-IronPort-SDR: C+9UVmClgbQXVE9Nm0up9iKW+Io7rYMSXIhKHaP13k8X3o1e/U8LJRu+9DndMKIVxmuyzITj5+
- 9l0OKuy62mXw==
-X-IronPort-AV: E=Sophos;i="5.77,481,1596524400"; 
-   d="scan'208";a="543427933"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.107]) ([10.238.4.107])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2020 19:22:26 -0800
-Subject: Re: [PATCH] perf/intel: Remove Perfmon-v4 counter_freezing support
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>, wei.w.wang@intel.com,
-        Tony Luck <tony.luck@intel.com>,
-        Stephane Eranian <eranian@google.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        linux-kernel@vger.kernel.org
-References: <20201109021254.79755-1-like.xu@linux.intel.com>
- <20201110151257.GP2611@hirez.programming.kicks-ass.net>
- <20201110153721.GQ2651@hirez.programming.kicks-ass.net>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <11ba9e20-84eb-3ea5-5987-8357ae5af53f@linux.intel.com>
-Date:   Mon, 16 Nov 2020 11:22:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+        id S1725969AbgKPD1i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Nov 2020 22:27:38 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 210213] New: vCPUs >= 64 can't be online and hotplugged in some
+ scenarios
+Date:   Mon, 16 Nov 2020 03:27:36 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: zelin.deng@linux.alibaba.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-210213-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20201110153721.GQ2651@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+https://bugzilla.kernel.org/show_bug.cgi?id=210213
 
-On 2020/11/10 23:37, Peter Zijlstra wrote:
-> -static int __init intel_perf_counter_freezing_setup(char *s)
-> -{
-> -	bool res;
-> -
-> -	if (kstrtobool(s, &res))
-> -		return -EINVAL;
-> -
-> -	disable_counter_freezing = !res;
-> -	return 1;
-> -}
-> -__setup("perf_v4_pmi=", intel_perf_counter_freezing_setup);
+            Bug ID: 210213
+           Summary: vCPUs >= 64 can't be online and hotplugged in some
+                    scenarios
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.10-rc4
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: zelin.deng@linux.alibaba.com
+        Regression: No
 
-...
+Created attachment 293685
+  --> https://bugzilla.kernel.org/attachment.cgi?id=293685&action=edit
+Here is a workaround to fix this issue
 
-> Anyway, as it stands I think the whole counter_freezing thing is a
-> trainwreck and it needs to go.
+In VM, if no-kvmclock-vsyscall is set, lscpu shows online 0-63 vcpus are online
+vcpus >= 64 are offline and if we attempting to hotplug them, they will return
+-ENOMEM.
+This issue also happened in VM which are on TSC unstable host.
+ bash-14295 [040] .... 64209.953702: cpuhp_enter: cpu: 0064 target: 199 step: 
+64 (kvmclock_setup_percpu)
+            bash-14295 [040] .... 64209.953702: cpuhp_exit:  cpu: 0064  state: 
+64 step:  64 ret: -12
+----------------------------
 
-If you really want to drop the counter_freezing stuff, we also need
-to clean it up in Documentation/admin-guide/kernel-parameters.txt:
+[root@iZwz9208df47apaoyvbmm3Z processor]# cat /sys/kernel/debug/tracing/trace
+# tracer: nop
+#
+# entries-in-buffer/entries-written: 166/166   #P:49
+#
+#                              _-----=> irqs-off
+#                             / _----=> need-resched
+#                            | / _---=> hardirq/softirq
+#                            || / _--=> preempt-depth
+#                            ||| /     delay
+#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
+#              | |       |   ||||       |         |
+            bash-14295 [040] .... 64209.953675: cpuhp_enter: cpu: 0064 target:
+199 step:   1 (smpboot_create_threads)
+            bash-14295 [040] .... 64209.953676: cpuhp_exit:  cpu: 0064  state: 
+ 1 step:   1 ret: 0
+            bash-14295 [040] .... 64209.953676: cpuhp_enter: cpu: 0064 target:
+199 step:   2 (perf_event_init_cpu)
+            bash-14295 [040] .... 64209.953677: cpuhp_exit:  cpu: 0064  state: 
+ 2 step:   2 ret: 0
+            bash-14295 [040] .... 64209.953678: cpuhp_enter: cpu: 0064 target:
+199 step:  35 (workqueue_prepare_cpu)
+            bash-14295 [040] .... 64209.953678: cpuhp_exit:  cpu: 0064  state: 
+35 step:  35 ret: 0
+            bash-14295 [040] .... 64209.953678: cpuhp_enter: cpu: 0064 target:
+199 step:  37 (hrtimers_prepare_cpu)
+            bash-14295 [040] .... 64209.953679: cpuhp_exit:  cpu: 0064  state: 
+37 step:  37 ret: 0
+            bash-14295 [040] .... 64209.953679: cpuhp_enter: cpu: 0064 target:
+199 step:  40 (smpcfd_prepare_cpu)
+            bash-14295 [040] .... 64209.953692: cpuhp_exit:  cpu: 0064  state: 
+40 step:  40 ret: 0
+            bash-14295 [040] .... 64209.953693: cpuhp_enter: cpu: 0064 target:
+199 step:  41 (relay_prepare_cpu)
+            bash-14295 [040] .... 64209.953693: cpuhp_exit:  cpu: 0064  state: 
+41 step:  41 ret: 0
+            bash-14295 [040] .... 64209.953693: cpuhp_enter: cpu: 0064 target:
+199 step:  44 (rcutree_prepare_cpu)
+            bash-14295 [040] .... 64209.953694: cpuhp_exit:  cpu: 0064  state: 
+44 step:  44 ret: 0
+            bash-14295 [040] .... 64209.953694: cpuhp_enter: cpu: 0064 target:
+199 step:  53 (topology_add_dev)
+            bash-14295 [040] .... 64209.953699: cpuhp_exit:  cpu: 0064  state: 
+53 step:  53 ret: 0
+            bash-14295 [040] .... 64209.953700: cpuhp_multi_enter: cpu: 0064
+target: 199 step:  56 (trace_rb_cpu_prepare)
+            bash-14295 [040] .... 64209.953700: cpuhp_exit:  cpu: 0064  state: 
+56 step:  56 ret: 0
+            bash-14295 [040] .... 64209.953700: cpuhp_multi_enter: cpu: 0064
+target: 199 step:  56 (trace_rb_cpu_prepare)
+            bash-14295 [040] .... 64209.953700: cpuhp_exit:  cpu: 0064  state: 
+56 step:  56 ret: 0
+            bash-14295 [040] .... 64209.953701: cpuhp_multi_enter: cpu: 0064
+target: 199 step:  56 (trace_rb_cpu_prepare)
+            bash-14295 [040] .... 64209.953701: cpuhp_exit:  cpu: 0064  state: 
+56 step:  56 ret: 0
+            bash-14295 [040] .... 64209.953701: cpuhp_enter: cpu: 0064 target:
+199 step:  62 (timers_prepare_cpu)
+            bash-14295 [040] .... 64209.953701: cpuhp_exit:  cpu: 0064  state: 
+62 step:  62 ret: 0
+            bash-14295 [040] .... 64209.953702: cpuhp_enter: cpu: 0064 target:
+199 step:  64 (kvmclock_setup_percpu)
+            bash-14295 [040] .... 64209.953702: cpuhp_exit:  cpu: 0064  state: 
+64 step:  64 ret: -12
 
-	perf_v4_pmi=	[X86,INTEL]
-			Format: <bool>
-			Disable Intel PMU counter freezing feature.
-			The feature only exists starting from
-			Arch Perfmon v4 (Skylake and newer).
-
-However someone may still need it based on the correct understanding
-of "Freeze-on-Overflow" as Stephane said. How about renaming and 
-documenting it instead of discarding it completely?
-
-Our guest PEBS enabling patches does not completely depend on it
-and we do not require the administrator to enable perf_v4_pmi for
-guest PEBS.
-
-Would you generously take a look at the perf part in this series?
-
-Thanks,
-Like Xu
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
