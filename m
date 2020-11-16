@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D4AF2B4FA8
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:34:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66A512B4FA6
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 19:34:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388589AbgKPSas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 13:30:48 -0500
+        id S2388577AbgKPSaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 13:30:39 -0500
 Received: from mga06.intel.com ([134.134.136.31]:20645 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388229AbgKPS2K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Nov 2020 13:28:10 -0500
-IronPort-SDR: YL/rgSuRDWEANztkCs2RMvtR3U4OO0Ing6QQIK3RFzq/QgrW0mlWqHzefqoHnhdekJhUVRhA3a
- ch3DfDvm2+wg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232410052"
+        id S2388232AbgKPS2L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 13:28:11 -0500
+IronPort-SDR: KeEoDG1/XRI5Ya6bLtbezkv/Sy76zeMOl3CcEFKD1dnWeShcjB7onn5+A0xwEc5fWa+cZVNpMh
+ 3/FkxOVEWp7w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232410054"
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="232410052"
+   d="scan'208";a="232410054"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:28:09 -0800
-IronPort-SDR: XDNgKlubACap/YjCiy30MO5c7BvGj9iaXY7uhsLE1kPts++UzGrhS27GqeyeIbE7E8WcHIw1g/
- hXMG8di6Ouxg==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:28:10 -0800
+IronPort-SDR: bu2bFn08Vmg/gkRfuMIFM+4MC8Z1WaU9xjW2sSXdPprtJ8MDaqAu4pvoPNFF9tOeEPIx/1em+3
+ JnVesnz854aw==
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="400528130"
+   d="scan'208";a="400528150"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:28:09 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:28:10 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -38,9 +38,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH 37/67] KVM: x86/mmu: Ignore bits 63 and 62 when checking for "present" SPTEs
-Date:   Mon, 16 Nov 2020 10:26:22 -0800
-Message-Id: <7ca4ebee9566d6fb5ecdbffd32468a6b756ab515.1605232743.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 39/67] KVM: x86/mmu: Refactor shadow walk in __direct_map() to reduce indentation
+Date:   Mon, 16 Nov 2020 10:26:24 -0800
+Message-Id: <bfd8536d1345d281e8522f724177f56e0a645c2b.1605232743.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1605232743.git.isaku.yamahata@intel.com>
 References: <cover.1605232743.git.isaku.yamahata@intel.com>
@@ -52,59 +52,44 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Ignore bits 63 and 62 when checking for present SPTEs to allow setting
-said bits in not-present SPTEs.  TDX will set bit 63 in "zero" SPTEs to
-suppress #VEs (TDX-SEAM unconditionally enables EPT Violation #VE), and
-will use bit 62 to track zapped private SPTEs.
+Employ a 'continue' to reduce the indentation for linking a new shadow
+page during __direct_map() in preparation for linking private pages.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
- arch/x86/kvm/mmu/spte.h        | 17 +++++++++++++++--
- 2 files changed, 16 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 5d4e9f404018..06659d5c8ba0 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1039,7 +1039,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		gpa_t pte_gpa;
- 		gfn_t gfn;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 732510ecda36..25aafac9b5de 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2953,16 +2953,15 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+ 			break;
  
--		if (!sp->spt[i])
-+		if (!__is_shadow_present_pte(sp->spt[i]))
- 			continue;
- 
- 		pte_gpa = first_pte_gpa + i * sizeof(pt_element_t);
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index e5c94848ade1..22256cc8cce6 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -174,9 +174,22 @@ static inline bool is_access_track_spte(u64 spte)
- 	return !spte_ad_enabled(spte) && (spte & shadow_acc_track_mask) == 0;
- }
- 
--static inline int is_shadow_present_pte(u64 pte)
-+static inline bool __is_shadow_present_pte(u64 pte)
- {
--	return (pte != 0) && !is_mmio_spte(pte);
-+	/*
-+	 * Ignore bits 63 and 62 so that they can be set in SPTEs that are well
-+	 * and truly not present.  We can't use the sane/obvious approach of
-+	 * querying bits 2:0 (RWX or P) because EPT without A/D bits will clear
-+	 * RWX of a "present" SPTE to do access tracking.  Tracking updates can
-+	 * be done out of mmu_lock, so even the flushing logic needs to treat
-+	 * such SPTEs as present.
-+	 */
-+	return !!(pte << 2);
-+}
+ 		drop_large_spte(vcpu, it.sptep);
+-		if (!is_shadow_present_pte(*it.sptep)) {
+-			sp = __kvm_mmu_get_page(vcpu, base_gfn,
+-						gfn_stolen_bits, it.addr,
+-						it.level - 1, true, ACC_ALL);
+-
+-			link_shadow_page(vcpu, it.sptep, sp);
+-			if (is_tdp && huge_page_disallowed &&
+-			    req_level >= it.level)
+-				account_huge_nx_page(vcpu->kvm, sp);
+-		}
++		if (is_shadow_present_pte(*it.sptep))
++			continue;
 +
-+static inline bool is_shadow_present_pte(u64 pte)
-+{
-+	return __is_shadow_present_pte(pte) && !is_mmio_spte(pte);
- }
++		sp = __kvm_mmu_get_page(vcpu, base_gfn, gfn_stolen_bits,
++					it.addr, it.level - 1, true, ACC_ALL);
++
++		link_shadow_page(vcpu, it.sptep, sp);
++		if (is_tdp && huge_page_disallowed && req_level >= it.level)
++			account_huge_nx_page(vcpu->kvm, sp);
+ 	}
  
- static inline int is_large_pte(u64 pte)
+ 	ret = mmu_set_spte(vcpu, it.sptep, ACC_ALL,
 -- 
 2.17.1
 
