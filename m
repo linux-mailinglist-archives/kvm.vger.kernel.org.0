@@ -2,85 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54C832B3D05
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 07:21:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0BFA2B3D9C
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 08:24:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727097AbgKPGU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Nov 2020 01:20:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726970AbgKPGU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Nov 2020 01:20:59 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6B28C0613CF
-        for <kvm@vger.kernel.org>; Sun, 15 Nov 2020 22:20:58 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CZJq95Fvyz9sRR;
-        Mon, 16 Nov 2020 17:20:53 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1605507656;
-        bh=mJiJ2dD46rXsWvmGaqBk9GBKy8gbF/FCLB/jibKcKH0=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=JdxmTmym1+HkpZRq3FDqd+1FXyX90Lsc/DNpqUMCyEaFPll7wKxeQBNXaKEt1/2H3
-         pxgPq4nhYtk1E24eiJq/QVl2xDJMZr7sv5VMngYc4dSMo4+dPYR1v0MMQ4E8IEtQF7
-         lEpTcdzqubWi0vbkUasiJM1vglh32VK8RIRArDy9nG3FfvqqjyWZDSXwXzIqDvsqP2
-         MHIbHbtPC6DPc54eeWteX1yFOs+f/eObHU134OjXmncKgA5u2xOgtP8vpjbVaiNaHu
-         ZRrS1VwuhODeBCqSEA6ouIwdq1a7LjTdt9TUnhgKeizDCrDbvIGRtfV/M+qTmi1sd/
-         AHD+NHnp/giHQ==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     Leonardo Augusto Guimaraes Garcia <lagarcia@br.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH kernel] vfio_pci_nvlink2: Do not attempt NPU2 setup on old P8's NPU
-In-Reply-To: <1f2be6b0-d53a-aa58-9c4f-d55a6a5b1c79@ozlabs.ru>
-References: <20201113050632.74124-1-aik@ozlabs.ru> <0b8ceab2-e304-809f-be3c-512b28b25852@linux.ibm.com> <1f2be6b0-d53a-aa58-9c4f-d55a6a5b1c79@ozlabs.ru>
-Date:   Mon, 16 Nov 2020 17:20:53 +1100
-Message-ID: <87eekt4ybe.fsf@mpe.ellerman.id.au>
+        id S1727527AbgKPHXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 02:23:01 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:7502 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727412AbgKPHXB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 02:23:01 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CZLBZ1jQfzhbcL;
+        Mon, 16 Nov 2020 15:22:46 +0800 (CST)
+Received: from [10.174.187.179] (10.174.187.179) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 16 Nov 2020 15:22:47 +0800
+Subject: Re: [PATCH] irqchip/gic-v4.1: Optimize the wait for the completion of
+ the analysis of the VPT
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Marc Zyngier <maz@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+CC:     <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20200923063543.1920-1-lushenming@huawei.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <5e09e050-071d-5a74-ec2b-aa6afd1480b9@huawei.com>
+Date:   Mon, 16 Nov 2020 15:22:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200923063543.1920-1-lushenming@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.179]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-> On 13/11/2020 16:30, Andrew Donnellan wrote:
->> On 13/11/20 4:06 pm, Alexey Kardashevskiy wrote:
->>> We execute certain NPU2 setup code (such as mapping an LPID to a device
->>> in NPU2) unconditionally if an Nvlink bridge is detected. However this
->>> cannot succeed on P8+ machines as the init helpers return an error other
->>> than ENODEV which means the device is there is and setup failed so
->>> vfio_pci_enable() fails and pass through is not possible.
->>>
->>> This changes the two NPU2 related init helpers to return -ENODEV if
->>> there is no "memory-region" device tree property as this is
->>> the distinction between NPU and NPU2.
->>>
->>> Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] 
->>> subdriver")
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> 
->> Should this be Cc: stable?
->
-> This depends on whether P8+ + NVLink was ever a  product (hi Leonardo) 
-> and had actual customers who still rely on upstream kernels to work as 
-> after many years only the last week I heard form some Redhat test 
-> engineer that it does not work. May be cc: stable...
+Hi Marc,
 
-I don't think it really matters if it was a product or not. Upstream is
-never a product anyway.
+Friendly ping, it is some time since I sent this patch according to your last advice...
 
-If the fix is simple and unlikely to introduce a regression, and would
-potentially save someone having to debug the problem again, then it
-should get backported to stable.
+Besides, recently we found that the mmio delay on GICv4.1 system is about 10 times higher
+than that on GICv4.0 system in kvm-unit-tests (the specific data is as follows). By the
+way, HiSilicon GICv4.1 has already been implemented and will be released with our
+next-generation server, which is almost the only implementation of GICv4.1 at present.
 
-You should also clarify what you mean by "P8+", it won't be clear to
-most readers if you mean "Power 8 and/or later" or specifically Naples /
-Power8 NVL.
+                        |   GICv4.1 emulator   |  GICv4.0 emulator
+mmio_read_user (ns)     |        12811         |        1598
 
-cheers
+After analysis, this is mainly caused by the 10 us delay in its_wait_vpt_parse_complete()
+(the above difference is just about 10 us)...
+
+What's your opinion about this?
+
+Thanks,
+Shenming
+
+On 2020/9/23 14:35, Shenming Lu wrote:
+> Right after a vPE is made resident, the code starts polling the
+> GICR_VPENDBASER.Dirty bit until it becomes 0, where the delay_us
+> is set to 10. But in our measurement, it takes only hundreds of
+> nanoseconds, or 1~2 microseconds, to finish parsing the VPT in most
+> cases. And we also measured the time from vcpu_load() (include it)
+> to __guest_enter() on Kunpeng 920. On average, it takes 2.55 microseconds
+> (not first run && the VPT is empty). So 10 microseconds delay might
+> really hurt performance.
+> 
+> To avoid this, we can set the delay_us to 1, which is more appropriate
+> in this situation and universal. Besides, we can delay the execution
+> of its_wait_vpt_parse_complete() (call it from kvm_vgic_flush_hwstate()
+> corresponding to vPE resident), giving the GIC a chance to work in
+> parallel with the CPU on the entry path.
+> 
+> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v4.c      | 18 ++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c         |  2 ++
+>  drivers/irqchip/irq-gic-v3-its.c   | 14 +++++++++++---
+>  drivers/irqchip/irq-gic-v4.c       | 11 +++++++++++
+>  include/kvm/arm_vgic.h             |  3 +++
+>  include/linux/irqchip/arm-gic-v4.h |  4 ++++
+>  6 files changed, 49 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index b5fa73c9fd35..1d5d2d6894d3 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -353,6 +353,24 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
+>  	return err;
+>  }
+>  
+> +void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu)
+> +{
+> +	struct its_vpe *vpe;
+> +
+> +	if (kvm_vgic_global_state.type == VGIC_V2 || !vgic_supports_direct_msis(vcpu->kvm))
+> +		return;
+> +
+> +	vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+> +
+> +	if (vpe->vpt_ready)
+> +		return;
+> +
+> +	if (its_wait_vpt(vpe))
+> +		return;
+> +
+> +	vpe->vpt_ready = true;
+> +}
+> +
+>  static struct vgic_its *vgic_get_its(struct kvm *kvm,
+>  				     struct kvm_kernel_irq_routing_entry *irq_entry)
+>  {
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index c3643b7f101b..ed810a80cda2 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -915,6 +915,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  
+>  	if (can_access_vgic_from_kernel())
+>  		vgic_restore_state(vcpu);
+> +
+> +	vgic_v4_wait_vpt(vcpu);
+>  }
+>  
+>  void kvm_vgic_load(struct kvm_vcpu *vcpu)
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 548de7538632..b7cbc9bcab9d 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -3803,7 +3803,7 @@ static void its_wait_vpt_parse_complete(void)
+>  	WARN_ON_ONCE(readq_relaxed_poll_timeout_atomic(vlpi_base + GICR_VPENDBASER,
+>  						       val,
+>  						       !(val & GICR_VPENDBASER_Dirty),
+> -						       10, 500));
+> +						       1, 500));
+>  }
+>  
+>  static void its_vpe_schedule(struct its_vpe *vpe)
+> @@ -3837,7 +3837,7 @@ static void its_vpe_schedule(struct its_vpe *vpe)
+>  	val |= GICR_VPENDBASER_Valid;
+>  	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+>  
+> -	its_wait_vpt_parse_complete();
+> +	vpe->vpt_ready = false;
+>  }
+>  
+>  static void its_vpe_deschedule(struct its_vpe *vpe)
+> @@ -3881,6 +3881,10 @@ static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+>  		its_vpe_schedule(vpe);
+>  		return 0;
+>  
+> +	case WAIT_VPT:
+> +		its_wait_vpt_parse_complete();
+> +		return 0;
+> +
+>  	case DESCHEDULE_VPE:
+>  		its_vpe_deschedule(vpe);
+>  		return 0;
+> @@ -4047,7 +4051,7 @@ static void its_vpe_4_1_schedule(struct its_vpe *vpe,
+>  
+>  	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+>  
+> -	its_wait_vpt_parse_complete();
+> +	vpe->vpt_ready = false;
+>  }
+>  
+>  static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
+> @@ -4118,6 +4122,10 @@ static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+>  		its_vpe_4_1_schedule(vpe, info);
+>  		return 0;
+>  
+> +	case WAIT_VPT:
+> +		its_wait_vpt_parse_complete();
+> +		return 0;
+> +
+>  	case DESCHEDULE_VPE:
+>  		its_vpe_4_1_deschedule(vpe, info);
+>  		return 0;
+> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+> index 0c18714ae13e..36be42569872 100644
+> --- a/drivers/irqchip/irq-gic-v4.c
+> +++ b/drivers/irqchip/irq-gic-v4.c
+> @@ -258,6 +258,17 @@ int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en)
+>  	return ret;
+>  }
+>  
+> +int its_wait_vpt(struct its_vpe *vpe)
+> +{
+> +	struct its_cmd_info info = { };
+> +
+> +	WARN_ON(preemptible());
+> +
+> +	info.cmd_type = WAIT_VPT;
+> +
+> +	return its_send_vpe_cmd(vpe, &info);
+> +}
+> +
+>  int its_invall_vpe(struct its_vpe *vpe)
+>  {
+>  	struct its_cmd_info info = {
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index a8d8fdcd3723..b55a835d28a8 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -402,6 +402,9 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+>  				 struct kvm_kernel_irq_routing_entry *irq_entry);
+>  
+>  int vgic_v4_load(struct kvm_vcpu *vcpu);
+> +
+> +void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu);
+> +
+>  int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
+>  
+>  #endif /* __KVM_ARM_VGIC_H */
+> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+> index 6976b8331b60..68ac2b7b9309 100644
+> --- a/include/linux/irqchip/arm-gic-v4.h
+> +++ b/include/linux/irqchip/arm-gic-v4.h
+> @@ -75,6 +75,8 @@ struct its_vpe {
+>  	u16			vpe_id;
+>  	/* Pending VLPIs on schedule out? */
+>  	bool			pending_last;
+> +	/* VPT parse complete */
+> +	bool			vpt_ready;
+>  };
+>  
+>  /*
+> @@ -103,6 +105,7 @@ enum its_vcpu_info_cmd_type {
+>  	PROP_UPDATE_VLPI,
+>  	PROP_UPDATE_AND_INV_VLPI,
+>  	SCHEDULE_VPE,
+> +	WAIT_VPT,
+>  	DESCHEDULE_VPE,
+>  	INVALL_VPE,
+>  	PROP_UPDATE_VSGI,
+> @@ -128,6 +131,7 @@ struct its_cmd_info {
+>  int its_alloc_vcpu_irqs(struct its_vm *vm);
+>  void its_free_vcpu_irqs(struct its_vm *vm);
+>  int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en);
+> +int its_wait_vpt(struct its_vpe *vpe);
+>  int its_make_vpe_non_resident(struct its_vpe *vpe, bool db);
+>  int its_invall_vpe(struct its_vpe *vpe);
+>  int its_map_vlpi(int irq, struct its_vlpi_map *map);
+> 
