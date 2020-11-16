@@ -2,146 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A5E92B3BD3
-	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 04:28:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54C832B3D05
+	for <lists+kvm@lfdr.de>; Mon, 16 Nov 2020 07:21:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726203AbgKPD1i convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 15 Nov 2020 22:27:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52052 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725969AbgKPD1i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Nov 2020 22:27:38 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 210213] New: vCPUs >= 64 can't be online and hotplugged in some
- scenarios
-Date:   Mon, 16 Nov 2020 03:27:36 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: zelin.deng@linux.alibaba.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-210213-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1727097AbgKPGU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Nov 2020 01:20:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53706 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726970AbgKPGU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Nov 2020 01:20:59 -0500
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6B28C0613CF
+        for <kvm@vger.kernel.org>; Sun, 15 Nov 2020 22:20:58 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CZJq95Fvyz9sRR;
+        Mon, 16 Nov 2020 17:20:53 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1605507656;
+        bh=mJiJ2dD46rXsWvmGaqBk9GBKy8gbF/FCLB/jibKcKH0=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=JdxmTmym1+HkpZRq3FDqd+1FXyX90Lsc/DNpqUMCyEaFPll7wKxeQBNXaKEt1/2H3
+         pxgPq4nhYtk1E24eiJq/QVl2xDJMZr7sv5VMngYc4dSMo4+dPYR1v0MMQ4E8IEtQF7
+         lEpTcdzqubWi0vbkUasiJM1vglh32VK8RIRArDy9nG3FfvqqjyWZDSXwXzIqDvsqP2
+         MHIbHbtPC6DPc54eeWteX1yFOs+f/eObHU134OjXmncKgA5u2xOgtP8vpjbVaiNaHu
+         ZRrS1VwuhODeBCqSEA6ouIwdq1a7LjTdt9TUnhgKeizDCrDbvIGRtfV/M+qTmi1sd/
+         AHD+NHnp/giHQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     Leonardo Augusto Guimaraes Garcia <lagarcia@br.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH kernel] vfio_pci_nvlink2: Do not attempt NPU2 setup on old P8's NPU
+In-Reply-To: <1f2be6b0-d53a-aa58-9c4f-d55a6a5b1c79@ozlabs.ru>
+References: <20201113050632.74124-1-aik@ozlabs.ru> <0b8ceab2-e304-809f-be3c-512b28b25852@linux.ibm.com> <1f2be6b0-d53a-aa58-9c4f-d55a6a5b1c79@ozlabs.ru>
+Date:   Mon, 16 Nov 2020 17:20:53 +1100
+Message-ID: <87eekt4ybe.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=210213
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+> On 13/11/2020 16:30, Andrew Donnellan wrote:
+>> On 13/11/20 4:06 pm, Alexey Kardashevskiy wrote:
+>>> We execute certain NPU2 setup code (such as mapping an LPID to a device
+>>> in NPU2) unconditionally if an Nvlink bridge is detected. However this
+>>> cannot succeed on P8+ machines as the init helpers return an error other
+>>> than ENODEV which means the device is there is and setup failed so
+>>> vfio_pci_enable() fails and pass through is not possible.
+>>>
+>>> This changes the two NPU2 related init helpers to return -ENODEV if
+>>> there is no "memory-region" device tree property as this is
+>>> the distinction between NPU and NPU2.
+>>>
+>>> Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] 
+>>> subdriver")
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> 
+>> Should this be Cc: stable?
+>
+> This depends on whether P8+ + NVLink was ever a  product (hi Leonardo) 
+> and had actual customers who still rely on upstream kernels to work as 
+> after many years only the last week I heard form some Redhat test 
+> engineer that it does not work. May be cc: stable...
 
-            Bug ID: 210213
-           Summary: vCPUs >= 64 can't be online and hotplugged in some
-                    scenarios
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.10-rc4
-          Hardware: x86-64
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: zelin.deng@linux.alibaba.com
-        Regression: No
+I don't think it really matters if it was a product or not. Upstream is
+never a product anyway.
 
-Created attachment 293685
-  --> https://bugzilla.kernel.org/attachment.cgi?id=293685&action=edit
-Here is a workaround to fix this issue
+If the fix is simple and unlikely to introduce a regression, and would
+potentially save someone having to debug the problem again, then it
+should get backported to stable.
 
-In VM, if no-kvmclock-vsyscall is set, lscpu shows online 0-63 vcpus are online
-vcpus >= 64 are offline and if we attempting to hotplug them, they will return
--ENOMEM.
-This issue also happened in VM which are on TSC unstable host.
- bash-14295 [040] .... 64209.953702: cpuhp_enter: cpu: 0064 target: 199 step: 
-64 (kvmclock_setup_percpu)
-            bash-14295 [040] .... 64209.953702: cpuhp_exit:  cpu: 0064  state: 
-64 step:  64 ret: -12
-----------------------------
+You should also clarify what you mean by "P8+", it won't be clear to
+most readers if you mean "Power 8 and/or later" or specifically Naples /
+Power8 NVL.
 
-[root@iZwz9208df47apaoyvbmm3Z processor]# cat /sys/kernel/debug/tracing/trace
-# tracer: nop
-#
-# entries-in-buffer/entries-written: 166/166   #P:49
-#
-#                              _-----=> irqs-off
-#                             / _----=> need-resched
-#                            | / _---=> hardirq/softirq
-#                            || / _--=> preempt-depth
-#                            ||| /     delay
-#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-#              | |       |   ||||       |         |
-            bash-14295 [040] .... 64209.953675: cpuhp_enter: cpu: 0064 target:
-199 step:   1 (smpboot_create_threads)
-            bash-14295 [040] .... 64209.953676: cpuhp_exit:  cpu: 0064  state: 
- 1 step:   1 ret: 0
-            bash-14295 [040] .... 64209.953676: cpuhp_enter: cpu: 0064 target:
-199 step:   2 (perf_event_init_cpu)
-            bash-14295 [040] .... 64209.953677: cpuhp_exit:  cpu: 0064  state: 
- 2 step:   2 ret: 0
-            bash-14295 [040] .... 64209.953678: cpuhp_enter: cpu: 0064 target:
-199 step:  35 (workqueue_prepare_cpu)
-            bash-14295 [040] .... 64209.953678: cpuhp_exit:  cpu: 0064  state: 
-35 step:  35 ret: 0
-            bash-14295 [040] .... 64209.953678: cpuhp_enter: cpu: 0064 target:
-199 step:  37 (hrtimers_prepare_cpu)
-            bash-14295 [040] .... 64209.953679: cpuhp_exit:  cpu: 0064  state: 
-37 step:  37 ret: 0
-            bash-14295 [040] .... 64209.953679: cpuhp_enter: cpu: 0064 target:
-199 step:  40 (smpcfd_prepare_cpu)
-            bash-14295 [040] .... 64209.953692: cpuhp_exit:  cpu: 0064  state: 
-40 step:  40 ret: 0
-            bash-14295 [040] .... 64209.953693: cpuhp_enter: cpu: 0064 target:
-199 step:  41 (relay_prepare_cpu)
-            bash-14295 [040] .... 64209.953693: cpuhp_exit:  cpu: 0064  state: 
-41 step:  41 ret: 0
-            bash-14295 [040] .... 64209.953693: cpuhp_enter: cpu: 0064 target:
-199 step:  44 (rcutree_prepare_cpu)
-            bash-14295 [040] .... 64209.953694: cpuhp_exit:  cpu: 0064  state: 
-44 step:  44 ret: 0
-            bash-14295 [040] .... 64209.953694: cpuhp_enter: cpu: 0064 target:
-199 step:  53 (topology_add_dev)
-            bash-14295 [040] .... 64209.953699: cpuhp_exit:  cpu: 0064  state: 
-53 step:  53 ret: 0
-            bash-14295 [040] .... 64209.953700: cpuhp_multi_enter: cpu: 0064
-target: 199 step:  56 (trace_rb_cpu_prepare)
-            bash-14295 [040] .... 64209.953700: cpuhp_exit:  cpu: 0064  state: 
-56 step:  56 ret: 0
-            bash-14295 [040] .... 64209.953700: cpuhp_multi_enter: cpu: 0064
-target: 199 step:  56 (trace_rb_cpu_prepare)
-            bash-14295 [040] .... 64209.953700: cpuhp_exit:  cpu: 0064  state: 
-56 step:  56 ret: 0
-            bash-14295 [040] .... 64209.953701: cpuhp_multi_enter: cpu: 0064
-target: 199 step:  56 (trace_rb_cpu_prepare)
-            bash-14295 [040] .... 64209.953701: cpuhp_exit:  cpu: 0064  state: 
-56 step:  56 ret: 0
-            bash-14295 [040] .... 64209.953701: cpuhp_enter: cpu: 0064 target:
-199 step:  62 (timers_prepare_cpu)
-            bash-14295 [040] .... 64209.953701: cpuhp_exit:  cpu: 0064  state: 
-62 step:  62 ret: 0
-            bash-14295 [040] .... 64209.953702: cpuhp_enter: cpu: 0064 target:
-199 step:  64 (kvmclock_setup_percpu)
-            bash-14295 [040] .... 64209.953702: cpuhp_exit:  cpu: 0064  state: 
-64 step:  64 ret: -12
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+cheers
