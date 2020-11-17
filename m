@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F4042B6B4A
-	for <lists+kvm@lfdr.de>; Tue, 17 Nov 2020 18:12:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A2F92B6B4C
+	for <lists+kvm@lfdr.de>; Tue, 17 Nov 2020 18:12:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728329AbgKQRKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Nov 2020 12:10:32 -0500
-Received: from mail-dm6nam11on2078.outbound.protection.outlook.com ([40.107.223.78]:30208
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S1729282AbgKQRKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Nov 2020 12:10:39 -0500
+Received: from mail-dm6nam12on2077.outbound.protection.outlook.com ([40.107.243.77]:50048
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728317AbgKQRKb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Nov 2020 12:10:31 -0500
+        id S1727922AbgKQRKi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Nov 2020 12:10:38 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TncMZ7/woMKQt6dBzN5bG2SdOZPI/8zY4ArIbNaDTvr0syZ+dhIopCB5SzPUTRMEIcF3hpAchhEPSQ4h4amwHxvpbi8snqaoBx4pg7zMR2nJ7BwVFfCRZUiJO3zgsSmqBikfFIxj4OKEu4UwS78OzXp5qyHudDpPYTvxqtrwgdKZQoNWP5wumgqZT80f2Mf/aJgV/xqacugFn24ky+uPB/zlDKk9XaAUx1hYjU19lWVfEnf+a8sh42CnqOMSM3m9NfPTtEsM4lSz+EkXPrZAWcXTuIQ0+5R5YKzCkviDnBnkMxFc5rftg56EiECA+CUtr32KBvNQgSArsq/c8Ce7hA==
+ b=kN/ceZC7j/ylgygKLlblTkjZ+zq3fKzhAwjupcY4QX059k4X2Gzy7ojEipuIMwH6zSZiG80E47HlRpL8l5Z8xle7O7YA9K2shtZ5uLRe5ezwdBhIsoCnXQtnJ6DON7ouhVKcdlDJsvTg1+Zylb1eBkx7Z9y2qaOWi4pt0vu9A/VTkbh89leazmt4kzrHiHVwufB+ApGfhvVomgKR3PyVvTRYtL6N0dXEXOfH9+bLhhVaXRhJc5XVzfsoctaTJ0n52dmIUNlbIExIYdGTVFAC2hs6BdTSv7z9fQ+u1xpP7uM+1gNOrftYpgFRIjL2EeUNW8hBNGxZSmXuBRFprexw2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TRM8KxiyOg4f05n/z6YN1VjEvXdRbnmsOyCHqV6Y7FI=;
- b=LhieZeiktoJwnigimqAjh+5nCZsBT1NNkyDD+/TWh7drJrj0ARRjt3/67PBsmbKcuK2XIvmAbtkfQEe+pV14UFdNDV+IYX/QPW9CjHS0Hv3pgLD/5dyzM933pbIKGYisgN7OBGNYMKj1mIEPa5ls4iAJK80bXQsACGkORic6UTwPFY+NYFX+ygpDjt93L4eAOprXAFavnudyhXWKops9xCmkuvGb1JyH3frdj9JzRniaqOwY72V1xGr535mD+5ByGjmbLfMSTZ6IOIDmt5JCLFBUgTVnP9UTmZcan5tAQDdOaZq2fDpGE2vcXFaSnQTyz0KwTAkT5VZT9Tgo3LaVlQ==
+ bh=4RxZ4prlfsGgcObgXQ6t1PLsXAkp0UgEi4AMr2trksM=;
+ b=UanSteT51/acxCJe9RG4XEbzoW8tMvdS4twN1LxNU+9fWXDm17WRY690URyv16fXVepXckO1WfHAQRlbyf95eWJsfJKXNHYAmSK/6xi1VkDFDXRCRpWsyes/9gky77LC7O6PH3cxh76DDpFvNPJzfkVqEzorvXz3EFHqt1X4Hx4cyfgV0te3aQC4tX0YfhCh6cdCG1Szg3Vp+K7MrV59PZXg8kyMuJa5evQIWWyiPnheyD5E5+eWvZfUd59kYpEBt1FfIlchjfuBCbF/G5VKss5kNTNnFGKQD8yB3wyg8oHOoA0VybLfkZSfs/TFAsY9x6tmGP6DRFnSPeQS2aXI5A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TRM8KxiyOg4f05n/z6YN1VjEvXdRbnmsOyCHqV6Y7FI=;
- b=1S3bu4+BbvKlMFR7pPUlD3rew1sQAfpFtqLFl/tc4B/zq43rq9obZv6aDxcdYks/q0++GAiJxlfm5YoNM8e+EFSTYHAYnG7QLLkiS3ds+sooqUX1oms9oWayXTqRWED/eonOCYaopRmnDwjXKvS6j4pWRciW2MvlGO/2oZn+5tM=
+ bh=4RxZ4prlfsGgcObgXQ6t1PLsXAkp0UgEi4AMr2trksM=;
+ b=ZqQQ7gQmaPiOiMqV5UStTS+sFtwaQUbRK+iyOGoKA4YJo1cnm4ZUlC8i43ZZrXL2aWpenyMMGcv3d3rXfLGRUXsQ48eKh8QfdKDMgsZjGW0JlTdkX5YbQpWgln4MfvdLgzoQdf+aZ3leWbY3dh9+Nbpa95gCC0IqZDyklDznESk=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
  DM5PR12MB1772.namprd12.prod.outlook.com (2603:10b6:3:107::10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3541.25; Tue, 17 Nov 2020 17:10:26 +0000
+ 15.20.3541.25; Tue, 17 Nov 2020 17:10:34 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::dcda:c3e8:2386:e7fe]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::dcda:c3e8:2386:e7fe%12]) with mapi id 15.20.3564.028; Tue, 17 Nov
- 2020 17:10:26 +0000
+ 2020 17:10:34 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,43 +48,43 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v4 20/34] KVM: SVM: Add support for EFER write traps for an SEV-ES guest
-Date:   Tue, 17 Nov 2020 11:07:23 -0600
-Message-Id: <d8a0d7b0d6f032bc0c0ae80d979f500b66efb332.1605632857.git.thomas.lendacky@amd.com>
+Subject: [PATCH v4 21/34] KVM: SVM: Add support for CR0 write traps for an SEV-ES guest
+Date:   Tue, 17 Nov 2020 11:07:24 -0600
+Message-Id: <80b9ee59892f0090f52b124f220fdba46e7c0b65.1605632857.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1605632857.git.thomas.lendacky@amd.com>
 References: <cover.1605632857.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA9PR10CA0004.namprd10.prod.outlook.com
- (2603:10b6:806:a7::9) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0501CA0149.namprd05.prod.outlook.com
+ (2603:10b6:803:2c::27) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by SA9PR10CA0004.namprd10.prod.outlook.com (2603:10b6:806:a7::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.20 via Frontend Transport; Tue, 17 Nov 2020 17:10:25 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by SN4PR0501CA0149.namprd05.prod.outlook.com (2603:10b6:803:2c::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.15 via Frontend Transport; Tue, 17 Nov 2020 17:10:33 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: abc133d6-e57b-4c53-3999-08d88b1bad45
+X-MS-Office365-Filtering-Correlation-Id: 55a06a38-a5d4-4381-cccd-08d88b1bb23a
 X-MS-TrafficTypeDiagnostic: DM5PR12MB1772:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1772FB09822DCE013F7A6513ECE20@DM5PR12MB1772.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1772199CDEDAC2A8DEB978F7ECE20@DM5PR12MB1772.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nk8UG5dj2Fd3yk6TTs1WgOov9JxUHyyO9cBxMB8Uwic215nTnXu/jMwX2huhdT2c9MQJSeqIsLhydpmHmasemUCvD9eSVSBqsW62OiauXWaUsClwLwdRyXFD3CZiU8544TJrwYRPml2oTB64GZJLNhdwDBcEMAqDSjYXSQ+VdDQOzFdFfbmqx+SOkzNK60jK4wDDP4VCUft0Ilc8ZlOTL+M34Q+rht5Mjn2mESepM7kVdD3u/7u70P/BunZP1375NV8koyb34pDDZK0sl3scoJ/zNUXxEQBBbPuKQ33fUVbtE5MRWZ8LsFySnbb9IUIYj+hCxElX+lsK2wZ2yPFy8A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(346002)(376002)(39860400002)(136003)(6486002)(66476007)(66946007)(8936002)(83380400001)(5660300002)(26005)(478600001)(66556008)(16526019)(186003)(36756003)(86362001)(8676002)(316002)(956004)(52116002)(4326008)(54906003)(7696005)(7416002)(2616005)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 1d4PXzPbeD0ynm+q3Ftcg949CNDFPr2TH+7KIk706w3yDd90mnfVZZkBbFEA0zyJ4lDZ1EVpBCeeuBL66DqogOxhUXBm7BxqvrWrfRbwt1+7M+LGaQ4Oa+cBex7McpvPVIg6/9SdYitqIpc/S6ZwSBija+13jpPGZtv6QXbWt+7DotiaNXDCYIQnvw+YjyfPx9b44bGIIFLxMy/m/oT3OcDtupIUoii/RRypU0xavmzivO0weq6LdaK581p+3al8g404zpkzc0O+6JD5yrP3oPCZLMBAub9NLU32Cb+j4h2yuC5JKbzWh0KFxGjuD5D3++7YxUmv1ikm6bxbA4QTrX/RUK7zSMxcvgCMciBAg23fdGB3jWVxrrQCx3j29PPbvSAYL1Pmu+KkYmA/p68PmGnHNtaZKQfwuH0wPM5B8DJaeYvBaTXDhBTf67a1lcdrQBgElpx04CX55Eb2Ta7I41uDxPfTAQEI6e8HLrHWVOI5xL4dqfpL4Yw0yZidx7CCcPNm9uQPqCaTMfbjxVKMjwIUUfeYuirY6nmWpAevvFIpKIvu3FS0f4aghPZ4+DHb81Jid6UaU9/rt9aSnARTOc3p3b/wcU1JoNOSjQTNTxAsdv5Zt0cd2wWabwjFpwc8dMhwPZynt88S/eekijo2mg==
+X-Microsoft-Antispam-Message-Info: wT5Dt/NrV721Oc4MvDe9q1A3xiWduQK/L2vXBr4BD4OJ3fOUCloEJxUetWr5QPJX/n2OW76bJ2zYQNjeGPEkLOMCzIojVVJiXfV8Kvb1OKSjAjPZJC2RUQfSZ1Spf+wdRin4zotlwfF/rQ09wC3LqgM9h1kS2jwld0z5rLAb5jfr+kkocsm4fucUSWG4X+WOxzhFuRTVfbgoSdLkIEcOIYIP+hcOJl1IXUbhzXgLNmIFPRwx9d1OK/0AwimuSRBbNapk7KILRt1KpZy5ByJXbFEGE4e4iyIBnt778BDVvbr8NOZvFxSFcEF01DWPEl+1
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(346002)(376002)(39860400002)(136003)(6486002)(66476007)(66946007)(8936002)(83380400001)(5660300002)(26005)(478600001)(66556008)(16526019)(6666004)(186003)(36756003)(86362001)(8676002)(316002)(956004)(52116002)(4326008)(54906003)(7696005)(7416002)(2616005)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: ITYvT26FbtPccX3K8OLs5eAL8yU1xNzN9ELOd0vTN95j+EaybrG7FOAnwqjligzt+2sTjaAyqi/kTEFekB68y4OSPSUvimQpib7tLlkSZSGnSuugVMOBVx0QHf2htoh5P2kJV2GAzdnZBf/JyPdOFYDm34QDmkxwZAKJC1e2yKZQzugDoR5U4Lc5RjTBXYPDFBTORunl+UFfDLGg3aoa7htOKwD7p7WCIlRXzIc9Wwps0ucpYaTy0Wyn8LxTz6UylZuWzbZ2eVjuSQIvaFybW0qW5efUgEA/76Z59/wtmXcIhK8cRlAaVOetH9ldfZOjbd6zgsWNc03vofvdEpnfFnVKQUfAXT0FDk5GbViTEaPd0gD3qOfkyVuhrjxcRugcQeCfy9gQyPKQUMDpEdsDPOWuRLAtwP2JvwOYRrLUX22qoDWv7xUYY5/dWKM45Dahgd7UOGgLR2ZK7gU+/UsEgCdFhVav5C4tjhYqB0Q0Dru7dYyUzys/3PRu05y4bYJBA2F9o7LiKDoiA0fkFrNfiP/hF3Lpzv64Lip9o7F0DYnsZGWUY0TMKK/JVuGIfIetvFh1sqRzZW6kSSTndzNf80E3v32IcWHMxv+/Y6kT8+QCAKQ/o+eDxSdEAe+ns79RRQyGDRSHH55BZ/HXY8HKfw==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: abc133d6-e57b-4c53-3999-08d88b1bad45
+X-MS-Exchange-CrossTenant-Network-Message-Id: 55a06a38-a5d4-4381-cccd-08d88b1bb23a
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2020 17:10:26.2677
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2020 17:10:34.5620
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qWbnOJFyX90E1uBLM5PAokYo9y/ixnG6OhUGkv5mEkXqzDVpVp47Y/QQd4URxrHK/hGdry80VMfhI/GOJnr0gg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: wuXjX3eLxczloxQLGgUBORwTdjVtExKV3J3bAGi8OSpAq//jOCTHgXUn+RZ6KAcyojMMnP23L010oxAiKOGnkQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1772
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -92,83 +92,182 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-For SEV-ES guests, the interception of EFER write access is not
-recommended. EFER interception occurs prior to EFER being modified and
-the hypervisor is unable to modify EFER itself because the register is
-located in the encrypted register state.
+For SEV-ES guests, the interception of control register write access
+is not recommended. Control register interception occurs prior to the
+control register being modified and the hypervisor is unable to modify
+the control register itself because the register is located in the
+encrypted register state.
 
-SEV-ES support introduces a new EFER write trap. This trap provides
-intercept support of an EFER write after it has been modified. The new
-EFER value is provided in the VMCB EXITINFO1 field, allowing the
-hypervisor to track the setting of the guest EFER.
+SEV-ES support introduces new control register write traps. These traps
+provide intercept support of a control register write after the control
+register has been modified. The new control register value is provided in
+the VMCB EXITINFO1 field, allowing the hypervisor to track the setting
+of the guest control registers.
 
-Add support to track the value of the guest EFER value using the EFER
-write trap so that the hypervisor understands the guest operating mode.
+Add support to track the value of the guest CR0 register using the control
+register write trap so that the hypervisor understands the guest operating
+mode.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/include/uapi/asm/svm.h |  2 ++
- arch/x86/kvm/svm/svm.c          | 20 ++++++++++++++++++++
- 2 files changed, 22 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/include/uapi/asm/svm.h | 17 ++++++++++++++
+ arch/x86/kvm/svm/svm.c          | 24 +++++++++++++++++++
+ arch/x86/kvm/x86.c              | 41 +++++++++++++++++++--------------
+ 4 files changed, 66 insertions(+), 17 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 4fe718e339c9..068853bcbc74 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1473,6 +1473,7 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
+ 		    int reason, bool has_error_code, u32 error_code);
+ 
++int __kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned long cr0);
+ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
+ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3);
+ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
 diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index 09f723945425..6e3f92e17655 100644
+index 6e3f92e17655..14b0d97b50e2 100644
 --- a/arch/x86/include/uapi/asm/svm.h
 +++ b/arch/x86/include/uapi/asm/svm.h
-@@ -77,6 +77,7 @@
- #define SVM_EXIT_MWAIT_COND    0x08c
+@@ -78,6 +78,22 @@
  #define SVM_EXIT_XSETBV        0x08d
  #define SVM_EXIT_RDPRU         0x08e
-+#define SVM_EXIT_EFER_WRITE_TRAP		0x08f
+ #define SVM_EXIT_EFER_WRITE_TRAP		0x08f
++#define SVM_EXIT_CR0_WRITE_TRAP			0x090
++#define SVM_EXIT_CR1_WRITE_TRAP			0x091
++#define SVM_EXIT_CR2_WRITE_TRAP			0x092
++#define SVM_EXIT_CR3_WRITE_TRAP			0x093
++#define SVM_EXIT_CR4_WRITE_TRAP			0x094
++#define SVM_EXIT_CR5_WRITE_TRAP			0x095
++#define SVM_EXIT_CR6_WRITE_TRAP			0x096
++#define SVM_EXIT_CR7_WRITE_TRAP			0x097
++#define SVM_EXIT_CR8_WRITE_TRAP			0x098
++#define SVM_EXIT_CR9_WRITE_TRAP			0x099
++#define SVM_EXIT_CR10_WRITE_TRAP		0x09a
++#define SVM_EXIT_CR11_WRITE_TRAP		0x09b
++#define SVM_EXIT_CR12_WRITE_TRAP		0x09c
++#define SVM_EXIT_CR13_WRITE_TRAP		0x09d
++#define SVM_EXIT_CR14_WRITE_TRAP		0x09e
++#define SVM_EXIT_CR15_WRITE_TRAP		0x09f
  #define SVM_EXIT_INVPCID       0x0a2
  #define SVM_EXIT_NPF           0x400
  #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
-@@ -184,6 +185,7 @@
- 	{ SVM_EXIT_MONITOR,     "monitor" }, \
+@@ -186,6 +202,7 @@
  	{ SVM_EXIT_MWAIT,       "mwait" }, \
  	{ SVM_EXIT_XSETBV,      "xsetbv" }, \
-+	{ SVM_EXIT_EFER_WRITE_TRAP,	"write_efer_trap" }, \
+ 	{ SVM_EXIT_EFER_WRITE_TRAP,	"write_efer_trap" }, \
++	{ SVM_EXIT_CR0_WRITE_TRAP,	"write_cr0_trap" }, \
  	{ SVM_EXIT_INVPCID,     "invpcid" }, \
  	{ SVM_EXIT_NPF,         "npf" }, \
  	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 02a8035dd6b2..f840e3a3ee45 100644
+index f840e3a3ee45..b6b16379ae8d 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -2519,6 +2519,25 @@ static int cr8_write_interception(struct vcpu_svm *svm)
- 	return 0;
+@@ -2466,6 +2466,29 @@ static int cr_interception(struct vcpu_svm *svm)
+ 	return kvm_complete_insn_gp(&svm->vcpu, err);
  }
  
-+static int efer_trap(struct vcpu_svm *svm)
++static int cr_trap(struct vcpu_svm *svm)
 +{
-+	struct msr_data msr_info;
++	unsigned long old_value, new_value;
++	unsigned int cr;
 +	int ret;
 +
-+	/*
-+	 * Clear the EFER_SVME bit from EFER. The SVM code always sets this
-+	 * bit in svm_set_efer(), but __kvm_valid_efer() checks it against
-+	 * whether the guest has X86_FEATURE_SVM - this avoids a failure if
-+	 * the guest doesn't have X86_FEATURE_SVM.
-+	 */
-+	msr_info.host_initiated = false;
-+	msr_info.index = MSR_EFER;
-+	msr_info.data = svm->vmcb->control.exit_info_1 & ~EFER_SVME;
-+	ret = kvm_set_msr_common(&svm->vcpu, &msr_info);
++	new_value = (unsigned long)svm->vmcb->control.exit_info_1;
++
++	cr = svm->vmcb->control.exit_code - SVM_EXIT_CR0_WRITE_TRAP;
++	switch (cr) {
++	case 0:
++		old_value = kvm_read_cr0(&svm->vcpu);
++
++		ret = __kvm_set_cr0(&svm->vcpu, old_value, new_value);
++		break;
++	default:
++		WARN(1, "unhandled CR%d write trap", cr);
++		ret = 1;
++	}
 +
 +	return kvm_complete_insn_gp(&svm->vcpu, ret);
 +}
 +
- static int svm_get_msr_feature(struct kvm_msr_entry *msr)
+ static int dr_interception(struct vcpu_svm *svm)
  {
- 	msr->data = 0;
-@@ -3027,6 +3046,7 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
- 	[SVM_EXIT_MWAIT]			= mwait_interception,
+ 	int reg, dr;
+@@ -3047,6 +3070,7 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
  	[SVM_EXIT_XSETBV]			= xsetbv_interception,
  	[SVM_EXIT_RDPRU]			= rdpru_interception,
-+	[SVM_EXIT_EFER_WRITE_TRAP]		= efer_trap,
+ 	[SVM_EXIT_EFER_WRITE_TRAP]		= efer_trap,
++	[SVM_EXIT_CR0_WRITE_TRAP]		= cr_trap,
  	[SVM_EXIT_INVPCID]                      = invpcid_interception,
  	[SVM_EXIT_NPF]				= npf_interception,
  	[SVM_EXIT_RSM]                          = rsm_interception,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 46bd83f0dbc3..a25c2bd43de3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -804,11 +804,33 @@ bool pdptrs_changed(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(pdptrs_changed);
+ 
++int __kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned long cr0)
++{
++	unsigned long update_bits = X86_CR0_PG | X86_CR0_WP;
++
++	kvm_x86_ops.set_cr0(vcpu, cr0);
++
++	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
++		kvm_clear_async_pf_completion_queue(vcpu);
++		kvm_async_pf_hash_reset(vcpu);
++	}
++
++	if ((cr0 ^ old_cr0) & update_bits)
++		kvm_mmu_reset_context(vcpu);
++
++	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
++	    kvm_arch_has_noncoherent_dma(vcpu->kvm) &&
++	    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
++		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(__kvm_set_cr0);
++
+ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ {
+ 	unsigned long old_cr0 = kvm_read_cr0(vcpu);
+ 	unsigned long pdptr_bits = X86_CR0_CD | X86_CR0_NW | X86_CR0_PG;
+-	unsigned long update_bits = X86_CR0_PG | X86_CR0_WP;
+ 
+ 	cr0 |= X86_CR0_ET;
+ 
+@@ -845,22 +867,7 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ 	if (!(cr0 & X86_CR0_PG) && kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE))
+ 		return 1;
+ 
+-	kvm_x86_ops.set_cr0(vcpu, cr0);
+-
+-	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
+-		kvm_clear_async_pf_completion_queue(vcpu);
+-		kvm_async_pf_hash_reset(vcpu);
+-	}
+-
+-	if ((cr0 ^ old_cr0) & update_bits)
+-		kvm_mmu_reset_context(vcpu);
+-
+-	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
+-	    kvm_arch_has_noncoherent_dma(vcpu->kvm) &&
+-	    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+-		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
+-
+-	return 0;
++	return __kvm_set_cr0(vcpu, old_cr0, cr0);
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_cr0);
+ 
 -- 
 2.28.0
 
