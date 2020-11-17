@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A07AE2B6898
-	for <lists+kvm@lfdr.de>; Tue, 17 Nov 2020 16:23:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C8AE2B68A4
+	for <lists+kvm@lfdr.de>; Tue, 17 Nov 2020 16:25:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387637AbgKQPWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Nov 2020 10:22:40 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7986 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728910AbgKQPWk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Nov 2020 10:22:40 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AHF2SqG109851;
-        Tue, 17 Nov 2020 10:22:39 -0500
+        id S1730182AbgKQPYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Nov 2020 10:24:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26218 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728786AbgKQPYT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 17 Nov 2020 10:24:19 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AHF2wch158322;
+        Tue, 17 Nov 2020 10:24:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
- content-type; s=pp1; bh=YHniPuEuAPL4CRFLdMzzTjZZ9Mcu3LSUcO092H7El8I=;
- b=RNYYPrcVJR/atJf5tcU6XCq8qRER/+NASHUjt3ImQn7LzwnA6D401oI3p7vtc+L2LbK2
- hL2hcORlqCXHH2OQZfWe/b7oGYGvw6TcAvNeWgZLcn6jfJFOWR8AR2B5EemRjcwd8qQ7
- K2xn3OeBrq7y+bt0MypWapNiMj89paIRkmFos/+wkY9v4mH8IIdkaUwkxp84gMPMsoD2
- 3DngYaY4flvOEh8o9KFB/kouahU4CGU6rhkoj6nspgM1W6pLF6RxgijVWHeR7wZ7l2my
- phRFR0VzGVDhE/klO8Fq0DAU15A81uaZpPykfqZlDe7pqYKWivV0y1YT9qqnnFEro/g2 bA== 
+ content-type; s=pp1; bh=CI4McZlEsBe24ylvr/aTNnuaqzeOk3QxC5dyQk95YdA=;
+ b=nsRUsbZKZQpAkCGbRPDTJvMmUm+pVxK90CKGhrVSuB4hiLGhMycXIPOgwUAgiqpYEFdL
+ 3nTlb1tHsQRPw1PLy1Uvf8pBWjFQCbAlKOlNLKBS0MnELhNPg/QYsaJBMIkmxoAg04uW
+ darBlui17LOwMTMbTIjEb2oOj5/za4rq+9qkaNU7JwpkivNyTHeDtLirMTXGFpW8OerO
+ xn7n3MwAcK8XRpDIz6Y5VqiAhqtLTWnxnQI2z+pUPusBt2NrSySOuu6ByKrRxU5Ngtgj
+ 1VEVLaaRGcLWuVtTyxEQ1gNId0qBTKlrpO2Pno4oHhRXkdHZwTwQtQSW9XkwmqUzOoKr Jg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34vb0vn7p2-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34ve31eyj5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Nov 2020 10:22:38 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AHF2c2S110626;
-        Tue, 17 Nov 2020 10:22:38 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34vb0vn7na-1
+        Tue, 17 Nov 2020 10:24:13 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AHF4V5D172874;
+        Tue, 17 Nov 2020 10:24:12 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34ve31eyh1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Nov 2020 10:22:38 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AHFMZ7m032220;
-        Tue, 17 Nov 2020 15:22:35 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 34v69ur94y-1
+        Tue, 17 Nov 2020 10:24:12 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AHFNHIV008304;
+        Tue, 17 Nov 2020 15:24:10 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 34t6v89nyv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Nov 2020 15:22:35 +0000
+        Tue, 17 Nov 2020 15:24:10 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AHFMW4v63767000
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AHFMqH78717008
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Nov 2020 15:22:32 GMT
+        Tue, 17 Nov 2020 15:22:53 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5EBB4A405C;
-        Tue, 17 Nov 2020 15:22:32 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C1878A405C;
+        Tue, 17 Nov 2020 15:22:52 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5ECFA4054;
-        Tue, 17 Nov 2020 15:22:31 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 448BFA4054;
+        Tue, 17 Nov 2020 15:22:52 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.158.127])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 17 Nov 2020 15:22:31 +0000 (GMT)
-Subject: Re: [PATCH 2/2] s390/gmap: make gmap memcg aware
+        Tue, 17 Nov 2020 15:22:52 +0000 (GMT)
+Subject: Re: [PATCH 1/2] KVM: s390: Add memcg accounting to KVM allocations
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -61,7 +61,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Heiko Carstens <hca@linux.ibm.com>
 References: <20201117151023.424575-1-borntraeger@de.ibm.com>
- <20201117151023.424575-3-borntraeger@de.ibm.com>
+ <20201117151023.424575-2-borntraeger@de.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
  xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -105,30 +105,30 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Message-ID: <fd9f77d2-fdd1-d2ab-d9ca-ee914ac9deaf@linux.ibm.com>
-Date:   Tue, 17 Nov 2020 16:22:31 +0100
+Message-ID: <f7318fcc-3c7b-27a9-6d6d-7c16109ed603@linux.ibm.com>
+Date:   Tue, 17 Nov 2020 16:22:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201117151023.424575-3-borntraeger@de.ibm.com>
+In-Reply-To: <20201117151023.424575-2-borntraeger@de.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="yn1L4LO3leP2IUxhIomLOzXc4goaloWlm"
+ boundary="6sMdO5WuoC7xWF7gUZKvadvAR6Op9P4pi"
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
  definitions=2020-11-17_04:2020-11-17,2020-11-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=2 clxscore=1015
- priorityscore=1501 adultscore=0 lowpriorityscore=0 mlxlogscore=999
- malwarescore=0 impostorscore=0 mlxscore=0 phishscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011170109
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 suspectscore=2 bulkscore=0 clxscore=1011 impostorscore=0
+ lowpriorityscore=0 spamscore=0 phishscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2011170109
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yn1L4LO3leP2IUxhIomLOzXc4goaloWlm
-Content-Type: multipart/mixed; boundary="r28RLISvB67qD59H8b7zxUWS9egGfrkWi";
+--6sMdO5WuoC7xWF7gUZKvadvAR6Op9P4pi
+Content-Type: multipart/mixed; boundary="oszkB5zXk7RHUoHPiBvOhd3bHhY6K1XWn";
  protected-headers="v1"
 From: Janosch Frank <frankja@linux.ibm.com>
 To: Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -136,167 +136,347 @@ To: Christian Borntraeger <borntraeger@de.ibm.com>,
 Cc: KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
  David Hildenbrand <david@redhat.com>, linux-s390
  <linux-s390@vger.kernel.org>, Heiko Carstens <hca@linux.ibm.com>
-Message-ID: <fd9f77d2-fdd1-d2ab-d9ca-ee914ac9deaf@linux.ibm.com>
-Subject: Re: [PATCH 2/2] s390/gmap: make gmap memcg aware
+Message-ID: <f7318fcc-3c7b-27a9-6d6d-7c16109ed603@linux.ibm.com>
+Subject: Re: [PATCH 1/2] KVM: s390: Add memcg accounting to KVM allocations
 References: <20201117151023.424575-1-borntraeger@de.ibm.com>
- <20201117151023.424575-3-borntraeger@de.ibm.com>
-In-Reply-To: <20201117151023.424575-3-borntraeger@de.ibm.com>
+ <20201117151023.424575-2-borntraeger@de.ibm.com>
+In-Reply-To: <20201117151023.424575-2-borntraeger@de.ibm.com>
 
---r28RLISvB67qD59H8b7zxUWS9egGfrkWi
+--oszkB5zXk7RHUoHPiBvOhd3bHhY6K1XWn
 Content-Type: multipart/mixed;
- boundary="------------32D3451EA9CF3737893459CE"
+ boundary="------------ACE1317D86CDEF8EB3357397"
 Content-Language: en-US
 
 This is a multi-part message in MIME format.
---------------32D3451EA9CF3737893459CE
+--------------ACE1317D86CDEF8EB3357397
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 11/17/20 4:10 PM, Christian Borntraeger wrote:
-> gmap allocations can be attributed to a process.
+> Almost all kvm allocations in the s390x KVM code can be attributed to
+> process that triggers the allocation (in other words, no global
+> allocation for other guests). This will help the memcg controller to do=
+
+> the right decisions.
 >=20
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > Acked-by: Heiko Carstens <hca@linux.ibm.com>
-> ---
->  arch/s390/mm/gmap.c | 30 +++++++++++++++---------------
->  1 file changed, 15 insertions(+), 15 deletions(-)
->=20
-> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-> index 64795d034926..9bb2c7512cd5 100644
-> --- a/arch/s390/mm/gmap.c
-> +++ b/arch/s390/mm/gmap.c
-> @@ -2,7 +2,7 @@
->  /*
->   *  KVM guest address space mapping code
->   *
-> - *    Copyright IBM Corp. 2007, 2016, 2018
-> + *    Copyright IBM Corp. 2007, 2020
-
-Do you mean 2007 - 2020 or did you drop the 2016 and 2018?
-How does this even work?
 
 Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
-
->   *    Author(s): Martin Schwidefsky <schwidefsky@de.ibm.com>
->   *		 David Hildenbrand <david@redhat.com>
->   *		 Janosch Frank <frankja@linux.vnet.ibm.com>
-> @@ -56,19 +56,19 @@ static struct gmap *gmap_alloc(unsigned long limit)=
-
->  		atype =3D _ASCE_TYPE_REGION1;
->  		etype =3D _REGION1_ENTRY_EMPTY;
->  	}
-> -	gmap =3D kzalloc(sizeof(struct gmap), GFP_KERNEL);
-> +	gmap =3D kzalloc(sizeof(struct gmap), GFP_KERNEL_ACCOUNT);
->  	if (!gmap)
+> ---
+>  arch/s390/kvm/guestdbg.c  |  8 ++++----
+>  arch/s390/kvm/intercept.c |  2 +-
+>  arch/s390/kvm/interrupt.c | 10 +++++-----
+>  arch/s390/kvm/kvm-s390.c  | 20 ++++++++++----------
+>  arch/s390/kvm/priv.c      |  4 ++--
+>  arch/s390/kvm/pv.c        |  6 +++---
+>  arch/s390/kvm/vsie.c      |  4 ++--
+>  7 files changed, 27 insertions(+), 27 deletions(-)
+>=20
+> diff --git a/arch/s390/kvm/guestdbg.c b/arch/s390/kvm/guestdbg.c
+> index 394a5f53805b..3765c4223bf9 100644
+> --- a/arch/s390/kvm/guestdbg.c
+> +++ b/arch/s390/kvm/guestdbg.c
+> @@ -184,7 +184,7 @@ static int __import_wp_info(struct kvm_vcpu *vcpu,
+>  	if (wp_info->len < 0 || wp_info->len > MAX_WP_SIZE)
+>  		return -EINVAL;
+>=20
+> -	wp_info->old_data =3D kmalloc(bp_data->len, GFP_KERNEL);
+> +	wp_info->old_data =3D kmalloc(bp_data->len, GFP_KERNEL_ACCOUNT);
+>  	if (!wp_info->old_data)
+>  		return -ENOMEM;
+>  	/* try to backup the original value */
+> @@ -234,7 +234,7 @@ int kvm_s390_import_bp_data(struct kvm_vcpu *vcpu,
+>  	if (nr_wp > 0) {
+>  		wp_info =3D kmalloc_array(nr_wp,
+>  					sizeof(*wp_info),
+> -					GFP_KERNEL);
+> +					GFP_KERNEL_ACCOUNT);
+>  		if (!wp_info) {
+>  			ret =3D -ENOMEM;
+>  			goto error;
+> @@ -243,7 +243,7 @@ int kvm_s390_import_bp_data(struct kvm_vcpu *vcpu,
+>  	if (nr_bp > 0) {
+>  		bp_info =3D kmalloc_array(nr_bp,
+>  					sizeof(*bp_info),
+> -					GFP_KERNEL);
+> +					GFP_KERNEL_ACCOUNT);
+>  		if (!bp_info) {
+>  			ret =3D -ENOMEM;
+>  			goto error;
+> @@ -349,7 +349,7 @@ static struct kvm_hw_wp_info_arch *any_wp_changed(s=
+truct kvm_vcpu *vcpu)
+>  		if (!wp_info || !wp_info->old_data || wp_info->len <=3D 0)
+>  			continue;
+>=20
+> -		temp =3D kmalloc(wp_info->len, GFP_KERNEL);
+> +		temp =3D kmalloc(wp_info->len, GFP_KERNEL_ACCOUNT);
+>  		if (!temp)
+>  			continue;
+>=20
+> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+> index e7a7c499a73f..72b25b7cc6ae 100644
+> --- a/arch/s390/kvm/intercept.c
+> +++ b/arch/s390/kvm/intercept.c
+> @@ -398,7 +398,7 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+>  	if (!kvm_s390_pv_cpu_is_protected(vcpu) && (addr & ~PAGE_MASK))
+>  		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+>=20
+> -	sctns =3D (void *)get_zeroed_page(GFP_KERNEL);
+> +	sctns =3D (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>  	if (!sctns)
+>  		return -ENOMEM;
+>=20
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 2f177298c663..e3183bd05910 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -1792,7 +1792,7 @@ struct kvm_s390_interrupt_info *kvm_s390_get_io_i=
+nt(struct kvm *kvm,
 >  		goto out;
->  	INIT_LIST_HEAD(&gmap->crst_list);
->  	INIT_LIST_HEAD(&gmap->children);
->  	INIT_LIST_HEAD(&gmap->pt_list);
-> -	INIT_RADIX_TREE(&gmap->guest_to_host, GFP_KERNEL);
-> -	INIT_RADIX_TREE(&gmap->host_to_guest, GFP_ATOMIC);
-> -	INIT_RADIX_TREE(&gmap->host_to_rmap, GFP_ATOMIC);
-> +	INIT_RADIX_TREE(&gmap->guest_to_host, GFP_KERNEL_ACCOUNT);
-> +	INIT_RADIX_TREE(&gmap->host_to_guest, GFP_ATOMIC | __GFP_ACCOUNT);
-> +	INIT_RADIX_TREE(&gmap->host_to_rmap, GFP_ATOMIC | __GFP_ACCOUNT);
->  	spin_lock_init(&gmap->guest_table_lock);
->  	spin_lock_init(&gmap->shadow_lock);
->  	refcount_set(&gmap->ref_count, 1);
-> -	page =3D alloc_pages(GFP_KERNEL, CRST_ALLOC_ORDER);
-> +	page =3D alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
->  	if (!page)
->  		goto out_free;
->  	page->index =3D 0;
-> @@ -309,7 +309,7 @@ static int gmap_alloc_table(struct gmap *gmap, unsi=
-gned long *table,
->  	unsigned long *new;
+>  	}
+>  gisa_out:
+> -	tmp_inti =3D kzalloc(sizeof(*inti), GFP_KERNEL);
+> +	tmp_inti =3D kzalloc(sizeof(*inti), GFP_KERNEL_ACCOUNT);
+>  	if (tmp_inti) {
+>  		tmp_inti->type =3D KVM_S390_INT_IO(1, 0, 0, 0);
+>  		tmp_inti->io.io_int_word =3D isc_to_int_word(isc);
+> @@ -2015,7 +2015,7 @@ int kvm_s390_inject_vm(struct kvm *kvm,
+>  	struct kvm_s390_interrupt_info *inti;
+>  	int rc;
 >=20
->  	/* since we dont free the gmap table until gmap_free we can unlock */=
-
-> -	page =3D alloc_pages(GFP_KERNEL, CRST_ALLOC_ORDER);
-> +	page =3D alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
->  	if (!page)
+> -	inti =3D kzalloc(sizeof(*inti), GFP_KERNEL);
+> +	inti =3D kzalloc(sizeof(*inti), GFP_KERNEL_ACCOUNT);
+>  	if (!inti)
 >  		return -ENOMEM;
->  	new =3D (unsigned long *) page_to_phys(page);
-> @@ -594,7 +594,7 @@ int __gmap_link(struct gmap *gmap, unsigned long ga=
-ddr, unsigned long vmaddr)
->  	if (pmd_large(*pmd) && !gmap->mm->context.allow_gmap_hpage_1m)
->  		return -EFAULT;
->  	/* Link gmap segment table entry location to page table. */
-> -	rc =3D radix_tree_preload(GFP_KERNEL);
-> +	rc =3D radix_tree_preload(GFP_KERNEL_ACCOUNT);
->  	if (rc)
->  		return rc;
->  	ptl =3D pmd_lock(mm, pmd);
-> @@ -1218,11 +1218,11 @@ static int gmap_protect_rmap(struct gmap *sg, u=
-nsigned long raddr,
->  		vmaddr =3D __gmap_translate(parent, paddr);
->  		if (IS_ERR_VALUE(vmaddr))
->  			return vmaddr;
-> -		rmap =3D kzalloc(sizeof(*rmap), GFP_KERNEL);
-> +		rmap =3D kzalloc(sizeof(*rmap), GFP_KERNEL_ACCOUNT);
->  		if (!rmap)
+>=20
+> @@ -2414,7 +2414,7 @@ static int enqueue_floating_irq(struct kvm_device=
+ *dev,
+>  		return -EINVAL;
+>=20
+>  	while (len >=3D sizeof(struct kvm_s390_irq)) {
+> -		inti =3D kzalloc(sizeof(*inti), GFP_KERNEL);
+> +		inti =3D kzalloc(sizeof(*inti), GFP_KERNEL_ACCOUNT);
+>  		if (!inti)
 >  			return -ENOMEM;
->  		rmap->raddr =3D raddr;
-> -		rc =3D radix_tree_preload(GFP_KERNEL);
-> +		rc =3D radix_tree_preload(GFP_KERNEL_ACCOUNT);
->  		if (rc) {
->  			kfree(rmap);
->  			return rc;
-> @@ -1741,7 +1741,7 @@ int gmap_shadow_r2t(struct gmap *sg, unsigned lon=
-g saddr, unsigned long r2t,
 >=20
->  	BUG_ON(!gmap_is_shadow(sg));
->  	/* Allocate a shadow region second table */
-> -	page =3D alloc_pages(GFP_KERNEL, CRST_ALLOC_ORDER);
-> +	page =3D alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
->  	if (!page)
->  		return -ENOMEM;
->  	page->index =3D r2t & _REGION_ENTRY_ORIGIN;
-> @@ -1825,7 +1825,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned lon=
-g saddr, unsigned long r3t,
+> @@ -2462,7 +2462,7 @@ static int register_io_adapter(struct kvm_device =
+*dev,
+>  	if (dev->kvm->arch.adapters[adapter_info.id] !=3D NULL)
+>  		return -EINVAL;
 >=20
->  	BUG_ON(!gmap_is_shadow(sg));
->  	/* Allocate a shadow region second table */
-> -	page =3D alloc_pages(GFP_KERNEL, CRST_ALLOC_ORDER);
-> +	page =3D alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
->  	if (!page)
+> -	adapter =3D kzalloc(sizeof(*adapter), GFP_KERNEL);
+> +	adapter =3D kzalloc(sizeof(*adapter), GFP_KERNEL_ACCOUNT);
+>  	if (!adapter)
 >  		return -ENOMEM;
->  	page->index =3D r3t & _REGION_ENTRY_ORIGIN;
-> @@ -1909,7 +1909,7 @@ int gmap_shadow_sgt(struct gmap *sg, unsigned lon=
-g saddr, unsigned long sgt,
 >=20
->  	BUG_ON(!gmap_is_shadow(sg) || (sgt & _REGION3_ENTRY_LARGE));
->  	/* Allocate a shadow segment table */
-> -	page =3D alloc_pages(GFP_KERNEL, CRST_ALLOC_ORDER);
-> +	page =3D alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
->  	if (!page)
->  		return -ENOMEM;
->  	page->index =3D sgt & _REGION_ENTRY_ORIGIN;
-> @@ -2116,7 +2116,7 @@ int gmap_shadow_page(struct gmap *sg, unsigned lo=
-ng saddr, pte_t pte)
->  	parent =3D sg->parent;
->  	prot =3D (pte_val(pte) & _PAGE_PROTECT) ? PROT_READ : PROT_WRITE;
+> @@ -3290,7 +3290,7 @@ int kvm_s390_gib_init(u8 nisc)
+>  		goto out;
+>  	}
 >=20
-> -	rmap =3D kzalloc(sizeof(*rmap), GFP_KERNEL);
-> +	rmap =3D kzalloc(sizeof(*rmap), GFP_KERNEL_ACCOUNT);
->  	if (!rmap)
+> -	gib =3D (struct kvm_s390_gib *)get_zeroed_page(GFP_KERNEL | GFP_DMA);=
+
+> +	gib =3D (struct kvm_s390_gib *)get_zeroed_page(GFP_KERNEL_ACCOUNT | G=
+FP_DMA);
+>  	if (!gib) {
+>  		rc =3D -ENOMEM;
+>  		goto out;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 425d3d75320b..282a13ece554 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1254,7 +1254,7 @@ static int kvm_s390_set_processor(struct kvm *kvm=
+, struct kvm_device_attr *attr)
+>  		ret =3D -EBUSY;
+>  		goto out;
+>  	}
+> -	proc =3D kzalloc(sizeof(*proc), GFP_KERNEL);
+> +	proc =3D kzalloc(sizeof(*proc), GFP_KERNEL_ACCOUNT);
+>  	if (!proc) {
+>  		ret =3D -ENOMEM;
+>  		goto out;
+> @@ -1416,7 +1416,7 @@ static int kvm_s390_get_processor(struct kvm *kvm=
+, struct kvm_device_attr *attr)
+>  	struct kvm_s390_vm_cpu_processor *proc;
+>  	int ret =3D 0;
+>=20
+> -	proc =3D kzalloc(sizeof(*proc), GFP_KERNEL);
+> +	proc =3D kzalloc(sizeof(*proc), GFP_KERNEL_ACCOUNT);
+>  	if (!proc) {
+>  		ret =3D -ENOMEM;
+>  		goto out;
+> @@ -1444,7 +1444,7 @@ static int kvm_s390_get_machine(struct kvm *kvm, =
+struct kvm_device_attr *attr)
+>  	struct kvm_s390_vm_cpu_machine *mach;
+>  	int ret =3D 0;
+>=20
+> -	mach =3D kzalloc(sizeof(*mach), GFP_KERNEL);
+> +	mach =3D kzalloc(sizeof(*mach), GFP_KERNEL_ACCOUNT);
+>  	if (!mach) {
+>  		ret =3D -ENOMEM;
+>  		goto out;
+> @@ -1812,7 +1812,7 @@ static long kvm_s390_get_skeys(struct kvm *kvm, s=
+truct kvm_s390_skeys *args)
+>  	if (args->count < 1 || args->count > KVM_S390_SKEYS_MAX)
+>  		return -EINVAL;
+>=20
+> -	keys =3D kvmalloc_array(args->count, sizeof(uint8_t), GFP_KERNEL);
+> +	keys =3D kvmalloc_array(args->count, sizeof(uint8_t), GFP_KERNEL_ACCO=
+UNT);
+>  	if (!keys)
 >  		return -ENOMEM;
->  	rmap->raddr =3D (saddr & PAGE_MASK) | _SHADOW_RMAP_PGTABLE;
-> @@ -2128,7 +2128,7 @@ int gmap_shadow_page(struct gmap *sg, unsigned lo=
-ng saddr, pte_t pte)
->  			rc =3D vmaddr;
->  			break;
->  		}
-> -		rc =3D radix_tree_preload(GFP_KERNEL);
-> +		rc =3D radix_tree_preload(GFP_KERNEL_ACCOUNT);
->  		if (rc)
->  			break;
->  		rc =3D -EAGAIN;
+>=20
+> @@ -1857,7 +1857,7 @@ static long kvm_s390_set_skeys(struct kvm *kvm, s=
+truct kvm_s390_skeys *args)
+>  	if (args->count < 1 || args->count > KVM_S390_SKEYS_MAX)
+>  		return -EINVAL;
+>=20
+> -	keys =3D kvmalloc_array(args->count, sizeof(uint8_t), GFP_KERNEL);
+> +	keys =3D kvmalloc_array(args->count, sizeof(uint8_t), GFP_KERNEL_ACCO=
+UNT);
+>  	if (!keys)
+>  		return -ENOMEM;
+>=20
+> @@ -2625,7 +2625,7 @@ static void sca_dispose(struct kvm *kvm)
+>=20
+>  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  {
+> -	gfp_t alloc_flags =3D GFP_KERNEL;
+> +	gfp_t alloc_flags =3D GFP_KERNEL_ACCOUNT;
+>  	int i, rc;
+>  	char debug_name[16];
+>  	static unsigned long sca_offset;
+> @@ -2670,7 +2670,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lo=
+ng type)
+>=20
+>  	BUILD_BUG_ON(sizeof(struct sie_page2) !=3D 4096);
+>  	kvm->arch.sie_page2 =3D
+> -	     (struct sie_page2 *) get_zeroed_page(GFP_KERNEL | GFP_DMA);
+> +	     (struct sie_page2 *) get_zeroed_page(GFP_KERNEL_ACCOUNT | GFP_DM=
+A);
+>  	if (!kvm->arch.sie_page2)
+>  		goto out_err;
+>=20
+> @@ -2900,7 +2900,7 @@ static int sca_switch_to_extended(struct kvm *kvm=
+)
+>  	if (kvm->arch.use_esca)
+>  		return 0;
+>=20
+> -	new_sca =3D alloc_pages_exact(sizeof(*new_sca), GFP_KERNEL|__GFP_ZERO=
+);
+> +	new_sca =3D alloc_pages_exact(sizeof(*new_sca), GFP_KERNEL_ACCOUNT | =
+__GFP_ZERO);
+>  	if (!new_sca)
+>  		return -ENOMEM;
+>=20
+> @@ -3133,7 +3133,7 @@ void kvm_s390_vcpu_unsetup_cmma(struct kvm_vcpu *=
+vcpu)
+>=20
+>  int kvm_s390_vcpu_setup_cmma(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu->arch.sie_block->cbrlo =3D get_zeroed_page(GFP_KERNEL);
+> +	vcpu->arch.sie_block->cbrlo =3D get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>  	if (!vcpu->arch.sie_block->cbrlo)
+>  		return -ENOMEM;
+>  	return 0;
+> @@ -3243,7 +3243,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	int rc;
+>=20
+>  	BUILD_BUG_ON(sizeof(struct sie_page) !=3D 4096);
+> -	sie_page =3D (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+> +	sie_page =3D (struct sie_page *) get_zeroed_page(GFP_KERNEL_ACCOUNT);=
+
+>  	if (!sie_page)
+>  		return -ENOMEM;
+>=20
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index cd74989ce0b0..9928f785c677 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -879,7 +879,7 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>  	switch (fc) {
+>  	case 1: /* same handling for 1 and 2 */
+>  	case 2:
+> -		mem =3D get_zeroed_page(GFP_KERNEL);
+> +		mem =3D get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>  		if (!mem)
+>  			goto out_no_data;
+>  		if (stsi((void *) mem, fc, sel1, sel2))
+> @@ -888,7 +888,7 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>  	case 3:
+>  		if (sel1 !=3D 2 || sel2 !=3D 2)
+>  			goto out_no_data;
+> -		mem =3D get_zeroed_page(GFP_KERNEL);
+> +		mem =3D get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>  		if (!mem)
+>  			goto out_no_data;
+>  		handle_stsi_3_2_2(vcpu, (void *) mem);
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index f5847f9dec7c..813b6e93dc83 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -60,7 +60,7 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16=
+ *rc, u16 *rrc)
+>  	if (kvm_s390_pv_cpu_get_handle(vcpu))
+>  		return -EINVAL;
+>=20
+> -	vcpu->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL,
+> +	vcpu->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL_ACCOUNT,
+>  						   get_order(uv_info.guest_cpu_stor_len));
+>  	if (!vcpu->arch.pv.stor_base)
+>  		return -ENOMEM;
+> @@ -72,7 +72,7 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16=
+ *rc, u16 *rrc)
+>  	uvcb.stor_origin =3D (u64)vcpu->arch.pv.stor_base;
+>=20
+>  	/* Alloc Secure Instruction Data Area Designation */
+> -	vcpu->arch.sie_block->sidad =3D __get_free_page(GFP_KERNEL | __GFP_ZE=
+RO);
+> +	vcpu->arch.sie_block->sidad =3D __get_free_page(GFP_KERNEL_ACCOUNT | =
+__GFP_ZERO);
+>  	if (!vcpu->arch.sie_block->sidad) {
+>  		free_pages(vcpu->arch.pv.stor_base,
+>  			   get_order(uv_info.guest_cpu_stor_len));
+> @@ -120,7 +120,7 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+>  	struct kvm_memory_slot *memslot;
+>=20
+>  	kvm->arch.pv.stor_var =3D NULL;
+> -	kvm->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL, get_order(bas=
+e));
+> +	kvm->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL_ACCOUNT, get_o=
+rder(base));
+>  	if (!kvm->arch.pv.stor_base)
+>  		return -ENOMEM;
+>=20
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index 4f3cbf6003a9..c5d0a58b2c29 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -1234,7 +1234,7 @@ static struct vsie_page *get_vsie_page(struct kvm=
+ *kvm, unsigned long addr)
+>=20
+>  	mutex_lock(&kvm->arch.vsie.mutex);
+>  	if (kvm->arch.vsie.page_count < nr_vcpus) {
+> -		page =3D alloc_page(GFP_KERNEL | __GFP_ZERO | GFP_DMA);
+> +		page =3D alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | GFP_DMA);
+>  		if (!page) {
+>  			mutex_unlock(&kvm->arch.vsie.mutex);
+>  			return ERR_PTR(-ENOMEM);
+> @@ -1336,7 +1336,7 @@ int kvm_s390_handle_vsie(struct kvm_vcpu *vcpu)
+>  void kvm_s390_vsie_init(struct kvm *kvm)
+>  {
+>  	mutex_init(&kvm->arch.vsie.mutex);
+> -	INIT_RADIX_TREE(&kvm->arch.vsie.addr_to_page, GFP_KERNEL);
+> +	INIT_RADIX_TREE(&kvm->arch.vsie.addr_to_page, GFP_KERNEL_ACCOUNT);
+>  }
+>=20
+>  /* Destroy the vsie data structures. To be called when a vm is destroy=
+ed. */
 >=20
 
 
---------------32D3451EA9CF3737893459CE
+--------------ACE1317D86CDEF8EB3357397
 Content-Type: application/pgp-keys;
  name="OpenPGP_0xE354E6B8E238B9F8.asc"
 Content-Transfer-Encoding: quoted-printable
@@ -511,30 +691,30 @@ DHb
 =3DR9cN
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------32D3451EA9CF3737893459CE--
+--------------ACE1317D86CDEF8EB3357397--
 
---r28RLISvB67qD59H8b7zxUWS9egGfrkWi--
+--oszkB5zXk7RHUoHPiBvOhd3bHhY6K1XWn--
 
---yn1L4LO3leP2IUxhIomLOzXc4goaloWlm
+--6sMdO5WuoC7xWF7gUZKvadvAR6Op9P4pi
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsF5BAABCAAjFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl+z6rcFAwAAAAAACgkQ41TmuOI4ufjR
-zxAAoQt8tXngi+kHZsETdMvdd+CWpxQQ8yWZjTu5IxeK7knb84532bzvxs3qTEfKaNoNzoiDtB+U
-WJT/zuRG+aZtLZu29PgqtzJA1Iuck++2fOgXJQjht2PU4Dm0/IlVmgvAQQweDPS6AeJrrieO6QqR
-geJIIoNnyy+mqQ+kLDYGv34lSmTkD89pzi2+ufgem1J6BT3AZk5DX4/3V4+KdjLYUIV/ICt9SVmK
-PID+Gbw2FX7fO1SIsrkweeXAtm2UhjLNuagVt3Sp8Wx5Xw+Pwz+0Koar2ZODBm9rbDJuy2ljqLUL
-Hg+lSymK+UsHOuUSLbuOrgLZgbXCfDu4a5f3rvc+KP+epzhj16o/APyscbt05qRaRjRjYIBAT+Sq
-SSRq+ImpVUW35jBRTUQSsotTDyS9Zcm/VQU67owqyRG7y2TVqXUe9tnar64yo3qIUN+j8zFH+1BX
-QOGv4WUrvt3tRL7rP3yDGSGqcYoo/spB+wZbeeFbi+ZyYG7JPG8mogRbCxS0/7gLmsXLazMrrz3l
-h+vs/xI9FF4MgjuuPFVurY093mAMpVJw0YkTwhbbWZnUkVXmQP33mjKAkUGinQB8UO7P2AnVvkyI
-d7xRYgzbz/+8YXlL1o2o3JjYDZmvl8BzKlvnrQsGHAOnRGfHMtJxO+uUBrQemTs3Jn2dg1Of1mpr
-j1I=
-=9DPo
+wsF5BAABCAAjFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl+z6ssFAwAAAAAACgkQ41TmuOI4ufg1
+ehAAjS2bmCrbnqFEhSep9MXEaRoeF2bmaZVn3LbxFw8qv4MQsx7w19wPob0ClbQnagS9gl4V9LEX
+XUTosg+35RIKCyLvlOrHVPzy5y2Fd+mO8ne5kvCnF744/x4QVFoQkLPwsbkqMMy3AQiGosVgi9vO
+gmUAmhjn2usJYFzUfkyxPzhsPTaMKFDgpmrF4h3Sv5Yrtu+AGWSo9Bj8GNo/h7R8XQgi4GXKmtAq
+eCuNwzJjCYilgDlmHoNoXhOq23Ex6Xf/6n/Wgt7KOAY4HHLHqC/ys0uDUd6iV3hcH9U593WqcOSJ
+nu1+PZFZ0Q8ScJGptED9MZB9q7oWdb7RVNaQlF82hsftGuhCa1C696qOOSbfS4tWRcD0g7SdQl8z
+3xZU+itmiWbiH59fqZQrb3oWSK906QvRPnAqEDaexskPgutXKpyWWVm1NJua/VQGG+Y2ZReQxJnJ
+8L/sx4b8HHAd0I4K2ngg2eQeB+f5eRNKyCyTkKzAL0Iwk8M59eb7ZHlp+wD8r5z/MGY2UFPCDmyh
+B/G6dcK7HQziVt0HWcMWGARswr1htYsdKh8x1VuQcO5mhuu8KDOgaUmmMy9quU2sVhxFliInoo3k
+qGfdoxlWyqQQNebmKs7IpsbHMJsWoH4cEnOutBn1B8C75L+jAPhwQ9NuHUh6lh4b5o3zVoJcTZjt
+o8Q=
+=IJjy
 -----END PGP SIGNATURE-----
 
---yn1L4LO3leP2IUxhIomLOzXc4goaloWlm--
+--6sMdO5WuoC7xWF7gUZKvadvAR6Op9P4pi--
 
