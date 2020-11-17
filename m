@@ -2,94 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13BE42B67A1
-	for <lists+kvm@lfdr.de>; Tue, 17 Nov 2020 15:36:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7493D2B67A9
+	for <lists+kvm@lfdr.de>; Tue, 17 Nov 2020 15:40:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728718AbgKQOf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Nov 2020 09:35:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42742 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727473AbgKQOf6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Nov 2020 09:35:58 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02A55C0613CF;
-        Tue, 17 Nov 2020 06:35:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=sollcZRLnQJ8RrafQij/FmHLw4zZVs0otZjXpirh3Ew=; b=XvjFyytAeKKVlJlLTby1rvMj7n
-        25wQJIA3xixyu+91CeN1Z5/ShGkAJtd+CJzTFPJiolWrKNipizl3VMKhr7oHyo1FTmQ5fYTgvKVAM
-        KQOEdSuEBBSAbVT+NjTrHu3TnPGXaudIlwsQ0grrNmoUOaLtXyvwkBELbyK63d33XwpRxTA4cr2h9
-        AdSm5yP9EKmNb3J4WJcnmBhqfZHVgs/44LkqwZzUCQgw1KSdpDXAncle6Zlt4qkpuQP0aG8JFk+by
-        nNuhv/0s15zlKPnxD/q1dYliRnGDDqdYch0pGzRCxnxHD61EAWnVzNL5Q31aqQFqtYbfYoEja8hUY
-        LD+RaDGA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kf24x-00023e-1Z; Tue, 17 Nov 2020 14:35:31 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D3558307A49;
-        Tue, 17 Nov 2020 15:35:29 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id BDEE220113347; Tue, 17 Nov 2020 15:35:29 +0100 (CET)
-Date:   Tue, 17 Nov 2020 15:35:29 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S1728517AbgKQOkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Nov 2020 09:40:10 -0500
+Received: from mga06.intel.com ([134.134.136.31]:50205 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728198AbgKQOkK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Nov 2020 09:40:10 -0500
+IronPort-SDR: VDgxn0vlquGxhQZaHMxe1d0hmgd/MGjbzS45ntjQ4oIZv7NjX5bL5zdHWAMpirnmjp7XgZakIE
+ PBjG2N+7DFTw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232549946"
+X-IronPort-AV: E=Sophos;i="5.77,485,1596524400"; 
+   d="scan'208";a="232549946"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2020 06:40:01 -0800
+IronPort-SDR: DFsIXHLgQqIVojG6gawwZvtSoSb8ApdFQe8B9nj2WzAOlvdK4OTMF/92Jcikey/4ur9YlPerar
+ TBhKilJZCdmQ==
+X-IronPort-AV: E=Sophos;i="5.77,485,1596524400"; 
+   d="scan'208";a="367884411"
+Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.210.201]) ([10.254.210.201])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2020 06:39:57 -0800
+Cc:     baolu.lu@linux.intel.com, Cornelia Huck <cohuck@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>, wei.w.wang@intel.com,
-        Tony Luck <tony.luck@intel.com>,
-        Stephane Eranian <eranian@google.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 04/17] perf: x86/ds: Handle guest PEBS overflow PMI
- and inject it to guest
-Message-ID: <20201117143529.GJ3121406@hirez.programming.kicks-ass.net>
-References: <20201109021254.79755-1-like.xu@linux.intel.com>
- <20201109021254.79755-5-like.xu@linux.intel.com>
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+To:     Alex Williamson <alex.williamson@redhat.com>
+References: <20201112022407.2063896-1-baolu.lu@linux.intel.com>
+ <20201116125631.2d043fcd@w520.home>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Re: [PATCH 1/1] vfio/type1: Add subdev_ioasid callback to
+ vfio_iommu_driver_ops
+Message-ID: <c4526653-2e0d-2f9a-66ad-b3dba284a4d3@linux.intel.com>
+Date:   Tue, 17 Nov 2020 22:39:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201109021254.79755-5-like.xu@linux.intel.com>
+In-Reply-To: <20201116125631.2d043fcd@w520.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 09, 2020 at 10:12:41AM +0800, Like Xu wrote:
-> With PEBS virtualization, the PEBS records get delivered to the guest,
-> and host still sees the PEBS overflow PMI from guest PEBS counters.
-> This would normally result in a spurious host PMI and we needs to inject
-> that PEBS overflow PMI into the guest, so that the guest PMI handler
-> can handle the PEBS records.
-> 
-> Check for this case in the host perf PEBS handler. If a PEBS overflow
-> PMI occurs and it's not generated from host side (via check host DS),
-> a fake event will be triggered. The fake event causes the KVM PMI callback
-> to be called, thereby injecting the PEBS overflow PMI into the guest.
-> 
-> No matter how many guest PEBS counters are overflowed, only triggering
-> one fake event is enough. The guest PEBS handler would retrieve the
-> correct information from its own PEBS records buffer.
-> 
-> If the counter_freezing is disabled on the host, a guest PEBS overflow
-> PMI would be missed when a PEBS counter is enabled on the host side
-> and coincidentally a host PEBS overflow PMI based on host DS_AREA is
-> also triggered right after vm-exit due to the guest PEBS overflow PMI
-> based on guest DS_AREA. In that case, KVM will disable guest PEBS before
-> vm-entry once there's a host PEBS counter enabled on the same CPU.
+Hi Alex,
 
-How does this guest DS crud work? DS_AREA is a host virtual address;
-ISTR there was lots of fail trying to virtualize it earlier. What's
-changed? There's 0 clues here.
+On 2020/11/17 3:56, Alex Williamson wrote:
+> On Thu, 12 Nov 2020 10:24:07 +0800
+> Lu Baolu<baolu.lu@linux.intel.com>  wrote:
+> 
+>> Add API for getting the ioasid of a subdevice (vfio/mdev). This calls
+>> into the backend IOMMU module to get the actual value or error number
+>> if ioasid for subdevice is not supported. The physical device driver
+>> implementations which rely on the vfio/mdev framework for mediated
+>> device user level access could typically consume this interface like
+>> below:
+>>
+>> 	struct device *dev = mdev_dev(mdev);
+>> 	unsigned int pasid;
+>> 	int ret;
+>>
+>> 	ret = vfio_subdev_ioasid(dev, &pasid);
+>> 	if (ret < 0)
+>> 		return ret;
+>>
+>>           /* Program device context with pasid value. */
+>>           ....
+> 
+> Seems like an overly specific callback.  We already export means for
+> you to get a vfio_group, test that a device is an mdev, and get the
+> iommu device from an mdev.  So you can already test whether a given
+> device is an mdev with an iommu backing device that supports aux
+> domains.  The only missing piece seems to be that you can't get the
+> domain for a group in order to retrieve the pasid.  So why aren't we
+> exporting a callback that given a vfio_group provides the iommu domain?
 
-Why are the host and guest DS area separate, why can't we map them to
-the exact same physical pages?
+Make sense! Thanks for your guidance. :-)
+
+So what we want to export in vfio.c is
+
+struct iommu_domain *vfio_group_get_domain(struct vfio_group *group)
+
+What the callers need to do are:
+
+	unsigned int pasid;
+	struct vfio_group *vfio_group;
+	struct iommu_domain *iommu_domain;
+	struct device *dev = mdev_dev(mdev);
+	struct device *iommu_device = mdev_get_iommu_device(dev);
+
+	if (!iommu_device ||
+	    !iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
+		return -EINVAL;
+
+	vfio_group = vfio_group_get_external_user_from_dev(dev);
+	if (IS_ERR_OR_NULL(vfio_group))
+		return -EFAULT;
+
+	iommu_domain = vfio_group_get_domain(vfio_group);
+	if (IS_ERR_OR_NULL(iommu_domain)) {
+		vfio_group_put_external_user(vfio_group);
+		return -EFAULT;
+	}
+
+	pasid = iommu_aux_get_pasid(iommu_domain, iommu_device);
+	if (pasid < 0) {
+		vfio_group_put_external_user(vfio_group);
+		return -EFAULT;
+	}
+
+	/* Program device context with pasid value. */
+	...
+
+	/* After use of this pasid */
+
+	/* Clear the pasid value in device context */
+	...
+
+	vfio_group_put_external_user(vfio_group);
+
+Do I understand your points correctly?
+
+Best regards,
+baolu
+
+
 
