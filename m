@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 062622B6B32
+	by mail.lfdr.de (Postfix) with ESMTP id 730932B6B33
 	for <lists+kvm@lfdr.de>; Tue, 17 Nov 2020 18:10:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728859AbgKQRJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Nov 2020 12:09:12 -0500
-Received: from mail-dm6nam11on2081.outbound.protection.outlook.com ([40.107.223.81]:9824
+        id S1728902AbgKQRJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Nov 2020 12:09:20 -0500
+Received: from mail-dm6nam11on2085.outbound.protection.outlook.com ([40.107.223.85]:21217
         "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727816AbgKQRJL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Nov 2020 12:09:11 -0500
+        id S1728873AbgKQRJU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Nov 2020 12:09:20 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JmhQD7vbP/VB7QRMw+UYnyHWmKNzhbTEMyRAftFTBv7B/AKlXjXHPrhMUrkrWs6N8Rh1kNTdQR9+hXXEo3eNjynYqkaCq7IJ9H/dySPRi1Q2TQ3ROuz9yB0JN71pPoAU7dFUbltwHwcPGUY7x1OCjblBwD19S5cJkrIUdZ6c2mQdl9NAw8jStZ5oYfo6vKHXJev2Z/K8g0pLG074T0vqth0VPy3c5t8EDYwtJlcQrBnrOFfFsB8RJr4a7wmfAfSAZZYgDG/nmYyQ2bo9yleHGbvFiQCjfltIHbAMcpEQvaet4iZ3vd/JZ8aDyPE0Yr18+421QNBZAIu/qNBOfYeqBA==
+ b=hzwWFOpvfi1r3p/YLEV18T4HqP4PlikQyqNZIfI9WUSB+NVF0ho/x5q5/t0V+79XOqjAbA6n6Lj9gAPVfJQuIkY+JM/QOkVvN805CGTiT8Q1QAZGadrwWZMXuZOfhffRsxAXzVTRFHNZd7ysawoTis5YaZRJd2RgqzZSiNz2skcXsnqI8G6K01wFU4eO/hK/3ZcTcSW7OVBrYyM1oeXKD+YJaSRyfezf/s2gX1XsGYHY30nXPVv9tsyrYDF8QHPeMKgnTpERDXKctdrhyt6tn492AIVUHy0Cr8PF3Ye2xVk7bryNHSKmtN42/0RonuzZ909GpgaiGNUIWdoTdf0i4g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xCPd1cemga2nT9Mliq6eEgmXXXeJRbwSStRGkT1lprA=;
- b=Xo7tKU+COO/yVKdnkGoXNHOi9PeqBe9i0CHL7Q9agUj8i8EkdmIxVCHIYyOkeFZVYTNEoD5fSxDprJfChspsvz1nxZQSwyJ6I8nwwuq+xdqVheueUy8VQwT9uRSmmPPIX92Ax6farsqi6ijKoV/V5c1Ksv0+MdKY6vBIxbvzcWQVvLiMkPmfWxHWVem5XV8N7768s3UOI3qRMAL6eBI50k4ju0qiaP6y2pGGKSsarXqpdyaKXc9KNT6SuFOVsP780gyiTM5ojTiXyFxZr88Otw1yeZAV2aGnZazEVeFpMuhADQ35s5+3lJ+yqIWCFhCkHJNDEDHqPxmTdfosaIPBYA==
+ bh=SZabV9guGbxCltEM7dvO9aa9sU1wbTinyLVyTMd9S8M=;
+ b=WWXK6AVIdZCzshBW1KVl25tE/zxLPgVhM9Q2pEOCUUtU/60kgArdkHu5LDTD7rOGPxT6wnbeOgwpAg6/KFsp0EpGmOiw58uL0vLyh9lMI/TXfXvrx+FVKmqQTn+2f4hSeCyjYedq51kWCanabNrS6nJGTNzQ3I7WuNV5/qCmljQgYiB4yPdzVR/kjd2Uty+9tV5Rfb7zb0uFxc528yPnZxODRtogbJkHr/9Bf0ARR43PKuXiVaq6frj41T00nlfFqN9JRa1I+jLTGHAGXiJAzPZuuP6gDcFpr2sSpYvjiiIhCiya+oq1XQzrXSilon3xtMseIjRV2VyzlebmkzLcLw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xCPd1cemga2nT9Mliq6eEgmXXXeJRbwSStRGkT1lprA=;
- b=j0JHmuoPC9nk12KbbXwewTbfJIQA/kDKXG1mUsGHjQmUb4Z3JinisMC1UkihZAvBppjRBxnFa1PYghDeTDo8deJV+TvjVxv6chF/E6fVPzrKvh4/rCXYNTsB3TV8FBMGGlyr3Dr+sumnvSdgn/8eapGLJ6d5MwuITIMzXG42XnE=
+ bh=SZabV9guGbxCltEM7dvO9aa9sU1wbTinyLVyTMd9S8M=;
+ b=QWi3o7r0Mib2enpkXfO2gJOiwcE+D1NwQaWre2NO2HECd22ZtJSln2IPKyRMCYQWqD1xEfhLmu0p0Lr/Bv0+45C1LqyGoVVT0FMT1pZgpxUaS5pQXRTf28iqO1xu22R5f9q9KRufkKUYk7cUxvg03M+B+3TQ6rr9m7a7gIun+jU=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
  DM5PR12MB1772.namprd12.prod.outlook.com (2603:10b6:3:107::10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3541.25; Tue, 17 Nov 2020 17:09:07 +0000
+ 15.20.3541.25; Tue, 17 Nov 2020 17:09:15 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::dcda:c3e8:2386:e7fe]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::dcda:c3e8:2386:e7fe%12]) with mapi id 15.20.3564.028; Tue, 17 Nov
- 2020 17:09:07 +0000
+ 2020 17:09:15 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,43 +48,43 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v4 10/34] KVM: SVM: Cannot re-initialize the VMCB after shutdown with SEV-ES
-Date:   Tue, 17 Nov 2020 11:07:13 -0600
-Message-Id: <71596ee517ed3a4eaf16721e7b5fa78fa93be01a.1605632857.git.thomas.lendacky@amd.com>
+Subject: [PATCH v4 11/34] KVM: SVM: Prepare for SEV-ES exit handling in the sev.c file
+Date:   Tue, 17 Nov 2020 11:07:14 -0600
+Message-Id: <7ba89a377d1fe006091e725dbe731fd530cd4b02.1605632857.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1605632857.git.thomas.lendacky@amd.com>
 References: <cover.1605632857.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: DM5PR13CA0015.namprd13.prod.outlook.com
- (2603:10b6:3:23::25) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM6PR21CA0024.namprd21.prod.outlook.com
+ (2603:10b6:5:174::34) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by DM5PR13CA0015.namprd13.prod.outlook.com (2603:10b6:3:23::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.15 via Frontend Transport; Tue, 17 Nov 2020 17:09:05 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by DM6PR21CA0024.namprd21.prod.outlook.com (2603:10b6:5:174::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.4 via Frontend Transport; Tue, 17 Nov 2020 17:09:14 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 00d4eafc-384b-44e4-6db0-08d88b1b7d9a
+X-MS-Office365-Filtering-Correlation-Id: 7ac5dd4c-1c80-4040-0777-08d88b1b82b9
 X-MS-TrafficTypeDiagnostic: DM5PR12MB1772:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1772670B2919EB3AA0DC2491ECE20@DM5PR12MB1772.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1772AE9C50F74B199DE12F26ECE20@DM5PR12MB1772.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +9EkJ81nvPmqA8cPFDOO3xsY/skRIuvOv6DYQxCgxU71kpL+1qTgceCC1Ip74eH46fquYl44o+xskuHh1BfRFlw9urTfE/i05CupLxNHel/hLDLmF3sLsMww0/qLpV5dXe3yb8JcVvACqZ+uTD6IxI4LOdBfNZk88qnGv+Lps5jMcfv2DwdWCKfJY/RRk7M1C8LIhLabwqHMaSh1rZSZr3j2061M2ziTdCtpoLHfMCtjrpNiAHeJU4pkLcguD2+AJ+X8Zts+hYyPf5xOW8GtqpaoKcxxBlD6JnxvUXAaO2or9vd9I7l+1wM2+Xhnwj9R
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(346002)(376002)(39860400002)(136003)(6486002)(66476007)(66946007)(4744005)(8936002)(5660300002)(26005)(478600001)(66556008)(16526019)(6666004)(186003)(36756003)(86362001)(8676002)(316002)(956004)(52116002)(4326008)(54906003)(7696005)(7416002)(2616005)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: BXLZi1WUNKXrS6fvbkJV+WYxEIRmbtAWLm+FplkNZYYym8uhX/Wil36ZgYg6fqxhIhd0UxXYgIoA9DSMEdhbVDgtfGo+8edPHpnnle6jtNCbyLMt3q91AIN3nv3sWADS3Ff6H1mOpoH97QU2+d3tG9pOq8dGxeHmQOf5C9vonk0QVtozgooHMFLcyYGlhyBeA3EiCFE1qiNRJC2M+S/t2cF4+4zNJbOtWm+RU8HeKFACXdrOyjgljO6YRnMLkqfqPBTuQV+1SaeRgDgRGwKKZWGOQrbq/lfnbJvuO8dvIEgDdyyX9jQwrNs1IAwjy6Q5RBjnvBfbciFea7KjNu71AxIPYUuq9PMVFN59QPoUUcfybZxRU2QEbqxPm24075dU5P1YzaXwQ+WMiN/rahLQZ5fQTwB8WIKe2OUJaoLHkAcnBJFQdZWfdbwn69i9gtRfxXJQ72QF0nHJEdpEroP+R1HP9IElu7QfFA6occfc/Shb15ePLUZohMu1yb3NPPBLQPs2/wI2QCL7UjVHwDc2GQdGHG1aGNaECWwi9EuLZyiO9TLGZqGW6hSqei8lt/aBFHSlcao3jBXCrkCsw0u/b8eq6XnG+90IlkSNTeXF+Hctoz3UdcgziFmmwgQT24ZzFd8pfms6hlcpu719ZvTgJw==
+X-Microsoft-Antispam-Message-Info: 38Y6Xn6rbVVETNYlDlid8P3DbE37IRoUFZs8AXDZKmmcHYfK7QNW2c/MudmpD244fpAOv30GMpY9dsPljEhOkVGrTEydkMn2V3pXflsSns48zIsfCmmm7iLvO/J4HSaMfAsvqJ56kY/Uwi2M1e3Ugug2NWbfQ/9H0uZc17EDFSJe6kpywtrEsDwYV/XdZfKvEUczLwQ7kdYBmV4CG6GHmOs2A4Od+U3mupFEc3Eti9jeaPzbxJn9kU6kIjTilhnNvxOKx66Cl1cAq77VxV/0RiYmuCPgRcCP7R4zXe9T7XWgjpcfmUr5YIBbJFhojAUVPV4ouifxPSSYj/pgj0cPFA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(346002)(376002)(39860400002)(136003)(6486002)(66476007)(66946007)(8936002)(83380400001)(5660300002)(26005)(478600001)(66556008)(16526019)(186003)(36756003)(86362001)(8676002)(316002)(956004)(52116002)(4326008)(54906003)(7696005)(7416002)(2616005)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: rS/jgvTJyN095MjJ2Wa1zU2+Ef7DvlONHFH+0HQ0m6cQ9o1R98sxGCvOp96rIS3i+dHP8KplCDPV9teG1gtTgcSalyLGMDb/rlOb9hMUiCj5jL0zRYRYcJ19sDw0KZ3FQIyLTlEXtgE4prsgVAL60ocZiAYvdRtVH6S42r+x+EgeZ1dfFAsFQAbKbYc/r5gdbXnQ9iRXCiHSUicOotjMKG9R8p9i2j2PnLCqtMCMqPQjnJdVO/Qni4zqhix3KKPiDqRbDJ5zXpDMQJ7Z5vvhxyVbCTe0l+DLH5jxTuRIoPl0n8BBfOCaOGhwDQir9bMIp8EKsCxgYF7qT8K7dBJ4SPox7UqlcrhPrHOC/WkCyP/390s3lA0uWQAUp0tsBbE4nmFQJ1SV0obciHZ9nceQ3OrjML80bPWOlMMQV0d7VK1hZZEzpzKNYgC73VxA7zyXB5kW5VAzJUfjzPCyynOAzxIquUo6BYkZ7CgzmH1vSyqaOoEFt4b42MJX6iKNwVpXMhfHDHM2FR6s1BtiiqGik0JK9VOz14m0T3E/ztsY5bq11cNJSqGFTdbm8D6IyRwgLJCZY1knrWHWl6L5Ldz//1L1+YkpBhcUDpUBBnlqpgdhilOTR0sks6t3gB7gmfGttAfYePtFq8phABhdCAxzFg==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00d4eafc-384b-44e4-6db0-08d88b1b7d9a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ac5dd4c-1c80-4040-0777-08d88b1b82b9
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2020 17:09:07.3080
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2020 17:09:14.8946
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xlOpey34vQ70zt6mhZY/Kfu7K+xl0PeLy2+Ie+pLvkFmFzUBPQisY5eB/jpnjryi+Sn6dVGrNFRLQ3SlV579tQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ktowA6krJGnGpCm//CLqQ+LU6zVabsXMmv8P9/3jlC6H0NXC14W9ShgkLsGNg1EoCfckmAfAO8aZSzQKJSgL2A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1772
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -92,35 +92,97 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-When a SHUTDOWN VMEXIT is encountered, normally the VMCB is re-initialized
-so that the guest can be re-launched. But when a guest is running as an
-SEV-ES guest, the VMSA cannot be re-initialized because it has been
-encrypted. For now, just return -EINVAL to prevent a possible attempt at
-a guest reset.
+This is a pre-patch to consolidate some exit handling code into callable
+functions. Follow-on patches for SEV-ES exit handling will then be able
+to use them from the sev.c file.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/kvm/svm/svm.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/x86/kvm/svm/svm.c | 64 +++++++++++++++++++++++++-----------------
+ 1 file changed, 38 insertions(+), 26 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0e5f83912b56..f353039e54b6 100644
+index f353039e54b6..602e20f38bdc 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -2026,6 +2026,13 @@ static int shutdown_interception(struct vcpu_svm *svm)
- {
- 	struct kvm_run *kvm_run = svm->vcpu.run;
+@@ -3147,6 +3147,43 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+ 	       "excp_to:", save->last_excp_to);
+ }
  
-+	/*
-+	 * The VM save area has already been encrypted so it
-+	 * cannot be reinitialized - just terminate.
-+	 */
-+	if (sev_es_guest(svm->vcpu.kvm))
-+		return -EINVAL;
++static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
++{
++	if (exit_code < ARRAY_SIZE(svm_exit_handlers) &&
++	    svm_exit_handlers[exit_code])
++		return 0;
 +
- 	/*
- 	 * VMCB is undefined after a SHUTDOWN intercept
- 	 * so reinitialize it.
++	vcpu_unimpl(vcpu, "svm: unexpected exit reason 0x%llx\n", exit_code);
++	dump_vmcb(vcpu);
++	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
++	vcpu->run->internal.ndata = 2;
++	vcpu->run->internal.data[0] = exit_code;
++	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++
++	return -EINVAL;
++}
++
++static int svm_invoke_exit_handler(struct vcpu_svm *svm, u64 exit_code)
++{
++	if (svm_handle_invalid_exit(&svm->vcpu, exit_code))
++		return 0;
++
++#ifdef CONFIG_RETPOLINE
++	if (exit_code == SVM_EXIT_MSR)
++		return msr_interception(svm);
++	else if (exit_code == SVM_EXIT_VINTR)
++		return interrupt_window_interception(svm);
++	else if (exit_code == SVM_EXIT_INTR)
++		return intr_interception(svm);
++	else if (exit_code == SVM_EXIT_HLT)
++		return halt_interception(svm);
++	else if (exit_code == SVM_EXIT_NPF)
++		return npf_interception(svm);
++#endif
++	return svm_exit_handlers[exit_code](svm);
++}
++
+ static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2,
+ 			      u32 *intr_info, u32 *error_code)
+ {
+@@ -3213,32 +3250,7 @@ static int handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	if (exit_fastpath != EXIT_FASTPATH_NONE)
+ 		return 1;
+ 
+-	if (exit_code >= ARRAY_SIZE(svm_exit_handlers)
+-	    || !svm_exit_handlers[exit_code]) {
+-		vcpu_unimpl(vcpu, "svm: unexpected exit reason 0x%x\n", exit_code);
+-		dump_vmcb(vcpu);
+-		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-		vcpu->run->internal.suberror =
+-			KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+-		vcpu->run->internal.ndata = 2;
+-		vcpu->run->internal.data[0] = exit_code;
+-		vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
+-		return 0;
+-	}
+-
+-#ifdef CONFIG_RETPOLINE
+-	if (exit_code == SVM_EXIT_MSR)
+-		return msr_interception(svm);
+-	else if (exit_code == SVM_EXIT_VINTR)
+-		return interrupt_window_interception(svm);
+-	else if (exit_code == SVM_EXIT_INTR)
+-		return intr_interception(svm);
+-	else if (exit_code == SVM_EXIT_HLT)
+-		return halt_interception(svm);
+-	else if (exit_code == SVM_EXIT_NPF)
+-		return npf_interception(svm);
+-#endif
+-	return svm_exit_handlers[exit_code](svm);
++	return svm_invoke_exit_handler(svm, exit_code);
+ }
+ 
+ static void reload_tss(struct kvm_vcpu *vcpu)
 -- 
 2.28.0
 
