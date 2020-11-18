@@ -2,115 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8D892B79D3
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4BE72B7A02
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:10:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727321AbgKRJAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 04:00:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35278 "EHLO
+        id S1726439AbgKRJGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Nov 2020 04:06:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56114 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725964AbgKRJAE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:00:04 -0500
+        by vger.kernel.org with ESMTP id S1726020AbgKRJGE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:06:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605690003;
+        s=mimecast20190719; t=1605690362;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vDHRiKISJxGrQNI5r+p1qOzE9Z04EU79HQXJnXOQAyM=;
-        b=epeFmXuG0tCYLP/m5ZSJlTUwZY/OUmPuk0HnZf3cC/iniYClXPfzqfzmRGrunc4VbqpBTi
-        je6a7BZohCqrnSOK07kOHcaAdcq1OW3dFbOf43NZH6e7wNLbpqQwgamG/6Iubuuu3Xvl2/
-        TNhd6CKN89NKkMCTXxgtWnlnb1TD0xo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-T0FjqNZXPbKAJwQy3XAMvg-1; Wed, 18 Nov 2020 04:00:02 -0500
-X-MC-Unique: T0FjqNZXPbKAJwQy3XAMvg-1
-Received: by mail-wr1-f71.google.com with SMTP id z13so642161wrm.19
-        for <kvm@vger.kernel.org>; Wed, 18 Nov 2020 01:00:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=vDHRiKISJxGrQNI5r+p1qOzE9Z04EU79HQXJnXOQAyM=;
-        b=uNrleiTtFOo3JhLN9+AMLIbNNuPix5DTEu9DxQCWZRV8tf6yoAWAEe9dsr8cNWcnyu
-         awhEvwZZDT7tHpnDfiNrqeg4UeqEn9y5Mpdv33nZO1bdHXgysf2NQfpSfxG0Z+brKzFv
-         Gb4E+HDDzatv2pklk5Jt31VAf4FRarxkS49Mg0mGeEnGk6jYXDgD2lsn6BAAlIFZmNkT
-         wNaLACXrXo3aSQGjzh+/q6+iqRqGGUKHPKfGPtIlwjP2CcCiGdkF+wZHe76FZ0c6blqZ
-         G0KLJW6idYVTUiLkGe1PvafCRF06DuQiSsMofTn/GKfIyHKdzT1V3m/Usy6JsXfBlOXB
-         p4vw==
-X-Gm-Message-State: AOAM532Q1TbKgKmf+Un1o3McM3n0msXBNnDVWtIg/mAZyeSseeiCPV1G
-        5Iqto8oU6hihgXqozPTLyu7g+KLviF5ya+F5pWCNX8RzGEEY2EiWXau+4CtNNyU8yOHGefVsMh0
-        gB5Hu9bv6qVmr
-X-Received: by 2002:adf:e484:: with SMTP id i4mr3807469wrm.398.1605690000210;
-        Wed, 18 Nov 2020 01:00:00 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwvrhlBebUzDcS1q8vIsRe9j3CAHx2KE5uTkubSY1aExSKkOG/BenM/FdfTnVGvEnynvcKDSg==
-X-Received: by 2002:adf:e484:: with SMTP id i4mr3807461wrm.398.1605690000074;
-        Wed, 18 Nov 2020 01:00:00 -0800 (PST)
-Received: from redhat.com (bzq-109-67-54-78.red.bezeqint.net. [109.67.54.78])
-        by smtp.gmail.com with ESMTPSA id i11sm33187631wro.85.2020.11.18.00.59.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2020 00:59:59 -0800 (PST)
-Date:   Wed, 18 Nov 2020 03:59:55 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, kuba@kernel.org
-Subject: Re: [PATCH net] vhost_vdpa: Return -EFUALT if copy_from_user() fails
-Message-ID: <20201118035912-mutt-send-email-mst@kernel.org>
-References: <20201023120853.GI282278@mwanda>
- <20201023113326-mutt-send-email-mst@kernel.org>
- <4485cc8d-ac69-c725-8493-eda120e29c41@redhat.com>
- <e7242333-b364-c2d8-53f5-1f688fc4d0b5@redhat.com>
+        bh=bfD81G5k2RGUWTORVxjv0Pn8YZ66RScRNGh2o/JvkBM=;
+        b=f/gSSKsHTm1div10NjB6bwFsKQnQYs+qZ7LbvJvTkGrNsaN9NUXIE3l4EMVb7sqz7HWMGs
+        kg8iGzyAQNODMVFR3x5tb/tGEU428qo1kFjrrwK507aUDTb1uQ6x5kVg4UYaoh/2CoFqFi
+        vNBlQV5KD4EePNzls8l0zWIQnQfqSqQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-o0duU4yMPvWRojSpYK5sTg-1; Wed, 18 Nov 2020 04:06:00 -0500
+X-MC-Unique: o0duU4yMPvWRojSpYK5sTg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADCBA8030B4;
+        Wed, 18 Nov 2020 09:05:59 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.150])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D1095D9CA;
+        Wed, 18 Nov 2020 09:05:54 +0000 (UTC)
+Date:   Wed, 18 Nov 2020 10:05:51 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, bgardon@google.com
+Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
+Message-ID: <20201118090551.5g5mj7pudfu72cut@kamzik.brq.redhat.com>
+References: <20201116121942.55031-1-drjones@redhat.com>
+ <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
+ <20201116184011.GB19950@xz-x1>
+ <20201118083831.jygosjdwhbk5dj66@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e7242333-b364-c2d8-53f5-1f688fc4d0b5@redhat.com>
+In-Reply-To: <20201118083831.jygosjdwhbk5dj66@kamzik.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 18, 2020 at 02:08:17PM +0800, Jason Wang wrote:
-> 
-> On 2020/10/26 上午10:59, Jason Wang wrote:
-> > 
-> > On 2020/10/23 下午11:34, Michael S. Tsirkin wrote:
-> > > On Fri, Oct 23, 2020 at 03:08:53PM +0300, Dan Carpenter wrote:
-> > > > The copy_to/from_user() functions return the number of bytes which we
-> > > > weren't able to copy but the ioctl should return -EFAULT if they fail.
+On Wed, Nov 18, 2020 at 09:38:31AM +0100, Andrew Jones wrote:
+> On Mon, Nov 16, 2020 at 01:40:11PM -0500, Peter Xu wrote:
+> > On Mon, Nov 16, 2020 at 07:16:50PM +0100, Paolo Bonzini wrote:
+> > > On 16/11/20 13:19, Andrew Jones wrote:
+> > > > This series attempts to clean up demand_paging_test, dirty_log_perf_test,
+> > > > and dirty_log_test by factoring out common code, creating some new API
+> > > > along the way. It also splits include/perf_test_util.h into a more
+> > > > conventional header and source pair.
 > > > > 
-> > > > Fixes: a127c5bbb6a8 ("vhost-vdpa: fix backend feature ioctls")
-> > > > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> > > Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > > Needed for stable I guess.
+> > > > I've tested on x86 and AArch64 (one config each), but not s390x.
+> > > > 
+> > > > v3:
+> > > >   - Rebased remaining four patches from v2 onto kvm/queue
+> > > >   - Picked up r-b's from Peter and Ben
+> > > > 
+> > > > v2: https://www.spinics.net/lists/kvm/msg228711.html
+> > > 
+> > > Unfortunately patch 2 is still broken:
+> > > 
+> > > $ ./dirty_log_test -M dirty-ring
+> > > Setting log mode to: 'dirty-ring'
+> > > Test iterations: 32, interval: 10 (ms)
+> > > Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+> > > ==== Test Assertion Failure ====
+> > >   lib/kvm_util.c:85: ret == 0
+> > >   pid=2010122 tid=2010122 - Invalid argument
+> > >      1	0x0000000000402ee7: vm_enable_cap at kvm_util.c:84
+> > >      2	0x0000000000403004: vm_enable_dirty_ring at kvm_util.c:124
+> > >      3	0x00000000004021a5: log_mode_create_vm_done at dirty_log_test.c:453
+> > >      4	 (inlined by) run_test at dirty_log_test.c:683
+> > >      5	0x000000000040b643: for_each_guest_mode at guest_modes.c:37
+> > >      6	0x00000000004019c2: main at dirty_log_test.c:864
+> > >      7	0x00007fe3f48207b2: ?? ??:0
+> > >      8	0x0000000000401aad: _start at ??:?
+> > >   KVM_ENABLE_CAP IOCTL failed,
+> > >   rc: -1 errno: 22
+> > > 
+> > > (Also fails without -M).
 > > 
+> > It should be because of the ordering of creating vcpu and enabling dirty rings,
+> > since currently for simplicity when enabling dirty ring we must have not
+> > created any vcpus:
 > > 
-> > Agree.
+> > +       if (kvm->created_vcpus) {
+> > +               /* We don't allow to change this value after vcpu created */
+> > +               r = -EINVAL;
+> > +       } else {
+> > +               kvm->dirty_ring_size = size;
+> > +               r = 0;
+> > +       }
 > > 
-> > Acked-by: Jason Wang <jasowang@redhat.com>
+> > We may need to call log_mode_create_vm_done() before creating any vcpus
+> > somehow.  Sorry to not have noticed that when reviewing it.
+> >
 > 
+> And sorry for having not tested with '-M dirty-ring'. I thought we were
+> trying to ensure each unique test type had its own test file (even if we
+> have to do the weird inclusion of C files). Doing that, the command line
+> options are then only used to change stuff like verbosity or to experiment
+> with tweaked configurations.
 > 
-> Hi Michael.
-> 
-> I don't see this in your tree, please consider to merge.
-> 
-> Thanks
-> 
+> If we're not doing that, then I think we should. We don't want to try and
+> explain to all the CI people how each test should be run. It's much easier
+> to say "run all the binaries, no parameters necessary". Each binary with
+> no parameters should run the test(s) using a good default or by executing
+> all possible configurations.
+>
 
-I do see it there:
+I just double checked and we are running all modes by default. This is
+the output I get
 
-commit 7922460e33c81f41e0d2421417228b32e6fdbe94
-Author: Dan Carpenter <dan.carpenter@oracle.com>
-Date:   Fri Oct 23 15:08:53 2020 +0300
+Test iterations: 32, interval: 10 (ms)
+Testing Log Mode 'dirty-log'
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+guest physical test memory offset: 0x7fbfffc000
+Dirtied 1024 pages
+Total bits checked: dirty (209373), clear (7917184), track_next (38548)
+Testing Log Mode 'clear-log'
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+guest physical test memory offset: 0x7fbfffc000
+Dirtied 1024 pages
+Total bits checked: dirty (464547), clear (7662010), track_next (37553)
+Testing Log Mode 'dirty-ring'
+Log mode 'dirty-ring' not supported, skipping test
 
-    vhost_vdpa: Return -EFAULT if copy_from_user() fails
-    
-the reason you can't find it is probably because I fixed up
-a typo in the subject.
+which matches the output before this patch, except for minor differences
+in the numbers.
 
+I'm not sure how this is failing in your environment and not mine.
 
--- 
-MST
+Peter?
+
+Thanks,
+drew
 
