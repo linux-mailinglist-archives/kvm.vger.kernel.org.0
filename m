@@ -2,152 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF0372B7A0B
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:11:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54A222B7A7F
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:42:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727123AbgKRJI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 04:08:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48937 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726704AbgKRJI6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:08:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605690537;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=u/gI6BS3S0KJAFUksfrY6Aa72D718BGlTqb+EtNbwoM=;
-        b=CfcKrblSsZfTUtfZ49x+ypb/6t2C7APUkkSHFIZCTT0UTLBPGQJ7VWvjVYDC9XuMC4LOxV
-        IwYBN+KdO0bXvLJ6ysjzAI+1eKCbtSL3AvUqwWXNqtjXhC0RYPaJB57AOLIBv4WOfLxwri
-        u1OKg7v8tFq3YKppnqocFQq3fgKDXwA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-595-k4rFzZbGPoyRDpHUnF8vfw-1; Wed, 18 Nov 2020 04:08:53 -0500
-X-MC-Unique: k4rFzZbGPoyRDpHUnF8vfw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 403696D241;
-        Wed, 18 Nov 2020 09:08:52 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.150])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 881A619647;
-        Wed, 18 Nov 2020 09:08:47 +0000 (UTC)
-Date:   Wed, 18 Nov 2020 10:08:44 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, bgardon@google.com
-Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
-Message-ID: <20201118090844.jsmmvwnsh56oh5fq@kamzik.brq.redhat.com>
-References: <20201116121942.55031-1-drjones@redhat.com>
- <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
- <20201116184011.GB19950@xz-x1>
- <20201118083831.jygosjdwhbk5dj66@kamzik.brq.redhat.com>
- <20201118090551.5g5mj7pudfu72cut@kamzik.brq.redhat.com>
+        id S1726483AbgKRJju (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Nov 2020 04:39:50 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55446 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725814AbgKRJjt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:39:49 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AI9Xfgh023727;
+        Wed, 18 Nov 2020 04:39:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=u54aAQWoLPMzEIvVZIw+FkSBkit07Cum0WnKaE4yIw8=;
+ b=hpP2DwEW0F+gOsEQCTUYcqbGyORJuMCkzYFXk8rMB3eFQBfJsytMicBF5oGvwifyybQN
+ ipb61tNZurjbgCag6dN6yWF5GlUnWe8+hmkf+cIFW0VLvh0V7BKk7hbZVy20K9YcA5Bj
+ YkTO66tDtRApHpMbxQ9RN2NwooMkqPGjZelkF+eALoJSH+T0gpdfTOqE6bqPh6H2MXX0
+ NqFVkHmDZdApLPnsK/ExSNsrW7G2zwcX8tmyNxKgKHx5Bhw0k9ms/2Mkt5ZyZeybBPiq
+ qV8EJiNR+zI4wZlDt/Z5b2houS/Wc8vvHj/iSPPcEY6KGjuAJEjn0bm0qiR8bqj6Dr6p GQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34w0sh8gcw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Nov 2020 04:39:48 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AI9YEKf027330;
+        Wed, 18 Nov 2020 04:39:48 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 34w0sh8gc6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Nov 2020 04:39:47 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AI9auNr018334;
+        Wed, 18 Nov 2020 09:39:46 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 34t6v8bye2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Nov 2020 09:39:46 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AI9dhse35389926
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Nov 2020 09:39:43 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 805EEA4040;
+        Wed, 18 Nov 2020 09:39:43 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F27AA4051;
+        Wed, 18 Nov 2020 09:39:43 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 18 Nov 2020 09:39:43 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 35618E23AF; Wed, 18 Nov 2020 10:39:43 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: [PATCH 0/2] Fix and MAINTAINER update for 5.10
+Date:   Wed, 18 Nov 2020 10:39:40 +0100
+Message-Id: <20201118093942.457191-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201118090551.5g5mj7pudfu72cut@kamzik.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-18_04:2020-11-17,2020-11-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ bulkscore=0 impostorscore=0 mlxscore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 clxscore=1015
+ mlxlogscore=524 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011180062
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 18, 2020 at 10:05:59AM +0100, Andrew Jones wrote:
-> On Wed, Nov 18, 2020 at 09:38:31AM +0100, Andrew Jones wrote:
-> > On Mon, Nov 16, 2020 at 01:40:11PM -0500, Peter Xu wrote:
-> > > On Mon, Nov 16, 2020 at 07:16:50PM +0100, Paolo Bonzini wrote:
-> > > > On 16/11/20 13:19, Andrew Jones wrote:
-> > > > > This series attempts to clean up demand_paging_test, dirty_log_perf_test,
-> > > > > and dirty_log_test by factoring out common code, creating some new API
-> > > > > along the way. It also splits include/perf_test_util.h into a more
-> > > > > conventional header and source pair.
-> > > > > 
-> > > > > I've tested on x86 and AArch64 (one config each), but not s390x.
-> > > > > 
-> > > > > v3:
-> > > > >   - Rebased remaining four patches from v2 onto kvm/queue
-> > > > >   - Picked up r-b's from Peter and Ben
-> > > > > 
-> > > > > v2: https://www.spinics.net/lists/kvm/msg228711.html
-> > > > 
-> > > > Unfortunately patch 2 is still broken:
-> > > > 
-> > > > $ ./dirty_log_test -M dirty-ring
-> > > > Setting log mode to: 'dirty-ring'
-> > > > Test iterations: 32, interval: 10 (ms)
-> > > > Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> > > > ==== Test Assertion Failure ====
-> > > >   lib/kvm_util.c:85: ret == 0
-> > > >   pid=2010122 tid=2010122 - Invalid argument
-> > > >      1	0x0000000000402ee7: vm_enable_cap at kvm_util.c:84
-> > > >      2	0x0000000000403004: vm_enable_dirty_ring at kvm_util.c:124
-> > > >      3	0x00000000004021a5: log_mode_create_vm_done at dirty_log_test.c:453
-> > > >      4	 (inlined by) run_test at dirty_log_test.c:683
-> > > >      5	0x000000000040b643: for_each_guest_mode at guest_modes.c:37
-> > > >      6	0x00000000004019c2: main at dirty_log_test.c:864
-> > > >      7	0x00007fe3f48207b2: ?? ??:0
-> > > >      8	0x0000000000401aad: _start at ??:?
-> > > >   KVM_ENABLE_CAP IOCTL failed,
-> > > >   rc: -1 errno: 22
-> > > > 
-> > > > (Also fails without -M).
-> > > 
-> > > It should be because of the ordering of creating vcpu and enabling dirty rings,
-> > > since currently for simplicity when enabling dirty ring we must have not
-> > > created any vcpus:
-> > > 
-> > > +       if (kvm->created_vcpus) {
-> > > +               /* We don't allow to change this value after vcpu created */
-> > > +               r = -EINVAL;
-> > > +       } else {
-> > > +               kvm->dirty_ring_size = size;
-> > > +               r = 0;
-> > > +       }
-> > > 
-> > > We may need to call log_mode_create_vm_done() before creating any vcpus
-> > > somehow.  Sorry to not have noticed that when reviewing it.
-> > >
-> > 
-> > And sorry for having not tested with '-M dirty-ring'. I thought we were
-> > trying to ensure each unique test type had its own test file (even if we
-> > have to do the weird inclusion of C files). Doing that, the command line
-> > options are then only used to change stuff like verbosity or to experiment
-> > with tweaked configurations.
-> > 
-> > If we're not doing that, then I think we should. We don't want to try and
-> > explain to all the CI people how each test should be run. It's much easier
-> > to say "run all the binaries, no parameters necessary". Each binary with
-> > no parameters should run the test(s) using a good default or by executing
-> > all possible configurations.
-> >
-> 
-> I just double checked and we are running all modes by default. This is
-> the output I get
-> 
-> Test iterations: 32, interval: 10 (ms)
-> Testing Log Mode 'dirty-log'
-> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> guest physical test memory offset: 0x7fbfffc000
-> Dirtied 1024 pages
-> Total bits checked: dirty (209373), clear (7917184), track_next (38548)
-> Testing Log Mode 'clear-log'
-> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> guest physical test memory offset: 0x7fbfffc000
-> Dirtied 1024 pages
-> Total bits checked: dirty (464547), clear (7662010), track_next (37553)
-> Testing Log Mode 'dirty-ring'
-> Log mode 'dirty-ring' not supported, skipping test
-> 
-> which matches the output before this patch, except for minor differences
-> in the numbers.
-> 
-> I'm not sure how this is failing in your environment and not mine.
->
+Conny, David,
 
-Doh, sorry. I didn't actually read the output. I was only looking for an
-assert and the string 'dirty-ring'. It looks like the test is skipping
-for me. That would explain why it "works" for me...
+your chance for quick feedback. I plan to send a pull request for kvm
+master soon.
 
-drew 
+I have agreed with Heiko to carry this via the KVM tree as
+this is KVM s390 specific.
+
+Christian Borntraeger (2):
+  s390/uv: handle destroy page legacy interface
+  MAINTAINERS: add uv.c also to KVM/s390
+
+ MAINTAINERS           | 1 +
+ arch/s390/kernel/uv.c | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+-- 
+2.28.0
 
