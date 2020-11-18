@@ -2,290 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEB202B7C04
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 12:03:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 737BC2B7C74
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 12:24:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727806AbgKRLAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 06:00:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23818 "EHLO
+        id S1727200AbgKRLWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Nov 2020 06:22:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29091 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727768AbgKRLAV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 06:00:21 -0500
+        by vger.kernel.org with ESMTP id S1726677AbgKRLWP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 06:22:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605697219;
+        s=mimecast20190719; t=1605698534;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SqWuAkoe91TfxTBFDnkKWT5U9ehJUI+pqFt27D9lSSw=;
-        b=AiNWq8HPxCXRbK7Ci+a8nzEzIb30ePeUv/5dH9kY0yuqeHQ5r1DPC9IV36LXAe5mLSK2+u
-        AOFrjaqxXWxhmOoW4Tg4qsYQ8Vt4OvIwa+nqPugnVRwkgNKyjpUgHPqabKGiiai7VUnTdU
-        7QytsTE4K7eDQATiP5CZBu45jFHFOW0=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JkykavBXCXxc/Cc+EpSfpWb6eYs51ekKp9L7LE1iLx4=;
+        b=a8BsEnMrTFyehj4YOzyc9yRHvyjaqCcSy99J1KOH5D+kQTKyU06NIAh63y7fpaDhAuitlK
+        pEP3hDkFk3Ehda7zWcdEU+ZC2VM99Yc1CkU9bN4hv1DZdR/4ww0jRwFxnbfz5IJV3+JyZR
+        nbdXOhGS8s4IpkduF1+nXEHBAPqJFVA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-iJ7RqIMGOEKOSINdpqlh0w-1; Wed, 18 Nov 2020 06:00:14 -0500
-X-MC-Unique: iJ7RqIMGOEKOSINdpqlh0w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-11-XmM7ArIhOz2XA7mA8hwAKw-1; Wed, 18 Nov 2020 06:22:10 -0500
+X-MC-Unique: XmM7ArIhOz2XA7mA8hwAKw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74661107B26E;
-        Wed, 18 Nov 2020 11:00:13 +0000 (UTC)
-Received: from [10.36.115.104] (ovpn-115-104.ams2.redhat.com [10.36.115.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B20210013DB;
-        Wed, 18 Nov 2020 11:00:07 +0000 (UTC)
-Subject: Re: [RFC, v1 0/3] msi support for platform devices
-To:     Vikas Gupta <vikas.gupta@broadcom.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vikram Prakash <vikram.prakash@broadcom.com>,
-        Srinath Mannam <srinath.mannam@broadcom.com>,
-        Manish Kurup <manish.kurup@broadcom.com>
-References: <20201105060257.35269-1-vikas.gupta@broadcom.com>
- <20201112175852.21572-1-vikas.gupta@broadcom.com>
- <96436cba-88e3-ddb6-36d6-000929b86979@redhat.com>
- <CAHLZf_uAp-CzA-rkvFF70wT5zoB98OvErXxFthoBHyvzwTRxAQ@mail.gmail.com>
- <c78d2706-f406-32ab-1637-bd0c9f459e23@redhat.com>
- <CAHLZf_uQBzQndGo1vtPtrUd2KXk+im=A9evowggzk6U=5vEvAg@mail.gmail.com>
- <92188bdf-e0a9-aad9-d26b-78a5443f2a47@redhat.com>
- <e44a2949-b86f-52a9-501c-4f099b820dcd@redhat.com>
- <CAHLZf_vWqcx_cGwfBJGZjaU2UQGd3BRNsKwGOLp0KAhqwh4x4w@mail.gmail.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <3d9ae9b8-3a0c-fc50-7b56-3097b515c6ca@redhat.com>
-Date:   Wed, 18 Nov 2020 12:00:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A11DC873079;
+        Wed, 18 Nov 2020 11:22:07 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-115-104.ams2.redhat.com [10.36.115.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 46D9F51512;
+        Wed, 18 Nov 2020 11:21:54 +0000 (UTC)
+From:   Eric Auger <eric.auger@redhat.com>
+To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
+        alex.williamson@redhat.com
+Cc:     jean-philippe@linaro.org, zhangfei.gao@linaro.org,
+        zhangfei.gao@gmail.com, vivek.gautam@arm.com,
+        shameerali.kolothum.thodi@huawei.com,
+        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com, tn@semihalf.com,
+        nicoleotsuka@gmail.com, yuzenghui@huawei.com
+Subject: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+Date:   Wed, 18 Nov 2020 12:21:36 +0100
+Message-Id: <20201118112151.25412-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHLZf_vWqcx_cGwfBJGZjaU2UQGd3BRNsKwGOLp0KAhqwh4x4w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vikas,
+This series brings the IOMMU part of HW nested paging support
+in the SMMUv3. The VFIO part is submitted separately.
 
-On 11/17/20 5:36 PM, Vikas Gupta wrote:
-> Hi Eric,
-> 
-> On Tue, Nov 17, 2020 at 1:55 PM Auger Eric <eric.auger@redhat.com> wrote:
->>
->> Hi Vikas,
->>
->> On 11/17/20 9:05 AM, Auger Eric wrote:
->>> Hi Vikas,
->>>
->>> On 11/17/20 7:25 AM, Vikas Gupta wrote:
->>>> Hi Eric,
->>>>
->>>> On Mon, Nov 16, 2020 at 6:44 PM Auger Eric <eric.auger@redhat.com> wrote:
->>>>>
->>>>> Hi Vikas,
->>>>>
->>>>> On 11/13/20 6:24 PM, Vikas Gupta wrote:
->>>>>> Hi Eric,
->>>>>>
->>>>>> On Fri, Nov 13, 2020 at 12:10 AM Auger Eric <eric.auger@redhat.com> wrote:
->>>>>>>
->>>>>>> Hi Vikas,
->>>>>>>
->>>>>>> On 11/12/20 6:58 PM, Vikas Gupta wrote:
->>>>>>>> This RFC adds support for MSI for platform devices.
->>>>>>>> a) MSI(s) is/are added in addition to the normal interrupts.
->>>>>>>> b) The vendor specific MSI configuration can be done using
->>>>>>>>    callbacks which is implemented as msi module.
->>>>>>>> c) Adds a msi handling module for the Broadcom platform devices.
->>>>>>>>
->>>>>>>> Changes from:
->>>>>>>> -------------
->>>>>>>>  v0 to v1:
->>>>>>>>    i)  Removed MSI device flag VFIO_DEVICE_FLAGS_MSI.
->>>>>>>>    ii) Add MSI(s) at the end of the irq list of platform IRQs.
->>>>>>>>        MSI(s) with first entry of MSI block has count and flag
->>>>>>>>        information.
->>>>>>>>        IRQ list: Allocation for IRQs + MSIs are allocated as below
->>>>>>>>        Example: if there are 'n' IRQs and 'k' MSIs
->>>>>>>>        -------------------------------------------------------
->>>>>>>>        |IRQ-0|IRQ-1|....|IRQ-n|MSI-0|MSI-1|MSI-2|......|MSI-k|
->>>>>>>>        -------------------------------------------------------
->>>>>>> I have not taken time yet to look at your series, but to me you should have
->>>>>>> |IRQ-0|IRQ-1|....|IRQ-n|MSI|MSIX
->>>>>>> then for setting a given MSIX (i) you would select the MSIx index and
->>>>>>> then set start=i count=1.
->>>>>>
->>>>>> As per your suggestion, we should have, if there are n-IRQs, k-MSIXs
->>>>>> and m-MSIs, allocation of IRQs should be done as below
->>>>>>
->>>>>> |IRQ0|IRQ1|......|IRQ-(n-1)|MSI|MSIX|
->>>>>>                                              |        |
->>>>>>                                              |
->>>>>> |MSIX0||MSIX1||MSXI2|....|MSIX-(k-1)|
->>>>>>                                              |MSI0||MSI1||MSI2|....|MSI-(m-1)|
->>>>> No I really meant this list of indices: IRQ0|IRQ1|......|IRQ-(n-1)|MSI|MSIX|
->>>>> and potentially later on IRQ0|IRQ1|......|IRQ-(n-1)|MSI|MSIX| ERR| REQ
->>>>> if ERR/REQ were to be added.
->>>> I agree on this. Actually the map I drew incorrectly above but wanted
->>>> to demonstrate the same. It was a child-parent relationship for MSI
->>>> and its members and similarly for MSIX as well.
->>>>>
->>>>> I think the userspace could query the total number of indices using
->>>>> VFIO_DEVICE_GET_INFO and retrieve num_irqs (corresponding to the n wire
->>>>> interrupts + MSI index + MSIX index)
->>>>>
->>>>> Then userspace can loop on all the indices using
->>>>> VFIO_DEVICE_GET_IRQ_INFO. For each index it uses count to determine the
->>>>> first indices related to wire interrupts (count = 1). Then comes the MSI
->>>>> index, and after the MSI index. If any of those is supported, count >1,
->>>>> otherwise count=0. The only thing I am dubious about is can the device
->>>>> use a single MSI/MSIX? Because my hypothesis here is we use count to
->>>>> discriminate between wire first indices and other indices.
->>>> I believe count can be one as well, especially for ERR/REQ as you
->>>> mentioned above.
->>> Given ERR and REQ indices would follow MSI and MSIX ones, MSI index
->>> could be recognized by the first index whose count != 1. But indeed I am
->>> not sure the number of supported vectors cannot be 1. In your case it is
->>> induced by the size of the ring so it is OK but for other devices this
->>> may be different.
->>>
->>> I think we can not rely on the count > 1. Now, this is
->>>> blocking and we are not left with options unless we consider adding
->>>> more enums in flags in vfio_irq_info to tell userspace that particular
->>>> index is wired, MSI, MSIX etc. for the platform device.
->>>> What do you think?
->>> If count is not reliable to discriminate the first n wired interrupts
->>> from the subsequen MSI and MSIx index, Alex suggested to add a
->>> capability extension in the vfio_irq_info structure. Something similar
->>> to what was done for vfio_region_info.
->>>
->>> Such kind of thing was attempted in
->>> https://lore.kernel.org/kvmarm/20201116110030.32335-8-eric.auger@redhat.com/T/#u
->>>
->>> ` [PATCH v11 07/13] vfio: Use capability chains to handle device
->>> specific irq
->>> ` [PATCH v11 08/13] vfio/pci: Add framework for custom interrupt indices
->>> ` [PATCH v11 09/13] vfio: Add new IRQ for DMA fault reporting
->>
->> By the way I was mentionning MSI/MSIx in my previous reply but, as Alex
->> pointed out, with platform device only a single MSI index does make
->> sense, no?
-> Yes, I think single MSI should be OK.
-> This single MSI index should be implemented as ext_irqs, similar to,
-> as you implemented in the mentioned patch. Is my understanding
-> correct?
-Yes, if count !=1 cannot be used to detect the MSI index, I think using
-a capability would do the job and this is aligned with last Alex'
-suggestion.
+The IOMMU API is extended to support 2 new API functionalities:
+1) pass the guest stage 1 configuration
+2) pass stage 1 MSI bindings
 
-Thanks
+Then those capabilities gets implemented in the SMMUv3 driver.
+
+The virtualizer passes information through the VFIO user API
+which cascades them to the iommu subsystem. This allows the guest
+to own stage 1 tables and context descriptors (so-called PASID
+table) while the host owns stage 2 tables and main configuration
+structures (STE).
+
+Best Regards
 
 Eric
-> Thanks,
-> Vikas
->>
->> Thanks
->>
->> Eric
->>>
->>> Note this has not been reviewed yet.
->>>
->>> Thanks
->>>
->>> Eric
->>>
->>>>>
->>>>>
->>>>>
->>>>>> With this implementation user space can know that, at indexes n and
->>>>>> n+1, edge triggered interrupts are present.
->>>>> note wired interrupts can also be edge ones.
->>>>>>    We may add an element in vfio_platform_irq itself to allocate MSIs/MSIXs
->>>>>>    struct vfio_platform_irq{
->>>>>>    .....
->>>>>>    .....
->>>>>>    struct vfio_platform_irq *block; => this points to the block
->>>>>> allocation for MSIs/MSIXs and all msi/msix are type of IRQs.As wired interrupts and MSI interrupts coexist, I would store in vdev an
->>>>> array of wired interrupts (the existing vdev->irqs) and a new array for
->>>>> MSI(x) as done in the PCI code.
->>>>>
->>>>> vdev->ctx = kcalloc(nvec, sizeof(struct vfio_pci_irq_ctx), GFP_KERNEL);
->>>>>
->>>>> Does it make sense?
->>>> Yes, we can use similar kinds of allocations.
->>>>
->>>> Thanks,
->>>> Vikas
->>>>>
->>>>>>    };
->>>>>>                          OR
->>>>>> Another structure can be defined in 'vfio_pci_private.h'
->>>>>> struct vfio_msi_ctx {
->>>>>>         struct eventfd_ctx      *trigger;
->>>>>>         char                    *name;
->>>>>> };
->>>>>> and
->>>>>> struct vfio_platform_irq {
->>>>>>   .....
->>>>>>   .....
->>>>>>   struct vfio_msi_ctx *block; => this points to the block allocation
->>>>>> for MSIs/MSIXs
->>>>>> };
->>>>>> Which of the above two options sounds OK to you? Please suggest.
->>>>>>
->>>>>>> to me individual MSIs are encoded in the subindex and not in the index.
->>>>>>> The index just selects the "type" of interrupt.
->>>>>>>
->>>>>>> For PCI you just have:
->>>>>>>         VFIO_PCI_INTX_IRQ_INDEX,
->>>>>>>         VFIO_PCI_MSI_IRQ_INDEX, -> MSI index and then you play with
->>>>>>> start/count
->>>>>>>         VFIO_PCI_MSIX_IRQ_INDEX,
->>>>>>>         VFIO_PCI_ERR_IRQ_INDEX,
->>>>>>>         VFIO_PCI_REQ_IRQ_INDEX,
->>>>>>>
->>>>>>> (include/uapi/linux/vfio.h)
->>>>>>
->>>>>> In pci case, type of interrupts is fixed so they can be 'indexed' by
->>>>>> these enums but for VFIO platform user space will need to iterate all
->>>>>> (num_irqs) indexes to know at which indexes edge triggered interrupts
->>>>>> are present.
->>>>> indeed, but can't you loop over all indices looking until count !=1? At
->>>>> this point you know if have finished emurating the wires. Holds if
->>>>> MSI(x) count !=1 of course.
->>>>>
->>>>> Thanks
->>>>>
->>>>> Eric
->>>>>
->>>>>>
->>>>>> Thanks,
->>>>>> Vikas
->>>>>>>
->>>>>>> Thanks
->>>>>>>
->>>>>>> Eric
->>>>>>>>        MSI-0 will have count=k set and flags set accordingly.
->>>>>>>>
->>>>>>>> Vikas Gupta (3):
->>>>>>>>   vfio/platform: add support for msi
->>>>>>>>   vfio/platform: change cleanup order
->>>>>>>>   vfio/platform: add Broadcom msi module
->>>>>>>>
->>>>>>>>  drivers/vfio/platform/Kconfig                 |   1 +
->>>>>>>>  drivers/vfio/platform/Makefile                |   1 +
->>>>>>>>  drivers/vfio/platform/msi/Kconfig             |   9 +
->>>>>>>>  drivers/vfio/platform/msi/Makefile            |   2 +
->>>>>>>>  .../vfio/platform/msi/vfio_platform_bcmplt.c  |  74 ++++++
->>>>>>>>  drivers/vfio/platform/vfio_platform_common.c  |  86 ++++++-
->>>>>>>>  drivers/vfio/platform/vfio_platform_irq.c     | 238 +++++++++++++++++-
->>>>>>>>  drivers/vfio/platform/vfio_platform_private.h |  23 ++
->>>>>>>>  8 files changed, 419 insertions(+), 15 deletions(-)
->>>>>>>>  create mode 100644 drivers/vfio/platform/msi/Kconfig
->>>>>>>>  create mode 100644 drivers/vfio/platform/msi/Makefile
->>>>>>>>  create mode 100644 drivers/vfio/platform/msi/vfio_platform_bcmplt.c
->>>>>>>>
->>>>>>>
->>>>>
->>
+
+This series can be found at:
+https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
+(including the VFIO part in his last version: v11)
+
+The series includes a patch from Jean-Philippe. It is better to
+review the original patch:
+[PATCH v8 2/9] iommu/arm-smmu-v3: Maintain a SID->device structure
+
+The VFIO series is sent separately.
+
+History:
+
+v12 -> v13:
+- fixed compilation issue with CONFIG_ARM_SMMU_V3_SVA
+  reported by Shameer. This urged me to revisit patch 4 into
+  iommu/smmuv3: Allow s1 and s2 configs to coexist where
+  s1_cfg and s2_cfg are not dynamically allocated anymore.
+  Instead I use a new set field in existing structs
+- fixed 2 others config checks
+- Updated "iommu/arm-smmu-v3: Maintain a SID->device structure"
+  according to the last version
+
+v11 -> v12:
+- rebase on top of v5.10-rc4
+
+Eric Auger (14):
+  iommu: Introduce attach/detach_pasid_table API
+  iommu: Introduce bind/unbind_guest_msi
+  iommu/smmuv3: Allow s1 and s2 configs to coexist
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+    regions
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
+  iommu/smmuv3: Accept configs with more than one context descriptor
+  iommu/smmuv3: Add PASID cache invalidation per PASID
+
+Jean-Philippe Brucker (1):
+  iommu/arm-smmu-v3: Maintain a SID->device structure
+
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 659 ++++++++++++++++++--
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 103 ++-
+ drivers/iommu/dma-iommu.c                   | 142 ++++-
+ drivers/iommu/iommu.c                       | 105 ++++
+ include/linux/dma-iommu.h                   |  16 +
+ include/linux/iommu.h                       |  41 ++
+ include/uapi/linux/iommu.h                  |  54 ++
+ 7 files changed, 1042 insertions(+), 78 deletions(-)
+
+-- 
+2.21.3
 
