@@ -2,109 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A5C82B7A81
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:42:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 638CB2B7A88
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:42:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbgKRJjv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 04:39:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4266 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725814AbgKRJju (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:39:50 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AI9WPEx154655;
-        Wed, 18 Nov 2020 04:39:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=TY3VLLUExHJfU4HE1AKylU5l7bPNgjMgJr9aT+gGxTc=;
- b=HuTtTZRbsxHZ+YodwLEobdvGUpoB1KlHCXw6qNWHLISOdPXME9f78ClRK/RNGicFsKbu
- +I7G3lYN2MWJlcs/HvHby4Pb7cu2wmkZXAvK++VRn7ihcWu/Bxyw+XXVivJBaymggTed
- qSWH1HOKuKR0sLxK6T7ZOuTGqASFNU6nWkDI9XPw6CTXYijjYRKKBkw6buXMN55n+gBU
- 3pUoPLvsW3baJv7h5VSOgBpwxDq+qWlAn3mozEcZQoSaRydr9Re71PGBvbWS+en1pBm9
- BanmuDS1TdW9qgljxSYhjBAdu36pE6Uq2ltEFnlhCJDUXKrbNPeEPnuVCOJ0F1NM3lsc wA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34w12kg8k8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Nov 2020 04:39:50 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AI9WjIx158429;
-        Wed, 18 Nov 2020 04:39:49 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34w12kg8j1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Nov 2020 04:39:49 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AI9bSq2008085;
-        Wed, 18 Nov 2020 09:39:47 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 34t6v8a1v0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Nov 2020 09:39:47 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AI9digw9765376
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Nov 2020 09:39:44 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 461FCAE053;
-        Wed, 18 Nov 2020 09:39:44 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34396AE04D;
-        Wed, 18 Nov 2020 09:39:44 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 18 Nov 2020 09:39:44 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id E761DE23AF; Wed, 18 Nov 2020 10:39:43 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Subject: [PATCH 2/2] MAINTAINERS: add uv.c also to KVM/s390
-Date:   Wed, 18 Nov 2020 10:39:42 +0100
-Message-Id: <20201118093942.457191-3-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201118093942.457191-1-borntraeger@de.ibm.com>
-References: <20201118093942.457191-1-borntraeger@de.ibm.com>
+        id S1727001AbgKRJkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Nov 2020 04:40:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46667 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725964AbgKRJkF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:40:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605692404;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8YUHjCb6T+duwkVVqtutOFcmHYQOlclmLV2nizfmVHg=;
+        b=gHrJDJKVkaPUDzSrA6d0t9YiwFJdbHP14kmgxeQ3MNsRF2cU13NPpN2IGnKJngwBLMyOo3
+        Jzfqbfb9BJaMUPns2PpWtsZWBe5FxKpZp+ZgseCQK2kIiO42h/pIiuU5qdZxXlXAvOclo3
+        1yMPT4jLa3jczBdz8DUPPmhONTx9oro=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-eJe0u6hPPU2DjFdLdYSYRg-1; Wed, 18 Nov 2020 04:40:00 -0500
+X-MC-Unique: eJe0u6hPPU2DjFdLdYSYRg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2459100855E;
+        Wed, 18 Nov 2020 09:39:58 +0000 (UTC)
+Received: from [10.72.12.138] (ovpn-12-138.pek2.redhat.com [10.72.12.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D14E655762;
+        Wed, 18 Nov 2020 09:39:52 +0000 (UTC)
+Subject: Re: [PATCH net] vhost_vdpa: Return -EFUALT if copy_from_user() fails
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, kuba@kernel.org
+References: <20201023120853.GI282278@mwanda>
+ <20201023113326-mutt-send-email-mst@kernel.org>
+ <4485cc8d-ac69-c725-8493-eda120e29c41@redhat.com>
+ <e7242333-b364-c2d8-53f5-1f688fc4d0b5@redhat.com>
+ <20201118035912-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4ac146a2-a3db-abc7-73a0-98f71119de3d@redhat.com>
+Date:   Wed, 18 Nov 2020 17:39:51 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20201118035912-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-18_04:2020-11-17,2020-11-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=924 clxscore=1015 malwarescore=0 impostorscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011180062
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Most changes in uv.c are related to KVM. Involve also the KVM team
-regarding changes to uv.c.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On 2020/11/18 下午4:59, Michael S. Tsirkin wrote:
+> On Wed, Nov 18, 2020 at 02:08:17PM +0800, Jason Wang wrote:
+>> On 2020/10/26 上午10:59, Jason Wang wrote:
+>>> On 2020/10/23 下午11:34, Michael S. Tsirkin wrote:
+>>>> On Fri, Oct 23, 2020 at 03:08:53PM +0300, Dan Carpenter wrote:
+>>>>> The copy_to/from_user() functions return the number of bytes which we
+>>>>> weren't able to copy but the ioctl should return -EFAULT if they fail.
+>>>>>
+>>>>> Fixes: a127c5bbb6a8 ("vhost-vdpa: fix backend feature ioctls")
+>>>>> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+>>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>>>> Needed for stable I guess.
+>>>
+>>> Agree.
+>>>
+>>> Acked-by: Jason Wang <jasowang@redhat.com>
+>>
+>> Hi Michael.
+>>
+>> I don't see this in your tree, please consider to merge.
+>>
+>> Thanks
+>>
+> I do see it there:
+>
+> commit 7922460e33c81f41e0d2421417228b32e6fdbe94
+> Author: Dan Carpenter <dan.carpenter@oracle.com>
+> Date:   Fri Oct 23 15:08:53 2020 +0300
+>
+>      vhost_vdpa: Return -EFAULT if copy_from_user() fails
+>      
+> the reason you can't find it is probably because I fixed up
+> a typo in the subject.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e73636b75f29..06116d892a4b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9674,6 +9674,7 @@ F:	Documentation/virt/kvm/s390*
- F:	arch/s390/include/asm/gmap.h
- F:	arch/s390/include/asm/kvm*
- F:	arch/s390/include/uapi/asm/kvm*
-+F:	arch/s390/kernel/uv.c
- F:	arch/s390/kvm/
- F:	arch/s390/mm/gmap.c
- F:	tools/testing/selftests/kvm/*/s390x/
--- 
-2.28.0
+
+I see that.
+
+Thanks
+
+
+>
+>
 
