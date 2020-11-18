@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 514642B7C78
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 12:24:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3766D2B7C7A
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 12:24:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726239AbgKRLWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 06:22:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34970 "EHLO
+        id S1727711AbgKRLWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Nov 2020 06:22:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51404 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725970AbgKRLWf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 06:22:35 -0500
+        by vger.kernel.org with ESMTP id S1726044AbgKRLWj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 06:22:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605698554;
+        s=mimecast20190719; t=1605698556;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BYsy2ca8H2b2MGK2A9c2/bIfhkbWMbLmJeReutvhMxw=;
-        b=fAqD5BuWQwOCg+Ftqd21kLWrC6Z/idM5+kQuzCKCjZ9n9Zqt6KEEOOfW9T25wN7dvhI8iz
-        KmAJxP6f7CS6hJ3V4kkgHdTa3S5TxtgUTntogqAdC3/gtvXTxABOM2rDJbBZ310ymo1yI9
-        R5XTACtWG+q+YtXKP1Z21HS30pVFLRw=
+        bh=nYI5PkZKqyzeNBSZxQm2/AJmHZgctRSPuWrFNeXa4Y0=;
+        b=Q1q/2vxqe+eZo4QDoSMB3F6Fr7FLjT69RRcSUMgLASbLyibhSvizoAPvS0LGI+tStaDDMM
+        WlKYsDcSlhxAfs/s0SzHrfJUJdFMRYPi43uDhdFvqderL1zeQ2u+SvMKItGkQqh7KgPweJ
+        kW4NwWpaXP9AXbCMX0TWpZZmesimpH8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-RYNNRrs6PDC8opvEejxgvA-1; Wed, 18 Nov 2020 06:22:29 -0500
-X-MC-Unique: RYNNRrs6PDC8opvEejxgvA-1
+ us-mta-201-1xOrbGZTP5GVXkk8bJHDFw-1; Wed, 18 Nov 2020 06:22:34 -0500
+X-MC-Unique: 1xOrbGZTP5GVXkk8bJHDFw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B1C11084D6B;
-        Wed, 18 Nov 2020 11:22:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01A2D64082;
+        Wed, 18 Nov 2020 11:22:32 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-115-104.ams2.redhat.com [10.36.115.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ECEC751512;
-        Wed, 18 Nov 2020 11:22:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9457351512;
+        Wed, 18 Nov 2020 11:22:27 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -44,9 +44,9 @@ Cc:     jean-philippe@linaro.org, zhangfei.gao@linaro.org,
         shameerali.kolothum.thodi@huawei.com,
         jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com, tn@semihalf.com,
         nicoleotsuka@gmail.com, yuzenghui@huawei.com
-Subject: [PATCH v13 02/15] iommu: Introduce bind/unbind_guest_msi
-Date:   Wed, 18 Nov 2020 12:21:38 +0100
-Message-Id: <20201118112151.25412-3-eric.auger@redhat.com>
+Subject: [PATCH v13 03/15] iommu/arm-smmu-v3: Maintain a SID->device structure
+Date:   Wed, 18 Nov 2020 12:21:39 +0100
+Message-Id: <20201118112151.25412-4-eric.auger@redhat.com>
 In-Reply-To: <20201118112151.25412-1-eric.auger@redhat.com>
 References: <20201118112151.25412-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -56,161 +56,287 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On ARM, MSI are translated by the SMMU. An IOVA is allocated
-for each MSI doorbell. If both the host and the guest are exposed
-with SMMUs, we end up with 2 different IOVAs allocated by each.
-guest allocates an IOVA (gIOVA) to map onto the guest MSI
-doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
-onto the physical doorbell (hDB).
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-So we end up with 2 untied mappings:
-         S1            S2
-gIOVA    ->    gDB
-              hIOVA    ->    hDB
+When handling faults from the event or PRI queue, we need to find the
+struct device associated to a SID. Add a rb_tree to keep track of SIDs.
 
-Currently the PCI device is programmed by the host with hIOVA
-as MSI doorbell. So this does not work.
-
-This patch introduces an API to pass gIOVA/gDB to the host so
-that gIOVA can be reused by the host instead of re-allocating
-a new IOVA. So the goal is to create the following nested mapping:
-
-         S1            S2
-gIOVA    ->    gDB     ->    hDB
-
-and program the PCI device with gIOVA MSI doorbell.
-
-In case we have several devices attached to this nested domain
-(devices belonging to the same group), they cannot be isolated
-on guest side either. So they should also end up in the same domain
-on guest side. We will enforce that all the devices attached to
-the host iommu domain use the same physical doorbell and similarly
-a single virtual doorbell mapping gets registered (1 single
-virtual doorbell is used on guest as well).
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
-v7 -> v8:
-- dummy iommu_unbind_guest_msi turned into a void function
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 161 ++++++++++++++++----
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  13 +-
+ 2 files changed, 144 insertions(+), 30 deletions(-)
 
-v6 -> v7:
-- remove the device handle parameter.
-- Add comments saying there can only be a single MSI binding
-  registered per iommu_domain
-v5 -> v6:
--fix compile issue when IOMMU_API is not set
-
-v3 -> v4:
-- add unbind
-
-v2 -> v3:
-- add a struct device handle
----
- drivers/iommu/iommu.c | 37 +++++++++++++++++++++++++++++++++++++
- include/linux/iommu.h | 20 ++++++++++++++++++++
- 2 files changed, 57 insertions(+)
-
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 978fe34378fb..0b1f458b444f 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -2252,6 +2252,43 @@ static void __iommu_detach_device(struct iommu_domain *domain,
- 	trace_detach_device_from_domain(dev);
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index e634bbe60573..1e4acc7f3d3c 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -911,8 +911,8 @@ static void arm_smmu_sync_cd(struct arm_smmu_domain *smmu_domain,
+ 
+ 	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+ 	list_for_each_entry(master, &smmu_domain->devices, domain_head) {
+-		for (i = 0; i < master->num_sids; i++) {
+-			cmd.cfgi.sid = master->sids[i];
++		for (i = 0; i < master->num_streams; i++) {
++			cmd.cfgi.sid = master->streams[i].id;
+ 			arm_smmu_cmdq_batch_add(smmu, &cmds, &cmd);
+ 		}
+ 	}
+@@ -1350,6 +1350,32 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
+ 	return 0;
  }
  
-+/**
-+ * iommu_bind_guest_msi - Passes the stage1 GIOVA/GPA mapping of a
-+ * virtual doorbell
-+ *
-+ * @domain: iommu domain the stage 1 mapping will be attached to
-+ * @iova: iova allocated by the guest
-+ * @gpa: guest physical address of the virtual doorbell
-+ * @size: granule size used for the mapping
-+ *
-+ * The associated IOVA can be reused by the host to create a nested
-+ * stage2 binding mapping translating into the physical doorbell used
-+ * by the devices attached to the domain.
-+ *
-+ * All devices within the domain must share the same physical doorbell.
-+ * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
-+ */
-+
-+int iommu_bind_guest_msi(struct iommu_domain *domain,
-+			 dma_addr_t giova, phys_addr_t gpa, size_t size)
++__maybe_unused
++static struct arm_smmu_master *
++arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
 +{
-+	if (unlikely(!domain->ops->bind_guest_msi))
-+		return -ENODEV;
++	struct rb_node *node;
++	struct arm_smmu_stream *stream;
++	struct arm_smmu_master *master = NULL;
 +
-+	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
++	mutex_lock(&smmu->streams_mutex);
++	node = smmu->streams.rb_node;
++	while (node) {
++		stream = rb_entry(node, struct arm_smmu_stream, node);
++		if (stream->id < sid) {
++			node = node->rb_right;
++		} else if (stream->id > sid) {
++			node = node->rb_left;
++		} else {
++			master = stream->master;
++			break;
++		}
++	}
++	mutex_unlock(&smmu->streams_mutex);
++
++	return master;
 +}
-+EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
 +
-+void iommu_unbind_guest_msi(struct iommu_domain *domain,
-+			    dma_addr_t iova)
+ /* IRQ and event handlers */
+ static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
+ {
+@@ -1569,8 +1595,8 @@ static int arm_smmu_atc_inv_master(struct arm_smmu_master *master)
+ 
+ 	arm_smmu_atc_inv_to_cmd(0, 0, 0, &cmd);
+ 
+-	for (i = 0; i < master->num_sids; i++) {
+-		cmd.atc.sid = master->sids[i];
++	for (i = 0; i < master->num_streams; i++) {
++		cmd.atc.sid = master->streams[i].id;
+ 		arm_smmu_cmdq_issue_cmd(master->smmu, &cmd);
+ 	}
+ 
+@@ -1613,8 +1639,8 @@ static int arm_smmu_atc_inv_domain(struct arm_smmu_domain *smmu_domain,
+ 		if (!master->ats_enabled)
+ 			continue;
+ 
+-		for (i = 0; i < master->num_sids; i++) {
+-			cmd.atc.sid = master->sids[i];
++		for (i = 0; i < master->num_streams; i++) {
++			cmd.atc.sid = master->streams[i].id;
+ 			arm_smmu_cmdq_batch_add(smmu_domain->smmu, &cmds, &cmd);
+ 		}
+ 	}
+@@ -2027,13 +2053,13 @@ static void arm_smmu_install_ste_for_dev(struct arm_smmu_master *master)
+ 	int i, j;
+ 	struct arm_smmu_device *smmu = master->smmu;
+ 
+-	for (i = 0; i < master->num_sids; ++i) {
+-		u32 sid = master->sids[i];
++	for (i = 0; i < master->num_streams; ++i) {
++		u32 sid = master->streams[i].id;
+ 		__le64 *step = arm_smmu_get_step_for_sid(smmu, sid);
+ 
+ 		/* Bridged PCI devices may end up with duplicated IDs */
+ 		for (j = 0; j < i; j++)
+-			if (master->sids[j] == sid)
++			if (master->streams[j].id == sid)
+ 				break;
+ 		if (j < i)
+ 			continue;
+@@ -2306,11 +2332,101 @@ static bool arm_smmu_sid_in_range(struct arm_smmu_device *smmu, u32 sid)
+ 	return sid < limit;
+ }
+ 
++static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
++				  struct arm_smmu_master *master)
 +{
-+	if (unlikely(!domain->ops->unbind_guest_msi))
++	int i;
++	int ret = 0;
++	struct arm_smmu_stream *new_stream, *cur_stream;
++	struct rb_node **new_node, *parent_node = NULL;
++	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
++
++	master->streams = kcalloc(fwspec->num_ids,
++				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
++	if (!master->streams)
++		return -ENOMEM;
++	master->num_streams = fwspec->num_ids;
++
++	mutex_lock(&smmu->streams_mutex);
++	for (i = 0; i < fwspec->num_ids && !ret; i++) {
++		u32 sid = fwspec->ids[i];
++
++		new_stream = &master->streams[i];
++		new_stream->id = sid;
++		new_stream->master = master;
++
++		/*
++		 * Check the SIDs are in range of the SMMU and our stream table
++		 */
++		if (!arm_smmu_sid_in_range(smmu, sid)) {
++			ret = -ERANGE;
++			break;
++		}
++
++		/* Ensure l2 strtab is initialised */
++		if (smmu->features & ARM_SMMU_FEAT_2_LVL_STRTAB) {
++			ret = arm_smmu_init_l2_strtab(smmu, sid);
++			if (ret)
++				break;
++		}
++
++		/* Insert into SID tree */
++		new_node = &(smmu->streams.rb_node);
++		while (*new_node) {
++			cur_stream = rb_entry(*new_node, struct arm_smmu_stream,
++					      node);
++			parent_node = *new_node;
++			if (cur_stream->id > new_stream->id) {
++				new_node = &((*new_node)->rb_left);
++			} else if (cur_stream->id < new_stream->id) {
++				new_node = &((*new_node)->rb_right);
++			} else {
++				dev_warn(master->dev,
++					 "stream %u already in tree\n",
++					 cur_stream->id);
++				ret = -EINVAL;
++				break;
++			}
++		}
++
++		if (!ret) {
++			rb_link_node(&new_stream->node, parent_node, new_node);
++			rb_insert_color(&new_stream->node, &smmu->streams);
++		}
++	}
++
++	if (ret) {
++		for (; i > 0; i--)
++			rb_erase(&master->streams[i].node, &smmu->streams);
++		kfree(master->streams);
++	}
++	mutex_unlock(&smmu->streams_mutex);
++
++	return ret;
++}
++
++static void arm_smmu_remove_master(struct arm_smmu_master *master)
++{
++	int i;
++	struct arm_smmu_device *smmu = master->smmu;
++	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
++
++	if (!smmu || !master->streams)
 +		return;
 +
-+	domain->ops->unbind_guest_msi(domain, iova);
++	mutex_lock(&smmu->streams_mutex);
++	for (i = 0; i < fwspec->num_ids; i++)
++		rb_erase(&master->streams[i].node, &smmu->streams);
++	mutex_unlock(&smmu->streams_mutex);
++
++	kfree(master->streams);
 +}
-+EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
 +
- void iommu_detach_device(struct iommu_domain *domain, struct device *dev)
- {
- 	struct iommu_group *group;
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 464fcbecf841..35819bff03bc 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -225,6 +225,8 @@ struct iommu_iotlb_gather {
-  * @sva_unbind_gpasid: unbind guest pasid and mm
-  * @attach_pasid_table: attach a pasid table
-  * @detach_pasid_table: detach the pasid table
-+ * @bind_guest_msi: provides a stage1 giova/gpa MSI doorbell mapping
-+ * @unbind_guest_msi: withdraw a stage1 giova/gpa MSI doorbell mapping
-  * @def_domain_type: device default domain type, return value:
-  *		- IOMMU_DOMAIN_IDENTITY: must use an identity domain
-  *		- IOMMU_DOMAIN_DMA: must use a dma domain
-@@ -305,6 +307,10 @@ struct iommu_ops {
+ static struct iommu_ops arm_smmu_ops;
  
- 	int (*def_domain_type)(struct device *dev);
- 
-+	int (*bind_guest_msi)(struct iommu_domain *domain,
-+			      dma_addr_t giova, phys_addr_t gpa, size_t size);
-+	void (*unbind_guest_msi)(struct iommu_domain *domain, dma_addr_t giova);
-+
- 	unsigned long pgsize_bitmap;
- 	struct module *owner;
- };
-@@ -444,6 +450,10 @@ extern int iommu_attach_pasid_table(struct iommu_domain *domain,
- extern int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
- 					 void __user *udata);
- extern void iommu_detach_pasid_table(struct iommu_domain *domain);
-+extern int iommu_bind_guest_msi(struct iommu_domain *domain,
-+				dma_addr_t giova, phys_addr_t gpa, size_t size);
-+extern void iommu_unbind_guest_msi(struct iommu_domain *domain,
-+				   dma_addr_t giova);
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-@@ -1087,6 +1097,16 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
+ static struct iommu_device *arm_smmu_probe_device(struct device *dev)
  {
- 	return NULL;
+-	int i, ret;
++	int ret;
+ 	struct arm_smmu_device *smmu;
+ 	struct arm_smmu_master *master;
+ 	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(dev);
+@@ -2331,27 +2447,12 @@ static struct iommu_device *arm_smmu_probe_device(struct device *dev)
+ 
+ 	master->dev = dev;
+ 	master->smmu = smmu;
+-	master->sids = fwspec->ids;
+-	master->num_sids = fwspec->num_ids;
+ 	INIT_LIST_HEAD(&master->bonds);
+ 	dev_iommu_priv_set(dev, master);
+ 
+-	/* Check the SIDs are in range of the SMMU and our stream table */
+-	for (i = 0; i < master->num_sids; i++) {
+-		u32 sid = master->sids[i];
+-
+-		if (!arm_smmu_sid_in_range(smmu, sid)) {
+-			ret = -ERANGE;
+-			goto err_free_master;
+-		}
+-
+-		/* Ensure l2 strtab is initialised */
+-		if (smmu->features & ARM_SMMU_FEAT_2_LVL_STRTAB) {
+-			ret = arm_smmu_init_l2_strtab(smmu, sid);
+-			if (ret)
+-				goto err_free_master;
+-		}
+-	}
++	ret = arm_smmu_insert_master(smmu, master);
++	if (ret)
++		goto err_free_master;
+ 
+ 	master->ssid_bits = min(smmu->ssid_bits, fwspec->num_pasid_bits);
+ 
+@@ -2389,6 +2490,7 @@ static void arm_smmu_release_device(struct device *dev)
+ 	WARN_ON(arm_smmu_master_sva_enabled(master));
+ 	arm_smmu_detach_dev(master);
+ 	arm_smmu_disable_pasid(master);
++	arm_smmu_remove_master(master);
+ 	kfree(master);
+ 	iommu_fwspec_free(dev);
  }
-+
-+static inline
-+int iommu_bind_guest_msi(struct iommu_domain *domain,
-+			 dma_addr_t giova, phys_addr_t gpa, size_t size)
-+{
-+	return -ENODEV;
-+}
-+static inline
-+void iommu_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova) {}
-+
- #endif /* CONFIG_IOMMU_API */
+@@ -2808,6 +2910,9 @@ static int arm_smmu_init_structures(struct arm_smmu_device *smmu)
+ {
+ 	int ret;
  
- /**
++	mutex_init(&smmu->streams_mutex);
++	smmu->streams = RB_ROOT;
++
+ 	ret = arm_smmu_init_queues(smmu);
+ 	if (ret)
+ 		return ret;
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+index d4b7f40ccb02..19196eea7c1d 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+@@ -636,6 +636,15 @@ struct arm_smmu_device {
+ 
+ 	/* IOMMU core code handle */
+ 	struct iommu_device		iommu;
++
++	struct rb_root			streams;
++	struct mutex			streams_mutex;
++};
++
++struct arm_smmu_stream {
++	u32				id;
++	struct arm_smmu_master		*master;
++	struct rb_node			node;
+ };
+ 
+ /* SMMU private data for each master */
+@@ -644,8 +653,8 @@ struct arm_smmu_master {
+ 	struct device			*dev;
+ 	struct arm_smmu_domain		*domain;
+ 	struct list_head		domain_head;
+-	u32				*sids;
+-	unsigned int			num_sids;
++	struct arm_smmu_stream		*streams;
++	unsigned int			num_streams;
+ 	bool				ats_enabled;
+ 	bool				sva_enabled;
+ 	struct list_head		bonds;
 -- 
 2.21.3
 
