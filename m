@@ -2,86 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA1A92B8097
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 16:33:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8A7E2B818E
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 17:16:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727423AbgKRPbz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 10:31:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48674 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726502AbgKRPby (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Nov 2020 10:31:54 -0500
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2690C0613D6
-        for <kvm@vger.kernel.org>; Wed, 18 Nov 2020 07:31:54 -0800 (PST)
-Received: by mail-ed1-x542.google.com with SMTP id ay21so2451761edb.2
-        for <kvm@vger.kernel.org>; Wed, 18 Nov 2020 07:31:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FwP65fTRBjJQOZTuLRa465u12tCsPFehRRoZ9l9M4Ak=;
-        b=NlgRJL/Cae3P8zfPrpG7Ys7H2L1c/bhLjHaY1tJqTVN/HIcCl137mJ+M7tjQii7HSz
-         7/13IqpUAed32nJyOyu8h6fm6e1cLJBaAAwr3klfcwyh2PK4acgPm4HAQWbR1q04IJrY
-         XHUPbx033YZzTDMBGvQD2bMVv/B0ckiTJDFWjK21/rcc0Flp3uWD5+1UWR8rQo5JQzDM
-         aKWFjTO88c3aIVkHqGQgSdigM9WqRWBl35taQkNEqj4gxaXRPAJA/+uNrwaJkA/MozNx
-         szHOKXFVo0sUYe++Q62xVTGCkMfqn97t7yyAg6hW+jNHexWjL2uPVngJEOjjv9a3yzq1
-         AyHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FwP65fTRBjJQOZTuLRa465u12tCsPFehRRoZ9l9M4Ak=;
-        b=lsnDPXyExUslAMcxp1Hx+OWBhKQyB1QPNQrH3kZ2i1hoPHpRAkAyhbAj0MxNjwJm9y
-         vdX//Cye82fF6I7zJU+27zklDhJw9qhv8GafPU3Ij3Htigwm+8lF145n997bRQWk+GJi
-         H6YJYwYWGDr2H+VyCl9AekmfRNDjezdfD4MnfBsQ87YQPZgDwbqbtfO+y7dpfJwXONhU
-         KP7fECivhHM0iBGF3XAfnZRoLKfzM90z/NEBjEgKhDKvsSGM7sxu20nZJVZ3vM2Ov//p
-         o6pO3aodvd6hJp5j/uR/fkH+Xng+nEGBpHKQAnFQFXfXaQ3H2JHUMFWEw9rtbiAqSqt5
-         wDuA==
-X-Gm-Message-State: AOAM532HRN9H0707x7D4PEMHq5Gj2AhqPqSla6H5br3dWELYm3Ukb8k/
-        hTD+UiSSdsM8CqXolQjuU40=
-X-Google-Smtp-Source: ABdhPJw6ucG29s9FXIqAGWTrU8gli8mtYZvzOjyI+qbTm0g2sBMjhDFe/vm8hQe+/EpnaWRe7LFt7w==
-X-Received: by 2002:aa7:cdd9:: with SMTP id h25mr26649646edw.294.1605713513399;
-        Wed, 18 Nov 2020 07:31:53 -0800 (PST)
-Received: from lb01399.pb.local (p200300ca573cea22894fd6f5c6d10f88.dip0.t-ipconnect.de. [2003:ca:573c:ea22:894f:d6f5:c6d1:f88])
-        by smtp.gmail.com with ESMTPSA id k12sm13150456ejz.48.2020.11.18.07.31.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2020 07:31:52 -0800 (PST)
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, pankaj.gupta.linux@gmail.com,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Subject: [RESEND kvm-unit-tests PATCH] x86: remove extra includes
-Date:   Wed, 18 Nov 2020 16:31:47 +0100
-Message-Id: <20201118153147.8069-1-pankaj.gupta.linux@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        id S1726416AbgKRQPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Nov 2020 11:15:22 -0500
+Received: from mga02.intel.com ([134.134.136.20]:12838 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726039AbgKRQPW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Nov 2020 11:15:22 -0500
+IronPort-SDR: BYC0+XFW+tVL1gVtVuyE+TOIGbFCa04FYU4WFDykUg1gbOo4k+SsC3dm5b1Q4cCitu4RI5bFij
+ Opnf3jQWtX0g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9808"; a="158173552"
+X-IronPort-AV: E=Sophos;i="5.77,486,1596524400"; 
+   d="scan'208";a="158173552"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2020 08:15:19 -0800
+IronPort-SDR: KXXwI6zttn0bm+t5tKedpWUNYCmo50FeuvjTm8URD5vp07OlxH3tgEOezC1rIlKY0yExugHu0J
+ z+qEsuFpLk9Q==
+X-IronPort-AV: E=Sophos;i="5.77,486,1596524400"; 
+   d="scan'208";a="476411969"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.255.28.176]) ([10.255.28.176])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2020 08:15:12 -0800
+Subject: Re: [PATCH v2 04/17] perf: x86/ds: Handle guest PEBS overflow PMI and
+ inject it to guest
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
+        Thomas Gleixner <tglx@linutronix.de>, wei.w.wang@intel.com,
+        Tony Luck <tony.luck@intel.com>,
+        Stephane Eranian <eranian@google.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        linux-kernel@vger.kernel.org
+References: <20201109021254.79755-1-like.xu@linux.intel.com>
+ <20201109021254.79755-5-like.xu@linux.intel.com>
+ <20201117143529.GJ3121406@hirez.programming.kicks-ass.net>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <b2c3f889-44dd-cadb-f225-a4c5db3a4447@linux.intel.com>
+Date:   Thu, 19 Nov 2020 00:15:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201117143529.GJ3121406@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Hi Peter,
 
-Remove extra includes.
+On 2020/11/17 22:35, Peter Zijlstra wrote:
+> On Mon, Nov 09, 2020 at 10:12:41AM +0800, Like Xu wrote:
+>> With PEBS virtualization, the PEBS records get delivered to the guest,
+>> and host still sees the PEBS overflow PMI from guest PEBS counters.
+>> This would normally result in a spurious host PMI and we needs to inject
+>> that PEBS overflow PMI into the guest, so that the guest PMI handler
+>> can handle the PEBS records.
+>>
+>> Check for this case in the host perf PEBS handler. If a PEBS overflow
+>> PMI occurs and it's not generated from host side (via check host DS),
+>> a fake event will be triggered. The fake event causes the KVM PMI callback
+>> to be called, thereby injecting the PEBS overflow PMI into the guest.
+>>
+>> No matter how many guest PEBS counters are overflowed, only triggering
+>> one fake event is enough. The guest PEBS handler would retrieve the
+>> correct information from its own PEBS records buffer.
+>>
+>> If the counter_freezing is disabled on the host, a guest PEBS overflow
+>> PMI would be missed when a PEBS counter is enabled on the host side
+>> and coincidentally a host PEBS overflow PMI based on host DS_AREA is
+>> also triggered right after vm-exit due to the guest PEBS overflow PMI
+>> based on guest DS_AREA. In that case, KVM will disable guest PEBS before
+>> vm-entry once there's a host PEBS counter enabled on the same CPU.
+> 
+> How does this guest DS crud work? DS_AREA is a host virtual address;
 
-Signed-off-by: Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
----
- x86/vmexit.c | 2 --
- 1 file changed, 2 deletions(-)
+A host counter will be scheduled (maybe cross-mapped) for a guest PEBS 
+counter (via guest PEBS event), and its enable bits (PEBS_ENABLE + EN
++ GLOBAL_CTRL) will be set according to guest's values right before the
+vcpu entry (via atomic_switch_perf_msrs).
 
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 47efb63..999babf 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -1,7 +1,5 @@
- #include "libcflat.h"
- #include "smp.h"
--#include "processor.h"
--#include "atomic.h"
- #include "pci.h"
- #include "x86/vm.h"
- #include "x86/desc.h"
--- 
-2.20.1
+The guest PEBS record(s) will be written to the guest DS buffer referenced
+by the guest DS_AREA msr, which is switched during the vmx transaction,
+and it is the guest virtual address.
+
+> ISTR there was lots of fail trying to virtualize it earlier. What's
+> changed? There's 0 clues here.
+
+Ah, now we have EPT-friendly PEBS facilities supported since Ice Lake
+which makes guest PEBS feature possible w/o guest memory pinned.
+
+> 
+> Why are the host and guest DS area separate, why can't we map them to
+> the exact same physical pages?
+
+If we map both guest and host DS_AREA to the exact same physical pages,
+- the guest can access the host PEBS records, which means that the host
+IP maybe leaked, because we cannot predict the time guest drains records 
+and it would be over-designed to clean it up before each vm-entry;
+- different tasks/vcpus on the same pcpu cannot share the same PEBS DS
+settings from the same physical page. For example, some require large
+PEBS and reset values, while others do not.
+
+Like many guest msrs, we use the separate guest DS_AREA for the guest's
+own use and it avoids mutual interference as little as possible.
+
+Thanks,
+Like Xu
 
