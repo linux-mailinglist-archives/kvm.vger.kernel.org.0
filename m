@@ -2,148 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4BE72B7A02
-	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:10:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF0372B7A0B
+	for <lists+kvm@lfdr.de>; Wed, 18 Nov 2020 10:11:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726439AbgKRJGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Nov 2020 04:06:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56114 "EHLO
+        id S1727123AbgKRJI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Nov 2020 04:08:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48937 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726020AbgKRJGE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:06:04 -0500
+        by vger.kernel.org with ESMTP id S1726704AbgKRJI6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Nov 2020 04:08:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605690362;
+        s=mimecast20190719; t=1605690537;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bfD81G5k2RGUWTORVxjv0Pn8YZ66RScRNGh2o/JvkBM=;
-        b=f/gSSKsHTm1div10NjB6bwFsKQnQYs+qZ7LbvJvTkGrNsaN9NUXIE3l4EMVb7sqz7HWMGs
-        kg8iGzyAQNODMVFR3x5tb/tGEU428qo1kFjrrwK507aUDTb1uQ6x5kVg4UYaoh/2CoFqFi
-        vNBlQV5KD4EePNzls8l0zWIQnQfqSqQ=
+        bh=u/gI6BS3S0KJAFUksfrY6Aa72D718BGlTqb+EtNbwoM=;
+        b=CfcKrblSsZfTUtfZ49x+ypb/6t2C7APUkkSHFIZCTT0UTLBPGQJ7VWvjVYDC9XuMC4LOxV
+        IwYBN+KdO0bXvLJ6ysjzAI+1eKCbtSL3AvUqwWXNqtjXhC0RYPaJB57AOLIBv4WOfLxwri
+        u1OKg7v8tFq3YKppnqocFQq3fgKDXwA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-o0duU4yMPvWRojSpYK5sTg-1; Wed, 18 Nov 2020 04:06:00 -0500
-X-MC-Unique: o0duU4yMPvWRojSpYK5sTg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-595-k4rFzZbGPoyRDpHUnF8vfw-1; Wed, 18 Nov 2020 04:08:53 -0500
+X-MC-Unique: k4rFzZbGPoyRDpHUnF8vfw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADCBA8030B4;
-        Wed, 18 Nov 2020 09:05:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 403696D241;
+        Wed, 18 Nov 2020 09:08:52 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.150])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D1095D9CA;
-        Wed, 18 Nov 2020 09:05:54 +0000 (UTC)
-Date:   Wed, 18 Nov 2020 10:05:51 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 881A619647;
+        Wed, 18 Nov 2020 09:08:47 +0000 (UTC)
+Date:   Wed, 18 Nov 2020 10:08:44 +0100
 From:   Andrew Jones <drjones@redhat.com>
 To:     Peter Xu <peterx@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         borntraeger@de.ibm.com, frankja@linux.ibm.com, bgardon@google.com
 Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
-Message-ID: <20201118090551.5g5mj7pudfu72cut@kamzik.brq.redhat.com>
+Message-ID: <20201118090844.jsmmvwnsh56oh5fq@kamzik.brq.redhat.com>
 References: <20201116121942.55031-1-drjones@redhat.com>
  <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
  <20201116184011.GB19950@xz-x1>
  <20201118083831.jygosjdwhbk5dj66@kamzik.brq.redhat.com>
+ <20201118090551.5g5mj7pudfu72cut@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201118083831.jygosjdwhbk5dj66@kamzik.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201118090551.5g5mj7pudfu72cut@kamzik.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 18, 2020 at 09:38:31AM +0100, Andrew Jones wrote:
-> On Mon, Nov 16, 2020 at 01:40:11PM -0500, Peter Xu wrote:
-> > On Mon, Nov 16, 2020 at 07:16:50PM +0100, Paolo Bonzini wrote:
-> > > On 16/11/20 13:19, Andrew Jones wrote:
-> > > > This series attempts to clean up demand_paging_test, dirty_log_perf_test,
-> > > > and dirty_log_test by factoring out common code, creating some new API
-> > > > along the way. It also splits include/perf_test_util.h into a more
-> > > > conventional header and source pair.
+On Wed, Nov 18, 2020 at 10:05:59AM +0100, Andrew Jones wrote:
+> On Wed, Nov 18, 2020 at 09:38:31AM +0100, Andrew Jones wrote:
+> > On Mon, Nov 16, 2020 at 01:40:11PM -0500, Peter Xu wrote:
+> > > On Mon, Nov 16, 2020 at 07:16:50PM +0100, Paolo Bonzini wrote:
+> > > > On 16/11/20 13:19, Andrew Jones wrote:
+> > > > > This series attempts to clean up demand_paging_test, dirty_log_perf_test,
+> > > > > and dirty_log_test by factoring out common code, creating some new API
+> > > > > along the way. It also splits include/perf_test_util.h into a more
+> > > > > conventional header and source pair.
+> > > > > 
+> > > > > I've tested on x86 and AArch64 (one config each), but not s390x.
+> > > > > 
+> > > > > v3:
+> > > > >   - Rebased remaining four patches from v2 onto kvm/queue
+> > > > >   - Picked up r-b's from Peter and Ben
+> > > > > 
+> > > > > v2: https://www.spinics.net/lists/kvm/msg228711.html
 > > > > 
-> > > > I've tested on x86 and AArch64 (one config each), but not s390x.
+> > > > Unfortunately patch 2 is still broken:
 > > > > 
-> > > > v3:
-> > > >   - Rebased remaining four patches from v2 onto kvm/queue
-> > > >   - Picked up r-b's from Peter and Ben
+> > > > $ ./dirty_log_test -M dirty-ring
+> > > > Setting log mode to: 'dirty-ring'
+> > > > Test iterations: 32, interval: 10 (ms)
+> > > > Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+> > > > ==== Test Assertion Failure ====
+> > > >   lib/kvm_util.c:85: ret == 0
+> > > >   pid=2010122 tid=2010122 - Invalid argument
+> > > >      1	0x0000000000402ee7: vm_enable_cap at kvm_util.c:84
+> > > >      2	0x0000000000403004: vm_enable_dirty_ring at kvm_util.c:124
+> > > >      3	0x00000000004021a5: log_mode_create_vm_done at dirty_log_test.c:453
+> > > >      4	 (inlined by) run_test at dirty_log_test.c:683
+> > > >      5	0x000000000040b643: for_each_guest_mode at guest_modes.c:37
+> > > >      6	0x00000000004019c2: main at dirty_log_test.c:864
+> > > >      7	0x00007fe3f48207b2: ?? ??:0
+> > > >      8	0x0000000000401aad: _start at ??:?
+> > > >   KVM_ENABLE_CAP IOCTL failed,
+> > > >   rc: -1 errno: 22
 > > > > 
-> > > > v2: https://www.spinics.net/lists/kvm/msg228711.html
+> > > > (Also fails without -M).
 > > > 
-> > > Unfortunately patch 2 is still broken:
+> > > It should be because of the ordering of creating vcpu and enabling dirty rings,
+> > > since currently for simplicity when enabling dirty ring we must have not
+> > > created any vcpus:
 > > > 
-> > > $ ./dirty_log_test -M dirty-ring
-> > > Setting log mode to: 'dirty-ring'
-> > > Test iterations: 32, interval: 10 (ms)
-> > > Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> > > ==== Test Assertion Failure ====
-> > >   lib/kvm_util.c:85: ret == 0
-> > >   pid=2010122 tid=2010122 - Invalid argument
-> > >      1	0x0000000000402ee7: vm_enable_cap at kvm_util.c:84
-> > >      2	0x0000000000403004: vm_enable_dirty_ring at kvm_util.c:124
-> > >      3	0x00000000004021a5: log_mode_create_vm_done at dirty_log_test.c:453
-> > >      4	 (inlined by) run_test at dirty_log_test.c:683
-> > >      5	0x000000000040b643: for_each_guest_mode at guest_modes.c:37
-> > >      6	0x00000000004019c2: main at dirty_log_test.c:864
-> > >      7	0x00007fe3f48207b2: ?? ??:0
-> > >      8	0x0000000000401aad: _start at ??:?
-> > >   KVM_ENABLE_CAP IOCTL failed,
-> > >   rc: -1 errno: 22
+> > > +       if (kvm->created_vcpus) {
+> > > +               /* We don't allow to change this value after vcpu created */
+> > > +               r = -EINVAL;
+> > > +       } else {
+> > > +               kvm->dirty_ring_size = size;
+> > > +               r = 0;
+> > > +       }
 > > > 
-> > > (Also fails without -M).
+> > > We may need to call log_mode_create_vm_done() before creating any vcpus
+> > > somehow.  Sorry to not have noticed that when reviewing it.
+> > >
 > > 
-> > It should be because of the ordering of creating vcpu and enabling dirty rings,
-> > since currently for simplicity when enabling dirty ring we must have not
-> > created any vcpus:
+> > And sorry for having not tested with '-M dirty-ring'. I thought we were
+> > trying to ensure each unique test type had its own test file (even if we
+> > have to do the weird inclusion of C files). Doing that, the command line
+> > options are then only used to change stuff like verbosity or to experiment
+> > with tweaked configurations.
 > > 
-> > +       if (kvm->created_vcpus) {
-> > +               /* We don't allow to change this value after vcpu created */
-> > +               r = -EINVAL;
-> > +       } else {
-> > +               kvm->dirty_ring_size = size;
-> > +               r = 0;
-> > +       }
-> > 
-> > We may need to call log_mode_create_vm_done() before creating any vcpus
-> > somehow.  Sorry to not have noticed that when reviewing it.
+> > If we're not doing that, then I think we should. We don't want to try and
+> > explain to all the CI people how each test should be run. It's much easier
+> > to say "run all the binaries, no parameters necessary". Each binary with
+> > no parameters should run the test(s) using a good default or by executing
+> > all possible configurations.
 > >
 > 
-> And sorry for having not tested with '-M dirty-ring'. I thought we were
-> trying to ensure each unique test type had its own test file (even if we
-> have to do the weird inclusion of C files). Doing that, the command line
-> options are then only used to change stuff like verbosity or to experiment
-> with tweaked configurations.
+> I just double checked and we are running all modes by default. This is
+> the output I get
 > 
-> If we're not doing that, then I think we should. We don't want to try and
-> explain to all the CI people how each test should be run. It's much easier
-> to say "run all the binaries, no parameters necessary". Each binary with
-> no parameters should run the test(s) using a good default or by executing
-> all possible configurations.
+> Test iterations: 32, interval: 10 (ms)
+> Testing Log Mode 'dirty-log'
+> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+> guest physical test memory offset: 0x7fbfffc000
+> Dirtied 1024 pages
+> Total bits checked: dirty (209373), clear (7917184), track_next (38548)
+> Testing Log Mode 'clear-log'
+> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+> guest physical test memory offset: 0x7fbfffc000
+> Dirtied 1024 pages
+> Total bits checked: dirty (464547), clear (7662010), track_next (37553)
+> Testing Log Mode 'dirty-ring'
+> Log mode 'dirty-ring' not supported, skipping test
+> 
+> which matches the output before this patch, except for minor differences
+> in the numbers.
+> 
+> I'm not sure how this is failing in your environment and not mine.
 >
 
-I just double checked and we are running all modes by default. This is
-the output I get
+Doh, sorry. I didn't actually read the output. I was only looking for an
+assert and the string 'dirty-ring'. It looks like the test is skipping
+for me. That would explain why it "works" for me...
 
-Test iterations: 32, interval: 10 (ms)
-Testing Log Mode 'dirty-log'
-Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-guest physical test memory offset: 0x7fbfffc000
-Dirtied 1024 pages
-Total bits checked: dirty (209373), clear (7917184), track_next (38548)
-Testing Log Mode 'clear-log'
-Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-guest physical test memory offset: 0x7fbfffc000
-Dirtied 1024 pages
-Total bits checked: dirty (464547), clear (7662010), track_next (37553)
-Testing Log Mode 'dirty-ring'
-Log mode 'dirty-ring' not supported, skipping test
-
-which matches the output before this patch, except for minor differences
-in the numbers.
-
-I'm not sure how this is failing in your environment and not mine.
-
-Peter?
-
-Thanks,
-drew
+drew 
 
