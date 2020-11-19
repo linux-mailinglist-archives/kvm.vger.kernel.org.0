@@ -2,145 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 272FE2B99AD
-	for <lists+kvm@lfdr.de>; Thu, 19 Nov 2020 18:44:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78B002B9A73
+	for <lists+kvm@lfdr.de>; Thu, 19 Nov 2020 19:15:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728945AbgKSRjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Nov 2020 12:39:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43330 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729474AbgKSRiO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Nov 2020 12:38:14 -0500
-Received: from kernel.org (unknown [77.125.7.142])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 29EAB246CE;
-        Thu, 19 Nov 2020 17:38:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605807494;
-        bh=j8yoUgNPwUrAH9hWklc4JtHbyJwtdVtZfAXrNV5fMkU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MWotZzvHI///F7nXbNuhmcE23HQZ5TAHfxi5tuIfW5aKphZWo8XXUCe3ChRSAXaMu
-         wdcf27o/gc8PdtGoPAg1WYJ59h/sNaDRhEECk9lUAzchusO/CfDlzZTbWrUpOojACA
-         jzma0oyE1R2w5WYeSpqXSn/IUhBY8iEJuAZsXlrg=
-Date:   Thu, 19 Nov 2020 19:38:00 +0200
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Alexander Graf <graf@amazon.de>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jann Horn <jannh@google.com>, Willy Tarreau <w@1wt.eu>,
-        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "bonzini@gnu.org" <bonzini@gnu.org>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        "oridgar@gmail.com" <oridgar@gmail.com>,
-        "ghammer@redhat.com" <ghammer@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Linux API <linux-api@vger.kernel.org>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        "areber@redhat.com" <areber@redhat.com>,
-        Pavel Emelyanov <ovzxemul@gmail.com>,
-        Andrey Vagin <avagin@gmail.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-        "gil@azul.com" <gil@azul.com>,
-        "asmehra@redhat.com" <asmehra@redhat.com>,
-        "dgunigun@redhat.com" <dgunigun@redhat.com>,
-        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>
-Subject: Re: [PATCH v2] drivers/virt: vmgenid: add vm generation id driver
-Message-ID: <20201119173800.GD8537@kernel.org>
-References: <3E05451B-A9CD-4719-99D0-72750A304044@amazon.com>
- <300d4404-3efe-880e-ef30-692eabbff5f7@de.ibm.com>
- <da1a1fa7-a1de-d0e6-755b-dd587687765e@amazon.de>
+        id S1729291AbgKSSPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Nov 2020 13:15:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14926 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727761AbgKSSPf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Nov 2020 13:15:35 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AJI2pnq134068;
+        Thu, 19 Nov 2020 13:15:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=27GOfRCLmrOpPdwc1nWg0zzBxV0oor0zhKyOQGBMgFU=;
+ b=NO2/ozUEVxERFF5dV67w1PyQlqBz4Ms8aPvuj9IVGrUzmQCsP2RMoYkjBPDsGcV6sjaP
+ 688z1V6XvqMck+p2q8ezVE9RO0IwQQw8m/5lr9hrzYFK4DrS0syNjyyNxy31kVtjTEoe
+ LUzydpafkourCIcTiiqC56PuFHfYtUvSzrmAqEXHAFjfvguIVrZh64ilYv4/Rp4Lesqv
+ 2KsatajQte/b4f2dh4wRB13F+JNQwbguv6KB6hFRLZaoh5djcKLxY6aeQcqI5OkAstjw
+ YONyiGr+lO+V6c1g6OfRmiH6gaWCGfDZaBLgQ81pdWL6yyGt5aAg80XOSfbUmaa+bdji Fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34w4xqvmc8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Nov 2020 13:15:32 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AJI33Zv135438;
+        Thu, 19 Nov 2020 13:15:31 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34w4xqvmb6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Nov 2020 13:15:31 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AJIBxIk021543;
+        Thu, 19 Nov 2020 18:15:30 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma03wdc.us.ibm.com with ESMTP id 34t6v9g4ae-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Nov 2020 18:15:30 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AJIFLSv36241710
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Nov 2020 18:15:21 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 55C03BE04F;
+        Thu, 19 Nov 2020 18:15:27 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D3DC0BE059;
+        Thu, 19 Nov 2020 18:15:25 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.152.80])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 19 Nov 2020 18:15:25 +0000 (GMT)
+Subject: Re: [PATCH v11 07/14] s390/vfio-ap: sysfs attribute to display the
+ guest's matrix
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
+ <20201022171209.19494-8-akrowiak@linux.ibm.com>
+ <20201028091758.73aa77a3.pasic@linux.ibm.com>
+ <b96fe876-c67a-fe6c-0e3a-7b4948edeef4@linux.ibm.com>
+ <20201114001248.3b397c8c.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <d25a6810-00df-a2fc-4541-548917fdcc40@linux.ibm.com>
+Date:   Thu, 19 Nov 2020 13:15:25 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da1a1fa7-a1de-d0e6-755b-dd587687765e@amazon.de>
+In-Reply-To: <20201114001248.3b397c8c.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-19_09:2020-11-19,2020-11-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 spamscore=0 impostorscore=0 mlxscore=0 adultscore=0
+ phishscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 bulkscore=0
+ suspectscore=3 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011190125
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 19, 2020 at 01:51:18PM +0100, Alexander Graf wrote:
-> 
-> 
-> On 19.11.20 13:02, Christian Borntraeger wrote:
-> > 
-> > On 16.11.20 16:34, Catangiu, Adrian Costin wrote:
-> > > - Background
-> > > 
-> > > The VM Generation ID is a feature defined by Microsoft (paper:
-> > > http://go.microsoft.com/fwlink/?LinkId=260709) and supported by
-> > > multiple hypervisor vendors.
-> > > 
-> > > The feature is required in virtualized environments by apps that work
-> > > with local copies/caches of world-unique data such as random values,
-> > > uuids, monotonically increasing counters, etc.
-> > > Such apps can be negatively affected by VM snapshotting when the VM
-> > > is either cloned or returned to an earlier point in time.
-> > > 
-> > > The VM Generation ID is a simple concept meant to alleviate the issue
-> > > by providing a unique ID that changes each time the VM is restored
-> > > from a snapshot. The hw provided UUID value can be used to
-> > > differentiate between VMs or different generations of the same VM.
-> > > 
-> > > - Problem
-> > > 
-> > > The VM Generation ID is exposed through an ACPI device by multiple
-> > > hypervisor vendors but neither the vendors or upstream Linux have no
-> > > default driver for it leaving users to fend for themselves.
-> > 
-> > I see that the qemu implementation is still under discussion. What is
-> 
-> Uh, the ACPI Vmgenid device emulation is in QEMU since 2.9.0 :).
-> 
-> > the status of the other existing implementations. Do they already exist?
-> > In other words is ACPI a given?
-> > I think the majority of this driver could be used with just a different
-> > backend for platforms without ACPI so in any case we could factor out
-> > the backend (acpi, virtio, whatever) but if we are open we could maybe
-> > start with something else.
-> 
-> I agree 100%. I don't think we really need a new framework in the kernel for
-> that. We can just have for example an s390x specific driver that also
-> provides the same notification mechanism through a device node that is also
-> named "/dev/vmgenid", no?
-> 
-> Or alternatively we can split the generic part of this driver as soon as a
-> second one comes along and then have both driver include that generic logic.
-> 
-> The only piece where I'm unsure is how this will interact with CRIU.
 
-To C/R applications that use /dev/vmgenid CRIU need to be aware of it.
-Checkpointing and restoring withing the same "VM generation" shouldn't be
-a problem, but IMHO, making restore work after genid bump could be
-challenging.
 
-Alex, what scenario involving CRIU did you have in mind?
+On 11/13/20 6:12 PM, Halil Pasic wrote:
+> On Fri, 13 Nov 2020 12:27:32 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>>
+>> On 10/28/20 4:17 AM, Halil Pasic wrote:
+>>> On Thu, 22 Oct 2020 13:12:02 -0400
+>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>>
+>>>> +static ssize_t guest_matrix_show(struct device *dev,
+>>>> +				 struct device_attribute *attr, char *buf)
+>>>> +{
+>>>> +	ssize_t nchars;
+>>>> +	struct mdev_device *mdev = mdev_from_dev(dev);
+>>>> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>>> +
+>>>> +	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
+>>>> +		return -ENODEV;
+>>> I'm wondering, would it make sense to have guest_matrix display the would
+>>> be guest matrix when we don't have a KVM? With the filtering in
+>>> place, the question in what guest_matrix would my (assign) matrix result
+>>> right now if I were to hook up my vfio_ap_mdev to a guest seems a
+>>> legitimate one.
+>> A couple of thoughts here:
+>> * The ENODEV informs the user that there is no guest running
+>>      which makes sense to me given this interface displays the
+>>      guest matrix. The alternative, which I considered, was to
+>>      display an empty matrix (i.e., nothing).
+>> * This would be a pretty drastic change to the design because
+>>      the shadow_apcb - which is what is displayed via this interface - is
+>>      only updated when the guest is started and while it is running (i.e.,
+>>      hot plug of new adapters/domains). Making this change would
+>>      require changing that entire design concept which I am reluctant
+>>      to do at this point in the game.
+>>
+>>
+> No problem. My thinking was, that, because we can do the
+> assign/unassing ops also for the running guest, that we also have
+> the code to do the maintenance on the shadow_apcb. In this
+> series this code is conditional with respect to vfio_ap_mdev_has_crycb().
+> E.g.
+>
+> static ssize_t assign_adapter_store(struct device *dev,
+>                                      struct device_attribute *attr,
+>                                      const char *buf, size_t count)
+> {
+> [..]
+>          if (vfio_ap_mdev_has_crycb(matrix_mdev))
+>                  if (vfio_ap_mdev_filter_guest_matrix(matrix_mdev, true))
+>                          vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+>
+> If one were to move the
+> vfio_ap_mdev_has_crycb() check into vfio_ap_mdev_commit_shadow_apcb()
+> then we would have an always up to date shatdow_apcb, we could display.
+>
+> I don't feel strongly about this. Was just an idea, because if the result
+> of the filtering is surprising, currently the only to see, without
+> knowing the algorithm, and possibly the state, and the history of the
+> system, is to actually start a guest.
 
-> Can containers emulate ioctls and device nodes?
+Okay, I can buy this and will make the change.
 
-Containers do not emulate ioctls but they can have /dev/vmgenid inside
-the container, so applications can use it the same way as outside the
-container.
+>
+> Regards,
+> Halil
+>
 
- 
-> Alex
-
--- 
-Sincerely yours,
-Mike.
