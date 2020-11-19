@@ -2,59 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE98E2B94F1
-	for <lists+kvm@lfdr.de>; Thu, 19 Nov 2020 15:41:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BE0A2B94F2
+	for <lists+kvm@lfdr.de>; Thu, 19 Nov 2020 15:42:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728044AbgKSOlz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Nov 2020 09:41:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37382 "EHLO
+        id S1728210AbgKSOl6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Nov 2020 09:41:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727074AbgKSOly (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Nov 2020 09:41:54 -0500
+        with ESMTP id S1727214AbgKSOl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Nov 2020 09:41:57 -0500
 Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDF98C0613D4
-        for <kvm@vger.kernel.org>; Thu, 19 Nov 2020 06:41:53 -0800 (PST)
-Received: by mail-wr1-x444.google.com with SMTP id 23so6668363wrc.8
-        for <kvm@vger.kernel.org>; Thu, 19 Nov 2020 06:41:53 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59031C061A49
+        for <kvm@vger.kernel.org>; Thu, 19 Nov 2020 06:41:55 -0800 (PST)
+Received: by mail-wr1-x444.google.com with SMTP id s8so6650764wrw.10
+        for <kvm@vger.kernel.org>; Thu, 19 Nov 2020 06:41:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ffwll.ch; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0+QV0eroCOghP6iF2qF6VQojb/qmwXTdLdxbXgSm38Q=;
-        b=QsUGwdzetI9prZKoeP2iAhcymfOD+I5vw5uQlsYPHXPJ6OfnoBMufDTFzZUJjNMLZ9
-         Yxrnkb3r0QOgb8tbJN+frKR3E7076su7FmADL1RedADyOMYsxHMJ1LuezxqfJ+4zvmNr
-         w6i7QaH+qoovsm/gkgX6mzTZtHLEyBkDPfyDk=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Fht1x4F+T6VzCgf1NaDBhBKtnXLiUuYYVlRneo30QNs=;
+        b=DXhtVpSOWcpXdJK21rs4Fp0d4l9+i/Ct+0QiVH10n6yOR0X9JUB+xG9QSShL8w70GM
+         mZMkMLfElwUq/INcoJ86TlvtNHxIwENjs79UhOpfl/9mHTexirmlYytroBBaZSYJMZwS
+         jKkzeL8RzGYzXxoAeA9jzB4tQ6PU2bVwzvvOo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0+QV0eroCOghP6iF2qF6VQojb/qmwXTdLdxbXgSm38Q=;
-        b=Gl5rU5oF0b4i87FT2nJi3yWf6N5ZsFDuZ14kjD1dx7GQWWavPANZE8qdz/uclSxpfM
-         Xp+GxC7d7RurfJOdcsBbS+fz6ib4oE7zMB3lxflznezJ8fbjvzJLSI4NqGxkARv3EGXa
-         h2NPhf0HyktlMgHlMhCbB+Tiry7+u1Kg/Wd8c4lDhalq6YoBoLdrS9yjEn9M9RggYtya
-         wMQouNL/Ne8EuKpnGqPOxhVDUTAUsfhj8LY2cB7MBDa25cHwKLe+s1orrADmEOhjZpH9
-         rMF0+o4gkyrq7gpS06ZjKbj0qNRuNMCmP/AveSQm8i5Ag4Tig+/mNSWHWU0rynzy5PRZ
-         mN5g==
-X-Gm-Message-State: AOAM533EkiE9PFs7Yh1BxOKxYfM5Fe9akbNffoSFffT0+jTi4jynYr+d
-        uJJ/Fug401g9ppVman9fQFpPcQ==
-X-Google-Smtp-Source: ABdhPJwEr0+MWxW25HcjQdBlrf+fNcxCL3BoIHGbwL4k+zwCdrQxRdMboyjz6DNXtMlDrKrjaCEFzw==
-X-Received: by 2002:a5d:4947:: with SMTP id r7mr9987226wrs.50.1605796912703;
-        Thu, 19 Nov 2020 06:41:52 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Fht1x4F+T6VzCgf1NaDBhBKtnXLiUuYYVlRneo30QNs=;
+        b=HVzFIyibhb2eiAuEiSLWHAoxDWORUstXtB229Ha5c1PyW0gDm8R9Afi9oCQmzkoduM
+         /L1jrxaRTYJakC6xvYC2+6RYaCJ2j4T9qv5DK70Q5Pah0eSyD0+4sT6GqreuMaySB6NZ
+         A0T512eCO7GPfgFIgXkQbGJ6hBhLoaemVI6ZhXJM4fJ3rqAY+y9NwROfVvDi4d/HMHZ1
+         0qu4sZVuVkjB/y7pM9fcxIN6c32spyyakxouUrAw1EUGD+FBxM3sZLIFbm71ijmJ5IqN
+         EUaAZ7qoLuFZuoUSxC7h5/oqg5nx5/weZzLuIm077RZxWZptlQMnYpdnpt9L/nT5dxm0
+         d1yw==
+X-Gm-Message-State: AOAM530ie2xhWg6jXUyy2yeA0TFdpDtVZe11Zaxq07lOCAAMx0rAq5J2
+        8HhJJaX09+2Htw7NeHWMlewUgQ==
+X-Google-Smtp-Source: ABdhPJxiB+ezDWRaWhzc+QskvK1DMsG1qeGQGBIpdFBX6dPCu/5SVpmVjX6WvoZgtP8NAV6pSGqFHQ==
+X-Received: by 2002:adf:f88c:: with SMTP id u12mr10421833wrp.209.1605796914108;
+        Thu, 19 Nov 2020 06:41:54 -0800 (PST)
 Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id x63sm51292wmb.48.2020.11.19.06.41.51
+        by smtp.gmail.com with ESMTPSA id x63sm51292wmb.48.2020.11.19.06.41.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2020 06:41:51 -0800 (PST)
+        Thu, 19 Nov 2020 06:41:53 -0800 (PST)
 From:   Daniel Vetter <daniel.vetter@ffwll.ch>
 To:     DRI Development <dri-devel@lists.freedesktop.org>,
         LKML <linux-kernel@vger.kernel.org>
 Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-arm-kernel@lists.infradead.org,
         linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@ffwll.ch>
-Subject: [PATCH v6 00/17] follow_pfn and other iomap races
-Date:   Thu, 19 Nov 2020 15:41:29 +0100
-Message-Id: <20201119144146.1045202-1-daniel.vetter@ffwll.ch>
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Inki Dae <inki.dae@samsung.com>,
+        Joonyoung Shim <jy0922.shim@samsung.com>,
+        Seung-Woo Kim <sw0312.kim@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>
+Subject: [PATCH v6 01/17] drm/exynos: Stop using frame_vector helpers
+Date:   Thu, 19 Nov 2020 15:41:30 +0100
+Message-Id: <20201119144146.1045202-2-daniel.vetter@ffwll.ch>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201119144146.1045202-1-daniel.vetter@ffwll.ch>
+References: <20201119144146.1045202-1-daniel.vetter@ffwll.ch>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -62,119 +78,160 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all
+All we need are a pages array, pin_user_pages_fast can give us that
+directly. Plus this avoids the entire raw pfn side of get_vaddr_frames.
 
-Another update of my patch series to clamp down a bunch of races and gaps
-around follow_pfn and other access to iomem mmaps. Previous version:
+Note that pin_user_pages_fast is a safe replacement despite the
+seeming lack of checking for vma->vm_flasg & (VM_IO | VM_PFNMAP). Such
+ptes are marked with pte_mkspecial (which pup_fast rejects in the
+fastpath), and only architectures supporting that support the
+pin_user_pages_fast fastpath.
 
-v1: https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
-v2: https://lore.kernel.org/dri-devel/20201009075934.3509076-1-daniel.vetter@ffwll.ch
-v3: https://lore.kernel.org/dri-devel/20201021085655.1192025-1-daniel.vetter@ffwll.ch/
-v4: https://lore.kernel.org/dri-devel/20201026105818.2585306-1-daniel.vetter@ffwll.ch/
-v5: https://lore.kernel.org/dri-devel/20201030100815.2269-1-daniel.vetter@ffwll.ch/
+Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Inki Dae <inki.dae@samsung.com>
+Cc: Joonyoung Shim <jy0922.shim@samsung.com>
+Cc: Seung-Woo Kim <sw0312.kim@samsung.com>
+Cc: Kyungmin Park <kyungmin.park@samsung.com>
+Cc: Kukjin Kim <kgene@kernel.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Jérôme Glisse <jglisse@redhat.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: linux-mm@kvack.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-samsung-soc@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+--
+v2: Use unpin_user_pages_dirty_lock (John)
+v6: Explain why pup_fast is safe, after discussions with John and
+Christoph.
+---
+ drivers/gpu/drm/exynos/Kconfig          |  1 -
+ drivers/gpu/drm/exynos/exynos_drm_g2d.c | 47 +++++++++++--------------
+ 2 files changed, 20 insertions(+), 28 deletions(-)
 
-And the discussion that sparked this journey:
-
-https://lore.kernel.org/dri-devel/20201007164426.1812530-1-daniel.vetter@ffwll.ch/
-
-Unfortunately took way longer to update than I hoped, I got sidetracked
-with a few things.
-
-Changes in v6:
-- Tested v4l userptr as Tomasz suggested. No boom observed
-- Added RFC for locking down follow_pfn, per discussion with Christoph and
-  Jason.
-- Explain why pup_fast is safe in relevant patches, there was a bit a
-  confusion when discussing v5.
-- Fix up the resource patch, with CONFIG_IO_STRICT_DEVMEM it crashed on
-  boot due to an unintended change (reported by John)
-
-Changes in v5:
-- Tomasz found some issues in the media patches
-- Polish suggested by Christoph for the unsafe_follow_pfn patch
-
-Changes in v4:
-- Drop the s390 patch, that was very stand-alone and now queued up to land
-  through s390 trees.
-- Comment polish per Dan's review.
-
-Changes in v3:
-- Bunch of polish all over, no functional changes aside from one barrier
-  in the resource code, for consistency.
-- A few more r-b tags.
-
-Changes in v2:
-- tons of small polish&fixes all over, thanks to all the reviewers who
-  spotted issues
-- I managed to test at least the generic_access_phys and pci mmap revoke
-  stuff with a few gdb sessions using our i915 debug tools (hence now also
-  the drm/i915 patch to properly request all the pci bar regions)
-- reworked approach for the pci mmap revoke: Infrastructure moved into
-  kernel/resource.c, address_space mapping is now set up at open time for
-  everyone (which required some sysfs changes). Does indeed look a lot
-  cleaner and a lot less invasive than I feared at first.
-
-I feel like this is ready for some wider soaking. Since the remaining bits
-are all kinda connnected probably simplest if it all goes through -mm.
-
-Cheers, Daniel
-
-Daniel Vetter (17):
-  drm/exynos: Stop using frame_vector helpers
-  drm/exynos: Use FOLL_LONGTERM for g2d cmdlists
-  misc/habana: Stop using frame_vector helpers
-  misc/habana: Use FOLL_LONGTERM for userptr
-  mm/frame-vector: Use FOLL_LONGTERM
-  media: videobuf2: Move frame_vector into media subsystem
-  mm: Close race in generic_access_phys
-  mm: Add unsafe_follow_pfn
-  media/videbuf1|2: Mark follow_pfn usage as unsafe
-  vfio/type1: Mark follow_pfn as unsafe
-  PCI: Obey iomem restrictions for procfs mmap
-  /dev/mem: Only set filp->f_mapping
-  resource: Move devmem revoke code to resource framework
-  sysfs: Support zapping of binary attr mmaps
-  PCI: Revoke mappings like devmem
-  RFC: kvm: pass kvm argument to follow_pfn callsites
-  RFC: mm: add mmu_notifier argument to follow_pfn
-
- arch/powerpc/kvm/book3s_64_mmu_hv.c           |   2 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c        |   2 +-
- arch/powerpc/kvm/e500_mmu_host.c              |   2 +-
- arch/x86/kvm/mmu/mmu.c                        |   8 +-
- drivers/char/mem.c                            |  86 +------------
- drivers/gpu/drm/exynos/Kconfig                |   1 -
- drivers/gpu/drm/exynos/exynos_drm_g2d.c       |  48 ++++----
- drivers/media/common/videobuf2/Kconfig        |   1 -
- drivers/media/common/videobuf2/Makefile       |   1 +
- .../media/common/videobuf2}/frame_vector.c    |  57 +++------
- .../media/common/videobuf2/videobuf2-memops.c |   3 +-
- drivers/media/platform/omap/Kconfig           |   1 -
- drivers/media/v4l2-core/videobuf-dma-contig.c |   2 +-
- drivers/misc/habanalabs/Kconfig               |   1 -
- drivers/misc/habanalabs/common/habanalabs.h   |   6 +-
- drivers/misc/habanalabs/common/memory.c       |  50 +++-----
- drivers/pci/pci-sysfs.c                       |   4 +
- drivers/pci/proc.c                            |   6 +
- drivers/vfio/vfio_iommu_type1.c               |   4 +-
- fs/sysfs/file.c                               |  11 ++
- include/linux/ioport.h                        |   6 +-
- include/linux/kvm_host.h                      |   9 +-
- include/linux/mm.h                            |  50 +-------
- include/linux/sysfs.h                         |   2 +
- include/media/frame_vector.h                  |  47 +++++++
- include/media/videobuf2-core.h                |   1 +
- kernel/resource.c                             |  98 ++++++++++++++-
- mm/Kconfig                                    |   3 -
- mm/Makefile                                   |   1 -
- mm/memory.c                                   | 115 +++++++++++++++---
- mm/nommu.c                                    |  48 +++++++-
- security/Kconfig                              |  13 ++
- virt/kvm/kvm_main.c                           |  56 +++++----
- 33 files changed, 447 insertions(+), 298 deletions(-)
- rename {mm => drivers/media/common/videobuf2}/frame_vector.c (84%)
- create mode 100644 include/media/frame_vector.h
-
+diff --git a/drivers/gpu/drm/exynos/Kconfig b/drivers/gpu/drm/exynos/Kconfig
+index 6417f374b923..43257ef3c09d 100644
+--- a/drivers/gpu/drm/exynos/Kconfig
++++ b/drivers/gpu/drm/exynos/Kconfig
+@@ -88,7 +88,6 @@ comment "Sub-drivers"
+ config DRM_EXYNOS_G2D
+ 	bool "G2D"
+ 	depends on VIDEO_SAMSUNG_S5P_G2D=n || COMPILE_TEST
+-	select FRAME_VECTOR
+ 	help
+ 	  Choose this option if you want to use Exynos G2D for DRM.
+ 
+diff --git a/drivers/gpu/drm/exynos/exynos_drm_g2d.c b/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+index 967a5cdc120e..ecede41af9b9 100644
+--- a/drivers/gpu/drm/exynos/exynos_drm_g2d.c
++++ b/drivers/gpu/drm/exynos/exynos_drm_g2d.c
+@@ -205,7 +205,8 @@ struct g2d_cmdlist_userptr {
+ 	dma_addr_t		dma_addr;
+ 	unsigned long		userptr;
+ 	unsigned long		size;
+-	struct frame_vector	*vec;
++	struct page		**pages;
++	unsigned int		npages;
+ 	struct sg_table		*sgt;
+ 	atomic_t		refcount;
+ 	bool			in_pool;
+@@ -378,7 +379,6 @@ static void g2d_userptr_put_dma_addr(struct g2d_data *g2d,
+ 					bool force)
+ {
+ 	struct g2d_cmdlist_userptr *g2d_userptr = obj;
+-	struct page **pages;
+ 
+ 	if (!obj)
+ 		return;
+@@ -398,15 +398,9 @@ static void g2d_userptr_put_dma_addr(struct g2d_data *g2d,
+ 	dma_unmap_sgtable(to_dma_dev(g2d->drm_dev), g2d_userptr->sgt,
+ 			  DMA_BIDIRECTIONAL, 0);
+ 
+-	pages = frame_vector_pages(g2d_userptr->vec);
+-	if (!IS_ERR(pages)) {
+-		int i;
+-
+-		for (i = 0; i < frame_vector_count(g2d_userptr->vec); i++)
+-			set_page_dirty_lock(pages[i]);
+-	}
+-	put_vaddr_frames(g2d_userptr->vec);
+-	frame_vector_destroy(g2d_userptr->vec);
++	unpin_user_pages_dirty_lock(g2d_userptr->pages, g2d_userptr->npages,
++				    true);
++	kvfree(g2d_userptr->pages);
+ 
+ 	if (!g2d_userptr->out_of_list)
+ 		list_del_init(&g2d_userptr->list);
+@@ -474,35 +468,34 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struct g2d_data *g2d,
+ 	offset = userptr & ~PAGE_MASK;
+ 	end = PAGE_ALIGN(userptr + size);
+ 	npages = (end - start) >> PAGE_SHIFT;
+-	g2d_userptr->vec = frame_vector_create(npages);
+-	if (!g2d_userptr->vec) {
++	g2d_userptr->pages = kvmalloc_array(npages, sizeof(*g2d_userptr->pages),
++					    GFP_KERNEL);
++	if (!g2d_userptr->pages) {
+ 		ret = -ENOMEM;
+ 		goto err_free;
+ 	}
+ 
+-	ret = get_vaddr_frames(start, npages, FOLL_FORCE | FOLL_WRITE,
+-		g2d_userptr->vec);
++	ret = pin_user_pages_fast(start, npages, FOLL_FORCE | FOLL_WRITE,
++				  g2d_userptr->pages);
+ 	if (ret != npages) {
+ 		DRM_DEV_ERROR(g2d->dev,
+ 			      "failed to get user pages from userptr.\n");
+ 		if (ret < 0)
+-			goto err_destroy_framevec;
+-		ret = -EFAULT;
+-		goto err_put_framevec;
+-	}
+-	if (frame_vector_to_pages(g2d_userptr->vec) < 0) {
++			goto err_destroy_pages;
++		npages = ret;
+ 		ret = -EFAULT;
+-		goto err_put_framevec;
++		goto err_unpin_pages;
+ 	}
++	g2d_userptr->npages = npages;
+ 
+ 	sgt = kzalloc(sizeof(*sgt), GFP_KERNEL);
+ 	if (!sgt) {
+ 		ret = -ENOMEM;
+-		goto err_put_framevec;
++		goto err_unpin_pages;
+ 	}
+ 
+ 	ret = sg_alloc_table_from_pages(sgt,
+-					frame_vector_pages(g2d_userptr->vec),
++					g2d_userptr->pages,
+ 					npages, offset, size, GFP_KERNEL);
+ 	if (ret < 0) {
+ 		DRM_DEV_ERROR(g2d->dev, "failed to get sgt from pages.\n");
+@@ -538,11 +531,11 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struct g2d_data *g2d,
+ err_free_sgt:
+ 	kfree(sgt);
+ 
+-err_put_framevec:
+-	put_vaddr_frames(g2d_userptr->vec);
++err_unpin_pages:
++	unpin_user_pages(g2d_userptr->pages, npages);
+ 
+-err_destroy_framevec:
+-	frame_vector_destroy(g2d_userptr->vec);
++err_destroy_pages:
++	kvfree(g2d_userptr->pages);
+ 
+ err_free:
+ 	kfree(g2d_userptr);
 -- 
 2.29.2
 
