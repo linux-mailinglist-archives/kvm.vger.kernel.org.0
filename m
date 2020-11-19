@@ -2,160 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78B002B9A73
-	for <lists+kvm@lfdr.de>; Thu, 19 Nov 2020 19:15:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DEAD2B9AC4
+	for <lists+kvm@lfdr.de>; Thu, 19 Nov 2020 19:40:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729291AbgKSSPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Nov 2020 13:15:36 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14926 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727761AbgKSSPf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Nov 2020 13:15:35 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AJI2pnq134068;
-        Thu, 19 Nov 2020 13:15:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=27GOfRCLmrOpPdwc1nWg0zzBxV0oor0zhKyOQGBMgFU=;
- b=NO2/ozUEVxERFF5dV67w1PyQlqBz4Ms8aPvuj9IVGrUzmQCsP2RMoYkjBPDsGcV6sjaP
- 688z1V6XvqMck+p2q8ezVE9RO0IwQQw8m/5lr9hrzYFK4DrS0syNjyyNxy31kVtjTEoe
- LUzydpafkourCIcTiiqC56PuFHfYtUvSzrmAqEXHAFjfvguIVrZh64ilYv4/Rp4Lesqv
- 2KsatajQte/b4f2dh4wRB13F+JNQwbguv6KB6hFRLZaoh5djcKLxY6aeQcqI5OkAstjw
- YONyiGr+lO+V6c1g6OfRmiH6gaWCGfDZaBLgQ81pdWL6yyGt5aAg80XOSfbUmaa+bdji Fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34w4xqvmc8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Nov 2020 13:15:32 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AJI33Zv135438;
-        Thu, 19 Nov 2020 13:15:31 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34w4xqvmb6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Nov 2020 13:15:31 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AJIBxIk021543;
-        Thu, 19 Nov 2020 18:15:30 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma03wdc.us.ibm.com with ESMTP id 34t6v9g4ae-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Nov 2020 18:15:30 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AJIFLSv36241710
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Nov 2020 18:15:21 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55C03BE04F;
-        Thu, 19 Nov 2020 18:15:27 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D3DC0BE059;
-        Thu, 19 Nov 2020 18:15:25 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.152.80])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Nov 2020 18:15:25 +0000 (GMT)
-Subject: Re: [PATCH v11 07/14] s390/vfio-ap: sysfs attribute to display the
- guest's matrix
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
- <20201022171209.19494-8-akrowiak@linux.ibm.com>
- <20201028091758.73aa77a3.pasic@linux.ibm.com>
- <b96fe876-c67a-fe6c-0e3a-7b4948edeef4@linux.ibm.com>
- <20201114001248.3b397c8c.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <d25a6810-00df-a2fc-4541-548917fdcc40@linux.ibm.com>
-Date:   Thu, 19 Nov 2020 13:15:25 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1729281AbgKSSim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Nov 2020 13:38:42 -0500
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:51623 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728525AbgKSSil (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Nov 2020 13:38:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1605811120; x=1637347120;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=82Rk73IpbZeskBh4MpmRnlAzQdRj3TbKP1cGbKkpEmg=;
+  b=UgXQk7s5AGwlRZruodHG+ctdFILs4qLDTtPuWU4ts1SAQdlsyOE2XPCq
+   fPdyXzys8XQiG8OtsXR7MYP48hmqXcgs6PQ8cuKdMcA4lH/CEbii6aToV
+   pL0xZT/HmrCkHfGpMK34a3yp1eoC0//wEW8J0lHn+DJHIkXjFJB3YX354
+   U=;
+X-IronPort-AV: E=Sophos;i="5.78,354,1599523200"; 
+   d="scan'208";a="95837366"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-e34f1ddc.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 19 Nov 2020 18:37:10 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-1a-e34f1ddc.us-east-1.amazon.com (Postfix) with ESMTPS id CDC9AA1794;
+        Thu, 19 Nov 2020 18:36:59 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 19 Nov 2020 18:36:58 +0000
+Received: from freeip.amazon.com (10.43.161.237) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 19 Nov 2020 18:36:51 +0000
+Subject: Re: [PATCH v2] drivers/virt: vmgenid: add vm generation id driver
+To:     Mike Rapoport <rppt@kernel.org>
+CC:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        "Catangiu, Adrian Costin" <acatan@amazon.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jann Horn <jannh@google.com>, Willy Tarreau <w@1wt.eu>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "bonzini@gnu.org" <bonzini@gnu.org>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        "oridgar@gmail.com" <oridgar@gmail.com>,
+        "ghammer@redhat.com" <ghammer@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Qemu Developers <qemu-devel@nongnu.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>,
+        Linux API <linux-api@vger.kernel.org>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        "areber@redhat.com" <areber@redhat.com>,
+        Pavel Emelyanov <ovzxemul@gmail.com>,
+        Andrey Vagin <avagin@gmail.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+        "gil@azul.com" <gil@azul.com>,
+        "asmehra@redhat.com" <asmehra@redhat.com>,
+        "dgunigun@redhat.com" <dgunigun@redhat.com>,
+        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>
+References: <3E05451B-A9CD-4719-99D0-72750A304044@amazon.com>
+ <300d4404-3efe-880e-ef30-692eabbff5f7@de.ibm.com>
+ <da1a1fa7-a1de-d0e6-755b-dd587687765e@amazon.de>
+ <20201119173800.GD8537@kernel.org>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <1cdb6fac-0d50-3399-74a6-24c119ebbaa5@amazon.de>
+Date:   Thu, 19 Nov 2020 19:36:49 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:84.0)
+ Gecko/20100101 Thunderbird/84.0
 MIME-Version: 1.0
-In-Reply-To: <20201114001248.3b397c8c.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201119173800.GD8537@kernel.org>
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-19_09:2020-11-19,2020-11-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 spamscore=0 impostorscore=0 mlxscore=0 adultscore=0
- phishscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 bulkscore=0
- suspectscore=3 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011190125
+X-Originating-IP: [10.43.161.237]
+X-ClientProxiedBy: EX13D46UWC004.ant.amazon.com (10.43.162.173) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 11/13/20 6:12 PM, Halil Pasic wrote:
-> On Fri, 13 Nov 2020 12:27:32 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->>
->> On 10/28/20 4:17 AM, Halil Pasic wrote:
->>> On Thu, 22 Oct 2020 13:12:02 -0400
->>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>>
->>>> +static ssize_t guest_matrix_show(struct device *dev,
->>>> +				 struct device_attribute *attr, char *buf)
->>>> +{
->>>> +	ssize_t nchars;
->>>> +	struct mdev_device *mdev = mdev_from_dev(dev);
->>>> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->>>> +
->>>> +	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
->>>> +		return -ENODEV;
->>> I'm wondering, would it make sense to have guest_matrix display the would
->>> be guest matrix when we don't have a KVM? With the filtering in
->>> place, the question in what guest_matrix would my (assign) matrix result
->>> right now if I were to hook up my vfio_ap_mdev to a guest seems a
->>> legitimate one.
->> A couple of thoughts here:
->> * The ENODEV informs the user that there is no guest running
->>      which makes sense to me given this interface displays the
->>      guest matrix. The alternative, which I considered, was to
->>      display an empty matrix (i.e., nothing).
->> * This would be a pretty drastic change to the design because
->>      the shadow_apcb - which is what is displayed via this interface - is
->>      only updated when the guest is started and while it is running (i.e.,
->>      hot plug of new adapters/domains). Making this change would
->>      require changing that entire design concept which I am reluctant
->>      to do at this point in the game.
->>
->>
-> No problem. My thinking was, that, because we can do the
-> assign/unassing ops also for the running guest, that we also have
-> the code to do the maintenance on the shadow_apcb. In this
-> series this code is conditional with respect to vfio_ap_mdev_has_crycb().
-> E.g.
->
-> static ssize_t assign_adapter_store(struct device *dev,
->                                      struct device_attribute *attr,
->                                      const char *buf, size_t count)
-> {
-> [..]
->          if (vfio_ap_mdev_has_crycb(matrix_mdev))
->                  if (vfio_ap_mdev_filter_guest_matrix(matrix_mdev, true))
->                          vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
->
-> If one were to move the
-> vfio_ap_mdev_has_crycb() check into vfio_ap_mdev_commit_shadow_apcb()
-> then we would have an always up to date shatdow_apcb, we could display.
->
-> I don't feel strongly about this. Was just an idea, because if the result
-> of the filtering is surprising, currently the only to see, without
-> knowing the algorithm, and possibly the state, and the history of the
-> system, is to actually start a guest.
-
-Okay, I can buy this and will make the change.
-
->
-> Regards,
-> Halil
->
+CgpPbiAxOS4xMS4yMCAxODozOCwgTWlrZSBSYXBvcG9ydCB3cm90ZToKPiAKPiBPbiBUaHUsIE5v
+diAxOSwgMjAyMCBhdCAwMTo1MToxOFBNICswMTAwLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToKPj4K
+Pj4KPj4gT24gMTkuMTEuMjAgMTM6MDIsIENocmlzdGlhbiBCb3JudHJhZWdlciB3cm90ZToKPj4+
+Cj4+PiBPbiAxNi4xMS4yMCAxNjozNCwgQ2F0YW5naXUsIEFkcmlhbiBDb3N0aW4gd3JvdGU6Cj4+
+Pj4gLSBCYWNrZ3JvdW5kCj4+Pj4KPj4+PiBUaGUgVk0gR2VuZXJhdGlvbiBJRCBpcyBhIGZlYXR1
+cmUgZGVmaW5lZCBieSBNaWNyb3NvZnQgKHBhcGVyOgo+Pj4+IGh0dHA6Ly9nby5taWNyb3NvZnQu
+Y29tL2Z3bGluay8/TGlua0lkPTI2MDcwOSkgYW5kIHN1cHBvcnRlZCBieQo+Pj4+IG11bHRpcGxl
+IGh5cGVydmlzb3IgdmVuZG9ycy4KPj4+Pgo+Pj4+IFRoZSBmZWF0dXJlIGlzIHJlcXVpcmVkIGlu
+IHZpcnR1YWxpemVkIGVudmlyb25tZW50cyBieSBhcHBzIHRoYXQgd29yawo+Pj4+IHdpdGggbG9j
+YWwgY29waWVzL2NhY2hlcyBvZiB3b3JsZC11bmlxdWUgZGF0YSBzdWNoIGFzIHJhbmRvbSB2YWx1
+ZXMsCj4+Pj4gdXVpZHMsIG1vbm90b25pY2FsbHkgaW5jcmVhc2luZyBjb3VudGVycywgZXRjLgo+
+Pj4+IFN1Y2ggYXBwcyBjYW4gYmUgbmVnYXRpdmVseSBhZmZlY3RlZCBieSBWTSBzbmFwc2hvdHRp
+bmcgd2hlbiB0aGUgVk0KPj4+PiBpcyBlaXRoZXIgY2xvbmVkIG9yIHJldHVybmVkIHRvIGFuIGVh
+cmxpZXIgcG9pbnQgaW4gdGltZS4KPj4+Pgo+Pj4+IFRoZSBWTSBHZW5lcmF0aW9uIElEIGlzIGEg
+c2ltcGxlIGNvbmNlcHQgbWVhbnQgdG8gYWxsZXZpYXRlIHRoZSBpc3N1ZQo+Pj4+IGJ5IHByb3Zp
+ZGluZyBhIHVuaXF1ZSBJRCB0aGF0IGNoYW5nZXMgZWFjaCB0aW1lIHRoZSBWTSBpcyByZXN0b3Jl
+ZAo+Pj4+IGZyb20gYSBzbmFwc2hvdC4gVGhlIGh3IHByb3ZpZGVkIFVVSUQgdmFsdWUgY2FuIGJl
+IHVzZWQgdG8KPj4+PiBkaWZmZXJlbnRpYXRlIGJldHdlZW4gVk1zIG9yIGRpZmZlcmVudCBnZW5l
+cmF0aW9ucyBvZiB0aGUgc2FtZSBWTS4KPj4+Pgo+Pj4+IC0gUHJvYmxlbQo+Pj4+Cj4+Pj4gVGhl
+IFZNIEdlbmVyYXRpb24gSUQgaXMgZXhwb3NlZCB0aHJvdWdoIGFuIEFDUEkgZGV2aWNlIGJ5IG11
+bHRpcGxlCj4+Pj4gaHlwZXJ2aXNvciB2ZW5kb3JzIGJ1dCBuZWl0aGVyIHRoZSB2ZW5kb3JzIG9y
+IHVwc3RyZWFtIExpbnV4IGhhdmUgbm8KPj4+PiBkZWZhdWx0IGRyaXZlciBmb3IgaXQgbGVhdmlu
+ZyB1c2VycyB0byBmZW5kIGZvciB0aGVtc2VsdmVzLgo+Pj4KPj4+IEkgc2VlIHRoYXQgdGhlIHFl
+bXUgaW1wbGVtZW50YXRpb24gaXMgc3RpbGwgdW5kZXIgZGlzY3Vzc2lvbi4gV2hhdCBpcwo+Pgo+
+PiBVaCwgdGhlIEFDUEkgVm1nZW5pZCBkZXZpY2UgZW11bGF0aW9uIGlzIGluIFFFTVUgc2luY2Ug
+Mi45LjAgOikuCj4+Cj4+PiB0aGUgc3RhdHVzIG9mIHRoZSBvdGhlciBleGlzdGluZyBpbXBsZW1l
+bnRhdGlvbnMuIERvIHRoZXkgYWxyZWFkeSBleGlzdD8KPj4+IEluIG90aGVyIHdvcmRzIGlzIEFD
+UEkgYSBnaXZlbj8KPj4+IEkgdGhpbmsgdGhlIG1ham9yaXR5IG9mIHRoaXMgZHJpdmVyIGNvdWxk
+IGJlIHVzZWQgd2l0aCBqdXN0IGEgZGlmZmVyZW50Cj4+PiBiYWNrZW5kIGZvciBwbGF0Zm9ybXMg
+d2l0aG91dCBBQ1BJIHNvIGluIGFueSBjYXNlIHdlIGNvdWxkIGZhY3RvciBvdXQKPj4+IHRoZSBi
+YWNrZW5kIChhY3BpLCB2aXJ0aW8sIHdoYXRldmVyKSBidXQgaWYgd2UgYXJlIG9wZW4gd2UgY291
+bGQgbWF5YmUKPj4+IHN0YXJ0IHdpdGggc29tZXRoaW5nIGVsc2UuCj4+Cj4+IEkgYWdyZWUgMTAw
+JS4gSSBkb24ndCB0aGluayB3ZSByZWFsbHkgbmVlZCBhIG5ldyBmcmFtZXdvcmsgaW4gdGhlIGtl
+cm5lbCBmb3IKPj4gdGhhdC4gV2UgY2FuIGp1c3QgaGF2ZSBmb3IgZXhhbXBsZSBhbiBzMzkweCBz
+cGVjaWZpYyBkcml2ZXIgdGhhdCBhbHNvCj4+IHByb3ZpZGVzIHRoZSBzYW1lIG5vdGlmaWNhdGlv
+biBtZWNoYW5pc20gdGhyb3VnaCBhIGRldmljZSBub2RlIHRoYXQgaXMgYWxzbwo+PiBuYW1lZCAi
+L2Rldi92bWdlbmlkIiwgbm8/Cj4+Cj4+IE9yIGFsdGVybmF0aXZlbHkgd2UgY2FuIHNwbGl0IHRo
+ZSBnZW5lcmljIHBhcnQgb2YgdGhpcyBkcml2ZXIgYXMgc29vbiBhcyBhCj4+IHNlY29uZCBvbmUg
+Y29tZXMgYWxvbmcgYW5kIHRoZW4gaGF2ZSBib3RoIGRyaXZlciBpbmNsdWRlIHRoYXQgZ2VuZXJp
+YyBsb2dpYy4KPj4KPj4gVGhlIG9ubHkgcGllY2Ugd2hlcmUgSSdtIHVuc3VyZSBpcyBob3cgdGhp
+cyB3aWxsIGludGVyYWN0IHdpdGggQ1JJVS4KPiAKPiBUbyBDL1IgYXBwbGljYXRpb25zIHRoYXQg
+dXNlIC9kZXYvdm1nZW5pZCBDUklVIG5lZWQgdG8gYmUgYXdhcmUgb2YgaXQuCj4gQ2hlY2twb2lu
+dGluZyBhbmQgcmVzdG9yaW5nIHdpdGhpbmcgdGhlIHNhbWUgIlZNIGdlbmVyYXRpb24iIHNob3Vs
+ZG4ndCBiZQo+IGEgcHJvYmxlbSwgYnV0IElNSE8sIG1ha2luZyByZXN0b3JlIHdvcmsgYWZ0ZXIg
+Z2VuaWQgYnVtcCBjb3VsZCBiZQo+IGNoYWxsZW5naW5nLgo+IAo+IEFsZXgsIHdoYXQgc2NlbmFy
+aW8gaW52b2x2aW5nIENSSVUgZGlkIHlvdSBoYXZlIGluIG1pbmQ/CgpZb3UgY2FuIGluIHRoZW9y
+eSBydW4gaW50byB0aGUgc2FtZSBzaXR1YXRpb24gd2l0aCBjb250YWluZXJzIHRoYXQgdGhpcyAK
+cGF0Y2ggaXMgc29sdmluZyBmb3IgdmlydHVhbCBtYWNoaW5lcy4gWW91IGNvdWxkIGZvciBleGFt
+cGxlIGRvIGEgCnNuYXBzaG90IG9mIGEgcHJld2FybWVkIEphdmEgcnVudGltZSB3aXRoIENSSVUg
+dG8gZ2V0IGZ1bGwgSklUIHNwZWVkcyAKc3RhcnRpbmcgZnJvbSB0aGUgZmlyc3QgcmVxdWVzdC4K
+ClRoYXQgaG93ZXZlciBtZWFucyB5b3UgcnVuIGludG8gdGhlIHByb2JsZW0gb2YgcHJlZGljdGFi
+bGUgcmFuZG9tbmVzcyBhZ2Fpbi4KCj4gCj4+IENhbiBjb250YWluZXJzIGVtdWxhdGUgaW9jdGxz
+IGFuZCBkZXZpY2Ugbm9kZXM/Cj4gCj4gQ29udGFpbmVycyBkbyBub3QgZW11bGF0ZSBpb2N0bHMg
+YnV0IHRoZXkgY2FuIGhhdmUgL2Rldi92bWdlbmlkIGluc2lkZQo+IHRoZSBjb250YWluZXIsIHNv
+IGFwcGxpY2F0aW9ucyBjYW4gdXNlIGl0IHRoZSBzYW1lIHdheSBhcyBvdXRzaWRlIHRoZQo+IGNv
+bnRhaW5lci4KCkhtLiBJIHN1cHBvc2Ugd2UgY291bGQgYWRkIGEgQ0FQX0FETUlOIGlvY3RsIGlu
+dGVyZmFjZSB0byAvZGV2L3ZtZ2VuaWQgCih3aGVuIGNvbnRhaW5lciBwZW9wbGUgZ2V0IHRvIHRo
+ZSBwb2ludCBvZiBuZWVkaW5nIGl0KSB0aGF0IHNldHMgdGhlIApnZW5lcmF0aW9uIHRvICJhdCBs
+ZWFzdCBYIi4gVGhhdCB3YXkgb24gcmVzdG9yZSwgeW91IGNvdWxkIGp1c3QgY2FsbCAKdGhhdCB3
+aXRoICJnZW5lcmF0aW9uIGF0IHNuYXBzaG90IisxLgoKVGhhdCBhbHNvIG1lYW5zIHdlIG5lZWQg
+dG8gaGF2ZSB0aGlzIGludGVyZmFjZSBhdmFpbGFibGUgd2l0aG91dCB2aXJ0dWFsIAptYWNoaW5l
+cyB0aGVuIHRob3VnaCwgcmlnaHQ/CgoKQWxleAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVy
+IEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhy
+dW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBB
+bXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGlu
+ClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
