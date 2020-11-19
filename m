@@ -2,185 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D08842B9BD1
-	for <lists+kvm@lfdr.de>; Thu, 19 Nov 2020 21:05:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC1652B9E8A
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 00:45:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727189AbgKSUEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Nov 2020 15:04:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57016 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726567AbgKSUEP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Nov 2020 15:04:15 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AJK3cYv043013;
-        Thu, 19 Nov 2020 15:04:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=figsb8yB5xo4yw3ajG1C3J4Mia80Yro+B5IPff6sMbA=;
- b=AsawqiMQkocMylH/6hD94QC+B68eER5PMt5zEj5+qidyX07/7Yw5algnd/9A5/5e1B2m
- 71Jsho1wmlZRfGxGE3LW2CcReHPWPaA2qXqt+c8LRTFZ5E5tTYXACS6HbkPRrTMpfgho
- ZHA4XBfyfTuNyLx60ErgUHQcKZP+XFySx+gM1a4eIiolhqFjaLHUnpHy2wsM8vq3O80n
- VBXmMh4NbF/BnaJ3we1Oya9FMl5NwoXcGRMJQXYOmph+kU39Eawrm3AhQ+JMoaMHLdfx
- rSLvvAC46HmrYwHDU4rHJ3QekDb+hy8/bNbKFp+te7dQU/IAutDe0u0kkdOPZW3dY2oP yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34w4xqy91p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Nov 2020 15:04:14 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AJK3r0w045861;
-        Thu, 19 Nov 2020 15:04:13 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34w4xqy90h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Nov 2020 15:04:13 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AJJuqLu001460;
-        Thu, 19 Nov 2020 20:04:12 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma02dal.us.ibm.com with ESMTP id 34vgjmwt0r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Nov 2020 20:04:12 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AJK4BwX10093224
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Nov 2020 20:04:11 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2036DB205F;
-        Thu, 19 Nov 2020 20:04:11 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BE281B2064;
-        Thu, 19 Nov 2020 20:04:09 +0000 (GMT)
-Received: from [9.163.28.108] (unknown [9.163.28.108])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Nov 2020 20:04:09 +0000 (GMT)
-Subject: Re: [RFC PATCH 1/2] vfio-mdev: Wire in a request handler for mdev
- parent
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20201117032139.50988-1-farman@linux.ibm.com>
- <20201117032139.50988-2-farman@linux.ibm.com>
- <20201119123026.1353cb3c.cohuck@redhat.com>
- <20201119092754.240847b8@w520.home>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <27946d84-ae22-6882-67a5-edb5bd782bfa@linux.ibm.com>
-Date:   Thu, 19 Nov 2020 15:04:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <20201119092754.240847b8@w520.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-19_10:2020-11-19,2020-11-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 spamscore=0 impostorscore=0 mlxscore=0 adultscore=0
- phishscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011190134
+        id S1726784AbgKSXhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Nov 2020 18:37:01 -0500
+Received: from mga03.intel.com ([134.134.136.65]:10765 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726494AbgKSXhB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Nov 2020 18:37:01 -0500
+IronPort-SDR: WuOZs6RvB5nnMBhLJWpTObQQ3pgoVUhRuwrG6VAO/Z+hc6sO2kuvfLY9iYQ6Nr1DiplOXmQULC
+ v+uhdXckqVnA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9810"; a="171481778"
+X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
+   d="scan'208";a="171481778"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 15:36:59 -0800
+IronPort-SDR: ESl+b9rggjpkQNWq+chDwRJjrviOXvUCj4KHSlE2lP/WXa2MnbTgBp2mB3BP0DEAu6vcrN7HaZ
+ z+POcxQOzhuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
+   d="scan'208";a="431392184"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by fmsmga001.fm.intel.com with ESMTP; 19 Nov 2020 15:36:59 -0800
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     tglx@linutronix.de, mingo@kernel.org, bp@suse.de, luto@kernel.org,
+        x86@kernel.org
+Cc:     len.brown@intel.com, dave.hansen@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        chang.seok.bae@intel.com, kvm@vger.kernel.org
+Subject: [PATCH v2 01/22] x86/fpu/xstate: Modify area init helper prototypes to access all the possible areas
+Date:   Thu, 19 Nov 2020 15:32:36 -0800
+Message-Id: <20201119233257.2939-2-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201119233257.2939-1-chang.seok.bae@intel.com>
+References: <20201119233257.2939-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The xstate infrastructure is not flexible to support dynamic areas in
+task->fpu. Change the fpstate_init() prototype to access task->fpu
+directly. It treats a null pointer as indicating init_fpstate, as this
+initial data does not belong to any task. For the compacted format,
+fpstate_init_xstate() now accepts the state component bitmap to configure
+XCOMP_BV.
 
+No functional change.
 
-On 11/19/20 11:27 AM, Alex Williamson wrote:
-> On Thu, 19 Nov 2020 12:30:26 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
->> On Tue, 17 Nov 2020 04:21:38 +0100
->> Eric Farman <farman@linux.ibm.com> wrote:
->>
->>> While performing some destructive tests with vfio-ccw, where the
->>> paths to a device are forcible removed and thus the device itself
->>> is unreachable, it is rather easy to end up in an endless loop in
->>> vfio_del_group_dev() due to the lack of a request callback for the
->>> associated device.
->>>
->>> In this example, one MDEV (77c) is used by a guest, while another
->>> (77b) is not. The symptom is that the iommu is detached from the
->>> mdev for 77b, but not 77c, until that guest is shutdown:
->>>
->>>      [  238.794867] vfio_ccw 0.0.077b: MDEV: Unregistering
->>>      [  238.794996] vfio_mdev 11f2d2bc-4083-431d-a023-eff72715c4f0: Removing from iommu group 2
->>>      [  238.795001] vfio_mdev 11f2d2bc-4083-431d-a023-eff72715c4f0: MDEV: detaching iommu
->>>      [  238.795036] vfio_ccw 0.0.077c: MDEV: Unregistering
->>>      ...silence...
->>>
->>> Let's wire in the request call back to the mdev device, so that a hot
->>> unplug can be (gracefully?) handled by the parent device at the time
->>> the device is being removed.
->>
->> I think it makes a lot of sense to give the vendor driver a way to
->> handle requests.
->>
->>>
->>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->>> ---
->>>   drivers/vfio/mdev/vfio_mdev.c | 11 +++++++++++
->>>   include/linux/mdev.h          |  4 ++++
->>>   2 files changed, 15 insertions(+)
->>>
->>> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
->>> index 30964a4e0a28..2dd243f73945 100644
->>> --- a/drivers/vfio/mdev/vfio_mdev.c
->>> +++ b/drivers/vfio/mdev/vfio_mdev.c
->>> @@ -98,6 +98,16 @@ static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
->>>   	return parent->ops->mmap(mdev, vma);
->>>   }
->>>   
->>> +static void vfio_mdev_request(void *device_data, unsigned int count)
->>> +{
->>> +	struct mdev_device *mdev = device_data;
->>> +	struct mdev_parent *parent = mdev->parent;
->>> +
->>> +	if (unlikely(!parent->ops->request))
->>
->> Hm. Do you think that all drivers should implement a ->request()
->> callback?
-> 
-> It's considered optional for bus drivers in vfio-core, obviously
-> mdev-core could enforce presence of this callback, but then we'd break
-> existing out of tree drivers.  We don't make guarantees to out of tree
-> drivers, but it feels a little petty.  We could instead encourage such
-> support by printing a warning for drivers that register without a
-> request callback.
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Reviewed-by: Len Brown <len.brown@intel.com>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+---
+ arch/x86/include/asm/fpu/internal.h |  6 +++---
+ arch/x86/kernel/fpu/core.c          | 14 +++++++++++---
+ arch/x86/kernel/fpu/init.c          |  2 +-
+ arch/x86/kernel/fpu/regset.c        |  2 +-
+ arch/x86/kernel/fpu/xstate.c        |  3 +--
+ arch/x86/kvm/x86.c                  |  2 +-
+ 6 files changed, 18 insertions(+), 11 deletions(-)
 
-Coincidentally, I'd considered adding a dev_warn_once() message in
-drivers/vfio/vfio.c:vfio_del_group_dev() when vfio_device->ops->request
-is NULL, and thus we're looping endlessly (and silently). But adding 
-this patch and not patch 2 made things silent again, so I left it out. 
-Putting a warning when the driver registers seems cool.
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 8d33ad80704f..d81d8c407dc0 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -80,20 +80,20 @@ static __always_inline __pure bool use_fxsr(void)
+ 
+ extern union fpregs_state init_fpstate;
+ 
+-extern void fpstate_init(union fpregs_state *state);
++extern void fpstate_init(struct fpu *fpu);
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+ #else
+ static inline void fpstate_init_soft(struct swregs_state *soft) {}
+ #endif
+ 
+-static inline void fpstate_init_xstate(struct xregs_state *xsave)
++static inline void fpstate_init_xstate(struct xregs_state *xsave, u64 xcomp_mask)
+ {
+ 	/*
+ 	 * XRSTORS requires these bits set in xcomp_bv, or it will
+ 	 * trigger #GP:
+ 	 */
+-	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xfeatures_mask_all;
++	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xcomp_mask;
+ }
+ 
+ static inline void fpstate_init_fxstate(struct fxregs_state *fx)
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index eb86a2b831b1..41d926c76615 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -191,8 +191,16 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
+ 	fp->fos = 0xffff0000u;
+ }
+ 
+-void fpstate_init(union fpregs_state *state)
++/* If a null pointer is given, assume to take the initial FPU state, init_fpstate. */
++void fpstate_init(struct fpu *fpu)
+ {
++	union fpregs_state *state;
++
++	if (fpu)
++		state = &fpu->state;
++	else
++		state = &init_fpstate;
++
+ 	if (!static_cpu_has(X86_FEATURE_FPU)) {
+ 		fpstate_init_soft(&state->soft);
+ 		return;
+@@ -201,7 +209,7 @@ void fpstate_init(union fpregs_state *state)
+ 	memset(state, 0, fpu_kernel_xstate_size);
+ 
+ 	if (static_cpu_has(X86_FEATURE_XSAVES))
+-		fpstate_init_xstate(&state->xsave);
++		fpstate_init_xstate(&state->xsave, xfeatures_mask_all);
+ 	if (static_cpu_has(X86_FEATURE_FXSR))
+ 		fpstate_init_fxstate(&state->fxsave);
+ 	else
+@@ -261,7 +269,7 @@ static void fpu__initialize(struct fpu *fpu)
+ 	WARN_ON_FPU(fpu != &current->thread.fpu);
+ 
+ 	set_thread_flag(TIF_NEED_FPU_LOAD);
+-	fpstate_init(&fpu->state);
++	fpstate_init(fpu);
+ 	trace_x86_fpu_init_state(fpu);
+ }
+ 
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 701f196d7c68..74e03e3bc20f 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -124,7 +124,7 @@ static void __init fpu__init_system_generic(void)
+ 	 * Set up the legacy init FPU context. (xstate init might overwrite this
+ 	 * with a more modern format, if the CPU supports it.)
+ 	 */
+-	fpstate_init(&init_fpstate);
++	fpstate_init(NULL);
+ 
+ 	fpu__init_system_mxcsr();
+ }
+diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
+index c413756ba89f..4c4d9059ff36 100644
+--- a/arch/x86/kernel/fpu/regset.c
++++ b/arch/x86/kernel/fpu/regset.c
+@@ -144,7 +144,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
+ 	 * In case of failure, mark all states as init:
+ 	 */
+ 	if (ret)
+-		fpstate_init(&fpu->state);
++		fpstate_init(fpu);
+ 
+ 	return ret;
+ }
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index 5d8047441a0a..1a3e5effe0fa 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -457,8 +457,7 @@ static void __init setup_init_fpu_buf(void)
+ 	print_xstate_features();
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+-		init_fpstate.xsave.header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+-						     xfeatures_mask_all;
++		fpstate_init_xstate(&init_fpstate.xsave, xfeatures_mask_all);
+ 
+ 	/*
+ 	 * Init all the features state with header.xfeatures being 0x0
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 078a39d489fe..90bf9d05a8cc 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9818,7 +9818,7 @@ static int sync_regs(struct kvm_vcpu *vcpu)
+ 
+ static void fx_init(struct kvm_vcpu *vcpu)
+ {
+-	fpstate_init(&vcpu->arch.guest_fpu->state);
++	fpstate_init(vcpu->arch.guest_fpu);
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+ 			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+-- 
+2.17.1
 
-> 
-> Minor nit, I tend to prefer:
-> 
-> 	if (callback for thing)
-> 		call thing
-> 
-> Rather than
-> 
-> 	if (!callback for thing)
-> 		return;
-> 	call thing
-
-I like it too.  I'll set it up that way in v2.
-
-> 
-> Thanks,
-> Alex
-> 
->>
->>> +		return;
->>> +	parent->ops->request(mdev, count);
->>> +}
->>> +
->>>   static const struct vfio_device_ops vfio_mdev_dev_ops = {
->>>   	.name		= "vfio-mdev",
->>>   	.open		= vfio_mdev_open,
-> 
