@@ -2,81 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BB532BAA9C
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 13:55:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C3272BAAA0
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 13:57:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727700AbgKTMy5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 07:54:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726560AbgKTMy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Nov 2020 07:54:57 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 111F9C0613CF;
-        Fri, 20 Nov 2020 04:54:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ARS+JFM8lp7IU5S39whnGWAR9zPTjiLED++SVe3kkDg=; b=LFnlsnKEh1oJBjqJmqWEjBMDPA
-        RhYAb819lhVkUmxOATMprP9zwrg4W8r9fnHYLaWcgSZc3ZZ+ibjAd2T+11VhwGcExv5iGdpTyCMCl
-        mu8SvfQAmTH0Vap4aaLOeQ7Yz08iwbMPlGI8DH6PpXe94p9k+F+8oAIrNh0dTW6jn/MznD4fLHthg
-        hRpx+wkXIeAkTOptyjsOsVhpg3FHxP6C9ShGQ7RFETLGfKWi3GUQcWQGmtIyrah0wRjprJzE6otgq
-        BlItKpepcV2xggTTCc5EEQRfa/Ks4Hgph9aAqxMSO+H7U1UxN0JN5JhIiYLI2O9xDoxiQKOjkmQqX
-        Ztj/Up7Q==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kg5v5-0000yt-TS; Fri, 20 Nov 2020 12:53:44 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9B3B9306BCA;
-        Fri, 20 Nov 2020 13:53:42 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 7A8C720244CF6; Fri, 20 Nov 2020 13:53:42 +0100 (CET)
-Date:   Fri, 20 Nov 2020 13:53:42 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     xen-devel@lists.xenproject.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, luto@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Deep Shah <sdeep@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>
-Subject: Re: [PATCH v2 00/12] x86: major paravirt cleanup
-Message-ID: <20201120125342.GC3040@hirez.programming.kicks-ass.net>
-References: <20201120114630.13552-1-jgross@suse.com>
+        id S1727933AbgKTM44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 07:56:56 -0500
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:50174 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726560AbgKTM44 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Nov 2020 07:56:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1605877016; x=1637413016;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=Tu3ky8QtpoG4/ntezhBA0uUewx/dtdgS9ou84KSbXl8=;
+  b=kemxds01Hy9ZOiA/cyOlZsjA2fDKKF7z08zVtylrUMQJ8NWoZkPkWnlt
+   I8La4by+AA5nfQb+nQKwlvhSYY+LIttlBvFBSESfGmzpg6whV0R1LA7jU
+   bf5ioDaWQ2bEdSMiViuRG+kKSK1JFA/B1lJ2Lo32zPLyiTzmD9yba1itl
+   k=;
+X-IronPort-AV: E=Sophos;i="5.78,356,1599523200"; 
+   d="scan'208";a="65112994"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 20 Nov 2020 12:56:48 +0000
+Received: from EX13D01EUA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id 930ACA18CE;
+        Fri, 20 Nov 2020 12:56:43 +0000 (UTC)
+Received: from EX13D52EUA002.ant.amazon.com (10.43.165.139) by
+ EX13D01EUA002.ant.amazon.com (10.43.165.199) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 20 Nov 2020 12:56:42 +0000
+Received: from uc995cb558fb65a.ant.amazon.com (10.43.162.50) by
+ EX13D52EUA002.ant.amazon.com (10.43.165.139) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 20 Nov 2020 12:56:37 +0000
+From:   <darkhan@amazon.com>
+To:     <pbonzini@redhat.com>
+CC:     <kvm@vger.kernel.org>, <corbet@lwn.net>, <maz@kernel.org>,
+        <james.morse@arm.com>, <catalin.marinas@arm.com>,
+        <chenhc@lemote.com>, <paulus@ozlabs.org>, <frankja@linux.ibm.com>,
+        <mingo@redhat.com>, <acme@redhat.com>, <graf@amazon.de>,
+        <darkhan@amazon.de>, Darkhan Mukashov <darkhan@amazon.com>
+Subject: [PATCH 0/3] Introduce new vcpu ioctls KVM_(GET|SET)_MANY_REGS
+Date:   Fri, 20 Nov 2020 13:56:13 +0100
+Message-ID: <20201120125616.14436-1-darkhan@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201120114630.13552-1-jgross@suse.com>
+Content-Type: text/plain
+X-Originating-IP: [10.43.162.50]
+X-ClientProxiedBy: EX13D32UWB001.ant.amazon.com (10.43.161.248) To
+ EX13D52EUA002.ant.amazon.com (10.43.165.139)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 12:46:18PM +0100, Juergen Gross wrote:
->  30 files changed, 325 insertions(+), 598 deletions(-)
+From: Darkhan Mukashov <darkhan@amazon.com>
 
-Much awesome ! I'll try and get that objtool thing sorted.
+The ultimate goal is to introduce new vcpu ioctls KVM_(GET|SET)_MANY_REGS.
+To introduce these ioctls, implementations of KVM_(GET|SET)_ONE_REG have
+to be refactored. Specifically, KVM_(GET|SET)_ONE_REG should be handled in
+a generic kvm_vcpu_ioctl function.
+
+New KVM APIs KVM_(GET|SET)_MANY_REGS make it possible to bulk read/write
+vCPU registers at one ioctl call. These ioctls can be very useful when
+vCPU state serialization/deserialization is required (e.g. live update of
+kvm, live migration of guests), hence all registers have to be
+saved/restored. KVM_(GET|SET)_MANY_REGS will help avoid performance
+overhead associated with syscall (ioctl in our case) handling. Tests
+conducted on AWS Graviton2 Processors (64-bit ARM Neoverse cores) show
+that average save/restore time of all vCPU registers can be optimized
+~3.5 times per vCPU with new ioctls. Test results can be found in Table 1.
++---------+-------------+---------------+
+|         | kvm_one_reg | kvm_many_regs |
++---------+-------------+---------------+
+| get all |   123 usec  |    33 usec    |
++---------+-------------+---------------+
+| set all |   120 usec  |    36 usec    |
++---------+-------------+---------------+
+	Table 1. Test results
+
+The patches are based out of kvm/queue.
+
+Darkhan Mukashov (3):
+  Documentation: KVM: change description of vcpu ioctls
+    KVM_(GET|SET)_ONE_REG
+  KVM: handle vcpu ioctls KVM_(GET|SET)_ONE_REG in a generic function
+  KVM: introduce new vcpu ioctls KVM_GET_MANY_REGS and KVM_SET_MANY_REGS
+
+ Documentation/virt/kvm/api.rst     | 80 ++++++++++++++++++++++++++++--
+ arch/arm64/include/asm/kvm_host.h  |  5 +-
+ arch/arm64/kvm/arm.c               | 25 +++-------
+ arch/arm64/kvm/guest.c             |  6 ++-
+ arch/mips/include/asm/kvm_host.h   |  6 +++
+ arch/mips/kvm/mips.c               | 32 ++++++------
+ arch/powerpc/include/asm/kvm_ppc.h |  2 -
+ arch/powerpc/kvm/powerpc.c         | 20 ++------
+ arch/s390/include/asm/kvm_host.h   |  6 +++
+ arch/s390/kvm/kvm-s390.c           | 38 +++++++-------
+ arch/x86/kvm/x86.c                 | 12 +++++
+ include/linux/kvm_host.h           | 18 +++++++
+ include/uapi/linux/kvm.h           | 11 ++++
+ virt/kvm/kvm_main.c                | 62 +++++++++++++++++++++++
+ 14 files changed, 244 insertions(+), 79 deletions(-)
+
+-- 
+2.17.1
+
