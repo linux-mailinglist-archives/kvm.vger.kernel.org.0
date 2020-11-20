@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78C5C2BB46D
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:00:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF2582BB490
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:00:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732060AbgKTSxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 13:53:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36712 "EHLO
+        id S1732119AbgKTSyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 13:54:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38294 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731358AbgKTSxo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:53:44 -0500
+        by vger.kernel.org with ESMTP id S1731664AbgKTSyB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:54:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605898423;
+        s=mimecast20190719; t=1605898440;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=geMra6s2mk7qQGmiDf6FdjeAxAi7bQOlm3m+XgBp7eM=;
-        b=C6sqfPQFxgXg0WLje1t+24Z6DDIPiM64FV0qbCn2GtvQIkQcm1kMOFl5OaK5ci4MNeOuUW
-        3eKuy+hoYNaM9zrr4A1OVoLgSddcDnYsFez2dz3OQrWNUQEUmV9hOCjNsuxi9F0EcxyjrG
-        1c7RdvcyCj+fK6i/O27b1iY4E3V3eXo=
+        bh=GYiokrtmxVGaxHYQFYtHrYcyj4QArcgChV2OGqAzahY=;
+        b=Hc3ctVPSgydSURZY66CjMLPs0tM+la9i9XB0tRnsg+tZd0LGxS2DJ8bseaWfMCGmMtbasA
+        qqB2jXefNJIIAJwlkoW1TWAn2VA22dpwYOPmnAiye3z+wB+0xhoitpJqj5fYywyeQrE2Ml
+        HMSpUrJX2XCxIvKkraO3+Go1ub0Xsrw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-O0I0LkrQMrGPImdL7SOirQ-1; Fri, 20 Nov 2020 13:53:39 -0500
-X-MC-Unique: O0I0LkrQMrGPImdL7SOirQ-1
+ us-mta-71-Q2QN0RgLOE-Z4tC5OIvHtg-1; Fri, 20 Nov 2020 13:53:58 -0500
+X-MC-Unique: Q2QN0RgLOE-Z4tC5OIvHtg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 437D1801AF1;
-        Fri, 20 Nov 2020 18:53:36 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4232100C605;
+        Fri, 20 Nov 2020 18:53:54 +0000 (UTC)
 Received: from eperezma.remote.csb (ovpn-112-88.ams2.redhat.com [10.36.112.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97F395C1D5;
-        Fri, 20 Nov 2020 18:53:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 721AB5C1D5;
+        Fri, 20 Nov 2020 18:53:36 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
@@ -61,9 +61,9 @@ Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
         Parav Pandit <parav@mellanox.com>,
         Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
         Stephen Finucane <stephenfin@redhat.com>
-Subject: [RFC PATCH 10/27] vhost: Allocate shadow vring
-Date:   Fri, 20 Nov 2020 19:50:48 +0100
-Message-Id: <20201120185105.279030-11-eperezma@redhat.com>
+Subject: [RFC PATCH 11/27] virtio: const-ify all virtio_tswap* functions
+Date:   Fri, 20 Nov 2020 19:50:49 +0100
+Message-Id: <20201120185105.279030-12-eperezma@redhat.com>
 In-Reply-To: <20201120185105.279030-1-eperezma@redhat.com>
 References: <20201120185105.279030-1-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -74,41 +74,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+They do not modify vdev, so these should be const as qemu coding style
+guideline.
+
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/virtio/vhost-sw-lm-ring.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/hw/virtio/virtio-access.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/virtio/vhost-sw-lm-ring.c b/hw/virtio/vhost-sw-lm-ring.c
-index cbf53965cd..cd7b5ba772 100644
---- a/hw/virtio/vhost-sw-lm-ring.c
-+++ b/hw/virtio/vhost-sw-lm-ring.c
-@@ -16,8 +16,11 @@
- #include "qemu/event_notifier.h"
+diff --git a/include/hw/virtio/virtio-access.h b/include/hw/virtio/virtio-access.h
+index 6818a23a2d..7474f89b5f 100644
+--- a/include/hw/virtio/virtio-access.h
++++ b/include/hw/virtio/virtio-access.h
+@@ -24,7 +24,7 @@
+ #define LEGACY_VIRTIO_IS_BIENDIAN 1
+ #endif
  
- typedef struct VhostShadowVirtqueue {
-+    struct vring vring;
-     EventNotifier hdev_notifier;
-     VirtQueue *vq;
-+
-+    vring_desc_t descs[];
- } VhostShadowVirtqueue;
+-static inline bool virtio_access_is_big_endian(VirtIODevice *vdev)
++static inline bool virtio_access_is_big_endian(const VirtIODevice *vdev)
+ {
+ #if defined(LEGACY_VIRTIO_IS_BIENDIAN)
+     return virtio_is_big_endian(vdev);
+@@ -147,7 +147,7 @@ static inline uint64_t virtio_ldq_p(VirtIODevice *vdev, const void *ptr)
+     }
+ }
  
- static inline bool vhost_vring_should_kick(VhostShadowVirtqueue *vq)
-@@ -37,10 +40,12 @@ VhostShadowVirtqueue *vhost_sw_lm_shadow_vq(struct vhost_dev *dev, int idx)
-         .index = idx
-     };
-     VirtQueue *vq = virtio_get_queue(dev->vdev, idx);
-+    unsigned num = virtio_queue_get_num(dev->vdev, idx);
-+    size_t ring_size = vring_size(num, VRING_DESC_ALIGN_SIZE);
-     VhostShadowVirtqueue *svq;
-     int r;
+-static inline uint16_t virtio_tswap16(VirtIODevice *vdev, uint16_t s)
++static inline uint16_t virtio_tswap16(const VirtIODevice *vdev, uint16_t s)
+ {
+ #ifdef HOST_WORDS_BIGENDIAN
+     return virtio_access_is_big_endian(vdev) ? s : bswap16(s);
+@@ -213,7 +213,7 @@ static inline void virtio_tswap16s(VirtIODevice *vdev, uint16_t *s)
+     *s = virtio_tswap16(vdev, *s);
+ }
  
--    svq = g_new0(VhostShadowVirtqueue, 1);
-+    svq = g_malloc0(sizeof(*svq) + ring_size);
-     svq->vq = vq;
+-static inline uint32_t virtio_tswap32(VirtIODevice *vdev, uint32_t s)
++static inline uint32_t virtio_tswap32(const VirtIODevice *vdev, uint32_t s)
+ {
+ #ifdef HOST_WORDS_BIGENDIAN
+     return virtio_access_is_big_endian(vdev) ? s : bswap32(s);
+@@ -227,7 +227,7 @@ static inline void virtio_tswap32s(VirtIODevice *vdev, uint32_t *s)
+     *s = virtio_tswap32(vdev, *s);
+ }
  
-     r = event_notifier_init(&svq->hdev_notifier, 0);
+-static inline uint64_t virtio_tswap64(VirtIODevice *vdev, uint64_t s)
++static inline uint64_t virtio_tswap64(const VirtIODevice *vdev, uint64_t s)
+ {
+ #ifdef HOST_WORDS_BIGENDIAN
+     return virtio_access_is_big_endian(vdev) ? s : bswap64(s);
 -- 
 2.18.4
 
