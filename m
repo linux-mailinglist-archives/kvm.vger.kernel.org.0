@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C0DA2BB4A7
+	by mail.lfdr.de (Postfix) with ESMTP id B97492BB4A8
 	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:00:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728529AbgKTS5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 13:57:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28573 "EHLO
+        id S1729254AbgKTS5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 13:57:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54680 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728378AbgKTS5D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:57:03 -0500
+        by vger.kernel.org with ESMTP id S1728378AbgKTS5V (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:57:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605898622;
+        s=mimecast20190719; t=1605898640;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CrZ8HzqKH9jvP8Zbz9rlbrynGHpm+xBKQyRidhhC+ks=;
-        b=JODFRAB5AGFUsX6SEnxeUozM0HOQzKVxDixChQuzJZX5zk5ukmdEr/VjOXafDSMY6UbqTW
-        3qOf+Zht98YDcncGML6Q1tApaRmOJ9qK5hFVR6knNlb2GVugWv6810U3RLbJd53XIF3ExL
-        fJ/w5hOmT41UJrQ2GR0/Ylp+WP+dgeM=
+        bh=ryEh3kyaXHqK19Bj8UjCon+CnIrYqmewzumtOEVqPsQ=;
+        b=H3kjDMtdWUV1rYRruexbHqgbOsphrs5gegTpkCA3jDr9UmI6h+46lQ92aUxSZUBHC0dcJo
+        iHhDngJ1Dir6s//vijMeZv7dk5tVxZkFDznyWOElxVVACCTGQ8qyXPov8pzVF5Z3BWf9vJ
+        yusqNHEhxwHGpEPZYJebk5PK0m6wJ54=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-Fp2Ve2KaObiDeZeZtu8-8A-1; Fri, 20 Nov 2020 13:57:00 -0500
-X-MC-Unique: Fp2Ve2KaObiDeZeZtu8-8A-1
+ us-mta-434-OefOQcNqNjmjp4PHqy7Kmg-1; Fri, 20 Nov 2020 13:57:17 -0500
+X-MC-Unique: OefOQcNqNjmjp4PHqy7Kmg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5123B10059A4;
-        Fri, 20 Nov 2020 18:56:58 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F365B1084425;
+        Fri, 20 Nov 2020 18:57:13 +0000 (UTC)
 Received: from eperezma.remote.csb (ovpn-112-88.ams2.redhat.com [10.36.112.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7FE645C1D5;
-        Fri, 20 Nov 2020 18:56:36 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A90BD5C1D5;
+        Fri, 20 Nov 2020 18:56:58 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
@@ -61,9 +61,9 @@ Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
         Parav Pandit <parav@mellanox.com>,
         Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
         Stephen Finucane <stephenfin@redhat.com>
-Subject: [RFC PATCH 23/27] vhost: unmap qemu's shadow virtqueues on sw live migration
-Date:   Fri, 20 Nov 2020 19:51:01 +0100
-Message-Id: <20201120185105.279030-24-eperezma@redhat.com>
+Subject: [RFC PATCH 24/27] vhost: iommu changes
+Date:   Fri, 20 Nov 2020 19:51:02 +0100
+Message-Id: <20201120185105.279030-25-eperezma@redhat.com>
 In-Reply-To: <20201120185105.279030-1-eperezma@redhat.com>
 References: <20201120185105.279030-1-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -74,26 +74,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since vhost does not need to access it, it has no sense to keep it
-mapped.
+Since vhost is now asking for qemu's VA, iommu needs to be bypassed.
 
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/virtio/vhost.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/virtio/vhost.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index f640d4edf0..eebfac4455 100644
+index eebfac4455..cb44b9997f 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -1124,6 +1124,7 @@ static int vhost_sw_live_migration_start(struct vhost_dev *dev)
+@@ -1109,6 +1109,10 @@ static int vhost_sw_live_migration_start(struct vhost_dev *dev)
  
-         dev->sw_lm_shadow_vq[idx] = vhost_sw_lm_shadow_vq(dev, idx);
-         event_notifier_set_handler(&vq->masked_notifier, vhost_handle_call);
-+        vhost_virtqueue_memory_unmap(dev, &dev->vqs[idx], true);
+     assert(dev->vhost_ops->vhost_set_vring_enable);
+     dev->vhost_ops->vhost_set_vring_enable(dev, false);
++    if (vhost_dev_has_iommu(dev)) {
++        r = vhost_backend_invalidate_device_iotlb(dev, 0, -1ULL);
++        assert(r == 0);
++    }
  
-         vhost_vring_write_addr(dev->sw_lm_shadow_vq[idx], &addr);
-         r = dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
+     for (idx = 0; idx < dev->nvqs; ++idx) {
+         struct vhost_virtqueue *vq = &dev->vqs[idx];
+@@ -1269,6 +1273,19 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+ 
+     trace_vhost_iotlb_miss(dev, 1);
+ 
++    if (dev->sw_lm_enabled) {
++        uaddr = iova;
++        len = 4096;
++        ret = vhost_backend_update_device_iotlb(dev, iova, uaddr, len,
++                                                IOMMU_RW);
++        if (ret) {
++            trace_vhost_iotlb_miss(dev, 2);
++            error_report("Fail to update device iotlb");
++        }
++
++        return ret;
++    }
++
+     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
+                                           iova, write,
+                                           MEMTXATTRS_UNSPECIFIED);
 -- 
 2.18.4
 
