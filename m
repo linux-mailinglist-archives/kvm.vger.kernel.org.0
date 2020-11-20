@@ -2,126 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B65C82B9E8C
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 00:45:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BDF42BA449
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 09:07:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727342AbgKSXhv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Nov 2020 18:37:51 -0500
-Received: from mga07.intel.com ([134.134.136.100]:49073 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727032AbgKSXhD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Nov 2020 18:37:03 -0500
-IronPort-SDR: Zq/Pe0p5l91hzzx48DOjm3ebbChK80LW8s+OwnICX1nGafsr13H2JNTzNYk/SXmj3kEoZO8atX
- D/aR+DdAIJ6w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9810"; a="235531197"
-X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
-   d="scan'208";a="235531197"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 15:37:02 -0800
-IronPort-SDR: VMCuB3rwBwInEHUHrFef2gQiRrhm7CgBMKml9/imwPF3Ks4pIjGh4SuRBPJusd72Ma53jJSb86
- TplYUTVs9q2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
-   d="scan'208";a="431392221"
-Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by fmsmga001.fm.intel.com with ESMTP; 19 Nov 2020 15:37:02 -0800
-From:   "Chang S. Bae" <chang.seok.bae@intel.com>
-To:     tglx@linutronix.de, mingo@kernel.org, bp@suse.de, luto@kernel.org,
-        x86@kernel.org
-Cc:     len.brown@intel.com, dave.hansen@intel.com, jing2.liu@intel.com,
-        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
-        chang.seok.bae@intel.com, kvm@vger.kernel.org
-Subject: [PATCH v2 10/22] x86/fpu/xstate: Update xstate save function for supporting dynamic user xstate
-Date:   Thu, 19 Nov 2020 15:32:45 -0800
-Message-Id: <20201119233257.2939-11-chang.seok.bae@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201119233257.2939-1-chang.seok.bae@intel.com>
-References: <20201119233257.2939-1-chang.seok.bae@intel.com>
+        id S1726575AbgKTIGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 03:06:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49440 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726224AbgKTIGN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 03:06:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605859572;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5Sc3/DoTPvTLhE+UbBZa2r71W9UwlwEzVG8I2Gq48DA=;
+        b=OggcpzvwzZ7tS2da95l+uqD1U3w7EwHcgY0Cyav8Yfy+Zs5HYwsozDebj2UnqrUZ0U5Mjx
+        Oh9ta6VM/JSQu/9Vb8sasHS4vDS4Aj4muOdxagIFGqD23EFcV4XmsM1oI+VtWbMqZUIZJq
+        r/GbgvYwgd1seQeSIPoEBZonSwhTPjU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-443-dGq18GHCMrC3pjvZ4Ewgjg-1; Fri, 20 Nov 2020 03:06:09 -0500
+X-MC-Unique: dGq18GHCMrC3pjvZ4Ewgjg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC958107ACE3;
+        Fri, 20 Nov 2020 08:06:07 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E0CC65D9D5;
+        Fri, 20 Nov 2020 08:05:59 +0000 (UTC)
+Date:   Fri, 20 Nov 2020 09:05:56 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        bgardon@google.com, peterx@redhat.com
+Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
+Message-ID: <20201120080556.2enu4ygvlnslmqiz@kamzik.brq.redhat.com>
+References: <20201116121942.55031-1-drjones@redhat.com>
+ <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-copy_xregs_to_kernel() used to save all user states in an invariably
-sufficient buffer. When the dynamic user state is enabled, it becomes
-conditional which state to be saved.
+On Mon, Nov 16, 2020 at 07:16:50PM +0100, Paolo Bonzini wrote:
+> On 16/11/20 13:19, Andrew Jones wrote:
+> > This series attempts to clean up demand_paging_test, dirty_log_perf_test,
+> > and dirty_log_test by factoring out common code, creating some new API
+> > along the way. It also splits include/perf_test_util.h into a more
+> > conventional header and source pair.
+> > 
+> > I've tested on x86 and AArch64 (one config each), but not s390x.
+> > 
+> > v3:
+> >   - Rebased remaining four patches from v2 onto kvm/queue
+> >   - Picked up r-b's from Peter and Ben
+> > 
+> > v2: https://www.spinics.net/lists/kvm/msg228711.html
+> 
+> Unfortunately patch 2 is still broken:
+> 
+> $ ./dirty_log_test -M dirty-ring
+> Setting log mode to: 'dirty-ring'
+> Test iterations: 32, interval: 10 (ms)
+> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+> ==== Test Assertion Failure ====
+>   lib/kvm_util.c:85: ret == 0
+>   pid=2010122 tid=2010122 - Invalid argument
+>      1	0x0000000000402ee7: vm_enable_cap at kvm_util.c:84
+>      2	0x0000000000403004: vm_enable_dirty_ring at kvm_util.c:124
+>      3	0x00000000004021a5: log_mode_create_vm_done at dirty_log_test.c:453
+>      4	 (inlined by) run_test at dirty_log_test.c:683
+>      5	0x000000000040b643: for_each_guest_mode at guest_modes.c:37
+>      6	0x00000000004019c2: main at dirty_log_test.c:864
+>      7	0x00007fe3f48207b2: ?? ??:0
+>      8	0x0000000000401aad: _start at ??:?
+>   KVM_ENABLE_CAP IOCTL failed,
+>   rc: -1 errno: 22
+> 
 
-fpu->state_mask can indicate which state components are reserved to be
-saved in XSAVE buffer. Use it as XSAVE's instruction mask to select states.
+So I finally looked closely enough at the dirty-ring stuff to see that
+patch 2 was always a dumb idea. dirty_ring_create_vm_done() has a comment
+that says "Switch to dirty ring mode after VM creation but before any of
+the vcpu creation". I'd argue that that comment would be better served at
+the log_mode_create_vm_done() call, but that doesn't excuse my sloppiness
+here. Maybe someday we can add a patch that adds that comment and also
+tries to use common code for the number of pages calculation for the VM,
+but not today.
 
-KVM saves xstate in guest_fpu and user_fpu. With the change, the KVM code
-needs to ensure a valid fpu->state_mask before XSAVE.
+Regarding this series, if the other three patches look good, then we
+can just drop 2/4. 3/4 and 4/4 should still apply cleanly and work.
 
-No functional change until the kernel supports dynamic user states.
-
-Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Reviewed-by: Len Brown <len.brown@intel.com>
-Cc: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org
----
- arch/x86/include/asm/fpu/internal.h |  3 +--
- arch/x86/kernel/fpu/core.c          |  2 +-
- arch/x86/kvm/x86.c                  | 11 ++++++++---
- 3 files changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
-index 3201468ff4aa..75196d10aa71 100644
---- a/arch/x86/include/asm/fpu/internal.h
-+++ b/arch/x86/include/asm/fpu/internal.h
-@@ -332,9 +332,8 @@ static inline void copy_kernel_to_xregs_booting(struct xregs_state *xstate)
- /*
-  * Save processor xstate to xsave area.
-  */
--static inline void copy_xregs_to_kernel(struct xregs_state *xstate)
-+static inline void copy_xregs_to_kernel(struct xregs_state *xstate, u64 mask)
- {
--	u64 mask = xfeatures_mask_all;
- 	u32 lmask = mask;
- 	u32 hmask = mask >> 32;
- 	int err;
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index dca4961fcc36..ece6428ba85b 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -99,7 +99,7 @@ int copy_fpregs_to_fpstate(struct fpu *fpu)
- 	if (likely(use_xsave())) {
- 		struct xregs_state *xsave = &xstate->xsave;
- 
--		copy_xregs_to_kernel(xsave);
-+		copy_xregs_to_kernel(xsave, fpu->state_mask);
- 
- 		/*
- 		 * AVX512 state is tracked here because its use is
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index abd5ff338155..023db770b55f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9212,15 +9212,20 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
- 
- static void kvm_save_current_fpu(struct fpu *fpu)
- {
-+	struct fpu *src_fpu = &current->thread.fpu;
-+
- 	/*
- 	 * If the target FPU state is not resident in the CPU registers, just
- 	 * memcpy() from current, else save CPU state directly to the target.
- 	 */
--	if (test_thread_flag(TIF_NEED_FPU_LOAD))
--		memcpy(&fpu->state, &current->thread.fpu.state,
-+	if (test_thread_flag(TIF_NEED_FPU_LOAD)) {
-+		memcpy(&fpu->state, &src_fpu->state,
- 		       fpu_kernel_xstate_default_size);
--	else
-+	} else {
-+		if (fpu->state_mask != src_fpu->state_mask)
-+			fpu->state_mask = src_fpu->state_mask;
- 		copy_fpregs_to_fpstate(fpu);
-+	}
- }
- 
- /* Swap (qemu) user FPU context for the guest FPU context. */
--- 
-2.17.1
+Thanks,
+drew
 
