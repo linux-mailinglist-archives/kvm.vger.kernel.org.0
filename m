@@ -2,101 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDA762BB327
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 19:37:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 431B72BB458
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:00:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730507AbgKTSac (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 13:30:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730135AbgKTSab (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Nov 2020 13:30:31 -0500
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 873F9C0617A7
-        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 10:30:31 -0800 (PST)
-Received: by mail-qk1-x742.google.com with SMTP id d28so9787420qka.11
-        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 10:30:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qS9ZqheXF3qXlYveFf6+vMdNm1LP9a7sCRmU5tIj0vQ=;
-        b=DrFYWt+1hb4WfINS92U5IVQMCB6WKF5xEz75W+ZSkpzKVYZw8JxEaaLRhFgpFsX1Rs
-         XUxXlb8HtK40tSfGjjunkX8SU199oPuB/G80+Ihj5S6pCKGr2HFJlL7MHo65gDiv8c23
-         ofoLjjtqKLcM53/YSHMQnD2n64U/s4LGFx0MXmrxSwtmydzCFFOGbOgl5AefevNt9z4B
-         /AzLhrlEIRoOx3a/FI6xZiykdYU/2XpV/SH5UXKmuao5MFBbsI3vKTIdga3hvHSW64qo
-         Z/90o2IZQUfzW0ooGr7K6UIiRhh4E1F7jHOF81fznndZO1wpQBiuooGayp0HJjzgftiB
-         hUzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qS9ZqheXF3qXlYveFf6+vMdNm1LP9a7sCRmU5tIj0vQ=;
-        b=mIK0qt9muiQO+VK670ujSUKirC9p7EXe2hxvCIa+pNeCjwl8PZyUPOMSyFGlalgErA
-         uycEGTGUNuhMGtidr5QXNCxKkIKKvvAqTUh8btBOSnyGjcAkeiTsUXaivfhbxKLFkDg/
-         LNbyFbGZDMvgkFJIwcNJEVVeRIw4ayy0N0yV5QpmCyo7Bd/2VBCQOeHeVoHsyXJACYIT
-         EOK0yziKnkAoSijmmBAP9ePF4ZChK3kIKqFlerlisJ9s1QMB9rXxm6I/ve5y6CxYXdlD
-         efvOkBBixmotK0sC/j4wTHa/mdXTytEJriSd+F/q1KXwF3m2ApA833GGo9qsE3tso1BO
-         L9UQ==
-X-Gm-Message-State: AOAM532QrTJb03y44oDdrAP0jO/DQtiimvxJeE83YPK9n1iCkXHJBOGH
-        gub8G2rfaFDM8PK4cnFSmHCoSQ==
-X-Google-Smtp-Source: ABdhPJz9SdUwITc+pZGgA9oQw0nYR0dAsKTieY7dxiA1OR9ilvjUimdkoUQjm+gMpnpYWVeoTDxPfg==
-X-Received: by 2002:a37:9441:: with SMTP id w62mr17877583qkd.474.1605897030779;
-        Fri, 20 Nov 2020 10:30:30 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id f14sm2400142qkk.89.2020.11.20.10.30.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2020 10:30:30 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1kgBAz-008ujM-Ig; Fri, 20 Nov 2020 14:30:29 -0400
-Date:   Fri, 20 Nov 2020 14:30:29 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH v6 17/17] RFC: mm: add mmu_notifier argument to follow_pfn
-Message-ID: <20201120183029.GQ244516@ziepe.ca>
-References: <20201119144146.1045202-1-daniel.vetter@ffwll.ch>
- <20201119144146.1045202-18-daniel.vetter@ffwll.ch>
+        id S1731994AbgKTSvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 13:51:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35244 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731937AbgKTSvi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:51:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605898296;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/Sb8SkhHSx+YyTW1MXsUsqQRkW1t3AvbZ30ip8xfmcY=;
+        b=cdswnbE9DhbYFCNDaG1rHdLz9ODZymz6QE97f2ynL105y4WtHjS23CSX/Y9ycL4MevJ088
+        jAHUNXuOB/jIf4CytYD6KR2GCcKXeyyxbZPgl4k9LuSwzcbRLit50uCGYGNjRTMi1a6lb2
+        1YUXMW9ndCBH9DjrHRigWTiqUVB+nXk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-vIcMi6b8OYG6iQ1GEt0oHw-1; Fri, 20 Nov 2020 13:51:32 -0500
+X-MC-Unique: vIcMi6b8OYG6iQ1GEt0oHw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF47263CC8;
+        Fri, 20 Nov 2020 18:51:22 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-112-88.ams2.redhat.com [10.36.112.88])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 38DB65C1D5;
+        Fri, 20 Nov 2020 18:51:07 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+Subject: [RFC PATCH 00/27] vDPA software assisted live migration
+Date:   Fri, 20 Nov 2020 19:50:38 +0100
+Message-Id: <20201120185105.279030-1-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201119144146.1045202-18-daniel.vetter@ffwll.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 19, 2020 at 03:41:46PM +0100, Daniel Vetter wrote:
-> @@ -4805,21 +4824,15 @@ EXPORT_SYMBOL(follow_pte_pmd);
->   * Return: zero and the pfn at @pfn on success, -ve otherwise.
->   */
->  int follow_pfn(struct vm_area_struct *vma, unsigned long address,
-> -	unsigned long *pfn)
-> +	unsigned long *pfn, struct mmu_notifier *subscription)
->  {
-> -	int ret = -EINVAL;
-> -	spinlock_t *ptl;
-> -	pte_t *ptep;
-> +	if (WARN_ON(!subscription->mm))
-> +		return -EINVAL;
->  
-> +	if (WARN_ON(subscription->mm != vma->vm_mm))
-> +		return -EINVAL;
+This series enable vDPA software assisted live migration for vhost-net
+devices. This is a new method of vhost devices migration: Instead of
+relay on vDPA device's dirty logging capability, SW assisted LM
+intercepts dataplane, forwarding the descriptors between VM and device.
 
-These two things are redundant right? vma->vm_mm != NULL?
+In this migration mode, qemu offers a new vring to the device to
+read and write into, and disable vhost notifiers, processing guest and
+vhost notifications in qemu. On used buffer relay, qemu will mark the
+dirty memory as with plain virtio-net devices. This way, devices does
+not need to have dirty page logging capability.
 
-BTW, why do we even have this for nommu? If the only caller is kvm,
-can you even compile kvm on nommu??
+This series is a POC doing SW LM for vhost-net devices, which already
+have dirty page logging capabilities. None of the changes have actual
+effect with current devices until last two patches (26 and 27) are
+applied, but they can be rebased on top of any other. These checks the
+device to meet all requirements, and disable vhost-net devices logging
+so migration goes through SW LM. This last patch is not meant to be
+applied in the final revision, it is in the series just for testing
+purposes.
 
-Jason
+For use SW assisted LM these vhost-net devices need to be instantiated:
+* With IOMMU (iommu_platform=on,ats=on)
+* Without event_idx (event_idx=off)
+
+Just the notification forwarding (with no descriptor relay) can be
+achieved with patches 7 and 9, and starting migration. Partial applies
+between 13 and 24 will not work while migrating on source, and patch
+25 is needed for the destination to resume network activity.
+
+It is based on the ideas of DPDK SW assisted LM, in the series of
+DPDK's https://patchwork.dpdk.org/cover/48370/ .
+
+Comments are welcome.
+
+Thanks!
+
+Eugenio Pérez (27):
+  vhost: Add vhost_dev_can_log
+  vhost: Add device callback in vhost_migration_log
+  vhost: Move log resize/put to vhost_dev_set_log
+  vhost: add vhost_kernel_set_vring_enable
+  vhost: Add hdev->dev.sw_lm_vq_handler
+  virtio: Add virtio_queue_get_used_notify_split
+  vhost: Route guest->host notification through qemu
+  vhost: Add a flag for software assisted Live Migration
+  vhost: Route host->guest notification through qemu
+  vhost: Allocate shadow vring
+  virtio: const-ify all virtio_tswap* functions
+  virtio: Add virtio_queue_full
+  vhost: Send buffers to device
+  virtio: Remove virtio_queue_get_used_notify_split
+  vhost: Do not invalidate signalled used
+  virtio: Expose virtqueue_alloc_element
+  vhost: add vhost_vring_set_notification_rcu
+  vhost: add vhost_vring_poll_rcu
+  vhost: add vhost_vring_get_buf_rcu
+  vhost: Return used buffers
+  vhost: Add vhost_virtqueue_memory_unmap
+  vhost: Add vhost_virtqueue_memory_map
+  vhost: unmap qemu's shadow virtqueues on sw live migration
+  vhost: iommu changes
+  vhost: Do not commit vhost used idx on vhost_virtqueue_stop
+  vhost: Add vhost_hdev_can_sw_lm
+  vhost: forbid vhost devices logging
+
+ hw/virtio/vhost-sw-lm-ring.h      |  39 +++
+ include/hw/virtio/vhost.h         |   5 +
+ include/hw/virtio/virtio-access.h |   8 +-
+ include/hw/virtio/virtio.h        |   4 +
+ hw/net/virtio-net.c               |  39 ++-
+ hw/virtio/vhost-backend.c         |  29 ++
+ hw/virtio/vhost-sw-lm-ring.c      | 268 +++++++++++++++++++
+ hw/virtio/vhost.c                 | 431 +++++++++++++++++++++++++-----
+ hw/virtio/virtio.c                |  18 +-
+ hw/virtio/meson.build             |   2 +-
+ 10 files changed, 758 insertions(+), 85 deletions(-)
+ create mode 100644 hw/virtio/vhost-sw-lm-ring.h
+ create mode 100644 hw/virtio/vhost-sw-lm-ring.c
+
+-- 
+2.18.4
+
