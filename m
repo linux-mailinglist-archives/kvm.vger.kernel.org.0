@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FB672BB4AB
+	by mail.lfdr.de (Postfix) with ESMTP id 8D3BA2BB4AC
 	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:00:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730091AbgKTS5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 13:57:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46012 "EHLO
+        id S1730095AbgKTS5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 13:57:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54637 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730060AbgKTS5r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:57:47 -0500
+        by vger.kernel.org with ESMTP id S1730060AbgKTS5u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:57:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605898666;
+        s=mimecast20190719; t=1605898669;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=O+qiriFl30O5ZK13M3dH3aBYCSEg2kw5TfbYjHT/iYc=;
-        b=iHL5Nl0iest7VSS05rFaJu8IoKGhwhaLrccFmkCio4hcqgs6nBAJhCqfeJR1i+hu1XNE2X
-        CLxvi7hN+aM10S/eCC1VeROcXEVsoEipAHEma8nwYzatB7em00PRJTNiYB4Atti/4LvCDK
-        96wrwNKkpa4WOkmUgyF4ljGeqNGD1lU=
+        bh=K8v+fo5FJLI5mUneJtRG5p9f1qblLX12fPi1h8UA2TI=;
+        b=gGBJp/eWhCWTBGtQ3VkVCivurzBOOO6cIhyTVYqsYwRLRlpjj+oKZPAmNl4WPuJ7qdF8LN
+        mWTHpE8uMNHis883v9w1AvL7TKWO28LPu59Vuziy+sWC+C+/GL04P1u+PkezFUDL2z732N
+        S4ivPC1FLKbZXlC+QGOl//zfD5/xYd8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320--iW6dT1CPiib-6aLo2w7YA-1; Fri, 20 Nov 2020 13:57:42 -0500
-X-MC-Unique: -iW6dT1CPiib-6aLo2w7YA-1
+ us-mta-461-_2evQM4sOaKGsMBKkPjsGA-1; Fri, 20 Nov 2020 13:57:48 -0500
+X-MC-Unique: _2evQM4sOaKGsMBKkPjsGA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA5C21084422;
-        Fri, 20 Nov 2020 18:57:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48BCB814411;
+        Fri, 20 Nov 2020 18:57:45 +0000 (UTC)
 Received: from eperezma.remote.csb (ovpn-112-88.ams2.redhat.com [10.36.112.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CDD7B5C1D5;
-        Fri, 20 Nov 2020 18:57:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E4555C1D5;
+        Fri, 20 Nov 2020 18:57:39 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
@@ -61,9 +61,9 @@ Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
         Parav Pandit <parav@mellanox.com>,
         Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
         Stephen Finucane <stephenfin@redhat.com>
-Subject: [RFC PATCH 26/27] vhost: Add vhost_hdev_can_sw_lm
-Date:   Fri, 20 Nov 2020 19:51:04 +0100
-Message-Id: <20201120185105.279030-27-eperezma@redhat.com>
+Subject: [RFC PATCH 27/27] vhost: forbid vhost devices logging
+Date:   Fri, 20 Nov 2020 19:51:05 +0100
+Message-Id: <20201120185105.279030-28-eperezma@redhat.com>
 In-Reply-To: <20201120185105.279030-1-eperezma@redhat.com>
 References: <20201120185105.279030-1-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -74,65 +74,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows a device to migrate if it meet a few requirements.
+This is NOT a commit intended for merge, but for test the patchset.
 
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/virtio/vhost.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ hw/virtio/vhost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index cf000b979f..44a51ccf5e 100644
+index 44a51ccf5e..069e5c915d 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -1529,6 +1529,37 @@ static void vhost_virtqueue_cleanup(struct vhost_virtqueue *vq)
-     event_notifier_cleanup(&vq->masked_notifier);
+@@ -79,7 +79,7 @@ static struct vhost_dev *vhost_dev_from_virtio(const VirtIODevice *vdev)
+ 
+ static bool vhost_dev_can_log(const struct vhost_dev *hdev)
+ {
+-    return hdev->features & (0x1ULL << VHOST_F_LOG_ALL);
++    return false;
  }
  
-+static bool vhost_hdev_can_sw_lm(struct vhost_dev *hdev)
-+{
-+    const char *cause = NULL;
-+
-+    if (hdev->features & (VIRTIO_F_IOMMU_PLATFORM)) {
-+        cause = "have iommu";
-+    } else if (hdev->features & VIRTIO_F_RING_PACKED) {
-+        cause = "is packed";
-+    } else if (hdev->features & VIRTIO_RING_F_EVENT_IDX) {
-+        cause = "Have event idx";
-+    } else if (hdev->features & VIRTIO_RING_F_INDIRECT_DESC) {
-+        cause = "Supports indirect descriptors";
-+    } else if (hdev->nvqs != 2) {
-+        cause = "!= 2 #vq supported";
-+    } else if (!hdev->vhost_ops->vhost_net_set_backend) {
-+        cause = "cannot pause device";
-+    }
-+
-+    if (cause) {
-+        if (!hdev->migration_blocker) {
-+            error_setg(&hdev->migration_blocker,
-+                "Migration disabled: vhost lacks VHOST_F_LOG_ALL feature and %s.",
-+                cause);
-+        }
-+
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-                    VhostBackendType backend_type, uint32_t busyloop_timeout)
- {
-@@ -1604,7 +1635,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     };
- 
-     if (hdev->migration_blocker == NULL) {
--        if (!vhost_dev_can_log(hdev)) {
-+        if (!vhost_dev_can_log(hdev) && !vhost_hdev_can_sw_lm(hdev)
-+            && hdev->migration_blocker == NULL) {
-             error_setg(&hdev->migration_blocker,
-                        "Migration disabled: vhost lacks VHOST_F_LOG_ALL feature.");
-         } else if (vhost_dev_log_is_shared(hdev) && !qemu_memfd_alloc_check()) {
+ static void vhost_dev_sync_region(struct vhost_dev *dev,
 -- 
 2.18.4
 
