@@ -2,92 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86DE32BA918
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 12:27:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 108CB2BA980
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 12:48:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728243AbgKTL0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 06:26:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33832 "EHLO mail.kernel.org"
+        id S1727409AbgKTLqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 06:46:36 -0500
+Received: from mx2.suse.de ([195.135.220.15]:55910 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727714AbgKTL0k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Nov 2020 06:26:40 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D34CC22244;
-        Fri, 20 Nov 2020 11:26:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605871600;
-        bh=e4dU3Fcu0n1ACqjkCBWzLMlbjaNYmEYYOuJTREFTOyk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=P4zweIOjwAsjb1amYtoKtfj/jkRrAFLkoeeYYASL4K06PAfVrCz8EBmM4MaS8UVpG
-         6ofZjZ+zn163yCRFv6Cz2OShDj1yHal6yxrPgs6uM7NQao6/7mrJWVqWjqVRxnM3yI
-         RzOntXJkFte54eXhHOWu4S2gBp3iTbL9cvXGVUuI=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kg4Yn-00CEtr-Sh; Fri, 20 Nov 2020 11:26:37 +0000
+        id S1727263AbgKTLqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Nov 2020 06:46:35 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1605872794; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=fjHe3+rmjY5cASW1XAPrcDHWzGbizvpE61ZYWB4j3cw=;
+        b=rHmTXjwVBmFJKyhCEqOmhgg9FGZswY8WJdm/UueRf8DddoT49obCKWkkpulXZkEmbMyr53
+        +tF6wEHiJQUjLKUN11yRtxzw2OPKHPWiM+6wvnAdRmBLFldnpbyUuBKOY+QFrHkVnZVwFO
+        BIZuxt25L9jBmyI/EuK0mKwTZgHx17c=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id C23BCAD57;
+        Fri, 20 Nov 2020 11:46:33 +0000 (UTC)
+From:   Juergen Gross <jgross@suse.com>
+To:     xen-devel@lists.xenproject.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org
+Cc:     peterz@infradead.org, luto@kernel.org,
+        Juergen Gross <jgross@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Deep Shah <sdeep@vmware.com>,
+        "VMware, Inc." <pv-drivers@vmware.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>
+Subject: [PATCH v2 00/12] x86: major paravirt cleanup
+Date:   Fri, 20 Nov 2020 12:46:18 +0100
+Message-Id: <20201120114630.13552-1-jgross@suse.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 20 Nov 2020 11:26:37 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     David Brazdil <dbrazdil@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>, ndesaulniers@google.com,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 3/5] KVM: arm64: Patch kimage_voffset instead of
- loading the EL1 value
-In-Reply-To: <20201119111454.vrbogriragp7zukk@google.com>
-References: <20201109175923.445945-1-maz@kernel.org>
- <20201109175923.445945-4-maz@kernel.org>
- <20201119111454.vrbogriragp7zukk@google.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <2c47608f4326c8251ebd940f8ecb99a9@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, ascull@google.com, will@kernel.org, qperret@google.com, ndesaulniers@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-11-19 11:14, David Brazdil wrote:
-> Hey Marc,
-> 
-> Just noticed in kvmarm/queue that the whitespacing in this patch is 
-> off.
-> 
->> +.macro kimg_pa reg, tmp
->> +alternative_cb kvm_get_kimage_voffset
->> +       movz    \tmp, #0
->> +       movk    \tmp, #0, lsl #16
->> +       movk    \tmp, #0, lsl #32
->> +       movk    \tmp, #0, lsl #48
->> +alternative_cb_end
->> +
->> +       /* reg = __pa(reg) */
->> +       sub     \reg, \reg, \tmp
->> +.endm
-> This uses spaces instead of tabs.
-> 
->> +
->>  #else
-> This added empty line actually has a tab in it.
+This is a major cleanup of the paravirt infrastructure aiming at
+eliminating all custom code patching via paravirt patching.
 
-Well spotted. Now fixed.
+This is achieved by using ALTERNATIVE instead, leading to the ability
+to give objtool access to the patched in instructions.
 
-Thanks,
+In order to remove most of the 32-bit special handling from pvops the
+time related operations are switched to use static_call() instead.
 
-         M.
+At the end of this series all paravirt patching has to do is to
+replace indirect calls with direct ones. In a further step this could
+be switched to static_call(), too, but that would require a major
+header file disentangling.
+
+Note that an updated objtool is needed for this series, as otherwise
+lots of warnings due to alternative instructions modifying the stack
+will be issued during the build.
+
+Changes in V2:
+- added patches 5-12
+
+Juergen Gross (12):
+  x86/xen: use specific Xen pv interrupt entry for MCE
+  x86/xen: use specific Xen pv interrupt entry for DF
+  x86/pv: switch SWAPGS to ALTERNATIVE
+  x86/xen: drop USERGS_SYSRET64 paravirt call
+  x86: rework arch_local_irq_restore() to not use popf
+  x86/paravirt: switch time pvops functions to use static_call()
+  x86: add new features for paravirt patching
+  x86/paravirt: remove no longer needed 32-bit pvops cruft
+  x86/paravirt: switch iret pvops to ALTERNATIVE
+  x86/paravirt: add new macros PVOP_ALT* supporting pvops in
+    ALTERNATIVEs
+  x86/paravirt: switch functions with custom code to ALTERNATIVE
+  x86/paravirt: have only one paravirt patch function
+
+ arch/x86/Kconfig                      |   1 +
+ arch/x86/entry/entry_32.S             |   4 +-
+ arch/x86/entry/entry_64.S             |  32 ++--
+ arch/x86/include/asm/cpufeatures.h    |   3 +
+ arch/x86/include/asm/idtentry.h       |   6 +
+ arch/x86/include/asm/irqflags.h       |  51 ++----
+ arch/x86/include/asm/mshyperv.h       |  11 --
+ arch/x86/include/asm/paravirt.h       | 170 ++++++--------------
+ arch/x86/include/asm/paravirt_time.h  |  38 +++++
+ arch/x86/include/asm/paravirt_types.h | 222 ++++++++++++--------------
+ arch/x86/kernel/Makefile              |   3 +-
+ arch/x86/kernel/alternative.c         |  30 +++-
+ arch/x86/kernel/asm-offsets.c         |   8 -
+ arch/x86/kernel/asm-offsets_64.c      |   3 -
+ arch/x86/kernel/cpu/vmware.c          |   5 +-
+ arch/x86/kernel/head_64.S             |   2 -
+ arch/x86/kernel/irqflags.S            |  11 --
+ arch/x86/kernel/kvm.c                 |   3 +-
+ arch/x86/kernel/kvmclock.c            |   3 +-
+ arch/x86/kernel/paravirt.c            |  70 +++-----
+ arch/x86/kernel/paravirt_patch.c      | 109 -------------
+ arch/x86/kernel/tsc.c                 |   3 +-
+ arch/x86/xen/enlighten_pv.c           |  36 +++--
+ arch/x86/xen/irq.c                    |  23 ---
+ arch/x86/xen/time.c                   |  12 +-
+ arch/x86/xen/xen-asm.S                |  52 +-----
+ arch/x86/xen/xen-ops.h                |   3 -
+ drivers/clocksource/hyperv_timer.c    |   5 +-
+ drivers/xen/time.c                    |   3 +-
+ kernel/sched/sched.h                  |   1 +
+ 30 files changed, 325 insertions(+), 598 deletions(-)
+ create mode 100644 arch/x86/include/asm/paravirt_time.h
+ delete mode 100644 arch/x86/kernel/paravirt_patch.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.26.2
+
