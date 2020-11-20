@@ -2,295 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB20C2BA7C8
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 11:52:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10C3C2BA7D4
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 11:56:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727614AbgKTKvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 05:51:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54654 "EHLO
+        id S1727349AbgKTKzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 05:55:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727333AbgKTKvd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Nov 2020 05:51:33 -0500
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D179C0613CF
-        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 02:51:31 -0800 (PST)
-Received: by mail-ot1-x342.google.com with SMTP id g19so8274696otp.13
-        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 02:51:31 -0800 (PST)
+        with ESMTP id S1727137AbgKTKzP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Nov 2020 05:55:15 -0500
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C41E1C0613CF
+        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 02:55:14 -0800 (PST)
+Received: by mail-wr1-x441.google.com with SMTP id r17so9625507wrw.1
+        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 02:55:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=9N1VJa6PgaSrJK1UStrZa9k9hVHdgTE/3/Vb+F7qDfg=;
-        b=MpezDlRHhDSLM+N5cZzIEzt77SYyy+A3JHsWxp1YZhY1ZVLefqezDmgWeeVuLW+0Sz
-         hNspdaDLmjlNt+Tms4qqJ/jndEuNmpgedZxgoIIUiCQI7bUtpNW3IvL2VvfxCvxRYz8A
-         tm+ce3BzWttaGumHJxGVfC2fzpl5+ui467JMg=
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Xegj5JQ49GKHqGAXzz8gAZ1DY5LujJVgAIPZFdhOM48=;
+        b=khE5rZYdcIAYRHncJd3g84jMHMi6sYINNMQRM3ddveU4a6WIeEjWZVMyUV/aOSzRxa
+         SCP0oXtj348TM/lamxSWHwNGV0ZSLEVvLFShpuCqRuHeOJ0hew2hlsxrdGYV3spSs+oo
+         +jVHOg9w/OpxpoDsWjHFFLQq1uB9vl+KQxvMnhDu9YTYsd4CnI6D7wwPn69MN6r86So8
+         cSyghPxHZLw0bnZSUD0M7OEegnpt1U4uztN7y0O2P9cgMnlSs3URfXBxxAoyiHEMaLQL
+         fdrT586UMDUrRIRw/3cG72rXETj0a3Qh3iuX+azx6FVx0h6jujyxpHjSCNHc4IZKvrj+
+         5+qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=9N1VJa6PgaSrJK1UStrZa9k9hVHdgTE/3/Vb+F7qDfg=;
-        b=S9RJwhpAFq0QhlQ8JFJpa1y+D3trBi/surh5NROj7CVm1jitawVDn1JTIjNRIrjasS
-         fUGUE6PxNVwMf42j7QK9KFcfO+95WMuVV5u3o5i5lnyxmbY56TPnvyReK3YnTR2Q/5CM
-         scNYjqBRawrAN5KuOYTodrCFLXCc5kOw4gYn/6ZyI/+vtk66r28kaDrS9SFeODc3tLzJ
-         3z6tErv7S1JBjUqusGlnEqJpyswjX9Lc/MdT8irGkyzaoxdHYKt6Np7QQcVkyQEQasq6
-         6RZKhF1j0MFroUj6h3LJISJhQJQ2z4ASFUSjUkT4lW6iTaIyNKlwO5pSoDAryBlBxMjj
-         Fu0w==
-X-Gm-Message-State: AOAM530p9grhST3a76LJBTkTgbGSoTIDmXO7CJlr7wLgGDJQ86mk7Dl6
-        /t/qbUDcj8qE/kbzVfDaKzjEyex3aqwmT1MEFuDxbA==
-X-Google-Smtp-Source: ABdhPJwaUr0TH4lPLa5FMJrImRPu3iblpyE9hZFNrMyCqKJhe/bQLEuDQvgi+ftqAXbnts12Il5Vkgn/R3iSW/a/ylM=
-X-Received: by 2002:a9d:3b4:: with SMTP id f49mr14063332otf.188.1605869490350;
- Fri, 20 Nov 2020 02:51:30 -0800 (PST)
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Xegj5JQ49GKHqGAXzz8gAZ1DY5LujJVgAIPZFdhOM48=;
+        b=TQilV9lcnpIGUsOh8HnesMDRi7F657XKqHzbeSzKcMrKPhLMS6omSYRuWNGpZ1iR9T
+         xK7ciocLJq8XrLfBTObPdjrvVaLqXIAz8sBrazcHDAUWhbBEUIGOSeePC9MmvO8Slixu
+         6hGhPCgaGuzytdmZDL2qeQ2hCb3x0r/Yej+FJy2XAj9mBI8YZX35HR/cOhbk35Ud9QfI
+         q0gRvga9SfTCwDo8L5bfLqjzdhMi9jcVUnFZNUt4GVLvTV8y84yjjhgLTKOvM9c3SdnN
+         YHnajoF8Hlr0IAsWEftYfjMmV0tiQ6npNgeum81xZPI6zpJgQYbSOvwopErP3ICzi42o
+         ON2w==
+X-Gm-Message-State: AOAM533uNEd15U11Zv1CGA3N9aHhNTX9qfZEim4ipnSETaJDg211owMi
+        BV68s29vsYYjayfb9LWqeWwXurqUnXo=
+X-Google-Smtp-Source: ABdhPJx0EipjX4t399BIPjYxrECHma65KFQdU7n3dKcbzivp+b4NE1RibcdvoVhUMI42c+8VZVqQSQ==
+X-Received: by 2002:a5d:438f:: with SMTP id i15mr15328794wrq.121.1605869713252;
+        Fri, 20 Nov 2020 02:55:13 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net. [83.42.66.234])
+        by smtp.gmail.com with ESMTPSA id e4sm2301525wrr.32.2020.11.20.02.55.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Nov 2020 02:55:12 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Subject: Re: [PATCH V13 2/9] meson.build: Re-enable KVM support for MIPS
+To:     Huacai Chen <chenhuacai@gmail.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Huacai Chen <zltjiangshi@gmail.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <1602059975-10115-1-git-send-email-chenhc@lemote.com>
+ <1602059975-10115-3-git-send-email-chenhc@lemote.com>
+ <0dfbe14a-9ddb-0069-9d86-62861c059d12@amsat.org>
+ <CAAhV-H63zhXyUizwOxUtXdQQOR=r82493tgH8NfLmgXF0g8row@mail.gmail.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9fc6161e-cf27-b636-97c0-9aca77d0f9cd@amsat.org>
+Date:   Fri, 20 Nov 2020 11:55:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20201119144146.1045202-1-daniel.vetter@ffwll.ch>
- <20201119144146.1045202-10-daniel.vetter@ffwll.ch> <f1f3a1d8-d62a-6e93-afc1-87a8e51081e9@xs4all.nl>
- <e1f7d30b-2012-0249-66c7-cf9d7d6246ad@xs4all.nl> <CAKMK7uEzFAtr9yxjaxi-kiuZhb+hWT3q6E41OegJr+J2-zkT8w@mail.gmail.com>
- <9035555a-af6b-e2dd-dbad-41ca70235e21@xs4all.nl>
-In-Reply-To: <9035555a-af6b-e2dd-dbad-41ca70235e21@xs4all.nl>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Fri, 20 Nov 2020 11:51:18 +0100
-Message-ID: <CAKMK7uFrXJh9jc5-v02A=JE8B3aThbYtTxFN-CGQUB=0TGmKgQ@mail.gmail.com>
-Subject: Re: [PATCH v6 09/17] media/videbuf1|2: Mark follow_pfn usage as unsafe
-To:     Hans Verkuil <hverkuil@xs4all.nl>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>, Tomasz Figa <tfiga@chromium.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Laurent Dufour <ldufour@linux.ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Michel Lespinasse <walken@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAAhV-H63zhXyUizwOxUtXdQQOR=r82493tgH8NfLmgXF0g8row@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 11:39 AM Hans Verkuil <hverkuil@xs4all.nl> wrote:
->
-> On 20/11/2020 10:18, Daniel Vetter wrote:
-> > On Fri, Nov 20, 2020 at 9:28 AM Hans Verkuil <hverkuil@xs4all.nl> wrote=
-:
-> >>
-> >> On 20/11/2020 09:06, Hans Verkuil wrote:
-> >>> On 19/11/2020 15:41, Daniel Vetter wrote:
-> >>>> The media model assumes that buffers are all preallocated, so that
-> >>>> when a media pipeline is running we never miss a deadline because th=
-e
-> >>>> buffers aren't allocated or available.
-> >>>>
-> >>>> This means we cannot fix the v4l follow_pfn usage through
-> >>>> mmu_notifier, without breaking how this all works. The only real fix
-> >>>> is to deprecate userptr support for VM_IO | VM_PFNMAP mappings and
-> >>>> tell everyone to cut over to dma-buf memory sharing for zerocopy.
-> >>>>
-> >>>> userptr for normal memory will keep working as-is, this only affects
-> >>>> the zerocopy userptr usage enabled in 50ac952d2263 ("[media]
-> >>>> videobuf2-dma-sg: Support io userptr operations on io memory").
-> >>>>
-> >>>> Acked-by: Tomasz Figa <tfiga@chromium.org>
-> >>>
-> >>> Acked-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
-> >>
-> >> Actually, cancel this Acked-by.
-> >>
-> >> So let me see if I understand this right: VM_IO | VM_PFNMAP mappings c=
-an
-> >> move around. There is a mmu_notifier that can be used to be notified w=
-hen
-> >> that happens, but that can't be used with media buffers since those bu=
-ffers
-> >> must always be available and in the same place.
-> >>
-> >> So follow_pfn is replaced by unsafe_follow_pfn to signal that what is =
-attempted
-> >> is unsafe and unreliable.
-> >>
-> >> If CONFIG_STRICT_FOLLOW_PFN is set, then unsafe_follow_pfn will fail, =
-if it
-> >> is unset, then it writes a warning to the kernel log but just continue=
-s while
-> >> still unsafe.
-> >>
-> >> I am very much inclined to just drop VM_IO | VM_PFNMAP support in the =
-media
-> >> subsystem. For vb2 there is a working alternative in the form of dmabu=
-f, and
-> >> frankly for vb1 I don't care. If someone really needs this for a vb1 d=
-river,
-> >> then they can do the work to convert that driver to vb2.
-> >>
-> >> I've added Mauro to the CC list and I'll ping a few more people to see=
- what
-> >> they think, but in my opinion support for USERPTR + VM_IO | VM_PFNMAP
-> >> should just be killed off.
-> >>
-> >> If others would like to keep it, then frame_vector.c needs a comment b=
-efore
-> >> the 'while' explaining why the unsafe_follow_pfn is there and that usi=
-ng
-> >> dmabuf is the proper alternative to use. That will make it easier for
-> >> developers to figure out why they see a kernel warning and what to do =
-to
-> >> fix it, rather than having to dig through the git history for the reas=
-on.
-> >
-> > I'm happy to add a comment, but otherwise if you all want to ditch
-> > this, can we do this as a follow up on top? There's quite a bit of
-> > code that can be deleted and I'd like to not hold up this patch set
-> > here on that - it's already a fairly sprawling pain touching about 7
-> > different subsystems (ok only 6-ish now since the s390 patch landed).
-> > For the comment, is the explanation next to unsafe_follow_pfn not good
-> > enough?
->
-> No, because that doesn't mention that you should use dma-buf as a replace=
-ment.
-> That's really the critical piece of information I'd like to see. That doe=
-sn't
-> belong in unsafe_follow_pfn, it needs to be in frame_vector.c since it's
-> vb2 specific.
+On 11/20/20 5:28 AM, Huacai Chen wrote:
+> On Wed, Nov 18, 2020 at 1:17 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> On 10/7/20 10:39 AM, Huacai Chen wrote:
+>>> After converting from configure to meson, KVM support is lost for MIPS,
+>>> so re-enable it in meson.build.
+>>>
+>>> Fixes: fdb75aeff7c212e1afaaa3a43 ("configure: remove target configuration")
+>>> Fixes: 8a19980e3fc42239aae054bc9 ("configure: move accelerator logic to meson")
+>>> Cc: aolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+>>> ---
+>>>  meson.build | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/meson.build b/meson.build
+>>> index 17c89c8..b407ff4 100644
+>>> --- a/meson.build
+>>> +++ b/meson.build
+>>> @@ -59,6 +59,8 @@ elif cpu == 's390x'
+>>>    kvm_targets = ['s390x-softmmu']
+>>>  elif cpu in ['ppc', 'ppc64']
+>>>    kvm_targets = ['ppc-softmmu', 'ppc64-softmmu']
+>>> +elif cpu in ['mips', 'mips64']
+>>> +  kvm_targets = ['mips-softmmu', 'mipsel-softmmu', 'mips64-softmmu', 'mips64el-softmmu']
+>>
+>> Are you sure both 32-bit hosts and targets are supported?
+>>
+>> I don't have hardware to test. If you are not working with
+>> 32-bit hardware I'd remove them.
+> When I add MIPS64 KVM support (Loongson-3 is MIPS64), MIPS32 KVM is
+> already there. On the kernel side, MIPS32 KVM is supported, but I
+> don't know whether it can work well.
 
-Ah makes sense, I'll add that.
+Well, from the history, you inherited from it:
 
-> >
-> > So ... can I get you to un-cancel your ack?
->
-> Hmm, I really would like to see support for this to be dropped completely=
-.
->
-> How about this: just replace follow_pfn() by -EINVAL instead of unsafe_fo=
-llow_pfn().
->
-> Add a TODO comment that this code now can be cleaned up a lot. Such a cle=
-an up patch
-> can be added on top later, and actually that is something that I can do o=
-nce this
-> series has landed.
->
-> Regardless, frame_vector.c should mention dma-buf as a replacement in a c=
-omment
-> since I don't want users who hit this issue to have to dig through git lo=
-gs
-> to find that dma-buf is the right approach.
->
-> BTW, nitpick: the subject line of this patch says 'videbuf' instead of 'v=
-ideobuf'.
+commit 1fa639e5618029e944ac68d27e32a99dcb85a349
+Author: James Hogan <jhogan@kernel.org>
+Date:   Sat Dec 21 15:53:06 2019 +0000
 
-Will fix to, and next round will have the additional -EINVAL on top.
-Iirc Mauro was pretty clear that we can't just delete this, so I kinda
-don't want to get stuck in this discussion with my patches :-)
--Daniel
+    MAINTAINERS: Orphan MIPS KVM CPUs
 
->
-> Regards,
->
->         Hans
->
-> >
-> > Thanks, Daniel
-> >
-> >>
-> >> Regards,
-> >>
-> >>         Hans
-> >>
-> >>>
-> >>> Thanks!
-> >>>
-> >>>       Hans
-> >>>
-> >>>> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> >>>> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> >>>> Cc: Kees Cook <keescook@chromium.org>
-> >>>> Cc: Dan Williams <dan.j.williams@intel.com>
-> >>>> Cc: Andrew Morton <akpm@linux-foundation.org>
-> >>>> Cc: John Hubbard <jhubbard@nvidia.com>
-> >>>> Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-> >>>> Cc: Jan Kara <jack@suse.cz>
-> >>>> Cc: Dan Williams <dan.j.williams@intel.com>
-> >>>> Cc: linux-mm@kvack.org
-> >>>> Cc: linux-arm-kernel@lists.infradead.org
-> >>>> Cc: linux-samsung-soc@vger.kernel.org
-> >>>> Cc: linux-media@vger.kernel.org
-> >>>> Cc: Pawel Osciak <pawel@osciak.com>
-> >>>> Cc: Marek Szyprowski <m.szyprowski@samsung.com>
-> >>>> Cc: Kyungmin Park <kyungmin.park@samsung.com>
-> >>>> Cc: Tomasz Figa <tfiga@chromium.org>
-> >>>> Cc: Laurent Dufour <ldufour@linux.ibm.com>
-> >>>> Cc: Vlastimil Babka <vbabka@suse.cz>
-> >>>> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-> >>>> Cc: Michel Lespinasse <walken@google.com>
-> >>>> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-> >>>> --
-> >>>> v3:
-> >>>> - Reference the commit that enabled the zerocopy userptr use case to
-> >>>>   make it abundandtly clear that this patch only affects that, and n=
-ot
-> >>>>   normal memory userptr. The old commit message already explained th=
-at
-> >>>>   normal memory userptr is unaffected, but I guess that was not clea=
-r
-> >>>>   enough.
-> >>>> ---
-> >>>>  drivers/media/common/videobuf2/frame_vector.c | 2 +-
-> >>>>  drivers/media/v4l2-core/videobuf-dma-contig.c | 2 +-
-> >>>>  2 files changed, 2 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/media/common/videobuf2/frame_vector.c b/drivers=
-/media/common/videobuf2/frame_vector.c
-> >>>> index a0e65481a201..1a82ec13ea00 100644
-> >>>> --- a/drivers/media/common/videobuf2/frame_vector.c
-> >>>> +++ b/drivers/media/common/videobuf2/frame_vector.c
-> >>>> @@ -70,7 +70,7 @@ int get_vaddr_frames(unsigned long start, unsigned=
- int nr_frames,
-> >>>>                      break;
-> >>>>
-> >>>>              while (ret < nr_frames && start + PAGE_SIZE <=3D vma->v=
-m_end) {
-> >>>> -                    err =3D follow_pfn(vma, start, &nums[ret]);
-> >>>> +                    err =3D unsafe_follow_pfn(vma, start, &nums[ret=
-]);
-> >>>>                      if (err) {
-> >>>>                              if (ret =3D=3D 0)
-> >>>>                                      ret =3D err;
-> >>>> diff --git a/drivers/media/v4l2-core/videobuf-dma-contig.c b/drivers=
-/media/v4l2-core/videobuf-dma-contig.c
-> >>>> index 52312ce2ba05..821c4a76ab96 100644
-> >>>> --- a/drivers/media/v4l2-core/videobuf-dma-contig.c
-> >>>> +++ b/drivers/media/v4l2-core/videobuf-dma-contig.c
-> >>>> @@ -183,7 +183,7 @@ static int videobuf_dma_contig_user_get(struct v=
-ideobuf_dma_contig_memory *mem,
-> >>>>      user_address =3D untagged_baddr;
-> >>>>
-> >>>>      while (pages_done < (mem->size >> PAGE_SHIFT)) {
-> >>>> -            ret =3D follow_pfn(vma, user_address, &this_pfn);
-> >>>> +            ret =3D unsafe_follow_pfn(vma, user_address, &this_pfn)=
-;
-> >>>>              if (ret)
-> >>>>                      break;
-> >>>>
-> >>>>
-> >>>
-> >>
-> >
-> >
->
+    I haven't been active for 18 months, and don't have the hardware
+    set up to test KVM for MIPS, so mark it as orphaned and remove
+    myself as maintainer. Hopefully somebody from MIPS can pick this up.
 
 
---=20
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+commit 134f7f7da12aad99daafbeb2a7ba9dbc6bd40abc
+Author: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date:   Mon Feb 24 12:50:58 2020 +0100
+
+    MAINTAINERS: Reactivate MIPS KVM CPUs
+
+    Reactivate MIPS KVM maintainership with a modest goal of keeping
+    the support alive, checking common KVM code changes against MIPS
+    functionality, etc. (hence the status "Odd Fixes"), with hope that
+    this component will be fully maintained at some further, but not
+    distant point in future.
+
+
+commit 15d983dee95edff1dc4c0bed71ce02fff877e766
+Author: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date:   Wed Jul 1 20:25:58 2020 +0200
+
+    MAINTAINERS: Adjust MIPS maintainership (Huacai Chen & Jiaxun Yang)
+
+    Huacai Chen and Jiaxun Yang step in as new energy [1].
+
+
+commit ca263c0fb9f33cc746e6e3d968b7db80072ecf86
+Author: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date:   Wed Oct 7 22:37:21 2020 +0200
+
+    MAINTAINERS: Remove myself
+
+    I have been working on project other than QEMU for some time,
+    and would like to devote myself to that project. It is impossible
+    for me to find enough time to perform maintainer's duties with
+    needed meticulousness and patience.
+
+
+QEMU deprecation process is quite slow, if we release mips-softmmu
+and mipsel-softmmu binaries with KVM support in 5.2, and you can not
+test them, you will still have to maintain them during 2021...
+
+If you don't have neither the hardware nor the time, I suggest you
+to only release it on 64-bit hosts. Personally I'd even only
+announce KVM supported on the little-endian binary only, because
+AFAIK you don't test big-endian KVM neither.
+
+Your call as a maintainer, but remember last RC tag is next
+Tuesday (Nov 24) in *4* days, then we release 5.2:
+https://wiki.qemu.org/Planning/5.2#Release_Schedule
+
+Regards,
+
+Phil.
