@@ -2,190 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E691B2BB21E
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 19:10:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDA762BB327
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 19:37:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729695AbgKTSHx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 13:07:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61526 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729680AbgKTSHw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:07:52 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AKI1jmr082195;
-        Fri, 20 Nov 2020 13:07:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=iOctTwIp/Fj3Oy4PzhVFvDdXfIeX1b7zsYKj95KQrx4=;
- b=YJruBOy7BFtjjXFMa/HOeQH/jhHhn71WEyQg0yq37MqMaa9CUyxXv5i1hcULuXifGNOJ
- YdEcZ27P3S6zJg2MAg/QvYZV9/yMX0MDUyI0FkFBgIz/pkoT6mLzzMKN5KBcCxnY5Dti
- 8vSmq7GvN0Gyy/Je+CsqzG67OgvFNk3z0rwEmJYNRGMg7Pwewgz7theP9S9PDnskAdpy
- lxRD4/JtHgo3Tk79YJwXauEpc2ODBH0YBWmac64LivDXEVNbpXKhmryZPy/s80yXUNp+
- lPZXx+xsAHWp+RI5rUSdQmD/X42RYqE+bDUGRhpvxp/VwszYFUSslDfBrQw6GYrFe02X GA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34xj7v16gp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Nov 2020 13:07:49 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AKI1kKn082291;
-        Fri, 20 Nov 2020 13:07:49 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34xj7v16fj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Nov 2020 13:07:49 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AKI25OS010464;
-        Fri, 20 Nov 2020 18:07:46 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 34t6v83cm4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Nov 2020 18:07:46 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AKI7hHx7078622
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Nov 2020 18:07:43 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E2DDAE053;
-        Fri, 20 Nov 2020 18:07:43 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6555DAE051;
-        Fri, 20 Nov 2020 18:07:43 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 20 Nov 2020 18:07:43 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 131BEE23B4; Fri, 20 Nov 2020 19:07:43 +0100 (CET)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v2 2/2] vfio-ccw: Wire in the request callback
-Date:   Fri, 20 Nov 2020 19:07:40 +0100
-Message-Id: <20201120180740.87837-3-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201120180740.87837-1-farman@linux.ibm.com>
-References: <20201120180740.87837-1-farman@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-20_09:2020-11-20,2020-11-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- mlxlogscore=999 suspectscore=2 lowpriorityscore=0 impostorscore=0
- mlxscore=0 clxscore=1015 malwarescore=0 spamscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011200120
+        id S1730507AbgKTSac (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 13:30:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730135AbgKTSab (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Nov 2020 13:30:31 -0500
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 873F9C0617A7
+        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 10:30:31 -0800 (PST)
+Received: by mail-qk1-x742.google.com with SMTP id d28so9787420qka.11
+        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 10:30:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qS9ZqheXF3qXlYveFf6+vMdNm1LP9a7sCRmU5tIj0vQ=;
+        b=DrFYWt+1hb4WfINS92U5IVQMCB6WKF5xEz75W+ZSkpzKVYZw8JxEaaLRhFgpFsX1Rs
+         XUxXlb8HtK40tSfGjjunkX8SU199oPuB/G80+Ihj5S6pCKGr2HFJlL7MHo65gDiv8c23
+         ofoLjjtqKLcM53/YSHMQnD2n64U/s4LGFx0MXmrxSwtmydzCFFOGbOgl5AefevNt9z4B
+         /AzLhrlEIRoOx3a/FI6xZiykdYU/2XpV/SH5UXKmuao5MFBbsI3vKTIdga3hvHSW64qo
+         Z/90o2IZQUfzW0ooGr7K6UIiRhh4E1F7jHOF81fznndZO1wpQBiuooGayp0HJjzgftiB
+         hUzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qS9ZqheXF3qXlYveFf6+vMdNm1LP9a7sCRmU5tIj0vQ=;
+        b=mIK0qt9muiQO+VK670ujSUKirC9p7EXe2hxvCIa+pNeCjwl8PZyUPOMSyFGlalgErA
+         uycEGTGUNuhMGtidr5QXNCxKkIKKvvAqTUh8btBOSnyGjcAkeiTsUXaivfhbxKLFkDg/
+         LNbyFbGZDMvgkFJIwcNJEVVeRIw4ayy0N0yV5QpmCyo7Bd/2VBCQOeHeVoHsyXJACYIT
+         EOK0yziKnkAoSijmmBAP9ePF4ZChK3kIKqFlerlisJ9s1QMB9rXxm6I/ve5y6CxYXdlD
+         efvOkBBixmotK0sC/j4wTHa/mdXTytEJriSd+F/q1KXwF3m2ApA833GGo9qsE3tso1BO
+         L9UQ==
+X-Gm-Message-State: AOAM532QrTJb03y44oDdrAP0jO/DQtiimvxJeE83YPK9n1iCkXHJBOGH
+        gub8G2rfaFDM8PK4cnFSmHCoSQ==
+X-Google-Smtp-Source: ABdhPJz9SdUwITc+pZGgA9oQw0nYR0dAsKTieY7dxiA1OR9ilvjUimdkoUQjm+gMpnpYWVeoTDxPfg==
+X-Received: by 2002:a37:9441:: with SMTP id w62mr17877583qkd.474.1605897030779;
+        Fri, 20 Nov 2020 10:30:30 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id f14sm2400142qkk.89.2020.11.20.10.30.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Nov 2020 10:30:30 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kgBAz-008ujM-Ig; Fri, 20 Nov 2020 14:30:29 -0400
+Date:   Fri, 20 Nov 2020 14:30:29 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v6 17/17] RFC: mm: add mmu_notifier argument to follow_pfn
+Message-ID: <20201120183029.GQ244516@ziepe.ca>
+References: <20201119144146.1045202-1-daniel.vetter@ffwll.ch>
+ <20201119144146.1045202-18-daniel.vetter@ffwll.ch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201119144146.1045202-18-daniel.vetter@ffwll.ch>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The device is being unplugged, so pass the request to userspace to
-ask for a graceful cleanup. This should free up the thread that
-would otherwise loop waiting for the device to be fully released.
+On Thu, Nov 19, 2020 at 03:41:46PM +0100, Daniel Vetter wrote:
+> @@ -4805,21 +4824,15 @@ EXPORT_SYMBOL(follow_pte_pmd);
+>   * Return: zero and the pfn at @pfn on success, -ve otherwise.
+>   */
+>  int follow_pfn(struct vm_area_struct *vma, unsigned long address,
+> -	unsigned long *pfn)
+> +	unsigned long *pfn, struct mmu_notifier *subscription)
+>  {
+> -	int ret = -EINVAL;
+> -	spinlock_t *ptl;
+> -	pte_t *ptep;
+> +	if (WARN_ON(!subscription->mm))
+> +		return -EINVAL;
+>  
+> +	if (WARN_ON(subscription->mm != vma->vm_mm))
+> +		return -EINVAL;
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- drivers/s390/cio/vfio_ccw_ops.c     | 26 ++++++++++++++++++++++++++
- drivers/s390/cio/vfio_ccw_private.h |  4 ++++
- include/uapi/linux/vfio.h           |  1 +
- 3 files changed, 31 insertions(+)
+These two things are redundant right? vma->vm_mm != NULL?
 
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 8b3ed5b45277..68106be4ba7a 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -394,6 +394,7 @@ static int vfio_ccw_mdev_get_irq_info(struct vfio_irq_info *info)
- 	switch (info->index) {
- 	case VFIO_CCW_IO_IRQ_INDEX:
- 	case VFIO_CCW_CRW_IRQ_INDEX:
-+	case VFIO_CCW_REQ_IRQ_INDEX:
- 		info->count = 1;
- 		info->flags = VFIO_IRQ_INFO_EVENTFD;
- 		break;
-@@ -424,6 +425,9 @@ static int vfio_ccw_mdev_set_irqs(struct mdev_device *mdev,
- 	case VFIO_CCW_CRW_IRQ_INDEX:
- 		ctx = &private->crw_trigger;
- 		break;
-+	case VFIO_CCW_REQ_IRQ_INDEX:
-+		ctx = &private->req_trigger;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -607,6 +611,27 @@ static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
- 	}
- }
- 
-+/* Request removal of the device*/
-+static void vfio_ccw_mdev_request(struct mdev_device *mdev, unsigned int count)
-+{
-+	struct vfio_ccw_private *private = dev_get_drvdata(mdev_parent_dev(mdev));
-+
-+	if (!private)
-+		return;
-+
-+	if (private->req_trigger) {
-+		if (!(count % 10))
-+			dev_notice_ratelimited(mdev_dev(private->mdev),
-+					       "Relaying device request to user (#%u)\n",
-+					       count);
-+
-+		eventfd_signal(private->req_trigger, 1);
-+	} else if (count == 0) {
-+		dev_notice(mdev_dev(private->mdev),
-+			   "No device request channel registered, blocked until released by user\n");
-+	}
-+}
-+
- static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
- 	.owner			= THIS_MODULE,
- 	.supported_type_groups  = mdev_type_groups,
-@@ -617,6 +642,7 @@ static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
- 	.read			= vfio_ccw_mdev_read,
- 	.write			= vfio_ccw_mdev_write,
- 	.ioctl			= vfio_ccw_mdev_ioctl,
-+	.request		= vfio_ccw_mdev_request,
- };
- 
- int vfio_ccw_mdev_reg(struct subchannel *sch)
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index 8723156b29ea..b2c762eb42b9 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -84,7 +84,10 @@ struct vfio_ccw_crw {
-  * @irb: irb info received from interrupt
-  * @scsw: scsw info
-  * @io_trigger: eventfd ctx for signaling userspace I/O results
-+ * @crw_trigger: eventfd ctx for signaling userspace CRW information
-+ * @req_trigger: eventfd ctx for signaling userspace to return device
-  * @io_work: work for deferral process of I/O handling
-+ * @crw_work: work for deferral process of CRW handling
-  */
- struct vfio_ccw_private {
- 	struct subchannel	*sch;
-@@ -108,6 +111,7 @@ struct vfio_ccw_private {
- 
- 	struct eventfd_ctx	*io_trigger;
- 	struct eventfd_ctx	*crw_trigger;
-+	struct eventfd_ctx	*req_trigger;
- 	struct work_struct	io_work;
- 	struct work_struct	crw_work;
- } __aligned(8);
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 2f313a238a8f..d1812777139f 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -820,6 +820,7 @@ enum {
- enum {
- 	VFIO_CCW_IO_IRQ_INDEX,
- 	VFIO_CCW_CRW_IRQ_INDEX,
-+	VFIO_CCW_REQ_IRQ_INDEX,
- 	VFIO_CCW_NUM_IRQS
- };
- 
--- 
-2.17.1
+BTW, why do we even have this for nommu? If the only caller is kvm,
+can you even compile kvm on nommu??
 
+Jason
