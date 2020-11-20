@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B97492BB4A8
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:00:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32A8C2BB4A9
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:00:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729254AbgKTS5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 13:57:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54680 "EHLO
+        id S1730021AbgKTS5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 13:57:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23964 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728378AbgKTS5V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:57:21 -0500
+        by vger.kernel.org with ESMTP id S1729047AbgKTS5b (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 13:57:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605898640;
+        s=mimecast20190719; t=1605898649;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ryEh3kyaXHqK19Bj8UjCon+CnIrYqmewzumtOEVqPsQ=;
-        b=H3kjDMtdWUV1rYRruexbHqgbOsphrs5gegTpkCA3jDr9UmI6h+46lQ92aUxSZUBHC0dcJo
-        iHhDngJ1Dir6s//vijMeZv7dk5tVxZkFDznyWOElxVVACCTGQ8qyXPov8pzVF5Z3BWf9vJ
-        yusqNHEhxwHGpEPZYJebk5PK0m6wJ54=
+        bh=7NFTh5Kxb25Zit2Z09Dwayle5qrijF2SdCF72+OTF/8=;
+        b=gfix5mH5ZtIhEDttf1Nc39m62DMRNKcOa2PG1Nz0KfublSxjHt8eHpnX3smXr+q8gbAc5K
+        4/3zih0zMo7X5q/69dCsW2F+yQZCMJgYVZYq84w9fZnCJ/0wqtYWwsB62tvtlffzsV2itT
+        J9qiLABP/TaLDecvqNePfKck3EwJR2Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-OefOQcNqNjmjp4PHqy7Kmg-1; Fri, 20 Nov 2020 13:57:17 -0500
-X-MC-Unique: OefOQcNqNjmjp4PHqy7Kmg-1
+ us-mta-111-APAVSU7rNfasUb3rHao7YA-1; Fri, 20 Nov 2020 13:57:26 -0500
+X-MC-Unique: APAVSU7rNfasUb3rHao7YA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F365B1084425;
-        Fri, 20 Nov 2020 18:57:13 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77F0D801B19;
+        Fri, 20 Nov 2020 18:57:23 +0000 (UTC)
 Received: from eperezma.remote.csb (ovpn-112-88.ams2.redhat.com [10.36.112.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A90BD5C1D5;
-        Fri, 20 Nov 2020 18:56:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 571CD5C1D5;
+        Fri, 20 Nov 2020 18:57:14 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
@@ -61,9 +61,9 @@ Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
         Parav Pandit <parav@mellanox.com>,
         Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
         Stephen Finucane <stephenfin@redhat.com>
-Subject: [RFC PATCH 24/27] vhost: iommu changes
-Date:   Fri, 20 Nov 2020 19:51:02 +0100
-Message-Id: <20201120185105.279030-25-eperezma@redhat.com>
+Subject: [RFC PATCH 25/27] vhost: Do not commit vhost used idx on vhost_virtqueue_stop
+Date:   Fri, 20 Nov 2020 19:51:03 +0100
+Message-Id: <20201120185105.279030-26-eperezma@redhat.com>
 In-Reply-To: <20201120185105.279030-1-eperezma@redhat.com>
 References: <20201120185105.279030-1-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -74,48 +74,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since vhost is now asking for qemu's VA, iommu needs to be bypassed.
+... if sw lm is enabled
 
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/virtio/vhost.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ hw/virtio/vhost.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index eebfac4455..cb44b9997f 100644
+index cb44b9997f..cf000b979f 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -1109,6 +1109,10 @@ static int vhost_sw_live_migration_start(struct vhost_dev *dev)
+@@ -1424,17 +1424,22 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
+     struct vhost_vring_state state = {
+         .index = vhost_vq_index,
+     };
+-    int r;
++    int r = -1;
  
-     assert(dev->vhost_ops->vhost_set_vring_enable);
-     dev->vhost_ops->vhost_set_vring_enable(dev, false);
-+    if (vhost_dev_has_iommu(dev)) {
-+        r = vhost_backend_invalidate_device_iotlb(dev, 0, -1ULL);
-+        assert(r == 0);
-+    }
+     if (virtio_queue_get_desc_addr(vdev, idx) == 0) {
+         /* Don't stop the virtqueue which might have not been started */
+         return;
+     }
  
-     for (idx = 0; idx < dev->nvqs; ++idx) {
-         struct vhost_virtqueue *vq = &dev->vqs[idx];
-@@ -1269,6 +1273,19 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
- 
-     trace_vhost_iotlb_miss(dev, 1);
- 
-+    if (dev->sw_lm_enabled) {
-+        uaddr = iova;
-+        len = 4096;
-+        ret = vhost_backend_update_device_iotlb(dev, iova, uaddr, len,
-+                                                IOMMU_RW);
-+        if (ret) {
-+            trace_vhost_iotlb_miss(dev, 2);
-+            error_report("Fail to update device iotlb");
+-    r = dev->vhost_ops->vhost_get_vring_base(dev, &state);
+-    if (r < 0) {
+-        VHOST_OPS_DEBUG("vhost VQ %u ring restore failed: %d", idx, r);
+-        /* Connection to the backend is broken, so let's sync internal
++    if (!dev->sw_lm_enabled) {
++        r = dev->vhost_ops->vhost_get_vring_base(dev, &state);
++        if (r < 0) {
++            VHOST_OPS_DEBUG("vhost VQ %u ring restore failed: %d", idx, r);
 +        }
-+
-+        return ret;
 +    }
 +
-     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
-                                           iova, write,
-                                           MEMTXATTRS_UNSPECIFIED);
++    if (!dev->sw_lm_enabled || r < 0) {
++        /* Connection to the backend is unusable, so let's sync internal
+          * last avail idx to the device used idx.
+          */
+         virtio_queue_restore_last_avail_idx(vdev, idx);
 -- 
 2.18.4
 
