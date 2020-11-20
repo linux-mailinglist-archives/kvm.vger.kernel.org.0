@@ -2,91 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D88922BA9C4
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 13:03:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9BB62BA9BB
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 13:01:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728049AbgKTMDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 07:03:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37684 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727678AbgKTMDQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Nov 2020 07:03:16 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B50FFC0613CF;
-        Fri, 20 Nov 2020 04:03:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xeukajkb0Dh8Aj05tLhXcYnJX0ZZcEiN+jLi0pnGRWQ=; b=eEI2XdW3SS3SvnEYkgrxIgrkkZ
-        QESj0xks6qaTJAnkv/SrECagNU+vSqctcrq0xLMAWIfHAZKLk9ye2uO7gskiUylP8RbcybpWeUXL2
-        uK6+gWyoCZxLIYAsj/8Cr6bDQjqDWnVAJEvPDRs9mQv3WAo/KAacUwgv54o4zvTL/2MI1ffWEmq47
-        iGzPS/OuVWATcJv3FdWhjqRfpijJMY2zQfXpueb6tRHat5LxD9HkJ5lF4m33YjKhMqWD/w/svRfZq
-        kIH2ZsgedGxLYnMj1h8GrezPVSEXeHN6F04tocRnYrqwZsV1M6RSBowt+3mIDzez5FevIapCnyvmm
-        E0VqGnQQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kg572-0006MQ-D6; Fri, 20 Nov 2020 12:02:00 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id EAD53305C16;
-        Fri, 20 Nov 2020 13:01:54 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id CD10B200DF1A6; Fri, 20 Nov 2020 13:01:54 +0100 (CET)
-Date:   Fri, 20 Nov 2020 13:01:54 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     xen-devel@lists.xenproject.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        luto@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Deep Shah <sdeep@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>
-Subject: Re: [PATCH v2 06/12] x86/paravirt: switch time pvops functions to
- use static_call()
-Message-ID: <20201120120154.GE3021@hirez.programming.kicks-ass.net>
-References: <20201120114630.13552-1-jgross@suse.com>
- <20201120114630.13552-7-jgross@suse.com>
+        id S1727865AbgKTMA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 07:00:56 -0500
+Received: from foss.arm.com ([217.140.110.172]:48420 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727858AbgKTMA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Nov 2020 07:00:56 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9DF6811D4;
+        Fri, 20 Nov 2020 04:00:55 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 107DC3F718;
+        Fri, 20 Nov 2020 04:00:54 -0800 (PST)
+To:     kvm@vger.kernel.org,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        Andrew Jones <drjones@redhat.com>,
+        Auger Eric <eric.auger@redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests] its-migration segmentation fault
+Message-ID: <d18ab1d5-4eff-43e1-4a5b-5373b67e4286@arm.com>
+Date:   Fri, 20 Nov 2020 12:02:10 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201120114630.13552-7-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 12:46:24PM +0100, Juergen Gross wrote:
-> The time pvops functions are the only ones left which might be
-> used in 32-bit mode and which return a 64-bit value.
-> 
-> Switch them to use the static_call() mechanism instead of pvops, as
-> this allows quite some simplification of the pvops implementation.
-> 
-> Due to include hell this requires to split out the time interfaces
-> into a new header file.
+When running all the tests with taskset -c 0-3 ./run_tests.sh on a rockpro64 (on
+the Cortex-a53 cores) the its-migration test hangs. In the log file I see:
 
-There's also this patch floating around; just in case that would come in
-handy:
+run_migration timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd
+-device pci-testdev -display none -serial stdio -kernel arm/gic.flat -smp 6
+-machine gic-version=3 -append its-migration # -initrd /tmp/tmp.OrlQiorBpY
+ITS: MAPD devid=2 size = 0x8 itt=0x40420000 valid=1
+ITS: MAPD devid=7 size = 0x8 itt=0x40430000 valid=1
+MAPC col_id=3 target_addr = 0x30000 valid=1
+MAPC col_id=2 target_addr = 0x20000 valid=1
+INVALL col_id=2
+INVALL col_id=3
+MAPTI dev_id=2 event_id=20 -> phys_id=8195, col_id=3
+MAPTI dev_id=7 event_id=255 -> phys_id=8196, col_id=2
+Now migrate the VM, then press a key to continue...
+scripts/arch-run.bash: line 103: 48549 Done                    echo '{ "execute":
+"qmp_capabilities" }{ "execute":' "$2" '}'
+     48550 Segmentation fault      (core dumped) | ncat -U $1
+scripts/arch-run.bash: line 103: 48568 Done                    echo '{ "execute":
+"qmp_capabilities" }{ "execute":' "$2" '}'
+     48569 Segmentation fault      (core dumped) | ncat -U $1
+scripts/arch-run.bash: line 103: 48583 Done                    echo '{ "execute":
+"qmp_capabilities" }{ "execute":' "$2" '}'
+     48584 Segmentation fault      (core dumped) | ncat -U $1
+[..]
+scripts/arch-run.bash: line 103: 49414 Done                    echo '{ "execute":
+"qmp_capabilities" }{ "execute":' "$2" '}'
+     49415 Segmentation fault      (core dumped) | ncat -U $1
+qemu-system-aarch64: terminating on signal 15 from pid 48496 (timeout)
+qemu-system-aarch64: terminating on signal 15 from pid 48504 (timeout)
+scripts/arch-run.bash: line 103: 49430 Done                    echo '{ "execute":
+"qmp_capabilities" }{ "execute":' "$2" '}'
+     49431 Segmentation fault      (core dumped) | ncat -U $1
+scripts/arch-run.bash: line 103: 49445 Done                    echo '{ "execute":
+"qmp_capabilities" }{ "execute":' "$2" '}'
+[..]
 
-  https://lkml.kernel.org/r/20201110005609.40989-3-frederic@kernel.org
+If I run the test manually:
+
+$ taskset -c 0-3 ./arm-run arm/gic.flat -smp 4 -machine gic-version=3 -append
+'its-migration'
+
+/usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm
+-cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/gic.flat -smp 4 -machine gic-version=3 -append its-migration # -initrd
+/tmp/tmp.OtsTj3QD4J
+ITS: MAPD devid=2 size = 0x8 itt=0x403a0000 valid=1
+ITS: MAPD devid=7 size = 0x8 itt=0x403b0000 valid=1
+MAPC col_id=3 target_addr = 0x30000 valid=1
+MAPC col_id=2 target_addr = 0x20000 valid=1
+INVALL col_id=2
+INVALL col_id=3
+MAPTI dev_id=2 event_id=20 -> phys_id=8195, col_id=3
+MAPTI dev_id=7 event_id=255 -> phys_id=8196, col_id=2
+Now migrate the VM, then press a key to continue...
+
+And the test hangs here after I press a key.
+
+Package versions:
+
+$ ncat --version
+Ncat: Version 7.91 ( https://nmap.org/ncat )
+
+$ /usr/bin/qemu-system-aarch64 --version
+QEMU emulator version 5.1.0
+Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+
+$ uname -a
+Linux rockpro 5.10.0-rc4 #33 SMP PREEMPT Thu Nov 19 15:58:57 GMT 2020 aarch64
+GNU/Linux
+
+Thanks,
+
+Alex
+
