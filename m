@@ -2,202 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1A912BB4CC
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:11:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AB862BB59A
+	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 20:32:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729371AbgKTTDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 14:03:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26817 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730102AbgKTTDm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Nov 2020 14:03:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605899020;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8UpoDNvLCM+M0RvdtXWxICqCloKh5IfInwxaMT4Cg4k=;
-        b=enBhRZqb/ScvkeKeWNPszvEAXCw/BJGpF2RUB5MVR3RsXjsXRkz6HlPzz07KRj9rSnPSb6
-        aWob6+GSvwTPdRTGQoETVomJgNAnveyyBlx18XaPR4+7i2qN2mM2wBEmBuab28ukepZSOU
-        CPXQHkjjccAJN/TJr95lNrxykkQdTv0=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-xwq064R0M1-XkciEDNa_zA-1; Fri, 20 Nov 2020 14:03:38 -0500
-X-MC-Unique: xwq064R0M1-XkciEDNa_zA-1
-Received: by mail-qv1-f72.google.com with SMTP id bl3so7782975qvb.8
-        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 11:03:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=8UpoDNvLCM+M0RvdtXWxICqCloKh5IfInwxaMT4Cg4k=;
-        b=X8fFuNI3NBLFjJSuJ+tkTl44Z4a+6e1YgeQULPf/g2PUqOHiBbyz4pUGNSQHpiEAZo
-         oKVEsi6AuTkQqpKwaYyRNJGstEogv2liKf9sMjWkMx64Z3MCzLQ7aXqYRT/V9nVOKyYx
-         Oc3GyEiYV6UzK6Zxq5Jcp+G56/g783yZRBPqcGgv+359TtaPsAdMKtczcUYc/xeyg2V4
-         24iLn5f32sdzL5d0z6I64AAW7UcCYD3SReTgCFzlAzYcf1I0A03e2fmekTXoyvnfYkap
-         /iOW6Zzsl4oNZEKHEnxcN0ZA1/ZyTD3FFlXmUci7VX+F2yxfsccTap6SYSJsUTf0tm1q
-         xn8Q==
-X-Gm-Message-State: AOAM530/fVcr4wZN2/Y4ZD05Cm2gI9iLhwdWxOj/fmFs0sVsObK7H1HW
-        2tVfDLsb5XApHnZKa9L7ynE8afEWZBATiEAdmyHfkMrQG0K4XM9iu5mOF0e+R0mDGzd2kCTqRBz
-        SbRzUr18ooz53yG9Mfgwk35vySkUw
-X-Received: by 2002:a37:9c84:: with SMTP id f126mr17330753qke.484.1605899018373;
-        Fri, 20 Nov 2020 11:03:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzagcEmUDx/GCW7LReFtHvEjhHy/aw1ygtlXKFvZxRpzjWbJy6uEELelA+5UzQIgsfxs9z8XJn8ulVkTu+Z7SY=
-X-Received: by 2002:a37:9c84:: with SMTP id f126mr17330702qke.484.1605899018067;
- Fri, 20 Nov 2020 11:03:38 -0800 (PST)
-MIME-Version: 1.0
-References: <20201120185105.279030-1-eperezma@redhat.com>
+        id S1727281AbgKTTb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Nov 2020 14:31:28 -0500
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21798 "EHLO
+        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726556AbgKTTb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Nov 2020 14:31:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1605900656; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=b3gHmCSSAezvrdIOK1AHnaaTsR2NSOZbFbzLhTpjQNjsbiM3JPzh6ePhAH4b+acbjvxF8fx+o5+zOruNKsKG9QVX5JbzaDynx0EyI0TqhsaT+4mut/S1vknmP1XD/nie/MeRxLGi8aCIqwpBUvlyMhAp9K4FN7+aHyOCMUmge84=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1605900656; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=nByJr/H9EU9wl5soVMOfVrqmOc8gd9i5N55IwngZRiY=; 
+        b=VLAg3cVRe1cTE2rjdeO8+2aOsBL8L4rJnqBEEdwmZaSQLW+L3q5KmTnq7qldVHeaOvHW5yy/eFk1kUPJ89jx/ZcaD1ejU0orNNTSRkd5Ne9GqRFCQ5fOTmevPwsGGaAyJDxXBX88olMxJ7JOM+aUsIkUSrDTmOXRr9sV/Xa3mes=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1605900654453431.9369414796388; Fri, 20 Nov 2020 11:30:54 -0800 (PST)
 In-Reply-To: <20201120185105.279030-1-eperezma@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 20 Nov 2020 20:03:01 +0100
-Message-ID: <CAJaqyWfXEgRC4x+GTxCXkOzBVgVmq9naFCZC+d-W26J4CyumKg@mail.gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
 Subject: Re: [RFC PATCH 00/27] vDPA software assisted live migration
-To:     qemu-level <qemu-devel@nongnu.org>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Daniel Daly <dandaly0@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        Liran Alon <liralon@gmail.com>, Eli Cohen <eli@mellanox.com>,
-        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
-        Alex Barba <alex.barba@broadcom.com>,
-        Christophe Fontaine <cfontain@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Lee Ballard <ballle98@gmail.com>,
-        Lars Ganrot <lars.ganrot@gmail.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Howard Cai <howard.cai@gmail.com>,
-        Parav Pandit <parav@mellanox.com>, vm <vmireyno@marvell.com>,
-        Salil Mehta <mehta.salil.lnk@gmail.com>,
-        Stephen Finucane <stephenfin@redhat.com>,
-        Xiao W Wang <xiao.w.wang@intel.com>,
-        Sean Mooney <smooney@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jim Harford <jim.harford@broadcom.com>,
-        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
-        Siwei Liu <loseweigh@gmail.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Michael Lilja <ml@napatech.com>,
-        Max Gurtovoy <maxgu14@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <160590065070.715.753957697844406262@9aeb27d8af94>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     eperezma@redhat.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, mst@redhat.com,
+        jasowang@redhat.com, dandaly0@gmail.com,
+        virtualization@lists.linux-foundation.org, liralon@gmail.com,
+        eli@mellanox.com, nitin.shrivastav@broadcom.com,
+        alex.barba@broadcom.com, cfontain@redhat.com, quintela@redhat.com,
+        ballle98@gmail.com, lars.ganrot@gmail.com, rob.miller@broadcom.com,
+        sgarzare@redhat.com, howard.cai@gmail.com, parav@mellanox.com,
+        vmireyno@marvell.com, mehta.salil.lnk@gmail.com,
+        stephenfin@redhat.com, xiao.w.wang@intel.com, smooney@redhat.com,
+        stefanha@redhat.com, jim.harford@broadcom.com,
+        dmytro.kazantsev@gmail.com, loseweigh@gmail.com, hanand@xilinx.com,
+        ml@napatech.com, maxgu14@gmail.com
+Date:   Fri, 20 Nov 2020 11:30:54 -0800 (PST)
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The main intention with this POC/RFC is to serve as a base to
-implement SW LM in vdpa devices.
-
-To implement in vhost-vdpa devices, the high priority is to achieve an
-interface for vdpa to stop the device without losing its state, i.e.,
-the avail_idx the destination device should start fetching descriptors
-from. Following this POC, an implementation on vdpa_sim will be
-performed.
-
-Apart from that, there is a TODO list about this series, they will be
-solved as the code is marked as valid. They don't affect the device,
-just internal qemu's code, and in case of change of direction it is
-easy to modify or delete. Comments about these are welcome.
-
-- Currently, it hijacks the log mechanism to know when migration is
-starting/done. Maybe it would be cleaner to forward migrate status
-from virtio_vmstate_change, since there is no need for the memory
-listener. However, this could make "memory backend" abstraction (also
-TODO) more complicated. This would drop patches 2,3 entirely.
-- There is a reverse search in a list on "vhost_dev_from_virtio" for
-each notification. Not really efficient, and it leads to a race
-condition at device destruction.
-- Implement new capabilities (no iommu, packed vq, event_idx, ...)
-- Lot of assertions need to be converted to proper error handling.
-
-Thanks!
-
-On Fri, Nov 20, 2020 at 8:02 PM Eugenio P=C3=A9rez <eperezma@redhat.com> wr=
-ote:
->
-> This series enable vDPA software assisted live migration for vhost-net
-> devices. This is a new method of vhost devices migration: Instead of
-> relay on vDPA device's dirty logging capability, SW assisted LM
-> intercepts dataplane, forwarding the descriptors between VM and device.
->
-> In this migration mode, qemu offers a new vring to the device to
-> read and write into, and disable vhost notifiers, processing guest and
-> vhost notifications in qemu. On used buffer relay, qemu will mark the
-> dirty memory as with plain virtio-net devices. This way, devices does
-> not need to have dirty page logging capability.
->
-> This series is a POC doing SW LM for vhost-net devices, which already
-> have dirty page logging capabilities. None of the changes have actual
-> effect with current devices until last two patches (26 and 27) are
-> applied, but they can be rebased on top of any other. These checks the
-> device to meet all requirements, and disable vhost-net devices logging
-> so migration goes through SW LM. This last patch is not meant to be
-> applied in the final revision, it is in the series just for testing
-> purposes.
->
-> For use SW assisted LM these vhost-net devices need to be instantiated:
-> * With IOMMU (iommu_platform=3Don,ats=3Don)
-> * Without event_idx (event_idx=3Doff)
->
-> Just the notification forwarding (with no descriptor relay) can be
-> achieved with patches 7 and 9, and starting migration. Partial applies
-> between 13 and 24 will not work while migrating on source, and patch
-> 25 is needed for the destination to resume network activity.
->
-> It is based on the ideas of DPDK SW assisted LM, in the series of
-> DPDK's https://patchwork.dpdk.org/cover/48370/ .
->
-> Comments are welcome.
->
-> Thanks!
->
-> Eugenio P=C3=A9rez (27):
->   vhost: Add vhost_dev_can_log
->   vhost: Add device callback in vhost_migration_log
->   vhost: Move log resize/put to vhost_dev_set_log
->   vhost: add vhost_kernel_set_vring_enable
->   vhost: Add hdev->dev.sw_lm_vq_handler
->   virtio: Add virtio_queue_get_used_notify_split
->   vhost: Route guest->host notification through qemu
->   vhost: Add a flag for software assisted Live Migration
->   vhost: Route host->guest notification through qemu
->   vhost: Allocate shadow vring
->   virtio: const-ify all virtio_tswap* functions
->   virtio: Add virtio_queue_full
->   vhost: Send buffers to device
->   virtio: Remove virtio_queue_get_used_notify_split
->   vhost: Do not invalidate signalled used
->   virtio: Expose virtqueue_alloc_element
->   vhost: add vhost_vring_set_notification_rcu
->   vhost: add vhost_vring_poll_rcu
->   vhost: add vhost_vring_get_buf_rcu
->   vhost: Return used buffers
->   vhost: Add vhost_virtqueue_memory_unmap
->   vhost: Add vhost_virtqueue_memory_map
->   vhost: unmap qemu's shadow virtqueues on sw live migration
->   vhost: iommu changes
->   vhost: Do not commit vhost used idx on vhost_virtqueue_stop
->   vhost: Add vhost_hdev_can_sw_lm
->   vhost: forbid vhost devices logging
->
->  hw/virtio/vhost-sw-lm-ring.h      |  39 +++
->  include/hw/virtio/vhost.h         |   5 +
->  include/hw/virtio/virtio-access.h |   8 +-
->  include/hw/virtio/virtio.h        |   4 +
->  hw/net/virtio-net.c               |  39 ++-
->  hw/virtio/vhost-backend.c         |  29 ++
->  hw/virtio/vhost-sw-lm-ring.c      | 268 +++++++++++++++++++
->  hw/virtio/vhost.c                 | 431 +++++++++++++++++++++++++-----
->  hw/virtio/virtio.c                |  18 +-
->  hw/virtio/meson.build             |   2 +-
->  10 files changed, 758 insertions(+), 85 deletions(-)
->  create mode 100644 hw/virtio/vhost-sw-lm-ring.h
->  create mode 100644 hw/virtio/vhost-sw-lm-ring.c
->
-> --
-> 2.18.4
->
->
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTEyMDE4NTEwNS4yNzkw
+MzAtMS1lcGVyZXptYUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDExMjAxODUxMDUuMjc5
+MDMwLTEtZXBlcmV6bWFAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUkZDIFBBVENIIDAwLzI3XSB2RFBB
+IHNvZnR3YXJlIGFzc2lzdGVkIGxpdmUgbWlncmF0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBb
+dGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAxMTE3MTczNjM1LjI5MTAxLTEtYWxleC5iZW5u
+ZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMjAxMTE3MTczNjM1LjI5MTAxLTEtYWxleC5iZW5u
+ZWVAbGluYXJvLm9yZwogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAxMTIwMTg1MTA1
+LjI3OTAzMC0xLWVwZXJlem1hQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMTEyMDE4NTEwNS4y
+NzkwMzAtMS1lcGVyZXptYUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKYWYyZmUyMiB2aG9zdDogZm9yYmlkIHZob3N0IGRldmljZXMgbG9nZ2luZwo0MDU5MjVjIHZo
+b3N0OiBBZGQgdmhvc3RfaGRldl9jYW5fc3dfbG0KN2YyOTU1YiB2aG9zdDogRG8gbm90IGNvbW1p
+dCB2aG9zdCB1c2VkIGlkeCBvbiB2aG9zdF92aXJ0cXVldWVfc3RvcApiNjhkM2Q1IHZob3N0OiBp
+b21tdSBjaGFuZ2VzCjc0ZjI4MmEgdmhvc3Q6IHVubWFwIHFlbXUncyBzaGFkb3cgdmlydHF1ZXVl
+cyBvbiBzdyBsaXZlIG1pZ3JhdGlvbgpjOTk5ZTg2IHZob3N0OiBBZGQgdmhvc3RfdmlydHF1ZXVl
+X21lbW9yeV9tYXAKNmU1ZjIxOSB2aG9zdDogQWRkIHZob3N0X3ZpcnRxdWV1ZV9tZW1vcnlfdW5t
+YXAKZDUwNTRjOCB2aG9zdDogUmV0dXJuIHVzZWQgYnVmZmVycwo4MDZkYjQ2IHZob3N0OiBhZGQg
+dmhvc3RfdnJpbmdfZ2V0X2J1Zl9yY3UKYjZiODE2OCB2aG9zdDogYWRkIHZob3N0X3ZyaW5nX3Bv
+bGxfcmN1CmNhNDQ4ODIgdmhvc3Q6IGFkZCB2aG9zdF92cmluZ19zZXRfbm90aWZpY2F0aW9uX3Jj
+dQozMTgzZjYyIHZpcnRpbzogRXhwb3NlIHZpcnRxdWV1ZV9hbGxvY19lbGVtZW50CjRlYWQwYWMg
+dmhvc3Q6IERvIG5vdCBpbnZhbGlkYXRlIHNpZ25hbGxlZCB1c2VkCmNlYjc2YTQgdmlydGlvOiBS
+ZW1vdmUgdmlydGlvX3F1ZXVlX2dldF91c2VkX25vdGlmeV9zcGxpdAo2YWFjZGZlIHZob3N0OiBT
+ZW5kIGJ1ZmZlcnMgdG8gZGV2aWNlCjlmY2M5OGQgdmlydGlvOiBBZGQgdmlydGlvX3F1ZXVlX2Z1
+bGwKNDFkYTBmOCB2aXJ0aW86IGNvbnN0LWlmeSBhbGwgdmlydGlvX3Rzd2FwKiBmdW5jdGlvbnMK
+YTNjOTJmMSB2aG9zdDogQWxsb2NhdGUgc2hhZG93IHZyaW5nCmI0MGIzZjcgdmhvc3Q6IFJvdXRl
+IGhvc3QtPmd1ZXN0IG5vdGlmaWNhdGlvbiB0aHJvdWdoIHFlbXUKOTJlYTExNyB2aG9zdDogQWRk
+IGEgZmxhZyBmb3Igc29mdHdhcmUgYXNzaXN0ZWQgTGl2ZSBNaWdyYXRpb24KYWNlOGMxMCB2aG9z
+dDogUm91dGUgZ3Vlc3QtPmhvc3Qgbm90aWZpY2F0aW9uIHRocm91Z2ggcWVtdQo2YmUxMWE2IHZp
+cnRpbzogQWRkIHZpcnRpb19xdWV1ZV9nZXRfdXNlZF9ub3RpZnlfc3BsaXQKNDdkNDQ4NSB2aG9z
+dDogQWRkIGhkZXYtPmRldi5zd19sbV92cV9oYW5kbGVyCjdkYmM4ZTUgdmhvc3Q6IGFkZCB2aG9z
+dF9rZXJuZWxfc2V0X3ZyaW5nX2VuYWJsZQo0ZTUxYzVjIHZob3N0OiBNb3ZlIGxvZyByZXNpemUv
+cHV0IHRvIHZob3N0X2Rldl9zZXRfbG9nCmI5NjRhYmMgdmhvc3Q6IEFkZCBkZXZpY2UgY2FsbGJh
+Y2sgaW4gdmhvc3RfbWlncmF0aW9uX2xvZwoyNjQ1MDRlIHZob3N0OiBBZGQgdmhvc3RfZGV2X2Nh
+bl9sb2cKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjcgQ2hlY2tpbmcgY29tbWl0IDI2NDUwNGVl
+MDAxOCAodmhvc3Q6IEFkZCB2aG9zdF9kZXZfY2FuX2xvZykKMi8yNyBDaGVja2luZyBjb21taXQg
+Yjk2NGFiYzMxNWJkICh2aG9zdDogQWRkIGRldmljZSBjYWxsYmFjayBpbiB2aG9zdF9taWdyYXRp
+b25fbG9nKQozLzI3IENoZWNraW5nIGNvbW1pdCA0ZTUxYzVjZWM1NmQgKHZob3N0OiBNb3ZlIGxv
+ZyByZXNpemUvcHV0IHRvIHZob3N0X2Rldl9zZXRfbG9nKQo0LzI3IENoZWNraW5nIGNvbW1pdCA3
+ZGJjOGU1YzY0YzMgKHZob3N0OiBhZGQgdmhvc3Rfa2VybmVsX3NldF92cmluZ19lbmFibGUpCjUv
+MjcgQ2hlY2tpbmcgY29tbWl0IDQ3ZDQ0ODU0NThkMSAodmhvc3Q6IEFkZCBoZGV2LT5kZXYuc3df
+bG1fdnFfaGFuZGxlcikKNi8yNyBDaGVja2luZyBjb21taXQgNmJlMTFhNjNlM2I0ICh2aXJ0aW86
+IEFkZCB2aXJ0aW9fcXVldWVfZ2V0X3VzZWRfbm90aWZ5X3NwbGl0KQo3LzI3IENoZWNraW5nIGNv
+bW1pdCBhY2U4YzEwMzRmODMgKHZob3N0OiBSb3V0ZSBndWVzdC0+aG9zdCBub3RpZmljYXRpb24g
+dGhyb3VnaCBxZW11KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
+Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3
+LzI3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMjcgQ2hlY2tpbmcgY29tbWl0IDkyZWEx
+MTcwMGUzMiAodmhvc3Q6IEFkZCBhIGZsYWcgZm9yIHNvZnR3YXJlIGFzc2lzdGVkIExpdmUgTWln
+cmF0aW9uKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2Vw
+YXJhdGUgbGluZQojNDY6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC5jOjE1ODE6CisgICAgICAgIC8q
+IFdlJ3ZlIGJlZW4gY2FsbGVkIGFmdGVyIG1pZ3JhdGlvbiBpcyBjb21wbGV0ZWQsIHNvIG5vIG5l
+ZWQgdG8KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSAqIG9uIHN1YnNlcXVlbnQgbGluZXMK
+IzQ3OiBGSUxFOiBody92aXJ0aW8vdmhvc3QuYzoxNTgyOgorICAgICAgICAvKiBXZSd2ZSBiZWVu
+IGNhbGxlZCBhZnRlciBtaWdyYXRpb24gaXMgY29tcGxldGVkLCBzbyBubyBuZWVkIHRvCisgICAg
+ICAgICAgIGRpc2FibGUgaXQgYWdhaW4KCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgNDUg
+bGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8yNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzI3
+IENoZWNraW5nIGNvbW1pdCBiNDBiM2Y3OTM1NWMgKHZob3N0OiBSb3V0ZSBob3N0LT5ndWVzdCBu
+b3RpZmljYXRpb24gdGhyb3VnaCBxZW11KQoxMC8yNyBDaGVja2luZyBjb21taXQgYTNjOTJmMTVi
+NTU0ICh2aG9zdDogQWxsb2NhdGUgc2hhZG93IHZyaW5nKQoxMS8yNyBDaGVja2luZyBjb21taXQg
+NDFkYTBmOGUwMmIyICh2aXJ0aW86IGNvbnN0LWlmeSBhbGwgdmlydGlvX3Rzd2FwKiBmdW5jdGlv
+bnMpCjEyLzI3IENoZWNraW5nIGNvbW1pdCA5ZmNjOThkYTljZDkgKHZpcnRpbzogQWRkIHZpcnRp
+b19xdWV1ZV9mdWxsKQoxMy8yNyBDaGVja2luZyBjb21taXQgNmFhY2RmZTBlMGJhICh2aG9zdDog
+U2VuZCBidWZmZXJzIHRvIGRldmljZSkKRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhvdXQgY29t
+bWVudAojNTA6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC1zdy1sbS1yaW5nLmM6NDU6CisgICAgc21w
+X3JtYigpOwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNl
+cGFyYXRlIGxpbmUKIzk4OiBGSUxFOiBody92aXJ0aW8vdmhvc3Qtc3ctbG0tcmluZy5jOjkzOgor
+LyogdmlydHF1ZXVlX2FkZDoKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcg
+Lyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMjU6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC1zdy1sbS1y
+aW5nLmM6MTIwOgorICAgIC8qIFB1dCBlbnRyeSBpbiBhdmFpbGFibGUgYXJyYXkgKGJ1dCBkb24n
+dCB1cGRhdGUgYXZhaWwtPmlkeCB1bnRpbCB0aGV5CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
+c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzEyNjogRklMRTogaHcvdmlydGlv
+L3Zob3N0LXN3LWxtLXJpbmcuYzoxMjE6CisgICAgICogZG8gc3luYykuICovCgpFUlJPUjogZ19m
+cmVlKE5VTEwpIGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3QgcmVxdWlyZWQKIzE0
+NzogRklMRTogaHcvdmlydGlvL3Zob3N0LXN3LWxtLXJpbmcuYzoxNDI6CisgICAgaWYgKHZxLT5y
+aW5nX2lkX21hcHNbaG9zdF9oZWFkXSkgeworICAgICAgICBnX2ZyZWUodnEtPnJpbmdfaWRfbWFw
+c1tob3N0X2hlYWRdKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFy
+bXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE4NTogRklMRTogaHcvdmlydGlvL3Zob3N0LXN3LWxtLXJp
+bmcuYzoxODE6CisgICAgZm9yIChpID0gMDsgaSA8IG51bSAtIDE7IGkrKykKWy4uLl0KCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIwNzogRklMRTogaHcvdmlydGlv
+L3Zob3N0LXN3LWxtLXJpbmcuaDoyMzoKK15JICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qgdmhv
+c3RfdnJpbmdfYWRkciAqYWRkcik7JAoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzI0NzogRklMRTogaHcvdmlydGlvL3Zob3N0LmM6OTg2Ogor
+ICAgIH0gd2hpbGUoIXZpcnRpb19xdWV1ZV9lbXB0eSh2cSkpOwoKdG90YWw6IDUgZXJyb3JzLCAz
+IHdhcm5pbmdzLCAyNzUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTMvMjcgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCjE0LzI3IENoZWNraW5nIGNvbW1pdCBjZWI3NmE0NDAxYjggKHZpcnRpbzog
+UmVtb3ZlIHZpcnRpb19xdWV1ZV9nZXRfdXNlZF9ub3RpZnlfc3BsaXQpCjE1LzI3IENoZWNraW5n
+IGNvbW1pdCA0ZWFkMGFjODQ1N2YgKHZob3N0OiBEbyBub3QgaW52YWxpZGF0ZSBzaWduYWxsZWQg
+dXNlZCkKMTYvMjcgQ2hlY2tpbmcgY29tbWl0IDMxODNmNjJkYjNkYyAodmlydGlvOiBFeHBvc2Ug
+dmlydHF1ZXVlX2FsbG9jX2VsZW1lbnQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCBjYTQ0ODgyYWYx
+NTIgKHZob3N0OiBhZGQgdmhvc3RfdnJpbmdfc2V0X25vdGlmaWNhdGlvbl9yY3UpCkVSUk9SOiBt
+ZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzQ1OiBGSUxFOiBody92aXJ0aW8vdmhvc3Qt
+c3ctbG0tcmluZy5jOjgzOgorICAgIHNtcF9tYigpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
+bmdzLCA0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy8yNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKMTgvMjcgQ2hlY2tpbmcgY29tbWl0IGI2YjgxNjhiOWZlNyAodmhvc3Q6IGFkZCB2aG9z
+dF92cmluZ19wb2xsX3JjdSkKRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhvdXQgY29tbWVudAoj
+Mzc6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC1zdy1sbS1yaW5nLmM6OTg6CisgICAgc21wX3JtYigp
+OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzOCBsaW5lcyBjaGVja2VkCgpQYXRjaCAx
+OC8yNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTkvMjcgQ2hlY2tpbmcgY29tbWl0IDgw
+NmRiNDZlOTE5NCAodmhvc3Q6IGFkZCB2aG9zdF92cmluZ19nZXRfYnVmX3JjdSkKMjAvMjcgQ2hl
+Y2tpbmcgY29tbWl0IGQ1MDU0Yzg1NTZiZiAodmhvc3Q6IFJldHVybiB1c2VkIGJ1ZmZlcnMpCjIx
+LzI3IENoZWNraW5nIGNvbW1pdCA2ZTVmMjE5MjI1NGEgKHZob3N0OiBBZGQgdmhvc3RfdmlydHF1
+ZXVlX21lbW9yeV91bm1hcCkKMjIvMjcgQ2hlY2tpbmcgY29tbWl0IGM5OTllODZjZjdmMCAodmhv
+c3Q6IEFkZCB2aG9zdF92aXJ0cXVldWVfbWVtb3J5X21hcCkKMjMvMjcgQ2hlY2tpbmcgY29tbWl0
+IDc0ZjI4MmE4MDAxOSAodmhvc3Q6IHVubWFwIHFlbXUncyBzaGFkb3cgdmlydHF1ZXVlcyBvbiBz
+dyBsaXZlIG1pZ3JhdGlvbikKMjQvMjcgQ2hlY2tpbmcgY29tbWl0IGI2OGQzZDVmYjgzOSAodmhv
+c3Q6IGlvbW11IGNoYW5nZXMpCjI1LzI3IENoZWNraW5nIGNvbW1pdCA3ZjI5NTViOGU3ODggKHZo
+b3N0OiBEbyBub3QgY29tbWl0IHZob3N0IHVzZWQgaWR4IG9uIHZob3N0X3ZpcnRxdWV1ZV9zdG9w
+KQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUg
+bGluZQojNDA6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC5jOjE0NDI6CisgICAgICAgIC8qIENvbm5l
+Y3Rpb24gdG8gdGhlIGJhY2tlbmQgaXMgdW51c2FibGUsIHNvIGxldCdzIHN5bmMgaW50ZXJuYWwK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjUv
+MjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjYvMjcgQ2hlY2tpbmcgY29tbWl0IDQwNTky
+NWM2YjU0YSAodmhvc3Q6IEFkZCB2aG9zdF9oZGV2X2Nhbl9zd19sbSkKMjcvMjcgQ2hlY2tpbmcg
+Y29tbWl0IGFmMmZlMjIxOWQzOSAodmhvc3Q6IGZvcmJpZCB2aG9zdCBkZXZpY2VzIGxvZ2dpbmcp
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAx
+MTIwMTg1MTA1LjI3OTAzMC0xLWVwZXJlem1hQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNo
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
