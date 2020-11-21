@@ -2,117 +2,337 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84E4A2BB904
-	for <lists+kvm@lfdr.de>; Fri, 20 Nov 2020 23:30:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F0902BBDEF
+	for <lists+kvm@lfdr.de>; Sat, 21 Nov 2020 09:00:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728708AbgKTW3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Nov 2020 17:29:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50554 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728282AbgKTW3y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Nov 2020 17:29:54 -0500
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C92C0613CF
-        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 14:29:54 -0800 (PST)
-Received: by mail-lf1-x144.google.com with SMTP id j205so15622363lfj.6
-        for <kvm@vger.kernel.org>; Fri, 20 Nov 2020 14:29:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rN2oDMLkDXvF2d0qSHyE1KGJoI0coYurxX8BvFhI+bY=;
-        b=G5VJUQuazvZ46rb86s40Pn6WkJ8vF48RjwI203WsXZ9Dd/97U9zAuv02njfWIOciBV
-         QuSh0dRcRHb6kNB5R91cqfNYC3Nx6BskGC8Id4k04GJmqF+iTSL0z/vx19itSZMS+dny
-         GX6UFvM4nLEOfv88ofsMR/2MQJp/CTfeCiBq4RMzNChRcKghzB+b2vhazIrHXFWol38n
-         pfrMAxiWdO7fXF7LhFiySxUhhlwuVHmMt2IU2HAhlY57qt8oywDFoatbjiKMM0J1tI0a
-         F2+QJ/feDTYc37U0EswhVkKC6ECmTYbgvZ1lbayAJ7xC0KxdUPr0mf9Jsvw5GLqRUrhv
-         ttbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rN2oDMLkDXvF2d0qSHyE1KGJoI0coYurxX8BvFhI+bY=;
-        b=VRbO/4B4OEOfrqjaKMFRR8sES0hfeDSf/h0/9/rLJUlcDGse2netixVD1CThEKtUri
-         kITg7P8LeUXuW5UtHJnh/O0famdxKVfB7r4VvoWzk0u+UqUpJUZvJFzm6Qy+e0bvWoAd
-         9eQD4Tx76BWSdeLuUevm8uJW7B9kRe1Vdy08bRkEUp+eOlLeraME6TaUQEWqcS9xwl44
-         pqUkqUPf7fhR+X7Y3HfiBwewVwnAUHyeowfojJFTcfLU0cOOTSZwpz5UzFkS3QBCyAnf
-         mYeJtvQ9EVpKGGezP7sbZKlsWeA4BPaVwKz4g6y1Ovi+7zFvYqYX/9ngS7PLd6EFsyZd
-         QN0Q==
-X-Gm-Message-State: AOAM532ByhoUF77MB/x7sCNLN4J3Wa2UwUX8JO+TXisa6ZwvHXD0Rj+y
-        Qn/+gWtCwj6JKK3z4vzWyeUfiglD2srnvP+og/Kg0w==
-X-Google-Smtp-Source: ABdhPJz7KhY3kkkWmPWTE7oEp1RrYqakWRzVBA4phAIJXfRGBYOb72PMtSpg2EcEFuNfIDhSB+mhcRErvgpdubnMvSw=
-X-Received: by 2002:a19:686:: with SMTP id 128mr8504175lfg.198.1605911392397;
- Fri, 20 Nov 2020 14:29:52 -0800 (PST)
+        id S1727127AbgKUH6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Nov 2020 02:58:45 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:2312 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726483AbgKUH6p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Nov 2020 02:58:45 -0500
+Received: from dggeme753-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4CdQl32JYqz13Kkm;
+        Sat, 21 Nov 2020 15:58:07 +0800 (CST)
+Received: from [10.174.184.120] (10.174.184.120) by
+ dggeme753-chm.china.huawei.com (10.3.19.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Sat, 21 Nov 2020 15:58:37 +0800
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     <kwankhede@nvidia.com>, <wu.wubin@huawei.com>,
+        <maoming.maoming@huawei.com>, <xieyingtai@huawei.com>,
+        <lizhengui@huawei.com>, <wubinfeng@huawei.com>,
+        "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>
+From:   "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>
+Subject: [PATCH v2] vfio iommu type1: Improve vfio_iommu_type1_pin_pages
+ performance
+Message-ID: <60d22fc6-88d6-c7c2-90bd-1e8eccb1fdcc@huawei.com>
+Date:   Sat, 21 Nov 2020 15:58:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.2
 MIME-Version: 1.0
-References: <3E05451B-A9CD-4719-99D0-72750A304044@amazon.com>
-In-Reply-To: <3E05451B-A9CD-4719-99D0-72750A304044@amazon.com>
-From:   Jann Horn <jannh@google.com>
-Date:   Fri, 20 Nov 2020 23:29:25 +0100
-Message-ID: <CAG48ez2VAu6oARGVZ+muDK9_6_38KVUTJf7utz5Nn=AsmN17nA@mail.gmail.com>
-Subject: Re: [PATCH v2] drivers/virt: vmgenid: add vm generation id driver
-To:     "Catangiu, Adrian Costin" <acatan@amazon.com>
-Cc:     "Graf (AWS), Alexander" <graf@amazon.de>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Willy Tarreau <w@1wt.eu>,
-        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "bonzini@gnu.org" <bonzini@gnu.org>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        "oridgar@gmail.com" <oridgar@gmail.com>,
-        "ghammer@redhat.com" <ghammer@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Linux API <linux-api@vger.kernel.org>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        "areber@redhat.com" <areber@redhat.com>,
-        Pavel Emelyanov <ovzxemul@gmail.com>,
-        Andrey Vagin <avagin@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-        "gil@azul.com" <gil@azul.com>,
-        "asmehra@redhat.com" <asmehra@redhat.com>,
-        "dgunigun@redhat.com" <dgunigun@redhat.com>,
-        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.120]
+X-ClientProxiedBy: dggeme709-chm.china.huawei.com (10.1.199.105) To
+ dggeme753-chm.china.huawei.com (10.3.19.99)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 16, 2020 at 4:35 PM Catangiu, Adrian Costin
-<acatan@amazon.com> wrote:
-> This patch is a driver that exposes a monotonic incremental Virtual
-> Machine Generation u32 counter via a char-dev FS interface that
-> provides sync and async VmGen counter updates notifications. It also
-> provides VmGen counter retrieval and confirmation mechanisms.
->
-> The hw provided UUID is not exposed to userspace, it is internally
-> used by the driver to keep accounting for the exposed VmGen counter.
-> The counter starts from zero when the driver is initialized and
-> monotonically increments every time the hw UUID changes (the VM
-> generation changes).
->
-> On each hw UUID change, the new hypervisor-provided UUID is also fed
-> to the kernel RNG.
+vfio_pin_pages() accepts an array of unrelated iova pfns and processes
+each to return the physical pfn.  When dealing with large arrays of
+contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
+it is processed page by page.In this case, we can divide the iova pfn
+array into multiple continuous ranges and optimize them.  For example,
+when the iova pfn array is {1,5,6,7,9}, it will be divided into three
+groups {1}, {5,6,7}, {9} for processing.  When processing {5,6,7}, the
+number of calls to pin_user_pages_remote is reduced from 3 times to once.
+For single page or large array of discontinuous iovas, we still use
+vfio_pin_page_external to deal with it to reduce the performance loss
+caused by refactoring.
 
-As for v1:
+Signed-off-by: Xiaoyang Xu <xuxiaoyang2@huawei.com>
+---
+v1 -> v2:
+ * make vfio_iommu_type1_pin_contiguous_pages use vfio_pin_page_external
+ to pin single page when npage=1
+ * make vfio_pin_contiguous_pages_external use set npage to mark
+ consecutive pages as dirty. simplify the processing logic of unwind
+ * remove unnecessary checks in vfio_get_contiguous_pages_length, put
+ the least costly judgment logic at the top, and replace
+ vfio_iova_get_vfio_pfn with vfio_find_vpfn
 
-Is there a reasonable usecase for the "confirmation" mechanism? It
-doesn't seem very useful to me.
+ drivers/vfio/vfio_iommu_type1.c | 231 ++++++++++++++++++++++++++++----
+ 1 file changed, 204 insertions(+), 27 deletions(-)
 
-How do you envision integrating this with libraries that have to work
-in restrictive seccomp sandboxes? If this was in the vDSO, that would
-be much easier.
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 67e827638995..080727b531c6 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -628,6 +628,196 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+ 	return unlocked;
+ }
+
++static int contiguous_vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
++				    int prot, long npage, unsigned long *phys_pfn)
++{
++	struct page **pages = NULL;
++	unsigned int flags = 0;
++	int i, ret;
++
++	pages = kvmalloc_array(npage, sizeof(struct page *), GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
++
++	if (prot & IOMMU_WRITE)
++		flags |= FOLL_WRITE;
++
++	mmap_read_lock(mm);
++	ret = pin_user_pages_remote(mm, vaddr, npage, flags | FOLL_LONGTERM,
++				    pages, NULL, NULL);
++	mmap_read_unlock(mm);
++
++	for (i = 0; i < ret; i++)
++		*(phys_pfn + i) = page_to_pfn(pages[i]);
++
++	kvfree(pages);
++
++	return ret;
++}
++
++static int vfio_pin_contiguous_pages_external(struct vfio_iommu *iommu,
++				    struct vfio_dma *dma,
++				    unsigned long *user_pfn,
++				    int npage, unsigned long *phys_pfn,
++				    bool do_accounting)
++{
++	int ret, i, j, lock_acct = 0;
++	unsigned long remote_vaddr;
++	dma_addr_t iova;
++	struct mm_struct *mm;
++	struct vfio_pfn *vpfn;
++
++	mm = get_task_mm(dma->task);
++	if (!mm)
++		return -ENODEV;
++
++	iova = user_pfn[0] << PAGE_SHIFT;
++	remote_vaddr = dma->vaddr + iova - dma->iova;
++	ret = contiguous_vaddr_get_pfn(mm, remote_vaddr, dma->prot,
++					    npage, phys_pfn);
++	mmput(mm);
++	if (ret <= 0)
++		return ret;
++
++	npage = ret;
++	for (i = 0; i < npage; i++) {
++		iova = user_pfn[i] << PAGE_SHIFT;
++		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
++		if (ret)
++			goto unwind;
++
++		if (!is_invalid_reserved_pfn(phys_pfn[i]))
++			lock_acct++;
++	}
++
++	if (do_accounting) {
++		ret = vfio_lock_acct(dma, lock_acct, true);
++		if (ret) {
++			if (ret == -ENOMEM)
++				pr_warn("%s: Task %s (%d) RLIMIT_MEMLOCK (%ld) exceeded\n",
++					__func__, dma->task->comm, task_pid_nr(dma->task),
++					task_rlimit(dma->task, RLIMIT_MEMLOCK));
++			goto unwind;
++		}
++	}
++
++	if (iommu->dirty_page_tracking) {
++		unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
++
++		/*
++		 * Bitmap populated with the smallest supported page
++		 * size
++		 */
++		bitmap_set(dma->bitmap,
++			   ((user_pfn[0] << PAGE_SHIFT) - dma->iova) >> pgshift, npage);
++	}
++
++	return i;
++unwind:
++	for (j = 0; j < npage; j++) {
++		if (j < i) {
++			iova = user_pfn[j] << PAGE_SHIFT;
++			vpfn = vfio_find_vpfn(dma, iova);
++			vfio_iova_put_vfio_pfn(dma, vpfn);
++		} else {
++			put_pfn(phys_pfn[j], dma->prot);
++		}
++
++		phys_pfn[j] = 0;
++	}
++
++	return ret;
++}
++
++static int vfio_iommu_type1_pin_contiguous_pages(struct vfio_iommu *iommu,
++					    struct vfio_dma *dma,
++					    unsigned long *user_pfn,
++					    int npage, unsigned long *phys_pfn,
++					    bool do_accounting)
++{
++	int ret = 0, i, j;
++	unsigned long remote_vaddr;
++	dma_addr_t iova;
++
++	if (npage == 1)
++		goto pin_single_page;
++
++	ret = vfio_pin_contiguous_pages_external(iommu, dma, user_pfn, npage,
++				phys_pfn, do_accounting);
++	if (ret == npage)
++		return ret;
++
++	if (ret < 0)
++		ret = 0;
++
++pin_single_page:
++	for (i = ret; i < npage; i++) {
++		iova = user_pfn[i] << PAGE_SHIFT;
++		remote_vaddr = dma->vaddr + iova - dma->iova;
++
++		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
++			    do_accounting);
++		if (ret)
++			goto pin_unwind;
++
++		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
++		if (ret) {
++			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
++				vfio_lock_acct(dma, -1, true);
++			goto pin_unwind;
++		}
++
++		if (iommu->dirty_page_tracking) {
++			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
++
++			/*
++			 * Bitmap populated with the smallest supported page
++			 * size
++			 */
++			bitmap_set(dma->bitmap,
++					   (iova - dma->iova) >> pgshift, 1);
++		}
++	}
++
++	return i;
++
++pin_unwind:
++	phys_pfn[i] = 0;
++	for (j = 0; j < i; j++) {
++		iova = user_pfn[j] << PAGE_SHIFT;
++		vfio_unpin_page_external(dma, iova, do_accounting);
++		phys_pfn[j] = 0;
++	}
++
++	return ret;
++}
++
++static int vfio_get_contiguous_pages_length(struct vfio_dma *dma,
++				    unsigned long *user_pfn, int npage)
++{
++	int i;
++	dma_addr_t iova = user_pfn[0] << PAGE_SHIFT;
++	struct vfio_pfn *vpfn;
++
++	if (npage <= 1)
++		return npage;
++
++	for (i = 1; i < npage; i++) {
++		if (user_pfn[i] != user_pfn[0] + i)
++			break;
++
++		iova = user_pfn[i] << PAGE_SHIFT;
++		if (iova >= dma->iova + dma->size ||
++				iova + PAGE_SIZE <= dma->iova)
++			break;
++
++		vpfn = vfio_find_vpfn(dma, iova);
++		if (vpfn)
++			break;
++	}
++	return i;
++}
++
+ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 				      struct iommu_group *iommu_group,
+ 				      unsigned long *user_pfn,
+@@ -637,9 +827,9 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 	struct vfio_iommu *iommu = iommu_data;
+ 	struct vfio_group *group;
+ 	int i, j, ret;
+-	unsigned long remote_vaddr;
+ 	struct vfio_dma *dma;
+ 	bool do_accounting;
++	int contiguous_npage;
+
+ 	if (!iommu || !user_pfn || !phys_pfn)
+ 		return -EINVAL;
+@@ -663,7 +853,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 	 */
+ 	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
+
+-	for (i = 0; i < npage; i++) {
++	for (i = 0; i < npage; i += contiguous_npage) {
+ 		dma_addr_t iova;
+ 		struct vfio_pfn *vpfn;
+
+@@ -682,31 +872,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+ 		if (vpfn) {
+ 			phys_pfn[i] = vpfn->pfn;
+-			continue;
+-		}
+-
+-		remote_vaddr = dma->vaddr + (iova - dma->iova);
+-		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
+-					     do_accounting);
+-		if (ret)
+-			goto pin_unwind;
+-
+-		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+-		if (ret) {
+-			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
+-				vfio_lock_acct(dma, -1, true);
+-			goto pin_unwind;
+-		}
+-
+-		if (iommu->dirty_page_tracking) {
+-			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+-
+-			/*
+-			 * Bitmap populated with the smallest supported page
+-			 * size
+-			 */
+-			bitmap_set(dma->bitmap,
+-				   (iova - dma->iova) >> pgshift, 1);
++			contiguous_npage = 1;
++		} else {
++			ret = vfio_get_contiguous_pages_length(dma,
++					&user_pfn[i], npage - i);
++			if (ret < 0)
++				goto pin_unwind;
++
++			ret = vfio_iommu_type1_pin_contiguous_pages(iommu,
++					dma, &user_pfn[i], ret, &phys_pfn[i], do_accounting);
++			if (ret < 0)
++				goto pin_unwind;
++			contiguous_npage = ret;
+ 		}
+ 	}
+ 	ret = i;
+--
+2.19.1
