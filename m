@@ -2,121 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CDAC2C1455
-	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 20:28:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E9612C1477
+	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 20:29:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730833AbgKWTM4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Nov 2020 14:12:56 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54806 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729873AbgKWTMz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Nov 2020 14:12:55 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0ANJ34Kx134456;
-        Mon, 23 Nov 2020 14:12:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fHY+zMuzc3A1muYe2I4TpPP78UvT54VW7n45WOdqBOg=;
- b=moNv/UbDV147AtDIt6ebejrJam2AuLEWa85VVA0ZrDQw5VGnSWoPwpgoKn03XGxtW9fy
- h3q2H35WvO2KhqzEd7umjZseMznXh9qrIn02Ffo8pC4Kr466kToCgki424tpF/x5Xy/k
- l9C5/QF4WC+f3wN+VeQj3KFqJhKnSgL7T3/ZHqcRaCsm7VwQpFeZNkBtiV0TZ9S4GIs2
- vR+jkUx+mcYKfUrMg/2CxALq732S61zwyOR+Sggu2WOvHhR+V/7r9MhpiZ6cTeeMy4Xv
- CNGgliMOkt5lM8r2xavL7UqQNyGJReJfDBE4KSr9zE6wl1ML0/ZABecRehWDxIXpMYAg Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34yq47ghb3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Nov 2020 14:12:50 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0ANJ4Wqp143471;
-        Mon, 23 Nov 2020 14:12:50 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 34yq47ghat-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Nov 2020 14:12:50 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0ANJCF3C001086;
-        Mon, 23 Nov 2020 19:12:49 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma02wdc.us.ibm.com with ESMTP id 34xth8sjb2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Nov 2020 19:12:49 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0ANJCnXu64356778
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Nov 2020 19:12:49 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE9CE112062;
-        Mon, 23 Nov 2020 19:12:48 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C96F112066;
-        Mon, 23 Nov 2020 19:12:48 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.169.207])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 23 Nov 2020 19:12:48 +0000 (GMT)
-Subject: Re: [RFC PATCH 1/2] vfio-mdev: Wire in a request handler for mdev
- parent
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20201117032139.50988-1-farman@linux.ibm.com>
- <20201117032139.50988-2-farman@linux.ibm.com>
- <20201119123026.1353cb3c.cohuck@redhat.com>
- <20201119165611.6a811d76.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <0fead493-332e-ff0a-ffea-c3b162cfe347@linux.ibm.com>
-Date:   Mon, 23 Nov 2020 14:12:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20201119165611.6a811d76.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-23_17:2020-11-23,2020-11-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 suspectscore=3 spamscore=0
- lowpriorityscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2011230122
+        id S1729474AbgKWTY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Nov 2020 14:24:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35336 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729265AbgKWTY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Nov 2020 14:24:56 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C957C0613CF
+        for <kvm@vger.kernel.org>; Mon, 23 Nov 2020 11:24:56 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id o5so24366792ybe.12
+        for <kvm@vger.kernel.org>; Mon, 23 Nov 2020 11:24:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=90VIOO1p74EA8hY3x50vda5a5ym/lg0uKWR1Pv2K87s=;
+        b=O7aeyASeFshazuGL9dQApDfdOcdEwZdJP/yBudh+uGvLZckx6wJAy22iKx/QNBgWAR
+         sPEGea/fCBXnbX9kLBuN+BVMU0Ie/mqn5NYcc6eyn0BxZRK6VTKku3Z5Eo4J8EkWuIiH
+         OojbKP4RJnc3o/y7jYg28uaeFMehPcNfVTDGc5NLluTWaOAmw8x/VqxJDsif/lIwIk04
+         BzYsV2ovSNcD6HlVp1w4jKazEmNj/OtPYXqx8clE8V5WOFuslSlj5fsrmo+hufNtLni5
+         JcpOsuObzjJ8h+pZnPpqUHBk7BHt68Zng3tfCKeD6RMXABFoX/K+LJOmsTVOAllMK4qe
+         JXsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=90VIOO1p74EA8hY3x50vda5a5ym/lg0uKWR1Pv2K87s=;
+        b=WHvbLnzyY3/mcOqeYCfqeUdHvD/+vFQD60Efcuw7EYfSJI+1yGL3f6Wnue0qvIZQaw
+         guCPemU4n7PL1f0oBjX+tS1Z71iJ8O+XWBSwF1g1SjhCnGfPv2JwBnSlq3MliNeRFrMm
+         ok5XcHhBrxrg0ctu8yp/SafKlosM1ElLbxKeZH885mWQiusUtl4X19xjcnhKyms2+Ipk
+         Vr2CSd+7wc62+J238p4e4tQ1QpKhFPQoLA3bgsVhdUOZxskZJd9xTvN0D+FsHND0bpc7
+         Eh6b1c15CYJYSM+jZ/baBcyMtXggbJoRecAbQ2j6Lo3cv0rPRpUi5IkVFgFWp8Jgc0Qb
+         Q7Ow==
+X-Gm-Message-State: AOAM531QI/t7pisHiqOvcPvFKq+N41Uv98IAyNyU1zB8K8/xquDdc5cw
+        dvRsnU91c7M/OJ5bBDX7bhNMWveNdJU=
+X-Google-Smtp-Source: ABdhPJzfvu5fgdg+Y65TRzGeZrswPyXC88UrQg3Yp0CgHwV2T0rdq3h+w5soMX3W0KFNCbduEhuOK1nUfcc=
+Sender: "oupton via sendgmr" <oupton@oupton2.c.googlers.com>
+X-Received: from oupton2.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:136])
+ (user=oupton job=sendgmr) by 2002:a25:6945:: with SMTP id e66mr1633874ybc.319.1606159495815;
+ Mon, 23 Nov 2020 11:24:55 -0800 (PST)
+Date:   Mon, 23 Nov 2020 19:22:24 +0000
+In-Reply-To: <95b9b017-ccde-97a0-f407-fd5f35f1157d@redhat.com>
+Message-Id: <20201123192223.3177490-1-oupton@google.com>
+Mime-Version: 1.0
+References: <95b9b017-ccde-97a0-f407-fd5f35f1157d@redhat.com>
+X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
+Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
+ posted-interrupt pending
+From:   Oliver Upton <oupton@google.com>
+To:     pbonzini@redhat.com
+Cc:     idan.brown@ORACLE.COM, jmattson@google.com, kvm@vger.kernel.org,
+        liam.merwick@ORACLE.COM, wanpeng.li@hotmail.com, seanjc@google.com,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 11/19/20 10:56 AM, Halil Pasic wrote:
-> On Thu, 19 Nov 2020 12:30:26 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
+>On 27/12/2017 16:15, Liran Alon wrote:
+>> I think I now follow what you mean regarding cleaning logic around
+>> pi_pending. This is how I understand it:
+>> 
+>> 1. "vmx->nested.pi_pending" is a flag used to indicate "L1 has sent a
+>> vmcs12->posted_intr_nv IPI". That's it.
+>> 
+>> 2. Currently code is a bit weird in the sense that instead of signal the
+>> pending IPI in virtual LAPIC IRR, we set it in a special variable.
+>> If we would have set it in virtual LAPIC IRR, we could in theory behave
+>> very similar to a standard CPU. At interrupt injection point, we could:
+>> (a) If vCPU is in root-mode: Just inject the pending interrupt normally.
+>> (b) If vCPU is in non-root-mode and posted-interrupts feature is active,
+>> then instead of injecting the pending interrupt, we should simulate
+>> processing of posted-interrupts.
+>> 
+>> 3. The processing of the nested posted-interrupts itself can still be
+>> done in self-IPI mechanism.
+>> 
+>> 4. Because not doing (2), there is still currently an issue that L1
+>> doesn't receive a vmcs12->posted_intr_nv interrupt when target vCPU
+>> thread has exited from L2 to L1 and pi_pending=true.
+>> 
+>> Do we agree on the above? Or am I still misunderstanding something?
 >
->>> +static void vfio_mdev_request(void *device_data, unsigned int count)
->>> +{
->>> +	struct mdev_device *mdev = device_data;
->>> +	struct mdev_parent *parent = mdev->parent;
->>> +
->>> +	if (unlikely(!parent->ops->request))
->> Hm. Do you think that all drivers should implement a ->request()
->> callback?
-> @Tony: What do you think, does vfio_ap need something like this?
+> Yes, I think we agree.
 >
-> BTW how is this supposed to work in a setup where the one parent
-> has may children (like vfio_ap or the gpu slice and dice usecases).
->
-> After giving this some thought I'm under the impression, I don't
-> get the full picture yet.
+> Paolo
 
-Eric Farman touched base with me on Friday to discuss this, but
-I was on my way out the door for an appointment. He is off this
-week; so, the bottom line for me is that I don't have even a
-piece of the picture here and therefore don't have enough
-info to speculate on whether vfio_ap needs something like this.
+Digging up this old thread to add discussions I had with Jim and Sean
+recently.
 
->
-> Regards,
-> Halil
+We were looking at what was necessary in order to implement the
+suggestions above (route the nested PINV through L1 IRR instead of using
+the pi_pending bit), but now believe this change could never work
+perfectly.
 
+The pi_pending bit works rather well as it is only a hint to KVM that it
+may owe the guest a posted-interrupt completion. However, if we were to
+set the guest's nested PINV as pending in the L1 IRR it'd be challenging
+to infer whether or not it should actually be injected in L1 or result
+in posted-interrupt processing for L2.
+
+A possible solution would be to install a real ISR in L0 for KVM's
+nested PINV in concert with a per-CPU data structure containing a
+linked-list of possible vCPUs that could've been meant to receive the
+doorbell. But how would L0 know to remove a vCPU from this list? Since
+posted interrupts is exitless, KVM never actually knows if a vCPU got
+the intended doorbell.
+
+Short of any brilliant ideas, it seems that the pi_pending bit
+is probably here to say. I have a patch to serialize it in the
+{GET,SET}_NESTED_STATE ioctls (live migration is busted for nested
+posted interrupts, currently) but wanted to make sure we all agree
+pi_pending isn't going anywhere.
+
+--
+Thanks,
+Oliver
