@@ -2,155 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52C452C03BD
-	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 12:00:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B4802C04C0
+	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 12:40:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728048AbgKWK6P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Nov 2020 05:58:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43186 "EHLO mail.kernel.org"
+        id S1729000AbgKWLjv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Nov 2020 06:39:51 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52500 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726289AbgKWK6P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Nov 2020 05:58:15 -0500
+        id S1726529AbgKWLjv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Nov 2020 06:39:51 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5037920781;
-        Mon, 23 Nov 2020 10:58:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F27BF2073C;
+        Mon, 23 Nov 2020 11:39:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606129094;
-        bh=/peUmxWwoiuoRZHOUT3CLjXhVSf0z9ZqsFQuW9bn+lU=;
+        s=default; t=1606131590;
+        bh=0UIU4HVD/JiG5U+u4RsuKKh3hEgOAsAPOUEnJ0oyqk4=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ggZdStaRDcuClrAZIfESIxlWj27QHDRXUH+C/KbP+gjBJzkGUQ8cNmRBUUeSjPG6F
-         K0qxnr2bzC3wS96VFks2K8I9SDy/jjGygPJY1Sjq0CYXMD8ayNzkFsFPaxMX6wUYaT
-         oae+rHW3jiJs5Cclmn17vL0aVsm3Yjijau6Kl0KA=
+        b=Q+nTExfrAFoGXJxebGNcj/i0n7QidFqfZK1qgrW0vMH5v+3P2p/SZPb0eLbc3GCQ2
+         B5PWlsOz2enbiiUP0j+eMdl+cUXZ0rkJBSI5Jb3XBvKLAtwYPsjDkgV1Tkexr54OEV
+         myK/qPy7FrEPKhoKjs1GlOcY3mFDNjKcnDeZ8k5A=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1kh9Xw-00CtAH-3h; Mon, 23 Nov 2020 10:58:12 +0000
+        id 1khACB-00Ctnb-Ky; Mon, 23 Nov 2020 11:39:47 +0000
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Mon, 23 Nov 2020 10:58:07 +0000
+Date:   Mon, 23 Nov 2020 11:39:47 +0000
 From:   Marc Zyngier <maz@kernel.org>
-To:     Jianyong Wu <jianyong.wu@arm.com>
-Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, richardcochran@gmail.com,
-        Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
-        Andre.Przywara@arm.com, steven.price@arm.com,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
-Subject: Re: [PATCH v15 8/9] doc: add ptp_kvm introduction for arm64 support
-In-Reply-To: <20201111062211.33144-9-jianyong.wu@arm.com>
-References: <20201111062211.33144-1-jianyong.wu@arm.com>
- <20201111062211.33144-9-jianyong.wu@arm.com>
+To:     darkhan@amazon.com
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, corbet@lwn.net,
+        james.morse@arm.com, catalin.marinas@arm.com, chenhc@lemote.com,
+        paulus@ozlabs.org, frankja@linux.ibm.com, mingo@redhat.com,
+        acme@redhat.com, graf@amazon.de, darkhan@amazon.de
+Subject: Re: [PATCH 0/3] Introduce new vcpu ioctls KVM_(GET|SET)_MANY_REGS
+In-Reply-To: <20201120125616.14436-1-darkhan@amazon.com>
+References: <20201120125616.14436-1-darkhan@amazon.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <38fad448a3a465e4c35994ce61f4d8dd@kernel.org>
+Message-ID: <287408cf179690f975daa4f665926d66@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
+X-SA-Exim-Rcpt-To: darkhan@amazon.com, pbonzini@redhat.com, kvm@vger.kernel.org, corbet@lwn.net, james.morse@arm.com, catalin.marinas@arm.com, chenhc@lemote.com, paulus@ozlabs.org, frankja@linux.ibm.com, mingo@redhat.com, acme@redhat.com, graf@amazon.de, darkhan@amazon.de
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-11-11 06:22, Jianyong Wu wrote:
-> PTP_KVM implementation depends on hypercall using SMCCC. So we
-> introduce a new SMCCC service ID. This doc explains how does the
-> ID define and how does PTP_KVM works on arm/arm64.
+On 2020-11-20 12:56, darkhan@amazon.com wrote:
+> From: Darkhan Mukashov <darkhan@amazon.com>
 > 
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->  Documentation/virt/kvm/api.rst         |  9 +++++++
->  Documentation/virt/kvm/arm/index.rst   |  1 +
->  Documentation/virt/kvm/arm/ptp_kvm.rst | 29 +++++++++++++++++++++
->  Documentation/virt/kvm/timekeeping.rst | 35 ++++++++++++++++++++++++++
->  4 files changed, 74 insertions(+)
->  create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+> The ultimate goal is to introduce new vcpu ioctls 
+> KVM_(GET|SET)_MANY_REGS.
+> To introduce these ioctls, implementations of KVM_(GET|SET)_ONE_REG 
+> have
+> to be refactored. Specifically, KVM_(GET|SET)_ONE_REG should be handled 
+> in
+> a generic kvm_vcpu_ioctl function.
 > 
-> diff --git a/Documentation/virt/kvm/api.rst 
-> b/Documentation/virt/kvm/api.rst
-> index 36d5f1f3c6dd..9843dbcbf770 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6391,3 +6391,12 @@ When enabled, KVM will disable paravirtual
-> features provided to the
->  guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
->  (0x40000001). Otherwise, a guest may use the paravirtual features
->  regardless of what has actually been exposed through the CPUID leaf.
-> +
-> +8.27 KVM_CAP_PTP_KVM
-> +--------------------
-> +
-> +:Architectures: arm64
-> +
-> +This capability indicates that KVM virtual PTP service is supported in 
-> host.
-> +It must company with the implementation of KVM virtual PTP service in 
-> host
-> +so VMM can probe if there is the service in host by checking this 
-> capability.
-> diff --git a/Documentation/virt/kvm/arm/index.rst
-> b/Documentation/virt/kvm/arm/index.rst
-> index 3e2b2aba90fc..78a9b670aafe 100644
-> --- a/Documentation/virt/kvm/arm/index.rst
-> +++ b/Documentation/virt/kvm/arm/index.rst
-> @@ -10,3 +10,4 @@ ARM
->     hyp-abi
->     psci
->     pvtime
-> +   ptp_kvm
-> diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst
-> b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> new file mode 100644
-> index 000000000000..bb1e6cfefe44
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> @@ -0,0 +1,29 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +PTP_KVM support for arm/arm64
-> +=============================
-> +
-> +PTP_KVM is used for time sync between guest and host in a high 
-> precision.
-> +It needs to get the wall time and counter value from the host and
-> transfer these
-> +to guest via hypercall service. So one more hypercall service has been 
-> added.
-> +
-> +This new SMCCC hypercall is defined as:
-> +
-> +* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0x86000001
-> +
-> +As both 32 and 64-bits ptp_kvm client should be supported, we choose
-> SMC32/HVC32
-> +calling convention.
-> +
-> +ARM_SMCCC_HYP_KVM_PTP_FUNC_ID:
-> +
-> +    =============    ==========    ==========
-> +    Function ID:     (uint32)      0x86000001
-> +    Arguments:	     (uint32)      ARM_PTP_PHY_COUNTER(1) or
-> ARM_PTP_VIRT_COUNTER(0)
-> +                                   which indicate acquiring physical 
-> counter or
-> +                                   virtual counter respectively.
-> +    return value:    (uint32)      NOT_SUPPORTED(-1) or val0 and val1 
-> represent
-> +                                   wall clock time and val2 and val3 
-> represent
-> +                                   counter cycle.
+> New KVM APIs KVM_(GET|SET)_MANY_REGS make it possible to bulk 
+> read/write
+> vCPU registers at one ioctl call. These ioctls can be very useful when
+> vCPU state serialization/deserialization is required (e.g. live update 
+> of
+> kvm, live migration of guests), hence all registers have to be
+> saved/restored. KVM_(GET|SET)_MANY_REGS will help avoid performance
+> overhead associated with syscall (ioctl in our case) handling. Tests
+> conducted on AWS Graviton2 Processors (64-bit ARM Neoverse cores) show
+> that average save/restore time of all vCPU registers can be optimized
+> ~3.5 times per vCPU with new ioctls. Test results can be found in Table 
+> 1.
+> +---------+-------------+---------------+
+> |         | kvm_one_reg | kvm_many_regs |
+> +---------+-------------+---------------+
+> | get all |   123 usec  |    33 usec    |
+> +---------+-------------+---------------+
+> | set all |   120 usec  |    36 usec    |
+> +---------+-------------+---------------+
+> 	Table 1. Test results
 
-This needs a lot more description:
+I have asked in private last week, and didn't get a satisfying answer:
 
-- Which word contains what part of the data (upper/lower part of the 
-64bit data)
-- The endianness of the data returned
+We are talking about 90us over the time taken by enough state to be
+transferred to the target so that it can be restarted. What proportion
+does this represent? I'd expect userspace to do this from the vcpu
+thread, and thus to be able to do everything in parallel, in which case
+the gain doesn't scale with the number of vcpu.
+
+One of the reasons for me being reluctant is that the userspace API
+breaks extremely often, and that you are now adding yet another one
+that can be used concurrently with the existing one.
+
+So I would really like to see the whole picture, and not just this
+very narrow "make it faster" approach. I also want to understand
+why this is a "MANY" approach, and not "ALL".
+
+Thanks,
 
          M.
 -- 
