@@ -2,99 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E39362C116C
-	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 18:08:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EA042C117F
+	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 18:08:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729815AbgKWRDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Nov 2020 12:03:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46607 "EHLO
+        id S2389248AbgKWRGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Nov 2020 12:06:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41368 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390215AbgKWRDg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Nov 2020 12:03:36 -0500
+        by vger.kernel.org with ESMTP id S1732295AbgKWRGN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Nov 2020 12:06:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606151015;
+        s=mimecast20190719; t=1606151171;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KQjlYGpM0Jo472SEJajFJgHSfKbcvhfoBX2kIE5oOZw=;
-        b=YU0yAUHYOOjTuWHPv6QylR1LfvSn/A83sczBrcmJxg/pYBkz9fySeJTOBNIaLnFYY5niwm
-        nZ4+m5Z3ZVotzVKhx7xQITCHN6wRPripaUB+iH8vYoSSJN4Ja3dt/Xut1lJu+4cvKrLhgv
-        GU7KrEhr4KJZXvQSsoo8q4G2qcdQMG4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-WuQ-qpwTOPqDoVFfXdXKkw-1; Mon, 23 Nov 2020 12:03:31 -0500
-X-MC-Unique: WuQ-qpwTOPqDoVFfXdXKkw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3055805BF6;
-        Mon, 23 Nov 2020 17:03:28 +0000 (UTC)
-Received: from gondolin (ovpn-113-104.ams2.redhat.com [10.36.113.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3909A5C1C4;
-        Mon, 23 Nov 2020 17:03:19 +0000 (UTC)
-Date:   Mon, 23 Nov 2020 18:03:16 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 05/14] s390/vfio-ap: implement in-use callback for
- vfio_ap driver
-Message-ID: <20201123180316.79273751.cohuck@redhat.com>
-In-Reply-To: <20201114004722.76c999e0.pasic@linux.ibm.com>
-References: <20201022171209.19494-1-akrowiak@linux.ibm.com>
-        <20201022171209.19494-6-akrowiak@linux.ibm.com>
-        <20201027142711.1b57825e.pasic@linux.ibm.com>
-        <6a5feb16-46b5-9dca-7e85-7d344b0ffa24@linux.ibm.com>
-        <20201114004722.76c999e0.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=ETdBmUCF01QVQJOZ+sQu9TUGQeVKu9xOEmE1E5gBvfU=;
+        b=BtEofZ03By1sp6OyH8lSI6IT4Bb/Q48OsWV2XnBXmdgQcceGh9rKSaQV86czSHO4W4CJHn
+        vUaUaH4n0l1WmtKl1NY4JjZQEtZdHR6F0okj/kLdyZp+LnqjvTzaYPmjipu9+IS6RcbTNg
+        lanzsvwsZXvmVS2IMlU/0SstZMlkjqs=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-eV3b5XG3PACngtLpU7K9ww-1; Mon, 23 Nov 2020 12:06:09 -0500
+X-MC-Unique: eV3b5XG3PACngtLpU7K9ww-1
+Received: by mail-qv1-f69.google.com with SMTP id e13so2219652qvl.19
+        for <kvm@vger.kernel.org>; Mon, 23 Nov 2020 09:06:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=ETdBmUCF01QVQJOZ+sQu9TUGQeVKu9xOEmE1E5gBvfU=;
+        b=lTVIhqIg5xcODXdLbPCYhom/ngoqeMdz9dTXYKu3oFxmDGRW+fljmCPtTssC0J10GY
+         N3zQCQb8ppGIMlTW3UriwIw/U/86cQNX8bbMHHD0ZliiMjNhPOdkyfmNtDBrEdG8qEsd
+         +AKKMadliHgaVkbO7LdNvHewOwG/SAvnVQXFAgt108pGSOudclEC/gHwViCuJvVriyAX
+         vLuHh2QMi/0Yrevv2L2g3H2RN+3Cz7jrk/Rz6ysi2Co88t2IaAA+9qwUHoneDXFmtJjh
+         MvhtOQs25Hj+yvIb0V4aQnWiZgD6c/Mgbu5wKZtP2eIuOeBv6o/UUvG7TJqWARejOUUA
+         MM+w==
+X-Gm-Message-State: AOAM532pAeA41gWAvJt0jt9opTZxqhXD6L7sjrWxQRXrY4mxBxUZsHBx
+        zsdQF0EJowt2PP+Uqr9m8bD4vyZeKwKYB5PolNl2/mvEyXz4CCe/hj+kBc0MClcO0S7az3GA269
+        kC9mCeafNDo4B
+X-Received: by 2002:ac8:5d53:: with SMTP id g19mr70898qtx.354.1606151168867;
+        Mon, 23 Nov 2020 09:06:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwHR8oVpP3xv7xpCkK6lH4mawBfXgRI3GL2dEiLGp13/vfLrDKV7SBtsWnvpv2iFDtHltekRw==
+X-Received: by 2002:ac8:5d53:: with SMTP id g19mr70839qtx.354.1606151168572;
+        Mon, 23 Nov 2020 09:06:08 -0800 (PST)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id o187sm10226153qkb.120.2020.11.23.09.06.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Nov 2020 09:06:07 -0800 (PST)
+Subject: Re: [RFC] MAINTAINERS tag for cleanup robot
+To:     Joe Perches <joe@perches.com>, clang-built-linux@googlegroups.com
+Cc:     linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, tboot-devel@lists.sourceforge.net,
+        kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-acpi@vger.kernel.org, devel@acpica.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
+        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+        linux-scsi@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ibm-acpi-devel@lists.sourceforge.net,
+        platform-driver-x86@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        ecryptfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        cluster-devel@redhat.com, linux-mtd@lists.infradead.org,
+        keyrings@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, alsa-devel@alsa-project.org,
+        bpf@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-nfs@vger.kernel.org, patches@opensource.cirrus.com
+References: <20201121165058.1644182-1-trix@redhat.com>
+ <2105f0c05e9eae8bee8e17dcc5314474b3c0bc73.camel@perches.com>
+ <6e8c1926-4209-8f10-d0f9-72c875a85a88@redhat.com>
+ <859bae8ddae3238116824192f6ddf1c91a381913.camel@perches.com>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <88eeba27-ee36-df63-8cd9-3cccbe5e0850@redhat.com>
+Date:   Mon, 23 Nov 2020 09:06:03 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <859bae8ddae3238116824192f6ddf1c91a381913.camel@perches.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 14 Nov 2020 00:47:22 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
 
-> On Fri, 13 Nov 2020 12:14:22 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> [..]
-> > >>   }
-> > >>   
-> > >> +#define MDEV_SHARING_ERR "Userspace may not re-assign queue %02lx.%04lx " \
-> > >> +			 "already assigned to %s"
-> > >> +
-> > >> +static void vfio_ap_mdev_log_sharing_err(const char *mdev_name,
-> > >> +					 unsigned long *apm,
-> > >> +					 unsigned long *aqm)
-> > >> +{
-> > >> +	unsigned long apid, apqi;
-> > >> +
-> > >> +	for_each_set_bit_inv(apid, apm, AP_DEVICES)
-> > >> +		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS)
-> > >> +			pr_err(MDEV_SHARING_ERR, apid, apqi, mdev_name);  
-> > > Isn't error rather severe for this? For my taste even warning would be
-> > > severe for this.  
-> > 
-> > The user only sees a EADDRINUSE returned from the sysfs interface,
-> > so Conny asked if I could log a message to indicate which APQNs are
-> > in use by which mdev. I can change this to an info message, but it
-> > will be missed if the log level is set higher. Maybe Conny can put in
-> > her two cents here since she asked for this.
-> >   
-> 
-> I'm looking forward to Conny's opinion. :)
+On 11/22/20 10:22 AM, Joe Perches wrote:
+> On Sun, 2020-11-22 at 08:33 -0800, Tom Rix wrote:
+>> On 11/21/20 9:10 AM, Joe Perches wrote:
+>>> On Sat, 2020-11-21 at 08:50 -0800, trix@redhat.com wrote:
+>>>> A difficult part of automating commits is composing the subsystem
+>>>> preamble in the commit log.  For the ongoing effort of a fixer producing
+>>>> one or two fixes a release the use of 'treewide:' does not seem appropriate.
+>>>>
+>>>> It would be better if the normal prefix was used.  Unfortunately normal is
+>>>> not consistent across the tree.
+>>>>
+>>>> So I am looking for comments for adding a new tag to the MAINTAINERS file
+>>>>
+>>>> 	D: Commit subsystem prefix
+>>>>
+>>>> ex/ for FPGA DFL DRIVERS
+>>>>
+>>>> 	D: fpga: dfl:
+>>> I'm all for it.  Good luck with the effort.  It's not completely trivial.
+>>>
+>>> From a decade ago:
+>>>
+>>> https://lore.kernel.org/lkml/1289919077.28741.50.camel@Joe-Laptop/
+>>>
+>>> (and that thread started with extra semicolon patches too)
+>> Reading the history, how about this.
+>>
+>> get_maintainer.pl outputs a single prefix, if multiple files have the
+>> same prefix it works, if they don't its an error.
+>>
+>> Another script 'commit_one_file.sh' does the call to get_mainainter.pl
+>> to get the prefix and be called by run-clang-tools.py to get the fixer
+>> specific message.
+> It's not whether the script used is get_maintainer or any other script,
+> the question is really if the MAINTAINERS file is the appropriate place
+> to store per-subsystem patch specific prefixes.
+>
+> It is.
+>
+> Then the question should be how are the forms described and what is the
+> inheritance priority.  My preference would be to have a default of
+> inherit the parent base and add basename(subsystem dirname).
+>
+> Commit history seems to have standardized on using colons as the separator
+> between the commit prefix and the subject.
+>
+> A good mechanism to explore how various subsystems have uses prefixes in
+> the past might be something like:
+>
+> $ git log --no-merges --pretty='%s' -<commit_count> <subsystem_path> | \
+>   perl -n -e 'print substr($_, 0, rindex($_, ":") + 1) . "\n";' | \
+>   sort | uniq -c | sort -rn
 
-(only just saw this; -ETOOMANYEMAILS)
+Thanks, I have shamelessly stolen this line and limited the commits to the maintainer.
 
-It is probably not an error in the sense of "things are broken, this
-cannot work"; but I'd consider this at least a warning "this does not
-work as you intended".
+I will post something once the generation of the prefixes is done.
+
+Tom
 
