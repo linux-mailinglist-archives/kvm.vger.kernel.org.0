@@ -2,149 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA042C117F
-	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 18:08:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BE992C11B4
+	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 18:16:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389248AbgKWRGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Nov 2020 12:06:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41368 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732295AbgKWRGN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Nov 2020 12:06:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606151171;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ETdBmUCF01QVQJOZ+sQu9TUGQeVKu9xOEmE1E5gBvfU=;
-        b=BtEofZ03By1sp6OyH8lSI6IT4Bb/Q48OsWV2XnBXmdgQcceGh9rKSaQV86czSHO4W4CJHn
-        vUaUaH4n0l1WmtKl1NY4JjZQEtZdHR6F0okj/kLdyZp+LnqjvTzaYPmjipu9+IS6RcbTNg
-        lanzsvwsZXvmVS2IMlU/0SstZMlkjqs=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-eV3b5XG3PACngtLpU7K9ww-1; Mon, 23 Nov 2020 12:06:09 -0500
-X-MC-Unique: eV3b5XG3PACngtLpU7K9ww-1
-Received: by mail-qv1-f69.google.com with SMTP id e13so2219652qvl.19
-        for <kvm@vger.kernel.org>; Mon, 23 Nov 2020 09:06:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=ETdBmUCF01QVQJOZ+sQu9TUGQeVKu9xOEmE1E5gBvfU=;
-        b=lTVIhqIg5xcODXdLbPCYhom/ngoqeMdz9dTXYKu3oFxmDGRW+fljmCPtTssC0J10GY
-         N3zQCQb8ppGIMlTW3UriwIw/U/86cQNX8bbMHHD0ZliiMjNhPOdkyfmNtDBrEdG8qEsd
-         +AKKMadliHgaVkbO7LdNvHewOwG/SAvnVQXFAgt108pGSOudclEC/gHwViCuJvVriyAX
-         vLuHh2QMi/0Yrevv2L2g3H2RN+3Cz7jrk/Rz6ysi2Co88t2IaAA+9qwUHoneDXFmtJjh
-         MvhtOQs25Hj+yvIb0V4aQnWiZgD6c/Mgbu5wKZtP2eIuOeBv6o/UUvG7TJqWARejOUUA
-         MM+w==
-X-Gm-Message-State: AOAM532pAeA41gWAvJt0jt9opTZxqhXD6L7sjrWxQRXrY4mxBxUZsHBx
-        zsdQF0EJowt2PP+Uqr9m8bD4vyZeKwKYB5PolNl2/mvEyXz4CCe/hj+kBc0MClcO0S7az3GA269
-        kC9mCeafNDo4B
-X-Received: by 2002:ac8:5d53:: with SMTP id g19mr70898qtx.354.1606151168867;
-        Mon, 23 Nov 2020 09:06:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwHR8oVpP3xv7xpCkK6lH4mawBfXgRI3GL2dEiLGp13/vfLrDKV7SBtsWnvpv2iFDtHltekRw==
-X-Received: by 2002:ac8:5d53:: with SMTP id g19mr70839qtx.354.1606151168572;
-        Mon, 23 Nov 2020 09:06:08 -0800 (PST)
-Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id o187sm10226153qkb.120.2020.11.23.09.06.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Nov 2020 09:06:07 -0800 (PST)
-Subject: Re: [RFC] MAINTAINERS tag for cleanup robot
-To:     Joe Perches <joe@perches.com>, clang-built-linux@googlegroups.com
-Cc:     linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xen-devel@lists.xenproject.org, tboot-devel@lists.sourceforge.net,
-        kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-acpi@vger.kernel.org, devel@acpica.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
-        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-        linux-scsi@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ibm-acpi-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        ecryptfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        cluster-devel@redhat.com, linux-mtd@lists.infradead.org,
-        keyrings@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, alsa-devel@alsa-project.org,
-        bpf@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-nfs@vger.kernel.org, patches@opensource.cirrus.com
-References: <20201121165058.1644182-1-trix@redhat.com>
- <2105f0c05e9eae8bee8e17dcc5314474b3c0bc73.camel@perches.com>
- <6e8c1926-4209-8f10-d0f9-72c875a85a88@redhat.com>
- <859bae8ddae3238116824192f6ddf1c91a381913.camel@perches.com>
-From:   Tom Rix <trix@redhat.com>
-Message-ID: <88eeba27-ee36-df63-8cd9-3cccbe5e0850@redhat.com>
-Date:   Mon, 23 Nov 2020 09:06:03 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S2387978AbgKWRPt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Nov 2020 12:15:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39676 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732295AbgKWRPt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Nov 2020 12:15:49 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0ANH4LRp014476;
+        Mon, 23 Nov 2020 12:15:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=THMpAouGIjleJboEsMLVa9YthvobYJGUhZDsdxouUvk=;
+ b=A160ecPJFRFonzQQZm5evAXAIvdHGCZenWKhwhMIbmor2/UIguvjv1Bk7Y23IfcKjkgR
+ uKvy1wQnqei7BpQV1O3DB0YSCNiWHDGSHW8WbxB63Wrc31DMPrWA/w/LB7pqmvH4b7Lo
+ 9Jhz75wF8dbicjfK40wTO0K6GgJZMtx6XIP2bo+0r303IpNINWLSEEfYWyZuMpjhTeyV
+ L37j8gfeYS+fm64uv6TMiCJj0hP9JsZN0KE56Q6fRrjy1KXYPRKYE9UHEUr6NIoearZy
+ CZCanuegwFeMyf9fgUYpOZjwl2E+vYkYcEbfTk/zBYRrCpUT8lYxabWFnyUUqAoFRGQw HA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34yvnrxbte-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Nov 2020 12:15:48 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0ANHEaSR038489;
+        Mon, 23 Nov 2020 12:15:48 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 34yvnrxbsj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Nov 2020 12:15:48 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0ANH82T1010128;
+        Mon, 23 Nov 2020 17:15:46 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 34xth8arf6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Nov 2020 17:15:46 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0ANHFhUM62128554
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Nov 2020 17:15:44 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD4BA11C052;
+        Mon, 23 Nov 2020 17:15:43 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 64BCF11C054;
+        Mon, 23 Nov 2020 17:15:43 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.54.238])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 23 Nov 2020 17:15:43 +0000 (GMT)
+Subject: Re: [PATCH 0/2] KVM: s390: memcg awareness
+To:     Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>
+References: <20201117151023.424575-1-borntraeger@de.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <ef538cd6-b82f-0773-3848-f3b5232e7412@de.ibm.com>
+Date:   Mon, 23 Nov 2020 18:15:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <859bae8ddae3238116824192f6ddf1c91a381913.camel@perches.com>
+In-Reply-To: <20201117151023.424575-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-23_14:2020-11-23,2020-11-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxlogscore=958 spamscore=0 suspectscore=0 priorityscore=1501
+ malwarescore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011230114
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 11/22/20 10:22 AM, Joe Perches wrote:
-> On Sun, 2020-11-22 at 08:33 -0800, Tom Rix wrote:
->> On 11/21/20 9:10 AM, Joe Perches wrote:
->>> On Sat, 2020-11-21 at 08:50 -0800, trix@redhat.com wrote:
->>>> A difficult part of automating commits is composing the subsystem
->>>> preamble in the commit log.  For the ongoing effort of a fixer producing
->>>> one or two fixes a release the use of 'treewide:' does not seem appropriate.
->>>>
->>>> It would be better if the normal prefix was used.  Unfortunately normal is
->>>> not consistent across the tree.
->>>>
->>>> So I am looking for comments for adding a new tag to the MAINTAINERS file
->>>>
->>>> 	D: Commit subsystem prefix
->>>>
->>>> ex/ for FPGA DFL DRIVERS
->>>>
->>>> 	D: fpga: dfl:
->>> I'm all for it.  Good luck with the effort.  It's not completely trivial.
->>>
->>> From a decade ago:
->>>
->>> https://lore.kernel.org/lkml/1289919077.28741.50.camel@Joe-Laptop/
->>>
->>> (and that thread started with extra semicolon patches too)
->> Reading the history, how about this.
->>
->> get_maintainer.pl outputs a single prefix, if multiple files have the
->> same prefix it works, if they don't its an error.
->>
->> Another script 'commit_one_file.sh' does the call to get_mainainter.pl
->> to get the prefix and be called by run-clang-tools.py to get the fixer
->> specific message.
-> It's not whether the script used is get_maintainer or any other script,
-> the question is really if the MAINTAINERS file is the appropriate place
-> to store per-subsystem patch specific prefixes.
->
-> It is.
->
-> Then the question should be how are the forms described and what is the
-> inheritance priority.  My preference would be to have a default of
-> inherit the parent base and add basename(subsystem dirname).
->
-> Commit history seems to have standardized on using colons as the separator
-> between the commit prefix and the subject.
->
-> A good mechanism to explore how various subsystems have uses prefixes in
-> the past might be something like:
->
-> $ git log --no-merges --pretty='%s' -<commit_count> <subsystem_path> | \
->   perl -n -e 'print substr($_, 0, rindex($_, ":") + 1) . "\n";' | \
->   sort | uniq -c | sort -rn
 
-Thanks, I have shamelessly stolen this line and limited the commits to the maintainer.
+On 17.11.20 16:10, Christian Borntraeger wrote:
+> This got somehow lost.  (so this is kind of a v2)
+> KVM does have memcg awareness. Lets implement this also for s390kvm
+> and gmap.
+> 
+> Christian Borntraeger (2):
+>   KVM: s390: Add memcg accounting to KVM allocations
+>   s390/gmap: make gmap memcg aware
 
-I will post something once the generation of the prefixes is done.
-
-Tom
-
+both applied.
+> 
+>  arch/s390/kvm/guestdbg.c  |  8 ++++----
+>  arch/s390/kvm/intercept.c |  2 +-
+>  arch/s390/kvm/interrupt.c | 10 +++++-----
+>  arch/s390/kvm/kvm-s390.c  | 20 ++++++++++----------
+>  arch/s390/kvm/priv.c      |  4 ++--
+>  arch/s390/kvm/pv.c        |  6 +++---
+>  arch/s390/kvm/vsie.c      |  4 ++--
+>  arch/s390/mm/gmap.c       | 30 +++++++++++++++---------------
+>  8 files changed, 42 insertions(+), 42 deletions(-)
+> 
