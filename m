@@ -2,125 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 760E82C0F65
-	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 16:56:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02BB42C0FD6
+	for <lists+kvm@lfdr.de>; Mon, 23 Nov 2020 17:13:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733218AbgKWPwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Nov 2020 10:52:37 -0500
-Received: from mga04.intel.com ([192.55.52.120]:3310 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732814AbgKWPwg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Nov 2020 10:52:36 -0500
-IronPort-SDR: wdIVWjG4qt3kkvZFlTfNHJ1qSha0XKAk2CxPFx4fu9uvtz0EoQNlcxjxuegxxUzv7XWLNMv6N9
- dwo6ar0lSANA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9813"; a="169224209"
-X-IronPort-AV: E=Sophos;i="5.78,363,1599548400"; 
-   d="scan'208";a="169224209"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2020 07:52:35 -0800
-IronPort-SDR: o6LRPZSLFHblJ72nLIxI7QtuEJsSPQd11jVZTPC9b01xjBsR6V5ML2IOh4GsWUUm1pKbyVJ0KQ
- V9qBxJqg/0zw==
-X-IronPort-AV: E=Sophos;i="5.78,363,1599548400"; 
-   d="scan'208";a="546463497"
-Received: from suygunge-mobl.ger.corp.intel.com (HELO localhost) ([10.249.40.108])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2020 07:52:23 -0800
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        trix@redhat.com, joe@perches.com,
-        clang-built-linux@googlegroups.com
-Cc:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        platform-driver-x86@vger.kernel.org,
-        ibm-acpi-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-scsi@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, cluster-devel@redhat.com,
-        linux-acpi@vger.kernel.org, tboot-devel@lists.sourceforge.net,
-        coreteam@netfilter.org, xen-devel@lists.xenproject.org,
-        MPT-FusionLinux.pdl@broadcom.com, linux-media@vger.kernel.org,
-        alsa-devel@alsa-project.org, intel-gfx@lists.freedesktop.org,
-        ecryptfs@vger.kernel.org, linux-omap@vger.kernel.org,
-        devel@acpica.org, linux-nfs@vger.kernel.org,
-        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, patches@opensource.cirrus.com,
-        linux-fsdevel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [RFC] MAINTAINERS tag for cleanup robot
-In-Reply-To: <5843ef910b0e86c00d9c0143dec20f93823b016b.camel@HansenPartnership.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20201121165058.1644182-1-trix@redhat.com> <5843ef910b0e86c00d9c0143dec20f93823b016b.camel@HansenPartnership.com>
-Date:   Mon, 23 Nov 2020 17:52:20 +0200
-Message-ID: <87y2ism5or.fsf@intel.com>
+        id S1731610AbgKWQJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Nov 2020 11:09:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26765 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732063AbgKWQJL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Nov 2020 11:09:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606147750;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vudEG5bLsot0T0VPkaODIJMcaiPIyeTC0NncFZ09Eyo=;
+        b=IP7Z3Di1EfIhF6XRWByVcFRKmGDEv8wMbsG02V8L6znmi77wMp84QVuSplitdf2+VWUoAd
+        /m6AfBWjlEKAKukNfmXObZTDWWb+mKUDzTXGUOzZrEIJEhgvZBTFFKC33Oz3juixdrnMOc
+        wpgOjpQQTrVEQk0udGSqV5PhZbsDDXs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-JqoY7vdGNFOHnuyf7fplsg-1; Mon, 23 Nov 2020 11:09:05 -0500
+X-MC-Unique: JqoY7vdGNFOHnuyf7fplsg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84A4A800050;
+        Mon, 23 Nov 2020 16:09:04 +0000 (UTC)
+Received: from gondolin (ovpn-113-104.ams2.redhat.com [10.36.113.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A2AE60864;
+        Mon, 23 Nov 2020 16:08:59 +0000 (UTC)
+Date:   Mon, 23 Nov 2020 17:08:57 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>
+Subject: Re: [PATCH 1/2] KVM: s390: Add memcg accounting to KVM allocations
+Message-ID: <20201123170857.1218d5e7.cohuck@redhat.com>
+In-Reply-To: <20201117151023.424575-2-borntraeger@de.ibm.com>
+References: <20201117151023.424575-1-borntraeger@de.ibm.com>
+        <20201117151023.424575-2-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 21 Nov 2020, James Bottomley <James.Bottomley@HansenPartnership.com> wrote:
-> On Sat, 2020-11-21 at 08:50 -0800, trix@redhat.com wrote:
->> A difficult part of automating commits is composing the subsystem
->> preamble in the commit log.  For the ongoing effort of a fixer
->> producing
->> one or two fixes a release the use of 'treewide:' does not seem
->> appropriate.
->> 
->> It would be better if the normal prefix was used.  Unfortunately
->> normal is
->> not consistent across the tree.
->> 
->> 
->> 	D: Commit subsystem prefix
->> 
->> ex/ for FPGA DFL DRIVERS
->> 
->> 	D: fpga: dfl:
->> 
->
-> I've got to bet this is going to cause more issues than it solves.
+On Tue, 17 Nov 2020 16:10:22 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Agreed.
+> Almost all kvm allocations in the s390x KVM code can be attributed to
+> process that triggers the allocation (in other words, no global
 
-> SCSI uses scsi: <driver>: for drivers but not every driver has a
-> MAINTAINERS entry.  We use either scsi: or scsi: core: for mid layer
-> things, but we're not consistent.  Block uses blk-<something>: for all
-> of it's stuff but almost no <somtehing>s have a MAINTAINERS entry.  So
-> the next thing you're going to cause is an explosion of suggested
-> MAINTAINERs entries.
+s/process/the process/
 
-On the one hand, adoption of new MAINTAINERS entries has been really
-slow. Look at B, C, or P, for instance. On the other hand, if this were
-to get adopted, you'll potentially get conflicting prefixes for patches
-touching multiple files. Then what?
+> allocation for other guests). This will help the memcg controller to do
 
-I'm guessing a script looking at git log could come up with better
-suggestions for prefixes via popularity contest than manually maintained
-MAINTAINERS entries. It might not always get it right, but then human
-outsiders aren't going to always get it right either.
+s/do/make/
 
-Now you'll only need Someone(tm) to write the script. ;)
+> the right decisions.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Acked-by: Heiko Carstens <hca@linux.ibm.com>
+> ---
+>  arch/s390/kvm/guestdbg.c  |  8 ++++----
+>  arch/s390/kvm/intercept.c |  2 +-
+>  arch/s390/kvm/interrupt.c | 10 +++++-----
+>  arch/s390/kvm/kvm-s390.c  | 20 ++++++++++----------
+>  arch/s390/kvm/priv.c      |  4 ++--
+>  arch/s390/kvm/pv.c        |  6 +++---
+>  arch/s390/kvm/vsie.c      |  4 ++--
+>  7 files changed, 27 insertions(+), 27 deletions(-)
 
-Something quick like this:
+Didn't do a deep review, but looks reasonable.
 
-git log --since={1year} --pretty=format:%s -- <FILES> |\
-	grep -v "^\(Merge\|Revert\)" |\
-        sed 's/:[^:]*$//' |\
-        sort | uniq -c | sort -rn | head -5
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
-already gives me results that really aren't worse than some of the
-prefixes invented by drive-by contributors.
-
-> Has anyone actually complained about treewide:?
-
-As Joe said, I'd feel silly applying patches to drivers with that
-prefix. If it gets applied by someone else higher up, literally
-treewide, then no complaints.
-
-BR,
-Jani.
-
-
--- 
-Jani Nikula, Intel Open Source Graphics Center
