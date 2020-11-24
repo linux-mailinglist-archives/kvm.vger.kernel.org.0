@@ -2,119 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B27B42C2381
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 12:02:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 140BC2C2387
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 12:04:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732455AbgKXLCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 06:02:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19932 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732447AbgKXLCD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 06:02:03 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AOAW7IA179620;
-        Tue, 24 Nov 2020 06:01:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=lVsos4lno+eB5udRSRAS82PyJA/Ru4W3MJVpinWqJn4=;
- b=brYKCB/3idy/CnIJVkj/VwKMTjEg7xIRCEhbBsd6fSRwFF+PmUkFf8WZqhrvOKIWJNyW
- IrwVp3iXJsCH8MuJi2Up2k0VHQbRS1EeIiEqmYrA3igbXZVRIfWtvCuABFrEVf4Wj2eC
- +kf0g9bsF8Xa28+5gWu7dZkQaM9Q+CQmE4xH1GRVhEK5jvbQLmspaiU1mBO29D/FRmDT
- sD/j6kM8GI9l21Q/2xk6hXKc6hYGNe4f7he+Mnn/vHvu73BZVGaL/2rs4s0lPKhqnK0c
- 1982OiuU+xgZQsxAMic+NM5Yo62IIj5MysVd359k1Z07+7x0AKM3kB7cdYUGGIq6zxRg Jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb0ysr4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 06:01:46 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AOB0aCR093282;
-        Tue, 24 Nov 2020 06:01:46 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb0ysmu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 06:01:46 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AOAr6Iw017837;
-        Tue, 24 Nov 2020 11:01:41 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 350cvrs0tk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 11:01:41 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AOB0O4B852534
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Nov 2020 11:00:24 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4E1D942061;
-        Tue, 24 Nov 2020 11:00:24 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AACD4205C;
-        Tue, 24 Nov 2020 11:00:21 +0000 (GMT)
-Received: from bangoria.ibmuc.com (unknown [9.199.32.189])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 24 Nov 2020 11:00:21 +0000 (GMT)
-From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-To:     mpe@ellerman.id.au, paulus@samba.org
-Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
-        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
-        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 4/4] KVM: PPC: Introduce new capability for 2nd DAWR
-Date:   Tue, 24 Nov 2020 16:29:53 +0530
-Message-Id: <20201124105953.39325-5-ravi.bangoria@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com>
-References: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com>
+        id S1732467AbgKXLCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 06:02:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59914 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732463AbgKXLCO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 06:02:14 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7A9E82083E;
+        Tue, 24 Nov 2020 11:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1606215733;
+        bh=1cxLgDpJmbdMl+KoljU+RVmexumupWZLEWD2oMoaKUU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=q75xZPDVFkN48q5ixVGY/INzSkna2IoQiNKgDb4iGJT45iswpwLADZaC+ly61ri94
+         8re58ReAIjl1Tnv1nU4Or8bpJk8xty90DFENNPZRJeKjb7j+ycPeOjyIMlv6xGWwzZ
+         3eBoXOh0wLdMYbdnDeNWJqq/1f0SacT67S0XRqYc=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1khW5L-00DE77-AT; Tue, 24 Nov 2020 11:02:11 +0000
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-24_04:2020-11-24,2020-11-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1015 spamscore=0
- lowpriorityscore=0 suspectscore=0 bulkscore=0 mlxlogscore=920
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011240061
+Date:   Tue, 24 Nov 2020 11:02:11 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jingyi Wang <wangjingyi11@huawei.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, will@kernel.org,
+        catalin.marinas@arm.com, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        wanghaibin.wang@huawei.com, yezengruan@huawei.com,
+        shameerali.kolothum.thodi@huawei.com, fanhenglong@huawei.com,
+        prime.zeng@hisilicon.com
+Subject: Re: [RFC PATCH 0/4] Add support for ARMv8.6 TWED feature
+In-Reply-To: <9d341a2d-19f8-400c-6674-ef991ab78f62@huawei.com>
+References: <20200929091727.8692-1-wangjingyi11@huawei.com>
+ <9d341a2d-19f8-400c-6674-ef991ab78f62@huawei.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <10463cb9a0ae167a89300185c1de348c@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: wangjingyi11@huawei.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com, yezengruan@huawei.com, shameerali.kolothum.thodi@huawei.com, fanhenglong@huawei.com, prime.zeng@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce KVM_CAP_PPC_DAWR1 which can be used by Qemu to query whether
-kvm supports 2nd DAWR or not.
+On 2020-11-13 07:54, Jingyi Wang wrote:
+> Hi all，
+> 
+> Sorry for the delay. I have been testing the TWED feature performance
+> lately. We select unixbench as the benchmark for some items of it is
+> lock-intensive(fstime/fsbuffer/fsdisk). We run unixbench on a 4-VCPU
+> VM, and bind every two VCPUs on one PCPU. Fixed TWED value is used and
+> here is the result.
 
-Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
----
- arch/powerpc/kvm/powerpc.c | 3 +++
- include/uapi/linux/kvm.h   | 1 +
- 2 files changed, 4 insertions(+)
+How representative is this?
 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 13999123b735..48763fe59fc5 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -679,6 +679,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 			!kvmppc_hv_ops->enable_svm(NULL);
- 		break;
- #endif
-+	case KVM_CAP_PPC_DAWR1:
-+		r = cpu_has_feature(CPU_FTR_DAWR1);
-+		break;
- 	default:
- 		r = 0;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6d86033c4fa..0f32d6cbabc2 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_LAST_CPU 184
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
-+#define KVM_CAP_PPC_DAWR1 187
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+TBH, I only know of two real world configurations: one where
+the vCPUs are pinned to different physical CPUs (and in this
+case your patch has absolutely no effect as long as there is
+no concurrent tasks), and one where there is oversubscription,
+and the scheduler moves things around as it sees fit, depending
+on the load.
+
+Having two vCPUs pinned per CPU feels like a test that has been
+picked to give the result you wanted. I'd like to see the full
+picture, including the case that matters for current use cases.
+I'm specially interested in the cases where the system is
+oversubscribed, because TWED is definitely going to screw with
+the scheduler latency.
+
+Thanks,
+
+         M.
 -- 
-2.26.2
-
+Jazz is not dead. It just smells funny...
