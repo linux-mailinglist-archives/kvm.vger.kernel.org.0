@@ -2,208 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0ECA2C1FD7
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 09:27:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC22B2C2012
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 09:33:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730527AbgKXI07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 03:26:59 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52632 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730500AbgKXI07 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Nov 2020 03:26:59 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 293F220870;
-        Tue, 24 Nov 2020 08:26:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606206418;
-        bh=YCvAHBNcK4JrFhb6WFO3tG22p20ZWh3it7ak5hEvG2I=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=DzSuDDeBaz/h0qW7OiRtKhYC5Y7L3qQx5larBizrKvm42cruk2f03ei1/RN4SR/Wr
-         VSq9y/dhO+f009B8o9oyOsJQZerIHcfaAvtZjq1hE5/nGqXOA5oGkdNmfMyTUC0dNJ
-         eR9lbz+Lh/m3jdkMri6N7jXDJshrGda3DKeHP0pM=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1khTf5-00DBXE-Ui; Tue, 24 Nov 2020 08:26:56 +0000
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Tue, 24 Nov 2020 08:26:55 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Shenming Lu <lushenming@huawei.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-Subject: Re: [RFC PATCH v1 2/4] KVM: arm64: GICv4.1: Try to save hw pending
- state in save_pending_tables
-In-Reply-To: <90f04f50-c1ba-55b2-0f93-1e755b40b487@huawei.com>
-References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-3-lushenming@huawei.com>
- <f3ea1b24436bb86b5a5633f8ccc9b3d1@kernel.org>
- <90f04f50-c1ba-55b2-0f93-1e755b40b487@huawei.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <4e2b87897485e38e251c447b9ad70eb6@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: lushenming@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, alex.williamson@redhat.com, kwankhede@nvidia.com, cohuck@redhat.com, cjia@nvidia.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1730690AbgKXIdJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 03:33:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44042 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730476AbgKXIdJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 03:33:09 -0500
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54061C0613CF
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 00:33:09 -0800 (PST)
+Received: by mail-il1-x143.google.com with SMTP id t13so18501038ilp.2
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 00:33:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=D+4ljYp5ekAR8JD2FAt/grYOdgFuxJ9VMOxQc5QIChM=;
+        b=FoUNVPwNEDJCIPJXL9qPHaOQEvDP44TszPSk3/mH98HJxtrTynFLR0c1yfwBnrcpwY
+         xPD2avNVH8qJPyRz01xHBTCv/u/WdsZDT/QSf94eYXcKy6Nz0f77JssgSHeFTrMlQxJr
+         yYkvP3dTwGzdbLFFLaUjT7sr9KKUdk4rvTIVsWKmR+3a8MqfoLMP28yB+OQo9Vc1C6Cg
+         x0Xa1elVjSM73pGK7L234QTWHrZjm1TCj1zUz0lEjqkn8YnLpgMnw1cKoTeTFye3/JsZ
+         2AQ1oSpmzWvU5h5AacTaViBvxnHdYcXS5diNrYLEoTSzrLI6UjyjIsNVcwIfBVfIF6Id
+         55rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=D+4ljYp5ekAR8JD2FAt/grYOdgFuxJ9VMOxQc5QIChM=;
+        b=jNz2CcRUNo9ggOzhWxUQeaEAnRWHOUEKWXqa6QkqAfkeb2YpZtnJtgISfyXo313Zn/
+         XYGm3ktQvaqGrOCRuhByjVJv4MReTZtNrq06+13PDBeiZ2IvY0HTqMJSGSYzwoApTYW7
+         E8luBTNrNyl+UpSsCJ+eqbOMov1K9fnw1ov+GI+WtiqezNcJcgp8MB9UpAS2AZ4IgVKv
+         qhEmLbmjgxpdkGj2b0o4WiA3hcsvl3CeFTOAXq9BZCO0FKJfx7iFvzr446hryenoMGng
+         7ivHHk2BgtkFTW/oObFC2VyvPf8WXewMqyUcnmE0XJEDlAWXfn1OnSmpRvnfCdDmF655
+         zTgQ==
+X-Gm-Message-State: AOAM532j1sLvKc1iJYfLzBzvxThzh5cj7tNwE2zCRpbNJt584xmRt/M/
+        dgjgZTP/ug6EFbdx+dMiFvqF7iJNLt4=
+X-Google-Smtp-Source: ABdhPJw/7A17eNwDMgOxftUlbqx73eCEW6HQFC/qaUwUhiIjZJy6RMkfvQ+H4GszAQeTklFP0x53iQ==
+X-Received: by 2002:a92:c50d:: with SMTP id r13mr1630559ilg.160.1606206788800;
+        Tue, 24 Nov 2020 00:33:08 -0800 (PST)
+Received: from pek-vx-bsp2.wrs.com (unknown-124-94.windriver.com. [147.11.124.94])
+        by smtp.gmail.com with ESMTPSA id f8sm9299753ile.11.2020.11.24.00.33.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 24 Nov 2020 00:33:08 -0800 (PST)
+From:   Bin Meng <bmeng.cn@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Bin Meng <bin.meng@windriver.com>
+Subject: [kvm-unit-tests][RFC PATCH] x86: Add a new test case for ret/iret with a nullified segment
+Date:   Tue, 24 Nov 2020 16:33:00 +0800
+Message-Id: <1606206780-80123-1-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-11-24 07:40, Shenming Lu wrote:
-> On 2020/11/23 17:18, Marc Zyngier wrote:
->> On 2020-11-23 06:54, Shenming Lu wrote:
->>> After pausing all vCPUs and devices capable of interrupting, in order
->>         ^^^^^^^^^^^^^^^^^
->> See my comment below about this.
->> 
->>> to save the information of all interrupts, besides flushing the 
->>> pending
->>> states in kvm’s vgic, we also try to flush the states of VLPIs in the
->>> virtual pending tables into guest RAM, but we need to have GICv4.1 
->>> and
->>> safely unmap the vPEs first.
->>> 
->>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
->>> ---
->>>  arch/arm64/kvm/vgic/vgic-v3.c | 62 
->>> +++++++++++++++++++++++++++++++----
->>>  1 file changed, 56 insertions(+), 6 deletions(-)
->>> 
->>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c 
->>> b/arch/arm64/kvm/vgic/vgic-v3.c
->>> index 9cdf39a94a63..e1b3aa4b2b12 100644
->>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
->>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
->>> @@ -1,6 +1,8 @@
->>>  // SPDX-License-Identifier: GPL-2.0-only
->>> 
->>>  #include <linux/irqchip/arm-gic-v3.h>
->>> +#include <linux/irq.h>
->>> +#include <linux/irqdomain.h>
->>>  #include <linux/kvm.h>
->>>  #include <linux/kvm_host.h>
->>>  #include <kvm/arm_vgic.h>
->>> @@ -356,6 +358,39 @@ int vgic_v3_lpi_sync_pending_status(struct kvm
->>> *kvm, struct vgic_irq *irq)
->>>      return 0;
->>>  }
->>> 
->>> +/*
->>> + * With GICv4.1, we can get the VLPI's pending state after unmapping
->>> + * the vPE. The deactivation of the doorbell interrupt will trigger
->>> + * the unmapping of the associated vPE.
->>> + */
->>> +static void get_vlpi_state_pre(struct vgic_dist *dist)
->>> +{
->>> +    struct irq_desc *desc;
->>> +    int i;
->>> +
->>> +    if (!kvm_vgic_global_state.has_gicv4_1)
->>> +        return;
->>> +
->>> +    for (i = 0; i < dist->its_vm.nr_vpes; i++) {
->>> +        desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
->>> +        irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
->>> +    }
->>> +}
->>> +
->>> +static void get_vlpi_state_post(struct vgic_dist *dist)
->> 
->> nit: the naming feels a bit... odd. Pre/post what?
-> 
-> My understanding is that the unmapping is a preparation for 
-> get_vlpi_state...
-> Maybe just call it unmap/map_all_vpes?
+From: Bin Meng <bin.meng@windriver.com>
 
-Yes, much better.
+This makes up the test case for the following QEMU patch:
+http://patchwork.ozlabs.org/project/qemu-devel/patch/1605261378-77971-1-git-send-email-bmeng.cn@gmail.com/
 
-[...]
+Note the test case only fails on an unpatched QEMU with "accel=tcg".
 
->>> +        if (irq->hw) {
->>> +            WARN_RATELIMIT(irq_get_irqchip_state(irq->host_irq,
->>> +                        IRQCHIP_STATE_PENDING, &is_pending),
->>> +                       "IRQ %d", irq->host_irq);
->> 
->> Isn't this going to warn like mad on a GICv4.0 system where this, by 
->> definition,
->> will generate an error?
-> 
-> As we have returned an error in save_its_tables if hw && !has_gicv4_1, 
-> we don't
-> have to warn this here?
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+---
+Sending this as RFC since I am new to kvm-unit-tests
 
-Are you referring to the check in vgic_its_save_itt() that occurs in 
-patch 4?
-Fair enough, though I think the use of irq_get_irqchip_state() isn't 
-quite
-what we want, as per my comments on patch #1.
+ x86/emulator.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
->> 
->>> +        }
->>> +
->>> +        if (stored == is_pending)
->>>              continue;
->>> 
->>> -        if (irq->pending_latch)
->>> +        if (is_pending)
->>>              val |= 1 << bit_nr;
->>>          else
->>>              val &= ~(1 << bit_nr);
->>> 
->>>          ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
->>>          if (ret)
->>> -            return ret;
->>> +            goto out;
->>>      }
->>> -    return 0;
->>> +
->>> +out:
->>> +    get_vlpi_state_post(dist);
->> 
->> This bit worries me: you have unmapped the VPEs, so any interrupt that 
->> has been
->> generated during that phase is now forever lost (the GIC doesn't have 
->> ownership
->> of the pending tables).
-> 
-> In my opinion, during this phase, the devices capable of interrupting
-> should have  already been paused (prevent from sending interrupts),
-> such as VFIO migration protocol has already realized it.
-
-Is that a hard guarantee? Pausing devices *may* be possible for a 
-limited
-set of endpoints, but I'm not sure that is universally possible to 
-restart
-them and expect a consistent state (you have just dropped a bunch of 
-network
-packets on the floor...).
-
->> Do you really expect the VM to be restartable from that point? I don't 
->> see how
->> this is possible.
->> 
-> 
-> If the migration has encountered an error, the src VM might be
-> restarted, so we have to map the vPEs back.
-
-As I said above, I doubt it is universally possible to do so, but
-after all, this probably isn't worse that restarting on the target...
-
-         M.
+diff --git a/x86/emulator.c b/x86/emulator.c
+index e46d97e..6100b6d 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -6,10 +6,14 @@
+ #include "processor.h"
+ #include "vmalloc.h"
+ #include "alloc_page.h"
++#include "usermode.h"
+ 
+ #define memset __builtin_memset
+ #define TESTDEV_IO_PORT 0xe0
+ 
++#define MAGIC_NUM 0xdeadbeefdeadbeefUL
++#define GS_BASE 0x400000
++
+ static int exceptions;
+ 
+ /* Forced emulation prefix, used to invoke the emulator unconditionally.  */
+@@ -925,6 +929,39 @@ static void test_sreg(volatile uint16_t *mem)
+     write_ss(ss);
+ }
+ 
++static uint64_t usr_gs_mov(void)
++{
++    static uint64_t dummy = MAGIC_NUM;
++    uint64_t dummy_ptr = (uint64_t)&dummy;
++    uint64_t ret;
++
++    dummy_ptr -= GS_BASE;
++    asm volatile("mov %%gs:(%%rcx), %%rax" : "=a"(ret): "c"(dummy_ptr) :);
++
++    return ret;
++}
++
++static void test_iret(void)
++{
++    uint64_t val;
++    bool raised_vector;
++
++    /* Update GS base to 4MiB */
++    wrmsr(MSR_GS_BASE, GS_BASE);
++
++    /*
++     * Per the SDM, jumping to user mode via `iret`, which is returning to
++     * outer privilege level, for segment registers (ES, FS, GS, and DS)
++     * if the check fails, the segment selector becomes null.
++     *
++     * In our test case, GS becomes null.
++     */
++    val = run_in_user((usermode_func)usr_gs_mov, GP_VECTOR,
++                      0, 0, 0, 0, &raised_vector);
++
++    report(val == MAGIC_NUM, "Test ret/iret with a nullified segment");
++}
++
+ /* Broken emulation causes triple fault, which skips the other tests. */
+ #if 0
+ static void test_lldt(volatile uint16_t *mem)
+@@ -1074,6 +1111,7 @@ int main(void)
+ 	test_shld_shrd(mem);
+ 	//test_lgdt_lidt(mem);
+ 	test_sreg(mem);
++	test_iret();
+ 	//test_lldt(mem);
+ 	test_ltr(mem);
+ 	test_cmov(mem);
 -- 
-Jazz is not dead. It just smells funny...
+2.7.4
+
