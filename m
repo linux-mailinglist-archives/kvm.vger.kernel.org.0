@@ -2,171 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58C5A2C24B5
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 12:39:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 570902C26DA
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 14:12:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732939AbgKXLjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 06:39:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45644 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727909AbgKXLjU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 06:39:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606217958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cOW9AP+FtQ6fH8fJ2Y4lCPfEd3mcrYQ9tsXTICs0PAo=;
-        b=VV/5M6BFXMSEPwGw01JCkoQeFBDiftG5Mm09qMQENlQqBAc6S96LJv1Huda5f8fZjHxIbL
-        HjTurlcgdvuVhr7KuSnTk1XTYQSi9kz2FdAXbsNT9LCwlDu4htNuNbRzJ23tq7UJafr9Ap
-        ufyV8ZoKWdMYEFIAGpiGQGFgIbFDiNQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-jmW_GPTJNje9Hd6aHFWICw-1; Tue, 24 Nov 2020 06:39:16 -0500
-X-MC-Unique: jmW_GPTJNje9Hd6aHFWICw-1
-Received: by mail-wm1-f72.google.com with SMTP id v5so565552wmj.0
-        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 03:39:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cOW9AP+FtQ6fH8fJ2Y4lCPfEd3mcrYQ9tsXTICs0PAo=;
-        b=mu/1OzOCxHjDQaRhgW8m+YzPpiWTdgtZ6UMjdfqgYLLhU2wFnmJnZAjvHtlvgfV3yO
-         cJqJZlGs4o0Xuc+MVsXoF8/giWnX3jCUBj5eTtyrPuBWGtQh+QiAESkr5Oeof4GGz/5v
-         VHVZskJrFIQyop6eFDTisdFR6vWHA+h6AQZb9o/TdM4fHjowh1mYeLVneZYFOttA0nBs
-         qLE6nCsINs10gGUqrK0fSnINZhE1Uy3DtDUbPeSgyxuD0Tlc5HraJqMlLJgyx9jjigJR
-         xla8xo6VZdXIh8Z1rVV2KjbuD0G/i2hKSPX7SxaBgCI3YIyYI1/at0yS3Z9fy1vCbp9G
-         f/pA==
-X-Gm-Message-State: AOAM533+2SEN9hWZpK6jxbjNEVkujwd6wRQgKQarjz7bxdSlcpsLQJ24
-        zuj5DQAT17NDF8GMZYNVm4efyw8bjIncV8YOE+UiPQyIAckk5CH70jN3lpAe8wpPqM+Hy4KBkJI
-        XDeFzhl0k1y19
-X-Received: by 2002:a05:600c:256:: with SMTP id 22mr3884634wmj.120.1606217955032;
-        Tue, 24 Nov 2020 03:39:15 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzd9llsbqF1ljSG18UayZZuFeWBhytEu3y8vCr1yADhBxuwV30iStuF+qpotJTMGR5f4aqR3g==
-X-Received: by 2002:a05:600c:256:: with SMTP id 22mr3884618wmj.120.1606217954799;
-        Tue, 24 Nov 2020 03:39:14 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z189sm4959465wme.23.2020.11.24.03.39.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Nov 2020 03:39:14 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>
-Cc:     idan.brown@oracle.com, Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>, liam.merwick@oracle.com,
-        wanpeng.li@hotmail.com
-References: <95b9b017-ccde-97a0-f407-fd5f35f1157d@redhat.com>
- <20201123192223.3177490-1-oupton@google.com>
- <4788d64f-1831-9eb9-2c78-c5d9934fb47b@redhat.com>
- <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
- <CAOQ_QshMoc9W9g6XRuGM4hCtMdvUxSDpGAhp3vNxhxhWTK-5CQ@mail.gmail.com>
- <20201124015515.GA75780@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
- posted-interrupt pending
-Message-ID: <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
-Date:   Tue, 24 Nov 2020 12:39:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S2387789AbgKXNLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 08:11:08 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7674 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733262AbgKXNLH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 08:11:07 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CgPXG64DNz15Q2Q;
+        Tue, 24 Nov 2020 21:10:38 +0800 (CST)
+Received: from [10.174.187.74] (10.174.187.74) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 24 Nov 2020 21:10:49 +0800
+Subject: Re: [RFC PATCH v1 2/4] KVM: arm64: GICv4.1: Try to save hw pending
+ state in save_pending_tables
+To:     Marc Zyngier <maz@kernel.org>
+CC:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20201123065410.1915-1-lushenming@huawei.com>
+ <20201123065410.1915-3-lushenming@huawei.com>
+ <f3ea1b24436bb86b5a5633f8ccc9b3d1@kernel.org>
+ <90f04f50-c1ba-55b2-0f93-1e755b40b487@huawei.com>
+ <4e2b87897485e38e251c447b9ad70eb6@kernel.org>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <86c2b9ad-7214-caef-0924-ec71b43aa003@huawei.com>
+Date:   Tue, 24 Nov 2020 21:10:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <20201124015515.GA75780@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <4e2b87897485e38e251c447b9ad70eb6@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.187.74]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/11/20 02:55, Sean Christopherson wrote:
->>> I believe there is a 1-to-many relationship here, which is why I said
->>> each CPU would need to maintain a linked list of possible vCPUs to
->>> iterate and find the intended recipient.
+On 2020/11/24 16:26, Marc Zyngier wrote:
+> On 2020-11-24 07:40, Shenming Lu wrote:
+>> On 2020/11/23 17:18, Marc Zyngier wrote:
+>>> On 2020-11-23 06:54, Shenming Lu wrote:
+>>>> After pausing all vCPUs and devices capable of interrupting, in order
+>>>         ^^^^^^^^^^^^^^^^^
+>>> See my comment below about this.
+>>>
+>>>> to save the information of all interrupts, besides flushing the pending
+>>>> states in kvm’s vgic, we also try to flush the states of VLPIs in the
+>>>> virtual pending tables into guest RAM, but we need to have GICv4.1 and
+>>>> safely unmap the vPEs first.
+>>>>
+>>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>>>> ---
+>>>>  arch/arm64/kvm/vgic/vgic-v3.c | 62 +++++++++++++++++++++++++++++++----
+>>>>  1 file changed, 56 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+>>>> index 9cdf39a94a63..e1b3aa4b2b12 100644
+>>>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>>>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>>>> @@ -1,6 +1,8 @@
+>>>>  // SPDX-License-Identifier: GPL-2.0-only
+>>>>
+>>>>  #include <linux/irqchip/arm-gic-v3.h>
+>>>> +#include <linux/irq.h>
+>>>> +#include <linux/irqdomain.h>
+>>>>  #include <linux/kvm.h>
+>>>>  #include <linux/kvm_host.h>
+>>>>  #include <kvm/arm_vgic.h>
+>>>> @@ -356,6 +358,39 @@ int vgic_v3_lpi_sync_pending_status(struct kvm
+>>>> *kvm, struct vgic_irq *irq)
+>>>>      return 0;
+>>>>  }
+>>>>
+>>>> +/*
+>>>> + * With GICv4.1, we can get the VLPI's pending state after unmapping
+>>>> + * the vPE. The deactivation of the doorbell interrupt will trigger
+>>>> + * the unmapping of the associated vPE.
+>>>> + */
+>>>> +static void get_vlpi_state_pre(struct vgic_dist *dist)
+>>>> +{
+>>>> +    struct irq_desc *desc;
+>>>> +    int i;
+>>>> +
+>>>> +    if (!kvm_vgic_global_state.has_gicv4_1)
+>>>> +        return;
+>>>> +
+>>>> +    for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>>>> +        desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>>>> +        irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +static void get_vlpi_state_post(struct vgic_dist *dist)
+>>>
+>>> nit: the naming feels a bit... odd. Pre/post what?
+>>
+>> My understanding is that the unmapping is a preparation for get_vlpi_state...
+>> Maybe just call it unmap/map_all_vpes?
 > 
-> Ya, the concern is that it's theoretically possible for the PINV to arrive in L0
-> after a different vCPU has been loaded (or even multiple different vCPUs).
-> E.g. if the sending pCPU is hit with an NMI after checking vcpu->mode, and the
-> NMI runs for some absurd amount of time.  If that happens, the PINV handler
-> won't know which vCPU(s) should get an IRQ injected into L1 without additional
-> tracking.  KVM would need to set something like nested.pi_pending before doing
-> kvm_vcpu_trigger_posted_interrupt(), i.e. nothing really changes, it just gets
-> more complex.
+> Yes, much better.
+> 
+> [...]
+> 
+>>>> +        if (irq->hw) {
+>>>> +            WARN_RATELIMIT(irq_get_irqchip_state(irq->host_irq,
+>>>> +                        IRQCHIP_STATE_PENDING, &is_pending),
+>>>> +                       "IRQ %d", irq->host_irq);
+>>>
+>>> Isn't this going to warn like mad on a GICv4.0 system where this, by definition,
+>>> will generate an error?
+>>
+>> As we have returned an error in save_its_tables if hw && !has_gicv4_1, we don't
+>> have to warn this here?
+> 
+> Are you referring to the check in vgic_its_save_itt() that occurs in patch 4?
+> Fair enough, though I think the use of irq_get_irqchip_state() isn't quite
+> what we want, as per my comments on patch #1.
+> 
+>>>
+>>>> +        }
+>>>> +
+>>>> +        if (stored == is_pending)
+>>>>              continue;
+>>>>
+>>>> -        if (irq->pending_latch)
+>>>> +        if (is_pending)
+>>>>              val |= 1 << bit_nr;
+>>>>          else
+>>>>              val &= ~(1 << bit_nr);
+>>>>
+>>>>          ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+>>>>          if (ret)
+>>>> -            return ret;
+>>>> +            goto out;
+>>>>      }
+>>>> -    return 0;
+>>>> +
+>>>> +out:
+>>>> +    get_vlpi_state_post(dist);
+>>>
+>>> This bit worries me: you have unmapped the VPEs, so any interrupt that has been
+>>> generated during that phase is now forever lost (the GIC doesn't have ownership
+>>> of the pending tables).
+>>
+>> In my opinion, during this phase, the devices capable of interrupting
+>> should have  already been paused (prevent from sending interrupts),
+>> such as VFIO migration protocol has already realized it.
+> 
+> Is that a hard guarantee? Pausing devices *may* be possible for a limited
+> set of endpoints, but I'm not sure that is universally possible to restart
+> them and expect a consistent state (you have just dropped a bunch of network
+> packets on the floor...).
 
-Ah, gotcha.  What if IN_GUEST_MODE/OUTSIDE_GUEST_MODE was replaced by a 
-generation count?  Then you reread vcpu->mode after sending the IPI, and 
-retry if it does not match.
+No, as far as I know, if the VFIO device does not support pause, the migration would
+fail early... And the specific action is decided by the vendor driver.
+In fact, the VFIO migration is still in an experimental phase... I will pay attention
+to the follow-up development.
 
-To guarantee atomicity, the OUTSIDE_GUEST_MODE IN_GUEST_MODE 
-EXITING_GUEST_MODE READING_SHADOW_PAGE_TABLES values would remain in the 
-bottom 2 bits.  That is, the vcpu->mode accesses like
-
-	vcpu->mode = IN_GUEST_MODE;
-
-	vcpu->mode = OUTSIDE_GUEST_MODE;
-
-	smp_store_mb(vcpu->mode, READING_SHADOW_PAGE_TABLES);
-
-	smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
-
-	return cmpxchg(&vcpu->mode, IN_GUEST_MODE, EXITING_GUEST_MODE);
-
-becoming
-
-	enum {
-		OUTSIDE_GUEST_MODE,
-		IN_GUEST_MODE,
-		EXITING_GUEST_MODE,
-		READING_SHADOW_PAGE_TABLES,
-		GUEST_MODE_MASK = 3,
-	};
-
-	vcpu->mode = (vcpu->mode | GUEST_MODE_MASK) + 1 + IN_GUEST_MODE;
-
-	vcpu->mode &= ~GUEST_MODE_MASK;
-
-	smp_store_mb(vcpu->mode, vcpu->mode|READING_SHADOW_PAGE_TABLES);
-
-	smp_store_release(&vcpu->mode, vcpu->mode & ~GUEST_MODE_MASK);
-
-	int x = READ_ONCE(vcpu->mode);
-	do {
-		if ((x & GUEST_MODE_MASK) != IN_GUEST_MODE)
-			return x & GUEST_MODE_MASK;
-	} while (!try_cmpxchg(&vcpu->mode, &x,
-			      x ^ IN_GUEST_MODE ^ EXITING_GUEST_MODE))
-	return IN_GUEST_MODE;
-
-You could still get spurious posted interrupt IPIs, but the IPI handler 
-need not do anything at all and that is much better.
-
-> if we're ok with KVM
-> processing virtual interrupts that technically shouldn't happen, yet.  E.g. if
-> the L0 PINV handler consumes vIRR bits that were set after the last PI from L1.
-
-I actually find it curious that the spec promises posted interrupt 
-processing to be triggered only by the arrival of the posted interrupt 
-IPI.  Why couldn't the processor in principle snoop for the address of 
-the ON bit instead, similar to an MWAIT?
-
-But even without that, I don't think the spec promises that kind of 
-strict ordering with respect to what goes on in the source.  Even though 
-posted interrupt processing is atomic with the acknowledgement of the 
-posted interrupt IPI, the spec only promises that the PINV triggers an 
-_eventual_ scan of PID.PIR when the interrupt controller delivers an 
-unmasked external interrupt to the destination CPU.  You can still have 
-something like
-
-	set PID.PIR[100]
-	set PID.ON
-					processor starts executing a
-					 very slow instruction...
-	send PINV
-	set PID.PIR[200]
-					acknowledge PINV
-
-and then vector 200 would be delivered before vector 100.  Of course 
-with nested PI the effect would be amplified, but it's possible even on 
-bare metal.
-
-Paolo
-
+> 
+>>> Do you really expect the VM to be restartable from that point? I don't see how
+>>> this is possible.
+>>>
+>>
+>> If the migration has encountered an error, the src VM might be
+>> restarted, so we have to map the vPEs back.
+> 
+> As I said above, I doubt it is universally possible to do so, but
+> after all, this probably isn't worse that restarting on the target...
+> 
+>         M.
