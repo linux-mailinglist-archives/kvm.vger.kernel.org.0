@@ -2,98 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE80C2C2FCA
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 19:13:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B682C3038
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 19:52:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390801AbgKXSMf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 13:12:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60499 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390661AbgKXSMe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 13:12:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606241553;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2oBIff2vrXptsOCDgJqXcxsBYnjbQeRRHymVbCela8Y=;
-        b=iambVB7RaNJVgMF2xdeXvuIPNhUj6J3ZHt3kPUVGfVNiKuLP8gsMyrKNxzhh9DQ1OpJjsv
-        j3wrJglq6asAKY91OQnqhH7etR+5dR/+9ZFQqzP0qNmha3L8oJFH60lj0TlorujYu845Ok
-        9g4/FzumrwZajALTHjEDfbfqaMyrpMM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-pJBqUPlWOtS6qyMSjytxxQ-1; Tue, 24 Nov 2020 13:12:31 -0500
-X-MC-Unique: pJBqUPlWOtS6qyMSjytxxQ-1
-Received: by mail-qv1-f70.google.com with SMTP id o16so2755150qvq.4
-        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 10:12:31 -0800 (PST)
+        id S2404361AbgKXSwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 13:52:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55844 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404170AbgKXSwV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 13:52:21 -0500
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBF76C0613D6
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 10:52:21 -0800 (PST)
+Received: by mail-pg1-x543.google.com with SMTP id t21so18292353pgl.3
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 10:52:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sFK91XydZyXQWY1gobkRf01DMmXQEgpxPXEOFflyrhY=;
+        b=wGHb/mKJwXBv7u/QmzjzG/MALQoIbanNCslwdtiAftMUjmxQA/tSmpHkH1LfnlM5WQ
+         Bgb4vK7OZ01J6Psj4OwntFDMq8R9j8Ns0ZwSrLkO7xjNNGdQDW04KlAgdiCiyD8LNNWQ
+         5aiaY+8GManhjhn+E5aO/tBswdaEw+HM2xRXaLymjZr5oIMM6uH5VL9sNAhxRPFgVgpr
+         4vzldQvxySfqaCH6UzhkfvBpVaAyJRFj3N51hqssxV5l43RuEcShm6lTXyQ4Zi54d7Qf
+         r70QPVWMNYXF7S9rbkgTKIWF47ApUWOgxguUVoBBVU4MHU1pr4TEd5zPuooD6N5PNjIN
+         Or4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=2oBIff2vrXptsOCDgJqXcxsBYnjbQeRRHymVbCela8Y=;
-        b=TCJCJ4COEffALSQlCJ63j7SUhYKe7sGqshTMeB122QnUjxrG3YS5IcJrQq+9fvDuvy
-         GMLjS0BgDRRUojPM+JxAU9XELR9RTCw5HY8zJWEfBI2agDUD1Obaa1jal6Rv9uG5cC75
-         AXdoqtb60cC/kTSwLxJXUEzgIJqS+WU88VKNfFTigqCWuANX4pYTNrXfqhnuZr3qKeJ1
-         cWZte2xBXMIu8viXUeJs5DBTWpq+rKGtSZPzrtxulH57eXxeq6WojEeM2H1xYfsqRbja
-         r3QiTjwuRXQyFlGaKGstAXJjLeru6B35CSdehlf+MZYp5PL9X+p7LL1t9DG3PqKNqBDF
-         vqsA==
-X-Gm-Message-State: AOAM531TKAu2r9EJ13FfwB7T2xMBa0gZFzrbqKulVWwl7JJDlzOFO/P7
-        MohjGPEQO4ioizQQNb6NhI3Giho6ZmEEfl/c63rs76noHkN1R9PaUMWL/92U42eGkhhXA3IjBht
-        7Sd/ZcueVogr6
-X-Received: by 2002:a0c:eec4:: with SMTP id h4mr6166751qvs.35.1606241551010;
-        Tue, 24 Nov 2020 10:12:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyYkcubJCjDfr3L92syDxFxlSzaLINmTiYCYOGr9X/iVg27guubvICQfcGQ1RnmdVIfefltCQ==
-X-Received: by 2002:a0c:eec4:: with SMTP id h4mr6166727qvs.35.1606241550714;
-        Tue, 24 Nov 2020 10:12:30 -0800 (PST)
-Received: from xz-x1 ([142.126.81.247])
-        by smtp.gmail.com with ESMTPSA id q32sm14116193qtb.71.2020.11.24.10.12.29
+        bh=sFK91XydZyXQWY1gobkRf01DMmXQEgpxPXEOFflyrhY=;
+        b=GXm8At842DNyhr/TaxtcmniD8a3qMJmWgvnXvCUHNDF/K9Y9hHwDgYDCEFKNqlGjhh
+         jlHqw6ChlKkFjNSQfOAl88DEqN36vWqIru3HbaBCphbprcGMkcjTrlYo4+P2T80Scwef
+         +jYeyqIjX7y4anPBGGPLBlNAF3vw1fyWbecCx6v70HEuzvGduz7NMHPL8MDtF4vYCAPB
+         6yTOHKsf7YpsV2WhnBUu58/MtCj6d3UT6mAKLH5LmCU1DySJ7fJgT7k//zj41wm+nFjZ
+         w9CzAnSqRsf1m7SQ/juG+isxb0R6m4QjkVgzqb/vy+6eu9CLWsCka5Pzz5Smd7cMaAFr
+         WxAg==
+X-Gm-Message-State: AOAM531yk+CISvL9dLn7ZjYgEXXUsuzWtrcZegd+MZP2TrmicxVMrJYe
+        r2y2zJfuGez0Jey5Liu+EkL1NQ==
+X-Google-Smtp-Source: ABdhPJybo0H5UE8SaKWsWUCBD/xp4c5gfAW+uTMZ/XhWwYLinb9fg4R73/Z9DQdE8oxNEfZbE+mB/Q==
+X-Received: by 2002:a17:90b:3781:: with SMTP id mz1mr6463471pjb.229.1606243941279;
+        Tue, 24 Nov 2020 10:52:21 -0800 (PST)
+Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
+        by smtp.gmail.com with ESMTPSA id m13sm5454151pfa.115.2020.11.24.10.52.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 10:12:29 -0800 (PST)
-Date:   Tue, 24 Nov 2020 13:12:28 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Jia He <justin.he@arm.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio iommu type1: Bypass the vma permission check in
- vfio_pin_pages_remote()
-Message-ID: <20201124181228.GA276043@xz-x1>
-References: <20201119142737.17574-1-justin.he@arm.com>
+        Tue, 24 Nov 2020 10:52:20 -0800 (PST)
+Date:   Tue, 24 Nov 2020 18:52:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v4 00/34] SEV-ES hypervisor support
+Message-ID: <20201124185216.GA235281@google.com>
+References: <cover.1605632857.git.thomas.lendacky@amd.com>
+ <347c5571-2141-44e5-4650-f63d93fd394f@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201119142737.17574-1-justin.he@arm.com>
+In-Reply-To: <347c5571-2141-44e5-4650-f63d93fd394f@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Jia,
-
-On Thu, Nov 19, 2020 at 10:27:37PM +0800, Jia He wrote:
-> The permission of vfio iommu is different and incompatible with vma
-> permission. If the iotlb->perm is IOMMU_NONE (e.g. qemu side), qemu will
-> simply call unmap ioctl() instead of mapping. Hence vfio_dma_map() can't
-> map a dma region with NONE permission.
+On Mon, Nov 23, 2020, Tom Lendacky wrote:
+> On 11/17/20 11:07 AM, Tom Lendacky wrote:
+> > From: Tom Lendacky <thomas.lendacky@amd.com>
+> > 
+> > This patch series provides support for running SEV-ES guests under KVM.
 > 
-> This corner case will be exposed in coming virtio_fs cache_size
-> commit [1]
->  - mmap(NULL, size, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
->    memory_region_init_ram_ptr()
->  - re-mmap the above area with read/write authority.
+> Any comments on this series?
 
-If iiuc here we'll remap the above PROT_NONE into PROT_READ|PROT_WRITE, then...
-
->  - vfio_dma_map() will be invoked when vfio device is hotplug added.
-
-... here I'm slightly confused on why VFIO_IOMMU_MAP_DMA would encounter vma
-check fail - aren't they already get rw permissions?
-
-I'd appreciate if you could explain why vfio needs to dma map some PROT_NONE
-pages after all, and whether QEMU would be able to postpone the vfio map of
-those PROT_NONE pages until they got to become with RW permissions.
-
-Thanks,
-
--- 
-Peter Xu
-
+I'm planning on doing a thorough review, but it'll probably take me a few more
+weeks to get to it.
