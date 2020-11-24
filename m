@@ -2,159 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A9452C20F0
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 10:14:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1BF02C213F
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 10:27:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731035AbgKXJM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 04:12:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47189 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728826AbgKXJM1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 04:12:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606209145;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xqaiCZDGtWlJBxJisOIJsVMv/Jkz4xVk/HMQaS8GFQc=;
-        b=g25po3sYVO4btfYelJPCaD97/wtpP1187XpvUW13RpvtNEyo+3kAVxKOsQ1jOomChf0+FT
-        efxNXnPcZ/iu8RCaM7UkrPygq9wkWXZio7AbpM/5iHjh2yQjXMDPGXyyD0+Tgrt9v/7rAw
-        vw92W6hh//Lgft/DQo0n0m5q+rMF0zI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-yo4eqad-PcaScB4-qrsBRw-1; Tue, 24 Nov 2020 04:12:22 -0500
-X-MC-Unique: yo4eqad-PcaScB4-qrsBRw-1
-Received: by mail-wr1-f70.google.com with SMTP id n13so1928419wrs.10
-        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 01:12:21 -0800 (PST)
+        id S1731221AbgKXJ1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 04:27:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52428 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728517AbgKXJ06 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 04:26:58 -0500
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7637AC0613D6
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 01:26:58 -0800 (PST)
+Received: by mail-lj1-x244.google.com with SMTP id s9so21157878ljo.11
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 01:26:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kukcRBKUzlxamYfGZyLQcYKTY8NzjKcvgUjtKw6Awcs=;
+        b=mTKhkigHDoPSK5lJonpLM+ptC9nzL1l0tydMD89elegFPdySD76uSEJsbq+YHeYnxf
+         Rz4FfjcDwKYN8FfQRRD+CLwKIrxw+xcIQTUUulqIGLJnGJJtpBcYxFzRdgpwQ6SWMOo+
+         q3PkgZauF0skJeSgzy6EUgoeZeJJIR3+wesynyuOYU7UUggGUuSO4MnumIkz/7FpUgH7
+         bPgZc731EbjWDEHb8hURC9bd0FVBXY8DcP4BR/R1Jo7TNsiP+2/tiOAVr2NZKsL2GNJp
+         Jz0F1Lwi4OR9qB/Gy/s392aYCVV5Fn7wwJXzfaxfm5gTj6TFxF3WmE5GY7WRrHhjdS8B
+         IXmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xqaiCZDGtWlJBxJisOIJsVMv/Jkz4xVk/HMQaS8GFQc=;
-        b=YuYDUhmZxGl1LkhV7QGXSbo/v42jeZOyPQEZVsw1RPgvJl9eOa6OzfhdSCK/FYnZDK
-         slqyJnnkKGVVB3Y/pj0v8mhhVDbX9VdLiTzb2tSXiEanfcgZnCNayqEpdntoodLwsKZq
-         V5I3S8As4zCxbiI2EM3ucm6/lQq7iF8jErLYTD1OAn/4uVv6JPYUqXceAOIsmSH8W8PW
-         ZqRXZLGqB/YKuEto5OMdI66OgGx6iRUQnQkPv71KmsPxO3cjwZaua887lI30G9AiYAQi
-         +Zrk3MCq/Nga9RRPnhueI8tOM/bfisyL3iN2ltiFOyHm21DxijNfFH6/1ZlL9rR4+Xi8
-         VjYQ==
-X-Gm-Message-State: AOAM5304u4e8rKiI88JZ/VTA9lVEi9243Q/TchtD5HEUHJ9Z0WXQxwMg
-        uDIHtWz+zbEx3mjX5tkOPmi/sUHaCxyK79C7N7HIROlizuN3yD+OEk0lvJ5d/YwwMWdSh48/lxF
-        Je3jQ5qncODS+
-X-Received: by 2002:a5d:654b:: with SMTP id z11mr3941071wrv.291.1606209140748;
-        Tue, 24 Nov 2020 01:12:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwev9tMvVZ6+bs0vxEZD9bywtFrWO5UNLrCC803m+IufWsliHlD991Gn5a/8h4BKIOSfX5saQ==
-X-Received: by 2002:a5d:654b:: with SMTP id z11mr3941051wrv.291.1606209140510;
-        Tue, 24 Nov 2020 01:12:20 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z17sm4050245wmf.15.2020.11.24.01.12.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Nov 2020 01:12:19 -0800 (PST)
-Subject: Re: [kvm-unit-tests][RFC PATCH] x86: Add a new test case for ret/iret
- with a nullified segment
-To:     Bin Meng <bmeng.cn@gmail.com>, kvm@vger.kernel.org
-Cc:     Bin Meng <bin.meng@windriver.com>
-References: <1606206780-80123-1-git-send-email-bmeng.cn@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be7005bb-94f8-4a3f-8e51-de1e21499683@redhat.com>
-Date:   Tue, 24 Nov 2020 10:12:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kukcRBKUzlxamYfGZyLQcYKTY8NzjKcvgUjtKw6Awcs=;
+        b=IfQ6WmUTgcOZkPjO4S+bU6lRm3TMr5Hc+4THtUYaSjHol2bj3LxKsd09cSvjA/FTG5
+         nVRDl/lkJLuAx1g1w5p4M6Stakgev1eQzqP0lFylrJbc+Pf44dTlN0U00j1xino2MBhP
+         t6Iw5Lxhq0oEqnrLo/jx9qTiC2fpT+l2g1trZuUrsvqmgKma6tEpn6HT7UIVHdSNbncQ
+         6N5BDiKv236Jlyg0RNyOVgMDN0Ke+Kv1aZZ6/n2Lpl8qO7G3V+jr4Tor+0xyMbUlvDrR
+         ZDcRAsTFA7wIBBxGt+T6npyJ2bd3He+zfTQdBtD8crLw3kQOIsUZGlRR6BYuDz6LrUVA
+         87aw==
+X-Gm-Message-State: AOAM5303wWZNI4jUMmihhz7NeyasajU/JcSmRTJeGOcRWATsuqogtNVf
+        FEO1SaXw64VuLQMM6kGcdf2yrMqKpUQGwsaZ/dy2MQ==
+X-Google-Smtp-Source: ABdhPJwOkzwqjm2LNBXyYJWEcdhsLWfHn+ob5iB1SDuNQIbquePN0gEeSNq06vXwo6W+kH3ODe5+sRqpAfJ/VDCKf+s=
+X-Received: by 2002:a05:651c:134f:: with SMTP id j15mr1495677ljb.469.1606210016792;
+ Tue, 24 Nov 2020 01:26:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1606206780-80123-1-git-send-email-bmeng.cn@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20201109113240.3733496-1-anup.patel@wdc.com> <20201109113240.3733496-11-anup.patel@wdc.com>
+ <186ade3c372b44ef8ca1830da8c5002b@huawei.com>
+In-Reply-To: <186ade3c372b44ef8ca1830da8c5002b@huawei.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 24 Nov 2020 14:56:43 +0530
+Message-ID: <CAAhSdy1sx_oLGGoGjzr5ZrPStwCyFF4mBDEBw5zpsbSGcCRJjg@mail.gmail.com>
+Subject: Re: [PATCH v15 10/17] RISC-V: KVM: Implement stage2 page table programming
+To:     Jiangyifei <jiangyifei@huawei.com>
+Cc:     Anup Patel <anup.patel@wdc.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmerdabbelt@google.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Graf <graf@amazon.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
+        "Wubin (H)" <wu.wubin@huawei.com>,
+        "dengkai (A)" <dengkai1@huawei.com>,
+        yinyipeng <yinyipeng1@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/11/20 09:33, Bin Meng wrote:
-> From: Bin Meng <bin.meng@windriver.com>
-> 
-> This makes up the test case for the following QEMU patch:
-> http://patchwork.ozlabs.org/project/qemu-devel/patch/1605261378-77971-1-git-send-email-bmeng.cn@gmail.com/
-> 
-> Note the test case only fails on an unpatched QEMU with "accel=tcg".
-> 
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> ---
-> Sending this as RFC since I am new to kvm-unit-tests
-> 
->   x86/emulator.c | 38 ++++++++++++++++++++++++++++++++++++++
->   1 file changed, 38 insertions(+)
-> 
-> diff --git a/x86/emulator.c b/x86/emulator.c
-> index e46d97e..6100b6d 100644
-> --- a/x86/emulator.c
-> +++ b/x86/emulator.c
-> @@ -6,10 +6,14 @@
->   #include "processor.h"
->   #include "vmalloc.h"
->   #include "alloc_page.h"
-> +#include "usermode.h"
->   
->   #define memset __builtin_memset
->   #define TESTDEV_IO_PORT 0xe0
->   
-> +#define MAGIC_NUM 0xdeadbeefdeadbeefUL
-> +#define GS_BASE 0x400000
-> +
->   static int exceptions;
->   
->   /* Forced emulation prefix, used to invoke the emulator unconditionally.  */
-> @@ -925,6 +929,39 @@ static void test_sreg(volatile uint16_t *mem)
->       write_ss(ss);
->   }
->   
-> +static uint64_t usr_gs_mov(void)
-> +{
-> +    static uint64_t dummy = MAGIC_NUM;
-> +    uint64_t dummy_ptr = (uint64_t)&dummy;
-> +    uint64_t ret;
-> +
-> +    dummy_ptr -= GS_BASE;
-> +    asm volatile("mov %%gs:(%%rcx), %%rax" : "=a"(ret): "c"(dummy_ptr) :);
-> +
-> +    return ret;
-> +}
-> +
-> +static void test_iret(void)
-> +{
-> +    uint64_t val;
-> +    bool raised_vector;
-> +
-> +    /* Update GS base to 4MiB */
-> +    wrmsr(MSR_GS_BASE, GS_BASE);
-> +
-> +    /*
-> +     * Per the SDM, jumping to user mode via `iret`, which is returning to
-> +     * outer privilege level, for segment registers (ES, FS, GS, and DS)
-> +     * if the check fails, the segment selector becomes null.
-> +     *
-> +     * In our test case, GS becomes null.
-> +     */
-> +    val = run_in_user((usermode_func)usr_gs_mov, GP_VECTOR,
-> +                      0, 0, 0, 0, &raised_vector);
-> +
-> +    report(val == MAGIC_NUM, "Test ret/iret with a nullified segment");
-> +}
-> +
->   /* Broken emulation causes triple fault, which skips the other tests. */
->   #if 0
->   static void test_lldt(volatile uint16_t *mem)
-> @@ -1074,6 +1111,7 @@ int main(void)
->   	test_shld_shrd(mem);
->   	//test_lgdt_lidt(mem);
->   	test_sreg(mem);
-> +	test_iret();
->   	//test_lldt(mem);
->   	test_ltr(mem);
->   	test_cmov(mem);
-> 
+On Mon, Nov 16, 2020 at 2:59 PM Jiangyifei <jiangyifei@huawei.com> wrote:
+>
+>
+> > -----Original Message-----
+> > From: Anup Patel [mailto:anup.patel@wdc.com]
+> > Sent: Monday, November 9, 2020 7:33 PM
+> > To: Palmer Dabbelt <palmer@dabbelt.com>; Palmer Dabbelt
+> > <palmerdabbelt@google.com>; Paul Walmsley <paul.walmsley@sifive.com>;
+> > Albert Ou <aou@eecs.berkeley.edu>; Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Alexander Graf <graf@amazon.com>; Atish Patra <atish.patra@wdc.com>;
+> > Alistair Francis <Alistair.Francis@wdc.com>; Damien Le Moal
+> > <damien.lemoal@wdc.com>; Anup Patel <anup@brainfault.org>;
+> > kvm@vger.kernel.org; kvm-riscv@lists.infradead.org;
+> > linux-riscv@lists.infradead.org; linux-kernel@vger.kernel.org; Anup Patel
+> > <anup.patel@wdc.com>; Jiangyifei <jiangyifei@huawei.com>
+> > Subject: [PATCH v15 10/17] RISC-V: KVM: Implement stage2 page table
+> > programming
+> >
+> > This patch implements all required functions for programming the stage2 page
+> > table for each Guest/VM.
+> >
+> > At high-level, the flow of stage2 related functions is similar from KVM
+> > ARM/ARM64 implementation but the stage2 page table format is quite
+> > different for KVM RISC-V.
+> >
+> > [jiangyifei: stage2 dirty log support]
+> > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  arch/riscv/include/asm/kvm_host.h     |  12 +
+> >  arch/riscv/include/asm/pgtable-bits.h |   1 +
+> >  arch/riscv/kvm/Kconfig                |   1 +
+> >  arch/riscv/kvm/main.c                 |  19 +
+> >  arch/riscv/kvm/mmu.c                  | 649
+> > +++++++++++++++++++++++++-
+> >  arch/riscv/kvm/vm.c                   |   6 -
+> >  6 files changed, 672 insertions(+), 16 deletions(-)
+> >
+>
+> ......
+>
+> >
+> >  int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu, @@ -69,27 +562,163 @@
+> > int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu,
+> >                        gpa_t gpa, unsigned long hva,
+> >                        bool writeable, bool is_write)
+> >  {
+> > -     /* TODO: */
+> > -     return 0;
+> > +     int ret;
+> > +     kvm_pfn_t hfn;
+> > +     short vma_pageshift;
+> > +     gfn_t gfn = gpa >> PAGE_SHIFT;
+> > +     struct vm_area_struct *vma;
+> > +     struct kvm *kvm = vcpu->kvm;
+> > +     struct kvm_mmu_page_cache *pcache = &vcpu->arch.mmu_page_cache;
+> > +     bool logging = (memslot->dirty_bitmap &&
+> > +                     !(memslot->flags & KVM_MEM_READONLY)) ? true : false;
+> > +     unsigned long vma_pagesize;
+> > +
+> > +     mmap_read_lock(current->mm);
+> > +
+> > +     vma = find_vma_intersection(current->mm, hva, hva + 1);
+> > +     if (unlikely(!vma)) {
+> > +             kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
+> > +             mmap_read_unlock(current->mm);
+> > +             return -EFAULT;
+> > +     }
+> > +
+> > +     if (is_vm_hugetlb_page(vma))
+> > +             vma_pageshift = huge_page_shift(hstate_vma(vma));
+> > +     else
+> > +             vma_pageshift = PAGE_SHIFT;
+> > +     vma_pagesize = 1ULL << vma_pageshift;
+> > +     if (logging || (vma->vm_flags & VM_PFNMAP))
+> > +             vma_pagesize = PAGE_SIZE;
+> > +
+> > +     if (vma_pagesize == PMD_SIZE || vma_pagesize == PGDIR_SIZE)
+> > +             gfn = (gpa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+> > +
+> > +     mmap_read_unlock(current->mm);
+> > +
+> > +     if (vma_pagesize != PGDIR_SIZE &&
+> > +         vma_pagesize != PMD_SIZE &&
+> > +         vma_pagesize != PAGE_SIZE) {
+> > +             kvm_err("Invalid VMA page size 0x%lx\n", vma_pagesize);
+> > +             return -EFAULT;
+> > +     }
+> > +
+> > +     /* We need minimum second+third level pages */
+> > +     ret = stage2_cache_topup(pcache, stage2_pgd_levels,
+> > +                              KVM_MMU_PAGE_CACHE_NR_OBJS);
+> > +     if (ret) {
+> > +             kvm_err("Failed to topup stage2 cache\n");
+> > +             return ret;
+> > +     }
+> > +
+> > +     hfn = gfn_to_pfn_prot(kvm, gfn, is_write, NULL);
+> > +     if (hfn == KVM_PFN_ERR_HWPOISON) {
+> > +             send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva,
+> > +                             vma_pageshift, current);
+> > +             return 0;
+> > +     }
+> > +     if (is_error_noslot_pfn(hfn))
+> > +             return -EFAULT;
+> > +
+> > +     /*
+> > +      * If logging is active then we allow writable pages only
+> > +      * for write faults.
+> > +      */
+> > +     if (logging && !is_write)
+> > +             writeable = false;
+> > +
+> > +     spin_lock(&kvm->mmu_lock);
+> > +
+> > +     if (writeable) {
+>
+> Hi Anup,
+>
+> What is the purpose of "writable = !memslot_is_readonly(slot)" in this series?
 
-Thanks, the patch is good.
+Where ? I don't see this line in any of the patches.
 
-Paolo
+>
+> When mapping the HVA to HPA above, it doesn't know that the PTE writeable of stage2 is "!memslot_is_readonly(slot)".
+> This may causes the difference between the writability of HVA->HPA and GPA->HPA.
+> For example, GPA->HPA is writeable, but HVA->HPA is not writeable.
 
+Yes, this is possible particularly when Host kernel is updating writability
+of HVA->HPA mappings for swapping in/out pages.
+
+>
+> Is it better that the writability of HVA->HPA is also determined by whether the memslot is readonly in this change?
+> Like this:
+> -    hfn = gfn_to_pfn_prot(kvm, gfn, is_write, NULL);
+> +    hfn = gfn_to_pfn_prot(kvm, gfn, writeable, NULL);
+
+The gfn_to_pfn_prot() needs to know what type of fault we
+got (i.e read/write fault). Rest of the information (such as whether
+slot is writable or not) is already available to gfn_to_pfn_prot().
+
+The question here is should we pass "&writeable" or NULL as
+last parameter to gfn_to_pfn_prot(). The recent JUMP label
+support in Linux RISC-V causes problem on HW where PTE
+'A' and 'D' bits are not updated by HW so I have to change
+last parameter of gfn_to_pfn_prot() from "&writeable" to NULL.
+
+I am still investigating this.
+
+Regards,
+Anup
+
+>
+> Regards,
+> Yifei
+>
+> > +             kvm_set_pfn_dirty(hfn);
+> > +             mark_page_dirty(kvm, gfn);
+> > +             ret = stage2_map_page(kvm, pcache, gpa, hfn << PAGE_SHIFT,
+> > +                                   vma_pagesize, false, true);
+> > +     } else {
+> > +             ret = stage2_map_page(kvm, pcache, gpa, hfn << PAGE_SHIFT,
+> > +                                   vma_pagesize, true, true);
+> > +     }
+> > +
+> > +     if (ret)
+> > +             kvm_err("Failed to map in stage2\n");
+> > +
+> > +     spin_unlock(&kvm->mmu_lock);
+> > +     kvm_set_pfn_accessed(hfn);
+> > +     kvm_release_pfn_clean(hfn);
+> > +     return ret;
+> >  }
+> >
+>
+> ......
+>
