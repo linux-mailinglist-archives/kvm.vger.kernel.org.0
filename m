@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 570902C26DA
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 14:12:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D2F32C26DC
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 14:12:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387789AbgKXNLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 08:11:08 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7674 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733262AbgKXNLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Nov 2020 08:11:07 -0500
+        id S2387869AbgKXNMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 08:12:18 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8027 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387781AbgKXNMR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 08:12:17 -0500
 Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CgPXG64DNz15Q2Q;
-        Tue, 24 Nov 2020 21:10:38 +0800 (CST)
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CgPYk74vlzhfq2;
+        Tue, 24 Nov 2020 21:11:54 +0800 (CST)
 Received: from [10.174.187.74] (10.174.187.74) by
  DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 24 Nov 2020 21:10:49 +0800
-Subject: Re: [RFC PATCH v1 2/4] KVM: arm64: GICv4.1: Try to save hw pending
- state in save_pending_tables
+ 14.3.487.0; Tue, 24 Nov 2020 21:12:04 +0800
+Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
+ state to physical side
 To:     Marc Zyngier <maz@kernel.org>
 CC:     James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -33,17 +33,17 @@ CC:     James Morse <james.morse@arm.com>,
         Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
 References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-3-lushenming@huawei.com>
- <f3ea1b24436bb86b5a5633f8ccc9b3d1@kernel.org>
- <90f04f50-c1ba-55b2-0f93-1e755b40b487@huawei.com>
- <4e2b87897485e38e251c447b9ad70eb6@kernel.org>
+ <20201123065410.1915-4-lushenming@huawei.com>
+ <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
+ <b03edcf2-2950-572f-fd31-601d8d766c80@huawei.com>
+ <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
 From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <86c2b9ad-7214-caef-0924-ec71b43aa003@huawei.com>
-Date:   Tue, 24 Nov 2020 21:10:38 +0800
+Message-ID: <49610291-cf57-ff78-d0ac-063af24efbb4@huawei.com>
+Date:   Tue, 24 Nov 2020 21:12:04 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <4e2b87897485e38e251c447b9ad70eb6@kernel.org>
+In-Reply-To: <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -53,136 +53,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/11/24 16:26, Marc Zyngier wrote:
-> On 2020-11-24 07:40, Shenming Lu wrote:
->> On 2020/11/23 17:18, Marc Zyngier wrote:
+On 2020/11/24 16:44, Marc Zyngier wrote:
+> On 2020-11-24 08:10, Shenming Lu wrote:
+>> On 2020/11/23 17:27, Marc Zyngier wrote:
 >>> On 2020-11-23 06:54, Shenming Lu wrote:
->>>> After pausing all vCPUs and devices capable of interrupting, in order
->>>         ^^^^^^^^^^^^^^^^^
->>> See my comment below about this.
->>>
->>>> to save the information of all interrupts, besides flushing the pending
->>>> states in kvm’s vgic, we also try to flush the states of VLPIs in the
->>>> virtual pending tables into guest RAM, but we need to have GICv4.1 and
->>>> safely unmap the vPEs first.
+>>>> From: Zenghui Yu <yuzenghui@huawei.com>
 >>>>
+>>>> When setting the forwarding path of a VLPI, it is more consistent to
+>>>
+>>> I'm not sure it is more consistent. It is a *new* behaviour, because it only
+>>> matters for migration, which has been so far unsupported.
+>>
+>> Alright, consistent may not be accurate...
+>> But I have doubt that whether there is really no need to transfer the
+>> pending states
+>> from kvm'vgic to VPT in set_forwarding regardless of migration, and the similar
+>> for unset_forwarding.
+> 
+> If you have to transfer that state outside of the a save/restore, it means that
+> you have missed the programming of the PCI endpoint. This is an established
+> restriction that the MSI programming must occur *after* the translation has
+> been established using MAPI/MAPTI (see the large comment at the beginning of
+> vgic-v4.c).
+> 
+> If you want to revisit this, fair enough. But you will need a lot more than
+> just opportunistically transfer the pending state.
+
+Thanks, I will look at what you mentioned.
+
+> 
+>>
+>>>
+>>>> also transfer the pending state from irq->pending_latch to VPT (especially
+>>>> in migration, the pending states of VLPIs are restored into kvm’s vgic
+>>>> first). And we currently send "INT+VSYNC" to trigger a VLPI to pending.
+>>>>
+>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 >>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
 >>>> ---
->>>>  arch/arm64/kvm/vgic/vgic-v3.c | 62 +++++++++++++++++++++++++++++++----
->>>>  1 file changed, 56 insertions(+), 6 deletions(-)
+>>>>  arch/arm64/kvm/vgic/vgic-v4.c | 12 ++++++++++++
+>>>>  1 file changed, 12 insertions(+)
 >>>>
->>>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
->>>> index 9cdf39a94a63..e1b3aa4b2b12 100644
->>>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
->>>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
->>>> @@ -1,6 +1,8 @@
->>>>  // SPDX-License-Identifier: GPL-2.0-only
+>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+>>>> index b5fa73c9fd35..cc3ab9cea182 100644
+>>>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+>>>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+>>>> @@ -418,6 +418,18 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>>>>      irq->host_irq    = virq;
+>>>>      atomic_inc(&map.vpe->vlpi_count);
 >>>>
->>>>  #include <linux/irqchip/arm-gic-v3.h>
->>>> +#include <linux/irq.h>
->>>> +#include <linux/irqdomain.h>
->>>>  #include <linux/kvm.h>
->>>>  #include <linux/kvm_host.h>
->>>>  #include <kvm/arm_vgic.h>
->>>> @@ -356,6 +358,39 @@ int vgic_v3_lpi_sync_pending_status(struct kvm
->>>> *kvm, struct vgic_irq *irq)
->>>>      return 0;
->>>>  }
->>>>
->>>> +/*
->>>> + * With GICv4.1, we can get the VLPI's pending state after unmapping
->>>> + * the vPE. The deactivation of the doorbell interrupt will trigger
->>>> + * the unmapping of the associated vPE.
->>>> + */
->>>> +static void get_vlpi_state_pre(struct vgic_dist *dist)
->>>> +{
->>>> +    struct irq_desc *desc;
->>>> +    int i;
+>>>> +    /* Transfer pending state */
+>>>> +    ret = irq_set_irqchip_state(irq->host_irq,
+>>>> +                    IRQCHIP_STATE_PENDING,
+>>>> +                    irq->pending_latch);
+>>>> +    WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
 >>>> +
->>>> +    if (!kvm_vgic_global_state.has_gicv4_1)
->>>> +        return;
->>>> +
->>>> +    for (i = 0; i < dist->its_vm.nr_vpes; i++) {
->>>> +        desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
->>>> +        irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
->>>> +    }
->>>> +}
->>>> +
->>>> +static void get_vlpi_state_post(struct vgic_dist *dist)
+>>>> +    /*
+>>>> +     * Let it be pruned from ap_list later and don't bother
+>>>> +     * the List Register.
+>>>> +     */
+>>>> +    irq->pending_latch = false;
 >>>
->>> nit: the naming feels a bit... odd. Pre/post what?
+>>> It occurs to me that calling into irq_set_irqchip_state() for a large
+>>> number of interrupts can take a significant amount of time. It is also
+>>> odd that you dump the VPT with the VPE unmapped, but rely on the VPE
+>>> being mapped for the opposite operation.
+>>>
+>>> Shouldn't these be symmetric, all performed while the VPE is unmapped?
+>>> It would also save a lot of ITS traffic.
+>>>
 >>
->> My understanding is that the unmapping is a preparation for get_vlpi_state...
->> Maybe just call it unmap/map_all_vpes?
-> 
-> Yes, much better.
-> 
-> [...]
-> 
->>>> +        if (irq->hw) {
->>>> +            WARN_RATELIMIT(irq_get_irqchip_state(irq->host_irq,
->>>> +                        IRQCHIP_STATE_PENDING, &is_pending),
->>>> +                       "IRQ %d", irq->host_irq);
->>>
->>> Isn't this going to warn like mad on a GICv4.0 system where this, by definition,
->>> will generate an error?
+>> My thought was to use the existing interface directly without unmapping...
 >>
->> As we have returned an error in save_its_tables if hw && !has_gicv4_1, we don't
->> have to warn this here?
+>> If you want to unmap the vPE and poke the VPT here, as I said in the cover
+>> letter, set/unset_forwarding might also be called when all devices are running
+>> at normal run time, in which case the unmapping of the vPE is not allowed...
 > 
-> Are you referring to the check in vgic_its_save_itt() that occurs in patch 4?
-> Fair enough, though I think the use of irq_get_irqchip_state() isn't quite
-> what we want, as per my comments on patch #1.
-> 
->>>
->>>> +        }
->>>> +
->>>> +        if (stored == is_pending)
->>>>              continue;
->>>>
->>>> -        if (irq->pending_latch)
->>>> +        if (is_pending)
->>>>              val |= 1 << bit_nr;
->>>>          else
->>>>              val &= ~(1 << bit_nr);
->>>>
->>>>          ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
->>>>          if (ret)
->>>> -            return ret;
->>>> +            goto out;
->>>>      }
->>>> -    return 0;
->>>> +
->>>> +out:
->>>> +    get_vlpi_state_post(dist);
->>>
->>> This bit worries me: you have unmapped the VPEs, so any interrupt that has been
->>> generated during that phase is now forever lost (the GIC doesn't have ownership
->>> of the pending tables).
->>
->> In my opinion, during this phase, the devices capable of interrupting
->> should have  already been paused (prevent from sending interrupts),
->> such as VFIO migration protocol has already realized it.
-> 
-> Is that a hard guarantee? Pausing devices *may* be possible for a limited
-> set of endpoints, but I'm not sure that is universally possible to restart
-> them and expect a consistent state (you have just dropped a bunch of network
-> packets on the floor...).
+> No, I'm suggesting that you don't do anything here, but instead as a by-product
+> of restoring the ITS tables. What goes wrong if you use the
+> KVM_DEV_ARM_ITS_RESTORE_TABLE backend instead?
 
-No, as far as I know, if the VFIO device does not support pause, the migration would
-fail early... And the specific action is decided by the vendor driver.
-In fact, the VFIO migration is still in an experimental phase... I will pay attention
-to the follow-up development.
+There is an issue if we do it in the restoring of the ITS tables: the transferring
+of the pending state needs the irq to be marked as hw before, which is done by the
+pass-through device, but the configuring of the forwarding path of the VLPI depends
+on the restoring of the vgic first... It is a circular dependency.
 
 > 
->>> Do you really expect the VM to be restartable from that point? I don't see how
->>> this is possible.
->>>
->>
->> If the migration has encountered an error, the src VM might be
->> restarted, so we have to map the vPEs back.
+>> Another possible solution is to add a new dedicated interface to QEMU
+>> to transfer
+>> these pending states to HW in GIC VM state change handler corresponding to
+>> save_pending_tables?
 > 
-> As I said above, I doubt it is universally possible to do so, but
-> after all, this probably isn't worse that restarting on the target...
+> Userspace has no way to know we use GICv4, and I intend to keep it
+> completely out of the loop. The API is already pretty tortuous, and
+> I really don't want to add any extra complexity to it.
+> 
+> Thanks,
 > 
 >         M.
