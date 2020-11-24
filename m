@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D41C32C3340
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 22:41:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E1B42C3346
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 22:41:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387856AbgKXVk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 16:40:56 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12876 "EHLO
+        id S2387751AbgKXVkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 16:40:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19476 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387454AbgKXVkq (ORCPT
+        by vger.kernel.org with ESMTP id S2387478AbgKXVkq (ORCPT
         <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 16:40:46 -0500
 Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AOLWKxG084508;
-        Tue, 24 Nov 2020 16:40:45 -0500
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AOLWKdD084501;
+        Tue, 24 Nov 2020 16:40:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=h3tB9DLGWHzop1yvGxPfELczgXIHJYVV4ngzK3bD1G4=;
- b=D/pPOhph4osBwuwwzzh5/FJvF67OqpP1SZhbf8+uGdOEqjxja7lb3mrv63gfnTMNlpB6
- OWOMzudzvGNL+qv/HqVyXvApzcJLH5xflpi57y0VmF1gxfnZwFPBqph649aJ+jE/Gfqe
- 1A9f8YlQt+fN8jcf2zH2u1pJYCsNxS9H714ESRmf2GAqLTjHBsV4aUcG5VEhek8W3ef/
- EUZhgtQFhkEbihPS79sg+sxknOF4xwf+gkjvz6rcttvilIGD9gRvnUQ3stO5wrxw6gJx
- pupezRlWIJor5Uluxbv5qgmap3VtrEtLwikKt7nRGuo7AHRETH9G+HkFBovZA2CpYD4L JQ== 
+ bh=y8aOQT5SmnoXRKImunB67aX0WnBX0uZusSHN7hejNPU=;
+ b=g1gBBE1nSrplt+dcpBwtTrgXwc87w+VPh5QJlfQjJPWMGbXpMngeaduFVy5gNeBjZNTI
+ yVNpsinmSMT3W03XQAlCYO1yflauEcSF4ln098SFtEAydC/DrFjqKuphVXoa3gH5lBo3
+ +wm4v05FFiCJQvFkliGuTMhmICwBN9+c8gB1uMjW5VkZoK0u4pohkmkkBvaaGA2j1+59
+ S9GUVlLNrJI9OMxxxVhLJBbf3ORVP9xUbpbI6K3W/DF8sCyKNR3UMaq7jtEO/fgw9to4
+ LemLRt9qbQ0Z3YH0ks1tbft2XFWtdh/Cqx/R9lfKEacdcb/9aCNG2mX9JwLdOFvQfdQz fg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb1kfuy-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb1kfv9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 16:40:45 -0500
+        Tue, 24 Nov 2020 16:40:46 -0500
 Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AOLY8xZ093326;
-        Tue, 24 Nov 2020 16:40:45 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb1kfua-1
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AOLXIZc087361;
+        Tue, 24 Nov 2020 16:40:46 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb1kfus-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 16:40:45 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AOLbXEg016193;
-        Tue, 24 Nov 2020 21:40:43 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma05wdc.us.ibm.com with ESMTP id 34xth92k0f-1
+        Tue, 24 Nov 2020 16:40:46 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AOLbNAL009355;
+        Tue, 24 Nov 2020 21:40:44 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02wdc.us.ibm.com with ESMTP id 34xth92kr7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 21:40:43 +0000
+        Tue, 24 Nov 2020 21:40:44 +0000
 Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AOLeg175178084
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AOLehrH1966756
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Nov 2020 21:40:42 GMT
+        Tue, 24 Nov 2020 21:40:43 GMT
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47AF5AE066;
+        by IMSVA (Postfix) with ESMTP id 5CEBFAE060;
+        Tue, 24 Nov 2020 21:40:43 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D5AFAE062;
         Tue, 24 Nov 2020 21:40:42 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 04063AE05C;
-        Tue, 24 Nov 2020 21:40:41 +0000 (GMT)
 Received: from cpe-66-24-58-13.stny.res.rr.com.com (unknown [9.85.195.249])
         by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 24 Nov 2020 21:40:40 +0000 (GMT)
+        Tue, 24 Nov 2020 21:40:42 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -62,11 +62,10 @@ Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
         alex.williamson@redhat.com, kwankhede@nvidia.com,
         fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
         hca@linux.ibm.com, gor@linux.ibm.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Tony Krowiak <akrowiak@stny.rr.com>
-Subject: [PATCH v12 13/17] s390/vfio-ap: hot plug/unplug queues on bind/unbind of queue device
-Date:   Tue, 24 Nov 2020 16:40:12 -0500
-Message-Id: <20201124214016.3013-14-akrowiak@linux.ibm.com>
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: [PATCH v12 14/17] s390/zcrypt: Notify driver on config changed and scan complete callbacks
+Date:   Tue, 24 Nov 2020 16:40:13 -0500
+Message-Id: <20201124214016.3013-15-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20201124214016.3013-1-akrowiak@linux.ibm.com>
 References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
@@ -84,127 +83,246 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In response to the probe or remove of a queue device, if a KVM guest is
-using the matrix mdev to which the APQN of the queue device is assigned,
-the vfio_ap device driver must respond accordingly. In an ideal world, the
-queue corresponding to the queue device being probed would be hot plugged
-into the guest. Likewise, the queue corresponding to the queue device being
-removed would be hot unplugged. Unfortunately, the AP architecture
-precludes plugging or unplugging individual queues. The queues to which a
-guest is granted access are specified as a matrix of adapter and domain
-numbers. The Cartesian product of the adapter and domain numbers assigned
-to this matrix comprise the AP queue numbers (APQN) to which the guest will
-be granted access; therefore, it becomes obvious that assigning a new
-adapter or domain number to the matrix may result in multiple APQNs
-getting assigned. Likewise, unassigning an adapter or domain number from
-the matrix may result in multiple APQNs getting unassigned. Additionally,
-in order to enforce the linux device model requirement that a pass-through
-device must be bound to the driver facilitating its passthrough, each new
-APQN assigned to the guest's matrix must reference a queue device bound to
-the vfio_ap device driver. The following sections articulate the design
-for this patch.
+This patch intruduces an extension to the ap bus to notify device drivers
+when the host AP configuration changes - i.e., adapters, domains or
+control domains are added or removed. To that end, two new callbacks are
+introduced for AP device drivers:
 
-Probing a queue device:
-----------------------
-The goal here is to assign the APQN of the queue being probed to the
-guest's matrix if possible by adhering to a set of rules:
-* The adapter number (APID) will be assigned to the guest matrix iff:
-  1. The adapter is in the host's AP configuration
-  2. The APID is not yet assigned to the guest's matrix
-  3. Each APQN derived from the APID and the domain numbers (APQI) of
-     domains already assigned to the guest's matrix references a queue
-     device bound to the vfio_ap device driver
-* The domain number (APQI) will be assigned to the guest matrix iff:
-  1. The domain is in the host's AP configuration
-  2. The APQI is not yet assigned to the guest's matrix
-  3. Each APQN derived from the APQI and the APIDs of
-     adapters already assigned to the guest's matrix references a queue
-     device bound to the vfio_ap device driver
+  void (*on_config_changed)(struct ap_config_info *new_config_info,
+                            struct ap_config_info *old_config_info);
 
-Removing a queue device:
------------------------
-Unassigning the adapter number from the guest's matrix will remove access
-to all domains on the adapter from the guest. Unassigning the domain
-number from the guest's matrix will remove access to that domain on all
-adapters assigned to the guest matrix. If both the adapter and domain are
-unassigned from the guest's matrix, That will reduce access to every
-adapter for the guest. Since an AP adapter card is the actual hardware
-device that gets physically plugged/unplugged, unassigning the adapter
-number from the guest's matrix makes the most sense here.
+     This callback is invoked at the start of the AP bus scan
+     function when it determines that the host AP configuration information
+     has changed since the previous scan. This is done by storing
+     an old and current QCI info struct and comparing them. If there is any
+     difference, the callback is invoked.
 
-Signed-off-by: Tony Krowiak <akrowiak@stny.rr.com>
+     Note that when the AP bus scan detects that AP adapters, domains or
+     control domains have been removed from the host's AP configuration, it
+     will remove the associated devices from the AP bus subsystem's device
+     model. This callback gives the device driver a chance to respond to
+     the removal of the AP devices from the host configuration prior to
+     calling the device driver's remove callback. The primary purpose of
+     this callback is to allow the vfio_ap driver to do a bulk unplug of
+     all affected adapters, domains and control domains from affected
+     guests rather than unplugging them one at a time when the remove
+     callback is invoked.
+
+  void (*on_scan_complete)(struct ap_config_info *new_config_info,
+                           struct ap_config_info *old_config_info);
+
+     The on_scan_complete callback is invoked after the ap bus scan is
+     complete if the host AP configuration data has changed.
+
+     Note that when the AP bus scan detects that adapters, domains or
+     control domains have been added to the host's configuration, it will
+     create new devices in the AP bus subsystem's device model. The primary
+     purpose of this callback is to allow the vfio_ap driver to do a bulk
+     plug of all affected adapters, domains and control domains into
+     affected guests rather than plugging them one at a time when the
+     probe callback is invoked.
+
+Please note that changes to the apmask and aqmask do not trigger
+these two callbacks since the bus scan function is not invoked by changes
+to those masks.
+
+Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 ---
- drivers/s390/crypto/vfio_ap_ops.c | 37 +++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ drivers/s390/crypto/ap_bus.c          | 83 ++++++++++++++++++++++++++-
+ drivers/s390/crypto/ap_bus.h          | 12 ++++
+ drivers/s390/crypto/vfio_ap_private.h | 14 ++++-
+ 3 files changed, 106 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 4f96b7861607..1179c6af59c6 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1508,6 +1508,23 @@ static void vfio_ap_queue_link_mdev(struct vfio_ap_queue *q)
- 	}
+diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
+index 593573740981..3a63f6b33d8a 100644
+--- a/drivers/s390/crypto/ap_bus.c
++++ b/drivers/s390/crypto/ap_bus.c
+@@ -75,6 +75,7 @@ DEFINE_MUTEX(ap_perms_mutex);
+ EXPORT_SYMBOL(ap_perms_mutex);
+ 
+ static struct ap_config_info *ap_qci_info;
++static struct ap_config_info *ap_qci_info_old;
+ 
+ /*
+  * AP bus related debug feature things.
+@@ -1440,6 +1441,52 @@ static int __match_queue_device_with_queue_id(struct device *dev, const void *da
+ 		&& AP_QID_QUEUE(to_ap_queue(dev)->qid) == (int)(long) data;
  }
  
-+
-+static void vfio_ap_mdev_hot_plug_queue(struct vfio_ap_queue *q)
++/* Helper function for notify_config_changed */
++static int __drv_notify_config_changed(struct device_driver *drv, void *data)
 +{
-+	bool hot_plug = false;
-+	unsigned long apid = (unsigned long)AP_QID_CARD(q->apqn);
-+	unsigned long apqi = (unsigned long)AP_QID_QUEUE(q->apqn);
++	struct ap_driver *ap_drv = to_ap_drv(drv);
 +
-+	if (q->matrix_mdev == NULL)
-+		return;
-+
-+	hot_plug |= vfio_ap_assign_apid_to_apcb(q->matrix_mdev, apid);
-+	hot_plug |= vfio_ap_assign_apqi_to_apcb(q->matrix_mdev, apqi);
-+
-+	if (hot_plug)
-+		vfio_ap_mdev_commit_shadow_apcb(q->matrix_mdev);
-+}
-+
- /**
-  * vfio_ap_mdev_probe_queue:
-  *
-@@ -1526,11 +1543,30 @@ int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
- 	q->apqn = to_ap_queue(&apdev->device)->qid;
- 	q->saved_isc = VFIO_AP_ISC_INVALID;
- 	vfio_ap_queue_link_mdev(q);
-+	vfio_ap_mdev_hot_plug_queue(q);
- 	mutex_unlock(&matrix_dev->lock);
- 
- 	return 0;
- }
- 
-+static void vfio_ap_mdev_hot_unplug_queue(struct vfio_ap_queue *q)
-+{
-+	unsigned long apid;
-+	unsigned long apqi;
-+
-+	if (q->matrix_mdev == NULL)
-+		return;
-+
-+	apid = AP_QID_CARD(q->apqn);
-+	apqi = AP_QID_QUEUE(q->apqn);
-+
-+	if (test_bit_inv(apid, q->matrix_mdev->shadow_apcb.apm) &&
-+	    test_bit_inv(apqi, q->matrix_mdev->shadow_apcb.aqm)) {
-+		clear_bit_inv(apid, q->matrix_mdev->shadow_apcb.apm);
-+		vfio_ap_mdev_commit_shadow_apcb(q->matrix_mdev);
++	if (try_module_get(drv->owner)) {
++		if (ap_drv->on_config_changed)
++			ap_drv->on_config_changed(ap_qci_info,
++						  ap_qci_info_old);
++		module_put(drv->owner);
 +	}
++
++	return 0;
++}
++
++/* Notify all drivers about an qci config change */
++static inline void notify_config_changed(void)
++{
++	bus_for_each_drv(&ap_bus_type, NULL, NULL,
++			 __drv_notify_config_changed);
++}
++
++/* Helper function for notify_scan_complete */
++static int __drv_notify_scan_complete(struct device_driver *drv, void *data)
++{
++	struct ap_driver *ap_drv = to_ap_drv(drv);
++
++	if (try_module_get(drv->owner)) {
++		if (ap_drv->on_scan_complete)
++			ap_drv->on_scan_complete(ap_qci_info,
++						 ap_qci_info_old);
++		module_put(drv->owner);
++	}
++
++	return 0;
++}
++
++/* Notify all drivers about bus scan complete */
++static inline void notify_scan_complete(void)
++{
++	bus_for_each_drv(&ap_bus_type, NULL, NULL,
++			 __drv_notify_scan_complete);
++}
++
++
++
+ /*
+  * Helper function for ap_scan_bus().
+  * Remove card device and associated queue devices.
+@@ -1718,15 +1765,43 @@ static inline void ap_scan_adapter(int ap)
+ 	put_device(&ac->ap_dev.device);
+ }
+ 
++static int ap_get_configuration(void)
++{
++	int cfg_chg = 0;
++
++	if (ap_qci_info) {
++		if (!ap_qci_info_old) {
++			ap_qci_info_old = kzalloc(sizeof(*ap_qci_info_old),
++						  GFP_KERNEL);
++			if (!ap_qci_info_old)
++				return 0;
++		} else {
++			memcpy(ap_qci_info_old, ap_qci_info,
++			       sizeof(struct ap_config_info));
++		}
++		ap_fetch_qci_info(ap_qci_info);
++		cfg_chg = memcmp(ap_qci_info,
++				 ap_qci_info_old,
++				 sizeof(struct ap_config_info)) != 0;
++	}
++
++	return cfg_chg;
 +}
 +
  /**
-  * vfio_ap_mdev_remove_queue:
-  *
-@@ -1544,6 +1580,7 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+  * ap_scan_bus(): Scan the AP bus for new devices
+  * Runs periodically, workqueue timer (ap_config_time)
+  */
+ static void ap_scan_bus(struct work_struct *unused)
+ {
+-	int ap;
++	int ap, config_changed = 0;
  
- 	mutex_lock(&matrix_dev->lock);
- 	q = dev_get_drvdata(&apdev->device);
-+	vfio_ap_mdev_hot_unplug_queue(q);
- 	dev_set_drvdata(&apdev->device, NULL);
- 	apid = AP_QID_CARD(q->apqn);
- 	apqi = AP_QID_QUEUE(q->apqn);
+-	ap_fetch_qci_info(ap_qci_info);
++	/* config change notify */
++	config_changed = ap_get_configuration();
++	if (config_changed)
++		notify_config_changed();
++	memcpy(ap_qci_info_old, ap_qci_info,
++	       sizeof(struct ap_config_info));
+ 	ap_select_domain();
+ 
+ 	AP_DBF_DBG("%s running\n", __func__);
+@@ -1735,6 +1810,10 @@ static void ap_scan_bus(struct work_struct *unused)
+ 	for (ap = 0; ap <= ap_max_adapter_id; ap++)
+ 		ap_scan_adapter(ap);
+ 
++	/* scan complete notify */
++	if (config_changed)
++		notify_scan_complete();
++
+ 	/* check if there is at least one queue available with default domain */
+ 	if (ap_domain_index >= 0) {
+ 		struct device *dev =
+diff --git a/drivers/s390/crypto/ap_bus.h b/drivers/s390/crypto/ap_bus.h
+index 65edd847c65a..fbfbf6991718 100644
+--- a/drivers/s390/crypto/ap_bus.h
++++ b/drivers/s390/crypto/ap_bus.h
+@@ -146,6 +146,18 @@ struct ap_driver {
+ 	int (*probe)(struct ap_device *);
+ 	void (*remove)(struct ap_device *);
+ 	int (*in_use)(unsigned long *apm, unsigned long *aqm);
++	/*
++	 * Called at the start of the ap bus scan function when
++	 * the crypto config information (qci) has changed.
++	 */
++	void (*on_config_changed)(struct ap_config_info *new_config_info,
++				  struct ap_config_info *old_config_info);
++	/*
++	 * Called at the end of the ap bus scan function when
++	 * the crypto config information (qci) has changed.
++	 */
++	void (*on_scan_complete)(struct ap_config_info *new_config_info,
++				 struct ap_config_info *old_config_info);
+ };
+ 
+ #define to_ap_drv(x) container_of((x), struct ap_driver, driver)
+diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+index 15b7cd74843b..7bd7e35eb2e0 100644
+--- a/drivers/s390/crypto/vfio_ap_private.h
++++ b/drivers/s390/crypto/vfio_ap_private.h
+@@ -36,14 +36,21 @@
+  *		driver, be it using @mdev_list or writing the state of a
+  *		single ap_matrix_mdev device. It's quite coarse but we don't
+  *		expect much contention.
++ ** @ap_add:	a bitmap specifying the APIDs added to the host AP configuration
++ *		as notified by the AP bus via the on_cfg_chg callback.
++ * @aq_add:	a bitmap specifying the APQIs added to the host AP configuration
++ *		as notified by the AP bus via the on_cfg_chg callback.
+  */
+ struct ap_matrix_dev {
+ 	struct device device;
+ 	atomic_t available_instances;
+-	struct ap_config_info info;
++	struct ap_config_info config_info;
++	struct ap_config_info config_info_prev;
+ 	struct list_head mdev_list;
+ 	struct mutex lock;
+ 	struct ap_driver  *vfio_ap_drv;
++	DECLARE_BITMAP(ap_add, AP_DEVICES);
++	DECLARE_BITMAP(aq_add, AP_DEVICES);
+ };
+ 
+ extern struct ap_matrix_dev *matrix_dev;
+@@ -90,6 +97,8 @@ struct ap_matrix_mdev {
+ 	struct kvm_s390_module_hook pqap_hook;
+ 	struct mdev_device *mdev;
+ 	DECLARE_HASHTABLE(qtable, 8);
++	DECLARE_BITMAP(ap_add, AP_DEVICES);
++	DECLARE_BITMAP(aq_add, AP_DEVICES);
+ };
+ 
+ extern int vfio_ap_mdev_register(void);
+@@ -109,4 +118,7 @@ void vfio_ap_mdev_remove_queue(struct ap_device *queue);
+ 
+ int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm);
+ 
++void vfio_ap_on_cfg_changed(struct ap_config_info *new_config_info,
++			    struct ap_config_info *old_config_info);
++
+ #endif /* _VFIO_AP_PRIVATE_H_ */
 -- 
 2.21.1
 
