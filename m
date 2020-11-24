@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E91EF2C1D56
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 06:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70BC22C1DA2
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 06:40:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728320AbgKXFWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 00:22:05 -0500
-Received: from mail-eopbgr80057.outbound.protection.outlook.com ([40.107.8.57]:27053
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        id S1728964AbgKXFhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 00:37:45 -0500
+Received: from mail-eopbgr50051.outbound.protection.outlook.com ([40.107.5.51]:25473
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728144AbgKXFWF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Nov 2020 00:22:05 -0500
+        id S1725616AbgKXFho (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 00:37:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rAMcHFUpHfYscir3212kekOoJuVQONeTUk7iu2FfxBo=;
- b=nU2IWDN0buyZwIw4Ft7KEgMeN3BpdAIfGjvZaNjbw95gJWs/zRAu82xEK8a1/tfF1kbxt7sv/h7OnplnYcQW8MgsT99cgngBKJUO7dh1QozblV6rB/CZDhntbG2AUfS2QV3MNTmj5+VL2mIpdbub35ZBIx2yhklITmYjoe1h0K0=
-Received: from AM6P191CA0098.EURP191.PROD.OUTLOOK.COM (2603:10a6:209:8a::39)
- by DB7PR08MB3836.eurprd08.prod.outlook.com (2603:10a6:10:76::23) with
+ bh=iPcSd9et9D9kYd1nzxxQUUu7Rndy/ovi5rtgozcAL2A=;
+ b=M7f8z1xVJuvm5gdEDTijmTvnb2B7WoT/dwQykeAdNuqtVtrNle21Iwfai2nx+J/f1OsENm1pqtrq8vGz9xBMjy0nJa2CPxmnBGVo/YWSAVdSwIyrOOWrBRQsS7dDwW+9JXSw9L5Jkf4WbdkDONbIyLGBU6LoNXmhvWro85TG/m4=
+Received: from AM6P191CA0077.EURP191.PROD.OUTLOOK.COM (2603:10a6:209:8a::18)
+ by DB6PR08MB2919.eurprd08.prod.outlook.com (2603:10a6:6:1e::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.20; Tue, 24 Nov
- 2020 05:21:59 +0000
-Received: from AM5EUR03FT042.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:209:8a:cafe::bb) by AM6P191CA0098.outlook.office365.com
- (2603:10a6:209:8a::39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.28; Tue, 24 Nov
+ 2020 05:37:32 +0000
+Received: from VE1EUR03FT018.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:209:8a:cafe::e7) by AM6P191CA0077.outlook.office365.com
+ (2603:10a6:209:8a::18) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.20 via Frontend
- Transport; Tue, 24 Nov 2020 05:21:58 +0000
+ Transport; Tue, 24 Nov 2020 05:37:31 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=pass action=none
@@ -35,42 +35,42 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  63.35.35.123 as permitted sender) receiver=protection.outlook.com;
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM5EUR03FT042.mail.protection.outlook.com (10.152.17.168) with Microsoft SMTP
+ VE1EUR03FT018.mail.protection.outlook.com (10.152.18.135) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3589.20 via Frontend Transport; Tue, 24 Nov 2020 05:21:58 +0000
-Received: ("Tessian outbound 814be617737e:v71"); Tue, 24 Nov 2020 05:21:58 +0000
+ 15.20.3589.20 via Frontend Transport; Tue, 24 Nov 2020 05:37:31 +0000
+Received: ("Tessian outbound e0cdfd2b0406:v71"); Tue, 24 Nov 2020 05:37:30 +0000
 X-CR-MTA-TID: 64aa7808
-Received: from 33b21df39ac0.2
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 8411E29B-2C51-420C-94D6-5B8AC7BCDF9E.1;
-        Tue, 24 Nov 2020 05:21:53 +0000
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 33b21df39ac0.2
+Received: from 8bbd5a06462b.2
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 6DCDF244-920A-45C3-8A2D-E32A8D7B0847.1;
+        Tue, 24 Nov 2020 05:37:25 +0000
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 8bbd5a06462b.2
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Tue, 24 Nov 2020 05:21:53 +0000
+    Tue, 24 Nov 2020 05:37:25 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HigVNubI4o/OPPw8bICHVASrhTGBDTthV2TUp5JcFkIlkQrhlH9CK95/brzXrpyl12a2Csadg0rUOZuTejoqUgRBc7pmqwYAOdUUI+WKGC3FTbFFV6zDdgfc+9LSz3yhQszDNTGgvWMSG2O4IlDUXgqmiuqlUXZrTtdaRPQP/YssdIgDj9bubRDTHpZrYdJYoEHKuvG0xjIldMqC2SydN+vkVevKR8zZLIqWWnVv8jIAQihWBMooWD2S4NOeoWrBrq58qrHJvcPGfdpsFnSRV+F34T8CHaf5NuwOs9ok92w27EndKZ1oedkQexD2LQs39FfNnklI6tMxigNUOVvCCA==
+ b=gA/ZovE8sdCPmqbNMWtHS+5WQsiC/fqSIokjGD23dWzBMHmLutnpoKnNOYa8or1N1XXUuUQkHEMVvxldtK/NQsdxXA1pXMjDMhhgbAlBeV7vgl26RFupyom/91UyuH1Rs5S1DJ0aMl9QSdQRHgZwklbx2F7GcK6gt907HQ4OHkRDRLIFFu5MadVVtGewsfWCp70x76E9/qDTwknk7NsdCtplBLWN7Gr1++fmQlM4bwKqdez6eFATr8Lnyyy7H8TE+/u/TfUcGNRTXyCnSIhoeDxSvvE9Lj1l0/VgJ5lqzlDEIuGDP5NEiuMddXIQP50iYc5LtU5zJ7758NMICWP+/A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rAMcHFUpHfYscir3212kekOoJuVQONeTUk7iu2FfxBo=;
- b=IwulHk6vSGIoKYKoDk+jlmoT6r9gD8vyIyrGXLahZarVIT/E98zqS7fj7xVfTHlEJ+l4ZH4m6mRdTcX2VbwgO6Pm5q36J7ACyAPrpdS+CC9+7EzE7WSawRxJFhQvAxwybkq1nSs9LKXSGDCsYA/VbWj1WdXY51Z8T7PSTczX9yrGlRIGUq3VmK/6MNuhZFqeGyFRA3TsXlpo+y8eAA0VmkVy+Ur3SznPIUVqm5j60tvQeptJ59oMg4ufC61s4n4Tlsk183f785Z0pcl4UH4kdoCvCNaDtM513MKoCMViXil1/oNGh7/AT+eUGvljNAT+sWUO/BEqpkVgFP2luImu4Q==
+ bh=iPcSd9et9D9kYd1nzxxQUUu7Rndy/ovi5rtgozcAL2A=;
+ b=ZOXhRHbgcvVDTucDniBDqjlSxcOpRxkOUmmxw7fwi6NjGOlugoZLfzQrVoG91dij3gS/3VhCs8MoCFbL+w+ZLyXvnALuMA9Q0XCRF3WzlC32Zt6yemd5GKQ8+2VTX+4RxpGdb0lMrJxHbHnvE8U3geThB9RaPfW/xuNer7AQK4o0pkEp4fVtS1Tt1LlfsKSchpJHVwbbBJBqpmRNA+k1sXEtiVEHVf9jK5MvRVMTJYIea7NX+pUzxnMwA/xhznqVI/lilguYj5GdgXctSn5dcc0YW5PyP06V6DwB8aY2yy+UK1sRfBSTCGQSeycA8PtPpHZdR3m83mA93XQhkjCahQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rAMcHFUpHfYscir3212kekOoJuVQONeTUk7iu2FfxBo=;
- b=nU2IWDN0buyZwIw4Ft7KEgMeN3BpdAIfGjvZaNjbw95gJWs/zRAu82xEK8a1/tfF1kbxt7sv/h7OnplnYcQW8MgsT99cgngBKJUO7dh1QozblV6rB/CZDhntbG2AUfS2QV3MNTmj5+VL2mIpdbub35ZBIx2yhklITmYjoe1h0K0=
+ bh=iPcSd9et9D9kYd1nzxxQUUu7Rndy/ovi5rtgozcAL2A=;
+ b=M7f8z1xVJuvm5gdEDTijmTvnb2B7WoT/dwQykeAdNuqtVtrNle21Iwfai2nx+J/f1OsENm1pqtrq8vGz9xBMjy0nJa2CPxmnBGVo/YWSAVdSwIyrOOWrBRQsS7dDwW+9JXSw9L5Jkf4WbdkDONbIyLGBU6LoNXmhvWro85TG/m4=
 Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com (2603:10a6:3:e0::7)
- by HE1PR0802MB2250.eurprd08.prod.outlook.com (2603:10a6:3:c3::21) with
+ by HE1PR0801MB1881.eurprd08.prod.outlook.com (2603:10a6:3:55::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.21; Tue, 24 Nov
- 2020 05:21:51 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.22; Tue, 24 Nov
+ 2020 05:37:22 +0000
 Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com
  ([fe80::9930:b22f:9e8c:8200]) by HE1PR0802MB2555.eurprd08.prod.outlook.com
  ([fe80::9930:b22f:9e8c:8200%5]) with mapi id 15.20.3589.021; Tue, 24 Nov 2020
- 05:21:51 +0000
+ 05:37:22 +0000
 From:   Jianyong Wu <Jianyong.Wu@arm.com>
 To:     Marc Zyngier <maz@kernel.org>
 CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
@@ -92,60 +92,60 @@ CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Steve Capper <Steve.Capper@arm.com>,
         Justin He <Justin.He@arm.com>, nd <nd@arm.com>
-Subject: RE: [PATCH v15 8/9] doc: add ptp_kvm introduction for arm64 support
-Thread-Topic: [PATCH v15 8/9] doc: add ptp_kvm introduction for arm64 support
-Thread-Index: AQHWt/NFDHcZq7JlmEiPhjJ99jyBiKnVnyWAgAE0KVA=
-Date:   Tue, 24 Nov 2020 05:21:51 +0000
-Message-ID: <HE1PR0802MB25553458B5878B8B32372960F4FB0@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+Subject: RE: [PATCH v15 7/9] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+Thread-Topic: [PATCH v15 7/9] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+Thread-Index: AQHWt/M8TW7h8ytFwE22PYJVJt7LOKnVnLWAgAE22MA=
+Date:   Tue, 24 Nov 2020 05:37:21 +0000
+Message-ID: <HE1PR0802MB2555C5D09EA2BF0BA369BE37F4FB0@HE1PR0802MB2555.eurprd08.prod.outlook.com>
 References: <20201111062211.33144-1-jianyong.wu@arm.com>
- <20201111062211.33144-9-jianyong.wu@arm.com>
- <38fad448a3a465e4c35994ce61f4d8dd@kernel.org>
-In-Reply-To: <38fad448a3a465e4c35994ce61f4d8dd@kernel.org>
+ <20201111062211.33144-8-jianyong.wu@arm.com>
+ <7bd3a66253ca4b7adbe2294eb598a23f@kernel.org>
+In-Reply-To: <7bd3a66253ca4b7adbe2294eb598a23f@kernel.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ts-tracking-id: 6075EE547CF5F44BA7DA3D606C509743.0
+x-ts-tracking-id: 6326F7F8614FA349943B6F4E755C265E.0
 x-checkrecipientchecked: true
 Authentication-Results-Original: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=arm.com;
 x-originating-ip: [203.126.0.113]
 x-ms-publictraffictype: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 768adc39-9009-434d-d3a5-08d89038dde8
-x-ms-traffictypediagnostic: HE1PR0802MB2250:|DB7PR08MB3836:
+X-MS-Office365-Filtering-Correlation-Id: 10adb08e-4144-4761-a2cd-08d8903b09e9
+x-ms-traffictypediagnostic: HE1PR0801MB1881:|DB6PR08MB2919:
 x-ms-exchange-transport-forked: True
-X-Microsoft-Antispam-PRVS: <DB7PR08MB383653F44080B3AEC1337D06F4FB0@DB7PR08MB3836.eurprd08.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DB6PR08MB2919EE6CFF6E1888EC6E9B17F4FB0@DB6PR08MB2919.eurprd08.prod.outlook.com>
 x-checkrecipientrouted: true
 nodisclaimer: true
-x-ms-oob-tlc-oobclassifiers: OLM:3513;OLM:3513;
+x-ms-oob-tlc-oobclassifiers: OLM:10000;OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: b0HzNshnIBHAG5zhWC9FSqtlh3pV+gWSQ+iYA9RtB6/K9fuKqxPyPqHQCJl6xxdRAJro85vX2PaQjFsf1tEiHZUlrk71jgdhwaUOiQ8CxSzYN6YNIM8klnh/wuJQeOx4pb+NFvpCpS164Eckc0Y3+wJOzaaNThoR/PnZZFtOD0kV1Y95VJJiVTp4yIJ1jsn76pnd4XBgj6LTuFt+SidVF0K97HtBxbqc5iu2P6yOq8Q2KGo9SH0b6mhFvg5lXpFv+mwCV/6tbMg1Y7aQMSSyflLI7tIQ2XNh4S0mGzhV6u/cbVjDn/czCF+KnycBC2uT
-X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0802MB2555.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(366004)(39860400002)(396003)(478600001)(8676002)(71200400001)(54906003)(6506007)(53546011)(316002)(186003)(33656002)(8936002)(52536014)(55016002)(5660300002)(9686003)(83380400001)(26005)(7696005)(7416002)(66446008)(6916009)(66476007)(64756008)(4001150100001)(66946007)(66556008)(4326008)(2906002)(86362001)(76116006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: zW2+MZMZ0qcnKd2rx1J6FZLRZY2ssq/OdodZJfANlzSN61V/gTFBm77R5BxA4mMUEE38D8VP+yr/puKMjSwExTZBmoZ17HlMATyc1QEskCIbMeJh/clwlnxyS1akpczGWalOt0wH5X0dV9wAVNH+GD+FhKS+P+X72KHzVVu6fXsuvbfmyd26M9TNyt/kcBnAqs4VBO5QNd6KhGMnuTS3P20K1+RQ7AHADEQxBSN30ppcUhxgyQjgc7h6O6O94eBxD7gXzNIfWeC4btO6GvsA+nqIQeDkeUcOl/NBtACf2K2EY/UoqQXvcgK+Gj2HaXQzXuxDptA462W6Lpx5DuZvL8MjkfLcHEOqjwhKOJ7r6PoRnzClsN6lspkVRM7uGTwfB4+HCObHbzdTzktm9PaLNMFb7i/iwwKSfthPamizVi37MNRF+OMyiAIrZ5G+0y7I8ddOi2tuxA5ezDnchxK6iGG/qdYuAhkmDYtZFKI4NDHR1H0dPPISIO6Y6rJIfsuFYZgSbsSatYMz9/2DkN4SLXYW0uHiVethDcUGZQ3Cvq0hF6sVhOVnOSYT8lNaS1JWfQIzsS/XM0YkR4VL8vZGh6EE6y6Kh4fAQcPdWPXBwVP4PgmHHdYw/BlV/9AFK4TY6ouk35l98IrPe1uSRZcoecB00OwyJo+w0ZEn6W/O+JkgKqdO5m1FQuO9qb0pdyhGfvai4DTDzcsnm/hE2EfRk7taaLXR17jysnaooGRxi/VIzQNCDk98PsR8b3sEqqjkips4N0mKz0WNmq20btOhrDoOawu+0k3m+0bUAplliyhn1x5lyXQZHpX4U2Ak4RNyPUZPSL2jmxjVJpB1l864UV+JIEiauccBrFj5K9mWlcpz0vokLlDRLKYI8u9pLnz6mt364OwEiz4Qi/qbs77nyQ==
+X-Microsoft-Antispam-Message-Info-Original: QmrcusFpBuuZXZXc6oSVZp0dWrP3PB7Uvh+uxCvHIMdVTfW9JJmL3Lr3xRiu+RFG+7iyavk/9+KfiRB1o+Orm+WkKsITMQsWNushcTzC+6Oo1nzDPL0lBBF2ahaUlqpxiJi8gSupTSpSYzzp/PQNmulS2wwuxOiDIPfR8kqNqvOH9G9GkRuDCGjRnP/heJlQCvkh0foWZUUPy3ptcNJ+ihSoOe7qVrP4BBNRS2IpSoPWr0ejCPs6aw+MLzKoaq+gOvbSZUaAlU3fxeZWqfC3mgEWXqmrHDTJOQDXXeEURo6zXSqbZI8ssXjy7XGeiaen
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0802MB2555.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(136003)(396003)(39860400002)(346002)(76116006)(66476007)(52536014)(186003)(5660300002)(26005)(66946007)(55016002)(86362001)(4326008)(4001150100001)(9686003)(316002)(7416002)(33656002)(6916009)(54906003)(2906002)(66446008)(66556008)(478600001)(6506007)(7696005)(8936002)(83380400001)(53546011)(8676002)(71200400001)(64756008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: 44nlNso5msO92xsJVDqXUoGnKJVWV7XVa1gbDKAioHMEBQZ+nNYAmPrTIacwf1j5d1NdHaHWMZyIguKlrckUygulnwRo4aIJWQ5dEuJGnm5eHssShiPbveL47Xlm9YhutdG6qNLxMO5fBgGnXfHmi0LYLltDKQeBKSwSWB8+I0K77RZj0RIGvOcSbSe8kOqRugyfuLcxnFmoVMlV4+185QGXzqIA4+Jfup5nwqQKhHRg130o8cUUVMW6eQAHpWEdm1TQozO3VDFpDr4Yw/dE83en2Lrt/Pp3DDnVucZbEPBRjoWJqSI6Bj6T73g1oB96effW2LZMT5iL4oQx4dqFPPAvaamCFVkY/5hxcMzZ4bEbBS1Oky8v3zD5yhECkrbRmlGbOUnbwwN+QnpzixvWAJvccI1v4TLNFUvxpeC3c2Sq+zJduXz64uTeRhG06CDqGbcCoiAJHNEv+Tvv97GotwKqygxZkcwGAP1D72pqSPXgMHtGIbfGII7Pa5pPnn9++GVeMkkAs9e2ahKPwts44k4leTvdG8qPAJP3e9u9PYLmbDiEESbGAQrryEJaUMq7Y6ZoYI0zORhLRS1V45gk0Worn6JqLtYFFw2BomJ76zlV53zctKqi2A0zxcFiPeZPuE3EFlCN7UaQSy+FBMnBSLo3Op1P2iAcBKI3OX7Pnx48YUscju87liaveUZqCn0qoqM5n0ZKsNnfHykZBL9kMXwwB3fjGr1GJWWlR2q/BBVZGqMoZtiippOJGKTFGKtsfmZDVsOEshsV0L+Y5TAXkF1/9DVvPK/NtJa7pqyoX4Oh+qCgv9VwcwKcoJf+7NPk0ztzc1jPCjejHAA0843s3YTKxofmZT+kD0J5DkFlwIdW6UnmeHx5yxvv2gzllBdnykurRYF+q1ngQNTV4AWaPQ==
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2250
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1881
 Original-Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=arm.com;
 X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT042.eop-EUR03.prod.protection.outlook.com
-X-MS-Office365-Filtering-Correlation-Id-Prvs: a3fe8848-0b08-48a0-4a3e-08d89038d99f
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: VE1EUR03FT018.eop-EUR03.prod.protection.outlook.com
+X-MS-Office365-Filtering-Correlation-Id-Prvs: b554fa0d-892c-41f1-80dd-08d8903b0438
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZuItpLqjsUBVMU5MRT6/7N4rGXSG6suvRVUIQ/twarAwG9P97VhMaHGi6BmZy3NxBOETTPYw2fdEoMckDVRM7YBhI/KklFpmWlSSYzUsfKztCmnBUt56tvHKft2h+d6AB9984OaEhBnlxsGfUuvbNoH1LDHi0OrVAYiowgMRHtu6Fe4H9/EgWxMqVAvP+xnLbyWKVDV1GoGWNdJsBVsjFO20puwZZJuglZDeSreL6d6JP908LocwYekaT+CgXg2QzSR7jXuuh36Ry2/dF/VeSnkkmtpPTYcQskvsyCwXfadFJmezhZKRKo+ZQQnCSngTz29oupoPUL3KQ666TF9YTRAhBxHAUWL1ecD0kap6fnIfbdShxnmhQ+fNz7R6JnaCLG6uL8bebUMopnaOiHbBDg==
-X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(136003)(39860400002)(46966005)(9686003)(47076004)(82310400003)(53546011)(2906002)(336012)(450100002)(55016002)(26005)(4001150100001)(7696005)(83380400001)(8936002)(6862004)(186003)(52536014)(33656002)(82740400003)(6506007)(316002)(70206006)(4326008)(54906003)(8676002)(356005)(70586007)(86362001)(478600001)(5660300002)(81166007)(36906005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: CGQZj7vQ691eS1kztlM9yMKjvjMqQMOfH6KLVOALYe9WqQ7h4+LrhAV3bR8gPVNRTQHye0BI1HqWXYf3OHHMfy5XamG0dE7Nw4tBRyuh8OUJuEHUjouLugqe4e7P/FFkeAfbVLR+0PDa6CAvLjpV4800Cyh4v2649op8miCiM+vENPuiNdb0j1oFor7PXaQlf2l3JN7toFPUstPFRxT/ZcHyWzhXURw57wD8PNXMqbCWXRuTJ/p4ok5U6oiXu/7LEjo8pV9S2iId5xZUB2aLUAI7miA9MSi1ZPTQ4C5O92TZhtgAS9c8szHGs607InR3AjAN4/oxZOQbVYz1DnlKwl6/qdpR8GjyMgxdqanFRZOeCUgJFFtdpS6ccl88i6AcoTiokfKcxtlN2r1k7AM39A==
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(346002)(39860400002)(396003)(376002)(136003)(46966005)(356005)(2906002)(47076004)(53546011)(70206006)(478600001)(26005)(4001150100001)(82310400003)(6506007)(186003)(5660300002)(52536014)(70586007)(8936002)(8676002)(82740400003)(83380400001)(7696005)(336012)(9686003)(33656002)(450100002)(86362001)(81166007)(6862004)(316002)(54906003)(55016002)(4326008);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2020 05:21:58.7337
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2020 05:37:31.4153
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 768adc39-9009-434d-d3a5-08d89038dde8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10adb08e-4144-4761-a2cd-08d8903b09e9
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM5EUR03FT042.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: VE1EUR03FT018.eop-EUR03.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3836
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR08MB2919
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -154,7 +154,7 @@ Hi Marc,
 
 > -----Original Message-----
 > From: Marc Zyngier <maz@kernel.org>
-> Sent: Monday, November 23, 2020 6:58 PM
+> Sent: Monday, November 23, 2020 6:49 PM
 > To: Jianyong Wu <Jianyong.Wu@arm.com>
 > Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
 > tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
@@ -165,114 +165,302 @@ Hi Marc,
 > kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
 > kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; Justin He
 > <Justin.He@arm.com>; nd <nd@arm.com>
-> Subject: Re: [PATCH v15 8/9] doc: add ptp_kvm introduction for arm64
-> support
+> Subject: Re: [PATCH v15 7/9] ptp: arm/arm64: Enable ptp_kvm for
+> arm/arm64
 >=20
 > On 2020-11-11 06:22, Jianyong Wu wrote:
-> > PTP_KVM implementation depends on hypercall using SMCCC. So we
-> > introduce a new SMCCC service ID. This doc explains how does the ID
-> > define and how does PTP_KVM works on arm/arm64.
+> > Currently, there is no mechanism to keep time sync between guest and
+> > host in arm/arm64 virtualization environment. Time in guest will drift
+> > compared with host after boot up as they may both use third party time
+> > sources to correct their time respectively. The time deviation will be
+> > in order of milliseconds. But in some scenarios,like in cloud
+> > envirenment, we ask
+>=20
+> environment
+>=20
+OK
+
+> > for higher time precision.
+> >
+> > kvm ptp clock, which chooses the host clock source as a reference
+> > clock to sync time between guest and host, has been adopted by x86
+> > which takes the time sync order from milliseconds to nanoseconds.
+> >
+> > This patch enables kvm ptp clock for arm/arm64 and improves clock sync
+> > precison
+>=20
+> precision
+>
+OK
+=20
+> > significantly.
+> >
+> > Test result comparisons between with kvm ptp clock and without it in
+> > arm/arm64
+> > are as follows. This test derived from the result of command 'chronyc
+> > sources'. we should take more care of the last sample column which
+> > shows the offset between the local clock and the source at the last
+> > measurement.
+> >
+> > no kvm ptp in guest:
+> > MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> >
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > ^* dns1.synet.edu.cn      2   6   377    13  +1040us[+1581us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    21  +1040us[+1581us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    29  +1040us[+1581us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    37  +1040us[+1581us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    45  +1040us[+1581us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    53  +1040us[+1581us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    61  +1040us[+1581us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377     4   -130us[ +796us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    12   -130us[ +796us] +/-
+> > 21ms
+> > ^* dns1.synet.edu.cn      2   6   377    20   -130us[ +796us] +/-
+> > 21ms
+> >
+> > in host:
+> > MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> >
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > ^* 120.25.115.20          2   7   377    72   -470us[ -603us] +/-
+> > 18ms
+> > ^* 120.25.115.20          2   7   377    92   -470us[ -603us] +/-
+> > 18ms
+> > ^* 120.25.115.20          2   7   377   112   -470us[ -603us] +/-
+> > 18ms
+> > ^* 120.25.115.20          2   7   377     2   +872ns[-6808ns] +/-
+> > 17ms
+> > ^* 120.25.115.20          2   7   377    22   +872ns[-6808ns] +/-
+> > 17ms
+> > ^* 120.25.115.20          2   7   377    43   +872ns[-6808ns] +/-
+> > 17ms
+> > ^* 120.25.115.20          2   7   377    63   +872ns[-6808ns] +/-
+> > 17ms
+> > ^* 120.25.115.20          2   7   377    83   +872ns[-6808ns] +/-
+> > 17ms
+> > ^* 120.25.115.20          2   7   377   103   +872ns[-6808ns] +/-
+> > 17ms
+> > ^* 120.25.115.20          2   7   377   123   +872ns[-6808ns] +/-
+> > 17ms
+> >
+> > The dns1.synet.edu.cn is the network reference clock for guest and
+> > 120.25.115.20 is the network reference clock for host. we can't get
+> > the clock error between guest and host directly, but a roughly
+> > estimated value will be in order of hundreds of us to ms.
+> >
+> > with kvm ptp in guest:
+> > chrony has been disabled in host to remove the disturb by network
+> > clock.
+> >
+> > MS Name/IP address         Stratum Poll Reach LastRx Last sample
+> >
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > * PHC0                    0   3   377     8     -7ns[   +1ns] +/-
+> > 3ns
+> > * PHC0                    0   3   377     8     +1ns[  +16ns] +/-
+> > 3ns
+> > * PHC0                    0   3   377     6     -4ns[   -0ns] +/-
+> > 6ns
+> > * PHC0                    0   3   377     6     -8ns[  -12ns] +/-
+> > 5ns
+> > * PHC0                    0   3   377     5     +2ns[   +4ns] +/-
+> > 4ns
+> > * PHC0                    0   3   377    13     +2ns[   +4ns] +/-
+> > 4ns
+> > * PHC0                    0   3   377    12     -4ns[   -6ns] +/-
+> > 4ns
+> > * PHC0                    0   3   377    11     -8ns[  -11ns] +/-
+> > 6ns
+> > * PHC0                    0   3   377    10    -14ns[  -20ns] +/-
+> > 4ns
+> > * PHC0                    0   3   377     8     +4ns[   +5ns] +/-
+> > 4ns
+> >
+> > The PHC0 is the ptp clock which choose the host clock as its source
+> > clock. So we can see that the clock difference between host and guest
+> > is in order of ns.
 > >
 > > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 > > ---
-> >  Documentation/virt/kvm/api.rst         |  9 +++++++
-> >  Documentation/virt/kvm/arm/index.rst   |  1 +
-> >  Documentation/virt/kvm/arm/ptp_kvm.rst | 29
-> +++++++++++++++++++++
-> > Documentation/virt/kvm/timekeeping.rst | 35
-> ++++++++++++++++++++++++++
-> >  4 files changed, 74 insertions(+)
-> >  create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+> >  drivers/clocksource/arm_arch_timer.c | 28 ++++++++++++++++++
+> >  drivers/ptp/Kconfig                  |  2 +-
+> >  drivers/ptp/Makefile                 |  1 +
+> >  drivers/ptp/ptp_kvm_arm.c            | 44
+> ++++++++++++++++++++++++++++
+> >  4 files changed, 74 insertions(+), 1 deletion(-)  create mode 100644
+> > drivers/ptp/ptp_kvm_arm.c
 > >
-> > diff --git a/Documentation/virt/kvm/api.rst
-> > b/Documentation/virt/kvm/api.rst index 36d5f1f3c6dd..9843dbcbf770
-> > 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6391,3 +6391,12 @@ When enabled, KVM will disable paravirtual
-> > features provided to the  guest according to the bits in the
-> > KVM_CPUID_FEATURES CPUID leaf  (0x40000001). Otherwise, a guest may
-> > use the paravirtual features  regardless of what has actually been
-> > exposed through the CPUID leaf.
+> > diff --git a/drivers/clocksource/arm_arch_timer.c
+> > b/drivers/clocksource/arm_arch_timer.c
+> > index d55acffb0b90..b33c5a663d30 100644
+> > --- a/drivers/clocksource/arm_arch_timer.c
+> > +++ b/drivers/clocksource/arm_arch_timer.c
+> > @@ -25,6 +25,7 @@
+> >  #include <linux/sched/clock.h>
+> >  #include <linux/sched_clock.h>
+> >  #include <linux/acpi.h>
+> > +#include <linux/arm-smccc.h>
+> >
+> >  #include <asm/arch_timer.h>
+> >  #include <asm/virt.h>
+> > @@ -1650,3 +1651,30 @@ static int __init arch_timer_acpi_init(struct
+> > acpi_table_header *table)  }  TIMER_ACPI_DECLARE(arch_timer,
+> > ACPI_SIG_GTDT, arch_timer_acpi_init);  #endif
 > > +
-> > +8.27 KVM_CAP_PTP_KVM
-> > +--------------------
+> > +int kvm_arch_ptp_get_crosststamp(u64 *cycle, struct timespec64 *ts,
+> > +			      struct clocksource **cs)
+> > +{
+> > +	struct arm_smccc_res hvc_res;
+> > +	ktime_t ktime;
+> > +	u32 ptp_counter;
 > > +
-> > +:Architectures: arm64
+> > +	if (arch_timer_uses_ppi =3D=3D ARCH_TIMER_VIRT_PPI)
+> > +		ptp_counter =3D ARM_PTP_VIRT_COUNTER;
+> > +	else
+> > +		ptp_counter =3D ARM_PTP_PHY_COUNTER;
 > > +
-> > +This capability indicates that KVM virtual PTP service is supported
-> > +in
-> > host.
-> > +It must company with the implementation of KVM virtual PTP service in
-> > host
-> > +so VMM can probe if there is the service in host by checking this
-> > capability.
-> > diff --git a/Documentation/virt/kvm/arm/index.rst
-> > b/Documentation/virt/kvm/arm/index.rst
-> > index 3e2b2aba90fc..78a9b670aafe 100644
-> > --- a/Documentation/virt/kvm/arm/index.rst
-> > +++ b/Documentation/virt/kvm/arm/index.rst
-> > @@ -10,3 +10,4 @@ ARM
-> >     hyp-abi
-> >     psci
-> >     pvtime
-> > +   ptp_kvm
-> > diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst
-> > b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> > new file mode 100644
-> > index 000000000000..bb1e6cfefe44
+> > +
+> 	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FU
+> NC_ID,
+> > +			     ptp_counter, &hvc_res);
+> > +
+> > +	if ((int)(hvc_res.a0) < 0)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	ktime =3D (u64)hvc_res.a0 << 32 | hvc_res.a1;
+> > +	*ts =3D ktime_to_timespec64(ktime);
+> > +	*cycle =3D (u64)hvc_res.a2 << 32 | hvc_res.a3;
+>=20
+> Endianness.
+>=20
+> > +	*cs =3D &clocksource_counter;
+> > +
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(kvm_arch_ptp_get_crosststamp);
+> > diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig index
+> > 942f72d8151d..677c7f696b70 100644
+> > --- a/drivers/ptp/Kconfig
+> > +++ b/drivers/ptp/Kconfig
+> > @@ -106,7 +106,7 @@ config PTP_1588_CLOCK_PCH  config
+> > PTP_1588_CLOCK_KVM
+> >  	tristate "KVM virtual PTP clock"
+> >  	depends on PTP_1588_CLOCK
+> > -	depends on KVM_GUEST && X86
+> > +	depends on KVM_GUEST && X86 ||
+> (HAVE_ARM_SMCCC_DISCOVERY &&
+> > ARM_ARCH_TIMER)
+> >  	default y
+> >  	help
+> >  	  This driver adds support for using kvm infrastructure as a PTP
+> > diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile index
+> > 699a4e4d19c2..9fa5ede44b2b 100644
+> > --- a/drivers/ptp/Makefile
+> > +++ b/drivers/ptp/Makefile
+> > @@ -5,6 +5,7 @@
+> >
+> >  ptp-y					:=3D ptp_clock.o ptp_chardev.o
+> ptp_sysfs.o
+> >  ptp_kvm-$(CONFIG_X86)			:=3D ptp_kvm_x86.o
+> ptp_kvm_common.o
+> > +ptp_kvm-$(CONFIG_HAVE_ARM_SMCCC)	:=3D ptp_kvm_arm.o
+> ptp_kvm_common.o
+> >  obj-$(CONFIG_PTP_1588_CLOCK)		+=3D ptp.o
+> >  obj-$(CONFIG_PTP_1588_CLOCK_DTE)	+=3D ptp_dte.o
+> >  obj-$(CONFIG_PTP_1588_CLOCK_INES)	+=3D ptp_ines.o
+> > diff --git a/drivers/ptp/ptp_kvm_arm.c b/drivers/ptp/ptp_kvm_arm.c new
+> > file mode 100644 index 000000000000..2212827c0384
 > > --- /dev/null
-> > +++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> > @@ -0,0 +1,29 @@
-> > +.. SPDX-License-Identifier: GPL-2.0
+> > +++ b/drivers/ptp/ptp_kvm_arm.c
+> > @@ -0,0 +1,44 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + *  Virtual PTP 1588 clock for use with KVM guests
+> > + *  Copyright (C) 2019 ARM Ltd.
+> > + *  All Rights Reserved
+> > + */
 > > +
-> > +PTP_KVM support for arm/arm64
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
+> > +#include <linux/kernel.h>
+> > +#include <linux/err.h>
+> > +#include <asm/hypervisor.h>
+> > +#include <linux/module.h>
+> > +#include <linux/psci.h>
+> > +#include <linux/arm-smccc.h>
+> > +#include <linux/timecounter.h>
+> > +#include <linux/sched/clock.h>
+> > +#include <asm/arch_timer.h>
+> > +#include <asm/hypervisor.h>
 > > +
-> > +PTP_KVM is used for time sync between guest and host in a high
-> > precision.
-> > +It needs to get the wall time and counter value from the host and
-> > transfer these
-> > +to guest via hypercall service. So one more hypercall service has
-> > +been
-> > added.
+> > +int kvm_arch_ptp_init(void)
+> > +{
+> > +	int ret;
 > > +
-> > +This new SMCCC hypercall is defined as:
+> > +	ret =3D
+> kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_KVM_PTP);
+> > +	if (ret <=3D 0)
+> > +		return -EOPNOTSUPP;
 > > +
-> > +* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0x86000001
+> > +	return 0;
+> > +}
 > > +
-> > +As both 32 and 64-bits ptp_kvm client should be supported, we choose
-> > SMC32/HVC32
-> > +calling convention.
+> > +int kvm_arch_ptp_get_clock(struct timespec64 *ts) {
+> > +	ktime_t ktime;
+> > +	struct arm_smccc_res hvc_res;
 > > +
-> > +ARM_SMCCC_HYP_KVM_PTP_FUNC_ID:
 > > +
-> > +    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D    =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +    Function ID:     (uint32)      0x86000001
-> > +    Arguments:	     (uint32)      ARM_PTP_PHY_COUNTER(1) or
-> > ARM_PTP_VIRT_COUNTER(0)
-> > +                                   which indicate acquiring physical
-> > counter or
-> > +                                   virtual counter respectively.
-> > +    return value:    (uint32)      NOT_SUPPORTED(-1) or val0 and val1
-> > represent
-> > +                                   wall clock time and val2 and val3
-> > represent
-> > +                                   counter cycle.
+> 	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FU
+> NC_ID,
+> > +			     ARM_PTP_NONE_COUNTER, &hvc_res);
 >=20
-> This needs a lot more description:
+> I really don't see the need to use a non-architectural counter ID.
+> Using the virtual counter ID should just be fine, and shouldn't lead to a=
+ny
+> issue.
 >=20
-> - Which word contains what part of the data (upper/lower part of the 64bi=
-t
-> data)
-> - The endianness of the data returned
 
-OK.
+> Am I missing something?
+
+In this function, no counter data is needed. If virtual counter ID is used =
+here, user may be confused with why we get virtual counter
+data and do nothing with it. So I explicitly add a new "NONE" counter ID to=
+ make it clear.
+
+WDYT?
 
 Thanks
-Jianyong=20
+Jianyong
+>=20
+> > +	if ((int)(hvc_res.a0) < 0)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	ktime =3D (u64)hvc_res.a0 << 32 | hvc_res.a1;
+>=20
+> Endianness.
+>=20
+> > +	*ts =3D ktime_to_timespec64(ktime);
+> > +
+> > +	return 0;
+> > +}
+>=20
+> Thanks,
 >=20
 >          M.
 > --
