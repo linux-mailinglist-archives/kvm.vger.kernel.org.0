@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D968B2C1EFC
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 08:41:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD5002C1F00
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 08:41:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730094AbgKXHir (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 02:38:47 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:7973 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728934AbgKXHiq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Nov 2020 02:38:46 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CgG90577CzhfY3;
-        Tue, 24 Nov 2020 15:38:28 +0800 (CST)
+        id S1730139AbgKXHk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 02:40:29 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:8395 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730006AbgKXHk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 02:40:28 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CgGBp5scLz71kd;
+        Tue, 24 Nov 2020 15:40:02 +0800 (CST)
 Received: from [10.174.187.74] (10.174.187.74) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 24 Nov 2020 15:38:32 +0800
-Subject: Re: [RFC PATCH v1 1/4] irqchip/gic-v4.1: Plumb get_irqchip_state VLPI
- callback
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 24 Nov 2020 15:40:14 +0800
+Subject: Re: [RFC PATCH v1 2/4] KVM: arm64: GICv4.1: Try to save hw pending
+ state in save_pending_tables
 To:     Marc Zyngier <maz@kernel.org>
 CC:     James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -33,15 +33,15 @@ CC:     James Morse <james.morse@arm.com>,
         Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
 References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-2-lushenming@huawei.com>
- <f64703b618a2ebc6c6f5c423e2b779c6@kernel.org>
+ <20201123065410.1915-3-lushenming@huawei.com>
+ <f3ea1b24436bb86b5a5633f8ccc9b3d1@kernel.org>
 From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <7bc7e428-cfd5-6171-dc1e-4be097c46690@huawei.com>
-Date:   Tue, 24 Nov 2020 15:38:32 +0800
+Message-ID: <90f04f50-c1ba-55b2-0f93-1e755b40b487@huawei.com>
+Date:   Tue, 24 Nov 2020 15:40:13 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <f64703b618a2ebc6c6f5c423e2b779c6@kernel.org>
+In-Reply-To: <f3ea1b24436bb86b5a5633f8ccc9b3d1@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -51,131 +51,179 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/11/23 17:01, Marc Zyngier wrote:
+On 2020/11/23 17:18, Marc Zyngier wrote:
 > On 2020-11-23 06:54, Shenming Lu wrote:
->> From: Zenghui Yu <yuzenghui@huawei.com>
->>
->> Up to now, the irq_get_irqchip_state() callback of its_irq_chip
->> leaves unimplemented since there is no architectural way to get
->> the VLPI's pending state before GICv4.1. Yeah, there has one in
->> v4.1 for VLPIs.
->>
->> With GICv4.1, after unmapping the vPE, which cleans and invalidates
->> any caching of the VPT, we can get the VLPI's pending state by
+>> After pausing all vCPUs and devices capable of interrupting, in order
+>         ^^^^^^^^^^^^^^^^^
+> See my comment below about this.
 > 
-> This is a crucial note: without this unmapping and invalidation,
-> the pending bits are not generally accessible (they could be cached
-> in a GIC private structure, cache or otherwise).
-> 
->> peeking at the VPT. So we implement the irq_get_irqchip_state()
->> callback of its_irq_chip to do it.
+>> to save the information of all interrupts, besides flushing the pending
+>> states in kvm’s vgic, we also try to flush the states of VLPIs in the
+>> virtual pending tables into guest RAM, but we need to have GICv4.1 and
+>> safely unmap the vPEs first.
 >>
->> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 >> Signed-off-by: Shenming Lu <lushenming@huawei.com>
 >> ---
->>  drivers/irqchip/irq-gic-v3-its.c | 38 ++++++++++++++++++++++++++++++++
->>  1 file changed, 38 insertions(+)
+>>  arch/arm64/kvm/vgic/vgic-v3.c | 62 +++++++++++++++++++++++++++++++----
+>>  1 file changed, 56 insertions(+), 6 deletions(-)
 >>
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
->> index 0fec31931e11..287003cacac7 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -1695,6 +1695,43 @@ static void its_irq_compose_msi_msg(struct
->> irq_data *d, struct msi_msg *msg)
->>      iommu_dma_compose_msi_msg(irq_data_get_msi_desc(d), msg);
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+>> index 9cdf39a94a63..e1b3aa4b2b12 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -1,6 +1,8 @@
+>>  // SPDX-License-Identifier: GPL-2.0-only
+>>
+>>  #include <linux/irqchip/arm-gic-v3.h>
+>> +#include <linux/irq.h>
+>> +#include <linux/irqdomain.h>
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <kvm/arm_vgic.h>
+>> @@ -356,6 +358,39 @@ int vgic_v3_lpi_sync_pending_status(struct kvm
+>> *kvm, struct vgic_irq *irq)
+>>      return 0;
 >>  }
 >>
->> +static bool its_peek_vpt(struct its_vpe *vpe, irq_hw_number_t hwirq)
+>> +/*
+>> + * With GICv4.1, we can get the VLPI's pending state after unmapping
+>> + * the vPE. The deactivation of the doorbell interrupt will trigger
+>> + * the unmapping of the associated vPE.
+>> + */
+>> +static void get_vlpi_state_pre(struct vgic_dist *dist)
 >> +{
->> +    int mask = hwirq % BITS_PER_BYTE;
+>> +    struct irq_desc *desc;
+>> +    int i;
+>> +
+>> +    if (!kvm_vgic_global_state.has_gicv4_1)
+>> +        return;
+>> +
+>> +    for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +        desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +        irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
+>> +    }
+>> +}
+>> +
+>> +static void get_vlpi_state_post(struct vgic_dist *dist)
 > 
-> nit: this isn't a mask, but a shift instead. BIT(hwirq % BPB) would give
-> you a mask.
+> nit: the naming feels a bit... odd. Pre/post what?
+
+My understanding is that the unmapping is a preparation for get_vlpi_state...
+Maybe just call it unmap/map_all_vpes?
+
+> 
+>> +{
+>> +    struct irq_desc *desc;
+>> +    int i;
+>> +
+>> +    if (!kvm_vgic_global_state.has_gicv4_1)
+>> +        return;
+>> +
+>> +    for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +        desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +        irq_domain_activate_irq(irq_desc_get_irq_data(desc), false);
+>> +    }
+>> +}
+>> +
+>>  /**
+>>   * vgic_v3_save_pending_tables - Save the pending tables into guest RAM
+>>   * kvm lock and all vcpu lock must be held
+>> @@ -365,14 +400,17 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>      struct vgic_dist *dist = &kvm->arch.vgic;
+>>      struct vgic_irq *irq;
+>>      gpa_t last_ptr = ~(gpa_t)0;
+>> -    int ret;
+>> +    int ret = 0;
+>>      u8 val;
+>>
+>> +    get_vlpi_state_pre(dist);
+>> +
+>>      list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+>>          int byte_offset, bit_nr;
+>>          struct kvm_vcpu *vcpu;
+>>          gpa_t pendbase, ptr;
+>>          bool stored;
+>> +        bool is_pending = irq->pending_latch;
+>>
+>>          vcpu = irq->target_vcpu;
+>>          if (!vcpu)
+>> @@ -387,24 +425,36 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>          if (ptr != last_ptr) {
+>>              ret = kvm_read_guest_lock(kvm, ptr, &val, 1);
+>>              if (ret)
+>> -                return ret;
+>> +                goto out;
+>>              last_ptr = ptr;
+>>          }
+>>
+>>          stored = val & (1U << bit_nr);
+>> -        if (stored == irq->pending_latch)
+>> +
+>> +        /* also flush hw pending state */
+> 
+> This comment looks out of place, as we aren't flushing anything.
 
 Ok, I will correct it.
 
 > 
->> +    void *va;
->> +    u8 *pt;
->> +
->> +    va = page_address(vpe->vpt_page);
->> +    pt = va + hwirq / BITS_PER_BYTE;
->> +
->> +    return !!(*pt & (1U << mask));
->> +}
->> +
->> +static int its_irq_get_irqchip_state(struct irq_data *d,
->> +                     enum irqchip_irq_state which, bool *val)
->> +{
->> +    struct its_device *its_dev = irq_data_get_irq_chip_data(d);
->> +    struct its_vlpi_map *map = get_vlpi_map(d);
->> +
->> +    if (which != IRQCHIP_STATE_PENDING)
->> +        return -EINVAL;
->> +
->> +    /* not intended for physical LPI's pending state */
->> +    if (!map)
->> +        return -EINVAL;
->> +
->> +    /*
->> +     * In GICv4.1, a VMAPP with {V,Alloc}=={0,1} cleans and invalidates
->> +     * any caching of the VPT associated with the vPEID held in the GIC.
->> +     */
->> +    if (!is_v4_1(its_dev->its) || atomic_read(&map->vpe->vmapp_count))
+>> +        if (irq->hw) {
+>> +            WARN_RATELIMIT(irq_get_irqchip_state(irq->host_irq,
+>> +                        IRQCHIP_STATE_PENDING, &is_pending),
+>> +                       "IRQ %d", irq->host_irq);
 > 
-> It isn't clear to me what prevents this from racing against a mapping of
-> the VPE. Actually, since we only hold the LPI irqdesc lock, I'm pretty sure
-> nothing prevents it.
+> Isn't this going to warn like mad on a GICv4.0 system where this, by definition,
+> will generate an error?
 
-Yes, should have the vmovp_lock held?
-And is it necessary to also hold this lock in its_vpe_irq_domain_activate/deactivate?
+As we have returned an error in save_its_tables if hw && !has_gicv4_1, we don't
+have to warn this here?
 
 > 
->> +        return -EACCES;
-> 
-> I can sort of buy EACCESS for a VPE that is currently mapped, but a non-4.1
-> ITS should definitely return EINVAL.
-
-Alright, EINVAL looks better.
-
-> 
+>> +        }
 >> +
->> +    *val = its_peek_vpt(map->vpe, map->vintid);
+>> +        if (stored == is_pending)
+>>              continue;
+>>
+>> -        if (irq->pending_latch)
+>> +        if (is_pending)
+>>              val |= 1 << bit_nr;
+>>          else
+>>              val &= ~(1 << bit_nr);
+>>
+>>          ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+>>          if (ret)
+>> -            return ret;
+>> +            goto out;
+>>      }
+>> -    return 0;
 >> +
->> +    return 0;
->> +}
+>> +out:
+>> +    get_vlpi_state_post(dist);
+> 
+> This bit worries me: you have unmapped the VPEs, so any interrupt that has been
+> generated during that phase is now forever lost (the GIC doesn't have ownership
+> of the pending tables).
+
+In my opinion, during this phase, the devices capable of interrupting should have
+already been paused (prevent from sending interrupts), such as VFIO migration protocol
+has already realized it.
+
+> 
+> Do you really expect the VM to be restartable from that point? I don't see how
+> this is possible.
+> 
+
+If the migration has encountered an error, the src VM might be restarted, so we have to
+map the vPEs back.
+
 >> +
->>  static int its_irq_set_irqchip_state(struct irq_data *d,
->>                       enum irqchip_irq_state which,
->>                       bool state)
->> @@ -1975,6 +2012,7 @@ static struct irq_chip its_irq_chip = {
->>      .irq_eoi        = irq_chip_eoi_parent,
->>      .irq_set_affinity    = its_set_affinity,
->>      .irq_compose_msi_msg    = its_irq_compose_msi_msg,
->> +    .irq_get_irqchip_state    = its_irq_get_irqchip_state,
-> 
-> My biggest issue with this is that it isn't a reliable interface.
-> It happens to work in the context of KVM, because you make sure it
-> is called at the right time, but that doesn't make it safe in general
-> (anyone with the interrupt number is allowed to call this at any time).
-
-We check the vmapp_count in it to ensure the unmapping of the vPE, and
-let the caller do the unmapping (they should know whether it is the right
-time). If the unmapping is not done, just return a failure.
-
-> 
-> Is there a problem with poking at the VPT page from the KVM side?
-> The code should be exactly the same (maybe simpler even), and at least
-> you'd be guaranteed to be in the correct context.
-
-Yeah, that also seems a good choice.
-If you prefer it, we can try to realize it in v2.
-
-> 
->>      .irq_set_irqchip_state    = its_irq_set_irqchip_state,
->>      .irq_retrigger        = its_irq_retrigger,
->>      .irq_set_vcpu_affinity    = its_irq_set_vcpu_affinity,
+>> +    return ret;
+>>  }
+>>
+>>  /**
 > 
 > Thanks,
 > 
 >         M.
+
+Thanks,
+Shenming
