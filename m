@@ -2,72 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30B762C23E9
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 12:11:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58C5A2C24B5
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 12:39:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732846AbgKXLJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 06:09:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45031 "EHLO
+        id S1732939AbgKXLjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 06:39:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45644 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731742AbgKXLJw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 06:09:52 -0500
+        by vger.kernel.org with ESMTP id S1727909AbgKXLjU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 06:39:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606216190;
+        s=mimecast20190719; t=1606217958;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dQyYdZ+ap0EfxwOL/l3zGdh80ZLJUtxQwG7cGkgQ45w=;
-        b=DPPleBDEnI3hnS6+2tz398h6NreoHcxUIMz0sPx/BTIj0YNLDo5pPlrcOm7l+oa9QyXAzd
-        G/F60JNGzbKS6FoqpFEOPQ1H2b/77smGdynFqTS2Cx7jvnEsfrsWQShvbGVV8mfLJyD+zS
-        BmDUcF9bFpEmhPi1r9igw9Lr3zAuxSQ=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-NjSIxNZPMiiXCluLR0_JjQ-1; Tue, 24 Nov 2020 06:09:48 -0500
-X-MC-Unique: NjSIxNZPMiiXCluLR0_JjQ-1
-Received: by mail-ej1-f71.google.com with SMTP id gr9so6741190ejb.19
-        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 03:09:48 -0800 (PST)
+        bh=cOW9AP+FtQ6fH8fJ2Y4lCPfEd3mcrYQ9tsXTICs0PAo=;
+        b=VV/5M6BFXMSEPwGw01JCkoQeFBDiftG5Mm09qMQENlQqBAc6S96LJv1Huda5f8fZjHxIbL
+        HjTurlcgdvuVhr7KuSnTk1XTYQSi9kz2FdAXbsNT9LCwlDu4htNuNbRzJ23tq7UJafr9Ap
+        ufyV8ZoKWdMYEFIAGpiGQGFgIbFDiNQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-jmW_GPTJNje9Hd6aHFWICw-1; Tue, 24 Nov 2020 06:39:16 -0500
+X-MC-Unique: jmW_GPTJNje9Hd6aHFWICw-1
+Received: by mail-wm1-f72.google.com with SMTP id v5so565552wmj.0
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 03:39:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:to:cc:references:from:subject:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=dQyYdZ+ap0EfxwOL/l3zGdh80ZLJUtxQwG7cGkgQ45w=;
-        b=YSddRuNYQnmqtsbxrANOWszygeFMLJIlsQ6gDxw6vwhVxZVp5lqMvb3Xk26SVu+2uR
-         qmJci4H88iayRrokBJgWvUCQ/bbMaOAvAaBOZt/2U/JideBf2gjyR+OVuh/IDtsx5Ttu
-         ORfXo7hXqJwJY7s1E7WwDpecPILQ7g7wsE2/R7vLZbB5W8fZ6PFFVdAUsHi+Ziugxqi6
-         qHOUWplg8RU46M+BvajXEXQnp7pgrldnNaGh7DqR6y/bN3UdrGY7fVxFL4dvBzcQfl9P
-         3qqd9+AHYgO/5r6izfI6ssKdyn2mcU6WSwwi+wMEChUe43+D9mk7rCiO1flN1kQQFX7m
-         g7MA==
-X-Gm-Message-State: AOAM531SKx2ndumLfEYZVHse8Q24RZNb4kPan3L9PPIDeqwo2gxTsVw2
-        PjCo00qLSsTlub6v4PQIhySPzJR4eSLf1/lTPa4x0nIl+Q5PSrAk8iaRuv9CVFFLFLwK6TvIFYS
-        /pHN7yGfplocM
-X-Received: by 2002:aa7:c45a:: with SMTP id n26mr3528542edr.112.1606216187763;
-        Tue, 24 Nov 2020 03:09:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyIo0tl9TRJPf6nQHiTsCk6PAR/E7dR9B1JBavnpOvAa9M+KtinE6zPlcv24h5riAmV0qQ1kg==
-X-Received: by 2002:aa7:c45a:: with SMTP id n26mr3528521edr.112.1606216187579;
-        Tue, 24 Nov 2020 03:09:47 -0800 (PST)
+        bh=cOW9AP+FtQ6fH8fJ2Y4lCPfEd3mcrYQ9tsXTICs0PAo=;
+        b=mu/1OzOCxHjDQaRhgW8m+YzPpiWTdgtZ6UMjdfqgYLLhU2wFnmJnZAjvHtlvgfV3yO
+         cJqJZlGs4o0Xuc+MVsXoF8/giWnX3jCUBj5eTtyrPuBWGtQh+QiAESkr5Oeof4GGz/5v
+         VHVZskJrFIQyop6eFDTisdFR6vWHA+h6AQZb9o/TdM4fHjowh1mYeLVneZYFOttA0nBs
+         qLE6nCsINs10gGUqrK0fSnINZhE1Uy3DtDUbPeSgyxuD0Tlc5HraJqMlLJgyx9jjigJR
+         xla8xo6VZdXIh8Z1rVV2KjbuD0G/i2hKSPX7SxaBgCI3YIyYI1/at0yS3Z9fy1vCbp9G
+         f/pA==
+X-Gm-Message-State: AOAM533+2SEN9hWZpK6jxbjNEVkujwd6wRQgKQarjz7bxdSlcpsLQJ24
+        zuj5DQAT17NDF8GMZYNVm4efyw8bjIncV8YOE+UiPQyIAckk5CH70jN3lpAe8wpPqM+Hy4KBkJI
+        XDeFzhl0k1y19
+X-Received: by 2002:a05:600c:256:: with SMTP id 22mr3884634wmj.120.1606217955032;
+        Tue, 24 Nov 2020 03:39:15 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzd9llsbqF1ljSG18UayZZuFeWBhytEu3y8vCr1yADhBxuwV30iStuF+qpotJTMGR5f4aqR3g==
+X-Received: by 2002:a05:600c:256:: with SMTP id 22mr3884618wmj.120.1606217954799;
+        Tue, 24 Nov 2020 03:39:14 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z14sm6626143ejx.58.2020.11.24.03.09.46
+        by smtp.gmail.com with ESMTPSA id z189sm4959465wme.23.2020.11.24.03.39.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Nov 2020 03:09:46 -0800 (PST)
-To:     Oliver Upton <oupton@google.com>
+        Tue, 24 Nov 2020 03:39:14 -0800 (PST)
+To:     Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>
 Cc:     idan.brown@oracle.com, Jim Mattson <jmattson@google.com>,
         kvm list <kvm@vger.kernel.org>, liam.merwick@oracle.com,
-        wanpeng.li@hotmail.com, Sean Christopherson <seanjc@google.com>
+        wanpeng.li@hotmail.com
 References: <95b9b017-ccde-97a0-f407-fd5f35f1157d@redhat.com>
  <20201123192223.3177490-1-oupton@google.com>
  <4788d64f-1831-9eb9-2c78-c5d9934fb47b@redhat.com>
  <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
+ <CAOQ_QshMoc9W9g6XRuGM4hCtMdvUxSDpGAhp3vNxhxhWTK-5CQ@mail.gmail.com>
+ <20201124015515.GA75780@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
  posted-interrupt pending
-Message-ID: <7ffaa63e-6e75-cf5f-e0c1-d168016c4eca@redhat.com>
-Date:   Tue, 24 Nov 2020 12:09:46 +0100
+Message-ID: <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
+Date:   Tue, 24 Nov 2020 12:39:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
+In-Reply-To: <20201124015515.GA75780@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -75,37 +78,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/11/20 01:10, Oliver Upton wrote:
->> but you also have to do the same*in the PINV handler*
->> sysvec_kvm_posted_intr_nested_ipi too, to handle the case where the
->> L2->L0 vmexit races against sending the IPI.
-> Indeed, there is a race but are we assured that the target vCPU thread
-> is scheduled on the target CPU when that IPI arrives?
+On 24/11/20 02:55, Sean Christopherson wrote:
+>>> I believe there is a 1-to-many relationship here, which is why I said
+>>> each CPU would need to maintain a linked list of possible vCPUs to
+>>> iterate and find the intended recipient.
+> 
+> Ya, the concern is that it's theoretically possible for the PINV to arrive in L0
+> after a different vCPU has been loaded (or even multiple different vCPUs).
+> E.g. if the sending pCPU is hit with an NMI after checking vcpu->mode, and the
+> NMI runs for some absurd amount of time.  If that happens, the PINV handler
+> won't know which vCPU(s) should get an IRQ injected into L1 without additional
+> tracking.  KVM would need to set something like nested.pi_pending before doing
+> kvm_vcpu_trigger_posted_interrupt(), i.e. nothing really changes, it just gets
+> more complex.
 
-This would only happen if the source vCPU saw vcpu->mode == 
-IN_GUEST_MODE for the target vCPU.  Thus there are three cases:
+Ah, gotcha.  What if IN_GUEST_MODE/OUTSIDE_GUEST_MODE was replaced by a 
+generation count?  Then you reread vcpu->mode after sending the IPI, and 
+retry if it does not match.
 
-1) the vCPU is in non-root mode.  This is easy. :)
+To guarantee atomicity, the OUTSIDE_GUEST_MODE IN_GUEST_MODE 
+EXITING_GUEST_MODE READING_SHADOW_PAGE_TABLES values would remain in the 
+bottom 2 bits.  That is, the vcpu->mode accesses like
 
-2) the vCPU hasn't entered the VM yet.  Then posted interrupt IPIs are 
-delayed after guest entry and ensured to result in virtual interrupt 
-delivery, just like case 1.
+	vcpu->mode = IN_GUEST_MODE;
 
-3) the vCPU has left the VM but it hasn't reached
+	vcpu->mode = OUTSIDE_GUEST_MODE;
 
-         vcpu->mode = OUTSIDE_GUEST_MODE;
-         smp_wmb();
+	smp_store_mb(vcpu->mode, READING_SHADOW_PAGE_TABLES);
 
-yet.  Then the interrupt will be right after that moment, at.
+	smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
 
-         kvm_before_interrupt(vcpu);
-         local_irq_enable();
-         ++vcpu->stat.exits;
-         local_irq_disable();
-         kvm_after_interrupt(vcpu);
+	return cmpxchg(&vcpu->mode, IN_GUEST_MODE, EXITING_GUEST_MODE);
 
-Anything else will cause kvm_vcpu_trigger_posted_interrupt(vcpu, true) 
-to return false instead of sending an IPI.
+becoming
+
+	enum {
+		OUTSIDE_GUEST_MODE,
+		IN_GUEST_MODE,
+		EXITING_GUEST_MODE,
+		READING_SHADOW_PAGE_TABLES,
+		GUEST_MODE_MASK = 3,
+	};
+
+	vcpu->mode = (vcpu->mode | GUEST_MODE_MASK) + 1 + IN_GUEST_MODE;
+
+	vcpu->mode &= ~GUEST_MODE_MASK;
+
+	smp_store_mb(vcpu->mode, vcpu->mode|READING_SHADOW_PAGE_TABLES);
+
+	smp_store_release(&vcpu->mode, vcpu->mode & ~GUEST_MODE_MASK);
+
+	int x = READ_ONCE(vcpu->mode);
+	do {
+		if ((x & GUEST_MODE_MASK) != IN_GUEST_MODE)
+			return x & GUEST_MODE_MASK;
+	} while (!try_cmpxchg(&vcpu->mode, &x,
+			      x ^ IN_GUEST_MODE ^ EXITING_GUEST_MODE))
+	return IN_GUEST_MODE;
+
+You could still get spurious posted interrupt IPIs, but the IPI handler 
+need not do anything at all and that is much better.
+
+> if we're ok with KVM
+> processing virtual interrupts that technically shouldn't happen, yet.  E.g. if
+> the L0 PINV handler consumes vIRR bits that were set after the last PI from L1.
+
+I actually find it curious that the spec promises posted interrupt 
+processing to be triggered only by the arrival of the posted interrupt 
+IPI.  Why couldn't the processor in principle snoop for the address of 
+the ON bit instead, similar to an MWAIT?
+
+But even without that, I don't think the spec promises that kind of 
+strict ordering with respect to what goes on in the source.  Even though 
+posted interrupt processing is atomic with the acknowledgement of the 
+posted interrupt IPI, the spec only promises that the PINV triggers an 
+_eventual_ scan of PID.PIR when the interrupt controller delivers an 
+unmasked external interrupt to the destination CPU.  You can still have 
+something like
+
+	set PID.PIR[100]
+	set PID.ON
+					processor starts executing a
+					 very slow instruction...
+	send PINV
+	set PID.PIR[200]
+					acknowledge PINV
+
+and then vector 200 would be delivered before vector 100.  Of course 
+with nested PI the effect would be amplified, but it's possible even on 
+bare metal.
 
 Paolo
 
