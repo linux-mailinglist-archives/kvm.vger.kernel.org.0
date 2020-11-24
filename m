@@ -2,189 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECC782C1F0B
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 08:44:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D968B2C1EFC
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 08:41:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730188AbgKXHms (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 02:42:48 -0500
-Received: from mx0b-00128a01.pphosted.com ([148.163.139.77]:6542 "EHLO
-        mx0b-00128a01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730073AbgKXHms (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 02:42:48 -0500
-X-Greylist: delayed 2578 seconds by postgrey-1.27 at vger.kernel.org; Tue, 24 Nov 2020 02:42:47 EST
-Received: from pps.filterd (m0167091.ppops.net [127.0.0.1])
-        by mx0b-00128a01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 0AO6oEnN011699;
-        Tue, 24 Nov 2020 01:59:48 -0500
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2173.outbound.protection.outlook.com [104.47.59.173])
-        by mx0b-00128a01.pphosted.com with ESMTP id 34y0fh6v73-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 01:59:48 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SQbU9jp5L5kpUEhHpGpAmwLsiIRboBPMM6wkS+cdEAMO3zKupXLmGL+P3JoaVb32uk7DzZXAr62hS0aziKRSftsd9vSvwwevy7d+7qMBXPCaKXzIwmq9feWnH6lMriD99lo20cnZ97/BQWwb/0EsquJvEwiDymFAQN+VCvO7cMTVgtYmZyUwCiWm2BS/IH94SYY7A91LS+9OqpJ1CaRhhcL2XWVi9Zb7UL2Milb7rwn0C4aHDm+6/Wym1ITko7vUCuZd7Ru2wyPH3WG0r4ol36MmOuyW7A75PkZRrVEtS3T37VJ+tlgBE1taXuwfBZJ7m5yTf2dVa+Gm6ukO9Q8dtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZAqwT7Nc26h/kUwls/rv05fuEBOSmKBY8xz4E9u0qc8=;
- b=kEH+KrAXw7chkI/w08BSxSsI/wlJqaYR6LG+Ov8gsjhKWN5L3KDP1MlgeixnL8xJ/cV7iyz8aiYSCPV0iJHcFDzp7/5AMvSKsZ5o7ycKYPRhw/ndDHxEviGNqrw/22qputDejuNxKJ8bXpoRjeRmLuYmi5ZPekKNHLb970K0w8DEjR0RN/QK4cA4CJIC0rKPR44v9I9UyGxFw7WqjMJhfp7JgGZXCbe81gQHgwIQxTjpMEDgZ/hYyItZxZe0f5kL806IYl8aYTha/OrZGW9F0qD6cWVHJE88A6kgO8869NTHpN3Brn13gD1w3jva3exuUCx1zq8C5ObUnd5VSDaFUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=analog.com; dmarc=pass action=none header.from=analog.com;
- dkim=pass header.d=analog.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=analog.onmicrosoft.com; s=selector2-analog-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZAqwT7Nc26h/kUwls/rv05fuEBOSmKBY8xz4E9u0qc8=;
- b=h39zRdVHXpo1JwjzQrJVx2Rx5tma2+3hPjpsuo2xyvn/w71c50pgX5gWENEs6Sbq9LMNhBPRmhXSxgj/PII6scunvuK9seOz1y2BnX4boJnd50rvWwXoXAI03ut+RUEiMB25df74jsSbh5vJPhvkSybwoe7jnIqY1d+3xTFbo88=
-Received: from DM6PR03MB4411.namprd03.prod.outlook.com (2603:10b6:5:10f::14)
- by DM5PR03MB3243.namprd03.prod.outlook.com (2603:10b6:4:41::35) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3589.28; Tue, 24 Nov
- 2020 06:59:45 +0000
-Received: from DM6PR03MB4411.namprd03.prod.outlook.com
- ([fe80::f99d:8928:7e14:1a62]) by DM6PR03MB4411.namprd03.prod.outlook.com
- ([fe80::f99d:8928:7e14:1a62%6]) with mapi id 15.20.3589.030; Tue, 24 Nov 2020
- 06:59:45 +0000
-From:   "Ardelean, Alexandru" <alexandru.Ardelean@analog.com>
-To:     "Ardelean, Alexandru" <alexandru.Ardelean@analog.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "mst@redhat.com" <mst@redhat.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-Subject: RE: [PATCH v2] uio/uio_pci_generic: remove unneeded pci_set_drvdata()
-Thread-Topic: [PATCH v2] uio/uio_pci_generic: remove unneeded
- pci_set_drvdata()
-Thread-Index: AQHWwaUUIcZryZWIbUiXJB5cBXvgBKnW20eg
-Date:   Tue, 24 Nov 2020 06:59:45 +0000
-Message-ID: <DM6PR03MB441117D7BD9A2A539C2D2480F9FB0@DM6PR03MB4411.namprd03.prod.outlook.com>
-References: <20201119145906.73727-1-alexandru.ardelean@analog.com>
- <20201123143447.16829-1-alexandru.ardelean@analog.com>
-In-Reply-To: <20201123143447.16829-1-alexandru.ardelean@analog.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-ref: =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcYWFyZGVsZWFc?=
- =?us-ascii?Q?YXBwZGF0YVxyb2FtaW5nXDA5ZDg0OWI2LTMyZDMtNGE0MC04NWVlLTZiODRi?=
- =?us-ascii?Q?YTI5ZTM1Ylxtc2dzXG1zZy1hMThmZDdkOS0yZTIyLTExZWItYTVjZC00MTU2?=
- =?us-ascii?Q?NDUwMDAwMzBcYW1lLXRlc3RcYTE4ZmQ3ZGItMmUyMi0xMWViLWE1Y2QtNDE1?=
- =?us-ascii?Q?NjQ1MDAwMDMwYm9keS50eHQiIHN6PSIxODI5IiB0PSIxMzI1MDY3NDc4NDk0?=
- =?us-ascii?Q?MTI3NzMiIGg9InkrYzhuN0RCWlk0TE4xQ0piSUNIWTdHMjkrTT0iIGlkPSIi?=
- =?us-ascii?Q?IGJsPSIwIiBibz0iMSIgY2k9ImNBQUFBRVJIVTFSU1JVRk5DZ1VBQUVvQ0FB?=
- =?us-ascii?Q?Q2xFT2hqTDhMV0FaSWRFbHQwZTFtNGtoMFNXM1I3V2JnREFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFIQUFBQURhQVFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFFQUFRQUJBQUFBZ3NWMDRRQUFBQUFBQUFBQUFBQUFBSjRBQUFCaEFHUUFh?=
- =?us-ascii?Q?UUJmQUhNQVpRQmpBSFVBY2dCbEFGOEFjQUJ5QUc4QWFnQmxBR01BZEFCekFG?=
- =?us-ascii?Q?OEFaZ0JoQUd3QWN3QmxBRjhBWmdCdkFITUFhUUIwQUdrQWRnQmxBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUVBQUFBQUFBQUFBZ0FBQUFBQW5nQUFBR0VBWkFCcEFGOEFjd0JsQUdNQWRR?=
- =?us-ascii?Q?QnlBR1VBWHdCd0FISUFid0JxQUdVQVl3QjBBSE1BWHdCMEFHa0FaUUJ5QURF?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FB?=
- =?us-ascii?Q?QUFBQUNlQUFBQVlRQmtBR2tBWHdCekFHVUFZd0IxQUhJQVpRQmZBSEFBY2dC?=
- =?us-ascii?Q?dkFHb0FaUUJqQUhRQWN3QmZBSFFBYVFCbEFISUFNZ0FBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFBPT0iLz48L21l?=
- =?us-ascii?Q?dGE+?=
-x-dg-rorf: true
-authentication-results: analog.com; dkim=none (message not signed)
- header.d=none;analog.com; dmarc=none action=none header.from=analog.com;
-x-originating-ip: [188.27.128.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: b876e12d-b7ef-4a6f-75e2-08d8904686be
-x-ms-traffictypediagnostic: DM5PR03MB3243:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR03MB3243159AE7A3E29AEB3B518FF9FB0@DM5PR03MB3243.namprd03.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:480;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +cJD5RHodrAwR9Vjr6EeoGBq55ggR7ebNXD52kiNmCMS2Ypemmve1CJVZFlulqmuxiSOpDN7srbQFGwLUMfltirevmxWRuRiQ7VUVNvYpKEOG3dymW/iCaSQXjD0/NXlQoXLid8A9BKVJCikIRmK/7ZEpqq2YIr4I+FCGAuBKxQct8QW+2hYSzU1yXyFL8kCjQomMxrtd4k5ezE0ybht0ABdryb1TuURZriYoIFsYYhR+RVb9U1qMsqbAddmJyJ00CXJKkgMc+XOs3CYDdV7SmuBQjVZENoZ3F8yDWmrrmHIOPD5TkeLC3nG6dtQII4OX6KeiaiS8ZoSIgKRNC184KbLQfS5CdhhfmQte5Zqh5AurUL7DZ1O/V2taztEpeHW
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB4411.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(396003)(376002)(136003)(346002)(8676002)(2906002)(4326008)(8936002)(186003)(478600001)(33656002)(9686003)(66946007)(55016002)(26005)(52536014)(86362001)(83380400001)(5660300002)(316002)(53546011)(71200400001)(76116006)(66446008)(64756008)(66556008)(66476007)(6506007)(7696005)(110136005)(54906003)(41533002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: ARz5hOQCb31fuEVyL7Jt2Jgys8/QApeIxT50nN6X9KMleziUrj5oGgK7im4sgjaE5AixpZnib/92b0rfHoTrgcFwrKvHPqfbGZ5DM2F/f+ivx4tzf8Lx9qt4+vYAqbidkFl007juskjL7sZUoysar1jtnWasrS+Ehwpn1SjbQ1Z6pCivtLXE5obtfIxzSZRsc2UFbI98zwT5vilqE/kPQCqhCmM0LCa6mr19r7fgACun1R2dfdbUpGRMq4VzNs+gSDErjMJwPHU4YTzHFVkjH9MMywEIYyohXiLN1y2gyrRjhC7M7Kn9TvPzXPbj74ftUbL+piMDU+fjBsEH7DWhkZ8+8Zk7GUNLOIFURMyF0PUraWHpftLjm4/ohmLdVFIx8YfWHzZwKrIVdPM7yWQWDiTZroU8t2B9O3wCkOU32zF0QnS3O2NTmq+vVzf3yIPcdIfx6il4dMEbilmoA3SXa5QvWtpvFilBzUiTC0k9CS4i8kHYeEiqDxaFIOXAUJn5NKdTogzWM9pkZOxIsV6PG0rBJSK/fyi/Drn1c5rCnA+HR9CcbRY5HqEk/Bg+25Ul78+I5uBLZNT2QJ5mZDUK4d9wtQSRbcZK+M6+DlnsjWAZbWRoWhFRFblYYRYmA42NVGd9BoGMHbku9iNPNizV0ARAKljOXAjjgW9OtiWv2umw9W/GiZbCqgaS+Wo7GaE9tNsCH2fOyfnYI2tI9uPr+XcFirOM1DCmMHHD7DGDmfwyz/saxqi6YEbzJIR9/uQn6F2WuZaA3/OlN0KRzQ2Rhn/HffWIHGVxFGF2f9btulyNy72tIZFkaVzcYAmH0iiN2U2013T8FExokmutJWJcQnUkitqVvPq9Qpg5IQK7DhOSEOOyRPulSQ+rqoVrzwI+f5SPa0akJVAmQDCJiRJzbw==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1730094AbgKXHir (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 02:38:47 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:7973 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728934AbgKXHiq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 02:38:46 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CgG90577CzhfY3;
+        Tue, 24 Nov 2020 15:38:28 +0800 (CST)
+Received: from [10.174.187.74] (10.174.187.74) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 24 Nov 2020 15:38:32 +0800
+Subject: Re: [RFC PATCH v1 1/4] irqchip/gic-v4.1: Plumb get_irqchip_state VLPI
+ callback
+To:     Marc Zyngier <maz@kernel.org>
+CC:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20201123065410.1915-1-lushenming@huawei.com>
+ <20201123065410.1915-2-lushenming@huawei.com>
+ <f64703b618a2ebc6c6f5c423e2b779c6@kernel.org>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <7bc7e428-cfd5-6171-dc1e-4be097c46690@huawei.com>
+Date:   Tue, 24 Nov 2020 15:38:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-X-OriginatorOrg: analog.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB4411.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b876e12d-b7ef-4a6f-75e2-08d8904686be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2020 06:59:45.4285
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: eaa689b4-8f87-40e0-9c6f-7228de4d754a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BP0G8Ucqnorii7SF5P23Ux43Z+0/hFR+hP6hIgeZgDvl20bRkHoKKVkjJlZNV5LgllkpbhLRwkCWdc34Inv4sh/NBg+5xgijb1oo1dq4vD0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR03MB3243
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-24_03:2020-11-24,2020-11-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 impostorscore=0 bulkscore=0 priorityscore=1501 mlxscore=0
- phishscore=0 adultscore=0 mlxlogscore=999 clxscore=1015 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011240039
+In-Reply-To: <f64703b618a2ebc6c6f5c423e2b779c6@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.187.74]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2020/11/23 17:01, Marc Zyngier wrote:
+> On 2020-11-23 06:54, Shenming Lu wrote:
+>> From: Zenghui Yu <yuzenghui@huawei.com>
+>>
+>> Up to now, the irq_get_irqchip_state() callback of its_irq_chip
+>> leaves unimplemented since there is no architectural way to get
+>> the VLPI's pending state before GICv4.1. Yeah, there has one in
+>> v4.1 for VLPIs.
+>>
+>> With GICv4.1, after unmapping the vPE, which cleans and invalidates
+>> any caching of the VPT, we can get the VLPI's pending state by
+> 
+> This is a crucial note: without this unmapping and invalidation,
+> the pending bits are not generally accessible (they could be cached
+> in a GIC private structure, cache or otherwise).
+> 
+>> peeking at the VPT. So we implement the irq_get_irqchip_state()
+>> callback of its_irq_chip to do it.
+>>
+>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>> ---
+>>  drivers/irqchip/irq-gic-v3-its.c | 38 ++++++++++++++++++++++++++++++++
+>>  1 file changed, 38 insertions(+)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index 0fec31931e11..287003cacac7 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -1695,6 +1695,43 @@ static void its_irq_compose_msi_msg(struct
+>> irq_data *d, struct msi_msg *msg)
+>>      iommu_dma_compose_msi_msg(irq_data_get_msi_desc(d), msg);
+>>  }
+>>
+>> +static bool its_peek_vpt(struct its_vpe *vpe, irq_hw_number_t hwirq)
+>> +{
+>> +    int mask = hwirq % BITS_PER_BYTE;
+> 
+> nit: this isn't a mask, but a shift instead. BIT(hwirq % BPB) would give
+> you a mask.
 
+Ok, I will correct it.
 
-> -----Original Message-----
-> From: Alexandru Ardelean <alexandru.ardelean@analog.com>
-> Sent: Monday, November 23, 2020 4:35 PM
-> To: linux-kernel@vger.kernel.org; kvm@vger.kernel.org
-> Cc: mst@redhat.com; gregkh@linuxfoundation.org; Ardelean, Alexandru
-> <alexandru.Ardelean@analog.com>
-> Subject: [PATCH v2] uio/uio_pci_generic: remove unneeded pci_set_drvdata(=
-)
->=20
-> The pci_get_drvdata() was moved during commit ef84928cff58
-> ("uio/uio_pci_generic: use device-managed function equivalents").
->=20
-> Storing a private object with pci_set_drvdata() doesn't make sense since =
-that
-> change, since there is no more pci_get_drvdata() call in the driver to re=
-trieve the
-> information.
->=20
-> This change removes it.
->=20
-> Fixes: ef84928cff58 ("io/uio_pci_generic: use device-managed function
-> equivalents")
-> Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
-> ---
+> 
+>> +    void *va;
+>> +    u8 *pt;
+>> +
+>> +    va = page_address(vpe->vpt_page);
+>> +    pt = va + hwirq / BITS_PER_BYTE;
+>> +
+>> +    return !!(*pt & (1U << mask));
+>> +}
+>> +
+>> +static int its_irq_get_irqchip_state(struct irq_data *d,
+>> +                     enum irqchip_irq_state which, bool *val)
+>> +{
+>> +    struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+>> +    struct its_vlpi_map *map = get_vlpi_map(d);
+>> +
+>> +    if (which != IRQCHIP_STATE_PENDING)
+>> +        return -EINVAL;
+>> +
+>> +    /* not intended for physical LPI's pending state */
+>> +    if (!map)
+>> +        return -EINVAL;
+>> +
+>> +    /*
+>> +     * In GICv4.1, a VMAPP with {V,Alloc}=={0,1} cleans and invalidates
+>> +     * any caching of the VPT associated with the vPEID held in the GIC.
+>> +     */
+>> +    if (!is_v4_1(its_dev->its) || atomic_read(&map->vpe->vmapp_count))
+> 
+> It isn't clear to me what prevents this from racing against a mapping of
+> the VPE. Actually, since we only hold the LPI irqdesc lock, I'm pretty sure
+> nothing prevents it.
 
-Forgot the changelog
-Apologies.
+Yes, should have the vmovp_lock held?
+And is it necessary to also hold this lock in its_vpe_irq_domain_activate/deactivate?
 
-Changelog v1 -> v2:
-* added Fixes tag
-* updated commit comment a bit from V1
+> 
+>> +        return -EACCES;
+> 
+> I can sort of buy EACCESS for a VPE that is currently mapped, but a non-4.1
+> ITS should definitely return EINVAL.
 
->  drivers/uio/uio_pci_generic.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
->=20
-> diff --git a/drivers/uio/uio_pci_generic.c b/drivers/uio/uio_pci_generic.=
-c index
-> 1c6c09e1280d..b8e44d16279f 100644
-> --- a/drivers/uio/uio_pci_generic.c
-> +++ b/drivers/uio/uio_pci_generic.c
-> @@ -101,13 +101,7 @@ static int probe(struct pci_dev *pdev,
->  			 "no support for interrupts?\n");
->  	}
->=20
-> -	err =3D devm_uio_register_device(&pdev->dev, &gdev->info);
-> -	if (err)
-> -		return err;
-> -
-> -	pci_set_drvdata(pdev, gdev);
-> -
-> -	return 0;
-> +	return devm_uio_register_device(&pdev->dev, &gdev->info);
->  }
->=20
->  static struct pci_driver uio_pci_driver =3D {
-> --
-> 2.17.1
+Alright, EINVAL looks better.
 
+> 
+>> +
+>> +    *val = its_peek_vpt(map->vpe, map->vintid);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>  static int its_irq_set_irqchip_state(struct irq_data *d,
+>>                       enum irqchip_irq_state which,
+>>                       bool state)
+>> @@ -1975,6 +2012,7 @@ static struct irq_chip its_irq_chip = {
+>>      .irq_eoi        = irq_chip_eoi_parent,
+>>      .irq_set_affinity    = its_set_affinity,
+>>      .irq_compose_msi_msg    = its_irq_compose_msi_msg,
+>> +    .irq_get_irqchip_state    = its_irq_get_irqchip_state,
+> 
+> My biggest issue with this is that it isn't a reliable interface.
+> It happens to work in the context of KVM, because you make sure it
+> is called at the right time, but that doesn't make it safe in general
+> (anyone with the interrupt number is allowed to call this at any time).
+
+We check the vmapp_count in it to ensure the unmapping of the vPE, and
+let the caller do the unmapping (they should know whether it is the right
+time). If the unmapping is not done, just return a failure.
+
+> 
+> Is there a problem with poking at the VPT page from the KVM side?
+> The code should be exactly the same (maybe simpler even), and at least
+> you'd be guaranteed to be in the correct context.
+
+Yeah, that also seems a good choice.
+If you prefer it, we can try to realize it in v2.
+
+> 
+>>      .irq_set_irqchip_state    = its_irq_set_irqchip_state,
+>>      .irq_retrigger        = its_irq_retrigger,
+>>      .irq_set_vcpu_affinity    = its_irq_set_vcpu_affinity,
+> 
+> Thanks,
+> 
+>         M.
