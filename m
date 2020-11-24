@@ -2,130 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 844F32C2E08
-	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 18:09:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B7BA2C2E82
+	for <lists+kvm@lfdr.de>; Tue, 24 Nov 2020 18:29:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403912AbgKXRJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 12:09:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42208 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2403885AbgKXRJE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 12:09:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606237742;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z5atMwpKAatS9hTVo/mzcGTzZMJlv8pILYgqT1sV3tI=;
-        b=SGW/ZOUQ4l6Y4FnWJ7e1MZ+4Jk1UEhqpIR+5cNnEeJDoi4j+pwx0j3kk/dSE2LdYAWUGNK
-        1v+4BLyMnAc/Jf0nv1RGXh6hlz1sWm3359RCeMYRRhaV7puWV254A9E66jF7RNEWoUiwGq
-        ZnRZlqi1O4FiVuFiqAjoMmPJXBVwXMg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-rf_htEO7MVGLXq5-13Ms2Q-1; Tue, 24 Nov 2020 12:08:48 -0500
-X-MC-Unique: rf_htEO7MVGLXq5-13Ms2Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9824D1016E60;
-        Tue, 24 Nov 2020 17:07:55 +0000 (UTC)
-Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 761B15C1A3;
-        Tue, 24 Nov 2020 17:07:51 +0000 (UTC)
-Date:   Tue, 24 Nov 2020 10:07:51 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Justin He <Justin.He@arm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH] vfio iommu type1: Bypass the vma permission check in
- vfio_pin_pages_remote()
-Message-ID: <20201124100751.793c671f@w520.home>
-In-Reply-To: <AM6PR08MB32248D873EDD8923675F2D3BF7FC0@AM6PR08MB3224.eurprd08.prod.outlook.com>
-References: <20201119142737.17574-1-justin.he@arm.com>
-        <20201119100508.483c6503@w520.home>
-        <AM6PR08MB32248D873EDD8923675F2D3BF7FC0@AM6PR08MB3224.eurprd08.prod.outlook.com>
+        id S2390860AbgKXR1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 12:27:12 -0500
+Received: from foss.arm.com ([217.140.110.172]:44898 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390725AbgKXR1L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Nov 2020 12:27:11 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18C011396;
+        Tue, 24 Nov 2020 09:27:11 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6253F3F71F;
+        Tue, 24 Nov 2020 09:27:10 -0800 (PST)
+Subject: Re: [PATCH 0/8] KVM: arm64: Disabled PMU handling
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     kernel-team@android.com
+References: <20201113182602.471776-1-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <750f5543-054a-f1aa-229f-2d41b8e233dd@arm.com>
+Date:   Tue, 24 Nov 2020 17:28:30 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201113182602.471776-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Nov 2020 02:37:32 +0000
-Justin He <Justin.He@arm.com> wrote:
+Hi Marc,
 
-> Hi Alex, thanks for the comments.
-> See mine below:
-> 
-> > -----Original Message-----
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, November 20, 2020 1:05 AM
-> > To: Justin He <Justin.He@arm.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org; linux-
-> > kernel@vger.kernel.org
-> > Subject: Re: [PATCH] vfio iommu type1: Bypass the vma permission check in
-> > vfio_pin_pages_remote()
-> >
-> > On Thu, 19 Nov 2020 22:27:37 +0800
-> > Jia He <justin.he@arm.com> wrote:
-> >  
-> > > The permission of vfio iommu is different and incompatible with vma
-> > > permission. If the iotlb->perm is IOMMU_NONE (e.g. qemu side), qemu will
-> > > simply call unmap ioctl() instead of mapping. Hence vfio_dma_map() can't
-> > > map a dma region with NONE permission.
-> > >
-> > > This corner case will be exposed in coming virtio_fs cache_size
-> > > commit [1]
-> > >  - mmap(NULL, size, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-> > >    memory_region_init_ram_ptr()
-> > >  - re-mmap the above area with read/write authority.
-> > >  - vfio_dma_map() will be invoked when vfio device is hotplug added.
-> > >
-> > > qemu:
-> > > vfio_listener_region_add()
-> > > vfio_dma_map(..., readonly=false)
-> > > map.flags is set to VFIO_DMA_MAP_FLAG_READ|VFIO_..._WRITE
-> > > ioctl(VFIO_IOMMU_MAP_DMA)
-> > >
-> > > kernel:
-> > > vfio_dma_do_map()
-> > > vfio_pin_map_dma()
-> > > vfio_pin_pages_remote()
-> > > vaddr_get_pfn()
-> > > ...
-> > > check_vma_flags() failed! because
-> > > vm_flags hasn't VM_WRITE && gup_flags
-> > > has FOLL_WRITE
-> > >
-> > > It will report error in qemu log when hotplug adding(vfio) a nvme disk
-> > > to qemu guest on an Ampere EMAG server:
-> > > "VFIO_MAP_DMA failed: Bad address"  
-> >
-> > I don't fully understand the argument here, I think this is suggesting
-> > that because QEMU won't call VFIO_IOMMU_MAP_DMA on a region that has
-> > NONE permission, the kernel can ignore read/write permission by using
-> > FOLL_FORCE.  Not only is QEMU not the only userspace driver for vfio,
-> > but regardless of that, we can't trust the behavior of any given
-> > userspace driver.  Bypassing the permission check with FOLL_FORCE seems
-> > like it's placing the trust in the user, which seems like a security
-> > issue.  Thanks,  
-> Yes, this might have side impact on security.
-> But besides this simple fix(adding FOLL_FORCE), do you think it is a good
-> idea that:
-> Qemu provides a special vfio_dma_map_none_perm() to allow mapping a
-> region with NONE permission?
+I believe there is something missing from this series.
 
-If NONE permission implies that we use FOLL_FORCE as described here to
-ignore the r+w permissions and trust that the user knows what they're
-doing, that seems like a non-starter.  Ultimately I think what you're
-describing is a scenario where our current permission check fails and
-the solution is probably to extend the check to account for other ways
-that a user may have access to a vma rather than bypass the check.
+The original behaviour, which this series changes, was not to do register
+emulation and PMU state update if the PMU wasn't ready, where vcpu->arch.pmu.ready
+was set to true if the PMU was initialized properly in kvm_vcpu_first_run_init()
+-> kvm_arm_pmu_v3_enable().
+
+The series changes PMU emulation such that register emulation and pmu state update
+is gated only on the VCPU feature being set. This means that now userspace can set
+the VCPU feature, don't do any initialization, and run a guest which can access
+PMU registers. Also kvm_pmu_update_state() will now be called before each VM
+entry. I'm not exactly sure what happens if we call kvm_vgic_inject_irq() for an
+irq_num = 0 and not owned by the PMU (the owner is set KVM_ARM_VCPU_PMU_V3_INIT ->
+kvm_arm_pmu_v3_init()), but I don't think that's allowed.
+
+I was also able to trigger this warning with a modified version of kvmtool:
+
+[  118.972174] ------------[ cut here ]------------
+[  118.974212] Unknown PMU version 0
+[  118.977622] WARNING: CPU: 0 PID: 238 at arch/arm64/kvm/pmu-emul.c:33
+kvm_pmu_event_mask.isra.0+0x6c/0x74
+[  118.987271] Modules linked in:
+[  118.990414] CPU: 0 PID: 238 Comm: kvm-vcpu-0 Not tainted
+5.10.0-rc4-00008-gc4cd5186fc2a #37
+[  118.999006] Hardware name: Globalscale Marvell ESPRESSOBin Board (DT)
+[  119.005641] pstate: 40000005 (nZcv daif -PAN -UAO -TCO BTYPE=--)
+[  119.011825] pc : kvm_pmu_event_mask.isra.0+0x6c/0x74
+[  119.016929] lr : kvm_pmu_event_mask.isra.0+0x6c/0x74
+[  119.022034] sp : ffff80001274ba40
+[  119.025438] x29: ffff80001274ba40 x28: ffff0000091c46a0
+[  119.030903] x27: 0000000000000000 x26: ffff800011e16ee0
+[  119.036368] x25: ffff800011e166c8 x24: ffff000006e00000
+[  119.041834] x23: 0000000000000000 x22: ffff80001274bb20
+[  119.047300] x21: 0000000000000000 x20: 000000000000001f
+[  119.052765] x19: 0000000000000000 x18: 0000000000000030
+[  119.058231] x17: 0000000000000000 x16: 0000000000000000
+[  119.063697] x15: ffff0000022caf30 x14: ffffffffffffffff
+[  119.069163] x13: ffff800011b72718 x12: 0000000000000456
+[  119.074627] x11: 0000000000000172 x10: ffff800011bca718
+[  119.080094] x9 : 00000000fffff000 x8 : ffff800011b72718
+[  119.085559] x7 : ffff800011bca718 x6 : 0000000000000000
+[  119.091025] x5 : 0000000000000000 x4 : ffff00003ddbe900
+[  119.096491] x3 : ffff00003ddc57f0 x2 : ffff00003ddbe900
+[  119.101956] x1 : 34d0d4b3321b9100 x0 : 0000000000000000
+[  119.107422] Call trace:
+[  119.109935]  kvm_pmu_event_mask.isra.0+0x6c/0x74
+[  119.114684]  kvm_pmu_set_counter_event_type+0x2c/0x80
+[  119.119882]  access_pmu_evtyper+0x128/0x180
+[  119.124181]  perform_access+0x34/0xb0
+[  119.127942]  kvm_handle_sys_reg+0xc8/0x160
+[  119.132156]  handle_exit+0x6c/0x1f0
+[  119.135738]  kvm_arch_vcpu_ioctl_run+0x1e8/0x73c
+[  119.140488]  kvm_vcpu_ioctl+0x23c/0x544
+[  119.144433]  __arm64_sys_ioctl+0xa8/0xf0
+[  119.148464]  el0_svc_common.constprop.0+0x78/0x1a0
+[  119.153390]  do_el0_svc+0x24/0x90
+[  119.156796]  el0_sync_handler+0x254/0x260
+[  119.160915]  el0_sync+0x174/0x180
+[  119.164319] ---[ end trace c0c2e6f299d58823 ]---
+
+I removed all KVM_ARM_VCPU_PMU_V3_CTRL ioctl calls from kvmtool's pmu emulation,
+and I started the pmu test from kvm-unit-tests:
+
+$ ./lkvm-pmu run -c1 -m64 -f arm/pmu.flat --pmu -p cycle-counter
+
+The reason for the warning is that the correct value for kvm->arch.pmuver is set
+in kvm_arm_pmu_v3_set_attr(), which is not called anymore.
+
+This diff seems to solve the issue:
+
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 643cf819f3c0..150b9cb0f741 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -825,9 +825,12 @@ bool kvm_arm_support_pmu_v3(void)
+ 
+ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+ {
+-       if (!vcpu->arch.pmu.created)
++       if (!kvm_vcpu_has_pmu(vcpu))
+                return 0;
+ 
++       if (!vcpu->arch.pmu.created)
++               return -ENOEXEC;
++
+        /*
+         * A valid interrupt configuration for the PMU is either to have a
+         * properly configured interrupt number and using an in-kernel
+
+If you agree with the fix, I can send a proper patch. vcpu->arch.pmu.created is
+set in kvm_arm_pmu_v3_init(), which checks if the interrupt ID has been set. I
+chose to return -ENOEXEC  because that's what KVM_RUN returns if the vcpu isn't
+initialized in kvm_arch_vcpu_ioctl_run().
+
 Thanks,
 
 Alex
 
+On 11/13/20 6:25 PM, Marc Zyngier wrote:
+> It recently dawned on me that the way we handle PMU traps when the PMU
+> is disabled is plain wrong. We consider that handling the registers as
+> RAZ/WI is a fine thing to do, while the ARMv8 ARM is pretty clear that
+> that's not OK and that such registers should UNDEF when FEAT_PMUv3
+> doesn't exist. I went all the way back to the first public version of
+> the spec, and it turns out we were *always* wrong.
+>
+> It probably comes from the fact that we used not to trap the ID
+> registers, and thus were unable to advertise the lack of PMU, but
+> that's hardly an excuse. So let's fix the damned thing.
+>
+> This series adds an extra check in the helpers that check for the
+> validity of the PMU access (most of the registers have to checked
+> against some enable flags and/or the accessing exception level), and
+> rids us of the RAZ/WI behaviour.
+>
+> This enables us to make additional cleanups, to the point where we can
+> remove the PMU "ready" state that always had very bizarre semantics.
+> All in all, a negative diffstat, and spec compliant behaviours. What's
+> not to like?
+>
+> I've run a few guests with and without PMUs as well as KUT, and
+> nothing caught fire. The patches are on top of kvmarm/queue.
+>
+> Marc Zyngier (8):
+>   KVM: arm64: Add kvm_vcpu_has_pmu() helper
+>   KVM: arm64: Set ID_AA64DFR0_EL1.PMUVer to 0 when no PMU support
+>   KVM: arm64: Refuse illegal KVM_ARM_VCPU_PMU_V3 at reset time
+>   KVM: arm64: Inject UNDEF on PMU access when no PMU configured
+>   KVM: arm64: Remove PMU RAZ/WI handling
+>   KVM: arm64: Remove dead PMU sysreg decoding code
+>   KVM: arm64: Gate kvm_pmu_update_state() on the PMU feature
+>   KVM: arm64: Get rid of the PMU ready state
+>
+>  arch/arm64/include/asm/kvm_host.h |  3 ++
+>  arch/arm64/kvm/pmu-emul.c         | 11 +++----
+>  arch/arm64/kvm/reset.c            |  4 +++
+>  arch/arm64/kvm/sys_regs.c         | 51 ++++++++-----------------------
+>  include/kvm/arm_pmu.h             |  3 --
+>  5 files changed, 24 insertions(+), 48 deletions(-)
+>
