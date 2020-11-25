@@ -2,166 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FD7B2C36AF
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 03:31:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 164AA2C39C5
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 08:14:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726188AbgKYCS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 21:18:28 -0500
-Received: from mga01.intel.com ([192.55.52.88]:3710 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725616AbgKYCS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Nov 2020 21:18:28 -0500
-IronPort-SDR: mE2EYBsCJ8aWVvveXOTun/vK0rYq/ifdV/q4BxW5GGP62gFWwFREKDR10QcesjQyoVnezk6kUZ
- JWCS4Ae2l65g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9815"; a="190186325"
-X-IronPort-AV: E=Sophos;i="5.78,367,1599548400"; 
-   d="scan'208";a="190186325"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2020 18:18:27 -0800
-IronPort-SDR: PxDT7wIK6vg4ude8q+gVTZm2n/bqdKFL/4Kk0K22bSnazJY6R5cpC6pUfv2wGkpL2iXAVQBULd
- sgzRD+N6EvGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,367,1599548400"; 
-   d="scan'208";a="536696759"
-Received: from unknown (HELO coxu-arch-shz.sh.intel.com) ([10.239.160.22])
-  by fmsmga005.fm.intel.com with ESMTP; 24 Nov 2020 18:18:26 -0800
-From:   Colin Xu <colin.xu@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     colin.xu@intel.com, swee.yee.fonn@intel.com
-Subject: [RFC PATCH] vfio/pci: Allow force needs_pm_restore as specified by device:vendor
-Date:   Wed, 25 Nov 2020 10:18:24 +0800
-Message-Id: <20201125021824.27411-1-colin.xu@intel.com>
-X-Mailer: git-send-email 2.29.2
+        id S1727136AbgKYHJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Nov 2020 02:09:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35385 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726596AbgKYHJS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 02:09:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606288156;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VUSbcPm6ZnSi1CPK9hIkQAxwx3nEzibHi6QrBh+W7dE=;
+        b=ZqHcBIySTUrn8hKxRxxApA/3H2Cx/C/pDCgReK3hOnRog4wGYv9/zYC5za/ZJ6iLWsddBP
+        eZL0hKjlsvtBFsZ4igfKMIJOLbtY/aYxGdxPDa5yW+7yFoWtGh9/5Xo93nxjz3S16L2+NC
+        AMXu6T9HUllgGK+b2X/h7smygRTNWXw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-bycO1I44PYCAiQ5nbkcSJA-1; Wed, 25 Nov 2020 02:09:11 -0500
+X-MC-Unique: bycO1I44PYCAiQ5nbkcSJA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEF5A809DD9;
+        Wed, 25 Nov 2020 07:09:08 +0000 (UTC)
+Received: from [10.72.13.165] (ovpn-13-165.pek2.redhat.com [10.72.13.165])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 09EF519C46;
+        Wed, 25 Nov 2020 07:08:33 +0000 (UTC)
+Subject: Re: [RFC PATCH 00/27] vDPA software assisted live migration
+To:     =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+References: <20201120185105.279030-1-eperezma@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <5a4d0b7a-fb62-9e78-9e85-9262dca57f1c@redhat.com>
+Date:   Wed, 25 Nov 2020 15:08:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20201120185105.279030-1-eperezma@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Force specific device listed in params pm_restore_ids to follow
-device state save/restore as needs_pm_restore.
-Some device has NoSoftRst so will skip current state save/restore enabled
-by needs_pm_restore. However once the device experienced power state
-D3<->D0 transition, either by idle_d3 or the guest driver changes PM_CTL,
-the guest driver won't get correct devie state although the configure
-space doesn't change.
 
-Cc: Swee Yee Fonn <swee.yee.fonn@intel.com>
-Signed-off-by: Colin Xu <colin.xu@intel.com>
----
- drivers/vfio/pci/vfio_pci.c | 66 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 65 insertions(+), 1 deletion(-)
+On 2020/11/21 上午2:50, Eugenio Pérez wrote:
+> This series enable vDPA software assisted live migration for vhost-net
+> devices. This is a new method of vhost devices migration: Instead of
+> relay on vDPA device's dirty logging capability, SW assisted LM
+> intercepts dataplane, forwarding the descriptors between VM and device.
+>
+> In this migration mode, qemu offers a new vring to the device to
+> read and write into, and disable vhost notifiers, processing guest and
+> vhost notifications in qemu. On used buffer relay, qemu will mark the
+> dirty memory as with plain virtio-net devices. This way, devices does
+> not need to have dirty page logging capability.
+>
+> This series is a POC doing SW LM for vhost-net devices, which already
+> have dirty page logging capabilities. None of the changes have actual
+> effect with current devices until last two patches (26 and 27) are
+> applied, but they can be rebased on top of any other. These checks the
+> device to meet all requirements, and disable vhost-net devices logging
+> so migration goes through SW LM. This last patch is not meant to be
+> applied in the final revision, it is in the series just for testing
+> purposes.
+>
+> For use SW assisted LM these vhost-net devices need to be instantiated:
+> * With IOMMU (iommu_platform=on,ats=on)
+> * Without event_idx (event_idx=off)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index e6190173482c..50a4141c9e1d 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -34,6 +34,15 @@
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
- #define DRIVER_DESC     "VFIO PCI - User Level meta-driver"
- 
-+#define VFIO_MAX_PM_DEV 32
-+struct vfio_pm_devs {
-+	struct {
-+		unsigned short  vendor;
-+		unsigned short  device;
-+	} ids[VFIO_MAX_PM_DEV];
-+	u32 count;
-+};
-+
- static char ids[1024] __initdata;
- module_param_string(ids, ids, sizeof(ids), 0);
- MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the vfio driver, format is \"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\" and multiple comma separated entries can be specified");
-@@ -64,6 +73,10 @@ static bool disable_denylist;
- module_param(disable_denylist, bool, 0444);
- MODULE_PARM_DESC(disable_denylist, "Disable use of device denylist. Disabling the denylist allows binding to devices with known errata that may lead to exploitable stability or security issues when accessed by untrusted users.");
- 
-+static char pm_restore_ids[1024] __initdata;
-+module_param_string(pm_restore_ids, pm_restore_ids, sizeof(pm_restore_ids), 0);
-+MODULE_PARM_DESC(pm_restore_ids, "comma separated device in format of \"vendor:device\"");
-+
- static inline bool vfio_vga_disabled(void)
- {
- #ifdef CONFIG_VFIO_PCI_VGA
-@@ -260,10 +273,50 @@ static bool vfio_pci_nointx(struct pci_dev *pdev)
- 	return false;
- }
- 
-+static struct vfio_pm_devs pm_devs = {0};
-+static void __init vfio_pci_fill_pm_ids(void)
-+{
-+	char *p, *id;
-+	int idx = 0;
-+
-+	/* no ids passed actually */
-+	if (pm_restore_ids[0] == '\0')
-+		return;
-+
-+	/* add ids specified in the module parameter */
-+	p = pm_restore_ids;
-+	while ((id = strsep(&p, ","))) {
-+		unsigned int vendor, device = PCI_ANY_ID;
-+		int fields;
-+
-+		if (!strlen(id))
-+			continue;
-+
-+		fields = sscanf(id, "%x:%x", &vendor, &device);
-+
-+		if (fields != 2) {
-+			pr_warn("invalid vendor:device string \"%s\"\n", id);
-+			continue;
-+		}
-+
-+		if (idx < VFIO_MAX_PM_DEV) {
-+			pm_devs.ids[idx].vendor = vendor;
-+			pm_devs.ids[idx].device = device;
-+			pm_devs.count++;
-+			idx++;
-+			pr_info("add [%04x:%04x] for needs_pm_restore\n",
-+				vendor, device);
-+		} else {
-+			pr_warn("Exceed maximum %d, skip adding [%04x:%04x] for needs_pm_restore\n",
-+				VFIO_MAX_PM_DEV, vendor, device);
-+		}
-+	}
-+}
-+
- static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
--	u16 pmcsr;
-+	u16 pmcsr, idx;
- 
- 	if (!pdev->pm_cap)
- 		return;
-@@ -271,6 +324,16 @@ static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
- 	pci_read_config_word(pdev, pdev->pm_cap + PCI_PM_CTRL, &pmcsr);
- 
- 	vdev->needs_pm_restore = !(pmcsr & PCI_PM_CTRL_NO_SOFT_RESET);
-+
-+	for (idx = 0; idx < pm_devs.count; idx++) {
-+		if (vdev->pdev->vendor == pm_devs.ids[idx].vendor &&
-+		    vdev->pdev->device == pm_devs.ids[idx].device) {
-+			vdev->needs_pm_restore = true;
-+			pr_info("force [%04x:%04x] to needs_pm_restore\n",
-+				vdev->pdev->vendor, vdev->pdev->device);
-+			break;
-+		}
-+	}
- }
- 
- /*
-@@ -2423,6 +2486,7 @@ static int __init vfio_pci_init(void)
- 		goto out_driver;
- 
- 	vfio_pci_fill_ids();
-+	vfio_pci_fill_pm_ids();
- 
- 	if (disable_denylist)
- 		pr_warn("device denylist disabled.\n");
--- 
-2.29.2
+
+So a question is at what level do we want to implement qemu assisted 
+live migration. To me it could be done at two levels:
+
+1) generic vhost level which makes it work for both vhost-net/vhost-user 
+and vhost-vDPA
+2) a specific type of vhost
+
+To me, having a generic one looks better but it would be much more 
+complicated. So what I read from this series is it was a vhost kernel 
+specific software assisted live migration which is a good start. 
+Actually it may even have real use case, e.g it can save dirty bitmaps 
+for guest with large memory. But we need to address the above 
+limitations first.
+
+So I would like to know what's the reason for mandating iommu platform 
+and ats? And I think we need to fix case of event idx support.
+
+
+>
+> Just the notification forwarding (with no descriptor relay) can be
+> achieved with patches 7 and 9, and starting migration. Partial applies
+> between 13 and 24 will not work while migrating on source, and patch
+> 25 is needed for the destination to resume network activity.
+>
+> It is based on the ideas of DPDK SW assisted LM, in the series of
+
+
+Actually we're better than that since there's no need the trick like 
+hardcoded IOVA for mediated(shadow) virtqueue.
+
+
+> DPDK's https://patchwork.dpdk.org/cover/48370/ .
+
+
+I notice that you do GPA->VA translations and try to establish a VA->VA 
+(use VA as IOVA) mapping via device IOTLB. This shortcut should work for 
+vhost-kernel/user but not vhost-vDPA. The reason is that there's no 
+guarantee that the whole 64bit address range could be used as IOVA. One 
+example is that for hardware IOMMU like intel, it usually has 47 or 52 
+bits of address width.
+
+So we probably need an IOVA allocator that can make sure the IOVA is not 
+overlapped and fit for [1]. We can probably build the IOVA for guest VA 
+via memory listeners. Then we have
+
+1) IOVA for GPA
+2) IOVA for shadow VQ
+
+And advertise IOVA to VA mapping to vhost.
+
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1b48dc03e575a872404f33b04cd237953c5d7498
+
+
+>
+> Comments are welcome.
+>
+> Thanks!
+>
+> Eugenio Pérez (27):
+>    vhost: Add vhost_dev_can_log
+>    vhost: Add device callback in vhost_migration_log
+>    vhost: Move log resize/put to vhost_dev_set_log
+>    vhost: add vhost_kernel_set_vring_enable
+>    vhost: Add hdev->dev.sw_lm_vq_handler
+>    virtio: Add virtio_queue_get_used_notify_split
+>    vhost: Route guest->host notification through qemu
+>    vhost: Add a flag for software assisted Live Migration
+>    vhost: Route host->guest notification through qemu
+>    vhost: Allocate shadow vring
+>    virtio: const-ify all virtio_tswap* functions
+>    virtio: Add virtio_queue_full
+>    vhost: Send buffers to device
+>    virtio: Remove virtio_queue_get_used_notify_split
+>    vhost: Do not invalidate signalled used
+>    virtio: Expose virtqueue_alloc_element
+>    vhost: add vhost_vring_set_notification_rcu
+>    vhost: add vhost_vring_poll_rcu
+>    vhost: add vhost_vring_get_buf_rcu
+>    vhost: Return used buffers
+>    vhost: Add vhost_virtqueue_memory_unmap
+>    vhost: Add vhost_virtqueue_memory_map
+>    vhost: unmap qemu's shadow virtqueues on sw live migration
+>    vhost: iommu changes
+>    vhost: Do not commit vhost used idx on vhost_virtqueue_stop
+>    vhost: Add vhost_hdev_can_sw_lm
+>    vhost: forbid vhost devices logging
+>
+>   hw/virtio/vhost-sw-lm-ring.h      |  39 +++
+>   include/hw/virtio/vhost.h         |   5 +
+>   include/hw/virtio/virtio-access.h |   8 +-
+>   include/hw/virtio/virtio.h        |   4 +
+>   hw/net/virtio-net.c               |  39 ++-
+>   hw/virtio/vhost-backend.c         |  29 ++
+>   hw/virtio/vhost-sw-lm-ring.c      | 268 +++++++++++++++++++
+>   hw/virtio/vhost.c                 | 431 +++++++++++++++++++++++++-----
+>   hw/virtio/virtio.c                |  18 +-
+>   hw/virtio/meson.build             |   2 +-
+>   10 files changed, 758 insertions(+), 85 deletions(-)
+>   create mode 100644 hw/virtio/vhost-sw-lm-ring.h
+>   create mode 100644 hw/virtio/vhost-sw-lm-ring.c
+
+
+So this looks like a pretty huge patchset which I'm trying to think of 
+ways to split. An idea is to do this is two steps
+
+1) implement a shadow virtqueue mode for vhost first (w/o live 
+migration). Then we can test descriptors relay, IOVA allocating, etc.
+2) add live migration support on top
+
+And it looks to me it's better to split the shadow virtqueue (virtio 
+driver part) into an independent file. And use generic name (w/o 
+"shadow") in order to be reused by other use cases as well.
+
+Thoughts?
 
