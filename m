@@ -2,29 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BEA42C3C8E
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:43:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB02F2C3CB2
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:44:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728587AbgKYJmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Nov 2020 04:42:06 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57188 "EHLO
+        id S1728733AbgKYJmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Nov 2020 04:42:43 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57312 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728360AbgKYJmC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:42:02 -0500
+        by vger.kernel.org with ESMTP id S1728461AbgKYJmD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:42:03 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 7E82E305D4F3;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id A1324305D4F4;
         Wed, 25 Nov 2020 11:35:43 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 63FA53072784;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 81DD83072785;
         Wed, 25 Nov 2020 11:35:43 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?=C8=98tefan=20=C8=98icleru?= <ssicleru@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v10 02/81] KVM: add kvm_vcpu_kick_and_wait()
-Date:   Wed, 25 Nov 2020 11:34:41 +0200
-Message-Id: <20201125093600.2766-3-alazar@bitdefender.com>
+Subject: [PATCH v10 03/81] KVM: add kvm_get_max_gfn()
+Date:   Wed, 25 Nov 2020 11:34:42 +0200
+Message-Id: <20201125093600.2766-4-alazar@bitdefender.com>
 In-Reply-To: <20201125093600.2766-1-alazar@bitdefender.com>
 References: <20201125093600.2766-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -34,65 +35,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This function is needed for the KVMI_VM_PAUSE_VCPU command, which sets
-the introspection request flag, kicks the vCPU out of guest and returns
-a success error code (0). The vCPU will send the KVMI_VCPU_EVENT_PAUSE
-event as soon as possible. Once the introspection tool receives the event,
-it knows that the vCPU doesn't run guest code and can handle introspection
-commands (until the reply for the pause event is sent).
+From: Ștefan Șicleru <ssicleru@bitdefender.com>
 
-To implement the "pause VM" command, the introspection tool will send
-a KVMI_VM_PAUSE_VCPU command for every vCPU. To know when the VM is
-paused, userspace has to receive and "parse" all events. For example,
-with a 4 vCPU VM, if "pause VM" was sent by userspace while handling
-an event from vCPU0 and at the same time a new vCPU was hot-plugged
-(which could send another event for vCPU4), the "pause VM" command has
-to receive and check all events until it gets the pause events for vCPU1,
-vCPU2 and vCPU3 before returning to the upper layer.
+This function is needed for the KVMI_VM_GET_MAX_GFN command.
 
-In order to make it easier for userspace to implement the "pause VM"
-command, KVMI_VM_PAUSE_VCPU has an optional 'wait' parameter. If this is
-set, kvm_vcpu_kick_and_wait() will be used instead of kvm_vcpu_kick().
-Once a sequence of KVMI_VM_PAUSE_VCPU commands with the 'wait' flag set
-is handled, the introspection tool can consider the VM paused, without
-the need to wait and check events.
-
+Signed-off-by: Ștefan Șicleru <ssicleru@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
  include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+ virt/kvm/kvm_main.c      | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f3b1013fb22c..1bbb07b87d1a 100644
+index 1bbb07b87d1a..cd6ac3a43c9a 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -841,6 +841,7 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
- bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu);
- void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
-+void kvm_vcpu_kick_and_wait(struct kvm_vcpu *vcpu);
- int kvm_vcpu_yield_to(struct kvm_vcpu *target);
- void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool usermode_vcpu_not_eligible);
+@@ -807,6 +807,7 @@ bool kvm_vcpu_is_visible_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn);
+ void mark_page_dirty_in_slot(struct kvm *kvm, struct kvm_memory_slot *memslot, gfn_t gfn);
+ void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
++gfn_t kvm_get_max_gfn(struct kvm *kvm);
  
+ struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu);
+ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3abcb2ce5b7d..069668b8afc2 100644
+index 069668b8afc2..e19dd6f92709 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -2887,6 +2887,16 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
- EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
- #endif /* !CONFIG_S390 */
+@@ -1410,6 +1410,31 @@ static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+ 	return kvm_set_memory_region(kvm, mem);
+ }
  
-+void kvm_vcpu_kick_and_wait(struct kvm_vcpu *vcpu)
++gfn_t kvm_get_max_gfn(struct kvm *kvm)
 +{
-+	if (kvm_vcpu_wake_up(vcpu))
-+		return;
++	u32 skip_mask = KVM_MEM_READONLY | KVM_MEMSLOT_INVALID;
++	struct kvm_memory_slot *memslot;
++	struct kvm_memslots *slots;
++	gfn_t max_gfn = 0;
++	int idx;
 +
-+	if (kvm_request_needs_ipi(vcpu, KVM_REQUEST_WAIT))
-+		smp_call_function_single(vcpu->cpu, ack_flush, NULL, 1);
++	idx = srcu_read_lock(&kvm->srcu);
++	spin_lock(&kvm->mmu_lock);
++
++	slots = kvm_memslots(kvm);
++	kvm_for_each_memslot(memslot, slots)
++		if (memslot->id < KVM_USER_MEM_SLOTS &&
++		   (memslot->flags & skip_mask) == 0 &&
++		   memslot->npages)
++			max_gfn = max(max_gfn, memslot->base_gfn
++						+ memslot->npages);
++
++	spin_unlock(&kvm->mmu_lock);
++	srcu_read_unlock(&kvm->srcu, idx);
++
++	return max_gfn;
 +}
-+EXPORT_SYMBOL_GPL(kvm_vcpu_kick_and_wait);
 +
- int kvm_vcpu_yield_to(struct kvm_vcpu *target)
- {
- 	struct pid *pid;
+ #ifndef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ /**
+  * kvm_get_dirty_log - get a snapshot of dirty pages
