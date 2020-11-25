@@ -2,124 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05A022C3B7F
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:03:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0C812C3B92
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:07:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726839AbgKYJAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Nov 2020 04:00:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45214 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726250AbgKYJAy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Nov 2020 04:00:54 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D70C061A4D
-        for <kvm@vger.kernel.org>; Wed, 25 Nov 2020 01:00:54 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id 92so1586541otd.5
-        for <kvm@vger.kernel.org>; Wed, 25 Nov 2020 01:00:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cb0IyYfwRRpwkSMXLoK5meWkqSB6m3aHpp32lgtuG5E=;
-        b=JkicOjiQYuUe4qC0NCYmxG5Jf2Qdd6VpUQG0aEBdA3L/hZkGUrza6gxYa2hMmPMY/s
-         ewVWRJYqWnQURjTZ+yFTAdl1Ez4sxo1/0FaXREz0psNNjo/Ewp3/C0rJLjM2dFGW9gyu
-         BSTEd4SBqAlo0o+/0PsIWfkx3MMZ6g5rTd+P4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cb0IyYfwRRpwkSMXLoK5meWkqSB6m3aHpp32lgtuG5E=;
-        b=E29uFu6stVA1+9LBqXt13Iv8AZad6dpW66RzKT5uKjHfH2mSkdETll/sf1u7Vsyxp1
-         mO/+oCiBoX1YTx9TJ7yPmiN55mL2j5HjzlQBrgz8h/mYEYO5wnnNTb4W65P12tgANIGt
-         2enPq7wDm48JRVBuTtPlh7Y5DtXDKmaISBQl2jAw8K1eluUZHydD3M4yhgDjVeoQBzZN
-         JLcrHhcWeGv5umh1+siKLvAIUtpC4lwBYuHmjId4P72hJbuTjB1u4zUgfVudAfyBfg04
-         GJVNr7Oko7eYXSz+UEDgpQylo8CP9PrXN7IKa3WLH7H1LtTgIT9tBE2CoaBvvZ7vA2hf
-         IFcA==
-X-Gm-Message-State: AOAM531joEho1QFfgs0YjKWmP/ThN4xwEOc+FnuFpyBBZLQ5U+TcqMBG
-        P6//kizsxC2igQT/CnDuQMgFdh2LwfSjG394crnGsQ==
-X-Google-Smtp-Source: ABdhPJzdLrBChJNmwAufHSFyRkbYFLtVRK1HD1rbwhJfrbBBuHxsolU3fINxVDwgeq07RNzsEDacWevGKQb60NxLVLQ=
-X-Received: by 2002:a05:6830:3155:: with SMTP id c21mr2109430ots.281.1606294853508;
- Wed, 25 Nov 2020 01:00:53 -0800 (PST)
+        id S1726345AbgKYJHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Nov 2020 04:07:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18900 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725836AbgKYJHF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:07:05 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AP94UBq160234;
+        Wed, 25 Nov 2020 04:07:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=2DWrLZN/AMjBuA8TzWNiQ+ZPU8UThgTKLRNsgUQGFFw=;
+ b=haV1423+T9HvYt9thxikbVTtZo3SKLwMIO36wzj9w0h9iygSZ406hsUiYKlEqo+9kOKI
+ ZsjPnMPJ6LAp4fDUu7lOL5jD6eCvSmzuy5Yy7fjmC/h0wgtOpFlZKowy4X5sJ0Wo42OX
+ W5NXzzIyj1qDcsMQAXZvbvSExklzGiyg97Y4eZJW+tr3q8sKE0DFlrYiIgIe9F1AAtDD
+ 7VwuRRaGiQ7d66JiZyUheL3BFJ5WQX5CUL8NjROqogvojxNcDWtvwQLVhANjUbbIY8lN
+ zV6Re1Ljj0mA0yR841aI1yCruisMp7vXTNBZQ7n8B5KsZRZNMpsV++qgK9dcAXVxJQoV OA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 351dd3tw44-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 Nov 2020 04:07:04 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AP94s7Z162639;
+        Wed, 25 Nov 2020 04:07:04 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 351dd3tw2n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 Nov 2020 04:07:04 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AP9252o006316;
+        Wed, 25 Nov 2020 09:07:01 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 34xth8cf67-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 Nov 2020 09:07:01 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AP96xhc64356734
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Nov 2020 09:06:59 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 699AEAE057;
+        Wed, 25 Nov 2020 09:06:59 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 615A3AE072;
+        Wed, 25 Nov 2020 09:06:59 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 25 Nov 2020 09:06:59 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 1D963E1472; Wed, 25 Nov 2020 10:06:59 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>
+Subject: [PATCH] KVM: s390: track synchronous pfault events in kvm_stat
+Date:   Wed, 25 Nov 2020 10:06:58 +0100
+Message-Id: <20201125090658.38463-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-References: <20201119144146.1045202-1-daniel.vetter@ffwll.ch>
- <20201119144146.1045202-18-daniel.vetter@ffwll.ch> <20201120183029.GQ244516@ziepe.ca>
- <20201124142814.GM401619@phenom.ffwll.local> <20201124155526.GH5487@ziepe.ca>
-In-Reply-To: <20201124155526.GH5487@ziepe.ca>
-From:   Daniel Vetter <daniel@ffwll.ch>
-Date:   Wed, 25 Nov 2020 10:00:42 +0100
-Message-ID: <CAKMK7uESguiML9eBonfU59T9fcfP4x18t=+nLdV8kMSc4mrs8A@mail.gmail.com>
-Subject: Re: [PATCH v6 17/17] RFC: mm: add mmu_notifier argument to follow_pfn
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-25_04:2020-11-25,2020-11-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501
+ malwarescore=0 clxscore=1015 suspectscore=0 phishscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011250051
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 25, 2020 at 9:13 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Tue, Nov 24, 2020 at 03:28:14PM +0100, Daniel Vetter wrote:
-> > On Fri, Nov 20, 2020 at 02:30:29PM -0400, Jason Gunthorpe wrote:
-> > > On Thu, Nov 19, 2020 at 03:41:46PM +0100, Daniel Vetter wrote:
-> > > > @@ -4805,21 +4824,15 @@ EXPORT_SYMBOL(follow_pte_pmd);
-> > > >   * Return: zero and the pfn at @pfn on success, -ve otherwise.
-> > > >   */
-> > > >  int follow_pfn(struct vm_area_struct *vma, unsigned long address,
-> > > > - unsigned long *pfn)
-> > > > + unsigned long *pfn, struct mmu_notifier *subscription)
-> > > >  {
-> > > > - int ret = -EINVAL;
-> > > > - spinlock_t *ptl;
-> > > > - pte_t *ptep;
-> > > > + if (WARN_ON(!subscription->mm))
-> > > > +         return -EINVAL;
-> > > >
-> > > > + if (WARN_ON(subscription->mm != vma->vm_mm))
-> > > > +         return -EINVAL;
-> > >
-> > > These two things are redundant right? vma->vm_mm != NULL?
-> >
-> > Yup, will remove.
-> >
-> > > BTW, why do we even have this for nommu? If the only caller is kvm,
-> > > can you even compile kvm on nommu??
-> >
-> > Kinda makes sense, but I have no idea how to make sure with compile
-> > testing this is really the case. And I didn't see any hard evidence in
-> > Kconfig or Makefile that mmu notifiers requires CONFIG_MMU. So not sure
-> > what to do here.
->
-> It looks like only some arches have selectable CONFIG_MMU: arm,
-> m68k, microblaze, riscv, sh
->
-> If we look at arches that work with HAVE_KVM, I only see: arm64, mips,
-> powerpc, s390, x86
->
-> So my conclusion is there is no intersection between !MMU and HAVE_KVM?
->
-> > Should I just remove the nommu version of follow_pfn and see what happens?
-> > We can't remove it earlier since it's still used by other
-> > subsystems.
->
-> This is what I was thinking might work
+Right now we do count pfault (pseudo page faults aka async page faults
+start and completion events). What we do not count is, if an async page
+fault would have been possible by the host, but it was disabled by the
+guest (e.g. interrupts off, pfault disabled, secure execution....).  Let
+us count those as well in the pfault_sync counter.
 
-Makes sense, I'll do that for the next round.
--Daniel
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/include/asm/kvm_host.h | 1 +
+ arch/s390/kvm/kvm-s390.c         | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 463c24e26000..74f9a036bab2 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -459,6 +459,7 @@ struct kvm_vcpu_stat {
+ 	u64 diagnose_308;
+ 	u64 diagnose_500;
+ 	u64 diagnose_other;
++	u64 pfault_sync;
+ };
+ 
+ #define PGM_OPERATION			0x01
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 282a13ece554..dbafd057ca6a 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -60,6 +60,7 @@
+ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	VCPU_STAT("userspace_handled", exit_userspace),
+ 	VCPU_STAT("exit_null", exit_null),
++	VCPU_STAT("pfault_sync", pfault_sync),
+ 	VCPU_STAT("exit_validity", exit_validity),
+ 	VCPU_STAT("exit_stop_request", exit_stop_request),
+ 	VCPU_STAT("exit_external_request", exit_external_request),
+@@ -4109,6 +4110,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
+ 		current->thread.gmap_pfault = 0;
+ 		if (kvm_arch_setup_async_pf(vcpu))
+ 			return 0;
++		vcpu->stat.pfault_sync++;
+ 		return kvm_arch_fault_in_page(vcpu, current->thread.gmap_addr, 1);
+ 	}
+ 	return vcpu_post_run_fault_in_sie(vcpu);
 -- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+2.28.0
+
