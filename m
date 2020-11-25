@@ -2,30 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 751472C3C75
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:43:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDFB52C3C8B
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:43:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727474AbgKYJly (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Nov 2020 04:41:54 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57032 "EHLO
+        id S1728574AbgKYJmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Nov 2020 04:42:05 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57134 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726973AbgKYJlw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:41:52 -0500
+        by vger.kernel.org with ESMTP id S1728304AbgKYJmC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:42:02 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id E41D6305D518;
-        Wed, 25 Nov 2020 11:35:48 +0200 (EET)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 23713305D460;
+        Wed, 25 Nov 2020 11:35:49 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id C21333072784;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id EA19F3072785;
         Wed, 25 Nov 2020 11:35:48 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v10 38/81] KVM: introspection: add KVMI_VM_GET_INFO
-Date:   Wed, 25 Nov 2020 11:35:17 +0200
-Message-Id: <20201125093600.2766-39-alazar@bitdefender.com>
+Subject: [PATCH v10 39/81] KVM: introspection: add KVM_INTROSPECTION_PREUNHOOK
+Date:   Wed, 25 Nov 2020 11:35:18 +0200
+Message-Id: <20201125093600.2766-40-alazar@bitdefender.com>
 In-Reply-To: <20201125093600.2766-1-alazar@bitdefender.com>
 References: <20201125093600.2766-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -35,170 +34,185 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+In certain situations (when the guest has to be paused, suspended,
+migrated, etc.), the device manager will use this new ioctl in order to
+trigger the KVMI_VM_EVENT_UNHOOK event. If the event is sent successfully
+(the VM has an active introspection channel), the device manager should
+delay the action (pause/suspend/...) to give the introspection tool the
+chance to remove its hooks (eg. breakpoints) while the guest is still
+running. Once a timeout is reached or the introspection tool has closed
+the socket, the device manager should resume the action.
 
-This command returns the number of online vCPUs.
-
-The introspection tool uses the vCPU index to specify to which vCPU
-the introspection command applies to.
-
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               | 18 ++++++++++
- include/uapi/linux/kvmi.h                     |  6 ++++
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 35 +++++++++++++++++--
- virt/kvm/introspection/kvmi_msg.c             | 13 +++++++
- 4 files changed, 69 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/api.rst    | 28 ++++++++++++++++++++++++++++
+ Documentation/virt/kvm/kvmi.rst   |  7 ++++---
+ include/linux/kvmi_host.h         |  1 +
+ include/uapi/linux/kvm.h          |  2 ++
+ virt/kvm/introspection/kvmi.c     | 30 ++++++++++++++++++++++++++++++
+ virt/kvm/introspection/kvmi_int.h |  1 +
+ virt/kvm/introspection/kvmi_msg.c |  5 +++++
+ virt/kvm/kvm_main.c               |  5 +++++
+ 8 files changed, 76 insertions(+), 3 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index f3698413ddab..e6544d94e040 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4946,6 +4946,34 @@ the event is disallowed.
+ Unless set to -1 (meaning all events), id must be a event ID
+ (e.g. KVMI_VM_EVENT_UNHOOK, KVMI_VCPU_EVENT_CR, etc.)
+ 
++4.131 KVM_INTROSPECTION_PREUNHOOK
++---------------------------------
++
++:Capability: KVM_CAP_INTROSPECTION
++:Architectures: x86
++:Type: vm ioctl
++:Parameters: none
++:Returns: 0 on success, a negative value on error
++
++Errors:
++
++  ======     ============================================================
++  EFAULT     the VM is not introspected yet (use KVM_INTROSPECTION_HOOK)
++  ENOENT     the socket (passed with KVM_INTROSPECTION_HOOK) had an error
++  ENOENT     the introspection tool didn't subscribed
++             to this type of introspection event (unhook)
++  ======     ============================================================
++
++This ioctl is used to inform that the current VM is
++paused/suspended/migrated/etc.
++
++KVM should send an 'unhook' introspection event to the introspection tool.
++
++If this ioctl is successful, the userspace should give the
++introspection tool a chance to unhook the VM and then it should use
++KVM_INTROSPECTION_UNHOOK to make sure all the introspection structures
++are freed.
++
+ 5. The kvm_run structure
+ ========================
+ 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index 13169575f75f..6f8583d4aeb2 100644
+index 6f8583d4aeb2..33490bc9d1c1 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -312,3 +312,21 @@ This command is always allowed.
- * -KVM_ENOENT - the event specified by ``id`` is unsupported
- * -KVM_EPERM - the event specified by ``id`` is disallowed
- * -KVM_EINVAL - the padding is not zero
-+
-+4. KVMI_VM_GET_INFO
-+-------------------
-+
-+:Architectures: all
-+:Versions: >= 1
-+:Parameters: none
-+:Returns:
-+
-+::
-+
-+	struct kvmi_error_code;
-+	struct kvmi_vm_get_info_reply {
-+		__u32 vcpu_count;
-+		__u32 padding[3];
-+	};
-+
-+Returns the number of online vCPUs.
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 0c2d0cedde6f..e06a7b80d4d9 100644
---- a/include/uapi/linux/kvmi.h
-+++ b/include/uapi/linux/kvmi.h
-@@ -20,6 +20,7 @@ enum {
- 	KVMI_GET_VERSION      = KVMI_VM_MESSAGE_ID(1),
- 	KVMI_VM_CHECK_COMMAND = KVMI_VM_MESSAGE_ID(2),
- 	KVMI_VM_CHECK_EVENT   = KVMI_VM_MESSAGE_ID(3),
-+	KVMI_VM_GET_INFO      = KVMI_VM_MESSAGE_ID(4),
+@@ -183,9 +183,10 @@ becomes necessary to remove them before the guest is suspended, moved
+ (migrated) or a snapshot with memory is created.
  
- 	KVMI_NEXT_VM_MESSAGE
- };
-@@ -67,4 +68,9 @@ struct kvmi_vm_check_event {
- 	__u32 padding2;
- };
+ The actions are normally performed by the device manager. In the case
+-of QEMU, it will use another ioctl to notify the introspection tool and
+-wait for a limited amount of time (a few seconds) for a confirmation that
+-is OK to proceed (the introspection tool will close the connection).
++of QEMU, it will use the *KVM_INTROSPECTION_PREUNHOOK* ioctl to trigger
++the *KVMI_VM_EVENT_UNHOOK* event and wait for a limited amount of time (a
++few seconds) for a confirmation that is OK to proceed. The introspection
++tool will close the connection to signal this.
  
-+struct kvmi_vm_get_info_reply {
-+	__u32 vcpu_count;
-+	__u32 padding[3];
-+};
+ Live migrations
+ ---------------
+diff --git a/include/linux/kvmi_host.h b/include/linux/kvmi_host.h
+index a5ede07686b9..81eac9f53a3f 100644
+--- a/include/linux/kvmi_host.h
++++ b/include/linux/kvmi_host.h
+@@ -32,6 +32,7 @@ int kvmi_ioctl_command(struct kvm *kvm,
+ 		       const struct kvm_introspection_feature *feat);
+ int kvmi_ioctl_event(struct kvm *kvm,
+ 		     const struct kvm_introspection_feature *feat);
++int kvmi_ioctl_preunhook(struct kvm *kvm);
+ 
+ #else
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index c69140893f68..a29fbdf93b84 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1661,6 +1661,8 @@ struct kvm_introspection_feature {
+ #define KVM_INTROSPECTION_COMMAND _IOW(KVMIO, 0xca, struct kvm_introspection_feature)
+ #define KVM_INTROSPECTION_EVENT   _IOW(KVMIO, 0xcb, struct kvm_introspection_feature)
+ 
++#define KVM_INTROSPECTION_PREUNHOOK  _IO(KVMIO, 0xcc)
 +
- #endif /* _UAPI__LINUX_KVMI_H */
-diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index cd8f16a3ce3a..d60ee23fa833 100644
---- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -80,6 +80,16 @@ static void set_command_perm(struct kvm_vm *vm, __s32 id, __u32 allow,
- 		 "KVM_INTROSPECTION_COMMAND");
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
+index 9125e6c92ded..72dd41915048 100644
+--- a/virt/kvm/introspection/kvmi.c
++++ b/virt/kvm/introspection/kvmi.c
+@@ -383,3 +383,33 @@ int kvmi_ioctl_command(struct kvm *kvm,
+ 	mutex_unlock(&kvm->kvmi_lock);
+ 	return err;
  }
- 
-+static void disallow_command(struct kvm_vm *vm, __s32 id)
++
++static bool kvmi_unhook_event(struct kvm_introspection *kvmi)
 +{
-+	set_command_perm(vm, id, 0, 0);
++	int err;
++
++	err = kvmi_msg_send_unhook(kvmi);
++
++	return !err;
 +}
 +
-+static void allow_command(struct kvm_vm *vm, __s32 id)
++int kvmi_ioctl_preunhook(struct kvm *kvm)
 +{
-+	set_command_perm(vm, id, 1, 0);
++	struct kvm_introspection *kvmi;
++	int err = 0;
++
++	mutex_lock(&kvm->kvmi_lock);
++
++	kvmi = KVMI(kvm);
++	if (!kvmi) {
++		err = -EFAULT;
++		goto out;
++	}
++
++	if (!kvmi_unhook_event(kvmi))
++		err = -ENOENT;
++
++out:
++	mutex_unlock(&kvm->kvmi_lock);
++	return err;
 +}
-+
- static void hook_introspection(struct kvm_vm *vm)
- {
- 	__u32 allow = 1, disallow = 0, allow_inval = 2;
-@@ -256,12 +266,16 @@ static void cmd_vm_check_command(__u16 id, int expected_err)
- 			expected_err);
- }
+diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
+index 1e1d1fad4035..ef4850e8bfae 100644
+--- a/virt/kvm/introspection/kvmi_int.h
++++ b/virt/kvm/introspection/kvmi_int.h
+@@ -18,6 +18,7 @@ bool kvmi_sock_get(struct kvm_introspection *kvmi, int fd);
+ void kvmi_sock_shutdown(struct kvm_introspection *kvmi);
+ void kvmi_sock_put(struct kvm_introspection *kvmi);
+ bool kvmi_msg_process(struct kvm_introspection *kvmi);
++int kvmi_msg_send_unhook(struct kvm_introspection *kvmi);
  
--static void test_cmd_vm_check_command(void)
-+static void test_cmd_vm_check_command(struct kvm_vm *vm)
- {
--	__u16 valid_id = KVMI_GET_VERSION, invalid_id = 0xffff;
-+	__u16 valid_id = KVMI_VM_GET_INFO, invalid_id = 0xffff;
- 
- 	cmd_vm_check_command(valid_id, 0);
- 	cmd_vm_check_command(invalid_id, -KVM_ENOENT);
-+
-+	disallow_command(vm, valid_id);
-+	cmd_vm_check_command(valid_id, -KVM_EPERM);
-+	allow_command(vm, valid_id);
- }
- 
- static void cmd_vm_check_event(__u16 id, int expected_err)
-@@ -284,6 +298,20 @@ static void test_cmd_vm_check_event(void)
- 	cmd_vm_check_event(invalid_id, -KVM_ENOENT);
- }
- 
-+static void test_cmd_vm_get_info(void)
-+{
-+	struct kvmi_vm_get_info_reply rpl;
-+	struct kvmi_msg_hdr req;
-+
-+	test_vm_command(KVMI_VM_GET_INFO, &req, sizeof(req), &rpl,
-+			sizeof(rpl), 0);
-+	TEST_ASSERT(rpl.vcpu_count == 1,
-+		    "Unexpected number of vCPU count %u\n",
-+		    rpl.vcpu_count);
-+
-+	pr_debug("vcpu count: %u\n", rpl.vcpu_count);
-+}
-+
- static void test_introspection(struct kvm_vm *vm)
- {
- 	setup_socket();
-@@ -291,8 +319,9 @@ static void test_introspection(struct kvm_vm *vm)
- 
- 	test_cmd_invalid();
- 	test_cmd_get_version();
--	test_cmd_vm_check_command();
-+	test_cmd_vm_check_command(vm);
- 	test_cmd_vm_check_event();
-+	test_cmd_vm_get_info();
- 
- 	unhook_introspection(vm);
- }
+ /* kvmi.c */
+ void *kvmi_msg_alloc(void);
 diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
-index 6538c7af710a..f0f5058403dd 100644
+index f0f5058403dd..513681290305 100644
 --- a/virt/kvm/introspection/kvmi_msg.c
 +++ b/virt/kvm/introspection/kvmi_msg.c
-@@ -150,6 +150,18 @@ static int handle_vm_check_event(struct kvm_introspection *kvmi,
- 	return kvmi_msg_vm_reply(kvmi, msg, ec, NULL, 0);
+@@ -260,3 +260,8 @@ bool kvmi_msg_process(struct kvm_introspection *kvmi)
+ out:
+ 	return err == 0;
  }
- 
-+static int handle_vm_get_info(struct kvm_introspection *kvmi,
-+			      const struct kvmi_msg_hdr *msg,
-+			      const void *req)
++
++int kvmi_msg_send_unhook(struct kvm_introspection *kvmi)
 +{
-+	struct kvmi_vm_get_info_reply rpl;
-+
-+	memset(&rpl, 0, sizeof(rpl));
-+	rpl.vcpu_count = atomic_read(&kvmi->kvm->online_vcpus);
-+
-+	return kvmi_msg_vm_reply(kvmi, msg, 0, &rpl, sizeof(rpl));
++	return -1;
 +}
-+
- /*
-  * These commands are executed by the receiving thread.
-  */
-@@ -157,6 +169,7 @@ static kvmi_vm_msg_fct const msg_vm[] = {
- 	[KVMI_GET_VERSION]      = handle_get_version,
- 	[KVMI_VM_CHECK_COMMAND] = handle_vm_check_command,
- 	[KVMI_VM_CHECK_EVENT]   = handle_vm_check_event,
-+	[KVMI_VM_GET_INFO]      = handle_vm_get_info,
- };
- 
- static kvmi_vm_msg_fct get_vm_msg_handler(u16 id)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c7ea1a61c50e..f30d1bd9495a 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4053,6 +4053,11 @@ static long kvm_vm_ioctl(struct file *filp,
+ 			r = kvmi_ioctl_command(kvm, &feat);
+ 		break;
+ 	}
++	case KVM_INTROSPECTION_PREUNHOOK:
++		r = -EPERM;
++		if (enable_introspection)
++			r = kvmi_ioctl_preunhook(kvm);
++		break;
+ #endif /* CONFIG_KVM_INTROSPECTION */
+ 	default:
+ 		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
