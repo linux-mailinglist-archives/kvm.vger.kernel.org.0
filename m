@@ -2,124 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18E0B2C49F5
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 22:33:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7927F2C4AA2
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 23:10:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731598AbgKYVd0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Nov 2020 16:33:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49812 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731022AbgKYVdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Nov 2020 16:33:25 -0500
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6382C0617A7
-        for <kvm@vger.kernel.org>; Wed, 25 Nov 2020 13:33:25 -0800 (PST)
-Received: by mail-pg1-x542.google.com with SMTP id t21so3566745pgl.3
-        for <kvm@vger.kernel.org>; Wed, 25 Nov 2020 13:33:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=9wOr1Z3d7SWlchBOy6uxh4z9+jZco6+UMrcMQHjYMTg=;
-        b=t2inMCCIEc63pZVJi8AhgGStflyTI1sfa5pD0zhJLM1aOfwmUOMZnaQIFAtyakXOfZ
-         iBa1tcN0wI2SzCbV7DKXgXOKUVpWAqmUiT9f3fftNj4OkBXpu8YIvfaNnUw2BjejIOqO
-         EXLnqOuu4vadYoFhS+1qppZw8iyWJPnZprYHDzWkB+PiFdBu6MKgdR+s8fb+3W0nLqqP
-         RzaXUtOGqZXImR75rRlETuWLuQrCj/+mOdkQ8NMaUDGaIufxA0cJlzdXRiXWFbkm87da
-         qP7W9GLxi3+ZjYxTpg2dq/7YrEIhnQcXe4s796soMoUUIT3s4F4+MQ0939Dm49r8I5oY
-         hfHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=9wOr1Z3d7SWlchBOy6uxh4z9+jZco6+UMrcMQHjYMTg=;
-        b=LAktKq366ZAFFVSUxq6rrqUrjQjeSsbCFG2o2SrAfXI3Sn6zo5VtLCYV0B/EL/BlYp
-         TRYEci3GFtNIFdtQTDiGPXAq/QA4tF0tshDB0knj1MJ9n9IpiFh5oTgke7qd1Q6hJEIL
-         VgjZc6TlP7310nsEIhKekllzWGuMnnIMWZJK/V3/Si4QOpyAQpIW8tGiUpS09FP5tFP+
-         lmxmyXRkZ98mjrmasufmSKRuAv11wZlteSGLQ2Q/KeILBTzd2ErqNJUVVFH+12DsrZi6
-         ElLLqB7ad9jxxeoqRmIuW+GPUssIl0ADj5TMfqRY+WIsyqAWHTnb1rsbleZqNh6TzQZI
-         6Z2w==
-X-Gm-Message-State: AOAM531GRzD6bGqr04znif6AJzQl6ufUnPlNXVZ7tmMeuP0Pc55AJqcu
-        klw6E8NIR0QQrfTLWD6TOotEwFKVH10CAw==
-X-Google-Smtp-Source: ABdhPJwelwPJ2/9ktxZ/fmdE6ZLyVDWLIV9fPYCcaVDkn78bhaY41J5Ywd394iAHQq5OTnX9qKTzYg==
-X-Received: by 2002:a17:90a:65c9:: with SMTP id i9mr6528623pjs.125.1606340005132;
-        Wed, 25 Nov 2020 13:33:25 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id s21sm2690987pgm.65.2020.11.25.13.33.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2020 13:33:24 -0800 (PST)
-Date:   Wed, 25 Nov 2020 21:33:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     =?utf-8?B?5b2t5rWpKFJpY2hhcmQp?= <richard.peng@oppo.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Suravee.Suthikulpanit@amd.com" <Suravee.Suthikulpanit@amd.com>,
-        =?utf-8?B?a3ZtQHZnZXIua2VybmVsLm9yZ++8mw==?= <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] kvm/svm: fixed a potential register value inconsistent
- with variable ldr_reg
-Message-ID: <20201125213320.GB450871@google.com>
-References: <HKAPR02MB429179237547D0B00A2F2C6FE0FA0@HKAPR02MB4291.apcprd02.prod.outlook.com>
+        id S1733162AbgKYWJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Nov 2020 17:09:54 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:41256 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733213AbgKYWJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Nov 2020 17:09:53 -0500
+Received: from zn.tnic (p200300ec2f0c9b00e207899b66220853.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:9b00:e207:899b:6622:853])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5EDE81EC04DB;
+        Wed, 25 Nov 2020 23:09:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1606342192;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=mW2FlkEjQCKR1BPA5xH59OBazNeYChxwpNjdkolWwXw=;
+        b=sLcVA309mm2mi+C2uR2bAJ2azv7NJYkAyuqQc6Wt2fHSweBxlUNGvzfh+x2CLYN4/zTlGT
+        1tBzEO0LsHNndTqK9hUuMiSvrCcpLzlNzcUH8wzxI0eSNmarnkJeHLZHIetrL5a4Hc0+iO
+        GlB4MFiW4NtEOAyjIw2mn4Meggfey/s=
+Date:   Wed, 25 Nov 2020 23:09:47 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     isaku.yamahata@intel.com
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com, Zhang Chen <chen.zhang@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [RFC PATCH 03/67] x86/cpu: Move get_builtin_firmware() common
+ code (from microcode only)
+Message-ID: <20201125220947.GA14656@zn.tnic>
+References: <cover.1605232743.git.isaku.yamahata@intel.com>
+ <46d35ce06d84c55ff02a05610ca3fb6d51ee1a71.1605232743.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <HKAPR02MB429179237547D0B00A2F2C6FE0FA0@HKAPR02MB4291.apcprd02.prod.outlook.com>
+In-Reply-To: <46d35ce06d84c55ff02a05610ca3fb6d51ee1a71.1605232743.git.isaku.yamahata@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 25, 2020, 彭浩(Richard) wrote:
-> If the ldr value is read out to zero, it does not call avic_ldr_write to update
-> the virtual register, but the variable ldr_reg is updated.
+On Mon, Nov 16, 2020 at 10:25:48AM -0800, isaku.yamahata@intel.com wrote:
+> From: Zhang Chen <chen.zhang@intel.com>
+> 
+> Move get_builtin_firmware() to common.c so that it can be used to get
+> non-ucode firmware, e.g. Intel's SEAM modules, even if MICROCODE=n.
 
-Is there a failure associated with this?  And/or can you elaborate on why
-skipping the svm->ldr_reg is correct?
+What for?
 
-I'm not familiar with the AVIC spec, and it's not at all clear to me what the
-correct behavior should be for the LDR updates.  E.g. skipping the svm->ldr_reg
-update appears to break avic_handle_apic_id_update(), which will see a stale
-svm->ldr_reg and call avic_invalidate_logical_id_entry() when it presumably
-should not.
+This is used for microcode built in the kernel - a non-common use case.
+Why is your thing built into the kernel and not a normal module object?
 
-> Fixes: 98d90582be2e ("SVM: Fix AVIC DFR and LDR handling")
-> Signed-off-by: Peng Hao <richard.peng@oppo.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 8c550999ace0..318735e0f2d0 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -417,7 +417,6 @@ static void avic_invalidate_logical_id_entry(struct kvm_vcpu *vcpu)
-> 
->  static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
->  {
-> -       int ret = 0;
->         struct vcpu_svm *svm = to_svm(vcpu);
->         u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
->         u32 id = kvm_xapic_id(vcpu->arch.apic);
-> @@ -427,13 +426,16 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
-> 
->         avic_invalidate_logical_id_entry(vcpu);
-> 
-> -       if (ldr)
-> +       if (ldr) {
-> +               int ret;
->                 ret = avic_ldr_write(vcpu, id, ldr);
-> 
-> -       if (!ret)
-> -               svm->ldr_reg = ldr;
-> -
-> -       return ret;
-> +               if (!ret)
-> +                       svm->ldr_reg = ldr;
-> +               else
-> +                       return ret;
-> +       }
-> +       return 0;
-> }
-> 
->  static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
-> --
-> 2.18.4
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
