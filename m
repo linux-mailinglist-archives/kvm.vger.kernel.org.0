@@ -2,99 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A75FF2C3497
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 00:22:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 724E02C353E
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 01:11:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387549AbgKXXSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Nov 2020 18:18:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40694 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727471AbgKXXST (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Nov 2020 18:18:19 -0500
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96620C0613D6
-        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 15:18:19 -0800 (PST)
-Received: by mail-pg1-x541.google.com with SMTP id t37so595285pga.7
-        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 15:18:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nI2CFR08TVYrjA8L8FQ1rV8lfflai02Hbg1xnZq/aLQ=;
-        b=TGRVwUyghmV6Y++qNyCuEHFIj5NexKfSDa8Ug82+bRV8Joh6DX6CqSVUA03kE0YCN+
-         gvN84VG47WYkm1TCbdSwWX/5h/yvPdMsu+3yoMZr73gr3ZKSL08rfkcDz7EsrjbNZpyR
-         vf57CM0AT0VBe/iic5U5QHi54nMEOKwuV/fACKDHwJvyLn4ojz+y/1M5BbK8swJU5pWh
-         6DDaApE5mDNGuOrRjmQu5ifVPVUVKs7nJZrdbnYE6HOqarY+Rmd2joTtKV9Nz1SKk/Tn
-         smL/NTLkBKtLAIdPQHFAudhhPAWJMQaklsNfKoCEud1Oz93ynweZXZhJxmYT61o5KkBT
-         GskQ==
+        id S1726765AbgKYAKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Nov 2020 19:10:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49295 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726708AbgKYAKx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Nov 2020 19:10:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606263051;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ksUFy87Li12vla/Gfu7y6UP52f3wVkRJgvgXkQchjyw=;
+        b=e4su0RqIvWISsDvJbBYa/deHGHrpR/UluCerzcveFr24Vrj8pZ5Sa52dk0Oti8wG9uwDMb
+        qKGcsiMAN+27dj8Hi66UpxMPLmRdst1ikk3M7pEmA6q+QXL8sNvr5JRtKDLRBMBZ5qnR49
+        Qt/hOszRensPfDkTh9XoQbFeS301RaU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-541-eMP3r2Y_PGadgRZ0n85Vrg-1; Tue, 24 Nov 2020 19:10:50 -0500
+X-MC-Unique: eMP3r2Y_PGadgRZ0n85Vrg-1
+Received: by mail-wr1-f70.google.com with SMTP id f4so115228wru.21
+        for <kvm@vger.kernel.org>; Tue, 24 Nov 2020 16:10:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nI2CFR08TVYrjA8L8FQ1rV8lfflai02Hbg1xnZq/aLQ=;
-        b=kFx3ZdQJ0bulG8f2qZFMtfQQsRFlBX7fHdeM5B+UdqoDB+zyDPoeBVvjihzFpJG/+C
-         U21AohC74byvc24NBtftjsdE6UGpnAkgMWxcPiddutySgr4nUYpjIRE+V7E5s1PI+E/j
-         StEdGA6lO1lcDB98tMPSJ9NK0RpJ16Pg2AJjGBjMEud0iC3zqJeyPN2jUGL2U2UX8s+X
-         +SHNM+jEwg6ozhhKMqT6+Jk0QgCt3f9tu/CfVWSYQGowd3ilBPl58R1nhX5Da5F4b7j6
-         ggmn7m+LR38Q5lFAUB1IKuMJNLjQQJYq1JWbGAZfamAUUdT0Da/mm92Wsh4g91MHqir5
-         r0PA==
-X-Gm-Message-State: AOAM5318QY5qA/CdfD9kugF3jBkmdYMXOuFpV7HQWBdMhpck+Qri9sGt
-        e7rywNfhM8Ek/azQpL6Ypg/QRQ==
-X-Google-Smtp-Source: ABdhPJwFPSMRB1bIwy9Xt2xkS1AFtFJNdNLegjqm6HtONrcPdiWAtjfSthKMSsElfRvzKOW5vQIrwQ==
-X-Received: by 2002:a63:de53:: with SMTP id y19mr606624pgi.107.1606259898933;
-        Tue, 24 Nov 2020 15:18:18 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id mn21sm273126pjb.28.2020.11.24.15.18.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 15:18:18 -0800 (PST)
-Date:   Tue, 24 Nov 2020 23:18:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     David Rientjes <rientjes@google.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Thomas <thomas.lendacky@amd.com>, pbonzini@redhat.com,
-        tj@kernel.org, lizefan@huawei.com, joro@8bytes.org, corbet@lwn.net,
-        Brijesh <brijesh.singh@amd.com>, Jon <jon.grimm@amd.com>,
-        Eric <eric.vantassell@amd.com>, gingell@google.com,
-        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC Patch 0/2] KVM: SVM: Cgroup support for SVM SEV ASIDs
-Message-ID: <20201124231814.GA258638@google.com>
-References: <alpine.DEB.2.23.453.2011131615510.333518@chino.kir.corp.google.com>
- <20201124191629.GB235281@google.com>
- <20201124194904.GA45519@google.com>
- <alpine.DEB.2.23.453.2011241215400.3594395@chino.kir.corp.google.com>
- <20201124210817.GA65542@google.com>
- <20201124212725.GB246319@google.com>
- <20201124222149.GB65542@google.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ksUFy87Li12vla/Gfu7y6UP52f3wVkRJgvgXkQchjyw=;
+        b=JPcJQxlFNU4mqJUH1IUJ0vygEDSzfqLwScMs746yw4PG2qtHLQ/j6UCaSwf+HZuVeS
+         mZFNnVku+aCWNbBfP5RYJS+ljZKELm/gDVYdgOSQ0LfKkJMF1kYanEkHtv46eBu8pnQM
+         jkM6vP02/gyeZ+I6yKxinON1/6U2559IejcScfQEIZO7WVXT5TNKYW5+aFHKxwDxi266
+         nZ+2T1Gvc8JMiOIZMLHpbJWNOo4sRoG4BD9b0l8yn4lGyxoIWvr43yQYIzc/qbjG+5ES
+         2bxqXV+va+ps2q6nl9yArBR4gVnQQqnpLAYESr5NmYennlT+i1w5VU6TiPyLJdHBwysm
+         egfQ==
+X-Gm-Message-State: AOAM533fnv/oCh8Tct4x4iXLTf3p+m5MawI8S3h8TGmcrkKGbpqxIHlK
+        ejv2I/KZLcfT38Y4d0P4OmXaQGt4A9fl16z68FkrutejVq1uF/qS+WZJJCXrh64DbT8Qgr+1Sp4
+        THdDmk8Yp7hJz
+X-Received: by 2002:a1c:5a08:: with SMTP id o8mr301195wmb.142.1606263048837;
+        Tue, 24 Nov 2020 16:10:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzd+aD9zifCVLUHW7ucS1C+5T6jOT4FTJKHcGRSXKz+f59UxjLLhV6IJIZdPlSmE0WPjceEzQ==
+X-Received: by 2002:a1c:5a08:: with SMTP id o8mr301177wmb.142.1606263048570;
+        Tue, 24 Nov 2020 16:10:48 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j14sm957705wrs.49.2020.11.24.16.10.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Nov 2020 16:10:47 -0800 (PST)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Oliver Upton <oupton@google.com>, idan.brown@oracle.com,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>, liam.merwick@oracle.com,
+        wanpeng.li@hotmail.com
+References: <95b9b017-ccde-97a0-f407-fd5f35f1157d@redhat.com>
+ <20201123192223.3177490-1-oupton@google.com>
+ <4788d64f-1831-9eb9-2c78-c5d9934fb47b@redhat.com>
+ <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
+ <CAOQ_QshMoc9W9g6XRuGM4hCtMdvUxSDpGAhp3vNxhxhWTK-5CQ@mail.gmail.com>
+ <20201124015515.GA75780@google.com>
+ <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
+ <20201124212215.GA246319@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
+ posted-interrupt pending
+Message-ID: <d5f4153b-975d-e61d-79e8-ed86df346953@redhat.com>
+Date:   Wed, 25 Nov 2020 01:10:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201124222149.GB65542@google.com>
+In-Reply-To: <20201124212215.GA246319@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 24, 2020, Vipin Sharma wrote:
-> On Tue, Nov 24, 2020 at 09:27:25PM +0000, Sean Christopherson wrote:
-> > Is a root level stat file needed?  Can't the infrastructure do .max - .current
-> > on the root cgroup to calculate the number of available ids in the system?
+On 24/11/20 22:22, Sean Christopherson wrote:
+>> What if IN_GUEST_MODE/OUTSIDE_GUEST_MODE was replaced by a
+>> generation count?  Then you reread vcpu->mode after sending the IPI, and
+>> retry if it does not match.
+> The sender will have seen IN_GUEST_MODE and so won't retry the IPI,
+> but hardware didn't process the PINV as a posted-interrupt.
+Uff, of course.
+
+That said, it may still be a good idea to keep pi_pending only as a very 
+short-lived flag only to handle this case, and maybe not even need the 
+generation count (late here so put up with me if it's wrong :)).  The 
+flag would not have to live past vmx_vcpu_run even, the vIRR[PINV] bit 
+would be the primary marker that a nested posted interrupt is pending.
+
+>>> if we're ok with KVM
+>>> processing virtual interrupts that technically shouldn't happen, yet.  E.g. if
+>>> the L0 PINV handler consumes vIRR bits that were set after the last PI from L1.
+>>
+>> I actually find it curious that the spec promises posted interrupt
+>> processing to be triggered only by the arrival of the posted interrupt IPI.
+>> Why couldn't the processor in principle snoop for the address of the ON bit
+>> instead, similar to an MWAIT?
 > 
-> For an efficient scheduling of workloads in the cloud infrastructure, a
-> scheduler needs to know the total capacity supported and the current
-> usage of the host to get the overall picture. There are some issues with
-> .max -.current approach:
+> It would lead to false positives and missed IRQs.
+
+Not to missed IRQs---false positives on the monitor would be possible, 
+but you would still have to send a posted interrupt IPI.  The weird 
+promise is that the PINV interrupt is the _only_ trigger for posted 
+interrupts.
+
+>> But even without that, I don't think the spec promises that kind of strict
+>> ordering with respect to what goes on in the source.  Even though posted
+>> interrupt processing is atomic with the acknowledgement of the posted
+>> interrupt IPI, the spec only promises that the PINV triggers an _eventual_
+>> scan of PID.PIR when the interrupt controller delivers an unmasked external
+>> interrupt to the destination CPU.  You can still have something like
+>>
+>> 	set PID.PIR[100]
+>> 	set PID.ON
+>> 					processor starts executing a
+>> 					 very slow instruction...
+>> 	send PINV
+>> 	set PID.PIR[200]
+>> 					acknowledge PINV
+>>
+>> and then vector 200 would be delivered before vector 100.  Of course with
+>> nested PI the effect would be amplified, but it's possible even on bare
+>> metal.
 > 
-> 1. Cgroup v2 convention is to not put resource control files in the
->    root. This will mean we need to sum (.max -.current) in all of the
->    immediate children of the root.
+> Jim was concerned that L1 could poll the PID to determine whether or not
+> PID.PIR[200] should be seen in L2.  The whole PIR is copied to the vIRR after
+> PID.ON is cleared the auto-EOI is done, and the read->clear is atomic.  So the
+> above sequence where PINV is acknowledge after PID.PIR[200] is legal, but
+> processing PIR bits that are set after the PIR is observed to be cleared would
+> be illegal.
 
-Ah, that's annoying.  Now that you mention it, I do vaguely recall this behavior.
- 
-> 2. .max can have any limit unless we add a check to not allow a user to
->    set any value more than the supported one. 
+That would be another case of the unnecessarily specific promise above.
 
-Duh, didn't think that one through.
+> E.g. if L1 did this
+> 
+> 	set PID.PIR[100]
+> 	set PID.ON
+> 	send PINV
+> 	while (PID.PIR)
+> 	set PID.PIR[200]
+> 	set PID.ON
+>
+> This is the part that is likely impossible to
+> solve without shadowing the PID (which, for the record, I have zero desire to do).
 
-Thanks!
+Neither do I. :)  But technically the SDM doesn't promise reading the 
+whole 256 bits at the same time.  Perhaps that's the only way it can 
+work in practice due to the cache coherency protocols, but the SDM only 
+promises atomicity of the read and clear of "a single PIR bit (or group 
+of bits)".  So there's in principle no reason why the target CPU 
+couldn't clear PID.PIR[100], and then L1 would sneak in and set 
+PID.PIR[200].
+
+Paolo
+
+> It seems extremely unlikely any guest will puke on the above, I can't imagine
+> there's for setting a PID.PIR + PID.ON without triggering PINV, but it's
+> technically bad behavior in KVM.
+> 
+
