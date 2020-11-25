@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 802B22C3C85
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:43:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A07B2C3CC2
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:44:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728519AbgKYJmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Nov 2020 04:42:02 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57240 "EHLO
+        id S1728753AbgKYJm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Nov 2020 04:42:59 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57142 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728007AbgKYJmA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:42:00 -0500
+        by vger.kernel.org with ESMTP id S1727673AbgKYJl6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:41:58 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 62E05305D3C1;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 8E452305D3C2;
         Wed, 25 Nov 2020 11:35:51 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 3F14A3072785;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 67B0C3072784;
         Wed, 25 Nov 2020 11:35:51 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
+        =?UTF-8?q?Mircea=20C=C3=AErjaliu?= <mcirjaliu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v10 53/81] KVM: introspection: add KVMI_VCPU_GET_REGISTERS
-Date:   Wed, 25 Nov 2020 11:35:32 +0200
-Message-Id: <20201125093600.2766-54-alazar@bitdefender.com>
+Subject: [PATCH v10 54/81] KVM: introspection: add KVMI_VCPU_SET_REGISTERS
+Date:   Wed, 25 Nov 2020 11:35:33 +0200
+Message-Id: <20201125093600.2766-55-alazar@bitdefender.com>
 In-Reply-To: <20201125093600.2766-1-alazar@bitdefender.com>
 References: <20201125093600.2766-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -37,35 +38,38 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Mihai Donțu <mdontu@bitdefender.com>
 
-This command is used to get kvm_regs and kvm_sregs structures,
-plus a list of struct kvm_msrs from a specific vCPU.
+During an introspection event, the introspection tool might need to
+change the vCPU state, for example, to skip the current instruction.
 
-While the kvm_regs and kvm_sregs structures are included with every
-event, this command allows reading any MSR.
+This command is allowed only during vCPU events and the registers will
+be set when the reply has been received.
 
 Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
+Co-developed-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
+Signed-off-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
 Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               | 44 ++++++++++++
- arch/x86/include/uapi/asm/kvmi.h              | 15 ++++
- arch/x86/kvm/kvmi.c                           | 25 +++++++
- arch/x86/kvm/kvmi.h                           |  9 +++
- arch/x86/kvm/kvmi_msg.c                       | 72 ++++++++++++++++++-
+ Documentation/virt/kvm/kvmi.rst               | 29 +++++++
+ arch/x86/include/asm/kvmi_host.h              |  2 +
+ arch/x86/kvm/kvmi.c                           | 22 +++++
+ arch/x86/kvm/kvmi.h                           |  2 +
+ arch/x86/kvm/kvmi_msg.c                       | 18 ++++
  include/uapi/linux/kvmi.h                     |  1 +
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 59 +++++++++++++++
- 7 files changed, 224 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kvm/kvmi.h
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 83 +++++++++++++++++++
+ virt/kvm/introspection/kvmi_int.h             |  1 +
+ virt/kvm/introspection/kvmi_msg.c             |  6 +-
+ 9 files changed, 162 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index a502cf9baead..dbaedbee9dee 100644
+index dbaedbee9dee..178832304458 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -557,6 +557,50 @@ the *KVMI_VM_CONTROL_EVENTS* command.
- * -KVM_EPERM - the access is disallowed (use *KVMI_VM_CHECK_EVENT* first)
+@@ -601,6 +601,35 @@ registers, the special registers and the requested set of MSRs.
  * -KVM_EAGAIN - the selected vCPU can't be introspected yet
+ * -KVM_ENOMEM - there is not enough memory to allocate the reply
  
-+11. KVMI_VCPU_GET_REGISTERS
++12. KVMI_VCPU_SET_REGISTERS
 +---------------------------
 +
 +:Architectures: x86
@@ -75,292 +79,262 @@ index a502cf9baead..dbaedbee9dee 100644
 +::
 +
 +	struct kvmi_vcpu_hdr;
-+	struct kvmi_vcpu_get_registers {
-+		__u16 nmsrs;
-+		__u16 padding1;
-+		__u32 padding2;
-+		__u32 msrs_idx[0];
-+	};
++	struct kvm_regs;
 +
 +:Returns:
 +
 +::
 +
-+	struct kvmi_error_code;
-+	struct kvmi_vcpu_get_registers_reply {
-+		__u32 mode;
-+		__u32 padding;
-+		struct kvm_regs regs;
-+		struct kvm_sregs sregs;
-+		struct kvm_msrs msrs;
-+	};
++	struct kvmi_error_code
 +
-+For the given vCPU and the ``nmsrs`` sized array of MSRs registers,
-+returns the current vCPU mode (in bytes: 2, 4 or 8), the general purpose
-+registers, the special registers and the requested set of MSRs.
++Sets the general purpose registers for the given vCPU. The changes become
++visible to other threads accessing the KVM vCPU structure after the event
++currently being handled is replied to.
 +
 +:Errors:
 +
 +* -KVM_EINVAL - the selected vCPU is invalid
-+* -KVM_EINVAL - one of the indicated MSRs is invalid
 +* -KVM_EINVAL - the padding is not zero
-+* -KVM_EINVAL - the reply size is larger than
-+                kvmi_get_version_reply.max_msg_size (too many MSRs)
 +* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+* -KVM_ENOMEM - there is not enough memory to allocate the reply
++* -KVM_EOPNOTSUPP - the command hasn't been received during an introspection event
 +
  Events
  ======
  
-diff --git a/arch/x86/include/uapi/asm/kvmi.h b/arch/x86/include/uapi/asm/kvmi.h
-index 9d9df09d381a..11835bf9bdc6 100644
---- a/arch/x86/include/uapi/asm/kvmi.h
-+++ b/arch/x86/include/uapi/asm/kvmi.h
-@@ -30,4 +30,19 @@ struct kvmi_vcpu_event_arch {
- 	} msrs;
+diff --git a/arch/x86/include/asm/kvmi_host.h b/arch/x86/include/asm/kvmi_host.h
+index 05ade3a16b24..cc945151cb36 100644
+--- a/arch/x86/include/asm/kvmi_host.h
++++ b/arch/x86/include/asm/kvmi_host.h
+@@ -5,6 +5,8 @@
+ #include <asm/kvmi.h>
+ 
+ struct kvm_vcpu_arch_introspection {
++	struct kvm_regs delayed_regs;
++	bool have_delayed_regs;
  };
  
-+struct kvmi_vcpu_get_registers {
-+	__u16 nmsrs;
-+	__u16 padding1;
-+	__u32 padding2;
-+	__u32 msrs_idx[0];
-+};
-+
-+struct kvmi_vcpu_get_registers_reply {
-+	__u32 mode;
-+	__u32 padding;
-+	struct kvm_regs regs;
-+	struct kvm_sregs sregs;
-+	struct kvm_msrs msrs;
-+};
-+
- #endif /* _UAPI_ASM_X86_KVMI_H */
+ struct kvm_arch_introspection {
 diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 383b19dcf054..fa9b20277dad 100644
+index fa9b20277dad..39638af7757e 100644
 --- a/arch/x86/kvm/kvmi.c
 +++ b/arch/x86/kvm/kvmi.c
-@@ -93,3 +93,28 @@ void kvmi_arch_setup_vcpu_event(struct kvm_vcpu *vcpu,
- 	ev->arch.mode = kvmi_vcpu_mode(vcpu, &event->sregs);
- 	kvmi_get_msrs(vcpu, event);
+@@ -118,3 +118,25 @@ int kvmi_arch_cmd_vcpu_get_registers(struct kvm_vcpu *vcpu,
+ 
+ 	return err ? -KVM_EINVAL : 0;
  }
 +
-+int kvmi_arch_cmd_vcpu_get_registers(struct kvm_vcpu *vcpu,
-+				const struct kvmi_vcpu_get_registers *req,
-+				struct kvmi_vcpu_get_registers_reply *rpl)
++void kvmi_arch_cmd_vcpu_set_registers(struct kvm_vcpu *vcpu,
++				      const struct kvm_regs *regs)
 +{
-+	struct msr_data m = {.host_initiated = true};
-+	int k, err = 0;
++	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
++	struct kvm_regs *dest = &vcpui->arch.delayed_regs;
 +
-+	kvm_arch_vcpu_get_regs(vcpu, &rpl->regs);
-+	kvm_arch_vcpu_get_sregs(vcpu, &rpl->sregs);
-+	rpl->mode = kvmi_vcpu_mode(vcpu, &rpl->sregs);
-+	rpl->msrs.nmsrs = req->nmsrs;
++	memcpy(dest, regs, sizeof(*dest));
 +
-+	for (k = 0; k < req->nmsrs && !err; k++) {
-+		m.index = req->msrs_idx[k];
++	vcpui->arch.have_delayed_regs = true;
++}
 +
-+		err = kvm_x86_ops.get_msr(vcpu, &m);
-+		if (!err) {
-+			rpl->msrs.entries[k].index = m.index;
-+			rpl->msrs.entries[k].data = m.data;
-+		}
-+	}
++void kvmi_arch_post_reply(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
 +
-+	return err ? -KVM_EINVAL : 0;
++	if (!vcpui->arch.have_delayed_regs)
++		return;
++
++	kvm_arch_vcpu_set_regs(vcpu, &vcpui->arch.delayed_regs, false);
++	vcpui->arch.have_delayed_regs = false;
 +}
 diff --git a/arch/x86/kvm/kvmi.h b/arch/x86/kvm/kvmi.h
-new file mode 100644
-index 000000000000..7aab4aaabcda
---- /dev/null
+index 7aab4aaabcda..4eeb0c900083 100644
+--- a/arch/x86/kvm/kvmi.h
 +++ b/arch/x86/kvm/kvmi.h
-@@ -0,0 +1,9 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef ARCH_X86_KVM_KVMI_H
-+#define ARCH_X86_KVM_KVMI_H
-+
-+int kvmi_arch_cmd_vcpu_get_registers(struct kvm_vcpu *vcpu,
-+				const struct kvmi_vcpu_get_registers *req,
-+				struct kvmi_vcpu_get_registers_reply *rpl);
-+
-+#endif
+@@ -5,5 +5,7 @@
+ int kvmi_arch_cmd_vcpu_get_registers(struct kvm_vcpu *vcpu,
+ 				const struct kvmi_vcpu_get_registers *req,
+ 				struct kvmi_vcpu_get_registers_reply *rpl);
++void kvmi_arch_cmd_vcpu_set_registers(struct kvm_vcpu *vcpu,
++				      const struct kvm_regs *regs);
+ 
+ #endif
 diff --git a/arch/x86/kvm/kvmi_msg.c b/arch/x86/kvm/kvmi_msg.c
-index 77552bf50984..fd837c241340 100644
+index fd837c241340..4046a5c4d306 100644
 --- a/arch/x86/kvm/kvmi_msg.c
 +++ b/arch/x86/kvm/kvmi_msg.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include "../../../virt/kvm/introspection/kvmi_int.h"
-+#include "kvmi.h"
- 
- static int handle_vcpu_get_info(const struct kvmi_vcpu_msg_job *job,
- 				const struct kvmi_msg_hdr *msg,
-@@ -21,8 +22,77 @@ static int handle_vcpu_get_info(const struct kvmi_vcpu_msg_job *job,
- 	return kvmi_msg_vcpu_reply(job, msg, 0, &rpl, sizeof(rpl));
+@@ -90,9 +90,27 @@ static int handle_vcpu_get_registers(const struct kvmi_vcpu_msg_job *job,
+ 	return err;
  }
  
-+static bool is_valid_get_regs_request(const struct kvmi_msg_hdr *msg,
-+				const struct kvmi_vcpu_get_registers *req)
-+{
-+	size_t req_size, msg_size;
-+
-+	if (req->padding1 || req->padding2)
-+		return false;
-+
-+	req_size = struct_size(req, msrs_idx, req->nmsrs);
-+
-+	if (check_add_overflow(sizeof(struct kvmi_vcpu_hdr),
-+			       req_size, &msg_size))
-+		return false;
-+
-+	if (msg_size > msg->size)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool is_valid_get_regs_reply(const struct kvmi_vcpu_get_registers *req,
-+				    size_t *ptr_rpl_size)
-+{
-+	struct kvmi_vcpu_get_registers_reply *rpl;
-+	size_t rpl_size, msg_size;
-+
-+	rpl_size = struct_size(rpl, msrs.entries, req->nmsrs);
-+
-+	if (check_add_overflow(sizeof(struct kvmi_error_code),
-+			       rpl_size, &msg_size))
-+		return false;
-+
-+	if (msg_size > KVMI_MAX_MSG_SIZE)
-+		return false;
-+
-+	*ptr_rpl_size = rpl_size;
-+	return true;
-+}
-+
-+static int handle_vcpu_get_registers(const struct kvmi_vcpu_msg_job *job,
++static int handle_vcpu_set_registers(const struct kvmi_vcpu_msg_job *job,
 +				     const struct kvmi_msg_hdr *msg,
 +				     const void *req)
 +{
-+	struct kvmi_vcpu_get_registers_reply *rpl = NULL;
-+	size_t rpl_size;
-+	int err, ec;
++	const struct kvm_regs *regs = req;
++	int ec = 0;
 +
-+	if (!is_valid_get_regs_request(msg, req) ||
-+	    !is_valid_get_regs_reply(req, &rpl_size)) {
++	if (msg->size < sizeof(*regs))
 +		ec = -KVM_EINVAL;
-+		goto reply;
-+	}
++	else if (!VCPUI(job->vcpu)->waiting_for_reply)
++		ec = -KVM_EOPNOTSUPP;
++	else
++		kvmi_arch_cmd_vcpu_set_registers(job->vcpu, regs);
 +
-+	rpl = kvmi_msg_alloc();
-+	if (!rpl) {
-+		ec = -KVM_ENOMEM;
-+		goto reply;
-+	}
-+
-+	ec = kvmi_arch_cmd_vcpu_get_registers(job->vcpu, req, rpl);
-+
-+reply:
-+	err = kvmi_msg_vcpu_reply(job, msg, ec, rpl, rpl ? rpl_size : 0);
-+
-+	kvmi_msg_free(rpl);
-+	return err;
++	return kvmi_msg_vcpu_reply(job, msg, ec, NULL, 0);
 +}
 +
  static kvmi_vcpu_msg_job_fct const msg_vcpu[] = {
--	[KVMI_VCPU_GET_INFO] = handle_vcpu_get_info,
-+	[KVMI_VCPU_GET_INFO]      = handle_vcpu_get_info,
-+	[KVMI_VCPU_GET_REGISTERS] = handle_vcpu_get_registers,
+ 	[KVMI_VCPU_GET_INFO]      = handle_vcpu_get_info,
+ 	[KVMI_VCPU_GET_REGISTERS] = handle_vcpu_get_registers,
++	[KVMI_VCPU_SET_REGISTERS] = handle_vcpu_set_registers,
  };
  
  kvmi_vcpu_msg_job_fct kvmi_arch_vcpu_msg_handler(u16 id)
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index acd00e883dc9..8548ead451c1 100644
+index 8548ead451c1..4b756d388ad3 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -37,6 +37,7 @@ enum {
- 
+@@ -38,6 +38,7 @@ enum {
  	KVMI_VCPU_GET_INFO       = KVMI_VCPU_MESSAGE_ID(1),
  	KVMI_VCPU_CONTROL_EVENTS = KVMI_VCPU_MESSAGE_ID(2),
-+	KVMI_VCPU_GET_REGISTERS  = KVMI_VCPU_MESSAGE_ID(3),
+ 	KVMI_VCPU_GET_REGISTERS  = KVMI_VCPU_MESSAGE_ID(3),
++	KVMI_VCPU_SET_REGISTERS  = KVMI_VCPU_MESSAGE_ID(4),
  
  	KVMI_NEXT_VCPU_MESSAGE
  };
 diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index 5948f9b79ed0..f91a70ad1013 100644
+index f91a70ad1013..311a050c26c1 100644
 --- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -808,6 +808,64 @@ static void test_cmd_vcpu_control_events(struct kvm_vm *vm)
- 
+@@ -638,6 +638,16 @@ static int do_vcpu_command(struct kvm_vm *vm, int cmd_id,
+ 	return r;
  }
  
-+static void cmd_vcpu_get_registers(struct kvm_vm *vm, struct kvm_regs *regs)
++static int __do_vcpu0_command(int cmd_id, struct kvmi_msg_hdr *req,
++			      size_t req_size, void *rpl, size_t rpl_size)
 +{
-+	struct {
-+		struct kvmi_msg_hdr hdr;
-+		struct kvmi_vcpu_hdr vcpu_hdr;
-+		struct kvmi_vcpu_get_registers cmd;
-+	} req = {};
-+	struct kvmi_vcpu_get_registers_reply rpl;
++	struct kvmi_vcpu_hdr *vcpu_hdr = (struct kvmi_vcpu_hdr *)(req + 1);
 +
-+	test_vcpu0_command(vm, KVMI_VCPU_GET_REGISTERS, &req.hdr, sizeof(req),
-+			   &rpl, sizeof(rpl), 0);
++	vcpu_hdr->vcpu = 0;
 +
-+	memcpy(regs, &rpl.regs, sizeof(*regs));
++	return do_command(cmd_id, req, req_size, rpl, rpl_size);
 +}
 +
-+static void test_invalid_vcpu_get_registers(struct kvm_vm *vm)
+ static int do_vcpu0_command(struct kvm_vm *vm, int cmd_id,
+ 			    struct kvmi_msg_hdr *req, size_t req_size,
+ 			    void *rpl, size_t rpl_size)
+@@ -866,6 +876,78 @@ static void test_cmd_vcpu_get_registers(struct kvm_vm *vm)
+ 	test_invalid_vcpu_get_registers(vm);
+ }
+ 
++static int __cmd_vcpu_set_registers(struct kvm_vm *vm,
++				    struct kvm_regs *regs)
 +{
 +	struct {
 +		struct kvmi_msg_hdr hdr;
 +		struct kvmi_vcpu_hdr vcpu_hdr;
-+		struct kvmi_vcpu_get_registers cmd;
-+		__u32 msrs_idx[1];
++		struct kvm_regs regs;
 +	} req = {};
-+	struct {
-+		struct kvmi_msg_hdr hdr;
-+		struct kvmi_vcpu_hdr vcpu_hdr;
-+		struct kvmi_vcpu_get_registers cmd;
-+	} *req_big;
-+	struct kvmi_vcpu_get_registers_reply rpl;
-+	struct kvmi_get_version_reply version;
 +
-+	req.cmd.nmsrs = 1;
-+	req.cmd.msrs_idx[0] = 0xffffffff;
-+	test_vcpu0_command(vm, KVMI_VCPU_GET_REGISTERS,
-+			   &req.hdr, sizeof(req),
-+			   &rpl, sizeof(rpl), -KVM_EINVAL);
++	memcpy(&req.regs, regs, sizeof(req.regs));
 +
-+	cmd_vm_get_version(&version);
-+
-+	req_big = calloc(1, version.max_msg_size);
-+	req_big->cmd.nmsrs = (version.max_msg_size - sizeof(*req_big)) / sizeof(__u32);
-+	test_vcpu0_command(vm, KVMI_VCPU_GET_REGISTERS,
-+			   &req.hdr, sizeof(req),
-+			   &rpl, sizeof(rpl), -KVM_EINVAL);
-+	free(req_big);
++	return __do_vcpu0_command(KVMI_VCPU_SET_REGISTERS,
++				  &req.hdr, sizeof(req), NULL, 0);
 +}
 +
-+static void test_cmd_vcpu_get_registers(struct kvm_vm *vm)
++static void test_invalid_cmd_vcpu_set_registers(struct kvm_vm *vm)
 +{
++	struct vcpu_worker_data data = {.vm = vm, .vcpu_id = VCPU_ID};
++	pthread_t vcpu_thread;
++	struct kvm_regs regs;
++	int r;
++
++	vcpu_thread = start_vcpu_worker(&data);
++
++	r = __cmd_vcpu_set_registers(vm, &regs);
++
++	wait_vcpu_worker(vcpu_thread);
++
++	TEST_ASSERT(r == -KVM_EOPNOTSUPP,
++		"KVMI_VCPU_SET_REGISTERS didn't failed with KVM_EOPNOTSUPP, error %d(%s)\n",
++		-r, kvm_strerror(-r));
++}
++
++static void __set_registers(struct kvm_vm *vm,
++			    struct kvm_regs *regs)
++{
++	int r;
++
++	r = __cmd_vcpu_set_registers(vm, regs);
++	TEST_ASSERT(r == 0,
++		"KVMI_VCPU_SET_REGISTERS failed, error %d(%s)\n",
++		-r, kvm_strerror(-r));
++}
++
++static void test_cmd_vcpu_set_registers(struct kvm_vm *vm)
++{
++	struct vcpu_worker_data data = {.vm = vm, .vcpu_id = VCPU_ID};
++	__u16 event_id = KVMI_VCPU_EVENT_PAUSE;
++	struct kvmi_msg_hdr hdr;
++	pthread_t vcpu_thread;
++	struct vcpu_event ev;
++	struct vcpu_reply rpl = {};
 +	struct kvm_regs regs = {};
 +
 +	cmd_vcpu_get_registers(vm, &regs);
 +
-+	pr_debug("get_registers rip 0x%llx\n", regs.rip);
++	test_invalid_cmd_vcpu_set_registers(vm);
 +
-+	test_invalid_vcpu_get_registers(vm);
++	pause_vcpu();
++
++	vcpu_thread = start_vcpu_worker(&data);
++
++	receive_vcpu_event(&hdr, &ev, sizeof(ev), event_id);
++
++	__set_registers(vm, &ev.common.arch.regs);
++
++	reply_to_event(&hdr, &ev, KVMI_EVENT_ACTION_CONTINUE,
++			&rpl, sizeof(rpl));
++
++	wait_vcpu_worker(vcpu_thread);
 +}
 +
  static void test_introspection(struct kvm_vm *vm)
  {
  	srandom(time(0));
-@@ -825,6 +883,7 @@ static void test_introspection(struct kvm_vm *vm)
- 	test_cmd_vcpu_get_info(vm);
+@@ -884,6 +966,7 @@ static void test_introspection(struct kvm_vm *vm)
  	test_pause(vm);
  	test_cmd_vcpu_control_events(vm);
-+	test_cmd_vcpu_get_registers(vm);
+ 	test_cmd_vcpu_get_registers(vm);
++	test_cmd_vcpu_set_registers(vm);
  
  	unhook_introspection(vm);
+ }
+diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
+index 8059029cadf4..018764ca1b71 100644
+--- a/virt/kvm/introspection/kvmi_int.h
++++ b/virt/kvm/introspection/kvmi_int.h
+@@ -70,5 +70,6 @@ void kvmi_arch_init_vcpu_events_mask(unsigned long *supported);
+ kvmi_vcpu_msg_job_fct kvmi_arch_vcpu_msg_handler(u16 id);
+ void kvmi_arch_setup_vcpu_event(struct kvm_vcpu *vcpu,
+ 				struct kvmi_vcpu_event *ev);
++void kvmi_arch_post_reply(struct kvm_vcpu *vcpu);
+ 
+ #endif
+diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
+index f7549baf5c41..b7de39d4afa6 100644
+--- a/virt/kvm/introspection/kvmi_msg.c
++++ b/virt/kvm/introspection/kvmi_msg.c
+@@ -717,10 +717,12 @@ int kvmi_send_vcpu_event(struct kvm_vcpu *vcpu, u32 ev_id,
+ 		err = vcpui->reply.error;
+ 
+ out:
+-	if (err)
++	if (err) {
+ 		kvmi_sock_shutdown(kvmi);
+-	else
++	} else {
++		kvmi_arch_post_reply(vcpu);
+ 		*action = vcpui->reply.action;
++	}
+ 
+ 	return err;
  }
