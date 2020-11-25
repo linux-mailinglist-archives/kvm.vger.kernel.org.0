@@ -2,30 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D8A72C3C9E
-	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:43:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82A3B2C3CC4
+	for <lists+kvm@lfdr.de>; Wed, 25 Nov 2020 10:44:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728660AbgKYJmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Nov 2020 04:42:19 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57144 "EHLO
+        id S1728826AbgKYJnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Nov 2020 04:43:06 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:57136 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728582AbgKYJmH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:42:07 -0500
+        by vger.kernel.org with ESMTP id S1727338AbgKYJl4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Nov 2020 04:41:56 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id BF6DB30462D2;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id E0AAF30462CE;
         Wed, 25 Nov 2020 11:35:53 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 9CB353072785;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id C2C243072784;
         Wed, 25 Nov 2020 11:35:53 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v10 67/81] KVM: introspection: add KVMI_VCPU_GET_XSAVE
-Date:   Wed, 25 Nov 2020 11:35:46 +0200
-Message-Id: <20201125093600.2766-68-alazar@bitdefender.com>
+Subject: [PATCH v10 68/81] KVM: introspection: add KVMI_VCPU_SET_XSAVE
+Date:   Wed, 25 Nov 2020 11:35:47 +0200
+Message-Id: <20201125093600.2766-69-alazar@bitdefender.com>
 In-Reply-To: <20201125093600.2766-1-alazar@bitdefender.com>
 References: <20201125093600.2766-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -35,30 +34,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+This can be used by the introspection tool to emulate SSE instructions.
 
-This vCPU command is used to get the XSAVE area.
-
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
-Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               | 29 +++++++++++++++++++
+ Documentation/virt/kvm/kvmi.rst               | 28 +++++++++++++++++++
  arch/x86/include/uapi/asm/kvmi.h              |  4 +++
- arch/x86/kvm/kvmi_msg.c                       | 20 +++++++++++++
+ arch/x86/kvm/kvmi_msg.c                       | 21 ++++++++++++++
  include/uapi/linux/kvmi.h                     |  1 +
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 26 +++++++++++++++++
- 5 files changed, 80 insertions(+)
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 27 ++++++++++++++----
+ 5 files changed, 75 insertions(+), 6 deletions(-)
 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index 008c7c73a46f..c1ac47def4e9 100644
+index c1ac47def4e9..56efeeb38980 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -830,6 +830,35 @@ Returns the value of an extended control register XCR.
- * -KVM_EINVAL - the padding is not zero
+@@ -859,6 +859,34 @@ Returns a buffer containing the XSAVE area.
  * -KVM_EAGAIN - the selected vCPU can't be introspected yet
+ * -KVM_ENOMEM - there is not enough memory to allocate the reply
  
-+19. KVMI_VCPU_GET_XSAVE
++20. KVMI_VCPU_SET_XSAVE
 +-----------------------
 +
 +:Architectures: x86
@@ -68,131 +63,151 @@ index 008c7c73a46f..c1ac47def4e9 100644
 +::
 +
 +	struct kvmi_vcpu_hdr;
++	struct kvmi_vcpu_set_xsave {
++		struct kvm_xsave xsave;
++	};
 +
 +:Returns:
 +
 +::
 +
 +	struct kvmi_error_code;
-+	struct kvmi_vcpu_get_xsave_reply {
-+		struct kvm_xsave xsave;
-+	};
 +
-+Returns a buffer containing the XSAVE area.
++Modifies the XSAVE area.
 +
 +:Errors:
 +
 +* -KVM_EINVAL - the selected vCPU is invalid
 +* -KVM_EINVAL - the padding is not zero
 +* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+* -KVM_ENOMEM - there is not enough memory to allocate the reply
 +
  Events
  ======
  
 diff --git a/arch/x86/include/uapi/asm/kvmi.h b/arch/x86/include/uapi/asm/kvmi.h
-index 5ca6190d85ec..0d3696c52d88 100644
+index 0d3696c52d88..6ec290b69b46 100644
 --- a/arch/x86/include/uapi/asm/kvmi.h
 +++ b/arch/x86/include/uapi/asm/kvmi.h
-@@ -111,4 +111,8 @@ struct kvmi_vcpu_get_xcr_reply {
- 	u64 value;
+@@ -115,4 +115,8 @@ struct kvmi_vcpu_get_xsave_reply {
+ 	struct kvm_xsave xsave;
  };
  
-+struct kvmi_vcpu_get_xsave_reply {
++struct kvmi_vcpu_set_xsave {
 +	struct kvm_xsave xsave;
 +};
 +
  #endif /* _UAPI_ASM_X86_KVMI_H */
 diff --git a/arch/x86/kvm/kvmi_msg.c b/arch/x86/kvm/kvmi_msg.c
-index 596f607296b5..77c753cd9705 100644
+index 77c753cd9705..c1b3bd56a42c 100644
 --- a/arch/x86/kvm/kvmi_msg.c
 +++ b/arch/x86/kvm/kvmi_msg.c
-@@ -194,12 +194,32 @@ static int handle_vcpu_get_xcr(const struct kvmi_vcpu_msg_job *job,
- 	return kvmi_msg_vcpu_reply(job, msg, ec, &rpl, sizeof(rpl));
+@@ -213,6 +213,26 @@ static int handle_vcpu_get_xsave(const struct kvmi_vcpu_msg_job *job,
+ 	return err;
  }
  
-+static int handle_vcpu_get_xsave(const struct kvmi_vcpu_msg_job *job,
++static int handle_vcpu_set_xsave(const struct kvmi_vcpu_msg_job *job,
 +				 const struct kvmi_msg_hdr *msg,
 +				 const void *req)
 +{
-+	struct kvmi_vcpu_get_xsave_reply *rpl;
-+	int err, ec = 0;
++	size_t req_size, msg_size = msg->size;
++	int ec = 0;
 +
-+	rpl = kvmi_msg_alloc();
-+	if (!rpl)
-+		ec = -KVM_ENOMEM;
-+	else
-+		kvm_vcpu_ioctl_x86_get_xsave(job->vcpu, &rpl->xsave);
++	if (check_sub_overflow(msg_size, sizeof(struct kvmi_vcpu_hdr),
++			       &req_size))
++		return -EINVAL;
 +
-+	err = kvmi_msg_vcpu_reply(job, msg, 0, rpl, sizeof(*rpl));
++	if (req_size < sizeof(struct kvm_xsave))
++		ec = -KVM_EINVAL;
++	else if (kvm_vcpu_ioctl_x86_set_xsave(job->vcpu,
++					      (struct kvm_xsave *) req))
++		ec = -KVM_EINVAL;
 +
-+	kvmi_msg_free(rpl);
-+	return err;
++	return kvmi_msg_vcpu_reply(job, msg, ec, NULL, 0);
 +}
 +
  static kvmi_vcpu_msg_job_fct const msg_vcpu[] = {
  	[KVMI_VCPU_CONTROL_CR]       = handle_vcpu_control_cr,
  	[KVMI_VCPU_GET_CPUID]        = handle_vcpu_get_cpuid,
- 	[KVMI_VCPU_GET_INFO]         = handle_vcpu_get_info,
- 	[KVMI_VCPU_GET_REGISTERS]    = handle_vcpu_get_registers,
- 	[KVMI_VCPU_GET_XCR]          = handle_vcpu_get_xcr,
-+	[KVMI_VCPU_GET_XSAVE]        = handle_vcpu_get_xsave,
+@@ -222,6 +242,7 @@ static kvmi_vcpu_msg_job_fct const msg_vcpu[] = {
+ 	[KVMI_VCPU_GET_XSAVE]        = handle_vcpu_get_xsave,
  	[KVMI_VCPU_INJECT_EXCEPTION] = handle_vcpu_inject_exception,
  	[KVMI_VCPU_SET_REGISTERS]    = handle_vcpu_set_registers,
++	[KVMI_VCPU_SET_XSAVE]        = handle_vcpu_set_xsave,
  };
+ 
+ kvmi_vcpu_msg_job_fct kvmi_arch_vcpu_msg_handler(u16 id)
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 07b6d383641a..e47c4ce0f8ed 100644
+index e47c4ce0f8ed..3baf5c7842bb 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -45,6 +45,7 @@ enum {
- 	KVMI_VCPU_CONTROL_CR       = KVMI_VCPU_MESSAGE_ID(6),
+@@ -46,6 +46,7 @@ enum {
  	KVMI_VCPU_INJECT_EXCEPTION = KVMI_VCPU_MESSAGE_ID(7),
  	KVMI_VCPU_GET_XCR          = KVMI_VCPU_MESSAGE_ID(8),
-+	KVMI_VCPU_GET_XSAVE        = KVMI_VCPU_MESSAGE_ID(9),
+ 	KVMI_VCPU_GET_XSAVE        = KVMI_VCPU_MESSAGE_ID(9),
++	KVMI_VCPU_SET_XSAVE        = KVMI_VCPU_MESSAGE_ID(10),
  
  	KVMI_NEXT_VCPU_MESSAGE
  };
 diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index da90c6a8d535..277b1061410b 100644
+index 277b1061410b..45c1f3132a3c 100644
 --- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -1448,6 +1448,31 @@ static void test_cmd_vcpu_get_xcr(struct kvm_vm *vm)
+@@ -1448,21 +1448,35 @@ static void test_cmd_vcpu_get_xcr(struct kvm_vm *vm)
  	cmd_vcpu_get_xcr(vm, xcr1, &value, -KVM_EINVAL);
  }
  
-+static void cmd_vcpu_get_xsave(struct kvm_vm *vm)
+-static void cmd_vcpu_get_xsave(struct kvm_vm *vm)
++static void cmd_vcpu_get_xsave(struct kvm_vm *vm, struct kvm_xsave *rpl)
+ {
+ 	struct {
+ 		struct kvmi_msg_hdr hdr;
+ 		struct kvmi_vcpu_hdr vcpu_hdr;
+ 	} req = {};
+-	struct kvm_xsave rpl;
+ 
+ 	test_vcpu0_command(vm, KVMI_VCPU_GET_XSAVE, &req.hdr, sizeof(req),
+-			   &rpl, sizeof(rpl), 0);
++			   rpl, sizeof(*rpl), 0);
+ }
+ 
+-static void test_cmd_vcpu_get_xsave(struct kvm_vm *vm)
++static void cmd_vcpu_set_xsave(struct kvm_vm *vm, struct kvm_xsave *rpl)
 +{
 +	struct {
 +		struct kvmi_msg_hdr hdr;
 +		struct kvmi_vcpu_hdr vcpu_hdr;
++		struct kvm_xsave xsave;
 +	} req = {};
-+	struct kvm_xsave rpl;
 +
-+	test_vcpu0_command(vm, KVMI_VCPU_GET_XSAVE, &req.hdr, sizeof(req),
-+			   &rpl, sizeof(rpl), 0);
++	memcpy(&req.xsave, rpl, sizeof(*rpl));
++
++	test_vcpu0_command(vm, KVMI_VCPU_SET_XSAVE, &req.hdr, sizeof(req),
++			   NULL, 0, 0);
 +}
 +
-+static void test_cmd_vcpu_get_xsave(struct kvm_vm *vm)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+
-+	entry = kvm_get_supported_cpuid_entry(1);
-+	if (!(entry->ecx & X86_FEATURE_XSAVE)) {
-+		print_skip("XSAVE not supported, ecx 0x%x", entry->ecx);
-+		return;
-+	}
-+
-+	cmd_vcpu_get_xsave(vm);
-+}
-+
- static void test_introspection(struct kvm_vm *vm)
++static void test_cmd_vcpu_xsave(struct kvm_vm *vm)
  {
- 	srandom(time(0));
-@@ -1476,6 +1501,7 @@ static void test_introspection(struct kvm_vm *vm)
+ 	struct kvm_cpuid_entry2 *entry;
++	struct kvm_xsave xsave;
+ 
+ 	entry = kvm_get_supported_cpuid_entry(1);
+ 	if (!(entry->ecx & X86_FEATURE_XSAVE)) {
+@@ -1470,7 +1484,8 @@ static void test_cmd_vcpu_get_xsave(struct kvm_vm *vm)
+ 		return;
+ 	}
+ 
+-	cmd_vcpu_get_xsave(vm);
++	cmd_vcpu_get_xsave(vm, &xsave);
++	cmd_vcpu_set_xsave(vm, &xsave);
+ }
+ 
+ static void test_introspection(struct kvm_vm *vm)
+@@ -1501,7 +1516,7 @@ static void test_introspection(struct kvm_vm *vm)
  	test_cmd_vm_get_max_gfn();
  	test_event_xsetbv(vm);
  	test_cmd_vcpu_get_xcr(vm);
-+	test_cmd_vcpu_get_xsave(vm);
+-	test_cmd_vcpu_get_xsave(vm);
++	test_cmd_vcpu_xsave(vm);
  
  	unhook_introspection(vm);
  }
