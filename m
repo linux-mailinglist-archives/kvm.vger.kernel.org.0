@@ -2,48 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF802C52A3
-	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 12:11:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6685F2C5390
+	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 13:06:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388750AbgKZLKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Nov 2020 06:10:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35100 "EHLO
+        id S1728364AbgKZMFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Nov 2020 07:05:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388738AbgKZLKu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Nov 2020 06:10:50 -0500
+        with ESMTP id S1726321AbgKZMFs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Nov 2020 07:05:48 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0A9C0613D4
-        for <kvm@vger.kernel.org>; Thu, 26 Nov 2020 03:10:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C63EC0613D4
+        for <kvm@vger.kernel.org>; Thu, 26 Nov 2020 04:05:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VXuG2B7RR+/EPNe4vjoWt8vrEdOTp6J7GlwQeycgqyM=; b=tNNW5dD9kW0IOSlmy82XSP8zBv
-        ELfehLS/c8GJuDMMY4lkLWxvbs9LbwrDAHYlAuHMHsqXBrhfUuw0DcBv+Bi04uIjvJJrL2eiEjT+w
-        8a0j4r+jqofBRIp1S8nGSLhuiiqldMhKUOwQUn7F+U5cdiJIuyBAu7ECj9iazRvWL/dePRdzzUcfu
-        hC3bIyeq+7CrJPTvmQRoPa+A/ZdpVAMW/y5DThxypamDlDF5kf0gWvEJTLvsVlxXIWHLq1tngRPdP
-        6ALJBqUlEnd3FwxvjrjBN4PZBW6jstg5chqDOZS1Vx2R59Vbp6opo5v1zZSD4nKNnV9dbhpPo+g0u
-        5vZjP7yA==;
-Received: from 54-240-197-238.amazon.com ([54.240.197.238] helo=freeip.amazon.com)
+        bh=0U9ehtY9XGUy3iyYnIyiQ5B+rTrgXoQsjFNpkMxJDNY=; b=MG6ZlfcF53BNOdLR8cydrJ8fAI
+        5xwyeTCovYXydSanISXabf5SISO22WOyioNFEuAmTiROY0/niRLqcEbQqCxFSXs8emqGTI1Nolx6Q
+        KOKBZeDl/oeKj2yD0tQdo+09MHxlslJ0KeiuUtNzVF+ARpuV7PJIafa1ir0e4KEc0rWMFZv0ZEoEp
+        53/VnI4n9JRi9nurxlhC63o9L9GyNgdCFku/PEreVQu9HC8mu23tCZ6iM2vq23zo57/zolOlmniPj
+        i5V7068lnNqQaJeneHxIzV8tg9N3r8hky2r0Batx7Lpar6UzYyag6kj96Aec/1KvYZc+W1Z2SZ9MP
+        zlV9n6Ug==;
+Received: from 54-240-197-230.amazon.com ([54.240.197.230] helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kiFAi-000594-5Q; Thu, 26 Nov 2020 11:10:44 +0000
-Message-ID: <99a9c1dfbb21744e5081d924291d3b09ab055813.camel@infradead.org>
-Subject: Re: [RFC PATCH] Fix split-irqchip vs interrupt injection window
- request.
+        id 1kiG1r-00060V-QS; Thu, 26 Nov 2020 12:05:40 +0000
+Message-ID: <6a8897917188a3a23710199f8da3f5f33670b80f.camel@infradead.org>
+Subject: [PATCH] kvm/x86: Fix simultaneous ExtINT and lapic interrupt
+ handling with APICv
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm <kvm@vger.kernel.org>, "Sironi, Filippo" <sironi@amazon.de>,
         "Raslan, KarimAllah" <karahmed@amazon.de>,
         Matt Gingell <gingell@google.com>,
         Steve Rutherford <srutherford@google.com>, liran@amazon.com
-Date:   Thu, 26 Nov 2020 11:10:41 +0000
-In-Reply-To: <20201125211955.GA450871@google.com>
+Date:   Thu, 26 Nov 2020 12:05:37 +0000
+In-Reply-To: <99a9c1dfbb21744e5081d924291d3b09ab055813.camel@infradead.org>
 References: <62918f65ec78f8990278a6a0db0567968fa23e49.camel@infradead.org>
          <017de9019136b5d2ec34132b96b9f0273c21d6f1.camel@infradead.org>
          <20201125211955.GA450871@google.com>
+         <99a9c1dfbb21744e5081d924291d3b09ab055813.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-VyxItZYY7p/HGD3q5vZb"
+        boundary="=-11Ux+li4/5eCeR0A+TmT"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -52,59 +54,50 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-VyxItZYY7p/HGD3q5vZb
+--=-11Ux+li4/5eCeR0A+TmT
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2020-11-25 at 21:19 +0000, Sean Christopherson wrote:
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -4028,7 +4028,7 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu=
- *vcpu)
-> >   static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vc=
-pu)
-> >   {
-> >          return kvm_arch_interrupt_allowed(vcpu) &&
-> > -               !kvm_cpu_has_interrupt(vcpu) &&
-> > +               !kvm_cpu_has_injectable_intr(vcpu) &&
->=20
-> Interrupt window exiting explicitly has priority over virtual interrupt d=
-elivery,
-> so this is correct from that perspective.
->=20
-> But I wonder if would make sense to be more precise so that KVM behavior =
-is
-> consistent for APICv and legacy IRQ injection.  If the LAPIC is in-kernel=
-,
-> KVM_INTERRUPT can only be used for EXTINT;=20
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-I think it should be used for injecting Xen event channel vectors too,
-shouldn't it? Those have their own EOI/mask mechanism and shouldn't be
-injected through the LAPIC (for example by simulating MSI to the
-appropriate APIC+vector) because the guest won't EOI them there.
+Booting a guest with 'noapic' with split irqchip and APICv enabled leads
+to a livelock in vcpu_run().
 
-Although to all extents and purposes that basically means we *are*
-treating them like ExtINT.
+When the userspace PIC has an IRQ to deliver, the VMM sets
+kvm_run->request_interrupt_window and vcpu_enter_guest() duly enables the
+corresponding VMexit, which happens immediately.
 
-Not that it makes a difference to the outcome right now, although there
-was once a patch floating around to allow KVM_INTERRUPT even when the
-PIC was in-kernel, precisely for that reason.
+However, if an interrupt also exists in the local APIC, that causes
+kvm_cpu_has_interrupt() to be true and thus causes
+kvm_vcpu_ready_for_interrupt_injection() to return false; the intent
+being that the kernel will use this interrupt window to inject its own
+interrupt from the LAPIC. So vcpu_run() doesn't exit all the way to
+userspace, and just loops.
 
-> whether or not there's an IRQ in the
-> LAPIC should be irrelevant when deciding to exit to userspace.  Note, the
-> reinjection check covers vcpu->arch.interrupt.injected for the case where=
- LAPIC
-> is in userspace.
->=20
->         return kvm_arch_interrupt_allowed(vcpu) &&
->                (!lapic_in_kernel(vcpu) || !kvm_cpu_has_extint(vcpu)) &&
->                !kvm_event_needs_reinjection(vcpu) &&
->                kvm_cpu_accept_dm_intr(vcpu);
-> }
+However, when APICv is in use there is no interrupt to be injected since
+that happens automatically. So the guest vCPU is launched again, exits
+again immediately, and the loop repeats ad infinitum without making any
+progress.
 
-Makes sense. I'm putting this version through some testing and will
-post it later...
+It looks like this was introduced in commit 782d422bcaee, when
+dm_request_for_irq_injection() started returning true based purely
+on the fact that userspace had requested the interrupt window, without
+heed to kvm_cpu_has_interrupt() also being true.
 
+Fix it by allowing userspace to use the interrupt window with priority
+over the interrupt that is already in the LAPIC, for both APICv and
+legacy injection alike. Instead of '!kvm_cpu_has_interrupt()', the
+condition becomes '!(lapic_in_kernel(vcpu) && kvm_cpu_has_extint(vcpu))'
+
+Fixes: 782d422bcaee ("KVM: x86: split kvm_vcpu_ready_for_interrupt_injectio=
+n out of dm_request_for_irq_injection")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Cc: stable@vger.kernel.org
+---
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/irq.c              | 2 +-
+ arch/x86/kvm/x86.c              | 6 ++++--
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
 t.h
@@ -155,8 +148,11 @@ vcpu)
  		!kvm_event_needs_reinjection(vcpu) &&
  		kvm_cpu_accept_dm_intr(vcpu);
  }
+--=20
+2.17.1
 
---=-VyxItZYY7p/HGD3q5vZb
+
+--=-11Ux+li4/5eCeR0A+TmT
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -239,20 +235,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MTI2MTExMDQxWjAvBgkqhkiG9w0BCQQxIgQg92QNRXybVLIJuk5gSEWGY3BLv32IqyEYmGfi5+U3
-Cr8wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MTI2MTIwNTM3WjAvBgkqhkiG9w0BCQQxIgQgnikawEBjZ46OaD/o0cTtlUVPU4vIOWlzUsPUrbxM
+eOswgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAKAzPUuUXfUz1Fc2Q42YTmsR+xa5WVGTfUir1aDp5GAL8PzFdg07gC+EhpQBIQu6
-iF++Wd5Hu2j3wnH4Q747BDkdUqnOxkQ6Yxd+VRaRcKL11FjgQPAltazagTX+cw9LBHwMYuJs4erY
-WpPseTUt/4SsgqSrTIFXeH6NKVFXfAEKU6iaiBAug0sO9MOwdM7DOb1SGP0ZV+HQb4EFdvSZCxZm
-rDbjSP/+7mHnrrZswn6YKqp8jIK6lIdzfP7LN92BAGxpUz7w/rCsfdovY00pMHjGDcDut8DgPQhm
-CS9Htqjk7yPmHLUO9pRntcpZf4V0as7SlSA0VqQK3WaP2Knw5MYAAAAAAAA=
+DQEBAQUABIIBAJZMf++4jIfq07ls/zcskvtkFMyqwoEnngL34StzW1Kzkp8sylFs7ShHjcvU4Yoh
+UR5vLBgGDKJ2rWS3jxgE8EAOHi5XCz446BA/YLe11pNewBq0CPKVvOs2+wzU0Ix+awiIc9b3JhB0
+UAPoTg7c28/H+xMt0T6xPU3i2F6wPUPnENLIbJ0cRSGRuPkol7YKQunNARZnYK7qxz293sAn6TRf
+l2WIAzNB1ME46664F07QeQcLLBC1JncYXp9BIlsnQDi7ELxYlRf7hY+llH39c/QwVC1njLNzAdP6
+x9BiBi8zS0HPT0TxYtwWB/RUJUdX6pkOioZwENCUi/Ti8tIHs6gAAAAAAAA=
 
 
---=-VyxItZYY7p/HGD3q5vZb--
+--=-11Ux+li4/5eCeR0A+TmT--
 
