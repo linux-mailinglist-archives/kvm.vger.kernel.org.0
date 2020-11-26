@@ -2,221 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BE502C50BD
-	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 09:51:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AAC52C514A
+	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 10:32:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389013AbgKZIuT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Nov 2020 03:50:19 -0500
-Received: from mga02.intel.com ([134.134.136.20]:61887 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726392AbgKZIuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Nov 2020 03:50:19 -0500
-IronPort-SDR: MzFXFOSU0FJi6aO7yXxvR74dBrECbzGlNmrYYR7uhFQmXLkQBdTd94EXJGqQ7N3j4ymIkpZpBH
- YRAsBBVS8wKA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9816"; a="159304162"
-X-IronPort-AV: E=Sophos;i="5.78,371,1599548400"; 
-   d="scan'208";a="159304162"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2020 00:50:18 -0800
-IronPort-SDR: 0ckRKnhBtLlrKe8kX3O58++wCeYNqa8uzQDWFbhBPT0Es9yZXN3LFAFJos4EYK1zxawGWUpSYN
- dybkCpwIi6Fg==
-X-IronPort-AV: E=Sophos;i="5.78,371,1599548400"; 
-   d="scan'208";a="547637576"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.208.39]) ([10.254.208.39])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2020 00:50:15 -0800
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Zeng, Xin" <xin.zeng@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2 1/1] vfio/type1: Add vfio_group_domain()
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20201126012726.1185171-1-baolu.lu@linux.intel.com>
- <DM5PR11MB143560E51C84BAF83AE54AC0C3F90@DM5PR11MB1435.namprd11.prod.outlook.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <e90e57bf-1ca1-0cbe-02ab-cce647c50b40@linux.intel.com>
-Date:   Thu, 26 Nov 2020 16:50:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S1733081AbgKZJao (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Nov 2020 04:30:44 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:8408 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732405AbgKZJao (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Nov 2020 04:30:44 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ChXY95fs7z741P;
+        Thu, 26 Nov 2020 17:30:21 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 26 Nov 2020 17:30:31 +0800
+Subject: Re: [kvm-unit-tests PATCH 10/10] arm64: gic: Use IPI test checking
+ for the LPI tests
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <drjones@redhat.com>
+CC:     <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-11-alexandru.elisei@arm.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
+Date:   Thu, 26 Nov 2020 17:30:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <DM5PR11MB143560E51C84BAF83AE54AC0C3F90@DM5PR11MB1435.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20201125155113.192079-11-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.179]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
-
-On 2020/11/26 15:21, Liu, Yi L wrote:
-> On Thurs, Nov 26, 2020, at 9:27 AM, Lu Baolu wrote:
->> Add the API for getting the domain from a vfio group. This could be used
->> by the physical device drivers which rely on the vfio/mdev framework for
->> mediated device user level access. The typical use case like below:
->>
->> 	unsigned int pasid;
->> 	struct vfio_group *vfio_group;
->> 	struct iommu_domain *iommu_domain;
->> 	struct device *dev = mdev_dev(mdev);
->> 	struct device *iommu_device = mdev_get_iommu_device(dev);
->>
->> 	if (!iommu_device ||
->> 	    !iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
->> 		return -EINVAL;
->>
->> 	vfio_group = vfio_group_get_external_user_from_dev(dev);(dev);
+On 2020/11/25 23:51, Alexandru Elisei wrote:
+> The reason for the failure is that the test "dev2/eventid=20 now triggers
+> an LPI" triggers 2 LPIs, not one. This behavior was present before this
+> patch, but it was ignored because check_lpi_stats() wasn't looking at the
+> acked array.
 > 
-> duplicate (dev); 😊other parts looks good to me. perhaps, you can also
+> I'm not familiar with the ITS so I'm not sure if this is expected, if the
+> test is incorrect or if there is something wrong with KVM emulation.
 
-Will fix this typo. Thanks!
+I think this is expected, or not.
 
-> describe that the release function of a sub-device fd should also call
-> vfio_group_put_external_user() to release its reference on the vfio_group.
+Before INVALL, the LPI-8195 was already pending but disabled. On
+receiving INVALL, VGIC will reload configuration for all LPIs targeting
+collection-3 and deliver the now enabled LPI-8195. We'll therefore see
+and handle it before sending the following INT (which will set the
+LPI-8195 pending again).
 
-This is just a sample code. The callers are free to decide when to get
-and release the vfio_group.
-
+> Did some more testing on an Ampere eMAG (fast out-of-order cores) using
+> qemu and kvmtool and Linux v5.8, here's what I found:
 > 
-> Regards,
-> Yi Liu
+> - Using qemu and gic.flat built from*master*: error encountered 864 times
+>    out of 1088 runs.
+> - Using qemu: error encountered 852 times out of 1027 runs.
+> - Using kvmtool: error encountered 8164 times out of 10602 runs.
 
-Best regards,
-baolu
+If vcpu-3 hadn't seen and handled LPI-8195 as quickly as possible (e.g.,
+vcpu-3 hadn't been scheduled), the following INT will set the already
+pending LPI-8195 pending again and we'll receive it *once* on vcpu-3.
+And we won't see the mentioned failure.
 
-> 
->> 	if (IS_ERR_OR_NULL(vfio_group))
->> 		return -EFAULT;
->>
->> 	iommu_domain = vfio_group_domain(vfio_group);
->> 	if (IS_ERR_OR_NULL(iommu_domain)) {
->> 		vfio_group_put_external_user(vfio_group);
->> 		return -EFAULT;
->> 	}
->>
->> 	pasid = iommu_aux_get_pasid(iommu_domain, iommu_device);
->> 	if (pasid < 0) {
->> 		vfio_group_put_external_user(vfio_group);
->> 		return -EFAULT;
->> 	}
->>
->> 	/* Program device context with pasid value. */
->> 	...
->>
->> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
->> ---
->>   drivers/vfio/vfio.c             | 18 ++++++++++++++++++
->>   drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++++++++++
->>   include/linux/vfio.h            |  3 +++
->>   3 files changed, 44 insertions(+)
->>
->> Change log:
->>   - v1: https://lore.kernel.org/linux-iommu/20201112022407.2063896-1-baolu.lu@linux.intel.com/
->>   - Changed according to comments @ https://lore.kernel.org/linux-iommu/20201116125631.2d043fcd@w520.home/
->>
->> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
->> index 2151bc7f87ab..62c652111c88 100644
->> --- a/drivers/vfio/vfio.c
->> +++ b/drivers/vfio/vfio.c
->> @@ -2331,6 +2331,24 @@ int vfio_unregister_notifier(struct device *dev,
->> enum vfio_notify_type type,
->>   }
->>   EXPORT_SYMBOL(vfio_unregister_notifier);
->>
->> +struct iommu_domain *vfio_group_domain(struct vfio_group *group)
->> +{
->> +	struct vfio_container *container;
->> +	struct vfio_iommu_driver *driver;
->> +
->> +	if (!group)
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	container = group->container;
->> +	driver = container->iommu_driver;
->> +	if (likely(driver && driver->ops->group_domain))
->> +		return driver->ops->group_domain(container->iommu_data,
->> +						 group->iommu_group);
->> +	else
->> +		return ERR_PTR(-ENOTTY);
->> +}
->> +EXPORT_SYMBOL(vfio_group_domain);
->> +
->>   /**
->>    * Module/class support
->>    */
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 67e827638995..783f18f21b95 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -2980,6 +2980,28 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data,
->> dma_addr_t user_iova,
->>   	return ret;
->>   }
->>
->> +static void *vfio_iommu_type1_group_domain(void *iommu_data,
->> +					   struct iommu_group *iommu_group)
->> +{
->> +	struct vfio_iommu *iommu = iommu_data;
->> +	struct iommu_domain *domain = NULL;
->> +	struct vfio_domain *d;
->> +
->> +	if (!iommu || !iommu_group)
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	mutex_lock(&iommu->lock);
->> +	list_for_each_entry(d, &iommu->domain_list, next) {
->> +		if (find_iommu_group(d, iommu_group)) {
->> +			domain = d->domain;
->> +			break;
->> +		}
->> +	}
->> +	mutex_unlock(&iommu->lock);
->> +
->> +	return domain;
->> +}
->> +
->>   static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
->>   	.name			= "vfio-iommu-type1",
->>   	.owner			= THIS_MODULE,
->> @@ -2993,6 +3015,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
->>   	.register_notifier	= vfio_iommu_type1_register_notifier,
->>   	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
->>   	.dma_rw			= vfio_iommu_type1_dma_rw,
->> +	.group_domain		= vfio_iommu_type1_group_domain,
->>   };
->>
->>   static int __init vfio_iommu_type1_init(void)
->> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
->> index 38d3c6a8dc7e..a0613a6f21cc 100644
->> --- a/include/linux/vfio.h
->> +++ b/include/linux/vfio.h
->> @@ -90,6 +90,7 @@ struct vfio_iommu_driver_ops {
->>   					       struct notifier_block *nb);
->>   	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
->>   				  void *data, size_t count, bool write);
->> +	void		*(*group_domain)(void *iommu_data, struct iommu_group *group);
->>   };
->>
->>   extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
->> @@ -126,6 +127,8 @@ extern int vfio_group_unpin_pages(struct vfio_group *group,
->>   extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
->>   		       void *data, size_t len, bool write);
->>
->> +extern struct iommu_domain *vfio_group_domain(struct vfio_group *group);
->> +
->>   /* each type has independent events */
->>   enum vfio_notify_type {
->>   	VFIO_IOMMU_NOTIFY = 0,
->> --
->> 2.25.1
-> 
+I think we can just drop the (meaningless and confusing?) INT.
+
+
+Thanks,
+Zenghui
