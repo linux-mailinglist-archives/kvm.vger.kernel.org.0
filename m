@@ -2,165 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 500132C5517
-	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 14:16:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCF5B2C55D8
+	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 14:38:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390088AbgKZNNj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Nov 2020 08:13:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27491 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390080AbgKZNNj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Nov 2020 08:13:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606396417;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HvROoBrLm2Fl8g98GGvDWrhSf1YkmYUSt3gbqPxqL3Q=;
-        b=PxZtIrBNyvmnhuMK7EffexDwbrrIwVOhzZBEzzDZX5a5zyFZIxzM5vvXlcx0HTC7pvVh3G
-        OgjD8knVvDEbV8lYp55FCBZE8a4QxH5fKK4vpiJgFZAUlhqKigFigrYWeR234QDHLFYMMR
-        Kpp+yxl0YW4fHUCj22ZBs5t8j9sm9XY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-sz6VQbisOX-QM2AesT_WqQ-1; Thu, 26 Nov 2020 08:13:35 -0500
-X-MC-Unique: sz6VQbisOX-QM2AesT_WqQ-1
-Received: by mail-wm1-f71.google.com with SMTP id o17so1347047wmd.9
-        for <kvm@vger.kernel.org>; Thu, 26 Nov 2020 05:13:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HvROoBrLm2Fl8g98GGvDWrhSf1YkmYUSt3gbqPxqL3Q=;
-        b=cVwoq8RJBzekn/m2/9QO8IKyk3twEQh3P6E1Dc6lK9R6P5AcsAZVW/+grB5+nmxP3z
-         NWJt4i/0GjDeIni8SsELlc9cnaAftcvlo647pALHL3Ffp1CPHuLwBLp9Wti/Q3c5ZNIz
-         L0yDyeDsOpElqIw5FmMaeMaaYDA3KpeiaiunijPGdSxMWoDwcBPDk93+maSc/8vNiN0L
-         /aaPkkIYmdZMk6PMLi71+ty7RaLCqvgqGnms+lUzaWWxdgVf+6xTtVQDWPr5CUedOhf7
-         xSoxvAqKcM/2exGmxNCG6AFXsY92D6H3ayXgOMcgjxmQhbVV6MHGVSX1YigoJsrNZjFI
-         860A==
-X-Gm-Message-State: AOAM531QX2yN5SXbAUL4B4Ab/BlPu9XUhYsfwyrXkin/9DcDjQQdO4/z
-        3K8RyXJNYz0GsajjehY9LkOc6vVYdHuyqj/jPrtGVpNOAbDNBuNqrESajlT/VR9ZjqmwrJmKr/n
-        7GG2PvPgdujpq
-X-Received: by 2002:a5d:6689:: with SMTP id l9mr3788755wru.134.1606396413650;
-        Thu, 26 Nov 2020 05:13:33 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw2X5TqtaP+sYxCew3Mpv22W83pXgju8y+0wnsNP81+5lKMBRCSHdFKhHZSz8ASdg7+HoupcA==
-X-Received: by 2002:a5d:6689:: with SMTP id l9mr3788736wru.134.1606396413447;
-        Thu, 26 Nov 2020 05:13:33 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b3sm8607472wrp.57.2020.11.26.05.13.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Nov 2020 05:13:32 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>, liam.merwick@oracle.com,
-        wanpeng.li@hotmail.com
-References: <20201123192223.3177490-1-oupton@google.com>
- <4788d64f-1831-9eb9-2c78-c5d9934fb47b@redhat.com>
- <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
- <CAOQ_QshMoc9W9g6XRuGM4hCtMdvUxSDpGAhp3vNxhxhWTK-5CQ@mail.gmail.com>
- <20201124015515.GA75780@google.com>
- <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
- <20201124212215.GA246319@google.com>
- <d5f4153b-975d-e61d-79e8-ed86df346953@redhat.com>
- <20201125011416.GA282994@google.com>
- <13e802d5-858c-df0a-d93f-ffebb444eca1@redhat.com>
- <20201125183236.GB400789@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
- posted-interrupt pending
-Message-ID: <89fe1772-36c7-7338-69aa-25d84a9febe8@redhat.com>
-Date:   Thu, 26 Nov 2020 14:13:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S2389980AbgKZNhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Nov 2020 08:37:47 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62270 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389919AbgKZNhq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Nov 2020 08:37:46 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AQDWBSV166420;
+        Thu, 26 Nov 2020 08:37:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=WSfkROi48m72xER+NaUnW8SnHhGr58DL6BR1O3Z2HfE=;
+ b=WmbMh72gkMsyG/gHCfLMLQHNFpWfLKLn03+PX5sRZMz0zRPN0J7UqSjY1kfZ7SW7JxBW
+ y4uxgrWF07qvIPnnWKrwsabYKwTA7HJu2KSl/qgv4NOB17ushmvIjCnYqVNl286qAJPH
+ +hUfqn+EYA+PpJVot0LCguIsXhTUE+7mLbBMlRP5+ka/0Lh5ztq9YNme/vcloHtiiSug
+ 02B2un7sS26PAT5IdIByy4SGzpmNYESqYYkNBFsgx87lHZ0NbK7D8GKUr5vXGd3J2vOT
+ 8EC6wyATQGmGln773Ndl8OUTWS5YWRuxYltR2LuFN/lwLt9XGpkXZ83LW9P3Fm8XhbBF kQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3527ys1fkg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Nov 2020 08:37:43 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AQDXKoB170447;
+        Thu, 26 Nov 2020 08:37:43 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3527ys1fjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Nov 2020 08:37:43 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AQDX2AM025464;
+        Thu, 26 Nov 2020 13:37:41 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 34xth8dndw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Nov 2020 13:37:41 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AQDbciW59244862
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Nov 2020 13:37:38 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0F7A342047;
+        Thu, 26 Nov 2020 13:37:38 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 44F4542041;
+        Thu, 26 Nov 2020 13:37:37 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.171.0.176])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 26 Nov 2020 13:37:37 +0000 (GMT)
+Date:   Thu, 26 Nov 2020 14:37:35 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v12 04/17] s390/vfio-ap: No need to disable IRQ after
+ queue reset
+Message-ID: <20201126143735.65e5d5e8.pasic@linux.ibm.com>
+In-Reply-To: <20201124214016.3013-5-akrowiak@linux.ibm.com>
+References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
+        <20201124214016.3013-5-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20201125183236.GB400789@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-26_04:2020-11-26,2020-11-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 bulkscore=0 impostorscore=0 adultscore=0
+ mlxscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011260078
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/11/20 19:32, Sean Christopherson wrote:
-> I'm pretty sure the exiting vCPU needs to wait
-> for all senders to finish their sequence, otherwise pi_pending could be left
-> set, but spinning on pi_pending is wrong.
+On Tue, 24 Nov 2020 16:40:03 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-What if you set it before?
+> The queues assigned to a matrix mediated device are currently reset when:
+> 
+> * The VFIO_DEVICE_RESET ioctl is invoked
+> * The mdev fd is closed by userspace (QEMU)
+> * The mdev is removed from sysfs.
+> 
+> Immediately after the reset of a queue, a call is made to disable
+> interrupts for the queue. This is entirely unnecessary because the reset of
+> a queue disables interrupts, so this will be removed.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
-						int vector)
-{
-	struct vcpu_vmx *vmx = to_vmx(vcpu);
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 
-	if (is_guest_mode(vcpu) &&
-	    vector == vmx->nested.posted_intr_nv) {
-		/*
-		 * Set pi_pending after ON.
-		 */
-		smp_store_release(&vmx->nested.pi_pending, true);
-		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, true)) {
-			/*
-			 * The guest was not running, let's try again
-			 * on the next vmentry.
-			 */
-			<set PINV in L1 vIRR>
-			kvm_make_request(KVM_REQ_EVENT, vcpu);
-			kvm_vcpu_kick(vcpu);
-			vmx->nested.pi_pending = false;
-		}
-		write_seqcount_end(&vmx->nested.pi_pending_sc);
-		return 0;
-	}
-	return -1;
-}
+As I said previously, I would prefer the cleanup of the airq
+resources being part of reset_queue(), but I can propose that
+later.
 
-On top of this:
-
-- kvm_x86_ops.hwapic_irr_update can be deleted.  It is already done 
-unconditionally by vmx_sync_pir_to_irr before every vmentry.  This gives 
-more freedom in changing vmx_sync_pir_to_irr and vmx_hwapic_irr_update.
-
-- VCPU entry must check if max_irr == vmx->nested.posted_intr_nv, and if 
-so send a POSTED_INTR_NESTED_VECTOR self-IPI.
-
-Combining both (and considering that AMD doesn't do anything interesting 
-in vmx_sync_pir_to_irr), I would move the whole call to 
-vmx_sync_pir_to_irr from x86.c to vmx/vmx.c, so that we know that 
-vmx_hwapic_irr_update is called with interrupts disabled and right 
-before vmentry:
-
-  static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
-  {
-	...
--	vmx_hwapic_irr_update(vcpu, max_irr);
-         return max_irr;
-  }
-
--static void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr)
-+static void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu)
-  {
-+	int max_irr;
-+
-+	WARN_ON(!irqs_disabled());
-+	max_irr = vmx_sync_pir_to_irr(vcpu);
-         if (!is_guest_mode(vcpu))
-                 vmx_set_rvi(max_irr);
-+	else if (max_irr == vmx->nested.posted_intr_nv) {
-+		...
-+	}
-  }
-
-and in vmx_vcpu_run:
-
-+	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
-+		vmx_hwapic_irr_update(vcpu);
-
-
-If you agree, feel free to send this (without the else of course) as a 
-separate cleanup patch immediately.
-
-Paolo
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 28 +++++-----------------------
+>  1 file changed, 5 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 8e6972495daa..dc699fd54505 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -26,14 +26,6 @@
+>  
+>  static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
+>  
+> -static int match_apqn(struct device *dev, const void *data)
+> -{
+> -	struct vfio_ap_queue *q = dev_get_drvdata(dev);
+> -
+> -	return (q->apqn == *(int *)(data)) ? 1 : 0;
+> -}
+> -
+> -
+>  /**
+>   * vfio_ap_get_queue: Retrieve a queue with a specific APQN.
+>   * @matrix_mdev: the associated mediated matrix
+> @@ -1121,20 +1113,6 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>  	return NOTIFY_OK;
+>  }
+>  
+> -static void vfio_ap_irq_disable_apqn(int apqn)
+> -{
+> -	struct device *dev;
+> -	struct vfio_ap_queue *q;
+> -
+> -	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+> -				 &apqn, match_apqn);
+> -	if (dev) {
+> -		q = dev_get_drvdata(dev);
+> -		vfio_ap_irq_disable(q);
+> -		put_device(dev);
+> -	}
+> -}
+> -
+>  static int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+>  				    unsigned int retry)
+>  {
+> @@ -1169,6 +1147,7 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
+>  {
+>  	int ret;
+>  	int rc = 0;
+> +	struct vfio_ap_queue *q;
+>  	unsigned long apid, apqi;
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  
+> @@ -1184,7 +1163,10 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
+>  			 */
+>  			if (ret)
+>  				rc = ret;
+> -			vfio_ap_irq_disable_apqn(AP_MKQID(apid, apqi));
+> +
+> +			q = vfio_ap_get_queue(matrix_mdev, AP_MKQID(apid, apqi);
+> +			if (q)
+> +				vfio_ap_free_aqic_resources(q);
+>  		}
+>  	}
+>  
 
