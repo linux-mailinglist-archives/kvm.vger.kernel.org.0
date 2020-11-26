@@ -2,128 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 413142C5185
-	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 10:45:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D12C12C51D8
+	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 11:15:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732732AbgKZJms (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Nov 2020 04:42:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8426 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731882AbgKZJmr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Nov 2020 04:42:47 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AQ9XD0h060007;
-        Thu, 26 Nov 2020 04:42:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=yxWmYa9S3svL+b+jzqzJOxS23lLhP49nBkfB7NFJ9dc=;
- b=Upw/tTzcDEeQKDSKykoptaTF4A5lwaH5YmokMC5jrSLAemtMp4OgOYhLfivBWr4HGG4H
- iLqxMu/SwolL5Fg/5ES+yJ0QOriR8TW2kduMiAxc40M/V7+RwIDNtSdjfe2A6DrAnTx7
- W6gKsdaBoh7q26/9y+xI9bFMNtXm69FHLoOvlfOkaxvOqW2J0prWoBv2nVk8A+Hdn5ua
- grTSyt3WhvKe6zP2/BlboKAAt+3ioQhA/ObNjE9vZ/7dwiRp7HYTVdF5piDcTUAsYN6c
- DHzOpabEURqEcn5uYqdC91dPHey82dK0VRilV+kFPzDKb1W0Pqkv87wyn6zIBZlVTf10 +w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3526k8dd39-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Nov 2020 04:42:43 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AQ9XGrW060270;
-        Thu, 26 Nov 2020 04:42:43 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3526k8dd2f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Nov 2020 04:42:43 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AQ9SDa3026545;
-        Thu, 26 Nov 2020 09:42:40 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 34xth8dg58-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Nov 2020 09:42:40 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AQ9gbGe53215732
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Nov 2020 09:42:37 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 414E811C04C;
-        Thu, 26 Nov 2020 09:42:37 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 77C0011C052;
-        Thu, 26 Nov 2020 09:42:36 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.0.176])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 26 Nov 2020 09:42:36 +0000 (GMT)
-Date:   Thu, 26 Nov 2020 10:42:34 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        Tony Krowiak <akrowiak@stny.rr.com>
-Subject: Re: [PATCH v12 02/17] s390/vfio-ap: decrement reference count to
- KVM
-Message-ID: <20201126104234.0bee248d.pasic@linux.ibm.com>
-In-Reply-To: <20201124214016.3013-3-akrowiak@linux.ibm.com>
-References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
-        <20201124214016.3013-3-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S2387700AbgKZKMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Nov 2020 05:12:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54230 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387677AbgKZKMG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Nov 2020 05:12:06 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA4CDC0613D4;
+        Thu, 26 Nov 2020 02:12:05 -0800 (PST)
+Received: from zn.tnic (p200300ec2f0c90002c8516e75060f16f.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:9000:2c85:16e7:5060:f16f])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 70C021EC04B9;
+        Thu, 26 Nov 2020 11:12:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1606385524;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=hL6+zLINeYzaNI1ZSXF12FfLj2TjMowBa3XIKWttURI=;
+        b=oh3PnwfIQCGovbg8R/dXRaAtANdtOYC+DIBshOQUKSuXB3aa6iD7Wv/nwoNMnRRzA6ORrK
+        Yvk/vagqVz5AJow1cmGib/6OZnf4Q9KxjZPD20IDnaYa1Rm5GmhYDcTPu8FgqPxitaOOdS
+        wQuR1bmngZDkiO0bLlQuoxBNZBTnn3s=
+Date:   Thu, 26 Nov 2020 11:12:03 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com, Zhang Chen <chen.zhang@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [RFC PATCH 03/67] x86/cpu: Move get_builtin_firmware() common
+ code (from microcode only)
+Message-ID: <20201126101203.GB31565@zn.tnic>
+References: <cover.1605232743.git.isaku.yamahata@intel.com>
+ <46d35ce06d84c55ff02a05610ca3fb6d51ee1a71.1605232743.git.isaku.yamahata@intel.com>
+ <20201125220947.GA14656@zn.tnic>
+ <20201126001812.GD450871@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-26_03:2020-11-26,2020-11-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 impostorscore=0 mlxscore=0 phishscore=0 adultscore=0
- spamscore=0 clxscore=1011 bulkscore=0 malwarescore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011260057
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20201126001812.GD450871@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 24 Nov 2020 16:40:01 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Thu, Nov 26, 2020 at 12:18:12AM +0000, Sean Christopherson wrote:
+> The SEAM module needs to be loaded during early boot, it can't be
+> deferred to a module, at least not without a lot more blood, sweat,
+> and tears.
 
-> Decrement the reference count to KVM when notified that KVM pointer is
-> invalidated via the vfio group notifier.
+Are you also planning to support builtin seam or only thru initrd loading?
 
-Can you please explain more thoroughly. Is this a bug you found? If
-yes do we need to backport it (cc stabe, fixes tag)? 
+In any case, this commit message needs to state intentions not me having
+to plow all the way up to patch 62.
 
-It doesn't see related to the objective of the series. If not related,
-why not spin it separately?
+> The SEAM Loader is an ACM that is invoked via GETSEC[EnterACCS], which
+> requires all APs to be in WFS.
 
+Yah, this is the other thing that sprang at me from looking at that
+"small" patchset briefly - I'm being killed by abbreviations. Whoever is
+sending the next version, pls put a proper documentation as patch 1 of
+the patchset just like the CET patchset does.
 
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@stny.rr.com>
+> SEAM Loader also returns control to the kernel with a null IDT and
+> NMIs unblocked, i.e. we're toast if there's a pending NMI. And unlike
+> the run-time SEAMCALLs, boot-time SEAMCALLs do not have a strictly
+> bounded runtime. Invoking configuration SEAMCALLs after the kernel is
+> fully up and running could cause instability as IRQ, NMI, and SMI are
+> all blocked in SEAM mode, e.g. a high priority IRQ/NMI/SMI could be
+> blocked for 50+ usecs (it might be far more than 50 usecs, I haven't
+> seen real numbers for all SEAMCALLs).
 
-This s-o-b is probably by accident.
+Yah, I sure hope people have taken an ample amount of time to think
+about all the implications of this thing because it sounds wonky to me.
+amluto certainly has already gone deeper and will surely comment. :)
 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 66fd9784a156..31e39c1f6e56 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -1095,7 +1095,11 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
->  	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
->  
->  	if (!data) {
-> +		if (matrix_mdev->kvm)
-> +			kvm_put_kvm(matrix_mdev->kvm);
-> +
->  		matrix_mdev->kvm = NULL;
-> +
->  		return NOTIFY_OK;
->  	}
->  
+Thx.
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
