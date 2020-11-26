@@ -2,76 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AAC52C514A
-	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 10:32:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EF852C5155
+	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 10:40:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733081AbgKZJao (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Nov 2020 04:30:44 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:8408 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732405AbgKZJao (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Nov 2020 04:30:44 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ChXY95fs7z741P;
-        Thu, 26 Nov 2020 17:30:21 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 26 Nov 2020 17:30:31 +0800
-Subject: Re: [kvm-unit-tests PATCH 10/10] arm64: gic: Use IPI test checking
- for the LPI tests
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <drjones@redhat.com>
-CC:     <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-11-alexandru.elisei@arm.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
-Date:   Thu, 26 Nov 2020 17:30:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1732317AbgKZJf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Nov 2020 04:35:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31488 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730787AbgKZJf4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Nov 2020 04:35:56 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AQ9VISY116782;
+        Thu, 26 Nov 2020 04:35:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FAVxL9P22rSr6aus9kpG2zf2SJCVGfdfDw+5+G1+VV4=;
+ b=nmaa2uNAkyleu5vZBN9JnJjV1rzzdtNGiyYGsC3uTwzk+k3QKjpzYoe2J+g7LPQMA1+v
+ VrvOPEyauU/pIcJyFuFRdcQ08FR+4M/6WxRvkWurkyp88PNS04+kn2/xVtxBvbt4c/80
+ O1P6W/4RS1Nt9IV4g26ymvZ6g1Vu3+rzCU54nX/eHJqv38zTLJIosb7pvVvgzhFPqYZT
+ EqWZSPkvLpl61wrGlpzhRT1aUwUmZCHAo2rVEa0FYenrrkOeAZKIVLUp3EVOcGtablbR
+ Mjt4zVeS3aOmHTy7zURGhmbHkOqbx5A6X5SrDsbrdXD1jPEEqccJ4KkL8S6/1KqnCOxL uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3529r5r6hf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Nov 2020 04:35:54 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AQ9VnwM118750;
+        Thu, 26 Nov 2020 04:35:54 -0500
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3529r5r6gj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Nov 2020 04:35:53 -0500
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AQ9QfeF023280;
+        Thu, 26 Nov 2020 09:35:52 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 34yy8r2qb9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Nov 2020 09:35:52 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AQ9Zncq60752132
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Nov 2020 09:35:49 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A75B42049;
+        Thu, 26 Nov 2020 09:35:49 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D78042042;
+        Thu, 26 Nov 2020 09:35:48 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.171.0.176])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 26 Nov 2020 09:35:48 +0000 (GMT)
+Date:   Thu, 26 Nov 2020 10:35:44 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v12 01/17] s390/vfio-ap: move probe and remove callbacks
+ to vfio_ap_ops.c
+Message-ID: <20201126103544.482ddd90.pasic@linux.ibm.com>
+In-Reply-To: <20201124214016.3013-2-akrowiak@linux.ibm.com>
+References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
+        <20201124214016.3013-2-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20201125155113.192079-11-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-26_02:2020-11-26,2020-11-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ priorityscore=1501 suspectscore=0 phishscore=0 clxscore=1015
+ mlxlogscore=999 adultscore=0 spamscore=0 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011260055
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/11/25 23:51, Alexandru Elisei wrote:
-> The reason for the failure is that the test "dev2/eventid=20 now triggers
-> an LPI" triggers 2 LPIs, not one. This behavior was present before this
-> patch, but it was ignored because check_lpi_stats() wasn't looking at the
-> acked array.
+On Tue, 24 Nov 2020 16:40:00 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> Let's move the probe and remove callbacks into the vfio_ap_ops.c
+> file to keep all code related to managing queues in a single file. This
+> way, all functions related to queue management can be removed from the
+> vfio_ap_private.h header file defining the public interfaces for the
+> vfio_ap device driver.
 > 
-> I'm not familiar with the ITS so I'm not sure if this is expected, if the
-> test is incorrect or if there is something wrong with KVM emulation.
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-I think this is expected, or not.
-
-Before INVALL, the LPI-8195 was already pending but disabled. On
-receiving INVALL, VGIC will reload configuration for all LPIs targeting
-collection-3 and deliver the now enabled LPI-8195. We'll therefore see
-and handle it before sending the following INT (which will set the
-LPI-8195 pending again).
-
-> Did some more testing on an Ampere eMAG (fast out-of-order cores) using
-> qemu and kvmtool and Linux v5.8, here's what I found:
-> 
-> - Using qemu and gic.flat built from*master*: error encountered 864 times
->    out of 1088 runs.
-> - Using qemu: error encountered 852 times out of 1027 runs.
-> - Using kvmtool: error encountered 8164 times out of 10602 runs.
-
-If vcpu-3 hadn't seen and handled LPI-8195 as quickly as possible (e.g.,
-vcpu-3 hadn't been scheduled), the following INT will set the already
-pending LPI-8195 pending again and we'll receive it *once* on vcpu-3.
-And we won't see the mentioned failure.
-
-I think we can just drop the (meaningless and confusing?) INT.
-
-
-Thanks,
-Zenghui
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
