@@ -2,108 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C3F02C528B
-	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 12:03:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCF802C52A3
+	for <lists+kvm@lfdr.de>; Thu, 26 Nov 2020 12:11:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730128AbgKZLCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Nov 2020 06:02:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29129 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729663AbgKZLCP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Nov 2020 06:02:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606388534;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wRLRXSeehVYPVGuCA1d0o01Y+gIuPbLbz2602T4YeXA=;
-        b=MJz8GNIycgMjs3uiRGTFuyENpaPTEYm600V7oDtz6TG9cL180qcERgTztvq5ND8fa0MXO2
-        mEfK2Amj5lpm/p4zEyk8cQrOW7zD1S8ynHvNUqkpYsldtI9stVWduu9p981GGNkkF8nvrZ
-        N+2R322Dk/xgm2GmdxXZ7v2wee47d+0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-La-84-XrMvy6T0qdNSLkKw-1; Thu, 26 Nov 2020 06:02:11 -0500
-X-MC-Unique: La-84-XrMvy6T0qdNSLkKw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE509805C06;
-        Thu, 26 Nov 2020 11:02:09 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1446260C05;
-        Thu, 26 Nov 2020 11:02:07 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: [PATCH] kvm: x86/mmu: Fix get_mmio_spte() on CPUs supporting 5-level PT
-Date:   Thu, 26 Nov 2020 12:02:06 +0100
-Message-Id: <20201126110206.2118959-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        id S2388750AbgKZLKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Nov 2020 06:10:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35100 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388738AbgKZLKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Nov 2020 06:10:50 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0A9C0613D4
+        for <kvm@vger.kernel.org>; Thu, 26 Nov 2020 03:10:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=VXuG2B7RR+/EPNe4vjoWt8vrEdOTp6J7GlwQeycgqyM=; b=tNNW5dD9kW0IOSlmy82XSP8zBv
+        ELfehLS/c8GJuDMMY4lkLWxvbs9LbwrDAHYlAuHMHsqXBrhfUuw0DcBv+Bi04uIjvJJrL2eiEjT+w
+        8a0j4r+jqofBRIp1S8nGSLhuiiqldMhKUOwQUn7F+U5cdiJIuyBAu7ECj9iazRvWL/dePRdzzUcfu
+        hC3bIyeq+7CrJPTvmQRoPa+A/ZdpVAMW/y5DThxypamDlDF5kf0gWvEJTLvsVlxXIWHLq1tngRPdP
+        6ALJBqUlEnd3FwxvjrjBN4PZBW6jstg5chqDOZS1Vx2R59Vbp6opo5v1zZSD4nKNnV9dbhpPo+g0u
+        5vZjP7yA==;
+Received: from 54-240-197-238.amazon.com ([54.240.197.238] helo=freeip.amazon.com)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kiFAi-000594-5Q; Thu, 26 Nov 2020 11:10:44 +0000
+Message-ID: <99a9c1dfbb21744e5081d924291d3b09ab055813.camel@infradead.org>
+Subject: Re: [RFC PATCH] Fix split-irqchip vs interrupt injection window
+ request.
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, "Sironi, Filippo" <sironi@amazon.de>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        Matt Gingell <gingell@google.com>,
+        Steve Rutherford <srutherford@google.com>, liran@amazon.com
+Date:   Thu, 26 Nov 2020 11:10:41 +0000
+In-Reply-To: <20201125211955.GA450871@google.com>
+References: <62918f65ec78f8990278a6a0db0567968fa23e49.camel@infradead.org>
+         <017de9019136b5d2ec34132b96b9f0273c21d6f1.camel@infradead.org>
+         <20201125211955.GA450871@google.com>
+Content-Type: multipart/signed; micalg="sha-256";
+        protocol="application/x-pkcs7-signature";
+        boundary="=-VyxItZYY7p/HGD3q5vZb"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 95fb5b0258b7 ("kvm: x86/mmu: Support MMIO in the TDP MMU") caused
-the following WARNING on an Intel Ice Lake CPU:
 
- get_mmio_spte: detect reserved bits on spte, addr 0xb80a0, dump hierarchy:
- ------ spte 0xb80a0 level 5.
- ------ spte 0xfcd210107 level 4.
- ------ spte 0x1004c40107 level 3.
- ------ spte 0x1004c41107 level 2.
- ------ spte 0x1db00000000b83b6 level 1.
- WARNING: CPU: 109 PID: 10254 at arch/x86/kvm/mmu/mmu.c:3569 kvm_mmu_page_fault.cold.150+0x54/0x22f [kvm]
-...
- Call Trace:
-  ? kvm_io_bus_get_first_dev+0x55/0x110 [kvm]
-  vcpu_enter_guest+0xaa1/0x16a0 [kvm]
-  ? vmx_get_cs_db_l_bits+0x17/0x30 [kvm_intel]
-  ? skip_emulated_instruction+0xaa/0x150 [kvm_intel]
-  kvm_arch_vcpu_ioctl_run+0xca/0x520 [kvm]
+--=-VyxItZYY7p/HGD3q5vZb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The guest triggering this crashes. Note, this happens with the traditional
-MMU and EPT enabled, not with the newly introduced TDP MMU. Turns out,
-there was a subtle change in the above mentioned commit. Previously,
-walk_shadow_page_get_mmio_spte() was setting 'root' to 'iterator.level'
-which is returned by shadow_walk_init() and this equals to
-'vcpu->arch.mmu->shadow_root_level'. Now, get_mmio_spte() sets it to
-'int root = vcpu->arch.mmu->root_level'.
+On Wed, 2020-11-25 at 21:19 +0000, Sean Christopherson wrote:
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -4028,7 +4028,7 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu=
+ *vcpu)
+> >   static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vc=
+pu)
+> >   {
+> >          return kvm_arch_interrupt_allowed(vcpu) &&
+> > -               !kvm_cpu_has_interrupt(vcpu) &&
+> > +               !kvm_cpu_has_injectable_intr(vcpu) &&
+>=20
+> Interrupt window exiting explicitly has priority over virtual interrupt d=
+elivery,
+> so this is correct from that perspective.
+>=20
+> But I wonder if would make sense to be more precise so that KVM behavior =
+is
+> consistent for APICv and legacy IRQ injection.  If the LAPIC is in-kernel=
+,
+> KVM_INTERRUPT can only be used for EXTINT;=20
 
-The difference between 'root_level' and 'shadow_root_level' on CPUs
-supporting 5-level page tables is that in some case we don't want to
-use 5-level, in particular when 'cpuid_maxphyaddr(vcpu) <= 48'
-kvm_mmu_get_tdp_level() returns '4'. In case upper layer is not used,
-the corresponding SPTE will fail '__is_rsvd_bits_set()' check.
+I think it should be used for injecting Xen event channel vectors too,
+shouldn't it? Those have their own EOI/mask mechanism and shouldn't be
+injected through the LAPIC (for example by simulating MSI to the
+appropriate APIC+vector) because the guest won't EOI them there.
 
-Revert to using 'shadow_root_level'.
+Although to all extents and purposes that basically means we *are*
+treating them like ExtINT.
 
-Fixes: 95fb5b0258b7 ("kvm: x86/mmu: Support MMIO in the TDP MMU")
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
-- The usual (for KVM MMU) caveat 'I may be missing everything' applies,
- please review)
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Not that it makes a difference to the outcome right now, although there
+was once a patch floating around to allow KVM_INTERRUPT even when the
+PIC was in-kernel, precisely for that reason.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5bb1939b65d8..7a6ae9e90bd7 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3517,7 +3517,7 @@ static bool get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
+> whether or not there's an IRQ in the
+> LAPIC should be irrelevant when deciding to exit to userspace.  Note, the
+> reinjection check covers vcpu->arch.interrupt.injected for the case where=
+ LAPIC
+> is in userspace.
+>=20
+>         return kvm_arch_interrupt_allowed(vcpu) &&
+>                (!lapic_in_kernel(vcpu) || !kvm_cpu_has_extint(vcpu)) &&
+>                !kvm_event_needs_reinjection(vcpu) &&
+>                kvm_cpu_accept_dm_intr(vcpu);
+> }
+
+Makes sense. I'm putting this version through some testing and will
+post it later...
+
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
+t.h
+index f002cdb13a0b..e85e2f1c661c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1656,6 +1656,7 @@ int kvm_unmap_hva_range(struct kvm *kvm, unsigned lon=
+g start, unsigned long end,
+ int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
+ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+ int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
++int kvm_cpu_has_extint(struct kvm_vcpu *v);
+ int kvm_cpu_has_injectable_intr(struct kvm_vcpu *v);
+ int kvm_cpu_has_interrupt(struct kvm_vcpu *vcpu);
+ int kvm_arch_interrupt_allowed(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index 99d118ffc67d..9c4ef1682b81 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -40,7 +40,7 @@ static int pending_userspace_extint(struct kvm_vcpu *v)
+  * check if there is pending interrupt from
+  * non-APIC source without intack.
+  */
+-static int kvm_cpu_has_extint(struct kvm_vcpu *v)
++int kvm_cpu_has_extint(struct kvm_vcpu *v)
  {
- 	u64 sptes[PT64_ROOT_MAX_LEVEL];
- 	struct rsvd_bits_validate *rsvd_check;
--	int root = vcpu->arch.mmu->root_level;
-+	int root = vcpu->arch.mmu->shadow_root_level;
- 	int leaf;
- 	int level;
- 	bool reserved = false;
--- 
-2.26.2
+ 	u8 accept =3D kvm_apic_accept_pic_intr(v);
+=20
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a3fdc16cfd6f..b50ae8ba66e9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4080,12 +4080,14 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *=
+vcpu)
+  * if userspace requested an interrupt window, check that the
+  * interrupt window is open.
+  *
+- * No need to exit to userspace if we already have an interrupt queued.
++ * If there is already an event which needs reinjection or a
++ * pending ExtINT, allow that to be processed by the kernel
++ * before letting userspace have the opportunity.
+  */
+ static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_arch_interrupt_allowed(vcpu) &&
+-		!kvm_cpu_has_interrupt(vcpu) &&
++		!(lapic_in_kernel(vcpu) && kvm_cpu_has_extint(vcpu)) &&
+ 		!kvm_event_needs_reinjection(vcpu) &&
+ 		kvm_cpu_accept_dm_intr(vcpu);
+ }
+
+--=-VyxItZYY7p/HGD3q5vZb
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
+MTI2MTExMDQxWjAvBgkqhkiG9w0BCQQxIgQg92QNRXybVLIJuk5gSEWGY3BLv32IqyEYmGfi5+U3
+Cr8wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAKAzPUuUXfUz1Fc2Q42YTmsR+xa5WVGTfUir1aDp5GAL8PzFdg07gC+EhpQBIQu6
+iF++Wd5Hu2j3wnH4Q747BDkdUqnOxkQ6Yxd+VRaRcKL11FjgQPAltazagTX+cw9LBHwMYuJs4erY
+WpPseTUt/4SsgqSrTIFXeH6NKVFXfAEKU6iaiBAug0sO9MOwdM7DOb1SGP0ZV+HQb4EFdvSZCxZm
+rDbjSP/+7mHnrrZswn6YKqp8jIK6lIdzfP7LN92BAGxpUz7w/rCsfdovY00pMHjGDcDut8DgPQhm
+CS9Htqjk7yPmHLUO9pRntcpZf4V0as7SlSA0VqQK3WaP2Knw5MYAAAAAAAA=
+
+
+--=-VyxItZYY7p/HGD3q5vZb--
 
