@@ -2,101 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2E652C62F4
-	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 11:23:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F108C2C63D3
+	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 12:22:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726999AbgK0KVz convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 27 Nov 2020 05:21:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60302 "EHLO mail.kernel.org"
+        id S1729229AbgK0LVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Nov 2020 06:21:23 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54866 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726034AbgK0KVy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Nov 2020 05:21:54 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209867] CPU soft lockup/stall with nested KVM and SMP
-Date:   Fri, 27 Nov 2020 10:21:53 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: frantisek@sumsal.cz
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-209867-28872-xcp34crhy1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209867-28872@https.bugzilla.kernel.org/>
-References: <bug-209867-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1729265AbgK0LVW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Nov 2020 06:21:22 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0DF2420B80;
+        Fri, 27 Nov 2020 11:21:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1606476081;
+        bh=fS6mF1IDPaTZHP4+FiQm7nj4O1emt6KtMrKo/Vv9QOc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=kCn5yoOc6ucB2MaxXimiA11mtBW5b7w5jKlVWS+s12qCYG6LSHjmiqy+k2ejZBkv3
+         XElrP4//E0eXdoRXTavH98gI/PnZRvEgzpQ4Y/ln8xpg4QBUKyoGXnql/wf9OLMk/+
+         zBphLzrdbtGS3HJvO13T9ICBUY2NsoWmCV/Fr1Ro=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kiboU-00E2fR-Nq; Fri, 27 Nov 2020 11:21:18 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Brazdil <dbrazdil@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jamie Iles <jamie@nuviainc.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.10, take #4
+Date:   Fri, 27 Nov 2020 11:20:59 +0000
+Message-Id: <20201127112101.658224-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dbrazdil@google.com, eric.auger@redhat.com, jamie@nuviainc.com, zhukeqian1@huawei.com, will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209867
+Hi Paolo,
 
-Frantisek Sumsal (frantisek@sumsal.cz) changed:
+This is hopefully the last set of fixes for 5.10. We have a linker
+script fix addressing the alignment requirement for the way we now
+build the EL2 code, and a fix for a long standing bug affecting
+userspace access to the GICR_TYPER registers.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|5.9.9-arch1-1               |5.9.10-arch1-1
+Please pull,
 
---- Comment #5 from Frantisek Sumsal (frantisek@sumsal.cz) ---
-I noticed there's a MSR access error when trying to online secondary CPUs,
-which may be relevant:
+	M.
 
-[    3.969876] Last level dTLB entries: 4KB 512, 2MB 255, 4MB 127, 1GB 0
-[    3.973256] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user
-pointer sanitization
-[    3.976544] Spectre V2 : Mitigation: Full AMD retpoline
-[    3.979874] Spectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on
-context switch
-[    3.983210] Spectre V2 : mitigation: Enabling conditional Indirect Branch
-Prediction Barrier
-[    3.986544] Speculative Store Bypass: Mitigation: Speculative Store Bypass
-disabled via prctl and seccomp
-[    3.990704] Freeing SMP alternatives memory: 32K
-[    3.997866] smpboot: CPU0: AMD Opteron 63xx class CPU (family: 0x15, model:
-0x2, stepping: 0x0)
-[    4.001938] Performance Events: Fam15h core perfctr, AMD PMU driver.
-[    4.003261] ... version:                0
-[    4.006576] ... bit width:              48
-[    4.009900] ... generic registers:      6
-[    4.013234] ... value mask:             0000ffffffffffff
-[    4.016567] ... max period:             00007fffffffffff
-[    4.019900] ... fixed-purpose events:   0
-[    4.023233] ... event mask:             000000000000003f
-[    4.026887] rcu: Hierarchical SRCU implementation.
-[    4.030952] smp: Bringing up secondary CPUs ...
-[    4.034030] x86: Booting SMP configuration:
+The following changes since commit ed4ffaf49bf9ce1002b516d8c6aa04937b7950bc:
 
-[    4.036581] .... node  #0, CPUs:      #1
-[    1.328014] kvm-clock: cpu 1, msr 8801041, secondary cpu clock
-[    1.328014] smpboot: CPU 1 Converting physical 0 to logical die 1
-[    1.328014] unchecked MSR access error: WRMSR to 0x48 (tried to write
-0x0000000000000000) at rIP: 0xffffffff9da6c984 (native_write_msr+0x4/0x20)
-[    1.328014] Call Trace:
-[    1.328014]  x86_spec_ctrl_setup_ap+0x34/0x50
-[    1.328014]  identify_secondary_cpu+0x6c/0x80
-[    1.328014]  smp_store_cpu_info+0x45/0x50
-[    1.328014]  start_secondary+0x58/0x160
-[    1.328014]  secondary_startup_64+0xb6/0xc0
-[    6.088346] kvm-guest: stealtime: cpu 1, msr 1e66e080
-[    6.094247]  #2
-[    1.328014] kvm-clock: cpu 2, msr 8801081, secondary cpu clock
-[    1.328014] smpboot: CPU 2 Converting physical 0 to logical die 2
-[    6.123987] kvm-guest: stealtime: cpu 2, msr 1e6ae080
+  KVM: arm64: Handle SCXTNUM_ELx traps (2020-11-12 21:22:46 +0000)
 
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.10-4
+
+for you to fetch changes up to 23bde34771f1ea92fb5e6682c0d8c04304d34b3b:
+
+  KVM: arm64: vgic-v3: Drop the reporting of GICR_TYPER.Last for userspace (2020-11-17 18:51:09 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for v5.10, take #4
+
+- Fix alignment of the new HYP sections
+- Fix GICR_TYPER access from userspace
+
+----------------------------------------------------------------
+Jamie Iles (1):
+      KVM: arm64: Correctly align nVHE percpu data
+
+Zenghui Yu (1):
+      KVM: arm64: vgic-v3: Drop the reporting of GICR_TYPER.Last for userspace
+
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S  |  5 +++++
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 22 ++++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 2 deletions(-)
