@@ -2,154 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 062352C6A17
-	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 17:49:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 642752C6A1A
+	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 17:49:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732115AbgK0Qqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Nov 2020 11:46:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47537 "EHLO
+        id S1731440AbgK0Qs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Nov 2020 11:48:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26127 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731632AbgK0Qqn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Nov 2020 11:46:43 -0500
+        by vger.kernel.org with ESMTP id S1731169AbgK0Qs5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Nov 2020 11:48:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606495601;
+        s=mimecast20190719; t=1606495735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=R51dwmJxWu1gwhdxk3dRVskkx4S0TgN03vZwhcFNpvs=;
-        b=TXH5DhEzt4vccFglOjcc4QazZse0aLEwRUW8k53h4oz5ciAF8Q5s3ckAhugP/NhZQwTQA0
-        zgSluazNiT9vAkUX6WxcRYav+j5xUD1CMX7pK5w5K99nveT9XhthEmI5IqvbWH1yz+Oyxf
-        gJ55p7ScLAy6OlbBY4U4hT+CqqO7CXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281--qutg5zyPySQi8SUnnRcvQ-1; Fri, 27 Nov 2020 11:46:37 -0500
-X-MC-Unique: -qutg5zyPySQi8SUnnRcvQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49BA41005D50;
-        Fri, 27 Nov 2020 16:46:36 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-70.ams2.redhat.com [10.36.113.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 14B6B60BF1;
-        Fri, 27 Nov 2020 16:46:30 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 6/7] s390x: Add diag318 intercept test
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20201127130629.120469-1-frankja@linux.ibm.com>
- <20201127130629.120469-7-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <f1f8ce84-e30a-29c5-8ab6-7294cdc248ce@redhat.com>
-Date:   Fri, 27 Nov 2020 17:46:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        bh=nGp/DntBx65LrgMqUH3vUA33NqIvtHitHZjJU3bsRLY=;
+        b=a/gE0UgJ1wrv7UwhdU4x33dZo1PJYs/AyIjHXWvpNnaQm1geTieizj+8W5J4jSV0opaaCu
+        /P0GiPgCJ4wcZlSTv6JJoMjVUTtAUSrf6yeKgfr+1kDe12A8Uz+gLXMSgdMxTIAslJxk2s
+        DkRGxR85IkkG6f0DfAGZV3uz2GxeF98=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-KztvyAuiOFWCwrG0YIA9zA-1; Fri, 27 Nov 2020 11:48:54 -0500
+X-MC-Unique: KztvyAuiOFWCwrG0YIA9zA-1
+Received: by mail-ej1-f70.google.com with SMTP id e7so2142122eja.15
+        for <kvm@vger.kernel.org>; Fri, 27 Nov 2020 08:48:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nGp/DntBx65LrgMqUH3vUA33NqIvtHitHZjJU3bsRLY=;
+        b=hImbFuz+SCTVRggbWdnOQUYNDdc6cZ2uGJ8BRynDMP/PwhMj0y14+eal6RgA3v7bf2
+         RO0W2Stde3bhYw5UU/iYFTgwHG1V2UACSc9mHQp6XtJRztK/dzfBbyN3VsxJPv8lhyvy
+         cEnifT4hU3pNMykSAnyX2Qk/iyQTueVnPtJ1I2xQ+1qAd8CcKVgeGsnhuNHZHnTSGP/e
+         qLk9te8rM3/GkurCX56Zaoxswshl90EVuIl2kmSRx4NN4JhbfdVk4Pbl82dIEv/clZQr
+         4mlXxSxg+GHLdUVNWnH3gDAKRM3zJ3ViWK5AeUphE9/eYrgkk7DdGKERmA35x5u23rSN
+         RoRw==
+X-Gm-Message-State: AOAM5306ayPOgdH+avpb1Bn+fFw2VdHGzLgLKaLhGAr1QUQrd85t2G1R
+        LZAYP4pJnx4QdGgVrZ5SOmLMqTwl6p3FIlQ0d7IGwbcbBkuafXHqC8OW+cNmzdlycxuK26Je1GJ
+        6IdhNlefOh+fu
+X-Received: by 2002:a17:906:6b82:: with SMTP id l2mr8531385ejr.241.1606495732775;
+        Fri, 27 Nov 2020 08:48:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzJUDCnzieJYN1ooH1FMZWePLUiObAU18Z7hCPD7yuVFtkt12b8hACer7ziwEvurg6/0HZMEQ==
+X-Received: by 2002:a17:906:6b82:: with SMTP id l2mr8531363ejr.241.1606495732591;
+        Fri, 27 Nov 2020 08:48:52 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b20sm557564eja.30.2020.11.27.08.48.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Nov 2020 08:48:51 -0800 (PST)
+Subject: Re: [PATCH] kvm/x86/mmu: use the correct inherited permissions to get
+ shadow page
+To:     Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Avi Kivity <avi@qumranet.com>, linux-doc@vger.kernel.org
+References: <20201120095517.19211-1-jiangshanlai@gmail.com>
+ <20201126000549.GC450871@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0724aeb9-3466-5505-8f12-a5899144e68f@redhat.com>
+Date:   Fri, 27 Nov 2020 17:48:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201127130629.120469-7-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20201126000549.GC450871@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/11/2020 14.06, Janosch Frank wrote:
-> Not much to test except for the privilege and specification
-> exceptions.
+On 26/11/20 01:05, Sean Christopherson wrote:
+> On Fri, Nov 20, 2020, Lai Jiangshan wrote:
+>> From: Lai Jiangshan <laijs@linux.alibaba.com>
+>>
+>> Commit 41074d07c78b ("KVM: MMU: Fix inherited permissions for emulated
+>> guest pte updates") said role.access is common access permissions for
+>> all ptes in this shadow page, which is the inherited permissions from
+>> the parent ptes.
+>>
+>> But the commit did not enforce this definition when kvm_mmu_get_page()
+>> is called in FNAME(fetch). Rather, it uses a random (last level pte's
+>> combined) access permissions.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/sclp.c  |  2 ++
->  lib/s390x/sclp.h  |  6 +++++-
->  s390x/intercept.c | 19 +++++++++++++++++++
->  3 files changed, 26 insertions(+), 1 deletion(-)
+> I wouldn't say it's random, the issue is specifically that all shadow pages end
+> up using the combined set of permissions of the entire walk, as opposed to the
+> only combined permissions of its parents.
 > 
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index 68833b5..3966086 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -138,6 +138,8 @@ void sclp_facilities_setup(void)
->  
->  	assert(read_info);
->  
-> +	sclp_facilities.has_diag318 = read_info->byte_134_diag318;
-> +
->  	cpu = (void *)read_info + read_info->offset_cpu;
->  	for (i = 0; i < read_info->entries_cpu; i++, cpu++) {
->  		if (cpu->address == cpu0_addr) {
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index e18f7e6..4e564dd 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -108,7 +108,8 @@ extern struct sclp_facilities sclp_facilities;
->  
->  struct sclp_facilities {
->  	uint64_t has_sief2 : 1;
-> -	uint64_t : 63;
-> +	uint64_t has_diag318 : 1;
-> +	uint64_t : 62;
->  };
->  
->  typedef struct ReadInfo {
-> @@ -133,6 +134,9 @@ typedef struct ReadInfo {
->      uint16_t highest_cpu;
->      uint8_t  _reserved5[124 - 122];     /* 122-123 */
->      uint32_t hmfai;
-> +    uint8_t reserved7[134 - 128];
-> +    uint8_t byte_134_diag318 : 1;
-> +    uint8_t : 7;
->      struct CPUEntry entries[0];
->  } __attribute__((packed)) ReadInfo;
->  
-> diff --git a/s390x/intercept.c b/s390x/intercept.c
-> index 2e38257..615f0a0 100644
-> --- a/s390x/intercept.c
-> +++ b/s390x/intercept.c
-> @@ -10,6 +10,7 @@
->   * under the terms of the GNU Library General Public License version 2.
->   */
->  #include <libcflat.h>
-> +#include <sclp.h>
->  #include <asm/asm-offsets.h>
->  #include <asm/interrupt.h>
->  #include <asm/page.h>
-> @@ -154,6 +155,23 @@ static void test_testblock(void)
->  	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
->  }
->  
-> +static void test_diag318(void)
-> +{
-> +	expect_pgm_int();
-> +	enter_pstate();
-> +	asm volatile("diag %0,0,0x318\n" : : "d" (0x42));
-> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-> +
-> +	if (!sclp_facilities.has_diag318)
-> +		expect_pgm_int();
-> +
-> +	asm volatile("diag %0,0,0x318\n" : : "d" (0x42));
-> +
-> +	if (!sclp_facilities.has_diag318)
-> +		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +
-
-Maybe remove the empty line above.
-
-> +}
-> +
->  struct {
->  	const char *name;
->  	void (*func)(void);
-> @@ -164,6 +182,7 @@ struct {
->  	{ "stap", test_stap, false },
->  	{ "stidp", test_stidp, false },
->  	{ "testblock", test_testblock, false },
-> +	{ "diag318", test_diag318, false },
->  	{ NULL, NULL, false }
->  };
->  
+>> And the permissions won't be checked again in next FNAME(fetch) since the
+>> spte is present. It might fail to meet guest's expectation when guest sets up
+>> spaghetti pagetables.
+> 
+> Can you provide details on the exact failure scenario?  It would be very helpful
+> for documentation and understanding.  I can see how using the full combined
+> permissions will cause weirdness for upper level SPs in kvm_mmu_get_page(), but
+> I'm struggling to connect the dots to understand how that will cause incorrect
+> behavior for the guest.  AFAICT, outside of the SP cache, KVM only consumes
+> role.access for the final/last SP.
 > 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Agreed, a unit test would be even better, but just a description in the 
+commit message would be enough.
+
+Paolo
 
