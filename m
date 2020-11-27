@@ -2,237 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E07DA2C6717
-	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 14:44:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7B1B2C6746
+	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 14:57:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729967AbgK0NoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Nov 2020 08:44:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33800 "EHLO
+        id S1730579AbgK0N45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Nov 2020 08:56:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48944 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729402AbgK0NoW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Nov 2020 08:44:22 -0500
+        by vger.kernel.org with ESMTP id S1730507AbgK0N45 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Nov 2020 08:56:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606484659;
+        s=mimecast20190719; t=1606485415;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Yeg+2fZ0UY+ADLsWFzmjQq4/iIrLsF7/2W/9Pc6APfo=;
-        b=L3Mm+UatYucAxjiQlWZDde43IBkJb5riwdbLn67WTvDhh0PxvPMLonI2KOOhY3j6h6Zh5P
-        YDCFAFtPBZVQk0q7WdaK2+yM+20dE5y4lGoSvnK6171zPyRzJBNDSav9hmepCGwr6zf/9c
-        bvlItEipXbRqh1txZz5uxUBcn38sfjA=
+        bh=gCZQlgci/SioymeB7B3rK1BO8SUaVrO0hA9s6D50hS8=;
+        b=bz+/thm7QiSkff7DmzbRnNxARBObFrszPP+TntT0gRiAWisdsfVIQ5uzDSOfYhBXxSJbKS
+        OF45tWtCSuVW+BwqOuYB78gGTCmMWalw3BnuTO/Z0weiMqQlWIwCGAyjB7em11itv8ix7U
+        0wllwMAoLtIzWbOzHKaHjGkTLNu3zrM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-Q4SkVzzzNkubeMLxirrd9Q-1; Fri, 27 Nov 2020 08:44:17 -0500
-X-MC-Unique: Q4SkVzzzNkubeMLxirrd9Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-48-l2xOrsBaNRuNmQZSz3rSMQ-1; Fri, 27 Nov 2020 08:56:51 -0500
+X-MC-Unique: l2xOrsBaNRuNmQZSz3rSMQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C54F809DD1;
-        Fri, 27 Nov 2020 13:44:16 +0000 (UTC)
-Received: from localhost (ovpn-113-76.ams2.redhat.com [10.36.113.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 643115D9D5;
-        Fri, 27 Nov 2020 13:44:04 +0000 (UTC)
-Date:   Fri, 27 Nov 2020 13:44:03 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, john.g.johnson@oracle.com, dinechin@redhat.com,
-        cohuck@redhat.com, felipe@nutanix.com,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Jag Raman <jag.raman@oracle.com>
-Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
-Message-ID: <20201127134403.GB46707@stefanha-x1.localdomain>
-References: <CAFO2pHzmVf7g3z0RikQbYnejwcWRtHKV=npALs49eRDJdt4mJQ@mail.gmail.com>
- <0447ec50-6fe8-4f10-73db-e3feec2da61c@redhat.com>
- <20201126123659.GC1180457@stefanha-x1.localdomain>
- <c9f926fb-438c-9588-f018-dd040935e5e5@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 140208049D1;
+        Fri, 27 Nov 2020 13:56:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-70.ams2.redhat.com [10.36.113.70])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A2405D6D1;
+        Fri, 27 Nov 2020 13:56:45 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 2/7] s390x: Consolidate sclp read info
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org
+References: <20201127130629.120469-1-frankja@linux.ibm.com>
+ <20201127130629.120469-3-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <5d79d1c9-0845-69b4-93ad-a4a69119554c@redhat.com>
+Date:   Fri, 27 Nov 2020 14:56:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <c9f926fb-438c-9588-f018-dd040935e5e5@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="kXdP64Ggrk/fb43R"
-Content-Disposition: inline
+In-Reply-To: <20201127130629.120469-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---kXdP64Ggrk/fb43R
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 27/11/2020 14.06, Janosch Frank wrote:
+> Let's only read the information once and pass a pointer to it instead
+> of calling sclp multiple times.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  lib/s390x/io.c   |  1 +
+>  lib/s390x/sclp.c | 29 +++++++++++++++++++++++------
+>  lib/s390x/sclp.h |  3 +++
+>  lib/s390x/smp.c  | 28 +++++++++++-----------------
+>  4 files changed, 38 insertions(+), 23 deletions(-)
+> 
+> diff --git a/lib/s390x/io.c b/lib/s390x/io.c
+> index c0f0bf7..e19a1f3 100644
+> --- a/lib/s390x/io.c
+> +++ b/lib/s390x/io.c
+> @@ -36,6 +36,7 @@ void setup(void)
+>  {
+>  	setup_args_progname(ipl_args);
+>  	setup_facilities();
+> +	sclp_read_info();
+>  	sclp_console_setup();
+>  	sclp_memory_setup();
+>  	smp_setup();
+> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+> index 4e2ac18..ff56c44 100644
+> --- a/lib/s390x/sclp.c
+> +++ b/lib/s390x/sclp.c
+> @@ -25,6 +25,8 @@ extern unsigned long stacktop;
+>  static uint64_t storage_increment_size;
+>  static uint64_t max_ram_size;
+>  static uint64_t ram_size;
+> +char _read_info[PAGE_SIZE] __attribute__((__aligned__(4096)));
+> +static ReadInfo *read_info;
+>  
+>  char _sccb[PAGE_SIZE] __attribute__((__aligned__(4096)));
+>  static volatile bool sclp_busy;
+> @@ -110,6 +112,22 @@ static void sclp_read_scp_info(ReadInfo *ri, int length)
+>  	report_abort("READ_SCP_INFO failed");
+>  }
+>  
+> +void sclp_read_info(void)
+> +{
+> +	sclp_read_scp_info((void *)_read_info, SCCB_SIZE);
+> +	read_info = (ReadInfo *)_read_info;
+> +}
+> +
+> +int sclp_get_cpu_num(void)
+> +{
+> +	return read_info->entries_cpu;
+> +}
+> +
+> +CPUEntry *sclp_get_cpu_entries(void)
+> +{
+> +	return (void *)read_info + read_info->offset_cpu;
+> +}
+> +
+>  /* Perform service call. Return 0 on success, non-zero otherwise. */
+>  int sclp_service_call(unsigned int command, void *sccb)
+>  {
+> @@ -127,23 +145,22 @@ int sclp_service_call(unsigned int command, void *sccb)
+>  
+>  void sclp_memory_setup(void)
+>  {
+> -	ReadInfo *ri = (void *)_sccb;
+>  	uint64_t rnmax, rnsize;
+>  	int cc;
+>  
+> -	sclp_read_scp_info(ri, SCCB_SIZE);
+> +	assert(read_info);
+>  
+>  	/* calculate the storage increment size */
+> -	rnsize = ri->rnsize;
+> +	rnsize = read_info->rnsize;
+>  	if (!rnsize) {
+> -		rnsize = ri->rnsize2;
+> +		rnsize = read_info->rnsize2;
+>  	}
+>  	storage_increment_size = rnsize << 20;
+>  
+>  	/* calculate the maximum memory size */
+> -	rnmax = ri->rnmax;
+> +	rnmax = read_info->rnmax;
+>  	if (!rnmax) {
+> -		rnmax = ri->rnmax2;
+> +		rnmax = read_info->rnmax2;
+>  	}
+>  	max_ram_size = rnmax * storage_increment_size;
+>  
+> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+> index 675f07e..6620531 100644
+> --- a/lib/s390x/sclp.h
+> +++ b/lib/s390x/sclp.h
+> @@ -271,6 +271,9 @@ void sclp_wait_busy(void);
+>  void sclp_mark_busy(void);
+>  void sclp_console_setup(void);
+>  void sclp_print(const char *str);
+> +void sclp_read_info(void);
+> +int sclp_get_cpu_num(void);
+> +CPUEntry *sclp_get_cpu_entries(void);
+>  int sclp_service_call(unsigned int command, void *sccb);
+>  void sclp_memory_setup(void);
+>  uint64_t get_ram_size(void);
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 77d80ca..f77ad1e 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -25,7 +25,6 @@
+>  #include "smp.h"
+>  #include "sclp.h"
+>  
+> -static char cpu_info_buffer[PAGE_SIZE] __attribute__((__aligned__(4096)));
+>  static struct cpu *cpus;
+>  static struct cpu *cpu0;
+>  static struct spinlock lock;
+> @@ -34,8 +33,7 @@ extern void smp_cpu_setup_state(void);
+>  
+>  int smp_query_num_cpus(void)
+>  {
+> -	struct ReadCpuInfo *info = (void *)cpu_info_buffer;
+> -	return info->nr_configured;
+> +	return sclp_get_cpu_num();
+>  }
+>  
+>  struct cpu *smp_cpu_from_addr(uint16_t addr)
+> @@ -228,10 +226,10 @@ void smp_teardown(void)
+>  {
+>  	int i = 0;
+>  	uint16_t this_cpu = stap();
+> -	struct ReadCpuInfo *info = (void *)cpu_info_buffer;
+> +	int num = smp_query_num_cpus();
+>  
+>  	spin_lock(&lock);
+> -	for (; i < info->nr_configured; i++) {
+> +	for (; i < num; i++) {
+>  		if (cpus[i].active &&
+>  		    cpus[i].addr != this_cpu) {
+>  			sigp_retry(cpus[i].addr, SIGP_STOP, 0, NULL);
+> @@ -245,22 +243,18 @@ extern uint64_t *stackptr;
+>  void smp_setup(void)
+>  {
+>  	int i = 0;
+> +	int num = smp_query_num_cpus();
+>  	unsigned short cpu0_addr = stap();
+> -	struct ReadCpuInfo *info = (void *)cpu_info_buffer;
+> +	struct CPUEntry *entry = sclp_get_cpu_entries();
+>  
+> -	spin_lock(&lock);
 
-On Fri, Nov 27, 2020 at 11:39:23AM +0800, Jason Wang wrote:
->=20
-> On 2020/11/26 =E4=B8=8B=E5=8D=888:36, Stefan Hajnoczi wrote:
-> > On Thu, Nov 26, 2020 at 11:37:30AM +0800, Jason Wang wrote:
-> > > On 2020/11/26 =E4=B8=8A=E5=8D=883:21, Elena Afanasova wrote:
-> > > > Hello,
-> > > >=20
-> > > > I'm an Outreachy intern with QEMU and I=E2=80=99m working on implem=
-enting the
-> > > > ioregionfd API in KVM.
-> > > > So I=E2=80=99d like to resume the ioregionfd design discussion. The=
- latest
-> > > > version of the ioregionfd API document is provided below.
-> > > >=20
-> > > > Overview
-> > > > --------
-> > > > ioregionfd is a KVM dispatch mechanism for handling MMIO/PIO access=
-es
-> > > > over a
-> > > > file descriptor without returning from ioctl(KVM_RUN). This allows =
-device
-> > > > emulation to run in another task separate from the vCPU task.
-> > > >=20
-> > > > This is achieved through KVM ioctls for registering MMIO/PIO region=
-s and
-> > > > a wire
-> > > > protocol that KVM uses to communicate with a task handling an MMIO/=
-PIO
-> > > > access.
-> > > >=20
-> > > > The traditional ioctl(KVM_RUN) dispatch mechanism with device emula=
-tion
-> > > > in a
-> > > > separate task looks like this:
-> > > >=20
-> > > >  =C2=A0 =C2=A0kvm.ko=C2=A0 <---ioctl(KVM_RUN)---> VMM vCPU task <--=
--messages---> device
-> > > > task
-> > > >=20
-> > > > ioregionfd improves performance by eliminating the need for the vCP=
-U
-> > > > task to
-> > > > forward MMIO/PIO exits to device emulation tasks:
-> > >=20
-> > > I wonder at which cases we care performance like this. (Note that vho=
-st-user
-> > > suppots set|get_config() for a while).
-> > NVMe emulation needs this because ioeventfd cannot transfer the value
-> > written to the doorbell. That's why QEMU's NVMe emulation doesn't
-> > support IOThreads.
->=20
->=20
-> I think it depends on how many different value that can be carried via
-> doorbell. If it's not tons of, we can use datamatch. Anyway virtio suppor=
-t
-> differing queue index via the value wrote to doorbell.
+You've removed the spin_lock(), but not the spin_unlock() at the end of the
+function ... looks wrong to me? I guess you rather should keep the
+spin_lock() call here?
 
-There are too many value, it's not the queue index. It's the ring index
-of the latest request. If the ring size is 128, we need 128 ioeventfd
-registrations, etc. It becomes a lot.
+> -	sclp_mark_busy();
+> -	info->h.length = PAGE_SIZE;
+> -	sclp_service_call(SCLP_READ_CPU_INFO, cpu_info_buffer);
+> +	if (num > 1)
+> +		printf("SMP: Initializing, found %d cpus\n", num);
+>  
+> -	if (smp_query_num_cpus() > 1)
+> -		printf("SMP: Initializing, found %d cpus\n", info->nr_configured);
+> -
+> -	cpus = calloc(info->nr_configured, sizeof(cpus));
+> -	for (i = 0; i < info->nr_configured; i++) {
+> -		cpus[i].addr = info->entries[i].address;
+> +	cpus = calloc(num, sizeof(cpus));
+> +	for (i = 0; i < num; i++) {
+> +		cpus[i].addr = entry[i].address;
+>  		cpus[i].active = false;
+> -		if (info->entries[i].address == cpu0_addr) {
+> +		if (entry[i].address == cpu0_addr) {
+>  			cpu0 = &cpus[i];
+>  			cpu0->stack = stackptr;
+>  			cpu0->lowcore = (void *)0;
+> 
 
-By the way, the long-term use case for ioregionfd is to allow vfio-user
-device emulation processes to directly handle I/O accesses. Elena
-benchmarked ioeventfd vs dispatching through QEMU and can share the
-perform results. I think the number was around 30+% improvement via
-direct ioeventfd dispatch, so it will be important for high IOPS
-devices (network and storage controllers).
+Apart from the spin_lock() problem, patch looks fine to me now.
 
-> >=20
-> > > > KVM_CREATE_IOREGIONFD
-> > > > ---------------------
-> > > > :Capability: KVM_CAP_IOREGIONFD
-> > > > :Architectures: all
-> > > > :Type: system ioctl
-> > > > :Parameters: none
-> > > > :Returns: an ioregionfd file descriptor, -1 on error
-> > > >=20
-> > > > This ioctl creates a new ioregionfd and returns the file descriptor=
-. The
-> > > > fd can
-> > > > be used to handle MMIO/PIO accesses instead of returning from
-> > > > ioctl(KVM_RUN)
-> > > > with KVM_EXIT_MMIO or KVM_EXIT_PIO. One or more MMIO or PIO regions=
- must
-> > > > be
-> > > > registered with KVM_SET_IOREGION in order to receive MMIO/PIO acces=
-ses
-> > > > on the
-> > > > fd. An ioregionfd can be used with multiple VMs and its lifecycle i=
-s not
-> > > > tied
-> > > > to a specific VM.
-> > > >=20
-> > > > When the last file descriptor for an ioregionfd is closed, all regi=
-ons
-> > > > registered with KVM_SET_IOREGION are dropped and guest accesses to =
-those
-> > > > regions cause ioctl(KVM_RUN) to return again.
-> > >=20
-> > > I may miss something, but I don't see any special requirement of this=
- fd.
-> > > The fd just a transport of a protocol between KVM and userspace proce=
-ss. So
-> > > instead of mandating a new type, it might be better to allow any type=
- of fd
-> > > to be attached. (E.g pipe or socket).
-> > pipe(2) is unidirectional on Linux, so it won't work.
->=20
->=20
-> Can we accept two file descriptors to make it work?
->=20
->=20
-> >=20
-> > mkfifo(3) seems usable but creates a node on a filesystem.
-> >=20
-> > socketpair(2) would work, but brings in the network stack when it's not
-> > needed. The advantage is that some future user case might want to direc=
-t
-> > ioregionfd over a real socket to a remote host, which would be cool.
-> >=20
-> > Do you have an idea of the performance difference of socketpair(2)
-> > compared to a custom fd?
->=20
->=20
-> It should be slower than custom fd and UNIX socket should be faster than
-> TIPC. Maybe we can have a custom fd, but it's better to leave the policy =
-to
-> the userspace:
->=20
-> 1) KVM should not have any limitation of the fd it uses, user will risk
-> itself if the fd has been used wrongly, and the custom fd should be one o=
-f
-> the choice
-> 2) it's better to not have a virt specific name (e.g "KVM" or "ioregion")
-
-Okay, it looks like there are things to investigate here.
-
-Elena: My suggestion would be to start with the simplest option -
-letting userspace pass in 1 file descriptor. You can investigate the
-performance of socketpair(2)/fifo(7), 2 pipe fds, or a custom file
-implementation later if time permits. That way the API has maximum
-flexibility (userspace can decide on the file type).
-
-> Or I wonder whether we can attach an eBPF program when trapping MMIO/PIO =
-and
-> allow it to decide how to proceed?
-
-The eBPF program approach is interesting, but it would probably require
-access to guest RAM and additional userspace state (e.g. device-specific
-register values). I don't know the current status of Linux eBPF - is it
-possible to access user memory (it could be swapped out)?
-
-Stefan
-
---kXdP64Ggrk/fb43R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/BAqMACgkQnKSrs4Gr
-c8j44gf/fIstq9/Sl/HopBlvSqKwV5cMFtEg36hr6s3Ln43IguOzLAJVlCDGsBVg
-WsVF2J7Q5112NgxlrvWpYmpX/BOuOG3LeHkt8XrTH4AWcUFgbDdAxzJvZkfyZIPA
-5gxc1mmOp8NX2knmUj+HPs/iGzKQeYDPre8j+jT8HYyoamvxuWuu7usvAbF+9zev
-WidcmBwOzXuUxOX6mD7JwBeeyCBe/ok99mmM+QwKoC4bKSytZDbDRpIYr7UOB7ny
-K/FMtV85UUcUZ4EJ4qGpUiuEuuABH4jiVMkQgmAdCrKAsCDwMc70nPVmUtFeOyVY
-Z+hFGIRgtN7HUbxHfVUVKU81TR6l4A==
-=PUpI
------END PGP SIGNATURE-----
-
---kXdP64Ggrk/fb43R--
+ Thomas
 
