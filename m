@@ -2,127 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E20452C682E
-	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 15:50:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1512C2C68B6
+	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 16:29:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730908AbgK0OtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Nov 2020 09:49:14 -0500
-Received: from foss.arm.com ([217.140.110.172]:43900 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729913AbgK0OtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Nov 2020 09:49:13 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 382481516;
-        Fri, 27 Nov 2020 06:49:13 -0800 (PST)
-Received: from [10.37.12.49] (unknown [10.37.12.49])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34E3A3F70D;
-        Fri, 27 Nov 2020 06:49:12 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 10/10] arm64: gic: Use IPI test checking
- for the LPI tests
-To:     Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-Cc:     andre.przywara@arm.com, Eric Auger <eric.auger@redhat.com>
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-11-alexandru.elisei@arm.com>
- <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <fd32d075-c6a9-a869-14a9-2c29f41d3318@arm.com>
-Date:   Fri, 27 Nov 2020 14:50:32 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+        id S1730171AbgK0P3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Nov 2020 10:29:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37285 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729344AbgK0P3K (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Nov 2020 10:29:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606490948;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oXKdmvLkDWwHXIC1vCfXtPKtHEwtoC4CPS+KvE2OLhs=;
+        b=AjAXuczT5MLVwZMNhZrrrMknP7FLdUrtzRa+iy2V4ADQXi8CCur7twE61a4Gx6OWu/HONq
+        hIdEBQnZb9cVZL50SNkLazautqd/vUwPw/HghbGfbDg/CeYNbt6UZzABV0VDFhgiOgKeTV
+        LxWG8NsSFQb6fQhw+E7D8sIdNAGpTz8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-uITk0hcoNHGrd3pF5pjkRg-1; Fri, 27 Nov 2020 10:29:06 -0500
+X-MC-Unique: uITk0hcoNHGrd3pF5pjkRg-1
+Received: by mail-wm1-f69.google.com with SMTP id k128so3327903wme.7
+        for <kvm@vger.kernel.org>; Fri, 27 Nov 2020 07:29:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=oXKdmvLkDWwHXIC1vCfXtPKtHEwtoC4CPS+KvE2OLhs=;
+        b=Oq7ZmdAGx1balzqFa+7KNZieXp+OX8w2cM7V5GvE8J6HBMC2c/uSCPy8rS+BCzJ0qN
+         m6CdJN7Acx7UUwE7bFdd+j5v9V5DrKRu6f5x7qTjFFwSklK9kOwvohuFo/EB0CMGXwem
+         ojRnX6p52mndmK9G1+GJE2HqgmrYjgEjiifytoVkNhCwQeYFM19QKf9RdUsrjxwOUx0o
+         xmOWH3r4WRF+HMjK3TPwHUJUKLrI+gcyH1d7LUB5QWYkfIzV41gDGShsXCEphGdXnwIY
+         cbongw+qsNvm/gEQl6G2fu51cd6TSF1zlrfQ3dPxYC9OpvhmLM58h9ClwfbReiBxPlmU
+         jHBw==
+X-Gm-Message-State: AOAM530RJWcsN4rNlkKcG9qMGowb67+/04vOcBIcx+P4KK8BN44en5RS
+        Rmmq5VOqQBqEqr0zTz8udOjb+qIbsWmG3JPpZcLPofP5ruPFxry8iqfzT1o3iKSl9XarSLsX498
+        93L65YW7A8tOA
+X-Received: by 2002:a5d:67c5:: with SMTP id n5mr11453730wrw.179.1606490945471;
+        Fri, 27 Nov 2020 07:29:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy/4cCpUXCG3PtHNxRVLUGmUfj2FFttkpnXAUAHHS8uWedyJzj98T7fAMDHerVy+9j1MoYo4Q==
+X-Received: by 2002:a5d:67c5:: with SMTP id n5mr11453684wrw.179.1606490945268;
+        Fri, 27 Nov 2020 07:29:05 -0800 (PST)
+Received: from steredhat (host-79-17-248-175.retail.telecomitalia.it. [79.17.248.175])
+        by smtp.gmail.com with ESMTPSA id d3sm14667103wrr.2.2020.11.27.07.29.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Nov 2020 07:29:04 -0800 (PST)
+Date:   Fri, 27 Nov 2020 16:29:01 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
+Cc:     qemu-devel@nongnu.org, Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+Subject: Re: [RFC PATCH 23/27] vhost: unmap qemu's shadow virtqueues on sw
+ live migration
+Message-ID: <20201127152901.cbfu7rmewbxventr@steredhat>
+References: <20201120185105.279030-1-eperezma@redhat.com>
+ <20201120185105.279030-24-eperezma@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <20201120185105.279030-24-eperezma@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zhenghui,
-
-Thank you for having a look at this!
-
-On 11/26/20 9:30 AM, Zenghui Yu wrote:
-> On 2020/11/25 23:51, Alexandru Elisei wrote:
->> The reason for the failure is that the test "dev2/eventid=20 now triggers
->> an LPI" triggers 2 LPIs, not one. This behavior was present before this
->> patch, but it was ignored because check_lpi_stats() wasn't looking at the
->> acked array.
->>
->> I'm not familiar with the ITS so I'm not sure if this is expected, if the
->> test is incorrect or if there is something wrong with KVM emulation.
+On Fri, Nov 20, 2020 at 07:51:01PM +0100, Eugenio P�rez wrote:
+>Since vhost does not need to access it, it has no sense to keep it
+>mapped.
 >
-> I think this is expected, or not.
+>Signed-off-by: Eugenio P�rez <eperezma@redhat.com>
+>---
+> hw/virtio/vhost.c | 1 +
+> 1 file changed, 1 insertion(+)
 >
-> Before INVALL, the LPI-8195 was already pending but disabled. On
-> receiving INVALL, VGIC will reload configuration for all LPIs targeting
-> collection-3 and deliver the now enabled LPI-8195. We'll therefore see
-> and handle it before sending the following INT (which will set the
-> LPI-8195 pending again).
+>diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+>index f640d4edf0..eebfac4455 100644
+>--- a/hw/virtio/vhost.c
+>+++ b/hw/virtio/vhost.c
+>@@ -1124,6 +1124,7 @@ static int vhost_sw_live_migration_start(struct vhost_dev *dev)
 >
->> Did some more testing on an Ampere eMAG (fast out-of-order cores) using
->> qemu and kvmtool and Linux v5.8, here's what I found:
->>
->> - Using qemu and gic.flat built from*master*: error encountered 864 times
->>    out of 1088 runs.
->> - Using qemu: error encountered 852 times out of 1027 runs.
->> - Using kvmtool: error encountered 8164 times out of 10602 runs.
+>         dev->sw_lm_shadow_vq[idx] = vhost_sw_lm_shadow_vq(dev, idx);
+>         event_notifier_set_handler(&vq->masked_notifier, vhost_handle_call);
+>+        vhost_virtqueue_memory_unmap(dev, &dev->vqs[idx], true);
+
+IIUC vhost_virtqueue_memory_unmap() is already called at the end of 
+vhost_virtqueue_stop(), so we can skip this call, right?
+
 >
-> If vcpu-3 hadn't seen and handled LPI-8195 as quickly as possible (e.g.,
-> vcpu-3 hadn't been scheduled), the following INT will set the already
-> pending LPI-8195 pending again and we'll receive it *once* on vcpu-3.
-> And we won't see the mentioned failure.
+>         vhost_vring_write_addr(dev->sw_lm_shadow_vq[idx], &addr);
+>         r = dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
+>-- 2.18.4
 >
-> I think we can just drop the (meaningless and confusing?) INT.
 
-I think I understand your explanation, the VCPU takes the interrupt immediately
-after the INVALL and before the INT, and the second interrupt that I am seeing is
-the one caused by the INT command.
-
-I tried modifying the test like this:
-
-diff --git a/arm/gic.c b/arm/gic.c
-index 6e93da80fe0d..0ef8c12ea234 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -761,10 +761,17 @@ static void test_its_trigger(void)
-        wmb();
-        cpumask_clear(&mask);
-        cpumask_set_cpu(3, &mask);
--       its_send_int(dev2, 20);
-        wait_for_interrupts(&mask);
-        report(check_acked(&mask, 0, 8195),
--                       "dev2/eventid=20 now triggers an LPI");
-+                       "dev2/eventid=20 pending LPI is received");
-+
-+       stats_reset();
-+       wmb();
-+       cpumask_clear(&mask);
-+       cpumask_set_cpu(3, &mask);
-+       its_send_int(dev2, 20);
-+       wait_for_interrupts(&mask);
-+       report(check_acked(&mask, 0, 8195), "dev2/eventid=20 triggers an LPI");
- 
-        report_prefix_pop();
- 
-I removed the INT from the initial test, and added a separate one to check that
-the INT command still works. That looks to me that preserves the spirit of the
-original test. After doing stress testing this is what I got:
-
-- with kvmtool, 47,709 iterations, 27 times the test timed out when waiting for
-the interrupt after INVALL.
-- with qemu, 15,511 iterations, 258 times the test timed out when waiting for the
-interrupt after INVALL, just like with kvmtool.
-
-Judging from the fact that there is an order of magnitude less failures with
-kvmtool than with qemu, I'm leaning towards some random timing issue. I will try
-increasing the timeout for wait_for_interrupts() and see if the results improve
-over the weekend.
-
-Thanks,
-Alex
->
->
-> Thanks,
-> Zenghui
