@@ -2,117 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAA632C5EB2
-	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 03:16:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81CDB2C5F0A
+	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 04:40:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392202AbgK0CO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Nov 2020 21:14:56 -0500
-Received: from mga14.intel.com ([192.55.52.115]:10922 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392194AbgK0CO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Nov 2020 21:14:56 -0500
-IronPort-SDR: hJ3cfura3hCxmqd4YDYOY4zwdU+eYo2lilAFoFJ8YSps2Nh8AON5J/R0au0tM6Ktwm6QOB2tgp
- /NIX8NRiw3/w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9817"; a="171560412"
-X-IronPort-AV: E=Sophos;i="5.78,373,1599548400"; 
-   d="scan'208";a="171560412"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2020 18:14:55 -0800
-IronPort-SDR: yWJeDj0DU3bGwjXS9UiOcHoAKzsabIXJHBjwFFeZtUYXj9smuI/cMCThEw/dGhO2UN/whyz+Fv
- wTFwRu9eOuOw==
-X-IronPort-AV: E=Sophos;i="5.78,373,1599548400"; 
-   d="scan'208";a="547899967"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.107]) ([10.238.4.107])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2020 18:14:51 -0800
-Subject: Re: [PATCH v2 04/17] perf: x86/ds: Handle guest PEBS overflow PMI and
- inject it to guest
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu@linux.intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>, wei.w.wang@intel.com,
-        Tony Luck <tony.luck@intel.com>,
-        Stephane Eranian <eranian@google.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        linux-kernel@vger.kernel.org
-References: <20201109021254.79755-1-like.xu@linux.intel.com>
- <20201109021254.79755-5-like.xu@linux.intel.com>
- <20201117143529.GJ3121406@hirez.programming.kicks-ass.net>
- <b2c3f889-44dd-cadb-f225-a4c5db3a4447@linux.intel.com>
- <20201118180721.GA3121392@hirez.programming.kicks-ass.net>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <682011d8-934f-4c76-69b0-788f71d91961@intel.com>
-Date:   Fri, 27 Nov 2020 10:14:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S2388671AbgK0Djq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Nov 2020 22:39:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55470 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727037AbgK0Djq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Nov 2020 22:39:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606448385;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kRpTLsgF/txC3+ZLF49orMM1xGYi7QtsWVXLf1XIl7I=;
+        b=Slswnm3Yvn1HTbRn+qgAT8us/OXZ8kBs1riSG0UNqb3qGciD/8wXe2ipmgUVwSHFsduEdn
+        5dCQlsOao3KWRTTUPGOH8AHcHOGl8/yqA+hsY/qXeX3uIsvUrWloTnSypOv6gSSUUfx8eY
+        k0KKBQPw+oAMVXTdWMERG0jBLUjDxbI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-VPMoAFDtOCG5v2Rjq0ttaQ-1; Thu, 26 Nov 2020 22:39:43 -0500
+X-MC-Unique: VPMoAFDtOCG5v2Rjq0ttaQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBCF01006C8E;
+        Fri, 27 Nov 2020 03:39:41 +0000 (UTC)
+Received: from [10.72.13.168] (ovpn-13-168.pek2.redhat.com [10.72.13.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E595660BF1;
+        Fri, 27 Nov 2020 03:39:24 +0000 (UTC)
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, john.g.johnson@oracle.com, dinechin@redhat.com,
+        cohuck@redhat.com, felipe@nutanix.com,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+References: <CAFO2pHzmVf7g3z0RikQbYnejwcWRtHKV=npALs49eRDJdt4mJQ@mail.gmail.com>
+ <0447ec50-6fe8-4f10-73db-e3feec2da61c@redhat.com>
+ <20201126123659.GC1180457@stefanha-x1.localdomain>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <c9f926fb-438c-9588-f018-dd040935e5e5@redhat.com>
+Date:   Fri, 27 Nov 2020 11:39:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201118180721.GA3121392@hirez.programming.kicks-ass.net>
+In-Reply-To: <20201126123659.GC1180457@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
 
-On 2020/11/19 2:07, Peter Zijlstra wrote:
-> On Thu, Nov 19, 2020 at 12:15:09AM +0800, Like Xu wrote:
->
->>> ISTR there was lots of fail trying to virtualize it earlier. What's
->>> changed? There's 0 clues here.
->> Ah, now we have EPT-friendly PEBS facilities supported since Ice Lake
->> which makes guest PEBS feature possible w/o guest memory pinned.
-> OK.
->
->>> Why are the host and guest DS area separate, why can't we map them to
->>> the exact same physical pages?
->> If we map both guest and host DS_AREA to the exact same physical pages,
->> - the guest can access the host PEBS records, which means that the host
->> IP maybe leaked, because we cannot predict the time guest drains records and
->> it would be over-designed to clean it up before each vm-entry;
->> - different tasks/vcpus on the same pcpu cannot share the same PEBS DS
->> settings from the same physical page. For example, some require large
->> PEBS and reset values, while others do not.
+On 2020/11/26 下午8:36, Stefan Hajnoczi wrote:
+> On Thu, Nov 26, 2020 at 11:37:30AM +0800, Jason Wang wrote:
+>> On 2020/11/26 上午3:21, Elena Afanasova wrote:
+>>> Hello,
+>>>
+>>> I'm an Outreachy intern with QEMU and I’m working on implementing the
+>>> ioregionfd API in KVM.
+>>> So I’d like to resume the ioregionfd design discussion. The latest
+>>> version of the ioregionfd API document is provided below.
+>>>
+>>> Overview
+>>> --------
+>>> ioregionfd is a KVM dispatch mechanism for handling MMIO/PIO accesses
+>>> over a
+>>> file descriptor without returning from ioctl(KVM_RUN). This allows device
+>>> emulation to run in another task separate from the vCPU task.
+>>>
+>>> This is achieved through KVM ioctls for registering MMIO/PIO regions and
+>>> a wire
+>>> protocol that KVM uses to communicate with a task handling an MMIO/PIO
+>>> access.
+>>>
+>>> The traditional ioctl(KVM_RUN) dispatch mechanism with device emulation
+>>> in a
+>>> separate task looks like this:
+>>>
+>>>     kvm.ko  <---ioctl(KVM_RUN)---> VMM vCPU task <---messages---> device
+>>> task
+>>>
+>>> ioregionfd improves performance by eliminating the need for the vCPU
+>>> task to
+>>> forward MMIO/PIO exits to device emulation tasks:
 >>
->> Like many guest msrs, we use the separate guest DS_AREA for the guest's
->> own use and it avoids mutual interference as little as possible.
-> OK, but the code here wanted to inspect the guest DS from the host. It
-> states this is somehow complicated/expensive. But surely we can at the
-> very least map the first guest DS page somewhere so we can at least
-> access the control bits without too much magic.
-We note that the SDM has a contiguous present memory mapping
-assumption about the DS save area and the PEBS buffer area.
+>> I wonder at which cases we care performance like this. (Note that vhost-user
+>> suppots set|get_config() for a while).
+> NVMe emulation needs this because ioeventfd cannot transfer the value
+> written to the doorbell. That's why QEMU's NVMe emulation doesn't
+> support IOThreads.
 
-Therefore, we revisit your suggestion here and move it a bit forward:
 
-When the PEBS is enabled, KVM will cache the following values:
-- gva ds_area (kvm msr trap)
-- hva1 for "gva ds_area" (walk guest page table)
-- hva2 for "gva pebs_buffer_base" via hva1 (walk guest page table)
+I think it depends on how many different value that can be carried via 
+doorbell. If it's not tons of, we can use datamatch. Anyway virtio 
+support differing queue index via the value wrote to doorbell.
 
-if the "gva ds_area" cache hits,
-- access PEBS "interrupt threshold" and "Counter Reset[]" via hva1
-- get "gva2 pebs_buffer_base" via __copy_from_user(hva1)
 
-if the "gva2 pebs_buffer_base" cache hits,
-- we get "gva2 pebs_index" via __copy_from_user(hva2),
-- rewrite the guest PEBS records via hva2 and pebs_index
+>
+>>> KVM_CREATE_IOREGIONFD
+>>> ---------------------
+>>> :Capability: KVM_CAP_IOREGIONFD
+>>> :Architectures: all
+>>> :Type: system ioctl
+>>> :Parameters: none
+>>> :Returns: an ioregionfd file descriptor, -1 on error
+>>>
+>>> This ioctl creates a new ioregionfd and returns the file descriptor. The
+>>> fd can
+>>> be used to handle MMIO/PIO accesses instead of returning from
+>>> ioctl(KVM_RUN)
+>>> with KVM_EXIT_MMIO or KVM_EXIT_PIO. One or more MMIO or PIO regions must
+>>> be
+>>> registered with KVM_SET_IOREGION in order to receive MMIO/PIO accesses
+>>> on the
+>>> fd. An ioregionfd can be used with multiple VMs and its lifecycle is not
+>>> tied
+>>> to a specific VM.
+>>>
+>>> When the last file descriptor for an ioregionfd is closed, all regions
+>>> registered with KVM_SET_IOREGION are dropped and guest accesses to those
+>>> regions cause ioctl(KVM_RUN) to return again.
+>>
+>> I may miss something, but I don't see any special requirement of this fd.
+>> The fd just a transport of a protocol between KVM and userspace process. So
+>> instead of mandating a new type, it might be better to allow any type of fd
+>> to be attached. (E.g pipe or socket).
+> pipe(2) is unidirectional on Linux, so it won't work.
 
-If any cache misses, setup the cache values via walking tables again.
 
-I wonder if you would agree with this optimization idea,
-we look forward to your confirmation for the next step.
+Can we accept two file descriptors to make it work?
 
-Thanks,
-Like Xu
+
+>
+> mkfifo(3) seems usable but creates a node on a filesystem.
+>
+> socketpair(2) would work, but brings in the network stack when it's not
+> needed. The advantage is that some future user case might want to direct
+> ioregionfd over a real socket to a remote host, which would be cool.
+>
+> Do you have an idea of the performance difference of socketpair(2)
+> compared to a custom fd?
+
+
+It should be slower than custom fd and UNIX socket should be faster than 
+TIPC. Maybe we can have a custom fd, but it's better to leave the policy 
+to the userspace:
+
+1) KVM should not have any limitation of the fd it uses, user will risk 
+itself if the fd has been used wrongly, and the custom fd should be one 
+of the choice
+2) it's better to not have a virt specific name (e.g "KVM" or "ioregion")
+
+Or I wonder whether we can attach an eBPF program when trapping MMIO/PIO 
+and allow it to decide how to proceed?
+
+Thanks
+
+
+>
+> If it's neglible then using an arbitrary socket is more flexible and
+> sounds good.
+>
+> Stefan
 
