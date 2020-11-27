@@ -2,172 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 228DF2C6618
-	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 13:53:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB9A22C6646
+	for <lists+kvm@lfdr.de>; Fri, 27 Nov 2020 14:07:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729922AbgK0Mxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Nov 2020 07:53:41 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:19348 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729880AbgK0Mxk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Nov 2020 07:53:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1606481620; x=1638017620;
-  h=to:cc:references:from:message-id:date:mime-version:
-   in-reply-to:content-transfer-encoding:subject;
-  bh=lPZgcfpghUIW415AybUBP2tZaGFUa1A88EtDROSX8VE=;
-  b=kqb0k6NX4SY9dx+tTbnkJzKSk4hcg2yObO6/bc4Q0cM9g1ES2uv+3Awr
-   k7+UzrLKAA3QbKDY3leds+pu7mYjvdJkUqpQAG4VaduKSr72yVmhvaJjf
-   rmCu8DUxwF71LuqIl7qbO8ix3U4kwe7NN9oMZ35TyDGIv2kmUfOtKerp7
-   s=;
-X-IronPort-AV: E=Sophos;i="5.78,374,1599523200"; 
-   d="scan'208";a="69086392"
-Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection window
- request
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-42f764a0.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 27 Nov 2020 12:53:33 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1e-42f764a0.us-east-1.amazon.com (Postfix) with ESMTPS id 42119E0E58;
-        Fri, 27 Nov 2020 12:53:30 +0000 (UTC)
-Received: from EX13D08UEE004.ant.amazon.com (10.43.62.182) by
- EX13MTAUEE001.ant.amazon.com (10.43.62.226) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 27 Nov 2020 12:53:28 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (10.43.162.135) by
- EX13D08UEE004.ant.amazon.com (10.43.62.182) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 27 Nov 2020 12:53:28 +0000
-Received: from u2196cf9297dc59.ant.amazon.com (10.95.77.210) by
- mail-relay.amazon.com (10.43.162.232) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Fri, 27 Nov 2020 12:53:25 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC:     <seanjc@google.com>, David Woodhouse <dwmw@amazon.co.uk>,
-        <stable@vger.kernel.org>
-References: <20201127112114.3219360-1-pbonzini@redhat.com>
- <20201127112114.3219360-3-pbonzini@redhat.com>
-From:   Filippo Sironi <sironi@amazon.de>
-Message-ID: <8f9b3f9a-b038-0beb-8b54-2ed857472438@amazon.de>
-Date:   Fri, 27 Nov 2020 13:53:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1729939AbgK0NGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Nov 2020 08:06:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14712 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729913AbgK0NGj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Nov 2020 08:06:39 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0ARCWTvs043296;
+        Fri, 27 Nov 2020 08:06:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Xy817aY861S7OaNIC59NI4hXOCA0DA3HMYWO4B/cY/I=;
+ b=ACjp2fPeeaAD03RPnUrEGqJ8byrDL8DLPByiQQTGb5h/SyhbbaIrMcTPkFMe1TTRGNBM
+ 2Jl7KWNQ99FWPOJXZ8rJoGzxA9b3+zICeoWTdm+mAwaKxx/7Lsqel5vrBiiFfQvEIfs9
+ /LmgYGCLnRD0gGiSJFN1hm80JvMrYvHhBihONSikiYA0/sWWVCVoqvOcVw0wT3tBUv6Q
+ 6FM+jXMguWCUl1lLEADrz1yxvhloUz0+cenn5DjeBavzS8lgIwLpJJ2XhGrB166VW4E1
+ BEe6zE5y7GyX2bM7BJs2bYrg0zNETQKpm5811iDWpQO1vzEqkAUdbxnn9C8v4YYhYsVx ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 352y94vrr4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Nov 2020 08:06:38 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0ARCZA26056085;
+        Fri, 27 Nov 2020 08:06:37 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 352y94vrqg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Nov 2020 08:06:37 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0ARCRVSr006449;
+        Fri, 27 Nov 2020 13:06:36 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3518j8jnwc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Nov 2020 13:06:36 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0ARD6XZ147579538
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Nov 2020 13:06:33 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 24AC94C063;
+        Fri, 27 Nov 2020 13:06:33 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F0F14C076;
+        Fri, 27 Nov 2020 13:06:32 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Nov 2020 13:06:32 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
+        imbrenda@linux.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v2 0/7] s390x: Add SIE library and simple test
+Date:   Fri, 27 Nov 2020 08:06:22 -0500
+Message-Id: <20201127130629.120469-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20201127112114.3219360-3-pbonzini@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-27_06:2020-11-26,2020-11-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ clxscore=1015 mlxlogscore=980 impostorscore=0 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 adultscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011270076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAxMS8yNy8yMCAxMjoyMSBQTSwgUGFvbG8gQm9uemluaSB3cm90ZToKPiAKPiBrdm1fY3B1
-X2FjY2VwdF9kbV9pbnRyIGFuZCBrdm1fdmNwdV9yZWFkeV9mb3JfaW50ZXJydXB0X2luamVjdGlv
-biBhcmUKPiBhIGhvZGdlLXBvZGdlIG9mIGNvbmRpdGlvbnMsIGhhY2tlZCB0b2dldGhlciB0byBn
-ZXQgc29tZXRoaW5nIHRoYXQKPiBtb3JlIG9yIGxlc3Mgd29ya3MuICBCdXQgd2hhdCBpcyBhY3R1
-YWxseSBuZWVkZWQgaXMgbXVjaCBzaW1wbGVyOwo+IGluIGJvdGggY2FzZXMgdGhlIGZ1bmRhbWVu
-dGFsIHF1ZXN0aW9uIGlzLCBkbyB3ZSBoYXZlIGEgcGxhY2UgdG8gc3Rhc2gKPiBhbiBpbnRlcnJ1
-cHQgaWYgdXNlcnNwYWNlIGRvZXMgS1ZNX0lOVEVSUlVQVD8KPiAKPiBJbiB1c2Vyc3BhY2UgaXJx
-Y2hpcCBtb2RlLCB0aGF0IGlzICF2Y3B1LT5hcmNoLmludGVycnVwdC5pbmplY3RlZC4KPiBDdXJy
-ZW50bHkga3ZtX2V2ZW50X25lZWRzX3JlaW5qZWN0aW9uKHZjcHUpIGNvdmVycyBpdCwgYnV0IGl0
-IGlzCj4gdW5uZWNlc3NhcmlseSByZXN0cmljdGl2ZS4KPiAKPiBJbiBzcGxpdCBpcnFjaGlwIG1v
-ZGUgaXQncyBhIGJpdCBtb3JlIGNvbXBsaWNhdGVkLCB3ZSBuZWVkIHRvIGNoZWNrCj4ga3ZtX2Fw
-aWNfYWNjZXB0X3BpY19pbnRyKHZjcHUpICh0aGUgSVJRIHdpbmRvdyBleGl0IGlzIGJhc2ljYWxs
-eSBhbiBJTlRBQ0sKPiBjeWNsZSBhbmQgdGh1cyByZXF1aXJlcyBFeHRJTlRzIG5vdCB0byBiZSBt
-YXNrZWQpIGFzIHdlbGwgYXMKPiAhcGVuZGluZ191c2Vyc3BhY2VfZXh0aW50KHZjcHUpLiAgSG93
-ZXZlciwgdGhlcmUgaXMgbm8gbmVlZCB0bwo+IGNoZWNrIGt2bV9ldmVudF9uZWVkc19yZWluamVj
-dGlvbih2Y3B1KSwgc2luY2Ugc3BsaXQgaXJxY2hpcCBrZWVwcwo+IHBlbmRpbmcgRXh0SU5UIHN0
-YXRlIHNlcGFyYXRlIGZyb20gZXZlbnQgaW5qZWN0aW9uIHN0YXRlLCBhbmQgY2hlY2tpbmcKPiBr
-dm1fY3B1X2hhc19pbnRlcnJ1cHQodmNwdSkgaXMgd3JvbmcgdG9vIHNpbmNlIEV4dElOVCBoYXMg
-aGlnaGVyCj4gcHJpb3JpdHkgdGhhbiBBUElDIGludGVycnVwdHMuICBJbiBmYWN0IHRoZSBsYXR0
-ZXIgZml4ZXMgYSBidWc6Cj4gd2hlbiB1c2Vyc3BhY2UgcmVxdWVzdHMgYW4gSVJRIHdpbmRvdyB2
-bWV4aXQsIGFuIGludGVycnVwdCBpbiB0aGUKPiBsb2NhbCBBUElDIGNhbiBjYXVzZSBrdm1fY3B1
-X2hhc19pbnRlcnJ1cHQoKSB0byBiZSB0cnVlIGFuZCB0aHVzCj4ga3ZtX3ZjcHVfcmVhZHlfZm9y
-X2ludGVycnVwdF9pbmplY3Rpb24oKSB0byByZXR1cm4gZmFsc2UuICBXaGVuIHRoaXMKPiBoYXBw
-ZW5zLCB2Y3B1X3J1biBkb2VzIG5vdCBleGl0IHRvIHVzZXJzcGFjZSBidXQgdGhlIGludGVycnVw
-dCB3aW5kb3cKPiB2bWV4aXRzIGtlZXAgb2NjdXJyaW5nLiAgVGhlIFZNIGxvb3BzIHdpdGhvdXQg
-YW55IGhvcGUgb2YgbWFraW5nIHByb2dyZXNzLgo+IAo+IE9uY2Ugd2UgdHJ5IHRvIGZpeCB0aGVz
-ZSB3aXRoIHNvbWV0aGluZyBsaWtlCj4gCj4gICAgICAgcmV0dXJuIGt2bV9hcmNoX2ludGVycnVw
-dF9hbGxvd2VkKHZjcHUpICYmCj4gLSAgICAgICAgIWt2bV9jcHVfaGFzX2ludGVycnVwdCh2Y3B1
-KSAmJgo+IC0gICAgICAgICFrdm1fZXZlbnRfbmVlZHNfcmVpbmplY3Rpb24odmNwdSkgJiYKPiAt
-ICAgICAgICBrdm1fY3B1X2FjY2VwdF9kbV9pbnRyKHZjcHUpOwo+ICsgICAgICAgICghbGFwaWNf
-aW5fa2VybmVsKHZjcHUpCj4gKyAgICAgICAgID8gIXZjcHUtPmFyY2guaW50ZXJydXB0LmluamVj
-dGVkCj4gKyAgICAgICAgIDogKGt2bV9hcGljX2FjY2VwdF9waWNfaW50cih2Y3B1KQo+ICsgICAg
-ICAgICAgICAmJiAhcGVuZGluZ191c2Vyc3BhY2VfZXh0aW50KHYpKSk7Cj4gCj4gd2UgcmVhbGl6
-ZSB0d28gdGhpbmdzLiAgRmlyc3QsIHRoYW5rcyB0byB0aGUgcHJldmlvdXMgcGF0Y2ggdGhlIGNv
-bXBsZXgKPiBjb25kaXRpb25hbCBjYW4gcmV1c2UgIWt2bV9jcHVfaGFzX2V4dGludCh2Y3B1KS4g
-IFNlY29uZCwgdGhlIGludGVycnVwdAo+IHdpbmRvdyByZXF1ZXN0IGluIHZjcHVfZW50ZXJfZ3Vl
-c3QoKQo+IAo+ICAgICAgICAgIGJvb2wgcmVxX2ludF93aW4gPQo+ICAgICAgICAgICAgICAgICAg
-ZG1fcmVxdWVzdF9mb3JfaXJxX2luamVjdGlvbih2Y3B1KSAmJgo+ICAgICAgICAgICAgICAgICAg
-a3ZtX2NwdV9hY2NlcHRfZG1faW50cih2Y3B1KTsKPiAKPiBzaG91bGQgYmUga2VwdCBpbiBzeW5j
-IHdpdGgga3ZtX3ZjcHVfcmVhZHlfZm9yX2ludGVycnVwdF9pbmplY3Rpb24oKToKPiBpdCBpcyB1
-bm5lY2Vzc2FyeSB0byBhc2sgdGhlIHByb2Nlc3NvciBmb3IgYW4gaW50ZXJydXB0IHdpbmRvdwo+
-IGlmIHdlIHdvdWxkIG5vdCBiZSBhYmxlIHRvIHJldHVybiB0byB1c2Vyc3BhY2UuICBUaGVyZWZv
-cmUsIHRoZQo+IGNvbXBsZXggY29uZGl0aW9uYWwgaXMgcmVhbGx5IHRoZSBjb3JyZWN0IGltcGxl
-bWVudGF0aW9uIG9mCj4ga3ZtX2NwdV9hY2NlcHRfZG1faW50cih2Y3B1KS4gIEl0IGFsbCBtYWtl
-cyBzZW5zZToKPiAKPiAtIHdlIGNhbiBhY2NlcHQgYW4gaW50ZXJydXB0IGZyb20gdXNlcnNwYWNl
-IGlmIHRoZXJlIGlzIGEgcGxhY2UKPiAgICB0byBzdGFzaCBpdCAoYW5kLCBmb3IgaXJxY2hpcCBz
-cGxpdCwgRXh0SU5UcyBhcmUgbm90IG1hc2tlZCkuCj4gICAgSW50ZXJydXB0cyBmcm9tIHVzZXJz
-cGFjZSBfY2FuXyBiZSBhY2NlcHRlZCBldmVuIGlmIHJpZ2h0IG5vdwo+ICAgIEVGTEFHUy5JRj0w
-Lgo+IAo+IC0gaW4gb3JkZXIgdG8gdGVsbCB1c2Vyc3BhY2Ugd2Ugd2lsbCBpbmplY3QgaXRzIGlu
-dGVycnVwdCAoIklSUQo+ICAgIHdpbmRvdyBvcGVuIiBpLmUuIGt2bV92Y3B1X3JlYWR5X2Zvcl9p
-bnRlcnJ1cHRfaW5qZWN0aW9uKSwgYm90aAo+ICAgIEtWTSBhbmQgdGhlIHZDUFUgbmVlZCB0byBi
-ZSByZWFkeSB0byBhY2NlcHQgdGhlIGludGVycnVwdC4KPiAKPiAuLi4gYW5kIHRoaXMgaXMgd2hh
-dCB0aGUgcGF0Y2ggaW1wbGVtZW50cy4KPiAKPiBSZXBvcnRlZC1ieTogRGF2aWQgV29vZGhvdXNl
-IDxkd213QGFtYXpvbi5jby51az4KPiBBbmFseXplZC1ieTogRGF2aWQgV29vZGhvdXNlIDxkd213
-QGFtYXpvbi5jby51az4KPiBDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZwo+IFNpZ25lZC1vZmYt
-Ynk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+Cj4gLS0tCj4gICBhcmNoL3g4
-Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHwgIDEgKwo+ICAgYXJjaC94ODYva3ZtL2lycS5jICAg
-ICAgICAgICAgICB8ICAyICstCj4gICBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgICAgICAgIHwg
-MTcgKysrKysrKy0tLS0tLS0tLS0KPiAgIDMgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCsp
-LCAxMSBkZWxldGlvbnMoLSkKPiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVkZS9hc20v
-a3ZtX2hvc3QuaCBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiBpbmRleCBkNDQ4
-NThiNjkzNTMuLmRkYWYzZTAxYTg1NCAxMDA2NDQKPiAtLS0gYS9hcmNoL3g4Ni9pbmNsdWRlL2Fz
-bS9rdm1faG9zdC5oCj4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IEBA
-IC0xNjU1LDYgKzE2NTUsNyBAQCBpbnQga3ZtX3Rlc3RfYWdlX2h2YShzdHJ1Y3Qga3ZtICprdm0s
-IHVuc2lnbmVkIGxvbmcgaHZhKTsKPiAgIGludCBrdm1fc2V0X3NwdGVfaHZhKHN0cnVjdCBrdm0g
-Kmt2bSwgdW5zaWduZWQgbG9uZyBodmEsIHB0ZV90IHB0ZSk7Cj4gICBpbnQga3ZtX2NwdV9oYXNf
-aW5qZWN0YWJsZV9pbnRyKHN0cnVjdCBrdm1fdmNwdSAqdik7Cj4gICBpbnQga3ZtX2NwdV9oYXNf
-aW50ZXJydXB0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4gK2ludCBrdm1fY3B1X2hhc19leHRp
-bnQoc3RydWN0IGt2bV92Y3B1ICp2KTsKPiAgIGludCBrdm1fYXJjaF9pbnRlcnJ1cHRfYWxsb3dl
-ZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwo+ICAgaW50IGt2bV9jcHVfZ2V0X2ludGVycnVwdChz
-dHJ1Y3Qga3ZtX3ZjcHUgKnYpOwo+ICAgdm9pZCBrdm1fdmNwdV9yZXNldChzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsIGJvb2wgaW5pdF9ldmVudCk7Cj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9p
-cnEuYyBiL2FyY2gveDg2L2t2bS9pcnEuYwo+IGluZGV4IGUyZDQ5YTUwNmU3Zi4uZmEwMWYwN2U0
-NDllIDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2t2bS9pcnEuYwo+ICsrKyBiL2FyY2gveDg2L2t2
-bS9pcnEuYwo+IEBAIC00MCw3ICs0MCw3IEBAIHN0YXRpYyBpbnQgcGVuZGluZ191c2Vyc3BhY2Vf
-ZXh0aW50KHN0cnVjdCBrdm1fdmNwdSAqdikKPiAgICAqIGNoZWNrIGlmIHRoZXJlIGlzIHBlbmRp
-bmcgaW50ZXJydXB0IGZyb20KPiAgICAqIG5vbi1BUElDIHNvdXJjZSB3aXRob3V0IGludGFjay4K
-PiAgICAqLwo+IC1zdGF0aWMgaW50IGt2bV9jcHVfaGFzX2V4dGludChzdHJ1Y3Qga3ZtX3ZjcHUg
-KnYpCj4gK2ludCBrdm1fY3B1X2hhc19leHRpbnQoc3RydWN0IGt2bV92Y3B1ICp2KQo+ICAgewo+
-ICAgICAgICAgIC8qCj4gICAgICAgICAgICogRklYTUU6IGludGVycnVwdC5pbmplY3RlZCByZXBy
-ZXNlbnRzIGFuIGludGVycnVwdCB0aGF0IGl0J3MKPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3Zt
-L3g4Ni5jIGIvYXJjaC94ODYva3ZtL3g4Ni5jCj4gaW5kZXggNDQ3ZWRjMGQxZDVhLi41NDEyNGI2
-MjExZGYgMTAwNjQ0Cj4gLS0tIGEvYXJjaC94ODYva3ZtL3g4Ni5jCj4gKysrIGIvYXJjaC94ODYv
-a3ZtL3g4Ni5jCj4gQEAgLTQwNTEsMjEgKzQwNTEsMjIgQEAgc3RhdGljIGludCBrdm1fdmNwdV9p
-b2N0bF9zZXRfbGFwaWMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+IAo+ICAgc3RhdGljIGludCBr
-dm1fY3B1X2FjY2VwdF9kbV9pbnRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgIHsKPiAtICAg
-ICAgIHJldHVybiAoIWxhcGljX2luX2tlcm5lbCh2Y3B1KSB8fAo+IC0gICAgICAgICAgICAgICBr
-dm1fYXBpY19hY2NlcHRfcGljX2ludHIodmNwdSkpOwo+ICsgICAgICAgLyoKPiArICAgICAgICAq
-IFdlIGNhbiBhY2NlcHQgdXNlcnNwYWNlJ3MgcmVxdWVzdCBmb3IgaW50ZXJydXB0IGluamVjdGlv
-bgo+ICsgICAgICAgICogYXMgbG9uZyBhcyB3ZSBoYXZlIGEgcGxhY2UgdG8gc3RvcmUgdGhlIGlu
-dGVycnVwdCBudW1iZXIuCj4gKyAgICAgICAgKiBUaGUgYWN0dWFsIGluamVjdGlvbiB3aWxsIGhh
-cHBlbiB3aGVuIHRoZSBDUFUgaXMgYWJsZSB0bwo+ICsgICAgICAgICogZGVsaXZlciB0aGUgaW50
-ZXJydXB0Lgo+ICsgICAgICAgICovCj4gKyAgICAgICBpZiAoa3ZtX2NwdV9oYXNfZXh0aW50KHZj
-cHUpKQo+ICsgICAgICAgICAgICAgICByZXR1cm4gZmFsc2U7Cj4gKwo+ICsgICAgICAgLyogQWNr
-bm93bGVkZ2luZyBFeHRJTlQgZG9lcyBub3QgaGFwcGVuIGlmIExJTlQwIGlzIG1hc2tlZC4gICov
-Cj4gKyAgICAgICByZXR1cm4gIShsYXBpY19pbl9rZXJuZWwodmNwdSkgJiYgIWt2bV9hcGljX2Fj
-Y2VwdF9waWNfaW50cih2Y3B1KSk7Cj4gICB9Cj4gCj4gLS8qCj4gLSAqIGlmIHVzZXJzcGFjZSBy
-ZXF1ZXN0ZWQgYW4gaW50ZXJydXB0IHdpbmRvdywgY2hlY2sgdGhhdCB0aGUKPiAtICogaW50ZXJy
-dXB0IHdpbmRvdyBpcyBvcGVuLgo+IC0gKgo+IC0gKiBObyBuZWVkIHRvIGV4aXQgdG8gdXNlcnNw
-YWNlIGlmIHdlIGFscmVhZHkgaGF2ZSBhbiBpbnRlcnJ1cHQgcXVldWVkLgo+IC0gKi8KPiAgIHN0
-YXRpYyBpbnQga3ZtX3ZjcHVfcmVhZHlfZm9yX2ludGVycnVwdF9pbmplY3Rpb24oc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1KQo+ICAgewo+ICAgICAgICAgIHJldHVybiBrdm1fYXJjaF9pbnRlcnJ1cHRf
-YWxsb3dlZCh2Y3B1KSAmJgo+IC0gICAgICAgICAgICAgICAha3ZtX2NwdV9oYXNfaW50ZXJydXB0
-KHZjcHUpICYmCj4gLSAgICAgICAgICAgICAgICFrdm1fZXZlbnRfbmVlZHNfcmVpbmplY3Rpb24o
-dmNwdSkgJiYKPiAgICAgICAgICAgICAgICAgIGt2bV9jcHVfYWNjZXB0X2RtX2ludHIodmNwdSk7
-Cj4gICB9Cj4gCj4gLS0KPiAyLjI4LjAKPiAKClJldmlld2VkLWJ5OiBGaWxpcHBvIFNpcm9uaSA8
-c2lyb25pQGFtYXpvbi5kZT4KCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdt
-YkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0
-aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQg
-Q2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERF
-IDI4OSAyMzcgODc5CgoK
+This is the absolute minimum needed to run VMs inside the KVM Unit
+Tests. It's more of a base for other tests that I can't (yet) publish
+than an addition of tests that check KVM functionality. However, I
+wanted to decrease the number of WIP patches in my private
+branch. Once the library is available maybe others will come and
+extend the SIE test itself.
+
+Yes, I have added VM management functionality like VM create/destroy,
+etc but as it is not needed right now, I'd like to exclude it from
+this patch set for now.
+
+Gitlab:
+https://gitlab.com/frankja/kvm-unit-tests/-/tree/sie
+
+CI:
+https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/222217716
+
+v2:
+	* Added license and source identifiers to test_bit patch
+	* Changed the way I test for sclp feature bits
+	* Removed the cpu info page itself and all references
+	* Added the diag318 and a sclp.h style fix patch
+
+Janosch Frank (7):
+  s390x: Add test_bit to library
+  s390x: Consolidate sclp read info
+  s390x: SCLP feature checking
+  s390x: sie: Add SIE to lib
+  s390x: sie: Add first SIE test
+  s390x: Add diag318 intercept test
+  s390x: Fix sclp.h style issues
+
+ lib/s390x/asm-offsets.c  |  13 +++
+ lib/s390x/asm/arch_def.h |   7 ++
+ lib/s390x/asm/bitops.h   |  26 ++++++
+ lib/s390x/asm/facility.h |   3 +-
+ lib/s390x/interrupt.c    |   7 ++
+ lib/s390x/io.c           |   2 +
+ lib/s390x/sclp.c         |  50 ++++++++--
+ lib/s390x/sclp.h         | 178 +++++++++++++++++++----------------
+ lib/s390x/sie.h          | 197 +++++++++++++++++++++++++++++++++++++++
+ lib/s390x/smp.c          |  28 +++---
+ s390x/Makefile           |   1 +
+ s390x/cstart64.S         |  56 +++++++++++
+ s390x/intercept.c        |  19 ++++
+ s390x/sie.c              | 125 +++++++++++++++++++++++++
+ s390x/unittests.cfg      |   3 +
+ 15 files changed, 611 insertions(+), 104 deletions(-)
+ create mode 100644 lib/s390x/sie.h
+ create mode 100644 s390x/sie.c
+
+-- 
+2.25.1
 
