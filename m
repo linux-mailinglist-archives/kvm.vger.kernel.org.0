@@ -2,161 +2,330 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A74002C6E5B
-	for <lists+kvm@lfdr.de>; Sat, 28 Nov 2020 03:08:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A2C02C6E88
+	for <lists+kvm@lfdr.de>; Sat, 28 Nov 2020 03:48:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731966AbgK1CFB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Nov 2020 21:05:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56162 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731924AbgK1CEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Nov 2020 21:04:13 -0500
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB31DC0613D2;
-        Fri, 27 Nov 2020 18:04:12 -0800 (PST)
-Received: by mail-il1-x144.google.com with SMTP id k8so6127551ilr.4;
-        Fri, 27 Nov 2020 18:04:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wflFfmV0h+VkTUXw4dnigENEr6YKI+GTw63N8b+QamM=;
-        b=mNfLDr8I9YeJdrdKv9F6I2Zuhv9FHtA6r2AZHsGp+2pPMuEfy9Ob0fu32gixgrtCcT
-         dqvxAqzOprHP7/6v3STPI+0mn/kDPaHQiDMUO20yTQHT5vf8s8Nd0rL2wuWbkDHvkNkx
-         fs05uG0otO2eFZoS0qwsRoxQG/QUKSRUGIj//Y/D5XTyIphSgpXw6ftfGRxqlFmYypBy
-         4dcE1xOU9rdOKIKezK7u57EDjXR3WaI2NbrbCi7M4y6RAXXscBur+g/lpwHtmGwxe8xg
-         QnOLBrqbZz480OcvPFlY0OGFglqdJvKgm01RHslBzVKcOXBCZ3hKL/1Tljla7+VPLQRd
-         DBWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wflFfmV0h+VkTUXw4dnigENEr6YKI+GTw63N8b+QamM=;
-        b=J+Gb+XqxZYhm3vwYbFFPrfJlpIFwt1aqnEAMHs8qJZW+sdmxFQGZxH4QbD+GZ6j9h4
-         rjLsK19qVFIRWdIh7YjHWfZMaJ1pOA3yrkTHJ3VT6Z04pv1T/7seaHvCJ3INc1i1Mphm
-         G+m6V6F9pvs+VF5cDQfxan5mKFwY4bm5P4BudNgzQJINW05Rl0ZLUwAylPx8WBdsFwLb
-         RB+L+JZt1OuaDpNWYp63vM6inK7rQ4WjlxFLgahD9cJaoC9yXF0SLRUnDTcnl3eXRPjK
-         p897wVtSmh5/2ltHsP0GYKS6nZfp28SSPwDLzskJg8/wg5+yqi+Zqk2G9VeX9+nYfLVs
-         Z2Cg==
-X-Gm-Message-State: AOAM5335h2/p0m0yBfHVHZMY8hysIdrsNVCjOnbI3Ll2QIHSXloLtogB
-        VdwWoSslPh7Jp9/0adhcxzZK5eqTxHnH+Jbc74Y=
-X-Google-Smtp-Source: ABdhPJysEVNq2gbUDgAqedaN0LFcXc+rap6lS2RKie2goF+k5/FfA5oVVSUVK9/bh741Gi8IvF6RpD3kTV799ulv5Qk=
-X-Received: by 2002:a92:ae0e:: with SMTP id s14mr9068421ilh.94.1606529052081;
- Fri, 27 Nov 2020 18:04:12 -0800 (PST)
+        id S1729672AbgK1Clw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Nov 2020 21:41:52 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:8191 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731071AbgK1Cj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Nov 2020 21:39:29 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CjbJ51R0yzkhWs;
+        Sat, 28 Nov 2020 10:37:41 +0800 (CST)
+Received: from [10.174.187.74] (10.174.187.74) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 28 Nov 2020 10:38:01 +0800
+Subject: Re: [PATCH] irqchip/gic-v4.1: Optimize the wait for the completion of
+ the analysis of the VPT
+To:     Marc Zyngier <maz@kernel.org>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20200923063543.1920-1-lushenming@huawei.com>
+ <7d0c6bfe7485094154a05bfb2de03640@kernel.org>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <6713e563-f037-f512-a3ce-801599114776@huawei.com>
+Date:   Sat, 28 Nov 2020 10:38:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-References: <20201120095517.19211-1-jiangshanlai@gmail.com>
- <20201126000549.GC450871@google.com> <0724aeb9-3466-5505-8f12-a5899144e68f@redhat.com>
-In-Reply-To: <0724aeb9-3466-5505-8f12-a5899144e68f@redhat.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Sat, 28 Nov 2020 10:04:01 +0800
-Message-ID: <CAJhGHyApvmQk4bxxK2rJKzyAShFSXyEb2W0qyFcVoUEcsMKs_w@mail.gmail.com>
-Subject: Re: [PATCH] kvm/x86/mmu: use the correct inherited permissions to get
- shadow page
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Avi Kivity <avi@qumranet.com>, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <7d0c6bfe7485094154a05bfb2de03640@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.187.74]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 28, 2020 at 12:48 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 26/11/20 01:05, Sean Christopherson wrote:
-> > On Fri, Nov 20, 2020, Lai Jiangshan wrote:
-> >> From: Lai Jiangshan <laijs@linux.alibaba.com>
-> >>
-> >> Commit 41074d07c78b ("KVM: MMU: Fix inherited permissions for emulated
-> >> guest pte updates") said role.access is common access permissions for
-> >> all ptes in this shadow page, which is the inherited permissions from
-> >> the parent ptes.
-> >>
-> >> But the commit did not enforce this definition when kvm_mmu_get_page()
-> >> is called in FNAME(fetch). Rather, it uses a random (last level pte's
-> >> combined) access permissions.
-> >
-> > I wouldn't say it's random, the issue is specifically that all shadow pages end
-> > up using the combined set of permissions of the entire walk, as opposed to the
-> > only combined permissions of its parents.
-> >
-> >> And the permissions won't be checked again in next FNAME(fetch) since the
-> >> spte is present. It might fail to meet guest's expectation when guest sets up
-> >> spaghetti pagetables.
-> >
-> > Can you provide details on the exact failure scenario?  It would be very helpful
-> > for documentation and understanding.  I can see how using the full combined
-> > permissions will cause weirdness for upper level SPs in kvm_mmu_get_page(), but
-> > I'm struggling to connect the dots to understand how that will cause incorrect
-> > behavior for the guest.  AFAICT, outside of the SP cache, KVM only consumes
-> > role.access for the final/last SP.
-> >
->
-> Agreed, a unit test would be even better, but just a description in the
-> commit message would be enough.
->
-> Paolo
->
+On 2020/11/28 3:35, Marc Zyngier wrote:
+> Shenming,
+> 
+> Somehow this patch ended up in the wrong folder.
+> Apologies for the delay reviewing it.>
+> On 2020-09-23 07:35, Shenming Lu wrote:
+>> Right after a vPE is made resident, the code starts polling the
+>> GICR_VPENDBASER.Dirty bit until it becomes 0, where the delay_us
+>> is set to 10. But in our measurement, it takes only hundreds of
+>> nanoseconds, or 1~2 microseconds, to finish parsing the VPT in most
+>> cases. And we also measured the time from vcpu_load() (include it)
+>> to __guest_enter() on Kunpeng 920. On average, it takes 2.55 microseconds
+>> (not first run && the VPT is empty). So 10 microseconds delay might
+>> really hurt performance.
+>>
+>> To avoid this, we can set the delay_us to 1, which is more appropriate
+>> in this situation and universal. Besides, we can delay the execution
+>> of its_wait_vpt_parse_complete() (call it from kvm_vgic_flush_hwstate()
+>> corresponding to vPE resident), giving the GIC a chance to work in
+>> parallel with the CPU on the entry path.
+>>
+>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-v4.c      | 18 ++++++++++++++++++
+>>  arch/arm64/kvm/vgic/vgic.c         |  2 ++
+>>  drivers/irqchip/irq-gic-v3-its.c   | 14 +++++++++++---
+>>  drivers/irqchip/irq-gic-v4.c       | 11 +++++++++++
+>>  include/kvm/arm_vgic.h             |  3 +++
+>>  include/linux/irqchip/arm-gic-v4.h |  4 ++++
+>>  6 files changed, 49 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+>> index b5fa73c9fd35..1d5d2d6894d3 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+>> @@ -353,6 +353,24 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
+>>      return err;
+>>  }
+>>
+>> +void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu)
+> 
+> I'd like something a bit more abstract as a name.
+> 
+> vgic_v4_commit() seems more appropriate, and could be used for other
+> purposes.
 
-Something in my mind, but I haven't test it:
+Yes, it looks more appropriate.
 
-pgd[]pud[]  pmd[]        pte[]            virtual address pointers
- (same hpa as pmd2\)  /->pte1(u--)->page1 <- ptr1 (u--)
-         /->pmd1(uw-)--->pte2(uw-)->page2 <- ptr2 (uw-)
-pgd->pud-|           (shared pte[] as above)
-         \->pmd2(u--)--->pte1(u--)->page1 <- ptr3 (u--)
- (same hpa as pmd1/)  \->pte2(uw-)->page2 <- ptr4 (u--)
+> 
+>> +{
+>> +    struct its_vpe *vpe;
+>> +
+>> +    if (kvm_vgic_global_state.type == VGIC_V2 ||
+> 
+> Why do you test for GICv2? Isn't the vgic_supports_direct_msis() test enough?
+> And the test should be moved to kvm_vgic_flush_hwstate(), as we already have
+> similar checks there.
 
+Yes, the test for GICv2 is unnecessary.... I will correct it.
 
-pmd1 and pmd2 point to the same pte table, so:
-ptr1 and ptr3 points to the same page.
-ptr2 and ptr4 points to the same page.
+> 
+>> !vgic_supports_direct_msis(vcpu->kvm))
+>> +        return;
+>> +
+>> +    vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+>> +
+>> +    if (vpe->vpt_ready)
+>> +        return;
+>> +
+>> +    if (its_wait_vpt(vpe))
+>> +        return;
+> 
+> How can that happen?
 
-  The guess read-accesses to ptr1 first. So the hypervisor gets the
-shadow pte page table with role.access=u-- among other things.
-   (Note the shadowed pmd1's access is uwx)
+Yes, it seems that its_wait_vpt() would always return 0.
 
-  And then the guest write-accesses to ptr2, and the hypervisor
-set up shadow page for ptr2.
-   (Note the hypervisor silencely accepts the role.access=u--
-    shadow pte page table in FNAME(fetch))
+> 
+>> +
+>> +    vpe->vpt_ready = true;
+> 
+> This is nasty. You need to explain what happens with this state (you are
+> trying not to access VPENDBASER across a shallow exit, as only a vcpu_put
 
-  After that, the guess read-accesses to ptr3, the hypervisor
-reused the same shadow pte page table as above.
+Ok, I will add a comment here.
 
-  At last, the guest writes to ptr4 without vmexit nor pagefault,
-Which should cause vmexit as the guest expects.
+> will invalidate the GIC state). And something like vpe_ready is more
+> generic (we try not to have too much of the GICv4 gunk in the KVM code).
 
-In theory, guest userspace can trick the guest kernel if the guest
-kernel sets up page table like this.
+Yes, that's better.
 
-Such spaghetti pagetables are unlikely to be seen in the guest.
+> 
+>> +}
+>> +
+>>  static struct vgic_its *vgic_get_its(struct kvm *kvm,
+>>                       struct kvm_kernel_irq_routing_entry *irq_entry)
+>>  {
+>> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+>> index c3643b7f101b..ed810a80cda2 100644
+>> --- a/arch/arm64/kvm/vgic/vgic.c
+>> +++ b/arch/arm64/kvm/vgic/vgic.c
+>> @@ -915,6 +915,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>>
+>>      if (can_access_vgic_from_kernel())
+>>          vgic_restore_state(vcpu);
+>> +
+>> +    vgic_v4_wait_vpt(vcpu);
+>>  }
+>>
+>>  void kvm_vgic_load(struct kvm_vcpu *vcpu)
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index 548de7538632..b7cbc9bcab9d 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -3803,7 +3803,7 @@ static void its_wait_vpt_parse_complete(void)
+>>      WARN_ON_ONCE(readq_relaxed_poll_timeout_atomic(vlpi_base + GICR_VPENDBASER,
+>>                                 val,
+>>                                 !(val & GICR_VPENDBASER_Dirty),
+>> -                               10, 500));
+>> +                               1, 500));
+> 
+> This really should be in a separate patch.
 
-But when the guest is using KPTI and not using SMEP. KPTI means
-all pgd entries are marked NX on the lower/userspace part of
-the kernel pagetable. Which means SMEP is not needed.
-(see arch/x86/mm/pti.c)
+Ok, I will separate it.
 
-Assume the guest does disable SMEP and the guest has the flaw
-that the guest user can trick guest kernel to execute on lower
-part of the address space.
+> 
+>>  }
+>>
+>>  static void its_vpe_schedule(struct its_vpe *vpe)
+>> @@ -3837,7 +3837,7 @@ static void its_vpe_schedule(struct its_vpe *vpe)
+>>      val |= GICR_VPENDBASER_Valid;
+>>      gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+>>
+>> -    its_wait_vpt_parse_complete();
+>> +    vpe->vpt_ready = false;
+> 
+> This really belongs to the deschedule path, doesn't it? Given that
+> it can only be set from vgic_flush_hwstate(), it should be fairly
+> foolproof.
 
-Normally, NX bit marked on the kernel pagetable's lower pgd
-entries can help in this case. But when in guest with shadowpage
-in hypervisor, the guest user can make those NX bit useless.
+Yes, that's better.
 
-Again, I haven't tested it neither. I will try it later and
-update the patch including adding some more checks in the mmu.c.
+> 
+>>  }
+>>
+>>  static void its_vpe_deschedule(struct its_vpe *vpe)
+>> @@ -3881,6 +3881,10 @@ static int its_vpe_set_vcpu_affinity(struct
+>> irq_data *d, void *vcpu_info)
+>>          its_vpe_schedule(vpe);
+>>          return 0;
+>>
+>> +    case WAIT_VPT:
+> 
+> COMMIT_VPE seems a better name.
 
-Thanks,
-Lai
+Yes, that's better.
+
+> 
+>> +        its_wait_vpt_parse_complete();
+>> +        return 0;
+>> +
+>>      case DESCHEDULE_VPE:
+>>          its_vpe_deschedule(vpe);
+>>          return 0;
+>> @@ -4047,7 +4051,7 @@ static void its_vpe_4_1_schedule(struct its_vpe *vpe,
+>>
+>>      gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+>>
+>> -    its_wait_vpt_parse_complete();
+>> +    vpe->vpt_ready = false;
+>>  }
+>>
+>>  static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
+>> @@ -4118,6 +4122,10 @@ static int its_vpe_4_1_set_vcpu_affinity(struct
+>> irq_data *d, void *vcpu_info)
+>>          its_vpe_4_1_schedule(vpe, info);
+>>          return 0;
+>>
+>> +    case WAIT_VPT:
+>> +        its_wait_vpt_parse_complete();
+>> +        return 0;
+>> +
+>>      case DESCHEDULE_VPE:
+>>          its_vpe_4_1_deschedule(vpe, info);
+>>          return 0;
+>> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+>> index 0c18714ae13e..36be42569872 100644
+>> --- a/drivers/irqchip/irq-gic-v4.c
+>> +++ b/drivers/irqchip/irq-gic-v4.c
+>> @@ -258,6 +258,17 @@ int its_make_vpe_resident(struct its_vpe *vpe,
+>> bool g0en, bool g1en)
+>>      return ret;
+>>  }
+>>
+>> +int its_wait_vpt(struct its_vpe *vpe)
+> 
+> its_commit_vpe()
+> 
+>> +{
+>> +    struct its_cmd_info info = { };
+>> +
+>> +    WARN_ON(preemptible());
+>> +
+>> +    info.cmd_type = WAIT_VPT;
+> 
+> Please write it as:
+> 
+>         struct its_cmd_info = {
+>                 .cmd_type = COMMIT_VPE,
+>         };
+> 
+> as for most of the commands.
+
+Ok, I will correct it.
+
+> 
+>> +
+>> +    return its_send_vpe_cmd(vpe, &info);
+>> +}
+>> +
+>>  int its_invall_vpe(struct its_vpe *vpe)
+>>  {
+>>      struct its_cmd_info info = {
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index a8d8fdcd3723..b55a835d28a8 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -402,6 +402,9 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+>>                   struct kvm_kernel_irq_routing_entry *irq_entry);
+>>
+>>  int vgic_v4_load(struct kvm_vcpu *vcpu);
+>> +
+>> +void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu);
+>> +
+>>  int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
+>>
+>>  #endif /* __KVM_ARM_VGIC_H */
+>> diff --git a/include/linux/irqchip/arm-gic-v4.h
+>> b/include/linux/irqchip/arm-gic-v4.h
+>> index 6976b8331b60..68ac2b7b9309 100644
+>> --- a/include/linux/irqchip/arm-gic-v4.h
+>> +++ b/include/linux/irqchip/arm-gic-v4.h
+>> @@ -75,6 +75,8 @@ struct its_vpe {
+>>      u16            vpe_id;
+>>      /* Pending VLPIs on schedule out? */
+>>      bool            pending_last;
+>> +    /* VPT parse complete */
+>> +    bool            vpt_ready;
+>>  };
+>>
+>>  /*
+>> @@ -103,6 +105,7 @@ enum its_vcpu_info_cmd_type {
+>>      PROP_UPDATE_VLPI,
+>>      PROP_UPDATE_AND_INV_VLPI,
+>>      SCHEDULE_VPE,
+>> +    WAIT_VPT,
+>>      DESCHEDULE_VPE,
+>>      INVALL_VPE,
+>>      PROP_UPDATE_VSGI,
+>> @@ -128,6 +131,7 @@ struct its_cmd_info {
+>>  int its_alloc_vcpu_irqs(struct its_vm *vm);
+>>  void its_free_vcpu_irqs(struct its_vm *vm);
+>>  int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en);
+>> +int its_wait_vpt(struct its_vpe *vpe);
+>>  int its_make_vpe_non_resident(struct its_vpe *vpe, bool db);
+>>  int its_invall_vpe(struct its_vpe *vpe);
+>>  int its_map_vlpi(int irq, struct its_vlpi_map *map);
+> 
+> My comments are mostly cosmetic. If you can respin quickly, I'll
+> pick it up for 5.11.
+
+Ok, I will try to respin it quickly.
+
+Thanks for reviewing, :)
+Shenming
+
+> 
+> Thanks,
+> 
+>         M.
