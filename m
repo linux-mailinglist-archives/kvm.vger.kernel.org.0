@@ -2,115 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E87E82C7880
-	for <lists+kvm@lfdr.de>; Sun, 29 Nov 2020 10:43:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9DE62C7A54
+	for <lists+kvm@lfdr.de>; Sun, 29 Nov 2020 18:36:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726136AbgK2JmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Nov 2020 04:42:14 -0500
-Received: from mail-mw2nam10on2063.outbound.protection.outlook.com ([40.107.94.63]:58529
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725830AbgK2JmN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 29 Nov 2020 04:42:13 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KsBfmlPio0Ue0/wjxTPsTPhcyC3juwT5BWh/BpgP9pT3op+GVf3mLh+SeCFivXX7+ISh3VfV+78aU/JvA/+l7v5d16PYcf1Gr2/eZdoKKNZpcbU5TxVV2LbPT4DcpsDLYhZnYE7hCFiQKBgev8B0k41wD0fO+U7p5/gDyuZvXLVn/xwJ/xfr5qRR4hr4hX/D2bcO++7HUpqAXKMVW7vQmgauCcSHqrBx/vVLRddbD5pD4Fuze9c8OQhuIzeDqzEu7KeXACR6rH9Vl75xmg+qr/mhcAlZ7nTOk9p1vBgEd2GHDFC2WjlWxI1uBJfHyyuJiTwWRby3onZqVvQb00yc9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t5S0XRocYnepAjR/HKPUrV9v0NhzfgBxxlezRszIWXE=;
- b=AApftqcf77JA9K56u8w78HSoi6JbX97EJKBZFU1UOj5T+t7z09UM/d18caqn2W6+j77Rg0jYkAealE/apmKV3h1pwLfuiZi7d6AwUvMe6DKU+NR5hio8/9TSUgR9wcjfqOv3yheSb2eP19SIRlPjJDKmH2JIN26r7kD99MPR7vOfTQLQWIo+KBCvADIUSqkOC4WeheuoGwjML2Ah9z13VjR/LH+wLnpdDZMH+HENjCAK0nD4Lw/nUVnMyxWRTJ7rEexZDGSmR+BW0eQw90l1GkjwfWyyh4XCVFGpoEQzbbE3PTGuwnvoP2/f+zKKJHQdnr0HZhucLFDBLmFhzi5I7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t5S0XRocYnepAjR/HKPUrV9v0NhzfgBxxlezRszIWXE=;
- b=2oVvRN++Zi6t+Q0OBUQwVEgjkQ28SSlQ8InoIoKDoW5q98csTtCcsXENJo1Z7EoVJfP8LIz9/apnTFE+/YlAjgAXiGM4NDrh+fHEq3lF22Wpe10XxZpdAospV0hHlp/OrjQbBfluluSPRBXgcjRZJZTRL01cCppg5RRlOULRXFM=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN1PR12MB2367.namprd12.prod.outlook.com (2603:10b6:802:26::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.28; Sun, 29 Nov
- 2020 09:41:20 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Sun, 29 Nov 2020
- 09:41:20 +0000
-From:   Ashish Kalra <Ashish.Kalra@amd.com>
-To:     pbonzini@redhat.com
-Cc:     cavery@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mlevitsk@redhat.com,
-        vkuznets@redhat.com, wei.huang2@amd.com, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com
-Subject: Re: [PATCH v2 1/2] KVM: SVM: Move asid to vcpu_svm
-Date:   Sun, 29 Nov 2020 09:41:09 +0000
-Message-Id: <20201129094109.32520-1-Ashish.Kalra@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <aadb4690-9b2b-4801-f2fc-783cb4ae7f60@redhat.com>
-References: <aadb4690-9b2b-4801-f2fc-783cb4ae7f60@redhat.com>
-Content-Type: text/plain
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: DM5PR16CA0028.namprd16.prod.outlook.com
- (2603:10b6:4:15::14) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+        id S1728495AbgK2Rfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Nov 2020 12:35:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58078 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728462AbgK2Rff (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 29 Nov 2020 12:35:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606671248;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Baf2YabTsa2IfZZmu8SPbdZascUUB96+ibE6qUCU1Gc=;
+        b=OcFNQ8Q0Cd66CIJO+fd/hzSsFKTxj7yn/w3Ki3tEzQXczI7jT73cO1CXLE5JNvmZ6rIYTg
+        5xB1fMDsU+CaTUd1QWtapL2wFrZxQMyCHbDnZBumLxmXlKbuF2MNI1RdsfX2011faP474+
+        AivSLGSkSnZLMDee2sHzRNovMaRYFOs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-555-R_G7cXFGPbuZ0Xep05l8ww-1; Sun, 29 Nov 2020 12:34:06 -0500
+X-MC-Unique: R_G7cXFGPbuZ0Xep05l8ww-1
+Received: by mail-wm1-f71.google.com with SMTP id o17so6070644wmd.9
+        for <kvm@vger.kernel.org>; Sun, 29 Nov 2020 09:34:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Baf2YabTsa2IfZZmu8SPbdZascUUB96+ibE6qUCU1Gc=;
+        b=YDzvn1yw06NB5og5WbmRroEI+87O0q8AowCRsOeq1Stk2zfa1Uy+1F0koC+jhtEce0
+         Xe8nspgDT2GKKyROSLB7UaucWy72krRkrsXMKZj9p499a6++GWuMl3L/aiuzXPnptB+6
+         FrozPF5c9/BfaK4ntL272EfkdOMXxja98J6+FZo/azuosQBzJ6k06A2WVWswkuvM6+1w
+         m89BTLn0kZwsv8AEwQ9guKjbOXRogAvhmrffYdnNkJTM6TpMaCfz5ZrBDYuEHIcUwmiL
+         9LTdJZJIPxie5LS5zwHpb1jM6+odz1n4hYQGu+FIK/f8tALjISXkAMjvHYCCDRHgBTZg
+         NXog==
+X-Gm-Message-State: AOAM533M6BSV7h8RMin24cz1iLI1i+y1TpNzlESxkds2wRED6JhbKc1G
+        vL6e1JUcOml3Wl7c5SOXmpHwET9NKut1FGDMAkM3hcohvcXkNE0bAasJJOTsTd13Dhds9gQbWK9
+        mf4bXLSBrvHZs
+X-Received: by 2002:a1c:4d0a:: with SMTP id o10mr19426256wmh.107.1606671245225;
+        Sun, 29 Nov 2020 09:34:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy21n5+1MquKPMw6OBo6U5LqUAw3wOmx072b/JbOC0N0bjRNE96mnvZ3UYX3LcDBBupYSjL2g==
+X-Received: by 2002:a1c:4d0a:: with SMTP id o10mr19426239wmh.107.1606671244962;
+        Sun, 29 Nov 2020 09:34:04 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id m4sm4842595wmi.41.2020.11.29.09.34.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Nov 2020 09:34:04 -0800 (PST)
+Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Mike Christie <michael.christie@oracle.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20201125153550.810101-1-sashal@kernel.org>
+ <20201125153550.810101-22-sashal@kernel.org>
+ <25cd0d64-bffc-9506-c148-11583fed897c@redhat.com>
+ <20201125180102.GL643756@sasha-vm>
+ <9670064e-793f-561e-b032-75b1ab5c9096@redhat.com>
+ <20201129041314.GO643756@sasha-vm>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
+Date:   Sun, 29 Nov 2020 18:34:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM5PR16CA0028.namprd16.prod.outlook.com (2603:10b6:4:15::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.20 via Frontend Transport; Sun, 29 Nov 2020 09:41:18 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: f0d06a39-88ba-4ada-1a90-08d8944aecdf
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2367:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB23678B828A5655EF693609D28EF60@SN1PR12MB2367.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iJrEFcdvWqKTBxb0ZrmY/K8XGaCL0KWopxQMTyOCujNoMF9kSWR0tkyH2vIiSLkze0qZ52ZjBLgPjTr+aGoJNanwLr++6USxoV1hfz1R8Y/agJdBZWEDWtQAjds+H5s0kxbdkeIsRsx6B7Z0JVEhklbe7nxfq+ebIH/99ye1D4Imyhq4p4Ct+airMwnBayVdeecehbLLo0X9n3esqWkF//WA9Hi1IFlqf1mSgzY6vUQzqLewnDPiiIfjSdAemU5NTA4ZSGtO44YEkA5AXXIzEzvHrMhbF/3W20PJ97irQDijfd2IA7jet4NueNbWb3+1
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39850400004)(366004)(376002)(396003)(346002)(6486002)(4326008)(4744005)(52116002)(2616005)(956004)(5660300002)(1076003)(478600001)(86362001)(6916009)(8676002)(26005)(66946007)(16526019)(2906002)(83380400001)(66476007)(66556008)(36756003)(6666004)(316002)(186003)(7696005)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?f2LwPQfLhSsmmm6Vws5eCTxzt8DnBcE3TYO+KmBTjrZY4MhZ54oY3SoSHOry?=
- =?us-ascii?Q?3gZgBK6Cl/QbyqnYToWJa/jO/ZwB4hIO3W001UzR7aS7L05Ow8OzytlsC7LK?=
- =?us-ascii?Q?cWxOR8I6GALbzVw/9dLYYm6sj8XM6jSPvaf2ob7DJBNPjbjjLFbNrHwfW/nq?=
- =?us-ascii?Q?J6U1pNAequyKgJb0ptcFwf+SAfQ0JA4bo/vICLo7od096LOGU2nbP2zprL97?=
- =?us-ascii?Q?ld0jbKkl1OaQWBhCz2MQc8qDTenK+xw1riBIhxWBBPIu0SVHxx0prGI7b8P0?=
- =?us-ascii?Q?t/gD+xuyt6foXxco/zBIc5bfrXjciEKbTl+Ghgyrsue4uROJBLY3F2UcCOL1?=
- =?us-ascii?Q?ExOG4hZPgq/2FcshoRv5NeZtc5Y8dCV8y79493Edd+ik93ZDTy4jCsf0tp9y?=
- =?us-ascii?Q?PqyF8sG7lM/tOzPiP8lguK629vHohC0QJ9V+bDBHDn2VoAYvcjjcysYiGIzB?=
- =?us-ascii?Q?8Tzt4+vSrefg2ecDWZlHJX8Q1m2yueP11Ogy/qvDkfqsG2jld4YE2ACTREl4?=
- =?us-ascii?Q?gPe3MdZXzkpzVstMxo1eEbhjd9g/5cUSd3paXPhMhosq52alkVYhKEGWvmUX?=
- =?us-ascii?Q?vH6n/9UtlaHTTU5NkBgN6SDgIvrNnzfJGb9LZwCtI2xZSAOMN1kDxwsHXwz8?=
- =?us-ascii?Q?D9tg1lKPzTA9QqxNn8zTyYf9G4HUWv8aAq6py4vSh+nwwcsAPuY5yCD5fmJU?=
- =?us-ascii?Q?+pA1By7SBSuEmEex64PDLZzj3WfLl9P2FnuVX3uCqRg8MN87EgvdC9oJFIQZ?=
- =?us-ascii?Q?3wzvekG+3u0lq9h0p38JYAC2hN09K5/x9qKR61yoliwUxBAsCiqBbi6qgwoB?=
- =?us-ascii?Q?b291SHcyyu8T8QxW8dZhHQK51mOWlb5iiL7BE4gZPfhI9wML5MS9ONVXk1h5?=
- =?us-ascii?Q?ZC3JVDJSk0k54yBr+p0aGzftCJbv7WOMEpVe54anOfJqMiApZER90yh0tGoR?=
- =?us-ascii?Q?YBVywUrdltbTnaE00irlPW7FpeV2DFUsF4zeXWw3j7Q=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0d06a39-88ba-4ada-1a90-08d8944aecdf
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2020 09:41:20.2466
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +aPqeXtmlhSor5u4Rw7ve48GYx0cScaT4wOIDFFIZRaLBMsCF5WCLM8ZvuEaoYVg/CJVFeFrfdBY8OSEGzrYNQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2367
+In-Reply-To: <20201129041314.GO643756@sasha-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On 29/11/20 05:13, Sasha Levin wrote:
+>> Which doesn't seem to be suitable for stable either...  Patch 3/5 in 
+> 
+> Why not? It was sent as a fix to Linus.
 
-This patch breaks SEV guests. 
+Dunno, 120 lines of new code?  Even if it's okay for an rc, I don't see 
+why it is would be backported to stable releases and release it without 
+any kind of testing.  Maybe for 5.9 the chances of breaking things are 
+low, but stuff like locking rules might have changed since older 
+releases like 5.4 or 4.19.  The autoselection bot does not know that, it 
+basically crosses fingers that these larger-scale changes cause the 
+patches not to apply or compile anymore.
 
-The patch stores current ASID in struct vcpu_svm and only moves it to VMCB in
-svm_vcpu_run(), but by doing so, the ASID allocated for SEV guests and setup 
-in vmcb->control.asid by pre_sev_run() gets over-written by this ASID
-stored in struct vcpu_svm and hence, VMRUN fails as SEV guest is bound/activated
-on a different ASID then the one overwritten in vmcb->control.asid at VMRUN. 
+Maybe it's just me, but the whole "autoselect stable patches" and 
+release them is very suspicious.  You are basically crossing fingers and 
+are ready to release any kind of untested crap, because you do not trust 
+maintainers of marking stable patches right.  Only then, when a backport 
+is broken, it's maintainers who get the blame and have to fix it.
 
-For example, asid#1 was activated for SEV guest and then vmcb->control.asid is
-overwritten with asid#0 (svm->asid) as part of this patch in svm_vcpu_run() and
-hence VMRUN fails.
+Personally I don't care because I have asked you to opt KVM out of 
+autoselection, but this is the opposite of what Greg brags about when he 
+touts the virtues of the upstream stable process over vendor kernels.
+
+Paolo
+
+>> the series might be (vhost scsi: fix cmd completion race), so I can 
+>> understand including 1/5 and 2/5 just in case, but not the rest.  Does 
+>> the bot not understand diffstats?
+> 
+> Not on their own, no. What's wrong with the diffstats?
+> 
+
