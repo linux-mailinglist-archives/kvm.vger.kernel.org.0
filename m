@@ -2,105 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 436132C768F
-	for <lists+kvm@lfdr.de>; Sun, 29 Nov 2020 00:18:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F8932C76E4
+	for <lists+kvm@lfdr.de>; Sun, 29 Nov 2020 01:47:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726392AbgK1XRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Nov 2020 18:17:45 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:48706 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725844AbgK1XRp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Nov 2020 18:17:45 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0ASNARoq155102;
-        Sat, 28 Nov 2020 23:16:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=WaJiSii+zp2LvXv7ymV3Ze5LFnN0sUhCPiictqURKYw=;
- b=x7W7MHh7STSNvloWi61erbJMfKJB064+PbtGTX1rqTuoYCKfXpF4+hS0YHgd11rY4IZA
- stkIP1YHPyITeN6dECugSSMmftMyj/OB7BsbmhgjRh1kSOxsRjwMJ5MgS8Q5qZeMVKCR
- QA9v7UVzIh1dMPhhD90AJfjg0U3VpNWFtQ2+keaBY1x4OIrSsnmyiebOUv6vqSwuYtzm
- WlWTURfJyateznkXjgOdGNgFX2fqR5mgfm/tYll8F+xPxI/6mdEu+XXCcAYGzbOPs7T9
- yRi7RG/Q9Hz67ipOO6Hm9OfqjJrn9XuwDGXyB67WDQ+lNEeZHruGKeMOnVDwE3CgDhvg XA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 353c2ahf9p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 28 Nov 2020 23:16:56 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0ASNA8dX195347;
-        Sat, 28 Nov 2020 23:16:55 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 353dvj0hb7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 28 Nov 2020 23:16:55 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0ASNGsYU020171;
-        Sat, 28 Nov 2020 23:16:54 GMT
-Received: from [192.168.1.67] (/94.61.1.144)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 28 Nov 2020 15:16:54 -0800
-Subject: Re: [PATCH] KVM: x86: Reinstate userspace hypercall support
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <3b9987c6-0d91-177c-7f44-0984dc586253@oracle.com>
-Date:   Sat, 28 Nov 2020 23:16:51 +0000
+        id S1726796AbgK2Arc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Nov 2020 19:47:32 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47334 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725616AbgK2Arc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 28 Nov 2020 19:47:32 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AT0VkVw140026;
+        Sat, 28 Nov 2020 19:46:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=AEu2YDydB/SF+5DWd+uZHgYYz+P4E6JaKj4SF/AC3wY=;
+ b=skVlZ8XtkXrvNgkj+OHqyrwev2g3q72g3qx7TRbwSc3i75f3RCs+SjWNsxiUqztkzho4
+ zkAtJa/kt6roUSUXxKQdO4jHdTnpPq2KUHMp9n0vLxP1o6o934JNq39ZmwhW+pHzvZV0
+ z2f6vCYNacmZTEGfVqiHemBzEGWjFIK/JC8irVTwjd8zgEbkIibA4Jm+4Wb5y3aQlS3B
+ fvftEVaBorz6oj+/fCYb4lUIxsLf3ri9FF0ttIXETM5JiBsDhWCDMQT4npeiv+BFzV0/
+ iiPputhAj52/wXdbJxXNBsE17n9nYw1PxLIHQAaz52oqOoXiIyZ9/W5fsBUpifV/8gpr Ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 353ybf1tw7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 28 Nov 2020 19:46:49 -0500
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AT0VpVV140112;
+        Sat, 28 Nov 2020 19:46:49 -0500
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 353ybf1tw0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 28 Nov 2020 19:46:48 -0500
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AT0WS33008777;
+        Sun, 29 Nov 2020 00:46:47 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 353e6813yy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 29 Nov 2020 00:46:47 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AT0iDol58524014
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 29 Nov 2020 00:44:14 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C80504C04E;
+        Sun, 29 Nov 2020 00:44:13 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 185774C04A;
+        Sun, 29 Nov 2020 00:44:13 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.171.47.217])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Sun, 29 Nov 2020 00:44:13 +0000 (GMT)
+Date:   Sun, 29 Nov 2020 01:44:11 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v12 08/17] s390/vfio-ap: introduce shadow APCB
+Message-ID: <20201129014411.19b24ee8.pasic@linux.ibm.com>
+In-Reply-To: <20201124214016.3013-9-akrowiak@linux.ibm.com>
+References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
+        <20201124214016.3013-9-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9819 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 adultscore=0
- mlxscore=0 mlxlogscore=959 suspectscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011280149
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9819 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 lowpriorityscore=0
- clxscore=1011 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
- spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011280149
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-28_18:2020-11-26,2020-11-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ phishscore=0 mlxscore=0 adultscore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011280156
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey David,
+On Tue, 24 Nov 2020 16:40:07 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-On 11/28/20 2:20 PM, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+> The APCB is a field within the CRYCB that provides the AP configuration
+> to a KVM guest. Let's introduce a shadow copy of the KVM guest's APCB and
+> maintain it for the lifespan of the guest.
 > 
-> For supporting Xen guests we really want to be able to use vmcall/vmmcall
-> for hypercalls as Xen itself does. Reinstate the KVM_EXIT_HYPERCALL
-> support that Anthony ripped out in 2007.
-> 
-> Yes, we *could* make it work with KVM_EXIT_IO if we really had to, but
-> that makes it guest-visible and makes it distinctly non-trivial to do
-> live migration from Xen because we'd have to update the hypercall page(s)
-> (which are at unknown locations) as well as dealing with any guest RIP
-> which happens to be *in* a hypercall page at the time.
-> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 
-I don't know how far you've gone on your implementation but in the past I had
-send a series for Xen guests support (and backends/uabi too), hopefully
-you find that useful and maybe part of that could be repurposed?
-
-https://lore.kernel.org/kvm/20190220201609.28290-1-joao.m.martins@oracle.com/
-
-(The link above has links towards userland parts albeit you probably don't
-care about Qemu)
-
-While it looks big at the first sight ... in reality out of the 39 patches,
-only the first 16 patches implement the guest parts [*] while reusing the
-XEN_HVM_CONFIG for the xen hypercall page MSR. Assuming the userspace VMM
-does most device emulation including xenbus handling.
-
-Also assumes one uses the xen shim for PV guests support.
-
-	Joao
-
-[*] Largely for guest performance as event channel IPIs in userspace with
-split irqchip weren't the fastest IIRC ... would have to dig the numbers;
+Still LGTM
