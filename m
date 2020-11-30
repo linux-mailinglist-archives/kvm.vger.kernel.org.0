@@ -2,133 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 917972C8F62
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 21:47:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76B732C8F8B
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 21:59:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728078AbgK3Urg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 15:47:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50174 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727103AbgK3Urg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 15:47:36 -0500
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 578FFC0613CF
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 12:46:56 -0800 (PST)
-Received: by mail-pj1-x1044.google.com with SMTP id b12so342109pjl.0
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 12:46:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=x/UYRKS76yf6XV+YyHN7tG/MDSMbk5GQZD17BxeoDQc=;
-        b=rXQMEKhuYVlgYkKLJroBygELIhh6G8eDW0jobPSDwfbRN9nDDLCqjs25zkkiEajzVX
-         HEzfZ6kcm6GXau86ybPvY8uJlfCTdRNAcqxVOtgV1LsQYD+lITz4ZukV7THocsSson5u
-         572Yv6G8Vc+DplRaeVP0hFH8JAzWkc/rLzM2T95z1fpG3r0YyPdOvSiAlFWBLNjKAoKQ
-         77J5xcYYMx6VQUV3OyQaPzWmsgzbfVucGs63ZbCg0TOrxZlEpdxCeknB1NTDhm3o+dwo
-         K48H/RzJ2d2YHeEjLVVeARlMfYhGWLLlS8l6/fb+C/QCg7OIYqB6o1dGmlRyJJTVo9g6
-         lKMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=x/UYRKS76yf6XV+YyHN7tG/MDSMbk5GQZD17BxeoDQc=;
-        b=aL0MF+JO8r/beck86uIPCRrluE6x5to6PPEFn/trDwLsLxERk4fZ7TV2nNk4/Hpfcl
-         bni9PV/X24aDho+FPfCz9wF/QXALTUgprO8tcSn0hI5aI1oMHCVNii2U7WI19mi0O6rL
-         +nMAoIleZeKbvMu0NRLkssUwmLakhueOe86p2AOz1FFRRCGLfa0FjiaaB9JmyHGyMwgp
-         MljqN4Wn6GegFPNfQVD15t7Fi30iU3ii5fTNrjy7TuaBnDJVYzYeFBStbZdknDZNnpfT
-         AdzNaEG1j8FEO3SmUyFYXsFqurGPUKR4ArdJx2xnJxU+0M6PLWduTzi3nkh1JUtpoqBW
-         zXVg==
-X-Gm-Message-State: AOAM533l8nX2z5apf6CZSKGRnye/LOBX6ZU+X3G65F31fGUOXIw1tD7j
-        Kqv8Rp4XF7SBAQcxvXHnlzJJ0A==
-X-Google-Smtp-Source: ABdhPJyb2yNeVPyi+nFomtJJqjOlBw81ew0j5HgRPmLNgebOlaGqNOBkJarwL+Kznzr1NeXQ0Kb58A==
-X-Received: by 2002:a17:90b:1218:: with SMTP id gl24mr746492pjb.130.1606769215774;
-        Mon, 30 Nov 2020 12:46:55 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id u4sm1039406pgg.48.2020.11.30.12.46.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Nov 2020 12:46:55 -0800 (PST)
-Date:   Mon, 30 Nov 2020 20:46:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86: Reinstate userspace hypercall support
-Message-ID: <X8VaO9DxaaKP7PFl@google.com>
-References: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
+        id S1730198AbgK3U7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 15:59:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38089 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726716AbgK3U7A (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 15:59:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606769853;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cq1No4dPtLmGbI2mqBJ+VtaVWU0d8csbHMbJytzQmX0=;
+        b=P1d0PVrKohAHTKKyoUxgDM2jMxmZo6XCEmSgcqTKrdH96I+coV1maix5t0ELn0+A0F6Kj0
+        d4oSBtwf2zDLVYfBl+RBQvfiaOG9/LGVs3tfp5/Qf15tm/3l+2C5tZK3m30D/bjPcphAUD
+        TcQyFLIfgVGvFKr4qKmUSmMsMsqmHLA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-Y7lpk6YDNsqnK6zdensHaA-1; Mon, 30 Nov 2020 15:57:29 -0500
+X-MC-Unique: Y7lpk6YDNsqnK6zdensHaA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71B6E1005D59;
+        Mon, 30 Nov 2020 20:57:27 +0000 (UTC)
+Received: from w520.home (ovpn-112-10.phx2.redhat.com [10.3.112.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 656B219C71;
+        Mon, 30 Nov 2020 20:57:26 +0000 (UTC)
+Date:   Mon, 30 Nov 2020 13:57:25 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] vfio/type1: Add vfio_group_domain()
+Message-ID: <20201130135725.70fdf17f@w520.home>
+In-Reply-To: <20201126012726.1185171-1-baolu.lu@linux.intel.com>
+References: <20201126012726.1185171-1-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 28, 2020, David Woodhouse wrote:
+On Thu, 26 Nov 2020 09:27:26 +0800
+Lu Baolu <baolu.lu@linux.intel.com> wrote:
 
-...
-
-> +static int complete_userspace_hypercall(struct kvm_vcpu *vcpu)
+> Add the API for getting the domain from a vfio group. This could be used
+> by the physical device drivers which rely on the vfio/mdev framework for
+> mediated device user level access. The typical use case like below:
+> 
+> 	unsigned int pasid;
+> 	struct vfio_group *vfio_group;
+> 	struct iommu_domain *iommu_domain;
+> 	struct device *dev = mdev_dev(mdev);
+> 	struct device *iommu_device = mdev_get_iommu_device(dev);
+> 
+> 	if (!iommu_device ||
+> 	    !iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
+> 		return -EINVAL;
+> 
+> 	vfio_group = vfio_group_get_external_user_from_dev(dev);(dev);
+> 	if (IS_ERR_OR_NULL(vfio_group))
+> 		return -EFAULT;
+> 
+> 	iommu_domain = vfio_group_domain(vfio_group);
+> 	if (IS_ERR_OR_NULL(iommu_domain)) {
+> 		vfio_group_put_external_user(vfio_group);
+> 		return -EFAULT;
+> 	}
+> 
+> 	pasid = iommu_aux_get_pasid(iommu_domain, iommu_device);
+> 	if (pasid < 0) {
+> 		vfio_group_put_external_user(vfio_group);
+> 		return -EFAULT;
+> 	}
+> 
+> 	/* Program device context with pasid value. */
+> 	...
+> 
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  drivers/vfio/vfio.c             | 18 ++++++++++++++++++
+>  drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++++++++++
+>  include/linux/vfio.h            |  3 +++
+>  3 files changed, 44 insertions(+)
+> 
+> Change log:
+>  - v1: https://lore.kernel.org/linux-iommu/20201112022407.2063896-1-baolu.lu@linux.intel.com/
+>  - Changed according to comments @ https://lore.kernel.org/linux-iommu/20201116125631.2d043fcd@w520.home/
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 2151bc7f87ab..62c652111c88 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -2331,6 +2331,24 @@ int vfio_unregister_notifier(struct device *dev, enum vfio_notify_type type,
+>  }
+>  EXPORT_SYMBOL(vfio_unregister_notifier);
+>  
+> +struct iommu_domain *vfio_group_domain(struct vfio_group *group)
 > +{
-> +	kvm_rax_write(vcpu, vcpu->run->hypercall.ret);
+> +	struct vfio_container *container;
+> +	struct vfio_iommu_driver *driver;
 > +
-> +	return kvm_skip_emulated_instruction(vcpu);
-
-This should probably verify the linear RIP is unchanged before modifying guest
-state, e.g. to let userspace reset the vCPU in response to a hypercall.  See
-complete_fast_pio_out().
-
+> +	if (!group)
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	container = group->container;
+> +	driver = container->iommu_driver;
+> +	if (likely(driver && driver->ops->group_domain))
+> +		return driver->ops->group_domain(container->iommu_data,
+> +						 group->iommu_group);
+> +	else
+> +		return ERR_PTR(-ENOTTY);
 > +}
+> +EXPORT_SYMBOL(vfio_group_domain);
+
+
+_GPL?  I don't see that there's a way for a driver to get the
+vfio_group pointer that's not already _GPL.
+
+
 > +
-> +int kvm_userspace_hypercall(struct kvm_vcpu *vcpu)
+>  /**
+>   * Module/class support
+>   */
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 67e827638995..783f18f21b95 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2980,6 +2980,28 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
+>  	return ret;
+>  }
+>  
+> +static void *vfio_iommu_type1_group_domain(void *iommu_data,
+> +					   struct iommu_group *iommu_group)
 > +{
-> +	struct kvm_run *run = vcpu->run;
+> +	struct vfio_iommu *iommu = iommu_data;
+> +	struct iommu_domain *domain = NULL;
+> +	struct vfio_domain *d;
 > +
-> +	if (is_long_mode(vcpu)) {
-> +		run->hypercall.longmode = 1;
-
-Should this also capture the CPL?  I assume the motivation for grabbing regs
-and longmode is to avoid having to call back into KVM on every hypercall, and I
-also assume there are (or will be) hypercalls that are CPL0 only.
-
-> +		run->hypercall.nr = kvm_rax_read(vcpu);
-> +		run->hypercall.args[0] = kvm_rdi_read(vcpu);
-> +		run->hypercall.args[1] = kvm_rsi_read(vcpu);
-> +		run->hypercall.args[2] = kvm_rdx_read(vcpu);
-> +		run->hypercall.args[3] = kvm_r10_read(vcpu);
-> +		run->hypercall.args[4] = kvm_r8_read(vcpu);
-> +		run->hypercall.args[5] = kvm_r9_read(vcpu);
-> +		run->hypercall.ret = -KVM_ENOSYS;
-> +	} else {
-> +		run->hypercall.longmode = 0;
-> +		run->hypercall.nr = (u32)kvm_rbx_read(vcpu);
-> +		run->hypercall.args[0] = (u32)kvm_rbx_read(vcpu);
-> +		run->hypercall.args[1] = (u32)kvm_rcx_read(vcpu);
-> +		run->hypercall.args[2] = (u32)kvm_rdx_read(vcpu);
-> +		run->hypercall.args[3] = (u32)kvm_rsi_read(vcpu);
-> +		run->hypercall.args[4] = (u32)kvm_rdi_read(vcpu);
-> +		run->hypercall.args[5] = (u32)kvm_rbp_read(vcpu);
-> +		run->hypercall.ret = (u32)-KVM_ENOSYS;
+> +	if (!iommu || !iommu_group)
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	mutex_lock(&iommu->lock);
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		if (find_iommu_group(d, iommu_group)) {
+> +			domain = d->domain;
+> +			break;
+> +		}
 > +	}
-
-Why not get/set all GPRs (except maybe RIP and RSP) as opposed to implementing 
-what I presume is Xen's ABI in a generic KVM user exit?  Copying 10 more GPRs
-to/from memory is likely lost in the noise relative to the cost of the userspace
-roundtrip.
-
-> +	run->exit_reason = KVM_EXIT_HYPERCALL;
-> +	vcpu->arch.complete_userspace_io = complete_userspace_hypercall;
+> +	mutex_unlock(&iommu->lock);
 > +
-> +	return 0;
+> +	return domain;
 > +}
+
+
+Why does this return void* rather than struct iommu_domain*, and why
+does the error case return an ERR_PTR but the not-found case returns
+NULL?  Thanks,
+
+Alex
+
+
 > +
->  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  {
->  	unsigned long nr, a0, a1, a2, a3, ret;
->  	int op_64_bit;
+>  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+>  	.name			= "vfio-iommu-type1",
+>  	.owner			= THIS_MODULE,
+> @@ -2993,6 +3015,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+>  	.register_notifier	= vfio_iommu_type1_register_notifier,
+>  	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
+>  	.dma_rw			= vfio_iommu_type1_dma_rw,
+> +	.group_domain		= vfio_iommu_type1_group_domain,
+>  };
 >  
-> +	if (vcpu->kvm->arch.user_space_hypercall)
-> +		return kvm_userspace_hypercall(vcpu);
+>  static int __init vfio_iommu_type1_init(void)
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 38d3c6a8dc7e..a0613a6f21cc 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -90,6 +90,7 @@ struct vfio_iommu_driver_ops {
+>  					       struct notifier_block *nb);
+>  	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
+>  				  void *data, size_t count, bool write);
+> +	void		*(*group_domain)(void *iommu_data, struct iommu_group *group);
+>  };
+>  
+>  extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+> @@ -126,6 +127,8 @@ extern int vfio_group_unpin_pages(struct vfio_group *group,
+>  extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
+>  		       void *data, size_t len, bool write);
+>  
+> +extern struct iommu_domain *vfio_group_domain(struct vfio_group *group);
 > +
->  	if (kvm_hv_hypercall_enabled(vcpu->kvm))
->  		return kvm_hv_hypercall(vcpu);
->  
+>  /* each type has independent events */
+>  enum vfio_notify_type {
+>  	VFIO_IOMMU_NOTIFY = 0,
+
