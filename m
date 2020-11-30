@@ -2,111 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 541022C8E32
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:39:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6F1A2C8E41
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:40:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729926AbgK3TiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 14:38:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26750 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728846AbgK3TiV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 14:38:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606765015;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Lvo38NeUmX3WfK50GcoDPfrgYcrXFeCoA1QNBxqIdDk=;
-        b=dOArAOssyzFMKNjZI6aAZTqxA9UBFy/hfrXjTlZ/d0Mp164f8nhj/KD+D79amrLT3Z71Dt
-        X2usRVHw389PhhOgguYup/lLGx8ij5vh9mylMIRlslOToo1/oL3xD1kp0PJRu8uA7E1dds
-        kqyBm3Onmg6aC12Xhxp9jl9G3BL/Xvk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-vdcwi835PnaEg2KSPzeNzQ-1; Mon, 30 Nov 2020 14:36:53 -0500
-X-MC-Unique: vdcwi835PnaEg2KSPzeNzQ-1
-Received: by mail-ed1-f72.google.com with SMTP id w24so3700559edt.11
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:36:52 -0800 (PST)
+        id S1729983AbgK3TkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 14:40:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729979AbgK3TkU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 14:40:20 -0500
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79A3C061A4A
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:39:29 -0800 (PST)
+Received: by mail-pl1-x641.google.com with SMTP id b23so7051043pls.11
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:39:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=o6rtmKPTOe3MI6LpooTnqzq594FdWbZHfm2j9oryTcE=;
+        b=pqHlgGMiEu/p0dKcFRIJepFYNmoKCvWk9svkXrglrSRAR/UqIpTJpbEu2FbJJOjZ2r
+         EENBGawkuvGUryYSHiS3NgAA8t5nnDT8E9BGZHdynRvNH4Riz5OQgIXScY1ZvsJQAkQY
+         G3Td1KM4MxUZtvJ6l8WRrlUG7+evwRBmuMquo8MThVsBAQDVmwOkiC7WjerKor54HV3h
+         ykK3TFYa4ZPxx5E2nXwhnKsv1YWpx5AYiAcqBAC8ePhwAVbIOwnR7ScbQbCFi1HGtk96
+         pVaJeguMZlwI/7EanFKZqmVl95AaH16KIm7TjlO0C0HKwgKwcqtnmxL7LQ54qhpZVVPR
+         5GUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Lvo38NeUmX3WfK50GcoDPfrgYcrXFeCoA1QNBxqIdDk=;
-        b=e5hai1+n8dUjN6/XTniBrA7bGBy0y5bWbadbfO9s72W+auhq0txriDcc4UpCu738Md
-         OK399hpVAKbrm9QMABYSi97Q0DyK9QJ7u53U+WAUKCZ7pb+rUGMo0rx8CxaX8VRFPZ6v
-         ipsvBIDaK3tfPwBe8R9KV1gcWxAL24O6g5ZgHrfXf6IYvPlzP0z1pdKjaGIjnlKydsk1
-         2+0QuXgwP3hbIujEG/sV7w/GdTECZ0TEOx8WQ4lWdNSWYX1UgxgxkjN3skdb8oHZCpYI
-         GnlkYtfLCTjJX/BiZH45BD/2xcIZiE9YCY/gVFFuCAVmah9fVU42uikTu+2+/BhEj/Zk
-         vARg==
-X-Gm-Message-State: AOAM533r+9IsOyW1yA5QarugR2VnBokozjWQWipevw/UVIOQMdfr5E+z
-        OgpEFoblDsQCfOsjkJD/RjtWV9lKuyQgrLiIrTz3igucFgwdd4MBJY0vWPvs68ToZLc45xbHFp/
-        wN8KOhBdnz5Tb
-X-Received: by 2002:aa7:d456:: with SMTP id q22mr22982808edr.206.1606765011999;
-        Mon, 30 Nov 2020 11:36:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwy9Tytw6MEry1xR4ddeMaHYj4fhtuj67ET7jm5fkpxq55qzNbeLPZjV+H3bxgnGaZnUuCsow==
-X-Received: by 2002:aa7:d456:: with SMTP id q22mr22982798edr.206.1606765011848;
-        Mon, 30 Nov 2020 11:36:51 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i7sm3715805edr.61.2020.11.30.11.36.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Nov 2020 11:36:51 -0800 (PST)
-Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
- posted-interrupt pending
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oupton@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=o6rtmKPTOe3MI6LpooTnqzq594FdWbZHfm2j9oryTcE=;
+        b=qfb8WTJ1zpY0cZu7Vzgjb8F3tMu1mBwRfnjg5rYuYXnv2Oo32MVsX5IejFBQD+8W8e
+         CD5awnzxWvKXFZyIy7QQdAyQtv2py2/dZrHHoz7b+XSN5WksHljnqzZlPqki9C8NaGut
+         Y/hUrUBdBAmJ3LNARWyTeIUfybGBMMZxXfK5c6TAptpuveYKvkN3Wj3fUgounvv0AeMt
+         pOPTs8JVStduv1+8OPiQaB2lfvQe648Q8V+nYbxv9XCUsmmXFEQOARbBI6coWnVSq5Mh
+         ckVy6sm7PZwEVjb5Qe0aCvtG2etd12sKkBSvIogA0paSHo0r9nCgbKOOaXKZ1hS6pA6b
+         tUSA==
+X-Gm-Message-State: AOAM531MCzQ9BtM8Nr4gzUBklZXq70A9NzJ2sDGdT1mhesWjAkupyMsp
+        +uMSOnntoUHHt5Iur3JzU1sxMQ==
+X-Google-Smtp-Source: ABdhPJyBPOj+BUOCDMsjX7h8TcafuKx02gSTxE7xTOAMupSoP4OnMeBtT6gqcJSdzXh51dADt+q6rw==
+X-Received: by 2002:a17:90a:7022:: with SMTP id f31mr405610pjk.213.1606765169152;
+        Mon, 30 Nov 2020 11:39:29 -0800 (PST)
+Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
+        by smtp.gmail.com with ESMTPSA id z11sm17647793pfk.52.2020.11.30.11.39.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Nov 2020 11:39:28 -0800 (PST)
+Date:   Mon, 30 Nov 2020 19:39:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
         Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>, liam.merwick@oracle.com,
-        wanpeng.li@hotmail.com
-References: <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
- <CAOQ_QshMoc9W9g6XRuGM4hCtMdvUxSDpGAhp3vNxhxhWTK-5CQ@mail.gmail.com>
- <20201124015515.GA75780@google.com>
- <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
- <20201124212215.GA246319@google.com>
- <d5f4153b-975d-e61d-79e8-ed86df346953@redhat.com>
- <20201125011416.GA282994@google.com>
- <13e802d5-858c-df0a-d93f-ffebb444eca1@redhat.com>
- <20201125183236.GB400789@google.com>
- <89fe1772-36c7-7338-69aa-25d84a9febe8@redhat.com>
- <X8VEsw4ENJ3MH+3o@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <165de965-4716-7d9e-df94-bde3fead232a@redhat.com>
-Date:   Mon, 30 Nov 2020 20:36:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [RFC PATCH 25/35] KVM: x86: Update __get_sregs() / __set_sregs()
+ to support SEV-ES
+Message-ID: <X8VKbLzEDc+W+jU/@google.com>
+References: <cover.1600114548.git.thomas.lendacky@amd.com>
+ <e08f56496a52a3a974310fbe05bb19100fd6c1d8.1600114548.git.thomas.lendacky@amd.com>
+ <20200914213708.GC7192@sjchrist-ice>
+ <7fa6b074-6a62-3f8e-f047-c63851ebf7c9@amd.com>
+ <20200915163342.GC8420@sjchrist-ice>
+ <6486b1f3-35e2-bcb0-9860-1df56017c85f@amd.com>
+ <20200915224410.GI8420@sjchrist-ice>
+ <3f5bd68d-7b2f-8b1f-49b9-0e59587513c8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <X8VEsw4ENJ3MH+3o@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3f5bd68d-7b2f-8b1f-49b9-0e59587513c8@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/11/20 20:14, Sean Christopherson wrote:
->> +	WARN_ON(!irqs_disabled());
->> +	max_irr = vmx_sync_pir_to_irr(vcpu);
->>          if (!is_guest_mode(vcpu))
->>                  vmx_set_rvi(max_irr);
->> +	else if (max_irr == vmx->nested.posted_intr_nv) {
->> +		...
->> +	}
->>   }
->>
->> and in vmx_vcpu_run:
->>
->> +	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
->> +		vmx_hwapic_irr_update(vcpu);
-> And also drop the direct call to vmx_sync_pir_to_irr() in the fastpath exit.
+On Mon, Nov 30, 2020, Paolo Bonzini wrote:
+> On 16/09/20 00:44, Sean Christopherson wrote:
+> > > KVM doesn't have control of them. They are part of the guest's encrypted
+> > > state and that is what the guest uses. KVM can't alter the value that the
+> > > guest is using for them once the VMSA is encrypted. However, KVM makes
+> > > some decisions based on the values it thinks it knows.  For example, early
+> > > on I remember the async PF support failing because the CR0 that KVM
+> > > thought the guest had didn't have the PE bit set, even though the guest
+> > > was in protected mode. So KVM didn't include the error code in the
+> > > exception it injected (is_protmode() was false) and things failed. Without
+> > > syncing these values after live migration, things also fail (probably for
+> > > the same reason). So the idea is to just keep KVM apprised of the values
+> > > that the guest has.
+> > 
+> > Ah, gotcha.  Migrating tracked state through the VMSA would probably be ideal.
+> > The semantics of __set_sregs() kinda setting state but not reaaaally setting
+> > state would be weird.
 > 
->> If you agree, feel free to send this (without the else of course) as a
->> separate cleanup patch immediately.
-> Without what "else"?
+> How would that work with TDX?
 
-This one:
-
-+	else if (max_irr == vmx->nested.posted_intr_nv) {
-+		...
-
-Paolo
-
+Can you elaborate?  I.e. how would what work with TDX?
