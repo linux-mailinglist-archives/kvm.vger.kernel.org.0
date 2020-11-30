@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 460CD2C8C8B
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 19:19:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5D502C8CCC
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 19:31:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387976AbgK3SSy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 13:18:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387960AbgK3SSy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 13:18:54 -0500
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 579C6C0613D2
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 10:18:14 -0800 (PST)
-Received: by mail-pf1-x444.google.com with SMTP id e8so10954293pfh.2
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 10:18:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=xdIedazEfXXnCAeqOGlzEefkWkg8iQVFK6VAg0y1HPI=;
-        b=QjpMwFKn9uAxSDuzuHZbkrtI966789Di/w6FPRS/lVvvqi73Bnf4hrsK0prfQyAdgt
-         U4y0g3xJm0ujAOltTSk1oqdb27zs86c2DDsr977N1potUxpXnBUU6/pbB8eM+RQHprrE
-         16u8gaF22DzW6tCfq6tnfKnykjGquX3jtCTXvPSpV+Wv6V1b0ImqhGCiTl+CSpzzd10/
-         fJ1bSov9m+J6shoi7BuHiqRRmbK/5BNHqoHGVrsEkO//su9hpZ237sy+CsHkf1JeSl0R
-         kVTvI6Jnn1gStqqFqZE8MznO5MGxhtU94lD5ZQXpbUzeCVVIZ5A2aU3AYcBZSykqnsUY
-         hubQ==
+        id S1728724AbgK3S3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 13:29:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47813 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726316AbgK3S3h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 13:29:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606760890;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TbtreiyDGBEVJHR6bcT5fhYEmcIXMhysj30QJYe5Mbc=;
+        b=Pm+5ZXLVk2Wj9gqvLH09S3+TPaAUN5607+cfeBHh37f1k08uHHDkkybHHTvPssww1eMffa
+        3jA8yM34NmSlinaYT2U7hY5Zao+5wHbv7C/8nKoHB15vepeDzZj8SZKzn1Eo9ueu4Mk+XM
+        wz4z+03q8jVkXGYbOgDimppPLXNBXQo=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-536-e9-1sF_XMDeh2HdDfn17pw-1; Mon, 30 Nov 2020 13:28:08 -0500
+X-MC-Unique: e9-1sF_XMDeh2HdDfn17pw-1
+Received: by mail-ed1-f71.google.com with SMTP id g13so733782eds.10
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 10:28:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=xdIedazEfXXnCAeqOGlzEefkWkg8iQVFK6VAg0y1HPI=;
-        b=HAGX7zuazMcDN8n9rgR0mDPDXVZGXIOvgNzhd5wJ4SjcakwXZSqJdyVWh1KfRXCN8E
-         QKzbMDdQLTAJKV77KJG8PHd1/K30W5LEKgFi8lO+pv8LETpxz5CpBZcRRsqJ4DyivvK7
-         M1pbDE1BlGGaFxfkzZNlRqhHOeDtkAOVGilarJq/WSyZw1fQEr3qWe2YXDFWoZ6R3eme
-         gJUCHOl1NdcuNFYJzxvXl+akcVngf9KoldetF4CkMg5M++EFs3W/n2aDUrPkYx3xDsTH
-         lPANGHlbghRcPiYZMTyIzq2mNjDXHxrSgi8Ho/uqyxFIz9RK/HldCZkl+UEtpbYWlIGC
-         85mw==
-X-Gm-Message-State: AOAM530MbLgSCUjsWGvg+6UZhrI6llAPSf7YaGS5ER/C58vREpx6h9iE
-        RXbge+aC3DXSifPXTwti6DDWzw==
-X-Google-Smtp-Source: ABdhPJwOM4/nwZd+OBDC/6sXShLheOMgPtxBR2yspsPjbxNYytV6YvKpviVNw+fOKCM53vWE1L4wsQ==
-X-Received: by 2002:a63:b1c:: with SMTP id 28mr19320876pgl.206.1606760293693;
-        Mon, 30 Nov 2020 10:18:13 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id s145sm17286194pfs.187.2020.11.30.10.18.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Nov 2020 10:18:13 -0800 (PST)
-Date:   Mon, 30 Nov 2020 18:18:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TbtreiyDGBEVJHR6bcT5fhYEmcIXMhysj30QJYe5Mbc=;
+        b=tha70RJpfcBbC/EXgHFNttINPjxaLkmXAguDr1j/4liULnt+hRXBTbEoKMdWmvpcx3
+         H3nFNm3iMpXHdBHPjc99u/MSs5IECQqFwRev7vIJcD5tfv+XFbaMDfyxmDxq+IwFpoKt
+         K2dbmHwDVHQJnfUtFO9GNFj3ZB4azpCcUxiRCcGEbTEANM45WmAo0Gh0mtOuGkCQ0gDz
+         9nAnuXtr6EQc5c7m6R3Zxs/pfjVHZsgI9gHSDqgzf/NtD2VG3iNKMbzBwY0pQjLEukeT
+         C3PRZpLlvGP/sLM21lCCt7Bw1IJbo7sbyPn9dmQJGi7aA/rgiNQHqWefWWXehaYtVCm6
+         9kpg==
+X-Gm-Message-State: AOAM533KPyKhiGvnQlwsc/GkAcm6WoAl6sRT4JoAfxDQwE9h7Fq5o4qr
+        fqg2oeAE1y1aKccPGID7pgQshA3BeObkLqMlvzVwQjj38+c+DatRhwJQRxNjvzfY9JUdeuJZOWZ
+        jswUHT5uaxO14
+X-Received: by 2002:a17:906:f8ce:: with SMTP id lh14mr10719373ejb.267.1606760885795;
+        Mon, 30 Nov 2020 10:28:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzI2tx7KbgvM1BKmi17D0Z7B1t1G7JZTOJ0/e6KdoqzSVgxvZ4sYKtg8ul1h6q4pwzHyzCJHQ==
+X-Received: by 2002:a17:906:f8ce:: with SMTP id lh14mr10719164ejb.267.1606760883832;
+        Mon, 30 Nov 2020 10:28:03 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id h15sm6773411edz.95.2020.11.30.10.28.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Nov 2020 10:28:02 -0800 (PST)
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -60,47 +61,47 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH 00/35] SEV-ES hypervisor support
-Message-ID: <X8U3YeoIg1m2NW9x@google.com>
 References: <cover.1600114548.git.thomas.lendacky@amd.com>
- <20200914225951.GM7192@sjchrist-ice>
- <bee6fdda-d548-8af5-f029-25c22165bf84@amd.com>
- <20200916001925.GL8420@sjchrist-ice>
- <60cbddaf-50f3-72ca-f673-ff0b421db3ad@redhat.com>
- <38e89899-cf58-3a39-1d09-3ce963140a57@amd.com>
+ <e08f56496a52a3a974310fbe05bb19100fd6c1d8.1600114548.git.thomas.lendacky@amd.com>
+ <20200914213708.GC7192@sjchrist-ice>
+ <7fa6b074-6a62-3f8e-f047-c63851ebf7c9@amd.com>
+ <20200915163342.GC8420@sjchrist-ice>
+ <6486b1f3-35e2-bcb0-9860-1df56017c85f@amd.com>
+ <20200915224410.GI8420@sjchrist-ice>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH 25/35] KVM: x86: Update __get_sregs() / __set_sregs()
+ to support SEV-ES
+Message-ID: <3f5bd68d-7b2f-8b1f-49b9-0e59587513c8@redhat.com>
+Date:   Mon, 30 Nov 2020 19:28:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20200915224410.GI8420@sjchrist-ice>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <38e89899-cf58-3a39-1d09-3ce963140a57@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 30, 2020, Tom Lendacky wrote:
-> On 11/30/20 9:31 AM, Paolo Bonzini wrote:
-> > On 16/09/20 02:19, Sean Christopherson wrote:
-> >>
-> >> TDX also selectively blocks/skips portions of other ioctl()s so that the
-> >> TDX code itself can yell loudly if e.g. .get_cpl() is invoked.  The event
-> >> injection restrictions are due to direct injection not being allowed
-> >> (except
-> >> for NMIs); all IRQs have to be routed through APICv (posted interrupts) and
-> >> exception injection is completely disallowed.
-> >>
-> >>    kvm_vcpu_ioctl_x86_get_vcpu_events:
-> >>     if (!vcpu->kvm->arch.guest_state_protected)
-> >>              events->interrupt.shadow =
-> >> kvm_x86_ops.get_interrupt_shadow(vcpu);
-> > 
-> > Perhaps an alternative implementation can enter the vCPU with immediate
-> > exit until no events are pending, and then return all zeroes?
+On 16/09/20 00:44, Sean Christopherson wrote:
+>> KVM doesn't have control of them. They are part of the guest's encrypted
+>> state and that is what the guest uses. KVM can't alter the value that the
+>> guest is using for them once the VMSA is encrypted. However, KVM makes
+>> some decisions based on the values it thinks it knows.  For example, early
+>> on I remember the async PF support failing because the CR0 that KVM
+>> thought the guest had didn't have the PE bit set, even though the guest
+>> was in protected mode. So KVM didn't include the error code in the
+>> exception it injected (is_protmode() was false) and things failed. Without
+>> syncing these values after live migration, things also fail (probably for
+>> the same reason). So the idea is to just keep KVM apprised of the values
+>> that the guest has.
 > 
-> SEV-SNP has support for restricting injections, but SEV-ES does not.
-> Perhaps a new boolean, guest_restricted_injection, can be used instead of
-> basing it on guest_state_protected.
+> Ah, gotcha.  Migrating tracked state through the VMSA would probably be ideal.
+> The semantics of __set_sregs() kinda setting state but not reaaaally setting
+> state would be weird.
 
-Ya, that probably makes sense.  I suspect the easiest way to resolve these
-conflicts will be to land the SEV-ES series and then tweak things as needed for
-TDX.  Easiest in the sense that it should be fairly obvious what can be covered
-by guest_state_protected and what needs a dedicated flag.
+How would that work with TDX?
+
+Paolo
+
