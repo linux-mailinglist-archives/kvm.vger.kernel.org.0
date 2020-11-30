@@ -2,41 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 570A52C8648
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 15:15:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8CC62C8679
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 15:19:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726948AbgK3ONY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 09:13:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33803 "EHLO
+        id S1727420AbgK3OQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 09:16:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52286 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726314AbgK3ONY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 09:13:24 -0500
+        by vger.kernel.org with ESMTP id S1727394AbgK3OQt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 09:16:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606745517;
+        s=mimecast20190719; t=1606745722;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2zv6+ucodm/xfDYyg+Sh6U/WzFb0IF6DwZNXabv7t90=;
-        b=G315h/fZ/ofSBt7PEJzLhRaHHtIKY8r2jwFeK7Ht6YwEhz4/xpPyXyZHp2CHUY52rVbdz+
-        wHUUO8Eyv87stFbWbL01PUkdBZ9XRaQnQTYZMOc/UZAhGZnf101MjPO8L4H66rdetyf8vG
-        5dlDcm63U3SUnYtzM7SA1A/xaLyO/Fs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-ZXWjAzGHO5eKzT-pFkIYUA-1; Mon, 30 Nov 2020 09:11:55 -0500
-X-MC-Unique: ZXWjAzGHO5eKzT-pFkIYUA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 098EF807357;
-        Mon, 30 Nov 2020 14:11:53 +0000 (UTC)
-Received: from starship (unknown [10.35.206.90])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AFB0063B8C;
-        Mon, 30 Nov 2020 14:11:45 +0000 (UTC)
-Message-ID: <638a2919cf7c11c55108776beecafdd8e2da2995.camel@redhat.com>
+        bh=Jy2WUd8qluzxUHyAVJZ0iTyH/i+egdeldCJel1aWn4Y=;
+        b=WbAR6USDMq9gX/HOqyaDX292Tv+pu1r1G6swvjne+R51VqAEqV3H7lENqpleH2j2S8d6wD
+        AS7uFgViUVFBxxp8bRDVEqzanBuiBst5n2mqfZAnNYCfeLlKFc8apeVspZpFAX5QJUkHoi
+        MbdwUWv4cx555HFf9NKPL68KJ3UEa0k=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-sDU7WYnGMMKNDQCmZmYkLg-1; Mon, 30 Nov 2020 09:15:17 -0500
+X-MC-Unique: sDU7WYnGMMKNDQCmZmYkLg-1
+Received: by mail-wm1-f70.google.com with SMTP id n18so1103470wmk.0
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 06:15:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Jy2WUd8qluzxUHyAVJZ0iTyH/i+egdeldCJel1aWn4Y=;
+        b=M7biJe00ZEOJaXGM+SWet0S3ZLmKKqqlDL08SHk8y6QGjZpY8ue73G6V3+Mkp/H++k
+         oGhH6/7rLhZijgpKnuHmvkCCIBt195jarG9oMYSjWxQIYQoqhPg7XwjckoSm3XqVrQG7
+         OWpHRVI7aBBFpuHQrYJIxdn+WfT1UKfo5EwZq/xqlRsgmPoSdXCujv4wwWYcBnJTku9z
+         c60ZQ1F4TsZ++Om0d0wn1rtb1GAtiJu9MLOz4Wd8me62Cw6grWFwgDO+4RZIcmbDpIeX
+         DAg+z0QcucTUtEbZobOKRMy7Go6UbBhAxAJ37BNKTABuAcqLwdi87ETnmOd/vC0o1eJl
+         p1zw==
+X-Gm-Message-State: AOAM531lMZiMR3LWoU7+UVh2Yxx/jOXBsTqGrWbAiAv2DSvXPkhalrFR
+        aXKgATh6DzQcVSNzlxSSfDmSXHJS/CI9eU725EWA/q+QeSOEXc6xps6XFK8M3qbHzIA+Q9ODOeN
+        7V2+eLreNLOns
+X-Received: by 2002:a1c:e142:: with SMTP id y63mr10768997wmg.28.1606745716252;
+        Mon, 30 Nov 2020 06:15:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy4NO6q15SbHWukyBJ8MRyRFWENoejaNPVjxMUi4v5OO3B+V6ojxrsSeiVtMWCnB1wM/pytUg==
+X-Received: by 2002:a1c:e142:: with SMTP id y63mr10768795wmg.28.1606745713286;
+        Mon, 30 Nov 2020 06:15:13 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id s2sm24357624wmh.37.2020.11.30.06.15.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Nov 2020 06:15:12 -0800 (PST)
 Subject: Re: [PATCH 2/2] KVM: x86: introduce KVM_X86_QUIRK_TSC_HOST_ACCESS
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Oliver Upton <oupton@google.com>, Ingo Molnar <mingo@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -51,119 +67,51 @@ Cc:     Oliver Upton <oupton@google.com>, Ingo Molnar <mingo@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Date:   Mon, 30 Nov 2020 16:11:43 +0200
-In-Reply-To: <c093973e-c8da-4d09-11f2-61cc0918f55f@redhat.com>
 References: <20201130133559.233242-1-mlevitsk@redhat.com>
-         <20201130133559.233242-3-mlevitsk@redhat.com>
-         <c093973e-c8da-4d09-11f2-61cc0918f55f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+ <20201130133559.233242-3-mlevitsk@redhat.com>
+ <c093973e-c8da-4d09-11f2-61cc0918f55f@redhat.com>
+ <638a2919cf7c11c55108776beecafdd8e2da2995.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5e77e912-893b-0c8f-a9a6-b43eaee24ed3@redhat.com>
+Date:   Mon, 30 Nov 2020 15:15:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
+In-Reply-To: <638a2919cf7c11c55108776beecafdd8e2da2995.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-11-30 at 14:54 +0100, Paolo Bonzini wrote:
-> On 30/11/20 14:35, Maxim Levitsky wrote:
-> > This quirk reflects the fact that we currently treat MSR_IA32_TSC
-> > and MSR_TSC_ADJUST access by the host (e.g qemu) in a way that is different
-> > compared to an access from the guest.
-> > 
-> > For host's MSR_IA32_TSC read we currently always return L1 TSC value, and for
-> > host's write we do the tsc synchronization.
-> > 
-> > For host's MSR_TSC_ADJUST write, we don't make the tsc 'jump' as we should
-> > for this msr.
-> > 
-> > When the hypervisor uses the new TSC GET/SET state ioctls, all of this is no
-> > longer needed, thus leave this enabled only with a quirk
-> > which the hypervisor can disable.
-> > 
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> This needs to be covered by a variant of the existing selftests testcase 
-> (running the same guest code, but different host code of course).
-Do you think that the test should go to the kernel's kvm unit tests,
-or to kvm-unit-tests project?
+On 30/11/20 15:11, Maxim Levitsky wrote:
+> On Mon, 2020-11-30 at 14:54 +0100, Paolo Bonzini wrote:
+>> On 30/11/20 14:35, Maxim Levitsky wrote:
+>>> This quirk reflects the fact that we currently treat MSR_IA32_TSC
+>>> and MSR_TSC_ADJUST access by the host (e.g qemu) in a way that is different
+>>> compared to an access from the guest.
+>>>
+>>> For host's MSR_IA32_TSC read we currently always return L1 TSC value, and for
+>>> host's write we do the tsc synchronization.
+>>>
+>>> For host's MSR_TSC_ADJUST write, we don't make the tsc 'jump' as we should
+>>> for this msr.
+>>>
+>>> When the hypervisor uses the new TSC GET/SET state ioctls, all of this is no
+>>> longer needed, thus leave this enabled only with a quirk
+>>> which the hypervisor can disable.
+>>>
+>>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>>
+>> This needs to be covered by a variant of the existing selftests testcase
+>> (running the same guest code, but different host code of course).
+> Do you think that the test should go to the kernel's kvm unit tests,
+> or to kvm-unit-tests project?
 
-Best regards,
-	Maxim Levitsky
+The latter already has x86_64/tsc_msrs_test.c (which I created in 
+preparation for this exact change :)).
 
-> 
-> Paolo
-> 
-> > ---
-> >   arch/x86/include/uapi/asm/kvm.h |  1 +
-> >   arch/x86/kvm/x86.c              | 19 ++++++++++++++-----
-> >   2 files changed, 15 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> > index 8e76d3701db3f..2a60fc6674164 100644
-> > --- a/arch/x86/include/uapi/asm/kvm.h
-> > +++ b/arch/x86/include/uapi/asm/kvm.h
-> > @@ -404,6 +404,7 @@ struct kvm_sync_regs {
-> >   #define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	   (1 << 2)
-> >   #define KVM_X86_QUIRK_OUT_7E_INC_RIP	   (1 << 3)
-> >   #define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
-> > +#define KVM_X86_QUIRK_TSC_HOST_ACCESS      (1 << 5)
-> >   
-> >   #define KVM_STATE_NESTED_FORMAT_VMX	0
-> >   #define KVM_STATE_NESTED_FORMAT_SVM	1
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 4f0ae9cb14b8a..46a2111d54840 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3091,7 +3091,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >   		break;
-> >   	case MSR_IA32_TSC_ADJUST:
-> >   		if (guest_cpuid_has(vcpu, X86_FEATURE_TSC_ADJUST)) {
-> > -			if (!msr_info->host_initiated) {
-> > +			if (!msr_info->host_initiated ||
-> > +			    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TSC_HOST_ACCESS)) {
-> >   				s64 adj = data - vcpu->arch.ia32_tsc_adjust_msr;
-> >   				adjust_tsc_offset_guest(vcpu, adj);
-> >   			}
-> > @@ -3118,7 +3119,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >   		vcpu->arch.msr_ia32_power_ctl = data;
-> >   		break;
-> >   	case MSR_IA32_TSC:
-> > -		if (msr_info->host_initiated) {
-> > +		if (msr_info->host_initiated &&
-> > +		    kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TSC_HOST_ACCESS)) {
-> >   			kvm_synchronize_tsc(vcpu, data);
-> >   		} else {
-> >   			u64 adj = kvm_compute_tsc_offset(vcpu, data) - vcpu->arch.l1_tsc_offset;
-> > @@ -3409,17 +3411,24 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >   		msr_info->data = vcpu->arch.msr_ia32_power_ctl;
-> >   		break;
-> >   	case MSR_IA32_TSC: {
-> > +		u64 tsc_offset;
-> > +
-> >   		/*
-> >   		 * Intel SDM states that MSR_IA32_TSC read adds the TSC offset
-> >   		 * even when not intercepted. AMD manual doesn't explicitly
-> >   		 * state this but appears to behave the same.
-> >   		 *
-> > -		 * On userspace reads and writes, however, we unconditionally
-> > +		 * On userspace reads and writes, when KVM_X86_QUIRK_SPECIAL_TSC_READ
-> > +		 * is present, however, we unconditionally
-> >   		 * return L1's TSC value to ensure backwards-compatible
-> >   		 * behavior for migration.
-> >   		 */
-> > -		u64 tsc_offset = msr_info->host_initiated ? vcpu->arch.l1_tsc_offset :
-> > -							    vcpu->arch.tsc_offset;
-> > +
-> > +		if (msr_info->host_initiated &&
-> > +		    kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TSC_HOST_ACCESS))
-> > +			tsc_offset = vcpu->arch.l1_tsc_offset;
-> > +		else
-> > +			tsc_offset = vcpu->arch.tsc_offset;
-> >   
-> >   		msr_info->data = kvm_scale_tsc(vcpu, rdtsc()) + tsc_offset;
-> >   		break;
-> > 
-
+Paolo
 
