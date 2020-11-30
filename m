@@ -2,127 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 060E12C7F5E
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 08:56:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECDC22C8014
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 09:35:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727505AbgK3H4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 02:56:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58323 "EHLO
+        id S1727762AbgK3IfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 03:35:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56582 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726858AbgK3H4X (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 02:56:23 -0500
+        by vger.kernel.org with ESMTP id S1727331AbgK3IfT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 03:35:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606722896;
+        s=mimecast20190719; t=1606725233;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cfYEN4na3C3FMqwMo6LNjQ8k4ZCO0qa7qNB5nkxkM6o=;
-        b=XEl7iqI3DAeA8AKUnM4dGpQ+oBDQzvSUExnupTNieRh/8JSJhihdjqSnEZkmOzYsPdOiPf
-        tN2IG2w04FGFNJ8eGeMDYbfZFWQfbpqZDVOBsWkSA9fUuth0uyWI7kCAShDXqE4k4K7xZa
-        5MFex9szYZ6VUJLKUOLgkLgaKrjvlAw=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-jzcMcfbPMjO3P68tJ2E7NQ-1; Mon, 30 Nov 2020 02:54:54 -0500
-X-MC-Unique: jzcMcfbPMjO3P68tJ2E7NQ-1
-Received: by mail-qk1-f197.google.com with SMTP id 202so8997864qkl.9
-        for <kvm@vger.kernel.org>; Sun, 29 Nov 2020 23:54:54 -0800 (PST)
+        bh=vOBw30VGGpYGUqtKjgp1D/xXFSKdq88sDVSnLLemHDo=;
+        b=FRb3fGdf6aLMG6xJeHSgATNF+5MeF8CsLcrSLmJgvy3tWcQKhs+x8n1PKDN30xWSabPxpt
+        CmxrZOqc6VAUEJDKbjpyg21zhrtTEb7PFhx3PYGLoFe7XuFsqRTEVI2FRF2E61wmZzUEUy
+        rRgZU3+c/Qu5Znvqo9UfzMIzUGxDz8c=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-xchCneZBNuGTM-chRHUMWw-1; Mon, 30 Nov 2020 03:33:50 -0500
+X-MC-Unique: xchCneZBNuGTM-chRHUMWw-1
+Received: by mail-wr1-f70.google.com with SMTP id 91so7989305wrk.17
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 00:33:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=cfYEN4na3C3FMqwMo6LNjQ8k4ZCO0qa7qNB5nkxkM6o=;
-        b=IQ5KuhLDbhdE4ynKsfO4qkRcf5teadKiyW6276errdnkEhp+5zMy+RmrZqZqANXvRo
-         oI4PqN2vF0H9Dr4v5mBoDIQwi7YCk/PwujYFfbeOnj//ejI8/dzv9QFeEJ+F5S/39cXu
-         g/L5zpVe0y4wWZD6Tq8Csgol1vYnoJkXQxWN7YU62XTc2ATG6RGmSk8DjtxbI2etnEkI
-         1ErkIiMJa6POY3KWqFh9JNxYEcViqRgb+UleFZOuPr2gzpzxZvT2laGZD7HBbCuLcmt0
-         guIcjU2TRdTUu1j06EdynFYqJusZjspLv+whJlfiPJ9/z5OhmlxezLbjHI3RDLGzTRuV
-         A3zg==
-X-Gm-Message-State: AOAM533SQ2nmDYLXHrBZEGzof6n5fwY1esIos0h++mjIdVDU7jlqPVP6
-        9sV82VeVVsLVNRO0MohHfR1F3SHIwTuhxqxsMd6JNSReoEOQNJcAHSga/TjonLsmukQsKs0F3g/
-        i/L1M1CTS66gN5jo2OdekLt1sDRZh
-X-Received: by 2002:a05:620a:132d:: with SMTP id p13mr21768019qkj.233.1606722894178;
-        Sun, 29 Nov 2020 23:54:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyuzkTzTp2p3vGrFooseaaNhC8uI+tyCQrxfu6y0WFvPSKipLD0ddM5+y6Pgg0Pf6Qwpznddv7mfYMwakFsfAA=
-X-Received: by 2002:a05:620a:132d:: with SMTP id p13mr21768001qkj.233.1606722893979;
- Sun, 29 Nov 2020 23:54:53 -0800 (PST)
-MIME-Version: 1.0
-References: <20201120185105.279030-1-eperezma@redhat.com> <20201120185105.279030-24-eperezma@redhat.com>
- <20201127152901.cbfu7rmewbxventr@steredhat>
-In-Reply-To: <20201127152901.cbfu7rmewbxventr@steredhat>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Mon, 30 Nov 2020 08:54:18 +0100
-Message-ID: <CAJaqyWe+u+ZPSeMr7ZLHYGbqRhH=YZxE8zrMamTQFxrSLgb3sA@mail.gmail.com>
-Subject: Re: [RFC PATCH 23/27] vhost: unmap qemu's shadow virtqueues on sw
- live migration
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     qemu-level <qemu-devel@nongnu.org>,
-        Lars Ganrot <lars.ganrot@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        Salil Mehta <mehta.salil.lnk@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Liran Alon <liralon@gmail.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        Max Gurtovoy <maxgu14@gmail.com>,
-        Alex Barba <alex.barba@broadcom.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jim Harford <jim.harford@broadcom.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vOBw30VGGpYGUqtKjgp1D/xXFSKdq88sDVSnLLemHDo=;
+        b=cnYGM7KvyuDoe6DlVWzE1Y9JF+opq/WcHSeRu6ge6SQQ5AdBL/k+5q92HSS8obfiSA
+         GIjwL8K9QTtqt3rL5yK9QG6z60JVI7recFaGucxV95q1GY0TfIx4namPO11vlwnLfFbR
+         cvaEsS+JVuazs8s+c7GVt4JmEjNZ/Xlrvu6O2e4LeU1XVON4SV0Ny5ZAL8kn4G5s9ATH
+         +787muaWOSTrFlNQV+uZw/mc9Bwr2wH/6dGUbw8H6wDM7JC16Q9linznqh6HJYO158iE
+         DTRWk0lwZV3fkOM/q2/14zL0eYjvy/r1NVJJOiuJ7fRVH0M/k5aILUprNNoAPFAbTDdm
+         CtmA==
+X-Gm-Message-State: AOAM532Q5Id66gDPHZgT76CoPY+VrJGi/PwqX4BEyfHa/0ipQbNHh5Dp
+        a3OZEY6ySiO0NbD18CIukXO6UlnBZYubWmsdQded3eH5xsOM+K5+3x++L1YKqGnTZxaxMnzW6aG
+        h/mhzctz4fecP
+X-Received: by 2002:adf:dd0e:: with SMTP id a14mr26727977wrm.36.1606725228960;
+        Mon, 30 Nov 2020 00:33:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxx/iQZGql5wZU5MomW2tQpacaKJDVUoRlyVnQsj6AxXWR1H+6D7EHUWZYX9I0NcbeUr12Ulw==
+X-Received: by 2002:adf:dd0e:: with SMTP id a14mr26727949wrm.36.1606725228783;
+        Mon, 30 Nov 2020 00:33:48 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id a184sm24043265wmf.8.2020.11.30.00.33.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Nov 2020 00:33:47 -0800 (PST)
+Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Mike Christie <michael.christie@oracle.com>,
         Jason Wang <jasowang@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Christophe Fontaine <cfontain@redhat.com>,
-        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
-        Michael Lilja <ml@napatech.com>,
-        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
-        Lee Ballard <ballle98@gmail.com>,
-        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
-        Juan Quintela <quintela@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Howard Cai <howard.cai@gmail.com>,
-        Xiao W Wang <xiao.w.wang@intel.com>,
-        Sean Mooney <smooney@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
-        Stephen Finucane <stephenfin@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20201125153550.810101-1-sashal@kernel.org>
+ <20201125153550.810101-22-sashal@kernel.org>
+ <25cd0d64-bffc-9506-c148-11583fed897c@redhat.com>
+ <20201125180102.GL643756@sasha-vm>
+ <9670064e-793f-561e-b032-75b1ab5c9096@redhat.com>
+ <20201129041314.GO643756@sasha-vm>
+ <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
+ <20201129210650.GP643756@sasha-vm>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e499986d-ade5-23bd-7a04-fa5eb3f15a56@redhat.com>
+Date:   Mon, 30 Nov 2020 09:33:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+MIME-Version: 1.0
+In-Reply-To: <20201129210650.GP643756@sasha-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 27, 2020 at 4:29 PM Stefano Garzarella <sgarzare@redhat.com> wr=
-ote:
->
-> On Fri, Nov 20, 2020 at 07:51:01PM +0100, Eugenio P=C3=83=C2=A9rez wrote:
-> >Since vhost does not need to access it, it has no sense to keep it
-> >mapped.
-> >
-> >Signed-off-by: Eugenio P=C3=83=C2=A9rez <eperezma@redhat.com>
-> >---
-> > hw/virtio/vhost.c | 1 +
-> > 1 file changed, 1 insertion(+)
-> >
-> >diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> >index f640d4edf0..eebfac4455 100644
-> >--- a/hw/virtio/vhost.c
-> >+++ b/hw/virtio/vhost.c
-> >@@ -1124,6 +1124,7 @@ static int vhost_sw_live_migration_start(struct vh=
-ost_dev *dev)
-> >
-> >         dev->sw_lm_shadow_vq[idx] =3D vhost_sw_lm_shadow_vq(dev, idx);
-> >         event_notifier_set_handler(&vq->masked_notifier, vhost_handle_c=
-all);
-> >+        vhost_virtqueue_memory_unmap(dev, &dev->vqs[idx], true);
->
-> IIUC vhost_virtqueue_memory_unmap() is already called at the end of
-> vhost_virtqueue_stop(), so we can skip this call, right?
->
+On 29/11/20 22:06, Sasha Levin wrote:
+> On Sun, Nov 29, 2020 at 06:34:01PM +0100, Paolo Bonzini wrote:
+>> On 29/11/20 05:13, Sasha Levin wrote:
+>>>> Which doesn't seem to be suitable for stable either...  Patch 3/5 in
+>>>
+>>> Why not? It was sent as a fix to Linus.
+>>
+>> Dunno, 120 lines of new code?  Even if it's okay for an rc, I don't 
+>> see why it is would be backported to stable releases and release it 
+>> without any kind of testing.  Maybe for 5.9 the chances of breaking 
+> 
+> Lines of code is not everything. If you think that this needs additional
+> testing then that's fine and we can drop it, but not picking up a fix
+> just because it's 120 lines is not something we'd do.
 
-You are totally right Stefano, thanks for the catch!
+Starting with the first two steps in stable-kernel-rules.rst:
 
-> >
-> >         vhost_vring_write_addr(dev->sw_lm_shadow_vq[idx], &addr);
-> >         r =3D dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
-> >-- 2.18.4
-> >
->
+Rules on what kind of patches are accepted, and which ones are not, into 
+the "-stable" tree:
+
+  - It must be obviously correct and tested.
+  - It cannot be bigger than 100 lines, with context.
+
+> Plus all the testing we have for the stable trees, yes. It goes beyond
+> just compiling at this point.
+> 
+> Your very own co-workers (https://cki-project.org/) are pushing hard on
+> this effort around stable kernel testing, and statements like these
+> aren't helping anyone.
+
+I am not aware of any public CI being done _at all_ done on vhost-scsi, 
+by CKI or everyone else.  So autoselection should be done only on 
+subsystems that have very high coverage in CI.
+
+Paolo
 
