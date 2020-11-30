@@ -2,43 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C88EB2C8D8C
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:00:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BDB82C8DAA
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:06:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728643AbgK3TAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 14:00:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
+        id S1729595AbgK3TEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 14:04:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727345AbgK3TAT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 14:00:19 -0500
+        with ESMTP id S1726026AbgK3TEv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 14:04:51 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8996BC0613CF
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 10:59:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E675CC0613D2;
+        Mon, 30 Nov 2020 11:04:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=H1N+sLXLzF0jvjjJMtvH7WYszRtTL7q9qpGiD6wM+c0=; b=GvKTZtLQqvMIsD/24YDdtdg1O7
-        Uw43R8dXQfsu+rerkazkgnB3qNz28GZHfBi2GpXvJDNx407PVqpi+Fv5B/WYQ5HhQNbziFF8FSRV2
-        2nXvl9wdRzQ3NN7/M9bwJxcSw8+D4+wiA4zqN2FooLMTxrGNqW9yI35zwiazw4bFY6saVIWMCWnMu
-        Z5mcoFZCQye2lSMONimNGiaBXSxtK/gDaPTNpuk06Ij8kal14STir4qAWNTWpzsqTUWi7VBGUh077
-        w1Wc05GiI0TKeAYe+zAhSS+cIMQIO4LDwu/hbsuf68lj4mzDSh749rORqZAgTX3AsgB3xADC+Q7ET
-        w+EV+qWg==;
-Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=freeip.amazon.com)
+        bh=P3CYDVn654x2YTNUBGuevoqknIl9NjHtQ853LnCqK9Y=; b=ahYgUQQ4Hw2fGDA5oPVeTibH5F
+        NBy9JzOF/WlLQlaeWywFPFzwNG/0oGhXN9tEb02OdhNaCxWPrx6or9o17CfEO7Z8Nlv+y5aIhSytp
+        39lP6yWzZ7otuZFuLobrDhAP1IFme+LKQZ+FcQmrpc3OHObvCgG11ioQF78AC0pGRbZwW3gMP1bmG
+        Q84M83Uzxqk+/jRKcM+ggRFl9fDauadwxPZrftoc+ri/DfhiWoFKKHaGTU4Ud0ieuOHocAUS9on5z
+        4c5R9HgM2MeMHzvE3YkrLSWyl9HSrrMgrHCJgMGyzSOnGZ3pM1oHkkVvQhUM1Ax5lBuPRumnrybbN
+        dm9BB1Yw==;
+Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kjoOf-0007fj-FY; Mon, 30 Nov 2020 18:59:37 +0000
-Message-ID: <4ae9f3fd5a0fd3493d0b5349a2f7f31321a4e8a0.camel@infradead.org>
-Subject: Re: [PATCH] KVM: x86: Reinstate userspace hypercall support
+        id 1kjoSw-00007i-I6; Mon, 30 Nov 2020 19:04:02 +0000
+Message-ID: <fbeb5b70f4c6b036b71a58d4a2a13c534ed360a1.camel@infradead.org>
+Subject: Re: [PATCH RFC 11/39] KVM: x86/xen: evtchn signaling via eventfd
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Date:   Mon, 30 Nov 2020 18:59:36 +0000
-In-Reply-To: <dc2d4330-e45d-641f-226b-005a477efd22@redhat.com>
-References: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
-         <dc2d4330-e45d-641f-226b-005a477efd22@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 30 Nov 2020 19:04:00 +0000
+In-Reply-To: <35e45689-8225-7e5d-44ef-23479b563444@oracle.com>
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+         <20190220201609.28290-12-joao.m.martins@oracle.com>
+         <874d1fa922cb56238676b90bbeeba930d0706500.camel@infradead.org>
+         <e83f6438-7256-1dc8-3b13-5498fd5bbed1@oracle.com>
+         <18e854e2a84750c2de2d32384710132b83d84286.camel@infradead.org>
+         <0b9d3901-c10b-effd-6278-6afd1e95b09e@oracle.com>
+         <315ea414c2bf938978f7f2c0598e80fa05b4c07b.camel@infradead.org>
+         <05661003-64f0-a32a-5659-6463d4806ef9@oracle.com>
+         <13bc2ca60ca4e6d74c619e65502889961a08c3ff.camel@infradead.org>
+         <35e45689-8225-7e5d-44ef-23479b563444@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-DOXfaHN/Na1r69Sz27dL"
+        boundary="=-wadkMPJbnbaLM7X4kv7T"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -47,51 +62,47 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-DOXfaHN/Na1r69Sz27dL
+--=-wadkMPJbnbaLM7X4kv7T
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2020-11-30 at 19:36 +0100, Paolo Bonzini wrote:
-> On 28/11/20 15:20, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > For supporting Xen guests we really want to be able to use vmcall/vmmca=
-ll
-> > for hypercalls as Xen itself does. Reinstate the KVM_EXIT_HYPERCALL
-> > support that Anthony ripped out in 2007.
-> >=20
-> > Yes, we *could* make it work with KVM_EXIT_IO if we really had to, but
-> > that makes it guest-visible and makes it distinctly non-trivial to do
-> > live migration from Xen because we'd have to update the hypercall page(=
-s)
-> > (which are at unknown locations) as well as dealing with any guest RIP
-> > which happens to be *in* a hypercall page at the time.
-> >=20
-> > We also actively want to *prevent* the KVM hypercalls from suddenly
-> > becoming available to guests which think they are Xen guests, which
-> > this achieves too.
-> >=20
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
-> > Should this test work OK on AMD? I see a separate test which is
-> > explicitly testing VMCALL on AMD, which makes me suspect it's expected
-> > to work as well as VMMCALL?
+On Mon, 2020-11-30 at 18:41 +0000, Joao Martins wrote:
+> int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+> {
+> ...
+>         if (kvm_hv_hypercall_enabled(vcpu->kvm))
+>                 return kvm_hv_hypercall(...);
 >=20
-> Yes, it should (via the #UD intercept instead of the VMMCALL exit).
+>         if (kvm_xen_hypercall_enabled(vcpu->kvm))
+>                 return kvm_xen_hypercall(...);
+> ...
+> }
 >=20
-> > Do we have the test infrastructure for running 32-bit guests easily?
->=20
-> Nope, unfortunately not, and I'm not going to ask you to port the=20
-> selftests infrastructure to 32-bit x86 (though it should not be too hard)=
-.
+> And on kvm_xen_hypercall() for the cases VMM offloads to demarshal what t=
+he registers mean
+> e.g. for event channel send 64-bit guest: RAX for opcode and RDI/RSI for =
+cmd and port.
 
-OK, thanks. I'll do a v2 with the 32-bit registers fixed as noted.
+Right, although it's a little more abstract than that: "RDI/RSI for
+arg#0, arg#1 respectively".
 
-I'll also tweak it a little to make it explicitly Xen-specific, to pave
-the way for putting Joao's evtchn short-circuit patches on top of it.
+And those are RDI/RSI for 64-bit Xen, EBX/ECX for 32-bit Xen, and
+RBX/RDI for Hyper-V. (And Hyper-V seems to use only the two, while Xen
+theoretically has up to 6).
+
+> The kernel logic wouldn't be much different at the core, so thought of ti=
+hs consolidation.
+> But the added complexity would have come from having to deal with two use=
+rspace exit types
+> -- indeed probably not worth the trouble as you pointed out.
+
+Yeah, I think I'm just going to move the 'kvm_userspace_hypercall()'
+from my patch to be 'kvm_xen_hypercall()' in a new xen.c but still
+using KVM_EXIT_HYPERCALL. Then I can rebase your other patches on top
+of that, with the evtchn bypass.
 
 
---=-DOXfaHN/Na1r69Sz27dL
+--=-wadkMPJbnbaLM7X4kv7T
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -174,20 +185,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MTMwMTg1OTM2WjAvBgkqhkiG9w0BCQQxIgQg9uEgq8K3pqh1f6B+/IRqmlrnWlPP5zZWJl8+FyL/
-LMIwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MTMwMTkwNDAwWjAvBgkqhkiG9w0BCQQxIgQgyqbNi291RxbuvAlb6zDlNiWQEiHLV++r86w6LFZr
+I8Ewgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAH/pyzLG/kRdbzXLyYvnxsmx83xpRLE1l9PpGQOmKiG7cHTt+GjGrb2pDIWV4VN9
-wfMclgtsfKeKFH2NC4q+bDBXQPoJNFMYCMUg8Xbf3dyFDNnetw1sifH5UCuSdcixOc5BVnfTWz2t
-qenygHwWjeKZNvx6hiom36gSwYGLD1gBfS2EjPeXmr9Errc+EgzLUW9dKXy8w6/WrRo29dfZ41ov
-5ve4X+5NwVSzze5jWsHznzjbOARUzu0n8iE4R0fLOF4p14oQR3oep/gZZNK8fRAxRG2IZn0GtvcN
-iOvhUlACLBm9V09CoPotU1Bvy/uo0ZnBr7MGnEr/elMKBmeXw5IAAAAAAAA=
+DQEBAQUABIIBAENRIH/C21DiV1jWjMe+cqT8mGo8GkPvC2qzyWqinO9HG1QUZRypxrE2oQRCVBXA
+3/iUJo69HYN1J8fCG02EUMv9+Evy1H3DdC84rAWF162o6UE+tK9WLU3dtTlG4FuNq0sWAyaH85KQ
+yirJtSqoJFdQl3x+wlrppufUpyRw1NeGMHdkrn7Jk3+37bThFQF4jA4/IcroWCwIHsVzZIwX1HAx
+tyfEWaZJwAtDdKKvykLFsGDiNb5tSGE2BvWoMOhEro6Viq6BRYyim5LFjXlOTmqz6lguLN/2owCu
+gmcL9oaKPohEiksan+lcoSsBoJ+Acbf4ez/T0IN/49csCbdSqDwAAAAAAAA=
 
 
---=-DOXfaHN/Na1r69Sz27dL--
+--=-wadkMPJbnbaLM7X4kv7T--
 
