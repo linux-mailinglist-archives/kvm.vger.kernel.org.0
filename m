@@ -2,108 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 860982C8F37
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 21:31:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 917972C8F62
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 21:47:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388502AbgK3Uaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 15:30:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38867 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728687AbgK3Uae (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 15:30:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606768147;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dEMeF3AMNMcYI65aSQplkoFbo+sAWz3Tjmr7jvdlwP0=;
-        b=QUCbwcOhQXqqFINSTELUhxXduDK9UrBhN6UxFJByEmQgIJwGxDKhvMadorz1AT1edjQhnH
-        FSqP/dHfeySKzb2lEIc3KBF1tkbtknwou7xrDN/0QaU2iUVd0m0YQhige7RwB8lwJR+sdH
-        3zBGUGbXKT849AFEJQWukZvJVNCqKxc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-115-DMSrmn35MvGXpVVMc6SBRg-1; Mon, 30 Nov 2020 15:29:05 -0500
-X-MC-Unique: DMSrmn35MvGXpVVMc6SBRg-1
-Received: by mail-ed1-f70.google.com with SMTP id g1so7357728edk.0
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 12:29:05 -0800 (PST)
+        id S1728078AbgK3Urg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 15:47:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50174 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727103AbgK3Urg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 15:47:36 -0500
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 578FFC0613CF
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 12:46:56 -0800 (PST)
+Received: by mail-pj1-x1044.google.com with SMTP id b12so342109pjl.0
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 12:46:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=x/UYRKS76yf6XV+YyHN7tG/MDSMbk5GQZD17BxeoDQc=;
+        b=rXQMEKhuYVlgYkKLJroBygELIhh6G8eDW0jobPSDwfbRN9nDDLCqjs25zkkiEajzVX
+         HEzfZ6kcm6GXau86ybPvY8uJlfCTdRNAcqxVOtgV1LsQYD+lITz4ZukV7THocsSson5u
+         572Yv6G8Vc+DplRaeVP0hFH8JAzWkc/rLzM2T95z1fpG3r0YyPdOvSiAlFWBLNjKAoKQ
+         77J5xcYYMx6VQUV3OyQaPzWmsgzbfVucGs63ZbCg0TOrxZlEpdxCeknB1NTDhm3o+dwo
+         K48H/RzJ2d2YHeEjLVVeARlMfYhGWLLlS8l6/fb+C/QCg7OIYqB6o1dGmlRyJJTVo9g6
+         lKMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dEMeF3AMNMcYI65aSQplkoFbo+sAWz3Tjmr7jvdlwP0=;
-        b=aUa1xDpr6Suj/rL0OCSM5Kjbpl+mcsQz1lM79kcIni1fbcIueK9xBQNGCbqcoIXZXp
-         oczz/hWduCG+FKTX8OYcltwksgYQwbIo0+VbU/t9YELSMYfa1nRcDPwREXTNQizQbrXc
-         GGXUDpvr4TloTjdBflRl0BdCrDd+KvXJeinB5/XXPicI0pB4/lHyCUPHJ6Nsyf/FMjME
-         PNuDI0URE3HVeVRF+B6DoTWBRn332whtD1kPQfur7PmKPCzMoedoejie1G0pJqrORxiy
-         yyN7817pf+yzMv8CjAWjQNR9ufsyQW4Zrb0uLez4t1wOX1jvIBjckGMwreSHGPLOY+DH
-         +JcQ==
-X-Gm-Message-State: AOAM533Im/Q32fhTuPYpp7sKResKdMhAeQcQRxBfIuy17Cj997E9CnFF
-        mBnGBw5pLGQhV7TCUDySPhKP6dX28CDfMoInSTR5CqOyfjtx9uKegF+mCYm6KIoVArYAxe09EB3
-        J9BfMFkJqluLS
-X-Received: by 2002:a05:6402:2070:: with SMTP id bd16mr11170003edb.107.1606768144692;
-        Mon, 30 Nov 2020 12:29:04 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxg9IglFIMQ0ZSm6k1KLj+p3mu5WZxF5QG0J+89nlaTxpR4umWpnoGsGHhv67ElcSjdL8GU8g==
-X-Received: by 2002:a05:6402:2070:: with SMTP id bd16mr11169987edb.107.1606768144486;
-        Mon, 30 Nov 2020 12:29:04 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a13sm2400959edb.76.2020.11.30.12.29.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Nov 2020 12:29:03 -0800 (PST)
-Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
-To:     Mike Christie <michael.christie@oracle.com>,
-        Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20201125153550.810101-1-sashal@kernel.org>
- <20201125153550.810101-22-sashal@kernel.org>
- <25cd0d64-bffc-9506-c148-11583fed897c@redhat.com>
- <20201125180102.GL643756@sasha-vm>
- <9670064e-793f-561e-b032-75b1ab5c9096@redhat.com>
- <20201129041314.GO643756@sasha-vm>
- <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
- <20201129210650.GP643756@sasha-vm>
- <e499986d-ade5-23bd-7a04-fa5eb3f15a56@redhat.com>
- <20201130173832.GR643756@sasha-vm>
- <238cbdd1-dabc-d1c1-cff8-c9604a0c9b95@redhat.com>
- <9ec7dff6-d679-ce19-5e77-f7bcb5a63442@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4c1b2bc7-cf50-4dcd-bfd4-be07e515de2a@redhat.com>
-Date:   Mon, 30 Nov 2020 21:29:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=x/UYRKS76yf6XV+YyHN7tG/MDSMbk5GQZD17BxeoDQc=;
+        b=aL0MF+JO8r/beck86uIPCRrluE6x5to6PPEFn/trDwLsLxERk4fZ7TV2nNk4/Hpfcl
+         bni9PV/X24aDho+FPfCz9wF/QXALTUgprO8tcSn0hI5aI1oMHCVNii2U7WI19mi0O6rL
+         +nMAoIleZeKbvMu0NRLkssUwmLakhueOe86p2AOz1FFRRCGLfa0FjiaaB9JmyHGyMwgp
+         MljqN4Wn6GegFPNfQVD15t7Fi30iU3ii5fTNrjy7TuaBnDJVYzYeFBStbZdknDZNnpfT
+         AdzNaEG1j8FEO3SmUyFYXsFqurGPUKR4ArdJx2xnJxU+0M6PLWduTzi3nkh1JUtpoqBW
+         zXVg==
+X-Gm-Message-State: AOAM533l8nX2z5apf6CZSKGRnye/LOBX6ZU+X3G65F31fGUOXIw1tD7j
+        Kqv8Rp4XF7SBAQcxvXHnlzJJ0A==
+X-Google-Smtp-Source: ABdhPJyb2yNeVPyi+nFomtJJqjOlBw81ew0j5HgRPmLNgebOlaGqNOBkJarwL+Kznzr1NeXQ0Kb58A==
+X-Received: by 2002:a17:90b:1218:: with SMTP id gl24mr746492pjb.130.1606769215774;
+        Mon, 30 Nov 2020 12:46:55 -0800 (PST)
+Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
+        by smtp.gmail.com with ESMTPSA id u4sm1039406pgg.48.2020.11.30.12.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Nov 2020 12:46:55 -0800 (PST)
+Date:   Mon, 30 Nov 2020 20:46:51 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] KVM: x86: Reinstate userspace hypercall support
+Message-ID: <X8VaO9DxaaKP7PFl@google.com>
+References: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <9ec7dff6-d679-ce19-5e77-f7bcb5a63442@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/11/20 20:44, Mike Christie wrote:
-> I have never seen a public/open-source vhost-scsi testsuite.
-> 
-> For patch 23 (the one that adds the lun reset support which is built on
-> patch 22), we can't add it to stable right now if you wanted to, because
-> it has a bug in it. Michael T, sent the fix:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?h=linux-next&id=b4fffc177fad3c99ee049611a508ca9561bb6871
-> 
-> to Linus today.
+On Sat, Nov 28, 2020, David Woodhouse wrote:
 
-Ok, so at least it was only a close call and anyway not for something 
-that most people would be running on their machines.  But it still seems 
-to me that the state of CI in Linux is abysmal compared to what is 
-needed to arbitrarily(*) pick up patches and commit them to "stable" trees.
+...
 
-Paolo
+> +static int complete_userspace_hypercall(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_rax_write(vcpu, vcpu->run->hypercall.ret);
+> +
+> +	return kvm_skip_emulated_instruction(vcpu);
 
-(*) A ML bot is an arbitrary choice as far as we are concerned since we 
-cannot know how it makes a decision.
+This should probably verify the linear RIP is unchanged before modifying guest
+state, e.g. to let userspace reset the vCPU in response to a hypercall.  See
+complete_fast_pio_out().
 
+> +}
+> +
+> +int kvm_userspace_hypercall(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_run *run = vcpu->run;
+> +
+> +	if (is_long_mode(vcpu)) {
+> +		run->hypercall.longmode = 1;
+
+Should this also capture the CPL?  I assume the motivation for grabbing regs
+and longmode is to avoid having to call back into KVM on every hypercall, and I
+also assume there are (or will be) hypercalls that are CPL0 only.
+
+> +		run->hypercall.nr = kvm_rax_read(vcpu);
+> +		run->hypercall.args[0] = kvm_rdi_read(vcpu);
+> +		run->hypercall.args[1] = kvm_rsi_read(vcpu);
+> +		run->hypercall.args[2] = kvm_rdx_read(vcpu);
+> +		run->hypercall.args[3] = kvm_r10_read(vcpu);
+> +		run->hypercall.args[4] = kvm_r8_read(vcpu);
+> +		run->hypercall.args[5] = kvm_r9_read(vcpu);
+> +		run->hypercall.ret = -KVM_ENOSYS;
+> +	} else {
+> +		run->hypercall.longmode = 0;
+> +		run->hypercall.nr = (u32)kvm_rbx_read(vcpu);
+> +		run->hypercall.args[0] = (u32)kvm_rbx_read(vcpu);
+> +		run->hypercall.args[1] = (u32)kvm_rcx_read(vcpu);
+> +		run->hypercall.args[2] = (u32)kvm_rdx_read(vcpu);
+> +		run->hypercall.args[3] = (u32)kvm_rsi_read(vcpu);
+> +		run->hypercall.args[4] = (u32)kvm_rdi_read(vcpu);
+> +		run->hypercall.args[5] = (u32)kvm_rbp_read(vcpu);
+> +		run->hypercall.ret = (u32)-KVM_ENOSYS;
+> +	}
+
+Why not get/set all GPRs (except maybe RIP and RSP) as opposed to implementing 
+what I presume is Xen's ABI in a generic KVM user exit?  Copying 10 more GPRs
+to/from memory is likely lost in the noise relative to the cost of the userspace
+roundtrip.
+
+> +	run->exit_reason = KVM_EXIT_HYPERCALL;
+> +	vcpu->arch.complete_userspace_io = complete_userspace_hypercall;
+> +
+> +	return 0;
+> +}
+> +
+>  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long nr, a0, a1, a2, a3, ret;
+>  	int op_64_bit;
+>  
+> +	if (vcpu->kvm->arch.user_space_hypercall)
+> +		return kvm_userspace_hypercall(vcpu);
+> +
+>  	if (kvm_hv_hypercall_enabled(vcpu->kvm))
+>  		return kvm_hv_hypercall(vcpu);
+>  
