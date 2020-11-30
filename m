@@ -2,187 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F9222C8B8A
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 18:43:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8D7D2C8BB3
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 18:51:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387754AbgK3RmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 12:42:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49378 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728499AbgK3RmN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 12:42:13 -0500
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2507AC0613D3
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 09:41:33 -0800 (PST)
-Received: by mail-pl1-x642.google.com with SMTP id l11so6897686plt.1
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 09:41:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BsDePY71l0NLhvDaTy8fIL8SZo/2TV0ypfJS9+JlCvs=;
-        b=SvTWPpI351hbuFvUDiH/M3SQ984PBGjRq+nlrAoR2IiQYy8z5lQ/pezxby0oxaDRWk
-         8YE4TKvuhbdkVyti6RKeG129UY8dnUpYtYipsuZ7+PsOMluy4C+0miirV8sMR5G4QE79
-         9t1kvUlaTIgpj3I1Y5zAft8iZaRRodtWUrfKPuwWjBISdVkbjaLcM/84e+plBz3T+Vz9
-         oPr9GSq8H8qeJDR/P5kxlJ31WUsq5A/WsSLyZumoF9faKKid0HfhQscUth+GenBaNb6Z
-         VTe16+cIwyYNwDKobNbsp/IgJq7ManAa5O+RIzIzPrpyDQAX9V+PZ5euL1jyn103dpTJ
-         6b0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BsDePY71l0NLhvDaTy8fIL8SZo/2TV0ypfJS9+JlCvs=;
-        b=gHvvBH6HBtBcukqg9qzMAOTRBovNjV4fluOp0F6PlAmN+8Wq9dnWaTbYLDVLsK2Gde
-         lezjbpn/6jP8o1Cel/2Aw7KM9iFXiWwnqM75l2PjrM9D+MzW1HmE/K3m/Gy0sh0kjj9C
-         NtfcWTKa5xUVlJ6kcnzIy/jnwExmjrTxZVeZc/cV8LBBBe+x13FddhIGHZMR7awsed0k
-         RhT1DKcdlmUw8l/CDqFwjuSXIPRwzA8ZisMc9+G7gdv532u/Okd1KosPgxSOI6FSm6ka
-         1IOEOYerrlgaCqKOzMFucmWwtoVERjwFs/xVwWud0HpbQpCXcKcfkbHMvrQV1m21oyH1
-         JgIg==
-X-Gm-Message-State: AOAM533cDqRNcuexnnF98buSFD8/wcJqVnz7u4g2RNRDABQJdzRMHxk2
-        K6ZDY25AYj8wEWXhMTM9wAHfDA==
-X-Google-Smtp-Source: ABdhPJwxxw/kUT4PLLb+HevJXnWfPnh1F4uPCzjIXQHiGfignYzjpcDo69fVQKHixpFKMlujGIkBjQ==
-X-Received: by 2002:a17:90a:62c8:: with SMTP id k8mr27902507pjs.33.1606758092369;
-        Mon, 30 Nov 2020 09:41:32 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id 21sm17032171pfj.134.2020.11.30.09.41.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Nov 2020 09:41:31 -0800 (PST)
-Date:   Mon, 30 Nov 2020 17:41:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Avi Kivity <avi@qumranet.com>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH] kvm/x86/mmu: use the correct inherited permissions to
- get shadow page
-Message-ID: <X8Uux62rJdf2feJ2@google.com>
-References: <20201120095517.19211-1-jiangshanlai@gmail.com>
- <20201126000549.GC450871@google.com>
- <0724aeb9-3466-5505-8f12-a5899144e68f@redhat.com>
- <CAJhGHyApvmQk4bxxK2rJKzyAShFSXyEb2W0qyFcVoUEcsMKs_w@mail.gmail.com>
+        id S1729230AbgK3RuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 12:50:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57002 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727476AbgK3RuB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 12:50:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606758514;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pQ4WpiPqnnYL566UEzHdmnDQQhCQF6P/OZJyfbS45g8=;
+        b=NPL8HPxXTJjCaBumm8MvGpcJsx0MsuDfJRYCFxTKrCJ4Y4eBKZhB6snATGXJRDGdrtz3sl
+        wG2XRHTXiD0sue75iHW0rCWHl4L00IyeUnUo73kUyiZsV0ey7bZJaCO9zHfnD5a+NJIVGz
+        JIJYx7NgzzH9tr4MvoU501q3ItDjxSw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-165-fOZeDxu5PhmzgVVkZbmwww-1; Mon, 30 Nov 2020 12:48:29 -0500
+X-MC-Unique: fOZeDxu5PhmzgVVkZbmwww-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F11C7190A7A1;
+        Mon, 30 Nov 2020 17:48:27 +0000 (UTC)
+Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 534425D6A8;
+        Mon, 30 Nov 2020 17:48:25 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 10/10] arm64: gic: Use IPI test checking
+ for the LPI tests
+To:     Zenghui Yu <yuzenghui@huawei.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com
+Cc:     andre.przywara@arm.com
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-11-alexandru.elisei@arm.com>
+ <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <23be6c11-fd2e-0d41-df06-91d87cf1a465@redhat.com>
+Date:   Mon, 30 Nov 2020 18:48:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyApvmQk4bxxK2rJKzyAShFSXyEb2W0qyFcVoUEcsMKs_w@mail.gmail.com>
+In-Reply-To: <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 28, 2020, Lai Jiangshan wrote:
-> On Sat, Nov 28, 2020 at 12:48 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 26/11/20 01:05, Sean Christopherson wrote:
-> > > On Fri, Nov 20, 2020, Lai Jiangshan wrote:
-> > >> From: Lai Jiangshan <laijs@linux.alibaba.com>
-> > >>
-> > >> Commit 41074d07c78b ("KVM: MMU: Fix inherited permissions for emulated
-> > >> guest pte updates") said role.access is common access permissions for
-> > >> all ptes in this shadow page, which is the inherited permissions from
-> > >> the parent ptes.
-> > >>
-> > >> But the commit did not enforce this definition when kvm_mmu_get_page()
-> > >> is called in FNAME(fetch). Rather, it uses a random (last level pte's
-> > >> combined) access permissions.
-> > >
-> > > I wouldn't say it's random, the issue is specifically that all shadow pages end
-> > > up using the combined set of permissions of the entire walk, as opposed to the
-> > > only combined permissions of its parents.
-> > >
-> > >> And the permissions won't be checked again in next FNAME(fetch) since the
-> > >> spte is present. It might fail to meet guest's expectation when guest sets up
-> > >> spaghetti pagetables.
-> > >
-> > > Can you provide details on the exact failure scenario?  It would be very helpful
-> > > for documentation and understanding.  I can see how using the full combined
-> > > permissions will cause weirdness for upper level SPs in kvm_mmu_get_page(), but
-> > > I'm struggling to connect the dots to understand how that will cause incorrect
-> > > behavior for the guest.  AFAICT, outside of the SP cache, KVM only consumes
-> > > role.access for the final/last SP.
-> > >
-> >
-> > Agreed, a unit test would be even better, but just a description in the
-> > commit message would be enough.
-> >
-> > Paolo
-> >
+Hi Alexandru, Zenghui
+On 11/26/20 10:30 AM, Zenghui Yu wrote:
+> On 2020/11/25 23:51, Alexandru Elisei wrote:
+>> The reason for the failure is that the test "dev2/eventid=20 now triggers
+>> an LPI" triggers 2 LPIs, not one. This behavior was present before this
+>> patch, but it was ignored because check_lpi_stats() wasn't looking at the
+>> acked array.
+>>
+>> I'm not familiar with the ITS so I'm not sure if this is expected, if the
+>> test is incorrect or if there is something wrong with KVM emulation.
 > 
-> Something in my mind, but I haven't test it:
+> I think this is expected, or not.
 > 
-> pgd[]pud[]  pmd[]        pte[]            virtual address pointers
->  (same hpa as pmd2\)  /->pte1(u--)->page1 <- ptr1 (u--)
->          /->pmd1(uw-)--->pte2(uw-)->page2 <- ptr2 (uw-)
-> pgd->pud-|           (shared pte[] as above)
->          \->pmd2(u--)--->pte1(u--)->page1 <- ptr3 (u--)
->  (same hpa as pmd1/)  \->pte2(uw-)->page2 <- ptr4 (u--)
+> Before INVALL, the LPI-8195 was already pending but disabled. On
+> receiving INVALL, VGIC will reload configuration for all LPIs targeting
+> collection-3 and deliver the now enabled LPI-8195. We'll therefore see
+> and handle it before sending the following INT (which will set the
+> LPI-8195 pending again).
 > 
+>> Did some more testing on an Ampere eMAG (fast out-of-order cores) using
+>> qemu and kvmtool and Linux v5.8, here's what I found:
+>>
+>> - Using qemu and gic.flat built from*master*: error encountered 864 times
+>>    out of 1088 runs.
+>> - Using qemu: error encountered 852 times out of 1027 runs.
+>> - Using kvmtool: error encountered 8164 times out of 10602 runs.
 > 
-> pmd1 and pmd2 point to the same pte table, so:
-> ptr1 and ptr3 points to the same page.
-> ptr2 and ptr4 points to the same page.
+> If vcpu-3 hadn't seen and handled LPI-8195 as quickly as possible (e.g.,
+> vcpu-3 hadn't been scheduled), the following INT will set the already
+> pending LPI-8195 pending again and we'll receive it *once* on vcpu-3.
+> And we won't see the mentioned failure.
 > 
->   The guess read-accesses to ptr1 first. So the hypervisor gets the
-> shadow pte page table with role.access=u-- among other things.
->    (Note the shadowed pmd1's access is uwx)
-> 
->   And then the guest write-accesses to ptr2, and the hypervisor
-> set up shadow page for ptr2.
->    (Note the hypervisor silencely accepts the role.access=u--
->     shadow pte page table in FNAME(fetch))
-> 
->   After that, the guess read-accesses to ptr3, the hypervisor
-> reused the same shadow pte page table as above.
-> 
->   At last, the guest writes to ptr4 without vmexit nor pagefault,
-> Which should cause vmexit as the guest expects.
+> I think we can just drop the (meaningless and confusing?) INT.
+Yes I agree with Zenghui, we can remove the INT and just check the
+pending LPI set while disabled eventually hits
 
-Hmm, yes, KVM would incorrectly handle this scenario.  But, the proposed patch
-would not address the issue as KVM always maps non-leaf shadow pages with full
-access permissions.
+Thanks
 
-> In theory, guest userspace can trick the guest kernel if the guest
-> kernel sets up page table like this.
-
-I doubt any kernel is affected.  Providing a RO or NX view by splitting the VA
-space at the PMD level is doable, but it would be much more awkward to deal with
-than splitting the VAs at the PGD level (kernel vs. userspace)
-
-E.g. Linux uses constant[*] protections for page tables, with different constant
-protections for kernel v. userspace.
-
-[*] Ignoring encryption, which is technically an address bit anyways.
-
-> Such spaghetti pagetables are unlikely to be seen in the guest.
+Eric
 > 
-> But when the guest is using KPTI and not using SMEP. KPTI means
-> all pgd entries are marked NX on the lower/userspace part of
-> the kernel pagetable. Which means SMEP is not needed.
-> (see arch/x86/mm/pti.c)
-> 
-> Assume the guest does disable SMEP and the guest has the flaw
-> that the guest user can trick guest kernel to execute on lower
-> part of the address space.
-> 
-> Normally, NX bit marked on the kernel pagetable's lower pgd
-> entries can help in this case. But when in guest with shadowpage
-> in hypervisor, the guest user can make those NX bit useless.
-
-This NX use case won't be affected.  The example above requires ptr2 and ptr4 to
-use the same PGD and PUD.  If ptr2 and ptr4 use different PGDs, i.e. kernel vs.
-userspace, KVM will use different shadow pages for the two PGDs, and the kernel
-variant will have role.NX=1 in the leaf SPTEs.
- 
-> Again, I haven't tested it neither. I will try it later and
-> update the patch including adding some more checks in the mmu.c.
 > 
 > Thanks,
-> Lai
+> Zenghui
+> 
+
