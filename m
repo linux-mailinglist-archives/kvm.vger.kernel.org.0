@@ -2,244 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 128202C8BF4
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 19:02:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B08B62C8C0B
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 19:04:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387882AbgK3SCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 13:02:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52648 "EHLO
+        id S1729437AbgK3SEc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 13:04:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387817AbgK3SCU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 13:02:20 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E14C0613CF;
-        Mon, 30 Nov 2020 10:01:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lg1/IRsPmvO9DVTV8smf2kgAGqoFtygDKQ6GjrqRXfM=; b=TMQrHEWBa5qbLermdB3Ap/V4mJ
-        3cDHfquXS7BZOqAQTA8bYWHgDSFP+t36wEomb72dxyucyK/7kBy2k+ag5W4OwMEc3jdh6iub23lKY
-        oZ2KbCyOsa+Uei6915c1zsFv18eSnIyNlFsytlqPP7T4ulVLnoMmVfJq2DWYYUkaRStN8dm2Ss3XL
-        1nkLZ03sAge1HemRG2Li2dAJYZJwZFDgLBpYkIXnqFvTzDUUystwdGgFl+wgkFiRXfZBghoW3K1hp
-        Zc/rlO5gmj0JKIMLnc7HieckHotzFNxhg1EYPwFxVGH9VOt7IYpc7/Ryf44A3yozp6p1zGOq30Rr6
-        Ju5IV8sw==;
-Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=freeip.amazon.com)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kjnUP-0007yg-1t; Mon, 30 Nov 2020 18:01:29 +0000
-Message-ID: <13bc2ca60ca4e6d74c619e65502889961a08c3ff.camel@infradead.org>
-Subject: Re: [PATCH RFC 11/39] KVM: x86/xen: evtchn signaling via eventfd
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 30 Nov 2020 18:01:25 +0000
-In-Reply-To: <05661003-64f0-a32a-5659-6463d4806ef9@oracle.com>
-References: <20190220201609.28290-1-joao.m.martins@oracle.com>
-         <20190220201609.28290-12-joao.m.martins@oracle.com>
-         <874d1fa922cb56238676b90bbeeba930d0706500.camel@infradead.org>
-         <e83f6438-7256-1dc8-3b13-5498fd5bbed1@oracle.com>
-         <18e854e2a84750c2de2d32384710132b83d84286.camel@infradead.org>
-         <0b9d3901-c10b-effd-6278-6afd1e95b09e@oracle.com>
-         <315ea414c2bf938978f7f2c0598e80fa05b4c07b.camel@infradead.org>
-         <05661003-64f0-a32a-5659-6463d4806ef9@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-s5323ca3rhxaqo0/GcDc"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        with ESMTP id S1729428AbgK3SEb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 13:04:31 -0500
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B628FC0613D3
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 10:03:51 -0800 (PST)
+Received: by mail-pj1-x1042.google.com with SMTP id e5so62583pjt.0
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 10:03:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q4aiUo+R2FBXYOJi5Lz6koIizaWvK7CXEvnPP0gtkHY=;
+        b=WJN/cBIIUk6MohKQRQk8JObz3Y9LIRoDzY/g4r9a3kx9ncZpcSl9Ijsv5SCGIzibSh
+         0TlyUwNA6WUTeVaDji0unOXv2cdZvhXuvxjCnwjIn3x+0V8XE3TAIDrJzsrpNG+3aDf4
+         O64vuJ+VwNbyqtWnGvDLZtyNBklkHcD86NkM+4KIgWOyxWehIcHAbicMIjz8UVVfaNdu
+         3KCfphu4L9CefgQu1LAF6kGWwy5dKyguiC1tYJR9q8cvgpGxIPIYuSAgf5my0+GwTpWT
+         jRZr3rRQ0PbEFDMRsQGjs3CEbCzRbcnlGqc5b5xAzkV8ryWyPL0pCFk54q9NH+Gmr1KI
+         NhYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q4aiUo+R2FBXYOJi5Lz6koIizaWvK7CXEvnPP0gtkHY=;
+        b=OlQFTCzluQoe3TCzg9773g7vYtDHH8Q7Q60WrZe8pldgi6ZBzfiCCo2xswV2j9pzJT
+         MYiYg7aliLVZ9xOQm+3m9rV6PeDXHvR0pRS6JNTJcTFXFxZXWarCKTMHD6xmMgUxOucv
+         yEq7R058EqPa/l5b4iJJvutzWBKvdRlQAPRduPWXBmkB5WoLCDET8ql/LfyfcUMV4xNE
+         g5EttsTAsYFl0Tpy7MuPbRCjzZ0gc1udlaS2EnRet50B4uXq0iBwYE0jw3m3xon8vd3B
+         EDBoe63yPeVm60cztxbJd34ttoo534yE3v3lQCs8mYF3g0vCx0rEjN9BE6VwOmFOcCdD
+         Rabg==
+X-Gm-Message-State: AOAM530w28+4zSY5DifyO1nKRnwBof2SIqHm3heIrKfbcFXFL1PnPPNo
+        UtvqM1iIoxyH3rrjkJcgw5QXO3MYgmTiApzQmIljOw==
+X-Google-Smtp-Source: ABdhPJxHm++0XMttvWDRWWKqxHdfZjFoymYvLuXf+7L3uOgrG9s2Gg6KNpvokgO5TP6MqRad6jHADnjuLxLnCan07K8=
+X-Received: by 2002:a17:90a:2e8c:: with SMTP id r12mr27529821pjd.101.1606759430885;
+ Mon, 30 Nov 2020 10:03:50 -0800 (PST)
+MIME-Version: 1.0
+References: <20201127164131.2244124-18-daniel.vetter@ffwll.ch>
+ <202011280356.rPWHFNW4-lkp@intel.com> <20201130142820.GN401619@phenom.ffwll.local>
+In-Reply-To: <20201130142820.GN401619@phenom.ffwll.local>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 30 Nov 2020 10:03:40 -0800
+Message-ID: <CAKwvOdnSrsnTgPEuQJyaOTSkTP2dR9208Y66HQG_h1e2LKfqtw@mail.gmail.com>
+Subject: Re: [PATCH v7 17/17] mm: add mmu_notifier argument to follow_pfn
+To:     Vasily Gorbik <gor@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>
+Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kbuild-all@lists.01.org,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        kvm <kvm@vger.kernel.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 30, 2020 at 6:28 AM Daniel Vetter <daniel@ffwll.ch> wrote:
+>
+> So I guess kvm platforms that don't set KVM_ARCH_WANT_MMU_NOTIFIER exist,
+> and at least on powerpc they're consistent with KVM_CAP_SYNC_MMU
+> signalling that the guest pagetables stays in sync automatically with any
+> updates. So for that case I guess we could use unsafe_follow_pfn.
+>
+> But on s390 this seems different: No mmu notifier, but KVM_CAP_SYNC_MMU is
+> set. So I guess there's some hardware magic on s390 that I don't know
+> about.
 
---=-s5323ca3rhxaqo0/GcDc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
++ Vasily + Heiko +s390
 
-On Mon, 2020-11-30 at 17:15 +0000, Joao Martins wrote:
-> On 11/30/20 4:48 PM, David Woodhouse wrote:
-> > On Mon, 2020-11-30 at 15:08 +0000, Joao Martins wrote:
-> > > On 11/30/20 12:55 PM, David Woodhouse wrote:
-> > > > On Mon, 2020-11-30 at 12:17 +0000, Joao Martins wrote:
-> > > > > On 11/30/20 9:41 AM, David Woodhouse wrote:
-> > > > > > On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
-> > > > >=20
-> > > > > One thing I didn't quite do at the time, is the whitelisting of u=
-nregistered
-> > > > > ports to userspace.
+>
+> Not sure what to do with this now here ...
+> -Daniel
+>
+>
+> On Sat, Nov 28, 2020 at 03:10:40AM +0800, kernel test robot wrote:
+> > Hi Daniel,
+> >
+> > I love your patch! Yet something to improve:
+> >
+> > [auto build test ERROR on linuxtv-media/master]
+> > [also build test ERROR on char-misc/char-misc-testing v5.10-rc5]
+> > [cannot apply to hnaz-linux-mm/master next-20201127]
+> > [If your patch is applied to the wrong git tree, kindly drop us a note.
+> > And when submitting patch, we suggest to use '--base' as documented in
+> > https://git-scm.com/docs/git-format-patch]
+> >
+> > url:    https://github.com/0day-ci/linux/commits/Daniel-Vetter/follow_pfn-and-other-iomap-races/20201128-004421
+> > base:   git://linuxtv.org/media_tree.git master
+> > config: s390-randconfig-r032-20201127 (attached as .config)
+> > compiler: clang version 12.0.0 (https://github.com/llvm/llvm-project f095ac11a9550530a4a54298debb8b04b36422be)
+> > reproduce (this is a W=1 build):
+> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >         chmod +x ~/bin/make.cross
+> >         # install s390 cross compiling tool for clang build
+> >         # apt-get install binutils-s390x-linux-gnu
+> >         # https://github.com/0day-ci/linux/commit/d76a3489433ce67d45da86aa12953385427f0ac9
+> >         git remote add linux-review https://github.com/0day-ci/linux
+> >         git fetch --no-tags linux-review Daniel-Vetter/follow_pfn-and-other-iomap-races/20201128-004421
+> >         git checkout d76a3489433ce67d45da86aa12953385427f0ac9
+> >         # save the attached .config to linux build tree
+> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=s390
+> >
+> > If you fix the issue, kindly add following tag as appropriate
+> > Reported-by: kernel test robot <lkp@intel.com>
+> >
+> > All errors (new ones prefixed by >>):
+> >
+> >    In file included from arch/s390/include/asm/kvm_para.h:25:
+> >    In file included from arch/s390/include/asm/diag.h:12:
+> >    In file included from include/linux/if_ether.h:19:
+> >    In file included from include/linux/skbuff.h:31:
+> >    In file included from include/linux/dma-mapping.h:10:
+> >    In file included from include/linux/scatterlist.h:9:
+> >    In file included from arch/s390/include/asm/io.h:80:
+> >    include/asm-generic/io.h:490:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+> >                                                            ~~~~~~~~~~ ^
+> >    include/uapi/linux/byteorder/big_endian.h:34:59: note: expanded from macro '__le32_to_cpu'
+> >    #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+> >                                                              ^
+> >    include/uapi/linux/swab.h:119:21: note: expanded from macro '__swab32'
+> >            ___constant_swab32(x) :                 \
+> >                               ^
+> >    include/uapi/linux/swab.h:21:12: note: expanded from macro '___constant_swab32'
+> >            (((__u32)(x) & (__u32)0x00ff0000UL) >>  8) |            \
+> >                      ^
+> >    In file included from arch/s390/kvm/../../../virt/kvm/kvm_main.c:18:
+> >    In file included from include/linux/kvm_host.h:32:
+> >    In file included from include/linux/kvm_para.h:5:
+> >    In file included from include/uapi/linux/kvm_para.h:36:
+> >    In file included from arch/s390/include/asm/kvm_para.h:25:
+> >    In file included from arch/s390/include/asm/diag.h:12:
+> >    In file included from include/linux/if_ether.h:19:
+> >    In file included from include/linux/skbuff.h:31:
+> >    In file included from include/linux/dma-mapping.h:10:
+> >    In file included from include/linux/scatterlist.h:9:
+> >    In file included from arch/s390/include/asm/io.h:80:
+> >    include/asm-generic/io.h:490:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+> >                                                            ~~~~~~~~~~ ^
+> >    include/uapi/linux/byteorder/big_endian.h:34:59: note: expanded from macro '__le32_to_cpu'
+> >    #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+> >                                                              ^
+> >    include/uapi/linux/swab.h:119:21: note: expanded from macro '__swab32'
+> >            ___constant_swab32(x) :                 \
+> >                               ^
+> >    include/uapi/linux/swab.h:22:12: note: expanded from macro '___constant_swab32'
+> >            (((__u32)(x) & (__u32)0xff000000UL) >> 24)))
+> >                      ^
+> >    In file included from arch/s390/kvm/../../../virt/kvm/kvm_main.c:18:
+> >    In file included from include/linux/kvm_host.h:32:
+> >    In file included from include/linux/kvm_para.h:5:
+> >    In file included from include/uapi/linux/kvm_para.h:36:
+> >    In file included from arch/s390/include/asm/kvm_para.h:25:
+> >    In file included from arch/s390/include/asm/diag.h:12:
+> >    In file included from include/linux/if_ether.h:19:
+> >    In file included from include/linux/skbuff.h:31:
+> >    In file included from include/linux/dma-mapping.h:10:
+> >    In file included from include/linux/scatterlist.h:9:
+> >    In file included from arch/s390/include/asm/io.h:80:
+> >    include/asm-generic/io.h:490:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+> >                                                            ~~~~~~~~~~ ^
+> >    include/uapi/linux/byteorder/big_endian.h:34:59: note: expanded from macro '__le32_to_cpu'
+> >    #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+> >                                                              ^
+> >    include/uapi/linux/swab.h:120:12: note: expanded from macro '__swab32'
+> >            __fswab32(x))
+> >                      ^
+> >    In file included from arch/s390/kvm/../../../virt/kvm/kvm_main.c:18:
+> >    In file included from include/linux/kvm_host.h:32:
+> >    In file included from include/linux/kvm_para.h:5:
+> >    In file included from include/uapi/linux/kvm_para.h:36:
+> >    In file included from arch/s390/include/asm/kvm_para.h:25:
+> >    In file included from arch/s390/include/asm/diag.h:12:
+> >    In file included from include/linux/if_ether.h:19:
+> >    In file included from include/linux/skbuff.h:31:
+> >    In file included from include/linux/dma-mapping.h:10:
+> >    In file included from include/linux/scatterlist.h:9:
+> >    In file included from arch/s390/include/asm/io.h:80:
+> >    include/asm-generic/io.h:501:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            __raw_writeb(value, PCI_IOBASE + addr);
+> >                                ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:511:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+> >                                                          ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:521:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+> >                                                          ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:609:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            readsb(PCI_IOBASE + addr, buffer, count);
+> >                   ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:617:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            readsw(PCI_IOBASE + addr, buffer, count);
+> >                   ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:625:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            readsl(PCI_IOBASE + addr, buffer, count);
+> >                   ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:634:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            writesb(PCI_IOBASE + addr, buffer, count);
+> >                    ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:643:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            writesw(PCI_IOBASE + addr, buffer, count);
+> >                    ~~~~~~~~~~ ^
+> >    include/asm-generic/io.h:652:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+> >            writesl(PCI_IOBASE + addr, buffer, count);
+> >                    ~~~~~~~~~~ ^
+> > >> arch/s390/kvm/../../../virt/kvm/kvm_main.c:1894:40: error: no member named 'mmu_notifier' in 'struct kvm'
+> >            r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+> >                                             ~~~  ^
+> >    arch/s390/kvm/../../../virt/kvm/kvm_main.c:1909:41: error: no member named 'mmu_notifier' in 'struct kvm'
+> >                    r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+> >                                                     ~~~  ^
+> >    20 warnings and 2 errors generated.
+> >
+> > vim +1894 arch/s390/kvm/../../../virt/kvm/kvm_main.c
+> >
+> >   1885
+> >   1886        static int hva_to_pfn_remapped(struct kvm *kvm, struct vm_area_struct *vma,
+> >   1887                                       unsigned long addr, bool *async,
+> >   1888                                       bool write_fault, bool *writable,
+> >   1889                                       kvm_pfn_t *p_pfn)
+> >   1890        {
+> >   1891                unsigned long pfn;
+> >   1892                int r;
+> >   1893
+> > > 1894                r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+> >   1895                if (r) {
+> >   1896                        /*
+> >   1897                         * get_user_pages fails for VM_IO and VM_PFNMAP vmas and does
+> >   1898                         * not call the fault handler, so do it here.
+> >   1899                         */
+> >   1900                        bool unlocked = false;
+> >   1901                        r = fixup_user_fault(current->mm, addr,
+> >   1902                                             (write_fault ? FAULT_FLAG_WRITE : 0),
+> >   1903                                             &unlocked);
+> >   1904                        if (unlocked)
+> >   1905                                return -EAGAIN;
+> >   1906                        if (r)
+> >   1907                                return r;
+> >   1908
+> >   1909                        r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+> >   1910                        if (r)
+> >   1911                                return r;
+> >   1912
+> >   1913                }
+> >   1914
+> >   1915                if (writable)
+> >   1916                        *writable = true;
+> >   1917
+> >   1918                /*
+> >   1919                 * Get a reference here because callers of *hva_to_pfn* and
+> >   1920                 * *gfn_to_pfn* ultimately call kvm_release_pfn_clean on the
+> >   1921                 * returned pfn.  This is only needed if the VMA has VM_MIXEDMAP
+> >   1922                 * set, but the kvm_get_pfn/kvm_release_pfn_clean pair will
+> >   1923                 * simply do nothing for reserved pfns.
+> >   1924                 *
+> >   1925                 * Whoever called remap_pfn_range is also going to call e.g.
+> >   1926                 * unmap_mapping_range before the underlying pages are freed,
+> >   1927                 * causing a call to our MMU notifier.
+> >   1928                 */
+> >   1929                kvm_get_pfn(pfn);
+> >   1930
+> >   1931                *p_pfn = pfn;
+> >   1932                return 0;
+> >   1933        }
+> >   1934
+> >
+> > ---
+> > 0-DAY CI Kernel Test Service, Intel Corporation
+> > https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>
+>
+>
+> --
+> Daniel Vetter
+> Software Engineer, Intel Corporation
+> http://blog.ffwll.ch
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20201130142820.GN401619%40phenom.ffwll.local.
 
-...
-
-> But felt it was still worth having this discussion ... should this be
-> considered or discarded. I suppose we stick with the later for now.
-
-Ack. Duly discarded :)
-
-> > > > > Perhaps eventfd could be a way to express this? Like if you regis=
-ter
-> > > > > without an eventfd it's offloaded, otherwise it's assigned to use=
-rspace,
-> > > > > or if neither it's then returned an error without bothering the V=
-MM.
-> > > >=20
-> > > > I much prefer the simple model where the *only* event channels that=
- the
-> > > > kernel knows about are the ones it's expected to handle.
-> > > >=20
-> > > > For any others, the bypass doesn't kick in, and userspace gets the
-> > > > KVM_EXIT_HYPERCALL exit.
-> > > >=20
-> > >=20
-> > > /me nods
-> > >=20
-> > > I should comment on your other patch but: if we're going to make it g=
-eneric for
-> > > the userspace hypercall handling, might as well move hyper-v there to=
-o. In this series,
-> > > I added KVM_EXIT_XEN, much like it exists KVM_EXIT_HYPERV -- but with=
- a generic version
-> > > I wonder if a capability could gate KVM_EXIT_HYPERCALL to handle both=
- guest types, while
-> > > disabling KVM_EXIT_HYPERV. But this is probably subject of its own se=
-parate patch :)
-> >=20
-> > There's a limit to how much consolidation we can do because the ABI is
-> > different; the args are in different registers.
-> >=20
->=20
-> Yes. It would be optionally enabled of course and VMM would have to adjus=
-t to the new ABI
-> -- surely wouldn't want to break current users of KVM_EXIT_HYPERV.
-
-True, but that means we'd have to keep KVM_EXIT_HYPERV around anyway,
-and can't actually *remove* it. The "consolidation" gives us more
-complexity, not less.
-
-> > I do suspect Hyper-V should have marshalled its arguments into the
-> > existing kvm_run->arch.hypercall and used KVM_EXIT_HYPERCALL but I
-> > don't think it makes sense to change it now since it's a user-facing
-> > ABI. I don't want to follow its lead by inventing *another* gratuitous
-> > exit type for Xen though.
-> >=20
->=20
-> I definitely like the KVM_EXIT_HYPERCALL better than a KVM_EXIT_XEN users=
-pace
-> exit type ;)
->=20
-> But I guess you still need to co-relate a type of hypercall (Xen guest ca=
-p enabled?) to
-> tell it's Xen or KVM to specially enlighten certain opcodes (EVTCHNOP_sen=
-d).
-
-Sure, but if the VMM doesn't know what kind of guest it's hosting, we
-have bigger problems... :)
 
 
---=-s5323ca3rhxaqo0/GcDc
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MTMwMTgwMTI1WjAvBgkqhkiG9w0BCQQxIgQgwXl927HAxRTqTTZ+51IbY/dubcEYhlrL0HyvDVKR
-VM8wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAH9NWd3Z4kXXIe+7bpzW+TLkp4b8i1SC8MYuPRtpcCmz2EFhAIEHnVeHGq76ekPO
-qCmNgt7smOmhg2s+8ESBBIaV5PlhwuYD49ImRJPZraKfHkXez5tfsHQ1lFiFemVfDpJEZy+6N2BF
-Sagnf+j97gOQUJhQy6lIS6zGk4vgpBOMXIg0Mz/lrUpN7TXxLXEumIWrAxiNPrV/ott71AZPGnxZ
-01gUEOL6rkwXpshCROSksCGTviAjJvBwLhTuKygwea15cmezDeLjecCrDp+jh3vXirMhtqzy35MG
-QJQXVQCZ/ar368M93yCO04AVl0GNHVeKUsKPybSZkeQyJGh4XawAAAAAAAA=
-
-
---=-s5323ca3rhxaqo0/GcDc--
-
+-- 
+Thanks,
+~Nick Desaulniers
