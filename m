@@ -2,184 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56EFB2C8681
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 15:19:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E90082C86BD
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 15:32:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727519AbgK3OTC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 09:19:02 -0500
-Received: from foss.arm.com ([217.140.110.172]:55476 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726961AbgK3OTC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 09:19:02 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D7D5D6E;
-        Mon, 30 Nov 2020 06:18:16 -0800 (PST)
-Received: from [10.37.12.38] (unknown [10.37.12.38])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4923C3F71F;
-        Mon, 30 Nov 2020 06:18:15 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 10/10] arm64: gic: Use IPI test checking
- for the LPI tests
-To:     Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-Cc:     andre.przywara@arm.com, Eric Auger <eric.auger@redhat.com>
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-11-alexandru.elisei@arm.com>
- <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
- <fd32d075-c6a9-a869-14a9-2c29f41d3318@arm.com>
- <49be46a8-2c29-b805-366e-7c955d395874@huawei.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <eb8f5df2-6ea5-7aad-344a-70fcef3adad8@arm.com>
-Date:   Mon, 30 Nov 2020 14:19:37 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+        id S1727659AbgK3O3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 09:29:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47372 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727646AbgK3O3c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 09:29:32 -0500
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A05C061A4B
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 06:28:24 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id v14so13067658wml.1
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 06:28:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eHLcaoGR3OBMxI8Ka9Vg7O4WIQrlDq3JLjO4ywGlLGY=;
+        b=dfMrMYg+Imtd1PT+Ug3KAxUR66mYTe9vAIQKEVg0p13ToattxxKgowHojH4QkVsl8o
+         qWCIFLhhk7c1mD01OWMkZ5hkSkRlkmPm+bVkb34eSimeJ1VnWw2ym78YElm9GSziyfkJ
+         EEgXBw3Tprvet3blzGCzAx/h7Dl9EX4sL5AEk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to;
+        bh=eHLcaoGR3OBMxI8Ka9Vg7O4WIQrlDq3JLjO4ywGlLGY=;
+        b=EZTFGDE25PRXrqQyktc+AMo/1sMfc2I14C01JFmLSju878vUjKnUt25cy8mfzXjaBo
+         gnTkvFe+jQ/7OcJ9t+ykZhQH26CHGEQy80GUmv7nC5tMGlLZz0maHc7H6hNdo+DjGW8E
+         zgs3+4Ze5Zi6+YLuIHVYIYunCLuALyp8Z0+VfF+VVEOsk4DSd/L7q0PVYrSq3Yc9Nt5N
+         4tutAXgIapngkscbLxpLbDAEfLtwrUWg81TbL32Hj+kaswDl06/Nzekj5kTt1ggBC2Po
+         Bn3W2LqzVpk/CwE1jy2Iz1MFo7YWYruuHnj/YS7ZUt8Cj7cteObgsMOyzpKNFqf0g7TR
+         2V+Q==
+X-Gm-Message-State: AOAM531Iw2jRasUosnlMKaX8s2CiYjLga/ZzSq39gMtV1z8iAEIiX5/c
+        0bqfzDYQO/2xJ0UT3I8kb4fA/Q==
+X-Google-Smtp-Source: ABdhPJw0HCNBfCYYbfgmPNymctRPGyVxi7hp50ZBAm3Q4du98rsXy8jIiPNtdF8UeMGO2YaRzuWbEw==
+X-Received: by 2002:a7b:c05a:: with SMTP id u26mr23719527wmc.159.1606746503617;
+        Mon, 30 Nov 2020 06:28:23 -0800 (PST)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id v3sm270080wrq.72.2020.11.30.06.28.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Nov 2020 06:28:22 -0800 (PST)
+Date:   Mon, 30 Nov 2020 15:28:20 +0100
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kbuild-all@lists.01.org,
+        clang-built-linux@googlegroups.com, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v7 17/17] mm: add mmu_notifier argument to follow_pfn
+Message-ID: <20201130142820.GN401619@phenom.ffwll.local>
+Mail-Followup-To: kernel test robot <lkp@intel.com>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kbuild-all@lists.01.org,
+        clang-built-linux@googlegroups.com, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+References: <20201127164131.2244124-18-daniel.vetter@ffwll.ch>
+ <202011280356.rPWHFNW4-lkp@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <49be46a8-2c29-b805-366e-7c955d395874@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202011280356.rPWHFNW4-lkp@intel.com>
+X-Operating-System: Linux phenom 5.7.0-1-amd64 
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+So I guess kvm platforms that don't set KVM_ARCH_WANT_MMU_NOTIFIER exist,
+and at least on powerpc they're consistent with KVM_CAP_SYNC_MMU
+signalling that the guest pagetables stays in sync automatically with any
+updates. So for that case I guess we could use unsafe_follow_pfn.
 
-On 11/30/20 1:59 PM, Zenghui Yu wrote:
-> Hi Alex,
->
-> On 2020/11/27 22:50, Alexandru Elisei wrote:
->> Hi Zhenghui,
->>
->> Thank you for having a look at this!
->>
->> On 11/26/20 9:30 AM, Zenghui Yu wrote:
->>> On 2020/11/25 23:51, Alexandru Elisei wrote:
->>>> The reason for the failure is that the test "dev2/eventid=20 now triggers
->>>> an LPI" triggers 2 LPIs, not one. This behavior was present before this
->>>> patch, but it was ignored because check_lpi_stats() wasn't looking at the
->>>> acked array.
->>>>
->>>> I'm not familiar with the ITS so I'm not sure if this is expected, if the
->>>> test is incorrect or if there is something wrong with KVM emulation.
->>>
->>> I think this is expected, or not.
->>>
->>> Before INVALL, the LPI-8195 was already pending but disabled. On
->>> receiving INVALL, VGIC will reload configuration for all LPIs targeting
->>> collection-3 and deliver the now enabled LPI-8195. We'll therefore see
->>> and handle it before sending the following INT (which will set the
->>> LPI-8195 pending again).
->>>
->>>> Did some more testing on an Ampere eMAG (fast out-of-order cores) using
->>>> qemu and kvmtool and Linux v5.8, here's what I found:
->>>>
->>>> - Using qemu and gic.flat built from*master*: error encountered 864 times
->>>>     out of 1088 runs.
->>>> - Using qemu: error encountered 852 times out of 1027 runs.
->>>> - Using kvmtool: error encountered 8164 times out of 10602 runs.
->>>
->>> If vcpu-3 hadn't seen and handled LPI-8195 as quickly as possible (e.g.,
->>> vcpu-3 hadn't been scheduled), the following INT will set the already
->>> pending LPI-8195 pending again and we'll receive it *once* on vcpu-3.
->>> And we won't see the mentioned failure.
->>>
->>> I think we can just drop the (meaningless and confusing?) INT.
->>
->> I think I understand your explanation, the VCPU takes the interrupt immediately
->> after the INVALL and before the INT, and the second interrupt that I am seeing is
->> the one caused by the INT command.
->
-> Yes.
->
->> I tried modifying the test like this:
->>
->> diff --git a/arm/gic.c b/arm/gic.c
->> index 6e93da80fe0d..0ef8c12ea234 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -761,10 +761,17 @@ static void test_its_trigger(void)
->>          wmb();
->>          cpumask_clear(&mask);
->>          cpumask_set_cpu(3, &mask);
->> -       its_send_int(dev2, 20);
->
-> Shouldn't its_send_invall(col3) be moved down here? See below.
->
->>          wait_for_interrupts(&mask);
->>          report(check_acked(&mask, 0, 8195),
->> -                       "dev2/eventid=20 now triggers an LPI");
->> +                       "dev2/eventid=20 pending LPI is received");
->> +
->> +       stats_reset();
->> +       wmb();
->> +       cpumask_clear(&mask);
->> +       cpumask_set_cpu(3, &mask);
->> +       its_send_int(dev2, 20);
->> +       wait_for_interrupts(&mask);
->> +       report(check_acked(&mask, 0, 8195), "dev2/eventid=20 triggers an LPI");
->>            report_prefix_pop();
->>   I removed the INT from the initial test, and added a separate one to check that
->> the INT command still works. That looks to me that preserves the spirit of the
->> original test. After doing stress testing this is what I got:
->>
->> - with kvmtool, 47,709 iterations, 27 times the test timed out when waiting for
->> the interrupt after INVALL.
->> - with qemu, 15,511 iterations, 258 times the test timed out when waiting for the
->> interrupt after INVALL, just like with kvmtool.
->
-> I guess the reason of failure is that the LPI is taken *immediately*
-> after the INVALL?
->
->     /* Now call the invall and check the LPI hits */
->     its_send_invall(col3);
->         <- LPI is taken, acked[]++
->     stats_reset();
->         <- acked[] is cleared unexpectedly
->     wmb();
->     cpumask_clear(&mask);
->     cpumask_set_cpu(3, &mask);
->     wait_for_interrupts(&mask);
->         <- we'll hit timed-out since acked[] is 0
+But on s390 this seems different: No mmu notifier, but KVM_CAP_SYNC_MMU is
+set. So I guess there's some hardware magic on s390 that I don't know
+about.
 
-Yes, of course, you're right, I didn't realize that I was resetting the stats
-*after* the interrupt was enabled. This also explains why I was still seeing
-timeouts even when the timeout duration was set to 50 seconds. I'll retest with
-the fix:
+Not sure what to do with this now here ...
+-Daniel
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 6e93da80fe0d..c4240f5aba39 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -756,15 +756,22 @@ static void test_its_trigger(void)
-                        "dev2/eventid=20 still does not trigger any LPI");
- 
-        /* Now call the invall and check the LPI hits */
-+       stats_reset();
-+       wmb();
-+       cpumask_clear(&mask);
-+       cpumask_set_cpu(3, &mask);
-        its_send_invall(col3);
-+       wait_for_interrupts(&mask);
-+       report(check_acked(&mask, 0, 8195),
-+                       "dev2/eventid=20 pending LPI is received");
-+
-        stats_reset();
-        wmb();
-        cpumask_clear(&mask);
-        cpumask_set_cpu(3, &mask);
-        its_send_int(dev2, 20);
-        wait_for_interrupts(&mask);
--       report(check_acked(&mask, 0, 8195),
--                       "dev2/eventid=20 now triggers an LPI");
-+       report(check_acked(&mask, 0, 8195), "dev2/eventid20 triggers an LPI");
- 
-        report_prefix_pop();
- 
-I also pushed a branch at [1].
 
-Thank you so much for spotting this! You've saved me (and probably others) a lot
-of time debugging.
+On Sat, Nov 28, 2020 at 03:10:40AM +0800, kernel test robot wrote:
+> Hi Daniel,
+> 
+> I love your patch! Yet something to improve:
+> 
+> [auto build test ERROR on linuxtv-media/master]
+> [also build test ERROR on char-misc/char-misc-testing v5.10-rc5]
+> [cannot apply to hnaz-linux-mm/master next-20201127]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Daniel-Vetter/follow_pfn-and-other-iomap-races/20201128-004421
+> base:   git://linuxtv.org/media_tree.git master
+> config: s390-randconfig-r032-20201127 (attached as .config)
+> compiler: clang version 12.0.0 (https://github.com/llvm/llvm-project f095ac11a9550530a4a54298debb8b04b36422be)
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # install s390 cross compiling tool for clang build
+>         # apt-get install binutils-s390x-linux-gnu
+>         # https://github.com/0day-ci/linux/commit/d76a3489433ce67d45da86aa12953385427f0ac9
+>         git remote add linux-review https://github.com/0day-ci/linux
+>         git fetch --no-tags linux-review Daniel-Vetter/follow_pfn-and-other-iomap-races/20201128-004421
+>         git checkout d76a3489433ce67d45da86aa12953385427f0ac9
+>         # save the attached .config to linux build tree
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=s390 
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    In file included from arch/s390/include/asm/kvm_para.h:25:
+>    In file included from arch/s390/include/asm/diag.h:12:
+>    In file included from include/linux/if_ether.h:19:
+>    In file included from include/linux/skbuff.h:31:
+>    In file included from include/linux/dma-mapping.h:10:
+>    In file included from include/linux/scatterlist.h:9:
+>    In file included from arch/s390/include/asm/io.h:80:
+>    include/asm-generic/io.h:490:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+>                                                            ~~~~~~~~~~ ^
+>    include/uapi/linux/byteorder/big_endian.h:34:59: note: expanded from macro '__le32_to_cpu'
+>    #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+>                                                              ^
+>    include/uapi/linux/swab.h:119:21: note: expanded from macro '__swab32'
+>            ___constant_swab32(x) :                 \
+>                               ^
+>    include/uapi/linux/swab.h:21:12: note: expanded from macro '___constant_swab32'
+>            (((__u32)(x) & (__u32)0x00ff0000UL) >>  8) |            \
+>                      ^
+>    In file included from arch/s390/kvm/../../../virt/kvm/kvm_main.c:18:
+>    In file included from include/linux/kvm_host.h:32:
+>    In file included from include/linux/kvm_para.h:5:
+>    In file included from include/uapi/linux/kvm_para.h:36:
+>    In file included from arch/s390/include/asm/kvm_para.h:25:
+>    In file included from arch/s390/include/asm/diag.h:12:
+>    In file included from include/linux/if_ether.h:19:
+>    In file included from include/linux/skbuff.h:31:
+>    In file included from include/linux/dma-mapping.h:10:
+>    In file included from include/linux/scatterlist.h:9:
+>    In file included from arch/s390/include/asm/io.h:80:
+>    include/asm-generic/io.h:490:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+>                                                            ~~~~~~~~~~ ^
+>    include/uapi/linux/byteorder/big_endian.h:34:59: note: expanded from macro '__le32_to_cpu'
+>    #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+>                                                              ^
+>    include/uapi/linux/swab.h:119:21: note: expanded from macro '__swab32'
+>            ___constant_swab32(x) :                 \
+>                               ^
+>    include/uapi/linux/swab.h:22:12: note: expanded from macro '___constant_swab32'
+>            (((__u32)(x) & (__u32)0xff000000UL) >> 24)))
+>                      ^
+>    In file included from arch/s390/kvm/../../../virt/kvm/kvm_main.c:18:
+>    In file included from include/linux/kvm_host.h:32:
+>    In file included from include/linux/kvm_para.h:5:
+>    In file included from include/uapi/linux/kvm_para.h:36:
+>    In file included from arch/s390/include/asm/kvm_para.h:25:
+>    In file included from arch/s390/include/asm/diag.h:12:
+>    In file included from include/linux/if_ether.h:19:
+>    In file included from include/linux/skbuff.h:31:
+>    In file included from include/linux/dma-mapping.h:10:
+>    In file included from include/linux/scatterlist.h:9:
+>    In file included from arch/s390/include/asm/io.h:80:
+>    include/asm-generic/io.h:490:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+>                                                            ~~~~~~~~~~ ^
+>    include/uapi/linux/byteorder/big_endian.h:34:59: note: expanded from macro '__le32_to_cpu'
+>    #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+>                                                              ^
+>    include/uapi/linux/swab.h:120:12: note: expanded from macro '__swab32'
+>            __fswab32(x))
+>                      ^
+>    In file included from arch/s390/kvm/../../../virt/kvm/kvm_main.c:18:
+>    In file included from include/linux/kvm_host.h:32:
+>    In file included from include/linux/kvm_para.h:5:
+>    In file included from include/uapi/linux/kvm_para.h:36:
+>    In file included from arch/s390/include/asm/kvm_para.h:25:
+>    In file included from arch/s390/include/asm/diag.h:12:
+>    In file included from include/linux/if_ether.h:19:
+>    In file included from include/linux/skbuff.h:31:
+>    In file included from include/linux/dma-mapping.h:10:
+>    In file included from include/linux/scatterlist.h:9:
+>    In file included from arch/s390/include/asm/io.h:80:
+>    include/asm-generic/io.h:501:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            __raw_writeb(value, PCI_IOBASE + addr);
+>                                ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:511:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+>                                                          ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:521:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+>                                                          ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:609:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            readsb(PCI_IOBASE + addr, buffer, count);
+>                   ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:617:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            readsw(PCI_IOBASE + addr, buffer, count);
+>                   ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:625:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            readsl(PCI_IOBASE + addr, buffer, count);
+>                   ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:634:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            writesb(PCI_IOBASE + addr, buffer, count);
+>                    ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:643:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            writesw(PCI_IOBASE + addr, buffer, count);
+>                    ~~~~~~~~~~ ^
+>    include/asm-generic/io.h:652:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+>            writesl(PCI_IOBASE + addr, buffer, count);
+>                    ~~~~~~~~~~ ^
+> >> arch/s390/kvm/../../../virt/kvm/kvm_main.c:1894:40: error: no member named 'mmu_notifier' in 'struct kvm'
+>            r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+>                                             ~~~  ^
+>    arch/s390/kvm/../../../virt/kvm/kvm_main.c:1909:41: error: no member named 'mmu_notifier' in 'struct kvm'
+>                    r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+>                                                     ~~~  ^
+>    20 warnings and 2 errors generated.
+> 
+> vim +1894 arch/s390/kvm/../../../virt/kvm/kvm_main.c
+> 
+>   1885	
+>   1886	static int hva_to_pfn_remapped(struct kvm *kvm, struct vm_area_struct *vma,
+>   1887				       unsigned long addr, bool *async,
+>   1888				       bool write_fault, bool *writable,
+>   1889				       kvm_pfn_t *p_pfn)
+>   1890	{
+>   1891		unsigned long pfn;
+>   1892		int r;
+>   1893	
+> > 1894		r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+>   1895		if (r) {
+>   1896			/*
+>   1897			 * get_user_pages fails for VM_IO and VM_PFNMAP vmas and does
+>   1898			 * not call the fault handler, so do it here.
+>   1899			 */
+>   1900			bool unlocked = false;
+>   1901			r = fixup_user_fault(current->mm, addr,
+>   1902					     (write_fault ? FAULT_FLAG_WRITE : 0),
+>   1903					     &unlocked);
+>   1904			if (unlocked)
+>   1905				return -EAGAIN;
+>   1906			if (r)
+>   1907				return r;
+>   1908	
+>   1909			r = follow_pfn(vma, addr, &pfn, &kvm->mmu_notifier);
+>   1910			if (r)
+>   1911				return r;
+>   1912	
+>   1913		}
+>   1914	
+>   1915		if (writable)
+>   1916			*writable = true;
+>   1917	
+>   1918		/*
+>   1919		 * Get a reference here because callers of *hva_to_pfn* and
+>   1920		 * *gfn_to_pfn* ultimately call kvm_release_pfn_clean on the
+>   1921		 * returned pfn.  This is only needed if the VMA has VM_MIXEDMAP
+>   1922		 * set, but the kvm_get_pfn/kvm_release_pfn_clean pair will
+>   1923		 * simply do nothing for reserved pfns.
+>   1924		 *
+>   1925		 * Whoever called remap_pfn_range is also going to call e.g.
+>   1926		 * unmap_mapping_range before the underlying pages are freed,
+>   1927		 * causing a call to our MMU notifier.
+>   1928		 */ 
+>   1929		kvm_get_pfn(pfn);
+>   1930	
+>   1931		*p_pfn = pfn;
+>   1932		return 0;
+>   1933	}
+>   1934	
+> 
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
-[1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/fixes1-v2
 
-Thanks,
-Alex
+
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
