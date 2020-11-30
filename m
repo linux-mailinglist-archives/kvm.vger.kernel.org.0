@@ -2,184 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE3CB2C843F
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 13:43:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AC582C844C
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 13:49:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725924AbgK3Mnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 07:43:32 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10902 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725870AbgK3Mnb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 07:43:31 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AUCZmpT066079;
-        Mon, 30 Nov 2020 07:42:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ei39xPZEfz2zjIdgNxAJpidokXFvDuN5d2aF4wQPKU0=;
- b=DsBeDtpJzLE1jyr1JcYalZ/cLXT4VbGfdBks8aBGbvqPGW1dUp2scuxYaxOaiwvM4Fpj
- jfq4edBCA9TiPzVa2fjWVJzXvqwj9EwaAa7sTD6zRzuTIoJIxJFdDJGk7tKLhXIJ2EK+
- TTUcaIFV8Z4CwH3wiPUbWSFi//pHFhJ00qAfMnVoTdr7idIAIp/p53V+5VZ2pe1dE48l
- X32Taa4qlysrysF4jmnL0tFmyl0YXmIy8jetRgSa0Jr06C9s8/2FTzOfQXR6ETJFo18g
- 359W7pAXIx3SP+FO6ih7qITR85WdaqxPOCUFDSF87ie2QDzXPj710/w1qGzMz8RhW5kZ dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 354xctcufu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Nov 2020 07:42:51 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AUCZsb5066473;
-        Mon, 30 Nov 2020 07:42:50 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 354xctcuf0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Nov 2020 07:42:50 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AUCXDRx008063;
-        Mon, 30 Nov 2020 12:42:48 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 353e6891ks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Nov 2020 12:42:48 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AUCgjSs55050694
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Nov 2020 12:42:45 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66250A405C;
-        Mon, 30 Nov 2020 12:42:45 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07727A405B;
-        Mon, 30 Nov 2020 12:42:45 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.29.252])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 30 Nov 2020 12:42:44 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 5/7] s390x: sie: Add first SIE test
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        linux-s390@vger.kernel.org
-References: <20201127130629.120469-1-frankja@linux.ibm.com>
- <20201127130629.120469-6-frankja@linux.ibm.com>
- <20201130114532.6fea10ac.cohuck@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <e312e141-5cee-9e4d-9e2c-d4770e77473d@linux.ibm.com>
-Date:   Mon, 30 Nov 2020 13:42:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1726036AbgK3Msl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 07:48:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22346 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725897AbgK3Msk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 07:48:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606740434;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SE0peqQRnn2fzC8E5zj7//ljEclCXVXCI/uFfBeiSNQ=;
+        b=Z4CjcgJ9ZpszEIgKUWEoP2f3LLsSM0ovNu20/O8M007WkH3jW2C3IQ868/iG285RhC4YFT
+        Jb2UIc+V0vSZbZpTiahFwNlxkwRFk6ng+D2mVh8XwiaKH8jE7IIK1+YASExSp+GsqaZ3Ki
+        Lk7NElgKCSVNOcNKjE+rjVHlqrEhqFc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-542-sEQA9DnHNke2LagMQ_THdw-1; Mon, 30 Nov 2020 07:47:10 -0500
+X-MC-Unique: sEQA9DnHNke2LagMQ_THdw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75EE380F04D;
+        Mon, 30 Nov 2020 12:47:09 +0000 (UTC)
+Received: from localhost (ovpn-115-30.ams2.redhat.com [10.36.115.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 022C027CA2;
+        Mon, 30 Nov 2020 12:47:02 +0000 (UTC)
+Date:   Mon, 30 Nov 2020 12:47:02 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, john.g.johnson@oracle.com, dinechin@redhat.com,
+        cohuck@redhat.com, felipe@nutanix.com,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <20201130124702.GB422962@stefanha-x1.localdomain>
+References: <CAFO2pHzmVf7g3z0RikQbYnejwcWRtHKV=npALs49eRDJdt4mJQ@mail.gmail.com>
+ <0447ec50-6fe8-4f10-73db-e3feec2da61c@redhat.com>
+ <20201126123659.GC1180457@stefanha-x1.localdomain>
+ <c9f926fb-438c-9588-f018-dd040935e5e5@redhat.com>
+ <20201127134403.GB46707@stefanha-x1.localdomain>
+ <6001ed07-5823-365e-5235-8bfea0e72c7f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201130114532.6fea10ac.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-30_03:2020-11-30,2020-11-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 spamscore=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011300081
+In-Reply-To: <6001ed07-5823-365e-5235-8bfea0e72c7f@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="xgyAXRrhYN0wYx8y"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/20 11:45 AM, Cornelia Huck wrote:
-> On Fri, 27 Nov 2020 08:06:27 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> Let's check if we get the correct interception data on a few
->> diags. This commit is more of an addition of boilerplate code than a
->> real test.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  s390x/Makefile      |   1 +
->>  s390x/sie.c         | 125 ++++++++++++++++++++++++++++++++++++++++++++
->>  s390x/unittests.cfg |   3 ++
->>  3 files changed, 129 insertions(+)
->>  create mode 100644 s390x/sie.c
->>
-> 
-> (...)
-> 
->> +static void sie(struct vm *vm)
->> +{
->> +	while (vm->sblk->icptcode == 0) {
->> +		sie64a(vm->sblk, &vm->save_area);
->> +		if (vm->sblk->icptcode == 32)
-> 
-> Can you maybe add #defines for the intercept codes you're checking for?
+--xgyAXRrhYN0wYx8y
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Sure ICTP_VALIDITY and ICPT_INSTRUCTION would make sense.
+On Mon, Nov 30, 2020 at 10:14:15AM +0800, Jason Wang wrote:
+> On 2020/11/27 =E4=B8=8B=E5=8D=889:44, Stefan Hajnoczi wrote:
+> > On Fri, Nov 27, 2020 at 11:39:23AM +0800, Jason Wang wrote:
+> > > On 2020/11/26 =E4=B8=8B=E5=8D=888:36, Stefan Hajnoczi wrote:
+> > > > On Thu, Nov 26, 2020 at 11:37:30AM +0800, Jason Wang wrote:
+> > > > > On 2020/11/26 =E4=B8=8A=E5=8D=883:21, Elena Afanasova wrote:
+> > > Or I wonder whether we can attach an eBPF program when trapping MMIO/=
+PIO and
+> > > allow it to decide how to proceed?
+> > The eBPF program approach is interesting, but it would probably require
+> > access to guest RAM and additional userspace state (e.g. device-specifi=
+c
+> > register values). I don't know the current status of Linux eBPF - is it
+> > possible to access user memory (it could be swapped out)?
+>=20
+>=20
+> AFAIK it doesn't, but just to make sure I understand, any reason that eBP=
+F
+> need to access userspace memory here?
 
-> 
->> +		    handle_validity(vm);
->> +	}
->> +	vm->save_area.guest.grs[14] = vm->sblk->gg14;
->> +	vm->save_area.guest.grs[15] = vm->sblk->gg15;
->> +}
->> +
->> +static void sblk_cleanup(struct vm *vm)
->> +{
->> +	vm->sblk->icptcode = 0;
->> +}
->> +
->> +static void intercept_diag_10(void)
->> +{
->> +	u32 instr = 0x83020010;
->> +
->> +	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
->> +	vm.sblk->gpsw.mask = 0x0000000180000000ULL;
->> +
->> +	memset(guest_instr, 0, PAGE_SIZE);
->> +	memcpy(guest_instr, &instr, 4);
->> +	sie(&vm);
->> +	report(vm.sblk->icptcode == 4 && vm.sblk->ipa == 0x8302 && vm.sblk->ipb == 0x100000,
-> 
-> Again, some #defines might help here, making clear that 0x8302 means
-> diag. (The ipb value is clear enough :) Maybe you can also assemble
-> instr out of pre-made pieces? Or factor out some code to a common
-> function?
+Maybe we're thinking of different things. In the past I've thought about
+using eBPF to avoid a trip to userspace for request submission and
+completion, but that requires virtqueue parsing from eBPF and guest RAM
+access.
 
-Yes, a diag test function that has the code as a parameter would make
-this look nicer and I could also test ipa against the first 16bits of instr.
+Are you thinking about replacing ioctl(KVM_SET_IOREGION) and all the
+necessary kvm.ko code with an ioctl(KVM_SET_IO_PROGRAM), where userspace
+can load an eBPF program into kvm.ko that gets executed when an MMIO/PIO
+accesses occur? Wouldn't it need to write to userspace memory to store
+the ring index that was written to the doorbell register, for example?
+How would the program communicate with userspace (eventfd isn't enough)
+and how can it handle synchronous I/O accesses like reads?
 
-> 
->> +	       "Diag 10 intercept");
->> +	sblk_cleanup(&vm);
->> +}
->> +
->> +static void intercept_diag_44(void)
->> +{
->> +	u32 instr = 0x83020044;
->> +
->> +	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
->> +	vm.sblk->gpsw.mask = 0x0000000180000000ULL;
->> +
->> +	memset(guest_instr, 0, PAGE_SIZE);
->> +	memcpy(guest_instr, &instr, 4);
->> +	sie(&vm);
->> +	report(vm.sblk->icptcode == 4 && vm.sblk->ipa == 0x8302 && vm.sblk->ipb == 0x440000,
->> +	       "Diag 44 intercept");
->> +	sblk_cleanup(&vm);
->> +}
->> +
->> +static void intercept_diag_9c(void)
->> +{
->> +	u32 instr = 0x8302009c;
->> +
->> +	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
->> +	vm.sblk->gpsw.mask = 0x0000000180000000ULL;
->> +
->> +	memset(guest_instr, 0, PAGE_SIZE);
->> +	memcpy(guest_instr, &instr, 4);
->> +	sie(&vm);
->> +	report(vm.sblk->icptcode == 4 && vm.sblk->ipa == 0x8302 && vm.sblk->ipb == 0x9c0000,
->> +	       "Diag 9c intercept");
->> +	sblk_cleanup(&vm);
->> +}
-> 
-> (...)
-> 
+Stefan
+
+--xgyAXRrhYN0wYx8y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/E6cUACgkQnKSrs4Gr
+c8hUbQgAo7jexK7IdFgPGVxfRMuNL6niODhTY7oAwwh0xzUIhmJcT5uh6zdNC9qc
+OVG99QB7fN7fOxUBMVJ7fLMG27UEeXZJ38iALGnVOCA6I2Ep6ekAdUBGducFKpkX
+N+cY72Z6zWSN4inmCDUJjBLHEhl87k7y3qa3KmdULM78ArAwxxSTYtmiZX3amUxa
+E7BfaCRMEa/AVzyNUj2m/TrO3oLzvEsukVmtZZsalFUCClZq6UmoI96wdgvZM6NR
+UAyc5+JjXZa+HPZz875VhpzpP2r9rQBElkV/Hbn6tg7rMf/W0bLPD0FViV8UaDG1
+8NPGOiy82Soolvi3QUpGps1YcjszWQ==
+=wC1T
+-----END PGP SIGNATURE-----
+
+--xgyAXRrhYN0wYx8y--
 
