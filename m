@@ -2,98 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B546F2C8BCE
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 18:54:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1AB62C8BD2
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 18:57:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387858AbgK3Ryi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 12:54:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58840 "EHLO
+        id S2387861AbgK3RzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 12:55:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30023 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726560AbgK3Ryb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 12:54:31 -0500
+        by vger.kernel.org with ESMTP id S1729370AbgK3RzO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 12:55:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606758785;
+        s=mimecast20190719; t=1606758828;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XZHdMrptq2/rYXjufX3+GIBx1xnGVoh3uBEQ7r4wKDM=;
-        b=E3ILZUTwwinvQZ7+YTUqQbAYEHuWm2OmnznwRmHQK8xQBBtupL5SNd+i9j9E+KamHGtkWn
-        CFRwsKxA+W3RHiqHzi31NEPjrFODObN0W1DXOdrRnRW3YaUtgThWkg5OqV3JRncBsPlUp0
-        tPfWjwF7uAlU9AW0YnHiaNrh5ZoaZOc=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-XXjZxk-ZNRKT5Giyk-cmTg-1; Mon, 30 Nov 2020 12:53:03 -0500
-X-MC-Unique: XXjZxk-ZNRKT5Giyk-cmTg-1
-Received: by mail-ej1-f69.google.com with SMTP id k15so6173752ejg.8
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 09:53:02 -0800 (PST)
+        bh=Gi4Rht/ELTnFAZIunHo+toOTUWTBXEGXm5AWopX3S1M=;
+        b=W62WWk1nFL06H8WfpvwDAkAaE61mXJcvFTHqHY/Cm9mvhQvNHNvm0QGmL4EvxFQiN84BPV
+        G3L37cTJFHDtlHZWyHJoHnOgD0VkQ85F/eY1ieNRYzMPtdoDl5Ve6ne3gP9+bCdU8TZRLO
+        fA+DOI9MvlVFevBbERTSBB9UxnH6McY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-Q64NB_2pNnq-ZYDMveWQnA-1; Mon, 30 Nov 2020 12:53:45 -0500
+X-MC-Unique: Q64NB_2pNnq-ZYDMveWQnA-1
+Received: by mail-ed1-f69.google.com with SMTP id g8so7167257edm.7
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 09:53:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XZHdMrptq2/rYXjufX3+GIBx1xnGVoh3uBEQ7r4wKDM=;
-        b=iZKqX2RynyXnHA7Gmug1tR7W3dYkI/KTA6ysnLdTXpRKmsVyTDkeNRGeOjvg0X/MwR
-         hqOjIdPTwwPmSkdgPqWtSrvoifKZHRQmYJnuOZKFsgufkXH7P1q6lZroaVaIxjWTwgPM
-         6dNwjQiDQfWXcV1w91P/2ln40YqBrzDQaJxmuuAMtMngbmjxG5vnZx4nVneCddPHVURP
-         HbCYSzXefapSzZiCVc6riWOL87dKo2bl2lVpVTTSM9RSQNG54DwBtRoT10hOHYRj5Rjj
-         niRSNku2ZZOJZEi2jEtlz5Nrb9whEbONwttrZEA2qh5yORoAy6BhhXcRyiryL+DnsMQD
-         RlmQ==
-X-Gm-Message-State: AOAM530EuWz1A40FOokhDApBJsALcfz/FjfsL8F6kcs+T4b3ErjH7tzw
-        Ri3EdJfr8WXHXVEZ8LHenKubMd1j0gezlAHjNGAP/PxILeiHX1f+pXDfMQ38DQhP+78AwDAE2AP
-        IUfvULKQqoSu3
-X-Received: by 2002:aa7:d2c9:: with SMTP id k9mr18165152edr.74.1606758781769;
-        Mon, 30 Nov 2020 09:53:01 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzr0C3ztJydvyz+oFfxr6BS9zKoQLZ9ul0+KLwEWxb/tzWQGQh/4ALcMPa0sNYIu2m1iyoA+g==
-X-Received: by 2002:aa7:d2c9:: with SMTP id k9mr18165131edr.74.1606758781630;
-        Mon, 30 Nov 2020 09:53:01 -0800 (PST)
+        bh=Gi4Rht/ELTnFAZIunHo+toOTUWTBXEGXm5AWopX3S1M=;
+        b=mCg963ThJ4TAroIliMxg+juNdNONAn3wbqAptfqDe6aTRysbNG7otQWOQ815JXh21d
+         UvqDVolflGlRCO/uFhMlYdvf85jbQ3187KLIOgtysIML8WFK+ni6FOiZ7cUXViOBp6Tb
+         AcjC6t9mUuG7DKJLYWHWUrhMZYrvcBmipE5yTsTOeokLxG9pjKrKf/jBhkxCLhXyLxS3
+         TM1mhQMLSK8DUV7lejVCplyLsOcz5HafxNo3Y7NaOGATqfB6/jpDoh8ZQ/LuqkD74HVr
+         Lj4ADqcP+dsPuEi7mQN7UDgumP04ZgUnOZ1jrSpDVkxhfWdCEUFvsywBAfEcCNb64Az1
+         f32Q==
+X-Gm-Message-State: AOAM533wK1tnIovzwsPfjtLHAVC7y2FJHtCtWxtGEauqVkETKDVkGyl0
+        Mi+qlYPdB32GMug9atmoe6RZXWy2H2+7pDxLrjlIVGkVMqhJ4lsByqvf2k5oaJKsbIaR69DvakB
+        VMA+rziCieiGO
+X-Received: by 2002:a17:907:d01:: with SMTP id gn1mr22075291ejc.357.1606758823760;
+        Mon, 30 Nov 2020 09:53:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwPXCLLq0F7NsxdGneoiL0swBKFgNHMjS0gZzWEdxb5xTK81UZfS/uvqb99Yq+sqLin3REwrQ==
+X-Received: by 2002:a17:907:d01:: with SMTP id gn1mr22075268ejc.357.1606758823492;
+        Mon, 30 Nov 2020 09:53:43 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k17sm8657435ejh.103.2020.11.30.09.53.00
+        by smtp.gmail.com with ESMTPSA id m2sm6847080edf.27.2020.11.30.09.53.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Nov 2020 09:53:00 -0800 (PST)
-Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Mike Christie <michael.christie@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20201125153550.810101-1-sashal@kernel.org>
- <20201125153550.810101-22-sashal@kernel.org>
- <25cd0d64-bffc-9506-c148-11583fed897c@redhat.com>
- <20201125180102.GL643756@sasha-vm>
- <9670064e-793f-561e-b032-75b1ab5c9096@redhat.com>
- <20201129041314.GO643756@sasha-vm>
- <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
- <20201129210650.GP643756@sasha-vm>
- <e499986d-ade5-23bd-7a04-fa5eb3f15a56@redhat.com>
- <20201130173832.GR643756@sasha-vm>
+        Mon, 30 Nov 2020 09:53:42 -0800 (PST)
+Subject: Re: [PATCH] kvm/x86/mmu: use the correct inherited permissions to get
+ shadow page
+To:     Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Avi Kivity <avi@qumranet.com>, linux-doc@vger.kernel.org
+References: <20201120095517.19211-1-jiangshanlai@gmail.com>
+ <20201126000549.GC450871@google.com>
+ <0724aeb9-3466-5505-8f12-a5899144e68f@redhat.com>
+ <CAJhGHyApvmQk4bxxK2rJKzyAShFSXyEb2W0qyFcVoUEcsMKs_w@mail.gmail.com>
+ <X8Uux62rJdf2feJ2@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <238cbdd1-dabc-d1c1-cff8-c9604a0c9b95@redhat.com>
-Date:   Mon, 30 Nov 2020 18:52:59 +0100
+Message-ID: <7a9d3517-7bcc-723a-5ec5-80018d0850d7@redhat.com>
+Date:   Mon, 30 Nov 2020 18:53:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201130173832.GR643756@sasha-vm>
+In-Reply-To: <X8Uux62rJdf2feJ2@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/11/20 18:38, Sasha Levin wrote:
->> I am not aware of any public CI being done _at all_ done on 
->> vhost-scsi, by CKI or everyone else.  So autoselection should be done 
->> only on subsystems that have very high coverage in CI.
-> 
-> Where can I find a testsuite for virtio/vhost? I see one for KVM, but
-> where is the one that the maintainers of virtio/vhost run on patches
-> that come in?
+On 30/11/20 18:41, Sean Christopherson wrote:
+>>
+>> pmd1 and pmd2 point to the same pte table, so:
+>> ptr1 and ptr3 points to the same page.
+>> ptr2 and ptr4 points to the same page.
+>>
+>>    The guess read-accesses to ptr1 first. So the hypervisor gets the
+>> shadow pte page table with role.access=u-- among other things.
+>>     (Note the shadowed pmd1's access is uwx)
+>>
+>>    And then the guest write-accesses to ptr2, and the hypervisor
+>> set up shadow page for ptr2.
+>>     (Note the hypervisor silencely accepts the role.access=u--
+>>      shadow pte page table in FNAME(fetch))
+>>
+>>    After that, the guess read-accesses to ptr3, the hypervisor
+>> reused the same shadow pte page table as above.
+>>
+>>    At last, the guest writes to ptr4 without vmexit nor pagefault,
+>> Which should cause vmexit as the guest expects.
+>
+> Hmm, yes, KVM would incorrectly handle this scenario.  But, the proposed patch
+> would not address the issue as KVM always maps non-leaf shadow pages with full
+> access permissions.
 
-I don't know of any, especially for vhost-scsi.  MikeC?
+Can we have a testcase in kvm-unit-tests?  It's okay of course if it 
+only fails with ept=0.
 
 Paolo
 
