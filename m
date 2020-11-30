@@ -2,270 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D6CD2C92BF
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 00:37:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4827B2C92A5
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 00:34:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389019AbgK3XfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 18:35:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19410 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389009AbgK3XfQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 18:35:16 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AUNYHkw071058;
-        Mon, 30 Nov 2020 18:34:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=kVqkkqol21M5O2VZ4tPALbjqKaclMGkgBCURMKttYLM=;
- b=AqFE2zShuWkrs5n22OhHqZzdjN224FsgtG5kyVEE9y7qSzf6yJpWLT7ugAFh3n1iGDU0
- hfDyfrqMLJmJSVqP1Ja6Li7lWS3DxLLzyR8rJB+KLX3QuQMOt4QO/GNJXkoVTqmuFXr9
- aXBg+7TfjVFe+Ujv/AJHn69KoKyukAvlQkjqNx1qp1GCihHnkLorQhGfG+5T4ZZ550x/
- 91bRSBxcvgIvwGH4HtqZqE0goHZk4VMT0bra1HXfISrYUJt3ivgxuON/xbfb9jBH4jzV
- QO2i3X30Lk6sjxAKjwB8DQQ39gzDl4s01GRFybDWquZXuThJFR81iAa0D939DrTR3ELv 3Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35585w3rjg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Nov 2020 18:34:34 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AUNYXuN072690;
-        Mon, 30 Nov 2020 18:34:33 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35585w3qqn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Nov 2020 18:34:32 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AUNNQJN013612;
-        Mon, 30 Nov 2020 23:32:33 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 353e689a94-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Nov 2020 23:32:33 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AUNWUHA58982796
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Nov 2020 23:32:30 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 568F94204C;
-        Mon, 30 Nov 2020 23:32:30 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 967D74203F;
-        Mon, 30 Nov 2020 23:32:29 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.74.188])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon, 30 Nov 2020 23:32:29 +0000 (GMT)
-Date:   Tue, 1 Dec 2020 00:32:27 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v12 12/17] s390/vfio-ap: allow hot plug/unplug of AP
- resources using mdev device
-Message-ID: <20201201003227.0c3696fc.pasic@linux.ibm.com>
-In-Reply-To: <103cbe02-2093-c950-8d65-d3dc385942ce@linux.ibm.com>
-References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
-        <20201124214016.3013-13-akrowiak@linux.ibm.com>
-        <20201129025250.16eb8355.pasic@linux.ibm.com>
-        <103cbe02-2093-c950-8d65-d3dc385942ce@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S2388843AbgK3Xdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 18:33:43 -0500
+Received: from mail-bn7nam10on2065.outbound.protection.outlook.com ([40.107.92.65]:9217
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388510AbgK3Xdm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 18:33:42 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ikkv3Xl3cRTnXfYtfhwybpGZIzFxZ2rloO7g6QIEkGZnargUN76ssGIwhtPZc6jL7sjIG3khcTOaKuA4O2nKUaR7NWWzUdBkRYm5KxJV9oaT4arRNcKnKnhxRjtjVvIjD2n1oS/z7YbA0QEILPFe75qxqFmTxXQMXY6pAAcp+bbBJXSaVRsxV15R7yeSxLTv/OiWMj6Q7LOCQwSJ2hnltTGAdSzAdNNWo5xAVnkn0kKXHuRU0LHxOVnm9oURrxtA2Pgmev0rIvfo2PicIEy1anH2f0dCClQPNyv4t7Y7vZG6itSNUnrVyJa+NZ5aK/00m9K2djtekZirvNCNbOB4oA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZhKI0DkAsAvx2gmnAyq5fMDUyMXKmNtJ5iq1d326ZZk=;
+ b=i2YMGvEzku7oKhlKYUQF1oIyJXP/V4gq7tgzFP8XiXb6ehvhMcsZn6iLuHHmBPpkOqj6vds/bhjn7LoJwqtbD5NcYm+BW69otnNPHWpPMBvye1rWxxqweCE0l7edxDFg6D5Mj56BkXKnacq6Usw0+9HQrC37UO9zww3mBAap5QJt+EsUMpIWJNLlKuWq6+ylnUoEtqexhCIBv61ps/DYWw1IzjbyieS3aqT7Smg8VD6XmyzBrmywLXyz+CIweqNrbeudfZfhumrhdJ66BmYBaLZHhDDDokf1jXfu55z4ks+xIq/W+WOxRcHCK29yuxT4ylIQAv8W/x3bhUGQK7ZtvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZhKI0DkAsAvx2gmnAyq5fMDUyMXKmNtJ5iq1d326ZZk=;
+ b=CiDr0DQu8/ggEI9J9wa81JH33gaRws1R1RNMGTYABxvpGNVl/bo0KF1x/xMfxEeg8rLfixte0KmkIzz4zwi2PJZ60QIhbbH/pVUTFeOI29UR9wKIdpPgTxaXBlFL1srqFv2uz37P3GsV/QHzfmN/SU+9x9/poq4Bfv1I7V9AJbs=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Mon, 30 Nov
+ 2020 23:32:53 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Mon, 30 Nov 2020
+ 23:32:53 +0000
+From:   Ashish Kalra <Ashish.Kalra@amd.com>
+To:     pbonzini@redhat.com
+Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        rkrcmar@redhat.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        brijesh.singh@amd.com, dovmurik@linux.vnet.ibm.com, tobin@ibm.com,
+        jejb@linux.ibm.com, frankeh@us.ibm.com, dgilbert@redhat.com
+Subject: [PATCH 4/9] mm: x86: Invoke hypercall when page encryption status is changed.
+Date:   Mon, 30 Nov 2020 23:32:44 +0000
+Message-Id: <ce187d20f776e63e27ab286536091041c9d46335.1606633738.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1606633738.git.ashish.kalra@amd.com>
+References: <cover.1606633738.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-30_12:2020-11-30,2020-11-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- clxscore=1015 priorityscore=1501 impostorscore=0 spamscore=0 mlxscore=0
- bulkscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011300146
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN4PR0501CA0052.namprd05.prod.outlook.com
+ (2603:10b6:803:41::29) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN4PR0501CA0052.namprd05.prod.outlook.com (2603:10b6:803:41::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.7 via Frontend Transport; Mon, 30 Nov 2020 23:32:52 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 371de7c6-5420-4b86-688e-08d895884250
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4509DA326F7C9DFF9B1DE1728EF50@SA0PR12MB4509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MGA8oBzux5zbQ8fCa/4fjXFtP2JYnV3S3rsIh5e4FiVG0Tyx/cHQRqfxt1tW3P7XriwkiiiuDTrb1r0vB1enYyY1l5bz/Me0PQLwI/14YMXlBT81cobe2SYrDZhovBWVPYh189uSYmmZ6bBoN+xZoq7yVH6DUG4/C6iQH2laaLBC+teQUH5XkM0L5sLILMsMEhS2hAgrXFukRtAQNkAeDnqZ9FQdCJgJ4ZwU23KxnWOnXqUCQdfOfEDmVFqjpuonix6JzuBJfVl3iP192u9mOrFto4gWqNhtTywgzWdZ4XvqtTB5fKt345BiatC6nBGbJSejk8KjAHG4Ht6wYbzr7w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(26005)(83380400001)(956004)(5660300002)(16526019)(7416002)(4326008)(86362001)(2616005)(186003)(316002)(7696005)(6916009)(2906002)(8936002)(6486002)(52116002)(8676002)(66946007)(478600001)(6666004)(66476007)(66556008)(66574015)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: mP9tnzDK1B4HB8SmYMhW9pSxr6YKVAhb/xvODlJGJYAVCuepWQQpeR0ZeJ5g16/+jW9h/o7Dotxj0mEJQjyNpQPFqjrI80m/xgo0jDTS8kFYcU6VnVwbdwid/DI+IRCgkqRdTDt1hl3xOMecqGJe1j1+fN3naATCPD6L7moO2gW1VKfUaabQMY8A+0SgdlA/KWA/wZpbjZ+OpGMHw+rD9NchgDPdtxEX1wFAG9GDrMceMNsr/zl9Qq5+iFIclhR0IP61OMJigUETP95BA0SpdEay1wTawB0moKjf5jkwfjJFC1vTT87CRM1iYm+wzpl5CrpDJ0juyQ0M3b1W3JwQwjXmRxasRYrdJutw9yOK18aL6cUfKuc0oC7njlSi9FIotVFKQdXWHXVFYqyUajjhR2ezXpCTZ8Vr5/Doi6gVNOm+7eSTc3NSrCC524W6HcWLstytHSJ8diMqZSt0pKI1rPvhcATMzZXult2mJ/qCD5ZyDyOQYFkRoxPab3uhyB9jOGJA5jMSLTy99X++pUylQ8Rk/+Rg19OWAEehrpuHq13WAfCFrveLiAWhlc6qMYKGS4WERFHDMxc18L36kpVDfzPav2k7tRDgNxOw/kkEY9GbX7mN9UaPtPqeBnb1mLkd/qWsCHnrBg6IrG3lkoDWvkrYQxZNopYCSprNszxu7fu6wKUKmNA1I+ltTXFr9dtSkgpJjNizCODFLh1pveFyaMaVb5C1nTWmdFhPVgJ+sm3h90JuZWxZJG/B63xlnbXd
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 371de7c6-5420-4b86-688e-08d895884250
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2020 23:32:53.5330
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZslHagqPvH4bJamFPbRkuoS3XAA4wro253/v/qStuNLUOCYqPCgoSRlzS/O2SXYlkw6Or7InwmYiYcpjrzuiiQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 30 Nov 2020 14:36:10 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-> 
-> 
-> On 11/28/20 8:52 PM, Halil Pasic wrote:
-[..]
-> >> * Unassign adapter from mdev's matrix:
-> >>
-> >>    The domain will be hot unplugged from the KVM guest if it is
-> >>    assigned to the guest's matrix.
-> >>
-> >> * Assign a control domain:
-> >>
-> >>    The control domain will be hot plugged into the KVM guest if it is not
-> >>    assigned to the guest's APCB. The AP architecture ensures a guest will
-> >>    only get access to the control domain if it is in the host's AP
-> >>    configuration, so there is no risk in hot plugging it; however, it will
-> >>    become automatically available to the guest when it is added to the host
-> >>    configuration.
-> >>
-> >> * Unassign a control domain:
-> >>
-> >>    The control domain will be hot unplugged from the KVM guest if it is
-> >>    assigned to the guest's APCB.
-> > This is where things start getting tricky. E.g. do we need to revise
-> > filtering after an unassign? (For example an assign_adapter X didn't
-> > change the shadow, because queue XY was missing, but now we unplug domain
-> > Y. Should the adapter X pop up? I guess it should.)
-> 
-> I suppose that makes sense at the expense of making the code
-> more complex. It is essentially what we had in the prior version
-> which used the same filtering code for assignment as well as
-> host AP configuration changes.
-> 
+Invoke a hypercall when a memory region is changed from encrypted ->
+decrypted and vice versa. Hypervisor needs to know the page encryption
+status during the guest migration.
 
-Will have to think about it some more. Making the user unplug and
-replug an adapter because at some point it got filtered, but there
-is no need to filter it does not feel right. On the other hand, I'm
-afraid I'm complaining in circles. 
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: x86@kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ arch/x86/include/asm/paravirt.h       | 10 +++++
+ arch/x86/include/asm/paravirt_types.h |  2 +
+ arch/x86/kernel/paravirt.c            |  1 +
+ arch/x86/mm/mem_encrypt.c             | 57 ++++++++++++++++++++++++++-
+ arch/x86/mm/pat/set_memory.c          |  7 ++++
+ 5 files changed, 76 insertions(+), 1 deletion(-)
 
-> >
-> >
-> >> Note: Now that hot plug/unplug is implemented, there is the possibility
-> >>        that an assignment/unassignment of an adapter, domain or control
-> >>        domain could be initiated while the guest is starting, so the
-> >>        matrix device lock will be taken for the group notification callback
-> >>        that initializes the guest's APCB when the KVM pointer is made
-> >>        available to the vfio_ap device driver.
-> >>
-> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> >> ---
-> >>   drivers/s390/crypto/vfio_ap_ops.c | 190 +++++++++++++++++++++++++-----
-> >>   1 file changed, 159 insertions(+), 31 deletions(-)
-> >>
-> >> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> >> index 586ec5776693..4f96b7861607 100644
-> >> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> >> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> >> @@ -631,6 +631,60 @@ static void vfio_ap_mdev_manage_qlinks(struct ap_matrix_mdev *matrix_mdev,
-> >>   	}
-> >>   }
-> >>   
-> >> +static bool vfio_ap_assign_apid_to_apcb(struct ap_matrix_mdev *matrix_mdev,
-> >> +					unsigned long apid)
-> >> +{
-> >> +	unsigned long apqi, apqn;
-> >> +	unsigned long *aqm = matrix_mdev->shadow_apcb.aqm;
-> >> +
-> >> +	/*
-> >> +	 * If the APID is already assigned to the guest's shadow APCB, there is
-> >> +	 * no need to assign it.
-> >> +	 */
-> >> +	if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm))
-> >> +		return false;
-> >> +
-> >> +	/*
-> >> +	 * If no domains have yet been assigned to the shadow APCB and one or
-> >> +	 * more domains have been assigned to the matrix mdev, then use
-> >> +	 * the domains assigned to the matrix mdev; otherwise, there is nothing
-> >> +	 * to assign to the shadow APCB.
-> >> +	 */
-> >> +	if (bitmap_empty(matrix_mdev->shadow_apcb.aqm, AP_DOMAINS)) {
-> >> +		if (bitmap_empty(matrix_mdev->matrix.aqm, AP_DOMAINS))
-> >> +			return false;
-> >> +
-> >> +		aqm = matrix_mdev->matrix.aqm;
-> >> +	}
-> >> +
-> >> +	/* Make sure all APQNs are bound to the vfio_ap driver */
-> >> +	for_each_set_bit_inv(apqi, aqm, AP_DOMAINS) {
-> >> +		apqn = AP_MKQID(apid, apqi);
-> >> +
-> >> +		if (vfio_ap_mdev_get_queue(matrix_mdev, apqn) == NULL)
-> >> +			return false;
-> >> +	}
-> >> +
-> >> +	set_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
-> >> +
-> >> +	/*
-> >> +	 * If we verified APQNs using the domains assigned to the matrix mdev,
-> >> +	 * then copy the APQIs of those domains into the guest's APCB
-> >> +	 */
-> >> +	if (bitmap_empty(matrix_mdev->shadow_apcb.aqm, AP_DOMAINS))
-> >> +		bitmap_copy(matrix_mdev->shadow_apcb.aqm,
-> >> +			    matrix_mdev->matrix.aqm, AP_DOMAINS);
-> >> +
-> >> +	return true;
-> >> +}
-> > What is the rationale behind the shadow aqm empty special handling?
-> 
-> The rationale was to avoid taking the VCPUs
-> out of SIE in order to make an update to the guest's APCB
-> unnecessarily. For example, suppose the guest is started
-> without access to any APQNs (i.e., all matrix and shadow_apcb
-> masks are zeros). Now suppose the administrator proceeds to
-> start assigning AP resources to the mdev. Let's say he starts
-> by assigning adapters 1 through 100. The code below will return
-> true indicating the shadow_apcb was updated. Consequently,
-> the calling code will commit the changes to the guest's
-> APCB. The problem there is that in order to update the guest's
-> VCPUs, they will have to be taken out of SIE, yet the guest will
-> not get access to the adapter since no domains have yet been
-> assigned to the APCB. Doing this 100 times - once for each
-> adapter 1-100 - is probably a bad idea.
->
-
-Not yanking the VCPUs out of SIE does make a lot of sense. At least
-I understand your motivation now. I will think some more about this,
-but in the meanwhile, please try to answer one more question (see
-below).
+diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
+index d25cc6830e89..7aeb7c508c53 100644
+--- a/arch/x86/include/asm/paravirt.h
++++ b/arch/x86/include/asm/paravirt.h
+@@ -84,6 +84,12 @@ static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
+ 	PVOP_VCALL1(mmu.exit_mmap, mm);
+ }
  
-> >   I.e.
-> > why not simply:
-> >
-> >
-> > static bool vfio_ap_assign_apid_to_apcb(struct ap_matrix_mdev *matrix_mdev,
-> >                                          unsigned long apid)
-> > {
-> >          unsigned long apqi, apqn;
-> >          unsigned long *aqm = matrix_mdev->shadow_apcb.aqm;
-> >                                                                                  
-> >          /*
-> >           * If the APID is already assigned to the guest's shadow APCB, there is
-> >           * no need to assign it.
-> >           */
-> >          if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm))
-> >                  return false;
-> >                                                                                  
-> >          /* Make sure all APQNs are bound to the vfio_ap driver */
-> >          for_each_set_bit_inv(apqi, aqm, AP_DOMAINS) {
-> >                  apqn = AP_MKQID(apid, apqi);
-> >                                                                                  
-> >                  if (vfio_ap_mdev_get_queue(matrix_mdev, apqn) == NULL)
-> >                          return false;
-> >          }
-> >                                                                                  
-> >          set_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
-> >                                                                                  
-> >          return true;
++static inline void page_encryption_changed(unsigned long vaddr, int npages,
++						bool enc)
++{
++	PVOP_VCALL3(mmu.page_encryption_changed, vaddr, npages, enc);
++}
++
+ #ifdef CONFIG_PARAVIRT_XXL
+ static inline void load_sp0(unsigned long sp0)
+ {
+@@ -840,6 +846,10 @@ static inline void paravirt_arch_dup_mmap(struct mm_struct *oldmm,
+ static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
+ {
+ }
++
++static inline void page_encryption_changed(unsigned long vaddr, int npages, bool enc)
++{
++}
+ #endif
+ #endif /* __ASSEMBLY__ */
+ #endif /* _ASM_X86_PARAVIRT_H */
+diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
+index 0fad9f61c76a..d7787ec4d19f 100644
+--- a/arch/x86/include/asm/paravirt_types.h
++++ b/arch/x86/include/asm/paravirt_types.h
+@@ -209,6 +209,8 @@ struct pv_mmu_ops {
+ 
+ 	/* Hook for intercepting the destruction of an mm_struct. */
+ 	void (*exit_mmap)(struct mm_struct *mm);
++	void (*page_encryption_changed)(unsigned long vaddr, int npages,
++					bool enc);
+ 
+ #ifdef CONFIG_PARAVIRT_XXL
+ 	struct paravirt_callee_save read_cr2;
+diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+index 6c3407ba6ee9..52913356b6fa 100644
+--- a/arch/x86/kernel/paravirt.c
++++ b/arch/x86/kernel/paravirt.c
+@@ -340,6 +340,7 @@ struct paravirt_patch_template pv_ops = {
+ 			(void (*)(struct mmu_gather *, void *))tlb_remove_page,
+ 
+ 	.mmu.exit_mmap		= paravirt_nop,
++	.mmu.page_encryption_changed	= paravirt_nop,
+ 
+ #ifdef CONFIG_PARAVIRT_XXL
+ 	.mmu.read_cr2		= __PV_IS_CALLEE_SAVE(native_read_cr2),
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index bc0833713be9..9d1ac65050d0 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -19,6 +19,7 @@
+ #include <linux/kernel.h>
+ #include <linux/bitops.h>
+ #include <linux/dma-mapping.h>
++#include <linux/kvm_para.h>
+ 
+ #include <asm/tlbflush.h>
+ #include <asm/fixmap.h>
+@@ -29,6 +30,7 @@
+ #include <asm/processor-flags.h>
+ #include <asm/msr.h>
+ #include <asm/cmdline.h>
++#include <asm/kvm_para.h>
+ 
+ #include "mm_internal.h"
+ 
+@@ -198,6 +200,47 @@ void __init sme_early_init(void)
+ 		swiotlb_force = SWIOTLB_FORCE;
+ }
+ 
++static void set_memory_enc_dec_hypercall(unsigned long vaddr, int npages,
++					bool enc)
++{
++	unsigned long sz = npages << PAGE_SHIFT;
++	unsigned long vaddr_end, vaddr_next;
++
++	vaddr_end = vaddr + sz;
++
++	for (; vaddr < vaddr_end; vaddr = vaddr_next) {
++		int psize, pmask, level;
++		unsigned long pfn;
++		pte_t *kpte;
++
++		kpte = lookup_address(vaddr, &level);
++		if (!kpte || pte_none(*kpte))
++			return;
++
++		switch (level) {
++		case PG_LEVEL_4K:
++			pfn = pte_pfn(*kpte);
++			break;
++		case PG_LEVEL_2M:
++			pfn = pmd_pfn(*(pmd_t *)kpte);
++			break;
++		case PG_LEVEL_1G:
++			pfn = pud_pfn(*(pud_t *)kpte);
++			break;
++		default:
++			return;
++		}
++
++		psize = page_level_size(level);
++		pmask = page_level_mask(level);
++
++		kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
++				   pfn << PAGE_SHIFT, psize >> PAGE_SHIFT, enc);
++
++		vaddr_next = (vaddr & pmask) + psize;
++	}
++}
++
+ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
+ {
+ 	pgprot_t old_prot, new_prot;
+@@ -255,12 +298,13 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
+ static int __init early_set_memory_enc_dec(unsigned long vaddr,
+ 					   unsigned long size, bool enc)
+ {
+-	unsigned long vaddr_end, vaddr_next;
++	unsigned long vaddr_end, vaddr_next, start;
+ 	unsigned long psize, pmask;
+ 	int split_page_size_mask;
+ 	int level, ret;
+ 	pte_t *kpte;
+ 
++	start = vaddr;
+ 	vaddr_next = vaddr;
+ 	vaddr_end = vaddr + size;
+ 
+@@ -315,6 +359,8 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
+ 
+ 	ret = 0;
+ 
++	set_memory_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_SHIFT,
++					enc);
+ out:
+ 	__flush_tlb_all();
+ 	return ret;
+@@ -448,6 +494,15 @@ void __init mem_encrypt_init(void)
+ 	if (sev_active())
+ 		static_branch_enable(&sev_enable_key);
+ 
++#ifdef CONFIG_PARAVIRT
++	/*
++	 * With SEV, we need to make a hypercall when page encryption state is
++	 * changed.
++	 */
++	if (sev_active())
++		pv_ops.mmu.page_encryption_changed = set_memory_enc_dec_hypercall;
++#endif
++
+ 	print_mem_encrypt_feature_info();
+ }
+ 
+diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
+index 40baa90e74f4..dcd4557bb7fa 100644
+--- a/arch/x86/mm/pat/set_memory.c
++++ b/arch/x86/mm/pat/set_memory.c
+@@ -27,6 +27,7 @@
+ #include <asm/proto.h>
+ #include <asm/memtype.h>
+ #include <asm/set_memory.h>
++#include <asm/paravirt.h>
+ 
+ #include "../mm_internal.h"
+ 
+@@ -2012,6 +2013,12 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
+ 	 */
+ 	cpa_flush(&cpa, 0);
+ 
++	/* Notify hypervisor that a given memory range is mapped encrypted
++	 * or decrypted. The hypervisor will use this information during the
++	 * VM migration.
++	 */
++	page_encryption_changed(addr, numpages, enc);
++
+ 	return ret;
+ }
+ 
+-- 
+2.17.1
 
-Would
-s/return true/return !bitmap_empty(matrix_mdev->shadow_apcb.aqm,
-AP_DOMAINS)/ 
-do the trick?
-
-I mean if empty, then we would not commit the APCB, so we would
-not take the vCPUs out of SIE -- see below.
-
-> >> +
-> >> +static void vfio_ap_mdev_hot_plug_adapter(struct ap_matrix_mdev *matrix_mdev,
-> >> +					  unsigned long apid)
-> >> +{
-> >> +	if (vfio_ap_assign_apid_to_apcb(matrix_mdev, apid))
-> >> +		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
-> >> +}
-> >> +
-[..]
-
-Regards,
-Halil
