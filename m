@@ -2,96 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B6E62C8DDD
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:20:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 717E12C8E07
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:27:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729850AbgK3TTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 14:19:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36534 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729861AbgK3TTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 14:19:37 -0500
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD29C0613CF
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:18:57 -0800 (PST)
-Received: by mail-pl1-x641.google.com with SMTP id x15so7036365pll.2
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:18:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4dzT1syF4BCGkw3x/x1xoTUO12SPv5cKYnd2t45XWII=;
-        b=fskAyQ3cXlLPpaMf+LHsgdRTzFh8eZ/cXaETrZgoAuHs8JMcZsYSymyGsatwH4OnSZ
-         DK7rYMCjiTHeAd1Ro32ARMahmSQIfIrP1A8hgpfzfiwsxpzMlEYXbYTN+f1n90zL7TBH
-         XAfHX82Qzf+Y4041aYGafKhuDEOcRTysdrV2Nqk1HTJehe0DihM0+xSjVNnksWN8eYCU
-         S7i0aIYwdkQ4XbxxGvYg+8Mq4gSMVAOoZyaZWZsesj3I2y2ApQs2KjdtxaBo9rNB5RhT
-         pSVocA5VmwOCCxIjfXb2QVd9cgGQI6O+sVwTjfdYajKFbksLHAT+L94dn760hyXfowiS
-         /RSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4dzT1syF4BCGkw3x/x1xoTUO12SPv5cKYnd2t45XWII=;
-        b=NUuxfzEWs/6L0HX7kTUIDGOIME4rvadd709PnpqPnWR3vylQymGk7cBGp7xXFeLX1s
-         HPMF5fX22xFI3i7+8Hh9P5onOHDTEjbezF9jIisB9AKtgu53mQa/mtm1ipQ5SWWVmpZv
-         sprR8JMmakvnGoWfuwozELk8EfuaNcG5wPku8mvobyqTAhPovsEnBe2LAd0M+7zoT/82
-         v3Ib5q7zRn36MJEnz1L7cXvzZsMCCIQKjRdy7Z83PbXQfnqW54za5ejPBbbSu7QAJ9dD
-         twYL4lrftpTVj6JZY0THBWPs9oYJgqXLcTEWhoPtWPT5QJ0s6/kCjf6oXhvJlkRe6OYW
-         fC0A==
-X-Gm-Message-State: AOAM533qs1VGjQDS9ggQKJmcevTi2VkN72EJmdRP0Qk2IUoymcacAv7K
-        ia2HFQZWF0XO9SHhsRpCseFIrA==
-X-Google-Smtp-Source: ABdhPJw6qhEQIWhvjA5t2SaocwtPwoCxrqx0IYgcupR2Iyk5+ROiudtRUdbN94Jy6o1ufHjP1MnMKA==
-X-Received: by 2002:a17:90a:902:: with SMTP id n2mr383861pjn.126.1606763936801;
-        Mon, 30 Nov 2020 11:18:56 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id f15sm172345pju.49.2020.11.30.11.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Nov 2020 11:18:56 -0800 (PST)
-Date:   Mon, 30 Nov 2020 19:18:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Andy Lutomirski <luto@kernel.org>, isaku.yamahata@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H . Peter Anvin" <hpa@zytor.com>,
+        id S2388258AbgK3T0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 14:26:18 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:44756 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbgK3T0P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 14:26:15 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AUJFAHh010116;
+        Mon, 30 Nov 2020 19:25:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=k2IvULPGlTPSH2d5C04hBupxMPjNibGgDLwGP6qaVSg=;
+ b=U9WnAmFr6xUeNUib3qlI8r8HeYq+XBE8tnUXq5w8nMtk8MUIDeipfNjM0IDnTHT7iuyd
+ ygeZL7sE5U27BdFU2aLXbg4yZSjfLB8Wuu+fyfxlInYg8bSYjUZkuyoorWHCo7WJ3YIm
+ 1YYRum+JTP8jZF16aGFba9g5Vr58daT0bXgV+lU7R+d6pnGZpYmtuTw6xFZYujZHA5mr
+ yITZZ2Jc/L6oC0NX1G8BWLiEo1UwFb+mszriKMVJlFXDT3ra6eeyeQd9V+uQo27vYMZb
+ gEFeWtgpeGH8Z2tsmbPWUZJRnOiuJoUv5jNHHNqk7iRfqLI0FvV+wqzSnUrEmo5x2pLF NQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 353dyqewmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 30 Nov 2020 19:25:18 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AUJGLrS109167;
+        Mon, 30 Nov 2020 19:25:18 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 35404kybrb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 Nov 2020 19:25:18 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AUJPHFD029341;
+        Mon, 30 Nov 2020 19:25:17 GMT
+Received: from [192.168.1.67] (/94.61.1.144)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 30 Nov 2020 11:25:17 -0800
+Subject: Re: [PATCH RFC 11/39] KVM: x86/xen: evtchn signaling via eventfd
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        isaku.yamahata@gmail.com, Zhang Chen <chen.zhang@intel.com>,
-        Kai Huang <kai.huang@linux.intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [RFC PATCH 03/67] x86/cpu: Move get_builtin_firmware() common
- code (from microcode only)
-Message-ID: <X8VFm5kYnYFTAOMc@google.com>
-References: <cover.1605232743.git.isaku.yamahata@intel.com>
- <46d35ce06d84c55ff02a05610ca3fb6d51ee1a71.1605232743.git.isaku.yamahata@intel.com>
- <20201125220947.GA14656@zn.tnic>
- <20201126001812.GD450871@google.com>
- <20201126101203.GB31565@zn.tnic>
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+ <20190220201609.28290-12-joao.m.martins@oracle.com>
+ <874d1fa922cb56238676b90bbeeba930d0706500.camel@infradead.org>
+ <e83f6438-7256-1dc8-3b13-5498fd5bbed1@oracle.com>
+ <18e854e2a84750c2de2d32384710132b83d84286.camel@infradead.org>
+ <0b9d3901-c10b-effd-6278-6afd1e95b09e@oracle.com>
+ <315ea414c2bf938978f7f2c0598e80fa05b4c07b.camel@infradead.org>
+ <05661003-64f0-a32a-5659-6463d4806ef9@oracle.com>
+ <13bc2ca60ca4e6d74c619e65502889961a08c3ff.camel@infradead.org>
+ <35e45689-8225-7e5d-44ef-23479b563444@oracle.com>
+ <fbeb5b70f4c6b036b71a58d4a2a13c534ed360a1.camel@infradead.org>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <106892fc-83a8-d397-fd96-b5fdeda442d2@oracle.com>
+Date:   Mon, 30 Nov 2020 19:25:12 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201126101203.GB31565@zn.tnic>
+In-Reply-To: <fbeb5b70f4c6b036b71a58d4a2a13c534ed360a1.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9821 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 bulkscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=999 phishscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011300124
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9821 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ clxscore=1015 mlxscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011300124
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 26, 2020, Borislav Petkov wrote:
-> On Thu, Nov 26, 2020 at 12:18:12AM +0000, Sean Christopherson wrote:
-> > The SEAM module needs to be loaded during early boot, it can't be
-> > deferred to a module, at least not without a lot more blood, sweat,
-> > and tears.
+
+
+On 11/30/20 7:04 PM, David Woodhouse wrote:
+> On Mon, 2020-11-30 at 18:41 +0000, Joao Martins wrote:
+>> int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>> {
+>> ...
+>>         if (kvm_hv_hypercall_enabled(vcpu->kvm))
+>>                 return kvm_hv_hypercall(...);
+>>
+>>         if (kvm_xen_hypercall_enabled(vcpu->kvm))
+>>                 return kvm_xen_hypercall(...);
+>> ...
+>> }
+>>
+>> And on kvm_xen_hypercall() for the cases VMM offloads to demarshal what the registers mean
+>> e.g. for event channel send 64-bit guest: RAX for opcode and RDI/RSI for cmd and port.
 > 
-> Are you also planning to support builtin seam or only thru initrd loading?
+> Right, although it's a little more abstract than that: "RDI/RSI for
+> arg#0, arg#1 respectively".
+> 
+> And those are RDI/RSI for 64-bit Xen, EBX/ECX for 32-bit Xen, and
+> RBX/RDI for Hyper-V. (And Hyper-V seems to use only the two, while Xen
+> theoretically has up to 6).
+> 
+Indeed, almost reminds my other patch for xen hypercalls -- it was handling 32-bit and
+64-bit that way:
 
-Yep, both built-in and initrd are supported.
+https://lore.kernel.org/kvm/20190220201609.28290-3-joao.m.martins@oracle.com/
 
-> In any case, this commit message needs to state intentions not me having
-> to plow all the way up to patch 62.
+>> The kernel logic wouldn't be much different at the core, so thought of tihs consolidation.
+>> But the added complexity would have come from having to deal with two userspace exit types
+>> -- indeed probably not worth the trouble as you pointed out.
+> 
+> Yeah, I think I'm just going to move the 'kvm_userspace_hypercall()'
+> from my patch to be 'kvm_xen_hypercall()' in a new xen.c but still
+> using KVM_EXIT_HYPERCALL. Then I can rebase your other patches on top
+> of that, with the evtchn bypass.
+> 
+Yeap, makes sense.
 
-Yeah, most of the changelogs are in terrible shape.  This first RFC was intended
-to get feedback on high level things like code organization and the KVM
-shenanigans for VMX and TDX coexistence.
+	Joao
