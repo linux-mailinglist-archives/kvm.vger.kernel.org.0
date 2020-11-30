@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0B6D2C9291
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 00:32:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB2DA2C9299
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 00:34:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387791AbgK3Xb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 18:31:57 -0500
-Received: from mail-bn8nam11on2043.outbound.protection.outlook.com ([40.107.236.43]:57696
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S2388587AbgK3Xc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 18:32:56 -0500
+Received: from mail-bn7nam10on2065.outbound.protection.outlook.com ([40.107.92.65]:9217
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725933AbgK3Xb4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 18:31:56 -0500
+        id S2387524AbgK3Xcz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 18:32:55 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cWkyfufRgKy85e16iQR6BDNP1thiMcF8uUOaEfhNzPBQb8M1V/tj+VPGmIrULB1LF+FfiNxnr7m+IIHPTvLm4LkKuTPRB8PN6rLss9BNLdrQrNkuQDD3Affmq9zbbqVmONlaV3dDTf8oHogZnzSHvVxlE+OY88HpjnmP0u17HWxjVFlIVQSzjzjMb3VKyf1bX0sW1kmg/VZQIQyztmi3t3TKQrYJA/EqCzsQvQPQ9IeP7QU7tZzHAId9dJizLO65Tt85oHLdfRn0cjBATsPTbjLybC3L7Ddz8zj4pH+1fkDx0tD6tR/Z+h28g+gwFHXbMpVwAxniDh6eWdRyKevIYQ==
+ b=PDxWx+SJrJX7YswGRR98ciqIuSGN/z4KyHT0OWNYxZaXiivgYxoEDqdPk1DtGo2uSesb8/tOiocYjLakqkSROr+Duis6bYFam+2vysLnh7sJB6tAaMtZAHaCRl+CLiAqEsnyKFkGOJG6NOldXBRRHaLVpJVJBVWuQtI8IYVf8UbVO5WOQmz7SGLb5aWaWDl2yMmD9XG1VHhgw/hyaFb29fIVdUteX1kUJSM9XIO2P4sef9Odpc3wZC8OYwidHYJh/P87FwVDVyGi3VaoYQun8iCdzp2XrbQTw6aXYkBj2xHSsUX7ICBei7Ca0bHsv6pR8bop1TXfnzUDLfwFlMqnmg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GPs10stIlZDQFkdrdo7I/cuF4hbgyuOhSYX1t/LOwxE=;
- b=jF37PxbTrUVkQhF3d2eWeFct7g8MKlbC7lBw4dk1hAAzdIDxu98RcA0MU1oL77l3OTDC7WdDrJigmOdncCVrA/Um2cYzq6nxFmPajucvru7p2f8s6jHo6w86yBbV5wwLS3fideOv9JEf4lgiT7/3SfetnNVz1y/DG45MrnLVQ/wSxctqSjYVXUXpNA++Kz56OxLFxrHfHm/dUfzbzoo9RJtjqyYabBXu/fiEv4dkjF6x1G61Nynr0GrO1UmjMlPTb8jSTAht9dTrCFCfgZe7oXMcW1a5PhSgNhvWtM1dpFF7gq9g9/Ip0rXUrR+xoesLk6FM8KEyk5yBWH3dD2VmNA==
+ bh=djYOIZIAe+UUpzeBZtr/RMxOzG5cL+NruPXwZsscQuI=;
+ b=g4fBt5DbqnLX9IRc4HWjt8v7NpWRE8wxBJz866zqOIGJ/iaNRG/TWoXNd+iQ5BtZGryyk6gvHzJhFN2Ykw19lfEDkoQ09KtDkr2RvpH9mVbVo05eylROfn54OzERMsARdysw8q3kIWl02hYve5zTIqQCXbwWQboPkCBJGx5ZQfy40FBEl8nonCkTsdgJpN+KhrJfi+1YPiuV7OQKiuqiU2Ztwg62Sq0xA9S83EdBRvNERxF87QTOfZizVL4wrxTrPXTKX+M6qT7Lvrd+nHuD9JO0YDvXCkIBWAEoOurLVIq5KZpX6icxBhyZdGuXNGS5WrxeFGKdzN7F2aHyVxqeSw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GPs10stIlZDQFkdrdo7I/cuF4hbgyuOhSYX1t/LOwxE=;
- b=UUcRMSruS6IsSTseeWHA5YBMZEet14AK+XZzoyInAhndIC/GtfP1Uuxr5NA/Vu7W5S8Me6DJ2jBHTYVKIgcx7MdhgnLL+1tQSCEDqNx9SdU8f/eOJeqPFFs31u8r2u4ldjb/gC5aq3kjxNXlp7GAIu0tHexOAFtGQ3otj1kAUp0=
+ bh=djYOIZIAe+UUpzeBZtr/RMxOzG5cL+NruPXwZsscQuI=;
+ b=UtQBwLjXckQQAd2MmOeaLPkhKGP1uhEDEkiXJt0foJenL85tH58fliENWlXe96RrWv/7IPtd8m+Epc4xOkh7A7pukYMyD+y2jjnsK2gEYySzKMrt2yBHObkOJgyJHuGKYPZINElZf8l/RGjhL6U3qxFyUK2EyISQ64ZzbyJ70B4=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
  by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Mon, 30 Nov
- 2020 23:31:00 +0000
+ 2020 23:32:01 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Mon, 30 Nov 2020
- 23:31:00 +0000
+ 23:32:01 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -46,106 +46,103 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         linux-kernel@vger.kernel.org, srutherford@google.com,
         brijesh.singh@amd.com, dovmurik@linux.vnet.ibm.com, tobin@ibm.com,
         jejb@linux.ibm.com, frankeh@us.ibm.com, dgilbert@redhat.com
-Subject: [PATCH 0/9] Add AMD SEV page encryption bitmap support.
-Date:   Mon, 30 Nov 2020 23:30:50 +0000
-Message-Id: <cover.1606633738.git.ashish.kalra@amd.com>
+Subject: [PATCH 1/9] KVM: x86: Add AMD SEV specific Hypercall3
+Date:   Mon, 30 Nov 2020 23:31:51 +0000
+Message-Id: <07e95f9e92673dc6373e7664f24db6c82ea596c9.1606633738.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1606633738.git.ashish.kalra@amd.com>
+References: <cover.1606633738.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA9PR13CA0188.namprd13.prod.outlook.com
- (2603:10b6:806:26::13) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA9PR13CA0115.namprd13.prod.outlook.com
+ (2603:10b6:806:24::30) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA9PR13CA0188.namprd13.prod.outlook.com (2603:10b6:806:26::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.9 via Frontend Transport; Mon, 30 Nov 2020 23:30:59 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA9PR13CA0115.namprd13.prod.outlook.com (2603:10b6:806:24::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.6 via Frontend Transport; Mon, 30 Nov 2020 23:32:01 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: d23fd190-8b85-413f-5716-08d89587fec2
+X-MS-Office365-Filtering-Correlation-Id: f3f9c834-53f8-44f2-0ecb-08d895882379
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4509865E460EF15EB35AA2038EF50@SA0PR12MB4509.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4509068A5218F55B59FE75378EF50@SA0PR12MB4509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SmIaleHRq16X80Rd8tDeN64/TQXhHogN0c03Alw9orD5ug4g23AKdOpqerroabGclpc8//DxrXjhr3/YuHHvtf5dCJWkQn0NdTr2aIFBNWEFGbUOHWfnlcX4bnLfKxEPKpY69B7RAWhkV6dBYMaxpl1bB2hn1qkxUXsJhB0pNSmlswO8rDbEys52ADRMNW2boUNEuwfGifnRFWF+5tOLiB1eyTQGf4jib0QRBNkEhVTbuCdEP0RXVt+cHaFiHSWq+ftG+B8AZ4+QaQ86JV3jY8qGwu71zehEU9pcj8n9SS0i4ooEx9KXwXlMFJfefFhbO3F5KlGA6ghOshQ4ou+toGjgnRqPZKFSLUaVY3jMANAh+6wcNnDSdDfseYRt5sZZizMOgPQmQepqy4duOjKWpw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(26005)(83380400001)(956004)(5660300002)(16526019)(7416002)(4326008)(86362001)(2616005)(186003)(316002)(966005)(7696005)(6916009)(2906002)(8936002)(6486002)(52116002)(8676002)(66946007)(478600001)(6666004)(66476007)(66556008)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: ic9Dy2lxaktl5cUl+BAkm4N9Uyu7r/1Y8sutVc7TaCEu7brTl5JO7tm7ZSLNkjOwcsgE+BAW4MpXFhaLJo8duuxuvRZyP5f76xfutIriCY2v3ePc8wo+IWTXXvIxO0aO9oyFqhEBbKa/OAbu462fnEaUp1J+crQK/YXFn6r6exrFeGMadifx03PdgIvBRcPdkCtlFCJ1QpwAUvV3P2d78cOuGQExVc0jIBKQ9fgCXJlkVi7x+tfSuUovJvDLsq2VnJGRraW1k8A01q56JCeZQJCEBuDVVAiPaGijlzVI8kZBlvg51LxTRB/AsiK6I13Y7Wgz+GNht9fapflOigiTxU1aCKJewcu4PVu8L/MyEUaS4fENNOoY/4k6E4ikSDDa0V75Yr9+RaSOntUf3rqc5+tRvBg6zShB8HBSlfzhbUoHFFXzlaxpyKiKzJEbNTuV8pjLOUxMhgLQzE4w7DUyjcDNtiglU384DVl7dlqQUHQcqS7Zd0H4U4ILT/S5lAKuNfWAaofzwa9nO6ieh0acBnfH7oZ6kRTTqjN2+QlDNrrnmaeiNK2+TDD/V0n3klJhXCVzIOQg/gpp9sCxF9oSUQ93DNHQdn826ADP5QolF93RxAYjWBechEQitdUSADPzwMYtPwElFTLyKT3mlWC3faKyxEBYDskHx9A3mRdEs54/2KCcQ46eDN+JyA6SFqkJ0h9Kqibeg3NGhAZL6RNT6AJts0HZaQY0I9VB86LL3iCCF47DvslYfKwmSAPjpRtH
+X-Microsoft-Antispam-Message-Info: xbfZkGFZAa/KC1a3OoqPtuRscmOGfzbuLm8ryCFc+GgOc1hY04Gt7vzolNgqaDY1C5ONcBJt6V7plEGV1tkzz8te04+fAFkLn9j78NLXnoaff0brI0YNAvPbkQVbeTPsAN18g+70opabBGk7qi1EuIFODGUPCIcZLOagTT8hVXZ+EkFWQU+/85LDjV9Oogq7TbMsFpLnWaR1sX8hRCSo46C0My/MGMgTKoFvOd/eTUcTIBCei/YYgAnEqpTttKRprh4bkGVKUFLpqPNf3e7mbmPnJj0nP89K4jgtPzbaTxAF902SspECY8xR2j8T3WPSUB/KC/e6i8evW56WQsVdxA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(26005)(956004)(5660300002)(16526019)(7416002)(4326008)(86362001)(2616005)(186003)(316002)(7696005)(6916009)(2906002)(8936002)(6486002)(52116002)(8676002)(66946007)(478600001)(6666004)(66476007)(66556008)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 4ohkbZHLXIkdiksEUkQmKv2eJQXc+l+dgsY2mYpRqIe2CkXiazVUIQsKLzNO96LLhM+gNZAsqbe8Met4molsrNTVMxbAqtywYpgWOQ7xCqjHN4bxi+BfqoplarA5jUIcFD6xlnqfV8BMMLVE9E6DVJ+OchHxUnn3WC0di8wnibH1aGC2uDeZEbP19NObXrpPBu86g0ZHar0jIRu5JJyanwMhmQRr1qxFkjXCL+11eq1k+E5E1aRax8VqVmylOruAkGmS++uJNI8Y7R1rlTnFzxmHLCDGAZmID+LIH80iQmP1mFFRGecxrL5+mv/LITeYlvA11BIXWDak+6Rd764oBGK+YIfdkNs7QQ8Et/RPznDKOAYjCTBxptephowJ1b92OsxHbE6QgvY3uR47nVcv6pR6rr4QhHHQ7ToBHAFz3/MUIfr5w/WW67YfDmdQTo4GX4ihk8j2qlMowYHC0hJLzfIJy3j3adr6vHGBtiVW+2RzSuDYi+4Xt5eUXT8imXqSp/HJoEDUpJWOqIYypU5jng8x68KQO0c0PKdTzNM33aByLoHvRz+7lvwR1pggQ7T7izK6Vguyreriv/NLLOGvCnBVZsqsAzqH+Qk4WePsYNQDRumcTKUhhAuHQL0kvw2fsATSPvjABeBbccIbVw9hvnpNivKqq+A2d+fsbSb/X+QkXazAVfmO5aTSi4sHLeWp3/eayKNu40f88xS9bhNgKXrJ8LHKqd7lLBMOZEPV+CBCKfKmqjaqWhLFo6uX1ysZ
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d23fd190-8b85-413f-5716-08d89587fec2
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3f9c834-53f8-44f2-0ecb-08d895882379
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2020 23:31:00.2376
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2020 23:32:01.7841
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o7j3TcUnr0rqmnPewEXIw0V17isJIWj9kxY/5AseSnkMcZtFGU6yOfYakVtY0JS0sV2NId4GglnCsi3rq7T6Cw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: QAqT6RRRSHJqTM4qFSxaVensdU7yRYmmZLCc9RTCsaigSbo3kymkh2J76MiHOIaf2iqfWojx3AEYJSH0HUa/kw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-The series add support for AMD SEV page encryption bitmap.
+KVM hypercall framework relies on alternative framework to patch the
+VMCALL -> VMMCALL on AMD platform. If a hypercall is made before
+apply_alternative() is called then it defaults to VMCALL. The approach
+works fine on non SEV guest. A VMCALL would causes #UD, and hypervisor
+will be able to decode the instruction and do the right things. But
+when SEV is active, guest memory is encrypted with guest key and
+hypervisor will not be able to decode the instruction bytes.
 
-SEV guest VMs have the concept of private and shared memory. Private memory
-is encrypted with the guest-specific key, while shared memory may be encrypted
-with hypervisor key. The patch series introduces a new hypercall.
-The guest OS can use this hypercall to notify the page encryption status.
+Add SEV specific hypercall3, it unconditionally uses VMMCALL. The hypercall
+will be used by the SEV guest to notify encrypted pages to the hypervisor.
 
-The patch adds new ioctls KVM_{SET,GET}_PAGE_ENC_BITMAP. The ioctl can be used
-by qemu to get the page encryption bitmap. Qemu can consult this bitmap
-during guest live migration / page migration and/or guest debugging to know
-whether the page is encrypted.
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: x86@kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Reviewed-by: Steve Rutherford <srutherford@google.com>
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ arch/x86/include/asm/kvm_para.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-The page encryption bitmap support is required for SEV guest live migration,
-guest page migration and guest debugging.
-
-The patch-set also adds support for bypassing unencrypted guest memory
-regions for DBG_DECRYPT API calls, guest memory region encryption status
-in sev_dbg_decrypt() is now referenced using the page encryption bitmap.
-
-A branch containing these patches is available here:
-https://github.com/AMDESE/linux/tree/sev-page-encryption-bitmap-v1
-
-Ashish Kalra (4):
-  KVM: SVM: Add support for static allocation of unified Page Encryption
-    Bitmap.
-  KVM: x86: Mark _bss_decrypted section variables as decrypted in page
-    encryption bitmap.
-  KVM: x86: Add kexec support for SEV page encryption bitmap.
-  KVM: SVM: Bypass DBG_DECRYPT API calls for unecrypted guest memory.
-
-Brijesh Singh (5):
-  KVM: x86: Add AMD SEV specific Hypercall3
-  KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
-  KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
-  mm: x86: Invoke hypercall when page encryption status is changed.
-  KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP ioctl
-
- Documentation/virt/kvm/api.rst        |  71 ++++++
- Documentation/virt/kvm/hypercalls.rst |  15 ++
- arch/x86/include/asm/kvm_host.h       |   7 +
- arch/x86/include/asm/kvm_para.h       |  12 +
- arch/x86/include/asm/mem_encrypt.h    |   4 +
- arch/x86/include/asm/paravirt.h       |  10 +
- arch/x86/include/asm/paravirt_types.h |   2 +
- arch/x86/kernel/kvm.c                 |  28 +++
- arch/x86/kernel/kvmclock.c            |  12 +
- arch/x86/kernel/paravirt.c            |   1 +
- arch/x86/kvm/svm/sev.c                | 319 ++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c                |   5 +
- arch/x86/kvm/svm/svm.h                |   7 +
- arch/x86/kvm/vmx/vmx.c                |   1 +
- arch/x86/kvm/x86.c                    |  35 +++
- arch/x86/mm/mem_encrypt.c             |  63 ++++-
- arch/x86/mm/pat/set_memory.c          |   7 +
- include/uapi/linux/kvm.h              |  13 ++
- include/uapi/linux/kvm_para.h         |   1 +
- 19 files changed, 612 insertions(+), 1 deletion(-)
-
+diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
+index 338119852512..bc1b11d057fc 100644
+--- a/arch/x86/include/asm/kvm_para.h
++++ b/arch/x86/include/asm/kvm_para.h
+@@ -85,6 +85,18 @@ static inline long kvm_hypercall4(unsigned int nr, unsigned long p1,
+ 	return ret;
+ }
+ 
++static inline long kvm_sev_hypercall3(unsigned int nr, unsigned long p1,
++				      unsigned long p2, unsigned long p3)
++{
++	long ret;
++
++	asm volatile("vmmcall"
++		     : "=a"(ret)
++		     : "a"(nr), "b"(p1), "c"(p2), "d"(p3)
++		     : "memory");
++	return ret;
++}
++
+ #ifdef CONFIG_KVM_GUEST
+ bool kvm_para_available(void);
+ unsigned int kvm_arch_para_features(void);
 -- 
 2.17.1
 
