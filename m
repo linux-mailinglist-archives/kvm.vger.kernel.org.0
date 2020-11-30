@@ -2,203 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BDB82C8DAA
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:06:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 212DB2C8DCC
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:16:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729595AbgK3TEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 14:04:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34234 "EHLO
+        id S2388210AbgK3TPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 14:15:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726026AbgK3TEv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 14:04:51 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E675CC0613D2;
-        Mon, 30 Nov 2020 11:04:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=P3CYDVn654x2YTNUBGuevoqknIl9NjHtQ853LnCqK9Y=; b=ahYgUQQ4Hw2fGDA5oPVeTibH5F
-        NBy9JzOF/WlLQlaeWywFPFzwNG/0oGhXN9tEb02OdhNaCxWPrx6or9o17CfEO7Z8Nlv+y5aIhSytp
-        39lP6yWzZ7otuZFuLobrDhAP1IFme+LKQZ+FcQmrpc3OHObvCgG11ioQF78AC0pGRbZwW3gMP1bmG
-        Q84M83Uzxqk+/jRKcM+ggRFl9fDauadwxPZrftoc+ri/DfhiWoFKKHaGTU4Ud0ieuOHocAUS9on5z
-        4c5R9HgM2MeMHzvE3YkrLSWyl9HSrrMgrHCJgMGyzSOnGZ3pM1oHkkVvQhUM1Ax5lBuPRumnrybbN
-        dm9BB1Yw==;
-Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=freeip.amazon.com)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kjoSw-00007i-I6; Mon, 30 Nov 2020 19:04:02 +0000
-Message-ID: <fbeb5b70f4c6b036b71a58d4a2a13c534ed360a1.camel@infradead.org>
-Subject: Re: [PATCH RFC 11/39] KVM: x86/xen: evtchn signaling via eventfd
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 30 Nov 2020 19:04:00 +0000
-In-Reply-To: <35e45689-8225-7e5d-44ef-23479b563444@oracle.com>
-References: <20190220201609.28290-1-joao.m.martins@oracle.com>
-         <20190220201609.28290-12-joao.m.martins@oracle.com>
-         <874d1fa922cb56238676b90bbeeba930d0706500.camel@infradead.org>
-         <e83f6438-7256-1dc8-3b13-5498fd5bbed1@oracle.com>
-         <18e854e2a84750c2de2d32384710132b83d84286.camel@infradead.org>
-         <0b9d3901-c10b-effd-6278-6afd1e95b09e@oracle.com>
-         <315ea414c2bf938978f7f2c0598e80fa05b4c07b.camel@infradead.org>
-         <05661003-64f0-a32a-5659-6463d4806ef9@oracle.com>
-         <13bc2ca60ca4e6d74c619e65502889961a08c3ff.camel@infradead.org>
-         <35e45689-8225-7e5d-44ef-23479b563444@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-wadkMPJbnbaLM7X4kv7T"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        with ESMTP id S1729309AbgK3TPp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 14:15:45 -0500
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00282C0613D4
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:15:04 -0800 (PST)
+Received: by mail-pf1-x442.google.com with SMTP id s21so11020116pfu.13
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:15:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=K6XZp2sQ8VNUzbAOEM0HgRmGllfj9pHRSlo82ijk8y4=;
+        b=tPMLC2WL6lx9xX1w+XddThEet+mfR4/8ih2NGfz2XUCaq3ZEsvjZGs9cqnnj4vPZJk
+         km6Q4WZP5OYH/cQmoOM93WrtBVZlzf7Q3rMROmJC6ky/X798lvIexeO2DLWE/jWBcult
+         v0+YRKe5l63/RPYBXUgP5HLmZFA0ltd2rOai/DDiNn9No+3dcQWKdHeEasAqy2KLReP2
+         IpcqrFle41ZbUMnWYIuRSY7/ZQhkFicFeeLE6qR4Yx41jBzJU6X1KG6DeI30rsrcCbIU
+         ChHYE5In6d7g97CLg1cm4CgcWq2Y+htSY0xPq+E90pNdGQ4ETL8+wvu6lPp8Ct+fAqXG
+         wN/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=K6XZp2sQ8VNUzbAOEM0HgRmGllfj9pHRSlo82ijk8y4=;
+        b=XjcgjDx7nHLYcbyHPr2RzhSztDzjmgWQCicdF/gW9xDQjHviCT6C+7AhoLC6iooChP
+         iPhzIpDg/lnVCMbpNvUcYQ5fiRbaM25FfGgB7zFRNoj2OMorl3NtPo7UpM4LwRPI7wBn
+         wi/6q53NMDuG3/0eIl6SPxtUZT9Esr0cNtBCC3qOczUOYIsBRb9+JAadT0/m8UarG7CI
+         TwymyzMqv5cMFgdfBB9jO9UjQX4uC1offZmfAcnUV6KJTYIHGETNVz2L+lQljr31oz3W
+         FaprvpV9xsq8DPmrgd0+6c5luznfThZGNU3/vs/1ulZx0CrUjdcw4HThD825vbIDs6TC
+         To6w==
+X-Gm-Message-State: AOAM531OR7tLKXHYvyXnl6LqVL4lYDITYHp0OBdFzQHSC/9ypcMI3BFr
+        B4IXhTG49yWddvStWhS1XsWL4g==
+X-Google-Smtp-Source: ABdhPJxNrazF7z34bVRnYrVzop7VItyISAImK7DNZPMz2Av+UnTe9nuECwHuBvUTpbYspP42yKqQYw==
+X-Received: by 2002:aa7:96ba:0:b029:197:e733:ae3c with SMTP id g26-20020aa796ba0000b0290197e733ae3cmr20132504pfk.46.1606763704331;
+        Mon, 30 Nov 2020 11:15:04 -0800 (PST)
+Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
+        by smtp.gmail.com with ESMTPSA id j10sm17415989pgc.85.2020.11.30.11.15.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Nov 2020 11:15:03 -0800 (PST)
+Date:   Mon, 30 Nov 2020 19:14:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>, liam.merwick@oracle.com,
+        wanpeng.li@hotmail.com
+Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
+ posted-interrupt pending
+Message-ID: <X8VEsw4ENJ3MH+3o@google.com>
+References: <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
+ <CAOQ_QshMoc9W9g6XRuGM4hCtMdvUxSDpGAhp3vNxhxhWTK-5CQ@mail.gmail.com>
+ <20201124015515.GA75780@google.com>
+ <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
+ <20201124212215.GA246319@google.com>
+ <d5f4153b-975d-e61d-79e8-ed86df346953@redhat.com>
+ <20201125011416.GA282994@google.com>
+ <13e802d5-858c-df0a-d93f-ffebb444eca1@redhat.com>
+ <20201125183236.GB400789@google.com>
+ <89fe1772-36c7-7338-69aa-25d84a9febe8@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89fe1772-36c7-7338-69aa-25d84a9febe8@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Nov 26, 2020, Paolo Bonzini wrote:
+> On 25/11/20 19:32, Sean Christopherson wrote:
+> > I'm pretty sure the exiting vCPU needs to wait
+> > for all senders to finish their sequence, otherwise pi_pending could be left
+> > set, but spinning on pi_pending is wrong.
+> 
+> What if you set it before?
 
---=-wadkMPJbnbaLM7X4kv7T
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+That doesn't help.  nested.pi_pending will be left set, with a valid vIRQ in the
+PID, after vmx_vcpu_run() if kvm_vcpu_trigger_posted_interrupt() succeeds but
+the PINV is delivered in the host.
 
-On Mon, 2020-11-30 at 18:41 +0000, Joao Martins wrote:
-> int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+Side topic, for the "wait" sequence to work, vmx_vcpu_run() would need to do
+kvm_vcpu_exiting_guest_mode() prior to waiting for senders to completely their
+sequence.
+
+> 
+> static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+> 						int vector)
 > {
-> ...
->         if (kvm_hv_hypercall_enabled(vcpu->kvm))
->                 return kvm_hv_hypercall(...);
->=20
->         if (kvm_xen_hypercall_enabled(vcpu->kvm))
->                 return kvm_xen_hypercall(...);
-> ...
+> 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> 
+> 	if (is_guest_mode(vcpu) &&
+> 	    vector == vmx->nested.posted_intr_nv) {
+> 		/*
+> 		 * Set pi_pending after ON.
+> 		 */
+> 		smp_store_release(&vmx->nested.pi_pending, true);
+> 		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, true)) {
+> 			/*
+> 			 * The guest was not running, let's try again
+> 			 * on the next vmentry.
+> 			 */
+> 			<set PINV in L1 vIRR>
+> 			kvm_make_request(KVM_REQ_EVENT, vcpu);
+> 			kvm_vcpu_kick(vcpu);
+> 			vmx->nested.pi_pending = false;
+> 		}
+> 		write_seqcount_end(&vmx->nested.pi_pending_sc);
+> 		return 0;
+> 	}
+> 	return -1;
 > }
->=20
-> And on kvm_xen_hypercall() for the cases VMM offloads to demarshal what t=
-he registers mean
-> e.g. for event channel send 64-bit guest: RAX for opcode and RDI/RSI for =
-cmd and port.
+> 
+> On top of this:
+> 
+> - kvm_x86_ops.hwapic_irr_update can be deleted.  It is already done
+> unconditionally by vmx_sync_pir_to_irr before every vmentry.  This gives
+> more freedom in changing vmx_sync_pir_to_irr and vmx_hwapic_irr_update.
 
-Right, although it's a little more abstract than that: "RDI/RSI for
-arg#0, arg#1 respectively".
+And would lower the barrier of entry for understanding this code :-)
 
-And those are RDI/RSI for 64-bit Xen, EBX/ECX for 32-bit Xen, and
-RBX/RDI for Hyper-V. (And Hyper-V seems to use only the two, while Xen
-theoretically has up to 6).
+> - VCPU entry must check if max_irr == vmx->nested.posted_intr_nv, and if so
+> send a POSTED_INTR_NESTED_VECTOR self-IPI.
 
-> The kernel logic wouldn't be much different at the core, so thought of ti=
-hs consolidation.
-> But the added complexity would have come from having to deal with two use=
-rspace exit types
-> -- indeed probably not worth the trouble as you pointed out.
+Hmm, there's also this snippet in vmx_sync_pir_to_irr() that needs to be dealt
+with.  If the new max_irr in this case is the nested PI vector, KVM will bail
+from the run loop instead of continuing on. 
 
-Yeah, I think I'm just going to move the 'kvm_userspace_hypercall()'
-from my patch to be 'kvm_xen_hypercall()' in a new xen.c but still
-using KVM_EXIT_HYPERCALL. Then I can rebase your other patches on top
-of that, with the evtchn bypass.
+	/*
+	 * If we are running L2 and L1 has a new pending interrupt
+	 * which can be injected, we should re-evaluate
+	 * what should be done with this new L1 interrupt.
+	 * If L1 intercepts external-interrupts, we should
+	 * exit from L2 to L1. Otherwise, interrupt should be
+	 * delivered directly to L2.
+	 */
+	if (is_guest_mode(vcpu) && max_irr_updated) {
+		if (nested_exit_on_intr(vcpu))
+			kvm_vcpu_exiting_guest_mode(vcpu);
+		else
+			kvm_make_request(KVM_REQ_EVENT, vcpu);
+	}
 
+> Combining both (and considering that AMD doesn't do anything interesting in
+> vmx_sync_pir_to_irr), I would move the whole call to vmx_sync_pir_to_irr
+> from x86.c to vmx/vmx.c, so that we know that vmx_hwapic_irr_update is
+> called with interrupts disabled and right before vmentry:
+> 
+>  static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+>  {
+> 	...
+> -	vmx_hwapic_irr_update(vcpu, max_irr);
+>         return max_irr;
+>  }
+> 
+> -static void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr)
+> +static void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu)
 
---=-wadkMPJbnbaLM7X4kv7T
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+I would also vote to rename this helper; not sure what to call it, but for me
+the current name doesn't help understand its purpose.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MTMwMTkwNDAwWjAvBgkqhkiG9w0BCQQxIgQgyqbNi291RxbuvAlb6zDlNiWQEiHLV++r86w6LFZr
-I8Ewgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAENRIH/C21DiV1jWjMe+cqT8mGo8GkPvC2qzyWqinO9HG1QUZRypxrE2oQRCVBXA
-3/iUJo69HYN1J8fCG02EUMv9+Evy1H3DdC84rAWF162o6UE+tK9WLU3dtTlG4FuNq0sWAyaH85KQ
-yirJtSqoJFdQl3x+wlrppufUpyRw1NeGMHdkrn7Jk3+37bThFQF4jA4/IcroWCwIHsVzZIwX1HAx
-tyfEWaZJwAtDdKKvykLFsGDiNb5tSGE2BvWoMOhEro6Viq6BRYyim5LFjXlOTmqz6lguLN/2owCu
-gmcL9oaKPohEiksan+lcoSsBoJ+Acbf4ez/T0IN/49csCbdSqDwAAAAAAAA=
+>  {
+> +	int max_irr;
+> +
+> +	WARN_ON(!irqs_disabled());
+> +	max_irr = vmx_sync_pir_to_irr(vcpu);
+>         if (!is_guest_mode(vcpu))
+>                 vmx_set_rvi(max_irr);
+> +	else if (max_irr == vmx->nested.posted_intr_nv) {
+> +		...
+> +	}
+>  }
+> 
+> and in vmx_vcpu_run:
+> 
+> +	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
+> +		vmx_hwapic_irr_update(vcpu);
 
+And also drop the direct call to vmx_sync_pir_to_irr() in the fastpath exit.
 
---=-wadkMPJbnbaLM7X4kv7T--
+> If you agree, feel free to send this (without the else of course) as a
+> separate cleanup patch immediately.
 
+Without what "else"?
