@@ -2,87 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 092182C8824
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 16:36:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CE912C886B
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 16:42:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727828AbgK3PgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 10:36:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55402 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727521AbgK3PgQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 10:36:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606750490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ekTEnzj+QPMF2L41+Oi7EL2a0qpEfLvgxnNu0apYUMY=;
-        b=Or0pez3hu0k9jqLcCZKDocdWJZgZNEmtywZXT4LBuzTOLdbeqeijyWF+5KF0b/r2dmBmct
-        oZQhH7QbP8HRi9J1hwjmziIerGJWxCeIgSzLRo7L7KJLrX4VobnuqxvUS/L9qJ5F2aRfyD
-        rzlhVUDOR8Tn5RouPnqMs1Ypyn7pGXs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-524-6_bFztZQNfe2O2gkQtqjNQ-1; Mon, 30 Nov 2020 10:34:48 -0500
-X-MC-Unique: 6_bFztZQNfe2O2gkQtqjNQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727648AbgK3Pk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 10:40:59 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44854 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726483AbgK3Pk7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 10:40:59 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C08081084D7E;
-        Mon, 30 Nov 2020 15:34:34 +0000 (UTC)
-Received: from w520.home (ovpn-112-10.phx2.redhat.com [10.3.112.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5B8DA5D9C0;
-        Mon, 30 Nov 2020 15:34:34 +0000 (UTC)
-Date:   Mon, 30 Nov 2020 08:34:33 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, Peter Xu <peterx@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio-pci: Use io_remap_pfn_range() for PCI IO memory
-Message-ID: <20201130083433.3b80ef13@w520.home>
-In-Reply-To: <f7de6a25-8ace-3d51-d954-149752f9cf26@amd.com>
-References: <0-v1-331b76591255+552-vfio_sme_jgg@nvidia.com>
-        <20201105233949.GA138364@xz-x1>
-        <20201116155341.GL917484@nvidia.com>
-        <02bd74bb-b672-da91-aae7-6364c4bf555f@amd.com>
-        <20201116232033.GR917484@nvidia.com>
-        <e076f2eb-7c27-5b16-2f45-4c2068c4c264@amd.com>
-        <20201117155757.GA13873@xz-x1>
-        <57f51f08-1dec-e3d6-b636-71c8a00142fb@amd.com>
-        <20201117181754.GC13873@xz-x1>
-        <20201126201339.GA552508@nvidia.com>
-        <f7de6a25-8ace-3d51-d954-149752f9cf26@amd.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 5F880206C0;
+        Mon, 30 Nov 2020 15:40:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1606750818;
+        bh=xvn4o/Ps2MmjI/dRiv8oM22Yyzf+9XlrLVdNZNcgBko=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=kSS5E+WkPTc5oeXpPcINZm3eSBnDfvMq4J4iFv4rFWgZE78tctxrEWiefyOS7HuLy
+         RIanrltHcrVOvGM/Tc+oyVthAQAS0lEOEmZAcg7+U0L8R7oL2yr3PXWF2pNi/Rzmjm
+         WDvG8Hbkk7BplkrnRgmyn4gSEjGfR2v17P2sLvLU=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kjlHk-00Ejeo-7O; Mon, 30 Nov 2020 15:40:16 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Date:   Mon, 30 Nov 2020 15:40:16 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     David Brazdil <dbrazdil@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 2/2] KVM: arm64: Advertise ID_AA64PFR0_EL1.CSV3=1 if the
+ CPUs are Meltdown-safe
+In-Reply-To: <20201130152655.oyzs2l4qg2pfzxmv@google.com>
+References: <20201128124659.669578-1-maz@kernel.org>
+ <20201128124659.669578-3-maz@kernel.org>
+ <20201130152655.oyzs2l4qg2pfzxmv@google.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <4a398347b173c5c1a7a0ebd4b54a64bd@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 30 Nov 2020 08:34:51 -0600
-Tom Lendacky <thomas.lendacky@amd.com> wrote:
+Hi David,
 
-> On 11/26/20 2:13 PM, Jason Gunthorpe wrote:
-> > On Tue, Nov 17, 2020 at 01:17:54PM -0500, Peter Xu wrote:
-> >    
-> >> Logically this patch should fix that, just like the dpdk scenario where mmio
-> >> regions were accessed from userspace (qemu).  From that pov, I think this patch
-> >> should help.
-> >>
-> >> Acked-by: Peter Xu <peterx@redhat.com>  
-> > 
-> > Thanks Peter
-> > 
-> > Is there more to do here?  
+On 2020-11-30 15:26, David Brazdil wrote:
+>> @@ -1227,9 +1229,16 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu 
+>> *vcpu,
+>>  	    (csv2 && arm64_get_spectre_v2_state() != SPECTRE_UNAFFECTED))
+>>  		return -EINVAL;
+>> 
+>> -	/* We can only differ with CSV2, and anything else is an error */
+>> +	/* Same thing for CSV3 */
+>> +	csv3 = cpuid_feature_extract_unsigned_field(val, 
+>> ID_AA64PFR0_CSV3_SHIFT);
+>> +	if (csv3 > 1 ||
+>> +	    (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
+>> +		return -EINVAL;
+>> +
+>> +	/* We can only differ with CSV[23], and anything else is an error */
+>>  	val ^= read_id_reg(vcpu, rd, false);
+>> -	val &= ~(0xFUL << ID_AA64PFR0_CSV2_SHIFT);
+>> +	val &= ~((0xFUL << ID_AA64PFR0_CSV2_SHIFT) ||
+>> +		 (0xFUL << ID_AA64PFR0_CSV3_SHIFT));
 > 
-> I just did a quick, limited passthrough test of a NIC device (non SRIOV)
-> for a legacy and an SEV guest and it all appears to work.
-> 
-> I don't have anything more (i.e. SRIOV, GPUs, etc.) with which to test
-> device passthrough.
+> That boolean OR looks like a typo.
 
-Thanks, I'll include this for v5.11.
+It definitely is. Who the hell is writing this code?
 
-Alex
+Thanks,
 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
