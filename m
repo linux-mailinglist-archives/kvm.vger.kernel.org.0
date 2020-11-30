@@ -2,119 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECDC22C8014
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 09:35:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 968BA2C804B
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 09:53:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727762AbgK3IfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 03:35:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56582 "EHLO
+        id S1727136AbgK3Iwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 03:52:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42541 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727331AbgK3IfT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 03:35:19 -0500
+        by vger.kernel.org with ESMTP id S1726762AbgK3Iwg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 03:52:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606725233;
+        s=mimecast20190719; t=1606726270;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vOBw30VGGpYGUqtKjgp1D/xXFSKdq88sDVSnLLemHDo=;
-        b=FRb3fGdf6aLMG6xJeHSgATNF+5MeF8CsLcrSLmJgvy3tWcQKhs+x8n1PKDN30xWSabPxpt
-        CmxrZOqc6VAUEJDKbjpyg21zhrtTEb7PFhx3PYGLoFe7XuFsqRTEVI2FRF2E61wmZzUEUy
-        rRgZU3+c/Qu5Znvqo9UfzMIzUGxDz8c=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-xchCneZBNuGTM-chRHUMWw-1; Mon, 30 Nov 2020 03:33:50 -0500
-X-MC-Unique: xchCneZBNuGTM-chRHUMWw-1
-Received: by mail-wr1-f70.google.com with SMTP id 91so7989305wrk.17
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 00:33:49 -0800 (PST)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=IfhR367gJyQi+IqH9Qg+155OiV0npyw4vEgjmNlOLaQ=;
+        b=dIU5rRB5mnZqJ9gQpaqkMMJzsa48qjZ7U2XXFRjvXyAtEl3ZccDjmnmJDh3yMtxjqZ6H78
+        T0pAO0RXO4346xUsv63ftiMcLy+TgEc/yH3rw6RzzJpMyGIeQXQYP+vL7r2WjbunImDrPQ
+        /IjqQwUjhwIOniiOWjkHvdldqG3oiTY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-pWKbxCe4NG-s-2QTMoNU4Q-1; Mon, 30 Nov 2020 03:50:15 -0500
+X-MC-Unique: pWKbxCe4NG-s-2QTMoNU4Q-1
+Received: by mail-wm1-f72.google.com with SMTP id o203so4061511wmo.3
+        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 00:50:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vOBw30VGGpYGUqtKjgp1D/xXFSKdq88sDVSnLLemHDo=;
-        b=cnYGM7KvyuDoe6DlVWzE1Y9JF+opq/WcHSeRu6ge6SQQ5AdBL/k+5q92HSS8obfiSA
-         GIjwL8K9QTtqt3rL5yK9QG6z60JVI7recFaGucxV95q1GY0TfIx4namPO11vlwnLfFbR
-         cvaEsS+JVuazs8s+c7GVt4JmEjNZ/Xlrvu6O2e4LeU1XVON4SV0Ny5ZAL8kn4G5s9ATH
-         +787muaWOSTrFlNQV+uZw/mc9Bwr2wH/6dGUbw8H6wDM7JC16Q9linznqh6HJYO158iE
-         DTRWk0lwZV3fkOM/q2/14zL0eYjvy/r1NVJJOiuJ7fRVH0M/k5aILUprNNoAPFAbTDdm
-         CtmA==
-X-Gm-Message-State: AOAM532Q5Id66gDPHZgT76CoPY+VrJGi/PwqX4BEyfHa/0ipQbNHh5Dp
-        a3OZEY6ySiO0NbD18CIukXO6UlnBZYubWmsdQded3eH5xsOM+K5+3x++L1YKqGnTZxaxMnzW6aG
-        h/mhzctz4fecP
-X-Received: by 2002:adf:dd0e:: with SMTP id a14mr26727977wrm.36.1606725228960;
-        Mon, 30 Nov 2020 00:33:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxx/iQZGql5wZU5MomW2tQpacaKJDVUoRlyVnQsj6AxXWR1H+6D7EHUWZYX9I0NcbeUr12Ulw==
-X-Received: by 2002:adf:dd0e:: with SMTP id a14mr26727949wrm.36.1606725228783;
-        Mon, 30 Nov 2020 00:33:48 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id a184sm24043265wmf.8.2020.11.30.00.33.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Nov 2020 00:33:47 -0800 (PST)
-Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Mike Christie <michael.christie@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20201125153550.810101-1-sashal@kernel.org>
- <20201125153550.810101-22-sashal@kernel.org>
- <25cd0d64-bffc-9506-c148-11583fed897c@redhat.com>
- <20201125180102.GL643756@sasha-vm>
- <9670064e-793f-561e-b032-75b1ab5c9096@redhat.com>
- <20201129041314.GO643756@sasha-vm>
- <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
- <20201129210650.GP643756@sasha-vm>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e499986d-ade5-23bd-7a04-fa5eb3f15a56@redhat.com>
-Date:   Mon, 30 Nov 2020 09:33:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=IfhR367gJyQi+IqH9Qg+155OiV0npyw4vEgjmNlOLaQ=;
+        b=T9G1Qy3rK4sdZJlwXnIS8nrYiG07JyZfRtYOx9kv81D4BbJTER2EjvDU7ocIbf32Aj
+         /Ucpb89J3tUnDcPfQkfAv6PK6DRAAfvrksZxbIA5Q9vtTKNdQMrdKYA4lTBajCmIkDAf
+         mSIVrA1Qw7a26w8B7lsTbA35Nzz6HALiI4dH1oBaRPS5g4OjFr/SllHtQghmy4t7xsgF
+         jvEgZ6oZmoKakIpucx474DR77t+aOFsvZ5ixn+sqO3c2R4Cv+QE+/T6BGkwhTtSP9G8E
+         +iEXnNxSFbScUWg4IyI8JBcVqobU63ITw/8co+1NEpLv4tuDdbJiBGnyD95kQnPXK61w
+         nbGQ==
+X-Gm-Message-State: AOAM530bDnTafS7HWbewVelBWqfpzdJ0NF8KfvLs5rJP8AG8lhIhE6AM
+        IpDF9ISoRT6bt2/kQC4KmFg1cUmPDCIs7AGEy5p6oS1ezS7q7XV8diVzILPNe3zSFNrmW12h0us
+        oQvR6+CZNTdvN
+X-Received: by 2002:a1c:9a4d:: with SMTP id c74mr15059096wme.5.1606726213696;
+        Mon, 30 Nov 2020 00:50:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx0lcq9LYEeQweeQ1PUtnvowfMkCnfs7A6y+pZ1luBu47l3TNrIhMMTxE9tXFN2kqV6KXqSzQ==
+X-Received: by 2002:a1c:9a4d:: with SMTP id c74mr15059071wme.5.1606726213486;
+        Mon, 30 Nov 2020 00:50:13 -0800 (PST)
+Received: from redhat.com (bzq-79-176-44-197.red.bezeqint.net. [79.176.44.197])
+        by smtp.gmail.com with ESMTPSA id 21sm12930310wme.0.2020.11.30.00.50.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Nov 2020 00:50:12 -0800 (PST)
+Date:   Mon, 30 Nov 2020 03:50:10 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jasowang@redhat.com, michael.christie@oracle.com, mst@redhat.com,
+        sgarzare@redhat.com, si-wei.liu@oracle.com, stefanha@redhat.com
+Subject: [GIT PULL] vhost,vdpa: bugfixes
+Message-ID: <20201130035010-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20201129210650.GP643756@sasha-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/11/20 22:06, Sasha Levin wrote:
-> On Sun, Nov 29, 2020 at 06:34:01PM +0100, Paolo Bonzini wrote:
->> On 29/11/20 05:13, Sasha Levin wrote:
->>>> Which doesn't seem to be suitable for stable either...  Patch 3/5 in
->>>
->>> Why not? It was sent as a fix to Linus.
->>
->> Dunno, 120 lines of new code?  Even if it's okay for an rc, I don't 
->> see why it is would be backported to stable releases and release it 
->> without any kind of testing.  Maybe for 5.9 the chances of breaking 
-> 
-> Lines of code is not everything. If you think that this needs additional
-> testing then that's fine and we can drop it, but not picking up a fix
-> just because it's 120 lines is not something we'd do.
+The following changes since commit 418baf2c28f3473039f2f7377760bd8f6897ae18:
 
-Starting with the first two steps in stable-kernel-rules.rst:
+  Linux 5.10-rc5 (2020-11-22 15:36:08 -0800)
 
-Rules on what kind of patches are accepted, and which ones are not, into 
-the "-stable" tree:
+are available in the Git repository at:
 
-  - It must be obviously correct and tested.
-  - It cannot be bigger than 100 lines, with context.
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-> Plus all the testing we have for the stable trees, yes. It goes beyond
-> just compiling at this point.
-> 
-> Your very own co-workers (https://cki-project.org/) are pushing hard on
-> this effort around stable kernel testing, and statements like these
-> aren't helping anyone.
+for you to fetch changes up to ad89653f79f1882d55d9df76c9b2b94f008c4e27:
 
-I am not aware of any public CI being done _at all_ done on vhost-scsi, 
-by CKI or everyone else.  So autoselection should be done only on 
-subsystems that have very high coverage in CI.
+  vhost-vdpa: fix page pinning leakage in error path (rework) (2020-11-25 04:29:07 -0500)
 
-Paolo
+----------------------------------------------------------------
+vhost,vdpa: fixes
+
+A couple of minor fixes.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Mike Christie (1):
+      vhost scsi: fix lun reset completion handling
+
+Si-Wei Liu (1):
+      vhost-vdpa: fix page pinning leakage in error path (rework)
+
+Stefano Garzarella (1):
+      vringh: fix vringh_iov_push_*() documentation
+
+ drivers/vhost/scsi.c   |  4 ++-
+ drivers/vhost/vdpa.c   | 80 ++++++++++++++++++++++++++++++++++++++------------
+ drivers/vhost/vringh.c |  6 ++--
+ 3 files changed, 68 insertions(+), 22 deletions(-)
 
