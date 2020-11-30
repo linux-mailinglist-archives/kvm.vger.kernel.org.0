@@ -2,128 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB0782C88D8
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 17:01:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4BA62C88F9
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 17:09:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727073AbgK3QAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 11:00:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43904 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725870AbgK3QAb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 11:00:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606751945;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WYyaNMWXIzphPUXACrUhTp271jhjXQRzrhohRKC0mcw=;
-        b=bU8xw2Y76mpMymDp4KDq1IzBooZhUUSqYav9GzBzPlBwwGVxMTWRp3K2cnE83ZU19bT39X
-        5KhzlOkgb8nUSjx5fV3T6P4RkhLJZwcPeka0cNbgx7JARjn+BTOtZ1S2TYIx2QOdLr93OP
-        jVv0+gAaekYWnya3cZkggsXy9N9aELI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-PEEJD8uZNkCkGJpbLxvTaw-1; Mon, 30 Nov 2020 10:59:03 -0500
-X-MC-Unique: PEEJD8uZNkCkGJpbLxvTaw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B30025708B;
-        Mon, 30 Nov 2020 15:59:01 +0000 (UTC)
-Received: from starship (unknown [10.35.206.90])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F15B05D9C0;
-        Mon, 30 Nov 2020 15:58:55 +0000 (UTC)
-Message-ID: <ee06976738dff35e387077ba73e6ab375963abbf.camel@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: implement
- KVM_SET_TSC_PRECISE/KVM_GET_TSC_PRECISE
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Oliver Upton <oupton@google.com>, Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        open list <linux-kernel@vger.kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
+        id S1728041AbgK3QHd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 11:07:33 -0500
+Received: from mail-mw2nam12on2063.outbound.protection.outlook.com ([40.107.244.63]:35372
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725933AbgK3QHd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 11:07:33 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FDb0QFqfVSsNvKsN9JT8Xmfd+/qtMZUR8LbDUT1VnY/EE85xmWgvf8UiYy2RWKaDAI2lUCyU75WrQ+HlfhwQf7r5CVqLuQDNvkjfBGbHNgwLryTXUiEbD4iVogI5kpVZgpFA8WjfD5vR4qhIlQU65U9VNDLE0quv1EZZHasJZYxTtd3g1JabUB+6AeK6QUpGgvZtRpscjz1hhYYY4qSFkb6GrOvaGCKQE4o5Mc4BTiElFXexQivN+AwUezH1EIb9AR7tmb18+eMEVepvDiHxAJYgYK3/z2ygxmbzyJRRWzvR9557MUStUtkFguJlB9WoeuMWwoqLKebNAPxnP69aPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d/fgtEcPBfS8uhm8TjrFayT6ljwj48MRYxCZwX1JU5A=;
+ b=YjS1sxRnv4us4a8sm5Cm2XEMqaknVu2WvBckMvxdXPDZSie+NVn8fDEut5T/MTCDn1waridxHavjR6inhkm0TstVTcHDvaSsj8SKJU4otO1Nxz4P+O2lwBdSjHgyodP1Pp+szx4l3hXgW/TWRW0hc2iJe6gL1/U3RLpVtMA7fxay5Pnzu/VF1lIGhsJcrMJuWfz6QbxK5Ti8Qd4bgYr60BzK6u2ZXy50uZ3u4Y6bBbBNx+Wk0RBTAcyX24peVlptA/V7qyjqTWLW9SD2kMRHOG9U05Lz5SNN/OvNNCmwLyLHWE9qOR9S610Iw0Qse9yAa36keWvz7InnEX/dFCGnnw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d/fgtEcPBfS8uhm8TjrFayT6ljwj48MRYxCZwX1JU5A=;
+ b=s/UginYNn+1dQlw1nFlXKiGJ8Tunh5IYNiEuExoFBV/adT4P8bJiIGGPItMKF9vVFODZqUtSq1l4Mn9X8lRQBtWVgtgfQuytr+shgC4MclkjKBqCEiq/O5Lh6KB8AePp1vKp6KZiuvS7cszTCta4WKH5+jSDJsrvdPes9N2g32M=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM5PR1201MB0027.namprd12.prod.outlook.com (2603:10b6:4:59::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3611.25; Mon, 30 Nov 2020 16:06:39 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::d95e:b9d:1d6a:e845]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::d95e:b9d:1d6a:e845%12]) with mapi id 15.20.3611.025; Mon, 30 Nov 2020
+ 16:06:39 +0000
+Subject: Re: [RFC PATCH 00/35] SEV-ES hypervisor support
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
         Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Date:   Mon, 30 Nov 2020 17:58:54 +0200
-In-Reply-To: <38602ef4-7ecf-a5fd-6db9-db86e8e974e4@redhat.com>
-References: <20201130133559.233242-1-mlevitsk@redhat.com>
-         <20201130133559.233242-2-mlevitsk@redhat.com>
-         <38602ef4-7ecf-a5fd-6db9-db86e8e974e4@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
-MIME-Version: 1.0
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <cover.1600114548.git.thomas.lendacky@amd.com>
+ <20200914225951.GM7192@sjchrist-ice>
+ <bee6fdda-d548-8af5-f029-25c22165bf84@amd.com>
+ <20200916001925.GL8420@sjchrist-ice>
+ <60cbddaf-50f3-72ca-f673-ff0b421db3ad@redhat.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <38e89899-cf58-3a39-1d09-3ce963140a57@amd.com>
+Date:   Mon, 30 Nov 2020 10:06:37 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <60cbddaf-50f3-72ca-f673-ff0b421db3ad@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN2PR01CA0025.prod.exchangelabs.com (2603:10b6:804:2::35)
+ To DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.118] (165.204.77.1) by SN2PR01CA0025.prod.exchangelabs.com (2603:10b6:804:2::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.20 via Frontend Transport; Mon, 30 Nov 2020 16:06:38 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 190132ba-26f8-4ac4-7aac-08d89549ebc1
+X-MS-TrafficTypeDiagnostic: DM5PR1201MB0027:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR1201MB002738D65014F1F11FEAC183ECF50@DM5PR1201MB0027.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 67CcpDaDb7dQcMndR7pmi1rrIR6Sj8LvQsBLfp1+9lReFqShy/zlvujpIqHG43yuNA25UONy2Fmue5vnfHJis7VoAkGYGlzRyCyuxBgfYE/9w43OJw/NAZ+1VPhowvhtROIh76ta+x6PZwDvV79161J1PjXaiSXLdf+vh5JPbvGDA1Q1sdX1Sg3ptSOyAyDfkjXPqh0yb9UrofyEVvBwJELW3fkqGekWuFfqexfWcB1eBIIXuPNxrWaQ8YlVV/GPjUSLCi1Wp53L/gchjnoThrTN6KzLhNKGghRBoaUreqf/PbQi7qgRMCpqFaa1QiC/NUCATNq6n4TeB399pVt1jpwgpPo4R5nV05RSA3JRVEOX3fw7k3HVB/8ZgAyVFsU2
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(396003)(376002)(346002)(136003)(31686004)(53546011)(8676002)(86362001)(52116002)(2906002)(31696002)(16576012)(316002)(110136005)(54906003)(7416002)(956004)(478600001)(5660300002)(66476007)(66946007)(2616005)(66556008)(26005)(8936002)(6486002)(36756003)(4744005)(16526019)(83380400001)(4326008)(186003)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?OXBHQ3NIT0xsMkc1MFRKRUdVVnRZMm5sLy9BbHpmaFVrQjJLaFNzUFJuY3ZO?=
+ =?utf-8?B?NGZxSVJCV3FWUnNBWUVGdkZUUmVabjdFYUNMUU9HWFI1QlhGczJSNTA3MmV0?=
+ =?utf-8?B?VWNSVG52cVlFY1ZhMk1PV3dCbFJHY0tOeUxhYWhXUEswL3FnWDhlalVNMGh1?=
+ =?utf-8?B?dEplb1gycFZmR05YUW5tUStpb3NTSlRURTlaUkNzVUxDVFhoTXV6N05JbE10?=
+ =?utf-8?B?d0VWL0d2V2xEZkU0Z0VvRmsxaEdvQmxnaFFibFRKa2J1VkkyMEJUUnkvZTNy?=
+ =?utf-8?B?RTY4N2JPN0Yveit0Q2lISnAzcDFZY0YrYkJNNjFpbksvUmp0TndPTUkxT2xz?=
+ =?utf-8?B?SUJZMHJEd0JxenFDeUU4UEhKc0sxQUdEWDlmRHRKUlhkdDc4dVZlczd5NXg3?=
+ =?utf-8?B?SlJIWFhWSkQyOFpZSnE1aURPMXpCT3RKU3dzRUVBb2VTcUxsMUgzbjdncDNt?=
+ =?utf-8?B?MkVpTEtCdEVSbEZ5YnBwSnZsUVF0S3NOV0Nzc3IxVXM1dmFzRUFqekZmSWdQ?=
+ =?utf-8?B?OTdJZitSUkxpRGh3ZHNjY0s3b042WFpTWG9HcHdtRzUyMVdoTHBsdmE1T0di?=
+ =?utf-8?B?WUxTektHeFh5clpzWXVVZEMxZDF3TGhXVWZvQXdKZGgybXVZdFlETEpQSGx0?=
+ =?utf-8?B?NVl4V0o5VXhhQnJGNm96S1NOV0phMjdJaDJOYWZyM3RORWVnVWVWZzJTL0x0?=
+ =?utf-8?B?d05lb0h2VDVuSnJRY2doZlNZQWZvTHBZRE5rdHg4ZVBZV0QrV3hObEpWUjND?=
+ =?utf-8?B?Z1I2T3NuQTBPekVkNTVTVTZpYzVEOHhNKy9FbHhLRFhHRU84OHJxRDJYOVZB?=
+ =?utf-8?B?d1BaWGRSMDVob1ovdEtvOGdQV3dBTXlrUGVkTFNINEVjUUFWN0JWSUVzQ0pp?=
+ =?utf-8?B?WXB6Qkx6ZVZ4ZWl0cERWZnN4a3R3eWhwVytOenpDV2lSSDMvN3F4S0M5UVJm?=
+ =?utf-8?B?cnowQllBTHhZd3NrRUlGL2Fzc1VrQWtXQWVJbG1lNEN5UTJUVHFoVXRyTmZI?=
+ =?utf-8?B?b0UxdjBwMCtNRUExNXZRUElPbDRSbkhhaG1oakY2QzBqZlJISjB4SEkrRDJD?=
+ =?utf-8?B?dk9hU1RrRUdzL0lvR1dRNXV6RHBkQzRvbW8xTWRFZWtJaEN6WnRCNWFLbUMy?=
+ =?utf-8?B?bXduaUJReERUMHVFQ256Y1FDbDJFRFNaK21pa0dxM3JhOEtzUlBBSHc0eG16?=
+ =?utf-8?B?OWZjQytCYjdiaTNqeG55WnRJa20yQU9PQ3M5YWxMUmZyS3hwbHJrcXlXYWVz?=
+ =?utf-8?B?S1pkdmR4UFZhL1hyeng5MVpWWmVkaGk1cFNBTXlaZXludHg4SWFFOEZuUlZX?=
+ =?utf-8?Q?UCkgfCommpcQ8=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 190132ba-26f8-4ac4-7aac-08d89549ebc1
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2020 16:06:39.6040
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yhlZ+V+ErlKxwpbmcppOp9SjjqDaJ/IZNBF63f+opyqXOQ7EkT4FCj+zQmFUQzkV7yjo+W3AHrCaedatEfs4Dw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0027
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-11-30 at 15:33 +0100, Paolo Bonzini wrote:
-> On 30/11/20 14:35, Maxim Levitsky wrote:
-> > +		if (guest_cpuid_has(vcpu, X86_FEATURE_TSC_ADJUST)) {
-> > +			tsc_state.tsc_adjust = vcpu->arch.ia32_tsc_adjust_msr;
-> > +			tsc_state.flags |= KVM_TSC_STATE_TSC_ADJUST_VALID;
-> > +		}
+On 11/30/20 9:31 AM, Paolo Bonzini wrote:
+> On 16/09/20 02:19, Sean Christopherson wrote:
+>>
+>> TDX also selectively blocks/skips portions of other ioctl()s so that the
+>> TDX code itself can yell loudly if e.g. .get_cpl() is invoked.  The event
+>> injection restrictions are due to direct injection not being allowed
+>> (except
+>> for NMIs); all IRQs have to be routed through APICv (posted interrupts) and
+>> exception injection is completely disallowed.
+>>
+>>    kvm_vcpu_ioctl_x86_get_vcpu_events:
+>>     if (!vcpu->kvm->arch.guest_state_protected)
+>>              events->interrupt.shadow =
+>> kvm_x86_ops.get_interrupt_shadow(vcpu);
 > 
-> This is mostly useful for userspace that doesn't disable the quirk, right?
+> Perhaps an alternative implementation can enter the vCPU with immediate
+> exit until no events are pending, and then return all zeroes?
 
-Isn't this the opposite? If I understand the original proposal correctly,
-the reason that we include the TSC_ADJUST in the new ioctl, is that
-we would like to disable the special kvm behavior (that is disable the quirk),
-which would mean that tsc will jump on regular host initiated TSC_ADJUST write.
+SEV-SNP has support for restricting injections, but SEV-ES does not.
+Perhaps a new boolean, guest_restricted_injection, can be used instead of
+basing it on guest_state_protected.
 
-To avoid this, userspace would set TSC_ADJUST through this new interface.
-
-Note that I haven't yet disabled the quirk in the patches I posted to the qemu,
-because we need some infrastructure to manage which quirks we want to disable
-in qemu
-(That is, KVM_ENABLE_CAP is as I understand write only, so I can't just disable
-KVM_X86_QUIRK_TSC_HOST_ACCESS, in the code that enables x-precise-tsc in qemu).
-
-> 
-> > +		kvm_get_walltime(&wall_nsec, &host_tsc);
-> > +		diff = wall_nsec - tsc_state.nsec;
-> > +
-> > +		if (diff < 0 || tsc_state.nsec == 0)
-> > +			diff = 0;
-> > +
-> 
-> diff < 0 should be okay.  Also why the nsec==0 special case?  What about 
-> using a flag instead?
-
-In theory diff < 0 should indeed be okay (though this would mean that target,
-has unsynchronized clock or time travel happened).
-
-However for example nsec_to_cycles takes unsigned number, and then
-pvclock_scale_delta also takes unsigned number, and so on,
-so I was thinking why bother with this case.
-
-There is still (mostly?) theoretical issue, if on some vcpus 'diff' is positive 
-and on some is negative
-(this can happen if the migration was really fast, and target has the clock
-   A. that is only slightly ahead of the source).
-Do you think that this is an issue? If so I can make the code work with
-signed numbers.
-
-About nsec == 0, this is to allow to use this API for VM initialization.
-(That is to call KVM_SET_TSC_PRECISE prior to doing KVM_GET_TSC_PRECISE)
-
-This simplifies qemu code, and I don't think 
-that this makes the API much worse.
-
-Best regards,
-	Maxim Levitsky
+Thanks,
+Tom
 
 > 
 > Paolo
 > 
-
-
