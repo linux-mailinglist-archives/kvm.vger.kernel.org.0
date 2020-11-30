@@ -2,100 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6F1A2C8E41
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:40:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54D7C2C8E52
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 20:47:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729983AbgK3TkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 14:40:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729979AbgK3TkU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 14:40:20 -0500
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79A3C061A4A
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:39:29 -0800 (PST)
-Received: by mail-pl1-x641.google.com with SMTP id b23so7051043pls.11
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 11:39:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=o6rtmKPTOe3MI6LpooTnqzq594FdWbZHfm2j9oryTcE=;
-        b=pqHlgGMiEu/p0dKcFRIJepFYNmoKCvWk9svkXrglrSRAR/UqIpTJpbEu2FbJJOjZ2r
-         EENBGawkuvGUryYSHiS3NgAA8t5nnDT8E9BGZHdynRvNH4Riz5OQgIXScY1ZvsJQAkQY
-         G3Td1KM4MxUZtvJ6l8WRrlUG7+evwRBmuMquo8MThVsBAQDVmwOkiC7WjerKor54HV3h
-         ykK3TFYa4ZPxx5E2nXwhnKsv1YWpx5AYiAcqBAC8ePhwAVbIOwnR7ScbQbCFi1HGtk96
-         pVaJeguMZlwI/7EanFKZqmVl95AaH16KIm7TjlO0C0HKwgKwcqtnmxL7LQ54qhpZVVPR
-         5GUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=o6rtmKPTOe3MI6LpooTnqzq594FdWbZHfm2j9oryTcE=;
-        b=qfb8WTJ1zpY0cZu7Vzgjb8F3tMu1mBwRfnjg5rYuYXnv2Oo32MVsX5IejFBQD+8W8e
-         CD5awnzxWvKXFZyIy7QQdAyQtv2py2/dZrHHoz7b+XSN5WksHljnqzZlPqki9C8NaGut
-         Y/hUrUBdBAmJ3LNARWyTeIUfybGBMMZxXfK5c6TAptpuveYKvkN3Wj3fUgounvv0AeMt
-         pOPTs8JVStduv1+8OPiQaB2lfvQe648Q8V+nYbxv9XCUsmmXFEQOARbBI6coWnVSq5Mh
-         ckVy6sm7PZwEVjb5Qe0aCvtG2etd12sKkBSvIogA0paSHo0r9nCgbKOOaXKZ1hS6pA6b
-         tUSA==
-X-Gm-Message-State: AOAM531MCzQ9BtM8Nr4gzUBklZXq70A9NzJ2sDGdT1mhesWjAkupyMsp
-        +uMSOnntoUHHt5Iur3JzU1sxMQ==
-X-Google-Smtp-Source: ABdhPJyBPOj+BUOCDMsjX7h8TcafuKx02gSTxE7xTOAMupSoP4OnMeBtT6gqcJSdzXh51dADt+q6rw==
-X-Received: by 2002:a17:90a:7022:: with SMTP id f31mr405610pjk.213.1606765169152;
-        Mon, 30 Nov 2020 11:39:29 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id z11sm17647793pfk.52.2020.11.30.11.39.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Nov 2020 11:39:28 -0800 (PST)
-Date:   Mon, 30 Nov 2020 19:39:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH 25/35] KVM: x86: Update __get_sregs() / __set_sregs()
- to support SEV-ES
-Message-ID: <X8VKbLzEDc+W+jU/@google.com>
-References: <cover.1600114548.git.thomas.lendacky@amd.com>
- <e08f56496a52a3a974310fbe05bb19100fd6c1d8.1600114548.git.thomas.lendacky@amd.com>
- <20200914213708.GC7192@sjchrist-ice>
- <7fa6b074-6a62-3f8e-f047-c63851ebf7c9@amd.com>
- <20200915163342.GC8420@sjchrist-ice>
- <6486b1f3-35e2-bcb0-9860-1df56017c85f@amd.com>
- <20200915224410.GI8420@sjchrist-ice>
- <3f5bd68d-7b2f-8b1f-49b9-0e59587513c8@redhat.com>
+        id S1729868AbgK3TpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 14:45:20 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:36446 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729127AbgK3TpT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 14:45:19 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AUJcsUq036566;
+        Mon, 30 Nov 2020 19:44:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=2cU8DZaDzE1cr1VPUQiF6BAqDQGKq3YIRt7Xa+jowHo=;
+ b=EQvSKitQTQ0nbmDJjqDklnoSINMHjmuJph87unCNA6Hos94Y89gSOVO4q9PwaQngrY/T
+ 0HHqP+ulzzdwVlo56zylpp3gt2xzkuHhimOCZZ+I5c/sBBGrVjrbPWoivNQwS72dm3HF
+ xsEx6yOVu0E0gluiMIf/U9Il/3uSP6vV4ydbOrraHkeAulL1vULbN4pY06AGjir6QuL4
+ MptfslZAcDNmABZ9iIQdzFxVf36+vEtROJkLm3hIHcVS3+Cnb97WmmfSlPzLBiiCxa3+
+ 6YJ3NE2zxT5xGlAhsgIP2yp9AxmKeUv/xsCK6VK+nQbGNips3Pq1IhMpLIhw/tm1v/fQ BA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2130.oracle.com with ESMTP id 353c2aq4jk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 30 Nov 2020 19:44:33 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0AUJe2ep149266;
+        Mon, 30 Nov 2020 19:44:32 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 3540ewywdf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 Nov 2020 19:44:32 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0AUJiUxD013922;
+        Mon, 30 Nov 2020 19:44:31 GMT
+Received: from [20.15.0.202] (/73.88.28.6)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 30 Nov 2020 11:44:30 -0800
+Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20201125153550.810101-1-sashal@kernel.org>
+ <20201125153550.810101-22-sashal@kernel.org>
+ <25cd0d64-bffc-9506-c148-11583fed897c@redhat.com>
+ <20201125180102.GL643756@sasha-vm>
+ <9670064e-793f-561e-b032-75b1ab5c9096@redhat.com>
+ <20201129041314.GO643756@sasha-vm>
+ <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
+ <20201129210650.GP643756@sasha-vm>
+ <e499986d-ade5-23bd-7a04-fa5eb3f15a56@redhat.com>
+ <20201130173832.GR643756@sasha-vm>
+ <238cbdd1-dabc-d1c1-cff8-c9604a0c9b95@redhat.com>
+From:   Mike Christie <michael.christie@oracle.com>
+Message-ID: <9ec7dff6-d679-ce19-5e77-f7bcb5a63442@oracle.com>
+Date:   Mon, 30 Nov 2020 13:44:29 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3f5bd68d-7b2f-8b1f-49b9-0e59587513c8@redhat.com>
+In-Reply-To: <238cbdd1-dabc-d1c1-cff8-c9604a0c9b95@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9821 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 phishscore=0
+ suspectscore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011300127
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9821 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 lowpriorityscore=0
+ clxscore=1031 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2011300127
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 30, 2020, Paolo Bonzini wrote:
-> On 16/09/20 00:44, Sean Christopherson wrote:
-> > > KVM doesn't have control of them. They are part of the guest's encrypted
-> > > state and that is what the guest uses. KVM can't alter the value that the
-> > > guest is using for them once the VMSA is encrypted. However, KVM makes
-> > > some decisions based on the values it thinks it knows.  For example, early
-> > > on I remember the async PF support failing because the CR0 that KVM
-> > > thought the guest had didn't have the PE bit set, even though the guest
-> > > was in protected mode. So KVM didn't include the error code in the
-> > > exception it injected (is_protmode() was false) and things failed. Without
-> > > syncing these values after live migration, things also fail (probably for
-> > > the same reason). So the idea is to just keep KVM apprised of the values
-> > > that the guest has.
-> > 
-> > Ah, gotcha.  Migrating tracked state through the VMSA would probably be ideal.
-> > The semantics of __set_sregs() kinda setting state but not reaaaally setting
-> > state would be weird.
+On 11/30/20 11:52 AM, Paolo Bonzini wrote:
+> On 30/11/20 18:38, Sasha Levin wrote:
+>>> I am not aware of any public CI being done _at all_ done on vhost-scsi, by CKI or everyone else.  So autoselection should be done only on subsystems that have very high coverage in CI.
+>>
+>> Where can I find a testsuite for virtio/vhost? I see one for KVM, but
+>> where is the one that the maintainers of virtio/vhost run on patches
+>> that come in?
 > 
-> How would that work with TDX?
+> I don't know of any, especially for vhost-scsi.  MikeC?
+> 
 
-Can you elaborate?  I.e. how would what work with TDX?
+Sorry for the late reply on the thread. I was out of the office.
+
+I have never seen a public/open-source vhost-scsi testsuite.
+
+For patch 23 (the one that adds the lun reset support which is built on
+patch 22), we can't add it to stable right now if you wanted to, because
+it has a bug in it. Michael T, sent the fix:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?h=linux-next&id=b4fffc177fad3c99ee049611a508ca9561bb6871
+
+to Linus today.
