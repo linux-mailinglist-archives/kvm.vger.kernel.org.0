@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0B3A2C92B5
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 00:34:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D923D2C92B7
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 00:34:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388969AbgK3Xea (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 18:34:30 -0500
-Received: from mail-bn7nam10on2065.outbound.protection.outlook.com ([40.107.92.65]:9217
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S2388977AbgK3Xee (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 18:34:34 -0500
+Received: from mail-bn8nam11on2064.outbound.protection.outlook.com ([40.107.236.64]:11880
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388949AbgK3Xe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 18:34:28 -0500
+        id S2388951AbgK3Xe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 18:34:29 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Sqkv9m2sJMHnzh7uIcGGZZ2uMXcf5c213kT+XC6artpDIMaejCTdut/QT4gNMWTWF2CzQZBcIwo9rrh6LA/mT27WXg/sXNx5GFcDgXr8Mg5v9y/npGGo7cknRrx8WyFL2+Eub06mIybrNCYTvmI2ZtRL7S8yK55GgZvzw5ogr9bi6AiVQNyDgM9b4+WRltg4t4Cz3QDziwGT3B32w0FmmPnscfDQBrQgDyk7OrnVNJWcHcArj5W9M/7Y+nBZx5hN9J8O4QZt5BUnKsvbhz87L5nEUl/UxeBj7x5yssmVU8M34ErmOlybALcBY1GUYV27sNR4AS0LIdae/xwhg0DHXA==
+ b=Ra0FlBqpYN+4z6Q+cmvqcbLwsKZWBQdeKHG9k//zexhZeq7EHSZ3huwaE3PvSkO1gF4CdPWCuSREn+Js3FDLSAY3nr624an4a3uKKkPimMyAvkGF2e9t1mqwuplQ6FUtaI704T05P7SSqMBhTKn3t4TXJiMwHncBZHtnRH8VuG4AmGQye3Nn0AhluhsycoRKQdnu2k12ZjKP620HTdszfPLx4Odd39le+rhhqyQ7i/XDB2crkEjnUT3PJgzWZ57w0CwLcvZsK1B+6N3pgP9+Co8cgKsdCc8Q2fyUxLNf1MEVq72AR+OIZc+xm1lFMTDQmZscJmg37m9C3JmI1l6lsQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ez+E+ZdxtGGPPZQ8bYXP+fWYSNIYW25ERPpDKhCks6g=;
- b=ZvK8tOp4x7TYyjY2rjbF9eaiOBkehEqR9HXoIJg4g55sOeeUuHpJj+V7uRwJyS8mHHub+CWBETl+EbwL68Z7nW0TQkzN+KEw2f2lvBRq3woArPuD5V2x/hkePhrFmFViz96r0ofgjVWlOIcc91yvQKo5YC4Zv2Gm73Ax8cDsonXIs8cllNBF9+1YSXp5fRAxJ8mg5zgLokKd4eHJOdjdEvBO/2Co62qZLpikr/02hCgPw6rE6CB8yxLt2nbaDAxCvCP+4mUN9gVwv3WP6LnaF4AWfmZxxAexruRazKaqCNOMoDRm7RE0ze9i/OxgzxkZTB40rhBC+aeyO7GsTNnTEA==
+ bh=GMm/eQKJw+rQ14sDUPcwk4EWWQ3Fl7hyawwQTrrgXy0=;
+ b=og292iKWDfrNtoapqHQffSofYAbZt9uBkUkrJ0y5e9bTS4R7dSiZddvGwht5BQdkdg6t4ka0oad9f+9OUH5GuDch2T2isUg5CmRCOYeD+I1XrJ2icbRfofCWzRMX5KRoYpvP6he/u4CBJQGIQmhPw9YpSAWlWJpKMub+yewzrWvYwMRuhJwqfT+RNS6pe2NlTY3TEkRvRlLZh3F40mIXPmAFpJs8vXs129nihVkJmlX8NIb9ACHcoAIk1+tyv9TVuyks8PUNHH2NJ0Hly9Z5egTdQOGWZZAxDm48g92M2QvmJQQ0e7qhu83Ac7Px6IO5MXowKZ0AtCnt2kT3HZl2Ug==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ez+E+ZdxtGGPPZQ8bYXP+fWYSNIYW25ERPpDKhCks6g=;
- b=KyNl4OiSbwt3KK8HO06NlfO6rUY7ruDldhFN3TAVoSnat3D5EBQHb1nkwgOVbH1PVZQOmbm21/7xcd3RXmImefGsziRNC1fN9+ofv24TNL9EERUrNopenXsykuxprAHFwyFvMxHR5wZ0QGgHQMPE9Nr2cTzFF/65UARhDzeY2W0=
+ bh=GMm/eQKJw+rQ14sDUPcwk4EWWQ3Fl7hyawwQTrrgXy0=;
+ b=hidfG1QVmqWexBpfen9eGw0zrmVszL2c6O/SXZh3RlGyzF088xCgLnGP14QUxTPCic3Z6AxKjVejwVNN85+8Y+Mz63of/Ooly9TlanVvXH+2z8pfs6/MBD2I8xVYkDxyWRBcVUZieFtZx15jXBUvPtwvg88YgipdGag7AnqKhkU=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
  by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Mon, 30 Nov
- 2020 23:33:40 +0000
+ 2020 23:33:57 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Mon, 30 Nov 2020
- 23:33:40 +0000
+ 23:33:57 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -46,42 +46,42 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         linux-kernel@vger.kernel.org, srutherford@google.com,
         brijesh.singh@amd.com, dovmurik@linux.vnet.ibm.com, tobin@ibm.com,
         jejb@linux.ibm.com, frankeh@us.ibm.com, dgilbert@redhat.com
-Subject: [PATCH 7/9] KVM: x86: Mark _bss_decrypted section variables as decrypted in page encryption bitmap.
-Date:   Mon, 30 Nov 2020 23:33:30 +0000
-Message-Id: <dc9ce1acf9817b0a13cb8ac3de21be20abcc60d0.1606633738.git.ashish.kalra@amd.com>
+Subject: [PATCH 8/9] KVM: x86: Add kexec support for SEV page encryption bitmap.
+Date:   Mon, 30 Nov 2020 23:33:46 +0000
+Message-Id: <a176837742fef70cf8fe911325a7d58e9befc2a6.1606633738.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1606633738.git.ashish.kalra@amd.com>
 References: <cover.1606633738.git.ashish.kalra@amd.com>
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN6PR2101CA0029.namprd21.prod.outlook.com
- (2603:10b6:805:106::39) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0401CA0003.namprd04.prod.outlook.com
+ (2603:10b6:803:21::13) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN6PR2101CA0029.namprd21.prod.outlook.com (2603:10b6:805:106::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.2 via Frontend Transport; Mon, 30 Nov 2020 23:33:39 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN4PR0401CA0003.namprd04.prod.outlook.com (2603:10b6:803:21::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25 via Frontend Transport; Mon, 30 Nov 2020 23:33:57 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c8369755-3b85-489c-15ba-08d895885e14
+X-MS-Office365-Filtering-Correlation-Id: 94611639-dba2-4603-8b44-08d8958868a6
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB45097B9F35BB59AEF16159588EF50@SA0PR12MB4509.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4509B3396E7559DEC14F3F3E8EF50@SA0PR12MB4509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3383;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HXFRIpOrnNmMCYew1nbBIDLzlnQ9vYc8VhJDylg6YChUYi7oyD+PXDMZB80nN3bXKyj2y+xAMA6fteAbsby62guzqyI2zGcDa/Y2vLw+0+cEQzKl5ZoT7YsjQR3WJxw35sD1Lt4nCDDVTbZc5pPSj59OsbVs1qcYlV7U9Ue9zK00kYq21Ou1OtXdYWkORfYHUzo4k1Jc6QIneC0VClko25mOedu/U6At7RQXtR50lddJGZSJKEzEHIa13GhgiL55DndhrRKr757eSsN5f9z7oPZKNThF6AeE3JdD2U5tqOCbOYOyhM23mBeTZM3m79AsBwEmuE+RsqWbCl4QNdvmPw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(26005)(83380400001)(956004)(5660300002)(16526019)(7416002)(4326008)(86362001)(2616005)(186003)(316002)(7696005)(6916009)(2906002)(8936002)(6486002)(52116002)(8676002)(66946007)(478600001)(6666004)(66476007)(66556008)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: HUgwuatq4QayFFwfl8es/izFXy6UFWBkcCbW+N8oOCAb/yVdef68h62aUs+Oofeph5yTjZftBxk3bfIvC8He+/ADWOfVSshImBCC/dNnyxO5Be9V/iZPQJVMqldiMjvP8aA3fp4Uar//OdQE3kjxT+/F2TThLqAck3OtQVBt7kYCRXVBf/jJa+SOrY+f3sO4wARnW3HUkYYi7tuYcszpndjdZPeGIkNqnzJVgos5eFFtU4L49HeEaGFjPvmWth7pXsPy1Cmx7wmcNNo64EwTjo7U48K2Nv0iPG8TDpifkuqeHl/sJRdxjRIeuxHpsndGOVHw38C8DVmYXZrFnDGLG+/NRu6YgI8tUKmCxkTKn0Dg7Dw40oUoy18o74OKTo8COaurtclfTDsDct16/rOx9ZPRz2U9IuLxHUmMUAsDgEQh1v2XMuBzW6bK0pQ9PwtZIgSTeR7D8zFSN0Zh62zc1jVsWpTQvhZR52zpbXRcBb1vqLUnCm0r40XZObVollfHtblaaVAU6TEq71pdzTHUbbkzYWmRWDRd2pPb7/uPPDjTofTu/ciSvAY2wyvpXva7aw9uZ0+56c7ZBjZrUymwuWt7in6Cpa5NT3DX8rMKhSsQyZBNyAS6xnjWKWuRM5F3wcU10i2OHedvtXQgy7rqpZjghY4qKf2NJjJaq0ZDJhpEeZj9pUOf1a+GDfDhXPB8t5vzBBJad2D8UkWSfOM8789HTC8glEYFgdBWTVZ1Ohhe0TLXuGQ+qVQbhrkHM0yV
+X-Microsoft-Antispam-Message-Info: adlC/l5qxO7c6cGIWpItKLNoblG6W44ksXI4Kdvj2LgyO137/IGBdJL0JsjWu8RkEySmKoK9NOB+7E20hdNGaeHap+Jr+z0UxHl7Xmu0Eusf+FM/CSoEWeYo8gTB4ZQx4mnp4uyhysWz6bU8sueQLOOaGrnjw8crsXVSDc+kDw1byw5DhmT/X6EdNFg6cMG6v+VjE85N3EKiGeEhS+qCV/smiCzme3bwwXMXMTxZlsNsuwFY1NhgVeojrm2jzOwgaLFl2+3kZr9Ih62rywp7lyL7x0fVtJRcCqJ5VOdxZ3WBosSe7g7DBAX9M+Ov3uvrNMyBY5fduJJEUTm0rrbg9A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(26005)(956004)(5660300002)(16526019)(7416002)(4326008)(86362001)(2616005)(186003)(316002)(7696005)(6916009)(2906002)(8936002)(6486002)(52116002)(8676002)(66946007)(478600001)(6666004)(66476007)(66556008)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: Lwk4eioi4d9NSJ6eP0clL9xDytpm0lTkRV4ap5urtI8REIWnFcDiPBXzANx5Wst5LiedRL32T+FEq6CwrJ6aA4onDIL+Ay4SOBTD2uWhUME8NmNXvZzZt7DGCpFJrrjiQ8uI9/s+PnxXLzH1U5ucWfE3vdR2SHe1XXz0UyPKYacfxyZfVPE2G9IZlSMLSO4juG0Kczt4GimY3zrezYYnE+QyP/KMVBTZD6pahCYrWayTPN9IJRruwwbJpnefBuNUQu2u+8y+733GZBj4975qUAHjxehFPNp5XeYsNBXQKuUJm7BQ5ue7yfJyROoUPm3KiV0bwddAvTruvzS8+Rm1kMNx+eIdnEy8AMs+SmtbGN0HeB5tvZlGU6ZWVnTjFQ42zebDaeoXtZI+jKCxF5ClcEfmtVbkXU5ob81A+Xs8yNIRgJD5NoD+z88sgcbuzmkYJDy59cnML9S1lDHNkSsmHHlk5aPvdhFug/jf3aV6udDKO2vAKh3plPc+P7+zUwy679+j3u1PthBLIZUg2udhT4dOB7MrCcxuM3KDY8wx6PF8QiDTxNz+k0UtS0SIsHaQ0bm0Pt98iVMZ2TOR9SUBA0d2AEg181DYpMOXL9KzAFxYW3WtLOeVrmKYS7X5KHNrM0w/WxvRCKC4I8QfTMp/HvUKAHYcodDGp0kLHIKD82/4b3HHW4cP/GNXoqhAhcuWFlZawrMLLHkWX2IVQp3G7G2I0SGE3W4uOnMX/f9AqaCIh/+ph7v4AaefLpJRJQTp
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8369755-3b85-489c-15ba-08d895885e14
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94611639-dba2-4603-8b44-08d8958868a6
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2020 23:33:40.3678
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2020 23:33:57.8250
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: B40LiPQHyWKasFgWgB8u7it2OK5m/I8pSmscKXUKhFCQR1SHXD+E+ctDXYrnLZ5g7EByopz4JEK3o1XUlwFDeQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: nByA6pYO+2XMuK4zM/U6EDgl7y78Kwo9wj1raio/0bPJyx4JQAZl33B5i91Ltl56KDNSbOpfvqtHwAMFsEjdLA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -89,79 +89,68 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-Ensure that _bss_decrypted section variables such as hv_clock_boot and
-wall_clock are marked as decrypted in the page encryption bitmap if
-sev liv migration is supported.
+Reset the host's page encryption bitmap related to kernel
+specific page encryption status settings before we load a
+new kernel by kexec. We cannot reset the complete
+page encryption bitmap here as we need to retain the
+UEFI/OVMF firmware specific settings.
+
+The host's page encryption bitmap is maintained for the
+guest to keep the encrypted/decrypted state of the guest pages,
+therefore we need to explicitly mark all shared pages as
+encrypted again before rebooting into the new guest kernel.
 
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- arch/x86/include/asm/mem_encrypt.h |  4 ++++
- arch/x86/kernel/kvmclock.c         | 12 ++++++++++++
- arch/x86/mm/mem_encrypt.c          |  6 ++++++
- 3 files changed, 22 insertions(+)
+ arch/x86/kernel/kvm.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
-index 2f62bbdd9d12..a4fd6a4229eb 100644
---- a/arch/x86/include/asm/mem_encrypt.h
-+++ b/arch/x86/include/asm/mem_encrypt.h
-@@ -43,6 +43,8 @@ void __init sme_enable(struct boot_params *bp);
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 7f57ede3cb8e..55d845e025b2 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -38,6 +38,7 @@
+ #include <asm/cpuidle_haltpoll.h>
+ #include <asm/ptrace.h>
+ #include <asm/svm.h>
++#include <asm/e820/api.h>
  
- int __init early_set_memory_decrypted(unsigned long vaddr, unsigned long size);
- int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size);
-+void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages,
-+					    bool enc);
+ DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
  
- void __init mem_encrypt_free_decrypted_mem(void);
- 
-@@ -82,6 +84,8 @@ static inline int __init
- early_set_memory_decrypted(unsigned long vaddr, unsigned long size) { return 0; }
- static inline int __init
- early_set_memory_encrypted(unsigned long vaddr, unsigned long size) { return 0; }
-+static inline void __init
-+early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool enc) {}
- 
- static inline void mem_encrypt_free_decrypted_mem(void) { }
- 
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index aa593743acf6..94a4fbf80e44 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -333,6 +333,18 @@ void __init kvmclock_init(void)
- 	pr_info("kvm-clock: Using msrs %x and %x",
- 		msr_kvm_system_time, msr_kvm_wall_clock);
- 
-+	if (sev_active()) {
+@@ -383,6 +384,33 @@ static void kvm_pv_guest_cpu_reboot(void *unused)
+ 	 */
+ 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+ 		wrmsrl(MSR_KVM_PV_EOI_EN, 0);
++	/*
++	 * Reset the host's page encryption bitmap related to kernel
++	 * specific page encryption status settings before we load a
++	 * new kernel by kexec. NOTE: We cannot reset the complete
++	 * page encryption bitmap here as we need to retain the
++	 * UEFI/OVMF firmware specific settings.
++	 */
++	if (sev_active() & (smp_processor_id() == 0)) {
++		int i;
 +		unsigned long nr_pages;
-+		/*
-+		 * sizeof(hv_clock_boot) is already PAGE_SIZE aligned
-+		 */
-+		early_set_mem_enc_dec_hypercall((unsigned long)hv_clock_boot,
-+						1, 0);
-+		nr_pages = DIV_ROUND_UP(sizeof(wall_clock), PAGE_SIZE);
-+		early_set_mem_enc_dec_hypercall((unsigned long)&wall_clock,
-+						nr_pages, 0);
++
++		for (i = 0; i < e820_table->nr_entries; i++) {
++			struct e820_entry *entry = &e820_table->entries[i];
++			unsigned long start_pfn;
++			unsigned long end_pfn;
++
++			if (entry->type != E820_TYPE_RAM)
++				continue;
++
++			start_pfn = entry->addr >> PAGE_SHIFT;
++			end_pfn = (entry->addr + entry->size) >> PAGE_SHIFT;
++			nr_pages = DIV_ROUND_UP(entry->size, PAGE_SIZE);
++
++			kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
++					   entry->addr, nr_pages, 1);
++		}
 +	}
-+
- 	this_cpu_write(hv_clock_per_cpu, &hv_clock_boot[0]);
- 	kvm_register_clock("primary cpu clock");
- 	pvclock_set_pvti_cpu0_va(hv_clock_boot);
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 9d1ac65050d0..1bcfbcd2bfd7 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -376,6 +376,12 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
- 	return early_set_memory_enc_dec(vaddr, size, true);
+ 	kvm_pv_disable_apf();
+ 	kvm_disable_steal_time();
  }
- 
-+void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages,
-+					    bool enc)
-+{
-+	set_memory_enc_dec_hypercall(vaddr, npages, enc);
-+}
-+
- /*
-  * SME and SEV are very similar but they are not the same, so there are
-  * times that the kernel will need to distinguish between SME and SEV. The
 -- 
 2.17.1
 
