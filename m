@@ -2,98 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D6862C8813
-	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 16:34:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E3012C881A
+	for <lists+kvm@lfdr.de>; Mon, 30 Nov 2020 16:36:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726653AbgK3Pd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 10:33:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45209 "EHLO
+        id S1727486AbgK3PfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 10:35:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24029 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726063AbgK3Pd1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 10:33:27 -0500
+        by vger.kernel.org with ESMTP id S1727464AbgK3PfA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Nov 2020 10:35:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606750321;
+        s=mimecast20190719; t=1606750414;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KsipwzBDzb60ARfCi+QI1m4LWf3wJygQ0AAsNDCG40s=;
-        b=BD1jZf+mQrP1qWOxTADZKpLmWT3winzbzpOSSKIzjmIyD7JVuLKvcTwbw7qvot2rc2YD9G
-        0LbTasmcmZ0ibFSASpRTE1lU4Yin9RUFYol0o6OSCbMMLIVWESBmZWULwWNUl8XPIH/FzQ
-        MGtDr0xDQHVIDZlN50V1WLEw4LNjMcg=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-pPK1LGbBMMe0bncGU5qe7A-1; Mon, 30 Nov 2020 10:31:57 -0500
-X-MC-Unique: pPK1LGbBMMe0bncGU5qe7A-1
-Received: by mail-ed1-f71.google.com with SMTP id c24so6941107edx.2
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 07:31:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KsipwzBDzb60ARfCi+QI1m4LWf3wJygQ0AAsNDCG40s=;
-        b=ftyFd74rnsBa0gA2jq2O8jY9WojHpXLQPedVBY4KKmm36mgpc9XCG/F2dVWDagqLsb
-         VY5fPSxlRuIwDTE4bfxiRbNH+pjhP22dA3VUJxzU8bx0TKQHKrWx1p1uhSiVgGbET2KK
-         Vs+sm21LFxMUYc4OO0tG1aM8MdVb2xIKnCzectiI5O9xiWY7knyAgNNzulwLFbR74idE
-         uZdbRrK3oHXKl24iMreaFo33btAALH5+V90fycKsRMyt/tgKrIS0MF5JTLamwJo/lOpY
-         /YWyi0eNAF+6s4Q12b7Ux5u3h284+4843vBO8i7cRoutin/PtAacVGSeUwkbyw3PPGqt
-         gXLg==
-X-Gm-Message-State: AOAM532ts7HGZI9D6MrC8PDAkib80Xi2KF0/YnIMH2K4Z+9PCTrQgMpZ
-        bni8YKrcafQou4MWgNzt/nPAUO7hjI0CrcDAYLXdpv3FAge47H5a+fA/KiFKToDb0lWX+eDu5Zf
-        Tkqv4MDTMOkr7
-X-Received: by 2002:a17:906:4d8d:: with SMTP id s13mr13795544eju.305.1606750315808;
-        Mon, 30 Nov 2020 07:31:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzJAmnB5boOvr5IKy7hOk2umHPy16BXprPN19ur+qcGYoWH+aEvjXuHby4AMDAYp+vPRqAQxw==
-X-Received: by 2002:a17:906:4d8d:: with SMTP id s13mr13795389eju.305.1606750313897;
-        Mon, 30 Nov 2020 07:31:53 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s5sm6581838eju.98.2020.11.30.07.31.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Nov 2020 07:31:53 -0800 (PST)
-Subject: Re: [RFC PATCH 00/35] SEV-ES hypervisor support
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        bh=FQatalQEFsFszop7DIO2Ob5g7uuYov1pLoszVHjjbgk=;
+        b=VDg7bIf8OZcLREUqCjj/cQyThH7bXhgILWBWYLszqdncDUsRyfazqWdVj2/zn2UqjNYsFH
+        SqzzJKlK/NWLCD4Rt2B3lHPN8iKCdRNm0pSDRTfTqe4G9jBryJs2r7XgfMCSaajkuewrka
+        fFjcPZKgc/yPVVI9Xz3/xXt7U4e+faQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-5J4J05ODOcqkm__noHraNA-1; Mon, 30 Nov 2020 10:33:30 -0500
+X-MC-Unique: 5J4J05ODOcqkm__noHraNA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85D097FE41;
+        Mon, 30 Nov 2020 15:33:26 +0000 (UTC)
+Received: from starship (unknown [10.35.206.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4989C5C233;
+        Mon, 30 Nov 2020 15:33:16 +0000 (UTC)
+Message-ID: <989974f32eab61187557239172c603857d4bd837.camel@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: x86: introduce KVM_X86_QUIRK_TSC_HOST_ACCESS
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Oliver Upton <oupton@google.com>, Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <cover.1600114548.git.thomas.lendacky@amd.com>
- <20200914225951.GM7192@sjchrist-ice>
- <bee6fdda-d548-8af5-f029-25c22165bf84@amd.com>
- <20200916001925.GL8420@sjchrist-ice>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <60cbddaf-50f3-72ca-f673-ff0b421db3ad@redhat.com>
-Date:   Mon, 30 Nov 2020 16:31:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        open list <linux-kernel@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Mon, 30 Nov 2020 17:33:15 +0200
+In-Reply-To: <5e77e912-893b-0c8f-a9a6-b43eaee24ed3@redhat.com>
+References: <20201130133559.233242-1-mlevitsk@redhat.com>
+         <20201130133559.233242-3-mlevitsk@redhat.com>
+         <c093973e-c8da-4d09-11f2-61cc0918f55f@redhat.com>
+         <638a2919cf7c11c55108776beecafdd8e2da2995.camel@redhat.com>
+         <5e77e912-893b-0c8f-a9a6-b43eaee24ed3@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20200916001925.GL8420@sjchrist-ice>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/09/20 02:19, Sean Christopherson wrote:
+On Mon, 2020-11-30 at 15:15 +0100, Paolo Bonzini wrote:
+> On 30/11/20 15:11, Maxim Levitsky wrote:
+> > On Mon, 2020-11-30 at 14:54 +0100, Paolo Bonzini wrote:
+> > > On 30/11/20 14:35, Maxim Levitsky wrote:
+> > > > This quirk reflects the fact that we currently treat MSR_IA32_TSC
+> > > > and MSR_TSC_ADJUST access by the host (e.g qemu) in a way that is different
+> > > > compared to an access from the guest.
+> > > > 
+> > > > For host's MSR_IA32_TSC read we currently always return L1 TSC value, and for
+> > > > host's write we do the tsc synchronization.
+> > > > 
+> > > > For host's MSR_TSC_ADJUST write, we don't make the tsc 'jump' as we should
+> > > > for this msr.
+> > > > 
+> > > > When the hypervisor uses the new TSC GET/SET state ioctls, all of this is no
+> > > > longer needed, thus leave this enabled only with a quirk
+> > > > which the hypervisor can disable.
+> > > > 
+> > > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > 
+> > > This needs to be covered by a variant of the existing selftests testcase
+> > > (running the same guest code, but different host code of course).
+> > Do you think that the test should go to the kernel's kvm unit tests,
+> > or to kvm-unit-tests project?
 > 
-> TDX also selectively blocks/skips portions of other ioctl()s so that the
-> TDX code itself can yell loudly if e.g. .get_cpl() is invoked.  The event
-> injection restrictions are due to direct injection not being allowed (except
-> for NMIs); all IRQs have to be routed through APICv (posted interrupts) and
-> exception injection is completely disallowed.
+> The latter already has x86_64/tsc_msrs_test.c (which I created in 
+> preparation for this exact change :)).
+
+I'll prepare a test then for it!
+
+Best regards,
+	Maxim Levitsky
 > 
->    kvm_vcpu_ioctl_x86_get_vcpu_events:
-> 	if (!vcpu->kvm->arch.guest_state_protected)
->          	events->interrupt.shadow = kvm_x86_ops.get_interrupt_shadow(vcpu);
+> Paolo
+> 
 
-Perhaps an alternative implementation can enter the vCPU with immediate 
-exit until no events are pending, and then return all zeroes?
-
-Paolo
 
