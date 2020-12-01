@@ -2,104 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E9602CA222
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 13:10:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 555CE2CA26B
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 13:16:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730261AbgLAMJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 07:09:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728587AbgLAMJS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 07:09:18 -0500
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A70C0613D3
-        for <kvm@vger.kernel.org>; Tue,  1 Dec 2020 04:08:40 -0800 (PST)
-Received: by mail-ej1-x641.google.com with SMTP id lt17so3642495ejb.3
-        for <kvm@vger.kernel.org>; Tue, 01 Dec 2020 04:08:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/M6qTRcb7ooypOLbSQABaMQfCmtDYaK+udx98ET3zE0=;
-        b=jgCyEL4GxykEGe6r0UMTPCaWikmwu2ELKKt7Sx6CWSLhNPAhlZocJgF+mBXShMebh4
-         FxA9ofaFQSCqEjipdvKk1dTg02CnPU5hHUXSTwH/tG6s+atndbczLMtsbWzaXEiq7UsI
-         RRmI+i+AEU6WBhrLTh4pc+CrTRxt0ykBj7qbcQ8sODFGWsSl6ptB1lr8KJXlXlQFJmae
-         lD22gINGZEfCq8dtKw6LSq8Hdw+twQqVftEBoItujquzL6+8tZGzMcAqn2bdmey+Hq/A
-         93zL9ZCvfUBfrlud7VyCsY4wFpftxqyk9CSx4EwAa21jwoStddERz3Nz/Hsojtq5kj7J
-         Q6Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/M6qTRcb7ooypOLbSQABaMQfCmtDYaK+udx98ET3zE0=;
-        b=QjXZGSyijsmtVgd8jnXHlL/r4ORvf7/gJn9YE0MI8N/cNFwXG196DhcEH7J4ysHkIo
-         jVNL7xiPeOWTdJtnqJmUlqh88clnnpb7ccKPluVdIMFHXT9y9ZhEIILGcIiClmnjBBU7
-         9SknilQd+fQv2jKnSmaIwLMHJrx274/yXqiqMfRQ08n5vY5ILc9cdmgecABIAoyxYoXJ
-         p9ek5HdP5hbOlI5fzXUfHlnakuDujOyt77tJ44Rt5hpaLiHGhK99i/+pZOUgo9XFbML7
-         z+WJyT8gypTOhT42VXaCUa+EE191r9HplD89HW12hg/WzllDFr14Q9rXrcmdT0aix/34
-         U53g==
-X-Gm-Message-State: AOAM5301GNCpZJmBqg+WlG0o3qxwc6Z4MZ+AfC6WYI/fneUpa8y9koc0
-        1/7MdoEgPRzHO25dfdv1uSwv9cqIOg74X4/i23v5eQ==
-X-Google-Smtp-Source: ABdhPJxEiWo1Tv+TW4J5r8DZAK6hUJecW72gylq3kLnK4od8ArvYvpKXzxlfh0l7i+n56+FxpQF+Zyhy51wNrSwiYaI=
-X-Received: by 2002:a17:906:1542:: with SMTP id c2mr2528306ejd.382.1606824519416;
- Tue, 01 Dec 2020 04:08:39 -0800 (PST)
+        id S1729002AbgLAMQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 07:16:07 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:8479 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726202AbgLAMQH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 07:16:07 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Clgyx4s0YzhlQd;
+        Tue,  1 Dec 2020 20:15:05 +0800 (CST)
+Received: from [10.174.184.209] (10.174.184.209) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 1 Dec 2020 20:15:15 +0800
+Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
+ state to physical side
+To:     Marc Zyngier <maz@kernel.org>
+CC:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20201123065410.1915-1-lushenming@huawei.com>
+ <20201123065410.1915-4-lushenming@huawei.com>
+ <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
+ <b03edcf2-2950-572f-fd31-601d8d766c80@huawei.com>
+ <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
+ <49610291-cf57-ff78-d0ac-063af24efbb4@huawei.com>
+ <48c10467-30f3-9b5c-bbcb-533a51516dc5@huawei.com>
+ <2ad38077300bdcaedd2e3b073cd36743@kernel.org>
+ <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
+ <274dafb2e21f49326a64bb575e668793@kernel.org>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <59ec07e5-c017-8644-b96f-e87fe600c490@huawei.com>
+Date:   Tue, 1 Dec 2020 20:15:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-References: <cover.1605316268.git.ashish.kalra@amd.com> <eeb1393a933c5443941ae795478a7bc33f843cf1.1605316268.git.ashish.kalra@amd.com>
-In-Reply-To: <eeb1393a933c5443941ae795478a7bc33f843cf1.1605316268.git.ashish.kalra@amd.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 1 Dec 2020 12:08:28 +0000
-Message-ID: <CAFEAcA8AW-jQXHeDuNHq1AHe=u8z_JtgP5gvLnz3vHvXR0uBzQ@mail.gmail.com>
-Subject: Re: [PATCH 03/11] exec: add ram_debug_ops support
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Lendacky <Thomas.Lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, ssg.sos.patches@amd.com,
-        Markus Armbruster <armbru@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <274dafb2e21f49326a64bb575e668793@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.184.209]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 Nov 2020 at 19:19, Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> Currently, guest memory access for debugging purposes is performed using
-> memcpy(). Extend the 'struct MemoryRegion' to include new callbacks that
-> can be used to override the use of memcpy() with something else.
->
-> The new callbacks can be used to display the guest memory of an SEV guest
-> by registering callbacks to the SEV memory encryption/decryption APIs.
->
-> Typical usage:
->
-> mem_read(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
-> mem_write(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
+On 2020/12/1 19:50, Marc Zyngier wrote:
+> On 2020-12-01 11:40, Shenming Lu wrote:
+>> On 2020/12/1 18:55, Marc Zyngier wrote:
+>>> On 2020-11-30 07:23, Shenming Lu wrote:
+>>>
+>>> Hi Shenming,
+>>>
+>>>> We are pondering over this problem these days, but still don't get a
+>>>> good solution...
+>>>> Could you give us some advice on this?
+>>>>
+>>>> Or could we move the restoring of the pending states (include the sync
+>>>> from guest RAM and the transfer to HW) to the GIC VM state change handler,
+>>>> which is completely corresponding to save_pending_tables (more symmetric?)
+>>>> and don't expose GICv4...
+>>>
+>>> What is "the GIC VM state change handler"? Is that a QEMU thing?
+>>
+>> Yeah, it is a a QEMU thing...
+>>
+>>> We don't really have that concept in KVM, so I'd appreciate if you could
+>>> be a bit more explicit on this.
+>>
+>> My thought is to add a new interface (to QEMU) for the restoring of
+>> the pending states, which is completely corresponding to
+>> KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES...
+>> And it is called from the GIC VM state change handler in QEMU, which
+>> is happening after the restoring (call kvm_vgic_v4_set_forwarding())
+>> but before the starting (running) of the VFIO device.
+> 
+> Right, that makes sense. I still wonder how much the GIC save/restore
+> stuff differs from other architectures that implement similar features,
+> such as x86 with VT-D.
 
-We already have a function prototype for "I need to call a function
-to do this read or write":
-    MemTxResult (*read_with_attrs)(void *opaque,
-                                   hwaddr addr,
-                                   uint64_t *data,
-                                   unsigned size,
-                                   MemTxAttrs attrs);
-    MemTxResult (*write_with_attrs)(void *opaque,
-                                    hwaddr addr,
-                                    uint64_t data,
-                                    unsigned size,
-                                    MemTxAttrs attrs);
+I am not familiar with it...
 
-Do the prototypes for accessing guest RAM that needs decryption
-really need to be different from that?
+> 
+> It is obviously too late to change the userspace interface, but I wonder
+> whether we missed something at the time.
 
-thanks
--- PMM
+The interface seems to be really asymmetrical?...
+
+Or is there a possibility that we could know which irq is hw before the VFIO
+device calls kvm_vgic_v4_set_forwarding()?
+
+Thanks,
+Shenming
+
+> 
+> Thanks,
+> 
+>         M.
