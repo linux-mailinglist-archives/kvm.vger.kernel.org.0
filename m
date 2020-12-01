@@ -2,213 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72A4C2CAA55
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 18:58:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C619D2CAAB6
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 19:26:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389943AbgLAR6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 12:58:05 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6842 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726104AbgLAR6F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Dec 2020 12:58:05 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B1HVvqN011551;
-        Tue, 1 Dec 2020 12:57:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=dH2ctsvET4xi8v0xPbDebqX2yq8lLAveDD3yFimQ4RY=;
- b=e+OYOlP7DyO6sGrihjXQaXbvQI0i98aqEIHWLyS0U190eStHqlV16fcg19MQo8MDaddc
- Jw/F++a3lvfiH1dxpFTJdyB1xIRuBCunAhEEKu3QmfxuxrH+Hqug/rqJNok7864/XzLZ
- 7WCcXQGJKgeboZLXVL6Vu8cH5G3wZzSyFtLDkmmV58mZ9jmP+mTx3FfIK2V8fNQAK4ue
- mpmRE/PNcbTwi3hhNNUd6F00qFnGWmm8YOmPCMF6efezumy9DWXYZ6L0trmTFRb1vowy
- VMAnP7zQcLK5rPunqMPbxO+3L3T6gF9Zr1rhL9DiLD4XD7PEyJdfjnY8iPtQc0JkGYsv CQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 355k52gh9r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Dec 2020 12:57:19 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B1HpJC9090108;
-        Tue, 1 Dec 2020 12:57:18 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 355k52gh94-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Dec 2020 12:57:18 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B1HgGlP012953;
-        Tue, 1 Dec 2020 17:57:16 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 353e683cxd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Dec 2020 17:57:16 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B1HvDUj54854096
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 1 Dec 2020 17:57:13 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BF15FA4051;
-        Tue,  1 Dec 2020 17:57:13 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 06959A4040;
-        Tue,  1 Dec 2020 17:57:11 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.25.88])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Tue,  1 Dec 2020 17:57:10 +0000 (GMT)
-Date:   Tue, 1 Dec 2020 18:56:59 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v12 12/17] s390/vfio-ap: allow hot plug/unplug of AP
- resources using mdev device
-Message-ID: <20201201185659.72ca96c8.pasic@linux.ibm.com>
-In-Reply-To: <20201201003227.0c3696fc.pasic@linux.ibm.com>
-References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
-        <20201124214016.3013-13-akrowiak@linux.ibm.com>
-        <20201129025250.16eb8355.pasic@linux.ibm.com>
-        <103cbe02-2093-c950-8d65-d3dc385942ce@linux.ibm.com>
-        <20201201003227.0c3696fc.pasic@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1729853AbgLAS0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 13:26:16 -0500
+Received: from out02.mta.xmission.com ([166.70.13.232]:56504 "EHLO
+        out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727278AbgLAS0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 13:26:16 -0500
+X-Greylist: delayed 1435 seconds by postgrey-1.27 at vger.kernel.org; Tue, 01 Dec 2020 13:26:16 EST
+Received: from in01.mta.xmission.com ([166.70.13.51])
+        by out02.mta.xmission.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1kk9xz-0034JV-Jl; Tue, 01 Dec 2020 11:01:31 -0700
+Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95] helo=x220.xmission.com)
+        by in01.mta.xmission.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1kk9xy-00081x-2R; Tue, 01 Dec 2020 11:01:31 -0700
+From:   ebiederm@xmission.com (Eric W. Biederman)
+To:     "Catangiu\, Adrian Costin" <acatan@amazon.com>
+Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
+        Alexander Graf <graf@amazon.de>,
+        Mike Rapoport <rppt@kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jann Horn <jannh@google.com>, Willy Tarreau <w@1wt.eu>,
+        "MacCarthaigh\, Colm" <colmmacc@amazon.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        "Woodhouse\, David" <dwmw@amazon.co.uk>,
+        "bonzini\@gnu.org" <bonzini@gnu.org>,
+        "Singh\, Balbir" <sblbir@amazon.com>,
+        "Weiss\, Radu" <raduweis@amazon.com>,
+        "oridgar\@gmail.com" <oridgar@gmail.com>,
+        "ghammer\@redhat.com" <ghammer@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Qemu Developers <qemu-devel@nongnu.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>,
+        Linux API <linux-api@vger.kernel.org>,
+        "mpe\@ellerman.id.au" <mpe@ellerman.id.au>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        "areber\@redhat.com" <areber@redhat.com>,
+        Pavel Emelyanov <ovzxemul@gmail.com>,
+        Andrey Vagin <avagin@gmail.com>,
+        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+        "gil\@azul.com" <gil@azul.com>,
+        "asmehra\@redhat.com" <asmehra@redhat.com>,
+        "dgunigun\@redhat.com" <dgunigun@redhat.com>,
+        "vijaysun\@ca.ibm.com" <vijaysun@ca.ibm.com>
+References: <3E05451B-A9CD-4719-99D0-72750A304044@amazon.com>
+        <300d4404-3efe-880e-ef30-692eabbff5f7@de.ibm.com>
+        <da1a1fa7-a1de-d0e6-755b-dd587687765e@amazon.de>
+        <20201119173800.GD8537@kernel.org>
+        <1cdb6fac-0d50-3399-74a6-24c119ebbaa5@amazon.de>
+        <106f56ca-49bc-7cad-480f-4b26656e90ce@gmail.com>
+        <96625ce2-66c6-34b8-ef81-7c17c05b4c7a@amazon.com>
+Date:   Tue, 01 Dec 2020 12:00:58 -0600
+In-Reply-To: <96625ce2-66c6-34b8-ef81-7c17c05b4c7a@amazon.com> (Adrian Costin
+        Catangiu's message of "Fri, 27 Nov 2020 20:26:02 +0200")
+Message-ID: <87zh2xcso5.fsf@x220.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-12-01_07:2020-11-30,2020-12-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 malwarescore=0 priorityscore=1501
- phishscore=0 bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015
- adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2012010104
+Content-Type: text/plain
+X-XM-SPF: eid=1kk9xy-00081x-2R;;;mid=<87zh2xcso5.fsf@x220.int.ebiederm.org>;;;hst=in01.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
+X-XM-AID: U2FsdGVkX1/R0Vga3FxvQqhqZmu6jrIe/AwE1gt5KtU=
+X-SA-Exim-Connect-IP: 68.227.160.95
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa06.xmission.com
+X-Spam-Level: 
+X-Spam-Status: No, score=0.5 required=8.0 tests=ALL_TRUSTED,BAYES_50,
+        DCC_CHECK_NEGATIVE,T_TM2_M_HEADER_IN_MSG,XMSubLong autolearn=disabled
+        version=3.4.2
+X-Spam-Report: * -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        *  0.7 XMSubLong Long Subject
+        *  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
+        * -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
+        *      [sa06 1397; Body=1 Fuz1=1 Fuz2=1]
+X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: ;"Catangiu\, Adrian Costin" <acatan@amazon.com>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 986 ms - load_scoreonly_sql: 0.05 (0.0%),
+        signal_user_changed: 26 (2.6%), b_tie_ro: 24 (2.5%), parse: 1.66
+        (0.2%), extract_message_metadata: 19 (1.9%), get_uri_detail_list: 3.6
+        (0.4%), tests_pri_-1000: 24 (2.5%), tests_pri_-950: 3.3 (0.3%),
+        tests_pri_-900: 2.1 (0.2%), tests_pri_-90: 417 (42.3%), check_bayes:
+        385 (39.1%), b_tokenize: 29 (3.0%), b_tok_get_all: 17 (1.7%),
+        b_comp_prob: 6 (0.6%), b_tok_touch_all: 322 (32.7%), b_finish: 1.30
+        (0.1%), tests_pri_0: 438 (44.4%), check_dkim_signature: 0.82 (0.1%),
+        check_dkim_adsp: 2.9 (0.3%), poll_dns_idle: 1.02 (0.1%), tests_pri_10:
+        2.1 (0.2%), tests_pri_500: 48 (4.9%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v3] drivers/virt: vmgenid: add vm generation id driver
+X-Spam-Flag: No
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on in01.mta.xmission.com)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 1 Dec 2020 00:32:27 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+"Catangiu, Adrian Costin" <acatan@amazon.com> writes:
 
-> > 
-> > 
-> > On 11/28/20 8:52 PM, Halil Pasic wrote:  
-> [..]
-> > >> * Unassign adapter from mdev's matrix:
-> > >>
-> > >>    The domain will be hot unplugged from the KVM guest if it is
-> > >>    assigned to the guest's matrix.
-> > >>
-> > >> * Assign a control domain:
-> > >>
-> > >>    The control domain will be hot plugged into the KVM guest if it is not
-> > >>    assigned to the guest's APCB. The AP architecture ensures a guest will
-> > >>    only get access to the control domain if it is in the host's AP
-> > >>    configuration, so there is no risk in hot plugging it; however, it will
-> > >>    become automatically available to the guest when it is added to the host
-> > >>    configuration.
-> > >>
-> > >> * Unassign a control domain:
-> > >>
-> > >>    The control domain will be hot unplugged from the KVM guest if it is
-> > >>    assigned to the guest's APCB.  
-> > > This is where things start getting tricky. E.g. do we need to revise
-> > > filtering after an unassign? (For example an assign_adapter X didn't
-> > > change the shadow, because queue XY was missing, but now we unplug domain
-> > > Y. Should the adapter X pop up? I guess it should.)  
-> > 
-> > I suppose that makes sense at the expense of making the code
-> > more complex. It is essentially what we had in the prior version
-> > which used the same filtering code for assignment as well as
-> > host AP configuration changes.
-> >   
-> 
-> Will have to think about it some more. Making the user unplug and
-> replug an adapter because at some point it got filtered, but there
-> is no need to filter it does not feel right. On the other hand, I'm
-> afraid I'm complaining in circles. 
+> - Background
+>
+> The VM Generation ID is a feature defined by Microsoft (paper:
+> http://go.microsoft.com/fwlink/?LinkId=260709) and supported by
+> multiple hypervisor vendors.
+>
+> The feature is required in virtualized environments by apps that work
+> with local copies/caches of world-unique data such as random values,
+> uuids, monotonically increasing counters, etc.
+> Such apps can be negatively affected by VM snapshotting when the VM
+> is either cloned or returned to an earlier point in time.
 
-I did some thinking. The following statements are about the state of
-affairs, when all 17 patches are applied. I'm commenting here, because
-I believe this is the patch that introduces the most controversial code.
+How does this differ from /proc/sys/kernel/random/boot_id?
 
-First about low level problems with the current code/design. The other is
-empty handling in vfio_ap_assign_apid_to_apcb() (and
-vfio_ap_assign_apqi_to_apcb()) is troublesome. The final product
-allows for over-commitment, i.e. assignment of e.g. domains that
-are not in the crypto host config. Let's assume the host LPAR
-has usage domains 1 and 2, and adapters 1, 2, and 3. The apmask
-and aqmask are both 0 (all in on vfio), all bound. We start with an empty
-mdev that is tied to a running guest:
-assign_adapter 1
-assign_adapter 2
-assign_adapter 3
-assign_adapter 4
-all of these will work. The resulting shadow_apcb is completely empty. No
-commit_apcb.
-assign_domain 1
-assign_domain 2
-assign_domain 3
-all of these will work. But again the shadow_apcb is completely empty at
-the end: we did get to the loop that is checking the boundness of the
-queues, but please note that we are checking against matrix.apm, and
-adapter 4 is not in the config of the host.
+> The VM Generation ID is a simple concept meant to alleviate the issue
+> by providing a unique ID that changes each time the VM is restored
+> from a snapshot. The hw provided UUID value can be used to
+> differentiate between VMs or different generations of the same VM.
 
-I've hacked up a fixup patch for these problems that simplifies the
-code considerably, but there are design level issues, that run deeper,
-so I'm not sure the fixups are the way to go.
+Does the VM generation ID change in a running that effectively things it
+is running?
 
-Now lets talk about design level stuff. Currently the assignment
-operations are designed in to accommodate the FCFS principle. This
-is a blessing and a curse at the same time. 
+> - Problem
+>
+> The VM Generation ID is exposed through an ACPI device by multiple
+> hypervisor vendors but neither the vendors or upstream Linux have no
+> default driver for it leaving users to fend for themselves.
+>
+> Furthermore, simply finding out about a VM generation change is only
+> the starting point of a process to renew internal states of possibly
+> multiple applications across the system. This process could benefit
+> from a driver that provides an interface through which orchestration
+> can be easily done.
+>
+> - Solution
+>
+> This patch is a driver that exposes a monotonic incremental Virtual
+> Machine Generation u32 counter via a char-dev FS interface.
 
-Consider the following scenarios. We have an empty (nothing assigned
-mdev) and the following queues are bound to the vfio_ap driver:
-0.0
-0.1
-1.0
-If the we do 
-asssign_adapter 0
-assign_domain 0
-assign_domain 1
-assign_adapter 1
-We end up with the guest_matrix
-0.0
-0.1
-and the matrix
-0.0
-0.1
-1.0
-1.0
+Earlier it was a UUID now it is 32bit number?
 
-That is a different result compared to
-asssign_adapter 0
-assign_domain 0
-assign_adapter 1
-assign_domain 1
-or the situation where we have 0.0, 0.1, 1.0 and 1.1 bound to vfio_ap
-and then 1.1 gets unbound.
+> The FS
+> interface provides sync and async VmGen counter updates notifications.
+> It also provides VmGen counter retrieval and confirmation mechanisms.
+>
+> The generation counter and the interface through which it is exposed
+> are available even when there is no acpi device present.
+>
+> When the device is present, the hw provided UUID is not exposed to
+> userspace, it is internally used by the driver to keep accounting for
+> the exposed VmGen counter. The counter starts from zero when the
+> driver is initialized and monotonically increments every time the hw
+> UUID changes (the VM generation changes).
+> On each hw UUID change, the new hypervisor-provided UUID is also fed
+> to the kernel RNG.
 
-For the same system state (bound, config, ap_perm, matrix) you get a
-different outcomes (guest_matrix), because the outcomes depend on
-history.
+Should this be a hotplug even rather than a new character device?
 
-Another thing is recovery. I believe the main idea behind shadow_apcb
-is that we should auto recover once the resources are available again.
-The current design choices make recovery more difficult to think about
-because we may end up having either the apid or the apqi filtered on
-a 'hole' (an queue missing for reasons different than, belonging to
-default, or not being in the host config).
+Without plugging into udev and the rest of the hotplug infrastructure
+I suspect things will be missed.
 
-I still think for these cases filtering out the apid is the lesser
-evil. Yes a hotplug of a domain making hot unplugging an adapter is
-ugly, but at least I can describe that. So I propose the following.
-Let me hack up a fixup that morphs things in this direction. Maybe
-I will run into unexpected problems, but if I don't then we will
-have an alternative design you can run your testcases against. How about
-that?
+> If there is no acpi vmgenid device present, the generation changes are
+> not driven by hw vmgenid events but can be driven by software through
+> a dedicated driver ioctl.
+>
+> This patch builds on top of Or Idgar <oridgar@gmail.com>'s proposal
+> https://lkml.org/lkml/2018/3/1/498
 
-Regards,
-Halil
+
+Eric
