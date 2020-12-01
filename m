@@ -2,149 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D6742C9796
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 07:36:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 658532C99B3
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 09:41:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbgLAGgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 01:36:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56844 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726142AbgLAGgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 01:36:25 -0500
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A7AFC0613CF
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 22:35:44 -0800 (PST)
-Received: by mail-ed1-x541.google.com with SMTP id v22so1484539edt.9
-        for <kvm@vger.kernel.org>; Mon, 30 Nov 2020 22:35:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=S43PKtEcjZv88RH3tWBFcTkeH+4F4E0oX/oGz7vFOqI=;
-        b=nTcdL2Mr0svJ68JE+t1HqftBehCy5BwLl7k4FJJ9RZxKob4h+aBNNtlJM/MV4su6dG
-         0yHFpLjkQKK8sWtt9v6YmaWEB68SfeqrPsJRkn9k5mPy/9pMdm5WYF8NXt9vf1rBxpIN
-         bcJSl2/FsxoJvWApWvgg/OgOtaUdQIDd78+FFk4k7q58i0Z086+6IpW4KZJTOXGA+85O
-         j5wrqWB+hr4XXs2tdBkO2qo0M4S2IKIVNvOvXoYOAA/5QrGCOcbttGlSe97w7o7l9Z0p
-         jdlhWF+ZXMmaNzes2RQFD2K6DPvfaTHa5nJSSFNLJCSX73dr7Zs6ctqXDp2Qn329q5HK
-         SEvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=S43PKtEcjZv88RH3tWBFcTkeH+4F4E0oX/oGz7vFOqI=;
-        b=PbMYMe5zZEn+gyBOthfPx+8HlTQEciOxELZlfPG/ebcqQVrq5/os6x98dDDKd/UfZk
-         yqf084dXjMYsL58DjxGXg3EqCjY3az26LR72QPqLAEPzcSigAl7tBtifbOnbBt0Exyke
-         cX8skoNknloVAaUopbooC9FzVGDj0jO7UQ8ZFDBc4dmsuhKP/bAJLsG+TZEZvIGk3wWM
-         eFgB6VXqBhVeJ31wlG+WwxZeLdrlm2MMmigVNeDpkfOXnFIgTxCUQPxuwoxYe5IXfhjs
-         un8hZeBdS7jbTVjzEkh9NQTgQYo2DZ1y7TXrmZQORDz63H9DzjFK4GaGWlMZLXze9Uxh
-         julw==
-X-Gm-Message-State: AOAM530rwBEr0DQzfwl9D4HOJc1RhNzhb6RfONVB+0IpZUCu6AUxmLG/
-        xXX3DWCcU1qDT5LQ4Udg55rg9wFRXYU=
-X-Google-Smtp-Source: ABdhPJw5G7y0A1Gq67b5cvnDYKCCgH3sfrn03OQn4e+0mGUV3tO/faCx1shxM8M56HmsG6EEgwW+UA==
-X-Received: by 2002:a50:ff05:: with SMTP id a5mr1507919edu.43.1606804542742;
-        Mon, 30 Nov 2020 22:35:42 -0800 (PST)
-Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
-        by smtp.gmail.com with ESMTPSA id m7sm322094ejo.125.2020.11.30.22.35.42
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Nov 2020 22:35:42 -0800 (PST)
-Date:   Tue, 1 Dec 2020 07:35:37 +0100
-From:   Zdenek Kaspar <zkaspar82@gmail.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: Bad performance since 5.9-rc1
-Message-ID: <20201201073537.6749e2d7.zkaspar82@gmail.com>
-In-Reply-To: <20201119040526.5263f557.zkaspar82@gmail.com>
-References: <20201119040526.5263f557.zkaspar82@gmail.com>
+        id S1728313AbgLAIkI convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 1 Dec 2020 03:40:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52454 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726604AbgLAIkI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 03:40:08 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 209867] CPU soft lockup/stall with nested KVM and SMP
+Date:   Tue, 01 Dec 2020 08:39:26 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: taz.007@zoho.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-209867-28872-QWakeYcUJK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209867-28872@https.bugzilla.kernel.org/>
+References: <bug-209867-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 Nov 2020 04:05:26 +0100
-Zdenek Kaspar <zkaspar82@gmail.com> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=209867
 
-> Hi,
-> 
-> in my initial report (https://marc.info/?l=kvm&m=160502183220080&w=2 -
-> now fixed by c887c9b9ca62c051d339b1c7b796edf2724029ed) I saw degraded
-> performance going back somewhere between v5.8 - v5.9-rc1.
-> 
-> OpenBSD 6.8 (GENERIC.MP) guest performance (time ./test-build.sh)
-> good: 0m13.54s real     0m10.51s user     0m10.96s system
-> bad : 6m20.07s real    11m42.93s user     0m13.57s system
-> 
-> bisected to first bad commit: 6b82ef2c9cf18a48726e4bb359aa9014632f6466
-> 
-> git bisect log:
-> # bad: [e47c4aee5bde03e7018f4fde45ba21028a8f8438] KVM: x86/mmu: Rename
-> page_header() to to_shadow_page() # good:
-> [01c3b2b5cdae39af8dfcf6e40fdf484ae0e812c5] KVM: SVM: Rename
-> svm_nested_virtualize_tpr() to nested_svm_virtualize_tpr() git bisect
-> start 'e47c4aee5bde' '01c3b2b5cdae' # bad:
-> [ebdb292dac7993425c8e31e2c21c9978e914a676] KVM: x86/mmu: Batch zap MMU
-> pages when shrinking the slab git bisect bad
-> ebdb292dac7993425c8e31e2c21c9978e914a676 # good:
-> [fb58a9c345f645f1774dcf6a36fda169253008ae] KVM: x86/mmu: Optimize MMU
-> page cache lookup for fully direct MMUs git bisect good
-> fb58a9c345f645f1774dcf6a36fda169253008ae # bad:
-> [6b82ef2c9cf18a48726e4bb359aa9014632f6466] KVM: x86/mmu: Batch zap MMU
-> pages when recycling oldest pages git bisect bad
-> 6b82ef2c9cf18a48726e4bb359aa9014632f6466 # good:
-> [f95eec9bed76d42194c23153cb1cc8f186bf91cb] KVM: x86/mmu: Don't put
-> invalid SPs back on the list of active pages git bisect good
-> f95eec9bed76d42194c23153cb1cc8f186bf91cb # first bad commit:
-> [6b82ef2c9cf18a48726e4bb359aa9014632f6466] KVM: x86/mmu: Batch zap MMU
-> pages when recycling oldest pages
-> 
-> Host machine is old Intel Core2 without EPT (TDP).
-> 
-> TIA, Z.
+taz.007@zoho.com changed:
 
-Hi, with v5.10-rc6:
-get_mmio_spte: detect reserved bits on spte, addr 0xfe00d000, dump hierarchy:
------- spte 0x8000030e level 3.
------- spte 0xaf82027 level 2.
------- spte 0x2038001ffe00d407 level 1.
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 355 at kvm_mmu_page_fault.cold+0x42/0x4f [kvm]
-...
-CPU: 1 PID: 355 Comm: qemu-build Not tainted 5.10.0-rc6-amd64 #1
-Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426 01/13/2010
-RIP: 0010:kvm_mmu_page_fault.cold+0x42/0x4f [kvm]
-Code: e2 ec 44 8b 04 24 8b 5c 24 0c 44 89 c5 89 da 83 eb 01 48 c7 c7 20 b2 65 c0 48 63 c3 48 8b 74 c4 30 e8 dd 74 e2 ec 39 dd 7e e3 <0f> 0b 41 b8 ea ff ff ff e9 27 99 ff ff 0f 0b 48 8b 54 24 10 48 83
-RSP: 0018:ffffb67400653d30 EFLAGS: 00010202
-RAX: 0000000000000027 RBX: 0000000000000000 RCX: ffffa271ff2976f8
-RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffffa271ff2976f0
-RBP: 0000000000000001 R08: ffffffffadd02ae8 R09: 0000000000000003
-R10: 00000000ffffe000 R11: 3fffffffffffffff R12: 00000000fe00d000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000001
-FS:  00007fc10ae3d640(0000) GS:ffffa271ff280000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000002dc2000 CR4: 00000000000026e0
-Call Trace:
- kvm_arch_vcpu_ioctl_run+0xbaf/0x18f0 [kvm]
- ? do_futex+0x7c4/0xb80
- kvm_vcpu_ioctl+0x203/0x520 [kvm]
- ? set_next_entity+0x5b/0x80
- ? __switch_to_asm+0x32/0x60
- ? finish_task_switch+0x70/0x260
- __x64_sys_ioctl+0x338/0x720
- ? __x64_sys_futex+0x120/0x190
- do_syscall_64+0x33/0x40
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x7fc10c389f6b
-Code: 89 d8 49 8d 3c 1c 48 f7 d8 49 39 c4 72 b5 e8 1c ff ff ff 85 c0 78 ba 4c 89 e0 5b 5d 41 5c c3 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 ae 0c 00 f7 d8 64 89 01 48
-RSP: 002b:00007fc10ae3c628 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007fc10c389f6b
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000012
-RBP: 000055ad3767baf0 R08: 000055ad36be4850 R09: 00000000000000ff
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-R13: 000055ad371d9800 R14: 0000000000000001 R15: 0000000000000002
----[ end trace c5f7ae690f5abcc4 ]---
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |taz.007@zoho.com
 
-without: kvm: x86/mmu: Fix get_mmio_spte() on CPUs supporting 5-level PT
-I can run guest again, but with degraded performance as before.
+--- Comment #6 from taz.007@zoho.com ---
+I've got a similar stack trace, but with a completely different context. This
+is a small htpc box, no kvm involved, Intel CPU, 32bits.
 
-Z.
+déc 01 05:01:20 Aspire kernel: watchdog: BUG: soft lockup - CPU#2 stuck for
+22s! [sshd:20874]
+déc 01 05:01:20 Aspire kernel: Modules linked in: mptcp_diag tcp_diag udp_diag
+raw_diag inet_diag rpcsec_gss_krb5 md4 cmac nls_utf8 cifs libdes dns_resolver
+fscache fuse hwmon_vid nouveau ath5k snd_hda_codec_hdmi ath mxm_wmi ttm
+snd_hda_codec_realtek mac80211 snd_hda_codec_generic drm_kms_helper
+ledtrig_audio snd_hda_intel cfg80211 snd_intel_dspcfg mousedev cec input_leds
+snd_hda_codec rc_core snd_hda_core syscopyarea rfkill hid_generic sysfillrect
+snd_hwdep wmi_bmof libarc4 snd_pcm sysimgblt snd_timer fb_sys_fops coretemp
+usbhid uas hid pcspkr i2c_algo_bit usb_storage snd nv_tco soundcore forcedeth
+i2c_nforce2 wmi evdev nfsd auth_rpcgss tcp_bbr nfs_acl lockd grace sunrpc sg
+drm nfs_ssc agpgart ip_tables x_tables ext4 crc32c_generic crc16 mbcache jbd2
+ohci_pci ehci_pci ehci_hcd ohci_hcd
+déc 01 05:01:20 Aspire kernel: CPU: 2 PID: 20874 Comm: sshd Tainted: G      D  
+        5.9.9-arch1-1 #1
+déc 01 05:01:20 Aspire kernel: Hardware name: Acer Aspire R3610/FMCP7A-ION-LE,
+BIOS P01-A4 11/03/2009
+déc 01 05:01:20 Aspire kernel: EIP: queued_spin_lock_slowpath+0x42/0x200
+déc 01 05:01:20 Aspire kernel: Code: 8b 01 0f b6 d2 c1 e2 08 30 e4 09 d0 a9 00
+01 ff ff 0f 85 21 01 00 00 85 c0 74 15 8b 01 84 c0 74 0f 8d b4 26 00 00 00 00
+f3 90 <8b> 01 84 c0 75 f8 b8 01 00 00 00 66 89 01 64 ff 05 c0 1e bd c6 c3
+déc 01 05:01:20 Aspire kernel: EAX: 00000101 EBX: df4f1ea4 ECX: c6bf5e68 EDX:
+00000000
+déc 01 05:01:20 Aspire kernel: ESI: 00000001 EDI: df4f1e58 EBP: df4f1dcc ESP:
+df4f1dc8
+déc 01 05:01:20 Aspire kernel: DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+EFLAGS: 00000202
+déc 01 05:01:20 Aspire kernel: CR0: 80050033 CR2: 0048a107 CR3: 218a8000 CR4:
+000006d0
+déc 01 05:01:20 Aspire kernel: Call Trace:
+déc 01 05:01:20 Aspire kernel:  ? _raw_spin_lock+0x2c/0x30
+déc 01 05:01:20 Aspire kernel:  __change_page_attr_set_clr+0x45/0x740
+déc 01 05:01:20 Aspire kernel:  ? _vm_unmap_aliases.part.0+0x114/0x130
+déc 01 05:01:20 Aspire kernel:  change_page_attr_set_clr+0xd0/0x2a0
+déc 01 05:01:20 Aspire kernel:  set_memory_ro+0x1b/0x20
+déc 01 05:01:20 Aspire kernel:  bpf_prog_select_runtime+0x16c/0x1b0
+déc 01 05:01:20 Aspire kernel:  bpf_migrate_filter+0xe2/0x130
+déc 01 05:01:20 Aspire kernel:  bpf_prog_create_from_user+0x147/0x190
+déc 01 05:01:20 Aspire kernel:  ? hardlockup_detector_perf_cleanup+0x70/0x70
+déc 01 05:01:20 Aspire kernel:  do_seccomp+0x22d/0x9a0
+déc 01 05:01:20 Aspire kernel:  ? security_task_prctl+0x38/0x90
+déc 01 05:01:20 Aspire kernel:  prctl_set_seccomp+0x27/0x40
+déc 01 05:01:20 Aspire kernel:  __ia32_sys_prctl+0x87/0x4f0
+déc 01 05:01:20 Aspire kernel:  __do_fast_syscall_32+0x40/0x70
+déc 01 05:01:20 Aspire kernel:  do_fast_syscall_32+0x29/0x60
+déc 01 05:01:20 Aspire kernel:  do_SYSENTER_32+0x15/0x20
+déc 01 05:01:20 Aspire kernel:  entry_SYSENTER_32+0x9f/0xf2
+déc 01 05:01:20 Aspire kernel: EIP: 0xb7fd0549
+déc 01 05:01:20 Aspire kernel: Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01
+10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34
+cd 80 <5d> 5a 59 c3 90 90 90 90 8d 76 00 58 b8 77 00 00 00 cd 80 90 8d 76
+déc 01 05:01:20 Aspire kernel: EAX: ffffffda EBX: 00000016 ECX: 00000002 EDX:
+004f4d5c
+déc 01 05:01:20 Aspire kernel: ESI: 00000000 EDI: 00000001 EBP: b7b6ae1c ESP:
+bffff6ec
+déc 01 05:01:20 Aspire kernel: DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b
+EFLAGS: 00000292
+
+kernel 5.9.9-arch1-1
+
+Feel free to report if it's non related and I'll open a new bug report about
+it.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
