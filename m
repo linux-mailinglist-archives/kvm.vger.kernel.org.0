@@ -2,115 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 300762CA1C7
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 12:51:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8473D2CA1CC
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 12:53:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728084AbgLALuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 06:50:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53900 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726530AbgLALuo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 06:50:44 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728457AbgLALw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 06:52:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42089 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728320AbgLALw0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Dec 2020 06:52:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606823460;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ay9ItD6Kzh25y4pze0iPQOTVfknUuyVxyktssHh8Ios=;
+        b=JeejJbXb62xBuMU5CZWX8XSvneKmwqtd01F4AIrNvQTxmbbfGzxarlDEtYa3mcgpuKj2Zh
+        7tEvMXMknSTbTZWfAykdMQKllYTBNfDcrAvBCzkZ4sxv6Lkpub2srv8RWCNgWoyBKOcfRY
+        YH4xurvIf9tRT+I/cRov6B8XZV3IYXk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-CgMN2nTtMV2UUlP0nhldsA-1; Tue, 01 Dec 2020 06:50:57 -0500
+X-MC-Unique: CgMN2nTtMV2UUlP0nhldsA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9726820770;
-        Tue,  1 Dec 2020 11:50:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606823402;
-        bh=UE/XVXCsi7+x/uyIjMjMl6em1uv7ikjqa7mp1FXveyA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S4VW9Sgn7iW1ndWIZxYcNhZNcYzrdu4YLpAlGR+L9NWq1kn48g6Y4AjQsLMUboqDi
-         px82TrnsP+fOea64waKx9MDPGYbxyC/mmTjMV2SDQGdhlKvlPPX3OrDSqCpOMwmDfU
-         pi97M7j6fHneG9TEh+N29owEJN700T5yy5JzU9kQ=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kk4AS-00F1ps-IO; Tue, 01 Dec 2020 11:50:00 +0000
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 905BF817B91;
+        Tue,  1 Dec 2020 11:50:55 +0000 (UTC)
+Received: from work-vm (ovpn-115-1.ams2.redhat.com [10.36.115.1])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FB4F6086F;
+        Tue,  1 Dec 2020 11:50:49 +0000 (UTC)
+Date:   Tue, 1 Dec 2020 11:50:47 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Lendacky <Thomas.Lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, ssg.sos.patches@amd.com,
+        Markus Armbruster <armbru@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH 01/11] memattrs: add debug attribute
+Message-ID: <20201201115047.GA15055@work-vm>
+References: <cover.1605316268.git.ashish.kalra@amd.com>
+ <2ba88b512ec667eff66b2ece2177330a28e657c0.1605316268.git.ashish.kalra@amd.com>
+ <CAFEAcA8eiyzUbHXQip1sT_TrT+Mfv-WG8cSMmM-w_eOFShAMzQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 01 Dec 2020 11:50:00 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Shenming Lu <lushenming@huawei.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
- state to physical side
-In-Reply-To: <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
-References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-4-lushenming@huawei.com>
- <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
- <b03edcf2-2950-572f-fd31-601d8d766c80@huawei.com>
- <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
- <49610291-cf57-ff78-d0ac-063af24efbb4@huawei.com>
- <48c10467-30f3-9b5c-bbcb-533a51516dc5@huawei.com>
- <2ad38077300bdcaedd2e3b073cd36743@kernel.org>
- <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <274dafb2e21f49326a64bb575e668793@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: lushenming@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, alex.williamson@redhat.com, kwankhede@nvidia.com, cohuck@redhat.com, cjia@nvidia.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8eiyzUbHXQip1sT_TrT+Mfv-WG8cSMmM-w_eOFShAMzQ@mail.gmail.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-12-01 11:40, Shenming Lu wrote:
-> On 2020/12/1 18:55, Marc Zyngier wrote:
->> On 2020-11-30 07:23, Shenming Lu wrote:
->> 
->> Hi Shenming,
->> 
->>> We are pondering over this problem these days, but still don't get a
->>> good solution...
->>> Could you give us some advice on this?
->>> 
->>> Or could we move the restoring of the pending states (include the 
->>> sync
->>> from guest RAM and the transfer to HW) to the GIC VM state change 
->>> handler,
->>> which is completely corresponding to save_pending_tables (more 
->>> symmetric?)
->>> and don't expose GICv4...
->> 
->> What is "the GIC VM state change handler"? Is that a QEMU thing?
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On Mon, 16 Nov 2020 at 19:28, Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> >
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> >
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> >
+> > Extend the MemTxAttrs to include a 'debug' flag. The flag can be used as
+> > general indicator that operation was triggered by the debugger.
+> >
+> > A subsequent patch will set the debug=1 when issuing a memory access
+> > from the gdbstub or HMP commands. This is a prerequisite to support
+> > debugging an encrypted guest. When a request with debug=1 is seen, the
+> > encryption APIs will be used to access the guest memory.
 > 
-> Yeah, it is a a QEMU thing...
+> So, what counts as "debug" here, and why are debug requests
+> special? If "debug=1" means "can actually get at the guest memory",
+> why wouldn't every device model want to use it?
+
+SEV has a flag that the guest-owner can set on a VM to enable debug;
+it's rare for it to be enabled; so it's not suitable for use by normal
+devices.  It's only there for debug if the guest owner allows you to.
+
+Dave
+
+> thanks
+> -- PMM
 > 
->> We don't really have that concept in KVM, so I'd appreciate if you 
->> could
->> be a bit more explicit on this.
-> 
-> My thought is to add a new interface (to QEMU) for the restoring of
-> the pending states, which is completely corresponding to
-> KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES...
-> And it is called from the GIC VM state change handler in QEMU, which
-> is happening after the restoring (call kvm_vgic_v4_set_forwarding())
-> but before the starting (running) of the VFIO device.
-
-Right, that makes sense. I still wonder how much the GIC save/restore
-stuff differs from other architectures that implement similar features,
-such as x86 with VT-D.
-
-It is obviously too late to change the userspace interface, but I wonder
-whether we missed something at the time.
-
-Thanks,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
