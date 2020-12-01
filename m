@@ -2,184 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 131152CA6B0
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 16:12:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0E162CA811
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 17:22:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391781AbgLAPJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 10:09:09 -0500
-Received: from foss.arm.com ([217.140.110.172]:44684 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389268AbgLAPJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 10:09:09 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 882FF30E;
-        Tue,  1 Dec 2020 07:08:23 -0800 (PST)
-Received: from [10.37.12.21] (unknown [10.37.12.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9EBE73F575;
-        Tue,  1 Dec 2020 07:08:22 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 10/10] arm64: gic: Use IPI test checking
- for the LPI tests
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-Cc:     andre.przywara@arm.com
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-11-alexandru.elisei@arm.com>
- <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
- <fd32d075-c6a9-a869-14a9-2c29f41d3318@arm.com>
- <49be46a8-2c29-b805-366e-7c955d395874@huawei.com>
- <eb8f5df2-6ea5-7aad-344a-70fcef3adad8@arm.com>
-Message-ID: <1dc913fd-80f5-4c8b-9c4d-52a1f0eee400@arm.com>
-Date:   Tue, 1 Dec 2020 15:09:44 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
-MIME-Version: 1.0
-In-Reply-To: <eb8f5df2-6ea5-7aad-344a-70fcef3adad8@arm.com>
+        id S2392151AbgLAQUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 11:20:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35256 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392031AbgLAQUM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 11:20:12 -0500
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2957BC0613CF
+        for <kvm@vger.kernel.org>; Tue,  1 Dec 2020 08:19:32 -0800 (PST)
+Received: by mail-pl1-x644.google.com with SMTP id t18so1429911plo.0
+        for <kvm@vger.kernel.org>; Tue, 01 Dec 2020 08:19:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=RQ6eP3x8Uql6SRukMHpaq5iPlo49Hd61yi+R2fWW3RY=;
+        b=U6lsyaByXZzf1zyz35LEgwPLFUGh/BibapC2vLzymKB8UB2iqC8wm/57yrzhFkGp8m
+         FOMmfX+AZjr4b4ilHoCQdE7NxQLunEfC8+wKjcQeGWh0SSxOKnY+iLRkdR+w1FiEfRXw
+         PK3IUk6Fb3BlVLb1AeFwn9mg1gjTC02FHhmntNXXjZuy5yObRMBg1pDllKx3QE9LZLK5
+         z18h4cEaDICpl2FgsPHTCc1NxKJGWNcKuev8awRXKOEbVMATagsxdQg/LeQ4RnWkruoO
+         Z9pdG4qObH81odhABf3M03879GLCjhqXhnZ2+wI8B1ohhXv96HP30f129yHn7dZwnBa0
+         /GPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=RQ6eP3x8Uql6SRukMHpaq5iPlo49Hd61yi+R2fWW3RY=;
+        b=E2H01jZG2H1BIao7HQWD5o4oeWiR4OZzvoT/csnB8hjnQRDr/a7aAvKO310RoT5u/w
+         QJ5thSpUvJcg405Yk5UlgUPwGLQFpKUtM0ezdVJTluwJmbQjLvlrYTk/R9HPcSVfP7+g
+         YIu4eHGxdmqFKPlUmzOCBs8UFVpnItuU8J8msFOojD5lt4B4oPMt02JeVU5c79svuNnG
+         qdgte6ZY0itrqLvHkAgEZ8eumILRwK+FHdmdQU5dRIkT0OpTCXUI6cqpqD2E4snNaduH
+         2uxasXY4k4fSz0xRGNMn+epM2FbeJM8HZt+1pLxrV4yJDO7U6W7jT4KOLSf79S3KkVqc
+         zbOg==
+X-Gm-Message-State: AOAM531NX9oDp+vMtBgFBsyJNNtlo3Hh7on2JiHxsklJiS5Nj3C4QesA
+        61iKpAeZrT3o5Gb7cjgWmcHf5g==
+X-Google-Smtp-Source: ABdhPJwZEm7FtvajqOgtJKdiPRxGmk1eLHI5zv3Mf2umHLLW6cpc4t2btmabaHgu9fez5PDPji40Xg==
+X-Received: by 2002:a17:90a:1182:: with SMTP id e2mr3225390pja.152.1606839571725;
+        Tue, 01 Dec 2020 08:19:31 -0800 (PST)
+Received: from ?IPv6:2601:646:c200:1ef2:1cf2:4039:af4e:499? ([2601:646:c200:1ef2:1cf2:4039:af4e:499])
+        by smtp.gmail.com with ESMTPSA id 3sm214147pfv.92.2020.12.01.08.19.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Dec 2020 08:19:30 -0800 (PST)
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 0/2] RFC: Precise TSC migration
+Date:   Tue, 1 Dec 2020 08:19:29 -0800
+Message-Id: <FB43C4E2-D7C4-430B-9D6B-15FA59BB5286@amacapital.net>
+References: <874kl5hbgp.fsf@nanos.tec.linutronix.de>
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <874kl5hbgp.fsf@nanos.tec.linutronix.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+X-Mailer: iPhone Mail (18B121)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On 11/30/20 2:19 PM, Alexandru Elisei wrote:
-> Hi Zenghui,
->
-> On 11/30/20 1:59 PM, Zenghui Yu wrote:
->> Hi Alex,
->>
->> On 2020/11/27 22:50, Alexandru Elisei wrote:
->>> Hi Zhenghui,
->>>
->>> Thank you for having a look at this!
->>>
->>> On 11/26/20 9:30 AM, Zenghui Yu wrote:
->>>> On 2020/11/25 23:51, Alexandru Elisei wrote:
->>>>> The reason for the failure is that the test "dev2/eventid=20 now triggers
->>>>> an LPI" triggers 2 LPIs, not one. This behavior was present before this
->>>>> patch, but it was ignored because check_lpi_stats() wasn't looking at the
->>>>> acked array.
->>>>>
->>>>> I'm not familiar with the ITS so I'm not sure if this is expected, if the
->>>>> test is incorrect or if there is something wrong with KVM emulation.
->>>> I think this is expected, or not.
->>>>
->>>> Before INVALL, the LPI-8195 was already pending but disabled. On
->>>> receiving INVALL, VGIC will reload configuration for all LPIs targeting
->>>> collection-3 and deliver the now enabled LPI-8195. We'll therefore see
->>>> and handle it before sending the following INT (which will set the
->>>> LPI-8195 pending again).
->>>>
->>>>> Did some more testing on an Ampere eMAG (fast out-of-order cores) using
->>>>> qemu and kvmtool and Linux v5.8, here's what I found:
->>>>>
->>>>> - Using qemu and gic.flat built from*master*: error encountered 864 times
->>>>>     out of 1088 runs.
->>>>> - Using qemu: error encountered 852 times out of 1027 runs.
->>>>> - Using kvmtool: error encountered 8164 times out of 10602 runs.
->>>> If vcpu-3 hadn't seen and handled LPI-8195 as quickly as possible (e.g.,
->>>> vcpu-3 hadn't been scheduled), the following INT will set the already
->>>> pending LPI-8195 pending again and we'll receive it *once* on vcpu-3.
->>>> And we won't see the mentioned failure.
->>>>
->>>> I think we can just drop the (meaningless and confusing?) INT.
->>> I think I understand your explanation, the VCPU takes the interrupt immediately
->>> after the INVALL and before the INT, and the second interrupt that I am seeing is
->>> the one caused by the INT command.
->> Yes.
->>
->>> I tried modifying the test like this:
->>>
->>> diff --git a/arm/gic.c b/arm/gic.c
->>> index 6e93da80fe0d..0ef8c12ea234 100644
->>> --- a/arm/gic.c
->>> +++ b/arm/gic.c
->>> @@ -761,10 +761,17 @@ static void test_its_trigger(void)
->>>          wmb();
->>>          cpumask_clear(&mask);
->>>          cpumask_set_cpu(3, &mask);
->>> -       its_send_int(dev2, 20);
->> Shouldn't its_send_invall(col3) be moved down here? See below.
->>
->>>          wait_for_interrupts(&mask);
->>>          report(check_acked(&mask, 0, 8195),
->>> -                       "dev2/eventid=20 now triggers an LPI");
->>> +                       "dev2/eventid=20 pending LPI is received");
->>> +
->>> +       stats_reset();
->>> +       wmb();
->>> +       cpumask_clear(&mask);
->>> +       cpumask_set_cpu(3, &mask);
->>> +       its_send_int(dev2, 20);
->>> +       wait_for_interrupts(&mask);
->>> +       report(check_acked(&mask, 0, 8195), "dev2/eventid=20 triggers an LPI");
->>>            report_prefix_pop();
->>>   I removed the INT from the initial test, and added a separate one to check that
->>> the INT command still works. That looks to me that preserves the spirit of the
->>> original test. After doing stress testing this is what I got:
->>>
->>> - with kvmtool, 47,709 iterations, 27 times the test timed out when waiting for
->>> the interrupt after INVALL.
->>> - with qemu, 15,511 iterations, 258 times the test timed out when waiting for the
->>> interrupt after INVALL, just like with kvmtool.
->> I guess the reason of failure is that the LPI is taken *immediately*
->> after the INVALL?
->>
->>     /* Now call the invall and check the LPI hits */
->>     its_send_invall(col3);
->>         <- LPI is taken, acked[]++
->>     stats_reset();
->>         <- acked[] is cleared unexpectedly
->>     wmb();
->>     cpumask_clear(&mask);
->>     cpumask_set_cpu(3, &mask);
->>     wait_for_interrupts(&mask);
->>         <- we'll hit timed-out since acked[] is 0
-> Yes, of course, you're right, I didn't realize that I was resetting the stats
-> *after* the interrupt was enabled. This also explains why I was still seeing
-> timeouts even when the timeout duration was set to 50 seconds. I'll retest with
-> the fix:
->
-> diff --git a/arm/gic.c b/arm/gic.c
-> index 6e93da80fe0d..c4240f5aba39 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -756,15 +756,22 @@ static void test_its_trigger(void)
->                         "dev2/eventid=20 still does not trigger any LPI");
->  
->         /* Now call the invall and check the LPI hits */
-> +       stats_reset();
-> +       wmb();
-> +       cpumask_clear(&mask);
-> +       cpumask_set_cpu(3, &mask);
->         its_send_invall(col3);
-> +       wait_for_interrupts(&mask);
-> +       report(check_acked(&mask, 0, 8195),
-> +                       "dev2/eventid=20 pending LPI is received");
-> +
->         stats_reset();
->         wmb();
->         cpumask_clear(&mask);
->         cpumask_set_cpu(3, &mask);
->         its_send_int(dev2, 20);
->         wait_for_interrupts(&mask);
-> -       report(check_acked(&mask, 0, 8195),
-> -                       "dev2/eventid=20 now triggers an LPI");
-> +       report(check_acked(&mask, 0, 8195), "dev2/eventid20 triggers an LPI");
->  
->         report_prefix_pop();
->  
-> I also pushed a branch at [1].
->
-> Thank you so much for spotting this! You've saved me (and probably others) a lot
-> of time debugging.
->
-> [1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/fixes1-v2
 
-I have been testing the branch, no failures after 17,996 runs with qemu and 58,669
-runs with kvmtool. This looks fine to me, I'll send a v2 with the fix.
+> On Dec 1, 2020, at 6:01 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
+>=20
+> =EF=BB=BFOn Mon, Nov 30 2020 at 16:16, Marcelo Tosatti wrote:
+>> Not really. The synchronization logic tries to sync TSCs during
+>> BIOS boot (and CPU hotplug), because the TSC values are loaded
+>> sequentially, say:
+>>=20
+>> CPU        realtime    TSC val
+>> vcpu0        0 usec        0
+>> vcpu1        100 usec    0
+>> vcpu2        200 usec    0
+>=20
+> That's nonsense, really.
+>=20
+>> And we'd like to see all vcpus to read the same value at all times.
+>=20
+> Providing guests with a synchronized and stable TSC on a host with a
+> synchronized and stable TSC is trivial.
+>=20
+> Write the _same_ TSC offset to _all_ vcpu control structs and be done
+> with it. It's not rocket science.
+>=20
+> The guest TSC read is:
+>=20
+>    hostTSC + vcpu_offset
+>=20
+> So if the host TSC is synchronized then the guest TSCs are synchronized
+> as well.
+>=20
+> If the host TSC is not synchronized, then don't even try.
 
-Thanks,
-Alex
+This reminds me: if you=E2=80=99re adding a new kvm feature that tells the g=
+uest that the TSC works well, could you perhaps only have one structure for a=
+ll vCPUs in the same guest?
+
+>=20
+> Thanks,
+>=20
+>        tglx
