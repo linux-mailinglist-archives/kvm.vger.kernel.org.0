@@ -2,148 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 086F82C94A2
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 02:27:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E66A2C94B2
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 02:32:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731117AbgLAB0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 20:26:18 -0500
-Received: from mga05.intel.com ([192.55.52.43]:61065 "EHLO mga05.intel.com"
+        id S1731176AbgLABcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 20:32:43 -0500
+Received: from mga04.intel.com ([192.55.52.120]:24249 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730037AbgLAB0S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 20:26:18 -0500
-IronPort-SDR: LFYbiZ/PEyua4oe1WzzSIc5sZElrTRXEOel3At7VHFPpYtBfPRNfqynAM35aeP7Lz49UqFTOss
- i7F6HyntJcfQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9821"; a="257452991"
+        id S1726063AbgLABcn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 20:32:43 -0500
+IronPort-SDR: 238u+3EXx0FGTg/nL03cag/rXEPTr6ZXr6I4j+2e6b7NguuFRFFtYp5iPIS6l4cLqwqxTQaCXs
+ pEHOXoGSOrUg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9821"; a="170178503"
 X-IronPort-AV: E=Sophos;i="5.78,382,1599548400"; 
-   d="scan'208";a="257452991"
+   d="scan'208";a="170178503"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2020 17:25:37 -0800
-IronPort-SDR: qJWgCtexdRDgL0abS9F/Mc757eplyHZlRPL8TtkC34L3iut3muWe84Cd/8TNTilIDhQyeeytPr
- mmKONjc+7wbw==
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2020 17:31:02 -0800
+IronPort-SDR: bdckBIAfENOt7pyp86oCzSrk4igrIIntskd0tH0TbhDy0SsgWsLlcW1F8lLym2VWLWMFYi9bY9
+ b5tAiAafunCQ==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.78,382,1599548400"; 
-   d="scan'208";a="480886177"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.107]) ([10.238.4.107])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2020 17:25:31 -0800
-Subject: Re: [PATCH v2 04/17] perf: x86/ds: Handle guest PEBS overflow PMI and
- inject it to guest
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Like Xu <like.xu@linux.intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>, wei.w.wang@intel.com,
-        Tony Luck <tony.luck@intel.com>,
-        Stephane Eranian <eranian@google.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        linux-kernel@vger.kernel.org
-References: <20201109021254.79755-1-like.xu@linux.intel.com>
- <20201109021254.79755-5-like.xu@linux.intel.com>
- <20201117143529.GJ3121406@hirez.programming.kicks-ass.net>
- <b2c3f889-44dd-cadb-f225-a4c5db3a4447@linux.intel.com>
- <20201118180721.GA3121392@hirez.programming.kicks-ass.net>
- <682011d8-934f-4c76-69b0-788f71d91961@intel.com>
- <20201130104935.GN3040@hirez.programming.kicks-ass.net>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <7739a926-8da8-32c5-650d-2ee46ddab1ed@intel.com>
-Date:   Tue, 1 Dec 2020 09:25:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+   d="scan'208";a="434477472"
+Received: from allen-box.sh.intel.com ([10.239.159.28])
+  by fmsmga001.fm.intel.com with ESMTP; 30 Nov 2020 17:30:58 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v3 1/1] vfio/type1: Add vfio_group_domain()
+Date:   Tue,  1 Dec 2020 09:23:28 +0800
+Message-Id: <20201201012328.2465735-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20201130104935.GN3040@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+Add the API for getting the domain from a vfio group. This could be used
+by the physical device drivers which rely on the vfio/mdev framework for
+mediated device user level access. The typical use case like below:
 
-On 2020/11/30 18:49, Peter Zijlstra wrote:
-> On Fri, Nov 27, 2020 at 10:14:49AM +0800, Xu, Like wrote:
->
->>> OK, but the code here wanted to inspect the guest DS from the host. It
->>> states this is somehow complicated/expensive. But surely we can at the
->>> very least map the first guest DS page somewhere so we can at least
->>> access the control bits without too much magic.
->> We note that the SDM has a contiguous present memory mapping
->> assumption about the DS save area and the PEBS buffer area.
->>
->> Therefore, we revisit your suggestion here and move it a bit forward:
->>
->> When the PEBS is enabled, KVM will cache the following values:
->> - gva ds_area (kvm msr trap)
->> - hva1 for "gva ds_area" (walk guest page table)
->> - hva2 for "gva pebs_buffer_base" via hva1 (walk guest page table)
-> What this [gh]va? Guest/Host Virtual Address? I think you're assuming I
-> know about all this virt crap,.. I don't.
-Oh, my bad and let me add it:
+	unsigned int pasid;
+	struct vfio_group *vfio_group;
+	struct iommu_domain *iommu_domain;
+	struct device *dev = mdev_dev(mdev);
+	struct device *iommu_device = mdev_get_iommu_device(dev);
 
-gva: guest virtual address
-gpa: guest physical address
-gfn: guest frame number
-hva: host virtual adderss
-hpa: host physical address
+	if (!iommu_device ||
+	    !iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
+		return -EINVAL;
 
-In the KVM, we get hva from gva in the following way:
+	vfio_group = vfio_group_get_external_user_from_dev(dev);
+	if (IS_ERR_OR_NULL(vfio_group))
+		return -EFAULT;
 
-gpa = kvm_mmu_gva_to_gpa_system(vcpu, gva, NULL);
-gfn = gpa >> PAGE_SHIFT;
-slot = gfn_to_memslot(kvm, gfn);
-hva = gfn_to_hva_memslot_prot(slot, gfn, NULL);
+	iommu_domain = vfio_group_domain(vfio_group);
+	if (IS_ERR_OR_NULL(iommu_domain)) {
+		vfio_group_put_external_user(vfio_group);
+		return -EFAULT;
+	}
 
->
->> if the "gva ds_area" cache hits,
-> what?
-Sorry, it looks a misuse of terminology.
+	pasid = iommu_aux_get_pasid(iommu_domain, iommu_device);
+	if (pasid < 0) {
+		vfio_group_put_external_user(vfio_group);
+		return -EFAULT;
+	}
 
-I mean KVM will save the last used "gva ds_area" value and its hva in the 
-extra fields,
-if the "gva ds_area" does not change this time, we will not walk the guest 
-page table
-to get its hva again.
+	/* Program device context with pasid value. */
+	...
 
-I think it's the main point in your suggestion, and I try to elaborate it.
->> - access PEBS "interrupt threshold" and "Counter Reset[]" via hva1
->> - get "gva2 pebs_buffer_base" via __copy_from_user(hva1)
-> But you already had hva2, so what's the point?
-hva1 is for for "gva ds_area"
-hva2 is for "gva pebs_buffer_base"
+Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+---
+ drivers/vfio/vfio.c             | 18 ++++++++++++++++++
+ drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++++++++++
+ include/linux/vfio.h            |  3 +++
+ 3 files changed, 44 insertions(+)
 
-The point is before using the last save hva2, we need to
-make sure that "gva pebs_buffer_base" is not changed to avoid
-that some malicious drivers may change it without changing ds_area.
+Change log:
+ - v2: https://lore.kernel.org/linux-iommu/20201126012726.1185171-1-baolu.lu@linux.intel.com/
+ - Changed according to comments @ https://lore.kernel.org/linux-iommu/20201130135725.70fdf17f@w520.home/
+ - Fix a typo https://lore.kernel.org/linux-iommu/DM5PR11MB143560E51C84BAF83AE54AC0C3F90@DM5PR11MB1435.namprd11.prod.outlook.com/
 
->
->> if the "gva2 pebs_buffer_base" cache hits,
-> What?
->
->> - we get "gva2 pebs_index" via __copy_from_user(hva2),
-> pebs_index is in ds_are, which would be hva1
-Yes, we get "gva2 pebs_index" via __copy_from_user(hva1).
->
->> - rewrite the guest PEBS records via hva2 and pebs_index
->>
->> If any cache misses, setup the cache values via walking tables again.
->>
->> I wonder if you would agree with this optimization idea,
->> we look forward to your confirmation for the next step.
-> I'm utterly confused. I really can't follow.
-Generally, KVM will save hva1 (gva1 ds_area) and hva2 (for gva2 
-pebs_buffer_base)
-in the first round of the guest page table walking and reuse them
-if they're not changed in subsequent use.
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 2151bc7f87ab..588e8026d94b 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -2331,6 +2331,24 @@ int vfio_unregister_notifier(struct device *dev, enum vfio_notify_type type,
+ }
+ EXPORT_SYMBOL(vfio_unregister_notifier);
+ 
++struct iommu_domain *vfio_group_domain(struct vfio_group *group)
++{
++	struct vfio_container *container;
++	struct vfio_iommu_driver *driver;
++
++	if (!group)
++		return ERR_PTR(-EINVAL);
++
++	container = group->container;
++	driver = container->iommu_driver;
++	if (likely(driver && driver->ops->group_domain))
++		return driver->ops->group_domain(container->iommu_data,
++						 group->iommu_group);
++	else
++		return ERR_PTR(-ENOTTY);
++}
++EXPORT_SYMBOL_GPL(vfio_group_domain);
++
+ /**
+  * Module/class support
+  */
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 67e827638995..d7b5acb3056a 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -2980,6 +2980,28 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
+ 	return ret;
+ }
+ 
++static struct iommu_domain *
++vfio_iommu_type1_group_domain(void *iommu_data, struct iommu_group *iommu_group)
++{
++	struct iommu_domain *domain = ERR_PTR(-ENODEV);
++	struct vfio_iommu *iommu = iommu_data;
++	struct vfio_domain *d;
++
++	if (!iommu || !iommu_group)
++		return ERR_PTR(-EINVAL);
++
++	mutex_lock(&iommu->lock);
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		if (find_iommu_group(d, iommu_group)) {
++			domain = d->domain;
++			break;
++		}
++	}
++	mutex_unlock(&iommu->lock);
++
++	return domain;
++}
++
+ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+ 	.name			= "vfio-iommu-type1",
+ 	.owner			= THIS_MODULE,
+@@ -2993,6 +3015,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+ 	.register_notifier	= vfio_iommu_type1_register_notifier,
+ 	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
+ 	.dma_rw			= vfio_iommu_type1_dma_rw,
++	.group_domain		= vfio_iommu_type1_group_domain,
+ };
+ 
+ static int __init vfio_iommu_type1_init(void)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 38d3c6a8dc7e..6cd0de2764cb 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -90,6 +90,7 @@ struct vfio_iommu_driver_ops {
+ 					       struct notifier_block *nb);
+ 	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
+ 				  void *data, size_t count, bool write);
++	struct iommu_domain *(*group_domain)(void *iommu_data, struct iommu_group *group);
+ };
+ 
+ extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+@@ -126,6 +127,8 @@ extern int vfio_group_unpin_pages(struct vfio_group *group,
+ extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
+ 		       void *data, size_t len, bool write);
+ 
++extern struct iommu_domain *vfio_group_domain(struct vfio_group *group);
++
+ /* each type has independent events */
+ enum vfio_notify_type {
+ 	VFIO_IOMMU_NOTIFY = 0,
+-- 
+2.25.1
 
-I think this approach is feasible, and please complain if you are still 
-confused or disagree.
-
-Thanks,
-Like Xu
