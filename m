@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76CF72CA60A
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 15:47:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 734F02CA64E
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 15:53:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391707AbgLAOof (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 09:44:35 -0500
-Received: from mail-eopbgr770059.outbound.protection.outlook.com ([40.107.77.59]:27254
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        id S2403922AbgLAOud (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 09:50:33 -0500
+Received: from mail-bn8nam11on2066.outbound.protection.outlook.com ([40.107.236.66]:29112
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2391447AbgLAOoe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 09:44:34 -0500
+        id S2391592AbgLAOuc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 09:50:32 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TN46/mB+oCjIA0oJuThnWcvWo8nHSyworiHQlkw3Qhp0jO8X843u6I/BNtaN+o4Cf/5zGxg+lZjwU7iCCGEjx6ccNUzLcg+aiGc/UGXsOCPzzhfKlBbcmDsa8s4cNp3vL5R4ulEP4jl1oKSoSFiZNQZiho9rS76oca1qeHXKBkcXGYpQRqg2gYu1Nxyru6WSXnA+YfqkDtAZv8cK8n4jNelMvHhZPX5P/BDTlcPaYcrV8xgoV64yQM5ZpYLoZsQD/XMKXclm9Ek3Rasz598t+/ZmOBLgiRnAkxov/+sxhKItMXzoY0PTb/2sqWr2oD8bKx7tvRQYqz9Z71zgg70AGw==
+ b=K36ImcI10HiXVeXZCUPDbOUnqEHJpPOX3hrbKJUnIczrM7pBFjvC6YSQdTB36gNhu9vTBnnNTBuOzcrgz2Nt61lcefq8TwUUuyuafq3xEGhGL7FHk8ZEUFLAVvybUu4dbMjl1/P5TZVW2J8KNA0DB4tcuArJFerGmeWWG+vv/WAYeXCjFs8GVkEHWBEa8QQzBwwkXFCJYOc5rUwr4/QHtHaSUoThL/Vu9/PO+k26BHsUPi09SIDpcRX1cDYztV75yqKeRxPY6AvH7xGmlMV7CpDc8+EwMiHiOFIqqSJH+Dz/APZDgqkD1tJRABwOKQ3SGyRpCQvahxpj1ht6eKtJKw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+23ZaN4KjkhRYvmoFFkx5hnLixngfe3O4CnHQl4YDo8=;
- b=Sh+pF0ADLxtCztS9rq5zVLFM8q+zbr2mQQ2hfaroylKIdwfWVahjGZwY345EFVrKoCBKNa93eI4mZnxdGbBT3aknrjUXa16TqDChyW6u6igXX3XVj1DdjGny5R48QTAfxiI7O6/JPpitbxX0cHPNE8jN9TixjeVNJFAU6MQY4xGqGRBbMdfDu/T/C+qp66473t6/V7H3l6LX6rlnTyR4sAjEXlf9J2H9nfStXZalv7uLzAQdveM1xIayvFRWvR3Wt+SPx4oOrB5Undqb7+OpC3AC8wNnZeb//h9DYWS5ifPXU6MyzM0tfQ3q121IAMs5bpzmuPgPrDYk0A+6OWsIpw==
+ bh=vkJfsxo9LkNbwCxAmSVHXShJyvVUuRICd08CZKYqVwc=;
+ b=WGoSdrnVCc0rWtKYJVa0taxHFc+U5podBeEAfe1InqgjGOpEr9/FLWfWlp9JhX8TP9WwxRxxYZ+rn5wA7U3VQJ26nW2aBQNf0TNeRL+SvT98dJ89ABg/TOyTxdve+RwDYoMTf19n2Mp26xtn9MqZMSChYHzIhTwHLs9ziwXpnfViY0W2YsCPiJguMUoNTCvqDVc3Of5cHUPS1AMf2j5PYWV2WFG8ulyU4B98dGhHCLP2ZvroEKmAeUFrV+lfarwoLjguIUXsC5bCbqlw3/ZSWd/VYVP/Wl7B7+EhV26SifMpLrQOMgHXWn2/HHrwfuMEBNGRutENOBLm7i4YIraFcQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+23ZaN4KjkhRYvmoFFkx5hnLixngfe3O4CnHQl4YDo8=;
- b=ezm7jYa3NYpoDW5rbMTgdDrHfg7sRhoMZlVI1krVskPregJkxORblUw1Yvb5ZmGIw959hNc4HLI9HsFBicnov53TEkHEGJr8/lBaKQ3FLzc8mCaMc9rhq8+tv7KKuMJbOrb9MNob0y55pZg1j2iuouhx3/YSN2CHlP8WSb5boJ8=
+ bh=vkJfsxo9LkNbwCxAmSVHXShJyvVUuRICd08CZKYqVwc=;
+ b=2ki3q2bM2wS0xYt/Pz1LSTn821ukBktsHjMJw+IOjUNbGQ4ZCVr8YFPSD64Xmz1FwZVOffWJv5VY3FwVx03kMEuJMEKPu+bp0PeL9258NIoo7LwEmDKvyd3bbfpfHG+7CjabrZ8POY8xIPwtZKb7w5VuVpEgHVeME2hV/yclFw0=
 Authentication-Results: linaro.org; dkim=none (message not signed)
  header.d=none;linaro.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4512.namprd12.prod.outlook.com (2603:10b6:806:71::9) with
+ by SA0PR12MB4431.namprd12.prod.outlook.com (2603:10b6:806:95::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17; Tue, 1 Dec
- 2020 14:43:39 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Tue, 1 Dec
+ 2020 14:49:38 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Tue, 1 Dec 2020
- 14:43:39 +0000
-Date:   Tue, 1 Dec 2020 14:43:36 +0000
+ 14:49:38 +0000
+Date:   Tue, 1 Dec 2020 14:49:35 +0000
 From:   Ashish Kalra <ashish.kalra@amd.com>
 To:     Peter Maydell <peter.maydell@linaro.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -52,106 +52,121 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         QEMU Developers <qemu-devel@nongnu.org>,
         "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
         Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH 03/11] exec: add ram_debug_ops support
-Message-ID: <20201201144336.GB27617@ashkalra_ubuntu_server>
+Subject: Re: [PATCH 02/11] exec: Add new MemoryDebugOps.
+Message-ID: <20201201144934.GC27617@ashkalra_ubuntu_server>
 References: <cover.1605316268.git.ashish.kalra@amd.com>
- <eeb1393a933c5443941ae795478a7bc33f843cf1.1605316268.git.ashish.kalra@amd.com>
- <CAFEAcA8AW-jQXHeDuNHq1AHe=u8z_JtgP5gvLnz3vHvXR0uBzQ@mail.gmail.com>
+ <4393d426ae8f070c6be45ff0252bae2dca8bbd42.1605316268.git.ashish.kalra@amd.com>
+ <CAFEAcA8=3ngeErUEaR-=qGQymKv5JSd-ZXz+hg7L46J_nWDUnQ@mail.gmail.com>
+ <20201201142756.GA27617@ashkalra_ubuntu_server>
+ <CAFEAcA8tJ7NZ1xVeZUhxYYTpjiZ7GJzDtcUPBWVO5C8cgLURVw@mail.gmail.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8AW-jQXHeDuNHq1AHe=u8z_JtgP5gvLnz3vHvXR0uBzQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA8tJ7NZ1xVeZUhxYYTpjiZ7GJzDtcUPBWVO5C8cgLURVw@mail.gmail.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: DM5PR04CA0046.namprd04.prod.outlook.com
- (2603:10b6:3:12b::32) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM5PR22CA0018.namprd22.prod.outlook.com
+ (2603:10b6:3:101::28) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by DM5PR04CA0046.namprd04.prod.outlook.com (2603:10b6:3:12b::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.20 via Frontend Transport; Tue, 1 Dec 2020 14:43:38 +0000
+Received: from ashkalra_ubuntu_server (165.204.77.1) by DM5PR22CA0018.namprd22.prod.outlook.com (2603:10b6:3:101::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17 via Frontend Transport; Tue, 1 Dec 2020 14:49:36 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 9524174c-1ef6-430c-e6dd-08d896077d94
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4512:
+X-MS-Office365-Filtering-Correlation-Id: c61b82f2-6bf7-43aa-9eca-08d896085372
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4431:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4512B8BA58375D5C1137D4708EF40@SA0PR12MB4512.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4431E71FBB290DF168082B6A8EF40@SA0PR12MB4431.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 90KeKsP8q99P/Z3AyHHvLOVUqNKMpM3WnNbGbxa/Ur7P5Dsc8Q2r0BBdhqHpJHPYVgkfhJD+3p38JQK56ozvM4wxXuMNDMlp9o1fj1Oqvo5Dw4ad4in/DM4z7PxcgJrcM4N55nPSq/aNDu9aEkCuqjZx/ZEMzRvsSWl6TkfetOiFuhrDCmW9Jn+aSdaSOtr1087/TZv3MCP7gPwb8/jJTfbeODOklBC5sOYgBHIGa6TCKFPGOon6KEGT5LicuOvqjgvUsd//46563nGwFMaDos5SZ/c60lNwuhxoQEXCTyl/S4ziHlHVsDJdWWpWHWCsGniRRosZXbaQ7RujohNolQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(136003)(39860400002)(396003)(366004)(26005)(4326008)(33656002)(2906002)(186003)(16526019)(7416002)(86362001)(9686003)(55016002)(6916009)(8936002)(52116002)(956004)(44832011)(8676002)(83380400001)(1076003)(66556008)(66476007)(66946007)(33716001)(6496006)(316002)(478600001)(5660300002)(54906003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?p/Ta0CepQ/BF9V9cLwGYfg0/EQbkF8xssrSyoAY+586qWF2qkXyzz9xZaBfi?=
- =?us-ascii?Q?Gpzp2W/JW17R3AukXUAAAmaBWj0HM49HpNOMY3T4Jp67tXdYHidGy5x3BAqW?=
- =?us-ascii?Q?4NNu8UtAsmB8cBbr5rgDkyfQ1DukpgQQTxyxq9RDbm+G6Xxw2mfKc+e0Gc36?=
- =?us-ascii?Q?TG0vHZeGhMWa57PG6OgXnGJV3ZrXA8yusnSjwDWch5N/yIxCgk6RZbWixDxg?=
- =?us-ascii?Q?rxqZhaTaT4n7yezKYYtf8npFC7L5Zw+3wdRHyg8U01XQlelPFdQeP+fVgCvB?=
- =?us-ascii?Q?VQrvVQw30iQ4i3wUOPExVrFWOnXU8fTZBFYAGgC+LGpzS29frqvxUmoOzKDw?=
- =?us-ascii?Q?nxT6fPUCknl/hKMP3AgTNubDZodIpglaYkJ5YF4HayQ3E4cAzhWtrjoLrnaS?=
- =?us-ascii?Q?mP58A7lEbrM6he+nWJZUNBBdBzehsgC5EM2RPgB9nSnHZLLsT6QqKRtwB/iu?=
- =?us-ascii?Q?MGINI8/HOylJvnjrvyhFsFmSM2+xODK2+Uq6tDF9JxVuH7b4MC33VR9tkv2I?=
- =?us-ascii?Q?B5NQlZ/dYrW9rkCEiO2Hmpjxc765tWEaYegFZzDDWpg57VtEmF+ako1FCcru?=
- =?us-ascii?Q?HkgCy755Lt7Rr1QQezK8L/nvGnNHwtcdlmnnFJ/gf8sF5KqmrArMzdl4AEJW?=
- =?us-ascii?Q?s7lOvU+YyUotrsOOmGfRJCDa01oQ3/nFw1MEGcW/49mA7pWasH7Pg90QfGBC?=
- =?us-ascii?Q?N5orjZWaPI5Ghx8vLu82W+Y7AXvbN6iFiOFFAEqdSG4qDNdN228Sov2BbWpn?=
- =?us-ascii?Q?c1/XQjuFdNImN3BzfZCYDmJnp6pMrv0LQscJn9WreNW2875A5dGJxgyroj+4?=
- =?us-ascii?Q?d16HPKoNZY0Mcw8XUqF0dkAWhbzB/GFeohCBJsCs50kLIGouttaO2pV8KhYY?=
- =?us-ascii?Q?GgxFjTNtm3x2ZGcN9XxunGVZKe9+BQ/Eptz6+cUobyeSsj+QXsEYSveFrk8a?=
- =?us-ascii?Q?6U5qsN8m3FXSapFZ2Mp+9mUtDSVVgNIolbswwUuD0ZKzWL6JfFKBVuXQFkI1?=
- =?us-ascii?Q?L+Wq?=
+X-Microsoft-Antispam-Message-Info: 5cEy8O87ACoU8SQU3mQ0IEmKftvAZcFOo7qTjkMEuB5vrqaqFqbH8rMeXpmVb+7DkgS+gVzf9onh7Kud7FUGeG9fMqt4rvlBIXT7jAh+y51zi0ggNoO9eo2y/UZeO8hqpnpQb0EcK2RtyXBwgLCLjpPLGWcFVjRMkel0UDQ/9/rmkZp2NcUcX0EPw53TzCP93ODADGW0NoRW8CK3fMUVoe/KvduxOTA3tP8l+xQfl7rCBRKq8/U3MrH3A2VrNqlml/NggzuoM2K84z3hz7n8ixt6gYn3H1rckKOZr8fL8bdOHvhLiFoEMB2fLdNvMUlCct1AeqqzY2k6N+8Q9aO8Qg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(376002)(346002)(366004)(396003)(54906003)(66946007)(44832011)(55016002)(8676002)(2906002)(33656002)(83380400001)(52116002)(6496006)(66556008)(5660300002)(33716001)(86362001)(9686003)(316002)(66476007)(6916009)(8936002)(7416002)(1076003)(186003)(956004)(16526019)(478600001)(4326008)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?6VTTo8EWsRWuy4woZnOLKzeSXyzYMYZpplifATtsRKAqVxQ/kzzo9wLeSa5R?=
+ =?us-ascii?Q?ZmO7IzPi3jhAF1LGQLb/WK3Ox1IBEOdOMeKuPZ8+d1uhMKiQfi3KsfQliwOW?=
+ =?us-ascii?Q?8wAqcPYyD8E1dSmnMzC7lAqSZyEn1J7rKrVZzoojj76Qslq/PgdOnFcnXwdM?=
+ =?us-ascii?Q?mYHEfzLU1Lssy43G2oVtSs/RVa82gKNw+g6Mco5VznFhyVWFfrCojtten0lv?=
+ =?us-ascii?Q?rzEFl7Adz2aRrajtaS+WoQAFUd4Z1tFX0c8VsVGkFAgyP/Qj3a4lMokpSPt2?=
+ =?us-ascii?Q?mMugCJZLUZmia5/nRt8fy9MB9rxb3VzmBJ5Tel5blw0s4c7+Uyc6CRnenchx?=
+ =?us-ascii?Q?3FygfkQCdbZ7Q0xk+Jv6MdlFfkmNExX3fdkSeQ9X/yX5wyD9yGRh6copUYqs?=
+ =?us-ascii?Q?2VEDfXImbpYHGJIFd0BjdBTg/Lbn1eUMPTYWuhVjr0B1uS5jQymaCCqfjmbX?=
+ =?us-ascii?Q?Vii2PrVy+Iq2m8cSiv8X1RWqrZuaxuDdtVV40swFaKnb+bo8DxR0Lbo+alSX?=
+ =?us-ascii?Q?NuxMjvE11bz6/4N3K2gDhA5FZg6o7YLeHjP4tA+g5vmaortleBY/VA7F3kPA?=
+ =?us-ascii?Q?WAQwwrQ6XP25PdWPlHUt3XO/tfDb0DMiYJ+ALKplBX7y1pRenoJdhtP60Egx?=
+ =?us-ascii?Q?xlTjbtmiz5BJLVr2AzudePSKGlP1fIv8yKBUVZOr3cdvScXOX7kZoF13UrNH?=
+ =?us-ascii?Q?8Y5bT20AS/vlwAqNMTDHwfPfnj+eat4OX5k1ZHbwYz2npUmLQRS7LFMKKV3x?=
+ =?us-ascii?Q?HP1rq0fHwIOKtDrZPyqrUc3Jg8Vlgfxrtd49p/EsI6h+EkkhyKpW6sXY0B0G?=
+ =?us-ascii?Q?YlgwwFX6rkzzQbjBM+lLZ+eLyu4mXDpKRa7Q2xjlnRl1RkuZg7VJlvBpA6k/?=
+ =?us-ascii?Q?nqvWXt0hOu6EVL26E1S7faObC5wjcMvc0H8cCt0babkgHX7ASLyVoZPaoIlS?=
+ =?us-ascii?Q?S9ZDnhDotvv4IzZPWaATrxsCF7FwLiNGGyajsRkgVAGHuKKwn/yT2nabgGDg?=
+ =?us-ascii?Q?v/hI?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9524174c-1ef6-430c-e6dd-08d896077d94
+X-MS-Exchange-CrossTenant-Network-Message-Id: c61b82f2-6bf7-43aa-9eca-08d896085372
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2020 14:43:39.0382
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2020 14:49:37.9569
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: USMHx8ROsZPro5NYwwmJuhIHCbimMXeCP9lX9jOe473vXSD+QhCR0AuogrWWWiJLewwWoE04uS7uslBjOrBh7w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4512
+X-MS-Exchange-CrossTenant-UserPrincipalName: gFvITNiM7YcVqm/ELn3ZQ3gN5NE9l0rOueuPm1bLIMIO5DtCT6th4yFBxaP1Senl8aRoxnZqlSbxbI7kB0Uk2A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4431
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 12:08:28PM +0000, Peter Maydell wrote:
-> On Mon, 16 Nov 2020 at 19:19, Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+On Tue, Dec 01, 2020 at 02:38:30PM +0000, Peter Maydell wrote:
+> On Tue, 1 Dec 2020 at 14:28, Ashish Kalra <ashish.kalra@amd.com> wrote:
+> > On Tue, Dec 01, 2020 at 11:48:23AM +0000, Peter Maydell wrote:
+> > > This seems like a weird place to insert these hooks. Not
+> > > all debug related accesses are going to go via
+> > > cpu_memory_rw_debug(). For instance when the gdb stub is in
+> > > "PhyMemMode" and all addresses from the debugger are treated as
+> > > physical rather than virtual, gdbstub.c will call
+> > > cpu_physical_memory_write()/_read().
+> > >
+> > > I would have expected the "oh, this is a debug access, do
+> > > something special" to be at a lower level, so that any
+> > > address_space_* access to the guest memory with the debug
+> > > attribute gets the magic treatment, whether that was done
+> > > as a direct "read this physaddr" or via cpu_memory_rw_debug()
+> > > doing the virt-to-phys conversion first.
+> > >
 > >
-> > From: Brijesh Singh <brijesh.singh@amd.com>
-> >
-> > From: Brijesh Singh <brijesh.singh@amd.com>
-> >
-> > Currently, guest memory access for debugging purposes is performed using
-> > memcpy(). Extend the 'struct MemoryRegion' to include new callbacks that
-> > can be used to override the use of memcpy() with something else.
-> >
-> > The new callbacks can be used to display the guest memory of an SEV guest
-> > by registering callbacks to the SEV memory encryption/decryption APIs.
-> >
-> > Typical usage:
-> >
-> > mem_read(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
-> > mem_write(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
+> > Actually, the earlier patch-set used to do this at a lower level,
+> > i.e., at the address_space level, but then Paolo's feedback on that
+> > was that we don't want to add debug specific hooks into generic code
+> > such as address_space_* interfaces, hence, these hooks are introduced at
+> > a higher level so that we can do this "debug" abstraction at
+> > cpu_memory_rw_debug() and adding new interfaces for physical memory
+> > read/write debugging such as cpu_physical_memory_rw_debug().
 > 
-> We already have a function prototype for "I need to call a function
-> to do this read or write":
->     MemTxResult (*read_with_attrs)(void *opaque,
->                                    hwaddr addr,
->                                    uint64_t *data,
->                                    unsigned size,
->                                    MemTxAttrs attrs);
->     MemTxResult (*write_with_attrs)(void *opaque,
->                                     hwaddr addr,
->                                     uint64_t data,
->                                     unsigned size,
->                                     MemTxAttrs attrs);
-> 
-> Do the prototypes for accessing guest RAM that needs decryption
-> really need to be different from that?
+> This seems to be mixing two separate designs, then. Either
+> you want to try to provide separate "debug" functions like this,
+> or you want to have a MemTxAttrs "debug" attribute, but you don't
+> need both. Personally I prefer the MemTxAttrs approach (and disagree
+> with Paolo :-)), because otherwise you're going to end up duplicating
+> a lot of functions, and the handling of "this memory is encrypted
+> and needs special handling" ends up being dealt with in various
+> layers of the code rather than being only in one place where the
+> lowest layer says "oh, debug access to encrypted memory, this is
+> how to do that".
 > 
 
-This again falls back to the same thought process, to keep the debug
-specific code separate from the generic code. If the above
-MemoryRegionOps are used, then again we are using generic code to invoke
-debug specific stuff.
+I agree that we end up duplicating a lot of functions, but doesn't that
+keep this whole debugging stuff separate and clean and also isolated
+from generic code ? 
 
 Thanks,
 Ashish
+
+> > This seems logical too as cpu_memory_rw_debug() is invoked via the
+> > debugger, i.e., either gdbstub or qemu monitor, so this interface seems
+> > to be the right place to add these hooks.
+> 
+> Except that as noted, although all uses of cpu_memory_rw_debug()
+> are debug related, not all debug related accesses are to
+> cpu_memory_rw_debug()... The interesting characteristics of
+> cpu_memory_rw_debug() are (1) it takes a virtual address rather
+> than physical (2) it writes to ROMs (3) it refuses to write to
+> devices.
+> 
