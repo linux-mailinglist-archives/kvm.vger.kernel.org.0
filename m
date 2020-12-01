@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3442CA217
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 13:07:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E9602CA222
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 13:10:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727780AbgLAMGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 07:06:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51872 "EHLO
+        id S1730261AbgLAMJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 07:09:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727376AbgLAMGR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 07:06:17 -0500
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E712C0613D2
-        for <kvm@vger.kernel.org>; Tue,  1 Dec 2020 04:05:36 -0800 (PST)
-Received: by mail-ed1-x542.google.com with SMTP id k4so2893389edl.0
-        for <kvm@vger.kernel.org>; Tue, 01 Dec 2020 04:05:36 -0800 (PST)
+        with ESMTP id S1728587AbgLAMJS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 07:09:18 -0500
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A70C0613D3
+        for <kvm@vger.kernel.org>; Tue,  1 Dec 2020 04:08:40 -0800 (PST)
+Received: by mail-ej1-x641.google.com with SMTP id lt17so3642495ejb.3
+        for <kvm@vger.kernel.org>; Tue, 01 Dec 2020 04:08:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=dZ8sExb6D1TJHHkVCOV6EAQsOL0RaMz69T7dbpfX3OM=;
-        b=fXpGGIQs8SwHbjw4dhjwoo46nGqeg5DOxkqINklQ3TOUNuWu24XzRsMf7/mxf1cFzH
-         MdYneBqpbJd6vRlM8hOsOSKsfCPvd9hGZxuL6lyYRThwg4+M48piLPWXlBCpsMOhfA47
-         GnAJzJe+ryvwhQxytAzEE9SfI67xFI3CpWEVPUT0JClN1i+RU5DFsGaZ6yQYFssrJOXM
-         IdlCN1H8b0R244egwcy9hESOG/aKZ10slkeF0HS/rMCzppf8QN5Jwla/kAEmSDEv0g1Q
-         DU7y3cwW/ija3T7u/pAAjC+ukJW9xXUB1olMn4Jor9na4Xxrai+oxVjmpOir8TUnrABC
-         nJ7Q==
+        bh=/M6qTRcb7ooypOLbSQABaMQfCmtDYaK+udx98ET3zE0=;
+        b=jgCyEL4GxykEGe6r0UMTPCaWikmwu2ELKKt7Sx6CWSLhNPAhlZocJgF+mBXShMebh4
+         FxA9ofaFQSCqEjipdvKk1dTg02CnPU5hHUXSTwH/tG6s+atndbczLMtsbWzaXEiq7UsI
+         RRmI+i+AEU6WBhrLTh4pc+CrTRxt0ykBj7qbcQ8sODFGWsSl6ptB1lr8KJXlXlQFJmae
+         lD22gINGZEfCq8dtKw6LSq8Hdw+twQqVftEBoItujquzL6+8tZGzMcAqn2bdmey+Hq/A
+         93zL9ZCvfUBfrlud7VyCsY4wFpftxqyk9CSx4EwAa21jwoStddERz3Nz/Hsojtq5kj7J
+         Q6Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=dZ8sExb6D1TJHHkVCOV6EAQsOL0RaMz69T7dbpfX3OM=;
-        b=rgNEx47N7CzyUkD/da48BBvaSrg1fvRKTl/G5ZlIZONl2Wz/zA1UhuY5qtPEqyflCM
-         jBdjsunYiJXJ6iILsBxh5yu72GNdjaJxLwTDF2Dis5MfDfSQOADfHmnbOtPU9Aqy/TyW
-         MTjUvKUFpqiigg2cJoLYHk7R9eXeWHU6FQTCJpZeHOu/xm38N86tU9M9pjoi9ezrK+01
-         nvHduB5Rwz/apopYoFcNCCXqKUnZM/CHi2cTIZv2OxxxAHQgIYLjpyhO6qfHYeAOW7Jv
-         ify+zl90lsP1JOj6tDH+csRK3RXf4dHuuvB70raraHEetygd9byQNL+cUoGb1HDX4o4w
-         QK8Q==
-X-Gm-Message-State: AOAM533IsGv4v5amOSN6Ut7zgM3wEYFO2M/x4ITVycC70HR7bW9MxgJJ
-        vwY+ef+fmFf60jp47eyHOV2qAuIDvbnm8B3z87BQRA==
-X-Google-Smtp-Source: ABdhPJyxpyeR1SDmXMFDnfu57acDSqOxPq2jB/wG3BKpbmbCQHhdjv1kxmHcygeEpB/gLMfQv/lQ4OZ8z85El5AEld4=
-X-Received: by 2002:a05:6402:3089:: with SMTP id de9mr2689855edb.100.1606824335347;
- Tue, 01 Dec 2020 04:05:35 -0800 (PST)
+        bh=/M6qTRcb7ooypOLbSQABaMQfCmtDYaK+udx98ET3zE0=;
+        b=QjXZGSyijsmtVgd8jnXHlL/r4ORvf7/gJn9YE0MI8N/cNFwXG196DhcEH7J4ysHkIo
+         jVNL7xiPeOWTdJtnqJmUlqh88clnnpb7ccKPluVdIMFHXT9y9ZhEIILGcIiClmnjBBU7
+         9SknilQd+fQv2jKnSmaIwLMHJrx274/yXqiqMfRQ08n5vY5ILc9cdmgecABIAoyxYoXJ
+         p9ek5HdP5hbOlI5fzXUfHlnakuDujOyt77tJ44Rt5hpaLiHGhK99i/+pZOUgo9XFbML7
+         z+WJyT8gypTOhT42VXaCUa+EE191r9HplD89HW12hg/WzllDFr14Q9rXrcmdT0aix/34
+         U53g==
+X-Gm-Message-State: AOAM5301GNCpZJmBqg+WlG0o3qxwc6Z4MZ+AfC6WYI/fneUpa8y9koc0
+        1/7MdoEgPRzHO25dfdv1uSwv9cqIOg74X4/i23v5eQ==
+X-Google-Smtp-Source: ABdhPJxEiWo1Tv+TW4J5r8DZAK6hUJecW72gylq3kLnK4od8ArvYvpKXzxlfh0l7i+n56+FxpQF+Zyhy51wNrSwiYaI=
+X-Received: by 2002:a17:906:1542:: with SMTP id c2mr2528306ejd.382.1606824519416;
+ Tue, 01 Dec 2020 04:08:39 -0800 (PST)
 MIME-Version: 1.0
-References: <cover.1605316268.git.ashish.kalra@amd.com> <aa90b9f98f7314ae8c197a16e2acedbd29e16200.1605316268.git.ashish.kalra@amd.com>
-In-Reply-To: <aa90b9f98f7314ae8c197a16e2acedbd29e16200.1605316268.git.ashish.kalra@amd.com>
+References: <cover.1605316268.git.ashish.kalra@amd.com> <eeb1393a933c5443941ae795478a7bc33f843cf1.1605316268.git.ashish.kalra@amd.com>
+In-Reply-To: <eeb1393a933c5443941ae795478a7bc33f843cf1.1605316268.git.ashish.kalra@amd.com>
 From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 1 Dec 2020 12:05:24 +0000
-Message-ID: <CAFEAcA8n353Zs_my_XsLv9+MS7UVo7Kx2Mm84cYrBQzAa_GHVA@mail.gmail.com>
-Subject: Re: [PATCH 06/11] monitor/i386: use debug APIs when accessing guest memory
+Date:   Tue, 1 Dec 2020 12:08:28 +0000
+Message-ID: <CAFEAcA8AW-jQXHeDuNHq1AHe=u8z_JtgP5gvLnz3vHvXR0uBzQ@mail.gmail.com>
+Subject: Re: [PATCH 03/11] exec: add ram_debug_ops support
 To:     Ashish Kalra <Ashish.Kalra@amd.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Lendacky <Thomas.Lendacky@amd.com>,
@@ -67,42 +67,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 Nov 2020 at 19:29, Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+On Mon, 16 Nov 2020 at 19:19, Ashish Kalra <Ashish.Kalra@amd.com> wrote:
 >
 > From: Brijesh Singh <brijesh.singh@amd.com>
 >
-> Update the HMP commands to use the debug version of APIs when accessing
-> guest memory.
+> From: Brijesh Singh <brijesh.singh@amd.com>
 >
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  monitor/misc.c        |  4 ++--
->  softmmu/cpus.c        |  2 +-
->  target/i386/monitor.c | 54 ++++++++++++++++++++++++-------------------
->  3 files changed, 33 insertions(+), 27 deletions(-)
+> Currently, guest memory access for debugging purposes is performed using
+> memcpy(). Extend the 'struct MemoryRegion' to include new callbacks that
+> can be used to override the use of memcpy() with something else.
 >
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index 32e6a8c13d..7eba3a6fce 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -824,8 +824,8 @@ static void hmp_sum(Monitor *mon, const QDict *qdict)
+> The new callbacks can be used to display the guest memory of an SEV guest
+> by registering callbacks to the SEV memory encryption/decryption APIs.
 >
->      sum = 0;
->      for(addr = start; addr < (start + size); addr++) {
-> -        uint8_t val = address_space_ldub(&address_space_memory, addr,
-> -                                         MEMTXATTRS_UNSPECIFIED, NULL);
-> +        uint8_t val;
-> +        cpu_physical_memory_read_debug(addr, &val, 1);
->          /* BSD sum algorithm ('sum' Unix command) */
->          sum = (sum >> 1) | (sum << 15);
->          sum += val;
+> Typical usage:
+>
+> mem_read(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
+> mem_write(uint8_t *dst, uint8_t *src, uint32_t len, MemTxAttrs *attrs);
 
-Side note -- are byte-by-byte accesses to the encrypted guest
-memory noticeably higher overhead than if we asked for a
-larger buffer to be decrypted at once? If so and if anybody
-cares about hmp_sum performance we might consider having it
-work on a larger buffer at a time rather than byte-by-byte...
+We already have a function prototype for "I need to call a function
+to do this read or write":
+    MemTxResult (*read_with_attrs)(void *opaque,
+                                   hwaddr addr,
+                                   uint64_t *data,
+                                   unsigned size,
+                                   MemTxAttrs attrs);
+    MemTxResult (*write_with_attrs)(void *opaque,
+                                    hwaddr addr,
+                                    uint64_t data,
+                                    unsigned size,
+                                    MemTxAttrs attrs);
+
+Do the prototypes for accessing guest RAM that needs decryption
+really need to be different from that?
 
 thanks
 -- PMM
