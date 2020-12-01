@@ -2,107 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30CA82CA0BB
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 12:01:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F00F52CA0DF
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 12:06:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730397AbgLAK7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 05:59:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47504 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730234AbgLAK7k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 05:59:40 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1730374AbgLALFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 06:05:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34440 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727591AbgLALFH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Dec 2020 06:05:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606820621;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lcOj7fkQipCIlpc5MBpXx4VRVwWSoBEvFgRn9IvZnQs=;
+        b=VwzwycQQ0KsH3hsY6IguF00x4G8gXWsNLGWsGABkJ/9wBQVmFXupaM2HHKHW4VsGsg2SEm
+        mCSY89BmeblJniBodZpSCbZMz3vaeLfNaZWeBVtbdRv1eBg7zNgfWvVux4QWvwY7pXUgZm
+        KEpYs9yl1asyQcHaLCtDjo38R6EG5bE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-PTDgUR51OGqzjinoyqlbcQ-1; Tue, 01 Dec 2020 06:03:39 -0500
+X-MC-Unique: PTDgUR51OGqzjinoyqlbcQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6AC6C20809;
-        Tue,  1 Dec 2020 10:58:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606820339;
-        bh=fjeXvv1+eOJ5uqv6M23051ubV3+oKlwmWBbroYxu4fw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Hh/ScutavvVCdCl58vcCojICg7CUUG5ERNrak0LxRYScrExjctS6PH40T0x1BYSkQ
-         o0GVgS1ppX077mlPbIml6Z4xF2DkBGekEKRDTslWE0H8Vxa/nLK4wxF/oIEoyg+cHe
-         z74rNevxrT0YthG8Hguh1Bjx2nwzVQpxpD8Pu6+A=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kk3N1-00F13G-9R; Tue, 01 Dec 2020 10:58:55 +0000
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A248B108E1A0;
+        Tue,  1 Dec 2020 11:03:37 +0000 (UTC)
+Received: from work-vm (ovpn-115-1.ams2.redhat.com [10.36.115.1])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B9B75D973;
+        Tue,  1 Dec 2020 11:03:04 +0000 (UTC)
+Date:   Tue, 1 Dec 2020 11:03:02 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net,
+        armbru@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org,
+        mst@redhat.com, marcel.apfelbaum@gmail.com, mtosatti@redhat.com,
+        Thomas.Lendacky@amd.com, brijesh.singh@amd.com,
+        ssg.sos.patches@amd.com
+Subject: Re: [PATCH 01/11] memattrs: add debug attribute
+Message-ID: <20201201110302.GC4338@work-vm>
+References: <cover.1605316268.git.ashish.kalra@amd.com>
+ <2ba88b512ec667eff66b2ece2177330a28e657c0.1605316268.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Tue, 01 Dec 2020 10:58:54 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     luojiaxing <luojiaxing@huawei.com>
-Cc:     Shenming Lu <lushenming@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-Subject: Re: [RFC PATCH v1 1/4] irqchip/gic-v4.1: Plumb get_irqchip_state VLPI
- callback
-In-Reply-To: <316fe41d-f004-f004-4f31-6fe6e7ff64b7@huawei.com>
-References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-2-lushenming@huawei.com>
- <869dbc36-c510-fd00-407a-b05e068537c8@huawei.com>
- <875z5p6ayp.wl-maz@kernel.org>
- <316fe41d-f004-f004-4f31-6fe6e7ff64b7@huawei.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <7f578fa825b946f74e9ebdee557d6804@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: luojiaxing@huawei.com, lushenming@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, alex.williamson@redhat.com, kwankhede@nvidia.com, cohuck@redhat.com, cjia@nvidia.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ba88b512ec667eff66b2ece2177330a28e657c0.1605316268.git.ashish.kalra@amd.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-12-01 09:38, luojiaxing wrote:
-> On 2020/11/28 18:18, Marc Zyngier wrote:
->> On Sat, 28 Nov 2020 07:19:48 +0000,
->> luojiaxing <luojiaxing@huawei.com> wrote:
-
->>> How can you confirm that the interrupt pending status is the latest?
->>> Is it possible that the interrupt pending status is still cached in
->>> the GICR but not synchronized to the memory.
->> That's a consequence of the vPE having been unmapped:
->> 
->> "A VMAPP with {V,Alloc}=={0,1} cleans and invalidates any caching of
->> the Virtual Pending Table and Virtual Configuration Table associated
->> with the vPEID held in the GIC."
+* Ashish Kalra (Ashish.Kalra@amd.com) wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Yes, in addition to that, if a vPE is scheduled out of the PE, the
-> cache clearing and write-back to VPT are also performed, I think.
-
-There is no such architectural requirement.
-
-> However, I feel a litter confusing to read this comment at first , 
-> because it is not only VMAPP that causes cache clearing.
-
-I can't see anything else that guarantee that the caches are clean,
-and that there is no possible write to the PE table.
-
-> I don't know why VMAPP was mentioned here until I check the other two
-> patches ("KVM: arm64: GICv4.1: Try to save hw pending state in
-> save_pending_tables").
+> Extend the MemTxAttrs to include a 'debug' flag. The flag can be used as
+> general indicator that operation was triggered by the debugger.
 > 
-> So I think may be it's better to add some background description here.
+> A subsequent patch will set the debug=1 when issuing a memory access
+> from the gdbstub or HMP commands. This is a prerequisite to support
+> debugging an encrypted guest. When a request with debug=1 is seen, the
+> encryption APIs will be used to access the guest memory.
 
-Well, relying on the standard irqchip state methods to peek at the
-pending state isn't very reliable, as you could be temped to call into
-this even when the VPE is mapped. Which is why I've suggested
-a different implementation.
+Is this also the flag that would be used for memory dumping?
 
-         M.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  include/exec/memattrs.h | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+> index 95f2d20d55..c8b56389d6 100644
+> --- a/include/exec/memattrs.h
+> +++ b/include/exec/memattrs.h
+> @@ -49,6 +49,8 @@ typedef struct MemTxAttrs {
+>      unsigned int target_tlb_bit0 : 1;
+>      unsigned int target_tlb_bit1 : 1;
+>      unsigned int target_tlb_bit2 : 1;
+> +    /* Memory access request from the debugger */
+> +    unsigned int debug:1;
+
+It might be good to clarify that this is for QEMU debug features, not
+guest side debug features (e.g. CPU debug facilities/registers)
+
+Dave
+
+>  } MemTxAttrs;
+>  
+>  /* Bus masters which don't specify any attributes will get this,
+> -- 
+> 2.17.1
+> 
 -- 
-Jazz is not dead. It just smells funny...
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
