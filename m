@@ -2,189 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E66A2C94B2
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 02:32:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A99D2C94B0
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 02:32:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731176AbgLABcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Nov 2020 20:32:43 -0500
-Received: from mga04.intel.com ([192.55.52.120]:24249 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726063AbgLABcn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Nov 2020 20:32:43 -0500
-IronPort-SDR: 238u+3EXx0FGTg/nL03cag/rXEPTr6ZXr6I4j+2e6b7NguuFRFFtYp5iPIS6l4cLqwqxTQaCXs
- pEHOXoGSOrUg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9821"; a="170178503"
-X-IronPort-AV: E=Sophos;i="5.78,382,1599548400"; 
-   d="scan'208";a="170178503"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2020 17:31:02 -0800
-IronPort-SDR: bdckBIAfENOt7pyp86oCzSrk4igrIIntskd0tH0TbhDy0SsgWsLlcW1F8lLym2VWLWMFYi9bY9
- b5tAiAafunCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,382,1599548400"; 
-   d="scan'208";a="434477472"
-Received: from allen-box.sh.intel.com ([10.239.159.28])
-  by fmsmga001.fm.intel.com with ESMTP; 30 Nov 2020 17:30:58 -0800
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v3 1/1] vfio/type1: Add vfio_group_domain()
-Date:   Tue,  1 Dec 2020 09:23:28 +0800
-Message-Id: <20201201012328.2465735-1-baolu.lu@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
+        id S1730094AbgLABcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Nov 2020 20:32:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37936 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728932AbgLABcA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Nov 2020 20:32:00 -0500
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03D32C0613CF;
+        Mon, 30 Nov 2020 17:31:20 -0800 (PST)
+Received: by mail-io1-xd41.google.com with SMTP id q137so10302263iod.9;
+        Mon, 30 Nov 2020 17:31:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PNkZykPzEuXa80Om8oj9TxXw1OAZxq3GW7d+3ZFIn8c=;
+        b=V03DwfRjUq6E4DklFFWjRAyQQ98HY/hYfkKSvK4xXfo0oSvUhv7GWHdXQBrQyB8Utp
+         VtNhBKLS52L8xx/YRX625cfTwX0ac5/o0YxE3HyD4NiXFSAJknroMY9mko4TDQQyPZ9O
+         DnE2J4K7czWRuXXeU5W6vMrQqPDdoF9TdNjck5h41OpiOt065Al/CNyFjxDdf/uXSOmj
+         F+iT0OIwyx18lOe3X8syNJacutaJnLmnleHOdn1ZmndSTmaHf6TBFuFoJQPrbdcTKRfV
+         QV3BD7NLU4vOP/pYXykRBP+rPnGSffOdvhvQFuBzbuva3gFVfsuLftus+XkzpIGvXtgZ
+         xZTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PNkZykPzEuXa80Om8oj9TxXw1OAZxq3GW7d+3ZFIn8c=;
+        b=mnjUQkNbPQpE65pYHpOf2wNXjK9XIfjA4Rr9+fi8ST8hsb9yNUxEoSpKwdGphqDuPt
+         +LVJ1Rg2UlZnFLN3XJjGTav/7X45b9q2IhPihQG6d6r21tMH8egQRuAvqHh+JPP/fgTq
+         IMH/sJ/l2DqMfkvcoTxH9UPhC4bHld4qQOKWB1xNq892larrI1ixW9yndYQQC8DZOepk
+         FkLSApemudJ75Iq0PNcX3NawZv+sxm1MUy+FoI53pk1QYuIVC6fWZwv3vrmZRTMrYckE
+         C/te/UfwEQBvefrsgaQOUIuGsiR1pg9HQLbep4SKH044nKeuXEzxefXjqJhWTsn0mDGi
+         bj2g==
+X-Gm-Message-State: AOAM5328kPUJ2S7oP9yCnONt2OFgIx9qSB1CYVR6YaBVCCzC+KfryhW8
+        +7SrgxoJqImwjoipkvHVnFJtpAturulMFCM9R2E=
+X-Google-Smtp-Source: ABdhPJzoJIB6tXp0JpwcWz8T5K9jHthVKvt7UWVqLfYxdQAL+gIR3fl6rsidxJhur1OUBb5mT1TWYM2PNpGt4iliaJE=
+X-Received: by 2002:a5d:8ad6:: with SMTP id e22mr528690iot.154.1606786279443;
+ Mon, 30 Nov 2020 17:31:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201120095517.19211-1-jiangshanlai@gmail.com>
+ <20201126000549.GC450871@google.com> <0724aeb9-3466-5505-8f12-a5899144e68f@redhat.com>
+ <CAJhGHyApvmQk4bxxK2rJKzyAShFSXyEb2W0qyFcVoUEcsMKs_w@mail.gmail.com> <X8Uux62rJdf2feJ2@google.com>
+In-Reply-To: <X8Uux62rJdf2feJ2@google.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Tue, 1 Dec 2020 09:31:08 +0800
+Message-ID: <CAJhGHyD=t3KiX1Tb_MbNOUVt6fXmVkBzax7DOmb-z5aPF3RuUw@mail.gmail.com>
+Subject: Re: [PATCH] kvm/x86/mmu: use the correct inherited permissions to get
+ shadow page
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Avi Kivity <avi@qumranet.com>, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the API for getting the domain from a vfio group. This could be used
-by the physical device drivers which rely on the vfio/mdev framework for
-mediated device user level access. The typical use case like below:
+On Tue, Dec 1, 2020 at 1:41 AM Sean Christopherson <seanjc@google.com> wrote:
 
-	unsigned int pasid;
-	struct vfio_group *vfio_group;
-	struct iommu_domain *iommu_domain;
-	struct device *dev = mdev_dev(mdev);
-	struct device *iommu_device = mdev_get_iommu_device(dev);
+>
+> Hmm, yes, KVM would incorrectly handle this scenario.  But, the proposed patch
+> would not address the issue as KVM always maps non-leaf shadow pages with full
+> access permissions.
+>
 
-	if (!iommu_device ||
-	    !iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
-		return -EINVAL;
+Is it possible to exactly copy the access permissions from the guest
+for non-leaf
+shadow pages? Any protection from hypervisor (such as dirty track,
+rmap_write_protect)
+can only play on the leaf shadow ptes.
 
-	vfio_group = vfio_group_get_external_user_from_dev(dev);
-	if (IS_ERR_OR_NULL(vfio_group))
-		return -EFAULT;
+> Can we have a testcase in kvm-unit-tests?  It's okay of course if it
+> only fails with ept=0.
 
-	iommu_domain = vfio_group_domain(vfio_group);
-	if (IS_ERR_OR_NULL(iommu_domain)) {
-		vfio_group_put_external_user(vfio_group);
-		return -EFAULT;
-	}
-
-	pasid = iommu_aux_get_pasid(iommu_domain, iommu_device);
-	if (pasid < 0) {
-		vfio_group_put_external_user(vfio_group);
-		return -EFAULT;
-	}
-
-	/* Program device context with pasid value. */
-	...
-
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
----
- drivers/vfio/vfio.c             | 18 ++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++++++++++
- include/linux/vfio.h            |  3 +++
- 3 files changed, 44 insertions(+)
-
-Change log:
- - v2: https://lore.kernel.org/linux-iommu/20201126012726.1185171-1-baolu.lu@linux.intel.com/
- - Changed according to comments @ https://lore.kernel.org/linux-iommu/20201130135725.70fdf17f@w520.home/
- - Fix a typo https://lore.kernel.org/linux-iommu/DM5PR11MB143560E51C84BAF83AE54AC0C3F90@DM5PR11MB1435.namprd11.prod.outlook.com/
-
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 2151bc7f87ab..588e8026d94b 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -2331,6 +2331,24 @@ int vfio_unregister_notifier(struct device *dev, enum vfio_notify_type type,
- }
- EXPORT_SYMBOL(vfio_unregister_notifier);
- 
-+struct iommu_domain *vfio_group_domain(struct vfio_group *group)
-+{
-+	struct vfio_container *container;
-+	struct vfio_iommu_driver *driver;
-+
-+	if (!group)
-+		return ERR_PTR(-EINVAL);
-+
-+	container = group->container;
-+	driver = container->iommu_driver;
-+	if (likely(driver && driver->ops->group_domain))
-+		return driver->ops->group_domain(container->iommu_data,
-+						 group->iommu_group);
-+	else
-+		return ERR_PTR(-ENOTTY);
-+}
-+EXPORT_SYMBOL_GPL(vfio_group_domain);
-+
- /**
-  * Module/class support
-  */
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 67e827638995..d7b5acb3056a 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2980,6 +2980,28 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
- 	return ret;
- }
- 
-+static struct iommu_domain *
-+vfio_iommu_type1_group_domain(void *iommu_data, struct iommu_group *iommu_group)
-+{
-+	struct iommu_domain *domain = ERR_PTR(-ENODEV);
-+	struct vfio_iommu *iommu = iommu_data;
-+	struct vfio_domain *d;
-+
-+	if (!iommu || !iommu_group)
-+		return ERR_PTR(-EINVAL);
-+
-+	mutex_lock(&iommu->lock);
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		if (find_iommu_group(d, iommu_group)) {
-+			domain = d->domain;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&iommu->lock);
-+
-+	return domain;
-+}
-+
- static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.name			= "vfio-iommu-type1",
- 	.owner			= THIS_MODULE,
-@@ -2993,6 +3015,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.register_notifier	= vfio_iommu_type1_register_notifier,
- 	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
- 	.dma_rw			= vfio_iommu_type1_dma_rw,
-+	.group_domain		= vfio_iommu_type1_group_domain,
- };
- 
- static int __init vfio_iommu_type1_init(void)
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 38d3c6a8dc7e..6cd0de2764cb 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -90,6 +90,7 @@ struct vfio_iommu_driver_ops {
- 					       struct notifier_block *nb);
- 	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
- 				  void *data, size_t count, bool write);
-+	struct iommu_domain *(*group_domain)(void *iommu_data, struct iommu_group *group);
- };
- 
- extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
-@@ -126,6 +127,8 @@ extern int vfio_group_unpin_pages(struct vfio_group *group,
- extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
- 		       void *data, size_t len, bool write);
- 
-+extern struct iommu_domain *vfio_group_domain(struct vfio_group *group);
-+
- /* each type has independent events */
- enum vfio_notify_type {
- 	VFIO_IOMMU_NOTIFY = 0,
--- 
-2.25.1
-
+Yes, it may have a flaw with ept=0. I don't get what "It's okay of course"
+means. Is it related to kvm-unit-tests? Or no cloud provider uses
+ept=0?
