@@ -2,57 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3D0C2CA3ED
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 14:36:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 061292CA445
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 14:50:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390680AbgLANeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 08:34:11 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:8485 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387578AbgLANeL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 08:34:11 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Cljhz3sStzhl60;
-        Tue,  1 Dec 2020 21:33:07 +0800 (CST)
-Received: from huawei.com (10.174.185.226) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Tue, 1 Dec 2020
- 21:33:18 +0800
-From:   Xingang Wang <wangxingang5@huawei.com>
-To:     <eric.auger@redhat.com>
-CC:     <alex.williamson@redhat.com>, <eric.auger.pro@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <jean-philippe@linaro.org>,
-        <joro@8bytes.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
-        <maz@kernel.org>, <robin.murphy@arm.com>, <vivek.gautam@arm.com>,
-        <will@kernel.org>, <zhangfei.gao@linaro.org>,
-        <xieyingtai@huawei.com>
-Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
-Date:   Tue, 1 Dec 2020 13:33:10 +0000
-Message-ID: <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
-X-Mailer: git-send-email 2.6.4.windows.1
-In-Reply-To: <20201118112151.25412-8-eric.auger@redhat.com>
-References: <20201118112151.25412-8-eric.auger@redhat.com>
+        id S2390268AbgLANsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 08:48:53 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:55624 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728848AbgLANsx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 08:48:53 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1606830491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=X7vkYB0d4Lflu7QTfntzoP7JhOSDHcXUHS8Skey04w0=;
+        b=sCogktfuvGAYAqsR3wllup0MEisJleDTOz/veQFQ3+WxnJh5ZX4IqvTJZsfquxZa8UR+MM
+        eYR4msMoIhJ6BWlKArOBvYfKoEfwq6Dn8oIkTGUUD3jMoFSyDQjwpwbBQYK2ivTaO9DEKi
+        1eOZm66IhjN8Ln9B8go38cS/815fWJWhQoNlcTJkhadIxm5UYdD7vJUIRXMwtk5JMp4Q8r
+        q9bfjeYpEkyF3N0ptO56wG2lP0g3AP9jUEBkXqVRhvFK1LImRah4VnPO45m89qRBtL57zd
+        8pRIcB7DAkt5TrjS0YTLIeMX/6qL1RnWJMceKuxFBiFjvu/NOyND+afGhBLK2w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1606830491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=X7vkYB0d4Lflu7QTfntzoP7JhOSDHcXUHS8Skey04w0=;
+        b=EQWFj7/bPK5TaeIVY8G/Qhg8oqXSWyRsTQvYSSfJXMQBySV1McRYlug/Ci1/nRoJkVIorr
+        3/1MwZ3VqoqmacBA==
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 0/2] RFC: Precise TSC migration
+In-Reply-To: <20201130191643.GA18861@fuller.cnet>
+References: <20201130133559.233242-1-mlevitsk@redhat.com> <20201130191643.GA18861@fuller.cnet>
+Date:   Tue, 01 Dec 2020 14:48:11 +0100
+Message-ID: <877dq1hc2s.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.174.185.226]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric
+On Mon, Nov 30 2020 at 16:16, Marcelo Tosatti wrote:
+>> Besides, Linux guests don't sync the TSC via IA32_TSC write,
+>> but rather use IA32_TSC_ADJUST which currently doesn't participate
+>> in the tsc sync heruistics.
+>
+> Linux should not try to sync the TSC with IA32_TSC_ADJUST. It expects
+> the BIOS to boot with synced TSCs.
 
-On  Wed, 18 Nov 2020 12:21:43, Eric Auger wrote:
->@@ -1710,7 +1710,11 @@ static void arm_smmu_tlb_inv_context(void *cookie)
-> 	 * insertion to guarantee those are observed before the TLBI. Do be
-> 	 * careful, 007.
-> 	 */
->-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->+	if (ext_asid >= 0) { /* guest stage 1 invalidation */
->+		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
->+		cmd.tlbi.asid	= ext_asid;
->+		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
->+	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+That's wishful thinking.
 
-Found a problem here, the cmd for guest stage 1 invalidation is built,
-but it is not delivered to smmu.
+Reality is that BIOS tinkerers fail to get it right. TSC_ADJUST allows
+us to undo the wreckage they create.
+
+Thanks,
+
+        tglx
