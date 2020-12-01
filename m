@@ -2,120 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0E162CA811
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 17:22:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82AB62CA85D
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 17:39:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392151AbgLAQUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 11:20:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35256 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392031AbgLAQUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 11:20:12 -0500
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2957BC0613CF
-        for <kvm@vger.kernel.org>; Tue,  1 Dec 2020 08:19:32 -0800 (PST)
-Received: by mail-pl1-x644.google.com with SMTP id t18so1429911plo.0
-        for <kvm@vger.kernel.org>; Tue, 01 Dec 2020 08:19:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=RQ6eP3x8Uql6SRukMHpaq5iPlo49Hd61yi+R2fWW3RY=;
-        b=U6lsyaByXZzf1zyz35LEgwPLFUGh/BibapC2vLzymKB8UB2iqC8wm/57yrzhFkGp8m
-         FOMmfX+AZjr4b4ilHoCQdE7NxQLunEfC8+wKjcQeGWh0SSxOKnY+iLRkdR+w1FiEfRXw
-         PK3IUk6Fb3BlVLb1AeFwn9mg1gjTC02FHhmntNXXjZuy5yObRMBg1pDllKx3QE9LZLK5
-         z18h4cEaDICpl2FgsPHTCc1NxKJGWNcKuev8awRXKOEbVMATagsxdQg/LeQ4RnWkruoO
-         Z9pdG4qObH81odhABf3M03879GLCjhqXhnZ2+wI8B1ohhXv96HP30f129yHn7dZwnBa0
-         /GPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=RQ6eP3x8Uql6SRukMHpaq5iPlo49Hd61yi+R2fWW3RY=;
-        b=E2H01jZG2H1BIao7HQWD5o4oeWiR4OZzvoT/csnB8hjnQRDr/a7aAvKO310RoT5u/w
-         QJ5thSpUvJcg405Yk5UlgUPwGLQFpKUtM0ezdVJTluwJmbQjLvlrYTk/R9HPcSVfP7+g
-         YIu4eHGxdmqFKPlUmzOCBs8UFVpnItuU8J8msFOojD5lt4B4oPMt02JeVU5c79svuNnG
-         qdgte6ZY0itrqLvHkAgEZ8eumILRwK+FHdmdQU5dRIkT0OpTCXUI6cqpqD2E4snNaduH
-         2uxasXY4k4fSz0xRGNMn+epM2FbeJM8HZt+1pLxrV4yJDO7U6W7jT4KOLSf79S3KkVqc
-         zbOg==
-X-Gm-Message-State: AOAM531NX9oDp+vMtBgFBsyJNNtlo3Hh7on2JiHxsklJiS5Nj3C4QesA
-        61iKpAeZrT3o5Gb7cjgWmcHf5g==
-X-Google-Smtp-Source: ABdhPJwZEm7FtvajqOgtJKdiPRxGmk1eLHI5zv3Mf2umHLLW6cpc4t2btmabaHgu9fez5PDPji40Xg==
-X-Received: by 2002:a17:90a:1182:: with SMTP id e2mr3225390pja.152.1606839571725;
-        Tue, 01 Dec 2020 08:19:31 -0800 (PST)
-Received: from ?IPv6:2601:646:c200:1ef2:1cf2:4039:af4e:499? ([2601:646:c200:1ef2:1cf2:4039:af4e:499])
-        by smtp.gmail.com with ESMTPSA id 3sm214147pfv.92.2020.12.01.08.19.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Dec 2020 08:19:30 -0800 (PST)
+        id S1726440AbgLAQis (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 11:38:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44713 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725885AbgLAQis (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Dec 2020 11:38:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606840641;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Yf2+yvwSxhBGm/bSuBR8fGgsM6o+l4r46kvMPzsQn7k=;
+        b=MhFrPsJf0HW5DsQdSJ7X067FVDQLl2A+VRxXWnnXJ2oZNEPcvbuvNHAfV0Q32uIM0KlyKZ
+        BvP8hUO/+JKaU/FDV/ftRbIhdclrG8HsiBzdZoiPhdWVWxFMaaJ63THpiYXInU+Ahy+zPy
+        Qsp98Al37HsnZqKRCL48kHkjOyc08Kg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-NuVz9-rUN0-4Ip9mcOqaCQ-1; Tue, 01 Dec 2020 11:37:19 -0500
+X-MC-Unique: NuVz9-rUN0-4Ip9mcOqaCQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 165318030D4;
+        Tue,  1 Dec 2020 16:37:18 +0000 (UTC)
+Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C593819C44;
+        Tue,  1 Dec 2020 16:37:16 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 03/10] arm/arm64: gic: Remove memory
+ synchronization from ipi_clear_active_handler()
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+Cc:     andre.przywara@arm.com
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-4-alexandru.elisei@arm.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <038402be-a119-c162-04f2-d32db26e8a96@redhat.com>
+Date:   Tue, 1 Dec 2020 17:37:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20201125155113.192079-4-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 0/2] RFC: Precise TSC migration
-Date:   Tue, 1 Dec 2020 08:19:29 -0800
-Message-Id: <FB43C4E2-D7C4-430B-9D6B-15FA59BB5286@amacapital.net>
-References: <874kl5hbgp.fsf@nanos.tec.linutronix.de>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <874kl5hbgp.fsf@nanos.tec.linutronix.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-X-Mailer: iPhone Mail (18B121)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Alexandru,
 
+On 11/25/20 4:51 PM, Alexandru Elisei wrote:
+> The gicv{2,3}-active test sends an IPI from the boot CPU to itself, then
+> checks that the interrupt has been received as expected. There is no need
+> to use inter-processor memory synchronization primitives on code that runs
+> on the same CPU, so remove the unneeded memory barriers.
+> 
+> The arrays are modified asynchronously (in the interrupt handler) and it is
+> possible for the compiler to infer that they won't be changed during normal
+> program flow and try to perform harmful optimizations (like stashing a
+> previous read in a register and reusing it). To prevent this, for GICv2,
+> the smp_wmb() in gicv2_ipi_send_self() is replaced with a compiler barrier.
+> For GICv3, the wmb() barrier in gic_ipi_send_single() already implies a
+> compiler barrier.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/gic.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index 401ffafe4299..4e947e8516a2 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -12,6 +12,7 @@
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+>  #include <libcflat.h>
+> +#include <linux/compiler.h>
+>  #include <errata.h>
+>  #include <asm/setup.h>
+>  #include <asm/processor.h>
+> @@ -260,7 +261,8 @@ static void check_lpi_hits(int *expected, const char *msg)
+>  
+>  static void gicv2_ipi_send_self(void)
+>  {> -	smp_wmb();
+nit: previous patch added it and this patch removes it. maybe squash the
+modifs into the previous patch saying only a barrier() is needed for self()?
+> +	/* Prevent the compiler from optimizing memory accesses */
+> +	barrier();
+>  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+>  }
+>  
+> @@ -359,6 +361,7 @@ static struct gic gicv3 = {
+>  	},
+>  };
+>  
+> +/* Runs on the same CPU as the sender, no need for memory synchronization */
+>  static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>  {
+>  	u32 irqstat = gic_read_iar();
+> @@ -375,13 +378,10 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>  
+>  		writel(val, base + GICD_ICACTIVER);
+>  
+> -		smp_rmb(); /* pairs with wmb in stats_reset */
+the comment says it is paired with wmd in stats_reset. So is it OK to
+leave the associated wmb?
+>  		++acked[smp_processor_id()];
+>  		check_irqnr(irqnr);
+> -		smp_wmb(); /* pairs with rmb in check_acked */
+same here.
+>  	} else {
+>  		++spurious[smp_processor_id()];
+> -		smp_wmb();
+>  	}
+>  }
+>  
+> 
+Thanks
 
-> On Dec 1, 2020, at 6:01 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
->=20
-> =EF=BB=BFOn Mon, Nov 30 2020 at 16:16, Marcelo Tosatti wrote:
->> Not really. The synchronization logic tries to sync TSCs during
->> BIOS boot (and CPU hotplug), because the TSC values are loaded
->> sequentially, say:
->>=20
->> CPU        realtime    TSC val
->> vcpu0        0 usec        0
->> vcpu1        100 usec    0
->> vcpu2        200 usec    0
->=20
-> That's nonsense, really.
->=20
->> And we'd like to see all vcpus to read the same value at all times.
->=20
-> Providing guests with a synchronized and stable TSC on a host with a
-> synchronized and stable TSC is trivial.
->=20
-> Write the _same_ TSC offset to _all_ vcpu control structs and be done
-> with it. It's not rocket science.
->=20
-> The guest TSC read is:
->=20
->    hostTSC + vcpu_offset
->=20
-> So if the host TSC is synchronized then the guest TSCs are synchronized
-> as well.
->=20
-> If the host TSC is not synchronized, then don't even try.
+Eric
 
-This reminds me: if you=E2=80=99re adding a new kvm feature that tells the g=
-uest that the TSC works well, could you perhaps only have one structure for a=
-ll vCPUs in the same guest?
-
->=20
-> Thanks,
->=20
->        tglx
