@@ -2,206 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EB1B2C9F09
-	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 11:21:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D4982C9FEE
+	for <lists+kvm@lfdr.de>; Tue,  1 Dec 2020 11:37:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391103AbgLAKUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 05:20:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55206 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725861AbgLAKUE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Dec 2020 05:20:04 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B1A2RDZ003901;
-        Tue, 1 Dec 2020 05:19:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=zcsKcaL/n16flYNT4L3IRwPPYwtWNvqwN2J50JiuBNc=;
- b=i9sUZv5R+jgMPHHR5CL+5t4NHkkgmQmub17U6re/lirzE631By2K5BE5qPyoO3CDmWBz
- chjPvbPIHa+arm65+5EdituqRoJKjZRBlc2XWTavzAbqgt3rkyAlLImu4VjBIT5K4dUD
- 4wSzdOmqDCEt1w++HwCL2Mv3F5lBIfnDPbRtlMJ852xot98uSUWFTDZ/291xSKr+Tx5v
- Q/qP/EPpgJMsjScsAHM+vpUaO18yovpYCO8WbJwhN5ps1IAqIlHgv0537or7PPhUZGG2
- H2zmdwR5r5HgPu3OowkOF0U2NrspwLkMM+E+AezCADHK8Tlta/aTxvTBafi2XwtOCNXr kA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 355a79qbhd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Dec 2020 05:19:22 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B1A47JM014642;
-        Tue, 1 Dec 2020 05:19:22 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 355a79qbgg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Dec 2020 05:19:22 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B1ABrI3020910;
-        Tue, 1 Dec 2020 10:19:19 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 354fpd9rc6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Dec 2020 10:19:19 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B1AJGil60490204
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 1 Dec 2020 10:19:16 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AEEF452051;
-        Tue,  1 Dec 2020 10:19:16 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.25.88])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id E2BB25204E;
-        Tue,  1 Dec 2020 10:19:15 +0000 (GMT)
-Date:   Tue, 1 Dec 2020 11:19:14 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v12 12/17] s390/vfio-ap: allow hot plug/unplug of AP
- resources using mdev device
-Message-ID: <20201201111914.25a80561.pasic@linux.ibm.com>
-In-Reply-To: <65834705-347c-1e8d-f33f-b64bc2501b37@linux.ibm.com>
-References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
-        <20201124214016.3013-13-akrowiak@linux.ibm.com>
-        <20201129025250.16eb8355.pasic@linux.ibm.com>
-        <103cbe02-2093-c950-8d65-d3dc385942ce@linux.ibm.com>
-        <20201201003227.0c3696fc.pasic@linux.ibm.com>
-        <65834705-347c-1e8d-f33f-b64bc2501b37@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1729931AbgLAKgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 05:36:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32204 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726026AbgLAKgy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Dec 2020 05:36:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606818927;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LH5UWQqwbd5/kxq4lkjgHhruTdGWdGIUaU1fDpEaKt0=;
+        b=XHxMkk912o1VSgdNiK8k7A9b3BsRqjQDlma/NpftvgXADZhS/Ju9S2207rK1KTUNCE2zs9
+        5sIru3F64bulppJUOJEKdLFhNPvdxnLAD6bhi2o9C/KeAYUChNaORrC76WeKOD+ac+xXk3
+        MFQLvZ+NgJwwKyF19pDG7T7K1LTtWlo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-1nfKgaPoMiOisMNycFbxXw-1; Tue, 01 Dec 2020 05:35:25 -0500
+X-MC-Unique: 1nfKgaPoMiOisMNycFbxXw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 030CF8558E2;
+        Tue,  1 Dec 2020 10:35:24 +0000 (UTC)
+Received: from localhost (ovpn-114-82.ams2.redhat.com [10.36.114.82])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A2636F439;
+        Tue,  1 Dec 2020 10:35:17 +0000 (UTC)
+Date:   Tue, 1 Dec 2020 10:35:16 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, john.g.johnson@oracle.com, dinechin@redhat.com,
+        cohuck@redhat.com, felipe@nutanix.com,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <20201201103516.GD567514@stefanha-x1.localdomain>
+References: <CAFO2pHzmVf7g3z0RikQbYnejwcWRtHKV=npALs49eRDJdt4mJQ@mail.gmail.com>
+ <0447ec50-6fe8-4f10-73db-e3feec2da61c@redhat.com>
+ <20201126123659.GC1180457@stefanha-x1.localdomain>
+ <c9f926fb-438c-9588-f018-dd040935e5e5@redhat.com>
+ <20201127134403.GB46707@stefanha-x1.localdomain>
+ <6001ed07-5823-365e-5235-8bfea0e72c7f@redhat.com>
+ <20201130124702.GB422962@stefanha-x1.localdomain>
+ <4c1af937-a176-be67-fbcc-2bcf965e0bbc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-12-01_01:2020-11-30,2020-12-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- adultscore=0 clxscore=1015 priorityscore=1501 spamscore=0 suspectscore=0
- impostorscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012010063
+In-Reply-To: <4c1af937-a176-be67-fbcc-2bcf965e0bbc@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="GpGaEY17fSl8rd50"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 30 Nov 2020 19:18:30 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+--GpGaEY17fSl8rd50
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> >>>> +static bool vfio_ap_assign_apid_to_apcb(struct ap_matrix_mdev *matrix_mdev,
-> >>>> +					unsigned long apid)
-> >>>> +{
-> >>>> +	unsigned long apqi, apqn;
-> >>>> +	unsigned long *aqm = matrix_mdev->shadow_apcb.aqm;
-> >>>> +
-> >>>> +	/*
-> >>>> +	 * If the APID is already assigned to the guest's shadow APCB, there is
-> >>>> +	 * no need to assign it.
-> >>>> +	 */
-> >>>> +	if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm))
-> >>>> +		return false;
-> >>>> +
-> >>>> +	/*
-> >>>> +	 * If no domains have yet been assigned to the shadow APCB and one or
-> >>>> +	 * more domains have been assigned to the matrix mdev, then use
-> >>>> +	 * the domains assigned to the matrix mdev; otherwise, there is nothing
-> >>>> +	 * to assign to the shadow APCB.
-> >>>> +	 */
-> >>>> +	if (bitmap_empty(matrix_mdev->shadow_apcb.aqm, AP_DOMAINS)) {
-> >>>> +		if (bitmap_empty(matrix_mdev->matrix.aqm, AP_DOMAINS))
-> >>>> +			return false;
-> >>>> +
-> >>>> +		aqm = matrix_mdev->matrix.aqm;
-> >>>> +	}
-> >>>> +
-> >>>> +	/* Make sure all APQNs are bound to the vfio_ap driver */
-> >>>> +	for_each_set_bit_inv(apqi, aqm, AP_DOMAINS) {
-> >>>> +		apqn = AP_MKQID(apid, apqi);
-> >>>> +
-> >>>> +		if (vfio_ap_mdev_get_queue(matrix_mdev, apqn) == NULL)
-> >>>> +			return false;
-> >>>> +	}
-> >>>> +
-> >>>> +	set_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
-> >>>> +
-> >>>> +	/*
-> >>>> +	 * If we verified APQNs using the domains assigned to the matrix mdev,
-> >>>> +	 * then copy the APQIs of those domains into the guest's APCB
-> >>>> +	 */
-> >>>> +	if (bitmap_empty(matrix_mdev->shadow_apcb.aqm, AP_DOMAINS))
-> >>>> +		bitmap_copy(matrix_mdev->shadow_apcb.aqm,
-> >>>> +			    matrix_mdev->matrix.aqm, AP_DOMAINS);
-> >>>> +
-> >>>> +	return true;
-> >>>> +}  
-> >>> What is the rationale behind the shadow aqm empty special handling?  
-> >> The rationale was to avoid taking the VCPUs
-> >> out of SIE in order to make an update to the guest's APCB
-> >> unnecessarily. For example, suppose the guest is started
-> >> without access to any APQNs (i.e., all matrix and shadow_apcb
-> >> masks are zeros). Now suppose the administrator proceeds to
-> >> start assigning AP resources to the mdev. Let's say he starts
-> >> by assigning adapters 1 through 100. The code below will return
-> >> true indicating the shadow_apcb was updated. Consequently,
-> >> the calling code will commit the changes to the guest's
-> >> APCB. The problem there is that in order to update the guest's
-> >> VCPUs, they will have to be taken out of SIE, yet the guest will
-> >> not get access to the adapter since no domains have yet been
-> >> assigned to the APCB. Doing this 100 times - once for each
-> >> adapter 1-100 - is probably a bad idea.
-> >>  
-> > Not yanking the VCPUs out of SIE does make a lot of sense. At least
-> > I understand your motivation now. I will think some more about this,
-> > but in the meanwhile, please try to answer one more question (see
-> > below).
-> >     
-> >>>    I.e.
-> >>> why not simply:
-> >>>
-> >>>
-> >>> static bool vfio_ap_assign_apid_to_apcb(struct ap_matrix_mdev *matrix_mdev,
-> >>>                                           unsigned long apid)
-> >>> {
-> >>>           unsigned long apqi, apqn;
-> >>>           unsigned long *aqm = matrix_mdev->shadow_apcb.aqm;
-> >>>                                                                                   
-> >>>           /*
-> >>>            * If the APID is already assigned to the guest's shadow APCB, there is
-> >>>            * no need to assign it.
-> >>>            */
-> >>>           if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm))
-> >>>                   return false;
-> >>>                                                                                   
-> >>>           /* Make sure all APQNs are bound to the vfio_ap driver */
-> >>>           for_each_set_bit_inv(apqi, aqm, AP_DOMAINS) {
-> >>>                   apqn = AP_MKQID(apid, apqi);
-> >>>                                                                                   
-> >>>                   if (vfio_ap_mdev_get_queue(matrix_mdev, apqn) == NULL)
-> >>>                           return false;
-> >>>           }
-> >>>                                                                                   
-> >>>           set_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
-> >>>                                                                                   
-> >>>           return true;  
-> > Would
-> > s/return true/return !bitmap_empty(matrix_mdev->shadow_apcb.aqm,
-> > AP_DOMAINS)/
-> > do the trick?
-> >
-> > I mean if empty, then we would not commit the APCB, so we would
-> > not take the vCPUs out of SIE -- see below.  
-> 
-> At first glance I'd say yes, it does the trick; but, I need to consider
-> all possible scenarios. For example, that will work fine when someone
-> either assigns all of the adapters or all of the domains first, then assigns
-> the other.
+On Tue, Dec 01, 2020 at 12:05:04PM +0800, Jason Wang wrote:
+>=20
+> On 2020/11/30 =E4=B8=8B=E5=8D=888:47, Stefan Hajnoczi wrote:
+> > On Mon, Nov 30, 2020 at 10:14:15AM +0800, Jason Wang wrote:
+> > > On 2020/11/27 =E4=B8=8B=E5=8D=889:44, Stefan Hajnoczi wrote:
+> > > > On Fri, Nov 27, 2020 at 11:39:23AM +0800, Jason Wang wrote:
+> > > > > On 2020/11/26 =E4=B8=8B=E5=8D=888:36, Stefan Hajnoczi wrote:
+> > > > > > On Thu, Nov 26, 2020 at 11:37:30AM +0800, Jason Wang wrote:
+> > > > > > > On 2020/11/26 =E4=B8=8A=E5=8D=883:21, Elena Afanasova wrote:
+> > > > > Or I wonder whether we can attach an eBPF program when trapping M=
+MIO/PIO and
+> > > > > allow it to decide how to proceed?
+> > > > The eBPF program approach is interesting, but it would probably req=
+uire
+> > > > access to guest RAM and additional userspace state (e.g. device-spe=
+cific
+> > > > register values). I don't know the current status of Linux eBPF - i=
+s it
+> > > > possible to access user memory (it could be swapped out)?
+> > >=20
+> > > AFAIK it doesn't, but just to make sure I understand, any reason that=
+ eBPF
+> > > need to access userspace memory here?
+> > Maybe we're thinking of different things. In the past I've thought abou=
+t
+> > using eBPF to avoid a trip to userspace for request submission and
+> > completion, but that requires virtqueue parsing from eBPF and guest RAM
+> > access.
+>=20
+>=20
+> I see. I've=C2=A0 considered something similar. e.g using eBPF dataplane =
+in
+> vhost, but it requires a lot of work. For guest RAM access, we probably c=
+an
+> provide some eBPF helpers to do that but we need strong point to convince
+> eBPF guys.
+>=20
+>=20
+> >=20
+> > Are you thinking about replacing ioctl(KVM_SET_IOREGION) and all the
+> > necessary kvm.ko code with an ioctl(KVM_SET_IO_PROGRAM), where userspac=
+e
+> > can load an eBPF program into kvm.ko that gets executed when an MMIO/PI=
+O
+> > accesses occur?
+>=20
+>=20
+> Yes.
+>=20
+>=20
+> >   Wouldn't it need to write to userspace memory to store
+> > the ring index that was written to the doorbell register, for example?
+>=20
+>=20
+> The proram itself can choose want to do:
+>=20
+> 1) do datamatch and write/wakeup eventfd
+>=20
+> or
+>=20
+> 2) transport the write via an arbitrary fd as what has been done in this
+> proposal, but the protocol is userspace defined
+>
+> > How would the program communicate with userspace (eventfd isn't enough)
+> > and how can it handle synchronous I/O accesses like reads?
+>=20
+>=20
+> I may miss something, but it can behave exactly as what has been proposed=
+ in
+> this patch?
 
-Maybe I can help you. The only caveat I have in mind is the show of the
-guest_matrix attribute. We probably don't want to display adapters
-without domains and vice-versa. But that can be easily handled with
-a flag.
+I see. This seems to have two possible advantages:
+1. Pushing the kvm.ko code into userspace thanks to eBPF. Less kernel
+   code.
+2. Allowing more flexibile I/O dispatch logic (e.g. ioeventfd-style
+   datamatch) and communication protocols.
 
-Regards,
-Halil
+I think #1 is minor because the communication protocol is trivial,
+struct kvm_io_device can be reused for dispatch, and eBPF will introduce
+some complexity itself.
+
+#2 is more interesting but I'm not sure how to use this extra
+flexibility to get a big advantage. Maybe vfio-user applications could
+install an eBPF program that speaks the vfio-user protocol instead of
+the ioregionfd protocol, making it easier to integrate ioregionfd into
+vfio-user programs?
+
+My opinion is that eBPF complicates things and since we lack a strong
+use case for that extra flexibility, I would stick to the ioregionfd
+proposal.
+
+Elena, Jason: Do you have any opinions on this?
+
+Stefan
+
+--GpGaEY17fSl8rd50
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/GHGQACgkQnKSrs4Gr
+c8iCAggAyI96rYyyD3SlSuwAJyHu4Pbqg8Uj5mOHteBpqeHW/gmyi6WmOt71mZJd
+EaKe4e707IbvFqXq3KN1gTh/Oi2Koo3fxeo7GMxACgkeVReZ/f6FAdI5hmAJKL+u
+nzHMgQfZN0lxluhydSMN1+zlW5IS3SxAlbeRBJDVm5CgptNOpKKsLD9HsFeL+Ed/
+OmoN1N0lqKY/Sq3uJHbx3gzCy8h9AHUReOyk1xCrN8v4XxR/fEJb3vkk59ZvhYOq
+BAf0QbQozxBUQ3LTlyuGCMVuHzb/Hd0gnTRpww7wJkqquAzQPiyAU2+vTjtaXWrp
+y/zj6IJ9pXsNCSdzy3/Md0PWc4sqTw==
+=LrzM
+-----END PGP SIGNATURE-----
+
+--GpGaEY17fSl8rd50--
+
