@@ -2,101 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2243A2CBF81
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 15:24:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65AB42CBFD5
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 15:35:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727235AbgLBOYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 09:24:05 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:60822 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726989AbgLBOYF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Dec 2020 09:24:05 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2EExrc118261;
-        Wed, 2 Dec 2020 14:23:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=37E9bYly/DSoMvegtY1gV4dMFH3LMubNqRkj3fMCSeE=;
- b=ZJamVgjr3fhLdCU/pEWgfR2Lj+EL5IwmXMFKFN0LlHnDsEXR9Uq2MssH7K7wO36Pwnsd
- 7cv0VNlFKUyuAS5pWBMRHDnL+guxiGjwssdFehlsb4WOPkC0ahKczdDbBcoiTsG2ZlVj
- qq3ZIUXLLW+HzMeU7+dm65YZZbtDqsgRoKGI6U7+MXi8mRSGoJQTFRTcBVvdEkgRy9PC
- K9+ggFZv58Hg2rSXS2KXDdr7l+n24JozFkGTkWvFd1Y9Q1DR/KXY1UylB2AToJxf7z+p
- S7omeyNYRaAhzjZjGHzE2Pt0OC1KSyEmiqGaOPhMtp5E8el87OJSrhSobNK1wPNCuj0y 3g== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2130.oracle.com with ESMTP id 353c2b0n08-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 02 Dec 2020 14:23:18 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2EFN5v108164;
-        Wed, 2 Dec 2020 14:23:17 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 3540fyt7de-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 02 Dec 2020 14:23:17 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B2ENG2N011837;
-        Wed, 2 Dec 2020 14:23:16 GMT
-Received: from [10.175.181.158] (/10.175.181.158)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 02 Dec 2020 06:23:15 -0800
-Subject: Re: [PATCH] KVM: x86: Reinstate userspace hypercall support
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-References: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
- <X8VaO9DxaaKP7PFl@google.com>
- <64d5fc26a0b5ccb7592f924aa61068e6ee55955f.camel@infradead.org>
- <56ef38fe-e976-229c-9215-8ddce8d5f9e1@redhat.com>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <da9191fa-6559-50a1-75bd-f7c0359f2b45@oracle.com>
-Date:   Wed, 2 Dec 2020 14:23:12 +0000
+        id S1727694AbgLBOff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 09:35:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38675 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726158AbgLBOff (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 09:35:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606919649;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0EkevmCLQ1GX33E9KXRD3p8BSpTHh3E7pEzchj2FWow=;
+        b=JAx6xKFZoZEt3NcuajqKWZn8HtNlrhOzg5+pVIevKGhstpaDzDNx7C9L3/UVPrFhsVDOVb
+        aKW+yz/vhyOeDJdzeSOqmkk4sUq0lpn0n++nzr+EWoOx+cPgPUH3eNdtaIxk3x6hIW/Sfv
+        3PG1TY+RhHUZfpdXodKgi7yf1FMibQY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-OXLcuBxbOca-YDdOQG16zw-1; Wed, 02 Dec 2020 09:34:06 -0500
+X-MC-Unique: OXLcuBxbOca-YDdOQG16zw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95C91100E324;
+        Wed,  2 Dec 2020 14:34:05 +0000 (UTC)
+Received: from localhost (ovpn-114-255.ams2.redhat.com [10.36.114.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B72D5C1D0;
+        Wed,  2 Dec 2020 14:33:57 +0000 (UTC)
+Date:   Wed, 2 Dec 2020 14:33:56 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Justin He <Justin.He@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vfio iommu type1: Bypass the vma permission check in
+ vfio_pin_pages_remote()
+Message-ID: <20201202143356.GK655829@stefanha-x1.localdomain>
+References: <20201119142737.17574-1-justin.he@arm.com>
+ <20201124181228.GA276043@xz-x1>
+ <AM6PR08MB32245E7F990955395B44CE6BF7FA0@AM6PR08MB3224.eurprd08.prod.outlook.com>
+ <20201125155711.GA6489@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <56ef38fe-e976-229c-9215-8ddce8d5f9e1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=1
- phishscore=0 mlxlogscore=999 adultscore=0 mlxscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012020087
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 lowpriorityscore=0
- clxscore=1011 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
- spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012020087
+In-Reply-To: <20201125155711.GA6489@xz-x1>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="qDymnuGqqhW10CwH"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/2/20 9:20 AM, Paolo Bonzini wrote:
-> On 30/11/20 23:42, David Woodhouse wrote:
->> Yes, good point.
->>
->> Xen*does*  allow one hypercall (HVMOP_guest_request_vm_event) from
->> !CPL0 so I don't think I can get away with allowing only CPL0 like
->> kvm_hv_hypercall() does.
->>
->> So unless I'm going to do that filtering in kernel (ick) I think we do
->> need to capture and pass up the CPL, as you say. Which means it doesn't
->> fit in the existing kvm_run->hypercall structure unless I'm prepared to
->> rename/abuse the ->hypercall.pad for it.
->>
->> I'll just use Joao's version of the hypercall support, and add cpl to
->> struct kvm_xen_exit.hcall. Userspace can inject the UD# where
->> appropriate.
-> 
-> Or you can use sync regs perhaps.  For your specific use I don't expect 
-> many exits to userspace other than Xen hypercalls, so it should be okay 
-> to always run with KVM_SYNC_X86_REGS|KVM_SYNC_X86_SREGS in 
-> kvm_run->kvm_valid_regs.
-> 
-For interdomain event channels, you can still expect quite a few, if your blkfront
-and netfront are trying to go at maximum offered throughput.
+--qDymnuGqqhW10CwH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Meaning it's not only setup of the guest, but also driver datapath operations.
+On Wed, Nov 25, 2020 at 10:57:11AM -0500, Peter Xu wrote:
+> On Wed, Nov 25, 2020 at 01:05:25AM +0000, Justin He wrote:
+> > > I'd appreciate if you could explain why vfio needs to dma map some
+> > > PROT_NONE
+> >=20
+> > Virtiofs will map a PROT_NONE cache window region firstly, then remap t=
+he sub
+> > region of that cache window with read or write permission. I guess this=
+ might
+> > be an security concern. Just CC virtiofs expert Stefan to answer it mor=
+e accurately.
+>=20
+> Yep.  Since my previous sentence was cut off, I'll rephrase: I was thinki=
+ng
+> whether qemu can do vfio maps only until it remaps the PROT_NONE regions =
+into
+> PROT_READ|PROT_WRITE ones, rather than trying to map dma pages upon PROT_=
+NONE.
 
-Assuming of course that vTimer/vIPI are offloaded to the kernel.
+Userspace processes sometimes use PROT_NONE to reserve virtual address
+space. That way future mmap(NULL, ...) calls will not accidentally
+allocate an address from the reserved range.
+
+virtio-fs needs to do this because the DAX window mappings change at
+runtime. Initially the entire DAX window is just reserved using
+PROT_NONE. When it's time to mmap a portion of a file into the DAX
+window an mmap(fixed_addr, ...) call will be made.
+
+Stefan
+
+--qDymnuGqqhW10CwH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/HpdQACgkQnKSrs4Gr
+c8gPrggAonKj8u861YBXdwmd9ewmkx/VVa0WqmIb9BHstu+ZJU4vEPWSCLs6Ztk3
+JlIeWhuwfvHWLRcEL7iki0ON0jgsV4076axu8aFvl0NsKWQk2TTIA3VwUiWh76Li
+Qy18X6LEEaR6UAJVgp1mQTG8oQzYQwvirdJSwWUSydq0SmhXPNHFeuRGxmmtcTIR
+9JzPk8VIqzddHqEnAHcFUTCE40830cm4oaSq1nesTpqwkuv9nx0tBmE4xj26TONM
+pTEHitIJKZIgxh6ZeDDAizwiRZp4l6DMuEb0vxiNsrBaddhe5sIoa7DwGgiXn0Ps
+ImXZKCwuxOieIb+HAIyjmwe3fIjctQ==
+=P7/h
+-----END PGP SIGNATURE-----
+
+--qDymnuGqqhW10CwH--
+
