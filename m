@@ -2,119 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 960382CC488
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 19:08:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F29792CC4F0
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 19:21:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728848AbgLBSIA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 13:08:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21500 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728414AbgLBSIA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 13:08:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606932393;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UUhswDH4r20yUImWQBsMsC4a1fG4mX4+xvMVdq4Y3Co=;
-        b=Hgr1Tq9XrkeTEMWpur1kyHhiqemT4/nII61kj4GnUSN6uXzqoXKEIokPqi4Gi58TCQecBm
-        Rz3o/DXy/WTZ8vJt0ZE0nQT4EmT+kQNdfwNcDq3xn5gZtVKErGaFuyeYF2fW+gEPwokyL+
-        PSEhtLSoqRSSt8ZRSa3OWNXVcrsGdVs=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-CD3Nb7zrO2WvIERYWOg4Kg-1; Wed, 02 Dec 2020 13:06:32 -0500
-X-MC-Unique: CD3Nb7zrO2WvIERYWOg4Kg-1
-Received: by mail-qv1-f70.google.com with SMTP id o16so1820472qvq.4
-        for <kvm@vger.kernel.org>; Wed, 02 Dec 2020 10:06:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UUhswDH4r20yUImWQBsMsC4a1fG4mX4+xvMVdq4Y3Co=;
-        b=oT2j77wc91VNn1oSi/3/mpeBukATV0EZYwg7/52KH7vHLpVFbDav/5GVxZ1tlkr78f
-         QTQSH/IdECmoY4kXWG9n5SMEkssRsFIoTeZztJjHNIJViibyOKy/TFkpjleEj6smcZO3
-         goSrNZWsBAidOJFSv12D3H6BzntYRfHWh2WI2OcrH10cle7eOozMewf429ane4ZfKlps
-         SUK/aVuHI/yRVgQn/KOK/fINAsDV1t74TQ1Ftc57t1HvPXEcfucqjQ6UdMtQJizb8cLS
-         YzwRvGwQO+3FQwyYtcn3Ou3kiwHoBMrF6xSDTAaG7TDGICme8wIcmpzQFOPQr0nJyVVd
-         ypKw==
-X-Gm-Message-State: AOAM530UTgm1f4s9g6r3EWpwxHjFTMh3Mx2u+Nf9Hnq9xvdsmYFxtVea
-        MMWeVoviSBEjEsfdTzQ9fwTdnbmYIYS92YGsKKpjtt7Aqz7N3Qeul199jy0ubxCaUXx/fXUXOLW
-        ZFVPrv4qSeTh3
-X-Received: by 2002:a05:620a:7e8:: with SMTP id k8mr3736964qkk.273.1606932391683;
-        Wed, 02 Dec 2020 10:06:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxxuKq3g+ANdmuQcQ4T1M4wF0P8m/TYFs4KsAkF3Uaz4a/JvvROJhb8A1fxanXalWrFjASseQ==
-X-Received: by 2002:a05:620a:7e8:: with SMTP id k8mr3736933qkk.273.1606932391359;
-        Wed, 02 Dec 2020 10:06:31 -0800 (PST)
-Received: from xz-x1 ([142.126.94.187])
-        by smtp.gmail.com with ESMTPSA id z23sm2470416qtq.66.2020.12.02.10.06.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Dec 2020 10:06:30 -0800 (PST)
-Date:   Wed, 2 Dec 2020 13:06:28 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Elena Afanasova <eafanasova@gmail.com>
-Cc:     kvm@vger.kernel.org, mst@redhat.com, john.g.johnson@oracle.com,
-        dinechin@redhat.com, cohuck@redhat.com, jasowang@redhat.com,
-        felipe@nutanix.com, stefanha@redhat.com,
-        elena.ufimtseva@oracle.com, jag.raman@oracle.com
-Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
-Message-ID: <20201202180628.GA100143@xz-x1>
-References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+        id S1730882AbgLBSVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 13:21:17 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:59568 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726283AbgLBSVR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 13:21:17 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2IAGEP060754;
+        Wed, 2 Dec 2020 18:20:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=NvXmPPCGdV/IwlwX5m8biP5G7/GLn4XsbadAGDcm+UM=;
+ b=aiAw6KzZJljLGyousX8MtLMVHd63vVGtR1foBlXW8W0fuHHk2AKDixJYmbwQ5Pil7kwy
+ 0qpdDkeRikZjMEH/vNv5XFOb57gzQDhAdKzpRZMepwCqVsi/VbRAGofkImCr9wXZWqbm
+ NcOdTJmJ7LSNhsQjefYc3uF5eTau2wq83ViDfGa5q9WK1n+R0DywICH3yLVGkZEQ7r5o
+ BweQnoSYe20iiXboQ20a1lUE3gKisul58g2Vxng52y10/Fo7GPMASeRU/FlJ71HNZqe2
+ U13Y9NdtAqxTjdxltH0OtxcdxcUdduNko70s6cxDEhztIy4B92iqSbcKswOyhThmXhfj TQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 353dyqt01w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 02 Dec 2020 18:20:24 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2IABEx151364;
+        Wed, 2 Dec 2020 18:20:24 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 3540f0rnrh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 02 Dec 2020 18:20:23 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B2IKLKE003344;
+        Wed, 2 Dec 2020 18:20:21 GMT
+Received: from [192.168.0.108] (/70.36.60.91)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 02 Dec 2020 10:20:20 -0800
+Subject: Re: [PATCH RFC 02/39] KVM: x86/xen: intercept xen hypercalls if
+ enabled
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+ <20190220201609.28290-3-joao.m.martins@oracle.com>
+ <b56f763e6bf29a65a11b7a36c4d7bfa79b2ec1b2.camel@infradead.org>
+ <240b82b3-9621-8b08-6d37-75da6a61b3ce@oracle.com>
+ <684bd330949528ecd352d4a381165c2681c0bae9.camel@infradead.org>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <9971be28-8a0f-a108-6d5e-6a891e395b5f@oracle.com>
+Date:   Wed, 2 Dec 2020 10:20:17 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+In-Reply-To: <684bd330949528ecd352d4a381165c2681c0bae9.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9823 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 phishscore=0
+ suspectscore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012020108
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9823 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ clxscore=1015 mlxscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020108
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 25, 2020 at 12:44:07PM -0800, Elena Afanasova wrote:
-
-[...]
-
-> Wire protocol
-> -------------
-> The protocol spoken over the file descriptor is as follows. The device reads
-> commands from the file descriptor with the following layout::
+On 2020-12-02 12:03 a.m., David Woodhouse wrote:
+> On Tue, 2020-12-01 at 21:19 -0800, Ankur Arora wrote:
+>>> +             for (i = 0; i < PAGE_SIZE / sizeof(instructions); i++) {
+>>> +                     *(u32 *)&instructions[1] = i;
+>>> +                     if (kvm_vcpu_write_guest(vcpu,
+>>> +                                              page_addr + (i * sizeof(instructions)),
+>>> +                                              instructions, sizeof(instructions)))
+>>> +                             return 1;
+>>> +             }
+>>
+>> HYPERVISOR_iret isn't supported on 64bit so should be ud2 instead.
 > 
->   struct ioregionfd_cmd {
->       __u32 info;
->       __u32 padding;
->       __u64 user_data;
->       __u64 offset;
->       __u64 data;
->   };
+> Yeah, I got part way through typing that part but concluded it probably
+> wasn't a fast path that absolutely needed to be emulated in the kernel.
+> 
+> The VMM can inject the UD# when it receives the hypercall.
 
-I'm thinking whether it would be nice to have a handshake on the wire protocol
-before starting the cmd/resp sequence.
+That would work as well but if it's a straight ud2 on the hypercall
+page, wouldn't the guest just execute it when/if it does a
+HYPERVISOR_iret?
 
-I was thinking about migration - we have had a hard time trying to be
-compatible between old/new qemus.  Now we fixed those by applying the same
-migration capabilities on both sides always so we do the handshake "manually"
-from libvirt, but it really should be done with a real handshake on the
-channel, imho..  That's another story, for sure.
+Ankur
 
-My understanding is that the wire protocol is kind of a standalone (but tiny)
-protocol between kvm and the emulation process.  So I'm thinking the handshake
-could also help when e.g. kvm can fallback to an old version of wire protocol
-if it knows the emulation binary is old.  Ideally, I think this could even
-happen without VMM's awareness.
 
-[...]
-
-> Ordering
-> --------
-> Guest accesses are delivered in order, including posted writes.
-
-I'm wondering whether it should prepare for out-of-order commands assuming if
-there's no handshake so harder to extend, just in case there could be some slow
-commands so we still have chance to reply to a very trivial command during
-handling the slow one (then each command may require a command ID, too).  But
-it won't be a problem at all if we can easily extend the wire protocol so the
-ordering constraint can be extended too when really needed, and we can always
-start with in-order-only requests.
-
-Thanks,
-
--- 
-Peter Xu
-
+> 
+> I appreciate it *is* a guest-visible difference, if we're being really
+> pedantic, but I don't think we were even going to be able to 100% hide
+> the fact that it's not actually Xen.
+> 
