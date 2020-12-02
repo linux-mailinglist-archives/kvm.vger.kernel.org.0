@@ -2,192 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DBB4D2CC5C9
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 19:48:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 998802CC612
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 20:00:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389259AbgLBSpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 13:45:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54442 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729246AbgLBSpx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Dec 2020 13:45:53 -0500
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB55C0613D6
-        for <kvm@vger.kernel.org>; Wed,  2 Dec 2020 10:45:07 -0800 (PST)
-Received: by mail-ed1-x543.google.com with SMTP id d18so5080196edt.7
-        for <kvm@vger.kernel.org>; Wed, 02 Dec 2020 10:45:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=0qmkrGEptEVCiJDUjarR/sRg1xwrhJu0233f4iQghuE=;
-        b=VEEiKEGje4NdtnwGQCYst8TxXWK5/CVSc/ZzNsq1ZhVu7vMHzteTxzkAsI4OOFbiWX
-         HjD9XbSrA2c7MR4No4cE4zLDR16YtHGwvQvhYUZteP0g+lkUyqDHLzmenKBixYwDUppG
-         JJz+YClSRXfnHzEjP11OgGuQYdL20QtIYe6z4+Ov6Sg/V9Ix7xkN6py4bndZ+pPgLoxK
-         2uvRAulzkg2yoNaxg1n1etRR26/kdzrJ14lnjsHQdf5g/T828CVaxQ2OPvf6TRJJ3hjV
-         w71d0jIdBxSmVEXQIGuS7Sl3qTNuyQCuX/Wwxz6mEu7idkTzUTgxaMGxgOoSdvxeZr6S
-         cVuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=0qmkrGEptEVCiJDUjarR/sRg1xwrhJu0233f4iQghuE=;
-        b=XLmbPcZDDTBuHRZxy1bmbvSyx6JNFOH46JGtMiTwO4a+7oFIOpgLvbM5/sqE2HhEBt
-         S5+YRH5a+Kg5M9c9irLdiGLykPrXyaiOfKO0qbH84kcZPjc4CoFzc6y2y+ABzzVR7zeS
-         /ObdWbBlF4KZvZtdV8oML6J9XqporcCBRHrsgGtZ2oy8c7/Itjikk1SmsQjhqodpBJ8I
-         24mCS1tEw3SfuODkiBnR1RMDQg0+ZiRurdlTUg9gw8RsG4ymWlfsO3r93o0Oo63wNwUA
-         1h7tDl2gaZQnkJwumfLwzJwlOzO8ypSMdp0mZ65P42FSgvEMBkXsLJ9EMTFGVnmVJr72
-         A+EA==
-X-Gm-Message-State: AOAM532TpyT9u+DpPPI09xI5p0IStcEsr9uxWXe6+3OnX42NJNrFRsg7
-        0Z06XMhojlM0847P+0J/wM0=
-X-Google-Smtp-Source: ABdhPJxb2Ob7W36UI/neEUTCqa00p170OxQsXQBj26kqOCh9An69Gf1sXgBnrt2+t71q44K8JynDPA==
-X-Received: by 2002:a05:6402:134a:: with SMTP id y10mr1304889edw.144.1606934706666;
-        Wed, 02 Dec 2020 10:45:06 -0800 (PST)
-Received: from x1w.redhat.com (111.red-88-21-205.staticip.rima-tde.net. [88.21.205.111])
-        by smtp.gmail.com with ESMTPSA id d6sm422392ejy.114.2020.12.02.10.45.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Dec 2020 10:45:06 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To:     qemu-devel@nongnu.org
-Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Huacai Chen <chenhc@lemote.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH 9/9] target/mips: Explode gen_msa_branch() as gen_msa_BxZ_V/BxZ()
-Date:   Wed,  2 Dec 2020 19:44:15 +0100
-Message-Id: <20201202184415.1434484-10-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201202184415.1434484-1-f4bug@amsat.org>
-References: <20201202184415.1434484-1-f4bug@amsat.org>
+        id S1729101AbgLBS6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 13:58:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39473 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726104AbgLBS6y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 13:58:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606935448;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iW9Y+FK67QlpiMgzFvAg8dTUxB+fwY2PmZJLE/xIKww=;
+        b=e7ZOK7u3VcLYXhq9y1h4i6VSs9TMIeSC7q5tEmES+/OKiwV9mePxnH8THdA/SF2MsA6K53
+        y8hIW+i3P/nRiNIUpTSSfBO+a8lP0Hz3uhM2crj04xflQ/07hmOwrM7FvnT4UdwI7ITCEo
+        dUFlq2ji7jL7m7RUdd/uTf9lPA97tvg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-UrWc0JhgNjGsYrIpgq6Gkg-1; Wed, 02 Dec 2020 13:57:25 -0500
+X-MC-Unique: UrWc0JhgNjGsYrIpgq6Gkg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EEDB858187;
+        Wed,  2 Dec 2020 18:57:24 +0000 (UTC)
+Received: from w520.home (ovpn-112-10.phx2.redhat.com [10.3.112.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A15C5C22B;
+        Wed,  2 Dec 2020 18:57:24 +0000 (UTC)
+Date:   Wed, 2 Dec 2020 11:57:23 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Fred Gao <fred.gao@intel.com>
+Cc:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Swee Yee Fonn <swee.yee.fonn@intel.com>
+Subject: Re: [PATCH v1] vfio/pci: Add support for opregion v2.0+
+Message-ID: <20201202115723.27df527b@w520.home>
+In-Reply-To: <20201202171249.17083-1-fred.gao@intel.com>
+References: <20201202171249.17083-1-fred.gao@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation of using the decodetree script, explode
-gen_msa_branch() as following:
+On Thu,  3 Dec 2020 01:12:49 +0800
+Fred Gao <fred.gao@intel.com> wrote:
 
-- OPC_BZ_V              -> BxZ_V(EQ)
-- OPC_BNZ_V             -> BxZ_V(NE)
-- OPC_BZ_[BHWD]         -> BxZ(false)
-- OPC_BNZ_[BHWD]        -> BxZ(true)
+> When VBT data exceeds 6KB size and cannot be within mailbox #4 starting
+> from opregion v2.0+, Extended VBT region, next to opregion, is used to
+> hold the VBT data, so the total size will be opregion size plus
+> extended VBT region size.
+> 
+> For opregion 2.1+: since rvda is relative offset from opregion base,
+> rvda as extended VBT start offset should be same as opregion size.
+> 
+> For opregion 2.0: the only difference between opregion 2.0 and 2.1 is
+> rvda addressing mode besides the version. since rvda is physical host
+> VBT address and cannot be directly used in guest, it is faked into
+> opregion 2.1's relative offset.
+> 
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Signed-off-by: Swee Yee Fonn <swee.yee.fonn@intel.com>
+> Signed-off-by: Fred Gao <fred.gao@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_igd.c | 44 +++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+> index 53d97f459252..78919a289914 100644
+> --- a/drivers/vfio/pci/vfio_pci_igd.c
+> +++ b/drivers/vfio/pci/vfio_pci_igd.c
+> @@ -21,6 +21,17 @@
+>  #define OPREGION_SIZE		(8 * 1024)
+>  #define OPREGION_PCI_ADDR	0xfc
+>  
+> +/*
+> + * opregion 2.0: rvda is the physical VBT address.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/mips/translate.c | 71 ++++++++++++++++++++++++++++-------------
- 1 file changed, 49 insertions(+), 22 deletions(-)
+What's rvda?  What's VBT?
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 5311e6ced62..8a35d4d0d03 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28744,49 +28744,76 @@ static void gen_check_zero_element(TCGv tresult, uint8_t df, uint8_t wt)
-     tcg_temp_free_i64(t1);
- }
- 
-+static bool gen_msa_BxZ_V(DisasContext *ctx, int wt, int s16, TCGCond cond)
-+{
-+    TCGv_i64 t0;
-+
-+    check_msa_access(ctx);
-+
-+    if (ctx->hflags & MIPS_HFLAG_BMASK) {
-+        generate_exception_end(ctx, EXCP_RI);
-+        return true;
-+    }
-+    t0 = tcg_temp_new_i64();
-+    tcg_gen_or_i64(t0, msa_wr_d[wt << 1], msa_wr_d[(wt << 1) + 1]);
-+    tcg_gen_setcondi_i64(cond, t0, t0, 0);
-+    tcg_gen_trunc_i64_tl(bcond, t0);
-+    tcg_temp_free_i64(t0);
-+
-+    ctx->btarget = ctx->base.pc_next + (s16 << 2) + 4;
-+
-+    ctx->hflags |= MIPS_HFLAG_BC;
-+    ctx->hflags |= MIPS_HFLAG_BDS32;
-+
-+    return true;
-+}
-+
-+static bool gen_msa_BxZ(DisasContext *ctx, int df, int wt, int s16, bool if_not)
-+{
-+    check_msa_access(ctx);
-+
-+    if (ctx->hflags & MIPS_HFLAG_BMASK) {
-+        generate_exception_end(ctx, EXCP_RI);
-+        return true;
-+    }
-+
-+    gen_check_zero_element(bcond, df, wt);
-+    if (if_not) {
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, bcond, bcond, 0);
-+    }
-+
-+    ctx->btarget = ctx->base.pc_next + (s16 << 2) + 4;
-+    ctx->hflags |= MIPS_HFLAG_BC;
-+    ctx->hflags |= MIPS_HFLAG_BDS32;
-+
-+    return true;
-+}
-+
- static void gen_msa_branch(DisasContext *ctx, uint32_t op1)
- {
-     uint8_t df = (ctx->opcode >> 21) & 0x3;
-     uint8_t wt = (ctx->opcode >> 16) & 0x1f;
-     int64_t s16 = (int16_t)ctx->opcode;
- 
--    check_msa_access(ctx);
--
--    if (ctx->hflags & MIPS_HFLAG_BMASK) {
--        generate_exception_end(ctx, EXCP_RI);
--        return;
--    }
-     switch (op1) {
-     case OPC_BZ_V:
-     case OPC_BNZ_V:
--        {
--            TCGv_i64 t0 = tcg_temp_new_i64();
--            tcg_gen_or_i64(t0, msa_wr_d[wt << 1], msa_wr_d[(wt << 1) + 1]);
--            tcg_gen_setcondi_i64((op1 == OPC_BZ_V) ?
--                    TCG_COND_EQ : TCG_COND_NE, t0, t0, 0);
--            tcg_gen_trunc_i64_tl(bcond, t0);
--            tcg_temp_free_i64(t0);
--        }
-+        gen_msa_BxZ_V(ctx, wt, s16, (op1 == OPC_BZ_V) ?
-+                                    TCG_COND_EQ : TCG_COND_NE);
-         break;
-     case OPC_BZ_B:
-     case OPC_BZ_H:
-     case OPC_BZ_W:
-     case OPC_BZ_D:
--        gen_check_zero_element(bcond, df, wt);
-+        gen_msa_BxZ(ctx, df, wt, s16, false);
-         break;
-     case OPC_BNZ_B:
-     case OPC_BNZ_H:
-     case OPC_BNZ_W:
-     case OPC_BNZ_D:
--        gen_check_zero_element(bcond, df, wt);
--        tcg_gen_setcondi_tl(TCG_COND_EQ, bcond, bcond, 0);
-+        gen_msa_BxZ(ctx, df, wt, s16, true);
-         break;
-     }
--
--    ctx->btarget = ctx->base.pc_next + (s16 << 2) + 4;
--
--    ctx->hflags |= MIPS_HFLAG_BC;
--    ctx->hflags |= MIPS_HFLAG_BDS32;
- }
- 
- static void gen_msa_i8(DisasContext *ctx)
--- 
-2.26.2
+> + *
+> + * opregion 2.1+: rvda is unsigned, relative offset from
+> + * opregion base, and should never point within opregion.
+> + */
+> +#define OPREGION_RDVA		0x3ba
+> +#define OPREGION_RDVS		0x3c2
+> +#define OPREGION_VERSION	22
+
+Why is this specified as decimal and the others in hex?  This makes it
+seem like the actual version rather than the offset of a version
+register.
+
+> +
+> +
+>  static size_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  			      size_t count, loff_t *ppos, bool iswrite)
+>  {
+> @@ -58,6 +69,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
+>  	u32 addr, size;
+>  	void *base;
+>  	int ret;
+> +	u16 version;
+>  
+>  	ret = pci_read_config_dword(vdev->pdev, OPREGION_PCI_ADDR, &addr);
+>  	if (ret)
+> @@ -83,6 +95,38 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
+>  
+>  	size *= 1024; /* In KB */
+>  
+> +	/* Support opregion v2.0+ */
+> +	version = le16_to_cpu(*(__le16 *)(base + OPREGION_VERSION));
+> +	if (version >= 0x0200) {
+> +		u64 rvda;
+> +		u32 rvds;
+> +
+> +		rvda = le64_to_cpu(*(__le64 *)(base + OPREGION_RDVA));
+> +		rvds = le32_to_cpu(*(__le32 *)(base + OPREGION_RDVS));
+> +		if (rvda && rvds) {
+> +			u32 offset;
+> +
+> +			if (version == 0x0200)
+> +				offset = (rvda - (u64)addr);
+
+Unnecessary outer ()
+
+> +			else
+> +				offset = rvda;
+> +
+> +			pci_WARN(vdev->pdev, offset != size,
+> +				"Extended VBT does not follow opregion !\n"
+> +				"opregion version 0x%x:offset 0x%x\n", version, offset);
+> +
+> +			if (version == 0x0200) {
+> +				/* opregion version v2.0 faked to v2.1 */
+> +				*(__le16 *)(base + OPREGION_VERSION) =
+> +					cpu_to_le16(0x0201);
+> +				/* rvda faked to relative offset */
+> +				(*(__le64 *)(base + OPREGION_RDVA)) =
+> +					cpu_to_le64((rvda - (u64)addr));
+
+We're writing to the OpRegion and affecting all future use of it, seems
+dangerous.
+
+
+> +			}
+> +			size = offset + rvds;
+
+
+We warn about VBT (whatever that is) not immediately following the
+OpRegion, but then we go ahead and size the thing that we expose to
+userspace to allow read access to everything between the OpRegion and
+VBT??
+
+> +		}
+> +	}
+> +
+>  	if (size != OPREGION_SIZE) {
+>  		memunmap(base);
+>  		base = memremap(addr, size, MEMREMAP_WB);
 
