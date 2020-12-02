@@ -2,215 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C8292CC926
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 22:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 888842CCAAB
+	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 00:46:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726901AbgLBVuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 16:50:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21983 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726640AbgLBVuJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 16:50:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606945722;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2kbJG5kdUlI0zyzgPHZ91f4kQH5+WuZ+GqKCLpBYMbE=;
-        b=A8sjJ3CDtBSzMpOOtwvMiUjWYfRl6DnBnpTkd6lbelQcTqUBaDdMkVaZ+twWy2p6Zptjo8
-        oiMyUAlFL54xM3mj385jsvZS/Dr51q46Xu3uwaaBAURNRvIJk/m8w8mqYE2s8ZB4dsAd1p
-        jF5JH2ElEkUrFL/bY0s7VpJtLYCCcDI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-dpP-CtcYP4GPWUH234jrRQ-1; Wed, 02 Dec 2020 16:48:38 -0500
-X-MC-Unique: dpP-CtcYP4GPWUH234jrRQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1110D185E489;
-        Wed,  2 Dec 2020 21:48:36 +0000 (UTC)
-Received: from w520.home (ovpn-112-10.phx2.redhat.com [10.3.112.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 051BF60BFA;
-        Wed,  2 Dec 2020 21:48:34 +0000 (UTC)
-Date:   Wed, 2 Dec 2020 14:48:34 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        id S1729199AbgLBXnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 18:43:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13994 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728186AbgLBXnJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 18:43:09 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B2NYSiJ083175;
+        Wed, 2 Dec 2020 18:42:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=HZLCVTOJklfB/d+YwxQ45wGtBPnDTEIvfKqqNrqkEoU=;
+ b=FUiAd3YFKnQMHnmftvsGx9f8XXgHVWDwYDpXLC60mzzP/3spSBfy1GUuurKxBfPGLcy4
+ CMQ5Kk54vsGW5eBkf2NWW8w5LVOpkl/7i9fd3iU2iLXBqlKltshw7HqDd9Vgt3I8VdUj
+ oQx+PFFPG4r1dq8Tlp7NGBgj4dqj5mBEJrHCz+yKeIgRftNRpbJGhdb7mP2NpMJEyJIe
+ qc5xcz7cGsL+bFav7tTNlE3Sk1OMWK5fMiATbhA5bnLsKqvFznRTI3GG/yfHUsQcRU49
+ qOA+9meiXLD9kfcikfkJ3dCOOHMZkMacCChbDzlZpjfJYZ5oyRQa8y0I6Wp18jJaOnkM OQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 356jg83p03-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Dec 2020 18:42:28 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B2NbRJn094468;
+        Wed, 2 Dec 2020 18:42:27 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 356jg83nyr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Dec 2020 18:42:27 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B2NXDdT019938;
+        Wed, 2 Dec 2020 23:42:26 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01wdc.us.ibm.com with ESMTP id 355vrfu3me-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Dec 2020 23:42:26 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B2NfBQ29175708
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Dec 2020 23:41:11 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 653DD112065;
+        Wed,  2 Dec 2020 23:41:11 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9190112061;
+        Wed,  2 Dec 2020 23:41:10 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com.com (unknown [9.85.195.249])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  2 Dec 2020 23:41:10 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: Re: [PATCH v3 1/1] vfio/type1: Add vfio_group_domain()
-Message-ID: <20201202144834.1dd0983e@w520.home>
-In-Reply-To: <20201201012328.2465735-1-baolu.lu@linux.intel.com>
-References: <20201201012328.2465735-1-baolu.lu@linux.intel.com>
+Cc:     borntraeger@de.ibm.com, cohuck@redhat.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com, david@redhat.com,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: [PATCH] s390/vfio-ap: Clean up vfio_ap resources when KVM pointer invalidated
+Date:   Wed,  2 Dec 2020 18:41:01 -0500
+Message-Id: <20201202234101.32169-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-12-02_14:2020-11-30,2020-12-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ spamscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ suspectscore=3 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020146
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  1 Dec 2020 09:23:28 +0800
-Lu Baolu <baolu.lu@linux.intel.com> wrote:
+The vfio_ap device driver registers a group notifier with VFIO when the
+file descriptor for a VFIO mediated device for a KVM guest is opened to
+receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
+event). When the KVM pointer is set, the vfio_ap driver stashes the pointer
+and calls the kvm_get_kvm() function to increment its reference counter.
+When the notifier is called to make notification that the KVM pointer has
+been set to NULL, the driver should clean up any resources associated with
+the KVM pointer and decrement its reference counter. The current
+implementation does not take care of this clean up.
 
-> Add the API for getting the domain from a vfio group. This could be used
-> by the physical device drivers which rely on the vfio/mdev framework for
-> mediated device user level access. The typical use case like below:
-> 
-> 	unsigned int pasid;
-> 	struct vfio_group *vfio_group;
-> 	struct iommu_domain *iommu_domain;
-> 	struct device *dev = mdev_dev(mdev);
-> 	struct device *iommu_device = mdev_get_iommu_device(dev);
-> 
-> 	if (!iommu_device ||
-> 	    !iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
-> 		return -EINVAL;
-> 
-> 	vfio_group = vfio_group_get_external_user_from_dev(dev);
-> 	if (IS_ERR_OR_NULL(vfio_group))
-> 		return -EFAULT;
-> 
-> 	iommu_domain = vfio_group_domain(vfio_group);
-> 	if (IS_ERR_OR_NULL(iommu_domain)) {
-> 		vfio_group_put_external_user(vfio_group);
-> 		return -EFAULT;
-> 	}
-> 
-> 	pasid = iommu_aux_get_pasid(iommu_domain, iommu_device);
-> 	if (pasid < 0) {
-> 		vfio_group_put_external_user(vfio_group);
-> 		return -EFAULT;
-> 	}
-> 
-> 	/* Program device context with pasid value. */
-> 	...
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> ---
->  drivers/vfio/vfio.c             | 18 ++++++++++++++++++
->  drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++++++++++
->  include/linux/vfio.h            |  3 +++
->  3 files changed, 44 insertions(+)
-> 
-> Change log:
->  - v2: https://lore.kernel.org/linux-iommu/20201126012726.1185171-1-baolu.lu@linux.intel.com/
->  - Changed according to comments @ https://lore.kernel.org/linux-iommu/20201130135725.70fdf17f@w520.home/
->  - Fix a typo https://lore.kernel.org/linux-iommu/DM5PR11MB143560E51C84BAF83AE54AC0C3F90@DM5PR11MB1435.namprd11.prod.outlook.com/
-> 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 2151bc7f87ab..588e8026d94b 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -2331,6 +2331,24 @@ int vfio_unregister_notifier(struct device *dev, enum vfio_notify_type type,
->  }
->  EXPORT_SYMBOL(vfio_unregister_notifier);
->  
-> +struct iommu_domain *vfio_group_domain(struct vfio_group *group)
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+---
+ drivers/s390/crypto/vfio_ap_ops.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-Could we make this vfio_group_iommu_domain()?  We're making a callback
-specific to a vfio IOMMU backend participating in the IOMMU API, so we
-might as well make this callback explicitly tied to it.
-
-> +{
-> +	struct vfio_container *container;
-> +	struct vfio_iommu_driver *driver;
-> +
-> +	if (!group)
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	container = group->container;
-> +	driver = container->iommu_driver;
-> +	if (likely(driver && driver->ops->group_domain))
-> +		return driver->ops->group_domain(container->iommu_data,
-> +						 group->iommu_group);
-
-Likewise group_iommu_domain()?
-
-
-> +	else
-> +		return ERR_PTR(-ENOTTY);
-
-Nit, we don't need 'else' here, the first branch always returns.
-
-Otherwise I think it looks good.  Thanks,
-
-Alex
-
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_group_domain);
-> +
->  /**
->   * Module/class support
->   */
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 67e827638995..d7b5acb3056a 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2980,6 +2980,28 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
->  	return ret;
->  }
->  
-> +static struct iommu_domain *
-> +vfio_iommu_type1_group_domain(void *iommu_data, struct iommu_group *iommu_group)
-> +{
-> +	struct iommu_domain *domain = ERR_PTR(-ENODEV);
-> +	struct vfio_iommu *iommu = iommu_data;
-> +	struct vfio_domain *d;
-> +
-> +	if (!iommu || !iommu_group)
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	mutex_lock(&iommu->lock);
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		if (find_iommu_group(d, iommu_group)) {
-> +			domain = d->domain;
-> +			break;
-> +		}
-> +	}
-> +	mutex_unlock(&iommu->lock);
-> +
-> +	return domain;
-> +}
-> +
->  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
->  	.name			= "vfio-iommu-type1",
->  	.owner			= THIS_MODULE,
-> @@ -2993,6 +3015,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
->  	.register_notifier	= vfio_iommu_type1_register_notifier,
->  	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
->  	.dma_rw			= vfio_iommu_type1_dma_rw,
-> +	.group_domain		= vfio_iommu_type1_group_domain,
->  };
->  
->  static int __init vfio_iommu_type1_init(void)
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 38d3c6a8dc7e..6cd0de2764cb 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -90,6 +90,7 @@ struct vfio_iommu_driver_ops {
->  					       struct notifier_block *nb);
->  	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
->  				  void *data, size_t count, bool write);
-> +	struct iommu_domain *(*group_domain)(void *iommu_data, struct iommu_group *group);
->  };
->  
->  extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
-> @@ -126,6 +127,8 @@ extern int vfio_group_unpin_pages(struct vfio_group *group,
->  extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
->  		       void *data, size_t len, bool write);
->  
-> +extern struct iommu_domain *vfio_group_domain(struct vfio_group *group);
-> +
->  /* each type has independent events */
->  enum vfio_notify_type {
->  	VFIO_IOMMU_NOTIFY = 0,
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index e0bde8518745..eeb9c9130756 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -1083,6 +1083,17 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
+ 	return NOTIFY_DONE;
+ }
+ 
++static void vfio_ap_mdev_put_kvm(struct ap_matrix_mdev *matrix_mdev)
++{
++	if (matrix_mdev->kvm) {
++		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
++		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
++		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
++		kvm_put_kvm(matrix_mdev->kvm);
++		matrix_mdev->kvm = NULL;
++	}
++}
++
+ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+ 				       unsigned long action, void *data)
+ {
+@@ -1095,7 +1106,7 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+ 	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
+ 
+ 	if (!data) {
+-		matrix_mdev->kvm = NULL;
++		vfio_ap_mdev_put_kvm(matrix_mdev);
+ 		return NOTIFY_OK;
+ 	}
+ 
+@@ -1222,13 +1233,7 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
+ 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+ 
+ 	mutex_lock(&matrix_dev->lock);
+-	if (matrix_mdev->kvm) {
+-		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+-		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+-		vfio_ap_mdev_reset_queues(mdev);
+-		kvm_put_kvm(matrix_mdev->kvm);
+-		matrix_mdev->kvm = NULL;
+-	}
++	vfio_ap_mdev_put_kvm(matrix_mdev);
+ 	mutex_unlock(&matrix_dev->lock);
+ 
+ 	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+-- 
+2.21.1
 
