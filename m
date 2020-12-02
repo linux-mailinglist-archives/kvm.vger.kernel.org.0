@@ -2,58 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E01332CC84E
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 21:49:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2690D2CC891
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 22:06:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729294AbgLBUtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 15:49:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38566 "EHLO mail.kernel.org"
+        id S2387412AbgLBVEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 16:04:22 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:44310 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727126AbgLBUtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Dec 2020 15:49:16 -0500
-Subject: Re: [GIT PULL] vdpa: last minute bugfixes
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1606942113;
-        bh=Pfal5eZHb3G2KKSiwL+xk4HK/vWCqBVH2HiQl3Y7Bnw=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=GIJbhoSgwSrDVO8gN/q7DdNyv+3y2WmmotTi9dLx7ITg47CY/Z1CFeXepmb9u2mra
-         r7HtzDNMascxpqVuXomN2igH4zLdyx9GS36qGqNnF1+jyigR3LFRGYA+1hGZwEIEzz
-         E5Ytt8h/Akm/Am1L0+rw1Y/bOJ+nFNl1Y5UCFfNZLnlaVXM9kuf7d3N//6DlAjwAc2
-         k6jSZK0yOWoLkeuJJqcczDrL2ISy1y9/AuypWQbMSUoP+OlN3XyG5hiptQ1lcdjYdM
-         VIyydKcS4kYEgJu/UYDrZIhZvDFOLe040NDGFkx+v7rfr/KREZnYs+5gNa2wczoe9y
-         jxI1KFY2U+/tg==
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20201202065147-mutt-send-email-mst@kernel.org>
-References: <20201202065147-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20201202065147-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 2c602741b51daa12f8457f222ce9ce9c4825d067
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 2c6ffa9e9b11bdfa267fe05ad1e98d3491b4224f
-Message-Id: <160694211318.5087.448562250965611321.pr-tracker-bot@kernel.org>
-Date:   Wed, 02 Dec 2020 20:48:33 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dan.carpenter@oracle.com, eli@mellanox.com, jasowang@redhat.com,
-        leonro@nvidia.com, lkp@intel.com, mst@redhat.com,
-        parav@mellanox.com, rdunlap@infradead.org, saeedm@nvidia.com
+        id S1729373AbgLBVEW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 16:04:22 -0500
+X-Greylist: delayed 1671 seconds by postgrey-1.27 at vger.kernel.org; Wed, 02 Dec 2020 16:04:20 EST
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.93.0.4)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1kkYqj-0004aI-SE; Wed, 02 Dec 2020 21:35:41 +0100
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] selftests: kvm/set_memory_region_test: Fix race in move region test
+Date:   Wed,  2 Dec 2020 21:35:36 +0100
+Message-Id: <0fdddb94bb0e31b7da129a809a308d91c10c0b5e.1606941224.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.29.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Wed, 2 Dec 2020 06:51:47 -0500:
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+The current memory region move test correctly handles the situation that
+the second (realigning) memslot move operation would temporarily trigger
+MMIO until it completes, however it does not handle the case in which the
+first (misaligning) move operation does this, too.
+This results in false test assertions in case it does so.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/2c6ffa9e9b11bdfa267fe05ad1e98d3491b4224f
+Fix this by handling temporary MMIO from the first memslot move operation
+in the test guest code, too.
 
-Thank you!
+Fixes: 8a0639fe9201 ("KVM: sefltests: Add explicit synchronization to move mem region test")
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+    The race is pretty hard to trigger on the current KVM memslot code,
+    to trigger it reliably an extra delay in memslot move op is needed:
+    --- a/virt/kvm/kvm_main.c
+    +++ b/virt/kvm/kvm_main.c
+    @@ -1173,7 +1173,7 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
+    
+            return slots;
+     }
+    -
+    +#include <linux/delay.h>
+     static int kvm_set_memslot(struct kvm *kvm,
+                               const struct kvm_userspace_memory_region *mem,
+                               struct kvm_memory_slot *old,
+    @@ -1212,6 +1212,8 @@ static int kvm_set_memslot(struct kvm *kvm,
+                     *      - kvm_is_visible_gfn (mmu_check_root)
+                     */
+                    kvm_arch_flush_shadow_memslot(kvm, slot);
+    +
+    +               if (change == KVM_MR_MOVE) mdelay(100);
+            }
+    
+            r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+ .../selftests/kvm/set_memory_region_test.c      | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index b3ece55a2da6..6f441dd9f33c 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -156,14 +156,23 @@ static void guest_code_move_memory_region(void)
+ 	GUEST_SYNC(0);
+ 
+ 	/*
+-	 * Spin until the memory region is moved to a misaligned address.  This
+-	 * may or may not trigger MMIO, as the window where the memslot is
+-	 * invalid is quite small.
++	 * Spin until the memory region starts getting moved to a
++	 * misaligned address.
++	 * Every region move may or may not trigger MMIO, as the
++	 * window where the memslot is invalid is usually quite small.
+ 	 */
+ 	val = guest_spin_on_val(0);
+ 	GUEST_ASSERT_1(val == 1 || val == MMIO_VAL, val);
+ 
+-	/* Spin until the memory region is realigned. */
++	/* Spin until the misaligning memory region move completes. */
++	val = guest_spin_on_val(MMIO_VAL);
++	GUEST_ASSERT_1(val == 1 || val == 0, val);
++
++	/* Spin until the memory region starts to get re-aligned. */
++	val = guest_spin_on_val(0);
++	GUEST_ASSERT_1(val == 1 || val == MMIO_VAL, val);
++
++	/* Spin until the re-aligning memory region move completes. */
+ 	val = guest_spin_on_val(MMIO_VAL);
+ 	GUEST_ASSERT_1(val == 1, val);
+ 
