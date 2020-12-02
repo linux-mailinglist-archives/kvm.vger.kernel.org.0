@@ -2,135 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F0672CB87E
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 10:18:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E83D2CBAEA
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 11:50:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387972AbgLBJSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 04:18:05 -0500
-Received: from mga03.intel.com ([134.134.136.65]:4848 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387658AbgLBJSF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Dec 2020 04:18:05 -0500
-IronPort-SDR: ClIbe/tXNcNINUlmnbTYoDSQDyqFewgGXtjJYgvhc8L2uYlf77ojbb5l23hFJDJbxREqeiUqB/
- BFvEfZZTmD7A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9822"; a="173082426"
-X-IronPort-AV: E=Sophos;i="5.78,386,1599548400"; 
-   d="scan'208";a="173082426"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2020 01:17:22 -0800
-IronPort-SDR: 1PkSdBBPN4QhBoDrBUwcsM0XvfJYNIjRheEQurMBt/wBCoP0zIuEj19MI391l2UOXk24ITR4pA
- 6Iu0R19cvrJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,386,1599548400"; 
-   d="scan'208";a="365205218"
-Received: from cfl-host.sh.intel.com ([10.239.158.59])
-  by fmsmga004.fm.intel.com with ESMTP; 02 Dec 2020 01:17:20 -0800
-From:   Fred Gao <fred.gao@intel.com>
-To:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org
-Cc:     Fred Gao <fred.gao@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Swee Yee Fonn <swee.yee.fonn@intel.com>
-Subject: [PATCH v1] vfio/pci: Add support for opregion v2.0+
-Date:   Thu,  3 Dec 2020 01:12:49 +0800
-Message-Id: <20201202171249.17083-1-fred.gao@intel.com>
-X-Mailer: git-send-email 2.24.1.1.gb6d4d82bd5
+        id S1729520AbgLBKrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 05:47:14 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:47074 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729514AbgLBKrN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 05:47:13 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2AixNW072970;
+        Wed, 2 Dec 2020 10:46:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=wwhr47586+/6Fpo43Hc7ftI6vWuRmnMUsfbm3tDnCB4=;
+ b=oFxRdXh4Zvbgyzs83YZP1YFbXgu/SHQNxfa1KhL6Kmk+m+hOpCEn4J/DwTkUAw4iHUQK
+ fC7Xln2u+2ylqsaPPG4jSOjgwrm3lvuFvG0wiekSHCFwM3EXCmBjMY+lYX6x6SVkgVtD
+ xHQ9WBju9CO63NBMum9NuN8XvLDSLrdT/Cf1U1v8dGEyrC4jl/ZP7njMGA7Hq2px5iSA
+ h9TYLZkXyAvYU+JLMw0UUdW4oxdUnWBH+1szuiBeaMBj2qSNl6FLzWIyO61pRPdidQy7
+ n9ZHsh5Hrq/gmkmzZZmX1NnRFdS0dCJbNe2y4Vhg5ihkO5fbaoicj1dvESjrq7pgQLBx /w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 353c2aypeg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 02 Dec 2020 10:46:12 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2AaXOY130396;
+        Wed, 2 Dec 2020 10:44:12 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 35404p4qj9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 02 Dec 2020 10:44:12 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B2Ai7ko032261;
+        Wed, 2 Dec 2020 10:44:08 GMT
+Received: from [10.175.181.158] (/10.175.181.158)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 02 Dec 2020 02:44:07 -0800
+Subject: Re: [PATCH RFC 03/39] KVM: x86/xen: register shared_info page
+To:     Ankur Arora <ankur.a.arora@oracle.com>,
+        David Woodhouse <dwmw2@infradead.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+ <20190220201609.28290-4-joao.m.martins@oracle.com>
+ <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
+ <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <896dc984-fa71-8f2f-d12b-458294f5f706@oracle.com>
+Date:   Wed, 2 Dec 2020 10:44:03 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 bulkscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=999 phishscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020062
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 lowpriorityscore=0
+ clxscore=1015 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012020063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When VBT data exceeds 6KB size and cannot be within mailbox #4 starting
-from opregion v2.0+, Extended VBT region, next to opregion, is used to
-hold the VBT data, so the total size will be opregion size plus
-extended VBT region size.
+[late response - was on holiday yesterday]
 
-For opregion 2.1+: since rvda is relative offset from opregion base,
-rvda as extended VBT start offset should be same as opregion size.
+On 12/2/20 12:40 AM, Ankur Arora wrote:
+> On 2020-12-01 5:07 a.m., David Woodhouse wrote:
+>> On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
+>>> +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+>>> +{
+>>> +       struct shared_info *shared_info;
+>>> +       struct page *page;
+>>> +
+>>> +       page = gfn_to_page(kvm, gfn);
+>>> +       if (is_error_page(page))
+>>> +               return -EINVAL;
+>>> +
+>>> +       kvm->arch.xen.shinfo_addr = gfn;
+>>> +
+>>> +       shared_info = page_to_virt(page);
+>>> +       memset(shared_info, 0, sizeof(struct shared_info));
+>>> +       kvm->arch.xen.shinfo = shared_info;
+>>> +       return 0;
+>>> +}
+>>> +
+>>
+>> Hm.
+>>
+>> How come we get to pin the page and directly dereference it every time,
+>> while kvm_setup_pvclock_page() has to use kvm_write_guest_cached()
+>> instead?
+> 
+> So looking at my WIP trees from the time, this is something that
+> we went back and forth on as well with using just a pinned page or a
+> persistent kvm_vcpu_map().
+> 
+> I remember distinguishing shared_info/vcpu_info from kvm_setup_pvclock_page()
+> as shared_info is created early and is not expected to change during the
+> lifetime of the guest which didn't seem true for MSR_KVM_SYSTEM_TIME (or
+> MSR_KVM_STEAL_TIME) so that would either need to do a kvm_vcpu_map()
+> kvm_vcpu_unmap() dance or do some kind of synchronization.
+> 
+> That said, I don't think this code explicitly disallows any updates
+> to shared_info.
+> 
+>>
+>> If that was allowed, wouldn't it have been a much simpler fix for
+>> CVE-2019-3016? What am I missing?
+> 
+> Agreed.
+> 
+> Perhaps, Paolo can chime in with why KVM never uses pinned page
+> and always prefers to do cached mappings instead?
+> 
+Part of the CVE fix to not use cached versions.
 
-For opregion 2.0: the only difference between opregion 2.0 and 2.1 is
-rvda addressing mode besides the version. since rvda is physical host
-VBT address and cannot be directly used in guest, it is faked into
-opregion 2.1's relative offset.
+It's not a longterm pin of the page unlike we try to do here (partly due to the nature
+of the pages we are mapping) but we still we map the gpa, RMW the steal time struct, and
+then unmap the page.
 
-Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-Signed-off-by: Swee Yee Fonn <swee.yee.fonn@intel.com>
-Signed-off-by: Fred Gao <fred.gao@intel.com>
----
- drivers/vfio/pci/vfio_pci_igd.c | 44 +++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+See record_steal_time() -- but more specifically commit b043138246 ("x86/KVM: Make sure
+KVM_VCPU_FLUSH_TLB flag is not missed").
 
-diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
-index 53d97f459252..78919a289914 100644
---- a/drivers/vfio/pci/vfio_pci_igd.c
-+++ b/drivers/vfio/pci/vfio_pci_igd.c
-@@ -21,6 +21,17 @@
- #define OPREGION_SIZE		(8 * 1024)
- #define OPREGION_PCI_ADDR	0xfc
- 
-+/*
-+ * opregion 2.0: rvda is the physical VBT address.
-+ *
-+ * opregion 2.1+: rvda is unsigned, relative offset from
-+ * opregion base, and should never point within opregion.
-+ */
-+#define OPREGION_RDVA		0x3ba
-+#define OPREGION_RDVS		0x3c2
-+#define OPREGION_VERSION	22
-+
-+
- static size_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
- 			      size_t count, loff_t *ppos, bool iswrite)
- {
-@@ -58,6 +69,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
- 	u32 addr, size;
- 	void *base;
- 	int ret;
-+	u16 version;
- 
- 	ret = pci_read_config_dword(vdev->pdev, OPREGION_PCI_ADDR, &addr);
- 	if (ret)
-@@ -83,6 +95,38 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
- 
- 	size *= 1024; /* In KB */
- 
-+	/* Support opregion v2.0+ */
-+	version = le16_to_cpu(*(__le16 *)(base + OPREGION_VERSION));
-+	if (version >= 0x0200) {
-+		u64 rvda;
-+		u32 rvds;
-+
-+		rvda = le64_to_cpu(*(__le64 *)(base + OPREGION_RDVA));
-+		rvds = le32_to_cpu(*(__le32 *)(base + OPREGION_RDVS));
-+		if (rvda && rvds) {
-+			u32 offset;
-+
-+			if (version == 0x0200)
-+				offset = (rvda - (u64)addr);
-+			else
-+				offset = rvda;
-+
-+			pci_WARN(vdev->pdev, offset != size,
-+				"Extended VBT does not follow opregion !\n"
-+				"opregion version 0x%x:offset 0x%x\n", version, offset);
-+
-+			if (version == 0x0200) {
-+				/* opregion version v2.0 faked to v2.1 */
-+				*(__le16 *)(base + OPREGION_VERSION) =
-+					cpu_to_le16(0x0201);
-+				/* rvda faked to relative offset */
-+				(*(__le64 *)(base + OPREGION_RDVA)) =
-+					cpu_to_le64((rvda - (u64)addr));
-+			}
-+			size = offset + rvds;
-+		}
-+	}
-+
- 	if (size != OPREGION_SIZE) {
- 		memunmap(base);
- 		base = memremap(addr, size, MEMREMAP_WB);
--- 
-2.24.1.1.gb6d4d82bd5
+But I am not sure it's a good idea to follow the same as record_steal_time() given that
+this is a fairly sensitive code path for event channels.
 
+>>
+>> Should I rework these to use kvm_write_guest_cached()?
+> 
+> kvm_vcpu_map() would be better. The event channel logic does RMW operations
+> on shared_info->vcpu_info.
+> 
+Indeed, yes.
+
+Ankur IIRC, we saw missed event channels notifications when we were using the
+{write,read}_cached() version of the patch.
+
+But I can't remember the reason it was due to, either the evtchn_pending or the mask
+word -- which would make it not inject an upcall.
+
+	Joao
