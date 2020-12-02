@@ -2,87 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 811602CB190
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 01:32:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73FE62CB1A7
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 01:45:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726258AbgLBAcd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 19:32:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54890 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726011AbgLBAcc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Dec 2020 19:32:32 -0500
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78467C0613CF
-        for <kvm@vger.kernel.org>; Tue,  1 Dec 2020 16:31:52 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id t8so70819pfg.8
-        for <kvm@vger.kernel.org>; Tue, 01 Dec 2020 16:31:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JZt5jnSTjB4ge5bDxNaFAa4gUn7gdODLjRSqk/KQY+I=;
-        b=Bfdti1cbXaoax1dKDfEJM3Bf+IfOeC36PzzrsVWdJrVRYod3Cpa0RkgYNjEodwIuXW
-         uNqGv6vI9i2AqIEooCnFwwZTLujVHFlUXQmcLU5ASeHqTrkpYHQOxdHro77PXvy56ozU
-         zTx3zhVs/uK2zYDIzGJwHIJg6/8RNI2WtBJ9zhVPFq4md4kE2d2UYZAIw9zVTaR+8vhk
-         d8VLYQRw5bu27dtVM4E+/Zzeoxz/1z8N30iusQlL4FA3eTtFyKAW3coUyR58TjIrqxU8
-         /AO5mOaC+iLMGwWR309B/7vHKTWKQifz/F+JH8ozr1qGlu+lQeOS0oNLZmw43aavl/SN
-         nHhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JZt5jnSTjB4ge5bDxNaFAa4gUn7gdODLjRSqk/KQY+I=;
-        b=TxMYM/mowKbTorZawlFMaDK/JOpklKD0ZEFoPu3HD5LW4y8FmX2TLAkFFxS42Ufwxe
-         qtbJsvmI0muN3GD6/DYZDnhxPS+EsU2dF6gKAua9TyBucREoN94PwmRTW9kmRIkLyvef
-         jhDzkoEdUfVqZZCkrUBPxl74TdstjoRSxuJjxkTGMHdwFI0qBr/7kJkKIfk2pZw19APs
-         WGqqN+QepFoza4x2M5eJS5e8i/NnMCW5CgO6XJXHILqOg3+5gUYGcogvyvzw+3szE4gw
-         bMbfWg3AJ+HvV4hhNX2wMXvSIFlyCF7JDkiBWC7lyPhMBmLeOPXuEh0Y1QOR2603m/xx
-         I6Lw==
-X-Gm-Message-State: AOAM530nZ0XQVoKVxJYUnOUU4l0hdTt1HFt5Ov+F2/s46O+fuifXZsmH
-        DYKW7W4JgqliXnPB/EBnZvDIveru0301EA==
-X-Google-Smtp-Source: ABdhPJzllf3/JRjbn1DKnx/a4SMN5TvUVaSUGO/qE2lsEM2SQ6avnngq0Suu0MGRJQkcpfFvY1hQfQ==
-X-Received: by 2002:a62:e103:0:b029:198:4776:b6a3 with SMTP id q3-20020a62e1030000b02901984776b6a3mr4881072pfh.65.1606869111816;
-        Tue, 01 Dec 2020 16:31:51 -0800 (PST)
-Received: from google.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id n72sm72824pfd.202.2020.12.01.16.31.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Dec 2020 16:31:51 -0800 (PST)
-Date:   Wed, 2 Dec 2020 00:31:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zdenek Kaspar <zkaspar82@gmail.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: Bad performance since 5.9-rc1
-Message-ID: <X8bgc55WroUpG9R9@google.com>
-References: <20201119040526.5263f557.zkaspar82@gmail.com>
+        id S1727370AbgLBAna (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Dec 2020 19:43:30 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:41056 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726166AbgLBAna (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Dec 2020 19:43:30 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B20e0bj031883;
+        Wed, 2 Dec 2020 00:42:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=+QnGX543wIkXyLX+8yfaBqOqLwRBEAofgYjBOnar1Sw=;
+ b=RoxUDqoPGYBjQqoW73RstcFbtrD6mhwgA8QUKF+7kSIG+146ln7VyZE1I5Tj2weHzWOc
+ JRvnDpQDpsnAkItn5NBE1214FSE4FYNkvJkBmlRJxy6lhH4ecau0heGUGqhmIeYy135G
+ xqiLHWBOU0L2tFqrYyn3gAnRr6KCumOPmrKUSVzebH/8wbMiws0aOKmuPJ+vqdwh/iKz
+ M8tP5RglcBIEftfeL9FA7drsqtjuO24aI3Qau7Ouc4Wcv7S0GrTdpWqp2UL+e7HzMfx5
+ 7GuH4arrLMWZyBrMXU8oF1pBrgPviEzBE0/QOhv8P6/UENYFBJOYBRwvulGY/SXq3OfL gg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 353dyqnhyd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 02 Dec 2020 00:42:12 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B20adfw193756;
+        Wed, 2 Dec 2020 00:40:12 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 35404njyv3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 02 Dec 2020 00:40:11 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B20e9QE001999;
+        Wed, 2 Dec 2020 00:40:09 GMT
+Received: from [10.159.145.103] (/10.159.145.103)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 01 Dec 2020 16:40:09 -0800
+Subject: Re: [PATCH RFC 03/39] KVM: x86/xen: register shared_info page
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+ <20190220201609.28290-4-joao.m.martins@oracle.com>
+ <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+Date:   Tue, 1 Dec 2020 16:40:07 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201119040526.5263f557.zkaspar82@gmail.com>
+In-Reply-To: <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 bulkscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=999 phishscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020001
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ clxscore=1011 mlxscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020001
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 19, 2020, Zdenek Kaspar wrote:
-> Hi,
+On 2020-12-01 5:07 a.m., David Woodhouse wrote:
+> On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
+>> +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+>> +{
+>> +       struct shared_info *shared_info;
+>> +       struct page *page;
+>> +
+>> +       page = gfn_to_page(kvm, gfn);
+>> +       if (is_error_page(page))
+>> +               return -EINVAL;
+>> +
+>> +       kvm->arch.xen.shinfo_addr = gfn;
+>> +
+>> +       shared_info = page_to_virt(page);
+>> +       memset(shared_info, 0, sizeof(struct shared_info));
+>> +       kvm->arch.xen.shinfo = shared_info;
+>> +       return 0;
+>> +}
+>> +
 > 
-> in my initial report (https://marc.info/?l=kvm&m=160502183220080&w=2 -
-> now fixed by c887c9b9ca62c051d339b1c7b796edf2724029ed) I saw degraded
-> performance going back somewhere between v5.8 - v5.9-rc1.
+> Hm.
 > 
-> OpenBSD 6.8 (GENERIC.MP) guest performance (time ./test-build.sh)
-> good: 0m13.54s real     0m10.51s user     0m10.96s system
-> bad : 6m20.07s real    11m42.93s user     0m13.57s system
-> 
-> bisected to first bad commit: 6b82ef2c9cf18a48726e4bb359aa9014632f6466
+> How come we get to pin the page and directly dereference it every time,
+> while kvm_setup_pvclock_page() has to use kvm_write_guest_cached()
+> instead?
 
-This is working as intended, in the sense that it's expected that guest
-performance would go down the drain due to KVM being much more aggressive when
-reclaiming shadow pages.  Prior to commit 6b82ef2c9cf1 ("KVM: x86/mmu: Batch zap
-MMU pages when recycling oldest pages"), the zapping was completely anemic,
-e.g. a few shadow pages would get zapped each call, without even really making a
-dent in the memory consumed by KVM for shadow pages.
+So looking at my WIP trees from the time, this is something that
+we went back and forth on as well with using just a pinned page or a
+persistent kvm_vcpu_map().
 
-Any chance you can track down what is triggering KVM reclaim of shadow pages?
-E.g. is KVM hitting its limit on the number of MMU pages and reclaiming via
-make_mmu_pages_available()?  Or is the host under high memory pressure and
-reclaiming memory via mmu_shrink_scan()?
+I remember distinguishing shared_info/vcpu_info from kvm_setup_pvclock_page()
+as shared_info is created early and is not expected to change during the
+lifetime of the guest which didn't seem true for MSR_KVM_SYSTEM_TIME (or
+MSR_KVM_STEAL_TIME) so that would either need to do a kvm_vcpu_map()
+kvm_vcpu_unmap() dance or do some kind of synchronization.
+
+That said, I don't think this code explicitly disallows any updates
+to shared_info.
+
+> 
+> If that was allowed, wouldn't it have been a much simpler fix for
+> CVE-2019-3016? What am I missing?
+
+Agreed.
+
+Perhaps, Paolo can chime in with why KVM never uses pinned page
+and always prefers to do cached mappings instead?
+
+> 
+> Should I rework these to use kvm_write_guest_cached()?
+
+kvm_vcpu_map() would be better. The event channel logic does RMW operations
+on shared_info->vcpu_info.
+
+
+Ankur
+
+> 
+> 
