@@ -2,174 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26C572CC7D1
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 21:31:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 477032CC7DE
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 21:35:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727880AbgLBUa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 15:30:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55425 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727322AbgLBUa0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 15:30:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606940940;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fCxAKSCZe5m5KQLZ03JszdsFqurd7mJTU7sYz3VIef4=;
-        b=c79t2vmH9JxAmlyN+5P7DlhinPRm1tUIfHF9WyLUmvSJomKWwkZEWzM0TmZ/CAKyNRb2eg
-        EAm7C+eK62yzwXwo++d6DtkPSmrbrr5mY5TkjQasuXlMzIS0/qScHHU5DVF1vbh+UIhvFj
-        g3INUlWsFHNyIS3tW9hR8rC/DGEdGr0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-L_iiw6j8ObGjXtYHOHaNaQ-1; Wed, 02 Dec 2020 15:28:58 -0500
-X-MC-Unique: L_iiw6j8ObGjXtYHOHaNaQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18F54803F57;
-        Wed,  2 Dec 2020 20:28:39 +0000 (UTC)
-Received: from w520.home (ovpn-112-10.phx2.redhat.com [10.3.112.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93F8F60854;
-        Wed,  2 Dec 2020 20:28:38 +0000 (UTC)
-Date:   Wed, 2 Dec 2020 13:28:38 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] vfio-mdev: Wire in a request handler for mdev
- parent
-Message-ID: <20201202132838.6a872c17@w520.home>
-In-Reply-To: <20201120180740.87837-2-farman@linux.ibm.com>
-References: <20201120180740.87837-1-farman@linux.ibm.com>
-        <20201120180740.87837-2-farman@linux.ibm.com>
+        id S1728972AbgLBUdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 15:33:14 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:57786 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728781AbgLBUdM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 15:33:12 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2KTSdw165964;
+        Wed, 2 Dec 2020 20:32:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=4ZTHgzowENKV9HQmSlHClfuqrgbKyEkgKGQT/XWcDAo=;
+ b=etWZK15yLUu3zVLWcHgK7XfHWk1m1EXPAGyRtVYbLwmXjmRbR9u64h6BSNeKX7QK+GF+
+ 2HNZLb5KN5lm9/dugZXDRCTk06kSBXzPRtbOJkwuFIYTDeosa1VN7IffjnQfSTtjBOTv
+ 5jDJtCjNIpqlTWGJs70ngcqRYwf7xplX7fKPpqRzdfFpVX6XWrL++nYBRPeW9GhWIwcv
+ lXg7Q7dmOUMlZQQkqTOdtEgRxZYcLR8OdSEiWuxnRqrXT3/hA+oLnSoi188wGb9d+pcI
+ hYKYFd3rHAP063/LbFY9xY4WuBNk9VfaXM/mwKWS3PPiCYW3jeMn1LwWWakTaHOdQPbv 1Q== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 353dyqtm6h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 02 Dec 2020 20:32:17 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2KULKu125625;
+        Wed, 2 Dec 2020 20:32:17 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 3540auure8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 02 Dec 2020 20:32:16 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B2KWFLe014269;
+        Wed, 2 Dec 2020 20:32:15 GMT
+Received: from [10.159.240.123] (/10.159.240.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 02 Dec 2020 12:32:15 -0800
+Subject: Re: [PATCH RFC 03/39] KVM: x86/xen: register shared_info page
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Joao Martins <joao.m.martins@oracle.com>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+ <20190220201609.28290-4-joao.m.martins@oracle.com>
+ <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
+ <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+ <896dc984-fa71-8f2f-d12b-458294f5f706@oracle.com>
+ <58db65203b9464f6f225f4ef97c45af3c72cf068.camel@infradead.org>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <6ea92fe2-4067-d0e0-b716-16d39a7a6065@oracle.com>
+Date:   Wed, 2 Dec 2020 12:32:11 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <58db65203b9464f6f225f4ef97c45af3c72cf068.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9823 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0
+ phishscore=0 mlxscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020122
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9823 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ clxscore=1015 mlxscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Nov 2020 19:07:39 +0100
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> While performing some destructive tests with vfio-ccw, where the
-> paths to a device are forcible removed and thus the device itself
-> is unreachable, it is rather easy to end up in an endless loop in
-> vfio_del_group_dev() due to the lack of a request callback for the
-> associated device.
+
+On 2020-12-02 4:20 a.m., David Woodhouse wrote:
+> On Wed, 2020-12-02 at 10:44 +0000, Joao Martins wrote:
+>> [late response - was on holiday yesterday]
+>>
+>> On 12/2/20 12:40 AM, Ankur Arora wrote:
+>>> On 2020-12-01 5:07 a.m., David Woodhouse wrote:
+>>>> On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
+>>>>> +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+>>>>> +{
+>>>>> +       struct shared_info *shared_info;
+>>>>> +       struct page *page;
+>>>>> +
+>>>>> +       page = gfn_to_page(kvm, gfn);
+>>>>> +       if (is_error_page(page))
+>>>>> +               return -EINVAL;
+>>>>> +
+>>>>> +       kvm->arch.xen.shinfo_addr = gfn;
+>>>>> +
+>>>>> +       shared_info = page_to_virt(page);
+>>>>> +       memset(shared_info, 0, sizeof(struct shared_info));
+>>>>> +       kvm->arch.xen.shinfo = shared_info;
+>>>>> +       return 0;
+>>>>> +}
+>>>>> +
+>>>>
+>>>> Hm.
+>>>>
+>>>> How come we get to pin the page and directly dereference it every time,
+>>>> while kvm_setup_pvclock_page() has to use kvm_write_guest_cached()
+>>>> instead?
+>>>
+>>> So looking at my WIP trees from the time, this is something that
+>>> we went back and forth on as well with using just a pinned page or a
+>>> persistent kvm_vcpu_map().
+>>>
+>>> I remember distinguishing shared_info/vcpu_info from kvm_setup_pvclock_page()
+>>> as shared_info is created early and is not expected to change during the
+>>> lifetime of the guest which didn't seem true for MSR_KVM_SYSTEM_TIME (or
+>>> MSR_KVM_STEAL_TIME) so that would either need to do a kvm_vcpu_map()
+>>> kvm_vcpu_unmap() dance or do some kind of synchronization.
+>>>
+>>> That said, I don't think this code explicitly disallows any updates
+>>> to shared_info.
+>>>
+>>>>
+>>>> If that was allowed, wouldn't it have been a much simpler fix for
+>>>> CVE-2019-3016? What am I missing?
+>>>
+>>> Agreed.
+>>>
+>>> Perhaps, Paolo can chime in with why KVM never uses pinned page
+>>> and always prefers to do cached mappings instead?
+>>>
+>>
+>> Part of the CVE fix to not use cached versions.
+>>
+>> It's not a longterm pin of the page unlike we try to do here (partly due to the nature
+>> of the pages we are mapping) but we still we map the gpa, RMW the steal time struct, and
+>> then unmap the page.
+>>
+>> See record_steal_time() -- but more specifically commit b043138246 ("x86/KVM: Make sure
+>> KVM_VCPU_FLUSH_TLB flag is not missed").
+>>
+>> But I am not sure it's a good idea to follow the same as record_steal_time() given that
+>> this is a fairly sensitive code path for event channels.
 > 
-> In this example, one MDEV (77c) is used by a guest, while another
-> (77b) is not. The symptom is that the iommu is detached from the
-> mdev for 77b, but not 77c, until that guest is shutdown:
+> Right. We definitely need to use atomic RMW operations (like the CVE
+> fix did) so the page needs to be *mapped*.
 > 
->     [  238.794867] vfio_ccw 0.0.077b: MDEV: Unregistering
->     [  238.794996] vfio_mdev 11f2d2bc-4083-431d-a023-eff72715c4f0: Removing from iommu group 2
->     [  238.795001] vfio_mdev 11f2d2bc-4083-431d-a023-eff72715c4f0: MDEV: detaching iommu
->     [  238.795036] vfio_ccw 0.0.077c: MDEV: Unregistering
->     ...silence...
+> My question was about a permanent pinned mapping vs the map/unmap as we
+> need it that record_steal_time() does.
 > 
-> Let's wire in the request call back to the mdev device, so that a
-> device being physically removed from the host can be (gracefully?)
-> handled by the parent device at the time the device is removed.
+> On IRC, Paolo told me that permanent pinning causes problems for memory
+> hotplug, and pointed me at the trick we do with an MMU notifier and
+> kvm_vcpu_reload_apic_access_page().
+
+Okay that answers my question. Thanks for clearing that up.
+
+Not sure of a good place to document this but it would be good to
+have this written down somewhere. Maybe kvm_map_gfn()?
+
 > 
-> Add a message when registering the device if a driver doesn't
-> provide this callback, so a clue is given that this same loop
-> may be encountered in a similar situation.
+> I'm going to stick with the pinning we have for the moment, and just
+> fix up the fact that it leaks the pinned pages if the guest sets the
+> shared_info address more than once.
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->  drivers/vfio/mdev/mdev_core.c |  4 ++++
->  drivers/vfio/mdev/vfio_mdev.c | 10 ++++++++++
->  include/linux/mdev.h          |  4 ++++
->  3 files changed, 18 insertions(+)
+> At some point the apic page MMU notifier thing can be made generic, and
+> we can use that for this and for KVM steal time too.
 > 
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> index b558d4cfd082..6de97d25a3f8 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -154,6 +154,10 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
->  	if (!dev)
->  		return -EINVAL;
->  
-> +	/* Not mandatory, but its absence could be a problem */
-> +	if (!ops->request)
-> +		dev_info(dev, "Driver cannot be asked to release device\n");
-> +
->  	mutex_lock(&parent_list_lock);
->  
->  	/* Check for duplicate */
-> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
-> index 30964a4e0a28..06d8fc4a6d72 100644
-> --- a/drivers/vfio/mdev/vfio_mdev.c
-> +++ b/drivers/vfio/mdev/vfio_mdev.c
-> @@ -98,6 +98,15 @@ static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
->  	return parent->ops->mmap(mdev, vma);
->  }
->  
-> +static void vfio_mdev_request(void *device_data, unsigned int count)
-> +{
-> +	struct mdev_device *mdev = device_data;
-> +	struct mdev_parent *parent = mdev->parent;
-> +
-> +	if (parent->ops->request)
-> +		parent->ops->request(mdev, count);
 
-What do you think about duplicating the count==0 notice in the else
-case here?  ie.
+Yeah, that's something that'll definitely be good to have.
 
-	else if (count == 0)
-		dev_notice(mdev_dev(mdev), "No mdev vendor driver	request callback support, blocked until released by user\n");
-
-This at least puts something in the log a bit closer to the timeframe
-of a possible issue versus the registration nag.  vfio-core could do
-this too, but vfio-mdev registers a request callback on behalf of all
-mdev devices, so vfio-core would no longer have visibility for this
-case.
-
-Otherwise this series looks fine to me and I can take it through the
-vfio tree.  Thanks,
-
-Alex
-
-> +}
-> +
->  static const struct vfio_device_ops vfio_mdev_dev_ops = {
->  	.name		= "vfio-mdev",
->  	.open		= vfio_mdev_open,
-> @@ -106,6 +115,7 @@ static const struct vfio_device_ops vfio_mdev_dev_ops = {
->  	.read		= vfio_mdev_read,
->  	.write		= vfio_mdev_write,
->  	.mmap		= vfio_mdev_mmap,
-> +	.request	= vfio_mdev_request,
->  };
->  
->  static int vfio_mdev_probe(struct device *dev)
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index 0ce30ca78db0..9004375c462e 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -72,6 +72,9 @@ struct device *mdev_get_iommu_device(struct device *dev);
->   * @mmap:		mmap callback
->   *			@mdev: mediated device structure
->   *			@vma: vma structure
-> + * @request:		request callback to release device
-> + *			@mdev: mediated device structure
-> + *			@count: request sequence number
->   * Parent device that support mediated device should be registered with mdev
->   * module with mdev_parent_ops structure.
->   **/
-> @@ -92,6 +95,7 @@ struct mdev_parent_ops {
->  	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
->  			 unsigned long arg);
->  	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
-> +	void	(*request)(struct mdev_device *mdev, unsigned int count);
->  };
->  
->  /* interface for exporting mdev supported type attributes */
-
+Ankur
