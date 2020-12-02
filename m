@@ -2,240 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFC772CC2B3
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 17:49:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B4C02CC2D1
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 17:58:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730613AbgLBQsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 11:48:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728654AbgLBQsB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Dec 2020 11:48:01 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F44C0613CF;
-        Wed,  2 Dec 2020 08:47:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=K8O1LT7aEdvP8ZF4rdGLyQoWXKiQHxVK9Mp0Dmd3oZc=; b=sOp+rvpCb48IB3smxK0BNaIVaW
-        9JYopgCKnyzgvzZ9VZX6YAaaH3GDTmb73lN0nIW8N2yTPIfOlfPMl4EPSDHRccloT4cQQ+xRCx9gA
-        xRf7jxACEAsqc5889PbAzVe2lLeBwA8Oz8GMZJtK49shAZaZa4k8GMghti0sWkp+mOY6nqY2c8nWw
-        yOTCQbG7GZCcP3AXJtBBkBcanMqUMVOLCQ8XtrSAOCbTTiDhtTB6N0yYgOkQT4zxDJ3AQphnj8Z5p
-        FB78EVmc4t+QWG7a9F5PfmNIth6VFWtBWFUFVLYC99MnI90DQ/8vBpvXkLZMzYt1bGyCMPhklT9Vs
-        4dmit+Uw==;
-Received: from 54-240-197-235.amazon.com ([54.240.197.235] helo=u3832b3a9db3152.ant.amazon.com)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kkVHT-0006Pj-FH; Wed, 02 Dec 2020 16:47:03 +0000
-Message-ID: <4ad0d157c5c7317a660cd8d65b535d3232f9249d.camel@infradead.org>
-Subject: Re: [PATCH RFC 10/39] KVM: x86/xen: support upcall vector
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 02 Dec 2020 16:47:00 +0000
-In-Reply-To: <53baeaa7-0fed-d22c-7767-09ae885d13a0@oracle.com>
-References: <20190220201609.28290-1-joao.m.martins@oracle.com>
-         <20190220201609.28290-11-joao.m.martins@oracle.com>
-         <71753a370cd6f9dd147427634284073b78679fa6.camel@infradead.org>
-         <53baeaa7-0fed-d22c-7767-09ae885d13a0@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-MynpSOGfQk2K65aZ7T/y"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        id S1728586AbgLBQ4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 11:56:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38622 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727826AbgLBQ4o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 11:56:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606928116;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7d+ODyxw2BpfIDkA7n8FBbX/gBxpW+0DWJBwsQ2CH/0=;
+        b=JBflWaO3oiTiZFEVK9BaPJuSFnFnk33jNTdBuj6WHedLZ8nm+hd6lwog60tcBoVRzKhHVR
+        SDJlRppN5qy+5aERDGN5pM3QVEt5QHZ8CyYz9NKwNfc9HxBZ5fv79/woKtv7SUNDKBPdfX
+        GPlpI5JGtNoIdNQCpINcMBrMx8dRq10=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-EBsUfN_SN2G-6-XWAMdKJw-1; Wed, 02 Dec 2020 11:55:12 -0500
+X-MC-Unique: EBsUfN_SN2G-6-XWAMdKJw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 225D3814413;
+        Wed,  2 Dec 2020 16:54:27 +0000 (UTC)
+Received: from work-vm (unknown [10.33.36.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E2D060BFA;
+        Wed,  2 Dec 2020 16:54:23 +0000 (UTC)
+Date:   Wed, 2 Dec 2020 16:54:20 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        brijesh.singh@amd.com, dovmurik@linux.vnet.ibm.com, tobin@ibm.com,
+        jejb@linux.ibm.com, frankeh@us.ibm.com
+Subject: Re: [PATCH v2 2/9] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
+ hypercall
+Message-ID: <20201202165420.GI3226@work-vm>
+References: <cover.1606782580.git.ashish.kalra@amd.com>
+ <40acca4b49cd904ea73038309908151508fb555c.1606782580.git.ashish.kalra@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <40acca4b49cd904ea73038309908151508fb555c.1606782580.git.ashish.kalra@amd.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+* Ashish Kalra (Ashish.Kalra@amd.com) wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> This hypercall is used by the SEV guest to notify a change in the page
+> encryption status to the hypervisor. The hypercall should be invoked
+> only when the encryption attribute is changed from encrypted -> decrypted
+> and vice versa. By default all guest pages are considered encrypted.
 
---=-MynpSOGfQk2K65aZ7T/y
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Is it defined whether these are supposed to be called before or after
+the the page type has been changed; is it change the type and then
+notify or the other way around?
 
-On Wed, 2020-12-02 at 13:12 +0000, Joao Martins wrote:
-> On 12/2/20 11:17 AM, David Woodhouse wrote:
-> > I might be more inclined to go for a model where the kernel handles the
-> > evtchn_pending/evtchn_mask for us. What would go into the irq routing
-> > table is { vcpu, port# } which get passed to kvm_xen_evtchn_send().
-> >=20
->=20
-> But passing port to the routing and handling the sending of events wouldn=
-'t it lead to
-> unnecessary handling of event channels which aren't handled by the kernel=
-, compared to
-> just injecting caring about the upcall?
+Dave
 
-Well, I'm generally in favour of *not* doing things in the kernel that
-don't need to be there.
-
-But if the kernel is going to short-circuit the IPIs and VIRQs, then
-it's already going to have to handle the evtchn_pending/evtchn_mask
-bitmaps, and actually injecting interrupts.
-
-Given that it has to have that functionality anyway, it seems saner to
-let the kernel have full control over it and to just expose
-'evtchn_send' to userspace.
-
-The alternative is to have userspace trying to play along with the
-atomic handling of those bitmasks too, and injecting events through
-KVM_INTERRUPT/KVM_SIGNAL_MSI in parallel to the kernel doing so. That
-seems like *more* complexity, not less.
-
-> I wanted to mention the GSI callback method too, but wasn't enterily sure=
- if eventfd was
-> enough.
-
-That actually works quite nicely even for userspace irqchip.
-
-Forgetting Xen for the moment... my model for userspace I/OAPIC with
-interrupt remapping is that during normal runtime, the irqfd is
-assigned and things all work and we can even have IRQ posting for
-eventfds which came from VFIO.=20
-
-When the IOMMU invalidates an IRQ translation, all it does is
-*deassign* the irqfd from the KVM IRQ. So the next time that eventfd
-fires, it's caught in the userspace event loop instead. Userspace can
-then retranslate through the IOMMU and reassign the irqfd for next
-time.
-
-So, back to Xen. As things stand with just the hypercall+shinfo patches
-I've already rebased, we have enough to do fully functional Xen
-hosting. The event channels are slow but it *can* be done entirely in
-userspace =E2=80=94 handling *all* the hypercalls, and delivering interrupt=
-s to
-the guest in whatever mode is required.
-
-Event channels are a very important optimisation though. For the VMM
-API I think we should follow the Xen model, mixing the domain-wide and
-per-vCPU configuration. It's the best way to faithfully model the
-behaviour a true Xen guest would experience.
-
-So KVM_XEN_ATTR_TYPE_CALLBACK_VIA can be used to set one of
- =E2=80=A2 HVMIRQ_callback_vector, taking a vector#
- =E2=80=A2 HVMIRQ_callback_gsi for the in-kernel irqchip, taking a GSI#
-
-And *maybe* in a later patch it could also handle
- =E2=80=A2 HVMIRQ_callback_gsi for split-irqchip, taking an eventfd
- =E2=80=A2 HVMIRQ_callback_pci_intx, taking an eventfd (or a pair, for EOI?=
-)
-
-I don't know if the latter two really make sense. After all the
-argument for handling IPI/VIRQ in kernel kind of falls over if we have
-to bounce out to userspace anyway. So it *only* makes sense if those
-eventfds actually end up wired *through* userspace to a KVM IRQFD as I
-described for the IOMMU stuff.
-
-
-In addition to that per-domain setup, we'd also have a per-vCPU
-KVM_XEN_ATTR_TYPE_VCPU_CALLBACK_VECTOR which takes {vCPU, vector}.
-
-
-
---=-MynpSOGfQk2K65aZ7T/y
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MjAyMTY0NzAwWjAvBgkqhkiG9w0BCQQxIgQgC5wS3Oizt6UsdxQXFA7XG8mkgPIEOgVatVjnjVtP
-OT4wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAI2pzbIS1CUN30zl7OtHhCIq27qqv78g3GbEAl2L2nE7pljIDtBV0gevvzOFwdY+
-8JHVYbyg9YC8OBJVGYOkVxLoivzqFxLBzhTpoHYe2hvcCBCrno+pe0Qr1p8vAOSOPdUZTnauagaQ
-qjKHexsdt4UTvwELzKImT1ZzHIL9en2tne86gmd87YYe9M3jXxsEaRx6XRV4WpTNZB0FxcBEm+Uj
-mn7RoMmzAnEnmmzoy8deWoeQLzKEKFcoM5k6ws9lRZyQT1aVC2iGgbLNGRbDNPChBqifYTgExcWg
-dQEdHQyS+ruSBMYpSyAVur4yIuAj/83pcFvizzIzoB2xWcgjHF8AAAAAAAA=
-
-
---=-MynpSOGfQk2K65aZ7T/y--
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  Documentation/virt/kvm/hypercalls.rst | 15 +++++
+>  arch/x86/include/asm/kvm_host.h       |  2 +
+>  arch/x86/kvm/svm/sev.c                | 90 +++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c                |  2 +
+>  arch/x86/kvm/svm/svm.h                |  4 ++
+>  arch/x86/kvm/vmx/vmx.c                |  1 +
+>  arch/x86/kvm/x86.c                    |  6 ++
+>  include/uapi/linux/kvm_para.h         |  1 +
+>  8 files changed, 121 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/hypercalls.rst b/Documentation/virt/kvm/hypercalls.rst
+> index ed4fddd364ea..7aff0cebab7c 100644
+> --- a/Documentation/virt/kvm/hypercalls.rst
+> +++ b/Documentation/virt/kvm/hypercalls.rst
+> @@ -169,3 +169,18 @@ a0: destination APIC ID
+>  
+>  :Usage example: When sending a call-function IPI-many to vCPUs, yield if
+>  	        any of the IPI target vCPUs was preempted.
+> +
+> +
+> +8. KVM_HC_PAGE_ENC_STATUS
+> +-------------------------
+> +:Architecture: x86
+> +:Status: active
+> +:Purpose: Notify the encryption status changes in guest page table (SEV guest)
+> +
+> +a0: the guest physical address of the start page
+> +a1: the number of pages
+> +a2: encryption attribute
+> +
+> +   Where:
+> +	* 1: Encryption attribute is set
+> +	* 0: Encryption attribute is cleared
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index f002cdb13a0b..d035dc983a7a 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1282,6 +1282,8 @@ struct kvm_x86_ops {
+>  
+>  	void (*migrate_timers)(struct kvm_vcpu *vcpu);
+>  	void (*msr_filter_changed)(struct kvm_vcpu *vcpu);
+> +	int (*page_enc_status_hc)(struct kvm *kvm, unsigned long gpa,
+> +				  unsigned long sz, unsigned long mode);
+>  };
+>  
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index c0b14106258a..6b8bc1297f9c 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -927,6 +927,93 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return ret;
+>  }
+>  
+> +static int sev_resize_page_enc_bitmap(struct kvm *kvm, unsigned long new_size)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	unsigned long *map;
+> +	unsigned long sz;
+> +
+> +	if (sev->page_enc_bmap_size >= new_size)
+> +		return 0;
+> +
+> +	sz = ALIGN(new_size, BITS_PER_LONG) / 8;
+> +
+> +	map = vmalloc(sz);
+> +	if (!map) {
+> +		pr_err_once("Failed to allocate encrypted bitmap size %lx\n",
+> +				sz);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/* mark the page encrypted (by default) */
+> +	memset(map, 0xff, sz);
+> +
+> +	bitmap_copy(map, sev->page_enc_bmap, sev->page_enc_bmap_size);
+> +	kvfree(sev->page_enc_bmap);
+> +
+> +	sev->page_enc_bmap = map;
+> +	sev->page_enc_bmap_size = new_size;
+> +
+> +	return 0;
+> +}
+> +
+> +int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
+> +				  unsigned long npages, unsigned long enc)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	kvm_pfn_t pfn_start, pfn_end;
+> +	gfn_t gfn_start, gfn_end;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -EINVAL;
+> +
+> +	if (!npages)
+> +		return 0;
+> +
+> +	gfn_start = gpa_to_gfn(gpa);
+> +	gfn_end = gfn_start + npages;
+> +
+> +	/* out of bound access error check */
+> +	if (gfn_end <= gfn_start)
+> +		return -EINVAL;
+> +
+> +	/* lets make sure that gpa exist in our memslot */
+> +	pfn_start = gfn_to_pfn(kvm, gfn_start);
+> +	pfn_end = gfn_to_pfn(kvm, gfn_end);
+> +
+> +	if (is_error_noslot_pfn(pfn_start) && !is_noslot_pfn(pfn_start)) {
+> +		/*
+> +		 * Allow guest MMIO range(s) to be added
+> +		 * to the page encryption bitmap.
+> +		 */
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (is_error_noslot_pfn(pfn_end) && !is_noslot_pfn(pfn_end)) {
+> +		/*
+> +		 * Allow guest MMIO range(s) to be added
+> +		 * to the page encryption bitmap.
+> +		 */
+> +		return -EINVAL;
+> +	}
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	if (sev->page_enc_bmap_size < gfn_end)
+> +		goto unlock;
+> +
+> +	if (enc)
+> +		__bitmap_set(sev->page_enc_bmap, gfn_start,
+> +				gfn_end - gfn_start);
+> +	else
+> +		__bitmap_clear(sev->page_enc_bmap, gfn_start,
+> +				gfn_end - gfn_start);
+> +
+> +unlock:
+> +	mutex_unlock(&kvm->lock);
+> +	return 0;
+> +}
+> +
+>  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -1123,6 +1210,9 @@ void sev_vm_destroy(struct kvm *kvm)
+>  
+>  	sev_unbind_asid(kvm, sev->handle);
+>  	sev_asid_free(sev->asid);
+> +
+> +	kvfree(sev->page_enc_bmap);
+> +	sev->page_enc_bmap = NULL;
+>  }
+>  
+>  int __init sev_hardware_setup(void)
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 6dc337b9c231..7122ea5f7c47 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4312,6 +4312,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
+>  
+>  	.msr_filter_changed = svm_msr_filter_changed,
+> +
+> +	.page_enc_status_hc = svm_page_enc_status_hc,
+>  };
+>  
+>  static struct kvm_x86_init_ops svm_init_ops __initdata = {
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index fdff76eb6ceb..0103a23ca174 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -66,6 +66,8 @@ struct kvm_sev_info {
+>  	int fd;			/* SEV device fd */
+>  	unsigned long pages_locked; /* Number of pages locked */
+>  	struct list_head regions_list;  /* List of registered regions */
+> +	unsigned long *page_enc_bmap;
+> +	unsigned long page_enc_bmap_size;
+>  };
+>  
+>  struct kvm_svm {
+> @@ -409,6 +411,8 @@ int nested_svm_check_exception(struct vcpu_svm *svm, unsigned nr,
+>  			       bool has_error_code, u32 error_code);
+>  int nested_svm_exit_special(struct vcpu_svm *svm);
+>  void sync_nested_vmcb_control(struct vcpu_svm *svm);
+> +int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
+> +                           unsigned long npages, unsigned long enc);
+>  
+>  extern struct kvm_x86_nested_ops svm_nested_ops;
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c3441e7e5a87..5bc37a38e6be 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7722,6 +7722,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  
+>  	.msr_filter_changed = vmx_msr_filter_changed,
+>  	.cpu_dirty_log_size = vmx_cpu_dirty_log_size,
+> +	.page_enc_status_hc = NULL,
+>  };
+>  
+>  static __init int hardware_setup(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a3fdc16cfd6f..3afc78f18f69 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8125,6 +8125,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  		kvm_sched_yield(vcpu->kvm, a0);
+>  		ret = 0;
+>  		break;
+> +	case KVM_HC_PAGE_ENC_STATUS:
+> +		ret = -KVM_ENOSYS;
+> +		if (kvm_x86_ops.page_enc_status_hc)
+> +			ret = kvm_x86_ops.page_enc_status_hc(vcpu->kvm,
+> +					a0, a1, a2);
+> +		break;
+>  	default:
+>  		ret = -KVM_ENOSYS;
+>  		break;
+> diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+> index 8b86609849b9..847b83b75dc8 100644
+> --- a/include/uapi/linux/kvm_para.h
+> +++ b/include/uapi/linux/kvm_para.h
+> @@ -29,6 +29,7 @@
+>  #define KVM_HC_CLOCK_PAIRING		9
+>  #define KVM_HC_SEND_IPI		10
+>  #define KVM_HC_SCHED_YIELD		11
+> +#define KVM_HC_PAGE_ENC_STATUS		12
+>  
+>  /*
+>   * hypercalls use architecture specific
+> -- 
+> 2.17.1
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
