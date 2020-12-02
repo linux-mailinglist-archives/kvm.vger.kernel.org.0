@@ -2,97 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31B5C2CB8A4
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 10:25:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F0672CB87E
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 10:18:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729072AbgLBJVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 04:21:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42141 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725933AbgLBJVo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 04:21:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606900818;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gB2nKuaq2TSTSf4FOqLPJgDC/FIIcQPOncac30ZtyEw=;
-        b=it6uMJwnUzSM3b+ZWy3/cx3AOL9G0rtV5m2uNo+BRTznCMsZ9xcJVqeuLgT9+w6RnbYrHZ
-        lAC55OOsEfVCVAVUgJfQ60qidamjEHTV42TAB+ERr5N7KG0LzXywFNaKcauHWJEAZ3I0x0
-        VLBi2855t3cH3L4mSS5lp/hakUXJKTQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-545-HNYvCPoyO7itf5FAlhTOIA-1; Wed, 02 Dec 2020 04:20:16 -0500
-X-MC-Unique: HNYvCPoyO7itf5FAlhTOIA-1
-Received: by mail-ej1-f72.google.com with SMTP id 2so2185509ejv.4
-        for <kvm@vger.kernel.org>; Wed, 02 Dec 2020 01:20:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gB2nKuaq2TSTSf4FOqLPJgDC/FIIcQPOncac30ZtyEw=;
-        b=r3vb8YnNVx/DUM6B3qfyOVHb+uaRGnfOVJVrSpWOGFC1nT+IjFE2SIIZflKx+31OQ8
-         t/TkVg8s3Wc6kDAS4+MudIWEUl8Zg8XkoHmM51zp8Yd/Y60/oDCzgHHAJddP3iq08M4Q
-         bh7TNYokBNl2WlD5+Mff1486SOcQRX52WaaXo3tm4btHFiC7Wl9bfaV0qiOV/Q4ZzCJx
-         JxonSHO0qDi3aFjYiS5qEi/BXelZEYoEfhSFI7XlD02m80N5fEOgGY067CPwCRBfneym
-         HVZldhlp81WixL/9aZjCsqd61ePXLTnk/IMojqJilklamG4Rmbeh1FRtv25IpG91dun9
-         Zvpg==
-X-Gm-Message-State: AOAM533RhtWN4rp+D8b1sFQZX9Rj7b1E1rg6GrzjnZO56NKxUU6ZqfJz
-        s1eUApyL5agjlM5rhRzl11Hm7uZ08kVa4fshbTjcHqKsspxpZ0GNH5Jyg6KuHkiLEYk7msNibEB
-        5UbXs887C2aiP
-X-Received: by 2002:a17:906:660b:: with SMTP id b11mr1459085ejp.190.1606900814955;
-        Wed, 02 Dec 2020 01:20:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwx3E0owqMs8Bt+7CLCVhnMmFoJVXu0IOpTL/Dtr5g/rsB+KPror3+OWlUuBNVRF2Er6DdzlQ==
-X-Received: by 2002:a17:906:660b:: with SMTP id b11mr1459073ejp.190.1606900814717;
-        Wed, 02 Dec 2020 01:20:14 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d9sm754265edk.86.2020.12.02.01.20.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Dec 2020 01:20:13 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: Reinstate userspace hypercall support
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Joao Martins <joao.m.martins@oracle.com>
-References: <1bde4a992be29581e559f7a57818e206e11f84f5.camel@infradead.org>
- <X8VaO9DxaaKP7PFl@google.com>
- <64d5fc26a0b5ccb7592f924aa61068e6ee55955f.camel@infradead.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <56ef38fe-e976-229c-9215-8ddce8d5f9e1@redhat.com>
-Date:   Wed, 2 Dec 2020 10:20:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S2387972AbgLBJSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 04:18:05 -0500
+Received: from mga03.intel.com ([134.134.136.65]:4848 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387658AbgLBJSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 04:18:05 -0500
+IronPort-SDR: ClIbe/tXNcNINUlmnbTYoDSQDyqFewgGXtjJYgvhc8L2uYlf77ojbb5l23hFJDJbxREqeiUqB/
+ BFvEfZZTmD7A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9822"; a="173082426"
+X-IronPort-AV: E=Sophos;i="5.78,386,1599548400"; 
+   d="scan'208";a="173082426"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2020 01:17:22 -0800
+IronPort-SDR: 1PkSdBBPN4QhBoDrBUwcsM0XvfJYNIjRheEQurMBt/wBCoP0zIuEj19MI391l2UOXk24ITR4pA
+ 6Iu0R19cvrJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,386,1599548400"; 
+   d="scan'208";a="365205218"
+Received: from cfl-host.sh.intel.com ([10.239.158.59])
+  by fmsmga004.fm.intel.com with ESMTP; 02 Dec 2020 01:17:20 -0800
+From:   Fred Gao <fred.gao@intel.com>
+To:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org
+Cc:     Fred Gao <fred.gao@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Swee Yee Fonn <swee.yee.fonn@intel.com>
+Subject: [PATCH v1] vfio/pci: Add support for opregion v2.0+
+Date:   Thu,  3 Dec 2020 01:12:49 +0800
+Message-Id: <20201202171249.17083-1-fred.gao@intel.com>
+X-Mailer: git-send-email 2.24.1.1.gb6d4d82bd5
 MIME-Version: 1.0
-In-Reply-To: <64d5fc26a0b5ccb7592f924aa61068e6ee55955f.camel@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/11/20 23:42, David Woodhouse wrote:
-> Yes, good point.
-> 
-> Xen*does*  allow one hypercall (HVMOP_guest_request_vm_event) from
-> !CPL0 so I don't think I can get away with allowing only CPL0 like
-> kvm_hv_hypercall() does.
-> 
-> So unless I'm going to do that filtering in kernel (ick) I think we do
-> need to capture and pass up the CPL, as you say. Which means it doesn't
-> fit in the existing kvm_run->hypercall structure unless I'm prepared to
-> rename/abuse the ->hypercall.pad for it.
-> 
-> I'll just use Joao's version of the hypercall support, and add cpl to
-> struct kvm_xen_exit.hcall. Userspace can inject the UD# where
-> appropriate.
+When VBT data exceeds 6KB size and cannot be within mailbox #4 starting
+from opregion v2.0+, Extended VBT region, next to opregion, is used to
+hold the VBT data, so the total size will be opregion size plus
+extended VBT region size.
 
-Or you can use sync regs perhaps.  For your specific use I don't expect 
-many exits to userspace other than Xen hypercalls, so it should be okay 
-to always run with KVM_SYNC_X86_REGS|KVM_SYNC_X86_SREGS in 
-kvm_run->kvm_valid_regs.
+For opregion 2.1+: since rvda is relative offset from opregion base,
+rvda as extended VBT start offset should be same as opregion size.
 
-Paolo
+For opregion 2.0: the only difference between opregion 2.0 and 2.1 is
+rvda addressing mode besides the version. since rvda is physical host
+VBT address and cannot be directly used in guest, it is faked into
+opregion 2.1's relative offset.
+
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+Signed-off-by: Swee Yee Fonn <swee.yee.fonn@intel.com>
+Signed-off-by: Fred Gao <fred.gao@intel.com>
+---
+ drivers/vfio/pci/vfio_pci_igd.c | 44 +++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+
+diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+index 53d97f459252..78919a289914 100644
+--- a/drivers/vfio/pci/vfio_pci_igd.c
++++ b/drivers/vfio/pci/vfio_pci_igd.c
+@@ -21,6 +21,17 @@
+ #define OPREGION_SIZE		(8 * 1024)
+ #define OPREGION_PCI_ADDR	0xfc
+ 
++/*
++ * opregion 2.0: rvda is the physical VBT address.
++ *
++ * opregion 2.1+: rvda is unsigned, relative offset from
++ * opregion base, and should never point within opregion.
++ */
++#define OPREGION_RDVA		0x3ba
++#define OPREGION_RDVS		0x3c2
++#define OPREGION_VERSION	22
++
++
+ static size_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
+ 			      size_t count, loff_t *ppos, bool iswrite)
+ {
+@@ -58,6 +69,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
+ 	u32 addr, size;
+ 	void *base;
+ 	int ret;
++	u16 version;
+ 
+ 	ret = pci_read_config_dword(vdev->pdev, OPREGION_PCI_ADDR, &addr);
+ 	if (ret)
+@@ -83,6 +95,38 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
+ 
+ 	size *= 1024; /* In KB */
+ 
++	/* Support opregion v2.0+ */
++	version = le16_to_cpu(*(__le16 *)(base + OPREGION_VERSION));
++	if (version >= 0x0200) {
++		u64 rvda;
++		u32 rvds;
++
++		rvda = le64_to_cpu(*(__le64 *)(base + OPREGION_RDVA));
++		rvds = le32_to_cpu(*(__le32 *)(base + OPREGION_RDVS));
++		if (rvda && rvds) {
++			u32 offset;
++
++			if (version == 0x0200)
++				offset = (rvda - (u64)addr);
++			else
++				offset = rvda;
++
++			pci_WARN(vdev->pdev, offset != size,
++				"Extended VBT does not follow opregion !\n"
++				"opregion version 0x%x:offset 0x%x\n", version, offset);
++
++			if (version == 0x0200) {
++				/* opregion version v2.0 faked to v2.1 */
++				*(__le16 *)(base + OPREGION_VERSION) =
++					cpu_to_le16(0x0201);
++				/* rvda faked to relative offset */
++				(*(__le64 *)(base + OPREGION_RDVA)) =
++					cpu_to_le64((rvda - (u64)addr));
++			}
++			size = offset + rvds;
++		}
++	}
++
+ 	if (size != OPREGION_SIZE) {
+ 		memunmap(base);
+ 		base = memremap(addr, size, MEMREMAP_WB);
+-- 
+2.24.1.1.gb6d4d82bd5
 
