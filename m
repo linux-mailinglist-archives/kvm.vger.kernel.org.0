@@ -2,156 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E83D2CBAEA
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 11:50:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21E9D2CBB0C
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 11:53:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729520AbgLBKrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 05:47:14 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:47074 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729514AbgLBKrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Dec 2020 05:47:13 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2AixNW072970;
-        Wed, 2 Dec 2020 10:46:13 GMT
+        id S1727915AbgLBKvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 05:51:35 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:58082 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726651AbgLBKvf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 05:51:35 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2AnlPV143571;
+        Wed, 2 Dec 2020 10:50:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=wwhr47586+/6Fpo43Hc7ftI6vWuRmnMUsfbm3tDnCB4=;
- b=oFxRdXh4Zvbgyzs83YZP1YFbXgu/SHQNxfa1KhL6Kmk+m+hOpCEn4J/DwTkUAw4iHUQK
- fC7Xln2u+2ylqsaPPG4jSOjgwrm3lvuFvG0wiekSHCFwM3EXCmBjMY+lYX6x6SVkgVtD
- xHQ9WBju9CO63NBMum9NuN8XvLDSLrdT/Cf1U1v8dGEyrC4jl/ZP7njMGA7Hq2px5iSA
- h9TYLZkXyAvYU+JLMw0UUdW4oxdUnWBH+1szuiBeaMBj2qSNl6FLzWIyO61pRPdidQy7
- n9ZHsh5Hrq/gmkmzZZmX1NnRFdS0dCJbNe2y4Vhg5ihkO5fbaoicj1dvESjrq7pgQLBx /w== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 353c2aypeg-1
+ bh=LBy33kEE4ZuMQSVUj6AUv7nj24FXkABu94+C69N2jaI=;
+ b=kzw6m3hAI73rfrheil0tHYx3sFso7rgbnp6mnSaJbLhUFUiDd/fvEQ3h+oiLQVSExBQH
+ sDSHN/zOGb4PRs3JH48Mpla0v6f7saJZwKwogN6OAvtdNClOXA8K7EGIkz6GTSCMImHw
+ nW3YXqbMP/zFEaxW5aObpmDt3a4Vyx/QIy0kpz5wjI+ex+pe7H1DIOOCgrAlw38Gkd+U
+ WqCh7or4kEpQogBARIkwaDjPG1QPC91EjKwLuTgzwZUNECzTT4o2G/Ds1H3voohEnW3d
+ MXNstftL/D/i/z28NkXeVvQQpQpdXBeOvWTy1OayV9pbfJ1JYagJmnBMfJ9jaV2f2RFN qQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 353dyqqk0w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 02 Dec 2020 10:46:12 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2AaXOY130396;
-        Wed, 2 Dec 2020 10:44:12 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 35404p4qj9-1
+        Wed, 02 Dec 2020 10:50:38 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B2AjNWT041209;
+        Wed, 2 Dec 2020 10:50:37 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 3540fyg1bk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 02 Dec 2020 10:44:12 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B2Ai7ko032261;
-        Wed, 2 Dec 2020 10:44:08 GMT
+        Wed, 02 Dec 2020 10:50:37 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B2AoZpk000516;
+        Wed, 2 Dec 2020 10:50:36 GMT
 Received: from [10.175.181.158] (/10.175.181.158)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 02 Dec 2020 02:44:07 -0800
+        with ESMTP ; Wed, 02 Dec 2020 02:50:35 -0800
 Subject: Re: [PATCH RFC 03/39] KVM: x86/xen: register shared_info page
-To:     Ankur Arora <ankur.a.arora@oracle.com>,
-        David Woodhouse <dwmw2@infradead.org>
+To:     Ankur Arora <ankur.a.arora@oracle.com>
 Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>
 References: <20190220201609.28290-1-joao.m.martins@oracle.com>
  <20190220201609.28290-4-joao.m.martins@oracle.com>
  <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
  <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+ <3ac692ed7dd77aa2ed23646bb1741a7b40bddcff.camel@infradead.org>
+ <a6102420-cbda-700a-b049-31db96d357b1@oracle.com>
 From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <896dc984-fa71-8f2f-d12b-458294f5f706@oracle.com>
-Date:   Wed, 2 Dec 2020 10:44:03 +0000
+Message-ID: <474f59b0-184d-12a1-4172-c65d8970810e@oracle.com>
+Date:   Wed, 2 Dec 2020 10:50:31 +0000
 MIME-Version: 1.0
-In-Reply-To: <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+In-Reply-To: <a6102420-cbda-700a-b049-31db96d357b1@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 bulkscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 phishscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012020062
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=1
+ phishscore=0 mlxlogscore=999 adultscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020063
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 lowpriorityscore=0
- clxscore=1015 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
- spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012020063
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ clxscore=1015 mlxscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=1 lowpriorityscore=0 phishscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[late response - was on holiday yesterday]
+On 12/2/20 5:17 AM, Ankur Arora wrote:
+> On 2020-12-01 5:26 p.m., David Woodhouse wrote
+>> On Tue, 2020-12-01 at 16:40 -0800, Ankur Arora wrote:
+>>> On 2020-12-01 5:07 a.m., David Woodhouse wrote:
 
-On 12/2/20 12:40 AM, Ankur Arora wrote:
-> On 2020-12-01 5:07 a.m., David Woodhouse wrote:
->> On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
->>> +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
->>> +{
->>> +       struct shared_info *shared_info;
->>> +       struct page *page;
->>> +
->>> +       page = gfn_to_page(kvm, gfn);
->>> +       if (is_error_page(page))
->>> +               return -EINVAL;
->>> +
->>> +       kvm->arch.xen.shinfo_addr = gfn;
->>> +
->>> +       shared_info = page_to_virt(page);
->>> +       memset(shared_info, 0, sizeof(struct shared_info));
->>> +       kvm->arch.xen.shinfo = shared_info;
->>> +       return 0;
->>> +}
->>> +
+[...]
+
+>>>> If that was allowed, wouldn't it have been a much simpler fix for
+>>>> CVE-2019-3016? What am I missing?
+>>>
+>>> Agreed.
+>>>
+>>> Perhaps, Paolo can chime in with why KVM never uses pinned page
+>>> and always prefers to do cached mappings instead?
+>>>
+>>>>
+>>>> Should I rework these to use kvm_write_guest_cached()?
+>>>
+>>> kvm_vcpu_map() would be better. The event channel logic does RMW operations
+>>> on shared_info->vcpu_info.
 >>
->> Hm.
+>> I've ported the shared_info/vcpu_info parts and made a test case, and
+>> was going back through to make it use kvm_write_guest_cached(). But I
+>> should probably plug on through the evtchn bits before I do that.
 >>
->> How come we get to pin the page and directly dereference it every time,
->> while kvm_setup_pvclock_page() has to use kvm_write_guest_cached()
->> instead?
+>> I also don't see much locking on the cache, and can't convince myself
+>> that accessing the shared_info page from multiple CPUs with
+>> kvm_write_guest_cached() or kvm_map_gfn() is sane unless they each have
+>> their own cache.
 > 
-> So looking at my WIP trees from the time, this is something that
-> we went back and forth on as well with using just a pinned page or a
-> persistent kvm_vcpu_map().
+> I think you could get a VCPU specific cache with kvm_vcpu_map().
 > 
-> I remember distinguishing shared_info/vcpu_info from kvm_setup_pvclock_page()
-> as shared_info is created early and is not expected to change during the
-> lifetime of the guest which didn't seem true for MSR_KVM_SYSTEM_TIME (or
-> MSR_KVM_STEAL_TIME) so that would either need to do a kvm_vcpu_map()
-> kvm_vcpu_unmap() dance or do some kind of synchronization.
-> 
-> That said, I don't think this code explicitly disallows any updates
-> to shared_info.
-> 
->>
->> If that was allowed, wouldn't it have been a much simpler fix for
->> CVE-2019-3016? What am I missing?
-> 
-> Agreed.
-> 
-> Perhaps, Paolo can chime in with why KVM never uses pinned page
-> and always prefers to do cached mappings instead?
-> 
-Part of the CVE fix to not use cached versions.
 
-It's not a longterm pin of the page unlike we try to do here (partly due to the nature
-of the pages we are mapping) but we still we map the gpa, RMW the steal time struct, and
-then unmap the page.
-
-See record_steal_time() -- but more specifically commit b043138246 ("x86/KVM: Make sure
-KVM_VCPU_FLUSH_TLB flag is not missed").
-
-But I am not sure it's a good idea to follow the same as record_steal_time() given that
-this is a fairly sensitive code path for event channels.
-
->>
->> Should I rework these to use kvm_write_guest_cached()?
-> 
-> kvm_vcpu_map() would be better. The event channel logic does RMW operations
-> on shared_info->vcpu_info.
-> 
-Indeed, yes.
-
-Ankur IIRC, we saw missed event channels notifications when we were using the
-{write,read}_cached() version of the patch.
-
-But I can't remember the reason it was due to, either the evtchn_pending or the mask
-word -- which would make it not inject an upcall.
+steal clock handling creates such a mapping cache (struct gfn_to_pfn_cache).
 
 	Joao
