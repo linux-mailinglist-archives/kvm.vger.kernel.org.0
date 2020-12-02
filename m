@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7621C2CBC9B
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 13:18:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14F692CBCD3
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 13:22:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388257AbgLBMNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 07:13:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49818 "EHLO
+        id S1729759AbgLBMVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 07:21:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387519AbgLBMNr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Dec 2020 07:13:47 -0500
+        with ESMTP id S1727427AbgLBMVf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 07:21:35 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CD35C0617A6;
-        Wed,  2 Dec 2020 04:13:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C65C0613D4;
+        Wed,  2 Dec 2020 04:20:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=h10G2vIq+mbt5pCFv6e5DIbzmI9LrjYsR48UBR6rSqE=; b=zQhbN8Fzoxr7+wjAh7rulcIPed
-        LDEQP6VP2zXd4yIpK/Zw9SDiYWvbNj2zhuPWlUWLNqtHWywJzfHpCDjXJsSuMpuOst0GMwbF4RVzr
-        vpykCxSPqx/6iJ3XpXIJ8t0/Dc3x0dxGk3nfrZP1quK/2IGRgn/eHNpwq8vxvqxhWgg8e4FxNXPRP
-        mJLMrCoztp7Ng+RIZY4Ih4oJK98jzsFT7Q3kRYIBxI9qfaYkZp95rgTglKQyfT9oZJWFU51LndJ5L
-        zxneBZnt1NMtQGHsd3O58Z9PVk4W+qdUE1t/GeR1Zk6YE3Sg/Xv8+BbGILHW9Dpee7B80+VVy+58U
-        zKIPDGEA==;
+        bh=0qwrnherWP4ru4uKQB8XamwrLihv5OafwMg8xKkjn0Q=; b=C9uHI56wZty6DXixAFxf9w6xv6
+        Dys55vVfQCjqLXwzaBVsZxnrIHH/HI4DftWsqUK7VAV89xdo43NQwfGGKTHlbdnlrIuGDHjVYTr5m
+        T7ax42ZQBXv2U5HKNtUCt/JtFpasegMstac+lJEFl7dAZhDphP4cAfcZn+A9kCAFxhUW6eLaNnTW1
+        92W0cWM8mX4ten67DukM7vhJo4g/Pic/1+vW/UCj9ahNgF9IeYBMuckxuoBV81fpb89lyj2/7xYFE
+        Ie52VqY9rkN7hZMtrrnyhFLxc+EBslgmumgeQuGS/WZwlXt1NxDp3YbmfMQ+C7YSKTNtzu7IU/E8X
+        WYdks1yw==;
 Received: from 54-240-197-235.amazon.com ([54.240.197.235] helo=u3832b3a9db3152.ant.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kkR0D-0002Nh-4R; Wed, 02 Dec 2020 12:12:57 +0000
-Message-ID: <69da742a6970b3b7c4e6feffa91f3162e0c6cf80.camel@infradead.org>
-Subject: Re: [PATCH RFC 02/39] KVM: x86/xen: intercept xen hypercalls if
- enabled
+        id 1kkR7l-0005Y2-07; Wed, 02 Dec 2020 12:20:45 +0000
+Message-ID: <58db65203b9464f6f225f4ef97c45af3c72cf068.camel@infradead.org>
+Subject: Re: [PATCH RFC 03/39] KVM: x86/xen: register shared_info page
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 02 Dec 2020 12:12:54 +0000
-In-Reply-To: <f30f1f50-9533-1416-e0ef-79f9fbd8d0e5@oracle.com>
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Wed, 02 Dec 2020 12:20:42 +0000
+In-Reply-To: <896dc984-fa71-8f2f-d12b-458294f5f706@oracle.com>
 References: <20190220201609.28290-1-joao.m.martins@oracle.com>
-         <20190220201609.28290-3-joao.m.martins@oracle.com>
-         <b56f763e6bf29a65a11b7a36c4d7bfa79b2ec1b2.camel@infradead.org>
-         <85c49b9c31f6b74f23ad58f93ec73786b7d48391.camel@infradead.org>
-         <f30f1f50-9533-1416-e0ef-79f9fbd8d0e5@oracle.com>
+         <20190220201609.28290-4-joao.m.martins@oracle.com>
+         <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
+         <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+         <896dc984-fa71-8f2f-d12b-458294f5f706@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-asro4h9wBwUGaT4OdGpa"
+        boundary="=-2sx9H7tYaCbChok8+xcS"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -57,29 +57,102 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-asro4h9wBwUGaT4OdGpa
+--=-2sx9H7tYaCbChok8+xcS
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2020-12-02 at 11:17 +0000, Joao Martins wrote:
-> Xen viridian mode is indeed one thing that needed fixing. And definitely =
-a
-> separate patch as you do here. Both this one and the previous is looking =
-good.
+On Wed, 2020-12-02 at 10:44 +0000, Joao Martins wrote:
+> [late response - was on holiday yesterday]
 >=20
-> I suppose that because you switch to kvm_vcpu_write_guest() you no longer=
- need
-> to validate that the hypercall page is correct neither marking as dirty. =
-Probably
-> worth making that explicit in the commit message.
+> On 12/2/20 12:40 AM, Ankur Arora wrote:
+> > On 2020-12-01 5:07 a.m., David Woodhouse wrote:
+> > > On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
+> > > > +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+> > > > +{
+> > > > +       struct shared_info *shared_info;
+> > > > +       struct page *page;
+> > > > +
+> > > > +       page =3D gfn_to_page(kvm, gfn);
+> > > > +       if (is_error_page(page))
+> > > > +               return -EINVAL;
+> > > > +
+> > > > +       kvm->arch.xen.shinfo_addr =3D gfn;
+> > > > +
+> > > > +       shared_info =3D page_to_virt(page);
+> > > > +       memset(shared_info, 0, sizeof(struct shared_info));
+> > > > +       kvm->arch.xen.shinfo =3D shared_info;
+> > > > +       return 0;
+> > > > +}
+> > > > +
+> > >=20
+> > > Hm.
+> > >=20
+> > > How come we get to pin the page and directly dereference it every tim=
+e,
+> > > while kvm_setup_pvclock_page() has to use kvm_write_guest_cached()
+> > > instead?
+> >=20
+> > So looking at my WIP trees from the time, this is something that
+> > we went back and forth on as well with using just a pinned page or a
+> > persistent kvm_vcpu_map().
+> >=20
+> > I remember distinguishing shared_info/vcpu_info from kvm_setup_pvclock_=
+page()
+> > as shared_info is created early and is not expected to change during th=
+e
+> > lifetime of the guest which didn't seem true for MSR_KVM_SYSTEM_TIME (o=
+r
+> > MSR_KVM_STEAL_TIME) so that would either need to do a kvm_vcpu_map()
+> > kvm_vcpu_unmap() dance or do some kind of synchronization.
+> >=20
+> > That said, I don't think this code explicitly disallows any updates
+> > to shared_info.
+> >=20
+> > >=20
+> > > If that was allowed, wouldn't it have been a much simpler fix for
+> > > CVE-2019-3016? What am I missing?
+> >=20
+> > Agreed.
+> >=20
+> > Perhaps, Paolo can chime in with why KVM never uses pinned page
+> > and always prefers to do cached mappings instead?
+> >=20
+>=20
+> Part of the CVE fix to not use cached versions.
+>=20
+> It's not a longterm pin of the page unlike we try to do here (partly due =
+to the nature
+> of the pages we are mapping) but we still we map the gpa, RMW the steal t=
+ime struct, and
+> then unmap the page.
+>=20
+> See record_steal_time() -- but more specifically commit b043138246 ("x86/=
+KVM: Make sure
+> KVM_VCPU_FLUSH_TLB flag is not missed").
+>=20
+> But I am not sure it's a good idea to follow the same as record_steal_tim=
+e() given that
+> this is a fairly sensitive code path for event channels.
 
-I had intended that to be covered by "open-coding it".
+Right. We definitely need to use atomic RMW operations (like the CVE
+fix did) so the page needs to be *mapped*.
 
-Surely the *point* in using a helper function and not open-coding it is
-that we don't *have* to care about the details of what it does ;)
+My question was about a permanent pinned mapping vs the map/unmap as we
+need it that record_steal_time() does.
+
+On IRC, Paolo told me that permanent pinning causes problems for memory
+hotplug, and pointed me at the trick we do with an MMU notifier and
+kvm_vcpu_reload_apic_access_page().
+
+I'm going to stick with the pinning we have for the moment, and just
+fix up the fact that it leaks the pinned pages if the guest sets the
+shared_info address more than once.
+
+At some point the apic page MMU notifier thing can be made generic, and
+we can use that for this and for KVM steal time too.
 
 
---=-asro4h9wBwUGaT4OdGpa
+--=-2sx9H7tYaCbChok8+xcS
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -162,20 +235,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MjAyMTIxMjU0WjAvBgkqhkiG9w0BCQQxIgQgS/7nTl6AevAdYFOLe19QcRNJch1/kNQmqUGMsDWf
-xsAwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjAyMTIyMDQyWjAvBgkqhkiG9w0BCQQxIgQgSvnrx6KNR9HIkq1lX0MfNxSyzA4gR7TtoUCCHiDm
+cLMwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBACoj86lKQH/4bWX41KCm+qL6cseTD1cnA35uaUlHAEfFyrA104kJRUJeW8IAEpN8
-h/JH/ED/gcXFVYUM91VKPAcj4YwEqCbnwpM2BHjdH4QoGS/H2ZgLazGRvg1bTQx6l0CA01jO9CgG
-6Wh9Gz6VHjfwv7LM5zCLHqZLE4Zt5DC4fzDV/4N5harZZ1hyUyqRnWQb88r7zkqYjpnNZOAhJZeh
-W41tThQvmphm3pNJHA6fy9cO3xAhFNsWrEZK3OpZYQ2qKKbCTBR7THJmGtXWr82k5F6vwuHSlBH8
-o9LXqoAvWoq+v3/rOhGymCdXnLypSEq0j3SSLJ4phuuYuqxeYTgAAAAAAAA=
+DQEBAQUABIIBAFTAfvC5jvJlaSFK2VMoBpN/6AYfQXlFczzDWGm1jCGMpL1zDdeofB0oevlDdYn7
+cC32/gE+1l7nI7RL2Yx177BKXNq4Sh7vB8OCTNZpgJAOF91ol9rNEsL+Pan3W0xRBXbn/5IXHApQ
+xxt5LEzdGt6Y3c6ruOiDrrVw6jpbSE+cHpPOcDtoS4ot4FLUj/QNraAEPRrtGx4kht8HRbymx94c
+gFF2jhJYcZI7ual7resoOWd6NsixRY5JeJzYPIW2ELtnss8q+SRoHcdh2qE+PG7Z8B+TJklfo/6k
+QEiyjHZ6lPn8Gmq1c4AVDi6C+ODB4LvH2Esh1eePhZnaovaR5uAAAAAAAAA=
 
 
---=-asro4h9wBwUGaT4OdGpa--
+--=-2sx9H7tYaCbChok8+xcS--
 
