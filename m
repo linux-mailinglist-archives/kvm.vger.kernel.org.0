@@ -2,157 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BB742CB2F7
-	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 03:56:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 750FF2CB44E
+	for <lists+kvm@lfdr.de>; Wed,  2 Dec 2020 06:23:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728053AbgLBCzh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Dec 2020 21:55:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52359 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727590AbgLBCzh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Dec 2020 21:55:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606877650;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9vqxpVgMGEKJ5/jWqjIrVL+uKldVNUjKodTeexFZtk0=;
-        b=Bps/bCi6dqlQdYTKkqIXfSefIeqDT06uTaYE64Rc2lvUghpmWXEZQrIu+J0mdgR+0lWVJ1
-        kbRWvSEVyDdGGSYOPaoCt8fw0uLgqrYjQL/vcaSc3TD//auxVK4jwZ8a8WFDvXWVTNaycy
-        6zrDH/QTBT00qoEfZZEOVpu8aYWYlrY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-553-Xdg-i7kgMneqoF3lACxVCQ-1; Tue, 01 Dec 2020 21:54:09 -0500
-X-MC-Unique: Xdg-i7kgMneqoF3lACxVCQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81255817B8C;
-        Wed,  2 Dec 2020 02:54:07 +0000 (UTC)
-Received: from [10.72.13.145] (ovpn-13-145.pek2.redhat.com [10.72.13.145])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB97660854;
-        Wed,  2 Dec 2020 02:53:53 +0000 (UTC)
-Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, john.g.johnson@oracle.com, dinechin@redhat.com,
-        cohuck@redhat.com, felipe@nutanix.com,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Jag Raman <jag.raman@oracle.com>
-References: <CAFO2pHzmVf7g3z0RikQbYnejwcWRtHKV=npALs49eRDJdt4mJQ@mail.gmail.com>
- <0447ec50-6fe8-4f10-73db-e3feec2da61c@redhat.com>
- <20201126123659.GC1180457@stefanha-x1.localdomain>
- <c9f926fb-438c-9588-f018-dd040935e5e5@redhat.com>
- <20201127134403.GB46707@stefanha-x1.localdomain>
- <6001ed07-5823-365e-5235-8bfea0e72c7f@redhat.com>
- <20201130124702.GB422962@stefanha-x1.localdomain>
- <4c1af937-a176-be67-fbcc-2bcf965e0bbc@redhat.com>
- <20201201103516.GD567514@stefanha-x1.localdomain>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d5ab77b8-63c0-8140-418e-59888e6c9ca8@redhat.com>
-Date:   Wed, 2 Dec 2020 10:53:52 +0800
+        id S1728482AbgLBFUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 00:20:47 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45616 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726228AbgLBFUq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 00:20:46 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B253ilM174598;
+        Wed, 2 Dec 2020 05:19:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=cMYiHoDqWu1caH/axLlQ3XDo3E331ceUnyp/wEwpk/k=;
+ b=X9nHrXrYHhHHLTyrNQ1Wey+8HxaacctT8UYzqypg6QB+IInFPSutvkDx4N3qJfeD2t2j
+ Umi/02K1vFG411Tfp+Zu2E/mYWk6tsDApUq9WcieUE6KlnmqZtDS+6V0D+SiKUJdfa0R
+ SDdvlQaDPuMOd4BhN3S1zkL/7yHr9rKLG9zICxEus9ugASrU9xxTcvR4S7egiMtS69OP
+ T80OzyoEIru1at9ZnAesUgqmP7LsN+vMfQlbRj95Q1SqC+CEqQMWbxqXYhos2U081c16
+ 6hMO+zW5m9sHR5W7+U2l5ae0MMUZOPZjj9vEx4G2d2acdoIYVvPwfL7GC8E9asnTdADl IA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 353dyqp8an-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 02 Dec 2020 05:19:54 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B251LhA076776;
+        Wed, 2 Dec 2020 05:17:54 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 3540fy287n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 02 Dec 2020 05:17:54 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B25Ho2l006448;
+        Wed, 2 Dec 2020 05:17:50 GMT
+Received: from [192.168.0.108] (/70.36.60.91)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 01 Dec 2020 21:17:49 -0800
+Subject: Re: [PATCH RFC 03/39] KVM: x86/xen: register shared_info page
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+ <20190220201609.28290-4-joao.m.martins@oracle.com>
+ <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
+ <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
+ <3ac692ed7dd77aa2ed23646bb1741a7b40bddcff.camel@infradead.org>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <a6102420-cbda-700a-b049-31db96d357b1@oracle.com>
+Date:   Tue, 1 Dec 2020 21:17:47 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201201103516.GD567514@stefanha-x1.localdomain>
+In-Reply-To: <3ac692ed7dd77aa2ed23646bb1741a7b40bddcff.camel@infradead.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 adultscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020031
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9822 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ clxscore=1015 mlxscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012020031
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2020-12-01 5:26 p.m., David Woodhouse wrote
+> On Tue, 2020-12-01 at 16:40 -0800, Ankur Arora wrote:
+>> On 2020-12-01 5:07 a.m., David Woodhouse wrote:
+>>> On Wed, 2019-02-20 at 20:15 +0000, Joao Martins wrote:
+>>>> +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+>>>> +{
+>>>> +       struct shared_info *shared_info;
+>>>> +       struct page *page;
+>>>> +
+>>>> +       page = gfn_to_page(kvm, gfn);
+>>>> +       if (is_error_page(page))
+>>>> +               return -EINVAL;
+>>>> +
+>>>> +       kvm->arch.xen.shinfo_addr = gfn;
+>>>> +
+>>>> +       shared_info = page_to_virt(page);
+>>>> +       memset(shared_info, 0, sizeof(struct shared_info));
+>>>> +       kvm->arch.xen.shinfo = shared_info;
+>>>> +       return 0;
+>>>> +}
+>>>> +
+>>>
+>>> Hm.
+>>>
+>>> How come we get to pin the page and directly dereference it every time,
+>>> while kvm_setup_pvclock_page() has to use kvm_write_guest_cached()
+>>> instead?
+>>
+>> So looking at my WIP trees from the time, this is something that
+>> we went back and forth on as well with using just a pinned page or a
+>> persistent kvm_vcpu_map().
+> 
+> OK, thanks.
+> 
+>> I remember distinguishing shared_info/vcpu_info from kvm_setup_pvclock_page()
+>> as shared_info is created early and is not expected to change during the
+>> lifetime of the guest which didn't seem true for MSR_KVM_SYSTEM_TIME (or
+>> MSR_KVM_STEAL_TIME) so that would either need to do a kvm_vcpu_map()
+>> kvm_vcpu_unmap() dance or do some kind of synchronization.
+>>
+>> That said, I don't think this code explicitly disallows any updates
+>> to shared_info.
+> 
+> It needs to allow updates as well as disabling the shared_info pages.
+> We're going to need that to implement SHUTDOWN_soft_reset for kexec.
+True.
 
-On 2020/12/1 下午6:35, Stefan Hajnoczi wrote:
-> On Tue, Dec 01, 2020 at 12:05:04PM +0800, Jason Wang wrote:
->> On 2020/11/30 下午8:47, Stefan Hajnoczi wrote:
->>> On Mon, Nov 30, 2020 at 10:14:15AM +0800, Jason Wang wrote:
->>>> On 2020/11/27 下午9:44, Stefan Hajnoczi wrote:
->>>>> On Fri, Nov 27, 2020 at 11:39:23AM +0800, Jason Wang wrote:
->>>>>> On 2020/11/26 下午8:36, Stefan Hajnoczi wrote:
->>>>>>> On Thu, Nov 26, 2020 at 11:37:30AM +0800, Jason Wang wrote:
->>>>>>>> On 2020/11/26 上午3:21, Elena Afanasova wrote:
->>>>>> Or I wonder whether we can attach an eBPF program when trapping MMIO/PIO and
->>>>>> allow it to decide how to proceed?
->>>>> The eBPF program approach is interesting, but it would probably require
->>>>> access to guest RAM and additional userspace state (e.g. device-specific
->>>>> register values). I don't know the current status of Linux eBPF - is it
->>>>> possible to access user memory (it could be swapped out)?
->>>> AFAIK it doesn't, but just to make sure I understand, any reason that eBPF
->>>> need to access userspace memory here?
->>> Maybe we're thinking of different things. In the past I've thought about
->>> using eBPF to avoid a trip to userspace for request submission and
->>> completion, but that requires virtqueue parsing from eBPF and guest RAM
->>> access.
+> 
+>>>
+>>> If that was allowed, wouldn't it have been a much simpler fix for
+>>> CVE-2019-3016? What am I missing?
 >>
->> I see. I've  considered something similar. e.g using eBPF dataplane in
->> vhost, but it requires a lot of work. For guest RAM access, we probably can
->> provide some eBPF helpers to do that but we need strong point to convince
->> eBPF guys.
+>> Agreed.
 >>
+>> Perhaps, Paolo can chime in with why KVM never uses pinned page
+>> and always prefers to do cached mappings instead?
 >>
->>> Are you thinking about replacing ioctl(KVM_SET_IOREGION) and all the
->>> necessary kvm.ko code with an ioctl(KVM_SET_IO_PROGRAM), where userspace
->>> can load an eBPF program into kvm.ko that gets executed when an MMIO/PIO
->>> accesses occur?
+>>>
+>>> Should I rework these to use kvm_write_guest_cached()?
 >>
->> Yes.
->>
->>
->>>    Wouldn't it need to write to userspace memory to store
->>> the ring index that was written to the doorbell register, for example?
->>
->> The proram itself can choose want to do:
->>
->> 1) do datamatch and write/wakeup eventfd
->>
->> or
->>
->> 2) transport the write via an arbitrary fd as what has been done in this
->> proposal, but the protocol is userspace defined
->>
->>> How would the program communicate with userspace (eventfd isn't enough)
->>> and how can it handle synchronous I/O accesses like reads?
->>
->> I may miss something, but it can behave exactly as what has been proposed in
->> this patch?
-> I see. This seems to have two possible advantages:
-> 1. Pushing the kvm.ko code into userspace thanks to eBPF. Less kernel
->     code.
-> 2. Allowing more flexibile I/O dispatch logic (e.g. ioeventfd-style
->     datamatch) and communication protocols.
->
-> I think #1 is minor because the communication protocol is trivial,
-> struct kvm_io_device can be reused for dispatch, and eBPF will introduce
-> some complexity itself.
->
-> #2 is more interesting but I'm not sure how to use this extra
-> flexibility to get a big advantage. Maybe vfio-user applications could
-> install an eBPF program that speaks the vfio-user protocol instead of
-> the ioregionfd protocol, making it easier to integrate ioregionfd into
-> vfio-user programs?
+>> kvm_vcpu_map() would be better. The event channel logic does RMW operations
+>> on shared_info->vcpu_info.
+> 
+> I've ported the shared_info/vcpu_info parts and made a test case, and
+> was going back through to make it use kvm_write_guest_cached(). But I
+> should probably plug on through the evtchn bits before I do that.
+> 
+> I also don't see much locking on the cache, and can't convince myself
+> that accessing the shared_info page from multiple CPUs with
+> kvm_write_guest_cached() or kvm_map_gfn() is sane unless they each have
+> their own cache.
 
+I think you could get a VCPU specific cache with kvm_vcpu_map().
 
-Yes, that's could be one. Basically it shift the policy from kernel to 
-userspace.
+> 
+> What I have so far is at
+> 
+> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/xenpv
 
+Thanks. Will take a look there.
 
->
-> My opinion is that eBPF complicates things and since we lack a strong
-> use case for that extra flexibility, I would stick to the ioregionfd
-> proposal.
->
-> Elena, Jason: Do you have any opinions on this?
+Ankur
 
-
-I agree. And we need a way to make it work without eBPF. Let's leave it 
-for future investigation.
-
-Thanks
-
-
->
-> Stefan
-
+> 
+> I'll do the event channel support tomorrow and hook it up to my actual
+> VMM to give it some more serious testing.
+> 
