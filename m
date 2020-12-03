@@ -2,149 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 519522CD478
-	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 12:22:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99F9A2CD4AB
+	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 12:35:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728808AbgLCLVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Dec 2020 06:21:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46502 "EHLO
+        id S2388310AbgLCLff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Dec 2020 06:35:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38606 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725985AbgLCLVe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Dec 2020 06:21:34 -0500
+        by vger.kernel.org with ESMTP id S2388266AbgLCLfe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Dec 2020 06:35:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606994407;
+        s=mimecast20190719; t=1606995247;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=aBnaYUr0lw2ghf4vmO9i9+7oCpgPHb/5P4+nJOj15wY=;
-        b=VnredGAuZzKFKRlE483nz0ANWa801m6vST0gSvTZBS0IVsXDT94eZ7wxIJ+8jp5r7jzC53
-        TtoQI24af9l8IokEgVVC2VRRaI5EXs0D2LI+vbxH4NRr6+SqAnL1WeW6WCh8yF1GCiUHg8
-        sx3g0DCJEbs5+t637rqG897UE9ffY3M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-b8fq0J7ZPTafWVTglXTe2Q-1; Thu, 03 Dec 2020 06:20:05 -0500
-X-MC-Unique: b8fq0J7ZPTafWVTglXTe2Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 241C2A40CE;
-        Thu,  3 Dec 2020 11:20:04 +0000 (UTC)
-Received: from localhost (ovpn-115-46.ams2.redhat.com [10.36.115.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B2E0A5C1B4;
-        Thu,  3 Dec 2020 11:20:03 +0000 (UTC)
-Date:   Thu, 3 Dec 2020 11:20:02 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Justin He <Justin.He@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vfio iommu type1: Bypass the vma permission check in
- vfio_pin_pages_remote()
-Message-ID: <20201203112002.GE689053@stefanha-x1.localdomain>
-References: <20201119142737.17574-1-justin.he@arm.com>
- <20201124181228.GA276043@xz-x1>
- <AM6PR08MB32245E7F990955395B44CE6BF7FA0@AM6PR08MB3224.eurprd08.prod.outlook.com>
- <20201125155711.GA6489@xz-x1>
- <20201202143356.GK655829@stefanha-x1.localdomain>
- <20201202154511.GI3277@xz-x1>
+        bh=wavkmqDxP0khrutcZKed1F8mOygRt6FLMDWhumXq1xo=;
+        b=TifrwUWdW9pWEY89WYM8OIhBo2t81nasfFq2UQoxajpkTmQ5p+0BKjSRbLeyw47DykG4i7
+        jMUFApSAiWbuj5hJC3Xm2vqMf7//HLxmI2gzctotYmH5LKCgFpLYGC4K30YSTZ2MCscZOl
+        nbEpFDVuEM36Dci1j40oWdx+zUV1CxM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-8nD01ns3PoisopkbrKZSEQ-1; Thu, 03 Dec 2020 06:34:06 -0500
+X-MC-Unique: 8nD01ns3PoisopkbrKZSEQ-1
+Received: by mail-wm1-f72.google.com with SMTP id r1so1384197wmn.8
+        for <kvm@vger.kernel.org>; Thu, 03 Dec 2020 03:34:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wavkmqDxP0khrutcZKed1F8mOygRt6FLMDWhumXq1xo=;
+        b=HtPKzTGbbPXObugygfpremeq6Nx9lDJzF86XPSc6ejye2p+1yYbJx63/Jq3gik/KKq
+         SE0aOjMfsowgibDF+/X6FlDE3Es1PodGtVXow9/mT7kNg7ImGikawZPLqPhc7Rq2tY8a
+         4tQQs047ue1Pp8AFSPnxEMvc0kzeAadqWVdU1gBZMmTGZ36+d98F3M/SS8M+YNVb45i4
+         t23b1iwnOSBWFmdbMQUmn5Z791iEqItxLoqa8o7GBOUF+3UABA4TKR9bV0mzHUu3YQ9+
+         wAu54o4kbmLXROG3a1+Z2hUUt4A00dFPLi7Csw3x/FQG4fP6Y0XQ9oXILSEfnVboRunt
+         SUGA==
+X-Gm-Message-State: AOAM531p5VjcFo5l1bGgdGevGpZktwHp5EhrkgM12S7uevkvec3iKs5a
+        INWKt6ZVW5IL2e+//TBM2Q00Zhby58fXVGaNO3CAoNpped+UgZLkgmdn2NeG0YUcLvqFYquxy3s
+        +5Qfk7IeWEnlP
+X-Received: by 2002:a1c:43c6:: with SMTP id q189mr2871935wma.7.1606995244789;
+        Thu, 03 Dec 2020 03:34:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyOH5pHcWAY/Avk36sIaVcrY0V/3/zWowk79b8bbB8n88tYmVUdZryjqrNwTkL447lpjE2tsQ==
+X-Received: by 2002:a1c:43c6:: with SMTP id q189mr2871917wma.7.1606995244589;
+        Thu, 03 Dec 2020 03:34:04 -0800 (PST)
+Received: from redhat.com (bzq-79-176-44-197.red.bezeqint.net. [79.176.44.197])
+        by smtp.gmail.com with ESMTPSA id o15sm1394318wrp.74.2020.12.03.03.34.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Dec 2020 03:34:03 -0800 (PST)
+Date:   Thu, 3 Dec 2020 06:34:00 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>,
+        Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        john.g.johnson@oracle.com, dinechin@redhat.com, cohuck@redhat.com,
+        jasowang@redhat.com, felipe@nutanix.com,
+        elena.ufimtseva@oracle.com, jag.raman@oracle.com
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <20201203062357-mutt-send-email-mst@kernel.org>
+References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+ <20201202180628.GA100143@xz-x1>
+ <20201203111036.GD689053@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20201202154511.GI3277@xz-x1>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="pY3vCvL1qV+PayAL"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20201203111036.GD689053@stefanha-x1.localdomain>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---pY3vCvL1qV+PayAL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, Dec 03, 2020 at 11:10:36AM +0000, Stefan Hajnoczi wrote:
+> On Wed, Dec 02, 2020 at 01:06:28PM -0500, Peter Xu wrote:
+> > On Wed, Nov 25, 2020 at 12:44:07PM -0800, Elena Afanasova wrote:
+> > 
+> > [...]
+> > 
+> > > Wire protocol
+> > > -------------
+> > > The protocol spoken over the file descriptor is as follows. The device reads
+> > > commands from the file descriptor with the following layout::
+> > > 
+> > >   struct ioregionfd_cmd {
+> > >       __u32 info;
+> > >       __u32 padding;
+> > >       __u64 user_data;
+> > >       __u64 offset;
+> > >       __u64 data;
+> > >   };
+> > 
+> > I'm thinking whether it would be nice to have a handshake on the wire protocol
+> > before starting the cmd/resp sequence.
+> > 
+> > I was thinking about migration - we have had a hard time trying to be
+> > compatible between old/new qemus.  Now we fixed those by applying the same
+> > migration capabilities on both sides always so we do the handshake "manually"
+> > from libvirt, but it really should be done with a real handshake on the
+> > channel, imho..  That's another story, for sure.
+> > 
+> > My understanding is that the wire protocol is kind of a standalone (but tiny)
+> > protocol between kvm and the emulation process.  So I'm thinking the handshake
+> > could also help when e.g. kvm can fallback to an old version of wire protocol
+> > if it knows the emulation binary is old.  Ideally, I think this could even
+> > happen without VMM's awareness.
+> > 
+> > [...]
+> 
+> I imagined that would happen in the control plane (KVM ioctls) instead
+> of the data plane (the fd). There is a flags field in
+> ioctl(KVM_SET_IOREGION):
+> 
+>   struct kvm_ioregion {
+>       __u64 guest_paddr; /* guest physical address */
+>       __u64 memory_size; /* bytes */
+>       __u64 user_data;
+>       __s32 fd; /* previously created with KVM_CREATE_IOREGIONFD */
+>       __u32 flags;
+>       __u8  pad[32];
+>   };
+> 
+> When userspace sets up the ioregionfd it can tell the kernel which
+> features to enable.
+> 
+> Feature availability can be checked through ioctl(KVM_CHECK_EXTENSION).
+> 
+> Do you think this existing mechanism is enough? It's not clear to me
+> what kind of additional negotiation would be necessary between the
+> device emulation process and KVM after the ioregionfd has been
+> registered?
+> 
+> > > Ordering
+> > > --------
+> > > Guest accesses are delivered in order, including posted writes.
+> > 
+> > I'm wondering whether it should prepare for out-of-order commands assuming if
+> > there's no handshake so harder to extend, just in case there could be some slow
+> > commands so we still have chance to reply to a very trivial command during
+> > handling the slow one (then each command may require a command ID, too).  But
+> > it won't be a problem at all if we can easily extend the wire protocol so the
+> > ordering constraint can be extended too when really needed, and we can always
+> > start with in-order-only requests.
+> 
+> Elena and I brainstormed out-of-order commands but didn't include them
+> in the proposal because it's not clear that they are needed. For
+> multi-queue devices the per-queue registers can be assigned different
+> ioregionfds that are handled by dedicated threads.
 
-On Wed, Dec 02, 2020 at 10:45:11AM -0500, Peter Xu wrote:
-> On Wed, Dec 02, 2020 at 02:33:56PM +0000, Stefan Hajnoczi wrote:
-> > On Wed, Nov 25, 2020 at 10:57:11AM -0500, Peter Xu wrote:
-> > > On Wed, Nov 25, 2020 at 01:05:25AM +0000, Justin He wrote:
-> > > > > I'd appreciate if you could explain why vfio needs to dma map som=
-e
-> > > > > PROT_NONE
-> > > >=20
-> > > > Virtiofs will map a PROT_NONE cache window region firstly, then rem=
-ap the sub
-> > > > region of that cache window with read or write permission. I guess =
-this might
-> > > > be an security concern. Just CC virtiofs expert Stefan to answer it=
- more accurately.
-> > >=20
-> > > Yep.  Since my previous sentence was cut off, I'll rephrase: I was th=
-inking
-> > > whether qemu can do vfio maps only until it remaps the PROT_NONE regi=
-ons into
-> > > PROT_READ|PROT_WRITE ones, rather than trying to map dma pages upon P=
-ROT_NONE.
-> >=20
-> > Userspace processes sometimes use PROT_NONE to reserve virtual address
-> > space. That way future mmap(NULL, ...) calls will not accidentally
-> > allocate an address from the reserved range.
-> >=20
-> > virtio-fs needs to do this because the DAX window mappings change at
-> > runtime. Initially the entire DAX window is just reserved using
-> > PROT_NONE. When it's time to mmap a portion of a file into the DAX
-> > window an mmap(fixed_addr, ...) call will be made.
->=20
-> Yes I can understand the rational on why the region is reserved.  However=
- IMHO
-> the real question is why such reservation behavior should affect qemu mem=
-ory
-> layout, and even further to VFIO mappings.
->=20
-> Note that PROT_NONE should likely mean that there's no backing page at al=
-l in
-> this case.  Since vfio will pin all the pages before mapping the DMAs, it=
- also
-> means that it's at least inefficient, because when we try to map all the
-> PROT_NONE pages we'll try to fault in every single page of it, even if th=
-ey may
-> not ever be used.
->=20
-> So I still think this patch is not doing the right thing.  Instead we sho=
-uld
-> somehow teach qemu that the virtiofs memory region should only be the siz=
-e of
-> enabled regions (with PROT_READ|PROT_WRITE), rather than the whole reserv=
-ed
-> PROT_NONE region.
+The difficulty is I think the reverse: reading
+any register from a PCI device is normally enough to flush any
+writes and interrupts in progress.
 
-virtio-fs was not implemented with IOMMUs in mind. The idea is just to
-install a kvm.ko memory region that exposes the DAX window.
 
-Perhaps we need to treat the DAX window like an IOMMU? That way the
-virtio-fs code can send map/unmap notifications and hw/vfio/ can
-propagate them to the host kernel.
 
-Stefan
+> Out-of-order commands are only necessary if a device needs to
+> concurrently process register accesses to the *same* set of registers. I
+> think it's rare for hardware register interfaces to be designed like
+> that.
+> 
+> This could be a mistake, of course. If someone knows a device that needs
+> multiple in-flight register accesses, please let us know.
+> 
+> Stefan
 
---pY3vCvL1qV+PayAL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/IyeIACgkQnKSrs4Gr
-c8iF/Af+JSgK6lDLW2cHuI6L3u9Vn1woF5DUnLlLyyXJ+JaSu1iT2HN9Fvp8FQuW
-651zMyqbvCGiuFqOD3MwP0umjJFoIq4F0ljrLmEySbatQQBinv5aybBYyjSheyx7
-Fqm1rhtsGtvbshhpWwwRJ2wo4w/LKlFTaFYGVzlP6gFdLBaaekxt8yxI+xzfZ6O1
-CiJkRN5XL8vxLj/QAxP10UY9Dq+apPXmqeGmGKxE9tLpAbRAdLUmz3xfVZOZc9Cl
-NVRUH652bL3B0PwLkmz7g4qS3zXrJjzVHVQ9KG9Nrijog+T1nk/0sUY4nr+rJI6o
-NZspGjfYJQNLzqxe8NQ3ZIo4B1HSNw==
-=hx6l
------END PGP SIGNATURE-----
-
---pY3vCvL1qV+PayAL--
 
