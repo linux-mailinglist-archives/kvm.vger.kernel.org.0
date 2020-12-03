@@ -2,106 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB9712CDBB2
-	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 18:03:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA7682CDBF3
+	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 18:09:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731371AbgLCRCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Dec 2020 12:02:31 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43714 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725918AbgLCRCb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Dec 2020 12:02:31 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B3Gtbn3193009;
-        Thu, 3 Dec 2020 12:01:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=TySp0bQWuLG9QgCwNcLob5Bj9l+o4YYRu3QmSA7cedk=;
- b=OszUncRmK3x5kyAdWanmLcP6IXwjw1ISV8h0/DVUDi/hJKZHj9yHgrGdeuZXrkw4x5XT
- ZHLQd03PNAZUJvEyJwZVe4EZ2bSFQO3KTO5sGKVLWD4uF/46pXy7rMDjt7wF8IUNMy6r
- 8tW3UR5CvGkj+U6wsyLfYoD2MXug/CsVtjTITKT+6M8UXAgk4Dn9LVG8uRr6PxM16Um0
- uXY2FHwFq+9GOxM6a2b/kiPdzDzIOnVzVcSPZVetgPc/clZhj1tM/tozssT8dMVo9Ifs
- JosvWHqshqoaFFVOuE80MXQPQiuEFmIpL2iiYYyusQTxvLR7oMBHYEyDf6/xRWA9xQBg AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3573yh86y3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Dec 2020 12:01:50 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B3GtqpR194398;
-        Thu, 3 Dec 2020 12:01:49 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3573yh86uk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Dec 2020 12:01:49 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B3Gq3hr018023;
-        Thu, 3 Dec 2020 17:01:47 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 353e68auc7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Dec 2020 17:01:47 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B3H1iPL26477034
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Dec 2020 17:01:44 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 10C624C046;
-        Thu,  3 Dec 2020 17:01:44 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E0184C040;
-        Thu,  3 Dec 2020 17:01:43 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.64.213])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu,  3 Dec 2020 17:01:43 +0000 (GMT)
-Date:   Thu, 3 Dec 2020 18:01:41 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        borntraeger@de.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, david@redhat.com
-Subject: Re: [PATCH] s390/vfio-ap: Clean up vfio_ap resources when KVM
- pointer invalidated
-Message-ID: <20201203180141.19425931.pasic@linux.ibm.com>
-In-Reply-To: <20201203111907.72a89884.cohuck@redhat.com>
-References: <20201202234101.32169-1-akrowiak@linux.ibm.com>
-        <20201203111907.72a89884.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S2501958AbgLCRJm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Dec 2020 12:09:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36762 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2501954AbgLCRJl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Dec 2020 12:09:41 -0500
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3205C061A4E
+        for <kvm@vger.kernel.org>; Thu,  3 Dec 2020 09:09:01 -0800 (PST)
+Received: by mail-oi1-x244.google.com with SMTP id t9so2936308oic.2
+        for <kvm@vger.kernel.org>; Thu, 03 Dec 2020 09:09:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lUXhP2BLApSFe26Hqd8EPuBUDi8Kp9hGIASjSzt0ujM=;
+        b=WIKcLd/OiCXi1vc0o3Fe2Li3FepJ7ZKtQgR4d0dFtqc67lDREOzGds0LbFGalFU9CA
+         8hx0djUwjzb+qoojTmHoTP6GW/UmLJ1hZY/BTk/kzHuqIaOOBjTAh1vN54yAWe9ZTzlb
+         6keAafoxWthce6o/2EFaafhEK9usdNpFlUyLJ0iKlmXt4lmg5Sv66w/6e1IORXxGlV+L
+         V7i1BD56Gzf3HEOdHvROnuwXOia5jNSawn037PnoPQH1Gqe4h+Ql6zzAqdZXARz7MMv3
+         WkbvqeMcd2kaYBTdn0pH7S9RDfT8ZiUxoN7USFWO11vISKsLxTTXypxMOcGGEJlQUzfM
+         uCpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lUXhP2BLApSFe26Hqd8EPuBUDi8Kp9hGIASjSzt0ujM=;
+        b=O7J7ebe0VKvJNB3RKxi6n03VYij2UFxnY0hFRsdNAvaqM8MyAOtEwjpqj7SYlOvOYk
+         pJqfDWaRgvA0RbB2u5sTg4BHTprceBkaJN49JF7mCLQ1whEXbkInkm44XjPqc50Y86KB
+         3pGaiRDVoDMOgXmRoOcObpoPVh7EfKvO/jkZqpIot9tnFOT0OL+TeMh9tp58CMQ2cw0W
+         w9EjX0TS7+rPDQOasC417YPIh2tz/ybZHJHCbtpvl3vJwo1kmEttDeZ06ca6e+sTvYRM
+         HtfhQ76yLlFiQ5TzAj0TtHWm10UxeOAn69dBg9kaogBgp2KVDhcizRPgHmxBIJbVQMB+
+         lp8w==
+X-Gm-Message-State: AOAM531oDlAjwyLSSmCofW4V+97h4poaPr6w4oV5wZdXtwMa7d3CRSfJ
+        QIXu/3pNrxJDPkSdnxiMaR9Xuw==
+X-Google-Smtp-Source: ABdhPJzd87IgBEvNamtifDm/ZyjgyBN03fsigayNL610Fj0QqkozKvKAs43FU8o4x4JF8jDVlc6kCA==
+X-Received: by 2002:aca:dec2:: with SMTP id v185mr103992oig.6.1607015341193;
+        Thu, 03 Dec 2020 09:09:01 -0800 (PST)
+Received: from [172.24.51.127] (168.189-204-159.bestelclientes.com.mx. [189.204.159.168])
+        by smtp.gmail.com with ESMTPSA id q3sm446639oij.27.2020.12.03.09.08.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Dec 2020 09:09:00 -0800 (PST)
+Subject: Re: [PATCH 1/9] target/mips: Introduce ase_msa_available() helper
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Huacai Chen <chenhc@lemote.com>, kvm@vger.kernel.org,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20201202184415.1434484-1-f4bug@amsat.org>
+ <20201202184415.1434484-2-f4bug@amsat.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b4cbe312-8dc8-d3e4-e5d2-8fe50f52e3fb@linaro.org>
+Date:   Thu, 3 Dec 2020 11:08:56 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20201202184415.1434484-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-12-03_09:2020-12-03,2020-12-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- adultscore=0 impostorscore=0 clxscore=1015 phishscore=0 spamscore=0
- bulkscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=859
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012030098
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 3 Dec 2020 11:19:07 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> > @@ -1095,7 +1106,7 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
-> >  	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
-> >  
-> >  	if (!data) {
-> > -		matrix_mdev->kvm = NULL;
-> > +		vfio_ap_mdev_put_kvm(matrix_mdev);  
+On 12/2/20 12:44 PM, Philippe Mathieu-Daudé wrote:
+> Instead of accessing CP0_Config3 directly and checking
+> the 'MSA Present' bit, introduce an explicit helper,
+> making the code easier to read.
 > 
-> Hm. I'm wondering whether you need to hold the maxtrix_dev lock here as
-> well?
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  target/mips/internal.h  |  6 ++++++
+>  target/mips/kvm.c       | 12 ++++++------
+>  target/mips/translate.c |  8 +++-----
+>  3 files changed, 15 insertions(+), 11 deletions(-)
 
-In v12 we eventually did come along and patch "s390/vfio-ap: allow hot
-plug/unplug of AP resources using mdev device" made this a part of a
-critical section protected by the matrix_dev->lock.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-IMHO the cleanup should definitely happen with the matrix_dev->lock held.
-
-Regards,
-Halil
+r~
