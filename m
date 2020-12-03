@@ -2,105 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D8C02CE151
-	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 23:06:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB3A92CE157
+	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 23:08:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727914AbgLCWGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Dec 2020 17:06:12 -0500
-Received: from smtp-fw-9103.amazon.com ([207.171.188.200]:4729 "EHLO
-        smtp-fw-9103.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725885AbgLCWGM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Dec 2020 17:06:12 -0500
+        id S1729551AbgLCWIE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Dec 2020 17:08:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54934 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727832AbgLCWID (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Dec 2020 17:08:03 -0500
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9111EC061A4F
+        for <kvm@vger.kernel.org>; Thu,  3 Dec 2020 14:07:23 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id t18so3337705otk.2
+        for <kvm@vger.kernel.org>; Thu, 03 Dec 2020 14:07:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1607033171; x=1638569171;
-  h=to:cc:references:from:message-id:date:mime-version:
-   in-reply-to:content-transfer-encoding:subject;
-  bh=NJkzfki/00T/A9FZ9WHVaO8rKb/C2gl2qXQ81IHQXcs=;
-  b=bCg0TiBIE8oLVZ5/QpMMo06PKYfT4LxdnujsLy9lXhrjOHBvnWSU+dby
-   wnK2AD/KvEwnFmhsPltGKBoTk0zGwGfeSoTi9dJv4t/OEp5KhdZoAKqcb
-   2lFJOfCE7Y2XTfuI7MH+0JKJ/HBhYT4CiaCczZWq67XyIbAZXQPS6zyHd
-   E=;
-X-IronPort-AV: E=Sophos;i="5.78,390,1599523200"; 
-   d="scan'208";a="900457271"
-Subject: Re: [PATCH v3 4/4] selftests: kvm: Test MSR exiting to userspace
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9103.sea19.amazon.com with ESMTP; 03 Dec 2020 22:05:24 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com (Postfix) with ESMTPS id 990F5A20BA;
-        Thu,  3 Dec 2020 22:05:23 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 3 Dec 2020 22:05:23 +0000
-Received: from Alexanders-Mac-mini.local (10.43.160.21) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 3 Dec 2020 22:05:21 +0000
-To:     Aaron Lewis <aaronlewis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     Peter Shier <pshier@google.com>, Jim Mattson <jmattson@google.com>,
-        "kvm list" <kvm@vger.kernel.org>
-References: <20201012194716.3950330-1-aaronlewis@google.com>
- <20201012194716.3950330-5-aaronlewis@google.com>
- <CAAAPnDGP13jh5cC1xBF_gL4VStoNPd01UjWvkDqdctDRNKw0bQ@mail.gmail.com>
- <1e7c370b-1904-4b54-db8a-c9d475bb4bf5@redhat.com>
- <CAAAPnDFpfiYRs7GZ0o0wSXdzD2AFxLy=XOhRyhcEaQKmaYJzGw@mail.gmail.com>
- <71f1c9c0-b92c-76f9-0878-e3b8b184b7f0@redhat.com>
- <CAAAPnDHkZaPZP6ht3y1A5mXkP=T6mDppy-zygKje1Hs5s8huWw@mail.gmail.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <db1e99c9-e328-53bf-45de-dd15585d3467@amazon.com>
-Date:   Thu, 3 Dec 2020 23:05:20 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:84.0)
- Gecko/20100101 Thunderbird/84.0
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+fcr9AsvTSU8M9HtgILoI/sqhE+c+IJbt4P3odH0eMM=;
+        b=XAE1W3uW3Fgd9wPm19jh2i7D4OoyG+4kWce7+hc8V2YgGIPbhxh3sk0V84PFFP/y3C
+         Fa7bL04XR7Lde0yLCBcKtLv8VER10Sl394P/4G2/Vl5oCH83fPoslorVUQjDFDFv+Ank
+         i7G5F5LH9T/fj4pTt2A/Fs9gb9UHbGVp7cNxw/Hy6H3LD+Jwm86hk++65SzRoa3XvgzL
+         u6A8F68vFZOIhh1v0qrWrMhLXu9tNA7L8t4/B5xj59ZdjMcVVg0SAZNBjW44XXOmIAAD
+         WEMLOmyzdAA+Ts2LFhXA5eRRyHbOdb9YIAmCcKCDVj8tDEDBp1nZFX4rkarMLKtr4EkM
+         4a3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+fcr9AsvTSU8M9HtgILoI/sqhE+c+IJbt4P3odH0eMM=;
+        b=Q/eH4U5IGpOA8b2u4p2UXuWAXbWndG2HLr6q3mCAmr+/+S+ARdWAo0aSQmxvprUAM5
+         nvebPQTcJ8kF4EeGMFb7R2k9k0OnvJ5+ooxFqTj8G+iK6BCr8Djdn0uFEecs8/AXyPnx
+         JdLd1cd6sfLzCp791ARVuda/RHXqRA3y2YDyv5/a1lZe/C6MmllolKmxwygWjDw+3Bav
+         mSZgpRTO18EzrqFeeulZjMseRsdzCS7mStp3Uy1VvYoN/JRJmCBBmmwFEyJSG0RVAqnp
+         aAW6VwvQkoTChT+ubCHyfroHS0nAsczZ//ftPIy3iffIliOhVwUlIBU9Wj9O5BGy9NYr
+         rXow==
+X-Gm-Message-State: AOAM530iyD3sj0GxiLDc+3tfd1UY6RX6GQ6AhEi3o0TfzyPPFbjEscy9
+        bBAV1YYlA8etXpBAtGQ9cZBATdwPChth4a2DM86eCg==
+X-Google-Smtp-Source: ABdhPJwDN9Q28DMrxT79iNOEzS/MtxwqOgnmqIpyYh3plJa9laHIJ+7/rwEx0Ej0MHwkBhPKF3CTqDRKMyFHTWJTUYM=
+X-Received: by 2002:a9d:68d9:: with SMTP id i25mr1146175oto.241.1607033242696;
+ Thu, 03 Dec 2020 14:07:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAAAPnDHkZaPZP6ht3y1A5mXkP=T6mDppy-zygKje1Hs5s8huWw@mail.gmail.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.21]
-X-ClientProxiedBy: EX13d09UWA001.ant.amazon.com (10.43.160.247) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+References: <95b9b017-ccde-97a0-f407-fd5f35f1157d@redhat.com>
+ <20201123192223.3177490-1-oupton@google.com> <4788d64f-1831-9eb9-2c78-c5d9934fb47b@redhat.com>
+ <CAOQ_QsiUAVob+3hnAURJF-1+GdRF9HMtuxpKWCB-3m-abRGqxw@mail.gmail.com>
+ <CAOQ_QshMoc9W9g6XRuGM4hCtMdvUxSDpGAhp3vNxhxhWTK-5CQ@mail.gmail.com>
+ <20201124015515.GA75780@google.com> <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
+In-Reply-To: <e140ed23-df91-5da2-965a-e92b4a54e54e@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 3 Dec 2020 14:07:10 -0800
+Message-ID: <CALMp9eTHKihAeq1uK3GfYwk=FkJtHzrxiUM3CqWqX3E+ZNQ_=g@mail.gmail.com>
+Subject: Re: [PATCH v3 11/11] KVM: nVMX: Wake L2 from HLT when nested
+ posted-interrupt pending
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Idan Brown <idan.brown@oracle.com>,
+        kvm list <kvm@vger.kernel.org>, liam.merwick@oracle.com,
+        Wanpeng Li <wanpeng.li@hotmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAwMy4xMi4yMCAyMjo0NywgQWFyb24gTGV3aXMgd3JvdGU6Cj4gQ0FVVElPTjogVGhpcyBl
-bWFpbCBvcmlnaW5hdGVkIGZyb20gb3V0c2lkZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3Qg
-Y2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IGNhbiBjb25maXJtIHRo
-ZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4KPiAKPiAKPiAKPiBPbiBUaHUs
-IERlYyAzLCAyMDIwIGF0IDk6NDggQU0gUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNv
-bT4gd3JvdGU6Cj4+Cj4+IE9uIDAyLzEyLzIwIDE2OjMxLCBBYXJvbiBMZXdpcyB3cm90ZToKPj4+
-IE9uIE1vbiwgTm92IDksIDIwMjAgYXQgOTowOSBBTSBQYW9sbyBCb256aW5pIDxwYm9uemluaUBy
-ZWRoYXQuY29tPiB3cm90ZToKPj4+Pgo+Pj4+IE9uIDA5LzExLzIwIDE3OjU4LCBBYXJvbiBMZXdp
-cyB3cm90ZToKPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IEFhcm9uIExld2lzPGFhcm9ubGV3aXNAZ29v
-Z2xlLmNvbT4KPj4+Pj4+IFJldmlld2VkLWJ5OiBBbGV4YW5kZXIgR3JhZjxncmFmQGFtYXpvbi5j
-b20+Cj4+Pj4+PiAtLS0KPj4+Pj4+ICAgICB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vLmdp
-dGlnbm9yZSAgICAgICAgfCAgIDEgKwo+Pj4+Pj4gICAgIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3Rz
-L2t2bS9NYWtlZmlsZSAgICAgICAgICB8ICAgMSArCj4+Pj4+PiAgICAgdG9vbHMvdGVzdGluZy9z
-ZWxmdGVzdHMva3ZtL2xpYi9rdm1fdXRpbC5jICAgIHwgICAyICsKPj4+Pj4+ICAgICAuLi4va3Zt
-L3g4Nl82NC91c2Vyc3BhY2VfbXNyX2V4aXRfdGVzdC5jICAgICAgfCA1NjAgKysrKysrKysrKysr
-KysrKysrCj4+Pj4+PiAgICAgNCBmaWxlcyBjaGFuZ2VkLCA1NjQgaW5zZXJ0aW9ucygrKQo+Pj4+
-Pj4gICAgIGNyZWF0ZSBtb2RlIDEwMDY0NCB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0veDg2
-XzY0L3VzZXJzcGFjZV9tc3JfZXhpdF90ZXN0LmMKPj4+Pj4+Cj4+Pj4+IEl0IGxvb2tzIGxpa2Ug
-dGhlIHJlc3Qgb2YgdGhpcyBwYXRjaHNldCBoYXMgYmVlbiBhY2NlcHRlZCB1cHN0cmVhbS4KPj4+
-Pj4gSXMgdGhpcyBvbmUgb2theSB0byBiZSB0YWtlbiB0b28/Cj4+Pj4+Cj4+Pj4KPj4+PiBJIG5l
-ZWRlZCBtb3JlIHRpbWUgdG8gdW5kZXJzdGFuZCB0aGUgb3ZlcmxhcCBiZXR3ZWVuIHRoZSB0ZXN0
-cywgYnV0IHllcy4KPj4+Pgo+Pj4+IFBhb2xvCj4+Pj4KPj4+Cj4+PiBQaW5naW5nIHRoaXMgdGhy
-ZWFkLgo+Pj4KPj4+IEp1c3Qgd2FudGVkIHRvIGNoZWNrIGlmIHRoaXMgd2lsbCBiZSB1cHN0cmVh
-bWVkIHNvb24gb3IgaWYgdGhlcmUgYXJlCj4+PiBhbnkgcXVlc3Rpb25zIGFib3V0IGl0Lgo+Pgo+
-PiBZZXMsIEknbSBxdWV1aW5nIGl0LiAgQW55IG9iamVjdGlvbnMgdG8gcmVwbGFjaW5nIHg4Nl82
-NC91c2VyX21zcl90ZXN0LmMKPj4gY29tcGxldGVseSwgc2luY2UgdGhpcyB0ZXN0IGlzIGVmZmVj
-dGl2ZWx5IGEgc3VwZXJzZXQ/Cj4+Cj4+IFBhb2xvCj4+Cj4gCj4gSGkgUGFvbG8sCj4gCj4gVGhl
-IG1haW4gZGlmZmVyZW5jZSBiZXR3ZWVuIHRoZSB0d28gdGVzdHMgaXMgbXkgdGVzdCBkb2VzIG5v
-dCBleGVyY2lzZQo+IHRoZSBLVk1fTVNSX0ZJTFRFUl9ERUZBVUxUX0RFTlkgZmxhZy4gIElmIEFs
-ZXggaXMgb2theSB3aXRoIHRoYXQgdGVzdAo+IGJlaW5nIHJlcGxhY2VkIEknbSBva2F5IHdpdGgg
-aXQuIEhvd2V2ZXIsIEkgd291bGRuJ3QgYmUgb3Bwb3NlZCB0bwo+IGFkZGluZyBpdCBmcm9tIHVz
-ZXJfbXNyX3Rlc3QuYyBpbnRvIG1pbmUuICBUaGF0IHdheSB0aGV5IGFyZSBhbGwgaW4KPiBvbmUg
-cGxhY2UuCgpJIHRoaW5rIHRoYXQgd291bGQgYmUgYmVzdC4gV291bGQgeW91IGhhcHBlbiB0byBo
-YXZlIHNvbWUgdGltZSB0byBqdXN0IAptZXJnZSB0aGVtIHF1aWNrbHk/IEl0J3MgcHJvYmFibHkg
-YmVzdCB0byBmaXJzdCBhcHBseSBib3RoLCBhbmQgdGhlbiAKaGF2ZSBvbmUgcGF0Y2ggdGhhdCBt
-ZXJnZXMgdGhlbS4gOikKCgpUaGFua3MhCgpBbGV4CgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50
-ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVl
-aHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFt
-IEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJs
-aW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+On Tue, Nov 24, 2020 at 3:39 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 24/11/20 02:55, Sean Christopherson wrote:
+> >>> I believe there is a 1-to-many relationship here, which is why I said
+> >>> each CPU would need to maintain a linked list of possible vCPUs to
+> >>> iterate and find the intended recipient.
+> >
+> > Ya, the concern is that it's theoretically possible for the PINV to arrive in L0
+> > after a different vCPU has been loaded (or even multiple different vCPUs).
+> > E.g. if the sending pCPU is hit with an NMI after checking vcpu->mode, and the
+> > NMI runs for some absurd amount of time.  If that happens, the PINV handler
+> > won't know which vCPU(s) should get an IRQ injected into L1 without additional
+> > tracking.  KVM would need to set something like nested.pi_pending before doing
+> > kvm_vcpu_trigger_posted_interrupt(), i.e. nothing really changes, it just gets
+> > more complex.
+>
+> Ah, gotcha.  What if IN_GUEST_MODE/OUTSIDE_GUEST_MODE was replaced by a
+> generation count?  Then you reread vcpu->mode after sending the IPI, and
+> retry if it does not match.
 
+Meanwhile, the IPI that you previously sent may have triggered posted
+interrupt processing for the wrong vCPU.
+
+Consider an overcommitted scenario, where each pCPU is running two
+vCPUs. L1 initializes all of the L2 PIDs so that PIR[x] and PID.ON are
+set. Then, it sends the VMCS12 NV IPI to one specific L2 vCPU. When L0
+processes the VM-exit for sending the IPI, the target vCPU is running
+IN_GUEST_MODE, so we send the vmcs02 NV to the corresponding pCPU.
+But, by the time the IPI is received on the pCPU, a different L2 vCPU
+is running. Oops. It seems that we have to pin the target vCPU to the
+pCPU until the IPI arrives. But since it's the vmcs02 NV, we have no
+way of knowing whether or not it has arrived.
+
+If the requisite IPI delivery delays seem too absurd to contemplate,
+consider pushing L0 down into L1.
+
+> To guarantee atomicity, the OUTSIDE_GUEST_MODE IN_GUEST_MODE
+> EXITING_GUEST_MODE READING_SHADOW_PAGE_TABLES values would remain in the
+> bottom 2 bits.  That is, the vcpu->mode accesses like
+>
+>         vcpu->mode = IN_GUEST_MODE;
+>
+>         vcpu->mode = OUTSIDE_GUEST_MODE;
+>
+>         smp_store_mb(vcpu->mode, READING_SHADOW_PAGE_TABLES);
+>
+>         smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
+>
+>         return cmpxchg(&vcpu->mode, IN_GUEST_MODE, EXITING_GUEST_MODE);
+>
+> becoming
+>
+>         enum {
+>                 OUTSIDE_GUEST_MODE,
+>                 IN_GUEST_MODE,
+>                 EXITING_GUEST_MODE,
+>                 READING_SHADOW_PAGE_TABLES,
+>                 GUEST_MODE_MASK = 3,
+>         };
+>
+>         vcpu->mode = (vcpu->mode | GUEST_MODE_MASK) + 1 + IN_GUEST_MODE;
+>
+>         vcpu->mode &= ~GUEST_MODE_MASK;
+>
+>         smp_store_mb(vcpu->mode, vcpu->mode|READING_SHADOW_PAGE_TABLES);
+>
+>         smp_store_release(&vcpu->mode, vcpu->mode & ~GUEST_MODE_MASK);
+>
+>         int x = READ_ONCE(vcpu->mode);
+>         do {
+>                 if ((x & GUEST_MODE_MASK) != IN_GUEST_MODE)
+>                         return x & GUEST_MODE_MASK;
+>         } while (!try_cmpxchg(&vcpu->mode, &x,
+>                               x ^ IN_GUEST_MODE ^ EXITING_GUEST_MODE))
+>         return IN_GUEST_MODE;
+>
+> You could still get spurious posted interrupt IPIs, but the IPI handler
+> need not do anything at all and that is much better.
+>
+> > if we're ok with KVM
+> > processing virtual interrupts that technically shouldn't happen, yet.  E.g. if
+> > the L0 PINV handler consumes vIRR bits that were set after the last PI from L1.
+>
+> I actually find it curious that the spec promises posted interrupt
+> processing to be triggered only by the arrival of the posted interrupt
+> IPI.  Why couldn't the processor in principle snoop for the address of
+> the ON bit instead, similar to an MWAIT?
+>
+> But even without that, I don't think the spec promises that kind of
+> strict ordering with respect to what goes on in the source.  Even though
+> posted interrupt processing is atomic with the acknowledgement of the
+> posted interrupt IPI, the spec only promises that the PINV triggers an
+> _eventual_ scan of PID.PIR when the interrupt controller delivers an
+> unmasked external interrupt to the destination CPU.  You can still have
+> something like
+>
+>         set PID.PIR[100]
+>         set PID.ON
+>                                         processor starts executing a
+>                                          very slow instruction...
+>         send PINV
+>         set PID.PIR[200]
+>                                         acknowledge PINV
+>
+> and then vector 200 would be delivered before vector 100.  Of course
+> with nested PI the effect would be amplified, but it's possible even on
+> bare metal.
+>
+> Paolo
+>
