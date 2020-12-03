@@ -2,93 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C89002CE043
-	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 22:01:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 092C62CE0D6
+	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 22:37:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727850AbgLCVAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Dec 2020 16:00:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44416 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726314AbgLCVAX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Dec 2020 16:00:23 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B93C061A51
-        for <kvm@vger.kernel.org>; Thu,  3 Dec 2020 12:59:43 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id 4so1881373pla.6
-        for <kvm@vger.kernel.org>; Thu, 03 Dec 2020 12:59:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=S5ra3fFtwyrR4DBSDAkXB7bmFSTJjJvoJm1aScqSvD8=;
-        b=CMgmPGQ3LRAJ91emyWbIDeeu4Npdy86zsS9HBSAc8ghZ8AyFtq8IPAKujurb3BXMl6
-         qydVnY5AUbZc+vdzxNbWWmIYmU4B56Pn368RqYqcA/O84Rn1fAmI+r5iI/4QxefdR5L4
-         iQPuaefyDoLSUm69oF0b5m4cjGZdtvwKugIsWO4AGpChjbjG3aZNa/TpTARfvmP7XDMv
-         kYG4ybDJe0sJEk612YLAPX11BceZM8h3ap3K0/bEhhEFT2n2BI4/ChT6ITK0bUC3ZAtT
-         gej5444rFOdUyWbg53TWG8bvVleKc4MyYctWo1+IF5Y2QdMGnyziGqHn4tNa6P/rBz3k
-         R3fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=S5ra3fFtwyrR4DBSDAkXB7bmFSTJjJvoJm1aScqSvD8=;
-        b=l4BaOkRfV1slAQ+wc0ZcLOYJjE1qKRS6Lm5xQg9ubGuA0XDKjkHgn4b5yatlHBBpNI
-         coQkwpeJ+j/c0RoDAICE1AwKNRX8gZ7aOUgF9ZShlu+pWo324RpVZnJV+/Lg36vMjzd+
-         plBjBSL38yTjXMMHpR9ASQpP7hINkauNm84hMzH9defslcWWIlqp2eKGngtbmQPrnpoZ
-         vY3/ARr99Yi5wYiDFp1zMJzqaQVEB5R8UOjO+iyYJiotnf63VoXB1OfDvc8hurSVdkeI
-         sKgtwi4P3JyALzWFZXyADjk97YvH8k6OvsS5bBHiSQTUaYWDtkY8MRzrFGqd0CSF3Uax
-         jwPw==
-X-Gm-Message-State: AOAM5335QjkkKNvlCq9pd4ZcrQ0z2+qh4DVf8k+HE45g0zd2ogHF145F
-        Bzl44WAaFfCQtbLdSJjCNABm3AFbXih8Ng==
-X-Google-Smtp-Source: ABdhPJzp6sEpJwizJg9kJ4t6HFh8/cL5/4seSshW8xQdAExolaPsro05znE1zqmIooU9dIASPm7CyJikDZMC8w==
-Sender: "jacobhxu via sendmgr" <jacobhxu@mhmmm.sea.corp.google.com>
-X-Received: from mhmmm.sea.corp.google.com ([2620:15c:100:202:f693:9fff:feef:a9a1])
- (user=jacobhxu job=sendmgr) by 2002:a62:1a16:0:b029:197:eabc:9b74 with SMTP
- id a22-20020a621a160000b0290197eabc9b74mr683802pfa.62.1607029182775; Thu, 03
- Dec 2020 12:59:42 -0800 (PST)
-Date:   Thu,  3 Dec 2020 12:59:39 -0800
-Message-Id: <20201203205939.1783969-1-jacobhxu@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH] kvm: svm: de-allocate svm_cpu_data for all cpus in svm_cpu_uninit()
-From:   Jacob Xu <jacobhxu@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jacob Xu <jacobhxu@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1728923AbgLCVgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Dec 2020 16:36:06 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62368 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728252AbgLCVgF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Dec 2020 16:36:05 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B3LYXo3027151;
+        Thu, 3 Dec 2020 16:35:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=202NPPv11LZXskIKT2kUmTrWRL/sWF+vMp8dh5k9rv0=;
+ b=Bd8H4QiwsZlIGgF+2kDRPYFgpigqbB/0dK2kL41Xqo0c+/AIkzORBPjxi2iTn43RE0MC
+ Q0IF81AYEdunv3i3MaepVWAu0VOCrA2G7/jXk4ODWI2Cboq5zNTOcauDm7qtAVyr3CPw
+ fEJQeYpBuEV0T7b/nzKtqQ0ZHHPWLo8XGXJNS/QUqTJRj61hC3kOdLVaNi+Whu6QEKvW
+ FE2w11BNI1kfUAbQVLzJ9hKF8xT9ItVF9FV/CD71AUBtWcygowyCrtUK6IBvNDeE+4+D
+ DtqAikB6qRhp9tmtQp2BGuGgJtlFbf8PYDvD+NCwpmAMoz4ddQUuB5PVqluOmVqjmKX9 0g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35775csgqa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Dec 2020 16:35:20 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B3LYcMA027701;
+        Thu, 3 Dec 2020 16:35:20 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35775csgpm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Dec 2020 16:35:20 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B3LW8aq021225;
+        Thu, 3 Dec 2020 21:35:18 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3573v9r67q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Dec 2020 21:35:18 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B3LZFed1835584
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 3 Dec 2020 21:35:15 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B3B0AAE053;
+        Thu,  3 Dec 2020 21:35:15 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9E892AE045;
+        Thu,  3 Dec 2020 21:35:15 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu,  3 Dec 2020 21:35:15 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 14A8DE01E6; Thu,  3 Dec 2020 22:35:15 +0100 (CET)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH v3 0/2] Connect request callback to mdev and vfio-ccw
+Date:   Thu,  3 Dec 2020 22:35:10 +0100
+Message-Id: <20201203213512.49357-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-12-03_12:2020-12-03,2020-12-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 spamscore=0 mlxscore=0 malwarescore=0 adultscore=0
+ phishscore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0
+ clxscore=1015 mlxlogscore=817 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2012030122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The cpu arg for svm_cpu_uninit() was previously ignored resulting in the
-per cpu structure svm_cpu_data not being de-allocated for all cpus.
+Alex,
 
-Signed-off-by: Jacob Xu <jacobhxu@google.com>
----
- arch/x86/kvm/svm/svm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+As promised, here is a v3 with a message indicating a request is blocked
+until a user releases the device in question and a corresponding tweak to
+the commit message describing this change (and Conny's r-b). The remainder
+of the patches are otherwise identical.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 79b3a564f1c9..da7eb4aaf44f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -530,12 +530,12 @@ static int svm_hardware_enable(void)
- 
- static void svm_cpu_uninit(int cpu)
- {
--	struct svm_cpu_data *sd = per_cpu(svm_data, raw_smp_processor_id());
-+	struct svm_cpu_data *sd = per_cpu(svm_data, cpu);
- 
- 	if (!sd)
- 		return;
- 
--	per_cpu(svm_data, raw_smp_processor_id()) = NULL;
-+	per_cpu(svm_data, cpu) = NULL;
- 	kfree(sd->sev_vmcbs);
- 	__free_page(sd->save_area);
- 	kfree(sd);
+v2      : https://lore.kernel.org/kvm/20201120180740.87837-1-farman@linux.ibm.com/
+v1(RFC) : https://lore.kernel.org/kvm/20201117032139.50988-1-farman@linux.ibm.com/
+
+Eric Farman (2):
+  vfio-mdev: Wire in a request handler for mdev parent
+  vfio-ccw: Wire in the request callback
+
+ drivers/s390/cio/vfio_ccw_ops.c     | 26 ++++++++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_private.h |  4 ++++
+ drivers/vfio/mdev/mdev_core.c       |  4 ++++
+ drivers/vfio/mdev/vfio_mdev.c       | 13 +++++++++++++
+ include/linux/mdev.h                |  4 ++++
+ include/uapi/linux/vfio.h           |  1 +
+ 6 files changed, 52 insertions(+)
+
 -- 
-2.29.2.576.ga3fc446d84-goog
+2.17.1
 
