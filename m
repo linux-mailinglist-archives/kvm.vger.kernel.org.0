@@ -2,217 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D719F2CCCF3
-	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 04:05:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 277CD2CCD66
+	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 04:40:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727697AbgLCDEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Dec 2020 22:04:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43324 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726977AbgLCDEh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Dec 2020 22:04:37 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B332vhq032666;
-        Wed, 2 Dec 2020 22:03:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=wFHLqLOz/dEosuKfUSnxuOQoZ30RXFoV+tYFwRLbGrc=;
- b=k/exz9gOnoEVWkqmG0xixN/T0DxbS8DJEjZzJtV0l63WAOcC/je8EZJO+kSHTMgm8Q4p
- 6p4zzdKE7lvvfF1uln7dCVA0v4LZZiZJtIRKEZnwDUmo9U5PnWlKS8/trtsmyQIWgG+c
- e6JqJibuctz9bLtR9/KgxCBu36IzY2WglLu2xTRHufNmtBWmysa/HKEPlXliwk7by4e9
- /lvYC4DP+2stgb/YUz0deQFYXNKTw8oIlhIiIV6XnypV147SjZ0Ghy5nNKhNWTqFFH9g
- p87EREugNMVuHECQE3HsQYQl6RcOxO5KaOC9jmYCO/D8ka3GdMoX3aV9D1fReDxzRv2S DA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 355jjjbqah-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Dec 2020 22:03:56 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B33338U032895;
-        Wed, 2 Dec 2020 22:03:56 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 355jjjbq9s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Dec 2020 22:03:55 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B332wF6008826;
-        Thu, 3 Dec 2020 03:03:54 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma01wdc.us.ibm.com with ESMTP id 355vrfvp8a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Dec 2020 03:03:54 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B332cv216319078
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Dec 2020 03:02:38 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BFF6DB205F;
-        Thu,  3 Dec 2020 03:02:38 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5B94B2064;
-        Thu,  3 Dec 2020 03:02:37 +0000 (GMT)
-Received: from [9.211.50.183] (unknown [9.211.50.183])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  3 Dec 2020 03:02:37 +0000 (GMT)
-Subject: Re: [PATCH v2 1/2] vfio-mdev: Wire in a request handler for mdev
- parent
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20201120180740.87837-1-farman@linux.ibm.com>
- <20201120180740.87837-2-farman@linux.ibm.com>
- <20201202132838.6a872c17@w520.home>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <eacaffbf-81eb-4d3d-a8eb-e8da8100c313@linux.ibm.com>
-Date:   Wed, 2 Dec 2020 22:02:36 -0500
+        id S1729616AbgLCDkJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Dec 2020 22:40:09 -0500
+Received: from relay-us1.mymailcheap.com ([51.81.35.219]:45456 "EHLO
+        relay-us1.mymailcheap.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727449AbgLCDkI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Dec 2020 22:40:08 -0500
+Received: from relay5.mymailcheap.com (relay5.mymailcheap.com [159.100.248.207])
+        by relay-us1.mymailcheap.com (Postfix) with ESMTPS id 78B2C20F6B
+        for <kvm@vger.kernel.org>; Thu,  3 Dec 2020 03:39:27 +0000 (UTC)
+Received: from relay3.mymailcheap.com (relay3.mymailcheap.com [217.182.119.155])
+        by relay5.mymailcheap.com (Postfix) with ESMTPS id 1A14D260EB
+        for <kvm@vger.kernel.org>; Thu,  3 Dec 2020 03:38:35 +0000 (UTC)
+Received: from filter1.mymailcheap.com (filter1.mymailcheap.com [149.56.130.247])
+        by relay3.mymailcheap.com (Postfix) with ESMTPS id 7ECBD3F15F;
+        Thu,  3 Dec 2020 04:37:02 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by filter1.mymailcheap.com (Postfix) with ESMTP id C188B2A374;
+        Wed,  2 Dec 2020 22:37:01 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+        s=default; t=1606966621;
+        bh=70YbnXa0sCfLKWQ9uffWIJYIy3lO51uB5MTk6KloPno=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=LIX5/vCvoGrRXuVIubqQHVqIi76ma7xML9wx83d6fXt3LfGB9YRIl23IBvglVHaVN
+         GpnD/6L6TCusoJOjz7473nS9CcewpOkJe3aE5LD2mODKknRtO75CzcEVj5G9sEmLzs
+         AFARWwyis8yfbrylZtCe7+kz3ArOe+sIEsRdAfYY=
+X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
+Received: from filter1.mymailcheap.com ([127.0.0.1])
+        by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id abE1zEUi6Byy; Wed,  2 Dec 2020 22:36:58 -0500 (EST)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by filter1.mymailcheap.com (Postfix) with ESMTPS;
+        Wed,  2 Dec 2020 22:36:58 -0500 (EST)
+Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
+        by mail20.mymailcheap.com (Postfix) with ESMTP id BFE214100D;
+        Thu,  3 Dec 2020 03:36:55 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com;
+        dkim=pass (1024-bit key; unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="IQ8Vho6E";
+        dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (li1861-199.members.linode.com [172.105.207.199])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail20.mymailcheap.com (Postfix) with ESMTPSA id EDAF74100D;
+        Thu,  3 Dec 2020 03:36:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+        s=default; t=1606966611;
+        bh=70YbnXa0sCfLKWQ9uffWIJYIy3lO51uB5MTk6KloPno=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=IQ8Vho6EEVoYb2ck3j7oEbuHAYh2H5KtFuNsLlz1lkYTGA4uIykm8i97JYtwSch0O
+         NAHnCrQuCYLnCzYz82FA0kgkX3Od8yQ4Pc9PQiDmjp7jOZn42T5ga+IIU3dJLUZzAm
+         +Qd5apxycTDOJKUd/R/qBussg4hEWqbMBkFRzYLU=
+Subject: Re: [PATCH 0/9] target/mips: Simplify MSA TCG logic
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Huacai Chen <chenhc@lemote.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm@vger.kernel.org,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20201202184415.1434484-1-f4bug@amsat.org>
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <b98de2d2-98db-1e34-64fd-ec0b4cafae11@flygoat.com>
+Date:   Thu, 3 Dec 2020 11:36:43 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-In-Reply-To: <20201202132838.6a872c17@w520.home>
+In-Reply-To: <20201202184415.1434484-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-12-03_01:2020-11-30,2020-12-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 phishscore=0 clxscore=1015 impostorscore=0
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012030017
+X-Rspamd-Queue-Id: BFE214100D
+X-Spamd-Result: default: False [2.90 / 10.00];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         RECEIVED_SPAMHAUS_XBL(3.00)[172.105.207.199:received];
+         R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+         ARC_NA(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         R_SPF_SOFTFAIL(0.00)[~all];
+         ML_SERVERS(-3.10)[148.251.23.173];
+         DKIM_TRACE(0.00)[flygoat.com:+];
+         DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+         RCPT_COUNT_SEVEN(0.00)[8];
+         DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
+         RCVD_COUNT_TWO(0.00)[2];
+         MID_RHS_MATCH_FROM(0.00)[];
+         HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1]
+X-Rspamd-Server: mail20.mymailcheap.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12/2/20 3:28 PM, Alex Williamson wrote:
-> On Fri, 20 Nov 2020 19:07:39 +0100
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> While performing some destructive tests with vfio-ccw, where the
->> paths to a device are forcible removed and thus the device itself
->> is unreachable, it is rather easy to end up in an endless loop in
->> vfio_del_group_dev() due to the lack of a request callback for the
->> associated device.
->>
->> In this example, one MDEV (77c) is used by a guest, while another
->> (77b) is not. The symptom is that the iommu is detached from the
->> mdev for 77b, but not 77c, until that guest is shutdown:
->>
->>      [  238.794867] vfio_ccw 0.0.077b: MDEV: Unregistering
->>      [  238.794996] vfio_mdev 11f2d2bc-4083-431d-a023-eff72715c4f0: Removing from iommu group 2
->>      [  238.795001] vfio_mdev 11f2d2bc-4083-431d-a023-eff72715c4f0: MDEV: detaching iommu
->>      [  238.795036] vfio_ccw 0.0.077c: MDEV: Unregistering
->>      ...silence...
->>
->> Let's wire in the request call back to the mdev device, so that a
->> device being physically removed from the host can be (gracefully?)
->> handled by the parent device at the time the device is removed.
->>
->> Add a message when registering the device if a driver doesn't
->> provide this callback, so a clue is given that this same loop
->> may be encountered in a similar situation.
->>
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> ---
->>   drivers/vfio/mdev/mdev_core.c |  4 ++++
->>   drivers/vfio/mdev/vfio_mdev.c | 10 ++++++++++
->>   include/linux/mdev.h          |  4 ++++
->>   3 files changed, 18 insertions(+)
->>
->> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
->> index b558d4cfd082..6de97d25a3f8 100644
->> --- a/drivers/vfio/mdev/mdev_core.c
->> +++ b/drivers/vfio/mdev/mdev_core.c
->> @@ -154,6 +154,10 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
->>   	if (!dev)
->>   		return -EINVAL;
->>   
->> +	/* Not mandatory, but its absence could be a problem */
->> +	if (!ops->request)
->> +		dev_info(dev, "Driver cannot be asked to release device\n");
->> +
->>   	mutex_lock(&parent_list_lock);
->>   
->>   	/* Check for duplicate */
->> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
->> index 30964a4e0a28..06d8fc4a6d72 100644
->> --- a/drivers/vfio/mdev/vfio_mdev.c
->> +++ b/drivers/vfio/mdev/vfio_mdev.c
->> @@ -98,6 +98,15 @@ static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
->>   	return parent->ops->mmap(mdev, vma);
->>   }
->>   
->> +static void vfio_mdev_request(void *device_data, unsigned int count)
->> +{
->> +	struct mdev_device *mdev = device_data;
->> +	struct mdev_parent *parent = mdev->parent;
->> +
->> +	if (parent->ops->request)
->> +		parent->ops->request(mdev, count);
-> 
-> What do you think about duplicating the count==0 notice in the else
-> case here?  ie.
-> 
-> 	else if (count == 0)
-> 		dev_notice(mdev_dev(mdev), "No mdev vendor driver	request callback support, blocked until released by user\n");
-> 
+在 2020/12/3 上午2:44, Philippe Mathieu-Daudé 写道:
+> I converted MSA opcodes to decodetree. To keep the series
+> small I split it in 2, this is the non-decodetree specific
+> patches (so non-decodetree experts can review it ;) ).
+>
+> First we stop using env->insn_flags to check for MSAi
+> presence, then we restrict TCG functions to DisasContext*.
 
-I'm fine with that. If there are no objections, I should be able to spin 
-a v3 with such a change tomorrow.
+Hi Philippe,
 
-Thank you!
+For the whole series,
+Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 
-Eric
 
-> This at least puts something in the log a bit closer to the timeframe
-> of a possible issue versus the registration nag.  vfio-core could do
-> this too, but vfio-mdev registers a request callback on behalf of all
-> mdev devices, so vfio-core would no longer have visibility for this
-> case.
-> 
-> Otherwise this series looks fine to me and I can take it through the
-> vfio tree.  Thanks,
-> 
-> Alex
-> 
->> +}
->> +
->>   static const struct vfio_device_ops vfio_mdev_dev_ops = {
->>   	.name		= "vfio-mdev",
->>   	.open		= vfio_mdev_open,
->> @@ -106,6 +115,7 @@ static const struct vfio_device_ops vfio_mdev_dev_ops = {
->>   	.read		= vfio_mdev_read,
->>   	.write		= vfio_mdev_write,
->>   	.mmap		= vfio_mdev_mmap,
->> +	.request	= vfio_mdev_request,
->>   };
->>   
->>   static int vfio_mdev_probe(struct device *dev)
->> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
->> index 0ce30ca78db0..9004375c462e 100644
->> --- a/include/linux/mdev.h
->> +++ b/include/linux/mdev.h
->> @@ -72,6 +72,9 @@ struct device *mdev_get_iommu_device(struct device *dev);
->>    * @mmap:		mmap callback
->>    *			@mdev: mediated device structure
->>    *			@vma: vma structure
->> + * @request:		request callback to release device
->> + *			@mdev: mediated device structure
->> + *			@count: request sequence number
->>    * Parent device that support mediated device should be registered with mdev
->>    * module with mdev_parent_ops structure.
->>    **/
->> @@ -92,6 +95,7 @@ struct mdev_parent_ops {
->>   	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
->>   			 unsigned long arg);
->>   	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
->> +	void	(*request)(struct mdev_device *mdev, unsigned int count);
->>   };
->>   
->>   /* interface for exporting mdev supported type attributes */
-> 
+I'm just curious about how would you deal with so many condition flags
+with decodetree?
+
+Unlike other ISAs, MIPS have so many flavors, every ISA level (MIPS-III 
+R2 R5 R6)
+has it's own instructions, and in my understanding decodetree file won't 
+generate
+these switches. I was trying to do the same thing but soon find out 
+we'll have around
+20 decodertree for MIPS.
+
+Thanks.
+
+- Jiaxun
+
+>
+> Based-on: <20201130102228.2395100-1-f4bug@amsat.org>
+> "target/mips: Allow executing MSA instructions on Loongson-3A4000"
+>
+> Philippe Mathieu-Daudé (9):
+>    target/mips: Introduce ase_msa_available() helper
+>    target/mips: Simplify msa_reset()
+>    target/mips: Use CP0_Config3 to set MIPS_HFLAG_MSA
+>    target/mips: Simplify MSA TCG logic
+>    target/mips: Remove now unused ASE_MSA definition
+>    target/mips: Alias MSA vector registers on FPU scalar registers
+>    target/mips: Extract msa_translate_init() from mips_tcg_init()
+>    target/mips: Remove CPUMIPSState* argument from gen_msa*() methods
+>    target/mips: Explode gen_msa_branch() as gen_msa_BxZ_V/BxZ()
+>
+>   target/mips/internal.h           |   8 +-
+>   target/mips/mips-defs.h          |   1 -
+>   target/mips/kvm.c                |  12 +-
+>   target/mips/translate.c          | 206 ++++++++++++++++++-------------
+>   target/mips/translate_init.c.inc |  12 +-
+>   5 files changed, 138 insertions(+), 101 deletions(-)
+>
