@@ -2,104 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9783C2CD669
-	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 14:12:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A1F92CD69D
+	for <lists+kvm@lfdr.de>; Thu,  3 Dec 2020 14:24:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388112AbgLCNLj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Dec 2020 08:11:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45676 "EHLO
+        id S2388397AbgLCNXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Dec 2020 08:23:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27447 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726302AbgLCNLj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Dec 2020 08:11:39 -0500
+        by vger.kernel.org with ESMTP id S2388022AbgLCNXE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Dec 2020 08:23:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607001012;
+        s=mimecast20190719; t=1607001697;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QmzYaUkBaQ2Yctwjpp50+AT2BYlAlf7JoSbm5HLlJOI=;
-        b=KkcC05OnMUXT8uAj0oq4eNtfyDX6TFeNTWAE1PoniWpjHWBBRWeFMXB4Zoo8IHFjA7DHce
-        44Xv77JxphbU7mpSuPD0PtxSJ6rdS4bQWvBLVXUnT8hhq5lNTEnXTwu8DO2MGm9JzSrNS2
-        96yJFVYyh9uomO4ALAFuA8HahZGH8O0=
+        bh=17TeDiAi7K0S6jRLyvG5tS2QR8aHxbPehr3O5F8cUhM=;
+        b=OIXeNNWlmZWXlDIcna6USG9ZJi9YAOU85DIrWwmhso4fiS4LsNaNsqONnP7MtFU2Wwl3cQ
+        iLZhDFkxYlx+flOzxtban3ec3TiMEego+xP6dptPfVI2a1GIrdGSfh5b/gfYH3dYZ1pM19
+        0egntsJMDI/lQvP7xi7YbnesqaWLIwU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-z5pjIOBOObyc92aaxOOOaQ-1; Thu, 03 Dec 2020 08:10:08 -0500
-X-MC-Unique: z5pjIOBOObyc92aaxOOOaQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-206-cvC7Zs4DNKGhVXB9qF5XVQ-1; Thu, 03 Dec 2020 08:21:33 -0500
+X-MC-Unique: cvC7Zs4DNKGhVXB9qF5XVQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA1A1100C60E;
-        Thu,  3 Dec 2020 13:10:07 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F62AA0CA6;
+        Thu,  3 Dec 2020 13:21:32 +0000 (UTC)
 Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B10C5C1B4;
-        Thu,  3 Dec 2020 13:10:06 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 04/10] arm/arm64: gic: Remove unnecessary
- synchronization with stats_reset()
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A97715D9CA;
+        Thu,  3 Dec 2020 13:21:30 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 07/10] arm/arm64: gic: Wait for writes to
+ acked or spurious to complete
 To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, drjones@redhat.com
 Cc:     andre.przywara@arm.com
 References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-5-alexandru.elisei@arm.com>
+ <20201125155113.192079-8-alexandru.elisei@arm.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <46af2717-6da7-3ea1-5ac0-1283b1d842cf@redhat.com>
-Date:   Thu, 3 Dec 2020 14:10:05 +0100
+Message-ID: <179b4f5f-8bdf-1922-f79a-930bde2ed103@redhat.com>
+Date:   Thu, 3 Dec 2020 14:21:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20201125155113.192079-5-alexandru.elisei@arm.com>
+In-Reply-To: <20201125155113.192079-8-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hi Alexandru,
 
 On 11/25/20 4:51 PM, Alexandru Elisei wrote:
-> The GICv3 driver executes a DSB barrier before sending an IPI, which
-> ensures that memory accesses have completed. This removes the need to
-> enforce ordering with respect to stats_reset() in the IPI handler.
+> The IPI test has two parts: in the first part, it tests that the sender CPU
+> can send an IPI to itself (ipi_test_self()), and in the second part it
+> sends interrupts to even-numbered CPUs (ipi_test_smp()). When acknowledging
+> an interrupt, if we read back a spurious interrupt ID (1023), the handler
+> increments the index in the static array spurious corresponding to the CPU
+> ID that the handler is running on; if we get the expected interrupt ID, we
+> increment the same index in the acked array.
 > 
-> For GICv2, we still need the DMB to ensure ordering between the read of the
-> GICC_IAR MMIO register and the read from the acked array. It also matches
-> what the Linux GICv2 driver does in gic_handle_irq().
+> Reads of the spurious and acked arrays are synchronized with writes
+> performed before sending the IPI. The synchronization is done either in the
+> IPI sender function (GICv3), either by creating a data dependency (GICv2).
+> 
+> At the end of the test, the sender CPU reads from the acked and spurious
+> arrays to check against the expected behaviour. We need to make sure the
+> that writes in ipi_handler() are observable by the sender CPU. Use a DSB
+> ISHST to make sure that the writes have completed.
+> 
+> One might rightfully argue that there are no guarantees regarding when the
+> DSB instruction completes, just like there are no guarantees regarding when
+> the value is observed by the other CPUs. However, let's do our best and
+> instruct the CPU to complete the memory access when we know that it will be
+> needed.
+> 
+> We still need to follow the message passing pattern for the acked,
+> respectively bad_irq and bad_sender, because DSB guarantees that all memory
+> accesses that come before the barrier have completed, not that they have
+> completed in program order.
+I guess the removal of the smp_rmb in check_spurious should belong to
+that patch?
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Besides, AFAIU
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
 
 Eric
 > ---
->  arm/gic.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+>  arm/gic.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arm/gic.c b/arm/gic.c
-> index 4e947e8516a2..7befda2a8673 100644
+> index 5727d72a0ef3..544c283f5f47 100644
 > --- a/arm/gic.c
 > +++ b/arm/gic.c
-> @@ -60,7 +60,6 @@ static void stats_reset(void)
->  		bad_sender[i] = -1;
->  		bad_irq[i] = -1;
+> @@ -161,8 +161,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
+>  		++acked[smp_processor_id()];
+>  	} else {
+>  		++spurious[smp_processor_id()];
+> -		smp_wmb();
 >  	}
-> -	smp_wmb();
+> +
+> +	/* Wait for writes to acked/spurious to complete */
+> +	dsb(ishst);
 >  }
 >  
->  static void check_acked(const char *testname, cpumask_t *mask)
-> @@ -150,7 +149,13 @@ static void ipi_handler(struct pt_regs *regs __unused)
->  
->  	if (irqnr != GICC_INT_SPURIOUS) {
->  		gic_write_eoir(irqstat);
-> -		smp_rmb(); /* pairs with wmb in stats_reset */
-> +		/*
-> +		 * Make sure data written before the IPI was triggered is
-> +		 * observed after the IAR is read. Pairs with the smp_wmb
-> +		 * when sending the IPI.
-> +		 */
-> +		if (gic_version() == 2)
-> +			smp_rmb();
->  		++acked[smp_processor_id()];
->  		check_ipi_sender(irqstat);
->  		check_irqnr(irqnr);
+>  static void setup_irq(irq_handler_fn handler)
 > 
 
