@@ -2,137 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20AF52CEC22
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 11:26:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 261912CECC5
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 12:10:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729861AbgLDKZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 05:25:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27470 "EHLO
+        id S1729951AbgLDLJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 06:09:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39454 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729852AbgLDKZp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 05:25:45 -0500
+        by vger.kernel.org with ESMTP id S1727365AbgLDLJv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 06:09:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607077458;
+        s=mimecast20190719; t=1607080105;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2T15ek84GRYZBFIB7crwXKiwkKfTgxR0/uZEpJtiF7w=;
-        b=SLloYKDdYp+CyHGbNW1sCRZTqmqcoNANfgfQiNf33KX/U9SJJ8FWt4gAsaCyi0OlECXUTh
-        tnCg9VcF8JPH62IgEFAKiwfC2E+lG83cf2fvTO0Bs47rSGm6LuOzONSYQHiuBTxKn7uqCA
-        vxpNO48A3DuXVYqUtyffL+o6tdp4hOg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-EHJ7jY99MrmUOFed-1HElg-1; Fri, 04 Dec 2020 05:24:13 -0500
-X-MC-Unique: EHJ7jY99MrmUOFed-1HElg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E4C8180A087;
-        Fri,  4 Dec 2020 10:24:11 +0000 (UTC)
-Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 59A2C620D7;
-        Fri,  4 Dec 2020 10:23:59 +0000 (UTC)
-Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
- unmanaged ASIDs
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     wangxingang <wangxingang5@huawei.com>,
-        Xieyingtai <xieyingtai@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        qubingbing <qubingbing@hisilicon.com>
-References: <20201118112151.25412-8-eric.auger@redhat.com>
- <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
- <2e69adf5-8207-64f7-fa8e-9f2bd3a3c4e3@redhat.com>
- <e10ad90dc5144c0d9df98a9a078091af@huawei.com>
- <20201204095338.GA1912466@myrica>
- <2de03a797517452cbfeab022e12612b7@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <0bf50dd6-ef3c-7aba-cbc1-1c2e17088470@redhat.com>
-Date:   Fri, 4 Dec 2020 11:23:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=51Ta8qG1IJwa9FMhdW7Zn/PZ+B+58uhGmZ7f+I3PgHQ=;
+        b=G2cAzR3TjPli7PM4v2tlSj95HPKpGMnAKiLCgXfQCwz90y/OA2WpAFNfGQjeCzBoBRDK3F
+        3TLnVz1z9fVy2e0HiVzpCnjw6/MQW/NG0TV9N6kqxQkbfIh1HOcn0pEx9iE1nf1Lg50pXk
+        mKRn+FS6oNs0PEFv8p4Lh8RpH9Bmf6Y=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-ywXqg6rrN3Wg9Lzkvmx1pg-1; Fri, 04 Dec 2020 06:08:23 -0500
+X-MC-Unique: ywXqg6rrN3Wg9Lzkvmx1pg-1
+Received: by mail-wr1-f71.google.com with SMTP id b1so2376014wrc.14
+        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 03:08:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=51Ta8qG1IJwa9FMhdW7Zn/PZ+B+58uhGmZ7f+I3PgHQ=;
+        b=oHxhaK4DOptQxa/z/mGrOS2mkdjjsuTQauv/QytojWvJGBYVooVZGq5TCH7fsWPGpm
+         zFM1VcAZCl4PKEC6U55iOeupCvvaFmYQSILdw0jF8RVjtQmnLsYxW8mBLQtPJahWkuLA
+         6Jpi9006TNm3pZl44LfvlJ28i+QRH97Z1+iD/zNVbp2Ks35SP8utw8dBtjbff9Nv1vn+
+         7/uSnldGa7lmVB9eTtldvFQKXUndMSconNmVEwo4A32MAvHnqIHsY+13HRzSvHYyGezd
+         U+eduNASwitPbh9hjs7gNsHETSyrEGHUlTUghI+LfId6TfG2DrQjUftHhXxkbUNGltGT
+         XsSw==
+X-Gm-Message-State: AOAM532V20okIlc3maOfAHmjISSMqILCg+pAOy6vurBGs5XLghE6bl+Q
+        iHnRcS/TMa6SSsIXeDwRo/+aKNCSW8TlPxAayg6gYSkCBVFBmeWs/LgJqmn+1spq7Awr/4aj9Kg
+        B4yp75Qt/fDTR
+X-Received: by 2002:a7b:cb82:: with SMTP id m2mr3540694wmi.75.1607080102592;
+        Fri, 04 Dec 2020 03:08:22 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxaSpQbJ4PCf7tY/VAwGU9ugjT37tjEuse2PP6trdypYVGMkqe9JgB5jOkELb4bTR9auHQTnQ==
+X-Received: by 2002:a7b:cb82:: with SMTP id m2mr3540670wmi.75.1607080102413;
+        Fri, 04 Dec 2020 03:08:22 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b17sm2245212wrv.10.2020.12.04.03.08.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Dec 2020 03:08:21 -0800 (PST)
+Subject: Re: [PATCH v8 12/18] KVM: SVM: Add support for static allocation of
+ unified Page Encryption Bitmap.
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, bp@suse.de, Thomas.Lendacky@amd.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        srutherford@google.com, rientjes@google.com,
+        venu.busireddy@oracle.com, brijesh.singh@amd.com
+References: <cover.1588711355.git.ashish.kalra@amd.com>
+ <17c14245a404ff679253313ffe899c5f4e966717.1588711355.git.ashish.kalra@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <617d3cba-cbe0-0f18-bdf2-e73a70e472d6@redhat.com>
+Date:   Fri, 4 Dec 2020 12:08:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <2de03a797517452cbfeab022e12612b7@huawei.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <17c14245a404ff679253313ffe899c5f4e966717.1588711355.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shameer, Jean-Philippe,
+On 05/05/20 23:18, Ashish Kalra wrote:
+> Add support for static 
+> allocation of the unified Page encryption bitmap by extending 
+> kvm_arch_commit_memory_region() callack to add svm specific x86_ops 
+> which can read the userspace provided memory region/memslots and 
+> calculate the amount of guest RAM managed by the KVM and grow the bitmap 
+> based on that information, i.e. the highest guest PA that is mapped by a 
+> memslot.
 
-On 12/4/20 11:20 AM, Shameerali Kolothum Thodi wrote:
-> Hi Jean,
-> 
->> -----Original Message-----
->> From: Jean-Philippe Brucker [mailto:jean-philippe@linaro.org]
->> Sent: 04 December 2020 09:54
->> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
->> Cc: Auger Eric <eric.auger@redhat.com>; wangxingang
->> <wangxingang5@huawei.com>; Xieyingtai <xieyingtai@huawei.com>;
->> kvm@vger.kernel.org; maz@kernel.org; joro@8bytes.org; will@kernel.org;
->> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
->> vivek.gautam@arm.com; alex.williamson@redhat.com;
->> zhangfei.gao@linaro.org; robin.murphy@arm.com;
->> kvmarm@lists.cs.columbia.edu; eric.auger.pro@gmail.com; Zengtao (B)
->> <prime.zeng@hisilicon.com>; qubingbing <qubingbing@hisilicon.com>
->> Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
->> unmanaged ASIDs
->>
->> Hi Shameer,
->>
->> On Thu, Dec 03, 2020 at 06:42:57PM +0000, Shameerali Kolothum Thodi wrote:
->>> Hi Jean/zhangfei,
->>> Is it possible to have a branch with minimum required SVA/UACCE related
->> patches
->>> that are already public and can be a "stable" candidate for future respin of
->> Eric's series?
->>> Please share your thoughts.
->>
->> By "stable" you mean a fixed branch with the latest SVA/UACCE patches
->> based on mainline? 
-> 
-> Yes. 
-> 
->  The uacce-devel branches from
->> https://github.com/Linaro/linux-kernel-uadk do provide this at the moment
->> (they track the latest sva/zip-devel branch
->> https://jpbrucker.net/git/linux/ which is roughly based on mainline.)
-> 
-> Thanks. 
-> 
-> Hi Eric,
-> 
-> Could you please take a look at the above branches and see whether it make sense
-> to rebase on top of either of those?
-> 
-> From vSVA point of view, it will be less rebase hassle if we can do that.
+Hi Ashish,
 
-Sure. I will rebase on top of this ;-)
+the commit message should explain why this is needed or useful.
 
-Thanks
-
-Eric
-> 
-> Thanks,
-> Shameer
-> 
->> Thanks,
->> Jean
-> 
+Paolo
 
