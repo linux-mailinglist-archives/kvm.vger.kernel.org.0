@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BAA92CF3DF
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 19:20:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 671B42CF3E2
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 19:20:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730105AbgLDSUl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1730088AbgLDSUl (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 4 Dec 2020 13:20:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45412 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:45422 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729472AbgLDSUl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729780AbgLDSUl (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Dec 2020 13:20:41 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B9FF322B4E;
+        by mail.kernel.org (Postfix) with ESMTPSA id EE9AD22C9C;
         Fri,  4 Dec 2020 18:20:00 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1klFgU-00G3EZ-ID; Fri, 04 Dec 2020 18:19:58 +0000
+        id 1klFgV-00G3EZ-5G; Fri, 04 Dec 2020 18:19:59 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Keqian Zhu <zhukeqian1@huawei.com>, Will Deacon <will@kernel.org>,
@@ -30,10 +30,12 @@ Cc:     Keqian Zhu <zhukeqian1@huawei.com>, Will Deacon <will@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 5.10, take #5
-Date:   Fri,  4 Dec 2020 18:19:11 +0000
-Message-Id: <20201204181914.783445-1-maz@kernel.org>
+Subject: [PATCH 1/3] KVM: arm64: Fix memory leak on stage2 update of a valid PTE
+Date:   Fri,  4 Dec 2020 18:19:12 +0000
+Message-Id: <20201204181914.783445-2-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201204181914.783445-1-maz@kernel.org>
+References: <20201204181914.783445-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -44,50 +46,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+From: Yanan Wang <wangyanan55@huawei.com>
 
-A week ago, I was hoping being done with the 5.10 fixes. I should
-obviously know better.
+When installing a new leaf PTE onto an invalid ptep, we need to
+get_page(ptep) to account for the new mapping.
 
-Thanks to Yanan's excellent work, we have another set of page table
-fixes, all plugging issues introduced with our new page table code.
-The problems range from memory leak to TLB conflicts, all of which are
-serious enough to be squashed right away.
+However, simply updating a valid PTE shouldn't result in any
+additional refcounting, as there is new mapping. This otherwise
+results in a page being forever wasted.
 
-Are we done yet? Fingers crossed.
+Address this by fixing-up the refcount in stage2_map_walker_try_leaf()
+if the PTE was already valid, balancing out the later get_page()
+in stage2_map_walk_leaf().
 
-Please pull,
+Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+[maz: update commit message, add comment in the code]
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Acked-by: Will Deacon <will@kernel.org>
+Link: https://lore.kernel.org/r/20201201201034.116760-2-wangyanan55@huawei.com
+---
+ arch/arm64/kvm/hyp/pgtable.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-	M.
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 0271b4a3b9fe..2beba1dc40ec 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -470,6 +470,15 @@ static bool stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+ 	if (!kvm_block_mapping_supported(addr, end, phys, level))
+ 		return false;
+ 
++	/*
++	 * If the PTE was already valid, drop the refcount on the table
++	 * early, as it will be bumped-up again in stage2_map_walk_leaf().
++	 * This ensures that the refcount stays constant across a valid to
++	 * valid PTE update.
++	 */
++	if (kvm_pte_valid(*ptep))
++		put_page(virt_to_page(ptep));
++
+ 	if (kvm_set_valid_leaf_pte(ptep, phys, data->attr, level))
+ 		goto out;
+ 
+-- 
+2.28.0
 
-The following changes since commit 23bde34771f1ea92fb5e6682c0d8c04304d34b3b:
-
-  KVM: arm64: vgic-v3: Drop the reporting of GICR_TYPER.Last for userspace (2020-11-17 18:51:09 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.10-5
-
-for you to fetch changes up to 7d894834a305568a0168c55d4729216f5f8cb4e6:
-
-  KVM: arm64: Add usage of stage 2 fault lookup level in user_mem_abort() (2020-12-02 09:53:29 +0000)
-
-----------------------------------------------------------------
-kvm/arm64 fixes for 5.10, take #5
-
-- Don't leak page tables on PTE update
-- Correctly invalidate TLBs on table to block transition
-- Only update permissions if the fault level matches the
-  expected mapping size
-
-----------------------------------------------------------------
-Yanan Wang (3):
-      KVM: arm64: Fix memory leak on stage2 update of a valid PTE
-      KVM: arm64: Fix handling of merging tables into a block entry
-      KVM: arm64: Add usage of stage 2 fault lookup level in user_mem_abort()
-
- arch/arm64/include/asm/esr.h         |  1 +
- arch/arm64/include/asm/kvm_emulate.h |  5 +++++
- arch/arm64/kvm/hyp/pgtable.c         | 17 ++++++++++++++++-
- arch/arm64/kvm/mmu.c                 | 11 +++++++++--
- 4 files changed, 31 insertions(+), 3 deletions(-)
