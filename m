@@ -2,24 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FECF2CE7B8
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 06:47:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26FE72CE7BA
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 06:47:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728245AbgLDFpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728285AbgLDFpp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 00:45:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41034 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728199AbgLDFpo (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Dec 2020 00:45:44 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53565 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728177AbgLDFpn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 00:45:43 -0500
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D242C061A51
+        for <kvm@vger.kernel.org>; Thu,  3 Dec 2020 21:45:03 -0800 (PST)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4CnM8g6bfwz9sVp; Fri,  4 Dec 2020 16:44:19 +1100 (AEDT)
+        id 4CnM8h0LnTz9sVm; Fri,  4 Dec 2020 16:44:19 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1607060659;
-        bh=Xn1Ehv+oTCo3XiURURCvz/JFFB+ow4VAF1+V7lqlNS4=;
+        d=gibson.dropbear.id.au; s=201602; t=1607060660;
+        bh=hbtdc5TUdS3/8sHWROwOs5A6oAM6BTjePKWUtzAj9NQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ed9o9wKFPM0s5Mo6zA5fSCi5uRSwLvtpYzjtCgaVHt7BW6ImDSZX0Gbyu3g6gOcIB
-         WGrL398jc4G4ePzohkUWw+5INq7Fpjpi/+fFmr/gLzJDZ0+Wk/XWsmAcwvtppSVUAZ
-         YLDm6JQVpnGfbC+vdWj85/oznV+REBNtZDCI45VU=
+        b=ZUC4GpdCtc/BzDd3JSxH2aETJSUskwK2DJH/4Pgwun1X28TM1dovNRARnmITGqJFd
+         VQxJKDBaCFyUGtDiIz4c4KbdVPeg03PGYC5wN054mNjZh+lw9FPceLLs2JS226Bk5e
+         Qx9Pjur7WxCUh527rGxLNrQ8fbxXjcyIF6CI/XfQ=
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
         brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org
@@ -31,220 +34,154 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
         david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
         borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
         cohuck@redhat.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        pasic@linux.ibm.com
-Subject: [for-6.0 v5 06/13] securable guest memory: Decouple kvm_memcrypt_*() helpers from KVM
-Date:   Fri,  4 Dec 2020 16:44:08 +1100
-Message-Id: <20201204054415.579042-7-david@gibson.dropbear.id.au>
+        pasic@linux.ibm.com,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [for-6.0 v5 07/13] sev: Add Error ** to sev_kvm_init()
+Date:   Fri,  4 Dec 2020 16:44:09 +1100
+Message-Id: <20201204054415.579042-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201204054415.579042-1-david@gibson.dropbear.id.au>
 References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kvm_memcrypt_enabled() and kvm_memcrypt_encrypt_data() helper functions
-don't conceptually have any connection to KVM (although it's not possible
-in practice to use them without it).
-
-They also rely on looking at the global KVMState.  But the same information
-is available from the machine, and the only existing callers have natural
-access to the machine state.
-
-Therefore, move and rename them to helpers in securable-guest-memory.h,
-taking an explicit machine parameter.
+This allows failures to be reported richly and idiomatically.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/kvm/kvm-all.c                   | 27 --------------------
- accel/stubs/kvm-stub.c                | 10 --------
- hw/i386/pc_sysfw.c                    |  6 +++--
- include/exec/securable-guest-memory.h | 36 +++++++++++++++++++++++++++
- include/sysemu/kvm.h                  | 17 -------------
- 5 files changed, 40 insertions(+), 56 deletions(-)
+ accel/kvm/kvm-all.c  |  4 +++-
+ accel/kvm/sev-stub.c |  5 +++--
+ include/sysemu/sev.h |  2 +-
+ target/i386/sev.c    | 31 +++++++++++++++----------------
+ 4 files changed, 22 insertions(+), 20 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 92a49b328a..c6bd7b9d02 100644
+index c6bd7b9d02..724e9294d0 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -121,9 +121,6 @@ struct KVMState
-     KVMMemoryListener memory_listener;
-     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
- 
--    /* securable guest memory (e.g. by guest memory encryption) */
--    SecurableGuestMemory *sgm;
--
-     /* For "info mtree -f" to tell if an MR is registered in KVM */
-     int nr_as;
-     struct KVMAs {
-@@ -222,28 +219,6 @@ int kvm_get_max_memslots(void)
-     return s->nr_slots;
- }
- 
--bool kvm_memcrypt_enabled(void)
--{
--    if (kvm_state && kvm_state->sgm) {
--        return true;
--    }
--
--    return false;
--}
--
--int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
--{
--    SecurableGuestMemory *sgm = kvm_state->sgm;
--
--    if (sgm) {
--        SecurableGuestMemoryClass *sgmc = SECURABLE_GUEST_MEMORY_GET_CLASS(sgm);
--
--        return sgmc->encrypt_data(sgm, ptr, len);
--    }
--
--    return 1;
--}
--
- /* Called with KVMMemoryListener.slots_lock held */
- static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
- {
-@@ -2213,8 +2188,6 @@ static int kvm_init(MachineState *ms)
+@@ -2183,9 +2183,11 @@ static int kvm_init(MachineState *ms)
+      * encryption context.
+      */
+     if (ms->sgm) {
++        Error *local_err = NULL;
+         /* FIXME handle mechanisms other than SEV */
+-        ret = sev_kvm_init(ms->sgm);
++        ret = sev_kvm_init(ms->sgm, &local_err);
          if (ret < 0) {
++            error_report_err(local_err);
              goto err;
          }
--
--        kvm_state->sgm = ms->sgm;
      }
+diff --git a/accel/kvm/sev-stub.c b/accel/kvm/sev-stub.c
+index 3df3c88eeb..537c91d9f8 100644
+--- a/accel/kvm/sev-stub.c
++++ b/accel/kvm/sev-stub.c
+@@ -15,7 +15,8 @@
+ #include "qemu-common.h"
+ #include "sysemu/sev.h"
  
-     ret = kvm_arch_init(ms, s);
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 680e099463..0f17acfac0 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -81,16 +81,6 @@ int kvm_on_sigbus(int code, void *addr)
-     return 1;
+-int sev_kvm_init(SecurableGuestMemory *sgm)
++int sev_kvm_init(SecurableGuestMemory *sgm, Error **errp)
+ {
+-    return -1;
++    /* SEV can't be selected if it's not compiled */
++    g_assert_not_reached();
+ }
+diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+index 36d038a36f..7aa35821f0 100644
+--- a/include/sysemu/sev.h
++++ b/include/sysemu/sev.h
+@@ -17,6 +17,6 @@
+ #include "sysemu/kvm.h"
+ #include "exec/securable-guest-memory.h"
+ 
+-int sev_kvm_init(SecurableGuestMemory *sgm);
++int sev_kvm_init(SecurableGuestMemory *sgm, Error **errp);
+ 
+ #endif
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 7b8ce590f7..7333a60dc0 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -626,7 +626,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
+     }
  }
  
--bool kvm_memcrypt_enabled(void)
--{
--    return false;
--}
--
--int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
--{
--  return 1;
--}
--
- #ifndef CONFIG_USER_ONLY
- int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+-int sev_kvm_init(SecurableGuestMemory *sgm)
++int sev_kvm_init(SecurableGuestMemory *sgm, Error **errp)
  {
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index b6c0822fe3..439ac78970 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -38,6 +38,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/block/flash.h"
- #include "sysemu/kvm.h"
-+#include "exec/securable-guest-memory.h"
+     SevGuestState *sev = SEV_GUEST(sgm);
+     char *devname;
+@@ -648,14 +648,14 @@ int sev_kvm_init(SecurableGuestMemory *sgm)
+     host_cbitpos = ebx & 0x3f;
  
- /*
-  * We don't have a theoretically justifiable exact lower bound on the base
-@@ -201,10 +202,11 @@ static void pc_system_flash_map(PCMachineState *pcms,
-             pc_isa_bios_init(rom_memory, flash_mem, size);
+     if (host_cbitpos != sev->cbitpos) {
+-        error_report("%s: cbitpos check failed, host '%d' requested '%d'",
+-                     __func__, host_cbitpos, sev->cbitpos);
++        error_setg(errp, "%s: cbitpos check failed, host '%d' requested '%d'",
++                   __func__, host_cbitpos, sev->cbitpos);
+         goto err;
+     }
  
-             /* Encrypt the pflash boot ROM */
--            if (kvm_memcrypt_enabled()) {
-+            if (securable_guest_memory_enabled(MACHINE(pcms))) {
-                 flash_ptr = memory_region_get_ram_ptr(flash_mem);
-                 flash_size = memory_region_size(flash_mem);
--                ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
-+                ret = securable_guest_memory_encrypt(MACHINE(pcms),
-+                                                     flash_ptr, flash_size);
-                 if (ret) {
-                     error_report("failed to encrypt pflash rom");
-                     exit(1);
-diff --git a/include/exec/securable-guest-memory.h b/include/exec/securable-guest-memory.h
-index 4e2ae27040..7325b504ba 100644
---- a/include/exec/securable-guest-memory.h
-+++ b/include/exec/securable-guest-memory.h
-@@ -21,6 +21,7 @@
- #ifndef CONFIG_USER_ONLY
+     if (sev->reduced_phys_bits < 1) {
+-        error_report("%s: reduced_phys_bits check failed, it should be >=1,"
+-                     " requested '%d'", __func__, sev->reduced_phys_bits);
++        error_setg(errp, "%s: reduced_phys_bits check failed, it should be >=1,"
++                   " requested '%d'", __func__, sev->reduced_phys_bits);
+         goto err;
+     }
  
- #include "qom/object.h"
-+#include "hw/boards.h"
+@@ -664,20 +664,19 @@ int sev_kvm_init(SecurableGuestMemory *sgm)
+     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
+     sev->sev_fd = open(devname, O_RDWR);
+     if (sev->sev_fd < 0) {
+-        error_report("%s: Failed to open %s '%s'", __func__,
+-                     devname, strerror(errno));
+-    }
+-    g_free(devname);
+-    if (sev->sev_fd < 0) {
++        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
++                   devname, strerror(errno));
++        g_free(devname);
+         goto err;
+     }
++    g_free(devname);
  
- #define TYPE_SECURABLE_GUEST_MEMORY "securable-guest-memory"
- #define SECURABLE_GUEST_MEMORY(obj)                                    \
-@@ -43,6 +44,41 @@ typedef struct SecurableGuestMemoryClass {
-     int (*encrypt_data)(SecurableGuestMemory *, uint8_t *, uint64_t);
- } SecurableGuestMemoryClass;
+     ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
+                              &fw_error);
+     if (ret) {
+-        error_report("%s: failed to get platform status ret=%d "
+-                     "fw_error='%d: %s'", __func__, ret, fw_error,
+-                     fw_error_to_str(fw_error));
++        error_setg(errp, "%s: failed to get platform status ret=%d "
++                   "fw_error='%d: %s'", __func__, ret, fw_error,
++                   fw_error_to_str(fw_error));
+         goto err;
+     }
+     sev->build_id = status.build;
+@@ -687,14 +686,14 @@ int sev_kvm_init(SecurableGuestMemory *sgm)
+     trace_kvm_sev_init();
+     ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
+     if (ret) {
+-        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+-                     __func__, ret, fw_error, fw_error_to_str(fw_error));
++        error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
++                   __func__, ret, fw_error, fw_error_to_str(fw_error));
+         goto err;
+     }
  
-+/**
-+ * securable_guest_memory_enabled - return whether guest memory is protected
-+ *                               from hypervisor access (with memory
-+ *                               encryption or otherwise)
-+ * Returns: true guest memory is not directly accessible to qemu
-+ *          false guest memory is directly accessible to qemu
-+ */
-+static inline bool securable_guest_memory_enabled(MachineState *machine)
-+{
-+    return !!machine->sgm;
-+}
-+
-+/**
-+ * securable_guest_memory_encrypt: encrypt the memory range to make
-+ *                              it guest accessible
-+ *
-+ * Return: 1 failed to encrypt the range
-+ *         0 succesfully encrypted memory region
-+ */
-+static inline int securable_guest_memory_encrypt(MachineState *machine,
-+                                              uint8_t *ptr, uint64_t len)
-+{
-+    SecurableGuestMemory *sgm = machine->sgm;
-+
-+    if (sgm) {
-+        SecurableGuestMemoryClass *sgmc = SECURABLE_GUEST_MEMORY_GET_CLASS(sgm);
-+
-+        if (sgmc->encrypt_data) {
-+            return sgmc->encrypt_data(sgm, ptr, len);
-+        }
-+    }
-+
-+    return 1;
-+}
-+
- #endif /* !CONFIG_USER_ONLY */
- 
- #endif /* QEMU_SECURABLE_GUEST_MEMORY_H */
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index bb5d5cf497..0e163c2c9d 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -233,23 +233,6 @@ int kvm_has_intx_set_mask(void);
-  */
- bool kvm_arm_supports_user_irq(void);
- 
--/**
-- * kvm_memcrypt_enabled - return boolean indicating whether memory encryption
-- *                        is enabled
-- * Returns: 1 memory encryption is enabled
-- *          0 memory encryption is disabled
-- */
--bool kvm_memcrypt_enabled(void);
--
--/**
-- * kvm_memcrypt_encrypt_data: encrypt the memory range
-- *
-- * Return: 1 failed to encrypt the range
-- *         0 succesfully encrypted memory region
-- */
--int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
--
--
- #ifdef NEED_CPU_H
- #include "cpu.h"
+     ret = sev_launch_start(sev);
+     if (ret) {
+-        error_report("%s: failed to create encryption context", __func__);
++        error_setg(errp, "%s: failed to create encryption context", __func__);
+         goto err;
+     }
  
 -- 
 2.28.0
