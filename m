@@ -2,153 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35DB12CF666
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 22:48:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 448DC2CF66D
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 22:55:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726532AbgLDVrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 16:47:53 -0500
-Received: from mail-bn7nam10on2066.outbound.protection.outlook.com ([40.107.92.66]:54241
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725995AbgLDVrw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 16:47:52 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O8UeieoL1g5zTvtjm0WThHcx7ahUMtZgmngts8m/wt1ISQqyWtMh91ffAjig5kJRNWxrYFTxP9OVjKNlkKjuQNcZgBc8V50qcYp+1KnLsx5LL7D6MsF/G2ZT7sKpXKhA4HSwbQoDeBAjm3FYYlCJeGIL4+/8XwMcgaQxmSgikaJRtqSHYFLC4PF1/O4JwWkmC5y2+gSeTVynL/M3vjp4ZAVKiQhIHhAkqtSoLQWzFRSdAoDfwKGFCaJFQ09VDCX2N09XfGzYU16SF5eiy7Sa5xxYbmdTobPmYI8H4UItvZ4vatlO8ppAh2RATUVS5uQ8lwM4YSTvZaRRpGIGElLKiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dIS/XuBtnNajztP6lsKvp1S1cA3sjSm0YqFIqffCUpc=;
- b=M65yr00MoVCcCvEKNjSzKV993AKq5GQl1lTbNY/ak9vkJbuUS8XczjhJlcXY1SLSd/bxWcFmcwEFO7wxqJF3a7P/CjRL/q3jntUNwU956CCQBS/2LzIRJ0frdTvbd5P8Z9ScIA/4r0E7GWN5yzs9cS2t+YnHmEI0n2coNDj9QWgb848Btc5Ge9Gc7tulhF6ovJ8mOlUfWfx4nUwj3dbqLqiI+XV8EL5YcoIs1bK0EWG0FvPkKq/GvM+cd7divcJV/E20rFg8VRrcfdfOrsrUGe5RXmmn4ANFrfAPjcqMkLna6/HhWd5KzvBrZQwgXoOZpzAPs7+5tKCYUDyIcEC9CA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dIS/XuBtnNajztP6lsKvp1S1cA3sjSm0YqFIqffCUpc=;
- b=q+5gqQbWKqaxFK6kC7iafJEf5A8yLZvhqHEWxHnzF9jthc9dw79/vFW7F7t1QTrdIirIeKCgk+Dmp5gtqIViOm+eaYIOvLJuZrOS04X+OWmDRvpuL2vPllpzW/i7QO0BkbQOPQ38uHCFgYbTXjfvqg75Dr7fh+qPWywDRKx6kCc=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN1PR12MB2446.namprd12.prod.outlook.com (2603:10b6:802:26::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.20; Fri, 4 Dec
- 2020 21:46:59 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Fri, 4 Dec 2020
- 21:46:59 +0000
-Date:   Fri, 4 Dec 2020 21:46:56 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, Thomas.Lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, rientjes@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: Re: [PATCH v8 18/18] KVM: SVM: Enable SEV live migration feature
- implicitly on Incoming VM(s).
-Message-ID: <20201204214656.GC1424@ashkalra_ubuntu_server>
-References: <cover.1588711355.git.ashish.kalra@amd.com>
- <a70e7ea40c47116339f968b7d2d2bf120f452c1e.1588711355.git.ashish.kalra@amd.com>
- <7a3e57c5-8a8c-30dc-4414-cd46b201eed3@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7a3e57c5-8a8c-30dc-4414-cd46b201eed3@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN2PR01CA0075.prod.exchangelabs.com (2603:10b6:800::43) To
- SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+        id S1726812AbgLDVzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 16:55:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28710 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725933AbgLDVzD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 16:55:03 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B4Lh9rj180814;
+        Fri, 4 Dec 2020 16:54:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=hkG/6yTFISThyBoLmsLxNYz65p9USehDQ4JZTauElTc=;
+ b=VTTN9QxC+GAe9Yg7NuzSIFTZ8tGyJeo/LgfBS72jhjRjZIzVVzQZnZN/8jo5KMEuDqC0
+ UoYe8lOTT1TW4IQX12Fgg2oePbtAX0G3e2O8mjuPzsLUoVjMXjwbb8YAyvhnMTMaH7eI
+ fhP5pmrKfVaxYz8sWWgQD/I0jmbMlxb7NVT44vOGIWhE2pXPgDybwCRWPeBK5S+U3r7K
+ 28eV816c6AafGnw4jhySsnChsOHUTkKEueTRzqqX0NOeuc9ZLplPOy1MaCynZ4C+AEka
+ Zm51GV3ZJoBB4mvPcuqZDisYhav4cvygeZcehkDfufUTiKC1iUNDKgfCqecGLZ/9SkZ+ Lw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 357sdk6hpf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Dec 2020 16:54:21 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B4Li3mn183337;
+        Fri, 4 Dec 2020 16:54:20 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 357sdk6hnr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Dec 2020 16:54:20 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B4LWg21023963;
+        Fri, 4 Dec 2020 21:54:18 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3573v9s5rg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Dec 2020 21:54:18 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B4LsFLp55247358
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Dec 2020 21:54:16 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0170A4054;
+        Fri,  4 Dec 2020 21:54:15 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4BA82A405C;
+        Fri,  4 Dec 2020 21:54:15 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.171.41.218])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Fri,  4 Dec 2020 21:54:15 +0000 (GMT)
+Date:   Fri, 4 Dec 2020 22:54:13 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com, david@redhat.com,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH] s390/vfio-ap: Clean up vfio_ap resources when KVM
+ pointer invalidated
+Message-ID: <20201204225413.2d91cf9f.pasic@linux.ibm.com>
+In-Reply-To: <cf2c6632-bcdc-fb93-471b-bfd834d87902@linux.ibm.com>
+References: <20201202234101.32169-1-akrowiak@linux.ibm.com>
+ <20201203185514.54060568.pasic@linux.ibm.com>
+ <a8a90aed-97df-6f10-85c2-8e18dba8f085@linux.ibm.com>
+ <20201204200502.1c34ae58.pasic@linux.ibm.com>
+ <cf2c6632-bcdc-fb93-471b-bfd834d87902@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by SN2PR01CA0075.prod.exchangelabs.com (2603:10b6:800::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17 via Frontend Transport; Fri, 4 Dec 2020 21:46:58 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e36521a0-6a42-493f-70b9-08d8989e2053
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2446:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB24465F764549002FBDF02C5A8EF10@SN1PR12MB2446.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1775;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: w9bQnxvzeR8dZSGYS+squLqsO2KNEwrN8ZFeMepo4lOTx7D5JlnXWD9q6bYXtd2jB8VK0z2oWnDxNBengRvatIJFDd5eSKNCUhccsUCWyyZN6DvqBh00KPDcanOR22ztN9k/u26dp1IXjY6fQ0CvPNSrvFVC3oXSu6sd6LUiU6z7vBJDyxXzj90PCqVTtRJQBH1CMUIHdwv9zwsHc2DV4TwKFAhnDu1NrMPZqVM4oXC+TZRcfRAK465hKvJ0tP50T0IPTTyLOO2bpju5UBAAzEJ6vdslnKrRc6XIOX8JbydXHrl2jtxfw7VaXGjHFO8MwbHhQFsHbz0vIBhgqEDiEQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(376002)(396003)(366004)(39860400002)(9686003)(956004)(8676002)(8936002)(55016002)(4326008)(316002)(53546011)(6496006)(33716001)(66946007)(16526019)(7416002)(44832011)(186003)(478600001)(2906002)(86362001)(52116002)(5660300002)(6916009)(1076003)(33656002)(66476007)(66556008)(83380400001)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?g09HWZyhbT7ml0M4aWT8fABUD2kEjdUA7a4NaMyKLyWZVrebImNkve5ljNpG?=
- =?us-ascii?Q?Ie4saYSW4Y4s2LkndCyhPO95JMGaiRWcQTslNJ8Fpid2Iwee7tZ9SinMTY1u?=
- =?us-ascii?Q?C+szd41oJ9Kg4mecnkFrJpDiSJ3DKVQxcz8zjOgPAZCgx1RHmsjf+SUeXhTT?=
- =?us-ascii?Q?SCk+975rI5txL5vDf7glLZUi0h1zO4LcMxGtWbFPoy7UEFdDkRNtqn5R8OAN?=
- =?us-ascii?Q?l9iZtsa7RGkS6W8uMXXRa1WbrYc64Gtx3wka9IfP/TIRcZjlEuEcFLAvuZHz?=
- =?us-ascii?Q?i6Ofkr+wLecJWscp6FF1z4HTkhmmhjBd93N9qfuyLSkZXC5SHEzE0BUuBBPK?=
- =?us-ascii?Q?OCUvigII+4hgeM1DeeyNZjdi4fXaxaQtlKJRy/7pSf3tt0dbpH7E6IA27xbV?=
- =?us-ascii?Q?vqXtfYtnmi/FzGcZaJhi8Pn7NmfaSYt2HzsynQlMU8qTdapFyUJmn2H/PR0Z?=
- =?us-ascii?Q?FnSu+4mxZf8YifzYoGTzTqaAsp9LV72T4B29eyKymEXFCtTM4QxzJsU/o6HY?=
- =?us-ascii?Q?kMFAq0E/BMjGMlARBkDIH3WqUlVlGDLLQwUl1/IVpCMEeQyTHk9XG/Woxfcf?=
- =?us-ascii?Q?pCQIVlbW4T/YHmjkGsXbd/MtUbenHTxoB2uGwskPskBkXqY/uPaklE2Zgrb3?=
- =?us-ascii?Q?u0gIOlkwnrpdgVMEznvlhxj4NKgLZlSy/1Kg3t7hlZxVg+hl5ggjjhOTs4pl?=
- =?us-ascii?Q?0pJ3nSsoEEkQxM5f3xhKYr0CopuYzpVUazoOSMlmRsK+wmAVyX/hvBDsebqp?=
- =?us-ascii?Q?gnN3njrdS74D6bWMhMDhcRVldr5eueBtg2wK72Ms1061+aJlShqJeDwXuXt2?=
- =?us-ascii?Q?vKgEKjaDCQFs9VJuhjCcS987gE0Et6LrUc18ZGVJyQ7XoLk4MkJu55HJ2F44?=
- =?us-ascii?Q?UGchlzNBRSRAiMsHshO5DcvQU3qrFYO2a21IvcuQJPLLJI0cLA+/2BQLGW6l?=
- =?us-ascii?Q?fKO2fI3LxyT41qMv7kHTLc8KnvIXjb4Jikr6xB6tPNmHkoj5BF5AGM+P90pw?=
- =?us-ascii?Q?Napf?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e36521a0-6a42-493f-70b9-08d8989e2053
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2020 21:46:59.1706
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BhOql5Ryo9sh7iJVSLHNLH0UUij1p5OfQzlmIKo0p0fcObnTzAxHI1boqfnZXAZy2OCDLdoFwXYUNitK3Dy55A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2446
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-12-04_09:2020-12-04,2020-12-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 adultscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
+ mlxscore=0 suspectscore=0 spamscore=0 malwarescore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012040120
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Paolo,
+On Fri, 4 Dec 2020 14:46:30 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-On Fri, Dec 04, 2020 at 12:22:48PM +0100, Paolo Bonzini wrote:
-> On 05/05/20 23:22, Ashish Kalra wrote:
-> > From: Ashish Kalra <ashish.kalra@amd.com>
-> > 
-> > For source VM, live migration feature is enabled explicitly
-> > when the guest is booting, for the incoming VM(s) it is implied.
-> > This is required for handling A->B->C->... VM migrations case.
-> > 
-> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > ---
-> >   arch/x86/kvm/svm/sev.c | 7 +++++++
-> >   1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index 6f69c3a47583..ba7c0ebfa1f3 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -1592,6 +1592,13 @@ int svm_set_page_enc_bitmap(struct kvm *kvm,
-> >   	if (ret)
-> >   		goto unlock;
-> > +	/*
-> > +	 * For source VM, live migration feature is enabled
-> > +	 * explicitly when the guest is booting, for the
-> > +	 * incoming VM(s) it is implied.
-> > +	 */
-> > +	sev_update_migration_flags(kvm, KVM_SEV_LIVE_MIGRATION_ENABLED);
-> > +
-> >   	bitmap_copy(sev->page_enc_bmap + BIT_WORD(gfn_start), bitmap,
-> >   		    (gfn_end - gfn_start));
-> > 
+> On 12/4/20 2:05 PM, Halil Pasic wrote:
+> > On Fri, 4 Dec 2020 09:43:59 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >  
+> >>>> +{
+> >>>> +	if (matrix_mdev->kvm) {
+> >>>> +		(matrix_mdev->kvm);
+> >>>> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;  
+> >>> Is a plain assignment to arch.crypto.pqap_hook apropriate, or do we need
+> >>> to take more care?
+> >>>
+> >>> For instance kvm_arch_crypto_set_masks() takes kvm->lock before poking
+> >>> kvm->arch.crypto.crycb.  
+> >> I do not think so. The CRYCB is used by KVM to provide crypto resources
+> >> to the guest so it makes sense to protect it from changes to it while
+> >> passing
+> >> the AP devices through to the guest. The hook is used only when an AQIC
+> >> executed on the guest is intercepted by KVM. If the notifier
+> >> is being invoked to notify vfio_ap that KVM has been set to NULL, this means
+> >> the guest is gone in which case there will be no AP instructions to
+> >> intercept.  
+> > If the update to pqap_hook isn't observed as atomic we still have a
+> > problem. With torn writes or reads we would try to use a corrupt function
+> > pointer. While the compiler probably ain't likely to generate silly code
+> > for the above assignment (multiple write instructions less then
+> > quadword wide), I know of nothing that would prohibit the compiler to do
+> > so.  
 > 
-> I would prefer that userspace does this using KVM_SET_MSR instead.
+> I see that in the handle_pqap() function in arch/s390/kvm/priv.c
+> that gets called when the AQIC instruction is intercepted,
+> the pqap_hook is protected by locking the owner of the hook:
 > 
+>          if (!try_module_get(vcpu->kvm->arch.crypto.pqap_hook->owner))
+>              return -EOPNOTSUPP;
+>          ret = vcpu->kvm->arch.crypto.pqap_hook->hook(vcpu);
+> module_put(vcpu->kvm->arch.crypto.pqap_hook->owner);
 > 
+> Maybe that is what we should do when the kvm->arch.crypto.pqap_hook
+> is set to NULL?
 
-Ok.
+To my best knowledge that ain't no locking but mere refcounting. The
+purpose of that is probably to prevent the owner module, and the code
+pointed to by the 'hook' function pointer from being unloaded while we
+are executing that very same code.
 
-But, this is for a VM which has already been migrated based on feature
-support on host and guest and host negotation and enablement of the live
-migration support, so i am assuming that a VM which has already been
-migrated can have this support enabled implicitly for further migration.
+Why is that necessary, frankly I have no idea. We do tend to invalidate
+the callback before doing our module_put in vfio_ap_mdev_release(). Maybe
+the case you are handling right now is the reason (because the
+callback is invalidated in vfio_ap_mdev_release() only if !!kvm.
 
-Thanks,
-Ashish
+Regards,
+Halil
+
