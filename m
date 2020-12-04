@@ -2,111 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 073C32CF3A2
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 19:08:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28DE72CF3C3
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 19:17:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387624AbgLDSHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 13:07:52 -0500
-Received: from mail-bn8nam12on2040.outbound.protection.outlook.com ([40.107.237.40]:26208
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726330AbgLDSHw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 13:07:52 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kyRYQyGQd5+Pa4NAlybcHmqI41wZ4lJr9Msf/ZIJ3hIRvApJ/BCz6W0poSbfMQxBQ+HIIHGYSsXn7ZruGPoo1JopBkvSk9A5qbCrFsBHMb0HWM7EOOaajxZkn+MkpP3GdxrVgzj5onf/FnrA+lWBaJSp1VlXPjgcQ14E5yhgJFLMNylf0+tyEtxUFV5wtQJ0Oxn+qxI7ss4eL2qy0oryD4w2eor56ipFMj4+bFhGu/5Bxq/5FXjqlInFM3HxJsv4ZG+qRRTm7shQFRX57uyL2FHDFuQXQk0kMLZobXKpzNoValDXRnp0NEK6v2eXv7P4fjT+RKnZ6h+bEcK3dObFpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SqtlYiB7SlsGU27zMvWx80kTuZFINQ3U0kB1mhCHcBc=;
- b=ASLh2CkYjNGWvi77A8jc8IktfmCD1R4kkctHLDp0x3M51ah9g9NPbjkm105vPQgrJTI0qNjmRNdArYUzS0U3J7+BOGZ0FQZBixdGrK5oZCCIPYwnuqtl+KZgfECxZrmEzwIR18su+SoYWJuYj57j2n9yoPoahPEQXjkc+VzoBbcNCZI9bgbPc6qS7J3RvgHj09UiAOtdJnfzeHjk3AtUZD81B5F7OFJ7eWJlCIhDA6SC9ulhwCaHaK/8/RF0u8IcGqi9J3OWzhwr1TOFC5irbjYhH/rZtOPmi/5XBJw+JpvJOXbpK1vqcGBJSppPsjQ4ZEYyuMlVFHz37ny90caQmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1728625AbgLDSPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 13:15:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44360 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726851AbgLDSPo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Dec 2020 13:15:44 -0500
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19C28C0613D1
+        for <kvm@vger.kernel.org>; Fri,  4 Dec 2020 10:15:04 -0800 (PST)
+Received: by mail-oi1-x242.google.com with SMTP id s75so4061016oih.1
+        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 10:15:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SqtlYiB7SlsGU27zMvWx80kTuZFINQ3U0kB1mhCHcBc=;
- b=ihTw0CnjznH3bSXPj7t91dGPAjEuQyiTcA/MLjNyke4GGFe1CcOZqQBLfdbgj9NCmKvMU2obLNpwvXZK42HgdaLRcelrLtRdyzCdcZpE2aRQAZ7ytw6vgHVdX0/zw9dMUYA+Sjq4YwksyyMZFisIAAgxMbaGK28W0iQ6aJwxDqk=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17; Fri, 4 Dec
- 2020 18:06:57 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Fri, 4 Dec 2020
- 18:06:57 +0000
-From:   Ashish Kalra <Ashish.Kalra@amd.com>
-To:     seanjc@google.com
-Cc:     Ashish.Kalra@amd.com, Thomas.Lendacky@amd.com, bp@suse.de,
-        brijesh.singh@amd.com, hpa@zytor.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, rientjes@google.com,
-        srutherford@google.com, tglx@linutronix.de,
-        venu.busireddy@oracle.com, x86@kernel.org
-Subject: Re: [PATCH v8 13/18] KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION feature & Custom MSR.
-Date:   Fri,  4 Dec 2020 18:06:45 +0000
-Message-Id: <20201204180645.1228-1-Ashish.Kalra@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <X8pocPZzn6C5rtSC@google.com>
-References: <X8pocPZzn6C5rtSC@google.com>
-Content-Type: text/plain
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH2PR05CA0020.namprd05.prod.outlook.com (2603:10b6:610::33)
- To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Xit7dWkZ/uWg67R5ypkMG8vhmSpZMrHrrLkUOGYkvmQ=;
+        b=kwTU2ej5wtGAKMk/t/SF8HMCWQMT90z6Er7H5JjodPi/gdzGi98p/VeIPuI4ij07Dm
+         4VRUdbDVQE1hFGYSVpAuX9p2rRAcaTO/1fhYcrKZbqIIhSkVqeQIegHcfzCfmLmbzU60
+         esWmyU3vAatDrjvne9Modl4Xv2HQRicbGf1uyk/3Luo0jk0lfWCR/NuUhuInU8yClaYF
+         OMP7acLniEQW0ctS42ZmEYsqBxn5cQckXwwcC4JmS/ITj+pJOb6jdbsNdvyoIegn7ArU
+         UDEd7tgUooi4zmfTECherwojRZ6ykhq4Vbt0/NlC7griNWmlBEmTT4Ddqg7qnMpaUWpd
+         x6Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Xit7dWkZ/uWg67R5ypkMG8vhmSpZMrHrrLkUOGYkvmQ=;
+        b=kstwGf0Ia/NtVraNT9YTJeDHA5sFmtVOTPkCLNPQ+n3mG06lJTzdRbNb62AT0CVy4l
+         5xjedsyw4j9KfJbbRZD5XGatw5984n7WT8qbmhnrnJ/P/1YfYYFI7Qsh/88cX25sv8OM
+         0DuK6fuaY6fHxC/mIUI90K3UJFWM0dvboO0dIWZ647Cz/NWSzNm/tVICp0gXLkyGQY22
+         zrH8DnDKQE+3yKBouol+fJEOsGcsbM6eoq9e8idqXRHIKDgOFStXpSoWdMnqmmkjaTSF
+         eHCWQ2E0DzwSvjVgVpG7XPSxSTZzPMudaLr9WtoR22EfIBMy/Cx3I0Zkl0P9tpkkAj4B
+         Jzhg==
+X-Gm-Message-State: AOAM533u1cXunB5TncVWmVFond+kRFDPh0c1PQKCOhECw3eD+BqeKZJJ
+        UKcCfDQfOcjq8HLYa41kcynW6lxyE2epScGn
+X-Google-Smtp-Source: ABdhPJwVGvS0KlNyzMEZr8Io3h0bNxMNQr8vTAObJ3nFQlo5BijMVIWuY6ycWapMvlNTr1CF8HRDhA==
+X-Received: by 2002:aca:d514:: with SMTP id m20mr4060984oig.22.1607105703333;
+        Fri, 04 Dec 2020 10:15:03 -0800 (PST)
+Received: from [172.24.51.127] (168.189-204-159.bestelclientes.com.mx. [189.204.159.168])
+        by smtp.gmail.com with ESMTPSA id w22sm778355otq.22.2020.12.04.10.15.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Dec 2020 10:15:02 -0800 (PST)
+Subject: Re: [PATCH 7/9] target/mips: Extract msa_translate_init() from
+ mips_tcg_init()
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20201202184415.1434484-1-f4bug@amsat.org>
+ <20201202184415.1434484-8-f4bug@amsat.org>
+ <9a103671-d4e7-bcff-c600-931655efbd2b@linaro.org>
+ <1d04e931-015b-116f-f189-3d24e015b087@amsat.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <39c6980e-f02c-9eb2-f85e-e8bd26c0920f@linaro.org>
+Date:   Fri, 4 Dec 2020 12:15:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by CH2PR05CA0020.namprd05.prod.outlook.com (2603:10b6:610::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.5 via Frontend Transport; Fri, 4 Dec 2020 18:06:56 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e1c31409-2e3c-4b9a-1b10-08d8987f639f
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4495BEC236005715D13CA18E8EF10@SA0PR12MB4495.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cGYVB6tQzH31qxWL9u+murwXEQZ2Xom2Do0QC888ZkYwbigIQGvpIyrpHhelU8Ci6Axbl3XfljqG3hGOG6SE9e9JqyYN4PaS7k6e0pnoVR9678UEzFZ4F5sM0ZRc2rbEFoQharaIL0BWMQQGIw52CwIbO06VWY01MmeLmCr/iiGHZTRf+fp1Z1FSP+0eJ3wrEVi4FKBIdxg1m1BnMX83Ae2xbqSl0q7u3X861ys4ayoAAlocX5jBJRf94Xf/hJp6CoDobd3SmwhuQp2oRMGXbHpq+JgDFUFRuJkxXCKC9y5O172EXowu5MepwqrYqsd/
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(39860400002)(366004)(396003)(66556008)(66476007)(66946007)(6916009)(316002)(6666004)(36756003)(26005)(4326008)(186003)(7696005)(558084003)(16526019)(7416002)(1076003)(6486002)(8936002)(5660300002)(956004)(52116002)(2906002)(8676002)(2616005)(86362001)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?+a694h88efJ0lCABl6oYfRdNinRYqt2yOYmqpl8ojzFHLT94G03eGDE/sUCv?=
- =?us-ascii?Q?k5/2SmArqJdAficg0/2BlGDu+wk2v6bUTIrcqc1ReNQfl7gcv4Cx6tBbY3/S?=
- =?us-ascii?Q?4CpcFwI38hJWIo8WIPU0fjwWzNIdAnGvW6hAqAElI1I7NzSUZBU/1Ymy2359?=
- =?us-ascii?Q?rkIzdq4MKcCvYPPmuHmk9k+yLliN01NPt8Mry78tdUTXWA9ySPylY0ES007H?=
- =?us-ascii?Q?9DftYBifKwWUoQfrVQYUkWrUZIQqvwm4bT+pK2M2QUP8Seg7pVKr3RpBL1ZV?=
- =?us-ascii?Q?8lHsy609cDatoUhZL+M5cv3kpo8MgB8gj1muQLZ+fQzwshJN1FmnjxfroSRG?=
- =?us-ascii?Q?MzMkjWhFUPbFFJe7nqSkSRLTMSmRAP0O09Lsc75C2kbvI4C7XsOmTNWQx/sX?=
- =?us-ascii?Q?/zdtw5VGVItvSAutGvQ/X3GTqQ2npjY64R3OH+xNQryp+AEr4DVsOTDH1lNN?=
- =?us-ascii?Q?77vKlNhzX3xSZGi6t4HXM+Dn73seamcJx4519Trhw7WjH/Z28iRbDBvtGBQz?=
- =?us-ascii?Q?PP0qlhN1zDsjljn8kte1PMt1xOq3MBcIsLDKaFzX2zW7JyKRVbyiljTp7ffG?=
- =?us-ascii?Q?vBVAYdyuf9Kr/ZCy1ITqeeAOw5JZFxYzvVQPDZ79WBOx18iCs1qAIymy5JJW?=
- =?us-ascii?Q?Aru6bLGhDWsSvV0VuLuL1O+rQ0NNCrIw4PI3JSdLlgiZhVuL3+w2k3F8QvaX?=
- =?us-ascii?Q?NhzTROjpiuj8q4XS2WY84lrP12kKfFGcdjWySW/EebRYoxbZT6mZFGEORnjg?=
- =?us-ascii?Q?dIGYaujqXxDQc27hpO7M25RXVqN/8CU/OPincgvD3RhQG90Lk1i/oHN4Wm8h?=
- =?us-ascii?Q?jwc8Pm/ocfptHJFvmehNBRxxwn54ZRekA/brNYyfoX72frDtFrqvd6S6Jhhu?=
- =?us-ascii?Q?efCJ/xeIqLUnow9m/WJSkOx2z+VEh7UcgJYnkjuX/Wg7VNsYsYjp6x0uQACg?=
- =?us-ascii?Q?M/ILg3SfoyBUjFZP/Yju0tEhAC4OkewQFkgSWLarAQGqQGDYzDAuX4eM8fB+?=
- =?us-ascii?Q?z9JV?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1c31409-2e3c-4b9a-1b10-08d8987f639f
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2020 18:06:57.8401
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cdLly1RbZ9WXe7SlKgWUOJQna8qY93K9tm5sEDgcT5f70A7ExkKcDMKQDpe8gyNmnx3o48LwacCJxgY127jrkw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
+In-Reply-To: <1d04e931-015b-116f-f189-3d24e015b087@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yes i will post a fresh version of the live migration patches. 
+On 12/4/20 11:23 AM, Philippe Mathieu-Daudé wrote:
+> On 12/4/20 5:30 PM, Richard Henderson wrote:
+>> On 12/2/20 12:44 PM, Philippe Mathieu-Daudé wrote:
+>>> Extract the logic initialization of the MSA registers from
+>>> the generic initialization.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>  target/mips/translate.c | 35 ++++++++++++++++++++---------------
+>>>  1 file changed, 20 insertions(+), 15 deletions(-)
+>>
+>> Why?
+> 
+> msa_wr_d[] registers are only used by MSA, so in the next series
+> that allows me to move the 'static msa_wr_d[]' in msa_translate.c,
+> without having to declare them global with extern.
 
-Also, can you please check your email settings, we are only able to see your response on the
-mailing list but we are not getting your direct responses.
+Ah, sure.
 
-Thanks,
-Ashish
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+r~
