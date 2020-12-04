@@ -2,95 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C39F72CF1A9
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 17:15:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C6D42CF1EB
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 17:30:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730532AbgLDQM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 11:12:59 -0500
-Received: from smtprelay0130.hostedemail.com ([216.40.44.130]:44912 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729032AbgLDQM6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 11:12:58 -0500
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay04.hostedemail.com (Postfix) with ESMTP id 24D69180A9F34;
-        Fri,  4 Dec 2020 16:12:17 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Spam-Summary: 10,1,0,,d41d8cd98f00b204,joe@perches.com,,RULES_HIT:41:355:379:599:967:973:988:989:1260:1277:1311:1313:1314:1345:1359:1437:1515:1516:1518:1534:1541:1593:1594:1711:1730:1747:1777:1792:2393:2525:2553:2560:2563:2682:2685:2828:2859:2933:2937:2939:2942:2945:2947:2951:2954:3022:3138:3139:3140:3141:3142:3353:3622:3865:3866:3867:3868:3870:3871:3872:3873:3874:3934:3936:3938:3941:3944:3947:3950:3953:3956:3959:4250:4321:5007:6119:6248:6691:7903:8957:9025:10004:10400:10848:11232:11658:11914:12043:12297:12438:12555:12660:12740:12760:12895:13069:13311:13357:13439:13845:14096:14097:14181:14659:14721:14777:21080:21433:21450:21451:21627:21811:21889:21990:30054:30056:30090:30091,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:1,LUA_SUMMARY:none
-X-HE-Tag: hen76_3903285273c5
-X-Filterd-Recvd-Size: 3208
-Received: from XPS-9350.home (unknown [47.151.137.21])
-        (Authenticated sender: joe@perches.com)
-        by omf18.hostedemail.com (Postfix) with ESMTPA;
-        Fri,  4 Dec 2020 16:12:14 +0000 (UTC)
-Message-ID: <235b856857d912d93ea00685b20baa5b66800c83.camel@perches.com>
-Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
-From:   Joe Perches <joe@perches.com>
-To:     Sasha Levin <sashal@kernel.org>,
+        id S1727211AbgLDQ3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 11:29:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726427AbgLDQ3j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Dec 2020 11:29:39 -0500
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83D5C0613D1
+        for <kvm@vger.kernel.org>; Fri,  4 Dec 2020 08:28:59 -0800 (PST)
+Received: by mail-ot1-x341.google.com with SMTP id z24so5723313oto.6
+        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 08:28:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=s/K/Z1mU174+bqILLTQa5GQtSbllWYCoyDJq8pLRWUs=;
+        b=mmXBGzKPxVKZBz6+V+ztZUYe22UlZo+cKJWbcol8wKgU+vrICSzzfxb1D8ithAMckd
+         n7W2JK2GzntOhFEoEmA+q4rCrpsNoNiIVXt1Oow42dZ/B6zrXb5dKo1wyGBPJ4qV9iNC
+         PjLLXIAxlkc0J9BACu18lI83xRz7L858iYgxeisD3RtCbp/guCwC1D71oyjoJw22mrhx
+         /T/BaY9yl0NcO8hYR9h3aZErk3vsoAYszrVXMpPdFTSBey9fnQiG3E3q7uTwfs8dq6PU
+         xYmMjeiwTQP8YaCj9n4BNCkr1TKUYW/VUYQ7wdwLDSe/uy0f9eqytjXodS9u2vOQ5aIU
+         7hTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=s/K/Z1mU174+bqILLTQa5GQtSbllWYCoyDJq8pLRWUs=;
+        b=YCn+tq/lAyD8Rzt7zEOhThFPn8+46OfyvaH4OnokLdhTc1xVv9Jrz7+R72cz8myW5y
+         9eWRuj9h9skrosKfWbXNaPKQ/HLC3Ilx8r0xa131pRArf7OA83c3nC2sMnMl/1Vo2M4T
+         S+5qWLgPeXiETnwf4SLVHimAJUZsnrRiQv2XB0UNtSsPcSIeykOKupI1FYyC2quIKq6K
+         lyEJJ5vSv+ecoIDj078ci5QvAK7kYW+o+dNXyBIEtidMIqM8s7+jhbv7dfZ5KrFy/W94
+         im7tydxEfvR9giXCuiy/my3uh2jVEe0oWbMMhpIg5NAexGfuVcR6fYI04G+65LUO0BsK
+         GeRw==
+X-Gm-Message-State: AOAM530WU4yvX+YQ44Kq4I2II5IkRWacvtbZ8yrdWTCiv54PExlZKzmz
+        lEf2I6igSrmPCMd6u0M6WJeHWYz04mhun7ve
+X-Google-Smtp-Source: ABdhPJy8jHi956LTYxapRjhjvfcFUICeFKrtbEDUKfTdYkuX+/gTpCCIEdWfxJNxdp8n+XwoeXvYIw==
+X-Received: by 2002:a9d:7d92:: with SMTP id j18mr4203985otn.17.1607099339170;
+        Fri, 04 Dec 2020 08:28:59 -0800 (PST)
+Received: from [172.24.51.127] (168.189-204-159.bestelclientes.com.mx. [189.204.159.168])
+        by smtp.gmail.com with ESMTPSA id k20sm734786oig.35.2020.12.04.08.28.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Dec 2020 08:28:58 -0800 (PST)
+Subject: Re: [PATCH 6/9] target/mips: Alias MSA vector registers on FPU scalar
+ registers
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Huacai Chen <chenhc@lemote.com>, kvm@vger.kernel.org,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     Mike Christie <michael.christie@oracle.com>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-Date:   Fri, 04 Dec 2020 08:12:13 -0800
-In-Reply-To: <20201204154911.GZ643756@sasha-vm>
-References: <20201129041314.GO643756@sasha-vm>
-         <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
-         <20201129210650.GP643756@sasha-vm>
-         <e499986d-ade5-23bd-7a04-fa5eb3f15a56@redhat.com>
-         <20201130173832.GR643756@sasha-vm>
-         <238cbdd1-dabc-d1c1-cff8-c9604a0c9b95@redhat.com>
-         <9ec7dff6-d679-ce19-5e77-f7bcb5a63442@oracle.com>
-         <4c1b2bc7-cf50-4dcd-bfd4-be07e515de2a@redhat.com>
-         <20201130235959.GS643756@sasha-vm>
-         <6c49ded5-bd8f-f219-0c51-3500fd751633@redhat.com>
-         <20201204154911.GZ643756@sasha-vm>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.38.1-1 
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20201202184415.1434484-1-f4bug@amsat.org>
+ <20201202184415.1434484-7-f4bug@amsat.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ac68e51c-650a-55df-c050-c22a1df355b5@linaro.org>
+Date:   Fri, 4 Dec 2020 10:28:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20201202184415.1434484-7-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2020-12-04 at 10:49 -0500, Sasha Levin wrote:
-> On Fri, Dec 04, 2020 at 09:27:28AM +0100, Paolo Bonzini wrote:
-> > On 01/12/20 00:59, Sasha Levin wrote:
-> > > 
-> > > It's quite easy to NAK a patch too, just reply saying "no" and it'll be
-> > > dropped (just like this patch was dropped right after your first reply)
-> > > so the burden on maintainers is minimal.
-> > 
-> > The maintainers are _already_ marking patches with "Cc: stable".  That 
-> 
-> They're not, though. Some forget, some subsystems don't mark anything,
-> some don't mark it as it's not stable material when it lands in their
-> tree but then it turns out to be one if it sits there for too long.
-> 
-> > (plus backports) is where the burden on maintainers should start and 
-> > end.  I don't see the need to second guess them.
-> 
-> This is similar to describing our CI infrastructure as "second
-> guessing": why are we second guessing authors and maintainers who are
-> obviously doing the right thing by testing their patches and reporting
-> issues to them?
-> 
-> Are you saying that you have always gotten stable tags right? never
-> missed a stable tag where one should go?
+On 12/2/20 12:44 PM, Philippe Mathieu-Daudé wrote:
+> Commits 863f264d10f ("add msa_reset(), global msa register") and
+> cb269f273fd ("fix multiple TCG registers covering same data")
+> removed the FPU scalar registers and replaced them by aliases to
+> the MSA vector registers.
+> While this might be the case for CPU implementing MSA, this makes
+> QEMU code incoherent for CPU not implementing it. It is simpler
+> to inverse the logic and alias the MSA vector registers on the
+> FPU scalar ones.
 
-I think this simply adds to the burden of being a maintainer
-without all that much value.
-
-I think the primary value here would be getting people to upgrade to
-current versions rather than backporting to nominally stable and
-relatively actively changed old versions.
-
-This is very much related to this thread about trivial patches
-and maintainer burdening:
-
-https://lore.kernel.org/lkml/1c7d7fde126bc0acf825766de64bf2f9b888f216.camel@HansenPartnership.com/
+How does it make things incoherent?  I'm missing how the logic has actually
+changed, as opposed to an order of assignments.
 
 
+r~
