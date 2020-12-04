@@ -2,119 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C54402CE95E
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 09:19:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3A302CE992
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 09:29:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728096AbgLDISu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 03:18:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23412 "EHLO
+        id S1729094AbgLDI3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 03:29:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31519 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725866AbgLDISu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 03:18:50 -0500
+        by vger.kernel.org with ESMTP id S1725967AbgLDI3A (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 03:29:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607069843;
+        s=mimecast20190719; t=1607070454;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OMu6Ts4aXegHwTfI5K4+wIFUI7ZOjwyzufO+hy2X5v0=;
-        b=htnOy2Y24XjqrC7RQU8BoFsfYIvzB32OXMiASal+Xx6aS7I9BR3o0y7adUWYs2I0I7n1Pv
-        m1H5dkttGWaSv1T28YKFm0KPyvr70a1bbReh4J5RRQS5IAmWlLFsKXvOp28c7mGiTo93e+
-        vtbrnsn8w4rEfb0013c2zC1cY90ynnQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-PkCGHXBdOoW3IS7HMSFR1g-1; Fri, 04 Dec 2020 03:17:21 -0500
-X-MC-Unique: PkCGHXBdOoW3IS7HMSFR1g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3581800D53;
-        Fri,  4 Dec 2020 08:17:19 +0000 (UTC)
-Received: from gondolin (ovpn-113-97.ams2.redhat.com [10.36.113.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 700395C1CF;
-        Fri,  4 Dec 2020 08:17:09 +0000 (UTC)
-Date:   Fri, 4 Dec 2020 09:17:06 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     David Gibson <david@gibson.dropbear.id.au>, pair@us.ibm.com,
-        pbonzini@redhat.com, frankja@linux.ibm.com, brijesh.singh@amd.com,
-        dgilbert@redhat.com, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
-        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
-        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com
-Subject: Re: [for-6.0 v5 12/13] securable guest memory: Alter virtio default
- properties for protected guests
-Message-ID: <20201204091706.4432dc1e.cohuck@redhat.com>
-In-Reply-To: <d739cae2-9197-76a5-1c19-057bfe832187@de.ibm.com>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
-        <20201204054415.579042-13-david@gibson.dropbear.id.au>
-        <d739cae2-9197-76a5-1c19-057bfe832187@de.ibm.com>
-Organization: Red Hat GmbH
+        bh=e9Y6WzFRcgbtIi5LBno88YZfeKK7F+ba+sYdLaKYH9w=;
+        b=Gg62bac1lWY9C3nvr1LFQkHRGjzBAKmpYjCuFkyRrbjzmO3uFwoH59bMyTpo4oWUwr+dSi
+        WxsaxdpEeJhJDagllXhg4XIEm+M/Lyl9Gjr9sAszWEHm0rf6NFDvspz6YrNy3Gmz4AJY9o
+        jVEG81aLGyknba9tOFPv4vnyheAcYAc=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-wkl3x-YnMAaXtFnuPD8x5A-1; Fri, 04 Dec 2020 03:27:32 -0500
+X-MC-Unique: wkl3x-YnMAaXtFnuPD8x5A-1
+Received: by mail-ed1-f72.google.com with SMTP id c23so2056850edr.4
+        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 00:27:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=e9Y6WzFRcgbtIi5LBno88YZfeKK7F+ba+sYdLaKYH9w=;
+        b=A/yo5xnGZfQhaLFfh7+McJQOJ5r1t85cFaX8whpzJ0PbKnatMt98+0pICzBtePWB3F
+         ARSzMe2Kl6CuqKsQ23v66QVw05p7W33vlMzUxIJpgPKIFKtlX9F9wUiM+ZVkhr3N/8lA
+         iWfwobVlsy9q5T/Nv4CZmAFDmQUKc17wX1j6pDgtkgYehaQMO5waXJ6G2UOR0E2TwE3s
+         V9P5A2w3P+n8ATxD+dQB+9l7u36XAOv9gdvIrBi7jO7QdsoOJeQn2pydizb78yzHdI3V
+         O42peKaDo/sDmw/d6gm47nBdWu0zQq4wKPFxc6LUM5UjQ+Y8UbuAL3Rsu4ylZQCcd1bx
+         TFdQ==
+X-Gm-Message-State: AOAM532GQrL/8V07ZZ1wZJtrUGBLq7fIX7rTX3xDX6X6uJl7gNndUTeN
+        heJs44CfnQll1kU6waNivVi7Sc+lX317X69ep7ISPfLo2sXEIYbvsFdCQDkDyEVtwKsDPZfCadd
+        Z5RbLaVTbMf5+
+X-Received: by 2002:a50:e0ce:: with SMTP id j14mr6573302edl.18.1607070451481;
+        Fri, 04 Dec 2020 00:27:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwMIyz5LS2iwvNf1iWyhuXSvOdoCaeoLpxIQO9KF7bm/bHa+j5UQfAthZzEj17BWx0cIuFxUQ==
+X-Received: by 2002:a50:e0ce:: with SMTP id j14mr6573281edl.18.1607070451200;
+        Fri, 04 Dec 2020 00:27:31 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id dh23sm1155140edb.15.2020.12.04.00.27.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Dec 2020 00:27:30 -0800 (PST)
+Subject: Re: [PATCH AUTOSEL 5.9 22/33] vhost scsi: add lun parser helper
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     Mike Christie <michael.christie@oracle.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20201125180102.GL643756@sasha-vm>
+ <9670064e-793f-561e-b032-75b1ab5c9096@redhat.com>
+ <20201129041314.GO643756@sasha-vm>
+ <7a4c3d84-8ff7-abd9-7340-3a6d7c65cfa7@redhat.com>
+ <20201129210650.GP643756@sasha-vm>
+ <e499986d-ade5-23bd-7a04-fa5eb3f15a56@redhat.com>
+ <20201130173832.GR643756@sasha-vm>
+ <238cbdd1-dabc-d1c1-cff8-c9604a0c9b95@redhat.com>
+ <9ec7dff6-d679-ce19-5e77-f7bcb5a63442@oracle.com>
+ <4c1b2bc7-cf50-4dcd-bfd4-be07e515de2a@redhat.com>
+ <20201130235959.GS643756@sasha-vm>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6c49ded5-bd8f-f219-0c51-3500fd751633@redhat.com>
+Date:   Fri, 4 Dec 2020 09:27:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20201130235959.GS643756@sasha-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 4 Dec 2020 09:10:36 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 04.12.20 06:44, David Gibson wrote:
-> > The default behaviour for virtio devices is not to use the platforms normal
-> > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > to directly access guest memory.  That doesn't work if the guest's memory
-> > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> > 
-> > So, if a securable guest memory mechanism is enabled, then apply the
-> > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > Those will presumably have some way of marking memory as shared with
-> > the hypervisor or hardware so that DMA will work.
-> > 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/core/machine.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> > 
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index a67a27d03c..d16273d75d 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -28,6 +28,8 @@
-> >  #include "hw/mem/nvdimm.h"
-> >  #include "migration/vmstate.h"
-> >  #include "exec/securable-guest-memory.h"
-> > +#include "hw/virtio/virtio.h"
-> > +#include "hw/virtio/virtio-pci.h"
-> >  
-> >  GlobalProperty hw_compat_5_1[] = {
-> >      { "vhost-scsi", "num_queues", "1"},
-> > @@ -1169,6 +1171,17 @@ void machine_run_board_init(MachineState *machine)
-> >           * areas.
-> >           */
-> >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > +
-> > +        /*
-> > +         * Virtio devices can't count on directly accessing guest
-> > +         * memory, so they need iommu_platform=on to use normal DMA
-> > +         * mechanisms.  That requires also disabling legacy virtio
-> > +         * support for those virtio pci devices which allow it.
-> > +         */
-> > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy",
-> > +                                   "on", true);
-> > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform",
-> > +                                   "on", false);  
+On 01/12/20 00:59, Sasha Levin wrote:
 > 
-> I have not followed all the history (sorry). Should we also set iommu_platform
-> for virtio-ccw? Halil?
-> 
+> It's quite easy to NAK a patch too, just reply saying "no" and it'll be
+> dropped (just like this patch was dropped right after your first reply)
+> so the burden on maintainers is minimal.
 
-That line should add iommu_platform for all virtio devices, shouldn't
-it?
+The maintainers are _already_ marking patches with "Cc: stable".  That 
+(plus backports) is where the burden on maintainers should start and 
+end.  I don't see the need to second guess them.
+
+Paolo
 
