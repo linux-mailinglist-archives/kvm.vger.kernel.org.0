@@ -2,112 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0E362CF31F
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 18:31:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 073C32CF3A2
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 19:08:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727297AbgLDRav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 12:30:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37368 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726021AbgLDRav (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 12:30:51 -0500
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2FD4C0613D1
-        for <kvm@vger.kernel.org>; Fri,  4 Dec 2020 09:30:10 -0800 (PST)
-Received: by mail-pj1-x1042.google.com with SMTP id j13so3545610pjz.3
-        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 09:30:10 -0800 (PST)
+        id S2387624AbgLDSHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 13:07:52 -0500
+Received: from mail-bn8nam12on2040.outbound.protection.outlook.com ([40.107.237.40]:26208
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726330AbgLDSHw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Dec 2020 13:07:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kyRYQyGQd5+Pa4NAlybcHmqI41wZ4lJr9Msf/ZIJ3hIRvApJ/BCz6W0poSbfMQxBQ+HIIHGYSsXn7ZruGPoo1JopBkvSk9A5qbCrFsBHMb0HWM7EOOaajxZkn+MkpP3GdxrVgzj5onf/FnrA+lWBaJSp1VlXPjgcQ14E5yhgJFLMNylf0+tyEtxUFV5wtQJ0Oxn+qxI7ss4eL2qy0oryD4w2eor56ipFMj4+bFhGu/5Bxq/5FXjqlInFM3HxJsv4ZG+qRRTm7shQFRX57uyL2FHDFuQXQk0kMLZobXKpzNoValDXRnp0NEK6v2eXv7P4fjT+RKnZ6h+bEcK3dObFpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SqtlYiB7SlsGU27zMvWx80kTuZFINQ3U0kB1mhCHcBc=;
+ b=ASLh2CkYjNGWvi77A8jc8IktfmCD1R4kkctHLDp0x3M51ah9g9NPbjkm105vPQgrJTI0qNjmRNdArYUzS0U3J7+BOGZ0FQZBixdGrK5oZCCIPYwnuqtl+KZgfECxZrmEzwIR18su+SoYWJuYj57j2n9yoPoahPEQXjkc+VzoBbcNCZI9bgbPc6qS7J3RvgHj09UiAOtdJnfzeHjk3AtUZD81B5F7OFJ7eWJlCIhDA6SC9ulhwCaHaK/8/RF0u8IcGqi9J3OWzhwr1TOFC5irbjYhH/rZtOPmi/5XBJw+JpvJOXbpK1vqcGBJSppPsjQ4ZEYyuMlVFHz37ny90caQmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=C83LWVZ8wM91AdWAS0iA3r1viy6kVdAOxGG9S1jtaCw=;
-        b=iJAUPmwWEnaAhg3wVRqh7oUcyTgWd+UHbESFOsFKDVfqajgfIROKPFQ5GD3OU+xa99
-         Jl3jC+WqpIsbkSbHw/wROs7jt7qUdrlmAp5EEseFWwhknRSyQQJrHkiSxJSWBujBv5TZ
-         7zhwhuArunV5D0CHnsEzlrVBVopSEiBeOYSKmSK8SJWyif03QcE0FIu0cTxZmcPzBgJm
-         Pnc3BsqDFAjAJounHoX0+dImC/5neswOWxsc5tDWdxI9ngeqt1ULE2o+4DlAW6Gkayg1
-         +7ieOETFbxJ7E6S7Tb1xRFdv1LS+r9l0jA3+JcuzuFQbbSYKINDifFz1seUopnH18UrJ
-         N0TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=C83LWVZ8wM91AdWAS0iA3r1viy6kVdAOxGG9S1jtaCw=;
-        b=O4Cc9HQVEFdI2vGNYJaTs4UMoOc9rHk5rTBBj/zv0KlNHAdViEi2xY1BmOo1v7xKBx
-         3cbPk8JKL3UiKk9IFFY3WrsWLQY9cu86YyWRuqF/Z1fQ/FTeb0d1EzD5z8te1xEUqLwY
-         j1AvCf85NldOpyGgw67j4ki6n2gy9ZZpLRtjrp84oucrS/FNLgeR5HCPRY3RheqAnMQC
-         XQxN0je6ely1n+iYQ+EUeCYc5jZ5K54SEWR77JpfXDBzoiWA2C4KquSXezk1rVHYcO7U
-         LeW91oaN2J9BJ28ZtiR++jiSnZS/eiecKS0lLgizB1tbRj67w+h7iG5sHNd6cYINgMSQ
-         gz9g==
-X-Gm-Message-State: AOAM532ieO+wzn4DgGqThMbrkB9D55OBHLwV4IT5eFKXce/ucC4l0aBd
-        5/g08JTO/17kz1Tc2GvBzOzr6Q==
-X-Google-Smtp-Source: ABdhPJy8VrWERnAQbr+qZ5xf1WYX5NQ0PtIo4qgWqJih4aRqFD0kiCHgE33P8yE3i2WON8L59+Zg8Q==
-X-Received: by 2002:a17:90a:154a:: with SMTP id y10mr5170231pja.6.1607103010205;
-        Fri, 04 Dec 2020 09:30:10 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id h11sm5728667pfn.27.2020.12.04.09.30.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Dec 2020 09:30:09 -0800 (PST)
-Date:   Fri, 4 Dec 2020 09:30:02 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC 03/39] KVM: x86/xen: register shared_info page
-Message-ID: <X8pyGiVDuBGJmazJ@google.com>
-References: <20190220201609.28290-1-joao.m.martins@oracle.com>
- <20190220201609.28290-4-joao.m.martins@oracle.com>
- <b647bed6c75f8743b8afea251a88f00a5feaee29.camel@infradead.org>
- <2d4df59d-f945-32dc-6999-a6f711e972ea@oracle.com>
- <896dc984-fa71-8f2f-d12b-458294f5f706@oracle.com>
- <58db65203b9464f6f225f4ef97c45af3c72cf068.camel@infradead.org>
- <6ea92fe2-4067-d0e0-b716-16d39a7a6065@oracle.com>
- <8c92b2f3a8e8829ec85d22091b2fe84794f12f78.camel@infradead.org>
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SqtlYiB7SlsGU27zMvWx80kTuZFINQ3U0kB1mhCHcBc=;
+ b=ihTw0CnjznH3bSXPj7t91dGPAjEuQyiTcA/MLjNyke4GGFe1CcOZqQBLfdbgj9NCmKvMU2obLNpwvXZK42HgdaLRcelrLtRdyzCdcZpE2aRQAZ7ytw6vgHVdX0/zw9dMUYA+Sjq4YwksyyMZFisIAAgxMbaGK28W0iQ6aJwxDqk=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17; Fri, 4 Dec
+ 2020 18:06:57 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3611.025; Fri, 4 Dec 2020
+ 18:06:57 +0000
+From:   Ashish Kalra <Ashish.Kalra@amd.com>
+To:     seanjc@google.com
+Cc:     Ashish.Kalra@amd.com, Thomas.Lendacky@amd.com, bp@suse.de,
+        brijesh.singh@amd.com, hpa@zytor.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, rientjes@google.com,
+        srutherford@google.com, tglx@linutronix.de,
+        venu.busireddy@oracle.com, x86@kernel.org
+Subject: Re: [PATCH v8 13/18] KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION feature & Custom MSR.
+Date:   Fri,  4 Dec 2020 18:06:45 +0000
+Message-Id: <20201204180645.1228-1-Ashish.Kalra@amd.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <X8pocPZzn6C5rtSC@google.com>
+References: <X8pocPZzn6C5rtSC@google.com>
+Content-Type: text/plain
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: CH2PR05CA0020.namprd05.prod.outlook.com (2603:10b6:610::33)
+ To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c92b2f3a8e8829ec85d22091b2fe84794f12f78.camel@infradead.org>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by CH2PR05CA0020.namprd05.prod.outlook.com (2603:10b6:610::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.5 via Frontend Transport; Fri, 4 Dec 2020 18:06:56 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: e1c31409-2e3c-4b9a-1b10-08d8987f639f
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4495BEC236005715D13CA18E8EF10@SA0PR12MB4495.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cGYVB6tQzH31qxWL9u+murwXEQZ2Xom2Do0QC888ZkYwbigIQGvpIyrpHhelU8Ci6Axbl3XfljqG3hGOG6SE9e9JqyYN4PaS7k6e0pnoVR9678UEzFZ4F5sM0ZRc2rbEFoQharaIL0BWMQQGIw52CwIbO06VWY01MmeLmCr/iiGHZTRf+fp1Z1FSP+0eJ3wrEVi4FKBIdxg1m1BnMX83Ae2xbqSl0q7u3X861ys4ayoAAlocX5jBJRf94Xf/hJp6CoDobd3SmwhuQp2oRMGXbHpq+JgDFUFRuJkxXCKC9y5O172EXowu5MepwqrYqsd/
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(39860400002)(366004)(396003)(66556008)(66476007)(66946007)(6916009)(316002)(6666004)(36756003)(26005)(4326008)(186003)(7696005)(558084003)(16526019)(7416002)(1076003)(6486002)(8936002)(5660300002)(956004)(52116002)(2906002)(8676002)(2616005)(86362001)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?+a694h88efJ0lCABl6oYfRdNinRYqt2yOYmqpl8ojzFHLT94G03eGDE/sUCv?=
+ =?us-ascii?Q?k5/2SmArqJdAficg0/2BlGDu+wk2v6bUTIrcqc1ReNQfl7gcv4Cx6tBbY3/S?=
+ =?us-ascii?Q?4CpcFwI38hJWIo8WIPU0fjwWzNIdAnGvW6hAqAElI1I7NzSUZBU/1Ymy2359?=
+ =?us-ascii?Q?rkIzdq4MKcCvYPPmuHmk9k+yLliN01NPt8Mry78tdUTXWA9ySPylY0ES007H?=
+ =?us-ascii?Q?9DftYBifKwWUoQfrVQYUkWrUZIQqvwm4bT+pK2M2QUP8Seg7pVKr3RpBL1ZV?=
+ =?us-ascii?Q?8lHsy609cDatoUhZL+M5cv3kpo8MgB8gj1muQLZ+fQzwshJN1FmnjxfroSRG?=
+ =?us-ascii?Q?MzMkjWhFUPbFFJe7nqSkSRLTMSmRAP0O09Lsc75C2kbvI4C7XsOmTNWQx/sX?=
+ =?us-ascii?Q?/zdtw5VGVItvSAutGvQ/X3GTqQ2npjY64R3OH+xNQryp+AEr4DVsOTDH1lNN?=
+ =?us-ascii?Q?77vKlNhzX3xSZGi6t4HXM+Dn73seamcJx4519Trhw7WjH/Z28iRbDBvtGBQz?=
+ =?us-ascii?Q?PP0qlhN1zDsjljn8kte1PMt1xOq3MBcIsLDKaFzX2zW7JyKRVbyiljTp7ffG?=
+ =?us-ascii?Q?vBVAYdyuf9Kr/ZCy1ITqeeAOw5JZFxYzvVQPDZ79WBOx18iCs1qAIymy5JJW?=
+ =?us-ascii?Q?Aru6bLGhDWsSvV0VuLuL1O+rQ0NNCrIw4PI3JSdLlgiZhVuL3+w2k3F8QvaX?=
+ =?us-ascii?Q?NhzTROjpiuj8q4XS2WY84lrP12kKfFGcdjWySW/EebRYoxbZT6mZFGEORnjg?=
+ =?us-ascii?Q?dIGYaujqXxDQc27hpO7M25RXVqN/8CU/OPincgvD3RhQG90Lk1i/oHN4Wm8h?=
+ =?us-ascii?Q?jwc8Pm/ocfptHJFvmehNBRxxwn54ZRekA/brNYyfoX72frDtFrqvd6S6Jhhu?=
+ =?us-ascii?Q?efCJ/xeIqLUnow9m/WJSkOx2z+VEh7UcgJYnkjuX/Wg7VNsYsYjp6x0uQACg?=
+ =?us-ascii?Q?M/ILg3SfoyBUjFZP/Yju0tEhAC4OkewQFkgSWLarAQGqQGDYzDAuX4eM8fB+?=
+ =?us-ascii?Q?z9JV?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1c31409-2e3c-4b9a-1b10-08d8987f639f
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2020 18:06:57.8401
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cdLly1RbZ9WXe7SlKgWUOJQna8qY93K9tm5sEDgcT5f70A7ExkKcDMKQDpe8gyNmnx3o48LwacCJxgY127jrkw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 03, 2020, David Woodhouse wrote:
-> On Wed, 2020-12-02 at 12:32 -0800, Ankur Arora wrote:
-> > > On IRC, Paolo told me that permanent pinning causes problems for memory
-> > > hotplug, and pointed me at the trick we do with an MMU notifier and
-> > > kvm_vcpu_reload_apic_access_page().
-> > 
-> > Okay that answers my question. Thanks for clearing that up.
-> > 
-> > Not sure of a good place to document this but it would be good to
-> > have this written down somewhere. Maybe kvm_map_gfn()?
-> 
-> Trying not to get too distracted by polishing this part, so I can
-> continue with making more things actually work. But I took a quick look
-> at the reload_apic_access_page() thing.
-> 
-> AFAICT it works because the access is only from *within* the vCPU, in
-> guest mode.
-> 
-> So all the notifier has to do is kick all CPUs, which happens when it
-> calls kvm_make_all_cpus_request(). Thus we are guaranteed that all CPUs
-> are *out* of guest mode by the time...
-> 
->     ...er... maybe not by the time the notifier returns, because all 
->     we've done is *send* the IPI and we don't know the other CPUs have 
->     actually stopped running the guest yet? 
-> 
->     Maybe there's some explanation of why the actual TLB shootdown 
->     truly *will* occur before the page goes away, and some ordering 
->     rules which mean our reschedule IPI will happen first? Something 
->     like that ideally would have been in a comment in in MMU notifier.
+Yes i will post a fresh version of the live migration patches. 
 
-KVM_REQ_APIC_PAGE_RELOAD is tagged with KVM_REQUEST_WAIT, which means that
-kvm_kick_many_cpus() and thus smp_call_function_many() will have @wait=true,
-i.e. the sender will wait for the SMP function call to finish on the target CPUs.
+Also, can you please check your email settings, we are only able to see your response on the
+mailing list but we are not getting your direct responses.
+
+Thanks,
+Ashish
