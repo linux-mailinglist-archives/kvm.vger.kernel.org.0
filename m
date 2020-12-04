@@ -2,314 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 041452CF632
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 22:30:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 435A92CF644
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 22:32:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387784AbgLDV3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 16:29:55 -0500
-Received: from mail-dm6nam11on2055.outbound.protection.outlook.com ([40.107.223.55]:55512
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S1727030AbgLDVcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 16:32:08 -0500
+Received: from mail-co1nam11on2083.outbound.protection.outlook.com ([40.107.220.83]:25824
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727176AbgLDV3y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 16:29:54 -0500
+        id S1726534AbgLDVcH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Dec 2020 16:32:07 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PUOfDAJiELDA1uPv/EQkXpqwI7lN8w4yohoUe/0iOETboGuJX4JQYYwdPEUMBfl30ZUQb2JcuRqEaOns3vGDfwLay+hMW44twE80u3tMwOdvKpSd26PI+JhditjwhfT4gp4bvYzLdmf5Kdy4EzlbLHrtM3reMF39kFbiBQif1w97mzbeeS6ve6YJ+5Kip/Psy6KErcC+ecg/LhxHQgQ5YuKfLV9FjepkOJwBBB0l0smF3LMpPJqUmvFvZ705HHwOkYIhRbE/vg4PBaN8nLEMZjSfG8nBlZcCspH2wY0tXRh4IrF3mAI+vYSimimqUWWQnGyaWytI1nRY0RbPZ6GVPg==
+ b=maLWT1Nl1pip5XFcsJ6bHjYYfiF4vOoo96aW6ptPLWOeOGR0uSOYSIrdgJ0wPMA8y7Uz2uo9H8yR9u5K0hFPoYr1AQ2+FrYBrAI1O0piWr7AEGsYbTj7z3Y6D06YSYd3OlhqfcfFAF16A1UBL2LXALttU6WNu6mS+23qJbdPR8Ez8Na3QbpgAvCwihwWQGFRYmkTB+R215mVWAas4gQs1gwiVNlYX341F+L4E2G9D/pownpPp/JVhNHyojw3UYB7ZsappjBh+ob8OSl2jCqGOgGf00ELUOD34su3WFYVixE2tONupTBfCUEtmwD0PyzVxdEexvbtv/mnz0VqydX2Tg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5+3dsg26zcWEAFfGxMccFYO1iXI3xw/02umty3122hY=;
- b=JOGqvYicnt0sRtOI2tqzH1hjOPn9nD4mTNLBNYVbvlFXmHk1/xdQ7iPRdLjPY0PzSpsaKcnMODc7YVAYWRhczGA6awgRG6lNPQi5PSu6lvt3qXEQgsTLlX2nRBToVYKOT/EjDz1lvnU30Kg3Lz40ERerSJz3WCoMa2+6AYGGkdomcoHS9DgUj5pEaltYN8nh5Lls6mYYpyEPZTFkImgpCwFtgM320Fslof6tXaDA0GQ/AI9jVlFKL6fkkmPtiHZgmbe9MldK2ghkV589QEYI24Up3k6g989yWRrlm//FhLXyNHOYjK43v/vYdQRDxRV6MrDSxuSiZpuTuoCQVsyJ+Q==
+ bh=cIFI4ju2A2xkxveYfptsHT7nH2HM2YPpf9lFfk5qebQ=;
+ b=jA684B2tr5CCdV5lcSa2Cp5xxi1e89oQ4mQZn+x+yPb3bmfsAqZ1YRba7QriBoZDeXgicMO4BT5QxssPCYibe17j8h8DK5+Q39wXTYE4VemoFcRRcpLnCXsHBknrQr/eFPjnS+Nirumj66mn8JQs/kXI3SWEyCWnOAjHsrYFh5w9guzdANMEO9nQDLIICAVEO4eeZTmLguW5D9AK/O0XZWBEpB51Eb9ag+PwWqvXgFOmoGPFUTIs5qHnzpUq3rXlKblqCP1ayj8v0wHttfxI9Nc21ZmrbtR+NZtOxHouSbbJV0ZhNuZahJbKpZeRf7vgSqO80q5KbX/iPbIL3q0t/g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5+3dsg26zcWEAFfGxMccFYO1iXI3xw/02umty3122hY=;
- b=KqatlDw2rIJBSMG8hQXC+B7gPDCWvp5kT856EClqmyciHQ83gjkrnKI24mZusCQ4Lt7Qy78Yw/uoFOil1G2LUIid0Fv9Q+/cVnxxKDIsI+/+OsCob8lQAExhiC3hzXTVKjmm7fGzfOnulE6lPfLmM7uIEDeMQ1zPaWbopKowxAE=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+ bh=cIFI4ju2A2xkxveYfptsHT7nH2HM2YPpf9lFfk5qebQ=;
+ b=S/rJmTAUqxwN45fLR8OIATYDn/BCGM7VlTlUVvoPfkxgmJQj3wPBg/3qtOz5mFjKqLNfpfhUIoVEpgDsAUCeCuu7LZBe+xD34pttDRNEmvpVtWis2JxGUSHK1fhHDLlzjBW7TB+kdeKmSubqlyC121phAMZcE4GtJO02tGax+rg=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
+ by SA0PR12MB4431.namprd12.prod.outlook.com (2603:10b6:806:95::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17; Fri, 4 Dec
- 2020 21:29:01 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Fri, 4 Dec
+ 2020 21:31:14 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::18a2:699:70b3:2b8a]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::18a2:699:70b3:2b8a%6]) with mapi id 15.20.3632.021; Fri, 4 Dec 2020
- 21:29:01 +0000
+ 21:31:14 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
+To:     qemu-devel@nongnu.org
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
         James Bottomley <jejb@linux.ibm.com>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] KVM/SVM: add support for SEV attestation command
-Date:   Fri,  4 Dec 2020 15:28:47 -0600
-Message-Id: <20201204212847.13256-1-brijesh.singh@amd.com>
+        Eric Blake <eblake@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH] target/i386/sev: add the support to query the attestation report
+Date:   Fri,  4 Dec 2020 15:31:01 -0600
+Message-Id: <20201204213101.14552-1-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN4PR0401CA0039.namprd04.prod.outlook.com
- (2603:10b6:803:2a::25) To SN6PR12MB2718.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN6PR2101CA0022.namprd21.prod.outlook.com
+ (2603:10b6:805:106::32) To SN6PR12MB2718.namprd12.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0401CA0039.namprd04.prod.outlook.com (2603:10b6:803:2a::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17 via Frontend Transport; Fri, 4 Dec 2020 21:29:01 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN6PR2101CA0022.namprd21.prod.outlook.com (2603:10b6:805:106::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.2 via Frontend Transport; Fri, 4 Dec 2020 21:31:14 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c979c4e3-97a4-41ee-2886-08d8989b9e30
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
+X-MS-Office365-Filtering-Correlation-Id: 900d0ca3-73e0-4fa4-2a02-08d8989bed7b
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4431:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4384B6247DCF1A21F082D293E5F10@SA0PR12MB4384.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB44316D5BC2C7DBC26BE87DDCE5F10@SA0PR12MB4431.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PJJ5qf81Cpev0/6oWnEHAK/6t8IUI4nkleXZlw31je3I7RAzBGGt6Ew7cIPaORGuZ6cftBW7kgm2qNny5fjFkSlFOM9QWWJShxRMQRA36+jTNdDZAK1GUIjbgWI8uE94u33hXfy5q1qfaETNyEQgOTgZSZlRkmJATpsgI/fuJkT9oq9q+a6NiKFm0dzEQGCjCkIHga8MNyMMHAWI2OHxqrZyR1SxxJ15QgM6MyHrmCYvY6Ycsqjb7r+PRdYTV7Ip3xncARkownBbCgt6rS6FFClLSFwW4bajWM94lybG/d250mvjpJ1HK1sUZUW9jZVfVajNp1aBB1jTFm8HSAvaFw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(366004)(346002)(376002)(39860400002)(6486002)(54906003)(8676002)(316002)(4326008)(52116002)(2906002)(7696005)(2616005)(7416002)(8936002)(1076003)(5660300002)(6666004)(83380400001)(6916009)(478600001)(86362001)(956004)(16526019)(66556008)(36756003)(26005)(66476007)(44832011)(66946007)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?OD1sqorUcnJLoj10SlQCbCpBABhesB/vBNrwvWCLQiyxs/3LkWi/6fPsy2FM?=
- =?us-ascii?Q?NQjgzEZxCjGFMU54Z0xZyFh//uorwUFNt6RyCEVXwLjQDPFaneZ8oxeGbGlS?=
- =?us-ascii?Q?iz9AH85G528kqW+EtgpGWLnnqT3UcW2gvaQceROo86YBid1hU3YbT98bL7Ls?=
- =?us-ascii?Q?HdY1WyLU+1XrBrU0ziliakKNfJPmzzxEpnj1/aljw1amZ2G3YLT1V4Gbu5fA?=
- =?us-ascii?Q?y0w5ndjKtwX3T1GRDkN1bVV1R0dOP4COonDeiON7zG0U2hB6I/UDjpipBFok?=
- =?us-ascii?Q?tUOuhl+htB7fLdOuUj8QpjhMkmgDmVNploFDEotgHrQGFgXXmDDNmuVFFksd?=
- =?us-ascii?Q?S0wcisEocGXfzRW8t45BtwvyY6nihfB0zxiXe+atTUqjDBbKSbMrTGL0pyS/?=
- =?us-ascii?Q?apgfjOhdsl3rdCTjqJ41novFpBgoyo5JY3iq2InlIWB/biP46S+0NcVnpFE1?=
- =?us-ascii?Q?90ahq0no6w9hJ3YgndgZUe/oFhxez9rxYYrkGdl2ed+jxHorMLmYYh+43qA3?=
- =?us-ascii?Q?2t09C4X778iolcmMWMlw5im8q4I0AqmZG4gJSKm5QVbvcj8ei+yAC/v44Pko?=
- =?us-ascii?Q?O+y59ThWfBK1VUuh7m5DzeWg9blxFa5WTbEsd0qI583B19bf8C/wXzOOQ2Sm?=
- =?us-ascii?Q?Bj5Hy27bP2zhBLv+h0WALq1ryRzbLT9Tpk3g54/cU1Htx0uaxtLjCKunT8jM?=
- =?us-ascii?Q?5ddatL3nUJV150Ge/taBg7zW3vlV1RaTIT3HsVMi3ODnI/kP5vatUxJBDbVP?=
- =?us-ascii?Q?DgZ29lkq7dXbv178lyuXPgnQ58mDcIJ8P3VpL8OUSj2BQCCeA9kpRsK/Nkt+?=
- =?us-ascii?Q?AkTp9UtI76pAagEwwheGdkis4MhP5dXrIdMNGJu4Jjh0x5j+72HhF23o98uJ?=
- =?us-ascii?Q?uWwOLsCtDP+rIf08sKGeupJmw9pUR7S9p/Rcz0f4j0JeiQiPll7SHrfvkEfn?=
- =?us-ascii?Q?PoQhrsDXC1bnWw6NlT20m5u1wJ4J5G0VCv/N6rqDhxrPTd7x8FLssuDLuEqj?=
- =?us-ascii?Q?SiTk?=
+X-Microsoft-Antispam-Message-Info: ZEYzC0z5YTXs+gMM3lHulWrHOZMcrX2O4hZop15YmlC6BeXMyiDqdUBj5F+XiVjCMWOprkaSS7OXejA7LGDK2235O4ZSbkFqWAxzgng0MS+1rw74oeJBedsjc3wgo3BCf6XAHEOZFIA/eUINREHbPylOt4v5cVA30T0EGch+ucxU8QBedz1kO398UsNGZw+cshnjgwl6TV+BIyvnAIe6o6li1LOkyTxCJtFu9Nj2dg3WbCfpd3ZiMvi6oSU/A8kLDdux5wPmMfyos2CebYbmOB1hC6L0AdrXpcWDKZcDfMm60weLRMBOpHdBwe7pk25I
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(376002)(136003)(39860400002)(346002)(66946007)(52116002)(6666004)(8676002)(86362001)(66556008)(5660300002)(316002)(186003)(83380400001)(44832011)(6916009)(66476007)(8936002)(2616005)(7696005)(2906002)(54906003)(36756003)(16526019)(1076003)(4326008)(6486002)(478600001)(956004)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?uS5/pglLyEPF25NM8MWpHYx9bpCt9FZ3lgIiz7ibpZOfILowqlInZNM48q7g?=
+ =?us-ascii?Q?znw0agHuuB6WMktl3dBKH9zSJIhKcKQQnwgLSWFXPD3DnhhRFKm0Q/HXWhOF?=
+ =?us-ascii?Q?RKhmiEVW7XopN8hOH919HkuLAKmQFB+QjB25cdjfL4ryk/6MRPrGeUTEEhtZ?=
+ =?us-ascii?Q?CYLUxUuU0MFfU6CujKwTGLXN0PvD9NG8tCyabRvpdrZWfF7MUtX+wHmr2CxF?=
+ =?us-ascii?Q?iIEN6u1mjDEwPM+uqZcIEG9XRu1gGBgvBLn6zBm9xb0ttqdPbgga7LwhRp7P?=
+ =?us-ascii?Q?RiQy+3Y9Z8FGskCsvvVRH2hb7ChEne9ktJMLhOKKc8yqRwKRwxmnIPYHFzYc?=
+ =?us-ascii?Q?Hi1QqfZWPT7oIlav/lamQfv6aq4lom/9OBAE4z1/BDOYokDHgo1Quxcioede?=
+ =?us-ascii?Q?65+PrwYJEyrl8vRKIfwoelYfJeumCOCIUxtqs6HHMwgopi/GgN99bpbRW9NO?=
+ =?us-ascii?Q?xs9v0DCHvmEh9wiQu+TK6rwuX1DjjqYxq5UP6a0jBp3sgLLsMKKx5/DbDaP/?=
+ =?us-ascii?Q?UVL7PKtL/suwM1gzD14B2lgAoN34VA66EbbQimDeH1kVoBXock6KmmILeZ6x?=
+ =?us-ascii?Q?I80xj4F5Th8Mn7RNcfvPFuSgM7Bl7wUutMsJjOmCR3J4ZUqVvUDRk/fk4Pu/?=
+ =?us-ascii?Q?OjtDEcA7Wm7n+q6N092oWk9JmEt1XjzRP6CjmNZC46vhxEUfnCy/ASEdbgj1?=
+ =?us-ascii?Q?00XtrwnqthbjM/wZPSt6Ka8V3z9uJcrSl2QK41mp/mxrvbWZC08aHMAGUoA6?=
+ =?us-ascii?Q?N2jXhWG0HcXeLs3MNGiJafYwk7O+4B2gmDHQXnApdZ29tB0C20bTVDLPrdxj?=
+ =?us-ascii?Q?WIFRkoHRDyJxC9gTNcc9uSdLN2EBQELUln3ClwMs8AhdrWUlxijwJxOv4Y47?=
+ =?us-ascii?Q?kM57dayhXj7+284k5YucmyzmrQ3+nQant5Su6rCR93ALRhIrNwFhhGhjrKth?=
+ =?us-ascii?Q?BxyUcnhnu1EzRz9VztqFkSZzVOSyjq17DB2bIIwkvcJoem68mKzQr5uqaY/H?=
+ =?us-ascii?Q?1Ick?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c979c4e3-97a4-41ee-2886-08d8989b9e30
+X-MS-Exchange-CrossTenant-Network-Message-Id: 900d0ca3-73e0-4fa4-2a02-08d8989bed7b
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2020 21:29:01.5933
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2020 21:31:14.5809
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ghe1oi28ZUUnzUbGr7XOgqz6dsgGDxR9IDEyEIASg999IYVsvdt083bFavWPrpWq9VNUah4r3+h84KY+A+xW5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
+X-MS-Exchange-CrossTenant-UserPrincipalName: VJDfbrXXlRJTz2uKSjc+E01eNpODfJ2+fqloJaMOApecGJGn64wlyM/iNHarrDneRpZIpq3RhulDVngXIEcJ6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4431
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SEV FW version >= 0.23 added a new command that can be used to query
-the attestation report containing the SHA-256 digest of the guest memory
-encrypted through the KVM_SEV_LAUNCH_UPDATE_{DATA, VMSA} commands and
-sign the report with the Platform Endorsement Key (PEK).
+The SEV FW >= 0.23 added a new command that can be used to query the
+attestation report containing the SHA-256 digest of the guest memory
+and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
 
-See the SEV FW API spec section 6.8 for more details.
+Note, we already have a command (LAUNCH_MEASURE) that can be used to
+query the SHA-256 digest of the guest memory encrypted through the
+LAUNCH_UPDATE. The main difference between previous and this command
+is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
+command the ATTESATION_REPORT command can be called while the guest
+is running.
 
-Note there already exist a command (KVM_SEV_LAUNCH_MEASURE) that can be
-used to get the SHA-256 digest. The main difference between the
-KVM_SEV_LAUNCH_MEASURE and KVM_SEV_ATTESTATION_REPORT is that the later
-can be called while the guest is running and the measurement value is
-signed with PEK.
+Add a QMP interface "query-sev-attestation-report" that can be used
+to get the report encoded in base64.
 
 Cc: James Bottomley <jejb@linux.ibm.com>
 Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: David Rientjes <rientjes@google.com>
+Cc: Eric Blake <eblake@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: John Allen <john.allen@amd.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
+Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- .../virt/kvm/amd-memory-encryption.rst        | 21 ++++++
- arch/x86/kvm/svm/sev.c                        | 71 +++++++++++++++++++
- drivers/crypto/ccp/sev-dev.c                  |  1 +
- include/linux/psp-sev.h                       | 17 +++++
- include/uapi/linux/kvm.h                      |  8 +++
- 5 files changed, 118 insertions(+)
+ linux-headers/linux/kvm.h |  8 ++++++
+ qapi/misc-target.json     | 38 +++++++++++++++++++++++++++
+ target/i386/monitor.c     |  6 +++++
+ target/i386/sev-stub.c    |  7 +++++
+ target/i386/sev.c         | 54 +++++++++++++++++++++++++++++++++++++++
+ target/i386/sev_i386.h    |  2 ++
+ 6 files changed, 115 insertions(+)
 
-diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index 09a8f2a34e39..4c6685d0fddd 100644
---- a/Documentation/virt/kvm/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -263,6 +263,27 @@ Returns: 0 on success, -negative on error
-                 __u32 trans_len;
-         };
- 
-+10. KVM_SEV_GET_ATTESATION_REPORT
-+---------------------------------
-+
-+The KVM_SEV_GET_ATTESATION_REPORT command can be used by the hypervisor to query the attestation
-+report containing the SHA-256 digest of the guest memory and VMSA passed through the KVM_SEV_LAUNCH
-+commands and signed with the PEK. The digest returned by the command should match the digest
-+used by the guest owner with the KVM_SEV_LAUNCH_MEASURE.
-+
-+Parameters (in): struct kvm_sev_attestation
-+
-+Returns: 0 on success, -negative on error
-+
-+::
-+
-+        struct kvm_sev_attestation_report {
-+                __u8 mnonce[16];        /* A random mnonce that will be placed in the report */
-+
-+                __u64 uaddr;            /* userspace address where the report should be copied */
-+                __u32 len;
-+        };
-+
- References
- ==========
- 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 566f4d18185b..c4d3ee6be362 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -927,6 +927,74 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	return ret;
- }
- 
-+static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
-+	void __user *report = (void __user *)(uintptr_t)argp->data;
-+	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct sev_data_attestation_report *data;
-+	struct kvm_sev_attestation_report params;
-+	void __user *p;
-+	void *blob = NULL;
-+	int ret;
-+
-+	if (!sev_guest(kvm))
-+		return -ENOTTY;
-+
-+	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-+		return -EFAULT;
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	/* User wants to query the blob length */
-+	if (!params.len)
-+		goto cmd;
-+
-+	p = (void __user *)(uintptr_t)params.uaddr;
-+	if (p) {
-+		if (params.len > SEV_FW_BLOB_MAX_SIZE) {
-+			ret = -EINVAL;
-+			goto e_free;
-+		}
-+
-+		ret = -ENOMEM;
-+		blob = kmalloc(params.len, GFP_KERNEL);
-+		if (!blob)
-+			goto e_free;
-+
-+		data->address = __psp_pa(blob);
-+		data->len = params.len;
-+		memcpy(data->mnonce, params.mnonce, sizeof(params.mnonce));
-+	}
-+cmd:
-+	data->handle = sev->handle;
-+	ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, data, &argp->error);
-+	/*
-+	 * If we query the session length, FW responded with expected data.
-+	 */
-+	if (!params.len)
-+		goto done;
-+
-+	if (ret)
-+		goto e_free_blob;
-+
-+	if (blob) {
-+		if (copy_to_user(p, blob, params.len))
-+			ret = -EFAULT;
-+	}
-+
-+done:
-+	params.len = data->len;
-+	if (copy_to_user(report, &params, sizeof(params)))
-+		ret = -EFAULT;
-+e_free_blob:
-+	kfree(blob);
-+e_free:
-+	kfree(data);
-+	return ret;
-+}
-+
- int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- {
- 	struct kvm_sev_cmd sev_cmd;
-@@ -971,6 +1039,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_LAUNCH_SECRET:
- 		r = sev_launch_secret(kvm, &sev_cmd);
- 		break;
-+	case KVM_SEV_GET_ATTESTATION_REPORT:
-+		r = sev_get_attestation_report(kvm, &sev_cmd);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 476113e12489..cb9b4c4e371e 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -128,6 +128,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
- 	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
- 	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
-+	case SEV_CMD_ATTESTATION_REPORT:	return sizeof(struct sev_data_attestation_report);
- 	default:				return 0;
- 	}
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 49d155cd2dfe..b801ead1e2bb 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -66,6 +66,7 @@ enum sev_cmd {
- 	SEV_CMD_LAUNCH_MEASURE		= 0x033,
- 	SEV_CMD_LAUNCH_UPDATE_SECRET	= 0x034,
- 	SEV_CMD_LAUNCH_FINISH		= 0x035,
-+	SEV_CMD_ATTESTATION_REPORT	= 0x036,
- 
- 	/* Guest migration commands (outgoing) */
- 	SEV_CMD_SEND_START		= 0x040,
-@@ -483,6 +484,22 @@ struct sev_data_dbg {
- 	u32 len;				/* In */
- } __packed;
- 
-+/**
-+ * struct sev_data_attestation_report - SEV_ATTESTATION_REPORT command parameters
-+ *
-+ * @handle: handle of the VM
-+ * @mnonce: a random nonce that will be included in the report.
-+ * @address: physical address where the report will be copied.
-+ * @len: length of the physical buffer.
-+ */
-+struct sev_data_attestation_report {
-+	u32 handle;				/* In */
-+	u32 reserved;
-+	u64 address;				/* In */
-+	u8 mnonce[16];				/* In */
-+	u32 len;				/* In/Out */
-+} __packed;
-+
- #ifdef CONFIG_CRYPTO_DEV_SP_PSP
- 
- /**
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ca41220b40b8..d3385f7f08a2 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 56ce14ad20..6d0f8101ba 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
 @@ -1585,6 +1585,8 @@ enum sev_cmd_id {
  	KVM_SEV_DBG_ENCRYPT,
  	/* Guest certificates commands */
@@ -332,6 +156,165 @@ index ca41220b40b8..d3385f7f08a2 100644
  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+index 1e561fa97b..ec6565e6ef 100644
+--- a/qapi/misc-target.json
++++ b/qapi/misc-target.json
+@@ -267,3 +267,41 @@
+ ##
+ { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
+   'if': 'defined(TARGET_ARM)' }
++
++
++##
++# @SevAttestationReport:
++#
++# The struct describes attestation report for a Secure Encrypted Virtualization
++# feature.
++#
++# @data:  guest attestation report (base64 encoded)
++#
++#
++# Since: 5.2
++##
++{ 'struct': 'SevAttestationReport',
++  'data': { 'data': 'str'},
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @query-sev-attestation-report:
++#
++# This command is used to get the SEV attestation report, and is supported on AMD
++# X86 platforms only.
++#
++# @mnonce: a random 16 bytes of data (it will be included in report)
++#
++# Returns: SevAttestationReport objects.
++#
++# Since: 5.2
++#
++# Example:
++#
++# -> { "execute" : "query-sev-attestation-report", "arguments": { "mnonce": "aaaaaaa" } }
++# <- { "return" : { "data": "aaaaaaaabbbddddd"} }
++#
++##
++{ 'command': 'query-sev-attestation-report', 'data': { 'mnonce': 'str' },
++  'returns': 'SevAttestationReport',
++  'if': 'defined(TARGET_I386)' }
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 9f9e1c42f4..a4b65f330c 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -729,3 +729,9 @@ SevCapability *qmp_query_sev_capabilities(Error **errp)
+ {
+     return sev_get_capabilities(errp);
+ }
++
++SevAttestationReport *
++qmp_query_sev_attestation_report(const char *mnonce, Error **errp)
++{
++    return sev_get_attestation_report(mnonce, errp);
++}
+diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+index 88e3f39a1e..66d16f53d8 100644
+--- a/target/i386/sev-stub.c
++++ b/target/i386/sev-stub.c
+@@ -49,3 +49,10 @@ SevCapability *sev_get_capabilities(Error **errp)
+     error_setg(errp, "SEV is not available in this QEMU");
+     return NULL;
+ }
++
++SevAttestationReport *
++sev_get_attestation_report(const char *mnonce, Error **errp)
++{
++    error_setg(errp, "SEV is not available in this QEMU");
++    return NULL;
++}
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 93c4d60b82..28958fb71b 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -68,6 +68,7 @@ struct SevGuestState {
+ 
+ #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+ #define DEFAULT_SEV_DEVICE      "/dev/sev"
++#define DEFAULT_ATTESATION_REPORT_BUF_SIZE      4096
+ 
+ static SevGuestState *sev_guest;
+ static Error *sev_mig_blocker;
+@@ -490,6 +491,59 @@ out:
+     return cap;
+ }
+ 
++SevAttestationReport *
++sev_get_attestation_report(const char *mnonce, Error **errp)
++{
++    struct kvm_sev_attestation_report input = {};
++    SevGuestState *sev = sev_guest;
++    SevAttestationReport *report;
++    guchar *data;
++    int err = 0, ret;
++
++    if (!sev_enabled()) {
++        error_setg(errp, "SEV is not enabled");
++        return NULL;
++    }
++
++    /* Verify that user provided random data length */
++    if (strlen(mnonce) != sizeof(input.mnonce)) {
++        error_setg(errp, "Expected mnonce data len %ld got %ld",
++                sizeof(input.mnonce), strlen(mnonce));
++        return NULL;
++    }
++
++    /* Query the report length */
++    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
++            &input, &err);
++    if (ret < 0) {
++        if (err != SEV_RET_INVALID_LEN) {
++            error_setg(errp, "failed to query the attestation report length "
++                    "ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
++            return NULL;
++        }
++    }
++
++    data = g_malloc(input.len);
++    input.uaddr = (unsigned long)data;
++    memcpy(input.mnonce, mnonce, sizeof(input.mnonce));
++
++    /* Query the report */
++    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
++            &input, &err);
++    if (ret) {
++        error_setg_errno(errp, errno, "Failed to get attestation report"
++                " ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
++        goto e_free_data;
++    }
++
++    report = g_new0(SevAttestationReport, 1);
++    report->data = g_base64_encode(data, input.len);
++
++e_free_data:
++    g_free(data);
++    return report;
++}
++
+ static int
+ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
+ {
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index 4db6960f60..e2d0774708 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -35,5 +35,7 @@ extern uint32_t sev_get_cbit_position(void);
+ extern uint32_t sev_get_reduced_phys_bits(void);
+ extern char *sev_get_launch_measurement(void);
+ extern SevCapability *sev_get_capabilities(Error **errp);
++extern SevAttestationReport *
++sev_get_attestation_report(const char *mnonce, Error **errp);
+ 
+ #endif
 -- 
 2.17.1
 
