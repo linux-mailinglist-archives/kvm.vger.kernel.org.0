@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D72482CF47D
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 20:04:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B0D92CF481
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 20:06:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728508AbgLDTDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 14:03:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51794 "EHLO
+        id S1729906AbgLDTF1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 14:05:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726405AbgLDTDR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 14:03:17 -0500
+        with ESMTP id S1726179AbgLDTF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Dec 2020 14:05:27 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42126C0613D1
-        for <kvm@vger.kernel.org>; Fri,  4 Dec 2020 11:02:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C760C0613D1
+        for <kvm@vger.kernel.org>; Fri,  4 Dec 2020 11:04:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Message-ID:From:CC:To:Subject:
         Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
         Date:Sender:Reply-To:Content-ID:Content-Description;
-        bh=Revx27MO6J70SJkJZ1JRJSVzo6qv/w1PfI7FMLDGkQw=; b=ajXbM2RGhQ9FFpms5BbXtv4onc
-        HZjlzYcHfRp1TAZZ6TOLd+igFEpAhr3lGzdq1LZlynwEkRlzBm3vxgKOYC2BYx1YF0EZlcO/cUF2y
-        AuMHvKgi+9EiW/SPJN3n8dWhXuFfjtAgvZSkbTwVwyZpzqX/x4QlhXp7rBsMNzGstdv4ezp86pCEG
-        laptZ0PeMwLtH0zvvR1RwOtKzVVjdTPQLAYI8+eUp/uRmYyPXYUy/UYU9IGi0kn8/2LtAG3iLL58j
-        QQvsLxIGpl9CRofLfRiD2nqOFlpIh51F+2Fp3meeJLbl6+/M6d6CfArlveS071xHYdpD9lzfrSCpr
-        712DlCtg==;
+        bh=kPqXbu8ArMczX787kSyHe0QSLGZSoxLtTzDM6rGhcKo=; b=SsRqSZI7GMDJZnoFEBtB/0oBQP
+        WCJvqwoZAVxyJ6JuqyD5iyQDkANC3HQV9YVC+x1CbaVGE9POWqYVYGb5y0EnSO+MXHh1CCrnrNSSi
+        T+bizUwzgZbNDVU+R9dHgLBFG6r6Zh0cG4mOetdSdcmRcNTAa295rKtjl9rb88yCkuXReUm/Tdkow
+        k8n2dg/EXnNajSBf+TTI7Xrsi3DVrUs2FFt+hXCqpaMamZ+VdCaYlYZzbE8nmz9znZ24q3LgeqBqn
+        UGrIbtCJZgpESelb7ASzcydHXeoSwLD6m+RxNBvzFegD4T0N9Yt9HxlhCHoFNuXCn/Mmh4l19ltvo
+        qxU3kjVQ==;
 Received: from [2001:8b0:10b:1:782d:346f:3c1:eeee]
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1klGLj-00016t-3X; Fri, 04 Dec 2020 19:02:35 +0000
-Date:   Fri, 04 Dec 2020 19:02:35 +0000
+        id 1klGNo-0001EA-H6; Fri, 04 Dec 2020 19:04:45 +0000
+Date:   Fri, 04 Dec 2020 19:04:43 +0000
 User-Agent: K-9 Mail for Android
-In-Reply-To: <cdee7797-b21b-2dad-0692-207dfe464980@amazon.com>
-References: <20201204011848.2967588-1-dwmw2@infradead.org> <20201204011848.2967588-2-dwmw2@infradead.org> <cdee7797-b21b-2dad-0692-207dfe464980@amazon.com>
+In-Reply-To: <b49acc58-70e0-a684-9457-555b059b4761@amazon.com>
+References: <20201204011848.2967588-1-dwmw2@infradead.org> <20201204011848.2967588-5-dwmw2@infradead.org> <b49acc58-70e0-a684-9457-555b059b4761@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 01/15] KVM: Fix arguments to kvm_{un,}map_gfn()
+Subject: Re: [PATCH 04/15] KVM: x86/xen: Fix coexistence of Xen and Hyper-V hypercalls
 To:     Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org
 CC:     Paolo Bonzini <pbonzini@redhat.com>,
         Ankur Arora <ankur.a.arora@oracle.com>,
@@ -43,7 +43,7 @@ CC:     Paolo Bonzini <pbonzini@redhat.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Sean Christopherson <seanjc@google.com>
 From:   David Woodhouse <dwmw2@infradead.org>
-Message-ID: <90A4DD4E-6E35-484C-8BE9-A142BFB786D1@infradead.org>
+Message-ID: <29B9E7DB-CB61-48DC-850A-DA08CC0F19EB@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -51,35 +51,29 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 4 December 2020 18:27:34 GMT, Alexander Graf <graf@amazon=2Ecom> wrote:
+On 4 December 2020 18:34:40 GMT, Alexander Graf <graf@amazon=2Ecom> wrote:
 >On 04=2E12=2E20 02:18, David Woodhouse wrote:
 >> From: David Woodhouse <dwmw@amazon=2Eco=2Euk>
 >>=20
->> It shouldn't take a vcpu=2E
+>> Disambiguate Xen vs=2E Hyper-V calls by adding 'orl $0x80000000, %eax'
+>> at the start of the Hyper-V hypercall page when Xen hypercalls are
+>> also enabled=2E
+>>=20
+>> That bit is reserved in the Hyper-V ABI, and those hypercall numbers
+>> will never be used by Xen (because it does precisely the same trick)=2E
+>>=20
+>> Switch to using kvm_vcpu_write_guest() while we're at it, instead of
+>> open-coding it=2E
+>>=20
+>> Signed-off-by: David Woodhouse <dwmw@amazon=2Eco=2Euk>
 >
->This is not a patch description=2E Please provide an actual rationale=2E
+>I'm not a big fan of the implicit assumption that "xen hypercall=20
+>enabled" means "this will be the offset"=2E Can we make that something=20
+>more explicit, say through an ENABLE_CAP?
 
-What?
+Nah=2E The kernel owns the ABI, and it would be complete overkill to allow=
+ more gratuitous tweakable options here=2E
 
-If you aren't familiar with the KVM function nomenclature=2E=2E=2E since t=
-he function name is kvm_xxx() and it operates on the struct KVM, not kvm_vc=
-pu_xxx() and it doesn't actually use the vCPU it's given except to get vcpu=
-->kvm and operate on that=2E=2E=2E it shouldn't take a vcpu=2E
-
-But most of those words are superfluous to anyone who's paying attention=
-=2E
-
-The rationale in the patch seems perfectly clear to me=2E
->
->
->
->Amazon Development Center Germany GmbH
->Krausenstr=2E 38
->10117 Berlin
->Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
->Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
->Sitz: Berlin
->Ust-ID: DE 289 237 879
-
+Can you explain a reason why anyone would ever want to change it?
 --=20
 Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
