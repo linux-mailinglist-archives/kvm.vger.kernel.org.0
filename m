@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 261912CECC5
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 12:10:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11FCA2CECCD
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 12:13:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729951AbgLDLJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 06:09:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39454 "EHLO
+        id S1729904AbgLDLMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 06:12:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37815 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727365AbgLDLJv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 06:09:51 -0500
+        by vger.kernel.org with ESMTP id S1726841AbgLDLMd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 06:12:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607080105;
+        s=mimecast20190719; t=1607080267;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=51Ta8qG1IJwa9FMhdW7Zn/PZ+B+58uhGmZ7f+I3PgHQ=;
-        b=G2cAzR3TjPli7PM4v2tlSj95HPKpGMnAKiLCgXfQCwz90y/OA2WpAFNfGQjeCzBoBRDK3F
-        3TLnVz1z9fVy2e0HiVzpCnjw6/MQW/NG0TV9N6kqxQkbfIh1HOcn0pEx9iE1nf1Lg50pXk
-        mKRn+FS6oNs0PEFv8p4Lh8RpH9Bmf6Y=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-ywXqg6rrN3Wg9Lzkvmx1pg-1; Fri, 04 Dec 2020 06:08:23 -0500
-X-MC-Unique: ywXqg6rrN3Wg9Lzkvmx1pg-1
-Received: by mail-wr1-f71.google.com with SMTP id b1so2376014wrc.14
-        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 03:08:23 -0800 (PST)
+        bh=/j9o0aMtbK+iCXtL48XT9SzYeWgplswBUn1K4plIIJo=;
+        b=fp289rx9wlKJ0rZAg+MVlxjtYf4JaABm/MM/c6VkZ8jdC1ho8HUbmnkcoQGcrkgyNtnTHN
+        IBSuuix/FM1TSX4KpO+xOOuZaE45vXBfeq7XB7SEmTMmfnWOruNCbRI9GAO+2daudPNISf
+        O2yibLj6+73kr+3bID4HALFiJHLZSE4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-yzGfrwAtPgK5sHS433jevA-1; Fri, 04 Dec 2020 06:11:05 -0500
+X-MC-Unique: yzGfrwAtPgK5sHS433jevA-1
+Received: by mail-wr1-f70.google.com with SMTP id w17so2377492wrp.11
+        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 03:11:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=51Ta8qG1IJwa9FMhdW7Zn/PZ+B+58uhGmZ7f+I3PgHQ=;
-        b=oHxhaK4DOptQxa/z/mGrOS2mkdjjsuTQauv/QytojWvJGBYVooVZGq5TCH7fsWPGpm
-         zFM1VcAZCl4PKEC6U55iOeupCvvaFmYQSILdw0jF8RVjtQmnLsYxW8mBLQtPJahWkuLA
-         6Jpi9006TNm3pZl44LfvlJ28i+QRH97Z1+iD/zNVbp2Ks35SP8utw8dBtjbff9Nv1vn+
-         7/uSnldGa7lmVB9eTtldvFQKXUndMSconNmVEwo4A32MAvHnqIHsY+13HRzSvHYyGezd
-         U+eduNASwitPbh9hjs7gNsHETSyrEGHUlTUghI+LfId6TfG2DrQjUftHhXxkbUNGltGT
-         XsSw==
-X-Gm-Message-State: AOAM532V20okIlc3maOfAHmjISSMqILCg+pAOy6vurBGs5XLghE6bl+Q
-        iHnRcS/TMa6SSsIXeDwRo/+aKNCSW8TlPxAayg6gYSkCBVFBmeWs/LgJqmn+1spq7Awr/4aj9Kg
-        B4yp75Qt/fDTR
-X-Received: by 2002:a7b:cb82:: with SMTP id m2mr3540694wmi.75.1607080102592;
-        Fri, 04 Dec 2020 03:08:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxaSpQbJ4PCf7tY/VAwGU9ugjT37tjEuse2PP6trdypYVGMkqe9JgB5jOkELb4bTR9auHQTnQ==
-X-Received: by 2002:a7b:cb82:: with SMTP id m2mr3540670wmi.75.1607080102413;
-        Fri, 04 Dec 2020 03:08:22 -0800 (PST)
+        bh=/j9o0aMtbK+iCXtL48XT9SzYeWgplswBUn1K4plIIJo=;
+        b=svxp8IOf1RqJX74nmbjlK9EqEOoloHB4xR/6f2xttDMecelXF/ILrQQpMEheZxdjuh
+         OdVxf5/8RZBq7gz8TWG5hViClyhKa2LAhWenLtdifLijT1/rmFLj2yiueHYHjKR4uLg5
+         jmkyOcsf5GgVwe4aUxBlmaUFfThDe34UFVcOT/MT1ldczHlQs7JgJaNR1QvuRIdr7nNq
+         d8HPLycA/5tAnDr4RcPtMIs/ZIvSq7dKeizeki6HQYqT0t9vON/Pc9XcIF0meNZ7YOMS
+         jhR9qlv/ID0a9ubVdJW5prTMnrMvl5JpZAxaZI5YoLMe9iTQE0M102+PPX8lyV1uqfMA
+         sH+w==
+X-Gm-Message-State: AOAM531ZXfTNLul5qG+IKdmofhf5cL68staBKSvzZ3HcmOCIwvlNBOZn
+        vP0KOV1+6yPg3df2VeVcDp+zdaKyvMTKHK8kX1vyOrQVvib5W3p8VkCt7HvzgjsBGrboUyf0FRL
+        9W0OsvWZOykvT
+X-Received: by 2002:adf:e544:: with SMTP id z4mr4399592wrm.83.1607080264428;
+        Fri, 04 Dec 2020 03:11:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwXI/qgR3hNN+mIU4D+6sj1PheqGHMz0GvaAC0S4MAFIFRza72ft7HZ5AeSVWORKWBqXf4PNA==
+X-Received: by 2002:adf:e544:: with SMTP id z4mr4399554wrm.83.1607080264236;
+        Fri, 04 Dec 2020 03:11:04 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b17sm2245212wrv.10.2020.12.04.03.08.21
+        by smtp.gmail.com with ESMTPSA id y7sm3128192wrp.3.2020.12.04.03.11.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Dec 2020 03:08:21 -0800 (PST)
-Subject: Re: [PATCH v8 12/18] KVM: SVM: Add support for static allocation of
- unified Page Encryption Bitmap.
+        Fri, 04 Dec 2020 03:11:03 -0800 (PST)
+Subject: Re: [PATCH v8 18/18] KVM: SVM: Enable SEV live migration feature
+ implicitly on Incoming VM(s).
 To:     Ashish Kalra <Ashish.Kalra@amd.com>
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         joro@8bytes.org, bp@suse.de, Thomas.Lendacky@amd.com,
@@ -60,14 +60,14 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         srutherford@google.com, rientjes@google.com,
         venu.busireddy@oracle.com, brijesh.singh@amd.com
 References: <cover.1588711355.git.ashish.kalra@amd.com>
- <17c14245a404ff679253313ffe899c5f4e966717.1588711355.git.ashish.kalra@amd.com>
+ <a70e7ea40c47116339f968b7d2d2bf120f452c1e.1588711355.git.ashish.kalra@amd.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <617d3cba-cbe0-0f18-bdf2-e73a70e472d6@redhat.com>
-Date:   Fri, 4 Dec 2020 12:08:20 +0100
+Message-ID: <5af7ca40-69eb-0870-7bf2-9bc17685d03b@redhat.com>
+Date:   Fri, 4 Dec 2020 12:11:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <17c14245a404ff679253313ffe899c5f4e966717.1588711355.git.ashish.kalra@amd.com>
+In-Reply-To: <a70e7ea40c47116339f968b7d2d2bf120f452c1e.1588711355.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,18 +75,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/20 23:18, Ashish Kalra wrote:
-> Add support for static 
-> allocation of the unified Page encryption bitmap by extending 
-> kvm_arch_commit_memory_region() callack to add svm specific x86_ops 
-> which can read the userspace provided memory region/memslots and 
-> calculate the amount of guest RAM managed by the KVM and grow the bitmap 
-> based on that information, i.e. the highest guest PA that is mapped by a 
-> memslot.
+On 05/05/20 23:22, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> For source VM, live migration feature is enabled explicitly
+> when the guest is booting, for the incoming VM(s) it is implied.
+> This is required for handling A->B->C->... VM migrations case.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>   arch/x86/kvm/svm/sev.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 6f69c3a47583..ba7c0ebfa1f3 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1592,6 +1592,13 @@ int svm_set_page_enc_bitmap(struct kvm *kvm,
+>   	if (ret)
+>   		goto unlock;
+>   
+> +	/*
+> +	 * For source VM, live migration feature is enabled
+> +	 * explicitly when the guest is booting, for the
+> +	 * incoming VM(s) it is implied.
+> +	 */
+> +	sev_update_migration_flags(kvm, KVM_SEV_LIVE_MIGRATION_ENABLED);
+> +
+>   	bitmap_copy(sev->page_enc_bmap + BIT_WORD(gfn_start), bitmap,
+>   		    (gfn_end - gfn_start));
 
-Hi Ashish,
-
-the commit message should explain why this is needed or useful.
+Why?  I'd prefer the host to do this manually using a KVM_ENABLE_CAP. 
+The hook in patch 12 would also be enabled/disabled using KVM_ENABLE_CAP.
 
 Paolo
 
