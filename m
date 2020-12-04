@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E2CF2CE7AE
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 06:45:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0026D2CE7AD
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 06:45:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728121AbgLDFpA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 00:45:00 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:51703 "EHLO ozlabs.org"
+        id S1728142AbgLDFpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 00:45:02 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54907 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728108AbgLDFpA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 00:45:00 -0500
+        id S1727038AbgLDFpC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Dec 2020 00:45:02 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4CnM8f6LNcz9sSs; Fri,  4 Dec 2020 16:44:18 +1100 (AEDT)
+        id 4CnM8g0J6bz9sVH; Fri,  4 Dec 2020 16:44:18 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1607060658;
-        bh=TI0InttZ4cpldxy+Is/TnhjLzGIsGHaeLN81S9U7Zsg=;
+        d=gibson.dropbear.id.au; s=201602; t=1607060659;
+        bh=JCKtB0CAUo5qRhgGPlJh6hWPpcLzzkSJ/S2kZoA7KMQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=D2OoZAh2yLriCG90unCBwKyMskSc/APR+ROuvB7A5a/UzSm3GKMPtumVEk+EN8dF9
-         1N41Mi1ebQNPsiZtXIIjgDar2WWHr27OOQW+E/ox29F+dxRDxo7hORY+JZp+Vtkh7d
-         bot4qHvcnMbfOtshTQnIjVYFywa38eiC5mOK9V7I=
+        b=UK+tvDTtyfxmDLRI1BAo0CZOnx4vxpzL2ZSR9EavNEYV8rsCiD4Ahf6FzorpORjPR
+         5iq+XMnBiZjBVkSaBKRqvbQdUmMhG9Le7wBJAyBPVRvKIDDi+T4IlayTd/RhuvWBbH
+         vB7aVZL1gPhz5FhRTPgdufirAHWHgPqjTZAQXP64=
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
         brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org
@@ -31,10 +31,10 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
         david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
         borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
         cohuck@redhat.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        pasic@linux.ibm.com, Greg Kurz <groug@kaod.org>
-Subject: [for-6.0 v5 01/13] qom: Allow optional sugar props
-Date:   Fri,  4 Dec 2020 16:44:03 +1100
-Message-Id: <20201204054415.579042-2-david@gibson.dropbear.id.au>
+        pasic@linux.ibm.com
+Subject: [for-6.0 v5 02/13] securable guest memory: Introduce new securable guest memory base class
+Date:   Fri,  4 Dec 2020 16:44:04 +1100
+Message-Id: <20201204054415.579042-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201204054415.579042-1-david@gibson.dropbear.id.au>
 References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
@@ -44,114 +44,165 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Greg Kurz <groug@kaod.org>
+Several architectures have mechanisms which are designed to protect guest
+memory from interference or eavesdropping by a compromised hypervisor.  AMD
+SEV does this with in-chip memory encryption and Intel's MKTME can do
+similar things.  POWER's Protected Execution Framework (PEF) accomplishes a
+similar goal using an ultravisor and new memory protection features,
+instead of encryption.
 
-Global properties have an @optional field, which allows to apply a given
-property to a given type even if one of its subclasses doesn't support
-it. This is especially used in the compat code when dealing with the
-"disable-modern" and "disable-legacy" properties and the "virtio-pci"
-type.
+To (partially) unify handling for these, this introduces a new
+SecurableGuestMemoryState QOM base class.  "Securable" is kind of vague,
+but "secure memory" or "secure guest" seems to be a common theme in the
+lexicon around these schemes, so it's the best name I've managed to find
+so far.  It's "securable" rather than "secure", because in at least some of
+the cases it requires the guest to take specific actions in order to
+protect itself from hypervisor eavesdropping.
 
-Allow object_register_sugar_prop() to set this field as well.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <159738953558.377274.16617742952571083440.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/qom/object.h |  3 ++-
- qom/object.c         |  4 +++-
- softmmu/vl.c         | 16 ++++++++++------
- 3 files changed, 15 insertions(+), 8 deletions(-)
+ backends/meson.build                  |  1 +
+ backends/securable-guest-memory.c     | 30 +++++++++++++++++
+ include/exec/securable-guest-memory.h | 46 +++++++++++++++++++++++++++
+ include/qemu/typedefs.h               |  1 +
+ target/i386/sev.c                     |  3 +-
+ 5 files changed, 80 insertions(+), 1 deletion(-)
+ create mode 100644 backends/securable-guest-memory.c
+ create mode 100644 include/exec/securable-guest-memory.h
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index d378f13a11..6721cd312e 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -638,7 +638,8 @@ bool object_apply_global_props(Object *obj, const GPtrArray *props,
-                                Error **errp);
- void object_set_machine_compat_props(GPtrArray *compat_props);
- void object_set_accelerator_compat_props(GPtrArray *compat_props);
--void object_register_sugar_prop(const char *driver, const char *prop, const char *value);
-+void object_register_sugar_prop(const char *driver, const char *prop,
-+                                const char *value, bool optional);
- void object_apply_compat_props(Object *obj);
+diff --git a/backends/meson.build b/backends/meson.build
+index 484456ece7..781594af86 100644
+--- a/backends/meson.build
++++ b/backends/meson.build
+@@ -6,6 +6,7 @@ softmmu_ss.add([files(
+   'rng-builtin.c',
+   'rng-egd.c',
+   'rng.c',
++  'securable-guest-memory.c',
+ ), numa])
  
- /**
-diff --git a/qom/object.c b/qom/object.c
-index 1065355233..62218bb17d 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -442,7 +442,8 @@ static GPtrArray *object_compat_props[3];
-  * other than "-global".  These are generally used for syntactic
-  * sugar and legacy command line options.
-  */
--void object_register_sugar_prop(const char *driver, const char *prop, const char *value)
-+void object_register_sugar_prop(const char *driver, const char *prop,
-+                                const char *value, bool optional)
- {
-     GlobalProperty *g;
-     if (!object_compat_props[2]) {
-@@ -452,6 +453,7 @@ void object_register_sugar_prop(const char *driver, const char *prop, const char
-     g->driver = g_strdup(driver);
-     g->property = g_strdup(prop);
-     g->value = g_strdup(value);
-+    g->optional = optional;
-     g_ptr_array_add(object_compat_props[2], g);
- }
+ softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files('rng-random.c'))
+diff --git a/backends/securable-guest-memory.c b/backends/securable-guest-memory.c
+new file mode 100644
+index 0000000000..5bf380fd84
+--- /dev/null
++++ b/backends/securable-guest-memory.c
+@@ -0,0 +1,30 @@
++/*
++ * QEMU Securable Guest Memory interface
++ *
++ * Copyright: David Gibson, Red Hat Inc. 2020
++ *
++ * Authors:
++ *  David Gibson <david@gibson.dropbear.id.au>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++
++#include "exec/securable-guest-memory.h"
++
++static const TypeInfo securable_guest_memory_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_SECURABLE_GUEST_MEMORY,
++    .class_size = sizeof(SecurableGuestMemoryClass),
++    .instance_size = sizeof(SecurableGuestMemory),
++};
++
++static void securable_guest_memory_register_types(void)
++{
++    type_register_static(&securable_guest_memory_info);
++}
++
++type_init(securable_guest_memory_register_types)
+diff --git a/include/exec/securable-guest-memory.h b/include/exec/securable-guest-memory.h
+new file mode 100644
+index 0000000000..0d5ecfb681
+--- /dev/null
++++ b/include/exec/securable-guest-memory.h
+@@ -0,0 +1,46 @@
++/*
++ * QEMU Securable Guest Memory interface
++ *   This interface describes the common pieces between various
++ *   schemes for protecting guest memory against a compromised
++ *   hypervisor.  This includes memory encryption (AMD's SEV and
++ *   Intel's MKTME) or special protection modes (PEF on POWER, or PV
++ *   on s390x).
++ *
++ * Copyright: David Gibson, Red Hat Inc. 2020
++ *
++ * Authors:
++ *  David Gibson <david@gibson.dropbear.id.au>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ *
++ */
++#ifndef QEMU_SECURABLE_GUEST_MEMORY_H
++#define QEMU_SECURABLE_GUEST_MEMORY_H
++
++#ifndef CONFIG_USER_ONLY
++
++#include "qom/object.h"
++
++#define TYPE_SECURABLE_GUEST_MEMORY "securable-guest-memory"
++#define SECURABLE_GUEST_MEMORY(obj)                                    \
++    OBJECT_CHECK(SecurableGuestMemory, (obj),                          \
++                 TYPE_SECURABLE_GUEST_MEMORY)
++#define SECURABLE_GUEST_MEMORY_CLASS(klass)                            \
++    OBJECT_CLASS_CHECK(SecurableGuestMemoryClass, (klass),             \
++                       TYPE_SECURABLE_GUEST_MEMORY)
++#define SECURABLE_GUEST_MEMORY_GET_CLASS(obj)                          \
++    OBJECT_GET_CLASS(SecurableGuestMemoryClass, (obj),                 \
++                     TYPE_SECURABLE_GUEST_MEMORY)
++
++struct SecurableGuestMemory {
++    Object parent;
++};
++
++typedef struct SecurableGuestMemoryClass {
++    ObjectClass parent;
++} SecurableGuestMemoryClass;
++
++#endif /* !CONFIG_USER_ONLY */
++
++#endif /* QEMU_SECURABLE_GUEST_MEMORY_H */
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 6281eae3b5..79d53746f1 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -116,6 +116,7 @@ typedef struct QString QString;
+ typedef struct RAMBlock RAMBlock;
+ typedef struct Range Range;
+ typedef struct SavedIOTLB SavedIOTLB;
++typedef struct SecurableGuestMemory SecurableGuestMemory;
+ typedef struct SHPCDevice SHPCDevice;
+ typedef struct SSIBus SSIBus;
+ typedef struct VirtIODevice VirtIODevice;
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 93c4d60b82..53f00a24cf 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -29,6 +29,7 @@
+ #include "trace.h"
+ #include "migration/blocker.h"
+ #include "qom/object.h"
++#include "exec/securable-guest-memory.h"
  
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index e6e0ad5a92..cf4a9dc198 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -884,7 +884,7 @@ static void configure_rtc(QemuOpts *opts)
-         if (!strcmp(value, "slew")) {
-             object_register_sugar_prop("mc146818rtc",
-                                        "lost_tick_policy",
--                                       "slew");
-+                                       "slew", false);
-         } else if (!strcmp(value, "none")) {
-             /* discard is default */
-         } else {
-@@ -2498,12 +2498,14 @@ static int machine_set_property(void *opaque,
-         return 0;
-     }
-     if (g_str_equal(qom_name, "igd-passthru")) {
--        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value);
-+        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value,
-+                                   false);
-         return 0;
-     }
-     if (g_str_equal(qom_name, "kvm-shadow-mem") ||
-         g_str_equal(qom_name, "kernel-irqchip")) {
--        object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value);
-+        object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value,
-+                                   false);
-         return 0;
-     }
+ #define TYPE_SEV_GUEST "sev-guest"
+ OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+@@ -320,7 +321,7 @@ sev_guest_instance_init(Object *obj)
  
-@@ -3645,7 +3647,8 @@ void qemu_init(int argc, char **argv, char **envp)
-                 exit(1);
- #endif
-                 warn_report("The -tb-size option is deprecated, use -accel tcg,tb-size instead");
--                object_register_sugar_prop(ACCEL_CLASS_NAME("tcg"), "tb-size", optarg);
-+                object_register_sugar_prop(ACCEL_CLASS_NAME("tcg"), "tb-size",
-+                                           optarg, false);
-                 break;
-             case QEMU_OPTION_icount:
-                 icount_opts = qemu_opts_parse_noisily(qemu_find_opts("icount"),
-@@ -3996,9 +3999,10 @@ void qemu_init(int argc, char **argv, char **envp)
-         char *val;
- 
-         val = g_strdup_printf("%d", current_machine->smp.cpus);
--        object_register_sugar_prop("memory-backend", "prealloc-threads", val);
-+        object_register_sugar_prop("memory-backend", "prealloc-threads", val,
-+                                   false);
-         g_free(val);
--        object_register_sugar_prop("memory-backend", "prealloc", "on");
-+        object_register_sugar_prop("memory-backend", "prealloc", "on", false);
-     }
- 
-     /*
+ /* sev guest info */
+ static const TypeInfo sev_guest_info = {
+-    .parent = TYPE_OBJECT,
++    .parent = TYPE_SECURABLE_GUEST_MEMORY,
+     .name = TYPE_SEV_GUEST,
+     .instance_size = sizeof(SevGuestState),
+     .instance_finalize = sev_guest_finalize,
 -- 
 2.28.0
 
