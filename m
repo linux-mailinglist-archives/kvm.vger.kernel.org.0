@@ -2,85 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 066E02CF438
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 19:39:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89E002CF43D
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 19:44:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728553AbgLDSi7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 13:38:59 -0500
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:37028 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726173AbgLDSi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 13:38:59 -0500
+        id S1729407AbgLDSmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 13:42:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48494 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726441AbgLDSmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Dec 2020 13:42:09 -0500
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA60FC0613D1
+        for <kvm@vger.kernel.org>; Fri,  4 Dec 2020 10:41:28 -0800 (PST)
+Received: by mail-ed1-x541.google.com with SMTP id ck29so6856090edb.8
+        for <kvm@vger.kernel.org>; Fri, 04 Dec 2020 10:41:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1607107139; x=1638643139;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=XlrKYk/M1jvQ0MDnIc5xTmRqCYJAUffLFZVUo9xuEeI=;
-  b=YwWN4Bdxj+ioVGL8OaTevrxBWK5SgNGRIOtzyMWOnBofh5hNmc1xiCfr
-   zzRr5mFFzAGxKEAY7zxoCaDlmHEY5CzTjzzvLvv+EqwsCTi3WSKrJtHNh
-   +mmSRtITzpWaxzdlhJBi0WkbBFoZeETHyG0ilDBjKgYg6xckXLVKvwoQ2
-   g=;
-X-IronPort-AV: E=Sophos;i="5.78,393,1599523200"; 
-   d="scan'208";a="69210751"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-41350382.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 04 Dec 2020 18:38:12 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-41350382.us-west-2.amazon.com (Postfix) with ESMTPS id C62D0C2C77;
-        Fri,  4 Dec 2020 18:38:10 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 4 Dec 2020 18:38:10 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.160.229) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 4 Dec 2020 18:38:07 +0000
-Subject: Re: [PATCH 06/15] KVM: x86/xen: latch long_mode when hypercall page
- is set up
-To:     David Woodhouse <dwmw2@infradead.org>, <kvm@vger.kernel.org>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "Boris Ostrovsky" <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20201204011848.2967588-1-dwmw2@infradead.org>
- <20201204011848.2967588-7-dwmw2@infradead.org>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <85442dac-7ed9-73d0-f8b3-2750dffa5278@amazon.com>
-Date:   Fri, 4 Dec 2020 19:38:05 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.5.1
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fpe0QzFR+pipwwlQ6a2MzDyp0bYD7DIdzQkuuRLNsTo=;
+        b=N1pWv4MVTu8h54c3GOs5Ue8aeY0is8BFjfmOMVaj0XxCqhP/03svogCo1dlFWT63Eh
+         A/rDBsUlceBfglZkzb0UDw3oaUnu8NMJ0KwRzihvA93AMxzYDYmejDM5IozeJKtEvICW
+         4AS2VR4VaWa5kMmpNSJgBndJQDyANHJuQFll+uqcq+nHn9V0tG6dhm8BGNofHDaz4kUC
+         7hPXvKaCtfvVorLMoY/CUnGi97CynEeSKpQDbux6DxSCoN2hA1MLAv56Pkx4rcmFkunL
+         qKzjKZemdJ4CeXh2fseFX/E4pvjtaRkM28xypluQoaDZhzEZRObj0nun1tT2Mr8m+r+7
+         uxfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fpe0QzFR+pipwwlQ6a2MzDyp0bYD7DIdzQkuuRLNsTo=;
+        b=tpvYIzh5I4ZNexdzyYAkUPdQQ6ZN/r1zDa1tGX7gwWGR2GSArd2GeF6/Tpb0lqXEXh
+         Kkp3MmnL70zBZbqDx84NHnaV1HhRneH6NADtSLGpQ44BG/Lbc1prfL15BeKxMYVpAs/V
+         F9/QEsLC9nw0DC6nsJDbxmAtMM4wEDYlH9ODtRmSUsjsfFAHMifNpTlyo8887SYzML3I
+         x//5Y381D6yuNKv92ompr9Q5qKWUOAnzsHG+iZqGg4s4Y1/GjmM79dCj/sTfqD3mNceA
+         1vbddoiOczm8mwhtkGjYGLLPBtRqG4S3HcKqVKEhNaD9KO7fcumi7Lb0dLlRzcx3nt/y
+         U4yw==
+X-Gm-Message-State: AOAM531SLml1Xfo/vZnobyLO9Tl/M08BiMndZeoQjuIi94zhK5pHVlG3
+        hj94k5TvUkkUxNLuWMMoImquIKuudGD7RX5E49ddqg==
+X-Google-Smtp-Source: ABdhPJz+JmjtP/rNpS01qPn31jBKjhcmz0scPpZbGA0wOOkM/QXJpxUIqwxfVRzPugL1FZDgtzhWYyvOBl24MWLcZ0M=
+X-Received: by 2002:a50:f089:: with SMTP id v9mr9080510edl.353.1607107287403;
+ Fri, 04 Dec 2020 10:41:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201204011848.2967588-7-dwmw2@infradead.org>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.229]
-X-ClientProxiedBy: EX13D38UWB002.ant.amazon.com (10.43.161.171) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+References: <X8pocPZzn6C5rtSC@google.com> <20201204180645.1228-1-Ashish.Kalra@amd.com>
+In-Reply-To: <20201204180645.1228-1-Ashish.Kalra@amd.com>
+From:   Sean Christopherson <seanjc@google.com>
+Date:   Fri, 4 Dec 2020 10:41:15 -0800
+Message-ID: <CAMS+r+XBhFHnXrepzMq+hkaP3yHOUELjyc65JQipKCN+7zubVw@mail.gmail.com>
+Subject: Re: [PATCH v8 13/18] KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION
+ feature & Custom MSR.
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     Tom Lendacky <Thomas.Lendacky@amd.com>, bp@suse.de,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        venu.busireddy@oracle.com, X86 ML <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.12.20 02:18, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Fri, Dec 4, 2020 at 10:07 AM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> Yes i will post a fresh version of the live migration patches.
+>
+> Also, can you please check your email settings, we are only able to see your response on the
+> mailing list but we are not getting your direct responses.
 
-If the shared_info page was maintained by user space, you wouldn't need =
+Hrm, as in you don't get the email?
 
-any of this, right?
-
-
-Alex
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Is this email any different?  Sending via gmail instead of mutt...
