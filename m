@@ -2,189 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CD2D2CEEBD
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 14:25:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D3AA2CEEC3
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 14:27:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728869AbgLDNZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 08:25:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21016 "EHLO
+        id S1727711AbgLDN04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 08:26:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21840 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728066AbgLDNZQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 08:25:16 -0500
+        by vger.kernel.org with ESMTP id S1726395AbgLDN04 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 08:26:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607088229;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y6CPOMvmdtjIpOxysMt1Ko7zRAeAEpIXTLMj5oLiKUA=;
-        b=Q1X0RHgpG+M31GsM0HMpbiZLcXHblktuzXK6DtjMVUZoD92iokW/P93vxWaLRWb/Hh3sVK
-        pgEIlXsgeWY7MKk1PEoyZZZQgLKEomjj9sUvJwa2Mi9UJYmC29W8r3e3FCJ/KAx6PnQ0pr
-        RBHcdYWhGOS1LYK68dy72y1+4ozUKKA=
+        s=mimecast20190719; t=1607088329;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=X/a++xww5bzaRfGpbjrSlypbsSv7INhqHTSBjxbZQlc=;
+        b=X6fSz39psvX/BpdUhpe7r6FVBGV8hFcuGi7dG2ySJV/D85dwwVSr2Fuf7Xhwi5rZXvC0cp
+        2qukAEtfxexaLQy4l2DBBGG0mNN0mNWMGvJ9PFEHXLumioe2qmOVRHpLjRITQNkcPK5lOW
+        53TE1t8iiqkkw8rVutzZz/ZoS8iWliI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-RMTy46Y6No-Ylp6MzHcUNw-1; Fri, 04 Dec 2020 08:23:45 -0500
-X-MC-Unique: RMTy46Y6No-Ylp6MzHcUNw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-277-monpTWtON_mFFFUnjNVkCw-1; Fri, 04 Dec 2020 08:25:17 -0500
+X-MC-Unique: monpTWtON_mFFFUnjNVkCw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D474910054FF;
-        Fri,  4 Dec 2020 13:23:43 +0000 (UTC)
-Received: from localhost (ovpn-112-11.ams2.redhat.com [10.36.112.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 74F066087C;
-        Fri,  4 Dec 2020 13:23:34 +0000 (UTC)
-Date:   Fri, 4 Dec 2020 13:23:33 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>,
-        Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
-        john.g.johnson@oracle.com, dinechin@redhat.com, cohuck@redhat.com,
-        jasowang@redhat.com, felipe@nutanix.com,
-        elena.ufimtseva@oracle.com, jag.raman@oracle.com
-Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
-Message-ID: <20201204132333.GA1008790@stefanha-x1.localdomain>
-References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
- <20201202180628.GA100143@xz-x1>
- <20201203111036.GD689053@stefanha-x1.localdomain>
- <20201203062357-mutt-send-email-mst@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 189C1800D55;
+        Fri,  4 Dec 2020 13:25:15 +0000 (UTC)
+Received: from redhat.com (ovpn-115-10.ams2.redhat.com [10.36.115.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 55A805C22B;
+        Fri,  4 Dec 2020 13:25:03 +0000 (UTC)
+Date:   Fri, 4 Dec 2020 13:25:00 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, pair@us.ibm.com,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
+        qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, thuth@redhat.com,
+        pbonzini@redhat.com, rth@twiddle.net,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [for-6.0 v5 00/13] Generalize memory encryption models
+Message-ID: <20201204132500.GI3056135@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+ <f2419585-4e39-1f3d-9e38-9095e26a6410@de.ibm.com>
+ <20201204140205.66e205da.cohuck@redhat.com>
+ <20201204130727.GD2883@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20201203062357-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20201204130727.GD2883@work-vm>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---mP3DRpeJDSE+ciuQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, Dec 04, 2020 at 01:07:27PM +0000, Dr. David Alan Gilbert wrote:
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+> > On Fri, 4 Dec 2020 09:06:50 +0100
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> > 
+> > > On 04.12.20 06:44, David Gibson wrote:
+> > > > A number of hardware platforms are implementing mechanisms whereby the
+> > > > hypervisor does not have unfettered access to guest memory, in order
+> > > > to mitigate the security impact of a compromised hypervisor.
+> > > > 
+> > > > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> > > > its own memory encryption mechanism.  POWER has an upcoming mechanism
+> > > > to accomplish this in a different way, using a new memory protection
+> > > > level plus a small trusted ultravisor.  s390 also has a protected
+> > > > execution environment.
+> > > > 
+> > > > The current code (committed or draft) for these features has each
+> > > > platform's version configured entirely differently.  That doesn't seem
+> > > > ideal for users, or particularly for management layers.
+> > > > 
+> > > > AMD SEV introduces a notionally generic machine option
+> > > > "machine-encryption", but it doesn't actually cover any cases other
+> > > > than SEV.
+> > > > 
+> > > > This series is a proposal to at least partially unify configuration
+> > > > for these mechanisms, by renaming and generalizing AMD's
+> > > > "memory-encryption" property.  It is replaced by a
+> > > > "securable-guest-memory" property pointing to a platform specific  
+> > > 
+> > > Can we do "securable-guest" ?
+> > > s390x also protects registers and integrity. memory is only one piece
+> > > of the puzzle and what we protect might differ from platform to 
+> > > platform.
+> > > 
+> > 
+> > I agree. Even technologies that currently only do memory encryption may
+> > be enhanced with more protections later.
+> 
+> There's already SEV-ES patches onlist for this on the SEV side.
+> 
+> <sigh on haggling over the name>
+> 
+> Perhaps 'confidential guest' is actually what we need, since the
+> marketing folks seem to have started labelling this whole idea
+> 'confidential computing'.
 
-On Thu, Dec 03, 2020 at 06:34:00AM -0500, Michael S. Tsirkin wrote:
-> On Thu, Dec 03, 2020 at 11:10:36AM +0000, Stefan Hajnoczi wrote:
-> > On Wed, Dec 02, 2020 at 01:06:28PM -0500, Peter Xu wrote:
-> > > On Wed, Nov 25, 2020 at 12:44:07PM -0800, Elena Afanasova wrote:
-> > >=20
-> > > [...]
-> > >=20
-> > > > Wire protocol
-> > > > -------------
-> > > > The protocol spoken over the file descriptor is as follows. The dev=
-ice reads
-> > > > commands from the file descriptor with the following layout::
-> > > >=20
-> > > >   struct ioregionfd_cmd {
-> > > >       __u32 info;
-> > > >       __u32 padding;
-> > > >       __u64 user_data;
-> > > >       __u64 offset;
-> > > >       __u64 data;
-> > > >   };
-> > >=20
-> > > I'm thinking whether it would be nice to have a handshake on the wire=
- protocol
-> > > before starting the cmd/resp sequence.
-> > >=20
-> > > I was thinking about migration - we have had a hard time trying to be
-> > > compatible between old/new qemus.  Now we fixed those by applying the=
- same
-> > > migration capabilities on both sides always so we do the handshake "m=
-anually"
-> > > from libvirt, but it really should be done with a real handshake on t=
-he
-> > > channel, imho..  That's another story, for sure.
-> > >=20
-> > > My understanding is that the wire protocol is kind of a standalone (b=
-ut tiny)
-> > > protocol between kvm and the emulation process.  So I'm thinking the =
-handshake
-> > > could also help when e.g. kvm can fallback to an old version of wire =
-protocol
-> > > if it knows the emulation binary is old.  Ideally, I think this could=
- even
-> > > happen without VMM's awareness.
-> > >=20
-> > > [...]
-> >=20
-> > I imagined that would happen in the control plane (KVM ioctls) instead
-> > of the data plane (the fd). There is a flags field in
-> > ioctl(KVM_SET_IOREGION):
-> >=20
-> >   struct kvm_ioregion {
-> >       __u64 guest_paddr; /* guest physical address */
-> >       __u64 memory_size; /* bytes */
-> >       __u64 user_data;
-> >       __s32 fd; /* previously created with KVM_CREATE_IOREGIONFD */
-> >       __u32 flags;
-> >       __u8  pad[32];
-> >   };
-> >=20
-> > When userspace sets up the ioregionfd it can tell the kernel which
-> > features to enable.
-> >=20
-> > Feature availability can be checked through ioctl(KVM_CHECK_EXTENSION).
-> >=20
-> > Do you think this existing mechanism is enough? It's not clear to me
-> > what kind of additional negotiation would be necessary between the
-> > device emulation process and KVM after the ioregionfd has been
-> > registered?
-> >=20
-> > > > Ordering
-> > > > --------
-> > > > Guest accesses are delivered in order, including posted writes.
-> > >=20
-> > > I'm wondering whether it should prepare for out-of-order commands ass=
-uming if
-> > > there's no handshake so harder to extend, just in case there could be=
- some slow
-> > > commands so we still have chance to reply to a very trivial command d=
-uring
-> > > handling the slow one (then each command may require a command ID, to=
-o).  But
-> > > it won't be a problem at all if we can easily extend the wire protoco=
-l so the
-> > > ordering constraint can be extended too when really needed, and we ca=
-n always
-> > > start with in-order-only requests.
-> >=20
-> > Elena and I brainstormed out-of-order commands but didn't include them
-> > in the proposal because it's not clear that they are needed. For
-> > multi-queue devices the per-queue registers can be assigned different
-> > ioregionfds that are handled by dedicated threads.
->=20
-> The difficulty is I think the reverse: reading
-> any register from a PCI device is normally enough to flush any
-> writes and interrupts in progress.
+I think we shouldn't worry about the specific name too much, as it
+won't be visible much outside QEMU and the internals of the immediate
+layer above such as libvirt. What matters much more is that we have
+documentation that clearly explains what the different levels of
+protection are for each different architecture, and/or generation of
+architecture. Mgmt apps / end users need understand exactly what
+kind of unicorns they are being promised for a given configuration.
 
-Accesses dispatched on the same ioregionfd are ordered. If a device
-requires ordering then it needs to use one ioregionfd.
-
-I'm not aware of issues with ioeventfd where the vhost worker thread or
-QEMU's IOThread process the doorbell while the vCPU thread processes
-other virtio-pci register accesses. The situation is similar with
-ioregionfd.
-
-Stefan
-
---mP3DRpeJDSE+ciuQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/KOFUACgkQnKSrs4Gr
-c8hRuwf/VYFYtwrordxeEGADK7KLIzOUbzW+SH0sonIf7dl+Cbm3k9SHdMwesonw
-0KEmzlo9TLM0k6I8/y3f53r9vZXPy+xwcMTynRCX17g+HDTkmL0ZPPbGtH4wcfZM
-HX7cbTiWtCN9M9R/a5cotVQHFbeTnvuptYcx7ek1vbm/DQ1hPnRT2hA2J5Qfwe2v
-xiG7JnOw3Zz6VW814ryeq66NLVhk7p7dtJjMXchmB/NOTu81MUY9x/qBV9rNuqk2
-wMRJc42buvPMYqlDyPg4vWO6l8gY5kq7ht9T3yFZqcAnY0QamFihauFrXcpe66Dq
-i9OwY20kBfYCSGv9QO0qU7ywXNyS/Q==
-=bzz/
------END PGP SIGNATURE-----
-
---mP3DRpeJDSE+ciuQ--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
