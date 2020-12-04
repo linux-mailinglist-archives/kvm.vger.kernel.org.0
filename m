@@ -2,104 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F1242CE8B0
-	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 08:36:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 808142CE935
+	for <lists+kvm@lfdr.de>; Fri,  4 Dec 2020 09:08:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728291AbgLDHgj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Dec 2020 02:36:39 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9010 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727518AbgLDHgj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Dec 2020 02:36:39 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CnPcx6ktLzhmMj;
-        Fri,  4 Dec 2020 15:35:29 +0800 (CST)
-Received: from [10.174.187.37] (10.174.187.37) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 4 Dec 2020 15:35:50 +0800
-Subject: Re: [PATCH v2 1/2] clocksource: arm_arch_timer: Use stable count
- reader in erratum sne
-To:     Marc Zyngier <maz@kernel.org>
-References: <20200818032814.15968-1-zhukeqian1@huawei.com>
- <20200818032814.15968-2-zhukeqian1@huawei.com>
- <c8e0506a7976deef0427a30b0d10e35b@kernel.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>
-From:   zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <e83c5aa4-3d1a-7647-dea6-4713606bacf8@huawei.com>
-Date:   Fri, 4 Dec 2020 15:35:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1728916AbgLDIIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Dec 2020 03:08:01 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32762 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728475AbgLDIIB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Dec 2020 03:08:01 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B486FB6035734;
+        Fri, 4 Dec 2020 03:07:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OrQsb4G3Mo6zPoHe7oS4IScRnebpdka+gnTXfO5aVEM=;
+ b=Ckd8QqNf9o7QGG3Rq0o9BtjcwnYr4pT1F156RwMx1I07PskW5neLQjtw0m/6d7i1htBV
+ CArH2xvTV6CwMMwFTXl9e3K8fF5VhLZu+QJPXbH+u6DdoZ+pcQoC7oE7Xp3jcQV4omdk
+ E4EbSRf8LgVw2kyI2KVOPWVeI+MOJPhgNl0K1rInJPaUIzbuDyEk7b6PtVRsHQl5bXMk
+ m4kU+OW/jRWpAJSchTuXEz+/392m3zyXC2WeTpwhenXxKSr4IqMI3cRzpCXRVyz3UPrl
+ TLsiIXYFnpIUkDno4WPhs46wUdttXlkroJD93rW62wNEUrgRqAG5BGngMKvEWeVK/ppU Og== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35789ax7cv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Dec 2020 03:07:02 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B486PjI036689;
+        Fri, 4 Dec 2020 03:07:01 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35789ax79a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Dec 2020 03:07:01 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B47wMk4026881;
+        Fri, 4 Dec 2020 08:06:58 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 35693xj1k3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Dec 2020 08:06:58 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B486tSW30212432
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Dec 2020 08:06:55 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A5CB5204E;
+        Fri,  4 Dec 2020 08:06:55 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.4.55])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D12665204F;
+        Fri,  4 Dec 2020 08:06:51 +0000 (GMT)
+Subject: Re: [for-6.0 v5 00/13] Generalize memory encryption models
+To:     David Gibson <david@gibson.dropbear.id.au>, pair@us.ibm.com,
+        pbonzini@redhat.com, frankja@linux.ibm.com, brijesh.singh@amd.com,
+        dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
+        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
+        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+        cohuck@redhat.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        pasic@linux.ibm.com
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <f2419585-4e39-1f3d-9e38-9095e26a6410@de.ibm.com>
+Date:   Fri, 4 Dec 2020 09:06:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <c8e0506a7976deef0427a30b0d10e35b@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.37]
-X-CFilter-Loop: Reflected
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-12-04_02:2020-12-04,2020-12-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ spamscore=0 clxscore=1011 adultscore=0 priorityscore=1501 mlxlogscore=946
+ lowpriorityscore=0 bulkscore=0 mlxscore=0 malwarescore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012040046
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On 2020/12/3 22:58, Marc Zyngier wrote:
-> On 2020-08-18 04:28, Keqian Zhu wrote:
->> In commit 0ea415390cd3 ("clocksource/arm_arch_timer: Use arch_timer_read_counter
->> to access stable counters"), we separate stable and normal count reader to omit
->> unnecessary overhead on systems that have no timer erratum.
->>
->> However, in erratum_set_next_event_tval_generic(), count reader becomes normal
->> reader. This converts it to stable reader.
->>
->> Fixes: 0ea415390cd3 ("clocksource/arm_arch_timer: Use
->>        arch_timer_read_counter to access stable counters")
-> 
-> On a single line.
-Addressed. Thanks.
 
+On 04.12.20 06:44, David Gibson wrote:
+> A number of hardware platforms are implementing mechanisms whereby the
+> hypervisor does not have unfettered access to guest memory, in order
+> to mitigate the security impact of a compromised hypervisor.
 > 
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>  drivers/clocksource/arm_arch_timer.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/clocksource/arm_arch_timer.c
->> b/drivers/clocksource/arm_arch_timer.c
->> index 6c3e841..777d38c 100644
->> --- a/drivers/clocksource/arm_arch_timer.c
->> +++ b/drivers/clocksource/arm_arch_timer.c
->> @@ -396,10 +396,10 @@ static void
->> erratum_set_next_event_tval_generic(const int access, unsigned long
->>      ctrl &= ~ARCH_TIMER_CTRL_IT_MASK;
->>
->>      if (access == ARCH_TIMER_PHYS_ACCESS) {
->> -        cval = evt + arch_counter_get_cntpct();
->> +        cval = evt + arch_counter_get_cntpct_stable();
->>          write_sysreg(cval, cntp_cval_el0);
->>      } else {
->> -        cval = evt + arch_counter_get_cntvct();
->> +        cval = evt + arch_counter_get_cntvct_stable();
->>          write_sysreg(cval, cntv_cval_el0);
->>      }
+> AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> its own memory encryption mechanism.  POWER has an upcoming mechanism
+> to accomplish this in a different way, using a new memory protection
+> level plus a small trusted ultravisor.  s390 also has a protected
+> execution environment.
 > 
-> With that fixed:
+> The current code (committed or draft) for these features has each
+> platform's version configured entirely differently.  That doesn't seem
+> ideal for users, or particularly for management layers.
 > 
-> Acked-by: Marc Zyngier <maz@kernel.org>
+> AMD SEV introduces a notionally generic machine option
+> "machine-encryption", but it doesn't actually cover any cases other
+> than SEV.
 > 
-> This should go via the clocksource tree.
-Added Cc to it's maintainers, thanks.
+> This series is a proposal to at least partially unify configuration
+> for these mechanisms, by renaming and generalizing AMD's
+> "memory-encryption" property.  It is replaced by a
+> "securable-guest-memory" property pointing to a platform specific
 
-> 
-> Thanks,
-> 
->         M.
-Cheers,
-Keqian
+Can we do "securable-guest" ?
+s390x also protects registers and integrity. memory is only one piece
+of the puzzle and what we protect might differ from platform to 
+platform.
