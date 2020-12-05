@@ -2,68 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BB012CFF75
-	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 23:18:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3642CFF95
+	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 23:58:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726125AbgLEWSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Dec 2020 17:18:09 -0500
-Received: from [41.80.191.118] ([41.80.191.118]:59518 "EHLO
+        id S1726430AbgLEW5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Dec 2020 17:57:14 -0500
+Received: from [41.80.191.118] ([41.80.191.118]:58591 "EHLO
         host31.registrar-servers.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726056AbgLEWSI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 5 Dec 2020 17:18:08 -0500
-Message-ID: <0fda963acf0ce9e5c2d76132c6004a4668b83e9a@datahost.co.ke>
-Reply-To: "Kenya Bulk Email" <info@datahost.co.ke>
-From:   "Kenya Bulk Email" <newsletter@datahost.co.ke>
+        by vger.kernel.org with ESMTP id S1725270AbgLEW5O (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 5 Dec 2020 17:57:14 -0500
+Message-ID: <8a276ec3203b11184441f75bbd092323035897@detahost.com>
+Reply-To: "ICT Kenya" <info@detahost.com>
+From:   "ICT Kenya" <newsletter@detahost.com>
 To:     <kvm@vger.kernel.org>
-Subject: Kenya bulk email marketing - Target over 1.8 Million Kenyans via email
-Date:   Sun, 6 Dec 2020 01:17:35 +0300
-Organization: Kenya Bulk Email
+Subject: Kenya - 50% OFF - Professional Website Development from Kshs.25,000
+Date:   Sun, 6 Dec 2020 01:56:36 +0300
+Organization: ICT Kenya
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8";
 Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; d=datahost.co.ke; s=default;
-        c=relaxed/relaxed; t=1607206655;
+DKIM-Signature: v=1; a=rsa-sha256; d=detahost.com; s=default;
+        c=relaxed/relaxed; t=1607208996;
         h=message-id:from:to:subject:date:mime-version;
-        bh=/5/6iHz2QxuWK0zadxEuGPqW6r+EaAkj+Wi8s0IiHBE=;
-        b=jgvWEOyKuzPhIAaIkvMX6tpLEIa5R+vN2HAPhMnSSrd3BA0So8uXhrSRYQzXAT
-        YUmA1qa82ZZ3gznQ7zJCDXCkGx2fM8rH33w6oexyREhG8TkpiQe5rHUz1mv8nxa8
-        43glZQE4hV3rU9zmXxqOVCMQkYMZScwsiRcAL8kMtQaUNDhwm6t98R/N+kqXekwt
-        yUJA3tK8Lt2PX2ODV4TD7isK2bHsEpxJHhmUNsNlKDiNU7CAYBarf1vt8DX3PlSq
-        LF2aHHBqOmFDPkNSKtq/mmXhCoOBtEWBKlejdi1vUUu1/LNRIku1/zOJInTv/IJZ
-        vNxjC49yU2ZHBwjhtzZce6xw==
+        bh=A9HLI0jmaJg85fpWhECB2JCmtB3yYC4+I0uwyh/vTg8=;
+        b=rMso2wUoD+GwVqvAbduX3iFPiUrpakvEJblHn6npN08xxFR0kTEKjksBY1sOTi
+        wRcHf27wCSc9onbtpIwGPkUhZdIMT2o4n79MM3BkdMvcn6PfUkSLXTL1nfDlpVlH
+        /CzUQptaCx2i8qwBOT+fNcCyP0h3zjZQ92P5TfC7hUTCV/Cn8AlpsempN9zhXrSs
+        lEGyESoZOXiaTtAVnqV8Q+gXrhdDJ29Mp1k/27XrvuanY3E5Zf80iwVIwcaSPhz2
+        Sjgf/KOAnKtCjyIBHgF9C3/rV/mghwhcbHEp4N71l9iXWpcKja94fvc8VOTofLvj
+        6paWWGE8SYT1NnhrF65ip+Qw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Gain more clients on top of your existing clients on a daily basis 24/7/3=
-65 via Bulk email marketing - GUARANTEED
-Get A Personal Mail Server For Your Company / Organization Fully Setup & =
-Configured & 1.8Million Kenyan Emails Loaded
-  - Why A Personal Mail Server For Bulk Mail Marketing
-  - Send mass email on a daily basis 24/7/365 days
-  - The mass mail server comes with its own logins to view the mass email=
-ing progress
-  - The mass mail server comes with 1.8Million clean Kenyan emails alread=
-y loaded.
-  - You only add the subject and the content of the email
-  - The mass mail server can send up to 100,000 emails per day all delive=
-red straight to inbox
-  - We Monitor your mail mail server 24/7  to ensure full deliverability
-  - Be able to add you own email list in the mail server
-  - Gain New Clients Today on Top Of Your Existing Clients.
-As they say, Mass Marketing is the True fuel for business growth.
-Reach 100,000+ People in a Day & Notice the Difference.
-Bulk Email Marketing - Most cost effective alternative to TV & Radio Ads
-Reach approximately 100,000 people on a daily basis. 24/7/365 With your o=
-wn personal mail server at a cost of Kshs 10,000 per month. (Offer Valid =
-for 7days ONLY)
-We also have a mobile phone numbers database segmented per county, and we=
- provide Bulk SMS  at  60cents/sms, sender ID Kshs.8300
+If you are looking for a modern and effective website design that represe=
+nts your business in the way that you want, at an affordable price, then =
+this is for you!
 
-Contact Us Today
-Regards
+Our Approach:
+Most of our designs are tended towards a clean and a modern look in order=
+ to make the user experience as great as possible. Only an eye catching d=
+esign will ensure that people will stay on your website for more then a f=
+ew seconds. After that, it=E2=80=99s down to an easy to understand layout=
+ and organized content to keep clients longer on your website, which we h=
+ave a very good eye for.=20
+Professional Website from - Kshs.25,000 - Limited Time Offer (7Days ONLY)
+
+Our work can only speak for itself. Contact us Today
+
+Below are a few Websites that we have worked on recently:
+http://laxiptv.com/
+http://laxtv.co.ke
+http://icta.go.ke
+http://nairobi.go.ke
+http://eastafricayouth.org/
+http://amalcapital.net
+http://foodiebox.co.ke
+http://keekorokcapital.co.ke
+http://mycarcare.co.ke
+http://kazitele.co.ke
+http://alecconsultancy.co.tz/
+http://stratechsms.co.ke
+
+We also offer Bulk SMS @60cents/sms and Bulk email marketing service via =
+www.textsms.co.ke
+
+We also have segmented Kenyan Mobile Database of (10Million) and 2Million=
+ Validated Kenyan email addresses=20
+The Ultimate Home TV Entertainment
+Get Over 500 Live Channels Including your favorite Sports Channels. Acces=
+s over 2,000 On Demand Movies & Series in 4K. Super-Fast Loading, Optimiz=
+ed to consume low Internet. Compatible with All Android Boxes. It cant ge=
+t Any better!
+For more information about LAXIPTV TV Channels go to: https://laxtv.live/=
+channel-list/
+
+
+
+
+Kind Regards;
+
+
 George K. Mariene
+
+
+
+Manager - Business & Development
 Wyzer Technologies Limited
-Tel: +254 707 559 080 | +254 721 351 269
-www.textsms.co.ke | www.datahost.co.ke =20
-18, Msanduku Road | Off Mbaazi Avenue | Lavington | Nairobi
+www.datahost.co.ke | www.textsms.co.ke | www.laxtv.co.ke
++254707559080 | +254721351269
+18, Msanduku Rd, Off Mbaazi Avenue, Lavington, Dagoreti North            =
+                                                                 Unsubscr=
+ibe from marketing emails
