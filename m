@@ -2,136 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8145D2CFDD0
-	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 19:53:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF3FC2CFDF7
+	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 19:54:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727519AbgLESom (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Dec 2020 13:44:42 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:36224 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725771AbgLESof (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Dec 2020 13:44:35 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B5IWmwf069660;
-        Sat, 5 Dec 2020 18:43:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=g5ZCUVS0B4kKX6H/quUkzqXg37mhis30l0KMOMkXMTc=;
- b=Sqr5JiAmGSQlnMF/9DV6FNZio0fdG2T92YdfuSTuQeMDZj2eG5JHaJkN/KvaRojvdmV1
- e1QCbMzSj5gdmBeOLDttftq0iHsUZVZp7HKZ1SauAwihiSe/6BPg3NYqEXWPJR/MZRaJ
- Zn61mt2eSy2DxNiphjg0OLEJSMzoVDETzEfXKGcIBDc9sgGUZHdkcrNNOVAWYj969eWV
- Q84tzs2iu5qok+2499LvnZeZrR1czj5qjp9IX+miTTprOjSmzyfPQxHfQ6XgepPVPeAD
- hm9zns7sVFs5tQTTAiVOZAOjQov9ML8A3XfqwqVDfvJ9zLScQSQrCAlic6XH0cH/txTQ qA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 357yqbhd9s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 05 Dec 2020 18:43:46 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B5IUU8v105132;
-        Sat, 5 Dec 2020 18:43:45 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 3581hgywr2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 05 Dec 2020 18:43:45 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B5Ihh5g007778;
-        Sat, 5 Dec 2020 18:43:43 GMT
-Received: from [10.175.203.58] (/10.175.203.58)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 05 Dec 2020 10:43:43 -0800
-Subject: Re: [PATCH 07/15] KVM: x86/xen: add definitions of
- compat_shared_info, compat_vcpu_info
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S1726505AbgLESwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Dec 2020 13:52:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45620 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726125AbgLESwB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Dec 2020 13:52:01 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A6DC0613D1
+        for <kvm@vger.kernel.org>; Sat,  5 Dec 2020 10:51:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Message-ID:From:CC:To:Subject:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
+        Date:Sender:Reply-To:Content-ID:Content-Description;
+        bh=72qn0wCk3+rll5i6MqNF5XWubar1zBuegi2RkyseWXk=; b=fE6vMn2I4Hkp7t2FBn3ILF7bcw
+        Z+37asaTAwoB+pAAaaSo0Wf+BealjUKyrJ3HvOi68FciHgS5F15fis4tXSWN40izSuwSo7RB7Ex/d
+        Kj8kWCFurqe3V4NRam/AFr7dVBJ9+1y9vf34XhgaQKXnl3/M6Mrx/otSR1bBYvCaunjA8KvNAvQg/
+        7yjLUR+/ZA7oTnsoe1AnJUo3nP2k1CuPijwDgFoNN+nWxKvTG/4nrbPRVzMEIEXEbwsXeqULKfIlG
+        YMhpdQqHB6cdRGlZdFzqZUzC3Y4S7wTuME7zUE3dvIV/zMrwuVwXWEfMAle4EEexbTv/irNoPefF1
+        qyLe5gCg==;
+Received: from [2a01:4c8:1065:9e1b:cae1:f652:6216:ccb1]
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1klceE-0007Yo-A8; Sat, 05 Dec 2020 18:51:10 +0000
+Date:   Sat, 05 Dec 2020 18:51:08 +0000
+User-Agent: K-9 Mail for Android
+In-Reply-To: <e62dd528-2bee-9e8b-c395-256e6980307e@oracle.com>
+References: <20201204011848.2967588-1-dwmw2@infradead.org> <20201204011848.2967588-4-dwmw2@infradead.org> <e62dd528-2bee-9e8b-c395-256e6980307e@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 03/15] KVM: x86/xen: intercept xen hypercalls if enabled
+To:     Joao Martins <joao.m.martins@oracle.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
         Ankur Arora <ankur.a.arora@oracle.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20201204011848.2967588-1-dwmw2@infradead.org>
- <20201204011848.2967588-8-dwmw2@infradead.org>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <84bdce1d-2096-34cf-0a90-6eaf69641705@oracle.com>
-Date:   Sat, 5 Dec 2020 18:43:40 +0000
-MIME-Version: 1.0
-In-Reply-To: <20201204011848.2967588-8-dwmw2@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9826 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 mlxscore=0
- spamscore=0 suspectscore=1 phishscore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012050124
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9826 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
- clxscore=1015 malwarescore=0 bulkscore=0 phishscore=0 adultscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012050124
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+From:   David Woodhouse <dwmw2@infradead.org>
+Message-ID: <9A93D396-9C77-4E57-A7E0-61BBEEB83658@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/4/20 1:18 AM, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> There aren't a lot of differences for the things that the kernel needs
-> to care about, but there are a few.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  arch/x86/kvm/xen.h | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-> index afc6dad41fb5..870ac7197a3a 100644
-> --- a/arch/x86/kvm/xen.h
-> +++ b/arch/x86/kvm/xen.h
-> @@ -21,4 +21,43 @@ static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
->  		KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
->  }
->  
-> +
-> +/* 32-bit compatibility definitions */
-> +#include <asm/pvclock-abi.h>
-> +#include <asm/xen/interface.h>
-> +
-> +struct compat_arch_vcpu_info {
-> +	unsigned int cr2;
-> +	unsigned int pad[5];
-> +};
-> +
-> +struct compat_vcpu_info {
-> +        uint8_t evtchn_upcall_pending;
-> +        uint8_t evtchn_upcall_mask;
-> +        uint32_t evtchn_pending_sel;
-> +        struct compat_arch_vcpu_info arch;
-> +        struct pvclock_vcpu_time_info time;
-> +}; /* 64 bytes (x86) */
-> +
-> +struct compat_arch_shared_info {
-> +	unsigned int max_pfn;
-> +	unsigned int pfn_to_mfn_frame_list_list;
-> +	unsigned int nmi_reason;
-> +	unsigned int p2m_cr3;
-> +	unsigned int p2m_vaddr;
-> +	unsigned int p2m_generation;
-> +	uint32_t wc_sec_hi;
-> +};
-> +
-> +struct compat_shared_info {
-> +	struct compat_vcpu_info vcpu_info[MAX_VIRT_CPUS];
-> +	uint32_t evtchn_pending[sizeof(compat_ulong_t) * 8];
-> +	uint32_t evtchn_mask[sizeof(compat_ulong_t) * 8];
-> +	uint32_t wc_version;
-> +	uint32_t wc_sec;
-> +	uint32_t wc_nsec;
-> +	struct compat_arch_shared_info arch;
-> +
-> +};
-> +
->  #endif /* __ARCH_X86_KVM_XEN_H__ */
-> 
-I would fold this into the next patch.
 
-For it makes sense to keep separate the xen canonical headers update (patch 10).
+
+On 5 December 2020 18:42:53 GMT, Joao Martins <joao=2Em=2Emartins@oracle=
+=2Ecom> wrote:
+>On 12/4/20 1:18 AM, David Woodhouse wrote:
+>> @@ -3742,6 +3716,9 @@ int kvm_vm_ioctl_check_extension(struct kvm
+>*kvm, long ext)
+>>  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+>>  		r =3D 1;
+>>  		break;
+>> +	case KVM_CAP_XEN_HVM:
+>> +		r =3D 1 | KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
+>> +		break;
+>
+>Maybe:
+>
+>	r =3D KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
+>		KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
+
+Yeah, I already did that as I did the docs=2E In my tree it's already fold=
+ed into this patch for when I post v2=2E Thanks=2E
+
+
+>I suppose it makes sense restricting to INTERCEPT_HCALL to make sure
+>that the kernel only
+>forwards the hcall if it is control off what it put there in the
+>hypercall page (i=2Ee=2E
+>vmmcall/vmcall)=2E hcall userspace exiting without INTERCEPT_HCALL would
+>break ABI over how
+>this ioctl was used before the new flag=2E=2E=2E In case
+>kvm_xen_hypercall_enabled() would
+>return true with KVM_XEN_HVM_CONFIG_HYPERCALL_MSR, as now it needs to
+>handle a new
+>userspace exit=2E
+
+Right=2E=20
+
+>If we're are being pedantic, the Xen hypercall MSR is a utility more
+>than a necessity as
+>the OS can always do without the hcall msr IIUC=2E But it is defacto used
+>by enlightened Xen
+>guests included FreeBSD=2E
+
+Not sure about that=2E Xen doesn't guarantee that the hypercall will be VM=
+CALL; the ABI *is* ",use the hypercall page MSR and call it" I believe=2E
+
+But if they do just do the VMCALL, that *will* work as I have it, won't it=
+?
+
+>
+>And adding:
+>
+>#define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
+>
+>Of course, this is a nit for readability only, but it aligns with what
+>you write
+>in the docs update you do in the last patch=2E
+
+Yep, already there=2E Thanks=2E
+
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
