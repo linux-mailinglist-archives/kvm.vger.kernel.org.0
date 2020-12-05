@@ -2,78 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3F442CFB38
-	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 13:02:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 686DB2CFB83
+	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 15:13:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726631AbgLEMAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Dec 2020 07:00:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60598 "EHLO
+        id S1726745AbgLEOBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Dec 2020 09:01:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729433AbgLELXd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Dec 2020 06:23:33 -0500
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA5AC0613D1
-        for <kvm@vger.kernel.org>; Sat,  5 Dec 2020 03:15:05 -0800 (PST)
-Received: by mail-wr1-x441.google.com with SMTP id e7so7807046wrv.6
-        for <kvm@vger.kernel.org>; Sat, 05 Dec 2020 03:15:05 -0800 (PST)
+        with ESMTP id S1726395AbgLEM6x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Dec 2020 07:58:53 -0500
+Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247CCC09424D
+        for <kvm@vger.kernel.org>; Sat,  5 Dec 2020 04:46:04 -0800 (PST)
+Received: by mail-oo1-xc44.google.com with SMTP id l10so2075009ooh.1
+        for <kvm@vger.kernel.org>; Sat, 05 Dec 2020 04:46:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vm0kTYRfsbbw/uXa2uKVACoRIfxCWD5Snf9/ZZBS4vI=;
-        b=Yr1ZIzDR77DcgbQbUxzYZI0kWHLoTvxPJi6yJox554/E5iE4d4BfyXrcjh9kQanIFl
-         7NUcFENYX8B+GnaTBmEk6JDJKwmS3wq9B0aXsIA8x8tpTNywbdy33TOjYqbDxWKM/e5Q
-         GRv5p43UpM6pr6oc14g2NF+YOtjmyBxBAasEiVBayB1JolLmXIoOUQwDotq0qLvYgOEH
-         eFPxAA3AeVwMsrNQr85hrxbLRcNd892rbKdnEljiKEWwEbUKYagkfFOxrGz4Htc+Iwaw
-         sFsVJz1U5Y6deBeak6EVLnN/0xjRCdFKrdESHIIoBJu1LHenlWG1SSleFpgFQYpnxFZ6
-         fQoA==
+        bh=9IsfdIjFimgTASaoEYrYzbBL1NGFPt1y7Sd6YBjA43E=;
+        b=wuGO4YTC+kWREOy1d4sUSKgZkZkxpcGpyMeeaMkRQR65jHTo8HBt52Sll8PgX0e5Ex
+         NU4ajyMEmCfPlR2O3bbMEBWt5bVAsoE+hWdSa2p12tiR1d/3OrubGXipf3ZDsv2oarl4
+         p0/dXqWrJA6rgzYhQ1UspuiUuheUw5tx8XgLG/2qqHXzzcX3hF6rPVT7s7GKtEHwR8ox
+         OLYoTJPu6x4Yyd8nn8Whjk1EYkGhRTYRtH6rq8awP005mqnN0ak88XSudPqk0WWTAPOi
+         ZC1Zo/Yz4w9qfsY+qrz/xOdvE6pa8nyVA42pIvE2w9XU+l1LJKUArXCf7k0DQFzUOyDq
+         4kJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=vm0kTYRfsbbw/uXa2uKVACoRIfxCWD5Snf9/ZZBS4vI=;
-        b=kVyzzZFCD9Mn6pGYquOKcJGVVbg5S33kRo+SoIKVbF8/eenJL/2laeRI9r7NFCcTZw
-         yQ0Xx/QDWB9JGq/p7cwpCc4i0b9myD3ygaiRL4I/GMko9QmMFU+lmB6x5yPw28/+wHqC
-         o8HbR/hl+E4VuMe7U6mw6HOZkZnzI9JhUUkH/lHUAMNLCNicoiDviCWiOxsQYhvFot9Z
-         XwiALYGuZg6bbV7yKjlaxLvqYsf10PhpcmOxHKezHynjkSxm18y8w8eeQxeLsa+QWHwW
-         fIDnalLhx+sx7cJ2ImRFzpM27OmWcp750zl1bJ9fLt820WeQ7xbQ2YMUfhGPewfd0pTq
-         q8Fw==
-X-Gm-Message-State: AOAM531GA9tgRt67kga9sD8EM7NkxvnRHdsADKP94Wdm4D6iI2XgE0+I
-        ri7wd74ORrntLVqMlXN/t7WkAY0yxK7Ujg==
-X-Google-Smtp-Source: ABdhPJzidHN37LYdbiTj7YPUSYlEeuJWU1/5ZyiN4M4YFSu2jXb2xdJ0Tww0x7DtBdcHudzvJvASzA==
-X-Received: by 2002:adf:a3d1:: with SMTP id m17mr9487100wrb.289.1607166904041;
-        Sat, 05 Dec 2020 03:15:04 -0800 (PST)
-Received: from ?IPv6:2a01:e34:ed2f:f020:8165:c1cc:d736:b53f? ([2a01:e34:ed2f:f020:8165:c1cc:d736:b53f])
-        by smtp.googlemail.com with ESMTPSA id a65sm6470758wmc.35.2020.12.05.03.15.02
+        bh=9IsfdIjFimgTASaoEYrYzbBL1NGFPt1y7Sd6YBjA43E=;
+        b=WLsKGm0iJh3rZlv8j1MwfscwzDJ4MGt0EkUaMqiItKqDor8vvqKpoZ1RbqFF/p9ij6
+         4Ywk63vOr0ct4stBu7OJPXMdNsIZbUao+6gIzxfhX5pXULe2xdhhHFL9kJZCV3hyV4+A
+         Y4J9fLx3LuvplsY70z8GmTA+IHAPViDfRHavi4ebMowrb5sFvHkVYjCRD2MnM4uWDZAF
+         f0QojzaYyHvsJc4sphWFlehw3Z7uWhMRrg33h1TuGrvXRapjMhkXvmllu3DiB8lQMige
+         SRkhtiSt9EnSm2JAgdcHYDnchA2xRuMjYRpbrFqc375YvrtRjcF/YK+DDkEJXq7w3qNK
+         h/nQ==
+X-Gm-Message-State: AOAM532tXhyhSQ0qtZX4MhdUdnE8080md89u/ka/davSbUJjPDsAHMxa
+        vMXAQpppODGeRb2KWgU1NI58Rwa6Hv0ht5iV
+X-Google-Smtp-Source: ABdhPJzsUdE6/jQtqRRXmdJdORXzCA0oeWcK2d/AlbkLS+gDFmR0L553O+PjWxTcCq9I7fL7lLrMEg==
+X-Received: by 2002:a4a:a444:: with SMTP id w4mr6784530ool.5.1607172363452;
+        Sat, 05 Dec 2020 04:46:03 -0800 (PST)
+Received: from [172.24.51.127] (168.189-204-159.bestelclientes.com.mx. [189.204.159.168])
+        by smtp.gmail.com with ESMTPSA id 2sm1384668oir.40.2020.12.05.04.46.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Dec 2020 03:15:03 -0800 (PST)
-Subject: Re: [PATCH v3 2/2] clocksource: arm_arch_timer: Correct fault
- programming of CNTKCTL_EL1.EVNTI
-To:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        wanghaibin.wang@huawei.com
-References: <20201204073126.6920-1-zhukeqian1@huawei.com>
- <20201204073126.6920-3-zhukeqian1@huawei.com>
-From:   Daniel Lezcano <daniel.lezcano@linaro.org>
-Message-ID: <a82cf9ff-f18d-ce0a-f7a2-82a56cbbec40@linaro.org>
-Date:   Sat, 5 Dec 2020 12:15:01 +0100
+        Sat, 05 Dec 2020 04:46:02 -0800 (PST)
+Subject: Re: [PATCH 9/9] target/mips: Explode gen_msa_branch() as
+ gen_msa_BxZ_V/BxZ()
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20201202184415.1434484-1-f4bug@amsat.org>
+ <20201202184415.1434484-10-f4bug@amsat.org>
+ <42cae1ae-46aa-1207-dac7-1076b3422a7f@linaro.org>
+ <c314aed2-9f39-89f7-c4f7-6b3e7c094996@amsat.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <27bbd279-b8be-4f82-5100-930caf142f4b@linaro.org>
+Date:   Sat, 5 Dec 2020 06:46:00 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201204073126.6920-3-zhukeqian1@huawei.com>
+In-Reply-To: <c314aed2-9f39-89f7-c4f7-6b3e7c094996@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -81,69 +74,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 12/4/20 4:53 PM, Philippe Mathieu-Daudé wrote:
+> Yes, will follow. I'm tempted to inline gen_check_zero_element (actually
+> move gen_msa_BxZ as gen_check_zero_element prologue/epilogue). Not sure
+> gen_check_zero_element() can be reused later though.
+
+The other thing that could happen is that gen_check_zero_element could grow a
+TCGCond argument (or boolean) for the setcond at the end, so that we generate
+the correct sense of the test in the first place.
 
 
-Hi Marc,
-
-are you fine with this patch ?
-
-
-On 04/12/2020 08:31, Keqian Zhu wrote:
-> ARM virtual counter supports event stream, it can only trigger an event
-> when the trigger bit (the value of CNTKCTL_EL1.EVNTI) of CNTVCT_EL0 changes,
-> so the actual period of event stream is 2^(cntkctl_evnti + 1). For example,
-> when the trigger bit is 0, then virtual counter trigger an event for every
-> two cycles.
-> 
-> Fixes: 037f637767a8 ("drivers: clocksource: add support for ARM architected timer event stream")
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  drivers/clocksource/arm_arch_timer.c | 23 ++++++++++++++++-------
->  1 file changed, 16 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-> index 777d38cb39b0..d0177824c518 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -822,15 +822,24 @@ static void arch_timer_evtstrm_enable(int divider)
->  
->  static void arch_timer_configure_evtstream(void)
->  {
-> -	int evt_stream_div, pos;
-> +	int evt_stream_div, lsb;
-> +
-> +	/*
-> +	 * As the event stream can at most be generated at half the frequency
-> +	 * of the counter, use half the frequency when computing the divider.
-> +	 */
-> +	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
-> +
-> +	/*
-> +	 * Find the closest power of two to the divisor. If the adjacent bit
-> +	 * of lsb (last set bit, starts from 0) is set, then we use (lsb + 1).
-> +	 */
-> +	lsb = fls(evt_stream_div) - 1;
-> +	if (lsb > 0 && (evt_stream_div & BIT(lsb - 1)))
-> +		lsb++;
->  
-> -	/* Find the closest power of two to the divisor */
-> -	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
-> -	pos = fls(evt_stream_div);
-> -	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
-> -		pos--;
->  	/* enable event stream */
-> -	arch_timer_evtstrm_enable(min(pos, 15));
-> +	arch_timer_evtstrm_enable(max(0, min(lsb, 15)));
->  }
->  
->  static void arch_counter_set_user_access(void)
-> 
-
-
--- 
-<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
-
-Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
-<http://twitter.com/#!/linaroorg> Twitter |
-<http://www.linaro.org/linaro-blog/> Blog
+r~
