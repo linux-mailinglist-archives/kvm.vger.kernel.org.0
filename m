@@ -2,135 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 894D52CFD52
-	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 19:52:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D4812CFDC7
+	for <lists+kvm@lfdr.de>; Sat,  5 Dec 2020 19:53:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387409AbgLESbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Dec 2020 13:31:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42378 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726276AbgLESbK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Dec 2020 13:31:10 -0500
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A557C061A4F
-        for <kvm@vger.kernel.org>; Sat,  5 Dec 2020 10:30:24 -0800 (PST)
-Received: by mail-wr1-x443.google.com with SMTP id t4so8520446wrr.12
-        for <kvm@vger.kernel.org>; Sat, 05 Dec 2020 10:30:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WWqB20MHAs7UMnoS0Q6wgVRoNx/aV34/MkacRhfSd2g=;
-        b=FqjMFY35Kb8fRgveJIbmJSEnngdTQVOSCs+4B3cuDi3ZkfsNiNGumRrAf8+yrzjVGy
-         arUYkhjkyxJdWdkV4eZluhd419jR1LaVgbv4cS0hX2RkpkMXAjWqYk0JG4mHEffhBcPv
-         GjYH3w169U7ENGBN2eXElYELND23Ow+AuFRmtwQaIH5PXytG4F/RRe4lCukoJuiDcN3S
-         64qRm68NomRD6Cg+1HvMAxjzf6ilu+0vxQropPGcSU8CGHbeu3RBkyQwGpquWbJlBlm7
-         5Se6Yw5x3tKgErPatWIsYmWdJeGWIa9MA5a0iqjkHprgq5FMYHWi6sh73m2QQ+If625c
-         47VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WWqB20MHAs7UMnoS0Q6wgVRoNx/aV34/MkacRhfSd2g=;
-        b=ljZoAlbupNY6d66PZvQ5t2sBqkCTQyXL5ZIODcd5K6m7rJvJ2gZH+Ou/lmVNfZ6Meq
-         72dqUSU5Zg0jdgwtsUlSxOvoTqEPYWGwZCTvNyaf+Ap+Z+WaxIyfVEREzqqMkpRJcjgU
-         OnZ7rRQ3Wa6Z3+BVs7ouI7c6dI3RS85rVooxUEcaC8KnzolIRn7XAMPlHqT0cv97vPIz
-         b4OD6EwgdOGfBYVArnELEZScmXOcD/qzov7IP5dAFGHcYwKermbY4sMQqWWjB8lXjfD7
-         icuWFO7wtSqSqCr41BRSp1a8zMam7YVOR4YDperd4FsJwywVwRVqFWQavAe+QdctKaHw
-         uqYA==
-X-Gm-Message-State: AOAM532bJGRsey62ZYGzjpcl8mAjE66AleglFJSaGGyAlMpWYhxy2jY5
-        yCpiZWDRR4c/lnH6CVDEPdBuHQ==
-X-Google-Smtp-Source: ABdhPJx/HpX8LbNHK0WAMgBXImoLA/JSSutGQfKGJfblyYzGcfa5RRxbrXAYyzeokwA/L1EWySoLug==
-X-Received: by 2002:adf:fdc7:: with SMTP id i7mr9400942wrs.398.1607193022694;
-        Sat, 05 Dec 2020 10:30:22 -0800 (PST)
-Received: from ?IPv6:2a01:e34:ed2f:f020:8165:c1cc:d736:b53f? ([2a01:e34:ed2f:f020:8165:c1cc:d736:b53f])
-        by smtp.googlemail.com with ESMTPSA id h20sm7581744wmb.29.2020.12.05.10.30.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Dec 2020 10:30:21 -0800 (PST)
-Subject: Re: [PATCH v3 2/2] clocksource: arm_arch_timer: Correct fault
- programming of CNTKCTL_EL1.EVNTI
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        wanghaibin.wang@huawei.com
-References: <20201204073126.6920-1-zhukeqian1@huawei.com>
- <20201204073126.6920-3-zhukeqian1@huawei.com>
- <a82cf9ff-f18d-ce0a-f7a2-82a56cbbec40@linaro.org>
- <ef43679b6710fc4320203975bc2bde98@kernel.org>
-From:   Daniel Lezcano <daniel.lezcano@linaro.org>
-Message-ID: <1ff86943-3f58-b57c-b3db-c3a92af79d2b@linaro.org>
-Date:   Sat, 5 Dec 2020 19:30:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728092AbgLESnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Dec 2020 13:43:55 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:40122 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728005AbgLESnu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Dec 2020 13:43:50 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B5IUrJ6159079;
+        Sat, 5 Dec 2020 18:42:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=B/9ylrvdjeiF4FbWCShAndEikcDVYIepIWkVUJJwLic=;
+ b=OZXHot2Ria8NFbU+cwnSh1/7wCBcxC8L6BCnzhjBlx/Gv18bCCP9uDkqC6ju/IJ6tNtC
+ VMQPZ5vbDpvZjBDWYzXEQynmiGxRq4QKAysa1gtfnkG3FZlhsczrmA2XPQ8vE3HF53UA
+ MU/RJB8ayL42O+vPB5bhn6/Z0LWcHIHq1n+8LMD+k9gof9abG+1vyBWW83uLv0zVdFCJ
+ blcGOo5qDZCkBeXhNfA3MxAWzTDGBASktAhzywXJBUIOO6+/g6bwbOXxIEtxx1Svg/rF
+ kca/SGm7qBe+XtPtVc4fjS8jgXKgAwqtvpVNPNvbWyk3vLhjmgJ1zijhg4HLvwKgbbNG Cg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 3581mqh8pp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Sat, 05 Dec 2020 18:42:59 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B5IUUWk105120;
+        Sat, 5 Dec 2020 18:42:58 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 3581hgyust-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 05 Dec 2020 18:42:58 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B5IgusB032492;
+        Sat, 5 Dec 2020 18:42:56 GMT
+Received: from [10.175.203.58] (/10.175.203.58)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sat, 05 Dec 2020 10:42:56 -0800
+Subject: Re: [PATCH 03/15] KVM: x86/xen: intercept xen hypercalls if enabled
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+References: <20201204011848.2967588-1-dwmw2@infradead.org>
+ <20201204011848.2967588-4-dwmw2@infradead.org>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <e62dd528-2bee-9e8b-c395-256e6980307e@oracle.com>
+Date:   Sat, 5 Dec 2020 18:42:53 +0000
 MIME-Version: 1.0
-In-Reply-To: <ef43679b6710fc4320203975bc2bde98@kernel.org>
+In-Reply-To: <20201204011848.2967588-4-dwmw2@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9826 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 mlxscore=0
+ spamscore=0 suspectscore=1 phishscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012050124
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9826 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
+ clxscore=1015 malwarescore=0 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012050124
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 12/4/20 1:18 AM, David Woodhouse wrote:
+> @@ -3742,6 +3716,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+>  		r = 1;
+>  		break;
+> +	case KVM_CAP_XEN_HVM:
+> +		r = 1 | KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
+> +		break;
 
-Hi Marc,
+Maybe:
 
-On 05/12/2020 19:22, Marc Zyngier wrote:
-> Hi Daniel,
-> 
-> On 2020-12-05 11:15, Daniel Lezcano wrote:
->> Hi Marc,
->>
->> are you fine with this patch ?
-> 
-> I am, although there still isn't any justification for the pos/lsb
-> rework in the commit message (and calling that variable lsb is somewhat
-> confusing). If you are going to apply it, please consider adding
-> the additional comment below.
+	r = KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
+		KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
 
-Ok, I will do that.
+>  	case KVM_CAP_SYNC_REGS:
+>  		r = KVM_SYNC_X86_VALID_FIELDS;
+>  		break;
+> @@ -5603,7 +5580,15 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  		if (copy_from_user(&xhc, argp, sizeof(xhc)))
+>  			goto out;
+>  		r = -EINVAL;
+> -		if (xhc.flags)
+> +		if (xhc.flags & ~KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL)
+> +			goto out;
+> +		/*
+> +		 * With hypercall interception the kernel generates its own
+> +		 * hypercall page so it must not be provided.
+> +		 */
+> +		if ((xhc.flags & KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL) &&
+> +		    (xhc.blob_addr_32 || xhc.blob_addr_64 ||
+> +		     xhc.blob_size_32 || xhc.blob_size_64))
+>  			goto out;
 
-Thanks for the additional comment
+I suppose it makes sense restricting to INTERCEPT_HCALL to make sure that the kernel only
+forwards the hcall if it is control off what it put there in the hypercall page (i.e.
+vmmcall/vmcall). hcall userspace exiting without INTERCEPT_HCALL would break ABI over how
+this ioctl was used before the new flag... In case kvm_xen_hypercall_enabled() would
+return true with KVM_XEN_HVM_CONFIG_HYPERCALL_MSR, as now it needs to handle a new
+userspace exit.
 
-  -- Daniel
+If we're are being pedantic, the Xen hypercall MSR is a utility more than a necessity as
+the OS can always do without the hcall msr IIUC. But it is defacto used by enlightened Xen
+guests included FreeBSD.
 
+If we were to lift the restriction in the conditional above to forward hcall without
+INTERCEPT_HCALL flag then kvm_xen_hypercall_enabled() would return true with
+CONFIG_HYPERCALL_MSR and CONFIG_INTERCEPT_HCALL. And on wrmsr time, we would only look at
+whether we had a blob_size* passed in when handling the msr and initializing the hcall
+page. The only added gain is that guests which do vmcalls without an hypercall page would
+still be handled.
 
->> On 04/12/2020 08:31, Keqian Zhu wrote:
->>> ARM virtual counter supports event stream, it can only trigger an event
->>> when the trigger bit (the value of CNTKCTL_EL1.EVNTI) of CNTVCT_EL0
->>> changes,
->>> so the actual period of event stream is 2^(cntkctl_evnti + 1). For
->>> example,
->>> when the trigger bit is 0, then virtual counter trigger an event for
->>> every
->>> two cycles.
-> 
-> "While we're at it, rework the way we compute the trigger bit position by
->  making it more obvious that when bits [n:n-1] are both set (with n being
->  the most significant bit), we pick bit (n + 1)."
-> 
-> With that:
-> 
-> Acked-by: Marc Zyngier <maz@kernel.org>
-> 
-> Thanks,
-> 
->         M.
+But I am not sure it's worth the trouble. I feel its good the way this is now, given that
+this is new behaviour of forward vmmcall/vmcall to userspace.
 
+> +#endif /* __ARCH_X86_KVM_XEN_H__ */> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index ca41220b40b8..00221fe56994 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -216,6 +216,20 @@ struct kvm_hyperv_exit {
+>  	} u;
+>  };
+>  
+> +struct kvm_xen_exit {
+> +#define KVM_EXIT_XEN_HCALL          1
+> +	__u32 type;
+> +	union {
+> +		struct {
+> +			__u32 longmode;
+> +			__u32 cpl;
+> +			__u64 input;
+> +			__u64 result;
+> +			__u64 params[6];
+> +		} hcall;
+> +	} u;
+> +};
+> +
+>  #define KVM_S390_GET_SKEYS_NONE   1
+>  #define KVM_S390_SKEYS_MAX        1048576
+>  
+> @@ -250,6 +264,7 @@ struct kvm_hyperv_exit {
+>  #define KVM_EXIT_ARM_NISV         28
+>  #define KVM_EXIT_X86_RDMSR        29
+>  #define KVM_EXIT_X86_WRMSR        30
+> +#define KVM_EXIT_XEN              31
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -426,6 +441,8 @@ struct kvm_run {
+>  			__u32 index; /* kernel -> user */
+>  			__u64 data; /* kernel <-> user */
+>  		} msr;
+> +		/* KVM_EXIT_XEN */
+> +		struct kvm_xen_exit xen;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -1126,6 +1143,8 @@ struct kvm_x86_mce {
+>  #endif
+>  
+>  #ifdef KVM_CAP_XEN_HVM
+> +#define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
+> +
 
--- 
-<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
+And adding:
 
-Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
-<http://twitter.com/#!/linaroorg> Twitter |
-<http://www.linaro.org/linaro-blog/> Blog
+#define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
+
+Of course, this is a nit for readability only, but it aligns with what you write
+in the docs update you do in the last patch.
