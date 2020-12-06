@@ -2,154 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 706C22D02BC
-	for <lists+kvm@lfdr.de>; Sun,  6 Dec 2020 11:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B11922D0313
+	for <lists+kvm@lfdr.de>; Sun,  6 Dec 2020 12:00:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727077AbgLFK1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Dec 2020 05:27:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50618 "EHLO
+        id S1726623AbgLFK5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Dec 2020 05:57:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40067 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726969AbgLFK1r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 6 Dec 2020 05:27:47 -0500
+        by vger.kernel.org with ESMTP id S1725767AbgLFK5t (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 6 Dec 2020 05:57:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607250380;
+        s=mimecast20190719; t=1607252183;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aJIrgW7mTTQlynTZ3aiM64Xrj0jHXvCpxGNmSuVEGWU=;
-        b=LOCM/8VfWPODae9SJhzEo/r+D0OWVFZjc0WpFd9l2Hq1Xxs8OG2QB8G+AygjMcdsJDHTex
-        HFGdxsL4fSQDMLW6TSDQWP9LWrca/GeN6TFE2eN0D7pTSJRBDD+Bzct8suJSVQaf/4yCW1
-        /O3qCqnu26E3Nyfhi6Ckr0BFZ3ElBkg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-19VzadXAOX2a4rKKcHrv2w-1; Sun, 06 Dec 2020 05:26:16 -0500
-X-MC-Unique: 19VzadXAOX2a4rKKcHrv2w-1
-Received: by mail-wm1-f71.google.com with SMTP id d16so1363806wmd.1
-        for <kvm@vger.kernel.org>; Sun, 06 Dec 2020 02:26:15 -0800 (PST)
+        bh=zb05xp01BEyQm5LEh62oLhnL6kPgxUW55TugbE4oo4M=;
+        b=OIzdyX3pM6H9Xey4luTP2WCVUDsv7QeNSp2Wz17G6BZcBYq/pzLgF0rJFWN5nmlsqhQF17
+        Bu0KLcrgzddPfSn4if0xK5AdehrziCyusGS/HPtxnlAyRno4yblBMWKyzcnq/kCVn3uaa6
+        ZKjc7aoW+38Igr6Udjuap3WtSZTlLbk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-TdiRe3hJMQeUegLYyCSYZA-1; Sun, 06 Dec 2020 05:56:21 -0500
+X-MC-Unique: TdiRe3hJMQeUegLYyCSYZA-1
+Received: by mail-wm1-f72.google.com with SMTP id r5so4058077wma.2
+        for <kvm@vger.kernel.org>; Sun, 06 Dec 2020 02:56:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=aJIrgW7mTTQlynTZ3aiM64Xrj0jHXvCpxGNmSuVEGWU=;
-        b=iDf7K++CQK/NZaXetx+y2jRGlIQyi3MKdijDeuSoof43sKGdQeQN/meTU17pquvuGJ
-         VMDNffV5J8TMl3rDhF4hGqLBJs6X5SFur/VD8sfemha/JC267WBa7TYKbvHPyGTnc+M1
-         Ck3P+bPgzOaR2QN3ArgbFomTIdatmzejYnNlwwjXCPedQRJpTozkOkuY/R4FiZNyubjp
-         x6oBVV8ufk+tI3UEjZ5lhyfcYoIR0VP8SaCh0ICZJNFRYCHuMCuyx6Dnn+lKj0KLr4qU
-         vJy50+Kr7/XJb6vZ2B561SLaXlmcc9obTKHNl5IV48DQ8c631FtL58sYtSIwf0J36E7j
-         2Pqg==
-X-Gm-Message-State: AOAM531rfaQWTtCHrFWq41CsqGjBn9qDTxqZ8EGbjlyJ1rOAzSwT0Nbw
-        1fL38S7nR8oE9AjLrbS9/nxn/pUhkNiHi+1N1Qjh894eNREbWIAHmdBFkFg91F/K/J4eexBoevv
-        5hO/lhxV/Z/G4
-X-Received: by 2002:a5d:6286:: with SMTP id k6mr14267418wru.309.1607250374960;
-        Sun, 06 Dec 2020 02:26:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxN9YTHpXeqXCURubyG2sxhTny8kew+tOlq2lzqgOXEB4Z7EVdYqQvKiESiowPEO42nHm7aBg==
-X-Received: by 2002:a5d:6286:: with SMTP id k6mr14267403wru.309.1607250374789;
-        Sun, 06 Dec 2020 02:26:14 -0800 (PST)
+        bh=zb05xp01BEyQm5LEh62oLhnL6kPgxUW55TugbE4oo4M=;
+        b=ZvX6nKk9X0UPe0xHu6hVWy/M5M/UtgNuwfhQJ5vCu7bV7pkSDFWmC1pC2f4PDPaSe3
+         73ud3YdVeeUaCK9mrM0AszPv44bI4Q/PR7E6qK0I7zeuKH4bfSCsBG46l++4xcYX/RX6
+         bRM/DEw0DndXrS+RJNNyEBrVTa75q+Mk9686GdtJJJDRitG78LlFwB8emyFh4PRxhKW1
+         un9U6fn5iaUKgAmYW7sc2Sse4S4QOqE1HHN3m5TrDJSgFP6TWiUJdQgLIj3pFM2ZhF9G
+         fZ5Ao3A4SfcFYr16wJuyiqPwhAHEJZs/BZyXYwiQ6NsZRvM1wIyKyayH7f9WdrcyC/qg
+         y2JQ==
+X-Gm-Message-State: AOAM533lUW0QevYQ5gJUQN1+42PXyZNApbr3Z24LzGPpaDHIRAXarG9N
+        gqdyqFPsavMel+NnwEi45DZW3hO3DIiYveqdExJ9fDuR2xOK/E/kTUvGWXiGE3FGxniIQgPrWB8
+        XqrVtxoZhjiTm
+X-Received: by 2002:a7b:cf37:: with SMTP id m23mr12991479wmg.37.1607252180121;
+        Sun, 06 Dec 2020 02:56:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyGX3cca6nPagY2g70Cl2YOoYgsl0EaRP4WwTL7DXdmVUAvbBY8Gmu27mN+p01TBovcAihFAA==
+X-Received: by 2002:a7b:cf37:: with SMTP id m23mr12991464wmg.37.1607252179933;
+        Sun, 06 Dec 2020 02:56:19 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id o74sm10679578wme.36.2020.12.06.02.26.13
+        by smtp.gmail.com with ESMTPSA id w17sm10634246wru.82.2020.12.06.02.56.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Dec 2020 02:26:14 -0800 (PST)
-Subject: Re: [PATCH v2 1/9] KVM: x86: Add AMD SEV specific Hypercall3
-To:     Sean Christopherson <seanjc@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, brijesh.singh@amd.com,
-        dovmurik@linux.vnet.ibm.com, tobin@ibm.com, jejb@linux.ibm.com,
-        frankeh@us.ibm.com, dgilbert@redhat.com
-References: <cover.1606782580.git.ashish.kalra@amd.com>
- <b6bc54ed6c8ae4444f3acf1ed4386010783ad386.1606782580.git.ashish.kalra@amd.com>
- <X8gyhCsEMf8QU9H/@google.com>
+        Sun, 06 Dec 2020 02:56:18 -0800 (PST)
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.10, take #5
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Keqian Zhu <zhukeqian1@huawei.com>, Will Deacon <will@kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>, kernel-team@android.com,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+References: <20201204181914.783445-1-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d63529ce-d613-9f83-6cfc-012a8b333e38@redhat.com>
-Date:   Sun, 6 Dec 2020 11:26:12 +0100
+Message-ID: <f8775fc2-8501-1674-03f4-d6660987a86f@redhat.com>
+Date:   Sun, 6 Dec 2020 11:56:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <X8gyhCsEMf8QU9H/@google.com>
+In-Reply-To: <20201204181914.783445-1-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/12/20 01:34, Sean Christopherson wrote:
-> On Tue, Dec 01, 2020, Ashish Kalra wrote:
->> From: Brijesh Singh <brijesh.singh@amd.com>
->>
->> KVM hypercall framework relies on alternative framework to patch the
->> VMCALL -> VMMCALL on AMD platform. If a hypercall is made before
->> apply_alternative() is called then it defaults to VMCALL. The approach
->> works fine on non SEV guest. A VMCALL would causes #UD, and hypervisor
->> will be able to decode the instruction and do the right things. But
->> when SEV is active, guest memory is encrypted with guest key and
->> hypervisor will not be able to decode the instruction bytes.
->>
->> Add SEV specific hypercall3, it unconditionally uses VMMCALL. The hypercall
->> will be used by the SEV guest to notify encrypted pages to the hypervisor.
+On 04/12/20 19:19, Marc Zyngier wrote:
+> Hi Paolo,
 > 
-> What if we invert KVM_HYPERCALL and X86_FEATURE_VMMCALL to default to VMMCALL
-> and opt into VMCALL?  It's a synthetic feature flag either way, and I don't
-> think there are any existing KVM hypercalls that happen before alternatives are
-> patched, i.e. it'll be a nop for sane kernel builds.
+> A week ago, I was hoping being done with the 5.10 fixes. I should
+> obviously know better.
 > 
-> I'm also skeptical that a KVM specific hypercall is the right approach for the
-> encryption behavior, but I'll take that up in the patches later in the series.
+> Thanks to Yanan's excellent work, we have another set of page table
+> fixes, all plugging issues introduced with our new page table code.
+> The problems range from memory leak to TLB conflicts, all of which are
+> serious enough to be squashed right away.
+> 
+> Are we done yet? Fingers crossed.
 
-Do you think that it's the guest that should "donate" memory for the 
-bitmap instead?
+Pulled, thanks.  I am not sure I'll get my own pull request to Linus 
+today, though.
 
 Paolo
 
+
+> Please pull,
 > 
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Ingo Molnar <mingo@redhat.com>
->> Cc: "H. Peter Anvin" <hpa@zytor.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
->> Cc: Joerg Roedel <joro@8bytes.org>
->> Cc: Borislav Petkov <bp@suse.de>
->> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->> Cc: x86@kernel.org
->> Cc: kvm@vger.kernel.org
->> Cc: linux-kernel@vger.kernel.org
->> Reviewed-by: Steve Rutherford <srutherford@google.com>
->> Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->> ---
->>   arch/x86/include/asm/kvm_para.h | 12 ++++++++++++
->>   1 file changed, 12 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
->> index 338119852512..bc1b11d057fc 100644
->> --- a/arch/x86/include/asm/kvm_para.h
->> +++ b/arch/x86/include/asm/kvm_para.h
->> @@ -85,6 +85,18 @@ static inline long kvm_hypercall4(unsigned int nr, unsigned long p1,
->>   	return ret;
->>   }
->>   
->> +static inline long kvm_sev_hypercall3(unsigned int nr, unsigned long p1,
->> +				      unsigned long p2, unsigned long p3)
->> +{
->> +	long ret;
->> +
->> +	asm volatile("vmmcall"
->> +		     : "=a"(ret)
->> +		     : "a"(nr), "b"(p1), "c"(p2), "d"(p3)
->> +		     : "memory");
->> +	return ret;
->> +}
->> +
->>   #ifdef CONFIG_KVM_GUEST
->>   bool kvm_para_available(void);
->>   unsigned int kvm_arch_para_features(void);
->> -- 
->> 2.17.1
->>
+> 	M.
+> 
+> The following changes since commit 23bde34771f1ea92fb5e6682c0d8c04304d34b3b:
+> 
+>    KVM: arm64: vgic-v3: Drop the reporting of GICR_TYPER.Last for userspace (2020-11-17 18:51:09 +0000)
+> 
+> are available in the Git repository at:
+> 
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.10-5
+> 
+> for you to fetch changes up to 7d894834a305568a0168c55d4729216f5f8cb4e6:
+> 
+>    KVM: arm64: Add usage of stage 2 fault lookup level in user_mem_abort() (2020-12-02 09:53:29 +0000)
+> 
+> ----------------------------------------------------------------
+> kvm/arm64 fixes for 5.10, take #5
+> 
+> - Don't leak page tables on PTE update
+> - Correctly invalidate TLBs on table to block transition
+> - Only update permissions if the fault level matches the
+>    expected mapping size
+> 
+> ----------------------------------------------------------------
+> Yanan Wang (3):
+>        KVM: arm64: Fix memory leak on stage2 update of a valid PTE
+>        KVM: arm64: Fix handling of merging tables into a block entry
+>        KVM: arm64: Add usage of stage 2 fault lookup level in user_mem_abort()
+> 
+>   arch/arm64/include/asm/esr.h         |  1 +
+>   arch/arm64/include/asm/kvm_emulate.h |  5 +++++
+>   arch/arm64/kvm/hyp/pgtable.c         | 17 ++++++++++++++++-
+>   arch/arm64/kvm/mmu.c                 | 11 +++++++++--
+>   4 files changed, 31 insertions(+), 3 deletions(-)
 > 
 
