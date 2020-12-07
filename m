@@ -2,139 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 976B52D15D8
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 17:22:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 996E62D168D
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 17:45:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbgLGQU3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 11:20:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57446 "EHLO
+        id S1725996AbgLGQjT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 11:39:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbgLGQU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 11:20:29 -0500
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF268C061793
-        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 08:19:42 -0800 (PST)
-Received: by mail-ej1-x644.google.com with SMTP id g20so20339917ejb.1
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 08:19:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/eSi/KSMttHPQgAIpGGrtrzzrv7ZxXO1mG7WIUe69XI=;
-        b=XBQhYfKoE1vDdmR6R6aw3GslMvqVhMHR+mWPKtK7kFF2S2NzpY3QDbR3B6hc6uqB2E
-         nS5Bx6SFAYDqdy/fjDiMPPqUVPc+FyRfT0Mx9I/PnAGu/JGo6420yHTKjXAI/83QoJOL
-         KXW9KklObO+mMR2gx5SZMQ93dzL4aK86V3M06gRdD4Ycqegs37yDDNaOPBmd/SWAPiaN
-         vjufootHqk+B7uY3S9qON91bzw2uV6jqjyhc5iolXZGBNiYZyorBkZ5P6gngcVB/eGIf
-         Qd51RPCKHOL9iMwHe2rnG3dEWHa1S+/v+HWZK75ObhxIlKBH84bLAR3t++wW7yZgMvYR
-         ah4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/eSi/KSMttHPQgAIpGGrtrzzrv7ZxXO1mG7WIUe69XI=;
-        b=YfSPfUse+VwKol/Srfx4fhGN6VF7SqvWhGUIE4u0Vv55Tp3NEpInGAArGkXqZ/QA2Q
-         KLqJ+YSh02MQhuWO0QfWt6N3JO60Ftu3afQmNU8vDE6TPB/oGq51Paw3M0i+WZneUjr4
-         nQBPembChIUIPTg/5eCHfjBy9ZFC5gZeurGYcgn2zNrY62olPlWZP7BjBhWMCDEnMhMB
-         K3bVIRAm2wOlTEr06WFvG3c8YFlFLnMZ1Q5tD860wqC89AscuSUl6B5fXr5ICTnDniAp
-         AcLxyUwIQ+oZcbxcIwFey/u+Vz3guy1jTxPTfT7ZsQJtwleYGs2TNJ3sRXrLe3G27ede
-         rXTg==
-X-Gm-Message-State: AOAM532eyUgntQZ8Sm+/I/nT9N0aQZLGvrsdawzJi+G6PdkG4v00EVxK
-        I5HJ/TzT6WULUXdppbNoPPXIi1znOXKC4A==
-X-Google-Smtp-Source: ABdhPJwKqNkLOxHgzPO8kSnC1Cb3/OofXxUefrdmsY4FNYlS+ZjB5jXyTOtCYTslSsyc6ct9KuXq4A==
-X-Received: by 2002:a17:906:7146:: with SMTP id z6mr19613913ejj.379.1607357981469;
-        Mon, 07 Dec 2020 08:19:41 -0800 (PST)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id u3sm12762018eje.33.2020.12.07.08.19.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 08:19:40 -0800 (PST)
-Date:   Mon, 7 Dec 2020 16:19:38 +0000
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     qemu-devel@nongnu.org, Lars Ganrot <lars.ganrot@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        Salil Mehta <mehta.salil.lnk@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Liran Alon <liralon@gmail.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        Max Gurtovoy <maxgu14@gmail.com>,
-        Alex Barba <alex.barba@broadcom.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jim Harford <jim.harford@broadcom.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Christophe Fontaine <cfontain@redhat.com>,
-        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
-        Michael Lilja <ml@napatech.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
-        Lee Ballard <ballle98@gmail.com>,
-        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
-        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
-        Howard Cai <howard.cai@gmail.com>,
-        Xiao W Wang <xiao.w.wang@intel.com>,
-        Sean Mooney <smooney@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
-        Stephen Finucane <stephenfin@redhat.com>
-Subject: Re: [RFC PATCH 02/27] vhost: Add device callback in
- vhost_migration_log
-Message-ID: <20201207161938.GJ203660@stefanha-x1.localdomain>
-References: <20201120185105.279030-1-eperezma@redhat.com>
- <20201120185105.279030-3-eperezma@redhat.com>
+        with ESMTP id S1725781AbgLGQjT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 11:39:19 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDBD2C061749;
+        Mon,  7 Dec 2020 08:38:38 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1607359117;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7l+UILr+JWHc8AnnfIEx57njnbogruA/YdmfJ48nOWQ=;
+        b=QEWCmfVg9WQzZxZMjjUfHb5J5LLN4FF5IbRC778foF8tzrzme+wn/5z/gtWeGMRX3M/d0V
+        06fmWGoVGLJrU4SCAa2kQbzP6hoZvrOYOtVOTrch/w4572yosLo3+qcAmdLs/oFrdj9nX0
+        jvC0TiIEdN9b5Igp1mw/hR3D5TRAdcobKVaUHdK54ZCgFEDZrdUC4VHat/caLcAPxr4SKK
+        Xt9scgAfUS3OTX9eRkTA+s8gB/tbxwxlzMtVTaDc+rs2hBI3G4kFp66JX0CaBioW8PxE5A
+        4jFVRqBZ4ohR1Mix2mfhqLCPPhtZ0qBiwbAoydPgyNmAIrhJFHysMKhY+1EgRA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1607359117;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7l+UILr+JWHc8AnnfIEx57njnbogruA/YdmfJ48nOWQ=;
+        b=Jl8yYrpCp9vwJobQHJttjXxAiqDTAdR0IBiu1qjmf4qFl/smdAMHpC8SOO7ort40g7LE1V
+        YkLLDTF8x0m0JmCw==
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list\:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+In-Reply-To: <1dbbeefc7c76c259b55582468ccd3aab35a6de60.camel@redhat.com>
+References: <20201203171118.372391-1-mlevitsk@redhat.com> <20201203171118.372391-2-mlevitsk@redhat.com> <87a6uq9abf.fsf@nanos.tec.linutronix.de> <1dbbeefc7c76c259b55582468ccd3aab35a6de60.camel@redhat.com>
+Date:   Mon, 07 Dec 2020 17:38:36 +0100
+Message-ID: <87a6up606r.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ZG+WKzXzVby2T9Ro"
-Content-Disposition: inline
-In-Reply-To: <20201120185105.279030-3-eperezma@redhat.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Dec 07 2020 at 14:16, Maxim Levitsky wrote:
+> On Sun, 2020-12-06 at 17:19 +0100, Thomas Gleixner wrote:
+>> From a timekeeping POV and the guests expectation of TSC this is
+>> fundamentally wrong:
+>> 
+>>       tscguest = scaled(hosttsc) + offset
+>> 
+>> The TSC has to be viewed systemwide and not per CPU. It's systemwide
+>> used for timekeeping and for that to work it has to be synchronized. 
+>> 
+>> Why would this be different on virt? Just because it's virt or what? 
+>> 
+>> Migration is a guest wide thing and you're not migrating single vCPUs.
+>> 
+>> This hackery just papers over he underlying design fail that KVM looks
+>> at the TSC per vCPU which is the root cause and that needs to be fixed.
+>
+> I don't disagree with you.
+> As far as I know the main reasons that kvm tracks TSC per guest are
+>
+> 1. cases when host tsc is not stable 
+> (hopefully rare now, and I don't mind making
+> the new API just refuse to work when this is detected, and revert to old way
+> of doing things).
 
---ZG+WKzXzVby2T9Ro
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+That's a trainwreck to begin with and I really would just not support it
+for anything new which aims to be more precise and correct.  TSC has
+become pretty reliable over the years.
 
-On Fri, Nov 20, 2020 at 07:50:40PM +0100, Eugenio P=E9rez wrote:
-> This allows code to reuse the logic to not to re-enable or re-disable
-> migration mechanisms. Code works the same way as before.
->=20
-> Signed-off-by: Eugenio P=E9rez <eperezma@redhat.com>
-> ---
->  hw/virtio/vhost.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 2bd8cdf893..2adb2718c1 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -862,7 +862,9 @@ err_features:
->      return r;
->  }
-> =20
-> -static int vhost_migration_log(MemoryListener *listener, bool enable)
-> +static int vhost_migration_log(MemoryListener *listener,
-> +                               bool enable,
-> +                               int (*device_cb)(struct vhost_dev *, bool=
-))
+> 2. (theoretical) ability of the guest to introduce per core tsc offfset
+> by either using TSC_ADJUST (for which I got recently an idea to stop
+> advertising this feature to the guest), or writing TSC directly which
+> is allowed by Intel's PRM:
 
-Please document the argument. What is the callback function supposed to
-do ("device_cb" is not descriptive so I'm not sure)?
+For anything halfways modern the write to TSC is reflected in TSC_ADJUST
+which means you get the precise offset.
 
---ZG+WKzXzVby2T9Ro
-Content-Type: application/pgp-signature; name="signature.asc"
+The general principle still applies from a system POV.
 
------BEGIN PGP SIGNATURE-----
+     TSC base (systemwide view) - The sane case
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/OVhoACgkQnKSrs4Gr
-c8gwwgf+I95GBsEKHODfWsFkV4okONNvzPrm37wdLDLPOul1sVnt6WLfrSCIsaMV
-JOtZ9+/JvsQFtyPkRSK8+rZhnj9hCnPpDeyHgi7L4w46JZsJDlxJTbu0cGOmg7N7
-M3b/q3g6WY3uH2vDG7s47bQbzT+cLO9VTRRiD8G7Vww4r9gG2i0KAtAcnohsfDTQ
-jPi3NnuwisOT8xYnj7+av7mVKgT1QhGFgGXp03qASF+KyLT/SCh8h7fOgYo/vrDb
-JzDowD77/K9l4bsGOvPi3bpIJu0VPPQ7aTVxWjALnBRIqCce8yeY5angbK+aUjPZ
-GLHd2rLH3KnQlEclmuCx0N8nCCvc1Q==
-=P6IF
------END PGP SIGNATURE-----
+     TSC CPU  = TSC base + TSC_ADJUST
 
---ZG+WKzXzVby2T9Ro--
+The guest TSC base is a per guest constant offset to the host TSC.
+
+     TSC guest base = TSC host base + guest base offset
+
+If the guest want's this different per vCPU by writing to the MSR or to
+TSC_ADJUST then you still can have a per vCPU offset in TSC_ADJUST which
+is the offset to the TSC base of the guest.
+
+    TSC guest CPU = TSC guest base + CPU TSC_ADJUST
+
+==>
+
+    TSC guest CPU = TSC host base + guest base offset + CPU TSC_ADJUST
+
+The normal and sane case is just TSC_ADJUST == 0.
+
+It's very cleanly decomposable.
+
+Thanks,
+
+        tglx
