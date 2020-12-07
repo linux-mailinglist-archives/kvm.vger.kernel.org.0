@@ -2,143 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 367C12D19E2
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 20:42:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8CDC2D1A40
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:07:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726261AbgLGTm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 14:42:28 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:51144 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbgLGTm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 14:42:27 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B7JdqVK004062;
-        Mon, 7 Dec 2020 19:41:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=HP4ykR3R0iwJZXcpzLQ6riSiwYYg8qZvFJCz5Jl3mJY=;
- b=FyISXWK+FILRZAtOhLfPTqM4kxVfOgYLc3imyy6omMqB5P0trOAcQMbkXL8DzcS/EpOz
- EWwgoGWsvpN6yC8t+0/yU3M/ptJDzKkVNOeZqk1NXmGBFEzeOWYBfWtohwGJc9eZjQoj
- FcD9i8+llxoToC/O1iYLKUTqQHQmzzmZGubIiyegkZZwNglZDUWC/0yPHswAHFmu7M74
- U/dOt2nzd0qAvtaEifxey0gPeDnMxicFvNypdW4K5TB4wa4g0xlaC/ejDyPIdOCLlSW4
- nfa1NhtHS125/+9eRSu0DjAlx7oYvdnvwpiTwRpvk4PmvPRkfQVQQaxqnb7yi5jIQb50 vw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 3581mqq668-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 07 Dec 2020 19:41:42 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B7Jdfu3026188;
-        Mon, 7 Dec 2020 19:41:42 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 358m4wqhgc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 07 Dec 2020 19:41:42 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B7JffHo015272;
-        Mon, 7 Dec 2020 19:41:41 GMT
-Received: from nsvm-sadhukhan.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 07 Dec 2020 11:41:41 -0800
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com
-Subject: [PATCH 2/2 v4] nSVM: Test reserved values for 'Type' and invalid vectors in EVENTINJ
-Date:   Mon,  7 Dec 2020 19:41:29 +0000
-Message-Id: <20201207194129.7543-3-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201207194129.7543-1-krish.sadhukhan@oracle.com>
-References: <20201207194129.7543-1-krish.sadhukhan@oracle.com>
+        id S1727040AbgLGUHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 15:07:20 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54840 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726485AbgLGUHU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:07:20 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B7K3FY1039176;
+        Mon, 7 Dec 2020 15:06:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=t6/ckOKiePnZT3QA6BRq4+1Aj5B0E016mGymqyZ/cy0=;
+ b=UhO0UOcZgldT7vqvGqSTEITvcHYOAIdU9sVY4OhMDXxpDEyh4l9sBsD/zcQz4yo6zSri
+ 3Iczw86JH2XMYUD3bHVIwoc0HGvWCINoCBWpjtErQlCopbJ2w26WnxiF3t3xMnLoCGm9
+ dGUSWvfn22EJNZ4ICtkGeSsIFIKxqgK6NZB0vqF+qcCDh3M4fcLTwH8CEHiXay3kAz2y
+ qZuchMYMZGr5zss0ubvHn0uWK5443kCBxjA/toHg3Y0FDbAuiyegRQESjMN75v9UPBhG
+ 87yk4qzYAgccNLcn0SQLqJ8/VrHJ47bMp2bNUf2YLykGpMSKCu8qy467yB5Y6NLHn/2N oQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 359qrnxkph-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Dec 2020 15:06:37 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B7K3UEe040579;
+        Mon, 7 Dec 2020 15:06:36 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 359qrnxknr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Dec 2020 15:06:36 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B7K3SUp030740;
+        Mon, 7 Dec 2020 20:06:36 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma02wdc.us.ibm.com with ESMTP id 3581u92d67-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Dec 2020 20:06:33 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B7K6WeC24183042
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Dec 2020 20:06:32 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4A31E7805C;
+        Mon,  7 Dec 2020 20:06:32 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9822478064;
+        Mon,  7 Dec 2020 20:06:31 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.174.71])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Dec 2020 20:06:31 +0000 (GMT)
+Subject: Re: [PATCH v4] self_tests/kvm: sync_regs test for diag318
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, pbonzini@redhat.com, imbrenda@linux.ibm.com
+References: <20201207154125.10322-1-walling@linux.ibm.com>
+ <2ea47a0e-40fb-35bc-5819-63a9e7b2ec59@de.ibm.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <d5289faa-0422-5f16-9d84-cd6c1d627033@linux.ibm.com>
+Date:   Mon, 7 Dec 2020 15:06:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 suspectscore=1
- bulkscore=0 malwarescore=0 phishscore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012070126
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
- clxscore=1015 malwarescore=0 priorityscore=1501 adultscore=0
- lowpriorityscore=0 phishscore=0 spamscore=0 impostorscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012070126
+In-Reply-To: <2ea47a0e-40fb-35bc-5819-63a9e7b2ec59@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-07_16:2020-12-04,2020-12-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ suspectscore=2 clxscore=1015 priorityscore=1501 phishscore=0 adultscore=0
+ mlxlogscore=999 impostorscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012070125
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to sections "Canonicalization and Consistency Checks" and "Event
-Injection" in APM vol 2
+On 12/7/20 2:32 PM, Christian Borntraeger wrote:
+> On 07.12.20 16:41, Collin Walling wrote:
+>> The DIAGNOSE 0x0318 instruction, unique to s390x, is a privileged call
+>> that must be intercepted via SIE, handled in userspace, and the
+>> information set by the instruction is communicated back to KVM.
+>>
+>> To test the instruction interception, an ad-hoc handler is defined which
+>> simply has a VM execute the instruction and then userspace will extract
+>> the necessary info. The handler is defined such that the instruction
+>> invocation occurs only once. It is up to the caller to determine how the
+>> info returned by this handler should be used.
+>>
+>> The diag318 info is communicated from userspace to KVM via a sync_regs
+>> call. This is tested During a sync_regs test, where the diag318 info is
+>> requested via the handler, then the info is stored in the appropriate
+>> register in KVM via a sync registers call.
+>>
+>> If KVM does not support diag318, then the tests will print a message
+>> stating that diag318 was skipped, and the asserts will simply test
+>> against a value of 0.
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> 
+> Interestingly enough, this testcase actually trigger a bug:
+> While we gracefully handle this (no crash)
+> debugfs: Directory 'kvm-200206' with parent 's390dbf' already present!
+> is certainly not ideal....
+> 
 
-    VMRUN exits with VMEXIT_INVALID error code if either:
-      - Reserved values of TYPE have been specified, or
-      - TYPE = 3 (exception) has been specified with a vector that does not
-	correspond to an exception (this includes vector 2, which is an NMI,
-	not an exception).
+Odd... I wonder what triggered this behavior?
 
-Existing tests already cover part of the second rule. This patch covers the
-the first rule and the missing pieces of the second rule.
+I run my tests with a simple command:
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- x86/svm_tests.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+make summary=0 TARGETS=kvm kselftest
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index f78c9e4..b9be522 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2132,6 +2132,43 @@ static void test_dr(void)
- 	vmcb->save.dr7 = dr_saved;
- }
- 
-+static void test_event_inject(void)
-+{
-+	u32 i;
-+	u32 event_inj_saved = vmcb->control.event_inj;
-+
-+	handle_exception(DE_VECTOR, my_isr);
-+
-+	report (svm_vmrun() == SVM_EXIT_VMMCALL && count_exc == 0, "Test "
-+	    "No EVENTINJ");
-+
-+	/*
-+	 * Reserved values for 'Type' in EVENTINJ causes VMEXIT_INVALID.
-+	 */
-+	for (i = 1; i < 8; i++) {
-+		if (i != 1 && i < 5)
-+			continue;
-+		vmcb->control.event_inj = DE_VECTOR |
-+		    i << SVM_EVTINJ_TYPE_SHIFT | SVM_EVTINJ_VALID;
-+		report(svm_vmrun() == SVM_EXIT_ERR && count_exc == 0,
-+		    "Test invalid TYPE (%x) in EVENTINJ", i);
-+	}
-+
-+	/*
-+	 * Invalid vector number for event type 'exception' in EVENTINJ
-+	 * causes VMEXIT_INVALID.
-+	 */
-+	for (i = 32; i < 256; i += 4) {
-+		vmcb->control.event_inj = i | SVM_EVTINJ_TYPE_EXEPT |
-+		    SVM_EVTINJ_VALID;
-+		report(svm_vmrun() == SVM_EXIT_ERR && count_exc == 0,
-+		    "Test invalid vector (%u) in EVENTINJ for event type "
-+		    "\'exception\'", i);
-+	}
-+
-+	vmcb->control.event_inj = event_inj_saved;
-+}
-+
- static void svm_guest_state_test(void)
- {
- 	test_set_guest(basic_guest_main);
-@@ -2141,6 +2178,7 @@ static void svm_guest_state_test(void)
- 	test_cr3();
- 	test_cr4();
- 	test_dr();
-+	test_event_inject();
- }
- 
- struct svm_test svm_tests[] = {
+This must have something to do with spinning up another VM to get the
+diag318 data. I think if I have the sync_regs test call the diag handler
+first, and then have the sync regs create a VM, that might solve that
+issue...
+
+May I ask how you encountered this bug so I may replicate in on my end?
+
+> 
+>> ---
+>>  tools/testing/selftests/kvm/Makefile          |  2 +-
+>>  .../kvm/include/s390x/diag318_test_handler.h  | 13 +++
+>>  .../kvm/lib/s390x/diag318_test_handler.c      | 82 +++++++++++++++++++
+>>  .../selftests/kvm/s390x/sync_regs_test.c      | 16 +++-
+>>  4 files changed, 111 insertions(+), 2 deletions(-)
+>>  create mode 100644 tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h
+>>  create mode 100644 tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index 3d14ef77755e..426c78449044 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -36,7 +36,7 @@ endif
+>>  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c lib/test_util.c
+>>  LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+>>  LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
+>> -LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c
+>> +LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+>>
+>>  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+>> diff --git a/tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h b/tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h
+>> new file mode 100644
+>> index 000000000000..b0ed71302722
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h
+>> @@ -0,0 +1,13 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-or-later
+>> + *
+>> + * Test handler for the s390x DIAGNOSE 0x0318 instruction.
+>> + *
+>> + * Copyright (C) 2020, IBM
+>> + */
+>> +
+>> +#ifndef SELFTEST_KVM_DIAG318_TEST_HANDLER
+>> +#define SELFTEST_KVM_DIAG318_TEST_HANDLER
+>> +
+>> +uint64_t get_diag318_info(void);
+>> +
+>> +#endif
+>> diff --git a/tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c b/tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c
+>> new file mode 100644
+>> index 000000000000..86b9e611ad87
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c
+>> @@ -0,0 +1,82 @@
+>> +// SPDX-License-Identifier: GPL-2.0-or-later
+>> +/*
+>> + * Test handler for the s390x DIAGNOSE 0x0318 instruction.
+>> + *
+>> + * Copyright (C) 2020, IBM
+>> + */
+>> +
+>> +#include "test_util.h"
+>> +#include "kvm_util.h"
+>> +
+>> +#define VCPU_ID	6
+>> +
+>> +#define ICPT_INSTRUCTION	0x04
+>> +#define IPA0_DIAG		0x8300
+>> +
+>> +static void guest_code(void)
+>> +{
+>> +	uint64_t diag318_info = 0x12345678;
+>> +
+>> +	asm volatile ("diag %0,0,0x318\n" : : "d" (diag318_info));
+>> +}
+>> +
+>> +/*
+>> + * The DIAGNOSE 0x0318 instruction call must be handled via userspace. As such,
+>> + * we create an ad-hoc VM here to handle the instruction then extract the
+>> + * necessary data. It is up to the caller to decide what to do with that data.
+>> + */
+>> +static uint64_t diag318_handler(void)
+>> +{
+>> +	struct kvm_vm *vm;
+>> +	struct kvm_run *run;
+>> +	uint64_t reg;
+>> +	uint64_t diag318_info;
+>> +
+>> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+>> +	vcpu_run(vm, VCPU_ID);
+>> +	run = vcpu_state(vm, VCPU_ID);
+>> +
+>> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_S390_SIEIC,
+>> +		    "DIAGNOSE 0x0318 instruction was not intercepted");
+>> +	TEST_ASSERT(run->s390_sieic.icptcode == ICPT_INSTRUCTION,
+>> +		    "Unexpected intercept code: 0x%x", run->s390_sieic.icptcode);
+>> +	TEST_ASSERT((run->s390_sieic.ipa & 0xff00) == IPA0_DIAG,
+>> +		    "Unexpected IPA0 code: 0x%x", (run->s390_sieic.ipa & 0xff00));
+>> +
+>> +	reg = (run->s390_sieic.ipa & 0x00f0) >> 4;
+>> +	diag318_info = run->s.regs.gprs[reg];
+>> +
+>> +	TEST_ASSERT(diag318_info != 0, "DIAGNOSE 0x0318 info not set");
+>> +
+>> +	kvm_vm_free(vm);
+>> +
+>> +	return diag318_info;
+>> +}
+>> +
+>> +uint64_t get_diag318_info(void)
+>> +{
+>> +	static uint64_t diag318_info;
+>> +	static bool printed_skip;
+>> +
+>> +	/*
+>> +	 * If KVM does not support diag318, then return 0 to
+>> +	 * ensure tests do not break.
+>> +	 */
+>> +	if (!kvm_check_cap(KVM_CAP_S390_DIAG318)) {
+>> +		if (!printed_skip) {
+>> +			fprintf(stdout, "KVM_CAP_S390_DIAG318 not supported. "
+>> +				"Skipping diag318 test.\n");
+>> +			printed_skip = true;
+>> +		}
+>> +		return 0;
+>> +	}
+>> +
+>> +	/*
+>> +	 * If a test has previously requested the diag318 info,
+>> +	 * then don't bother spinning up a temporary VM again.
+>> +	 */
+>> +	if (!diag318_info)
+>> +		diag318_info = diag318_handler();
+>> +
+>> +	return diag318_info;
+>> +}
+>> diff --git a/tools/testing/selftests/kvm/s390x/sync_regs_test.c b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+>> index 5731ccf34917..caf7b8859a94 100644
+>> --- a/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+>> +++ b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+>> @@ -20,6 +20,7 @@
+>>
+>>  #include "test_util.h"
+>>  #include "kvm_util.h"
+>> +#include "diag318_test_handler.h"
+>>
+>>  #define VCPU_ID 5
+>>
+>> @@ -70,7 +71,7 @@ static void compare_sregs(struct kvm_sregs *left, struct kvm_sync_regs *right)
+>>
+>>  #undef REG_COMPARE
+>>
+>> -#define TEST_SYNC_FIELDS   (KVM_SYNC_GPRS|KVM_SYNC_ACRS|KVM_SYNC_CRS)
+>> +#define TEST_SYNC_FIELDS   (KVM_SYNC_GPRS|KVM_SYNC_ACRS|KVM_SYNC_CRS|KVM_SYNC_DIAG318)
+>>  #define INVALID_SYNC_FIELD 0x80000000
+>>
+>>  int main(int argc, char *argv[])
+>> @@ -152,6 +153,12 @@ int main(int argc, char *argv[])
+>>
+>>  	run->kvm_valid_regs = TEST_SYNC_FIELDS;
+>>  	run->kvm_dirty_regs = KVM_SYNC_GPRS | KVM_SYNC_ACRS;
+>> +
+>> +	if (get_diag318_info() > 0) {
+>> +		run->s.regs.diag318 = get_diag318_info();
+>> +		run->kvm_dirty_regs |= KVM_SYNC_DIAG318;
+>> +	}
+>> +
+>>  	rv = _vcpu_run(vm, VCPU_ID);
+>>  	TEST_ASSERT(rv == 0, "vcpu_run failed: %d\n", rv);
+>>  	TEST_ASSERT(run->exit_reason == KVM_EXIT_S390_SIEIC,
+>> @@ -164,6 +171,9 @@ int main(int argc, char *argv[])
+>>  	TEST_ASSERT(run->s.regs.acrs[0]  == 1 << 11,
+>>  		    "acr0 sync regs value incorrect 0x%x.",
+>>  		    run->s.regs.acrs[0]);
+>> +	TEST_ASSERT(run->s.regs.diag318 == get_diag318_info(),
+>> +		    "diag318 sync regs value incorrect 0x%llx.",
+>> +		    run->s.regs.diag318);
+>>
+>>  	vcpu_regs_get(vm, VCPU_ID, &regs);
+>>  	compare_regs(&regs, &run->s.regs);
+>> @@ -177,6 +187,7 @@ int main(int argc, char *argv[])
+>>  	run->kvm_valid_regs = TEST_SYNC_FIELDS;
+>>  	run->kvm_dirty_regs = 0;
+>>  	run->s.regs.gprs[11] = 0xDEADBEEF;
+>> +	run->s.regs.diag318 = 0x4B1D;
+>>  	rv = _vcpu_run(vm, VCPU_ID);
+>>  	TEST_ASSERT(rv == 0, "vcpu_run failed: %d\n", rv);
+>>  	TEST_ASSERT(run->exit_reason == KVM_EXIT_S390_SIEIC,
+>> @@ -186,6 +197,9 @@ int main(int argc, char *argv[])
+>>  	TEST_ASSERT(run->s.regs.gprs[11] != 0xDEADBEEF,
+>>  		    "r11 sync regs value incorrect 0x%llx.",
+>>  		    run->s.regs.gprs[11]);
+>> +	TEST_ASSERT(run->s.regs.diag318 != 0x4B1D,
+>> +		    "diag318 sync regs value incorrect 0x%llx.",
+>> +		    run->s.regs.diag318);
+>>
+>>  	kvm_vm_free(vm);
+>>
+
+
 -- 
-2.18.4
+Regards,
+Collin
 
+Stay safe and stay healthy
