@@ -2,92 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB0D72D16F9
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 17:58:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C1892D1705
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 18:02:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727128AbgLGQ5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 11:57:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41371 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726840AbgLGQ5g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 11:57:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607360169;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TL6ePzwnUJ23W39OpdfafXqwxU8F5GgHEtsegtnBJFQ=;
-        b=cedtbKORnGkDOYcz9g8gHW0qAZTxgjDCkT8f6E3Pq3r8E+PLtycEiOnXocaNTykz7H+HR2
-        b3Lcy1rOQT8uV+VZOqe8+IY5JA5ncBQx7zhPjpjES5EE+sW4vnIWK+p2/zbHESoti5czYY
-        9wgBufi+5Coz8hda/Fp6wj3Ewa3jwEE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-itUbY_ODMUSHo1VTizqoRQ-1; Mon, 07 Dec 2020 11:56:06 -0500
-X-MC-Unique: itUbY_ODMUSHo1VTizqoRQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53F26107ACE3;
-        Mon,  7 Dec 2020 16:56:05 +0000 (UTC)
-Received: from gondolin (ovpn-113-45.ams2.redhat.com [10.36.113.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC67D620DE;
-        Mon,  7 Dec 2020 16:55:59 +0000 (UTC)
-Date:   Mon, 7 Dec 2020 17:55:57 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Collin Walling <walling@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        borntraeger@de.ibm.com, pbonzini@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [PATCH v4] self_tests/kvm: sync_regs test for diag318
-Message-ID: <20201207175557.674236b3.cohuck@redhat.com>
-In-Reply-To: <20201207154125.10322-1-walling@linux.ibm.com>
-References: <20201207154125.10322-1-walling@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727805AbgLGQ7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 11:59:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35340 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727352AbgLGQ7c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 11:59:32 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9A8C061749
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 08:58:51 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id lt17so20541052ejb.3
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 08:58:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ODFYNKTjMTwnPrK31rw4SLzGgzSU67H0O2yeRZFdhqE=;
+        b=StWv8dDxId3OKQIuDuKxj9jQNu0m2dzeV78062mOPIKyxMU89QJYro/YNl6/gjoSSS
+         v+t8vX/HJok65OHBMUd/BtXcUpWPE5Ub+gyBQOwt1/2u/C8p+9CU+1Mcr4dA+Y14w57i
+         45c9afhRrA+LOIgaVY/Kd651s2f0piLIcWD4/ZPGUokK04B51HiNdCtNJ238uJfgGUcE
+         rw4cg4ji6epNW5tAC0WMjVbnEYY1SQjxkYzqX3FZ/JoKmSLH1MrT7IFpcIu3FPLfnUTb
+         s+MZhd9GtEOIS4n+mXJNrCelojEWWRysYkGqyQ3LzTTqgH5FkkH79xzDO9SGVNseGj6i
+         Q13g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ODFYNKTjMTwnPrK31rw4SLzGgzSU67H0O2yeRZFdhqE=;
+        b=bHQY7mWAM19jAvhY85NqzRWXW+hnd6DVZvJpUyOO0KR51ZAfH/I4sR5j9aYG5vhcm8
+         lzrGDxFtXPRpsZO8mpsFoOChzcvqDTQLZkS21RHS6PzG33NeJwlqXuIZvmNqQfrd0/hE
+         KROFv+3YH9+nPrKpbhwyhBihV+lxeKIwBi2mmhl1jxWZ0K9bNixSXKNiXW+belUThW6I
+         GfCVsDW3dI9UObgACbinbonUmZ0tyi+UwgFY7w1U3P89umML/EmjdY+/U/3PhyZfNMv6
+         YqYDM/BTQpNYKHL7DX2nrali75U7/d/sXKqkbpbamU47dvJ4F8Q2Z+oJjm9goGkAd3Yt
+         ZqvA==
+X-Gm-Message-State: AOAM531g70erDa6fUTpZchSXzAjE2C82MV1lc0WzXl67lJbEipwcQutF
+        1rOvZRKEbFXwhWJHiq1eDo4=
+X-Google-Smtp-Source: ABdhPJzHOW+Ylwqjw+on2+NxIj8szkbB93r8R6R4oPxzlBCIMpXESI+nx/IQwtqoqUYOs2yYBcEfMQ==
+X-Received: by 2002:a17:907:447d:: with SMTP id oo21mr19969752ejb.367.1607360330523;
+        Mon, 07 Dec 2020 08:58:50 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id n1sm12853926ejb.2.2020.12.07.08.58.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Dec 2020 08:58:49 -0800 (PST)
+Date:   Mon, 7 Dec 2020 16:58:48 +0000
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc:     qemu-devel@nongnu.org, Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+Subject: Re: [RFC PATCH 06/27] virtio: Add virtio_queue_get_used_notify_split
+Message-ID: <20201207165848.GM203660@stefanha-x1.localdomain>
+References: <20201120185105.279030-1-eperezma@redhat.com>
+ <20201120185105.279030-7-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="EOHJn1TVIJfeVXv2"
+Content-Disposition: inline
+In-Reply-To: <20201120185105.279030-7-eperezma@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  7 Dec 2020 10:41:25 -0500
-Collin Walling <walling@linux.ibm.com> wrote:
 
-> The DIAGNOSE 0x0318 instruction, unique to s390x, is a privileged call
-> that must be intercepted via SIE, handled in userspace, and the
-> information set by the instruction is communicated back to KVM.
-> 
-> To test the instruction interception, an ad-hoc handler is defined which
-> simply has a VM execute the instruction and then userspace will extract
-> the necessary info. The handler is defined such that the instruction
-> invocation occurs only once. It is up to the caller to determine how the
-> info returned by this handler should be used.
-> 
-> The diag318 info is communicated from userspace to KVM via a sync_regs
-> call. This is tested During a sync_regs test, where the diag318 info is
+--EOHJn1TVIJfeVXv2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-s/During/during/
+On Fri, Nov 20, 2020 at 07:50:44PM +0100, Eugenio P=E9rez wrote:
+> This function is just used for a few commits, so SW LM is developed
+> incrementally, and it is deleted after it is useful.
+>=20
+> For a few commits, only the events (irqfd, eventfd) are forwarded.
 
-> requested via the handler, then the info is stored in the appropriate
-> register in KVM via a sync registers call.
-> 
-> If KVM does not support diag318, then the tests will print a message
-> stating that diag318 was skipped, and the asserts will simply test
-> against a value of 0.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |  2 +-
->  .../kvm/include/s390x/diag318_test_handler.h  | 13 +++
->  .../kvm/lib/s390x/diag318_test_handler.c      | 82 +++++++++++++++++++
->  .../selftests/kvm/s390x/sync_regs_test.c      | 16 +++-
->  4 files changed, 111 insertions(+), 2 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h
->  create mode 100644 tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c
+s/eventfd/ioeventfd/ (irqfd is also an eventfd)
 
-Looks reasonable to me.
+> +bool virtio_queue_get_used_notify_split(VirtQueue *vq)
+> +{
+> +    VRingMemoryRegionCaches *caches;
+> +    hwaddr pa =3D offsetof(VRingUsed, flags);
+> +    uint16_t flags;
+> +
+> +    RCU_READ_LOCK_GUARD();
+> +
+> +    caches =3D vring_get_region_caches(vq);
+> +    assert(caches);
+> +    flags =3D virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
+> +    return !(VRING_USED_F_NO_NOTIFY & flags);
+> +}
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+QEMU stores the notification status:
 
+void virtio_queue_set_notification(VirtQueue *vq, int enable)
+{
+    vq->notification =3D enable; <---- here
+
+    if (!vq->vring.desc) {
+        return;
+    }
+
+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+        virtio_queue_packed_set_notification(vq, enable);
+    } else {
+        virtio_queue_split_set_notification(vq, enable);
+
+I'm wondering why it's necessary to fetch from guest RAM instead of
+using vq->notification? It also works for both split and packed
+queues so the code would be simpler.
+
+--EOHJn1TVIJfeVXv2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/OX0gACgkQnKSrs4Gr
+c8joJwgAxP2IQdibt4q6jUVfHjl/jy+5PpzROcRTI3+NTOW7RZAtHwg1VSLc+N8N
+AGRSKiaMpsWS/ApNmdzTjrmMurFOZRjrsPVwu+UDqsd1vscYk9ZWhc3vS24gYSot
+X9Y0av+ZpV0OBKlFGpEdqaOHt7LuK/IwyZe5fXGH0CAH25+OKky7gisAMXeY9c3L
+CEusJ6PGE4fr+99IcJcefGiMPCW6QvmJQnvsq2F7ST1ArsPfhvZASZWnucmtXsNH
+YywpV+RFNQrbyiMU86CwVE99COm16dTpb1n4QHu5+4tTQa9l3wy9cKTPrrFzlUGI
+Wm8tTPQ1Njha3wNnYaoHBGcNMX0sCg==
+=RgXt
+-----END PGP SIGNATURE-----
+
+--EOHJn1TVIJfeVXv2--
