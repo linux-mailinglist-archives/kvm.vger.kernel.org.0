@@ -2,84 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8B282D13E7
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 15:42:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38F7C2D13EF
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 15:46:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726275AbgLGOmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 09:42:23 -0500
-Received: from forward101o.mail.yandex.net ([37.140.190.181]:47839 "EHLO
-        forward101o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726142AbgLGOmX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 09:42:23 -0500
-Received: from mxback28o.mail.yandex.net (mxback28o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::79])
-        by forward101o.mail.yandex.net (Yandex) with ESMTP id F1E6B3C00876;
-        Mon,  7 Dec 2020 17:41:38 +0300 (MSK)
-Received: from iva5-057a0d1fbbd8.qloud-c.yandex.net (iva5-057a0d1fbbd8.qloud-c.yandex.net [2a02:6b8:c0c:7f1c:0:640:57a:d1f])
-        by mxback28o.mail.yandex.net (mxback/Yandex) with ESMTP id oamv1XwPu4-fcWWfQid;
-        Mon, 07 Dec 2020 17:41:38 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1607352098;
-        bh=14tUsqybUpCpcHIHOV3QLP0iWuq+HJ50yDceRMbfNI8=;
-        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
-        b=BO/gcz0D/DfBZeX8UOYKeghLawyt4u9WmDhYsCZzq2c0NihbTNySUP44owk/Vxquj
-         BMW4UUJrg2e1F/gdmkrM+RaLN+WVr21YUzeRtLsjmxLgEs5S8xcAk91uDjYakShNvA
-         rjiPXoY8gOR9ZWFjgtJYAhO2wjbnjwm0OLOc4iA8=
-Authentication-Results: mxback28o.mail.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by iva5-057a0d1fbbd8.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id awEwUpSmah-fbmmVX2Y;
-        Mon, 07 Dec 2020 17:41:37 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: KVM_SET_CPUID doesn't check supported bits (was Re: [PATCH 0/6]
- KVM: x86: KVM_SET_SREGS.CR4 bug fixes and cleanup)
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201007014417.29276-1-sean.j.christopherson@intel.com>
- <99334de1-ba3d-dfac-0730-e637d39b948f@yandex.ru>
- <20201008175951.GA9267@linux.intel.com>
- <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
- <20201009040453.GA10744@linux.intel.com>
- <5dfa55f3-ecdf-9f8d-2d45-d2e6e54f2daa@yandex.ru>
- <20201009153053.GA16234@linux.intel.com>
- <b38dff0b-7e6d-3f3e-9724-8e280938628a@yandex.ru>
- <c206865e-b2da-b996-3d48-2c71d7783fbc@redhat.com>
- <c0c473c1-93af-2a52-bb35-c32f9e96faea@yandex.ru>
- <CABgObfYS57_ez-t=eu9+3S2bhSXC_9DTj=64Sna2jnYEMYo2Ag@mail.gmail.com>
- <9201e8ac-68d2-2bb3-1ef3-efd698391955@yandex.ru>
- <CABgObfb_4r=k_qakd+48hPar8rzc-P50+dgdoYvQaL2H-po6+g@mail.gmail.com>
- <f505b1f3-4117-ba0f-ef3a-e6ff5293205f@yandex.ru>
- <CABgObfYN7Okdt+YfHtsd3M_00iuWf=UyKPmbQhhYBhoiMtdXuw@mail.gmail.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <ae433269-61ee-9bb8-0e06-a266b10c7f31@yandex.ru>
-Date:   Mon, 7 Dec 2020 17:41:26 +0300
+        id S1726177AbgLGOpY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 09:45:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27057 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725803AbgLGOpX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 09:45:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607352237;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yYikCPcIPVfkQPyOTA1er7+ojxS2PgeXAGCbiR51IuI=;
+        b=iHwXxWisxMiXzPL6x/bK02QYfui7KaNo1aOqsdWC2uhmJRBz1IFgL9GSz9D2kARYnr5uR/
+        hT57THpM41hFGPfC/1mzUr+6+qc2giFdhWxnQwiQhp/neLj2aBdegESbGoQma77oG+FRYJ
+        PxWG6i+GSLLzsaC6BBhDd0977aBpF/8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-SPQGlG4kPs6bEH4OCatr7A-1; Mon, 07 Dec 2020 09:43:56 -0500
+X-MC-Unique: SPQGlG4kPs6bEH4OCatr7A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EB25107ACE6;
+        Mon,  7 Dec 2020 14:43:54 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-85.ams2.redhat.com [10.36.112.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0439760C0F;
+        Mon,  7 Dec 2020 14:43:45 +0000 (UTC)
+Subject: Re: [PATCH v3 5/5] gitlab-ci: Add Xen cross-build jobs
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+        Willian Rampazzo <wrampazz@redhat.com>,
+        Paul Durrant <paul@xen.org>, Cornelia Huck <cohuck@redhat.com>,
+        xen-devel@lists.xenproject.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Claudio Fontana <cfontana@suse.de>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>
+References: <20201207131503.3858889-1-philmd@redhat.com>
+ <20201207131503.3858889-6-philmd@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <f69be51c-1a16-8c5a-f46c-d621d905c9ca@redhat.com>
+Date:   Mon, 7 Dec 2020 15:43:44 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <CABgObfYN7Okdt+YfHtsd3M_00iuWf=UyKPmbQhhYBhoiMtdXuw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201207131503.3858889-6-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-07.12.2020 17:34, Paolo Bonzini пишет:
->
->     > It is too late to change that aspect of the API, unfortunately. We
->     > don't know how various userspaces would behave.
->     Which means some sensible behaviour
->     already exists if I don't call KVM_SET_CPUID2.
->     So what is it, #UD on CPUID?
->
->
-> I would have to check but I think you always get zeroes; not entirely 
-> sensible.
-In that case I would argue that you can't
-break anything by changing that to something
-sensible. :)
-But anyway, since my problem is solved,
-this is just a potential improvement for the
-future, or the case for documenting.
+On 07/12/2020 14.15, Philippe Mathieu-Daudé wrote:
+> Cross-build ARM and X86 targets with only Xen accelerator enabled.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  .gitlab-ci.d/crossbuilds.yml | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
+> index 51896bbc9fb..bd6473a75a7 100644
+> --- a/.gitlab-ci.d/crossbuilds.yml
+> +++ b/.gitlab-ci.d/crossbuilds.yml
+> @@ -134,3 +134,17 @@ cross-win64-system:
+>    extends: .cross_system_build_job
+>    variables:
+>      IMAGE: fedora-win64-cross
+> +
+> +cross-amd64-xen-only:
+> +  extends: .cross_accel_build_job
+> +  variables:
+> +    IMAGE: debian-amd64-cross
+> +    ACCEL: xen
+> +    ACCEL_CONFIGURE_OPTS: --disable-tcg --disable-kvm
+> +
+> +cross-arm64-xen-only:
+> +  extends: .cross_accel_build_job
+> +  variables:
+> +    IMAGE: debian-arm64-cross
+> +    ACCEL: xen
+> +    ACCEL_CONFIGURE_OPTS: --disable-tcg --disable-kvm
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+
