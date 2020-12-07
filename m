@@ -2,112 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 005272D11AA
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 14:17:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 557792D11AD
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 14:18:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725550AbgLGNRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 08:17:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48385 "EHLO
+        id S1726366AbgLGNRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 08:17:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59030 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726076AbgLGNRF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 08:17:05 -0500
+        by vger.kernel.org with ESMTP id S1726339AbgLGNRq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 08:17:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607346938;
+        s=mimecast20190719; t=1607346980;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6EJ4iyK07Ty3dzRyIkzOuiJNHq5RuTRyKsBVarixwBA=;
-        b=IHyMtIXD7TANrj3jfNr05Jy4SgPy//KTjAZzakE8dyMMy6rrFboFhpiz1oslqSDQ2Wj8aZ
-        ga7hyqa9+aUP2uZXK6dGeV8/vm8b4Tkdm8UuZaascv+3vbHcNXJNNU72zvS9KWb5uiwd8j
-        fAuaSsErcCYSMvcyn7SpGl3DQrwm5gA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-5Ldi9ZuTOIqXt_sQBh6ZYA-1; Mon, 07 Dec 2020 08:15:35 -0500
-X-MC-Unique: 5Ldi9ZuTOIqXt_sQBh6ZYA-1
-Received: by mail-wm1-f71.google.com with SMTP id u123so4118568wmu.5
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 05:15:35 -0800 (PST)
+        bh=79CDQSAGopTcyYZWDZiCTCDAaMDLvT94+iPcW3Ja/gg=;
+        b=LvLi/A5dfoYuRJy3OAC9ysOWrhyr4fHfCqo32guSrmwZmFWor3q/a9dBulAxx8zMBNwoEG
+        vA/AUpZJiFSlwVgxNCu81KgnxCTrAqmtzHjLJhrj0lqtN9Me7peTiJbOQbB0l0lvCboBp0
+        0hORq99iT7V2NQD/YO6vcnG8d4M5wTQ=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-lfnKTglpOXWSMBdw4KyGzA-1; Mon, 07 Dec 2020 08:16:19 -0500
+X-MC-Unique: lfnKTglpOXWSMBdw4KyGzA-1
+Received: by mail-ed1-f71.google.com with SMTP id r16so5762151eds.13
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 05:16:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6EJ4iyK07Ty3dzRyIkzOuiJNHq5RuTRyKsBVarixwBA=;
-        b=o+1KVaWp7VNF1Y/lPTI+eari0S6Rp3NJeuF6o7s+HojV+bGogjBZycJdKZhZUOxJZW
-         aQCA3NFw53CZNR3xJdcsR9XfIFV0+8gRFCY0Eo5G4xtGDpGTl+gjltzhnKQ22j8gbTz8
-         gmQoYDiEcTLSRQvAtyNPime/pxjbDz9cOE0zS5tTJs4uEfJFs87n7S343W1etSM9ArsN
-         q3wmGTRhptQVXXuPLumeURbvCZtffRIAbMo/mOOJKJ/jqoln33lSKo02rJZK0pd6vuCg
-         +CcjmLRU8JOc7pfn7SHgnzR0JURBkldABNOLHrEznnhvSrqzLP8BREelJaFARE03oGu6
-         AziQ==
-X-Gm-Message-State: AOAM531Y/rxxOOOueKz9Jlr3r+dggl5aPkVnN4T0qitG9yx+9BE/iscK
-        ZHeVMMUAuOFTOLimp++Ka0W26KUD6stNINSiU00vEm8MPIKky6C/srdCkS7Qb0MHEWdBsOhvnPr
-        CijcXeHBYsVkR
-X-Received: by 2002:a5d:4c49:: with SMTP id n9mr20011857wrt.30.1607346934122;
-        Mon, 07 Dec 2020 05:15:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx9XTTmfTlfqcd6ffk3O9VyZaaUJTIkcE7tELrfEhCU+PvMWzkv9xF2oA2F54WLRjz0+k84yQ==
-X-Received: by 2002:a5d:4c49:: with SMTP id n9mr20011839wrt.30.1607346933986;
-        Mon, 07 Dec 2020 05:15:33 -0800 (PST)
-Received: from localhost.localdomain (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id c190sm14567845wme.19.2020.12.07.05.15.32
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=79CDQSAGopTcyYZWDZiCTCDAaMDLvT94+iPcW3Ja/gg=;
+        b=h7SEI5FWBss0JUcFdX8g/O8/4DjVsXXy3rFQwQIqHaTsqG9GiGPyqt2zpa2e9EkU0L
+         jwITQheIkzY05qb7c9C2/8P8nolrNqr5lTrECpsB24R+DEvDMC0m9/5DvKWRfQOCG7rE
+         vAZFcyN1tenE3lgN5Jn0+fK6WYNzHa0l8ZTd8YBhhsE/GtDucWep2NKBQdUc7IG7UTMf
+         9MYe5QSU9leB6pPwIAjRmJO/zTLB7GKZnfpw2FVUCGoDOWLXL+qxPJ3S7FiaaNrIafHD
+         xw9h1SWnqkDd5fZp36Se1w1XyBmFBhwA0JgqoPelWQvaNhF2/HaX1SrEQ9/QnjzwS0cy
+         4bxA==
+X-Gm-Message-State: AOAM530r13oM5t5tYh6Q5LGZ2rKphPcjEecKrTzHahgArrq7SPXcFzKX
+        oDxT0szmRzj/5CBmEz0A31Y/aElsDBte9zfILYzCb0fcBWk9NT7LhvuiaL1Gvj1Ldahfbut4hdR
+        ggzvwXvgQRcsWuHkC4XGJZMoNUxGz6uKOInN1BfZTQjQJMXnyhneBYODf2ieoMNOn
+X-Received: by 2002:a50:ff0c:: with SMTP id a12mr19974997edu.79.1607346977482;
+        Mon, 07 Dec 2020 05:16:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwl7wJhrOzNS1+1ArDJ93sSPPCNdBbU63ASXPczoyfqdvj9aq9nJs+MSWplfTwlW8IubCCmHg==
+X-Received: by 2002:a50:ff0c:: with SMTP id a12mr19974957edu.79.1607346977230;
+        Mon, 07 Dec 2020 05:16:17 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id x20sm12357813ejv.66.2020.12.07.05.16.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 05:15:33 -0800 (PST)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        Mon, 07 Dec 2020 05:16:16 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
-        Willian Rampazzo <wrampazz@redhat.com>,
-        Paul Durrant <paul@xen.org>, Cornelia Huck <cohuck@redhat.com>,
-        xen-devel@lists.xenproject.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Claudio Fontana <cfontana@suse.de>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>
-Subject: [PATCH v3 5/5] gitlab-ci: Add Xen cross-build jobs
-Date:   Mon,  7 Dec 2020 14:15:03 +0100
-Message-Id: <20201207131503.3858889-6-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201207131503.3858889-1-philmd@redhat.com>
-References: <20201207131503.3858889-1-philmd@redhat.com>
+        Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+In-Reply-To: <1dbbeefc7c76c259b55582468ccd3aab35a6de60.camel@redhat.com>
+References: <20201203171118.372391-1-mlevitsk@redhat.com>
+ <20201203171118.372391-2-mlevitsk@redhat.com>
+ <87a6uq9abf.fsf@nanos.tec.linutronix.de>
+ <1dbbeefc7c76c259b55582468ccd3aab35a6de60.camel@redhat.com>
+Date:   Mon, 07 Dec 2020 14:16:15 +0100
+Message-ID: <87im9dlpsw.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cross-build ARM and X86 targets with only Xen accelerator enabled.
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- .gitlab-ci.d/crossbuilds.yml | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+>
+> But other than that I don't mind making TSC offset global per VM thing.
+> Paulo, what do you think about this?
+>
 
-diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
-index 51896bbc9fb..bd6473a75a7 100644
---- a/.gitlab-ci.d/crossbuilds.yml
-+++ b/.gitlab-ci.d/crossbuilds.yml
-@@ -134,3 +134,17 @@ cross-win64-system:
-   extends: .cross_system_build_job
-   variables:
-     IMAGE: fedora-win64-cross
-+
-+cross-amd64-xen-only:
-+  extends: .cross_accel_build_job
-+  variables:
-+    IMAGE: debian-amd64-cross
-+    ACCEL: xen
-+    ACCEL_CONFIGURE_OPTS: --disable-tcg --disable-kvm
-+
-+cross-arm64-xen-only:
-+  extends: .cross_accel_build_job
-+  variables:
-+    IMAGE: debian-arm64-cross
-+    ACCEL: xen
-+    ACCEL_CONFIGURE_OPTS: --disable-tcg --disable-kvm
+Not Paolo here but personally I'd very much prefer we go this route but
+unsynchronized TSCs are, unfortunately, still a thing: I was observing
+it on an AMD Epyc server just a couple years ago (cured with firmware
+update). We try to catch such situation in KVM instead of blowing up but
+this may still result in subtle bugs I believe. Maybe we would be better
+off killing all VMs in case TSC ever gets unsynced (by default).
+
+Another thing to this bucket is kvmclock which is currently per-cpu. If
+we forbid TSC to un-synchronize (he-he), there is no point in doing
+that. We can as well use e.g. Hyper-V TSC page method which is
+per-VM. Creating another PV clock in KVM may be a hard sell as all
+modern x86 CPUs support TSC scaling (in addition to TSC offsetting which
+is there for a long time) and when it's there we don't really need a PV
+clock to make migration possible.
+
 -- 
-2.26.2
+Vitaly
 
