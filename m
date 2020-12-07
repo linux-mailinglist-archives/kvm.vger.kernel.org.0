@@ -2,480 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 686DB2D17BC
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 18:45:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 195F62D1829
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 19:06:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbgLGRnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 12:43:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42104 "EHLO
+        id S1726214AbgLGSFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 13:05:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726250AbgLGRnS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 12:43:18 -0500
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCAB2C061749
-        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 09:42:37 -0800 (PST)
-Received: by mail-ed1-x541.google.com with SMTP id r5so14592068eda.12
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 09:42:37 -0800 (PST)
+        with ESMTP id S1725822AbgLGSFe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 13:05:34 -0500
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 483C9C0617B0
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 10:04:48 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id q22so10800013pfk.12
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 10:04:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mq8NM1bE2akKplJdl1Dq9pIrf37eZ1c662uiTUaXVd8=;
-        b=UO0DMOXJ564lPXCQ3QeKCEYsm+qs6EWwHCdb4Dytr1pqf0oMJrE3OUfdwxiDzazbYO
-         cnh+8Cpp70M0K/miVknDpbAq03n4r8scIALOPVpyP7hq2+J7B6VAq9HiNLVHTCQQXboB
-         l9jBaV3UI7vTmurBackdZeUIiXje+dV/RDldpX9xd24fzlHsuBRzLpKQcO3wUoqfKRgp
-         NDGtmlzThhjABfYeKslwiVA0JeyTUAafCJE6i05G6/8iAn4/B5B9gIVTuG1r69XhTXfF
-         RblpTfikRFx1yCfgd7v/MOsN5zmcswXghp+OHd6mJXLtIAfqCbBSNcAMTfmgjQhTNIEv
-         8tSg==
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=kbV3WSMn8Z3r9fdGwZbCofxQ8ZlQoCXfrnC4rA/3kXU=;
+        b=BvSGPkk1XV51HulmhP09dGtC50Mqu3r9NSlD6Rtp/fEgFbKCUYHJxoiQ/Lw026a8eV
+         8pkollCNLgLs0UCVhW4o6brcgbS7lvxuFZaOmJ+LJEDtCq8YuLMMQZrtArDfIaA4qRjK
+         1rYEF7M/0093Uw/TQm30akYxGr+J8KFgSt2kBgvDwZmhZx7l1TrKcKnw/BLb64ju6OEZ
+         7uNmPHrSbOS4KEe61x/bBDbhbX48C3Z5YfVlyWUBeqc96naM8cDULIA2yeOq4vSQjPXK
+         LnXlIyvD6dTz28bK9V8o5Ko8tRYCjDgrUKZ2yxSAi3weyMM2+TT4+dd//sg+88u0Yyhh
+         csoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mq8NM1bE2akKplJdl1Dq9pIrf37eZ1c662uiTUaXVd8=;
-        b=NZBTfXpTI+04dRm+ZkM2Ug/RhW0CBoRDLVRGJu/q6OBB7BBD0FHVsNkJ33cXXVJ+aW
-         x055u3CnaWMIiIeHGp6wW5yUG3qv3tT4eX2LsDATdUc0Cf+FY/NIyWY6pWHtQizjYmQ1
-         xB+BhH0EFNITK/Q8Vkefm6cOf8y+5dma5VaKkyZJRF107huyYk7lvGAnQTroZQPweuIP
-         7k0WR10DV6/ottrLJ/kdRJ3ZNCMuX+O2yY645Pvaej9ro8+jdiTfYuhXgFkt3t99FBxy
-         gmIZ58s7ir9kNBvDZh/RLRGYnYzyoTpU/Qwedz08jOtxNgM+gmmZxa8EPUC2WrhYeiSP
-         574g==
-X-Gm-Message-State: AOAM531VgNp/nRg3AbC0MrPemna5mn79/LsTcXKPnNWrsUDoAqZ+xTgx
-        YjDsNOb/19e21qM+QYmmNl0=
-X-Google-Smtp-Source: ABdhPJy7+IEKb9uzYTmTc5pViy/GvuWuhCq5qtrc08HdUt26qDDUsNUD/XGUmJoaUCOKu46EfQ8gsA==
-X-Received: by 2002:a50:f299:: with SMTP id f25mr6660415edm.133.1607362955995;
-        Mon, 07 Dec 2020 09:42:35 -0800 (PST)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id q4sm10802329ejc.78.2020.12.07.09.42.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 09:42:34 -0800 (PST)
-Date:   Mon, 7 Dec 2020 17:42:33 +0000
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     qemu-devel@nongnu.org, Lars Ganrot <lars.ganrot@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        Salil Mehta <mehta.salil.lnk@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Liran Alon <liralon@gmail.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        Max Gurtovoy <maxgu14@gmail.com>,
-        Alex Barba <alex.barba@broadcom.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jim Harford <jim.harford@broadcom.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Christophe Fontaine <cfontain@redhat.com>,
-        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
-        Michael Lilja <ml@napatech.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
-        Lee Ballard <ballle98@gmail.com>,
-        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
-        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
-        Howard Cai <howard.cai@gmail.com>,
-        Xiao W Wang <xiao.w.wang@intel.com>,
-        Sean Mooney <smooney@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
-        Stephen Finucane <stephenfin@redhat.com>
-Subject: Re: [RFC PATCH 07/27] vhost: Route guest->host notification through
- qemu
-Message-ID: <20201207174233.GN203660@stefanha-x1.localdomain>
-References: <20201120185105.279030-1-eperezma@redhat.com>
- <20201120185105.279030-8-eperezma@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="8MZM6zh5Bb05FW+3"
-Content-Disposition: inline
-In-Reply-To: <20201120185105.279030-8-eperezma@redhat.com>
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=kbV3WSMn8Z3r9fdGwZbCofxQ8ZlQoCXfrnC4rA/3kXU=;
+        b=mVUgVrT3KuJvTNFhXoAcg+4draXdLItFrw3IeJqfQgT3xnnzwRUK8V0zN5kO5GG3rT
+         ukduGRlAE25/y4PiJJIfdDKJ/w0osrNWkm3Wy2T27mATSs4wzi6Kq8IrAs8A44oM2qKv
+         i0i5tE2u5gXB+p8XHBIb+yubuKafnazaPGC85ICHM2s5DxDnfKsbAyJgJK/0feSF6edL
+         Ss+WsFZve6URd3jfnREJllSm+TVfuzPj7P7cQNifQoQNsx1dU7jDqjUWUqxcLE7FvLQx
+         3eHyTbEyaFcrHBHr1jwtCwGGfn6LXrQIo8DkR6IaXtj2+6693Qgi2pqthrnS7IFed3rk
+         ybXQ==
+X-Gm-Message-State: AOAM530pnYuDcUN0PGyZ4/6HIh6qrh8HvoZOtaYASz7aiHeXAfB9H0W6
+        KpKll9CaRYwe1CXyVQAVadxFdg==
+X-Google-Smtp-Source: ABdhPJwV3xytw1x+Of85bMOMEIGarLom/VlHMSxobmAAr7XDbFmck2N5F2W7tVz+G+34gQVIMGV2aQ==
+X-Received: by 2002:a62:1c88:0:b029:197:f6e4:bc2b with SMTP id c130-20020a621c880000b0290197f6e4bc2bmr17027674pfc.6.1607364287776;
+        Mon, 07 Dec 2020 10:04:47 -0800 (PST)
+Received: from ?IPv6:2601:646:c200:1ef2:4be:8206:69d7:62c1? ([2601:646:c200:1ef2:4be:8206:69d7:62c1])
+        by smtp.gmail.com with ESMTPSA id x1sm15247910pfj.95.2020.12.07.10.04.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Dec 2020 10:04:47 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+Date:   Mon, 7 Dec 2020 10:04:45 -0800
+Message-Id: <885C1725-B479-47F6-B08D-A7181637A80A@amacapital.net>
+References: <636fecc20b0143128b484f159ff795ff65d05b82.camel@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+In-Reply-To: <636fecc20b0143128b484f159ff795ff65d05b82.camel@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+X-Mailer: iPhone Mail (18B121)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---8MZM6zh5Bb05FW+3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 20, 2020 at 07:50:45PM +0100, Eugenio P=E9rez wrote:
-> Signed-off-by: Eugenio P=E9rez <eperezma@redhat.com>
-> ---
->  hw/virtio/vhost-sw-lm-ring.h |  26 +++++++++
->  include/hw/virtio/vhost.h    |   3 ++
->  hw/virtio/vhost-sw-lm-ring.c |  60 +++++++++++++++++++++
->  hw/virtio/vhost.c            | 100 +++++++++++++++++++++++++++++++++--
->  hw/virtio/meson.build        |   2 +-
->  5 files changed, 187 insertions(+), 4 deletions(-)
->  create mode 100644 hw/virtio/vhost-sw-lm-ring.h
->  create mode 100644 hw/virtio/vhost-sw-lm-ring.c
+> On Dec 7, 2020, at 9:00 AM, Maxim Levitsky <mlevitsk@redhat.com> wrote:
 >=20
-> diff --git a/hw/virtio/vhost-sw-lm-ring.h b/hw/virtio/vhost-sw-lm-ring.h
-> new file mode 100644
-> index 0000000000..86dc081b93
-> --- /dev/null
-> +++ b/hw/virtio/vhost-sw-lm-ring.h
-> @@ -0,0 +1,26 @@
-> +/*
-> + * vhost software live migration ring
-> + *
-> + * SPDX-FileCopyrightText: Red Hat, Inc. 2020
-> + * SPDX-FileContributor: Author: Eugenio P=E9rez <eperezma@redhat.com>
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +#ifndef VHOST_SW_LM_RING_H
-> +#define VHOST_SW_LM_RING_H
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "hw/virtio/virtio.h"
-> +#include "hw/virtio/vhost.h"
-> +
-> +typedef struct VhostShadowVirtqueue VhostShadowVirtqueue;
+> =EF=BB=BFOn Mon, 2020-12-07 at 08:53 -0800, Andy Lutomirski wrote:
+>>>> On Dec 7, 2020, at 8:38 AM, Thomas Gleixner <tglx@linutronix.de> wrote:=
 
-Here it's called a shadow virtqueue while the file calls it a
-sw-lm-ring. Please use a single name.
+>>>=20
+>>> =EF=BB=BFOn Mon, Dec 07 2020 at 14:16, Maxim Levitsky wrote:
+>>>>> On Sun, 2020-12-06 at 17:19 +0100, Thomas Gleixner wrote:
+>>>>> =46rom a timekeeping POV and the guests expectation of TSC this is
+>>>>> fundamentally wrong:
+>>>>>=20
+>>>>>     tscguest =3D scaled(hosttsc) + offset
+>>>>>=20
+>>>>> The TSC has to be viewed systemwide and not per CPU. It's systemwide
+>>>>> used for timekeeping and for that to work it has to be synchronized.=20=
 
-> +
-> +bool vhost_vring_kick(VhostShadowVirtqueue *vq);
+>>>>>=20
+>>>>> Why would this be different on virt? Just because it's virt or what?=20=
 
-vhost_shadow_vq_kick()?
+>>>>>=20
+>>>>> Migration is a guest wide thing and you're not migrating single vCPUs.=
 
-> +
-> +VhostShadowVirtqueue *vhost_sw_lm_shadow_vq(struct vhost_dev *dev, int i=
-dx);
+>>>>>=20
+>>>>> This hackery just papers over he underlying design fail that KVM looks=
 
-vhost_dev_get_shadow_vq()? This could be in include/hw/virtio/vhost.h
-with the other vhost_dev_*() functions.
+>>>>> at the TSC per vCPU which is the root cause and that needs to be fixed=
+.
+>>>>=20
+>>>> I don't disagree with you.
+>>>> As far as I know the main reasons that kvm tracks TSC per guest are
+>>>>=20
+>>>> 1. cases when host tsc is not stable=20
+>>>> (hopefully rare now, and I don't mind making
+>>>> the new API just refuse to work when this is detected, and revert to ol=
+d way
+>>>> of doing things).
+>>>=20
+>>> That's a trainwreck to begin with and I really would just not support it=
 
-> +
-> +void vhost_sw_lm_shadow_vq_free(VhostShadowVirtqueue *vq);
+>>> for anything new which aims to be more precise and correct.  TSC has
+>>> become pretty reliable over the years.
+>>>=20
+>>>> 2. (theoretical) ability of the guest to introduce per core tsc offfset=
 
-Hmm...now I wonder what the lifecycle is. Does vhost_sw_lm_shadow_vq()
-allocate it?
+>>>> by either using TSC_ADJUST (for which I got recently an idea to stop
+>>>> advertising this feature to the guest), or writing TSC directly which
+>>>> is allowed by Intel's PRM:
+>>>=20
+>>> For anything halfways modern the write to TSC is reflected in TSC_ADJUST=
 
-Please add doc comments explaining these functions either in this header
-file or in vhost-sw-lm-ring.c.
+>>> which means you get the precise offset.
+>>>=20
+>>> The general principle still applies from a system POV.
+>>>=20
+>>>    TSC base (systemwide view) - The sane case
+>>>=20
+>>>    TSC CPU  =3D TSC base + TSC_ADJUST
+>>>=20
+>>> The guest TSC base is a per guest constant offset to the host TSC.
+>>>=20
+>>>    TSC guest base =3D TSC host base + guest base offset
+>>>=20
+>>> If the guest want's this different per vCPU by writing to the MSR or to
+>>> TSC_ADJUST then you still can have a per vCPU offset in TSC_ADJUST which=
 
-> +
-> +#endif
-> diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-> index b5b7496537..93cc3f1ae3 100644
-> --- a/include/hw/virtio/vhost.h
-> +++ b/include/hw/virtio/vhost.h
-> @@ -54,6 +54,8 @@ struct vhost_iommu {
->      QLIST_ENTRY(vhost_iommu) iommu_next;
->  };
-> =20
-> +typedef struct VhostShadowVirtqueue VhostShadowVirtqueue;
-> +
->  typedef struct VhostDevConfigOps {
->      /* Vhost device config space changed callback
->       */
-> @@ -83,6 +85,7 @@ struct vhost_dev {
->      bool started;
->      bool log_enabled;
->      uint64_t log_size;
-> +    VhostShadowVirtqueue *sw_lm_shadow_vq[2];
-
-The hardcoded 2 is probably for single-queue virtio-net? I guess this
-will eventually become VhostShadowVirtqueue *shadow_vqs or
-VhostShadowVirtqueue **shadow_vqs, depending on whether each one should
-be allocated individually.
-
->      VirtIOHandleOutput sw_lm_vq_handler;
->      Error *migration_blocker;
->      const VhostOps *vhost_ops;
-> diff --git a/hw/virtio/vhost-sw-lm-ring.c b/hw/virtio/vhost-sw-lm-ring.c
-> new file mode 100644
-> index 0000000000..0192e77831
-> --- /dev/null
-> +++ b/hw/virtio/vhost-sw-lm-ring.c
-> @@ -0,0 +1,60 @@
-> +/*
-> + * vhost software live migration ring
-> + *
-> + * SPDX-FileCopyrightText: Red Hat, Inc. 2020
-> + * SPDX-FileContributor: Author: Eugenio P=E9rez <eperezma@redhat.com>
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +#include "hw/virtio/vhost-sw-lm-ring.h"
-> +#include "hw/virtio/vhost.h"
-> +
-> +#include "standard-headers/linux/vhost_types.h"
-> +#include "standard-headers/linux/virtio_ring.h"
-> +
-> +#include "qemu/event_notifier.h"
-> +
-> +typedef struct VhostShadowVirtqueue {
-> +    EventNotifier hdev_notifier;
-> +    VirtQueue *vq;
-> +} VhostShadowVirtqueue;
-> +
-> +static inline bool vhost_vring_should_kick(VhostShadowVirtqueue *vq)
-> +{
-> +    return virtio_queue_get_used_notify_split(vq->vq);
-> +}
-> +
-> +bool vhost_vring_kick(VhostShadowVirtqueue *vq)
-> +{
-> +    return vhost_vring_should_kick(vq) ? event_notifier_set(&vq->hdev_no=
-tifier)
-> +                                       : true;
-> +}
-
-How is the return value used? event_notifier_set() returns -errno so
-this function returns false on success, and true when notifications are
-disabled or event_notifier_set() failed. I'm not sure this return value
-can be used for anything.
-
-> +
-> +VhostShadowVirtqueue *vhost_sw_lm_shadow_vq(struct vhost_dev *dev, int i=
-dx)
-
-I see now that this function allocates the VhostShadowVirtqueue. Maybe
-adding _new() to the name would make that clear?
-
-> +{
-> +    struct vhost_vring_file file =3D {
-> +        .index =3D idx
-> +    };
-> +    VirtQueue *vq =3D virtio_get_queue(dev->vdev, idx);
-> +    VhostShadowVirtqueue *svq;
-> +    int r;
-> +
-> +    svq =3D g_new0(VhostShadowVirtqueue, 1);
-> +    svq->vq =3D vq;
-> +
-> +    r =3D event_notifier_init(&svq->hdev_notifier, 0);
-> +    assert(r =3D=3D 0);
-> +
-> +    file.fd =3D event_notifier_get_fd(&svq->hdev_notifier);
-> +    r =3D dev->vhost_ops->vhost_set_vring_kick(dev, &file);
-> +    assert(r =3D=3D 0);
-> +
-> +    return svq;
-> +}
-
-I guess there are assumptions about the status of the device? Does the
-virtqueue need to be disabled when this function is called?
-
-> +
-> +void vhost_sw_lm_shadow_vq_free(VhostShadowVirtqueue *vq)
-> +{
-> +    event_notifier_cleanup(&vq->hdev_notifier);
-> +    g_free(vq);
-> +}
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 9cbd52a7f1..a55b684b5f 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -13,6 +13,8 @@
->   * GNU GPL, version 2 or (at your option) any later version.
->   */
-> =20
-> +#include "hw/virtio/vhost-sw-lm-ring.h"
-> +
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "hw/virtio/vhost.h"
-> @@ -61,6 +63,20 @@ bool vhost_has_free_slot(void)
->      return slots_limit > used_memslots;
->  }
-> =20
-> +static struct vhost_dev *vhost_dev_from_virtio(const VirtIODevice *vdev)
-> +{
-> +    struct vhost_dev *hdev;
-> +
-> +    QLIST_FOREACH(hdev, &vhost_devices, entry) {
-> +        if (hdev->vdev =3D=3D vdev) {
-> +            return hdev;
-> +        }
-> +    }
-> +
-> +    assert(hdev);
-> +    return NULL;
-> +}
-> +
->  static bool vhost_dev_can_log(const struct vhost_dev *hdev)
->  {
->      return hdev->features & (0x1ULL << VHOST_F_LOG_ALL);
-> @@ -148,6 +164,12 @@ static int vhost_sync_dirty_bitmap(struct vhost_dev =
-*dev,
->      return 0;
->  }
-> =20
-> +static void vhost_log_sync_nop(MemoryListener *listener,
-> +                               MemoryRegionSection *section)
-> +{
-> +    return;
-> +}
-> +
->  static void vhost_log_sync(MemoryListener *listener,
->                            MemoryRegionSection *section)
->  {
-> @@ -928,6 +950,71 @@ static void vhost_log_global_stop(MemoryListener *li=
-stener)
->      }
->  }
-> =20
-> +static void handle_sw_lm_vq(VirtIODevice *vdev, VirtQueue *vq)
-> +{
-> +    struct vhost_dev *hdev =3D vhost_dev_from_virtio(vdev);
-
-If this lookup becomes a performance bottleneck there are other options
-for determining the vhost_dev. For example VirtIODevice could have a
-field for stashing the vhost_dev pointer.
-
-> +    uint16_t idx =3D virtio_get_queue_index(vq);
-> +
-> +    VhostShadowVirtqueue *svq =3D hdev->sw_lm_shadow_vq[idx];
-> +
-> +    vhost_vring_kick(svq);
-> +}
-
-I'm a confused. Do we need to pop elements from vq and push equivalent
-elements onto svq before kicking? Either a todo comment is missing or I
-misunderstand how this works.
-
-> +
-> +static int vhost_sw_live_migration_stop(struct vhost_dev *dev)
-> +{
-> +    int idx;
-> +
-> +    vhost_dev_enable_notifiers(dev, dev->vdev);
-> +    for (idx =3D 0; idx < dev->nvqs; ++idx) {
-> +        vhost_sw_lm_shadow_vq_free(dev->sw_lm_shadow_vq[idx]);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int vhost_sw_live_migration_start(struct vhost_dev *dev)
-> +{
-> +    int idx;
-> +
-> +    for (idx =3D 0; idx < dev->nvqs; ++idx) {
-> +        dev->sw_lm_shadow_vq[idx] =3D vhost_sw_lm_shadow_vq(dev, idx);
-> +    }
-> +
-> +    vhost_dev_disable_notifiers(dev, dev->vdev);
-
-There is a race condition if the guest kicks the vq while this is
-happening. The shadow vq hdev_notifier needs to be set so the vhost
-device checks the virtqueue for requests that slipped in during the
-race window.
-
-> +
-> +    return 0;
-> +}
-> +
-> +static int vhost_sw_live_migration_enable(struct vhost_dev *dev,
-> +                                          bool enable_lm)
-> +{
-> +    if (enable_lm) {
-> +        return vhost_sw_live_migration_start(dev);
-> +    } else {
-> +        return vhost_sw_live_migration_stop(dev);
-> +    }
-> +}
-> +
-> +static void vhost_sw_lm_global_start(MemoryListener *listener)
-> +{
-> +    int r;
-> +
-> +    r =3D vhost_migration_log(listener, true, vhost_sw_live_migration_en=
-able);
-> +    if (r < 0) {
-> +        abort();
-> +    }
-> +}
-> +
-> +static void vhost_sw_lm_global_stop(MemoryListener *listener)
-> +{
-> +    int r;
-> +
-> +    r =3D vhost_migration_log(listener, false, vhost_sw_live_migration_e=
-nable);
-> +    if (r < 0) {
-> +        abort();
-> +    }
-> +}
-> +
->  static void vhost_log_start(MemoryListener *listener,
->                              MemoryRegionSection *section,
->                              int old, int new)
-> @@ -1334,9 +1421,14 @@ int vhost_dev_init(struct vhost_dev *hdev, void *o=
-paque,
->          .region_nop =3D vhost_region_addnop,
->          .log_start =3D vhost_log_start,
->          .log_stop =3D vhost_log_stop,
-> -        .log_sync =3D vhost_log_sync,
-> -        .log_global_start =3D vhost_log_global_start,
-> -        .log_global_stop =3D vhost_log_global_stop,
-> +        .log_sync =3D !vhost_dev_can_log(hdev) ?
-> +                    vhost_log_sync_nop :
-> +                    vhost_log_sync,
-
-Why is this change necessary now? It's not clear to me why it was
-previously okay to call vhost_log_sync().
-
-> +        .log_global_start =3D !vhost_dev_can_log(hdev) ?
-> +                            vhost_sw_lm_global_start :
-> +                            vhost_log_global_start,
-> +        .log_global_stop =3D !vhost_dev_can_log(hdev) ? vhost_sw_lm_glob=
-al_stop :
-> +                                                      vhost_log_global_s=
-top,
->          .eventfd_add =3D vhost_eventfd_add,
->          .eventfd_del =3D vhost_eventfd_del,
->          .priority =3D 10
-> @@ -1364,6 +1456,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *op=
-aque,
->              error_free(hdev->migration_blocker);
->              goto fail_busyloop;
->          }
-> +    } else {
-> +        hdev->sw_lm_vq_handler =3D handle_sw_lm_vq;
->      }
-> =20
->      hdev->mem =3D g_malloc0(offsetof(struct vhost_memory, regions));
-> diff --git a/hw/virtio/meson.build b/hw/virtio/meson.build
-> index fbff9bc9d4..17419cb13e 100644
-> --- a/hw/virtio/meson.build
-> +++ b/hw/virtio/meson.build
-> @@ -11,7 +11,7 @@ softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhos=
-t-stub.c'))
-> =20
->  virtio_ss =3D ss.source_set()
->  virtio_ss.add(files('virtio.c'))
-> -virtio_ss.add(when: 'CONFIG_VHOST', if_true: files('vhost.c', 'vhost-bac=
-kend.c'))
-> +virtio_ss.add(when: 'CONFIG_VHOST', if_true: files('vhost.c', 'vhost-bac=
-kend.c', 'vhost-sw-lm-ring.c'))
->  virtio_ss.add(when: 'CONFIG_VHOST_USER', if_true: files('vhost-user.c'))
->  virtio_ss.add(when: 'CONFIG_VHOST_VDPA', if_true: files('vhost-vdpa.c'))
->  virtio_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-ball=
-oon.c'))
-> --=20
-> 2.18.4
+>>> is the offset to the TSC base of the guest.
+>>=20
+>> How about, if the guest wants to write TSC_ADJUST, it can turn off all pa=
+ravirt features and keep both pieces?
+>>=20
 >=20
+> This is one of the things I had in mind recently.
+>=20
+> Even better, we can stop advertising TSC_ADJUST in CPUID to the guest=20
+> and forbid it from writing it at all.
 
---8MZM6zh5Bb05FW+3
-Content-Type: application/pgp-signature; name="signature.asc"
+Seems reasonable to me.
 
------BEGIN PGP SIGNATURE-----
+It also seems okay for some MSRs to stop working after the guest enabled new=
+ PV timekeeping.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/OaYkACgkQnKSrs4Gr
-c8iEswf/etvUvTrUil9p4TKYwAwjQvB7prmFUDbZsEbaAxQ86BKvb7Yfnh2rlCSM
-c7vW5iFraTfx99tpn8E5OtWUGQu4Gr9eWOBt7sCPo2mv7+HnL3kwNrAPKo8Qv3JN
-n149BZ9+rVcyENSo33LlveV0tp31hGZg+lVvjxq8b5pYJN9ACYh5fosDfW8l8wkN
-ha6nTL90z0GpfPuXderOpMhm9aTFpM/3QS8CcweC/VEMG+ThrMbSVHMRSQdP4sVa
-DOkYpMh1gY1oaDLy0LXMcU5YzD8QbB3oT9BhhPjjt1qNdwWGYwWVXsoQ0Nl5RM0w
-LVKr8Uh2aFycabSOVLUsjBqa2RSSFg==
-=OGl0
------END PGP SIGNATURE-----
+I do have a feature request, though: IMO it would be quite nifty if the new k=
+vmclock structure could also expose NTP corrections. In other words, if you c=
+ould expose enough info to calculate CLOCK_MONOTONIC_RAW, CLOCK_MONOTONIC, a=
+nd CLOCK_REALTIME, then we could have paravirt NTP.
 
---8MZM6zh5Bb05FW+3--
+Bonus points if whatever you do for CLOCK_REALTIME also exposes leap seconds=
+ in a race free way :). But I suppose that just exposing TAI and letting the=
+ guest deal with the TAI - UTC offset itself would get the job done just fin=
+e.
