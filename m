@@ -2,134 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FDDF2D1006
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 13:05:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 668042D106C
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 13:18:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727329AbgLGMEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 07:04:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28260 "EHLO
+        id S1727395AbgLGMSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 07:18:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52839 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727148AbgLGMEW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 07:04:22 -0500
+        by vger.kernel.org with ESMTP id S1727154AbgLGMSH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 07:18:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607342575;
+        s=mimecast20190719; t=1607343400;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VV+E+pdDesJK1ua/OBZSFe/m+EuDUY9iFBTNIzHgamg=;
-        b=ThifjIEcKVv6a0yMxfsCk0fFevCyCjRjNg1nPY1afZmsffxCQbF7gKeo/ZRTewDLaw44im
-        oyr0RUG8tuXvoDVRWJVjgp0+QUJsZIbgs8+c6f7e/DxmvtOfk7dei5ifyD2IU0bp/ASdBS
-        SGpgk4Ubn8stcPMiXrnDoaw/YJJAywQ=
+        bh=N6oDFfyq47RyWju2nHjeojjMvm9K1GLJgiOLjWvGMww=;
+        b=UwwBSkj+mlXwW1MtNPIAG2q2coi2BIccQIo5mwm3PcSLXS0Bu082ujvXrJNlvbz/FX8EWI
+        1xgJaXZPNvf5T77s3u74ImZLosGxiioMcTw+yaxcezHX2gSvtEteQ94qt1KsGBnpLnkLiO
+        dJAfmapiUoD/V/EXijz3eEIv0Khzq3c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-tlIb3Xe8OLCWM9fm3MzovQ-1; Mon, 07 Dec 2020 07:02:53 -0500
-X-MC-Unique: tlIb3Xe8OLCWM9fm3MzovQ-1
+ us-mta-486-_HOXYd9OOjWvW5CDT30MqA-1; Mon, 07 Dec 2020 07:16:39 -0500
+X-MC-Unique: _HOXYd9OOjWvW5CDT30MqA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED8511015C88;
-        Mon,  7 Dec 2020 12:02:50 +0000 (UTC)
-Received: from [10.36.114.33] (ovpn-114-33.ams2.redhat.com [10.36.114.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 879A860BD8;
-        Mon,  7 Dec 2020 12:02:47 +0000 (UTC)
-Subject: Re: [RFC V2 00/37] Enhance memory utilization with DMEMFS
-To:     yulei.kernel@gmail.com, linux-mm@kvack.org,
-        akpm@linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        naoya.horiguchi@nec.com, viro@zeniv.linux.org.uk,
-        pbonzini@redhat.com, Dan Williams <dan.j.williams@intel.com>
-Cc:     joao.m.martins@oracle.com, rdunlap@infradead.org,
-        sean.j.christopherson@intel.com, xiaoguangrong.eric@gmail.com,
-        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
-        Yulei Zhang <yuleixzhang@tencent.com>
-References: <cover.1607332046.git.yuleixzhang@tencent.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <33a1c4ca-9f78-96ca-a774-3adea64aaed3@redhat.com>
-Date:   Mon, 7 Dec 2020 13:02:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2F0F800D62;
+        Mon,  7 Dec 2020 12:16:36 +0000 (UTC)
+Received: from starship (unknown [10.35.206.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D1B74620DE;
+        Mon,  7 Dec 2020 12:16:27 +0000 (UTC)
+Message-ID: <1dbbeefc7c76c259b55582468ccd3aab35a6de60.camel@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Date:   Mon, 07 Dec 2020 14:16:26 +0200
+In-Reply-To: <87a6uq9abf.fsf@nanos.tec.linutronix.de>
+References: <20201203171118.372391-1-mlevitsk@redhat.com>
+         <20201203171118.372391-2-mlevitsk@redhat.com>
+         <87a6uq9abf.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <cover.1607332046.git.yuleixzhang@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.12.20 12:30, yulei.kernel@gmail.com wrote:
-> From: Yulei Zhang <yuleixzhang@tencent.com>
+On Sun, 2020-12-06 at 17:19 +0100, Thomas Gleixner wrote:
+> On Thu, Dec 03 2020 at 19:11, Maxim Levitsky wrote:
+> > +	case KVM_SET_TSC_STATE: {
+> > +		struct kvm_tsc_state __user *user_tsc_state = argp;
+> > +		struct kvm_tsc_state tsc_state;
+> > +		u64 host_tsc, wall_nsec;
+> > +
+> > +		u64 new_guest_tsc, new_guest_tsc_offset;
+> > +
+> > +		r = -EFAULT;
+> > +		if (copy_from_user(&tsc_state, user_tsc_state, sizeof(tsc_state)))
+> > +			goto out;
+> > +
+> > +		kvm_get_walltime(&wall_nsec, &host_tsc);
+> > +		new_guest_tsc = tsc_state.tsc;
+> > +
+> > +		if (tsc_state.flags & KVM_TSC_STATE_TIMESTAMP_VALID) {
+> > +			s64 diff = wall_nsec - tsc_state.nsec;
+> > +			if (diff >= 0)
+> > +				new_guest_tsc += nsec_to_cycles(vcpu, diff);
+> > +			else
+> > +				new_guest_tsc -= nsec_to_cycles(vcpu, -diff);
+> > +		}
+> > +
+> > +		new_guest_tsc_offset = new_guest_tsc - kvm_scale_tsc(vcpu, host_tsc);
+> > +		kvm_vcpu_write_tsc_offset(vcpu, new_guest_tsc_offset);
 > 
-> In current system each physical memory page is assocaited with
-> a page structure which is used to track the usage of this page.
-> But due to the memory usage rapidly growing in cloud environment,
-> we find the resource consuming for page structure storage becomes
-> more and more remarkable. So is it possible that we could reclaim
-> such memory and make it reusable?
+> From a timekeeping POV and the guests expectation of TSC this is
+> fundamentally wrong:
 > 
-> This patchset introduces an idea about how to save the extra
-> memory through a new virtual filesystem -- dmemfs.
+>       tscguest = scaled(hosttsc) + offset
 > 
-> Dmemfs (Direct Memory filesystem) is device memory or reserved
-> memory based filesystem. This kind of memory is special as it
-> is not managed by kernel and most important it is without 'struct page'.
-> Therefore we can leverage the extra memory from the host system
-> to support more tenants in our cloud service.
+> The TSC has to be viewed systemwide and not per CPU. It's systemwide
+> used for timekeeping and for that to work it has to be synchronized. 
+> 
+> Why would this be different on virt? Just because it's virt or what? 
+> 
+> Migration is a guest wide thing and you're not migrating single vCPUs.
+> 
+> This hackery just papers over he underlying design fail that KVM looks
+> at the TSC per vCPU which is the root cause and that needs to be fixed.
 
-"is not managed by kernel" well, it's obviously is managed by the
-kernel. It's not managed by the buddy ;)
+I don't disagree with you.
+As far as I know the main reasons that kvm tracks TSC per guest are
 
-How is this different to using "mem=X" and mapping the relevant memory
-directly into applications? Is this "simply" a control instance on top
-that makes sure unprivileged process can access it and not step onto
-each others feet? Is that the reason why it's called  a "file system"?
-(an example would have helped here, showing how it's used)
+1. cases when host tsc is not stable 
+(hopefully rare now, and I don't mind making
+the new API just refuse to work when this is detected, and revert to old way
+of doing things).
 
-It's worth noting that memory hotunplug, memory poisoning and probably
-more is currently fundamentally incompatible with this approach - which
-should better be pointed out in the cover letter.
+2. (theoretical) ability of the guest to introduce per core tsc offfset
+by either using TSC_ADJUST (for which I got recently an idea to stop
+advertising this feature to the guest), or writing TSC directly which
+is allowed by Intel's PRM:
 
-Also, I think something similar can be obtained by using dax/hmat
-infrastructure with "memmap=", at least I remember a talk where this was
-discussed (but not sure if they modified the firmware to expose selected
-memory as soft-reserved - we would only need a cmdline parameter to
-achieve the same - Dan might know more).
+"The RDMSR and WRMSR instructions read and write the time-stamp counter, treating the time-stamp counter as an
+ordinary MSR (address 10H). In the Pentium 4, Intel Xeon, and P6 family processors, all 64-bits of the time-stamp
+counter are read using RDMSR (just as with RDTSC). When WRMSR is used to write the time-stamp counter on
+processors before family [0FH], models [03H, 04H]: only the low-order 32-bits of the time-stamp counter can be
+written (the high-order 32 bits are cleared to 0). For family [0FH], models [03H, 04H, 06H]; for family [06H]],
+model [0EH, 0FH]; for family [06H]], DisplayModel [17H, 1AH, 1CH, 1DH]: all 64 bits are writable."
+
+
+But other than that I don't mind making TSC offset global per VM thing.
+Paulo, what do you think about this?
+
+Best regards,
+	Maxim Levitsky
+
 
 > 
-> As the belowing figure shows, we uses a kernel boot parameter 'dmem='
-> to reserve the system memory when the host system boots up, the
-> remaining system memory is still managed by system memory management
-> which is associated with "struct page", the reserved memory
-> will be managed by dmem and assigned to guest system, the details
-> can be checked in /Documentation/admin-guide/kernel-parameters.txt.
+> Thanks,
 > 
->    +------------------+--------------------------------------+
->    |  system memory   |     memory for guest system          | 
->    +------------------+--------------------------------------+
->     |                                   |
->     v                                   |
-> struct page                             |
->     |                                   |
->     v                                   v
->     system mem management             dmem  
+>         tglx
 > 
-> And during the usage, the dmemfs will handle the memory request to
-> allocate and free the reserved memory on each NUMA node, the user 
-> space application could leverage the mmap interface to access the 
-> memory, and kernel module such as kvm and vfio would be able to pin
-> the memory thongh follow_pfn() and get_user_page() in different given
-> page size granularities.
 
-I cannot say that I really like this approach. I really prefer the
-proposal to free-up most vmemmap pages for huge/gigantic pages instead
-if all this is about is reducing the memmap size.
-
-
--- 
-Thanks,
-
-David / dhildenb
 
