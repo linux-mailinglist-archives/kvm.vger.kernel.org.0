@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 029A02D1EA1
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 00:57:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E1F72D1EA4
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 00:57:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728314AbgLGX4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 18:56:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43960 "EHLO
+        id S1728000AbgLGX4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 18:56:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728249AbgLGX4d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 18:56:33 -0500
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6A9C06179C
-        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 15:55:53 -0800 (PST)
-Received: by mail-ej1-x643.google.com with SMTP id lt17so22117703ejb.3
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 15:55:53 -0800 (PST)
+        with ESMTP id S1725931AbgLGX4j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 18:56:39 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F471C0617B0
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 15:55:58 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id g20so22108517ejb.1
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 15:55:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=id6OmDgw7iWNDI7dt45hX8qgU9Twf4yyUu+1zQG1NFY=;
-        b=aHsv2dYNJ008+x9hkHPl4FOfen0SZ1OFwpinszYcZJUz+aP9aeyUN1ZcOLNMeTPR50
-         lI/ejL8HdgXAZsiY57Jl0QAHgMmoysWwCL0l1Tu3q5n2BHqwGYzDOVivI3p5jFxkcnCE
-         ABPkRxp4fIbSxeoVy1JEPiu9fcIy99yx87VuzMAlAZ26vmcwgEAQs3XhzyV1awnZO4QV
-         MaxrHcvUbDk+RaQY0ffo5n19JOVoRUoLIepHvym3qPUjzBLRH/o/K/+R/vt26JDro9Rd
-         l+pAm0HYemD2BOkeugi7F/xLOSs7N4iGMsaxc5wXGRescT5+e0Owb8p+i42BUISEP28K
-         0tDw==
+        bh=Yk+4p5NVLbhbYdTmBYgtuSNG/soGvYd4+FvnWCldyIo=;
+        b=Gg/Y8+1rtb3xwKY9CB5z0cBk5KutL9CyL00CS0c8blZC0aVFyaP+WgKtxqS3pGaB3H
+         X1kTkQfQuKz2LtdQW9xD1pcmwAc76nK3twBAgg0X35NNq9kV9sdzLnpypLSa82DYTRIJ
+         DFbBWXCdHkhXXTCPfTRn9V4RAXCbIM8Z3hrudAUHM/cGkGs5tv2zaADMEl1S+didzkrJ
+         iDnzWEqAPU9/RlUBBdupPdjUmgTHbuGrCEN3On1sk7wrMVTtlCQxSdRSOggIRu1MX7+0
+         wVxU4+8an/Rqh8DkSPQVQuawjZ++eyJxN/vyO0slz4Yxl6vNZ10lxJmoQ3Z082jF/JUC
+         tnIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=id6OmDgw7iWNDI7dt45hX8qgU9Twf4yyUu+1zQG1NFY=;
-        b=rJAR1jXzUN5jo5bVPb7Fshbfr5ML87sO050jaKSJlzNwRinq+1RZv1pLYACZpOnhu0
-         tJeDz3OQWyGDZNPMep0AknXfkrc5bZpB6cdrrdtiGRph6yE9bjnBS8xdbcRS1keTVItn
-         hksTCHgKY9oFgc2+cjjQcdhvy/H3pzBaYf7spq30QUPh6o9I5fl2r6aaUT59YcO5QXqE
-         mh4sEL4E1Q5VlIFXf1RvQmZNwSLQe3KqvSUn9KRffXLGKRm6I4lvzNoRpHRpvLe8Ldog
-         4IVHOyz2WgX/fv1w4HKiVxO2+wCGPiuYoh1dhQxltfFtxmuHyI/ct8EnXWsgVoLP89Sz
-         yOKg==
-X-Gm-Message-State: AOAM53323AYUKhDcZKWg9T54s194jaJ2dNSA3aKAkysYCXfVSAt+imsh
-        Owl45Cu1qCgshnlEAyPrLxM=
-X-Google-Smtp-Source: ABdhPJxc/ZEpdrjqB80I8uVnrTgzwjQBANtrdvqXUbG5/8NG8ImZsDEWaQuhsSszKycsr6gLE2fCTA==
-X-Received: by 2002:a17:906:229a:: with SMTP id p26mr21204396eja.291.1607385352216;
-        Mon, 07 Dec 2020 15:55:52 -0800 (PST)
+        bh=Yk+4p5NVLbhbYdTmBYgtuSNG/soGvYd4+FvnWCldyIo=;
+        b=qMZfTI5U3Ljx1Hhs8RLcQbswzZjEHooKGBQY5qm0pIQ8KTeCS5N0s88BeqC4N9rxWH
+         cb8iWDND2SOQGkUVgfnWNrDaA8T3yd54FKI7nLQkYjG8hAedS1Y7FDNmzDnuXH4iWBXu
+         W2WTtXZyohMR93F1SNLTihYKvD1OQ/PiOcBSXMyUsChzLq5GZD8CcoWkwwpjmRf0YXcv
+         ad4mpIaDP12nZlJpcVdYYJldGASQtNgCChNvX1rEVXp/K1zaQVpA7bj0f+vufnvMEvTj
+         JF7fQwli79Zp2o4uknB8G0zB73Mts4T7vQN1ixA4GsfN5ysh2Nu2Ms6odp8fL3TWQ9rK
+         GzRA==
+X-Gm-Message-State: AOAM532HesPdCLgEj42wqwycmThRm7v4N91VV3x1fHUe+sNnPr6sBlbN
+        FL3HtPKemNiDbhxmcAtLORTjO3fRzjE=
+X-Google-Smtp-Source: ABdhPJzGo39RgOyatmYdrC5PJJBlDjUjAhkacEaMqiF2vblIZIij08por5k4fKlPDv3V9jwDqmJnCQ==
+X-Received: by 2002:a17:906:81ca:: with SMTP id e10mr20829350ejx.449.1607385357466;
+        Mon, 07 Dec 2020 15:55:57 -0800 (PST)
 Received: from x1w.redhat.com (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id be6sm15474616edb.29.2020.12.07.15.55.50
+        by smtp.gmail.com with ESMTPSA id k2sm14013964ejp.6.2020.12.07.15.55.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 15:55:51 -0800 (PST)
+        Mon, 07 Dec 2020 15:55:56 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -59,9 +59,9 @@ Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Laurent Vivier <laurent@vivier.eu>,
         Richard Henderson <richard.henderson@linaro.org>,
         Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH 2/7] target/mips/translate: Add declarations for generic code
-Date:   Tue,  8 Dec 2020 00:55:34 +0100
-Message-Id: <20201207235539.4070364-3-f4bug@amsat.org>
+Subject: [PATCH 3/7] target/mips: Use FloatRoundMode enum for FCR31 modes conversion
+Date:   Tue,  8 Dec 2020 00:55:35 +0100
+Message-Id: <20201207235539.4070364-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201207235539.4070364-1-f4bug@amsat.org>
 References: <20201207235539.4070364-1-f4bug@amsat.org>
@@ -72,165 +72,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some CPU translation functions / registers / macros and
-definitions can be used by ISA / ASE / extensions out of
-the big translate.c file. Declare them in "translate.h".
+Use the FloatRoundMode enum type introduced in commit 3dede407cc6
+("softfloat: Name rounding mode enum") instead of 'unsigned int'.
 
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20201123204448.3260804-2-f4bug@amsat.org>
 ---
- target/mips/translate.h | 33 ++++++++++++++++++++++++++++++++
- target/mips/translate.c | 42 ++++++++++++-----------------------------
- 2 files changed, 45 insertions(+), 30 deletions(-)
+ target/mips/internal.h   | 3 ++-
+ target/mips/fpu_helper.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/translate.h b/target/mips/translate.h
-index fcda1a99001..dbf7df7ba6d 100644
---- a/target/mips/translate.h
-+++ b/target/mips/translate.h
-@@ -10,6 +10,8 @@
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index d290c1afe30..5d8a8a1838e 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -226,7 +226,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ uint32_t float_class_s(uint32_t arg, float_status *fst);
+ uint64_t float_class_d(uint64_t arg, float_status *fst);
  
- #include "exec/translator.h"
- 
-+#define MIPS_DEBUG_DISAS 0
+-extern unsigned int ieee_rm[];
++extern const FloatRoundMode ieee_rm[4];
 +
- typedef struct DisasContext {
-     DisasContextBase base;
-     target_ulong saved_pc;
-@@ -47,4 +49,35 @@ typedef struct DisasContext {
-     int gi;
- } DisasContext;
+ void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask);
  
-+/* MIPS major opcodes */
-+#define MASK_OP_MAJOR(op)   (op & (0x3F << 26))
-+
-+void generate_exception_end(DisasContext *ctx, int excp);
-+void gen_reserved_instruction(DisasContext *ctx);
-+void check_insn(DisasContext *ctx, uint64_t flags);
-+void gen_base_offset_addr(DisasContext *ctx, TCGv addr, int base, int offset);
-+
-+void gen_load_gpr(TCGv t, int reg);
-+void gen_store_gpr(TCGv t, int reg);
-+
-+extern TCGv bcond;
-+
-+#define LOG_DISAS(...)                                                        \
-+    do {                                                                      \
-+        if (MIPS_DEBUG_DISAS) {                                               \
-+            qemu_log_mask(CPU_LOG_TB_IN_ASM, ## __VA_ARGS__);                 \
-+        }                                                                     \
-+    } while (0)
-+
-+#define MIPS_INVAL(op)                                                        \
-+    do {                                                                      \
-+        if (MIPS_DEBUG_DISAS) {                                               \
-+            qemu_log_mask(CPU_LOG_TB_IN_ASM,                                  \
-+                          TARGET_FMT_lx ": %08x Invalid %s %03x %03x %03x\n", \
-+                          ctx->base.pc_next, ctx->opcode, op,                 \
-+                          ctx->opcode >> 26, ctx->opcode & 0x3F,              \
-+                          ((ctx->opcode >> 16) & 0x1F));                      \
-+        }                                                                     \
-+    } while (0)
-+
- #endif
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d7f5a1e8d84..46aab26b868 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -41,11 +41,6 @@
- #include "qemu/qemu-print.h"
- #include "translate.h"
+ static inline void restore_rounding_mode(CPUMIPSState *env)
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index 020b768e87b..501bd401a16 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -42,7 +42,7 @@
+ #define FP_TO_INT64_OVERFLOW 0x7fffffffffffffffULL
  
--#define MIPS_DEBUG_DISAS 0
--
--/* MIPS major opcodes */
--#define MASK_OP_MAJOR(op)       (op & (0x3F << 26))
--
- enum {
-     /* indirect opcode tables */
-     OPC_SPECIAL  = (0x00 << 26),
-@@ -2496,7 +2491,8 @@ enum {
- /* global register indices */
- static TCGv cpu_gpr[32], cpu_PC;
- static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
--static TCGv cpu_dspctrl, btarget, bcond;
-+static TCGv cpu_dspctrl, btarget;
-+TCGv bcond;
- static TCGv cpu_lladdr, cpu_llval;
- static TCGv_i32 hflags;
- static TCGv_i32 fpu_fcr0, fpu_fcr31;
-@@ -2609,26 +2605,8 @@ static const char * const mxuregnames[] = {
- };
- #endif
- 
--#define LOG_DISAS(...)                                                        \
--    do {                                                                      \
--        if (MIPS_DEBUG_DISAS) {                                               \
--            qemu_log_mask(CPU_LOG_TB_IN_ASM, ## __VA_ARGS__);                 \
--        }                                                                     \
--    } while (0)
--
--#define MIPS_INVAL(op)                                                        \
--    do {                                                                      \
--        if (MIPS_DEBUG_DISAS) {                                               \
--            qemu_log_mask(CPU_LOG_TB_IN_ASM,                                  \
--                          TARGET_FMT_lx ": %08x Invalid %s %03x %03x %03x\n", \
--                          ctx->base.pc_next, ctx->opcode, op,                 \
--                          ctx->opcode >> 26, ctx->opcode & 0x3F,              \
--                          ((ctx->opcode >> 16) & 0x1F));                      \
--        }                                                                     \
--    } while (0)
--
- /* General purpose registers moves. */
--static inline void gen_load_gpr(TCGv t, int reg)
-+void gen_load_gpr(TCGv t, int reg)
- {
-     if (reg == 0) {
-         tcg_gen_movi_tl(t, 0);
-@@ -2637,7 +2615,7 @@ static inline void gen_load_gpr(TCGv t, int reg)
-     }
- }
- 
--static inline void gen_store_gpr(TCGv t, int reg)
-+void gen_store_gpr(TCGv t, int reg)
- {
-     if (reg != 0) {
-         tcg_gen_mov_tl(cpu_gpr[reg], t);
-@@ -2782,11 +2760,16 @@ static inline void generate_exception(DisasContext *ctx, int excp)
-     gen_helper_0e0i(raise_exception, excp);
- }
- 
--static inline void generate_exception_end(DisasContext *ctx, int excp)
-+void generate_exception_end(DisasContext *ctx, int excp)
- {
-     generate_exception_err(ctx, excp, 0);
- }
- 
-+void gen_reserved_instruction(DisasContext *ctx)
-+{
-+    generate_exception_end(ctx, EXCP_RI);
-+}
-+
- /* Floating point register moves. */
- static void gen_load_fpr32(DisasContext *ctx, TCGv_i32 t, int reg)
- {
-@@ -3016,7 +2999,7 @@ static inline void check_dsp_r3(DisasContext *ctx)
-  * This code generates a "reserved instruction" exception if the
-  * CPU does not support the instruction set corresponding to flags.
-  */
--static inline void check_insn(DisasContext *ctx, uint64_t flags)
-+void check_insn(DisasContext *ctx, uint64_t flags)
- {
-     if (unlikely(!(ctx->insn_flags & flags))) {
-         generate_exception_end(ctx, EXCP_RI);
-@@ -3393,8 +3376,7 @@ OP_LD_ATOMIC(lld, ld64);
- #endif
- #undef OP_LD_ATOMIC
- 
--static void gen_base_offset_addr(DisasContext *ctx, TCGv addr,
--                                 int base, int offset)
-+void gen_base_offset_addr(DisasContext *ctx, TCGv addr, int base, int offset)
- {
-     if (base == 0) {
-         tcg_gen_movi_tl(addr, offset);
+ /* convert MIPS rounding mode in FCR31 to IEEE library */
+-unsigned int ieee_rm[] = {
++const FloatRoundMode ieee_rm[4] = {
+     float_round_nearest_even,
+     float_round_to_zero,
+     float_round_up,
 -- 
 2.26.2
 
