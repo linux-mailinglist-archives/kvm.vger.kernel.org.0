@@ -2,29 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BBA82D1AEA
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:47:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F8D82D1AF5
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:50:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726898AbgLGUqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 15:46:54 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:41894 "EHLO
+        id S1726948AbgLGUrf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 15:47:35 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:42560 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726270AbgLGUqy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:46:54 -0500
+        by vger.kernel.org with ESMTP id S1725885AbgLGUrf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:47:35 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 75CAF305D4FC;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id A16CF305D4FD;
         Mon,  7 Dec 2020 22:46:12 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 51E963072784;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 7DEB73072785;
         Mon,  7 Dec 2020 22:46:12 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v11 04/81] KVM: doc: fix the hypercalls numbering
-Date:   Mon,  7 Dec 2020 22:45:05 +0200
-Message-Id: <20201207204622.15258-5-alazar@bitdefender.com>
+Subject: [PATCH v11 05/81] KVM: x86: add kvm_arch_vcpu_get_regs() and kvm_arch_vcpu_get_sregs()
+Date:   Mon,  7 Dec 2020 22:45:06 +0200
+Message-Id: <20201207204622.15258-6-alazar@bitdefender.com>
 In-Reply-To: <20201207204622.15258-1-alazar@bitdefender.com>
 References: <20201207204622.15258-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -34,32 +35,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The next hypercalls will be correctly numbered.
+From: Mihai Donțu <mdontu@bitdefender.com>
 
+These functions are used by the VM introspection code
+(for the KVMI_VCPU_GET_REGISTERS command and all events sending the vCPU
+registers to the introspection tool).
+
+Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/hypercalls.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c       | 10 ++++++++++
+ include/linux/kvm_host.h |  3 +++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/Documentation/virt/kvm/hypercalls.rst b/Documentation/virt/kvm/hypercalls.rst
-index ed4fddd364ea..70e77c66b64c 100644
---- a/Documentation/virt/kvm/hypercalls.rst
-+++ b/Documentation/virt/kvm/hypercalls.rst
-@@ -137,7 +137,7 @@ compute the CLOCK_REALTIME for its clock, at the same instant.
- Returns KVM_EOPNOTSUPP if the host does not use TSC clocksource,
- or if clock type is different than KVM_CLOCK_PAIRING_WALLCLOCK.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a3fdc16cfd6f..540e42341435 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9375,6 +9375,11 @@ int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ 	return 0;
+ }
  
--6. KVM_HC_SEND_IPI
-+7. KVM_HC_SEND_IPI
- ------------------
++void kvm_arch_vcpu_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
++{
++	__get_regs(vcpu, regs);
++}
++
+ static void __set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ {
+ 	vcpu->arch.emulate_regs_need_sync_from_vcpu = true;
+@@ -9470,6 +9475,11 @@ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
  
- :Architecture: x86
-@@ -158,7 +158,7 @@ corresponds to the APIC ID a2+1, and so on.
++void kvm_arch_vcpu_get_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
++{
++	__get_sregs(vcpu, sregs);
++}
++
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index cd6ac3a43c9a..13c6b806477b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -902,9 +902,12 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_translation *tr);
  
- Returns the number of CPUs to which the IPIs were delivered successfully.
- 
--7. KVM_HC_SCHED_YIELD
-+8. KVM_HC_SCHED_YIELD
- ---------------------
- 
- :Architecture: x86
+ int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs);
++void kvm_arch_vcpu_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs);
+ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs);
+ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+ 				  struct kvm_sregs *sregs);
++void kvm_arch_vcpu_get_sregs(struct kvm_vcpu *vcpu,
++				  struct kvm_sregs *sregs);
+ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 				  struct kvm_sregs *sregs);
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
