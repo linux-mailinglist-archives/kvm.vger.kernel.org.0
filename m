@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D68302D1B01
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:50:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9EB22D1B1B
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:50:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727117AbgLGUrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 15:47:53 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:42572 "EHLO
+        id S1727308AbgLGUs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 15:48:27 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:42600 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727075AbgLGUrx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:47:53 -0500
+        by vger.kernel.org with ESMTP id S1727227AbgLGUsS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:48:18 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id A3A5F305D50F;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id C5510305D510;
         Mon,  7 Dec 2020 22:46:15 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 8266B3072785;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id A8BB13072784;
         Mon,  7 Dec 2020 22:46:15 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
+        =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <nicu.citu@icloud.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v11 23/81] KVM: x86: extend kvm_mmu_gva_to_gpa_system() with the 'access' parameter
-Date:   Mon,  7 Dec 2020 22:45:24 +0200
-Message-Id: <20201207204622.15258-24-alazar@bitdefender.com>
+Subject: [PATCH v11 24/81] KVM: x86: export kvm_inject_pending_exception()
+Date:   Mon,  7 Dec 2020 22:45:25 +0200
+Message-Id: <20201207204622.15258-25-alazar@bitdefender.com>
 In-Reply-To: <20201207204622.15258-1-alazar@bitdefender.com>
 References: <20201207204622.15258-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -35,53 +35,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+From: Nicușor Cîțu <nicu.citu@icloud.com>
 
-This is needed for kvmi_update_ad_flags() to emulate a guest page
-table walk on SPT violations due to A/D bit updates.
+This function is needed for the KVMI_VCPU_INJECT_EXCEPTION command.
 
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
+Signed-off-by: Nicușor Cîțu <nicu.citu@icloud.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 +-
- arch/x86/kvm/x86.c              | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 52 +++++++++++++++++++--------------
+ 2 files changed, 31 insertions(+), 22 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c2da5c24e825..3a06a7799571 100644
+index 3a06a7799571..7dc1ebac8d91 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1568,7 +1568,7 @@ gpa_t kvm_mmu_gva_to_gpa_fetch(struct kvm_vcpu *vcpu, gva_t gva,
- gpa_t kvm_mmu_gva_to_gpa_write(struct kvm_vcpu *vcpu, gva_t gva,
- 			       struct x86_exception *exception);
- gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
--				struct x86_exception *exception);
-+				u32 access, struct x86_exception *exception);
+@@ -1514,6 +1514,7 @@ unsigned long kvm_get_rflags(struct kvm_vcpu *vcpu);
+ void kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+ bool kvm_rdpmc(struct kvm_vcpu *vcpu);
  
- bool kvm_apicv_activated(struct kvm *kvm);
- void kvm_apicv_init(struct kvm *kvm, bool enable);
++bool kvm_inject_pending_exception(struct kvm_vcpu *vcpu);
+ void kvm_queue_exception(struct kvm_vcpu *vcpu, unsigned nr);
+ void kvm_queue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
+ void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr, unsigned long payload);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 00ab76366868..8eda5c3bd244 100644
+index 8eda5c3bd244..741505f405b1 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -5890,9 +5890,9 @@ gpa_t kvm_mmu_gva_to_gpa_write(struct kvm_vcpu *vcpu, gva_t gva,
- 
- /* uses this to access any guest's mapped memory without checking CPL */
- gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
--				struct x86_exception *exception)
-+				u32 access, struct x86_exception *exception)
- {
--	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, 0, exception);
-+	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
+@@ -8200,6 +8200,35 @@ static void update_cr8_intercept(struct kvm_vcpu *vcpu)
+ 	kvm_x86_ops.update_cr8_intercept(vcpu, tpr, max_irr);
  }
  
- static int kvm_read_guest_virt_helper(gva_t addr, void *val, unsigned int bytes,
-@@ -9762,7 +9762,7 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
- 	vcpu_load(vcpu);
++bool kvm_inject_pending_exception(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.exception.pending) {
++		trace_kvm_inj_exception(vcpu->arch.exception.nr,
++					vcpu->arch.exception.has_error_code,
++					vcpu->arch.exception.error_code);
++
++		vcpu->arch.exception.pending = false;
++		vcpu->arch.exception.injected = true;
++
++		if (exception_type(vcpu->arch.exception.nr) == EXCPT_FAULT)
++			__kvm_set_rflags(vcpu, kvm_get_rflags(vcpu) |
++					     X86_EFLAGS_RF);
++
++		if (vcpu->arch.exception.nr == DB_VECTOR) {
++			kvm_deliver_exception_payload(vcpu);
++			if (vcpu->arch.dr7 & DR7_GD) {
++				vcpu->arch.dr7 &= ~DR7_GD;
++				kvm_update_dr7(vcpu);
++			}
++		}
++
++		kvm_x86_ops.queue_exception(vcpu);
++		return true;
++	}
++
++	return false;
++}
++
+ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
+ {
+ 	int r;
+@@ -8251,29 +8280,8 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
+ 	}
  
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
--	gpa = kvm_mmu_gva_to_gpa_system(vcpu, vaddr, NULL);
-+	gpa = kvm_mmu_gva_to_gpa_system(vcpu, vaddr, 0, NULL);
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	tr->physical_address = gpa;
- 	tr->valid = gpa != UNMAPPED_GVA;
+ 	/* try to inject new event if pending */
+-	if (vcpu->arch.exception.pending) {
+-		trace_kvm_inj_exception(vcpu->arch.exception.nr,
+-					vcpu->arch.exception.has_error_code,
+-					vcpu->arch.exception.error_code);
+-
+-		vcpu->arch.exception.pending = false;
+-		vcpu->arch.exception.injected = true;
+-
+-		if (exception_type(vcpu->arch.exception.nr) == EXCPT_FAULT)
+-			__kvm_set_rflags(vcpu, kvm_get_rflags(vcpu) |
+-					     X86_EFLAGS_RF);
+-
+-		if (vcpu->arch.exception.nr == DB_VECTOR) {
+-			kvm_deliver_exception_payload(vcpu);
+-			if (vcpu->arch.dr7 & DR7_GD) {
+-				vcpu->arch.dr7 &= ~DR7_GD;
+-				kvm_update_dr7(vcpu);
+-			}
+-		}
+-
+-		kvm_x86_ops.queue_exception(vcpu);
++	if (kvm_inject_pending_exception(vcpu))
+ 		can_inject = false;
+-	}
+ 
+ 	/*
+ 	 * Finally, inject interrupt events.  If an event cannot be injected
