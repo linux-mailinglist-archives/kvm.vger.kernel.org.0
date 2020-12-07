@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F2512D1B23
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:50:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E69872D1B22
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:50:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727373AbgLGUsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727365AbgLGUsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 7 Dec 2020 15:48:35 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:42574 "EHLO
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:42566 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727294AbgLGUsa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:48:30 -0500
+        by vger.kernel.org with ESMTP id S1727302AbgLGUs3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:48:29 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 7CCA0305D470;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id A54DE305D471;
         Mon,  7 Dec 2020 22:46:20 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 510403072785;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 824A43072784;
         Mon,  7 Dec 2020 22:46:20 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v11 49/81] KVM: introspection: add support for vCPU events
-Date:   Mon,  7 Dec 2020 22:45:50 +0200
-Message-Id: <20201207204622.15258-50-alazar@bitdefender.com>
+Subject: [PATCH v11 50/81] KVM: introspection: add KVMI_VCPU_EVENT_PAUSE
+Date:   Mon,  7 Dec 2020 22:45:51 +0200
+Message-Id: <20201207204622.15258-51-alazar@bitdefender.com>
 In-Reply-To: <20201207204622.15258-1-alazar@bitdefender.com>
 References: <20201207204622.15258-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -34,544 +34,252 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the common code used by vCPU threads to send events and wait for
-replies (received and dispatched by the receiving thread). While waiting
-for an event reply, the vCPU thread will handle any introspection command
-already queued or received during this period.
+This event is sent by the vCPU thread as a response to the
+KVMI_VM_PAUSE_VCPU command, but it has a lower priority, being sent
+after any other introspection event and when no other introspection
+command is queued.
+
+The number of KVMI_VCPU_EVENT_PAUSE will match the number of successful
+KVMI_VM_PAUSE_VCPU commands.
 
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst   |  56 ++++++++++-
- arch/x86/include/uapi/asm/kvmi.h  |  20 ++++
- arch/x86/kvm/kvmi.c               |  85 ++++++++++++++++
- include/linux/kvmi_host.h         |  11 ++
- include/uapi/linux/kvmi.h         |  23 +++++
- virt/kvm/introspection/kvmi.c     |   1 +
- virt/kvm/introspection/kvmi_int.h |   6 ++
- virt/kvm/introspection/kvmi_msg.c | 161 +++++++++++++++++++++++++++++-
- 8 files changed, 359 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/kvmi.rst               | 26 ++++++++
+ include/uapi/linux/kvmi.h                     |  2 +
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 65 ++++++++++++++++++-
+ virt/kvm/introspection/kvmi.c                 | 26 +++++++-
+ virt/kvm/introspection/kvmi_int.h             |  1 +
+ virt/kvm/introspection/kvmi_msg.c             | 18 +++++
+ 6 files changed, 136 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index a71fb78d546e..5e99baf7e2f3 100644
+index 5e99baf7e2f3..c86c83566c3d 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -521,7 +521,61 @@ The message data begins with a common structure having the event id::
- 		__u16 padding[3];
- 	};
- 
--Specific event data can follow this common structure.
-+The vCPU introspection events are sent using the KVMI_VCPU_EVENT message id.
-+No event is sent unless it is explicitly enabled or requested
-+(e.g. *KVMI_VCPU_EVENT_PAUSE*).
-+A vCPU event begins with a common structure having the size of the
-+structure and the vCPU index::
+@@ -596,3 +596,29 @@ the guest (see **Unhooking**) and the introspection has been enabled for
+ this event (see **KVMI_VM_CONTROL_EVENTS**). The introspection tool has
+ a chance to unhook and close the introspection socket (signaling that
+ the operation can proceed).
 +
-+	struct kvmi_vcpu_event {
-+		__u16 size;
-+		__u16 vcpu;
-+		__u32 padding;
-+		struct kvmi_vcpu_event_arch arch;
-+	};
++2. KVMI_VCPU_EVENT_PAUSE
++------------------------
 +
-+On x86::
++:Architectures: all
++:Versions: >= 1
++:Actions: CONTINUE, CRASH
++:Parameters:
 +
-+	struct kvmi_vcpu_event_arch {
-+		__u8 mode;
-+		__u8 padding[7];
-+		struct kvm_regs regs;
-+		struct kvm_sregs sregs;
-+		struct {
-+			__u64 sysenter_cs;
-+			__u64 sysenter_esp;
-+			__u64 sysenter_eip;
-+			__u64 efer;
-+			__u64 star;
-+			__u64 lstar;
-+			__u64 cstar;
-+			__u64 pat;
-+			__u64 shadow_gs;
-+		} msrs;
-+	};
++::
 +
-+It contains information about the vCPU state at the time of the event.
++	struct kvmi_event_hdr;
++	struct kvmi_vcpu_event;
 +
-+A vCPU event reply begins with two common structures::
++:Returns:
++
++::
 +
 +	struct kvmi_vcpu_hdr;
-+	struct kvmi_vcpu_event_reply {
-+		__u8 action;
-+		__u8 event;
-+		__u16 padding1;
-+		__u32 padding2;
-+	};
++	struct kvmi_vcpu_event_reply;
 +
-+All events accept the KVMI_EVENT_ACTION_CRASH action, which stops the
-+guest ungracefully, but as soon as possible.
-+
-+Most events accept the KVMI_EVENT_ACTION_CONTINUE action, which
-+means that KVM will continue handling the event.
-+
-+Some events accept the KVMI_EVENT_ACTION_RETRY action, which means that
-+KVM will stop handling the event and re-enter in guest.
-+
-+Specific event data can follow these common structures.
- 
- 1. KVMI_VM_EVENT_UNHOOK
- -----------------------
-diff --git a/arch/x86/include/uapi/asm/kvmi.h b/arch/x86/include/uapi/asm/kvmi.h
-index 2b6192e1a9a4..9d9df09d381a 100644
---- a/arch/x86/include/uapi/asm/kvmi.h
-+++ b/arch/x86/include/uapi/asm/kvmi.h
-@@ -6,8 +6,28 @@
-  * KVM introspection - x86 specific structures and definitions
-  */
- 
-+#include <asm/kvm.h>
-+
- struct kvmi_vcpu_get_info_reply {
- 	__u64 tsc_speed;
- };
- 
-+struct kvmi_vcpu_event_arch {
-+	__u8 mode;		/* 2, 4 or 8 */
-+	__u8 padding[7];
-+	struct kvm_regs regs;
-+	struct kvm_sregs sregs;
-+	struct {
-+		__u64 sysenter_cs;
-+		__u64 sysenter_esp;
-+		__u64 sysenter_eip;
-+		__u64 efer;
-+		__u64 star;
-+		__u64 lstar;
-+		__u64 cstar;
-+		__u64 pat;
-+		__u64 shadow_gs;
-+	} msrs;
-+};
-+
- #endif /* _UAPI_ASM_X86_KVMI_H */
-diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 35742d927be5..383b19dcf054 100644
---- a/arch/x86/kvm/kvmi.c
-+++ b/arch/x86/kvm/kvmi.c
-@@ -5,6 +5,91 @@
-  * Copyright (C) 2019-2020 Bitdefender S.R.L.
-  */
- 
-+#include "linux/kvm_host.h"
-+#include "x86.h"
-+#include "../../../virt/kvm/introspection/kvmi_int.h"
-+
- void kvmi_arch_init_vcpu_events_mask(unsigned long *supported)
- {
- }
-+
-+static unsigned int kvmi_vcpu_mode(const struct kvm_vcpu *vcpu,
-+				   const struct kvm_sregs *sregs)
-+{
-+	unsigned int mode = 0;
-+
-+	if (is_long_mode((struct kvm_vcpu *) vcpu)) {
-+		if (sregs->cs.l)
-+			mode = 8;
-+		else if (!sregs->cs.db)
-+			mode = 2;
-+		else
-+			mode = 4;
-+	} else if (sregs->cr0 & X86_CR0_PE) {
-+		if (!sregs->cs.db)
-+			mode = 2;
-+		else
-+			mode = 4;
-+	} else if (!sregs->cs.db) {
-+		mode = 2;
-+	} else {
-+		mode = 4;
-+	}
-+
-+	return mode;
-+}
-+
-+static void kvmi_get_msrs(struct kvm_vcpu *vcpu,
-+			  struct kvmi_vcpu_event_arch *event)
-+{
-+	struct msr_data msr;
-+
-+	msr.host_initiated = true;
-+
-+	msr.index = MSR_IA32_SYSENTER_CS;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.sysenter_cs = msr.data;
-+
-+	msr.index = MSR_IA32_SYSENTER_ESP;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.sysenter_esp = msr.data;
-+
-+	msr.index = MSR_IA32_SYSENTER_EIP;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.sysenter_eip = msr.data;
-+
-+	msr.index = MSR_EFER;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.efer = msr.data;
-+
-+	msr.index = MSR_STAR;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.star = msr.data;
-+
-+	msr.index = MSR_LSTAR;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.lstar = msr.data;
-+
-+	msr.index = MSR_CSTAR;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.cstar = msr.data;
-+
-+	msr.index = MSR_IA32_CR_PAT;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.pat = msr.data;
-+
-+	msr.index = MSR_KERNEL_GS_BASE;
-+	kvm_x86_ops.get_msr(vcpu, &msr);
-+	event->msrs.shadow_gs = msr.data;
-+}
-+
-+void kvmi_arch_setup_vcpu_event(struct kvm_vcpu *vcpu,
-+				struct kvmi_vcpu_event *ev)
-+{
-+	struct kvmi_vcpu_event_arch *event = &ev->arch;
-+
-+	kvm_arch_vcpu_get_regs(vcpu, &event->regs);
-+	kvm_arch_vcpu_get_sregs(vcpu, &event->sregs);
-+	ev->arch.mode = kvmi_vcpu_mode(vcpu, &event->sregs);
-+	kvmi_get_msrs(vcpu, event);
-+}
-diff --git a/include/linux/kvmi_host.h b/include/linux/kvmi_host.h
-index 59e645d9ea34..4a43e51a44c9 100644
---- a/include/linux/kvmi_host.h
-+++ b/include/linux/kvmi_host.h
-@@ -6,6 +6,14 @@
- 
- #include <asm/kvmi_host.h>
- 
-+struct kvmi_vcpu_reply {
-+	int error;
-+	u32 action;
-+	u32 seq;
-+	void *data;
-+	size_t size;
-+};
-+
- struct kvmi_job {
- 	struct list_head link;
- 	void *ctx;
-@@ -20,6 +28,9 @@ struct kvm_vcpu_introspection {
- 	spinlock_t job_lock;
- 
- 	atomic_t pause_requests;
-+
-+	struct kvmi_vcpu_reply reply;
-+	bool waiting_for_reply;
- };
- 
- struct kvm_introspection {
++This event is sent in response to a *KVMI_VCPU_PAUSE* command and
++cannot be controlled with *KVMI_VCPU_CONTROL_EVENTS*.
++Because it has a low priority, it will be sent after any other vCPU
++introspection event and when no other vCPU introspection command is
++queued.
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index bb90d03f059b..6a57efb5664d 100644
+index 6a57efb5664d..757d4b84f473 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -8,6 +8,7 @@
- 
- #include <linux/kernel.h>
- #include <linux/types.h>
-+#include <asm/kvmi.h>
- 
- enum {
- 	KVMI_VERSION = 0x00000001
-@@ -32,6 +33,8 @@ enum {
+@@ -50,6 +50,8 @@ enum {
  };
  
  enum {
-+	KVMI_VCPU_EVENT = KVMI_VCPU_MESSAGE_ID(0),
++	KVMI_VCPU_EVENT_PAUSE = KVMI_VCPU_EVENT_ID(0),
 +
- 	KVMI_VCPU_GET_INFO = KVMI_VCPU_MESSAGE_ID(1),
- 
- 	KVMI_NEXT_VCPU_MESSAGE
-@@ -50,6 +53,12 @@ enum {
  	KVMI_NEXT_VCPU_EVENT
  };
  
-+enum {
-+	KVMI_EVENT_ACTION_CONTINUE = 0,
-+	KVMI_EVENT_ACTION_RETRY    = 1,
-+	KVMI_EVENT_ACTION_CRASH    = 2,
-+};
-+
- struct kvmi_msg_hdr {
- 	__u16 id;
- 	__u16 size;
-@@ -123,4 +132,18 @@ struct kvmi_vm_pause_vcpu {
- 	__u32 padding2;
- };
+diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
+index 52765ca3f9c8..4c9dc6560ad9 100644
+--- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
++++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
+@@ -34,6 +34,17 @@ static vm_paddr_t test_gpa;
  
-+struct kvmi_vcpu_event {
-+	__u16 size;
-+	__u16 vcpu;
-+	__u32 padding;
-+	struct kvmi_vcpu_event_arch arch;
-+};
-+
-+struct kvmi_vcpu_event_reply {
-+	__u8 action;
-+	__u8 event;
-+	__u16 padding1;
-+	__u32 padding2;
-+};
-+
- #endif /* _UAPI__LINUX_KVMI_H */
-diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
-index 904362d00e62..92a5ed5c75e4 100644
---- a/virt/kvm/introspection/kvmi.c
-+++ b/virt/kvm/introspection/kvmi.c
-@@ -368,6 +368,7 @@ static void kvmi_job_release_vcpu(struct kvm_vcpu *vcpu, void *ctx)
- 	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
+ static int page_size;
  
- 	atomic_set(&vcpui->pause_requests, 0);
-+	vcpui->waiting_for_reply = false;
++struct vcpu_event {
++	struct kvmi_event_hdr hdr;
++	struct kvmi_vcpu_event common;
++};
++
++struct vcpu_reply {
++	struct kvmi_msg_hdr hdr;
++	struct kvmi_vcpu_hdr vcpu_hdr;
++	struct kvmi_vcpu_event_reply reply;
++};
++
+ struct vcpu_worker_data {
+ 	struct kvm_vm *vm;
+ 	int vcpu_id;
+@@ -690,14 +701,66 @@ static void pause_vcpu(void)
+ 	cmd_vcpu_pause(1, 0);
  }
  
- static void kvmi_release_vcpus(struct kvm *kvm)
++static void reply_to_event(struct kvmi_msg_hdr *ev_hdr, struct vcpu_event *ev,
++			   __u8 action, struct vcpu_reply *rpl, size_t rpl_size)
++{
++	ssize_t r;
++
++	rpl->hdr.id = ev_hdr->id;
++	rpl->hdr.seq = ev_hdr->seq;
++	rpl->hdr.size = rpl_size - sizeof(rpl->hdr);
++
++	rpl->vcpu_hdr.vcpu = ev->common.vcpu;
++
++	rpl->reply.action = action;
++	rpl->reply.event = ev->hdr.event;
++
++	r = send(Userspace_socket, rpl, rpl_size, 0);
++	TEST_ASSERT(r == rpl_size,
++		"send() failed, sending %zd, result %zd, errno %d (%s)\n",
++		rpl_size, r, errno, strerror(errno));
++}
++
++static void receive_vcpu_event(struct kvmi_msg_hdr *msg_hdr,
++			       struct vcpu_event *ev,
++			       size_t ev_size, u16 ev_id)
++{
++	receive_event(msg_hdr, KVMI_VCPU_EVENT,
++		      &ev->hdr, ev_id, ev_size);
++}
++
++static void discard_pause_event(struct kvm_vm *vm)
++{
++	struct vcpu_worker_data data = {.vm = vm, .vcpu_id = VCPU_ID};
++	struct vcpu_reply rpl = {};
++	struct kvmi_msg_hdr hdr;
++	pthread_t vcpu_thread;
++	struct vcpu_event ev;
++
++	vcpu_thread = start_vcpu_worker(&data);
++
++	receive_vcpu_event(&hdr, &ev, sizeof(ev), KVMI_VCPU_EVENT_PAUSE);
++
++	reply_to_event(&hdr, &ev, KVMI_EVENT_ACTION_CONTINUE,
++			&rpl, sizeof(rpl));
++
++	wait_vcpu_worker(vcpu_thread);
++}
++
+ static void test_pause(struct kvm_vm *vm)
+ {
+-	__u8 wait = 1, wait_inval = 2;
++	__u8 no_wait = 0, wait = 1, wait_inval = 2;
+ 
+ 	pause_vcpu();
++	discard_pause_event(vm);
+ 
+ 	cmd_vcpu_pause(wait, 0);
++	discard_pause_event(vm);
+ 	cmd_vcpu_pause(wait_inval, -KVM_EINVAL);
++
++	disallow_event(vm, KVMI_VCPU_EVENT_PAUSE);
++	cmd_vcpu_pause(no_wait, -KVM_EPERM);
++	allow_event(vm, KVMI_VCPU_EVENT_PAUSE);
+ }
+ 
+ static void test_introspection(struct kvm_vm *vm)
+diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
+index 92a5ed5c75e4..ded791e97de1 100644
+--- a/virt/kvm/introspection/kvmi.c
++++ b/virt/kvm/introspection/kvmi.c
+@@ -103,6 +103,7 @@ static void kvmi_init_known_events(void)
+ 
+ 	bitmap_zero(Kvmi_known_vcpu_events, KVMI_NUM_EVENTS);
+ 	kvmi_arch_init_vcpu_events_mask(Kvmi_known_vcpu_events);
++	set_bit(KVMI_VCPU_EVENT_PAUSE, Kvmi_known_vcpu_events);
+ 
+ 	bitmap_or(Kvmi_known_events, Kvmi_known_vm_events,
+ 		  Kvmi_known_vcpu_events, KVMI_NUM_EVENTS);
+@@ -741,12 +742,35 @@ void kvmi_run_jobs(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++static void kvmi_handle_unsupported_event_action(struct kvm *kvm)
++{
++	kvmi_sock_shutdown(KVMI(kvm));
++}
++
++void kvmi_handle_common_event_actions(struct kvm_vcpu *vcpu, u32 action)
++{
++	struct kvm *kvm = vcpu->kvm;
++
++	switch (action) {
++	default:
++		kvmi_handle_unsupported_event_action(kvm);
++	}
++}
++
+ static void kvmi_vcpu_pause_event(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
++	u32 action;
+ 
+ 	atomic_dec(&vcpui->pause_requests);
+-	/* to be implemented */
++
++	action = kvmi_msg_send_vcpu_pause(vcpu);
++	switch (action) {
++	case KVMI_EVENT_ACTION_CONTINUE:
++		break;
++	default:
++		kvmi_handle_common_event_actions(vcpu, action);
++	}
+ }
+ 
+ void kvmi_handle_requests(struct kvm_vcpu *vcpu)
 diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
-index f1caa67dbdc3..65d8c1c37796 100644
+index 65d8c1c37796..0876740dfa24 100644
 --- a/virt/kvm/introspection/kvmi_int.h
 +++ b/virt/kvm/introspection/kvmi_int.h
-@@ -32,6 +32,9 @@ void kvmi_sock_shutdown(struct kvm_introspection *kvmi);
- void kvmi_sock_put(struct kvm_introspection *kvmi);
- bool kvmi_msg_process(struct kvm_introspection *kvmi);
- int kvmi_msg_send_unhook(struct kvm_introspection *kvmi);
-+int kvmi_send_vcpu_event(struct kvm_vcpu *vcpu, u32 ev_id,
-+			 void *ev, size_t ev_size,
-+			 void *rpl, size_t rpl_size, u32 *action);
+@@ -38,6 +38,7 @@ int kvmi_send_vcpu_event(struct kvm_vcpu *vcpu, u32 ev_id,
  int kvmi_msg_vcpu_reply(const struct kvmi_vcpu_msg_job *job,
  			const struct kvmi_msg_hdr *msg, int err,
  			const void *rpl, size_t rpl_size);
-@@ -46,6 +49,7 @@ bool kvmi_is_known_vm_event(u16 id);
- int kvmi_add_job(struct kvm_vcpu *vcpu,
- 		 void (*fct)(struct kvm_vcpu *vcpu, void *ctx),
- 		 void *ctx, void (*free_fct)(void *ctx));
-+void kvmi_run_jobs(struct kvm_vcpu *vcpu);
- int kvmi_cmd_vm_control_events(struct kvm_introspection *kvmi,
- 			       u16 event_id, bool enable);
- int kvmi_cmd_read_physical(struct kvm *kvm, u64 gpa, size_t size,
-@@ -60,5 +64,7 @@ int kvmi_cmd_vcpu_pause(struct kvm_vcpu *vcpu, bool wait);
- /* arch */
- void kvmi_arch_init_vcpu_events_mask(unsigned long *supported);
- kvmi_vcpu_msg_job_fct kvmi_arch_vcpu_msg_handler(u16 id);
-+void kvmi_arch_setup_vcpu_event(struct kvm_vcpu *vcpu,
-+				struct kvmi_vcpu_event *ev);
++u32 kvmi_msg_send_vcpu_pause(struct kvm_vcpu *vcpu);
  
- #endif
+ /* kvmi.c */
+ void *kvmi_msg_alloc(void);
 diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
-index 8d87ba16eb12..12195941c486 100644
+index 12195941c486..9a408054c321 100644
 --- a/virt/kvm/introspection/kvmi_msg.c
 +++ b/virt/kvm/introspection/kvmi_msg.c
-@@ -299,6 +299,69 @@ static bool is_vm_command(u16 id)
- 	return is_vm_message(id) && id != KVMI_VM_EVENT;
- }
+@@ -258,6 +258,11 @@ static int handle_vm_pause_vcpu(struct kvm_introspection *kvmi,
+ 		goto reply;
+ 	}
  
-+static int check_event_reply(const struct kvmi_msg_hdr *msg,
-+			     const struct kvmi_vcpu_event_reply *reply,
-+			     const struct kvmi_vcpu_reply *expected,
-+			     u8 *action, size_t *received)
-+{
-+	size_t msg_size, common_size, event_size;
-+	int err = -EINVAL;
-+
-+	if (unlikely(msg->seq != expected->seq))
-+		return err;
-+
-+	msg_size = msg->size;
-+	common_size = sizeof(struct kvmi_vcpu_hdr) + sizeof(*reply);
-+
-+	if (check_sub_overflow(msg_size, common_size, &event_size))
-+		return err;
-+
-+	if (unlikely(event_size > expected->size))
-+		return err;
-+
-+	if (unlikely(reply->padding1 || reply->padding2))
-+		return err;
-+
-+	*received = event_size;
-+	*action = reply->action;
-+	return 0;
-+}
-+
-+static int handle_vcpu_event_reply(const struct kvmi_vcpu_msg_job *job,
-+				   const struct kvmi_msg_hdr *msg,
-+				   const void *rpl)
-+{
-+	struct kvm_vcpu_introspection *vcpui = VCPUI(job->vcpu);
-+	struct kvmi_vcpu_reply *expected = &vcpui->reply;
-+	const struct kvmi_vcpu_event_reply *reply = rpl;
-+	const void *reply_data = reply + 1;
-+	size_t useful, received;
-+	int err = -EINTR;
-+	u8 action;
-+
-+	if (unlikely(!vcpui->waiting_for_reply))
-+		goto out;
-+
-+	err = check_event_reply(msg, reply, expected, &action, &received);
-+	if (unlikely(err))
-+		goto out;
-+
-+	useful = min(received, expected->size);
-+	if (useful)
-+		memcpy(expected->data, reply_data, useful);
-+
-+	if (expected->size > useful)
-+		memset((char *)expected->data + useful, 0,
-+			expected->size - useful);
-+
-+	expected->action = action;
-+
-+out:
-+	vcpui->waiting_for_reply = false;
-+	expected->error = err;
-+	return expected->error;
-+}
-+
- /*
-  * These functions are executed from the vCPU thread. The receiving thread
-  * passes the messages using a newly allocated 'struct kvmi_vcpu_msg_job'
-@@ -306,6 +369,7 @@ static bool is_vm_command(u16 id)
-  * sending back the reply).
-  */
- static kvmi_vcpu_msg_job_fct const msg_vcpu[] = {
-+	[KVMI_VCPU_EVENT] = handle_vcpu_event_reply,
- };
- 
- static kvmi_vcpu_msg_job_fct get_vcpu_msg_handler(u16 id)
-@@ -329,7 +393,7 @@ static bool is_vcpu_message(u16 id)
- 
- static bool is_vcpu_command(u16 id)
- {
--	return is_vcpu_message(id);
-+	return is_vcpu_message(id) && id != KVMI_VCPU_EVENT;
- }
- 
- static void kvmi_job_vcpu_msg(struct kvm_vcpu *vcpu, void *ctx)
-@@ -422,7 +486,8 @@ static int kvmi_msg_handle_vm_cmd(struct kvm_introspection *kvmi,
- 
- static bool vcpu_can_handle_messages(struct kvm_vcpu *vcpu)
- {
--	return vcpu->arch.mp_state != KVM_MP_STATE_UNINITIALIZED;
-+	return VCPUI(vcpu)->waiting_for_reply
-+		|| vcpu->arch.mp_state != KVM_MP_STATE_UNINITIALIZED;
- }
- 
- static int kvmi_get_vcpu_if_ready(struct kvm_introspection *kvmi,
-@@ -467,7 +532,8 @@ static int kvmi_msg_handle_vcpu_msg(struct kvm_introspection *kvmi,
- 	struct kvm_vcpu *vcpu = NULL;
- 	int err, ec;
- 
--	if (!kvmi_is_command_allowed(kvmi, msg->id))
-+	if (msg->id != KVMI_VCPU_EVENT &&
-+	    !kvmi_is_command_allowed(kvmi, msg->id))
- 		return kvmi_msg_vm_reply_ec(kvmi, msg, -KVM_EPERM);
- 
- 	if (vcpu_hdr->padding1 || vcpu_hdr->padding2)
-@@ -547,3 +613,92 @@ int kvmi_msg_send_unhook(struct kvm_introspection *kvmi)
- 
- 	return kvmi_sock_write(kvmi, vec, n, msg_size);
- }
-+
-+static int kvmi_wait_for_reply(struct kvm_vcpu *vcpu)
-+{
-+	struct rcuwait *waitp = kvm_arch_vcpu_get_wait(vcpu);
-+	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
-+	int err = 0;
-+
-+	while (vcpui->waiting_for_reply && !err) {
-+		kvmi_run_jobs(vcpu);
-+
-+		err = rcuwait_wait_event(waitp,
-+			!vcpui->waiting_for_reply ||
-+			!list_empty(&vcpui->job_list),
-+			TASK_KILLABLE);
++	if (!kvmi_is_event_allowed(kvmi, KVMI_VCPU_EVENT_PAUSE)) {
++		ec = -KVM_EPERM;
++		goto reply;
 +	}
 +
-+	return err;
-+}
+ 	vcpu = kvmi_get_vcpu(kvmi, req->vcpu);
+ 	if (!vcpu)
+ 		ec = -KVM_EINVAL;
+@@ -702,3 +707,16 @@ int kvmi_send_vcpu_event(struct kvm_vcpu *vcpu, u32 ev_id,
+ 
+ 	return err;
+ }
 +
-+static void kvmi_setup_vcpu_reply(struct kvm_vcpu_introspection *vcpui,
-+				  u32 msg_seq, void *rpl, size_t rpl_size)
++u32 kvmi_msg_send_vcpu_pause(struct kvm_vcpu *vcpu)
 +{
-+	memset(&vcpui->reply, 0, sizeof(vcpui->reply));
-+
-+	vcpui->reply.seq = msg_seq;
-+	vcpui->reply.data = rpl;
-+	vcpui->reply.size = rpl_size;
-+	vcpui->reply.error = -EINTR;
-+	vcpui->waiting_for_reply = true;
-+}
-+
-+static int kvmi_fill_and_sent_vcpu_event(struct kvm_vcpu *vcpu,
-+					 u32 ev_id, void *ev,
-+					 size_t ev_size, u32 msg_seq)
-+{
-+	struct kvmi_msg_hdr msg_hdr;
-+	struct kvmi_event_hdr ev_hdr;
-+	struct kvmi_vcpu_event common;
-+	struct kvec vec[] = {
-+		{.iov_base = &msg_hdr, .iov_len = sizeof(msg_hdr)},
-+		{.iov_base = &ev_hdr,  .iov_len = sizeof(ev_hdr) },
-+		{.iov_base = &common,  .iov_len = sizeof(common) },
-+		{.iov_base = ev,       .iov_len = ev_size        },
-+	};
-+	size_t msg_size = sizeof(msg_hdr) + sizeof(ev_hdr)
-+			+ sizeof(common) + ev_size;
-+	size_t n = ARRAY_SIZE(vec) - (ev_size == 0 ? 1 : 0);
-+	struct kvm_introspection *kvmi = KVMI(vcpu->kvm);
-+
-+	kvmi_fill_ev_msg_hdr(kvmi, &msg_hdr, &ev_hdr, KVMI_VCPU_EVENT,
-+			     msg_seq, msg_size, ev_id);
-+
-+	common.size = sizeof(common);
-+	common.vcpu = kvm_vcpu_get_idx(vcpu);
-+
-+	kvmi_arch_setup_vcpu_event(vcpu, &common);
-+
-+	return kvmi_sock_write(kvmi, vec, n, msg_size);
-+}
-+
-+int kvmi_send_vcpu_event(struct kvm_vcpu *vcpu, u32 ev_id,
-+			 void *ev, size_t ev_size,
-+			 void *rpl, size_t rpl_size, u32 *action)
-+{
-+	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
-+	struct kvm_introspection *kvmi = KVMI(vcpu->kvm);
-+	u32 msg_seq = atomic_inc_return(&kvmi->ev_seq);
++	u32 action;
 +	int err;
 +
-+	kvmi_setup_vcpu_reply(vcpui, msg_seq, rpl, rpl_size);
-+
-+	err = kvmi_fill_and_sent_vcpu_event(vcpu, ev_id, ev, ev_size, msg_seq);
++	err = kvmi_send_vcpu_event(vcpu, KVMI_VCPU_EVENT_PAUSE, NULL, 0,
++				   NULL, 0, &action);
 +	if (err)
-+		goto out;
++		return KVMI_EVENT_ACTION_CONTINUE;
 +
-+	err = kvmi_wait_for_reply(vcpu);
-+	if (!err)
-+		err = vcpui->reply.error;
-+
-+out:
-+	vcpui->waiting_for_reply = false;
-+
-+	if (err)
-+		kvmi_sock_shutdown(kvmi);
-+	else
-+		*action = vcpui->reply.action;
-+
-+	return err;
++	return action;
 +}
