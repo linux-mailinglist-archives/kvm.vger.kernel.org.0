@@ -2,128 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 239302D10D2
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 13:48:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 465922D10F3
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 13:51:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726011AbgLGMrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 07:47:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50344 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725774AbgLGMrk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 07:47:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607345173;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tyOz5Tc9PqhiNlZWIQPWc0O+She1E1/qQZR6bIJl32A=;
-        b=TFT5gCyh0sYW7vZSRiFYl044JhkHSyrllUZ+Tn6h2CWvo6JckS5E2WEu4QjjInEM3MVe0c
-        c8wLxb4/ebw9CQsTy+B9UkGOMjN3oh738XxcHDcjVTIHM3LdLXySiBsmAMKZJSFyMkoICc
-        5taaEZOGfFRzACDXHEpWXvOAZqmZius=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-OX_cxnIgOoe3cygcb1rAsw-1; Mon, 07 Dec 2020 07:46:12 -0500
-X-MC-Unique: OX_cxnIgOoe3cygcb1rAsw-1
-Received: by mail-wr1-f69.google.com with SMTP id 91so4743384wrk.17
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 04:46:11 -0800 (PST)
+        id S1726151AbgLGMuN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 07:50:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52762 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726129AbgLGMuL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 07:50:11 -0500
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5639C0613D0
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 04:49:30 -0800 (PST)
+Received: by mail-wr1-x442.google.com with SMTP id c1so687292wrq.6
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 04:49:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Ff9dudwKzr9RKp54jL9aoNOKi5jGdTwCO9eItajzqEc=;
+        b=IVnn0AIhYSHv9u87ESDdqrWomo8kk0nc3fiHqKd3Z2OYvGrnNORnRLycA+wMW3OxXU
+         i6lHg/g70V4/Eh1GbmzzBu+eTDo7jWQzotzY7EauYa5GbqC3MzsIhhi7cuKQwVmksCmB
+         SCFksi/MAgZsjMW3PNvykh23hQWI5O3JI2IunjSWwFZd7nZ25E/+KipY7naETB1ruucA
+         ag4YHhUZaKjvx9yfLwOShMakGt6M4XRKTT/Wx8J3SvYzMPAmPBwoY76mfFykRdDirogi
+         cItLxdSfduTJochct1rbUPWuXGXi587JGbyqkkyPJZ4skVxEo7Y4+7JVQ/YaQnL+8i0G
+         SfZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=tyOz5Tc9PqhiNlZWIQPWc0O+She1E1/qQZR6bIJl32A=;
-        b=kfqw2Nr1ifpVXM7UL0fUIsLIIabyUSGMpAzX0RnYKi8OV9/zJPGYjalxXykeeXihUn
-         lzaOOdYrbBebhp7fAJJ6XKWEH4DVSpxn2Vr4bCucg/gC5misGGnBwRTOLs2jNkKYKcZE
-         fCt5pUJlllEHnGBepws4AOwCti3Lpjqm5maviEQ2bN2IEGGYWP1FmbNrGuVmq8cA/Y1G
-         jZbg83dq7WFcrXiGxR7ThPFeqpmMuAgY9s+Js8TFbx4D4sSj16fobKEMz4PkzmbgkaYD
-         R5b5ima+XOaRvS2FGLRYQbk5dEAnvKfmYMPWWn/zIid7w5zXQMqV/aPl+hqDfsPBl1WP
-         6PjA==
-X-Gm-Message-State: AOAM530yLQ9eZJfuqPueYMLRFnrne9CYoRy+MQl47D1qlusI5xhSD4nd
-        4Vz4TlFEpRkDDdpueiVsXMt25SZtfS49hMi/lHSS5k5VEdhOFXicxDosDX56/HhUMYTxv6OK8aw
-        DTD7G2OG2sFxM
-X-Received: by 2002:a1c:9d8b:: with SMTP id g133mr18420818wme.189.1607345170870;
-        Mon, 07 Dec 2020 04:46:10 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxp1cQ0YqyVCzSrPnn6i9/5M4B45ElmdNAkkARQoGv3NPSs4feaDlLXpquqrHa2sqmKk3jUew==
-X-Received: by 2002:a1c:9d8b:: with SMTP id g133mr18420802wme.189.1607345170698;
-        Mon, 07 Dec 2020 04:46:10 -0800 (PST)
+        bh=Ff9dudwKzr9RKp54jL9aoNOKi5jGdTwCO9eItajzqEc=;
+        b=JdQHPKJBZU38JZ2zgIKcmJks7UhtrXSENCy+cmsILSh3Im6UcpwzHePXTKhES0BZCY
+         6+dFbEP+vJg98jCPwY3XIBDsSH9DpIZGugpjqXIZPB+4+CSvcr0pG7u6Yasj5m8i4aMZ
+         Y8RWu+jH7dT9QE2qxsAMq3E9hVJpKufj69YPK1vDCoPypyMZCwODR0zRI47yaOBBzjEp
+         J+V40On+3vmA57And8sEbNBUkARGZaqU+H4UWlBXVJqcetkOZpEk5Vr/X1WIoBrWeAzt
+         vjLZWZQb376pNhvuWJtgmDtsO/FdDFCMs41ay/5mxy113yYrF3tIgv9PmuiXMvU3qIU6
+         p8SQ==
+X-Gm-Message-State: AOAM533a0UvPsqxlqs+gWKGXAVbQfOSFxY2BBh9SU1FzqEopiL7ci/0v
+        QUsiYm9EiPx0Vcw53iehOio=
+X-Google-Smtp-Source: ABdhPJwlJ8CPD2Sept02Gb7oU5fhvYr05v1HXgF+3Qwi0gzpfCkIJhVHqwmIc3CsbfwKoxRa5ZdGEQ==
+X-Received: by 2002:adf:8184:: with SMTP id 4mr16425617wra.63.1607345369527;
+        Mon, 07 Dec 2020 04:49:29 -0800 (PST)
 Received: from [192.168.1.36] (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id h20sm13745748wmb.29.2020.12.07.04.46.09
+        by smtp.gmail.com with ESMTPSA id s13sm15034323wrt.80.2020.12.07.04.49.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 04:46:10 -0800 (PST)
-Subject: Re: [PATCH v2 5/5] gitlab-ci: Add Xen cross-build jobs
-To:     Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Fontana <cfontana@suse.de>,
-        Willian Rampazzo <wrampazz@redhat.com>, qemu-s390x@nongnu.org,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        xen-devel@lists.xenproject.org, Paul Durrant <paul@xen.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Stefano Stabellini <sstabellini@kernel.org>
-References: <20201207112353.3814480-1-philmd@redhat.com>
- <20201207112353.3814480-6-philmd@redhat.com>
- <9bfd1ed4-baa2-ece8-5b96-ec8fc7a8c547@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c335d1f5-e8cb-a9c2-9718-822dc0248fda@redhat.com>
-Date:   Mon, 7 Dec 2020 13:46:08 +0100
+        Mon, 07 Dec 2020 04:49:28 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Subject: Re: [RFC PATCH 18/19] target/mips: Restrict some TCG specific
+ CPUClass handlers
+To:     Claudio Fontana <cfontana@suse.de>
+Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        kvm@vger.kernel.org, Paul Burton <paulburton@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20201206233949.3783184-1-f4bug@amsat.org>
+ <20201206233949.3783184-19-f4bug@amsat.org>
+ <88161f99-aae5-3b80-e8c6-a57d122a28c4@suse.de>
+ <61618998-f854-a7df-301f-f860d9725f1d@suse.de>
+ <3956df0d-a42e-f3af-d5e1-cf396ddcb795@suse.de>
+ <5d11701b-31f8-cfcd-30f9-3eba62c3bab7@suse.de>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <92611fa6-b3bc-51d2-f90a-995b9cc99bf4@amsat.org>
+Date:   Mon, 7 Dec 2020 13:49:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <9bfd1ed4-baa2-ece8-5b96-ec8fc7a8c547@redhat.com>
+In-Reply-To: <5d11701b-31f8-cfcd-30f9-3eba62c3bab7@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/7/20 12:51 PM, Thomas Huth wrote:
-> On 07/12/2020 12.23, Philippe Mathieu-Daudé wrote:
->> Cross-build ARM and X86 targets with only Xen accelerator enabled.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  .gitlab-ci.d/crossbuilds.yml | 15 +++++++++++++++
->>  1 file changed, 15 insertions(+)
->>
->> diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
->> index 7a94a66b4b3..31f10f1e145 100644
->> --- a/.gitlab-ci.d/crossbuilds.yml
->> +++ b/.gitlab-ci.d/crossbuilds.yml
->> @@ -135,3 +135,18 @@ cross-win64-system:
->>    extends: .cross_system_build_job
->>    variables:
->>      IMAGE: fedora-win64-cross
->> +
->> +cross-amd64-xen:
->> +  extends: .cross_accel_build_job
->> +  variables:
->> +    IMAGE: debian-amd64-cross
->> +    ACCEL: xen
->> +    TARGETS: i386-softmmu,x86_64-softmmu
->> +    ACCEL_CONFIGURE_OPTS: --disable-tcg --disable-kvm
->> +
->> +cross-arm64-xen:
->> +  extends: .cross_accel_build_job
->> +  variables:
->> +    IMAGE: debian-arm64-cross
->> +    ACCEL: xen
->> +    TARGETS: aarch64-softmmu
-> Could you please simply replace aarch64-softmmu by arm-softmmu in the
-> target-list-exclude statement in this file instead of adding a new job for
-> arm64? That should have the same results and will spare us one job...
+On 12/7/20 12:43 PM, Claudio Fontana wrote:
+> I am adding to my cleanup series the following, so this is done for all targets:
 
-Ah, I now see my mistake, this is not the job I wanted to add,
-I probably messed during rebase. I'll respin with the proper
-xen-only config.
+Great! thank you Claudio :)
 
 > 
->  Thanks,
->   Thomas
 > 
-
+> Author: Claudio Fontana <cfontana@suse.de>
+> Date:   Mon Dec 7 11:02:34 2020 +0100
+> 
+>     cpu: move do_unaligned_access to tcg_ops
+>     
+>     make it consistently SOFTMMU-only.
+>     
+>     Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> 
+> commit 1ee8254b568a47453ab481aa206fb9fecc7c16f7
+> Author: Claudio Fontana <cfontana@suse.de>
+> Date:   Mon Dec 7 10:29:22 2020 +0100
+> 
+>     cpu: move cc->transaction_failed to tcg_ops
+>     
+>     Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> 
+> commit 1a03124581841b5c473f879f5fd396dccde48667
+> Author: Claudio Fontana <cfontana@suse.de>
+> Date:   Mon Dec 7 10:02:07 2020 +0100
+> 
+>     cpu: move cc->do_interrupt to tcg_ops
+>     
+>     Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> 
+> commit 6a35e8f4ee68923006bba404f1f2471038b1039c
+> Author: Claudio Fontana <cfontana@suse.de>
+> Date:   Mon Dec 7 09:31:14 2020 +0100
+> 
+>     target/arm: do not use cc->do_interrupt for KVM directly
+>     
+>     cc->do_interrupt is a TCG callback used in accel/tcg only,
+>     call instead directly the arm_cpu_do_interrupt for the
+>     injection of exeptions from KVM, so that
+>     
+>     do_interrupt can be exported to TCG-only operations in
+>     the CPUClass.
+>     
+>     Signed-off-by: Claudio Fontana <cfontana@suse.de>
