@@ -2,116 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC9882D1503
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 16:47:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D74BF2D1595
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 17:14:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726785AbgLGPn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 10:43:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34444 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726182AbgLGPn7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 10:43:59 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B7FXqbY173504;
-        Mon, 7 Dec 2020 10:43:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=jryC5GXE1RaEt8i2AwMsMZAJ0ckjA/Vb5TXsH+O/5Jg=;
- b=ZjSw7y/fbn7v3hQGPpPdkcDn9LS/yDOQgBDcddIc2ya9+dPuI22UNqBnWL7ek3GxvJmg
- z1ajBznPmDBeaBB7B52TGUBNrZ+PmiGkpCNfe4PIet4EeKZBBEckMYdje2noFzh2PFLR
- v1c+SMikje8A/myFCWnPSAgYsrbJLUDeKD8M/HBdOfS2qz39EM62muX4FLpzIRgYMdZx
- dsyKNs1jNjNVi3vbsUPEvXvdGnkW30Zf9BnoEws4jy8U3uHDGqL0WEEWPfkLnvyaAn73
- XNSIjZjlaNup26vZZHZep/o/IYAtBh4YBjkPPQZtCxJTn/KLlUFEw1a1zvKw/ouO775k DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 359d5nxv5c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 10:43:18 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B7FYPDV174725;
-        Mon, 7 Dec 2020 10:43:17 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 359d5nxv4c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 10:43:17 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B7FVsVu023275;
-        Mon, 7 Dec 2020 15:43:14 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma02dal.us.ibm.com with ESMTP id 3581u9csrm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 15:43:14 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B7FhD5a24576442
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Dec 2020 15:43:13 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 508677805C;
-        Mon,  7 Dec 2020 15:43:13 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC6177805E;
-        Mon,  7 Dec 2020 15:43:12 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.174.71])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Dec 2020 15:43:12 +0000 (GMT)
-Subject: Re: [PATCH v4] self_tests/kvm: sync_regs test for diag318
-From:   Collin Walling <walling@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, borntraeger@de.ibm.com, pbonzini@redhat.com,
-        imbrenda@linux.ibm.com
-References: <20201207154125.10322-1-walling@linux.ibm.com>
-Message-ID: <d315f431-869a-891b-c18c-7e97a824ee56@linux.ibm.com>
-Date:   Mon, 7 Dec 2020 10:43:12 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S1727484AbgLGQIV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 11:08:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726377AbgLGQIU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 11:08:20 -0500
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A3CC061749;
+        Mon,  7 Dec 2020 08:07:34 -0800 (PST)
+Received: by mail-ej1-x643.google.com with SMTP id m19so20185807ejj.11;
+        Mon, 07 Dec 2020 08:07:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=WM/4xKSlXYVQWjEHfbWD8YX/luYlEiJYgCc/oLAT72M=;
+        b=qKgDPJDPA18nffgQ211xSgkPcAycCzVVcqW7ZbuMWzxFCl++LQpCcZ0C8J9T4DBrb6
+         p2DyTpTDyOyGEmGwTleB4Bx0L0GLAX5iez4RwZzXoWT1pdfjAq/co6NNNvtB7OLGfOKI
+         1uX0OOQSymZjTgwxQdxqYq/qFmw5H3489UCNx2Z2BRcY0cSZQVaZhYcWNkZ9TAhWc1K5
+         QuRFZclmSDh7OabGFcl1oAqmMQL9EuZqUQ6WGjkmo192doqD6wBVw4b1H/xZ3ctMDW7n
+         OWOuLFt2ht5DYzcpHSswwkatv6rFQKTbuggtu44/Ptnhuxws2wgN22HqGQOxjgpyOA8u
+         lW1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WM/4xKSlXYVQWjEHfbWD8YX/luYlEiJYgCc/oLAT72M=;
+        b=I06gYwwQyMWjGxy5hJ/YCNBs9CYyY6ylhwPCQrHjvrMk5hnaGWkRpjUajfYsVTvdEa
+         ynmU0NhhhvjoxAn4eA2i1TFmxqbCfiG5/Yc6cbw+tgu+dpUVJBcaLACUSPpga778Xc76
+         Yero6HczDsHa4RYSt6DDDgco+JuLWOCvwaw/bM0St0H+mKJkErAEB1g44/zfIhUX/Wfy
+         oOovlVdoiVd8MAV/n/V2G+ads6LAMvHdIRAldhYHKydD35dAw7TwnzvlGqFgjNyhwp0X
+         8MWZF8R+Ts0dvmEhK2WbVFALWJLWBsOGG4pnlbsYhGUyAnpWYxVOlcomqhrBne3dT8CN
+         VaQA==
+X-Gm-Message-State: AOAM530av7WoJnQTM0cOPS9RIrXe9JZC1qUMQWEnsrNoLqBAPoOZGJwB
+        OCHjrnChAvbEuZxabcTzWFQ=
+X-Google-Smtp-Source: ABdhPJzwCMTqsxTqqO4VotBrTjalTBZGvqcXJVYEDpt0nKWW3uuKzpE893tD69cUr19XrpsPZQAWzg==
+X-Received: by 2002:a17:906:c1c6:: with SMTP id bw6mr20020182ejb.199.1607357252890;
+        Mon, 07 Dec 2020 08:07:32 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id e21sm13941813edv.96.2020.12.07.08.07.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Dec 2020 08:07:31 -0800 (PST)
+Date:   Mon, 7 Dec 2020 16:07:30 +0000
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Zhang Changzhong <zhangchangzhong@huawei.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        Maurizio Lombardi <mlombard@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost scsi: fix error return code in
+ vhost_scsi_set_endpoint()
+Message-ID: <20201207160730.GI203660@stefanha-x1.localdomain>
+References: <1607071411-33484-1-git-send-email-zhangchangzhong@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201207154125.10322-1-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-07_11:2020-12-04,2020-12-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- spamscore=0 mlxlogscore=999 priorityscore=1501 mlxscore=0 impostorscore=0
- lowpriorityscore=0 malwarescore=0 suspectscore=8 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012070100
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ev7mvGV+3JQuI2Eo"
+Content-Disposition: inline
+In-Reply-To: <1607071411-33484-1-git-send-email-zhangchangzhong@huawei.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/7/20 10:41 AM, Collin Walling wrote:
-> The DIAGNOSE 0x0318 instruction, unique to s390x, is a privileged call
-> that must be intercepted via SIE, handled in userspace, and the
-> information set by the instruction is communicated back to KVM.
-> 
-> To test the instruction interception, an ad-hoc handler is defined which
-> simply has a VM execute the instruction and then userspace will extract
-> the necessary info. The handler is defined such that the instruction
-> invocation occurs only once. It is up to the caller to determine how the
-> info returned by this handler should be used.
-> 
-> The diag318 info is communicated from userspace to KVM via a sync_regs
-> call. This is tested During a sync_regs test, where the diag318 info is
-> requested via the handler, then the info is stored in the appropriate
-> register in KVM via a sync registers call.
-> 
-> If KVM does not support diag318, then the tests will print a message
-> stating that diag318 was skipped, and the asserts will simply test
-> against a value of 0.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
 
-Please add
+--ev7mvGV+3JQuI2Eo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+On Fri, Dec 04, 2020 at 04:43:30PM +0800, Zhang Changzhong wrote:
+> Fix to return a negative error code from the error handling
+> case instead of 0, as done elsewhere in this function.
+>=20
+> Fixes: 25b98b64e284 ("vhost scsi: alloc cmds per vq instead of session")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Zhang Changzhong <zhangchangzhong@huawei.com>
+> ---
+>  drivers/vhost/scsi.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-[...]
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 
--- 
-Regards,
-Collin
+--ev7mvGV+3JQuI2Eo
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Stay safe and stay healthy
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/OU0IACgkQnKSrs4Gr
+c8gAeQf+MEz4NCEr2G4ywg8AHw7rf050IHblQEjkZBazrQQ706YvtfGZssxTae9f
+psRCnNLjHsZ2mFYWbtyPqI91egzIyJTNuu7odm3ILPfrXA7Lv8Uo2vZ9TNMN4+ZG
+L060RA9br9G2+DYTn7yC6M9B1a6mKdDS68rzDQSMAHns29WLSoRLYXIJBsoxd/sv
+Q9hxE1Sns6QVw/zOGCD9bre1pEWU2der61Qa4SfblpZgY9c9hXYNeKztrnznYufl
+TsFTa02ME99jRC71/mG/qoT+Nh1OEtpcJ6ZqkU2lHEaYAng800NpNTIOaqEMmEZV
+DfiQZ9kcrCzp+QXcuRpFFk/5rcaGdg==
+=tZ45
+-----END PGP SIGNATURE-----
+
+--ev7mvGV+3JQuI2Eo--
