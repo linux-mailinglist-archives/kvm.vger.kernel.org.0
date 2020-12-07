@@ -2,113 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 812CD2D1401
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 15:49:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97A932D1432
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 15:59:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726685AbgLGOtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 09:49:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43204 "EHLO
+        id S1726050AbgLGO7H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 09:59:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725822AbgLGOtW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 09:49:22 -0500
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D103C0613D0;
-        Mon,  7 Dec 2020 06:48:41 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id f23so19870125ejk.2;
-        Mon, 07 Dec 2020 06:48:41 -0800 (PST)
+        with ESMTP id S1725772AbgLGO7F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 09:59:05 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFA5C061749
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 06:58:25 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id p22so1968400edu.11
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 06:58:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=vvj+sguFIHCuvKw9HAkbiDDdNCIhXEC7IvjtKCPDPx0=;
-        b=BZSpRRfIVSET+efV/b/fBEgdvRZsvtUl8nALoEPcJGcqxLa/Apn59UIRsV5hCVQemL
-         99P0WEtFrYVG/FWLP+j3PU8PLZ0A+rLUjy7w8jTWMhnB3TBMTTEZvLhBDyCVwll1ePFi
-         2CQy7NLTHKmomtC5JUX5+Zw0iPRp37rt0cFtdgIKQGRSaS9w/L8ow00DoCGLfFKkpOYm
-         E3ut6ksre/YMS5F+Q7gPpu7QHGozz934R1gaIod0b4H6lgbPfX98QsgkjrcKVCOWarqi
-         9aJTzEX+RtTSGp+oMkSBKGThWdvHXAWbNt5qBDesfnYMayVBvM2lN4bzHmJIbEZB9DA7
-         QKQA==
+        bh=zbBc26vLrzccGvn35QwETDj9Yz9c3XiSyayc4sPGk54=;
+        b=uFMrmLgf9g/4hMvuG3sQUx1TaT60mGwmGxE7/6bWtIg4Hm7T+0pyNFAbMFf0SDdq0Z
+         JPYK0nkQdRWl/yzY2KuRfpFHususXN8gsCLcol9iWiStyilw7iI0GaihcoYGLTj98kfD
+         +76tmISqFzeoABZqeMQXcCRBtxRznoXJrSPRQSGvf4ZIPDaUwdM1A7FSyxf/UypWLDOp
+         fbbIJhkZduP+52WeYQfMYF+lIIyOVx+0ZZMmD5OtS9GQt2ujQF1ISweLtU1klXylYae3
+         DIYuTW7a3u2sRQx0nYshR7ZYeSY5t3oL5luSKv2+/bjPXcX+LiH0xKQbRqQxXYl3EVGC
+         YIkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=vvj+sguFIHCuvKw9HAkbiDDdNCIhXEC7IvjtKCPDPx0=;
-        b=BQ73q6UQ3dAgwUVw1jI7FaNBAgQJw0bsbmUHu9aO/I02Uy3MV5V/cwz2KRNiypaZJj
-         Bhqe4d2ud0GbQ4/xK6dNUgAG5TMcwE3RxxwLB2ejfpkkmtQVpcuoEa033rwDfJjCkBEo
-         FMm+q+kHWzwobWqqx5yQ/q0xUzZIqTnY9wxBojX31h11poNtmvCLzlUTxrF0LgO3ArPa
-         NJudufNq+6UiPJkZU5nkL3gixRM6nUB7ehiimPJl4se/Ok3pAGi7pHTPXw3ZnOsrD69f
-         qW6uCrEJbulk7/hUI2zucJbRw5C0nU6Uquc6FcFLO3iAmgKCI2QZ14RqVCSrsjUcprxD
-         eEYA==
-X-Gm-Message-State: AOAM532OHBa4uRMG/UUTHBz2s7hfIeXCGP5s+HGLaYGjusH4NJ1b3Euu
-        +WHqoor8Jixpc0BCaTR66EA=
-X-Google-Smtp-Source: ABdhPJwBNVQ7yrztLvoTTpW0NYHawkNrb81krpaZzFsMcLKRhBi7EqHEIkHJIZPB4baoYYek6nlVMA==
-X-Received: by 2002:a17:906:578e:: with SMTP id k14mr13885209ejq.90.1607352520379;
-        Mon, 07 Dec 2020 06:48:40 -0800 (PST)
+        bh=zbBc26vLrzccGvn35QwETDj9Yz9c3XiSyayc4sPGk54=;
+        b=dnlz3eNfe6+9hhOmeXuxFPQjrynx7pCLkNPcCXpBlh/7UEav5ngfyd7p8VcDpjtRB3
+         odC2dRn/C9T5/Udhurqj8hnR/RduR8VWKblND2lY9V4ru0/8+tln09P0DoCCdPKjFQAH
+         nfzikPhFZolgWgyZag4PMqo6BM6rOkH+E0pdZlH2pcar4vTmH1DQXsvSQ8Rg8IBn21jo
+         fxsOo2HSH0upGQ8ypu7PiRkrhTQRot1EPY2tRYOnXYiBEJLbjeguDn17eVtCBsKn7LWT
+         esH33iHOP+771F8raoUNRYg/sv7/YYwJueinkffsZEJoE/u9D7xoPGdideW4W6sgCaw3
+         fStg==
+X-Gm-Message-State: AOAM530EUXblfksiZUIr0x8ZASbN+8iEoc6lS42ijeqoQRQXwKuinfBh
+        7aTgXBGpdO+2HYSkRbnV6s8=
+X-Google-Smtp-Source: ABdhPJwDzwTNHuGesMF+zOuP4Y+i2YlF/CIBBNLCC3tuHUOoPtDYeqBFHYBUP2YMLE2JxzV0L9aGuA==
+X-Received: by 2002:aa7:d5d6:: with SMTP id d22mr3582118eds.160.1607353104281;
+        Mon, 07 Dec 2020 06:58:24 -0800 (PST)
 Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id oq7sm2678535ejb.63.2020.12.07.06.48.38
+        by smtp.gmail.com with ESMTPSA id zn5sm12448022ejb.111.2020.12.07.06.58.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 06:48:39 -0800 (PST)
-Date:   Mon, 7 Dec 2020 14:48:38 +0000
+        Mon, 07 Dec 2020 06:58:22 -0800 (PST)
+Date:   Mon, 7 Dec 2020 14:58:21 +0000
 From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Justin He <Justin.He@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vfio iommu type1: Bypass the vma permission check in
- vfio_pin_pages_remote()
-Message-ID: <20201207144838.GG203660@stefanha-x1.localdomain>
-References: <20201119142737.17574-1-justin.he@arm.com>
- <20201124181228.GA276043@xz-x1>
- <AM6PR08MB32245E7F990955395B44CE6BF7FA0@AM6PR08MB3224.eurprd08.prod.outlook.com>
- <20201125155711.GA6489@xz-x1>
- <20201202143356.GK655829@stefanha-x1.localdomain>
- <20201202154511.GI3277@xz-x1>
- <20201203112002.GE689053@stefanha-x1.localdomain>
- <20201203154322.GH108496@xz-x1>
- <6a33e908-17ff-7a26-7341-4bcf7bbefe28@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, john.g.johnson@oracle.com, dinechin@redhat.com,
+        cohuck@redhat.com, jasowang@redhat.com, felipe@nutanix.com,
+        elena.ufimtseva@oracle.com, jag.raman@oracle.com
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <20201207145821.GH203660@stefanha-x1.localdomain>
+References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+ <20201202180628.GA100143@xz-x1>
+ <20201203111036.GD689053@stefanha-x1.localdomain>
+ <20201203144037.GG108496@xz-x1>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="yZnyZsPjQYjG7xG7"
+        protocol="application/pgp-signature"; boundary="U3BNvdZEnlJXqmh+"
 Content-Disposition: inline
-In-Reply-To: <6a33e908-17ff-7a26-7341-4bcf7bbefe28@redhat.com>
+In-Reply-To: <20201203144037.GG108496@xz-x1>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---yZnyZsPjQYjG7xG7
+--U3BNvdZEnlJXqmh+
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 03, 2020 at 05:01:32PM +0100, David Hildenbrand wrote:
-> The real question is: do we even *need* DMA from vfio devices to
-> virtio-fs regions? If not (do guests rely on it? what does the spec
-> state?), just don't care about vfio at all and don't map anything.
+On Thu, Dec 03, 2020 at 09:40:37AM -0500, Peter Xu wrote:
+> On Thu, Dec 03, 2020 at 11:10:36AM +0000, Stefan Hajnoczi wrote:
+> > On Wed, Dec 02, 2020 at 01:06:28PM -0500, Peter Xu wrote:
+> > > On Wed, Nov 25, 2020 at 12:44:07PM -0800, Elena Afanasova wrote:
+> > >=20
+> > > [...]
+> > >=20
+> > > > Wire protocol
+> > > > -------------
+> > > > The protocol spoken over the file descriptor is as follows. The dev=
+ice reads
+> > > > commands from the file descriptor with the following layout::
+> > > >=20
+> > > >   struct ioregionfd_cmd {
+> > > >       __u32 info;
+> > > >       __u32 padding;
+> > > >       __u64 user_data;
+> > > >       __u64 offset;
+> > > >       __u64 data;
+> > > >   };
+> > >=20
+> > > I'm thinking whether it would be nice to have a handshake on the wire=
+ protocol
+> > > before starting the cmd/resp sequence.
+> > >=20
+> > > I was thinking about migration - we have had a hard time trying to be
+> > > compatible between old/new qemus.  Now we fixed those by applying the=
+ same
+> > > migration capabilities on both sides always so we do the handshake "m=
+anually"
+> > > from libvirt, but it really should be done with a real handshake on t=
+he
+> > > channel, imho..  That's another story, for sure.
+> > >=20
+> > > My understanding is that the wire protocol is kind of a standalone (b=
+ut tiny)
+> > > protocol between kvm and the emulation process.  So I'm thinking the =
+handshake
+> > > could also help when e.g. kvm can fallback to an old version of wire =
+protocol
+> > > if it knows the emulation binary is old.  Ideally, I think this could=
+ even
+> > > happen without VMM's awareness.
+> > >=20
+> > > [...]
+> >=20
+> > I imagined that would happen in the control plane (KVM ioctls) instead
+> > of the data plane (the fd). There is a flags field in
+> > ioctl(KVM_SET_IOREGION):
+> >=20
+> >   struct kvm_ioregion {
+> >       __u64 guest_paddr; /* guest physical address */
+> >       __u64 memory_size; /* bytes */
+> >       __u64 user_data;
+> >       __s32 fd; /* previously created with KVM_CREATE_IOREGIONFD */
+> >       __u32 flags;
+> >       __u8  pad[32];
+> >   };
+> >=20
+> > When userspace sets up the ioregionfd it can tell the kernel which
+> > features to enable.
+> >=20
+> > Feature availability can be checked through ioctl(KVM_CHECK_EXTENSION).
+> >=20
+> > Do you think this existing mechanism is enough? It's not clear to me
+> > what kind of additional negotiation would be necessary between the
+> > device emulation process and KVM after the ioregionfd has been
+> > registered?
+>=20
+> Yes I think kvm capability can be used as a way for the handshake between=
+ VMM
+> and KVM.  However I'm not sure how to do similar things to the emulation
+> process besides passing over the ioregionfd, because that's between VMM a=
+nd the
+> emulation process.  Is there a way to do so with current proposasl?
 
-Can DMA to/from the virtio-fs DAX Window happen? Yes, the guest could do
-it although it's rare.
+The interface is designed so the VMM controls the ioregionfd setup on
+behalf of the device emulation process. This is for security: the device
+emulation process is untrusted.
 
-Is it a great idea to combine VFIO and virtio-fs DAX? Maybe not. It
-involves pinning host page cache pages O_o.
+There is setup involving the VMM and the device emulation process that
+is outside the scope of the KVM API where the device emulation process
+could request for the VMM to enable ioregionfd features. For example, if
+QEMU is initializing a vfio-user device emulation program then QEMU
+queries available vfio-user device regions from the device emulation
+program. This is where extra information like ioregionfd support would
+be indicated by the device emulation program.
+
+> The out-of-order feature may not be a good enough example if it's destine=
+d to
+> be useless... but let's just imagine we have such a requirement as an ext=
+ention
+> to the current wire protocol.  What I was thinking was whether we could h=
+ave
+> another handshake somehow to the emulation process, so that we can identi=
+fy "ok
+> this emulation process supports out-of-band" or vice versa.  Only with th=
+at
+> information could VMM enable/disable the out-of-band in KVM.
+>=20
+> The handshake to the emulation process can start from either VMM or KVM. =
+ And
+> my previous idea was simply let KVM and emualtion process talk rather tha=
+n VMM
+> against the emulation, because they really look like two isolated protoco=
+ls:
+>=20
+>   - The VMM <-> KVM talks via KVM_SET_IOREGIONFD, it is only responsible =
+to
+>     setup a mmio/pio region in the guest and create the fd. As long as the
+>     region is properly setup, and the fd is passed over to emulation proc=
+ess,
+>     it's done as a proxy layer.
+>=20
+>   - The KVM <-> emulation process talks via the wire protocol (so this pr=
+otocol
+>     can be irrelevant to KVM_SET_IOREGIONFD protocol itself).  For exampl=
+e the
+>     out-of-band feature changes the behavior of the wire protocol.  Ideal=
+ly it
+>     does not even need a new KVM capability because KVM_SET_IOREGIONFD
+>     functionality shouldn't be touched.
+>=20
+> I thought it would be cleaner to have these protocols separate, but I cou=
+ld
+> also be wrong or over-engineering.
+
+This makes sense to me if the wire protocol needs to become complex. For
+now sticking to the simple control/data plane approach is what I would
+suggest for security.
 
 Stefan
 
---yZnyZsPjQYjG7xG7
+--U3BNvdZEnlJXqmh+
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/OQMUACgkQnKSrs4Gr
-c8jT2Af+JXkEPTuSerosjvKJgxGcKudB8C6f/Okm8J3Ylryh+5QznpspkUcnzDUe
-DokGkgjxcA6sqSsEMGqwSGLS3Ozshm9sUGRK4GAZsblxWDS9a5Es5A9SQvh117ip
-PED58xmoIHuFhoMIkzo/BrBvVzRFX/x4q7VEredEv23pAvlNWIRQm60DsgULcqiU
-1EEbA+Hl8w0s4PYEYOw7suFUI3+lDB/0oOd9+YXl9UyV7guC7jaGJg+gQX7mVBi2
-fnTlX/JeigsKT/DcwMFmlMtvw0emRYtfIOtubsT/k2eYM+5Az9OTzWqNF+33sJhe
-fGup4va8T0HHYPiOwaKu+QrFfwDgHw==
-=gJnL
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/OQw0ACgkQnKSrs4Gr
+c8iIpgf/X2xmXUC+aoi/QZjVwPf7oYcYOeypEl2uP26dJ0LqpQgG1gKgQQent8MU
+0G5GurM5XgRG5jiFh+hQddJX1y4tp9DiW4CDGTXJ2EWiC5gedcHDH4IAS7hlOVP1
+Gua5wIL3pUGOUbsjV2CAbtg0Chs0vLFI/5t4SFQ3am9qyOakSPlcw+1CJLMW9Q9A
+ShQc6xQS/EBrL9rmYXNOqoFjypnYjFcszpAz9q20Tzd9S1dHGaJT6X13jeFHEpDG
+YaYFftVZkCIvihT4sm/xtEQeZZHQexyglRy/nusgNnfWWh8562zHh6hW1x1A05vo
+L1fcPDcfBSR3MVK4epAaNFN2aq84mA==
+=qKLE
 -----END PGP SIGNATURE-----
 
---yZnyZsPjQYjG7xG7--
+--U3BNvdZEnlJXqmh+--
