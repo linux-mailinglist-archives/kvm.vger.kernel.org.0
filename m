@@ -2,160 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB3512D1920
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 20:09:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34C6B2D192A
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 20:14:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726852AbgLGTGn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 14:06:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63938 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726459AbgLGTGn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 14:06:43 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B7J1KgK142231;
-        Mon, 7 Dec 2020 14:06:00 -0500
+        id S1726652AbgLGTKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 14:10:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48612 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726635AbgLGTJ7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 14:09:59 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B7J6pPi029384;
+        Mon, 7 Dec 2020 14:09:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=rz/hQifI7yG+1lfVplc1tW6OqA321PiRrPM49SK9VH8=;
- b=q0meRKXudrG6MMuphS2OjM5RYZX7QuSHCnWlQdY7bVUuY/PirZdp6r/UvVYiJ2NRWXe+
- QXmf6bgaLr4B/XRFtOXCAS+eCJqCUq0yrBusBOH226Oy28/6QTviPZeQybuupLnA5iZ4
- mmN+r7cN+7ACWvSD/v4ZW/glA5RGhWQV4/mY9yc0hFIWvtI58fjD1BqHixpGQ82VYMFI
- ErX8sxmyA3AE+e16WNfVoTb5OUb7AR0S5Js518nf7+gVWgn7ADxvK+YC1Sdw9UAVl0Jr
- FFhidHU3BWtXnsIEQMRN6M0AcHdHcjEQbeTdwnR/f5TYLObKykWoWphy9kQKvqoo8002 Tg== 
+ bh=rZCcftZ797n+Em3es+TpYX3wz/johhfSx7hdYdEo3Xk=;
+ b=C2TdJPpXJM/nUpAbYAi3v1mvSKC+NWYthPlL96uSH7CC7tYGmk4SIVvvhTAcckVucgWK
+ XjAihxx546H2h8PwXzsds+1TicLYmVP96/HOxEdt0Un1EdONKtadCN4N8PPfIXdgZo1h
+ 80RSwaXoKxC9JITc6lwNosdU+4GHsxqn8GNjQi3WfgFHae3A8TTvV3YXBmqnZQ72yLVY
+ AFqbJf7pYNGbczUW8V0JEwbZR+f1ecuKnHHk3fD7UX7XwoP1iR4XrM1oTqORjArKdYzA
+ 4z239wYqZ7QG4Jv+K7rET+COkIxlRsDbyRSaa7hF2bQWnmsII0kr/zvQRBwQtfQ0ksDl /w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 359q2u6fqa-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359p7x9b7j-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 14:05:59 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B7J2vuT148497;
-        Mon, 7 Dec 2020 14:05:59 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 359q2u6fpr-1
+        Mon, 07 Dec 2020 14:09:18 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B7J76MB030796;
+        Mon, 7 Dec 2020 14:09:18 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359p7x9b6k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 14:05:59 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B7J1uXg020330;
-        Mon, 7 Dec 2020 19:05:58 GMT
+        Mon, 07 Dec 2020 14:09:18 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B7J6uev025380;
+        Mon, 7 Dec 2020 19:09:17 GMT
 Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma02dal.us.ibm.com with ESMTP id 3581u9ej04-1
+        by ppma04dal.us.ibm.com with ESMTP id 3581u96kye-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 19:05:58 +0000
+        Mon, 07 Dec 2020 19:09:17 +0000
 Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B7J5vcw20644280
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B7J9Fsm22872376
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Dec 2020 19:05:57 GMT
+        Mon, 7 Dec 2020 19:09:15 GMT
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D7217805F;
-        Mon,  7 Dec 2020 19:05:57 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 867157805E;
+        Mon,  7 Dec 2020 19:09:15 +0000 (GMT)
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0E16F78060;
-        Mon,  7 Dec 2020 19:05:55 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.162.205])
+        by IMSVA (Postfix) with ESMTP id CAF6178060;
+        Mon,  7 Dec 2020 19:09:14 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.174.71])
         by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Dec 2020 19:05:55 +0000 (GMT)
-Subject: Re: [PATCH] s390/vfio-ap: Clean up vfio_ap resources when KVM pointer
- invalidated
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, cohuck@redhat.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com, david@redhat.com
-References: <20201202234101.32169-1-akrowiak@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <ab3f1948-bb23-c0d0-7205-f46cd6dbe99d@linux.ibm.com>
-Date:   Mon, 7 Dec 2020 14:05:55 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        Mon,  7 Dec 2020 19:09:14 +0000 (GMT)
+Subject: Re: [PATCH v4] self_tests/kvm: sync_regs test for diag318
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        borntraeger@de.ibm.com, pbonzini@redhat.com, imbrenda@linux.ibm.com
+References: <20201207154125.10322-1-walling@linux.ibm.com>
+ <20201207175557.674236b3.cohuck@redhat.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <dcb5cfd1-ed40-21fb-0216-d0e0b8ea2cd3@linux.ibm.com>
+Date:   Mon, 7 Dec 2020 14:09:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201202234101.32169-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20201207175557.674236b3.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2020-12-07_16:2020-12-04,2020-12-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- mlxlogscore=999 suspectscore=3 mlxscore=0 adultscore=0 clxscore=1015
- spamscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012070119
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ adultscore=0 clxscore=1015 phishscore=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=999 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012070121
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 12/7/20 11:55 AM, Cornelia Huck wrote:
+> On Mon,  7 Dec 2020 10:41:25 -0500
+> Collin Walling <walling@linux.ibm.com> wrote:
+> 
+>> The DIAGNOSE 0x0318 instruction, unique to s390x, is a privileged call
+>> that must be intercepted via SIE, handled in userspace, and the
+>> information set by the instruction is communicated back to KVM.
+>>
+>> To test the instruction interception, an ad-hoc handler is defined which
+>> simply has a VM execute the instruction and then userspace will extract
+>> the necessary info. The handler is defined such that the instruction
+>> invocation occurs only once. It is up to the caller to determine how the
+>> info returned by this handler should be used.
+>>
+>> The diag318 info is communicated from userspace to KVM via a sync_regs
+>> call. This is tested During a sync_regs test, where the diag318 info is
+> 
+> s/During/during/
+> 
+>> requested via the handler, then the info is stored in the appropriate
+>> register in KVM via a sync registers call.
+>>
+>> If KVM does not support diag318, then the tests will print a message
+>> stating that diag318 was skipped, and the asserts will simply test
+>> against a value of 0.
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>  tools/testing/selftests/kvm/Makefile          |  2 +-
+>>  .../kvm/include/s390x/diag318_test_handler.h  | 13 +++
+>>  .../kvm/lib/s390x/diag318_test_handler.c      | 82 +++++++++++++++++++
+>>  .../selftests/kvm/s390x/sync_regs_test.c      | 16 +++-
+>>  4 files changed, 111 insertions(+), 2 deletions(-)
+>>  create mode 100644 tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h
+>>  create mode 100644 tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c
+> 
+> Looks reasonable to me.
+> 
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> 
 
+Thanks. I'll resubmit the entire patch as a reply to the top-most email
+with the proposed commit message changes.
 
-On 12/2/20 6:41 PM, Tony Krowiak wrote:
-> The vfio_ap device driver registers a group notifier with VFIO when the
-> file descriptor for a VFIO mediated device for a KVM guest is opened to
-> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
-> event). When the KVM pointer is set, the vfio_ap driver stashes the pointer
-> and calls the kvm_get_kvm() function to increment its reference counter.
-> When the notifier is called to make notification that the KVM pointer has
-> been set to NULL, the driver should clean up any resources associated with
-> the KVM pointer and decrement its reference counter. The current
-> implementation does not take care of this clean up.
->
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->   drivers/s390/crypto/vfio_ap_ops.c | 21 +++++++++++++--------
->   1 file changed, 13 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index e0bde8518745..eeb9c9130756 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -1083,6 +1083,17 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
->   	return NOTIFY_DONE;
->   }
->   
-> +static void vfio_ap_mdev_put_kvm(struct ap_matrix_mdev *matrix_mdev)
-> +{
-> +	if (matrix_mdev->kvm) {
-> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-> +		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+-- 
+Regards,
+Collin
 
-This reset probably does not belong here since there is no
-reason to reset the queues in the group notifier (see below).
-The reset should be done in the release callback only regardless
-of whether the KVM pointer exists or not.
-
-> +		kvm_put_kvm(matrix_mdev->kvm);
-> +		matrix_mdev->kvm = NULL;
-> +	}
-> +}
-> +
->   static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
->   				       unsigned long action, void *data)
->   {
-> @@ -1095,7 +1106,7 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
->   	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
->   
->   	if (!data) {
-> -		matrix_mdev->kvm = NULL;
-> +		vfio_ap_mdev_put_kvm(matrix_mdev);
->   		return NOTIFY_OK;
->   	}
->   
-> @@ -1222,13 +1233,7 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
->   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->   
->   	mutex_lock(&matrix_dev->lock);
-> -	if (matrix_mdev->kvm) {
-> -		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> -		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-> -		vfio_ap_mdev_reset_queues(mdev);
-
-This release should be moved outside of the block and
-performed regardless of whether the KVM pointer exists or
-not.
-
-> -		kvm_put_kvm(matrix_mdev->kvm);
-> -		matrix_mdev->kvm = NULL;
-> -	}
-> +	vfio_ap_mdev_put_kvm(matrix_mdev);
->   	mutex_unlock(&matrix_dev->lock);
->   
->   	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
-
+Stay safe and stay healthy
