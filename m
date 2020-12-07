@@ -2,104 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F090D2D0F08
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 12:31:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A52392D0F0B
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 12:33:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726468AbgLGLbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 06:31:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50009 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726332AbgLGLbF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 06:31:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607340579;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RUUmIf9d5raiFEfOQ0JhRAqjErNztrP6nIp2TZr3s30=;
-        b=eU3m7kIvJhK46uxGyHubhE3+mFaSiGHItQ6P9/U8eNyxnggoBOSJEA90oi8mtQySgW7sxc
-        7lHQLX/mhWLpxbOpNXL6FuMr3tf1Bor1oyMjMYRfV80rbzmN83MqNHK2K/MPC7kkw5+Fbl
-        Xc700R9wEVxyk6KpjmgdHpf08GzsIYI=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-P9vgF1PVMz6aEiN7c5hKYA-1; Mon, 07 Dec 2020 06:29:38 -0500
-X-MC-Unique: P9vgF1PVMz6aEiN7c5hKYA-1
-Received: by mail-ej1-f71.google.com with SMTP id 3so3037389ejw.13
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 03:29:37 -0800 (PST)
+        id S1726650AbgLGLcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 06:32:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40460 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbgLGLcR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 06:32:17 -0500
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3457CC0613D1;
+        Mon,  7 Dec 2020 03:31:37 -0800 (PST)
+Received: by mail-pf1-x441.google.com with SMTP id t7so9599419pfh.7;
+        Mon, 07 Dec 2020 03:31:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ILnSBWwyABm/ViEoQp4lFyaqVJLrOFveysOKfZkRhag=;
+        b=rOqpLC970kODnReOtTNxrnnMNPzauP6Lc115KldbryjjQRCZwd2tgMSQz36C/kXt9Z
+         56dN0/oxHJyldy4W9HdAVs4m9hHTgiYq6XORi2+17t9QxzLq9CSyGMoY6sU9WsUCUJmq
+         hFSae+7CYWJuWnmH/utLWNjoeEGfdF6L92cc0b3mNBllb5TrS0zuwZQIrwEPB3RlN99I
+         AL9gnTSq4awwyxv0ReEbuh0yGvL6GN3JwGQN39IHk9PEYfw2jBETrr4s+uq3N4+1Qm17
+         takM/sOTbb34RuK6uOEAKMGSZYeKzXJt0NLJiHOg0sAG9T948DCs8tOXnElF9Bk+1YeY
+         e2WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=RUUmIf9d5raiFEfOQ0JhRAqjErNztrP6nIp2TZr3s30=;
-        b=gL4ImEY1UtpJpylwoDcpzKuTD3YPRfXTFGWaH+fn/ik1/n+15SIzg8pBkjK7EmfXi4
-         Tjg/XEvnEw7Ry1qD/wEQ+EzHF+Nayju22G8dI04kp6gQnUu9LRfW1jIpFQeVi7hiEWfu
-         qFkw21UN13icOC/PRu5Q3whJr1zw5lBwQsoZ1NvILH1A2alWMTcIMFrsTS1OVQDTCXVs
-         X1bPnpbLZ14sxw+bXUcZN/Z8GiPbq0qqZN/HDbEqrZ8j9EeKFypHDBA3/aTOeGizrWSw
-         qNHeMAgarsJOM7HFb26KwtzNWXhRdjHkBggc4+n9B+yBrnD3f+sBGHHit6Js8kkM8nqp
-         gXzg==
-X-Gm-Message-State: AOAM531WlpSa15d+52ufHvOOxFpK4PdqkU9c5jhKTxV1J/W2FUMjMG0B
-        xrXDmfXaiK1jB4KzxzrxS9UZzbv2UCNK5frHL4rmCBEHWXYSnWs26tQwWIe5NoLipO0t5+y7tLC
-        vTbgfIZt3gJmZ
-X-Received: by 2002:aa7:da01:: with SMTP id r1mr19631535eds.45.1607340576464;
-        Mon, 07 Dec 2020 03:29:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy22YgC9+zXV2Fz3O6j80uNXHmIZwmHhehotkxzZQgiiFto+9+iy0k3k5rRSPr8xd3nqwaetA==
-X-Received: by 2002:aa7:da01:: with SMTP id r1mr19631524eds.45.1607340576324;
-        Mon, 07 Dec 2020 03:29:36 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id u17sm11835476eje.11.2020.12.07.03.29.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 03:29:35 -0800 (PST)
-Subject: Re: KVM_SET_CPUID doesn't check supported bits (was Re: [PATCH 0/6]
- KVM: x86: KVM_SET_SREGS.CR4 bug fixes and cleanup)
-To:     stsp <stsp2@yandex.ru>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201007014417.29276-1-sean.j.christopherson@intel.com>
- <99334de1-ba3d-dfac-0730-e637d39b948f@yandex.ru>
- <20201008175951.GA9267@linux.intel.com>
- <7efe1398-24c0-139f-29fa-3d89b6013f34@yandex.ru>
- <20201009040453.GA10744@linux.intel.com>
- <5dfa55f3-ecdf-9f8d-2d45-d2e6e54f2daa@yandex.ru>
- <20201009153053.GA16234@linux.intel.com>
- <b38dff0b-7e6d-3f3e-9724-8e280938628a@yandex.ru>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c206865e-b2da-b996-3d48-2c71d7783fbc@redhat.com>
-Date:   Mon, 7 Dec 2020 12:29:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        bh=ILnSBWwyABm/ViEoQp4lFyaqVJLrOFveysOKfZkRhag=;
+        b=LbQvAnkdfmEtyjwSlUnaagEcJqxyK9SE81MFzarHXAC1bS1KWovtx5uZH7vUR9GMWd
+         tlWubRY1Xz7q4RHjbGAOFn8ejLqR1nh2bKf6JYDM1f3rRM2vGRGD1O6siPLpKDBZNzb2
+         XY36QModpMXV+qKCon8nSV/UwPCHPT3LPDA/714rP/XBo5lGXb7NZSZoGLtZKOqR5mOI
+         HeiBMIpFp+tLUpOAd/NpUCE/uuQcWL7aB5669BiPKCZ5RBvtzTGcv8tFl15AojGxrjlZ
+         Yjowa+IQBWVb6eJ00Um0JbrlDT/Rod6TwfSATD0gYfN97T9Xhr2qNu3+F/C598Z3btiL
+         8pnw==
+X-Gm-Message-State: AOAM530H0I8Wov6OWI8XUq7/k5ntpITAThEalqB/lKnHhcQ5ssIXWCY2
+        nwJfNvcxVK03d4zYwO5Uc/4=
+X-Google-Smtp-Source: ABdhPJymSUXlaRjzXEzU2ngDriybhzR1Pzab6/cvJ6uKqjlNaxk3d/92EIH+NhH+um1mO4rml2NgOw==
+X-Received: by 2002:a17:902:6103:b029:da:c46c:b3d6 with SMTP id t3-20020a1709026103b02900dac46cb3d6mr15400411plj.46.1607340696714;
+        Mon, 07 Dec 2020 03:31:36 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id d4sm14219822pfo.127.2020.12.07.03.31.33
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 07 Dec 2020 03:31:36 -0800 (PST)
+From:   yulei.kernel@gmail.com
+X-Google-Original-From: yuleixzhang@tencent.com
+To:     linux-mm@kvack.org, akpm@linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, naoya.horiguchi@nec.com,
+        viro@zeniv.linux.org.uk, pbonzini@redhat.com
+Cc:     joao.m.martins@oracle.com, rdunlap@infradead.org,
+        sean.j.christopherson@intel.com, xiaoguangrong.eric@gmail.com,
+        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
+        Yulei Zhang <yuleixzhang@tencent.com>
+Subject: [RFC V2 00/37] Enhance memory utilization with DMEMFS
+Date:   Mon,  7 Dec 2020 19:30:53 +0800
+Message-Id: <cover.1607332046.git.yuleixzhang@tencent.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <b38dff0b-7e6d-3f3e-9724-8e280938628a@yandex.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/12/20 12:24, stsp wrote:
-> It tries to enable VME among other things.
-> qemu appears to disable VME by default,
-> unless you do "-cpu host". So we have a situation where
-> the host (which is qemu) doesn't have VME,
-> and guest (dosemu) is trying to enable it.
-> Now obviously KVM_SET_CPUID doesn't check anyting
-> at all and returns success. That later turns
-> into an invalid guest state.
-> 
-> 
-> Question: should KVM_SET_CPUID check for
-> supported bits, end return error if not everything
-> is supported?
+From: Yulei Zhang <yuleixzhang@tencent.com>
 
-No, it is intentional.  Most bits of CPUID are not ever checked by KVM, 
-so userspace is supposed to set values that makes sense or just copy the 
-value of KVM_GET_SUPPORTED_CPUID more or less blindly.
+In current system each physical memory page is assocaited with
+a page structure which is used to track the usage of this page.
+But due to the memory usage rapidly growing in cloud environment,
+we find the resource consuming for page structure storage becomes
+more and more remarkable. So is it possible that we could reclaim
+such memory and make it reusable?
 
-Paolo
+This patchset introduces an idea about how to save the extra
+memory through a new virtual filesystem -- dmemfs.
+
+Dmemfs (Direct Memory filesystem) is device memory or reserved
+memory based filesystem. This kind of memory is special as it
+is not managed by kernel and most important it is without 'struct page'.
+Therefore we can leverage the extra memory from the host system
+to support more tenants in our cloud service.
+
+As the belowing figure shows, we uses a kernel boot parameter 'dmem='
+to reserve the system memory when the host system boots up, the
+remaining system memory is still managed by system memory management
+which is associated with "struct page", the reserved memory
+will be managed by dmem and assigned to guest system, the details
+can be checked in /Documentation/admin-guide/kernel-parameters.txt.
+
+   +------------------+--------------------------------------+
+   |  system memory   |     memory for guest system          | 
+   +------------------+--------------------------------------+
+    |                                   |
+    v                                   |
+struct page                             |
+    |                                   |
+    v                                   v
+    system mem management             dmem  
+
+And during the usage, the dmemfs will handle the memory request to
+allocate and free the reserved memory on each NUMA node, the user 
+space application could leverage the mmap interface to access the 
+memory, and kernel module such as kvm and vfio would be able to pin
+the memory thongh follow_pfn() and get_user_page() in different given
+page size granularities.
+
+          +-----------+  +-----------+
+          |   QEMU    |  |  dpdk etc.|      user
+          +-----+-----+  +-----------+
+  +-----------|------\------------------------------+
+  |           |       v                    kernel   |
+  |           |     +-------+  +-------+            |
+  |           |     |  KVM  |  | vfio  |            |
+  |           |     +-------+  +-------+            |
+  |           |         |          |                |
+  |      +----v---------v----------v------+         |
+  |      |                                |         |
+  |      |             Dmemfs             |         |
+  |      |                                |         |
+  |      +--------------------------------+         |
+  +-----------/-----------------------\-------------+
+             /                         \
+     +------v-----+                +----v-------+
+     |   node 0   |                |   node 1   |
+     +------------+                +------------+
+
+Theoretically for each 4k physical page it can save 64 bytes if
+we drop the 'struct page', so for guest memory with 320G it can
+save about 5G physical memory totally.
+
+Detailed usage of dmemfs is included in
+/Documentation/filesystem/dmemfs.rst.
+
+V1->V2:
+* Rebase the code the kernel version 5.10.0-rc3.
+* Introudce dregion->memmap for dmem to add _refcount for each
+  dmem page.
+* Enable record_steal_time for dmem before entering guest system.
+* Adjust page walking for dmem.
+
+Yulei Zhang (37):
+  fs: introduce dmemfs module
+  mm: support direct memory reservation
+  dmem: implement dmem memory management
+  dmem: let pat recognize dmem
+  dmemfs: support mmap for dmemfs
+  dmemfs: support truncating inode down
+  dmem: trace core functions
+  dmem: show some statistic in debugfs
+  dmemfs: support remote access
+  dmemfs: introduce max_alloc_try_dpages parameter
+  mm: export mempolicy interfaces to serve dmem allocator
+  dmem: introduce mempolicy support
+  mm, dmem: introduce PFN_DMEM and pfn_t_dmem
+  mm, dmem: differentiate dmem-pmd and thp-pmd
+  mm: add pmd_special() check for pmd_trans_huge_lock()
+  dmemfs: introduce ->split() to dmemfs_vm_ops
+  mm, dmemfs: support unmap_page_range() for dmemfs pmd
+  mm: follow_pmd_mask() for dmem huge pmd
+  mm: gup_huge_pmd() for dmem huge pmd
+  mm: support dmem huge pmd for vmf_insert_pfn_pmd()
+  mm: support dmem huge pmd for follow_pfn()
+  kvm, x86: Distinguish dmemfs page from mmio page
+  kvm, x86: introduce VM_DMEM for syscall support usage
+  dmemfs: support hugepage for dmemfs
+  mm, x86, dmem: fix estimation of reserved page for vaddr_get_pfn()
+  mm, dmem: introduce pud_special() for dmem huge pud support
+  mm: add pud_special() check to support dmem huge pud
+  mm, dmemfs: support huge_fault() for dmemfs
+  mm: add follow_pte_pud() to support huge pud look up
+  dmem: introduce dmem_bitmap_alloc() and dmem_bitmap_free()
+  dmem: introduce mce handler
+  mm, dmemfs: register and handle the dmem mce
+  kvm, x86: enable record_steal_time for dmem
+  dmem: add dmem unit tests
+  mm, dmem: introduce dregion->memmap for dmem
+  vfio: support dmempage refcount for vfio
+  Add documentation for dmemfs
+
+ Documentation/admin-guide/kernel-parameters.txt |   38 +
+ Documentation/filesystems/dmemfs.rst            |   58 ++
+ Documentation/filesystems/index.rst             |    1 +
+ arch/x86/Kconfig                                |    1 +
+ arch/x86/include/asm/pgtable.h                  |   32 +-
+ arch/x86/include/asm/pgtable_types.h            |   13 +-
+ arch/x86/kernel/setup.c                         |    3 +
+ arch/x86/kvm/mmu/mmu.c                          |    1 +
+ arch/x86/mm/pat/memtype.c                       |   21 +
+ drivers/vfio/vfio_iommu_type1.c                 |   13 +-
+ fs/Kconfig                                      |    1 +
+ fs/Makefile                                     |    1 +
+ fs/dmemfs/Kconfig                               |   16 +
+ fs/dmemfs/Makefile                              |    8 +
+ fs/dmemfs/inode.c                               | 1060 ++++++++++++++++++++
+ fs/dmemfs/trace.h                               |   54 +
+ fs/inode.c                                      |    6 +
+ include/linux/dmem.h                            |   54 +
+ include/linux/fs.h                              |    1 +
+ include/linux/huge_mm.h                         |    5 +-
+ include/linux/mempolicy.h                       |    3 +
+ include/linux/mm.h                              |    9 +
+ include/linux/pfn_t.h                           |   17 +-
+ include/linux/pgtable.h                         |   22 +
+ include/trace/events/dmem.h                     |   85 ++
+ include/uapi/linux/magic.h                      |    1 +
+ mm/Kconfig                                      |   19 +
+ mm/Makefile                                     |    1 +
+ mm/dmem.c                                       | 1196 +++++++++++++++++++++++
+ mm/dmem_reserve.c                               |  303 ++++++
+ mm/gup.c                                        |  101 +-
+ mm/huge_memory.c                                |   19 +-
+ mm/memory-failure.c                             |   70 +-
+ mm/memory.c                                     |   74 +-
+ mm/mempolicy.c                                  |    4 +-
+ mm/mincore.c                                    |    8 +-
+ mm/mprotect.c                                   |    7 +-
+ mm/mremap.c                                     |    3 +
+ mm/pagewalk.c                                   |    4 +-
+ tools/testing/dmem/Kbuild                       |    1 +
+ tools/testing/dmem/Makefile                     |   10 +
+ tools/testing/dmem/dmem-test.c                  |  184 ++++
+ virt/kvm/kvm_main.c                             |   13 +-
+ 43 files changed, 3483 insertions(+), 58 deletions(-)
+ create mode 100644 Documentation/filesystems/dmemfs.rst
+ create mode 100644 fs/dmemfs/Kconfig
+ create mode 100644 fs/dmemfs/Makefile
+ create mode 100644 fs/dmemfs/inode.c
+ create mode 100644 fs/dmemfs/trace.h
+ create mode 100644 include/linux/dmem.h
+ create mode 100644 include/trace/events/dmem.h
+ create mode 100644 mm/dmem.c
+ create mode 100644 mm/dmem_reserve.c
+ create mode 100644 tools/testing/dmem/Kbuild
+ create mode 100644 tools/testing/dmem/Makefile
+ create mode 100644 tools/testing/dmem/dmem-test.c
+
+-- 
+1.8.3.1
 
