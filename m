@@ -2,375 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDF652D2C60
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 14:58:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 380B92D2D14
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 15:25:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729616AbgLHN4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 08:56:38 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4111 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729570AbgLHN4i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 08:56:38 -0500
-Received: from dggeme753-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Cr1sV4kNdzXlHd;
-        Tue,  8 Dec 2020 21:55:26 +0800 (CST)
-Received: from [10.174.184.120] (10.174.184.120) by
- dggeme753-chm.china.huawei.com (10.3.19.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Tue, 8 Dec 2020 21:55:53 +0800
-Subject: Re: [PATCH v2] vfio iommu type1: Improve vfio_iommu_type1_pin_pages
- performance
-To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     <kwankhede@nvidia.com>, <wu.wubin@huawei.com>,
-        <maoming.maoming@huawei.com>, <xieyingtai@huawei.com>,
-        <lizhengui@huawei.com>, <wubinfeng@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-References: <60d22fc6-88d6-c7c2-90bd-1e8eccb1fdcc@huawei.com>
-From:   "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>
-Message-ID: <4d58b74d-72bb-6473-9523-aeaa392a470e@huawei.com>
-Date:   Tue, 8 Dec 2020 21:55:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.2
+        id S1729751AbgLHOZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 09:25:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24492 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729749AbgLHOZQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 09:25:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607437429;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1ocH5W3W6/BNUy9ovonqCXcdd/rBC0yAl/SfS8e31LM=;
+        b=DkDAjNbiKX4z5iMTdN5El/2EmR+r38/bt+2145csPjOn/PjCO0PjuK1ExN62cn0adHZGIG
+        3ZnFN4OL2davyTeUpXIHSfYUlywJEQ4f3VyLAVKoWbAlU8ZddfW0tz0wGo88hyzXvNygcS
+        I5hUzI/YprPv5B2Dq09miKmU9ylSX7A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-aK6QfRXaO3m8dgajqCgvOA-1; Tue, 08 Dec 2020 09:23:45 -0500
+X-MC-Unique: aK6QfRXaO3m8dgajqCgvOA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28E2E107ACE4;
+        Tue,  8 Dec 2020 14:23:43 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 53D7760877;
+        Tue,  8 Dec 2020 14:23:42 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 95B74416CD79; Mon,  7 Dec 2020 20:11:27 -0300 (-03)
+Date:   Mon, 7 Dec 2020 20:11:27 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+Message-ID: <20201207231127.GB27492@fuller.cnet>
+References: <636fecc20b0143128b484f159ff795ff65d05b82.camel@redhat.com>
+ <885C1725-B479-47F6-B08D-A7181637A80A@amacapital.net>
 MIME-Version: 1.0
-In-Reply-To: <60d22fc6-88d6-c7c2-90bd-1e8eccb1fdcc@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-GB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.120]
-X-ClientProxiedBy: dggeme705-chm.china.huawei.com (10.1.199.101) To
- dggeme753-chm.china.huawei.com (10.3.19.99)
-X-CFilter-Loop: Reflected
+In-Reply-To: <885C1725-B479-47F6-B08D-A7181637A80A@amacapital.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020/11/21 15:58, xuxiaoyang (C) wrote:
-> vfio_pin_pages() accepts an array of unrelated iova pfns and processes
-> each to return the physical pfn.  When dealing with large arrays of
-> contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
-> it is processed page by page.In this case, we can divide the iova pfn
-> array into multiple continuous ranges and optimize them.  For example,
-> when the iova pfn array is {1,5,6,7,9}, it will be divided into three
-> groups {1}, {5,6,7}, {9} for processing.  When processing {5,6,7}, the
-> number of calls to pin_user_pages_remote is reduced from 3 times to once.
-> For single page or large array of discontinuous iovas, we still use
-> vfio_pin_page_external to deal with it to reduce the performance loss
-> caused by refactoring.
+On Mon, Dec 07, 2020 at 10:04:45AM -0800, Andy Lutomirski wrote:
 > 
-> Signed-off-by: Xiaoyang Xu <xuxiaoyang2@huawei.com>
-> ---
-> v1 -> v2:
->  * make vfio_iommu_type1_pin_contiguous_pages use vfio_pin_page_external
->  to pin single page when npage=1
->  * make vfio_pin_contiguous_pages_external use set npage to mark
->  consecutive pages as dirty. simplify the processing logic of unwind
->  * remove unnecessary checks in vfio_get_contiguous_pages_length, put
->  the least costly judgment logic at the top, and replace
->  vfio_iova_get_vfio_pfn with vfio_find_vpfn
+> > On Dec 7, 2020, at 9:00 AM, Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > 
+> > ﻿On Mon, 2020-12-07 at 08:53 -0800, Andy Lutomirski wrote:
+> >>>> On Dec 7, 2020, at 8:38 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
+> >>> 
+> >>> ﻿On Mon, Dec 07 2020 at 14:16, Maxim Levitsky wrote:
+> >>>>> On Sun, 2020-12-06 at 17:19 +0100, Thomas Gleixner wrote:
+> >>>>> From a timekeeping POV and the guests expectation of TSC this is
+> >>>>> fundamentally wrong:
+> >>>>> 
+> >>>>>     tscguest = scaled(hosttsc) + offset
+> >>>>> 
+> >>>>> The TSC has to be viewed systemwide and not per CPU. It's systemwide
+> >>>>> used for timekeeping and for that to work it has to be synchronized. 
+> >>>>> 
+> >>>>> Why would this be different on virt? Just because it's virt or what? 
+> >>>>> 
+> >>>>> Migration is a guest wide thing and you're not migrating single vCPUs.
+> >>>>> 
+> >>>>> This hackery just papers over he underlying design fail that KVM looks
+> >>>>> at the TSC per vCPU which is the root cause and that needs to be fixed.
+> >>>> 
+> >>>> I don't disagree with you.
+> >>>> As far as I know the main reasons that kvm tracks TSC per guest are
+> >>>> 
+> >>>> 1. cases when host tsc is not stable 
+> >>>> (hopefully rare now, and I don't mind making
+> >>>> the new API just refuse to work when this is detected, and revert to old way
+> >>>> of doing things).
+> >>> 
+> >>> That's a trainwreck to begin with and I really would just not support it
+> >>> for anything new which aims to be more precise and correct.  TSC has
+> >>> become pretty reliable over the years.
+> >>> 
+> >>>> 2. (theoretical) ability of the guest to introduce per core tsc offfset
+> >>>> by either using TSC_ADJUST (for which I got recently an idea to stop
+> >>>> advertising this feature to the guest), or writing TSC directly which
+> >>>> is allowed by Intel's PRM:
+> >>> 
+> >>> For anything halfways modern the write to TSC is reflected in TSC_ADJUST
+> >>> which means you get the precise offset.
+> >>> 
+> >>> The general principle still applies from a system POV.
+> >>> 
+> >>>    TSC base (systemwide view) - The sane case
+> >>> 
+> >>>    TSC CPU  = TSC base + TSC_ADJUST
+> >>> 
+> >>> The guest TSC base is a per guest constant offset to the host TSC.
+> >>> 
+> >>>    TSC guest base = TSC host base + guest base offset
+> >>> 
+> >>> If the guest want's this different per vCPU by writing to the MSR or to
+> >>> TSC_ADJUST then you still can have a per vCPU offset in TSC_ADJUST which
+> >>> is the offset to the TSC base of the guest.
+> >> 
+> >> How about, if the guest wants to write TSC_ADJUST, it can turn off all paravirt features and keep both pieces?
+> >> 
+> > 
+> > This is one of the things I had in mind recently.
+> > 
+> > Even better, we can stop advertising TSC_ADJUST in CPUID to the guest 
+> > and forbid it from writing it at all.
 > 
->  drivers/vfio/vfio_iommu_type1.c | 231 ++++++++++++++++++++++++++++----
->  1 file changed, 204 insertions(+), 27 deletions(-)
+> Seems reasonable to me.
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 67e827638995..080727b531c6 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -628,6 +628,196 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->  	return unlocked;
->  }
+> It also seems okay for some MSRs to stop working after the guest enabled new PV timekeeping.
 > 
-> +static int contiguous_vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
-> +				    int prot, long npage, unsigned long *phys_pfn)
-> +{
-> +	struct page **pages = NULL;
-> +	unsigned int flags = 0;
-> +	int i, ret;
-> +
-> +	pages = kvmalloc_array(npage, sizeof(struct page *), GFP_KERNEL);
-> +	if (!pages)
-> +		return -ENOMEM;
-> +
-> +	if (prot & IOMMU_WRITE)
-> +		flags |= FOLL_WRITE;
-> +
-> +	mmap_read_lock(mm);
-> +	ret = pin_user_pages_remote(mm, vaddr, npage, flags | FOLL_LONGTERM,
-> +				    pages, NULL, NULL);
-> +	mmap_read_unlock(mm);
-> +
-> +	for (i = 0; i < ret; i++)
-> +		*(phys_pfn + i) = page_to_pfn(pages[i]);
-> +
-> +	kvfree(pages);
-> +
-> +	return ret;
-> +}
-> +
-> +static int vfio_pin_contiguous_pages_external(struct vfio_iommu *iommu,
-> +				    struct vfio_dma *dma,
-> +				    unsigned long *user_pfn,
-> +				    int npage, unsigned long *phys_pfn,
-> +				    bool do_accounting)
-> +{
-> +	int ret, i, j, lock_acct = 0;
-> +	unsigned long remote_vaddr;
-> +	dma_addr_t iova;
-> +	struct mm_struct *mm;
-> +	struct vfio_pfn *vpfn;
-> +
-> +	mm = get_task_mm(dma->task);
-> +	if (!mm)
-> +		return -ENODEV;
-> +
-> +	iova = user_pfn[0] << PAGE_SHIFT;
-> +	remote_vaddr = dma->vaddr + iova - dma->iova;
-> +	ret = contiguous_vaddr_get_pfn(mm, remote_vaddr, dma->prot,
-> +					    npage, phys_pfn);
-> +	mmput(mm);
-> +	if (ret <= 0)
-> +		return ret;
-> +
-> +	npage = ret;
-> +	for (i = 0; i < npage; i++) {
-> +		iova = user_pfn[i] << PAGE_SHIFT;
-> +		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> +		if (ret)
-> +			goto unwind;
-> +
-> +		if (!is_invalid_reserved_pfn(phys_pfn[i]))
-> +			lock_acct++;
-> +	}
-> +
-> +	if (do_accounting) {
-> +		ret = vfio_lock_acct(dma, lock_acct, true);
-> +		if (ret) {
-> +			if (ret == -ENOMEM)
-> +				pr_warn("%s: Task %s (%d) RLIMIT_MEMLOCK (%ld) exceeded\n",
-> +					__func__, dma->task->comm, task_pid_nr(dma->task),
-> +					task_rlimit(dma->task, RLIMIT_MEMLOCK));
-> +			goto unwind;
-> +		}
-> +	}
-> +
-> +	if (iommu->dirty_page_tracking) {
-> +		unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> +
-> +		/*
-> +		 * Bitmap populated with the smallest supported page
-> +		 * size
-> +		 */
-> +		bitmap_set(dma->bitmap,
-> +			   ((user_pfn[0] << PAGE_SHIFT) - dma->iova) >> pgshift, npage);
-> +	}
-> +
-> +	return i;
-> +unwind:
-> +	for (j = 0; j < npage; j++) {
-> +		if (j < i) {
-> +			iova = user_pfn[j] << PAGE_SHIFT;
-> +			vpfn = vfio_find_vpfn(dma, iova);
-> +			vfio_iova_put_vfio_pfn(dma, vpfn);
-> +		} else {
-> +			put_pfn(phys_pfn[j], dma->prot);
-> +		}
-> +
-> +		phys_pfn[j] = 0;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int vfio_iommu_type1_pin_contiguous_pages(struct vfio_iommu *iommu,
-> +					    struct vfio_dma *dma,
-> +					    unsigned long *user_pfn,
-> +					    int npage, unsigned long *phys_pfn,
-> +					    bool do_accounting)
-> +{
-> +	int ret = 0, i, j;
-> +	unsigned long remote_vaddr;
-> +	dma_addr_t iova;
-> +
-> +	if (npage == 1)
-> +		goto pin_single_page;
-> +
-> +	ret = vfio_pin_contiguous_pages_external(iommu, dma, user_pfn, npage,
-> +				phys_pfn, do_accounting);
-> +	if (ret == npage)
-> +		return ret;
-> +
-> +	if (ret < 0)
-> +		ret = 0;
-> +
-> +pin_single_page:
-> +	for (i = ret; i < npage; i++) {
-> +		iova = user_pfn[i] << PAGE_SHIFT;
-> +		remote_vaddr = dma->vaddr + iova - dma->iova;
-> +
-> +		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
-> +			    do_accounting);
-> +		if (ret)
-> +			goto pin_unwind;
-> +
-> +		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> +		if (ret) {
-> +			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
-> +				vfio_lock_acct(dma, -1, true);
-> +			goto pin_unwind;
-> +		}
-> +
-> +		if (iommu->dirty_page_tracking) {
-> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> +
-> +			/*
-> +			 * Bitmap populated with the smallest supported page
-> +			 * size
-> +			 */
-> +			bitmap_set(dma->bitmap,
-> +					   (iova - dma->iova) >> pgshift, 1);
-> +		}
-> +	}
-> +
-> +	return i;
-> +
-> +pin_unwind:
-> +	phys_pfn[i] = 0;
-> +	for (j = 0; j < i; j++) {
-> +		iova = user_pfn[j] << PAGE_SHIFT;
-> +		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		phys_pfn[j] = 0;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int vfio_get_contiguous_pages_length(struct vfio_dma *dma,
-> +				    unsigned long *user_pfn, int npage)
-> +{
-> +	int i;
-> +	dma_addr_t iova = user_pfn[0] << PAGE_SHIFT;
-> +	struct vfio_pfn *vpfn;
-> +
-> +	if (npage <= 1)
-> +		return npage;
-> +
-> +	for (i = 1; i < npage; i++) {
-> +		if (user_pfn[i] != user_pfn[0] + i)
-> +			break;
-> +
-> +		iova = user_pfn[i] << PAGE_SHIFT;
-> +		if (iova >= dma->iova + dma->size ||
-> +				iova + PAGE_SIZE <= dma->iova)
-> +			break;
-> +
-> +		vpfn = vfio_find_vpfn(dma, iova);
-> +		if (vpfn)
-> +			break;
-> +	}
-> +	return i;
-> +}
-> +
->  static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  				      struct iommu_group *iommu_group,
->  				      unsigned long *user_pfn,
-> @@ -637,9 +827,9 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  	struct vfio_iommu *iommu = iommu_data;
->  	struct vfio_group *group;
->  	int i, j, ret;
-> -	unsigned long remote_vaddr;
->  	struct vfio_dma *dma;
->  	bool do_accounting;
-> +	int contiguous_npage;
-> 
->  	if (!iommu || !user_pfn || !phys_pfn)
->  		return -EINVAL;
-> @@ -663,7 +853,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  	 */
->  	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-> 
-> -	for (i = 0; i < npage; i++) {
-> +	for (i = 0; i < npage; i += contiguous_npage) {
->  		dma_addr_t iova;
->  		struct vfio_pfn *vpfn;
-> 
-> @@ -682,31 +872,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
->  		if (vpfn) {
->  			phys_pfn[i] = vpfn->pfn;
-> -			continue;
-> -		}
-> -
-> -		remote_vaddr = dma->vaddr + (iova - dma->iova);
-> -		ret = vfio_pin_page_external(dma, remote_vaddr, &phys_pfn[i],
-> -					     do_accounting);
-> -		if (ret)
-> -			goto pin_unwind;
-> -
-> -		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> -		if (ret) {
-> -			if (put_pfn(phys_pfn[i], dma->prot) && do_accounting)
-> -				vfio_lock_acct(dma, -1, true);
-> -			goto pin_unwind;
-> -		}
-> -
-> -		if (iommu->dirty_page_tracking) {
-> -			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> -
-> -			/*
-> -			 * Bitmap populated with the smallest supported page
-> -			 * size
-> -			 */
-> -			bitmap_set(dma->bitmap,
-> -				   (iova - dma->iova) >> pgshift, 1);
-> +			contiguous_npage = 1;
-> +		} else {
-> +			ret = vfio_get_contiguous_pages_length(dma,
-> +					&user_pfn[i], npage - i);
-> +			if (ret < 0)
-> +				goto pin_unwind;
-> +
-> +			ret = vfio_iommu_type1_pin_contiguous_pages(iommu,
-> +					dma, &user_pfn[i], ret, &phys_pfn[i], do_accounting);
-> +			if (ret < 0)
-> +				goto pin_unwind;
-> +			contiguous_npage = ret;
->  		}
->  	}
->  	ret = i;
-> --
-> 2.19.1
-> .
-> 
+> I do have a feature request, though: IMO it would be quite nifty if the new kvmclock structure could also expose NTP corrections. In other words, if you could expose enough info to calculate CLOCK_MONOTONIC_RAW, CLOCK_MONOTONIC, and CLOCK_REALTIME, then we could have paravirt NTP.
 
-hi Cornelia Huck, Eric Farman, Zhenyu Wang, Zhi Wang
+Hi Andy,
 
-vfio_pin_pages() accepts an array of unrelated iova pfns and processes
-each to return the physical pfn.  When dealing with large arrays of
-contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
-it is processed page by page.  In this case, we can divide the iova pfn
-array into multiple continuous ranges and optimize them.  I have a set
-of performance test data for reference.
+Any reason why drivers/ptp/ptp_kvm.c does not work for you?
 
-The patch was not applied
-                    1 page           512 pages
-no huge pages：     1638ns           223651ns
-THP：               1668ns           222330ns
-HugeTLB：           1526ns           208151ns
-
-The patch was applied
-                    1 page           512 pages
-no huge pages       1735ns           167286ns
-THP：               1934ns           126900ns
-HugeTLB：           1713ns           102188ns
-
-As Alex Williamson said, this patch lacks proof that it works in the
-real world. I think you will have some valuable opinions.
-
-Regards,
-Xu
+> Bonus points if whatever you do for CLOCK_REALTIME also exposes leap seconds in a race free way :). But I suppose that just exposing TAI and letting the guest deal with the TAI - UTC offset itself would get the job done just fine.
 
