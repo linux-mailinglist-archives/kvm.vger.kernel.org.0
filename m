@@ -2,112 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E67F2D0DC4
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 11:07:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C7A42D0DF4
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 11:25:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726629AbgLGKGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 05:06:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34171 "EHLO
+        id S1726497AbgLGKZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 05:25:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33118 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726023AbgLGKGR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 05:06:17 -0500
+        by vger.kernel.org with ESMTP id S1725802AbgLGKZP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 05:25:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607335490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1607336628;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NYGMZWwBeIh3fFPx69mvYjTdx1z088fxfHeToI+lsX8=;
-        b=IUj/WNf5h8IqWTIOYg2z84Hv9lQBHEyKKAIlxidutKotmmyqXc3FpcRUuwERstCHy0B0tT
-        kf9Z+L1alyvdKNdvuqCwkaIXbeuvz7wF3DLBEs2HwE8c6/p5vABFyblj54irnClcuEHY6I
-        I/KvIc6erd2CSwBb2aGFbDlmayJoaX4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-MrDrvghsPUCjUJwU4WA3og-1; Mon, 07 Dec 2020 05:04:49 -0500
-X-MC-Unique: MrDrvghsPUCjUJwU4WA3og-1
-Received: by mail-wr1-f69.google.com with SMTP id p18so4634030wro.9
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 02:04:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NYGMZWwBeIh3fFPx69mvYjTdx1z088fxfHeToI+lsX8=;
-        b=JUjeRoO9Np8ALzmgHZzRwGQQpUmzA/G3FWxeWkzVgF0xdfc693He0EDZmoBgyMWgtC
-         3JU1j7FSTPvVWZI4D+EDHjUeBNfEZneA8ooTaZ48u2kBXV4jwq2MlY8r361jlVfdt4qL
-         MGbSessRAOPPX7WErB/OrKdjXBWA2LqVq5XgwB9D9tJNhjnKhoEvqe9I+uskVYV8hBKV
-         ZT1RPiU4F1SwkpocmjjzyDI5nJ+EM8TxBp+PkUe299jnKVMW7PYLauQMY67Rs703WkHG
-         RvpNd6H/EJdi5VGf6G6EPUJSyUgboOg6+auOdTJtnRdgjbkCxhLyCyTr89uMyX32bqH2
-         0hbQ==
-X-Gm-Message-State: AOAM533RqySfVy98JQgqIqoWOriWYu1MdZmgBm/PNtgIzM+fOkriwdDA
-        dpS8JPH0BcBSz5cWOszaKyFH0NzlDthMEahH3mP7F/UfToT1taiORz1uY3hIqehB74Czab8NwDe
-        Z5Q8u3oBiCc0J
-X-Received: by 2002:a1c:4604:: with SMTP id t4mr16984343wma.17.1607335487738;
-        Mon, 07 Dec 2020 02:04:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxh2IvFXXS0Sn+Z6xWooK0ZB7J3J/ucSwA/Wd5Mn37PSJsH8VDS/ZbIW+jBzvFF1CRvg0hS8w==
-X-Received: by 2002:a1c:4604:: with SMTP id t4mr16984316wma.17.1607335487585;
-        Mon, 07 Dec 2020 02:04:47 -0800 (PST)
-Received: from [192.168.1.36] (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id e17sm4403139wrw.84.2020.12.07.02.04.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 02:04:46 -0800 (PST)
-Subject: Re: [PATCH 3/8] gitlab-ci: Add KVM X86 cross-build jobs
-To:     Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        bh=0qgjftJvMWB28i7vhzEDVbkT48Qo4f02gO6Q9KnMTyo=;
+        b=F3jphWWxTBKIayQyMHQgdh6xxeWjdYrFKjCRV0i0E2UGtJveyNTweXCj7exJqs/OmfZUJ7
+        iIJkBVrZvynEeO6pKLOJzQjwjeL/GdoqrkXMvx0xZLCRhH6zP7ZjS7CdExRix5qk6UIff1
+        l1i7Yq23hvCL1ArjXY5zSqVS6A7Q2P4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-W4NZmy85M4282Y90Lqh5rw-1; Mon, 07 Dec 2020 05:23:32 -0500
+X-MC-Unique: W4NZmy85M4282Y90Lqh5rw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7432C801AE8;
+        Mon,  7 Dec 2020 10:23:29 +0000 (UTC)
+Received: from redhat.com (ovpn-113-137.ams2.redhat.com [10.36.113.137])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 435C360BD8;
+        Mon,  7 Dec 2020 10:23:19 +0000 (UTC)
+Date:   Mon, 7 Dec 2020 10:23:16 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        Paul Durrant <paul@xen.org>, Thomas Huth <thuth@redhat.com>,
         Willian Rampazzo <wrampazz@redhat.com>,
-        Paul Durrant <paul@xen.org>, Huacai Chen <chenhc@lemote.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
+        Huacai Chen <chenhc@lemote.com>,
         Stefano Stabellini <sstabellini@kernel.org>,
-        Claudio Fontana <cfontana@suse.de>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
         Halil Pasic <pasic@linux.ibm.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Fontana <cfontana@suse.de>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        xen-devel@lists.xenproject.org,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
         David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org,
-        Aurelien Jarno <aurelien@aurel32.net>, qemu-arm@nongnu.org
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+Subject: Re: [PATCH 0/8] gitlab-ci: Add accelerator-specific Linux jobs
+Message-ID: <20201207102316.GF3102898@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20201206185508.3545711-1-philmd@redhat.com>
- <20201206185508.3545711-4-philmd@redhat.com>
- <1048bbc0-7124-3564-4219-aa32ed11a35b@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <951882fd-fae0-2dec-5a81-d72adf139511@redhat.com>
-Date:   Mon, 7 Dec 2020 11:04:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <1048bbc0-7124-3564-4219-aa32ed11a35b@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201206185508.3545711-1-philmd@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/7/20 6:20 AM, Thomas Huth wrote:
-> On 06/12/2020 19.55, Philippe Mathieu-Daudé wrote:
->> Cross-build x86 target with only KVM accelerator enabled.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  .gitlab-ci.d/crossbuilds-kvm-x86.yml | 6 ++++++
->>  .gitlab-ci.yml                       | 1 +
->>  MAINTAINERS                          | 1 +
->>  3 files changed, 8 insertions(+)
->>  create mode 100644 .gitlab-ci.d/crossbuilds-kvm-x86.yml
+On Sun, Dec 06, 2020 at 07:55:00PM +0100, Philippe Mathieu-Daudé wrote:
+> Hi,
 > 
-> We already have a job that tests with KVM enabled and TCG disabled in the
-> main .gitlab-ci.yml file, the "build-tcg-disabled" job. So I don't quite see
-> the point in adding yet another job that does pretty much the same? Did I
-> miss something?
+> I was custom to use Travis-CI for testing KVM builds on s390x/ppc
+> with the Travis-CI jobs.
+> 
+> During October Travis-CI became unusable for me (extremely slow,
+> see [1]). Then my free Travis account got updated to the new
+> "10K credit minutes allotment" [2] which I burned without reading
+> the notification email in time (I'd burn them eventually anyway).
+> 
+> Today Travis-CI is pointless to me. While I could pay to run my
+> QEMU jobs, I don't think it is fair for an Open Source project to
+> ask its forks to pay for a service.
+> 
+> As we want forks to run some CI before contributing patches, and
+> we have cross-build Docker images available for Linux hosts, I
+> added some cross KVM/Xen build jobs to Gitlab-CI.
+> 
+> Cross-building doesn't have the same coverage as native building,
+> as we can not run the tests. But this is still useful to get link
+> failures.
+> 
+> Each job is added in its own YAML file, so it is easier to notify
+> subsystem maintainers in case of troubles.
+> 
+> Resulting pipeline:
+> https://gitlab.com/philmd/qemu/-/pipelines/225948077
+> 
+> Regards,
+> 
+> Phil.
+> 
+> [1] https://travis-ci.community/t/build-delays-for-open-source-project/10272
+> [2] https://blog.travis-ci.com/2020-11-02-travis-ci-new-billing
+> 
+> Philippe Mathieu-Daudé (8):
+>   gitlab-ci: Replace YAML anchors by extends (cross_system_build_job)
+>   gitlab-ci: Introduce 'cross_accel_build_job' template
+>   gitlab-ci: Add KVM X86 cross-build jobs
+>   gitlab-ci: Add KVM ARM cross-build jobs
+>   gitlab-ci: Add KVM s390x cross-build jobs
+>   gitlab-ci: Add KVM PPC cross-build jobs
+>   gitlab-ci: Add KVM MIPS cross-build jobs
+>   gitlab-ci: Add Xen cross-build jobs
+> 
+>  .gitlab-ci.d/crossbuilds-kvm-arm.yml   |  5 +++
+>  .gitlab-ci.d/crossbuilds-kvm-mips.yml  |  5 +++
+>  .gitlab-ci.d/crossbuilds-kvm-ppc.yml   |  5 +++
+>  .gitlab-ci.d/crossbuilds-kvm-s390x.yml |  6 +++
+>  .gitlab-ci.d/crossbuilds-kvm-x86.yml   |  6 +++
+>  .gitlab-ci.d/crossbuilds-xen.yml       | 14 +++++++
 
-I missed it was x86-specific myself.
+Adding so many different files here is crazy IMHO, and then should
+all be under the same GitLab CI maintainers, not the respective
+arch maintainers.  The MAINTAINERS file is saying who is responsible
+for the contents of the .yml file, not who is responsible for making
+sure KVM works on that arch. 
 
-> 
->  Thomas
-> 
+>  .gitlab-ci.d/crossbuilds.yml           | 52 ++++++++++++++++----------
+>  .gitlab-ci.yml                         |  6 +++
+>  MAINTAINERS                            |  6 +++
+>  9 files changed, 85 insertions(+), 20 deletions(-)
+>  create mode 100644 .gitlab-ci.d/crossbuilds-kvm-arm.yml
+>  create mode 100644 .gitlab-ci.d/crossbuilds-kvm-mips.yml
+>  create mode 100644 .gitlab-ci.d/crossbuilds-kvm-ppc.yml
+>  create mode 100644 .gitlab-ci.d/crossbuilds-kvm-s390x.yml
+>  create mode 100644 .gitlab-ci.d/crossbuilds-kvm-x86.yml
+>  create mode 100644 .gitlab-ci.d/crossbuilds-xen.yml
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
