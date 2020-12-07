@@ -2,104 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3979A2D0FBC
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 12:53:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FDDF2D1006
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 13:05:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726950AbgLGLw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 06:52:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23809 "EHLO
+        id S1727329AbgLGMEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 07:04:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28260 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726935AbgLGLw4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 06:52:56 -0500
+        by vger.kernel.org with ESMTP id S1727148AbgLGMEW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 07:04:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607341889;
+        s=mimecast20190719; t=1607342575;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fZbtPO9TKtQkBSC6vY2I2aKZfTmFL8HdRvz1iHz5xEM=;
-        b=bDezUNc5uTQczcQ2QXUYj2rRctQ83cHjszSoBT488sQip6LXeoDLEP8UFP5eeC6SdPSOMQ
-        XOgR9/ZIUq155RK1IcsbgluG1IYYXFXTJcqjLiKQz5ujihAY0n9yWKKUcMtz+LHNCI+GrW
-        7U3ewoAgDIkFs2CVQsLwn3h9+qSvdOA=
+        bh=VV+E+pdDesJK1ua/OBZSFe/m+EuDUY9iFBTNIzHgamg=;
+        b=ThifjIEcKVv6a0yMxfsCk0fFevCyCjRjNg1nPY1afZmsffxCQbF7gKeo/ZRTewDLaw44im
+        oyr0RUG8tuXvoDVRWJVjgp0+QUJsZIbgs8+c6f7e/DxmvtOfk7dei5ifyD2IU0bp/ASdBS
+        SGpgk4Ubn8stcPMiXrnDoaw/YJJAywQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-OLykk5vMNfObUY5WAyj2jg-1; Mon, 07 Dec 2020 06:51:26 -0500
-X-MC-Unique: OLykk5vMNfObUY5WAyj2jg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-219-tlIb3Xe8OLCWM9fm3MzovQ-1; Mon, 07 Dec 2020 07:02:53 -0500
+X-MC-Unique: tlIb3Xe8OLCWM9fm3MzovQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC390107ACE4;
-        Mon,  7 Dec 2020 11:51:23 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-85.ams2.redhat.com [10.36.112.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0AE7C5D9E2;
-        Mon,  7 Dec 2020 11:51:11 +0000 (UTC)
-Subject: Re: [PATCH v2 5/5] gitlab-ci: Add Xen cross-build jobs
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Fontana <cfontana@suse.de>,
-        Willian Rampazzo <wrampazz@redhat.com>, qemu-s390x@nongnu.org,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        xen-devel@lists.xenproject.org, Paul Durrant <paul@xen.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Stefano Stabellini <sstabellini@kernel.org>
-References: <20201207112353.3814480-1-philmd@redhat.com>
- <20201207112353.3814480-6-philmd@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <9bfd1ed4-baa2-ece8-5b96-ec8fc7a8c547@redhat.com>
-Date:   Mon, 7 Dec 2020 12:51:10 +0100
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED8511015C88;
+        Mon,  7 Dec 2020 12:02:50 +0000 (UTC)
+Received: from [10.36.114.33] (ovpn-114-33.ams2.redhat.com [10.36.114.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 879A860BD8;
+        Mon,  7 Dec 2020 12:02:47 +0000 (UTC)
+Subject: Re: [RFC V2 00/37] Enhance memory utilization with DMEMFS
+To:     yulei.kernel@gmail.com, linux-mm@kvack.org,
+        akpm@linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        naoya.horiguchi@nec.com, viro@zeniv.linux.org.uk,
+        pbonzini@redhat.com, Dan Williams <dan.j.williams@intel.com>
+Cc:     joao.m.martins@oracle.com, rdunlap@infradead.org,
+        sean.j.christopherson@intel.com, xiaoguangrong.eric@gmail.com,
+        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
+        Yulei Zhang <yuleixzhang@tencent.com>
+References: <cover.1607332046.git.yuleixzhang@tencent.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <33a1c4ca-9f78-96ca-a774-3adea64aaed3@redhat.com>
+Date:   Mon, 7 Dec 2020 13:02:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201207112353.3814480-6-philmd@redhat.com>
+In-Reply-To: <cover.1607332046.git.yuleixzhang@tencent.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/12/2020 12.23, Philippe Mathieu-Daudé wrote:
-> Cross-build ARM and X86 targets with only Xen accelerator enabled.
+On 07.12.20 12:30, yulei.kernel@gmail.com wrote:
+> From: Yulei Zhang <yuleixzhang@tencent.com>
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  .gitlab-ci.d/crossbuilds.yml | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+> In current system each physical memory page is assocaited with
+> a page structure which is used to track the usage of this page.
+> But due to the memory usage rapidly growing in cloud environment,
+> we find the resource consuming for page structure storage becomes
+> more and more remarkable. So is it possible that we could reclaim
+> such memory and make it reusable?
 > 
-> diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
-> index 7a94a66b4b3..31f10f1e145 100644
-> --- a/.gitlab-ci.d/crossbuilds.yml
-> +++ b/.gitlab-ci.d/crossbuilds.yml
-> @@ -135,3 +135,18 @@ cross-win64-system:
->    extends: .cross_system_build_job
->    variables:
->      IMAGE: fedora-win64-cross
-> +
-> +cross-amd64-xen:
-> +  extends: .cross_accel_build_job
-> +  variables:
-> +    IMAGE: debian-amd64-cross
-> +    ACCEL: xen
-> +    TARGETS: i386-softmmu,x86_64-softmmu
-> +    ACCEL_CONFIGURE_OPTS: --disable-tcg --disable-kvm
-> +
-> +cross-arm64-xen:
-> +  extends: .cross_accel_build_job
-> +  variables:
-> +    IMAGE: debian-arm64-cross
-> +    ACCEL: xen
-> +    TARGETS: aarch64-softmmu
-Could you please simply replace aarch64-softmmu by arm-softmmu in the
-target-list-exclude statement in this file instead of adding a new job for
-arm64? That should have the same results and will spare us one job...
+> This patchset introduces an idea about how to save the extra
+> memory through a new virtual filesystem -- dmemfs.
+> 
+> Dmemfs (Direct Memory filesystem) is device memory or reserved
+> memory based filesystem. This kind of memory is special as it
+> is not managed by kernel and most important it is without 'struct page'.
+> Therefore we can leverage the extra memory from the host system
+> to support more tenants in our cloud service.
 
- Thanks,
-  Thomas
+"is not managed by kernel" well, it's obviously is managed by the
+kernel. It's not managed by the buddy ;)
+
+How is this different to using "mem=X" and mapping the relevant memory
+directly into applications? Is this "simply" a control instance on top
+that makes sure unprivileged process can access it and not step onto
+each others feet? Is that the reason why it's called  a "file system"?
+(an example would have helped here, showing how it's used)
+
+It's worth noting that memory hotunplug, memory poisoning and probably
+more is currently fundamentally incompatible with this approach - which
+should better be pointed out in the cover letter.
+
+Also, I think something similar can be obtained by using dax/hmat
+infrastructure with "memmap=", at least I remember a talk where this was
+discussed (but not sure if they modified the firmware to expose selected
+memory as soft-reserved - we would only need a cmdline parameter to
+achieve the same - Dan might know more).
+
+> 
+> As the belowing figure shows, we uses a kernel boot parameter 'dmem='
+> to reserve the system memory when the host system boots up, the
+> remaining system memory is still managed by system memory management
+> which is associated with "struct page", the reserved memory
+> will be managed by dmem and assigned to guest system, the details
+> can be checked in /Documentation/admin-guide/kernel-parameters.txt.
+> 
+>    +------------------+--------------------------------------+
+>    |  system memory   |     memory for guest system          | 
+>    +------------------+--------------------------------------+
+>     |                                   |
+>     v                                   |
+> struct page                             |
+>     |                                   |
+>     v                                   v
+>     system mem management             dmem  
+> 
+> And during the usage, the dmemfs will handle the memory request to
+> allocate and free the reserved memory on each NUMA node, the user 
+> space application could leverage the mmap interface to access the 
+> memory, and kernel module such as kvm and vfio would be able to pin
+> the memory thongh follow_pfn() and get_user_page() in different given
+> page size granularities.
+
+I cannot say that I really like this approach. I really prefer the
+proposal to free-up most vmemmap pages for huge/gigantic pages instead
+if all this is about is reducing the memmap size.
+
+
+-- 
+Thanks,
+
+David / dhildenb
 
