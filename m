@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13C032D1AFB
-	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:50:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B12F2D1AFA
+	for <lists+kvm@lfdr.de>; Mon,  7 Dec 2020 21:50:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727017AbgLGUrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 15:47:39 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:42566 "EHLO
+        id S1727002AbgLGUrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 15:47:37 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:42564 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726181AbgLGUrg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:47:36 -0500
+        by vger.kernel.org with ESMTP id S1726063AbgLGUrh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 15:47:37 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 00C09305D4FF;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 28797305D500;
         Mon,  7 Dec 2020 22:46:13 +0200 (EET)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id CEDC63072785;
-        Mon,  7 Dec 2020 22:46:12 +0200 (EET)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 067003072784;
+        Mon,  7 Dec 2020 22:46:13 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
+        =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <nicu.citu@icloud.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v11 07/81] KVM: x86: avoid injecting #PF when emulate the VMCALL instruction
-Date:   Mon,  7 Dec 2020 22:45:08 +0200
-Message-Id: <20201207204622.15258-8-alazar@bitdefender.com>
+Subject: [PATCH v11 08/81] KVM: x86: add kvm_x86_ops.bp_intercepted()
+Date:   Mon,  7 Dec 2020 22:45:09 +0200
+Message-Id: <20201207204622.15258-9-alazar@bitdefender.com>
 In-Reply-To: <20201207204622.15258-1-alazar@bitdefender.com>
 References: <20201207204622.15258-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -35,43 +35,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+From: Nicușor Cîțu <nicu.citu@icloud.com>
 
-It can happened to end up emulating the VMCALL instruction as a result
-of the handling of an EPT write fault. In this situation,
-the emulator will try to unconditionally patch the correct hypercall
-opcode bytes using emulator_write_emulated(). However, this last call
-uses the fault GPA (if available) or walks the guest page tables at RIP,
-otherwise. The trouble begins when using VM introspection,
-when we forbid the use of the fault GPA and fallback to the guest pt walk:
-in Windows (8.1 and newer) the page that we try to write into
-is marked read-execute and as such emulator_write_emulated() fails
-and we inject a write #PF, leading to a guest crash.
+Both, the introspection tool and the device manager can request #BP
+interception. This function will be used to check if this interception
+is already enabled by either side.
 
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
+Signed-off-by: Nicușor Cîțu <nicu.citu@icloud.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- arch/x86/kvm/x86.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/svm/svm.c          | 8 ++++++++
+ arch/x86/kvm/svm/svm.h          | 7 +++++++
+ arch/x86/kvm/vmx/vmx.c          | 6 ++++++
+ 4 files changed, 22 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5951458408fb..816801d6c95d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8144,11 +8144,15 @@ static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt)
- 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
- 	char instruction[3];
- 	unsigned long rip = kvm_rip_read(vcpu);
-+	int err;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f002cdb13a0b..e46fee59d4ed 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1104,6 +1104,7 @@ struct kvm_x86_ops {
+ 	void (*vcpu_load)(struct kvm_vcpu *vcpu, int cpu);
+ 	void (*vcpu_put)(struct kvm_vcpu *vcpu);
  
- 	kvm_x86_ops.patch_hypercall(vcpu, instruction);
- 
--	return emulator_write_emulated(ctxt, rip, instruction, 3,
-+	err = emulator_write_emulated(ctxt, rip, instruction, 3,
- 		&ctxt->exception);
-+	if (err == X86EMUL_PROPAGATE_FAULT)
-+		err = X86EMUL_CONTINUE;
-+	return err;
++	bool (*bp_intercepted)(struct kvm_vcpu *vcpu);
+ 	void (*update_exception_bitmap)(struct kvm_vcpu *vcpu);
+ 	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr);
+ 	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 6dc337b9c231..95c7072cde8e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1738,6 +1738,13 @@ static void svm_set_segment(struct kvm_vcpu *vcpu,
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_SEG);
  }
  
- static int dm_request_for_irq_injection(struct kvm_vcpu *vcpu)
++static bool svm_bp_intercepted(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	return get_exception_intercept(svm, BP_VECTOR);
++}
++
+ static void update_exception_bitmap(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4213,6 +4220,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.vcpu_blocking = svm_vcpu_blocking,
+ 	.vcpu_unblocking = svm_vcpu_unblocking,
+ 
++	.bp_intercepted = svm_bp_intercepted,
+ 	.update_exception_bitmap = update_exception_bitmap,
+ 	.get_msr_feature = svm_get_msr_feature,
+ 	.get_msr = svm_get_msr,
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index fdff76eb6ceb..dca2dfe2e30d 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -294,6 +294,13 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
+ 	recalc_intercepts(svm);
+ }
+ 
++static inline bool get_exception_intercept(struct vcpu_svm *svm, int bit)
++{
++	struct vmcb *vmcb = get_host_vmcb(svm);
++
++	return vmcb_is_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
++}
++
+ static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
+ {
+ 	struct vmcb *vmcb = get_host_vmcb(svm);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c3441e7e5a87..93a97aa3d847 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -807,6 +807,11 @@ static u32 vmx_read_guest_seg_ar(struct vcpu_vmx *vmx, unsigned seg)
+ 	return *p;
+ }
+ 
++static bool vmx_bp_intercepted(struct kvm_vcpu *vcpu)
++{
++	return (vmcs_read32(EXCEPTION_BITMAP) & (1u << BP_VECTOR));
++}
++
+ void update_exception_bitmap(struct kvm_vcpu *vcpu)
+ {
+ 	u32 eb;
+@@ -7611,6 +7616,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.vcpu_load = vmx_vcpu_load,
+ 	.vcpu_put = vmx_vcpu_put,
+ 
++	.bp_intercepted = vmx_bp_intercepted,
+ 	.update_exception_bitmap = update_exception_bitmap,
+ 	.get_msr_feature = vmx_get_msr_feature,
+ 	.get_msr = vmx_get_msr,
