@@ -2,102 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0D052D1E46
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 00:25:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E4DD2D1E9F
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 00:57:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727723AbgLGXWx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 18:22:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38806 "EHLO
+        id S1728237AbgLGX4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 18:56:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726196AbgLGXWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 18:22:53 -0500
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F484C061749
-        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 15:22:13 -0800 (PST)
-Received: by mail-ot1-x341.google.com with SMTP id q25so2426499otn.10
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 15:22:13 -0800 (PST)
+        with ESMTP id S1727157AbgLGX4X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 18:56:23 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E9AC061749
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 15:55:42 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id bo9so21976774ejb.13
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 15:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ecLFgA6ZVCXrlWighsImjDrXnRjbX/ebIaxkalo6/1w=;
-        b=m9uza9hGO/gEO45Mlbe5J+I8EvvJeJHIkmRVRSp5NbFk4RQSlSp828okY3HqNFwRmC
-         lg6oDYOANzhyajOmaeldvAnga3DuDtJf72t/6jMyIERuC0EYCg8QpUGyahruhT7Eebn5
-         uE1Uj1QZ+pH7wjFxnjU69zipvFLf+HflQkjR/PKvWLN33evvvHJ/vCCxzmD+Y77OipEb
-         A1Uhzily9tuqOO3xODNqNWkiUSO41F/P6jx+hXJeavMGrPBJeJod9kgVEuUv3rsRrP1Y
-         wHCG+XFGYgqDZO0zLbMuJkvx2DI2QisX3UvkfvrKiqwKu2FyPFb/OIs4nwYF8gRZXlGm
-         AtBQ==
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Kzl0AALsmS8BSI2s1yWwb1eTTjeSxRukzNssdVVqA8I=;
+        b=PN/ZQBXNMBzJU80aKISghDI5zOgu9bkTExQbUVp9TffgV4DSdh8Gm0j09upPo7OVfV
+         QIQVYYkLya7Whmg74erX1jwfvODegvzHQ+IDK2F+7S4yvyvKHrHSW7MFE+v8iRDgwrBb
+         qEvRmCnLAN6FJERQwnSiTOyMnvUYPhvyg3Ii9Q/ZrFVJcG8cN8NINRsYfLuD3N0Dg+1A
+         17FM47FM1HcYrdAg6PATgIKW/Xj4wFpfEDQ8J3wFWbROIxSUlwuDQIgmFz6ecTQ6jZK4
+         UilqtuW3YV6B7gOEml3D5jC06nYF/busfgH4b+UHzdshegdwbUzH0sq7yjbWBEGLdjGl
+         SPcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ecLFgA6ZVCXrlWighsImjDrXnRjbX/ebIaxkalo6/1w=;
-        b=D2MxO91LmMM5MsZ5XXHW7qIZr6FlcSlfR1O/uFAdNaSX1sI3lLO+ZSJ0ZAN7JvHKJj
-         wfnBiu7k2gFzP0V7m9eKgDalRaDvEKOT4eyXSdOnlUgGXj2NdAYDz+Q6asV7Ct7cl29y
-         a9saxokmVBEjGxUuDINdL73s28DkgAZRJIymO98JIrlN3wAzWNx6WhNbG+bcoUDZYW6P
-         F63oxHaVdtOFIt7bRZbzeV1xVk2D2hqdR60jzt42KulhwJ8pWusQ29vA/lAk86XTvINF
-         YPu39nLmDtRFj0FPCngn7JHhLJmpDN0/21zU6cFSxhw3sNa5wsh6lZWw4BZRQpMPMAyt
-         /8bg==
-X-Gm-Message-State: AOAM53141rlEM6ap2Yd8/vVR7HnI3nCNePGYCg17JRTIzTl6K58pRXXR
-        XegpgzVUycjrzUZWTUngNylVWr26VbpDK26S1aIm6w==
-X-Google-Smtp-Source: ABdhPJx72Bm1nE0g6cD2iqMrP2OAG4RUggDRs+kLGI/Mzm3KLvKIiWvl0+zmUu779zCvhLp7KCnx2Hj9ArckxZjwkJM=
-X-Received: by 2002:a9d:d01:: with SMTP id 1mr14480096oti.295.1607383332277;
- Mon, 07 Dec 2020 15:22:12 -0800 (PST)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=Kzl0AALsmS8BSI2s1yWwb1eTTjeSxRukzNssdVVqA8I=;
+        b=oeNYtIy7zd6kfCZPkcn9fAU+GY0/8E06JUryD416vM11PRK0AjDOag9LhZ9Koa3Ecg
+         baMSgaVaP8emGd40Ye8HpJGwlumvZ3qBy3zqEuFyVC50cY1MmD0A8oX6w/RBUBojf8i6
+         m/8SKPyDuP3xlJJBOPKB2S1BIkFON6ZamSUTY7A43cNyqiqQeF/g7+LbowdK0bIHhp8a
+         MWaAhh6iqmYlWfR4s2H09YRuLFaNgpNAaDvFN742XQhVD38Ew7XwxLd9wS/ktkd3x2K6
+         H/79E3ChgWC3XoeYqETkXWiF9ZZiIKvzVxciF/jivGOpqot5vJ2qU6qsN6JJbuON+OXL
+         /eXw==
+X-Gm-Message-State: AOAM532FE4sHdIuVxuP4fBE+o8fqbynbwibHwo5oyNjK40tB8VwmLcig
+        ubwVy1zDFm3qGMQLyWwl2TbHfTb1Z2c=
+X-Google-Smtp-Source: ABdhPJzVOcw+tUDWczT7m8MPPc4QIS0c7OXNkIN6I3lbJUhs0wn/J5cPJB+VnQLTpOm6ehLZyXX/7A==
+X-Received: by 2002:a17:906:1945:: with SMTP id b5mr22157491eje.388.1607385341622;
+        Mon, 07 Dec 2020 15:55:41 -0800 (PST)
+Received: from x1w.redhat.com (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
+        by smtp.gmail.com with ESMTPSA id dd18sm13785298ejb.53.2020.12.07.15.55.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Dec 2020 15:55:40 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To:     qemu-devel@nongnu.org
+Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH 0/7] target/mips: Add translate.h and fpu_translate.h headers
+Date:   Tue,  8 Dec 2020 00:55:32 +0100
+Message-Id: <20201207235539.4070364-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <160738054169.28590.5171339079028237631.stgit@bmoger-ubuntu> <160738067105.28590.10158084163761735153.stgit@bmoger-ubuntu>
-In-Reply-To: <160738067105.28590.10158084163761735153.stgit@bmoger-ubuntu>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 7 Dec 2020 15:22:00 -0800
-Message-ID: <CALMp9eTk6B2832EN8EhL51m8UqmHLTfeOjdKs8TvFSSAUxGk2Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86/cpufeatures: Add the Virtual SPEC_CTRL feature
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        kyung.min.park@intel.com, LKML <linux-kernel@vger.kernel.org>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, mgross@linux.intel.com,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kim.phillips@amd.com,
-        wei.huang2@amd.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 7, 2020 at 2:38 PM Babu Moger <babu.moger@amd.com> wrote:
->
-> Newer AMD processors have a feature to virtualize the use of the SPEC_CTRL
-> MSR. This feature is identified via CPUID 0x8000000A_EDX[20]. When present,
-> the SPEC_CTRL MSR is automatically virtualized and no longer requires
-> hypervisor intervention.
->
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h |    1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index dad350d42ecf..d649ac5ed7c7 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -335,6 +335,7 @@
->  #define X86_FEATURE_AVIC               (15*32+13) /* Virtual Interrupt Controller */
->  #define X86_FEATURE_V_VMSAVE_VMLOAD    (15*32+15) /* Virtual VMSAVE VMLOAD */
->  #define X86_FEATURE_VGIF               (15*32+16) /* Virtual GIF */
-> +#define X86_FEATURE_V_SPEC_CTRL                (15*32+20) /* Virtual SPEC_CTRL */
-
-Shouldn't this bit be reported by KVM_GET_SUPPORTED_CPUID when it's
-enumerated on the host?
-
->  /* Intel-defined CPU features, CPUID level 0x00000007:0 (ECX), word 16 */
->  #define X86_FEATURE_AVX512VBMI         (16*32+ 1) /* AVX512 Vector Bit Manipulation instructions*/
->
+As the 'extract MSA' series keep growing, yet another=0D
+preliminary series.=0D
+=0D
+Basically we add declarations for everything that will=0D
+be reused by code extracted from the big translate.c.=0D
+=0D
+Doing so now, we avoid the intermediate step of using=0D
+.c.inc files, and we compile as different objects.=0D
+(We would have to do this later anyway).=0D
+Slower, as it involve more series, but we can bisect.=0D
+=0D
+This series is common to the other 'extract XYZ from=0D
+translate.c' series.=0D
+=0D
+Regards,=0D
+=0D
+Phil.=0D
+=0D
+Based-on: mips-next (https://gitlab.com/philmd/qemu/-/tree/mips-next)=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (7):=0D
+  target/mips/translate: Extract DisasContext structure=0D
+  target/mips/translate: Add declarations for generic code=0D
+  target/mips: Use FloatRoundMode enum for FCR31 modes conversion=0D
+  target/mips: Extract FPU helpers to 'fpu_helper.h'=0D
+  target/mips/fpu_helper: Remove unused headers=0D
+  target/mips: Declare generic FPU functions in 'fpu_translate.h'=0D
+  target/mips: Extract FPU specific definitions to fpu_translate.h=0D
+=0D
+ target/mips/fpu_helper.h    |  59 +++++++++++++=0D
+ target/mips/fpu_translate.h |  96 +++++++++++++++++++++=0D
+ target/mips/internal.h      |  49 -----------=0D
+ target/mips/translate.h     |  83 ++++++++++++++++++=0D
+ linux-user/mips/cpu_loop.c  |   1 +=0D
+ target/mips/fpu_helper.c    |   7 +-=0D
+ target/mips/gdbstub.c       |   1 +=0D
+ target/mips/kvm.c           |   1 +=0D
+ target/mips/machine.c       |   1 +=0D
+ target/mips/msa_helper.c    |   1 +=0D
+ target/mips/op_helper.c     |   1 +=0D
+ target/mips/translate.c     | 163 +++++-------------------------------=0D
+ 12 files changed, 267 insertions(+), 196 deletions(-)=0D
+ create mode 100644 target/mips/fpu_helper.h=0D
+ create mode 100644 target/mips/fpu_translate.h=0D
+ create mode 100644 target/mips/translate.h=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
