@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B269D2D35DF
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:13:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 634712D35DC
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:13:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731116AbgLHWHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 17:07:02 -0500
-Received: from mail-co1nam11on2072.outbound.protection.outlook.com ([40.107.220.72]:15073
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S1730920AbgLHWGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 17:06:45 -0500
+Received: from mail-mw2nam12on2074.outbound.protection.outlook.com ([40.107.244.74]:34912
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729512AbgLHWHC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 17:07:02 -0500
+        id S1730486AbgLHWGm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 17:06:42 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JSghebjzTLB64Dy+MwgzW3M6rNqhlEc/EEd9S2WaKjzRbt/T0zSJTRuOP8x7QKf3JiJiIx3vSDZ2wjn+iJrUOOAqE7cL3aYA+HUCNFFgkb9+EzcfG3oav8Ztv+buuHkkBPRvkDckGOQeOUABFbx3hpw4hV90Tu78J8p4PdUN1x4Wa51tReG5hINEwE4vVKPNsPoJhQBFHEUQwkRXXDcJRXg9ZGhf65BtLlJqbMhHOimfV4aTn69JE5Zh/ey7PuHDEMy+W5FqXVREqzF5jyPbWlRrBnYMEyZFglZRpCzQZa/eFIW/Nz0PxjSG6jkypuY2si4uLqZhNwFerBfYUeVSig==
+ b=KvmzFZp2vVvO7DTSbWAgMde4DOy5jSACGsXF9ZQDgGvAfdjkQ+eJUln4OQxZmYFsBzt5siWKJ3doAzxWQkAeQhwMtbftn31UEsVqzPfOLqMjAF07dTcIzqOUfG/P82MRubd0L++OM3eCgbyzLQEtlkoIxQyk2AMfHCBiP/Ufwe6cYytbgh6lUU5yq/xEWONr8U80qbFnvn9V6cVxxh3l5nDrq2yhTQtnFXE/pDDd/8TvKJI94fW3Pr4asZ3U4etYkw+wMcxz6wDDckEAUzzFHfHtqTAufWtfV/0limQr/kigqeW5qKU/32u2ACHwl9IJtUvW7NV9ZVQcFaCDwsMfzQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/GzUfptb1o9LpS39d6U0Vl8Zl4L1BADu/Gjsvh7RIEI=;
- b=T8ev5MYcgVN6Z+HKcEC6rY/5KL0vDZ73yg0AC1ORH+X1TqJZUq6lRrbU4MgGRqqltXXTy8vl+kXWhJQv7XB0BGFZ1aT/f1dxH5rp/3ePajiXW4ub/VMO6n/OsOy15cIj5LJPwTXyIkw16mvRb4YXFaDdyfyo3FM48xLVRnfZO9s0++u1oOCbm18r2ZiFQJA0+ehfZZzGZkFLMFaGmt6nF9ux4mpagpzrW3vPCWC5iu3FUNBnk50BUkbnIfgvvqLQzy5EESAVpKpRxeoJ/duz1v13v79JzUw9DbqCth/hXM89hjHGvBDUK71vq/pXHi0hXQh03/Kyb0S8kd6JkoNkEA==
+ bh=M75rSIoIjHyp8gjWTs/3Jm6+mwNRo44GL4tGH8ct4lA=;
+ b=DEQpy4LrRZIEJyYwLCPkUBz4iwoHNp4jzcuuDq+4CL4DxNInveRmfPbH9WbyzO2JdDXjDpdchV4+1p76AmGx6ugd0smGR67QkG6mIbWsfLdBYqRsHXnt1VmkbuwHxhbsU3EYQoHvAeFQHlz7RRoyDjm+awG36CUVWUN4B19OKOoePSmQNDLiqnOrUkoOCXbanYUcktVojnEoT610vUJKPpcwYZv7Pb0YgO6RXPw4cHE+OMzbCkzCw4F7EuyRGk2t9LVfA5Faa+UZHaC83A0DsMZfr4NV3yLBJs5M4Dzf8lG6USatSzKh2HP9ymRZg+xElLGh1Lv3Yb6YMlQACZyWig==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/GzUfptb1o9LpS39d6U0Vl8Zl4L1BADu/Gjsvh7RIEI=;
- b=xbG7KbV9WcCszAsQohT00NouK959YYgyCresodw40wktVKSvpIELEGoLcSKPW0RFLYFPPrrLSkixABPcDOiEh09KgQM5PQPx3UwiqJ2oYvzMSyDA2xtK/6G0JUlfh+dbtI2BGqMLGwuxqFU2ZmFTKMxkRIYS3XfLXnMn8x9z8Kc=
+ bh=M75rSIoIjHyp8gjWTs/3Jm6+mwNRo44GL4tGH8ct4lA=;
+ b=gdfR6GmfRd6U5VJq7ciyQhjGZXm0p6Z9BP2hgOw8lkA9hu9UlksMIKDo+MLHZksJQr/4WqcHhuONpEXuoE8gTqfUfLoa+486lL/pJL4aOMVbVH0Upxp2KsKcHUF2wBIq3Q1wmZ5BgT+utBzs/nbnpCTNhyMfK+o9DtNd4UezhE8=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2640.namprd12.prod.outlook.com (2603:10b6:805:6c::20) with
+ by SA0PR12MB4415.namprd12.prod.outlook.com (2603:10b6:806:70::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.21; Tue, 8 Dec
- 2020 22:05:32 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.23; Tue, 8 Dec
+ 2020 22:05:50 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3632.021; Tue, 8 Dec 2020
- 22:05:32 +0000
+ 22:05:50 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -45,74 +45,73 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, srutherford@google.com,
         venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH v9 05/18] KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
-Date:   Tue,  8 Dec 2020 22:05:21 +0000
-Message-Id: <50c8df07a4469bd121c335dbe6107c55d459259e.1607460588.git.ashish.kalra@amd.com>
+Subject: [PATCH v9 06/18] KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
+Date:   Tue,  8 Dec 2020 22:05:38 +0000
+Message-Id: <97f0da36644b54701cb8a85b5d9394585da3a66f.1607460588.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1607460588.git.ashish.kalra@amd.com>
 References: <cover.1607460588.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH0PR03CA0032.namprd03.prod.outlook.com
- (2603:10b6:610:b3::7) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+X-ClientProxiedBy: CH2PR05CA0007.namprd05.prod.outlook.com (2603:10b6:610::20)
+ To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by CH0PR03CA0032.namprd03.prod.outlook.com (2603:10b6:610:b3::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17 via Frontend Transport; Tue, 8 Dec 2020 22:05:31 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by CH2PR05CA0007.namprd05.prod.outlook.com (2603:10b6:610::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.5 via Frontend Transport; Tue, 8 Dec 2020 22:05:48 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 99933383-f05e-4c4a-2dd6-08d89bc56214
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2640:
+X-MS-Office365-Filtering-Correlation-Id: f273f058-e10c-4e9f-c216-08d89bc56c64
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4415:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB2640905291E7E8C0FFE56DA18ECD0@SN6PR12MB2640.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB44156D2EE300B493D2E971528ECD0@SA0PR12MB4415.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VvM80az3OdRxAeoX2+5VTIShvCceSFmM1aWtB9WGrVwwVYhoT7eDKWCe1L42uSrCpfR/BCv1UwWvYu2mJUxBDn8ZplXdtRJsq84ToWqEYPqO7LbOaFMH+B3h6zk7Xzh/lsFZGZXrH6p8//QT9OEHuTLrcTL+1Pmb+rTpunvTKS6jWDfpHVBk6kRSAxMV15TGINQxVLrZ3LP5uDK75ddXsMhho4JZcnB4F9OHHrDNZ6ps9sy9HgRtydu+X5MUKqSKRx9Np0Wek0iQdCvp6Ybn73y4XKR5Ta2Vd9J2lkzXPTlbNzYEWUjSO+RUAq8zfwnzBMYgtVwAqlArnyuJsvdAKBG2iDqczJ9hyzECza+huYArrw2Awg0kQ5+WzwjtN76A
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(366004)(136003)(2616005)(2906002)(66556008)(83380400001)(508600001)(4326008)(5660300002)(6916009)(52116002)(7416002)(66476007)(6486002)(66574015)(34490700003)(186003)(6666004)(8936002)(16526019)(8676002)(66946007)(86362001)(7696005)(26005)(956004)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?czFJNlpydDFyNmpGcldIN3JOOTZJQ1phNjhDbk5FRnNMdzAxbC8vRWFTQVYz?=
- =?utf-8?B?dERPYytSZDF0Nms3VlVYQjE4M0t4Q05XQlMrVWRjN09RVFJlYURid2gwMHdS?=
- =?utf-8?B?L1FFem5nam8xL3RqVEN1cVdOZzJxMk84ZFB1N2l5bGRjK0wxcU0rQlV1YnlG?=
- =?utf-8?B?OFpTQks5bUhscjM4YkUrZWl2Wnc4TGNHNXVZbXM2L0JUU1pZQVJxeG9oUmhn?=
- =?utf-8?B?RWNKUVRONC9DZnMxWWZ2K3VwbWhtblF3ZitRajNvNXUyMmxnWGhCb0lxc2do?=
- =?utf-8?B?K2I3VXJNbkhCeWxQNUtjN2lrZFhJQWd4dHRFd2EwQTZVODNnSmRFZ25NanhX?=
- =?utf-8?B?TlVMMTZvREUxckxtZmI2SlhBaW9DVFd5OGlESU1yUDBxM2JPdE1iUzZNWWpj?=
- =?utf-8?B?VG9CTUxrU1NLaVByakxTQlArUUV5Z3JOSXFuWWJFZVd0S3lSa0R4YjkvNkM4?=
- =?utf-8?B?aFVhandWdkczT2xaMytkT0tFUTRxazZ6azA2RmY5SEVSY0g3bXVJaUh6bFJ0?=
- =?utf-8?B?bHpjL2h0UnVuc2N1aUhobHBTQjlmOXZkcGlNd3VabktNZUZrNXRIZzVyekZY?=
- =?utf-8?B?eFg3M0NqUXZiaUc5VndzOGtHWVZvYWtTRmw1VVErOWJ0bmNQNkJJUkE1bHRt?=
- =?utf-8?B?eEJEUjdLc3VhOVUybzI2UFpwZEFvK0JXeVV0YTBxelR0QlNYUFV1MEhYSWlG?=
- =?utf-8?B?bkp4dmtKUU5MQlI1Q2YrR1NVajFZQWQrZWZtYzE2RzRoSy9mYVZndGJBQTFR?=
- =?utf-8?B?Wkwyd0d5a2ZVVk14VVF6QnZNUjhuQzhJQnNudSsxYVY3RXFhL0VwODUrTk1m?=
- =?utf-8?B?R2pGUUV5U0FFMldkVG9zbDdpV2xXMEg2eU5aaW1SWnNxWlJkQnJQRWNCOENw?=
- =?utf-8?B?eE5XNmlXOUxjQlFZcGx1eCtNd0RVUkpKRlJoOElUaDlERDErWGxqckNCUmNp?=
- =?utf-8?B?S25TeDRxKzQ0SlNJLzh1anBoeFNId0RremdSeUZWRmxBMVNZdlFLcFRYNC9P?=
- =?utf-8?B?em1EWmpjeVk3MHM5WnZKZ1pQRzFkWldIOUR4bnNiZU9kOEt2MmNFRDU3eXNB?=
- =?utf-8?B?NHV2UjRKOHEwWC9md0szaVZoYTYvcXNRS3kvRzNaOXB1dVp1c1JRcVJIa2NC?=
- =?utf-8?B?aUhPOE1ZSXF6dldSTzd4My9NQlhPUGR6TVVOOUFuU0Q3dzRDVkQ3c0Mxcmwy?=
- =?utf-8?B?ZzNRc1BCekQyRXk2ZEZxM2NzT2E1RmEwcjhyRzYyeGNiQXd6NGZ1aURyWlVS?=
- =?utf-8?B?QW5Sd2JObW5BbHZTRGFJT3lUSEJST1IyaUJMU2VaOFZtZS91SjdGM0o5Q21K?=
- =?utf-8?Q?HbzMUZLpnawDE=3D?=
+X-Microsoft-Antispam-Message-Info: xvfvOQXNvfEoQrW+tK7kW+NQy0mPgZEks7Z8YZmf+lnIBbjSZS+IAFc44whdb1q1MolZzyz6ZZcnJ5efrLGN0Z3rrL/rlp/o2FcM2nqkWtwUhXm6JSa/W4EpTyhnI5p67W+YPb9ojt9LGdmv6yYwQKoefjEp8hIGNdQP6QwbrY1LwEQnVuHOq8ICizzw5byX7cjPaFtiLZ4s5zErkrS+uNjNqilUT/dke73+A1dO634gN0CqCiUsV7oHANu8ioy60dfi54iqwVsVZRHIbxg17KRsBJDsCw1UFtGeIq+FYju1pP63xRrv95e1CZBE7N0oCY29/dGkylaZK4dEB2ZAJz4q0P3L8jSgVDQX1D3butkNR8jSirZ4sX8hyeVT0pds
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(366004)(34490700003)(83380400001)(186003)(4326008)(86362001)(6916009)(7416002)(16526019)(6486002)(5660300002)(66556008)(8676002)(8936002)(508600001)(7696005)(52116002)(66574015)(66946007)(956004)(36756003)(2906002)(6666004)(26005)(66476007)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?K2VpN252alZrbUVQakFwWlRCYXczcEF0QkpVTjRDVjFsbU1WM0pYVUg2MjdE?=
+ =?utf-8?B?RUVUeWgzZUFQVjl4RVQ5YzdDMlowQ25oVTlPS3k1cm1jazlPTlorYTdPUUVF?=
+ =?utf-8?B?WkJ6NWk1WFE4K2xFNDdDTVp6VEFnOU1IUmsySzBWVWpSRENqalU1QWJDTVlt?=
+ =?utf-8?B?SzJPZ0p3eHk5WkYvVDlXcXcxL0dYc3JBSW1tY0d1M0lpNHBvTG5PcUNKVHg1?=
+ =?utf-8?B?SnUzV2tQUC96d2F5VFNIWkNjalZ2Y0pRNE5udUVJVWFVTlAxWWZvVGNxU09p?=
+ =?utf-8?B?MHdNUEVoT0I1WHlMSlZEWGRQQWFzZUtkTVNwaHBUWDZldGtveERQL3lmREJI?=
+ =?utf-8?B?ZzloWThkTitYRWhzVG95N0NtSEtPZXBqVTMzdXJvazlYMXNvaVJBVUdaMUpx?=
+ =?utf-8?B?ZmNVWGpaOWh2ZlcydGxrcXpYQVZHRjFwVHJqN1pLV3BieWtybXpySklLMCt3?=
+ =?utf-8?B?SlVsYWtLSzhQSTQ5QitUOG8zVkM0NmphSngvbWNVWnp4THVhWnZTVldDNUhu?=
+ =?utf-8?B?dm1lYUZVWnVKZGpoVHorK3l2RGVmQmo4ZndWUDNacVFXRTRWc1NYU1pyYjNL?=
+ =?utf-8?B?bmEzbzJKVHpPMG5UM0ZVUTdSdnhEcjBURHFTUGh0a0NlL0VNVG9PUkJzTGJE?=
+ =?utf-8?B?bFBHVlhGdkw0Mnh2aEM3QW5wSWNPVFVNVWJBcDZnenUyWmpBQWs3cG45U0Rl?=
+ =?utf-8?B?QzErL095T1VCS3VNVFA3cndObWVtZGI1VFVTODdiTDJocmVEK2ZOZjlkejlZ?=
+ =?utf-8?B?d2tOakNhZk53eXNYZVhNMUN1bUJlbDFQV285UXhWd3lnV1RnMzRXZk9NaGtV?=
+ =?utf-8?B?ZXQ5c3NqT0x6cFZlL04yOG1Tdk9sRG9wS2o1dTN3M1RaYUNjQ1UyV25mUEkx?=
+ =?utf-8?B?cGprUFF0YndzcmRna1JIWUdYUmNkTjNBTjNNQWJBUm5oR0h6R0M3aStJRjcx?=
+ =?utf-8?B?QkMyVTU1bm1mMndlUVAxeWFkdHgxNDcrODVDdURDQWo5SkpMc1Z4RTNNSnNP?=
+ =?utf-8?B?QWtRc2xVcW1OQ0MvNVdzSlpOVVN3Yk9ZK1c0OXBhb1I5WUcyMWQzU0drZlp6?=
+ =?utf-8?B?bFgrTXhxZE53MUlBSXB4aHNpUzQrTU5Mcy9rSE02WjNNQ3NsendWbG92K2hE?=
+ =?utf-8?B?QndrNndWQ3FEc0Q5VW1jTGJ2SmVsanU5N1ZNSHo2ekVKVEJMK3FodGl2U05v?=
+ =?utf-8?B?VGVJam95MUtmcVdzZDArMW5aOXdtNnRJN25ReVpkbjdkRE9odEgvNjUxaUwr?=
+ =?utf-8?B?c3hmWDRmc2FSQ2VYak1aeHNpZlQyOUNIWXRGWXB4dis0U2p2RDhJZ2Iwank0?=
+ =?utf-8?Q?8EHb0hrYXm/QFvZbClBfUyfv0MsgKO2iVk?=
 X-OriginatorOrg: amd.com
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2020 22:05:32.8208
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2020 22:05:50.1560
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99933383-f05e-4c4a-2dd6-08d89bc56214
+X-MS-Exchange-CrossTenant-Network-Message-Id: f273f058-e10c-4e9f-c216-08d89bc56c64
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FWJsLadhdomjYCqT7vCQVlK0iicVx1G/jf5R2r2jW8U26u1uYG6E2ZWTvEi2ZiLhvSRPvn6b9RznyQVU7dptMw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2640
+X-MS-Exchange-CrossTenant-UserPrincipalName: kKjgp2+6LTMGroCIAZ1hLx3JMCEIU97RlbH6c7mW4V/QM4gq1Kx0W5vPiUVwxfAJBylYl7neQuFTzg71RRfBpw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4415
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The command is used for copying the incoming buffer into the
-SEV guest memory space.
+The command finalize the guest receiving process and make the SEV guest
+ready for the execution.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -125,168 +124,74 @@ Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: x86@kernel.org
 Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
 Reviewed-by: Steve Rutherford <srutherford@google.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- .../virt/kvm/amd-memory-encryption.rst        | 24 ++++++
- arch/x86/kvm/svm/sev.c                        | 79 +++++++++++++++++++
- include/uapi/linux/kvm.h                      |  9 +++
- 3 files changed, 112 insertions(+)
+ .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
+ arch/x86/kvm/svm/sev.c                        | 23 +++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
 diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index 079ac5ac2459..da40be3d8bc2 100644
+index da40be3d8bc2..1f7bbda1f971 100644
 --- a/Documentation/virt/kvm/amd-memory-encryption.rst
 +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -351,6 +351,30 @@ On success, the 'handle' field contains a new handle and on error, a negative va
+@@ -375,6 +375,14 @@ Returns: 0 on success, -negative on error
+                 __u32 trans_len;
+         };
  
- For more details, see SEV spec Section 6.12.
- 
-+14. KVM_SEV_RECEIVE_UPDATE_DATA
-+----------------------------
++15. KVM_SEV_RECEIVE_FINISH
++------------------------
 +
-+The KVM_SEV_RECEIVE_UPDATE_DATA command can be used by the hypervisor to copy
-+the incoming buffers into the guest memory region with encryption context
-+created during the KVM_SEV_RECEIVE_START.
-+
-+Parameters (in): struct kvm_sev_receive_update_data
++After completion of the migration flow, the KVM_SEV_RECEIVE_FINISH command can be
++issued by the hypervisor to make the guest ready for execution.
 +
 +Returns: 0 on success, -negative on error
-+
-+::
-+
-+        struct kvm_sev_launch_receive_update_data {
-+                __u64 hdr_uaddr;        /* userspace address containing the packet header */
-+                __u32 hdr_len;
-+
-+                __u64 guest_uaddr;      /* the destination guest memory region */
-+                __u32 guest_len;
-+
-+                __u64 trans_uaddr;      /* the incoming buffer memory region  */
-+                __u32 trans_len;
-+        };
 +
  References
  ==========
  
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 25f869dc1448..34240c022042 100644
+index 34240c022042..edd98a8de2f8 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -1265,6 +1265,82 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+@@ -1341,6 +1341,26 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
  	return ret;
  }
  
-+static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
 +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct kvm_sev_receive_update_data params;
-+	struct sev_data_receive_update_data *data;
-+	void *hdr = NULL, *trans = NULL;
-+	struct page **guest_page;
-+	unsigned long n;
-+	int ret, offset;
++	struct sev_data_receive_finish *data;
++	int ret;
 +
 +	if (!sev_guest(kvm))
-+		return -EINVAL;
++		return -ENOTTY;
 +
-+	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-+			sizeof(struct kvm_sev_receive_update_data)))
-+		return -EFAULT;
-+
-+	if (!params.hdr_uaddr || !params.hdr_len ||
-+	    !params.guest_uaddr || !params.guest_len ||
-+	    !params.trans_uaddr || !params.trans_len)
-+		return -EINVAL;
-+
-+	/* Check if we are crossing the page boundary */
-+	offset = params.guest_uaddr & (PAGE_SIZE - 1);
-+	if ((params.guest_len + offset > PAGE_SIZE))
-+		return -EINVAL;
-+
-+	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
-+	if (IS_ERR(hdr))
-+		return PTR_ERR(hdr);
-+
-+	trans = psp_copy_user_blob(params.trans_uaddr, params.trans_len);
-+	if (IS_ERR(trans)) {
-+		ret = PTR_ERR(trans);
-+		goto e_free_hdr;
-+	}
-+
-+	ret = -ENOMEM;
 +	data = kzalloc(sizeof(*data), GFP_KERNEL);
 +	if (!data)
-+		goto e_free_trans;
++		return -ENOMEM;
 +
-+	data->hdr_address = __psp_pa(hdr);
-+	data->hdr_len = params.hdr_len;
-+	data->trans_address = __psp_pa(trans);
-+	data->trans_len = params.trans_len;
-+
-+	/* Pin guest memory */
-+	ret = -EFAULT;
-+	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
-+				    PAGE_SIZE, &n, 0);
-+	if (!guest_page)
-+		goto e_free;
-+
-+	/* The RECEIVE_UPDATE_DATA command requires C-bit to be always set. */
-+	data->guest_address = (page_to_pfn(guest_page[0]) << PAGE_SHIFT) +
-+				offset;
-+	data->guest_address |= sev_me_mask;
-+	data->guest_len = params.guest_len;
 +	data->handle = sev->handle;
++	ret = sev_issue_cmd(kvm, SEV_CMD_RECEIVE_FINISH, data, &argp->error);
 +
-+	ret = sev_issue_cmd(kvm, SEV_CMD_RECEIVE_UPDATE_DATA, data,
-+				&argp->error);
-+
-+	sev_unpin_memory(kvm, guest_page, n);
-+
-+e_free:
 +	kfree(data);
-+e_free_trans:
-+	kfree(trans);
-+e_free_hdr:
-+	kfree(hdr);
-+
 +	return ret;
 +}
 +
  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
  {
  	struct kvm_sev_cmd sev_cmd;
-@@ -1321,6 +1397,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_RECEIVE_START:
- 		r = sev_receive_start(kvm, &sev_cmd);
+@@ -1400,6 +1420,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_RECEIVE_UPDATE_DATA:
+ 		r = sev_receive_update_data(kvm, &sev_cmd);
  		break;
-+	case KVM_SEV_RECEIVE_UPDATE_DATA:
-+		r = sev_receive_update_data(kvm, &sev_cmd);
++	case KVM_SEV_RECEIVE_FINISH:
++		r = sev_receive_finish(kvm, &sev_cmd);
 +		break;
  	default:
  		r = -EINVAL;
  		goto out;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index a9e6ffcfe7e2..fc0a48c37aac 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1673,6 +1673,15 @@ struct kvm_sev_receive_start {
- 	__u32 session_len;
- };
- 
-+struct kvm_sev_receive_update_data {
-+	__u64 hdr_uaddr;
-+	__u32 hdr_len;
-+	__u64 guest_uaddr;
-+	__u32 guest_len;
-+	__u64 trans_uaddr;
-+	__u32 trans_len;
-+};
-+
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
- #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
 -- 
 2.17.1
 
