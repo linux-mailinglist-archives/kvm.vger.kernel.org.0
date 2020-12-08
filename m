@@ -2,135 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E60012D1EBE
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 01:02:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08A142D1F0F
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 01:38:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728355AbgLHACR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 19:02:17 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54824 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726207AbgLHACQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Dec 2020 19:02:16 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B7NWYHC086651;
-        Mon, 7 Dec 2020 19:01:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=C7ZENVW1dr4uhcX3MvbQ3d8uls/tihQUr88RU0IrEus=;
- b=q81G/1vzAZ8DL5fchF19kT+aZy3wHw13dGYLSna4AaLOILAGa2FgEGFFpw/NeBrvOyeb
- NZPjE+2uba899ND+qOtlq20TaBtFMnf60vR8NBxQQgyR2gAHQZSJp3qzEsONZn2jnN0b
- Qu+JusCaFneQLF3J03eyDNY8oqFoyfSZh3bN8TA/rU+P+9t/vVcTU11RUqWJNs4Bf00o
- T4q46KZiaWI16kWpY/Y8Hy1E+MHhOCWuK5oeBpUrKmq0jPuRNwvkkUeLYsQy+yZ65Pc7
- TNWvYxmUlkWfhczpYil0sV1+bYWMmSjU074ZiMphxu07vQIeQXAGk3rpmnt07hT4o+2V 2A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 359wwjryq7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 19:01:33 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B7NsJCP155829;
-        Mon, 7 Dec 2020 19:01:33 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 359wwjrypg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Dec 2020 19:01:33 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B7NqphK018707;
-        Tue, 8 Dec 2020 00:01:31 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3581u83030-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Dec 2020 00:01:31 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B801Sdw52429124
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Dec 2020 00:01:28 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2FD564C058;
-        Tue,  8 Dec 2020 00:01:28 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9036D4C050;
-        Tue,  8 Dec 2020 00:01:27 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.6.119])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Tue,  8 Dec 2020 00:01:27 +0000 (GMT)
-Date:   Tue, 8 Dec 2020 01:01:25 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com, david@redhat.com,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH] s390/vfio-ap: Clean up vfio_ap resources when KVM
- pointer invalidated
-Message-ID: <20201208010125.209883f5.pasic@linux.ibm.com>
-In-Reply-To: <683dd341-f047-0447-1ee8-c126c305b6c2@linux.ibm.com>
-References: <20201202234101.32169-1-akrowiak@linux.ibm.com>
-        <20201203185514.54060568.pasic@linux.ibm.com>
-        <a8a90aed-97df-6f10-85c2-8e18dba8f085@linux.ibm.com>
-        <20201204200502.1c34ae58.pasic@linux.ibm.com>
-        <683dd341-f047-0447-1ee8-c126c305b6c2@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1728701AbgLHAhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 19:37:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50392 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728689AbgLHAhq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 19:37:46 -0500
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5325CC06179C
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 16:37:06 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id f23so22197487ejk.2
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 16:37:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OWgkzaBL8Ks+W5c6hc//5jS9TAtR2BEXueICNpeXGzI=;
+        b=dA3Jz1COIag7v1M7puPMdmwoXec5vp17JFsARrNCqYYWr9GEeAr97x4gvDHoEiUlRs
+         61h7Vg50DmSQ25pu5RCo7FN4NlIixt75Dmh8aQCiiWYnU1GHti7ElSExMxy6xDh+YTTC
+         0tUsR/1rk4BaEvtM4zpttMWb45vyR+RNfOsdA1yP6WuwRKk5+lrenQkpCkjuY3N2Gi1s
+         VlnHCQBoRusSlPaQ6DnxhDFoTZJd46+WbYFizK7IRLMJld4kiQ1NzI+fKO/CY8/zFxHZ
+         RVEK47YWVx6sSNuxdnrlY1ilkxemJKEwCSpwKP7wQamiBixRgdzEd8/6o/j2UqvlXJqP
+         rw/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=OWgkzaBL8Ks+W5c6hc//5jS9TAtR2BEXueICNpeXGzI=;
+        b=E6nvlEG77qvjL6WnKOZamkPlCpq+IdWXJYppfpGslCNG2N6ZH8K6Zmg+2/yyex0g/Q
+         RCnSSYVuB1bgbTleV1cHjq9yfD3oZMCI/fUrOOhiN6QOYozrYla1qaad7pu1g7XD3iWJ
+         xA4z15UGdoEXrQMzjxWAnxYO0XjCRZqAnotr+0aQaGyV7RXo27Avo2DMVOUpXyw9UIj4
+         9Ubcje+S6BvPAWYAh1zA4801qcexH0PHe2mJZT2dqXiT0hkTNpDV60IvMm86rSVyxy5Z
+         vsNfSVXovmKFxNuhZoKfU/sCIkQoqcMVBBJXcLsY8QvbYE6QSiL5hOH3U8qWvGqfHjC9
+         T1ew==
+X-Gm-Message-State: AOAM531hyBO5APaedbJAXoQfnP3yZivUjyx0fgDp37FklkYNJMlFcHbb
+        dyFL1r0agM7IRhYDs41JsS8=
+X-Google-Smtp-Source: ABdhPJyOLT7IrJOkvySteoCMLX7D7ldLNTWfL3J3pXoTi91sQP7BLNIp4IPEJBTN7t8ugtAPLoMvIQ==
+X-Received: by 2002:a17:906:b74b:: with SMTP id fx11mr21056135ejb.410.1607387825097;
+        Mon, 07 Dec 2020 16:37:05 -0800 (PST)
+Received: from x1w.redhat.com (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
+        by smtp.gmail.com with ESMTPSA id mb15sm13785560ejb.9.2020.12.07.16.37.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Dec 2020 16:37:04 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To:     qemu-devel@nongnu.org
+Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        kvm@vger.kernel.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Subject: [PATCH 00/17] target/mips: Convert MSA ASE to decodetree
+Date:   Tue,  8 Dec 2020 01:36:45 +0100
+Message-Id: <20201208003702.4088927-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-07_16:2020-12-04,2020-12-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 phishscore=0 adultscore=0 malwarescore=0 spamscore=0
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012070152
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 7 Dec 2020 13:50:36 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> On 12/4/20 2:05 PM, Halil Pasic wrote:
-> > On Fri, 4 Dec 2020 09:43:59 -0500
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >  
-> >>>> +{
-> >>>> +	if (matrix_mdev->kvm) {
-> >>>> +		(matrix_mdev->kvm);
-> >>>> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;  
-> >>> Is a plain assignment to arch.crypto.pqap_hook apropriate, or do we need
-> >>> to take more care?
-> >>>
-> >>> For instance kvm_arch_crypto_set_masks() takes kvm->lock before poking
-> >>> kvm->arch.crypto.crycb.  
-> >> I do not think so. The CRYCB is used by KVM to provide crypto resources
-> >> to the guest so it makes sense to protect it from changes to it while
-> >> passing
-> >> the AP devices through to the guest. The hook is used only when an AQIC
-> >> executed on the guest is intercepted by KVM. If the notifier
-> >> is being invoked to notify vfio_ap that KVM has been set to NULL, this means
-> >> the guest is gone in which case there will be no AP instructions to
-> >> intercept.  
-> > If the update to pqap_hook isn't observed as atomic we still have a
-> > problem. With torn writes or reads we would try to use a corrupt function
-> > pointer. While the compiler probably ain't likely to generate silly code
-> > for the above assignment (multiple write instructions less then
-> > quadword wide), I know of nothing that would prohibit the compiler to do
-> > so.  
-> 
-> I'm sorry, but I still don't understand why you tkvm_vfio_group_set_kvmhink this is a problem
-> given what I stated above.
-
-I assume you are specifically referring to 'the guest is gone in which
-case there will be no AP instructions to intercept'.  I assume by 'guest
-is gone' you mean that the VM is being destroyed, and the vcpus are out
-of SIE. You are probably right for the invocation of
-kvm_vfio_group_set_kvm() in kvm_vfio_destroy(), but is that true for
-the invocation in the KVM_DEV_VFIO_GROUP_DEL case in
-kvm_vfio_set_group()? I.e. can't we get the notifier called when the
-qemu device is hot unplugged (modulo remove which unregisters the
-notifier and usually precludes the notifier being with NULL called at
-all)?
-
-Regards,
-Halil
+Finally, we use decodetree with the MIPS target.=0D
+=0D
+Starting easy with the MSA ASE. 2700+ lines extracted=0D
+from helper.h and translate.c, now built as an new=0D
+object: mod-msa_translate.o.=0D
+=0D
+While the diff stat is positive by 86 lines, we actually=0D
+(re)moved code, but added (C) notices.=0D
+=0D
+The most interesting patches are the 2 last ones.=0D
+=0D
+Please review,=0D
+=0D
+Phil.=0D
+=0D
+Based-on: <20201207224335.4030582-1-f4bug@amsat.org>=0D
+(linux-user: Rework get_elf_hwcap() and support MIPS Loongson 2F/3A)=0D
+Based-on: <20201207235539.4070364-1-f4bug@amsat.org>=0D
+(target/mips: Add translate.h and fpu_translate.h headers)=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (17):=0D
+  target/mips: Introduce ase_msa_available() helper=0D
+  target/mips: Simplify msa_reset()=0D
+  target/mips: Use CP0_Config3 to set MIPS_HFLAG_MSA=0D
+  target/mips: Simplify MSA TCG logic=0D
+  target/mips: Remove now unused ASE_MSA definition=0D
+  target/mips: Alias MSA vector registers on FPU scalar registers=0D
+  target/mips: Extract msa_translate_init() from mips_tcg_init()=0D
+  target/mips: Remove CPUMIPSState* argument from gen_msa*() methods=0D
+  target/mips: Explode gen_msa_branch() as gen_msa_BxZ_V/BxZ()=0D
+  target/mips: Rename msa_helper.c as mod-msa_helper.c=0D
+  target/mips: Move msa_reset() to mod-msa_helper.c=0D
+  target/mips: Extract MSA helpers from op_helper.c=0D
+  target/mips: Extract MSA helper definitions=0D
+  target/mips: Declare gen_msa/_branch() in 'translate.h'=0D
+  target/mips: Extract MSA translation routines=0D
+  target/mips: Introduce decode tree bindings for MSA opcodes=0D
+  target/mips: Use decode_msa32() generated from decodetree=0D
+=0D
+ target/mips/cpu.h                             |    6 +=0D
+ target/mips/fpu_translate.h                   |   10 -=0D
+ target/mips/helper.h                          |  436 +---=0D
+ target/mips/internal.h                        |    4 +-=0D
+ target/mips/mips-defs.h                       |    1 -=0D
+ target/mips/translate.h                       |    4 +=0D
+ target/mips/mod-msa32.decode                  |   24 +=0D
+ target/mips/kvm.c                             |   12 +-=0D
+ .../mips/{msa_helper.c =3D> mod-msa_helper.c}   |  429 ++++=0D
+ target/mips/mod-msa_translate.c               | 2270 +++++++++++++++++=0D
+ target/mips/op_helper.c                       |  394 ---=0D
+ target/mips/translate.c                       | 2264 +---------------=0D
+ target/mips/meson.build                       |    9 +-=0D
+ target/mips/mod-msa_helper.h.inc              |  443 ++++=0D
+ target/mips/translate_init.c.inc              |   38 +-=0D
+ 15 files changed, 3215 insertions(+), 3129 deletions(-)=0D
+ create mode 100644 target/mips/mod-msa32.decode=0D
+ rename target/mips/{msa_helper.c =3D> mod-msa_helper.c} (93%)=0D
+ create mode 100644 target/mips/mod-msa_translate.c=0D
+ create mode 100644 target/mips/mod-msa_helper.h.inc=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
