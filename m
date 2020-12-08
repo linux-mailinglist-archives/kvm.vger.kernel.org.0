@@ -2,151 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3B002D25CC
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 09:26:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AA3B2D25D2
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 09:27:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728089AbgLHI0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 03:26:02 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9033 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727983AbgLHI0C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 03:26:02 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CqtX05LC1zhpDC;
-        Tue,  8 Dec 2020 16:24:48 +0800 (CST)
-Received: from [10.174.187.47] (10.174.187.47) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 8 Dec 2020 16:25:13 +0800
-Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
- state to physical side
-From:   Shenming Lu <lushenming@huawei.com>
-To:     Marc Zyngier <maz@kernel.org>
-CC:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-4-lushenming@huawei.com>
- <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
- <b03edcf2-2950-572f-fd31-601d8d766c80@huawei.com>
- <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
- <49610291-cf57-ff78-d0ac-063af24efbb4@huawei.com>
- <48c10467-30f3-9b5c-bbcb-533a51516dc5@huawei.com>
- <2ad38077300bdcaedd2e3b073cd36743@kernel.org>
- <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
- <274dafb2e21f49326a64bb575e668793@kernel.org>
- <59ec07e5-c017-8644-b96f-e87fe600c490@huawei.com>
-Message-ID: <77f60f4e-a832-97aa-7ec6-da9d596438b2@huawei.com>
-Date:   Tue, 8 Dec 2020 16:25:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S1728186AbgLHI0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 03:26:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37830 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727983AbgLHI0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 03:26:41 -0500
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E07C061749
+        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 00:25:55 -0800 (PST)
+Received: by mail-ed1-x541.google.com with SMTP id h16so5351568edt.7
+        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 00:25:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=CRRpx8acZX4QjtTnMIWAXX++AMuePl61ml+xI4XshWU=;
+        b=fOK/3HgiuVBZ02q0KOifw6SzUXjBYw5+AuClkdFIgY1bJpmlwwdbHVyVivO0eg+aa2
+         JhYZdRbBcHtFNThHnS9vSHXgzNgZeaJEBYXDf+pb/wF3NqwCKtbzTo4BTUNaoLugNuZH
+         Pjmhf/0107cUNmr1PnADrcmbvF7Xsg9WQLMYay/4/HoolpX8IO6F7BV0/6z84Ayj6tyC
+         t5UJEqv5AmQuY9sKeu1suv8qLhIIZKBjCrXblTOv0AkITuMqGH+5DqYFYgff4E0Yiawv
+         voT9qUCZKgkr2A3wCFgycaL2kPM43WHTbx/qHUPsQYjC/mtOwMW7GE/3K/ArfNn4RJWd
+         ZhVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CRRpx8acZX4QjtTnMIWAXX++AMuePl61ml+xI4XshWU=;
+        b=pGs7hucIwACKQHcncZ4QeiIUAz+vZtcNRfdpV9L73S9QwXrPJITdP7HtOXlopAtR+G
+         e9NsRatYLKmsoktwyCr05tdfwutbVhs6m0pxI0b4q0mv3Mv4GxPyWeJ1eBgmOzk1+i8O
+         6OvtUjYbN9lXQ8kB0iFginfPr+99HjqU9lGYvXgUxkSIO/d2Dhpb9yLvjFh0Ix30cds6
+         MxE6orq0eIuJ8yY0VVMZ8khfAHeZ3fHaCWmWYpPt6mVKnTJrhAc6nGOnMWkIszRZ3R4m
+         CyLTWTPyb4j9UmvvhfJRZ73R6C4n6HpB5lhWI6huEcU7PO4T7EeesbWVRwEMUWukHwHO
+         DG4w==
+X-Gm-Message-State: AOAM5332YLT1mfo6+g0hLLT3N661kFJMXd3LtO0PwPXgHpdXlDDSfQlv
+        KMTuRbOuML8fdg5g9FLawWQ=
+X-Google-Smtp-Source: ABdhPJwgXgn+yrMMIjilMjVvsLWwQHozsuf+tTEAZtoyMOYhysd+aHWNX+tUMzVsB8iXuDrM/o5tQA==
+X-Received: by 2002:a05:6402:3074:: with SMTP id bs20mr23700631edb.365.1607415954491;
+        Tue, 08 Dec 2020 00:25:54 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id rs27sm15112106ejb.21.2020.12.08.00.25.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Dec 2020 00:25:53 -0800 (PST)
+Date:   Tue, 8 Dec 2020 08:25:52 +0000
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc:     qemu-devel@nongnu.org, Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+Subject: Re: [RFC PATCH 16/27] virtio: Expose virtqueue_alloc_element
+Message-ID: <20201208082552.GT203660@stefanha-x1.localdomain>
+References: <20201120185105.279030-1-eperezma@redhat.com>
+ <20201120185105.279030-17-eperezma@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <59ec07e5-c017-8644-b96f-e87fe600c490@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.187.47]
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="80Ds8Z/hZmemMosa"
+Content-Disposition: inline
+In-Reply-To: <20201120185105.279030-17-eperezma@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/12/1 20:15, Shenming Lu wrote:
-> On 2020/12/1 19:50, Marc Zyngier wrote:
->> On 2020-12-01 11:40, Shenming Lu wrote:
->>> On 2020/12/1 18:55, Marc Zyngier wrote:
->>>> On 2020-11-30 07:23, Shenming Lu wrote:
->>>>
->>>> Hi Shenming,
->>>>
->>>>> We are pondering over this problem these days, but still don't get a
->>>>> good solution...
->>>>> Could you give us some advice on this?
->>>>>
->>>>> Or could we move the restoring of the pending states (include the sync
->>>>> from guest RAM and the transfer to HW) to the GIC VM state change handler,
->>>>> which is completely corresponding to save_pending_tables (more symmetric?)
->>>>> and don't expose GICv4...
->>>>
->>>> What is "the GIC VM state change handler"? Is that a QEMU thing?
->>>
->>> Yeah, it is a a QEMU thing...
->>>
->>>> We don't really have that concept in KVM, so I'd appreciate if you could
->>>> be a bit more explicit on this.
->>>
->>> My thought is to add a new interface (to QEMU) for the restoring of
->>> the pending states, which is completely corresponding to
->>> KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES...
->>> And it is called from the GIC VM state change handler in QEMU, which
->>> is happening after the restoring (call kvm_vgic_v4_set_forwarding())
->>> but before the starting (running) of the VFIO device.
->>
->> Right, that makes sense. I still wonder how much the GIC save/restore
->> stuff differs from other architectures that implement similar features,
->> such as x86 with VT-D.
-> 
-> I am not familiar with it...
-> 
->>
->> It is obviously too late to change the userspace interface, but I wonder
->> whether we missed something at the time.
-> 
-> The interface seems to be really asymmetrical?...
-> 
-> Or is there a possibility that we could know which irq is hw before the VFIO
-> device calls kvm_vgic_v4_set_forwarding()?
-> 
-> Thanks,
-> Shenming
-> 
->>
->> Thanks,
->>
->>         M.
-> .
-> 
 
-Hi Marc,
+--80Ds8Z/hZmemMosa
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I am learning VT-d Posted Interrupt (PI) these days.
+On Fri, Nov 20, 2020 at 07:50:54PM +0100, Eugenio P=E9rez wrote:
+> Specify VirtQueueElement * as return type makes no harm at this moment.
 
-As far as I can tell, the posted interrupts are firstly recorded in the Posted
-Interrupt Request (*PIR*) field of the Posted Interrupt Descriptor (a temporary
-storage area (data structure in memory) which is specific to PI), and when the
-vCPU is running, a notification event (host vector) will be generated and sent
-to the CPU (the target vCPU is currently scheduled on it), which will cause the
-CPU to transfer the posted interrupt in the PIR field to the *Virtual-APIC page*
-(a data structure in kvm, the virtual interrupts delivered through kvm are put
-here, and it is also accessed by the VMX microcode (the layout matches the register
-layout seen by the guest)) of the vCPU and directly deliver it to the vCPU.
+The reason for the void * return type is that C implicitly converts void
+pointers to pointers of any type. The function takes a size_t sz
+argument so it can allocate a object of user-defined size. The idea is
+that the user's struct embeds a VirtQueueElement field. Changing the
+return type to VirtQueueElement * means that callers may need to
+explicitly cast to the user's struct type.
 
-So they only have to sync the PIR field to the Virtual-APIC page for the migration
-saving, and do nothing for the resuming...
+It's a question of coding style but I think the void * return type
+communicates what is going on better than VirtQueueElement *.
 
-Besides, on x86 the setting of the IRQ bypass is independent of the VM interrupt
-setup...
+--80Ds8Z/hZmemMosa
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Not sure if I have missed something.
+-----BEGIN PGP SIGNATURE-----
 
-In addition, I found that the enabling of the vAPIC is at the end of the migration
-(just before the VM start) on x86. So I am wondering if we could move the calling
-of *vgic_enable_lpis()* back, and transfer the pending state to the VPT there if the
-irq is hw (and I think the semantics of this function should include the transfer).
-In fact, this function is dependent on the restoring of the vgic(lpi_list)...
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/POJAACgkQnKSrs4Gr
+c8iIOQf/eNAzxK1ncAAJ6gkC5ZN4/DQUgcfZBmB/a4jRwojXtH7Tkr9soSJU/TN+
+1mJPWNebsod4iVWGO+yl0y+YL4Iif2d2TSFpiyZvwOyNY1KAXpSgm3TwsbBW1UkG
+WduAcNnpl06uIFb+x2w1aQlVE7RMaCFKRSw7GgLxDxuBJipan4LO+cDLlgwJk62z
+RMsgHlzhfHZ9Kq2MMbZkwF4Etz1sWFOkn80cbFQT247Mn6Kx0KtU3RM7ubowKDmY
+fXsySdAnqcU8fNv+7Oi3lM1zHI2jWTVPbfvmFDK7cYghlUU5lQJlUSC2icXRKm1T
+OtyLrwUxDfPwL4895JADTzpPAwngDA==
+=Cecc
+-----END PGP SIGNATURE-----
 
-After exploration, there seems to be no perfect place to transfer the pending states
-to HW in order to be compatible with the existing interface and under the current
-architecture, but we have to choose one solution?
-
-Thanks,
-Shenming
+--80Ds8Z/hZmemMosa--
