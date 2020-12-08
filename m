@@ -2,167 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 794322D35E3
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:13:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46A232D35DE
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:13:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730652AbgLHWHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 17:07:32 -0500
-Received: from mail-mw2nam12on2059.outbound.protection.outlook.com ([40.107.244.59]:19552
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729512AbgLHWHc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 17:07:32 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mW4ncGhUc2toQx1V49hUot87fWvOlOKWpItlMXPrACatLFK+1tA8xo2WmI8iQE2VYG1LXNR2q6Xhq0ytxEMYvJOLP1EuDLt8N3q5llZ1WDy3Qtbcc1htaf3T/amiRPWhAn8hR4kxgmElTOp2zhEO1uTcGUKv+bWSeRfEhyLfeYdrfJpmB0nZgYbPkysTouwrTw+KuNmdbvq2nw1b5Rs4WmhZWVqGUzVOkxzjZ5NSd6HdIjR0IRqrD3/6JELtH26OJlPcLlHCneeKdbIVfERM5DuKrUvfRAdo4+o1A2hpRQdNqvkdFROefq+BXPsmgYFDZmmNvisXz/WBIMsyTgFqkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=djYOIZIAe+UUpzeBZtr/RMxOzG5cL+NruPXwZsscQuI=;
- b=RlKs6ypQqmb8gkx95LRQ0pwbpueDC800d279T/5riOKrWn9Cr3OjwKN2MU/ix1UWqR1xecURpEB/xr6f0TE5D7iRWOz0y8+RXbG4aBToXTHHh4sFmnarxMVDyMN923D1lMel9lxP9Zzj7DCIJlNC/IoLgaERFO7OmOnONS7MspHJTYgNPJSU2xpeqlZ9XJG5dBBIdkA2PAQYNMJ0KQQvRuCOBHr9iD61NXo6mFZizVj6EqZ06CTLYZsFRTWLQFODIRKqld3Vv5ruNtyaD51U6NpEhoimawYtaeOMSdskgu+6gQCTycFNQwk+JkJlTnWFUi7XfprYEeqqMz64dnbRIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1730486AbgLHWGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 17:06:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54450 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731078AbgLHWGt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 17:06:49 -0500
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED7DC0613D6
+        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 14:06:08 -0800 (PST)
+Received: by mail-ot1-x343.google.com with SMTP id x13so240441oto.8
+        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 14:06:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=djYOIZIAe+UUpzeBZtr/RMxOzG5cL+NruPXwZsscQuI=;
- b=BaK70AuuJBIxuywqMB1R77GsKHlgFHq0FThDU+TmNTSIUg5MU9871U8RTQQ/8EIm9EuvkgSAjLWAArDf/q8Ma1F6WivxBIyh8as7z8M0m48ktKDmn2+nUkCNAqauPdsq3Y4PARUW4kLL+QDSeyDUlBPR57qTImKFQwalouwbq1I=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4415.namprd12.prod.outlook.com (2603:10b6:806:70::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.23; Tue, 8 Dec
- 2020 22:06:08 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::d8f2:fde4:5e1d:afec%3]) with mapi id 15.20.3632.021; Tue, 8 Dec 2020
- 22:06:08 +0000
-From:   Ashish Kalra <Ashish.Kalra@amd.com>
-To:     pbonzini@redhat.com
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        rkrcmar@redhat.com, joro@8bytes.org, bp@suse.de,
-        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, srutherford@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH v9 07/18] KVM: x86: Add AMD SEV specific Hypercall3
-Date:   Tue,  8 Dec 2020 22:05:56 +0000
-Message-Id: <f63b059819239d4667e4edf5901b06f5672d209e.1607460588.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1607460588.git.ashish.kalra@amd.com>
-References: <cover.1607460588.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH2PR05CA0032.namprd05.prod.outlook.com (2603:10b6:610::45)
- To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MGDLM4skllCoDmoEk+etig/If787U2zDrg6DgpVHTno=;
+        b=rCbe3+/XPmFCHDirAutZtQSLmnLl65wBbcvTbTFXLlZlFTp9AE2BNM6Ul60D08tvcD
+         CNAx8B4GZtXOK1Oo0q+S9KlZqhuKlEp2U3uvf4Ml0sBI6TJi52q2d7yjPBio8ti7GUJK
+         eAWbq4kY6Z8Nsi1gfv3EjB3b9B/jU+YjgQvqFmXWEasC1FbKZVkaxGGBMh9GQmQjz2jc
+         1fzAdeIm5jrwlv7lWXzGfsxSdw2/OgooajyXd47RbE8fdhaB195pDmCQ5U0Crb3W6M0O
+         syfgAMnoX12iNiy31MIJQjflGIs15eb9980yA+YquFtTjGFv+J1I3MQtDHGjYbcorMK4
+         NzeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MGDLM4skllCoDmoEk+etig/If787U2zDrg6DgpVHTno=;
+        b=lQghzJ2j1Xv3WaVDXnkD6tY37RqkFMJzoeHONt6YcXfAb6AblL9wACR+z8O+CNiLOx
+         AZGb1UL+JMyDvVfrMhUhcio2XYSbR4e/UWo4nqWgk+C7LcvV734m/UXZKq+cmiq0RhYI
+         QwZXe3xn3mIq8KkefdEzVqY7u/wJMw9C3neNhWtDpDVwSU3sXVsyqC2yIXg0lK05Zaxh
+         +b55/EQmR9DAGXC+KGfcL6Ynf7AwU/7b2P7SblHwtb7jLeuf01xDsgTHqx+/cx/Hqagf
+         i/60FsT2SlmLVZoldAeoUJ+x1UdriP2YkABiBa7FDEGp6OplQOQLqcBk0NKbableHE/Y
+         I9Ww==
+X-Gm-Message-State: AOAM531uVU9qRkDJA072tQVVd9shp8zNMcJAwFqkj3kRxATp7QxVb9RN
+        lE1OMR5BSWL+p6QBPudh0GLsNQ==
+X-Google-Smtp-Source: ABdhPJzGu1vkEQl9iHAF95ayPIF0SsoBWDvRps0GQgPBGBv+W0ifzemthuvGb0R/rvlhUEiyqT4DYQ==
+X-Received: by 2002:a9d:19cf:: with SMTP id k73mr148076otk.360.1607465168294;
+        Tue, 08 Dec 2020 14:06:08 -0800 (PST)
+Received: from [10.10.121.52] (fixed-187-189-51-144.totalplay.net. [187.189.51.144])
+        by smtp.gmail.com with ESMTPSA id l142sm25265oih.4.2020.12.08.14.06.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Dec 2020 14:06:07 -0800 (PST)
+Subject: Re: [PATCH 11/19] target/mips: Extract common helpers from helper.c
+ to common_helper.c
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Aurelien Jarno <aurelien@aurel32.net>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Paul Burton <paulburton@kernel.org>, kvm@vger.kernel.org,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20201206233949.3783184-1-f4bug@amsat.org>
+ <20201206233949.3783184-12-f4bug@amsat.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ac8afc12-2ab4-a2a3-81b5-b9d75314bf6f@linaro.org>
+Date:   Tue, 8 Dec 2020 16:06:05 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by CH2PR05CA0032.namprd05.prod.outlook.com (2603:10b6:610::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.7 via Frontend Transport; Tue, 8 Dec 2020 22:06:07 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e384e82f-25bd-49d2-963f-08d89bc57747
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4415:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB44157598110BB35F70C722488ECD0@SA0PR12MB4415.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ahEtrBOLmqHrXvkQ6npitCAdpB5kQ/lk9XqhRgyOZho+Sb54i83RTDnSRUIZEFA5hg117sVftjdLNJsBWRV7B5/2W8VslO2tU9DunF1ir+swjFqv1LDsPRE6wSBOsvHgf0kx2HDfIRfi3J/V5t6QOsm6mm75ct7xvZvfOMXEAGBujmPHY+5HBdQ32FNvKsNygRMSV7cQY5OobK3haxcj5VYCR28QvLAe/m51thvTCeYwZzFjRU/cOkCalI+eDbTFs6Z18SVEG9O1yBytt3RQ9eZyP5V+UZCngYwBkrJVMa+3kTXCsmCftcDYRlT0bETUpzfgksdQLXU8fmTs7/8MVCZvok6jshD3E3TFlBs3jECAf6PGxvtq84PgjL/K3QVV
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(366004)(34490700003)(186003)(4326008)(86362001)(6916009)(7416002)(16526019)(6486002)(5660300002)(66556008)(8676002)(8936002)(508600001)(7696005)(52116002)(66946007)(956004)(36756003)(2906002)(6666004)(26005)(66476007)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?dmhxSE1pc3d6Z1ZUWDBHODlCYWJZampSQnNvODZ1SWJIeFRZM2NIQktucCt5?=
- =?utf-8?B?NU0zQlRScTE0YWxmQWNJNUhMcFI5ZlhReTEya2NpTHBnbUJMQ0RFaXZURDJB?=
- =?utf-8?B?akpoRVBrOEorZkFFVDF3WTI0MWpjRndqUUY1Y0k3bVN2TUszemJvYUhkNnFp?=
- =?utf-8?B?QWZGRzMyRnpyVGlzd0FENkRNUExSZG5mWjJxS2lHWHkzeExtRnphdjBJTlVT?=
- =?utf-8?B?QnFTS29XSzRlZVJDQWVUNzdHZk83VHYySmtPS1ZkOGlvYkpUUUJZbWZXcGox?=
- =?utf-8?B?b0dsK2Y5WXZjakVROVVIbzZwMnV1UVpGbUcrZklWMEtJUWR3THdFRmNCWVFR?=
- =?utf-8?B?WlJCayszWEswUzM0SDM0YkNXTXZqOW9raUl3bFlTZVR0QmpZaFV5aDlLb0Yx?=
- =?utf-8?B?ZDlxRlVMRG4wUzJnM05WMURNQU1NRDR6cGtkWU9hR3JLeSthUzNEOFloUity?=
- =?utf-8?B?Y0pqclFvd0ZXTkJnMGQ5ZENTN21aTWVvamV2YWR6MUNPcThxNFZJeHF5bXd2?=
- =?utf-8?B?c01USGVockQ0cXQ2bU1RY1NzMFU2MjhZZzN4bXNuR0hKOEIyNitQWk1ZVUVx?=
- =?utf-8?B?WEN6ZVdyN1VrbFZDM1pqMVcyNFZEZi9sTDkxaGZhcEdaR2tJMUtldHY3RFM2?=
- =?utf-8?B?QVJ1NHA3aVlyVGJ2S0loMDFvU2xPOFpNNVNUYXFtTnlEM0NDbTFrL3ZCS2hV?=
- =?utf-8?B?OW9DTzBDQ3ROZVk0b3RydjJZQklMRFI3MGVoV2hCUEhXUG5neW9zSGk0NE1F?=
- =?utf-8?B?MVdsbTZFUDZnbjYzZ05WN21KT0l3VWE2N1o2M2I4Z0xaYXVGQTc1anpUM1VO?=
- =?utf-8?B?NTQ0VVFkcnUzSm56YkFnc3VTd1RMdFZydkhXSW9mUTEvRHMxWG5OeDdxMGtT?=
- =?utf-8?B?RDVxSjV0RDNtZVdnVmUxVzNENmNkN2ZCNkw2eDRiNkltZ2srUkY5MXpZWEEz?=
- =?utf-8?B?bFV6WDllWTZSMXN5SnZmZ3RXMTR2RWVweWlaL2VlMXNaZUI1dGpsWHJEenpT?=
- =?utf-8?B?V2dQdlRRNTN6T2JJMkNPdkdZQTEzRjJKdFlkZjFkUVJWc1ZYS3hoWDBZd0RG?=
- =?utf-8?B?MWRhem9RTUxnS09PNnZyY1BnVXczWTkxMEpTV2k4aCtDd1lzb3ZzaGhHWVZn?=
- =?utf-8?B?T1g5MFdSMXMyYnB1NXhPTkkwM0NKYkt4SGNXUnBVTjExVzhKTENsZVhFYlNX?=
- =?utf-8?B?bWhsVmcvNEl6QzVpcis4MFI5MzJOUUIvcGtVWlJUZzhxQS9Hc29mcm01STRz?=
- =?utf-8?B?ZDROUXh4ZUpld2ZZK0VsZUdHTUFEMlRXTVAvSUlFTVdnbjNVS3VCWllTYXli?=
- =?utf-8?Q?Zxly2htGDFI0t5jxyN2ifW/hrFFhEKFsFT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2020 22:06:08.3778
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: e384e82f-25bd-49d2-963f-08d89bc57747
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iaoetLSuAU/0WX8LQRL2tSzULD2KdsRIUXM4cEaBR0FcYPMcy7xvsPN6rHVYYy5P1pO6n0ZuimbGKW2j0IZ/ag==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4415
+In-Reply-To: <20201206233949.3783184-12-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+On 12/6/20 5:39 PM, Philippe Mathieu-Daudé wrote:
+> The rest of helper.c is TLB related. Extract the non TLB
+> specific functions to a new file, so we can rename helper.c
+> as tlb_helper.c in the next commit.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> Any better name? xxx_helper.c are usually TCG helpers.
 
-KVM hypercall framework relies on alternative framework to patch the
-VMCALL -> VMMCALL on AMD platform. If a hypercall is made before
-apply_alternative() is called then it defaults to VMCALL. The approach
-works fine on non SEV guest. A VMCALL would causes #UD, and hypervisor
-will be able to decode the instruction and do the right things. But
-when SEV is active, guest memory is encrypted with guest key and
-hypervisor will not be able to decode the instruction bytes.
+*shrug* perhaps cpu_common.c, no "helper" at all?
+Perhaps just move these bits to cpu.c?
 
-Add SEV specific hypercall3, it unconditionally uses VMMCALL. The hypercall
-will be used by the SEV guest to notify encrypted pages to the hypervisor.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: x86@kernel.org
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Reviewed-by: Steve Rutherford <srutherford@google.com>
-Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- arch/x86/include/asm/kvm_para.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-index 338119852512..bc1b11d057fc 100644
---- a/arch/x86/include/asm/kvm_para.h
-+++ b/arch/x86/include/asm/kvm_para.h
-@@ -85,6 +85,18 @@ static inline long kvm_hypercall4(unsigned int nr, unsigned long p1,
- 	return ret;
- }
- 
-+static inline long kvm_sev_hypercall3(unsigned int nr, unsigned long p1,
-+				      unsigned long p2, unsigned long p3)
-+{
-+	long ret;
-+
-+	asm volatile("vmmcall"
-+		     : "=a"(ret)
-+		     : "a"(nr), "b"(p1), "c"(p2), "d"(p3)
-+		     : "memory");
-+	return ret;
-+}
-+
- #ifdef CONFIG_KVM_GUEST
- bool kvm_para_available(void);
- unsigned int kvm_arch_para_features(void);
--- 
-2.17.1
-
+r~
