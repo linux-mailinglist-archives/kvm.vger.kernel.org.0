@@ -2,179 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E34A2D3649
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:34:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64F172D364D
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:34:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731358AbgLHWay (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 17:30:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
+        id S1731455AbgLHWbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 17:31:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729323AbgLHWay (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 17:30:54 -0500
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57C6C0613CF
-        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 14:30:13 -0800 (PST)
-Received: by mail-io1-xd41.google.com with SMTP id i18so166956ioa.1
-        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 14:30:13 -0800 (PST)
+        with ESMTP id S1729034AbgLHWbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 17:31:09 -0500
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 698F7C0613D6
+        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 14:30:23 -0800 (PST)
+Received: by mail-oi1-x243.google.com with SMTP id s2so305870oij.2
+        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 14:30:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=29eBtDtyvwAuueSeF0oAu/txUr+9Ao/9LQHUlVU+2fc=;
-        b=TlDD6aUalTYuTfenNQAJ3zERjK6Q4H8256n1j7bQnm2m971BN4p1XB8JDCwAWfJBf+
-         2ejwqZ+KDc0ShxbVivY+Yt1aOz2GBbGNfiE69BdzG/ZGu8C1zL3XpzxhERfeqCuoSXe3
-         c3cvYwq9Y6Q6eoLLvyYl4zxrsf9yXyqItjWUkqeYN2UPHukd45hxYRLw1IY6PTEz0/x3
-         qshEjy0GXYWL1L553lcudUwAIMbDL8aU/Sr+MyHeirorCDuR1Qga4GCYKs7V6u8EFtZM
-         If9Bt5Yq/P7dLFox6eXHEAEMco6zV/K3JO0W4aFKRyrkuo8YwQQVyskYq1sWdymu//EI
-         PbzQ==
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=2yI4VHuGJabs7ooQuq5prMjs6mJCDCBvKCDGtTApf90=;
+        b=GIKd+Xz5dUZW4BACDCrTg8k9AoR3hGyQv95jeI0sj2LszcmegbtY7VOAPvpvlFPBV4
+         eMFTGTvLZ4SmXF7wB9ss3Yb6YSQJmaPPK5vUSIiEcGc9PIT80SPDhiD3EzZYrU8gltqA
+         P11ZrVP2eS2Oe6fSn5r0Px4QAoLlkF8yjgGb4XrrcLvDv2DQkTIsfmqtBeoSx6Y66e8g
+         0EO86c0njocYB/aH4m3P+w+kSZeHcAlkoq7hA/gq9PLfWvvzo3KugBIJJQcJNrDsZ3Ys
+         hZW18r18mbi12BPOqeJDD7/Q13Nlr3HHjZdkpiLDJw7Mc2EARFOl9PGwQWJfvDR7SneX
+         8TwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=29eBtDtyvwAuueSeF0oAu/txUr+9Ao/9LQHUlVU+2fc=;
-        b=XezDJZKDkrhOATINFfPQEtUE9jyUZFFTmHH8tjmVJlaKjPI0Klj4FADGJnnUPC+byX
-         NcLa+GLgHa6D49KYO3Zx4NpUyLwDhhMAYcLAaW76wnx1tBxwbXj1A+q6mTDp6+MNXJix
-         KZUDlbcWMWMITmKUi1cC1A8/+W0np4YhTC6CNCSS/4H3MQRhglCNoqShP8x1VZdY+9Fu
-         qYxdav1i0J/4S98HymOPIuzIjLevZFM1NdpGpWffmIDrwfRRi/Vt6MJOMPHqfEOeATRN
-         leQOZlBbF5s9rojM6w8uB1d2jHyW4kHAfNfc+b1hsBYIWE+I6ZMCWyYRmpnKJgbk8R/h
-         zYFw==
-X-Gm-Message-State: AOAM531vvcQHWm2++mUegCiuKNnAeZH1aT/UNde3+vylbjELl/b/Wmxd
-        YnV6+VmQsQDVcpDJ3HPMPjk5e6ydvxrSLiBWofk=
-X-Google-Smtp-Source: ABdhPJydZr404HaRvsRmgbtUATpJcCUZ8/SGlgfkBg22Seph0XiRiwRnnc4GJRJOJCjBUjk7r9govf33CuCi98jG7+8=
-X-Received: by 2002:a02:6c09:: with SMTP id w9mr28541514jab.135.1607466613268;
- Tue, 08 Dec 2020 14:30:13 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2yI4VHuGJabs7ooQuq5prMjs6mJCDCBvKCDGtTApf90=;
+        b=MTtBbfTRpuo/k7ufrG6WxsZbKn6V3+ttgVEIjC5hLOOKrCLQwaIiaGy2X6/BbmAsIB
+         7j4uw8WDxJFRV5Qq5RgG6KDtXMUsViTFXKAFpUmprHL6FgfvzMgU0lPY2b4YdstTKt7V
+         de5O2uPiCL/fWKhlUhX83RDFSXYmXNGYChvBoKC6HmR/Yuefm+7cdzLQcc+9bxCulnwg
+         q9eS37+TNODNR0E+rf1xH48oUEei01JA6Eu6nWei28XtPvO0/WGKOBAR67FepytuLkHJ
+         Ev4xFAgF/rblFuFdrlNfFbjvUFSMG8pGueDDUGTJPhXgGo34bLArnT+i+O2JRjBpmFDI
+         koDQ==
+X-Gm-Message-State: AOAM531Xt86JAHkkPOaGMECXRqSWt4E/PSCE5DF8YOGsHcdRQHmip9On
+        /cqi2C5oocLAslzP3MJesmi0JQ==
+X-Google-Smtp-Source: ABdhPJzWPK4dKug6Hg8z2BjFoQ7ubgZPPLYDWDmujFKKY4nSu09XAekU5vYsXWdF6Gd1Ok4LMZf0gQ==
+X-Received: by 2002:aca:d841:: with SMTP id p62mr87833oig.38.1607466622877;
+        Tue, 08 Dec 2020 14:30:22 -0800 (PST)
+Received: from [10.10.121.52] (fixed-187-189-51-144.totalplay.net. [187.189.51.144])
+        by smtp.gmail.com with ESMTPSA id o6sm81671oon.7.2020.12.08.14.30.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Dec 2020 14:30:22 -0800 (PST)
+Subject: Re: [PATCH 17/19] target/mips: Rename translate_init.c as cpu-defs.c
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Aurelien Jarno <aurelien@aurel32.net>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Paul Burton <paulburton@kernel.org>, kvm@vger.kernel.org,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20201206233949.3783184-1-f4bug@amsat.org>
+ <20201206233949.3783184-18-f4bug@amsat.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <56eefa47-f95a-087e-54d2-05135d2c506d@linaro.org>
+Date:   Tue, 8 Dec 2020 16:30:19 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20201203124703.168-1-jiangyifei@huawei.com> <20201203124703.168-8-jiangyifei@huawei.com>
-In-Reply-To: <20201203124703.168-8-jiangyifei@huawei.com>
-From:   Alistair Francis <alistair23@gmail.com>
-Date:   Tue, 8 Dec 2020 14:29:47 -0800
-Message-ID: <CAKmqyKMXmCPyMmo_OHdeVZCjN1k_Lv9n_FVFe9pvbnoHhVSL1g@mail.gmail.com>
-Subject: Re: [PATCH RFC v4 07/15] hw/riscv: PLIC update external interrupt by
- KVM when kvm enabled
-To:     Yifei Jiang <jiangyifei@huawei.com>
-Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
-        Sagar Karandikar <sagark@eecs.berkeley.edu>,
-        "open list:Overall" <kvm@vger.kernel.org>, libvir-list@redhat.com,
-        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-        Anup Patel <anup.patel@wdc.com>,
-        yinyipeng <yinyipeng1@huawei.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        kvm-riscv@lists.infradead.org, Palmer Dabbelt <palmer@dabbelt.com>,
-        "dengkai (A)" <dengkai1@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        Zhanghailiang <zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201206233949.3783184-18-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 3, 2020 at 4:47 AM Yifei Jiang <jiangyifei@huawei.com> wrote:
->
-> Only support supervisor external interrupt currently.
->
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+On 12/6/20 5:39 PM, Philippe Mathieu-Daudé wrote:
+> This file is not TCG specific, contains CPU definitions
+> and is consumed by cpu.c. Rename it as such.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/intc/sifive_plic.c    | 31 ++++++++++++++++++++++---------
->  target/riscv/kvm.c       | 19 +++++++++++++++++++
->  target/riscv/kvm_riscv.h |  1 +
->  3 files changed, 42 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/intc/sifive_plic.c b/hw/intc/sifive_plic.c
-> index 97a1a27a9a..a419ca3a3c 100644
-> --- a/hw/intc/sifive_plic.c
-> +++ b/hw/intc/sifive_plic.c
-> @@ -31,6 +31,8 @@
->  #include "target/riscv/cpu.h"
->  #include "sysemu/sysemu.h"
->  #include "migration/vmstate.h"
-> +#include "sysemu/kvm.h"
-> +#include "kvm_riscv.h"
->
->  #define RISCV_DEBUG_PLIC 0
->
-> @@ -147,15 +149,26 @@ static void sifive_plic_update(SiFivePLICState *plic)
->              continue;
->          }
->          int level = sifive_plic_irqs_pending(plic, addrid);
-> -        switch (mode) {
-> -        case PLICMode_M:
-> -            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
-> -            break;
-> -        case PLICMode_S:
-> -            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_SEIP, BOOL_TO_MASK(level));
-> -            break;
-> -        default:
-> -            break;
-> +        if (kvm_enabled()) {
-> +            if (mode == PLICMode_M) {
-> +                continue;
-> +            }
-> +#ifdef CONFIG_KVM
-> +            kvm_riscv_set_irq(RISCV_CPU(cpu), IRQ_S_EXT, level);
-> +#endif
+> cpu-defs.c still contains fpu_init()/mvp_init()/msa_reset().
+> They are moved out in different series (already posted).
 
-What if kvm_enalbed() is true, but CONFIG_KVM isn't defined?
+After the other functions are moved, then this file may be compiled separately?
 
-Alistair
+Or... why is mips_cpu_list moved?  I guess it wouldn't be able to be separately
+compiled, because of the ARRAY_SIZE.
 
-> +        } else {
-> +            switch (mode) {
-> +            case PLICMode_M:
-> +                riscv_cpu_update_mip(RISCV_CPU(cpu),
-> +                                     MIP_MEIP, BOOL_TO_MASK(level));
-> +                break;
-> +            case PLICMode_S:
-> +                riscv_cpu_update_mip(RISCV_CPU(cpu),
-> +                                     MIP_SEIP, BOOL_TO_MASK(level));
-> +                break;
-> +            default:
-> +                break;
-> +            }
->          }
->      }
->
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index 6250ca0c7d..b01ff0754c 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -454,3 +454,22 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
->      env->satp = 0;
->  }
->
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level)
-> +{
-> +    int ret;
-> +    unsigned virq = level ? KVM_INTERRUPT_SET : KVM_INTERRUPT_UNSET;
-> +
-> +    if (irq != IRQ_S_EXT) {
-> +        return;
-> +    }
-> +
-> +    if (!kvm_enabled()) {
-> +        return;
-> +    }
-> +
-> +    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_INTERRUPT, &virq);
-> +    if (ret < 0) {
-> +        perror("Set irq failed");
-> +        abort();
-> +    }
-> +}
-> diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
-> index f38c82bf59..ed281bdce0 100644
-> --- a/target/riscv/kvm_riscv.h
-> +++ b/target/riscv/kvm_riscv.h
-> @@ -20,5 +20,6 @@
->  #define QEMU_KVM_RISCV_H
->
->  void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
->
->  #endif
-> --
-> 2.19.1
->
->
+
+r~
