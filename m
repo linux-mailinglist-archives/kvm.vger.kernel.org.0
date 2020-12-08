@@ -2,177 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99D402D288B
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 11:11:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 16C222D28E9
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 11:30:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728774AbgLHKKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 05:10:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23296 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726734AbgLHKKT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 05:10:19 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B8A3f1x163729;
-        Tue, 8 Dec 2020 05:09:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=5/TrwPbfHl9X0bHCx6Y4zScwpYDU0Ds9sPXGhs/IsSo=;
- b=UHi1xpoaxaEgtcmjylvw5wWvPZnnzdNgDRz+vVhIciVj8wINpuvvf1Ruo3/0JzlLf3KM
- RpLzRheI0sB5/vUUWgzIFUNIW65fug4sZdINtCaU1hphUw+qG1vrRT7A67WXRsXNPk6Q
- bgmx39TDQ4kqYK/FxDErL9CScLMNQNgh2nUinrFpfRMFeSvNaN0sHTyUBQ3brNPvKIHA
- fBtrnAFh5+0t2VypEmHV8JTarvc3D/Has1uugaOGpunERyaEl+gxmrUHYKZ/CYIVM864
- r1tjZlGvDN6gOE7NfjLU2BB12/OU2BJcnZ6ggdzP7yG0tfIXPVRHoi5MkVBkqmVrn9fE HA== 
+        id S1728045AbgLHKaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 05:30:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61800 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726138AbgLHKaG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 05:30:06 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B8A3lW5110977;
+        Tue, 8 Dec 2020 05:29:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type; s=pp1; bh=/q+AtQG9CkQbyFwRmsw9IzYWCkRqtptX3eCtXxdIT5A=;
+ b=nKn2BBxt8W2CAdsn8VxIO7iz3pV2nNwF3Y6f9s91bATmcBDsazQdfaAf/AXzFAiweFc5
+ FkeyWnrKeckngg07Gf55DQLx7WX+L180FMqMJz49z5uADJ1Ein+wIfurr1XMmVEhd8M/
+ MgZG/pqxaCl+axqbvNYSFcgUUkvc5JBwqA6WIJhuE86ZUfSPsE2XwHk4CiwjzjBf0/eh
+ uyk7Zr4HzflYj3sq2H/6apXSgzW95b0wmAE8FuV/QcY/qs+wDVGf738nDel5P2A2JuOb
+ tdCa8ZhZx6OorF/mQvE1ANEwd8mT4bx5WU99pJFUTXIYlASJbsIi+D/eZoVnvVPxQNCV cg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35a61x2m3n-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359wwde4rv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Dec 2020 05:09:38 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B8A3tc2165731;
-        Tue, 8 Dec 2020 05:09:38 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35a61x2m36-1
+        Tue, 08 Dec 2020 05:29:11 -0500
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B89Wbvv110964;
+        Tue, 8 Dec 2020 05:29:10 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359wwde4pu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Dec 2020 05:09:38 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B8A8Ekg021900;
-        Tue, 8 Dec 2020 10:09:36 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3581u83ed4-1
+        Tue, 08 Dec 2020 05:29:09 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B8ASf4M010097;
+        Tue, 8 Dec 2020 10:29:02 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3583svkbun-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Dec 2020 10:09:36 +0000
+        Tue, 08 Dec 2020 10:29:02 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B8A9XAj21102936
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B8ASxaf41419212
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Dec 2020 10:09:33 GMT
+        Tue, 8 Dec 2020 10:28:59 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62BAD4C044;
-        Tue,  8 Dec 2020 10:09:33 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 770334C040;
+        Tue,  8 Dec 2020 10:28:59 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F5694C04E;
-        Tue,  8 Dec 2020 10:09:32 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.152.117])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Dec 2020 10:09:32 +0000 (GMT)
-Subject: Re: [PATCH v4] self_tests/kvm: sync_regs test for diag318
-To:     Collin Walling <walling@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        pbonzini@redhat.com, imbrenda@linux.ibm.com
-References: <20201207154125.10322-1-walling@linux.ibm.com>
- <2ea47a0e-40fb-35bc-5819-63a9e7b2ec59@de.ibm.com>
- <d5289faa-0422-5f16-9d84-cd6c1d627033@linux.ibm.com>
- <87bf5fb7-26bf-f757-1efa-d2a49bde5188@de.ibm.com>
- <501fe03a-c245-73f3-4715-1327cc73a712@linux.ibm.com>
- <ed4013bb-ac56-cd16-ca90-008bca8bf52b@de.ibm.com>
- <a3b745cf-d0ed-a200-b01e-907c9ffb4569@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <ac497116-5b07-43f0-95cf-90c1c7b3965a@linux.ibm.com>
-Date:   Tue, 8 Dec 2020 11:09:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        by IMSVA (Postfix) with ESMTP id 7D0704C044;
+        Tue,  8 Dec 2020 10:28:58 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.171.56.90])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Tue,  8 Dec 2020 10:28:58 +0000 (GMT)
+Date:   Tue, 8 Dec 2020 11:28:29 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>, pair@us.ibm.com,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
+        dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+        qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+        berrange@redhat.com, thuth@redhat.com, pbonzini@redhat.com,
+        rth@twiddle.net, mdroth@linux.vnet.ibm.com
+Subject: Re: [for-6.0 v5 12/13] securable guest memory: Alter virtio default
+ properties for protected guests
+Message-ID: <20201208112829.0f8fcdf4.pasic@linux.ibm.com>
+In-Reply-To: <20201208015403.GB2555@yekko.fritz.box>
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+        <20201204054415.579042-13-david@gibson.dropbear.id.au>
+        <d739cae2-9197-76a5-1c19-057bfe832187@de.ibm.com>
+        <20201204091706.4432dc1e.cohuck@redhat.com>
+        <038214d1-580d-6692-cd1e-701cd41b5cf8@de.ibm.com>
+        <20201204154310.158b410e.pasic@linux.ibm.com>
+        <20201208015403.GB2555@yekko.fritz.box>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <a3b745cf-d0ed-a200-b01e-907c9ffb4569@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ boundary="Sig_/.IV=x5r6L.IjUJN6uZ=6R+3"; protocol="application/pgp-signature"
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2020-12-08_06:2020-12-08,2020-12-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
- impostorscore=0 spamscore=0 suspectscore=0 phishscore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2012080062
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ suspectscore=0 impostorscore=0 adultscore=0 mlxlogscore=999
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012080059
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/7/20 9:59 PM, Collin Walling wrote:
-> On 12/7/20 3:16 PM, Christian Borntraeger wrote:
->>
->>
->> On 07.12.20 21:13, Collin Walling wrote:
->>> On 12/7/20 3:09 PM, Christian Borntraeger wrote:
->>>>
->>>>
->>>> On 07.12.20 21:06, Collin Walling wrote:
->>>>> On 12/7/20 2:32 PM, Christian Borntraeger wrote:
->>>>>> On 07.12.20 16:41, Collin Walling wrote:
->>>>>>> The DIAGNOSE 0x0318 instruction, unique to s390x, is a privileged call
->>>>>>> that must be intercepted via SIE, handled in userspace, and the
->>>>>>> information set by the instruction is communicated back to KVM.
->>>>>>>
->>>>>>> To test the instruction interception, an ad-hoc handler is defined which
->>>>>>> simply has a VM execute the instruction and then userspace will extract
->>>>>>> the necessary info. The handler is defined such that the instruction
->>>>>>> invocation occurs only once. It is up to the caller to determine how the
->>>>>>> info returned by this handler should be used.
->>>>>>>
->>>>>>> The diag318 info is communicated from userspace to KVM via a sync_regs
->>>>>>> call. This is tested During a sync_regs test, where the diag318 info is
->>>>>>> requested via the handler, then the info is stored in the appropriate
->>>>>>> register in KVM via a sync registers call.
->>>>>>>
->>>>>>> If KVM does not support diag318, then the tests will print a message
->>>>>>> stating that diag318 was skipped, and the asserts will simply test
->>>>>>> against a value of 0.
->>>>>>>
->>>>>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->>>>>>
->>>>>> Interestingly enough, this testcase actually trigger a bug:
->>>>>> While we gracefully handle this (no crash)
->>>>>> debugfs: Directory 'kvm-200206' with parent 's390dbf' already present!
->>>>>> is certainly not ideal....
->>>>>>
->>>>>
->>>>> Odd... I wonder what triggered this behavior?
->>>>>
->>>>> I run my tests with a simple command:
->>>>>
->>>>> make summary=0 TARGETS=kvm kselftest
->>>>>
->>>>> This must have something to do with spinning up another VM to get the
->>>>> diag318 data. I think if I have the sync_regs test call the diag handler
->>>>> first, and then have the sync regs create a VM, that might solve that
->>>>> issue...
->>>>
->>>> Yes, the s390dbf code will try to create a file named kvm-%pid. With
->>>> 2 VMs the 2nd one fails. Luckily the kvm will be created anyway and 
->>>> also the shutdown seems to be fine, still....
->>>>
->>>>>
->>>>> May I ask how you encountered this bug so I may replicate in on my end?
->>>>
->>>> I just did
->>>> make TARGETS=kvm selftests
->>>>
->>>> and then the error is on dmesg.
->>>>
->>>
->>> Thanks. v5 with fix incoming.
->>
->> I think the test is actually fine and we should rather fix the kvm module to
->> gracefully handle a userspace that starts up 2 or more guests.
->>
-> 
-> Looks like the root cause is within the inode.c file used for the debug
-> filesystem. Essentially, the 2nd VM starts / ends just fine as you
-> mentioned, but doesn't get a dbfs.
-> 
-> Since this touches the dbfs related area, and I'm unsure how common this
-> problem is out in the wild, should we ping the kernel list and see if it
-> catches anyone's attention?
-> 
-> A first thought would be to append a per-userspace incrementing value to
-> the end of the kvm-%pid part to account for any collisions, but that's
-> up to the folks that know more than I do.
-> 
+--Sig_/.IV=x5r6L.IjUJN6uZ=6R+3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Seems like I have a deja-vu, I remember having to fix that for the
-common code :-)
-For the KVM debugfs I solved that by appending the file descriptor after
-the pid. Maybe we can steal the string from the dentry.
+On Tue, 8 Dec 2020 12:54:03 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Have a look into vm_create_vm_debugfs(struct kvm *kvm, int fd).
+> > > >>> +         * Virtio devices can't count on directly accessing guest
+> > > >>> +         * memory, so they need iommu_platform=3Don to use norma=
+l DMA
+> > > >>> +         * mechanisms.  That requires also disabling legacy virt=
+io
+> > > >>> +         * support for those virtio pci devices which allow it.
+> > > >>> +         */
+> > > >>> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-leg=
+acy",
+> > > >>> +                                   "on", true);
+> > > >>> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_pl=
+atform",
+> > > >>> +                                   "on", false);   =20
+> > > >>
+> > > >> I have not followed all the history (sorry). Should we also set io=
+mmu_platform
+> > > >> for virtio-ccw? Halil?
+> > > >> =20
+> > > >=20
+> > > > That line should add iommu_platform for all virtio devices, shouldn=
+'t
+> > > > it? =20
+> > >=20
+> > > Yes, sorry. Was misreading that with the line above.=20
+> > >  =20
+> >=20
+> > I believe this is the best we can get. In a sense it is still a
+> > pessimization, =20
+>=20
+> I'm not really clear on what you're getting at here.
+
+By pessimiziation, I mean that we are going to indicate
+_F_PLATFORM_ACCESS even if it isn't necessary, because the guest never
+opted in for confidential/memory protection/memory encryption. We have
+discussed this before, and I don't see a better solution that works for
+everybody.
+
+Regards,
+Halil
+
+--Sig_/.IV=x5r6L.IjUJN6uZ=6R+3
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJfz1VnAAoJEA0vhuyXGx0A09UP+wX7WpVWpLrQfblOQAcnGs4e
+66Zacg4YfrzkEAR+VGlKQt27C7IB3w+7qSrkxqNO/kZeI2aa+Uc9VGZ9CZJKMy6a
+1NnVSSqR6VtJ6Q2eLU7CRacm/Mmb2Dw1VHKxWjupXpvCviGzclCs/32XiL8U+3ss
+iuZpH7GPI0Che7OEEhGVyXmzPZ+p7NPMlm4CRtwDC6lCbZ8lQjcaBnR8hAPjHFbx
+rL0yp+nIKweFnFE88h5OYXFx5cdlmfqzp1Btk38VksTdgMfZ2JOYnX5DEYPE9Dkw
+zjGqQdcpfdjXyUSWq4h7dsmU1JGxhSzU3a5lGLBXoreXEL+/K/bRI/J4+uU7/8nt
+Y6QifkpHBPUkGgIuu7+ja7Sn20qQNlug33XKzHYpFINN2ehLPQJn6zMkq2NLda4/
+LIXrjShVSMwVLtGGDujHWRR17clFyIFPZ2+BCAC7sXQnsYw5otC/e9aj+54kzeE2
+gd2Tj4TUwUeAyYEenmHh84buTBtXxAB911t2pddqQDSL2+UeyG283qlgzDlgG1AJ
+kxYqJcwadcAwwU4zT4JtUMxCJFOs4nqhU32v2qlarrWDNkG0vRF95fQ1Sm8okYRM
+/9voXbA/gbWrVmNT/kC8n8oT7HPKkAatst//Yg91KITZoFJlD5/brV5bQs+o0VGU
+1tZYPudJTC2Pg8VBMjoS
+=GE8Q
+-----END PGP SIGNATURE-----
+
+--Sig_/.IV=x5r6L.IjUJN6uZ=6R+3--
+
