@@ -2,336 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90F302D2D92
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 15:52:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04C222D2DE5
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 16:10:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729740AbgLHOwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 09:52:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28220 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729570AbgLHOwe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 09:52:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607439068;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NYSUflpZUUZ89cE7q6id1OpwYjRrpvo45jLvK9kPzUA=;
-        b=cKF0yJrNzoiCW3SFdKkmeX0PZXG5T77V+1y3nJZv5tWNj1K8Vrlgkeayry/3VYwrUfd0Dj
-        Slww7/pq6CKD35Pf7KEKRp0Lp314u9Qtuw3+Pm3xVdCXCU0G3QDRnuh31Mi3owCFKgzeTi
-        wQwJHo/bthsFLnX+p2fMK4oEf87Hxcs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-Anqmj7lqPGS67iimRX5v8w-1; Tue, 08 Dec 2020 09:51:04 -0500
-X-MC-Unique: Anqmj7lqPGS67iimRX5v8w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21F80803646;
-        Tue,  8 Dec 2020 14:51:02 +0000 (UTC)
-Received: from starship (unknown [10.35.206.133])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93DC05D9DD;
-        Tue,  8 Dec 2020 14:50:54 +0000 (UTC)
-Message-ID: <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     kvm@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Date:   Tue, 08 Dec 2020 16:50:53 +0200
-In-Reply-To: <20201207232920.GD27492@fuller.cnet>
-References: <20201203171118.372391-1-mlevitsk@redhat.com>
-         <20201203171118.372391-2-mlevitsk@redhat.com>
-         <20201207232920.GD27492@fuller.cnet>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        id S1729915AbgLHPJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 10:09:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51546 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727925AbgLHPJy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 10:09:54 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B8F3OGV136929;
+        Tue, 8 Dec 2020 10:09:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=DDTALXsM0JFGwV6p5LS+C2/BmUHS2x1iSw4xTD1U66U=;
+ b=EZ6gTxX3zUYCUBZmPQ141rMilaEktLX6T0jfswRNGttkCWjsYJjSq7FEKY7OvpHRHBX1
+ LpwNBUiNGyaJFxo4YCznO2AQUsZOJZe35njVdaJOor+XVUHtIl4UrTX+oyg6ndbAEUMq
+ ntS48etwgWv2vAthhiG0O3JYU8WRKBE4C9UHZu+mmPZ/XDZoyyO/NMXAqjPEp/loKCYH
+ 9R3CqKesejKxDI9i1j9IqBL2hQfu1fOVMtd0zSNmeo2hjMasih0vTtlrgkqlEdUQafoJ
+ VFHAB9oBtVdkfUvfLEB4dAnP4GXXMfkKfVcfbGlZmFXAriNVLsBNozlq8VyolY0vw8o1 7Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359s1ee81h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Dec 2020 10:09:14 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B8F3bSR139249;
+        Tue, 8 Dec 2020 10:09:13 -0500
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359s1ee80d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Dec 2020 10:09:13 -0500
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B8F828K018362;
+        Tue, 8 Dec 2020 15:09:11 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 3581u8ne3n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Dec 2020 15:09:11 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B8F98Eh6685284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Dec 2020 15:09:09 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C981FAE05A;
+        Tue,  8 Dec 2020 15:09:08 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 35DF1AE065;
+        Tue,  8 Dec 2020 15:09:08 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Dec 2020 15:09:08 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH 0/2] s390x: Move from LGPL 2 to GPL 2
+Date:   Tue,  8 Dec 2020 10:09:00 -0500
+Message-Id: <20201208150902.32383-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-08_09:2020-12-08,2020-12-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1015 suspectscore=1 adultscore=0 malwarescore=0
+ phishscore=0 spamscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012080093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-12-07 at 20:29 -0300, Marcelo Tosatti wrote:
-> On Thu, Dec 03, 2020 at 07:11:16PM +0200, Maxim Levitsky wrote:
-> > These two new ioctls allow to more precisly capture and
-> > restore guest's TSC state.
-> > 
-> > Both ioctls are meant to be used to accurately migrate guest TSC
-> > even when there is a significant downtime during the migration.
-> > 
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 65 ++++++++++++++++++++++++++++++
-> >  arch/x86/kvm/x86.c             | 73 ++++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/kvm.h       | 15 +++++++
-> >  3 files changed, 153 insertions(+)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 70254eaa5229f..ebecfe4b414ce 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -4826,6 +4826,71 @@ If a vCPU is in running state while this ioctl is invoked, the vCPU may
-> >  experience inconsistent filtering behavior on MSR accesses.
-> >  
-> >  
-> > +4.127 KVM_GET_TSC_STATE
-> > +----------------------------
-> > +
-> > +:Capability: KVM_CAP_PRECISE_TSC
-> > +:Architectures: x86
-> > +:Type: vcpu ioctl
-> > +:Parameters: struct kvm_tsc_state
-> > +:Returns: 0 on success, < 0 on error
-> > +
-> > +::
-> > +
-> > +  #define KVM_TSC_STATE_TIMESTAMP_VALID 1
-> > +  #define KVM_TSC_STATE_TSC_ADJUST_VALID 2
-> > +  struct kvm_tsc_state {
-> > +	__u32 flags;
-> > +	__u64 nsec;
-> > +	__u64 tsc;
-> > +	__u64 tsc_adjust;
-> > +  };
-> > +
-> > +flags values for ``struct kvm_tsc_state``:
-> > +
-> > +``KVM_TSC_STATE_TIMESTAMP_VALID``
-> > +
-> > +  ``nsec`` contains nanoseconds from unix epoch.
-> > +    Always set by KVM_GET_TSC_STATE, might be omitted in KVM_SET_TSC_STATE
-> > +
-> > +``KVM_TSC_STATE_TSC_ADJUST_VALID``
-> > +
-> > +  ``tsc_adjust`` contains valid IA32_TSC_ADJUST value
-> > +
-> > +
-> > +This ioctl allows the user space to read the guest's IA32_TSC,IA32_TSC_ADJUST,
-> > +and the current value of host's CLOCK_REALTIME clock in nanoseconds since unix
-> > +epoch.
-> 
-> Why is CLOCK_REALTIME necessary at all? kvmclock uses the host clock as
-> a time base, but for TSC it should not be necessary.
+KVM and the KVM unit tests should be able to share code to improve
+development speed and the LGPL is currently preventing us from doing
+exactly that. Additionally we have a multitude of different licenses
+in s390x files: GPL 2 only, GPL 2 or greater, LGPL 2 and LGPL 2.1 or
+later.
 
+This patch set tries to move the licenses to GPL 2 where
+possible. Also we introduce the SPDX identifiers so the file headers
+are more readable.
 
-CLOCK_REALTIME is used as an absolute time reference that should match
-on both computers. I could have used CLOCK_TAI instead for example.
+Janosch Frank (2):
+  s390x: Move to GPL 2 and SPDX license identifiers
+  s390x: lib: Move to GPL 2 and SPDX license identifiers
 
-The reference allows to account for time passed between saving and restoring
-the TSC as explained above.
+ lib/s390x/asm-offsets.c     | 4 +---
+ lib/s390x/asm/arch_def.h    | 4 +---
+ lib/s390x/asm/asm-offsets.h | 4 +---
+ lib/s390x/asm/barrier.h     | 4 +---
+ lib/s390x/asm/cpacf.h       | 1 +
+ lib/s390x/asm/facility.h    | 4 +---
+ lib/s390x/asm/float.h       | 4 +---
+ lib/s390x/asm/interrupt.h   | 4 +---
+ lib/s390x/asm/io.h          | 4 +---
+ lib/s390x/asm/mem.h         | 4 +---
+ lib/s390x/asm/page.h        | 4 +---
+ lib/s390x/asm/pgtable.h     | 4 +---
+ lib/s390x/asm/sigp.h        | 4 +---
+ lib/s390x/asm/spinlock.h    | 4 +---
+ lib/s390x/asm/stack.h       | 4 +---
+ lib/s390x/asm/time.h        | 4 +---
+ lib/s390x/css.h             | 4 +---
+ lib/s390x/css_dump.c        | 4 +---
+ lib/s390x/css_lib.c         | 4 +---
+ lib/s390x/interrupt.c       | 4 +---
+ lib/s390x/io.c              | 4 +---
+ lib/s390x/mmu.c             | 4 +---
+ lib/s390x/mmu.h             | 4 +---
+ lib/s390x/sclp-console.c    | 5 +----
+ lib/s390x/sclp.c            | 4 +---
+ lib/s390x/sclp.h            | 5 +----
+ lib/s390x/smp.c             | 4 +---
+ lib/s390x/smp.h             | 4 +---
+ lib/s390x/stack.c           | 4 +---
+ lib/s390x/vm.c              | 3 +--
+ lib/s390x/vm.h              | 3 +--
+ s390x/cmm.c                 | 4 +---
+ s390x/cpumodel.c            | 4 +---
+ s390x/css.c                 | 4 +---
+ s390x/cstart64.S            | 4 +---
+ s390x/diag10.c              | 4 +---
+ s390x/diag288.c             | 4 +---
+ s390x/diag308.c             | 5 +----
+ s390x/emulator.c            | 4 +---
+ s390x/gs.c                  | 4 +---
+ s390x/iep.c                 | 4 +---
+ s390x/intercept.c           | 4 +---
+ s390x/pfmf.c                | 4 +---
+ s390x/sclp.c                | 4 +---
+ s390x/selftest.c            | 4 +---
+ s390x/skey.c                | 4 +---
+ s390x/skrf.c                | 4 +---
+ s390x/smp.c                 | 4 +---
+ s390x/sthyi.c               | 4 +---
+ s390x/sthyi.h               | 4 +---
+ s390x/stsi.c                | 4 +---
+ s390x/uv-guest.c            | 4 +---
+ s390x/vector.c              | 4 +---
+ 53 files changed, 53 insertions(+), 157 deletions(-)
 
-
-> 
-> > +
-> > +
-> > +4.128 KVM_SET_TSC_STATE
-> > +----------------------------
-> > +
-> > +:Capability: KVM_CAP_PRECISE_TSC
-> > +:Architectures: x86
-> > +:Type: vcpu ioctl
-> > +:Parameters: struct kvm_tsc_state
-> > +:Returns: 0 on success, < 0 on error
-> > +
-> > +::
-> > +
-> > +This ioctl allows to reconstruct the guest's IA32_TSC and TSC_ADJUST value
-> > +from the state obtained in the past by KVM_GET_TSC_STATE on the same vCPU.
-> > +
-> > +If 'KVM_TSC_STATE_TIMESTAMP_VALID' is set in flags,
-> > +KVM will adjust the guest TSC value by the time that passed since the moment
-> > +CLOCK_REALTIME timestamp was saved in the struct and current value of
-> > +CLOCK_REALTIME, and set the guest's TSC to the new value.
-> 
-> This introduces the wraparound bug in Linux timekeeping, doesnt it?
-
-It does.
-Could you prepare a reproducer for this bug so I get a better idea about
-what are you talking about?
-
-I assume you need very long (like days worth) jump to trigger this bug
-and for such case we can either work around it in qemu / kernel 
-or fix it in the guest kernel and I strongly prefer the latter.
-
-Thomas, what do you think about it?
-
-Best regards,
-	Maxim Levitsky
-
-> 
-
-> > +
-> > +Otherwise KVM will set the guest TSC value to the exact value as given
-> > +in the struct.
-> > +
-> > +if KVM_TSC_STATE_TSC_ADJUST_VALID is set, and guest supports IA32_MSR_TSC_ADJUST,
-> > +then its value will be set to the given value from the struct.
-> > +
-> > +It is assumed that either both ioctls will be run on the same machine,
-> > +or that source and destination machines have synchronized clocks.
-> 
-> 
-> >  5. The kvm_run structure
-> >  ========================
-> >  
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index a3fdc16cfd6f3..9b8a2fe3a2398 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -2438,6 +2438,21 @@ static bool kvm_get_walltime_and_clockread(struct timespec64 *ts,
-> >  
-> >  	return gtod_is_based_on_tsc(do_realtime(ts, tsc_timestamp));
-> >  }
-> > +
-> > +
-> > +static void kvm_get_walltime(u64 *walltime_ns, u64 *host_tsc)
-> > +{
-> > +	struct timespec64 ts;
-> > +
-> > +	if (kvm_get_walltime_and_clockread(&ts, host_tsc)) {
-> > +		*walltime_ns = timespec64_to_ns(&ts);
-> > +		return;
-> > +	}
-> > +
-> > +	*host_tsc = rdtsc();
-> > +	*walltime_ns = ktime_get_real_ns();
-> > +}
-> > +
-> >  #endif
-> >  
-> >  /*
-> > @@ -3757,6 +3772,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_X86_USER_SPACE_MSR:
-> >  	case KVM_CAP_X86_MSR_FILTER:
-> >  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-> > +#ifdef CONFIG_X86_64
-> > +	case KVM_CAP_PRECISE_TSC:
-> > +#endif
-> >  		r = 1;
-> >  		break;
-> >  	case KVM_CAP_SYNC_REGS:
-> > @@ -4999,6 +5017,61 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-> >  	case KVM_GET_SUPPORTED_HV_CPUID:
-> >  		r = kvm_ioctl_get_supported_hv_cpuid(vcpu, argp);
-> >  		break;
-> > +#ifdef CONFIG_X86_64
-> > +	case KVM_GET_TSC_STATE: {
-> > +		struct kvm_tsc_state __user *user_tsc_state = argp;
-> > +		u64 host_tsc;
-> > +
-> > +		struct kvm_tsc_state tsc_state = {
-> > +			.flags = KVM_TSC_STATE_TIMESTAMP_VALID
-> > +		};
-> > +
-> > +		kvm_get_walltime(&tsc_state.nsec, &host_tsc);
-> > +		tsc_state.tsc = kvm_read_l1_tsc(vcpu, host_tsc);
-> > +
-> > +		if (guest_cpuid_has(vcpu, X86_FEATURE_TSC_ADJUST)) {
-> > +			tsc_state.tsc_adjust = vcpu->arch.ia32_tsc_adjust_msr;
-> > +			tsc_state.flags |= KVM_TSC_STATE_TSC_ADJUST_VALID;
-> > +		}
-> > +
-> > +		r = -EFAULT;
-> > +		if (copy_to_user(user_tsc_state, &tsc_state, sizeof(tsc_state)))
-> > +			goto out;
-> > +		r = 0;
-> > +		break;
-> > +	}
-> > +	case KVM_SET_TSC_STATE: {
-> > +		struct kvm_tsc_state __user *user_tsc_state = argp;
-> > +		struct kvm_tsc_state tsc_state;
-> > +		u64 host_tsc, wall_nsec;
-> > +
-> > +		u64 new_guest_tsc, new_guest_tsc_offset;
-> > +
-> > +		r = -EFAULT;
-> > +		if (copy_from_user(&tsc_state, user_tsc_state, sizeof(tsc_state)))
-> > +			goto out;
-> > +
-> > +		kvm_get_walltime(&wall_nsec, &host_tsc);
-> > +		new_guest_tsc = tsc_state.tsc;
-> > +
-> > +		if (tsc_state.flags & KVM_TSC_STATE_TIMESTAMP_VALID) {
-> > +			s64 diff = wall_nsec - tsc_state.nsec;
-> > +			if (diff >= 0)
-> > +				new_guest_tsc += nsec_to_cycles(vcpu, diff);
-> > +			else
-> > +				new_guest_tsc -= nsec_to_cycles(vcpu, -diff);
-> > +		}
-> > +
-> > +		new_guest_tsc_offset = new_guest_tsc - kvm_scale_tsc(vcpu, host_tsc);
-> > +		kvm_vcpu_write_tsc_offset(vcpu, new_guest_tsc_offset);
-> > +
-> > +		if (tsc_state.flags & KVM_TSC_STATE_TSC_ADJUST_VALID)
-> > +			if (guest_cpuid_has(vcpu, X86_FEATURE_TSC_ADJUST))
-> > +				vcpu->arch.ia32_tsc_adjust_msr = tsc_state.tsc_adjust;
-> > +		r = 0;
-> > +		break;
-> > +	}
-> > +#endif
-> >  	default:
-> >  		r = -EINVAL;
-> >  	}
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 886802b8ffba3..bf4c38fd58291 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1056,6 +1056,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-> >  #define KVM_CAP_SYS_HYPERV_CPUID 191
-> >  #define KVM_CAP_DIRTY_LOG_RING 192
-> > +#define KVM_CAP_PRECISE_TSC 193
-> >  
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >  
-> > @@ -1169,6 +1170,16 @@ struct kvm_clock_data {
-> >  	__u32 pad[9];
-> >  };
-> >  
-> > +
-> > +#define KVM_TSC_STATE_TIMESTAMP_VALID 1
-> > +#define KVM_TSC_STATE_TSC_ADJUST_VALID 2
-> > +struct kvm_tsc_state {
-> > +	__u32 flags;
-> > +	__u64 nsec;
-> > +	__u64 tsc;
-> > +	__u64 tsc_adjust;
-> > +};
-> > +
-> >  /* For KVM_CAP_SW_TLB */
-> >  
-> >  #define KVM_MMU_FSL_BOOKE_NOHV		0
-> > @@ -1563,6 +1574,10 @@ struct kvm_pv_cmd {
-> >  /* Available with KVM_CAP_DIRTY_LOG_RING */
-> >  #define KVM_RESET_DIRTY_RINGS		_IO(KVMIO, 0xc7)
-> >  
-> > +/* Available with KVM_CAP_PRECISE_TSC*/
-> > +#define KVM_SET_TSC_STATE          _IOW(KVMIO,  0xc8, struct kvm_tsc_state)
-> > +#define KVM_GET_TSC_STATE          _IOR(KVMIO,  0xc9, struct kvm_tsc_state)
-> > +
-> >  /* Secure Encrypted Virtualization command */
-> >  enum sev_cmd_id {
-> >  	/* Guest initialization commands */
-> > -- 
-> > 2.26.2
-
+-- 
+2.25.1
 
