@@ -2,179 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E1C02D2B53
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 13:46:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 213992D2B5E
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 13:49:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729316AbgLHMpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 07:45:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35030 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725881AbgLHMpI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 07:45:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607431421;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9NjwKxT/SFtSebETsZkqlQUYSJrNizbHsL2kPkriiiI=;
-        b=Rowk3x/L720c3YANCmjb3F5tyt8DqoSIfUy7JLBiX+0ygDVLzOTFlc96pRBu5+XIa4DnVo
-        Zg140yLbvQ25BpmR2OZYxo55V+iFge/lRA6r78zFqZjbN2vuUQqk1hyG3a4nXZyWd7t6FH
-        rUy+LlOq03FCw/EdEn8SRcO339/B76s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-n86cLAbHN0u98jWvn_X04A-1; Tue, 08 Dec 2020 07:43:38 -0500
-X-MC-Unique: n86cLAbHN0u98jWvn_X04A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42CF887950E;
-        Tue,  8 Dec 2020 12:43:36 +0000 (UTC)
-Received: from gondolin (ovpn-113-5.ams2.redhat.com [10.36.113.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 62FC41001901;
-        Tue,  8 Dec 2020 12:43:24 +0000 (UTC)
-Date:   Tue, 8 Dec 2020 13:43:08 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        brijesh.singh@amd.com, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
-        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
-        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com
-Subject: Re: [for-6.0 v5 00/13] Generalize memory encryption models
-Message-ID: <20201208134308.2afa0e3e.cohuck@redhat.com>
-In-Reply-To: <20201208025728.GD2555@yekko.fritz.box>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
-        <f2419585-4e39-1f3d-9e38-9095e26a6410@de.ibm.com>
-        <20201204140205.66e205da.cohuck@redhat.com>
-        <20201204130727.GD2883@work-vm>
-        <20201204141229.688b11e4.cohuck@redhat.com>
-        <20201208025728.GD2555@yekko.fritz.box>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/zU8XNVbQwRALPRxAVzVqthS";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        id S1729346AbgLHMsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 07:48:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50166 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726415AbgLHMsw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 07:48:52 -0500
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93668C0613D6
+        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 04:48:12 -0800 (PST)
+Received: by mail-pl1-x642.google.com with SMTP id 4so6932828plk.5
+        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 04:48:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=2xC/30zdoPJZixJb/Fmz+ZJRVHITwlCsE0s1lEl9W7M=;
+        b=ZB+RGQDZfBDtEGPWfQY2vs5cX4BvWRZd1sL0TPeo9a9YiKOMcbLa4slmAhUWYHncN2
+         vz/1KHvacnY9wxxpv/fR6fq6XQtjRwwavcg3hHRAGF8DO6RkimvI+HufBrquGsfAxUiZ
+         gTl9h4FAwx0tRyE4Z4MRjGheXk47EEDJ2inI/rkTZMrioaqWyBTU53MTn3ZSRLzMreUx
+         ipSHN/255fHVnZYB8eMbtPR4tDzsDXrkQoO5nOhdIQ6ueEJ2oejudrlsvh4Ccu/WrAcK
+         dAjYnhU7OYvQKjO97U/5b5qD7qGVItoNxNRunQypCW8HQPtSZOUZJd/qoCZ26pSN1Q/6
+         pJMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=2xC/30zdoPJZixJb/Fmz+ZJRVHITwlCsE0s1lEl9W7M=;
+        b=hwPPIE5/pVHtjjHoLloNL4O+v3LVokYaXXGN/GXetyLypO6JYbksb0eqlzufKutfH9
+         m76uxnt/ro9oRNEBhlL8MWfF9YGXQN0RbBaL3m3CxlEB0V0fWyZlONivQ3bal0XazTaw
+         gZV8M4Upg5tAZDKpU75tgpQxQX6mCGwGdiPGp85SzcIc3H/NTX7+ikHCx8LtEeYLJzmk
+         DR1ZWDC0OuGRNIeQgQASidC4FxiNSIh/HfpEmUzBpgtKTPtf+JNp/dSBNktqGSw1K6wM
+         1LZs98lVGWg6o4X87b18nQqfH6plLt4I+/fBw9Mr2JsrhRb6OoVhLCd2CneCpiqXff2d
+         kZUg==
+X-Gm-Message-State: AOAM533ETNUR7OMAm7+q7+SkfrdsB1i0m6GONjcSAYhfEmogHXzPdEyb
+        DzPQdVWfq5DWSaXMznjAXYM=
+X-Google-Smtp-Source: ABdhPJxO+2Gdx6YENVZJv2MbAWKYIyv9QTADEb/jnTEBZ1QLsrxkPyBaWFloFILlbYH17JGcleTrwg==
+X-Received: by 2002:a17:902:a711:b029:da:f065:1315 with SMTP id w17-20020a170902a711b02900daf0651315mr11441448plq.36.1607431691690;
+        Tue, 08 Dec 2020 04:48:11 -0800 (PST)
+Received: from ?IPv6:2601:647:4700:9b2:5c98:e5b3:1ddc:54ce? ([2601:647:4700:9b2:5c98:e5b3:1ddc:54ce])
+        by smtp.gmail.com with ESMTPSA id a17sm14997636pga.56.2020.12.08.04.48.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 08 Dec 2020 04:48:11 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
+Subject: Re: [kvm-unit-tests PATCH v2 4/7] lib/alloc_page: complete rewrite of
+ the page allocator
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20201208110010.7d05bd3a@ibm-vm>
+Date:   Tue, 8 Dec 2020 04:48:09 -0800
+Cc:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, cohuck@redhat.com,
+        lvivier@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7D823148-A383-470A-9611-E77C2E442524@gmail.com>
+References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
+ <20201002154420.292134-5-imbrenda@linux.ibm.com>
+ <C812A718-DCD6-4485-BB5A-B24DE73A0FD3@gmail.com>
+ <11863F45-D4E5-4192-9541-EC4D26AC3634@gmail.com>
+ <20201208101510.4e3866dc@ibm-vm>
+ <A32A8A40-5581-4A3D-9DC8-4591C3A034C7@gmail.com>
+ <20201208110010.7d05bd3a@ibm-vm>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/zU8XNVbQwRALPRxAVzVqthS
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 8 Dec 2020 13:57:28 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Fri, Dec 04, 2020 at 02:12:29PM +0100, Cornelia Huck wrote:
-> > On Fri, 4 Dec 2020 13:07:27 +0000
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >  =20
-> > > * Cornelia Huck (cohuck@redhat.com) wrote: =20
-> > > > On Fri, 4 Dec 2020 09:06:50 +0100
-> > > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> > > >    =20
-> > > > > On 04.12.20 06:44, David Gibson wrote:   =20
-> > > > > > A number of hardware platforms are implementing mechanisms wher=
-eby the
-> > > > > > hypervisor does not have unfettered access to guest memory, in =
-order
-> > > > > > to mitigate the security impact of a compromised hypervisor.
-> > > > > >=20
-> > > > > > AMD's SEV implements this with in-cpu memory encryption, and In=
-tel has
-> > > > > > its own memory encryption mechanism.  POWER has an upcoming mec=
-hanism
-> > > > > > to accomplish this in a different way, using a new memory prote=
-ction
-> > > > > > level plus a small trusted ultravisor.  s390 also has a protect=
-ed
-> > > > > > execution environment.
-> > > > > >=20
-> > > > > > The current code (committed or draft) for these features has ea=
-ch
-> > > > > > platform's version configured entirely differently.  That doesn=
-'t seem
-> > > > > > ideal for users, or particularly for management layers.
-> > > > > >=20
-> > > > > > AMD SEV introduces a notionally generic machine option
-> > > > > > "machine-encryption", but it doesn't actually cover any cases o=
-ther
-> > > > > > than SEV.
-> > > > > >=20
-> > > > > > This series is a proposal to at least partially unify configura=
-tion
-> > > > > > for these mechanisms, by renaming and generalizing AMD's
-> > > > > > "memory-encryption" property.  It is replaced by a
-> > > > > > "securable-guest-memory" property pointing to a platform specif=
-ic     =20
-> > > > >=20
-> > > > > Can we do "securable-guest" ?
-> > > > > s390x also protects registers and integrity. memory is only one p=
-iece
-> > > > > of the puzzle and what we protect might differ from platform to=
-=20
-> > > > > platform.
-> > > > >    =20
-> > > >=20
-> > > > I agree. Even technologies that currently only do memory encryption=
- may
-> > > > be enhanced with more protections later.   =20
-> > >=20
-> > > There's already SEV-ES patches onlist for this on the SEV side.
-> > >=20
-> > > <sigh on haggling over the name>
-> > >=20
-> > > Perhaps 'confidential guest' is actually what we need, since the
-> > > marketing folks seem to have started labelling this whole idea
-> > > 'confidential computing'. =20
+> On Dec 8, 2020, at 2:00 AM, Claudio Imbrenda <imbrenda@linux.ibm.com> =
+wrote:
 >=20
-> That's not a bad idea, much as I usually hate marketing terms.  But it
-> does seem to be becoming a general term for this style of thing, and
-> it doesn't overlap too badly with other terms ("secure" and
-> "protected" are also used for hypervisor-from-guest and
-> guest-from-guest protection).
+> On Tue, 8 Dec 2020 01:23:59 -0800
+> Nadav Amit <nadav.amit@gmail.com> wrote:
 >=20
-> > It's more like a 'possibly confidential guest', though. =20
+>>> On Dec 8, 2020, at 1:15 AM, Claudio Imbrenda
+>>> <imbrenda@linux.ibm.com> wrote:
+>>>=20
+>>> On Mon, 7 Dec 2020 17:10:13 -0800
+>>> Nadav Amit <nadav.amit@gmail.com> wrote:
+>>>=20
+>>>>> On Dec 7, 2020, at 4:41 PM, Nadav Amit <nadav.amit@gmail.com>
+>>>>> wrote:=20
+>>>>>> On Oct 2, 2020, at 8:44 AM, Claudio Imbrenda
+>>>>>> <imbrenda@linux.ibm.com> wrote:
+>>>>>>=20
+>>>>>> This is a complete rewrite of the page allocator.   =20
+>>>>>=20
+>>>>> This patch causes me crashes:
+>>>>>=20
+>>>>> lib/alloc_page.c:433: assert failed: !(areas_mask & BIT(n))
+>>>>>=20
+>>>>> It appears that two areas are registered on AREA_LOW_NUMBER, as
+>>>>> setup_vm() can call (and calls on my system)
+>>>>> page_alloc_init_area() twice.
+>>>>>=20
+>>>>> setup_vm() uses AREA_ANY_NUMBER as the area number argument but
+>>>>> eventually this means, according to the code, that
+>>>>> __page_alloc_init_area() would use AREA_LOW_NUMBER.
+>>>>>=20
+>>>>> I do not understand the rationale behind these areas well enough
+>>>>> to fix it.   =20
+>>>>=20
+>>>> One more thing: I changed the previous allocator to zero any
+>>>> allocated page. Without it, I get strange failures when I do not
+>>>> run the tests on KVM, which are presumably caused by some
+>>>> intentional or unintentional hidden assumption of kvm-unit-tests
+>>>> that the memory is zeroed.
+>>>>=20
+>>>> Can you restore this behavior? I can also send this one-line fix,
+>>>> but I do not want to overstep on your (hopeful) fix for the
+>>>> previous problem that I mentioned (AREA_ANY_NUMBER). =20
+>>>=20
+>>> no. Some tests depend on the fact that the memory is being touched
+>>> for the first time.
+>>>=20
+>>> if your test depends on memory being zeroed on allocation, maybe you
+>>> can zero the memory yourself in the test?
+>>>=20
+>>> otherwise I can try adding a function to explicitly allocate a
+>>> zeroed page. =20
+>>=20
+>> To be fair, I do not know which non-zeroed memory causes the failure,
+>> and debugging these kind of failures is hard and sometimes
+>> non-deterministic. For instance, the failure I got this time was:
+>>=20
+>> 	Test suite: vmenter
+>> 	VM-Fail on vmlaunch: error number is 7. See Intel 30.4.
+>>=20
+>> And other VM-entry failures, which are not easy to debug, especially
+>> on bare-metal.
 >=20
-> Hmm.  What about "Confidential Guest Facility" or "Confidential Guest
-> Mechanism"?  The implication being that the facility is there, whether
-> or not the guest actually uses it.
+> so you are running the test on bare metal?
 >=20
+> that is something I had not tested
 
-"Confidential Guest Enablement"? The others generally sound fine to me
-as well, though; not sure if "Facility" might be a bit confusing, as
-that term is already a bit overloaded.
+Base-metal / VMware.
 
---Sig_/zU8XNVbQwRALPRxAVzVqthS
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+>=20
+>> Note that the failing test is not new, and unfortunately these kind =
+of
+>> errors (wrong assumption that memory is zeroed) are not rare, since
+>> KVM indeed zeroes the memory (unlike other hypervisors and
+>> bare-metal).
+>>=20
+>> The previous allocator had the behavior of zeroing the memory to
+>=20
+> I don't remember such behaviour, but I'll have a look
 
------BEGIN PGP SIGNATURE-----
+See https://www.spinics.net/lists/kvm/msg186474.html
 
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl/PdNwACgkQ3s9rk8bw
-L68BRA//TCOIZrF+v+dXbOq+uR5phW4kslQrUTC7M7RK7pWVrmP7OJizDIuOfNj4
-ev+p+5nspO1c5gYh/m/kU4qy/dwkrR/q/AdZm19lft5fRb/77NFWALdqq6ftH0YK
-7IOogAYlmIo2qg1L1ETQdig4MRCNnrThf7NILYU4mHNVWj7TQkwoJEOA0ow00qze
-Svd5myUVZqVD3tX6AbKl/kW7/F8oY0kHUWd8zL5JkvG4OtNKrwdv+eIpPTzatTNA
-Xr8z5j2VDHhQRFaw/gQg1RJBRSV9eCJbXQ1SpVUdPxBz04hQxYBg8MpfPSlI/ECV
-+f6NTiXuUxHpguyKy4gLODcwgDIG5D81FljHYsQc2JS+M0mbqaHZcf5nb7oFhtFt
-sLBAOrc6NLG1LjupzExH1LaXZSxjuOEDh7Ow9bTU06DhkxXu32LRundLKcENXVv5
-X4Ob1IEFt28djLiDSFJxRyj1K8Yz4vR1QVKulmTD7U9HvXXOCm2EpRLEnO4S/nHf
-HBk5fpvQmY8g3eG2/CdZHbc1OI0HNXpfiWCmFYnF3/cB+aVg9dNF2614vQxLTyQN
-tFG+4xJxrpkXizwaTnDHRuU80jCPL668UH3cetBOc5L2Q0gbR9EhbKta6X50ZFix
-i4B1hE3MnQh28dMTU7w2Z1hdbJLGJ3hINDXfTvoTKAhNEII+FKU=
-=Z85K
------END PGP SIGNATURE-----
+>=20
+>> avoid such problems. I would argue that zeroing should be the default
+>> behavior, and if someone wants to have the memory =E2=80=9Cuntouched=E2=
+=80=9D for a
+>> specific test (which one?) he should use an alternative function for
+>> this matter.
+>=20
+> probably we need some commandline switches to change the behaviour of
+> the allocator according to the specific needs of each testcase
+>=20
+>=20
+> I'll see what I can do
 
---Sig_/zU8XNVbQwRALPRxAVzVqthS--
+I do not think commandline switches are the right way. I think that
+reproducibility requires the memory to always be on a given state before =
+the
+tests begin. There are latent bugs in kvm-unit-tests that are not =
+apparent
+when the memory is zeroed. I do not think anyone wants to waste time on
+resolving these bugs.
 
