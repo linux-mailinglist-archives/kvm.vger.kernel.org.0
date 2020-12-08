@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DBCB92D21A1
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 04:57:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5601B2D21A2
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 04:57:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726903AbgLHD4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 22:56:30 -0500
+        id S1727029AbgLHD4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 22:56:45 -0500
 Received: from mga14.intel.com ([192.55.52.115]:59706 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726556AbgLHD4a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 22:56:30 -0500
-IronPort-SDR: 4bap6LJ9XyrO89KUGzw447xJzLX16Qtg8D16T+ztHbArfNdwWKIKUVPhgHz2lTWiXKTNA2HjSF
- Y6uovgLArv+Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9828"; a="173060180"
+        id S1726556AbgLHD4p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 22:56:45 -0500
+IronPort-SDR: Pevb0BF4lHRIr9bC7/RguIX0ejY0RSmGRQCwxdqvVSsW7OZisJprRxjd1se5fDvqw039bB4FT7
+ ILJtYha9SufQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9828"; a="173060182"
 X-IronPort-AV: E=Sophos;i="5.78,401,1599548400"; 
-   d="scan'208";a="173060180"
+   d="scan'208";a="173060182"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2020 19:55:35 -0800
-IronPort-SDR: nvu23G2qECChJTtgThqTte/uySMynDEZAW3ErrvTP74P9lLCwnVcbuKlTKjyTAxbe68EorHFUQ
- s5xHgsHIFkFg==
+IronPort-SDR: 99uynEt5jHqcAbRU/AZLAFnaNABKgcDEZBW0H4iDxedrURkee1Et3Uw7BtVHxhnWl/Vauv3WXX
+ 5e/hpWBUrG9A==
 X-IronPort-AV: E=Sophos;i="5.78,401,1599548400"; 
-   d="scan'208";a="363469717"
+   d="scan'208";a="363469731"
 Received: from km-skylake-client-platform.sc.intel.com ([10.3.52.146])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2020 19:55:34 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2020 19:55:35 -0800
 From:   Kyung Min Park <kyung.min.park@intel.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
@@ -31,9 +31,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
         jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
         wanpengli@tencent.com, kyung.min.park@intel.com,
         cathy.zhang@intel.com
-Subject: [PATCH 1/2] Enumerate AVX512 FP16 CPUID feature flag
-Date:   Mon,  7 Dec 2020 19:34:40 -0800
-Message-Id: <20201208033441.28207-2-kyung.min.park@intel.com>
+Subject: [PATCH 2/2] x86: Expose AVX512_FP16 for supported CPUID
+Date:   Mon,  7 Dec 2020 19:34:41 -0800
+Message-Id: <20201208033441.28207-3-kyung.min.park@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201208033441.28207-1-kyung.min.park@intel.com>
 References: <20201208033441.28207-1-kyung.min.park@intel.com>
@@ -41,53 +41,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enumerate AVX512 Half-precision floating point (FP16) CPUID feature
-flag. Compared with using FP32, using FP16 cut the number of bits
-required for storage in half, reducing the exponent from 8 bits to 5,
-and the mantissa from 23 bits to 10. Using FP16 also enables developers
-to train and run inference on deep learning models fast when all
-precision or magnitude (FP32) is not needed.
+From: Cathy Zhang <cathy.zhang@intel.com>
 
-A processor supports AVX512 FP16 if CPUID.(EAX=7,ECX=0):EDX[bit 23]
-is present. The AVX512 FP16 requires AVX512BW feature be implemented
-since the instructions for manipulating 32bit masks are associated with
-AVX512BW.
+AVX512_FP16 is supported by Intel processors, like Sapphire Rapids.
+It could gain better performance for it's faster compared to FP32
+while meets the precision or magnitude requirement. It's availability
+is indicated by CPUID.(EAX=7,ECX=0):EDX[bit 23].
 
-The only in-kernel usage of this is kvm passthrough. The CPU feature
-flag is shown as "avx512_fp16" in /proc/cpuinfo.
+Expose it in KVM supported CPUID, then guest could make use of it.
 
+Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
 Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
 Acked-by: Dave Hansen <dave.hansen@intel.com>
 Reviewed-by: Tony Luck <tony.luck@intel.com>
 ---
- arch/x86/include/asm/cpufeatures.h | 1 +
- arch/x86/kernel/cpu/cpuid-deps.c   | 1 +
- 2 files changed, 2 insertions(+)
+ arch/x86/kvm/cpuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index b6b9b3407c22..bec37ec7101e 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -375,6 +375,7 @@
- #define X86_FEATURE_TSXLDTRK		(18*32+16) /* TSX Suspend Load Address Tracking */
- #define X86_FEATURE_PCONFIG		(18*32+18) /* Intel PCONFIG */
- #define X86_FEATURE_ARCH_LBR		(18*32+19) /* Intel ARCH LBR */
-+#define X86_FEATURE_AVX512_FP16		(18*32+23) /* AVX512 FP16 */
- #define X86_FEATURE_SPEC_CTRL		(18*32+26) /* "" Speculation Control (IBRS + IBPB) */
- #define X86_FEATURE_INTEL_STIBP		(18*32+27) /* "" Single Thread Indirect Branch Predictors */
- #define X86_FEATURE_FLUSH_L1D		(18*32+28) /* Flush L1D cache */
-diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-index d502241995a3..42af31b64c2c 100644
---- a/arch/x86/kernel/cpu/cpuid-deps.c
-+++ b/arch/x86/kernel/cpu/cpuid-deps.c
-@@ -69,6 +69,7 @@ static const struct cpuid_dep cpuid_deps[] = {
- 	{ X86_FEATURE_CQM_MBM_TOTAL,		X86_FEATURE_CQM_LLC   },
- 	{ X86_FEATURE_CQM_MBM_LOCAL,		X86_FEATURE_CQM_LLC   },
- 	{ X86_FEATURE_AVX512_BF16,		X86_FEATURE_AVX512VL  },
-+	{ X86_FEATURE_AVX512_FP16,		X86_FEATURE_AVX512BW  },
- 	{ X86_FEATURE_ENQCMD,			X86_FEATURE_XSAVES    },
- 	{ X86_FEATURE_PER_THREAD_MBA,		X86_FEATURE_MBA       },
- 	{}
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index e83bfe2daf82..d7707cfc9401 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -416,7 +416,7 @@ void kvm_set_cpu_caps(void)
+ 		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
+ 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+ 		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
+-		F(SERIALIZE) | F(TSXLDTRK)
++		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16)
+ 	);
+ 
+ 	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
 -- 
 2.17.1
 
