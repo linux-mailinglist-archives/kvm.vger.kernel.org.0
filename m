@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E94392D1F1D
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 01:40:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D90652D1F1E
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 01:40:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbgLHAiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 19:38:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50584 "EHLO
+        id S1727266AbgLHAi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 19:38:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726055AbgLHAiu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 19:38:50 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B384FC06138C
-        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 16:38:09 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id cw27so15768936edb.5
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 16:38:09 -0800 (PST)
+        with ESMTP id S1726055AbgLHAi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 19:38:56 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A35CC061285
+        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 16:38:15 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id v22so15757278edt.9
+        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 16:38:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=iM3H2Ta4pn+TmsQ3aEW4N1rY8+vva4THxsw5TVI8MU4=;
-        b=WBhLs8SQ3OiYTnyt2aaYUXwJxbKWB9tbGUaTQjwo9ky5q00QzXjBwHt96gtuiNg8Ep
-         lBrHzRZO9USx6sLY69s3YpGQNAzgsEkW8VM+PAB2xKXIpPHM3mzKMFBhmHDdWqSq5UKJ
-         KZa5Ktw7/pfEgBWTWA3FOHj9ceBEYUBVe8HlR3G+T4TIiKnI8x/gLvWe8dcyIGjLo/oV
-         AkxvpOz6N05DrH0qH8M1cxHOAZwqAQcAaFcz7ig60xQDEUu+5GDMPHrNkyu4td+RLXqn
-         BeNz93+QNJqyM6Ov/kZ1RTFhgk2EQM7iIww9o4kl2YDg45a7MOsmWu23F8VkSkqlJo3b
-         MbGQ==
+        bh=4LRz+2kXa1G+kvmW7hNaI1eqoy4+tVkf4TaV4Xk9Z+E=;
+        b=rKYlg8VVU303Q8fTYU9IRyIoA9EHSugVE17S9JoxMaGUkRpKnyxGGjBEGdojwp6SGv
+         r6mexaijbwIVvKizsB3I3hMXxOBUwpGTCTZn/omBf6rhldPQ9uA9z+BPcqsyW41inEHn
+         82t54Q9nQEYv/ZDNBLDiRJSjRiJ0VEULPNiE2Qs2tzz8ZzgP8cefVTbz9IqkLw90dpM1
+         7brBqPkq2q9WQx7UHtbC3MB095TWChEHhlszqVUD5SXdXLkGRiYi3AcVwfx9MJUeHoYX
+         0DvmQi6KdPjXphpMDxzw8+QovEskAJ3+1SOekPAwRcPidKgc7GphfTLR29+VBWMi+eqP
+         NouA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=iM3H2Ta4pn+TmsQ3aEW4N1rY8+vva4THxsw5TVI8MU4=;
-        b=DqfG+f0eTwEEy31fJMRJQIMjG0paOcOKJdOOJUtyNJpkCtXBZ9T6Cuq7Of9WSpr8gM
-         w6gh5nA7kmF/69EYSlbdGMHjBUiyygOwJrZM8gi2R6iJIMnc7CPsc/b3IeIp7cEI1651
-         Uzvu2A31yP4EUB78Dbr0kXyLcASTjECt00fgqSztlvVBdjktZiaPdiLIkhu08NUWf81e
-         t5kuqTSbv7hJfOAkLB14t9CJHizDcZNcJL07RDDJYUQjDrXzcCIv69NFwO5oapuoRoAS
-         wbbw4wk9uXuWSqCJZkQKNs1rvUmk+tqBH+1NtWDmgOdjFbG93ibedDQsu3q4m9I6CCOR
-         yBSQ==
-X-Gm-Message-State: AOAM530Qad4bt08XspxkB0xQbHrt+ySYVYE7h8he7USkRCgXI/6ITffz
-        KI7OezY/O4DhMxTT21XLt6k=
-X-Google-Smtp-Source: ABdhPJz/T2RNYjSwREIDjK1dctOdOKN3qyCsHMkk+yLzLx6y2hi96E/f502UEpHiYX22T+V0xS8MOQ==
-X-Received: by 2002:aa7:d915:: with SMTP id a21mr22114267edr.251.1607387888253;
-        Mon, 07 Dec 2020 16:38:08 -0800 (PST)
+        bh=4LRz+2kXa1G+kvmW7hNaI1eqoy4+tVkf4TaV4Xk9Z+E=;
+        b=FhqlVekJhVQktKweGSq/LxG5eHqAGszK0jgEUO5OcQPN8vGOfK0GQ2JXd5m2kQXod1
+         TmoZurRbSt4shXmgtbVEEMTL7Djd9DkGD6SDkIgASZAuKdRqlqmZyAtLHIh1902zCZQW
+         jL/mMqBOHv/+j7TQjjWsUty27WgFHS2D7EGJC4egTw+CTlvffTirEo3iR6ozWS5AWmjA
+         NgYtTTJFSCiTCp0n9RctVxu9XkiOLi9+z4wJ3vEdOOd+QigJ1xFGYW/A2161DISJ/xTx
+         Jz+KWlZEUCply7iTlnxZ5QiLQjnzKqYqI0M12VheySmkvxkSWy4sIn0SJjmFRPlCbDwr
+         tnIQ==
+X-Gm-Message-State: AOAM532+7vxeVAF8yz5MLIzqjCq9xWjG4uHHcdpz6ejRTJQcJyIOqX08
+        D2VbARiShRkBPgCiZZRo7G8=
+X-Google-Smtp-Source: ABdhPJy8OSVdsw2f443NkY2BcKObeSrejkfkAjii2ISzvPXd+rZwev03jy17bPn+o55PqG7EvXBGow==
+X-Received: by 2002:a50:e78b:: with SMTP id b11mr12577580edn.165.1607387893640;
+        Mon, 07 Dec 2020 16:38:13 -0800 (PST)
 Received: from x1w.redhat.com (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id 91sm16992226edy.45.2020.12.07.16.38.06
+        by smtp.gmail.com with ESMTPSA id t15sm11956602ejx.88.2020.12.07.16.38.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 16:38:07 -0800 (PST)
+        Mon, 07 Dec 2020 16:38:12 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -59,9 +59,9 @@ Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Aurelien Jarno <aurelien@aurel32.net>,
         Huacai Chen <chenhuacai@kernel.org>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: [PATCH 12/17] target/mips: Extract MSA helpers from op_helper.c
-Date:   Tue,  8 Dec 2020 01:36:57 +0100
-Message-Id: <20201208003702.4088927-13-f4bug@amsat.org>
+Subject: [PATCH 13/17] target/mips: Extract MSA helper definitions
+Date:   Tue,  8 Dec 2020 01:36:58 +0100
+Message-Id: <20201208003702.4088927-14-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201208003702.4088927-1-f4bug@amsat.org>
 References: <20201208003702.4088927-1-f4bug@amsat.org>
@@ -72,840 +72,911 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have ~400 lines of MSA helpers in the generic op_helper.c,
-move them with the other helpers in 'mod-msa_helper.c'.
+Keep all MSA-related code altogether.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20201123204448.3260804-5-f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20201120210844.2625602-4-f4bug@amsat.org>
 ---
- target/mips/mod-msa_helper.c | 393 ++++++++++++++++++++++++++++++++++
- target/mips/op_helper.c      | 394 -----------------------------------
- 2 files changed, 393 insertions(+), 394 deletions(-)
+ target/mips/helper.h             | 436 +-----------------------------
+ target/mips/mod-msa_helper.h.inc | 443 +++++++++++++++++++++++++++++++
+ 2 files changed, 445 insertions(+), 434 deletions(-)
+ create mode 100644 target/mips/mod-msa_helper.h.inc
 
-diff --git a/target/mips/mod-msa_helper.c b/target/mips/mod-msa_helper.c
-index f0d728c03f0..1298a1917ce 100644
---- a/target/mips/mod-msa_helper.c
-+++ b/target/mips/mod-msa_helper.c
-@@ -22,6 +22,7 @@
- #include "internal.h"
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
-+#include "exec/memop.h"
- #include "fpu/softfloat.h"
- #include "fpu_helper.h"
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index e97655dc0eb..80eb675fa64 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -781,438 +781,6 @@ DEF_HELPER_FLAGS_3(dmthlip, 0, void, tl, tl, env)
+ DEF_HELPER_FLAGS_3(wrdsp, 0, void, tl, tl, env)
+ DEF_HELPER_FLAGS_2(rddsp, 0, tl, tl, env)
  
-@@ -8202,6 +8203,398 @@ void helper_msa_ffint_u_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-     msa_move_v(pwd, pwx);
- }
- 
-+/* Data format min and max values */
-+#define DF_BITS(df) (1 << ((df) + 3))
-+
-+/* Element-by-element access macros */
-+#define DF_ELEMENTS(df) (MSA_WRLEN / DF_BITS(df))
-+
-+#if !defined(CONFIG_USER_ONLY)
-+#define MEMOP_IDX(DF)                                           \
-+        TCGMemOpIdx oi = make_memop_idx(MO_TE | DF | MO_UNALN,  \
-+                                        cpu_mmu_index(env, false));
-+#else
-+#define MEMOP_IDX(DF)
-+#endif
-+
-+void helper_msa_ld_b(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    MEMOP_IDX(DF_BYTE)
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
-+    pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
-+    pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
-+    pwd->b[3]  = helper_ret_ldub_mmu(env, addr + (3  << DF_BYTE), oi, GETPC());
-+    pwd->b[4]  = helper_ret_ldub_mmu(env, addr + (4  << DF_BYTE), oi, GETPC());
-+    pwd->b[5]  = helper_ret_ldub_mmu(env, addr + (5  << DF_BYTE), oi, GETPC());
-+    pwd->b[6]  = helper_ret_ldub_mmu(env, addr + (6  << DF_BYTE), oi, GETPC());
-+    pwd->b[7]  = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
-+    pwd->b[8]  = helper_ret_ldub_mmu(env, addr + (8  << DF_BYTE), oi, GETPC());
-+    pwd->b[9]  = helper_ret_ldub_mmu(env, addr + (9  << DF_BYTE), oi, GETPC());
-+    pwd->b[10] = helper_ret_ldub_mmu(env, addr + (10 << DF_BYTE), oi, GETPC());
-+    pwd->b[11] = helper_ret_ldub_mmu(env, addr + (11 << DF_BYTE), oi, GETPC());
-+    pwd->b[12] = helper_ret_ldub_mmu(env, addr + (12 << DF_BYTE), oi, GETPC());
-+    pwd->b[13] = helper_ret_ldub_mmu(env, addr + (13 << DF_BYTE), oi, GETPC());
-+    pwd->b[14] = helper_ret_ldub_mmu(env, addr + (14 << DF_BYTE), oi, GETPC());
-+    pwd->b[15] = helper_ret_ldub_mmu(env, addr + (15 << DF_BYTE), oi, GETPC());
-+#else
-+    pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
-+    pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (6  << DF_BYTE), oi, GETPC());
-+    pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (5  << DF_BYTE), oi, GETPC());
-+    pwd->b[3]  = helper_ret_ldub_mmu(env, addr + (4  << DF_BYTE), oi, GETPC());
-+    pwd->b[4]  = helper_ret_ldub_mmu(env, addr + (3  << DF_BYTE), oi, GETPC());
-+    pwd->b[5]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
-+    pwd->b[6]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
-+    pwd->b[7]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
-+    pwd->b[8]  = helper_ret_ldub_mmu(env, addr + (15 << DF_BYTE), oi, GETPC());
-+    pwd->b[9]  = helper_ret_ldub_mmu(env, addr + (14 << DF_BYTE), oi, GETPC());
-+    pwd->b[10] = helper_ret_ldub_mmu(env, addr + (13 << DF_BYTE), oi, GETPC());
-+    pwd->b[11] = helper_ret_ldub_mmu(env, addr + (12 << DF_BYTE), oi, GETPC());
-+    pwd->b[12] = helper_ret_ldub_mmu(env, addr + (11 << DF_BYTE), oi, GETPC());
-+    pwd->b[13] = helper_ret_ldub_mmu(env, addr + (10 << DF_BYTE), oi, GETPC());
-+    pwd->b[14] = helper_ret_ldub_mmu(env, addr + (9  << DF_BYTE), oi, GETPC());
-+    pwd->b[15] = helper_ret_ldub_mmu(env, addr + (8  << DF_BYTE), oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    pwd->b[0]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
-+    pwd->b[1]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
-+    pwd->b[2]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
-+    pwd->b[3]  = cpu_ldub_data(env, addr + (3  << DF_BYTE));
-+    pwd->b[4]  = cpu_ldub_data(env, addr + (4  << DF_BYTE));
-+    pwd->b[5]  = cpu_ldub_data(env, addr + (5  << DF_BYTE));
-+    pwd->b[6]  = cpu_ldub_data(env, addr + (6  << DF_BYTE));
-+    pwd->b[7]  = cpu_ldub_data(env, addr + (7  << DF_BYTE));
-+    pwd->b[8]  = cpu_ldub_data(env, addr + (8  << DF_BYTE));
-+    pwd->b[9]  = cpu_ldub_data(env, addr + (9  << DF_BYTE));
-+    pwd->b[10] = cpu_ldub_data(env, addr + (10 << DF_BYTE));
-+    pwd->b[11] = cpu_ldub_data(env, addr + (11 << DF_BYTE));
-+    pwd->b[12] = cpu_ldub_data(env, addr + (12 << DF_BYTE));
-+    pwd->b[13] = cpu_ldub_data(env, addr + (13 << DF_BYTE));
-+    pwd->b[14] = cpu_ldub_data(env, addr + (14 << DF_BYTE));
-+    pwd->b[15] = cpu_ldub_data(env, addr + (15 << DF_BYTE));
-+#else
-+    pwd->b[0]  = cpu_ldub_data(env, addr + (7  << DF_BYTE));
-+    pwd->b[1]  = cpu_ldub_data(env, addr + (6  << DF_BYTE));
-+    pwd->b[2]  = cpu_ldub_data(env, addr + (5  << DF_BYTE));
-+    pwd->b[3]  = cpu_ldub_data(env, addr + (4  << DF_BYTE));
-+    pwd->b[4]  = cpu_ldub_data(env, addr + (3  << DF_BYTE));
-+    pwd->b[5]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
-+    pwd->b[6]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
-+    pwd->b[7]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
-+    pwd->b[8]  = cpu_ldub_data(env, addr + (15 << DF_BYTE));
-+    pwd->b[9]  = cpu_ldub_data(env, addr + (14 << DF_BYTE));
-+    pwd->b[10] = cpu_ldub_data(env, addr + (13 << DF_BYTE));
-+    pwd->b[11] = cpu_ldub_data(env, addr + (12 << DF_BYTE));
-+    pwd->b[12] = cpu_ldub_data(env, addr + (11 << DF_BYTE));
-+    pwd->b[13] = cpu_ldub_data(env, addr + (10 << DF_BYTE));
-+    pwd->b[14] = cpu_ldub_data(env, addr + (9 << DF_BYTE));
-+    pwd->b[15] = cpu_ldub_data(env, addr + (8 << DF_BYTE));
-+#endif
-+#endif
-+}
-+
-+void helper_msa_ld_h(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    MEMOP_IDX(DF_HALF)
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    pwd->h[0] = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
-+    pwd->h[1] = helper_ret_lduw_mmu(env, addr + (1 << DF_HALF), oi, GETPC());
-+    pwd->h[2] = helper_ret_lduw_mmu(env, addr + (2 << DF_HALF), oi, GETPC());
-+    pwd->h[3] = helper_ret_lduw_mmu(env, addr + (3 << DF_HALF), oi, GETPC());
-+    pwd->h[4] = helper_ret_lduw_mmu(env, addr + (4 << DF_HALF), oi, GETPC());
-+    pwd->h[5] = helper_ret_lduw_mmu(env, addr + (5 << DF_HALF), oi, GETPC());
-+    pwd->h[6] = helper_ret_lduw_mmu(env, addr + (6 << DF_HALF), oi, GETPC());
-+    pwd->h[7] = helper_ret_lduw_mmu(env, addr + (7 << DF_HALF), oi, GETPC());
-+#else
-+    pwd->h[0] = helper_ret_lduw_mmu(env, addr + (3 << DF_HALF), oi, GETPC());
-+    pwd->h[1] = helper_ret_lduw_mmu(env, addr + (2 << DF_HALF), oi, GETPC());
-+    pwd->h[2] = helper_ret_lduw_mmu(env, addr + (1 << DF_HALF), oi, GETPC());
-+    pwd->h[3] = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
-+    pwd->h[4] = helper_ret_lduw_mmu(env, addr + (7 << DF_HALF), oi, GETPC());
-+    pwd->h[5] = helper_ret_lduw_mmu(env, addr + (6 << DF_HALF), oi, GETPC());
-+    pwd->h[6] = helper_ret_lduw_mmu(env, addr + (5 << DF_HALF), oi, GETPC());
-+    pwd->h[7] = helper_ret_lduw_mmu(env, addr + (4 << DF_HALF), oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    pwd->h[0] = cpu_lduw_data(env, addr + (0 << DF_HALF));
-+    pwd->h[1] = cpu_lduw_data(env, addr + (1 << DF_HALF));
-+    pwd->h[2] = cpu_lduw_data(env, addr + (2 << DF_HALF));
-+    pwd->h[3] = cpu_lduw_data(env, addr + (3 << DF_HALF));
-+    pwd->h[4] = cpu_lduw_data(env, addr + (4 << DF_HALF));
-+    pwd->h[5] = cpu_lduw_data(env, addr + (5 << DF_HALF));
-+    pwd->h[6] = cpu_lduw_data(env, addr + (6 << DF_HALF));
-+    pwd->h[7] = cpu_lduw_data(env, addr + (7 << DF_HALF));
-+#else
-+    pwd->h[0] = cpu_lduw_data(env, addr + (3 << DF_HALF));
-+    pwd->h[1] = cpu_lduw_data(env, addr + (2 << DF_HALF));
-+    pwd->h[2] = cpu_lduw_data(env, addr + (1 << DF_HALF));
-+    pwd->h[3] = cpu_lduw_data(env, addr + (0 << DF_HALF));
-+    pwd->h[4] = cpu_lduw_data(env, addr + (7 << DF_HALF));
-+    pwd->h[5] = cpu_lduw_data(env, addr + (6 << DF_HALF));
-+    pwd->h[6] = cpu_lduw_data(env, addr + (5 << DF_HALF));
-+    pwd->h[7] = cpu_lduw_data(env, addr + (4 << DF_HALF));
-+#endif
-+#endif
-+}
-+
-+void helper_msa_ld_w(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    MEMOP_IDX(DF_WORD)
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    pwd->w[0] = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
-+    pwd->w[1] = helper_ret_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
-+    pwd->w[2] = helper_ret_ldul_mmu(env, addr + (2 << DF_WORD), oi, GETPC());
-+    pwd->w[3] = helper_ret_ldul_mmu(env, addr + (3 << DF_WORD), oi, GETPC());
-+#else
-+    pwd->w[0] = helper_ret_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
-+    pwd->w[1] = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
-+    pwd->w[2] = helper_ret_ldul_mmu(env, addr + (3 << DF_WORD), oi, GETPC());
-+    pwd->w[3] = helper_ret_ldul_mmu(env, addr + (2 << DF_WORD), oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    pwd->w[0] = cpu_ldl_data(env, addr + (0 << DF_WORD));
-+    pwd->w[1] = cpu_ldl_data(env, addr + (1 << DF_WORD));
-+    pwd->w[2] = cpu_ldl_data(env, addr + (2 << DF_WORD));
-+    pwd->w[3] = cpu_ldl_data(env, addr + (3 << DF_WORD));
-+#else
-+    pwd->w[0] = cpu_ldl_data(env, addr + (1 << DF_WORD));
-+    pwd->w[1] = cpu_ldl_data(env, addr + (0 << DF_WORD));
-+    pwd->w[2] = cpu_ldl_data(env, addr + (3 << DF_WORD));
-+    pwd->w[3] = cpu_ldl_data(env, addr + (2 << DF_WORD));
-+#endif
-+#endif
-+}
-+
-+void helper_msa_ld_d(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    MEMOP_IDX(DF_DOUBLE)
-+#if !defined(CONFIG_USER_ONLY)
-+    pwd->d[0] = helper_ret_ldq_mmu(env, addr + (0 << DF_DOUBLE), oi, GETPC());
-+    pwd->d[1] = helper_ret_ldq_mmu(env, addr + (1 << DF_DOUBLE), oi, GETPC());
-+#else
-+    pwd->d[0] = cpu_ldq_data(env, addr + (0 << DF_DOUBLE));
-+    pwd->d[1] = cpu_ldq_data(env, addr + (1 << DF_DOUBLE));
-+#endif
-+}
-+
-+#define MSA_PAGESPAN(x) \
-+        ((((x) & ~TARGET_PAGE_MASK) + MSA_WRLEN / 8 - 1) >= TARGET_PAGE_SIZE)
-+
-+static inline void ensure_writable_pages(CPUMIPSState *env,
-+                                         target_ulong addr,
-+                                         int mmu_idx,
-+                                         uintptr_t retaddr)
-+{
-+    /* FIXME: Probe the actual accesses (pass and use a size) */
-+    if (unlikely(MSA_PAGESPAN(addr))) {
-+        /* first page */
-+        probe_write(env, addr, 0, mmu_idx, retaddr);
-+        /* second page */
-+        addr = (addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-+        probe_write(env, addr, 0, mmu_idx, retaddr);
-+    }
-+}
-+
-+void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_BYTE)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi, GETPC());
-+#else
-+    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
-+    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
-+    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
-+    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
-+    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
-+    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
-+    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
-+    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
-+    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
-+    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
-+    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
-+    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
-+    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
-+    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
-+    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
-+    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
-+#else
-+    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
-+    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
-+    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
-+    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
-+    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
-+    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
-+    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
-+    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
-+    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
-+    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
-+    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
-+    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
-+    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
-+    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
-+    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
-+    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
-+#endif
-+#endif
-+}
-+
-+void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_HALF)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi, GETPC());
-+#else
-+    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[0], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[1], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[2], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[3], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[4], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[5], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[6], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
-+    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
-+    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
-+    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
-+    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
-+    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
-+    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
-+    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
-+#else
-+    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
-+    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
-+    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
-+    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
-+    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
-+    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
-+    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
-+    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
-+#endif
-+#endif
-+}
-+
-+void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_WORD)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[0], oi, GETPC());
-+    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[1], oi, GETPC());
-+    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), pwd->w[2], oi, GETPC());
-+    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), pwd->w[3], oi, GETPC());
-+#else
-+    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[0], oi, GETPC());
-+    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[1], oi, GETPC());
-+    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), pwd->w[2], oi, GETPC());
-+    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), pwd->w[3], oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
-+    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
-+    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
-+    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
-+#else
-+    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
-+    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
-+    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
-+    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
-+#endif
-+#endif
-+}
-+
-+void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_DOUBLE)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi, GETPC());
-+    helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi, GETPC());
-+#else
-+    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
-+    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
-+#endif
-+}
-+
- void msa_reset(CPUMIPSState *env)
- {
-     if (!ase_msa_available(env)) {
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 72613706188..dd09a4c714a 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -28,7 +28,6 @@
- #include "exec/cpu_ldst.h"
- #include "exec/memop.h"
- #include "sysemu/kvm.h"
--#include "fpu_helper.h"
- 
- 
- /*****************************************************************************/
-@@ -1179,399 +1178,6 @@ void mips_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
- #endif /* !CONFIG_USER_ONLY */
- 
- 
--/* MSA */
--/* Data format min and max values */
--#define DF_BITS(df) (1 << ((df) + 3))
+-/* MIPS SIMD Architecture */
 -
--/* Element-by-element access macros */
--#define DF_ELEMENTS(df) (MSA_WRLEN / DF_BITS(df))
+-DEF_HELPER_3(msa_nloc_b, void, env, i32, i32)
+-DEF_HELPER_3(msa_nloc_h, void, env, i32, i32)
+-DEF_HELPER_3(msa_nloc_w, void, env, i32, i32)
+-DEF_HELPER_3(msa_nloc_d, void, env, i32, i32)
 -
--#if !defined(CONFIG_USER_ONLY)
--#define MEMOP_IDX(DF)                                           \
--        TCGMemOpIdx oi = make_memop_idx(MO_TE | DF | MO_UNALN,  \
--                                        cpu_mmu_index(env, false));
--#else
--#define MEMOP_IDX(DF)
--#endif
+-DEF_HELPER_3(msa_nlzc_b, void, env, i32, i32)
+-DEF_HELPER_3(msa_nlzc_h, void, env, i32, i32)
+-DEF_HELPER_3(msa_nlzc_w, void, env, i32, i32)
+-DEF_HELPER_3(msa_nlzc_d, void, env, i32, i32)
 -
--void helper_msa_ld_b(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    MEMOP_IDX(DF_BYTE)
--#if !defined(CONFIG_USER_ONLY)
--#if !defined(HOST_WORDS_BIGENDIAN)
--    pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
--    pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
--    pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
--    pwd->b[3]  = helper_ret_ldub_mmu(env, addr + (3  << DF_BYTE), oi, GETPC());
--    pwd->b[4]  = helper_ret_ldub_mmu(env, addr + (4  << DF_BYTE), oi, GETPC());
--    pwd->b[5]  = helper_ret_ldub_mmu(env, addr + (5  << DF_BYTE), oi, GETPC());
--    pwd->b[6]  = helper_ret_ldub_mmu(env, addr + (6  << DF_BYTE), oi, GETPC());
--    pwd->b[7]  = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
--    pwd->b[8]  = helper_ret_ldub_mmu(env, addr + (8  << DF_BYTE), oi, GETPC());
--    pwd->b[9]  = helper_ret_ldub_mmu(env, addr + (9  << DF_BYTE), oi, GETPC());
--    pwd->b[10] = helper_ret_ldub_mmu(env, addr + (10 << DF_BYTE), oi, GETPC());
--    pwd->b[11] = helper_ret_ldub_mmu(env, addr + (11 << DF_BYTE), oi, GETPC());
--    pwd->b[12] = helper_ret_ldub_mmu(env, addr + (12 << DF_BYTE), oi, GETPC());
--    pwd->b[13] = helper_ret_ldub_mmu(env, addr + (13 << DF_BYTE), oi, GETPC());
--    pwd->b[14] = helper_ret_ldub_mmu(env, addr + (14 << DF_BYTE), oi, GETPC());
--    pwd->b[15] = helper_ret_ldub_mmu(env, addr + (15 << DF_BYTE), oi, GETPC());
--#else
--    pwd->b[0]  = helper_ret_ldub_mmu(env, addr + (7  << DF_BYTE), oi, GETPC());
--    pwd->b[1]  = helper_ret_ldub_mmu(env, addr + (6  << DF_BYTE), oi, GETPC());
--    pwd->b[2]  = helper_ret_ldub_mmu(env, addr + (5  << DF_BYTE), oi, GETPC());
--    pwd->b[3]  = helper_ret_ldub_mmu(env, addr + (4  << DF_BYTE), oi, GETPC());
--    pwd->b[4]  = helper_ret_ldub_mmu(env, addr + (3  << DF_BYTE), oi, GETPC());
--    pwd->b[5]  = helper_ret_ldub_mmu(env, addr + (2  << DF_BYTE), oi, GETPC());
--    pwd->b[6]  = helper_ret_ldub_mmu(env, addr + (1  << DF_BYTE), oi, GETPC());
--    pwd->b[7]  = helper_ret_ldub_mmu(env, addr + (0  << DF_BYTE), oi, GETPC());
--    pwd->b[8]  = helper_ret_ldub_mmu(env, addr + (15 << DF_BYTE), oi, GETPC());
--    pwd->b[9]  = helper_ret_ldub_mmu(env, addr + (14 << DF_BYTE), oi, GETPC());
--    pwd->b[10] = helper_ret_ldub_mmu(env, addr + (13 << DF_BYTE), oi, GETPC());
--    pwd->b[11] = helper_ret_ldub_mmu(env, addr + (12 << DF_BYTE), oi, GETPC());
--    pwd->b[12] = helper_ret_ldub_mmu(env, addr + (11 << DF_BYTE), oi, GETPC());
--    pwd->b[13] = helper_ret_ldub_mmu(env, addr + (10 << DF_BYTE), oi, GETPC());
--    pwd->b[14] = helper_ret_ldub_mmu(env, addr + (9  << DF_BYTE), oi, GETPC());
--    pwd->b[15] = helper_ret_ldub_mmu(env, addr + (8  << DF_BYTE), oi, GETPC());
--#endif
--#else
--#if !defined(HOST_WORDS_BIGENDIAN)
--    pwd->b[0]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
--    pwd->b[1]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
--    pwd->b[2]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
--    pwd->b[3]  = cpu_ldub_data(env, addr + (3  << DF_BYTE));
--    pwd->b[4]  = cpu_ldub_data(env, addr + (4  << DF_BYTE));
--    pwd->b[5]  = cpu_ldub_data(env, addr + (5  << DF_BYTE));
--    pwd->b[6]  = cpu_ldub_data(env, addr + (6  << DF_BYTE));
--    pwd->b[7]  = cpu_ldub_data(env, addr + (7  << DF_BYTE));
--    pwd->b[8]  = cpu_ldub_data(env, addr + (8  << DF_BYTE));
--    pwd->b[9]  = cpu_ldub_data(env, addr + (9  << DF_BYTE));
--    pwd->b[10] = cpu_ldub_data(env, addr + (10 << DF_BYTE));
--    pwd->b[11] = cpu_ldub_data(env, addr + (11 << DF_BYTE));
--    pwd->b[12] = cpu_ldub_data(env, addr + (12 << DF_BYTE));
--    pwd->b[13] = cpu_ldub_data(env, addr + (13 << DF_BYTE));
--    pwd->b[14] = cpu_ldub_data(env, addr + (14 << DF_BYTE));
--    pwd->b[15] = cpu_ldub_data(env, addr + (15 << DF_BYTE));
--#else
--    pwd->b[0]  = cpu_ldub_data(env, addr + (7  << DF_BYTE));
--    pwd->b[1]  = cpu_ldub_data(env, addr + (6  << DF_BYTE));
--    pwd->b[2]  = cpu_ldub_data(env, addr + (5  << DF_BYTE));
--    pwd->b[3]  = cpu_ldub_data(env, addr + (4  << DF_BYTE));
--    pwd->b[4]  = cpu_ldub_data(env, addr + (3  << DF_BYTE));
--    pwd->b[5]  = cpu_ldub_data(env, addr + (2  << DF_BYTE));
--    pwd->b[6]  = cpu_ldub_data(env, addr + (1  << DF_BYTE));
--    pwd->b[7]  = cpu_ldub_data(env, addr + (0  << DF_BYTE));
--    pwd->b[8]  = cpu_ldub_data(env, addr + (15 << DF_BYTE));
--    pwd->b[9]  = cpu_ldub_data(env, addr + (14 << DF_BYTE));
--    pwd->b[10] = cpu_ldub_data(env, addr + (13 << DF_BYTE));
--    pwd->b[11] = cpu_ldub_data(env, addr + (12 << DF_BYTE));
--    pwd->b[12] = cpu_ldub_data(env, addr + (11 << DF_BYTE));
--    pwd->b[13] = cpu_ldub_data(env, addr + (10 << DF_BYTE));
--    pwd->b[14] = cpu_ldub_data(env, addr + (9 << DF_BYTE));
--    pwd->b[15] = cpu_ldub_data(env, addr + (8 << DF_BYTE));
--#endif
--#endif
--}
+-DEF_HELPER_3(msa_pcnt_b, void, env, i32, i32)
+-DEF_HELPER_3(msa_pcnt_h, void, env, i32, i32)
+-DEF_HELPER_3(msa_pcnt_w, void, env, i32, i32)
+-DEF_HELPER_3(msa_pcnt_d, void, env, i32, i32)
 -
--void helper_msa_ld_h(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    MEMOP_IDX(DF_HALF)
--#if !defined(CONFIG_USER_ONLY)
--#if !defined(HOST_WORDS_BIGENDIAN)
--    pwd->h[0] = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
--    pwd->h[1] = helper_ret_lduw_mmu(env, addr + (1 << DF_HALF), oi, GETPC());
--    pwd->h[2] = helper_ret_lduw_mmu(env, addr + (2 << DF_HALF), oi, GETPC());
--    pwd->h[3] = helper_ret_lduw_mmu(env, addr + (3 << DF_HALF), oi, GETPC());
--    pwd->h[4] = helper_ret_lduw_mmu(env, addr + (4 << DF_HALF), oi, GETPC());
--    pwd->h[5] = helper_ret_lduw_mmu(env, addr + (5 << DF_HALF), oi, GETPC());
--    pwd->h[6] = helper_ret_lduw_mmu(env, addr + (6 << DF_HALF), oi, GETPC());
--    pwd->h[7] = helper_ret_lduw_mmu(env, addr + (7 << DF_HALF), oi, GETPC());
--#else
--    pwd->h[0] = helper_ret_lduw_mmu(env, addr + (3 << DF_HALF), oi, GETPC());
--    pwd->h[1] = helper_ret_lduw_mmu(env, addr + (2 << DF_HALF), oi, GETPC());
--    pwd->h[2] = helper_ret_lduw_mmu(env, addr + (1 << DF_HALF), oi, GETPC());
--    pwd->h[3] = helper_ret_lduw_mmu(env, addr + (0 << DF_HALF), oi, GETPC());
--    pwd->h[4] = helper_ret_lduw_mmu(env, addr + (7 << DF_HALF), oi, GETPC());
--    pwd->h[5] = helper_ret_lduw_mmu(env, addr + (6 << DF_HALF), oi, GETPC());
--    pwd->h[6] = helper_ret_lduw_mmu(env, addr + (5 << DF_HALF), oi, GETPC());
--    pwd->h[7] = helper_ret_lduw_mmu(env, addr + (4 << DF_HALF), oi, GETPC());
--#endif
--#else
--#if !defined(HOST_WORDS_BIGENDIAN)
--    pwd->h[0] = cpu_lduw_data(env, addr + (0 << DF_HALF));
--    pwd->h[1] = cpu_lduw_data(env, addr + (1 << DF_HALF));
--    pwd->h[2] = cpu_lduw_data(env, addr + (2 << DF_HALF));
--    pwd->h[3] = cpu_lduw_data(env, addr + (3 << DF_HALF));
--    pwd->h[4] = cpu_lduw_data(env, addr + (4 << DF_HALF));
--    pwd->h[5] = cpu_lduw_data(env, addr + (5 << DF_HALF));
--    pwd->h[6] = cpu_lduw_data(env, addr + (6 << DF_HALF));
--    pwd->h[7] = cpu_lduw_data(env, addr + (7 << DF_HALF));
--#else
--    pwd->h[0] = cpu_lduw_data(env, addr + (3 << DF_HALF));
--    pwd->h[1] = cpu_lduw_data(env, addr + (2 << DF_HALF));
--    pwd->h[2] = cpu_lduw_data(env, addr + (1 << DF_HALF));
--    pwd->h[3] = cpu_lduw_data(env, addr + (0 << DF_HALF));
--    pwd->h[4] = cpu_lduw_data(env, addr + (7 << DF_HALF));
--    pwd->h[5] = cpu_lduw_data(env, addr + (6 << DF_HALF));
--    pwd->h[6] = cpu_lduw_data(env, addr + (5 << DF_HALF));
--    pwd->h[7] = cpu_lduw_data(env, addr + (4 << DF_HALF));
--#endif
--#endif
--}
+-DEF_HELPER_4(msa_binsl_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_binsl_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_binsl_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_binsl_d, void, env, i32, i32, i32)
 -
--void helper_msa_ld_w(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    MEMOP_IDX(DF_WORD)
--#if !defined(CONFIG_USER_ONLY)
--#if !defined(HOST_WORDS_BIGENDIAN)
--    pwd->w[0] = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
--    pwd->w[1] = helper_ret_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
--    pwd->w[2] = helper_ret_ldul_mmu(env, addr + (2 << DF_WORD), oi, GETPC());
--    pwd->w[3] = helper_ret_ldul_mmu(env, addr + (3 << DF_WORD), oi, GETPC());
--#else
--    pwd->w[0] = helper_ret_ldul_mmu(env, addr + (1 << DF_WORD), oi, GETPC());
--    pwd->w[1] = helper_ret_ldul_mmu(env, addr + (0 << DF_WORD), oi, GETPC());
--    pwd->w[2] = helper_ret_ldul_mmu(env, addr + (3 << DF_WORD), oi, GETPC());
--    pwd->w[3] = helper_ret_ldul_mmu(env, addr + (2 << DF_WORD), oi, GETPC());
--#endif
--#else
--#if !defined(HOST_WORDS_BIGENDIAN)
--    pwd->w[0] = cpu_ldl_data(env, addr + (0 << DF_WORD));
--    pwd->w[1] = cpu_ldl_data(env, addr + (1 << DF_WORD));
--    pwd->w[2] = cpu_ldl_data(env, addr + (2 << DF_WORD));
--    pwd->w[3] = cpu_ldl_data(env, addr + (3 << DF_WORD));
--#else
--    pwd->w[0] = cpu_ldl_data(env, addr + (1 << DF_WORD));
--    pwd->w[1] = cpu_ldl_data(env, addr + (0 << DF_WORD));
--    pwd->w[2] = cpu_ldl_data(env, addr + (3 << DF_WORD));
--    pwd->w[3] = cpu_ldl_data(env, addr + (2 << DF_WORD));
--#endif
--#endif
--}
+-DEF_HELPER_4(msa_binsr_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_binsr_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_binsr_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_binsr_d, void, env, i32, i32, i32)
 -
--void helper_msa_ld_d(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    MEMOP_IDX(DF_DOUBLE)
--#if !defined(CONFIG_USER_ONLY)
--    pwd->d[0] = helper_ret_ldq_mmu(env, addr + (0 << DF_DOUBLE), oi, GETPC());
--    pwd->d[1] = helper_ret_ldq_mmu(env, addr + (1 << DF_DOUBLE), oi, GETPC());
--#else
--    pwd->d[0] = cpu_ldq_data(env, addr + (0 << DF_DOUBLE));
--    pwd->d[1] = cpu_ldq_data(env, addr + (1 << DF_DOUBLE));
--#endif
--}
+-DEF_HELPER_4(msa_bmnz_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bmz_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bsel_v, void, env, i32, i32, i32)
 -
--#define MSA_PAGESPAN(x) \
--        ((((x) & ~TARGET_PAGE_MASK) + MSA_WRLEN / 8 - 1) >= TARGET_PAGE_SIZE)
+-DEF_HELPER_4(msa_bclr_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bclr_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bclr_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bclr_d, void, env, i32, i32, i32)
 -
--static inline void ensure_writable_pages(CPUMIPSState *env,
--                                         target_ulong addr,
--                                         int mmu_idx,
--                                         uintptr_t retaddr)
--{
--    /* FIXME: Probe the actual accesses (pass and use a size) */
--    if (unlikely(MSA_PAGESPAN(addr))) {
--        /* first page */
--        probe_write(env, addr, 0, mmu_idx, retaddr);
--        /* second page */
--        addr = (addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
--        probe_write(env, addr, 0, mmu_idx, retaddr);
--    }
--}
+-DEF_HELPER_4(msa_bneg_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bneg_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bneg_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bneg_d, void, env, i32, i32, i32)
 -
--void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    int mmu_idx = cpu_mmu_index(env, false);
+-DEF_HELPER_4(msa_bset_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bset_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bset_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bset_d, void, env, i32, i32, i32)
 -
--    MEMOP_IDX(DF_BYTE)
--    ensure_writable_pages(env, addr, mmu_idx, GETPC());
--#if !defined(CONFIG_USER_ONLY)
--#if !defined(HOST_WORDS_BIGENDIAN)
--    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi, GETPC());
--#else
--    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi, GETPC());
--    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi, GETPC());
--#endif
--#else
--#if !defined(HOST_WORDS_BIGENDIAN)
--    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
--    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
--    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
--    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
--    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
--    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
--    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
--    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
--    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
--    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
--    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
--    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
--    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
--    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
--    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
--    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
--#else
--    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
--    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
--    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
--    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
--    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
--    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
--    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
--    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
--    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
--    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
--    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
--    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
--    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
--    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
--    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
--    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
--#endif
--#endif
--}
+-DEF_HELPER_4(msa_add_a_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_add_a_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_add_a_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_add_a_d, void, env, i32, i32, i32)
 -
--void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    int mmu_idx = cpu_mmu_index(env, false);
+-DEF_HELPER_4(msa_adds_a_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_a_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_a_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_a_d, void, env, i32, i32, i32)
 -
--    MEMOP_IDX(DF_HALF)
--    ensure_writable_pages(env, addr, mmu_idx, GETPC());
--#if !defined(CONFIG_USER_ONLY)
--#if !defined(HOST_WORDS_BIGENDIAN)
--    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi, GETPC());
--#else
--    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[0], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[1], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[2], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[3], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[4], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[5], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[6], oi, GETPC());
--    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi, GETPC());
--#endif
--#else
--#if !defined(HOST_WORDS_BIGENDIAN)
--    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
--    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
--    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
--    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
--    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
--    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
--    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
--    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
--#else
--    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
--    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
--    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
--    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
--    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
--    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
--    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
--    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
--#endif
--#endif
--}
+-DEF_HELPER_4(msa_adds_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_s_d, void, env, i32, i32, i32)
 -
--void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    int mmu_idx = cpu_mmu_index(env, false);
+-DEF_HELPER_4(msa_adds_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_adds_u_d, void, env, i32, i32, i32)
 -
--    MEMOP_IDX(DF_WORD)
--    ensure_writable_pages(env, addr, mmu_idx, GETPC());
--#if !defined(CONFIG_USER_ONLY)
--#if !defined(HOST_WORDS_BIGENDIAN)
--    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[0], oi, GETPC());
--    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[1], oi, GETPC());
--    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), pwd->w[2], oi, GETPC());
--    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), pwd->w[3], oi, GETPC());
--#else
--    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), pwd->w[0], oi, GETPC());
--    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), pwd->w[1], oi, GETPC());
--    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), pwd->w[2], oi, GETPC());
--    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), pwd->w[3], oi, GETPC());
--#endif
--#else
--#if !defined(HOST_WORDS_BIGENDIAN)
--    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
--    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
--    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
--    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
--#else
--    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
--    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
--    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
--    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
--#endif
--#endif
--}
+-DEF_HELPER_4(msa_addv_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_addv_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_addv_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_addv_d, void, env, i32, i32, i32)
 -
--void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
--                     target_ulong addr)
--{
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
--    int mmu_idx = cpu_mmu_index(env, false);
+-DEF_HELPER_4(msa_hadd_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hadd_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hadd_s_d, void, env, i32, i32, i32)
 -
--    MEMOP_IDX(DF_DOUBLE)
--    ensure_writable_pages(env, addr, mmu_idx, GETPC());
--#if !defined(CONFIG_USER_ONLY)
--    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi, GETPC());
--    helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi, GETPC());
--#else
--    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
--    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
--#endif
--}
+-DEF_HELPER_4(msa_hadd_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hadd_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hadd_u_d, void, env, i32, i32, i32)
 -
- void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_t op)
- {
- #ifndef CONFIG_USER_ONLY
+-DEF_HELPER_4(msa_ave_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ave_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ave_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ave_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_ave_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ave_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ave_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ave_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_aver_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_aver_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_aver_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_aver_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_aver_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_aver_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_aver_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_aver_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_ceq_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ceq_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ceq_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ceq_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_cle_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_cle_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_cle_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_cle_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_cle_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_cle_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_cle_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_cle_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_clt_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_clt_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_clt_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_clt_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_clt_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_clt_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_clt_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_clt_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_div_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_div_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_div_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_div_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_div_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_div_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_div_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_div_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_max_a_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_a_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_a_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_a_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_s_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_max_u_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_a_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_a_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_a_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_a_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_s_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_min_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_mod_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mod_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mod_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mod_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_mod_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_maddv_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_maddv_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_maddv_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_maddv_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_msubv_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_msubv_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_msubv_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_msubv_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_mulv_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mulv_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mulv_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_mulv_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_asub_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_asub_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_asub_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_asub_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_asub_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_asub_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_asub_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_asub_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_hsub_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hsub_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hsub_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_hsub_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hsub_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_hsub_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_subs_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subs_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subs_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subs_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_subs_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subs_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subs_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subs_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_subsus_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subsus_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subsus_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subsus_u_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_subsuu_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subsuu_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subsuu_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subsuu_s_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_subv_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subv_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subv_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_subv_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_ilvev_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvev_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvev_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvev_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvod_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvod_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvod_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvod_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvl_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvl_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvl_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvl_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvr_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvr_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvr_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ilvr_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_and_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_nor_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_or_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_xor_v, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_pckev_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_pckev_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_pckev_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_pckev_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_pckod_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_pckod_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_pckod_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_pckod_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_sll_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_sll_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_sll_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_sll_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_sra_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_sra_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_sra_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_sra_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_srar_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srar_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srar_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srar_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_srl_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srl_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srl_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srl_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_srlr_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srlr_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srlr_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_srlr_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_3(msa_move_v, void, env, i32, i32)
+-
+-DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_nori_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_xori_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bmnzi_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bmzi_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bseli_b, void, env, i32, i32, i32)
+-DEF_HELPER_5(msa_shf_df, void, env, i32, i32, i32, i32)
+-
+-DEF_HELPER_5(msa_addvi_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_subvi_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_maxi_s_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_maxi_u_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_mini_s_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_mini_u_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_ceqi_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_clti_s_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_clti_u_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_clei_s_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_5(msa_clei_u_df, void, env, i32, i32, i32, s32)
+-DEF_HELPER_4(msa_ldi_df, void, env, i32, i32, s32)
+-
+-DEF_HELPER_5(msa_slli_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_srai_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_srli_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_bclri_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_bseti_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_bnegi_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_binsli_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_binsri_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_sat_s_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_sat_u_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_srari_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_srlri_df, void, env, i32, i32, i32, i32)
+-
+-DEF_HELPER_5(msa_binsl_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_binsr_df, void, env, i32, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_dotp_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dotp_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dotp_s_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dotp_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dotp_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dotp_u_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpadd_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpadd_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpadd_s_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpadd_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpadd_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpadd_u_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpsub_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpsub_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpsub_s_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpsub_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpsub_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_dpsub_u_d, void, env, i32, i32, i32)
+-DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+-
+-DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
+-
+-DEF_HELPER_5(msa_insve_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_3(msa_ctcmsa, void, env, tl, i32)
+-DEF_HELPER_2(msa_cfcmsa, tl, env, i32)
+-
+-DEF_HELPER_5(msa_fcaf_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcun_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fceq_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcueq_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fclt_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcult_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcle_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcule_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsaf_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsun_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fseq_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsueq_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fslt_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsult_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsle_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsule_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fadd_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsub_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fmul_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fdiv_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fmadd_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fmsub_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fexp2_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fexdo_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_ftq_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fmin_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fmin_a_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fmax_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fmax_a_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcor_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcune_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fcne_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_mul_q_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_madd_q_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_msub_q_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsor_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsune_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_fsne_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_mulr_q_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_maddr_q_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_msubr_q_df, void, env, i32, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_fill_df, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_copy_s_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_copy_s_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_copy_s_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_copy_s_d, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_copy_u_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_copy_u_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_copy_u_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_insert_b, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_insert_h, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_insert_w, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_insert_d, void, env, i32, i32, i32)
+-
+-DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ftrunc_u_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_fsqrt_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_frsqrt_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_frcp_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_frint_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_flog2_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_fexupl_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_fexupr_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ffql_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ffqr_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ftint_s_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ftint_u_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ffint_s_df, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_ffint_u_df, void, env, i32, i32, i32)
+-
+-#define MSALDST_PROTO(type)                         \
+-DEF_HELPER_3(msa_ld_ ## type, void, env, i32, tl)   \
+-DEF_HELPER_3(msa_st_ ## type, void, env, i32, tl)
+-MSALDST_PROTO(b)
+-MSALDST_PROTO(h)
+-MSALDST_PROTO(w)
+-MSALDST_PROTO(d)
+-#undef MSALDST_PROTO
+-
+ DEF_HELPER_3(cache, void, env, tl, i32)
++
++#include "mod-msa_helper.h.inc"
+diff --git a/target/mips/mod-msa_helper.h.inc b/target/mips/mod-msa_helper.h.inc
+new file mode 100644
+index 00000000000..4963d1553a0
+--- /dev/null
++++ b/target/mips/mod-msa_helper.h.inc
+@@ -0,0 +1,443 @@
++/*
++ *  MIPS SIMD Architecture Module (MSA) helpers for QEMU.
++ *
++ *  Copyright (c) 2004-2005 Jocelyn Mayer
++ *  Copyright (c) 2006 Marius Groeger (FPU operations)
++ *  Copyright (c) 2006 Thiemo Seufer (MIPS32R2 support)
++ *  Copyright (c) 2009 CodeSourcery (MIPS16 and microMIPS support)
++ *  Copyright (c) 2012 Jia Liu & Dongxue Zhang (MIPS ASE DSP support)
++ *
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++
++DEF_HELPER_3(msa_nloc_b, void, env, i32, i32)
++DEF_HELPER_3(msa_nloc_h, void, env, i32, i32)
++DEF_HELPER_3(msa_nloc_w, void, env, i32, i32)
++DEF_HELPER_3(msa_nloc_d, void, env, i32, i32)
++
++DEF_HELPER_3(msa_nlzc_b, void, env, i32, i32)
++DEF_HELPER_3(msa_nlzc_h, void, env, i32, i32)
++DEF_HELPER_3(msa_nlzc_w, void, env, i32, i32)
++DEF_HELPER_3(msa_nlzc_d, void, env, i32, i32)
++
++DEF_HELPER_3(msa_pcnt_b, void, env, i32, i32)
++DEF_HELPER_3(msa_pcnt_h, void, env, i32, i32)
++DEF_HELPER_3(msa_pcnt_w, void, env, i32, i32)
++DEF_HELPER_3(msa_pcnt_d, void, env, i32, i32)
++
++DEF_HELPER_4(msa_binsl_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_binsl_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_binsl_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_binsl_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_binsr_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_binsr_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_binsr_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_binsr_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_bmnz_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bmz_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bsel_v, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_bclr_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bclr_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bclr_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bclr_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_bneg_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bneg_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bneg_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bneg_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_bset_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bset_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bset_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bset_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_add_a_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_add_a_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_add_a_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_add_a_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_adds_a_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_a_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_a_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_a_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_adds_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_adds_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_adds_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_addv_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_addv_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_addv_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_addv_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_hadd_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hadd_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hadd_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_hadd_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hadd_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hadd_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_ave_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ave_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ave_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ave_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_ave_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ave_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ave_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ave_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_aver_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_aver_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_ceq_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ceq_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ceq_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ceq_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_cle_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_cle_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_cle_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_cle_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_cle_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_cle_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_cle_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_cle_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_clt_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_clt_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_clt_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_clt_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_clt_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_clt_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_clt_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_clt_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_div_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_div_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_div_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_div_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_div_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_div_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_div_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_div_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_max_a_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_a_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_a_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_a_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_max_u_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_a_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_a_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_a_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_a_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_min_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_mod_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_mod_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_maddv_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_maddv_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_maddv_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_maddv_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_msubv_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_msubv_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_msubv_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_msubv_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_mulv_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mulv_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mulv_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mulv_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_asub_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_asub_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_asub_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_asub_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_asub_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_asub_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_asub_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_asub_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_hsub_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hsub_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hsub_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_hsub_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hsub_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_hsub_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_subs_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subs_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subs_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subs_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_subs_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subs_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subs_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subs_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_subsus_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subsus_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subsus_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subsus_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_subsuu_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subsuu_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subsuu_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subsuu_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_subv_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subv_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subv_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_subv_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_ilvev_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvev_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvev_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvev_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_and_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_nor_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_or_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_xor_v, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_pckev_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_pckev_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_pckev_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_pckev_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_pckod_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_pckod_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_pckod_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_pckod_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_sll_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_sll_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_sll_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_sll_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_sra_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_sra_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_sra_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_sra_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_srar_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srar_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srar_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srar_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_srl_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srl_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srl_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srl_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_srlr_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srlr_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srlr_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_srlr_d, void, env, i32, i32, i32)
++
++DEF_HELPER_3(msa_move_v, void, env, i32, i32)
++
++DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_nori_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_xori_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bmnzi_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bmzi_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bseli_b, void, env, i32, i32, i32)
++DEF_HELPER_5(msa_shf_df, void, env, i32, i32, i32, i32)
++
++DEF_HELPER_5(msa_addvi_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_subvi_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_maxi_s_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_maxi_u_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_mini_s_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_mini_u_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_ceqi_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_clti_s_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_clti_u_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_clei_s_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_5(msa_clei_u_df, void, env, i32, i32, i32, s32)
++DEF_HELPER_4(msa_ldi_df, void, env, i32, i32, s32)
++
++DEF_HELPER_5(msa_slli_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_srai_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_srli_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_bclri_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_bseti_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_bnegi_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_binsli_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_binsri_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_sat_s_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_sat_u_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_srari_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_srlri_df, void, env, i32, i32, i32, i32)
++
++DEF_HELPER_5(msa_binsl_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_binsr_df, void, env, i32, i32, i32, i32)
++
++DEF_HELPER_4(msa_dotp_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dotp_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dotp_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dotp_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dotp_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dotp_u_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_u_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpsub_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpsub_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpsub_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpsub_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpsub_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpsub_u_d, void, env, i32, i32, i32)
++DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
++
++DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
++
++DEF_HELPER_5(msa_insve_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_3(msa_ctcmsa, void, env, tl, i32)
++DEF_HELPER_2(msa_cfcmsa, tl, env, i32)
++
++DEF_HELPER_5(msa_fcaf_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcun_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fceq_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcueq_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fclt_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcult_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcle_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcule_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsaf_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsun_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fseq_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsueq_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fslt_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsult_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsle_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsule_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fadd_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsub_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fmul_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fdiv_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fmadd_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fmsub_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fexp2_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fexdo_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_ftq_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fmin_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fmin_a_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fmax_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fmax_a_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcor_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcune_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fcne_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_mul_q_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_madd_q_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_msub_q_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsor_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsune_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_fsne_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_mulr_q_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_maddr_q_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(msa_msubr_q_df, void, env, i32, i32, i32, i32)
++
++DEF_HELPER_4(msa_fill_df, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_copy_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ftrunc_u_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_fsqrt_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_frsqrt_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_frcp_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_frint_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_flog2_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_fexupl_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_fexupr_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ffql_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ffqr_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ftint_s_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ftint_u_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ffint_s_df, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ffint_u_df, void, env, i32, i32, i32)
++
++#define MSALDST_PROTO(type)                         \
++DEF_HELPER_3(msa_ld_ ## type, void, env, i32, tl)   \
++DEF_HELPER_3(msa_st_ ## type, void, env, i32, tl)
++MSALDST_PROTO(b)
++MSALDST_PROTO(h)
++MSALDST_PROTO(w)
++MSALDST_PROTO(d)
++#undef MSALDST_PROTO
 -- 
 2.26.2
 
