@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFB8F2D35AE
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A251F2D35B4
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 23:00:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729934AbgLHV4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 16:56:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52814 "EHLO
+        id S1730432AbgLHWAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 17:00:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729343AbgLHV4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 16:56:40 -0500
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FCF2C0613D6
-        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 13:56:00 -0800 (PST)
-Received: by mail-oi1-x242.google.com with SMTP id v85so176491oia.6
-        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 13:56:00 -0800 (PST)
+        with ESMTP id S1728964AbgLHWAb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 17:00:31 -0500
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF28DC0613CF
+        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 13:59:51 -0800 (PST)
+Received: by mail-ot1-x344.google.com with SMTP id y24so252562otk.3
+        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 13:59:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Ykm1CW81/1yVrovVuyB6hv6LMEyheoG0djpb+ytEzLg=;
-        b=CohF/Y9Hqo9Ac2AUx2gO8PT4OyUy6EF18fpcoa+n6NtdqI3jo5MHZ/1lUJSmqmI8jd
-         /A+u55gO4pID1FLicSRys3f7cKZWFarcVoJz6/rLYiUwr+EwpiIzVmpSpc82FETxgn6N
-         uqu3Z2cg0N8w3F2/JO/+Dz5tVG3RxkgH+EwP9gCLPWSjeLG8qCTfC0qWgv8FQG8R0uIB
-         9a6qo1J9w/F/Wk52FXwvJh8TQ8LKL69QHxkl33CMEO6V/fqc69msV6Z54dEa7TGb1wQc
-         lLBOdlJU9fyqu8n0q/DTNWI2lKM2P8m+gtK0KqL2sPDDFAYE5igIcw5WLj6BEgtwLf5W
-         /eLA==
+        bh=0P4LgLAwd23RvZRpXo4n9bDoeMvsbtK2X5N+B4o2WS8=;
+        b=QKk+zgC0v/TuRgR0tH8ShBc9XymN0M/NYnr3xrXjOvokyOJO9wsHjkcg20MNSEoqoR
+         sOGDIN6uGqD2XMo2/QYk0xeQeTaubkROAB7UuFPkMPZB8b9sWyPX38Zaofmtfi050idT
+         nFQeDqVyO3t3pcijnADFuRdlCCsIEQuVIYk7y78Wn67dXA43tb3wxxZKE/VKhIzO/M0T
+         r4bQNSIyTVAMjTqG6gkq/zqs8c+i7RQ81DK1lx37hlJwpHSIQgc69YVBTElJSXZG828P
+         3UtKbNGz1ssgx09csY470X8PARUPJAT8Bl46UbXof7K7H9APlGm3bPjqu6l3iWImV1t6
+         tdsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Ykm1CW81/1yVrovVuyB6hv6LMEyheoG0djpb+ytEzLg=;
-        b=SqQkRYTH6pbLZk/LXn9l9n9zQQ0mUZSI7NToOXgfVDITabzwC3eg9Mogow1+uCl6N6
-         1mgMeMX6+MATxTqz5F/VFN2NJwx8drZ5lLZ8qboYD8lC6zZp/fR0aVaPgv/QtIFTKjCj
-         cH9OQveqceAJi7iWpZUwYsnDri/z0XRPJ6NRYTkIlhYe8idRw5CPUoKwg8XmLbazHaRU
-         FE3XQtI2a7hwraSDwwNVVAgCCQKCWE4baEMTCoyn6gc0+U8O0KZqVHtvgDU84gilaMU8
-         MApF09Q3U7GLHh0LYxKkL+BYeUuRxYY5i8jEC4YeO7piToRjdBzUaQrZV+vCI0dGfaaj
-         a4dQ==
-X-Gm-Message-State: AOAM532naJiwDi0DmwdvjLgLhRmnZkPcs/2QKrCeV/2hpJ1eKRC2HEwh
-        MCOOPA3CvbpZ2perrBC0e9RbTQ==
-X-Google-Smtp-Source: ABdhPJwyiBxLWMbeoV6IkX5eBT3+OCDE8cmPzhVHxVRYy67mswfM9jpwzc/L0i0X7tmXoLgWUd5ULg==
-X-Received: by 2002:aca:4e0a:: with SMTP id c10mr4493910oib.14.1607464559477;
-        Tue, 08 Dec 2020 13:55:59 -0800 (PST)
+        bh=0P4LgLAwd23RvZRpXo4n9bDoeMvsbtK2X5N+B4o2WS8=;
+        b=KiHAlfmswvjLnL0aTbx8SHwweZm9DvxmYrb9OKPL4Y+EweYy9wDZTBKBXqB++lYann
+         Xth7O3TKd6S5DSsYpL4J1FiEL0wvO3+LGmqCA9husnbIjObrRB440KRFlJ56yxq0g108
+         ms3FmhxKjCIw7emjBEgbHDueV7mW7awS725wkUJa03u1JYIKeKsjxOl+ddw0PO+6wd21
+         UvOTMDo4L5TCmAsMLrHoGPzaha3MlAxWqkFMxJtC9PbaPw+Ydwe9KcqtfPrv69UJ5qC6
+         k40y8CgrBYZSF7x5QY/cTLZtdqjaytOVYwf0ENGUX3OLmIPHgr8bBDq9Lh1BAkjimG94
+         L1gQ==
+X-Gm-Message-State: AOAM5319p251PZaL7iGm5AHNvvphQzQoD+yAvIRbxMdetbOdHvBXo8BG
+        8eeU/WC2hlE5WKKDYjWb0L2VSw==
+X-Google-Smtp-Source: ABdhPJx+Y9zpLRfi6TECmsaeVWuPFjVtd8A+zbPdCw3e4gsvOOeW5QBDnedsiZDc+ccxdvkZGtyekw==
+X-Received: by 2002:a9d:5909:: with SMTP id t9mr88508oth.263.1607464791245;
+        Tue, 08 Dec 2020 13:59:51 -0800 (PST)
 Received: from [10.10.121.52] (fixed-187-189-51-144.totalplay.net. [187.189.51.144])
-        by smtp.gmail.com with ESMTPSA id v8sm16120otp.10.2020.12.08.13.55.58
+        by smtp.gmail.com with ESMTPSA id j204sm18833oih.15.2020.12.08.13.59.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Dec 2020 13:55:58 -0800 (PST)
-Subject: Re: [PATCH 09/19] target/mips: Move mips_cpu_add_definition() from
- helper.c to cpu.c
+        Tue, 08 Dec 2020 13:59:50 -0800 (PST)
+Subject: Re: [PATCH 10/19] target/mips: Add !CONFIG_USER_ONLY comment after
+ #endif
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         qemu-devel@nongnu.org
 Cc:     Aurelien Jarno <aurelien@aurel32.net>,
@@ -59,14 +59,14 @@ Cc:     Aurelien Jarno <aurelien@aurel32.net>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 References: <20201206233949.3783184-1-f4bug@amsat.org>
- <20201206233949.3783184-10-f4bug@amsat.org>
+ <20201206233949.3783184-11-f4bug@amsat.org>
 From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0d2371ed-2904-622a-9a49-f96ec731b3b6@linaro.org>
-Date:   Tue, 8 Dec 2020 15:55:56 -0600
+Message-ID: <b31cd1bd-fd5f-f05b-e0a6-0df83035d5f8@linaro.org>
+Date:   Tue, 8 Dec 2020 15:59:48 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201206233949.3783184-10-f4bug@amsat.org>
+In-Reply-To: <20201206233949.3783184-11-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -75,12 +75,17 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 12/6/20 5:39 PM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/mips/cpu.c    | 33 +++++++++++++++++++++++++++++++++
->  target/mips/helper.c | 33 ---------------------------------
->  2 files changed, 33 insertions(+), 33 deletions(-)
+> To help understand ifdef'ry, add comment after #endif.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This does more than that.
+
+> @@ -550,9 +552,7 @@ hwaddr mips_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+>      }
+>      return phys_addr;
+>  }
+> -#endif
+>  
+> -#if !defined(CONFIG_USER_ONLY)
+
 
 r~
