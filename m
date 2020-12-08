@@ -2,148 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE8382D26D4
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 10:03:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 640B82D2739
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 10:13:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728646AbgLHJDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 04:03:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43526 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728411AbgLHJDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 04:03:36 -0500
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1925C061749
-        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 01:02:55 -0800 (PST)
-Received: by mail-ej1-x642.google.com with SMTP id qw4so23521030ejb.12
-        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 01:02:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=heOnO8xtoXTUu7nkg7Tr0zoCny6XJ7I7y8VFkwKx3YI=;
-        b=NAcUA4g6FpMBOE1Xlxt2Q1ElVyu7anh6kb/qyZlxlLM2F5boiqCY7XXrG73lLkjkTO
-         G24s2g422BaJZe7uWJWbXmCoKCwFQGB7nP3ln4yb+t0aO74TxgVEvBrAK+i6Lg6p4ZRx
-         4o+Nc01KscoeDYfhWOgT8Jke8eZgxT/e8fyJ9To8vxOA6OyyIKLwsBuznaAOAmwlcGmo
-         1BePba9ADIsphBcP16NjyMjxqjyGLJLp4qwcAPlebCigeVxX5uR6f5HANjd0HIzTIgBH
-         veF5YLY0e8cNXIPT+nO7CAqZ86TDl6IKWGH5eimx+JDkHCnAQWSJJQMO9G74fjFcjVhX
-         t/GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=heOnO8xtoXTUu7nkg7Tr0zoCny6XJ7I7y8VFkwKx3YI=;
-        b=TOUE9kWQtexwmroMU2GjHIuswyAXQjPFrGKPL35MX2RPoQhzT0HCLBufbV8H8stqZ3
-         VnL6uhWOb3Gp6dqoR7Qw+DqvjYKJ/kgP/YboS6pK++per2PvMy/MD1ukNrd3OEfbJcEL
-         9IATvYa0sloNHcW4no4fZIiIkz3Ol+q+R4M+KX5h9RIdevvU1egVJCg0M6I4B1+l/m0W
-         DqpV+RkdffYex6SXtrX9fd19AC8/1yFgDccTpKvBYMvJey8DQwx7FNvySjdwi3PZnOv+
-         2zlHnccGdU9ql8l2SbRNfOxB64FXo/PFn2qYpeDEJVgqzIOLrz/3/YpuOM/bRhWhCgMF
-         uxDA==
-X-Gm-Message-State: AOAM530zkPg02PtKUgnR8waZAqiz/ri0vjN1xmCbRg5g2MpQ603fnoKH
-        mpSxl8MoPoy/0//sui3C+wE=
-X-Google-Smtp-Source: ABdhPJwwqplxjiYTxGvk+CUu6nv9Om15+cCcDhpuWLQyJld3SKfxflSD8GOU2YNR5fW6/sN9mUvT0g==
-X-Received: by 2002:a17:906:4d52:: with SMTP id b18mr21499156ejv.405.1607418174634;
-        Tue, 08 Dec 2020 01:02:54 -0800 (PST)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id x16sm6694407ejb.38.2020.12.08.01.02.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Dec 2020 01:02:53 -0800 (PST)
-Date:   Tue, 8 Dec 2020 09:02:52 +0000
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     qemu-devel@nongnu.org, Lars Ganrot <lars.ganrot@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        Salil Mehta <mehta.salil.lnk@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Liran Alon <liralon@gmail.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        Max Gurtovoy <maxgu14@gmail.com>,
-        Alex Barba <alex.barba@broadcom.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jim Harford <jim.harford@broadcom.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Christophe Fontaine <cfontain@redhat.com>,
-        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
-        Michael Lilja <ml@napatech.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
-        Lee Ballard <ballle98@gmail.com>,
-        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
-        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
-        Howard Cai <howard.cai@gmail.com>,
-        Xiao W Wang <xiao.w.wang@intel.com>,
-        Sean Mooney <smooney@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
-        Stephen Finucane <stephenfin@redhat.com>
-Subject: Re: [RFC PATCH 24/27] vhost: iommu changes
-Message-ID: <20201208090252.GW203660@stefanha-x1.localdomain>
-References: <20201120185105.279030-1-eperezma@redhat.com>
- <20201120185105.279030-25-eperezma@redhat.com>
+        id S1728732AbgLHJMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 04:12:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64190 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726418AbgLHJMp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 04:12:45 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B892j9O106833
+        for <kvm@vger.kernel.org>; Tue, 8 Dec 2020 04:12:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3dE+1osCOrGF6GufbVXamYuQI9+/ZoOq0+2Hu43PU/I=;
+ b=cFFjlhYttLN8RujzpXL9r3bN6P7lPO9nyo8wcH94jPs/+tG+I3H/zjwhiA7Da74GZwI0
+ UdUU4wbNc74nTIMXH/oYjcpFezt1C0xZW12COvAYd3CN0zr7gXwHSTuFulF5CZG8i+E+
+ y0Z2H+XEYIppXGosV0TTyb7lobzDmeXwyMjPc+dyWH+lpI4vanmkZoXstZXEtnyZX1NX
+ Jswta0+4ibMo45z1QsiHtM7fkMfWlDDzFEZKUFEF2CXI4KSHC1QVZ15aRuK4yGrkIBEm
+ hZKTrfLIzJXNdleXkA44g4bwAQHCDXMUE+o/GzHQ413u//CvwPCzzBmZ9l3PjiNehixV Kg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 359wwk5591-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 04:12:03 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B893EJK109147
+        for <kvm@vger.kernel.org>; Tue, 8 Dec 2020 04:12:03 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 359wwk558f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Dec 2020 04:12:03 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B898Uug008910;
+        Tue, 8 Dec 2020 09:12:01 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3583svk9wk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Dec 2020 09:12:01 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B89BxvH9044624
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Dec 2020 09:11:59 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1E23552052;
+        Tue,  8 Dec 2020 09:11:59 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.11.93])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9530F5204E;
+        Tue,  8 Dec 2020 09:11:58 +0000 (GMT)
+Date:   Tue, 8 Dec 2020 10:11:55 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     KVM <kvm@vger.kernel.org>, pbonzini@redhat.com,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, lvivier@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 4/7] lib/alloc_page: complete rewrite
+ of the page allocator
+Message-ID: <20201208101155.0e2de3c9@ibm-vm>
+In-Reply-To: <C812A718-DCD6-4485-BB5A-B24DE73A0FD3@gmail.com>
+References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
+        <20201002154420.292134-5-imbrenda@linux.ibm.com>
+        <C812A718-DCD6-4485-BB5A-B24DE73A0FD3@gmail.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="pEAjBjStGYT6H+Py"
-Content-Disposition: inline
-In-Reply-To: <20201120185105.279030-25-eperezma@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-08_03:2020-12-04,2020-12-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 phishscore=0 adultscore=0 malwarescore=0 spamscore=0
+ mlxscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012080054
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 7 Dec 2020 16:41:18 -0800
+Nadav Amit <nadav.amit@gmail.com> wrote:
 
---pEAjBjStGYT6H+Py
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > On Oct 2, 2020, at 8:44 AM, Claudio Imbrenda
+> > <imbrenda@linux.ibm.com> wrote:
+> > 
+> > This is a complete rewrite of the page allocator.  
+> 
+> This patch causes me crashes:
+> 
+>   lib/alloc_page.c:433: assert failed: !(areas_mask & BIT(n))
+> 
+> It appears that two areas are registered on AREA_LOW_NUMBER, as
+> setup_vm() can call (and calls on my system) page_alloc_init_area()
+> twice.
 
-On Fri, Nov 20, 2020 at 07:51:02PM +0100, Eugenio P=E9rez wrote:
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index eebfac4455..cb44b9997f 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -1109,6 +1109,10 @@ static int vhost_sw_live_migration_start(struct vh=
-ost_dev *dev)
-> =20
->      assert(dev->vhost_ops->vhost_set_vring_enable);
->      dev->vhost_ops->vhost_set_vring_enable(dev, false);
-> +    if (vhost_dev_has_iommu(dev)) {
-> +        r =3D vhost_backend_invalidate_device_iotlb(dev, 0, -1ULL);
-> +        assert(r =3D=3D 0);
-> +    }
-> =20
->      for (idx =3D 0; idx < dev->nvqs; ++idx) {
->          struct vhost_virtqueue *vq =3D &dev->vqs[idx];
-> @@ -1269,6 +1273,19 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev,=
- uint64_t iova, int write)
-> =20
->      trace_vhost_iotlb_miss(dev, 1);
-> =20
-> +    if (dev->sw_lm_enabled) {
-> +        uaddr =3D iova;
-> +        len =3D 4096;
-> +        ret =3D vhost_backend_update_device_iotlb(dev, iova, uaddr, len,
-> +                                                IOMMU_RW);
+which system is that? page_alloc_init_area should not be called twice
+on the same area!
 
-It would be nice to look up the available memory so
-vhost_backend_update_device_iotlb() can be called with a much bigger
-[uaddr, uaddr+len) range. This will reduce the number of iotlb misses.
+> setup_vm() uses AREA_ANY_NUMBER as the area number argument but
+> eventually this means, according to the code, that
+> __page_alloc_init_area() would use AREA_LOW_NUMBER.
+> 
+> I do not understand the rationale behind these areas well enough to
+> fix it.
 
-Will vIOMMU be required for this feature? If not, then the vring needs
-to be added to the vhost memory regions because vhost will not send QEMU
-iotlb misses.
+I'll see what I can fix
 
---pEAjBjStGYT6H+Py
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/PQTwACgkQnKSrs4Gr
-c8g3Ggf/ezALRa8CClAoD8oR71XoA1kVIcse2cg110kSgP3P6FQZ4K8P3eagY4KQ
-MZOEBk/dhIcMAMUhqDGhKvCOgFzp4rxXGLJWWpVRqWXnyt+3pbt+qbRN1K6Mnw5m
-yYr0IR/vdzG0tDl7Oy5n5igf8gbTiNAiO82jgonHy6KLiw8vhEqB/fdBVQOjorQn
-4QbiOck2C58BSE+8G7iXFHCJWtoQd0O3zIgxDGsecDrDZYIP3RKcpd3EQfXUKDgc
-8pESaRJsNfEfiM485waNw2fA9C4cV9tkWe9qup607f1Hgj6qw+1/Wboy+y4A86B2
-0RfBLz7wh4oXLsoYnD1JLzTW2e3qXw==
-=ebuW
------END PGP SIGNATURE-----
-
---pEAjBjStGYT6H+Py--
+Claudio
