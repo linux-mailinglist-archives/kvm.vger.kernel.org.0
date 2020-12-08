@@ -2,110 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F4262D1FBD
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 02:11:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18B012D2062
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 02:55:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726182AbgLHBK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Dec 2020 20:10:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55740 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725877AbgLHBK4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Dec 2020 20:10:56 -0500
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D40C061749
-        for <kvm@vger.kernel.org>; Mon,  7 Dec 2020 17:10:16 -0800 (PST)
-Received: by mail-pf1-x441.google.com with SMTP id q22so12196710pfk.12
-        for <kvm@vger.kernel.org>; Mon, 07 Dec 2020 17:10:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=bx+Vl9JgF8W82HQw1BgvFlKwvrUO3IJ4Z04ne+ReaG4=;
-        b=qrXFRqBLDPe3SQUDL3CpcpyB8yQ6rHGKTyWs37WyGOgtMZl8UJqrcXFZ4ub+YWypmr
-         unqXAFz9d20X8wzNgj8bXq+B2z7MprIIxTsppzuf6Yj/A+pcVKUg4tY6LsY6JJmWXm8K
-         FEeoKmezQd4vxJqO+dm84hibvlQUIHx3PUUA7jY2V0fwVx6yeLGbPD/okfgmtjamO9xp
-         qg+hvdVgkJlfPuEcAnHp/LzF2sRL+Z8uXrugr3QmbOYBfd0B+ykoQoy/Wf1HGzw5QyV8
-         6vRW8Wu7Ku6b0Qt6CSkbDiMF5sC/T+daih3YvP0JNL9lauVxzrALP2AopoosvbLAQ+bK
-         9jeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=bx+Vl9JgF8W82HQw1BgvFlKwvrUO3IJ4Z04ne+ReaG4=;
-        b=QLpyNfHv122nEWTEeczwVNihJjkibR25PG8xixDr8VQBUAfFwZCNeiJTNelCBGHm0X
-         ePRCnDoVHgQVsWJculF8bjjqJCduYh6nwcEZ0RU41uU8p5fC23BpsNlM80z5OGPa9cH3
-         KMcZv3y5+4KSx62nUnsGlL1sg0wzDjU0Jg1iBEhDo+IlZEnpS6b7k4S8SFCSfp0aU89j
-         aX5KdYOe/BG6XY5LEaFZss7zYuN5eLygVgRsq9Reb98xyzk4uWMqg8DwgguBW8SOdkfh
-         cooCdSP7yxaz4f7Pbpn2Zd6iH1FajsTb3kjTv/lh98si4/Mi6j7dm1Ozoz0E+E208yJa
-         akYA==
-X-Gm-Message-State: AOAM530f2wji7cHpKEFTo+uDXxooigzBvVUz80LFzB0Z1Tsr3afuxcM3
-        pS4xYQ9dqE+7H/zNHIeBUBbgkI3VVW8PrQ==
-X-Google-Smtp-Source: ABdhPJwLnrbSkaa4eig0JC6Eonm8lMdBywQWTmDBY1otaJoYE1K4enYCTD0xAUmv4T74hZRNd+YmNg==
-X-Received: by 2002:aa7:8014:0:b029:197:cd5c:3e6b with SMTP id j20-20020aa780140000b0290197cd5c3e6bmr18171607pfi.21.1607389815579;
-        Mon, 07 Dec 2020 17:10:15 -0800 (PST)
-Received: from ?IPv6:2601:647:4700:9b2:5c98:e5b3:1ddc:54ce? ([2601:647:4700:9b2:5c98:e5b3:1ddc:54ce])
-        by smtp.gmail.com with ESMTPSA id x22sm12491563pfc.19.2020.12.07.17.10.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 07 Dec 2020 17:10:14 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [kvm-unit-tests PATCH v2 4/7] lib/alloc_page: complete rewrite of
- the page allocator
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <C812A718-DCD6-4485-BB5A-B24DE73A0FD3@gmail.com>
-Date:   Mon, 7 Dec 2020 17:10:13 -0800
-Cc:     KVM <kvm@vger.kernel.org>, pbonzini@redhat.com,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, lvivier@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <11863F45-D4E5-4192-9541-EC4D26AC3634@gmail.com>
-References: <20201002154420.292134-1-imbrenda@linux.ibm.com>
- <20201002154420.292134-5-imbrenda@linux.ibm.com>
- <C812A718-DCD6-4485-BB5A-B24DE73A0FD3@gmail.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+        id S1727352AbgLHByw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Dec 2020 20:54:52 -0500
+Received: from ozlabs.org ([203.11.71.1]:37839 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727133AbgLHByv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Dec 2020 20:54:51 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4CqjsF5WlBz9sWF; Tue,  8 Dec 2020 12:54:09 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1607392449;
+        bh=AexoOEEhA6+9jjhuMsVG1acI2Ih+hqkNZX3YsplyDNM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YJ0bk6rfBb49iGteqQ1UAWkGLCiwtME7vCXkRZ10rUMxYHzGztB1qrtXeY5RFURnZ
+         JiEIrhPnvEqqxwgdEAQqlwUy1NrUmLl6MC3J3Hw6rzX47PjPms6zH6zFCdHtsngnq6
+         QUc0l8b8VcI7PL4DycdGWwkAYnpTJZEZtIBIYgu0=
+Date:   Tue, 8 Dec 2020 12:54:03 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>, pair@us.ibm.com,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
+        dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+        qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+        berrange@redhat.com, thuth@redhat.com, pbonzini@redhat.com,
+        rth@twiddle.net, mdroth@linux.vnet.ibm.com
+Subject: Re: [for-6.0 v5 12/13] securable guest memory: Alter virtio default
+ properties for protected guests
+Message-ID: <20201208015403.GB2555@yekko.fritz.box>
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+ <20201204054415.579042-13-david@gibson.dropbear.id.au>
+ <d739cae2-9197-76a5-1c19-057bfe832187@de.ibm.com>
+ <20201204091706.4432dc1e.cohuck@redhat.com>
+ <038214d1-580d-6692-cd1e-701cd41b5cf8@de.ibm.com>
+ <20201204154310.158b410e.pasic@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="bCsyhTFzCvuiizWE"
+Content-Disposition: inline
+In-Reply-To: <20201204154310.158b410e.pasic@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Dec 7, 2020, at 4:41 PM, Nadav Amit <nadav.amit@gmail.com> wrote:
->=20
->> On Oct 2, 2020, at 8:44 AM, Claudio Imbrenda <imbrenda@linux.ibm.com> =
-wrote:
->>=20
->> This is a complete rewrite of the page allocator.
->=20
-> This patch causes me crashes:
->=20
->  lib/alloc_page.c:433: assert failed: !(areas_mask & BIT(n))
->=20
-> It appears that two areas are registered on AREA_LOW_NUMBER, as =
-setup_vm()
-> can call (and calls on my system) page_alloc_init_area() twice.
->=20
-> setup_vm() uses AREA_ANY_NUMBER as the area number argument but =
-eventually
-> this means, according to the code, that __page_alloc_init_area() would =
-use
-> AREA_LOW_NUMBER.
->=20
-> I do not understand the rationale behind these areas well enough to =
-fix it.
 
-One more thing: I changed the previous allocator to zero any allocated =
-page.
-Without it, I get strange failures when I do not run the tests on KVM, =
-which
-are presumably caused by some intentional or unintentional hidden =
-assumption
-of kvm-unit-tests that the memory is zeroed.
+--bCsyhTFzCvuiizWE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Can you restore this behavior? I can also send this one-line fix, but I =
-do
-not want to overstep on your (hopeful) fix for the previous problem that =
-I
-mentioned (AREA_ANY_NUMBER).
+On Fri, Dec 04, 2020 at 03:43:10PM +0100, Halil Pasic wrote:
+> On Fri, 4 Dec 2020 09:29:59 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>=20
+> > On 04.12.20 09:17, Cornelia Huck wrote:
+> > > On Fri, 4 Dec 2020 09:10:36 +0100
+> > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> > >=20
+> > >> On 04.12.20 06:44, David Gibson wrote:
+> > >>> The default behaviour for virtio devices is not to use the platform=
+s normal
+> > >>> DMA paths, but instead to use the fact that it's running in a hyper=
+visor
+> > >>> to directly access guest memory.  That doesn't work if the guest's =
+memory
+> > >>> is protected from hypervisor access, such as with AMD's SEV or POWE=
+R's PEF.
+> > >>>
+> > >>> So, if a securable guest memory mechanism is enabled, then apply the
+> > >>> iommu_platform=3Don option so it will go through normal DMA mechani=
+sms.
+> > >>> Those will presumably have some way of marking memory as shared with
+> > >>> the hypervisor or hardware so that DMA will work.
+> > >>>
+> > >>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > >>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > >>> ---
+> > >>>  hw/core/machine.c | 13 +++++++++++++
+> > >>>  1 file changed, 13 insertions(+)
+> > >>>
+> > >>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > >>> index a67a27d03c..d16273d75d 100644
+> > >>> --- a/hw/core/machine.c
+> > >>> +++ b/hw/core/machine.c
+> > >>> @@ -28,6 +28,8 @@
+> > >>>  #include "hw/mem/nvdimm.h"
+> > >>>  #include "migration/vmstate.h"
+> > >>>  #include "exec/securable-guest-memory.h"
+> > >>> +#include "hw/virtio/virtio.h"
+> > >>> +#include "hw/virtio/virtio-pci.h"
+> > >>> =20
+> > >>>  GlobalProperty hw_compat_5_1[] =3D {
+> > >>>      { "vhost-scsi", "num_queues", "1"},
+> > >>> @@ -1169,6 +1171,17 @@ void machine_run_board_init(MachineState *ma=
+chine)
+> > >>>           * areas.
+> > >>>           */
+> > >>>          machine_set_mem_merge(OBJECT(machine), false, &error_abort=
+);
+> > >>> +
+> > >>> +        /*
+> > >>> +         * Virtio devices can't count on directly accessing guest
+> > >>> +         * memory, so they need iommu_platform=3Don to use normal =
+DMA
+> > >>> +         * mechanisms.  That requires also disabling legacy virtio
+> > >>> +         * support for those virtio pci devices which allow it.
+> > >>> +         */
+> > >>> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legac=
+y",
+> > >>> +                                   "on", true);
+> > >>> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_plat=
+form",
+> > >>> +                                   "on", false); =20
+> > >>
+> > >> I have not followed all the history (sorry). Should we also set iomm=
+u_platform
+> > >> for virtio-ccw? Halil?
+> > >>
+> > >=20
+> > > That line should add iommu_platform for all virtio devices, shouldn't
+> > > it?
+> >=20
+> > Yes, sorry. Was misreading that with the line above.=20
+> >=20
+>=20
+> I believe this is the best we can get. In a sense it is still a
+> pessimization,
 
-Thanks,
-Nadav=
+I'm not really clear on what you're getting at here.
+
+> but it is a big usability improvement compared to having
+> to set iommu_platform manually.=20
+>=20
+> Regards,
+> Halil
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--bCsyhTFzCvuiizWE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/O3LkACgkQbDjKyiDZ
+s5IRxQ//cmGUbtEIT1HBgw1z4WsymknaXfK7BFJcNdIpLJmKZqe+XQjynq2EWLh5
+wIbQneKKyRlZo1WlurkAvMgOexL1g4JujE/eUBGLQ1Itrf3zG6+eLbsUijFhTCxs
+VdyNP6sVyijEZ3yTqb3It0UnT6spNszYO0SwWY6/b1K/7m1hJ6c5M1I8fwYtlOpx
+FsYiErMGpYLP2d9zWLgbKfwGmv6K6joCireNmYMsf+IDK5qdxDDou3WnEuTZte2f
+m1g9wlQQPDmDD7+k2x1gkMXgiIUXtsm0stEsdCiwe27PWLWaNSJFo98EqDRxcX32
+Qe1PIvjQuLQQxI/UqHaX2u8me1LShhwvrMPzSRYEC+fmglSi5VnyJVNwEs0XIxeg
+TNt9KROHKyC9c9r7oCcp40mzmS3YcngOuTxHsX8+5x3Xtix9r4Xv14dwzwF1mGRT
+e0wL7sD4FZKIVNkjA4+tAQ5allBPY1pwZIRsC1LTp2jGaxI2jSLwA8eksHCps+0U
+5hA8pHqR8rROloq88rtyVU5mJXXp7nORoT5w4GtSivl8v+DGC3x/+VR8YKnE6OLq
+h7S4fyyysVSe1towkrOGJdCNw6vvN/u4emrVG28dISre75GcAuh3sdSsxgOI+GlL
+Q/5e5ZCsOvtyejOInniCi7c1EPrzpoKSQijvVMpvJgOu9MynBZc=
+=JfQj
+-----END PGP SIGNATURE-----
+
+--bCsyhTFzCvuiizWE--
