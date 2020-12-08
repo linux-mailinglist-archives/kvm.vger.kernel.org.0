@@ -2,169 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D97A52D3439
-	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 21:51:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE1252D3503
+	for <lists+kvm@lfdr.de>; Tue,  8 Dec 2020 22:14:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730262AbgLHUdh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 15:33:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39876 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726338AbgLHUdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 15:33:37 -0500
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3952AC06179C
-        for <kvm@vger.kernel.org>; Tue,  8 Dec 2020 12:32:51 -0800 (PST)
-Received: by mail-pg1-x541.google.com with SMTP id f17so13237256pge.6
-        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 12:32:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=X3jaTUl9GBo4a8qnhQEMvznUX5ksekBuFBQfWILQ+U8=;
-        b=MrliCpl8hL4cJC8PERAnNSwTdw6bXwTTXhAZ/M5/h7klwCksqQ6Ag35pmFF1pxUlTT
-         XQJ2QeciTt9iZFcybbCPAOWut3Mp8EWvFsTGWzCkPREPRSEXjTcA9xchQcRSUroN+CzI
-         STLPmTE4Xc+a36i7ap+UAK8ndr2qoM5aj8iRgtNJTv+tP+4ZPmBW2xu6Te336JZ4a2j2
-         R/JIVw0N8rxTDFu4L1TXxBTxtO3OKCOlmkdkzthu3wt3BV2FKt3XlanBn5ef8C49Pfir
-         HsVPP3dqRjfjkctYO0dzupgCnDP7/I4WqvNmoHHCqeUQrfK/uOodQ4oUU7C243b1Grn9
-         2naA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=X3jaTUl9GBo4a8qnhQEMvznUX5ksekBuFBQfWILQ+U8=;
-        b=KNHeV0TBgpc/ib/8vzqLqCIwfzACmwN5lJkOBj2T9qHRoQvfTK9F8PPHO+m8ooEw5j
-         W1D3JIyUHXwOGz6QaJFQx6Hn4I41pU8yaXqvffj7kFb5bTZ+dgVjqX85r1amJR+JOYxp
-         mDphcWsXjzdqX1Cbtro/Ntqwy2ihox2NsziKMhBP1T6U1+dYW12Q9AphoJ3RuX18qVqN
-         jYWG9HE7cYefCRQ2EngypaBCVKWu8O44QubHFktsLxGmZ3ZqsoJa3PpzZjOAIrKj3e1O
-         H7OROaaAIVWFD9VkxmTQeNEhvzCHsVcbGLeDy3TmryM5ItQUxlgTjbA+kctp2pQILlYx
-         QSJg==
-X-Gm-Message-State: AOAM532nc33gbwXhwSuiqN0KkPMMl3+eZuMoVHdlWpKj851SbnEJ5Qh7
-        CQXrj4MLjDLAGd4Y35tiGgBf6Q==
-X-Google-Smtp-Source: ABdhPJxYJCnYuntUM3RTj5G4uZ8JcqXRsmHjDtNdlCetqy79aa/LEq/fJzELfZLm7dPA5RZVrqzYYQ==
-X-Received: by 2002:a17:90b:a04:: with SMTP id gg4mr6017057pjb.8.1607459570651;
-        Tue, 08 Dec 2020 12:32:50 -0800 (PST)
-Received: from ?IPv6:2600:1010:b020:7dd:51f8:22c8:74de:21e0? ([2600:1010:b020:7dd:51f8:22c8:74de:21e0])
-        by smtp.gmail.com with ESMTPSA id a17sm15902499pga.56.2020.12.08.12.32.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Dec 2020 12:32:49 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-Date:   Tue, 8 Dec 2020 12:32:48 -0800
-Message-Id: <301491B7-DEB6-41ED-B8FD-657B864696CF@amacapital.net>
-References: <87h7ow2j91.fsf@nanos.tec.linutronix.de>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-In-Reply-To: <87h7ow2j91.fsf@nanos.tec.linutronix.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-X-Mailer: iPhone Mail (18B121)
+        id S1728495AbgLHVL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 16:11:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28562 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726222AbgLHVL7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Dec 2020 16:11:59 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B8L3YvX124516
+        for <kvm@vger.kernel.org>; Tue, 8 Dec 2020 16:11:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=NUKTl7y3bzATptUYlxKPLeunh5t4ViwNFw7VQPU2MUg=;
+ b=NWiMM7J6+OXuyg0WfY+fIkH1V3M/MIodNybKzWmbQyclVmS/E/yAEnenONU30WNbJkc+
+ UYER2ak0aDV+768bT4LvC0YpjmGZaSBcC9yksYzfvIMV5Nt3o3KmjisJxD3JSorDjtD0
+ sZvxHM3T12ZpJQIYcujfc+ftMnzVkYQlmyIKv0DASkitpeZUzGwUkdToncU0HYKRp+ZL
+ x+eon6i/an/o22lVCX1HidjUE56wvAs9Yr7QlOfXSsdCubLvwRylnti12hJZkSJ8ltic
+ tVo9yk0b1YqAbcG4NVYAYDIlyK5csQxQwjTOXZY8jmBSdxLxImfGdxze7XGyNBU2ijmO Mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359s0s9uxa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 08 Dec 2020 16:11:17 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B8L5Ix5139378
+        for <kvm@vger.kernel.org>; Tue, 8 Dec 2020 16:11:17 -0500
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 359s0s9uwh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Dec 2020 16:11:17 -0500
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B8L86Z4007820;
+        Tue, 8 Dec 2020 21:11:15 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3581u8nt3u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Dec 2020 21:11:15 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B8L8gZ752625740
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Dec 2020 21:08:42 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C6225A405F;
+        Tue,  8 Dec 2020 21:08:42 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9030BA4054;
+        Tue,  8 Dec 2020 21:08:42 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Dec 2020 21:08:42 +0000 (GMT)
+From:   Stefan Raspl <raspl@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, pbonzini@redhat.com
+Subject: [PATCH] tools/kvm_stat: Exempt time-based counters
+Date:   Tue,  8 Dec 2020 22:08:29 +0100
+Message-Id: <20201208210829.101324-1-raspl@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-08_15:2020-12-08,2020-12-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 clxscore=1011 mlxlogscore=940 lowpriorityscore=0
+ suspectscore=1 spamscore=0 malwarescore=0 bulkscore=0 mlxscore=0
+ phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2012080126
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Stefan Raspl <raspl@de.ibm.com>
 
-> On Dec 8, 2020, at 11:25 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
->=20
-> =EF=BB=BFOn Tue, Dec 08 2020 at 09:43, Andy Lutomirski wrote:
->> On Tue, Dec 8, 2020 at 6:23 AM Marcelo Tosatti <mtosatti@redhat.com> wrot=
-e:
->> It looks like it tries to accomplish the right goal, but in a rather
->> roundabout way.  The host knows how to convert from TSC to
->> CLOCK_REALTIME, and ptp_kvm.c exposes this data to the guest.  But,
->> rather than just making the guest use the same CLOCK_REALTIME data as
->> the host, ptp_kvm.c seems to expose information to usermode that a
->> user daemon could use to attempt (with some degree of error?) to use
->> to make the guest kernel track CLOCK_REALTIME.  This seems inefficient
->> and dubiously accurate.
->>=20
->> My feature request is for this to be fully automatic and completely
->> coherent.  I would like for a host user program and a guest user
->> program to be able to share memory, run concurrently, and use the
->> shared memory to exchange CLOCK_REALTIME values without ever observing
->> the clock going backwards.  This ought to be doable.  Ideally the
->> result should even be usable for Spanner-style synchronization
->> assuming the host clock is good enough.  Also, this whole thing should
->> work without needing to periodically wake the guest to remain
->> synchronized.  If the guest sleeps for two minutes (full nohz-idle, no
->> guest activity at all), the host makes a small REALTIME frequency
->> adjustment, and then the guest runs user code that reads
->> CLOCK_REALTIME, the guest clock should still be fully synchronized
->> with the host.  I don't think that ptp_kvm.c-style synchronization can
->> do this.
->=20
-> One issue here is that guests might want to run their own NTP/PTP. One
-> reason to do that is that some people prefer the leap second smearing
-> NTP servers.=20
+The new counters halt_poll_success_ns and halt_poll_fail_ns do not count
+events. Instead they provide a time, and mess up our statistics. Therefore,
+we should exclude them.
+Removal is currently implemented with an exempt list. If more counters like
+these appear, we can think about a more general rule like excluding all
+fields name "*_ns", in case that's a standing convention.
 
-I would hope that using this part would be optional on the guest=E2=80=99s p=
-art. Guests should be able to use just the CLOCK_MONOTONIC_RAW part or fanci=
-er stuff at their option.
+Signed-off-by: Stefan Raspl <raspl@linux.ibm.com>
+Tested-and-reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ tools/kvm/kvm_stat/kvm_stat | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-(Hmm, it would, in principle, be possible for a guest to use the host=E2=80=99=
-s TAI but still smear leap seconds. Even without virt, smearing could be a p=
-er-timens option.)
+diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+index d199a3694be8..b0bf56c5f120 100755
+--- a/tools/kvm/kvm_stat/kvm_stat
++++ b/tools/kvm/kvm_stat/kvm_stat
+@@ -742,7 +742,11 @@ class DebugfsProvider(Provider):
+         The fields are all available KVM debugfs files
+ 
+         """
+-        return self.walkdir(PATH_DEBUGFS_KVM)[2]
++        exempt_list = ['halt_poll_fail_ns', 'halt_poll_success_ns']
++        fields = [field for field in self.walkdir(PATH_DEBUGFS_KVM)[2]
++                  if field not in exempt_list]
++
++        return fields
+ 
+     def update_fields(self, fields_filter):
+         """Refresh fields, applying fields_filter"""
+-- 
+2.17.1
 
->=20
->> tglx etc, I think that doing this really really nicely might involve
->> promoting something like the current vDSO data structures to ABI -- a
->> straightforward-ish implementation would be for the KVM host to export
->> its vvar clock data to the guest and for the guest to use it, possibly
->> with an offset applied.  The offset could work a lot like timens works
->> today.
->=20
-> Works nicely if the guest TSC is not scaled. But that means that on
-> migration the raw TSC usage in the guest is borked because the new host
-> might have a different TSC frequency.
->=20
-> If you use TSC scaling then the conversion needs to take TSC scaling
-> into account which needs some thought. And the guest would need to read
-> the host conversion from 'vdso data' and the scaling from the next page
-> (per guest) and then still has to support timens. Doable but adds extra
-> overhead on every time read operation.
-
-Is the issue that scaling would result in a different guest vs host frequenc=
-y?  Perhaps we could limit each physical machine to exactly two modes: unsca=
-led (use TSC ticks, convert in software) and scaled to nanoseconds (CLOCK_MO=
-NOTONIC_RAW is RDTSC + possible offset).  Then the host could produce its da=
-ta structures in exactly those two formats and export them as appropriate.=20=
-
-
->=20
-> If you want to avoid that you are back to the point where you need to
-> chase all guest data when the host NTP/PTP adjusts the host side.
-> Chasing and updating all this stuff in the tick was the reason why I was
-> fighting the idea of clock realtime in namespaces.
-
-I think that, if we can arrange for a small, bounded number of pages generat=
-ed by the host, then this problem isn=E2=80=99t so bad.
-
-Hmm, leap second smearing is just a different linear mapping. I=E2=80=99m no=
-t sure how leap second smearing should interact with timens, but it seems to=
- be that the host should be able to produce four data pages (scaled vs unsca=
-led and smeared vs unsmeared) and one per-guest/timens offset page (where of=
-fset applies to MONOTONIC and MONOTONIC_RAW only) and cover all bases.  Or d=
-o people actually want to offset their TAI and/or REALTIME, and what would t=
-hat even mean if the offset crosses a leap second?
-
-(I haven=E2=80=99t though about the interaction of any of this with ART.)
