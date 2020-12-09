@@ -2,230 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D1E52D3A2D
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 06:15:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7C882D3B45
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 07:14:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726058AbgLIFOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 00:14:43 -0500
-Received: from mga04.intel.com ([192.55.52.120]:26818 "EHLO mga04.intel.com"
+        id S1727860AbgLIGKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 01:10:47 -0500
+Received: from foss.arm.com ([217.140.110.172]:57756 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725765AbgLIFOn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Dec 2020 00:14:43 -0500
-IronPort-SDR: 5u7pBuW1+D0AsKwn1DWpHUMB1GuWDdOByjQpUxdzj9ETppKXbfekGN3jIJCYgrihjzKPZSzcsk
- Mda7MUxBMV+Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9829"; a="171448042"
-X-IronPort-AV: E=Sophos;i="5.78,404,1599548400"; 
-   d="scan'208";a="171448042"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2020 21:14:03 -0800
-IronPort-SDR: iJF68Iogu7Awd297quq/5qGbK1KJI3yUTYkcGGikoOkCcqyp6qSouH7X4nXJuGK8j+irLzgaDt
- YRZM87ITPHjw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,404,1599548400"; 
-   d="scan'208";a="407917783"
-Received: from unknown (HELO [10.239.160.37]) ([10.239.160.37])
-  by orsmga001.jf.intel.com with ESMTP; 08 Dec 2020 21:14:01 -0800
-Reply-To: Colin.Xu@intel.com
-Subject: Re: [RFC PATCH] vfio/pci: Allow force needs_pm_restore as specified
- by device:vendor
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Fonn, Swee Yee" <swee.yee.fonn@intel.com>
-References: <20201125021824.27411-1-colin.xu@intel.com>
- <20201125085312.63510f9f@w520.home>
- <7e7a83ca-8530-1afa-4b85-2ef76fb99a5c@intel.com>
- <20201127083529.6c4a780c@x1.home>
-From:   Colin Xu <Colin.Xu@intel.com>
-Message-ID: <29124528-f02a-008e-fab1-60f6b6e643b7@intel.com>
-Date:   Wed, 9 Dec 2020 13:14:00 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
-MIME-Version: 1.0
-In-Reply-To: <20201127083529.6c4a780c@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S1725878AbgLIGKp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Dec 2020 01:10:45 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE0941042;
+        Tue,  8 Dec 2020 22:09:53 -0800 (PST)
+Received: from entos-thunderx2-desktop.shanghai.arm.com (entos-thunderx2-desktop.shanghai.arm.com [10.169.212.215])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B07303F66B;
+        Tue,  8 Dec 2020 22:09:47 -0800 (PST)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+        steven.price@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
+        nd@arm.com
+Subject: [PATCH v16 0/9] Enable ptp_kvm for arm/arm64
+Date:   Wed,  9 Dec 2020 14:09:23 +0800
+Message-Id: <20201209060932.212364-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Currently, we offen use ntp (sync time with remote network clock)
+to sync time in VM. But the precision of ntp is subject to network delay
+so it's difficult to sync time in a high precision.
 
-On 11/27/20 11:35 PM, Alex Williamson wrote:
-> On Fri, 27 Nov 2020 11:53:39 +0800
-> Colin Xu <Colin.Xu@intel.com> wrote:
->
->> On 11/25/20 11:53 PM, Alex Williamson wrote:
->>> On Wed, 25 Nov 2020 10:18:24 +0800
->>> Colin Xu <colin.xu@intel.com> wrote:
->>>   
->>>> Force specific device listed in params pm_restore_ids to follow
->>>> device state save/restore as needs_pm_restore.
->>>> Some device has NoSoftRst so will skip current state save/restore enabled
->>>> by needs_pm_restore. However once the device experienced power state
->>>> D3<->D0 transition, either by idle_d3 or the guest driver changes PM_CTL,
->>>> the guest driver won't get correct devie state although the configure
->>>> space doesn't change.
->>> It sounds like you're describing a device that incorrectly exposes
->>> NoSoftRst when there is in fact some sort of internal reset that
->>> requires reprogramming config space.  What device requires this?  How
->>> is a user to know when this option is required?  It seems like this
->>> would be better handled via a quirk in PCI core that sets a device flag
->>> that the NoSoftRst value is incorrect for the specific affected
->>> devices.  Thanks,
->>>
->>> Alex
->> Thanks for the feedback.
->>
->> The device found are: Comet Lake PCH Serial IO I2C Controller
->> [8086:06e8]
->> [8086:06e9]
->>
->> Yes you're right, there is no straight way for user to know the device.
->> The above device I found is during pass through them to VM. Although
->> adding such param may help in certain scenario, it still too
->> device-specific but not common in most cases.
->
-> The chipset i2c controller seems like a pretty suspicious device for
-> Intel to advocate assigning to a VM.  Are you assigning this to satisfy
-> the isolation issue that we often see where a device like a NIC is
-> grouped together with platform management devices due to lack of
-> multifunction ACS?  If that's the case, I would think it would make
-> more sense to investigate from the perspective of whether there is
-> actually DMA isolation between those integrated, multifunction devices
-> and if so, implement ACS quirks to expose that isolation.  Thanks,
->
-> Alex
+kvm virtual ptp clock (ptp_kvm) offers another way to sync time in VM,
+as the remote clock locates in the host instead of remote network clock.
+It targets to sync time between guest and host in virtualization
+environment and in this way, we can keep the time of all the VMs running
+in the same host in sync. In general, the delay of communication between
+host and guest is quiet small, so ptp_kvm can offer time sync precision
+up to in order of nanosecond. Please keep in mind that ptp_kvm just
+limits itself to be a channel which transmit the remote clock from
+host to guest and leaves the time sync jobs to an application, eg. chrony,
+in usersapce in VM.
 
-Hi Alex,
+How ptp_kvm works:
+After ptp_kvm initialized, there will be a new device node under
+/dev called ptp%d. A guest userspace service, like chrony, can use this
+device to get host walltime, sometimes also counter cycle, which depends
+on the service it calls. Then this guest userspace service can use those
+data to do the time sync for guest.
+here is a rough sketch to show how kvm ptp clock works.
 
-Sorry for late reply. E-mail incorrectly filtered so didn't see this one 
-until manual search.
+|----------------------------|              |--------------------------|
+|       guest userspace      |              |          host            |
+|ioctl -> /dev/ptp%d         |              |                          |
+|       ^   |                |              |                          |
+|----------------------------|              |                          |
+|       |   | guest kernel   |              |                          |
+|       |   V      (get host walltime/counter cycle)                   |
+|      ptp_kvm -> hypercall - - - - - - - - - - ->hypercall service    |
+|                         <- - - - - - - - - - - -                     |
+|----------------------------|              |--------------------------|
 
-The mentioned two I2C controller are in same iommu group and there is NO 
-other device in the same group. The I2C controller is integrated in PCH 
-chipset and there are other devices integrated too, but in different 
-group. When assigning them to a VM, both are assigned, and function 0 is 
-set with multifunction=on. If iommu driver group no other device in the 
-same group, could we assume there is no DMA isolation issue?
+1. time sync service in guest userspace call ptp device through /dev/ptp%d.
+2. ptp_kvm module in guest receives this request then invoke hypercall to route
+into host kernel to request host walltime/counter cycle.
+3. ptp_kvm hypercall service in host response to the request and send data back.
+4. ptp (not ptp_kvm) in guest copy the data to userspace.
 
->
->>>> Cc: Swee Yee Fonn <swee.yee.fonn@intel.com>
->>>> Signed-off-by: Colin Xu <colin.xu@intel.com>
->>>> ---
->>>>    drivers/vfio/pci/vfio_pci.c | 66 ++++++++++++++++++++++++++++++++++++-
->>>>    1 file changed, 65 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->>>> index e6190173482c..50a4141c9e1d 100644
->>>> --- a/drivers/vfio/pci/vfio_pci.c
->>>> +++ b/drivers/vfio/pci/vfio_pci.c
->>>> @@ -34,6 +34,15 @@
->>>>    #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
->>>>    #define DRIVER_DESC     "VFIO PCI - User Level meta-driver"
->>>>    
->>>> +#define VFIO_MAX_PM_DEV 32
->>>> +struct vfio_pm_devs {
->>>> +	struct {
->>>> +		unsigned short  vendor;
->>>> +		unsigned short  device;
->>>> +	} ids[VFIO_MAX_PM_DEV];
->>>> +	u32 count;
->>>> +};
->>>> +
->>>>    static char ids[1024] __initdata;
->>>>    module_param_string(ids, ids, sizeof(ids), 0);
->>>>    MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the vfio driver, format is \"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\" and multiple comma separated entries can be specified");
->>>> @@ -64,6 +73,10 @@ static bool disable_denylist;
->>>>    module_param(disable_denylist, bool, 0444);
->>>>    MODULE_PARM_DESC(disable_denylist, "Disable use of device denylist. Disabling the denylist allows binding to devices with known errata that may lead to exploitable stability or security issues when accessed by untrusted users.");
->>>>    
->>>> +static char pm_restore_ids[1024] __initdata;
->>>> +module_param_string(pm_restore_ids, pm_restore_ids, sizeof(pm_restore_ids), 0);
->>>> +MODULE_PARM_DESC(pm_restore_ids, "comma separated device in format of \"vendor:device\"");
->>>> +
->>>>    static inline bool vfio_vga_disabled(void)
->>>>    {
->>>>    #ifdef CONFIG_VFIO_PCI_VGA
->>>> @@ -260,10 +273,50 @@ static bool vfio_pci_nointx(struct pci_dev *pdev)
->>>>    	return false;
->>>>    }
->>>>    
->>>> +static struct vfio_pm_devs pm_devs = {0};
->>>> +static void __init vfio_pci_fill_pm_ids(void)
->>>> +{
->>>> +	char *p, *id;
->>>> +	int idx = 0;
->>>> +
->>>> +	/* no ids passed actually */
->>>> +	if (pm_restore_ids[0] == '\0')
->>>> +		return;
->>>> +
->>>> +	/* add ids specified in the module parameter */
->>>> +	p = pm_restore_ids;
->>>> +	while ((id = strsep(&p, ","))) {
->>>> +		unsigned int vendor, device = PCI_ANY_ID;
->>>> +		int fields;
->>>> +
->>>> +		if (!strlen(id))
->>>> +			continue;
->>>> +
->>>> +		fields = sscanf(id, "%x:%x", &vendor, &device);
->>>> +
->>>> +		if (fields != 2) {
->>>> +			pr_warn("invalid vendor:device string \"%s\"\n", id);
->>>> +			continue;
->>>> +		}
->>>> +
->>>> +		if (idx < VFIO_MAX_PM_DEV) {
->>>> +			pm_devs.ids[idx].vendor = vendor;
->>>> +			pm_devs.ids[idx].device = device;
->>>> +			pm_devs.count++;
->>>> +			idx++;
->>>> +			pr_info("add [%04x:%04x] for needs_pm_restore\n",
->>>> +				vendor, device);
->>>> +		} else {
->>>> +			pr_warn("Exceed maximum %d, skip adding [%04x:%04x] for needs_pm_restore\n",
->>>> +				VFIO_MAX_PM_DEV, vendor, device);
->>>> +		}
->>>> +	}
->>>> +}
->>>> +
->>>>    static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
->>>>    {
->>>>    	struct pci_dev *pdev = vdev->pdev;
->>>> -	u16 pmcsr;
->>>> +	u16 pmcsr, idx;
->>>>    
->>>>    	if (!pdev->pm_cap)
->>>>    		return;
->>>> @@ -271,6 +324,16 @@ static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
->>>>    	pci_read_config_word(pdev, pdev->pm_cap + PCI_PM_CTRL, &pmcsr);
->>>>    
->>>>    	vdev->needs_pm_restore = !(pmcsr & PCI_PM_CTRL_NO_SOFT_RESET);
->>>> +
->>>> +	for (idx = 0; idx < pm_devs.count; idx++) {
->>>> +		if (vdev->pdev->vendor == pm_devs.ids[idx].vendor &&
->>>> +		    vdev->pdev->device == pm_devs.ids[idx].device) {
->>>> +			vdev->needs_pm_restore = true;
->>>> +			pr_info("force [%04x:%04x] to needs_pm_restore\n",
->>>> +				vdev->pdev->vendor, vdev->pdev->device);
->>>> +			break;
->>>> +		}
->>>> +	}
->>>>    }
->>>>    
->>>>    /*
->>>> @@ -2423,6 +2486,7 @@ static int __init vfio_pci_init(void)
->>>>    		goto out_driver;
->>>>    
->>>>    	vfio_pci_fill_ids();
->>>> +	vfio_pci_fill_pm_ids();
->>>>    
->>>>    	if (disable_denylist)
->>>>    		pr_warn("device denylist disabled.\n");
+This ptp_kvm implementation focuses itself to step 2 and 3 and step 2 works
+in guest comparing step 3 works in host kernel.
+
+change log:
+
+from v15 to v16:
+        (1) remove ARM_PTP_NONE_COUNTER suggested by Marc.
+        (2) add more detail for ptp_kvm doc.
+        (3) fix ci issues reported by test robot.
+
+from v14 to v15:
+        (1) enable ptp_kvm on arm32 guest, also ptp_kvm has been tested
+on both arm64 and arm32 guest running on arm64 kvm host.
+        (2) move arch-agnostic part of ptp_kvm.rst into timekeeping.rst.
+        (3) rename KVM_CAP_ARM_PTP_KVM to KVM_CAP_PTP_KVM as it should be
+arch agnostic.
+        (4) add description for KVM_CAP_PTP_KVM in Documentation/virt/kvm/api.rst.
+        (5) adjust dependency in Kconfig for ptp_kvm.
+        (6) refine multi-arch process in driver/ptp/Makefile.
+        (7) fix make pdfdocs htmldocs issue for ptp_kvm doc.
+        (8) address other issues from comments in v14.
+        (9) fold hypercall service of ptp_kvm as a function.
+        (10) rebase to 5.10-rc3.
+
+from v13 to v14
+        (1) rebase code on 5.9-rc3.
+        (2) add a document to introduce implementation of PTP_KVM on
+arm64.
+        (3) fix comments issue in hypercall.c.
+        (4) export arm_smccc_1_1_get_conduit using EXPORT_SYMBOL_GPL.
+        (5) fix make issue on x86 reported by kernel test robot.
+
+from v12 to v13:
+        (1) rebase code on 5.8-rc1.
+        (2) this patch set base on 2 patches of 1/8 and 2/8 from Will Decon.
+        (3) remove the change to ptp device code of extend getcrosststamp.
+        (4) remove the mechanism of letting user choose the counter type in
+ptp_kvm for arm64.
+        (5) add virtual counter option in ptp_kvm service to let user choose
+the specific counter explicitly.
+
+from v11 to v12:
+        (1) rebase code on 5.7-rc6 and rebase 2 patches from Will Decon
+including 1/11 and 2/11. as these patches introduce discover mechanism of
+vendor smccc service.
+        (2) rebase ptp_kvm hypercall service from standard smccc to vendor
+smccc and add ptp_kvm to vendor smccc service discover mechanism.
+        (3) add detail of why we need ptp_kvm and how ptp_kvm works in cover
+letter.
+
+from v10 to v11:
+        (1) rebase code on 5.7-rc2.
+        (2) remove support for arm32, as kvm support for arm32 will be
+removed [1]
+        (3) add error report in ptp_kvm initialization.
+
+from v9 to v10:
+        (1) change code base to v5.5.
+        (2) enable ptp_kvm both for arm32 and arm64.
+        (3) let user choose which of virtual counter or physical counter
+should return when using crosstimestamp mode of ptp_kvm for arm/arm64.
+        (4) extend input argument for getcrosstimestamp API.
+
+from v8 to v9:
+        (1) move ptp_kvm.h to driver/ptp/
+        (2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
+
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
+
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
+
+from v4 to v5:
+        (1) remove hvc delay compensasion as it should leave to userspace.
+        (2) check current clocksource in hvc call service.
+        (3) expose current clocksource by adding it to
+system_time_snapshot.
+        (4) add helper to check if clocksource is arm_arch_counter.
+        (5) rename kvm_ptp.c to ptp_kvm_common.c
+
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1] https://patchwork.kernel.org/cover/11373351/
+
+
+Jianyong Wu (6):
+  ptp: Reorganize ptp_kvm module to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  arm64/kvm: Add hypercall service for kvm ptp.
+  ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+  doc: add ptp_kvm introduction for arm64 support
+  arm64: Add kvm capability check extension for ptp_kvm
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Will Deacon (2):
+  arm64: Probe for the presence of KVM hypervisor
+  arm/arm64: KVM: Advertise KVM UID to guests via SMCCC
+
+ Documentation/virt/kvm/api.rst              |  9 ++
+ Documentation/virt/kvm/arm/index.rst        |  1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst      | 31 +++++++
+ Documentation/virt/kvm/timekeeping.rst      | 35 ++++++++
+ arch/arm/kernel/setup.c                     |  5 ++
+ arch/arm64/kernel/setup.c                   |  1 +
+ arch/arm64/kvm/arm.c                        |  1 +
+ arch/arm64/kvm/hypercalls.c                 | 86 ++++++++++++++++--
+ drivers/clocksource/arm_arch_timer.c        | 31 +++++++
+ drivers/firmware/smccc/smccc.c              | 37 ++++++++
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  2 +
+ drivers/ptp/ptp_kvm_arm.c                   | 45 ++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 84 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 96 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 59 +++++++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/ptp_kvm.h                     | 16 ++++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  2 +
+ kernel/time/timekeeping.c                   |  1 +
+ 23 files changed, 498 insertions(+), 77 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+ create mode 100644 drivers/ptp/ptp_kvm_arm.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+ create mode 100644 include/linux/ptp_kvm.h
 
 -- 
-Best Regards,
-Colin Xu
+2.17.1
 
