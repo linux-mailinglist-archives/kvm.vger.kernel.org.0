@@ -2,114 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8855B2D4181
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 12:58:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D7032D41A4
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 13:03:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731134AbgLIL4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 06:56:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33128 "EHLO
+        id S1731228AbgLIMCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 07:02:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37023 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730695AbgLIL4b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 06:56:31 -0500
+        by vger.kernel.org with ESMTP id S1731046AbgLIMCZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 07:02:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607514904;
+        s=mimecast20190719; t=1607515258;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=AAGWrTXE2wtUiOQk5bJL+e+smh03p2zf7YVDeW5MSN8=;
-        b=SA6HbTJYp5jkOY4z10daWjaL9pu/W0FVRMzeW2ekn6H1/3v6KcXrusY+bJ+1Pupg5oWVQR
-        /k4BW5Y6CHwABop68ZtLzPQEBa39mAh6SBgO3hlihcg4m2cd1X30ladktaDMkdUKsNs3JN
-        mU3OKFv+RKjVMHtObbOzEixjIELZSK8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-mONXM4exMaKNZ9X_88D0Sw-1; Wed, 09 Dec 2020 06:55:00 -0500
-X-MC-Unique: mONXM4exMaKNZ9X_88D0Sw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB4C96D529;
-        Wed,  9 Dec 2020 11:54:58 +0000 (UTC)
-Received: from gondolin (ovpn-113-135.ams2.redhat.com [10.36.113.135])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BCDFF7092B;
-        Wed,  9 Dec 2020 11:54:52 +0000 (UTC)
-Date:   Wed, 9 Dec 2020 12:54:50 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>,
-        Eric Farman <farman@linux.ibm.com>
-Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <kwankhede@nvidia.com>, <wu.wubin@huawei.com>,
-        <maoming.maoming@huawei.com>, <xieyingtai@huawei.com>,
-        <lizhengui@huawei.com>, <wubinfeng@huawei.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Subject: Re: [PATCH v2] vfio iommu type1: Improve vfio_iommu_type1_pin_pages
- performance
-Message-ID: <20201209125450.3f5834ab.cohuck@redhat.com>
-In-Reply-To: <4d58b74d-72bb-6473-9523-aeaa392a470e@huawei.com>
-References: <60d22fc6-88d6-c7c2-90bd-1e8eccb1fdcc@huawei.com>
-        <4d58b74d-72bb-6473-9523-aeaa392a470e@huawei.com>
-Organization: Red Hat GmbH
+        bh=swJyXfHdLUgSl0keTb4tv1Zg2o/rljVaHBscj8NqdsQ=;
+        b=RIVWHCQ1gHOq/yTwI7gJXHSnRZ4TBKl1uQz83a0i6Sd9QnkM6ScFIB6DmAXcegIFumxdGM
+        6RdyknPKUtiOwHD3MOxAV1m/eCV+/73kifCDif4tcAl42PBmXOLR2rsah7R8cLYp6VcKlc
+        MdJZ8lca5Pfrt5OJryi5Dq4aEaqFXyA=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-FaJUMGJuPZGCYZ01ovYmSA-1; Wed, 09 Dec 2020 07:00:57 -0500
+X-MC-Unique: FaJUMGJuPZGCYZ01ovYmSA-1
+Received: by mail-qv1-f69.google.com with SMTP id 102so922605qva.0
+        for <kvm@vger.kernel.org>; Wed, 09 Dec 2020 04:00:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=swJyXfHdLUgSl0keTb4tv1Zg2o/rljVaHBscj8NqdsQ=;
+        b=DCsGqWmPGLDi0Xw7f71OoF/Ku/Lr9FMoo0mFzfh2bnMSX37Ln00u9avyaEp8gjAWA3
+         RUI+iNzLiVFha7K5EJaFpNryMBEVJLjP3EetEprP3rv2FqMS+1xmCrli5fw9QwhvJM6s
+         JPtm3UC8dP7HyGcp2JFGEeXPzp09mA3j+QBetJVWoqtiJ1FTx9O57baBsL3NsSjl0W/C
+         w4QRlrKbvqhvvmWZcgzpsYSIDjNLho40oLi4sgZ02SIASXanmumvSbdWymQOMLFV/T30
+         wDx/APUQ7rqvpDTT5rW7p1jpAhcLSkUrfpy36NWtSeWfyPuETRLPEhVL8UM4BXTXy80A
+         OCLA==
+X-Gm-Message-State: AOAM5338JW3pzixjpCTy2TJiw4bvudc1/Ub63754ymdh/eQOQeyD5Yym
+        XLk0wcGY81ELXMl280hKzkCAIwCGTFq2NE1CS7Ntm63dDr46tAq0CO7t+TCqt9NNRQjEhab2eQt
+        mFgwGZ+XNhLQgd4aemZWaUNOo9LsW
+X-Received: by 2002:ae9:dcc1:: with SMTP id q184mr2482633qkf.425.1607515255954;
+        Wed, 09 Dec 2020 04:00:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwcJSG02TAyUTW+VNdiN2re1N9kAh2N75Xi7v7CXyvg3kf2iqP7u2vinBaagIz7uHe3uMaKmoLrXvjkvH01MEM=
+X-Received: by 2002:ae9:dcc1:: with SMTP id q184mr2482593qkf.425.1607515255708;
+ Wed, 09 Dec 2020 04:00:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20201120185105.279030-1-eperezma@redhat.com> <20201120185105.279030-5-eperezma@redhat.com>
+ <20201207164323.GK203660@stefanha-x1.localdomain>
+In-Reply-To: <20201207164323.GK203660@stefanha-x1.localdomain>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 9 Dec 2020 13:00:19 +0100
+Message-ID: <CAJaqyWd5oAJ4kJOhyDz+1KNvwzqJi3NO+5Z7X6W5ju2Va=LTMQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/27] vhost: add vhost_kernel_set_vring_enable
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     qemu-level <qemu-devel@nongnu.org>,
+        Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Dec 2020 21:55:53 +0800
-"xuxiaoyang (C)" <xuxiaoyang2@huawei.com> wrote:
+On Mon, Dec 7, 2020 at 5:43 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Fri, Nov 20, 2020 at 07:50:42PM +0100, Eugenio P=C3=A9rez wrote:
+> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > ---
+> >  hw/virtio/vhost-backend.c | 29 +++++++++++++++++++++++++++++
+> >  1 file changed, 29 insertions(+)
+> >
+> > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> > index 222bbcc62d..317f1f96fa 100644
+> > --- a/hw/virtio/vhost-backend.c
+> > +++ b/hw/virtio/vhost-backend.c
+> > @@ -201,6 +201,34 @@ static int vhost_kernel_get_vq_index(struct vhost_=
+dev *dev, int idx)
+> >      return idx - dev->vq_index;
+> >  }
+> >
+> > +static int vhost_kernel_set_vq_enable(struct vhost_dev *dev, unsigned =
+idx,
+> > +                                      bool enable)
+> > +{
+> > +    struct vhost_vring_file file =3D {
+> > +        .index =3D idx,
+> > +    };
+> > +
+> > +    if (!enable) {
+> > +        file.fd =3D -1; /* Pass -1 to unbind from file. */
+> > +    } else {
+> > +        struct vhost_net *vn_dev =3D container_of(dev, struct vhost_ne=
+t, dev);
+> > +        file.fd =3D vn_dev->backend;
+> > +    }
+> > +
+> > +    return vhost_kernel_net_set_backend(dev, &file);
+>
+> This is vhost-net specific even though the function appears to be
+> generic. Is there a plan to extend this to all devices?
+>
 
-> On 2020/11/21 15:58, xuxiaoyang (C) wrote:
-> > vfio_pin_pages() accepts an array of unrelated iova pfns and processes
-> > each to return the physical pfn.  When dealing with large arrays of
-> > contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
-> > it is processed page by page.In this case, we can divide the iova pfn
-> > array into multiple continuous ranges and optimize them.  For example,
-> > when the iova pfn array is {1,5,6,7,9}, it will be divided into three
-> > groups {1}, {5,6,7}, {9} for processing.  When processing {5,6,7}, the
-> > number of calls to pin_user_pages_remote is reduced from 3 times to onc=
-e.
-> > For single page or large array of discontinuous iovas, we still use
-> > vfio_pin_page_external to deal with it to reduce the performance loss
-> > caused by refactoring.
-> >=20
-> > Signed-off-by: Xiaoyang Xu <xuxiaoyang2@huawei.com>
+I expected each vhost backend to enable-disable in its own terms, but
+I think it could be 100% virtio-device generic with something like the
+device state capability:
+https://lists.oasis-open.org/archives/virtio-comment/202012/msg00005.html
+.
 
-(...)
+> > +}
+> > +
+> > +static int vhost_kernel_set_vring_enable(struct vhost_dev *dev, int en=
+able)
+> > +{
+> > +    int i;
+> > +
+> > +    for (i =3D 0; i < dev->nvqs; ++i) {
+> > +        vhost_kernel_set_vq_enable(dev, i, enable);
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+>
+> I suggest exposing the per-vq interface (vhost_kernel_set_vq_enable())
+> in VhostOps so it follows the ioctl interface.
 
->=20
-> hi Cornelia Huck, Eric Farman, Zhenyu Wang, Zhi Wang
->=20
-> vfio_pin_pages() accepts an array of unrelated iova pfns and processes
-> each to return the physical pfn.  When dealing with large arrays of
-> contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
-> it is processed page by page.  In this case, we can divide the iova pfn
-> array into multiple continuous ranges and optimize them.  I have a set
-> of performance test data for reference.
->=20
-> The patch was not applied
->                     1 page           512 pages
-> no huge pages=EF=BC=9A     1638ns           223651ns
-> THP=EF=BC=9A               1668ns           222330ns
-> HugeTLB=EF=BC=9A           1526ns           208151ns
->=20
-> The patch was applied
->                     1 page           512 pages
-> no huge pages       1735ns           167286ns
-> THP=EF=BC=9A               1934ns           126900ns
-> HugeTLB=EF=BC=9A           1713ns           102188ns
->=20
-> As Alex Williamson said, this patch lacks proof that it works in the
-> real world. I think you will have some valuable opinions.
+It was actually the initial plan, I left as all-or-nothing to make less cha=
+nges.
 
-Looking at this from the vfio-ccw angle, I'm not sure how much this
-would buy us, as we deal with IDAWs, which are designed so that they
-can be non-contiguous. I guess this depends a lot on what the guest
-does.
+> vhost_kernel_set_vring_enable() can be moved to vhost.c can loop over
+> all vqs if callers find it convenient to loop over all vqs.
 
-Eric, any opinion? Do you maybe also happen to have a test setup that
-mimics workloads actually seen in the real world?
+I'm ok with it. Thinking out loud, I don't know if it is easier for
+some devices to enable/disable all of it (less syscalls? less downtime
+somehow?) but I find more generic and useful the per-virtqueue
+approach.
+
+Thanks!
 
