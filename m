@@ -2,309 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D34BC2D444F
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 15:29:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02D5F2D44A4
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 15:47:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732990AbgLIO1q convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 9 Dec 2020 09:27:46 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2523 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732405AbgLIO1p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Dec 2020 09:27:45 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CrfVx558zzQp1g;
-        Wed,  9 Dec 2020 22:26:33 +0800 (CST)
-Received: from dggema766-chm.china.huawei.com (10.1.198.208) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Wed, 9 Dec 2020 22:27:01 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggema766-chm.china.huawei.com (10.1.198.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Wed, 9 Dec 2020 22:27:01 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2106.002; Wed, 9 Dec 2020 14:26:59 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Eric Auger <eric.auger@redhat.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
-        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "tn@semihalf.com" <tn@semihalf.com>,
-        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        qubingbing <qubingbing@hisilicon.com>
-Subject: RE: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
- support
-Thread-Topic: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
- support
-Thread-Index: AQHWvZ3YzXx0Iv4/TkmqLZQuADrJXqnu73jQ
-Date:   Wed, 9 Dec 2020 14:26:59 +0000
-Message-ID: <d31ca662eb124fd3ba0c88936dcc098f@huawei.com>
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-6-eric.auger@redhat.com>
-In-Reply-To: <20201118112151.25412-6-eric.auger@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.1.56]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1733063AbgLIOpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 09:45:17 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23670 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733060AbgLIOpJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 09:45:09 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B9EXfMg167391;
+        Wed, 9 Dec 2020 09:42:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9yaToXePl5w30PZNMLzXKenGOVLUECi6fnk4Bwg1kqs=;
+ b=egH335cyF4EjWtM14prZHcXm1ncwClP38Bi8eTZcJJ/MxRY9ZhaF6ze5TsExStyD5UnQ
+ 6C4yxz8rdZ+5iPWAGRC919JIZLKAq/qQlkb7+UOGyR9nLNG4sVSGOX7EwEXmw7IJkm0M
+ wjLwDIWexNLZzBIRNsb1wci7MQYCsC0HtlJcIziITUqWKdxAg09uFWv3XOtzvHA6OF6m
+ igc3qWZa8BdGD0F6lVt6eoazgejts8wg+Z+WtHPfjtddCjuoW9BKRejPybcX9ijErFUH
+ BQzKwDJPRJphYrGTfFrtK6igoWKWKPx2NA0ZOmhcXuLMwxkAXILCa1z1ZIBcEGrCafmm AA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35avder39x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 09:42:51 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B9EYpfd178675;
+        Wed, 9 Dec 2020 09:42:51 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35avder35a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 09:42:51 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B9Ec9rQ009612;
+        Wed, 9 Dec 2020 14:42:41 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma02dal.us.ibm.com with ESMTP id 3581ua06gf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 14:42:41 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B9Ege1S12059340
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Dec 2020 14:42:40 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94DB428059;
+        Wed,  9 Dec 2020 14:42:40 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A28E228058;
+        Wed,  9 Dec 2020 14:42:38 +0000 (GMT)
+Received: from [9.211.50.183] (unknown [9.211.50.183])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Dec 2020 14:42:38 +0000 (GMT)
+Subject: Re: [PATCH v2] vfio iommu type1: Improve vfio_iommu_type1_pin_pages
+ performance
+To:     Cornelia Huck <cohuck@redhat.com>,
+        "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kwankhede@nvidia.com, wu.wubin@huawei.com,
+        maoming.maoming@huawei.com, xieyingtai@huawei.com,
+        lizhengui@huawei.com, wubinfeng@huawei.com,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+References: <60d22fc6-88d6-c7c2-90bd-1e8eccb1fdcc@huawei.com>
+ <4d58b74d-72bb-6473-9523-aeaa392a470e@huawei.com>
+ <20201209125450.3f5834ab.cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <9e37b8d9-3654-5b89-e3b4-5e6ede736320@linux.ibm.com>
+Date:   Wed, 9 Dec 2020 09:42:37 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20201209125450.3f5834ab.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-09_13:2020-12-09,2020-12-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0
+ clxscore=1011 phishscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ suspectscore=9 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012090104
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
 
-> -----Original Message-----
-> From: Eric Auger [mailto:eric.auger@redhat.com]
-> Sent: 18 November 2020 11:22
-> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
-> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
-> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
-> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
-> alex.williamson@redhat.com
-> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
-> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
-> Thodi <shameerali.kolothum.thodi@huawei.com>;
-> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
-> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
-> Subject: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
-> support
-> 
-> When nested stage translation is setup, both s1_cfg and
-> s2_cfg are set.
-> 
-> We introduce a new smmu domain abort field that will be set
-> upon guest stage1 configuration passing.
-> 
-> arm_smmu_write_strtab_ent() is modified to write both stage
-> fields in the STE and deal with the abort field.
-> 
-> In nested mode, only stage 2 is "finalized" as the host does
-> not own/configure the stage 1 context descriptor; guest does.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v10 -> v11:
-> - Fix an issue reported by Shameer when switching from with vSMMU
->   to without vSMMU. Despite the spec does not seem to mention it
->   seems to be needed to reset the 2 high 64b when switching from
->   S1+S2 cfg to S1 only. Especially dst[3] needs to be reset (S2TTB).
->   On some implementations, if the S2TTB is not reset, this causes
->   a C_BAD_STE error
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 64
-> +++++++++++++++++----
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  2 +
->  2 files changed, 56 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 18ac5af1b284..412ea1bafa50 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -1181,8 +1181,10 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  	 * three cases at the moment:
->  	 *
->  	 * 1. Invalid (all zero) -> bypass/fault (init)
-> -	 * 2. Bypass/fault -> translation/bypass (attach)
-> -	 * 3. Translation/bypass -> bypass/fault (detach)
-> +	 * 2. Bypass/fault -> single stage translation/bypass (attach)
-> +	 * 3. Single or nested stage Translation/bypass -> bypass/fault (detach)
-> +	 * 4. S2 -> S1 + S2 (attach_pasid_table)
-> +	 * 5. S1 + S2 -> S2 (detach_pasid_table)
->  	 *
->  	 * Given that we can't update the STE atomically and the SMMU
->  	 * doesn't read the thing in a defined order, that leaves us
-> @@ -1193,7 +1195,8 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  	 * 3. Update Config, sync
->  	 */
->  	u64 val = le64_to_cpu(dst[0]);
-> -	bool ste_live = false;
-> +	bool s1_live = false, s2_live = false, ste_live;
-> +	bool abort, nested = false, translate = false;
->  	struct arm_smmu_device *smmu = NULL;
->  	struct arm_smmu_s1_cfg *s1_cfg;
->  	struct arm_smmu_s2_cfg *s2_cfg;
-> @@ -1233,6 +1236,8 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  		default:
->  			break;
->  		}
-> +		nested = s1_cfg->set && s2_cfg->set;
 
-This is a problem when the Guest is booted with iommu.passthrough = 1 as we
-set s1_cfg.set = false for IOMMU_PASID_CONFIG_BYPASS. 
+On 12/9/20 6:54 AM, Cornelia Huck wrote:
+> On Tue, 8 Dec 2020 21:55:53 +0800
+> "xuxiaoyang (C)" <xuxiaoyang2@huawei.com> wrote:
+> 
+>> On 2020/11/21 15:58, xuxiaoyang (C) wrote:
+>>> vfio_pin_pages() accepts an array of unrelated iova pfns and processes
+>>> each to return the physical pfn.  When dealing with large arrays of
+>>> contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
+>>> it is processed page by page.In this case, we can divide the iova pfn
+>>> array into multiple continuous ranges and optimize them.  For example,
+>>> when the iova pfn array is {1,5,6,7,9}, it will be divided into three
+>>> groups {1}, {5,6,7}, {9} for processing.  When processing {5,6,7}, the
+>>> number of calls to pin_user_pages_remote is reduced from 3 times to once.
+>>> For single page or large array of discontinuous iovas, we still use
+>>> vfio_pin_page_external to deal with it to reduce the performance loss
+>>> caused by refactoring.
+>>>
+>>> Signed-off-by: Xiaoyang Xu <xuxiaoyang2@huawei.com>
+> 
+> (...)
+> 
+>>
+>> hi Cornelia Huck, Eric Farman, Zhenyu Wang, Zhi Wang
+>>
+>> vfio_pin_pages() accepts an array of unrelated iova pfns and processes
+>> each to return the physical pfn.  When dealing with large arrays of
+>> contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
+>> it is processed page by page.  In this case, we can divide the iova pfn
+>> array into multiple continuous ranges and optimize them.  I have a set
+>> of performance test data for reference.
+>>
+>> The patch was not applied
+>>                      1 page           512 pages
+>> no huge pages：     1638ns           223651ns
+>> THP：               1668ns           222330ns
+>> HugeTLB：           1526ns           208151ns
+>>
+>> The patch was applied
+>>                      1 page           512 pages
+>> no huge pages       1735ns           167286ns
+>> THP：               1934ns           126900ns
+>> HugeTLB：           1713ns           102188ns
+>>
+>> As Alex Williamson said, this patch lacks proof that it works in the
+>> real world. I think you will have some valuable opinions.
+> 
+> Looking at this from the vfio-ccw angle, I'm not sure how much this
+> would buy us, as we deal with IDAWs, which are designed so that they
+> can be non-contiguous. I guess this depends a lot on what the guest
+> does.
 
-Results in BUG_ON(ste_live && !nested).
+This would be my concern too, but I don't have data off the top of my 
+head to say one way or another...
 
-Can we instead have nested = true set a bit above in the code, where we set
-s2_cfg->set = true for the ARM_SMMU_DOMAIN_NESTED case?
+> 
+> Eric, any opinion? Do you maybe also happen to have a test setup that
+> mimics workloads actually seen in the real world?
+> 
 
-Please take a look.
+...I do have some test setups, which I will try to get some data from in 
+a couple days. At the moment I've broken most of those setups trying to 
+implement some other stuff, and can't revert back at the moment. Will 
+get back to this.
 
-Thanks,
-Shameer
-
-> +		translate = s1_cfg->set || s2_cfg->set;
->  	}
-> 
->  	if (val & STRTAB_STE_0_V) {
-> @@ -1240,23 +1245,36 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  		case STRTAB_STE_0_CFG_BYPASS:
->  			break;
->  		case STRTAB_STE_0_CFG_S1_TRANS:
-> +			s1_live = true;
-> +			break;
->  		case STRTAB_STE_0_CFG_S2_TRANS:
-> -			ste_live = true;
-> +			s2_live = true;
-> +			break;
-> +		case STRTAB_STE_0_CFG_NESTED:
-> +			s1_live = true;
-> +			s2_live = true;
->  			break;
->  		case STRTAB_STE_0_CFG_ABORT:
-> -			BUG_ON(!disable_bypass);
->  			break;
->  		default:
->  			BUG(); /* STE corruption */
->  		}
->  	}
-> 
-> +	ste_live = s1_live || s2_live;
-> +
->  	/* Nuke the existing STE_0 value, as we're going to rewrite it */
->  	val = STRTAB_STE_0_V;
-> 
->  	/* Bypass/fault */
-> -	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
-> -		if (!smmu_domain && disable_bypass)
-> +
-> +	if (!smmu_domain)
-> +		abort = disable_bypass;
-> +	else
-> +		abort = smmu_domain->abort;
-> +
-> +	if (abort || !translate) {
-> +		if (abort)
->  			val |= FIELD_PREP(STRTAB_STE_0_CFG,
-> STRTAB_STE_0_CFG_ABORT);
->  		else
->  			val |= FIELD_PREP(STRTAB_STE_0_CFG,
-> STRTAB_STE_0_CFG_BYPASS);
-> @@ -1274,8 +1292,16 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  		return;
->  	}
-> 
-> +	BUG_ON(ste_live && !nested);
-> +
-> +	if (ste_live) {
-> +		/* First invalidate the live STE */
-> +		dst[0] = cpu_to_le64(STRTAB_STE_0_CFG_ABORT);
-> +		arm_smmu_sync_ste_for_sid(smmu, sid);
-> +	}
-> +
->  	if (s1_cfg->set) {
-> -		BUG_ON(ste_live);
-> +		BUG_ON(s1_live);
->  		dst[1] = cpu_to_le64(
->  			 FIELD_PREP(STRTAB_STE_1_S1DSS,
-> STRTAB_STE_1_S1DSS_SSID0) |
->  			 FIELD_PREP(STRTAB_STE_1_S1CIR,
-> STRTAB_STE_1_S1C_CACHE_WBRA) |
-> @@ -1294,7 +1320,14 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  	}
-> 
->  	if (s2_cfg->set) {
-> -		BUG_ON(ste_live);
-> +		u64 vttbr = s2_cfg->vttbr & STRTAB_STE_3_S2TTB_MASK;
-> +
-> +		if (s2_live) {
-> +			u64 s2ttb = le64_to_cpu(dst[3] & STRTAB_STE_3_S2TTB_MASK);
-> +
-> +			BUG_ON(s2ttb != vttbr);
-> +		}
-> +
->  		dst[2] = cpu_to_le64(
->  			 FIELD_PREP(STRTAB_STE_2_S2VMID, s2_cfg->vmid) |
->  			 FIELD_PREP(STRTAB_STE_2_VTCR, s2_cfg->vtcr) |
-> @@ -1304,9 +1337,12 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  			 STRTAB_STE_2_S2PTW | STRTAB_STE_2_S2AA64 |
->  			 STRTAB_STE_2_S2R);
-> 
-> -		dst[3] = cpu_to_le64(s2_cfg->vttbr & STRTAB_STE_3_S2TTB_MASK);
-> +		dst[3] = cpu_to_le64(vttbr);
-> 
->  		val |= FIELD_PREP(STRTAB_STE_0_CFG,
-> STRTAB_STE_0_CFG_S2_TRANS);
-> +	} else {
-> +		dst[2] = 0;
-> +		dst[3] = 0;
->  	}
-> 
->  	if (master->ats_enabled)
-> @@ -1982,6 +2018,14 @@ static int arm_smmu_domain_finalise(struct
-> iommu_domain *domain,
->  		return 0;
->  	}
-> 
-> +	if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED &&
-> +	    (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1) ||
-> +	     !(smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
-> +		dev_info(smmu_domain->smmu->dev,
-> +			 "does not implement two stages\n");
-> +		return -EINVAL;
-> +	}
-> +
->  	/* Restrict the stage to what we can actually support */
->  	if (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1))
->  		smmu_domain->stage = ARM_SMMU_DOMAIN_S2;
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> index 07f59252dd21..269779dee8d1 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> @@ -206,6 +206,7 @@
->  #define STRTAB_STE_0_CFG_BYPASS		4
->  #define STRTAB_STE_0_CFG_S1_TRANS	5
->  #define STRTAB_STE_0_CFG_S2_TRANS	6
-> +#define STRTAB_STE_0_CFG_NESTED		7
-> 
->  #define STRTAB_STE_0_S1FMT		GENMASK_ULL(5, 4)
->  #define STRTAB_STE_0_S1FMT_LINEAR	0
-> @@ -682,6 +683,7 @@ struct arm_smmu_domain {
->  	enum arm_smmu_domain_stage	stage;
->  	struct arm_smmu_s1_cfg	s1_cfg;
->  	struct arm_smmu_s2_cfg	s2_cfg;
-> +	bool				abort;
-> 
->  	struct iommu_domain		domain;
-> 
-> --
-> 2.21.3
-
+Eric
