@@ -2,128 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 201C82D4218
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 13:23:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C297B2D4258
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 13:45:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731528AbgLIMWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 07:22:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45659 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731495AbgLIMWQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 07:22:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607516449;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=02tquZiATMN/D94oqS1HgMSz6T4cchxv1MZSl+fk/68=;
-        b=LlMssY+oeg62FO4iyAm4luod1eiUx1QnNPUL3ZKpQMT9SiDYYvC3P7IWr6Fyy94wtUHpcH
-        ytHM7zVmGQaTbt+i2LGZKnROQNb1tHzRYID7ReM7uZ4MK1gOuaFMQ2SbqRsmxvIhIo/5Fs
-        ECYKUpEUY9wGpaItMpcVf/wYCwpt+Uw=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-KfyEmGOOP4eBXOGSsOfJAw-1; Wed, 09 Dec 2020 07:20:47 -0500
-X-MC-Unique: KfyEmGOOP4eBXOGSsOfJAw-1
-Received: by mail-qt1-f200.google.com with SMTP id n12so1056723qta.9
-        for <kvm@vger.kernel.org>; Wed, 09 Dec 2020 04:20:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=02tquZiATMN/D94oqS1HgMSz6T4cchxv1MZSl+fk/68=;
-        b=nWPi//Ow471Wp2u7ftJz60Yfg4CpHWHxzvlark7ijMlC8Z6+gbzT5Ex/lQC/durSyu
-         NQ9P7bgwL/F9RPOdpwS/+RNCUP0WgZ9Baql62o5iV3Z3B7KH3+vu6XJ5cLnWdyLmVxqO
-         ZtA093I2rMGSqSFEtL1GcAKByHrbaPxjAVBMx1Xw/U2HNIIQleTM5BG1PvoVV5/1bttQ
-         FA4iCfknDxrqj+i0AkGVEnNfonz9SDJhG0WowRXYBNVeXbceUf5w6VJhu03o9MAumrPN
-         86rT7MUfgQCte3kaLwc9ZSDB0wDqgpHmAHXnIDaTRgwf6Y8vRNHeByRsaUr0KYVvQMj6
-         tFVA==
-X-Gm-Message-State: AOAM532TClwZAqIwWN52LvEOSQRnOmy/85ztzRkHXcFDFXoCvmg8zlux
-        hgg111o3/KeqM0GZqWXdvNu6jFnMMLp94gKN7lJ8Yo+h6E+6lUAr8YwH499cxXdBy1hsKFOMTWL
-        O7ExCMLK7aR7B1FqYHI/FBdQEyjvM
-X-Received: by 2002:a37:8485:: with SMTP id g127mr2590261qkd.233.1607516447501;
-        Wed, 09 Dec 2020 04:20:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxt/nrA+PEG+B8jRnIAdin9fm1aHeI7kL5mjtjcSfyl2llDTS9p8AJqVYo87tA8/xuhq3mMWO7Vd0gMqaadb3Y=
-X-Received: by 2002:a37:8485:: with SMTP id g127mr2590212qkd.233.1607516447222;
- Wed, 09 Dec 2020 04:20:47 -0800 (PST)
+        id S1731826AbgLIMoD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 07:44:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41490 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731770AbgLIMoB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 07:44:01 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B9CffVL025153;
+        Wed, 9 Dec 2020 07:43:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TBqu9X2wd1HwUV6NSmhuqToiZ+WkY5yDn4wZENQ6i30=;
+ b=ljCF8C82RJk+a/8oIToLasSI+jlBY11zdetslRkAxNtM3K5wVyuX7Ory22lsskW0Osju
+ sEdZ+4f4GykoFSGIQTp9iHIY4AKqMFe5SiNtkIY1qNvuGRNnZNbt9Nw0DE+6Xe/caZ/2
+ Ydb9/CzN7zRpHYlW9aF4g2bTmnpmDM4ZAOZlaeOMVaosAFHZGtDrXP+wYl1kASqnP37N
+ OL/uk781H1I4HBLNeWgWz/h3bjQSuvKntMDZbjvFmpWhZa6JttsXcSLFZNwdEvWp9czT
+ gYkQs7SQZDj4BI07mBkERr1FAqVZ2/SH0ngPBm8Yw01gR6E/DjUI/1RMRoIH815EI/3k OQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35axtg00ss-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 07:43:19 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B9CgxvI027397;
+        Wed, 9 Dec 2020 07:43:18 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35axtg00s4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 07:43:18 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B9CflIh011369;
+        Wed, 9 Dec 2020 12:43:16 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 3581u84kk3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 12:43:16 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B9ChEuU6750842
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Dec 2020 12:43:14 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 35FB042045;
+        Wed,  9 Dec 2020 12:43:14 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D5F6A42042;
+        Wed,  9 Dec 2020 12:43:13 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.56.167])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Dec 2020 12:43:13 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: Move to GPL 2 and SPDX license
+ identifiers
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+References: <20201208150902.32383-1-frankja@linux.ibm.com>
+ <20201208150902.32383-2-frankja@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <414068f0-4bf4-8ccc-a11e-63deb5f01c42@linux.ibm.com>
+Date:   Wed, 9 Dec 2020 13:43:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20201120185105.279030-1-eperezma@redhat.com> <20201120185105.279030-3-eperezma@redhat.com>
- <20201207161938.GJ203660@stefanha-x1.localdomain>
-In-Reply-To: <20201207161938.GJ203660@stefanha-x1.localdomain>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 9 Dec 2020 13:20:10 +0100
-Message-ID: <CAJaqyWcZ_LEu1OibCoG+couDPoOjDPQNLkoEppEat=jDP6zvxQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 02/27] vhost: Add device callback in vhost_migration_log
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     qemu-level <qemu-devel@nongnu.org>,
-        Lars Ganrot <lars.ganrot@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        Salil Mehta <mehta.salil.lnk@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Liran Alon <liralon@gmail.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        Max Gurtovoy <maxgu14@gmail.com>,
-        Alex Barba <alex.barba@broadcom.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jim Harford <jim.harford@broadcom.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Christophe Fontaine <cfontain@redhat.com>,
-        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
-        Michael Lilja <ml@napatech.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
-        Lee Ballard <ballle98@gmail.com>,
-        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
-        Juan Quintela <quintela@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Howard Cai <howard.cai@gmail.com>,
-        Xiao W Wang <xiao.w.wang@intel.com>,
-        Sean Mooney <smooney@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
-        Stephen Finucane <stephenfin@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20201208150902.32383-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-09_09:2020-12-09,2020-12-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ adultscore=0 priorityscore=1501 impostorscore=0 lowpriorityscore=0
+ mlxscore=0 clxscore=1011 spamscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012090085
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 7, 2020 at 5:19 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Fri, Nov 20, 2020 at 07:50:40PM +0100, Eugenio P=C3=A9rez wrote:
-> > This allows code to reuse the logic to not to re-enable or re-disable
-> > migration mechanisms. Code works the same way as before.
-> >
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > ---
-> >  hw/virtio/vhost.c | 12 +++++++-----
-> >  1 file changed, 7 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index 2bd8cdf893..2adb2718c1 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -862,7 +862,9 @@ err_features:
-> >      return r;
-> >  }
-> >
-> > -static int vhost_migration_log(MemoryListener *listener, bool enable)
-> > +static int vhost_migration_log(MemoryListener *listener,
-> > +                               bool enable,
-> > +                               int (*device_cb)(struct vhost_dev *, bo=
-ol))
->
-> Please document the argument. What is the callback function supposed to
-> do ("device_cb" is not descriptive so I'm not sure)?
 
-Sure, I will expand documentation if we stick with this approach to
-enable/disable the shadow virtqueue (I hope we agree on a better one
-anyway).
 
-Just for completion, it was meant for vhost_dev_set_log, so vhost_dev*
-is the device to enable/disable migration, and the second bool is for
-enable/disable it.
+On 12/8/20 4:09 PM, Janosch Frank wrote:
+> In the past we had some issues when developers wanted to use code
+> snippets or constants from the kernel in a test or in the library. To
+> remedy that the s390x maintainers decided to move all files to GPL
+> 2 (if possible).
+> 
+> At the same time let's move to SPDX identifiers as they are much nicer
+> to read.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   s390x/cmm.c       | 4 +---
+>   s390x/cpumodel.c  | 4 +---
+>   s390x/css.c       | 4 +---
+>   s390x/cstart64.S  | 4 +---
+>   s390x/diag10.c    | 4 +---
+>   s390x/diag288.c   | 4 +---
+>   s390x/diag308.c   | 5 +----
+>   s390x/emulator.c  | 4 +---
+>   s390x/gs.c        | 4 +---
+>   s390x/iep.c       | 4 +---
+>   s390x/intercept.c | 4 +---
+>   s390x/pfmf.c      | 4 +---
+>   s390x/sclp.c      | 4 +---
+>   s390x/selftest.c  | 4 +---
+>   s390x/skey.c      | 4 +---
+>   s390x/skrf.c      | 4 +---
+>   s390x/smp.c       | 4 +---
+>   s390x/sthyi.c     | 4 +---
+>   s390x/sthyi.h     | 4 +---
+>   s390x/stsi.c      | 4 +---
+>   s390x/uv-guest.c  | 4 +---
+>   s390x/vector.c    | 4 +---
+>   22 files changed, 22 insertions(+), 67 deletions(-)
+> 
 
-Thanks!
+Acked-by: Pierre Morel <pmorel@linux.ibm.com>
 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
