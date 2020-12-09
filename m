@@ -2,66 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 535DD2D3E3D
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 10:11:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AADAF2D3E40
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 10:11:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728722AbgLIJJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 04:09:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39981 "EHLO
+        id S1728778AbgLIJKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 04:10:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52389 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727899AbgLIJJf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 04:09:35 -0500
+        by vger.kernel.org with ESMTP id S1728650AbgLIJKV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 04:10:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607504889;
+        s=mimecast20190719; t=1607504935;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KJwxuIPd4nlAbXQQmhJtbvMuCe0z2W0Y13mU4B8OPV4=;
-        b=aSQon+ceUNshuC/9wuc1b5F/GXB0EeMcl9PQB5jqeHWA982TJyy7avNx79G0wXXhwEcj/N
-        AOIpdFL84Wb8Zmqm3J+LQptUOKp5ibAZkzDrHNgusVDvJK+M3WXKMhVy/t3A0H9mLSEYE9
-        PSKye/WwSQbO8MKBOWjSZwmV5rR2V4U=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-sMpbSN5AMJy3yRmHV2EUGw-1; Wed, 09 Dec 2020 04:08:07 -0500
-X-MC-Unique: sMpbSN5AMJy3yRmHV2EUGw-1
-Received: by mail-ej1-f72.google.com with SMTP id 3so344904ejw.13
-        for <kvm@vger.kernel.org>; Wed, 09 Dec 2020 01:08:06 -0800 (PST)
+        bh=Z8HlquEoW4X2q/+qcVSM6H75qDDj8W+Dq9wZut/Sz5s=;
+        b=OsZ0bIonnXTORI237wlYn5X4VKEJwgHmORSbvBSSG174d1mT+/9EWRvl5E08A/Z0O5ZBJb
+        FhjqNVTgj84j3IN+WwCdF3GGKIy3UE2v2taWRflUX5753C4Z1Gz/w9fNzjiANvTGqWL5Oi
+        OUiyVIc+q7rS4+ToXEJl1BMelfPUP84=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-b6Z06jIAOeWosayiRswDcA-1; Wed, 09 Dec 2020 04:08:53 -0500
+X-MC-Unique: b6Z06jIAOeWosayiRswDcA-1
+Received: by mail-ed1-f69.google.com with SMTP id bf13so605552edb.10
+        for <kvm@vger.kernel.org>; Wed, 09 Dec 2020 01:08:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=KJwxuIPd4nlAbXQQmhJtbvMuCe0z2W0Y13mU4B8OPV4=;
-        b=Y0alivYgYMOdIhUIolXtAOrlxkPmVUeFlpMMy6skNLMP3oTZBHevrM9HeGHW/nwpSH
-         I7umefWAW80cNM5Bp8gkASWmxBXmptvxUGiWxrehX7YEVqr8cdk4usgUIoPztPBJ6Vlm
-         z9y0lyWhW3cHNKyTCGiiW6urgE1oQ0a4dtbp79zMDlpLyTs1qDsNJcGdXcy+dujHtqvF
-         YiCuEjf/5G6b2H70OCh4LWT1a5PDQ/0W3S2GC9aCbm+uRJ3ma/Aci7+/CXSsWclnU6sa
-         U8q/ZvWrxPybnqmMPa9P723bi9aZyBk46Op3fR4Dbxy2KQr5ulEXu25HQQ4ApITUEqIm
-         IrCA==
-X-Gm-Message-State: AOAM530hSxppXNkakw3OAj+2Hl5+zGBLdqtc2AQ2zmHz4yav7/HOLsFM
-        0rSBrH1Rh0lNSsLax52Q7he6oyA3Vv0riaO2Bi+DC7Yhp1+myXIDQjUY6psUqvja2LZuUGuyHjF
-        gRZHyvVo2ssXG
-X-Received: by 2002:a50:cfcf:: with SMTP id i15mr1084522edk.351.1607504885986;
-        Wed, 09 Dec 2020 01:08:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwU5q85qW8vH9F5ycwt/U1/kcp/ss/VQNclhj/fFBciLk8UGvUfCYextx3u3uT92XhQv1qelQ==
-X-Received: by 2002:a50:cfcf:: with SMTP id i15mr1084506edk.351.1607504885789;
-        Wed, 09 Dec 2020 01:08:05 -0800 (PST)
+        bh=Z8HlquEoW4X2q/+qcVSM6H75qDDj8W+Dq9wZut/Sz5s=;
+        b=k6vPrZRupneB5yYHnvje+fqTAZ78T2m3tFK34KDPWcw1XGL0f90+UTF+SySLrl9uKU
+         N/hbWJQYuWSPIqnfDUmkN5p4zVlkayI3MHsByP/XcKC4WeU+DyayUzp4QUS5M+GdhYdm
+         t4+o245F+kViU0gClZbWy0f5F7aDcbk/BY+dcJtBJhBBLD+hN0NUWf5SIPcmSkis8BPM
+         JUiFpNB4rbek0AHnfj5mZJjYYHrrSkDRN8X7xnxzdzqoUOD7kPsCBooZgVBwvt1SCfW8
+         0oHEgE0JDFI8bNPiZqNpl+iX2gyXtjskp2faeS4TMzyLOymSGUHCA7oZhqGsOGI57tqE
+         HnjA==
+X-Gm-Message-State: AOAM532wiW+jnQjpGxocV55g4C1XQuk63A0ZuCGA70/XC8/PxyQSbf9j
+        bHvM/DaIjkLIKYPyK84ZXiK7xh8iC/HDJPpSLTcFjdJuOqQ3nLqlMVjKq+t+Ja/NlQ7lrEpHKRj
+        50eDALwb01Q+6
+X-Received: by 2002:a17:906:c193:: with SMTP id g19mr1169801ejz.393.1607504932109;
+        Wed, 09 Dec 2020 01:08:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyyCALCpD/nDA8Lmv55gbFxBTmrGaC6FbUiJ6kN1W5/lZm38nY8tddFPlonjiINu/+QS9+lYQ==
+X-Received: by 2002:a17:906:c193:: with SMTP id g19mr1169784ejz.393.1607504931925;
+        Wed, 09 Dec 2020 01:08:51 -0800 (PST)
 Received: from [192.168.1.124] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id v16sm915151eds.64.2020.12.09.01.08.03
+        by smtp.gmail.com with ESMTPSA id m24sm868412ejo.52.2020.12.09.01.08.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Dec 2020 01:08:04 -0800 (PST)
-Subject: Re: [PATCH] tools/kvm_stat: Exempt time-based counters
-To:     Stefan Raspl <raspl@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com
-References: <20201208210829.101324-1-raspl@linux.ibm.com>
+        Wed, 09 Dec 2020 01:08:51 -0800 (PST)
+Subject: Re: [PATCH] KVM: mmu: Fix SPTE encoding of MMIO generation upper half
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <156700708db2a5296c5ed7a8b9ac71f1e9765c85.1607129096.git.maciej.szmigiero@oracle.com>
+ <370db207-7216-ae26-0c33-dab61e0fdaab@redhat.com>
+ <X8/sWzYUjuEYwCuf@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c89c376-3cce-3d46-ca29-2b5ba1a3aab8@redhat.com>
-Date:   Wed, 9 Dec 2020 10:08:02 +0100
+Message-ID: <5e1dc1cd-b175-86be-b33e-0456ecbd50e8@redhat.com>
+Date:   Wed, 9 Dec 2020 10:08:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201208210829.101324-1-raspl@linux.ibm.com>
+In-Reply-To: <X8/sWzYUjuEYwCuf@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -69,22 +77,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/12/20 22:08, Stefan Raspl wrote:
-> From: Stefan Raspl<raspl@de.ibm.com>
-> 
-> The new counters halt_poll_success_ns and halt_poll_fail_ns do not count
-> events. Instead they provide a time, and mess up our statistics. Therefore,
-> we should exclude them.
+On 08/12/20 22:12, Sean Christopherson wrote:
+>> #define MMIO_SPTE_GEN_MASK               GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
+> What if we leave MMIO_SPTE_GEN_MASK as is, GENMASK_ULL(17, 0), and instead add a
+> BUILD_BUG_ON() to assert that it matches the above logic?  It's really easy to
+> get lost when reading through the chain of defines, I find the explicit mask
+> helps provide an anchor/reference for understand what's going on.  It'll require
+> an update if/when PT64_SECOND_AVAIL_BITS_SHIFT, but that's not necessarily a bad
+> thing, e.g. the comment above this block will also be stale.
 
-What is the issue exactly?  Do they mess up the formatting?
+Sounds good.
 
 Paolo
-
-> Removal is currently implemented with an exempt list. If more counters like
-> these appear, we can think about a more general rule like excluding all
-> fields name "*_ns", in case that's a standing convention.
-> 
-> Signed-off-by: Stefan Raspl<raspl@linux.ibm.com>
-> Tested-and-reported-by: Christian Borntraeger<borntraeger@de.ibm.com>
-> ---
 
