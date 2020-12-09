@@ -2,201 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96F7D2D4673
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 17:11:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDCFC2D468D
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 17:18:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730345AbgLIQKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 11:10:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43354 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730136AbgLIQKg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 11:10:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607530149;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fOS/4HJ6CdAMgJzGnNDCHYvTBIuYNCc44EVO6kOzhSI=;
-        b=QpVzMEyaZoFXM7BxJMYaC6G2RW+tkfN/N8ksGbLtOCLl8bpE2pLIdlhEa/Ick6/J9yc4pU
-        4nTXarJIgLEtxxlhI1VBJx2kxEnJ0gsABvwo24EmrdCXxT3nTNNPvx57+1IqjR8U5CSvbC
-        X3fjNqYbQWUNrgc1CDzyal63bzBIwWo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-rVoJ1VpoO0KvyhUnBjsi5w-1; Wed, 09 Dec 2020 11:09:05 -0500
-X-MC-Unique: rVoJ1VpoO0KvyhUnBjsi5w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 127241005504;
-        Wed,  9 Dec 2020 16:09:02 +0000 (UTC)
-Received: from localhost (ovpn-115-48.ams2.redhat.com [10.36.115.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AC6B60BF1;
-        Wed,  9 Dec 2020 16:08:58 +0000 (UTC)
-Date:   Wed, 9 Dec 2020 16:08:57 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     Stefan Hajnoczi <stefanha@gmail.com>,
-        qemu-level <qemu-devel@nongnu.org>,
-        Lars Ganrot <lars.ganrot@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        Salil Mehta <mehta.salil.lnk@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Liran Alon <liralon@gmail.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        Max Gurtovoy <maxgu14@gmail.com>,
-        Alex Barba <alex.barba@broadcom.com>,
-        Jim Harford <jim.harford@broadcom.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Christophe Fontaine <cfontain@redhat.com>,
-        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
-        Michael Lilja <ml@napatech.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
-        Lee Ballard <ballle98@gmail.com>,
-        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
-        Juan Quintela <quintela@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Howard Cai <howard.cai@gmail.com>,
-        Xiao W Wang <xiao.w.wang@intel.com>,
-        Sean Mooney <smooney@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
-        Stephen Finucane <stephenfin@redhat.com>
-Subject: Re: [RFC PATCH 04/27] vhost: add vhost_kernel_set_vring_enable
-Message-ID: <20201209160857.GC396498@stefanha-x1.localdomain>
-References: <20201120185105.279030-1-eperezma@redhat.com>
- <20201120185105.279030-5-eperezma@redhat.com>
- <20201207164323.GK203660@stefanha-x1.localdomain>
- <CAJaqyWd5oAJ4kJOhyDz+1KNvwzqJi3NO+5Z7X6W5ju2Va=LTMQ@mail.gmail.com>
+        id S1731702AbgLIQQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 11:16:13 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:47040 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728404AbgLIQQF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Dec 2020 11:16:05 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B9G9MnR083781;
+        Wed, 9 Dec 2020 16:15:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=86yS5ZSEM4uLoGDP4K4dfalOsPgydZF3kRohkHa788k=;
+ b=OEWxn/8v3C0lRN470tEn+9GKAsOfbGeBngvE0EwG4JpCfeyL+cqztxrxumCrtv2F51zs
+ j6sC19bk2GQns84sKXvvRw0YuyR9a4sqDpndz2EZj/jDM6WdbRaT1vcfFLeMhgxn+L/E
+ pL1NjR61rmKp2TRc+b5A80VNzYMoqb6F6vhot65LI+jRsRN1P7he1heQ/0l7kgZUMw2k
+ PrYGuhboP9FkE4K3nlV9I1WtziuzjbrTSzgYyPD7214iHw8zQeWtdbBMfiN6HrLQIntx
+ f0OBKIUALFsoSsGvl+wtFesu/WjUbMbYUtq3GmwE0B8rDFzcDZgGD4iyu1NA1aN4K16/ oQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 357yqc13jt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 09 Dec 2020 16:15:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B9GAil4111778;
+        Wed, 9 Dec 2020 16:13:07 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 358kyuwg06-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 09 Dec 2020 16:13:07 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B9GD3f3012679;
+        Wed, 9 Dec 2020 16:13:03 GMT
+Received: from [10.175.160.66] (/10.175.160.66)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 09 Dec 2020 08:13:02 -0800
+Subject: Re: [PATCH RFC 10/39] KVM: x86/xen: support upcall vector
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>, karahmed@amazon.de
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190220201609.28290-1-joao.m.martins@oracle.com>
+ <20190220201609.28290-11-joao.m.martins@oracle.com>
+ <71753a370cd6f9dd147427634284073b78679fa6.camel@infradead.org>
+ <53baeaa7-0fed-d22c-7767-09ae885d13a0@oracle.com>
+ <4ad0d157c5c7317a660cd8d65b535d3232f9249d.camel@infradead.org>
+ <c43024b3-6508-3b77-870c-da81e74284a4@oracle.com>
+ <052867ae1c997487d85c21e995feb5647ac6c458.camel@infradead.org>
+ <6a6b5806be1fe4c0fe96c0b664710d1ce614f29d.camel@infradead.org>
+ <1af00fa4-03b8-a059-d859-5cfd71ef10f4@oracle.com>
+ <0eb8c2ef01b77af0d288888f200e812d374beada.camel@infradead.org>
+ <f7dec3f1-aadc-bda5-f4dc-7185ffd9c1a6@oracle.com>
+ <db4ea3bd6ebec53c40526d67273ccfba38982811.camel@infradead.org>
+ <35165dbc-73d0-21cd-0baf-db4ffb55fc47@oracle.com>
+ <2E57982D-6508-4850-ABA5-67592381379D@infradead.org>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <f92d0cfa-f1fe-9339-e319-946f6475131d@oracle.com>
+Date:   Wed, 9 Dec 2020 16:12:58 +0000
 MIME-Version: 1.0
-In-Reply-To: <CAJaqyWd5oAJ4kJOhyDz+1KNvwzqJi3NO+5Z7X6W5ju2Va=LTMQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Bu8it7iiRSEf40bY"
-Content-Disposition: inline
+In-Reply-To: <2E57982D-6508-4850-ABA5-67592381379D@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9829 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 suspectscore=1 mlxlogscore=999 bulkscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012090113
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9829 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
+ clxscore=1015 malwarescore=0 bulkscore=0 phishscore=0 adultscore=0
+ spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012090113
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Bu8it7iiRSEf40bY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 12/9/20 3:41 PM, David Woodhouse wrote:
+> On 9 December 2020 13:26:55 GMT, Joao Martins <joao.m.martins@oracle.com> wrote:
+>> On 12/9/20 11:39 AM, David Woodhouse wrote:
+>>> As far as I can tell, Xen's hvm_vcpu_has_pending_irq() will still
+>>> return the domain-wide vector in preference to the one in the LAPIC,
+>> if
+>>> it actually gets invoked. 
+>>
+>> Only if the callback installed is HVMIRQ_callback_vector IIUC.
+>>
+>> Otherwise the vector would be pending like any other LAPIC vector.
+> 
+> Ah, right.
+> 
+> For some reason I had it in my head that you could only set the per-vCPU lapic vector if the domain was set to HVMIRQ_callback_vector. If the domain is set to HVMIRQ_callback_none, that clearly makes more sense.
+> 
+> Still, my patch should do the same as Xen does in the case where a guest does set both, I think.
+> 
+> Faithful compatibility with odd Xen behaviour FTW :)
+> 
+Ah, yes. In that case, HVMIRQ_callback_vector does take precedence.
 
-On Wed, Dec 09, 2020 at 01:00:19PM +0100, Eugenio Perez Martin wrote:
-> On Mon, Dec 7, 2020 at 5:43 PM Stefan Hajnoczi <stefanha@gmail.com> wrote=
-:
-> >
-> > On Fri, Nov 20, 2020 at 07:50:42PM +0100, Eugenio P=E9rez wrote:
-> > > Signed-off-by: Eugenio P=E9rez <eperezma@redhat.com>
-> > > ---
-> > >  hw/virtio/vhost-backend.c | 29 +++++++++++++++++++++++++++++
-> > >  1 file changed, 29 insertions(+)
-> > >
-> > > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> > > index 222bbcc62d..317f1f96fa 100644
-> > > --- a/hw/virtio/vhost-backend.c
-> > > +++ b/hw/virtio/vhost-backend.c
-> > > @@ -201,6 +201,34 @@ static int vhost_kernel_get_vq_index(struct vhos=
-t_dev *dev, int idx)
-> > >      return idx - dev->vq_index;
-> > >  }
-> > >
-> > > +static int vhost_kernel_set_vq_enable(struct vhost_dev *dev, unsigne=
-d idx,
-> > > +                                      bool enable)
-> > > +{
-> > > +    struct vhost_vring_file file =3D {
-> > > +        .index =3D idx,
-> > > +    };
-> > > +
-> > > +    if (!enable) {
-> > > +        file.fd =3D -1; /* Pass -1 to unbind from file. */
-> > > +    } else {
-> > > +        struct vhost_net *vn_dev =3D container_of(dev, struct vhost_=
-net, dev);
-> > > +        file.fd =3D vn_dev->backend;
-> > > +    }
-> > > +
-> > > +    return vhost_kernel_net_set_backend(dev, &file);
-> >
-> > This is vhost-net specific even though the function appears to be
-> > generic. Is there a plan to extend this to all devices?
-> >
->=20
-> I expected each vhost backend to enable-disable in its own terms, but
-> I think it could be 100% virtio-device generic with something like the
-> device state capability:
-> https://lists.oasis-open.org/archives/virtio-comment/202012/msg00005.html
-> .
-
-Great, thanks for the link!
-
-> > > +}
-> > > +
-> > > +static int vhost_kernel_set_vring_enable(struct vhost_dev *dev, int =
-enable)
-> > > +{
-> > > +    int i;
-> > > +
-> > > +    for (i =3D 0; i < dev->nvqs; ++i) {
-> > > +        vhost_kernel_set_vq_enable(dev, i, enable);
-> > > +    }
-> > > +
-> > > +    return 0;
-> > > +}
-> >
-> > I suggest exposing the per-vq interface (vhost_kernel_set_vq_enable())
-> > in VhostOps so it follows the ioctl interface.
->=20
-> It was actually the initial plan, I left as all-or-nothing to make less c=
-hanges.
->=20
-> > vhost_kernel_set_vring_enable() can be moved to vhost.c can loop over
-> > all vqs if callers find it convenient to loop over all vqs.
->=20
-> I'm ok with it. Thinking out loud, I don't know if it is easier for
-> some devices to enable/disable all of it (less syscalls? less downtime
-> somehow?) but I find more generic and useful the per-virtqueue
-> approach.
-
-That's an interesting question, the ability to enable/disable specific
-virtqueues seems like it could be useful. For example, guests with vCPU
-hotplug may want to enable/disable virtqueues so that multi-queue
-adapts as the number of vCPUs changes. A per-vq interface is needed for
-that.
-
-I'm a little worried that some device types might not cope well with
-quiescing individual vqs. Here "quiesce" means to complete in flight
-requests. This would be where two or more vqs have a relationship and
-disabling one vq could cause a deadlock when trying to disable the other
-one. However, I can't think of a case where this happens.
-
-virtio-vsock is the closest example but luckily we don't need complete
-in flight requests, we can just stop the vq immediately. So although
-there is a dependency on the other vq it won't deadlock in this case.
-
-Stefan
-
---Bu8it7iiRSEf40bY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/Q9pkACgkQnKSrs4Gr
-c8iMSwgAuQkVy+8P+reUkH3zK4kRMJP39XJyEVGBk4XKwPzrKZMdOaUjfCdmtrS5
-8mdhYb/M4pl2/kvGRgIMZFL/6fF+FqPl2awpYD7fWDQvMuUmg6Ky2czgPERekkjy
-awjY044CskD0euoaLLbF8NawY+5/vkm65diOPvwhSVu9w/2ZPhAmEX8I+kL1w/8H
-RfFdptKdp8+U24zVbF/Deb8i0aTC0SCpOlkdMzhXuK+KIVtz71I68T/bFgIgkThM
-J/SvDM0FkIxRP4+BKY5fkxgNidAqWA3CnNZZxLNBZEhFeApizydASnYZyur+asYH
-2WuQ+zP5DcEQTL5ehLWnwkSYdndt9A==
-=VK9G
------END PGP SIGNATURE-----
-
---Bu8it7iiRSEf40bY--
-
+But it would be very weird for a guest to setup two callback vectors :)
