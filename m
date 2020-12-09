@@ -2,227 +2,309 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C5982D4449
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 15:29:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D34BC2D444F
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 15:29:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732964AbgLIO0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 09:26:45 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36358 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732623AbgLIO0o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 09:26:44 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B9E2Z77119171;
-        Wed, 9 Dec 2020 09:25:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=bqFwMxKIfvJ8bopMr1/KAEblJfpQ8B3u0rXvp6N6T20=;
- b=A4yMV1J8BVScsnt00pSQd3hRPFOcSEr5TdOTGsHkrl9D4OIwCWDy7/WHHmdV7Ata5q4l
- VXsafgpl+EEX/E6JT2TzBS5UyUREiTxM+RMrEcB2sLJJDEJDfEbnDd2TpMHh725QGmfV
- ZYiW6WFxW/mcXrrky+G+T++1xmu+QSIGImVC8vqP4/wqJFO92eJ5qWAmvCqNI3DkQQZi
- kIx/KquKWHgD/+bFUHjYlp1C6vJvWU7hiaAFHqWJr4oVWQhYUbZrQ1yn0aFgBH6opj6p
- gGTamMtC4Lk+kXEjsbQs0bE3oM6yA0ZjBYQddD+siNQt2aUyjLwfMC7k8qKUpVa0vKL0 /A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35avmu7bs1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Dec 2020 09:25:31 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B9E2cBC119399;
-        Wed, 9 Dec 2020 09:25:30 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35avmu7br7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Dec 2020 09:25:30 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B9EMAJT022362;
-        Wed, 9 Dec 2020 14:25:29 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma02dal.us.ibm.com with ESMTP id 3581ua02gr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Dec 2020 14:25:29 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B9EPSNY9700036
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 9 Dec 2020 14:25:28 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4925EBE054;
-        Wed,  9 Dec 2020 14:25:28 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A097BE05A;
-        Wed,  9 Dec 2020 14:25:27 +0000 (GMT)
-Received: from localhost (unknown [9.211.134.143])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Wed,  9 Dec 2020 14:25:27 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>, mpe@ellerman.id.au,
-        paulus@samba.org
-Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
-        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
-        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v2 1/4] KVM: PPC: Allow nested guest creation when L0 hv_guest_state > L1
-In-Reply-To: <20201124105953.39325-2-ravi.bangoria@linux.ibm.com>
-References: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com> <20201124105953.39325-2-ravi.bangoria@linux.ibm.com>
-Date:   Wed, 09 Dec 2020 11:25:24 -0300
-Message-ID: <87r1nzgip7.fsf@linux.ibm.com>
+        id S1732990AbgLIO1q convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 9 Dec 2020 09:27:46 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2523 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732405AbgLIO1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Dec 2020 09:27:45 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CrfVx558zzQp1g;
+        Wed,  9 Dec 2020 22:26:33 +0800 (CST)
+Received: from dggema766-chm.china.huawei.com (10.1.198.208) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Wed, 9 Dec 2020 22:27:01 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggema766-chm.china.huawei.com (10.1.198.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Wed, 9 Dec 2020 22:27:01 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2106.002; Wed, 9 Dec 2020 14:26:59 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Eric Auger <eric.auger@redhat.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
+        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "tn@semihalf.com" <tn@semihalf.com>,
+        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        qubingbing <qubingbing@hisilicon.com>
+Subject: RE: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
+ support
+Thread-Topic: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
+ support
+Thread-Index: AQHWvZ3YzXx0Iv4/TkmqLZQuADrJXqnu73jQ
+Date:   Wed, 9 Dec 2020 14:26:59 +0000
+Message-ID: <d31ca662eb124fd3ba0c88936dcc098f@huawei.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-6-eric.auger@redhat.com>
+In-Reply-To: <20201118112151.25412-6-eric.auger@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.1.56]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-09_11:2020-12-09,2020-12-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- spamscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- mlxscore=0 malwarescore=0 suspectscore=1 adultscore=0 clxscore=1011
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012090097
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ravi Bangoria <ravi.bangoria@linux.ibm.com> writes:
+Hi Eric,
 
-> On powerpc, L1 hypervisor takes help of L0 using H_ENTER_NESTED
-> hcall to load L2 guest state in cpu. L1 hypervisor prepares the
-> L2 state in struct hv_guest_state and passes a pointer to it via
-> hcall. Using that pointer, L0 reads/writes that state directly
-> from/to L1 memory. Thus L0 must be aware of hv_guest_state layout
-> of L1. Currently it uses version field to achieve this. i.e. If
-> L0 hv_guest_state.version != L1 hv_guest_state.version, L0 won't
-> allow nested kvm guest.
->
-> This restriction can be loosen up a bit. L0 can be taught to
-> understand older layout of hv_guest_state, if we restrict the
-> new member to be added only at the end. i.e. we can allow
-> nested guest even when L0 hv_guest_state.version > L1
-> hv_guest_state.version. Though, the other way around is not
-> possible.
->
-> Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
-
+> -----Original Message-----
+> From: Eric Auger [mailto:eric.auger@redhat.com]
+> Sent: 18 November 2020 11:22
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
+> alex.williamson@redhat.com
+> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
+> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
+> Thodi <shameerali.kolothum.thodi@huawei.com>;
+> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
+> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
+> Subject: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
+> support
+> 
+> When nested stage translation is setup, both s1_cfg and
+> s2_cfg are set.
+> 
+> We introduce a new smmu domain abort field that will be set
+> upon guest stage1 configuration passing.
+> 
+> arm_smmu_write_strtab_ent() is modified to write both stage
+> fields in the STE and deal with the abort field.
+> 
+> In nested mode, only stage 2 is "finalized" as the host does
+> not own/configure the stage 1 context descriptor; guest does.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  arch/powerpc/include/asm/hvcall.h   | 17 +++++++--
->  arch/powerpc/kvm/book3s_hv_nested.c | 53 ++++++++++++++++++++++++-----
->  2 files changed, 59 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-> index fbb377055471..a7073fddb657 100644
-> --- a/arch/powerpc/include/asm/hvcall.h
-> +++ b/arch/powerpc/include/asm/hvcall.h
-> @@ -524,9 +524,12 @@ struct h_cpu_char_result {
->  	u64 behaviour;
->  };
->
-> -/* Register state for entering a nested guest with H_ENTER_NESTED */
-> +/*
-> + * Register state for entering a nested guest with H_ENTER_NESTED.
-> + * New member must be added at the end.
-> + */
->  struct hv_guest_state {
-> -	u64 version;		/* version of this structure layout */
-> +	u64 version;		/* version of this structure layout, must be first */
->  	u32 lpid;
->  	u32 vcpu_token;
->  	/* These registers are hypervisor privileged (at least for writing) */
-> @@ -560,6 +563,16 @@ struct hv_guest_state {
->  /* Latest version of hv_guest_state structure */
->  #define HV_GUEST_STATE_VERSION	1
->
-> +static inline int hv_guest_state_size(unsigned int version)
-> +{
-> +	switch (version) {
-> +	case 1:
-> +		return offsetofend(struct hv_guest_state, ppr);
-> +	default:
-> +		return -1;
+> v10 -> v11:
+> - Fix an issue reported by Shameer when switching from with vSMMU
+>   to without vSMMU. Despite the spec does not seem to mention it
+>   seems to be needed to reset the 2 high 64b when switching from
+>   S1+S2 cfg to S1 only. Especially dst[3] needs to be reset (S2TTB).
+>   On some implementations, if the S2TTB is not reset, this causes
+>   a C_BAD_STE error
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 64
+> +++++++++++++++++----
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  2 +
+>  2 files changed, 56 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index 18ac5af1b284..412ea1bafa50 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -1181,8 +1181,10 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
+>  	 * three cases at the moment:
+>  	 *
+>  	 * 1. Invalid (all zero) -> bypass/fault (init)
+> -	 * 2. Bypass/fault -> translation/bypass (attach)
+> -	 * 3. Translation/bypass -> bypass/fault (detach)
+> +	 * 2. Bypass/fault -> single stage translation/bypass (attach)
+> +	 * 3. Single or nested stage Translation/bypass -> bypass/fault (detach)
+> +	 * 4. S2 -> S1 + S2 (attach_pasid_table)
+> +	 * 5. S1 + S2 -> S2 (detach_pasid_table)
+>  	 *
+>  	 * Given that we can't update the STE atomically and the SMMU
+>  	 * doesn't read the thing in a defined order, that leaves us
+> @@ -1193,7 +1195,8 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
+>  	 * 3. Update Config, sync
+>  	 */
+>  	u64 val = le64_to_cpu(dst[0]);
+> -	bool ste_live = false;
+> +	bool s1_live = false, s2_live = false, ste_live;
+> +	bool abort, nested = false, translate = false;
+>  	struct arm_smmu_device *smmu = NULL;
+>  	struct arm_smmu_s1_cfg *s1_cfg;
+>  	struct arm_smmu_s2_cfg *s2_cfg;
+> @@ -1233,6 +1236,8 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
+>  		default:
+>  			break;
+>  		}
+> +		nested = s1_cfg->set && s2_cfg->set;
+
+This is a problem when the Guest is booted with iommu.passthrough = 1 as we
+set s1_cfg.set = false for IOMMU_PASID_CONFIG_BYPASS. 
+
+Results in BUG_ON(ste_live && !nested).
+
+Can we instead have nested = true set a bit above in the code, where we set
+s2_cfg->set = true for the ARM_SMMU_DOMAIN_NESTED case?
+
+Please take a look.
+
+Thanks,
+Shameer
+
+> +		translate = s1_cfg->set || s2_cfg->set;
+>  	}
+> 
+>  	if (val & STRTAB_STE_0_V) {
+> @@ -1240,23 +1245,36 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
+>  		case STRTAB_STE_0_CFG_BYPASS:
+>  			break;
+>  		case STRTAB_STE_0_CFG_S1_TRANS:
+> +			s1_live = true;
+> +			break;
+>  		case STRTAB_STE_0_CFG_S2_TRANS:
+> -			ste_live = true;
+> +			s2_live = true;
+> +			break;
+> +		case STRTAB_STE_0_CFG_NESTED:
+> +			s1_live = true;
+> +			s2_live = true;
+>  			break;
+>  		case STRTAB_STE_0_CFG_ABORT:
+> -			BUG_ON(!disable_bypass);
+>  			break;
+>  		default:
+>  			BUG(); /* STE corruption */
+>  		}
+>  	}
+> 
+> +	ste_live = s1_live || s2_live;
+> +
+>  	/* Nuke the existing STE_0 value, as we're going to rewrite it */
+>  	val = STRTAB_STE_0_V;
+> 
+>  	/* Bypass/fault */
+> -	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
+> -		if (!smmu_domain && disable_bypass)
+> +
+> +	if (!smmu_domain)
+> +		abort = disable_bypass;
+> +	else
+> +		abort = smmu_domain->abort;
+> +
+> +	if (abort || !translate) {
+> +		if (abort)
+>  			val |= FIELD_PREP(STRTAB_STE_0_CFG,
+> STRTAB_STE_0_CFG_ABORT);
+>  		else
+>  			val |= FIELD_PREP(STRTAB_STE_0_CFG,
+> STRTAB_STE_0_CFG_BYPASS);
+> @@ -1274,8 +1292,16 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
+>  		return;
+>  	}
+> 
+> +	BUG_ON(ste_live && !nested);
+> +
+> +	if (ste_live) {
+> +		/* First invalidate the live STE */
+> +		dst[0] = cpu_to_le64(STRTAB_STE_0_CFG_ABORT);
+> +		arm_smmu_sync_ste_for_sid(smmu, sid);
 > +	}
-> +}
 > +
->  #endif /* __ASSEMBLY__ */
->  #endif /* __KERNEL__ */
->  #endif /* _ASM_POWERPC_HVCALL_H */
-> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-> index 33b58549a9aa..2b433c3bacea 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nested.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-> @@ -215,6 +215,45 @@ static void kvmhv_nested_mmio_needed(struct kvm_vcpu *vcpu, u64 regs_ptr)
+>  	if (s1_cfg->set) {
+> -		BUG_ON(ste_live);
+> +		BUG_ON(s1_live);
+>  		dst[1] = cpu_to_le64(
+>  			 FIELD_PREP(STRTAB_STE_1_S1DSS,
+> STRTAB_STE_1_S1DSS_SSID0) |
+>  			 FIELD_PREP(STRTAB_STE_1_S1CIR,
+> STRTAB_STE_1_S1C_CACHE_WBRA) |
+> @@ -1294,7 +1320,14 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
 >  	}
->  }
->
-> +static int kvmhv_read_guest_state_and_regs(struct kvm_vcpu *vcpu,
-> +					   struct hv_guest_state *l2_hv,
-> +					   struct pt_regs *l2_regs,
-> +					   u64 hv_ptr, u64 regs_ptr)
-> +{
-> +	int size;
+> 
+>  	if (s2_cfg->set) {
+> -		BUG_ON(ste_live);
+> +		u64 vttbr = s2_cfg->vttbr & STRTAB_STE_3_S2TTB_MASK;
 > +
-> +	if (kvm_vcpu_read_guest(vcpu, hv_ptr, &(l2_hv->version),
-> +				sizeof(l2_hv->version)))
-> +		return -1;
+> +		if (s2_live) {
+> +			u64 s2ttb = le64_to_cpu(dst[3] & STRTAB_STE_3_S2TTB_MASK);
 > +
-> +	if (kvmppc_need_byteswap(vcpu))
-> +		l2_hv->version = swab64(l2_hv->version);
+> +			BUG_ON(s2ttb != vttbr);
+> +		}
 > +
-> +	size = hv_guest_state_size(l2_hv->version);
-> +	if (size < 0)
-> +		return -1;
-> +
-> +	return kvm_vcpu_read_guest(vcpu, hv_ptr, l2_hv, size) ||
-> +		kvm_vcpu_read_guest(vcpu, regs_ptr, l2_regs,
-> +				    sizeof(struct pt_regs));
-> +}
-> +
-> +static int kvmhv_write_guest_state_and_regs(struct kvm_vcpu *vcpu,
-> +					    struct hv_guest_state *l2_hv,
-> +					    struct pt_regs *l2_regs,
-> +					    u64 hv_ptr, u64 regs_ptr)
-> +{
-> +	int size;
-> +
-> +	size = hv_guest_state_size(l2_hv->version);
-> +	if (size < 0)
-> +		return -1;
-> +
-> +	return kvm_vcpu_write_guest(vcpu, hv_ptr, l2_hv, size) ||
-> +		kvm_vcpu_write_guest(vcpu, regs_ptr, l2_regs,
-> +				     sizeof(struct pt_regs));
-> +}
-> +
->  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  {
->  	long int err, r;
-> @@ -235,17 +274,15 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  	hv_ptr = kvmppc_get_gpr(vcpu, 4);
->  	regs_ptr = kvmppc_get_gpr(vcpu, 5);
->  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> -	err = kvm_vcpu_read_guest(vcpu, hv_ptr, &l2_hv,
-> -				  sizeof(struct hv_guest_state)) ||
-> -		kvm_vcpu_read_guest(vcpu, regs_ptr, &l2_regs,
-> -				    sizeof(struct pt_regs));
-> +	err = kvmhv_read_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
-> +					      hv_ptr, regs_ptr);
->  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
->  	if (err)
->  		return H_PARAMETER;
->
->  	if (kvmppc_need_byteswap(vcpu))
->  		byteswap_hv_regs(&l2_hv);
-> -	if (l2_hv.version != HV_GUEST_STATE_VERSION)
-> +	if (l2_hv.version > HV_GUEST_STATE_VERSION)
->  		return H_P2;
->
->  	if (kvmppc_need_byteswap(vcpu))
-> @@ -325,10 +362,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  		byteswap_pt_regs(&l2_regs);
+>  		dst[2] = cpu_to_le64(
+>  			 FIELD_PREP(STRTAB_STE_2_S2VMID, s2_cfg->vmid) |
+>  			 FIELD_PREP(STRTAB_STE_2_VTCR, s2_cfg->vtcr) |
+> @@ -1304,9 +1337,12 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
+>  			 STRTAB_STE_2_S2PTW | STRTAB_STE_2_S2AA64 |
+>  			 STRTAB_STE_2_S2R);
+> 
+> -		dst[3] = cpu_to_le64(s2_cfg->vttbr & STRTAB_STE_3_S2TTB_MASK);
+> +		dst[3] = cpu_to_le64(vttbr);
+> 
+>  		val |= FIELD_PREP(STRTAB_STE_0_CFG,
+> STRTAB_STE_0_CFG_S2_TRANS);
+> +	} else {
+> +		dst[2] = 0;
+> +		dst[3] = 0;
 >  	}
->  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> -	err = kvm_vcpu_write_guest(vcpu, hv_ptr, &l2_hv,
-> -				   sizeof(struct hv_guest_state)) ||
-> -		kvm_vcpu_write_guest(vcpu, regs_ptr, &l2_regs,
-> -				   sizeof(struct pt_regs));
-> +	err = kvmhv_write_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
-> +					       hv_ptr, regs_ptr);
->  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
->  	if (err)
->  		return H_AUTHORITY;
+> 
+>  	if (master->ats_enabled)
+> @@ -1982,6 +2018,14 @@ static int arm_smmu_domain_finalise(struct
+> iommu_domain *domain,
+>  		return 0;
+>  	}
+> 
+> +	if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED &&
+> +	    (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1) ||
+> +	     !(smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
+> +		dev_info(smmu_domain->smmu->dev,
+> +			 "does not implement two stages\n");
+> +		return -EINVAL;
+> +	}
+> +
+>  	/* Restrict the stage to what we can actually support */
+>  	if (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1))
+>  		smmu_domain->stage = ARM_SMMU_DOMAIN_S2;
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> index 07f59252dd21..269779dee8d1 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> @@ -206,6 +206,7 @@
+>  #define STRTAB_STE_0_CFG_BYPASS		4
+>  #define STRTAB_STE_0_CFG_S1_TRANS	5
+>  #define STRTAB_STE_0_CFG_S2_TRANS	6
+> +#define STRTAB_STE_0_CFG_NESTED		7
+> 
+>  #define STRTAB_STE_0_S1FMT		GENMASK_ULL(5, 4)
+>  #define STRTAB_STE_0_S1FMT_LINEAR	0
+> @@ -682,6 +683,7 @@ struct arm_smmu_domain {
+>  	enum arm_smmu_domain_stage	stage;
+>  	struct arm_smmu_s1_cfg	s1_cfg;
+>  	struct arm_smmu_s2_cfg	s2_cfg;
+> +	bool				abort;
+> 
+>  	struct iommu_domain		domain;
+> 
+> --
+> 2.21.3
+
