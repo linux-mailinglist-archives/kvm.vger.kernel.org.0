@@ -2,114 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E61D72D45A4
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 16:42:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06A392D4639
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 17:02:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729591AbgLIPmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 10:42:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47672 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726431AbgLIPmN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Dec 2020 10:42:13 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FC6C061793;
-        Wed,  9 Dec 2020 07:41:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Message-ID:From:CC:To:Subject:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
-        Date:Sender:Reply-To:Content-ID:Content-Description;
-        bh=6r9heBjzWXYJc89ySTWF0dstHk+7cI5ZT6+P8OGgWRk=; b=m+D2g1sGexb0Y8RFn4mA4QNiNl
-        oDT3PmXNumeabAlzk0BkSisiByiKbz5fmEFipdVq2YGitAr55xt05Rer6S6A+ESAd9uqDYfwaKFKQ
-        SJNcnXfua//C/WmH+xsop61sFpVpVMxO1fqGpdhXbxn60w/YLNhb8ZiviUQzT16S77BVBcA5dNNom
-        iX0NSBQpHLzMmCEZ+aQnvBR2VYiBzfw45f1M7RZwIGVqNwf3ONWVdjKFyu6ZrzNvc57wwox65s7gk
-        CXzof3lalgMWS8tZGViU8Rms39jIEoGoRHbAT/8ZTm0kKfvHG6FPtgvMJE4JaNOTkIh75+wxXwjgb
-        D1xmYY5w==;
-Received: from [2a01:4c8:1485:1509:f1a9:965:876e:14dd]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kn1ac-00061D-Su; Wed, 09 Dec 2020 15:41:15 +0000
-Date:   Wed, 09 Dec 2020 15:41:10 +0000
-User-Agent: K-9 Mail for Android
-In-Reply-To: <35165dbc-73d0-21cd-0baf-db4ffb55fc47@oracle.com>
-References: <20190220201609.28290-1-joao.m.martins@oracle.com> <20190220201609.28290-11-joao.m.martins@oracle.com> <71753a370cd6f9dd147427634284073b78679fa6.camel@infradead.org> <53baeaa7-0fed-d22c-7767-09ae885d13a0@oracle.com> <4ad0d157c5c7317a660cd8d65b535d3232f9249d.camel@infradead.org> <c43024b3-6508-3b77-870c-da81e74284a4@oracle.com> <052867ae1c997487d85c21e995feb5647ac6c458.camel@infradead.org> <6a6b5806be1fe4c0fe96c0b664710d1ce614f29d.camel@infradead.org> <1af00fa4-03b8-a059-d859-5cfd71ef10f4@oracle.com> <0eb8c2ef01b77af0d288888f200e812d374beada.camel@infradead.org> <f7dec3f1-aadc-bda5-f4dc-7185ffd9c1a6@oracle.com> <db4ea3bd6ebec53c40526d67273ccfba38982811.camel@infradead.org> <35165dbc-73d0-21cd-0baf-db4ffb55fc47@oracle.com>
+        id S1729901AbgLIQAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 11:00:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50608 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727024AbgLIQAH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 11:00:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607529520;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JBr32EfwjraHmhGUU1qWmpGQu6trXhEY+c3U2JTdT58=;
+        b=Cae9WGaouIuQalqCvNagq8SRtMfMkFnpwJ1q+pltPZWHNpPKySvRtA/jpT4ycxocZXzq8N
+        31kJgEo0SPGv4wO7YME+RBF1QuJZFs4cqAlZQ/WCaEfoSVSNc7xuLz5PaMW+cg3XE7tJpW
+        eCENZzox7vazQiMgzoRvTYhV0B2mWh8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-2pOf97PaMRukBQZCgWs7BA-1; Wed, 09 Dec 2020 10:58:35 -0500
+X-MC-Unique: 2pOf97PaMRukBQZCgWs7BA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADE23180DE10;
+        Wed,  9 Dec 2020 15:57:31 +0000 (UTC)
+Received: from localhost (ovpn-115-48.ams2.redhat.com [10.36.115.48])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD6786064B;
+        Wed,  9 Dec 2020 15:57:30 +0000 (UTC)
+Date:   Wed, 9 Dec 2020 15:57:29 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@gmail.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        qemu-devel@nongnu.org, Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+Subject: Re: [RFC PATCH 00/27] vDPA software assisted live migration
+Message-ID: <20201209155729.GB396498@stefanha-x1.localdomain>
+References: <20201120185105.279030-1-eperezma@redhat.com>
+ <20201208093715.GX203660@stefanha-x1.localdomain>
+ <1410217602.34486578.1607506010536.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH RFC 10/39] KVM: x86/xen: support upcall vector
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>, karahmed@amazon.de
-CC:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-From:   David Woodhouse <dwmw2@infradead.org>
-Message-ID: <2E57982D-6508-4850-ABA5-67592381379D@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1410217602.34486578.1607506010536.JavaMail.zimbra@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="JP+T4n/bALQSJXh8"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--JP+T4n/bALQSJXh8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Dec 09, 2020 at 04:26:50AM -0500, Jason Wang wrote:
+> ----- Original Message -----
+> > On Fri, Nov 20, 2020 at 07:50:38PM +0100, Eugenio P=E9rez wrote:
+> > > This series enable vDPA software assisted live migration for vhost-ne=
+t
+> > > devices. This is a new method of vhost devices migration: Instead of
+> > > relay on vDPA device's dirty logging capability, SW assisted LM
+> > > intercepts dataplane, forwarding the descriptors between VM and devic=
+e.
+> >=20
+> > Pros:
+> > + vhost/vDPA devices don't need to implement dirty memory logging
+> > + Obsoletes ioctl(VHOST_SET_LOG_BASE) and friends
+> >=20
+> > Cons:
+> > - Not generic, relies on vhost-net-specific ioctls
+> > - Doesn't support VIRTIO Shared Memory Regions
+> >   https://github.com/oasis-tcs/virtio-spec/blob/master/shared-mem.tex
+>=20
+> I may miss something but my understanding is that it's the
+> responsiblity of device to migrate this part?
 
-On 9 December 2020 13:26:55 GMT, Joao Martins <joao=2Em=2Emartins@oracle=
-=2Ecom> wrote:
->On 12/9/20 11:39 AM, David Woodhouse wrote:
->> On Wed, 2020-12-09 at 10:51 +0000, Joao Martins wrote:
->>> Isn't this what the first half of this patch was doing initially
->(minus the
->>> irq routing) ? Looks really similar:
->>>
->>>
->https://lore=2Ekernel=2Eorg/kvm/20190220201609=2E28290-11-joao=2Em=2Emart=
-ins@oracle=2Ecom/
->>=20
->> Absolutely! This thread is in reply to your original posting of
->> precisely that patch, and I've had your tree open in gitk to crib
->from
->> for most of the last week=2E
->>=20
->I forgot about this patch given all the discussion so far and I had to
->re-look given that
->it resembled me from your snippet=2E But I ended up being a little
->pedantic -- sorry about that=2E
+Good point. You're right.
 
-Nah, pedantry is good :)
+> > - Performance (see below)
+> >=20
+> > I think performance will be significantly lower when the shadow vq is
+> > enabled. Imagine a vDPA device with hardware vq doorbell registers
+> > mapped into the guest so the guest driver can directly kick the device.
+> > When the shadow vq is enabled a vmexit is needed to write to the shadow
+> > vq ioeventfd, then the host kernel scheduler switches to a QEMU thread
+> > to read the ioeventfd, the descriptors are translated, QEMU writes to
+> > the vhost hdev kick fd, the host kernel scheduler switches to the vhost
+> > worker thread, vhost/vDPA notifies the virtqueue, and finally the
+> > vDPA driver writes to the hardware vq doorbell register. That is a lot
+> > of overhead compared to writing to an exitless MMIO register!
+>=20
+> I think it's a balance. E.g we can poll the virtqueue to have an
+> exitless doorbell.
+>=20
+> >=20
+> > If the shadow vq was implemented in drivers/vhost/ and QEMU used the
+> > existing ioctl(VHOST_SET_LOG_BASE) approach, then the overhead would be
+> > reduced to just one set of ioeventfd/irqfd. In other words, the QEMU
+> > dirty memory logging happens asynchronously and isn't in the dataplane.
+> >=20
+> > In addition, hardware that supports dirty memory logging as well as
+> > software vDPA devices could completely eliminate the shadow vq for even
+> > better performance.
+>=20
+> Yes. That's our plan. But the interface might require more thought.
+>=20
+> E.g is the bitmap a good approach? To me reporting dirty pages via
+> virqueue is better since it get less footprint and is self throttled.
+>=20
+> And we need an address space other than the one used by guest for
+> either bitmap for virtqueue.
+>=20
+> >=20
+> > But performance is a question of "is it good enough?". Maybe this
+> > approach is okay and users don't expect good performance while dirty
+> > memory logging is enabled.
+>=20
+> Yes, and actually such slow down may help for the converge of the
+> migration.
+>=20
+> Note that the whole idea is try to have a generic solution for all
+> types of devices. It's good to consider the performance but for the
+> first stage, it should be sufficient to make it work and consider to
+> optimize on top.
 
->> At most, we just need to make sure that kvm_xen_has_interrupt()
->returns
->> false if the per-vCPU LAPIC vector is configured=2E But I didn't do
->that
->> because I checked Xen and it doesn't do it either=2E
->>=20
->Oh! I have this strange recollection that it was, when we were looking
->at the Xen
->implementation=2E
+Moving the shadow vq to the kernel later would be quite a big change
+requiring rewriting much of the code. That's why I mentioned this now
+before a lot of effort is invested in a QEMU implementation.
 
-Hm, maybe I missed it=2E Will stare at it harder, although looking at Xen =
-code tends to make my brain hurt :)
+> > I just wanted to share the idea of moving the
+> > shadow vq into the kernel in case you like that approach better.
+>=20
+> My understanding is to keep kernel as simple as possible and leave the
+> polices to userspace as much as possible. E.g it requires us to
+> disable doorbell mapping and irq offloading, all of which were under
+> the control of userspace.
 
->> As far as I can tell, Xen's hvm_vcpu_has_pending_irq() will still
->> return the domain-wide vector in preference to the one in the LAPIC,
->if
->> it actually gets invoked=2E=20
->
->Only if the callback installed is HVMIRQ_callback_vector IIUC=2E
->
->Otherwise the vector would be pending like any other LAPIC vector=2E
+If the performance is acceptable with the QEMU approach then I think
+that's the best place to implement it. It looks high-overhead though so
+maybe one of the first things to do is to run benchmarks to collect data
+on how it performs?
 
-Ah, right=2E
+Stefan
 
-For some reason I had it in my head that you could only set the per-vCPU l=
-apic vector if the domain was set to HVMIRQ_callback_vector=2E If the domai=
-n is set to HVMIRQ_callback_none, that clearly makes more sense=2E
+--JP+T4n/bALQSJXh8
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Still, my patch should do the same as Xen does in the case where a guest d=
-oes set both, I think=2E
+-----BEGIN PGP SIGNATURE-----
 
-Faithful compatibility with odd Xen behaviour FTW :)
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/Q8+kACgkQnKSrs4Gr
+c8gzgwf/R8XyRehTNARVsYQYQS8pC8vzoJcb4LMSB4/opM4DdNb2gIFzVOzHt7am
+ibFu8Wyl3C2txGaFCh4YlGIwVkGTdAp++Dwhl9wWZaVA0vvjv/yxR/r82IIid7oR
+tLb5LibQ19LXmVdFgAfGaT3dXSIkPG38RECJZwSk3QBrgXfsKclGZHRpnPGsK0B3
+3PIQtGy3wjJIuVXoknfAXjThXpzXmwlc/EHQnBSajm9byvMVWzlHb2Kirc5PO0xP
+Vrg2wdmUUwnVgSC2n9DgEjb1IRyVWEW9dsF+8QdmBnPtYSOJ74EekvFkn6fKWd2A
+/NyM+ry+1zHgomC5WqzC9bKCp+KacQ==
+=WM5k
+-----END PGP SIGNATURE-----
 
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+--JP+T4n/bALQSJXh8--
+
