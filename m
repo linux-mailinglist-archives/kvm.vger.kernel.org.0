@@ -2,184 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 68FA72D3975
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 05:11:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3ADE2D397B
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 05:14:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727093AbgLIEJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 23:09:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35010 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726880AbgLIEJu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 23:09:50 -0500
-X-Gm-Message-State: AOAM530y9xW7DVBYvSahqRxUmsqynTCxj0/MHk98oFHJP/RQDQEG8jtq
-        W1IshnH9wwfBDobHzU/5vE3QPBwFLKn4hP6Hc5hsww==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607486949;
-        bh=oYWxHXQ62C0mJPCCULJOFjbEn8mPiFRGhNAfsRwo+mY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=gZUlSCsh09rf2zhL5Bh0chn4eXVlp7Awkzq0RldKYyb9pnGpVpj4rBL3vKOYRzg9f
-         bVt7+1tmu2vRnb8/dV+EAWWnGnSVHs7erF15Vl/9Vm7eyf/+uhC1xAAqVN9D+Q8ebR
-         yswYQwBqFuj2KX+FHAsKN9Wr7ORUdO/IsQwJLozT3EIqveFEX27nuo3N3ophCC0hHw
-         nPYh+hlRw4oJkZhUUeOIczvCbP8t5c2a3wwnzFq4972o382rIKInykpxPejxpn5ZbK
-         4RK+Ddim/dJzBLZLje0OdZ0mfm6hOw8p0O2GwaANO1d/7jX4/MrFz93HeSqY7m70u7
-         K+9+PPDq36H/g==
-X-Google-Smtp-Source: ABdhPJyPreMEtl1P7lQQQDkaaodeKWAa7yzPM9UvV4cRoYUa/4FCUz55VfV8kjpchfi0VRMnuLRmsm2k3UBpYxyIZ1k=
-X-Received: by 2002:a5d:4a10:: with SMTP id m16mr403401wrq.18.1607486947915;
- Tue, 08 Dec 2020 20:09:07 -0800 (PST)
+        id S1726929AbgLIEMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 23:12:40 -0500
+Received: from relay-us1.mymailcheap.com ([51.81.35.219]:59556 "EHLO
+        relay-us1.mymailcheap.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726303AbgLIEMk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 23:12:40 -0500
+Received: from relay5.mymailcheap.com (relay5.mymailcheap.com [159.100.248.207])
+        by relay-us1.mymailcheap.com (Postfix) with ESMTPS id E1E2B20F59
+        for <kvm@vger.kernel.org>; Wed,  9 Dec 2020 04:11:58 +0000 (UTC)
+Received: from relay2.mymailcheap.com (relay2.mymailcheap.com [217.182.66.162])
+        by relay5.mymailcheap.com (Postfix) with ESMTPS id E6A5D260EB
+        for <kvm@vger.kernel.org>; Wed,  9 Dec 2020 04:11:06 +0000 (UTC)
+Received: from filter1.mymailcheap.com (filter1.mymailcheap.com [149.56.130.247])
+        by relay2.mymailcheap.com (Postfix) with ESMTPS id 11B5C3ECD9;
+        Wed,  9 Dec 2020 05:09:34 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by filter1.mymailcheap.com (Postfix) with ESMTP id 577FC2A36D;
+        Tue,  8 Dec 2020 23:09:33 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+        s=default; t=1607486973;
+        bh=Omf4375Bcm8QKp7HuGa223zj7zWUqbF5ZEXTNzqxj2U=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=y+goKP9ZT32TBWiQO3E1chp1bxmSeKCbmP7XFbYbgQmw/IPlEZBPdSjtxQsgjRv6H
+         fof022deJPi8PNDVT/bT8OV1TSdZJMITH15GigmUKplmJ65hQkpTQHlbzCmWdoJgGm
+         U5hlZVdME3dBai5MIkGjK6MEwVyFWazYhpPYPAi4=
+X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
+Received: from filter1.mymailcheap.com ([127.0.0.1])
+        by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 4M9iPFcP7rxw; Tue,  8 Dec 2020 23:09:32 -0500 (EST)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by filter1.mymailcheap.com (Postfix) with ESMTPS;
+        Tue,  8 Dec 2020 23:09:32 -0500 (EST)
+Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
+        by mail20.mymailcheap.com (Postfix) with ESMTP id 127CF41FA4;
+        Wed,  9 Dec 2020 04:09:31 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com;
+        dkim=pass (1024-bit key; unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="Xca5lk2W";
+        dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (unknown [154.17.13.103])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by mail20.mymailcheap.com (Postfix) with ESMTPSA id A29C941FA4;
+        Wed,  9 Dec 2020 04:09:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+        s=default; t=1607486965;
+        bh=Omf4375Bcm8QKp7HuGa223zj7zWUqbF5ZEXTNzqxj2U=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=Xca5lk2WgI6DV/NwF7JwKW5JlW+Xx5vLuzdgwmQhu4UMF+99fDZqT7+M/OeQbsh7A
+         9LwBC3H38mEgWTTu5QJiw4teGLYmhGHU8eXOYGYhrkNTirtGYwI3B51lcHPCHoCfuY
+         ELgARzSx9IQyenlqhYdcXZVZ4Hls3zKIBEZhRfiw=
+Subject: Re: [PATCH 16/17] target/mips: Introduce decode tree bindings for MSA
+ opcodes
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Huacai Chen <chenhuacai@kernel.org>
+References: <20201208003702.4088927-1-f4bug@amsat.org>
+ <20201208003702.4088927-17-f4bug@amsat.org>
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <f9fe41e5-14c9-82f0-f2bb-a343ee532216@flygoat.com>
+Date:   Wed, 9 Dec 2020 12:09:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-References: <87h7ow2j91.fsf@nanos.tec.linutronix.de> <301491B7-DEB6-41ED-B8FD-657B864696CF@amacapital.net>
- <87v9db25me.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <87v9db25me.fsf@nanos.tec.linutronix.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Tue, 8 Dec 2020 20:08:56 -0800
-X-Gmail-Original-Message-ID: <CALCETrXeXCvbxAuRuLwWoF3-zvjhzzjj46VZ3RfgUEhb0SeK6A@mail.gmail.com>
-Message-ID: <CALCETrXeXCvbxAuRuLwWoF3-zvjhzzjj46VZ3RfgUEhb0SeK6A@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20201208003702.4088927-17-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Rspamd-Queue-Id: 127CF41FA4
+X-Spamd-Result: default: False [-0.10 / 10.00];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         ARC_NA(0.00)[];
+         R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         R_SPF_SOFTFAIL(0.00)[~all];
+         ML_SERVERS(-3.10)[148.251.23.173];
+         DKIM_TRACE(0.00)[flygoat.com:+];
+         DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+         RCPT_COUNT_SEVEN(0.00)[8];
+         DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
+         RCVD_COUNT_TWO(0.00)[2];
+         MID_RHS_MATCH_FROM(0.00)[];
+         HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1]
+X-Rspamd-Server: mail20.mymailcheap.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 8, 2020 at 4:19 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+
+
+在 2020/12/8 上午8:37, Philippe Mathieu-Daudé 写道:
+> Introduce the 'mod-msa32' decodetree config for the 32-bit MSA ASE.
 >
-> On Tue, Dec 08 2020 at 12:32, Andy Lutomirski wrote:
-> >> On Dec 8, 2020, at 11:25 AM, Thomas Gleixner <tglx@linutronix.de> wrot=
-e:
-> >> One issue here is that guests might want to run their own NTP/PTP. One
-> >> reason to do that is that some people prefer the leap second smearing
-> >> NTP servers.
-> >
-> > I would hope that using this part would be optional on the guest=E2=80=
-=99s
-> > part. Guests should be able to use just the CLOCK_MONOTONIC_RAW part
-> > or fancier stuff at their option.
-> >
-> > (Hmm, it would, in principle, be possible for a guest to use the
-> > host=E2=80=99s TAI but still smear leap seconds. Even without virt, sme=
-aring
-> > could be a per-timens option.)
+> We decode the branch instructions, and all instructions based
+> on the MSA opcode.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+
+Double checked opcode formats with the manual.
+
+Thanks!
+
+- Jiaxun
+
+> ---
+>   target/mips/translate.h         |  1 +
+>   target/mips/mod-msa32.decode    | 24 ++++++++++++++++++++++++
+>   target/mips/mod-msa_translate.c | 31 +++++++++++++++++++++++++++++++
+>   target/mips/meson.build         |  5 +++++
+>   4 files changed, 61 insertions(+)
+>   create mode 100644 target/mips/mod-msa32.decode
 >
-> No. Don't even think about it. Read the thread:
->
->   https://lore.kernel.org/r/20201030110229.43f0773b@jawa
->
-> all the way through the end and then come up with a real proposal which
-> solves all of the issues mentioned there.
-
-You're misunderstanding me, which is entirely reasonable, since my
-description was crap.  In particular, what I meant by smearing is not
-at all what's done today.  Let me try again.  The thing below is my
-proposal, not necessarily a description of exactly what happens now.
-
-(I read most of that thread, and I read most of this thread, and I've
-hacked on the time code, cursed at the KVM code, modified the KVM
-code, cursed at the KVM code some more, etc.  None of which is to say
-that I have a full understanding of every possible timekeeping nuance,
-but I'm pretty sure I can at least pretend to understand some of it.)
-
-We have some time source that we can read (e.g. TSC).  Let's call it
-read_time().  It returns an integer (64-bits would be nice, but we'll
-take what we can get).  From the output of read_time(), Linux user
-programs, and the kernel itself (and guests perhaps, see below) would
-like to produce various outputs.  Each of them is protected by a
-seqlock that I'll omit in the descriptions below.  The operations
-below are all protected by a seqlock retry loop.  Also, when I say *
-below, I mean the usual calculation with a multiplication and a shift.
-
-All of these are only valid if t_start <=3D read_time() <=3D t_end and,
-and they all assume that read_time() hasn't wrapped and gotten into
-that interval again.  There is nothing at all we can do in software if
-we wrap like this.  t_end isn't necessarily something we compute
-explicitly --- it might just be the case that, if read_time() > t_end,
-our arithmetic overflows and we return garbage.  But t_end might be a
-real thing on architectures where vdso_cycles_ok() actually does
-something (sigh, x86).
-
-CLOCK_MONOTONIC_RAW: not affected by NTP, adjtimex, etc.
-return mult[monotonic_raw] * (read_time() - t_start) + offset[monotonic_raw=
-];
-
-CLOCK_MONOTONIC:  This is never affected by leap-second smearing.  If
-userspace tries to smear it in the new mode, userspace gets to keep
-all the pieces.
-return mult[monotonic] * (read_time() - t_start) + offset[monotonic];
-
-CLOCK_TAI:  This is not smeared.
-return mult[tai] * (read_time() - t_start) + offset[tai];
-
-CLOCK_SANE_REALTIME: This is not smeared either.
-return mult[sane_realtime] * (read_time() - t_start) + offset[sane_realtime=
-];
-
-And yes, we require that mult[monotonic] =3D=3D mult[tai] =3D=3D mult[sane_=
-realtime].
-
-CLOCK_SMEARED_REALTIME:
-return mult[smeared_realtime] * (read_time() - t_start) +
-offset[smeared_realtime]
-This is a leap-second-smeared variant of CLOCK_SANE_REALTIME.
-
-CLOCK_REALTIME: maps to CLOCK_SANE_REALTIME or CLOCK_SMEARED_REALTIME
-depending on user preference.  Doing this without an extra branch
-somewhere might take a bit of thought.
-
-If t > t_end, then we fall back to a syscall if we're in user mode and
-we fall back to hypercall or we just spin if we're in the kernel.  But
-see below.
-
-As far as I can tell, if the kernel were to do something utterly
-asinine like adding some arbitrary value to TSC_ADJUST on all CPUs,
-the kernel could do so correctly by taking the seqlock, making the
-change, updating everything, and releasing the seqlock.  This would be
-nuts, but it's more or less the same thing that happens when a VM
-migrates.  So I think a VM could migrate a guest without any
-particular magic, except that there's a potential race if the old and
-new systems happen to have close enough seqlock values that the guest
-might start reading on the old host, finish on the new host, see the
-same seqlock value, and end up with utter garbage.  One way to
-mitigate this would be, in paravirt mode, to have an extra per-guest
-page that contains a count of how many times the guest has migrated.
-
-Timens would work a lot like it does today, but the mechanism that
-tells the vdso code to use timens might need tweaking.
-
-I could easily be missing something that prevents this from working,
-but I'm not seeing any fundamental problems.
-
-If we want to get fancy, we can make a change that I've contemplated
-for a while -- we could make t_end explicit and have two copies of all
-these data structures.  The reader would use one copy if t < t_change
-and a different copy if t >=3D t_change.  This would allow NTP-like code
-in usermode to schedule a frequency shift to start at a specific time.
-With some care, it would also allow the timekeeping code to update the
-data structures without causing clock_gettime() to block while the
-timekeeping code is running on a different CPU.
-
-One other thing that might be worth noting: there's another thread
-about "vmgenid".  It's plausible that it's worth considering stopping
-the guest or perhaps interrupting all vCPUs to allow it to take some
-careful actions on migration for reasons that have nothing to do with
-timekeeping.
+> diff --git a/target/mips/translate.h b/target/mips/translate.h
+> index c26b0d9155d..c4fe18d187e 100644
+> --- a/target/mips/translate.h
+> +++ b/target/mips/translate.h
+> @@ -84,5 +84,6 @@ extern TCGv bcond;
+>   void msa_translate_init(void);
+>   void gen_msa(DisasContext *ctx);
+>   void gen_msa_branch(DisasContext *ctx, uint32_t op1);
+> +bool decode_msa32(DisasContext *ctx, uint32_t insn);
+>   
+>   #endif
+> diff --git a/target/mips/mod-msa32.decode b/target/mips/mod-msa32.decode
+> new file mode 100644
+> index 00000000000..d69675132b8
+> --- /dev/null
+> +++ b/target/mips/mod-msa32.decode
+> @@ -0,0 +1,24 @@
+> +# MIPS SIMD Architecture Module instruction set
+> +#
+> +# Copyright (C) 2020  Philippe Mathieu-Daudé
+> +#
+> +# SPDX-License-Identifier: LGPL-2.1-or-later
+> +#
+> +# Reference:
+> +#       MIPS Architecture for Programmers Volume IV-j
+> +#       The MIPS32 SIMD Architecture Module, Revision 1.12
+> +#       (Document Number: MD00866-2B-MSA32-AFP-01.12)
+> +#
+> +
+> +&msa_bz             df wt s16
+> +
+> +@bz                 ...... ... ..   wt:5 s16:16             &msa_bz df=3
+> +@bz_df              ...... ... df:2 wt:5 s16:16             &msa_bz
+> +
+> +BZ_V                010001 01011  ..... ................    @bz
+> +BNZ_V               010001 01111  ..... ................    @bz
+> +
+> +BZ_x                010001 110 .. ..... ................    @bz_df
+> +BNZ_x               010001 111 .. ..... ................    @bz_df
+> +
+> +MSA                 011110 --------------------------
+> diff --git a/target/mips/mod-msa_translate.c b/target/mips/mod-msa_translate.c
+> index 55c2a2f1acc..02df39c6b6c 100644
+> --- a/target/mips/mod-msa_translate.c
+> +++ b/target/mips/mod-msa_translate.c
+> @@ -6,6 +6,7 @@
+>    *  Copyright (c) 2006 Thiemo Seufer (MIPS32R2 support)
+>    *  Copyright (c) 2009 CodeSourcery (MIPS16 and microMIPS support)
+>    *  Copyright (c) 2012 Jia Liu & Dongxue Zhang (MIPS ASE DSP support)
+> + *  Copyright (c) 2020 Philippe Mathieu-Daudé
+>    *
+>    * SPDX-License-Identifier: LGPL-2.1-or-later
+>    */
+> @@ -17,6 +18,9 @@
+>   #include "fpu_helper.h"
+>   #include "internal.h"
+>   
+> +/* Include the auto-generated decoder.  */
+> +#include "decode-mod-msa32.c.inc"
+> +
+>   #define OPC_MSA (0x1E << 26)
+>   
+>   #define MASK_MSA_MINOR(op)          (MASK_OP_MAJOR(op) | (op & 0x3F))
+> @@ -370,6 +374,16 @@ static bool gen_msa_BxZ_V(DisasContext *ctx, int wt, int s16, TCGCond cond)
+>       return true;
+>   }
+>   
+> +static bool trans_BZ_V(DisasContext *ctx, arg_msa_bz *a)
+> +{
+> +    return gen_msa_BxZ_V(ctx, a->wt, a->s16, TCG_COND_EQ);
+> +}
+> +
+> +static bool trans_BNZ_V(DisasContext *ctx, arg_msa_bz *a)
+> +{
+> +    return gen_msa_BxZ_V(ctx, a->wt, a->s16, TCG_COND_NE);
+> +}
+> +
+>   static bool gen_msa_BxZ(DisasContext *ctx, int df, int wt, int s16, bool if_not)
+>   {
+>       check_msa_access(ctx);
+> @@ -391,6 +405,16 @@ static bool gen_msa_BxZ(DisasContext *ctx, int df, int wt, int s16, bool if_not)
+>       return true;
+>   }
+>   
+> +static bool trans_BZ_x(DisasContext *ctx, arg_msa_bz *a)
+> +{
+> +    return gen_msa_BxZ(ctx, a->df, a->wt, a->s16, false);
+> +}
+> +
+> +static bool trans_BNZ_x(DisasContext *ctx, arg_msa_bz *a)
+> +{
+> +    return gen_msa_BxZ(ctx, a->df, a->wt, a->s16, true);
+> +}
+> +
+>   void gen_msa_branch(DisasContext *ctx, uint32_t op1)
+>   {
+>       uint8_t df = (ctx->opcode >> 21) & 0x3;
+> @@ -2264,3 +2288,10 @@ void gen_msa(DisasContext *ctx)
+>           break;
+>       }
+>   }
+> +
+> +static bool trans_MSA(DisasContext *ctx, arg_MSA *a)
+> +{
+> +    gen_msa(ctx);
+> +
+> +    return true;
+> +}
+> diff --git a/target/mips/meson.build b/target/mips/meson.build
+> index b6697e2fd72..7d0414bbe23 100644
+> --- a/target/mips/meson.build
+> +++ b/target/mips/meson.build
+> @@ -1,4 +1,9 @@
+> +gen = [
+> +  decodetree.process('mod-msa32.decode', extra_args: [ '--decode=decode_msa32' ]),
+> +]
+> +
+>   mips_ss = ss.source_set()
+> +mips_ss.add(gen)
+>   mips_ss.add(files(
+>     'cpu.c',
+>     'dsp_helper.c',
