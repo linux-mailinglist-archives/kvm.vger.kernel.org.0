@@ -2,217 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B4BF2D3780
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 01:20:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 341F72D3876
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 02:56:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731036AbgLIAUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 19:20:06 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:42222 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725906AbgLIAUG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 19:20:06 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1607473161;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dB3FaQD65hJ9XsSWC9J+0ud8HQXWI4+epYGVfEmS9H0=;
-        b=V70Fs8VHpdHaRMIyCVrUXQNCNrkqfhkzcKfqEoh61XUC4Fhf2A4Sj0dhUK1/C4j94E5474
-        xG/0j3cA7DZdCD7xYUM2jnYkmAglgjMhapmWV+gOuuy/lCLUJR74vF/n/9Hfj2uHO9B7WE
-        LutmVb2TbnDAlLRB0nVwqjbIyMmFpZ7sDoZkWIlPZqh103jjf08rJtP8FQJovWVsR3OHBo
-        T5lZj1fXh/N2Xcin9QLaQI/DrNAgkk1U+yQauHmh/7vQZtRIWQln+xN63H8yKFJbJ7C5oK
-        q07sH7/c0D5td5s6x/ooL8xyF8z/18xGN7eq4kslBCRJWmSBfmkKjtmGGGSl2w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1607473161;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dB3FaQD65hJ9XsSWC9J+0ud8HQXWI4+epYGVfEmS9H0=;
-        b=5fmzqM5m1ODVJj0sDIioZZSr2M26neNDSyzFEIz19X4vzeBrLp4aZzlcsVpgmTldL6XfGB
-        eMcT13Plnp+zdlDQ==
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list\:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-In-Reply-To: <301491B7-DEB6-41ED-B8FD-657B864696CF@amacapital.net>
-References: <87h7ow2j91.fsf@nanos.tec.linutronix.de> <301491B7-DEB6-41ED-B8FD-657B864696CF@amacapital.net>
-Date:   Wed, 09 Dec 2020 01:19:21 +0100
-Message-ID: <87v9db25me.fsf@nanos.tec.linutronix.de>
+        id S1726250AbgLIByI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Dec 2020 20:54:08 -0500
+Received: from mga11.intel.com ([192.55.52.93]:50399 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725283AbgLIByI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Dec 2020 20:54:08 -0500
+IronPort-SDR: g3Vq3VUV6ba3QM4jti/tITZY1Y4vDeG0ud/sfx2x4T1K+NlDSI5Z7POvxIDTKqbnqPcewuRG67
+ 7LWesUq7QTyQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9829"; a="170493420"
+X-IronPort-AV: E=Sophos;i="5.78,404,1599548400"; 
+   d="scan'208";a="170493420"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2020 17:52:22 -0800
+IronPort-SDR: p9GFQc1L7/h6pbmnpMG4Am+qXvFd6Zl3fTnwJGN3OBiNcEQkmNyUac0raGFIqVqQPy119057Rt
+ c2Hw6pi3fkgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,404,1599548400"; 
+   d="scan'208";a="367998068"
+Received: from allen-box.sh.intel.com ([10.239.159.28])
+  by fmsmga004.fm.intel.com with ESMTP; 08 Dec 2020 17:52:18 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v4 1/1] vfio/type1: Add vfio_group_iommu_domain()
+Date:   Wed,  9 Dec 2020 09:44:44 +0800
+Message-Id: <20201209014444.332772-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 08 2020 at 12:32, Andy Lutomirski wrote:
->> On Dec 8, 2020, at 11:25 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
->> One issue here is that guests might want to run their own NTP/PTP. One
->> reason to do that is that some people prefer the leap second smearing
->> NTP servers.=20
->
-> I would hope that using this part would be optional on the guest=E2=80=99s
-> part. Guests should be able to use just the CLOCK_MONOTONIC_RAW part
-> or fancier stuff at their option.
->
-> (Hmm, it would, in principle, be possible for a guest to use the
-> host=E2=80=99s TAI but still smear leap seconds. Even without virt, smear=
-ing
-> could be a per-timens option.)
+Add the API for getting the domain from a vfio group. This could be used
+by the physical device drivers which rely on the vfio/mdev framework for
+mediated device user level access. The typical use case like below:
 
-No. Don't even think about it. Read the thread:
+	unsigned int pasid;
+	struct vfio_group *vfio_group;
+	struct iommu_domain *iommu_domain;
+	struct device *dev = mdev_dev(mdev);
+	struct device *iommu_device = mdev_get_iommu_device(dev);
 
-  https://lore.kernel.org/r/20201030110229.43f0773b@jawa
+	if (!iommu_device ||
+	    !iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
+		return -EINVAL;
 
-all the way through the end and then come up with a real proposal which
-solves all of the issues mentioned there.
+	vfio_group = vfio_group_get_external_user_from_dev(dev);
+	if (IS_ERR_OR_NULL(vfio_group))
+		return -EFAULT;
 
-I might be missing the obvious, but please before you make proposals
-about time keeping out of thin air, please do your homework. You would
-not ask these questions otherwise.
+	iommu_domain = vfio_group_iommu_domain(vfio_group);
+	if (IS_ERR_OR_NULL(iommu_domain)) {
+		vfio_group_put_external_user(vfio_group);
+		return -EFAULT;
+	}
 
-If it would be that simple we wouldn't be discussing this in the first
-place.
+	pasid = iommu_aux_get_pasid(iommu_domain, iommu_device);
+	if (pasid < 0) {
+		vfio_group_put_external_user(vfio_group);
+		return -EFAULT;
+	}
 
-Sorry for being blunt, but this has been discussed to death already.
+	/* Program device context with pasid value. */
+	...
 
-It can be solved on the theory level, but it's not practical.
+Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+---
+ drivers/vfio/vfio.c             | 18 ++++++++++++++++++
+ drivers/vfio/vfio_iommu_type1.c | 24 ++++++++++++++++++++++++
+ include/linux/vfio.h            |  4 ++++
+ 3 files changed, 46 insertions(+)
 
-You _cannot_ make leap second smearing or different notions of clock
-realtime an isolated problem. We have
+Change log:
+ - v3: https://lore.kernel.org/linux-iommu/20201201012328.2465735-1-baolu.lu@linux.intel.com/
+ - Changed according to comments @ https://lore.kernel.org/linux-iommu/20201202144834.1dd0983e@w520.home/
+   - Rename group_domain to group_iommu_domain;
+   - Remove an unnecessary else branch.
 
-   CLOCK_MONOTONIC
-   CLOCK_BOOTTIME
-   CLOCK_REALTIME
-   CLOCK_TAI
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 2151bc7f87ab..4ad8a35667a7 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -2331,6 +2331,24 @@ int vfio_unregister_notifier(struct device *dev, enum vfio_notify_type type,
+ }
+ EXPORT_SYMBOL(vfio_unregister_notifier);
+ 
++struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group)
++{
++	struct vfio_container *container;
++	struct vfio_iommu_driver *driver;
++
++	if (!group)
++		return ERR_PTR(-EINVAL);
++
++	container = group->container;
++	driver = container->iommu_driver;
++	if (likely(driver && driver->ops->group_iommu_domain))
++		return driver->ops->group_iommu_domain(container->iommu_data,
++						       group->iommu_group);
++
++	return ERR_PTR(-ENOTTY);
++}
++EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
++
+ /**
+  * Module/class support
+  */
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 67e827638995..0b4dedaa9128 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -2980,6 +2980,29 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
+ 	return ret;
+ }
+ 
++static struct iommu_domain *
++vfio_iommu_type1_group_iommu_domain(void *iommu_data,
++				    struct iommu_group *iommu_group)
++{
++	struct iommu_domain *domain = ERR_PTR(-ENODEV);
++	struct vfio_iommu *iommu = iommu_data;
++	struct vfio_domain *d;
++
++	if (!iommu || !iommu_group)
++		return ERR_PTR(-EINVAL);
++
++	mutex_lock(&iommu->lock);
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		if (find_iommu_group(d, iommu_group)) {
++			domain = d->domain;
++			break;
++		}
++	}
++	mutex_unlock(&iommu->lock);
++
++	return domain;
++}
++
+ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+ 	.name			= "vfio-iommu-type1",
+ 	.owner			= THIS_MODULE,
+@@ -2993,6 +3016,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+ 	.register_notifier	= vfio_iommu_type1_register_notifier,
+ 	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
+ 	.dma_rw			= vfio_iommu_type1_dma_rw,
++	.group_iommu_domain	= vfio_iommu_type1_group_iommu_domain,
+ };
+ 
+ static int __init vfio_iommu_type1_init(void)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 38d3c6a8dc7e..f45940b38a02 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -90,6 +90,8 @@ struct vfio_iommu_driver_ops {
+ 					       struct notifier_block *nb);
+ 	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
+ 				  void *data, size_t count, bool write);
++	struct iommu_domain *(*group_iommu_domain)(void *iommu_data,
++						   struct iommu_group *group);
+ };
+ 
+ extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+@@ -126,6 +128,8 @@ extern int vfio_group_unpin_pages(struct vfio_group *group,
+ extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t user_iova,
+ 		       void *data, size_t len, bool write);
+ 
++extern struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group);
++
+ /* each type has independent events */
+ enum vfio_notify_type {
+ 	VFIO_IOMMU_NOTIFY = 0,
+-- 
+2.25.1
 
-They share one fundamental property:
-
-     All frequency adjustments done by NTP/PTP/PPS or whatever affect
-     _ALL_ of them in the exactly same way.
-
-I.e. leap second smearing whether you like it or not is affecting all of
-them and there is nothing we can do about that. Why?
-
- 1) Because it's wrong to begin with. It creates a seperate universe of
-    CLOCK_REALTIME and therefore of CLOCK_TAI because they are strictly
-    coupled by definition.
-
- 2) It's user space ABI. adjtimex() can make the kernel do random
-    crap. So if you extend that to time namespaces (which is pretty much
-    the same as a guest time space) then you have to solve the following
-    problems:
-
-    A) The tick based gradual adjustment of adjtimex() to avoid time
-       jumping around have to be done for every time universe which has
-       different parameters than the host.
-
-       Arguably this can be solved by having a seqcount based magic hack
-       which forces the first time name space consumer into updating the
-       per time name space notion of time instead of doing it from the
-       host tick, but that requires to have fully synchronized nested
-       sequence counts and if you extend this to nested virt it creates
-       an exponential problem.
-
-    B) What to do about enforced time jumps on the host (settimeofday,
-       adjtimex)?=20
-
-    C) Once you have solved #1 and #2 explain how timers (nanosleep,
-       interval timers, ....) which are all user space ABI and have the
-       fundamental guarantee to not expire early can be handled in a sane
-       and scalable way.
-
-Once you have a coherent answer for all of the above I'm happy to step
-down and hand over. In that case I'm more than happy not to have to deal
-with the inevitable regression reports.
-
->>> tglx etc, I think that doing this really really nicely might involve
->>> promoting something like the current vDSO data structures to ABI -- a
->>> straightforward-ish implementation would be for the KVM host to export
->>> its vvar clock data to the guest and for the guest to use it, possibly
->>> with an offset applied.  The offset could work a lot like timens works
->>> today.
->>=20
->> Works nicely if the guest TSC is not scaled. But that means that on
->> migration the raw TSC usage in the guest is borked because the new host
->> might have a different TSC frequency.
->>=20
->> If you use TSC scaling then the conversion needs to take TSC scaling
->> into account which needs some thought. And the guest would need to read
->> the host conversion from 'vdso data' and the scaling from the next page
->> (per guest) and then still has to support timens. Doable but adds extra
->> overhead on every time read operation.
->
-> Is the issue that scaling would result in a different guest vs host
-> frequency?  Perhaps we could limit each physical machine to exactly
-> two modes: unscaled (use TSC ticks, convert in software) and scaled to
-> nanoseconds (CLOCK_MONOTONIC_RAW is RDTSC + possible offset).  Then
-> the host could produce its data structures in exactly those two
-> formats and export them as appropriate.
-
-The latter - nanoseconds scaling - is the only reasonable solution but
-then _ALL_ involved hosts must agree on that.
-
->> If you want to avoid that you are back to the point where you need to
->> chase all guest data when the host NTP/PTP adjusts the host side.
->> Chasing and updating all this stuff in the tick was the reason why I was
->> fighting the idea of clock realtime in namespaces.
->
-> I think that, if we can arrange for a small, bounded number of pages
-> generated by the host, then this problem isn=E2=80=99t so bad.
-
-Whishful thinking unless we have a very strict contract about
-
- - scaling to 1 GHz, aka nanoseconds,
- - all guest argree with the host defined management of clock
-   REALTIME and TAI
-
-> Hmm, leap second smearing is just a different linear mapping. I=E2=80=99m=
- not
-> sure how leap second smearing should interact with timens, but it
-> seems to be that the host should be able to produce four data pages
-> (scaled vs unscaled and smeared vs unsmeared) and one per-guest/timens
-> offset page (where offset applies to MONOTONIC and MONOTONIC_RAW only)
-> and cover all bases.  Or do people actually want to offset their TAI
-> and/or REALTIME, and what would that even mean if the offset crosses a
-> leap second?
->
-
-See above.
-
-And yes people want to run different time universes where TAI !=3D TAI.
-
-> (I haven=E2=80=99t though about the interaction of any of this with ART.)
-
-Obviously not:) And I'm pretty sure that nobody else did, but ART is the
-least of my worries so far.
-
-The current VM migration approach is: Get it done no matter what, we
-deal with the fallout later. Which means endless tinkering because you
-can't fix essential design fails after the fact.
-
-Thanks,
-
-        tglx
