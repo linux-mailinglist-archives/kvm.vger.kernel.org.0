@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D7032D41A4
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 13:03:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 201C82D4218
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 13:23:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731228AbgLIMCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Dec 2020 07:02:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37023 "EHLO
+        id S1731528AbgLIMWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 07:22:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45659 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731046AbgLIMCZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 07:02:25 -0500
+        by vger.kernel.org with ESMTP id S1731495AbgLIMWQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Dec 2020 07:22:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607515258;
+        s=mimecast20190719; t=1607516449;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=swJyXfHdLUgSl0keTb4tv1Zg2o/rljVaHBscj8NqdsQ=;
-        b=RIVWHCQ1gHOq/yTwI7gJXHSnRZ4TBKl1uQz83a0i6Sd9QnkM6ScFIB6DmAXcegIFumxdGM
-        6RdyknPKUtiOwHD3MOxAV1m/eCV+/73kifCDif4tcAl42PBmXOLR2rsah7R8cLYp6VcKlc
-        MdJZ8lca5Pfrt5OJryi5Dq4aEaqFXyA=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-FaJUMGJuPZGCYZ01ovYmSA-1; Wed, 09 Dec 2020 07:00:57 -0500
-X-MC-Unique: FaJUMGJuPZGCYZ01ovYmSA-1
-Received: by mail-qv1-f69.google.com with SMTP id 102so922605qva.0
-        for <kvm@vger.kernel.org>; Wed, 09 Dec 2020 04:00:57 -0800 (PST)
+        bh=02tquZiATMN/D94oqS1HgMSz6T4cchxv1MZSl+fk/68=;
+        b=LlMssY+oeg62FO4iyAm4luod1eiUx1QnNPUL3ZKpQMT9SiDYYvC3P7IWr6Fyy94wtUHpcH
+        ytHM7zVmGQaTbt+i2LGZKnROQNb1tHzRYID7ReM7uZ4MK1gOuaFMQ2SbqRsmxvIhIo/5Fs
+        ECYKUpEUY9wGpaItMpcVf/wYCwpt+Uw=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-KfyEmGOOP4eBXOGSsOfJAw-1; Wed, 09 Dec 2020 07:20:47 -0500
+X-MC-Unique: KfyEmGOOP4eBXOGSsOfJAw-1
+Received: by mail-qt1-f200.google.com with SMTP id n12so1056723qta.9
+        for <kvm@vger.kernel.org>; Wed, 09 Dec 2020 04:20:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=swJyXfHdLUgSl0keTb4tv1Zg2o/rljVaHBscj8NqdsQ=;
-        b=DCsGqWmPGLDi0Xw7f71OoF/Ku/Lr9FMoo0mFzfh2bnMSX37Ln00u9avyaEp8gjAWA3
-         RUI+iNzLiVFha7K5EJaFpNryMBEVJLjP3EetEprP3rv2FqMS+1xmCrli5fw9QwhvJM6s
-         JPtm3UC8dP7HyGcp2JFGEeXPzp09mA3j+QBetJVWoqtiJ1FTx9O57baBsL3NsSjl0W/C
-         w4QRlrKbvqhvvmWZcgzpsYSIDjNLho40oLi4sgZ02SIASXanmumvSbdWymQOMLFV/T30
-         wDx/APUQ7rqvpDTT5rW7p1jpAhcLSkUrfpy36NWtSeWfyPuETRLPEhVL8UM4BXTXy80A
-         OCLA==
-X-Gm-Message-State: AOAM5338JW3pzixjpCTy2TJiw4bvudc1/Ub63754ymdh/eQOQeyD5Yym
-        XLk0wcGY81ELXMl280hKzkCAIwCGTFq2NE1CS7Ntm63dDr46tAq0CO7t+TCqt9NNRQjEhab2eQt
-        mFgwGZ+XNhLQgd4aemZWaUNOo9LsW
-X-Received: by 2002:ae9:dcc1:: with SMTP id q184mr2482633qkf.425.1607515255954;
-        Wed, 09 Dec 2020 04:00:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwcJSG02TAyUTW+VNdiN2re1N9kAh2N75Xi7v7CXyvg3kf2iqP7u2vinBaagIz7uHe3uMaKmoLrXvjkvH01MEM=
-X-Received: by 2002:ae9:dcc1:: with SMTP id q184mr2482593qkf.425.1607515255708;
- Wed, 09 Dec 2020 04:00:55 -0800 (PST)
+        bh=02tquZiATMN/D94oqS1HgMSz6T4cchxv1MZSl+fk/68=;
+        b=nWPi//Ow471Wp2u7ftJz60Yfg4CpHWHxzvlark7ijMlC8Z6+gbzT5Ex/lQC/durSyu
+         NQ9P7bgwL/F9RPOdpwS/+RNCUP0WgZ9Baql62o5iV3Z3B7KH3+vu6XJ5cLnWdyLmVxqO
+         ZtA093I2rMGSqSFEtL1GcAKByHrbaPxjAVBMx1Xw/U2HNIIQleTM5BG1PvoVV5/1bttQ
+         FA4iCfknDxrqj+i0AkGVEnNfonz9SDJhG0WowRXYBNVeXbceUf5w6VJhu03o9MAumrPN
+         86rT7MUfgQCte3kaLwc9ZSDB0wDqgpHmAHXnIDaTRgwf6Y8vRNHeByRsaUr0KYVvQMj6
+         tFVA==
+X-Gm-Message-State: AOAM532TClwZAqIwWN52LvEOSQRnOmy/85ztzRkHXcFDFXoCvmg8zlux
+        hgg111o3/KeqM0GZqWXdvNu6jFnMMLp94gKN7lJ8Yo+h6E+6lUAr8YwH499cxXdBy1hsKFOMTWL
+        O7ExCMLK7aR7B1FqYHI/FBdQEyjvM
+X-Received: by 2002:a37:8485:: with SMTP id g127mr2590261qkd.233.1607516447501;
+        Wed, 09 Dec 2020 04:20:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxt/nrA+PEG+B8jRnIAdin9fm1aHeI7kL5mjtjcSfyl2llDTS9p8AJqVYo87tA8/xuhq3mMWO7Vd0gMqaadb3Y=
+X-Received: by 2002:a37:8485:: with SMTP id g127mr2590212qkd.233.1607516447222;
+ Wed, 09 Dec 2020 04:20:47 -0800 (PST)
 MIME-Version: 1.0
-References: <20201120185105.279030-1-eperezma@redhat.com> <20201120185105.279030-5-eperezma@redhat.com>
- <20201207164323.GK203660@stefanha-x1.localdomain>
-In-Reply-To: <20201207164323.GK203660@stefanha-x1.localdomain>
+References: <20201120185105.279030-1-eperezma@redhat.com> <20201120185105.279030-3-eperezma@redhat.com>
+ <20201207161938.GJ203660@stefanha-x1.localdomain>
+In-Reply-To: <20201207161938.GJ203660@stefanha-x1.localdomain>
 From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 9 Dec 2020 13:00:19 +0100
-Message-ID: <CAJaqyWd5oAJ4kJOhyDz+1KNvwzqJi3NO+5Z7X6W5ju2Va=LTMQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 04/27] vhost: add vhost_kernel_set_vring_enable
+Date:   Wed, 9 Dec 2020 13:20:10 +0100
+Message-ID: <CAJaqyWcZ_LEu1OibCoG+couDPoOjDPQNLkoEppEat=jDP6zvxQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 02/27] vhost: Add device callback in vhost_migration_log
 To:     Stefan Hajnoczi <stefanha@gmail.com>
 Cc:     qemu-level <qemu-devel@nongnu.org>,
         Lars Ganrot <lars.ganrot@gmail.com>,
@@ -89,78 +89,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 7, 2020 at 5:43 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+On Mon, Dec 7, 2020 at 5:19 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
 >
-> On Fri, Nov 20, 2020 at 07:50:42PM +0100, Eugenio P=C3=A9rez wrote:
+> On Fri, Nov 20, 2020 at 07:50:40PM +0100, Eugenio P=C3=A9rez wrote:
+> > This allows code to reuse the logic to not to re-enable or re-disable
+> > migration mechanisms. Code works the same way as before.
+> >
 > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 > > ---
-> >  hw/virtio/vhost-backend.c | 29 +++++++++++++++++++++++++++++
-> >  1 file changed, 29 insertions(+)
+> >  hw/virtio/vhost.c | 12 +++++++-----
+> >  1 file changed, 7 insertions(+), 5 deletions(-)
 > >
-> > diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> > index 222bbcc62d..317f1f96fa 100644
-> > --- a/hw/virtio/vhost-backend.c
-> > +++ b/hw/virtio/vhost-backend.c
-> > @@ -201,6 +201,34 @@ static int vhost_kernel_get_vq_index(struct vhost_=
-dev *dev, int idx)
-> >      return idx - dev->vq_index;
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index 2bd8cdf893..2adb2718c1 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -862,7 +862,9 @@ err_features:
+> >      return r;
 > >  }
 > >
-> > +static int vhost_kernel_set_vq_enable(struct vhost_dev *dev, unsigned =
-idx,
-> > +                                      bool enable)
-> > +{
-> > +    struct vhost_vring_file file =3D {
-> > +        .index =3D idx,
-> > +    };
-> > +
-> > +    if (!enable) {
-> > +        file.fd =3D -1; /* Pass -1 to unbind from file. */
-> > +    } else {
-> > +        struct vhost_net *vn_dev =3D container_of(dev, struct vhost_ne=
-t, dev);
-> > +        file.fd =3D vn_dev->backend;
-> > +    }
-> > +
-> > +    return vhost_kernel_net_set_backend(dev, &file);
+> > -static int vhost_migration_log(MemoryListener *listener, bool enable)
+> > +static int vhost_migration_log(MemoryListener *listener,
+> > +                               bool enable,
+> > +                               int (*device_cb)(struct vhost_dev *, bo=
+ol))
 >
-> This is vhost-net specific even though the function appears to be
-> generic. Is there a plan to extend this to all devices?
->
+> Please document the argument. What is the callback function supposed to
+> do ("device_cb" is not descriptive so I'm not sure)?
 
-I expected each vhost backend to enable-disable in its own terms, but
-I think it could be 100% virtio-device generic with something like the
-device state capability:
-https://lists.oasis-open.org/archives/virtio-comment/202012/msg00005.html
-.
+Sure, I will expand documentation if we stick with this approach to
+enable/disable the shadow virtqueue (I hope we agree on a better one
+anyway).
 
-> > +}
-> > +
-> > +static int vhost_kernel_set_vring_enable(struct vhost_dev *dev, int en=
-able)
-> > +{
-> > +    int i;
-> > +
-> > +    for (i =3D 0; i < dev->nvqs; ++i) {
-> > +        vhost_kernel_set_vq_enable(dev, i, enable);
-> > +    }
-> > +
-> > +    return 0;
-> > +}
->
-> I suggest exposing the per-vq interface (vhost_kernel_set_vq_enable())
-> in VhostOps so it follows the ioctl interface.
-
-It was actually the initial plan, I left as all-or-nothing to make less cha=
-nges.
-
-> vhost_kernel_set_vring_enable() can be moved to vhost.c can loop over
-> all vqs if callers find it convenient to loop over all vqs.
-
-I'm ok with it. Thinking out loud, I don't know if it is easier for
-some devices to enable/disable all of it (less syscalls? less downtime
-somehow?) but I find more generic and useful the per-virtqueue
-approach.
+Just for completion, it was meant for vhost_dev_set_log, so vhost_dev*
+is the device to enable/disable migration, and the second bool is for
+enable/disable it.
 
 Thanks!
 
