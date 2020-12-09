@@ -2,63 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9E942D39AA
-	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 05:38:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D1E52D3A2D
+	for <lists+kvm@lfdr.de>; Wed,  9 Dec 2020 06:15:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727335AbgLIEhg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Dec 2020 23:37:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58168 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726303AbgLIEhg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Dec 2020 23:37:36 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB13BC0613CF;
-        Tue,  8 Dec 2020 20:36:55 -0800 (PST)
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4CrPQY6Dvbz9sWL; Wed,  9 Dec 2020 15:36:53 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1607488613; bh=4qK0Qeph9aujlXGIFVNGaEAyJsEJ75znCDH6aXQBnaQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=saNnipqailTWZYEW7o1ETFKqbdiCFVgtlrhAlbhLtiElZxzzwFEmnfrXPdhBgys+a
-         d0gWxSbTajAn5DXmA7bQthrlka5qpKKBNb0qzC5wHWZfEKW9R5UbkP/aeUOBiWnzOp
-         mvs92dvWGLufV0p3b/bsxctGKwxuID2zW33fh1P0aOnWWlSCPtJfzelfqljdkxhv5u
-         scToA9zMk+qWYvWTpaZH0dZi6DIN4IX7CmFf+0qa945U/7r7vAlCj75hxjI8ngjxPb
-         4UU3yHvWOQitK25dHPKpKMuTBleyugeZWWYLEbhnxOX1u40KESNUmiwjJsCS6u+f7/
-         6cz08KAshW+3Q==
-Date:   Wed, 9 Dec 2020 15:36:48 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Cc:     mpe@ellerman.id.au, mikey@neuling.org, npiggin@gmail.com,
-        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
-        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v2 4/4] KVM: PPC: Introduce new capability for 2nd DAWR
-Message-ID: <20201209043648.GB29825@thinks.paulus.ozlabs.org>
-References: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com>
- <20201124105953.39325-5-ravi.bangoria@linux.ibm.com>
+        id S1726058AbgLIFOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Dec 2020 00:14:43 -0500
+Received: from mga04.intel.com ([192.55.52.120]:26818 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725765AbgLIFOn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Dec 2020 00:14:43 -0500
+IronPort-SDR: 5u7pBuW1+D0AsKwn1DWpHUMB1GuWDdOByjQpUxdzj9ETppKXbfekGN3jIJCYgrihjzKPZSzcsk
+ Mda7MUxBMV+Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9829"; a="171448042"
+X-IronPort-AV: E=Sophos;i="5.78,404,1599548400"; 
+   d="scan'208";a="171448042"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2020 21:14:03 -0800
+IronPort-SDR: iJF68Iogu7Awd297quq/5qGbK1KJI3yUTYkcGGikoOkCcqyp6qSouH7X4nXJuGK8j+irLzgaDt
+ YRZM87ITPHjw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,404,1599548400"; 
+   d="scan'208";a="407917783"
+Received: from unknown (HELO [10.239.160.37]) ([10.239.160.37])
+  by orsmga001.jf.intel.com with ESMTP; 08 Dec 2020 21:14:01 -0800
+Reply-To: Colin.Xu@intel.com
+Subject: Re: [RFC PATCH] vfio/pci: Allow force needs_pm_restore as specified
+ by device:vendor
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Fonn, Swee Yee" <swee.yee.fonn@intel.com>
+References: <20201125021824.27411-1-colin.xu@intel.com>
+ <20201125085312.63510f9f@w520.home>
+ <7e7a83ca-8530-1afa-4b85-2ef76fb99a5c@intel.com>
+ <20201127083529.6c4a780c@x1.home>
+From:   Colin Xu <Colin.Xu@intel.com>
+Message-ID: <29124528-f02a-008e-fab1-60f6b6e643b7@intel.com>
+Date:   Wed, 9 Dec 2020 13:14:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201124105953.39325-5-ravi.bangoria@linux.ibm.com>
+In-Reply-To: <20201127083529.6c4a780c@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 04:29:53PM +0530, Ravi Bangoria wrote:
-> Introduce KVM_CAP_PPC_DAWR1 which can be used by Qemu to query whether
-> kvm supports 2nd DAWR or not.
 
-This should be described in Documentation/virt/kvm/api.rst.
+On 11/27/20 11:35 PM, Alex Williamson wrote:
+> On Fri, 27 Nov 2020 11:53:39 +0800
+> Colin Xu <Colin.Xu@intel.com> wrote:
+>
+>> On 11/25/20 11:53 PM, Alex Williamson wrote:
+>>> On Wed, 25 Nov 2020 10:18:24 +0800
+>>> Colin Xu <colin.xu@intel.com> wrote:
+>>>   
+>>>> Force specific device listed in params pm_restore_ids to follow
+>>>> device state save/restore as needs_pm_restore.
+>>>> Some device has NoSoftRst so will skip current state save/restore enabled
+>>>> by needs_pm_restore. However once the device experienced power state
+>>>> D3<->D0 transition, either by idle_d3 or the guest driver changes PM_CTL,
+>>>> the guest driver won't get correct devie state although the configure
+>>>> space doesn't change.
+>>> It sounds like you're describing a device that incorrectly exposes
+>>> NoSoftRst when there is in fact some sort of internal reset that
+>>> requires reprogramming config space.  What device requires this?  How
+>>> is a user to know when this option is required?  It seems like this
+>>> would be better handled via a quirk in PCI core that sets a device flag
+>>> that the NoSoftRst value is incorrect for the specific affected
+>>> devices.  Thanks,
+>>>
+>>> Alex
+>> Thanks for the feedback.
+>>
+>> The device found are: Comet Lake PCH Serial IO I2C Controller
+>> [8086:06e8]
+>> [8086:06e9]
+>>
+>> Yes you're right, there is no straight way for user to know the device.
+>> The above device I found is during pass through them to VM. Although
+>> adding such param may help in certain scenario, it still too
+>> device-specific but not common in most cases.
+>
+> The chipset i2c controller seems like a pretty suspicious device for
+> Intel to advocate assigning to a VM.  Are you assigning this to satisfy
+> the isolation issue that we often see where a device like a NIC is
+> grouped together with platform management devices due to lack of
+> multifunction ACS?  If that's the case, I would think it would make
+> more sense to investigate from the perspective of whether there is
+> actually DMA isolation between those integrated, multifunction devices
+> and if so, implement ACS quirks to expose that isolation.  Thanks,
+>
+> Alex
 
-Strictly speaking, it should be a capability which is disabled by
-default, so the guest can only do the H_SET_MODE to set DAWR[X]1 if it
-has been explicitly permitted to do so by userspace (QEMU).  This is
-because we want as little as possible of the VM configuration to come
-from the host capabilities rather than from what userspace configures.
+Hi Alex,
 
-So what we really need here is for this to be a capability which can
-be queried by userspace to find out if it is possible, and then
-enabled by userspace if it wants.  See how KVM_CAP_PPC_NESTED_HV is
-handled for example.
+Sorry for late reply. E-mail incorrectly filtered so didn't see this one 
+until manual search.
 
-Paul.
+The mentioned two I2C controller are in same iommu group and there is NO 
+other device in the same group. The I2C controller is integrated in PCH 
+chipset and there are other devices integrated too, but in different 
+group. When assigning them to a VM, both are assigned, and function 0 is 
+set with multifunction=on. If iommu driver group no other device in the 
+same group, could we assume there is no DMA isolation issue?
+
+>
+>>>> Cc: Swee Yee Fonn <swee.yee.fonn@intel.com>
+>>>> Signed-off-by: Colin Xu <colin.xu@intel.com>
+>>>> ---
+>>>>    drivers/vfio/pci/vfio_pci.c | 66 ++++++++++++++++++++++++++++++++++++-
+>>>>    1 file changed, 65 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+>>>> index e6190173482c..50a4141c9e1d 100644
+>>>> --- a/drivers/vfio/pci/vfio_pci.c
+>>>> +++ b/drivers/vfio/pci/vfio_pci.c
+>>>> @@ -34,6 +34,15 @@
+>>>>    #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+>>>>    #define DRIVER_DESC     "VFIO PCI - User Level meta-driver"
+>>>>    
+>>>> +#define VFIO_MAX_PM_DEV 32
+>>>> +struct vfio_pm_devs {
+>>>> +	struct {
+>>>> +		unsigned short  vendor;
+>>>> +		unsigned short  device;
+>>>> +	} ids[VFIO_MAX_PM_DEV];
+>>>> +	u32 count;
+>>>> +};
+>>>> +
+>>>>    static char ids[1024] __initdata;
+>>>>    module_param_string(ids, ids, sizeof(ids), 0);
+>>>>    MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the vfio driver, format is \"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\" and multiple comma separated entries can be specified");
+>>>> @@ -64,6 +73,10 @@ static bool disable_denylist;
+>>>>    module_param(disable_denylist, bool, 0444);
+>>>>    MODULE_PARM_DESC(disable_denylist, "Disable use of device denylist. Disabling the denylist allows binding to devices with known errata that may lead to exploitable stability or security issues when accessed by untrusted users.");
+>>>>    
+>>>> +static char pm_restore_ids[1024] __initdata;
+>>>> +module_param_string(pm_restore_ids, pm_restore_ids, sizeof(pm_restore_ids), 0);
+>>>> +MODULE_PARM_DESC(pm_restore_ids, "comma separated device in format of \"vendor:device\"");
+>>>> +
+>>>>    static inline bool vfio_vga_disabled(void)
+>>>>    {
+>>>>    #ifdef CONFIG_VFIO_PCI_VGA
+>>>> @@ -260,10 +273,50 @@ static bool vfio_pci_nointx(struct pci_dev *pdev)
+>>>>    	return false;
+>>>>    }
+>>>>    
+>>>> +static struct vfio_pm_devs pm_devs = {0};
+>>>> +static void __init vfio_pci_fill_pm_ids(void)
+>>>> +{
+>>>> +	char *p, *id;
+>>>> +	int idx = 0;
+>>>> +
+>>>> +	/* no ids passed actually */
+>>>> +	if (pm_restore_ids[0] == '\0')
+>>>> +		return;
+>>>> +
+>>>> +	/* add ids specified in the module parameter */
+>>>> +	p = pm_restore_ids;
+>>>> +	while ((id = strsep(&p, ","))) {
+>>>> +		unsigned int vendor, device = PCI_ANY_ID;
+>>>> +		int fields;
+>>>> +
+>>>> +		if (!strlen(id))
+>>>> +			continue;
+>>>> +
+>>>> +		fields = sscanf(id, "%x:%x", &vendor, &device);
+>>>> +
+>>>> +		if (fields != 2) {
+>>>> +			pr_warn("invalid vendor:device string \"%s\"\n", id);
+>>>> +			continue;
+>>>> +		}
+>>>> +
+>>>> +		if (idx < VFIO_MAX_PM_DEV) {
+>>>> +			pm_devs.ids[idx].vendor = vendor;
+>>>> +			pm_devs.ids[idx].device = device;
+>>>> +			pm_devs.count++;
+>>>> +			idx++;
+>>>> +			pr_info("add [%04x:%04x] for needs_pm_restore\n",
+>>>> +				vendor, device);
+>>>> +		} else {
+>>>> +			pr_warn("Exceed maximum %d, skip adding [%04x:%04x] for needs_pm_restore\n",
+>>>> +				VFIO_MAX_PM_DEV, vendor, device);
+>>>> +		}
+>>>> +	}
+>>>> +}
+>>>> +
+>>>>    static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
+>>>>    {
+>>>>    	struct pci_dev *pdev = vdev->pdev;
+>>>> -	u16 pmcsr;
+>>>> +	u16 pmcsr, idx;
+>>>>    
+>>>>    	if (!pdev->pm_cap)
+>>>>    		return;
+>>>> @@ -271,6 +324,16 @@ static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
+>>>>    	pci_read_config_word(pdev, pdev->pm_cap + PCI_PM_CTRL, &pmcsr);
+>>>>    
+>>>>    	vdev->needs_pm_restore = !(pmcsr & PCI_PM_CTRL_NO_SOFT_RESET);
+>>>> +
+>>>> +	for (idx = 0; idx < pm_devs.count; idx++) {
+>>>> +		if (vdev->pdev->vendor == pm_devs.ids[idx].vendor &&
+>>>> +		    vdev->pdev->device == pm_devs.ids[idx].device) {
+>>>> +			vdev->needs_pm_restore = true;
+>>>> +			pr_info("force [%04x:%04x] to needs_pm_restore\n",
+>>>> +				vdev->pdev->vendor, vdev->pdev->device);
+>>>> +			break;
+>>>> +		}
+>>>> +	}
+>>>>    }
+>>>>    
+>>>>    /*
+>>>> @@ -2423,6 +2486,7 @@ static int __init vfio_pci_init(void)
+>>>>    		goto out_driver;
+>>>>    
+>>>>    	vfio_pci_fill_ids();
+>>>> +	vfio_pci_fill_pm_ids();
+>>>>    
+>>>>    	if (disable_denylist)
+>>>>    		pr_warn("device denylist disabled.\n");
+
+-- 
+Best Regards,
+Colin Xu
+
