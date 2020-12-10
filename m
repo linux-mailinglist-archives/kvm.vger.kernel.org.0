@@ -2,279 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A2DB2D5DC3
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 15:31:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFBE62D5EAE
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 15:55:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390279AbgLJOaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 09:30:20 -0500
-Received: from foss.arm.com ([217.140.110.172]:44814 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732915AbgLJOaN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 09:30:13 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5393413D5;
-        Thu, 10 Dec 2020 06:29:27 -0800 (PST)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1ECCE3F718;
-        Thu, 10 Dec 2020 06:29:26 -0800 (PST)
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Marc Zyngier <maz@kernel.org>
-Subject: [PATCH kvmtool 04/21] mmio: Extend handling to include ioport emulation
-Date:   Thu, 10 Dec 2020 14:28:51 +0000
-Message-Id: <20201210142908.169597-5-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201210142908.169597-1-andre.przywara@arm.com>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
+        id S1732597AbgLJOyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 09:54:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46241 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389212AbgLJOyE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 09:54:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607611958;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/hi8a0jEzGqN1iBD0C9+/eRWGMqXO+jd3SvUGWEwjC4=;
+        b=dHf9rMPRlO5xjUYvgl3Bl5kqlrSsBgzVMUjmSpIs9xBLxUoq/ao5y60o5+aIToQSoYZ7SY
+        L13mVDszXOUUqSDO/mth7mg3bd04bBGcufzo1PjZ/fsq9X5+5+IFFfl5gGjEKFmCEp/aOX
+        2aaSLR6NUw9/GyuwmpMAHNsa6u8sG6c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-qv4wd_1gML2sR-lxBto1jw-1; Thu, 10 Dec 2020 09:52:34 -0500
+X-MC-Unique: qv4wd_1gML2sR-lxBto1jw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AAB1858182;
+        Thu, 10 Dec 2020 14:52:32 +0000 (UTC)
+Received: from starship (unknown [10.35.206.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E3DB19C78;
+        Thu, 10 Dec 2020 14:52:26 +0000 (UTC)
+Message-ID: <9389c1198da174bcc9483d6ebf535405aa8bdb45.camel@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     kvm@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Date:   Thu, 10 Dec 2020 16:52:25 +0200
+In-Reply-To: <70f9a5b3-d912-2a46-3718-a9c7591cd1f4@redhat.com>
+References: <20201203171118.372391-1-mlevitsk@redhat.com>
+         <20201203171118.372391-2-mlevitsk@redhat.com>
+         <20201207232920.GD27492@fuller.cnet>
+         <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com>
+         <87sg8g2sn4.fsf@nanos.tec.linutronix.de>
+         <6f64558a029574444da417754786f711c2fec407.camel@redhat.com>
+         <87blf42dvv.fsf@nanos.tec.linutronix.de>
+         <70f9a5b3-d912-2a46-3718-a9c7591cd1f4@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In their core functionality MMIO and I/O port traps are not really
-different, yet we still have two totally separate code paths for
-handling them. Devices need to decide on one conduit or need to provide
-different handler functions for each of them.
+On Thu, 2020-12-10 at 12:48 +0100, Paolo Bonzini wrote:
+> On 08/12/20 22:20, Thomas Gleixner wrote:
+> > So now life migration comes a long time after timekeeping had set the
+> > limits and just because it's virt it expects that everything works and it
+> > just can ignore these limits.
+> > 
+> > TBH. That's not any different than SMM or hard/firmware taking the
+> > machine out for lunch. It's exactly the same: It's broken.
+> 
+> I agree.  If *live* migration stops the VM for 200 seconds, it's broken.
+> 
+> Sure, there's the case of snapshotting the VM over the weekend.  My 
+> favorite solution would be to just put it in S3 before doing that.  *Do 
+> what bare metal does* and you can't go that wrong.
 
-Extend the existing MMIO emulation to also cover ioport handlers.
-This just adds another RB tree root for holding the I/O port handlers,
-but otherwise uses the same tree population and lookup code.
-"ioport" or "mmio" just become a flag in the registration function.
-Provide wrappers to not break existing users, and allow an easy
-transition for the existing ioport handlers.
+Note though that qemu has a couple of issues with s3, and it is disabled 
+by default in libvirt. 
+I would be very happy to work on improving this if there is a need for that.
 
-This also means that ioport handlers now can use the same emulation
-callback prototype as MMIO handlers, which means we have to migrate them
-over. To allow a smooth transition, we hook up the new I/O emulate
-function to the end of the existing ioport emulation code.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- include/kvm/kvm.h | 42 +++++++++++++++++++++++++++++----
- ioport.c          |  4 ++--
- mmio.c            | 59 +++++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 89 insertions(+), 16 deletions(-)
+> 
+> In general it's userspace policy whether to keep the TSC value the same 
+> across live migration.  There's pros and cons to both approaches, so KVM 
+> should provide the functionality to keep the TSC running (which the 
+> guest will see as a very long, but not extreme SMI), and this is what 
+> this series does.  Maxim will change it to operate per-VM.  Thanks 
+> Thomas, Oliver and everyone else for the input.
 
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index ee99c28e..14f9d58b 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -27,10 +27,16 @@
- #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
- #endif
+I agree with that.
  
-+#define IOTRAP_BUS_MASK		0xf
-+#define IOTRAP_COALESCE		(1U << 4)
-+
- #define DEFINE_KVM_EXT(ext)		\
- 	.name = #ext,			\
- 	.code = ext
+I still think though that we should have a discussion on feasibility
+of making the kernel time code deal with large *forward* tsc jumps 
+without crashing.
+
+If that is indeed hard to do, or will cause performance issues,
+then I agree that we might indeed inform the guest of time jumps instead.
  
-+struct kvm_cpu;
-+typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
-+				u32 len, u8 is_write, void *ptr);
- typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type);
+In fact kvmclock already have such a mechanism (KVM_KVMCLOCK_CTRL ioctl, which sets 
+the PVCLOCK_GUEST_STOPPED bit in the PV clock struct).
+That informs the guest that it was stopped (guest clears this bit), 
+and currently that makes the guest touch various watchdogs.
  
- enum {
-@@ -113,6 +119,8 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
- void kvm__irq_trigger(struct kvm *kvm, int irq);
- bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
- bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
-+bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-+		      int direction, int size, u32 count);
- int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
- int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
- 		      enum kvm_mem_type type);
-@@ -136,10 +144,36 @@ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
- 				 KVM_MEM_TYPE_RESERVED);
- }
- 
--int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
--				    void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
--				    void *ptr);
--bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr);
-+int __must_check kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 len,
-+				      mmio_handler_fn mmio_fn, void *ptr,
-+				      unsigned int flags);
-+
-+static inline
-+int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr,
-+				    u64 phys_addr_len, bool coalesce,
-+				    mmio_handler_fn mmio_fn, void *ptr)
-+{
-+	return kvm__register_iotrap(kvm, phys_addr, phys_addr_len, mmio_fn, ptr,
-+			DEVICE_BUS_MMIO | (coalesce ? IOTRAP_COALESCE : 0));
-+}
-+static inline
-+int __must_check kvm__register_pio(struct kvm *kvm, u16 port, u16 len,
-+				   mmio_handler_fn mmio_fn, void *ptr)
-+{
-+	return kvm__register_iotrap(kvm, port, len, mmio_fn, ptr,
-+				    DEVICE_BUS_IOPORT);
-+}
-+
-+bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags);
-+static inline bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-+{
-+	return kvm__deregister_iotrap(kvm, phys_addr, DEVICE_BUS_MMIO);
-+}
-+static inline bool kvm__deregister_pio(struct kvm *kvm, u16 port)
-+{
-+	return kvm__deregister_iotrap(kvm, port, DEVICE_BUS_IOPORT);
-+}
-+
- void kvm__reboot(struct kvm *kvm);
- void kvm__pause(struct kvm *kvm);
- void kvm__continue(struct kvm *kvm);
-diff --git a/ioport.c b/ioport.c
-index b98836d3..204d8103 100644
---- a/ioport.c
-+++ b/ioport.c
-@@ -147,7 +147,8 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
- 
- 	entry = ioport_get(&ioport_tree, port);
- 	if (!entry)
--		goto out;
-+		return kvm__emulate_pio(vcpu, port, data, direction,
-+					size, count);
- 
- 	ops	= entry->ops;
- 
-@@ -162,7 +163,6 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
- 
- 	ioport_put(&ioport_tree, entry);
- 
--out:
- 	if (ret)
- 		return true;
- 
-diff --git a/mmio.c b/mmio.c
-index cd141cd3..4cce1901 100644
---- a/mmio.c
-+++ b/mmio.c
-@@ -19,13 +19,14 @@ static DEFINE_MUTEX(mmio_lock);
- 
- struct mmio_mapping {
- 	struct rb_int_node	node;
--	void			(*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr);
-+	mmio_handler_fn		mmio_fn;
- 	void			*ptr;
- 	u32			refcount;
- 	bool			remove;
- };
- 
- static struct rb_root mmio_tree = RB_ROOT;
-+static struct rb_root pio_tree = RB_ROOT;
- 
- static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
- {
-@@ -103,9 +104,9 @@ static void mmio_put(struct kvm *kvm, struct rb_root *root, struct mmio_mapping
- 	mutex_unlock(&mmio_lock);
- }
- 
--int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
--		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
--			void *ptr)
-+int kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len,
-+			 mmio_handler_fn mmio_fn, void *ptr,
-+			 unsigned int flags)
- {
- 	struct mmio_mapping *mmio;
- 	struct kvm_coalesced_mmio_zone zone;
-@@ -127,7 +128,7 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
- 		.remove		= false,
- 	};
- 
--	if (coalesce) {
-+	if (flags & IOTRAP_COALESCE) {
- 		zone = (struct kvm_coalesced_mmio_zone) {
- 			.addr	= phys_addr,
- 			.size	= phys_addr_len,
-@@ -139,18 +140,27 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
- 		}
- 	}
- 	mutex_lock(&mmio_lock);
--	ret = mmio_insert(&mmio_tree, mmio);
-+	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
-+		ret = mmio_insert(&pio_tree, mmio);
-+	else
-+		ret = mmio_insert(&mmio_tree, mmio);
- 	mutex_unlock(&mmio_lock);
- 
- 	return ret;
- }
- 
--bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-+bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags)
- {
- 	struct mmio_mapping *mmio;
-+	struct rb_root *tree;
-+
-+	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
-+		tree = &pio_tree;
-+	else
-+		tree = &mmio_tree;
- 
- 	mutex_lock(&mmio_lock);
--	mmio = mmio_search_single(&mmio_tree, phys_addr);
-+	mmio = mmio_search_single(tree, phys_addr);
- 	if (mmio == NULL) {
- 		mutex_unlock(&mmio_lock);
- 		return false;
-@@ -167,7 +177,7 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
- 	 * called mmio_put(). This will trigger use-after-free errors on VCPU0.
- 	 */
- 	if (mmio->refcount == 0)
--		mmio_deregister(kvm, &mmio_tree, mmio);
-+		mmio_deregister(kvm, tree, mmio);
- 	else
- 		mmio->remove = true;
- 	mutex_unlock(&mmio_lock);
-@@ -175,7 +185,8 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
- 	return true;
- }
- 
--bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write)
-+bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
-+		       u32 len, u8 is_write)
- {
- 	struct mmio_mapping *mmio;
- 
-@@ -194,3 +205,31 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u
- out:
- 	return true;
- }
-+
-+bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-+		     int direction, int size, u32 count)
-+{
-+	struct mmio_mapping *mmio;
-+	bool is_write = direction == KVM_EXIT_IO_OUT;
-+
-+	mmio = mmio_get(&pio_tree, port, size);
-+	if (!mmio) {
-+		if (vcpu->kvm->cfg.ioport_debug) {
-+			fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n",
-+				to_direction(direction), port, size, count);
-+
-+			return false;
-+		}
-+		return true;
-+	}
-+
-+	while (count--) {
-+		mmio->mmio_fn(vcpu, port, data, size, is_write, mmio->ptr);
-+
-+		data += size;
-+	}
-+
-+	mmio_put(vcpu->kvm, &pio_tree, mmio);
-+
-+	return true;
-+}
--- 
-2.17.1
+I think that the guest uses it only when kvmclock is used but
+we can think about extending this to make guest use it 
+even when bare tsc is used, and also implement whatever logic is
+needed to jump the guest clock forward when this bit is set.
+
+What do you think?
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> Paolo
+> 
+
 
