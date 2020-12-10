@@ -2,135 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8C052D5EBE
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 15:57:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3EBD2D5F46
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 16:15:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727776AbgLJO4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 09:56:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35558 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727249AbgLJO4K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 09:56:10 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BAEZ7N7088316;
-        Thu, 10 Dec 2020 09:54:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=VsCisPySZHG4Vff0eAvJw4F76GzoTiGXaBqWHoCkKF0=;
- b=H/i0vBJaVrEsIxTNzzpSFA/FCskUwAue6ja+2YX99G5xdQAchy5YHz28mh0jiokEVJh3
- cVZVOQaOOGLQHSbKM9vb4OlkQS0lpZNLgdmAh8uifjptyOloMlsBkGmjAkOL/h1hmyzo
- 5ANkm8pODhkiJfDX7wP2kvW+FVbcpDzP7v9QbxASmDfzsNGCUl8QrHMs+c0AZVs4IHoc
- r9bYF0tv/FR5mng22P6Rrs6Qc283dFG5Jc4L9VdSpX8y9OHnYyDSwE27LhruKR4v7YxK
- zypN7M+fXF08EenWsawvPzSRb+wz9CHSdTqjHIRc4bmgMRRK7ZcttZS5CtfejBDyWve/ 3Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35bndu9187-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Dec 2020 09:54:09 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BAEWOAc069949;
-        Thu, 10 Dec 2020 09:54:08 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35bndu916u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Dec 2020 09:54:08 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BAEqWrN021791;
-        Thu, 10 Dec 2020 14:54:05 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3581u8rpv5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Dec 2020 14:54:05 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BAEs30S33030568
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Dec 2020 14:54:03 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B3044C70D;
-        Thu, 10 Dec 2020 14:54:03 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F63E4C70F;
-        Thu, 10 Dec 2020 14:54:02 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.88.139])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Dec 2020 14:54:01 +0000 (GMT)
-Subject: Re: [Patch v3 0/2] cgroup: KVM: New Encryption IDs cgroup controller
-To:     Tejun Heo <tj@kernel.org>, Vipin Sharma <vipinsh@google.com>
-Cc:     thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
-        eric.vantassell@amd.com, pbonzini@redhat.com, seanjc@google.com,
-        lizefan@huawei.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        corbet@lwn.net, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201209205413.3391139-1-vipinsh@google.com>
- <X9E6eZaIFDhzrqWO@mtj.duckdns.org>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <4f7b9c3f-200e-6127-1d94-91dd9c917921@de.ibm.com>
-Date:   Thu, 10 Dec 2020 15:54:01 +0100
+        id S2389736AbgLJPO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 10:14:57 -0500
+Received: from foss.arm.com ([217.140.110.172]:46020 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391595AbgLJOqg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 09:46:36 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9666C1FB;
+        Thu, 10 Dec 2020 06:45:50 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD18C3F718;
+        Thu, 10 Dec 2020 06:45:49 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 08/10] arm/arm64: gic: Split check_acked()
+ into two functions
+To:     Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+Cc:     andre.przywara@arm.com
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-9-alexandru.elisei@arm.com>
+ <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <2b8d774e-9398-e24b-6989-8643f5dd2492@arm.com>
+Date:   Thu, 10 Dec 2020 14:45:37 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-In-Reply-To: <X9E6eZaIFDhzrqWO@mtj.duckdns.org>
+In-Reply-To: <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-10_05:2020-12-09,2020-12-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- priorityscore=1501 adultscore=0 malwarescore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 phishscore=0 clxscore=1011 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012100088
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09.12.20 21:58, Tejun Heo wrote:
-> Hello,
-> 
-> Rough take after skimming:
-> 
-> * I don't have an overall objection. In terms of behavior, the only thing
->   which stood out was input rejection depending on the current usage. The
->   preferred way of handling that is rejecting future allocations rather than
->   failing configuration as that makes it impossible e.g. to lower limit and
->   drain existing usages from outside the container.
-> 
-> * However, the boilerplate to usefulness ratio doesn't look too good and I
->   wonder whether what we should do is adding a generic "misc" controller
->   which can host this sort of static hierarchical counting. I'll think more
->   on it.
+Hi Eric,
 
-We first dicussed to have
-encryption_ids.stat
-encryption_ids.max
-encryption_ids.current
+On 12/3/20 1:39 PM, Auger Eric wrote:
+>
+> On 11/25/20 4:51 PM, Alexandru Elisei wrote:
+>> check_acked() has several peculiarities: is the only function among the
+>> check_* functions which calls report() directly, it does two things
+>> (waits for interrupts and checks for misfired interrupts) and it also
+>> mixes printf, report_info and report calls.
+>>
+>> check_acked() also reports a pass and returns as soon all the target CPUs
+>> have received interrupts, However, a CPU not having received an interrupt
+>> *now* does not guarantee not receiving an eroneous interrupt if we wait
+> erroneous
+>> long enough.
+>>
+>> Rework the function by splitting it into two separate functions, each with
+>> a single responsability: wait_for_interrupts(), which waits for the
+>> expected interrupts to fire, and check_acked() which checks that interrupts
+>> have been received as expected.
+>>
+>> wait_for_interrupts() also waits an extra 100 milliseconds after the
+>> expected interrupts have been received in an effort to make sure we don't
+>> miss misfiring interrupts.
+>>
+>> Splitting check_acked() into two functions will also allow us to
+>> customize the behavior of each function in the future more easily
+>> without using an unnecessarily long list of arguments for check_acked().
+>>
+>> CC: Andre Przywara <andre.przywara@arm.com>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
+>>  1 file changed, 47 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index 544c283f5f47..dcdab7d5f39a 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -62,41 +62,42 @@ static void stats_reset(void)
+>>  	}
+>>  }
+>>  
+>> -static void check_acked(const char *testname, cpumask_t *mask)
+>> +static void wait_for_interrupts(cpumask_t *mask)
+>>  {
+>> -	int missing = 0, extra = 0, unexpected = 0;
+>>  	int nr_pass, cpu, i;
+>> -	bool bad = false;
+>>  
+>>  	/* Wait up to 5s for all interrupts to be delivered */
+>> -	for (i = 0; i < 50; ++i) {
+>> +	for (i = 0; i < 50; i++) {
+>>  		mdelay(100);
+>>  		nr_pass = 0;
+>>  		for_each_present_cpu(cpu) {
+>> +			/*
+>> +			 * A CPU having receied more than one interrupts will
+> received
+>> +			 * show up in check_acked(), and no matter how long we
+>> +			 * wait it cannot un-receive it. Consier at least one
+> consider
 
-and we added the sev in later, so that we can also have tdx, seid, sgx or whatever.
-Maybe also 2 or more things at the same time.
+Will fix all three typos, thanks.
 
-Right now this code has
+>> +			 * interrupt as a pass.
+>> +			 */
+>>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
+>> -				acked[cpu] == 1 : acked[cpu] == 0;
+>> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+>> -
+>> -			if (bad_sender[cpu] != -1) {
+>> -				printf("cpu%d received IPI from wrong sender %d\n",
+>> -					cpu, bad_sender[cpu]);
+>> -				bad = true;
+>> -			}
+>> -
+>> -			if (bad_irq[cpu] != -1) {
+>> -				printf("cpu%d received wrong irq %d\n",
+>> -					cpu, bad_irq[cpu]);
+>> -				bad = true;
+>> -			}
+>> +				acked[cpu] >= 1 : acked[cpu] == 0;
+>>  		}
+>> +
+>>  		if (nr_pass == nr_cpus) {
+>> -			report(!bad, "%s", testname);
+>>  			if (i)
+>> -				report_info("took more than %d ms", i * 100);
+>> +				report_info("interrupts took more than %d ms", i * 100);
+>> +			mdelay(100);
+>>  			return;
+>>  		}
+>>  	}
+>>  
+>> +	report_info("interrupts timed-out (5s)");
+>> +}
+>> +
+>> +static bool check_acked(cpumask_t *mask)
+>> +{
+>> +	int missing = 0, extra = 0, unexpected = 0;
+>> +	bool pass = true;
+>> +	int cpu;
+>> +
+>>  	for_each_present_cpu(cpu) {
+>>  		if (cpumask_test_cpu(cpu, mask)) {
+>>  			if (!acked[cpu])
+>> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
+>>  			if (acked[cpu])
+>>  				++unexpected;
+>>  		}
+>> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+>> +
+>> +		if (bad_sender[cpu] != -1) {
+>> +			report_info("cpu%d received IPI from wrong sender %d",
+>> +					cpu, bad_sender[cpu]);
+>> +			pass = false;
+>> +		}
+>> +
+>> +		if (bad_irq[cpu] != -1) {
+>> +			report_info("cpu%d received wrong irq %d",
+>> +					cpu, bad_irq[cpu]);
+>> +			pass = false;
+>> +		}
+>> +	}
+>> +
+>> +	if (missing || extra || unexpected) {
+>> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
+>> +				missing, extra, unexpected);
+>> +		pass = false;
+>>  	}
+>>  
+>> -	report(false, "%s", testname);
+>> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
+>> -		    missing, extra, unexpected);
+>> +	return pass;
+>>  }
+>>  
+>>  static void check_spurious(void)
+>> @@ -300,7 +318,8 @@ static void ipi_test_self(void)
+>>  	cpumask_clear(&mask);
+>>  	cpumask_set_cpu(smp_processor_id(), &mask);
+>>  	gic->ipi.send_self();
+>> -	check_acked("IPI: self", &mask);
+>> +	wait_for_interrupts(&mask);
+>> +	report(check_acked(&mask), "Interrupts received");
+>>  	report_prefix_pop();
+>>  }
+>>  
+>> @@ -315,7 +334,8 @@ static void ipi_test_smp(void)
+>>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+>>  		cpumask_clear_cpu(i, &mask);
+>>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+>> -	check_acked("IPI: directed", &mask);
+>> +	wait_for_interrupts(&mask);
+>> +	report(check_acked(&mask), "Interrupts received");
+> both ipi_test_smp and ipi_test_self are called from the same test so
+> better to use different error messages like it was done originally.
 
-encryption_ids.sev.stat
-encryption_ids.sev.max
-encryption_ids.sev.current
+I used the same error message because the tests have a different prefix
+("target-list" versus "broadcast"). Do you think there are cases where that's not
+enough?
 
-And it would be trivial to extend it to have
-encryption_ids.seid.stat
-encryption_ids.seid.max
-encryption_ids.seid.current
-on s390 instead (for our secure guests).
-
-So in the end this is almost already a misc controller, the only thing that we
-need to change is the capability to also define things other than encryption.*.*
-And of course we would need to avoid adding lots of random garbage to such a thing.
-
-But if you feel ok with the burden to keep things kind of organized a misc
-controller would certainly work for the encryption ID usecase as well. 
-So I would be fine with the thing as is or a misc controlĺer.
-
-Christian
+Thanks,
+Alex
