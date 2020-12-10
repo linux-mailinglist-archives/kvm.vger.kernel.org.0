@@ -2,109 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61F342D5A6A
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 13:24:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0A362D5A98
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 13:35:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732029AbgLJMYO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 07:24:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39754 "EHLO
+        id S1728458AbgLJMep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 07:34:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35916 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731297AbgLJMYE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 07:24:04 -0500
+        by vger.kernel.org with ESMTP id S1727647AbgLJMeo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 07:34:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607602957;
+        s=mimecast20190719; t=1607603598;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CbL1hr0MkH3C8eOOjZugT5xr3j1bVGFoTW4KwOXJn84=;
-        b=FADjFgus8Ht8oHvdnM8Xpc8zbTZHP1Ql41t/xNQ1w8gEHQ8Dzft2GHS1HQ56Lr42aVdRv3
-        JnrLXa4cv1zMJtLdDWrUOeVncxg9Bm8XXqSQgU6QhSuwVWl15f/Gh6/6THdwU2iOhkTnLm
-        GM5uESIkjtem5vgp5OGUxRMRXKS0Pt8=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-cpSkmWRHNci6ngzvrg-cyQ-1; Thu, 10 Dec 2020 07:22:35 -0500
-X-MC-Unique: cpSkmWRHNci6ngzvrg-cyQ-1
-Received: by mail-ed1-f70.google.com with SMTP id ca7so2366122edb.12
-        for <kvm@vger.kernel.org>; Thu, 10 Dec 2020 04:22:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CbL1hr0MkH3C8eOOjZugT5xr3j1bVGFoTW4KwOXJn84=;
-        b=UXgIjwE3ShSNd1vutJfsRqhYRV3zCpvXCN3NvdiaNHvmXDTGDKwcQ3TNQ0XtfCfD+c
-         mhAzkIx1iWbl+/YzrZBM0tavDvud548f0AMFDWXbo0bS8eQqM3yfw9egso78hbriiDxX
-         YU3NF9x2gx04iOuYUc+aLajM2NwjkRtmvfjleBIp9NKaNnSXhztpdTrAX6r9xaFYvZNZ
-         YV7PsIAQbJHutePLxwQSZifKdElhu/FS1GPOebnC0l9+AvHqaE6dxc+TLzeUpoo69IZ8
-         nMWb13vbDUU/Wt3bQWlhBLDafgCk3VkIh3EQLmvmbo1IJRlsHc9MTW0X4J/GVe6WdmO+
-         +fTA==
-X-Gm-Message-State: AOAM530pAJXEkk7JoMBcNwRgFBP3IKBI5xjNzmUPmoTnAIyAf0yH3W7F
-        4ZG1Aumws+gLARpxSyUHD5rFY6mCsg9O0SiLuoaRnrvM+7gsbyVBOg4nFYRpV1tpgSgv/I6TCTi
-        Jnb/oe2HPNNTP
-X-Received: by 2002:a17:906:b79a:: with SMTP id dt26mr5915901ejb.337.1607602954585;
-        Thu, 10 Dec 2020 04:22:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxAlEpsTIBduQ0dhGOGwUDMxag4uvl0NcWL+0EXFkE/Un+PxEJA6gX5IQoaqO17v6zbkBdfsA==
-X-Received: by 2002:a17:906:b79a:: with SMTP id dt26mr5915894ejb.337.1607602954422;
-        Thu, 10 Dec 2020 04:22:34 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id d4sm4873994edq.36.2020.12.10.04.22.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Dec 2020 04:22:33 -0800 (PST)
-Subject: Re: [PATCH] tools/kvm_stat: Exempt time-based counters
-To:     Stefan Raspl <raspl@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com
-References: <20201208210829.101324-1-raspl@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <012bef63-9ef4-98d3-5ec7-53ce9bee8643@redhat.com>
-Date:   Thu, 10 Dec 2020 13:22:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        bh=J+KcZJva1JHnm2VE0m2PQnQTxCgdEEnkxtAmetNWcaI=;
+        b=OSBu7q1i2jRRukxQPZKvvtpVfhbDRZDcFg4GtXwp2Y9AFspmUOZuXrytYRt62fapKsgKXo
+        wgpNTzZdPKIvtFB/BgM2ZXVsKGFgNjrdV2hUjiuf96NKeaDc6/tzbgZNZ5y/zDvfsuCDMz
+        tqDgj9m9U2jnbzcmGZn33Y8U/WL5Jvs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-SEh5N4KeNU66XMmL6OwI1g-1; Thu, 10 Dec 2020 07:33:16 -0500
+X-MC-Unique: SEh5N4KeNU66XMmL6OwI1g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E56410A0F44;
+        Thu, 10 Dec 2020 12:33:15 +0000 (UTC)
+Received: from gondolin (ovpn-112-77.ams2.redhat.com [10.36.112.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 55D316F965;
+        Thu, 10 Dec 2020 12:33:09 +0000 (UTC)
+Date:   Thu, 10 Dec 2020 13:33:06 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC 0/4] vfio-pci/zdev: Fixing s390 vfio-pci ISM support
+Message-ID: <20201210133306.70d1a556.cohuck@redhat.com>
+In-Reply-To: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
+References: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20201208210829.101324-1-raspl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/12/20 22:08, Stefan Raspl wrote:
-> From: Stefan Raspl <raspl@de.ibm.com>
-> 
-> The new counters halt_poll_success_ns and halt_poll_fail_ns do not count
-> events. Instead they provide a time, and mess up our statistics. Therefore,
-> we should exclude them.
-> Removal is currently implemented with an exempt list. If more counters like
-> these appear, we can think about a more general rule like excluding all
-> fields name "*_ns", in case that's a standing convention.
-> 
-> Signed-off-by: Stefan Raspl <raspl@linux.ibm.com>
-> Tested-and-reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->   tools/kvm/kvm_stat/kvm_stat | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
-> index d199a3694be8..b0bf56c5f120 100755
-> --- a/tools/kvm/kvm_stat/kvm_stat
-> +++ b/tools/kvm/kvm_stat/kvm_stat
-> @@ -742,7 +742,11 @@ class DebugfsProvider(Provider):
->           The fields are all available KVM debugfs files
->   
->           """
-> -        return self.walkdir(PATH_DEBUGFS_KVM)[2]
-> +        exempt_list = ['halt_poll_fail_ns', 'halt_poll_success_ns']
-> +        fields = [field for field in self.walkdir(PATH_DEBUGFS_KVM)[2]
-> +                  if field not in exempt_list]
-> +
-> +        return fields
->   
->       def update_fields(self, fields_filter):
->           """Refresh fields, applying fields_filter"""
-> 
+On Wed,  9 Dec 2020 15:27:46 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Queued, thanks.
+> Today, ISM devices are completely disallowed for vfio-pci passthrough as
+> QEMU will reject the device due to an (inappropriate) MSI-X check.
+> However, in an effort to enable ISM device passthrough, I realized that the
+> manner in which ISM performs block write operations is highly incompatible
+> with the way that QEMU s390 PCI instruction interception and
+> vfio_pci_bar_rw break up I/O operations into 8B and 4B operations -- ISM
+> devices have particular requirements in regards to the alignment, size and
+> order of writes performed.  Furthermore, they require that legacy/non-MIO
+> s390 PCI instructions are used, which is also not guaranteed when the I/O
+> is passed through the typical userspace channels.
 
-Paolo
+The part about the non-MIO instructions confuses me. How can MIO
+instructions be generated with the current code, and why does changing
+the write pattern help?
+
+> 
+> As a result, this patchset proposes a new VFIO region to allow a guest to
+> pass certain PCI instruction intercepts directly to the s390 host kernel
+> PCI layer for exeuction, pinning the guest buffer in memory briefly in
+> order to execute the requested PCI instruction.
+> 
+> Matthew Rosato (4):
+>   s390/pci: track alignment/length strictness for zpci_dev
+>   vfio-pci/zdev: Pass the relaxed alignment flag
+>   s390/pci: Get hardware-reported max store block length
+>   vfio-pci/zdev: Introduce the zPCI I/O vfio region
+> 
+>  arch/s390/include/asm/pci.h         |   4 +-
+>  arch/s390/include/asm/pci_clp.h     |   7 +-
+>  arch/s390/pci/pci_clp.c             |   2 +
+>  drivers/vfio/pci/vfio_pci.c         |   8 ++
+>  drivers/vfio/pci/vfio_pci_private.h |   6 ++
+>  drivers/vfio/pci/vfio_pci_zdev.c    | 160 ++++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h           |   4 +
+>  include/uapi/linux/vfio_zdev.h      |  33 ++++++++
+>  8 files changed, 221 insertions(+), 3 deletions(-)
+> 
 
