@@ -2,207 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B3DDF2D6C19
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 01:28:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF01C2D6C20
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 01:28:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733200AbgLJXnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 18:43:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59796 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393854AbgLJXnZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 18:43:25 -0500
-X-Gm-Message-State: AOAM531PefE3WuJdQdYsuX+qZT360BEtKKrXqdqbcs3KPxS4z2rfwisD
-        k/enAhyaJzRVuVyhm7K0cMaIS9ucxZ4Q8lL2WiGV3A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607643764;
-        bh=aDUgcrOjJHp0mQjbB5wZvqYkGsM2qYU6k/VAqT3R+WA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=FGp9IaKzuRbglOgmHOQ9u10r1PAKxq7XnvEyrgno+yD7EMzhvrpFCTTmqmM6zr3hL
-         70swxxWYHlGhnNeazzooH5aPD5LM2wnNvBmfe3kH0T614BKdOg1Zuf19En9CdY4+Ka
-         HHWaSxgfsfQiqh5Kq1ctb+Hd4NJffdgAONG0PJeTxLObSF/iyTMBzodFCJLUk0XYrf
-         DeXaHqpaS9NPaIW3KBOzcqy1BuNSo4wTzp6UJIyt6a6FM/P6CVM6ygw82v8VUKYpGm
-         /LAg8+uC1r3pgbNrnHTEID8KGqqUph82lhnwwdocKEIn7FJr+YZIY84jIgW6EQ5x5y
-         ukAH2EJvj2UIg==
-X-Google-Smtp-Source: ABdhPJziwLtAmmpO/LbhskFlxkb1P0wMIysjlNojkf8wrbc3mNp641j73CHEkz/5cnjDHvWhRXkgCyZELNAG2ldvgYw=
-X-Received: by 2002:a1c:1d85:: with SMTP id d127mr10897421wmd.49.1607643762611;
- Thu, 10 Dec 2020 15:42:42 -0800 (PST)
+        id S2394424AbgLJXp2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 18:45:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394426AbgLJXpR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 18:45:17 -0500
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E75C061794
+        for <kvm@vger.kernel.org>; Thu, 10 Dec 2020 15:44:37 -0800 (PST)
+Received: by mail-pg1-x543.google.com with SMTP id w16so5801811pga.9
+        for <kvm@vger.kernel.org>; Thu, 10 Dec 2020 15:44:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :mime-version;
+        bh=g1SDPT6a/nyFvkH1HOjQQzabblTO3UWN2aLImo+cfxM=;
+        b=b9JDy4JmEv/AHWcU0PvO6asgJykeWO4XV039dPaKEH7CcxQJFd2pK3NCB4vsUNDhn6
+         GGR9tHvFnfoFo89JP+jG7TclK4/eoVQ2KutfTGDx97mrgbK+vddqNaNOBzxMCrcAcdDm
+         m3aDwid4LKxuBUv7ule60TmAKuYb60Hw4IRYyipMRDOIz84lcAryoYdqZYTP2tqfU8Sj
+         CVSbmYzX6giwyTTWrjK8MPbpyH2UpZjePDtxa2HBZOTo7cvTurCvgniHeSI/emF68M8R
+         UVfQBwlEP18Q9i9iW44LwjF5mOSB5VuC0VaP5tbNnCH4myyap2C4/QXXZ+qefaUr/yt6
+         dVug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:mime-version;
+        bh=g1SDPT6a/nyFvkH1HOjQQzabblTO3UWN2aLImo+cfxM=;
+        b=KFCKP0QBMejH9COgHjiTtzu9UBRouwgqq31V+58YAl64JrIfBPeS4BmpBm8aEdOO0w
+         q42fB8F9DmrIfp9XdWETUqMe2mC5D0bxm924fRNkxB19t0GZkPgmhmzobQXV2/+KfMnD
+         P/jhnWV/ImEZiMcmxe6RNvvqTeALPRbLH4i9k8YGB6J6umyWN3oTikCfT/8SI1mhLPF8
+         dRUqRE2iQhIEtE29y2Ip3nUp+duJzMCYtAB8Fq8fvpbB6I68T0cUql4Y1GVbq/AcdQGN
+         PUxgdoycLDj5K9JhtqDpwTu08Yy/9YLEemeOrMWPM8AIBUEf0dBlGu/W3qVZpWGp2VeR
+         i2Ig==
+X-Gm-Message-State: AOAM532J57DaJswAuPXyt3t/855hCelO6UwqUKqFWvtHEVTPkqTfrpkL
+        3o3SufpeLcqJPWGmVFcFDS28fg==
+X-Google-Smtp-Source: ABdhPJys1uu7FVwYO4hbjffu3RIHA+ARy0okQqM9r8wqDKhwr//ncETBKoXEYPHvhSyqXh8AWyQ+vw==
+X-Received: by 2002:a17:90a:d494:: with SMTP id s20mr10351423pju.178.1607643876956;
+        Thu, 10 Dec 2020 15:44:36 -0800 (PST)
+Received: from [2620:15c:17:3:4a0f:cfff:fe51:6667] ([2620:15c:17:3:4a0f:cfff:fe51:6667])
+        by smtp.gmail.com with ESMTPSA id z19sm7367692pfa.122.2020.12.10.15.44.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Dec 2020 15:44:36 -0800 (PST)
+Date:   Thu, 10 Dec 2020 15:44:35 -0800 (PST)
+From:   David Rientjes <rientjes@google.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+cc:     Tejun Heo <tj@kernel.org>, Vipin Sharma <vipinsh@google.com>,
+        thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
+        eric.vantassell@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        lizefan@huawei.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        corbet@lwn.net, joro@8bytes.org, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        dionnaglaze@google.com, kvm@vger.kernel.org, x86@kernel.org,
+        cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v3 0/2] cgroup: KVM: New Encryption IDs cgroup
+ controller
+In-Reply-To: <4f7b9c3f-200e-6127-1d94-91dd9c917921@de.ibm.com>
+Message-ID: <5f8d4cba-d3f-61c2-f97-fdb338fec9b8@google.com>
+References: <20201209205413.3391139-1-vipinsh@google.com> <X9E6eZaIFDhzrqWO@mtj.duckdns.org> <4f7b9c3f-200e-6127-1d94-91dd9c917921@de.ibm.com>
 MIME-Version: 1.0
-References: <87h7ow2j91.fsf@nanos.tec.linutronix.de> <301491B7-DEB6-41ED-B8FD-657B864696CF@amacapital.net>
- <87v9db25me.fsf@nanos.tec.linutronix.de> <CALCETrXeXCvbxAuRuLwWoF3-zvjhzzjj46VZ3RfgUEhb0SeK6A@mail.gmail.com>
- <87lfe71e1z.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <87lfe71e1z.fsf@nanos.tec.linutronix.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Thu, 10 Dec 2020 15:42:30 -0800
-X-Gmail-Original-Message-ID: <CALCETrVpW3m45opNRzF-xzuZ6xS90HYo_a74JzACrdj8zutE5w@mail.gmail.com>
-Message-ID: <CALCETrVpW3m45opNRzF-xzuZ6xS90HYo_a74JzACrdj8zutE5w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="1482994552-364622287-1607643875=:399992"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Dec 9, 2020, at 2:14 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
+--1482994552-364622287-1607643875=:399992
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
->
-> But what's more problematic is the basic requirement that time all over
-> the place has to be consistent.
->
-> On machines which use DISTORTED_REALTIME everything _IS_ consistent
-> within the distorted universe they created. It's still inconsistent
-> vs. the outside, but that's unsolvable and none of our problems.
->
-> TLDR: Do not even think about opening pandoras box.
+On Thu, 10 Dec 2020, Christian Borntraeger wrote:
 
-This could be a per-machine/per-vm setting that nonetheless uses the
-same underlying implementation. There are, sadly, lots of people using
-smeared time, and there will probably be VM hosts that simultaneously
-have both styles of guest. Supporting full PV time for both would be
-nice.  Obviously this gets a bit screwy if they are using a paravirt
-fs, but it=E2=80=99s also a problem with NFS, etc. So maybe the nasty corne=
-rs
-could be narrow enough to just say =E2=80=9Cdon=E2=80=99t do that=E2=80=9D.
+> > * However, the boilerplate to usefulness ratio doesn't look too good and I
+> >   wonder whether what we should do is adding a generic "misc" controller
+> >   which can host this sort of static hierarchical counting. I'll think more
+> >   on it.
+> 
+> We first dicussed to have
+> encryption_ids.stat
+> encryption_ids.max
+> encryption_ids.current
+> 
+> and we added the sev in later, so that we can also have tdx, seid, sgx or whatever.
+> Maybe also 2 or more things at the same time.
+> 
+> Right now this code has
+> 
+> encryption_ids.sev.stat
+> encryption_ids.sev.max
+> encryption_ids.sev.current
+> 
+> And it would be trivial to extend it to have
+> encryption_ids.seid.stat
+> encryption_ids.seid.max
+> encryption_ids.seid.current
+> on s390 instead (for our secure guests).
+> 
+> So in the end this is almost already a misc controller, the only thing that we
+> need to change is the capability to also define things other than encryption.*.*
+> And of course we would need to avoid adding lots of random garbage to such a thing.
+> 
+> But if you feel ok with the burden to keep things kind of organized a misc
+> controller would certainly work for the encryption ID usecase as well. 
+> So I would be fine with the thing as is or a misc controlĺer.
+> 
 
->
->> If we want to get fancy, we can make a change that I've contemplated
->> for a while -- we could make t_end explicit and have two copies of all
->> these data structures.  The reader would use one copy if t < t_change
->> and a different copy if t >=3D t_change.
->
-> See below.
->
->> This would allow NTP-like code in usermode to schedule a frequency
->> shift to start at a specific time.
->
-> That's an orthogonal problem and can be done without changing the
-> reader side.
+Yeah, I think generalization of this would come in the form of either (1) 
+the dumping ground of an actual "misc" controller, that you elude to, or 
+(2) a kernel abstraction so you can spin up your own generic controller 
+that has the {current, max, stat} support.  In the case of the latter, 
+encryption IDs becomes a user of that abstraction.
 
-Really?  Right now, the switch happens whenever the kernel takes the
-seqlock, which it doesn=E2=80=99t have exact control over. But I meant
-something a little different:
+Concern with a single misc controller would be that any subsystem that 
+wants to use it has to exactly fit this support: current, max, stat, 
+nothing more.  The moment a controller needs some additional support, and 
+its controller is already implemented in previous kernel versionv as a 
+part of "misc," we face a problem.
 
->
->> With some care, it would also allow the timekeeping code to update the
->> data structures without causing clock_gettime() to block while the
->> timekeeping code is running on a different CPU.
->
-> It still has to block, i.e. retry, because the data set becomes invalid
-> when t_end is reached. So the whole thing would be:
->
->       do {
->               seq =3D read_seqcount_latch();
->                data =3D select_data(seq);
->                delta =3D read_clocksource() - data->base;
->                if (delta >=3D data->max_delta)
->                    continue;
->                ....
->      } while (read_seqcount_latch_retry());
->
-> TBH, I like the idea for exactly one reason: It increases robustness.
-
-I like the max_delta for robustness, too.
-
-What do you have in mind for select_data()?  Is the idea that
-select_data() returns something like &data[seq & 1]?
-
-But I actually meant something a little bit different: you would use
-delta >=3D data->max_delta as an indication that you need to look at the
-other copy.  Perhaps the lower three bits of the seqcount would work
-like:
-
-00: both copies are valid, but start with the first copy.
-10: only the first copy is valid.
-01: both copies are valid, but start with the second copy.
-11: only the second copy is valid
-
-You'd read it like this (with all the bugs that I surely have fixed);
-
-do {
-  seq =3D read_seqcount();
-  data =3D &data_array[seq & 1];
-  clock =3D read_clocksource();
-  delta =3D clock - data->base;
-  if (delta->data->max_delta) {
-    if (seq & 2)
-      continue;
-    data =3D &data_array[(seq + 1) & 1];  // <-- the other copy
-    delta =3D clock - data->base;
-    if (delta >=3D data->max_delta)
-      continue;
-  }
-  ...;
-} while (seq =3D=3D read_seqcount());
-
-This has two main benefits.  First, it allows the timekeeping code to
-run concurrently with readers, which is nice for tail latency --
-readers would only ever need to spin if the timekeeper falls behind,
-intentionally disables both copies, or somehow manages to run one
-iteration for each reader attempt and livelocks the reader.  The
-latter is very unlikely.)  Second, it allows the timekeeping code to
-literally schedule an update to occur at a precise clocksource tick,
-which seems to be like it could make the timekeeping code simpler and
-more robust.
-
-(If the timekeeper wants to simultaneously disable both copies, it
-sets one copy's max_delta to zero and uses seq to disable the other
-copy.)
-
---Andy
-
-
-
-
-
-
->
-> For X86 we already have the comparison for dealing with TSC < base
-> which would be covered by
->
->                if (delta >=3D data->max_delta)
->                    continue;
->
-> automatically. Non X86 gains this extra conditional, but I think it's
-> worth to pay that price.
->
-> It won't solve the VM migration problem on it's own though. You still
-> have to be careful about the inner workings of everything related to
-> timekeeping itself.
->
->> One other thing that might be worth noting: there's another thread
->> about "vmgenid".  It's plausible that it's worth considering stopping
->> the guest or perhaps interrupting all vCPUs to allow it to take some
->> careful actions on migration for reasons that have nothing to do with
->> timekeeping.
->
-> How surprising. Who could have thought about that?
->
-> OMG, virtualization seems to have gone off into a virtual reality long
-> ago.
->
-> Thanks,
->
->        tglx
->
+On the other hand, a kernel abstraction that provides just the basic 
+{current, max, stat} support might be interesting if it can be extended by 
+the subsystem instance using it.
+--1482994552-364622287-1607643875=:399992--
