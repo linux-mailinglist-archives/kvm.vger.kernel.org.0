@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAA202D640F
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 18:51:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4CC12D6408
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 18:50:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392953AbgLJRuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 12:50:46 -0500
-Received: from mail-bn8nam11on2059.outbound.protection.outlook.com ([40.107.236.59]:9021
+        id S2392635AbgLJROa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 12:14:30 -0500
+Received: from mail-bn8nam11on2055.outbound.protection.outlook.com ([40.107.236.55]:12128
         "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2392564AbgLJRNz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 12:13:55 -0500
+        id S2392618AbgLJROR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 12:14:17 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P58n4UzuYk9QQLLji1HG8vI9DaGqrtPC7CmS2wyw4bZMgSWvHP6zQq8FTCsbzh0V8INE0BPTKLAZU3Tai0Yr7mo+9Qn4kqqoIXBuqSJ5djPrTYFIVAEPesWj1ekn/hDw5MrXy8wSptN/eZR3zNqCbN99NGikVeTcSEfkJxTDH0xUT61REHhhv7gj6/UkTZxC8O0RYWCsS9pVBYuTML40PW/wt7bxM1VZS59rvn3pY9vQ4GFCUkjoNEnQdWaIV04dk4Ao2z478DfkASAhf4IggQIVL0/WHAwsn1UBjs0PUMT3zxYemhTiqkx/k2iC3wTZwr3EW3ObW4xH18NE1xJnOw==
+ b=PoCJc2n18RixN97LKA+h7v+kpmLIHqrb2zA/+GW2GLic4WRVQsP1Uq2C56VpUmxclkQ56hpj7Z7DCoKlMR/2PbbqH56dH6rERO8q8A9JjElxs+WwXBZHqcfbcXrtPLF/uh+2jKi60KC45CmE3kbP/6hgCvGIw82iFBZan0gAodGjO3dbZjIEY7BEdKmEyuEOWpKfXnr9XojkG9mdXS/Gq8ZZL5CpR7kV1nuoYV/DWHO93tyFQg0EmyHIwlQrbXpgXoK0EmN/eeCq6sTkxdu7+aOpCU/LyMtf9rGihk4vTyxgIjlSyrEAItMpMxSUJx78Ut8/w4bf5UnoN/ap0tycLw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=65vd2SCR7CxcVYHAZDS/7uCBTD0tZyJR+ANoP2eCmpg=;
- b=C+rpn0C8L6tg0WF/Ohidg7HAnsvgoCKrLcQMurF0B6l/yHfiS6rF2TrlYG6NciDqcyFEszDeGuVZ0yJXqp+sc5h+O+4IHMnCsWqaWybW1H+lwwCImF5zZEA+87Fbz/HdZTXBrr5jwOVfd8MCRB6YuoovAnMRd4qZnz/+j13e+ji4FZY+dMHICOrtPklQ+0fDjdNeyCyIvD84jUZXe70WaozCLtC94t62YnDJzWTkSVUdEPptlGjC+G/HLJRrCn2oxwBzkb97AYDhu725r+JoRDRrZ4gRmOcJ+SmS5O1iw8A54nuavjTiD/anVAFwY2B2XyTgZnMR5iVgtAGjKtGtSg==
+ bh=VyVPVr88IIWm4PKBln0zfj5IfY+l/4IqCXXFghal0Ng=;
+ b=E6xF+cWqk36SaQElySwA33xswRdtYE6SHn1SV/x40wTE9Q8ydxoSCg6Xhfesk04qvjdXiFiP1RXLysbJxUv77dtPcbRmLqN3HTLISlTVnZmkZNOo7xNMcxOVWG9UOdPBNuJjEioDtgEnDvI386nWOb+sEK3/uRfBX8NEQ4uoeTE7XaksIXBqSdP1DSSdD4SzbFs8vZhRH5QsYkDSKbPVIqvxsylDrXveJdznTQF1FEIG45NSGq4Y/R2wxmN4dczbT8VLbJJ70nqhuQ78q4YTpTfgJqujzcjmljsFowz60dg2QGacQ0DU97Yrlfq5Bm+Vwv44ko3ew6MB1L90y0hT4g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=65vd2SCR7CxcVYHAZDS/7uCBTD0tZyJR+ANoP2eCmpg=;
- b=eS2lGmOIYaXh2HnqkyETsk+t1/QpcJ1dpMz3aznihj16umvyPgJkS/msteFBuLblWjzOxuJqymm2n6bPOImrbFULIphVcAkg+Zwnh6z/md3ZCFTqLo9q7s38AoDeWTB2H/dst5dcmvVpuAMf0nMXPewrxhsBM57Lu35s2B7z4oM=
+ bh=VyVPVr88IIWm4PKBln0zfj5IfY+l/4IqCXXFghal0Ng=;
+ b=QgxqgHTEPIR8WSd9FkGniAku4pFGCR+xzVYqm9K+4+m0sdBKgakj0PZnrtckdlt/3Wll5wKLJgUJQyPsUF/dbOL+nLfHi+Q0qnMg/58u2jGSDJ0lM4eqMQNFHWwmNF2k9z5SzFJXLqe55/FA7eMSbs70I3DNZGldRheJs5DqVcM=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
  by CY4PR1201MB0149.namprd12.prod.outlook.com (2603:10b6:910:1c::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12; Thu, 10 Dec
- 2020 17:12:40 +0000
+ 2020 17:12:49 +0000
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::a10a:295e:908d:550d]) by CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::a10a:295e:908d:550d%8]) with mapi id 15.20.3632.021; Thu, 10 Dec 2020
- 17:12:40 +0000
+ 17:12:49 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,60 +49,60 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v5 16/34] KVM: SVM: Add support for SEV-ES GHCB MSR protocol function 0x100
-Date:   Thu, 10 Dec 2020 11:09:51 -0600
-Message-Id: <f3a1f7850c75b6ea4101e15bbb4a3af1a203f1dc.1607620209.git.thomas.lendacky@amd.com>
+Subject: [PATCH v5 17/34] KVM: SVM: Create trace events for VMGEXIT MSR protocol processing
+Date:   Thu, 10 Dec 2020 11:09:52 -0600
+Message-Id: <c5b3b440c3e0db43ff2fc02813faa94fa54896b0.1607620209.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1607620209.git.thomas.lendacky@amd.com>
 References: <cover.1607620209.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH2PR10CA0007.namprd10.prod.outlook.com
- (2603:10b6:610:4c::17) To CY4PR12MB1352.namprd12.prod.outlook.com
+X-ClientProxiedBy: CH2PR18CA0023.namprd18.prod.outlook.com
+ (2603:10b6:610:4f::33) To CY4PR12MB1352.namprd12.prod.outlook.com
  (2603:10b6:903:3a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by CH2PR10CA0007.namprd10.prod.outlook.com (2603:10b6:610:4c::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12 via Frontend Transport; Thu, 10 Dec 2020 17:12:39 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by CH2PR18CA0023.namprd18.prod.outlook.com (2603:10b6:610:4f::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12 via Frontend Transport; Thu, 10 Dec 2020 17:12:48 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 74adb1e8-5107-4810-16b6-08d89d2ecd06
+X-MS-Office365-Filtering-Correlation-Id: 3cffb790-d1b6-4ab6-ab45-08d89d2ed24d
 X-MS-TrafficTypeDiagnostic: CY4PR1201MB0149:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR1201MB0149F676839815B1432D33EAECCB0@CY4PR1201MB0149.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB01497F76CB75E203C2106133ECCB0@CY4PR1201MB0149.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NPu2FGsHyzbga8D19s/bzNGeQtgUQTDvtZHyW2e7E4Fn8Eh9CC33z6MXD/Tanzh0L+DlQJb4VyvqbB3Ne5Bq/X9YQyhjpc2Q36yJD7+R/pywR9Mw0vv2GE3oNa4vs7DYPm2q1c8LrpTOdZVqSJfbQiT/R0GkGfq22idrssWWODno/QteR4nJV6Cgv5zzsnUvYYpi6JaTvALEjoCk+kxqEIDxRhjTCVk6p9WxnkT0uiAqzRYtL38O4/rIE1V1GPHbAZIhmeb2I1SABS40TTvUivQPkmsKgqBunOQSTywkaEXxhU48Y1CG9Mhmum5ERiC1gcBF8WtFtpkqh/j+S16Fk2n3dpbil8vuHkdoUcrCVMichrTe3WEUxXzS2uoQn47W
+X-Microsoft-Antispam-Message-Info: M0GZUB6aDp+aK0aiuz479xS6cUNyXnO8YgTpNK7ICZfzRP1DsaxxWZri6uCAq79pjhzUWEONRyTPUvYMjes54OdVwHV0JcFKm3cKfffMx1moRTScHDBfl9xYNCMEtxRxMyUpCL3toCLLB0uzp74jVIICkmOGr8UwWH76+ti0FVURzogkGpi7QTpfWonQ8b7L0PdyuSLv4zRfNfDPEMXWd+dM2uEnkiXSUThxBFzky9fnm3Ug1FUDOV2ZxTipWD++dM/mS3NODP7+C5xUWcSGR3UEJZhmX+1iQFMKcPLqkbgfDlV2UWZUVm+5cqoI952u7LCMB8uWMjYkT9TWD/bahr2aK4rgg+xRWppzOvPp4MOctwWYlYuYd/7lWZvkGU9k
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(376002)(366004)(2906002)(5660300002)(6666004)(26005)(52116002)(186003)(83380400001)(16526019)(54906003)(6486002)(956004)(2616005)(8936002)(7696005)(508600001)(66946007)(66476007)(36756003)(8676002)(86362001)(34490700003)(4326008)(7416002)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?eax+bFFcHnWJnIzktXIEvwDTwFHy+1mQPqOmgxqLK5DpPzTyV4oO/9PqIq8H?=
- =?us-ascii?Q?3Pd9DVMVxJpsBNW2C048q2wy0szNnSGVIhEHfUBIYrguKhOMcHhWyPFeqF9r?=
- =?us-ascii?Q?egIn7TzVByerQ333sLYyEudgP9HE1pTxAGQq4ACuPsFhJVNLQzodFpMJaN0J?=
- =?us-ascii?Q?fdojnD5UucLyy4MlUTJHo41kYV1vUwLmupVCrGWmBPC8jKLkB+4Skx+NDwhG?=
- =?us-ascii?Q?CdGcJ0l7gFoZtglfdO4BJAOpFRsvl1fpn6tkZqdsdIc7v1W2fqQmdzuP66Ed?=
- =?us-ascii?Q?cUK4bZ10rtT1PDSAo4dAYxXJXd64PoDwvRLCto9z5qN2pr0+7M9PT0mwXA/B?=
- =?us-ascii?Q?fUoDy+y/T7bNnj4bJ66kHQw9zUTMlORe1RWGCOP+VSjmtUWIfU3Ll2l/pGzZ?=
- =?us-ascii?Q?BNOFS5Obuvc92BWaU2EZvdhago2D4wwxQ4rMilhbhdB3kG1ekCLiWxyGxS9G?=
- =?us-ascii?Q?BcnCmM5caJKSt91q/l3nZ1q1fabZMg255z+r+DKunSI4Enl6RXpYAKE2hJ/t?=
- =?us-ascii?Q?2/QTY0l6kf4so8gjY1S+wKxLAaxeGO+hpa2NZGP9tmvkoncfFZf2njyNt0TA?=
- =?us-ascii?Q?Um631QO3VzT+OLvzAuHCE/8IblA97XesujK7RR5BbgMrxT3l66yhTVadIBOp?=
- =?us-ascii?Q?GOhAw4SMiibvM4acJ/2O+JUuY8u16QflZzjdhSYvhiaiB5PXqFjOc54P596B?=
- =?us-ascii?Q?VDYAf1f0HIsuKO1rQ6EM0x7aH1Ar12K+RUn5jg/xQsPItgW7+5cGNSsk6yEn?=
- =?us-ascii?Q?y0KbSC4gbNwsuVaotIbeS1VaJtd/2orM1IwhPcNp49lgrVcllsn3PddhqDbJ?=
- =?us-ascii?Q?uBFa/1hFRR60jPIgfZliC+JfyR5g0O7eTRD7vAYB+6hLJhOxTuenz4vArevK?=
- =?us-ascii?Q?3MXCLigvoFLIbPfeI47yuviPnTEIdZ7h6ylr5xtz+KydV7/25uOfE6GDxTvo?=
- =?us-ascii?Q?AFseB4aWn7oeI2PEk4TFpdkDjMHgfwJMP1gA/MZILZxHXRsyLtvlvA/uWC0+?=
- =?us-ascii?Q?ZV/x?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?JNIbDF9ptgYYXpN/y32mytQX9b6sRjJ4+GqWQr+QIhzRtZvG9n7ErlkyJ4vk?=
+ =?us-ascii?Q?PjPB0YgCPzmnht/L/Dh3tpD88Bw4gprA6iAkU3NavUXaqLENy0K1gzTSTpn9?=
+ =?us-ascii?Q?TmlG6hY+nfZQfoP+GRmVpp7/Y9EIc9YPxePiMnc6eOGLDceo5DLAuu/NLIJ2?=
+ =?us-ascii?Q?Kh5tBrvCLY6btnTuUIxs8fXHKvhceHdGg9vZB7UqW4iDZZujqEzsd0ka3B39?=
+ =?us-ascii?Q?7QsuGHLCO0mdz9PIMlUsnP8i4X+8ck9GrD9nPALSs4QcLKe4EAxj2eIgVVEb?=
+ =?us-ascii?Q?ktKhZTKZP3tiVG1n6D7fFc/a6SNl1TbNTL0kfCU4ee2FqpQ/PRu5qbnyJdEz?=
+ =?us-ascii?Q?zgXgA3bsJolNGScsd2CJb32J+wTJ07utqAGbEAFG3JOSQ2POb6Kid1GKfOXn?=
+ =?us-ascii?Q?tXdGrBAzDYLquyBE2ONdr+iwVSqXDJ0in14sVDrk6wMF0bH7RezNIcBNeSQm?=
+ =?us-ascii?Q?hGeIAnILoPHlHqELN1yFu79cvywIAl3Hwkupp1p6kR2fRkj1fYKna7s/xFVp?=
+ =?us-ascii?Q?u5xFW9Wtmq0Jh0X5vgavZtekMYEFIihn5XqKF4kx0PbDBoaI37mKTnp1oyUg?=
+ =?us-ascii?Q?VOHkKa/u86ubs/0Hnot0pzGhtKAaniFrIG+9gSgR/e0H1Nvc0klov7oK/R13?=
+ =?us-ascii?Q?BMAFBXnLuRxgaPtZh+nsBpIPyLWUh7O7WOYhed08m+aFqmiGwcKzWfAuH8DX?=
+ =?us-ascii?Q?gnl33CmOcpKkI7pLcoXRwuMaz678BH5EGpRTltsuXULxzzo84OBfVw9zbF6W?=
+ =?us-ascii?Q?0lGntF6SR5epEYokHppCwXaacTFang2WCY6TPjpEF3AGjJX/4PE9ORDNMSBm?=
+ =?us-ascii?Q?+QoDHxijLuOlqfCXism+92KoHyIk9pTkmhP0od/ZYUqYE60FKvcbiF/Sp0Ha?=
+ =?us-ascii?Q?RBldAPJlBjqOsf3hkH//yEbDsFiJGuQpi3KRXZKUY+/x8j8thEWOEsih7rxP?=
+ =?us-ascii?Q?vQU1AlzYpBrMooh5S+b2xOMyS8WhLBe69gDITVETWVL9XVuTgSA7RXXRsTGW?=
+ =?us-ascii?Q?BDwE?=
 X-OriginatorOrg: amd.com
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1352.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2020 17:12:40.5010
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2020 17:12:49.4047
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74adb1e8-5107-4810-16b6-08d89d2ecd06
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3cffb790-d1b6-4ab6-ab45-08d89d2ed24d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qOKsNkDEYRUGUtJbeO2proyL6Uuk4Vjlb8QqPzA3EZr2CuSU7mf6l3vhrLfhjOHEQ20oSzArZfa0oB+8zsMtnA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: SZ8QhLrS1jDO+TdxYS2agGq57EBR7TQN6CYFWWDMxeT7OmwNTtMUr401TKxM3/HTKvca2EKywEQZIBYSuCTn/g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0149
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -110,61 +110,109 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-The GHCB specification defines a GHCB MSR protocol using the lower
-12-bits of the GHCB MSR (in the hypervisor this corresponds to the
-GHCB GPA field in the VMCB).
-
-Function 0x100 is a request for termination of the guest. The guest has
-encountered some situation for which it has requested to be terminated.
-The GHCB MSR value contains the reason for the request.
+Add trace events for entry to and exit from VMGEXIT MSR protocol
+processing. The vCPU will be common for the trace events. The MSR
+protocol processing is guided by the GHCB GPA in the VMCB, so the GHCB
+GPA will represent the input and output values for the entry and exit
+events, respectively. Additionally, the exit event will contain the
+return code for the event.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 13 +++++++++++++
- arch/x86/kvm/svm/svm.h |  6 ++++++
- 2 files changed, 19 insertions(+)
+ arch/x86/kvm/svm/sev.c |  6 ++++++
+ arch/x86/kvm/trace.h   | 44 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c     |  2 ++
+ 3 files changed, 52 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 53bf3ff1d9cc..c2cc38e7400b 100644
+index c2cc38e7400b..2e2548fa369b 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -1574,6 +1574,19 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 				  GHCB_MSR_INFO_POS);
- 		break;
- 	}
-+	case GHCB_MSR_TERM_REQ: {
-+		u64 reason_set, reason_code;
+@@ -1530,6 +1530,9 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 
+ 	ghcb_info = control->ghcb_gpa & GHCB_MSR_INFO_MASK;
+ 
++	trace_kvm_vmgexit_msr_protocol_enter(svm->vcpu.vcpu_id,
++					     control->ghcb_gpa);
 +
-+		reason_set = get_ghcb_msr_bits(svm,
-+					       GHCB_MSR_TERM_REASON_SET_MASK,
-+					       GHCB_MSR_TERM_REASON_SET_POS);
-+		reason_code = get_ghcb_msr_bits(svm,
-+						GHCB_MSR_TERM_REASON_MASK,
-+						GHCB_MSR_TERM_REASON_POS);
-+		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
-+			reason_set, reason_code);
-+		fallthrough;
-+	}
- 	default:
+ 	switch (ghcb_info) {
+ 	case GHCB_MSR_SEV_INFO_REQ:
+ 		set_ghcb_msr(svm, GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
+@@ -1591,6 +1594,9 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
  		ret = -EINVAL;
  	}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 9dd8429f2b27..fc69bc2e0cad 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -543,6 +543,12 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
- #define GHCB_MSR_CPUID_REG_POS		30
- #define GHCB_MSR_CPUID_REG_MASK		0x3
  
-+#define GHCB_MSR_TERM_REQ		0x100
-+#define GHCB_MSR_TERM_REASON_SET_POS	12
-+#define GHCB_MSR_TERM_REASON_SET_MASK	0xf
-+#define GHCB_MSR_TERM_REASON_POS	16
-+#define GHCB_MSR_TERM_REASON_MASK	0xff
++	trace_kvm_vmgexit_msr_protocol_exit(svm->vcpu.vcpu_id,
++					    control->ghcb_gpa, ret);
 +
- extern unsigned int max_sev_asid;
+ 	return ret;
+ }
  
- static inline bool svm_sev_enabled(void)
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index 7da931a511c9..2de30c20bc26 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -1631,6 +1631,50 @@ TRACE_EVENT(kvm_vmgexit_exit,
+ 		  __entry->info1, __entry->info2)
+ );
+ 
++/*
++ * Tracepoint for the start of VMGEXIT MSR procotol processing
++ */
++TRACE_EVENT(kvm_vmgexit_msr_protocol_enter,
++	TP_PROTO(unsigned int vcpu_id, u64 ghcb_gpa),
++	TP_ARGS(vcpu_id, ghcb_gpa),
++
++	TP_STRUCT__entry(
++		__field(unsigned int, vcpu_id)
++		__field(u64, ghcb_gpa)
++	),
++
++	TP_fast_assign(
++		__entry->vcpu_id  = vcpu_id;
++		__entry->ghcb_gpa = ghcb_gpa;
++	),
++
++	TP_printk("vcpu %u, ghcb_gpa %016llx",
++		  __entry->vcpu_id, __entry->ghcb_gpa)
++);
++
++/*
++ * Tracepoint for the end of VMGEXIT MSR procotol processing
++ */
++TRACE_EVENT(kvm_vmgexit_msr_protocol_exit,
++	TP_PROTO(unsigned int vcpu_id, u64 ghcb_gpa, int result),
++	TP_ARGS(vcpu_id, ghcb_gpa, result),
++
++	TP_STRUCT__entry(
++		__field(unsigned int, vcpu_id)
++		__field(u64, ghcb_gpa)
++		__field(int, result)
++	),
++
++	TP_fast_assign(
++		__entry->vcpu_id  = vcpu_id;
++		__entry->ghcb_gpa = ghcb_gpa;
++		__entry->result   = result;
++	),
++
++	TP_printk("vcpu %u, ghcb_gpa %016llx, result %d",
++		  __entry->vcpu_id, __entry->ghcb_gpa, __entry->result)
++);
++
+ #endif /* _TRACE_KVM_H */
+ 
+ #undef TRACE_INCLUDE_PATH
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d89736066b39..ba26b62e0262 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11323,3 +11323,5 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_ga_log);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_apicv_update_request);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_enter);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
 -- 
 2.28.0
 
