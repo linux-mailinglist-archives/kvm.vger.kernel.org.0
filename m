@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0A712D61B3
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 17:25:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FF232D6127
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 17:06:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389250AbgLJQZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 11:25:05 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33716 "EHLO mail.kernel.org"
+        id S2392276AbgLJQFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 11:05:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34590 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389616AbgLJQFk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 11:05:40 -0500
+        id S2392273AbgLJQFx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 11:05:53 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CD69223DE8;
-        Thu, 10 Dec 2020 16:04:50 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4D8E923E51;
+        Thu, 10 Dec 2020 16:05:21 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1knONq-0008Di-RZ; Thu, 10 Dec 2020 16:01:35 +0000
+        id 1knONr-0008Di-Mu; Thu, 10 Dec 2020 16:01:36 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -32,9 +32,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v3 63/66] KVM: arm64: nv: Allocate VNCR page when required
-Date:   Thu, 10 Dec 2020 15:59:59 +0000
-Message-Id: <20201210160002.1407373-64-maz@kernel.org>
+Subject: [PATCH v3 64/66] KVM: arm64: nv: Enable ARMv8.4-NV support
+Date:   Thu, 10 Dec 2020 16:00:00 +0000
+Message-Id: <20201210160002.1407373-65-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -48,69 +48,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If running a NV guest on an ARMv8.4-NV capable system, let's
-allocate an additional page that will be used by the hypervisor
-to fulfill system register accesses.
+As all the VNCR-capable system registers are nicely separated
+from the rest of the crowd, let's set HCR_EL2.NV2 on and let
+the ball rolling.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 ++-
- arch/arm64/kvm/nested.c           | 8 ++++++++
- arch/arm64/kvm/reset.c            | 1 +
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h     |  1 +
+ arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
+ arch/arm64/include/asm/sysreg.h      |  1 +
+ arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
+ 4 files changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 78630bd5124d..dada0678c28e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -523,7 +523,8 @@ struct kvm_vcpu_arch {
-  */
- static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 0d88a7c51dec..37cd86aac727 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -14,6 +14,7 @@
+ /* Hyp Configuration Register (HCR) bits */
+ #define HCR_ATA		(UL(1) << 56)
+ #define HCR_FWB		(UL(1) << 46)
++#define HCR_NV2		(UL(1) << 45)
+ #define HCR_AT		(UL(1) << 44)
+ #define HCR_NV1		(UL(1) << 43)
+ #define HCR_NV		(UL(1) << 42)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 44b395854430..3afe937b81f1 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -242,21 +242,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+ 
+ static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
  {
--	if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
-+	if (unlikely(cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
-+		     r >= __VNCR_START__ && ctxt->vncr_array))
- 		return &ctxt->vncr_array[r - __VNCR_START__];
- 
- 	return (u64 *)&ctxt->sys_regs[r];
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index eef8f9873814..88147ec99755 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -47,6 +47,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
- 		return -EINVAL;
- 
-+	if (cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
-+		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
-+		if (!vcpu->arch.ctxt.vncr_array)
-+			return -ENOMEM;
-+	}
+-	if (!__vcpu_el2_e2h_is_set(ctxt)) {
+-		/*
+-		 * Clear the .M field when writing SPSR to the CPU, so that we
+-		 * can detect when the CPU clobbered our SPSR copy during a
+-		 * local exception.
+-		 */
+-		val &= ~0xc;
+-	}
++	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
 +
- 	mutex_lock(&kvm->lock);
++	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
++		return val;
  
- 	/*
-@@ -64,6 +70,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
- 			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
- 			kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
-+			free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
-+			vcpu->arch.ctxt.vncr_array = NULL;
- 		} else {
- 			kvm->arch.nested_mmus_size = num_mmus;
- 			ret = 0;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 2d2c780e6c69..d281eb39036f 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -150,6 +150,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
- void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
- 	kfree(vcpu->arch.sve_state);
-+	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+-	return val;
++	/*
++	 * Clear the .M field when writing SPSR to the CPU, so that we
++	 * can detect when the CPU clobbered our SPSR copy during a
++	 * local exception.
++	 */
++	return val &= ~0xc;
  }
  
- static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+ static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
+ {
+-	if (__vcpu_el2_e2h_is_set(ctxt))
++	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
++
++	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+ 		return val;
+ 
+ 	/*
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index d047954400d4..4cb55cf3c1d9 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -487,6 +487,7 @@
+ #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+ #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+ #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
++#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+ 
+ #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 4d80596e32a5..6d57d09b8503 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -48,7 +48,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			 * the EL1 virtual memory control register accesses
+ 			 * as well as the AT S1 operations.
+ 			 */
+-			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
++			if (enhanced_nested_virt_in_use(vcpu)) {
++				hcr &= ~HCR_TVM;
++			} else {
++				hcr |= HCR_TVM | HCR_TRVM | HCR_TTLB;
++			}
++
++			hcr |= HCR_AT | HCR_NV1;
+ 		} else {
+ 			/*
+ 			 * For a guest hypervisor on v8.1 (VHE), allow to
+@@ -80,6 +86,12 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			if (!vcpu_el2_tge_is_set(vcpu))
+ 				hcr |= HCR_AT | HCR_TTLB;
+ 		}
++
++		if (enhanced_nested_virt_in_use(vcpu)) {
++			hcr |= HCR_AT | HCR_TTLB | HCR_NV2;
++			write_sysreg_s(vcpu->arch.ctxt.vncr_array,
++				       SYS_VNCR_EL2);
++		}
+ 	} else if (nested_virt_in_use(vcpu)) {
+ 		hcr |= __vcpu_sys_reg(vcpu, HCR_EL2);
+ 	}
 -- 
 2.29.2
 
