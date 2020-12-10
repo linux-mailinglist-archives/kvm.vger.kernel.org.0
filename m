@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 761F32D61F9
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 17:33:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1382D61ED
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 17:33:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391310AbgLJQco (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 11:32:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33732 "EHLO mail.kernel.org"
+        id S2392409AbgLJQbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 11:31:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33716 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389812AbgLJQEv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 11:04:51 -0500
+        id S2391517AbgLJQFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 11:05:08 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DAFB923E24;
-        Thu, 10 Dec 2020 16:03:43 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2A10423EB0;
+        Thu, 10 Dec 2020 16:04:00 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1knOMz-0008Di-KD; Thu, 10 Dec 2020 16:00:41 +0000
+        id 1knON7-0008Di-I8; Thu, 10 Dec 2020 16:00:50 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -31,77 +31,77 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH v3 15/66] KVM: arm64: nv: Handle HCR_EL2.E2H specially
-Date:   Thu, 10 Dec 2020 15:59:11 +0000
-Message-Id: <20201210160002.1407373-16-maz@kernel.org>
+        kernel-team@android.com, Jintack Lim <jintack.lim@linaro.org>
+Subject: [PATCH v3 20/66] KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+Date:   Thu, 10 Dec 2020 15:59:16 +0000
+Message-Id: <20201210160002.1407373-21-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, jintack.lim@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HCR_EL2.E2H is nasty, as a flip of this bit completely changes the way
-we deal with a lot of the state. So when the guest flips this bit
-(sysregs are live), do the put/load dance so that we have a consistent
-state.
+From: Jintack Lim <jintack.lim@linaro.org>
 
-Yes, this is slow. Don't do it.
+For the same reason we trap virtual memory register accesses in virtual
+EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
+access EL1 system register state instead of the virtual EL2 one.
 
-Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h | 2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c  | 3 +++
+ arch/arm64/kvm/sys_regs.c        | 2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 4cf745f79985..3bd29fd01d80 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -269,7 +269,7 @@
+ #define CPTR_EL2_TFP_SHIFT 10
+ 
+ /* Hyp Coprocessor Trap Register */
+-#define CPTR_EL2_TCPAC	(1 << 31)
++#define CPTR_EL2_TCPAC	(1U << 31)
+ #define CPTR_EL2_TAM	(1 << 30)
+ #define CPTR_EL2_TTA	(1 << 20)
+ #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 3d8a4402b52c..66358f8ec5ad 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -68,6 +68,9 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
+ 
++	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
++		val |= CPTR_EL2_TCPAC;
++	
+ 	write_sysreg(val, cpacr_el1);
+ 
+ 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 77a2d452b79d..e7db4d809674 100644
+index 5185f148f25e..4410d399f8e2 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -183,9 +183,24 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		goto memory_write;
+@@ -1736,7 +1736,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
- 	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-+		bool need_put_load;
-+
- 		if (!is_hyp_ctxt(vcpu))
- 			goto memory_write;
+ 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+ 	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
+-	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
++	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
  
-+		/*
-+		 * HCR_EL2.E2H is nasty: it changes the way we interpret a
-+		 * lot of the EL2 state, so treat is as a full state
-+		 * transition.
-+		 */
-+		need_put_load = ((reg == HCR_EL2) &&
-+				 vcpu_el2_e2h_is_set(vcpu) != !!(val & HCR_E2H));
-+
-+		if (need_put_load) {
-+			preempt_disable();
-+			kvm_arch_vcpu_put(vcpu);
-+		}
-+
- 		/*
- 		 * Always store a copy of the write to memory to avoid having
- 		 * to reverse-translate virtual EL2 system registers for a
-@@ -193,6 +208,11 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		 */
- 		__vcpu_sys_reg(vcpu, reg) = val;
- 
-+		if (need_put_load) {
-+			kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+			preempt_enable();
-+		}
-+
- 		switch (reg) {
- 		case ELR_EL2:
- 			write_sysreg_el1(val, SYS_ELR);
+ 	{ SYS_DESC(SYS_RGSR_EL1), undef_access },
+ 	{ SYS_DESC(SYS_GCR_EL1), undef_access },
 -- 
 2.29.2
 
