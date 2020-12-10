@@ -2,202 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABCCE2D64E7
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 19:27:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C99682D65A0
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 19:56:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392350AbgLJS1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 13:27:03 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:41584 "EHLO vps-vb.mhejs.net"
+        id S2390508AbgLJObf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 09:31:35 -0500
+Received: from foss.arm.com ([217.140.110.172]:45084 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389529AbgLJS05 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 13:26:57 -0500
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.93.0.4)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1knQdO-0004dA-3B; Thu, 10 Dec 2020 19:25:46 +0100
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: mmu: Fix SPTE encoding of MMIO generation upper half
-Date:   Thu, 10 Dec 2020 19:25:40 +0100
-Message-Id: <85d2d9f31ff693cf39e787af3ec5fe599cb66c5e.1607624644.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.29.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S2390494AbgLJOb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 09:31:26 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8BD9152D;
+        Thu, 10 Dec 2020 06:29:41 -0800 (PST)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ACA5C3F718;
+        Thu, 10 Dec 2020 06:29:40 -0800 (PST)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Marc Zyngier <maz@kernel.org>
+Subject: [PATCH kvmtool 15/21] vfio: Refactor ioport trap handler
+Date:   Thu, 10 Dec 2020 14:29:02 +0000
+Message-Id: <20201210142908.169597-16-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201210142908.169597-1-andre.przywara@arm.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+With the planned retirement of the special ioport emulation code, we
+need to provide an emulation function compatible with the MMIO prototype.
 
-Commit cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
-cleaned up the computation of MMIO generation SPTE masks, however it
-introduced a bug how the upper part was encoded:
-SPTE bits 52-61 were supposed to contain bits 10-19 of the current
-generation number, however a missing shift encoded bits 1-10 there instead
-(mostly duplicating the lower part of the encoded generation number that
-then consisted of bits 1-9).
+Adjust the I/O port trap handler to use that new function, and provide
+shims to implement the old ioport interface, for now.
 
-In the meantime, the upper part was shrunk by one bit and moved by
-subsequent commits to become an upper half of the encoded generation number
-(bits 9-17 of bits 0-17 encoded in a SPTE).
-
-In addition to the above, commit 56871d444bc4 ("KVM: x86: fix overlap between SPTE_MMIO_MASK and generation")
-has changed the SPTE bit range assigned to encode the generation number and
-the total number of bits encoded but did not update them in the comment
-attached to their defines, nor in the KVM MMU doc.
-Let's do it here, too, since it is too trivial thing to warrant a separate
-commit.
-
-Fixes: cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-    Changes from v1:
-    * Introduce MMIO_SPTE_GEN_{LOW,HIGH}_BITS and use it to compute
-      MMIO_SPTE_GEN_HIGH_SHIFT.
-    
-    * Add build-time MMIO_SPTE_GEN_MASK consistency checking with the
-      above bits defines via a BUILD_BUG_ON().
-    
-    The easiest way to reproduce the issue is to apply the patch
-    below to the existing code and observe how memslots generations
-    are mis-decoded from the SPTEs:
-    diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-    --- a/arch/x86/kvm/mmu/spte.c
-    +++ b/arch/x86/kvm/mmu/spte.c
-    @@ -42,6 +42,9 @@ static u64 generation_mmio_spte_mask(u64 gen)
-    
-            mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
-            mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
-    +
-    +       pr_notice("Gen %llx -> mask %llx\n", gen, mask);
-    +
-            return mask;
-     }
-    
-    diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-    --- a/arch/x86/kvm/mmu/spte.h
-    +++ b/arch/x86/kvm/mmu/spte.h
-    @@ -230,6 +230,9 @@ static inline u64 get_mmio_spte_generation(u64 spte)
-    
-            gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_START;
-            gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_START;
-    +
-    +       pr_notice("Mask %llx -> gen %llx\n", spte, gen);
-    +
-            return gen;
-     }
-    
-    diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-    --- a/virt/kvm/kvm_main.c
-    +++ b/virt/kvm/kvm_main.c
-    @@ -766,7 +766,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
-                    if (!slots)
-                            goto out_err_no_arch_destroy_vm;
-                    /* Generations must be different for each address space. */
-    -               slots->generation = i;
-    +               slots->generation = i + 0x1234;
-                    rcu_assign_pointer(kvm->memslots[i], slots);
-            }
+ vfio/core.c | 51 ++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 36 insertions(+), 15 deletions(-)
 
- Documentation/virt/kvm/mmu.rst |  2 +-
- arch/x86/kvm/mmu/spte.c        |  7 +++++--
- arch/x86/kvm/mmu/spte.h        | 24 +++++++++++++++++-------
- 3 files changed, 23 insertions(+), 10 deletions(-)
-
-diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
-index 1c030dbac7c4..5bfe28b0728e 100644
---- a/Documentation/virt/kvm/mmu.rst
-+++ b/Documentation/virt/kvm/mmu.rst
-@@ -455,7 +455,7 @@ If the generation number of the spte does not equal the global generation
- number, it will ignore the cached MMIO information and handle the page
- fault through the slow path.
- 
--Since only 19 bits are used to store generation-number on mmio spte, all
-+Since only 18 bits are used to store generation-number on mmio spte, all
- pages are zapped when there is an overflow.
- 
- Unfortunately, a single memory access might access kvm_memslots(kvm) multiple
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index fcac2cac78fe..ef3c6db0648b 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -39,9 +39,12 @@ static u64 generation_mmio_spte_mask(u64 gen)
- 
- 	WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
- 	BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK | MMIO_SPTE_GEN_LOW_MASK) & SPTE_SPECIAL_MASK);
-+	BUILD_BUG_ON(GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS +
-+				 MMIO_SPTE_GEN_HIGH_BITS - 1, 0) !=
-+		     MMIO_SPTE_GEN_MASK);
- 
--	mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
--	mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
-+	mask = (gen << MMIO_SPTE_GEN_LOW_SHIFT) & MMIO_SPTE_GEN_LOW_MASK;
-+	mask |= (gen << MMIO_SPTE_GEN_HIGH_SHIFT) & MMIO_SPTE_GEN_HIGH_MASK;
- 	return mask;
+diff --git a/vfio/core.c b/vfio/core.c
+index 0b45e78b..f55f1f87 100644
+--- a/vfio/core.c
++++ b/vfio/core.c
+@@ -81,15 +81,12 @@ out_free_buf:
+ 	return ret;
  }
  
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 5c75a451c000..5a117fed1cb6 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -56,11 +56,11 @@
- #define SPTE_MMU_WRITEABLE	(1ULL << (PT_FIRST_AVAIL_BITS_SHIFT + 1))
- 
- /*
-- * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
-+ * Due to limited space in PTEs, the MMIO generation is a 18 bit subset of
-  * the memslots generation and is derived as follows:
-  *
-  * Bits 0-8 of the MMIO generation are propagated to spte bits 3-11
-- * Bits 9-18 of the MMIO generation are propagated to spte bits 52-61
-+ * Bits 9-17 of the MMIO generation are propagated to spte bits 54-62
-  *
-  * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
-  * the MMIO generation number, as doing so would require stealing a bit from
-@@ -73,14 +73,24 @@
- 
- #define MMIO_SPTE_GEN_LOW_START		3
- #define MMIO_SPTE_GEN_LOW_END		11
--#define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
--						    MMIO_SPTE_GEN_LOW_START)
- 
- #define MMIO_SPTE_GEN_HIGH_START	PT64_SECOND_AVAIL_BITS_SHIFT
- #define MMIO_SPTE_GEN_HIGH_END		62
--#define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
-+
-+#define MMIO_SPTE_GEN_LOW_BITS		(MMIO_SPTE_GEN_LOW_END - \
-+					 MMIO_SPTE_GEN_LOW_START + 1)
-+#define MMIO_SPTE_GEN_HIGH_BITS	(MMIO_SPTE_GEN_HIGH_END - \
-+					 MMIO_SPTE_GEN_HIGH_START + 1)
-+
-+#define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
-+						    MMIO_SPTE_GEN_LOW_START)
-+#define MMIO_SPTE_GEN_HIGH_MASK	GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
- 						    MMIO_SPTE_GEN_HIGH_START)
- 
-+#define MMIO_SPTE_GEN_LOW_SHIFT	(MMIO_SPTE_GEN_LOW_START - 0)
-+#define MMIO_SPTE_GEN_HIGH_SHIFT	(MMIO_SPTE_GEN_HIGH_START - \
-+					 MMIO_SPTE_GEN_LOW_BITS)
-+
- extern u64 __read_mostly shadow_nx_mask;
- extern u64 __read_mostly shadow_x_mask; /* mutual exclusive with nx_mask */
- extern u64 __read_mostly shadow_user_mask;
-@@ -228,8 +238,8 @@ static inline u64 get_mmio_spte_generation(u64 spte)
+-static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+-			   u16 port, void *data, int len)
++static bool _vfio_ioport_in(struct vfio_region *region, u32 offset,
++			    void *data, int len)
  {
- 	u64 gen;
+-	u32 val;
+-	ssize_t nr;
+-	struct vfio_region *region = ioport->priv;
+ 	struct vfio_device *vdev = region->vdev;
+-
+-	u32 offset = port - region->port_base;
++	ssize_t nr;
++	u32 val;
  
--	gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_START;
--	gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_START;
-+	gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_SHIFT;
-+	gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_SHIFT;
- 	return gen;
+ 	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_READ))
+ 		return false;
+@@ -97,7 +94,7 @@ static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+ 	nr = pread(vdev->fd, &val, len, region->info.offset + offset);
+ 	if (nr != len) {
+ 		vfio_dev_err(vdev, "could not read %d bytes from I/O port 0x%x\n",
+-			     len, port);
++			     len, offset);
+ 		return false;
+ 	}
+ 
+@@ -118,15 +115,13 @@ static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+ 	return true;
  }
  
+-static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+-			    u16 port, void *data, int len)
++static bool _vfio_ioport_out(struct vfio_region *region, u32 offset,
++			     void *data, int len)
+ {
+-	u32 val;
+-	ssize_t nr;
+-	struct vfio_region *region = ioport->priv;
+ 	struct vfio_device *vdev = region->vdev;
++	ssize_t nr;
++	u32 val;
+ 
+-	u32 offset = port - region->port_base;
+ 
+ 	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_WRITE))
+ 		return false;
+@@ -148,11 +143,37 @@ static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+ 	nr = pwrite(vdev->fd, &val, len, region->info.offset + offset);
+ 	if (nr != len)
+ 		vfio_dev_err(vdev, "could not write %d bytes to I/O port 0x%x",
+-			     len, port);
++			     len, offset);
+ 
+ 	return nr == len;
+ }
+ 
++static void vfio_ioport_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
++			     u8 is_write, void *ptr)
++{
++	struct vfio_region *region = ptr;
++	u32 offset = addr - region->port_base;
++
++	if (is_write)
++		_vfio_ioport_out(region, offset, data, len);
++	else
++		_vfio_ioport_in(region, offset, data, len);
++}
++
++static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
++			    u16 port, void *data, int len)
++{
++	vfio_ioport_mmio(vcpu, port, data, len, true, ioport->priv);
++	return true;
++}
++
++static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
++			   u16 port, void *data, int len)
++{
++	vfio_ioport_mmio(vcpu, port, data, len, false, ioport->priv);
++	return true;
++}
++
+ static struct ioport_operations vfio_ioport_ops = {
+ 	.io_in	= vfio_ioport_in,
+ 	.io_out	= vfio_ioport_out,
+-- 
+2.17.1
+
