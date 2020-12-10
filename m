@@ -2,118 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3E522D584E
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 11:35:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77A512D594B
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 12:34:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732497AbgLJKfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 05:35:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47421 "EHLO
+        id S2389556AbgLJLdR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 06:33:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43410 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729066AbgLJKfF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 05:35:05 -0500
+        by vger.kernel.org with ESMTP id S1727007AbgLJLdD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 06:33:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607596416;
+        s=mimecast20190719; t=1607599897;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1jXSCoC1ms56gAaFCVtVI4M8b5wsl5JWLo/bBLEQpIE=;
-        b=L/SxyvEQOL6ng94xqjQ86pm6YiivTrwzH/XGXAZYCunR9iYfoBdHrBo9bbyktIUdwOMfcD
-        H5Jy2dsxa3FDfS5NZs5dwcTxuAgPfiIU66q4CP9uMV5H3ET7NKpyog0o2vmYe0IqGFDint
-        lrbB/sE6w+9Tp7jj8aDii5RT0o5+Je4=
+        bh=0vpeFoxvipiFfHjrK3SmcHRfsuQ3JzQdub6tkzQBRZk=;
+        b=Q6al0xrUQUAl2OiNHSpxbSaWIdcHwo6D06pJ84r3GgVqIi9Q3yE59sOJ5Yi2K0jRELBLQG
+        d66Yl2oznFlA0vbQIOPEN0vwwhNFGI3VvESMpMqymT8nKoYw6KI10mhChHFjrUvY4Jy+yy
+        e5WRxMCuPB2cIT9QU9HDUI+7cJT48HU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-Ge1oi4s0Oh6yPlm7eNIhFw-1; Thu, 10 Dec 2020 05:33:28 -0500
-X-MC-Unique: Ge1oi4s0Oh6yPlm7eNIhFw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-41-IPyTpgFpPWuti1cYkS4kHA-1; Thu, 10 Dec 2020 06:31:33 -0500
+X-MC-Unique: IPyTpgFpPWuti1cYkS4kHA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3315801817;
-        Thu, 10 Dec 2020 10:33:26 +0000 (UTC)
-Received: from gondolin (ovpn-112-77.ams2.redhat.com [10.36.112.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 65ADF10023AC;
-        Thu, 10 Dec 2020 10:33:21 +0000 (UTC)
-Date:   Thu, 10 Dec 2020 11:33:18 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC 1/4] s390/pci: track alignment/length strictness for
- zpci_dev
-Message-ID: <20201210113318.136636e2.cohuck@redhat.com>
-In-Reply-To: <1607545670-1557-2-git-send-email-mjrosato@linux.ibm.com>
-References: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
-        <1607545670-1557-2-git-send-email-mjrosato@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0353810CE7BC;
+        Thu, 10 Dec 2020 11:30:53 +0000 (UTC)
+Received: from localhost (ovpn-113-62.ams2.redhat.com [10.36.113.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 380665D9DD;
+        Thu, 10 Dec 2020 11:30:52 +0000 (UTC)
+Date:   Thu, 10 Dec 2020 11:30:51 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@gmail.com>,
+        qemu-level <qemu-devel@nongnu.org>,
+        Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
+Subject: Re: [RFC PATCH 05/27] vhost: Add hdev->dev.sw_lm_vq_handler
+Message-ID: <20201210113051.GF416119@stefanha-x1.localdomain>
+References: <20201120185105.279030-1-eperezma@redhat.com>
+ <20201120185105.279030-6-eperezma@redhat.com>
+ <20201207165216.GL203660@stefanha-x1.localdomain>
+ <CAJaqyWfSUHD0MU=1yfU1N6pZ4TU7prxyoG6NY-VyNGt=MO9H4g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CAJaqyWfSUHD0MU=1yfU1N6pZ4TU7prxyoG6NY-VyNGt=MO9H4g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="wtjvnLv0o8UUzur2"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  9 Dec 2020 15:27:47 -0500
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+--wtjvnLv0o8UUzur2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Some zpci device types (e.g., ISM) follow different rules for length
-> and alignment of pci instructions.  Recognize this and keep track of
-> it in the zpci_dev.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  arch/s390/include/asm/pci.h     | 3 ++-
->  arch/s390/include/asm/pci_clp.h | 4 +++-
->  arch/s390/pci/pci_clp.c         | 1 +
->  3 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
-> index 2126289..f16ffba 100644
-> --- a/arch/s390/include/asm/pci.h
-> +++ b/arch/s390/include/asm/pci.h
-> @@ -133,7 +133,8 @@ struct zpci_dev {
->  	u8		has_hp_slot	: 1;
->  	u8		is_physfn	: 1;
->  	u8		util_str_avail	: 1;
-> -	u8		reserved	: 4;
-> +	u8		relaxed_align	: 1;
-> +	u8		reserved	: 3;
->  	unsigned int	devfn;		/* DEVFN part of the RID*/
->  
->  	struct mutex lock;
-> diff --git a/arch/s390/include/asm/pci_clp.h b/arch/s390/include/asm/pci_clp.h
-> index 1f4b666..9fb7cbf 100644
-> --- a/arch/s390/include/asm/pci_clp.h
-> +++ b/arch/s390/include/asm/pci_clp.h
-> @@ -150,7 +150,9 @@ struct clp_rsp_query_pci_grp {
->  	u16			:  4;
->  	u16 noi			: 12;	/* number of interrupts */
->  	u8 version;
-> -	u8			:  6;
-> +	u8			:  4;
-> +	u8 relaxed_align	:  1;	/* Relax length and alignment rules */
-> +	u8			:  1;
->  	u8 frame		:  1;
->  	u8 refresh		:  1;	/* TLB refresh mode */
->  	u16 reserved2;
-> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
-> index 153720d..630f8fc 100644
-> --- a/arch/s390/pci/pci_clp.c
-> +++ b/arch/s390/pci/pci_clp.c
-> @@ -103,6 +103,7 @@ static void clp_store_query_pci_fngrp(struct zpci_dev *zdev,
->  	zdev->max_msi = response->noi;
->  	zdev->fmb_update = response->mui;
->  	zdev->version = response->version;
-> +	zdev->relaxed_align = response->relaxed_align;
->  
->  	switch (response->version) {
->  	case 1:
+On Wed, Dec 09, 2020 at 04:02:56PM +0100, Eugenio Perez Martin wrote:
+> On Mon, Dec 7, 2020 at 5:52 PM Stefan Hajnoczi <stefanha@gmail.com> wrote=
+:
+> > On Fri, Nov 20, 2020 at 07:50:43PM +0100, Eugenio P=E9rez wrote:
+> > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > > index 9179013ac4..9a69ae3598 100644
+> > > --- a/hw/net/virtio-net.c
+> > > +++ b/hw/net/virtio-net.c
+> > > @@ -2628,24 +2628,32 @@ static void virtio_net_tx_bh(void *opaque)
+> > >      }
+> > >  }
+> > >
+> > > -static void virtio_net_add_queue(VirtIONet *n, int index)
+> > > +static void virtio_net_add_queue(VirtIONet *n, int index,
+> > > +                                 VirtIOHandleOutput custom_handler)
+> > >  {
+> >
+> > We talked about the possibility of moving this into the generic vhost
+> > code so that devices don't need to be modified. It would be nice to hid=
+e
+> > this feature inside vhost.
+>=20
+> I'm thinking of tying it to VirtQueue, allowing the caller to override
+> the handler knowing it is not going to be called (I mean, not offering
+> race conditions protection, like before of starting processing
+> notifications in qemu calling vhost_dev_disable_notifiers).
 
-Hm, what does that 'relaxed alignment' imply? Is that something that
-can apply to emulated devices as well?
+Yes, I can see how at least part of this belongs to VirtQueue.
+
+Stefan
+
+--wtjvnLv0o8UUzur2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/SBusACgkQnKSrs4Gr
+c8iLwgf/aaGiY0DHn8I8FYdQGoreiYRr1SK+yJ4QWre7tvYsACl3EXz8Uq2PKZRo
++7NkNHIwhXEpcb1usOfH5PrUw4pRoMH78oQckxlnJtoQOdKiYi1SikAQKxOrooRs
+Cn4E2SA9vVnDyCa0ZFs83GkRJyhnsLfs/AOYtWk/t2JdxzXWZhbewHgI3lUhy5qN
+nLo/wINyWrndWt1HoI7HFbe82IDwhpwh5ACBxlb5579HaSwJsI/HX4k+jcHEJGAl
+S7wSdufuVz9xzQ07r3fIWjTh9GsVJRJhHS3cfUcYmL/7CbmkGxYOiHPveHLEPogL
+0G812OH8HJc+Hde+Ce/yAwlHGjXPFw==
+=/sJb
+-----END PGP SIGNATURE-----
+
+--wtjvnLv0o8UUzur2--
 
