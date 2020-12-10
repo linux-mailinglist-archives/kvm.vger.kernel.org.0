@@ -2,194 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4D8E2D61D5
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 17:30:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 050A42D6174
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 17:17:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391641AbgLJQaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 11:30:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33732 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391588AbgLJQFa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 11:05:30 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CCCCA23F34;
-        Thu, 10 Dec 2020 16:04:35 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1knONt-0008Di-H2; Thu, 10 Dec 2020 16:01:38 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH v3 66/66] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-Date:   Thu, 10 Dec 2020 16:00:02 +0000
-Message-Id: <20201210160002.1407373-67-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
-References: <20201210160002.1407373-1-maz@kernel.org>
+        id S1733204AbgLJQQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 11:16:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7547 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732975AbgLJQQX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 11:16:23 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BAG8JmK117442;
+        Thu, 10 Dec 2020 11:15:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=2zSaeJyMImLTGA0olPxsmbdkSyRuOyihRCAxeyJ7UJ0=;
+ b=sQr+E3e8uJRIH9+a0YrJf+GOAX307aJQu2li/sDhov22HSredp+vGS5fAAHOy2f7g+Sc
+ IbTLe0vteyvnXXDT09TvXdm1XJGyNqt9ofD+kBr96FDI/ZQ747mOmSXFdCdRfvwE56sf
+ PbenwjKq/Copz48MlTwMqdFXK//1245bby4Kgadcz1U1jJYBpzSGdNr73Jm+jvGCH8uo
+ 0mD9zXprOztBDhbw7c80TR65UMVPeYrouxY1kPnvWUJquvFdZfr9zst9fRdReuhJ08Va
+ OCFvl/k1VtOwnXnDpjHVPiwWSkSYNyHsY7XyU0pAuJ5k1sJiiVQC1VrLUWnX+qLpZK00 kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35bpgss2rt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Dec 2020 11:15:29 -0500
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BAG8cwu119797;
+        Thu, 10 Dec 2020 11:15:28 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35bpgss2r4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Dec 2020 11:15:28 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BAG7Kms017567;
+        Thu, 10 Dec 2020 16:15:27 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma01wdc.us.ibm.com with ESMTP id 3581u9rbak-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Dec 2020 16:15:27 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BAGEBNc18350588
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Dec 2020 16:14:12 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D89DE6A057;
+        Thu, 10 Dec 2020 16:14:11 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A30146A058;
+        Thu, 10 Dec 2020 16:14:10 +0000 (GMT)
+Received: from jarvis.int.hansenpartnership.com (unknown [9.85.183.17])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 10 Dec 2020 16:14:10 +0000 (GMT)
+Message-ID: <22795177a81715d31a141887771b21e518b363c7.camel@linux.ibm.com>
+Subject: Re: [PATCH] target/i386/sev: add the support to query the
+ attestation report
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
+Cc:     Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Eric Blake <eblake@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Date:   Thu, 10 Dec 2020 08:13:59 -0800
+In-Reply-To: <20201204213101.14552-1-brijesh.singh@amd.com>
+References: <20201204213101.14552-1-brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-10_06:2020-12-09,2020-12-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ mlxlogscore=999 suspectscore=2 malwarescore=0 spamscore=0 phishscore=0
+ clxscore=1011 adultscore=0 mlxscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012100099
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Due to the way ARMv8.4-NV suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
-even if they don't affect any guest.
+On Fri, 2020-12-04 at 15:31 -0600, Brijesh Singh wrote:
+> The SEV FW >= 0.23 added a new command that can be used to query the
+> attestation report containing the SHA-256 digest of the guest memory
+> and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
+> 
+> Note, we already have a command (LAUNCH_MEASURE) that can be used to
+> query the SHA-256 digest of the guest memory encrypted through the
+> LAUNCH_UPDATE. The main difference between previous and this command
+> is that the report is signed with the PEK and unlike the
+> LAUNCH_MEASURE
+> command the ATTESATION_REPORT command can be called while the guest
+> is running.
+> 
+> Add a QMP interface "query-sev-attestation-report" that can be used
+> to get the report encoded in base64.
+> 
+> Cc: James Bottomley <jejb@linux.ibm.com>
+> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  linux-headers/linux/kvm.h |  8 ++++++
+>  qapi/misc-target.json     | 38 +++++++++++++++++++++++++++
+>  target/i386/monitor.c     |  6 +++++
+>  target/i386/sev-stub.c    |  7 +++++
+>  target/i386/sev.c         | 54
+> +++++++++++++++++++++++++++++++++++++++
+>  target/i386/sev_i386.h    |  2 ++
+>  6 files changed, 115 insertions(+)
+> 
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 56ce14ad20..6d0f8101ba 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -1585,6 +1585,8 @@ enum sev_cmd_id {
+>  	KVM_SEV_DBG_ENCRYPT,
+>  	/* Guest certificates commands */
+>  	KVM_SEV_CERT_EXPORT,
+> +	/* Attestation report */
+> +	KVM_SEV_GET_ATTESTATION_REPORT,
+>  
+>  	KVM_SEV_NR_MAX,
+>  };
+> @@ -1637,6 +1639,12 @@ struct kvm_sev_dbg {
+>  	__u32 len;
+>  };
+>  
+> +struct kvm_sev_attestation_report {
+> +	__u8 mnonce[16];
+> +	__u64 uaddr;
+> +	__u32 len;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+> index 1e561fa97b..ec6565e6ef 100644
+> --- a/qapi/misc-target.json
+> +++ b/qapi/misc-target.json
+> @@ -267,3 +267,41 @@
+>  ##
+>  { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
+>    'if': 'defined(TARGET_ARM)' }
+> +
+> +
+> +##
+> +# @SevAttestationReport:
+> +#
+> +# The struct describes attestation report for a Secure Encrypted
+> Virtualization
+> +# feature.
+> +#
+> +# @data:  guest attestation report (base64 encoded)
+> +#
+> +#
+> +# Since: 5.2
+> +##
+> +{ 'struct': 'SevAttestationReport',
+> +  'data': { 'data': 'str'},
+> +  'if': 'defined(TARGET_I386)' }
+> +
+> +##
+> +# @query-sev-attestation-report:
+> +#
+> +# This command is used to get the SEV attestation report, and is
+> supported on AMD
+> +# X86 platforms only.
+> +#
+> +# @mnonce: a random 16 bytes of data (it will be included in report)
+> +#
+> +# Returns: SevAttestationReport objects.
+> +#
+> +# Since: 5.2
+> +#
+> +# Example:
+> +#
+> +# -> { "execute" : "query-sev-attestation-report", "arguments": {
+> "mnonce": "aaaaaaa" } }
+> +# <- { "return" : { "data": "aaaaaaaabbbddddd"} }
 
-This obviously has a huge impact on performance, as we handle
-TLBI traps as a normal exit, and a normal VHE host issues
-thousands of TLBIs when booting (and quite a few when running
-userspace).
+It would be nice here, rather than returning a binary blob to break it
+up into the actual returned components like query-sev does.
 
-A cheap way to reduce the overhead is to handle the limited
-case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
-the right mmu configuration in place. Just execute the decoded
-instruction right away and return to the guest.
+> +##
+> +{ 'command': 'query-sev-attestation-report', 'data': { 'mnonce':
+> 'str' },
+> +  'returns': 'SevAttestationReport',
+> +  'if': 'defined(TARGET_I386)' }
+[...]
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 93c4d60b82..28958fb71b 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -68,6 +68,7 @@ struct SevGuestState {
+>  
+>  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+>  #define DEFAULT_SEV_DEVICE      "/dev/sev"
+> +#define DEFAULT_ATTESATION_REPORT_BUF_SIZE      4096
+>  
+>  static SevGuestState *sev_guest;
+>  static Error *sev_mig_blocker;
+> @@ -490,6 +491,59 @@ out:
+>      return cap;
+>  }
+>  
+> +SevAttestationReport *
+> +sev_get_attestation_report(const char *mnonce, Error **errp)
+> +{
+> +    struct kvm_sev_attestation_report input = {};
+> +    SevGuestState *sev = sev_guest;
+> +    SevAttestationReport *report;
+> +    guchar *data;
+> +    int err = 0, ret;
+> +
+> +    if (!sev_enabled()) {
+> +        error_setg(errp, "SEV is not enabled");
+> +        return NULL;
+> +    }
+> +
+> +    /* Verify that user provided random data length */
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vhe/switch.c | 36 +++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/vhe/tlb.c    |  6 ++++--
- arch/arm64/kvm/sys_regs.c       | 25 ++++++++---------------
- 3 files changed, 48 insertions(+), 19 deletions(-)
+There should be a g_base64_decode here, shouldn't there, so we can pass
+an arbitrary 16 byte binary blob.
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index c90aed418f73..0b9bc36340a5 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -168,6 +168,39 @@ void deactivate_traps_vhe_put(void)
- 	__deactivate_traps_common();
- }
- 
-+static bool __hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu)
-+{
-+	u32 instr;
-+	u64 val;
-+
-+	/*
-+	 * Ideally, we would never trap on EL1 TLB invalidations when the
-+	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
-+	 * don't trap writes to HCR_EL2, meaning that we can't track
-+	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
-+	 * the host. Oopsie...
-+	 *
-+	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
-+	 * set, try and handle these invalidation as quickly as possible,
-+	 * without fully exiting (unless this needs forwarding).
-+	 */
-+	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64 ||
-+	    !vcpu_mode_el2(vcpu) ||
-+	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
-+		return false;
-+
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	if (sys_reg_Op0(instr) != TLBI_Op0 ||
-+	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
-+		return false;
-+
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+	__kvm_tlb_el1_instr(NULL, val, instr);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
- static bool __hyp_handle_eret(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-@@ -261,6 +294,9 @@ static bool fixup_guest_exit_vhe(struct kvm_vcpu *vcpu, u64 *exit_code,
- 	if (*exit_code == ARM_EXCEPTION_TRAP) {
- 		if (__hyp_handle_eret(vcpu))
- 			return true;
-+
-+		if (__hyp_handle_tlbi_el1(vcpu))
-+			return true;
- 	}
- 
- 	return fixup_guest_exit(vcpu, exit_code);
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 52fda1d61308..6dd7f224e0f3 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -200,7 +200,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_guest(mmu, &cxt);
- 
- 	/*
- 	 * Execute the same instruction as the guest hypervisor did,
-@@ -239,5 +240,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	if (mmu)
-+		__tlb_switch_to_host(&cxt);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c7b004982ea9..cf03281f06a3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2684,6 +2684,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	struct kvm_s2_mmu *mmu;
- 
- 	/*
- 	 * If we're here, this is because we've trapped on a EL1 TLBI
-@@ -2702,24 +2704,13 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	mutex_lock(&vcpu->kvm->lock);
- 
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
--		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--		struct kvm_s2_mmu *mmu;
--
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
--		if (mmu)
--			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
-+	if (mmu)
-+		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
- 
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
--		if (mmu)
--			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
--	} else {
--		/*
--		 * ARMv8.4-NV allows the guest to change TGE behind
--		 * our back, so we always trap EL1 TLBIs from vEL2...
--		 */
--		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
--	}
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
-+	if (mmu)
-+		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
- 
- 	mutex_unlock(&vcpu->kvm->lock);
- 
--- 
-2.29.2
+> +    if (strlen(mnonce) != sizeof(input.mnonce)) {
+
+So this if would check the decoded length.
+
+> +        error_setg(errp, "Expected mnonce data len %ld got %ld",
+> +                sizeof(input.mnonce), strlen(mnonce));
+> +        return NULL;
+> +    }
+> +
+> +    /* Query the report length */
+> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
+> +            &input, &err);
+> +    if (ret < 0) {
+> +        if (err != SEV_RET_INVALID_LEN) {
+> +            error_setg(errp, "failed to query the attestation report
+> length "
+> +                    "ret=%d fw_err=%d (%s)", ret, err,
+> fw_error_to_str(err));
+> +            return NULL;
+> +        }
+> +    }
+> +
+> +    data = g_malloc(input.len);
+> +    input.uaddr = (unsigned long)data;
+> +    memcpy(input.mnonce, mnonce, sizeof(input.mnonce));
+> +
+> +    /* Query the report */
+> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
+> +            &input, &err);
+> +    if (ret) {
+> +        error_setg_errno(errp, errno, "Failed to get attestation
+> report"
+> +                " ret=%d fw_err=%d (%s)", ret, err,
+> fw_error_to_str(err));
+
+report should be set to NULL here to avoid returning uninitialized data
+from the goto.
+
+> +        goto e_free_data;
+> +    }
+> +
+> +    report = g_new0(SevAttestationReport, 1);
+> +    report->data = g_base64_encode(data, input.len);
+> +
+> +e_free_data:
+> +    g_free(data);
+> +    return report;
+> +}
+> +
+>  static int
+>  sev_read_file_base64(const char *filename, guchar **data, gsize
+> *len)
+
+James
+
 
