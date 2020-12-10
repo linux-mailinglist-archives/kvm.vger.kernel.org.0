@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A16F32D6333
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 18:15:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97F462D6337
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 18:15:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389373AbgLJROF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 12:14:05 -0500
-Received: from mail-bn8nam11on2055.outbound.protection.outlook.com ([40.107.236.55]:12128
+        id S2392631AbgLJROl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 12:14:41 -0500
+Received: from mail-bn8nam11on2059.outbound.protection.outlook.com ([40.107.236.59]:9021
         "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2392569AbgLJRNv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 12:13:51 -0500
+        id S2392625AbgLJROZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 12:14:25 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rp/5Ag2zNvXIda3Eugo5/QyCA3SC9JiSSQ0JEng9iTDIOgaaW58Z1NCmQ6O/c583n1uKmLd8yNyevjbuiSQXTvyUCWsqhkTexyMu7Khxwl/VSO4xxPKy5k4I9x5GRsa7dyi75y0TD6HW8xXrDUwAantEWjPjxaKyPgOcAomsclMafrWfZmJVaMp+YUGg37rGVTupA9rQeJB8pDnjmQTqu9Q22tVeZurblemB2AW04cYI/rf9d7Y3sD+xzSVWOLTuMf1w6NUYZVkG3p+g36RmQYdAlwR9QKtzEvV7vZzDOpj70wvlaEKiE8OsIlohj4VMi/m+5xWNyy5j9KWFBS6woQ==
+ b=eDzRuO/b7u1qKBnt9UXBS9n2UZjmkzXZoZmx/JyM/BXKGEYQIqGun7xwFK5L4OBVHuShWPEcnzUB+qU6cyFiMLe+Z3DxRoJXP5pZlr+AeHPnQldqhWGQrzE2iK5mHTqufIWlwvQ7P9yhQfvZWCn5Bg39c6fixkcJELhKUoiyu98gRtX9HSCSd5nKNrtCQE6GilPHRgxw8a7G2vz5nOluhqKACmp8QVxqTBkrDOkZqbMKzl5fzn0RtF8+QZpohPkJSQdBdg4e5N+1ds7wQZ0BjgDXpRvBfWJReHRMyLIPUKETAovN+T2YGTFjMmAXw5jE7P5QsLlJCbr5l7G7NUw/AA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pCUxrJUr64eBqs6C+4VnRSOKpUKEqp7DF+Qa67yAxO4=;
- b=Bh2f3S0JGFNT1mkNK4pBZIGkZp8EQcPlvX+Hb5Koq7xIUuOvTQToehO0y6PUKtJn48pBcsIX6++6Wm6hW1q9xJcLLBhFDvT7KZIbD5HFZY/wfTq40PI84RyigKO+oIwYjABvLzTpcwjA+rzlTIG33qGHbWmwGlEjxH7gRG5uUxPRs4sZKI3LyUZaTYQUXA+LELK7qTqovjjDpaaWpiXrbqcbi3TU0c9o586NRt3NhBKEtgvZ24pTJXdVLkdLbOYKz7i8JCMuSi4qbWqkGR8th9VBcZSdSQKTfgXO/xmRQmIFr+kic8pQDxHbwQaZt83PYWydkMAMbrV3aqfadlN0Yg==
+ bh=82V9jjp9v0HIyZGj5zrbsWIzmq2QqzdkrE7DolSJy74=;
+ b=STJMPyZCbqT/FUExIcTjqWuL603shj/oiETO5qIKpCOvjcKGvh9EpVPjPKxOgARUIIaUD/Gy51pf67cFrzaNjrQ0zser1emAfBxt8ATJEdA9f0pSn+n803zFZ+sSuhmV1zCgV3zEdf8UW+Ksytc/dQXNxvw6cgGdRvbzJH7IXg4ZPd3aZeTH26u18TWdZS3JjRPG16NJIpbjLZ3/hwhrI+VA4VIIfqfGxSTyutZ65PJzmF0jRq3NszM5qN0x+oDh3f9UVbvQjGL0HM5RDrczuBqJfFKmvZ1n9uobUZZBESsUtTy9K2YcCD/0sG27tIbQBlijY/d+pGcKkB1l+zCUrA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pCUxrJUr64eBqs6C+4VnRSOKpUKEqp7DF+Qa67yAxO4=;
- b=RAJcFbt8d/jmP8EH+7nnIO2zQ1Xs2hvZyJyefcOvX8Wpnd1+U0Y1IxYhCUatOpL+WlPKJc12+k2MULPoTOcugKHt8430OS+9TcQtSvfsThdt4iNCeP7XeZJIjtjJCpA82r4q2i4/97S5U0rwlHh84D9XvIJ0Lwlz5mr39HTmJsU=
+ bh=82V9jjp9v0HIyZGj5zrbsWIzmq2QqzdkrE7DolSJy74=;
+ b=aUPSWcA0fyDvv2S/vZHABuUlyGyF+4kf9lT0ttMEPTydhw8Dbb8lsuwfWEuCe/1H6zyXONs3kZUjPxmsA7OdZtTJ8aW7Q/DqxgJLpYq16uki984wmh6Hfty/hC/JrNm7PoTB2reUKpdSrn+rdfgnaerC2qS3ATMTUNV80Z7sH5I=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
  by CY4PR1201MB0149.namprd12.prod.outlook.com (2603:10b6:910:1c::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12; Thu, 10 Dec
- 2020 17:12:04 +0000
+ 2020 17:12:59 +0000
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::a10a:295e:908d:550d]) by CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::a10a:295e:908d:550d%8]) with mapi id 15.20.3632.021; Thu, 10 Dec 2020
- 17:12:04 +0000
+ 17:12:58 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,60 +49,60 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v5 12/34] KVM: SVM: Add initial support for a VMGEXIT VMEXIT
-Date:   Thu, 10 Dec 2020 11:09:47 -0600
-Message-Id: <c6a4ed4294a369bd75c44d03bd7ce0f0c3840e50.1607620209.git.thomas.lendacky@amd.com>
+Subject: [PATCH v5 18/34] KVM: SVM: Support MMIO for an SEV-ES guest
+Date:   Thu, 10 Dec 2020 11:09:53 -0600
+Message-Id: <af8de55127d5bcc3253d9b6084a0144c12307d4d.1607620209.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1607620209.git.thomas.lendacky@amd.com>
 References: <cover.1607620209.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH2PR14CA0002.namprd14.prod.outlook.com
- (2603:10b6:610:60::12) To CY4PR12MB1352.namprd12.prod.outlook.com
+X-ClientProxiedBy: CH2PR18CA0012.namprd18.prod.outlook.com
+ (2603:10b6:610:4f::22) To CY4PR12MB1352.namprd12.prod.outlook.com
  (2603:10b6:903:3a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by CH2PR14CA0002.namprd14.prod.outlook.com (2603:10b6:610:60::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12 via Frontend Transport; Thu, 10 Dec 2020 17:12:03 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by CH2PR18CA0012.namprd18.prod.outlook.com (2603:10b6:610:4f::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12 via Frontend Transport; Thu, 10 Dec 2020 17:12:57 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 476feabb-15b3-4fba-9943-08d89d2eb788
+X-MS-Office365-Filtering-Correlation-Id: 204a7da3-b1ec-4141-e586-08d89d2ed7e0
 X-MS-TrafficTypeDiagnostic: CY4PR1201MB0149:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR1201MB014946923D6CBCF59AE08AD2ECCB0@CY4PR1201MB0149.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB0149494DCC9B82590B80F0EDECCB0@CY4PR1201MB0149.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mIwWIgHqO/cBifvD9qCrrZ2Ef0qxUSYgs4rIxSeCqlcklmZi9wT/z+rCVeknS+VBxf2++n1eNH0gKWDUqvTuwyOs9M6rHjI/ZPjb1ZfGE1qcZ3h5uNDkzhdzaFPrt9ryeMHJ59Utwg+HKrAjUoPYly9SnbPKqjXv0VUk/HFSFfKpv7w3gEXduvINe1Qj3BcbYcYMYPXIe27El0NwobejwkIu2LQPRiwdNGNczA19sBO8YmCGXzrT7QHAMuJ8qv2TFqa6O69e4FdXxXNUDrFsaPFarWZEsHAR9sxTeZFUIhx3Cx5J4ggwru4ecIp1QCqInBLJ0e80r5o1lO+vPlwKN7IkAipPl3b6/G25gmT+aCIcNd+GB9GsA9dHNWDlFX4M
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(376002)(366004)(2906002)(5660300002)(6666004)(26005)(52116002)(186003)(83380400001)(16526019)(54906003)(6486002)(956004)(2616005)(8936002)(7696005)(508600001)(66946007)(66476007)(36756003)(8676002)(86362001)(34490700003)(4326008)(30864003)(7416002)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?AaKvSOZKP9I0Ds6YSAo/PbuRi/Sf/Ct3IPGHhlz+xEXuZbrmKyZDeryzo3Y5?=
- =?us-ascii?Q?pi4UlKSb2jePvTHTtFP6jB4WVKH3HkCbZPtSHPDbNAFC8JCs7fWjIBjAacsd?=
- =?us-ascii?Q?1CqxAvFZatfs5kmrwhkOLSc4PgTvzik6/KnOLMwiGVmHMeTrYwfe2wd0OyW+?=
- =?us-ascii?Q?OUxv/TtFBEtSq7Wh3yzdjIQB4kVvCGVZE57vfsC1jooYF0zbeGKpR2JI9ks6?=
- =?us-ascii?Q?cX5dG2eS7MvwdoepoY9uQ2QrvbOKFqea0baDGW46EzK/VyOinZyixlxo0QLy?=
- =?us-ascii?Q?28zFO27+bXeHDNEIG3LJC4cdyLsfhDJySjZVgiNrtkz+tK2CZTGDhpfYg5Pd?=
- =?us-ascii?Q?kV2dYUSu/RRMMtUEhe/GhKpmwOkMD1XxKE37wth4i2QUvttEU07R/swS2zGp?=
- =?us-ascii?Q?kMQiKBd8LILeWWE45uKQW1T0IQcqhPv5+/duDaG3QZas2LFlhVu5+g/XD9yN?=
- =?us-ascii?Q?DRgBvDjJPhIjqHAiBRlJIPJNjaqRDHX2PdcHLOWjQlIGi3ahleM3DH0vbrUt?=
- =?us-ascii?Q?C6fak/tL1eZRy/4L0enaqmne9I3N0L1d8uwMB/Ebxpac360ZdgLylGWdWbI8?=
- =?us-ascii?Q?2UcpOZ2Hrml26fnDkuPjnqA2qCWYMFy3irzFvR2xtF9du0QAgQ/od+AXENnT?=
- =?us-ascii?Q?TUtep9SD8w2uvy+Lp2CWiQ4k7DLqINxCeCOemq4kinWwMPs5Flp0DGF/er+n?=
- =?us-ascii?Q?ufzTo3vF1tDO7toJuCEqCBgjjkVwTghj8Jfv+08epop1lEMIvbcGihzK9jRp?=
- =?us-ascii?Q?r6z+6coNbtiwrKCbtBtNywqhxaBqhMrTeq63QbdeO/g7DLi3rjHoaOG8BMM6?=
- =?us-ascii?Q?OY3nbIVdC+Q6bEVqJFB6gkt1xuy30t12jWP4Yvj+M8geXYkmMudT+jnhsl9M?=
- =?us-ascii?Q?mFL41JB7M6tk9zyzqXGZZ6gHftfGKiF01o2V5i8huunbYNbb31R0BlixA/+j?=
- =?us-ascii?Q?dfRjMtwTktM1ShgLvOzX19OxaffjLWz5UUgDQBL12jZj3UH4bvVoWZ9mHGcZ?=
- =?us-ascii?Q?go5l?=
+X-Microsoft-Antispam-Message-Info: hj3YRX29vYNgm+VqdGV3JEs7owh1ln33dw9VhN35ZHSEEhKUie6YLigYZIPe60kM06lFJd6r2CwiWlwgB+PxgpQbUZd3fgDCoOOUsWUTnOE1ZMUoOqPeaeH0v+oi69sKUmTTEgSpCv9VNvZ6aPHCUgrzJhHpT58nKe3Lnca3FVQcK71b4hsoI5wdG1wjTtq32SkjZ0b6UIXsLPy48dYLKwmx5hmoeeAzG5Lh220JzxOuzw3GBtYLY/Qz/oq8mrPYSainoblVfYYYaHmhP3/07D8J8ELNHgZLjTVjQY7yqBWDEWPc/wNtFM1UtabIBmbukoyZxG/Lyd8DL49LIdhupDjs+IULhrpW6HdqHI3zbFZfSzMAjOv4UeujWAT8l/Xh
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(376002)(366004)(2906002)(5660300002)(6666004)(26005)(52116002)(186003)(83380400001)(16526019)(54906003)(6486002)(956004)(2616005)(8936002)(7696005)(508600001)(66946007)(66476007)(36756003)(8676002)(86362001)(34490700003)(4326008)(7416002)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?7a72TSjU951I8bzT+YctH7TCcy/Qt7D0uyFQqM7/b/lc5Xp3o85Tz7gKeUnf?=
+ =?us-ascii?Q?YiL5nRddgAHul3uZMhdR9unxR5XIboFRwzCmGrxyk5EmhJbffoMAW3at7D9c?=
+ =?us-ascii?Q?OoCrwiWrbmPHOWQlYvrw7W0+WomM7WX4a+//SY8+LqiJ7p/12gAydEzDatmU?=
+ =?us-ascii?Q?5+eypOYunhsE9pEYhx0nGfV/7wd58w2WqpMW6/XgkgonLEoCJwSnsFI+QZ8L?=
+ =?us-ascii?Q?05+W3BBp8J0cYeaQImesFBgDr7aOzJjTSfTJ5p0Owwxnj13Hw7W4oGarwbuH?=
+ =?us-ascii?Q?dKrgpgLsgsxZlGVOzUW0DWjrLpzE8sdBnhyXhaXqbuxAB9u3M7y3SO5uvKRo?=
+ =?us-ascii?Q?4iFH8zFulg5zRqWNnzSRHlwKwlS4aYjwyyaIjfCaKdNxC95+5JL2w3DQ8ZYJ?=
+ =?us-ascii?Q?VDN0ISMTpSe1GuCSVvoiV5Okq9MqsEnrpfKac0pItOXTfyjGynOvXKNJUWdj?=
+ =?us-ascii?Q?VAuE1y0IHnYms8snPTvGdXA8UI5DQHxRcIrprMrDdBpzvH2tvmsT/F571kxw?=
+ =?us-ascii?Q?gAqSukL2CBoAxua6RwnpIMiXdVbOM9l7LTg5sehlwyFS3+BkT4gdxUcZK7PT?=
+ =?us-ascii?Q?vCAuNpXQa1Ey1ixLIDTAZIcS8tkLipv4k4CleP6FL4i6jYnOZkjdEn7sHwqb?=
+ =?us-ascii?Q?hN1oUpQUCsnO/67wgbuMYjK2LljY5OnKTLYcodRQUkEWIFQsW1W1/eVj6Hwr?=
+ =?us-ascii?Q?uC1oPiRwOn2ljvLEw1L2sm6RS9wArMsasIOtds6HKfzFSHhtj7ePQCW89YpV?=
+ =?us-ascii?Q?6GEsOXLD9nMaLHtBchdtkAiIKv3zGtc/UFlhHRM5zsnjVOtLC7aDZWmIQRVH?=
+ =?us-ascii?Q?HKhUId0JYMwSG8xAhXFEzCGS7/5JfbXO2t0eiaSVJjA5PIID2DfyxW8Om5nT?=
+ =?us-ascii?Q?eLFzdh7xFIG1q0FnhFwtsPlTGrpziyXLsqrAMd7frqb8v1pksZobGRkT3EEt?=
+ =?us-ascii?Q?2ood8JKMVnSlKpx0AlBYh4CDfNh7KUUE9B2e5fsVebqZqYKVcoRJtDhg9XyW?=
+ =?us-ascii?Q?nHf3?=
 X-OriginatorOrg: amd.com
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1352.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2020 17:12:04.5244
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2020 17:12:58.7602
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 476feabb-15b3-4fba-9943-08d89d2eb788
+X-MS-Exchange-CrossTenant-Network-Message-Id: 204a7da3-b1ec-4141-e586-08d89d2ed7e0
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: axO6oqk+hqS+qL3yCgXqKLw4+bXxx98+E0vdHXtNrTYnF0O/AKLRLgl44ab+JWr+/ogVbHH5PEKCcfbyrs5r3g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2eyxSEww675VM+P04OHGWSlyN8jn5KIw4HwAgTQTC8fJ5OKDQdw2r5fLi8UZIQHsnN8k/knmOJKJaa2yngUVGw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0149
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -110,463 +110,351 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-SEV-ES adds a new VMEXIT reason code, VMGEXIT. Initial support for a
-VMGEXIT includes mapping the GHCB based on the guest GPA, which is
-obtained from a new VMCB field, and then validating the required inputs
-for the VMGEXIT exit reason.
+For an SEV-ES guest, MMIO is performed to a shared (un-encrypted) page
+so that both the hypervisor and guest can read or write to it and each
+see the contents.
 
-Since many of the VMGEXIT exit reasons correspond to existing VMEXIT
-reasons, the information from the GHCB is copied into the VMCB control
-exit code areas and KVM register areas. The standard exit handlers are
-invoked, similar to standard VMEXIT processing. Before restarting the
-vCPU, the GHCB is updated with any registers that have been updated by
-the hypervisor.
+The GHCB specification provides software-defined VMGEXIT exit codes to
+indicate a request for an MMIO read or an MMIO write. Add support to
+recognize the MMIO requests and invoke SEV-ES specific routines that
+can complete the MMIO operation. These routines use common KVM support
+to complete the MMIO operation.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/include/asm/svm.h      |   2 +-
- arch/x86/include/uapi/asm/svm.h |   7 +
- arch/x86/kvm/svm/sev.c          | 272 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c          |   8 +-
- arch/x86/kvm/svm/svm.h          |   8 +
- 5 files changed, 294 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/sev.c | 124 +++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.h |   6 ++
+ arch/x86/kvm/x86.c     | 123 ++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h     |   5 ++
+ 4 files changed, 258 insertions(+)
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index bce28482d63d..caa8628f5fba 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -130,7 +130,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u32 exit_int_info_err;
- 	u64 nested_ctl;
- 	u64 avic_vapic_bar;
--	u8 reserved_4[8];
-+	u64 ghcb_gpa;
- 	u32 event_inj;
- 	u32 event_inj_err;
- 	u64 nested_cr3;
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index f1d8307454e0..09f723945425 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -81,6 +81,7 @@
- #define SVM_EXIT_NPF           0x400
- #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
- #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS	0x402
-+#define SVM_EXIT_VMGEXIT       0x403
- 
- /* SEV-ES software-defined VMGEXIT events */
- #define SVM_VMGEXIT_MMIO_READ			0x80000001
-@@ -187,6 +188,12 @@
- 	{ SVM_EXIT_NPF,         "npf" }, \
- 	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
- 	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
-+	{ SVM_EXIT_VMGEXIT,		"vmgexit" }, \
-+	{ SVM_VMGEXIT_MMIO_READ,	"vmgexit_mmio_read" }, \
-+	{ SVM_VMGEXIT_MMIO_WRITE,	"vmgexit_mmio_write" }, \
-+	{ SVM_VMGEXIT_NMI_COMPLETE,	"vmgexit_nmi_complete" }, \
-+	{ SVM_VMGEXIT_AP_HLT_LOOP,	"vmgexit_ap_hlt_loop" }, \
-+	{ SVM_VMGEXIT_AP_JUMP_TABLE,	"vmgexit_ap_jump_table" }, \
- 	{ SVM_EXIT_ERR,         "invalid_guest_state" }
- 
- 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index fb4a411f7550..54e6894b26d2 100644
+index 2e2548fa369b..63f20be4bc69 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -18,6 +18,7 @@
- 
- #include "x86.h"
- #include "svm.h"
-+#include "cpuid.h"
- 
- static int sev_flush_asids(void);
- static DECLARE_RWSEM(sev_deactivate_lock);
-@@ -1257,11 +1258,226 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+@@ -1262,6 +1262,9 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.guest_state_protected)
+ 		sev_flush_guest_memory(svm, svm->vmsa, PAGE_SIZE);
  	__free_page(virt_to_page(svm->vmsa));
++
++	if (svm->ghcb_sa_free)
++		kfree(svm->ghcb_sa);
  }
  
-+static void dump_ghcb(struct vcpu_svm *svm)
-+{
-+	struct ghcb *ghcb = svm->ghcb;
-+	unsigned int nbits;
-+
-+	/* Re-use the dump_invalid_vmcb module parameter */
-+	if (!dump_invalid_vmcb) {
-+		pr_warn_ratelimited("set kvm_amd.dump_invalid_vmcb=1 to dump internal KVM state.\n");
-+		return;
-+	}
-+
-+	nbits = sizeof(ghcb->save.valid_bitmap) * 8;
-+
-+	pr_err("GHCB (GPA=%016llx):\n", svm->vmcb->control.ghcb_gpa);
-+	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_code",
-+	       ghcb->save.sw_exit_code, ghcb_sw_exit_code_is_valid(ghcb));
-+	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_1",
-+	       ghcb->save.sw_exit_info_1, ghcb_sw_exit_info_1_is_valid(ghcb));
-+	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_2",
-+	       ghcb->save.sw_exit_info_2, ghcb_sw_exit_info_2_is_valid(ghcb));
-+	pr_err("%-20s%016llx is_valid: %u\n", "sw_scratch",
-+	       ghcb->save.sw_scratch, ghcb_sw_scratch_is_valid(ghcb));
-+	pr_err("%-20s%*pb\n", "valid_bitmap", nbits, ghcb->save.valid_bitmap);
-+}
-+
-+static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
-+{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct ghcb *ghcb = svm->ghcb;
-+
-+	/*
-+	 * The GHCB protocol so far allows for the following data
-+	 * to be returned:
-+	 *   GPRs RAX, RBX, RCX, RDX
-+	 *
-+	 * Copy their values to the GHCB if they are dirty.
-+	 */
-+	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RAX))
-+		ghcb_set_rax(ghcb, vcpu->arch.regs[VCPU_REGS_RAX]);
-+	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RBX))
-+		ghcb_set_rbx(ghcb, vcpu->arch.regs[VCPU_REGS_RBX]);
-+	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RCX))
-+		ghcb_set_rcx(ghcb, vcpu->arch.regs[VCPU_REGS_RCX]);
-+	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RDX))
-+		ghcb_set_rdx(ghcb, vcpu->arch.regs[VCPU_REGS_RDX]);
-+}
-+
-+static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
-+{
-+	struct vmcb_control_area *control = &svm->vmcb->control;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct ghcb *ghcb = svm->ghcb;
-+	u64 exit_code;
-+
-+	/*
-+	 * The GHCB protocol so far allows for the following data
-+	 * to be supplied:
-+	 *   GPRs RAX, RBX, RCX, RDX
-+	 *   XCR0
-+	 *   CPL
-+	 *
-+	 * VMMCALL allows the guest to provide extra registers. KVM also
-+	 * expects RSI for hypercalls, so include that, too.
-+	 *
-+	 * Copy their values to the appropriate location if supplied.
-+	 */
-+	memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
-+
-+	vcpu->arch.regs[VCPU_REGS_RAX] = ghcb_get_rax_if_valid(ghcb);
-+	vcpu->arch.regs[VCPU_REGS_RBX] = ghcb_get_rbx_if_valid(ghcb);
-+	vcpu->arch.regs[VCPU_REGS_RCX] = ghcb_get_rcx_if_valid(ghcb);
-+	vcpu->arch.regs[VCPU_REGS_RDX] = ghcb_get_rdx_if_valid(ghcb);
-+	vcpu->arch.regs[VCPU_REGS_RSI] = ghcb_get_rsi_if_valid(ghcb);
-+
-+	svm->vmcb->save.cpl = ghcb_get_cpl_if_valid(ghcb);
-+
-+	if (ghcb_xcr0_is_valid(ghcb)) {
-+		vcpu->arch.xcr0 = ghcb_get_xcr0(ghcb);
-+		kvm_update_cpuid_runtime(vcpu);
-+	}
-+
-+	/* Copy the GHCB exit information into the VMCB fields */
-+	exit_code = ghcb_get_sw_exit_code(ghcb);
-+	control->exit_code = lower_32_bits(exit_code);
-+	control->exit_code_hi = upper_32_bits(exit_code);
-+	control->exit_info_1 = ghcb_get_sw_exit_info_1(ghcb);
-+	control->exit_info_2 = ghcb_get_sw_exit_info_2(ghcb);
-+
-+	/* Clear the valid entries fields */
-+	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
-+}
-+
-+static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct ghcb *ghcb;
-+	u64 exit_code = 0;
-+
-+	ghcb = svm->ghcb;
-+
-+	/* Only GHCB Usage code 0 is supported */
-+	if (ghcb->ghcb_usage)
-+		goto vmgexit_err;
-+
-+	/*
-+	 * Retrieve the exit code now even though is may not be marked valid
-+	 * as it could help with debugging.
-+	 */
-+	exit_code = ghcb_get_sw_exit_code(ghcb);
-+
-+	if (!ghcb_sw_exit_code_is_valid(ghcb) ||
-+	    !ghcb_sw_exit_info_1_is_valid(ghcb) ||
-+	    !ghcb_sw_exit_info_2_is_valid(ghcb))
-+		goto vmgexit_err;
-+
-+	switch (ghcb_get_sw_exit_code(ghcb)) {
-+	case SVM_EXIT_READ_DR7:
-+		break;
-+	case SVM_EXIT_WRITE_DR7:
-+		if (!ghcb_rax_is_valid(ghcb))
+ static void dump_ghcb(struct vcpu_svm *svm)
+@@ -1436,6 +1439,11 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 		    !ghcb_rcx_is_valid(ghcb))
+ 			goto vmgexit_err;
+ 		break;
++	case SVM_VMGEXIT_MMIO_READ:
++	case SVM_VMGEXIT_MMIO_WRITE:
++		if (!ghcb_sw_scratch_is_valid(ghcb))
 +			goto vmgexit_err;
 +		break;
-+	case SVM_EXIT_RDTSC:
-+		break;
-+	case SVM_EXIT_RDPMC:
-+		if (!ghcb_rcx_is_valid(ghcb))
-+			goto vmgexit_err;
-+		break;
-+	case SVM_EXIT_CPUID:
-+		if (!ghcb_rax_is_valid(ghcb) ||
-+		    !ghcb_rcx_is_valid(ghcb))
-+			goto vmgexit_err;
-+		if (ghcb_get_rax(ghcb) == 0xd)
-+			if (!ghcb_xcr0_is_valid(ghcb))
-+				goto vmgexit_err;
-+		break;
-+	case SVM_EXIT_INVD:
-+		break;
-+	case SVM_EXIT_IOIO:
-+		if (!(ghcb_get_sw_exit_info_1(ghcb) & SVM_IOIO_TYPE_MASK))
-+			if (!ghcb_rax_is_valid(ghcb))
-+				goto vmgexit_err;
-+		break;
-+	case SVM_EXIT_MSR:
-+		if (!ghcb_rcx_is_valid(ghcb))
-+			goto vmgexit_err;
-+		if (ghcb_get_sw_exit_info_1(ghcb)) {
-+			if (!ghcb_rax_is_valid(ghcb) ||
-+			    !ghcb_rdx_is_valid(ghcb))
-+				goto vmgexit_err;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		break;
+ 	default:
+@@ -1470,6 +1478,24 @@ static void pre_sev_es_run(struct vcpu_svm *svm)
+ 	if (!svm->ghcb)
+ 		return;
+ 
++	if (svm->ghcb_sa_free) {
++		/*
++		 * The scratch area lives outside the GHCB, so there is a
++		 * buffer that, depending on the operation performed, may
++		 * need to be synced, then freed.
++		 */
++		if (svm->ghcb_sa_sync) {
++			kvm_write_guest(svm->vcpu.kvm,
++					ghcb_get_sw_scratch(svm->ghcb),
++					svm->ghcb_sa, svm->ghcb_sa_len);
++			svm->ghcb_sa_sync = false;
 +		}
-+		break;
-+	case SVM_EXIT_VMMCALL:
-+		if (!ghcb_rax_is_valid(ghcb) ||
-+		    !ghcb_cpl_is_valid(ghcb))
-+			goto vmgexit_err;
-+		break;
-+	case SVM_EXIT_RDTSCP:
-+		break;
-+	case SVM_EXIT_WBINVD:
-+		break;
-+	case SVM_EXIT_MONITOR:
-+		if (!ghcb_rax_is_valid(ghcb) ||
-+		    !ghcb_rcx_is_valid(ghcb) ||
-+		    !ghcb_rdx_is_valid(ghcb))
-+			goto vmgexit_err;
-+		break;
-+	case SVM_EXIT_MWAIT:
-+		if (!ghcb_rax_is_valid(ghcb) ||
-+		    !ghcb_rcx_is_valid(ghcb))
-+			goto vmgexit_err;
-+		break;
-+	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-+		break;
-+	default:
-+		goto vmgexit_err;
++
++		kfree(svm->ghcb_sa);
++		svm->ghcb_sa = NULL;
++		svm->ghcb_sa_free = false;
 +	}
 +
-+	return 0;
-+
-+vmgexit_err:
-+	vcpu = &svm->vcpu;
-+
-+	if (ghcb->ghcb_usage) {
-+		vcpu_unimpl(vcpu, "vmgexit: ghcb usage %#x is not valid\n",
-+			    ghcb->ghcb_usage);
-+	} else {
-+		vcpu_unimpl(vcpu, "vmgexit: exit reason %#llx is not valid\n",
-+			    exit_code);
-+		dump_ghcb(svm);
-+	}
-+
-+	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-+	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-+	vcpu->run->internal.ndata = 2;
-+	vcpu->run->internal.data[0] = exit_code;
-+	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-+
-+	return -EINVAL;
-+}
-+
-+static void pre_sev_es_run(struct vcpu_svm *svm)
-+{
-+	if (!svm->ghcb)
-+		return;
-+
-+	sev_es_sync_to_ghcb(svm);
-+
-+	kvm_vcpu_unmap(&svm->vcpu, &svm->ghcb_map, true);
-+	svm->ghcb = NULL;
-+}
-+
- void pre_sev_run(struct vcpu_svm *svm, int cpu)
- {
- 	struct svm_cpu_data *sd = per_cpu(svm_data, cpu);
- 	int asid = sev_get_asid(svm->vcpu.kvm);
+ 	trace_kvm_vmgexit_exit(svm->vcpu.vcpu_id, svm->ghcb);
  
-+	/* Perform any SEV-ES pre-run actions */
-+	pre_sev_es_run(svm);
-+
- 	/* Assign the asid allocated with this SEV guest */
- 	svm->vmcb->control.asid = asid;
- 
-@@ -1279,3 +1495,59 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
- 	svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
+ 	sev_es_sync_to_ghcb(svm);
+@@ -1504,6 +1530,86 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
  	vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
  }
-+
-+static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
-+{
-+	return -EINVAL;
-+}
-+
-+int sev_handle_vmgexit(struct vcpu_svm *svm)
+ 
++#define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
++static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
 +{
 +	struct vmcb_control_area *control = &svm->vmcb->control;
-+	u64 ghcb_gpa, exit_code;
-+	struct ghcb *ghcb;
-+	int ret;
++	struct ghcb *ghcb = svm->ghcb;
++	u64 ghcb_scratch_beg, ghcb_scratch_end;
++	u64 scratch_gpa_beg, scratch_gpa_end;
++	void *scratch_va;
 +
-+	/* Validate the GHCB */
-+	ghcb_gpa = control->ghcb_gpa;
-+	if (ghcb_gpa & GHCB_MSR_INFO_MASK)
-+		return sev_handle_vmgexit_msr_protocol(svm);
-+
-+	if (!ghcb_gpa) {
-+		vcpu_unimpl(&svm->vcpu, "vmgexit: GHCB gpa is not set\n");
-+		return -EINVAL;
++	scratch_gpa_beg = ghcb_get_sw_scratch(ghcb);
++	if (!scratch_gpa_beg) {
++		pr_err("vmgexit: scratch gpa not provided\n");
++		return false;
 +	}
 +
-+	if (kvm_vcpu_map(&svm->vcpu, ghcb_gpa >> PAGE_SHIFT, &svm->ghcb_map)) {
-+		/* Unable to map GHCB from guest */
-+		vcpu_unimpl(&svm->vcpu, "vmgexit: error mapping GHCB [%#llx] from guest\n",
-+			    ghcb_gpa);
-+		return -EINVAL;
++	scratch_gpa_end = scratch_gpa_beg + len;
++	if (scratch_gpa_end < scratch_gpa_beg) {
++		pr_err("vmgexit: scratch length (%#llx) not valid for scratch address (%#llx)\n",
++		       len, scratch_gpa_beg);
++		return false;
 +	}
 +
-+	svm->ghcb = svm->ghcb_map.hva;
-+	ghcb = svm->ghcb_map.hva;
++	if ((scratch_gpa_beg & PAGE_MASK) == control->ghcb_gpa) {
++		/* Scratch area begins within GHCB */
++		ghcb_scratch_beg = control->ghcb_gpa +
++				   offsetof(struct ghcb, shared_buffer);
++		ghcb_scratch_end = control->ghcb_gpa +
++				   offsetof(struct ghcb, reserved_1);
 +
-+	exit_code = ghcb_get_sw_exit_code(ghcb);
++		/*
++		 * If the scratch area begins within the GHCB, it must be
++		 * completely contained in the GHCB shared buffer area.
++		 */
++		if (scratch_gpa_beg < ghcb_scratch_beg ||
++		    scratch_gpa_end > ghcb_scratch_end) {
++			pr_err("vmgexit: scratch area is outside of GHCB shared buffer area (%#llx - %#llx)\n",
++			       scratch_gpa_beg, scratch_gpa_end);
++			return false;
++		}
 +
-+	ret = sev_es_validate_vmgexit(svm);
-+	if (ret)
-+		return ret;
++		scratch_va = (void *)svm->ghcb;
++		scratch_va += (scratch_gpa_beg - control->ghcb_gpa);
++	} else {
++		/*
++		 * The guest memory must be read into a kernel buffer, so
++		 * limit the size
++		 */
++		if (len > GHCB_SCRATCH_AREA_LIMIT) {
++			pr_err("vmgexit: scratch area exceeds KVM limits (%#llx requested, %#llx limit)\n",
++			       len, GHCB_SCRATCH_AREA_LIMIT);
++			return false;
++		}
++		scratch_va = kzalloc(len, GFP_KERNEL);
++		if (!scratch_va)
++			return false;
 +
-+	sev_es_sync_from_ghcb(svm);
-+	ghcb_set_sw_exit_info_1(ghcb, 0);
-+	ghcb_set_sw_exit_info_2(ghcb, 0);
++		if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, scratch_va, len)) {
++			/* Unable to copy scratch area from guest */
++			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
 +
-+	ret = -EINVAL;
-+	switch (exit_code) {
-+	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-+		vcpu_unimpl(&svm->vcpu,
-+			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
-+			    control->exit_info_1, control->exit_info_2);
-+		break;
-+	default:
-+		ret = svm_invoke_exit_handler(svm, exit_code);
++			kfree(scratch_va);
++			return false;
++		}
++
++		/*
++		 * The scratch area is outside the GHCB. The operation will
++		 * dictate whether the buffer needs to be synced before running
++		 * the vCPU next time (i.e. a read was requested so the data
++		 * must be written back to the guest memory).
++		 */
++		svm->ghcb_sa_sync = sync;
++		svm->ghcb_sa_free = true;
 +	}
 +
-+	return ret;
++	svm->ghcb_sa = scratch_va;
++	svm->ghcb_sa_len = len;
++
++	return true;
 +}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ce7bcb9cf90c..ad1ec6ad558e 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -195,7 +195,7 @@ module_param(sev, int, 0444);
- int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
- module_param(sev_es, int, 0444);
- 
--static bool __read_mostly dump_invalid_vmcb = 0;
-+bool __read_mostly dump_invalid_vmcb;
- module_param(dump_invalid_vmcb, bool, 0644);
- 
- static u8 rsm_ins_bytes[] = "\x0f\xaa";
-@@ -3031,6 +3031,7 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
- 	[SVM_EXIT_RSM]                          = rsm_interception,
- 	[SVM_EXIT_AVIC_INCOMPLETE_IPI]		= avic_incomplete_ipi_interception,
- 	[SVM_EXIT_AVIC_UNACCELERATED_ACCESS]	= avic_unaccelerated_access_interception,
-+	[SVM_EXIT_VMGEXIT]			= sev_handle_vmgexit,
- };
- 
- static void dump_vmcb(struct kvm_vcpu *vcpu)
-@@ -3072,6 +3073,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
- 	pr_err("%-20s%lld\n", "nested_ctl:", control->nested_ctl);
- 	pr_err("%-20s%016llx\n", "nested_cr3:", control->nested_cr3);
- 	pr_err("%-20s%016llx\n", "avic_vapic_bar:", control->avic_vapic_bar);
-+	pr_err("%-20s%016llx\n", "ghcb:", control->ghcb_gpa);
- 	pr_err("%-20s%08x\n", "event_inj:", control->event_inj);
- 	pr_err("%-20s%08x\n", "event_inj_err:", control->event_inj_err);
- 	pr_err("%-20s%lld\n", "virt_ext:", control->virt_ext);
-@@ -3168,7 +3170,7 @@ static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
- 	return -EINVAL;
- }
- 
--static int svm_invoke_exit_handler(struct vcpu_svm *svm, u64 exit_code)
-+int svm_invoke_exit_handler(struct vcpu_svm *svm, u64 exit_code)
++
+ static void set_ghcb_msr_bits(struct vcpu_svm *svm, u64 value, u64 mask,
+ 			      unsigned int pos)
  {
- 	if (svm_handle_invalid_exit(&svm->vcpu, exit_code))
- 		return 0;
-@@ -3184,6 +3186,8 @@ static int svm_invoke_exit_handler(struct vcpu_svm *svm, u64 exit_code)
- 		return halt_interception(svm);
- 	else if (exit_code == SVM_EXIT_NPF)
- 		return npf_interception(svm);
-+	else if (exit_code == SVM_EXIT_VMGEXIT)
-+		return sev_handle_vmgexit(svm);
- #endif
- 	return svm_exit_handlers[exit_code](svm);
- }
+@@ -1641,6 +1747,24 @@ int sev_handle_vmgexit(struct vcpu_svm *svm)
+ 
+ 	ret = -EINVAL;
+ 	switch (exit_code) {
++	case SVM_VMGEXIT_MMIO_READ:
++		if (!setup_vmgexit_scratch(svm, true, control->exit_info_2))
++			break;
++
++		ret = kvm_sev_es_mmio_read(&svm->vcpu,
++					   control->exit_info_1,
++					   control->exit_info_2,
++					   svm->ghcb_sa);
++		break;
++	case SVM_VMGEXIT_MMIO_WRITE:
++		if (!setup_vmgexit_scratch(svm, false, control->exit_info_2))
++			break;
++
++		ret = kvm_sev_es_mmio_write(&svm->vcpu,
++					    control->exit_info_1,
++					    control->exit_info_2,
++					    svm->ghcb_sa);
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(&svm->vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index abfe53d6b3dc..89bcb26977e5 100644
+index fc69bc2e0cad..9019ad6a8138 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -17,6 +17,7 @@
- 
- #include <linux/kvm_types.h>
- #include <linux/kvm_host.h>
-+#include <linux/bits.h>
- 
- #include <asm/svm.h>
- 
-@@ -172,6 +173,7 @@ struct vcpu_svm {
- 	/* SEV-ES support */
+@@ -174,6 +174,12 @@ struct vcpu_svm {
  	struct vmcb_save_area *vmsa;
  	struct ghcb *ghcb;
-+	struct kvm_host_map ghcb_map;
+ 	struct kvm_host_map ghcb_map;
++
++	/* SEV-ES scratch area support */
++	void *ghcb_sa;
++	u64 ghcb_sa_len;
++	bool ghcb_sa_sync;
++	bool ghcb_sa_free;
  };
  
  struct svm_cpu_data {
-@@ -390,6 +392,7 @@ static inline bool gif_set(struct vcpu_svm *svm)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ba26b62e0262..78e8c8b36f9b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11299,6 +11299,129 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+ }
+ EXPORT_SYMBOL_GPL(kvm_handle_invpcid);
  
- extern int sev;
- extern int sev_es;
-+extern bool dump_invalid_vmcb;
- 
- u32 svm_msrpm_offset(u32 msr);
- u32 *svm_vcpu_alloc_msrpm(void);
-@@ -405,6 +408,7 @@ bool svm_smi_blocked(struct kvm_vcpu *vcpu);
- bool svm_nmi_blocked(struct kvm_vcpu *vcpu);
- bool svm_interrupt_blocked(struct kvm_vcpu *vcpu);
- void svm_set_gif(struct vcpu_svm *svm, bool value);
-+int svm_invoke_exit_handler(struct vcpu_svm *svm, u64 exit_code);
- 
- /* nested.c */
- 
-@@ -510,6 +514,9 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
- 
- /* sev.c */
- 
-+#define GHCB_MSR_INFO_POS		0
-+#define GHCB_MSR_INFO_MASK		(BIT_ULL(12) - 1)
++static int complete_sev_es_emulated_mmio(struct kvm_vcpu *vcpu)
++{
++	struct kvm_run *run = vcpu->run;
++	struct kvm_mmio_fragment *frag;
++	unsigned int len;
 +
- extern unsigned int max_sev_asid;
++	BUG_ON(!vcpu->mmio_needed);
++
++	/* Complete previous fragment */
++	frag = &vcpu->mmio_fragments[vcpu->mmio_cur_fragment];
++	len = min(8u, frag->len);
++	if (!vcpu->mmio_is_write)
++		memcpy(frag->data, run->mmio.data, len);
++
++	if (frag->len <= 8) {
++		/* Switch to the next fragment. */
++		frag++;
++		vcpu->mmio_cur_fragment++;
++	} else {
++		/* Go forward to the next mmio piece. */
++		frag->data += len;
++		frag->gpa += len;
++		frag->len -= len;
++	}
++
++	if (vcpu->mmio_cur_fragment >= vcpu->mmio_nr_fragments) {
++		vcpu->mmio_needed = 0;
++
++		// VMG change, at this point, we're always done
++		// RIP has already been advanced
++		return 1;
++	}
++
++	// More MMIO is needed
++	run->mmio.phys_addr = frag->gpa;
++	run->mmio.len = min(8u, frag->len);
++	run->mmio.is_write = vcpu->mmio_is_write;
++	if (run->mmio.is_write)
++		memcpy(run->mmio.data, frag->data, min(8u, frag->len));
++	run->exit_reason = KVM_EXIT_MMIO;
++
++	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_mmio;
++
++	return 0;
++}
++
++int kvm_sev_es_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned int bytes,
++			  void *data)
++{
++	int handled;
++	struct kvm_mmio_fragment *frag;
++
++	if (!data)
++		return -EINVAL;
++
++	handled = write_emultor.read_write_mmio(vcpu, gpa, bytes, data);
++	if (handled == bytes)
++		return 1;
++
++	bytes -= handled;
++	gpa += handled;
++	data += handled;
++
++	/*TODO: Check if need to increment number of frags */
++	frag = vcpu->mmio_fragments;
++	vcpu->mmio_nr_fragments = 1;
++	frag->len = bytes;
++	frag->gpa = gpa;
++	frag->data = data;
++
++	vcpu->mmio_needed = 1;
++	vcpu->mmio_cur_fragment = 0;
++
++	vcpu->run->mmio.phys_addr = gpa;
++	vcpu->run->mmio.len = min(8u, frag->len);
++	vcpu->run->mmio.is_write = 1;
++	memcpy(vcpu->run->mmio.data, frag->data, min(8u, frag->len));
++	vcpu->run->exit_reason = KVM_EXIT_MMIO;
++
++	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_mmio;
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(kvm_sev_es_mmio_write);
++
++int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned int bytes,
++			 void *data)
++{
++	int handled;
++	struct kvm_mmio_fragment *frag;
++
++	if (!data)
++		return -EINVAL;
++
++	handled = read_emultor.read_write_mmio(vcpu, gpa, bytes, data);
++	if (handled == bytes)
++		return 1;
++
++	bytes -= handled;
++	gpa += handled;
++	data += handled;
++
++	/*TODO: Check if need to increment number of frags */
++	frag = vcpu->mmio_fragments;
++	vcpu->mmio_nr_fragments = 1;
++	frag->len = bytes;
++	frag->gpa = gpa;
++	frag->data = data;
++
++	vcpu->mmio_needed = 1;
++	vcpu->mmio_cur_fragment = 0;
++
++	vcpu->run->mmio.phys_addr = gpa;
++	vcpu->run->mmio.len = min(8u, frag->len);
++	vcpu->run->mmio.is_write = 0;
++	vcpu->run->exit_reason = KVM_EXIT_MMIO;
++
++	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_mmio;
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(kvm_sev_es_mmio_read);
++
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 764c967a1993..804369fe45e3 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -407,4 +407,9 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+ 	__reserved_bits;                                \
+ })
  
- static inline bool svm_sev_enabled(void)
-@@ -527,5 +534,6 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu);
- void __init sev_hardware_setup(void);
- void sev_hardware_teardown(void);
- void sev_free_vcpu(struct kvm_vcpu *vcpu);
-+int sev_handle_vmgexit(struct vcpu_svm *svm);
- 
++int kvm_sev_es_mmio_write(struct kvm_vcpu *vcpu, gpa_t src, unsigned int bytes,
++			  void *dst);
++int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t src, unsigned int bytes,
++			 void *dst);
++
  #endif
 -- 
 2.28.0
