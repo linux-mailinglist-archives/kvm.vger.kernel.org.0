@@ -2,41 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84FD62D5A28
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 13:17:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 112362D5A70
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 13:25:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387832AbgLJMPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 07:15:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39926 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728530AbgLJMPc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 07:15:32 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E09D5C0613CF;
-        Thu, 10 Dec 2020 04:14:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=DB9D2pH9CmpJ5O5VlPeB8KKtAT8lj7o0SsGztCVyPIc=; b=v8XablaO9IAVxnRpzKKiYxZ6A4
-        e3FokL4c8tO2GFLkoHXXcB0+WfLH0Md9xHCFiMF/Zvq2TUuns77qGs+SKkUsi/8z2lYxR4VCcNfgQ
-        Iuo+1NrRwS+aqWX9VVo/LRALvz2V+wQg9L80vPW8+ONsZEr6OyayEEqV4aYPm+ReaXI5XP5Td9huU
-        mGNPRvEdXbiDEBWQ8LHUoZme42ePDpcoOMwArsMtSrt43XH1e2iNajNXqC0j/TuNO7DHrQEA90Xqr
-        9B78bCN15JC3/hk8Sq1KzmanZFyJTxThUUABuKpJHXg/DXAWxeQmeDcBgX1Eva0ZNZGKPdlf1evIJ
-        EncVXFBw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1knKpy-00066Z-Ct; Thu, 10 Dec 2020 12:14:22 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1A84A3059C6;
-        Thu, 10 Dec 2020 13:14:17 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id D7A2F20234B76; Thu, 10 Dec 2020 13:14:17 +0100 (CET)
-Date:   Thu, 10 Dec 2020 13:14:17 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1730356AbgLJMXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 07:23:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39994 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730027AbgLJMXg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 07:23:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607602928;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7PSrzA8rIkZ91gYxwlJNdk5yQ9KUFigi9bQ/KRmwMkM=;
+        b=JO0uVZism5S7+vnQuEfo5UV3rO3rhFVCYs/dOHzHEDv0Q0vxl9n/KN2jw3n45jkBUQb94I
+        TJ4zW7LT2pwflkyCBQAsrGFALXI1hlNNRY9QfPJrR3UOXfJicktvEFA9TFaKlbKt2Xx+sC
+        quLWNh1brjNVeTYxEsbPD67OJIsQSAM=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-AwBS0FLVOAmmZbV9gWo9NQ-1; Thu, 10 Dec 2020 07:22:06 -0500
+X-MC-Unique: AwBS0FLVOAmmZbV9gWo9NQ-1
+Received: by mail-ed1-f69.google.com with SMTP id u18so2357721edy.5
+        for <kvm@vger.kernel.org>; Thu, 10 Dec 2020 04:22:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7PSrzA8rIkZ91gYxwlJNdk5yQ9KUFigi9bQ/KRmwMkM=;
+        b=ULFyHFH4GmyB/OdHf5R+dlsDdah7PQC8BLHkieceXkteegT4oW5SF8DKjEQvlpFmAP
+         l9CfMbu0glOJ6xTX+Z6qZb3QEjMkt6mkJvXZUCv01sbQBfwq6KGB3QXxNj4ejCMxhgeK
+         Dc+H/98ywJbCZEnPKFQxDHzZdSr0VWAvSCrG/xuNWc4BmWY7EwqO9Llyr6C/dTtQHTXo
+         cLDASQw0cb9LcKwiPoSspX3YQq0pe6CwuAJmusMDyCa/LXLFBGtgSgbQAn8OaCiYTXV+
+         F21dNMFiS8wdo8VZYH5E5oMYTdVC1UdvUIe9TULGHvwlqg4m1HAx7rc391k91Mtxom/C
+         MaPA==
+X-Gm-Message-State: AOAM531Mh8deJ6vbbNhFQ9+ATVex2azmHtNLJjplJotyHs9pvccSVUUW
+        klsFkqBjK59C//UNfd94haZ3pwPMBG230VzbXVQcaIMKMfxHfaU+QedwSZI+fvzdcOPblF8tdcN
+        1ZcM4CC32jk4lgSqzZTUVmuz82UMrlcDk/jZmFvyhyKiG0AztkqbFOmOKGw6YpY60
+X-Received: by 2002:aa7:cf85:: with SMTP id z5mr6509225edx.274.1607602925155;
+        Thu, 10 Dec 2020 04:22:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJybequ2MuYAvUJlcvYBoDwmZDe57QoKmulE84b6L8d93gCq/hTPU3F6HevqVt9BG7Kzyoq87w==
+X-Received: by 2002:aa7:cf85:: with SMTP id z5mr6509198edx.274.1607602924980;
+        Thu, 10 Dec 2020 04:22:04 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id h15sm4492763ejq.29.2020.12.10.04.22.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Dec 2020 04:22:04 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
@@ -56,8 +72,6 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Oliver Upton <oupton@google.com>,
         "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
         kvm@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-Message-ID: <20201210121417.GN2414@hirez.programming.kicks-ass.net>
 References: <20201203171118.372391-1-mlevitsk@redhat.com>
  <20201203171118.372391-2-mlevitsk@redhat.com>
  <87a6uq9abf.fsf@nanos.tec.linutronix.de>
@@ -65,22 +79,36 @@ References: <20201203171118.372391-1-mlevitsk@redhat.com>
  <87im9dlpsw.fsf@vitty.brq.redhat.com>
  <875z5d5x9m.fsf@nanos.tec.linutronix.de>
  <b6e0656b-4e3f-cf47-5ec9-eead44b2f2e9@redhat.com>
+ <20201210121417.GN2414@hirez.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fe3e4637-b74b-864a-9d2f-c4f2d9450f2e@redhat.com>
+Date:   Thu, 10 Dec 2020 13:22:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6e0656b-4e3f-cf47-5ec9-eead44b2f2e9@redhat.com>
+In-Reply-To: <20201210121417.GN2414@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 10, 2020 at 12:42:36PM +0100, Paolo Bonzini wrote:
-> On 07/12/20 18:41, Thomas Gleixner wrote:
-> > Right this happens still occasionally, but for quite some time this is
-> > 100% firmware sillyness and not a fundamental property of the hardware
-> > anymore.
+On 10/12/20 13:14, Peter Zijlstra wrote:
+> On Thu, Dec 10, 2020 at 12:42:36PM +0100, Paolo Bonzini wrote:
+>> On 07/12/20 18:41, Thomas Gleixner wrote:
+>>> Right this happens still occasionally, but for quite some time this is
+>>> 100% firmware sillyness and not a fundamental property of the hardware
+>>> anymore.
+>>
+>> It's still a fundamental property of old hardware.  Last time I tried to
+>> kill support for processors earlier than Core 2, I had to revert it. That's
+>> older than Nehalem.
 > 
-> It's still a fundamental property of old hardware.  Last time I tried to
-> kill support for processors earlier than Core 2, I had to revert it. That's
-> older than Nehalem.
+> Core2 doesn't use TSC for timekeeping anyway. KVM shouldn't either.
 
-Core2 doesn't use TSC for timekeeping anyway. KVM shouldn't either.
+On Core2, KVM guests pass TSC through kvmclock in order to get something 
+usable and not incredibly slow.
+
+Paolo
+
