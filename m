@@ -2,205 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3EBD2D5F46
-	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 16:15:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C81AF2D5F72
+	for <lists+kvm@lfdr.de>; Thu, 10 Dec 2020 16:22:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389736AbgLJPO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 10:14:57 -0500
-Received: from foss.arm.com ([217.140.110.172]:46020 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391595AbgLJOqg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 09:46:36 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9666C1FB;
-        Thu, 10 Dec 2020 06:45:50 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD18C3F718;
-        Thu, 10 Dec 2020 06:45:49 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 08/10] arm/arm64: gic: Split check_acked()
- into two functions
-To:     Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-Cc:     andre.przywara@arm.com
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-9-alexandru.elisei@arm.com>
- <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <2b8d774e-9398-e24b-6989-8643f5dd2492@arm.com>
-Date:   Thu, 10 Dec 2020 14:45:37 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
-MIME-Version: 1.0
-In-Reply-To: <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
+        id S2391479AbgLJPRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 10:17:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39706 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391555AbgLJPRE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Dec 2020 10:17:04 -0500
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DBFCC0617A7
+        for <kvm@vger.kernel.org>; Thu, 10 Dec 2020 07:16:13 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id i3so4365696pfd.6
+        for <kvm@vger.kernel.org>; Thu, 10 Dec 2020 07:16:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=ZRkSD0Q57BhwAifo2zbWB1GnhkM5sfgv11URhPoKJvI=;
+        b=mJpQkx5DuKXjnzxJcDiFhvesmPZulAjLaZyoKF9b0TcBKkJgtMyY/yd7datmdIkf3l
+         wDyFPxdbU35gEQ/pEX3CVf0PLNHD2eMPUPFUYVRrn2aAiKBG5b1796tkaXQKWgVCZQd1
+         z84Pu6rbNn4kNAHICiftdvfPJkzsSHaGXacG4NCquX3Ys8X6xyUWE4ctOnyatv4lgTHE
+         P3W9mn4Zt634Fc/7D7abawqoJUNQxwdOQytnRqpFde6s6OVXX+KsoV5PKgKsYtrGNSlv
+         Vyv3O31DitJvejfpNLjH9qZa+FHgkXxeWPSv/APTrmBHzF3pB+tfnFqqlb2N8UsTN97b
+         yWWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=ZRkSD0Q57BhwAifo2zbWB1GnhkM5sfgv11URhPoKJvI=;
+        b=UV882QwyUDDMDdHCPDAQhVf2IPOjgZeVGEw6pQT/LLWaIcZLGi984njKAaQG2hhuBu
+         IXKvDcW7BV4MHcvO9beU06u3SzWNXWdJhW5AufUF7h5J6aHkjXrEYulFUdGw7xxhTmDu
+         /5gMo0yYfDtNKrIgApxUB3SvQVdclNiR7Ia0qseyQWAcMP6G6mxL/iN7Nd/KrDfQkW/e
+         M2j7I3N3eC8TShT6IsCWXG7JCmPbDdoWGG8KTSJVsrL0foO+rf68gvKY/jpSzWnoEH1O
+         XSQvcWkkLrS3rdOCd8IDH9bAysHICny5PgyU0leoD0ROtISFIMOk8QdqlYKluKIj//iq
+         f5Og==
+X-Gm-Message-State: AOAM533KHE05dbiGlDhgDM5hzq0J/xRtMguzRLxsRrGXceblgcGD5xbr
+        F4Mn9L8MCngmEX2YxvMuTy/n9A==
+X-Google-Smtp-Source: ABdhPJx46Ci6hjCq0tAYhUM/2n8+GZTDgJP0pxIYwMM2jhoQAngZlbEdM/F8U+CzdFsazwI5ydqLyA==
+X-Received: by 2002:a17:90a:e38c:: with SMTP id b12mr8266014pjz.177.1607613372534;
+        Thu, 10 Dec 2020 07:16:12 -0800 (PST)
+Received: from ?IPv6:2601:646:c200:1ef2:b5ad:66ae:88c:b76d? ([2601:646:c200:1ef2:b5ad:66ae:88c:b76d])
+        by smtp.gmail.com with ESMTPSA id 19sm7079080pfu.85.2020.12.10.07.16.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Dec 2020 07:16:11 -0800 (PST)
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+Date:   Thu, 10 Dec 2020 07:16:10 -0800
+Message-Id: <E4F263BE-6CAA-4152-8818-187D34D8D0FD@amacapital.net>
+References: <9389c1198da174bcc9483d6ebf535405aa8bdb45.camel@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+In-Reply-To: <9389c1198da174bcc9483d6ebf535405aa8bdb45.camel@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+X-Mailer: iPhone Mail (18B121)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
 
-On 12/3/20 1:39 PM, Auger Eric wrote:
->
-> On 11/25/20 4:51 PM, Alexandru Elisei wrote:
->> check_acked() has several peculiarities: is the only function among the
->> check_* functions which calls report() directly, it does two things
->> (waits for interrupts and checks for misfired interrupts) and it also
->> mixes printf, report_info and report calls.
->>
->> check_acked() also reports a pass and returns as soon all the target CPUs
->> have received interrupts, However, a CPU not having received an interrupt
->> *now* does not guarantee not receiving an eroneous interrupt if we wait
-> erroneous
->> long enough.
->>
->> Rework the function by splitting it into two separate functions, each with
->> a single responsability: wait_for_interrupts(), which waits for the
->> expected interrupts to fire, and check_acked() which checks that interrupts
->> have been received as expected.
->>
->> wait_for_interrupts() also waits an extra 100 milliseconds after the
->> expected interrupts have been received in an effort to make sure we don't
->> miss misfiring interrupts.
->>
->> Splitting check_acked() into two functions will also allow us to
->> customize the behavior of each function in the future more easily
->> without using an unnecessarily long list of arguments for check_acked().
->>
->> CC: Andre Przywara <andre.przywara@arm.com>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
->>  1 file changed, 47 insertions(+), 26 deletions(-)
->>
->> diff --git a/arm/gic.c b/arm/gic.c
->> index 544c283f5f47..dcdab7d5f39a 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -62,41 +62,42 @@ static void stats_reset(void)
->>  	}
->>  }
->>  
->> -static void check_acked(const char *testname, cpumask_t *mask)
->> +static void wait_for_interrupts(cpumask_t *mask)
->>  {
->> -	int missing = 0, extra = 0, unexpected = 0;
->>  	int nr_pass, cpu, i;
->> -	bool bad = false;
->>  
->>  	/* Wait up to 5s for all interrupts to be delivered */
->> -	for (i = 0; i < 50; ++i) {
->> +	for (i = 0; i < 50; i++) {
->>  		mdelay(100);
->>  		nr_pass = 0;
->>  		for_each_present_cpu(cpu) {
->> +			/*
->> +			 * A CPU having receied more than one interrupts will
-> received
->> +			 * show up in check_acked(), and no matter how long we
->> +			 * wait it cannot un-receive it. Consier at least one
-> consider
 
-Will fix all three typos, thanks.
+> On Dec 10, 2020, at 6:52 AM, Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>=20
+> =EF=BB=BFOn Thu, 2020-12-10 at 12:48 +0100, Paolo Bonzini wrote:
+>>> On 08/12/20 22:20, Thomas Gleixner wrote:
+>>> So now life migration comes a long time after timekeeping had set the
+>>> limits and just because it's virt it expects that everything works and i=
+t
+>>> just can ignore these limits.
+>>>=20
+>>> TBH. That's not any different than SMM or hard/firmware taking the
+>>> machine out for lunch. It's exactly the same: It's broken.
+>>=20
+>> I agree.  If *live* migration stops the VM for 200 seconds, it's broken.
+>>=20
+>> Sure, there's the case of snapshotting the VM over the weekend.  My=20
+>> favorite solution would be to just put it in S3 before doing that.  *Do=20=
 
->> +			 * interrupt as a pass.
->> +			 */
->>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
->> -				acked[cpu] == 1 : acked[cpu] == 0;
->> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
->> -
->> -			if (bad_sender[cpu] != -1) {
->> -				printf("cpu%d received IPI from wrong sender %d\n",
->> -					cpu, bad_sender[cpu]);
->> -				bad = true;
->> -			}
->> -
->> -			if (bad_irq[cpu] != -1) {
->> -				printf("cpu%d received wrong irq %d\n",
->> -					cpu, bad_irq[cpu]);
->> -				bad = true;
->> -			}
->> +				acked[cpu] >= 1 : acked[cpu] == 0;
->>  		}
->> +
->>  		if (nr_pass == nr_cpus) {
->> -			report(!bad, "%s", testname);
->>  			if (i)
->> -				report_info("took more than %d ms", i * 100);
->> +				report_info("interrupts took more than %d ms", i * 100);
->> +			mdelay(100);
->>  			return;
->>  		}
->>  	}
->>  
->> +	report_info("interrupts timed-out (5s)");
->> +}
->> +
->> +static bool check_acked(cpumask_t *mask)
->> +{
->> +	int missing = 0, extra = 0, unexpected = 0;
->> +	bool pass = true;
->> +	int cpu;
->> +
->>  	for_each_present_cpu(cpu) {
->>  		if (cpumask_test_cpu(cpu, mask)) {
->>  			if (!acked[cpu])
->> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
->>  			if (acked[cpu])
->>  				++unexpected;
->>  		}
->> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
->> +
->> +		if (bad_sender[cpu] != -1) {
->> +			report_info("cpu%d received IPI from wrong sender %d",
->> +					cpu, bad_sender[cpu]);
->> +			pass = false;
->> +		}
->> +
->> +		if (bad_irq[cpu] != -1) {
->> +			report_info("cpu%d received wrong irq %d",
->> +					cpu, bad_irq[cpu]);
->> +			pass = false;
->> +		}
->> +	}
->> +
->> +	if (missing || extra || unexpected) {
->> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
->> +				missing, extra, unexpected);
->> +		pass = false;
->>  	}
->>  
->> -	report(false, "%s", testname);
->> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
->> -		    missing, extra, unexpected);
->> +	return pass;
->>  }
->>  
->>  static void check_spurious(void)
->> @@ -300,7 +318,8 @@ static void ipi_test_self(void)
->>  	cpumask_clear(&mask);
->>  	cpumask_set_cpu(smp_processor_id(), &mask);
->>  	gic->ipi.send_self();
->> -	check_acked("IPI: self", &mask);
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask), "Interrupts received");
->>  	report_prefix_pop();
->>  }
->>  
->> @@ -315,7 +334,8 @@ static void ipi_test_smp(void)
->>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
->>  		cpumask_clear_cpu(i, &mask);
->>  	gic_ipi_send_mask(IPI_IRQ, &mask);
->> -	check_acked("IPI: directed", &mask);
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask), "Interrupts received");
-> both ipi_test_smp and ipi_test_self are called from the same test so
-> better to use different error messages like it was done originally.
+>> what bare metal does* and you can't go that wrong.
+>=20
+> Note though that qemu has a couple of issues with s3, and it is disabled=20=
 
-I used the same error message because the tests have a different prefix
-("target-list" versus "broadcast"). Do you think there are cases where that's not
-enough?
+> by default in libvirt.=20
+> I would be very happy to work on improving this if there is a need for tha=
+t.
 
-Thanks,
-Alex
+There=E2=80=99s also the case where someone has a VM running on a laptop and=
+ someone closes the lid. The host QEMU might not have a chance to convince t=
+he guest to enter S3.
+
+>=20
+>=20
+>>=20
+>> In general it's userspace policy whether to keep the TSC value the same=20=
+
+>> across live migration.  There's pros and cons to both approaches, so KVM=20=
+
+>> should provide the functionality to keep the TSC running (which the=20
+>> guest will see as a very long, but not extreme SMI), and this is what=20
+>> this series does.  Maxim will change it to operate per-VM.  Thanks=20
+>> Thomas, Oliver and everyone else for the input.
+>=20
+> I agree with that.
+>=20
+> I still think though that we should have a discussion on feasibility
+> of making the kernel time code deal with large *forward* tsc jumps=20
+> without crashing.
+>=20
+> If that is indeed hard to do, or will cause performance issues,
+> then I agree that we might indeed inform the guest of time jumps instead.
+>=20
+
+Tglx, even without fancy shared host/guest timekeeping, count the guest kern=
+el manage to update its timekeeping if the host sent the guest an interrupt o=
+r NMI on all CPUs synchronously on resume?
+
+Alternatively, if we had the explicit =E2=80=9Cmax TSC value that makes sens=
+e right now=E2=80=9D in the timekeeping data, the guest would reliably notic=
+e the large jump and could at least do something intelligent about it instea=
+d of overflowing its internal calculation.=
