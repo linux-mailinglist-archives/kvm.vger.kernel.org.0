@@ -2,130 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 881772D769D
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 14:32:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD3AC2D76BD
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 14:40:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405710AbgLKNb1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 08:31:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35568 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393521AbgLKNbQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Dec 2020 08:31:16 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3246FC0613CF;
-        Fri, 11 Dec 2020 05:30:36 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1607693434;
+        id S2394231AbgLKNjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 08:39:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35313 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732873AbgLKNjA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 08:39:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607693852;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vPs+PXjGVHxlOB/Nvchr1edaRAyM1X+O6QVeZcxHz34=;
-        b=3MTDNYN7cIuhRhHt2eUJgMlAQzexhjLVGow1jvZps2MmDM1h8FFmjfFTu4VeRqE2HPQx/v
-        oLcsvEbjdF3roZDfgWgaEWQ1un6T97YP5Zhjg+S9rveXU0ixrEcZ/jvGtZaG41pdwDL1J5
-        chogprmkOqU7XIKuYHBp5YOFPlt9VEUT92lPuvrM+VmQXI9t0iX6d4NOkbPDWTGZ8kQAul
-        gsN3VU2Cpa6nO9IbFC1V3YI0zCufWfcGWZw8pvfCkbMIiSFxaz/4SXKygRQdCXnq6raK/t
-        k9V2063qDuPcdS7JZ9cDOkfeHQD2HWRc6e4EJyDJL192Yef5R5fJ6ocqk7hoNg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1607693434;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vPs+PXjGVHxlOB/Nvchr1edaRAyM1X+O6QVeZcxHz34=;
-        b=um+pwlsgKjHt5srVyxPU5j7MMAhBot9S4ux0OggFrgjXX4Pgs4iBir3DISdYhOj8HUFUdS
-        WaaNGcqU/DjnkYDQ==
-To:     Marcelo Tosatti <mtosatti@redhat.com>
+        bh=gV4c090IqWI5tEA2buwHKvS0/NqK9RSA3GoSyg8aYNs=;
+        b=iTCa6FGrc6qZ+CZCtxQ9Xc66Nef0EeItlW4FqcPpMw5F2epXHNgfbDd3f56G1kL1CTnlyz
+        3CswlN0mZMejTAWkTcxacBvWxXlNqdz6MoPluDy9oQ09GSDt8oyMuTUJLILTzj5z1ee37g
+        M0fLNCc8Z1mHinZGjxfWUF6ZCs12uWo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-560-Vh1_Vo8hPNyH7nsgD7N5dg-1; Fri, 11 Dec 2020 08:37:31 -0500
+X-MC-Unique: Vh1_Vo8hPNyH7nsgD7N5dg-1
+Received: by mail-wm1-f70.google.com with SMTP id s130so2413889wme.0
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 05:37:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gV4c090IqWI5tEA2buwHKvS0/NqK9RSA3GoSyg8aYNs=;
+        b=HbLUlo0vEy+EUgqJ/5/a7ofEQUYTxZ+YVic66JFe24IzBviH4xcsVc7wNJjcisxYjx
+         IOtFUMpcKTMnhHeufre4BQEHqQqsab2dcRwfkHfWFWru8ObnTQcPMES49yZFSKKn/5BN
+         6e/Se/eB0NFvYhyvN1hPFGuPkxyznQtW7IKd8nWdRwS+O/RoUKEws1aS8e0HoA3KnJqm
+         A4BNB9Rrx/ON+WNrqwgq5I3cU7ksVQ0v93AreKLenWqiEJLm8lQIRpUTZzxwvzblo9Tg
+         iFI/YW2MWSi/lDGWDUPcP1UaHErvu7wCUs1EQpD71mkBZo45nspWVdYuY9+VrX6wMNNG
+         eIfA==
+X-Gm-Message-State: AOAM530ywGvNyK3aAXIBvXh586Zg6Xiy225qLvEg7/89Q9wO94BzwvnB
+        oZjzcRQTPXDGjw0xUGPcNa3SEP9TiL7FjTWTIFEvX2J6FN+8VhBjPdMqjwXMr+mQx3TIW1lUiFX
+        ePB0AmcpscLbS
+X-Received: by 2002:adf:dd90:: with SMTP id x16mr13783244wrl.85.1607693850198;
+        Fri, 11 Dec 2020 05:37:30 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwJ6/HzWkhgIrtQKABfYostveB3IDy4vSX+reQk78mBEui3U7TXREPtLi7Hnr4bOSkxry96bA==
+X-Received: by 2002:adf:dd90:: with SMTP id x16mr13783217wrl.85.1607693850018;
+        Fri, 11 Dec 2020 05:37:30 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id z64sm13966730wme.10.2020.12.11.05.37.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Dec 2020 05:37:28 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
 Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        "open list\:KERNEL SELFTEST FRAMEWORK" 
+        "open list:KERNEL SELFTEST FRAMEWORK" 
         <linux-kselftest@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         open list <linux-kernel@vger.kernel.org>,
         Ingo Molnar <mingo@redhat.com>,
-        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
         Shuah Khan <shuah@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
         Oliver Upton <oupton@google.com>,
-        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-In-Reply-To: <20201211002703.GA47016@fuller.cnet>
-References: <20201203171118.372391-2-mlevitsk@redhat.com> <20201207232920.GD27492@fuller.cnet> <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com> <87sg8g2sn4.fsf@nanos.tec.linutronix.de> <20201208181107.GA31442@fuller.cnet> <875z5c2db8.fsf@nanos.tec.linutronix.de> <20201209163434.GA22851@fuller.cnet> <87r1nyzogg.fsf@nanos.tec.linutronix.de> <20201210152618.GB23951@fuller.cnet> <87zh2lib8l.fsf@nanos.tec.linutronix.de> <20201211002703.GA47016@fuller.cnet>
-Date:   Fri, 11 Dec 2020 14:30:34 +0100
-Message-ID: <87v9d8h3lx.fsf@nanos.tec.linutronix.de>
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+References: <20201203171118.372391-2-mlevitsk@redhat.com>
+ <20201207232920.GD27492@fuller.cnet>
+ <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com>
+ <87sg8g2sn4.fsf@nanos.tec.linutronix.de> <20201208181107.GA31442@fuller.cnet>
+ <875z5c2db8.fsf@nanos.tec.linutronix.de> <20201209163434.GA22851@fuller.cnet>
+ <87r1nyzogg.fsf@nanos.tec.linutronix.de> <20201210152618.GB23951@fuller.cnet>
+ <87zh2lib8l.fsf@nanos.tec.linutronix.de> <20201211002703.GA47016@fuller.cnet>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ec926c2c-985a-2e3d-1ba0-b35ce55a19c4@redhat.com>
+Date:   Fri, 11 Dec 2020 14:37:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20201211002703.GA47016@fuller.cnet>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 10 2020 at 21:27, Marcelo Tosatti wrote:
-> On Thu, Dec 10, 2020 at 10:48:10PM +0100, Thomas Gleixner wrote:
->> You really all live in a seperate universe creating your own rules how
->> things which other people work hard on to get it correct can be screwed
->> over.
->
-> 	1. T = read timestamp.
-> 	2. migrate (VM stops for a certain period).
-> 	3. use timestamp T.
+On 11/12/20 01:27, Marcelo Tosatti wrote:
+> This features first, correctness later frenzy is insane and it better
+> stops now before you pile even more crap on the existing steaming pile
+> of insanities.
 
-This is exactly the problem. Time stops at pause and continues where it
-stopped on resume.
+FWIW I agree, in fact I wish I knew exactly where to start simplifying 
+it; the timekeeping code in KVM is perhaps the last remaining bastion 
+where I'm afraid just to look at it.
 
-But CLOCK_REALTIME and CLOCK_TAI advanced in reality. So up to the point
-where NTP fixes this - if there is NTP at all - the guest CLOCK_REALTIME
-and CLOCK_TAI are off by tpause.
+At least I know there's a couple of features that IMHO are completely 
+useless, and that's even before you reach the ones that might "only" be 
+obsolete.  So perhaps that's where to start, together with the messiest 
+userspace interfaces.
 
-Now the application gets a packet from the outside world with a
-CLOCK_REALTIME timestamp which is suddenly ahead of the value it reads
-from clock_gettime(CLOCK_REALTIME) by tpause. So what is it supposed to
-do with that? Make stupid assumptions that the other end screwed up
-timekeeping, throw an error that the system it is running on screwed up
-timekeeping? And a second later when NTP catched up it gets the next
-surprise because the systems CLOCK_REALTIME jumped forward unexpectedly
-or if there is no NTP it's confused forever.
+Paolo
 
-How can you even assume that this is correct?
-
-It is exactly the same problem as we had many years ago with hardware
-clocks suddenly stopping to tick which caused quite some stuff to go
-belly up.
-
-In a proper suspend/resume scenario CLOCK_REALTIME/TAI are advanced
-(with a certain degree of accuracy) to compensate for the sleep time, so
-the other end of a communication is at least in the same ballpark, but
-not 50 seconds off.
-
->> This features first, correctness later frenzy is insane and it better
->> stops now before you pile even more crap on the existing steaming pile
->> of insanities.
->
-> Sure.
-
-I wish that would be true. OS people - you should know that - are
-fighting forever with hardware people over feature madness and the
-attitude of 'we can fix that in software' which turns often enough out
-to be wrong.
-
-Now sadly enough people who suffered from that madness work on
-virtualization and instead of trying to avoid the same problem they go
-off and make it even worse.
-
-It's the same problem again as with hardware people. Not talking to the
-other people _before_ making uninformed assumptions and decisions.
-
-We did it that way because big customer asked for it is not a
-justification for inflicting this on everybody else and thereby
-violating correctness. Works for me and my big customer is not a proof
-of correctness either.
-
-It's another proof that this industry just "works" by chance.
-
-Thanks,
-
-        tglx
