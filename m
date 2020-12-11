@@ -2,71 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27B3E2D814B
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 22:52:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC3D62D8182
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 23:03:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406202AbgLKVvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 16:51:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35689 "EHLO
+        id S2406020AbgLKWB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 17:01:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40631 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2393025AbgLKVuy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 16:50:54 -0500
+        by vger.kernel.org with ESMTP id S2405965AbgLKWBb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 17:01:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607723364;
+        s=mimecast20190719; t=1607724005;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zuczDP3rlDg+1gIk7tYHPGxKD84Ww8Vb8YLolRymw1E=;
-        b=Yb3n7p9rrYq1cn/n2gjsqQDZ6f9sI2WEh4l/LSwTZDfXwLK+/heQVYQe/O/jbC2/ah6Bwk
-        HEtOcJ2kl7ENN2EuzWQCo0Tzj7o/sowqsAxAMqvALd6TDKQGN1o2kKFOl7bwhFcT3EP2bw
-        WiujvfhxHU1iYLrr/F6VzKkMRzF1+gI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-XhW1WGd4M86Fx8bEXc7YgQ-1; Fri, 11 Dec 2020 16:49:21 -0500
-X-MC-Unique: XhW1WGd4M86Fx8bEXc7YgQ-1
-Received: by mail-wr1-f69.google.com with SMTP id v1so3826094wri.16
-        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 13:49:21 -0800 (PST)
+        bh=EK8HRAAQwG+zadkdfwj/A0swUara/4+Zbd8qXA1iC48=;
+        b=VaXikNQheHBTlQYnrUSRBQ6pQVolGT6xdY10dh5cjGCW1abbPYpe9iknv8jTBEFP1e+DNY
+        EKlkGeMsz06Y6fA/wDsEQ600QyvUTSTym9Ky2xW+CLUwL6/hVPddi4d9GoFmepSM8GVgq+
+        mABjdDC0OjeWYTtgEd+K0ETzMjnwSR0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-561-1I9peuCcMx-Z1MHhy34ADw-1; Fri, 11 Dec 2020 17:00:03 -0500
+X-MC-Unique: 1I9peuCcMx-Z1MHhy34ADw-1
+Received: by mail-ej1-f72.google.com with SMTP id bm18so3249517ejb.6
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 14:00:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=zuczDP3rlDg+1gIk7tYHPGxKD84Ww8Vb8YLolRymw1E=;
-        b=PN3SqF4gz+4SOWZgtHeNhQHMpXihIizfXjLzOM1dEQngjlSymwPOLw3nGhml3hRzPJ
-         wk1P3gJQWPHduz483gRftX3KYgvoFK8hLq5Q+4/AEaK3fyzdtUuJfQj+8IL/YHKktU6y
-         bUswv3+fkarJ5W67CTVf0eqINMVA07xFyUjsVG3lVA7R9yprRyOZFECjmlLKmns9iABD
-         Q622/FhJLIFa9PfGPz1VmZ8ik790CxrJLXgwVJUCa/k8Y95f0MFrLCCvlyw3ULq0FNSD
-         XuHeWk0TBGycf8zfL/CEp25QMXPc10Bgsnt5hCTSEiqCtoKxRqc/kvNsLPLQTQHHElXU
-         pRyw==
-X-Gm-Message-State: AOAM531awyh6Sdy8y7ffAiWD94Ar3Bnkmt+Ov9WWX5Wkcnoi6uHcU4vH
-        UJJuXXvZjouvKNyMt9IZugaIUNN6bZEV5EoowgZazSN1G7FAA4gY8oCTENWP2JXmj+fFpiGY2xZ
-        lkq8DlUltF+m6
-X-Received: by 2002:a5d:554e:: with SMTP id g14mr16259382wrw.264.1607723360372;
-        Fri, 11 Dec 2020 13:49:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyp9O8KaTlxS9WiIfSRbc0GS8E6srYLo1peTpBJKxqoKM0bWmQHn8t4KP4a/gjQhgnBhpfCDw==
-X-Received: by 2002:a5d:554e:: with SMTP id g14mr16259372wrw.264.1607723360229;
-        Fri, 11 Dec 2020 13:49:20 -0800 (PST)
+        bh=EK8HRAAQwG+zadkdfwj/A0swUara/4+Zbd8qXA1iC48=;
+        b=a8p+acTw8z6jKBMifkwughgSXk3TRgNIEgYkQGNm0D931qhWyORfU5L18G7oyzoYzE
+         OuAXBi9FcELY3/TsH289e1Q+6/PzwIXpKYU3QKUFWXth1jKq/Lbqk8p1gONdlFlQI+dL
+         89tV1y015+dqUmFNgsNbfCYP0ugS2xujNnqQnS163txdCMqWcTe+G92r3Pk9RKGInD/B
+         dGFyDwW0TDntby7kCCHqIDjSbDVXTpq+EzYocjXYexk1cTSsUcGJUQGKeA1fL9U8D8Pw
+         oQeNyX5n5Mvo/i5i2iqpJOtGwzRBtPzBwou1FOtmeH85KorKLUIPi4GDqO0nwnyOfAdy
+         jR/w==
+X-Gm-Message-State: AOAM530eZ6LCW3F7hHN4KxAbigl/cL1Fkvv3RFfxq01f1A3ykicfesOb
+        zQTKON6sJEcOQAFY8n6hJ6dYfvZZJjfsH0VoTWb4TXmH7EngvgkImldhu9OIBpO0G2FfPqgj30+
+        YNKU/ZwmbHEfI
+X-Received: by 2002:a17:906:e18:: with SMTP id l24mr12334242eji.434.1607724001759;
+        Fri, 11 Dec 2020 14:00:01 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxZEnlN3IFEJh4D6v54mu+Ro6WoFbJdFge0yKqBGFzqCplQ9jUb3+USgCjAlG9gzjAUdRFuyg==
+X-Received: by 2002:a17:906:e18:: with SMTP id l24mr12334212eji.434.1607724001534;
+        Fri, 11 Dec 2020 14:00:01 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n17sm15635202wmc.33.2020.12.11.13.49.18
+        by smtp.gmail.com with ESMTPSA id a12sm8568558edu.89.2020.12.11.13.59.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Dec 2020 13:49:19 -0800 (PST)
-Subject: Re: [PATCH 1/2 v4] KVM: nSVM: Check reserved values for 'Type' and
- invalid vectors in EVENTINJ
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, jmattson@google.com
-References: <20201207194129.7543-1-krish.sadhukhan@oracle.com>
- <20201207194129.7543-2-krish.sadhukhan@oracle.com>
- <X86N2c7ZG5fAToND@google.com>
- <76431b0c-4add-79b5-3f62-9c15306a1421@oracle.com>
+        Fri, 11 Dec 2020 14:00:00 -0800 (PST)
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+References: <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com>
+ <87sg8g2sn4.fsf@nanos.tec.linutronix.de> <20201208181107.GA31442@fuller.cnet>
+ <875z5c2db8.fsf@nanos.tec.linutronix.de> <20201209163434.GA22851@fuller.cnet>
+ <87r1nyzogg.fsf@nanos.tec.linutronix.de> <20201210152618.GB23951@fuller.cnet>
+ <87zh2lib8l.fsf@nanos.tec.linutronix.de> <20201211002703.GA47016@fuller.cnet>
+ <87v9d8h3lx.fsf@nanos.tec.linutronix.de> <20201211141822.GA67764@fuller.cnet>
+ <87k0togikr.fsf@nanos.tec.linutronix.de>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dac77325-7127-c8f2-4bb6-03210407c15a@redhat.com>
-Date:   Fri, 11 Dec 2020 22:49:18 +0100
+Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
+Message-ID: <d9063c37-a965-d5cf-e923-c0c9f6ddc044@redhat.com>
+Date:   Fri, 11 Dec 2020 22:59:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <76431b0c-4add-79b5-3f62-9c15306a1421@oracle.com>
+In-Reply-To: <87k0togikr.fsf@nanos.tec.linutronix.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -74,30 +91,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/20 22:44, Krish Sadhukhan wrote:
->>>
->>> +    if (valid && (type == SVM_EVTINJ_TYPE_EXEPT))
->>> +        if (vector == NMI_VECTOR || vector > 31)
->> Preferred style is to combine these into a single statement.
-> 
-> 
-> The reason why I split them was to avoid using too many parentheses 
-> which was what Paolo was objecting to. 😁
+On 11/12/20 22:04, Thomas Gleixner wrote:
+>> Its 100ms off with migration, and can be reduced further (customers
+>> complained about 5 seconds but seem happy with 0.1ms).
+> What is 100ms? Guaranteed maximum migration time?
 
-But you kept the parentheses that I was objecting to.  Good:
+I suppose it's the length between the time from KVM_GET_CLOCK and 
+KVM_GET_MSR(IA32_TSC) to KVM_SET_CLOCK and KVM_SET_MSR(IA32_TSC).  But 
+the VM is paused for much longer, the sequence for the non-live part of 
+the migration (aka brownout) is as follows:
 
-	if (valid && type == SVM_EVTINJ_TYPE_EXEPT &&
-	    (vector == NMI_VECTOR || vector > 31))
+     pause
+     finish sending RAM            receive RAM               ~1 sec
+     send paused-VM state          finish receiving RAM     \
+                                   receive paused-VM state   ) 0.1 sec
+                                   restart                  /
 
-Bad:
+The nanosecond and TSC times are sent as part of the paused-VM state at 
+the very end of the live migration process.
 
-	if (valid && (type == SVM_EVTINJ_TYPE_EXEPT) &&
-	    (vector == NMI_VECTOR || vector > 31))
-
-There should be no parentheses around relational operators, only around 
-& | ^ and && ||.
-
-Thanks,
+So it's still true that the time advances during live migration 
+brownout; 0.1 seconds is just the final part of the live migration 
+process.  But for _live_ migration there is no need to design things 
+according to "people are happy if their clock is off by 0.1 seconds 
+only".  Again, save-to-disk, reverse debugging and the like are a 
+different story, which is why KVM should delegate policy to userspace 
+(while documenting how to do it right).
 
 Paolo
+
+> CLOCK_REALTIME and CLOCK_TAI are off by the time the VM is paused and
+> this state persists up to the point where NTP corrects it with a time
+> jump.
+> 
+> So if migration takes 5 seconds then CLOCK_REALTIME is not off by 100ms
+> it's off by 5 seconds.
+> 
+> CLOCK_MONOTONIC/BOOTTIME might be off by 100ms between pause and resume.
+> 
 
