@@ -2,88 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B1932D8123
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 22:30:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3654F2D8144
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 22:49:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405358AbgLKV2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 16:28:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27576 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392101AbgLKV2l (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 16:28:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607722034;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2baaQLSNBEeqb8s4I052o+MuhTpKsGsOVMcltvWRcFE=;
-        b=MS/6rZbU/buc9zcnquU9rlpJ7y6a29qJAmOsKrzkVtmTZyxPFJ0NPAiB0rgEoJFTJvx2V1
-        Z9YEI0TC0K0ndOiqNDziy+/tOtgq41Zpah5T2qcJLr10T/LTEsUh6KFqu4MK8Yty+J+5DT
-        UQLIzxVDLGm2q9BGWkNvwWa/gAsIOsc=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-hixGFL-SNAKLSlbKDHwIvg-1; Fri, 11 Dec 2020 16:27:13 -0500
-X-MC-Unique: hixGFL-SNAKLSlbKDHwIvg-1
-Received: by mail-ua1-f69.google.com with SMTP id 93so1945308uax.12
-        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 13:27:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2baaQLSNBEeqb8s4I052o+MuhTpKsGsOVMcltvWRcFE=;
-        b=sakE1sF4LWU3IJvah72fCH6TSDVAEBgKj8qw9dODJxLHHp7XeOL3aBPhnNA/YuFgI2
-         UMpUABiWZrqxc08+VtB5iPvesovBfMDfD037NupulbHHPeeiZpQPVC/zo5IqlhRW6FcS
-         Qv9WSIs8O/v0m3GsEZGZtBP1DQDCV1dXhMFY8tfxW6AfE8Wnn6A/CwPeTCW/Kf8G+sXc
-         2++NydDxHZ/OQADYklpRt+8cfkAWfqpGOdzn6PWZh3K16zEthIYhTl3iyN3XTL7nMyxc
-         o6XNFZ8Gixbe2xD7l9m+tjv2lWclqWXcwZqCMLP7zqyXwcwq5ZFcYlgx0JcAhCCp0HAO
-         HNHQ==
-X-Gm-Message-State: AOAM532/IhNWcW5E2HTz/5OlcI+43CfNd2+DstWBC4qIfc1CSu2Vh0CE
-        6QPydMVLLfpfQaViPQ2fde7Fj2cqYhYg5JCLFbIyCoi7mXid71UIgKxclGR9A1937afAsio8auW
-        WEXv8MQmHQf9lrhYMYq9ee/jHMS7X
-X-Received: by 2002:a1f:3216:: with SMTP id y22mr16017722vky.1.1607722032621;
-        Fri, 11 Dec 2020 13:27:12 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzoAxYS7LmWjUd46I3qBH/wmX8+rEnzXAY9WUS8yNPb88aaCCmUw66PGF9HvP9W43g/thyTvGXx+ar4+M0xIEI=
-X-Received: by 2002:a1f:3216:: with SMTP id y22mr16017712vky.1.1607722032420;
- Fri, 11 Dec 2020 13:27:12 -0800 (PST)
+        id S2392509AbgLKVr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 16:47:28 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:54148 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390810AbgLKVq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Dec 2020 16:46:58 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BBLi4Bc023798;
+        Fri, 11 Dec 2020 21:46:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=7/MHF/pBuDL2hjdppy8iRHkatHDpSD0GBuW1gbAMxs8=;
+ b=G6oy9wI/c/MzDo6hoXshLY3mlF7MdylymZCpuvZAjFVCBYjIL6fUSmsz3pNM9DF+q1TC
+ oNeP9XpVshvWY0FKjT7kb9+GGerUSwwzfeoNPRp3VAKcEYKzCczgr2tufRkorjtSu2kB
+ v0jObj6r6Sc1LASxL/0VpIKFwRra2rywBlbWwmDNwtnCGv+Z2ZxZSHRvuFOjHORklAQC
+ s1j7JwvaraN09TaXf0+XGkDAbbwTrHTvMViKuN11tk9t+G+d8uvYkvdXrQXVze+DUReA
+ frKaDJxRMK78mQJ6QiR4iphFPPs/8mZkBoYmYgM+7XYSm3vMYjyc1oVB3cOkp1DbfMDE Kw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 3581mrcsuh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 11 Dec 2020 21:46:13 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BBLYpbK123876;
+        Fri, 11 Dec 2020 21:44:12 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 358kyyq835-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Dec 2020 21:44:12 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0BBLiBGR008570;
+        Fri, 11 Dec 2020 21:44:11 GMT
+Received: from [10.159.129.196] (/10.159.129.196)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 11 Dec 2020 13:44:11 -0800
+Subject: Re: [PATCH 1/2 v4] KVM: nSVM: Check reserved values for 'Type' and
+ invalid vectors in EVENTINJ
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+References: <20201207194129.7543-1-krish.sadhukhan@oracle.com>
+ <20201207194129.7543-2-krish.sadhukhan@oracle.com>
+ <X86N2c7ZG5fAToND@google.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <76431b0c-4add-79b5-3f62-9c15306a1421@oracle.com>
+Date:   Fri, 11 Dec 2020 13:44:10 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20201207131503.3858889-1-philmd@redhat.com> <20201207131503.3858889-2-philmd@redhat.com>
-In-Reply-To: <20201207131503.3858889-2-philmd@redhat.com>
-From:   Willian Rampazzo <wrampazz@redhat.com>
-Date:   Fri, 11 Dec 2020 18:27:01 -0300
-Message-ID: <CAKJDGDYwUdGxHC4ctzqO6JfrsGQDv7uwdCC29x5Ty61=fzV2RA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/5] gitlab-ci: Document 'build-tcg-disabled' is a KVM
- X86 job
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
-        Paul Durrant <paul@xen.org>, Cornelia Huck <cohuck@redhat.com>,
-        xen-devel@lists.xenproject.org,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Claudio Fontana <cfontana@suse.de>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <X86N2c7ZG5fAToND@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9832 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012110143
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9832 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
+ clxscore=1015 malwarescore=0 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012110144
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 7, 2020 at 10:15 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Document what this job cover (build X86 targets with
-> KVM being the single accelerator available).
->
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  .gitlab-ci.yml | 5 +++++
->  1 file changed, 5 insertions(+)
 
-Reviewed-by: WIllian Rampazzo <willianr@redhat.com>
+On 12/7/20 12:17 PM, Sean Christopherson wrote:
+> On Mon, Dec 07, 2020, Krish Sadhukhan wrote:
+>> According to sections "Canonicalization and Consistency Checks" and "Event
+>> Injection" in APM vol 2
+>>
+>>      VMRUN exits with VMEXIT_INVALID error code if either:
+>>        - Reserved values of TYPE have been specified, or
+>>        - TYPE = 3 (exception) has been specified with a vector that does not
+>> 	correspond to an exception (this includes vector 2, which is an NMI,
+>> 	not an exception).
+>>
+>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> ---
+>>   arch/x86/include/asm/svm.h |  4 ++++
+>>   arch/x86/kvm/svm/nested.c  | 14 ++++++++++++++
+>>   2 files changed, 18 insertions(+)
+>>
+>> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+>> index 71d630bb5e08..d676f140cd19 100644
+>> --- a/arch/x86/include/asm/svm.h
+>> +++ b/arch/x86/include/asm/svm.h
+>> @@ -341,9 +341,13 @@ struct vmcb {
+>>   #define SVM_EVTINJ_TYPE_MASK (7 << SVM_EVTINJ_TYPE_SHIFT)
+>>   
+>>   #define SVM_EVTINJ_TYPE_INTR (0 << SVM_EVTINJ_TYPE_SHIFT)
+>> +#define SVM_EVTINJ_TYPE_RESV1 (1 << SVM_EVTINJ_TYPE_SHIFT)
+>>   #define SVM_EVTINJ_TYPE_NMI (2 << SVM_EVTINJ_TYPE_SHIFT)
+>>   #define SVM_EVTINJ_TYPE_EXEPT (3 << SVM_EVTINJ_TYPE_SHIFT)
+>>   #define SVM_EVTINJ_TYPE_SOFT (4 << SVM_EVTINJ_TYPE_SHIFT)
+>> +#define SVM_EVTINJ_TYPE_RESV5 (5 << SVM_EVTINJ_TYPE_SHIFT)
+>> +#define SVM_EVTINJ_TYPE_RESV6 (6 << SVM_EVTINJ_TYPE_SHIFT)
+>> +#define SVM_EVTINJ_TYPE_RESV7 (7 << SVM_EVTINJ_TYPE_SHIFT)
+>>   
+>>   #define SVM_EVTINJ_VALID (1 << 31)
+>>   #define SVM_EVTINJ_VALID_ERR (1 << 11)
+>> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+>> index 9e4c226dbf7d..fa51231c1f24 100644
+>> --- a/arch/x86/kvm/svm/nested.c
+>> +++ b/arch/x86/kvm/svm/nested.c
+>> @@ -212,6 +212,9 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+>>   
+>>   static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
+>>   {
+>> +	u8 type, vector;
+>> +	bool valid;
+>> +
+>>   	if ((vmcb_is_intercept(control, INTERCEPT_VMRUN)) == 0)
+>>   		return false;
+>>   
+>> @@ -222,6 +225,17 @@ static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
+>>   	    !npt_enabled)
+>>   		return false;
+>>   
+>> +	valid = control->event_inj & SVM_EVTINJ_VALID;
+>> +	type = control->event_inj & SVM_EVTINJ_TYPE_MASK;
+> The mask is shifted by 8, which means type is guaranteed to be 0 since the value
+> will be truncated when casting to a u8.  I'm somewhat surprised neither
+> checkpatch nor checkpatch warns.  The types are also shifted, so the easiest
+> thing is probably to store it as a u32, same as event_inj.  I suspect your test
+> passes because type==0 is INTR and the test always injects #DE, which is likely
+> an illegal vector.
 
+
+My bad. Will change it back to u32.
+
+>
+>> +	if (valid && (type == SVM_EVTINJ_TYPE_RESV1 ||
+>> +	    type >= SVM_EVTINJ_TYPE_RESV5))
+>> +		return false;
+>> +
+>> +	vector = control->event_inj & SVM_EVTINJ_VEC_MASK;
+>> +	if (valid && (type == SVM_EVTINJ_TYPE_EXEPT))
+>> +		if (vector == NMI_VECTOR || vector > 31)
+> Preferred style is to combine these into a single statement.
+
+
+The reason why I split them was to avoid using too many parentheses 
+which was what Paolo was objecting to. 😁
+
+>
+>> +			return false;
+>> +
+>>   	return true;
+>>   }
+>>   
+>> -- 
+>> 2.27.0
+>>
