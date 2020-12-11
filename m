@@ -2,131 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3D62D8182
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 23:03:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61D452D81F0
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 23:24:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406020AbgLKWB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 17:01:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40631 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2405965AbgLKWBb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 17:01:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607724005;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EK8HRAAQwG+zadkdfwj/A0swUara/4+Zbd8qXA1iC48=;
-        b=VaXikNQheHBTlQYnrUSRBQ6pQVolGT6xdY10dh5cjGCW1abbPYpe9iknv8jTBEFP1e+DNY
-        EKlkGeMsz06Y6fA/wDsEQ600QyvUTSTym9Ky2xW+CLUwL6/hVPddi4d9GoFmepSM8GVgq+
-        mABjdDC0OjeWYTtgEd+K0ETzMjnwSR0=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-1I9peuCcMx-Z1MHhy34ADw-1; Fri, 11 Dec 2020 17:00:03 -0500
-X-MC-Unique: 1I9peuCcMx-Z1MHhy34ADw-1
-Received: by mail-ej1-f72.google.com with SMTP id bm18so3249517ejb.6
-        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 14:00:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EK8HRAAQwG+zadkdfwj/A0swUara/4+Zbd8qXA1iC48=;
-        b=a8p+acTw8z6jKBMifkwughgSXk3TRgNIEgYkQGNm0D931qhWyORfU5L18G7oyzoYzE
-         OuAXBi9FcELY3/TsH289e1Q+6/PzwIXpKYU3QKUFWXth1jKq/Lbqk8p1gONdlFlQI+dL
-         89tV1y015+dqUmFNgsNbfCYP0ugS2xujNnqQnS163txdCMqWcTe+G92r3Pk9RKGInD/B
-         dGFyDwW0TDntby7kCCHqIDjSbDVXTpq+EzYocjXYexk1cTSsUcGJUQGKeA1fL9U8D8Pw
-         oQeNyX5n5Mvo/i5i2iqpJOtGwzRBtPzBwou1FOtmeH85KorKLUIPi4GDqO0nwnyOfAdy
-         jR/w==
-X-Gm-Message-State: AOAM530eZ6LCW3F7hHN4KxAbigl/cL1Fkvv3RFfxq01f1A3ykicfesOb
-        zQTKON6sJEcOQAFY8n6hJ6dYfvZZJjfsH0VoTWb4TXmH7EngvgkImldhu9OIBpO0G2FfPqgj30+
-        YNKU/ZwmbHEfI
-X-Received: by 2002:a17:906:e18:: with SMTP id l24mr12334242eji.434.1607724001759;
-        Fri, 11 Dec 2020 14:00:01 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxZEnlN3IFEJh4D6v54mu+Ro6WoFbJdFge0yKqBGFzqCplQ9jUb3+USgCjAlG9gzjAUdRFuyg==
-X-Received: by 2002:a17:906:e18:: with SMTP id l24mr12334212eji.434.1607724001534;
-        Fri, 11 Dec 2020 14:00:01 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a12sm8568558edu.89.2020.12.11.13.59.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Dec 2020 14:00:00 -0800 (PST)
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-References: <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com>
- <87sg8g2sn4.fsf@nanos.tec.linutronix.de> <20201208181107.GA31442@fuller.cnet>
- <875z5c2db8.fsf@nanos.tec.linutronix.de> <20201209163434.GA22851@fuller.cnet>
- <87r1nyzogg.fsf@nanos.tec.linutronix.de> <20201210152618.GB23951@fuller.cnet>
- <87zh2lib8l.fsf@nanos.tec.linutronix.de> <20201211002703.GA47016@fuller.cnet>
- <87v9d8h3lx.fsf@nanos.tec.linutronix.de> <20201211141822.GA67764@fuller.cnet>
- <87k0togikr.fsf@nanos.tec.linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-Message-ID: <d9063c37-a965-d5cf-e923-c0c9f6ddc044@redhat.com>
-Date:   Fri, 11 Dec 2020 22:59:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S2406567AbgLKWXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 17:23:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19576 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387557AbgLKWXX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 17:23:23 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BBM297J064781;
+        Fri, 11 Dec 2020 17:22:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=8SHFA+w9P/czyxvX214l3fdhHSK2bnKXKI2MqKjCnig=;
+ b=SwlT1K/0e7uItl5MywCR1cp3wcXFGW1Tr+qfKR/u01WLK4AAQITB8+6Ii4GaOpV3K1Aj
+ AQXMYwrjTbcVExawC8MeD5DWKp2qUvNfNehk1keQ36YKIJ1JcMi9HLGDLTwTP7XXDh0e
+ pjoso7PHsTtfZtw+2hJubEyXzI1z8YB9B2L4V58Gzzc1+xFBNXLDfsUt8Yp4lGI5RB0c
+ ruhyzQ/btaJQAlZc5pwwelnq8hmmCtH5V3eqW80suyIPlu4N4Z/TVdAJTWhaSBRL6Rqi
+ MBF+7J8PawCBum9eNTyLVOZ917RXmXgUejj6yBRzsvgucz39giRW4jOMhO8cYqJ6RtAm +Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35cgx0gsa3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Dec 2020 17:22:23 -0500
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BBM6ZUG103733;
+        Fri, 11 Dec 2020 17:22:23 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35cgx0gs9r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Dec 2020 17:22:22 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BBMLmL9028635;
+        Fri, 11 Dec 2020 22:22:21 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma03wdc.us.ibm.com with ESMTP id 3581u9tvqs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Dec 2020 22:22:21 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BBMMKh223265704
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Dec 2020 22:22:20 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 55472C605B;
+        Fri, 11 Dec 2020 22:22:20 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E7524C6057;
+        Fri, 11 Dec 2020 22:22:18 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com.com (unknown [9.85.193.150])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Dec 2020 22:22:18 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, gregkh@linuxfoundation.org,
+        sashal@kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
+        kwankhede@nvidia.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: [PATCH v2 0/2] Clean up vfio_ap resources when KVM pointer invalidated
+Date:   Fri, 11 Dec 2020 17:22:09 -0500
+Message-Id: <20201211222211.20869-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <87k0togikr.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-11_06:2020-12-11,2020-12-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ impostorscore=0 malwarescore=0 mlxscore=0 adultscore=0 suspectscore=3
+ clxscore=1011 priorityscore=1501 mlxlogscore=999 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012110142
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/20 22:04, Thomas Gleixner wrote:
->> Its 100ms off with migration, and can be reduced further (customers
->> complained about 5 seconds but seem happy with 0.1ms).
-> What is 100ms? Guaranteed maximum migration time?
+The vfio_ap device driver registers a group notifier with VFIO when the
+file descriptor for a VFIO mediated device attached to a KVM guest is
+opened. The group notifier is registered to receive notification that the
+KVM pointer for the guest is set (VFIO_GROUP_NOTIFY_SET_KVM event). When
+the KVM pointer is set to a non-NULL value, the vfio_ap driver takes the
+following actions:
+1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
+   of the mediated device.
+2. Calls the kvm_get_kvm() function to increment its reference counter.
+3. Sets the function pointer to the function that handles interception of
+   the instruction that enables/disables interrupt processing for the
+   KVM guest.
+4. Plugs the AP devices assigned to the mediated device into the KVM
+   guest.
 
-I suppose it's the length between the time from KVM_GET_CLOCK and 
-KVM_GET_MSR(IA32_TSC) to KVM_SET_CLOCK and KVM_SET_MSR(IA32_TSC).  But 
-the VM is paused for much longer, the sequence for the non-live part of 
-the migration (aka brownout) is as follows:
+These actions are reversed by the release callback which is invoked when
+userspace closes the mediated device's file descriptor. In this case, the
+group notifier does not get called to invalidate the KVM pointer because
+the notifier is unregistered by the release callback; however, there are no
+guarantees that userspace will do the right thing before shutting down.
+To ensure that there are no resource leaks should the group notifier get
+called to set the KVM pointer to NULL, the notifier should also reverse
+the actions taken when it was called to set the pointer. This patch series
+ensures proper clean up is done via the group notifier.
 
-     pause
-     finish sending RAM            receive RAM               ~1 sec
-     send paused-VM state          finish receiving RAM     \
-                                   receive paused-VM state   ) 0.1 sec
-                                   restart                  /
+Tony Krowiak (2):
+  s390/vfio-ap: No need to disable IRQ after queue reset
+  s390/vfio-ap: reverse group notifier actions when KVM pointer
+    invalidated
 
-The nanosecond and TSC times are sent as part of the paused-VM state at 
-the very end of the live migration process.
+ drivers/s390/crypto/vfio_ap_drv.c     |  1 -
+ drivers/s390/crypto/vfio_ap_ops.c     | 80 +++++++++++++++++----------
+ drivers/s390/crypto/vfio_ap_private.h |  1 -
+ 3 files changed, 50 insertions(+), 32 deletions(-)
 
-So it's still true that the time advances during live migration 
-brownout; 0.1 seconds is just the final part of the live migration 
-process.  But for _live_ migration there is no need to design things 
-according to "people are happy if their clock is off by 0.1 seconds 
-only".  Again, save-to-disk, reverse debugging and the like are a 
-different story, which is why KVM should delegate policy to userspace 
-(while documenting how to do it right).
-
-Paolo
-
-> CLOCK_REALTIME and CLOCK_TAI are off by the time the VM is paused and
-> this state persists up to the point where NTP corrects it with a time
-> jump.
-> 
-> So if migration takes 5 seconds then CLOCK_REALTIME is not off by 100ms
-> it's off by 5 seconds.
-> 
-> CLOCK_MONOTONIC/BOOTTIME might be off by 100ms between pause and resume.
-> 
+-- 
+2.21.1
 
