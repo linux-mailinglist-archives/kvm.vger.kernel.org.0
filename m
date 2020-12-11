@@ -2,203 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1376B2D8061
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 22:06:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AAFE2D8083
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 22:12:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392908AbgLKVFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 16:05:52 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:37518 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392579AbgLKVFl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Dec 2020 16:05:41 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1607720693;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0fiMhIgezjMm4j4B451ig1YSH6sP5DgP4ssfWySwTGs=;
-        b=AQYRNJvcxXd/HlimRdNjo1jnET0BBogqtVB+Ri+UcW9mLEHO290gRs/+90RaLXritQJb2i
-        CODTbdo6SmBCi63OMkXnOeeSd6Ws1yDR9yzDddkR8t/LP9l/LrQ4eZdQbDRveb3SSL5aKZ
-        066p2LnvLEsWNLyOe8sbOqVESUlrFFr5ku8/BNydTbz3w03wsxadl/EE4B/8tC8lNDQK8y
-        8i8H3Q+qOVu9x95DBC9Gp2kUoNiFFchFz9UsxlV2K2vCIzKWSIQWz0MPjea6aJzZGUP4Aj
-        gtoARwkvi5g5dT/9gWudhqt23Y5P6qjwjW5+42mKJkZUDRZGfzljBwounMc6XA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1607720693;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0fiMhIgezjMm4j4B451ig1YSH6sP5DgP4ssfWySwTGs=;
-        b=7iQ5hCbTFwAguKL6g6/ZBi2aTwaGL2TT/9TwwH+bT3LyWirf3PdhADoyPYz5c4Tpsay7uw
-        r0JJjUFQ04wBM6AA==
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list\:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-In-Reply-To: <20201211141822.GA67764@fuller.cnet>
-References: <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com> <87sg8g2sn4.fsf@nanos.tec.linutronix.de> <20201208181107.GA31442@fuller.cnet> <875z5c2db8.fsf@nanos.tec.linutronix.de> <20201209163434.GA22851@fuller.cnet> <87r1nyzogg.fsf@nanos.tec.linutronix.de> <20201210152618.GB23951@fuller.cnet> <87zh2lib8l.fsf@nanos.tec.linutronix.de> <20201211002703.GA47016@fuller.cnet> <87v9d8h3lx.fsf@nanos.tec.linutronix.de> <20201211141822.GA67764@fuller.cnet>
-Date:   Fri, 11 Dec 2020 22:04:52 +0100
-Message-ID: <87k0togikr.fsf@nanos.tec.linutronix.de>
+        id S2395146AbgLKVKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 16:10:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61874 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2391366AbgLKVJj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 16:09:39 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BBL48JM100849;
+        Fri, 11 Dec 2020 16:08:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=7W9EXi6FBr4M5CwXHJjhL8dHYscgsE2VcxpFxYoZTjY=;
+ b=I1+wyzPAG6nXwVTcZe+XsOQYCDqC2NtHVTlBC1VQzhXu6Uwve2hE+VlKw9rMK6U5l1Be
+ U39Jqp4hZ2nUkSIDopH212CVZc0j5r0ECquHEzUt1A/HKTtY4GxdB9lVdVLjq/K80LHX
+ Ws6S2Bn5khNVrsT7J8FoUXCbUeJ9scMonSvoIU1pdovXggrdhawGgKN7q79/CAtCbYNm
+ 7ErCSfVoA2lduxqVWQvYLfpDpL0cWrsziJxTmS4mSfY2ZlpmnwwyDXCzX7x2Pioog7Ew
+ uMOWRQHvgyOzMSGeiV8rn2aLQ4uT0ABy6VKG2QjDznmWg4ClUTKZxwjWQTJRY9bGCXAu DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35cb191eph-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Dec 2020 16:08:57 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BBL4pIS103961;
+        Fri, 11 Dec 2020 16:08:57 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35cb191ep7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Dec 2020 16:08:57 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BBL37dm003274;
+        Fri, 11 Dec 2020 21:08:56 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04dal.us.ibm.com with ESMTP id 3581uaf3ns-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Dec 2020 21:08:56 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BBL8sme27394358
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Dec 2020 21:08:54 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CC3406A066;
+        Fri, 11 Dec 2020 21:08:54 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE3116A054;
+        Fri, 11 Dec 2020 21:08:53 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Dec 2020 21:08:53 +0000 (GMT)
+Subject: Re: [PATCH] s390/vfio-ap: Clean up vfio_ap resources when KVM pointer
+ invalidated
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com, david@redhat.com
+References: <20201202234101.32169-1-akrowiak@linux.ibm.com>
+ <ab3f1948-bb23-c0d0-7205-f46cd6dbe99d@linux.ibm.com>
+ <20201208014018.3f89527f.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <ff21dd8e-9ac7-8625-5c77-4705e1344477@linux.ibm.com>
+Date:   Fri, 11 Dec 2020 16:08:53 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20201208014018.3f89527f.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-11_06:2020-12-11,2020-12-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501
+ phishscore=0 mlxscore=0 adultscore=0 bulkscore=0 malwarescore=0
+ suspectscore=3 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2012110139
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 11 2020 at 11:18, Marcelo Tosatti wrote:
-> On Fri, Dec 11, 2020 at 02:30:34PM +0100, Thomas Gleixner wrote:
-> Unless you notify applications to invalidate their time reads,
-> i can't see a way to fix this.
 
-This is just wrong. Suspend/resume handles that fine and the system is
-guaranteed to come back with time which is very close to the reality.
 
-And for suspend/resume everything from kernel to userspace can have a
-notification before suspend and post resume. So applications or those
-parts of the kernel which are e.g. time sensitive can prepare upfront
-for the disruption and mop up on resume.
-
-> Therefore if you use VM migration in the first place, a certain amount of
-> timestamp accuracy error must be tolerated.
-
-That's just because it was never designed in the right way. And you
-simply declared that all applications have to deal with that.
-
-Again, where is this documented? VMs are subject to migration whether
-the customer who pays for it wants it or not. None of the virt tool docs
-mentions that pausing a VM for a long time makes timekeeping go
-south.
-
-I still have no sensible explanation WHY time should not advance accross
-a migration. All you told me is that customers complained. Which
-customers? The ones running the hosts or the ones paying for the VM?
-
-It's all just decided by some folks to "fix" a problem with the pause/
-migration mechanism they designed instead of fixing the design fail.
-
->> How can you even assume that this is correct?
+On 12/7/20 7:40 PM, Halil Pasic wrote:
+> On Mon, 7 Dec 2020 14:05:55 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 >
-> As noted above, even without a window of unsynchronized time (due to
-> delay for NTP to sync time), time reads can be stale.
+>>
+>> On 12/2/20 6:41 PM, Tony Krowiak wrote:
+>>> The vfio_ap device driver registers a group notifier with VFIO when the
+>>> file descriptor for a VFIO mediated device for a KVM guest is opened to
+>>> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
+>>> event). When the KVM pointer is set, the vfio_ap driver stashes the pointer
+>>> and calls the kvm_get_kvm() function to increment its reference counter.
+>>> When the notifier is called to make notification that the KVM pointer has
+>>> been set to NULL, the driver should clean up any resources associated with
+>>> the KVM pointer and decrement its reference counter. The current
+>>> implementation does not take care of this clean up.
+>>>
+>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> ---
+>>>    drivers/s390/crypto/vfio_ap_ops.c | 21 +++++++++++++--------
+>>>    1 file changed, 13 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+>>> index e0bde8518745..eeb9c9130756 100644
+>>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>>> @@ -1083,6 +1083,17 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
+>>>    	return NOTIFY_DONE;
+>>>    }
+>>>    
+>>> +static void vfio_ap_mdev_put_kvm(struct ap_matrix_mdev *matrix_mdev)
+>>> +{
+>>> +	if (matrix_mdev->kvm) {
+>>> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+>>> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+>>> +		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+>> This reset probably does not belong here since there is no
+>> reason to reset the queues in the group notifier (see below).
+> What about kvm_s390_gisc_unregister()? That needs a valid kvm
+> pointer, or? Or is it OK to not pair a kvm_s390_gisc_register()
+> with an kvm_s390_gisc_unregister()?
 
-So with suspend/resume we have:
+I probably should have been more specific about what I meant.
+I was thinking that the reset should not be dependent upon
+whether there is a KVM pointer or not since this function is
+also called from the release callback. On the other hand,
+the vfio_ap_mdev_reset_queues function calls the
+vfio_ap_irq_disable (AQIC) function after each queue is reset.
+The vfio_ap_irq_disable function also cleans up the AQIC
+resources which requires that the KVM point is valid, so if
+the vfio_ap_reset_queues function is not called with a
+valid KVM pointer, that could result in an exception.
 
-app:
-   t = clock_gettime()
-        <---------------- tsuspend
-        <-----------------tresume
-        So t is now behind reality by tresume - tsuspend
+The thing is, it is unnecessary to disable interrupts after
+resetting a queue because the reset disables interrupts,
+so I think I should include a patch for this fix that does the
+following:
 
-  packet -> check timestamp .... ooops recheck
-  t = clock_gettime()
-  and t and timestamp are in the same ballpark again
+1. Removes the disabling of interrupts subsequent to resetting
+     a queue.
+2. Includes the cleanup of AQIC resources when a queue is
+     reset if a KVM pointer is present.
 
-Now with your thing:
+This will allow us to keep the reset in the function above as well
+as the other places from which reset is executed.
 
-app:
-   t = clock_gettime()
-        <---------------- tpause
-        <-----------------tresume
-        So t is now behind reality by tresume - tpause
-
-  packet -> check timestamp .... ooops recheck
-  t = clock_gettime()
-  and t and timestamp are still apart by ~ (tresume - tpause)
-
-this persists until NTP kicks in, if and only if NTP is running.
-
-Can you spot the difference?
-
->> It is exactly the same problem as we had many years ago with hardware
->> clocks suddenly stopping to tick which caused quite some stuff to go
->> belly up.
 >
-> Customers complained when it was 5 seconds off, now its 0.1ms (and
-> people seem happy).
-
-And because customers complained you decided to create a scenario which
-is completely different to all other scenarios and from a time keeping
-POV not making any sense at all.
-
->> In a proper suspend/resume scenario CLOCK_REALTIME/TAI are advanced
->> (with a certain degree of accuracy) to compensate for the sleep time, so
->> the other end of a communication is at least in the same ballpark, but
->> not 50 seconds off.
+> Regards,
+> Halil
 >
-> Its 100ms off with migration, and can be reduced further (customers
-> complained about 5 seconds but seem happy with 0.1ms).
+>> The reset should be done in the release callback only regardless
+>> of whether the KVM pointer exists or not.
+>>
+>>> +		kvm_put_kvm(matrix_mdev->kvm);
+>>> +		matrix_mdev->kvm = NULL;
+>>> +	}
+>>> +}
+>>> +
+>>>    static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>>>    				       unsigned long action, void *data)
+>>>    {
+>>> @@ -1095,7 +1106,7 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>>>    	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
+>>>    
+>>>    	if (!data) {
+>>> -		matrix_mdev->kvm = NULL;
+>>> +		vfio_ap_mdev_put_kvm(matrix_mdev);
+>>>    		return NOTIFY_OK;
+>>>    	}
+>>>    
+>>> @@ -1222,13 +1233,7 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
+>>>    	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>>>    
+>>>    	mutex_lock(&matrix_dev->lock);
+>>> -	if (matrix_mdev->kvm) {
+>>> -		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+>>> -		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+>>> -		vfio_ap_mdev_reset_queues(mdev);
+>> This release should be moved outside of the block and
+>> performed regardless of whether the KVM pointer exists or
+>> not.
+>>
+>>> -		kvm_put_kvm(matrix_mdev->kvm);
+>>> -		matrix_mdev->kvm = NULL;
+>>> -	}
+>>> +	vfio_ap_mdev_put_kvm(matrix_mdev);
+>>>    	mutex_unlock(&matrix_dev->lock);
+>>>    
+>>>    	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
 
-What is 100ms? Guaranteed maximum migration time?
-
-CLOCK_REALTIME and CLOCK_TAI are off by the time the VM is paused and
-this state persists up to the point where NTP corrects it with a time
-jump.
-
-So if migration takes 5 seconds then CLOCK_REALTIME is not off by 100ms
-it's off by 5 seconds.
-
-CLOCK_MONOTONIC/BOOTTIME might be off by 100ms between pause and resume.
-
-> OK, makes sense, then reducing the 0.1ms window even further
-> is a useful thing to do. What would be an acceptable 
-> CLOCK_REALTIME accuracy error, on migration?
-
-Can you please explain how you can achive 0.1ms accuracy when migration
-time is more than that and guest TSC is just restored to the value at
-which it was stopped?
-
-Then ALL clocks including CLOCK_REALTIME and CLOCK_TAI continue from the
-point at which they were stopped. Ergo:
-
-      t(CLOCK_REALTIME) = t(REALITY) - t(STOPPED)
-
-CLOCK_REALTIME and CLOCK_TAI are global clocks and they have rules which
-have to be respected in order to make stuff work.
-
-CLOCK_MONOTONIC and CLOCK_BOOTTIME are local to a system (host, guests).
-So manipulating them is a completely different story albeit the kernel
-has explicit guarantees for the relationship between CLOCK_MONOTONIC,
-CLOCK_BOOTTIME and CLOCK_REALTIME/TAI
-
-If you could guarantee t(STOPPED) < 100ms and therefore
-
-   t(REALITY) - t(CLOCK_REALTIME) < 100ms
-
-under _all_ circumstances then we would not even have that discussion.
-
-Even < 1000ms might be acceptable. That's the margin of error which is
-also happening accross bare metal suspend/resume in the case that the
-sleep time has to be read from the RTC when TSC stops accross suspend.
-
-But suspend/resume is still substantially different because everything
-from kernel to userspace can have a notification before suspend. So
-applications or those parts of the kernel which are e.g. time sensitive
-can prepare upfront for the disruption. In your case, not at all. They
-just have to cope with the fallout. Brilliant.
-
-Your design or the lack of it just decides that everything has to cope
-with what you decided is the right thing to do and for how long it
-takes.
-
-Yes it "works" by some definition of works, but that does not mean it
-works correctly.
-
-Thanks,
-
-        tglx
