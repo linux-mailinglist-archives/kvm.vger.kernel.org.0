@@ -2,89 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3672D6C43
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 01:28:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A11E92D6C96
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 01:57:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391405AbgLKAFM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Dec 2020 19:05:12 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:59118 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389478AbgLKAEd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Dec 2020 19:04:33 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1607645028;
+        id S2393591AbgLKA3W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Dec 2020 19:29:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59366 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2393469AbgLKA3H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Dec 2020 19:29:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607646461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gKnbSWvo8xgTWID+gjefEKKndhjtzYov0drs0ofkV50=;
-        b=UgL/pVRQVx6CwCqI/WGkF/Mp3fuDuGQXlfnEMqs9tAdeD1zA2jL+UNbySvoyUOUhqj391I
-        dvrrru3OXdKZbXN8hnFkG/lPNvuMpVNPmyIC9MRWshE0EmeTJzHmoVLJa4FbStrMSsmRBY
-        TJhUbXPHpTpFRcIBA87MGLlFhyqAYyV65PgpjefcWWAmHsFW8/Ub8FkbYBSI0p4GGfJZsC
-        S/B+8VX1osg6+PJ9KI5x6jCHclWqt8nh6LQIlDnsrImlfUxqItyIiRwsPy0OlBZvQu39jE
-        9oE/SbkSpKNaiR3oNTwdCQki9hEtB3XrWLgo6gJen0fob30LKEx75cVogkz70A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1607645028;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gKnbSWvo8xgTWID+gjefEKKndhjtzYov0drs0ofkV50=;
-        b=hrZAtY96p4hQAVs/6ikH5XoTRunFp/9Y1K0KGacfOMgUsJ3TCVL0dXSGKVDsS8n56160U7
-        a0S0FM1PUR58cVCA==
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+        bh=smSusb6V6UpqcgwJnIn5HTzBcj5wuKKaCTquGzVm8wA=;
+        b=Ghc/KzfXKWaeartQ2tlocNw4Pxqm4jg2tYN6P0hRjWUtoGUvQE3OJgOxiqX8cybBruaE35
+        4BS+mOv6+Ca4oTqMylKcEJLAn+CLsb0MjmTUH/Bf3vilLC5n78vYa/L04NWR34/mq9czCv
+        NboWcHS0x+WRiEo5CoAZFWheAkGeY4o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-545-01-RlXyYP0eRgWNEySdgJA-1; Thu, 10 Dec 2020 19:27:37 -0500
+X-MC-Unique: 01-RlXyYP0eRgWNEySdgJA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70D00180A086;
+        Fri, 11 Dec 2020 00:27:34 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-7.gru2.redhat.com [10.97.112.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB44A100239F;
+        Fri, 11 Dec 2020 00:27:32 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id BFCF94172EDF; Thu, 10 Dec 2020 21:27:03 -0300 (-03)
+Date:   Thu, 10 Dec 2020 21:27:03 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
+        Jonathan Corbet <corbet@lwn.net>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        "open list\:KERNEL SELFTEST FRAMEWORK" 
+        "open list:KERNEL SELFTEST FRAMEWORK" 
         <linux-kselftest@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         open list <linux-kernel@vger.kernel.org>,
         Ingo Molnar <mingo@redhat.com>,
-        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
         Shuah Khan <shuah@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
         Oliver Upton <oupton@google.com>,
-        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
 Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-In-Reply-To: <D4FDC64D-C632-42CF-A4F1-A9584C94AFD9@amacapital.net>
-References: <87v9d9i9dt.fsf@nanos.tec.linutronix.de> <D4FDC64D-C632-42CF-A4F1-A9584C94AFD9@amacapital.net>
-Date:   Fri, 11 Dec 2020 01:03:47 +0100
-Message-ID: <87lfe5i4yk.fsf@nanos.tec.linutronix.de>
+Message-ID: <20201211002703.GA47016@fuller.cnet>
+References: <20201203171118.372391-2-mlevitsk@redhat.com>
+ <20201207232920.GD27492@fuller.cnet>
+ <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com>
+ <87sg8g2sn4.fsf@nanos.tec.linutronix.de>
+ <20201208181107.GA31442@fuller.cnet>
+ <875z5c2db8.fsf@nanos.tec.linutronix.de>
+ <20201209163434.GA22851@fuller.cnet>
+ <87r1nyzogg.fsf@nanos.tec.linutronix.de>
+ <20201210152618.GB23951@fuller.cnet>
+ <87zh2lib8l.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zh2lib8l.fsf@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 10 2020 at 15:19, Andy Lutomirski wrote:
->> On Dec 10, 2020, at 2:28 PM, Thomas Gleixner <tglx@linutronix.de> wrote:
->> Can we please focus on real problems instead of making up new ones?
->>=20
->> Correctness of time is a real problem despite the believe of virt folks
->> that it can be ignored or duct taped to death.
->>=20
-> I=E2=80=99m fine with this as long as it=E2=80=99s intentional. If we say=
- =E2=80=9Cguest
-> timekeeping across host suspend is correct because we notify the
-> guest=E2=80=9D, then we have a hole. But if we say =E2=80=9Cthe host will=
- try to
-> notify the guest, and if the guest is out to lunch then the host
-> reserves the right to suspend without waiting, and the guest should
-> deal with this=E2=80=9D, then okay.
+On Thu, Dec 10, 2020 at 10:48:10PM +0100, Thomas Gleixner wrote:
+> On Thu, Dec 10 2020 at 12:26, Marcelo Tosatti wrote:
+> > On Wed, Dec 09, 2020 at 09:58:23PM +0100, Thomas Gleixner wrote:
+> >> Marcelo,
+> >> 
+> >> On Wed, Dec 09 2020 at 13:34, Marcelo Tosatti wrote:
+> >> > On Tue, Dec 08, 2020 at 10:33:15PM +0100, Thomas Gleixner wrote:
+> >> >> On Tue, Dec 08 2020 at 15:11, Marcelo Tosatti wrote:
+> >> >> > max_cycles overflow. Sent a message to Maxim describing it.
+> >> >> 
+> >> >> Truly helpful. Why the hell did you not talk to me when you ran into
+> >> >> that the first time?
+> >> >
+> >> > Because 
+> >> >
+> >> > 1) Users wanted CLOCK_BOOTTIME to stop counting while the VM 
+> >> > is paused (so we wanted to stop guest clock when VM is paused anyway).
+> >> 
+> >> How is that supposed to work w/o the guest kernels help if you have to
+> >> keep clock realtime up to date? 
+> >
+> > Upon VM resume, we notify NTP daemon in the guest to sync realtime
+> > clock.
+> 
+> Brilliant. What happens if there is no NTP daemon? What happens if the
+> NTP daemon is not part of the virt orchestration magic and cannot be
+> notified, then it will notice the time jump after the next update
+> interval.
+> 
+> What about correctness?
+> 
+> ALL CLOCK_* stop and resume when the VM is resumed at the point where
+> they stopped.
+> 
+> So up to the point where NTP catches up and corrects clock realtime and
+> TAI other processes can observe that time jumped in the outside world,
+> e.g. via a network packet or whatever, but there is no reason why time
+> should have jumped outside vs. the local one.
+> 
+> You really all live in a seperate universe creating your own rules how
+> things which other people work hard on to get it correct can be screwed
+> over.
 
-Yes of course this would be intentional and documented behaviour, which
-is an infinite improvement over the current situation.
+	1. T = read timestamp.
+	2. migrate (VM stops for a certain period).
+	3. use timestamp T.
 
-Thanks,
+> Of course this all is nowhere documented in detail. At least a quick
+> search with about 10 different keyword combinations revealed absolutely
+> nothing.
+> 
+> This features first, correctness later frenzy is insane and it better
+> stops now before you pile even more crap on the existing steaming pile
+> of insanities.
 
-        tglx
+Sure.
+
