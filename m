@@ -2,206 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8E5B2D82D7
-	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 00:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B4D52D82DC
+	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 00:46:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406963AbgLKXmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 18:42:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45144 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394297AbgLKXmI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Dec 2020 18:42:08 -0500
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07D63C0613D6
-        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 15:41:28 -0800 (PST)
-Received: by mail-lj1-x243.google.com with SMTP id y16so12877710ljk.1
-        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 15:41:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=B5oYtcI05/HUW08c5nQkZJHcJp3VMffDMRCN8r5A5m4=;
-        b=fc66hbjDdZafO62K/7t7EDZ2tiN4nQgytRslt/72mIEzRQzzDx/xcEWjjHKIHYsGSh
-         +RhZPpx7QCdvh5UX/Dudxo9mGnaRNm0FUur9feaJLGz/i5hOjWhiHQIOp7jE+zVkNND4
-         DupSuTfbq5xhMA/j9V2FaVLa+dTSPoGdLLVNPLAkTxPOAuAOGmjN54L2/kwnHyI3RsSM
-         Vz+vjdyeYcP8M8Fx9Igv9hoOdAQO977pLj7G3x+1Lagv7pGpcLTJVhhGx1G768gOQPON
-         I9yqvAejbmEd9G2rHyPqdpI9LSZy57SzbE2BkqDlGb2ghMJaJoQGJ4DdcHMCrtjEj697
-         fVCA==
+        id S2437435AbgLKXoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 18:44:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34970 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2437411AbgLKXoD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 18:44:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607730158;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jotAI/z0SgHF4RKYgh49UHm2UtBNvCYayLKxMawgge0=;
+        b=OSCZkxt9x2BbM0YbyzLK+LZK+zguJ63mS+8/uWuXmELgky8+GTL718yBXpT5/1HZmgtmdz
+        GciYzUFYUr5LjKlmo5yhEfvuqSapMlnDNJdouna8XpZdU5QNcvj5w/yQrtQtktOaDlIsCo
+        igglNWbej4+Yts6hA+kIKIDHxycsuls=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-215--Y9RIs1sO8WO1YekMfHqMg-1; Fri, 11 Dec 2020 18:42:32 -0500
+X-MC-Unique: -Y9RIs1sO8WO1YekMfHqMg-1
+Received: by mail-ed1-f70.google.com with SMTP id u18so4652316edy.5
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 15:42:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=B5oYtcI05/HUW08c5nQkZJHcJp3VMffDMRCN8r5A5m4=;
-        b=owCW9c6B7Za6yLaq//f1hw61Wyo8RlOl065ONygUKd11/azWtSUXTWCVQX47cB3ySQ
-         GeOVZuW1TtZMmDSkSh7+BK0uwRR9gOz9Lhhi0PPYtqE7fTc5vILX9cWo1cHRAp+cz6OB
-         Crqk9CA+/Os6ggsbGttIu9BxznzpUyKBWLCPByRCtLHxfQJJvVMGrNWmnbzcBeA0InMm
-         5n8/1pN6G59BRxVp0zV3JVnY/E+gXo2Q5Z3TjcrOhaJUQ82T1Mn9khk2w4Wuwwfb3A5u
-         LgZqLW/IQOgX/gDkEhJ6a8QvJjox34CAfID8WM7NSCkF1J6uXW0Tj0gakpuYB7qqoj9v
-         7ASQ==
-X-Gm-Message-State: AOAM531Ij23kg5cA4bSSnOZvh2zwi9CeBG9bU5mJpv0nM9w4OOsc6GkT
-        3UIT2ouf47J1frWRG9jzTbPsl7nQuOKohYceRNoRjw==
-X-Google-Smtp-Source: ABdhPJzNnCt3vSEc2ApPy3kL6tgqiT6kt/2Cue/d/pTvBgn2knNkTvz7+2FYJTl4ygClcLNxZmwDZ7CeqEAeFu4FfCE=
-X-Received: by 2002:a2e:b4ab:: with SMTP id q11mr5752976ljm.129.1607730086194;
- Fri, 11 Dec 2020 15:41:26 -0800 (PST)
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jotAI/z0SgHF4RKYgh49UHm2UtBNvCYayLKxMawgge0=;
+        b=PaqG3jbxdZ3AWJ074thN9t/Zm4Vg+h/9BR+CcnJaftVX1ZSTRC19hWqcvUjkRWKJ3E
+         kaRjvhhkJfFHevW8nDlR1d3oWzsivLU8Ea5SncD2Nw3+uHPw2JSFpXuGuiQbdK0xv360
+         WdqgGN6DTZv+ZSOAFbeE+lflNjLPW6zpx8OuVgK6jaCqqZK/rsat5sN2ZqQ44Tg4D2Db
+         qfJDjKdJzu2IJLbg2JhBhLl9zYdshqFVCDEvzIX1lsCWKFBrefBKGNr3EsTI111KcQN6
+         eBI4n9q6Ft1/lCpHI6NX7sC59ZXxxOZ+Fm9bLldv2Y4aDIxZx0M6qKUyD46u0prybwCr
+         6QKw==
+X-Gm-Message-State: AOAM532xdlq6AkF3zI6XClbB0flXv4fDIGXly/RsrPj/JTq0BliELxhQ
+        3BNY2qLBnlF1oRYmkU+tseIZw1k+6u7qgUQvVkINCxvrHm7wNlE9cJBFTlM0lEL9+qGqgEsRvF6
+        tOxv1NxbFs0kz
+X-Received: by 2002:a17:906:9345:: with SMTP id p5mr2495289ejw.40.1607730151327;
+        Fri, 11 Dec 2020 15:42:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx3LVgCNtTtC0f4GHARhc60LCk+APdTa24DP118eIdFTFQMJEjB/X9/zS+fDV5WyBMGTsD2pQ==
+X-Received: by 2002:a17:906:9345:: with SMTP id p5mr2495273ejw.40.1607730151120;
+        Fri, 11 Dec 2020 15:42:31 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n4sm9021138edt.46.2020.12.11.15.42.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Dec 2020 15:42:30 -0800 (PST)
+To:     Kyung Min Park <kyung.min.park@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        cathy.zhang@intel.com
+References: <20201208033441.28207-1-kyung.min.park@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 0/2] Enumerate and expose AVX512_FP16 feature
+Message-ID: <a10c6b11-9e70-23ac-cdb2-141bb913de3d@redhat.com>
+Date:   Sat, 12 Dec 2020 00:42:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20201006212556.882066-1-oupton@google.com> <18085741-6370-bde6-0f28-fa788d5b68e5@redhat.com>
-In-Reply-To: <18085741-6370-bde6-0f28-fa788d5b68e5@redhat.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Fri, 11 Dec 2020 17:41:15 -0600
-Message-ID: <CAOQ_QsjABDVuaKJYSxZOMga4JbJkzQFnZPQJkx2F-XVEahtDqQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: vmx: add regression test for posted interrupts
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201208033441.28207-1-kyung.min.park@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 5:20 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 06/10/20 23:25, Oliver Upton wrote:
-> > If a guest blocks interrupts for the entirety of running in root mode
-> > (RFLAGS.IF=0), a pending interrupt corresponding to the posted-interrupt
-> > vector set in the VMCS should result in an interrupt posting to the vIRR
-> > at VM-entry. However, on KVM this is not the case. The pending interrupt
-> > is not recognized as the posted-interrupt vector and instead results in
-> > an external interrupt VM-exit.
-> >
-> > Add a regression test to exercise this issue.
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
->
-> I am a bit confused.  Is this testing the KVM or the bare metal
-> behavior?  Or was this fixed in KVM already?
+On 08/12/20 04:34, Kyung Min Park wrote:
+> Introduce AVX512_FP16 feature and expose it to KVM CPUID for processors
+> that support it. KVM reports this information and guests can make use
+> of it.
+> 
+> Detailed information on the instruction and CPUID feature flag can be found
+> in the latest "extensions" manual [1].
+> 
+> Reference:
+> [1]. https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+> 
+> Cathy Zhang (1):
+>    x86: Expose AVX512_FP16 for supported CPUID
+> 
+> Kyung Min Park (1):
+>    Enumerate AVX512 FP16 CPUID feature flag
+> 
+>   arch/x86/include/asm/cpufeatures.h | 1 +
+>   arch/x86/kernel/cpu/cpuid-deps.c   | 1 +
+>   arch/x86/kvm/cpuid.c               | 2 +-
+>   3 files changed, 3 insertions(+), 1 deletion(-)
+> 
 
-This is a directed test case for
-25bb2cf97139 ("KVM: nVMX: Morph notification vector IRQ on nested
-VM-Enter to pending PI")
+Queued, with adjusted commit message according to Sean's review.
 
-My local version of this patch has changed a bit. I'll send a v2 shortly.
+Paolo
 
---
-Thanks,
-Oliver
-
->
-> Paolo
->
-> > ---
-> >   lib/x86/asm/bitops.h |  8 +++++
-> >   x86/vmx_tests.c      | 76 ++++++++++++++++++++++++++++++++++++++++++++
-> >   2 files changed, 84 insertions(+)
-> >
-> > diff --git a/lib/x86/asm/bitops.h b/lib/x86/asm/bitops.h
-> > index 13a25ec9853d..ce5743538f65 100644
-> > --- a/lib/x86/asm/bitops.h
-> > +++ b/lib/x86/asm/bitops.h
-> > @@ -13,4 +13,12 @@
-> >
-> >   #define HAVE_BUILTIN_FLS 1
-> >
-> > +static inline void test_and_set_bit(long nr, unsigned long *addr)
-> > +{
-> > +     asm volatile("lock; bts %1, %0"
-> > +                  : "+m" (*addr)
-> > +                  : "Ir" (nr)
-> > +                  : "memory");
-> > +}
-> > +
-> >   #endif
-> > diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> > index d2084ae9e8ce..9ba9a5d452a2 100644
-> > --- a/x86/vmx_tests.c
-> > +++ b/x86/vmx_tests.c
-> > @@ -10430,6 +10430,81 @@ static void atomic_switch_overflow_msrs_test(void)
-> >               test_skip("Test is only supported on KVM");
-> >   }
-> >
-> > +#define PI_VECTOR 0xe0
-> > +#define PI_TEST_VECTOR 0x21
-> > +
-> > +static void enable_posted_interrupts(void)
-> > +{
-> > +     void *pi_desc = alloc_page();
-> > +
-> > +     vmcs_set_bits(PIN_CONTROLS, PIN_POST_INTR);
-> > +     vmcs_set_bits(EXI_CONTROLS, EXI_INTA);
-> > +     vmcs_write(PINV, PI_VECTOR);
-> > +     vmcs_write(POSTED_INTR_DESC_ADDR, (u64)pi_desc);
-> > +}
-> > +
-> > +static unsigned long *get_pi_desc(void)
-> > +{
-> > +     return (unsigned long *)vmcs_read(POSTED_INTR_DESC_ADDR);
-> > +}
-> > +
-> > +static void post_interrupt(u8 vector, u32 dest)
-> > +{
-> > +     unsigned long *pi_desc = get_pi_desc();
-> > +
-> > +     test_and_set_bit(vector, pi_desc);
-> > +     test_and_set_bit(256, pi_desc);
-> > +     apic_icr_write(PI_VECTOR, dest);
-> > +}
-> > +
-> > +static struct vmx_posted_interrupt_test_args {
-> > +     bool isr_fired;
-> > +} vmx_posted_interrupt_test_args;
-> > +
-> > +static void vmx_posted_interrupt_test_isr(isr_regs_t *regs)
-> > +{
-> > +     volatile struct vmx_posted_interrupt_test_args *args
-> > +                     = &vmx_posted_interrupt_test_args;
-> > +
-> > +     args->isr_fired = true;
-> > +     eoi();
-> > +}
-> > +
-> > +static void vmx_posted_interrupt_test_guest(void)
-> > +{
-> > +     handle_irq(PI_TEST_VECTOR, vmx_posted_interrupt_test_isr);
-> > +     irq_enable();
-> > +     vmcall();
-> > +     asm volatile("nop");
-> > +     vmcall();
-> > +}
-> > +
-> > +static void vmx_posted_interrupt_test(void)
-> > +{
-> > +     volatile struct vmx_posted_interrupt_test_args *args
-> > +                     = &vmx_posted_interrupt_test_args;
-> > +
-> > +     if (!cpu_has_apicv()) {
-> > +             report_skip(__func__);
-> > +             return;
-> > +     }
-> > +
-> > +     enable_vid();
-> > +     enable_posted_interrupts();
-> > +     test_set_guest(vmx_posted_interrupt_test_guest);
-> > +
-> > +     enter_guest();
-> > +     skip_exit_vmcall();
-> > +
-> > +     irq_disable();
-> > +     post_interrupt(PI_TEST_VECTOR, apic_id());
-> > +     enter_guest();
-> > +
-> > +     skip_exit_vmcall();
-> > +     TEST_ASSERT(args->isr_fired);
-> > +     enter_guest();
-> > +}
-> > +
-> >   #define TEST(name) { #name, .v2 = name }
-> >
-> >   /* name/init/guest_main/exit_handler/syscall_handler/guest_regs */
-> > @@ -10533,5 +10608,6 @@ struct vmx_test vmx_tests[] = {
-> >       TEST(rdtsc_vmexit_diff_test),
-> >       TEST(vmx_mtf_test),
-> >       TEST(vmx_mtf_pdpte_test),
-> > +     TEST(vmx_posted_interrupt_test),
-> >       { NULL, NULL, NULL, NULL, NULL, {0} },
-> >   };
-> >
->
