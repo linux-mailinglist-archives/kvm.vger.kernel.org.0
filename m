@@ -2,203 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F7002D81E6
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 23:24:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B740D2D8239
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 23:39:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404046AbgLKWXq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 17:23:46 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20130 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389930AbgLKWXX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 17:23:23 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BBMEYsQ186323;
-        Fri, 11 Dec 2020 17:22:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=CvZ6ed3lQl/BG9srwuIEWAY0PIXHO1HWpFDNCxW9pag=;
- b=O1A4+xcyVxSnAEQKiPSe2hlzYeImTzZV3Jin+Qk45dU1NkxeRaECMnXVp0YKXkhqYscY
- M5wJyJSZ1p9ixi9dyWmhmFRmxyZpnJ6xXjbZzcxB9kyJeWl1+acwVBT28fYd+SpN7IE+
- oYiHIZTSAyEI51hCo/ir/lrC5ENNF5hHntacxeef58l3ulZUWU+dNzi+QGUPCji04O9M
- tPaBea4vIIWKalw93NTWFc8QfGT2VT2hnPgszhwSmW6YabLFvCMzj1wIEczGj1gizH78
- Dxa6NJlTZabuTWWnaR1mBOJamt1LvKL7SUkcn1uXpXBcqvLsetH0WfZB2cwNQ43tJbhx ZQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35chcrg51m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 17:22:27 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BBMGK99191066;
-        Fri, 11 Dec 2020 17:22:26 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35chcrg51e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 17:22:26 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BBMCSqr021964;
-        Fri, 11 Dec 2020 22:22:25 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma02dal.us.ibm.com with ESMTP id 3581uaqkf7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 22:22:25 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BBMMOtp24576384
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Dec 2020 22:22:24 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 11CEEC605A;
-        Fri, 11 Dec 2020 22:22:24 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64776C6057;
-        Fri, 11 Dec 2020 22:22:22 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com.com (unknown [9.85.193.150])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 11 Dec 2020 22:22:22 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, gregkh@linuxfoundation.org,
-        sashal@kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
-        kwankhede@nvidia.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v2 2/2] s390/vfio-ap: reverse group notifier actions when KVM pointer invalidated
-Date:   Fri, 11 Dec 2020 17:22:11 -0500
-Message-Id: <20201211222211.20869-3-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20201211222211.20869-1-akrowiak@linux.ibm.com>
-References: <20201211222211.20869-1-akrowiak@linux.ibm.com>
+        id S2406964AbgLKWhs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 17:37:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35186 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406969AbgLKWhT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Dec 2020 17:37:19 -0500
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75078C0613D3
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 14:36:39 -0800 (PST)
+Received: by mail-oi1-x243.google.com with SMTP id q25so11644069oij.10
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 14:36:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=me7pZBCCC6C4vmXTYs8zR2DK1M/nmZJANtE1sbs6rXY=;
+        b=GpPry6NGp8B7XEE6H0c6U5/K4Vd379ySpHfSoh/gbK4XY1p+evKT1ba/h7tm/jFW3T
+         hYoA2QSWGmrcRD/Mp2VoBOxVDVBn+JIz2U6JmfwBe3Sq+aDD4JpnH5aY9TO3lxt+u9m+
+         fYVzobsJVDy6VgMXnvttGFCoqyDwcqeL2UdQf7ZR8JAdKlBJeCWpw2TvcJ9xfiUCvOQd
+         RLh/i9b+pzhdfzWt6KEYD0ImID57bUy6JtMI4xl4KIbRpgbrbE+MI2geMo2MAiya9msF
+         8FA1RRyo9UbjmU14PJLf1Z+HbE9fr/0muvIyu6zcVD9uCbKtfx8hHES1bi003BpLIa0F
+         A/MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=me7pZBCCC6C4vmXTYs8zR2DK1M/nmZJANtE1sbs6rXY=;
+        b=lVcxzzshu+wHwiFam/bZ65xbE88PFXp+DrUSMDu7jhUlBj1yxm6QMe80n8cWYVi+EF
+         UHOHsRFxiXI8z3O2tcroRXjANQq9b1zY5xYJpp9zypwW4TWjA7dXN5BNNacm7c2nDz+Y
+         Su8B4fjjcIWr9gaKIp8dXP2NSaJ7deZ7BJdeLGY4h45ytZ28SeO+5JYj1+RycK+YS0uR
+         nYlkYF51Z2dM8SJZxGErUO3hMjM8QikvgKEST9JorZjJIB1J6BoEW9XZaDeGbEJknX9u
+         sBxrsK+++9Q1JddBylelIjw5MNrcBIHPX0L3XzPPdb1DHVEqmnc1wbgib/DFuKXECBc2
+         gK4g==
+X-Gm-Message-State: AOAM5302zHlhqNIVJTpavVhmKLOq1jhYdSnCtaF6ek+8/iVqsSPAp6ce
+        N3e986s/SJFijR5NqPsCUQpfx0UQtz23YSc/KG/onw==
+X-Google-Smtp-Source: ABdhPJxa6JCzF5ToMNCQopi+4YgsIiP6hy2Oo4Xz/+p2eiODWIREUVdjQG1Z3Stlk0hu9WNBiXWbHZJsSn7AKVtf5NM=
+X-Received: by 2002:aca:bf0b:: with SMTP id p11mr5936446oif.6.1607726198532;
+ Fri, 11 Dec 2020 14:36:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-11_09:2020-12-11,2020-12-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- malwarescore=0 bulkscore=0 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 suspectscore=3 phishscore=0 clxscore=1015
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2012110145
+References: <20201006212556.882066-1-oupton@google.com>
+In-Reply-To: <20201006212556.882066-1-oupton@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 11 Dec 2020 14:36:27 -0800
+Message-ID: <CALMp9eQ_iFBDRcfffhTO1Nnqpf7tPqDk=HSUqUPpF4B4kyyuNg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: vmx: add regression test for posted interrupts
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vfio_ap device driver registers a group notifier with VFIO when the
-file descriptor for a VFIO mediated device for a KVM guest is opened to
-receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
-event). When the KVM pointer is set, the vfio_ap driver takes the
-following actions:
-1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
-   of the mediated device.
-2. Calls the kvm_get_kvm() function to increment its reference counter.
-3. Sets the function pointer to the function that handles interception of
-   the instruction that enables/disables interrupt processing.
+On Tue, Oct 6, 2020 at 2:26 PM Oliver Upton <oupton@google.com> wrote:
+>
+> If a guest blocks interrupts for the entirety of running in root mode
+> (RFLAGS.IF=0), a pending interrupt corresponding to the posted-interrupt
+> vector set in the VMCS should result in an interrupt posting to the vIRR
+> at VM-entry. However, on KVM this is not the case. The pending interrupt
+> is not recognized as the posted-interrupt vector and instead results in
+> an external interrupt VM-exit.
+>
+> Add a regression test to exercise this issue.
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  lib/x86/asm/bitops.h |  8 +++++
+>  x86/vmx_tests.c      | 76 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 84 insertions(+)
+>
+> diff --git a/lib/x86/asm/bitops.h b/lib/x86/asm/bitops.h
+> index 13a25ec9853d..ce5743538f65 100644
+> --- a/lib/x86/asm/bitops.h
+> +++ b/lib/x86/asm/bitops.h
+> @@ -13,4 +13,12 @@
+>
+>  #define HAVE_BUILTIN_FLS 1
+>
+> +static inline void test_and_set_bit(long nr, unsigned long *addr)
+> +{
+> +       asm volatile("lock; bts %1, %0"
+> +                    : "+m" (*addr)
+> +                    : "Ir" (nr)
+> +                    : "memory");
+> +}
+> +
+>  #endif
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index d2084ae9e8ce..9ba9a5d452a2 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -10430,6 +10430,81 @@ static void atomic_switch_overflow_msrs_test(void)
+>                 test_skip("Test is only supported on KVM");
+>  }
+>
+> +#define PI_VECTOR 0xe0
+> +#define PI_TEST_VECTOR 0x21
+> +
+> +static void enable_posted_interrupts(void)
+> +{
+> +       void *pi_desc = alloc_page();
+> +
+> +       vmcs_set_bits(PIN_CONTROLS, PIN_POST_INTR);
+> +       vmcs_set_bits(EXI_CONTROLS, EXI_INTA);
+> +       vmcs_write(PINV, PI_VECTOR);
+> +       vmcs_write(POSTED_INTR_DESC_ADDR, (u64)pi_desc);
+> +}
+> +
+> +static unsigned long *get_pi_desc(void)
+> +{
+> +       return (unsigned long *)vmcs_read(POSTED_INTR_DESC_ADDR);
+> +}
+> +
+> +static void post_interrupt(u8 vector, u32 dest)
+> +{
+> +       unsigned long *pi_desc = get_pi_desc();
+> +
+> +       test_and_set_bit(vector, pi_desc);
+> +       test_and_set_bit(256, pi_desc);
+> +       apic_icr_write(PI_VECTOR, dest);
+> +}
+> +
+> +static struct vmx_posted_interrupt_test_args {
+> +       bool isr_fired;
+> +} vmx_posted_interrupt_test_args;
+> +
+> +static void vmx_posted_interrupt_test_isr(isr_regs_t *regs)
+> +{
+> +       volatile struct vmx_posted_interrupt_test_args *args
+> +                       = &vmx_posted_interrupt_test_args;
+> +
+> +       args->isr_fired = true;
+> +       eoi();
+> +}
+> +
+> +static void vmx_posted_interrupt_test_guest(void)
+> +{
+> +       handle_irq(PI_TEST_VECTOR, vmx_posted_interrupt_test_isr);
+> +       irq_enable();
+> +       vmcall();
+> +       asm volatile("nop");
+> +       vmcall();
+> +}
+> +
+> +static void vmx_posted_interrupt_test(void)
+> +{
+> +       volatile struct vmx_posted_interrupt_test_args *args
+> +                       = &vmx_posted_interrupt_test_args;
+> +
+> +       if (!cpu_has_apicv()) {
+> +               report_skip(__func__);
+> +               return;
+> +       }
+> +
+> +       enable_vid();
+> +       enable_posted_interrupts();
+> +       test_set_guest(vmx_posted_interrupt_test_guest);
+> +
+> +       enter_guest();
+> +       skip_exit_vmcall();
+> +
+> +       irq_disable();
+> +       post_interrupt(PI_TEST_VECTOR, apic_id());
+> +       enter_guest();
+> +
+> +       skip_exit_vmcall();
+> +       TEST_ASSERT(args->isr_fired);
+> +       enter_guest();
+> +}
+> +
+>  #define TEST(name) { #name, .v2 = name }
+>
+>  /* name/init/guest_main/exit_handler/syscall_handler/guest_regs */
+> @@ -10533,5 +10608,6 @@ struct vmx_test vmx_tests[] = {
+>         TEST(rdtsc_vmexit_diff_test),
+>         TEST(vmx_mtf_test),
+>         TEST(vmx_mtf_pdpte_test),
+> +       TEST(vmx_posted_interrupt_test),
+>         { NULL, NULL, NULL, NULL, NULL, {0} },
+>  };
+> --
+> 2.28.0.806.g8561365e88-goog
+>
 
-When the notifier is called to make notification that the KVM pointer has
-been set to NULL, the driver should reverse the actions taken when the
-KVM pointer was set as well as unplugging the AP devices passed through
-to the KVM guest.
-
-Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 40 ++++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index c854d7ab2079..1c3c2a0898b9 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1033,8 +1033,6 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
- {
- 	struct ap_matrix_mdev *m;
- 
--	mutex_lock(&matrix_dev->lock);
--
- 	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
- 		if ((m != matrix_mdev) && (m->kvm == kvm)) {
- 			mutex_unlock(&matrix_dev->lock);
-@@ -1045,7 +1043,6 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
- 	matrix_mdev->kvm = kvm;
- 	kvm_get_kvm(kvm);
- 	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
--	mutex_unlock(&matrix_dev->lock);
- 
- 	return 0;
- }
-@@ -1079,35 +1076,49 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
- 	return NOTIFY_DONE;
- }
- 
-+static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
-+{
-+	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-+	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-+	vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
-+	kvm_put_kvm(matrix_mdev->kvm);
-+	matrix_mdev->kvm = NULL;
-+}
-+
- static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
- 				       unsigned long action, void *data)
- {
--	int ret;
-+	int ret, notify_rc = NOTIFY_DONE;
- 	struct ap_matrix_mdev *matrix_mdev;
- 
- 	if (action != VFIO_GROUP_NOTIFY_SET_KVM)
- 		return NOTIFY_OK;
- 
- 	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
-+	mutex_lock(&matrix_dev->lock);
- 
- 	if (!data) {
--		matrix_mdev->kvm = NULL;
--		return NOTIFY_OK;
-+		if (matrix_mdev->kvm)
-+			vfio_ap_mdev_unset_kvm(matrix_mdev);
-+		notify_rc = NOTIFY_OK;
-+		goto notify_done;
- 	}
- 
- 	ret = vfio_ap_mdev_set_kvm(matrix_mdev, data);
- 	if (ret)
--		return NOTIFY_DONE;
-+		goto notify_done;
- 
- 	/* If there is no CRYCB pointer, then we can't copy the masks */
- 	if (!matrix_mdev->kvm->arch.crypto.crycbd)
--		return NOTIFY_DONE;
-+		goto notify_done;
- 
- 	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
- 				  matrix_mdev->matrix.aqm,
- 				  matrix_mdev->matrix.adm);
- 
--	return NOTIFY_OK;
-+notify_done:
-+	mutex_unlock(&matrix_dev->lock);
-+	return notify_rc;
- }
- 
- static struct vfio_ap_queue *vfio_ap_find_queue(int apqn)
-@@ -1234,13 +1245,10 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
- 
- 	mutex_lock(&matrix_dev->lock);
--	if (matrix_mdev->kvm) {
--		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
--		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
--		vfio_ap_mdev_reset_queues(mdev);
--		kvm_put_kvm(matrix_mdev->kvm);
--		matrix_mdev->kvm = NULL;
--	}
-+	if (matrix_mdev->kvm)
-+		vfio_ap_mdev_unset_kvm(matrix_mdev);
-+	else
-+		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
- 	mutex_unlock(&matrix_dev->lock);
- 
- 	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
--- 
-2.21.1
-
+Ping.
