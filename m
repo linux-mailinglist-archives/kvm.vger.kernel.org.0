@@ -2,109 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D29F62D76CD
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 14:43:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B2EC2D76E8
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 14:50:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392947AbgLKNl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 08:41:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47499 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2391858AbgLKNkp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 08:40:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607693958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MbYS50aLgaeYn8FPpMDIw3UPfwJ6Umvgz/HtFuKmk7s=;
-        b=FDGfxCvjAcKcpody997hwe2QCct8sYdZ5oWWOwgBPDSBskf9awx3I8xQCWy+VIRF1OzSLF
-        itU8PIyelL9nrnlZplF8RehTvappOql2t4JPP9Tb4m8nko7HTTC8EJsxOwsm9Yb7PbKhYd
-        V67+9z93sau1I4bQiXA8srz7p3hhUlU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-LrkluromNhmZcUeW_yf26w-1; Fri, 11 Dec 2020 08:39:16 -0500
-X-MC-Unique: LrkluromNhmZcUeW_yf26w-1
-Received: by mail-wr1-f69.google.com with SMTP id b5so3309499wrp.3
-        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 05:39:16 -0800 (PST)
+        id S2394349AbgLKNta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 08:49:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38342 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391239AbgLKNtJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Dec 2020 08:49:09 -0500
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB5BC0613CF
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 05:48:28 -0800 (PST)
+Received: by mail-lj1-x242.google.com with SMTP id y16so10972066ljk.1
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 05:48:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=DcPMMVsrCMnOQadt35QrJ5qdpictWliOZDoC6TNx80E=;
+        b=vY/LBoJg0Ek5J1MLYvtaMbjMAn1+U2D9zwZqVg4O3t+q8PZw1K1gDXBzq85blTYbQH
+         TxgsNtwkEyXe8a3jUUqtnsyBQv7mDHXd244S9nv52s+yfc31JNpbJxlTxbQNcr0gg26W
+         2Roz++3eNu1gzMtlWSZOCcbsJ0pVU0yF8F1lGpmYWT3zwT7a4Dd+UjZqCV76UaXnIf8H
+         szjYf0fFhw93zPbOIvaqX0rbJp+iFTmbkBL7T/+l17BH7EeFxIyqHMsIMBrVlI34Ex3H
+         ZT+Lkbw0zu7kBwJ4+FE1kCCqfL+hNuybwwm37ldzptA2eg4jSP8AW9AB+JVKfWgdeafo
+         enLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MbYS50aLgaeYn8FPpMDIw3UPfwJ6Umvgz/HtFuKmk7s=;
-        b=U6F3jPZoBu+xj57C2tKqOAjIW4yiD46zWoDjhI0SHv324lVCGns8cU4UncZsyYDiUS
-         IeNvaav9L2Aifby0rCL+pWW+CykBQLaJPdSn7Bvwb1uHzEyFKsin+thcU023wQ8MCUU6
-         vxenlql8eMULLqjsDfyuB8KdriqOlPp2KziwEjrJLDO3INcFIpih5sEvlnFm4oeWqprq
-         fB+kDuGaWN45IpkcMwClGHd8ht7p6YmUxCicZ+5ylVUeyC+obmfYPHLRSj73K00Il1Zj
-         Qf265J4wgp1h/DUx7NXCtIi7T9x1IDYLdOGI56jsEzmPfRpw6L3pT77ilKvQg6PFMzHU
-         OESA==
-X-Gm-Message-State: AOAM533L0Xx1zzMcHgLYVcT9o/CSR/m+4Gx6mjeGez8mvNrmt+qLNpDt
-        M/y/e5QwXnAYoMCrIOE/ll8gnKqYN9R3xMi8EbGHjrQLDJ4qFrjLu+XhF0RElBnOEJJoM72p9F8
-        ydDe9TC6z2nuI
-X-Received: by 2002:a1c:220b:: with SMTP id i11mr13842441wmi.8.1607693955308;
-        Fri, 11 Dec 2020 05:39:15 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzI2Sm8O13+RtyhcFkjm1JSpJmZY6RWQyd+X32UvA79o8vY1b2Js12gOWiXyJUU7zuv6xuLIQ==
-X-Received: by 2002:a1c:220b:: with SMTP id i11mr13842421wmi.8.1607693955133;
-        Fri, 11 Dec 2020 05:39:15 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id q25sm16582950wmq.37.2020.12.11.05.39.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Dec 2020 05:39:14 -0800 (PST)
-Subject: Re: [PATCH] KVM: SVM: use vmsave/vmload for saving/restoring
- additional host state
-To:     Michael Roth <michael.roth@amd.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H.Peter Anvin" <hpa@zytor.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20201210174814.1122585-1-michael.roth@amd.com>
- <CALCETrXo+2LjUt_ObxV+6u6719gTVaMR4-KCrgsjQVRe=xPo+g@mail.gmail.com>
- <160763562772.1125101.13951354991725886671@vm0>
- <CALCETrV2-WwV+uz99r2RCJx6OADzwxaLxPUVW22wjHoAAN5cSQ@mail.gmail.com>
- <160764771044.1223913.9946447556531152629@vm0>
- <CALCETrVuCZ5itAN3Ns3D04qR1Z_eJiA9=UvyM95zLE076X=JEA@mail.gmail.com>
- <X9LLFMN5CNPIikSp@google.com>
- <5083c2dd-5aed-f7a9-4267-04cfca92032b@redhat.com>
- <160769329840.1247637.5575272518529940842@vm0>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd8305fa-22f4-bd05-a318-ebc6c3a8ec72@redhat.com>
-Date:   Fri, 11 Dec 2020 14:39:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=DcPMMVsrCMnOQadt35QrJ5qdpictWliOZDoC6TNx80E=;
+        b=MufoqhGJKMjU46GYvRu0yIYTzvqP1Sw3zSP6LS/I1gbuilCTQ7B9ITx31seQtm+SYr
+         97be/OEXu3smI3fwAfvOtjy/E4Sr67oeqKSzBQCDzEKr2rAAJ0kSEzKk32mQIr24mNyc
+         hpxwr6BsLxHR4ssragasMiISiDSdSaSqg5eilvnyyYGeozfKrUshPxeaAbFAHgfjhDwU
+         BeKYiFPxK1CxiR6/3FmQQwWzfYdy1cVuOp0WPFAJI7NAnMM4MyFqDSmIgFfrRHfCnm2F
+         qKuzE1T0PzoJSR3AHCqz8TmgYqf1JF5L/cRTl/7yKeMoqHh6h/etVlhpTOEjCwyaSYyx
+         lYdA==
+X-Gm-Message-State: AOAM533jGlI81y/fy5NiRA6neeUoZqTGZULkiHt1ScJ2dkTH5/67U7FG
+        QGwG6UZz84OzdrVxpPB5nKSWrWtC3VfpkjMVvlg=
+X-Google-Smtp-Source: ABdhPJx1dn2TFWn67mwxT9bwpeONR+1AotROr0/krBVHmeZvjBT3ls9R9ov8vNDRfRuVTd4VaJqXVlZ30e14hEhes/g=
+X-Received: by 2002:a2e:98e:: with SMTP id 136mr5149034ljj.16.1607694507216;
+ Fri, 11 Dec 2020 05:48:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <160769329840.1247637.5575272518529940842@vm0>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Sender: muhamedouedrago12@gmail.com
+Received: by 2002:a05:6520:17d2:b029:a6:7874:ea69 with HTTP; Fri, 11 Dec 2020
+ 05:48:26 -0800 (PST)
+From:   Muhamed ouedrago <mohamedouedrago84@gmail.com>
+Date:   Fri, 11 Dec 2020 13:48:26 +0000
+X-Google-Sender-Auth: DBRRwS3vWGav4l1TjDQCL-Hp5Ew
+Message-ID: <CALznxM-zkUkzV2w0LEw93J+6t3G7CATpJUj=NEAy72oAqeg=Ww@mail.gmail.com>
+Subject: Greetings
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/20 14:28, Michael Roth wrote:
-> Quoting Paolo Bonzini (2020-12-11 05:42:02)
->> On 11/12/20 02:27, Sean Christopherson wrote:
->>> Michael, please reply to all so that everyone can read along and so that the
->>> conversation gets recorded in the various mailing list archives.
->>>
->>> If you are replying all, then I think something funky is going on with AMD's
->>> mail servers, as I'm not getting your responses (I double checked SPAM), nor are
->>> they showing up on lore.
->> I think somebody else reported similar issues with AMD's mail servers.
-> It looks like my messages did make their way to lore eventually:
-> 
->    https://lore.kernel.org/patchwork/patch/1352128/
+I AM MR.MOHAMMD OUEDRAGO.I WORK WITH THE BILL & EXCHANGE ( Bank of Africa (BOA)
+OUAGADOUGOU ANNEX OFFICE, BURKINA FASO.I HAVE A BUSINESS
+WHICH WILL BE BENEFICIAL TO BOTH OF US. THE AMOUNT OF MONEY INVOLVED IS ($11.2
+MILLION US DOLLARS) WHICH I WANT TO TRANSFER OUT OF THE COUNTRY TO YOUR BANK
+ACCOUNT. THIS MONEY IS OWNED BY A MAN CALLED KURT KAHLE A GERMAN BUSINESS MAN .
+ HE DIED ON MONDAY, THE 31 OF
+JULY 2001 IN A PLANE CRASH BUT NO CLAIM HAS BEEN MADE AS HE LEFT NO ONE BEHIND
+TO PLACE A CLAIM ON HIS BANK ACCOUNT BALANCE AS HIS NEXT OF KIN. THESE FUNDS
+CANNOT BE TRANSFERRED WITHOUT A NEXT OF KIN BEEN INTRODUCED OFFICIALLY.
 
-Ok, so maybe some graylisting.  If it fixes itself it's not a big deal.
+THE PROCESSING STARTS BY PRESENTING YOURSELF AS THE NEXT OF KIN TO LATE [KURT
+KAHLE]. I SHALL SEND TO YOU A TEXT OF APPLICATION FORM WITH WHICH YOU CAN APPLY
+TO THE BANK AS HIS NEXT OF KIN. I WILL MAKE AVAILABLE TO YOU ALL USEFUL
+INFORMATIONS WITH WHICH A SUCCESSFUL CLAIM SHALL BE PLACED ON THESE FUNDS. I
+WILL BE GUIDING YOU THROUGHOUT THE DURATION OF THIS TRANSACTION SO AS TO ENSURE
+A SMOOTH AND RISK FREE TRANSFER OF THESE FUNDS INTO YOUR BANK ACCOUNT, LIKE
+PROVIDING YOU WITH THE ANSWERS TO THE QUESTIONAIRE YOU WILL RECIEVE FROM THE
+BANK WHEN YOUR APPLICATION IS RECIEVED BY THE BANK. YOU SHALL BE ENTITLED TO 40%
+OF THESE FUNDS FOR YOUR CO-OPERATION AND ACCEPTANCE WHILE 10% WILL ACT AS
+COMPENSATION FOR THE SOFT EXPENSES YOU WILL INCURE IN THE PROCESS OF CONSUMATING
+THIS TRANSACTION. SEND ME A REPLY ON RECIEPT OF THIS EMAIL THROUGH
+(mohammedoudrago15@gmail.com)
+ URGENCY HAS TO BE IMPLIED AND DO PROMISE ME OF KEEPING
+EVERYTHING CONCERNING THIS TRANSACTION STRICTLY CONFIDENTIAL AND AS A TOP SECRET
+FOR TWO WORKING WEEKS NEEDED TO CONCLUDE WITH EVERYTHING.
 
-Paolo
+BEST REGARDS,
 
+
+MR.MOHAMMD OUEDRAGO
