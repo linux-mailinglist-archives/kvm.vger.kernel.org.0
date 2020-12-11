@@ -2,327 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9815B2D7348
-	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 11:03:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C1202D74D1
+	for <lists+kvm@lfdr.de>; Fri, 11 Dec 2020 12:39:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405007AbgLKKDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 05:03:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3106 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2404848AbgLKKCY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 05:02:24 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BB9raGW041203;
-        Fri, 11 Dec 2020 05:01:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dRmdfgT/bVHYOvi58JRZQb78ahxPHaWvQasThmhLnl4=;
- b=tmOZZKDV/FV9yO3n9d87H1RwgCVS5Xg8vMYyLTubKKU0VHuZ3Al2TdWdlFHkSEfYT1lD
- xhff7y20UPc8AFksIXJLJoNkzODRj0ZedloKqvoi9GA3RxEnFmkHzyAZglWJ4v7XY3zO
- epZoBXr2E+vBwlZySMdH/4NjZH9v/Kgtt6CdXu+Xm2pTipaeNg4j9IFHjBdeEh6jaCKp
- QmfmqdhzFDzQfx+qg3Q0QBJLaKcw2/QPHZ+TMZucp7LxK18fyeXnKTEPgXVOsOqz4p8I
- rvy2KsjZyCQmqObqrZ9fpikcyFmNqDUw+V+wNL1qjoraMiHIwoDRMR29Q/uvET7NmTTX dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35c6hn065v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 05:01:42 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BB9sejX042807;
-        Fri, 11 Dec 2020 05:01:42 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35c6hn0643-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 05:01:42 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BB9qNtv026655;
-        Fri, 11 Dec 2020 10:01:39 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 35bnts8g3u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 10:01:39 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BBA1acW20513162
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Dec 2020 10:01:36 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 40D34A4059;
-        Fri, 11 Dec 2020 10:01:36 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E20FA405E;
-        Fri, 11 Dec 2020 10:01:35 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 11 Dec 2020 10:01:35 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
-        imbrenda@linux.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 8/8] s390x: Fix sclp.h style issues
-Date:   Fri, 11 Dec 2020 05:00:39 -0500
-Message-Id: <20201211100039.63597-9-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201211100039.63597-1-frankja@linux.ibm.com>
-References: <20201211100039.63597-1-frankja@linux.ibm.com>
+        id S2394436AbgLKLjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 06:39:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46225 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2391879AbgLKLjK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 06:39:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607686664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RqIjgNGP8EpRseSxFoBnqE8y63I178BwzCy3MXCM4mw=;
+        b=dGzEMqk0j9e/Z6L3lTiQxCZYMmZaaKmobd7quwyWEoyYFLA5NA0gMxKTtIQ/Nydbghp7/v
+        bqY8qTonJPMGK7m+KoEQe5TX0j0tHonmuuNBSXTJp9GxMvHqw7EQK633tgnAMa30JrpPNr
+        KD2W3OzA7oIMf/hGphGKQBcqcnCkHPs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-uYx1psuZPVahtzYjTJGM0w-1; Fri, 11 Dec 2020 06:37:40 -0500
+X-MC-Unique: uYx1psuZPVahtzYjTJGM0w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 282FC190A7A4;
+        Fri, 11 Dec 2020 11:37:38 +0000 (UTC)
+Received: from gondolin (ovpn-112-240.ams2.redhat.com [10.36.112.240])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 851305D705;
+        Fri, 11 Dec 2020 11:37:32 +0000 (UTC)
+Date:   Fri, 11 Dec 2020 12:37:29 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC 1/4] s390/pci: track alignment/length strictness for
+ zpci_dev
+Message-ID: <20201211123729.37647fa0.cohuck@redhat.com>
+In-Reply-To: <15132f7f-cad7-d663-a8b9-90f417e85c81@linux.ibm.com>
+References: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
+        <1607545670-1557-2-git-send-email-mjrosato@linux.ibm.com>
+        <20201210113318.136636e2.cohuck@redhat.com>
+        <15132f7f-cad7-d663-a8b9-90f417e85c81@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-11_01:2020-12-09,2020-12-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=999 mlxscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 spamscore=0 clxscore=1015 suspectscore=1
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012110057
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix indentation
+On Thu, 10 Dec 2020 10:26:22 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
----
- lib/s390x/sclp.h | 172 +++++++++++++++++++++++------------------------
- 1 file changed, 86 insertions(+), 86 deletions(-)
+> On 12/10/20 5:33 AM, Cornelia Huck wrote:
+> > On Wed,  9 Dec 2020 15:27:47 -0500
+> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >   
+> >> Some zpci device types (e.g., ISM) follow different rules for length
+> >> and alignment of pci instructions.  Recognize this and keep track of
+> >> it in the zpci_dev.
+> >>
+> >> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> >> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> >> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+> >> ---
+> >>   arch/s390/include/asm/pci.h     | 3 ++-
+> >>   arch/s390/include/asm/pci_clp.h | 4 +++-
+> >>   arch/s390/pci/pci_clp.c         | 1 +
+> >>   3 files changed, 6 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> >> index 2126289..f16ffba 100644
+> >> --- a/arch/s390/include/asm/pci.h
+> >> +++ b/arch/s390/include/asm/pci.h
+> >> @@ -133,7 +133,8 @@ struct zpci_dev {
+> >>   	u8		has_hp_slot	: 1;
+> >>   	u8		is_physfn	: 1;
+> >>   	u8		util_str_avail	: 1;
+> >> -	u8		reserved	: 4;
+> >> +	u8		relaxed_align	: 1;
+> >> +	u8		reserved	: 3;
+> >>   	unsigned int	devfn;		/* DEVFN part of the RID*/
+> >>   
+> >>   	struct mutex lock;
+> >> diff --git a/arch/s390/include/asm/pci_clp.h b/arch/s390/include/asm/pci_clp.h
+> >> index 1f4b666..9fb7cbf 100644
+> >> --- a/arch/s390/include/asm/pci_clp.h
+> >> +++ b/arch/s390/include/asm/pci_clp.h
+> >> @@ -150,7 +150,9 @@ struct clp_rsp_query_pci_grp {
+> >>   	u16			:  4;
+> >>   	u16 noi			: 12;	/* number of interrupts */
+> >>   	u8 version;
+> >> -	u8			:  6;
+> >> +	u8			:  4;
+> >> +	u8 relaxed_align	:  1;	/* Relax length and alignment rules */
+> >> +	u8			:  1;
+> >>   	u8 frame		:  1;
+> >>   	u8 refresh		:  1;	/* TLB refresh mode */
+> >>   	u16 reserved2;
+> >> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
+> >> index 153720d..630f8fc 100644
+> >> --- a/arch/s390/pci/pci_clp.c
+> >> +++ b/arch/s390/pci/pci_clp.c
+> >> @@ -103,6 +103,7 @@ static void clp_store_query_pci_fngrp(struct zpci_dev *zdev,
+> >>   	zdev->max_msi = response->noi;
+> >>   	zdev->fmb_update = response->mui;
+> >>   	zdev->version = response->version;
+> >> +	zdev->relaxed_align = response->relaxed_align;
+> >>   
+> >>   	switch (response->version) {
+> >>   	case 1:  
+> > 
+> > Hm, what does that 'relaxed alignment' imply? Is that something that
+> > can apply to emulated devices as well?
+> >   
+> The relaxed alignment simply loosens the rules on the PCISTB instruction 
+> so that it doesn't have to be on particular boundaries / have a minimum 
+> length restriction, these effectively allow ISM devices to use PCISTB 
+> instead of PCISTG for just about everything.  If you have a look at the 
+> patch "s390x/pci: Handle devices that support relaxed alignment" from 
+> the linked qemu set, you can get an idea of what the bit changes via the 
+> way qemu has to be more permissive of what the guest provides for PCISTB.
 
-diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-index 58f8e54..dccbaa8 100644
---- a/lib/s390x/sclp.h
-+++ b/lib/s390x/sclp.h
-@@ -79,10 +79,10 @@
- #define SCCB_SIZE 4096
- 
- typedef struct SCCBHeader {
--    uint16_t length;
--    uint8_t function_code;
--    uint8_t control_mask[3];
--    uint16_t response_code;
-+	uint16_t length;
-+	uint8_t function_code;
-+	uint8_t control_mask[3];
-+	uint16_t response_code;
- } __attribute__((packed)) SCCBHeader;
- 
- #define SCCB_DATA_LEN (SCCB_SIZE - sizeof(SCCBHeader))
-@@ -90,15 +90,15 @@ typedef struct SCCBHeader {
- 
- /* CPU information */
- typedef struct CPUEntry {
--    uint8_t address;
--    uint8_t reserved0;
--    uint8_t : 4;
--    uint8_t feat_sief2 : 1;
--    uint8_t : 3;
--    uint8_t features_res2 [SCCB_CPU_FEATURE_LEN - 1];
--    uint8_t reserved2[6];
--    uint8_t type;
--    uint8_t reserved1;
-+	uint8_t address;
-+	uint8_t reserved0;
-+	uint8_t : 4;
-+	uint8_t feat_sief2 : 1;
-+	uint8_t : 3;
-+	uint8_t features_res2 [SCCB_CPU_FEATURE_LEN - 1];
-+	uint8_t reserved2[6];
-+	uint8_t type;
-+	uint8_t reserved1;
- } __attribute__((packed)) CPUEntry;
- 
- extern struct sclp_facilities sclp_facilities;
-@@ -110,77 +110,77 @@ struct sclp_facilities {
- };
- 
- typedef struct ReadInfo {
--    SCCBHeader h;
--    uint16_t rnmax;
--    uint8_t rnsize;
--    uint8_t  _reserved1[16 - 11];       /* 11-15 */
--    uint16_t entries_cpu;               /* 16-17 */
--    uint16_t offset_cpu;                /* 18-19 */
--    uint8_t  _reserved2[24 - 20];       /* 20-23 */
--    uint8_t  loadparm[8];               /* 24-31 */
--    uint8_t  _reserved3[48 - 32];       /* 32-47 */
--    uint64_t facilities;                /* 48-55 */
--    uint8_t  _reserved0[76 - 56];       /* 56-75 */
--    uint32_t ibc_val;
--    uint8_t  conf_char[99 - 80];        /* 80-98 */
--    uint8_t mha_pow;
--    uint32_t rnsize2;
--    uint64_t rnmax2;
--    uint8_t  _reserved6[116 - 112];     /* 112-115 */
--    uint8_t  conf_char_ext[120 - 116];   /* 116-119 */
--    uint16_t highest_cpu;
--    uint8_t  _reserved5[124 - 122];     /* 122-123 */
--    uint32_t hmfai;
--    uint8_t reserved7[134 - 128];
--    uint8_t byte_134_diag318 : 1;
--    uint8_t : 7;
--    struct CPUEntry entries[0];
-+	SCCBHeader h;
-+	uint16_t rnmax;
-+	uint8_t rnsize;
-+	uint8_t  _reserved1[16 - 11];       /* 11-15 */
-+	uint16_t entries_cpu;               /* 16-17 */
-+	uint16_t offset_cpu;                /* 18-19 */
-+	uint8_t  _reserved2[24 - 20];       /* 20-23 */
-+	uint8_t  loadparm[8];               /* 24-31 */
-+	uint8_t  _reserved3[48 - 32];       /* 32-47 */
-+	uint64_t facilities;                /* 48-55 */
-+	uint8_t  _reserved0[76 - 56];       /* 56-75 */
-+	uint32_t ibc_val;
-+	uint8_t  conf_char[99 - 80];        /* 80-98 */
-+	uint8_t mha_pow;
-+	uint32_t rnsize2;
-+	uint64_t rnmax2;
-+	uint8_t  _reserved6[116 - 112];     /* 112-115 */
-+	uint8_t  conf_char_ext[120 - 116];   /* 116-119 */
-+	uint16_t highest_cpu;
-+	uint8_t  _reserved5[124 - 122];     /* 122-123 */
-+	uint32_t hmfai;
-+	uint8_t reserved7[134 - 128];
-+	uint8_t byte_134_diag318 : 1;
-+	uint8_t : 7;
-+	struct CPUEntry entries[0];
- } __attribute__((packed)) ReadInfo;
- 
- typedef struct ReadCpuInfo {
--    SCCBHeader h;
--    uint16_t nr_configured;         /* 8-9 */
--    uint16_t offset_configured;     /* 10-11 */
--    uint16_t nr_standby;            /* 12-13 */
--    uint16_t offset_standby;        /* 14-15 */
--    uint8_t reserved0[24-16];       /* 16-23 */
--    struct CPUEntry entries[0];
-+	SCCBHeader h;
-+	uint16_t nr_configured;         /* 8-9 */
-+	uint16_t offset_configured;     /* 10-11 */
-+	uint16_t nr_standby;            /* 12-13 */
-+	uint16_t offset_standby;        /* 14-15 */
-+	uint8_t reserved0[24-16];       /* 16-23 */
-+	struct CPUEntry entries[0];
- } __attribute__((packed)) ReadCpuInfo;
- 
- typedef struct ReadStorageElementInfo {
--    SCCBHeader h;
--    uint16_t max_id;
--    uint16_t assigned;
--    uint16_t standby;
--    uint8_t _reserved0[16 - 14]; /* 14-15 */
--    uint32_t entries[0];
-+	SCCBHeader h;
-+	uint16_t max_id;
-+	uint16_t assigned;
-+	uint16_t standby;
-+	uint8_t _reserved0[16 - 14]; /* 14-15 */
-+	uint32_t entries[0];
- } __attribute__((packed)) ReadStorageElementInfo;
- 
- typedef struct AttachStorageElement {
--    SCCBHeader h;
--    uint8_t _reserved0[10 - 8];  /* 8-9 */
--    uint16_t assigned;
--    uint8_t _reserved1[16 - 12]; /* 12-15 */
--    uint32_t entries[0];
-+	SCCBHeader h;
-+	uint8_t _reserved0[10 - 8];  /* 8-9 */
-+	uint16_t assigned;
-+	uint8_t _reserved1[16 - 12]; /* 12-15 */
-+	uint32_t entries[0];
- } __attribute__((packed)) AttachStorageElement;
- 
- typedef struct AssignStorage {
--    SCCBHeader h;
--    uint16_t rn;
-+	SCCBHeader h;
-+	uint16_t rn;
- } __attribute__((packed)) AssignStorage;
- 
- typedef struct IoaCfgSccb {
--    SCCBHeader header;
--    uint8_t atype;
--    uint8_t reserved1;
--    uint16_t reserved2;
--    uint32_t aid;
-+	SCCBHeader header;
-+	uint8_t atype;
-+	uint8_t reserved1;
-+	uint16_t reserved2;
-+	uint32_t aid;
- } __attribute__((packed)) IoaCfgSccb;
- 
- typedef struct SCCB {
--    SCCBHeader h;
--    char data[SCCB_DATA_LEN];
-- } __attribute__((packed)) SCCB;
-+	SCCBHeader h;
-+	char data[SCCB_DATA_LEN];
-+} __attribute__((packed)) SCCB;
- 
- /* SCLP event types */
- #define SCLP_EVENT_ASCII_CONSOLE_DATA           0x1a
-@@ -195,13 +195,13 @@ typedef struct SCCB {
- #define SCLP_SELECTIVE_READ                     0x01
- 
- typedef struct WriteEventMask {
--    SCCBHeader h;
--    uint16_t _reserved;
--    uint16_t mask_length;
--    uint32_t cp_receive_mask;
--    uint32_t cp_send_mask;
--    uint32_t send_mask;
--    uint32_t receive_mask;
-+	SCCBHeader h;
-+	uint16_t _reserved;
-+	uint16_t mask_length;
-+	uint32_t cp_receive_mask;
-+	uint32_t cp_send_mask;
-+	uint32_t send_mask;
-+	uint32_t receive_mask;
- } __attribute__((packed)) WriteEventMask;
- 
- #define MDBTYP_GO               0x0001
-@@ -254,25 +254,25 @@ struct mdb {
- } __attribute__((packed));
- 
- typedef struct EventBufferHeader {
--    uint16_t length;
--    uint8_t  type;
--    uint8_t  flags;
--    uint16_t _reserved;
-+	uint16_t length;
-+	uint8_t  type;
-+	uint8_t  flags;
-+	uint16_t _reserved;
- } __attribute__((packed)) EventBufferHeader;
- 
- typedef struct WriteEventData {
--    SCCBHeader h;
--    EventBufferHeader ebh;
--    union {
--	char data[0];
--	struct mdb mdb;
--    } msg;
-+	SCCBHeader h;
-+	EventBufferHeader ebh;
-+	union {
-+		char data[0];
-+		struct mdb mdb;
-+	} msg;
- } __attribute__((packed)) WriteEventData;
- 
- typedef struct ReadEventData {
--    SCCBHeader h;
--    EventBufferHeader ebh;
--    uint32_t mask;
-+	SCCBHeader h;
-+	EventBufferHeader ebh;
-+	uint32_t mask;
- } __attribute__((packed)) ReadEventData;
- 
- extern char _sccb[];
--- 
-2.25.1
+Ok, so it is basically a characteristic of a specific device that
+changes the rules of what pcistb will accept.
+
+> 
+> Re: emulated devices...  The S390 PCI I/O layer in the guest is always 
+> issuing strict? aligned I/O for PCISTB, and if it decided to later 
+> change that behavior it would need to look at this CLP bit to decide 
+> whether that would be a valid operation for a given PCI function anyway. 
+>   This bit will remain off in the CLP response we give for emulated 
+> devices, ensuring that should such a change occur in the guest s390 PCI 
+> I/O layer, we'd just continue getting strictly-aligned PCISTB.
+
+My question was more whether that was a feature that might make sense
+to emulate on the hypervisor side for fully emulated devices. I'd like
+to leave the door open for emulated devices to advertise this and make
+it possible for guests using those devices to use pcistb with the
+relaxed rules, if it makes sense.
+
+I guess we can easily retrofit this if we come up with a use case for it.
 
