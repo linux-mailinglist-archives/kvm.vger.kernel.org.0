@@ -2,143 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 802002D83A5
-	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 01:54:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50E8C2D8593
+	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 11:02:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391670AbgLLAxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 19:53:21 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:33460 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407335AbgLLAxM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Dec 2020 19:53:12 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BC0nUil036538;
-        Sat, 12 Dec 2020 00:52:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=HP4ykR3R0iwJZXcpzLQ6riSiwYYg8qZvFJCz5Jl3mJY=;
- b=czEvxtVkI8pmqAzHpEZSduxgLcXcZSZFloYqmXeQe6/wpFjTIdG4GZP29pLqfYp1ticR
- fOufseeI8Zleqs2lG5iJExzS9wD8z/QK5Bq1ZCX+R4Rc3ZvW7qs68ldar39F3IBpNiCT
- enDYBekuBRZ0ko0yQXv8gS+TcRV3k4KxKUJL1rRc4ObaB8r3mpRJXNd7DoxnS1y1u58I
- 7PiX46/MzblIRrpXOcECK1erhC5F70Q3yyQ7EmBdin1lU6CkB8bVL0flBSfJquH5BBPt
- LWRi1hzKloFPCkbULXqS8uh+lwInP/NRYrNmXmlnS+O75uNr60wqUB3Kw0Er5/T9z0Sa Jw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 35825mn8bj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 12 Dec 2020 00:52:28 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BC0ns10099715;
-        Sat, 12 Dec 2020 00:50:28 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 35cjyqsb64-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 12 Dec 2020 00:50:27 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0BC0oQPX012201;
-        Sat, 12 Dec 2020 00:50:26 GMT
-Received: from nsvm-sadhukhan.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 11 Dec 2020 16:50:26 -0800
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, jmattson@google.com
-Subject: [PATCH 2/2 v5] nSVM: Test reserved values for 'Type' and invalid vectors in EVENTINJ
-Date:   Sat, 12 Dec 2020 00:50:19 +0000
-Message-Id: <20201212005019.6807-3-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201212005019.6807-1-krish.sadhukhan@oracle.com>
-References: <20201212005019.6807-1-krish.sadhukhan@oracle.com>
+        id S2438514AbgLLKBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Dec 2020 05:01:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26100 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2438541AbgLLKBj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 12 Dec 2020 05:01:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607767202;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mqytnWHmiXa+Di95y5cLkMPHeDA8E7hFbdSv3omYri8=;
+        b=L39003LNmXKTl1ijqJxQxPcNgpWXoaX9EDNo58wTTZlKeJYLC9QfLkZujb+p0KhKD4AUnH
+        eq01rjUUXy/5R8X7x1HwgxeXU2GQzvSqtV0JYQTmYGNEfs2QB/55AQHEWwzgnzG544bDiL
+        A8uVrQDWYWp4EgR2YObILkFYlfXT5gg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-Kdgcwk48Mb6PDnYpHVaeIQ-1; Sat, 12 Dec 2020 03:58:34 -0500
+X-MC-Unique: Kdgcwk48Mb6PDnYpHVaeIQ-1
+Received: by mail-ed1-f72.google.com with SMTP id u17so5203031edi.18
+        for <kvm@vger.kernel.org>; Sat, 12 Dec 2020 00:58:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mqytnWHmiXa+Di95y5cLkMPHeDA8E7hFbdSv3omYri8=;
+        b=fqbFp1iBhBcgnH5Euqpevkgt1KPcKmo6k5NLq9BMCLyvsKY6g/Qi8J5oCMLhs5W7MT
+         XIdykJ0JvI5GCNQRlh9G9jXovJXzjg0KYZ+GLkA/DmvpFyTjocJO4q6hJyzW/M/AnzL4
+         XxWMoY1prlY6mTMpfH0AbESJpS/IMhON1QuPZJrgCu/nexm9bG37rY6wZnOClKfbmN7g
+         H1/WNXGM67ON/p7RZhcSFgMBUbbw3z3VbjtJJfGZZIownYpOxS7tU4cqSk98caFH0hqm
+         uNMtBmkNPhSBcFsvCRC1KLTrN6n2JVXJyKUjVyEbqxFHhX17Vh37gOF60HDfQeIeXs2F
+         oaow==
+X-Gm-Message-State: AOAM532+KDAa8cE45B2kaV9/SWsfQ6MJ8M5P5okgWf9SFlpHKFiz3/Ie
+        lOV6xC8+TQIfrwm9ISF1rtoT8mxmxKJoepkSxRyScL7xTZKor4ovgnJ4avdUv8EvPX6rqk4m4Jn
+        7j3YKDZgdBLiw
+X-Received: by 2002:a17:906:e093:: with SMTP id gh19mr14499737ejb.510.1607763513782;
+        Sat, 12 Dec 2020 00:58:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzjcC4qLFJDONn4gSe2O+WmHUA/dQM7eXyyXAesmAunOsoTEsz2yxGYrRGFW809kDTB3U6Shw==
+X-Received: by 2002:a17:906:e093:: with SMTP id gh19mr14499723ejb.510.1607763513586;
+        Sat, 12 Dec 2020 00:58:33 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j2sm8628980eja.97.2020.12.12.00.58.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 12 Dec 2020 00:58:32 -0800 (PST)
+Subject: Re: [GIT PULL 0/4] KVM: s390: features and test for 5.11
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Collin Walling <walling@linux.ibm.com>
+References: <20201210142600.6771-1-borntraeger@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <43278089-2579-8a3d-8f13-81b8d3b75836@redhat.com>
+Date:   Sat, 12 Dec 2020 09:58:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9832 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- phishscore=0 suspectscore=0 mlxscore=0 bulkscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012120004
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9832 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0 bulkscore=0
- phishscore=0 mlxlogscore=999 clxscore=1015 priorityscore=1501 mlxscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012120004
+In-Reply-To: <20201210142600.6771-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to sections "Canonicalization and Consistency Checks" and "Event
-Injection" in APM vol 2
+On 10/12/20 15:25, Christian Borntraeger wrote:
+> Paolo,
+> 
+> the following changes since commit f8394f232b1eab649ce2df5c5f15b0e528c92091:
+> 
+>    Linux 5.10-rc3 (2020-11-08 16:10:16 -0800)
+> 
+> are available in the Git repository at:
+> 
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.11-1
+> 
+> for you to fetch changes up to 50a05be484cb70d9dfb55fa5a6ed57eab193901f:
+> 
+>    KVM: s390: track synchronous pfault events in kvm_stat (2020-12-10 14:20:26 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM: s390: Features and Test for 5.11
+> 
+> - memcg accouting for s390 specific parts of kvm and gmap
+> - selftest for diag318
+> - new kvm_stat for when async_pf falls back to sync
+> 
+> The selftest even triggers a non-critical bug that is unrelated
+> to diag318, fix will follow later.
+> 
+> ----------------------------------------------------------------
+> Christian Borntraeger (3):
+>        KVM: s390: Add memcg accounting to KVM allocations
+>        s390/gmap: make gmap memcg aware
+>        KVM: s390: track synchronous pfault events in kvm_stat
+> 
+> Collin Walling (1):
+>        KVM: selftests: sync_regs test for diag318
+> 
+>   arch/s390/include/asm/kvm_host.h                   |  1 +
+>   arch/s390/kvm/guestdbg.c                           |  8 +--
+>   arch/s390/kvm/intercept.c                          |  2 +-
+>   arch/s390/kvm/interrupt.c                          | 10 +--
+>   arch/s390/kvm/kvm-s390.c                           | 22 +++---
+>   arch/s390/kvm/priv.c                               |  4 +-
+>   arch/s390/kvm/pv.c                                 |  6 +-
+>   arch/s390/kvm/vsie.c                               |  4 +-
+>   arch/s390/mm/gmap.c                                | 30 ++++----
+>   tools/testing/selftests/kvm/Makefile               |  2 +-
+>   .../kvm/include/s390x/diag318_test_handler.h       | 13 ++++
+>   .../selftests/kvm/lib/s390x/diag318_test_handler.c | 82 ++++++++++++++++++++++
+>   tools/testing/selftests/kvm/s390x/sync_regs_test.c | 16 ++++-
+>   13 files changed, 156 insertions(+), 44 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/include/s390x/diag318_test_handler.h
+>   create mode 100644 tools/testing/selftests/kvm/lib/s390x/diag318_test_handler.c
+> 
 
-    VMRUN exits with VMEXIT_INVALID error code if either:
-      - Reserved values of TYPE have been specified, or
-      - TYPE = 3 (exception) has been specified with a vector that does not
-	correspond to an exception (this includes vector 2, which is an NMI,
-	not an exception).
+Pulled, thanks.
 
-Existing tests already cover part of the second rule. This patch covers the
-the first rule and the missing pieces of the second rule.
-
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- x86/svm_tests.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
-
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index f78c9e4..b9be522 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2132,6 +2132,43 @@ static void test_dr(void)
- 	vmcb->save.dr7 = dr_saved;
- }
- 
-+static void test_event_inject(void)
-+{
-+	u32 i;
-+	u32 event_inj_saved = vmcb->control.event_inj;
-+
-+	handle_exception(DE_VECTOR, my_isr);
-+
-+	report (svm_vmrun() == SVM_EXIT_VMMCALL && count_exc == 0, "Test "
-+	    "No EVENTINJ");
-+
-+	/*
-+	 * Reserved values for 'Type' in EVENTINJ causes VMEXIT_INVALID.
-+	 */
-+	for (i = 1; i < 8; i++) {
-+		if (i != 1 && i < 5)
-+			continue;
-+		vmcb->control.event_inj = DE_VECTOR |
-+		    i << SVM_EVTINJ_TYPE_SHIFT | SVM_EVTINJ_VALID;
-+		report(svm_vmrun() == SVM_EXIT_ERR && count_exc == 0,
-+		    "Test invalid TYPE (%x) in EVENTINJ", i);
-+	}
-+
-+	/*
-+	 * Invalid vector number for event type 'exception' in EVENTINJ
-+	 * causes VMEXIT_INVALID.
-+	 */
-+	for (i = 32; i < 256; i += 4) {
-+		vmcb->control.event_inj = i | SVM_EVTINJ_TYPE_EXEPT |
-+		    SVM_EVTINJ_VALID;
-+		report(svm_vmrun() == SVM_EXIT_ERR && count_exc == 0,
-+		    "Test invalid vector (%u) in EVENTINJ for event type "
-+		    "\'exception\'", i);
-+	}
-+
-+	vmcb->control.event_inj = event_inj_saved;
-+}
-+
- static void svm_guest_state_test(void)
- {
- 	test_set_guest(basic_guest_main);
-@@ -2141,6 +2178,7 @@ static void svm_guest_state_test(void)
- 	test_cr3();
- 	test_cr4();
- 	test_dr();
-+	test_event_inject();
- }
- 
- struct svm_test svm_tests[] = {
--- 
-2.18.4
+Paolo
 
