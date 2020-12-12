@@ -2,90 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E90C2D869A
-	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 14:04:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADB0E2D8776
+	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 17:00:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407414AbgLLNEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Dec 2020 08:04:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394867AbgLLNEF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Dec 2020 08:04:05 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A410CC0613CF;
-        Sat, 12 Dec 2020 05:03:24 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1607778202;
+        id S2439283AbgLLPzM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Dec 2020 10:55:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21518 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726133AbgLLPzM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 12 Dec 2020 10:55:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607788426;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dm0h1kETERLgrH3MYccPKguhl9RAaSD+kQ67+0pK7gQ=;
-        b=Ym3dRr/Y+Sb79nbnelKOQlClJALoto3behsFcq1miJktOuA0kzzOVdVcS7UUx0se15/m/t
-        wdvP10HVpZpXTGthQrL3UhPTwRqNWAjn3RI4/3+an4yBMaR5kBF9P6VaMjj8XIkiXn6CFe
-        kYm6Bd7x/KzQqV8DBtfRgy1lz3PD4DI8Dma4mTgIbJWMUVwdzyqU86OpLKN2f3MULD3jyc
-        ZyXN1Vw7dfr6kisWY7hBvz9bCCZG2bZCD099FWS6Uyl3E75nsk3JBisz0hBcGPOkerunbi
-        zcEFOeB63/oY/6EuQ2uDCwdts6e87L0ImP/iZ8wdf90bvd4x3Z4TJuMmmEPSWQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1607778202;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dm0h1kETERLgrH3MYccPKguhl9RAaSD+kQ67+0pK7gQ=;
-        b=limZ6dagZ2Cmsj35YZ/sv7F5dIwrMyk02ULK2mEBjFv3NwSiZb0GC8oYw4z+0SXtD+K7jO
-        /ZCrQTiJ9XcpZVAA==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "open list\:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        "open list\:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] KVM: x86: implement KVM_{GET|SET}_TSC_STATE
-In-Reply-To: <d9063c37-a965-d5cf-e923-c0c9f6ddc044@redhat.com>
-References: <05aaabedd4aac7d3bce81d338988108885a19d29.camel@redhat.com> <87sg8g2sn4.fsf@nanos.tec.linutronix.de> <20201208181107.GA31442@fuller.cnet> <875z5c2db8.fsf@nanos.tec.linutronix.de> <20201209163434.GA22851@fuller.cnet> <87r1nyzogg.fsf@nanos.tec.linutronix.de> <20201210152618.GB23951@fuller.cnet> <87zh2lib8l.fsf@nanos.tec.linutronix.de> <20201211002703.GA47016@fuller.cnet> <87v9d8h3lx.fsf@nanos.tec.linutronix.de> <20201211141822.GA67764@fuller.cnet> <87k0togikr.fsf@nanos.tec.linutronix.de> <d9063c37-a965-d5cf-e923-c0c9f6ddc044@redhat.com>
-Date:   Sat, 12 Dec 2020 14:03:22 +0100
-Message-ID: <87lfe3fa79.fsf@nanos.tec.linutronix.de>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=49p9jAWEo46JDV7PkNFs54HnwrvxIQVr2zd4nKr9GNo=;
+        b=JHDxovB5UOYiXMOFlwoZHMcm9cz1z7V25w0BRaVi7Rx9ZdhaKGSQlNm9ccMWN5grnV12oM
+        RAWEla/BSERfIp0mmgl0vOIL2iXxhixaUAh7OTQkX/VX9z6ReXSvMAnfLoDr5Qp97KXTv2
+        zaRfq+Tk8NxHtjLesWzgCLHcgRMEdWg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-235-HONcu8xoOe-mZTnguP9Gcg-1; Sat, 12 Dec 2020 10:53:44 -0500
+X-MC-Unique: HONcu8xoOe-mZTnguP9Gcg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B3FE180A095;
+        Sat, 12 Dec 2020 15:53:43 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ACECC63BA7;
+        Sat, 12 Dec 2020 15:53:42 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Final batch of KVM changes for Linux 5.10
+Date:   Sat, 12 Dec 2020 10:53:42 -0500
+Message-Id: <20201212155342.812596-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 11 2020 at 22:59, Paolo Bonzini wrote:
-> On 11/12/20 22:04, Thomas Gleixner wrote:
-> The nanosecond and TSC times are sent as part of the paused-VM state at 
-> the very end of the live migration process.
->
-> So it's still true that the time advances during live migration 
-> brownout; 0.1 seconds is just the final part of the live migration 
-> process.  But for _live_ migration there is no need to design things 
-> according to "people are happy if their clock is off by 0.1 seconds 
-> only".
+Linus,
 
-The problem is not the 0.1 second jump of the TSC. That's just a minor
-nuisance. The problem is the incorrectness of CLOCK_REALTIME after this
-operation which is far larger than 0.1s and this needs to be fixed.
+The following changes since commit 9a2a0d3ca163fc645991804b8b032f7d59326bb5:
 
-> Again, save-to-disk, reverse debugging and the like are a different
-> story, which is why KVM should delegate policy to userspace (while
-> documenting how to do it right).
+  kvm: x86/mmu: Fix get_mmio_spte() on CPUs supporting 5-level PT (2020-11-27 11:14:27 -0500)
 
-One ready to use option would be suspend to idle. It's fast and readily
-available including all the notifications and kernel side handling of
-time and whatever.
+are available in the Git repository at:
 
-Thanks,
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-        tglx
+for you to fetch changes up to 111d0bda8eeb4b54e0c63897b071effbf9fd9251:
+
+  tools/kvm_stat: Exempt time-based counters (2020-12-11 19:18:51 -0500)
+
+----------------------------------------------------------------
+Bugfixes for ARM, x86 and tools.
+
+----------------------------------------------------------------
+Jacob Xu (1):
+      kvm: svm: de-allocate svm_cpu_data for all cpus in svm_cpu_uninit()
+
+Maciej S. Szmigiero (2):
+      selftests: kvm/set_memory_region_test: Fix race in move region test
+      KVM: mmu: Fix SPTE encoding of MMIO generation upper half
+
+Paolo Bonzini (1):
+      Merge tag 'kvmarm-fixes-5.10-5' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
+
+Rick Edgecombe (1):
+      kvm: x86/mmu: Use cpuid to determine max gfn
+
+Stefan Raspl (1):
+      tools/kvm_stat: Exempt time-based counters
+
+Yanan Wang (3):
+      KVM: arm64: Fix memory leak on stage2 update of a valid PTE
+      KVM: arm64: Fix handling of merging tables into a block entry
+      KVM: arm64: Add usage of stage 2 fault lookup level in user_mem_abort()
+
+ Documentation/virt/kvm/mmu.rst                     |  2 +-
+ arch/arm64/include/asm/esr.h                       |  1 +
+ arch/arm64/include/asm/kvm_emulate.h               |  5 +++++
+ arch/arm64/kvm/hyp/pgtable.c                       | 17 ++++++++++++++-
+ arch/arm64/kvm/mmu.c                               | 11 ++++++++--
+ arch/x86/kvm/mmu/spte.c                            |  4 ++--
+ arch/x86/kvm/mmu/spte.h                            | 25 ++++++++++++++++------
+ arch/x86/kvm/mmu/tdp_mmu.c                         |  4 ++--
+ arch/x86/kvm/svm/svm.c                             |  4 ++--
+ tools/kvm/kvm_stat/kvm_stat                        |  6 +++++-
+ .../testing/selftests/kvm/set_memory_region_test.c | 17 +++++++++++----
+ 11 files changed, 74 insertions(+), 22 deletions(-)
+
