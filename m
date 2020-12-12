@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 768432D8980
-	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 19:58:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 562B22D896D
+	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 19:52:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407752AbgLLSwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Dec 2020 13:52:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44081 "EHLO
+        id S2407766AbgLLSwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Dec 2020 13:52:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53775 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726167AbgLLSv7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 12 Dec 2020 13:51:59 -0500
+        by vger.kernel.org with ESMTP id S2407743AbgLLSwC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 12 Dec 2020 13:52:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607799032;
+        s=mimecast20190719; t=1607799035;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aRu7FhoYj+iXi1m//Yx7IJ9OctRxhpZYB5NeyA8SUmk=;
-        b=A0+KL0oe9NG5zExx2UkPnw7TeMzjNnciFy+QplK+cYVLLeUV4bin+iEFk3AjDcao6rP/Od
-        Io74xXZYcLt2wIzQhhrRFZYlHg0NRuZNRAKh3wfXu+43WkbGh8cKzj2cjKvJW/jqa+mxQV
-        ih1x0mqHBG1y0XuvhpftQZpsWbY5ork=
+        bh=kn3KZ7/GxYn1wDyYk6D1LQUiV8vDzkIoMPBbbiV7RLY=;
+        b=eGxraiV/1KUR8nDsy3NkSoZiERVW4pvi7rlk2Pfc6gPLtyFqfOtPA3lWGZzpAhLJcotG5d
+        oGHm3aKyoZq9ghLmV36j7fpraI8nz2VaJnB+niwrHn358MIy818VP3dm2F4nft2F3RLzS7
+        Dr4rWzyM2o2/Z4AJ0KFDRZUR7/qmgXA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-HqWWyWeLNnqf-MJRL5v7cQ-1; Sat, 12 Dec 2020 13:50:30 -0500
-X-MC-Unique: HqWWyWeLNnqf-MJRL5v7cQ-1
+ us-mta-153-jrQyYtE6O0GLo8dAS1Pvuw-1; Sat, 12 Dec 2020 13:50:34 -0500
+X-MC-Unique: jrQyYtE6O0GLo8dAS1Pvuw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3246A107ACE3;
-        Sat, 12 Dec 2020 18:50:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63E5C800D55;
+        Sat, 12 Dec 2020 18:50:32 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-115-41.ams2.redhat.com [10.36.115.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 492F01F069;
-        Sat, 12 Dec 2020 18:50:26 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 892131F069;
+        Sat, 12 Dec 2020 18:50:29 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc:     alexandru.elisei@arm.com, james.morse@arm.com,
         julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
         shuah@kernel.org, pbonzini@redhat.com
-Subject: [PATCH 1/9] KVM: arm64: vgic-v3: Fix some error codes when setting RDIST base
-Date:   Sat, 12 Dec 2020 19:50:02 +0100
-Message-Id: <20201212185010.26579-2-eric.auger@redhat.com>
+Subject: [PATCH 2/9] KVM: arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read
+Date:   Sat, 12 Dec 2020 19:50:03 +0100
+Message-Id: <20201212185010.26579-3-eric.auger@redhat.com>
 In-Reply-To: <20201212185010.26579-1-eric.auger@redhat.com>
 References: <20201212185010.26579-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -52,39 +52,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_DEV_ARM_VGIC_GRP_ADDR group doc says we should return
--EEXIST in case the base address of the redist is already set.
-We currently return -EINVAL.
+The doc says:
+"The characteristics of a specific redistributor region can
+ be read by presetting the index field in the attr data.
+ Only valid for KVM_DEV_TYPE_ARM_VGIC_V3"
 
-However we need to return -EINVAL in case a legacy REDIST address
-is attempted to be set while REDIST_REGIONS were set. This case
-is discriminated by looking at the count field.
+Unfortunately the existing code fails to read the input attr data
+and thus the index always is 0.
 
+Fixes: 04c110932225 ("KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION")
+Cc: stable@vger.kernel.org#v4.17+
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 15a6c98ee92f..8e8a862def76 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -792,8 +792,13 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
- 	int ret;
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 44419679f91a..2f66cf247282 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -226,6 +226,9 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+ 		u64 addr;
+ 		unsigned long type = (unsigned long)attr->attr;
  
- 	/* single rdist region already set ?*/
--	if (!count && !list_empty(rd_regions))
--		return -EINVAL;
-+	if (!count && !list_empty(rd_regions)) {
-+		rdreg = list_last_entry(rd_regions,
-+				       struct vgic_redist_region, list);
-+		if (rdreg->count)
-+			return -EINVAL; /* Mixing REDIST and REDIST_REGION API */
-+		return -EEXIST;
-+	}
- 
- 	/* cross the end of memory ? */
- 	if (base + size < base)
++		if (copy_from_user(&addr, uaddr, sizeof(addr)))
++			return -EFAULT;
++
+ 		r = kvm_vgic_addr(dev->kvm, type, &addr, false);
+ 		if (r)
+ 			return (r == -ENODEV) ? -ENXIO : r;
 -- 
 2.21.3
 
