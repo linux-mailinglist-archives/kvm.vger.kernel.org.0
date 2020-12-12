@@ -2,125 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD4FD2D834D
-	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 01:15:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44D472D835A
+	for <lists+kvm@lfdr.de>; Sat, 12 Dec 2020 01:20:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394547AbgLLANP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Dec 2020 19:13:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46182 "EHLO
+        id S2407307AbgLLATQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Dec 2020 19:19:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49725 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389275AbgLLANO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 19:13:14 -0500
+        by vger.kernel.org with ESMTP id S2407299AbgLLASi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Dec 2020 19:18:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607731907;
+        s=mimecast20190719; t=1607732231;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lzlGKMbnrfGvCdrIWPnbPiuADFoVhbI0Kl9RIcmeVLQ=;
-        b=O0Fm9PGC2ftaIhfdPsQFUxKr/F+c4nsgWrBckrF1KA43XJlj2caoTRU0Uhuq8TwT0qghrY
-        Vm1ijymaL24IrKzV191e8Ug1V4i2ZmVMZi6a6/ONvutdEFzqvTAo609HoTZSeGuSxYq3f8
-        HUwfCX23PFcSHZDaLFbwicYJuIpGp3I=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-sIy_XNPeMtW9LDDG6RUCTQ-1; Fri, 11 Dec 2020 19:11:46 -0500
-X-MC-Unique: sIy_XNPeMtW9LDDG6RUCTQ-1
-Received: by mail-wm1-f71.google.com with SMTP id s11so1269469wmh.0
-        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 16:11:46 -0800 (PST)
+        bh=8HnEp95H6Cj/L1NiOjOIURqCHoJCueCAOJ0vn4hPY1s=;
+        b=NIlVIQXSZoDubTlTbb8Bdebmibx5gqvYoLZvjk915E3YpIq0B6i1typ5dWKK3XY0ZO7hvz
+        5HXNWUzO1Yhf4k6RsqhrXUWiSskdoJRJCvR+oIVYMi4XDOfKJ9q7SCYrjEQQGSOalrH3Zd
+        3Noltbxo4UT61cybvF/vlljtP2bvqgs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-RIF5iqdrMsCTmtShR-LlXw-1; Fri, 11 Dec 2020 19:17:10 -0500
+X-MC-Unique: RIF5iqdrMsCTmtShR-LlXw-1
+Received: by mail-wr1-f72.google.com with SMTP id r8so3930321wro.22
+        for <kvm@vger.kernel.org>; Fri, 11 Dec 2020 16:17:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=lzlGKMbnrfGvCdrIWPnbPiuADFoVhbI0Kl9RIcmeVLQ=;
-        b=hYR1ProcpW7+3thios60ViwYnOqAA1/gTzBhwPk8QrGaW4QQzez22sw8vJQUf54KAB
-         zMYJnAJ+vVfdL6PZMaW1hQTIzDhsUOwvOoX5Q/zUXsWYD0HM3maM7/O9c/tUrtkpV08q
-         e9OD7j5AkEcM1187iZufgBvfbnSrj7NDvPqzVAtbmcnlwXA9eRnkkv9xKDPc8IUbrhej
-         47+Rt9a/aZovXOmPUYq5psPFUVUnOBws3WmQKopl9Wj6vgmuM51aAyTR6ca2byWGSZqX
-         Qn+vFlpeO6zSzM5zW8reX+FB1BEPAU8rnM0SZNR5qOyespTSS+UAtPQUMsUzWSX9EzAN
-         3otw==
-X-Gm-Message-State: AOAM5306jyKkSgDZWAY4AA3Ciyk5uryDa4ZZb2DckzavyNTaj+V+siza
-        wfRaRS1Tvf6QXW1DtBQ/lceAaECyzFamJuvXNtrsD/5EEXJvQVOo5S+WYtUmCjBeWLtClfVohM5
-        2wVIhr6IPf9jF
-X-Received: by 2002:a1c:7318:: with SMTP id d24mr16260162wmb.39.1607731904570;
-        Fri, 11 Dec 2020 16:11:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwUoIjTFz7kibleaF0KiCrf+JT2FvsBWrot4QvrzU18ItBt56b0YivFM2BmKg/8RZdvoxiT6g==
-X-Received: by 2002:a1c:7318:: with SMTP id d24mr16260153wmb.39.1607731904343;
-        Fri, 11 Dec 2020 16:11:44 -0800 (PST)
+        bh=8HnEp95H6Cj/L1NiOjOIURqCHoJCueCAOJ0vn4hPY1s=;
+        b=iBDRxDRQbgi9do+GYBO7LWgUdJk1rr4ZUZ6dyE9RI7RGdYLorOmPYHOBbfA4Xjc8bE
+         87NX9ORWGYCi7LmpWMTajn4slXrO/B/CaxOmAQnufHclOG0WdFVcqnjtQBZF2GA+UJWx
+         Uv9+F/nj4OTln6QXVbGz2IPhFCMcZGLFb+MZsMO//7+V+PUEGGFxJfjUwU/TRr/dLoDt
+         UBLXYprG8q2rs8iwLGywtoO3dWukHApaZColCIgYHQqjH7BGdxieRcxPLvnZVss5ryJo
+         l2FrgWU+q+S0vA8w9ZEJPRskkaKn7vGYwX21BY0dQtoxSWDdAwEBCU6s/Wu7NGhNuLKx
+         a2fw==
+X-Gm-Message-State: AOAM533m0mHwoKJ3qfO6+uHEk2yQRKWGiGqbvtWCG7esYoJh1lfTDI2f
+        4NROEQGJFGwCTjhCYDD/n14P7qM65XX/d2w+r9miFrRVe8JTEcvur8e9pyWN6ammWJcSUqKLNa5
+        2zIrMvOWr3Qdu
+X-Received: by 2002:a1c:6055:: with SMTP id u82mr16542342wmb.61.1607732228498;
+        Fri, 11 Dec 2020 16:17:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxafgEV96P5fIG0IcPCdnNpX7bKtZSxTlxYKVtfAr73+YlHMtvxRiiK/CtDyfYDK+az6YaHGw==
+X-Received: by 2002:a1c:c2d4:: with SMTP id s203mr16012670wmf.58.1607732227409;
+        Fri, 11 Dec 2020 16:17:07 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b83sm16258211wmd.48.2020.12.11.16.11.43
+        by smtp.gmail.com with ESMTPSA id z17sm16782340wrh.88.2020.12.11.16.17.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Dec 2020 16:11:43 -0800 (PST)
-Subject: Re: [PATCH v3] KVM: mmu: Fix SPTE encoding of MMIO generation upper
- half
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        stable@nongnu.org
-References: <20201211234532.686593-1-pbonzini@redhat.com>
- <X9QGw9vJfzCrFNzd@google.com>
+        Fri, 11 Dec 2020 16:17:06 -0800 (PST)
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20201006212556.882066-1-oupton@google.com>
+ <18085741-6370-bde6-0f28-fa788d5b68e5@redhat.com>
+ <CAOQ_QsjABDVuaKJYSxZOMga4JbJkzQFnZPQJkx2F-XVEahtDqQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ae56d2b-23bd-c31e-94b3-34e0d5e8076e@redhat.com>
-Date:   Sat, 12 Dec 2020 01:11:42 +0100
+Subject: Re: [kvm-unit-tests PATCH] x86: vmx: add regression test for posted
+ interrupts
+Message-ID: <ec7287a9-70e0-3e00-eab9-8288669b6e2e@redhat.com>
+Date:   Sat, 12 Dec 2020 01:17:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <X9QGw9vJfzCrFNzd@google.com>
+In-Reply-To: <CAOQ_QsjABDVuaKJYSxZOMga4JbJkzQFnZPQJkx2F-XVEahtDqQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/12/20 00:54, Sean Christopherson wrote:
-> On Fri, Dec 11, 2020, Paolo Bonzini wrote:
->> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On 12/12/20 00:41, Oliver Upton wrote:
+> On Fri, Dec 11, 2020 at 5:20 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >>
->> Commit cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
->> cleaned up the computation of MMIO generation SPTE masks, however it
->> introduced a bug how the upper part was encoded:
->> SPTE bits 52-61 were supposed to contain bits 10-19 of the current
->> generation number, however a missing shift encoded bits 1-10 there instead
->> (mostly duplicating the lower part of the encoded generation number that
->> then consisted of bits 1-9).
+>> On 06/10/20 23:25, Oliver Upton wrote:
+>>> If a guest blocks interrupts for the entirety of running in root mode
+>>> (RFLAGS.IF=0), a pending interrupt corresponding to the posted-interrupt
+>>> vector set in the VMCS should result in an interrupt posting to the vIRR
+>>> at VM-entry. However, on KVM this is not the case. The pending interrupt
+>>> is not recognized as the posted-interrupt vector and instead results in
+>>> an external interrupt VM-exit.
+>>>
+>>> Add a regression test to exercise this issue.
+>>>
+>>> Signed-off-by: Oliver Upton <oupton@google.com>
 >>
->> In the meantime, the upper part was shrunk by one bit and moved by
->> subsequent commits to become an upper half of the encoded generation number
->> (bits 9-17 of bits 0-17 encoded in a SPTE).
->>
->> In addition to the above, commit 56871d444bc4 ("KVM: x86: fix overlap between SPTE_MMIO_MASK and generation")
->> has changed the SPTE bit range assigned to encode the generation number and
->> the total number of bits encoded but did not update them in the comment
->> attached to their defines, nor in the KVM MMU doc.
->> Let's do it here, too, since it is too trivial thing to warrant a separate
->> commit.
->>
->> Fixes: cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
->> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
->> Message-Id: <156700708db2a5296c5ed7a8b9ac71f1e9765c85.1607129096.git.maciej.szmigiero@oracle.com>
->> Cc: stable@nongnu.org
+>> I am a bit confused.  Is this testing the KVM or the bare metal
+>> behavior?  Or was this fixed in KVM already?
 > 
-> I assume you want stable@vger.kernel.org?
+> This is a directed test case for
+> 25bb2cf97139 ("KVM: nVMX: Morph notification vector IRQ on nested
+> VM-Enter to pending PI")
 
-I do.
+Ok, thanks.  However, the patch currently fails like this:
 
->> [Reorganize macros so that everything is computed from the bit ranges. - Paolo]
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> 	Compared to v2 by Maciej, I chose to keep GEN_MASK's argument calculated,
-> 
-> Booooo.  :-D
+	Test suite: vmx_posted_interrupt_test
+	VM-Fail on vmlaunch: error number is 7. See Intel 30.4.
 
-But I explained why. :)
+I haven't debugged it, so for now I suggest that you just move it to a 
+separate suite.
 
 Paolo
-
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> 
-> 
->> 	but assert on the number of bits in the low and high parts.  This is
->> 	because any change on those numbers will have to be reflected in the
->> 	comment, and essentially we're asserting that the comment is up-to-date.
-> 
 
