@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3FCE2D905F
+	by mail.lfdr.de (Postfix) with ESMTP id 37DE72D905E
 	for <lists+kvm@lfdr.de>; Sun, 13 Dec 2020 21:21:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391069AbgLMUVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2403928AbgLMUVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Sun, 13 Dec 2020 15:21:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47546 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726787AbgLMUVL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S2390355AbgLMUVL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 13 Dec 2020 15:21:11 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299E6C06179C
-        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:15 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id e25so13417256wme.0
-        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:15 -0800 (PST)
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE63C0617A6
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:20 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id r3so14411598wrt.2
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2ISNCVzJYbaoq1vI61by2IBAkaqbdNie7OHgVDeXnbA=;
-        b=QnkMcMiqG8UVyDMMuGRox71t7T+UqZBUKvKswBUB2KOeED01VBfl1gTqc5svpwe1CC
-         rgudl0VE4QS0bigb8esLT9df+NjBOsWyrZfVj+qQPS449oSmXo9w2OybNxuwdEVbGcnf
-         9OZMrO0pd1dU/wYb+ybwrpJ0agz5ct4pj1VARipaQZi2eWaE2lDbgFBkJv4TXxPQ73ds
-         n3sXcx4L7PddPgiwLLwSksoL8J28lLeRaYWBl/pcU7PRnZTDyVwPmI//BYk9vZdt7FsQ
-         HwBqSaqbkszXuQTYtepR5kp0AgKMRup1qCrXkbc0/S+7Kkax0P9mPw/pOaLd5c2R2Ccw
-         wprA==
+        bh=s6etg05C/BF399R/sCtLPATOdY8AkUS5HEwSvbkWAQM=;
+        b=q4Prp5VDpN3rINMABx1tB5qHHGoJp9wExi3jL5uSHNsSREz9xmjlJpKgJLDEI0nRnb
+         SEH5OLN2DDe1Uv+sCv4EFmTSzWAr62LWrJUCmGGhw4U/NciSZWU/xewdzor/2AQLvCA2
+         VK0sNiuweaJZ/Z66bF/qSabLa+jLFxy1NH9kJDRbtSwQ6/bVEhvBBclWGJhywWlaYLAm
+         JA6mpkIMwqyOMXu9EO99W3KGya+i7RL/n9G2A59bifZZmi0I77DgpBuzLC4Inv6wsWwD
+         YNzZKn82oQuaYqRuB55jAm80wN4awzHSd0CtpIwZn5en4Re0uwMungEGFH97Axt+iFji
+         XXFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=2ISNCVzJYbaoq1vI61by2IBAkaqbdNie7OHgVDeXnbA=;
-        b=q0j42VthGUdggprPYjMpqc0lG4aDrVhQeHP/FbEq+g6uLs22q4q/e7CD83LY93YdWO
-         2BeHZHfesxhJBTlqrM57z6a89YgjhAl89INgABQ4qOdvHpLiKetVV1peZQGdldSzq/kK
-         1S3CP/JtyjTAdYXsUrLgewjzZVGVeFgFLI7+eqCCbAmy+AkWtqMzxVhm6BCIR1+zVdSr
-         nxqD2xi8Evd0JpYDVZ/Gn1VZZ6HExLhChF7PUhmBQYNtpF02pGkpBoLqG7K9YvK88j4n
-         uYDDfIZLtBeb2XAbThTfekmxS8Y8ImV5xGVc61ODyNe7H9ktibLt/rxFQ9lpf9B3+x+6
-         Ep+w==
-X-Gm-Message-State: AOAM533s48Hp0fljAHawiY072ifxaS3bmi8GAQ1KDnznCH+gUdSn8jv8
-        1RF2yfoU3Q/8I+6l0ji/LzM=
-X-Google-Smtp-Source: ABdhPJw2ev9B7VvAvmY2StzAj4Kxo6/UL0BE2A2EbJKABhbhMiX+nTwfhVj5Xh5TwXp8OPQeLmPEsw==
-X-Received: by 2002:a1c:2b46:: with SMTP id r67mr24316116wmr.162.1607890813972;
-        Sun, 13 Dec 2020 12:20:13 -0800 (PST)
+        bh=s6etg05C/BF399R/sCtLPATOdY8AkUS5HEwSvbkWAQM=;
+        b=Rdo6Zn5Mwue0IHJ0WA1fB0FqghfdFKHhBtawmmmAUVEhAZa0frXVT1upYrIER6/zxO
+         z+HS6obYlEcFHhaBtPSjbCaSuHR0lxIN2KHwHlLSfnLj5pvRQwrfRtlJosuOaL1jKMZd
+         TPNlohjQuMoSljsVBQKyibcqmM8tEz5nx074Q+z85mOO8v0HlkQDIo2/NPZV27vWMd1n
+         bXk0eJ4qv+UdlUo6VV+k3/jpCQkJ64+EZRcP2i7Y+kFm40n2ssV/bKE60yXeDYElJaZ3
+         e5PR7tNlNZ7tBpY5hyibVkQIlUiCx6eDr1zFsdINQRTYQ5IBKzbSvz/p7JSs+/Sc7C6Q
+         lh3A==
+X-Gm-Message-State: AOAM532QrSM3J+RoW1G1wtMl3a+7frRIh8zMnpiAOIoWvfMjE7sAPajT
+        X8LKtciBiaRXIQARP1ViJPc=
+X-Google-Smtp-Source: ABdhPJyZsyojoo5AMZgAvYJyhWWykvGk9uZc61cVzGwJ7TbpydQtRq7kaBJdz/R8v4Gzu5uT0JKT6A==
+X-Received: by 2002:adf:ded1:: with SMTP id i17mr23100083wrn.190.1607890818932;
+        Sun, 13 Dec 2020 12:20:18 -0800 (PST)
 Received: from localhost.localdomain (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id l8sm20448668wrb.73.2020.12.13.12.20.12
+        by smtp.gmail.com with ESMTPSA id x7sm19488199wmi.11.2020.12.13.12.20.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Dec 2020 12:20:13 -0800 (PST)
+        Sun, 13 Dec 2020 12:20:18 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -60,9 +60,9 @@ Cc:     =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         Paul Burton <paulburton@kernel.org>,
         Richard Henderson <richard.henderson@linaro.org>,
         Huacai Chen <chenhc@lemote.com>
-Subject: [PULL 05/26] target/mips: Replace magic values by CP0PM_MASK or TARGET_PAGE_BITS_MIN
-Date:   Sun, 13 Dec 2020 21:19:25 +0100
-Message-Id: <20201213201946.236123-6-f4bug@amsat.org>
+Subject: [PULL 06/26] target/mips: Do not include CP0 helpers in user-mode emulation
+Date:   Sun, 13 Dec 2020 21:19:26 +0100
+Message-Id: <20201213201946.236123-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201213201946.236123-1-f4bug@amsat.org>
 References: <20201213201946.236123-1-f4bug@amsat.org>
@@ -73,58 +73,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace magic values related to page size:
-
-  12 -> TARGET_PAGE_BITS_MIN
-  13 -> CP0PM_MASK
+CP0 helpers are restricted to system-mode emulation.
+Do not intent do build cp0_helper.c in user-mode (this
+allows to simplify some #ifdef'ry).
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Huacai Chen <chenhc@lemote.com>
-Message-Id: <20201109090422.2445166-2-f4bug@amsat.org>
+Message-Id: <20201109090422.2445166-3-f4bug@amsat.org>
 ---
- target/mips/cp0_helper.c | 5 +++--
- target/mips/helper.c     | 4 ++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ target/mips/cp0_helper.c | 4 ----
+ target/mips/meson.build  | 2 +-
+ 2 files changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-index a1b5140ccaf..e8b9343ec9c 100644
+index e8b9343ec9c..caaaefcc8ad 100644
 --- a/target/mips/cp0_helper.c
 +++ b/target/mips/cp0_helper.c
-@@ -904,7 +904,7 @@ void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
-         goto invalid;
-     }
-     /* We don't support VTLB entry smaller than target page */
--    if ((maskbits + 12) < TARGET_PAGE_BITS) {
-+    if ((maskbits + TARGET_PAGE_BITS_MIN) < TARGET_PAGE_BITS) {
-         goto invalid;
-     }
-     env->CP0_PageMask = mask << CP0PM_MASK;
-@@ -913,7 +913,8 @@ void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
+@@ -32,7 +32,6 @@
+ #include "sysemu/kvm.h"
  
- invalid:
-     /* When invalid, set to default target page size. */
--    env->CP0_PageMask = (~TARGET_PAGE_MASK >> 12) << CP0PM_MASK;
-+    mask = (~TARGET_PAGE_MASK >> TARGET_PAGE_BITS_MIN);
-+    env->CP0_PageMask = mask << CP0PM_MASK;
+ 
+-#ifndef CONFIG_USER_ONLY
+ /* SMP helpers.  */
+ static bool mips_vpe_is_wfi(MIPSCPU *c)
+ {
+@@ -1667,10 +1666,8 @@ target_ulong helper_evpe(CPUMIPSState *env)
+     }
+     return prev;
  }
+-#endif /* !CONFIG_USER_ONLY */
  
- void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 063b65c0528..041432489d6 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -858,8 +858,8 @@ refill:
-             break;
-         }
+ /* R6 Multi-threading */
+-#ifndef CONFIG_USER_ONLY
+ target_ulong helper_dvp(CPUMIPSState *env)
+ {
+     CPUState *other_cs = first_cpu;
+@@ -1709,4 +1706,3 @@ target_ulong helper_evp(CPUMIPSState *env)
      }
--    pw_pagemask = m >> 12;
--    update_pagemask(env, pw_pagemask << 13, &pw_pagemask);
-+    pw_pagemask = m >> TARGET_PAGE_BITS_MIN;
-+    update_pagemask(env, pw_pagemask << CP0PM_MASK, &pw_pagemask);
-     pw_entryhi = (address & ~0x1fff) | (env->CP0_EntryHi & 0xFF);
-     {
-         target_ulong tmp_entryhi = env->CP0_EntryHi;
+     return prev;
+ }
+-#endif /* !CONFIG_USER_ONLY */
+diff --git a/target/mips/meson.build b/target/mips/meson.build
+index fa1f024e782..681a5524c0e 100644
+--- a/target/mips/meson.build
++++ b/target/mips/meson.build
+@@ -1,6 +1,5 @@
+ mips_ss = ss.source_set()
+ mips_ss.add(files(
+-  'cp0_helper.c',
+   'cpu.c',
+   'dsp_helper.c',
+   'fpu_helper.c',
+@@ -15,6 +14,7 @@
+ 
+ mips_softmmu_ss = ss.source_set()
+ mips_softmmu_ss.add(files(
++  'cp0_helper.c',
+   'cp0_timer.c',
+   'machine.c',
+   'mips-semi.c',
 -- 
 2.26.2
 
