@@ -2,94 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C0AF2D8B36
-	for <lists+kvm@lfdr.de>; Sun, 13 Dec 2020 04:51:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D13A52D9059
+	for <lists+kvm@lfdr.de>; Sun, 13 Dec 2020 21:21:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392992AbgLMDtV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Dec 2020 22:49:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37708 "EHLO
+        id S1731161AbgLMUUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Dec 2020 15:20:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726903AbgLMDtV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Dec 2020 22:49:21 -0500
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340BAC0613CF;
-        Sat, 12 Dec 2020 19:48:41 -0800 (PST)
-Received: by mail-pj1-x1042.google.com with SMTP id b5so4642983pjl.0;
-        Sat, 12 Dec 2020 19:48:41 -0800 (PST)
+        with ESMTP id S1728701AbgLMUUa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Dec 2020 15:20:30 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 723CEC0613CF
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:19:50 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id y17so14366397wrr.10
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:19:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
+        h=sender:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=/rkSHMlojCXH5HcNeMma4J+v/xy53IB23f7w2LPElmU=;
-        b=EVNwfV5I90T9E5wxQytNgAQmw7uPec5es98+pvxsGjnTW7S/iPGeOo7aZMQAiZgHIt
-         06YF0qpahKC/XxyUyA2bAS5k3o8V+hGGJ0FOK7UiuRCgcYPx2nlSnlQkx4+uj02rQdm5
-         ibe1hUqytfRSIJ1NNKOD6SYITKDvGTbhqwtE0V+lxJPNoFyxkDhZGmV4wrneRZP67MGG
-         /Q2GMASPZP55Kyz9a//iZpioORq3UaWF3bOYCZOrDzyxjsreOsAaJujfh6DMSkrVppD+
-         TsApegmtJ1fCor7/11dN8syHiw9l24OWA3UyTaMkAgf2MySxKTB3lUAorY+KxMzI4KD+
-         zOLA==
+        bh=6aT0hnxN9Lk7mHwwTD8w8mjwYa5KaIbUi6jXCtHBCQM=;
+        b=RXb4/2mjYb9G+dykIme3OPCkocGwJCGkzuu8clS4GEEKO6f7cta1u/r1bQAFbtjYbs
+         /zKjnseBBJh+zQECv52jnZTPvPGT/ymFWc7pDbD90QNaj5dz37UZWRkhTBk7FY+rgDjt
+         F+QlCoK1mzZabzzXwrCUAfOZqQSLPqqCRA2giCqCJqAcuQBzWZOp2daV1r3sVprGWe0b
+         BjnWngxp7PVwrZb9yFA/RrSFnGcOtriXO9yUNmuBORsTQamxRLCuxwarWFm0qFSwCMdM
+         7rzqFzD//+hkRkbjZmQcS9njY7E3xJBd6R450w3pqn4/J07XCNd3E/rmy7hUSHhV0Vp2
+         3IfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=/rkSHMlojCXH5HcNeMma4J+v/xy53IB23f7w2LPElmU=;
-        b=ICiI69eHIGOyWbreYBCH2tEY1uV7N5U2aKuNBSkkBUxa3dHwiOKKZ8Aar5txyxtO9N
-         c/Xew16PMghix3HCK0iifHk7JSSLQApuYa2Shv9+2x19XbWG1I59vc8DnhNxJ03voVnL
-         oY/b71fGQW0Iv5fHK8ZAB43Hv/4+acSRMI0QKORFDNK2QTUytqz7YTV06rZpPifeQ5tA
-         aTipc0AxiP2+kya5ePTNif+6PTOd3HyANSe+FOGKMqp58Zk6QrW8FB/0YJjUol9naH8L
-         xJ/S0sI+26EcQbLvz/RYe/wE5ZkCfNSBy7LuFsz7+Er0f/pxBJiJiuKkmNqwwHlVFXFE
-         v1SA==
-X-Gm-Message-State: AOAM533O7alzxh365cS9q9ruQHUJVBpFh2swxUR3qHJhZNE53JQlyfLh
-        SMTqfUkgjNCcvDwiaGGt0D+pipM6r0rr/g==
-X-Google-Smtp-Source: ABdhPJzzvPl38bay+gvAQcb3Ia9CmxQMfSPrl4F4mwZpCo0Vpc70AhI6Oj5UailreqoqW9vokCifFQ==
-X-Received: by 2002:a17:902:8f82:b029:da:f37f:79bf with SMTP id z2-20020a1709028f82b02900daf37f79bfmr17520254plo.79.1607831320510;
-        Sat, 12 Dec 2020 19:48:40 -0800 (PST)
-Received: from localhost ([47.88.5.130])
-        by smtp.gmail.com with ESMTPSA id l141sm16887356pfd.124.2020.12.12.19.48.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 12 Dec 2020 19:48:40 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] kvm: don't lose the higher 32 bits of tlbs_dirty
-Date:   Sun, 13 Dec 2020 12:49:13 +0800
-Message-Id: <20201213044913.15137-1-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=6aT0hnxN9Lk7mHwwTD8w8mjwYa5KaIbUi6jXCtHBCQM=;
+        b=ffzopROiwaeRqk2LFjDbJr3wBNTCsAt0I5aRsghbsDjOUYVXSBlz0d0XUtF8fc4QFf
+         56srBuQpH6j5EPboZmPErDlmYSYdfTXFpYUFXDTB0Gfy0NXyh2WOdKHg5tEdqlDV8p6j
+         AnQfhDIXAJk0qi4R1loTZy7xHjoigygx/n8OSmNuwglAjojwkpaSL0tOIIIOazDr2FmV
+         38Q3j9miqJl7WVysOFQhTqr6uEOshKdwd0IMGhRLIjD8w5mhemEvpEFGuZg1/h8BAnt6
+         07QF322gmHMBdWWAA1s4iBbRVki8v9YGoJaVhd7cSOzmhR1nqNCuxXka9h3OJCqy45K0
+         uEEQ==
+X-Gm-Message-State: AOAM530DvxbfDrkmYRoSCSnV16dMx2v4dQJCnfb1NzJg5eKBgqCgMGlh
+        0f+XaEeJ2xhifmoLZANgasg=
+X-Google-Smtp-Source: ABdhPJzLu1l79ty9fZ484FlDoec/3Llbbu/ND5f33k0x8Pjnud30Pvq+O1w+UgnL5w5ESi994IyXZA==
+X-Received: by 2002:adf:c454:: with SMTP id a20mr25225088wrg.314.1607890789069;
+        Sun, 13 Dec 2020 12:19:49 -0800 (PST)
+Received: from localhost.localdomain (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
+        by smtp.gmail.com with ESMTPSA id i9sm31558614wrs.70.2020.12.13.12.19.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Dec 2020 12:19:48 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To:     qemu-devel@nongnu.org
+Cc:     =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        kvm@vger.kernel.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Paul Burton <paulburton@kernel.org>
+Subject: [PULL 00/26] MIPS patches for 2020-12-13
+Date:   Sun, 13 Dec 2020 21:19:20 +0100
+Message-Id: <20201213201946.236123-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
-
-In kvm_mmu_notifier_invalidate_range_start(), tlbs_dirty is used as:
-	need_tlb_flush |= kvm->tlbs_dirty;
-with need_tlb_flush's type being int and tlbs_dirty's type being long.
-
-It means that tlbs_dirty is always used as int and the higher 32 bits
-is useless. We can just change need_tlb_flush's type to long to
-make full use of tlbs_dirty.
-
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
- virt/kvm/kvm_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2541a17ff1c4..4e519a517e9f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -470,7 +470,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 					const struct mmu_notifier_range *range)
- {
- 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
--	int need_tlb_flush = 0, idx;
-+	long need_tlb_flush = 0;
-+	int idx;
- 
- 	idx = srcu_read_lock(&kvm->srcu);
- 	spin_lock(&kvm->mmu_lock);
--- 
-2.19.1.6.gb485710b
-
+The following changes since commit ad717e6da3852b5729217d7938eecdb81c546114=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into stagi=
+ng (2020-12-12 00:20:46 +0000)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  https://gitlab.com/philmd/qemu.git tags/mips-20201213=0D
+=0D
+for you to fetch changes up to 3533ee301c46620fd5699cb97f2d4bd194fe0c24:=0D
+=0D
+  target/mips: Use FloatRoundMode enum for FCR31 modes conversion (2020-12-=
+13 20:27:11 +0100)=0D
+=0D
+----------------------------------------------------------------=0D
+MIPS patches queue=0D
+=0D
+. Allow executing MSA instructions on Loongson-3A4000=0D
+. Update Huacai Chen email address=0D
+. Various cleanups:=0D
+  - unused headers removal=0D
+  - use definitions instead of magic values=0D
+  - remove dead code=0D
+  - avoid calling unused code=0D
+. Various code movements=0D
+=0D
+CI jobs results:=0D
+  https://gitlab.com/philmd/qemu/-/pipelines/229120169=0D
+  https://cirrus-ci.com/build/4857731557359616=0D
+----------------------------------------------------------------=0D
+=0D
+Huacai Chen (1):=0D
+  MAINTAINERS: chenhc@lemote.com -> chenhuacai@kernel.org=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (25):=0D
+  target/mips/kvm: Assert unreachable code is not used=0D
+  target/mips/kvm: Remove unused headers=0D
+  target/mips: Include "exec/memattrs.h" in 'internal.h'=0D
+  target/mips: Replace magic values by CP0PM_MASK or=0D
+    TARGET_PAGE_BITS_MIN=0D
+  target/mips: Do not include CP0 helpers in user-mode emulation=0D
+  target/mips: Remove unused headers from cp0_helper.c=0D
+  target/mips: Also display exception names in user-mode=0D
+  target/mips: Allow executing MSA instructions on Loongson-3A4000=0D
+  target/mips: Explicit Release 6 MMU types=0D
+  target/mips: Rename cpu_supports_FEAT() as cpu_type_supports_FEAT()=0D
+  target/mips: Introduce cpu_supports_isa() taking CPUMIPSState argument=0D
+  hw/mips: Move address translation helpers to target/mips/=0D
+  target/mips: Remove unused headers from translate.c=0D
+  target/mips: Remove unused headers from op_helper.c=0D
+  target/mips: Remove mips_def_t unused argument from mvp_init()=0D
+  target/mips: Introduce ase_mt_available() helper=0D
+  target/mips: Do not initialize MT registers if MT ASE absent=0D
+  hw/mips/malta: Do not initialize MT registers if MT ASE absent=0D
+  hw/mips/malta: Rewrite CP0_MVPConf0 access using deposit()=0D
+  target/mips: Extract cpu_supports*/cpu_set* translate.c=0D
+  target/mips: Move mips_cpu_add_definition() from helper.c to cpu.c=0D
+  target/mips: Move cpu definitions, reset() and realize() to cpu.c=0D
+  target/mips: Inline cpu_mips_realize_env() in mips_cpu_realizefn()=0D
+  target/mips: Remove unused headers from fpu_helper.c=0D
+  target/mips: Use FloatRoundMode enum for FCR31 modes conversion=0D
+=0D
+ include/hw/mips/cpudevs.h        |   7 -=0D
+ target/mips/cpu.h                |  20 ++-=0D
+ target/mips/internal.h           |  17 +-=0D
+ hw/mips/boston.c                 |   5 +-=0D
+ hw/mips/cps.c                    |   3 +-=0D
+ hw/mips/malta.c                  |  14 +-=0D
+ {hw =3D> target}/mips/addr.c       |   2 +-=0D
+ target/mips/cp0_helper.c         |  15 +-=0D
+ target/mips/cpu.c                | 299 ++++++++++++++++++++++++++++++-=0D
+ target/mips/fpu_helper.c         |   6 +-=0D
+ target/mips/helper.c             |  64 ++-----=0D
+ target/mips/kvm.c                |  11 +-=0D
+ target/mips/op_helper.c          |   4 -=0D
+ target/mips/translate.c          | 262 ---------------------------=0D
+ target/mips/translate_init.c.inc |  10 +-=0D
+ .mailmap                         |   2 +=0D
+ MAINTAINERS                      |   8 +-=0D
+ hw/mips/meson.build              |   2 +-=0D
+ target/mips/meson.build          |   3 +-=0D
+ 19 files changed, 378 insertions(+), 376 deletions(-)=0D
+ rename {hw =3D> target}/mips/addr.c (98%)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
