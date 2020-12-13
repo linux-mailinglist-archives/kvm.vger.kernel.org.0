@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 267022D9060
+	by mail.lfdr.de (Postfix) with ESMTP id 92E792D9061
 	for <lists+kvm@lfdr.de>; Sun, 13 Dec 2020 21:21:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403976AbgLMUVQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2392457AbgLMUVQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Sun, 13 Dec 2020 15:21:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47564 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390355AbgLMUVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S2390539AbgLMUVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 13 Dec 2020 15:21:16 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24099C0617A7
-        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:25 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id d26so1169762wrb.12
-        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:25 -0800 (PST)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D1AC0617B0
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:30 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id g185so13431486wmf.3
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:20:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ElGn7JwtMTMMU13LrhvDMbTZ+gVsyAEKbzwxbxdSXTQ=;
-        b=r279oMzyuCA06s9efRNLeeAbvEmXQa8MM5wCrkN4z80SdfG4YW8i5qEoPXL3o3oJzi
-         RmVwgMhKBr4cnlxAyCF1GV3mj4WeRSBTBlqhLnx+iO+4rrza/osaiircUIlMbzxNd3iK
-         Cbwao2wMXofejyOGUVwrDa3Mf/5sK/dAsxP39CKyeGmdw4+1UtmB9pQuHKPBPFn9bSht
-         7zAg5Kaca5zsZLeJuvFC37lgO14GuwKCNbMWbpRowN04gx/ili7iU2l2H8mkWf8bmfS0
-         tq3lVJknSoW4EbcjJAJPadvtUseVOKUUdCQvD5ciCtG5101ztnGpoCG/dKyAxgwTlvjB
-         lG/w==
+        bh=WU7av211Gw3wbADY6XPgoCLNL0Q/6KDqRZlDd72LlCc=;
+        b=lg3Plv9yDZIf0oqfQcqIFKuS+fY1twqqoLWJGkP/0s5QmgX9g+AcAhlXe1vIXb4SkU
+         u6+sEEol4i03yQAqE9FQXbu+uJeG4jQ718E7L+3h4cgjvP6xQ1yzqV14WzhsvaDrVG0P
+         XTMhtyIG1mGkUbiZ7EkPa89KKSkfSi4+ZKW1Capz0GuBJr3TBqqMgLU9DJ5WgV3BQGZ+
+         CdCT70G6GNCe49e0Qzn/arC9q/YMgpkeOdC5fZdvpcze8suLyybPK+ZM84FYfw742Tk0
+         SrhkkMAjcR233PY95gVChi8+8HwmS3hTg9g4QhMLzpOsJw2UyGpoLsFgG/Ul6Ol8kqE4
+         8OqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=ElGn7JwtMTMMU13LrhvDMbTZ+gVsyAEKbzwxbxdSXTQ=;
-        b=SD+6DPZ+r+qpgdHHlfN5bJU1j9VEDsQaLBq+D4FwhL+RSLSiP3jCvRgZaHD0SkuOlq
-         +a++/0FMYIg0rv8C1BDomsUBlm+mELMQnr7lRJaMSMvoUVTPLWg+lELAHnxmRGqkWfOq
-         v5vKHZuO2YSaOC++kN5Du9OoXqK2jxizH8KtIu4vQFWx6XoZ5gNb/3H3SmumoW827G/m
-         hlr6+BW3JH5wr2SGryRyN6uPeXcM6EfaTDSJPqA0m5ptkv7JmhZ4VExHtg1lByhpbPla
-         XFYWUbIVDJr0NcMLV4LCu/+gUkXES5GLeQ8kBkiaNapWgkh1kC+Oy7RjlVvtNrEnbW1Z
-         aP5g==
-X-Gm-Message-State: AOAM533cj59AMenyNdn14gYGdTGtvXK4dSzuGKkIRnVGWR6Nanfo+tky
-        hIfXY56lvugrHoxwazP+6OY=
-X-Google-Smtp-Source: ABdhPJyXLdF/7P0sm1YXBUTdja+xRF+QyOyW3QdtUpku/c3SnS6EaVS1ygEllhtb7X2nkTZzGO+ydg==
-X-Received: by 2002:a5d:4349:: with SMTP id u9mr24715442wrr.319.1607890823912;
-        Sun, 13 Dec 2020 12:20:23 -0800 (PST)
+        bh=WU7av211Gw3wbADY6XPgoCLNL0Q/6KDqRZlDd72LlCc=;
+        b=tNN4fLBhtdOWNzbFqI6nNKVYSxzgNDbLMl62o6yGKwqh4izOtehopzqzQRFnwZcyd5
+         MEt9eTBs5QQL1DjeEKNzGf2c2cJjNo3ioO89sBJfvWtYKDOu8d75Nh39BXBm+aa2mNpc
+         B8pxIIr0QnRO+4xkl0noi53qa3HFBqSOaVQ3E3bOJPVs2Px+6DaIbofeDsLE6O6wjPhQ
+         8OtigYVveuY4CdUc6cNWQ7qDHDv5aqf3WTgWQTH62q2sSW5OTVKlkKRi4nwnHH0kWQLm
+         kWGoAvaD+Qabn9MYoGGMXxeMF6UM0uRYTJd7Ck9/Oc4KCsuUxqzVMiZCz2Vy4Njes6UN
+         A2kQ==
+X-Gm-Message-State: AOAM531kLUoCJVAJRcat8aeaaaf3lGKIgLD/nZEXU5EzJtBrQodKlikG
+        dTbXv9ewUM9FhcESzR26cj0=
+X-Google-Smtp-Source: ABdhPJwGswfU1INeuc5+Xpdh/7IEhKrZYuniVVNcdgaPCtjzp2Ttm7znjOhHTptaP+0DrvPGZdnyxQ==
+X-Received: by 2002:a1c:2182:: with SMTP id h124mr24378018wmh.25.1607890828851;
+        Sun, 13 Dec 2020 12:20:28 -0800 (PST)
 Received: from localhost.localdomain (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id q17sm27617700wrr.53.2020.12.13.12.20.22
+        by smtp.gmail.com with ESMTPSA id 64sm28192537wmd.12.2020.12.13.12.20.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Dec 2020 12:20:23 -0800 (PST)
+        Sun, 13 Dec 2020 12:20:28 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -59,9 +59,9 @@ Cc:     =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         Huacai Chen <chenhuacai@kernel.org>,
         Paul Burton <paulburton@kernel.org>,
         Richard Henderson <richard.henderson@linaro.org>
-Subject: [PULL 07/26] target/mips: Remove unused headers from cp0_helper.c
-Date:   Sun, 13 Dec 2020 21:19:27 +0100
-Message-Id: <20201213201946.236123-8-f4bug@amsat.org>
+Subject: [PULL 08/26] target/mips: Also display exception names in user-mode
+Date:   Sun, 13 Dec 2020 21:19:28 +0100
+Message-Id: <20201213201946.236123-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201213201946.236123-1-f4bug@amsat.org>
 References: <20201213201946.236123-1-f4bug@amsat.org>
@@ -72,37 +72,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove unused headers and add missing "qemu/log.h" since
-qemu_log() is called.
+Currently MIPS exceptions are displayed as string in system-mode
+emulation, but as number in user-mode.
+Unify by extracting the current system-mode code as excp_name()
+and use that in user-mode.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20201206233949.3783184-5-f4bug@amsat.org>
+Message-Id: <20201119160536.1980329-1-f4bug@amsat.org>
 ---
- target/mips/cp0_helper.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ target/mips/helper.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-index caaaefcc8ad..cb899fe3d73 100644
---- a/target/mips/cp0_helper.c
-+++ b/target/mips/cp0_helper.c
-@@ -21,15 +21,13 @@
-  */
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 041432489d6..59de58fcbc9 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -978,6 +978,7 @@ hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address,
+         return physical;
+     }
+ }
++#endif /* !CONFIG_USER_ONLY */
  
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "qemu/main-loop.h"
- #include "cpu.h"
- #include "internal.h"
- #include "qemu/host-utils.h"
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
--#include "exec/cpu_ldst.h"
--#include "exec/memop.h"
--#include "sysemu/kvm.h"
+ static const char * const excp_names[EXCP_LAST + 1] = {
+     [EXCP_RESET] = "reset",
+@@ -1018,7 +1019,14 @@ static const char * const excp_names[EXCP_LAST + 1] = {
+     [EXCP_MSADIS] = "MSA disabled",
+     [EXCP_MSAFPE] = "MSA floating point",
+ };
+-#endif
++
++static const char *mips_exception_name(int32_t exception)
++{
++    if (exception < 0 || exception > EXCP_LAST) {
++        return "unknown";
++    }
++    return excp_names[exception];
++}
  
+ target_ulong exception_resume_pc(CPUMIPSState *env)
+ {
+@@ -1091,19 +1099,13 @@ void mips_cpu_do_interrupt(CPUState *cs)
+     bool update_badinstr = 0;
+     target_ulong offset;
+     int cause = -1;
+-    const char *name;
  
- /* SMP helpers.  */
+     if (qemu_loglevel_mask(CPU_LOG_INT)
+         && cs->exception_index != EXCP_EXT_INTERRUPT) {
+-        if (cs->exception_index < 0 || cs->exception_index > EXCP_LAST) {
+-            name = "unknown";
+-        } else {
+-            name = excp_names[cs->exception_index];
+-        }
+-
+         qemu_log("%s enter: PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx
+                  " %s exception\n",
+-                 __func__, env->active_tc.PC, env->CP0_EPC, name);
++                 __func__, env->active_tc.PC, env->CP0_EPC,
++                 mips_exception_name(cs->exception_index));
+     }
+     if (cs->exception_index == EXCP_EXT_INTERRUPT &&
+         (env->hflags & MIPS_HFLAG_DM)) {
+@@ -1490,8 +1492,9 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
+ {
+     CPUState *cs = env_cpu(env);
+ 
+-    qemu_log_mask(CPU_LOG_INT, "%s: %d %d\n",
+-                  __func__, exception, error_code);
++    qemu_log_mask(CPU_LOG_INT, "%s: %d (%s) %d\n",
++                  __func__, exception, mips_exception_name(exception),
++                  error_code);
+     cs->exception_index = exception;
+     env->error_code = error_code;
+ 
 -- 
 2.26.2
 
