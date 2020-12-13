@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D13A52D9059
-	for <lists+kvm@lfdr.de>; Sun, 13 Dec 2020 21:21:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E4092D905A
+	for <lists+kvm@lfdr.de>; Sun, 13 Dec 2020 21:21:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731161AbgLMUUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Dec 2020 15:20:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47436 "EHLO
+        id S1731384AbgLMUUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Dec 2020 15:20:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728701AbgLMUUa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Dec 2020 15:20:30 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 723CEC0613CF
-        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:19:50 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id y17so14366397wrr.10
-        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:19:50 -0800 (PST)
+        with ESMTP id S1726787AbgLMUUf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Dec 2020 15:20:35 -0500
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C16C0613D3
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:19:55 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id g25so7884792wmh.1
+        for <kvm@vger.kernel.org>; Sun, 13 Dec 2020 12:19:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=6aT0hnxN9Lk7mHwwTD8w8mjwYa5KaIbUi6jXCtHBCQM=;
-        b=RXb4/2mjYb9G+dykIme3OPCkocGwJCGkzuu8clS4GEEKO6f7cta1u/r1bQAFbtjYbs
-         /zKjnseBBJh+zQECv52jnZTPvPGT/ymFWc7pDbD90QNaj5dz37UZWRkhTBk7FY+rgDjt
-         F+QlCoK1mzZabzzXwrCUAfOZqQSLPqqCRA2giCqCJqAcuQBzWZOp2daV1r3sVprGWe0b
-         BjnWngxp7PVwrZb9yFA/RrSFnGcOtriXO9yUNmuBORsTQamxRLCuxwarWFm0qFSwCMdM
-         7rzqFzD//+hkRkbjZmQcS9njY7E3xJBd6R450w3pqn4/J07XCNd3E/rmy7hUSHhV0Vp2
-         3IfQ==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=h+0f4MZSwT7Z4ULpAMMMf+Y2JWijk+gFO9yAfDJUPRo=;
+        b=UJMr2i9eDj/K0MVcCJ+eHoqUUGk/nd2qt7yFEqMack+wSX2s7WSSO6FxE+tCIP/Ys7
+         N1neLRDTRYdoM1prp+IqS1S/88Ms03F0CT9Z0sQCLxORgWu8ynoO/3J3Ivji5uFMuG84
+         25MsLPNiUWV7VedPd4IHFWPH5y0xuG1Ftc6OXkFi25B8PBoLKTF4TCU0pUWg+8Eip5cl
+         avfscgy49AaE9FsWpQB6/I/IZ8O9Eal3JQYYMEXTpOlCsmZO7RZ3xKPAbhkFQoTQvmDI
+         aFgPPqnGlHqso7eYh2r5Rsc93wLo2YYc3GDhQkfmQdo8dBh2gyGN5p4jRDoqiKNFgvWr
+         7WBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=6aT0hnxN9Lk7mHwwTD8w8mjwYa5KaIbUi6jXCtHBCQM=;
-        b=ffzopROiwaeRqk2LFjDbJr3wBNTCsAt0I5aRsghbsDjOUYVXSBlz0d0XUtF8fc4QFf
-         56srBuQpH6j5EPboZmPErDlmYSYdfTXFpYUFXDTB0Gfy0NXyh2WOdKHg5tEdqlDV8p6j
-         AnQfhDIXAJk0qi4R1loTZy7xHjoigygx/n8OSmNuwglAjojwkpaSL0tOIIIOazDr2FmV
-         38Q3j9miqJl7WVysOFQhTqr6uEOshKdwd0IMGhRLIjD8w5mhemEvpEFGuZg1/h8BAnt6
-         07QF322gmHMBdWWAA1s4iBbRVki8v9YGoJaVhd7cSOzmhR1nqNCuxXka9h3OJCqy45K0
-         uEEQ==
-X-Gm-Message-State: AOAM530DvxbfDrkmYRoSCSnV16dMx2v4dQJCnfb1NzJg5eKBgqCgMGlh
-        0f+XaEeJ2xhifmoLZANgasg=
-X-Google-Smtp-Source: ABdhPJzLu1l79ty9fZ484FlDoec/3Llbbu/ND5f33k0x8Pjnud30Pvq+O1w+UgnL5w5ESi994IyXZA==
-X-Received: by 2002:adf:c454:: with SMTP id a20mr25225088wrg.314.1607890789069;
-        Sun, 13 Dec 2020 12:19:49 -0800 (PST)
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=h+0f4MZSwT7Z4ULpAMMMf+Y2JWijk+gFO9yAfDJUPRo=;
+        b=O9Ka3B2tNVvHzgjpMCJ/b5eBRUBVh2Y5aqa+iPzzq9kIruz+MdBzbd4G683Pp8enLf
+         NsnHjAUGNegjo6yb5HHTcTpbTbV47bz6hoxCE9uhdez/r6zpQRnMU//ccLlVTgmDS5XL
+         MU2Hg6bcLYmf9VqqHid0fp6wzSyfIZ+kV0x4W2ZU/wyrlv/4Y9KenACQvMeXNS9v6k1Q
+         hHnMcpRkn5jo859IiB52vJ/HB1lMqaKu/s62H5lhDqQW8wsGDf5hyBbR1o9w/TaZdU5y
+         lQFAquIlQMWyeadrxI8+/LMEBm7rdGA9CIU5zmYpVEm9SUy7qyWq5HTyhLTjoBvzJDAM
+         rs0w==
+X-Gm-Message-State: AOAM533RmkZ0+mnXWPHOY8kJwRR+8wyjCVW02MsUtU1NCq6pjKbqw1Fm
+        fkeKQ8VMfsbxuQOjuBRemD+NXWmW6vg=
+X-Google-Smtp-Source: ABdhPJyQGcPstFoF2k+UOL35hL2hnxGP87DnUYgX7saUmt1VArW5Q/W9u0DyNBvUw9DDWFHQkeJQJQ==
+X-Received: by 2002:a7b:cb84:: with SMTP id m4mr24472231wmi.157.1607890793929;
+        Sun, 13 Dec 2020 12:19:53 -0800 (PST)
 Received: from localhost.localdomain (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id i9sm31558614wrs.70.2020.12.13.12.19.47
+        by smtp.gmail.com with ESMTPSA id b4sm27219980wrr.30.2020.12.13.12.19.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Dec 2020 12:19:48 -0800 (PST)
+        Sun, 13 Dec 2020 12:19:53 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -57,103 +57,88 @@ Cc:     =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         kvm@vger.kernel.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Huacai Chen <chenhuacai@kernel.org>,
-        Paul Burton <paulburton@kernel.org>
-Subject: [PULL 00/26] MIPS patches for 2020-12-13
-Date:   Sun, 13 Dec 2020 21:19:20 +0100
-Message-Id: <20201213201946.236123-1-f4bug@amsat.org>
+        Paul Burton <paulburton@kernel.org>,
+        Huacai Chen <zltjiangshi@gmail.com>
+Subject: [PULL 01/26] MAINTAINERS: chenhc@lemote.com -> chenhuacai@kernel.org
+Date:   Sun, 13 Dec 2020 21:19:21 +0100
+Message-Id: <20201213201946.236123-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201213201946.236123-1-f4bug@amsat.org>
+References: <20201213201946.236123-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit ad717e6da3852b5729217d7938eecdb81c546114=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into stagi=
-ng (2020-12-12 00:20:46 +0000)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://gitlab.com/philmd/qemu.git tags/mips-20201213=0D
-=0D
-for you to fetch changes up to 3533ee301c46620fd5699cb97f2d4bd194fe0c24:=0D
-=0D
-  target/mips: Use FloatRoundMode enum for FCR31 modes conversion (2020-12-=
-13 20:27:11 +0100)=0D
-=0D
-----------------------------------------------------------------=0D
-MIPS patches queue=0D
-=0D
-. Allow executing MSA instructions on Loongson-3A4000=0D
-. Update Huacai Chen email address=0D
-. Various cleanups:=0D
-  - unused headers removal=0D
-  - use definitions instead of magic values=0D
-  - remove dead code=0D
-  - avoid calling unused code=0D
-. Various code movements=0D
-=0D
-CI jobs results:=0D
-  https://gitlab.com/philmd/qemu/-/pipelines/229120169=0D
-  https://cirrus-ci.com/build/4857731557359616=0D
-----------------------------------------------------------------=0D
-=0D
-Huacai Chen (1):=0D
-  MAINTAINERS: chenhc@lemote.com -> chenhuacai@kernel.org=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (25):=0D
-  target/mips/kvm: Assert unreachable code is not used=0D
-  target/mips/kvm: Remove unused headers=0D
-  target/mips: Include "exec/memattrs.h" in 'internal.h'=0D
-  target/mips: Replace magic values by CP0PM_MASK or=0D
-    TARGET_PAGE_BITS_MIN=0D
-  target/mips: Do not include CP0 helpers in user-mode emulation=0D
-  target/mips: Remove unused headers from cp0_helper.c=0D
-  target/mips: Also display exception names in user-mode=0D
-  target/mips: Allow executing MSA instructions on Loongson-3A4000=0D
-  target/mips: Explicit Release 6 MMU types=0D
-  target/mips: Rename cpu_supports_FEAT() as cpu_type_supports_FEAT()=0D
-  target/mips: Introduce cpu_supports_isa() taking CPUMIPSState argument=0D
-  hw/mips: Move address translation helpers to target/mips/=0D
-  target/mips: Remove unused headers from translate.c=0D
-  target/mips: Remove unused headers from op_helper.c=0D
-  target/mips: Remove mips_def_t unused argument from mvp_init()=0D
-  target/mips: Introduce ase_mt_available() helper=0D
-  target/mips: Do not initialize MT registers if MT ASE absent=0D
-  hw/mips/malta: Do not initialize MT registers if MT ASE absent=0D
-  hw/mips/malta: Rewrite CP0_MVPConf0 access using deposit()=0D
-  target/mips: Extract cpu_supports*/cpu_set* translate.c=0D
-  target/mips: Move mips_cpu_add_definition() from helper.c to cpu.c=0D
-  target/mips: Move cpu definitions, reset() and realize() to cpu.c=0D
-  target/mips: Inline cpu_mips_realize_env() in mips_cpu_realizefn()=0D
-  target/mips: Remove unused headers from fpu_helper.c=0D
-  target/mips: Use FloatRoundMode enum for FCR31 modes conversion=0D
-=0D
- include/hw/mips/cpudevs.h        |   7 -=0D
- target/mips/cpu.h                |  20 ++-=0D
- target/mips/internal.h           |  17 +-=0D
- hw/mips/boston.c                 |   5 +-=0D
- hw/mips/cps.c                    |   3 +-=0D
- hw/mips/malta.c                  |  14 +-=0D
- {hw =3D> target}/mips/addr.c       |   2 +-=0D
- target/mips/cp0_helper.c         |  15 +-=0D
- target/mips/cpu.c                | 299 ++++++++++++++++++++++++++++++-=0D
- target/mips/fpu_helper.c         |   6 +-=0D
- target/mips/helper.c             |  64 ++-----=0D
- target/mips/kvm.c                |  11 +-=0D
- target/mips/op_helper.c          |   4 -=0D
- target/mips/translate.c          | 262 ---------------------------=0D
- target/mips/translate_init.c.inc |  10 +-=0D
- .mailmap                         |   2 +=0D
- MAINTAINERS                      |   8 +-=0D
- hw/mips/meson.build              |   2 +-=0D
- target/mips/meson.build          |   3 +-=0D
- 19 files changed, 378 insertions(+), 376 deletions(-)=0D
- rename {hw =3D> target}/mips/addr.c (98%)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+From: Huacai Chen <zltjiangshi@gmail.com>
+
+Use @kernel.org address as the main communications end point. Update the
+corresponding M-entries and .mailmap (for git shortlog translation).
+
+Signed-off-by: Huacai Chen <chenhuacai@kernel.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <1607160121-9977-1-git-send-email-chenhuacai@kernel.org>
+---
+ .mailmap    | 2 ++
+ MAINTAINERS | 8 ++++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/.mailmap b/.mailmap
+index 663819fb017..a1bd659817d 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -49,6 +49,8 @@ Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm.com>
+ Filip Bozuta <filip.bozuta@syrmia.com> <filip.bozuta@rt-rk.com.com>
+ Frederic Konrad <konrad@adacore.com> <fred.konrad@greensocs.com>
+ Greg Kurz <groug@kaod.org> <gkurz@linux.vnet.ibm.com>
++Huacai Chen <chenhuacai@kernel.org> <chenhc@lemote.com>
++Huacai Chen <chenhuacai@kernel.org> <chenhuacai@loongson.cn>
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
+ Radoslaw Biernacki <rad@semihalf.com> <radoslaw.biernacki@linaro.org>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d48a4e8a8b7..d396c5943b6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -388,7 +388,7 @@ S: Maintained
+ F: target/arm/kvm.c
+ 
+ MIPS KVM CPUs
+-M: Huacai Chen <chenhc@lemote.com>
++M: Huacai Chen <chenhuacai@kernel.org>
+ S: Odd Fixes
+ F: target/mips/kvm.c
+ 
+@@ -1149,7 +1149,7 @@ F: hw/mips/mipssim.c
+ F: hw/net/mipsnet.c
+ 
+ Fuloong 2E
+-M: Huacai Chen <chenhc@lemote.com>
++M: Huacai Chen <chenhuacai@kernel.org>
+ M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ S: Odd Fixes
+@@ -1159,7 +1159,7 @@ F: hw/pci-host/bonito.c
+ F: include/hw/isa/vt82c686.h
+ 
+ Loongson-3 virtual platforms
+-M: Huacai Chen <chenhc@lemote.com>
++M: Huacai Chen <chenhuacai@kernel.org>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ S: Maintained
+ F: hw/intc/loongson_liointc.c
+@@ -2861,7 +2861,7 @@ F: disas/i386.c
+ MIPS TCG target
+ M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+-R: Huacai Chen <chenhc@lemote.com>
++R: Huacai Chen <chenhuacai@kernel.org>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Odd Fixes
+-- 
+2.26.2
+
