@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF5472DA2AB
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 22:44:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F346C2DA2BC
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 22:47:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387651AbgLNVnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 16:43:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41988 "EHLO
+        id S2503583AbgLNVq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 16:46:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33808 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392109AbgLNVmy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 16:42:54 -0500
+        by vger.kernel.org with ESMTP id S2503565AbgLNVqS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 16:46:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607982088;
+        s=mimecast20190719; t=1607982292;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=DV2mr6X5vesd9C3WlI0urcyPxkqlznyh99zPeXEjrvs=;
-        b=UhOLXgKKfQWcDrKDh8qNpWs9uCh/bp/k7DTouR46yIEfxQhdN9RtjAuxgxKuR09bSQ4kEz
-        U9o7sJ652fHDf9U3ylH3gLi8jo5rXe6h3XEvbVX9VvJjEDkJHQeam5oS/9xgJkUem6m3lz
-        9yOs+i76yl3abxcXRMOb9u3RCLIw99Y=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-RhVs-OyiPECKm2RWGfvwgw-1; Mon, 14 Dec 2020 16:41:26 -0500
-X-MC-Unique: RhVs-OyiPECKm2RWGfvwgw-1
-Received: by mail-ed1-f70.google.com with SMTP id p17so8936005edx.22
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 13:41:26 -0800 (PST)
+        bh=Y5+S7Ad2XyX9pkxnkrXX2LGZ2aRhSIyfHipDehm+l+E=;
+        b=L1H+m8+YRl71EexhEwq9at0A6xffBmkgYf8LnfWfW9bgw4bRv+IsVItvyCBkJYEm2oinU1
+        dwEijEDQgJ7kOrxrBiWRX70DzxwRp8nOzbpPgmnYSknlEd3aaZtwBYmdRApp8GZkgGuFxJ
+        qYI9pXWDWdD/x6wq9S3Ih9TPes08vz8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-484-bgBY6BcYPlmx4X6yEMLN_A-1; Mon, 14 Dec 2020 16:44:50 -0500
+X-MC-Unique: bgBY6BcYPlmx4X6yEMLN_A-1
+Received: by mail-ed1-f72.google.com with SMTP id d12so8980606edx.23
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 13:44:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=DV2mr6X5vesd9C3WlI0urcyPxkqlznyh99zPeXEjrvs=;
-        b=mH6Gq7l+MI2D5mNjVtL4fsmWkGiifrh9bixRyH2QUchbd+hwNTnPb0IlVgpAz/vtuj
-         fpCFuneE5X8lD+Q5Zbtd2gjjdInUuZ/O3QI8HadQD2F0J1lqH5iiZ7XoR2ZYX/iT0/of
-         uszIqntHPLRH5fUBBBVcLT18x9WaETVSVBd+4j1qCKpyMRQaPVz0CRvyvSpmQ0zHlnax
-         vKcDXbfHHbTIY53my5GUYrDqtanT1i/sVLj3/gt+4GQ18AkW9dwd0p0mvabSg+brXN7k
-         irjV7tvxdRh75KDxYucAqaLXaoTwsePJ9N9hY1q3iZleNL7BSgApHceKpB+1yR2K2rDz
-         j1pA==
-X-Gm-Message-State: AOAM533jwQw9QsFOzTOemQLCtaLuHrIk9ZQgwxyjxXExjUHHVVfbLjME
-        yKZ4X7MU3knaaQCAKSRZYQfBndBlzyAj8W/K+EuF5RVHQr0rimJkEBX3tWwEzDJfD6dj3wC7TQ7
-        j+1QgwFT6PdRe
-X-Received: by 2002:a05:6402:1592:: with SMTP id c18mr26513114edv.181.1607982085286;
-        Mon, 14 Dec 2020 13:41:25 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzUk89K2+30f3elqKuu9WOlVFi4pIAsQjKigrfZO2J0L1BTXheuLbdVa4VsgJnHo4+hMmlenw==
-X-Received: by 2002:a05:6402:1592:: with SMTP id c18mr26513093edv.181.1607982085142;
-        Mon, 14 Dec 2020 13:41:25 -0800 (PST)
+        bh=Y5+S7Ad2XyX9pkxnkrXX2LGZ2aRhSIyfHipDehm+l+E=;
+        b=OTHAMH7SRiYSH3hCBSEfVpgMkSB7WHe3mWMC3RisKnCwRalKSPAPYpHZiomg1lRorc
+         2nTKGcqmKt2FyllbaI5MX2s/Ob47YGLqmAEF7Q88Tg0/4+AMbg/fgbV2CiSGL2Amzmbh
+         1BQKL6Ai3UnIfHQTpCib+jLlVIkcJuBHLQ+D7OUPSdFAvwmrTmAYIB5LlP9rzaz7KjTg
+         nC5zEYAaYHRwCvel2vXbZfCAFVKCEXwEv1p981Oy0cvAdrmTWcrCgUvxefrDgHvKZalL
+         2xZ/eO9D14UEQSsfzVS43XlnhZpEiXMR2sCB7W8l98IkQQKpcZCBwJgEk/Xuow85ttBr
+         cubQ==
+X-Gm-Message-State: AOAM5307lIdU9slG/WXu3tWZO4qS9G2GqW4u9eZhLGyM1ypM/YD3OXZn
+        jpeayFt53IA5iYkXVIjP9L5V0wXoLGYkvGpkEre+mXGPbWJk2FNEHwekSJBjdsUuOxNYuAKFpLK
+        RFBv2EXd6bnxK
+X-Received: by 2002:a17:906:7146:: with SMTP id z6mr24248208ejj.379.1607982289242;
+        Mon, 14 Dec 2020 13:44:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzpP/qHyvqyAW3R6HFy98z0QrKXZtowZdOYvRvJsjvgoFnL/28dB06toMKKxPeFTfy30xKWZA==
+X-Received: by 2002:a17:906:7146:: with SMTP id z6mr24248186ejj.379.1607982289063;
+        Mon, 14 Dec 2020 13:44:49 -0800 (PST)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f8sm16605165eds.19.2020.12.14.13.41.23
+        by smtp.gmail.com with ESMTPSA id i4sm165405eje.90.2020.12.14.13.44.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Dec 2020 13:41:24 -0800 (PST)
+        Mon, 14 Dec 2020 13:44:48 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -58,14 +58,14 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com
-Subject: Re: [PATCH v3 01/17] KVM: Fix arguments to kvm_{un,}map_gfn()
-In-Reply-To: <6E8FD19B-7ABD-4BF1-84C5-26EDD327F01D@infradead.org>
+Subject: Re: [PATCH v3 02/17] KVM: x86/xen: fix Xen hypercall page msr handling
+In-Reply-To: <58AC82A4-ADE4-4A8F-9522-16B8A4B9CBDD@infradead.org>
 References: <20201214083905.2017260-1-dwmw2@infradead.org>
- <20201214083905.2017260-2-dwmw2@infradead.org>
- <87ft48w0or.fsf@vitty.brq.redhat.com>
- <6E8FD19B-7ABD-4BF1-84C5-26EDD327F01D@infradead.org>
-Date:   Mon, 14 Dec 2020 22:41:23 +0100
-Message-ID: <87a6ugvzek.fsf@vitty.brq.redhat.com>
+ <20201214083905.2017260-3-dwmw2@infradead.org>
+ <87czzcw020.fsf@vitty.brq.redhat.com>
+ <58AC82A4-ADE4-4A8F-9522-16B8A4B9CBDD@infradead.org>
+Date:   Mon, 14 Dec 2020 22:44:47 +0100
+Message-ID: <877dpkvz8w.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -74,29 +74,41 @@ X-Mailing-List: kvm@vger.kernel.org
 
 David Woodhouse <dwmw2@infradead.org> writes:
 
-> On 14 December 2020 21:13:40 GMT, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>What about different address space ids? 
+>>> @@ -3001,6 +3001,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu,
+>>struct msr_data *msr_info)
+>>>  	u32 msr = msr_info->index;
+>>>  	u64 data = msr_info->data;
+>>>  
+>>> +	if (msr && (msr == vcpu->kvm->arch.xen_hvm_config.msr))
+>>> +		return xen_hvm_config(vcpu, data);
+>>> +
 >>
->>gfn_to_memslot() now calls kvm_memslots() which gives memslots for
->>address space id = 0 but what if we want something different? Note,
->>different vCPUs can (in theory) be in different address spaces so we
->>actually need 'vcpu' and not 'kvm' then.
+>>Can we generalize this maybe? E.g. before handling KVM and
+>>architectural
+>>MSRs we check that the particular MSR is not overriden by an emulated
+>>hypervisor, 
+>>
+>>e.g.
+>>	if (kvm_emulating_hyperv(kvm) && kvm_hyperv_msr_overriden(kvm,msr)
+>>		return kvm_hyperv_handle_msr(kvm, msr);
+>>	if (kvm_emulating_xen(kvm) && kvm_xen_msr_overriden(kvm,msr)
+>>		return kvm_xen_handle_msr(kvm, msr);
 >
-> Sure, but then you want a different function; this one is called
-> 'kvm_map_gfn()' and it operates on kvm_memslots(). It *doesn't*
-> operate on the vcpu at all.
->
+> That smells a bit like overengineering. As I said, I did have a play
+> with "improving" Joao's original patch but nothing I tried actually
+> made more sense to me than this once the details were ironed out.
 
-Actually, we already have kvm_vcpu_map() which uses kvm_vcpu_memslots()
-inside so no new function is needed.
+This actually looks more or less like hypercall distinction from after PATCH3:
 
-> Which is why it's so bizarre that its argument is a 'vcpu' which it
-> only ever uses to get vcpu->kvm from it. It should just take the kvm
-> pointer.
+	if (kvm_xen_hypercall_enabled(vcpu->kvm))
+		return kvm_xen_hypercall(vcpu);
 
-Your change is correct but I'm not sure that it's entirely clear that
-kvm_map_gfn() implicitly uses 'as_id=0' and I don't even see a comment
-about the fact :-(
+        if (kvm_hv_hypercall_enabled(vcpu->kvm))
+  	        return kvm_hv_hypercall(vcpu);
+
+....
+
+so my idea was why not do the same for MSRs?
 
 -- 
 Vitaly
