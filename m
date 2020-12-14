@@ -2,46 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C26632D98A6
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 14:20:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11DC62D98D1
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 14:32:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407827AbgLNNUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 08:20:31 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:52126 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725763AbgLNNUb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 08:20:31 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEDECCC090781;
-        Mon, 14 Dec 2020 13:19:42 GMT
+        id S2439490AbgLNNaz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 08:30:55 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:37014 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2439357AbgLNNag (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 08:30:36 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEDTmB0111029;
+        Mon, 14 Dec 2020 13:29:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=2Ml3UiX3V2p1Hqv5ZaN0N3rzkyNu6u3gV+YWMdc9Lpo=;
- b=eOdXXZxDUkL/zHS1HVFhb4VtIh28zdaEs8ymp1vVADw94WS6QkhHq7TY/27k02F0Ys5N
- 0QZXd98PXTGgpkxJ7Qar6nBdLOOVpwsjbYi9ZuKbHtAlpGOTsLGK2U3kpHrlCK8TYWAP
- IDry30W329LdlSOug+7el8oGFQ0MJbgcYKrRocsSvlEiRdt4JqBA0ZywIJ1bC6mGa++q
- 0iX1FKxy4Ei92y//0pzD9HzbV1RzaoBAlpyrBtOOQ0qYdhqP151MU7gbnsm2A/uunYQT
- 4VWas+WoXXCOe/TIATplWJ3cdm6mEHJoN/Ur3+N0CJn4cBv9t0ubFvdabKGVUO8FTo7S 7g== 
+ bh=2MzHpnxakq2CoovSBtglQu1YHaBVANM9msXN3tNBkYg=;
+ b=YTHL7P7YphNPia7OvQ7vcNVr5KJRfJ4aB3vbtPpswb7Yvl4kZpWNQ7sh5amXMvZY7j2S
+ XDaxcOFnDMJsrmnIMyueP3wFcsf6+r95XGm+wXcmB0lkdRqWXcyoShcQYUg3hyZQEueU
+ eqJlHUaepv57RNVYwimp/NkLeYyidslbNbsZS3rs3C+qPetuVL11ZDvNRjNIX3h2T5Gr
+ +EMiwXehvITaY7o8sA3HpiriGKxg9jNsYiUi5e3OkNk0MPNtzQVjoAVOVrWj059FzAhB
+ 7Q/vqaBxSuoIdn/UU/qUlyjPkjHgSw3+XKkPCJtISf0KPkSWW7dAD5tRLHkSUbCM7n8/ xQ== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 35cn9r53kw-1
+        by aserp2130.oracle.com with ESMTP id 35ckcb59w0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 14 Dec 2020 13:19:42 +0000
+        Mon, 14 Dec 2020 13:29:48 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEDG4Xb052947;
-        Mon, 14 Dec 2020 13:19:41 GMT
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEDK34H062022;
+        Mon, 14 Dec 2020 13:29:47 GMT
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 35d7sugsm6-1
+        by userp3030.oracle.com with ESMTP id 35d7suh5xe-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Dec 2020 13:19:41 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0BEDJesb000786;
-        Mon, 14 Dec 2020 13:19:40 GMT
+        Mon, 14 Dec 2020 13:29:47 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0BEDTkTv005457;
+        Mon, 14 Dec 2020 13:29:46 GMT
 Received: from [10.175.173.239] (/10.175.173.239)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 14 Dec 2020 05:19:40 -0800
-Subject: Re: [PATCH v3 17/17] KVM: x86/xen: Add event channel interrupt vector
- upcall
+        with ESMTP ; Mon, 14 Dec 2020 05:29:45 -0800
+Subject: Re: [PATCH v3 12/17] KVM: x86/xen: setup pvclock updates
 To:     David Woodhouse <dwmw2@infradead.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ankur Arora <ankur.a.arora@oracle.com>,
@@ -50,12 +49,12 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, kvm@vger.kernel.org
 References: <20201214083905.2017260-1-dwmw2@infradead.org>
- <20201214083905.2017260-18-dwmw2@infradead.org>
+ <20201214083905.2017260-13-dwmw2@infradead.org>
 From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <3917aa37-ed00-9350-1ba5-c3390be6b500@oracle.com>
-Date:   Mon, 14 Dec 2020 13:19:34 +0000
+Message-ID: <5cb7cd9b-cdeb-be12-7e86-040b7610b2e7@oracle.com>
+Date:   Mon, 14 Dec 2020 13:29:41 +0000
 MIME-Version: 1.0
-In-Reply-To: <20201214083905.2017260-18-dwmw2@infradead.org>
+In-Reply-To: <20201214083905.2017260-13-dwmw2@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -63,100 +62,140 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=6
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
  mlxlogscore=999 spamscore=0 mlxscore=0 suspectscore=0 malwarescore=0
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012140092
+ engine=8.12.0-2009150000 definitions=main-2012140093
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
- malwarescore=0 priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012140092
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999
+ priorityscore=1501 mlxscore=0 suspectscore=0 adultscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 lowpriorityscore=0 clxscore=1015
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012140094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 12/14/20 8:39 AM, David Woodhouse wrote:
+> From: Joao Martins <joao.m.martins@oracle.com>
+> 
+> Parameterise kvm_setup_pvclock_page() a little bit so that it can be
+> invoked for different gfn_to_hva_cache structures, and with different
+> offsets. Then we can invoke it for the normal KVM pvclock and also for
+> the Xen one in the vcpu_info.
+> 
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>  arch/x86/kvm/x86.c | 31 ++++++++++++++++++-------------
+>  arch/x86/kvm/xen.c |  4 ++++
+>  2 files changed, 22 insertions(+), 13 deletions(-)
+> 
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index df44d9e50adc..e627139cf8cd 100644
+> index 64016443159c..cbdc05bb53bd 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -8896,7 +8896,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  			kvm_x86_ops.msr_filter_changed(vcpu);
->  	}
->  
-> -	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win) {
-> +	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-> +	    kvm_xen_has_interrupt(vcpu)) {
->  		++vcpu->stat.req_event;
->  		kvm_apic_accept_events(vcpu);
->  		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 17cbb4462b7e..4bc9da9fcfb8 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -176,6 +176,45 @@ void kvm_xen_setup_runstate_page(struct kvm_vcpu *v)
->  	kvm_xen_update_runstate(v, RUNSTATE_running, steal_time);
+> @@ -2582,13 +2582,15 @@ u64 get_kvmclock_ns(struct kvm *kvm)
+>  	return ret;
 >  }
 >  
-> +int kvm_xen_has_interrupt(struct kvm_vcpu *v)
-> +{
-> +	u8 rc = 0;
-> +
-> +	/*
-> +	 * If the global upcall vector (HVMIRQ_callback_vector) is set and
-> +	 * the vCPU's evtchn_upcall_pending flag is set, the IRQ is pending.
-> +	 */
-> +	if (v->arch.xen.vcpu_info_set && v->kvm->arch.xen.upcall_vector) {
-> +		struct gfn_to_hva_cache *ghc = &v->arch.xen.vcpu_info_cache;
-> +		struct kvm_memslots *slots = kvm_memslots(v->kvm);
-> +		unsigned int offset = offsetof(struct vcpu_info, evtchn_upcall_pending);
-> +
+> -static void kvm_setup_pvclock_page(struct kvm_vcpu *v)
+> +static void kvm_setup_pvclock_page(struct kvm_vcpu *v,
+> +				   struct gfn_to_hva_cache *cache,
+> +				   unsigned int offset)
+>  {
+>  	struct kvm_vcpu_arch *vcpu = &v->arch;
+>  	struct pvclock_vcpu_time_info guest_hv_clock;
+>  
+> -	if (unlikely(kvm_read_guest_cached(v->kvm, &vcpu->pv_time,
+> -		&guest_hv_clock, sizeof(guest_hv_clock))))
+> +	if (unlikely(kvm_read_guest_offset_cached(v->kvm, cache,
+> +		&guest_hv_clock, offset, sizeof(guest_hv_clock))))
+>  		return;
+>  
+>  	/* This VCPU is paused, but it's legal for a guest to read another
+> @@ -2611,9 +2613,9 @@ static void kvm_setup_pvclock_page(struct kvm_vcpu *v)
+>  		++guest_hv_clock.version;  /* first time write, random junk */
+>  
+>  	vcpu->hv_clock.version = guest_hv_clock.version + 1;
+> -	kvm_write_guest_cached(v->kvm, &vcpu->pv_time,
+> -				&vcpu->hv_clock,
+> -				sizeof(vcpu->hv_clock.version));
+> +	kvm_write_guest_offset_cached(v->kvm, cache,
+> +				      &vcpu->hv_clock, offset,
+> +				      sizeof(vcpu->hv_clock.version));
+>  
+>  	smp_wmb();
+>  
+> @@ -2627,16 +2629,16 @@ static void kvm_setup_pvclock_page(struct kvm_vcpu *v)
+>  
+>  	trace_kvm_pvclock_update(v->vcpu_id, &vcpu->hv_clock);
+>  
+> -	kvm_write_guest_cached(v->kvm, &vcpu->pv_time,
+> -				&vcpu->hv_clock,
+> -				sizeof(vcpu->hv_clock));
+> +	kvm_write_guest_offset_cached(v->kvm, cache,
+> +				      &vcpu->hv_clock, offset,
+> +				      sizeof(vcpu->hv_clock));
+>  
+>  	smp_wmb();
+>  
+>  	vcpu->hv_clock.version++;
+> -	kvm_write_guest_cached(v->kvm, &vcpu->pv_time,
+> -				&vcpu->hv_clock,
+> -				sizeof(vcpu->hv_clock.version));
+> +	kvm_write_guest_offset_cached(v->kvm, cache,
+> +				     &vcpu->hv_clock, offset,
+> +				     sizeof(vcpu->hv_clock.version));
+>  }
+>  
+>  static int kvm_guest_time_update(struct kvm_vcpu *v)
+> @@ -2723,7 +2725,10 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+>  	vcpu->hv_clock.flags = pvclock_flags;
+>  
+>  	if (vcpu->pv_time_enabled)
+> -		kvm_setup_pvclock_page(v);
+> +		kvm_setup_pvclock_page(v, &vcpu->pv_time, 0);
+> +	if (vcpu->xen.vcpu_info_set)
+> +		kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_info_cache,
+> +				       offsetof(struct compat_vcpu_info, time));
 
-To have less nesting, wouldn't it be better to invert the logic?
+We might be missing the case where only shared_info is registered. Something like:
 
-say:
-
-	u8 rc = 0;
-	struct gfn_to_hva_cache *ghc
-	struct kvm_memslots *slots;
-	unsigned int offset;
-
-
-	if (!v->arch.xen.vcpu_info_set || !v->kvm->arch.xen.upcall_vector)
-		return 0;
-
-	BUILD_BUG_ON(...)
-	
-	ghc = &v->arch.xen.vcpu_info_cache;
-	slots = kvm_memslots(v->kvm);
-	offset = offsetof(struct vcpu_info, evtchn_upcall_pending);
-
-But I think there's a flaw here. That is handling the case where you don't have a
-vcpu_info registered, and only shared info. The vcpu_info is then placed elsewhere, i.e.
-another offset out of shared_info -- which is *I think* the case for PVHVM Windows guests.
-
-Perhaps introducing a helper which adds xen_vcpu_info() and returns you the hva (picking
-the right cache) similar to the RFC patch. Albeit that was with page pinning, but
-borrowing an older version I had with hva_to_gfn_cache incantation would probably look like:
-
-
-        if (v->arch.xen.vcpu_info_set) {
-		ghc = &v->arch.xen.vcpu_info_cache;
-        } else {
-		ghc = &v->arch.xen.vcpu_info_cache;
+	if (vcpu->xen.shinfo_set && !vcpu->xen.vcpu_info_set) {
+		offset = offsetof(struct compat_vcpu_info, time);
                 offset += offsetof(struct shared_info, vcpu_info);
-                offset += (v - kvm_get_vcpu_by_id(0)) * sizeof(struct vcpu_info);
-        }
-
-	if (likely(slots->generation == ghc->generation &&
-		   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
-		/* Fast path */
-		__get_user(rc, (u8 __user *)ghc->hva + offset);
-	} else {
-		/* Slow path */
-		kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
-					     sizeof(rc));
+                offset += (v - kvm_get_vcpu_by_id(0)) * sizeof(struct compat_vcpu_info);
+		
+		kvm_setup_pvclock_page(v, &vcpu->xen.shinfo_cache, offset);
 	}
 
- ?
+Part of the reason I had a kvm_xen_setup_pvclock_page() was to handle this all these
+combinations i.e. 1) shared_info && !vcpu_info 2) vcpu_info and unilaterially updating
+secondary time info.
 
-	Joao
+But maybe introducing this xen_vcpu_info() helper to accommodate all this.
+
+>  	if (v == kvm_get_vcpu(v->kvm, 0))
+>  		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+>  	return 0;
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 4bc72e0b9928..d2055b60fdc1 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -82,6 +82,9 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+>  		/* No compat necessary here. */
+>  		BUILD_BUG_ON(sizeof(struct vcpu_info) !=
+>  			     sizeof(struct compat_vcpu_info));
+> +		BUILD_BUG_ON(offsetof(struct vcpu_info, time) !=
+> +			     offsetof(struct compat_vcpu_info, time));
+> +
+>  		r = kvm_gfn_to_hva_cache_init(kvm, &v->arch.xen.vcpu_info_cache,
+>  					      data->u.vcpu_attr.gpa,
+>  					      sizeof(struct vcpu_info));
+> @@ -89,6 +92,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+>  			return r;
+>  
+>  		v->arch.xen.vcpu_info_set = true;
+> +		kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
+>  		break;
+>  
+>  	default:
+> 
