@@ -2,34 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 447AE2D9A6E
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 15:59:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECF2F2D9A74
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 15:59:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408278AbgLNO6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 09:58:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49376 "EHLO
+        id S2408345AbgLNO71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 09:59:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2408263AbgLNO5x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 09:57:53 -0500
+        with ESMTP id S2408295AbgLNO7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 09:59:24 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A48C0613D3
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 06:57:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D08C0613D3
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 06:58:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wYk5yQ4MZyNN1mkPZktPSWUVh8R4sz7foXyLfEbP55E=; b=DqNw3CM7chzisthgLC9cWXQkgu
-        g6gx8oEB6VbwfB8c1dVsDdxM+xgj9EXMcSLwR49mr7/yeYyB3eFKKC21bzahRXM2NbY9Phrf9CwXy
-        6euY3lRqlhcvQrd6R59idT0JeWRWdogmbcKlliaEAFDNq+NcsNovQ4KSgMtS0sV5M3DTgEAXyTAs6
-        30IhCEYPLfyi5B6pk1MkFX8k79UtINingWxpFeb3n5pDFSVCMBIhQPnt/iXsxUIzrCh9d9n/5oOj/
-        bUwvmtQIVEInfOaMS3T81da4ZvUlGqdGL3RrZUKDcbFCPfv0RB+QBbtmaikvGmkNIXPQfrJv2wzX1
-        wh7cWaMw==;
-Received: from [54.239.6.186] (helo=freeip.amazon.com)
+        bh=gLniXcix3e++dhUjq66VctrYWqmw5o239pAip6KrF3M=; b=KvI4I0tGSqGvoXrwbbhVjH6AWn
+        aERz4/M+N5UWeNBVac8ftjAcMjbXliYaDCvY/owATROfVkKcXJ4ZyeAhZhjYMDY5JPF4CqW8b5NG5
+        hHajP8kqPBBXZ97j1YQaa38HMPcRJJLHv+QRXgAcbCw0aZYTU0KG72S48HFXjSxeR+T0pJ4hEdoQX
+        dTze09hBd9Lx1IkmQnbeS12onSd9fCTXrNCWUZVXlaSNxDBQBLLSwjrvjnED5QGtCHu1pVXZVgjkD
+        I9YM8/d0srfn+/L0Zbi7IrinmXB94gD6hXeZGS1vh+fA3DaLJWhWhZPwhNAGVOl+RQqxMLbI18pJd
+        /zi5yd2A==;
+Received: from [54.239.6.187] (helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kopHa-0005wO-Kw; Mon, 14 Dec 2020 14:57:02 +0000
-Message-ID: <69daac6166942fa75db068b57e2f1a382a0753fe.camel@infradead.org>
-Subject: Re: [PATCH v3 17/17] KVM: x86/xen: Add event channel interrupt
- vector upcall
+        id 1kopJ8-00069Y-71; Mon, 14 Dec 2020 14:58:38 +0000
+Message-ID: <7bb3bdebb32c2536e67f658a80c3efa09077cc0f.camel@infradead.org>
+Subject: Re: [PATCH v3 12/17] KVM: x86/xen: setup pvclock updates
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Joao Martins <joao.m.martins@oracle.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -38,14 +37,14 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, kvm@vger.kernel.org
-Date:   Mon, 14 Dec 2020 14:57:00 +0000
-In-Reply-To: <3917aa37-ed00-9350-1ba5-c3390be6b500@oracle.com>
+Date:   Mon, 14 Dec 2020 14:58:35 +0000
+In-Reply-To: <5cb7cd9b-cdeb-be12-7e86-040b7610b2e7@oracle.com>
 References: <20201214083905.2017260-1-dwmw2@infradead.org>
-         <20201214083905.2017260-18-dwmw2@infradead.org>
-         <3917aa37-ed00-9350-1ba5-c3390be6b500@oracle.com>
+         <20201214083905.2017260-13-dwmw2@infradead.org>
+         <5cb7cd9b-cdeb-be12-7e86-040b7610b2e7@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-g0Hu2JY6gw0+3k/W8FoV"
+        boundary="=-nZsiVu2EfO/WxPrnItZg"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -54,96 +53,41 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-g0Hu2JY6gw0+3k/W8FoV
+--=-nZsiVu2EfO/WxPrnItZg
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2020-12-14 at 13:19 +0000, Joao Martins wrote:
-> But I think there's a flaw here. That is handling the case where you don'=
-t have a
-> vcpu_info registered, and only shared info. The vcpu_info is then placed =
-elsewhere, i.e.
-> another offset out of shared_info -- which is *I think* the case for PVHV=
-M Windows guests.
-
-There is no such case any more. In my v3 patch set I *stopped* the
-kernel from attempting to use the vcpu_info embedded in the shinfo, and
-went to *requiring* that the VMM explicitly tell the kernel where it
-is.
-
-$ git diff xenpv-post-2..xenpv-post-3 -- Documentation
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rs=
-t
-index d98c2ff90880..d1c30105e6fd 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4834,7 +4834,7 @@ experience inconsistent filtering behavior on MSR acc=
-esses.
-                        __u64 gfn;
-                } shared_info;
-                struct {
--                       __u32 vcpu;
-+                       __u32 vcpu_id;
-                        __u64 gpa;
-                } vcpu_attr;
-                __u64 pad[4];
-@@ -4849,9 +4849,13 @@ KVM_XEN_ATTR_TYPE_LONG_MODE
-=20
- KVM_XEN_ATTR_TYPE_SHARED_INFO
-   Sets the guest physical frame number at which the Xen "shared info"
--  page resides. It is the default location for the vcpu_info for the
--  first 32 vCPUs, and contains other VM-wide data structures shared
--  between the VM and the host.
-+  page resides. Note that although Xen places vcpu_info for the first
-+  32 vCPUs in the shared_info page, KVM does not automatically do so
-+  and requires that KVM_XEN_ATTR_TYPE_VCPU_INFO be used explicitly
-+  even when the vcpu_info for a given vCPU resides at the "default"
-+  location in the shared_info page. This is because KVM is not aware
-+  of the Xen CPU id which is used as the index into the vcpu_info[]
-+  array, so cannot know the correct default location.
-=20
- KVM_XEN_ATTR_TYPE_VCPU_INFO
-   Sets the guest physical address of the vcpu_info for a given vCPU.
-
-> Perhaps introducing a helper which adds xen_vcpu_info() and returns you t=
-he hva (picking
-> the right cache) similar to the RFC patch. Albeit that was with page pinn=
-ing, but
-> borrowing an older version I had with hva_to_gfn_cache incantation would =
-probably look like:
+On Mon, 2020-12-14 at 13:29 +0000, Joao Martins wrote:
+> We might be missing the case where only shared_info is registered. Someth=
+ing like:
 >=20
->=20
->         if (v->arch.xen.vcpu_info_set) {
->                 ghc =3D &v->arch.xen.vcpu_info_cache;
->         } else {
->                 ghc =3D &v->arch.xen.vcpu_info_cache;
+>         if (vcpu->xen.shinfo_set && !vcpu->xen.vcpu_info_set) {
+>                 offset =3D offsetof(struct compat_vcpu_info, time);
 >                 offset +=3D offsetof(struct shared_info, vcpu_info);
->                 offset +=3D (v - kvm_get_vcpu_by_id(0)) * sizeof(struct v=
-cpu_info);
+>                 offset +=3D (v - kvm_get_vcpu_by_id(0)) * sizeof(struct c=
+ompat_vcpu_info);
+>                =20
+>                 kvm_setup_pvclock_page(v, &vcpu->xen.shinfo_cache, offset=
+);
 >         }
+>=20
+> Part of the reason I had a kvm_xen_setup_pvclock_page() was to handle thi=
+s all these
+> combinations i.e. 1) shared_info && !vcpu_info 2) vcpu_info and unilateri=
+ally updating
+> secondary time info.
+>=20
+> But maybe introducing this xen_vcpu_info() helper to accommodate all this=
+.
 
-The problem is that we *can't* just use shared_info->vcpu_info[N]
-because we don't know what N is.
+There was complexity.
 
-This is what I spent half of last week chasing down, because whatever I
-tried, the original version just ended up delivering interrupts to the
-wrong CPUs.
+I don't like complexity.
 
-The N we want there is actually the *XEN* vcpu_id, which Xen puts into
-CPUID leaf 0x40000004.ebx and which is also the ACPI ID. (Those two had
-better match up since Linux guests use CPUID 0x40000004 for the BSP and
-ACPI for the APs).
+I made it go away.
 
-The kernel knows nothing of those numbers. In particular they do *not*
-match up to the indices in kvm->vcpus[M] (which is vcpu->vcpu_idx and
-means nothing except the chronological order in which each vCPU's
-userspace thread happened to create it during startup), and they do not
-match up to vcpu->vcpu_id which is the APIC (not ACPI) ID.
 
-The kernel doesn't know. Let userspace tell it, since we already needed
-that API for the separate vcpu_info case anyway.
-
---=-g0Hu2JY6gw0+3k/W8FoV
+--=-nZsiVu2EfO/WxPrnItZg
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -226,20 +170,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MjE0MTQ1NzAwWjAvBgkqhkiG9w0BCQQxIgQg27+hG5QnK+r6T+tuNTN1DUFASRiqpKD8/wCYu213
-ExAwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjE0MTQ1ODM1WjAvBgkqhkiG9w0BCQQxIgQgSuQ5yeda4xPk7QvrkBk/yAWDECaRS0WC19EFU/5Z
+0iQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAKp35SF+mil46k+ojkbFPJimTiBzGTpedTmvSF5o0BleUzYEInVwAy9KjtFlEfF0
-YBXWhJgOAt2GqhNRG+4qnK2n9mZq2lijvedFQAT36WbiSXzfn7AUPTXWxe8xneYZZ+jYqZwuMD8M
-lRtRjMH4S4ay39spG/KkXx2s6Ud4Qcly9vVIoUkR9PGn8UlT9r0E3k3p4C+RFCKqbF/P8x7+ZP0w
-6YLklo4v0eF8IBUjp0cu7YJRlOmtyf0Hn8fnWbN8j7sZfVApnp2ETB0omhS6IZhlbsCHjTxIXcZ5
-7f3ziMagybHjDXjAOL+dn2THcg13NXvL6p63YNW5xIlOEiFZc7sAAAAAAAA=
+DQEBAQUABIIBAA5KK6dL63lYb+iOWGtjg85OGkJcomCpYfDjmlLKQ0JfhC+Wrt8tWH1cPfQDiAAb
+yhIKTAF5CWm3YPI7Yx47ZhV54jp43khW1IVU0yYHZxePfWJbBeaxVbr/c+271MTQ6JZYATSIoGu0
+CwDMBp5XiHpa4qPdia5YdgM59j8tuPlel7IhAkQVAaPFmuYbIZ4bgf9XtXoZif5Ags7uaARJ6OUm
+tE9NloZYZ3ASypNf5PYwv2F0NUEcEujUrcfCVV3UD/YE8Da+VKDoWmHxBeKm0rKNN1tsndeTcarm
+jyS/qfwoeRpgVvNgsP1csnk1wNmt1byrV+YWP/uJBGJ4tBll4YYAAAAAAAA=
 
 
---=-g0Hu2JY6gw0+3k/W8FoV--
+--=-nZsiVu2EfO/WxPrnItZg--
 
