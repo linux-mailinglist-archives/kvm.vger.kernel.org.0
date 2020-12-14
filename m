@@ -2,199 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 726532DA220
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 21:57:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E29862DA271
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 22:15:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387825AbgLNU4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 15:56:19 -0500
-Received: from mail-mw2nam10on2064.outbound.protection.outlook.com ([40.107.94.64]:29169
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726227AbgLNU4K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 15:56:10 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EAU1ayco3IhzEthP1vLAs0t+HLvdVsyFQbP6lMc23g4qAFqj/Ew1jF8ksrmt8LGZUlUwyeZn8xOu1jI9SazfxaqlmJv9/POOPtDX/SzwcSvkqfkQUu9nOg8HdEy+hQX1D8I8dMgrjwdTtdRVtlSsCWsIf+HslyybQ94tN1acTBYJReWJkqPhG4yB/ITuE7XClxtmqkA/mQx1SK7FFymTGEYcc/eUb49DUyZMz8fdDXasOTYnPJPaCqioI1In5FTErIKmok2+QE656so8kuB6ANywvlS7CoHCKjeXe2/Swbe3U+w5lAwXEYenkjqbPmfImqZqFSFP6nDfDtQsg+iB2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ts4YCnk1G5Bev+b+EhGD/d6SQC0uJtfOHsRgc6KEiiU=;
- b=AMoVA08lCaLBTQ4einv2swNDMU9vozoU2b9pZIz4++qsh5armvk9jp86EZNsAiwRyf+0mkgnoKLJm23gnjgOpaqAlpwbI4y1OE4Kp3DbeAq+ElqQlDak8/hALt/Tt5qkVitXxbpUQU0IRrCwh4uy5EuxamJhC5wQ8TtkMbdrVxbUw700sFmDtDlziXvM257PsuwQzY8q/SDz8330V4rXQ3+QCw7s4ASxc48fZ0CenP9GU6OAzu/qMw4rRgPybD2IbdgHk+O1Ja/P9KuX4mkIC+NeDFdlJELIO17bEYBi/IgTkXaHgJeraYtFeD1qOuPjSYCjSQJ7++/0Ms/wFbo3kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ts4YCnk1G5Bev+b+EhGD/d6SQC0uJtfOHsRgc6KEiiU=;
- b=rt0mRx03/r4fRDd2EXanMGBGOseNUTQ7NMLxD2fkoyntcjXRBWm/a9KJJs/QnY07SxZ/K2hHfXnMHGihQrsD45Q/qDASr20DFnieogFyvQXFxJ4TnSSFsgpH3HI9xehvEwyeylEm7aaigLElO9+/wbsLCBkWgNMhT17VxwaZROY=
-Authentication-Results: amazon.com; dkim=none (message not signed)
- header.d=none;amazon.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB2892.namprd12.prod.outlook.com (2603:10b6:5:182::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3632.22; Mon, 14 Dec 2020 20:55:14 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::d95e:b9d:1d6a:e845]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::d95e:b9d:1d6a:e845%12]) with mapi id 15.20.3654.024; Mon, 14 Dec 2020
- 20:55:14 +0000
-Subject: Re: [PATCH 3/3] KVM: x86: introduce complete_emulated_msr callback
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-References: <20201214183250.1034541-1-pbonzini@redhat.com>
- <20201214183250.1034541-4-pbonzini@redhat.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <da346203-7465-dcc8-9ed3-7e92aa136e62@amd.com>
-Date:   Mon, 14 Dec 2020 14:55:12 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20201214183250.1034541-4-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH0PR03CA0012.namprd03.prod.outlook.com
- (2603:10b6:610:b0::17) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S2503481AbgLNVPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 16:15:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42794 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728461AbgLNVPM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 16:15:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607980425;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yBM6GwLsbOpYYOoBdDeKnBBPU0ajqAjEvKlkTZFVb1I=;
+        b=IxA4BxzE3lmgLbyoSPnYvYeu8DNHZS+0hJgdEVzLXK6O/F27rPQDJFYBVqAN+BsZIcib9f
+        qNlKqD/n3Dy8lJhOVNE5oQIW6E8T26S8wiSPBevu9HF30r43IGl6H/WZ6pdKyOw1Td6oJT
+        IWQ+NOjWgAzcXJOnpy5Iau4yykyPKLQ=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-J7cLns8zNh-9WW_Mj_ggnQ-1; Mon, 14 Dec 2020 16:13:43 -0500
+X-MC-Unique: J7cLns8zNh-9WW_Mj_ggnQ-1
+Received: by mail-ej1-f69.google.com with SMTP id g18so5034008eje.1
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 13:13:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=yBM6GwLsbOpYYOoBdDeKnBBPU0ajqAjEvKlkTZFVb1I=;
+        b=QfN1JUWBdiIbQnbQHSHbw1GC5ZGaFEfg9hYk50UYFftgbOaCQ99EcnQFx+aOwZ6GVv
+         ubz/fKhkqKVHHvpn/PIpzOVveb7MWNZn0LpyQGRmMNjKkvgLnUTnIDTfj2KyRw7cgVq3
+         +LbZ1XyWTIRSMjU8tQ3ebIGKBTtylg8NmzpaNHy49RVBz+nSaNnfSXsbi/suN40d2t/4
+         GYUeX6kCj3VnEzXRT2ysueByjonqhnzf6AYYqkd6eqEtYDkd+4XCSinH+zcfbp5q7IVw
+         200kZ1ePLznIxf/vk3HVADkWK83fzs4JeHeDP3i8aYQQNdG96plQ5daB96TPWZXZbyxH
+         XrqQ==
+X-Gm-Message-State: AOAM532s/oAFsl2T1FzHsYa5m5ib8FZdZDsu37b1KmXWSJgbs1fQnzsD
+        D2RKMv/F0dwDiruJ6ZyN0w5W0fqGYSxDmrD3fvp19oyIHzdW/xZbrcD6mBTpUnP8v9b6vy1sKE6
+        KF2Njxpaiztbh
+X-Received: by 2002:a50:d5c1:: with SMTP id g1mr27542229edj.299.1607980422374;
+        Mon, 14 Dec 2020 13:13:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwUGsTdEeL5YFkgnOsN5chqPJOJLrHGFiF3T52Fl6g6X4SA6FgVJC4ISaFrBN8wjhc8S2JGyA==
+X-Received: by 2002:a50:d5c1:: with SMTP id g1mr27542213edj.299.1607980422202;
+        Mon, 14 Dec 2020 13:13:42 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id s12sm16669891edu.28.2020.12.14.13.13.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Dec 2020 13:13:41 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com
+Subject: Re: [PATCH v3 01/17] KVM: Fix arguments to kvm_{un,}map_gfn()
+In-Reply-To: <20201214083905.2017260-2-dwmw2@infradead.org>
+References: <20201214083905.2017260-1-dwmw2@infradead.org>
+ <20201214083905.2017260-2-dwmw2@infradead.org>
+Date:   Mon, 14 Dec 2020 22:13:40 +0100
+Message-ID: <87ft48w0or.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by CH0PR03CA0012.namprd03.prod.outlook.com (2603:10b6:610:b0::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.17 via Frontend Transport; Mon, 14 Dec 2020 20:55:13 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b18c7ad8-28e7-4f98-55e3-08d8a0728e20
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2892:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB2892BACB90E12A707DDBC72CECC70@DM6PR12MB2892.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:989;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 63wa6TcHW+Qsa+SujW6ZUnN2AY5OOlrieqKacCfHrH9QnDWnAjDMzDRNC13GICW8zgmutemkO271b3kh08XUztF112buWUpRsW1EyOD1yEc0i2xh44OpUFcgi/ZfdmEZ8heiocOCYAzBM/AwLlR8qoCfi4QGxDrkKYER8miTUEy+f44Ac6wKDNT3kitpQEW+H212MvzICjPNHSaxJsaLylIgcOUpkKPrKkeYSR7poC2Ght9eWoHa/nU3G4aFh+zRbv0xAHy9Hul/kygVrKb9X5sPrjqNfKIkpE+DCxNOEDxJvXtafWIOibZM23odkloBwXS6M6zez0FZg6rbrFUJll1/jojmkHbxdyzMrJ3s2sg6t1Wjtdz43mI8loxbjt+WEBM+A6zzuvGmasc5cxH8tMsBG8btbUwKP5BevTNwe2kzWn3kdRF0x+OFLxh6ZHtz
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(346002)(136003)(6486002)(5660300002)(53546011)(52116002)(34490700003)(54906003)(31686004)(508600001)(83380400001)(8936002)(16576012)(186003)(4326008)(16526019)(26005)(86362001)(66556008)(66476007)(2616005)(31696002)(956004)(36756003)(8676002)(66946007)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?cVE3RnFPSS8zYnBzMitDM3AwaXdVU0NJOENJYUFtTjhXRWxCZDJpNVJvdm1s?=
- =?utf-8?B?STdnR2xTSC9hVG8rU0xNMjg5THBLQy9yR2l5YWlZQXdDSnFPellGUVNuc2RU?=
- =?utf-8?B?VjFwc1JlUVRYNXFHaTlOSjJOL1piUmc2cG5xRkNBWDJwamVVK3VuSWxweHE0?=
- =?utf-8?B?Q2grRlFjbk1TR2tRd1FCZWdwSjM3dEpSQndHK204SkRKMWpOeDZRNlBNTnRw?=
- =?utf-8?B?ZFA1ZW9HejZtUmZIb0E4R1hIRWJNMDRmZ0xtdHJDUjNUVFFLYks0RHRRU3d2?=
- =?utf-8?B?UXZ5YWhmekpBVzZtUUh3TkY1OGlnNUJYUG8yc3RiMU1hckZzdmNMa0NrN2k1?=
- =?utf-8?B?TTI1TDMxS2NQNnFmNG5rSDlzMHd5RGo3akR0WE42Zy9rSlVYSFAyOGg3Yjh1?=
- =?utf-8?B?eE9lSjhIY1p4UjNrcEkvMWhuNWZLQlhyekhjd2tXWWMvWmJQL0hQT3FGQmxL?=
- =?utf-8?B?VW9uVk9YTUthbUpLOGV3QlREZzBSZG1QSTN2U0hHTFBtZUcwenRIQXpxYmd0?=
- =?utf-8?B?YTFqUjE2S1lqQ0xSbFQ1UjRpWkUzdXpqNzlsejhyYVppRVpPVkdzZkdUN0c2?=
- =?utf-8?B?UDk0aUN3SWVoL0RuOEdsTnlockF5VmxqODVOZitXdXlzMzZISVI2eHBGTmNW?=
- =?utf-8?B?bm5tSGxpMkViRmlvMnV1WGFXYTJqbHQzWVdZYk1WM1E0ZGh0SW9iRGppd3BL?=
- =?utf-8?B?TWx4cjN2YjNEbTdTUjcxODNiT1J5NGgzYmZCcHJidnNBSEp3SWFkc2JSVXdX?=
- =?utf-8?B?Q3QwYTQ3ZDNTcEJEWmozNzh5c2x1dkdqV2V2eGtLakFMWVRDaWxjYVFHYmlw?=
- =?utf-8?B?QUg3M01BSk4veHBlVEU5Y0o4Sko2Q3RrUEdST2ticFNjaUQ2V05pN0JLMTI2?=
- =?utf-8?B?dSt4RWZvNkh2U2JRWFZmUGpZTjltbHlKZU82MVM5V1gvMDhTVjJiM0VpemhI?=
- =?utf-8?B?U0dtdTRpNmVCZjFXRnlvQ0dPZU5icEJBdFF1VTIyRXExcUlLTDNVY1NwbFdB?=
- =?utf-8?B?RjE5dFEzQkVqK0E3UGw5STdGeGIrQVV1clZySExMTVFLaXdVU2k5ZDNIRGZX?=
- =?utf-8?B?bWZmNmxyY1NFeUpSSjNpQVloY2hFRE9oUzVWMFlaQ0I5cUFRandJWTFEeW1S?=
- =?utf-8?B?UFo2MlRtSUdMeExzYTN5VzgvZVorbEdOY2kxd2NUVnJzU24rT3dpS2pwSXMr?=
- =?utf-8?B?U1BjZTFuRHVLdzkrMVA0Tk1xbXpqUGx5REtCRHNpY1JxcS84OFVCSnFZOEhI?=
- =?utf-8?B?M1FHOHVKUjdCZk9UR1FOZG0zVVdzb2lOOCtmNmtGdzk3Y0ptQUdTSUFTTG85?=
- =?utf-8?Q?E6EQwR0QiCPnHHAEpeHWO3r8D/lkq6xM8I?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2020 20:55:14.3055
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: b18c7ad8-28e7-4f98-55e3-08d8a0728e20
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 426vahXQzB0cB+BCGKMTXFuFSmgljkInVwS16+sAjHaR3VnUR/6HvIT3UKZgpBrfMI/1whcoE46fz59hvF3Feg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2892
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/14/20 12:32 PM, Paolo Bonzini wrote:
-> This will be used by SEV-ES to inject MSR failure via the GHCB.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+David Woodhouse <dwmw2@infradead.org> writes:
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-
-(Changed Sean's email on this reply, but missed the others...)
-
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>
+> It shouldn't take a vcpu.
+>
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->  arch/x86/include/asm/kvm_host.h | 1 +
->  arch/x86/kvm/svm/svm.c          | 1 +
->  arch/x86/kvm/vmx/vmx.c          | 1 +
->  arch/x86/kvm/x86.c              | 8 ++++----
->  4 files changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 8cf6b0493d49..18aa15e6fadd 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1285,6 +1285,7 @@ struct kvm_x86_ops {
->  
->  	void (*migrate_timers)(struct kvm_vcpu *vcpu);
->  	void (*msr_filter_changed)(struct kvm_vcpu *vcpu);
-> +	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 801e0a641258..4067d511be08 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4306,6 +4306,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
->  
->  	.msr_filter_changed = svm_msr_filter_changed,
-> +	.complete_emulated_msr = kvm_complete_insn_gp,
->  };
->  
->  static struct kvm_x86_init_ops svm_init_ops __initdata = {
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 849be2a9f260..55fa51c0cd9d 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7701,6 +7701,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->  	.migrate_timers = vmx_migrate_timers,
->  
->  	.msr_filter_changed = vmx_msr_filter_changed,
-> +	.complete_emulated_msr = kvm_complete_insn_gp,
->  	.cpu_dirty_log_size = vmx_cpu_dirty_log_size,
->  };
->  
+>  arch/x86/kvm/x86.c       | 8 ++++----
+>  include/linux/kvm_host.h | 4 ++--
+>  virt/kvm/kvm_main.c      | 8 ++++----
+>  3 files changed, 10 insertions(+), 10 deletions(-)
+>
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2f1bc52e70c0..6c4482b97c91 100644
+> index e545a8a613b1..c7f1ba21212e 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -1642,12 +1642,12 @@ static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
->  		kvm_rdx_write(vcpu, vcpu->run->msr.data >> 32);
->  	}
+> @@ -2957,7 +2957,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>  		return;
 >  
-> -	return kvm_complete_insn_gp(vcpu, err);
-> +	return kvm_x86_ops.complete_emulated_msr(vcpu, err);
+>  	/* -EAGAIN is returned in atomic context so we can just return. */
+> -	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT,
+> +	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT,
+>  			&map, &vcpu->arch.st.cache, false))
+>  		return;
+>  
+> @@ -2992,7 +2992,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>  
+>  	st->version += 1;
+>  
+> -	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, false);
+> +	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, false);
 >  }
 >  
->  static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
+>  int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> @@ -3981,7 +3981,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+>  	if (vcpu->arch.st.preempted)
+>  		return;
+>  
+> -	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
+> +	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
+>  			&vcpu->arch.st.cache, true))
+>  		return;
+>  
+> @@ -3990,7 +3990,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+>  
+>  	st->preempted = vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
+>  
+> -	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, true);
+> +	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, true);
+>  }
+>  
+>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 7f2e2a09ebbd..8eb5eb1399f5 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -806,11 +806,11 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+>  kvm_pfn_t kvm_vcpu_gfn_to_pfn_atomic(struct kvm_vcpu *vcpu, gfn_t gfn);
+>  kvm_pfn_t kvm_vcpu_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+>  int kvm_vcpu_map(struct kvm_vcpu *vcpu, gpa_t gpa, struct kvm_host_map *map);
+> -int kvm_map_gfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
+> +int kvm_map_gfn(struct kvm *kvm, gfn_t gfn, struct kvm_host_map *map,
+>  		struct gfn_to_pfn_cache *cache, bool atomic);
+>  struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn);
+>  void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map, bool dirty);
+> -int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
+> +int kvm_unmap_gfn(struct kvm *kvm, struct kvm_host_map *map,
+>  		  struct gfn_to_pfn_cache *cache, bool dirty, bool atomic);
+>  unsigned long kvm_vcpu_gfn_to_hva(struct kvm_vcpu *vcpu, gfn_t gfn);
+>  unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *writable);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2541a17ff1c4..f01a8df7806a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2181,10 +2181,10 @@ static int __kvm_map_gfn(struct kvm_memslots *slots, gfn_t gfn,
+>  	return 0;
+>  }
+>  
+> -int kvm_map_gfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
+> +int kvm_map_gfn(struct kvm *kvm, gfn_t gfn, struct kvm_host_map *map,
+>  		struct gfn_to_pfn_cache *cache, bool atomic)
 >  {
-> -	return kvm_complete_insn_gp(vcpu, vcpu->run->msr.error);
-> +	return kvm_x86_ops.complete_emulated_msr(vcpu, vcpu->run->msr.error);
+> -	return __kvm_map_gfn(kvm_memslots(vcpu->kvm), gfn, map,
+> +	return __kvm_map_gfn(kvm_memslots(kvm), gfn, map,
+>  			cache, atomic);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_map_gfn);
+> @@ -2232,10 +2232,10 @@ static void __kvm_unmap_gfn(struct kvm_memory_slot *memslot,
+>  	map->page = NULL;
 >  }
 >  
->  static u64 kvm_msr_reason(int r)
-> @@ -1720,7 +1720,7 @@ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
->  		trace_kvm_msr_read_ex(ecx);
->  	}
->  
-> -	return kvm_complete_insn_gp(vcpu, r);
-> +	return kvm_x86_ops.complete_emulated_msr(vcpu, r);
+> -int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map, 
+> +int kvm_unmap_gfn(struct kvm *kvm, struct kvm_host_map *map,
+>  		  struct gfn_to_pfn_cache *cache, bool dirty, bool atomic)
+>  {
+> -	__kvm_unmap_gfn(gfn_to_memslot(vcpu->kvm, map->gfn), map,
+> +	__kvm_unmap_gfn(gfn_to_memslot(kvm, map->gfn), map,
+>  			cache, dirty, atomic);
+>  	return 0;
 >  }
->  EXPORT_SYMBOL_GPL(kvm_emulate_rdmsr);
->  
-> @@ -1747,7 +1747,7 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
->  	else
->  		trace_kvm_msr_write_ex(ecx, data);
->  
-> -	return kvm_complete_insn_gp(vcpu, r);
-> +	return kvm_x86_ops.complete_emulated_msr(vcpu, r);
->  }
->  EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr);
->  
-> 
+
+What about different address space ids? 
+
+gfn_to_memslot() now calls kvm_memslots() which gives memslots for
+address space id = 0 but what if we want something different? Note,
+different vCPUs can (in theory) be in different address spaces so we
+actually need 'vcpu' and not 'kvm' then.
+
+-- 
+Vitaly
+
