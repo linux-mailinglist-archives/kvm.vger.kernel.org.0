@@ -2,128 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9F492DA0B6
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 20:41:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F0FE2DA0BA
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 20:44:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502200AbgLNTkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 14:40:23 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28770 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2502451AbgLNTkH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 14:40:07 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BEJWXLH055980;
-        Mon, 14 Dec 2020 14:39:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=NfbmMGPGggSntZnV08WpyL7IdWUT25YdQzm8WlnYAO8=;
- b=AQerL53bXzprya9YvkNX4wQpn6WikgNvPSPIqoCyFhlQFtYtOOVTDd5+G32y7ef0hyCN
- k5y+D4z/fvjP/8FD4ZnEiX6/dfE2z7tuGALVYtsG8eRY21mGSFqX6lib8JznXO0uUOaV
- OEV6Ng8sRVaXmnedu69+p5t46UlBD5HAR/UlMRCyhE4eZYLC84RXB6urhdbWSvFz8mjI
- eLUbyfKA+0ApHQZro5n6a4Y1c5YRrkBwEG773gUiwCpOv4WxGMnOddzFl4kXzpr/IwPE
- E0qGl6B1uZcA9LIL0KW4XYY/y4LI+40JDrZ6Vev+iHj3m7ZneV7ieWk82fMy4isHyS4W fQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35ebcg5hfk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 14:39:20 -0500
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BEJWw8a058074;
-        Mon, 14 Dec 2020 14:39:20 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35ebcg5hfa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 14:39:20 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BEJWm0v002872;
-        Mon, 14 Dec 2020 19:39:19 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma02dal.us.ibm.com with ESMTP id 35d525h24a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 19:39:19 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BEJdIKA26018208
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Dec 2020 19:39:18 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64F82AE064;
-        Mon, 14 Dec 2020 19:39:18 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BE97CAE05C;
-        Mon, 14 Dec 2020 19:39:17 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Dec 2020 19:39:17 +0000 (GMT)
-Subject: Re: [PATCH v3] s390/vfio-ap: clean up vfio_ap resources when KVM
- pointer invalidated
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org, sashal@kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-References: <20201214165617.28685-1-akrowiak@linux.ibm.com>
- <X9ebwKJSSyVP/M9H@kroah.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <237fe6d3-ebcc-1046-b295-a0154ce1158e@linux.ibm.com>
-Date:   Mon, 14 Dec 2020 14:39:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2441148AbgLNTmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 14:42:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37774 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2440560AbgLNTmm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 14:42:42 -0500
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FAF0C061793
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 11:42:02 -0800 (PST)
+Received: by mail-pj1-x1043.google.com with SMTP id hk16so7294606pjb.4
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 11:42:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=tQ1Bpu5oHoBGvr4L4gTgzNHgLGZGVMAxov28riT0mIk=;
+        b=nDBML6/9KtUJt5AWaYUKQflXKeK3VuKMTrX1RFv6y8ooY5/ol4lS8Z3W70b26pmrfJ
+         NFKxUG8kf2HMgppCqREHwAYV8nUy5lGfa37TtU70cPxL/GaqaQLTGJo+8qlE5XynIajI
+         rPbGO5xRmDDMJPJNVRwGzeTsRd6wf49l8kyue9oU0QQYQ7bf4bfqE4uxRiwUCnQWZBwP
+         YE5IkCmrJg788kJaSY9NJ0D9cUcYwvGRrMGvuLqeai0iL3w4Oodhrk0PFg8Cd3mMKkBw
+         YW9CqEIPYtqPE7ATJs56fNhuwVnoe8y8rus+HQcPwQZhzg2GA8ZuTg8kgZdRttEEetmW
+         3MDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=tQ1Bpu5oHoBGvr4L4gTgzNHgLGZGVMAxov28riT0mIk=;
+        b=ncUmsSX4ff463RhsckRn1AOcgd2nz373AHG7r5lpcX4NSqsf9/FuxknQLAMwWVqPIl
+         cbsO5uLZK6UOO+XjjYXrxYQfxXqWlP33AUQZvHJgzefArMI27Kx8A/g905VjTw2/Zu5X
+         2+vGPIa9sE6qDR7Pk+4gJ9mDyU5oZF7qCY2tz+fFwRkT4HGRIL8PZA8V2dl9KTJfmXPT
+         SZzJZBsmF4w2UgsQ8qmgRQyPO2V8GEcis48+QXacCnfWvfe67a6eSCyZ7KTEezWheY4Q
+         lMDlz05BPvl7DPfP3+3ykQGTapBmdT7arZ10LB7YAdPc5prTM+sIp2bm0/8ShAFQg7xQ
+         fq8Q==
+X-Gm-Message-State: AOAM530noDEDmhxaW2BM76f5rRIIA1vh88W2XhPyDwjpQHErueIx7WJB
+        nD5OyM9bSwlXCKEHsW46wbi00g==
+X-Google-Smtp-Source: ABdhPJxut0s9zU9vwkfccoPDTRKtBV5FQ6zi56LS/XeWZaLsLJSLO9kMNI9kNB9W9Klijp1XuHZZXg==
+X-Received: by 2002:a17:90b:80d:: with SMTP id bk13mr22195210pjb.41.1607974921955;
+        Mon, 14 Dec 2020 11:42:01 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id h7sm21031678pfr.210.2020.12.14.11.42.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Dec 2020 11:42:01 -0800 (PST)
+Date:   Mon, 14 Dec 2020 11:41:54 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v5 12/34] KVM: SVM: Add initial support for a VMGEXIT
+ VMEXIT
+Message-ID: <X9fAAhF2LzOmZAtv@google.com>
+References: <cover.1607620209.git.thomas.lendacky@amd.com>
+ <c6a4ed4294a369bd75c44d03bd7ce0f0c3840e50.1607620209.git.thomas.lendacky@amd.com>
+ <7bac31c8-a008-8223-0ed5-9c25012e380a@redhat.com>
+ <33e98d2d-93b5-acd6-4608-f30c709019ad@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <X9ebwKJSSyVP/M9H@kroah.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-14_10:2020-12-11,2020-12-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- spamscore=0 mlxlogscore=797 suspectscore=0 clxscore=1015 bulkscore=0
- phishscore=0 priorityscore=1501 impostorscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012140125
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <33e98d2d-93b5-acd6-4608-f30c709019ad@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Dec 14, 2020, Tom Lendacky wrote:
+> On 12/14/20 9:45 AM, Paolo Bonzini wrote:
+> > On 10/12/20 18:09, Tom Lendacky wrote:
+> >> @@ -3184,6 +3186,8 @@ static int svm_invoke_exit_handler(struct vcpu_svm
+> >> *svm, u64 exit_code)
+> >>           return halt_interception(svm);
+> >>       else if (exit_code == SVM_EXIT_NPF)
+> >>           return npf_interception(svm);
+> >> +    else if (exit_code == SVM_EXIT_VMGEXIT)
+> >> +        return sev_handle_vmgexit(svm);
+> > 
+> > Are these common enough to warrant putting them in this short list?
+> 
+> A VMGEXIT exit occurs for any of the listed NAE events in the GHCB
+> specification (e.g. CPUID, RDMSR/WRMSR, MMIO, port IO, etc.) if those
+> events are being intercepted (or triggered in the case of MMIO). It will
+> depend on what is considered common. Since SVM_EXIT_MSR was already in the
+> list, I figured I should add VMGEXIT.
 
-
-On 12/14/20 12:07 PM, Greg KH wrote:
-> On Mon, Dec 14, 2020 at 11:56:17AM -0500, Tony Krowiak wrote:
->> The vfio_ap device driver registers a group notifier with VFIO when the
->> file descriptor for a VFIO mediated device for a KVM guest is opened to
->> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
->> event). When the KVM pointer is set, the vfio_ap driver takes the
->> following actions:
->> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
->>     of the mediated device.
->> 2. Calls the kvm_get_kvm() function to increment its reference counter.
->> 3. Sets the function pointer to the function that handles interception of
->>     the instruction that enables/disables interrupt processing.
->> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
->>     the guest.
->>
->> In order to avoid memory leaks, when the notifier is called to receive
->> notification that the KVM pointer has been set to NULL, the vfio_ap device
->> driver should reverse the actions taken when the KVM pointer was set.
->>
->> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 29 ++++++++++++++++++++---------
->>   1 file changed, 20 insertions(+), 9 deletions(-)
-> <formletter>
->
-> This is not the correct way to submit patches for inclusion in the
-> stable kernel tree.  Please read:
->      https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-> for how to do this properly.
->
-> </formletter>
-
-I read the document on the correct way to submit patches for inclusion in
-the stable kernel. I apologize for my ignorance, but I don't see the
-problem. Can you help me out here? Does a patch that fixes a memory leak
-not qualify or is it something else?
-
-
+I agree VMGEXIT should be added to the hot path, it could very well be the most
+common exit reason due to all instruction-based emulation getting funneled
+through VMGEXIT.
