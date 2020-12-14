@@ -2,236 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF5132DA0B3
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 20:39:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9F492DA0B6
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 20:41:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502514AbgLNTjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 14:39:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37232 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2502231AbgLNTjM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 14:39:12 -0500
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A931C0613D6
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 11:38:32 -0800 (PST)
-Received: by mail-pg1-x544.google.com with SMTP id w16so13279860pga.9
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 11:38:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7ML7ThXu8y4LI3MvZ4tRJfKc7dUKZJX7duL+1BfFjz4=;
-        b=nng+F48fGur3o1uwwTgM/1tCRsagqNFpojAjfFep0QysXyAcifr8JuIm9qxFuAMgCh
-         5WaRdBqfhtwWAg91tH7D4YUWd+40dnYLECgA99C+q8LLM/AiUNO2QUVfTzJyW0tmX2iO
-         1hwk4iVsqmeV6g37Q/KpUBVY5wpNpPvHIg/brXueB+Z1SQXdiURqGWi9LO8ctSSevKcP
-         Mfdz0Us5LlLAtxcTJ1v00aCyS6BSXcYT1TYpXk0T1MraNB0Y+BhCZYaQEcgdfW/gR20Y
-         122w/B2A0AycQeBoDqy7BmigwpkcK8UulBjK/xHXoTEPP5p0fXYOu9R927Al/SBmZqPv
-         Z7BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7ML7ThXu8y4LI3MvZ4tRJfKc7dUKZJX7duL+1BfFjz4=;
-        b=CSkgm1qYFE6157Ava/2wqWQCEcYcU6gW3awoUXHqE5qS+tYOsS8CvkcpmlrBOiyiOj
-         Ib+9Mf5QXFzVdoq0uW013Qgf0e9VXGFeMGr15HVTA/eoEheLTT64g1oMzGELHOHEhlCU
-         RJTKewJuNTP5LNzVUg7iPMRwsTWuZzE1ydjkGImluG0Xl/RbHSPmE/J+5Csh5BotRI27
-         IqubYRbvpKVYzvPgD5S/elVFor3liBCKoztqDfmzvT5dxA8Fi7Ju3UO1Zn7mdo1x1FB8
-         vgRgQZEQhZjLekxQusGZMbqQbrECk31gYJ2CB7r72DtASH7+4NKzYLx0LhPMl8qApfPU
-         SRjA==
-X-Gm-Message-State: AOAM533FMWNbG1eCF4fO2gRrvlld4EWaZ0nhJ7oFJLvAs/OcfSsN41H7
-        HhfYqL8c8O7q21gbKuCKrHK5JQ==
-X-Google-Smtp-Source: ABdhPJzZbXVpUg3QFZ/YUx6ClXATAvESyuTowwoLEVEoFfBa0X5Mc/V8DGVRR8RnRMEZP721M9afmQ==
-X-Received: by 2002:aa7:9501:0:b029:155:3b11:d5c4 with SMTP id b1-20020aa795010000b02901553b11d5c4mr24567294pfp.76.1607974711328;
-        Mon, 14 Dec 2020 11:38:31 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id c62sm17084018pfa.116.2020.12.14.11.38.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Dec 2020 11:38:30 -0800 (PST)
-Date:   Mon, 14 Dec 2020 11:38:23 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Andy Lutomirski <luto@kernel.org>
-Subject: Re: [PATCH v2] KVM: SVM: use vmsave/vmload for saving/restoring
- additional host state
-Message-ID: <X9e/L3YTAT/N+ljh@google.com>
-References: <20201214174127.1398114-1-michael.roth@amd.com>
+        id S2502200AbgLNTkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 14:40:23 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28770 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2502451AbgLNTkH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 14:40:07 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BEJWXLH055980;
+        Mon, 14 Dec 2020 14:39:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=NfbmMGPGggSntZnV08WpyL7IdWUT25YdQzm8WlnYAO8=;
+ b=AQerL53bXzprya9YvkNX4wQpn6WikgNvPSPIqoCyFhlQFtYtOOVTDd5+G32y7ef0hyCN
+ k5y+D4z/fvjP/8FD4ZnEiX6/dfE2z7tuGALVYtsG8eRY21mGSFqX6lib8JznXO0uUOaV
+ OEV6Ng8sRVaXmnedu69+p5t46UlBD5HAR/UlMRCyhE4eZYLC84RXB6urhdbWSvFz8mjI
+ eLUbyfKA+0ApHQZro5n6a4Y1c5YRrkBwEG773gUiwCpOv4WxGMnOddzFl4kXzpr/IwPE
+ E0qGl6B1uZcA9LIL0KW4XYY/y4LI+40JDrZ6Vev+iHj3m7ZneV7ieWk82fMy4isHyS4W fQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35ebcg5hfk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Dec 2020 14:39:20 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BEJWw8a058074;
+        Mon, 14 Dec 2020 14:39:20 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35ebcg5hfa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Dec 2020 14:39:20 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BEJWm0v002872;
+        Mon, 14 Dec 2020 19:39:19 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma02dal.us.ibm.com with ESMTP id 35d525h24a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 14 Dec 2020 19:39:19 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BEJdIKA26018208
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Dec 2020 19:39:18 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 64F82AE064;
+        Mon, 14 Dec 2020 19:39:18 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE97CAE05C;
+        Mon, 14 Dec 2020 19:39:17 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 14 Dec 2020 19:39:17 +0000 (GMT)
+Subject: Re: [PATCH v3] s390/vfio-ap: clean up vfio_ap resources when KVM
+ pointer invalidated
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org, sashal@kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+References: <20201214165617.28685-1-akrowiak@linux.ibm.com>
+ <X9ebwKJSSyVP/M9H@kroah.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <237fe6d3-ebcc-1046-b295-a0154ce1158e@linux.ibm.com>
+Date:   Mon, 14 Dec 2020 14:39:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201214174127.1398114-1-michael.roth@amd.com>
+In-Reply-To: <X9ebwKJSSyVP/M9H@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-14_10:2020-12-11,2020-12-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ spamscore=0 mlxlogscore=797 suspectscore=0 clxscore=1015 bulkscore=0
+ phishscore=0 priorityscore=1501 impostorscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012140125
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Andy, who provided a lot of feedback on v1.
 
-On Mon, Dec 14, 2020, Michael Roth wrote:
 
-Cc: Andy Lutomirski <luto@kernel.org>
+On 12/14/20 12:07 PM, Greg KH wrote:
+> On Mon, Dec 14, 2020 at 11:56:17AM -0500, Tony Krowiak wrote:
+>> The vfio_ap device driver registers a group notifier with VFIO when the
+>> file descriptor for a VFIO mediated device for a KVM guest is opened to
+>> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
+>> event). When the KVM pointer is set, the vfio_ap driver takes the
+>> following actions:
+>> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
+>>     of the mediated device.
+>> 2. Calls the kvm_get_kvm() function to increment its reference counter.
+>> 3. Sets the function pointer to the function that handles interception of
+>>     the instruction that enables/disables interrupt processing.
+>> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
+>>     the guest.
+>>
+>> In order to avoid memory leaks, when the notifier is called to receive
+>> notification that the KVM pointer has been set to NULL, the vfio_ap device
+>> driver should reverse the actions taken when the KVM pointer was set.
+>>
+>> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   drivers/s390/crypto/vfio_ap_ops.c | 29 ++++++++++++++++++++---------
+>>   1 file changed, 20 insertions(+), 9 deletions(-)
+> <formletter>
+>
+> This is not the correct way to submit patches for inclusion in the
+> stable kernel tree.  Please read:
+>      https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+> for how to do this properly.
+>
+> </formletter>
 
-> Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
-> v2:
-> * rebase on latest kvm/next
-> * move VMLOAD to just after vmexit so we can use it to handle all FS/GS
->   host state restoration and rather than relying on loadsegment() and
->   explicit write to MSR_GS_BASE (Andy)
-> * drop 'host' field from struct vcpu_svm since it is no longer needed
->   for storing FS/GS/LDT state (Andy)
-> ---
->  arch/x86/kvm/svm/svm.c | 44 ++++++++++++++++--------------------------
->  arch/x86/kvm/svm/svm.h | 14 +++-----------
->  2 files changed, 20 insertions(+), 38 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 0e52fac4f5ae..fb15b7bd461f 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1367,15 +1367,19 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  		vmcb_mark_all_dirty(svm->vmcb);
->  	}
->  
-> -#ifdef CONFIG_X86_64
-> -	rdmsrl(MSR_GS_BASE, to_svm(vcpu)->host.gs_base);
-> -#endif
-> -	savesegment(fs, svm->host.fs);
-> -	savesegment(gs, svm->host.gs);
-> -	svm->host.ldt = kvm_read_ldt();
-> -
-> -	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
-> +	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++) {
->  		rdmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
-> +	}
+I read the document on the correct way to submit patches for inclusion in
+the stable kernel. I apologize for my ignorance, but I don't see the
+problem. Can you help me out here? Does a patch that fixes a memory leak
+not qualify or is it something else?
 
-Unnecessary change that violates preferred coding style.  Checkpatch explicitly
-complains about this.
 
-WARNING: braces {} are not necessary for single statement blocks
-#132: FILE: arch/x86/kvm/svm/svm.c:1370:
-+	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++) {
- 		rdmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
-+
-
-> +
-> +	asm volatile(__ex("vmsave")
-> +		     : : "a" (page_to_pfn(sd->save_area) << PAGE_SHIFT)
-
-I'm pretty sure this can be page_to_phys().
-
-> +		     : "memory");
-
-I think we can defer this until we're actually planning on running the guest,
-i.e. put this in svm_prepare_guest_switch().
-
-> +	/*
-> +	 * Store a pointer to the save area to we can access it after
-> +	 * vmexit for vmload. This is needed since per-cpu accesses
-> +	 * won't be available until GS is restored as part of vmload
-> +	 */
-> +	svm->host_save_area = sd->save_area;
-
-Unless I'm missing something with how SVM loads guest state, you can avoid
-adding host_save_area by saving the PA of the save area on the stack prior to
-the vmload of guest state.
-
->  
->  	if (static_cpu_has(X86_FEATURE_TSCRATEMSR)) {
->  		u64 tsc_ratio = vcpu->arch.tsc_scaling_ratio;
-> @@ -1403,18 +1407,10 @@ static void svm_vcpu_put(struct kvm_vcpu *vcpu)
->  	avic_vcpu_put(vcpu);
->  
->  	++vcpu->stat.host_state_reload;
-> -	kvm_load_ldt(svm->host.ldt);
-> -#ifdef CONFIG_X86_64
-> -	loadsegment(fs, svm->host.fs);
-> -	wrmsrl(MSR_KERNEL_GS_BASE, current->thread.gsbase);
-> -	load_gs_index(svm->host.gs);
-> -#else
-> -#ifdef CONFIG_X86_32_LAZY_GS
-> -	loadsegment(gs, svm->host.gs);
-> -#endif
-> -#endif
-> -	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
-> +
-> +	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++) {
->  		wrmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
-> +	}
-
-Same bogus change and checkpatch warning.
-
->  }
->  
->  static unsigned long svm_get_rflags(struct kvm_vcpu *vcpu)
-> @@ -3507,14 +3503,8 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
->  
->  	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
-
-Tying in with avoiding svm->host_save_area, what about passing in the PA of the
-save area and doing the vmload in __svm_vcpu_run()?  One less instance of inline
-assembly to stare at...
-
->  
-> -#ifdef CONFIG_X86_64
-> -	native_wrmsrl(MSR_GS_BASE, svm->host.gs_base);
-> -#else
-> -	loadsegment(fs, svm->host.fs);
-> -#ifndef CONFIG_X86_32_LAZY_GS
-> -	loadsegment(gs, svm->host.gs);
-> -#endif
-> -#endif
-> +	asm volatile(__ex("vmload")
-> +		     : : "a" (page_to_pfn(svm->host_save_area) << PAGE_SHIFT));
->  
->  	/*
->  	 * VMEXIT disables interrupts (host state), but tracing and lockdep
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index fdff76eb6ceb..bf01a8c19ec0 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -21,11 +21,6 @@
->  #include <asm/svm.h>
->  
->  static const u32 host_save_user_msrs[] = {
-> -#ifdef CONFIG_X86_64
-> -	MSR_STAR, MSR_LSTAR, MSR_CSTAR, MSR_SYSCALL_MASK, MSR_KERNEL_GS_BASE,
-> -	MSR_FS_BASE,
-> -#endif
-> -	MSR_IA32_SYSENTER_CS, MSR_IA32_SYSENTER_ESP, MSR_IA32_SYSENTER_EIP,
->  	MSR_TSC_AUX,
-
-With this being whittled down to TSC_AUX, a good follow-on series would be to
-add SVM usage of the "user return" MSRs to handle TSC_AUX.  If no one objects,
-I'll plan on doing that in the not-too-distant future as a ramp task of sorts.
-
->  };
->  
-> @@ -117,12 +112,9 @@ struct vcpu_svm {
->  	u64 next_rip;
->  
->  	u64 host_user_msrs[NR_HOST_SAVE_USER_MSRS];
-> -	struct {
-> -		u16 fs;
-> -		u16 gs;
-> -		u16 ldt;
-> -		u64 gs_base;
-> -	} host;
-> +
-> +	/* set by vcpu_load(), for use when per-cpu accesses aren't available */
-> +	struct page *host_save_area;
->  
->  	u64 spec_ctrl;
->  	/*
-> -- 
-> 2.25.1
-> 
