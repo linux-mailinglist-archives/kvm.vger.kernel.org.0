@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15A302D9E22
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 18:49:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A17C02D9E27
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 18:49:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408691AbgLNRqV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 12:46:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47230 "EHLO
+        id S2408820AbgLNRsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 12:48:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730877AbgLNRqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 12:46:09 -0500
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE89BC0613D3
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 09:45:29 -0800 (PST)
-Received: by mail-pj1-x1042.google.com with SMTP id hk16so7009059pjb.4
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 09:45:29 -0800 (PST)
+        with ESMTP id S1731282AbgLNRqP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 12:46:15 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 873E0C061793
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 09:45:34 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id f9so12497765pfc.11
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 09:45:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=mime-version:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=qsZglg7YDD1R/xq2UYS6OScnwm+S6oaLv8VfaqEBCrY=;
-        b=HvLQR4hVHShkUXunMDNeoR12kKL1Wfebd+Zb+b2tOoxI93uJ+1s4kRBVBu4pJrk+IO
-         gFPNFC0LxgVpSS9UfZwdcnPMVCpcOQXIdRDzLBDKRU/BctMgC6oYyIzpCps749Zj9ngH
-         zaO/tY8HCyMH4Io2jSFyHGETTUDGotc+bhaT8=
+        bh=UenM37lmodjiB6QmDFlmWzNtX75/O38PCHVxXC9Tk0A=;
+        b=EcAMIBMZUYk8eRj5Smjue1JFqe7ourqOPjmI/UlMxT7sA4/9YRwCK6Wdw+1T9qqZAl
+         igo6SSIeDHitdmLrHXYaJy/dFovuvBho9HM/uuG86R7tjmHrJaVDdYlXp9gffpNQrXcX
+         4sfrSLcltinUY/DhgbCu6Jj0ipwcPbAeyfIro=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=qsZglg7YDD1R/xq2UYS6OScnwm+S6oaLv8VfaqEBCrY=;
-        b=jaK+1xsqZ4ZwzVdjXxSHl8V3eXZ+rsfHP8q4S6S6mOSdLEkodsQAvbFZdoikxfQeJW
-         nYxK7Migd470MfotBaatboqj1dbcxV5EWNqbuzE+F/P/OeEKXTkZ61Go64jlQzeCH2TD
-         gisMHiVZtnFXhzJW9e2QR4u0CRK3e0hhwt3sH79mqv1PardTdPAXCOEeU8Dlj7VUuEm8
-         46qgJAoCzblEopqBK7Ece8v0mjsjXJOFp8ks5ADWQo+1hAvfHQtxaRhI684YNUIuZrzP
-         1eIuDHlXYAxtXJ33jgZXJzTsBSOPVAi2QRlxBQVfv94dDzgEIuS/9E7WxOlVVXlv+raE
-         OQ7g==
+        bh=UenM37lmodjiB6QmDFlmWzNtX75/O38PCHVxXC9Tk0A=;
+        b=BcLVZFwInMBnya5lKIURh+47ENQE40EfRRHsmdBOuG7kDChafHazoKNWQzLAGxyfor
+         3PzqS/4g+E6ZfrZj0PF+EV5l19189ow9b6pUbJKb9GtydwE75vrn4HlS0FJkJmyLl7LS
+         z4QI4zNI90TcV8swg03bxGGbfPyqBr71HwDa0bjC8EyR3nyNb3U5/5wHNhCxDoQWyqeh
+         3RpHCO+vta4GvwBruax10sYR2xn4m1nMfMENBV962w+XPUennythgNef6j32vlL2RiWE
+         +rqXpQn02SmVju7kbjQUAocQCVSLyB6ZyN/bDUbVqA2UyroFS0EKstxZsUrUY6vJl4sU
+         SHUw==
 MIME-Version: 1.0
-X-Gm-Message-State: AOAM5310CYcGztAYESbXuAweypJ5nJlJCp1c5qPSzQVbifYcEr1FiNpK
-        R1AYvCKIRdTF+9/LeGFX+IQtFJcRvzfE2PDBMkGNKYcqGRt7jNGBd3NWTuyOkNeZjalCmyP/F9B
-        wCTc=
-X-Google-Smtp-Source: ABdhPJx5QiCPwN50K+LREilTYGjyEtiHQSZRpErcamh+B+9kk8PEkIf0bPJaXsyoGTCZKvTW1rP0tA==
-X-Received: by 2002:a17:90a:a781:: with SMTP id f1mr15360359pjq.111.1607967928796;
-        Mon, 14 Dec 2020 09:45:28 -0800 (PST)
+X-Gm-Message-State: AOAM532cvvzRpPv3mCNI0/n1JRblaMTfaF7jRpBNYvcvmB7TWcRmA60m
+        Xz5/CCGQNXAmUueSWHVp3zQ/9c3MrdGEMJVB1mytIkVWQ5oN6QYd8AV095RVgzGcpKWxYMJqpCv
+        TUn4=
+X-Google-Smtp-Source: ABdhPJxf958fcFXu5aP/lMOjPztpGBYMLRiNAQGjmruLXEx2L9f5hqeNlD6g/zhKtr/nAfFzK4pdqA==
+X-Received: by 2002:a62:8683:0:b029:1a3:9879:c326 with SMTP id x125-20020a6286830000b02901a39879c326mr10890941pfd.72.1607967933743;
+        Mon, 14 Dec 2020 09:45:33 -0800 (PST)
 Received: from rahul_yocto_ubuntu18.ibn.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id m8sm6658131pgg.78.2020.12.14.09.45.24
+        by smtp.gmail.com with ESMTPSA id m8sm6658131pgg.78.2020.12.14.09.45.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Dec 2020 09:45:27 -0800 (PST)
+        Mon, 14 Dec 2020 09:45:32 -0800 (PST)
 From:   Vikas Gupta <vikas.gupta@broadcom.com>
 To:     eric.auger@redhat.com, alex.williamson@redhat.com,
         cohuck@redhat.com, kvm@vger.kernel.org,
@@ -53,81 +53,777 @@ To:     eric.auger@redhat.com, alex.williamson@redhat.com,
 Cc:     vikram.prakash@broadcom.com, srinath.mannam@broadcom.com,
         ashwin.kamath@broadcom.com, zachary.schroff@broadcom.com,
         manish.kurup@broadcom.com, Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [RFC, v3 0/2] msi support for platform devices
-Date:   Mon, 14 Dec 2020 23:15:12 +0530
-Message-Id: <20201214174514.22006-1-vikas.gupta@broadcom.com>
+Subject: [RFC v3 1/2] vfio/platform: add support for msi
+Date:   Mon, 14 Dec 2020 23:15:13 +0530
+Message-Id: <20201214174514.22006-2-vikas.gupta@broadcom.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201124161646.41191-1-vikas.gupta@broadcom.com>
+In-Reply-To: <20201214174514.22006-1-vikas.gupta@broadcom.com>
 References: <20201124161646.41191-1-vikas.gupta@broadcom.com>
+ <20201214174514.22006-1-vikas.gupta@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000003e898605b67035e0"
+        boundary="000000000000894b2405b67035d1"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---0000000000003e898605b67035e0
+--000000000000894b2405b67035d1
 Content-Type: text/plain; charset="US-ASCII"
 
-This RFC adds support for MSI for platform devices.
-MSI block is added as an ext irq along with the existing
-wired interrupt implementation. The patchset exports two
-caps for MSI and related data to configure MSI source device.
+MSI support for platform devices.The MSI block
+is added as an extended IRQ which exports caps
+VFIO_IRQ_INFO_CAP_TYPE and VFIO_IRQ_INFO_CAP_MSI_DESCS.
 
-Changes from:
--------------
- v2 to v3:
-	1) Restored the vendor specific module to get max number
-	   of MSIs supported and .count value initialized.
-	2) Comments from Eric addressed.
-
- v1 to v2:
-	1) IRQ allocation has been implemented as below:
-	       ----------------------------
-	       |IRQ-0|IRQ-1|....|IRQ-n|MSI|
-       	       ----------------------------
-		MSI block has msi contexts and its implemneted
-		as ext irq.
-
-	2) Removed vendor specific module for msi handling so
-	   previously patch2 and patch3 are not required.
-
-	3) MSI related data is exported to userspace using 'caps'.
-	 Please note VFIO_IRQ_INFO_CAP_TYPE in include/uapi/linux/vfio.h implementation
-	is taken from the Eric`s patch
-        https://patchwork.kernel.org/project/kvm/patch/20201116110030.32335-8-eric.auger@redhat.com/
-
-
- v0 to v1:
-   i)  Removed MSI device flag VFIO_DEVICE_FLAGS_MSI.
-   ii) Add MSI(s) at the end of the irq list of platform IRQs.
-       MSI(s) with first entry of MSI block has count and flag
-       information.
-       IRQ list: Allocation for IRQs + MSIs are allocated as below
-       Example: if there are 'n' IRQs and 'k' MSIs
-       -------------------------------------------------------
-       |IRQ-0|IRQ-1|....|IRQ-n|MSI-0|MSI-1|MSI-2|......|MSI-k|
-       -------------------------------------------------------
-       MSI-0 will have count=k set and flags set accordingly.
-
-
-Vikas Gupta (2):
-  vfio/platform: add support for msi
-  vfio/platform: msi: add Broadcom platform devices
-
- drivers/vfio/platform/Kconfig                 |   1 +
- drivers/vfio/platform/Makefile                |   1 +
- drivers/vfio/platform/msi/Kconfig             |   9 +
- drivers/vfio/platform/msi/Makefile            |   2 +
- .../vfio/platform/msi/vfio_platform_bcmplt.c  |  49 ++++
+Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+---
  drivers/vfio/platform/vfio_platform_common.c  | 179 +++++++++++-
  drivers/vfio/platform/vfio_platform_irq.c     | 260 +++++++++++++++++-
  drivers/vfio/platform/vfio_platform_private.h |  32 +++
  include/uapi/linux/vfio.h                     |  44 +++
- 9 files changed, 558 insertions(+), 19 deletions(-)
- create mode 100644 drivers/vfio/platform/msi/Kconfig
- create mode 100644 drivers/vfio/platform/msi/Makefile
- create mode 100644 drivers/vfio/platform/msi/vfio_platform_bcmplt.c
+ 4 files changed, 496 insertions(+), 19 deletions(-)
 
+diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+index fb4b385191f2..c936852f35d7 100644
+--- a/drivers/vfio/platform/vfio_platform_common.c
++++ b/drivers/vfio/platform/vfio_platform_common.c
+@@ -16,6 +16,7 @@
+ #include <linux/types.h>
+ #include <linux/uaccess.h>
+ #include <linux/vfio.h>
++#include <linux/nospec.h>
+ 
+ #include "vfio_platform_private.h"
+ 
+@@ -26,6 +27,8 @@
+ #define VFIO_PLATFORM_IS_ACPI(vdev) ((vdev)->acpihid != NULL)
+ 
+ static LIST_HEAD(reset_list);
++/* devices having MSI support */
++static LIST_HEAD(msi_list);
+ static DEFINE_MUTEX(driver_lock);
+ 
+ static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat,
+@@ -47,6 +50,25 @@ static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat,
+ 	return reset_fn;
+ }
+ 
++static bool vfio_platform_lookup_msi(struct vfio_platform_device *vdev)
++{
++	bool has_msi = false;
++	struct vfio_platform_msi_node *iter;
++
++	mutex_lock(&driver_lock);
++	list_for_each_entry(iter, &msi_list, link) {
++		if (!strcmp(iter->compat, vdev->compat) &&
++		    try_module_get(iter->owner)) {
++			vdev->msi_module = iter->owner;
++			vdev->of_get_msi = iter->of_get_msi;
++			has_msi = true;
++			break;
++		}
++	}
++	mutex_unlock(&driver_lock);
++	return has_msi;
++}
++
+ static int vfio_platform_acpi_probe(struct vfio_platform_device *vdev,
+ 				    struct device *dev)
+ {
+@@ -126,6 +148,19 @@ static int vfio_platform_get_reset(struct vfio_platform_device *vdev)
+ 	return vdev->of_reset ? 0 : -ENOENT;
+ }
+ 
++static int vfio_platform_get_msi(struct vfio_platform_device *vdev)
++{
++	bool has_msi;
++
++	has_msi = vfio_platform_lookup_msi(vdev);
++	if (!has_msi) {
++		request_module("vfio-msi:%s", vdev->compat);
++		has_msi = vfio_platform_lookup_msi(vdev);
++	}
++
++	return has_msi ? 0 : -ENOENT;
++}
++
+ static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
+ {
+ 	if (VFIO_PLATFORM_IS_ACPI(vdev))
+@@ -135,6 +170,12 @@ static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
+ 		module_put(vdev->reset_module);
+ }
+ 
++static void vfio_platform_put_msi(struct vfio_platform_device *vdev)
++{
++	if (vdev->of_get_msi)
++		module_put(vdev->msi_module);
++}
++
+ static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
+ {
+ 	int cnt = 0, i;
+@@ -343,9 +384,17 @@ static long vfio_platform_ioctl(void *device_data,
+ 
+ 	} else if (cmd == VFIO_DEVICE_GET_IRQ_INFO) {
+ 		struct vfio_irq_info info;
++		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
++		struct vfio_irq_info_cap_msi *msi_info = NULL;
++		int ext_irq_index = vdev->num_irqs - vdev->num_ext_irqs;
++		unsigned long capsz;
++		u32 index;
+ 
+ 		minsz = offsetofend(struct vfio_irq_info, count);
+ 
++		/* For backward compatibility, cannot require this */
++		capsz = offsetofend(struct vfio_irq_info, cap_offset);
++
+ 		if (copy_from_user(&info, (void __user *)arg, minsz))
+ 			return -EFAULT;
+ 
+@@ -355,8 +404,94 @@ static long vfio_platform_ioctl(void *device_data,
+ 		if (info.index >= vdev->num_irqs)
+ 			return -EINVAL;
+ 
+-		info.flags = vdev->irqs[info.index].flags;
+-		info.count = vdev->irqs[info.index].count;
++		if (info.argsz >= capsz)
++			minsz = capsz;
++
++		index = info.index;
++
++		info.flags = vdev->irqs[index].flags;
++		info.count = vdev->irqs[index].count;
++
++		if (ext_irq_index - index == VFIO_EXT_IRQ_MSI) {
++			struct vfio_irq_info_cap_type cap_type = {
++				.header.id = VFIO_IRQ_INFO_CAP_TYPE,
++				.header.version = 1 };
++			struct vfio_platform_irq *irq;
++			size_t msi_info_size;
++			int num_msgs;
++			int ret;
++			int i;
++
++			index = array_index_nospec(index,
++						   vdev->num_irqs);
++			irq = &vdev->irqs[index];
++
++			cap_type.type = irq->type;
++			cap_type.subtype = irq->subtype;
++
++			ret = vfio_info_add_capability(&caps,
++						       &cap_type.header,
++						       sizeof(cap_type));
++			if (ret)
++				return ret;
++
++			num_msgs = irq->num_ctx;
++			if (num_msgs) {
++				msi_info_size = struct_size(msi_info,
++							    msgs, num_msgs);
++
++				msi_info = kzalloc(msi_info_size, GFP_KERNEL);
++				if (!msi_info) {
++					kfree(caps.buf);
++					return -ENOMEM;
++				}
++
++				msi_info->header.id =
++						VFIO_IRQ_INFO_CAP_MSI_DESCS;
++				msi_info->header.version = 1;
++				msi_info->nr_msgs = num_msgs;
++
++				for (i = 0; i < num_msgs; i++) {
++					struct vfio_irq_ctx *ctx = &irq->ctx[i];
++
++					msi_info->msgs[i].addr_lo =
++							ctx->msg.address_lo;
++					msi_info->msgs[i].addr_hi =
++							ctx->msg.address_hi;
++					msi_info->msgs[i].data = ctx->msg.data;
++				}
++
++				ret = vfio_info_add_capability(&caps,
++							&msi_info->header,
++							msi_info_size);
++				if (ret) {
++					kfree(msi_info);
++					kfree(caps.buf);
++					return ret;
++				}
++			}
++		}
++
++		if (caps.size) {
++			info.flags |= VFIO_IRQ_INFO_FLAG_CAPS;
++			if (info.argsz < sizeof(info) + caps.size) {
++				info.argsz = sizeof(info) + caps.size;
++				info.cap_offset = 0;
++			} else {
++				vfio_info_cap_shift(&caps, sizeof(info));
++				if (copy_to_user((void __user *)arg +
++						  sizeof(info), caps.buf,
++						  caps.size)) {
++					kfree(msi_info);
++					kfree(caps.buf);
++					return -EFAULT;
++				}
++				info.cap_offset = sizeof(info);
++			}
++
++			kfree(msi_info);
++			kfree(caps.buf);
++		}
+ 
+ 		return copy_to_user((void __user *)arg, &info, minsz) ?
+ 			-EFAULT : 0;
+@@ -365,6 +500,7 @@ static long vfio_platform_ioctl(void *device_data,
+ 		struct vfio_irq_set hdr;
+ 		u8 *data = NULL;
+ 		int ret = 0;
++		int max;
+ 		size_t data_size = 0;
+ 
+ 		minsz = offsetofend(struct vfio_irq_set, count);
+@@ -372,8 +508,14 @@ static long vfio_platform_ioctl(void *device_data,
+ 		if (copy_from_user(&hdr, (void __user *)arg, minsz))
+ 			return -EFAULT;
+ 
+-		ret = vfio_set_irqs_validate_and_prepare(&hdr, vdev->num_irqs,
+-						 vdev->num_irqs, &data_size);
++		if (hdr.index >= vdev->num_irqs)
++			return -EINVAL;
++
++		max = vdev->irqs[hdr.index].count;
++
++		ret = vfio_set_irqs_validate_and_prepare(&hdr, max,
++							 vdev->num_irqs,
++							 &data_size);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -678,6 +820,10 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ 		return ret;
+ 	}
+ 
++	ret = vfio_platform_get_msi(vdev);
++	if (ret)
++		dev_info(vdev->device, "msi not supported\n");
++
+ 	group = vfio_iommu_group_get(dev);
+ 	if (!group) {
+ 		dev_err(dev, "No IOMMU group for device %s\n", vdev->name);
+@@ -697,6 +843,7 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ put_iommu:
+ 	vfio_iommu_group_put(group, dev);
+ put_reset:
++	vfio_platform_put_msi(vdev);
+ 	vfio_platform_put_reset(vdev);
+ 	return ret;
+ }
+@@ -744,6 +891,30 @@ void vfio_platform_unregister_reset(const char *compat,
+ }
+ EXPORT_SYMBOL_GPL(vfio_platform_unregister_reset);
+ 
++void __vfio_platform_register_msi(struct vfio_platform_msi_node *node)
++{
++	mutex_lock(&driver_lock);
++	list_add(&node->link, &msi_list);
++	mutex_unlock(&driver_lock);
++}
++EXPORT_SYMBOL_GPL(__vfio_platform_register_msi);
++
++void vfio_platform_unregister_msi(const char *compat)
++{
++	struct vfio_platform_msi_node *iter, *temp;
++
++	mutex_lock(&driver_lock);
++	list_for_each_entry_safe(iter, temp, &msi_list, link) {
++		if (!strcmp(iter->compat, compat)) {
++			list_del(&iter->link);
++			break;
++		}
++	}
++
++	mutex_unlock(&driver_lock);
++}
++EXPORT_SYMBOL_GPL(vfio_platform_unregister_msi);
++
+ MODULE_VERSION(DRIVER_VERSION);
+ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR(DRIVER_AUTHOR);
+diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+index c5b09ec0a3c9..e0f4696afedd 100644
+--- a/drivers/vfio/platform/vfio_platform_irq.c
++++ b/drivers/vfio/platform/vfio_platform_irq.c
+@@ -8,10 +8,12 @@
+ 
+ #include <linux/eventfd.h>
+ #include <linux/interrupt.h>
++#include <linux/eventfd.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/vfio.h>
+ #include <linux/irq.h>
++#include <linux/msi.h>
+ 
+ #include "vfio_platform_private.h"
+ 
+@@ -253,6 +255,195 @@ static int vfio_platform_set_irq_trigger(struct vfio_platform_device *vdev,
+ 	return 0;
+ }
+ 
++/* MSI/MSIX */
++static irqreturn_t vfio_msihandler(int irq, void *arg)
++{
++	struct eventfd_ctx *trigger = arg;
++
++	eventfd_signal(trigger, 1);
++	return IRQ_HANDLED;
++}
++
++static void msi_write(struct msi_desc *desc, struct msi_msg *msg)
++{
++	int i;
++	struct vfio_platform_irq *irq;
++	u16 index = desc->platform.msi_index;
++	struct device *dev = msi_desc_to_dev(desc);
++	struct vfio_device *device = dev_get_drvdata(dev);
++	struct vfio_platform_device *vdev = (struct vfio_platform_device *)
++						vfio_device_data(device);
++
++	for (i = 0; i < vdev->num_irqs; i++)
++		if (vdev->irqs[i].type == VFIO_IRQ_TYPE_MSI)
++			irq = &vdev->irqs[i];
++
++	irq->ctx[index].msg.address_lo = msg->address_lo;
++	irq->ctx[index].msg.address_hi = msg->address_hi;
++	irq->ctx[index].msg.data = msg->data;
++}
++
++static int vfio_msi_enable(struct vfio_platform_device *vdev,
++			   struct vfio_platform_irq *irq, int nvec)
++{
++	int ret;
++	int msi_idx = 0;
++	struct msi_desc *desc;
++	struct device *dev = vdev->device;
++
++	irq->ctx = kcalloc(nvec, sizeof(struct vfio_irq_ctx), GFP_KERNEL);
++	if (!irq->ctx)
++		return -ENOMEM;
++
++	/* Allocate platform MSIs */
++	ret = platform_msi_domain_alloc_irqs(dev, nvec, msi_write);
++	if (ret < 0) {
++		kfree(irq->ctx);
++		return ret;
++	}
++
++	for_each_msi_entry(desc, dev) {
++		irq->ctx[msi_idx].hwirq = desc->irq;
++		msi_idx++;
++	}
++
++	irq->num_ctx = nvec;
++	irq->config_msi = 1;
++
++	return 0;
++}
++
++static int vfio_msi_set_vector_signal(struct vfio_platform_irq *irq,
++				      int vector, int fd)
++{
++	struct eventfd_ctx *trigger;
++	int irq_num, ret;
++
++	if (vector < 0 || vector >= irq->num_ctx)
++		return -EINVAL;
++
++	irq_num = irq->ctx[vector].hwirq;
++
++	if (irq->ctx[vector].trigger) {
++		free_irq(irq_num, irq->ctx[vector].trigger);
++		kfree(irq->ctx[vector].name);
++		eventfd_ctx_put(irq->ctx[vector].trigger);
++		irq->ctx[vector].trigger = NULL;
++	}
++
++	if (fd < 0)
++		return 0;
++
++	irq->ctx[vector].name = kasprintf(GFP_KERNEL,
++					  "vfio-msi[%d]", vector);
++	if (!irq->ctx[vector].name)
++		return -ENOMEM;
++
++	trigger = eventfd_ctx_fdget(fd);
++	if (IS_ERR(trigger)) {
++		kfree(irq->ctx[vector].name);
++		return PTR_ERR(trigger);
++	}
++
++	ret = request_irq(irq_num, vfio_msihandler, 0,
++			  irq->ctx[vector].name, trigger);
++	if (ret) {
++		kfree(irq->ctx[vector].name);
++		eventfd_ctx_put(trigger);
++		return ret;
++	}
++
++	irq->ctx[vector].trigger = trigger;
++
++	return 0;
++}
++
++static int vfio_msi_set_block(struct vfio_platform_irq *irq, unsigned int start,
++			      unsigned int count, int32_t *fds)
++{
++	int i, j, ret = 0;
++
++	if (start >= irq->num_ctx || start + count > irq->num_ctx)
++		return -EINVAL;
++
++	for (i = 0, j = start; i < count && !ret; i++, j++) {
++		int fd = fds ? fds[i] : -1;
++
++		ret = vfio_msi_set_vector_signal(irq, j, fd);
++	}
++
++	if (ret) {
++		for (--j; j >= (int)start; j--)
++			vfio_msi_set_vector_signal(irq, j, -1);
++	}
++
++	return ret;
++}
++
++static void vfio_msi_disable(struct vfio_platform_device *vdev,
++			     struct vfio_platform_irq *irq)
++{
++	struct device *dev = vdev->device;
++
++	vfio_msi_set_block(irq, 0, irq->num_ctx, NULL);
++
++	platform_msi_domain_free_irqs(dev);
++
++	irq->config_msi = 0;
++	irq->num_ctx = 0;
++
++	kfree(irq->ctx);
++}
++
++static int vfio_set_msi_trigger(struct vfio_platform_device *vdev,
++				unsigned int index, unsigned int start,
++				unsigned int count, uint32_t flags, void *data)
++{
++	int i;
++	struct vfio_platform_irq *irq = &vdev->irqs[index];
++
++	if (start + count > irq->count)
++		return -EINVAL;
++
++	if (!count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
++		vfio_msi_disable(vdev, irq);
++		return 0;
++	}
++
++	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
++		s32 *fds = data;
++		int ret;
++
++		if (irq->config_msi)
++			return vfio_msi_set_block(irq, start, count,
++						  fds);
++		ret = vfio_msi_enable(vdev, irq, start + count);
++		if (ret)
++			return ret;
++
++		ret = vfio_msi_set_block(irq, start, count, fds);
++		if (ret)
++			vfio_msi_disable(vdev, irq);
++
++		return ret;
++	}
++
++	for (i = start; i < start + count; i++) {
++		if (!irq->ctx[i].trigger)
++			continue;
++		if (flags & VFIO_IRQ_SET_DATA_NONE) {
++			eventfd_signal(irq->ctx[i].trigger, 1);
++		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
++			u8 *bools = data;
++
++			if (bools[i - start])
++				eventfd_signal(irq->ctx[i].trigger, 1);
++		}
++	}
++
++	return 0;
++}
++
+ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+ 				 uint32_t flags, unsigned index, unsigned start,
+ 				 unsigned count, void *data)
+@@ -261,16 +452,29 @@ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+ 		    unsigned start, unsigned count, uint32_t flags,
+ 		    void *data) = NULL;
+ 
+-	switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+-	case VFIO_IRQ_SET_ACTION_MASK:
+-		func = vfio_platform_set_irq_mask;
+-		break;
+-	case VFIO_IRQ_SET_ACTION_UNMASK:
+-		func = vfio_platform_set_irq_unmask;
+-		break;
+-	case VFIO_IRQ_SET_ACTION_TRIGGER:
+-		func = vfio_platform_set_irq_trigger;
+-		break;
++	struct vfio_platform_irq *irq = &vdev->irqs[index];
++
++	if (irq->type == VFIO_IRQ_TYPE_MSI) {
++		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
++		case VFIO_IRQ_SET_ACTION_MASK:
++		case VFIO_IRQ_SET_ACTION_UNMASK:
++			break;
++		case VFIO_IRQ_SET_ACTION_TRIGGER:
++			func = vfio_set_msi_trigger;
++			break;
++		}
++	} else {
++		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
++		case VFIO_IRQ_SET_ACTION_MASK:
++			func = vfio_platform_set_irq_mask;
++			break;
++		case VFIO_IRQ_SET_ACTION_UNMASK:
++			func = vfio_platform_set_irq_unmask;
++			break;
++		case VFIO_IRQ_SET_ACTION_TRIGGER:
++			func = vfio_platform_set_irq_trigger;
++			break;
++		}
+ 	}
+ 
+ 	if (!func)
+@@ -281,12 +485,21 @@ int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+ 
+ int vfio_platform_irq_init(struct vfio_platform_device *vdev)
+ {
+-	int cnt = 0, i;
++	int i;
++	int cnt = 0;
++	int num_irqs;
++	int msi_cnt = 0;
+ 
+ 	while (vdev->get_irq(vdev, cnt) >= 0)
+ 		cnt++;
+ 
+-	vdev->irqs = kcalloc(cnt, sizeof(struct vfio_platform_irq), GFP_KERNEL);
++	if (vdev->of_get_msi) {
++		msi_cnt = vdev->of_get_msi(vdev);
++		num_irqs++;
++	}
++
++	vdev->irqs = kcalloc(num_irqs, sizeof(struct vfio_platform_irq),
++			     GFP_KERNEL);
+ 	if (!vdev->irqs)
+ 		return -ENOMEM;
+ 
+@@ -309,7 +522,19 @@ int vfio_platform_irq_init(struct vfio_platform_device *vdev)
+ 		vdev->irqs[i].masked = false;
+ 	}
+ 
+-	vdev->num_irqs = cnt;
++	/*
++	 * MSI block is added at last index and it is an ext irq
++	 */
++	if (msi_cnt > 0) {
++		vdev->irqs[i].flags = VFIO_IRQ_INFO_EVENTFD;
++		vdev->irqs[i].count = msi_cnt;
++		vdev->irqs[i].hwirq = 0;
++		vdev->irqs[i].masked = false;
++		vdev->irqs[i].type = VFIO_IRQ_TYPE_MSI;
++		vdev->num_ext_irqs = 1;
++	}
++
++	vdev->num_irqs = num_irqs;
+ 
+ 	return 0;
+ err:
+@@ -321,8 +546,13 @@ void vfio_platform_irq_cleanup(struct vfio_platform_device *vdev)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < vdev->num_irqs; i++)
+-		vfio_set_trigger(vdev, i, -1, NULL);
++	for (i = 0; i < vdev->num_irqs; i++) {
++		if (vdev->irqs[i].type == VFIO_IRQ_TYPE_MSI)
++			vfio_set_msi_trigger(vdev, i, 0, 0,
++					     VFIO_IRQ_SET_DATA_NONE, NULL);
++		else
++			vfio_set_trigger(vdev, i, -1, NULL);
++	}
+ 
+ 	vdev->num_irqs = 0;
+ 	kfree(vdev->irqs);
+diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+index 289089910643..1307feddda21 100644
+--- a/drivers/vfio/platform/vfio_platform_private.h
++++ b/drivers/vfio/platform/vfio_platform_private.h
+@@ -9,6 +9,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/interrupt.h>
++#include <linux/msi.h>
+ 
+ #define VFIO_PLATFORM_OFFSET_SHIFT   40
+ #define VFIO_PLATFORM_OFFSET_MASK (((u64)(1) << VFIO_PLATFORM_OFFSET_SHIFT) - 1)
+@@ -19,9 +20,21 @@
+ #define VFIO_PLATFORM_INDEX_TO_OFFSET(index)	\
+ 	((u64)(index) << VFIO_PLATFORM_OFFSET_SHIFT)
+ 
++/* IRQ index for MSI in ext IRQs */
++#define VFIO_EXT_IRQ_MSI	0
++
++struct vfio_irq_ctx {
++	int			hwirq;
++	char			*name;
++	struct msi_msg		msg;
++	struct eventfd_ctx	*trigger;
++};
++
+ struct vfio_platform_irq {
+ 	u32			flags;
+ 	u32			count;
++	int			num_ctx;
++	struct vfio_irq_ctx	*ctx;
+ 	int			hwirq;
+ 	char			*name;
+ 	struct eventfd_ctx	*trigger;
+@@ -29,6 +42,11 @@ struct vfio_platform_irq {
+ 	spinlock_t		lock;
+ 	struct virqfd		*unmask;
+ 	struct virqfd		*mask;
++
++	/* for extended irqs */
++	u32			type;
++	u32			subtype;
++	int			config_msi;
+ };
+ 
+ struct vfio_platform_region {
+@@ -46,12 +64,14 @@ struct vfio_platform_device {
+ 	u32				num_regions;
+ 	struct vfio_platform_irq	*irqs;
+ 	u32				num_irqs;
++	int				num_ext_irqs;
+ 	int				refcnt;
+ 	struct mutex			igate;
+ 	struct module			*parent_module;
+ 	const char			*compat;
+ 	const char			*acpihid;
+ 	struct module			*reset_module;
++	struct module			*msi_module;
+ 	struct device			*device;
+ 
+ 	/*
+@@ -65,11 +85,13 @@ struct vfio_platform_device {
+ 		(*get_resource)(struct vfio_platform_device *vdev, int i);
+ 	int	(*get_irq)(struct vfio_platform_device *vdev, int i);
+ 	int	(*of_reset)(struct vfio_platform_device *vdev);
++	u32	(*of_get_msi)(struct vfio_platform_device *vdev);
+ 
+ 	bool				reset_required;
+ };
+ 
+ typedef int (*vfio_platform_reset_fn_t)(struct vfio_platform_device *vdev);
++typedef u32 (*vfio_platform_get_msi_fn_t)(struct vfio_platform_device *vdev);
+ 
+ struct vfio_platform_reset_node {
+ 	struct list_head link;
+@@ -78,6 +100,13 @@ struct vfio_platform_reset_node {
+ 	vfio_platform_reset_fn_t of_reset;
+ };
+ 
++struct vfio_platform_msi_node {
++	struct list_head link;
++	char *compat;
++	struct module *owner;
++	vfio_platform_get_msi_fn_t of_get_msi;
++};
++
+ extern int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ 				      struct device *dev);
+ extern struct vfio_platform_device *vfio_platform_remove_common
+@@ -94,6 +123,9 @@ extern int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+ extern void __vfio_platform_register_reset(struct vfio_platform_reset_node *n);
+ extern void vfio_platform_unregister_reset(const char *compat,
+ 					   vfio_platform_reset_fn_t fn);
++void __vfio_platform_register_msi(struct vfio_platform_msi_node *n);
++void vfio_platform_unregister_msi(const char *compat);
++
+ #define vfio_platform_register_reset(__compat, __reset)		\
+ static struct vfio_platform_reset_node __reset ## _node = {	\
+ 	.owner = THIS_MODULE,					\
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index d1812777139f..53a7ff2b524e 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -697,11 +697,55 @@ struct vfio_irq_info {
+ #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
+ #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
+ #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
++#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info supports caps */
+ 	__u32	index;		/* IRQ index */
+ 	__u32	count;		/* Number of IRQs within this index */
++	__u32	cap_offset;	/* Offset within info struct of first cap */
+ };
+ #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE + 9)
+ 
++/*
++ * The irq type capability allows IRQs unique to a specific device or
++ * class of devices to be exposed.
++ *
++ * The structures below define version 1 of this capability.
++ */
++#define VFIO_IRQ_INFO_CAP_TYPE		3
++
++struct vfio_irq_info_cap_type {
++	struct vfio_info_cap_header header;
++	__u32 type;     /* global per bus driver */
++	__u32 subtype;  /* type specific */
++};
++
++/*
++ * List of IRQ types, global per bus driver.
++ * If you introduce a new type, please add it here.
++ */
++
++/* Non PCI devices having MSI(s) support */
++#define VFIO_IRQ_TYPE_MSI		(1)
++
++/*
++ * The msi capability allows the user to use the msi msg to
++ * configure the iova for the msi configuration.
++ * The structures below define version 1 of this capability.
++ */
++#define VFIO_IRQ_INFO_CAP_MSI_DESCS	4
++
++struct vfio_irq_msi_msg {
++	__u32	addr_lo;
++	__u32	addr_hi;
++	__u32	data;
++};
++
++struct vfio_irq_info_cap_msi {
++	struct vfio_info_cap_header header;
++	__u32	nr_msgs;
++	__u32	reserved;
++	struct vfio_irq_msi_msg msgs[];
++};
++
+ /**
+  * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
+  *
 -- 
 2.17.1
 
@@ -145,7 +841,7 @@ this e-mail is strictly prohibited. If you received this e-mail in error,
 please return the e-mail to the sender, delete it from your computer, and 
 destroy any printed copy of it.
 
---0000000000003e898605b67035e0
+--000000000000894b2405b67035d1
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -215,14 +911,14 @@ JH2nMg39SpVAwmRqfs6mYtenpMwKtQd9goGkIFXqdSvOPATkbS1YIGtU2byLK+/1rIWPoKNmRddj
 WOu/loxldI1sJa1tOHgtb93YpIe0HEmgxLGS0KEnbM+rn9vXNKCe+9n0PhxJIfqcf6rAtK0prRwr
 Y2MxggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNh
 MTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMCDDTZ
-lyNZkGMqSi5xbzANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgy+TYQlUwwGqCo4ma
-gWtKIxpW0C0CFdf0xDdEI7+rSAwwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMjAxMjE0MTc0NTI5WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjALBglghkgB
+lyNZkGMqSi5xbzANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgKwzvUmUM6QTyu8TJ
+86v+aEMee4yGqqrx8V4bzb0OW34wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMjAxMjE0MTc0NTM0WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjALBglghkgB
 ZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG9w0BAQcw
-CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAJtt1X9CSvPH1+x2gtI1XcTrLQpFCRX54E0A
-zliVBcvRAYBQbjB6t9Pswf2iwfaDMXX6Waa+XX54OFeXqgVIi+N1xS70d91c4juq34zY3aPWENO1
-A3R+I7Z0/oe9bjlG9FEKaXHvGIK1H+Pls82vAPh12+fNXU4OPHOAbdnZlbNZIF7Ljdms+YENEnAp
-2Jzcde1oeEVJhxkwHzjbYJAuHhk3urXt8uhyTbJAoxfFvslWYk97xneQcxBq31X7UU/TPfSVrxip
-RZcGW1MKxJ8kRkJjOE2wZbgM21wAA/RnwL92iOF6AuZ71XvTJYNrCmcq0a48V4OEYScfrOH3pZ1c
-RSc=
---0000000000003e898605b67035e0--
+CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBADTLrhGEwzofogH8D4r4CdjoKnq+UAn4UWF+
+ST+eI7Knw3f5bDKpTr86X6jjUquYDRBt4YMJdnPLC+/ChaAcr3dyCTuCnG/GcOIniwpMNc74BSzW
+W356I7LyuI72Je05cs1iRREQWfTZcjVvlPRmN+7/XZTB/CE7nw+XUwNtKp0sXqFiDEwjCfA8VtV/
+FmyZbbBXI8DuluSJaf/Kl3EbcxjSnJdY9nn7vGRo12AfzGOT6tKfSGDAZ5V+HYyP4Fg3RJmVECi3
+ICDBvrhXZTnvtFOo1dK0Y4p9/bYHMEb2IOKuH/XSdvh1oIYeUabWdYBXUCh8PiFcYtTGt6CMntPL
+NII=
+--000000000000894b2405b67035d1--
