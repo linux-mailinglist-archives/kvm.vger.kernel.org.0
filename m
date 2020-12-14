@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF8292D9443
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 09:42:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F33012D943A
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 09:41:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2439401AbgLNIkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 03:40:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47572 "EHLO
+        id S2439343AbgLNIkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 03:40:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2439374AbgLNIki (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 03:40:38 -0500
+        with ESMTP id S2439324AbgLNIjx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 03:39:53 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68D6C0617A6
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B978EC0613D6
         for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 00:39:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=SHy2+xDWEp3nAI2MDjVmGwD47Q0EuTz2//89CbFKm44=; b=vSo1UFV7ESLDmM8awvYZ1bDzXo
-        Y0L+wpfgWGCPb+I+bX0iespurhZOvV9uovNc7inm1tsRbLYTU7fjW+ujp9mDGCxNgS4fHJXVnJSZ/
-        fNnXFVwTrB5yH/GT63JRqKV2vGEfj6zcHKYyzQf5qbHGmZ4R8Ibgc45LthAqRlJKV0R6mu9cgSbHv
-        348WcW8GQrD0GL/KLEFaytpUyTPXAhnjLsvBrztr9NtmWD6dO0134hqr42pn2U2CG8cYzSlELJaZm
-        Ndk4uNbblBUZoGYOaPlOZwftbktKU2FDhUmj81ads78iSZxl8ALDz5FmlT7S7cTX2mp79G38SEfJC
-        rmZg3dQA==;
+        bh=DVuchc0wovglNBlK0pAkz7Qkk8ALoX0wH/2YatUIn2o=; b=AR9uTfog5G9oSk8brRr0yOp76f
+        hhSda/S42xyAImPYw51WgEOCnX1RMn0Rmn/nWmQkaXga0EPXkq4xI+GyBaNoHXNB3XADqT4/Sn9tZ
+        c5d3lGbZ/OnpDJgf30wx8jCFEEyeykP7banB0/Q0IErCMgkMZflx3OhEmALFYGPnPkLl2tLQoFEPI
+        eePXoaths1nKKe5btMSukoQuXvszNQtpIW5X51KopNiAQ+a0mGBvpq13XZLAjnNtC6eUamOCNfhCB
+        8K7fAd3KVoAq6VWxCwjnHgBaP3w8itbpZkQPk7AyrjobxWdViZgYtZMTFRLtdc9w4/5ApAshFToaJ
+        aUMkjvsA==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kojNs-00028f-AB; Mon, 14 Dec 2020 08:39:08 +0000
+        id 1kojNs-00028g-Aw; Mon, 14 Dec 2020 08:39:08 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kojNr-008SyF-SP; Mon, 14 Dec 2020 08:39:07 +0000
+        id 1kojNr-008SyI-Sy; Mon, 14 Dec 2020 08:39:07 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -38,9 +38,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com
-Subject: [PATCH v3 16/17] KVM: Add documentation for Xen hypercall and shared_info updates
-Date:   Mon, 14 Dec 2020 08:39:04 +0000
-Message-Id: <20201214083905.2017260-17-dwmw2@infradead.org>
+Subject: [PATCH v3 17/17] KVM: x86/xen: Add event channel interrupt vector upcall
+Date:   Mon, 14 Dec 2020 08:39:05 +0000
+Message-Id: <20201214083905.2017260-18-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201214083905.2017260-1-dwmw2@infradead.org>
 References: <20201214083905.2017260-1-dwmw2@infradead.org>
@@ -54,163 +54,212 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
+It turns out that we can't handle event channels *entirely* in userspace
+by delivering them as ExtINT, because KVM is a bit picky about when it
+accepts ExtINT interrupts from a legacy PIC. The in-kernel local APIC
+has to have LVT0 configured in APIC_MODE_EXTINT and unmasked, which
+isn't necessarily the case for Xen guests especially on secondary CPUs.
+
+To cope with this, add kvm_xen_get_interrupt() which checks the
+evtchn_pending_upcall field in the Xen vcpu_info, and delivers the Xen
+upcall vector (configured by KVM_XEN_ATTR_TYPE_UPCALL_VECTOR) if it's
+set regardless of LAPIC LVT0 configuration. This gives us the minimum
+support we need for completely userspace-based implementation of event
+channels.
+
+This does mean that vcpu_enter_guest() needs to check for the
+evtchn_pending_upcall flag being set, because it can't rely on someone
+having set KVM_REQ_EVENT unless we were to add some way for userspace to
+do so manually.
+
+But actually, I don't quite see how that works reliably for interrupts
+injected with KVM_INTERRUPT either. In kvm_vcpu_ioctl_interrupt() the
+KVM_REQ_EVENT request is set once, but that'll get cleared the first time
+through vcpu_enter_guest(). So if the first exit is for something *else*
+without interrupts being enabled yet, won't the KVM_REQ_EVENT request
+have been consumed already and just be lost?
+
+I wonder if my addition of '|| kvm_xen_has_interrupt(vcpu)' should
+actually be '|| kvm_has_injectable_intr(vcpu)' to fix that pre-existing
+bug?
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- Documentation/virt/kvm/api.rst | 123 +++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/irq.c              |  7 +++++
+ arch/x86/kvm/x86.c              |  3 +-
+ arch/x86/kvm/xen.c              | 52 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/xen.h              |  1 +
+ include/uapi/linux/kvm.h        |  2 ++
+ 6 files changed, 65 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e00a66d72372..d1c30105e6fd 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -944,6 +944,13 @@ memory.
- 	__u8 pad2[30];
-   };
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 4b345a8945ea..68a66b98fd5f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -903,6 +903,7 @@ struct msr_bitmap_range {
+ struct kvm_xen {
+ 	bool long_mode;
+ 	bool shinfo_set;
++	u8 upcall_vector;
+ 	struct gfn_to_hva_cache shinfo_cache;
+ };
  
-+If the KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL flag is returned from the
-+KVM_CAP_XEN_HVM check, it may be set in the flags field of this ioctl.
-+This requests KVM to generate the contents of the hypercall page
-+automatically, and also to intercept hypercalls with KVM_EXIT_XEN.
-+In this case, all of the blob size and address fields must be zero.
-+
-+No other flags are currently valid.
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index 814698e5b152..24668b51b5c8 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -14,6 +14,7 @@
+ #include "irq.h"
+ #include "i8254.h"
+ #include "x86.h"
++#include "xen.h"
  
- 4.29 KVM_GET_CLOCK
- ------------------
-@@ -4807,6 +4814,71 @@ into user space.
- If a vCPU is in running state while this ioctl is invoked, the vCPU may
- experience inconsistent filtering behavior on MSR accesses.
+ /*
+  * check if there are pending timer events
+@@ -56,6 +57,9 @@ int kvm_cpu_has_extint(struct kvm_vcpu *v)
+ 	if (!lapic_in_kernel(v))
+ 		return v->arch.interrupt.injected;
  
-+4.127 KVM_XEN_HVM_SET_ATTR
-+--------------------------
++	if (kvm_xen_has_interrupt(v))
++		return 1;
 +
-+:Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO
-+:Architectures: x86
-+:Type: vm ioctl
-+:Parameters: struct kvm_xen_hvm_attr
-+:Returns: 0 on success, < 0 on error
-+
-+::
-+
-+  struct kvm_xen_hvm_attr {
-+	__u16 type;
-+
-+	union {
-+		__u8 long_mode;
-+		struct {
-+			__u64 gfn;
-+		} shared_info;
-+		struct {
-+			__u32 vcpu_id;
-+			__u64 gpa;
-+		} vcpu_attr;
-+		__u64 pad[4];
-+	} u;
-+  };
-+
-+type values:
-+
-+KVM_XEN_ATTR_TYPE_LONG_MODE
-+  Sets the ABI mode of the VM to 32-bit or 64-bit (long mode). This
-+  determines the layout of the shared info pages exposed to the VM.
-+
-+KVM_XEN_ATTR_TYPE_SHARED_INFO
-+  Sets the guest physical frame number at which the Xen "shared info"
-+  page resides. Note that although Xen places vcpu_info for the first
-+  32 vCPUs in the shared_info page, KVM does not automatically do so
-+  and requires that KVM_XEN_ATTR_TYPE_VCPU_INFO be used explicitly
-+  even when the vcpu_info for a given vCPU resides at the "default"
-+  location in the shared_info page. This is because KVM is not aware
-+  of the Xen CPU id which is used as the index into the vcpu_info[]
-+  array, so cannot know the correct default location.
-+
-+KVM_XEN_ATTR_TYPE_VCPU_INFO
-+  Sets the guest physical address of the vcpu_info for a given vCPU.
-+
-+KVM_XEN_ATTR_TYPE_VCPU_TIME_INFO
-+  Sets the guest physical address of an additional pvclock structure
-+  for a given vCPU. This is typically used for guest vsyscall support.
-+
-+KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE
-+  Sets the guest physical address of the vcpu_runstate_info for a given
-+  vCPU. This is how a Xen guest tracks CPU state such as steal time.
-+
-+4.128 KVM_XEN_HVM_GET_ATTR
-+--------------------------
-+
-+:Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO
-+:Architectures: x86
-+:Type: vm ioctl
-+:Parameters: struct kvm_xen_hvm_attr
-+:Returns: 0 on success, < 0 on error
-+
-+Allows Xen VM attributes to be read. For the structure and types,
-+see KVM_XEN_HVM_SET_ATTR above.
+ 	if (!kvm_apic_accept_pic_intr(v))
+ 		return 0;
  
- 5. The kvm_run structure
- ========================
-@@ -5303,6 +5375,34 @@ wants to write. Once finished processing the event, user space must continue
- vCPU execution. If the MSR write was unsuccessful, user space also sets the
- "error" field to "1".
+@@ -110,6 +114,9 @@ static int kvm_cpu_get_extint(struct kvm_vcpu *v)
+ 	if (!lapic_in_kernel(v))
+ 		return v->arch.interrupt.nr;
  
-+::
++	if (kvm_xen_has_interrupt(v))
++		return v->kvm->arch.xen.upcall_vector;
 +
-+
-+		struct kvm_xen_exit {
-+  #define KVM_EXIT_XEN_HCALL          1
-+			__u32 type;
-+			union {
-+				struct {
-+					__u32 longmode;
-+					__u32 cpl;
-+					__u64 input;
-+					__u64 result;
-+					__u64 params[6];
-+				} hcall;
-+			} u;
-+		};
-+		/* KVM_EXIT_XEN */
-+                struct kvm_hyperv_exit xen;
-+
-+Indicates that the VCPU exits into userspace to process some tasks
-+related to Xen emulation.
-+
-+Valid values for 'type' are:
-+
-+  - KVM_EXIT_XEN_HCALL -- synchronously notify user-space about Xen hypercall.
-+    Userspace is expected to place the hypercall result into the appropriate
-+    field before invoking KVM_RUN again.
-+
- ::
+ 	if (irqchip_split(v->kvm)) {
+ 		int vector = v->arch.pending_external_vector;
  
- 		/* Fix the size of the union. */
-@@ -6390,3 +6490,26 @@ When enabled, KVM will disable paravirtual features provided to the
- guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
- (0x40000001). Otherwise, a guest may use the paravirtual features
- regardless of what has actually been exposed through the CPUID leaf.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index df44d9e50adc..e627139cf8cd 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8896,7 +8896,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 			kvm_x86_ops.msr_filter_changed(vcpu);
+ 	}
+ 
+-	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win) {
++	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
++	    kvm_xen_has_interrupt(vcpu)) {
+ 		++vcpu->stat.req_event;
+ 		kvm_apic_accept_events(vcpu);
+ 		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 17cbb4462b7e..4bc9da9fcfb8 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -176,6 +176,45 @@ void kvm_xen_setup_runstate_page(struct kvm_vcpu *v)
+ 	kvm_xen_update_runstate(v, RUNSTATE_running, steal_time);
+ }
+ 
++int kvm_xen_has_interrupt(struct kvm_vcpu *v)
++{
++	u8 rc = 0;
 +
-+8.29 KVM_CAP_XEN_HVM
-+--------------------
++	/*
++	 * If the global upcall vector (HVMIRQ_callback_vector) is set and
++	 * the vCPU's evtchn_upcall_pending flag is set, the IRQ is pending.
++	 */
++	if (v->arch.xen.vcpu_info_set && v->kvm->arch.xen.upcall_vector) {
++		struct gfn_to_hva_cache *ghc = &v->arch.xen.vcpu_info_cache;
++		struct kvm_memslots *slots = kvm_memslots(v->kvm);
++		unsigned int offset = offsetof(struct vcpu_info, evtchn_upcall_pending);
 +
-+:Architectures: x86
++		/* No need for compat handling here */
++		BUILD_BUG_ON(offsetof(struct vcpu_info, evtchn_upcall_pending) !=
++			     offsetof(struct compat_vcpu_info, evtchn_upcall_pending));
++		BUILD_BUG_ON(sizeof(rc) !=
++			     sizeof(((struct vcpu_info *)0)->evtchn_upcall_pending));
++		BUILD_BUG_ON(sizeof(rc) !=
++			     sizeof(((struct compat_vcpu_info *)0)->evtchn_upcall_pending));
 +
-+This capability indicates the features that Xen supports for hosting Xen
-+PVHVM guests. Valid flags are::
++		/*
++		 * For efficiency, this mirrors the checks for using the valid
++		 * cache in kvm_read_guest_offset_cached(), but just uses
++		 * __get_user() instead. And falls back to the slow path.
++		 */
++		if (likely(slots->generation == ghc->generation &&
++			   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
++			/* Fast path */
++			__get_user(rc, (u8 __user *)ghc->hva + offset);
++		} else {
++			/* Slow path */
++			kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
++						      sizeof(rc));
++		}
++	}
++	return rc;
++}
 +
-+  #define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
-+  #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
-+  #define KVM_XEN_HVM_CONFIG_SHARED_INFO	(1 << 2)
+ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ {
+ 	struct kvm_vcpu *v;
+@@ -245,6 +284,14 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		v->arch.xen.last_state_ns = ktime_get_ns();
+ 		break;
+ 
++	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
++		if (data->u.vector < 0x10)
++			return -EINVAL;
 +
-+The KVM_XEN_HVM_CONFIG_HYPERCALL_MSR flag indicates that the KVM_XEN_HVM_CONFIG
-+ioctl is available, for the guest to set its hypercall page.
++		kvm->arch.xen.upcall_vector = data->u.vector;
++		r = 0;
++		break;
 +
-+If KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL is also set, the same flag may also be
-+provided in the flags to KVM_XEN_HVM_CONFIG, without providing hypercall page
-+contents, to request that KVM generate hypercall page content automatically
-+and also enable interception of guest hypercalls with KVM_EXIT_XEN.
+ 	default:
+ 		break;
+ 	}
+@@ -303,6 +350,11 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		}
+ 		break;
+ 
++	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
++		data->u.vector = kvm->arch.xen.upcall_vector;
++		r = 0;
++		break;
 +
-+The KVM_XEN_HVM_CONFIG_SHARED_INFO flag indicates the availability of the
-+KVM_XEN_HVM_SET_ATTR and KVM_XEN_HVM_GET_ATTR ioctls.
+ 	default:
+ 		break;
+ 	}
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index 407e717476d6..d64916ac4a12 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -11,6 +11,7 @@
+ 
+ void kvm_xen_setup_runstate_page(struct kvm_vcpu *vcpu);
+ void kvm_xen_runstate_set_preempted(struct kvm_vcpu *vcpu);
++int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
+ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
+ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
+ int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 749a7112df99..33609bc25021 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1587,6 +1587,7 @@ struct kvm_xen_hvm_attr {
+ 
+ 	union {
+ 		__u8 long_mode;
++		__u8 vector;
+ 		struct {
+ 			__u64 gfn;
+ 		} shared_info;
+@@ -1604,6 +1605,7 @@ struct kvm_xen_hvm_attr {
+ #define KVM_XEN_ATTR_TYPE_VCPU_INFO		0x2
+ #define KVM_XEN_ATTR_TYPE_VCPU_TIME_INFO	0x3
+ #define KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE		0x4
++#define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR		0x5
+ 
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
 -- 
 2.26.2
 
