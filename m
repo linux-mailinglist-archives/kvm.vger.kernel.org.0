@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECF2F2D9A74
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 15:59:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79DE82D9A8D
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 16:06:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408345AbgLNO71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 09:59:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49606 "EHLO
+        id S2389638AbgLNPGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 10:06:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2408295AbgLNO7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 09:59:24 -0500
+        with ESMTP id S1729361AbgLNPGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 10:06:08 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D08C0613D3
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 06:58:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DE87C0613D3
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 07:05:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gLniXcix3e++dhUjq66VctrYWqmw5o239pAip6KrF3M=; b=KvI4I0tGSqGvoXrwbbhVjH6AWn
-        aERz4/M+N5UWeNBVac8ftjAcMjbXliYaDCvY/owATROfVkKcXJ4ZyeAhZhjYMDY5JPF4CqW8b5NG5
-        hHajP8kqPBBXZ97j1YQaa38HMPcRJJLHv+QRXgAcbCw0aZYTU0KG72S48HFXjSxeR+T0pJ4hEdoQX
-        dTze09hBd9Lx1IkmQnbeS12onSd9fCTXrNCWUZVXlaSNxDBQBLLSwjrvjnED5QGtCHu1pVXZVgjkD
-        I9YM8/d0srfn+/L0Zbi7IrinmXB94gD6hXeZGS1vh+fA3DaLJWhWhZPwhNAGVOl+RQqxMLbI18pJd
-        /zi5yd2A==;
+        bh=9XOGZb0Pv2o65nRS4Ta8EcItRKFRBkPOeW7Y2d+NsL0=; b=iZhHsxz0SEsI9hCsunoTZnyDvX
+        9UAY649LUdGCdXVLKuIy8qGnpBIEdRd2IIOSuostUjb3pkNr6XP6Xw+H8MOGCAdGTkV+DAASEieGj
+        gMvUDefujVVsD28DcjLTg4ZeuqN0pKmoRi/UdGpFPNdUB2Y0PpjH2PAP8SrW+lx011HA9TaFmnTHA
+        0mrq8jm/B+hIms8YOZkjuehZgzyvL9DM+StwS2KUkivBXF9sG4n5bcRQjnqpsoZUF/wyaJ8ofh4gX
+        r4P0J4TY01Cvw4eah9Oxx5km5gq+Ek87VAqCoyl8hSUHMDMzIVNdDWJXs+R8Krd6JGzRQ1M7drdGZ
+        IjX6BppA==;
 Received: from [54.239.6.187] (helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kopJ8-00069Y-71; Mon, 14 Dec 2020 14:58:38 +0000
-Message-ID: <7bb3bdebb32c2536e67f658a80c3efa09077cc0f.camel@infradead.org>
-Subject: Re: [PATCH v3 12/17] KVM: x86/xen: setup pvclock updates
+        id 1kopPb-00072w-Um; Mon, 14 Dec 2020 15:05:20 +0000
+Message-ID: <4c0eaaca2defb68ecc4ab4eeec24b679f25551b8.camel@infradead.org>
+Subject: Re: [PATCH v3 08/17] KVM: x86/xen: register shared_info page
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Joao Martins <joao.m.martins@oracle.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -37,14 +37,16 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, kvm@vger.kernel.org
-Date:   Mon, 14 Dec 2020 14:58:35 +0000
-In-Reply-To: <5cb7cd9b-cdeb-be12-7e86-040b7610b2e7@oracle.com>
+Date:   Mon, 14 Dec 2020 15:05:17 +0000
+In-Reply-To: <ac6c4865-453d-0d01-a14f-12aa5354c322@oracle.com>
 References: <20201214083905.2017260-1-dwmw2@infradead.org>
-         <20201214083905.2017260-13-dwmw2@infradead.org>
-         <5cb7cd9b-cdeb-be12-7e86-040b7610b2e7@oracle.com>
+         <20201214083905.2017260-9-dwmw2@infradead.org>
+         <da2f8101-c318-d7e5-1e93-f9b99f1718dd@oracle.com>
+         <51c4cbf069c14447f8382be9a570e180449d823f.camel@infradead.org>
+         <ac6c4865-453d-0d01-a14f-12aa5354c322@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-nZsiVu2EfO/WxPrnItZg"
+        boundary="=-nZhveIHNK62VSIgVDMTM"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -53,41 +55,50 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-nZsiVu2EfO/WxPrnItZg
+--=-nZhveIHNK62VSIgVDMTM
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2020-12-14 at 13:29 +0000, Joao Martins wrote:
-> We might be missing the case where only shared_info is registered. Someth=
-ing like:
+On Mon, 2020-12-14 at 12:53 +0000, Joao Martins wrote:
+> Ah OK -- I didn't notice @pv_time_enabled before suggesting this.
 >=20
->         if (vcpu->xen.shinfo_set && !vcpu->xen.vcpu_info_set) {
->                 offset =3D offsetof(struct compat_vcpu_info, time);
->                 offset +=3D offsetof(struct shared_info, vcpu_info);
->                 offset +=3D (v - kvm_get_vcpu_by_id(0)) * sizeof(struct c=
-ompat_vcpu_info);
->                =20
->                 kvm_setup_pvclock_page(v, &vcpu->xen.shinfo_cache, offset=
-);
->         }
+> An helper would probably suffice without sacrificing footprint in
+> data structures (because you will add 3 of these). The helpers would be, =
+say:
 >=20
-> Part of the reason I had a kvm_xen_setup_pvclock_page() was to handle thi=
-s all these
-> combinations i.e. 1) shared_info && !vcpu_info 2) vcpu_info and unilateri=
-ally updating
-> secondary time info.
+>         kvm_xen_shared_info_set(vcpu->kvm)
+>         kvm_xen_vcpu_info_set(vcpu)
+>         kvm_xen_vcpu_runstate_set(vcpu)
 >=20
-> But maybe introducing this xen_vcpu_info() helper to accommodate all this=
-.
+> And maybe backed by a:
+>=20
+>         kvm_gfn_to_hva_cache_valid(&v->kvm->arch.xen.shinfo_cache)
+>=20
+> Which would check whether a cache is initialized or valid.
+>=20
+> But anyhow, I don't feel strongly about it, specially if there's an exist=
+ing
+> one which sort of sets the precedent.
 
-There was complexity.
+Maybe if I end up adding a fifth. But right now they aren't even taking
+any space. They're just filling what would otherwise be a hole...
 
-I don't like complexity.
+/* Xen HVM per vcpu emulation context */
+struct kvm_vcpu_xen {
+	u64 hypercall_rip;                                 // 0x00=20
+	u32 current_runstate;                              // 0x08
+	bool vcpu_info_set;                                // 0x0c
+	bool vcpu_time_info_set;                           // 0x0d
+	bool runstate_set;                                 // 0x0e
+        /* I can add one more before I care */             // 0x0f
+	struct gfn_to_hva_cache vcpu_info_cache;           // 0x10
+	struct gfn_to_hva_cache vcpu_time_info_cache;      // 0x38
+	struct gfn_to_hva_cache runstate_cache;            // 0x60
+	u64 last_steal;                                    // 0x88
+	u64 last_state_ns;                                 // 0x90
+};
 
-I made it go away.
-
-
---=-nZsiVu2EfO/WxPrnItZg
+--=-nZhveIHNK62VSIgVDMTM
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -170,20 +181,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MjE0MTQ1ODM1WjAvBgkqhkiG9w0BCQQxIgQgSuQ5yeda4xPk7QvrkBk/yAWDECaRS0WC19EFU/5Z
-0iQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjE0MTUwNTE3WjAvBgkqhkiG9w0BCQQxIgQg/kZ0ohZjVYn0q4gaeXCPMmGmZ9mqGCFShBlfYV6J
+/nYwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAA5KK6dL63lYb+iOWGtjg85OGkJcomCpYfDjmlLKQ0JfhC+Wrt8tWH1cPfQDiAAb
-yhIKTAF5CWm3YPI7Yx47ZhV54jp43khW1IVU0yYHZxePfWJbBeaxVbr/c+271MTQ6JZYATSIoGu0
-CwDMBp5XiHpa4qPdia5YdgM59j8tuPlel7IhAkQVAaPFmuYbIZ4bgf9XtXoZif5Ags7uaARJ6OUm
-tE9NloZYZ3ASypNf5PYwv2F0NUEcEujUrcfCVV3UD/YE8Da+VKDoWmHxBeKm0rKNN1tsndeTcarm
-jyS/qfwoeRpgVvNgsP1csnk1wNmt1byrV+YWP/uJBGJ4tBll4YYAAAAAAAA=
+DQEBAQUABIIBAHavGavR/wWPKZSCJcqsJMadzIV6LPdpxIaIEeLGZ4Owf0IgOsV30DEgQjbk17ES
+oEB9YwAJJeAD9Zs2F4enSZAlhtHeBBg0TSylHJD3KWC6xNZtRzQ5OxWGys5Xco83xjDgjMfuAOwK
+IvsUBIAF4o3fS6j6kF5RGYQzdC0CJM9Ibakzn5m/RyoSKwSO44gvwGDh4OfKVCgcRjv6vPRXYdWe
+4fnixyuobgidfBgCmz08Hv7uPveW8ELm3wl5hMCoLWgkwOeBwASsz7mZZJunEZIDgtzZC+iyEvN7
+HbSAnJDm5Tm3xcKd8uFa89Unk/3hTznjELytaswl/1c67k5dTgAAAAAAAAA=
 
 
---=-nZsiVu2EfO/WxPrnItZg--
+--=-nZhveIHNK62VSIgVDMTM--
 
