@@ -2,78 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E5972D977D
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 12:38:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC1F52D9787
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 12:42:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405341AbgLNLhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 06:37:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46609 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2407277AbgLNLhd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 06:37:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607945765;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=t9wz3YiKOXMMp/r+Wo0hz3x1+xMatpyPFXdpkKPjUXM=;
-        b=RAcrU8J7VOlowiyfvki8h8VZ6OpC7OrJjGzZfVon+D/5Y6594EEprMiVrqjI7kGCyPSbCM
-        uu8NQ1WCO/P1nSXCr3m+AVXr9gr9by13JbCwwI9VkG9IXl6JC5vdJHqn0w0M3N3ZUMhr+1
-        tdeX88UG4aZYPmQqBCHWx3YE/d6OyKI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-bpTtJ95VPlqOAGgWYgs67g-1; Mon, 14 Dec 2020 06:36:04 -0500
-X-MC-Unique: bpTtJ95VPlqOAGgWYgs67g-1
-Received: by mail-ed1-f69.google.com with SMTP id e12so8113128eds.19
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 03:36:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=t9wz3YiKOXMMp/r+Wo0hz3x1+xMatpyPFXdpkKPjUXM=;
-        b=cuqOTpezMXSky7PXmjQfm/I8vNm4UBqyViTX330MT14Cb/cRp8vyc6eYypslq/ZeP6
-         ejetSgq9NKGc5b5UxfHi+myYbyLhRvh1tScF6zUY99qgXoDnXB2lPytrlPTJMtmonUzM
-         P9IuwqBEUlchzplO/ER5NCHFycLJgp3BrUojHCt0JLP0G9sTiws8j0M7QubcfYoWgpZq
-         Hd41FIhPXF+G9dazPbZKNM6ev+P+0CwciudyRsnNle4MLEgtfRyoyRMwU7YgeNK/MeFf
-         9SpJ4L8aEkvbmtA1e9RpbjkM4v0Cizdb8rbvagAUBvxmmU0SdMON4gxb2Ww4n4nsVmOT
-         ELow==
-X-Gm-Message-State: AOAM531FWYsBaAr+s43uUneH2o1sfB00amZgwf+Kjy1AAmd2Ope+G9eY
-        ShWxWo/Zom96n28zBMDcOosf/pkyKI9/273n7aHwwKukb+lFIsfHJjNWvk3vudAzwyoqhZ2N3FY
-        NhQNsaI0IxQP4
-X-Received: by 2002:a17:906:7a46:: with SMTP id i6mr21318905ejo.257.1607945762613;
-        Mon, 14 Dec 2020 03:36:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwzOAjOfMz0gO0tv1SgMZjq/o4qOUwyfrF8DeJA6aqd2BYmwYLdDbp05xP/qI9reG6LCuJTog==
-X-Received: by 2002:a17:906:7a46:: with SMTP id i6mr21318895ejo.257.1607945762415;
-        Mon, 14 Dec 2020 03:36:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id x6sm16321683edl.67.2020.12.14.03.36.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Dec 2020 03:36:01 -0800 (PST)
-Subject: Re: [PATCH] KVM/VMX/SVM: Move kvm_machine_check function to x86.h
-To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20201029135600.122392-1-ubizjak@gmail.com>
- <CAFULd4YaRJ+9CN5XZSKXTJzO8CCAOGCeooxoj5=OwjLucnJiDw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c80110f4-2c34-ec7b-64f2-3940cb1b09e7@redhat.com>
-Date:   Mon, 14 Dec 2020 12:36:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S2405872AbgLNLjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 06:39:31 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:9876 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392388AbgLNLja (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 06:39:30 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CvfXD08TLz7DrK;
+        Mon, 14 Dec 2020 19:38:04 +0800 (CST)
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.185.179) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 14 Dec 2020 19:38:31 +0800
+From:   Zenghui Yu <yuzenghui@huawei.com>
+To:     <qemu-devel@nongnu.org>, <pbonzini@redhat.com>
+CC:     <kvm@vger.kernel.org>, <wanghaibin.wang@huawei.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, Peter Xu <peterx@redhat.com>
+Subject: [PATCH v2] kvm: Take into account the unaligned section size when preparing bitmap
+Date:   Mon, 14 Dec 2020 19:37:06 +0800
+Message-ID: <20201214113706.1553-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <CAFULd4YaRJ+9CN5XZSKXTJzO8CCAOGCeooxoj5=OwjLucnJiDw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.185.179]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/12/20 17:27, Uros Bizjak wrote:
-> Move kvm_machine_check to x86.h to avoid two exact copies
+The kernel KVM_CLEAR_DIRTY_LOG interface has align requirement on both the
+start and the size of the given range of pages. We have been careful to
+handle the unaligned cases when performing CLEAR on one slot. But it seems
+that we forget to take the unaligned *size* case into account when
+preparing bitmap for the interface, and we may end up clearing dirty status
+for pages outside of [start, start + size). As an example,
 
-Queued, thanks for your patience.
+    // psize = qemu_real_host_page_size;
+    // slot.start_addr = 0;
+    // slot.memory_size = 64 * psize;
 
-Paolo
+    kvm_log_clear_one_slot(slot, as, 0 * psize, 32 * psize);   --> [1]
+
+So the @size is not aligned with 64 pages. With [1], we'll clear dirty
+status for all 64 pages within this slot whilst the caller only wants to
+clear the former 32 pages.
+
+If the size is unaligned, let's go through the slow path to manipulate a
+temp bitmap for the interface so that we won't bother with those unaligned
+bits at the end of bitmap.
+
+I don't think this can happen in practice since the upper layer would
+provide us with the alignment guarantee. But kvm-all shouldn't rely on it.
+Carefully handle it in case someday we'll hit it.
+
+Acked-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+* From v1:
+  - Squash the misbehave example into commit message
+  - Add Peter's Acked-by
+
+ accel/kvm/kvm-all.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index baaa54249d..7644d44097 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -745,7 +745,7 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
+     assert(bmap_start % BITS_PER_LONG == 0);
+     /* We should never do log_clear before log_sync */
+     assert(mem->dirty_bmap);
+-    if (start_delta) {
++    if (start_delta || bmap_npages - size / psize) {
+         /* Slow path - we need to manipulate a temp bitmap */
+         bmap_clear = bitmap_new(bmap_npages);
+         bitmap_copy_with_src_offset(bmap_clear, mem->dirty_bmap,
+@@ -758,7 +758,10 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start,
+         bitmap_clear(bmap_clear, 0, start_delta);
+         d.dirty_bitmap = bmap_clear;
+     } else {
+-        /* Fast path - start address aligns well with BITS_PER_LONG */
++        /*
++         * Fast path - both start and size align well with BITS_PER_LONG
++         * (or the end of memory slot)
++         */
+         d.dirty_bitmap = mem->dirty_bmap + BIT_WORD(bmap_start);
+     }
+ 
+-- 
+2.19.1
 
