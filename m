@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 537932D97D3
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 13:04:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 800B52D97DB
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 13:07:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438708AbgLNMDx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 07:03:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50874 "EHLO
+        id S2438875AbgLNMFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 07:05:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730771AbgLNMDx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 07:03:53 -0500
+        with ESMTP id S2438853AbgLNMFj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 07:05:39 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FF79C0613CF
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 04:03:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFECCC0613CF
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 04:04:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=WZ6yT3oCozmDE8Zx+Z3hSIX3loeEYPX0dWYArSU/z6A=; b=14VyuWjOug36wshAmc1JF4aEar
-        Q0sU6a3ZZPxVdFPHhtVW7foqOcJS81Pz0kFGvRbFTLkRmUUzngR61ZL9lSsiDMJyqHZqXsp75ai6y
-        IX6qI5e29EaoEO/QW8Miw5SErKCgyySkUqJBipYBTns8OmqR1NP/NAXuYea588rX/o9WhhPq8lsRl
-        OcYG8LutbM5Ds8KeOmqovZs+zIAlTjy3xrloTtCyiP0KZQVH5XjQBTCvjSFapWSy3KHsdnmmAN4f8
-        7JQRDJlGrsF7ZHPRxuFNTlge2dn6wbkaqbUVYgDbkuOJQvKuZW22csDrtQ2Alumtw1kxDb3qfHT6Q
-        TAlVkhlA==;
-Received: from [54.239.6.185] (helo=freeip.amazon.com)
+        bh=8UjmU6FZe0/RDF8KgEmfJRmxw1EaIVmQM6f6n89yxSU=; b=SyaAEWRGN7VbtLOXcW48mY1d91
+        7mFmFD9DEN9hPsVbCEdpWJ90OtKH+TMt31BsWh5WSHc6+aU6jAXuRkaWM68vfI2exLQF5RIcDuJub
+        pVBcqn8Nt2bQu8/rI6OHbEgbf1+srT/q1XbgaDsp9r5KxkJud1PRtil73YZlzmQx+DkSo1LCop3qO
+        ToJlnI/tMRJZvKfGNk3+GwrBJhhQduQNWPD8Ojrm31pY/of9hQB7UdwMg4TiuZZzPQ8m7FXxM4yB/
+        Ykhw0GhluozAYj8cbw7jkZzB1XRpULfdHLNSiumyYShCAwLCUXzRbBsEXUFsEY9r/9b7SvIYT5hLT
+        h0ZDwDuw==;
+Received: from [54.239.6.186] (helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1komZE-000552-Ge; Mon, 14 Dec 2020 12:03:04 +0000
-Message-ID: <9cceffb7b12561423658ca98e6848b4e7a0ead4a.camel@infradead.org>
-Subject: Re: [PATCH v3 13/17] KVM: x86/xen: register vcpu time info region
+        id 1komay-00057p-JB; Mon, 14 Dec 2020 12:04:52 +0000
+Message-ID: <b5a9a2fc0cfa1df5bce98b787f7ad41b813997b9.camel@infradead.org>
+Subject: Re: [PATCH v3 08/17] KVM: x86/xen: register shared_info page
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Joao Martins <joao.m.martins@oracle.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -37,14 +37,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, kvm@vger.kernel.org
-Date:   Mon, 14 Dec 2020 12:03:01 +0000
-In-Reply-To: <26cfa76d-8712-d78d-24f3-5ab8b0fb5024@oracle.com>
+Date:   Mon, 14 Dec 2020 12:04:50 +0000
+In-Reply-To: <f965d9e5-3dae-afa7-d4ff-5177a13ea708@oracle.com>
 References: <20201214083905.2017260-1-dwmw2@infradead.org>
-         <20201214083905.2017260-14-dwmw2@infradead.org>
-         <26cfa76d-8712-d78d-24f3-5ab8b0fb5024@oracle.com>
+         <20201214083905.2017260-9-dwmw2@infradead.org>
+         <da2f8101-c318-d7e5-1e93-f9b99f1718dd@oracle.com>
+         <f965d9e5-3dae-afa7-d4ff-5177a13ea708@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-6buRIV8/fqUUhW/pHWpK"
+        boundary="=-Q2KTQ/dJQsxwIdxnNa2h"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -53,20 +54,25 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-6buRIV8/fqUUhW/pHWpK
+--=-Q2KTQ/dJQsxwIdxnNa2h
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2020-12-14 at 10:55 +0000, Joao Martins wrote:
-> Same comment as shared_info: we probably don't need
-> vcpu_time_info_set if we piggyback
-> on the gfn_to_hva cache setting its @gpa field.
+On Mon, 2020-12-14 at 11:30 +0000, Joao Martins wrote:
+> > Can't you just use:
+> >=20
+> >        kvm->arch.xen.shinfo_cache.gpa
+> >=20
+> > Rather than added a bool just to say you set a shinfo?
+> >=20
+>=20
+> Or maybe @len in case you want to consider @gpa =3D 0 as valid.
 
-Now we *could* potentially use the @hva field there... but I didn't
-want to. I'd rather keep it clean and simple.
+Ah yes, it was @len not @hva that I was thinking of using, before
+deciding I preferred an explicit boolean.
 
 
---=-6buRIV8/fqUUhW/pHWpK
+--=-Q2KTQ/dJQsxwIdxnNa2h
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -149,20 +155,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MjE0MTIwMzAxWjAvBgkqhkiG9w0BCQQxIgQgaKISDYJNZWFPWEFlQIDnAhlxzMmVqR3r2CzKYJwJ
-q98wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjE0MTIwNDUwWjAvBgkqhkiG9w0BCQQxIgQgemsCsMayX+kjb3zLA2m9YNOTym602YhTkIhXiyuu
+lykwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAFEfItMZ7fx0cBOC/tq289lkXtqin+l1FzeuiJEs7UNb6LCrDXfoBuI87fZmxr0l
-YKWGrvm8IW3t+uiY/ok0D+1PdnQN0du/FYMjuZDciPqFEtSh2prdBtXuDL8z9LB7hhZ70JWllpBh
-dg05zmWFRKvsrbo2Si42Iz+dwrOVkxHIiXAPo8/IDVIOdqgYsqhoVcUbscBDyP5JQLdA14v9yc2S
-HpxhUkjR3NIuW7SeJEjH5JOmRXJRBNx2l9czhORg+cOY0SRSe/TChJq/TZtcpLTCbIQG9twh0DJ3
-wFspjeUNukCrQJXZppdGYm0fM2VNSw0F/exjim9vDqqS7LsBr54AAAAAAAA=
+DQEBAQUABIIBADnBcKdLlvNcY7Z38JjCNAqkNADPfFSvKxbJAUR5ZKkl9w25J66y/g8pyO0KJgfP
+PMPc7lhNz15vwKeY2BOCx/yeHkqDbxRi345tHqNCYpILSim9phMQ9FMQU06T8kqIcMjicihDBZeh
+pCzAbcfEyYSYzYvyuYug3pZJneNgnbnJl4C8lm7IvA95E4HLG5C9/naPREB/6aYa48AhuYj03BUr
+noyczSdWLVdlbVy2023d0DHRSleP6NiL9FWUFK0YI9mOp7pj1l95/xW2v+xFH1SuqqqUfpTH1BLI
+oCOKyuPLpkhUrVVhMkjZ5Y49dIIEB02VDugIyINfZghNvqd5Zx8AAAAAAAA=
 
 
---=-6buRIV8/fqUUhW/pHWpK--
+--=-Q2KTQ/dJQsxwIdxnNa2h--
 
