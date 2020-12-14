@@ -2,109 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CB132D9A6C
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 15:59:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 447AE2D9A6E
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 15:59:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407791AbgLNO5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 09:57:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
+        id S2408278AbgLNO6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 09:58:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2408264AbgLNOzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 09:55:49 -0500
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EC3C0617A7
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 06:54:43 -0800 (PST)
-Received: by mail-wr1-x444.google.com with SMTP id r3so16736723wrt.2
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 06:54:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4DaLqvsDm5SqCzWwMhnyPtFEtL70bMDG+mFsDKou0X4=;
-        b=UJR/wKdU6rPLN4XQ3J0CDWMk263//v8P+bzOWQhJFiDK7OEBa3DuB1QqwJ9FhLwnBU
-         sVYRyqltLyyrCEquXvzE1avw0uaZ/7GIeZsXUMYNR13u7QsAxv1Kpts39QRlHYUJjMMw
-         4ZO7U8o2c+gnn08eeunaQ3NbLBwWFp+UQfbvTeDiEOXdK0qYT4R+hJaVehV7fhKcQtEz
-         qIZO4zp0dM1YCew+9lZM+4ZGxz7yabrnCZqaEUT2O6oRTjtc9aNrujj2zWCy2Y7eOv2q
-         eqVjfJnpDlYtv4xIBSx6G5RV6AjtnmL+0bsAD+OX2Bcs3F/ZoE1qIGzK3+KSiBhFGEFe
-         ZynA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4DaLqvsDm5SqCzWwMhnyPtFEtL70bMDG+mFsDKou0X4=;
-        b=qfMv2Mt6OOoLHgD6Z4/SzzkIr7hBbpyVYlEy3Ken3uPPLz04mfz6Ex4yNJalNlORa0
-         5tPnLv+j70KOKt3oc8XOlj2HIfEvbvi5VC256A4xhLwzDJe2WilZ2IfnlCLC8Lq0aYFr
-         OtIaKmouf81SmvS3vo7PYRnm0xPEdOEqmURCny9vm+RPSD4d1weandg+5f4pGHPQxn4o
-         PI6kjsrJwiP53JpoeT0qiWnKV2uLsUiKd/LamybCIqBj8g9uZK5eMXcuiDQDmB034oP9
-         KVW4AxWQITaFi72yszBgrRl4siDaAlwoc5jyjrsonvDXtuq19BfxYJv+Gi+rUu9HyiG4
-         tH5g==
-X-Gm-Message-State: AOAM530LzE/DSeIt821kiswpMgZC/Ph/0Su4sX8dM9+kWFg85wSKfWw6
-        IF65NDb/b46Uz01DJHf9Klw=
-X-Google-Smtp-Source: ABdhPJx7e+I0xjoB2By16ZZyhXRHSXtUxgskPOphW25lvrTalpUyK5RyKtestnWlQd/kWiJWMBFQlQ==
-X-Received: by 2002:adf:9e4d:: with SMTP id v13mr28765704wre.135.1607957682692;
-        Mon, 14 Dec 2020 06:54:42 -0800 (PST)
-Received: from [192.168.1.36] (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
-        by smtp.gmail.com with ESMTPSA id o13sm29553783wmc.44.2020.12.14.06.54.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Dec 2020 06:54:42 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Subject: Re: [PATCH 11/19] target/mips: Extract common helpers from helper.c
- to common_helper.c
-To:     luoyonggang@gmail.com,
-        Richard Henderson <richard.henderson@linaro.org>
-Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        kvm@vger.kernel.org, Paul Burton <paulburton@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        qemu-level <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>
-References: <20201206233949.3783184-1-f4bug@amsat.org>
- <20201206233949.3783184-12-f4bug@amsat.org>
- <ac8afc12-2ab4-a2a3-81b5-b9d75314bf6f@linaro.org>
- <CAE2XoE_WzMzCbvxtPdQfbU2rs-wd26GXpds9VypW7B-ik7qWJA@mail.gmail.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8021bdf5-bc67-9029-b9af-0b9ee3b0d4dd@amsat.org>
-Date:   Mon, 14 Dec 2020 15:54:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
-MIME-Version: 1.0
-In-Reply-To: <CAE2XoE_WzMzCbvxtPdQfbU2rs-wd26GXpds9VypW7B-ik7qWJA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S2408263AbgLNO5x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 09:57:53 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A48C0613D3
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 06:57:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=wYk5yQ4MZyNN1mkPZktPSWUVh8R4sz7foXyLfEbP55E=; b=DqNw3CM7chzisthgLC9cWXQkgu
+        g6gx8oEB6VbwfB8c1dVsDdxM+xgj9EXMcSLwR49mr7/yeYyB3eFKKC21bzahRXM2NbY9Phrf9CwXy
+        6euY3lRqlhcvQrd6R59idT0JeWRWdogmbcKlliaEAFDNq+NcsNovQ4KSgMtS0sV5M3DTgEAXyTAs6
+        30IhCEYPLfyi5B6pk1MkFX8k79UtINingWxpFeb3n5pDFSVCMBIhQPnt/iXsxUIzrCh9d9n/5oOj/
+        bUwvmtQIVEInfOaMS3T81da4ZvUlGqdGL3RrZUKDcbFCPfv0RB+QBbtmaikvGmkNIXPQfrJv2wzX1
+        wh7cWaMw==;
+Received: from [54.239.6.186] (helo=freeip.amazon.com)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kopHa-0005wO-Kw; Mon, 14 Dec 2020 14:57:02 +0000
+Message-ID: <69daac6166942fa75db068b57e2f1a382a0753fe.camel@infradead.org>
+Subject: Re: [PATCH v3 17/17] KVM: x86/xen: Add event channel interrupt
+ vector upcall
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, kvm@vger.kernel.org
+Date:   Mon, 14 Dec 2020 14:57:00 +0000
+In-Reply-To: <3917aa37-ed00-9350-1ba5-c3390be6b500@oracle.com>
+References: <20201214083905.2017260-1-dwmw2@infradead.org>
+         <20201214083905.2017260-18-dwmw2@infradead.org>
+         <3917aa37-ed00-9350-1ba5-c3390be6b500@oracle.com>
+Content-Type: multipart/signed; micalg="sha-256";
+        protocol="application/x-pkcs7-signature";
+        boundary="=-g0Hu2JY6gw0+3k/W8FoV"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/14/20 3:51 PM, 罗勇刚(Yonggang Luo) wrote:
-> On Wed, Dec 9, 2020 at 6:09 AM Richard Henderson
-> <richard.henderson@linaro.org <mailto:richard.henderson@linaro.org>> wrote:
->>
->> On 12/6/20 5:39 PM, Philippe Mathieu-Daudé wrote:
->> > The rest of helper.c is TLB related. Extract the non TLB
->> > specific functions to a new file, so we can rename helper.c
->> > as tlb_helper.c in the next commit.
->> >
->> > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org
-> <mailto:f4bug@amsat.org>>
->> > ---
->> > Any better name? xxx_helper.c are usually TCG helpers.
->>
->> *shrug* perhaps cpu_common.c, no "helper" at all?
->> Perhaps just move these bits to cpu.c?
->>
->>
->> r~
->>
-> Does these are general cpu bits or misp_cpu bits?
-> if only misp cpu related, prefer misp_cpu.c
-> or cpu.c under misp folder.
 
-Yes, as the patch subject prefix implies, this is a change
-local to the target/mips/ directory.
+--=-g0Hu2JY6gw0+3k/W8FoV
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
+On Mon, 2020-12-14 at 13:19 +0000, Joao Martins wrote:
+> But I think there's a flaw here. That is handling the case where you don'=
+t have a
+> vcpu_info registered, and only shared info. The vcpu_info is then placed =
+elsewhere, i.e.
+> another offset out of shared_info -- which is *I think* the case for PVHV=
+M Windows guests.
 
-Phil.
+There is no such case any more. In my v3 patch set I *stopped* the
+kernel from attempting to use the vcpu_info embedded in the shinfo, and
+went to *requiring* that the VMM explicitly tell the kernel where it
+is.
+
+$ git diff xenpv-post-2..xenpv-post-3 -- Documentation
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rs=
+t
+index d98c2ff90880..d1c30105e6fd 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4834,7 +4834,7 @@ experience inconsistent filtering behavior on MSR acc=
+esses.
+                        __u64 gfn;
+                } shared_info;
+                struct {
+-                       __u32 vcpu;
++                       __u32 vcpu_id;
+                        __u64 gpa;
+                } vcpu_attr;
+                __u64 pad[4];
+@@ -4849,9 +4849,13 @@ KVM_XEN_ATTR_TYPE_LONG_MODE
+=20
+ KVM_XEN_ATTR_TYPE_SHARED_INFO
+   Sets the guest physical frame number at which the Xen "shared info"
+-  page resides. It is the default location for the vcpu_info for the
+-  first 32 vCPUs, and contains other VM-wide data structures shared
+-  between the VM and the host.
++  page resides. Note that although Xen places vcpu_info for the first
++  32 vCPUs in the shared_info page, KVM does not automatically do so
++  and requires that KVM_XEN_ATTR_TYPE_VCPU_INFO be used explicitly
++  even when the vcpu_info for a given vCPU resides at the "default"
++  location in the shared_info page. This is because KVM is not aware
++  of the Xen CPU id which is used as the index into the vcpu_info[]
++  array, so cannot know the correct default location.
+=20
+ KVM_XEN_ATTR_TYPE_VCPU_INFO
+   Sets the guest physical address of the vcpu_info for a given vCPU.
+
+> Perhaps introducing a helper which adds xen_vcpu_info() and returns you t=
+he hva (picking
+> the right cache) similar to the RFC patch. Albeit that was with page pinn=
+ing, but
+> borrowing an older version I had with hva_to_gfn_cache incantation would =
+probably look like:
+>=20
+>=20
+>         if (v->arch.xen.vcpu_info_set) {
+>                 ghc =3D &v->arch.xen.vcpu_info_cache;
+>         } else {
+>                 ghc =3D &v->arch.xen.vcpu_info_cache;
+>                 offset +=3D offsetof(struct shared_info, vcpu_info);
+>                 offset +=3D (v - kvm_get_vcpu_by_id(0)) * sizeof(struct v=
+cpu_info);
+>         }
+
+The problem is that we *can't* just use shared_info->vcpu_info[N]
+because we don't know what N is.
+
+This is what I spent half of last week chasing down, because whatever I
+tried, the original version just ended up delivering interrupts to the
+wrong CPUs.
+
+The N we want there is actually the *XEN* vcpu_id, which Xen puts into
+CPUID leaf 0x40000004.ebx and which is also the ACPI ID. (Those two had
+better match up since Linux guests use CPUID 0x40000004 for the BSP and
+ACPI for the APs).
+
+The kernel knows nothing of those numbers. In particular they do *not*
+match up to the indices in kvm->vcpus[M] (which is vcpu->vcpu_idx and
+means nothing except the chronological order in which each vCPU's
+userspace thread happened to create it during startup), and they do not
+match up to vcpu->vcpu_id which is the APIC (not ACPI) ID.
+
+The kernel doesn't know. Let userspace tell it, since we already needed
+that API for the separate vcpu_info case anyway.
+
+--=-g0Hu2JY6gw0+3k/W8FoV
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
+MjE0MTQ1NzAwWjAvBgkqhkiG9w0BCQQxIgQg27+hG5QnK+r6T+tuNTN1DUFASRiqpKD8/wCYu213
+ExAwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAKp35SF+mil46k+ojkbFPJimTiBzGTpedTmvSF5o0BleUzYEInVwAy9KjtFlEfF0
+YBXWhJgOAt2GqhNRG+4qnK2n9mZq2lijvedFQAT36WbiSXzfn7AUPTXWxe8xneYZZ+jYqZwuMD8M
+lRtRjMH4S4ay39spG/KkXx2s6Ud4Qcly9vVIoUkR9PGn8UlT9r0E3k3p4C+RFCKqbF/P8x7+ZP0w
+6YLklo4v0eF8IBUjp0cu7YJRlOmtyf0Hn8fnWbN8j7sZfVApnp2ETB0omhS6IZhlbsCHjTxIXcZ5
+7f3ziMagybHjDXjAOL+dn2THcg13NXvL6p63YNW5xIlOEiFZc7sAAAAAAAA=
+
+
+--=-g0Hu2JY6gw0+3k/W8FoV--
+
