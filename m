@@ -2,331 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A17A2D9E1E
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 18:49:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15A302D9E22
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 18:49:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408649AbgLNRnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 12:43:03 -0500
-Received: from mail-mw2nam12hn2204.outbound.protection.outlook.com ([52.100.167.204]:16033
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2502546AbgLNRmk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 12:42:40 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FTHz+sEONGQmVIXnhTEg6Zz296K2DVorrJrKV+D7Gg1atqoAoOm1EGgOqaOUzkgVssXFE5135B2SPl5B528MqXDAfFou4FlzUSwwabF81AG7dzEVoSU8wDv+PPm5NG0VPNKWIGfqcbVGoKY4YeXaNZJVSgJaeiUVvv6gdqRL5ec7P7zhVNukyrw+SC2/DAuyD76b/wRMWi3PooDAuBA/MB50KDXCnGyWptC+TyP/hTM2duSBpXYrId2gjZA2TCFqVxwa5Fw4twHKN4hgx/Y/DyTA2nlyRgHw+W+8AesGlbYhR8km1LUtu6GTkfwhOxOWBWzGDP8zz0fkUbI3MBCV2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yrbeWcVtwTsAGiLUmOQuK3TdmVGLrbLQkgfpcjG4iNc=;
- b=dN8AmXb3Ccp4T0xk3HHn9x2QjXn+8YzGy4TZCnGWBR9eMKomia65UbBq3Y+/PzPmpwjGWzL/qnoG+GFlrxvPafixPpbLpfeWBySeEoocajS4XWpn/rGOemC02axuLjjrWNf1VQHvcuixgNBdDdR1dzticDRQKLUv4/OQgw6y2JKnN6HXgHuEC2RU81zToUCMOPjDoAIhBvCMCH2zUxeSZNF6kEE2s+r3Wg4U3Q4xEAkQRxCTYTAJv3Zl45h2fgRx1odjEcC/t/SdyRdmqPnd0QL8SkAnZhRwkggAFsdPS64R4xWNallAvKMvECUM4kss6rmu34J8WvP1XMH97Q3NuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S2408691AbgLNRqV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 12:46:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47230 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730877AbgLNRqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 12:46:09 -0500
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE89BC0613D3
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 09:45:29 -0800 (PST)
+Received: by mail-pj1-x1042.google.com with SMTP id hk16so7009059pjb.4
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 09:45:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yrbeWcVtwTsAGiLUmOQuK3TdmVGLrbLQkgfpcjG4iNc=;
- b=keVGLXoioU0kQH9sBOm02ioD4eNWfDk/14u970ohVwaBFD3CCk4xoKfQasRnuSBnAlF7A2XbZSx2L0qUDEw1oxdv7m+Yt5WnfSUzcQwvyNLPmY1IvJ+vaaxAXCQDOap49pMlnm7jAeT1i/PvlKPzB2rw4L71w138j23tFAs/Moc=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from BY5PR12MB4131.namprd12.prod.outlook.com (2603:10b6:a03:212::13)
- by BY5PR12MB4275.namprd12.prod.outlook.com (2603:10b6:a03:20a::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.13; Mon, 14 Dec
- 2020 17:41:50 +0000
-Received: from BY5PR12MB4131.namprd12.prod.outlook.com
- ([fe80::2432:5fa6:a1f:61f0]) by BY5PR12MB4131.namprd12.prod.outlook.com
- ([fe80::2432:5fa6:a1f:61f0%4]) with mapi id 15.20.3654.025; Mon, 14 Dec 2020
- 17:41:50 +0000
-From:   Michael Roth <michael.roth@amd.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v2] KVM: SVM: use vmsave/vmload for saving/restoring additional host state
-Date:   Mon, 14 Dec 2020 11:41:27 -0600
-Message-Id: <20201214174127.1398114-1-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [165.204.54.211]
-X-ClientProxiedBy: YT1PR01CA0006.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01::19)
- To BY5PR12MB4131.namprd12.prod.outlook.com (2603:10b6:a03:212::13)
+        d=broadcom.com; s=google;
+        h=mime-version:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=qsZglg7YDD1R/xq2UYS6OScnwm+S6oaLv8VfaqEBCrY=;
+        b=HvLQR4hVHShkUXunMDNeoR12kKL1Wfebd+Zb+b2tOoxI93uJ+1s4kRBVBu4pJrk+IO
+         gFPNFC0LxgVpSS9UfZwdcnPMVCpcOQXIdRDzLBDKRU/BctMgC6oYyIzpCps749Zj9ngH
+         zaO/tY8HCyMH4Io2jSFyHGETTUDGotc+bhaT8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :in-reply-to:references;
+        bh=qsZglg7YDD1R/xq2UYS6OScnwm+S6oaLv8VfaqEBCrY=;
+        b=jaK+1xsqZ4ZwzVdjXxSHl8V3eXZ+rsfHP8q4S6S6mOSdLEkodsQAvbFZdoikxfQeJW
+         nYxK7Migd470MfotBaatboqj1dbcxV5EWNqbuzE+F/P/OeEKXTkZ61Go64jlQzeCH2TD
+         gisMHiVZtnFXhzJW9e2QR4u0CRK3e0hhwt3sH79mqv1PardTdPAXCOEeU8Dlj7VUuEm8
+         46qgJAoCzblEopqBK7Ece8v0mjsjXJOFp8ks5ADWQo+1hAvfHQtxaRhI684YNUIuZrzP
+         1eIuDHlXYAxtXJ33jgZXJzTsBSOPVAi2QRlxBQVfv94dDzgEIuS/9E7WxOlVVXlv+raE
+         OQ7g==
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.54.211) by YT1PR01CA0006.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12 via Frontend Transport; Mon, 14 Dec 2020 17:41:49 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 6627b056-216b-4f9a-0f43-08d8a05789b1
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4275:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR12MB42756839A38541C0AA57A83895C70@BY5PR12MB4275.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KgYdG/SxYP4eLVfvHxU1i26fX1jOslmGbK17T8IRW5ivXgX1owMNvvPApbvAY62NWZyfofxqUONpCkX3Dv8YNIoS5HFrTlHLTv7U9RYBi7kiuSlM/PZFAwed8D1eFNMCb8EbsZ4tstVZILfh2sHEM3Vflvfl0+1HojfwiSQ/6/Zz1yatrMt6n+fIyCoGlUQ6m9Kt7rp0L4mtqQkWsQ9HczzHvBD/gncrsbiY45I6SllX44J3TEZQxnp9/ie6acwa3cjSLjMzVcgNNpcg9YznhDdAogIKovjzgBfq0ctJFUCFGqbEwMWETraPZqEXYf3/PPmcsbX3uRFk59lKqguo2B9Jc980qEvou2rFYG+OtZmsI2Pv3YZE0ZvG01xcmya23ej/SBCAC3swkyVG7JG0KFuwHmq352NgReWAEOnKkqHJh9DFtTuYdgMd1c9GwM5esAtvSm2lxWWVbIjHmuG8o5ctxpX3bZc5LQndNkEE1f2NCcRLXNsnfMOMqa6WL20MyUnwaln9mm7MAajDs7fTLcJV36jVqovlJO9fNVgAogN8vPCgQWnkj7o3ueGDfmctHuZWIa6OicKf/nSGTsm9bhz7Sr1+v2n9gGMPN03n8VGalULU2UEjeFmyS7jJKupvDmHpgrDo02hO6fV0O+jT6VedNOq4dHhJTQ77rLXojt94NmOyhxufPW6e2DUqAXM71WkCCIT6sNfMANVPeN/3mQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:BY5PR12MB4131.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(136003)(346002)(376002)(366004)(54906003)(6916009)(36756003)(26005)(44832011)(1076003)(7416002)(4326008)(52116002)(66476007)(6486002)(186003)(5660300002)(34490700003)(83380400001)(6496006)(86362001)(16526019)(8676002)(66946007)(66556008)(508600001)(2906002)(956004)(6666004)(2616005)(8936002)(23200700001);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?RXoMBHxnD9y+2SA+grjH5LVUjXKUFOkWAC8NuzYNMfBYurcWyJeuMEaHsqz3?=
- =?us-ascii?Q?JcFVvc5GzU9TbnDtkIYpN5ahs3ZX54Igju8ZH4MuFhr/02oC17ZcYtdP412j?=
- =?us-ascii?Q?UT9bhCMVlV5NIsIkbbO4bvHQfAkVx0X388yLqYLiMrh48wH8gH82yT4msfyL?=
- =?us-ascii?Q?VA8Bslyvlqve0cWyRfohWOnxhlsg266IeHOehCeqLWR+Ga+6n8XP7b1+OXc5?=
- =?us-ascii?Q?YXdhzPQycQ4DSG+jZSaPLOFVbQRgaa0rWVeUrguJzm8yBxsHw2+n3w0BYbbA?=
- =?us-ascii?Q?7G1gCCxJY5ECJ94E7Ik70cjy3p4Lmu2kw+czNuy67a3qlPXljja/wLjVgS74?=
- =?us-ascii?Q?5fG0fTSk5y6atsvNLXwLwIEzbHn8LYhF6qu74vbkhP6h2na12SKNEdmVnNnL?=
- =?us-ascii?Q?YkIUWi2M6g+l2rPScSU9JLImRZlcGi7ryDgLALnk+XQ33JxpBe/kc6TnXS0d?=
- =?us-ascii?Q?j3lCrfFCD6OeL/ONwxDjIB/cSvlHZX1SQFiqPUYFJsvR5m8TMSwL++qAKFxq?=
- =?us-ascii?Q?YybT6j2lk70U+hXByXOSE/hY6ORSUwRTQMO9FT3sRZNFDcescnQBpfClH0Jy?=
- =?us-ascii?Q?hWpVlOWKFvoOIEqTtMiwbSHqdS5qbavm/ndA5s4I24K5ygHjUV4dhsN9nUXL?=
- =?us-ascii?Q?hgvzSsl/0dNSb+VaLVGwTAnS4wTVUTdDZXjessCrXMyWPLz8q2QQxQ1IFKl2?=
- =?us-ascii?Q?GYSscLZew0e4ICFxYQkIyvfQEdoO+33P5hVH+fh9FVCeOGMhOuQmgu/m2hGF?=
- =?us-ascii?Q?M9KF7FdzXF0dXMoA9N/C9BuIDA/ayo0FM7iCzNciT59ZFf5ybIIuaq/PK3Ko?=
- =?us-ascii?Q?N3xD0IuzzZLCHgR56eOAck1zuMXdjrjJl/4NTdmrmJMc78w+qkiySFumtFh7?=
- =?us-ascii?Q?wan1nB+lUEE21IcdUyOlK6yg/rxCc7bUbD1vcnzfqc6bnZ7jiI7n0EouO+8E?=
- =?us-ascii?Q?t0LBJSMvpsdejITz57f7ITKJO7KOD5/vKr9e+zQaDtfS/n9DJq1QwWYd6hvv?=
- =?us-ascii?Q?4a4O?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4131.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2020 17:41:50.4501
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6627b056-216b-4f9a-0f43-08d8a05789b1
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cgeusDRQxdjjVEzyzLiL9Qgh/o3JrdvtEV1Q28jDq1AkEI8XB6T9t2CuxNUtP3+KBR+FnosycFFDuCZMVmE81g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4275
+X-Gm-Message-State: AOAM5310CYcGztAYESbXuAweypJ5nJlJCp1c5qPSzQVbifYcEr1FiNpK
+        R1AYvCKIRdTF+9/LeGFX+IQtFJcRvzfE2PDBMkGNKYcqGRt7jNGBd3NWTuyOkNeZjalCmyP/F9B
+        wCTc=
+X-Google-Smtp-Source: ABdhPJx5QiCPwN50K+LREilTYGjyEtiHQSZRpErcamh+B+9kk8PEkIf0bPJaXsyoGTCZKvTW1rP0tA==
+X-Received: by 2002:a17:90a:a781:: with SMTP id f1mr15360359pjq.111.1607967928796;
+        Mon, 14 Dec 2020 09:45:28 -0800 (PST)
+Received: from rahul_yocto_ubuntu18.ibn.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id m8sm6658131pgg.78.2020.12.14.09.45.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Dec 2020 09:45:27 -0800 (PST)
+From:   Vikas Gupta <vikas.gupta@broadcom.com>
+To:     eric.auger@redhat.com, alex.williamson@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     vikram.prakash@broadcom.com, srinath.mannam@broadcom.com,
+        ashwin.kamath@broadcom.com, zachary.schroff@broadcom.com,
+        manish.kurup@broadcom.com, Vikas Gupta <vikas.gupta@broadcom.com>
+Subject: [RFC, v3 0/2] msi support for platform devices
+Date:   Mon, 14 Dec 2020 23:15:12 +0530
+Message-Id: <20201214174514.22006-1-vikas.gupta@broadcom.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201124161646.41191-1-vikas.gupta@broadcom.com>
+References: <20201124161646.41191-1-vikas.gupta@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="0000000000003e898605b67035e0"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using a guest workload which simply issues 'hlt' in a tight loop to
-generate VMEXITs, it was observed (on a recent EPYC processor) that a
-significant amount of the VMEXIT overhead measured on the host was the
-result of MSR reads/writes in svm_vcpu_load/svm_vcpu_put according to
-perf:
+--0000000000003e898605b67035e0
+Content-Type: text/plain; charset="US-ASCII"
 
-  67.49%--kvm_arch_vcpu_ioctl_run
-          |
-          |--23.13%--vcpu_put
-          |          kvm_arch_vcpu_put
-          |          |
-          |          |--21.31%--native_write_msr
-          |          |
-          |           --1.27%--svm_set_cr4
-          |
-          |--16.11%--vcpu_load
-          |          |
-          |           --15.58%--kvm_arch_vcpu_load
-          |                     |
-          |                     |--13.97%--svm_set_cr4
-          |                     |          |
-          |                     |          |--12.64%--native_read_msr
+This RFC adds support for MSI for platform devices.
+MSI block is added as an ext irq along with the existing
+wired interrupt implementation. The patchset exports two
+caps for MSI and related data to configure MSI source device.
 
-Most of these MSRs relate to 'syscall'/'sysenter' and segment bases, and
-can be saved/restored using 'vmsave'/'vmload' instructions rather than
-explicit MSR reads/writes. In doing so there is a significant reduction
-in the svm_vcpu_load/svm_vcpu_put overhead measured for the above
-workload:
+Changes from:
+-------------
+ v2 to v3:
+	1) Restored the vendor specific module to get max number
+	   of MSIs supported and .count value initialized.
+	2) Comments from Eric addressed.
 
-  50.92%--kvm_arch_vcpu_ioctl_run
-          |
-          |--19.28%--disable_nmi_singlestep
-          |
-          |--13.68%--vcpu_load
-          |          kvm_arch_vcpu_load
-          |          |
-          |          |--9.19%--svm_set_cr4
-          |          |          |
-          |          |           --6.44%--native_read_msr
-          |          |
-          |           --3.55%--native_write_msr
-          |
-          |--6.05%--kvm_inject_nmi
-          |--2.80%--kvm_sev_es_mmio_read
-          |--2.19%--vcpu_put
-          |          |
-          |           --1.25%--kvm_arch_vcpu_put
-          |                     native_write_msr
+ v1 to v2:
+	1) IRQ allocation has been implemented as below:
+	       ----------------------------
+	       |IRQ-0|IRQ-1|....|IRQ-n|MSI|
+       	       ----------------------------
+		MSI block has msi contexts and its implemneted
+		as ext irq.
 
-Quantifying this further, if we look at the raw cycle counts for a
-normal iteration of the above workload (according to 'rdtscp'),
-kvm_arch_vcpu_ioctl_run() takes ~4600 cycles from start to finish with
-the current behavior. Using 'vmsave'/'vmload', this is reduced to
-~2800 cycles, a savings of 39%.
+	2) Removed vendor specific module for msi handling so
+	   previously patch2 and patch3 are not required.
 
-While this approach doesn't seem to manifest in any noticeable
-improvement for more realistic workloads like UnixBench, netperf, and
-kernel builds, likely due to their exit paths generally involving IO
-with comparatively high latencies, it does improve overall overhead
-of KVM_RUN significantly, which may still be noticeable for certain
-situations. It also simplifies some aspects of the code.
+	3) MSI related data is exported to userspace using 'caps'.
+	 Please note VFIO_IRQ_INFO_CAP_TYPE in include/uapi/linux/vfio.h implementation
+	is taken from the Eric`s patch
+        https://patchwork.kernel.org/project/kvm/patch/20201116110030.32335-8-eric.auger@redhat.com/
 
-With this change, explicit save/restore is no longer needed for the
-following host MSRs, since they are documented[1] as being part of the
-VMCB State Save Area:
 
-  MSR_STAR, MSR_LSTAR, MSR_CSTAR,
-  MSR_SYSCALL_MASK, MSR_KERNEL_GS_BASE,
-  MSR_IA32_SYSENTER_CS,
-  MSR_IA32_SYSENTER_ESP,
-  MSR_IA32_SYSENTER_EIP,
-  MSR_FS_BASE, MSR_GS_BASE
+ v0 to v1:
+   i)  Removed MSI device flag VFIO_DEVICE_FLAGS_MSI.
+   ii) Add MSI(s) at the end of the irq list of platform IRQs.
+       MSI(s) with first entry of MSI block has count and flag
+       information.
+       IRQ list: Allocation for IRQs + MSIs are allocated as below
+       Example: if there are 'n' IRQs and 'k' MSIs
+       -------------------------------------------------------
+       |IRQ-0|IRQ-1|....|IRQ-n|MSI-0|MSI-1|MSI-2|......|MSI-k|
+       -------------------------------------------------------
+       MSI-0 will have count=k set and flags set accordingly.
 
-and only the following MSR needs individual handling in
-svm_vcpu_put/svm_vcpu_load:
 
-  MSR_TSC_AUX
+Vikas Gupta (2):
+  vfio/platform: add support for msi
+  vfio/platform: msi: add Broadcom platform devices
 
-We could drop the host_save_user_msrs array/loop and instead handle
-MSR read/write of MSR_TSC_AUX directly, but we leave that for now as
-a potential follow-up.
+ drivers/vfio/platform/Kconfig                 |   1 +
+ drivers/vfio/platform/Makefile                |   1 +
+ drivers/vfio/platform/msi/Kconfig             |   9 +
+ drivers/vfio/platform/msi/Makefile            |   2 +
+ .../vfio/platform/msi/vfio_platform_bcmplt.c  |  49 ++++
+ drivers/vfio/platform/vfio_platform_common.c  | 179 +++++++++++-
+ drivers/vfio/platform/vfio_platform_irq.c     | 260 +++++++++++++++++-
+ drivers/vfio/platform/vfio_platform_private.h |  32 +++
+ include/uapi/linux/vfio.h                     |  44 +++
+ 9 files changed, 558 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/vfio/platform/msi/Kconfig
+ create mode 100644 drivers/vfio/platform/msi/Makefile
+ create mode 100644 drivers/vfio/platform/msi/vfio_platform_bcmplt.c
 
-Since 'vmsave'/'vmload' also handles the LDTR and FS/GS segment
-registers (and associated hidden state)[2], some of the code
-previously used to handle this is no longer needed, so we drop it
-as well.
-
-The first public release of the SVM spec[3] also documents the same
-handling for the host state in question, so we make these changes
-unconditionally.
-
-Also worth noting is that we 'vmsave' to the same page that is
-subsequently used by 'vmrun' to record some host additional state. This
-is okay, since, in accordance with the spec[2], the additional state
-written to the page by 'vmrun' does not overwrite any fields written by
-'vmsave'. This has also been confirmed through testing (for the above
-CPU, at least).
-
-[1] AMD64 Architecture Programmer's Manual, Rev 3.33, Volume 2, Appendix B, Table B-2
-[2] AMD64 Architecture Programmer's Manual, Rev 3.31, Volume 3, Chapter 4, VMSAVE/VMLOAD
-[3] Secure Virtual Machine Architecture Reference Manual, Rev 3.01
-
-Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
-v2:
-* rebase on latest kvm/next
-* move VMLOAD to just after vmexit so we can use it to handle all FS/GS
-  host state restoration and rather than relying on loadsegment() and
-  explicit write to MSR_GS_BASE (Andy)
-* drop 'host' field from struct vcpu_svm since it is no longer needed
-  for storing FS/GS/LDT state (Andy)
----
- arch/x86/kvm/svm/svm.c | 44 ++++++++++++++++--------------------------
- arch/x86/kvm/svm/svm.h | 14 +++-----------
- 2 files changed, 20 insertions(+), 38 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0e52fac4f5ae..fb15b7bd461f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1367,15 +1367,19 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		vmcb_mark_all_dirty(svm->vmcb);
- 	}
- 
--#ifdef CONFIG_X86_64
--	rdmsrl(MSR_GS_BASE, to_svm(vcpu)->host.gs_base);
--#endif
--	savesegment(fs, svm->host.fs);
--	savesegment(gs, svm->host.gs);
--	svm->host.ldt = kvm_read_ldt();
--
--	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
-+	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++) {
- 		rdmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
-+	}
-+
-+	asm volatile(__ex("vmsave")
-+		     : : "a" (page_to_pfn(sd->save_area) << PAGE_SHIFT)
-+		     : "memory");
-+	/*
-+	 * Store a pointer to the save area to we can access it after
-+	 * vmexit for vmload. This is needed since per-cpu accesses
-+	 * won't be available until GS is restored as part of vmload
-+	 */
-+	svm->host_save_area = sd->save_area;
- 
- 	if (static_cpu_has(X86_FEATURE_TSCRATEMSR)) {
- 		u64 tsc_ratio = vcpu->arch.tsc_scaling_ratio;
-@@ -1403,18 +1407,10 @@ static void svm_vcpu_put(struct kvm_vcpu *vcpu)
- 	avic_vcpu_put(vcpu);
- 
- 	++vcpu->stat.host_state_reload;
--	kvm_load_ldt(svm->host.ldt);
--#ifdef CONFIG_X86_64
--	loadsegment(fs, svm->host.fs);
--	wrmsrl(MSR_KERNEL_GS_BASE, current->thread.gsbase);
--	load_gs_index(svm->host.gs);
--#else
--#ifdef CONFIG_X86_32_LAZY_GS
--	loadsegment(gs, svm->host.gs);
--#endif
--#endif
--	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
-+
-+	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++) {
- 		wrmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
-+	}
- }
- 
- static unsigned long svm_get_rflags(struct kvm_vcpu *vcpu)
-@@ -3507,14 +3503,8 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 
- 	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
- 
--#ifdef CONFIG_X86_64
--	native_wrmsrl(MSR_GS_BASE, svm->host.gs_base);
--#else
--	loadsegment(fs, svm->host.fs);
--#ifndef CONFIG_X86_32_LAZY_GS
--	loadsegment(gs, svm->host.gs);
--#endif
--#endif
-+	asm volatile(__ex("vmload")
-+		     : : "a" (page_to_pfn(svm->host_save_area) << PAGE_SHIFT));
- 
- 	/*
- 	 * VMEXIT disables interrupts (host state), but tracing and lockdep
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index fdff76eb6ceb..bf01a8c19ec0 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -21,11 +21,6 @@
- #include <asm/svm.h>
- 
- static const u32 host_save_user_msrs[] = {
--#ifdef CONFIG_X86_64
--	MSR_STAR, MSR_LSTAR, MSR_CSTAR, MSR_SYSCALL_MASK, MSR_KERNEL_GS_BASE,
--	MSR_FS_BASE,
--#endif
--	MSR_IA32_SYSENTER_CS, MSR_IA32_SYSENTER_ESP, MSR_IA32_SYSENTER_EIP,
- 	MSR_TSC_AUX,
- };
- 
-@@ -117,12 +112,9 @@ struct vcpu_svm {
- 	u64 next_rip;
- 
- 	u64 host_user_msrs[NR_HOST_SAVE_USER_MSRS];
--	struct {
--		u16 fs;
--		u16 gs;
--		u16 ldt;
--		u64 gs_base;
--	} host;
-+
-+	/* set by vcpu_load(), for use when per-cpu accesses aren't available */
-+	struct page *host_save_area;
- 
- 	u64 spec_ctrl;
- 	/*
 -- 
-2.25.1
+2.17.1
 
+
+-- 
+This electronic communication and the information and any files transmitted 
+with it, or attached to it, are confidential and are intended solely for 
+the use of the individual or entity to whom it is addressed and may contain 
+information that is confidential, legally privileged, protected by privacy 
+laws, or otherwise restricted from disclosure to anyone else. If you are 
+not the intended recipient or the person responsible for delivering the 
+e-mail to the intended recipient, you are hereby notified that any use, 
+copying, distributing, dissemination, forwarding, printing, or copying of 
+this e-mail is strictly prohibited. If you received this e-mail in error, 
+please return the e-mail to the sender, delete it from your computer, and 
+destroy any printed copy of it.
+
+--0000000000003e898605b67035e0
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIQPwYJKoZIhvcNAQcCoIIQMDCCECwCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg2UMIIE6DCCA9CgAwIBAgIOSBtqCRO9gCTKXSLwFPMwDQYJKoZIhvcNAQELBQAwTDEgMB4GA1UE
+CxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMT
+Ckdsb2JhbFNpZ24wHhcNMTYwNjE1MDAwMDAwWhcNMjQwNjE1MDAwMDAwWjBdMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEzMDEGA1UEAxMqR2xvYmFsU2lnbiBQZXJzb25h
+bFNpZ24gMiBDQSAtIFNIQTI1NiAtIEczMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+tpZok2X9LAHsYqMNVL+Ly6RDkaKar7GD8rVtb9nw6tzPFnvXGeOEA4X5xh9wjx9sScVpGR5wkTg1
+fgJIXTlrGESmaqXIdPRd9YQ+Yx9xRIIIPu3Jp/bpbiZBKYDJSbr/2Xago7sb9nnfSyjTSnucUcIP
+ZVChn6hKneVGBI2DT9yyyD3PmCEJmEzA8Y96qT83JmVH2GaPSSbCw0C+Zj1s/zqtKUbwE5zh8uuZ
+p4vC019QbaIOb8cGlzgvTqGORwK0gwDYpOO6QQdg5d03WvIHwTunnJdoLrfvqUg2vOlpqJmqR+nH
+9lHS+bEstsVJtZieU1Pa+3LzfA/4cT7XA/pnwwIDAQABo4IBtTCCAbEwDgYDVR0PAQH/BAQDAgEG
+MGoGA1UdJQRjMGEGCCsGAQUFBwMCBggrBgEFBQcDBAYIKwYBBQUHAwkGCisGAQQBgjcUAgIGCisG
+AQQBgjcKAwQGCSsGAQQBgjcVBgYKKwYBBAGCNwoDDAYIKwYBBQUHAwcGCCsGAQUFBwMRMBIGA1Ud
+EwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFGlygmIxZ5VEhXeRgMQENkmdewthMB8GA1UdIwQYMBaA
+FI/wS3+oLkUkrk1Q+mOai97i3Ru8MD4GCCsGAQUFBwEBBDIwMDAuBggrBgEFBQcwAYYiaHR0cDov
+L29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3RyMzA2BgNVHR8ELzAtMCugKaAnhiVodHRwOi8vY3Js
+Lmdsb2JhbHNpZ24uY29tL3Jvb3QtcjMuY3JsMGcGA1UdIARgMF4wCwYJKwYBBAGgMgEoMAwGCisG
+AQQBoDIBKAowQQYJKwYBBAGgMgFfMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNp
+Z24uY29tL3JlcG9zaXRvcnkvMA0GCSqGSIb3DQEBCwUAA4IBAQConc0yzHxn4gtQ16VccKNm4iXv
+6rS2UzBuhxI3XDPiwihW45O9RZXzWNgVcUzz5IKJFL7+pcxHvesGVII+5r++9eqI9XnEKCILjHr2
+DgvjKq5Jmg6bwifybLYbVUoBthnhaFB0WLwSRRhPrt5eGxMw51UmNICi/hSKBKsHhGFSEaJQALZy
+4HL0EWduE6ILYAjX6BSXRDtHFeUPddb46f5Hf5rzITGLsn9BIpoOVrgS878O4JnfUWQi29yBfn75
+HajifFvPC+uqn+rcVnvrpLgsLOYG/64kWX/FRH8+mhVe+mcSX3xsUpcxK9q9vLTVtroU/yJUmEC4
+OcH5dQsbHBqjMIIDXzCCAkegAwIBAgILBAAAAAABIVhTCKIwDQYJKoZIhvcNAQELBQAwTDEgMB4G
+A1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNV
+BAMTCkdsb2JhbFNpZ24wHhcNMDkwMzE4MTAwMDAwWhcNMjkwMzE4MTAwMDAwWjBMMSAwHgYDVQQL
+ExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMK
+R2xvYmFsU2lnbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMwldpB5BngiFvXAg7aE
+yiie/QV2EcWtiHL8RgJDx7KKnQRfJMsuS+FggkbhUqsMgUdwbN1k0ev1LKMPgj0MK66X17YUhhB5
+uzsTgHeMCOFJ0mpiLx9e+pZo34knlTifBtc+ycsmWQ1z3rDI6SYOgxXG71uL0gRgykmmKPZpO/bL
+yCiR5Z2KYVc3rHQU3HTgOu5yLy6c+9C7v/U9AOEGM+iCK65TpjoWc4zdQQ4gOsC0p6Hpsk+QLjJg
+6VfLuQSSaGjlOCZgdbKfd/+RFO+uIEn8rUAVSNECMWEZXriX7613t2Saer9fwRPvm2L7DWzgVGkW
+qQPabumDk3F2xmmFghcCAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8w
+HQYDVR0OBBYEFI/wS3+oLkUkrk1Q+mOai97i3Ru8MA0GCSqGSIb3DQEBCwUAA4IBAQBLQNvAUKr+
+yAzv95ZURUm7lgAJQayzE4aGKAczymvmdLm6AC2upArT9fHxD4q/c2dKg8dEe3jgr25sbwMpjjM5
+RcOO5LlXbKr8EpbsU8Yt5CRsuZRj+9xTaGdWPoO4zzUhw8lo/s7awlOqzJCK6fBdRoyV3XpYKBov
+Hd7NADdBj+1EbddTKJd+82cEHhXXipa0095MJ6RMG3NzdvQXmcIfeg7jLQitChws/zyrVQ4PkX42
+68NXSb7hLi18YIvDQVETI53O9zJrlAGomecsMx86OyXShkDOOyyGeMlhLxS67ttVb9+E7gUJTb0o
+2HLO02JQZR7rkpeDMdmztcpHWD9fMIIFQTCCBCmgAwIBAgIMNNmXI1mQYypKLnFvMA0GCSqGSIb3
+DQEBCwUAMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTMwMQYDVQQD
+EypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMwHhcNMjAwOTIxMTQx
+NzIyWhcNMjIwOTIyMTQxNzIyWjCBjDELMAkGA1UEBhMCSU4xEjAQBgNVBAgTCUthcm5hdGFrYTES
+MBAGA1UEBxMJQmFuZ2Fsb3JlMRYwFAYDVQQKEw1Ccm9hZGNvbSBJbmMuMRQwEgYDVQQDEwtWaWth
+cyBHdXB0YTEnMCUGCSqGSIb3DQEJARYYdmlrYXMuZ3VwdGFAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArW9Ji37dLG2JbyJkPyYCg0PODECQWS5hT3MJNWBqXpFF
+ZtJyfIhbtRvtcM2uqbM/9F5YGpmCrCLQzEYr0awKrRBaj4IXUrYPwZAfAQxOs/dcrZ6QZW8deHEA
+iYIz931O7dVY1gVkZ3lTLIT4+b8G97IVoDSp0gx8Ga1DyfRO9GdIzFGXVnpT5iMAwXEAcmbyWyHL
+S10iGbdfjNXcpvxMThGdkFqwWqSFUMKZwAr/X/7sf4lV9IkUzXzfYLpzl88UksQH/cWZSsblflTt
+2lQ6rFUP408r38ha7ieLj9GoHHitwSmKYwUIGObe2Y57xYNj855BF4wx44Z80uM2ugKCZwIDAQAB
+o4IBzzCCAcswDgYDVR0PAQH/BAQDAgWgMIGeBggrBgEFBQcBAQSBkTCBjjBNBggrBgEFBQcwAoZB
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NwZXJzb25hbHNpZ24yc2hhMmcz
+b2NzcC5jcnQwPQYIKwYBBQUHMAGGMWh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9nc3BlcnNv
+bmFsc2lnbjJzaGEyZzMwTQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0
+dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwRAYDVR0fBD0w
+OzA5oDegNYYzaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc3BlcnNvbmFsc2lnbjJzaGEyZzMu
+Y3JsMCMGA1UdEQQcMBqBGHZpa2FzLmd1cHRhQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEF
+BQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQUnmgVV8btvFtO
+FD3kFjPWxD/aB8MwDQYJKoZIhvcNAQELBQADggEBAGCcuBN7G3mbQ7xMF8g8Lpz6WE+UFmkSSqU3
+FZLC2I92SA5lRIthcdz4AEgte6ywnef3+2mG7HWMoQ1wriSG5qLppAD02Uku6yRD52Sn67DB2Ozk
+yhBJayurzUxN1+R5E/YZtj2fkNajS5+i85e83PZPvVJ8/WnseIADGvDoouWqK7mxU/p8hELdb3PW
+JH2nMg39SpVAwmRqfs6mYtenpMwKtQd9goGkIFXqdSvOPATkbS1YIGtU2byLK+/1rIWPoKNmRddj
+WOu/loxldI1sJa1tOHgtb93YpIe0HEmgxLGS0KEnbM+rn9vXNKCe+9n0PhxJIfqcf6rAtK0prRwr
+Y2MxggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNh
+MTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0gRzMCDDTZ
+lyNZkGMqSi5xbzANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgy+TYQlUwwGqCo4ma
+gWtKIxpW0C0CFdf0xDdEI7+rSAwwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMjAxMjE0MTc0NTI5WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjALBglghkgB
+ZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG9w0BAQcw
+CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAJtt1X9CSvPH1+x2gtI1XcTrLQpFCRX54E0A
+zliVBcvRAYBQbjB6t9Pswf2iwfaDMXX6Waa+XX54OFeXqgVIi+N1xS70d91c4juq34zY3aPWENO1
+A3R+I7Z0/oe9bjlG9FEKaXHvGIK1H+Pls82vAPh12+fNXU4OPHOAbdnZlbNZIF7Ljdms+YENEnAp
+2Jzcde1oeEVJhxkwHzjbYJAuHhk3urXt8uhyTbJAoxfFvslWYk97xneQcxBq31X7UU/TPfSVrxip
+RZcGW1MKxJ8kRkJjOE2wZbgM21wAA/RnwL92iOF6AuZ71XvTJYNrCmcq0a48V4OEYScfrOH3pZ1c
+RSc=
+--0000000000003e898605b67035e0--
