@@ -2,117 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CEB22DA29A
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 22:37:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF5472DA2AB
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 22:44:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503519AbgLNVgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 16:36:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55464 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733209AbgLNVgn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 16:36:43 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B759C0613D3
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 13:36:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Message-ID:From:CC:To:Subject:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
-        Date:Sender:Reply-To:Content-ID:Content-Description;
-        bh=nZHfJwoGP24oRXDdt0rE3l2attpI/obOz/Gzj9OtITc=; b=l0g/fNtGl6s/sr8NEwf+fnX7zB
-        ghgATe60Z5NB0Cdmb62L0i+klaNar7C7z+q6hKjeSC+RnHSxGnyEHb4fPGvphUGKM8pkUV0FbLLOn
-        ckiaSnCxBZnslRfvwayaeKVpzhWwdsMGkP1H1pZFfjuXp/lqbAZR9AGoIstHYf6TT2KOeOnC1S/IM
-        UgFFrqPu9FD+8r+ur5vz/DrvWfp67b40iOexfUeZZQPHtWvfR6tZ3jQ/awd9enrjFlU2ZF5xwSZib
-        qoJbWY6E8Ok2V/oekz/XiQ49FYRSwIMkM3VEGHYheOYAX9EVsYuPmD9LKkr0ikevtCvueD/RpKUzr
-        r35UETFw==;
-Received: from [2001:8b0:10b:1:4d32:84d8:690e:d301]
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kovVh-0001Nf-6k; Mon, 14 Dec 2020 21:36:01 +0000
-Date:   Mon, 14 Dec 2020 21:35:49 +0000
-User-Agent: K-9 Mail for Android
-In-Reply-To: <87czzcw020.fsf@vitty.brq.redhat.com>
-References: <20201214083905.2017260-1-dwmw2@infradead.org> <20201214083905.2017260-3-dwmw2@infradead.org> <87czzcw020.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v3 02/17] KVM: x86/xen: fix Xen hypercall page msr handling
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S2387651AbgLNVnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 16:43:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41988 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2392109AbgLNVmy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 16:42:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607982088;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DV2mr6X5vesd9C3WlI0urcyPxkqlznyh99zPeXEjrvs=;
+        b=UhOLXgKKfQWcDrKDh8qNpWs9uCh/bp/k7DTouR46yIEfxQhdN9RtjAuxgxKuR09bSQ4kEz
+        U9o7sJ652fHDf9U3ylH3gLi8jo5rXe6h3XEvbVX9VvJjEDkJHQeam5oS/9xgJkUem6m3lz
+        9yOs+i76yl3abxcXRMOb9u3RCLIw99Y=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-RhVs-OyiPECKm2RWGfvwgw-1; Mon, 14 Dec 2020 16:41:26 -0500
+X-MC-Unique: RhVs-OyiPECKm2RWGfvwgw-1
+Received: by mail-ed1-f70.google.com with SMTP id p17so8936005edx.22
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 13:41:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=DV2mr6X5vesd9C3WlI0urcyPxkqlznyh99zPeXEjrvs=;
+        b=mH6Gq7l+MI2D5mNjVtL4fsmWkGiifrh9bixRyH2QUchbd+hwNTnPb0IlVgpAz/vtuj
+         fpCFuneE5X8lD+Q5Zbtd2gjjdInUuZ/O3QI8HadQD2F0J1lqH5iiZ7XoR2ZYX/iT0/of
+         uszIqntHPLRH5fUBBBVcLT18x9WaETVSVBd+4j1qCKpyMRQaPVz0CRvyvSpmQ0zHlnax
+         vKcDXbfHHbTIY53my5GUYrDqtanT1i/sVLj3/gt+4GQ18AkW9dwd0p0mvabSg+brXN7k
+         irjV7tvxdRh75KDxYucAqaLXaoTwsePJ9N9hY1q3iZleNL7BSgApHceKpB+1yR2K2rDz
+         j1pA==
+X-Gm-Message-State: AOAM533jwQw9QsFOzTOemQLCtaLuHrIk9ZQgwxyjxXExjUHHVVfbLjME
+        yKZ4X7MU3knaaQCAKSRZYQfBndBlzyAj8W/K+EuF5RVHQr0rimJkEBX3tWwEzDJfD6dj3wC7TQ7
+        j+1QgwFT6PdRe
+X-Received: by 2002:a05:6402:1592:: with SMTP id c18mr26513114edv.181.1607982085286;
+        Mon, 14 Dec 2020 13:41:25 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzUk89K2+30f3elqKuu9WOlVFi4pIAsQjKigrfZO2J0L1BTXheuLbdVa4VsgJnHo4+hMmlenw==
+X-Received: by 2002:a05:6402:1592:: with SMTP id c18mr26513093edv.181.1607982085142;
+        Mon, 14 Dec 2020 13:41:25 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f8sm16605165eds.19.2020.12.14.13.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Dec 2020 13:41:24 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ankur Arora <ankur.a.arora@oracle.com>,
         Joao Martins <joao.m.martins@oracle.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com
-From:   David Woodhouse <dwmw2@infradead.org>
-Message-ID: <58AC82A4-ADE4-4A8F-9522-16B8A4B9CBDD@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Subject: Re: [PATCH v3 01/17] KVM: Fix arguments to kvm_{un,}map_gfn()
+In-Reply-To: <6E8FD19B-7ABD-4BF1-84C5-26EDD327F01D@infradead.org>
+References: <20201214083905.2017260-1-dwmw2@infradead.org>
+ <20201214083905.2017260-2-dwmw2@infradead.org>
+ <87ft48w0or.fsf@vitty.brq.redhat.com>
+ <6E8FD19B-7ABD-4BF1-84C5-26EDD327F01D@infradead.org>
+Date:   Mon, 14 Dec 2020 22:41:23 +0100
+Message-ID: <87a6ugvzek.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+David Woodhouse <dwmw2@infradead.org> writes:
 
-
-On 14 December 2020 21:27:19 GMT, Vitaly Kuznetsov <vkuznets@redhat=2Ecom>=
- wrote:
->David Woodhouse <dwmw2@infradead=2Eorg> writes:
->
->> From: Joao Martins <joao=2Em=2Emartins@oracle=2Ecom>
+> On 14 December 2020 21:13:40 GMT, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>>What about different address space ids? 
 >>
->> Xen usually places its MSR at 0x40000000 or 0x40000200 depending on
->> whether it is running in viridian mode or not=2E Note that this is not
->> ABI guaranteed, so it is possible for Xen to advertise the MSR some
->> place else=2E
->>
->> Given the way xen_hvm_config() is handled, if the former address is
->> selected, this will conflict with Hyper-V's MSR
->> (HV_X64_MSR_GUEST_OS_ID) which unconditionally uses the same address=2E
->>
->> Given that the MSR location is arbitrary, move the xen_hvm_config()
->> handling to the top of kvm_set_msr_common() before falling through=2E
->>
+>>gfn_to_memslot() now calls kvm_memslots() which gives memslots for
+>>address space id = 0 but what if we want something different? Note,
+>>different vCPUs can (in theory) be in different address spaces so we
+>>actually need 'vcpu' and not 'kvm' then.
 >
->In case we're making MSR 0x40000000 something different from
->HV_X64_MSR_GUEST_OS_ID we can and probably should disable Hyper-V
->emulation in KVM completely -- or how else is it going to work?
-=20
-The way Xen itself does this =E2=80=94 and the way we have to do it if we =
-want to faithfully emulate Xen and support live migration from it =E2=80=94=
- is to shift the Xen MSRs up to (from memory) 0x40000200 if Hyper-V is enab=
-led=2E
-
-I did look at disabling Hyper-V entirely when it isn't enabled, but the on=
-ly flag we have for it being enabled is the guest OS ID being set=2E=2E=2E =
-which is done through that MSR :)
-
-My minimal version ended up being so close to Joao's original that it was =
-not longer worth the bikeshedding and so I gave up on it and stuck with the=
- original=2E
-
-
->> @@ -3001,6 +3001,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu,
->struct msr_data *msr_info)
->>  	u32 msr =3D msr_info->index;
->>  	u64 data =3D msr_info->data;
->> =20
->> +	if (msr && (msr =3D=3D vcpu->kvm->arch=2Exen_hvm_config=2Emsr))
->> +		return xen_hvm_config(vcpu, data);
->> +
+> Sure, but then you want a different function; this one is called
+> 'kvm_map_gfn()' and it operates on kvm_memslots(). It *doesn't*
+> operate on the vcpu at all.
 >
->Can we generalize this maybe? E=2Eg=2E before handling KVM and
->architectural
->MSRs we check that the particular MSR is not overriden by an emulated
->hypervisor,=20
->
->e=2Eg=2E
->	if (kvm_emulating_hyperv(kvm) && kvm_hyperv_msr_overriden(kvm,msr)
->		return kvm_hyperv_handle_msr(kvm, msr);
->	if (kvm_emulating_xen(kvm) && kvm_xen_msr_overriden(kvm,msr)
->		return kvm_xen_handle_msr(kvm, msr);
 
-That smells a bit like overengineering=2E As I said, I did have a play wit=
-h "improving" Joao's original patch but nothing I tried actually made more =
-sense to me than this once the details were ironed out=2E
+Actually, we already have kvm_vcpu_map() which uses kvm_vcpu_memslots()
+inside so no new function is needed.
 
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+> Which is why it's so bizarre that its argument is a 'vcpu' which it
+> only ever uses to get vcpu->kvm from it. It should just take the kvm
+> pointer.
+
+Your change is correct but I'm not sure that it's entirely clear that
+kvm_map_gfn() implicitly uses 'as_id=0' and I don't even see a comment
+about the fact :-(
+
+-- 
+Vitaly
+
