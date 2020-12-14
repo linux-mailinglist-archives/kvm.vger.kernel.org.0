@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 025E82D9F1F
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 19:35:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6241D2D9F3F
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 19:37:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440924AbgLNSek (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 13:34:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25871 "EHLO
+        id S2440940AbgLNSfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 13:35:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42162 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2440908AbgLNSe0 (ORCPT
+        by vger.kernel.org with ESMTP id S2440910AbgLNSe0 (ORCPT
         <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 13:34:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1607970777;
@@ -17,30 +17,30 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fQPbU8GdbnzOAorUym/8Nh50DXJaOVkOwZQhPivX8ig=;
-        b=TfddmJNqCfrCfnnV7GbA9L4PezaVG5vXdneUxJAxH/u58Gd6tj0vHd33NAaLoMY8XNFvd1
-        N1Rb4RFJOhyoHhkJY3eVpkQ3IyCRrv7VyrgZ6DdTfQAIbHRLt/xEQnmlfyPV2LxAISeyKY
-        R0iE2cLNK5TTXb5wHE5H3DlXkEU9zgo=
+        bh=USNp54c4CGW4oD+PKyfbkSkCcQ2e4aS8DnesiYB6pyo=;
+        b=ZRPsZGtnUyxnthgWDUw77ISi62MlUo3hPJqyprUGkEVoVTkQ9s97KdIFHXUF00LYsmsT4N
+        +B23hQaeFiW6odG0FyDwEugjTQFBsM5wv1FzjDU1IYpaEZbKiw3+AB+Z3m8JKZ+opHywZp
+        uQMNAHB8n/VLI14ackHdLIg2C5Tbx+8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-GWbl7I2-Nh-7Rb5DSeGttA-1; Mon, 14 Dec 2020 13:32:54 -0500
-X-MC-Unique: GWbl7I2-Nh-7Rb5DSeGttA-1
+ us-mta-185-K_RamMgQPe6o9kQefbaNUQ-1; Mon, 14 Dec 2020 13:32:55 -0500
+X-MC-Unique: K_RamMgQPe6o9kQefbaNUQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E715180A092;
-        Mon, 14 Dec 2020 18:32:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12399180A093;
+        Mon, 14 Dec 2020 18:32:54 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C884F100AE36;
-        Mon, 14 Dec 2020 18:32:52 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F32C100AE36;
+        Mon, 14 Dec 2020 18:32:53 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Alexander Graf <graf@amazon.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH 2/3] KVM: x86: use kvm_complete_insn_gp in emulating RDMSR/WRMSR
-Date:   Mon, 14 Dec 2020 13:32:49 -0500
-Message-Id: <20201214183250.1034541-3-pbonzini@redhat.com>
+Subject: [PATCH 3/3] KVM: x86: introduce complete_emulated_msr callback
+Date:   Mon, 14 Dec 2020 13:32:50 -0500
+Message-Id: <20201214183250.1034541-4-pbonzini@redhat.com>
 In-Reply-To: <20201214183250.1034541-1-pbonzini@redhat.com>
 References: <20201214183250.1034541-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -50,101 +50,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simplify the four functions that handle {kernel,user} {rd,wr}msr, there
-is still some repetition between the two instances of rdmsr but the
-whole business of calling kvm_inject_gp and kvm_skip_emulated_instruction
-can be unified nicely.
-
-Because complete_emulated_wrmsr now becomes essentially a call to
-kvm_complete_insn_gp, remove complete_emulated_msr.
+This will be used by SEV-ES to inject MSR failure via the GHCB.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/x86.c | 42 ++++++++++++++++--------------------------
- 1 file changed, 16 insertions(+), 26 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/svm/svm.c          | 1 +
+ arch/x86/kvm/vmx/vmx.c          | 1 +
+ arch/x86/kvm/x86.c              | 8 ++++----
+ 4 files changed, 7 insertions(+), 4 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 8cf6b0493d49..18aa15e6fadd 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1285,6 +1285,7 @@ struct kvm_x86_ops {
+ 
+ 	void (*migrate_timers)(struct kvm_vcpu *vcpu);
+ 	void (*msr_filter_changed)(struct kvm_vcpu *vcpu);
++	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
+ };
+ 
+ struct kvm_x86_nested_ops {
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 801e0a641258..4067d511be08 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4306,6 +4306,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
+ 
+ 	.msr_filter_changed = svm_msr_filter_changed,
++	.complete_emulated_msr = kvm_complete_insn_gp,
+ };
+ 
+ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 849be2a9f260..55fa51c0cd9d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7701,6 +7701,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.migrate_timers = vmx_migrate_timers,
+ 
+ 	.msr_filter_changed = vmx_msr_filter_changed,
++	.complete_emulated_msr = kvm_complete_insn_gp,
+ 	.cpu_dirty_log_size = vmx_cpu_dirty_log_size,
+ };
+ 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a3fdc16cfd6f..2f1bc52e70c0 100644
+index 2f1bc52e70c0..6c4482b97c91 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1634,27 +1634,20 @@ int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
- }
- EXPORT_SYMBOL_GPL(kvm_set_msr);
- 
--static int complete_emulated_msr(struct kvm_vcpu *vcpu, bool is_read)
-+static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
- {
--	if (vcpu->run->msr.error) {
--		kvm_inject_gp(vcpu, 0);
--		return 1;
--	} else if (is_read) {
-+	int err = vcpu->run->msr.error;
-+	if (!err) {
- 		kvm_rax_write(vcpu, (u32)vcpu->run->msr.data);
+@@ -1642,12 +1642,12 @@ static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
  		kvm_rdx_write(vcpu, vcpu->run->msr.data >> 32);
  	}
  
--	return kvm_skip_emulated_instruction(vcpu);
--}
--
--static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
--{
--	return complete_emulated_msr(vcpu, true);
-+	return kvm_complete_insn_gp(vcpu, err);
+-	return kvm_complete_insn_gp(vcpu, err);
++	return kvm_x86_ops.complete_emulated_msr(vcpu, err);
  }
  
  static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
  {
--	return complete_emulated_msr(vcpu, false);
-+	return kvm_complete_insn_gp(vcpu, vcpu->run->msr.error);
+-	return kvm_complete_insn_gp(vcpu, vcpu->run->msr.error);
++	return kvm_x86_ops.complete_emulated_msr(vcpu, vcpu->run->msr.error);
  }
  
  static u64 kvm_msr_reason(int r)
-@@ -1718,17 +1711,16 @@ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/* MSR read failed? Inject a #GP */
--	if (r) {
-+	if (!r) {
-+		trace_kvm_msr_read(ecx, data);
-+
-+		kvm_rax_write(vcpu, data & -1u);
-+		kvm_rdx_write(vcpu, (data >> 32) & -1u);
-+	} else {
+@@ -1720,7 +1720,7 @@ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
  		trace_kvm_msr_read_ex(ecx);
--		kvm_inject_gp(vcpu, 0);
--		return 1;
  	}
  
--	trace_kvm_msr_read(ecx, data);
--
--	kvm_rax_write(vcpu, data & -1u);
--	kvm_rdx_write(vcpu, (data >> 32) & -1u);
--	return kvm_skip_emulated_instruction(vcpu);
-+	return kvm_complete_insn_gp(vcpu, r);
+-	return kvm_complete_insn_gp(vcpu, r);
++	return kvm_x86_ops.complete_emulated_msr(vcpu, r);
  }
  EXPORT_SYMBOL_GPL(kvm_emulate_rdmsr);
  
-@@ -1750,14 +1742,12 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
- 		return r;
- 
- 	/* MSR write failed? Inject a #GP */
--	if (r > 0) {
-+	if (!r)
-+		trace_kvm_msr_write(ecx, data);
-+	else
+@@ -1747,7 +1747,7 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+ 	else
  		trace_kvm_msr_write_ex(ecx, data);
--		kvm_inject_gp(vcpu, 0);
--		return 1;
--	}
  
--	trace_kvm_msr_write(ecx, data);
--	return kvm_skip_emulated_instruction(vcpu);
-+	return kvm_complete_insn_gp(vcpu, r);
+-	return kvm_complete_insn_gp(vcpu, r);
++	return kvm_x86_ops.complete_emulated_msr(vcpu, r);
  }
  EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr);
  
 -- 
 2.26.2
-
 
