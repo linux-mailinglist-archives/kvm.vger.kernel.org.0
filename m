@@ -2,182 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D72E2D9665
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 11:37:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E621A2D968D
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 11:47:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437118AbgLNKgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 05:36:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12648 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2436572AbgLNKgz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 05:36:55 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BEAYQc2010671;
-        Mon, 14 Dec 2020 05:36:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+        id S2407267AbgLNKqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 05:46:55 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:60952 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730488AbgLNKqk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 05:46:40 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEAiVKv051778;
+        Mon, 14 Dec 2020 10:45:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=TL0E756GVDlYlkk14G7BJCT9SVvDQ61sP4GI8lSS11Q=;
- b=YNcPm+BgsFI9QUlIcRhnhIQtjoRrCbWuON83Bgs+2bpZj2HUtlErLgAm3kxwGO5n0dKg
- n0TzYlnA9r4rNOGSfZw45+JD5qTfJCHUqXlRH60rkd7Ph9vWE7fn5UfZ0CFGUszO9jy+
- 50xPucUXdoEt1KvSUcOYBN9o746ITRdanIHw7FifNRC6KmiLe2JB4DbIXuk9Lck8D7Ys
- KPqXgpe2EpDHxemejMAs52EGCcmVWxlYGU/XaExSg9cFIvW4G6HS2CnRlqg0qwEy7H+S
- DJjws4nJ4cPhdm/cO7brGOsev0p5ZJ2/mH4Igh9IgRy1fNWX9AigSHRVvaQHuMQYWtA8 Mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35e5c9hqw3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 05:36:14 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BEAYasj011252;
-        Mon, 14 Dec 2020 05:36:14 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35e5c9hqux-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 05:36:13 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BEAWvr1026930;
-        Mon, 14 Dec 2020 10:36:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 35cng8b1jn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 10:36:11 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BEAYrVA57278910
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Dec 2020 10:34:53 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 340214C058;
-        Mon, 14 Dec 2020 10:34:53 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CE4224C04E;
-        Mon, 14 Dec 2020 10:34:52 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.40.101])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Dec 2020 10:34:52 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v3 4/8] s390x: Split assembly and move to
- s390x/asm/
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20201211100039.63597-1-frankja@linux.ibm.com>
- <20201211100039.63597-5-frankja@linux.ibm.com>
- <5f1e9f51-86d9-4bb1-1dcf-09ec687419f4@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <34bf37fd-ba78-7cd4-7d46-dce1f27b8f62@linux.ibm.com>
-Date:   Mon, 14 Dec 2020 11:34:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=RAn6sODM68y9NMKZ5dwdPw+ZhNafbh2IF6p59A17kMM=;
+ b=MOb8hyAFCsACXT8hM9aZe81MiEvJZH8QnYotbmfr/BWOK5pYUNDZriFbo9dzPGGiJqfN
+ ueUH6hK77AJXeMO+LOBkx4pekqw+7CGju3tpOwod4F9HOGCqDnatxv3XyR85Gg/RAs95
+ 3rABTPIbcUfXZlJUqvREBLN6mZpbi/6tXvaXDDrHRyXpUxktJhjuzqx6LlpawJLTzIMF
+ 0UCKj34ySxNZPkUWrFTg5aIEmJDheGgr3hLhXZCLXOYi9pqDUuh0M/D/qEkRKkuPF9Hw
+ Ra0rg7E8Ybsvl35JyLWUhiTJF683CW07nmXOZU+k5S/gZ56ZFFBzjYeU6xXjFQuaj2tt Og== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 35cn9r4j31-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 14 Dec 2020 10:45:40 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEAj7nB033586;
+        Mon, 14 Dec 2020 10:45:39 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 35d7ekaeau-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Dec 2020 10:45:39 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0BEAjbBZ022228;
+        Mon, 14 Dec 2020 10:45:37 GMT
+Received: from [10.175.173.239] (/10.175.173.239)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Dec 2020 02:45:37 -0800
+Subject: Re: [PATCH v3 08/17] KVM: x86/xen: register shared_info page
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, kvm@vger.kernel.org
+References: <20201214083905.2017260-1-dwmw2@infradead.org>
+ <20201214083905.2017260-9-dwmw2@infradead.org>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <da2f8101-c318-d7e5-1e93-f9b99f1718dd@oracle.com>
+Date:   Mon, 14 Dec 2020 10:45:31 +0000
 MIME-Version: 1.0
-In-Reply-To: <5f1e9f51-86d9-4bb1-1dcf-09ec687419f4@redhat.com>
+In-Reply-To: <20201214083905.2017260-9-dwmw2@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-14_04:2020-12-11,2020-12-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 mlxlogscore=999
- suspectscore=0 impostorscore=0 spamscore=0 mlxscore=0 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012140075
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 bulkscore=0
+ suspectscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012140077
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 clxscore=1011 spamscore=0
+ malwarescore=0 priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012140077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/11/20 1:18 PM, Thomas Huth wrote:
-> On 11/12/2020 11.00, Janosch Frank wrote:
->> I've added too much to cstart64.S which is not start related
->> already. Now that I want to add even more code it's time to split
->> cstart64.S. lib.S has functions that are used in tests. macros.S
->> contains macros which are used in cstart64.S and lib.S
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  s390x/Makefile             |   8 +--
->>  s390x/{ => asm}/cstart64.S | 119 ++-----------------------------------
->>  s390x/asm/lib.S            |  65 ++++++++++++++++++++
->>  s390x/asm/macros.S         |  77 ++++++++++++++++++++++++
->>  4 files changed, 150 insertions(+), 119 deletions(-)
->>  rename s390x/{ => asm}/cstart64.S (50%)
->>  create mode 100644 s390x/asm/lib.S
->>  create mode 100644 s390x/asm/macros.S
->>
->> diff --git a/s390x/Makefile b/s390x/Makefile
->> index b079a26..fb62e87 100644
->> --- a/s390x/Makefile
->> +++ b/s390x/Makefile
->> @@ -66,10 +66,10 @@ cflatobjs += lib/s390x/css_lib.o
->>  
->>  OBJDIRS += lib/s390x
->>  
->> -cstart.o = $(TEST_DIR)/cstart64.o
->> +asmlib = $(TEST_DIR)/asm/cstart64.o $(TEST_DIR)/asm/lib.o
->>  
->>  FLATLIBS = $(libcflat)
->> -%.elf: %.o $(FLATLIBS) $(SRCDIR)/s390x/flat.lds $(cstart.o)
->> +%.elf: %.o $(FLATLIBS) $(SRCDIR)/s390x/flat.lds $(asmlib)
->>  	$(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) \
->>  		$(SRCDIR)/lib/auxinfo.c -DPROGNAME=\"$@\"
->>  	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/flat.lds \
->> @@ -87,7 +87,7 @@ FLATLIBS = $(libcflat)
->>  	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT) --no-verify --image $< -o $@
->>  
->>  arch_clean: asm_offsets_clean
->> -	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(TEST_DIR)/.*.d lib/s390x/.*.d
->> +	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(TEST_DIR)/.*.d lib/s390x/.*.d $(TEST_DIR)/asm/*.{o,elf,bin} $(TEST_DIR)/asm/.*.d
->>  
->>  generated-files = $(asm-offsets)
->> -$(tests:.elf=.o) $(cstart.o) $(cflatobjs): $(generated-files)
->> +$(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
+On 12/14/20 8:38 AM, David Woodhouse wrote:
+> From: Joao Martins <joao.m.martins@oracle.com>
 > 
-> Did you check this with both, in-tree and out-of-tree builds?
-> (I wonder whether that new asm directory needs some special handling for
-> out-of-tree builds?)
+> We add a new ioctl, XEN_HVM_SHARED_INFO, to allow hypervisor
+> to know where the guest's shared info page is.
+> 
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 ++
+>  arch/x86/kvm/xen.c              | 27 +++++++++++++++++++++++++++
+>  arch/x86/kvm/xen.h              |  1 -
+>  include/uapi/linux/kvm.h        |  4 ++++
+>  4 files changed, 33 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index c9a4feaee2e7..8bcd83dacf43 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -893,6 +893,8 @@ struct msr_bitmap_range {
+>  /* Xen emulation context */
+>  struct kvm_xen {
+>  	bool long_mode;
+> +	bool shinfo_set;
+> +	struct gfn_to_hva_cache shinfo_cache;
+>  };
+>  
+>  enum kvm_irqchip_mode {
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 52cb9e465542..9dd9c42842b8 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -13,9 +13,23 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <trace/events/kvm.h>
+> +#include <xen/interface/xen.h>
+>  
+>  #include "trace.h"
+>  
+> +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+> +{
+> +	int ret;
+> +
+> +	ret = kvm_gfn_to_hva_cache_init(kvm, &kvm->arch.xen.shinfo_cache,
+> +					gfn_to_gpa(gfn), PAGE_SIZE);
+> +	if (ret)
+> +		return ret;
+> +
+> +	kvm->arch.xen.shinfo_set = true;
 
-I'm not a big fan of out-of-tree builds, so I didn't check.
-To get those builds working we would need to create the asm directory in
-the $testdir
+Can't you just use:
 
-> 
->> diff --git a/s390x/asm/lib.S b/s390x/asm/lib.S
->> new file mode 100644
->> index 0000000..4d78ec6
->> --- /dev/null
->> +++ b/s390x/asm/lib.S
->> @@ -0,0 +1,65 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * s390x assembly library
->> + *
->> + * Copyright (c) 2019 IBM Corp.
->> + *
->> + * Authors:
->> + *    Janosch Frank <frankja@linux.ibm.com>
->> + */
->> +#include <asm/asm-offsets.h>
->> +#include <asm/sigp.h>
->> +
->> +#include "macros.S"
->> +
->> +/*
->> + * load_reset calling convention:
->> + * %r2 subcode (0 or 1)
->> + */
->> +.globl diag308_load_reset
->> +diag308_load_reset:
-> 
-> Thinking about this twice ... this function is only used by s390x/diag308.c,
-> so it's not really a library function, but rather part of a single test ...
-> I think it would be cleaner to put it into a separate file instead, what do
-> you think?
+	kvm->arch.xen.shinfo_cache.gpa
 
-I don't really want to split this any further.
-Moving the asm files into an own directory already improves readability
-a lot for me and I don't need more files if they aren't absolutely
-necessary.
+Rather than added a bool just to say you set a shinfo?
 
-> 
->  Thomas
-> 
-> 
+> +	return 0;
+> +}
 
+And then here you just return @ret while removing the other conditional.
+
+> +
+>  int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+>  {
+>  	int r = -ENOENT;
+> @@ -28,6 +42,11 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+>  		kvm->arch.xen.long_mode = !!data->u.long_mode;
+>  		r = 0;
+>  		break;
+> +
+> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+> +		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn);
+> +		break;
+> +
+>  	default:
+>  		break;
+>  	}
+> @@ -44,6 +63,14 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+>  		data->u.long_mode = kvm->arch.xen.long_mode;
+>  		r = 0;
+>  		break;
+> +
+> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+> +		if (kvm->arch.xen.shinfo_set) {
+> +			data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
+> +			r = 0;
+> +		}
+> +		break;
+> +
+>  	default:
+>  		break;
+>  	}
+> diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+> index cd3c52b62068..120b7450252a 100644
+> --- a/arch/x86/kvm/xen.h
+> +++ b/arch/x86/kvm/xen.h
+> @@ -13,7 +13,6 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
+>  int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
+>  int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+>  int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data);
+> -void kvm_xen_destroy_vm(struct kvm *kvm);
+>  
+spurious deletion ?
+
+>  static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
+>  {
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 6b556ef98b76..caa9faf3c5ad 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1585,11 +1585,15 @@ struct kvm_xen_hvm_attr {
+>  
+>  	union {
+>  		__u8 long_mode;
+> +		struct {
+> +			__u64 gfn;
+> +		} shared_info;
+>  		__u64 pad[4];
+>  	} u;
+>  };
+>  
+>  #define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
+> +#define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
+>  
+>  /* Secure Encrypted Virtualization command */
+>  enum sev_cmd_id {
+> 
