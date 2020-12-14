@@ -2,121 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E7BC2D9D2A
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 18:03:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A732E2D9D37
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 18:07:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394370AbgLNRCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 12:02:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28917 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732052AbgLNRC3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 12:02:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607965256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0B0YEDnoS8M0GXlt72UhVhZU/03A7MZBaySCY6cDkCI=;
-        b=OJmMc1Ma3X27pTM3zSowYoiiKiGi9pI4BaAPtzfbpCVnkXLVQUSHt7kjGyaJLpDojs1li3
-        r86x/Kaeu42P2AN2d8yNvps4yGbejxUMzxwW8zXaPzPuVi4BrOS0EeTTd9aIRW2AFu1zOn
-        nE/WXCCkXWfcbU36iXuc9r4xEvwr3pw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-7ofVFPZmMuK2pj4vvakPIw-1; Mon, 14 Dec 2020 12:00:53 -0500
-X-MC-Unique: 7ofVFPZmMuK2pj4vvakPIw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFA82612AD;
-        Mon, 14 Dec 2020 17:00:50 +0000 (UTC)
-Received: from gondolin (ovpn-113-171.ams2.redhat.com [10.36.113.171])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1524470497;
-        Mon, 14 Dec 2020 17:00:38 +0000 (UTC)
-Date:   Mon, 14 Dec 2020 18:00:36 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
-        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
-        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        borntraeger@de.ibm.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        pasic@linux.ibm.com
-Subject: Re: [for-6.0 v5 08/13] securable guest memory: Introduce sgm
- "ready" flag
-Message-ID: <20201214180036.3837693e.cohuck@redhat.com>
-In-Reply-To: <20201204054415.579042-9-david@gibson.dropbear.id.au>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
-        <20201204054415.579042-9-david@gibson.dropbear.id.au>
-Organization: Red Hat GmbH
+        id S2502087AbgLNRHA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 12:07:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56632 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728823AbgLNRGs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 12:06:48 -0500
+Date:   Mon, 14 Dec 2020 18:07:12 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1607965567;
+        bh=XjDBjYMCqVD98jVY+CGYKWMFLLq5KO9XQBw4EMhV+B8=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NqFNLfa3msvVa1ZGRzFFgG6Nol618BrIswo2mFPWYssqVCDkRx9cePPq3/TZGm2Ax
+         OZffz9GQnR2rV/nqMCOYaGVdBFpoUHYQGIVqaQv8XwGD289JeGPazXpyNUKmiDiB4m
+         5Isj5mCJ79vmE7EArDh043Pfg4ISDjhwkvJzP8D0=
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org, sashal@kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH v3] s390/vfio-ap: clean up vfio_ap resources when KVM
+ pointer invalidated
+Message-ID: <X9ebwKJSSyVP/M9H@kroah.com>
+References: <20201214165617.28685-1-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201214165617.28685-1-akrowiak@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  4 Dec 2020 16:44:10 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> The platform specific details of mechanisms for implementing securable
-> guest memory may require setup at various points during initialization.
-> Thus, it's not really feasible to have a single sgm initialization hook,
-> but instead each mechanism needs its own initialization calls in arch or
-> machine specific code.
+On Mon, Dec 14, 2020 at 11:56:17AM -0500, Tony Krowiak wrote:
+> The vfio_ap device driver registers a group notifier with VFIO when the
+> file descriptor for a VFIO mediated device for a KVM guest is opened to
+> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
+> event). When the KVM pointer is set, the vfio_ap driver takes the
+> following actions:
+> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
+>    of the mediated device.
+> 2. Calls the kvm_get_kvm() function to increment its reference counter.
+> 3. Sets the function pointer to the function that handles interception of
+>    the instruction that enables/disables interrupt processing.
+> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
+>    the guest.
 > 
-> However, to make it harder to have a bug where a mechanism isn't properly
-> initialized under some circumstances, we want to have a common place,
-> relatively late in boot, where we verify that sgm has been initialized if
-> it was requested.
+> In order to avoid memory leaks, when the notifier is called to receive
+> notification that the KVM pointer has been set to NULL, the vfio_ap device
+> driver should reverse the actions taken when the KVM pointer was set.
 > 
-> This patch introduces a ready flag to the SecurableGuestMemory base type
-> to accomplish this, which we verify just before the machine specific
-> initialization function.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 > ---
->  hw/core/machine.c                     | 8 ++++++++
->  include/exec/securable-guest-memory.h | 2 ++
->  target/i386/sev.c                     | 2 ++
->  3 files changed, 12 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 816ea3ae3e..a67a27d03c 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -1155,6 +1155,14 @@ void machine_run_board_init(MachineState *machine)
->      }
->  
->      if (machine->sgm) {
-> +        /*
-> +         * Where securable guest memory is initialized depends on the
-> +         * specific mechanism in use.  But, we need to make sure it's
-> +         * ready by now.  If it isn't, that's a bug in the
-> +         * implementation of that sgm mechanism.
-> +         */
-> +        assert(machine->sgm->ready);
+>  drivers/s390/crypto/vfio_ap_ops.c | 29 ++++++++++++++++++++---------
+>  1 file changed, 20 insertions(+), 9 deletions(-)
 
-Under which circumstances might we arrive here with 'ready' not set?
+<formletter>
 
-- programming error, setup is happening too late -> assert() seems
-  appropriate
-- we tried to set it up, but some error happened -> should we rely on
-  the setup code to error out first? (i.e. we won't end up here, unless
-  there's a programming error, in which case the assert() looks fine)
-  Is there a possible use case for "we could not set it up, but we
-  support an unsecured guest (as long as it is clear what happens)"?
-  Likely only for guests that transition themselves, but one could
-  argue that QEMU should simply be invoked a second time without the
-  sgm stuff being specified in the error case.
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
-> +
->          /*
->           * With securable guest memory, the host can't see the real
->           * contents of RAM, so there's no point in it trying to merge
-
+</formletter>
