@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B6F32D97D2
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 13:03:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 537932D97D3
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 13:04:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437740AbgLNMDI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 07:03:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50762 "EHLO
+        id S2438708AbgLNMDx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 07:03:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730535AbgLNMDI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 07:03:08 -0500
+        with ESMTP id S1730771AbgLNMDx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Dec 2020 07:03:53 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D2DC0613CF
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 04:02:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FF79C0613CF
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 04:03:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=qfWChqZA8NORs4nbLCD308rwNbUJRuO8WMM8O9WTNIk=; b=Lr5BmnPCczUZAPAGKAx5ug7/+D
-        vGGyuGXxM8OlHj4dMksa7BNP/+D7RlSet3qlDWCQF3fLsyyb6jE7sS3nhtokNAQHkanhtnYHCjpRI
-        Z73ghWifh/5F+ZM+U1hEm7WxpeDmlPZ23fUV8g/KAwJ3lN5hg8lGhXnk+fcNB+NJnkIzwJINVuI9p
-        qAbXXmQHF8appI3+G3ejfhWHTXuFQYiQRuc70Asjdjw/68rHNzYo98ndh6J6+cGkL2STB2CQlp6TD
-        L2UkM9DH1J4VKT20IUHN5HRSmB0/MwfimnwCb6+F615/Vw/0nWWf6O0VVPQRspMkdbN188WYTX83v
-        evL2wp+w==;
-Received: from [54.239.6.186] (helo=freeip.amazon.com)
+        bh=WZ6yT3oCozmDE8Zx+Z3hSIX3loeEYPX0dWYArSU/z6A=; b=14VyuWjOug36wshAmc1JF4aEar
+        Q0sU6a3ZZPxVdFPHhtVW7foqOcJS81Pz0kFGvRbFTLkRmUUzngR61ZL9lSsiDMJyqHZqXsp75ai6y
+        IX6qI5e29EaoEO/QW8Miw5SErKCgyySkUqJBipYBTns8OmqR1NP/NAXuYea588rX/o9WhhPq8lsRl
+        OcYG8LutbM5Ds8KeOmqovZs+zIAlTjy3xrloTtCyiP0KZQVH5XjQBTCvjSFapWSy3KHsdnmmAN4f8
+        7JQRDJlGrsF7ZHPRxuFNTlge2dn6wbkaqbUVYgDbkuOJQvKuZW22csDrtQ2Alumtw1kxDb3qfHT6Q
+        TAlVkhlA==;
+Received: from [54.239.6.185] (helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1komYM-00053f-7Y; Mon, 14 Dec 2020 12:02:10 +0000
-Message-ID: <51c4cbf069c14447f8382be9a570e180449d823f.camel@infradead.org>
-Subject: Re: [PATCH v3 08/17] KVM: x86/xen: register shared_info page
+        id 1komZE-000552-Ge; Mon, 14 Dec 2020 12:03:04 +0000
+Message-ID: <9cceffb7b12561423658ca98e6848b4e7a0ead4a.camel@infradead.org>
+Subject: Re: [PATCH v3 13/17] KVM: x86/xen: register vcpu time info region
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Joao Martins <joao.m.martins@oracle.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -37,14 +37,14 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, kvm@vger.kernel.org
-Date:   Mon, 14 Dec 2020 12:02:07 +0000
-In-Reply-To: <da2f8101-c318-d7e5-1e93-f9b99f1718dd@oracle.com>
+Date:   Mon, 14 Dec 2020 12:03:01 +0000
+In-Reply-To: <26cfa76d-8712-d78d-24f3-5ab8b0fb5024@oracle.com>
 References: <20201214083905.2017260-1-dwmw2@infradead.org>
-         <20201214083905.2017260-9-dwmw2@infradead.org>
-         <da2f8101-c318-d7e5-1e93-f9b99f1718dd@oracle.com>
+         <20201214083905.2017260-14-dwmw2@infradead.org>
+         <26cfa76d-8712-d78d-24f3-5ab8b0fb5024@oracle.com>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-kzSen7lWpbsLq1dk5nH+"
+        boundary="=-6buRIV8/fqUUhW/pHWpK"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -53,94 +53,20 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-kzSen7lWpbsLq1dk5nH+
+--=-6buRIV8/fqUUhW/pHWpK
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2020-12-14 at 10:45 +0000, Joao Martins wrote:
-> On 12/14/20 8:38 AM, David Woodhouse wrote:
-> > From: Joao Martins <joao.m.martins@oracle.com>
-> >=20
-> > We add a new ioctl, XEN_HVM_SHARED_INFO, to allow hypervisor
-> > to know where the guest's shared info page is.
-> >=20
-> > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  2 ++
-> >  arch/x86/kvm/xen.c              | 27 +++++++++++++++++++++++++++
-> >  arch/x86/kvm/xen.h              |  1 -
-> >  include/uapi/linux/kvm.h        |  4 ++++
-> >  4 files changed, 33 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/arch/x86/include/asm/kvm_host.h
-> > b/arch/x86/include/asm/kvm_host.h
-> > index c9a4feaee2e7..8bcd83dacf43 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -893,6 +893,8 @@ struct msr_bitmap_range {
-> >  /* Xen emulation context */
-> >  struct kvm_xen {
-> >  	bool long_mode;
-> > +	bool shinfo_set;
-> > +	struct gfn_to_hva_cache shinfo_cache;
-> >  };
-> > =20
-> >  enum kvm_irqchip_mode {
-> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> > index 52cb9e465542..9dd9c42842b8 100644
-> > --- a/arch/x86/kvm/xen.c
-> > +++ b/arch/x86/kvm/xen.c
-> > @@ -13,9 +13,23 @@
-> >  #include <linux/kvm_host.h>
-> > =20
-> >  #include <trace/events/kvm.h>
-> > +#include <xen/interface/xen.h>
-> > =20
-> >  #include "trace.h"
-> > =20
-> > +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret =3D kvm_gfn_to_hva_cache_init(kvm, &kvm-
-> > >arch.xen.shinfo_cache,
-> > +					gfn_to_gpa(gfn), PAGE_SIZE);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	kvm->arch.xen.shinfo_set =3D true;
->=20
-> Can't you just use:
->=20
-> 	kvm->arch.xen.shinfo_cache.gpa
->=20
-> Rather than added a bool just to say you set a shinfo?
+On Mon, 2020-12-14 at 10:55 +0000, Joao Martins wrote:
+> Same comment as shared_info: we probably don't need
+> vcpu_time_info_set if we piggyback
+> on the gfn_to_hva cache setting its @gpa field.
 
-I see no reason why a guest shouldn't be able to use GPA zero if it
-really wanted to. Using a separate boolean matches what KVM does for
-the wallclock info.
+Now we *could* potentially use the @hva field there... but I didn't
+want to. I'd rather keep it clean and simple.
 
 
-> > --- a/arch/x86/kvm/xen.h
-> > +++ b/arch/x86/kvm/xen.h
-> > @@ -13,7 +13,6 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct
-> > kvm_xen_hvm_attr *data);
-> >  int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr
-> > *data);
-> >  int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
-> >  int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data);
-> > -void kvm_xen_destroy_vm(struct kvm *kvm);
-> > =20
->=20
-> spurious deletion ?
-
-Now nothing is kept mapped, there's no need for a destroy function. It
-must have been spuriously *added* in a previous patch and then deleted
-here. Will fix.
-
-
---=-kzSen7lWpbsLq1dk5nH+
+--=-6buRIV8/fqUUhW/pHWpK
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -223,20 +149,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MjE0MTIwMjA3WjAvBgkqhkiG9w0BCQQxIgQg0ao9sSnS9hPUGU7DPCrtN/gi88iUYpD0rBQVGUn3
-35swgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjE0MTIwMzAxWjAvBgkqhkiG9w0BCQQxIgQgaKISDYJNZWFPWEFlQIDnAhlxzMmVqR3r2CzKYJwJ
+q98wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAJtqBIK8dQPo8WD6Rws4K/ILYK0Ns5iTdW6Nmx5To+y+XZmsLZmgpp5IAOcr4USF
-CvQuCXRAvi7VzSy3ncSmJ7y9BOJQKfIYVZYRrvbnDrNs4rmc2aGn5+5nNq8guSjuep47HULwlmz8
-td+FH6VL7wzx/gq6c/Z8B9q51E/nAsXh8ZTYVq64oByheLR/1zXzvPS5MUkz1BW46G8Iv3v2G0X3
-78lR84naMOWCTEACmVvd6XGMaqkCGy/Y5yTcBHq97R24Tkd6cQtxkSP547MKX+2x9+YsZaFTOMn3
-6UghPGB7zmZxfChCPo8LQpHpyFlRGNepjlonNzVGX1sO2gWQfOwAAAAAAAA=
+DQEBAQUABIIBAFEfItMZ7fx0cBOC/tq289lkXtqin+l1FzeuiJEs7UNb6LCrDXfoBuI87fZmxr0l
+YKWGrvm8IW3t+uiY/ok0D+1PdnQN0du/FYMjuZDciPqFEtSh2prdBtXuDL8z9LB7hhZ70JWllpBh
+dg05zmWFRKvsrbo2Si42Iz+dwrOVkxHIiXAPo8/IDVIOdqgYsqhoVcUbscBDyP5JQLdA14v9yc2S
+HpxhUkjR3NIuW7SeJEjH5JOmRXJRBNx2l9czhORg+cOY0SRSe/TChJq/TZtcpLTCbIQG9twh0DJ3
+wFspjeUNukCrQJXZppdGYm0fM2VNSw0F/exjim9vDqqS7LsBr54AAAAAAAA=
 
 
---=-kzSen7lWpbsLq1dk5nH+--
+--=-6buRIV8/fqUUhW/pHWpK--
 
