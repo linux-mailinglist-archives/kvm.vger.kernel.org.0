@@ -2,206 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CAEE2D975D
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 12:32:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E5972D977D
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 12:38:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407668AbgLNLb1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 06:31:27 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:43530 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407650AbgLNLbK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 06:31:10 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEBTu0t072962;
-        Mon, 14 Dec 2020 11:30:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=GzBilYAxAOnEjFtUNSYwMg6h9xoU9ni+coXKujVia28=;
- b=IAU6cUcxyRVTThOeXe+FbUoHH6DlwvGBfBVUAp9Q/TlQWtj5nGgYFCXg/9firYyutH/K
- 8QbSbRsqCJRTc0yl+UV+L4wYEsrCFFPxoTOcgpf7Fs/8150H+v9OWPHHWrzXpmbi2Myl
- Hf4ba/G/KP1YSnMhwAoImaOYw4WYsz6lqwNu1IzzfE7obFG+HYCCjubLw+G06ffzpQO5
- qD/l00tioV4M0yYJunfKk9JKY+8SFyM/OXgdxGsk+gmt+LPtSHJO/RK9P6aGrCLluJLX
- XkH/X5d/LC2P5pkqG1c2fLVeIZQDz2DaJ0LWPpbjKy/e7vbeTQHgtuv0FSZQ95tQohjt Kw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 35ckcb4u8k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 14 Dec 2020 11:30:22 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEBPGkx139905;
-        Mon, 14 Dec 2020 11:30:21 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 35d7ekbmx9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Dec 2020 11:30:21 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0BEBUKKm019935;
-        Mon, 14 Dec 2020 11:30:20 GMT
-Received: from [10.175.173.239] (/10.175.173.239)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 14 Dec 2020 03:30:20 -0800
-Subject: Re: [PATCH v3 08/17] KVM: x86/xen: register shared_info page
-From:   Joao Martins <joao.m.martins@oracle.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com, kvm@vger.kernel.org
-References: <20201214083905.2017260-1-dwmw2@infradead.org>
- <20201214083905.2017260-9-dwmw2@infradead.org>
- <da2f8101-c318-d7e5-1e93-f9b99f1718dd@oracle.com>
-Message-ID: <f965d9e5-3dae-afa7-d4ff-5177a13ea708@oracle.com>
-Date:   Mon, 14 Dec 2020 11:30:16 +0000
+        id S2405341AbgLNLhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 06:37:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46609 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2407277AbgLNLhd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 06:37:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607945765;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=t9wz3YiKOXMMp/r+Wo0hz3x1+xMatpyPFXdpkKPjUXM=;
+        b=RAcrU8J7VOlowiyfvki8h8VZ6OpC7OrJjGzZfVon+D/5Y6594EEprMiVrqjI7kGCyPSbCM
+        uu8NQ1WCO/P1nSXCr3m+AVXr9gr9by13JbCwwI9VkG9IXl6JC5vdJHqn0w0M3N3ZUMhr+1
+        tdeX88UG4aZYPmQqBCHWx3YE/d6OyKI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-bpTtJ95VPlqOAGgWYgs67g-1; Mon, 14 Dec 2020 06:36:04 -0500
+X-MC-Unique: bpTtJ95VPlqOAGgWYgs67g-1
+Received: by mail-ed1-f69.google.com with SMTP id e12so8113128eds.19
+        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 03:36:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=t9wz3YiKOXMMp/r+Wo0hz3x1+xMatpyPFXdpkKPjUXM=;
+        b=cuqOTpezMXSky7PXmjQfm/I8vNm4UBqyViTX330MT14Cb/cRp8vyc6eYypslq/ZeP6
+         ejetSgq9NKGc5b5UxfHi+myYbyLhRvh1tScF6zUY99qgXoDnXB2lPytrlPTJMtmonUzM
+         P9IuwqBEUlchzplO/ER5NCHFycLJgp3BrUojHCt0JLP0G9sTiws8j0M7QubcfYoWgpZq
+         Hd41FIhPXF+G9dazPbZKNM6ev+P+0CwciudyRsnNle4MLEgtfRyoyRMwU7YgeNK/MeFf
+         9SpJ4L8aEkvbmtA1e9RpbjkM4v0Cizdb8rbvagAUBvxmmU0SdMON4gxb2Ww4n4nsVmOT
+         ELow==
+X-Gm-Message-State: AOAM531FWYsBaAr+s43uUneH2o1sfB00amZgwf+Kjy1AAmd2Ope+G9eY
+        ShWxWo/Zom96n28zBMDcOosf/pkyKI9/273n7aHwwKukb+lFIsfHJjNWvk3vudAzwyoqhZ2N3FY
+        NhQNsaI0IxQP4
+X-Received: by 2002:a17:906:7a46:: with SMTP id i6mr21318905ejo.257.1607945762613;
+        Mon, 14 Dec 2020 03:36:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwzOAjOfMz0gO0tv1SgMZjq/o4qOUwyfrF8DeJA6aqd2BYmwYLdDbp05xP/qI9reG6LCuJTog==
+X-Received: by 2002:a17:906:7a46:: with SMTP id i6mr21318895ejo.257.1607945762415;
+        Mon, 14 Dec 2020 03:36:02 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id x6sm16321683edl.67.2020.12.14.03.36.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Dec 2020 03:36:01 -0800 (PST)
+Subject: Re: [PATCH] KVM/VMX/SVM: Move kvm_machine_check function to x86.h
+To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20201029135600.122392-1-ubizjak@gmail.com>
+ <CAFULd4YaRJ+9CN5XZSKXTJzO8CCAOGCeooxoj5=OwjLucnJiDw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c80110f4-2c34-ec7b-64f2-3940cb1b09e7@redhat.com>
+Date:   Mon, 14 Dec 2020 12:36:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <da2f8101-c318-d7e5-1e93-f9b99f1718dd@oracle.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFULd4YaRJ+9CN5XZSKXTJzO8CCAOGCeooxoj5=OwjLucnJiDw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 bulkscore=0
- suspectscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012140081
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999
- priorityscore=1501 mlxscore=0 suspectscore=0 adultscore=0 phishscore=0
- malwarescore=0 impostorscore=0 lowpriorityscore=0 clxscore=1015
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012140081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/14/20 10:45 AM, Joao Martins wrote:
-> On 12/14/20 8:38 AM, David Woodhouse wrote:
->> From: Joao Martins <joao.m.martins@oracle.com>
->>
->> We add a new ioctl, XEN_HVM_SHARED_INFO, to allow hypervisor
->> to know where the guest's shared info page is.
->>
->> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
->> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
->> ---
->>  arch/x86/include/asm/kvm_host.h |  2 ++
->>  arch/x86/kvm/xen.c              | 27 +++++++++++++++++++++++++++
->>  arch/x86/kvm/xen.h              |  1 -
->>  include/uapi/linux/kvm.h        |  4 ++++
->>  4 files changed, 33 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index c9a4feaee2e7..8bcd83dacf43 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -893,6 +893,8 @@ struct msr_bitmap_range {
->>  /* Xen emulation context */
->>  struct kvm_xen {
->>  	bool long_mode;
->> +	bool shinfo_set;
->> +	struct gfn_to_hva_cache shinfo_cache;
->>  };
->>  
->>  enum kvm_irqchip_mode {
->> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
->> index 52cb9e465542..9dd9c42842b8 100644
->> --- a/arch/x86/kvm/xen.c
->> +++ b/arch/x86/kvm/xen.c
->> @@ -13,9 +13,23 @@
->>  #include <linux/kvm_host.h>
->>  
->>  #include <trace/events/kvm.h>
->> +#include <xen/interface/xen.h>
->>  
->>  #include "trace.h"
->>  
->> +static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
->> +{
->> +	int ret;
->> +
->> +	ret = kvm_gfn_to_hva_cache_init(kvm, &kvm->arch.xen.shinfo_cache,
->> +					gfn_to_gpa(gfn), PAGE_SIZE);
->> +	if (ret)
->> +		return ret;
->> +
->> +	kvm->arch.xen.shinfo_set = true;
-> 
-> Can't you just use:
-> 
-> 	kvm->arch.xen.shinfo_cache.gpa
-> 
-> Rather than added a bool just to say you set a shinfo?
-> 
-Or maybe @len in case you want to consider @gpa = 0 as valid.
+On 12/12/20 17:27, Uros Bizjak wrote:
+> Move kvm_machine_check to x86.h to avoid two exact copies
 
->> +	return 0;
->> +}
-> 
-> And then here you just return @ret while removing the other conditional.
-> 
->> +
->>  int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
->>  {
->>  	int r = -ENOENT;
->> @@ -28,6 +42,11 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
->>  		kvm->arch.xen.long_mode = !!data->u.long_mode;
->>  		r = 0;
->>  		break;
->> +
->> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
->> +		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn);
->> +		break;
->> +
->>  	default:
->>  		break;
->>  	}
->> @@ -44,6 +63,14 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
->>  		data->u.long_mode = kvm->arch.xen.long_mode;
->>  		r = 0;
->>  		break;
->> +
->> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
->> +		if (kvm->arch.xen.shinfo_set) {
->> +			data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
->> +			r = 0;
->> +		}
->> +		break;
->> +
->>  	default:
->>  		break;
->>  	}
->> diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
->> index cd3c52b62068..120b7450252a 100644
->> --- a/arch/x86/kvm/xen.h
->> +++ b/arch/x86/kvm/xen.h
->> @@ -13,7 +13,6 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
->>  int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
->>  int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
->>  int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data);
->> -void kvm_xen_destroy_vm(struct kvm *kvm);
->>  
-> spurious deletion ?
-> 
->>  static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
->>  {
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 6b556ef98b76..caa9faf3c5ad 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1585,11 +1585,15 @@ struct kvm_xen_hvm_attr {
->>  
->>  	union {
->>  		__u8 long_mode;
->> +		struct {
->> +			__u64 gfn;
->> +		} shared_info;
->>  		__u64 pad[4];
->>  	} u;
->>  };
->>  
->>  #define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
->> +#define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
->>  
->>  /* Secure Encrypted Virtualization command */
->>  enum sev_cmd_id {
->>
+Queued, thanks for your patience.
+
+Paolo
+
