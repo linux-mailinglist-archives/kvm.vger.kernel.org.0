@@ -2,72 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 161AE2DA283
-	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 22:22:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC88D2DA28D
+	for <lists+kvm@lfdr.de>; Mon, 14 Dec 2020 22:27:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503619AbgLNVVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 16:21:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53142 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727156AbgLNVVr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Dec 2020 16:21:47 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 172F6C0613D6
-        for <kvm@vger.kernel.org>; Mon, 14 Dec 2020 13:21:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Message-ID:From:CC:To:Subject:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:
-        Date:Sender:Reply-To:Content-ID:Content-Description;
-        bh=KvyITt9SumauwIQpzwk5tm1fPNAvAS4BDglppUVMRm4=; b=XjX4pzUAtVjR2FBkO7u/G7vl2J
-        2eIyBlYFp5USCZC+NTFNfV7WZVkkv7oGk/fhE9K0hh1wtLb2kPMl1DtV7QZ6I+iSVt+QJHpqNHkVg
-        BkuTwLR25hb4wl6nwk8e8s1lfyyosIW2rDWf8p0Bhg+G+9vxUl2GSW9UeFpG3CB6VlqUWrSHm/0OA
-        w648l6GUN519csIJY37ibop+2Tsd2Np/dMxaE/mPuUE9Er0ZxRwGzKcy26lwpsPJht4prRD9iRqIp
-        VAFnxf6C2vmEL2bct23zryHiEjZJc75ZLNTMZ8z7rbvrbSXuX3Z/1ybgdsWKc2mX1mFRoHiUb1N+g
-        2hthGMyQ==;
-Received: from [2001:8b0:10b:1:4d32:84d8:690e:d301]
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kovHE-0000XO-EY; Mon, 14 Dec 2020 21:21:04 +0000
-Date:   Mon, 14 Dec 2020 21:21:00 +0000
-User-Agent: K-9 Mail for Android
-In-Reply-To: <87ft48w0or.fsf@vitty.brq.redhat.com>
-References: <20201214083905.2017260-1-dwmw2@infradead.org> <20201214083905.2017260-2-dwmw2@infradead.org> <87ft48w0or.fsf@vitty.brq.redhat.com>
+        id S2503576AbgLNV1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 16:27:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22266 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2503571AbgLNV1C (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 16:27:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607981136;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sj44vDZp0yoWNaa+V0L2lJeML/RXpnxN2J+1LkLWlyw=;
+        b=SJOtguax8IFl30Ma5b4NC/+ccj9w00yceZI1ooCz57iBIs4j8TEU2i/fLbHumawaNCvLw1
+        IPJBK3KFs/i5MwyDX69V977KcahrcLM1VzBZnChSN4wQ36pADWZmJRa99Kaa16LrOCHkwi
+        kwspMOFqywnOem9Ur4YqH8iKIvmTmgc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-4SccWWaQPOeOxSEBp6sW3w-1; Mon, 14 Dec 2020 16:25:34 -0500
+X-MC-Unique: 4SccWWaQPOeOxSEBp6sW3w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66A341005504;
+        Mon, 14 Dec 2020 21:25:31 +0000 (UTC)
+Received: from localhost (ovpn-116-160.rdu2.redhat.com [10.10.116.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D4EFE60BE2;
+        Mon, 14 Dec 2020 21:25:24 +0000 (UTC)
+Date:   Mon, 14 Dec 2020 16:25:23 -0500
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
+        brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org,
+        qemu-ppc@nongnu.org, rth@twiddle.net, thuth@redhat.com,
+        berrange@redhat.com, mdroth@linux.vnet.ibm.com,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        qemu-s390x@nongnu.org, pasic@linux.ibm.com,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [for-6.0 v5 01/13] qom: Allow optional sugar props
+Message-ID: <20201214212523.GS1289986@habkost.net>
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+ <20201204054415.579042-2-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v3 01/17] KVM: Fix arguments to kvm_{un,}map_gfn()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com
-From:   David Woodhouse <dwmw2@infradead.org>
-Message-ID: <6E8FD19B-7ABD-4BF1-84C5-26EDD327F01D@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20201204054415.579042-2-david@gibson.dropbear.id.au>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Dec 04, 2020 at 04:44:03PM +1100, David Gibson wrote:
+> From: Greg Kurz <groug@kaod.org>
+> 
+> Global properties have an @optional field, which allows to apply a given
+> property to a given type even if one of its subclasses doesn't support
+> it. This is especially used in the compat code when dealing with the
+> "disable-modern" and "disable-legacy" properties and the "virtio-pci"
+> type.
+> 
+> Allow object_register_sugar_prop() to set this field as well.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Message-Id: <159738953558.377274.16617742952571083440.stgit@bahia.lan>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-On 14 December 2020 21:13:40 GMT, Vitaly Kuznetsov <vkuznets@redhat=2Ecom>=
- wrote:
->What about different address space ids?=20
->
->gfn_to_memslot() now calls kvm_memslots() which gives memslots for
->address space id =3D 0 but what if we want something different? Note,
->different vCPUs can (in theory) be in different address spaces so we
->actually need 'vcpu' and not 'kvm' then=2E
+-- 
+Eduardo
 
-Sure, but then you want a different function; this one is called 'kvm_map_=
-gfn()' and it operates on kvm_memslots()=2E It *doesn't* operate on the vcp=
-u at all=2E
-
-Which is why it's so bizarre that its argument is a 'vcpu' which it only e=
-ver uses to get vcpu->kvm from it=2E It should just take the kvm pointer=2E
-
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
