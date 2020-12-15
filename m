@@ -2,89 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A97652DAEB2
-	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 15:16:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B08342DAECA
+	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 15:22:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729336AbgLOOPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 09:15:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40146 "EHLO
+        id S1727997AbgLOOUZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 09:20:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728893AbgLOOPC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 09:15:02 -0500
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67BF7C06179C
-        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 06:14:22 -0800 (PST)
-Received: by mail-ot1-x344.google.com with SMTP id j20so14969197otq.5
-        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 06:14:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=mxSP3kFM7PYG2X3Xvc5Q+8/V1v1oyvnId/RXHuZQRWo=;
-        b=fV2YmI952lufK9e+eyVRtJZmjiCdyZNvvFXsyOcyQfQD/h/JT49wroGtIZoJp9uD89
-         G8Gi32FXD3KByJuQ6qegR6W+NdaRGHXbrVQ9unZoEp5tMeEpV3FwaaoPNhnoO+qTangi
-         SJeQkONy7qqGt69XoCWaL2TQkeJaCFkfr3+IW7PKSsrM2ZLC1HMeurFrVB0L+dtlFxWk
-         xrBqkN0Xgl2sVw8kdZ/JSpdwC3bEa8iZndymKbfTqXj3ZaafDrV83jxYXMjWrL/j/r8w
-         tRwsfm4LeJfX6ktDH7MP8SaOz75CYRJbLGvnEOWP6gAQZH5i2ccp2nlrABwWo9liftQE
-         ATRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mxSP3kFM7PYG2X3Xvc5Q+8/V1v1oyvnId/RXHuZQRWo=;
-        b=diwqNZ4chwK/Bet595knbayGiSWWw4EVH8JE/X7CD6Xs3uMNy0eLXOpUCBtshL95fS
-         ZUEpwsPak45sfMJf3sPhxlF//fHamZyZZW5HEwcuyRiMO4PEDBCNWoUV/aU7YTiRTIOi
-         bHnm++6qW5hlsEWnX4EzPuA6bRkFYGPSfH/2ByUtsKqx6WcujPaGu0JKa/3VsQbUnE8z
-         sLAwtKfgTX7XKFiZzLNAzq75HI65XJ5BuKstsNHp69GCG75oRF3s6XUGmdPUPEUqaCC7
-         LN3LfKEZY5lui9A0UrcqR5SsevAZXf3hI8naDVBgLU56CWflQkQ+XbRfaFYDVxodob4l
-         Bj/Q==
-X-Gm-Message-State: AOAM530MLyudxymBuOfqrA8KQY9jQT0XfZKyV3rDXxE3DcN9O7oQSYRr
-        P9NpTgP7VZ5PHL4XPEnpwAILAQ==
-X-Google-Smtp-Source: ABdhPJxPVdLqgoucY7TCXjLsFxLSkdajXZ5cb1t/Q0TlwVl6oVZI05fXJy+pkozxqeqMRL46/egGqQ==
-X-Received: by 2002:a9d:590c:: with SMTP id t12mr22974744oth.308.1608041660340;
-        Tue, 15 Dec 2020 06:14:20 -0800 (PST)
-Received: from [10.10.121.52] (fixed-187-189-51-144.totalplay.net. [187.189.51.144])
-        by smtp.gmail.com with ESMTPSA id p4sm5102367oib.24.2020.12.15.06.14.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Dec 2020 06:14:19 -0800 (PST)
-Subject: Re: [PATCH v2 15/16] target/mips: Extract FPU specific definitions to
- translate.h
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        qemu-devel@nongnu.org
-Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        kvm@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        with ESMTP id S1727227AbgLOOUO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 09:20:14 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84008C06179C;
+        Tue, 15 Dec 2020 06:19:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=n3MIZt3/znb4uRxmCaPyGVKsSFg4njtwCHLsmpqHHtc=; b=j5aJJbiLj/qdgQPvO1H9cZO69S
+        cghj1tVt1MmeFUvrTyb7sI8SjpJMY/zf9c3AF09ZpaS3kpNRMq7Qcza+a+4SVPftUg92+de3j06ij
+        TpvnEmE1F1M9N0xpaIyBwLxOwyzPMjM1Fuu/184ceVPJZHJ8yc8/CxeiHpKLfHNVY2JdoHHrZrv/6
+        52/R56RdCA7sZvOvf5pukk87Nrmwsfm/qV5Ymb9hkIGZ805z6H/EQBg+eqwMVq1zBU/Ekh8ZN0Wyq
+        bkHOj3MQ8RLBs8mNaGQ8LQey8vYZ+0uPL6pOynf1wFmF5Sb2xwez3kwxSkQndlTWxEbDpMaIXx+2n
+        SfEy17IQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kpB9x-0007Qz-Vq; Tue, 15 Dec 2020 14:18:38 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C214A300446;
+        Tue, 15 Dec 2020 15:18:34 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A8CE3200CFB30; Tue, 15 Dec 2020 15:18:34 +0100 (CET)
+Date:   Tue, 15 Dec 2020 15:18:34 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     =?iso-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>
+Cc:     xen-devel@lists.xenproject.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, luto@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Deep Shah <sdeep@vmware.com>,
+        "VMware, Inc." <pv-drivers@vmware.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>
-References: <20201214183739.500368-1-f4bug@amsat.org>
- <20201214183739.500368-16-f4bug@amsat.org>
-From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <14fc4112-a7da-0665-4009-ae3c6e8dbbe3@linaro.org>
-Date:   Tue, 15 Dec 2020 08:14:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH v2 00/12] x86: major paravirt cleanup
+Message-ID: <20201215141834.GG3040@hirez.programming.kicks-ass.net>
+References: <20201120114630.13552-1-jgross@suse.com>
+ <20201120125342.GC3040@hirez.programming.kicks-ass.net>
+ <20201123134317.GE3092@hirez.programming.kicks-ass.net>
+ <6771a12c-051d-1655-fb3a-cc45a3c82e29@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <20201214183739.500368-16-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <6771a12c-051d-1655-fb3a-cc45a3c82e29@suse.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/14/20 12:37 PM, Philippe Mathieu-Daudé wrote:
-> Extract FPU specific definitions that can be used by
-> ISA / ASE / extensions to translate.h header.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/mips/translate.h | 71 +++++++++++++++++++++++++++++++++++++++++
->  target/mips/translate.c | 70 ----------------------------------------
->  2 files changed, 71 insertions(+), 70 deletions(-)
+On Tue, Dec 15, 2020 at 12:42:45PM +0100, J=FCrgen Gro=DF wrote:
+> Peter,
+>=20
+> On 23.11.20 14:43, Peter Zijlstra wrote:
+> > On Fri, Nov 20, 2020 at 01:53:42PM +0100, Peter Zijlstra wrote:
+> > > On Fri, Nov 20, 2020 at 12:46:18PM +0100, Juergen Gross wrote:
+> > > >   30 files changed, 325 insertions(+), 598 deletions(-)
+> > >=20
+> > > Much awesome ! I'll try and get that objtool thing sorted.
+> >=20
+> > This seems to work for me. It isn't 100% accurate, because it doesn't
+> > know about the direct call instruction, but I can either fudge that or
+> > switching to static_call() will cure that.
+> >=20
+> > It's not exactly pretty, but it should be straight forward.
+>=20
+> Are you planning to send this out as an "official" patch, or should I
+> include it in my series (in this case I'd need a variant with a proper
+> commit message)?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
-
+Ah, I was waiting for Josh to have an opinion (and then sorta forgot
+about the whole thing again). Let me refresh and provide at least a
+Changelog.
