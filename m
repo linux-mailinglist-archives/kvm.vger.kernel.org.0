@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F5962DB6F0
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 00:11:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BC6C2DB6F5
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 00:12:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727940AbgLOXL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 18:11:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39548 "EHLO
+        id S1729063AbgLOXMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 18:12:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726181AbgLOXKj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 18:10:39 -0500
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F20AC061793
-        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 15:09:59 -0800 (PST)
-Received: by mail-oi1-x241.google.com with SMTP id 15so25276310oix.8
-        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 15:09:59 -0800 (PST)
+        with ESMTP id S1727106AbgLOXLg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 18:11:36 -0500
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D60C0613D6
+        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 15:10:55 -0800 (PST)
+Received: by mail-ot1-x343.google.com with SMTP id d8so21113166otq.6
+        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 15:10:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=KxqGV+AGNTcfF3zrazYtJ7eYwmIBbvEZbcQH4yg1ucc=;
-        b=OMzErqkr+MJ0j1m6BUExYhdT+cWjx8CFEW1l83SZR8FPpCQR91xbKiCwmX+bq6c0a6
-         fW18eMVXgMpNdc+EpNnvMQ9OM4Lpc1/FP+b4r5wgvhnQZAL8H4jpDtF5ACe0g7pCsVnY
-         KGDkzhugFbOjJSi4c6fRPldO3EUccoxb5pWNkdysZH/WU62MoHUYJq5s2+iSODUqrVDS
-         L3UOW2O3bjGRUZjWrlx4+Elit63ZuA1leAIp9IgOAF40A/86aJkbq4DZuCykHxdN3e8O
-         w2UjgIG2smmLQH+mnVCU+BtlXgIxSMXEwtCfp02LQoDbQMRHkzHrXJyRiR6WVlra+CQj
-         ttig==
+        bh=wTMQDLsyjqLUPdBjNd2tYsE4oew6FnlOhnAcVZzKNgU=;
+        b=Xpc3DrAJ4PRP1g8NNA95kpEHtyrpHPvJaGCBbofubsxIrI7kjaSbqTWWPvWeqXFtW0
+         +0WWKGn8hMRkHXeoa63PiY3RnhcraTkHJ3ecW4daktBOmGCjmTsvai5NKIlvm1y7o20v
+         i5TV/EVXy0nmGx6J4O/u49W1Px6d+sijPRq01B+KU2/bfyKgs3ftdunXshclQox9eNwr
+         AC+8caMMhjRdHaKjLS44LzV8SZD4+Bu0ObTfEaUhEzAXpb2pVuaqSWbnrxO/rFQqAo+j
+         zFjgIdxK1LIXV6DV7m+xY1MclAPMutdO6W6yK7lM9wQbqOuhkfYbQ7gEEEP+QrxKNVPC
+         GOsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=KxqGV+AGNTcfF3zrazYtJ7eYwmIBbvEZbcQH4yg1ucc=;
-        b=AhmWjEkilAtXL2jWqPvTK+Kj7gySE9JeET8WW0YzxOfU7oat1yqzOfcWSXtivAqIvd
-         x4JS/huZ4njEFRtKsUpeg7XFQ10Krr7Upx8WOuxyyMSjIx4P7qrrQYBmQ81X88iRHTqG
-         0WQTBcMVFCz0cjPOlcKagfxPHbIGvE4C+CgnPCNlgeJvalvIqetWLzDsJkGYkfpgGlGC
-         Jm+lZ8yvIWk/v6o8qMb6DgbtImYcCs8Iofd8tgGBI1xa74UBpNC2OFopOaob1T/ntjmG
-         XwygGx0fr2SrmAwfn4EJk+yI3edgWMLuLRXYbDaNSmvZebzkM0RZVoT9ZvA6MfpC3tP4
-         7o2w==
-X-Gm-Message-State: AOAM530RIfvNIj2GU+7leGVUMfl0B1byKl85rkx9SppDXpsSXG9Z5NBL
-        MHUv0UOiELbtuCKLbYhjUbSSGjqknQ+cZb54
-X-Google-Smtp-Source: ABdhPJznkgL2tgml828BQ50Mi4XLxbwQr1VhGmLLDhS7LgYcUyRlVfJH5Dzer5/2+xH/Aq8fDUH4Jw==
-X-Received: by 2002:a54:4413:: with SMTP id k19mr635066oiw.110.1608073798890;
-        Tue, 15 Dec 2020 15:09:58 -0800 (PST)
+        bh=wTMQDLsyjqLUPdBjNd2tYsE4oew6FnlOhnAcVZzKNgU=;
+        b=IdAIj0liRcyW/ihDFw78j02G5S57FyIVbbPgTckPF0HEW7+bg1M7aD4/JxvqfkFtSM
+         W7KZavRt6iiBTnwdFitVBmexNXpJ3C7FZtiz58/PDaul7RuW1MQ/axH9MmnPkp6DzNQi
+         Id0pT0j5Ar0yRgF6WPfdzf1PmcBnocCEUTwkqOnaQg8G7DIOtxmK5Dkk0JqHbrwbM/aJ
+         AeYD/PVhURqUs5GPF9guENtho8HiCe88GvoNkL/nq6j/r9pkP2iCSQm0GTMv3P5+gDBM
+         /dmptf2+QZAk/Zq38HicS3Y0u1mnD7emL4jbKYGYpJtzlBfp5iceZNU2X1/nPplb/kfM
+         DGLQ==
+X-Gm-Message-State: AOAM5304h2jxMQVYDvnuiqhLoIEEb3O8XQ9UM2F6sAxROr5UCiRNbgzH
+        VFpDaJTTeJqveU3A4VxF/pUJjA==
+X-Google-Smtp-Source: ABdhPJwqtGGljFISM+gVi4Q2iK6ihzuMOgL1IrxJPWgK18uVDmsw7qct1hUIIKFAYWS0mCnlfNN8KQ==
+X-Received: by 2002:a05:6830:458:: with SMTP id d24mr24416668otc.163.1608073855396;
+        Tue, 15 Dec 2020 15:10:55 -0800 (PST)
 Received: from [10.10.121.52] (fixed-187-189-51-144.totalplay.net. [187.189.51.144])
-        by smtp.gmail.com with ESMTPSA id y84sm66894oig.36.2020.12.15.15.09.57
+        by smtp.gmail.com with ESMTPSA id d62sm75839oia.6.2020.12.15.15.10.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Dec 2020 15:09:58 -0800 (PST)
-Subject: Re: [PATCH v2 14/24] target/mips: Move msa_reset() to
- mod-msa_helper.c
+        Tue, 15 Dec 2020 15:10:54 -0800 (PST)
+Subject: Re: [PATCH v2 17/24] target/mips: Declare gen_msa/_branch() in
+ 'translate.h'
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org,
@@ -59,14 +59,14 @@ Cc:     kvm@vger.kernel.org,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Huacai Chen <chenhuacai@kernel.org>
 References: <20201215225757.764263-1-f4bug@amsat.org>
- <20201215225757.764263-15-f4bug@amsat.org>
+ <20201215225757.764263-18-f4bug@amsat.org>
 From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7b374223-9275-cfcf-6edf-c0c99ae0e971@linaro.org>
-Date:   Tue, 15 Dec 2020 17:09:55 -0600
+Message-ID: <00d52bce-ad68-6465-cdc4-e34faa6cf4d1@linaro.org>
+Date:   Tue, 15 Dec 2020 17:10:51 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201215225757.764263-15-f4bug@amsat.org>
+In-Reply-To: <20201215225757.764263-18-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -75,19 +75,15 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 12/15/20 4:57 PM, Philippe Mathieu-Daudé wrote:
-> translate_init.c.inc mostly contains CPU definitions.
-> msa_reset() doesn't belong here, move it with the MSA
-> helpers.
-> 
-> One comment style is updated to avoid checkpatch.pl warning.
+> Make gen_msa() and gen_msa_branch() public declarations
+> so we can keep calling them once extracted from the big
+> translate.c in the next commit.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  target/mips/internal.h       |  2 ++
->  target/mips/cpu.c            |  1 +
->  target/mips/mod-msa_helper.c | 36 ++++++++++++++++++++++++++++++++++++
->  target/mips/cpu-defs.c.inc   | 36 ------------------------------------
->  4 files changed, 39 insertions(+), 36 deletions(-)
+>  target/mips/translate.h | 2 ++
+>  target/mips/translate.c | 4 ++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
