@@ -2,161 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71D902DB41A
-	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 19:59:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C2E92DB42C
+	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 20:01:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731759AbgLOS5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 13:57:38 -0500
-Received: from mail-dm6nam11on2072.outbound.protection.outlook.com ([40.107.223.72]:11701
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731743AbgLOS5R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 13:57:17 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Sfwqn//BwBoVN52pdO3v7/HDZUvkjLcl5Hw8Wz8gsxKN+xQOxYXfh7H3ElNDG97bHc9PdbzbzLN3VGGbO8yIyb4fBQ1M/RATzjrs75e7Mp2eAZ2MBbZ3FK1NilYseuMNbjFGkGj4ySUwXgAKMdgsIYCT2uNhv19Jdp0om2QyYJvntnnkOlL54x7+e0FwCnpQtKYGesqcOyhTaJmL1G+l+a7QeQ8kMgUswK4xjcl8+KNfnZrYI+b4ZzX5nr0e6LVEGoV2BZrOK8O9IeraGz6q3WjJDNsbOfsEg62HEqqocmxBnimJe4CK14KUeUr/u58oyAkqXU73AUEw7U0ET98log==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QYA+LhAH6BVJ+KU0KjAdu1EOYhmTMySsNijRSOQ/7IA=;
- b=MUgw53mqBq7NO+pvJ6W64ZxECE29X/Fdoxs9KJ6famCrHvAKPx2hztomZTil5Dr4AGw51RldAsamrUgKxTtDCSIpPA9Zyld09SJdwaitjvvgoT4qnOGVHW1mmrAiBsdMtXGBZ4RCHurkwUdm24ni5F0XVWfijZDWTFgharKDmYuUVvWUdLBaVukwwwU5UCL8aNepsfygBHPzxXe/IlpA5K2TC3Tl76HqfuA+UxvvftFBFc1cQUmPUM9LnorsYqFK+2XK7fsmCjDFYQ6PJaP1r2C2/+vRMMaXGJd7OWaq8DpTcn9azcbPCltDqgcsplMp6T8d5hreJsWB2+iMRdy+XA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1731812AbgLOTBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 14:01:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56114 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731740AbgLOTAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 14:00:47 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD74C06179C
+        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 11:00:07 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id i9so20940637wrc.4
+        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 11:00:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QYA+LhAH6BVJ+KU0KjAdu1EOYhmTMySsNijRSOQ/7IA=;
- b=DeXd+bLXCqjYuwCDCzhiymH6tEI7wUFBQVsugJimJ+Um9Oo0cp2BiyybJDNm6ueMOUR4qVWv+h8Kq+m/7+nm5qHVN0fJ1fc+wewxDQnUpTiZ17PhfowtrabeJk+x6iqOT8xwlKZP20nZd/HxWwOg2r62K/GW3xmKWjQlHYSoBxs=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
- by CH2PR12MB4326.namprd12.prod.outlook.com (2603:10b6:610:af::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.21; Tue, 15 Dec
- 2020 18:55:52 +0000
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::b965:3158:a370:d81e]) by CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::b965:3158:a370:d81e%6]) with mapi id 15.20.3654.025; Tue, 15 Dec 2020
- 18:55:52 +0000
-Date:   Tue, 15 Dec 2020 12:55:41 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Andy Lutomirski <luto@kernel.org>
-Subject: Re: [PATCH v2] KVM: SVM: use vmsave/vmload for saving/restoring
- additional host state
-Message-ID: <20201215185541.nxm2upy76u7z2ko6@amd.com>
-References: <20201214174127.1398114-1-michael.roth@amd.com>
- <X9e/L3YTAT/N+ljh@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <X9e/L3YTAT/N+ljh@google.com>
-X-Originating-IP: [165.204.11.250]
-X-ClientProxiedBy: BL1PR13CA0294.namprd13.prod.outlook.com
- (2603:10b6:208:2bc::29) To CH2PR12MB4133.namprd12.prod.outlook.com
- (2603:10b6:610:7a::13)
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=aT1PJnajciJE2dqCzWg1aHs1GZklEjKsUm8z46pbejA=;
+        b=QhXRaJPhkgfnd4SaaKWQHSeaEei8xLWzw26Hp1K18TR9ajmV5Ej+vX/MFZphop4cfv
+         giQ55k5XtkD+5gvJkKcNKxtW5mnrM7Jjrli8W4iAr3poOwDBYYFwRYHYG00WUoWuIYm6
+         DJOVV8x9fy/okGU+sRDOcFfYgd6rBLjm31R7PStE+q6v0DNV3H4AVXp/UCcIqrDZhQNa
+         5CL8sE5Dtuh8iO3fpV8zmUmZMDF9FKQNVhmBDtRsvtmuRpcibDygXoL1ZjijMeCEWWjh
+         rCQvln2NZYCE1DFYJEbMGTa2/FnD7Mk+tBhnJGsiBxe674LnTo6gRPe1FebOAZl5sRXM
+         FfFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aT1PJnajciJE2dqCzWg1aHs1GZklEjKsUm8z46pbejA=;
+        b=YZ2TldLB+hT9jq1dJGMyDoignqdhjkjAdt8f9vhLsJG00ulyjIQ52XUuKVZUUWcPDJ
+         q+tg/dhxbBDYo69vJ9dY5T1YSWNnjyNlthN04gODsrnxAE2aQZSy4DzViwacvzWYGEDF
+         2kOxJmIh96gDq76kh+Q5lk02dtwx/3neJ8rpjD4/Y4eB2U4A2c5CapF9KChMOjxzN4KR
+         3tLU4z5awXyvb4O2HpSEGd0yiktdAA6gZ+cbqoDlTvujDnxhr+sUc1iMk/naRr7a8EQO
+         kHwJ2RwfK2Fkw1EqEg0ajJZ78UX6UjYWaA+sdLIfVb6W+v+Kc6pbkyxCiF+PJ6prt5yT
+         FTow==
+X-Gm-Message-State: AOAM530URHg/LkDD6c7lHP/N8zBStLp2NRT1E1He0xpCLmyOiyva19iu
+        nOqp8wNP3ff7wiJzZRuzf+FXBkrp2O8y5g==
+X-Google-Smtp-Source: ABdhPJy6HQrXfvvj6hsfog09rPzxtPJZNP7hh1tKQMxkQQLMl4O/dCQKEgV1zkhWR3+b6xZ27H22xw==
+X-Received: by 2002:adf:b343:: with SMTP id k3mr34730670wrd.202.1608058803884;
+        Tue, 15 Dec 2020 11:00:03 -0800 (PST)
+Received: from [192.168.1.36] (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
+        by smtp.gmail.com with ESMTPSA id d191sm37510180wmd.24.2020.12.15.11.00.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Dec 2020 11:00:02 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Subject: Re: [PATCH v2 00/16] target/mips: Boring code reordering + add
+ "translate.h"
+To:     qemu-devel@nongnu.org, no-reply@patchew.org
+Cc:     aleksandar.rikalo@syrmia.com, kvm@vger.kernel.org,
+        chenhuacai@kernel.org, jiaxun.yang@flygoat.com, laurent@vivier.eu,
+        pbonzini@redhat.com, aurelien@aurel32.net
+References: <160804228706.20355.2388937911912422319@600e7e483b3a>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e7d7154a-c9d9-5d91-9601-3e7d2c36c383@amsat.org>
+Date:   Tue, 15 Dec 2020 20:00:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.11.250) by BL1PR13CA0294.namprd13.prod.outlook.com (2603:10b6:208:2bc::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3676.13 via Frontend Transport; Tue, 15 Dec 2020 18:55:51 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 6a96de9a-116e-4f2d-d86d-08d8a12b0bb9
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4326:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB4326143817306B281F9F3BD995C60@CH2PR12MB4326.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fkXAbeoH0sQZ0UThMbOYoUYLz5antqL/ffRGA9G9MRtxdoox2qw/KjMPt6irFd+pXPzplKm7Oj0MqT2Zpm1gpDUP8lmDKXezD81fmKjDq1B9dHuUIyScGfsWGN2wikCD+MVQBEBWLzmGhs5c7od5UH1Kw3H8NNqZSwqAt7hDUsNL+eQVTLCNp3jp5lQde+T3lTv+DRxljkYjukF2fpz0oByTlyHcvsmLKBWHZn9luGUECBzc9IyyhPlQslJF5UYwfIdQzryOFr28j2iMsTCtXNwo3LCRHef4vIL8Z0pFwq5IHgai87Y6aatojNxR8q/8r8/NbrZnUlfFZjHTuhm0wVZg5/aTLUuB9bMIipueFlzN2+V54YNYAX7C34SVyNeV
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(366004)(376002)(6916009)(6496006)(66476007)(508600001)(6486002)(36756003)(5660300002)(66946007)(7416002)(66556008)(54906003)(8676002)(4326008)(34490700003)(52116002)(186003)(26005)(44832011)(956004)(2616005)(2906002)(83380400001)(86362001)(16526019)(8936002)(6666004)(1076003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?FYYj90TavCEJ1UGaDhgGuC0zGFfsvQicyXVMgFdEAcY2AMTOHkiuH3un2nos?=
- =?us-ascii?Q?xS4JqPpPblcCVdXm8GFrNYpZ74M4dmaWbldHgjdubFz/VBd9y4oqATc1esHn?=
- =?us-ascii?Q?Ia34qb2cwsvTV1N4VQa0URcWtabTeg3NQSw/gTAxMsrT+cCi2OI6kEjL9Qth?=
- =?us-ascii?Q?NKgMinVlH1C05FH1vyJCbNzvcvrzHgdyjmFpOO+WxU6YqZ5oK/zOGF3C4hD8?=
- =?us-ascii?Q?i3pd3rigBRufdM+mU/+DQKRmmiZIiqfyC5KKzhaRSIebeZfQ5xYGAqbHC/xW?=
- =?us-ascii?Q?0CmzvZ67zJ6f2zR6rBiOGnYhJ2v8E7LuTJXcZNQnyKJ/FzkIh2tqm5tbcnvx?=
- =?us-ascii?Q?7MPQ2WHFFUTJqnfmf+Z5NSNTONzEnYmPYshAy8WoHBTZ3WX6Bsim5YTLcRZv?=
- =?us-ascii?Q?UE2QErTbPGk2mdhzmbh+k+aIuYRW6pivs5J7948JYMAW37JeSnT8+syvvyp9?=
- =?us-ascii?Q?91sQfQOMP4lHkzXRxCNV3OC/WCVOfT1Uz21CFb1bGQTfjN0IpqCy5WPQimwk?=
- =?us-ascii?Q?//G4TryQfKRW4FjCrXZnRf+hAwlJhpg3pvwrKc/LZ+40vhB8v7fiHBKzrYYq?=
- =?us-ascii?Q?FdoRlhS/IoxbH9++5w1mszV9plnmchl0AOj3/nwUvMYrFh60LYGnNuKHb0Vv?=
- =?us-ascii?Q?qBDoCJQb7p4+CtNFobZM1/upVckBEdgbT/iN6Wa1rK7gBzBfeGVt+wyQyJdq?=
- =?us-ascii?Q?LGrLMptvIvF0FDsz89FGV7gvxt1BJtzMj+DxYvvhFA0/6b2acaUsfOlL1Fmp?=
- =?us-ascii?Q?WELk1Wmr/uZbIrJ8xRfyvb8rhHy8zAehMgw4Nr0wAk2MzeNB48JZRPPnMxz2?=
- =?us-ascii?Q?vjT0TAZ4TPLLZafMw3/EATllEXhYxXPGSxuFxLL5GGOt3BR6v7RtwoOahLEW?=
- =?us-ascii?Q?yufAjT2lTDLv6imELKngIUZDXSrgWx8k+CV8KEP+ZRGOl2NowJ1Pu8CZuFFm?=
- =?us-ascii?Q?v8TWVQpGNWXRbPVmwO1wV9JwnrkhURCl6zbfEFNgje4WuzWEQ3yVtVjkeuX5?=
- =?us-ascii?Q?VVKM?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2020 18:55:52.4015
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a96de9a-116e-4f2d-d86d-08d8a12b0bb9
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2LHrON6JhRFg4HAPUH9XqAB+Xa57haBjlzZBCLsZHjaedMdaY9XhQBLQivhtEqhtJsh4UTcXHi8E7mNeJmgfgA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4326
+In-Reply-To: <160804228706.20355.2388937911912422319@600e7e483b3a>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On 12/15/20 3:24 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20201214183739.500368-1-f4bug@amsat.org/
+> 
+> 
+> === OUTPUT BEGIN ===
+> 1/16 Checking commit 02da9907b334 (target/mips: Inline cpu_state_reset() in mips_cpu_reset())
+> 2/16 Checking commit a129631d782b (target/mips: Extract FPU helpers to 'fpu_helper.h')
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #42: 
+> new file mode 100644
+> 
+> total: 0 errors, 1 warnings, 193 lines checked
+> 
+> Patch 2/16 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 3/16 Checking commit 8a5a0b7f9c26 (target/mips: Add !CONFIG_USER_ONLY comment after #endif)
+> 4/16 Checking commit d10b7c71feb1 (target/mips: Remove consecutive CONFIG_USER_ONLY ifdefs)
+> 5/16 Checking commit 051e87cd7a13 (target/mips: Extract common helpers from helper.c to common_helper.c)
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #41: FILE: target/mips/cpu.c:53:
+> +    cu = (v >> CP0St_CU0) & 0xf;
+>                            ^
+> 
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #42: FILE: target/mips/cpu.c:54:
+> +    mx = (v >> CP0St_MX) & 0x1;
+>                           ^
+> 
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #43: FILE: target/mips/cpu.c:55:
+> +    ksu = (v >> CP0St_KSU) & 0x3;
+>                             ^
+> 
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #70: FILE: target/mips/cpu.c:82:
+> +        uint32_t ksux = (1 << CP0St_KX) & val;
+>                                          ^
+> 
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #78: FILE: target/mips/cpu.c:90:
+> +        mask &= ~(((1 << CP0St_SR) | (1 << CP0St_NMI)) & val);
+>                                                         ^
+> 
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #105: FILE: target/mips/cpu.c:117:
+> +        mask &= ~((1 << CP0Ca_WP) & val);
+>                                    ^
+> 
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #110: FILE: target/mips/cpu.c:122:
+> +    if ((old ^ env->CP0_Cause) & (1 << CP0Ca_DC)) {
+>                                 ^
+> 
+> ERROR: space prohibited after that '&' (ctx:WxW)
+> #120: FILE: target/mips/cpu.c:132:
+> +        if ((old ^ env->CP0_Cause) & (1 << (CP0Ca_IP + i))) {
+>                                     ^
+> 
+> total: 8 errors, 0 warnings, 433 lines checked
+> 
+> Patch 5/16 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
 
-Sorry to reply out-of-thread, our mail server is having issues with
-certain email addresses at the moment so I only see your message via
-the archives atm. But regarding:
-
->>> I think we can defer this until we're actually planning on running
->>> the guest,
->>> i.e. put this in svm_prepare_guest_switch().
->>
->> It looks like the SEV-ES patches might land before this one, and those
->> introduce similar handling of VMSAVE in svm_vcpu_load(), so I think it
->> might also create some churn there if we take this approach and want
->> to keep the SEV-ES and non-SEV-ES handling similar.
->
->Hmm, I'll make sure to pay attention to that when I review the SEV-ES
->patches,
->which I was hoping to get to today, but that's looking unlikely at this
->point.
-
-It looks like SEV-ES patches are queued now. Those patches have
-undergone a lot of internal testing so I'm really hesitant to introduce
-any significant change to those at this stage as a prereq for my little
-patch. So for v3 I'm a little unsure how best to approach this.
-
-The main options are:
-
-a) go ahead and move the vmsave handling for non-sev-es case into
-   prepare_guest_switch() as you suggested, but leave the sev-es where
-   they are. then we can refactor those as a follow-up patch that can be
-   tested/reviewed as a separate series after we've had some time to
-   re-test, though that would probably just complicate the code in the
-   meantime...
-
-b) stick with the current approach for now, and consider a follow-up series
-   to refactor both sev-es and non-sev-es as a whole that we can test
-   separately.
-
-c) refactor SEV-ES handling as part of this series. it's only a small change
-   to the SEV-ES code but it re-orders enough things around that I'm
-   concerned it might invalidate some of the internal testing we've done.
-   whereas a follow-up refactoring such as the above options can be rolled
-   into our internal testing so we can let our test teams re-verify
-
-Obviously I prefer b) but I'm biased on the matter and fine with whatever
-you and others think is best. I just wanted to point out my concerns with
-the various options.
-
--Mike
+All pre-existing issues (code moved).
