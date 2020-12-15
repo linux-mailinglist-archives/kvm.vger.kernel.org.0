@@ -2,165 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BDFF2DB3EC
-	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 19:46:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71D902DB41A
+	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 19:59:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731640AbgLOSpY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 13:45:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731621AbgLOSpL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 13:45:11 -0500
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD18C061282
-        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 10:44:26 -0800 (PST)
-Received: by mail-pf1-x444.google.com with SMTP id w6so15059840pfu.1
-        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 10:44:26 -0800 (PST)
+        id S1731759AbgLOS5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 13:57:38 -0500
+Received: from mail-dm6nam11on2072.outbound.protection.outlook.com ([40.107.223.72]:11701
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731743AbgLOS5R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 13:57:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Sfwqn//BwBoVN52pdO3v7/HDZUvkjLcl5Hw8Wz8gsxKN+xQOxYXfh7H3ElNDG97bHc9PdbzbzLN3VGGbO8yIyb4fBQ1M/RATzjrs75e7Mp2eAZ2MBbZ3FK1NilYseuMNbjFGkGj4ySUwXgAKMdgsIYCT2uNhv19Jdp0om2QyYJvntnnkOlL54x7+e0FwCnpQtKYGesqcOyhTaJmL1G+l+a7QeQ8kMgUswK4xjcl8+KNfnZrYI+b4ZzX5nr0e6LVEGoV2BZrOK8O9IeraGz6q3WjJDNsbOfsEg62HEqqocmxBnimJe4CK14KUeUr/u58oyAkqXU73AUEw7U0ET98log==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QYA+LhAH6BVJ+KU0KjAdu1EOYhmTMySsNijRSOQ/7IA=;
+ b=MUgw53mqBq7NO+pvJ6W64ZxECE29X/Fdoxs9KJ6famCrHvAKPx2hztomZTil5Dr4AGw51RldAsamrUgKxTtDCSIpPA9Zyld09SJdwaitjvvgoT4qnOGVHW1mmrAiBsdMtXGBZ4RCHurkwUdm24ni5F0XVWfijZDWTFgharKDmYuUVvWUdLBaVukwwwU5UCL8aNepsfygBHPzxXe/IlpA5K2TC3Tl76HqfuA+UxvvftFBFc1cQUmPUM9LnorsYqFK+2XK7fsmCjDFYQ6PJaP1r2C2/+vRMMaXGJd7OWaq8DpTcn9azcbPCltDqgcsplMp6T8d5hreJsWB2+iMRdy+XA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=IVZnctmfk0yIQtj/yNYoj8vI1ASqyPivl3mLB8gsmgg=;
-        b=kQdu4FVrZaDf94OglYYj4VmJzt57PCwr5ElOcMG1XjIh130u6xY4kqOJx1EP4je2fy
-         U+uTD4pz8k+qwHMnsIFlGKc518FFySmgPigdgVGg1c42BD+PeuqmlqGERF654QDXXxj4
-         4uP7WlF//MDAtdNQUZDSwZ5Zn7qpOnl1dwPhDAzSY8EGfwB6UxskcNc0w6TJrlNoq80n
-         wZvGxZozyZU5lXMASiCPBN5+7l6iGKtth4DINbgpDDi3nntYb1HW2Gf6Kzqtb134wq4c
-         ShczGVT4uk7rGI/pkqTsVVryiI59XsDsd8AcPxlFFNqILKCEMT5/vvNRvFfxZBDhlrGe
-         W7kQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=IVZnctmfk0yIQtj/yNYoj8vI1ASqyPivl3mLB8gsmgg=;
-        b=GDnkBmBkKB53fX1WS2Omr7d2gkqvIGl6f9Bwfvsdch06zMESpcSuKZWFxSrUvZRIj1
-         iTFE6wcfp85aR+6xLqRad1w252X3dql8gQQVNSZ/Z/cUX7RzGeISSxQOUNuYKDMNpFlu
-         3CnwDhQBXkSJJ/Pio5sn4iw9piSIXBKyU3P1MK3CNLxyFPZS6XenM9X/jJIfCtq3emgx
-         MREOmLhyDtSiWs3S/rruKxlymdwRPpqn9bo07Rx47guFK4nwcHqMXaBYvkTGVpSQRd+H
-         BNFF5t7YxOuBmQOmxU8uGo+47nGOs8TztgvZNp//3utfdPOfWQCLPecuPhRy4SVBV03l
-         FmVw==
-X-Gm-Message-State: AOAM531gwzi2ZSsdw7cBzj5eH/c+zbknZ08Rf8VoDPR4C8W3swBVDzTm
-        jtG8hHhgtckhs8Rtb/jseZFvpQ==
-X-Google-Smtp-Source: ABdhPJxKNkTxXkjEjLNAjtmohl1H3VRCv0y9bGHizEAISRmWlhvt0TCdWWdOGpxwcvHfS3ihBKKPGw==
-X-Received: by 2002:a63:f84d:: with SMTP id v13mr30226286pgj.234.1608057865256;
-        Tue, 15 Dec 2020 10:44:25 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id na6sm21029310pjb.12.2020.12.15.10.44.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Dec 2020 10:44:24 -0800 (PST)
-Date:   Tue, 15 Dec 2020 10:44:18 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>, stable@vger.kernel.org
-Subject: Re: [PATCH V2] kvm: check tlbs_dirty directly
-Message-ID: <X9kEAh7z1rmlmyhZ@google.com>
-References: <ea0938d2-f766-99de-2019-9daf5798ccac@redhat.com>
- <20201215145259.18684-1-jiangshanlai@gmail.com>
-MIME-Version: 1.0
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QYA+LhAH6BVJ+KU0KjAdu1EOYhmTMySsNijRSOQ/7IA=;
+ b=DeXd+bLXCqjYuwCDCzhiymH6tEI7wUFBQVsugJimJ+Um9Oo0cp2BiyybJDNm6ueMOUR4qVWv+h8Kq+m/7+nm5qHVN0fJ1fc+wewxDQnUpTiZ17PhfowtrabeJk+x6iqOT8xwlKZP20nZd/HxWwOg2r62K/GW3xmKWjQlHYSoBxs=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB4326.namprd12.prod.outlook.com (2603:10b6:610:af::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.21; Tue, 15 Dec
+ 2020 18:55:52 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::b965:3158:a370:d81e]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::b965:3158:a370:d81e%6]) with mapi id 15.20.3654.025; Tue, 15 Dec 2020
+ 18:55:52 +0000
+Date:   Tue, 15 Dec 2020 12:55:41 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH v2] KVM: SVM: use vmsave/vmload for saving/restoring
+ additional host state
+Message-ID: <20201215185541.nxm2upy76u7z2ko6@amd.com>
+References: <20201214174127.1398114-1-michael.roth@amd.com>
+ <X9e/L3YTAT/N+ljh@google.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201215145259.18684-1-jiangshanlai@gmail.com>
+In-Reply-To: <X9e/L3YTAT/N+ljh@google.com>
+X-Originating-IP: [165.204.11.250]
+X-ClientProxiedBy: BL1PR13CA0294.namprd13.prod.outlook.com
+ (2603:10b6:208:2bc::29) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.11.250) by BL1PR13CA0294.namprd13.prod.outlook.com (2603:10b6:208:2bc::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3676.13 via Frontend Transport; Tue, 15 Dec 2020 18:55:51 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 6a96de9a-116e-4f2d-d86d-08d8a12b0bb9
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4326:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR12MB4326143817306B281F9F3BD995C60@CH2PR12MB4326.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fkXAbeoH0sQZ0UThMbOYoUYLz5antqL/ffRGA9G9MRtxdoox2qw/KjMPt6irFd+pXPzplKm7Oj0MqT2Zpm1gpDUP8lmDKXezD81fmKjDq1B9dHuUIyScGfsWGN2wikCD+MVQBEBWLzmGhs5c7od5UH1Kw3H8NNqZSwqAt7hDUsNL+eQVTLCNp3jp5lQde+T3lTv+DRxljkYjukF2fpz0oByTlyHcvsmLKBWHZn9luGUECBzc9IyyhPlQslJF5UYwfIdQzryOFr28j2iMsTCtXNwo3LCRHef4vIL8Z0pFwq5IHgai87Y6aatojNxR8q/8r8/NbrZnUlfFZjHTuhm0wVZg5/aTLUuB9bMIipueFlzN2+V54YNYAX7C34SVyNeV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(366004)(376002)(6916009)(6496006)(66476007)(508600001)(6486002)(36756003)(5660300002)(66946007)(7416002)(66556008)(54906003)(8676002)(4326008)(34490700003)(52116002)(186003)(26005)(44832011)(956004)(2616005)(2906002)(83380400001)(86362001)(16526019)(8936002)(6666004)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?FYYj90TavCEJ1UGaDhgGuC0zGFfsvQicyXVMgFdEAcY2AMTOHkiuH3un2nos?=
+ =?us-ascii?Q?xS4JqPpPblcCVdXm8GFrNYpZ74M4dmaWbldHgjdubFz/VBd9y4oqATc1esHn?=
+ =?us-ascii?Q?Ia34qb2cwsvTV1N4VQa0URcWtabTeg3NQSw/gTAxMsrT+cCi2OI6kEjL9Qth?=
+ =?us-ascii?Q?NKgMinVlH1C05FH1vyJCbNzvcvrzHgdyjmFpOO+WxU6YqZ5oK/zOGF3C4hD8?=
+ =?us-ascii?Q?i3pd3rigBRufdM+mU/+DQKRmmiZIiqfyC5KKzhaRSIebeZfQ5xYGAqbHC/xW?=
+ =?us-ascii?Q?0CmzvZ67zJ6f2zR6rBiOGnYhJ2v8E7LuTJXcZNQnyKJ/FzkIh2tqm5tbcnvx?=
+ =?us-ascii?Q?7MPQ2WHFFUTJqnfmf+Z5NSNTONzEnYmPYshAy8WoHBTZ3WX6Bsim5YTLcRZv?=
+ =?us-ascii?Q?UE2QErTbPGk2mdhzmbh+k+aIuYRW6pivs5J7948JYMAW37JeSnT8+syvvyp9?=
+ =?us-ascii?Q?91sQfQOMP4lHkzXRxCNV3OC/WCVOfT1Uz21CFb1bGQTfjN0IpqCy5WPQimwk?=
+ =?us-ascii?Q?//G4TryQfKRW4FjCrXZnRf+hAwlJhpg3pvwrKc/LZ+40vhB8v7fiHBKzrYYq?=
+ =?us-ascii?Q?FdoRlhS/IoxbH9++5w1mszV9plnmchl0AOj3/nwUvMYrFh60LYGnNuKHb0Vv?=
+ =?us-ascii?Q?qBDoCJQb7p4+CtNFobZM1/upVckBEdgbT/iN6Wa1rK7gBzBfeGVt+wyQyJdq?=
+ =?us-ascii?Q?LGrLMptvIvF0FDsz89FGV7gvxt1BJtzMj+DxYvvhFA0/6b2acaUsfOlL1Fmp?=
+ =?us-ascii?Q?WELk1Wmr/uZbIrJ8xRfyvb8rhHy8zAehMgw4Nr0wAk2MzeNB48JZRPPnMxz2?=
+ =?us-ascii?Q?vjT0TAZ4TPLLZafMw3/EATllEXhYxXPGSxuFxLL5GGOt3BR6v7RtwoOahLEW?=
+ =?us-ascii?Q?yufAjT2lTDLv6imELKngIUZDXSrgWx8k+CV8KEP+ZRGOl2NowJ1Pu8CZuFFm?=
+ =?us-ascii?Q?v8TWVQpGNWXRbPVmwO1wV9JwnrkhURCl6zbfEFNgje4WuzWEQ3yVtVjkeuX5?=
+ =?us-ascii?Q?VVKM?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2020 18:55:52.4015
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a96de9a-116e-4f2d-d86d-08d8a12b0bb9
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2LHrON6JhRFg4HAPUH9XqAB+Xa57haBjlzZBCLsZHjaedMdaY9XhQBLQivhtEqhtJsh4UTcXHi8E7mNeJmgfgA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4326
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Note, you don't actually need to Cc stable@vger.kernel.org when sending the
-patch.  If/when the patch is merged to Linus' tree, the stable tree maintainers,
-or more accurately their scripts, will automatically pick up the patch and apply
-it to the relevant stable trees.
+Hi Sean,
 
-You'll probably be getting the following letter from Greg KH any time now :-)
+Sorry to reply out-of-thread, our mail server is having issues with
+certain email addresses at the moment so I only see your message via
+the archives atm. But regarding:
 
-<formletter>
+>>> I think we can defer this until we're actually planning on running
+>>> the guest,
+>>> i.e. put this in svm_prepare_guest_switch().
+>>
+>> It looks like the SEV-ES patches might land before this one, and those
+>> introduce similar handling of VMSAVE in svm_vcpu_load(), so I think it
+>> might also create some churn there if we take this approach and want
+>> to keep the SEV-ES and non-SEV-ES handling similar.
+>
+>Hmm, I'll make sure to pay attention to that when I review the SEV-ES
+>patches,
+>which I was hoping to get to today, but that's looking unlikely at this
+>point.
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
+It looks like SEV-ES patches are queued now. Those patches have
+undergone a lot of internal testing so I'm really hesitant to introduce
+any significant change to those at this stage as a prereq for my little
+patch. So for v3 I'm a little unsure how best to approach this.
 
-</formletter>
+The main options are:
 
+a) go ahead and move the vmsave handling for non-sev-es case into
+   prepare_guest_switch() as you suggested, but leave the sev-es where
+   they are. then we can refactor those as a follow-up patch that can be
+   tested/reviewed as a separate series after we've had some time to
+   re-test, though that would probably just complicate the code in the
+   meantime...
 
-On Tue, Dec 15, 2020, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
-> 
-> In kvm_mmu_notifier_invalidate_range_start(), tlbs_dirty is used as:
->         need_tlb_flush |= kvm->tlbs_dirty;
-> with need_tlb_flush's type being int and tlbs_dirty's type being long.
-> 
-> It means that tlbs_dirty is always used as int and the higher 32 bits
-> is useless.  We need to check tlbs_dirty in a correct way and this
-> change checks it directly without propagating it to need_tlb_flush.
-> 
-> And need_tlb_flush is changed to boolean because it is used as a
-> boolean and its name starts with "need".
-> 
-> Note: it's _extremely_ unlikely this neglecting of higher 32 bits can
-> cause problems in practice.  It would require encountering tlbs_dirty
-> on a 4 billion count boundary, and KVM would need to be using shadow
-> paging or be running a nested guest.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: a4ee1ca4a36e ("KVM: MMU: delay flush all tlbs on sync_page path")
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
-> Changed from V1:
-> 	Update the patch and the changelog as Sean Christopherson suggested.
-> 
->  virt/kvm/kvm_main.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2541a17ff1c4..1c17f3d073cb 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -470,7 +470,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->  					const struct mmu_notifier_range *range)
->  {
->  	struct kvm *kvm = mmu_notifier_to_kvm(mn);
-> -	int need_tlb_flush = 0, idx;
-> +	int idx;
-> +	bool need_tlb_flush;
+b) stick with the current approach for now, and consider a follow-up series
+   to refactor both sev-es and non-sev-es as a whole that we can test
+   separately.
 
-It's a bit silly given how small this patch already is, but I do think this
-should be split into two patches so that the kvm->tlbs_dirty bug fix is fully
-isolated for backporting.  I.e. patch 1/2 would simply be:
+c) refactor SEV-ES handling as part of this series. it's only a small change
+   to the SEV-ES code but it re-orders enough things around that I'm
+   concerned it might invalidate some of the internal testing we've done.
+   whereas a follow-up refactoring such as the above options can be rolled
+   into our internal testing so we can let our test teams re-verify
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3abcb2ce5b7d..19dae28904f7 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -485,9 +485,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
-        kvm->mmu_notifier_count++;
-        need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
-                                             range->flags);
--       need_tlb_flush |= kvm->tlbs_dirty;
-        /* we've to flush the tlb before the pages can be freed */
--       if (need_tlb_flush)
-+       if (need_tlb_flush || kvm->tlbs_dirty)
-                kvm_flush_remote_tlbs(kvm);
+Obviously I prefer b) but I'm biased on the matter and fine with whatever
+you and others think is best. I just wanted to point out my concerns with
+the various options.
 
-        spin_unlock(&kvm->mmu_lock);
-
->  
->  	idx = srcu_read_lock(&kvm->srcu);
->  	spin_lock(&kvm->mmu_lock);
-> @@ -480,11 +481,10 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->  	 * count is also read inside the mmu_lock critical section.
->  	 */
->  	kvm->mmu_notifier_count++;
-> -	need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
-> -					     range->flags);
-> -	need_tlb_flush |= kvm->tlbs_dirty;
-> +	need_tlb_flush = !!kvm_unmap_hva_range(kvm, range->start, range->end,
-> +					       range->flags);
->  	/* we've to flush the tlb before the pages can be freed */
-> -	if (need_tlb_flush)
-> +	if (need_tlb_flush || kvm->tlbs_dirty)
->  		kvm_flush_remote_tlbs(kvm);
->  
->  	spin_unlock(&kvm->mmu_lock);
-> -- 
-> 2.19.1.6.gb485710b
-> 
+-Mike
