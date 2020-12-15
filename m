@@ -2,160 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 747522DAEEC
-	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 15:28:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B6A42DAF0A
+	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 15:37:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729510AbgLOO00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 09:26:26 -0500
-Received: from sender4-of-o56.zoho.com ([136.143.188.56]:21615 "EHLO
-        sender4-of-o56.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729500AbgLOO0R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 09:26:17 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1608042291; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=KTEoqZANMbRRcuyBMBxnPXZ7rdkI5efvsBdgMjvsnPrZDV1ynMb1fnilPZo9M7iNd2kwTSzyJnwOFT4jqAXOTKKICn5PSM4WVrxhsRglKKluWDcbpd8XRpINtXUViVOCjErng8eXyOVpIj6QqaK4ybPh0LusxYxwxv5v3JBXvYo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1608042291; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=UH9Ltgalvh799rbDCJr9WW2FaypIxnQT2OcEFvCR+HM=; 
-        b=b18P7zigZ6KOVzplWKSlvJeHkI7M9aDGBTYZ/afcJX+u+NKsPDO02JNjR4Fhf1jOCNPW9WM9lnisRS/2xt37JHEi4PkPr11e1T7FcCi1J4CKkMt0FElpizHUTlihXKPJm5b14zm59rnVaa/rpaNoYZi6yOQe8PFIJV8y1Npptq0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 160804228882162.79656866001767; Tue, 15 Dec 2020 06:24:48 -0800 (PST)
-In-Reply-To: <20201214183739.500368-1-f4bug@amsat.org>
-Reply-To: <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v2 00/16] target/mips: Boring code reordering + add "translate.h"
-Message-ID: <160804228706.20355.2388937911912422319@600e7e483b3a>
+        id S1729130AbgLOOgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 09:36:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43380 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729034AbgLOOgC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 09:36:02 -0500
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A1BC06179C
+        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 06:35:21 -0800 (PST)
+Received: by mail-lf1-x144.google.com with SMTP id a9so39897024lfh.2
+        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 06:35:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jHo9eRpcVbowVem3+A/2C+0RJYKD+KBjZqYkwvwjgmE=;
+        b=QLDx14aQMb+UuKM/FWXhNMbv+GprX9K9cAWs0Lz/YUFM/vjU3ojksLrIfKT7B1mtwA
+         PHosrhOnnO86SbgKDJ2TP2YTgZ88oPLUQC6pGZArum3yvJyUwpWM0ecEXg/sv4QXPHG+
+         1321P2lfo+/8Vj7UVfGVcPx1Uf5cFVKQEnDV8Kf9Rb9muBKt1HHZVSeE2oXVuZMgQ9mR
+         XLzx/SdL2L/jYkBUc5CCuQnY9Sxwmyd8Cu0u05YUBDxmSKAqfE+Et3UDIeLtbaMqLtwq
+         14VER2XtOYtSORk2jGXjSoc9upbmLHBdVu1w+KdeTwH4kH2J2QB16ppis8i3ry5MgWAt
+         1TGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jHo9eRpcVbowVem3+A/2C+0RJYKD+KBjZqYkwvwjgmE=;
+        b=gECbPIrHtQuqz2Q0eUKqARs0M2fgEkNDGMk6w59W4j5QGodqGBNR+rHcbnQOxmcrO1
+         uxdjQI4i5WoRGLoWXfVS84YAsTvWQ0kl+CnnVJka/HUww/UIZ6Z7HdigCn/2hqXjh8i7
+         smcX4u5cbf+BYISSfuY0N2EiEjV0kYMrPfxjjT637gjSPR6KK0nY74mlfCFZ7fS5oN9F
+         cbsS/TuzCjqEanuss1U0ExGLKt9hO6d6267q7WKGV3HHzAJKSQnQJW/QQ8c1eAaMJdxm
+         jrEQtU7AqNbfLYsM4YigEt0Gnr+UpDQZaTYXDRSXE/7fn/W2fRrKhfznMWrHlir4V7r4
+         4KxQ==
+X-Gm-Message-State: AOAM530izVKyUlVbWW8DOveGHlrOQhkwWRu1mzNB2FCbBB1q8fPhVSRN
+        DBud51HhDtbTSGeI2nM3rBhsXUDHMEsmsRm1
+X-Google-Smtp-Source: ABdhPJw8N1OdDLRB1QGHnXvUDAFeNKyzffcK4rvBCFsVaBdj1x3PfYRv8RT1fxhIB4FWawiAeU1nkg==
+X-Received: by 2002:a2e:7c01:: with SMTP id x1mr8676155ljc.397.1608042919073;
+        Tue, 15 Dec 2020 06:35:19 -0800 (PST)
+Received: from localhost.localdomain (109-252-202-142.dynamic.spd-mgts.ru. [109.252.202.142])
+        by smtp.gmail.com with ESMTPSA id o26sm2365749ljg.55.2020.12.15.06.35.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Dec 2020 06:35:18 -0800 (PST)
+From:   Sergey Temerkhanov <s.temerkhanov@gmail.com>
+To:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     Sergey Temerkhanov <s.temerkhanov@gmail.com>
+Subject: [PATCH kvmtool] pci: Deactivate BARs before reactivating
+Date:   Tue, 15 Dec 2020 17:35:12 +0300
+Message-Id: <20201215143512.559367-1-s.temerkhanov@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     f4bug@amsat.org
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, aurelien@aurel32.net,
-        chenhuacai@kernel.org, aleksandar.rikalo@syrmia.com,
-        jiaxun.yang@flygoat.com, laurent@vivier.eu, pbonzini@redhat.com,
-        f4bug@amsat.org
-Date:   Tue, 15 Dec 2020 06:24:48 -0800 (PST)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTIxNDE4MzczOS41MDAz
-NjgtMS1mNGJ1Z0BhbXNhdC5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMTIxNDE4MzczOS41MDAzNjgt
-MS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDogW1BBVENIIHYyIDAwLzE2XSB0YXJnZXQvbWlwczog
-Qm9yaW5nIGNvZGUgcmVvcmRlcmluZyArIGFkZCAidHJhbnNsYXRlLmgiCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
-fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAxMjA0MDgxMjA5LjM2MDUyNC0x
-LWdhbnFpeGluQGh1YXdlaS5jb20gLT4gcGF0Y2hldy8yMDIwMTIwNDA4MTIwOS4zNjA1MjQtMS1n
-YW5xaXhpbkBodWF3ZWkuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDEyMTQx
-ODM3MzkuNTAwMzY4LTEtZjRidWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAyMDEyMTQxODM3Mzku
-NTAwMzY4LTEtZjRidWdAYW1zYXQub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-YjY5OGIyYyB0YXJnZXQvbWlwczogT25seSBidWlsZCBUQ0cgY29kZSB3aGVuIENPTkZJR19UQ0cg
-aXMgc2V0CjJiN2NlYjIgdGFyZ2V0L21pcHM6IEV4dHJhY3QgRlBVIHNwZWNpZmljIGRlZmluaXRp
-b25zIHRvIHRyYW5zbGF0ZS5oCmM4ZmI5Y2EgdGFyZ2V0L21pcHM6IERlY2xhcmUgZ2VuZXJpYyBG
-UFUgZnVuY3Rpb25zIGluICd0cmFuc2xhdGUuaCcKOWM3MmQwYyB0YXJnZXQvbWlwcy90cmFuc2xh
-dGU6IEFkZCBkZWNsYXJhdGlvbnMgZm9yIGdlbmVyaWMgY29kZQpkOGY2ZDFkIHRhcmdldC9taXBz
-L3RyYW5zbGF0ZTogRXh0cmFjdCBEaXNhc0NvbnRleHQgc3RydWN0dXJlCmU5NmE5MzcgdGFyZ2V0
-L21pcHM6IFJlcGxhY2UgZ2VuX2V4Y2VwdGlvbl9lbmQoRVhDUF9SSSkgYnkgZ2VuX3JzdmRfaW5z
-dHJ1Y3Rpb24KYmZmYWUyMCB0YXJnZXQvbWlwczogUmVwbGFjZSBnZW5fZXhjZXB0aW9uX2Vycihl
-cnI9MCkgYnkgZ2VuX2V4Y2VwdGlvbl9lbmQoKQo3MzE5Nzc1IHRhcmdldC9taXBzOiBSZW5hbWUg
-dHJhbnNsYXRlX2luaXQuYyBhcyBjcHUtZGVmcy5jCmIyNTYwMmIgdGFyZ2V0L21pcHM6IE1vdmUg
-bW11X2luaXQoKSBmdW5jdGlvbnMgdG8gdGxiX2hlbHBlci5jCjYyMTljYWYgdGFyZ2V0L21pcHM6
-IEZpeCBjb2RlIHN0eWxlIGZvciBjaGVja3BhdGNoLnBsCjViZTg3YzUgdGFyZ2V0L21pcHM6IFJl
-bmFtZSBoZWxwZXIuYyBhcyB0bGJfaGVscGVyLmMKMDUxZTg3YyB0YXJnZXQvbWlwczogRXh0cmFj
-dCBjb21tb24gaGVscGVycyBmcm9tIGhlbHBlci5jIHRvIGNvbW1vbl9oZWxwZXIuYwpkMTBiN2M3
-IHRhcmdldC9taXBzOiBSZW1vdmUgY29uc2VjdXRpdmUgQ09ORklHX1VTRVJfT05MWSBpZmRlZnMK
-OGE1YTBiNyB0YXJnZXQvbWlwczogQWRkICFDT05GSUdfVVNFUl9PTkxZIGNvbW1lbnQgYWZ0ZXIg
-I2VuZGlmCmExMjk2MzEgdGFyZ2V0L21pcHM6IEV4dHJhY3QgRlBVIGhlbHBlcnMgdG8gJ2ZwdV9o
-ZWxwZXIuaCcKMDJkYTk5MCB0YXJnZXQvbWlwczogSW5saW5lIGNwdV9zdGF0ZV9yZXNldCgpIGlu
-IG1pcHNfY3B1X3Jlc2V0KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcgY29t
-bWl0IDAyZGE5OTA3YjMzNCAodGFyZ2V0L21pcHM6IElubGluZSBjcHVfc3RhdGVfcmVzZXQoKSBp
-biBtaXBzX2NwdV9yZXNldCgpKQoyLzE2IENoZWNraW5nIGNvbW1pdCBhMTI5NjMxZDc4MmIgKHRh
-cmdldC9taXBzOiBFeHRyYWN0IEZQVSBoZWxwZXJzIHRvICdmcHVfaGVscGVyLmgnKQpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiM0MjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE5MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzE2IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjMvMTYgQ2hlY2tpbmcgY29tbWl0IDhhNWEwYjdmOWMyNiAodGFyZ2V0L21pcHM6
-IEFkZCAhQ09ORklHX1VTRVJfT05MWSBjb21tZW50IGFmdGVyICNlbmRpZikKNC8xNiBDaGVja2lu
-ZyBjb21taXQgZDEwYjdjNzFmZWIxICh0YXJnZXQvbWlwczogUmVtb3ZlIGNvbnNlY3V0aXZlIENP
-TkZJR19VU0VSX09OTFkgaWZkZWZzKQo1LzE2IENoZWNraW5nIGNvbW1pdCAwNTFlODdjZDdhMTMg
-KHRhcmdldC9taXBzOiBFeHRyYWN0IGNvbW1vbiBoZWxwZXJzIGZyb20gaGVscGVyLmMgdG8gY29t
-bW9uX2hlbHBlci5jKQpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4
-Old4VykKIzQxOiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuYzo1MzoKKyAgICBjdSA9ICh2ID4+IENQ
-MFN0X0NVMCkgJiAweGY7CiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
-ZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYnIChjdHg6V3hXKQojNDI6IEZJTEU6IHRhcmdldC9t
-aXBzL2NwdS5jOjU0OgorICAgIG14ID0gKHYgPj4gQ1AwU3RfTVgpICYgMHgxOwogICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYn
-IChjdHg6V3hXKQojNDM6IEZJTEU6IHRhcmdldC9taXBzL2NwdS5jOjU1OgorICAgIGtzdSA9ICh2
-ID4+IENQMFN0X0tTVSkgJiAweDM7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
-Ujogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzcwOiBGSUxFOiB0
-YXJnZXQvbWlwcy9jcHUuYzo4MjoKKyAgICAgICAgdWludDMyX3Qga3N1eCA9ICgxIDw8IENQMFN0
-X0tYKSAmIHZhbDsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzc4OiBGSUxF
-OiB0YXJnZXQvbWlwcy9jcHUuYzo5MDoKKyAgICAgICAgbWFzayAmPSB+KCgoMSA8PCBDUDBTdF9T
-UikgfCAoMSA8PCBDUDBTdF9OTUkpKSAmIHZhbCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiMxMDU6IEZJTEU6IHRhcmdldC9taXBzL2NwdS5jOjEx
-NzoKKyAgICAgICAgbWFzayAmPSB+KCgxIDw8IENQMENhX1dQKSAmIHZhbCk7CiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIg
-dGhhdCAnJicgKGN0eDpXeFcpCiMxMTA6IEZJTEU6IHRhcmdldC9taXBzL2NwdS5jOjEyMjoKKyAg
-ICBpZiAoKG9sZCBeIGVudi0+Q1AwX0NhdXNlKSAmICgxIDw8IENQMENhX0RDKSkgewogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVy
-IHRoYXQgJyYnIChjdHg6V3hXKQojMTIwOiBGSUxFOiB0YXJnZXQvbWlwcy9jcHUuYzoxMzI6Cisg
-ICAgICAgIGlmICgob2xkIF4gZW52LT5DUDBfQ2F1c2UpICYgKDEgPDwgKENQMENhX0lQICsgaSkp
-KSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiA4IGVycm9y
-cywgMCB3YXJuaW5ncywgNDMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvMTYgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjYvMTYgQ2hlY2tpbmcgY29tbWl0IDViZTg3YzU0ZWViMSAodGFyZ2V0
-L21pcHM6IFJlbmFtZSBoZWxwZXIuYyBhcyB0bGJfaGVscGVyLmMpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzM2OiAKcmVuYW1lIGZyb20gdGFyZ2V0L21pcHMvaGVscGVyLmMKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMTcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xNiBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgo3LzE2IENoZWNraW5nIGNvbW1pdCA2MjE5Y2FmOTRmOTggKHRhcmdldC9taXBz
-OiBGaXggY29kZSBzdHlsZSBmb3IgY2hlY2twYXRjaC5wbCkKOC8xNiBDaGVja2luZyBjb21taXQg
-YjI1NjAyYjZmMGVmICh0YXJnZXQvbWlwczogTW92ZSBtbXVfaW5pdCgpIGZ1bmN0aW9ucyB0byB0
-bGJfaGVscGVyLmMpCjkvMTYgQ2hlY2tpbmcgY29tbWl0IDczMTk3NzU1ZTgzNCAodGFyZ2V0L21p
-cHM6IFJlbmFtZSB0cmFuc2xhdGVfaW5pdC5jIGFzIGNwdS1kZWZzLmMpCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzE4OiAKcmVuYW1lIGZyb20gdGFyZ2V0L21pcHMvdHJhbnNsYXRlX2luaXQuYy5pbmMKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgOCBsaW5lcyBjaGVja2VkCgpQYXRjaCA5LzE2IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEwLzE2IENoZWNraW5nIGNvbW1pdCBiZmZhZTIwZTBj
-NmYgKHRhcmdldC9taXBzOiBSZXBsYWNlIGdlbl9leGNlcHRpb25fZXJyKGVycj0wKSBieSBnZW5f
-ZXhjZXB0aW9uX2VuZCgpKQoxMS8xNiBDaGVja2luZyBjb21taXQgZTk2YTkzNzRlMTE2ICh0YXJn
-ZXQvbWlwczogUmVwbGFjZSBnZW5fZXhjZXB0aW9uX2VuZChFWENQX1JJKSBieSBnZW5fcnN2ZF9p
-bnN0cnVjdGlvbikKMTIvMTYgQ2hlY2tpbmcgY29tbWl0IGQ4ZjZkMWQ1MmQwZCAodGFyZ2V0L21p
-cHMvdHJhbnNsYXRlOiBFeHRyYWN0IERpc2FzQ29udGV4dCBzdHJ1Y3R1cmUpCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzc2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgMTAwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEyLzE2IGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCjEzLzE2IENoZWNraW5nIGNvbW1pdCA5YzcyZDBjMzcyZGQgKHRhcmdldC9taXBzL3Ry
-YW5zbGF0ZTogQWRkIGRlY2xhcmF0aW9ucyBmb3IgZ2VuZXJpYyBjb2RlKQoxNC8xNiBDaGVja2lu
-ZyBjb21taXQgYzhmYjljYTY3MjUxICh0YXJnZXQvbWlwczogRGVjbGFyZSBnZW5lcmljIEZQVSBm
-dW5jdGlvbnMgaW4gJ3RyYW5zbGF0ZS5oJykKMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDJiN2NlYjJm
-YzQ2NyAodGFyZ2V0L21pcHM6IEV4dHJhY3QgRlBVIHNwZWNpZmljIGRlZmluaXRpb25zIHRvIHRy
-YW5zbGF0ZS5oKQoxNi8xNiBDaGVja2luZyBjb21taXQgYjY5OGIyY2JmZWNmICh0YXJnZXQvbWlw
-czogT25seSBidWlsZCBUQ0cgY29kZSB3aGVuIENPTkZJR19UQ0cgaXMgc2V0KQo9PT0gT1VUUFVU
-IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMTIxNDE4MzczOS41
-MDAzNjgtMS1mNGJ1Z0BhbXNhdC5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+Deactivate BARs before reactivating them to avoid breakage.
+Some firmware components do not check whether the COMMAND
+register contains any values before writing BARs which leads
+to kvmtool errors during subsequent BAR deactivation
+
+Signed-off-by: Sergey Temerkhanov <s.temerkhanov@gmail.com>
+---
+ pci.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/pci.c b/pci.c
+index 2e2c027..515d9dc 100644
+--- a/pci.c
++++ b/pci.c
+@@ -320,10 +320,6 @@ static void pci_config_bar_wr(struct kvm *kvm,
+ 	 */
+ 	if (value == 0xffffffff) {
+ 		value = ~(pci__bar_size(pci_hdr, bar_num) - 1);
+-		/* Preserve the special bits. */
+-		value = (value & mask) | (pci_hdr->bar[bar_num] & ~mask);
+-		pci_hdr->bar[bar_num] = value;
+-		return;
+ 	}
+ 
+ 	value = (value & mask) | (pci_hdr->bar[bar_num] & ~mask);
+-- 
+2.25.1
+
