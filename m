@@ -2,134 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E746D2DA436
-	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 00:38:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FECC2DA486
+	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 01:07:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728851AbgLNXhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Dec 2020 18:37:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27896 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728481AbgLNXhy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 18:37:54 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BENW5mi097437;
-        Mon, 14 Dec 2020 18:37:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=83PhmHXQK3GmlVP6IBkwIiEPFyrpXVbAGOgJ0k9Roc0=;
- b=ELsG8Vs/wTDb07n55bHQo6LZCPz5YVYJPHPee8SItaO4i01dYRlTVdWtdS3/puuLaYA/
- 2UxOIHxfni3d65nmgTHnlWNpy3PkGquIN5qxA8t+HsaMCEx8QbTpCPxaxpcnZZ89mm8m
- KgdhpgHF5Fuzm7s9B7sT+PvvnLsWQkgW0r/7cyccWZ3NmVBiQWvPGO7iytV71pVO4mP/
- 3UmjUdQKNEpbkH0dPbTVJ2ij84tn9OA2nzhuJy4a7wa0Ch1EYVA4Z4PpQzyeMyFnLF8M
- I32AqvUg+yyfB5u7EiT1N/0D/Bt/sH7ndzINhJ169Y7J9J7Dmw4OStt9pDOsJY6gMm2i 6w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35eg1datpe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 18:37:13 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BENX3w0101612;
-        Mon, 14 Dec 2020 18:37:13 -0500
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35eg1datp1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 18:37:13 -0500
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BENMEMQ003451;
-        Mon, 14 Dec 2020 23:37:12 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma04wdc.us.ibm.com with ESMTP id 35cng8ufqd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Dec 2020 23:37:12 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BENb9oQ35980018
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Dec 2020 23:37:10 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DFF93AE060;
-        Mon, 14 Dec 2020 23:37:09 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 20DE9AE05F;
-        Mon, 14 Dec 2020 23:37:09 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Dec 2020 23:37:09 +0000 (GMT)
-Subject: Re: [PATCH v12 05/17] s390/vfio-ap: manage link between queue struct
- and matrix mdev
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
- <20201124214016.3013-6-akrowiak@linux.ibm.com>
- <20201126150828.78776e62.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <eac90113-4c68-a42f-cbfa-41e6b2780380@linux.ibm.com>
-Date:   Mon, 14 Dec 2020 18:37:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1728308AbgLOAGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Dec 2020 19:06:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34016 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727211AbgLOAGe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Dec 2020 19:06:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607990707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6g3IZkefy8eigv1Fk+b3mkHNOWy4CEh/CsuZ+osvTpg=;
+        b=RI/HhD7yxWR8w5M7A630pFTfU8jCZgIWQNhFgO4cfsQLxPDnAqzTlAbgqWWQbYGPlfE3N/
+        pP3RA9xWlACH7nD6mytBCKaiTOD7Vv7Xqyj4fGBcDv/1+75fzK9tbbAo8q7MxuDd3dZAwh
+        PYko6FnC4NsAT+8cmNHa1h4cjLa5ZVY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-SlUMOcjYPhqQzRsC2yXrMQ-1; Mon, 14 Dec 2020 19:05:04 -0500
+X-MC-Unique: SlUMOcjYPhqQzRsC2yXrMQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7820C59;
+        Tue, 15 Dec 2020 00:05:01 +0000 (UTC)
+Received: from omen.home (ovpn-112-193.phx2.redhat.com [10.3.112.193])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A28DC5D9DC;
+        Tue, 15 Dec 2020 00:04:59 +0000 (UTC)
+Date:   Mon, 14 Dec 2020 17:04:59 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Cornelia Huck <cohuck@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: Re: [PATCH 4/7] vfio: iommu_type1: Fix missing dirty page when
+ promote pinned_scope
+Message-ID: <20201214170459.50cb8729@omen.home>
+In-Reply-To: <20201210073425.25960-5-zhukeqian1@huawei.com>
+References: <20201210073425.25960-1-zhukeqian1@huawei.com>
+        <20201210073425.25960-5-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201126150828.78776e62.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-14_12:2020-12-11,2020-12-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 mlxscore=0 spamscore=0
- priorityscore=1501 clxscore=1015 suspectscore=0 adultscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012140153
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 10 Dec 2020 15:34:22 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
+
+> When we pin or detach a group which is not dirty tracking capable,
+> we will try to promote pinned_scope of vfio_iommu.
+> 
+> If we succeed to do so, vfio only report pinned_scope as dirty to
+> userspace next time, but these memory written before pin or detach
+> is missed.
+> 
+> The solution is that we must populate all dma range as dirty before
+> promoting pinned_scope of vfio_iommu.
+
+Please don't bury fixes patches into a series with other optimizations
+and semantic changes.  Send it separately.
+
+> 
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index bd9a94590ebc..00684597b098 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1633,6 +1633,20 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>  	return group;
+>  }
+>  
+> +static void vfio_populate_bitmap_all(struct vfio_iommu *iommu)
+> +{
+> +	struct rb_node *n;
+> +	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+> +
+> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> +		unsigned long nbits = dma->size >> pgshift;
+> +
+> +		if (dma->iommu_mapped)
+> +			bitmap_set(dma->bitmap, 0, nbits);
+> +	}
+> +}
 
 
-On 11/26/20 9:08 AM, Halil Pasic wrote:
-> On Tue, 24 Nov 2020 16:40:04 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> @@ -1155,6 +1243,11 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
->>   			     matrix_mdev->matrix.apm_max + 1) {
->>   		for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
->>   				     matrix_mdev->matrix.aqm_max + 1) {
->> +			q = vfio_ap_mdev_get_queue(matrix_mdev,
->> +						   AP_MKQID(apid, apqi));
->> +			if (!q)
->> +				continue;
->> +
->>   			ret = vfio_ap_mdev_reset_queue(apid, apqi, 1);
->>   			/*
->>   			 * Regardless whether a queue turns out to be busy, or
->> @@ -1164,9 +1257,7 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
->>   			if (ret)
->>   				rc = ret;
->>   
->> -			q = vfio_ap_get_queue(matrix_mdev, AP_MKQID(apid, apqi);
->> -			if (q)
->> -				vfio_ap_free_aqic_resources(q);
->> +			vfio_ap_free_aqic_resources(q);
->>   		}
->>   	}
-> During the review of v11 we discussed this. Introducing this the one
-> way around, just to change it in the next patch, which should deal
-> with something different makes no sense to me.
+If we detach a group which results in only non-IOMMU backed mdevs,
+don't we also clear dma->iommu_mapped as part of vfio_unmap_unpin()
+such that this test is invalid?  Thanks,
 
-This is handled by the vfio_ap_mdev_reset_queue() function in the
-next version.
+Alex
 
->
-> BTW I've provided a ton of feedback for '[PATCH v11 03/14]
-> s390/vfio-ap: manage link between queue struct and matrix mdev', but I
-> can't find your response to that. Some of the things resurface here, and
-> I don't feel like repeating myself. Can you provide me an answer to
-> the v11 version?
-
-I can.
-
+> +
+>  static void promote_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>  {
+>  	struct vfio_domain *domain;
+> @@ -1657,6 +1671,10 @@ static void promote_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>  	}
+>  
+>  	iommu->pinned_page_dirty_scope = true;
+> +
+> +	/* Set all bitmap to avoid missing dirty page */
+> +	if (iommu->dirty_page_tracking)
+> +		vfio_populate_bitmap_all(iommu);
+>  }
+>  
+>  static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
 
