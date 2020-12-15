@@ -2,197 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA0BC2DAD6C
-	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 13:46:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5691E2DADDB
+	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 14:15:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728812AbgLOMqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 07:46:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54462 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726158AbgLOMqG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 07:46:06 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98343C06179C
-        for <kvm@vger.kernel.org>; Tue, 15 Dec 2020 04:45:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=EoTv7mlhkymvP3xeg8QNHwPeTjp+n8e8JQ+yLQUxWdA=; b=RNYUUVBmCZxMXrONddEwPq4kRC
-        YDDNuQLf/G8FhWQ9h4YR6XbjWNQi6+oDFcISVi7RjR8R2IQ5a3IA98LCTFFUd64DNMsZeAuy5j/vh
-        rV9OFwVKScgP6+mwWjom0ZfJAgEpko01bvxMKGOxkB6+hHdQgdVm52aX/9xms3l2o/Dn/62+dmg1L
-        yX8pgShiboYrKVjcD1OD5iIxTyxyQQV8gjnD66GGzbLAHKPwa7GAn4HwE3+RXn52xes3VKL7TaRie
-        DxaQRTcsQnZiBFrfA4SVas67ImhahUzVaCeaXEv+f6BNOHJcFaH83cITX2693IlbIFKLGyBumxYeh
-        O9JG9jCA==;
-Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u3832b3a9db3152.ant.amazon.com)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kp9hi-0006Ky-RX; Tue, 15 Dec 2020 12:45:23 +0000
-Message-ID: <f184111246693b9616f88580a5d32bac4b1f9dc9.camel@infradead.org>
-Subject: Re: [PATCH v3 01/17] KVM: Fix arguments to kvm_{un,}map_gfn()
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com
-Date:   Tue, 15 Dec 2020 12:45:20 +0000
-In-Reply-To: <87tusnuvah.fsf@vitty.brq.redhat.com>
-References: <20201214083905.2017260-1-dwmw2@infradead.org>
-         <20201214083905.2017260-2-dwmw2@infradead.org>
-         <87ft48w0or.fsf@vitty.brq.redhat.com>
-         <6E8FD19B-7ABD-4BF1-84C5-26EDD327F01D@infradead.org>
-         <87a6ugvzek.fsf@vitty.brq.redhat.com>
-         <3E601C94-B52B-43AF-9D13-FD8CB24DED20@infradead.org>
-         <87tusnuvah.fsf@vitty.brq.redhat.com>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-Ze1XUtUkkJoZVcABrV4G"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        id S1727130AbgLONOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 08:14:03 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:2336 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728653AbgLONNy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 08:13:54 -0500
+Received: from dggeme753-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4CwJZG3py7z13R23;
+        Tue, 15 Dec 2020 21:12:06 +0800 (CST)
+Received: from [10.174.184.120] (10.174.184.120) by
+ dggeme753-chm.china.huawei.com (10.3.19.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Tue, 15 Dec 2020 21:13:08 +0800
+Subject: Re: [PATCH v2] vfio iommu type1: Improve vfio_iommu_type1_pin_pages
+ performance
+To:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        <kwankhede@nvidia.com>, <wu.wubin@huawei.com>,
+        <maoming.maoming@huawei.com>, <xieyingtai@huawei.com>,
+        <lizhengui@huawei.com>, <wubinfeng@huawei.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+References: <60d22fc6-88d6-c7c2-90bd-1e8eccb1fdcc@huawei.com>
+ <4d58b74d-72bb-6473-9523-aeaa392a470e@huawei.com>
+ <20201209125450.3f5834ab.cohuck@redhat.com>
+ <9e37b8d9-3654-5b89-e3b4-5e6ede736320@linux.ibm.com>
+ <a585357e-6796-7bf4-ef37-185617e2a865@huawei.com>
+ <78a066b2-9b08-accd-77d4-d367b588c114@linux.ibm.com>
+From:   "xuxiaoyang (C)" <xuxiaoyang2@huawei.com>
+Message-ID: <0ebcc7b0-2984-1b30-2cc7-a569306488a5@huawei.com>
+Date:   Tue, 15 Dec 2020 21:13:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.2
+MIME-Version: 1.0
+In-Reply-To: <78a066b2-9b08-accd-77d4-d367b588c114@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.184.120]
+X-ClientProxiedBy: dggeme718-chm.china.huawei.com (10.1.199.114) To
+ dggeme753-chm.china.huawei.com (10.3.19.99)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-Ze1XUtUkkJoZVcABrV4G
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2020-12-15 at 13:07 +0100, Vitaly Kuznetsov wrote:
-> Yes, sadly. Multiple address spaces support was added to KVM as a
-> generic feature but the only use-case for it at this moment is SMM on
-> x86 which is 'special', i.e. currently there's only one user for=20
-> kvm_map_gfn()/kvm_unmap_gfn() which is steal time accounting and it's
-> not easy to come up with a use-case when this PV feature needs to be
-> used from SMM. On the other hand, if we try using multiple address
-> spaces in KVM for e.g. emulating something like Hyper-V VSM, it becomes
-> unclear which address space id needs to be used even for steal
-> time. To be entirely correct, we probably need to remember as_id which
-> was active when steal time was enabled and stick to it later when we
-> want to update the data. If we do that, kvm_map_gfn() will lose its only
-> user.
+On 2020/12/15 2:58, Eric Farman wrote:
+> 
+> 
+> On 12/10/20 8:56 AM, xuxiaoyang (C) wrote:
+>>
+>>
+>> On 2020/12/9 22:42, Eric Farman wrote:
+>>>
+>>>
+>>> On 12/9/20 6:54 AM, Cornelia Huck wrote:
+>>>> On Tue, 8 Dec 2020 21:55:53 +0800
+>>>> "xuxiaoyang (C)" <xuxiaoyang2@huawei.com> wrote:
+>>>>
+>>>>> On 2020/11/21 15:58, xuxiaoyang (C) wrote:
+>>>>>> vfio_pin_pages() accepts an array of unrelated iova pfns and processes
+>>>>>> each to return the physical pfn.  When dealing with large arrays of
+>>>>>> contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
+>>>>>> it is processed page by page.In this case, we can divide the iova pfn
+>>>>>> array into multiple continuous ranges and optimize them.  For example,
+>>>>>> when the iova pfn array is {1,5,6,7,9}, it will be divided into three
+>>>>>> groups {1}, {5,6,7}, {9} for processing.  When processing {5,6,7}, the
+>>>>>> number of calls to pin_user_pages_remote is reduced from 3 times to once.
+>>>>>> For single page or large array of discontinuous iovas, we still use
+>>>>>> vfio_pin_page_external to deal with it to reduce the performance loss
+>>>>>> caused by refactoring.
+>>>>>>
+>>>>>> Signed-off-by: Xiaoyang Xu <xuxiaoyang2@huawei.com>
+>>>>
+>>>> (...)
+>>>>
+>>>>>
+>>>>> hi Cornelia Huck, Eric Farman, Zhenyu Wang, Zhi Wang
+>>>>>
+>>>>> vfio_pin_pages() accepts an array of unrelated iova pfns and processes
+>>>>> each to return the physical pfn.  When dealing with large arrays of
+>>>>> contiguous iovas, vfio_iommu_type1_pin_pages is very inefficient because
+>>>>> it is processed page by page.  In this case, we can divide the iova pfn
+>>>>> array into multiple continuous ranges and optimize them.  I have a set
+>>>>> of performance test data for reference.
+>>>>>
+>>>>> The patch was not applied
+>>>>>                       1 page           512 pages
+>>>>> no huge pages：     1638ns           223651ns
+>>>>> THP：               1668ns           222330ns
+>>>>> HugeTLB：           1526ns           208151ns
+>>>>>
+>>>>> The patch was applied
+>>>>>                       1 page           512 pages
+>>>>> no huge pages       1735ns           167286ns
+>>>>> THP：               1934ns           126900ns
+>>>>> HugeTLB：           1713ns           102188ns
+>>>>>
+>>>>> As Alex Williamson said, this patch lacks proof that it works in the
+>>>>> real world. I think you will have some valuable opinions.
+>>>>
+>>>> Looking at this from the vfio-ccw angle, I'm not sure how much this
+>>>> would buy us, as we deal with IDAWs, which are designed so that they
+>>>> can be non-contiguous. I guess this depends a lot on what the guest
+>>>> does.
+>>>
+>>> This would be my concern too, but I don't have data off the top of my head to say one way or another...
+>>>
+>>>>
+>>>> Eric, any opinion? Do you maybe also happen to have a test setup that
+>>>> mimics workloads actually seen in the real world?
+>>>>
+>>>
+>>> ...I do have some test setups, which I will try to get some data from in a couple days. At the moment I've broken most of those setups trying to implement some other stuff, and can't revert back at the moment. Will get back to this.
+>>>
+>>> Eric
+>>> .
+>>
+>> Thank you for your reply. Looking forward to your test data.
+> 
+> Xu,
+> 
+> The scenario I ran was a host kernel 5.10.0-rc7 with qemu 5.2.0, with a Fedora 32 guest with 4 VCPU and 4GB memory. I tried this a handful of times across a couple different hosts, so the likelihood that these numbers are outliers are pretty low. The histograms below come from a simple bpftrace, recording the number of pages asked to be pinned, and the length of time (in nanoseconds) it took to pin all those pages. I separated out the length of time for a request of one page versus a request of multiple pages, because as you will see the former far outnumbers the latter.
+> 
+> The first thing I tried was simply to boot the guest via vfio-ccw, to see how the patch itself behaved:
+> 
+> @1_page_ns    BASE        +PATCH
+> 256, 512    12531    42.50%    12744    42.26%
+> 512, 1K        5660    19.20%    5611    18.61%
+> 1K, 2K        8416    28.54%    8947    29.67%
+> 2K, 4K        2694    9.14%    2669    8.85%
+> 4K, 8K        164    0.56%    169    0.56%
+> 8K, 16K        14    0.05%    14    0.05%
+> 16K, 32K    2    0.01%    3    0.01%
+> 32K, 64K    0    0.00%    0    0.00%
+> 64K, 128K    0    0.00%    0    0.00%
+> 
+> @n_pages_ns    BASE        +PATCH
+> 256, 512    0    0.00%    0    0.00%
+> 512, 1K        67    0.97%    48    0.68%
+> 1K, 2K        1598    23.13%    1036    14.71%
+> 2K, 4K        2784    40.30%    3112    44.17%
+> 4K, 8K        1288    18.64%    1579    22.41%
+> 8K, 16K        1011    14.63%    1032    14.65%
+> 16K, 32K    159    2.30%    234    3.32%
+> 32K, 64K    1    0.01%    2    0.03%
+> 64K, 128K    0    0.00%    2    0.03%
+> 
+> @npage        BASE        +PATCH
+> 1        29484    81.02%    30157    81.06%
+> 2, 4        3298    9.06%    3385    9.10%
+> 4, 8        1011    2.78%    1029    2.77%
+> 8, 16        2600    7.14%    2631    7.07%
+> 
+> 
+> The second thing I tried was simply fio, running it for about 10 minutes with a few minutes each for sequential read, sequential write, random read, and random write. (I tried this with both the guest booted off vfio-ccw and virtio-blk, but the difference was negligible.) The results in this space are similar as well:
+> 
+> @1_page_ns    BASE        +PATCH
+> 256, 512    5648104    66.79%    6615878    66.75%
+> 512, 1K        1784047    21.10%    2082852    21.01%
+> 1K, 2K        648877    7.67%    771964    7.79%
+> 2K, 4K        339551    4.01%    396381    4.00%
+> 4K, 8K        32513    0.38%    40359    0.41%
+> 8K, 16K        2602    0.03%    2884    0.03%
+> 16K, 32K    758    0.01%    762    0.01%
+> 32K, 64K    434    0.01%    352    0.00%
+> 
+> @n_pages_ns    BASE        +PATCH
+> 256, 512    0    0.00%    0    0.00%
+> 512, 1K        470803    12.18%    360524    7.95%
+> 1K, 2K        1305166    33.75%    1739183    38.37%
+> 2K, 4K        1338277    34.61%    1471161    32.46%
+> 4K, 8K        733480    18.97%    937341    20.68%
+> 8K, 16K        16954    0.44%    20708    0.46%
+> 16K, 32K    1278    0.03%    2197    0.05%
+> 32K, 64K    707    0.02%    703    0.02%
+> 
+> @npage        BASE        +PATCH
+> 1        8457107    68.62%    9911624    68.62%
+> 2, 4        2066957    16.77%    2446462    16.94%
+> 4, 8        359989    2.92%    417188    2.89%
+> 8, 16        1440006    11.68%    1668482    11.55%
+> 
+> 
+> I tried a smattering of other tests that might be more realistic, but the results were all pretty similar so there's no point in appending them here. Across the board, the amount of time spent on a multi-page request grows with the supplied patch. It doesn't get me very excited.
+> 
+> If you are wondering why this might be, Conny's initial take about IDAWs being non-contiguous by design is spot on. Let's observe the page counts given to vfio_iommu_type1_pin_contiguous_pages() in addition to the counts in vfio_iommu_type1_pin_pages(). The following is an example of one guest boot PLUS an fio run:
+> 
+> vfio_iommu_type1_pin_pages npage:
+> 1    9890332        68.64%
+> 2, 4    2438213        16.92%
+> 4, 8    416278        2.89%
+> 8, 16    1663201        11.54%
+> Total    14408024   
+> 
+> vfio_iommu_type1_pin_contiguous_pages npage:
+> 1    16384925    86.89%
+> 2, 4    1327548        7.04%
+> 4, 8    727564        3.86%
+> 8, 16    417182        2.21%
+> Total    18857219   
+> 
+> Yup... 87% of the calls to vfio_iommu_type1_pin_contiguous_pages() do so with a length of just a single page.
+> 
+> Happy to provide more data if desired, but it doesn't look like a benefit to vfio-ccw's use.
+> 
+> Thanks,
+> Eric
+> 
+> 
+Eric, vfio-ccw pin single page accounted for 87%,
+and the length of continuous pages is very short.
+In my test data, the continuous page length is 512,
+which is a huge difference.  It is easy to understand
+that this patch does not benefit vfio-ccw.
+Finally, thank you very much for your test data.
 
-I'm also OK with just completely deleting kvm_map_gfn(). I'm not even
-using it any more myself; I just kept this patch in my v3 series
-because it's a sane cleanup.
-
-The steal time accounting doesn't *need* to have a kernel mapping of
-the page just so it can do atomic xchg on it; we can do that just fine
-on userspace addresses, and do exactly that for futexes.
-
-So I'm probably going to knock up a kvm_cmpxchg_guest_offset_cached()
-and make the steal time code use that, on the *userspace* address.
-There's already a futex_atomic_cmpxchg_inatomic() which does the actual
-operation. (It returns -EFAULT for an absent page and lets the caller
-worry about faulting it in, which isn't quite what I want, but it's a
-good start and I can either wrap the existing arch-provided function
-like futexes do, or use it as a basis for a version that waits.)
-
-And by an amazing coincidence that's also the function I need for
-accelerating Xen event channel support... :)
-
-
---=-Ze1XUtUkkJoZVcABrV4G
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjAx
-MjE1MTI0NTIwWjAvBgkqhkiG9w0BCQQxIgQga6P+495CYc/LQCstw6rsrb6X+uOzv5n3buYaymF7
-AS4wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBABKPhUAzoGvPlbuKUOyxBwdEXzwiJWmCLnjUgZ5y5fGgDydkSs3sCZrxeoEkrZPR
-T+UulmO5O+VONjuPf4e0FY+zzYfTDfODU1lskyFmbZRYkvn0xGyh03V28lv4fuCJA6xQ2JDA+WbE
-dTsDAg/BWbPMX+Cz6rqQ2IEw1yjEEt41QDYLoAlwvzX+0Kvg2/Em8t9JI3p6y1TTiW9CV5or4dDI
-0O8VlhvXOPpt0rRreuhP+YivkQU7zdWKzUfU+nyYptA/5UvKGlNa9JYSYfiW81DyMUSYqqPX5dsu
-f84ReAKGy8AGqiDIlFNFvMXQziiT8wvWnK6UPVYrOG5YQM+aNN8AAAAAAAA=
-
-
---=-Ze1XUtUkkJoZVcABrV4G--
-
+Regards,
+Xu
+>>
+>> Regards,
+>> Xu
+>>
+> .
