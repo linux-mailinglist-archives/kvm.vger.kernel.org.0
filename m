@@ -2,159 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64CCF2DA7A6
-	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 06:28:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FE5A2DA86F
+	for <lists+kvm@lfdr.de>; Tue, 15 Dec 2020 08:22:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726136AbgLOFYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 00:24:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42994 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725962AbgLOFYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 00:24:23 -0500
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA5AC06179C;
-        Mon, 14 Dec 2020 21:14:37 -0800 (PST)
-Received: by mail-il1-x141.google.com with SMTP id p5so18041152iln.8;
-        Mon, 14 Dec 2020 21:14:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OMeW5OwFJaFbzmMhVRdKenrFpNfjIBXNuOkkzI7axiY=;
-        b=uhLL56ouklyItc4++bYAHnJJzS7KZGkHZ0Zl/+O7pvReKfc+axcaoLGP2yN88FQgh1
-         BWfwwtYSBGbXMofydLQ+/H/wDYsD4M8Xt7OH+kHRWV7/wq3/PnRdOgHOFY1Nr1twvi+M
-         FBBk/9CrLwRHpAwVYxI3Nus3eZ+wWXUW8tPOgVqoO2kP443UCKu9hcimp1+8wvlcV+3s
-         un4sezeOlDtIy2KtdZ2daAuEDgKxab7uOFuDMNI/IPMFiFB9uxJ2dUyeWk9vAkSBQuDN
-         dMhQj1+Ome3JFwCIy9JFE5cyLf4PFNqARa4UbJrfRlpfLCJaxbC2Z1Blp/5PnGepXjF6
-         J67g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OMeW5OwFJaFbzmMhVRdKenrFpNfjIBXNuOkkzI7axiY=;
-        b=tmMbBb4gvxyLLsRoC+haWGN+I50E/lQo3QgtaOSD8rBq5ZGloXFFQqrVCq5W0Fb2wo
-         q+fSZBYg4KtivPxpQ8OKeTrEES/8TuWy48bBZFrNxiVrJa+D7YcnoHWUGzLyCzxEGkPh
-         EfXW8WLg9I/NEcYrQfOwszF6bOss/ROqNCLLpUI6mlKcVytXOLUCoMtrDhxayKMZnvIe
-         1uJJbXfSxnSXClvQYiMXYAhCxxN94VmyJWKGaaJmTO/Wf3bJg3XdS2BVbXCFNgQ0gtOO
-         jZQR9rf89qEA2NKJI9EY7jsdW4WNS0Uc1rI3mKhbhEGlDoZMh2FD9evSBzROjixvIpXV
-         71cg==
-X-Gm-Message-State: AOAM531Yz5KsjsoLPBESpokXewAPq/MY5qvZajzB5qXbWr5PuuLHO/TO
-        IoltAooXm7uMppnz4uFwuPS5aJ605gmxb+mZNMwX0dtGjhB1bg==
-X-Google-Smtp-Source: ABdhPJyr7okVjyaNDLT3Yki4p2NdKxNVTrapTe1ew+D/vFTUlyiFudWJ2zBIZlhsnwk29eA5cWteKGxv0xeOWGwakA4=
-X-Received: by 2002:a92:7789:: with SMTP id s131mr39728085ilc.52.1608009276995;
- Mon, 14 Dec 2020 21:14:36 -0800 (PST)
+        id S1726154AbgLOHV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 02:21:28 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2400 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726147AbgLOHV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 02:21:28 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Cw8kq0KFcz556N;
+        Tue, 15 Dec 2020 15:18:59 +0800 (CST)
+Received: from dggemm753-chm.china.huawei.com (10.1.198.59) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Tue, 15 Dec 2020 15:19:45 +0800
+Received: from dggpemm000001.china.huawei.com (7.185.36.245) by
+ dggemm753-chm.china.huawei.com (10.1.198.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Tue, 15 Dec 2020 15:19:45 +0800
+Received: from dggpemm000001.china.huawei.com ([7.185.36.245]) by
+ dggpemm000001.china.huawei.com ([7.185.36.245]) with mapi id 15.01.1913.007;
+ Tue, 15 Dec 2020 15:19:45 +0800
+From:   Jiangyifei <jiangyifei@huawei.com>
+To:     Alistair Francis <alistair23@gmail.com>
+CC:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+        "open list:RISC-V" <qemu-riscv@nongnu.org>,
+        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
+        Sagar Karandikar <sagark@eecs.berkeley.edu>,
+        "open list:Overall" <kvm@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Anup Patel <anup.patel@wdc.com>,
+        yinyipeng <yinyipeng1@huawei.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "Palmer Dabbelt" <palmer@dabbelt.com>,
+        "dengkai (A)" <dengkai1@huawei.com>,
+        "Wubin (H)" <wu.wubin@huawei.com>,
+        Zhanghailiang <zhang.zhanghailiang@huawei.com>
+Subject: RE: [PATCH RFC v4 06/15] target/riscv: Support start kernel directly
+ by KVM
+Thread-Topic: [PATCH RFC v4 06/15] target/riscv: Support start kernel directly
+ by KVM
+Thread-Index: AQHWyXJ3Fi228NdDdEWN5Odmu//VYantR0QAgAqIptA=
+Date:   Tue, 15 Dec 2020 07:19:45 +0000
+Message-ID: <5ff41bb0d16247c1bf15cdbb148561d9@huawei.com>
+References: <20201203124703.168-1-jiangyifei@huawei.com>
+ <20201203124703.168-7-jiangyifei@huawei.com>
+ <CAKmqyKO4vsY90DnVVp6wgAvSquoW0auFRr3LLfSHrCqXV6vWcg@mail.gmail.com>
+In-Reply-To: <CAKmqyKO4vsY90DnVVp6wgAvSquoW0auFRr3LLfSHrCqXV6vWcg@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.186.236]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20201213044913.15137-1-jiangshanlai@gmail.com> <X9ee7RzW+Dhv1aoW@google.com>
-In-Reply-To: <X9ee7RzW+Dhv1aoW@google.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 15 Dec 2020 13:14:25 +0800
-Message-ID: <CAJhGHyAzGwpXN2+cdQE=xhMP+Lm_9grvm_HUi7NfypOGcySxrg@mail.gmail.com>
-Subject: Re: [PATCH] kvm: don't lose the higher 32 bits of tlbs_dirty
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 15, 2020 at 1:20 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Sun, Dec 13, 2020, Lai Jiangshan wrote:
-> > From: Lai Jiangshan <laijs@linux.alibaba.com>
-> >
-> > In kvm_mmu_notifier_invalidate_range_start(), tlbs_dirty is used as:
-> >       need_tlb_flush |= kvm->tlbs_dirty;
-> > with need_tlb_flush's type being int and tlbs_dirty's type being long.
-> >
-> > It means that tlbs_dirty is always used as int and the higher 32 bits
-> > is useless.
->
-> It's probably worth noting in the changelog that it's _extremely_ unlikely this
-> bug can cause problems in practice.  It would require encountering tlbs_dirty
-> on a 4 billion count boundary, and KVM would need to be using shadow paging or
-> be running a nested guest.
-
-You are right, I don't consider it would cause problems in practice, and I
-also tried to make tlbs_dirty as "int" and found that I have to change too
-many places.
-
-And you are right it is worth noting about it, I'm sorry for neglecting.
-
->
-> > We can just change need_tlb_flush's type to long to
-> > make full use of tlbs_dirty.
->
-> Hrm, this does solve the problem, but I'm not a fan of continuing to use an
-> integer variable as a boolean.  Rather than propagate tlbs_dirty to
-> need_tlb_flush, what if this bug fix patch checks tlbs_dirty directly, and then
-> a follow up patch converts need_tlb_flush to a bool and removes the unnecessary
-> initialization (see below).
->
-> E.g. the net result of both patches would be:
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 3abcb2ce5b7d..93b6986d3dfc 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -473,7 +473,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->                                         const struct mmu_notifier_range *range)
->  {
->         struct kvm *kvm = mmu_notifier_to_kvm(mn);
-> -       int need_tlb_flush = 0, idx;
-> +       bool need_tlb_flush;
-> +       int idx;
->
->         idx = srcu_read_lock(&kvm->srcu);
->         spin_lock(&kvm->mmu_lock);
-> @@ -483,11 +484,10 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->          * count is also read inside the mmu_lock critical section.
->          */
->         kvm->mmu_notifier_count++;
-> -       need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
-> -                                            range->flags);
-> -       need_tlb_flush |= kvm->tlbs_dirty;
-> +       need_tlb_flush = !!kvm_unmap_hva_range(kvm, range->start, range->end,
-> +                                              range->flags);
->         /* we've to flush the tlb before the pages can be freed */
-> -       if (need_tlb_flush)
-> +       if (need_tlb_flush || kvm->tlbs_dirty)
->                 kvm_flush_remote_tlbs(kvm);
->
->         spin_unlock(&kvm->mmu_lock);
->
-> Cc: stable@vger.kernel.org
-> Fixes: a4ee1ca4a36e ("KVM: MMU: delay flush all tlbs on sync_page path")
-
-I searched back, found it and considered adding this fixes tag, but I was
-afraid that this cleanup would be backported. Is it worth backporting such
-patch which is extremely hardly a problem in practice?
-
->
-> > Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 2541a17ff1c4..4e519a517e9f 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -470,7 +470,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
-> >                                       const struct mmu_notifier_range *range)
-> >  {
-> >       struct kvm *kvm = mmu_notifier_to_kvm(mn);
-> > -     int need_tlb_flush = 0, idx;
-> > +     long need_tlb_flush = 0;
->
-> need_tlb_flush doesn't need to be initialized here, it's explicitly set via the
-> call to kvm_unmap_hva_range().
->
-> > +     int idx;
-> >
-> >       idx = srcu_read_lock(&kvm->srcu);
-> >       spin_lock(&kvm->mmu_lock);
-> > --
-> > 2.19.1.6.gb485710b
-> >
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFsaXN0YWlyIEZyYW5jaXMg
+W21haWx0bzphbGlzdGFpcjIzQGdtYWlsLmNvbV0NCj4gU2VudDogV2VkbmVzZGF5LCBEZWNlbWJl
+ciA5LCAyMDIwIDY6MTkgQU0NCj4gVG86IEppYW5neWlmZWkgPGppYW5neWlmZWlAaHVhd2VpLmNv
+bT4NCj4gQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZyBEZXZlbG9wZXJzIDxxZW11LWRldmVsQG5v
+bmdudS5vcmc+OyBvcGVuDQo+IGxpc3Q6UklTQy1WIDxxZW11LXJpc2N2QG5vbmdudS5vcmc+OyBa
+aGFuZ3hpYW9mZW5nIChGKQ0KPiA8dmljdG9yLnpoYW5neGlhb2ZlbmdAaHVhd2VpLmNvbT47IFNh
+Z2FyIEthcmFuZGlrYXINCj4gPHNhZ2Fya0BlZWNzLmJlcmtlbGV5LmVkdT47IG9wZW4gbGlzdDpP
+dmVyYWxsIDxrdm1Admdlci5rZXJuZWwub3JnPjsNCj4gbGlidmlyLWxpc3RAcmVkaGF0LmNvbTsg
+QmFzdGlhbiBLb3BwZWxtYW5uDQo+IDxrYmFzdGlhbkBtYWlsLnVuaS1wYWRlcmJvcm4uZGU+OyBB
+bnVwIFBhdGVsIDxhbnVwLnBhdGVsQHdkYy5jb20+Ow0KPiB5aW55aXBlbmcgPHlpbnlpcGVuZzFA
+aHVhd2VpLmNvbT47IEFsaXN0YWlyIEZyYW5jaXMNCj4gPEFsaXN0YWlyLkZyYW5jaXNAd2RjLmNv
+bT47IGt2bS1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnOyBQYWxtZXIgRGFiYmVsdA0KPiA8cGFs
+bWVyQGRhYmJlbHQuY29tPjsgZGVuZ2thaSAoQSkgPGRlbmdrYWkxQGh1YXdlaS5jb20+OyBXdWJp
+biAoSCkNCj4gPHd1Lnd1YmluQGh1YXdlaS5jb20+OyBaaGFuZ2hhaWxpYW5nIDx6aGFuZy56aGFu
+Z2hhaWxpYW5nQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggUkZDIHY0IDA2LzE1
+XSB0YXJnZXQvcmlzY3Y6IFN1cHBvcnQgc3RhcnQga2VybmVsIGRpcmVjdGx5IGJ5DQo+IEtWTQ0K
+PiANCj4gT24gVGh1LCBEZWMgMywgMjAyMCBhdCA0OjU4IEFNIFlpZmVpIEppYW5nIDxqaWFuZ3lp
+ZmVpQGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+DQo+ID4gR2V0IGtlcm5lbCBhbmQgZmR0IHN0YXJ0
+IGFkZHJlc3MgaW4gdmlydC5jLCBhbmQgcGFzcyB0aGVtIHRvIEtWTSB3aGVuDQo+ID4gY3B1IHJl
+c2V0LiBJbiBhZGRpdGlvbiwgYWRkIGt2bV9yaXNjdi5oIHRvIHBsYWNlIHJpc2N2IHNwZWNpZmlj
+DQo+ID4gaW50ZXJmYWNlLg0KPiANCj4gVGhpcyBkb2Vzbid0IHNlZW0gcmlnaHQuIFdoeSBkbyB3
+ZSBuZWVkIHRvIGRvIHRoaXM/IE90aGVyIGFyY2hpdGVjdHVyZXMgZG9uJ3QNCj4gc2VlbSB0byBk
+byB0aGlzLg0KPiANCj4gV3JpdGluZyB0byB0aGUgQ1BVIGZyb20gdGhlIGJvYXJkIGxpa2UgdGhp
+cyBsb29rcyBmaXNoeSBhbmQgcHJvYmFibHkgYnJlYWtzDQo+IHNvbWUgUU9NIHJ1bGVzLg0KPiAN
+Cj4gQWxpc3RhaXINCj4gDQoNClNvcnJ5IGZvciB0aGUgZGVsYXllZCByZXBseS4NCg0KV2UgbmVl
+ZCB0byBzZXQgdGhlIHN0YXJ0aW5nIGFkZHJlc3Mgb2YgdGhlIGtlcm5lbCBhbmQgZmR0IHRvIHZj
+cHUsIHdoaWNoIGlzIGltcGxlbWVudGVkDQpieSBmaXJtd2FyZSBib290bG9hZGVyIHVuZGVyIG90
+aGVyIGFyY2hpdGVjdHVyZXMgYW5kIFJJU0MtViBlbXVsYXRvcnMuIEhvd2V2ZXIsIHRoZQ0KUklT
+Qy1WIHZpcnR1YWwgbWFjaGluZSBkb2VzIG5vdCBoYXZlIGJvb3Rsb2FkZXIsIHNvIHdlIGJvb3Qg
+dGhlIGtlcm5lbCBkaXJlY3RseS4NCkluIHRoZSBmdXR1cmUsIHdlIHdpbGwgc3VwcG9ydCBmaXJt
+d2FyZSBsb2FkaW5nLg0KDQpCZWZvcmUgc3VwcG9ydGluZyB0aGUgZmlybXdhcmUgYm9vdGxvYWRl
+ciwgd2UgY2FuIGFkZCBhIHB1YmxpYyBpbnRlcmZhY2UgaW5zdGVhZCBvZg0KbW9kaWZ5aW5nIHRo
+ZSBDUFUgaW5zdGFuY2UgZGlyZWN0bHkgdG8gY29tcGx5IHdpdGggdGhlIFFPTSBydWxlcy4NCg0K
+WWlmZWkNCg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogWWlmZWkgSmlhbmcgPGppYW5neWlmZWlA
+aHVhd2VpLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBZaXBlbmcgWWluIDx5aW55aXBlbmcxQGh1
+YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4gIGh3L3Jpc2N2L3ZpcnQuYyAgICAgICAgICB8ICA4ICsr
+KysrKysrDQo+ID4gIHRhcmdldC9yaXNjdi9jcHUuYyAgICAgICB8ICA0ICsrKysNCj4gPiAgdGFy
+Z2V0L3Jpc2N2L2NwdS5oICAgICAgIHwgIDMgKysrDQo+ID4gIHRhcmdldC9yaXNjdi9rdm0uYyAg
+ICAgICB8IDE1ICsrKysrKysrKysrKysrKw0KPiA+ICB0YXJnZXQvcmlzY3Yva3ZtX3Jpc2N2Lmgg
+fCAyNCArKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiAgNSBmaWxlcyBjaGFuZ2VkLCA1NCBp
+bnNlcnRpb25zKCspDQo+ID4gIGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJnZXQvcmlzY3Yva3ZtX3Jp
+c2N2LmgNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9yaXNjdi92aXJ0LmMgYi9ody9yaXNjdi92
+aXJ0LmMgaW5kZXgNCj4gPiAyNWNlYTdhYTY3Li40N2I3MDE4MTkzIDEwMDY0NA0KPiA+IC0tLSBh
+L2h3L3Jpc2N2L3ZpcnQuYw0KPiA+ICsrKyBiL2h3L3Jpc2N2L3ZpcnQuYw0KPiA+IEBAIC00Miw2
+ICs0Miw3IEBADQo+ID4gICNpbmNsdWRlICJzeXNlbXUvc3lzZW11LmgiDQo+ID4gICNpbmNsdWRl
+ICJody9wY2kvcGNpLmgiDQo+ID4gICNpbmNsdWRlICJody9wY2ktaG9zdC9ncGV4LmgiDQo+ID4g
+KyNpbmNsdWRlICJzeXNlbXUva3ZtLmgiDQo+ID4NCj4gPiAgI2lmIGRlZmluZWQoVEFSR0VUX1JJ
+U0NWMzIpDQo+ID4gICMgZGVmaW5lIEJJT1NfRklMRU5BTUUgIm9wZW5zYmktcmlzY3YzMi1nZW5l
+cmljLWZ3X2R5bmFtaWMuYmluIg0KPiA+IEBAIC01MTEsNiArNTEyLDcgQEAgc3RhdGljIHZvaWQg
+dmlydF9tYWNoaW5lX2luaXQoTWFjaGluZVN0YXRlDQo+ICptYWNoaW5lKQ0KPiA+ICAgICAgdWlu
+dDY0X3Qga2VybmVsX2VudHJ5Ow0KPiA+ICAgICAgRGV2aWNlU3RhdGUgKm1taW9fcGxpYywgKnZp
+cnRpb19wbGljLCAqcGNpZV9wbGljOw0KPiA+ICAgICAgaW50IGksIGosIGJhc2VfaGFydGlkLCBo
+YXJ0X2NvdW50Ow0KPiA+ICsgICAgQ1BVU3RhdGUgKmNzOw0KPiA+DQo+ID4gICAgICAvKiBDaGVj
+ayBzb2NrZXQgY291bnQgbGltaXQgKi8NCj4gPiAgICAgIGlmIChWSVJUX1NPQ0tFVFNfTUFYIDwg
+cmlzY3Zfc29ja2V0X2NvdW50KG1hY2hpbmUpKSB7IEBAIC02NjAsNg0KPiA+ICs2NjIsMTIgQEAg
+c3RhdGljIHZvaWQgdmlydF9tYWNoaW5lX2luaXQoTWFjaGluZVN0YXRlICptYWNoaW5lKQ0KPiA+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2aXJ0X21lbW1hcFtWSVJUX01ST01dLnNp
+emUsDQo+IGtlcm5lbF9lbnRyeSwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ZmR0X2xvYWRfYWRkciwgcy0+ZmR0KTsNCj4gPg0KPiA+ICsgICAgZm9yIChjcyA9IGZpcnN0X2Nw
+dTsgY3M7IGNzID0gQ1BVX05FWFQoY3MpKSB7DQo+ID4gKyAgICAgICAgUklTQ1ZDUFUgKnJpc2N2
+X2NwdSA9IFJJU0NWX0NQVShjcyk7DQo+ID4gKyAgICAgICAgcmlzY3ZfY3B1LT5lbnYua2VybmVs
+X2FkZHIgPSBrZXJuZWxfZW50cnk7DQo+ID4gKyAgICAgICAgcmlzY3ZfY3B1LT5lbnYuZmR0X2Fk
+ZHIgPSBmZHRfbG9hZF9hZGRyOw0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAgICAgIC8qIFNpRml2
+ZSBUZXN0IE1NSU8gZGV2aWNlICovDQo+ID4gICAgICBzaWZpdmVfdGVzdF9jcmVhdGUobWVtbWFw
+W1ZJUlRfVEVTVF0uYmFzZSk7DQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L3Jpc2N2L2Nw
+dS5jIGIvdGFyZ2V0L3Jpc2N2L2NwdS5jIGluZGV4DQo+ID4gNmEwMjY0ZmM2Yi4uZmFlZTk4YTU4
+YyAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvcmlzY3YvY3B1LmMNCj4gPiArKysgYi90YXJnZXQv
+cmlzY3YvY3B1LmMNCj4gPiBAQCAtMjksNiArMjksNyBAQA0KPiA+ICAjaW5jbHVkZSAiaHcvcWRl
+di1wcm9wZXJ0aWVzLmgiDQo+ID4gICNpbmNsdWRlICJtaWdyYXRpb24vdm1zdGF0ZS5oIg0KPiA+
+ICAjaW5jbHVkZSAiZnB1L3NvZnRmbG9hdC1oZWxwZXJzLmgiDQo+ID4gKyNpbmNsdWRlICJrdm1f
+cmlzY3YuaCINCj4gPg0KPiA+ICAvKiBSSVNDLVYgQ1BVIGRlZmluaXRpb25zICovDQo+ID4NCj4g
+PiBAQCAtMzMwLDYgKzMzMSw5IEBAIHN0YXRpYyB2b2lkIHJpc2N2X2NwdV9yZXNldChEZXZpY2VT
+dGF0ZSAqZGV2KQ0KPiA+ICAgICAgY3MtPmV4Y2VwdGlvbl9pbmRleCA9IEVYQ1BfTk9ORTsNCj4g
+PiAgICAgIGVudi0+bG9hZF9yZXMgPSAtMTsNCj4gPiAgICAgIHNldF9kZWZhdWx0X25hbl9tb2Rl
+KDEsICZlbnYtPmZwX3N0YXR1cyk7DQo+ID4gKyNpZmRlZiBDT05GSUdfS1ZNDQo+ID4gKyAgICBr
+dm1fcmlzY3ZfcmVzZXRfdmNwdShjcHUpOw0KPiA+ICsjZW5kaWYNCj4gPiAgfQ0KPiA+DQo+ID4g
+IHN0YXRpYyB2b2lkIHJpc2N2X2NwdV9kaXNhc19zZXRfaW5mbyhDUFVTdGF0ZSAqcywgZGlzYXNz
+ZW1ibGVfaW5mbw0KPiA+ICppbmZvKSBkaWZmIC0tZ2l0IGEvdGFyZ2V0L3Jpc2N2L2NwdS5oIGIv
+dGFyZ2V0L3Jpc2N2L2NwdS5oIGluZGV4DQo+ID4gYzBhMzI2Yzg0My4uYWQxYzkwZjc5OCAxMDA2
+NDQNCj4gPiAtLS0gYS90YXJnZXQvcmlzY3YvY3B1LmgNCj4gPiArKysgYi90YXJnZXQvcmlzY3Yv
+Y3B1LmgNCj4gPiBAQCAtMjMzLDYgKzIzMyw5IEBAIHN0cnVjdCBDUFVSSVNDVlN0YXRlIHsNCj4g
+Pg0KPiA+ICAgICAgLyogRmllbGRzIGZyb20gaGVyZSBvbiBhcmUgcHJlc2VydmVkIGFjcm9zcyBD
+UFUgcmVzZXQuICovDQo+ID4gICAgICBRRU1VVGltZXIgKnRpbWVyOyAvKiBJbnRlcm5hbCB0aW1l
+ciAqLw0KPiA+ICsNCj4gPiArICAgIGh3YWRkciBrZXJuZWxfYWRkcjsNCj4gPiArICAgIGh3YWRk
+ciBmZHRfYWRkcjsNCj4gPiAgfTsNCj4gPg0KPiA+ICBPQkpFQ1RfREVDTEFSRV9UWVBFKFJJU0NW
+Q1BVLCBSSVNDVkNQVUNsYXNzLCBkaWZmIC0tZ2l0DQo+ID4gYS90YXJnZXQvcmlzY3Yva3ZtLmMg
+Yi90YXJnZXQvcmlzY3Yva3ZtLmMgaW5kZXggOGIyMDZjZTk5Yy4uNjI1MGNhMGM3ZA0KPiA+IDEw
+MDY0NA0KPiA+IC0tLSBhL3RhcmdldC9yaXNjdi9rdm0uYw0KPiA+ICsrKyBiL3RhcmdldC9yaXNj
+di9rdm0uYw0KPiA+IEBAIC0zNyw2ICszNyw3IEBADQo+ID4gICNpbmNsdWRlICJody9pcnEuaCIN
+Cj4gPiAgI2luY2x1ZGUgInFlbXUvbG9nLmgiDQo+ID4gICNpbmNsdWRlICJody9sb2FkZXIuaCIN
+Cj4gPiArI2luY2x1ZGUgImt2bV9yaXNjdi5oIg0KPiA+DQo+ID4gIHN0YXRpYyBfX3U2NCBrdm1f
+cmlzY3ZfcmVnX2lkKF9fdTY0IHR5cGUsIF9fdTY0IGlkeCkgIHsgQEAgLTQzOSwzDQo+ID4gKzQ0
+MCwxNyBAQCBpbnQga3ZtX2FyY2hfaGFuZGxlX2V4aXQoQ1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3Zt
+X3J1biAqcnVuKQ0KPiA+IHsNCj4gPiAgICAgIHJldHVybiAwOw0KPiA+ICB9DQo+ID4gKw0KPiA+
+ICt2b2lkIGt2bV9yaXNjdl9yZXNldF92Y3B1KFJJU0NWQ1BVICpjcHUpIHsNCj4gPiArICAgIENQ
+VVJJU0NWU3RhdGUgKmVudiA9ICZjcHUtPmVudjsNCj4gPiArDQo+ID4gKyAgICBpZiAoIWt2bV9l
+bmFibGVkKCkpIHsNCj4gPiArICAgICAgICByZXR1cm47DQo+ID4gKyAgICB9DQo+ID4gKyAgICBl
+bnYtPnBjID0gY3B1LT5lbnYua2VybmVsX2FkZHI7DQo+ID4gKyAgICBlbnYtPmdwclsxMF0gPSBr
+dm1fYXJjaF92Y3B1X2lkKENQVShjcHUpKTsgLyogYTAgKi8NCj4gPiArICAgIGVudi0+Z3ByWzEx
+XSA9IGNwdS0+ZW52LmZkdF9hZGRyOyAgICAgICAgICAvKiBhMSAqLw0KPiA+ICsgICAgZW52LT5z
+YXRwID0gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L3Jpc2N2L2t2
+bV9yaXNjdi5oIGIvdGFyZ2V0L3Jpc2N2L2t2bV9yaXNjdi5oIG5ldw0KPiA+IGZpbGUgbW9kZSAx
+MDA2NDQgaW5kZXggMDAwMDAwMDAwMC4uZjM4YzgyYmY1OQ0KPiA+IC0tLSAvZGV2L251bGwNCj4g
+PiArKysgYi90YXJnZXQvcmlzY3Yva3ZtX3Jpc2N2LmgNCj4gPiBAQCAtMCwwICsxLDI0IEBADQo+
+ID4gKy8qDQo+ID4gKyAqIFFFTVUgS1ZNIHN1cHBvcnQgLS0gUklTQy1WIHNwZWNpZmljIGZ1bmN0
+aW9ucy4NCj4gPiArICoNCj4gPiArICogQ29weXJpZ2h0IChjKSAyMDIwIEh1YXdlaSBUZWNobm9s
+b2dpZXMgQ28uLCBMdGQNCj4gPiArICoNCj4gPiArICogVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29m
+dHdhcmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vcg0KPiA+ICttb2RpZnkgaXQNCj4g
+PiArICogdW5kZXIgdGhlIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIHRoZSBHTlUgR2VuZXJhbCBQ
+dWJsaWMgTGljZW5zZSwNCj4gPiArICogdmVyc2lvbiAyIG9yIGxhdGVyLCBhcyBwdWJsaXNoZWQg
+YnkgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbi4NCj4gPiArICoNCj4gPiArICogVGhpcyBw
+cm9ncmFtIGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIGl0IHdpbGwgYmUgdXNlZnVsLCBidXQN
+Cj4gPiArV0lUSE9VVA0KPiA+ICsgKiBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1w
+bGllZCB3YXJyYW50eSBvZg0KPiBNRVJDSEFOVEFCSUxJVFkNCj4gPiArb3INCj4gPiArICogRklU
+TkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuICBTZWUgdGhlIEdOVSBHZW5lcmFsIFB1Ymxp
+Yw0KPiA+ICtMaWNlbnNlIGZvcg0KPiA+ICsgKiBtb3JlIGRldGFpbHMuDQo+ID4gKyAqDQo+ID4g
+KyAqIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1
+YmxpYyBMaWNlbnNlDQo+ID4gK2Fsb25nIHdpdGgNCj4gPiArICogdGhpcyBwcm9ncmFtLiAgSWYg
+bm90LCBzZWUgPGh0dHA6Ly93d3cuZ251Lm9yZy9saWNlbnNlcy8+Lg0KPiA+ICsgKi8NCj4gPiAr
+DQo+ID4gKyNpZm5kZWYgUUVNVV9LVk1fUklTQ1ZfSA0KPiA+ICsjZGVmaW5lIFFFTVVfS1ZNX1JJ
+U0NWX0gNCj4gPiArDQo+ID4gK3ZvaWQga3ZtX3Jpc2N2X3Jlc2V0X3ZjcHUoUklTQ1ZDUFUgKmNw
+dSk7DQo+ID4gKw0KPiA+ICsjZW5kaWYNCj4gPiAtLQ0KPiA+IDIuMTkuMQ0KPiA+DQo+ID4NCg==
