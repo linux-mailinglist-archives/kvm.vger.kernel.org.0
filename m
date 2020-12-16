@@ -2,156 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 986C82DB996
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 04:18:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B84EE2DB9DB
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 04:56:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725785AbgLPDRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 22:17:34 -0500
-Received: from relay5.mymailcheap.com ([159.100.241.64]:44323 "EHLO
-        relay5.mymailcheap.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725275AbgLPDRe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 22:17:34 -0500
-X-Greylist: delayed 1483 seconds by postgrey-1.27 at vger.kernel.org; Tue, 15 Dec 2020 22:17:32 EST
-Received: from relay1.mymailcheap.com (relay1.mymailcheap.com [149.56.97.132])
-        by relay5.mymailcheap.com (Postfix) with ESMTPS id 08998200FE
-        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 03:16:41 +0000 (UTC)
-Received: from filter2.mymailcheap.com (filter2.mymailcheap.com [91.134.140.82])
-        by relay1.mymailcheap.com (Postfix) with ESMTPS id 821893F157;
-        Wed, 16 Dec 2020 03:15:08 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-        by filter2.mymailcheap.com (Postfix) with ESMTP id C68F22A45B;
-        Wed, 16 Dec 2020 04:15:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
-        s=default; t=1608088507;
-        bh=1xyrlrBIqLtYHaZfwjobQnF/1NiC16uKGYnZgrRLFUM=;
-        h=Subject:From:To:Cc:References:Date:In-Reply-To:From;
-        b=XhKXL6KX8/R78++ud+WKXAUd0xlt/GiuF0ElYGwtO/t6SnCkmvFbIEYjJi4Mzr87N
-         Z1bTyMgJlEde5ff17yfRZ5lcP5Xvv76Iuvz8TB7pWZMW6NJHEdQwOFYfrmTLlYE3Mv
-         aOrChDH482+GI9bjIwXDUIrtFWpq3a7u1f9ocZ3w=
-X-Virus-Scanned: Debian amavisd-new at filter2.mymailcheap.com
-Received: from filter2.mymailcheap.com ([127.0.0.1])
-        by localhost (filter2.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id hPgxqFNmWNci; Wed, 16 Dec 2020 04:15:06 +0100 (CET)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
-        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by filter2.mymailcheap.com (Postfix) with ESMTPS;
-        Wed, 16 Dec 2020 04:15:06 +0100 (CET)
-Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
-        by mail20.mymailcheap.com (Postfix) with ESMTP id 79BD440FF4;
-        Wed, 16 Dec 2020 03:15:04 +0000 (UTC)
-Authentication-Results: mail20.mymailcheap.com;
-        dkim=pass (1024-bit key; unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="SBHa++/5";
-        dkim-atps=neutral
-AI-Spam-Status: Not processed
-Received: from [0.0.0.0] (li1000-254.members.linode.com [45.33.50.254])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by mail20.mymailcheap.com (Postfix) with ESMTPSA id 033B141990;
-        Wed, 16 Dec 2020 03:14:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
-        s=default; t=1608088496;
-        bh=1xyrlrBIqLtYHaZfwjobQnF/1NiC16uKGYnZgrRLFUM=;
-        h=Subject:From:To:Cc:References:Date:In-Reply-To:From;
-        b=SBHa++/5ct0rwPmuLmByl3QuSId9+IIvKZ0aIKmZa73pUJ5e8AMXHex9L8nIL1YZs
-         /kX+KA2gNhJMXPT3TVaHrnF3loAjRHWzryvS9bOKdaZjL6IyPYwciY9bAN+nDpx7z2
-         LhwWfaL2O0KSnM9+/p+WTSxRpZ+GyK314kTNW5mc=
-Subject: Re: [PATCH v2 03/24] target/mips/cpu: Introduce isa_rel6_available()
- helper
-From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
-Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        kvm@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20201215225757.764263-1-f4bug@amsat.org>
- <20201215225757.764263-4-f4bug@amsat.org>
- <508441db-8748-1b55-5f39-e6a778c0bdc0@linaro.org>
- <40e8df0f-01ab-6693-785b-257b8d3144bf@amsat.org>
- <af357960-40f2-b9e6-485f-d1cf36a4e95d@flygoat.com>
-Message-ID: <b1e8b44c-ae6f-786c-abe0-9a03eb5d3d63@flygoat.com>
-Date:   Wed, 16 Dec 2020 11:14:46 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
-MIME-Version: 1.0
-In-Reply-To: <af357960-40f2-b9e6-485f-d1cf36a4e95d@flygoat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S1725841AbgLPDzM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 22:55:12 -0500
+Received: from mail-eopbgr760115.outbound.protection.outlook.com ([40.107.76.115]:1443
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725550AbgLPDzM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 22:55:12 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DQN9zJwPHeHEccWqLfe176WtQkttJAMn6Wqp9bZzZholuP0PTp4nAWZWiu251iaHHjbgWiRtB9l4FecBgVBgMp9QlofU5k/afBgbrVw8Kd4TxgBpcien++8Y7vnx+ef5ndmiKQhHTZSHtLRBVFc2tSZBdg3bQRAZB+oDSJdhalf3CYQACtxAq3gAo4tU8rc9smLY5gnMgsI9gWBFh0uuVM8m8Xog3Szb8NL8P4aF0THD8k1UIpuXoORNHIVPg0qjnT4ulA4dwNubrLYp27XMmB6YIetxFNTqpD5trMwPQY+ROjGlELIK+xj2hlPDHPsjdNtDkn1xOsNRqzSXFbjQ2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bgUyZvlB+b1KHI0Lo6uDSrawrtZQUb2GXWRAKAkqxf4=;
+ b=aM8zXmUVXgAfNfAvfX2ReOwTLWRPmnPRhg1zo+mzUCLqjuVLaV2ahBuGOI45ggqZcyzl6FMsm4Hn35YGWZJ9FqeM0LUmUQcxRpsrfPMozR2KlU6yp6YAbPGyo5VGS/xY+fCpD2VONE7DInhtJocQnMQvcxQ6bM2s60C9ya4Q400CXlz5QCBPxWBtbEAXST5kVLmdbFL3WXikO693n1xSMclq43O/34WWF69qRArNNrWaJPgn2LMwruPoLRMUadtFLB57JZnn1BxdLWOq1gx1NEh6rdM4hHPyTwsFjE4zFELRv/zoDSZtzQz4g/DTD+P/Mw9uMJWve1nrX2MBs+egYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bgUyZvlB+b1KHI0Lo6uDSrawrtZQUb2GXWRAKAkqxf4=;
+ b=FJYvSyNq2xK6yUPxMa2Z62TlrTBJabmzZAkRPNhiU0c/BEWSCdTFjkiQASBV5F73lvA7kkx0WwYYiLsHZgiCbB1SJpaMjAczzXM9YUkCM/tWYfQADlRUyAMZMhlfC8KAbeGhQSqmp7uXC1d+ZMTzxV0RmKySci6LhsbUgK+mnLI=
+Received: from (2603:10b6:303:74::12) by
+ MWHPR21MB0639.namprd21.prod.outlook.com (2603:10b6:300:127::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3700.8; Wed, 16 Dec
+ 2020 03:54:29 +0000
+Received: from MW4PR21MB1857.namprd21.prod.outlook.com
+ ([fe80::f133:55b5:4633:c485]) by MW4PR21MB1857.namprd21.prod.outlook.com
+ ([fe80::f133:55b5:4633:c485%5]) with mapi id 15.20.3700.012; Wed, 16 Dec 2020
+ 03:54:29 +0000
+From:   Dexuan Cui <decui@microsoft.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: static_branch_enable() does not work from a __init function?
+Thread-Topic: static_branch_enable() does not work from a __init function?
+Thread-Index: AdbTW3KiWdYv++9aQjWyNkn3nWo7IA==
+Date:   Wed, 16 Dec 2020 03:54:29 +0000
+Message-ID: <MW4PR21MB1857CC85A6844C89183C93E9BFC59@MW4PR21MB1857.namprd21.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Rspamd-Server: mail20.mymailcheap.com
-X-Spamd-Result: default: False [-0.10 / 10.00];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         ARC_NA(0.00)[];
-         R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
-         FROM_HAS_DN(0.00)[];
-         TO_DN_SOME(0.00)[];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         MIME_GOOD(-0.10)[text/plain];
-         R_SPF_SOFTFAIL(0.00)[~all];
-         ML_SERVERS(-3.10)[148.251.23.173];
-         DKIM_TRACE(0.00)[flygoat.com:+];
-         DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
-         RCPT_COUNT_SEVEN(0.00)[8];
-         DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
-         RCVD_NO_TLS_LAST(0.10)[];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+];
-         ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
-         RCVD_COUNT_TWO(0.00)[2];
-         MID_RHS_MATCH_FROM(0.00)[];
-         HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1]
-X-Rspamd-Queue-Id: 79BD440FF4
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=cad3edbe-6569-47e6-bb9d-60ae53f80dbc;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-12-16T03:24:57Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=none action=none
+ header.from=microsoft.com;
+x-originating-ip: [2601:600:a280:7f70:4162:5057:b066:2876]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 3348ac3c-2b72-40ad-c6eb-08d8a1764a48
+x-ms-traffictypediagnostic: MWHPR21MB0639:
+x-microsoft-antispam-prvs: <MWHPR21MB06395EC916A8D3B5C2C9ACFDBFC59@MWHPR21MB0639.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3EjMyWU2L1RJW96YgT8YjYOBipnvsIi77Rz1zM98skxPX2xRaOf2rgV7nS2w+C+IUhV4BWwaBVWQcQI3/sMfFtA4/ulNdcmGaaENNgixAoPeF5wXx5eIqWFaw7oAeHMC/A26Wl1QjW3AHBB7zY2TfUEGnCmDPLhF6Khf8lvC7gsqhuMN37q95rqwJdsjJbM9g+aJJVr7gUWKRpNKvIw616nCjV1WO1bmUYSYq9qsMWogGa1KkwhWMSgNArreKYl3CSHox2/o7EVseE5qEuaNReiNot2vTThbzsBQ4Rz081pT+6an7Z7aQ6G6KO/89GsgVt03cJLX2C2R+h9zVJ+b6c5rIltN8KttlgpMpGld7gBvijVQWLHbHzqwWIOrmAJ4mNu8sgKgnlKH3H/R3phA+Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR21MB1857.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(136003)(376002)(396003)(39860400002)(366004)(8676002)(2906002)(8990500004)(82950400001)(5660300002)(82960400001)(4326008)(7696005)(8936002)(186003)(6506007)(10290500003)(66556008)(76116006)(66946007)(66476007)(64756008)(86362001)(33656002)(478600001)(9686003)(52536014)(71200400001)(55016002)(110136005)(316002)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?p7BQdwWZgLtd8IBsqmqyS7uJZe3VOLQ2tvEqPTPcC9JAhzaGQhMjdc8AlAv8?=
+ =?us-ascii?Q?AMJMjVMLAzv/hgddM6cJzoOtFiC89p+pk6cl6OLtX9U5ktYwHq8z5a/zyuMV?=
+ =?us-ascii?Q?u0BZhJWbqu/1MHFx3t5HynRAFGVjQdKjgpQ+TaJq02MHVLITdLdEzfakRkhp?=
+ =?us-ascii?Q?WrR6vyM8+I3SdFdfdbACwK8L8IuB+4oGyB9Egs1XIx4khHzFFM7h/kFjga69?=
+ =?us-ascii?Q?dzCSc4onIViYsbOiG5unrYMkYswvb8gADsImtL5PbVuWoT2fyxiG0bYJD95M?=
+ =?us-ascii?Q?0+CLFT/uK+2HaMT3/FaiKUpheBX14vIUX+QmTuaVgXgl85QB3W0rTsXzmTsk?=
+ =?us-ascii?Q?x6ImelwwDnbDv73FXbyom8f++1zFWcIulymMsv8JYKJjhLGxVad/BJp7lSj5?=
+ =?us-ascii?Q?y9WyFlKvZWS1fYSf5AHuFSjUqLiR4QaZWdxb2TDHzyUtPzWQbewRdrpkHGYb?=
+ =?us-ascii?Q?iNr7DySy2RnLv2BAdbY4LNRTOG2aZ9VYy/M1CJDoa8vxHZRku0g3AoVbyxXU?=
+ =?us-ascii?Q?YUCroya9eqeQQG8UOB8SNrsaE616cqZWni0508O9VEnKFtaeSzaIFCzeh32J?=
+ =?us-ascii?Q?m0oMCEJqj6Tw9CAMImO6GAJMtKHd4gjxJxlhQkg4AJhH9XpZolWdrOR/HzyZ?=
+ =?us-ascii?Q?xiFI83XBXpa5NH445XhPMjsYWXU/tKpjZCXs4Lgo40RiJPh9UxNEe02Sn/sG?=
+ =?us-ascii?Q?M+4qoxRbrLjlRFpEno7lar6QV/QIL/0voVa3d4i5R+HGqpPmqKlesrIgphac?=
+ =?us-ascii?Q?bHhHnwVg1pg1N0BOiKvTBToM3usG5n+fOlmvlRnu8xvuZV3sWkLFoeN2RL+H?=
+ =?us-ascii?Q?ni7gHIoQg/SCVc1q8BGd4FmVfJrdyZ9B2wJ7CVeEGiem0XgrxWEebamkR1UC?=
+ =?us-ascii?Q?9FEyn25WrlOBYCLrn7oyNx/GanHS+/IH4zRBJPQzVA49JMsXhPDJAhaqVjpf?=
+ =?us-ascii?Q?zaS/4spa4g6pkcOLyZhL+nemTcuzLU/92pVOfsaZQcxf6UjmWP68n1ZO8IDc?=
+ =?us-ascii?Q?OXRgD7j93GUCJOJ0HkqfdWUmPY3RoZsVJdUM2DmghxWq+Ac=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR21MB1857.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3348ac3c-2b72-40ad-c6eb-08d8a1764a48
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Dec 2020 03:54:29.6157
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mlutSdxVVDh7kyesKZDsh2rc7LB2FVoQ+wtM1DOOuVi5LKNKW9sFUvaYo/EpKbmjKIT64eKvYzEMsW3hR413Ug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR21MB0639
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
+The below init_module() prints "foo: false". This is strange since
+static_branch_enable() is called before the static_branch_unlikely().
+This strange behavior happens to v5.10 and an old v5.4 kernel.
+
+If I remove the "__init" marker from the init_module() function, then
+I get the expected output of "foo: true"! I guess here I'm missing
+something with Static Keys?
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/jump_label.h>
+
+static DEFINE_STATIC_KEY_FALSE(enable_foo);
+
+int __init init_module(void)
+{
+        static_branch_enable(&enable_foo);
+
+        if (static_branch_unlikely(&enable_foo))
+                printk("foo: true\n");
+        else
+                printk("foo: false\n");
+
+        return 0;
+}
+
+void cleanup_module(void)
+{
+        static_branch_disable(&enable_foo);
+}
+
+MODULE_LICENSE("GPL");
 
 
-在 2020/12/16 上午10:50, Jiaxun Yang 写道:
->
->
-> TBH I do think it doesn't sounds like a good idea to make 32-bit
-> and 64-bit different. In fact ISA_MIPS32R6 is always set for targets
-> with ISA_MIPS64R6.
->
-> We're treating MIPS64R6 as a superset of MIPS32R6, and ISA_MIPS3
-> is used to tell if a CPU supports 64-bit.
->
-> FYI: 
-> https://commons.wikimedia.org/wiki/File:MIPS_instruction_set_family.svg
+PS, I originally found: in arch/x86/kvm/vmx/vmx.c: vmx_init(), it looks
+like the line "static_branch_enable(&enable_evmcs);" does not take effect
+in a v5.4-based kernel, but does take effect in the v5.10 kernel in the
+same x86-64 virtual machine on Hyper-V, so I made the above test module
+to test static_branch_enable(), and found that static_branch_enable() in
+the test module does not work with both v5.10 and my v5.4 kernel, if the
+__init marker is used.
 
-Just add more cents here...
-The current method we handle R6 makes me a little bit annoying.
+Thanks,
+-- Dexuan
 
-Given that MIPS is backward compatible until R5, and R6 reorganized a lot
-of opcodes, I do think decoding procdure of R6 should be dedicated from 
-the rest,
-otherwise we may fall into the hell of finding difference between R6 and 
-previous
-ISAs, also I've heard some R6 only ASEs is occupying opcodes marked as
-"removed in R6", so it doesn't looks like a wise idea to check removed in R6
-in helpers.
 
-So we may end up having four series of decodetrees for ISA
-Series1: MIPS-II, MIPS32, MIPS32R2, MIPS32R5 (32bit "old" ISAs)
-Series2: MIPS-III, MIPS64, MIPS64R2, MIPS64R5 (64bit "old" ISAs)
-
-Series3: MIPS32R6 (32bit "new" ISAs)
-Series4: MIPS64R6 (64bit "new" ISAs)
-
-Thanks
-
-- Jiaxun
->
-> Thanks.
->
-> - Jiaxun
->
->
->>
->> Thanks for reviewing the series!
->>
->> Phil.
->
