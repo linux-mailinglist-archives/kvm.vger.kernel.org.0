@@ -2,214 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C28C2DBEED
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 11:45:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB332DBF04
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 11:52:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726340AbgLPKod (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 05:44:33 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28420 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725562AbgLPKoc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 05:44:32 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAX7dL056766;
-        Wed, 16 Dec 2020 05:43:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=3tnHLPjh9qpDIqfh7R6GMQ3xavAW0IZ7Ihe8oP/GnlE=;
- b=DfzmxFdjFM7ks0MTchkSLecgU2jy3hKORQu3qDRuM3aCr1fRB4lSMG/mL9k7WKDR4acT
- KrDNDE9upRWJ+2V70EMAzWaqvbzt6ZQ5A90SY31yJtGU/9mtDUHUvXXxERZV/iz9WPBQ
- RgzeZt62mWkaRfjqK8WV0/J01+jJIbaFhGkpNfyW/OXOZAbcy/jN1PY02/iVNvaLK5yz
- gTPup1g1EgTj2o7qKyoRB7sRGwlL3D2q1qno4DpUuOSCHmBLgLcpBHWjz4s3kmwu1Hcj
- 8nhBlI27D4UPk989lrc96LuhqZ8oqpP9kwY36wXyI0JeDE87Iaskv1OGJwEMglyyvq9+ 7w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35fe53md6x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 05:43:30 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BGAXa8d058460;
-        Wed, 16 Dec 2020 05:43:30 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35fe53md64-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 05:43:29 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAghOt016789;
-        Wed, 16 Dec 2020 10:43:27 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 35cng846en-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 10:43:27 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BGAhPOt18612528
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Dec 2020 10:43:25 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 94C6711C052;
-        Wed, 16 Dec 2020 10:43:25 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 895C311C04C;
-        Wed, 16 Dec 2020 10:43:22 +0000 (GMT)
-Received: from bangoria.ibmuc.com (unknown [9.199.41.249])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Dec 2020 10:43:22 +0000 (GMT)
-From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-To:     mpe@ellerman.id.au, paulus@samba.org
-Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
-        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
-        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v3 4/4] KVM: PPC: Introduce new capability for 2nd DAWR
-Date:   Wed, 16 Dec 2020 16:12:19 +0530
-Message-Id: <20201216104219.458713-5-ravi.bangoria@linux.ibm.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201216104219.458713-1-ravi.bangoria@linux.ibm.com>
-References: <20201216104219.458713-1-ravi.bangoria@linux.ibm.com>
+        id S1726205AbgLPKvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 05:51:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34680 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725275AbgLPKvh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Dec 2020 05:51:37 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D44C0617A6
+        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 02:50:56 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id 91so22704622wrj.7
+        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 02:50:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Xv90pGKHSd1iup8rHBBas7LG9OwRK+eYIdDVNAi+Y4Q=;
+        b=Y8WyiA0pXnULlK5az9uL5SaoKyZt5CYUHj2IODFlWsPFIWlHbpVK6r4XiyTQUN33pt
+         IYlYtmDt1025FXEkHJzd1vyomivhWp+R5h3zYYPe1dcSrg46dMNtByKsdfn558dHPrrw
+         YKadNJktDc3UULjj7Y1QZIP7qNZJN2UYI6Myj1dm3qd/pOKn2tZy8ZyKwReLc7BHQBKA
+         P4uyFt7cFABs8qduy8BDvqBOqWVy8R9jf1RcuuRFY5LywS3c73pFG2CThETYIl21szT0
+         H/ZiYqa03NTcRd+5JDbwV/fmR0MrDljwS5sjn4eJWTVNOtbsKX0EVi49Yc+2ugWBK95O
+         qr9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Xv90pGKHSd1iup8rHBBas7LG9OwRK+eYIdDVNAi+Y4Q=;
+        b=r4lzbtpXEitA+xw+9DuJqplfCSA513dyqveuaDTjSOTpAvMOUeybtfmSy8tCbqbX0s
+         YwuImnaTH1Lf/fewEN8FiJDyPJ+jIb5nWlqWsADHsoGqMh0r/bcomNOW+QYkxVq2uCzD
+         ce5rd/JDxIEh0J7Hy7ywUBaBm7/RCCespA1T42mb52bI/1kJnkgFCaGPEPsFoOHj8JpD
+         BG+SOY1ccGlpFPER3zO0+LP0WPyH0RPx+dCezxG+MrRQoa8k+oloIEMplFEFZPpbzbEt
+         rFGkA/YgpNYkflNid4YTMYw+91tQY/XOpI4p89rvjfjVn/Ts687nZd1OuVfIG5k4v2LN
+         ta4w==
+X-Gm-Message-State: AOAM533gPZPAOAIbh/tbxJwFwcyl4cfRyGFyfmKOkm/NLOL3QYOSRqqr
+        m87iKzBteRHQ9IZVie3RgJaEvATIHxf01Q==
+X-Google-Smtp-Source: ABdhPJwQfjTDc2P9bNpOrGqtI0lYbrDk2aMoShxBLBmrnbZ3rDbSvb1JSJSTXMYL8iorSSEjtVWgGw==
+X-Received: by 2002:adf:f7d2:: with SMTP id a18mr15934993wrq.47.1608115855152;
+        Wed, 16 Dec 2020 02:50:55 -0800 (PST)
+Received: from [192.168.1.36] (101.red-88-21-206.staticip.rima-tde.net. [88.21.206.101])
+        by smtp.gmail.com with ESMTPSA id o13sm2092470wmc.44.2020.12.16.02.50.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Dec 2020 02:50:54 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Subject: Re: [PATCH v2 03/24] target/mips/cpu: Introduce isa_rel6_available()
+ helper
+To:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org
+References: <20201215225757.764263-1-f4bug@amsat.org>
+ <20201215225757.764263-4-f4bug@amsat.org>
+ <508441db-8748-1b55-5f39-e6a778c0bdc0@linaro.org>
+ <40e8df0f-01ab-6693-785b-257b8d3144bf@amsat.org>
+ <af357960-40f2-b9e6-485f-d1cf36a4e95d@flygoat.com>
+ <b1e8b44c-ae6f-786c-abe0-9a03eb5d3d63@flygoat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5977d0f5-7e62-5f8a-d4ec-284f6f1af81d@amsat.org>
+Date:   Wed, 16 Dec 2020 11:50:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
+In-Reply-To: <b1e8b44c-ae6f-786c-abe0-9a03eb5d3d63@flygoat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-16_04:2020-12-15,2020-12-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
- impostorscore=0 bulkscore=0 phishscore=0 priorityscore=1501 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012160067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce KVM_CAP_PPC_DAWR1 which can be used by Qemu to query whether
-kvm supports 2nd DAWR or not. The capability is by default disabled
-even when the underlying CPU supports 2nd DAWR. Qemu needs to check
-and enable it manually to use the feature.
+On 12/16/20 4:14 AM, Jiaxun Yang wrote:
+> 在 2020/12/16 上午10:50, Jiaxun Yang 写道:
+>>
+>>
+>> TBH I do think it doesn't sounds like a good idea to make 32-bit
+>> and 64-bit different. In fact ISA_MIPS32R6 is always set for targets
+>> with ISA_MIPS64R6.
+>>
+>> We're treating MIPS64R6 as a superset of MIPS32R6, and ISA_MIPS3
+>> is used to tell if a CPU supports 64-bit.
 
-Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst     | 10 ++++++++++
- arch/powerpc/include/asm/kvm_ppc.h |  1 +
- arch/powerpc/kvm/book3s_hv.c       | 12 ++++++++++++
- arch/powerpc/kvm/powerpc.c         | 10 ++++++++++
- include/uapi/linux/kvm.h           |  1 +
- tools/include/uapi/linux/kvm.h     |  1 +
- 6 files changed, 35 insertions(+)
+Which is why I don't understand why they are 2 ISA_MIPS32R6/ISA_MIPS64R6
+definitions.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index abb24575bdf9..049f07ebf197 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6016,6 +6016,16 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
- can then handle to implement model specific MSR handling and/or user notifications
- to inform a user that an MSR was not handled.
- 
-+7.22 KVM_CAP_PPC_DAWR1
-+----------------------
-+
-+:Architectures: ppc
-+:Parameters: none
-+:Returns: 0 on success, -EINVAL when CPU doesn't support 2nd DAWR
-+
-+This capability can be used to check / enable 2nd DAWR feature provided
-+by POWER10 processor.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index 0a056c64c317..13c39d24dda5 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -314,6 +314,7 @@ struct kvmppc_ops {
- 			      int size);
- 	int (*enable_svm)(struct kvm *kvm);
- 	int (*svm_off)(struct kvm *kvm);
-+	int (*enable_dawr1)(struct kvm *kvm);
- };
- 
- extern struct kvmppc_ops *kvmppc_hv_ops;
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index b7a30c0692a7..04c02344bd3f 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -5625,6 +5625,17 @@ static int kvmhv_svm_off(struct kvm *kvm)
- 	return ret;
- }
- 
-+static int kvmhv_enable_dawr1(struct kvm *kvm)
-+{
-+	if (!cpu_has_feature(CPU_FTR_DAWR1))
-+		return -ENODEV;
-+
-+	/* kvm == NULL means the caller is testing if the capability exists */
-+	if (kvm)
-+		kvm->arch.dawr1_enabled = true;
-+	return 0;
-+}
-+
- static struct kvmppc_ops kvm_ops_hv = {
- 	.get_sregs = kvm_arch_vcpu_ioctl_get_sregs_hv,
- 	.set_sregs = kvm_arch_vcpu_ioctl_set_sregs_hv,
-@@ -5668,6 +5679,7 @@ static struct kvmppc_ops kvm_ops_hv = {
- 	.store_to_eaddr = kvmhv_store_to_eaddr,
- 	.enable_svm = kvmhv_enable_svm,
- 	.svm_off = kvmhv_svm_off,
-+	.enable_dawr1 = kvmhv_enable_dawr1,
- };
- 
- static int kvm_init_subcore_bitmap(void)
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 13999123b735..380656528b5b 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -678,6 +678,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = hv_enabled && kvmppc_hv_ops->enable_svm &&
- 			!kvmppc_hv_ops->enable_svm(NULL);
- 		break;
-+	case KVM_CAP_PPC_DAWR1:
-+		r = !!(hv_enabled && kvmppc_hv_ops->enable_dawr1 &&
-+		       !kvmppc_hv_ops->enable_dawr1(NULL));
-+		break;
- #endif
- 	default:
- 		r = 0;
-@@ -2187,6 +2191,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			break;
- 		r = kvm->arch.kvm_ops->enable_svm(kvm);
- 		break;
-+	case KVM_CAP_PPC_DAWR1:
-+		r = -EINVAL;
-+		if (!is_kvmppc_hv_enabled(kvm) || !kvm->arch.kvm_ops->enable_dawr1)
-+			break;
-+		r = kvm->arch.kvm_ops->enable_dawr1(kvm);
-+		break;
- #endif
- 	default:
- 		r = -EINVAL;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ca41220b40b8..f1210f99a52d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_USER_SPACE_MSR 188
- #define KVM_CAP_X86_MSR_FILTER 189
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-+#define KVM_CAP_PPC_DAWR1 191
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index ca41220b40b8..f1210f99a52d 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_USER_SPACE_MSR 188
- #define KVM_CAP_X86_MSR_FILTER 189
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-+#define KVM_CAP_PPC_DAWR1 191
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.26.2
+>>
+>> FYI:
+>> https://commons.wikimedia.org/wiki/File:MIPS_instruction_set_family.svg
+> 
+> Just add more cents here...
+> The current method we handle R6 makes me a little bit annoying.
+> 
+> Given that MIPS is backward compatible until R5, and R6 reorganized a lot
+> of opcodes, I do think decoding procdure of R6 should be dedicated from
+> the rest,
+> otherwise we may fall into the hell of finding difference between R6 and
+> previous
+> ISAs, also I've heard some R6 only ASEs is occupying opcodes marked as
+> "removed in R6", so it doesn't looks like a wise idea to check removed
+> in R6
+> in helpers.
 
+I'm not sure I understood well your comment, but I also find how
+R6 is handled messy...
+
+I'm doing this removal (from helper to decoder) with the decodetree
+conversion.
+
+> So we may end up having four series of decodetrees for ISA
+> Series1: MIPS-II, MIPS32, MIPS32R2, MIPS32R5 (32bit "old" ISAs)
+> Series2: MIPS-III, MIPS64, MIPS64R2, MIPS64R5 (64bit "old" ISAs)
+> 
+> Series3: MIPS32R6 (32bit "new" ISAs)
+> Series4: MIPS64R6 (64bit "new" ISAs)
+
+Something like that, I'm starting by converting the messier leaves
+first, so the R6 and ASEs. My approach is from your "series4" to
+"series1" last.
+
+Regards,
+
+Phil.
