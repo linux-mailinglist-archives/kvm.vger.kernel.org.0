@@ -2,75 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 510D42DC082
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 13:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E6B32DC080
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 13:49:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726048AbgLPMsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 07:48:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55124 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726044AbgLPMsn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 07:48:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608122836;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kfzYxCyTjHrFC4Rv1VBa+4B22tlACHoq5hjmmViJzUY=;
-        b=F8NVgsGzPQg+lYzO4uu5gPks/ldmY/WKgnlxDEfFqPTJ+boXKJmOAS0a/hK4LeVUWPToLH
-        PP+cfof/yxsjB7fG3Uvvotf9C9I+hDTiNrEWGUDB784k84lpa7AF7iL4EYpn1FanOam5Dm
-        yFfNWao0UDQ7LqmHPV67hOzkAHSCUZs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-F1EGZ-4xM0mq9-tWp4Qq9A-1; Wed, 16 Dec 2020 07:47:15 -0500
-X-MC-Unique: F1EGZ-4xM0mq9-tWp4Qq9A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0F9C5F9E6;
-        Wed, 16 Dec 2020 12:47:12 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.81])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E12E460C82;
-        Wed, 16 Dec 2020 12:46:41 +0000 (UTC)
-Date:   Wed, 16 Dec 2020 13:46:38 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        bgardon@google.com, peterx@redhat.com
-Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
-Message-ID: <20201216124638.paliq7v3erhpgfh6@kamzik.brq.redhat.com>
-References: <20201116121942.55031-1-drjones@redhat.com>
- <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
- <20201120080556.2enu4ygvlnslmqiz@kamzik.brq.redhat.com>
- <6c53eb4d-32ed-ed94-a3ef-dca139b0003d@redhat.com>
+        id S1725891AbgLPMr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 07:47:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52692 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725778AbgLPMr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Dec 2020 07:47:58 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3A9C0617A7;
+        Wed, 16 Dec 2020 04:47:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=nRkl1ftL5o4b/KrhceyfWd4kfXLiLhPAekED99MnXJw=; b=fwQGBMQF6zSKMb09Y7Tj+nntNV
+        6l2x04XDkAUFLqOu3QKP/NpoC8wmaSIJo6MNdzg3NOXUhVEeGOiyJAYsupv8drHiTapDvcNqj5a25
+        b8NpMotmuihhYqNZF22q0VVRvI7rG7GMp9ERCl+iMXManVw+Cg2iv6Go6fE/S/a8mPirgKnOyXxwF
+        aKiIqOJ7nX+ixnBUE9rz6le572Svc3+bWS4ZCGqz6H+pA6jpWuHp31kLXaMz78sYkQmvTCyV3eMZ5
+        ML2yQ9tFnvYK2Y0hHg6t8nD9+tfV6StbMk18NyxCIryZXVZ1FPS0NQLsfeOxkAmxyKDKm29BFLFwU
+        Ww9eopkA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kpWD3-0001aH-7u; Wed, 16 Dec 2020 12:47:13 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 47203304D28;
+        Wed, 16 Dec 2020 13:47:09 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id CBB7B203C64AC; Wed, 16 Dec 2020 13:47:08 +0100 (CET)
+Date:   Wed, 16 Dec 2020 13:47:08 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Jessica Yu <jeyu@kernel.org>
+Cc:     Dexuan Cui <decui@microsoft.com>, Ingo Molnar <mingo@kernel.org>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: static_branch_enable() does not work from a __init function?
+Message-ID: <20201216124708.GZ3021@hirez.programming.kicks-ass.net>
+References: <MW4PR21MB1857CC85A6844C89183C93E9BFC59@MW4PR21MB1857.namprd21.prod.outlook.com>
+ <20201216092649.GM3040@hirez.programming.kicks-ass.net>
+ <20201216115524.GA13751@linux-8ccs>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6c53eb4d-32ed-ed94-a3ef-dca139b0003d@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20201216115524.GA13751@linux-8ccs>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 09:48:26AM +0100, Paolo Bonzini wrote:
-> On 20/11/20 09:05, Andrew Jones wrote:
-> > So I finally looked closely enough at the dirty-ring stuff to see that
-> > patch 2 was always a dumb idea. dirty_ring_create_vm_done() has a comment
-> > that says "Switch to dirty ring mode after VM creation but before any of
-> > the vcpu creation". I'd argue that that comment would be better served at
-> > the log_mode_create_vm_done() call, but that doesn't excuse my sloppiness
-> > here. Maybe someday we can add a patch that adds that comment and also
-> > tries to use common code for the number of pages calculation for the VM,
-> > but not today.
-> > 
-> > Regarding this series, if the other three patches look good, then we
-> > can just drop 2/4. 3/4 and 4/4 should still apply cleanly and work.
+On Wed, Dec 16, 2020 at 12:55:25PM +0100, Jessica Yu wrote:
+> +++ Peter Zijlstra [16/12/20 10:26 +0100]:
+> [snip]
+> > > PS, I originally found: in arch/x86/kvm/vmx/vmx.c: vmx_init(), it looks
+> > > like the line "static_branch_enable(&enable_evmcs);" does not take effect
+> > > in a v5.4-based kernel, but does take effect in the v5.10 kernel in the
+> > > same x86-64 virtual machine on Hyper-V, so I made the above test module
+> > > to test static_branch_enable(), and found that static_branch_enable() in
+> > > the test module does not work with both v5.10 and my v5.4 kernel, if the
+> > > __init marker is used.
 > 
-> Yes, the rest is good.
->
+> Because the jump label code currently does not allow you to update if
+> the entry resides in an init section. By marking the module init
+> section __init you place it in the .init.text section.
+> jump_label_add_module() detects this (by calling within_module_init())
+> and marks the entry by calling jump_entry_set_init(). Then you have
+> the following sequence of calls (roughly):
+> 
+> static_branch_enable
+>  static_key_enable
+>    static_key_enable_cpuslocked
+>      jump_label_update
+>        jump_label_can_update
+>          jump_entry_is_init returns true, so bail out
+> 
+> Judging from the comment in jump_label_can_update(), this seems to be
+> intentional behavior:
+> 
+> static bool jump_label_can_update(struct jump_entry *entry, bool init)
+> {
+>        /*
+>         * Cannot update code that was in an init text area.
+>         */
+>        if (!init && jump_entry_is_init(entry))
+>                return false;
+> 
 
-Ping?
-
-Thanks,
-drew 
-
+Only because we're having .init=false, incorrectly. See the other email.
