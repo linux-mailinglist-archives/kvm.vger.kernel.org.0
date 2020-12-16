@@ -2,79 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 082582DC068
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 13:39:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 510D42DC082
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 13:49:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726026AbgLPMiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 07:38:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50860 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725943AbgLPMiv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Dec 2020 07:38:51 -0500
-Date:   Wed, 16 Dec 2020 13:38:05 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608122290;
-        bh=/vWZmZvghpr6F9yCtq98EC441mITAJqIEkMnbirYzEQ=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sPHVFQ2C9AvSHa04+66kxuGPInU0Ju9ieUIux+tb+q0O1H7xwB3wblE8f4ias+HL5
-         eX5tNXBf7vXicl2Dd5YF2rDYUU6X4MxIvzCy0NuxYAkFb3MEn2tXc4E+fJh+nQpLAq
-         jtcoE9uKKS9hNDISUkK+NE81aVKraV4uVT0v49rIDGNyABIW4NyM3q0D+eFnqk9q31
-         ljSkyJyd844RSjxBk+32/dDsmhzdok8hvL3wlV138/EguAuXBwA73YdvK2nLeXp6Vq
-         sxJvBf0YWp+aFVJxkLzGJhfDK7oHE7gKtYA/wkgIQ/zqRrcvLM/bmO3ldSAosUjg5f
-         uDXIzivWfkwpw==
-From:   Jessica Yu <jeyu@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Dexuan Cui <decui@microsoft.com>, Ingo Molnar <mingo@kernel.org>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: static_branch_enable() does not work from a __init function?
-Message-ID: <20201216123805.GB13751@linux-8ccs>
-References: <MW4PR21MB1857CC85A6844C89183C93E9BFC59@MW4PR21MB1857.namprd21.prod.outlook.com>
- <20201216092649.GM3040@hirez.programming.kicks-ass.net>
+        id S1726048AbgLPMsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 07:48:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55124 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726044AbgLPMsn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 07:48:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608122836;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kfzYxCyTjHrFC4Rv1VBa+4B22tlACHoq5hjmmViJzUY=;
+        b=F8NVgsGzPQg+lYzO4uu5gPks/ldmY/WKgnlxDEfFqPTJ+boXKJmOAS0a/hK4LeVUWPToLH
+        PP+cfof/yxsjB7fG3Uvvotf9C9I+hDTiNrEWGUDB784k84lpa7AF7iL4EYpn1FanOam5Dm
+        yFfNWao0UDQ7LqmHPV67hOzkAHSCUZs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-F1EGZ-4xM0mq9-tWp4Qq9A-1; Wed, 16 Dec 2020 07:47:15 -0500
+X-MC-Unique: F1EGZ-4xM0mq9-tWp4Qq9A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0F9C5F9E6;
+        Wed, 16 Dec 2020 12:47:12 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.81])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E12E460C82;
+        Wed, 16 Dec 2020 12:46:41 +0000 (UTC)
+Date:   Wed, 16 Dec 2020 13:46:38 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        bgardon@google.com, peterx@redhat.com
+Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
+Message-ID: <20201216124638.paliq7v3erhpgfh6@kamzik.brq.redhat.com>
+References: <20201116121942.55031-1-drjones@redhat.com>
+ <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
+ <20201120080556.2enu4ygvlnslmqiz@kamzik.brq.redhat.com>
+ <6c53eb4d-32ed-ed94-a3ef-dca139b0003d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201216092649.GM3040@hirez.programming.kicks-ass.net>
-X-OS:   Linux linux-8ccs 4.12.14-lp150.12.61-default x86_64
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <6c53eb4d-32ed-ed94-a3ef-dca139b0003d@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+++ Peter Zijlstra [16/12/20 10:26 +0100]:
->On Wed, Dec 16, 2020 at 03:54:29AM +0000, Dexuan Cui wrote:
->> PS, I originally found: in arch/x86/kvm/vmx/vmx.c: vmx_init(), it looks
->> like the line "static_branch_enable(&enable_evmcs);" does not take effect
->> in a v5.4-based kernel, but does take effect in the v5.10 kernel in the
->> same x86-64 virtual machine on Hyper-V, so I made the above test module
->> to test static_branch_enable(), and found that static_branch_enable() in
->> the test module does not work with both v5.10 and my v5.4 kernel, if the
->> __init marker is used.
+On Fri, Nov 20, 2020 at 09:48:26AM +0100, Paolo Bonzini wrote:
+> On 20/11/20 09:05, Andrew Jones wrote:
+> > So I finally looked closely enough at the dirty-ring stuff to see that
+> > patch 2 was always a dumb idea. dirty_ring_create_vm_done() has a comment
+> > that says "Switch to dirty ring mode after VM creation but before any of
+> > the vcpu creation". I'd argue that that comment would be better served at
+> > the log_mode_create_vm_done() call, but that doesn't excuse my sloppiness
+> > here. Maybe someday we can add a patch that adds that comment and also
+> > tries to use common code for the number of pages calculation for the VM,
+> > but not today.
+> > 
+> > Regarding this series, if the other three patches look good, then we
+> > can just drop 2/4. 3/4 and 4/4 should still apply cleanly and work.
+> 
+> Yes, the rest is good.
+>
 
-By the way, it probably works now because there was a workaround
-merged in v5.10, that mentions this very issue:
+Ping?
 
-commit 064eedf2c50f692088e1418c553084bf9c1432f8
-Author: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date:   Wed Oct 14 16:33:46 2020 +0200
-
-    KVM: VMX: eVMCS: make evmcs_sanitize_exec_ctrls() work again
-
-    It was noticed that evmcs_sanitize_exec_ctrls() is not being executed
-    nowadays despite the code checking 'enable_evmcs' static key looking
-    correct. Turns out, static key magic doesn't work in '__init' section
-    (and it is unclear when things changed) but setup_vmcs_config() is called
-    only once per CPU so we don't really need it to. Switch to checking
-    'enlightened_vmcs' instead, it is supposed to be in sync with
-    'enable_evmcs'.
-
-    Opportunistically make evmcs_sanitize_exec_ctrls '__init' and drop unneeded
-    extra newline from it.
-
-    Reported-by: Yang Weijiang <weijiang.yang@intel.com>
-    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-    Message-Id: <20201014143346.2430936-1-vkuznets@redhat.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks,
+drew 
 
