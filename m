@@ -2,77 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46B142DC5F6
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 19:10:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53D1D2DC74B
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 20:39:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729453AbgLPSKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 13:10:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26744 "EHLO
+        id S1728525AbgLPTii (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 14:38:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25011 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729193AbgLPSKE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 13:10:04 -0500
+        by vger.kernel.org with ESMTP id S1727349AbgLPTii (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 14:38:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608142118;
+        s=mimecast20190719; t=1608147431;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding;
-        bh=mamO1/NlN2O4Takc5K2x/wvpBK6RpZ5yuQxG16/89wI=;
-        b=OIdKkCKbFdOH+dHu+n+NbGvVBHwX1Rtabaw35AXcLtXkZuBzG0mHzW1HoQ2qOn5Hze4wVS
-        l6SOd+EUhb9HJENZjRBmwdiuBv1AGrHBP8HCkMfx3EJL4qS5/G2OZOu3rW/wQkPPyl3X9I
-        XxMnShdZgdC29pHCBcl6ae9Z7pTumws=
+        bh=YSOn/k1Hw3PBV10RiB9kjk1aQ7QyRB3qI+j4unC73oI=;
+        b=XmwrndeU3pBY4WoT0oCKwaLkau8Wg1V20NOgcgw57braFsmvJD3lPDEENJB1XAp8ircIbB
+        7i41UCqwjlzibq3z7FN7l1nElBBStFDvDsK7WzYD4iHpTNzANiQrwZctzhiHoFdgxz9UIL
+        3uy/WnZARnaEPDgxKASDqQkYtrUaRy0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-wsnpYp6oP0Gt_w03dLWVEg-1; Wed, 16 Dec 2020 13:08:36 -0500
-X-MC-Unique: wsnpYp6oP0Gt_w03dLWVEg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-230-p0hO15rhNR-TlnjQbwOxFA-1; Wed, 16 Dec 2020 14:37:07 -0500
+X-MC-Unique: p0hO15rhNR-TlnjQbwOxFA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5253873233;
-        Wed, 16 Dec 2020 18:08:35 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 52CF45D9EF;
-        Wed, 16 Dec 2020 18:08:35 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     thomas.lendacky@amd.com
-Subject: [PATCH] KVM: SVM: fix 32-bit compilation
-Date:   Wed, 16 Dec 2020 13:08:34 -0500
-Message-Id: <20201216180834.1466389-1-pbonzini@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64071180A086;
+        Wed, 16 Dec 2020 19:37:06 +0000 (UTC)
+Received: from omen.home (ovpn-112-193.phx2.redhat.com [10.3.112.193])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B1817177F8;
+        Wed, 16 Dec 2020 19:37:01 +0000 (UTC)
+Date:   Wed, 16 Dec 2020 12:37:01 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, eric.auger@redhat.com,
+        jgg@nvidia.com, aik@ozlabs.ru, farman@linux.ibm.com,
+        baolu.lu@linux.intel.com
+Subject: [GIT PULL] VFIO updates for v5.11-rc1
+Message-ID: <20201216123701.00517b52@omen.home>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VCPU_REGS_R8...VCPU_REGS_R15 are not defined on 32-bit x86,
-so cull them from the synchronization of the VMSA.
+Hi Linus,
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm/sev.c | 2 ++
- 1 file changed, 2 insertions(+)
+The following changes since commit b65054597872ce3aefbc6a666385eabdf9e288da:
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 8b5ef0fe4490..e57847ff8bd2 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -529,6 +529,7 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
- 	save->rbp = svm->vcpu.arch.regs[VCPU_REGS_RBP];
- 	save->rsi = svm->vcpu.arch.regs[VCPU_REGS_RSI];
- 	save->rdi = svm->vcpu.arch.regs[VCPU_REGS_RDI];
-+#ifdef CONFIG_X86_64
- 	save->r8  = svm->vcpu.arch.regs[VCPU_REGS_R8];
- 	save->r9  = svm->vcpu.arch.regs[VCPU_REGS_R9];
- 	save->r10 = svm->vcpu.arch.regs[VCPU_REGS_R10];
-@@ -537,6 +538,7 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
- 	save->r13 = svm->vcpu.arch.regs[VCPU_REGS_R13];
- 	save->r14 = svm->vcpu.arch.regs[VCPU_REGS_R14];
- 	save->r15 = svm->vcpu.arch.regs[VCPU_REGS_R15];
-+#endif
- 	save->rip = svm->vcpu.arch.regs[VCPU_REGS_RIP];
- 
- 	/* Sync some non-GPR registers before encrypting */
--- 
-2.26.2
+  Linux 5.10-rc6 (2020-11-29 15:50:50 -0800)
+
+are available in the Git repository at:
+
+  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.11-rc1
+
+for you to fetch changes up to bdfae1c9a913930eae5ea506733aa7c285e12a06:
+
+  vfio/type1: Add vfio_group_iommu_domain() (2020-12-10 14:47:56 -0700)
+
+----------------------------------------------------------------
+VFIO updates for v5.11-rc1
+
+ - Fix uninitialized list walk in error path (Eric Auger)
+
+ - Use io_remap_pfn_range() (Jason Gunthorpe)
+
+ - Allow fallback support for NVLink on POWER8 (Alexey Kardashevskiy)
+
+ - Enable mdev request interrupt with CCW support (Eric Farman)
+
+ - Enable interface to iommu_domain from vfio_group (Lu Baolu)
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      vfio/pci/nvlink2: Do not attempt NPU2 setup on POWER8NVL NPU
+
+Eric Auger (1):
+      vfio/pci: Move dummy_resources_list init in vfio_pci_probe()
+
+Eric Farman (2):
+      vfio-mdev: Wire in a request handler for mdev parent
+      vfio-ccw: Wire in the request callback
+
+Jason Gunthorpe (1):
+      vfio-pci: Use io_remap_pfn_range() for PCI IO memory
+
+Lu Baolu (1):
+      vfio/type1: Add vfio_group_iommu_domain()
+
+ drivers/s390/cio/vfio_ccw_ops.c     | 26 ++++++++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_private.h |  4 ++++
+ drivers/vfio/mdev/mdev_core.c       |  4 ++++
+ drivers/vfio/mdev/vfio_mdev.c       | 13 +++++++++++++
+ drivers/vfio/pci/vfio_pci.c         |  7 +++----
+ drivers/vfio/pci/vfio_pci_nvlink2.c |  7 +++++--
+ drivers/vfio/vfio.c                 | 18 ++++++++++++++++++
+ drivers/vfio/vfio_iommu_type1.c     | 24 ++++++++++++++++++++++++
+ include/linux/mdev.h                |  4 ++++
+ include/linux/vfio.h                |  4 ++++
+ include/uapi/linux/vfio.h           |  1 +
+ 11 files changed, 106 insertions(+), 6 deletions(-)
 
