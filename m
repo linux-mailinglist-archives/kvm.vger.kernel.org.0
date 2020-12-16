@@ -2,112 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C81D2DC820
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 22:06:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E3BA2DC844
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 22:21:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727612AbgLPVGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 16:06:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45210 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726979AbgLPVGk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Dec 2020 16:06:40 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01501C06179C
-        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 13:06:00 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id 131so17383814pfb.9
-        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 13:05:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TaU9p63XhvWNhY6D/qJiSam8sjXJmlJiAOjcENiYbJc=;
-        b=bNXjpByCKgOosTIt5c7REa1FXJQnnPrFfh/Ktk59hc7JWyFfCsy4zoi9fTxjqrPaef
-         /3FNiMUtqTDchcD7nRkYty+LVxecYSct+G3GAUfp2DlWNQRYJ8ULovPuHZzRikL7JpRm
-         +fNjkvCT2Wp9PrPEu+LZ6GeuJd3JTzYElkPB7c/Zt6cJnC797LF82jAzl4W98ZYp1reK
-         x1kUUOhru4t9oVt1bEqObz9v+FK4TbBh6s131gZ7b+8R1kEJ1HltoJx4IjlBNCNZCdoc
-         JZxYPzvckBHPio5ifbRhkm7GLVaOeqatTteJUAcY6hZ+w3CwsyUhAOX+Em2DmSlZqRSU
-         6Q8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TaU9p63XhvWNhY6D/qJiSam8sjXJmlJiAOjcENiYbJc=;
-        b=fmpEZX7HPm4AuKKIJvZXMXt71bwg4a/ER6gIzwpm7Lkh/fNKM2WHlth0AUdK1wNKYv
-         15lkh5O0z3ILdURAW4rucxrSL0vlYV+Xu8OCGYXhHlGLFNL2rik2iIT/llJUzaAqRi7W
-         IlXias/ZX7Q/BYWKZbF6BbVLAte+7scgzDBRzObZQ5DVVfJv7R8xjMGNOVDd2LzWSs56
-         FnP7u/89Sbh7KjX3NG20PoJliU0SK93MLwyz39Zl2cjw6Crx0WAXK9p/y+60n9mFnLcc
-         Nk1sDFQdF9AHcGlvhilDRKTykoGfB4yQMa4p0AfOoYgtwZegKjsRH/1CEd10rd7npDx+
-         9d5w==
-X-Gm-Message-State: AOAM530/kCkzzIDq9AoLY5mFb7IFU9aD2hjVk/VPXbvm1PTs13XAPLKj
-        X8TjNnrhOHypSMfKHAyhuyEBeg==
-X-Google-Smtp-Source: ABdhPJxR1+wOui1rk4K1WVCogFybFQRo0PstIcBIKL8cEivwnW7iocdWC2VB9ZYTEbFhOcaDgDUo1g==
-X-Received: by 2002:a62:844b:0:b029:19e:62a0:ca18 with SMTP id k72-20020a62844b0000b029019e62a0ca18mr3033382pfd.46.1608152759348;
-        Wed, 16 Dec 2020 13:05:59 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id v3sm3075218pjn.7.2020.12.16.13.05.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Dec 2020 13:05:58 -0800 (PST)
-Date:   Wed, 16 Dec 2020 13:05:52 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM/nVMX: Use __vmx_vcpu_run in
- nested_vmx_check_vmentry_hw
-Message-ID: <X9p2sHrG0ezvSetC@google.com>
-References: <20201029134145.107560-1-ubizjak@gmail.com>
- <CAFULd4av_xehfPBBL76dH+On4ezLa6rqU6YkqBuLhPcvZTr5pQ@mail.gmail.com>
- <c0f5129e-a04a-5b9c-f561-1132283077f1@oracle.com>
+        id S1727100AbgLPVTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 16:19:55 -0500
+Received: from mx0a-00190b01.pphosted.com ([67.231.149.131]:17126 "EHLO
+        mx0a-00190b01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726238AbgLPVTz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 16:19:55 -0500
+Received: from pps.filterd (m0122333.ppops.net [127.0.0.1])
+        by mx0a-00190b01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 0BGLEFVi013122;
+        Wed, 16 Dec 2020 21:16:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=jan2016.eng;
+ bh=2aFvK27wjUPLUSmZ2FYvAYjppRuYn0YXB4jA+O/tDoI=;
+ b=iSM8bgIvaCii5Ze1U0E0yKyrbB66XlIDqF+knqg9YdRjG5lfyXFJYwoGxbi5ympnp4/a
+ 4p/WSWCjUlEJQFlZX4zg413V29EXYzQkkpeIaoEVC+gJQtCbjrTVEKTIpQIDTASk/dcF
+ Mvm0pE/e6VfafQyVqR2WK1N9mL+NecSHhfkOQpE9ffV68nkQxZ0X6ye/I5czf0q6Pb3R
+ 9I4S7wsLyCgw3ZakyhpIcCPx7oa9mEPIgPApuaTcfSccpAvAKCuvuv9wxxtj9V58Zjfw
+ 1U7n8qKgo6pSj1WvWYSPZHaWGglTz6ct4t6/umGfLMGIG4pDpSWpPNEkyWHd4mPdcRVb iA== 
+Received: from prod-mail-ppoint8 (a72-247-45-34.deploy.static.akamaitechnologies.com [72.247.45.34] (may be forged))
+        by mx0a-00190b01.pphosted.com with ESMTP id 35dfsjnxy2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 21:16:36 +0000
+Received: from pps.filterd (prod-mail-ppoint8.akamai.com [127.0.0.1])
+        by prod-mail-ppoint8.akamai.com (8.16.0.42/8.16.0.42) with SMTP id 0BGL3nl5014066;
+        Wed, 16 Dec 2020 16:16:35 -0500
+Received: from prod-mail-relay18.dfw02.corp.akamai.com ([172.27.165.172])
+        by prod-mail-ppoint8.akamai.com with ESMTP id 35ct338ahu-1;
+        Wed, 16 Dec 2020 16:16:35 -0500
+Received: from [0.0.0.0] (unknown [172.27.119.138])
+        by prod-mail-relay18.dfw02.corp.akamai.com (Postfix) with ESMTP id 611FE525;
+        Wed, 16 Dec 2020 21:16:34 +0000 (GMT)
+Subject: Re: [RFC][PATCH] jump_label/static_call: Add MAINTAINERS
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Dexuan Cui <decui@microsoft.com>
+Cc:     Ingo Molnar <mingo@kernel.org>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        jeyu@kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>,
+        ardb@kernel.org, Steven Rostedt <rostedt@goodmis.org>
+References: <MW4PR21MB1857CC85A6844C89183C93E9BFC59@MW4PR21MB1857.namprd21.prod.outlook.com>
+ <20201216092649.GM3040@hirez.programming.kicks-ass.net>
+ <20201216105926.GS3092@hirez.programming.kicks-ass.net>
+ <20201216133014.GT3092@hirez.programming.kicks-ass.net>
+ <20201216134249.GU3092@hirez.programming.kicks-ass.net>
+From:   Jason Baron <jbaron@akamai.com>
+Message-ID: <7a7ceca6-5a8d-f88e-27f1-9ac14d27a6b8@akamai.com>
+Date:   Wed, 16 Dec 2020 16:16:34 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0f5129e-a04a-5b9c-f561-1132283077f1@oracle.com>
+In-Reply-To: <20201216134249.GU3092@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-16_09:2020-12-15,2020-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ phishscore=0 adultscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012160131
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-16_09:2020-12-15,2020-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=903 suspectscore=0
+ impostorscore=0 phishscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
+ priorityscore=1501 malwarescore=0 adultscore=0 clxscore=1011 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012160133
+X-Agari-Authentication-Results: mx.akamai.com; spf=${SPFResult} (sender IP is 72.247.45.34)
+ smtp.mailfrom=jbaron@akamai.com smtp.helo=prod-mail-ppoint8
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 16, 2020, Krish Sadhukhan wrote:
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index d14c94d0aff1..0f390c748b18 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -6591,8 +6591,6 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
-> > >          }
-> > >   }
-> > > 
-> > > -bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
-> > > -
-> > >   static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> > >                                          struct vcpu_vmx *vmx)
-> > >   {
-> > > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> > > index f6f66e5c6510..32db3b033e9b 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.h
-> > > +++ b/arch/x86/kvm/vmx/vmx.h
-> > > @@ -339,6 +339,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
-> > >   struct vmx_uret_msr *vmx_find_uret_msr(struct vcpu_vmx *vmx, u32 msr);
-> > >   void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu);
-> > >   void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
-> > > +bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
-> > >   int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr);
-> > >   void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
-> > > 
-> > > --
-> > > 2.26.2
-> > > 
-> Semantically __vmx_vcpu_run() is called to enter guest mode. In
-> nested_vmx_check_vmentry_hw(), we are not entering guest mode. Guest mode is
-> entered when nested_vmx_enter_non_root_mode() calls enter_guest_mode().
 
-Naming aside, this patch intentionally redefines the semantics to mean "execute
-VM-Enter that may or may not succeed".  And as called out in the changelog, the
-overhead of the GPR save/load/restore is tolerable; reusing code and avoiding
-ugly inline asm is more important.
 
-> Secondly, why not just replace the first half of the assembly block with a
-> call to vmx_update_host_rsp() and leave the rest as is ?
+On 12/16/20 8:42 AM, Peter Zijlstra wrote:
+> On Wed, Dec 16, 2020 at 02:30:14PM +0100, Peter Zijlstra wrote:
+>>
 
-As above, though not called out in the changelog, the goal is to move away from
-the inline asm without introducing another asm subroutine.
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -16766,6 +16766,18 @@ M:	Ion Badulescu <ionut@badula.org>
+>>  S:	Odd Fixes
+>>  F:	drivers/net/ethernet/adaptec/starfire*
+>>  
+>> +STATIC BRANCH/CALL
+>> +M:	Peter Zijlstra <peterz@infradead.org>
+>> +M:	Josh Poimboeuf <jpoimboe@redhat.com>
+>> +M:	Jason Baron <jbaron@akamai.com>
+>> +R:	Steven Rostedt <rostedt@goodmis.org>
+>> +R:	Ard Biesheuvel <ardb@kernel.org>
+>> +S:	Supported
+> 
+> F:	arch/*/include/asm/jump_label*.h
+> F:	arch/*/include/asm/static_call*.h
+> F:	arch/*/kernel/jump_label.c
+> F:	arch/*/kernel/static_call.c
+> 
+> These too?
+> 
+>> +F:	include/linux/jump_label*.h
+>> +F:	include/linux/static_call*.h
+>> +F:	kernel/jump_label.c
+>> +F:	kernel/static_call.c
+>> +
+>>  STEC S1220 SKD DRIVER
+>>  M:	Damien Le Moal <Damien.LeMoal@wdc.com>
+>>  L:	linux-block@vger.kernel.org
 
-Uros, I'll try to double check and review this later today.
+
+Thanks Peter.
+
+Acked-by: Jason Baron <jbaron@akamai.com>
