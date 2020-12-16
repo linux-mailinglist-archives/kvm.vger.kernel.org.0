@@ -2,149 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F39D22DBECB
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 11:39:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE3EC2DBEE8
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 11:45:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726281AbgLPKhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 05:37:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53951 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726242AbgLPKhg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 05:37:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608114970;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=t9CKeWnWAx3u5eiNFnwtMWhwXN3PXTOPoJxw+acCycA=;
-        b=F5tYhX6eUAjgVfhJxdkvU0bpAbPbzXrQjSZKW8yCkPFZtyrtU8HoP8RDU8/Y+U1U4LtPW9
-        +aQkLYXgS5Tju34bAOfMV2Jk/Fddgy787/HdpAiCJy9T2n2uA37U3SohWWjigqOOe191t2
-        gk/rMgWcKWq0UiWsajkVZiUUvTCMQDQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-njN3WV6WMg-q2N8opfkSmQ-1; Wed, 16 Dec 2020 05:36:06 -0500
-X-MC-Unique: njN3WV6WMg-q2N8opfkSmQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83CB58030AC;
-        Wed, 16 Dec 2020 10:36:03 +0000 (UTC)
-Received: from [10.36.112.243] (ovpn-112-243.ams2.redhat.com [10.36.112.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7449860C43;
-        Wed, 16 Dec 2020 10:35:55 +0000 (UTC)
-Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
- state to physical side
-To:     Shenming Lu <lushenming@huawei.com>, Marc Zyngier <maz@kernel.org>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-4-lushenming@huawei.com>
- <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
- <b03edcf2-2950-572f-fd31-601d8d766c80@huawei.com>
- <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
- <49610291-cf57-ff78-d0ac-063af24efbb4@huawei.com>
- <48c10467-30f3-9b5c-bbcb-533a51516dc5@huawei.com>
- <2ad38077300bdcaedd2e3b073cd36743@kernel.org>
- <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
- <274dafb2e21f49326a64bb575e668793@kernel.org>
- <59ec07e5-c017-8644-b96f-e87fe600c490@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <f8b398df-9945-9ce6-18e6-970637a1bb51@redhat.com>
-Date:   Wed, 16 Dec 2020 11:35:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726327AbgLPKoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 05:44:32 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55098 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726288AbgLPKob (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 05:44:31 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAVUGp074045;
+        Wed, 16 Dec 2020 05:43:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=sTi5ENDvNYn/Nu6cWCNyjnsbtTWHyVrZRsMwWRoJwmY=;
+ b=fWdZdtSr52y3gdyvh7hsCHrC5li8W4aI7388ehhNFlT4btNADdIxDgn9AigPkrJHYV/r
+ 3HS01300rQjpv3DlzEdTiCBOZ+ugLOsl5LQAKG3UCAUBNPVG3WuFTBKP4RrivtamUp68
+ inPZgmNdOtaS8pVhiZBZNjWt5Cax78gR3sNlS7HsivDGbkwiyYPH1YB7Xs8V7/62AjPy
+ IksFq4HHWB4k0a4aw1FpOGAJVo1TTpxnsh44cPSSrsNRH4jo79Hwq2J5k3ZwoiavqTpu
+ ThmSUNkYMhN3LHvx5bQv8E9eHs0Omazti0j2VCKJ1zKVAY9IFieyU0XKizK1VINLEQPc lA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35ff7k2p3u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 05:43:16 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BGAVZHu074484;
+        Wed, 16 Dec 2020 05:43:15 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35ff7k2p36-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 05:43:15 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAhE7P011329;
+        Wed, 16 Dec 2020 10:43:14 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 35cng8a66n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 10:43:13 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BGAhBKf29557034
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Dec 2020 10:43:11 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8DF7E11C052;
+        Wed, 16 Dec 2020 10:43:11 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62C7D11C05C;
+        Wed, 16 Dec 2020 10:43:08 +0000 (GMT)
+Received: from bangoria.ibmuc.com (unknown [9.199.41.249])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Dec 2020 10:43:08 +0000 (GMT)
+From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+To:     mpe@ellerman.id.au, paulus@samba.org
+Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
+        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
+        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v3 0/4] KVM: PPC: Power10 2nd DAWR enablement
+Date:   Wed, 16 Dec 2020 16:12:15 +0530
+Message-Id: <20201216104219.458713-1-ravi.bangoria@linux.ibm.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <59ec07e5-c017-8644-b96f-e87fe600c490@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-16_04:2020-12-15,2020-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 mlxlogscore=966 adultscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 priorityscore=1501 phishscore=0 bulkscore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012160063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shenming,
+Enable p10 2nd DAWR feature for Book3S kvm guest. DAWR is a hypervisor
+resource and thus H_SET_MODE hcall is used to set/unset it. A new case
+H_SET_MODE_RESOURCE_SET_DAWR1 is introduced in H_SET_MODE hcall for
+setting/unsetting 2nd DAWR. Also, new capability KVM_CAP_PPC_DAWR1 has
+been added to query 2nd DAWR support via kvm ioctl.
 
-On 12/1/20 1:15 PM, Shenming Lu wrote:
-> On 2020/12/1 19:50, Marc Zyngier wrote:
->> On 2020-12-01 11:40, Shenming Lu wrote:
->>> On 2020/12/1 18:55, Marc Zyngier wrote:
->>>> On 2020-11-30 07:23, Shenming Lu wrote:
->>>>
->>>> Hi Shenming,
->>>>
->>>>> We are pondering over this problem these days, but still don't get a
->>>>> good solution...
->>>>> Could you give us some advice on this?
->>>>>
->>>>> Or could we move the restoring of the pending states (include the sync
->>>>> from guest RAM and the transfer to HW) to the GIC VM state change handler,
->>>>> which is completely corresponding to save_pending_tables (more symmetric?)
->>>>> and don't expose GICv4...
->>>>
->>>> What is "the GIC VM state change handler"? Is that a QEMU thing?
->>>
->>> Yeah, it is a a QEMU thing...
->>>
->>>> We don't really have that concept in KVM, so I'd appreciate if you could
->>>> be a bit more explicit on this.
->>>
->>> My thought is to add a new interface (to QEMU) for the restoring of
->>> the pending states, which is completely corresponding to
->>> KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES...
->>> And it is called from the GIC VM state change handler in QEMU, which
->>> is happening after the restoring (call kvm_vgic_v4_set_forwarding())
->>> but before the starting (running) of the VFIO device.
->>
->> Right, that makes sense. I still wonder how much the GIC save/restore
->> stuff differs from other architectures that implement similar features,
->> such as x86 with VT-D.
-> 
-> I am not familiar with it...
-> 
->>
->> It is obviously too late to change the userspace interface, but I wonder
->> whether we missed something at the time.
-> 
-> The interface seems to be really asymmetrical?...
+This feature also needs to be enabled in Qemu to really use it. I'll
+post Qemu patches once kvm patches get accepted.
 
-in qemu d5aa0c229a ("hw/intc/arm_gicv3_kvm: Implement pending table
-save") commit message, it is traced:
+v2: https://lore.kernel.org/kvm/20201124105953.39325-1-ravi.bangoria@linux.ibm.com
 
-"There is no explicit restore as the tables are implicitly sync'ed
-on ITS table restore and on LPI enable at redistributor level."
+v2->v3:
+ - Patch #1. If L0 version > L1, L0 hv_guest_state will contain some
+   additional fields which won't be filled while reading from L1
+   memory and thus they can contain garbage. Initialize l2_hv with 0s
+   to avoid such situations.
+ - Patch #3. Introduce per vm flag dawr1_enabled.
+ - Patch #4. Instead of auto enabling KVM_CAP_PPC_DAWR1, let user check
+   and enable it manually. Also move KVM_CAP_PPC_DAWR1 check / enable
+   logic inside #if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE).
+ - Explain KVM_CAP_PPC_DAWR1 in Documentation/virt/kvm/api.rst 
+ - Rebased on top of 5.10-rc3.
 
-At that time there was no real justification behind adding the RESTORE
-fellow attr.
+v1->v2:
+ - patch #1: New patch
+ - patch #2: Don't rename KVM_REG_PPC_DAWR, it's an uapi macro
+ - patch #3: Increment HV_GUEST_STATE_VERSION
+ - Split kvm and selftests patches into different series
+ - Patches rebased to paulus/kvm-ppc-next (cf59eb13e151) + few
+   other watchpoint patches which are yet to be merged in
+   paulus/kvm-ppc-next.
 
-Maybe a stupid question but isn't it possible to unset the forwarding
-when saving and rely on VFIO to automatically restore it when resuming
-on destination?
+Ravi Bangoria (4):
+  KVM: PPC: Allow nested guest creation when L0 hv_guest_state > L1
+  KVM: PPC: Rename current DAWR macros and variables
+  KVM: PPC: Add infrastructure to support 2nd DAWR
+  KVM: PPC: Introduce new capability for 2nd DAWR
 
-Thanks
+ Documentation/virt/kvm/api.rst            | 12 ++++
+ arch/powerpc/include/asm/hvcall.h         | 25 ++++++-
+ arch/powerpc/include/asm/kvm_host.h       |  7 +-
+ arch/powerpc/include/asm/kvm_ppc.h        |  1 +
+ arch/powerpc/include/uapi/asm/kvm.h       |  2 +
+ arch/powerpc/kernel/asm-offsets.c         |  6 +-
+ arch/powerpc/kvm/book3s_hv.c              | 79 +++++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_nested.c       | 70 ++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 43 +++++++++---
+ arch/powerpc/kvm/powerpc.c                | 10 +++
+ include/uapi/linux/kvm.h                  |  1 +
+ tools/arch/powerpc/include/uapi/asm/kvm.h |  2 +
+ tools/include/uapi/linux/kvm.h            |  1 +
+ 13 files changed, 216 insertions(+), 43 deletions(-)
 
-Eric
-
-
-> 
-> Or is there a possibility that we could know which irq is hw before the VFIO
-> device calls kvm_vgic_v4_set_forwarding()?
-> 
-> Thanks,
-> Shenming
-> 
->>
->> Thanks,
->>
->>         M.
-> 
+-- 
+2.26.2
 
