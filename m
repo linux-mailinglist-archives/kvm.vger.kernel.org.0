@@ -2,117 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A4282DBC68
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 09:03:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69F662DBC72
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 09:07:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725848AbgLPICW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 03:02:22 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2093 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725766AbgLPICW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Dec 2020 03:02:22 -0500
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4CwncL4gcpzVpnY;
-        Wed, 16 Dec 2020 16:00:34 +0800 (CST)
-Received: from dggemm751-chm.china.huawei.com (10.1.198.57) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Wed, 16 Dec 2020 16:01:37 +0800
-Received: from dggpemm000001.china.huawei.com (7.185.36.245) by
- dggemm751-chm.china.huawei.com (10.1.198.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Wed, 16 Dec 2020 16:01:37 +0800
-Received: from dggpemm000001.china.huawei.com ([7.185.36.245]) by
- dggpemm000001.china.huawei.com ([7.185.36.245]) with mapi id 15.01.1913.007;
- Wed, 16 Dec 2020 16:01:37 +0800
-From:   Jiangyifei <jiangyifei@huawei.com>
-To:     Anup Patel <anup@brainfault.org>
-CC:     Anup Patel <anup.patel@wdc.com>, Atish Patra <atish.patra@wdc.com>,
-        "Paul Walmsley" <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zhanghailiang <zhang.zhanghailiang@huawei.com>,
-        KVM General <kvm@vger.kernel.org>,
-        yinyipeng <yinyipeng1@huawei.com>,
-        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        "dengkai (A)" <dengkai1@huawei.com>
-Subject: RE: [PATCH RFC 0/3] Implement guest time scaling in RISC-V KVM
-Thread-Topic: [PATCH RFC 0/3] Implement guest time scaling in RISC-V KVM
-Thread-Index: AQHWyW7J7KJ3/h39l0SdrqVdkwzNb6n403kAgACcZuA=
-Date:   Wed, 16 Dec 2020 08:01:37 +0000
-Message-ID: <70bdbe9c25214e9483950a0a0efb4305@huawei.com>
-References: <20201203121839.308-1-jiangyifei@huawei.com>
- <CAAhSdy2zdwfOGFUtakhbeDUJBapz6fWPnQptT7nCdyFMSoLyGg@mail.gmail.com>
-In-Reply-To: <CAAhSdy2zdwfOGFUtakhbeDUJBapz6fWPnQptT7nCdyFMSoLyGg@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.186.236]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1725807AbgLPIHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 03:07:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37638 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725287AbgLPIHW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Dec 2020 03:07:22 -0500
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B794FC0613D6;
+        Wed, 16 Dec 2020 00:06:41 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id r5so23794418eda.12;
+        Wed, 16 Dec 2020 00:06:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WiqtPjd/js6CZTuGoiZofY3uvp09PMvJ3JUNNxlan84=;
+        b=DE5oaqJ3vyS4oiPOJTQmR4NOm/RfY6ZOo4/k5OSR+TR3vDapVHTtEEKisb22SxNTW2
+         kKIpcqg7LyLqX72kqPkzH9VkToRm96OYXwmG5Nq8kgf5Am0xZ90Z1zwzlzX2Rpy7OVJa
+         feWeYroF2A2IgO9uamM585WQV4BHqJkGRDFYOh1K9yVn5WmTqSne6vx8kLZw8nS2pd46
+         sV+8HOO763HfsMK75SQtKObkP/GsawUNdvcln8bL8O/s6WNoA28/o4F4RWDQlbC3jory
+         5aeh6/VnRxlQRiZlJt9sfJgwIf6z8xwKOsseYtdnoAIie1UDVzqar/YymWQzXCdvc3+Q
+         o38w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WiqtPjd/js6CZTuGoiZofY3uvp09PMvJ3JUNNxlan84=;
+        b=C6afoAyNY5xg5sY/C8zrQz6DuWR91zsn+g/Yv/J9e/QMyst+IQPLIzSo7deyiBzC22
+         It/FaW+mskRJFJTq1AW8ZTrs97RidWIF/sJIMdlaTW9D8Aocjf9F5eWnqoyBUpJb9yH5
+         iKzexre1dinTpBPF0VQIecWdfipdKLtn5SBcnqPThApbUU0cfgtkNHcrzwLkB/MTqvVE
+         wj0v7XiREoMxZT8KawSL2+1yzdv0lbmoDbiiukczK27bav77fKkMcM0hGkhCFHYAu0mD
+         sQ6QZY1rF8QX5O2xB6a17mpdOXf6madCO26RjGNbjyi6xla641IMxauac7xrOTEie2ff
+         iAxA==
+X-Gm-Message-State: AOAM5331wg/dYc68qWuxC1E4x5FfZyyYyJfBp4EQ1Y41K42JegXcf1jy
+        FOJQ5KCa8RZDsQ4RakA3lbeut5VefNyLJ1Bd
+X-Google-Smtp-Source: ABdhPJy2j30t7eDxmfIN066lb8awYMuxtPbkAxdnh5WYjjy5dQDkvCXPcYhas6GNsQ01BdaNpwosgg==
+X-Received: by 2002:a05:6402:404:: with SMTP id q4mr33389998edv.295.1608106000499;
+        Wed, 16 Dec 2020 00:06:40 -0800 (PST)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id n20sm798334ejo.83.2020.12.16.00.06.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Dec 2020 00:06:39 -0800 (PST)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH v2 2/3] locking/atomic/x86: Introduce arch_try_cmpxchg64()
+Date:   Wed, 16 Dec 2020 09:05:20 +0100
+Message-Id: <20201216080519.55600-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFudXAgUGF0ZWwgW21haWx0
-bzphbnVwQGJyYWluZmF1bHQub3JnXQ0KPiBTZW50OiBXZWRuZXNkYXksIERlY2VtYmVyIDE2LCAy
-MDIwIDI6NDAgUE0NCj4gVG86IEppYW5neWlmZWkgPGppYW5neWlmZWlAaHVhd2VpLmNvbT4NCj4g
-Q2M6IEFudXAgUGF0ZWwgPGFudXAucGF0ZWxAd2RjLmNvbT47IEF0aXNoIFBhdHJhIDxhdGlzaC5w
-YXRyYUB3ZGMuY29tPjsNCj4gUGF1bCBXYWxtc2xleSA8cGF1bC53YWxtc2xleUBzaWZpdmUuY29t
-PjsgUGFsbWVyIERhYmJlbHQNCj4gPHBhbG1lckBkYWJiZWx0LmNvbT47IEFsYmVydCBPdSA8YW91
-QGVlY3MuYmVya2VsZXkuZWR1PjsgUGFvbG8gQm9uemluaQ0KPiA8cGJvbnppbmlAcmVkaGF0LmNv
-bT47IFpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47DQo+IEtW
-TSBHZW5lcmFsIDxrdm1Admdlci5rZXJuZWwub3JnPjsgeWlueWlwZW5nIDx5aW55aXBlbmcxQGh1
-YXdlaS5jb20+Ow0KPiBaaGFuZ3hpYW9mZW5nIChGKSA8dmljdG9yLnpoYW5neGlhb2ZlbmdAaHVh
-d2VpLmNvbT47DQo+IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcgTGlzdCA8bGludXgta2Vy
-bmVsQHZnZXIua2VybmVsLm9yZz47DQo+IGt2bS1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnOyBs
-aW51eC1yaXNjdiA8bGludXgtcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZz47DQo+IFd1YmluIChI
-KSA8d3Uud3ViaW5AaHVhd2VpLmNvbT47IGRlbmdrYWkgKEEpIDxkZW5na2FpMUBodWF3ZWkuY29t
-Pg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIFJGQyAwLzNdIEltcGxlbWVudCBndWVzdCB0aW1lIHNj
-YWxpbmcgaW4gUklTQy1WIEtWTQ0KPiANCj4gT24gVGh1LCBEZWMgMywgMjAyMCBhdCA1OjUxIFBN
-IFlpZmVpIEppYW5nIDxqaWFuZ3lpZmVpQGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+DQo+ID4gVGhp
-cyBzZXJpZXMgaW1wbGVtZW50cyBndWVzdCB0aW1lIHNjYWxpbmcgYmFzZWQgb24gUkRUSU1FIGlu
-c3RydWN0aW9uDQo+ID4gZW11bGF0aW9uIHNvIHRoYXQgd2UgY2FuIGFsbG93IG1pZ3JhdGluZyBH
-dWVzdC9WTSBhY3Jvc3MgSG9zdHMgd2l0aA0KPiA+IGRpZmZlcmVudCB0aW1lIGZyZXF1ZW5jeS4N
-Cj4gPg0KPiA+IFdoeSBub3QgdGhyb3VnaCBwYXJhLXZpcnQuIEZyb20gYXJtJ3MgZXhwZXJpZW5j
-ZVsxXSwgcGFyYS12aXJ0DQo+ID4gaW1wbGVtZW50YXRpb24gZG9lc24ndCByZWFsbHkgc29sdmUg
-dGhlIHByb2JsZW0gZm9yIHRoZSBmb2xsb3dpbmcgdHdvIG1haW4NCj4gcmVhc29uczoNCj4gPiAt
-IFJEVElNRSBub3Qgb25seSBiZSB1c2VkIGluIGxpbnV4LCBidXQgYWxzbyBpbiBmaXJtd2FyZSBh
-bmQgdXNlcnNwYWNlLg0KPiA+IC0gSXQgaXMgZGlmZmljdWx0IHRvIGJlIGNvbXBhdGlibGUgd2l0
-aCBuZXN0ZWQgdmlydHVhbGl6YXRpb24uDQo+IA0KPiBJIHRoaW5rIHRoaXMgYXBwcm9hY2ggaXMg
-cmF0aGVyIGluY29tcGxldGUuIEFsc28sIEkgZG9uJ3Qgc2VlIGhvdyBwYXJhLXZpcnQgdGltZQ0K
-PiBzY2FsaW5nIHdpbGwgYmUgZGlmZmljdWx0IGZvciBuZXN0ZWQgdmlydHVhbGl6YXRpb24uDQo+
-IA0KPiBJZiB0cmFwLW4tZW11bGF0ZSBUSU1FIENTUiBmb3IgR3Vlc3QgTGludXggdGhlbiBpdCB3
-aWxsIGhhdmUgc2lnbmlmaWNhbnQNCj4gcGVyZm9ybWFuY2UgaW1wYWN0IG9mIHN5c3RlbXMgd2hl
-cmUgVElNRSBDU1IgaXMgaW1wbGVtZW50ZWQgaW4gSFcuDQo+IA0KPiBCZXN0IGFwcHJvYWNoIHdp
-bGwgYmUgdG8gaGF2ZSBWRFNPLXN0eWxlIHBhcmEtdmlydCB0aW1lLXNjYWxlIFNCSSBjYWxscyAo
-c2ltaWxhcg0KPiB0byB3aGF0IEtWTSB4ODYgZG9lcykuIElmIHRoZSBHdWVzdCBzb2Z0d2FyZSAo
-TGludXgvQm9vdGxvYWRlcikgZG9lcyBub3QNCj4gZW5hYmxlIHBhcmEtdmlydCB0aW1lLXNjYWxp
-bmcgdGhlbiB3ZSB0cmFwLW4tZW11bGF0ZSBUSU1FIENTUiAodGhpcyBzZXJpZXMpLg0KPiANCj4g
-UGxlYXNlIHByb3Bvc2UgVkRTTy1zdHlsZSBwYXJhLXZpcnQgdGltZS1zY2FsZSBTQkkgY2FsbCBh
-bmQgZXhwYW5kIHRoaXMgdGhpcw0KPiBzZXJpZXMgdG8gcHJvdmlkZSBib3RoOg0KPiAxLiBWRFNP
-LXN0eWxlIHBhcmEtdmlydCB0aW1lLXNjYWxpbmcNCj4gMi4gVHJhcC1uLWVtdWxhdGlvbiBvZiBU
-SU1FIENTUiB3aGVuICMxIGlzIGRpc2FibGVkDQo+IA0KPiBSZWdhcmRzLA0KPiBBbnVwDQo+IA0K
-DQpPSywgaXQgc291bmRzIGdvb2QuIFdlIHdpbGwgbG9vayBpbnRvIHRoZSBwYXJhLXZpcnQgdGlt
-ZS1zY2FsaW5nIGZvciBtb3JlIGRldGFpbHMuDQoNCllpZmVpDQoNCj4gPg0KPiA+IFsxXSBodHRw
-czovL2xvcmUua2VybmVsLm9yZy9wYXRjaHdvcmsvY292ZXIvMTI4ODE1My8NCj4gPg0KPiA+IFlp
-ZmVpIEppYW5nICgzKToNCj4gPiAgIFJJU0MtVjogS1ZNOiBDaGFuZ2UgdGhlIG1ldGhvZCBvZiBj
-YWxjdWxhdGluZyBjeWNsZXMgdG8gbmFub3NlY29uZHMNCj4gPiAgIFJJU0MtVjogS1ZNOiBTdXBw
-b3J0IGR5bmFtaWMgdGltZSBmcmVxdWVuY3kgZnJvbSB1c2Vyc3BhY2UNCj4gPiAgIFJJU0MtVjog
-S1ZNOiBJbXBsZW1lbnQgZ3Vlc3QgdGltZSBzY2FsaW5nDQo+ID4NCj4gPiAgYXJjaC9yaXNjdi9p
-bmNsdWRlL2FzbS9jc3IuaCAgICAgICAgICAgIHwgIDMgKysNCj4gPiAgYXJjaC9yaXNjdi9pbmNs
-dWRlL2FzbS9rdm1fdmNwdV90aW1lci5oIHwgMTMgKysrKystLQ0KPiA+ICBhcmNoL3Jpc2N2L2t2
-bS92Y3B1X2V4aXQuYyAgICAgICAgICAgICAgfCAzNSArKysrKysrKysrKysrKysrKw0KPiA+ICBh
-cmNoL3Jpc2N2L2t2bS92Y3B1X3RpbWVyLmMgICAgICAgICAgICAgfCA1MQ0KPiArKysrKysrKysr
-KysrKysrKysrKysrLS0tDQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgOTMgaW5zZXJ0aW9ucygrKSwg
-OSBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IC0tDQo+ID4gMi4xOS4xDQo+ID4NCj4gPg0KPiA+IC0t
-DQo+ID4ga3ZtLXJpc2N2IG1haWxpbmcgbGlzdA0KPiA+IGt2bS1yaXNjdkBsaXN0cy5pbmZyYWRl
-YWQub3JnDQo+ID4gaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9r
-dm0tcmlzY3YNCg==
+Add arch_try_cmpxchg64(), similar to arch_try_cmpxchg(), that
+operates with 64 bit operands. This function provides the same
+interface for 32 bit and 64 bit targets.
+
+v2: Use correct #ifdef.
+
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+---
+ arch/x86/include/asm/cmpxchg_32.h | 64 ++++++++++++++++++++++++++-----
+ arch/x86/include/asm/cmpxchg_64.h |  6 +++
+ 2 files changed, 60 insertions(+), 10 deletions(-)
+
+diff --git a/arch/x86/include/asm/cmpxchg_32.h b/arch/x86/include/asm/cmpxchg_32.h
+index 0a7fe0321613..f3684c0413b1 100644
+--- a/arch/x86/include/asm/cmpxchg_32.h
++++ b/arch/x86/include/asm/cmpxchg_32.h
+@@ -35,15 +35,6 @@ static inline void set_64bit(volatile u64 *ptr, u64 value)
+ 		     : "memory");
+ }
+ 
+-#ifdef CONFIG_X86_CMPXCHG64
+-#define arch_cmpxchg64(ptr, o, n)					\
+-	((__typeof__(*(ptr)))__cmpxchg64((ptr), (unsigned long long)(o), \
+-					 (unsigned long long)(n)))
+-#define arch_cmpxchg64_local(ptr, o, n)					\
+-	((__typeof__(*(ptr)))__cmpxchg64_local((ptr), (unsigned long long)(o), \
+-					       (unsigned long long)(n)))
+-#endif
+-
+ static inline u64 __cmpxchg64(volatile u64 *ptr, u64 old, u64 new)
+ {
+ 	u64 prev;
+@@ -70,7 +61,40 @@ static inline u64 __cmpxchg64_local(volatile u64 *ptr, u64 old, u64 new)
+ 	return prev;
+ }
+ 
+-#ifndef CONFIG_X86_CMPXCHG64
++#ifdef CONFIG_X86_CMPXCHG64
++#define arch_cmpxchg64(ptr, o, n)					\
++	((__typeof__(*(ptr)))__cmpxchg64((ptr), (unsigned long long)(o), \
++					 (unsigned long long)(n)))
++#define arch_cmpxchg64_local(ptr, o, n)					\
++	((__typeof__(*(ptr)))__cmpxchg64_local((ptr), (unsigned long long)(o), \
++
++#define __raw_try_cmpxchg64(_ptr, _pold, _new, lock)		\
++({								\
++	bool success;						\
++	__typeof__(_ptr) _old = (__typeof__(_ptr))(_pold);	\
++	__typeof__(*(_ptr)) __old = *_old;			\
++	__typeof__(*(_ptr)) __new = (_new);			\
++	asm volatile(lock "cmpxchg8b %1"			\
++		     CC_SET(z)					\
++		     : CC_OUT(z) (success),			\
++		       "+m" (*_ptr),				\
++		       "+A" (__old)				\
++		     : "b" ((unsigned int)__new),		\
++		       "c" ((unsigned int)(__new>>32))		\
++		     : "memory");				\
++	if (unlikely(!success))					\
++		*_old = __old;					\
++	likely(success);					\
++})
++
++#define __try_cmpxchg64(ptr, pold, new)				\
++	__raw_try_cmpxchg64((ptr), (pold), (new), LOCK_PREFIX)
++
++#define arch_try_cmpxchg64(ptr, pold, new) 			\
++	__try_cmpxchg64((ptr), (pold), (new))
++
++#else
++
+ /*
+  * Building a kernel capable running on 80386 and 80486. It may be necessary
+  * to simulate the cmpxchg8b on the 80386 and 80486 CPU.
+@@ -108,6 +132,26 @@ static inline u64 __cmpxchg64_local(volatile u64 *ptr, u64 old, u64 new)
+ 		       : "memory");				\
+ 	__ret; })
+ 
++#define arch_try_cmpxchg64(ptr, po, n)				\
++({								\
++	bool success;						\
++	__typeof__(ptr) _old = (__typeof__(ptr))(po);		\
++	__typeof__(*(ptr)) __old = *_old;			\
++	__typeof__(*(ptr)) __new = (n);				\
++	alternative_io(LOCK_PREFIX_HERE				\
++			"call cmpxchg8b_emu",			\
++			"lock; cmpxchg8b (%%esi)" ,		\
++		       X86_FEATURE_CX8,				\
++		       "+A" (__old),				\
++		       "S" ((ptr)),				\
++		       "b" ((unsigned int)__new),		\
++		       "c" ((unsigned int)(__new>>32))		\
++		       : "memory");				\
++	success = (__old == *_old);				\
++	if (unlikely(!success))					\
++		*_old = __old;					\
++	likely(success);					\
++})
+ #endif
+ 
+ #define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX8)
+diff --git a/arch/x86/include/asm/cmpxchg_64.h b/arch/x86/include/asm/cmpxchg_64.h
+index 072e5459fe2f..250187ac8248 100644
+--- a/arch/x86/include/asm/cmpxchg_64.h
++++ b/arch/x86/include/asm/cmpxchg_64.h
+@@ -19,6 +19,12 @@ static inline void set_64bit(volatile u64 *ptr, u64 val)
+ 	arch_cmpxchg_local((ptr), (o), (n));				\
+ })
+ 
++#define arch_try_cmpxchg64(ptr, po, n)					\
++({									\
++	BUILD_BUG_ON(sizeof(*(ptr)) != 8);				\
++	arch_try_cmpxchg((ptr), (po), (n));				\
++})
++
+ #define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX16)
+ 
+ #endif /* _ASM_X86_CMPXCHG_64_H */
+-- 
+2.26.2
+
