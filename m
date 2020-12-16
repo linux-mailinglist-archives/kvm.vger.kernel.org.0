@@ -2,146 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15FA92DBCD4
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 09:43:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D31612DBD7D
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 10:25:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbgLPIm6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 03:42:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43048 "EHLO
+        id S1725833AbgLPJZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 04:25:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726414AbgLPIm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Dec 2020 03:42:58 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A75C0613D6;
-        Wed, 16 Dec 2020 00:42:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0Vl8v+K48CQ1CpDPZyiLdlZ3QZd1xhq2vGyfDmO1QSk=; b=d0ukNEGopW7xSAvf4l6oxB/hVo
-        FRyEdkJ6gVh6WhW3HqIsdfeYXWYQ1HLOyEXl/M8OOjMOALFor8DXrwW8OkhssqBZWj2qY+dOjn3WQ
-        w+eOTFIjqNLK3/OUKiTAiR7DfaZ2tzpDvvAr4qqHg7G/gm2EllebQ0U87v/0G0msGEUvStoO64DY+
-        jRApct0VEjBdukFFaWwT/w5fpgGG2r/xGFbqZ+y+RR+1foywG9EkTHpqpIVFJmYZHyDNnwWxdOg8q
-        B4pWQSqNEGAgqHIW+S7+CgCiPXoMiutaQwIno90DVH6FICQhR2vzciTHwxWeaxxT1doUmhnq8aMrv
-        PjYDhOMw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kpSMu-0005UY-Qg; Wed, 16 Dec 2020 08:41:09 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AB87E307697;
-        Wed, 16 Dec 2020 09:40:59 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 967842CADD880; Wed, 16 Dec 2020 09:40:59 +0100 (CET)
-Date:   Wed, 16 Dec 2020 09:40:59 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Josh Poimboeuf <jpoimboe@redhat.com>
-Cc:     =?iso-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
-        xen-devel@lists.xenproject.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, luto@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Deep Shah <sdeep@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>
-Subject: Re: [PATCH v2 00/12] x86: major paravirt cleanup
-Message-ID: <20201216084059.GL3040@hirez.programming.kicks-ass.net>
-References: <20201120114630.13552-1-jgross@suse.com>
- <20201120125342.GC3040@hirez.programming.kicks-ass.net>
- <20201123134317.GE3092@hirez.programming.kicks-ass.net>
- <6771a12c-051d-1655-fb3a-cc45a3c82e29@suse.com>
- <20201215141834.GG3040@hirez.programming.kicks-ass.net>
- <20201215145408.GR3092@hirez.programming.kicks-ass.net>
- <20201216003802.5fpklvx37yuiufrt@treble>
+        with ESMTP id S1725789AbgLPJZX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Dec 2020 04:25:23 -0500
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7034C0613D6
+        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 01:24:42 -0800 (PST)
+Received: by mail-qk1-x732.google.com with SMTP id z11so21895624qkj.7
+        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 01:24:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VnOERqJmNL9fajfQHoyutXn+UfnLadGj9bydZ04YbIo=;
+        b=uD74+aiG/aHlTDkROMZ7Zs/+MVYoNtZLwBCHmP15fCLtYSiSD09I5VuEhRX30dTckP
+         gQFKJbebmS937xmxFPP5tzJBW6fsjx9qS7pWqzEKk5VEBnjaFA28/oa+Dp2KCMPrzLeF
+         vTr5iK3aEayGTNFZNBifQL08jRA5cr2Nas+6RERN/LAFIX/qHVKSyM26/VrdbVZYfMvo
+         oGaorOAJVUc8gCHRWOt72RebpWUbfdVj4kP4SOpCZB90W5OCRzspuD3B5yXQC/t4n28u
+         JlWtBitiGCey/b8U0tA5Z9zuzfSB49XbjlIXZkHf3zUxvivObC2JRsZPN4kII0VQmpy2
+         XyNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VnOERqJmNL9fajfQHoyutXn+UfnLadGj9bydZ04YbIo=;
+        b=ozU+bz8KLe8XgI6iL16WnCCKgbKzBd7Ms0aDfKXQL4b7SCa+MZ4cA5mtHMWstzg7EQ
+         JL0U7wcqjw+YJazQebxMMppjNSEB6OlYoTO1/JVElsjaHikkzvLD140EHTv18yri0HRO
+         RnHey76Hio+RlR0lXrfbs2EME2VjipbSfn3lauGYLwkmLnZr43Nw/ZPCBiMXjI42SJBg
+         MuGXwk8UhI0g0LqUMsMcM5jMCZXOEoaH6q0SQ62MiIb5rMICyVRvvJO4UZQW6iDhuUNY
+         njAvE1tDdSc78kdjRanMwOVQDkLWH40wyayU9RVwA2X38ytZ4YLST/T0ePYje7zLJ0tt
+         OTMQ==
+X-Gm-Message-State: AOAM5313D2k869N709p8gXqnc8p+qYskCiZgcVEKxEhTBHVwi487FIjN
+        u13JMH2tqnSMGDPP89xIVL45qRA7XHT7EGViBm2GYVJ6o7Gz9A==
+X-Google-Smtp-Source: ABdhPJyjr9dR1o7cz7G6NeibDKnN/6X3I4zE2yOd0bLycyQoS6dU5wD81UnS97yqEIzJQschUrVl8jEbCPFCpSZMPRk=
+X-Received: by 2002:a37:458:: with SMTP id 85mr41956906qke.61.1608110681874;
+ Wed, 16 Dec 2020 01:24:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201216003802.5fpklvx37yuiufrt@treble>
+References: <20201029134145.107560-1-ubizjak@gmail.com>
+In-Reply-To: <20201029134145.107560-1-ubizjak@gmail.com>
+From:   Uros Bizjak <ubizjak@gmail.com>
+Date:   Wed, 16 Dec 2020 10:24:30 +0100
+Message-ID: <CAFULd4av_xehfPBBL76dH+On4ezLa6rqU6YkqBuLhPcvZTr5pQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM/nVMX: Use __vmx_vcpu_run in nested_vmx_check_vmentry_hw
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 15, 2020 at 06:38:02PM -0600, Josh Poimboeuf wrote:
-> On Tue, Dec 15, 2020 at 03:54:08PM +0100, Peter Zijlstra wrote:
-> > The problem is that a single instance of unwind information (ORC) must
-> > capture and correctly unwind all alternatives. Since the trivially
-> > correct mandate is out, implement the straight forward brute-force
-> > approach:
-> > 
-> >  1) generate CFI information for each alternative
-> > 
-> >  2) unwind every alternative with the merge-sort of the previously
-> >     generated CFI information -- O(n^2)
-> > 
-> >  3) for any possible conflict: yell.
-> > 
-> >  4) Generate ORC with merge-sort
-> > 
-> > Specifically for 3 there are two possible classes of conflicts:
-> > 
-> >  - the merge-sort itself could find conflicting CFI for the same
-> >    offset.
-> > 
-> >  - the unwind can fail with the merged CFI.
-> 
-> So much algorithm.
+Ping.  This patch didn't receive any feedback.
 
-:-)
+Thanks,
+Uros.
 
-It's not really hard, but it has a few pesky details (as always).
-
-> Could we make it easier by caching the shared
-> per-alt-group CFI state somewhere along the way?
-
-Yes, but when I tried it grew the code required. Runtime costs would be
-less, but I figured that since alternatives are typically few and small,
-that wasn't a real consideration.
-
-That is, it would basically cache the results of find_alt_unwind(), but
-you still need find_alt_unwind() to generate that data, and so you gain
-the code for filling and using the extra data structure.
-
-Yes, computing it 3 times is naf, but meh.
-
-> [ 'offset' is a byte offset from the beginning of the group.  It could
->   be calculated based on 'orig_insn' or 'orig_insn->alts', depending on
->   whether 'insn' is an original or a replacement. ]
-
-That's exactly what it already does ofcourse ;-)
-
-> If the array entry is NULL, just update it with a pointer to the CFI.
-> If it's not NULL, make sure it matches the existing CFI, and WARN if it
-> doesn't.
-> 
-> Also, with this data structure, the ORC generation should also be a lot
-> more straightforward, just ignore the NULL entries.
-
-Yeah, I suppose it gets rid of the memcmp-prev thing.
-
-> Thoughts?  This is all theoretical of course, I could try to do a patch
-> tomorrow.
-
-No real objection, I just didn't do it because 1) it works, and 2) even
-moar lines.
+On Thu, Oct 29, 2020 at 2:41 PM Uros Bizjak <ubizjak@gmail.com> wrote:
+>
+> Replace inline assembly in nested_vmx_check_vmentry_hw
+> with a call to __vmx_vcpu_run.  The function is not
+> performance critical, so (double) GPR save/restore
+> in __vmx_vcpu_run can be tolerated, as far as performance
+> effects are concerned.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 32 +++-----------------------------
+>  arch/x86/kvm/vmx/vmx.c    |  2 --
+>  arch/x86/kvm/vmx/vmx.h    |  1 +
+>  3 files changed, 4 insertions(+), 31 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 89af692deb7e..6ab62bf277c4 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -12,6 +12,7 @@
+>  #include "nested.h"
+>  #include "pmu.h"
+>  #include "trace.h"
+> +#include "vmx.h"
+>  #include "x86.h"
+>
+>  static bool __read_mostly enable_shadow_vmcs = 1;
+> @@ -3056,35 +3057,8 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+>                 vmx->loaded_vmcs->host_state.cr4 = cr4;
+>         }
+>
+> -       asm(
+> -               "sub $%c[wordsize], %%" _ASM_SP "\n\t" /* temporarily adjust RSP for CALL */
+> -               "cmp %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
+> -               "je 1f \n\t"
+> -               __ex("vmwrite %%" _ASM_SP ", %[HOST_RSP]") "\n\t"
+> -               "mov %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
+> -               "1: \n\t"
+> -               "add $%c[wordsize], %%" _ASM_SP "\n\t" /* un-adjust RSP */
+> -
+> -               /* Check if vmlaunch or vmresume is needed */
+> -               "cmpb $0, %c[launched](%[loaded_vmcs])\n\t"
+> -
+> -               /*
+> -                * VMLAUNCH and VMRESUME clear RFLAGS.{CF,ZF} on VM-Exit, set
+> -                * RFLAGS.CF on VM-Fail Invalid and set RFLAGS.ZF on VM-Fail
+> -                * Valid.  vmx_vmenter() directly "returns" RFLAGS, and so the
+> -                * results of VM-Enter is captured via CC_{SET,OUT} to vm_fail.
+> -                */
+> -               "call vmx_vmenter\n\t"
+> -
+> -               CC_SET(be)
+> -             : ASM_CALL_CONSTRAINT, CC_OUT(be) (vm_fail)
+> -             : [HOST_RSP]"r"((unsigned long)HOST_RSP),
+> -               [loaded_vmcs]"r"(vmx->loaded_vmcs),
+> -               [launched]"i"(offsetof(struct loaded_vmcs, launched)),
+> -               [host_state_rsp]"i"(offsetof(struct loaded_vmcs, host_state.rsp)),
+> -               [wordsize]"i"(sizeof(ulong))
+> -             : "memory"
+> -       );
+> +       vm_fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
+> +                                vmx->loaded_vmcs->launched);
+>
+>         if (vmx->msr_autoload.host.nr)
+>                 vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d14c94d0aff1..0f390c748b18 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6591,8 +6591,6 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+>         }
+>  }
+>
+> -bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
+> -
+>  static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+>                                         struct vcpu_vmx *vmx)
+>  {
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index f6f66e5c6510..32db3b033e9b 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -339,6 +339,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+>  struct vmx_uret_msr *vmx_find_uret_msr(struct vcpu_vmx *vmx, u32 msr);
+>  void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu);
+>  void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
+> +bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
+>  int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr);
+>  void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
+>
+> --
+> 2.26.2
+>
