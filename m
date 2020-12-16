@@ -2,182 +2,381 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 478BD2DC7AE
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 21:21:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AAB82DC7D6
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 21:39:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728878AbgLPUSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 15:18:50 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:34886 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728867AbgLPUSu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Dec 2020 15:18:50 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BGKEXML164411;
-        Wed, 16 Dec 2020 20:18:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+        id S1729027AbgLPUij (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 15:38:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16030 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726902AbgLPUii (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 15:38:38 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BGKZ8gH052306;
+        Wed, 16 Dec 2020 15:37:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=j286CjgxHgz1qwlQn/RARa8ecin2nybO/6ohNUkNOug=;
- b=Qz0QjcXzHP+DkSK8NLOgV8DGxLByLPPP+m2vXKwT1h9dqh5BMa548F7IBbbnoN67rAnM
- yJGvWfpNYOhk4ilVOQZsbOwJn9tykRD3tyaOf/cYEBSgjWRn4CSUN96TV+jCg5HD/GfX
- cW9uHDNrY+y3uVPtYHTV72kshp7dfRkeJfz9c34azgnWr1ugI+lh/HZ4iP+dopC31dN7
- 2+I5ZPjf5/JkMta3w2qEulSNET2vpLARvoqnONY+71bz1jX0mXb9tRwMM5O+mWEgePKQ
- xpsepkN7QRUZB1sJGxag5kaD65AwAKN2v5QYWcLkpBQAQR3FzqOFwpO1f74QShA0ZLjO SA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 35cn9rjb9k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 16 Dec 2020 20:18:04 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BGKFEWW102139;
-        Wed, 16 Dec 2020 20:16:04 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 35e6jt98jv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Dec 2020 20:16:04 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0BGKG3E8001831;
-        Wed, 16 Dec 2020 20:16:03 GMT
-Received: from localhost.localdomain (/10.159.143.35)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 16 Dec 2020 12:16:03 -0800
-Subject: Re: [PATCH] KVM/nVMX: Use __vmx_vcpu_run in
- nested_vmx_check_vmentry_hw
-To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20201029134145.107560-1-ubizjak@gmail.com>
- <CAFULd4av_xehfPBBL76dH+On4ezLa6rqU6YkqBuLhPcvZTr5pQ@mail.gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <c0f5129e-a04a-5b9c-f561-1132283077f1@oracle.com>
-Date:   Wed, 16 Dec 2020 12:15:54 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6ONDTD88Y2woxlSYkiG7e/QtbZeqdt2OttqDfJjtHT0=;
+ b=suuywsWiORwuqCz5SDFznH1krs6JC2SDV7bewl4dTirUu2MPb2gtdZ7Sx+84wPp5a+0e
+ ps9bsW15DeoSoAcvChK+VQ0VgIIk2HdWlllTPr8MKbYjPtzyKOhFLTWO4XiSP7js/pRv
+ EjEPnNHs5nyK79m/1CeqRofIgRYHjchVY1vuhCRauTBEc020Pfuezph2sPMwhTG2vONC
+ I7YAjsoGNTiIUtUzXsbhVLFzeMfDi+JFLoY1J1/r4w0DKwUqGlT7pRrKdzoLmTd/2oyO
+ 45yFVM/d39Pdm2Qpr0oXJJUhhnmKY5hROWwnvmVP1gBDy3cU7Xd83yNx96wTlIdZ//8f hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35fp0bpdgh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 15:37:51 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BGKZEHB053261;
+        Wed, 16 Dec 2020 15:37:51 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35fp0bpdg6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 15:37:51 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BGKRL3F029329;
+        Wed, 16 Dec 2020 20:32:50 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma04dal.us.ibm.com with ESMTP id 35cng9k0gq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 20:32:50 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BGKWjoo11665926
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Dec 2020 20:32:45 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3C53BE056;
+        Wed, 16 Dec 2020 20:32:44 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73E39BE053;
+        Wed, 16 Dec 2020 20:32:43 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Dec 2020 20:32:43 +0000 (GMT)
+Subject: Re: [PATCH v12 14/17] s390/zcrypt: Notify driver on config changed
+ and scan complete callbacks
+To:     Harald Freudenberger <freude@linux.ibm.com>,
+        h@d06av26.portsmouth.uk.ibm.com
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com
+References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
+ <20201124214016.3013-15-akrowiak@linux.ibm.com>
+ <20201130101836.0399547c.pasic@linux.ibm.com>
+ <e36c3f95-e015-3664-aa64-fc6b863d08a4@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <de06ed50-599e-8a6c-0ff5-d2265851506c@linux.ibm.com>
+Date:   Wed, 16 Dec 2020 15:32:42 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAFULd4av_xehfPBBL76dH+On4ezLa6rqU6YkqBuLhPcvZTr5pQ@mail.gmail.com>
+In-Reply-To: <e36c3f95-e015-3664-aa64-fc6b863d08a4@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9837 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 bulkscore=0
- malwarescore=0 adultscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012160125
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9837 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 clxscore=1011 spamscore=0
- malwarescore=0 priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012160125
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-16_08:2020-12-15,2020-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 suspectscore=0 bulkscore=0 adultscore=0 clxscore=1015
+ malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012160124
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 12/16/20 1:24 AM, Uros Bizjak wrote:
-> Ping.  This patch didn't receive any feedback.
->
-> Thanks,
-> Uros.
->
-> On Thu, Oct 29, 2020 at 2:41 PM Uros Bizjak <ubizjak@gmail.com> wrote:
->> Replace inline assembly in nested_vmx_check_vmentry_hw
->> with a call to __vmx_vcpu_run.  The function is not
->> performance critical, so (double) GPR save/restore
->> in __vmx_vcpu_run can be tolerated, as far as performance
->> effects are concerned.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
->> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
->> ---
->>   arch/x86/kvm/vmx/nested.c | 32 +++-----------------------------
->>   arch/x86/kvm/vmx/vmx.c    |  2 --
->>   arch/x86/kvm/vmx/vmx.h    |  1 +
->>   3 files changed, 4 insertions(+), 31 deletions(-)
->>
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 89af692deb7e..6ab62bf277c4 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -12,6 +12,7 @@
->>   #include "nested.h"
->>   #include "pmu.h"
->>   #include "trace.h"
->> +#include "vmx.h"
->>   #include "x86.h"
->>
->>   static bool __read_mostly enable_shadow_vmcs = 1;
->> @@ -3056,35 +3057,8 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
->>                  vmx->loaded_vmcs->host_state.cr4 = cr4;
->>          }
->>
->> -       asm(
->> -               "sub $%c[wordsize], %%" _ASM_SP "\n\t" /* temporarily adjust RSP for CALL */
->> -               "cmp %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
->> -               "je 1f \n\t"
->> -               __ex("vmwrite %%" _ASM_SP ", %[HOST_RSP]") "\n\t"
->> -               "mov %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
->> -               "1: \n\t"
->> -               "add $%c[wordsize], %%" _ASM_SP "\n\t" /* un-adjust RSP */
->> -
->> -               /* Check if vmlaunch or vmresume is needed */
->> -               "cmpb $0, %c[launched](%[loaded_vmcs])\n\t"
->> -
->> -               /*
->> -                * VMLAUNCH and VMRESUME clear RFLAGS.{CF,ZF} on VM-Exit, set
->> -                * RFLAGS.CF on VM-Fail Invalid and set RFLAGS.ZF on VM-Fail
->> -                * Valid.  vmx_vmenter() directly "returns" RFLAGS, and so the
->> -                * results of VM-Enter is captured via CC_{SET,OUT} to vm_fail.
->> -                */
->> -               "call vmx_vmenter\n\t"
->> -
->> -               CC_SET(be)
->> -             : ASM_CALL_CONSTRAINT, CC_OUT(be) (vm_fail)
->> -             : [HOST_RSP]"r"((unsigned long)HOST_RSP),
->> -               [loaded_vmcs]"r"(vmx->loaded_vmcs),
->> -               [launched]"i"(offsetof(struct loaded_vmcs, launched)),
->> -               [host_state_rsp]"i"(offsetof(struct loaded_vmcs, host_state.rsp)),
->> -               [wordsize]"i"(sizeof(ulong))
->> -             : "memory"
->> -       );
->> +       vm_fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
->> +                                vmx->loaded_vmcs->launched);
->>
->>          if (vmx->msr_autoload.host.nr)
->>                  vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index d14c94d0aff1..0f390c748b18 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -6591,8 +6591,6 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
->>          }
->>   }
->>
->> -bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
->> -
->>   static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
->>                                          struct vcpu_vmx *vmx)
->>   {
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index f6f66e5c6510..32db3b033e9b 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -339,6 +339,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
->>   struct vmx_uret_msr *vmx_find_uret_msr(struct vcpu_vmx *vmx, u32 msr);
->>   void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu);
->>   void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
->> +bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
->>   int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr);
->>   void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
->>
->> --
->> 2.26.2
->>
-Semantically __vmx_vcpu_run() is called to enter guest mode. In 
-nested_vmx_check_vmentry_hw(), we are not entering guest mode. Guest 
-mode is entered when nested_vmx_enter_non_root_mode() calls 
-enter_guest_mode().
 
-Secondly, why not just replace the first half of the assembly block with 
-a call to vmx_update_host_rsp() and leave the rest as is ?
+On 12/9/20 2:20 AM, Harald Freudenberger wrote:
+> On 30.11.20 10:18, h@d06av26.portsmouth.uk.ibm.com wrote:
+>> On Tue, 24 Nov 2020 16:40:13 -0500
+>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>
+>>> This patch intruduces an extension to the ap bus to notify device drivers
+>>> when the host AP configuration changes - i.e., adapters, domains or
+>>> control domains are added or removed. To that end, two new callbacks are
+>>> introduced for AP device drivers:
+>>>
+>>>    void (*on_config_changed)(struct ap_config_info *new_config_info,
+>>>                              struct ap_config_info *old_config_info);
+>>>
+>>>       This callback is invoked at the start of the AP bus scan
+>>>       function when it determines that the host AP configuration information
+>>>       has changed since the previous scan. This is done by storing
+>>>       an old and current QCI info struct and comparing them. If there is any
+>>>       difference, the callback is invoked.
+>>>
+>>>       Note that when the AP bus scan detects that AP adapters, domains or
+>>>       control domains have been removed from the host's AP configuration, it
+>>>       will remove the associated devices from the AP bus subsystem's device
+>>>       model. This callback gives the device driver a chance to respond to
+>>>       the removal of the AP devices from the host configuration prior to
+>>>       calling the device driver's remove callback. The primary purpose of
+>>>       this callback is to allow the vfio_ap driver to do a bulk unplug of
+>>>       all affected adapters, domains and control domains from affected
+>>>       guests rather than unplugging them one at a time when the remove
+>>>       callback is invoked.
+>>>
+>>>    void (*on_scan_complete)(struct ap_config_info *new_config_info,
+>>>                             struct ap_config_info *old_config_info);
+>>>
+>>>       The on_scan_complete callback is invoked after the ap bus scan is
+>>>       complete if the host AP configuration data has changed.
+>>>
+>>>       Note that when the AP bus scan detects that adapters, domains or
+>>>       control domains have been added to the host's configuration, it will
+>>>       create new devices in the AP bus subsystem's device model. The primary
+>>>       purpose of this callback is to allow the vfio_ap driver to do a bulk
+>>>       plug of all affected adapters, domains and control domains into
+>>>       affected guests rather than plugging them one at a time when the
+>>>       probe callback is invoked.
+>>>
+>>> Please note that changes to the apmask and aqmask do not trigger
+>>> these two callbacks since the bus scan function is not invoked by changes
+>>> to those masks.
+>>>
+>>> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> ---
+>>>   drivers/s390/crypto/ap_bus.c          | 83 ++++++++++++++++++++++++++-
+>>>   drivers/s390/crypto/ap_bus.h          | 12 ++++
+>>>   drivers/s390/crypto/vfio_ap_private.h | 14 ++++-
+>>>   3 files changed, 106 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
+>>> index 593573740981..3a63f6b33d8a 100644
+>>> --- a/drivers/s390/crypto/ap_bus.c
+>>> +++ b/drivers/s390/crypto/ap_bus.c
+>>> @@ -75,6 +75,7 @@ DEFINE_MUTEX(ap_perms_mutex);
+>>>   EXPORT_SYMBOL(ap_perms_mutex);
+>>>   
+>>>   static struct ap_config_info *ap_qci_info;
+>>> +static struct ap_config_info *ap_qci_info_old;
+>>>   
+>>>   /*
+>>>    * AP bus related debug feature things.
+>>> @@ -1440,6 +1441,52 @@ static int __match_queue_device_with_queue_id(struct device *dev, const void *da
+>>>   		&& AP_QID_QUEUE(to_ap_queue(dev)->qid) == (int)(long) data;
+>>>   }
+>>>   
+>>> +/* Helper function for notify_config_changed */
+>>> +static int __drv_notify_config_changed(struct device_driver *drv, void *data)
+>>> +{
+>>> +	struct ap_driver *ap_drv = to_ap_drv(drv);
+>>> +
+>>> +	if (try_module_get(drv->owner)) {
+>>> +		if (ap_drv->on_config_changed)
+>>> +			ap_drv->on_config_changed(ap_qci_info,
+>>> +						  ap_qci_info_old);
+>>> +		module_put(drv->owner);
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +/* Notify all drivers about an qci config change */
+>>> +static inline void notify_config_changed(void)
+>>> +{
+>>> +	bus_for_each_drv(&ap_bus_type, NULL, NULL,
+>>> +			 __drv_notify_config_changed);
+>>> +}
+>>> +
+>>> +/* Helper function for notify_scan_complete */
+>>> +static int __drv_notify_scan_complete(struct device_driver *drv, void *data)
+>>> +{
+>>> +	struct ap_driver *ap_drv = to_ap_drv(drv);
+>>> +
+>>> +	if (try_module_get(drv->owner)) {
+>>> +		if (ap_drv->on_scan_complete)
+>>> +			ap_drv->on_scan_complete(ap_qci_info,
+>>> +						 ap_qci_info_old);
+>>> +		module_put(drv->owner);
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +/* Notify all drivers about bus scan complete */
+>>> +static inline void notify_scan_complete(void)
+>>> +{
+>>> +	bus_for_each_drv(&ap_bus_type, NULL, NULL,
+>>> +			 __drv_notify_scan_complete);
+>>> +}
+>>> +
+>>> +
+>>> +
+>>>   /*
+>>>    * Helper function for ap_scan_bus().
+>>>    * Remove card device and associated queue devices.
+>>> @@ -1718,15 +1765,43 @@ static inline void ap_scan_adapter(int ap)
+>>>   	put_device(&ac->ap_dev.device);
+>>>   }
+>>>   
+>>> +static int ap_get_configuration(void)
+>> I believe this was Haralds request. I'm OO contaminated, but
+>> the signature and the semantic does not mash well with my understanding
+>> of a 'getter'. Especially the return value being actually a boolean and
+>> 'configuration changed/still the same'. From the signature it looks more
+>> like the usual C-stlyle try to do something and return 0 if OK, otherwise
+>> error code != 0.
+>>
+>> Since it's Haralds dominion, I'm not asking you to change this, but we
+>> could at least document the return value (maybe also the behavior).
+> Well, no. This function comes from Tony. And you can see a mixture of
+> bool and int return values within the AP code. Historically there was no bool
+> and it was very long frowned upon using bool within the kernel.
+> However, long term I'd like to use bool for all these true/false functions and
+> so Tony if you need to touch this anyway you could change to bool here.
+
+I will change the return code to a bool.
+
+>
+> Tony, as you anyway need to rebase here - the ap code has significant changed in this corner -
+> should I pull these changes within the ap bus code from your patch series and push them
+> into the development branch after some adaptions to the current code ?
+
+This can be done, however I worry about creating pre-reqs for this patch
+series. Are the changes you are talking about not yet in the code base?
+In other words, if rebasing this off of our master branch not enough?
+If that is the case and you want to pull these changes into your code,
+that may be fine. I will be posting v13 before I leave for Christmas
+vacation and I have no reason to expect, based on the review history for
+this series, that the next review will be the final one. I will not be 
+returning
+until late in the first week of January, so that should give enough time 
+for all
+of this to resolve itself.
+
+>>> +{
+>>> +	int cfg_chg = 0;
+>>> +
+>>> +	if (ap_qci_info) {
+>>> +		if (!ap_qci_info_old) {
+>>> +			ap_qci_info_old = kzalloc(sizeof(*ap_qci_info_old),
+>>> +						  GFP_KERNEL);
+>>> +			if (!ap_qci_info_old)
+>>> +				return 0;
+>>> +		} else {
+>>> +			memcpy(ap_qci_info_old, ap_qci_info,
+>>> +			       sizeof(struct ap_config_info));
+>>> +		}
+>>> +		ap_fetch_qci_info(ap_qci_info);
+>>> +		cfg_chg = memcmp(ap_qci_info,
+>>> +				 ap_qci_info_old,
+>>> +				 sizeof(struct ap_config_info)) != 0;
+>>> +	}
+>>> +
+>>> +	return cfg_chg;
+>>> +}
+>>> +
+>>>   /**
+>>>    * ap_scan_bus(): Scan the AP bus for new devices
+>>>    * Runs periodically, workqueue timer (ap_config_time)
+>>>    */
+>>>   static void ap_scan_bus(struct work_struct *unused)
+>>>   {
+>>> -	int ap;
+>>> +	int ap, config_changed = 0;
+>>>   
+>>> -	ap_fetch_qci_info(ap_qci_info);
+>>> +	/* config change notify */
+>>> +	config_changed = ap_get_configuration();
+>>> +	if (config_changed)
+>>> +		notify_config_changed();
+>>> +	memcpy(ap_qci_info_old, ap_qci_info,
+>>> +	       sizeof(struct ap_config_info));
+>> Why is this memcpy needed? Isn't that already take care of in
+>> ap_get_configuration()?
+>>
+>>>   	ap_select_domain();
+>>>   
+>>>   	AP_DBF_DBG("%s running\n", __func__);
+>>> @@ -1735,6 +1810,10 @@ static void ap_scan_bus(struct work_struct *unused)
+>>>   	for (ap = 0; ap <= ap_max_adapter_id; ap++)
+>>>   		ap_scan_adapter(ap);
+>>>   
+>>> +	/* scan complete notify */
+>>> +	if (config_changed)
+>>> +		notify_scan_complete();
+>>> +
+>>>   	/* check if there is at least one queue available with default domain */
+>>>   	if (ap_domain_index >= 0) {
+>>>   		struct device *dev =
+>>> diff --git a/drivers/s390/crypto/ap_bus.h b/drivers/s390/crypto/ap_bus.h
+>>> index 65edd847c65a..fbfbf6991718 100644
+>>> --- a/drivers/s390/crypto/ap_bus.h
+>>> +++ b/drivers/s390/crypto/ap_bus.h
+>>> @@ -146,6 +146,18 @@ struct ap_driver {
+>>>   	int (*probe)(struct ap_device *);
+>>>   	void (*remove)(struct ap_device *);
+>>>   	int (*in_use)(unsigned long *apm, unsigned long *aqm);
+>>> +	/*
+>>> +	 * Called at the start of the ap bus scan function when
+>>> +	 * the crypto config information (qci) has changed.
+>>> +	 */
+>>> +	void (*on_config_changed)(struct ap_config_info *new_config_info,
+>>> +				  struct ap_config_info *old_config_info);
+>>> +	/*
+>>> +	 * Called at the end of the ap bus scan function when
+>>> +	 * the crypto config information (qci) has changed.
+>>> +	 */
+>>> +	void (*on_scan_complete)(struct ap_config_info *new_config_info,
+>>> +				 struct ap_config_info *old_config_info);
+>>>   };
+>>>   
+>>>   #define to_ap_drv(x) container_of((x), struct ap_driver, driver)
+>>> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+>>> index 15b7cd74843b..7bd7e35eb2e0 100644
+>>> --- a/drivers/s390/crypto/vfio_ap_private.h
+>>> +++ b/drivers/s390/crypto/vfio_ap_private.h
+>> These changes probably belong to some next patch...
+>>
+>> With the things I just brought up clarified, you can slap a:
+>> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+>> over it next time.
+>>
+>>> @@ -36,14 +36,21 @@
+>>>    *		driver, be it using @mdev_list or writing the state of a
+>>>    *		single ap_matrix_mdev device. It's quite coarse but we don't
+>>>    *		expect much contention.
+>>> + ** @ap_add:	a bitmap specifying the APIDs added to the host AP configuration
+>>> + *		as notified by the AP bus via the on_cfg_chg callback.
+>>> + * @aq_add:	a bitmap specifying the APQIs added to the host AP configuration
+>>> + *		as notified by the AP bus via the on_cfg_chg callback.
+>>>    */
+>>>   struct ap_matrix_dev {
+>>>   	struct device device;
+>>>   	atomic_t available_instances;
+>>> -	struct ap_config_info info;
+>>> +	struct ap_config_info config_info;
+>>> +	struct ap_config_info config_info_prev;
+>>>   	struct list_head mdev_list;
+>>>   	struct mutex lock;
+>>>   	struct ap_driver  *vfio_ap_drv;
+>>> +	DECLARE_BITMAP(ap_add, AP_DEVICES);
+>>> +	DECLARE_BITMAP(aq_add, AP_DEVICES);
+>>>   };
+>>>   
+>>>   extern struct ap_matrix_dev *matrix_dev;
+>>> @@ -90,6 +97,8 @@ struct ap_matrix_mdev {
+>>>   	struct kvm_s390_module_hook pqap_hook;
+>>>   	struct mdev_device *mdev;
+>>>   	DECLARE_HASHTABLE(qtable, 8);
+>>> +	DECLARE_BITMAP(ap_add, AP_DEVICES);
+>>> +	DECLARE_BITMAP(aq_add, AP_DEVICES);
+>>>   };
+>>>   
+>>>   extern int vfio_ap_mdev_register(void);
+>>> @@ -109,4 +118,7 @@ void vfio_ap_mdev_remove_queue(struct ap_device *queue);
+>>>   
+>>>   int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm);
+>>>   
+>>> +void vfio_ap_on_cfg_changed(struct ap_config_info *new_config_info,
+>>> +			    struct ap_config_info *old_config_info);
+>>> +
+>>>   #endif /* _VFIO_AP_PRIVATE_H_ */
 
