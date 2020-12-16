@@ -2,145 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54A852DB7DB
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 01:41:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60C1D2DB863
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 02:22:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726131AbgLPAki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 19:40:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38583 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726097AbgLPAkd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Dec 2020 19:40:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608079147;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BCyr+zCzlSHQ1KjMAt3Zb/a+qisNyayFH7/e91jTxqk=;
-        b=Snze6ynPda7VvaiqdJe7E9l3GeM58gKaIloPQs+ANvI1sEK34ZibQBIx+MxhhjuvUcDIDP
-        EeD3idBJARoX/pc3LR7k5Wn75nvXJMwOIqNEM5KXsQ5nSvEudETMIJVoQF+/OSHxgDM98H
-        84Aiayq3rfDJ8KNllsHRt/GplGB9CO8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-wYBKR5ESPACLwIRJr6G_JA-1; Tue, 15 Dec 2020 19:39:03 -0500
-X-MC-Unique: wYBKR5ESPACLwIRJr6G_JA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B14061054F8E;
-        Wed, 16 Dec 2020 00:38:10 +0000 (UTC)
-Received: from treble (ovpn-112-170.rdu2.redhat.com [10.10.112.170])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44CAF5DD87;
-        Wed, 16 Dec 2020 00:38:04 +0000 (UTC)
-Date:   Tue, 15 Dec 2020 18:38:02 -0600
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     =?utf-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
-        xen-devel@lists.xenproject.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, luto@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Deep Shah <sdeep@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>
-Subject: Re: [PATCH v2 00/12] x86: major paravirt cleanup
-Message-ID: <20201216003802.5fpklvx37yuiufrt@treble>
-References: <20201120114630.13552-1-jgross@suse.com>
- <20201120125342.GC3040@hirez.programming.kicks-ass.net>
- <20201123134317.GE3092@hirez.programming.kicks-ass.net>
- <6771a12c-051d-1655-fb3a-cc45a3c82e29@suse.com>
- <20201215141834.GG3040@hirez.programming.kicks-ass.net>
- <20201215145408.GR3092@hirez.programming.kicks-ass.net>
+        id S1726166AbgLPBWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Dec 2020 20:22:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8018 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725952AbgLPBWi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Dec 2020 20:22:38 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BG10x1x028450;
+        Tue, 15 Dec 2020 20:21:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=0+BnuKA8p1Jrwe6PPrdqKhHIW1sVQdnh7AMkQ8h2wWA=;
+ b=PUxN2HawcIcUXGlDLWk/G/PbfI4DzbDsJevw+pjpQgSAhet6dX4KQar6jHYFPsaVhrW9
+ 5I/MiCEeXMQDi5hxudlQ7QgptKQUT9cYAouWEycYjQjXTODYbAT1Yat7GGH+dI08AyVP
+ MNtWC0FzIh/QX5PzoSwXTYJvKL5NYfv+2qr79FcfDk33OcbkhlcPHjljUSM6XX0XWEV6
+ xXytFGWKxzNiiWzFcbk9Ey406fUiVMKKUNpgbfnuIJeX0d85U2ba9wMAu0DlNEdTn1dX
+ c/tI9hdo8NNg6GIwXnZ8I9XggHcXtI/wrF0WuSU4Oal7NpmZP4wp3PM3MEtupoTB/tjE 4w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35f5qe42ve-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Dec 2020 20:21:50 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BG1Ln4l094992;
+        Tue, 15 Dec 2020 20:21:49 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35f5qe42v2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Dec 2020 20:21:49 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BG1D8sk027041;
+        Wed, 16 Dec 2020 01:21:48 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 35cng89y8e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 01:21:47 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BG1LjWR31457654
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Dec 2020 01:21:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E93EBAE045;
+        Wed, 16 Dec 2020 01:21:44 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4931AAE053;
+        Wed, 16 Dec 2020 01:21:44 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.171.86.205])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Wed, 16 Dec 2020 01:21:44 +0000 (GMT)
+Date:   Wed, 16 Dec 2020 02:21:40 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org, gregkh@linuxfoundation.org,
+        sashal@kernel.org, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH v3] s390/vfio-ap: clean up vfio_ap resources when KVM
+ pointer invalidated
+Message-ID: <20201216022140.02741788.pasic@linux.ibm.com>
+In-Reply-To: <44ffb312-964a-95c3-d691-38221cee2c0a@de.ibm.com>
+References: <20201214165617.28685-1-akrowiak@linux.ibm.com>
+        <20201215115746.3552e873.pasic@linux.ibm.com>
+        <44ffb312-964a-95c3-d691-38221cee2c0a@de.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201215145408.GR3092@hirez.programming.kicks-ass.net>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-15_13:2020-12-15,2020-12-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ impostorscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1015 priorityscore=1501
+ mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012160001
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 15, 2020 at 03:54:08PM +0100, Peter Zijlstra wrote:
-> The problem is that a single instance of unwind information (ORC) must
-> capture and correctly unwind all alternatives. Since the trivially
-> correct mandate is out, implement the straight forward brute-force
-> approach:
+On Tue, 15 Dec 2020 19:10:20 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
 > 
->  1) generate CFI information for each alternative
 > 
->  2) unwind every alternative with the merge-sort of the previously
->     generated CFI information -- O(n^2)
+> On 15.12.20 11:57, Halil Pasic wrote:
+> > On Mon, 14 Dec 2020 11:56:17 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> > 
+> >> The vfio_ap device driver registers a group notifier with VFIO when the
+> >> file descriptor for a VFIO mediated device for a KVM guest is opened to
+> >> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
+> >> event). When the KVM pointer is set, the vfio_ap driver takes the
+> >> following actions:
+> >> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
+> >>    of the mediated device.
+> >> 2. Calls the kvm_get_kvm() function to increment its reference counter.
+> >> 3. Sets the function pointer to the function that handles interception of
+> >>    the instruction that enables/disables interrupt processing.
+> >> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
+> >>    the guest.
+> >>
+> >> In order to avoid memory leaks, when the notifier is called to receive
+> >> notification that the KVM pointer has been set to NULL, the vfio_ap device
+> >> driver should reverse the actions taken when the KVM pointer was set.
+> >>
+> >> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
+> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >> ---
+> >>  drivers/s390/crypto/vfio_ap_ops.c | 29 ++++++++++++++++++++---------
+> >>  1 file changed, 20 insertions(+), 9 deletions(-)
+> >>
+> >> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> >> index e0bde8518745..cd22e85588e1 100644
+> >> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> >> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> >> @@ -1037,8 +1037,6 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+> >>  {
+> >>  	struct ap_matrix_mdev *m;
+> >>
+> >> -	mutex_lock(&matrix_dev->lock);
+> >> -
+> >>  	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
+> >>  		if ((m != matrix_mdev) && (m->kvm == kvm)) {
+> >>  			mutex_unlock(&matrix_dev->lock);
+> >> @@ -1049,7 +1047,6 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+> >>  	matrix_mdev->kvm = kvm;
+> >>  	kvm_get_kvm(kvm);
+> >>  	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+> >> -	mutex_unlock(&matrix_dev->lock);
+> >>
+> >>  	return 0;
+> >>  }
+> >> @@ -1083,35 +1080,49 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
+> >>  	return NOTIFY_DONE;
+> >>  }
+> >>
+> >> +static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+> >> +{
+> >> +	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> >> +	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+> > 
+> > 
+> > This patch LGTM. The only concern I have with it is whether a
+> > different cpu is guaranteed to observe the above assignment as
+> > an atomic operation. I think we didn't finish this discussion
+> > at v1, or did we?
 > 
->  3) for any possible conflict: yell.
-> 
->  4) Generate ORC with merge-sort
-> 
-> Specifically for 3 there are two possible classes of conflicts:
-> 
->  - the merge-sort itself could find conflicting CFI for the same
->    offset.
-> 
->  - the unwind can fail with the merged CFI.
+> You mean just this assigment:
+> >> +	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+> should either have the old or the new value, but not halve zero halve old?
+>
 
-So much algorithm.  Could we make it easier by caching the shared
-per-alt-group CFI state somewhere along the way?
+Yes that is the assignment I was referring to. Old value will work as well because
+kvm holds a reference to this module while in the pqap_hook.
+ 
+> Normally this should be ok (and I would consider this a compiler bug if
+> this is split into 2 32 bit zeroes) But if you really want to be sure then we
+> can use WRITE_ONCE.
 
-For example:
+Just my curiosity: what would make this a bug? Is it the s390 elf ABI,
+or some gcc feature, or even the C standard? Also how exactly would
+WRITE_ONCE, also access via volatile help in this particular situation?
 
-struct alt_group_info {
+I agree, if the member is properly aligned, (which it is),
+normally/probably we are fine on s390x (which is also a given). 
 
-	/* first original insn in the group */
-	struct instruction *orig_insn;
+> I think we take this via the s390 tree? I can add the WRITE_ONCE when applying?
 
-	/* max # of bytes in the group (cfi array size) */
-	unsigned long nbytes;
+Yes that works fine with me.
 
-	/* byte-offset-addressed array of CFI pointers */
-	struct cfi_state **cfi;
-};
-
-We could change 'insn->alt_group' to be a pointer to a shared instance
-of the above struct, so that all original and replacement instructions
-in a group have a pointer to it.
-
-Starting out, 'cfi' array is all NULLs.  Then when updating CFI, check
-'insn->alt_group.cfi[offset]'.
-
-[ 'offset' is a byte offset from the beginning of the group.  It could
-  be calculated based on 'orig_insn' or 'orig_insn->alts', depending on
-  whether 'insn' is an original or a replacement. ]
-
-If the array entry is NULL, just update it with a pointer to the CFI.
-If it's not NULL, make sure it matches the existing CFI, and WARN if it
-doesn't.
-
-Also, with this data structure, the ORC generation should also be a lot
-more straightforward, just ignore the NULL entries.
-
-Thoughts?  This is all theoretical of course, I could try to do a patch
-tomorrow.
-
--- 
-Josh
-
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
