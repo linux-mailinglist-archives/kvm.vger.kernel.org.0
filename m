@@ -2,82 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E6B32DB97E
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 03:57:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2BC62DB8BB
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 03:05:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725826AbgLPC45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Dec 2020 21:56:57 -0500
-Received: from mga03.intel.com ([134.134.136.65]:9465 "EHLO mga03.intel.com"
+        id S1725308AbgLPCEJ convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 15 Dec 2020 21:04:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39486 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725710AbgLPC45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Dec 2020 21:56:57 -0500
-IronPort-SDR: l/GbeQzpI/RUt2XvSSFs08soNGP+wKjlqV95/u4oYn6QpEbA5JVDaRcae8dzHCx+lki1hLoa4y
- DkhKje1WWsjg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9836"; a="175099207"
-X-IronPort-AV: E=Sophos;i="5.78,423,1599548400"; 
-   d="scan'208";a="175099207"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2020 18:56:02 -0800
-IronPort-SDR: +VwLccgiubthbN3MImiBbjdrCD7vWyJpzM1SJMs6x1PVBVDNKi3fXXqnXmKzhl3/SuVjKXn43O
- YFZvj0pk4JnA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,423,1599548400"; 
-   d="scan'208";a="451538814"
-Received: from icx-2s.bj.intel.com ([10.240.192.119])
-  by fmsmga001.fm.intel.com with ESMTP; 15 Dec 2020 18:55:59 -0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        tony.luck@intel.com, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, kyung.min.park@intel.com, yang.zhong@intel.com
-Subject: [PATCH 2/2] KVM: Expose AVX_VNNI instruction to guset
-Date:   Wed, 16 Dec 2020 10:01:29 +0800
-Message-Id: <20201216020129.19875-3-yang.zhong@intel.com>
-X-Mailer: git-send-email 2.29.2.334.gfaefdd61ec
-In-Reply-To: <20201216020129.19875-1-yang.zhong@intel.com>
-References: <20201216020129.19875-1-yang.zhong@intel.com>
+        id S1725208AbgLPCEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Dec 2020 21:04:09 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 210695] error: kvm run failed Invalid argument
+Date:   Wed, 16 Dec 2020 02:03:28 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: seanjc@google.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-210695-28872-vQTu33nCVK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-210695-28872@https.bugzilla.kernel.org/>
+References: <bug-210695-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expose AVX (VEX-encoded) versions of the Vector Neural Network
-Instructions to guest.
+https://bugzilla.kernel.org/show_bug.cgi?id=210695
 
-The bit definition:
-CPUID.(EAX=7,ECX=1):EAX[bit 4] AVX_VNNI
+Sean Christopherson (seanjc@google.com) changed:
 
-The following instructions are available when this feature is
-present in the guest.
-  1. VPDPBUS: Multiply and Add Unsigned and Signed Bytes
-  2. VPDPBUSDS: Multiply and Add Unsigned and Signed Bytes with Saturation
-  3. VPDPWSSD: Multiply and Add Signed Word Integers
-  4. VPDPWSSDS: Multiply and Add Signed Integers with Saturation
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |seanjc@google.com
 
-This instruction is currently documented in the latest "extensions"
-manual (ISE). It will appear in the "main" manual (SDM) in the future.
+--- Comment #1 from Sean Christopherson (seanjc@google.com) ---
+Hrm, this is more than likely related to refactoring for the introduction of
+the TDP MMU.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Reviewed-by: Tony Luck <tony.luck@intel.com>
----
- arch/x86/kvm/cpuid.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> kernel get_mmio_spte: detect reserved bits on spte, addr 0xfe013000, dump
+> hierarchy:
+> kernel        ------ spte 0x80000b0e level 3.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 83637a2ff605..4229b67f0a8d 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -433,7 +433,7 @@ void kvm_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
- 
- 	kvm_cpu_cap_mask(CPUID_7_1_EAX,
--		F(AVX512_BF16)
-+		F(AVX_VNNI) | F(AVX512_BF16)
- 	);
- 
- 	kvm_cpu_cap_mask(CPUID_D_1_EAX,
+This SPTE looks odd/wrong, but unless I'm misreading things, there are no
+reserved bits set.
+
+> kernel        ------ spte 0x49c0027 level 2.
+> kernel        ------ spte 0x38001ffe0134d7 level 1.
+
+And this SPTE obviously has reserved bits set, but that's intentional and this
+should not trigger the warning as the SPTE should be recognized as an MMIO
+SPTE.
+
+I'll stare at this more tomorrow and play with things a bit to see if I can
+figure out what's broken.
+
 -- 
-2.29.2.334.gfaefdd61ec
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
