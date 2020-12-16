@@ -2,107 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53D1D2DC74B
-	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 20:39:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AA882DC779
+	for <lists+kvm@lfdr.de>; Wed, 16 Dec 2020 21:01:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728525AbgLPTii (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 14:38:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25011 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727349AbgLPTii (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 14:38:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608147431;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=YSOn/k1Hw3PBV10RiB9kjk1aQ7QyRB3qI+j4unC73oI=;
-        b=XmwrndeU3pBY4WoT0oCKwaLkau8Wg1V20NOgcgw57braFsmvJD3lPDEENJB1XAp8ircIbB
-        7i41UCqwjlzibq3z7FN7l1nElBBStFDvDsK7WzYD4iHpTNzANiQrwZctzhiHoFdgxz9UIL
-        3uy/WnZARnaEPDgxKASDqQkYtrUaRy0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-p0hO15rhNR-TlnjQbwOxFA-1; Wed, 16 Dec 2020 14:37:07 -0500
-X-MC-Unique: p0hO15rhNR-TlnjQbwOxFA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64071180A086;
-        Wed, 16 Dec 2020 19:37:06 +0000 (UTC)
-Received: from omen.home (ovpn-112-193.phx2.redhat.com [10.3.112.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B1817177F8;
-        Wed, 16 Dec 2020 19:37:01 +0000 (UTC)
-Date:   Wed, 16 Dec 2020 12:37:01 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, eric.auger@redhat.com,
-        jgg@nvidia.com, aik@ozlabs.ru, farman@linux.ibm.com,
-        baolu.lu@linux.intel.com
-Subject: [GIT PULL] VFIO updates for v5.11-rc1
-Message-ID: <20201216123701.00517b52@omen.home>
+        id S1728556AbgLPUBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 15:01:37 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42044 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727027AbgLPUBg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 15:01:36 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BGJWKsW177543;
+        Wed, 16 Dec 2020 15:00:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ukgGyv0rQrNMw1i5qVhyrpzV7aI2cPAKbS26lUD1rD4=;
+ b=jyUKVUCaZdk6IIN3JP5H68NPSX0S1319O3XcyKl4oIvXIJFi4+EpNw0oWD8880SQJTvA
+ 24elereFaOXGRDIP1O9rKzob5Gb+g0Qxe5+LGQqWWrrdT3Mc9MWhD4cDARALwAJ8uLAj
+ oADv2Piab/FQ0NCH2wVkiIzMywkGBxT6nHXLvbaHPaIaxs42wvVeypffNHJOMCxe0fzo
+ Crw80v2T7U4GLLZiFQ395e8hetnnvMtWUHEq06qw3aZXdEJUhszB3Cp0GHTovFjr/+Nt
+ Qmo0tFLKuwKJYBLiDoxeSwtj5NEvhlFKJ32HprAhwsm+6IGpanFd8HO/IEEr7btFPRwU tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35fp0bngud-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 15:00:52 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BGJewTk019937;
+        Wed, 16 Dec 2020 15:00:51 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35fp0bngu3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 15:00:51 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BGJvP2H015580;
+        Wed, 16 Dec 2020 20:00:50 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma04dal.us.ibm.com with ESMTP id 35cng9jsba-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 20:00:50 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BGK0lFD25625038
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Dec 2020 20:00:47 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33EE0BE053;
+        Wed, 16 Dec 2020 20:00:47 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C07B1BE04F;
+        Wed, 16 Dec 2020 20:00:45 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Dec 2020 20:00:45 +0000 (GMT)
+Subject: Re: [PATCH v12 09/17] s390/vfio-ap: sysfs attribute to display the
+ guest's matrix
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+References: <20201124214016.3013-1-akrowiak@linux.ibm.com>
+ <20201124214016.3013-10-akrowiak@linux.ibm.com>
+ <20201129014904.4fafdbba.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <831cbbac-06bb-dade-c291-2e1954003da4@linux.ibm.com>
+Date:   Wed, 16 Dec 2020 15:00:45 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20201129014904.4fafdbba.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-16_08:2020-12-15,2020-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 suspectscore=0 bulkscore=0 adultscore=0 clxscore=1015
+ malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012160118
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+Thanks for the review.
 
-The following changes since commit b65054597872ce3aefbc6a666385eabdf9e288da:
-
-  Linux 5.10-rc6 (2020-11-29 15:50:50 -0800)
-
-are available in the Git repository at:
-
-  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.11-rc1
-
-for you to fetch changes up to bdfae1c9a913930eae5ea506733aa7c285e12a06:
-
-  vfio/type1: Add vfio_group_iommu_domain() (2020-12-10 14:47:56 -0700)
-
-----------------------------------------------------------------
-VFIO updates for v5.11-rc1
-
- - Fix uninitialized list walk in error path (Eric Auger)
-
- - Use io_remap_pfn_range() (Jason Gunthorpe)
-
- - Allow fallback support for NVLink on POWER8 (Alexey Kardashevskiy)
-
- - Enable mdev request interrupt with CCW support (Eric Farman)
-
- - Enable interface to iommu_domain from vfio_group (Lu Baolu)
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      vfio/pci/nvlink2: Do not attempt NPU2 setup on POWER8NVL NPU
-
-Eric Auger (1):
-      vfio/pci: Move dummy_resources_list init in vfio_pci_probe()
-
-Eric Farman (2):
-      vfio-mdev: Wire in a request handler for mdev parent
-      vfio-ccw: Wire in the request callback
-
-Jason Gunthorpe (1):
-      vfio-pci: Use io_remap_pfn_range() for PCI IO memory
-
-Lu Baolu (1):
-      vfio/type1: Add vfio_group_iommu_domain()
-
- drivers/s390/cio/vfio_ccw_ops.c     | 26 ++++++++++++++++++++++++++
- drivers/s390/cio/vfio_ccw_private.h |  4 ++++
- drivers/vfio/mdev/mdev_core.c       |  4 ++++
- drivers/vfio/mdev/vfio_mdev.c       | 13 +++++++++++++
- drivers/vfio/pci/vfio_pci.c         |  7 +++----
- drivers/vfio/pci/vfio_pci_nvlink2.c |  7 +++++--
- drivers/vfio/vfio.c                 | 18 ++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c     | 24 ++++++++++++++++++++++++
- include/linux/mdev.h                |  4 ++++
- include/linux/vfio.h                |  4 ++++
- include/uapi/linux/vfio.h           |  1 +
- 11 files changed, 106 insertions(+), 6 deletions(-)
+On 11/28/20 7:49 PM, Halil Pasic wrote:
+> On Tue, 24 Nov 2020 16:40:08 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> The matrix of adapters and domains configured in a guest's APCB may
+>> differ from the matrix of adapters and domains assigned to the matrix mdev,
+>> so this patch introduces a sysfs attribute to display the matrix of
+>> adapters and domains that are or will be assigned to the APCB of a guest
+>> that is or will be using the matrix mdev. For a matrix mdev denoted by
+>> $uuid, the guest matrix can be displayed as follows:
+>>
+>>     cat /sys/devices/vfio_ap/matrix/$uuid/guest_matrix
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Code looks good, but it may be a little early, since the treatment of
+> guset_matrix is changed by the following patches.
 
