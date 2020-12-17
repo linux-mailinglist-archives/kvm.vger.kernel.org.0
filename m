@@ -2,128 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40F922DCC4C
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 07:01:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D18C42DCC49
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 07:01:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727223AbgLQGBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 01:01:16 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50399 "EHLO ozlabs.org"
+        id S1727115AbgLQGBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 01:01:11 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58565 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727064AbgLQGBK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727065AbgLQGBK (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 17 Dec 2020 01:01:10 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4CxLvJ0Q6Bz9sTv; Thu, 17 Dec 2020 17:00:27 +1100 (AEDT)
+        id 4CxLvJ0mf8z9sRR; Thu, 17 Dec 2020 17:00:28 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1608184828;
-        bh=7b/4HdUoY4KqFQN7P8s4ld6mZkyQK98LyF3YI8eIOPw=;
+        bh=f053HisAC8PbxoKtjnMPlGENN+/doGlZH5baP74TMbE=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZJnJYKCkxkR+I5kadzvUCg8MjNbHrxVXQe7dMa8YfCJpuatfw6nmtVC3A6Mbt+D5j
-         XVSDxVqdHVx9POMeiWsNZmQ1zBpwm5xAHMk1QFUWmPgmfneGY1q7m+GlgHNTjaouNr
-         PP9M4GwQiDWVW7JtahYmJYgryIsabFwG9Y0WhvoQ=
-Date:   Thu, 17 Dec 2020 16:47:36 +1100
+        b=goDpN05Yaa6hPcLfAQxWGknmnLRAIx9dvSty7LP942NkqwJDSbl1l1gCeaik6AVnU
+         q7+W9AdIz4JdBanf8T8hEa2JNDmr00ZTTBhoY5HQNPLP15BXKfI+BkEVZ+8rhRZpiR
+         xMokVghWz98FATiuUksdhbwutN4OZpJTukHfrSLI=
+Date:   Thu, 17 Dec 2020 16:53:38 +1100
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
-        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
-        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        borntraeger@de.ibm.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        pasic@linux.ibm.com
-Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20201217054736.GH310465@yekko.fritz.box>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
+        dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+        qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+        berrange@redhat.com, thuth@redhat.com, pbonzini@redhat.com,
+        rth@twiddle.net, mdroth@linux.vnet.ibm.com
+Subject: Re: [for-6.0 v5 12/13] securable guest memory: Alter virtio default
+ properties for protected guests
+Message-ID: <20201217055338.GI310465@yekko.fritz.box>
 References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
- <20201204054415.579042-12-david@gibson.dropbear.id.au>
- <20201214182240.2abd85eb.cohuck@redhat.com>
+ <20201204054415.579042-13-david@gibson.dropbear.id.au>
+ <d739cae2-9197-76a5-1c19-057bfe832187@de.ibm.com>
+ <20201204091706.4432dc1e.cohuck@redhat.com>
+ <038214d1-580d-6692-cd1e-701cd41b5cf8@de.ibm.com>
+ <20201204154310.158b410e.pasic@linux.ibm.com>
+ <20201208015403.GB2555@yekko.fritz.box>
+ <20201208112829.0f8fcdf4.pasic@linux.ibm.com>
+ <20201208135005.100d56fb.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="SdvjNjn6lL3tIsv0"
+        protocol="application/pgp-signature"; boundary="cVp8NMj01v+Em8Se"
 Content-Disposition: inline
-In-Reply-To: <20201214182240.2abd85eb.cohuck@redhat.com>
+In-Reply-To: <20201208135005.100d56fb.cohuck@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---SdvjNjn6lL3tIsv0
+--cVp8NMj01v+Em8Se
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 14, 2020 at 06:22:40PM +0100, Cornelia Huck wrote:
-> On Fri,  4 Dec 2020 16:44:13 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, Dec 08, 2020 at 01:50:05PM +0100, Cornelia Huck wrote:
+> On Tue, 8 Dec 2020 11:28:29 +0100
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 >=20
-> > We haven't yet implemented the fairly involved handshaking that will be
-> > needed to migrate PEF protected guests.  For now, just use a migration
-> > blocker so we get a meaningful error if someone attempts this (this is =
-the
-> > same approach used by AMD SEV).
+> > On Tue, 8 Dec 2020 12:54:03 +1100
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
 > >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/ppc/pef.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
+> > > > > >>> +         * Virtio devices can't count on directly accessing =
+guest
+> > > > > >>> +         * memory, so they need iommu_platform=3Don to use n=
+ormal DMA
+> > > > > >>> +         * mechanisms.  That requires also disabling legacy =
+virtio
+> > > > > >>> +         * support for those virtio pci devices which allow =
+it.
+> > > > > >>> +         */
+> > > > > >>> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable=
+-legacy",
+> > > > > >>> +                                   "on", true);
+> > > > > >>> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iomm=
+u_platform",
+> > > > > >>> +                                   "on", false);     =20
+> > > > > >>
+> > > > > >> I have not followed all the history (sorry). Should we also se=
+t iommu_platform
+> > > > > >> for virtio-ccw? Halil?
+> > > > > >>   =20
+> > > > > >=20
+> > > > > > That line should add iommu_platform for all virtio devices, sho=
+uldn't
+> > > > > > it?   =20
+> > > > >=20
+> > > > > Yes, sorry. Was misreading that with the line above.=20
+> > > > >    =20
+> > > >=20
+> > > > I believe this is the best we can get. In a sense it is still a
+> > > > pessimization,   =20
+> > >=20
+> > > I'm not really clear on what you're getting at here. =20
 > >=20
-> > diff --git a/hw/ppc/pef.c b/hw/ppc/pef.c
-> > index 3ae3059cfe..edc3e744ba 100644
-> > --- a/hw/ppc/pef.c
-> > +++ b/hw/ppc/pef.c
-> > @@ -38,7 +38,11 @@ struct PefGuestState {
-> >  };
-> > =20
-> >  #ifdef CONFIG_KVM
-> > +static Error *pef_mig_blocker;
-> > +
-> >  static int kvmppc_svm_init(Error **errp)
+> > By pessimiziation, I mean that we are going to indicate
+> > _F_PLATFORM_ACCESS even if it isn't necessary, because the guest never
+> > opted in for confidential/memory protection/memory encryption. We have
+> > discussed this before, and I don't see a better solution that works for
+> > everybody.
 >=20
-> This looks weird?
+> If you consider specifying the secure guest option as a way to tell
+> QEMU to make everything ready for running a secure guest, I'd certainly
+> consider it necessary. If you do not want to force it, you should not
+> do the secure guest preparation setup.
 
-Oops.  Not sure how that made it past even my rudimentary compile
-testing.
+Right, that's my feeling as well.
 
-> > +
-> > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
-> >  {
-> >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)) {
-> >          error_setg(errp,
-> > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
-> >          }
-> >      }
-> > =20
-> > +    /* add migration blocker */
-> > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
-> > +    /* NB: This can fail if --only-migratable is used */
-> > +    migrate_add_blocker(pef_mig_blocker, &error_fatal);
->=20
-> Just so that I understand: is PEF something that is enabled by the host
-> (and the guest is either secured or doesn't start), or is it using a
-> model like s390x PV where the guest initiates the transition into
-> secured mode?
-
-Like s390x PV it's initiated by the guest.
-
-> Asking because s390x adds the migration blocker only when the
-> transition is actually happening (i.e. guests that do not transition
-> into secure mode remain migratable.) This has the side effect that you
-> might be able to start a machine with --only-migratable that
-> transitions into a non-migratable machine via a guest action, if I'm
-> not mistaken. Without the new object, I don't see a way to block with
-> --only-migratable; with it, we should be able to do that. Not sure what
-> the desirable behaviour is here.
-
-Hm, I'm not sure what the best option is here either.
-
->=20
-> > +
-> >      return 0;
-> >  }
-> > =20
->=20
+I'm also of the opinion that !F_PLATFORM_ACCESS is kind of a nasty
+hack that has some other problems (e.g. it means an L1 can't safely
+pass the device into an L2).
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -131,24 +123,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---SdvjNjn6lL3tIsv0
+--cVp8NMj01v+Em8Se
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/a8PcACgkQbDjKyiDZ
-s5J0JRAAm5k3JWI3ONab2QPJtkrHcY8gaAFoBdMG0O1TZ/qh6SQ99l6z2PNXbFac
-ecp3nNOfHcIvVQgeaT5Q6WHIH8st2K+qXufTr1PIftiTH8I+X/tkjEp9WsPlz+y5
-dSSlEQSbdjQ6v1RnD9b7NGHxf8eTAhuCBQosDGPjoSNM39q9WaM6xLT+PMnXVekh
-dZwhpdQQWfP58oPRXuM3rgo4tnfB67PL44NxfqLrKHVQDxWqgGa4v+FMOvGrm6IT
-stwtIKamuZDgtXpXVl3HS89WbikLYlnfCZpD+BXdj0Rm7UCDC6es8ZM2NhUe1QaQ
-wtcwe4Uf2a64YTY/VJCjk1LVi4Fez1v4bMGTX23D+nbHupNoi+Llo/gi4+pqhc6H
-Yb3+jWv1vc9nC9BWCK0OzyJGBc7FvW4Ur8Bxhm3hmy6WwBQ0rPdxs3xrlhY3lXLO
-trOhBsA1Fue7O7DOxheEgRGuuMGugKCxcZKVuzh5LbRugLkHmu2e+yXhgxyveLtn
-l4Ypb2qRcClZuGT+fRbdWsRCaKwCZtc4c4obKNMiT/gDl2E/YsMrNDMkpX1cFgyL
-ijcgFCS7l/SELvrkjNt74TpBj55fzAnyb/mhLztlYWNanfPUherIFc7BhZ26sa7t
-Wx6w/6XPm0fozCzj9BvPg9svZPIr0ql+QtfiMa4CoriY+T6jIqU=
-=diPo
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/a8mIACgkQbDjKyiDZ
+s5JiQxAArukILcLSGnwHWTNQEamXCCRO2x3cVi/gp2M/5nIJG1s1uvIsiG0LzGNE
+awUDnvRiK72sQSaclAeXA7mf/B7GLmbdgY2zh9TaheNhOEjtSJ2gPs54s/5iaPgh
+BqiwZt+O54Zec5WmloAUWB+N8mk+6TJGYWWSyenP9VUEN0pbRZs9KNs2wyPGhAQc
+NPZAkZWZ4tS6U2JLxj4AN6Z6J4J2D8cPFJA+3+yPM8ECL2O5oJweI/XsKEwnDgQW
+UTg970vC4eE50fhyLvZO4YW7xKx1saoHXRJ3257mo7yIPpBPGLva4b6dVpnKH4SD
+Tb5KRV8DmuKh9lLMSJCcnfyBfj/hjh2EExJUIokj25Le81s0mnahbL4X1PnWyovn
+MM2o+DNPEsoizEiVF129iOwSr2vOcZKT4jvvVw5pAazhmjXO8ozi6sSI96PVkqvb
+NwRrMBaOp/ZfijiD5ZkJ3PUkQ0o6UfehAmvsAXfFGlh4tu495S1ZzviWy4+cTuGx
+UG0pXX/8Tp0a7YSMRKWI2PD1R4L4GTqcjJnW0sbSs+TaSaysC2tKn35OJC51gRtb
+2gFNvvM+a+j+CymRYu1uwE/jX6rlnARt4QQBub5AqY1M0ejulI9+FJqz7a36DbJy
+0mrWyQrzeIiDd/UVG0KED6P80aBcIwqQolUCrHrUxd+9rRrbhbk=
+=PR0/
 -----END PGP SIGNATURE-----
 
---SdvjNjn6lL3tIsv0--
+--cVp8NMj01v+Em8Se--
