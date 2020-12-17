@@ -2,465 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61EE52DD36B
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 15:59:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 152F82DD1C6
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 14:01:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728089AbgLQO7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 09:59:22 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51608 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726291AbgLQO7W (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 09:59:22 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BHErpM5160201;
-        Thu, 17 Dec 2020 09:58:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=EZ+sj+wL8v1cjWHtjnMPnL3jdyclrd8hqXl89L477jY=;
- b=jqtzLUBm0KXzNOT5nxkkUZvyharrlA4r1FGXpk81lys0sfx5mFh8uM6udPZ4a/FdjpDR
- BPeHa6+qJxQiYPcQ/n8mYPvqvQHE7Mji/5A6YLkZpcauvorplfVpxorxNclk1/VUjmrN
- AF/o2l4R1GrWv2X61Os2KBn7+Rv54cXEvKIeGPgGqjpEDvjYTk0hAhUHQgnVNbd1SPmw
- +PKeUiAH4Typ8SRlUQ6X99APgdjPq6KrYASG8Y0KMrGa6zDprIdy3mNETPrsHCY3XOSU
- WuSyF9hwXqjamR6GpW5at4GmNcEax9RwU5f4Y2XsJXFnYOhv/MGZBtsIBoXHIV6/TvDf VA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35g9gdg2rk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 09:58:40 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BHEsGVA161771;
-        Thu, 17 Dec 2020 09:58:39 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35g9gdg2qg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 09:58:39 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BHEvNx2030902;
-        Thu, 17 Dec 2020 14:58:37 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 35cng8g3qj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 14:58:37 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BHEwYkQ27591090
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Dec 2020 14:58:34 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9425BA405F;
-        Thu, 17 Dec 2020 14:58:34 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 325A7A4054;
-        Thu, 17 Dec 2020 14:58:34 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.12.102])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Dec 2020 14:58:34 +0000 (GMT)
-Date:   Thu, 17 Dec 2020 13:54:59 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 4/8] s390x: Split assembly and move to
- s390x/asm/
-Message-ID: <20201217135459.01a76f86@ibm-vm>
-In-Reply-To: <20201211100039.63597-5-frankja@linux.ibm.com>
-References: <20201211100039.63597-1-frankja@linux.ibm.com>
-        <20201211100039.63597-5-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727423AbgLQNBN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 08:01:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28068 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727260AbgLQNBK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 08:01:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608209982;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hP9o8iBbJgcJqXSkMh+zWL+OzzVy5h8KfyvZRhgl3ZY=;
+        b=iAwxX+q3nnTePutzYHGW6tLepX+NO+Ox2sJgjk0cln8gipH/k1WYY8xyCOHjsY0ezXPtEe
+        KcA2NYzWW+ycN0PPM1KyExX17iFlhIQ9KeFbP4+CrdRaK4Y0oB7et1z2V4Wbl99EhYhq/d
+        qvG2SvpeMF5tfDM3e4VotCb0gxs9IQY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-8H7XtUbwM02c5-GiGs25Ww-1; Thu, 17 Dec 2020 07:59:40 -0500
+X-MC-Unique: 8H7XtUbwM02c5-GiGs25Ww-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A5E781DFB3;
+        Thu, 17 Dec 2020 12:59:36 +0000 (UTC)
+Received: from gondolin (ovpn-113-176.ams2.redhat.com [10.36.113.176])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B20E460C7A;
+        Thu, 17 Dec 2020 12:59:22 +0000 (UTC)
+Date:   Thu, 17 Dec 2020 13:59:19 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC 0/4] vfio-pci/zdev: Fixing s390 vfio-pci ISM support
+Message-ID: <20201217135919.46d5c43f.cohuck@redhat.com>
+In-Reply-To: <a974c5cc-fc42-7bf0-66a6-df095da7105f@linux.ibm.com>
+References: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
+        <20201210133306.70d1a556.cohuck@redhat.com>
+        <ce9d4ef2-2629-59b7-99ed-4c8212cb004f@linux.ibm.com>
+        <20201211153501.7767a603.cohuck@redhat.com>
+        <6c9528f3-f012-ba15-1d68-7caefb942356@linux.ibm.com>
+        <a974c5cc-fc42-7bf0-66a6-df095da7105f@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-17_09:2020-12-15,2020-12-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 clxscore=1015
- malwarescore=0 spamscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012170099
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Dec 2020 05:00:35 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, 11 Dec 2020 10:04:43 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> I've added too much to cstart64.S which is not start related
-> already. Now that I want to add even more code it's time to split
-> cstart64.S. lib.S has functions that are used in tests. macros.S
-> contains macros which are used in cstart64.S and lib.S
+> On 12/11/20 10:01 AM, Matthew Rosato wrote:
+> > On 12/11/20 9:35 AM, Cornelia Huck wrote: =20
 
-Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> >> Let me summarize this to make sure I understand this new region
+> >> correctly:
+> >>
+> >> - some devices may have relaxed alignment/length requirements for
+> >> =C2=A0=C2=A0 pcistb (and friends?) =20
+> >=20
+> > The relaxed alignment bit is really specific to PCISTB behavior, so the=
+=20
+> > "and friends" doesn't apply there.
 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/Makefile             |   8 +--
->  s390x/{ => asm}/cstart64.S | 119
-> ++----------------------------------- s390x/asm/lib.S            |
-> 65 ++++++++++++++++++++ s390x/asm/macros.S         |  77
-> ++++++++++++++++++++++++ 4 files changed, 150 insertions(+), 119
-> deletions(-) rename s390x/{ => asm}/cstart64.S (50%)
->  create mode 100644 s390x/asm/lib.S
->  create mode 100644 s390x/asm/macros.S
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index b079a26..fb62e87 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -66,10 +66,10 @@ cflatobjs += lib/s390x/css_lib.o
->  
->  OBJDIRS += lib/s390x
->  
-> -cstart.o = $(TEST_DIR)/cstart64.o
-> +asmlib = $(TEST_DIR)/asm/cstart64.o $(TEST_DIR)/asm/lib.o
->  
->  FLATLIBS = $(libcflat)
-> -%.elf: %.o $(FLATLIBS) $(SRCDIR)/s390x/flat.lds $(cstart.o)
-> +%.elf: %.o $(FLATLIBS) $(SRCDIR)/s390x/flat.lds $(asmlib)
->  	$(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) \
->  		$(SRCDIR)/lib/auxinfo.c -DPROGNAME=\"$@\"
->  	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/flat.lds \
-> @@ -87,7 +87,7 @@ FLATLIBS = $(libcflat)
->  	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT)
-> --no-verify --image $< -o $@ 
->  arch_clean: asm_offsets_clean
-> -	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(TEST_DIR)/.*.d
-> lib/s390x/.*.d
-> +	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(TEST_DIR)/.*.d
-> lib/s390x/.*.d $(TEST_DIR)/asm/*.{o,elf,bin} $(TEST_DIR)/asm/.*.d 
->  generated-files = $(asm-offsets)
-> -$(tests:.elf=.o) $(cstart.o) $(cflatobjs): $(generated-files)
-> +$(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
-> diff --git a/s390x/cstart64.S b/s390x/asm/cstart64.S
-> similarity index 50%
-> rename from s390x/cstart64.S
-> rename to s390x/asm/cstart64.S
-> index cc86fc7..ace0c0d 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/asm/cstart64.S
-> @@ -3,14 +3,17 @@
->   * s390x startup code
->   *
->   * Copyright (c) 2017 Red Hat Inc
-> + * Copyright (c) 2019 IBM Corp.
->   *
->   * Authors:
->   *  Thomas Huth <thuth@redhat.com>
->   *  David Hildenbrand <david@redhat.com>
-> + *  Janosch Frank <frankja@linux.ibm.com>
->   */
->  #include <asm/asm-offsets.h>
->  #include <asm/sigp.h>
->  
-> +#include "macros.S"
->  .section .init
->  
->  /*
-> @@ -87,120 +90,7 @@ clear_bss_remainder:
->  memsetxc:
->  	xc 0(1,%r1),0(%r1)
->  
-> -	.macro SAVE_REGS
-> -	/* save grs 0-15 */
-> -	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
-> -	/* save crs 0-15 */
-> -	stctg	%c0, %c15, GEN_LC_SW_INT_CRS
-> -	/* load a cr0 that has the AFP control bit which enables all
-> FPRs */
-> -	larl	%r1, initial_cr0
-> -	lctlg	%c0, %c0, 0(%r1)
-> -	/* save fprs 0-15 + fpc */
-> -	la	%r1, GEN_LC_SW_INT_FPRS
-> -	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> -	std	\i, \i * 8(%r1)
-> -	.endr
-> -	stfpc	GEN_LC_SW_INT_FPC
-> -	.endm
-> -
-> -	.macro RESTORE_REGS
-> -	/* restore fprs 0-15 + fpc */
-> -	la	%r1, GEN_LC_SW_INT_FPRS
-> -	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> -	ld	\i, \i * 8(%r1)
-> -	.endr
-> -	lfpc	GEN_LC_SW_INT_FPC
-> -	/* restore crs 0-15 */
-> -	lctlg	%c0, %c15, GEN_LC_SW_INT_CRS
-> -	/* restore grs 0-15 */
-> -	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
-> -	.endm
-> -
-> -/* Save registers on the stack (r15), so we can have stacked
-> interrupts. */
-> -	.macro SAVE_REGS_STACK
-> -	/* Allocate a stack frame for 15 general registers */
-> -	slgfi   %r15, 15 * 8
-> -	/* Store registers r0 to r14 on the stack */
-> -	stmg    %r0, %r14, 0(%r15)
-> -	/* Allocate a stack frame for 16 floating point registers */
-> -	/* The size of a FP register is the size of an double word */
-> -	slgfi   %r15, 16 * 8
-> -	/* Save fp register on stack: offset to SP is multiple of
-> reg number */
-> -	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> -	std	\i, \i * 8(%r15)
-> -	.endr
-> -	/* Save fpc, but keep stack aligned on 64bits */
-> -	slgfi   %r15, 8
-> -	efpc	%r0
-> -	stg	%r0, 0(%r15)
-> -	.endm
-> -
-> -/* Restore the register in reverse order */
-> -	.macro RESTORE_REGS_STACK
-> -	/* Restore fpc */
-> -	lfpc	0(%r15)
-> -	algfi	%r15, 8
-> -	/* Restore fp register from stack: SP still where it was
-> left */
-> -	/* and offset to SP is a multiple of reg number */
-> -	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> -	ld	\i, \i * 8(%r15)
-> -	.endr
-> -	/* Now that we're done, rewind the stack pointer by 16
-> double word */
-> -	algfi   %r15, 16 * 8
-> -	/* Load the registers from stack */
-> -	lmg     %r0, %r14, 0(%r15)
-> -	/* Rewind the stack by 15 double word */
-> -	algfi   %r15, 15 * 8
-> -	.endm
-> -
->  .section .text
-> -/*
-> - * load_reset calling convention:
-> - * %r2 subcode (0 or 1)
-> - */
-> -.globl diag308_load_reset
-> -diag308_load_reset:
-> -	SAVE_REGS
-> -	/* Backup current PSW mask, as we have to restore it on
-> success */
-> -	epsw	%r0, %r1
-> -	st	%r0, GEN_LC_SW_INT_PSW
-> -	st	%r1, GEN_LC_SW_INT_PSW + 4
-> -	/* Load reset psw mask (short psw, 64 bit) */
-> -	lg	%r0, reset_psw
-> -	/* Load the success label address */
-> -	larl    %r1, 0f
-> -	/* Or it to the mask */
-> -	ogr	%r0, %r1
-> -	/* Store it at the reset PSW location (real 0x0) */
-> -	stg	%r0, 0
-> -	/* Do the reset */
-> -	diag    %r0,%r2,0x308
-> -	/* Failure path */
-> -	xgr	%r2, %r2
-> -	br	%r14
-> -	/* Success path */
-> -	/* load a cr0 that has the AFP control bit which enables all
-> FPRs */ -0:	larl	%r1, initial_cr0
-> -	lctlg	%c0, %c0, 0(%r1)
-> -	RESTORE_REGS
-> -	lhi	%r2, 1
-> -	larl	%r0, 1f
-> -	stg	%r0, GEN_LC_SW_INT_PSW + 8
-> -	lpswe	GEN_LC_SW_INT_PSW
-> -1:	br	%r14
-> -
-> -.globl smp_cpu_setup_state
-> -smp_cpu_setup_state:
-> -	xgr	%r1, %r1
-> -	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
-> -	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
-> -	/* We should only go once through cpu setup and not for
-> every restart */
-> -	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
-> -	larl	%r14, 0f
-> -	lpswe	GEN_LC_SW_INT_PSW
-> -	/* If the function returns, just loop here */
-> -0:	j	0
-> -
->  pgm_int:
->  	SAVE_REGS
->  	brasl	%r14, handle_pgm_int
-> @@ -232,8 +122,6 @@ svc_int:
->  	lpswe	GEN_LC_SVC_OLD_PSW
->  
->  	.align	8
-> -reset_psw:
-> -	.quad	0x0008000180000000
->  initial_psw:
->  	.quad	0x0000000180000000, clear_bss_start
->  pgm_int_psw:
-> @@ -246,6 +134,7 @@ io_int_psw:
->  	.quad	0x0000000180000000, io_int
->  svc_int_psw:
->  	.quad	0x0000000180000000, svc_int
-> +.globl initial_cr0
->  initial_cr0:
->  	/* enable AFP-register control, so FP regs (+BFP instr) can
-> be used */ .quad	0x0000000000040000
-> diff --git a/s390x/asm/lib.S b/s390x/asm/lib.S
-> new file mode 100644
-> index 0000000..4d78ec6
-> --- /dev/null
-> +++ b/s390x/asm/lib.S
-> @@ -0,0 +1,65 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * s390x assembly library
-> + *
-> + * Copyright (c) 2019 IBM Corp.
-> + *
-> + * Authors:
-> + *    Janosch Frank <frankja@linux.ibm.com>
-> + */
-> +#include <asm/asm-offsets.h>
-> +#include <asm/sigp.h>
-> +
-> +#include "macros.S"
-> +
-> +/*
-> + * load_reset calling convention:
-> + * %r2 subcode (0 or 1)
-> + */
-> +.globl diag308_load_reset
-> +diag308_load_reset:
-> +	SAVE_REGS
-> +	/* Backup current PSW mask, as we have to restore it on
-> success */
-> +	epsw	%r0, %r1
-> +	st	%r0, GEN_LC_SW_INT_PSW
-> +	st	%r1, GEN_LC_SW_INT_PSW + 4
-> +	/* Load reset psw mask (short psw, 64 bit) */
-> +	lg	%r0, reset_psw
-> +	/* Load the success label address */
-> +	larl    %r1, 0f
-> +	/* Or it to the mask */
-> +	ogr	%r0, %r1
-> +	/* Store it at the reset PSW location (real 0x0) */
-> +	stg	%r0, 0
-> +	/* Do the reset */
-> +	diag    %r0,%r2,0x308
-> +	/* Failure path */
-> +	xgr	%r2, %r2
-> +	br	%r14
-> +	/* Success path */
-> +	/* load a cr0 that has the AFP control bit which enables all
-> FPRs */ +0:	larl	%r1, initial_cr0
-> +	lctlg	%c0, %c0, 0(%r1)
-> +	RESTORE_REGS
-> +	lhi	%r2, 1
-> +	larl	%r0, 1f
-> +	stg	%r0, GEN_LC_SW_INT_PSW + 8
-> +	lpswe	GEN_LC_SW_INT_PSW
-> +1:	br	%r14
-> +
-> +/* Sets up general registers and cr0 when a new cpu is brought
-> online. */ +.globl smp_cpu_setup_state
-> +smp_cpu_setup_state:
-> +	xgr	%r1, %r1
-> +	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
-> +	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
-> +	/* We should only go once through cpu setup and not for
-> every restart */
-> +	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
-> +	larl	%r14, 0f
-> +	lpswe	GEN_LC_SW_INT_PSW
-> +	/* If the function returns, just loop here */
-> +0:	j	0
-> +
-> +	.align	8
-> +reset_psw:
-> +	.quad	0x0008000180000000
-> diff --git a/s390x/asm/macros.S b/s390x/asm/macros.S
-> new file mode 100644
-> index 0000000..37a6a63
-> --- /dev/null
-> +++ b/s390x/asm/macros.S
-> @@ -0,0 +1,77 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * s390x assembly macros
-> + *
-> + * Copyright (c) 2017 Red Hat Inc
-> + * Copyright (c) 2020 IBM Corp.
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + *  David Hildenbrand <david@redhat.com>
-> + */
-> +#include <asm/asm-offsets.h>
-> +	.macro SAVE_REGS
-> +	/* save grs 0-15 */
-> +	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
-> +	/* save crs 0-15 */
-> +	stctg	%c0, %c15, GEN_LC_SW_INT_CRS
-> +	/* load a cr0 that has the AFP control bit which enables all
-> FPRs */
-> +	larl	%r1, initial_cr0
-> +	lctlg	%c0, %c0, 0(%r1)
-> +	/* save fprs 0-15 + fpc */
-> +	la	%r1, GEN_LC_SW_INT_FPRS
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	std	\i, \i * 8(%r1)
-> +	.endr
-> +	stfpc	GEN_LC_SW_INT_FPC
-> +	.endm
-> +
-> +	.macro RESTORE_REGS
-> +	/* restore fprs 0-15 + fpc */
-> +	la	%r1, GEN_LC_SW_INT_FPRS
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	ld	\i, \i * 8(%r1)
-> +	.endr
-> +	lfpc	GEN_LC_SW_INT_FPC
-> +	/* restore crs 0-15 */
-> +	lctlg	%c0, %c15, GEN_LC_SW_INT_CRS
-> +	/* restore grs 0-15 */
-> +	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
-> +	.endm
-> +
-> +/* Save registers on the stack (r15), so we can have stacked
-> interrupts. */
-> +	.macro SAVE_REGS_STACK
-> +	/* Allocate a stack frame for 15 general registers */
-> +	slgfi   %r15, 15 * 8
-> +	/* Store registers r0 to r14 on the stack */
-> +	stmg    %r0, %r14, 0(%r15)
-> +	/* Allocate a stack frame for 16 floating point registers */
-> +	/* The size of a FP register is the size of an double word */
-> +	slgfi   %r15, 16 * 8
-> +	/* Save fp register on stack: offset to SP is multiple of
-> reg number */
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	std	\i, \i * 8(%r15)
-> +	.endr
-> +	/* Save fpc, but keep stack aligned on 64bits */
-> +	slgfi   %r15, 8
-> +	efpc	%r0
-> +	stg	%r0, 0(%r15)
-> +	.endm
-> +
-> +/* Restore the register in reverse order */
-> +	.macro RESTORE_REGS_STACK
-> +	/* Restore fpc */
-> +	lfpc	0(%r15)
-> +	algfi	%r15, 8
-> +	/* Restore fp register from stack: SP still where it was
-> left */
-> +	/* and offset to SP is a multiple of reg number */
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	ld	\i, \i * 8(%r15)
-> +	.endr
-> +	/* Now that we're done, rewind the stack pointer by 16
-> double word */
-> +	algfi   %r15, 16 * 8
-> +	/* Load the registers from stack */
-> +	lmg     %r0, %r14, 0(%r15)
-> +	/* Rewind the stack by 15 double word */
-> +	algfi   %r15, 15 * 8
-> +	.endm
+Ok.
+
+> >  =20
+> >> - some devices may actually require writes to be done in a large chunk
+> >> =C2=A0=C2=A0 instead of being broken up (is that a strict subset of th=
+e devices
+> >> =C2=A0=C2=A0 above?) =20
+> >=20
+> > Yes, this is specific to ISM devices, which are always a relaxed=20
+> > alignment/length device.
+> >=20
+> > The inverse is an interesting question though (relaxed alignment device=
+s=20
+> > that are not ISM, which you've posed as a possible future extension for=
+=20
+> > emulated devices).=C2=A0 I'm not sure that any (real devices) exist whe=
+re=20
+> > (relaxed_alignment && !ism), but 'what if' -- I guess the right approac=
+h=20
+> > would mean additional code in QEMU to handle relaxed alignment for the=
+=20
+> > vfio mmio path as well (seen as pcistb_default in my qemu patchset) and=
+=20
+> > being very specific in QEMU to only enable the region for an ism device=
+. =20
+>=20
+> Let me be more precise there...  It would be additional code to handle=20
+> relaxed alignment for the default pcistb path (pcistb_default) which=20
+> would include BOTH emulated devices (should we ever surface the relaxed=20
+> alignment CLP bit and the guest kernel honor it) as well as any s390x=20
+> vfio-pci device that doesn't use this new I/O region described here.
+
+Understood. Not sure if it is useful, but the important part is that we
+could extend it if we wanted.
+
+>=20
+> >  =20
+> >> - some devices do not support the new MIO instructions (is that a
+> >> =C2=A0=C2=A0 subset of the relaxed alignment devices? I'm not familiar=
+ with the
+> >> =C2=A0=C2=A0 MIO instructions)
+> >> =20
+> >=20
+> > The non-MIO requirement is again specific to ISM, which is a subset of=
+=20
+> > the relaxed alignment devices.=C2=A0 In this case, the requirement is n=
+ot=20
+> > limited to PCISTB, and that's why PCILG is also included here.=C2=A0 Th=
+e ISM=20
+> > driver does not use PCISTG, and the only PCISTG instructions coming fro=
+m=20
+> > the guest against an ISM device would be against the config space and=20
+> > those are OK to go through vfio still; so what was provided via the=20
+> > region is effectively the bare-minimum requirement to allow ISM to=20
+> > function properly in the guest.
+> >  =20
+> >> The patchsets introduce a new region that (a) is used by QEMU to submit
+> >> writes in one go, and (b) makes sure to call into the non-MIO
+> >> instructions directly; it's basically killing two birds with one stone
+> >> for ISM devices. Are these two requirements (large writes and non-MIO)
+> >> always going hand-in-hand, or is ISM just an odd device? =20
+> >=20
+> > I would say that ISM is definitely a special-case device, even just=20
+> > looking at the way it's implemented in the base kernel (interacting=20
+> > directly with the s390 kernel PCI layer in order to avoid use of MIO=20
+> > instructions -- no other driver does this).=C2=A0 But that said, having=
+ the=20
+> > two requirements hand-in-hand I think is not bad, though -- This=20
+> > approach ensures the specific instruction the guest wanted (or in this=
+=20
+> > case, needed) is actually executed on the underlying host.
+
+The basic question I have is whether it makes sense to specialcase the
+ISM device (can we even find out that we're dealing with an ISM device
+here?) to force the non-MIO instructions, as it is just a device with
+some special requirements, or tie non-MIO to relaxed alignment. (Could
+relaxed alignment devices in theory be served by MIO instructions as
+well?)
+
+Another thing that came to my mind is whether we consider the guest to
+be using a pci device and needing weird instructions to do that because
+it's on s390, or whether it is issuing instructions for a device that
+happens to be a pci device (sorry if that sounds a bit meta :)
+
+> >=20
+> > That said, the ability to re-use the large write for other devices woul=
+d=20
+> > be nice -- but as hinted in the QEMU cover letter, this approach only=20
+> > works because ISM does not support MSI-X; using this approach for=20
+> > MSI-X-enabled devices breaks the MSI-X masking that vfio-pci does in=20
+> > QEMU (I tried an approach that used this region approach for all 3=20
+> > instructions as a test, PCISTG/PCISTB/PCILG, and threw it against mlx -=
+-=20
+> > any writes against an MSI-X enabled bar will miss the msi-x notifiers=20
+> > since we aren't performing memory operations against the typical=20
+> > vfio-pci bar).
+
+Ugh. I wonder why ISM is so different from anything else.
+
+> >  =20
+> >>
+> >> If there's an expectation that the new region will always use the
+> >> non-MIO instructions (in addition to the changed write handling), it
+> >> should be noted in the description for the region as well.
+> >> =20
+> >=20
+> > Yes, this is indeed the expectation; I can clarify that.
+> >  =20
+
+Thanks!
 
