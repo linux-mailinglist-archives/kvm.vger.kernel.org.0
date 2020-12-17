@@ -2,218 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5F752DD489
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 16:47:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDB652DD4E7
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 17:08:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728672AbgLQPqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 10:46:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51394 "EHLO
+        id S1729684AbgLQQFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 11:05:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34682 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728131AbgLQPqI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 10:46:08 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BHFWkHO105623;
-        Thu, 17 Dec 2020 10:45:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
+        by vger.kernel.org with ESMTP id S1729641AbgLQQFg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 11:05:36 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BHG1inK102952;
+        Thu, 17 Dec 2020 11:04:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=SrSnq+Lrp7lcCITWSoGuDUVXJL8pnv1ZhaLX/A4f3Ls=;
- b=ZbHeRtrglZO7HSyskmLWJSZgLaQeHLxc6HmPNZLplQPijqabufQ3iZZAXypFyDR2JNIq
- njSjGpSA3MhLWRsgloNVZ0uEL94cwYA6At6F2IdF57MsVuMPam5XB5JqjEGHZUxwhP0q
- jHlFPjU+vpAmfAdV7440sSKQBu9/WPGa/NtW3Lahg5+70g/NGfrqZsD3C/ZI3NNl8am7
- dcAYUtP+Qlt88r1JMUqiciPKAcHzfIamhczV6ulaU7p24rXMdb3PpOqeccxbF57b3RvV
- +IZCIxUwowniSFqW4B6rGuTB/SWcvXgFbwmPJXnYkNedcRIW5ai5H2FJWFesvqsRnQTK yg== 
+ bh=rR3knOmdu5EqQMyS8ET4W6d0ifU5WsrbYgh6NGimjG4=;
+ b=WbvkJdM+Pn+gmwAK8lXRn3GXaGF1/NIyw14jYnMa+MiYKVsjr+Ja6OsIjVoKVSgYSqfJ
+ anqzt6qyHo7Ol8vWxxuU6IoRLV46rAhM8c9E5TeNsN8FdQDULJkq5vdIfh+YKeQOL+v6
+ wn8cf2Bu3efERlP1/WbrR9yQU8fTRhp4EXL7geVlFdsZ+veM5OUAEyjgmrXCnfnr2pnk
+ 0Xf86ZThVii1IdhdNdAQOZNqmai45iscsOfHLAHPSEnPXWBG5sXQsYisljPsMQ63bZ59
+ Z7fvpBI4xarZSe4m0Ve0C/wN3zGoaNEw1MfipTDK6DIKBTK5sLC5OLAYGk31Yu5+6B2X DA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35g8prb92a-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35g9uthfqh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 10:45:27 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BHFWwIG106940;
-        Thu, 17 Dec 2020 10:45:27 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35g8prb91b-1
+        Thu, 17 Dec 2020 11:04:55 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BHG1vYM104302;
+        Thu, 17 Dec 2020 11:04:54 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35g9uthfp7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 10:45:27 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BHFSDGu015195;
-        Thu, 17 Dec 2020 15:45:25 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 35fbp5hjdy-1
+        Thu, 17 Dec 2020 11:04:54 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BHG23Du013864;
+        Thu, 17 Dec 2020 16:04:53 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma03wdc.us.ibm.com with ESMTP id 35cng9rq7v-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 15:45:25 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BHFjMnE35651930
+        Thu, 17 Dec 2020 16:04:53 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BHG4o8l17695054
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Dec 2020 15:45:22 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2EA7E42049;
-        Thu, 17 Dec 2020 15:45:22 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C16E84203F;
-        Thu, 17 Dec 2020 15:45:21 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.181.71])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Dec 2020 15:45:21 +0000 (GMT)
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20201211100039.63597-1-frankja@linux.ibm.com>
- <20201211100039.63597-6-frankja@linux.ibm.com>
- <0bb4934a-23b6-bf4f-2742-3892c17c81d0@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 5/8] s390x: sie: Add SIE to lib
-Message-ID: <365acc5e-0f57-ed9e-cee3-b321827fd2b6@linux.ibm.com>
-Date:   Thu, 17 Dec 2020 16:45:21 +0100
+        Thu, 17 Dec 2020 16:04:50 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EF311136063;
+        Thu, 17 Dec 2020 16:04:49 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D5A5813604F;
+        Thu, 17 Dec 2020 16:04:48 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.143.229])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 17 Dec 2020 16:04:48 +0000 (GMT)
+Subject: Re: [RFC 0/4] vfio-pci/zdev: Fixing s390 vfio-pci ISM support
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
+ <20201210133306.70d1a556.cohuck@redhat.com>
+ <ce9d4ef2-2629-59b7-99ed-4c8212cb004f@linux.ibm.com>
+ <20201211153501.7767a603.cohuck@redhat.com>
+ <6c9528f3-f012-ba15-1d68-7caefb942356@linux.ibm.com>
+ <a974c5cc-fc42-7bf0-66a6-df095da7105f@linux.ibm.com>
+ <20201217135919.46d5c43f.cohuck@redhat.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <f9f312d8-1948-d5b8-22fe-82f1975c8a18@linux.ibm.com>
+Date:   Thu, 17 Dec 2020 11:04:48 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <0bb4934a-23b6-bf4f-2742-3892c17c81d0@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20201217135919.46d5c43f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2020-12-17_10:2020-12-15,2020-12-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- suspectscore=0 adultscore=0 impostorscore=0 mlxscore=0 malwarescore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 clxscore=1015
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ mlxlogscore=999 bulkscore=0 impostorscore=0 mlxscore=0 malwarescore=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=0 spamscore=0
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012170106
+ engine=8.12.0-2009150000 definitions=main-2012170108
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/17/20 10:37 AM, Thomas Huth wrote:
-> On 11/12/2020 11.00, Janosch Frank wrote:
->> This commit adds the definition of the SIE control block struct and
->> the assembly to execute SIE and save/restore guest registers.
+On 12/17/20 7:59 AM, Cornelia Huck wrote:
+> On Fri, 11 Dec 2020 10:04:43 -0500
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> 
+>> On 12/11/20 10:01 AM, Matthew Rosato wrote:
+>>> On 12/11/20 9:35 AM, Cornelia Huck wrote:
+> 
+>>>> Let me summarize this to make sure I understand this new region
+>>>> correctly:
+>>>>
+>>>> - some devices may have relaxed alignment/length requirements for
+>>>>     pcistb (and friends?)
+>>>
+>>> The relaxed alignment bit is really specific to PCISTB behavior, so the
+>>> "and friends" doesn't apply there.
+> 
+> Ok.
+> 
+>>>    
+>>>> - some devices may actually require writes to be done in a large chunk
+>>>>     instead of being broken up (is that a strict subset of the devices
+>>>>     above?)
+>>>
+>>> Yes, this is specific to ISM devices, which are always a relaxed
+>>> alignment/length device.
+>>>
+>>> The inverse is an interesting question though (relaxed alignment devices
+>>> that are not ISM, which you've posed as a possible future extension for
+>>> emulated devices).  I'm not sure that any (real devices) exist where
+>>> (relaxed_alignment && !ism), but 'what if' -- I guess the right approach
+>>> would mean additional code in QEMU to handle relaxed alignment for the
+>>> vfio mmio path as well (seen as pcistb_default in my qemu patchset) and
+>>> being very specific in QEMU to only enable the region for an ism device.
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  lib/s390x/asm-offsets.c  |  13 +++
->>  lib/s390x/asm/arch_def.h |   7 ++
->>  lib/s390x/interrupt.c    |   7 ++
->>  lib/s390x/sie.h          | 197 +++++++++++++++++++++++++++++++++++++++
->>  s390x/asm/lib.S          |  56 +++++++++++
->>  5 files changed, 280 insertions(+)
->>  create mode 100644 lib/s390x/sie.h
+>> Let me be more precise there...  It would be additional code to handle
+>> relaxed alignment for the default pcistb path (pcistb_default) which
+>> would include BOTH emulated devices (should we ever surface the relaxed
+>> alignment CLP bit and the guest kernel honor it) as well as any s390x
+>> vfio-pci device that doesn't use this new I/O region described here.
+> 
+> Understood. Not sure if it is useful, but the important part is that we
+> could extend it if we wanted.
+> 
 >>
->> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
->> index ee94ed3..35697de 100644
->> --- a/lib/s390x/asm-offsets.c
->> +++ b/lib/s390x/asm-offsets.c
->> @@ -8,6 +8,7 @@
->>  #include <libcflat.h>
->>  #include <kbuild.h>
->>  #include <asm/arch_def.h>
->> +#include <sie.h>
->>  
->>  int main(void)
->>  {
->> @@ -69,6 +70,18 @@ int main(void)
->>  	OFFSET(GEN_LC_ARS_SA, lowcore, ars_sa);
->>  	OFFSET(GEN_LC_CRS_SA, lowcore, crs_sa);
->>  	OFFSET(GEN_LC_PGM_INT_TDB, lowcore, pgm_int_tdb);
->> +	OFFSET(__SF_GPRS, stack_frame, gprs);
->> +	OFFSET(__SF_SIE_CONTROL, stack_frame, empty1[0]);
->> +	OFFSET(__SF_SIE_SAVEAREA, stack_frame, empty1[1]);
->> +	OFFSET(__SF_SIE_REASON, stack_frame, empty1[2]);
->> +	OFFSET(__SF_SIE_FLAGS, stack_frame, empty1[3]);
->> +	OFFSET(SIE_SAVEAREA_HOST_GRS, vm_save_area, host.grs[0]);
->> +	OFFSET(SIE_SAVEAREA_HOST_FPRS, vm_save_area, host.fprs[0]);
->> +	OFFSET(SIE_SAVEAREA_HOST_FPC, vm_save_area, host.fpc);
->> +	OFFSET(SIE_SAVEAREA_GUEST_GRS, vm_save_area, guest.grs[0]);
->> +	OFFSET(SIE_SAVEAREA_GUEST_FPRS, vm_save_area, guest.fprs[0]);
->> +	OFFSET(SIE_SAVEAREA_GUEST_FPC, vm_save_area, guest.fpc);
->> +
->>  
->>  	return 0;
->>  }
->> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
->> index f3ab830..5a13cf2 100644
->> --- a/lib/s390x/asm/arch_def.h
->> +++ b/lib/s390x/asm/arch_def.h
->> @@ -8,6 +8,13 @@
->>  #ifndef _ASM_S390X_ARCH_DEF_H_
->>  #define _ASM_S390X_ARCH_DEF_H_
->>  
->> +struct stack_frame {
->> +	unsigned long back_chain;
->> +	unsigned long empty1[5];
->> +	unsigned long gprs[10];
->> +	unsigned int  empty2[8];
+>>>    
+>>>> - some devices do not support the new MIO instructions (is that a
+>>>>     subset of the relaxed alignment devices? I'm not familiar with the
+>>>>     MIO instructions)
+>>>>   
+>>>
+>>> The non-MIO requirement is again specific to ISM, which is a subset of
+>>> the relaxed alignment devices.  In this case, the requirement is not
+>>> limited to PCISTB, and that's why PCILG is also included here.  The ISM
+>>> driver does not use PCISTG, and the only PCISTG instructions coming from
+>>> the guest against an ISM device would be against the config space and
+>>> those are OK to go through vfio still; so what was provided via the
+>>> region is effectively the bare-minimum requirement to allow ISM to
+>>> function properly in the guest.
+>>>    
+>>>> The patchsets introduce a new region that (a) is used by QEMU to submit
+>>>> writes in one go, and (b) makes sure to call into the non-MIO
+>>>> instructions directly; it's basically killing two birds with one stone
+>>>> for ISM devices. Are these two requirements (large writes and non-MIO)
+>>>> always going hand-in-hand, or is ISM just an odd device?
+>>>
+>>> I would say that ISM is definitely a special-case device, even just
+>>> looking at the way it's implemented in the base kernel (interacting
+>>> directly with the s390 kernel PCI layer in order to avoid use of MIO
+>>> instructions -- no other driver does this).  But that said, having the
+>>> two requirements hand-in-hand I think is not bad, though -- This
+>>> approach ensures the specific instruction the guest wanted (or in this
+>>> case, needed) is actually executed on the underlying host.
 > 
-> I think you can drop empty2 ?
+> The basic question I have is whether it makes sense to specialcase the
+> ISM device (can we even find out that we're dealing with an ISM device
+> here?) to force the non-MIO instructions, as it is just a device with
 
-Since I don't need to allocate it I could also remove the gprs. We only
-use empty1 right now as far as I know.
+Yes, with the addition of the CLP data passed from the host via vfio 
+capabilities, we can tell this is an ISM device specifically via the 
+'pft' field in VFOI_DEVICE_INFO_CAP_ZPCI_BASE.  We don't actually 
+surface that field to the guest itself in the Q PCI FN clp rsponse (has 
+to do with Function Measurement Block requirements) but we can certainly 
+use that information in QEMU to restrict this behavior to only ISM devices.
 
-> 
->> +};
->> +
->>  struct psw {
->>  	uint64_t	mask;
->>  	uint64_t	addr;
->> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
->> index bac8862..3858096 100644
->> --- a/lib/s390x/interrupt.c
->> +++ b/lib/s390x/interrupt.c
->> @@ -11,6 +11,7 @@
->>  #include <asm/barrier.h>
->>  #include <sclp.h>
->>  #include <interrupt.h>
->> +#include <sie.h>
->>  
->>  static bool pgm_int_expected;
->>  static bool ext_int_expected;
->> @@ -57,6 +58,12 @@ void register_pgm_cleanup_func(void (*f)(void))
->>  
->>  static void fixup_pgm_int(void)
->>  {
->> +	/* If we have an error on SIE we directly move to sie_exit */
->> +	if (lc->pgm_old_psw.addr >= (uint64_t)&sie_entry &&
->> +	    lc->pgm_old_psw.addr <= (uint64_t)&sie_entry + 10) {
-> 
-> Can you please explain that "magic" number 10 in the comment?
+> some special requirements, or tie non-MIO to relaxed alignment. (Could
+> relaxed alignment devices in theory be served by MIO instructions as
+> well?)
 
-I think using sie_exit would make more sense than explaining that
-sie_entry + 10 bytes is the location of sie_exit.
-
+In practice, I think there are none today, but per the architecture it 
+IS possible to have relaxed alignment devices served by MIO 
+instructions, so we shouldn't rely on that bit alone as I'm doing in 
+this RFC.  I think instead relying on the pft value as I mention above 
+is what we have to do.
 
 > 
->> +		lc->pgm_old_psw.addr = (uint64_t)&sie_exit;
->> +	}
->> +
->>  	switch (lc->pgm_int_code) {
->>  	case PGM_INT_CODE_PRIVILEGED_OPERATION:
->>  		/* Normal operation is in supervisor state, so this exception
->> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
->> new file mode 100644
->> index 0000000..b00bdf4
->> --- /dev/null
->> +++ b/lib/s390x/sie.h
-> [...]
->> +extern u64 sie_entry;
->> +extern u64 sie_exit;
+> Another thing that came to my mind is whether we consider the guest to
+> be using a pci device and needing weird instructions to do that because
+> it's on s390, or whether it is issuing instructions for a device that
+> happens to be a pci device (sorry if that sounds a bit meta :)
 > 
-> Maybe better:
-> 
-> extern uint16_t sie_entry[];
-> extern uint16_t sie_exit[];
-> 
-> ?
-> 
-> Or even:
-> 
-> extern void sie_entry();
-> extern void sie_exit();
 
-Definitely better since I don't return values in sie_exit anymore (I
-used to before).
+Typically, I'd classify things as the former but I think ISM seems more 
+like the latter -- To me, ISM seems like less a classic PCI device and 
+more a device that happens to be using s390 PCI interfaces to accomplish 
+its goal.  But it's probably more of a case of this particular device 
+(and it's driver) are s390-specific and therefore built with the unique 
+s390 interface in-mind (and in fact invokes it directly rather than 
+through the general PCI layer), rather than fitting the typical PCI 
+device architecture on top of the s390 interface.
 
+
+>>>
+>>> That said, the ability to re-use the large write for other devices would
+>>> be nice -- but as hinted in the QEMU cover letter, this approach only
+>>> works because ISM does not support MSI-X; using this approach for
+>>> MSI-X-enabled devices breaks the MSI-X masking that vfio-pci does in
+>>> QEMU (I tried an approach that used this region approach for all 3
+>>> instructions as a test, PCISTG/PCISTB/PCILG, and threw it against mlx --
+>>> any writes against an MSI-X enabled bar will miss the msi-x notifiers
+>>> since we aren't performing memory operations against the typical
+>>> vfio-pci bar).
 > 
-> ?
+> Ugh. I wonder why ISM is so different from anything else.
 > 
->  Thomas
+
+...  I've asked myself that alot lately :)
+
+>>>    
+>>>>
+>>>> If there's an expectation that the new region will always use the
+>>>> non-MIO instructions (in addition to the changed write handling), it
+>>>> should be noted in the description for the region as well.
+>>>>   
+>>>
+>>> Yes, this is indeed the expectation; I can clarify that.
+>>>    
+> 
+> Thanks!
 > 
 
