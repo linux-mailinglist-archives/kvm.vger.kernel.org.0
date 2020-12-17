@@ -2,177 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5F522DCC6C
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 07:22:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9FAE2DCCF5
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 08:28:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726384AbgLQGWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 01:22:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46008 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725921AbgLQGWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Dec 2020 01:22:07 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C34C0617A7
-        for <kvm@vger.kernel.org>; Wed, 16 Dec 2020 22:21:27 -0800 (PST)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4CxMMT2yg5z9sW4; Thu, 17 Dec 2020 17:21:25 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1608186085;
-        bh=YdCuD3Vy9G1qMy5stSqn/dM/yhe8CwLet1I0HgO67Rw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iBbMpNbC3XPPzWAhHsMoBhBreH3Kbth7scDIaAZMhmxLv1i2o4/nd9PPeSgKbAJcy
-         OVKpptPfSrTTnXgRvY2fEEAgN3Ls4cy36Y0KvIJm9O4KyoljhW2Ytla8cazRS+DgDA
-         xGVEhZejg7koVC2Ph1pj5gVDlabbCTDU/A0XHy9U=
-Date:   Thu, 17 Dec 2020 17:21:16 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        brijesh.singh@amd.com, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
-        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
-        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com
-Subject: Re: [for-6.0 v5 00/13] Generalize memory encryption models
-Message-ID: <20201217062116.GK310465@yekko.fritz.box>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
- <f2419585-4e39-1f3d-9e38-9095e26a6410@de.ibm.com>
- <20201204140205.66e205da.cohuck@redhat.com>
- <20201204130727.GD2883@work-vm>
- <20201204141229.688b11e4.cohuck@redhat.com>
- <20201208025728.GD2555@yekko.fritz.box>
- <20201208134308.2afa0e3e.cohuck@redhat.com>
+        id S1726158AbgLQH1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 02:27:31 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:4093 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726470AbgLQH12 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 02:27:28 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5fdb08380000>; Wed, 16 Dec 2020 23:26:48 -0800
+Received: from mtl-vdi-166.wap.labs.mlnx (172.20.145.6) by
+ HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Thu, 17 Dec 2020 07:26:26 +0000
+Date:   Thu, 17 Dec 2020 09:26:22 +0200
+From:   Eli Cohen <elic@nvidia.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     <mst@redhat.com>, <eperezma@redhat.com>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <lulu@redhat.com>, <eli@mellanox.com>, <lingshan.zhu@intel.com>,
+        <rob.miller@broadcom.com>, <stefanha@redhat.com>,
+        <sgarzare@redhat.com>
+Subject: Re: [PATCH 00/21] Control VQ support in vDPA
+Message-ID: <20201217072622.GA183776@mtl-vdi-166.wap.labs.mlnx>
+References: <20201216064818.48239-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="mGCtrYeZ202LI9ZG"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20201208134308.2afa0e3e.cohuck@redhat.com>
+In-Reply-To: <20201216064818.48239-1-jasowang@redhat.com>
+User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1608190008; bh=AeN8b9KPyrD/VVYP2KcQSRMHK50hVuE+3vlPQDmcSQc=;
+        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+         Content-Type:Content-Disposition:In-Reply-To:User-Agent:
+         X-Originating-IP:X-ClientProxiedBy;
+        b=asq6UKVoAxwr6HevCOVogu4mA3BIipaPZN3JWPg7N17CyrkMxxEYmvjdvkZrNgy48
+         nkk8rvftwca0dCa7sKpQSKodMw9KZdLsnlPA124yx9HoZwFWbHsYXri/hiXP/kn31J
+         hYQqiUrT+3AsCh8mwOJu5L4eFDwBx+mWYwGB2n8954QIEK6zV7adWvEQrre1MgHqYO
+         CoM7dz0h9CXoHNrRc9Dv88XDD/yIQY/1PirSTa6y0xb3v8wkPk9bGWbzh0sdbOIP6u
+         aEkM1/a0K8vPdcOjx6ql+UiBFHChHI6E/2pZl5AbemM/UqJu916aQwhEPqGWgtRCgL
+         ecKaYbVIhls+Q==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Dec 16, 2020 at 02:47:57PM +0800, Jason Wang wrote:
 
---mGCtrYeZ202LI9ZG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Jason,
+I saw the patchset and will start reviewing it starting Dec 27. I am out
+of office next week.
 
-On Tue, Dec 08, 2020 at 01:43:08PM +0100, Cornelia Huck wrote:
-> On Tue, 8 Dec 2020 13:57:28 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Fri, Dec 04, 2020 at 02:12:29PM +0100, Cornelia Huck wrote:
-> > > On Fri, 4 Dec 2020 13:07:27 +0000
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >  =20
-> > > > * Cornelia Huck (cohuck@redhat.com) wrote: =20
-> > > > > On Fri, 4 Dec 2020 09:06:50 +0100
-> > > > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> > > > >    =20
-> > > > > > On 04.12.20 06:44, David Gibson wrote:   =20
-> > > > > > > A number of hardware platforms are implementing mechanisms wh=
-ereby the
-> > > > > > > hypervisor does not have unfettered access to guest memory, i=
-n order
-> > > > > > > to mitigate the security impact of a compromised hypervisor.
-> > > > > > >=20
-> > > > > > > AMD's SEV implements this with in-cpu memory encryption, and =
-Intel has
-> > > > > > > its own memory encryption mechanism.  POWER has an upcoming m=
-echanism
-> > > > > > > to accomplish this in a different way, using a new memory pro=
-tection
-> > > > > > > level plus a small trusted ultravisor.  s390 also has a prote=
-cted
-> > > > > > > execution environment.
-> > > > > > >=20
-> > > > > > > The current code (committed or draft) for these features has =
-each
-> > > > > > > platform's version configured entirely differently.  That doe=
-sn't seem
-> > > > > > > ideal for users, or particularly for management layers.
-> > > > > > >=20
-> > > > > > > AMD SEV introduces a notionally generic machine option
-> > > > > > > "machine-encryption", but it doesn't actually cover any cases=
- other
-> > > > > > > than SEV.
-> > > > > > >=20
-> > > > > > > This series is a proposal to at least partially unify configu=
-ration
-> > > > > > > for these mechanisms, by renaming and generalizing AMD's
-> > > > > > > "memory-encryption" property.  It is replaced by a
-> > > > > > > "securable-guest-memory" property pointing to a platform spec=
-ific     =20
-> > > > > >=20
-> > > > > > Can we do "securable-guest" ?
-> > > > > > s390x also protects registers and integrity. memory is only one=
- piece
-> > > > > > of the puzzle and what we protect might differ from platform to=
-=20
-> > > > > > platform.
-> > > > > >    =20
-> > > > >=20
-> > > > > I agree. Even technologies that currently only do memory encrypti=
-on may
-> > > > > be enhanced with more protections later.   =20
-> > > >=20
-> > > > There's already SEV-ES patches onlist for this on the SEV side.
-> > > >=20
-> > > > <sigh on haggling over the name>
-> > > >=20
-> > > > Perhaps 'confidential guest' is actually what we need, since the
-> > > > marketing folks seem to have started labelling this whole idea
-> > > > 'confidential computing'. =20
-> >=20
-> > That's not a bad idea, much as I usually hate marketing terms.  But it
-> > does seem to be becoming a general term for this style of thing, and
-> > it doesn't overlap too badly with other terms ("secure" and
-> > "protected" are also used for hypervisor-from-guest and
-> > guest-from-guest protection).
-> >=20
-> > > It's more like a 'possibly confidential guest', though. =20
-> >=20
-> > Hmm.  What about "Confidential Guest Facility" or "Confidential Guest
-> > Mechanism"?  The implication being that the facility is there, whether
-> > or not the guest actually uses it.
-> >=20
->=20
-> "Confidential Guest Enablement"? The others generally sound fine to me
-> as well, though; not sure if "Facility" might be a bit confusing, as
-> that term is already a bit overloaded.
-
-Well, "facility" is a bit overloaded, but IMO "enablement" is even
-more so.  I think I'll go with "confidential guest support" in the
-next spin.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---mGCtrYeZ202LI9ZG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/a+NkACgkQbDjKyiDZ
-s5LepRAAvDUtft5znuifkMn2ShJlgnkETHq9L4+yDdDH8eke4VQ+qo9rNcFua2ZC
-JJXp0JtkHbffpncC6ELcedewIf+iLlccfNvnkdK1weRbzZJfLPL2PTVbmmNbbqVw
-Ms2yLpF/5wRHBbYaEAs3iEs8T/0R00Z7R959/UlHhQjtQ/AdJJA1Sy006v7GCxXN
-ui44bSpNVrJYkEZ5mNb+nSXXF2Y3U9c8imSidp5AJhkOoH0H0RfmJuwU/Yjtu0dv
-QP+ELz1gga4gOmZoHx6GbY2jWF1FgD51O2HgWn7q7Pj0PE1myNRQWa4xvLazScwa
-9uqhrYrs8VKVxQUMG2t+rEz/JoP4sK86lCr7GCWzJG2DS5yDnhBznDKmwTklldPH
-ovdA8ExYp1AE9XXDcLe+hNv2UbjL61FFz5Ot3wYKEL6LOKZhsTydW/YR5z4Txg/j
-MEY3dIGMT5GAVdnPvpKzIcuHMSpRqGbYY6NYuJzFy9Lul0ZQEodEnkwtLkvJ5COH
-mHBuiwwUQrflTCx64oDQsF4dgzRfTqese6lrTZOOzSLTd1XSuMgvjhfrWP/6FPk/
-eb8E5lFmsKA7G+GOkfC9SqwjgIEUvUQhyzLUXHCtSt9JM/m9cW2sdNBSUkBJ5mV0
-8Gt21ST1FmgptBZDUZsdADzd0G0sAw6KFWTPHCnGPypcxggZBKg=
-=Vq8q
------END PGP SIGNATURE-----
-
---mGCtrYeZ202LI9ZG--
+> Hi All:
+> 
+> This series tries to add the support for control virtqueue in vDPA.
+> 
+> Control virtqueue is used by networking device for accepting various
+> commands from the driver. It's a must to support multiqueue and other
+> configurations.
+> 
+> When used by vhost-vDPA bus driver for VM, the control virtqueue
+> should be shadowed via userspace VMM (Qemu) instead of being assigned
+> directly to Guest. This is because Qemu needs to know the device state
+> in order to start and stop device correctly (e.g for Live Migration).
+> 
+> This requies to isolate the memory mapping for control virtqueue
+> presented by vhost-vDPA to prevent guest from accesing it directly.
+> 
+> To achieve this, vDPA introduce two new abstractions:
+> 
+> - address space: identified through address space id (ASID) and a set
+>                  of memory mapping in maintained
+> - virtqueue group: the minimal set of virtqueues that must share an
+>                  address space
+> 
+> Device needs to advertise the following attributes to vDPA:
+> 
+> - the number of address spaces supported in the device
+> - the number of virtqueue groups supported in the device
+> - the mappings from a specific virtqueue to its virtqueue groups
+> 
+> The mappings from virtqueue to virtqueue groups is fixed and defined
+> by vDPA device driver. E.g:
+> 
+> - For the device that has hardware ASID support, it can simply
+>   advertise a per virtqueue virtqueue group.
+> - For the device that does not have hardware ASID support, it can
+>   simply advertise a single virtqueue group that contains all
+>   virtqueues. Or if it wants a software emulated control virtqueue, it
+>   can advertise two virtqueue groups, one is for cvq, another is for
+>   the rest virtqueues.
+> 
+> vDPA also allow to change the association between virtqueue group and
+> address space. So in the case of control virtqueue, userspace
+> VMM(Qemu) may use a dedicated address space for the control virtqueue
+> group to isolate the memory mapping.
+> 
+> The vhost/vhost-vDPA is also extend for the userspace to:
+> 
+> - query the number of virtqueue groups and address spaces supported by
+>   the device
+> - query the virtqueue group for a specific virtqueue
+> - assocaite a virtqueue group with an address space
+> - send ASID based IOTLB commands
+> 
+> This will help userspace VMM(Qemu) to detect whether the control vq
+> could be supported and isolate memory mappings of control virtqueue
+> from the others.
+> 
+> To demonstrate the usage, vDPA simulator is extended to support
+> setting MAC address via a emulated control virtqueue.
+> 
+> Please review.
+> 
+> Changes since RFC:
+> 
+> - tweak vhost uAPI documentation
+> - switch to use device specific IOTLB really in patch 4
+> - tweak the commit log
+> - fix that ASID in vhost is claimed to be 32 actually but 16bit
+>   actually
+> - fix use after free when using ASID with IOTLB batching requests
+> - switch to use Stefano's patch for having separated iov
+> - remove unused "used_as" variable
+> - fix the iotlb/asid checking in vhost_vdpa_unmap()
+> 
+> Thanks
+> 
+> Jason Wang (20):
+>   vhost: move the backend feature bits to vhost_types.h
+>   virtio-vdpa: don't set callback if virtio doesn't need it
+>   vhost-vdpa: passing iotlb to IOMMU mapping helpers
+>   vhost-vdpa: switch to use vhost-vdpa specific IOTLB
+>   vdpa: add the missing comment for nvqs in struct vdpa_device
+>   vdpa: introduce virtqueue groups
+>   vdpa: multiple address spaces support
+>   vdpa: introduce config operations for associating ASID to a virtqueue
+>     group
+>   vhost_iotlb: split out IOTLB initialization
+>   vhost: support ASID in IOTLB API
+>   vhost-vdpa: introduce asid based IOTLB
+>   vhost-vdpa: introduce uAPI to get the number of virtqueue groups
+>   vhost-vdpa: introduce uAPI to get the number of address spaces
+>   vhost-vdpa: uAPI to get virtqueue group id
+>   vhost-vdpa: introduce uAPI to set group ASID
+>   vhost-vdpa: support ASID based IOTLB API
+>   vdpa_sim: advertise VIRTIO_NET_F_MTU
+>   vdpa_sim: factor out buffer completion logic
+>   vdpa_sim: filter destination mac address
+>   vdpasim: control virtqueue support
+> 
+> Stefano Garzarella (1):
+>   vdpa_sim: split vdpasim_virtqueue's iov field in out_iov and in_iov
+> 
+>  drivers/vdpa/ifcvf/ifcvf_main.c   |   9 +-
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c |  11 +-
+>  drivers/vdpa/vdpa.c               |   8 +-
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c  | 292 ++++++++++++++++++++++++------
+>  drivers/vhost/iotlb.c             |  23 ++-
+>  drivers/vhost/vdpa.c              | 246 ++++++++++++++++++++-----
+>  drivers/vhost/vhost.c             |  23 ++-
+>  drivers/vhost/vhost.h             |   4 +-
+>  drivers/virtio/virtio_vdpa.c      |   2 +-
+>  include/linux/vdpa.h              |  42 ++++-
+>  include/linux/vhost_iotlb.h       |   2 +
+>  include/uapi/linux/vhost.h        |  25 ++-
+>  include/uapi/linux/vhost_types.h  |  10 +-
+>  13 files changed, 561 insertions(+), 136 deletions(-)
+> 
+> -- 
+> 2.25.1
+> 
