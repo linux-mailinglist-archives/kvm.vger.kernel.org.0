@@ -2,217 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91B7A2DCB4D
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 04:32:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 417572DCBAB
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 05:22:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727801AbgLQDcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 22:32:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56268 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727231AbgLQDcA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 22:32:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608175833;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HO6KkKBsPBYL8yo5xJcOwAGMsGPxSzjnmDq5FDQ+Bkg=;
-        b=hOLLwjVxfFh4wOWnIKO3spOSkNsD979sSlXIm4JCbsftlObLnZtp7fswaH8tzqNcuYpzMC
-        pRqsn0HQ9DoxErO7tWKHmx9bQ8sLAlLbkgwUnSZmlVvsrgiN4bbKFB3sz0nIUT8TXkUJY2
-        j3oLUkL3FyRNc3ePLWWass8OfUwLI7A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-XOc3xLNlML-NxSqRAwwukw-1; Wed, 16 Dec 2020 22:30:32 -0500
-X-MC-Unique: XOc3xLNlML-NxSqRAwwukw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B86910054FF;
-        Thu, 17 Dec 2020 03:30:30 +0000 (UTC)
-Received: from [10.72.12.223] (ovpn-12-223.pek2.redhat.com [10.72.12.223])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4301860C15;
-        Thu, 17 Dec 2020 03:30:20 +0000 (UTC)
-Subject: Re: [PATCH 00/21] Control VQ support in vDPA
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     eperezma@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lulu@redhat.com, eli@mellanox.com,
-        lingshan.zhu@intel.com, rob.miller@broadcom.com,
-        stefanha@redhat.com, sgarzare@redhat.com
-References: <20201216064818.48239-1-jasowang@redhat.com>
- <20201216044051-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <aa061fcb-9395-3a1b-5d6e-76b5454dfb6c@redhat.com>
-Date:   Thu, 17 Dec 2020 11:30:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726199AbgLQEUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 23:20:31 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9221 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726074AbgLQEUb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Dec 2020 23:20:31 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CxJf46wsZzkr0L;
+        Thu, 17 Dec 2020 12:18:52 +0800 (CST)
+Received: from [10.174.187.231] (10.174.187.231) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 17 Dec 2020 12:19:35 +0800
+Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
+ state to physical side
+To:     Auger Eric <eric.auger@redhat.com>, Marc Zyngier <maz@kernel.org>
+CC:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, "Neo Jia" <cjia@nvidia.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20201123065410.1915-1-lushenming@huawei.com>
+ <20201123065410.1915-4-lushenming@huawei.com>
+ <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
+ <b03edcf2-2950-572f-fd31-601d8d766c80@huawei.com>
+ <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
+ <49610291-cf57-ff78-d0ac-063af24efbb4@huawei.com>
+ <48c10467-30f3-9b5c-bbcb-533a51516dc5@huawei.com>
+ <2ad38077300bdcaedd2e3b073cd36743@kernel.org>
+ <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
+ <274dafb2e21f49326a64bb575e668793@kernel.org>
+ <59ec07e5-c017-8644-b96f-e87fe600c490@huawei.com>
+ <f8b398df-9945-9ce6-18e6-970637a1bb51@redhat.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <5732e2a2-7b78-dcbe-bd7d-77541c7bcf16@huawei.com>
+Date:   Thu, 17 Dec 2020 12:19:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <20201216044051-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <f8b398df-9945-9ce6-18e6-970637a1bb51@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.187.231]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2020/12/16 18:35, Auger Eric wrote:
+> Hi Shenming,
+> 
+> On 12/1/20 1:15 PM, Shenming Lu wrote:
+>> On 2020/12/1 19:50, Marc Zyngier wrote:
+>>> On 2020-12-01 11:40, Shenming Lu wrote:
+>>>> On 2020/12/1 18:55, Marc Zyngier wrote:
+>>>>> On 2020-11-30 07:23, Shenming Lu wrote:
+>>>>>
+>>>>> Hi Shenming,
+>>>>>
+>>>>>> We are pondering over this problem these days, but still don't get a
+>>>>>> good solution...
+>>>>>> Could you give us some advice on this?
+>>>>>>
+>>>>>> Or could we move the restoring of the pending states (include the sync
+>>>>>> from guest RAM and the transfer to HW) to the GIC VM state change handler,
+>>>>>> which is completely corresponding to save_pending_tables (more symmetric?)
+>>>>>> and don't expose GICv4...
+>>>>>
+>>>>> What is "the GIC VM state change handler"? Is that a QEMU thing?
+>>>>
+>>>> Yeah, it is a a QEMU thing...
+>>>>
+>>>>> We don't really have that concept in KVM, so I'd appreciate if you could
+>>>>> be a bit more explicit on this.
+>>>>
+>>>> My thought is to add a new interface (to QEMU) for the restoring of
+>>>> the pending states, which is completely corresponding to
+>>>> KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES...
+>>>> And it is called from the GIC VM state change handler in QEMU, which
+>>>> is happening after the restoring (call kvm_vgic_v4_set_forwarding())
+>>>> but before the starting (running) of the VFIO device.
+>>>
+>>> Right, that makes sense. I still wonder how much the GIC save/restore
+>>> stuff differs from other architectures that implement similar features,
+>>> such as x86 with VT-D.
+>>
+>> I am not familiar with it...
+>>
+>>>
+>>> It is obviously too late to change the userspace interface, but I wonder
+>>> whether we missed something at the time.
+>>
+>> The interface seems to be really asymmetrical?...
+> 
+> in qemu d5aa0c229a ("hw/intc/arm_gicv3_kvm: Implement pending table
+> save") commit message, it is traced:
+> 
+> "There is no explicit restore as the tables are implicitly sync'ed
+> on ITS table restore and on LPI enable at redistributor level."
+> 
+> At that time there was no real justification behind adding the RESTORE
+> fellow attr.
+> 
+> Maybe a stupid question but isn't it possible to unset the forwarding
+> when saving and rely on VFIO to automatically restore it when resuming
+> on destination?
 
-On 2020/12/16 下午5:47, Michael S. Tsirkin wrote:
-> On Wed, Dec 16, 2020 at 02:47:57PM +0800, Jason Wang wrote:
->> Hi All:
->>
->> This series tries to add the support for control virtqueue in vDPA.
->>
->> Control virtqueue is used by networking device for accepting various
->> commands from the driver. It's a must to support multiqueue and other
->> configurations.
->>
->> When used by vhost-vDPA bus driver for VM, the control virtqueue
->> should be shadowed via userspace VMM (Qemu) instead of being assigned
->> directly to Guest. This is because Qemu needs to know the device state
->> in order to start and stop device correctly (e.g for Live Migration).
->>
->> This requies to isolate the memory mapping for control virtqueue
->> presented by vhost-vDPA to prevent guest from accesing it directly.
->> To achieve this, vDPA introduce two new abstractions:
->>
->> - address space: identified through address space id (ASID) and a set
->>                   of memory mapping in maintained
->> - virtqueue group: the minimal set of virtqueues that must share an
->>                   address space
-> How will this support the pretty common case where control vq
-> is programmed by the kernel through the PF, and others by the VFs?
+It seems that the unset_forwarding would not be called when saving, it would
+be called after migration completion...
+As for the resuming/set_forwarding, I still wonder: is it really improper to
+transfer the pending states from vgic to VPT in set_forwarding (not only in
+migration)?...  -_-
 
+Thanks,
+Shenming
 
-In this case, the VF parent need to provide a software control vq and 
-decode the command then send them to VF.
-
-
->
->
-> I actually thought the way to support it is by exposing
-> something like an "inject buffers" API which sends data to a given VQ.
-> Maybe an ioctl, and maybe down the road uio ring can support batching
-> these ....
-
-
-So the virtuqueue allows the request to be processed asynchronously (e.g 
-driver may choose to use interrupt for control vq). This means we need 
-to support that in uAPI level. And if we manage to do that, it's just 
-another type of virtqueue.
-
-For virtio-vDPA, this also means the extensions for queue processing 
-which is a functional duplication. Using what proposed in this series, 
-we don't need any changes for kernel virtio drivers.
-
-What's more important, this series could be used for future features 
-that requires DMA isolation between virtqueues:
-
-- report dirty pages via virtqueue
-- sub function level device slicing
-
-...
-
-Thanks
-
-
->
->
->> Device needs to advertise the following attributes to vDPA:
+> 
+> Thanks
+> 
+> Eric
+> 
+> 
 >>
->> - the number of address spaces supported in the device
->> - the number of virtqueue groups supported in the device
->> - the mappings from a specific virtqueue to its virtqueue groups
+>> Or is there a possibility that we could know which irq is hw before the VFIO
+>> device calls kvm_vgic_v4_set_forwarding()?
 >>
->> The mappings from virtqueue to virtqueue groups is fixed and defined
->> by vDPA device driver. E.g:
+>> Thanks,
+>> Shenming
 >>
->> - For the device that has hardware ASID support, it can simply
->>    advertise a per virtqueue virtqueue group.
->> - For the device that does not have hardware ASID support, it can
->>    simply advertise a single virtqueue group that contains all
->>    virtqueues. Or if it wants a software emulated control virtqueue, it
->>    can advertise two virtqueue groups, one is for cvq, another is for
->>    the rest virtqueues.
+>>>
+>>> Thanks,
+>>>
+>>>         M.
 >>
->> vDPA also allow to change the association between virtqueue group and
->> address space. So in the case of control virtqueue, userspace
->> VMM(Qemu) may use a dedicated address space for the control virtqueue
->> group to isolate the memory mapping.
->>
->> The vhost/vhost-vDPA is also extend for the userspace to:
->>
->> - query the number of virtqueue groups and address spaces supported by
->>    the device
->> - query the virtqueue group for a specific virtqueue
->> - assocaite a virtqueue group with an address space
->> - send ASID based IOTLB commands
->>
->> This will help userspace VMM(Qemu) to detect whether the control vq
->> could be supported and isolate memory mappings of control virtqueue
->> from the others.
->>
->> To demonstrate the usage, vDPA simulator is extended to support
->> setting MAC address via a emulated control virtqueue.
->>
->> Please review.
->>
->> Changes since RFC:
->>
->> - tweak vhost uAPI documentation
->> - switch to use device specific IOTLB really in patch 4
->> - tweak the commit log
->> - fix that ASID in vhost is claimed to be 32 actually but 16bit
->>    actually
->> - fix use after free when using ASID with IOTLB batching requests
->> - switch to use Stefano's patch for having separated iov
->> - remove unused "used_as" variable
->> - fix the iotlb/asid checking in vhost_vdpa_unmap()
->>
->> Thanks
->>
->> Jason Wang (20):
->>    vhost: move the backend feature bits to vhost_types.h
->>    virtio-vdpa: don't set callback if virtio doesn't need it
->>    vhost-vdpa: passing iotlb to IOMMU mapping helpers
->>    vhost-vdpa: switch to use vhost-vdpa specific IOTLB
->>    vdpa: add the missing comment for nvqs in struct vdpa_device
->>    vdpa: introduce virtqueue groups
->>    vdpa: multiple address spaces support
->>    vdpa: introduce config operations for associating ASID to a virtqueue
->>      group
->>    vhost_iotlb: split out IOTLB initialization
->>    vhost: support ASID in IOTLB API
->>    vhost-vdpa: introduce asid based IOTLB
->>    vhost-vdpa: introduce uAPI to get the number of virtqueue groups
->>    vhost-vdpa: introduce uAPI to get the number of address spaces
->>    vhost-vdpa: uAPI to get virtqueue group id
->>    vhost-vdpa: introduce uAPI to set group ASID
->>    vhost-vdpa: support ASID based IOTLB API
->>    vdpa_sim: advertise VIRTIO_NET_F_MTU
->>    vdpa_sim: factor out buffer completion logic
->>    vdpa_sim: filter destination mac address
->>    vdpasim: control virtqueue support
->>
->> Stefano Garzarella (1):
->>    vdpa_sim: split vdpasim_virtqueue's iov field in out_iov and in_iov
->>
->>   drivers/vdpa/ifcvf/ifcvf_main.c   |   9 +-
->>   drivers/vdpa/mlx5/net/mlx5_vnet.c |  11 +-
->>   drivers/vdpa/vdpa.c               |   8 +-
->>   drivers/vdpa/vdpa_sim/vdpa_sim.c  | 292 ++++++++++++++++++++++++------
->>   drivers/vhost/iotlb.c             |  23 ++-
->>   drivers/vhost/vdpa.c              | 246 ++++++++++++++++++++-----
->>   drivers/vhost/vhost.c             |  23 ++-
->>   drivers/vhost/vhost.h             |   4 +-
->>   drivers/virtio/virtio_vdpa.c      |   2 +-
->>   include/linux/vdpa.h              |  42 ++++-
->>   include/linux/vhost_iotlb.h       |   2 +
->>   include/uapi/linux/vhost.h        |  25 ++-
->>   include/uapi/linux/vhost_types.h  |  10 +-
->>   13 files changed, 561 insertions(+), 136 deletions(-)
->>
->> -- 
->> 2.25.1
-
+> 
+> .
+> 
