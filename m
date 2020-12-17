@@ -2,110 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 000EF2DCB25
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 03:57:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91B7A2DCB4D
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 04:32:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727620AbgLQC44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Dec 2020 21:56:56 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59597 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727115AbgLQC44 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Dec 2020 21:56:56 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S1727801AbgLQDcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Dec 2020 22:32:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56268 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727231AbgLQDcA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Dec 2020 22:32:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608175833;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HO6KkKBsPBYL8yo5xJcOwAGMsGPxSzjnmDq5FDQ+Bkg=;
+        b=hOLLwjVxfFh4wOWnIKO3spOSkNsD979sSlXIm4JCbsftlObLnZtp7fswaH8tzqNcuYpzMC
+        pRqsn0HQ9DoxErO7tWKHmx9bQ8sLAlLbkgwUnSZmlVvsrgiN4bbKFB3sz0nIUT8TXkUJY2
+        j3oLUkL3FyRNc3ePLWWass8OfUwLI7A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-19-XOc3xLNlML-NxSqRAwwukw-1; Wed, 16 Dec 2020 22:30:32 -0500
+X-MC-Unique: XOc3xLNlML-NxSqRAwwukw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CxGpg5JCjz9sRR;
-        Thu, 17 Dec 2020 13:56:11 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1608173773;
-        bh=0BUN17/xDSq7+CWgU8wi0dZDg7QZRtEzB1WlEheKggE=;
-        h=Date:From:To:Cc:Subject:From;
-        b=TpWRTGPMExPzxK4g6VJFBkIPYYtyYT4sVp8ZeelQHmrO+qbYC7mvlB2fWDyd++g7k
-         NQWfs75u66yPdiG8dTWmlqfSj0vmQt0SYH6dNZZXcUgiRjf03597lrr6HmScTzLG6b
-         jdF8cQEPnVlA4XKrndHBSu1ozFroi5JlXplqHyM28V6SS4LsYV/W5s1NBqgiEGjpk/
-         knO6reWL99Zo6oC0EKRMc8QeZim3R0VLRrYw9YmvBB4jv2B2N+m3K3glziFJ/P97wz
-         P/+M5WCjpv5ZW072G9zJ8x4Yv9s/l88nKMONdppCsMxrgivTukK2WXByGn0RMXBZ3n
-         9xmcNUdmuRO8g==
-Date:   Thu, 17 Dec 2020 13:56:09 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Chen Zhou <chenzhou10@huawei.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: linux-next: manual merge of the kvm tree with Linus' tree
-Message-ID: <20201217135609.6543533c@canb.auug.org.au>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B86910054FF;
+        Thu, 17 Dec 2020 03:30:30 +0000 (UTC)
+Received: from [10.72.12.223] (ovpn-12-223.pek2.redhat.com [10.72.12.223])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4301860C15;
+        Thu, 17 Dec 2020 03:30:20 +0000 (UTC)
+Subject: Re: [PATCH 00/21] Control VQ support in vDPA
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     eperezma@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lulu@redhat.com, eli@mellanox.com,
+        lingshan.zhu@intel.com, rob.miller@broadcom.com,
+        stefanha@redhat.com, sgarzare@redhat.com
+References: <20201216064818.48239-1-jasowang@redhat.com>
+ <20201216044051-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <aa061fcb-9395-3a1b-5d6e-76b5454dfb6c@redhat.com>
+Date:   Thu, 17 Dec 2020 11:30:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/m2GsJ3mUgdFxez.xofiN/.G";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <20201216044051-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/m2GsJ3mUgdFxez.xofiN/.G
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On 2020/12/16 下午5:47, Michael S. Tsirkin wrote:
+> On Wed, Dec 16, 2020 at 02:47:57PM +0800, Jason Wang wrote:
+>> Hi All:
+>>
+>> This series tries to add the support for control virtqueue in vDPA.
+>>
+>> Control virtqueue is used by networking device for accepting various
+>> commands from the driver. It's a must to support multiqueue and other
+>> configurations.
+>>
+>> When used by vhost-vDPA bus driver for VM, the control virtqueue
+>> should be shadowed via userspace VMM (Qemu) instead of being assigned
+>> directly to Guest. This is because Qemu needs to know the device state
+>> in order to start and stop device correctly (e.g for Live Migration).
+>>
+>> This requies to isolate the memory mapping for control virtqueue
+>> presented by vhost-vDPA to prevent guest from accesing it directly.
+>> To achieve this, vDPA introduce two new abstractions:
+>>
+>> - address space: identified through address space id (ASID) and a set
+>>                   of memory mapping in maintained
+>> - virtqueue group: the minimal set of virtqueues that must share an
+>>                   address space
+> How will this support the pretty common case where control vq
+> is programmed by the kernel through the PF, and others by the VFs?
 
-Today's linux-next merge of the kvm tree got a conflict in:
 
-  arch/x86/kvm/svm/svm.c
+In this case, the VF parent need to provide a software control vq and 
+decode the command then send them to VF.
 
-between commit:
 
-  054409ab253d ("KVM: SVM: fix error return code in svm_create_vcpu()")
+>
+>
+> I actually thought the way to support it is by exposing
+> something like an "inject buffers" API which sends data to a given VQ.
+> Maybe an ioctl, and maybe down the road uio ring can support batching
+> these ....
 
-from Linus' tree and commit:
 
-  add5e2f04541 ("KVM: SVM: Add support for the SEV-ES VMSA")
+So the virtuqueue allows the request to be processed asynchronously (e.g 
+driver may choose to use interrupt for control vq). This means we need 
+to support that in uAPI level. And if we manage to do that, it's just 
+another type of virtqueue.
 
-from the kvm tree.
+For virtio-vDPA, this also means the extensions for queue processing 
+which is a functional duplication. Using what proposed in this series, 
+we don't need any changes for kernel virtio drivers.
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+What's more important, this series could be used for future features 
+that requires DMA isolation between virtqueues:
 
---=20
-Cheers,
-Stephen Rothwell
+- report dirty pages via virtqueue
+- sub function level device slicing
 
-diff --cc arch/x86/kvm/svm/svm.c
-index da7eb4aaf44f,941e5251e13f..000000000000
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@@ -1309,10 -1347,8 +1347,10 @@@ static int svm_create_vcpu(struct kvm_v
-  		svm->avic_is_running =3D true;
- =20
-  	svm->msrpm =3D svm_vcpu_alloc_msrpm();
- -	if (!svm->msrpm)
- +	if (!svm->msrpm) {
- +		err =3D -ENOMEM;
-- 		goto error_free_vmcb_page;
-+ 		goto error_free_vmsa_page;
- +	}
- =20
-  	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
- =20
+...
 
---Sig_/m2GsJ3mUgdFxez.xofiN/.G
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Thanks
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/ayMkACgkQAVBC80lX
-0GyIkQf7BcLVgA0gSlM4vf1TYexJbBY0qpgPu2A2Uc7SJDkYqesPaW92MwR4DNI9
-TLlzxnoMJrJutlUWHKbULGokRPIVMRcte4uG4zjG4TmFVirNdhhj7hLL08Ob0IpO
-kxicci7tkXm68jMDmqJI3vMmdegPkBKpON9BFol3xwGov0IqYkn0O9zkXD62rEqz
-v5HbALddFIKB4934gX4ng8u0503/QC2CLELpDmLk7+h+8lBdEwULTWVvDRodf7hv
-Zg7l5HGrSs1GvdeFNDKlMflY+r+lJn4dTwshCamdFpleZzfsCp5XeQYFluVnNni5
-WlL32AsrgYanF/KHxAPLcEPEd5bAxQ==
-=569i
------END PGP SIGNATURE-----
+>
+>
+>> Device needs to advertise the following attributes to vDPA:
+>>
+>> - the number of address spaces supported in the device
+>> - the number of virtqueue groups supported in the device
+>> - the mappings from a specific virtqueue to its virtqueue groups
+>>
+>> The mappings from virtqueue to virtqueue groups is fixed and defined
+>> by vDPA device driver. E.g:
+>>
+>> - For the device that has hardware ASID support, it can simply
+>>    advertise a per virtqueue virtqueue group.
+>> - For the device that does not have hardware ASID support, it can
+>>    simply advertise a single virtqueue group that contains all
+>>    virtqueues. Or if it wants a software emulated control virtqueue, it
+>>    can advertise two virtqueue groups, one is for cvq, another is for
+>>    the rest virtqueues.
+>>
+>> vDPA also allow to change the association between virtqueue group and
+>> address space. So in the case of control virtqueue, userspace
+>> VMM(Qemu) may use a dedicated address space for the control virtqueue
+>> group to isolate the memory mapping.
+>>
+>> The vhost/vhost-vDPA is also extend for the userspace to:
+>>
+>> - query the number of virtqueue groups and address spaces supported by
+>>    the device
+>> - query the virtqueue group for a specific virtqueue
+>> - assocaite a virtqueue group with an address space
+>> - send ASID based IOTLB commands
+>>
+>> This will help userspace VMM(Qemu) to detect whether the control vq
+>> could be supported and isolate memory mappings of control virtqueue
+>> from the others.
+>>
+>> To demonstrate the usage, vDPA simulator is extended to support
+>> setting MAC address via a emulated control virtqueue.
+>>
+>> Please review.
+>>
+>> Changes since RFC:
+>>
+>> - tweak vhost uAPI documentation
+>> - switch to use device specific IOTLB really in patch 4
+>> - tweak the commit log
+>> - fix that ASID in vhost is claimed to be 32 actually but 16bit
+>>    actually
+>> - fix use after free when using ASID with IOTLB batching requests
+>> - switch to use Stefano's patch for having separated iov
+>> - remove unused "used_as" variable
+>> - fix the iotlb/asid checking in vhost_vdpa_unmap()
+>>
+>> Thanks
+>>
+>> Jason Wang (20):
+>>    vhost: move the backend feature bits to vhost_types.h
+>>    virtio-vdpa: don't set callback if virtio doesn't need it
+>>    vhost-vdpa: passing iotlb to IOMMU mapping helpers
+>>    vhost-vdpa: switch to use vhost-vdpa specific IOTLB
+>>    vdpa: add the missing comment for nvqs in struct vdpa_device
+>>    vdpa: introduce virtqueue groups
+>>    vdpa: multiple address spaces support
+>>    vdpa: introduce config operations for associating ASID to a virtqueue
+>>      group
+>>    vhost_iotlb: split out IOTLB initialization
+>>    vhost: support ASID in IOTLB API
+>>    vhost-vdpa: introduce asid based IOTLB
+>>    vhost-vdpa: introduce uAPI to get the number of virtqueue groups
+>>    vhost-vdpa: introduce uAPI to get the number of address spaces
+>>    vhost-vdpa: uAPI to get virtqueue group id
+>>    vhost-vdpa: introduce uAPI to set group ASID
+>>    vhost-vdpa: support ASID based IOTLB API
+>>    vdpa_sim: advertise VIRTIO_NET_F_MTU
+>>    vdpa_sim: factor out buffer completion logic
+>>    vdpa_sim: filter destination mac address
+>>    vdpasim: control virtqueue support
+>>
+>> Stefano Garzarella (1):
+>>    vdpa_sim: split vdpasim_virtqueue's iov field in out_iov and in_iov
+>>
+>>   drivers/vdpa/ifcvf/ifcvf_main.c   |   9 +-
+>>   drivers/vdpa/mlx5/net/mlx5_vnet.c |  11 +-
+>>   drivers/vdpa/vdpa.c               |   8 +-
+>>   drivers/vdpa/vdpa_sim/vdpa_sim.c  | 292 ++++++++++++++++++++++++------
+>>   drivers/vhost/iotlb.c             |  23 ++-
+>>   drivers/vhost/vdpa.c              | 246 ++++++++++++++++++++-----
+>>   drivers/vhost/vhost.c             |  23 ++-
+>>   drivers/vhost/vhost.h             |   4 +-
+>>   drivers/virtio/virtio_vdpa.c      |   2 +-
+>>   include/linux/vdpa.h              |  42 ++++-
+>>   include/linux/vhost_iotlb.h       |   2 +
+>>   include/uapi/linux/vhost.h        |  25 ++-
+>>   include/uapi/linux/vhost_types.h  |  10 +-
+>>   13 files changed, 561 insertions(+), 136 deletions(-)
+>>
+>> -- 
+>> 2.25.1
 
---Sig_/m2GsJ3mUgdFxez.xofiN/.G--
