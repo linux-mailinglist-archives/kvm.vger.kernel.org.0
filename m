@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D65142DD2EF
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 15:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDEE42DD2F3
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 15:23:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728117AbgLQOWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 09:22:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21021 "EHLO
+        id S1728085AbgLQOWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 09:22:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41332 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727385AbgLQOWm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 09:22:42 -0500
+        by vger.kernel.org with ESMTP id S1726488AbgLQOWs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 09:22:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608214874;
+        s=mimecast20190719; t=1608214881;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hcD+kMtaFtPvzKyY/JuQIAmqlfriWBsmZQrLjKikKr4=;
-        b=OVeheA/DPNlUV5Ppn7QudZBb9op89cUAnn0wUZFhNRbI9zkZOni2OO5KRKuXMKrjLfdI3+
-        8jfCuw/QQ9+z4vB+cnkv8LBchoP1JNRQQNwIF853n4ztguUaTZSTqT/Ih+7fJwlT8Z+wIE
-        m9r8+sJSRiPLur3jkyS/hr08K25Uc/A=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-Gbbnn06vMtehX3iDpQrRTQ-1; Thu, 17 Dec 2020 09:21:13 -0500
-X-MC-Unique: Gbbnn06vMtehX3iDpQrRTQ-1
-Received: by mail-ed1-f72.google.com with SMTP id d12so13535841edx.23
-        for <kvm@vger.kernel.org>; Thu, 17 Dec 2020 06:21:13 -0800 (PST)
+        bh=q3zX9nGma2sc+foBdiZDz1vjiexa9yeL6J3v7SV/DL0=;
+        b=Dgs1flo/0pD0D0NCfRLs3jz8oe4/wmsILf2qJobE+iG3nHVrVTO1h+TdYIiMdT3U+qqkS9
+        oU+ASn23KnPqI2xJ1vodiWngmImD3P3dmXSwKBPh8lX8cEcMcqL5Kf8umU8D1PsWyLIc6O
+        vFq18qhBvPz63Hk4f5lksdgRZf/aDXU=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-qxpasQ8-O1-FAuE7exYUAg-1; Thu, 17 Dec 2020 09:21:19 -0500
+X-MC-Unique: qxpasQ8-O1-FAuE7exYUAg-1
+Received: by mail-ej1-f72.google.com with SMTP id t17so8720217ejd.12
+        for <kvm@vger.kernel.org>; Thu, 17 Dec 2020 06:21:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hcD+kMtaFtPvzKyY/JuQIAmqlfriWBsmZQrLjKikKr4=;
-        b=p0j2Gq/9Y5y+7fE/Jvu1B6Q5aP60KFuH0cPGvZI+W2IYaIRNKf/8JT8Bmm3Cnke609
-         HrHToG1MzCY5FcjvzCa6c5SyCDn50f+6qkfPv5FJbDttQ/Fqr83KPjg8W0ORRMRJzVJ6
-         jdYeT5sQ2Zy4ytI1kma2PR6X2Ht7xdX+tuS2ImszztgbDk0/j2I6H6jR/B0I6RtogpSy
-         5T0aDeVeTQKEWSjfDfqrp/EacfAYkP6D7DRScKb3h05DEv4XGyveo+g348mf7LwltNJK
-         BhpOMdRH4FrIHXTtMiJBYgKy1295I03X0YEQfAuvq1HugQj1AzNnZJwJpZsPZO3674RW
-         VkWQ==
-X-Gm-Message-State: AOAM5335rA7qjL4IwMARm3sOsWK0P1RQZGyo6UuDo1cVWXHwes47QeEF
-        s1JunFgadX/nqHlKNHTSdzE9b6Yt+P6P5f8F7El9lGfFJvLkWPFkqcdeHhNnttILXw3c8p/9Omv
-        HR+zG//RemhxDzJGej7rnwi6ZWM7pTinNz9qoNrOhzdB7696L6VozOInuBcD8LFVt
-X-Received: by 2002:a50:d50a:: with SMTP id u10mr8933791edi.58.1608214871653;
-        Thu, 17 Dec 2020 06:21:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz3hTrIqdmHGdsi3U1PnxHfRaRQT9o2PkvtSkrbd/8ciiBLRIb0lsnRHkYqJRPNdib+8dzLKg==
-X-Received: by 2002:a50:d50a:: with SMTP id u10mr8933761edi.58.1608214871329;
-        Thu, 17 Dec 2020 06:21:11 -0800 (PST)
+        bh=q3zX9nGma2sc+foBdiZDz1vjiexa9yeL6J3v7SV/DL0=;
+        b=EpOion3LjUf/gGEBqFHdZ4hPtqA3xKYEZTGvEtfxF/CHEUawp14D4hvj/rFds9DuGn
+         IMTqYr4tTCzpukmsUcHuqPpkFoeJosvAVAyuRqKapSmlq6UoMX1xPODyRKmfI8lP7dpc
+         +c0jj3VYq6LVjgBr28ZzoiojVv9z7tpjiooz0sx4Wp7NESvYTpuEitZ0elIIXbRhJCwu
+         HGpBkusEvI/U4chKHSfDBiA7nFcinTeJDXAvO3fTEHPBzEefLgpvxbSxHiyf5P58eIO3
+         tmY3lQf9ZSVrjjI8o+OCXpEFC5Zp2u8U3hKbC8r5ktooScps4yONNfKpDqaLBrQSGcu5
+         uJNg==
+X-Gm-Message-State: AOAM533XIS8aHS7ZJ/Oi0Pi5NP2YOPShJKDtijxNXaz9DIZDwbEvedXy
+        zIAvYe8oNxa3kY/7F3NRobaAEQpjla0p5vplyGgrtBTyvbQ2F5Iz76v1CDAqnrZ9TX+TS81apM8
+        cYtt1LG+pHnaExA/NQ9olJ5y32LAvcy1PLfchLsH3lq4XhDGlnbA1uOeLbzqA3BTG
+X-Received: by 2002:a17:906:9250:: with SMTP id c16mr36252418ejx.355.1608214877787;
+        Thu, 17 Dec 2020 06:21:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwBtuAn/5oKnQJimo74RKWwWmYaG5Jtmtqkhyj0v4zAd/vGeoPQ6Ib4nnTFsSMeyLfi3tLVrw==
+X-Received: by 2002:a17:906:9250:: with SMTP id c16mr36252384ejx.355.1608214877492;
+        Thu, 17 Dec 2020 06:21:17 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id be6sm23542372edb.29.2020.12.17.06.21.09
+        by smtp.gmail.com with ESMTPSA id dd18sm3881873ejb.53.2020.12.17.06.21.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Dec 2020 06:21:10 -0800 (PST)
+        Thu, 17 Dec 2020 06:21:16 -0800 (PST)
 Subject: Re: [PATCH] KVM: mmu: Fix SPTE encoding of MMIO generation upper half
 To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
         stable@vger.kernel.org
@@ -60,15 +60,15 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org
-References: <1607955407131211@kroah.com>
- <f5cb26d9a45cbaf617928d1314e7c0efea597e05.1608169775.git.maciej.szmigiero@oracle.com>
+References: <1607955408254166@kroah.com>
+ <8bf9d5caf338d705744764c60256ace1d3f1d252.1608168540.git.maciej.szmigiero@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2304633f-b9ae-c471-9edc-257fb3ceb390@redhat.com>
-Date:   Thu, 17 Dec 2020 15:21:08 +0100
+Message-ID: <41d60554-ba04-b877-1189-6cb33bc3600b@redhat.com>
+Date:   Thu, 17 Dec 2020 15:21:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <f5cb26d9a45cbaf617928d1314e7c0efea597e05.1608169775.git.maciej.szmigiero@oracle.com>
+In-Reply-To: <8bf9d5caf338d705744764c60256ace1d3f1d252.1608168540.git.maciej.szmigiero@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -98,8 +98,9 @@ On 17/12/20 14:46, Maciej S. Szmigiero wrote:
 > Let's do it here, too, since it is too trivial thing to warrant a separate
 > commit.
 > 
-> This is a backport of the upstream commit for 5.9.x stable series, in which
-> the x86 KVM MMU SPTE handling isn't yet split out to spte.{c,h} files.
+> This is a backport of the upstream commit for 5.4.x stable series, which
+> has KVM docs still in a raw text format and the x86 KVM MMU isn't yet split
+> into separate files under "mmu" directory.
 > Other than that, it's a straightforward port.
 > 
 > Fixes: cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
@@ -107,17 +108,17 @@ On 17/12/20 14:46, Maciej S. Szmigiero wrote:
 > [Reorganize macros so that everything is computed from the bit ranges. - Paolo]
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > (cherry picked from commit 34c0f6f2695a2db81e09a3ab7bdb2853f45d4d3d)
-> Cc: stable@vger.kernel.org # 5.9.x
+> Cc: stable@vger.kernel.org # 5.4.x
 > ---
->   Documentation/virt/kvm/mmu.rst |  2 +-
->   arch/x86/kvm/mmu/mmu.c         | 29 ++++++++++++++++++++---------
+>   Documentation/virt/kvm/mmu.txt |  2 +-
+>   arch/x86/kvm/mmu.c             | 29 ++++++++++++++++++++---------
 >   2 files changed, 21 insertions(+), 10 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
-> index 1c030dbac7c4..5bfe28b0728e 100644
-> --- a/Documentation/virt/kvm/mmu.rst
-> +++ b/Documentation/virt/kvm/mmu.rst
-> @@ -455,7 +455,7 @@ If the generation number of the spte does not equal the global generation
+> diff --git a/Documentation/virt/kvm/mmu.txt b/Documentation/virt/kvm/mmu.txt
+> index dadb29e8738f..ec072c6bc03f 100644
+> --- a/Documentation/virt/kvm/mmu.txt
+> +++ b/Documentation/virt/kvm/mmu.txt
+> @@ -420,7 +420,7 @@ If the generation number of the spte does not equal the global generation
 >   number, it will ignore the cached MMIO information and handle the page
 >   fault through the slow path.
 >   
@@ -126,11 +127,11 @@ On 17/12/20 14:46, Maciej S. Szmigiero wrote:
 >   pages are zapped when there is an overflow.
 >   
 >   Unfortunately, a single memory access might access kvm_memslots(kvm) multiple
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index d0ca3ab38952..c1b48d04a306 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -402,11 +402,11 @@ static inline bool is_access_track_spte(u64 spte)
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index b90e8fd2f6ce..47c27c6e3842 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -407,11 +407,11 @@ static inline bool is_access_track_spte(u64 spte)
 >   }
 >   
 >   /*
@@ -144,7 +145,7 @@ On 17/12/20 14:46, Maciej S. Szmigiero wrote:
 >    *
 >    * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
 >    * the MMIO generation number, as doing so would require stealing a bit from
-> @@ -415,18 +415,29 @@ static inline bool is_access_track_spte(u64 spte)
+> @@ -420,18 +420,29 @@ static inline bool is_access_track_spte(u64 spte)
 >    * requires a full MMU zap).  The flag is instead explicitly queried when
 >    * checking for MMIO spte cache hits.
 >    */
@@ -177,7 +178,7 @@ On 17/12/20 14:46, Maciej S. Szmigiero wrote:
 >   static u64 generation_mmio_spte_mask(u64 gen)
 >   {
 >   	u64 mask;
-> @@ -434,8 +445,8 @@ static u64 generation_mmio_spte_mask(u64 gen)
+> @@ -439,8 +450,8 @@ static u64 generation_mmio_spte_mask(u64 gen)
 >   	WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
 >   	BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK | MMIO_SPTE_GEN_LOW_MASK) & SPTE_SPECIAL_MASK);
 >   
@@ -188,7 +189,7 @@ On 17/12/20 14:46, Maciej S. Szmigiero wrote:
 >   	return mask;
 >   }
 >   
-> @@ -443,8 +454,8 @@ static u64 get_mmio_spte_generation(u64 spte)
+> @@ -448,8 +459,8 @@ static u64 get_mmio_spte_generation(u64 spte)
 >   {
 >   	u64 gen;
 >   
