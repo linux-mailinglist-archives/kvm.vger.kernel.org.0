@@ -2,231 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDB652DD4E7
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 17:08:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3408A2DD647
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 18:33:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729684AbgLQQFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 11:05:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34682 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729641AbgLQQFg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 11:05:36 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BHG1inK102952;
-        Thu, 17 Dec 2020 11:04:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=rR3knOmdu5EqQMyS8ET4W6d0ifU5WsrbYgh6NGimjG4=;
- b=WbvkJdM+Pn+gmwAK8lXRn3GXaGF1/NIyw14jYnMa+MiYKVsjr+Ja6OsIjVoKVSgYSqfJ
- anqzt6qyHo7Ol8vWxxuU6IoRLV46rAhM8c9E5TeNsN8FdQDULJkq5vdIfh+YKeQOL+v6
- wn8cf2Bu3efERlP1/WbrR9yQU8fTRhp4EXL7geVlFdsZ+veM5OUAEyjgmrXCnfnr2pnk
- 0Xf86ZThVii1IdhdNdAQOZNqmai45iscsOfHLAHPSEnPXWBG5sXQsYisljPsMQ63bZ59
- Z7fvpBI4xarZSe4m0Ve0C/wN3zGoaNEw1MfipTDK6DIKBTK5sLC5OLAYGk31Yu5+6B2X DA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35g9uthfqh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 11:04:55 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BHG1vYM104302;
-        Thu, 17 Dec 2020 11:04:54 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35g9uthfp7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 11:04:54 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BHG23Du013864;
-        Thu, 17 Dec 2020 16:04:53 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma03wdc.us.ibm.com with ESMTP id 35cng9rq7v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 16:04:53 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BHG4o8l17695054
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Dec 2020 16:04:50 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EF311136063;
-        Thu, 17 Dec 2020 16:04:49 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5A5813604F;
-        Thu, 17 Dec 2020 16:04:48 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.143.229])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Dec 2020 16:04:48 +0000 (GMT)
-Subject: Re: [RFC 0/4] vfio-pci/zdev: Fixing s390 vfio-pci ISM support
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
- <20201210133306.70d1a556.cohuck@redhat.com>
- <ce9d4ef2-2629-59b7-99ed-4c8212cb004f@linux.ibm.com>
- <20201211153501.7767a603.cohuck@redhat.com>
- <6c9528f3-f012-ba15-1d68-7caefb942356@linux.ibm.com>
- <a974c5cc-fc42-7bf0-66a6-df095da7105f@linux.ibm.com>
- <20201217135919.46d5c43f.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <f9f312d8-1948-d5b8-22fe-82f1975c8a18@linux.ibm.com>
-Date:   Thu, 17 Dec 2020 11:04:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <20201217135919.46d5c43f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1728535AbgLQRcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 12:32:42 -0500
+Received: from mail-dm6nam11on2126.outbound.protection.outlook.com ([40.107.223.126]:50305
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726548AbgLQRcl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 12:32:41 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GcfSep0dkGQn3ohRtbDF4xJZawKRvdyJUcwji40pveLhisgfWxuMDyDp8RGjYtPc2MAhRwu6LfVK68z+4lqZvwZLyntLPYMayWpRW2mUG/qLXk2ydYsLgs6gPgxkj3+jt3IPyyV84y6eP//IiGpEERCF6mDk7KXELjqzju9k3qxxXFI9qpi6Z5d/2il5QrnzAx7leivcPrDaGFI3jpx6OrL9Ms6dCUMUDNEX56hsWgeF/QYTVLuNNstKC11VnXw3AESdYCaE21tJW9uulXUWvjOI2yfxpJUTz6syheXQyQZJaq63J1G0DhHV05kWsQwLTTgKITvYLNUbMFVRK3KbVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BPUvqVY/oR9yRE41vY4FRFh2McGy5ZpgCl1eY+7+Zio=;
+ b=S1IkMLweI9kX7Jtwkq0gqcR0PEKvp9dQh18JB8CWM9b1KOkgGcohvkZYDpp2hGiG8lyxf4Eq0GFhZwtXo6kyzik73tpl1nqUJCZDfGtiigT2z2vcWbYFhP1kcKC0a7T7wtcQgl5J7E9c+eyEMPd0exyheyjbKFpbGiIN9HMISW7vo70fPEhwJTPZNIJkvP5KRp4lF0yrEyMeQhhpr0P0HGu6C/llkaY221IeTpLdKQ3jLeiyOVhVUlTUruynyE7IIiUig6TXTQJr4SBuWph/2p9UsZS119UwfB+FpDSu2xLvozPHpxJGk/GtZuo+TFcna3jj5JNlt2E99w4SU7GyDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BPUvqVY/oR9yRE41vY4FRFh2McGy5ZpgCl1eY+7+Zio=;
+ b=FyRNgfWs/Pli5rsBwJHYWCbwTdc9OXDgR2AXqT5ifIuPDPfTVjvGp/o5K700//fBAlEdny1twUQRu/4AU2r4XHINq81MTN02L1FVtmjfEDKd4tadbDMOMt+kMqpQ0lSxlQv9cqfjOijeKpHKYhUgitWW2rym7zscwTZLxNGudew=
+Received: from (2603:10b6:302:a::16) by
+ MWHPR21MB0142.namprd21.prod.outlook.com (2603:10b6:300:78::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3700.6; Thu, 17 Dec 2020 17:31:51 +0000
+Received: from MW2PR2101MB1052.namprd21.prod.outlook.com
+ ([fe80::b8f6:e748:cdf2:1922]) by MW2PR2101MB1052.namprd21.prod.outlook.com
+ ([fe80::b8f6:e748:cdf2:1922%8]) with mapi id 15.20.3700.013; Thu, 17 Dec 2020
+ 17:31:51 +0000
+From:   Michael Kelley <mikelley@microsoft.com>
+To:     Juergen Gross <jgross@suse.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Deep Shah <sdeep@vmware.com>,
+        "VMware, Inc." <pv-drivers@vmware.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        vkuznets <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>
+Subject: RE: [PATCH v3 06/15] x86/paravirt: switch time pvops functions to use
+ static_call()
+Thread-Topic: [PATCH v3 06/15] x86/paravirt: switch time pvops functions to
+ use static_call()
+Thread-Index: AQHW1FgK985cvXh+pkSmuKOGNWS3nqn7ilNA
+Date:   Thu, 17 Dec 2020 17:31:50 +0000
+Message-ID: <MW2PR2101MB1052877B5376112F1BAF3D93D7C49@MW2PR2101MB1052.namprd21.prod.outlook.com>
+References: <20201217093133.1507-1-jgross@suse.com>
+ <20201217093133.1507-7-jgross@suse.com>
+In-Reply-To: <20201217093133.1507-7-jgross@suse.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-17_10:2020-12-15,2020-12-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- mlxlogscore=999 bulkscore=0 impostorscore=0 mlxscore=0 malwarescore=0
- clxscore=1015 lowpriorityscore=0 suspectscore=0 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012170108
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-12-17T17:31:48Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=2f28ae99-1d93-43a6-b6b4-5233e0d4e0a9;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0
+authentication-results: suse.com; dkim=none (message not signed)
+ header.d=none;suse.com; dmarc=none action=none header.from=microsoft.com;
+x-originating-ip: [24.22.167.197]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: c4135d3c-37b9-435f-411d-08d8a2b1a3f9
+x-ms-traffictypediagnostic: MWHPR21MB0142:
+x-ms-exchange-transport-forked: True
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-microsoft-antispam-prvs: <MWHPR21MB0142C163DFC2F39C4763FC67D7C49@MWHPR21MB0142.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:989;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IaLSeEbsG8rP8E8je3b9OZamJ+BskrPETAcRrYVlQI3Rt8aj7KtizwCjW57Zqz2Zx275n/W7MR0jQ85VCW7UNqLs8aKRkvDWfIMAnhCRY4zd5brm5wI9zIvlXELzQ/vrf/xdtYv6pMzXHSc5opt53rOneu7GAB8bPGy+lYpRZbHKCKoDB8vGBTFVgwIIt9765jFJHRtOsggQBtiel7KTr2NS4C7Y6L995UdLZQk38anh2bY71FjssNraL9InvIQsSywdXHZVKFB2EFsMO1cb9MWkI4MyEhqjmJ9OoqnSJ7SCCVZlYe2YLRUL67dN1rivbmaUgYpsZ8f5iFIiwopN0c7wOxBX2Ed/AEUZgurxcwZVqsEid25xsr++WVwMcRgSFoID+F/J5+2pVf9LMXWpNg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR2101MB1052.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(396003)(346002)(136003)(376002)(366004)(7696005)(110136005)(64756008)(33656002)(66446008)(66556008)(8676002)(55016002)(186003)(66946007)(5660300002)(66476007)(10290500003)(478600001)(8936002)(86362001)(2906002)(26005)(7416002)(316002)(82950400001)(6506007)(52536014)(7406005)(76116006)(9686003)(8990500004)(71200400001)(82960400001)(54906003)(4326008)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?R+Y9nc8b6UEA7w8KIpQ6o0v1/MFkvTl91lNvfEN6wXfr8U6qJFOo+foh2ADb?=
+ =?us-ascii?Q?UCmkJiQx3AubR0XSzzMri+4BnswxO7qZwukUjjFCDbal5pJa4XNKR/KrMRTY?=
+ =?us-ascii?Q?73EgN0zFfqKUUfGSv2plvip3GA/FEggH7nyvmDrfYR5mjoeEQL5+9/r+6Yf/?=
+ =?us-ascii?Q?mlKXxd3dBVm2fJVMMmFMXY2bH2Q+3xp/p9kz8a1G8VGbUxE25U7CYixKFDfz?=
+ =?us-ascii?Q?GkvWD3Gr6BjVSfILdz4jilitWQId+hgQ1YvkcLxzoIn4R3iV6AR5/R6YgSf3?=
+ =?us-ascii?Q?Ta2H8b82IEpBWXydjLYty5qVvXM3avLKDJrvTjjEpC/2U1KK9ilwNwdD8mN3?=
+ =?us-ascii?Q?QVGPQeoBDcFlbLnsMLeJG8RBOdwJDAcbgRXyu9J6b+K1qkmejj2REh2zppgl?=
+ =?us-ascii?Q?Ex7wEM9NAWXJzBmo7FAEb26XrolYEmt5zijx1Re3vYysaaLTL2VMkEvk5omV?=
+ =?us-ascii?Q?GG8Nu4JSYcsCzxcNoxzGxWnSfFOY2yN7poOIEsvuUNhURTcwn7donnhimYI3?=
+ =?us-ascii?Q?cAhiQCpY/FtanBD9S/8RvG1bDhtIvI6BJJfSCkm6ollskdGVyRpWpgdd9xYa?=
+ =?us-ascii?Q?tY5lydtjAdz4EJcofqRU4MPq8Lv/mlLej1R5tdOHWjDGZoAxThPakVq6Fljm?=
+ =?us-ascii?Q?MmXrBZNlWOgDludtgKTJyBFvIgo1VeKXwuRQA5KsJzvxELD6Rp7Xe8Ryqqkg?=
+ =?us-ascii?Q?jpWzHxRx0JBV+hYJNAELCQX9Sax4sRcmjMnORmDTdrRzleSl7MfujiV76vzU?=
+ =?us-ascii?Q?3OXtfuDMhi0sNE/hFp5nAAFHlhF1wQMmTkhw7vAH5Xqmj7aiy6UpTE2Y0Vp5?=
+ =?us-ascii?Q?tWrlj11qpKH4TJbL0nLJTgAQHLzhwqljt+ALjPmUZ9hXfx1fqLJZOpbozNFm?=
+ =?us-ascii?Q?M8ba4+xJDh0cMDNH8H2zIgOGyNuHjHWkuKAtH/TowV1S+pcdNOJIp5o8BogS?=
+ =?us-ascii?Q?HSz+K1CIixkIRgNda0mVSrBsTrTfqxagd8+2n3yEco0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR2101MB1052.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4135d3c-37b9-435f-411d-08d8a2b1a3f9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2020 17:31:51.0431
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /Q5InnaJJLcy01EpA6UmZxFA1/22sr9BtTksbFiG3rnBWdxJ29Ds9dE6ZwmP4DBytRWwgdPYYjW15F4LEpR0acdS0Q0E8FQRsiq2pQ/kriE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR21MB0142
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/17/20 7:59 AM, Cornelia Huck wrote:
-> On Fri, 11 Dec 2020 10:04:43 -0500
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> 
->> On 12/11/20 10:01 AM, Matthew Rosato wrote:
->>> On 12/11/20 9:35 AM, Cornelia Huck wrote:
-> 
->>>> Let me summarize this to make sure I understand this new region
->>>> correctly:
->>>>
->>>> - some devices may have relaxed alignment/length requirements for
->>>>     pcistb (and friends?)
->>>
->>> The relaxed alignment bit is really specific to PCISTB behavior, so the
->>> "and friends" doesn't apply there.
-> 
-> Ok.
-> 
->>>    
->>>> - some devices may actually require writes to be done in a large chunk
->>>>     instead of being broken up (is that a strict subset of the devices
->>>>     above?)
->>>
->>> Yes, this is specific to ISM devices, which are always a relaxed
->>> alignment/length device.
->>>
->>> The inverse is an interesting question though (relaxed alignment devices
->>> that are not ISM, which you've posed as a possible future extension for
->>> emulated devices).  I'm not sure that any (real devices) exist where
->>> (relaxed_alignment && !ism), but 'what if' -- I guess the right approach
->>> would mean additional code in QEMU to handle relaxed alignment for the
->>> vfio mmio path as well (seen as pcistb_default in my qemu patchset) and
->>> being very specific in QEMU to only enable the region for an ism device.
->>
->> Let me be more precise there...  It would be additional code to handle
->> relaxed alignment for the default pcistb path (pcistb_default) which
->> would include BOTH emulated devices (should we ever surface the relaxed
->> alignment CLP bit and the guest kernel honor it) as well as any s390x
->> vfio-pci device that doesn't use this new I/O region described here.
-> 
-> Understood. Not sure if it is useful, but the important part is that we
-> could extend it if we wanted.
-> 
->>
->>>    
->>>> - some devices do not support the new MIO instructions (is that a
->>>>     subset of the relaxed alignment devices? I'm not familiar with the
->>>>     MIO instructions)
->>>>   
->>>
->>> The non-MIO requirement is again specific to ISM, which is a subset of
->>> the relaxed alignment devices.  In this case, the requirement is not
->>> limited to PCISTB, and that's why PCILG is also included here.  The ISM
->>> driver does not use PCISTG, and the only PCISTG instructions coming from
->>> the guest against an ISM device would be against the config space and
->>> those are OK to go through vfio still; so what was provided via the
->>> region is effectively the bare-minimum requirement to allow ISM to
->>> function properly in the guest.
->>>    
->>>> The patchsets introduce a new region that (a) is used by QEMU to submit
->>>> writes in one go, and (b) makes sure to call into the non-MIO
->>>> instructions directly; it's basically killing two birds with one stone
->>>> for ISM devices. Are these two requirements (large writes and non-MIO)
->>>> always going hand-in-hand, or is ISM just an odd device?
->>>
->>> I would say that ISM is definitely a special-case device, even just
->>> looking at the way it's implemented in the base kernel (interacting
->>> directly with the s390 kernel PCI layer in order to avoid use of MIO
->>> instructions -- no other driver does this).  But that said, having the
->>> two requirements hand-in-hand I think is not bad, though -- This
->>> approach ensures the specific instruction the guest wanted (or in this
->>> case, needed) is actually executed on the underlying host.
-> 
-> The basic question I have is whether it makes sense to specialcase the
-> ISM device (can we even find out that we're dealing with an ISM device
-> here?) to force the non-MIO instructions, as it is just a device with
+From: Juergen Gross <jgross@suse.com> Sent: Thursday, December 17, 2020 1:3=
+1 AM
 
-Yes, with the addition of the CLP data passed from the host via vfio 
-capabilities, we can tell this is an ISM device specifically via the 
-'pft' field in VFOI_DEVICE_INFO_CAP_ZPCI_BASE.  We don't actually 
-surface that field to the guest itself in the Q PCI FN clp rsponse (has 
-to do with Function Measurement Block requirements) but we can certainly 
-use that information in QEMU to restrict this behavior to only ISM devices.
+> The time pvops functions are the only ones left which might be
+> used in 32-bit mode and which return a 64-bit value.
+>=20
+> Switch them to use the static_call() mechanism instead of pvops, as
+> this allows quite some simplification of the pvops implementation.
+>=20
+> Due to include hell this requires to split out the time interfaces
+> into a new header file.
+>=20
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> ---
+>  arch/x86/Kconfig                      |  1 +
+>  arch/x86/include/asm/mshyperv.h       | 11 --------
+>  arch/x86/include/asm/paravirt.h       | 14 ----------
+>  arch/x86/include/asm/paravirt_time.h  | 38 +++++++++++++++++++++++++++
+>  arch/x86/include/asm/paravirt_types.h |  6 -----
+>  arch/x86/kernel/cpu/vmware.c          |  5 ++--
+>  arch/x86/kernel/kvm.c                 |  3 ++-
+>  arch/x86/kernel/kvmclock.c            |  3 ++-
+>  arch/x86/kernel/paravirt.c            | 16 ++++++++---
+>  arch/x86/kernel/tsc.c                 |  3 ++-
+>  arch/x86/xen/time.c                   | 12 ++++-----
+>  drivers/clocksource/hyperv_timer.c    |  5 ++--
+>  drivers/xen/time.c                    |  3 ++-
+>  kernel/sched/sched.h                  |  1 +
+>  14 files changed, 71 insertions(+), 50 deletions(-)
+>  create mode 100644 arch/x86/include/asm/paravirt_time.h
+>
 
-> some special requirements, or tie non-MIO to relaxed alignment. (Could
-> relaxed alignment devices in theory be served by MIO instructions as
-> well?)
+[snip]
+=20
+> diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyp=
+erv.h
+> index ffc289992d1b..45942d420626 100644
+> --- a/arch/x86/include/asm/mshyperv.h
+> +++ b/arch/x86/include/asm/mshyperv.h
+> @@ -56,17 +56,6 @@ typedef int (*hyperv_fill_flush_list_func)(
+>  #define hv_get_raw_timer() rdtsc_ordered()
+>  #define hv_get_vector() HYPERVISOR_CALLBACK_VECTOR
+>=20
+> -/*
+> - * Reference to pv_ops must be inline so objtool
+> - * detection of noinstr violations can work correctly.
+> - */
+> -static __always_inline void hv_setup_sched_clock(void *sched_clock)
+> -{
+> -#ifdef CONFIG_PARAVIRT
+> -	pv_ops.time.sched_clock =3D sched_clock;
+> -#endif
+> -}
+> -
+>  void hyperv_vector_handler(struct pt_regs *regs);
+>=20
+>  static inline void hv_enable_stimer0_percpu_irq(int irq) {}
 
-In practice, I think there are none today, but per the architecture it 
-IS possible to have relaxed alignment devices served by MIO 
-instructions, so we shouldn't rely on that bit alone as I'm doing in 
-this RFC.  I think instead relying on the pft value as I mention above 
-is what we have to do.
+[snip]
 
-> 
-> Another thing that came to my mind is whether we consider the guest to
-> be using a pci device and needing weird instructions to do that because
-> it's on s390, or whether it is issuing instructions for a device that
-> happens to be a pci device (sorry if that sounds a bit meta :)
-> 
+> diff --git a/drivers/clocksource/hyperv_timer.c b/drivers/clocksource/hyp=
+erv_timer.c
+> index ba04cb381cd3..1ed79993fc50 100644
+> --- a/drivers/clocksource/hyperv_timer.c
+> +++ b/drivers/clocksource/hyperv_timer.c
+> @@ -21,6 +21,7 @@
+>  #include <clocksource/hyperv_timer.h>
+>  #include <asm/hyperv-tlfs.h>
+>  #include <asm/mshyperv.h>
+> +#include <asm/paravirt_time.h>
+>=20
+>  static struct clock_event_device __percpu *hv_clock_event;
+>  static u64 hv_sched_clock_offset __ro_after_init;
+> @@ -445,7 +446,7 @@ static bool __init hv_init_tsc_clocksource(void)
+>  	clocksource_register_hz(&hyperv_cs_tsc, NSEC_PER_SEC/100);
+>=20
+>  	hv_sched_clock_offset =3D hv_read_reference_counter();
+> -	hv_setup_sched_clock(read_hv_sched_clock_tsc);
+> +	paravirt_set_sched_clock(read_hv_sched_clock_tsc);
+>=20
+>  	return true;
+>  }
+> @@ -470,6 +471,6 @@ void __init hv_init_clocksource(void)
+>  	clocksource_register_hz(&hyperv_cs_msr, NSEC_PER_SEC/100);
+>=20
+>  	hv_sched_clock_offset =3D hv_read_reference_counter();
+> -	hv_setup_sched_clock(read_hv_sched_clock_msr);
+> +	static_call_update(pv_sched_clock, read_hv_sched_clock_msr);
+>  }
+>  EXPORT_SYMBOL_GPL(hv_init_clocksource);
 
-Typically, I'd classify things as the former but I think ISM seems more 
-like the latter -- To me, ISM seems like less a classic PCI device and 
-more a device that happens to be using s390 PCI interfaces to accomplish 
-its goal.  But it's probably more of a case of this particular device 
-(and it's driver) are s390-specific and therefore built with the unique 
-s390 interface in-mind (and in fact invokes it directly rather than 
-through the general PCI layer), rather than fitting the typical PCI 
-device architecture on top of the s390 interface.
+These Hyper-V changes are problematic as we want to keep hyperv_timer.c
+architecture independent.  While only the code for x86/x64 is currently
+accepted upstream, code for ARM64 support is in progress.   So we need
+to use hv_setup_sched_clock() in hyperv_timer.c, and have the per-arch
+implementation in mshyperv.h.
 
-
->>>
->>> That said, the ability to re-use the large write for other devices would
->>> be nice -- but as hinted in the QEMU cover letter, this approach only
->>> works because ISM does not support MSI-X; using this approach for
->>> MSI-X-enabled devices breaks the MSI-X masking that vfio-pci does in
->>> QEMU (I tried an approach that used this region approach for all 3
->>> instructions as a test, PCISTG/PCISTB/PCILG, and threw it against mlx --
->>> any writes against an MSI-X enabled bar will miss the msi-x notifiers
->>> since we aren't performing memory operations against the typical
->>> vfio-pci bar).
-> 
-> Ugh. I wonder why ISM is so different from anything else.
-> 
-
-...  I've asked myself that alot lately :)
-
->>>    
->>>>
->>>> If there's an expectation that the new region will always use the
->>>> non-MIO instructions (in addition to the changed write handling), it
->>>> should be noted in the description for the region as well.
->>>>   
->>>
->>> Yes, this is indeed the expectation; I can clarify that.
->>>    
-> 
-> Thanks!
-> 
-
+Michael
