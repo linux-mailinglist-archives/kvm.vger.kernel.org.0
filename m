@@ -2,192 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42DD32DD43F
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 16:34:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D65142DD2EF
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 15:22:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728429AbgLQPcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 10:32:54 -0500
-Received: from 2.mo51.mail-out.ovh.net ([178.33.255.19]:44096 "EHLO
-        2.mo51.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727160AbgLQPcy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Dec 2020 10:32:54 -0500
-X-Greylist: delayed 4202 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Dec 2020 10:32:52 EST
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.102])
-        by mo51.mail-out.ovh.net (Postfix) with ESMTPS id 5C1002496CD;
-        Thu, 17 Dec 2020 15:15:37 +0100 (CET)
-Received: from kaod.org (37.59.142.98) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 17 Dec
- 2020 15:15:31 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-98R002eb1eb60c-f1ce-4f5a-a695-035b055ce97f,
-                    D250AAD16230E071DBA8D0F8473359178B71E032) smtp.auth=groug@kaod.org
-X-OVh-ClientIp: 82.253.208.248
-Date:   Thu, 17 Dec 2020 15:15:30 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     Cornelia Huck <cohuck@redhat.com>
-CC:     David Gibson <david@gibson.dropbear.id.au>, <pair@us.ibm.com>,
-        <brijesh.singh@amd.com>, <frankja@linux.ibm.com>,
-        <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, <david@redhat.com>,
-        <qemu-devel@nongnu.org>, <dgilbert@redhat.com>,
-        <pasic@linux.ibm.com>, <borntraeger@de.ibm.com>,
-        <qemu-s390x@nongnu.org>, <qemu-ppc@nongnu.org>,
-        <berrange@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        <thuth@redhat.com>, <pbonzini@redhat.com>, <rth@twiddle.net>,
-        <mdroth@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20201217151530.54431f0e@bahia.lan>
-In-Reply-To: <20201217123842.51063918.cohuck@redhat.com>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
-        <20201204054415.579042-12-david@gibson.dropbear.id.au>
-        <20201214182240.2abd85eb.cohuck@redhat.com>
-        <20201217054736.GH310465@yekko.fritz.box>
-        <20201217123842.51063918.cohuck@redhat.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1728117AbgLQOWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 09:22:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21021 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727385AbgLQOWm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 09:22:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608214874;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hcD+kMtaFtPvzKyY/JuQIAmqlfriWBsmZQrLjKikKr4=;
+        b=OVeheA/DPNlUV5Ppn7QudZBb9op89cUAnn0wUZFhNRbI9zkZOni2OO5KRKuXMKrjLfdI3+
+        8jfCuw/QQ9+z4vB+cnkv8LBchoP1JNRQQNwIF853n4ztguUaTZSTqT/Ih+7fJwlT8Z+wIE
+        m9r8+sJSRiPLur3jkyS/hr08K25Uc/A=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-53-Gbbnn06vMtehX3iDpQrRTQ-1; Thu, 17 Dec 2020 09:21:13 -0500
+X-MC-Unique: Gbbnn06vMtehX3iDpQrRTQ-1
+Received: by mail-ed1-f72.google.com with SMTP id d12so13535841edx.23
+        for <kvm@vger.kernel.org>; Thu, 17 Dec 2020 06:21:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hcD+kMtaFtPvzKyY/JuQIAmqlfriWBsmZQrLjKikKr4=;
+        b=p0j2Gq/9Y5y+7fE/Jvu1B6Q5aP60KFuH0cPGvZI+W2IYaIRNKf/8JT8Bmm3Cnke609
+         HrHToG1MzCY5FcjvzCa6c5SyCDn50f+6qkfPv5FJbDttQ/Fqr83KPjg8W0ORRMRJzVJ6
+         jdYeT5sQ2Zy4ytI1kma2PR6X2Ht7xdX+tuS2ImszztgbDk0/j2I6H6jR/B0I6RtogpSy
+         5T0aDeVeTQKEWSjfDfqrp/EacfAYkP6D7DRScKb3h05DEv4XGyveo+g348mf7LwltNJK
+         BhpOMdRH4FrIHXTtMiJBYgKy1295I03X0YEQfAuvq1HugQj1AzNnZJwJpZsPZO3674RW
+         VkWQ==
+X-Gm-Message-State: AOAM5335rA7qjL4IwMARm3sOsWK0P1RQZGyo6UuDo1cVWXHwes47QeEF
+        s1JunFgadX/nqHlKNHTSdzE9b6Yt+P6P5f8F7El9lGfFJvLkWPFkqcdeHhNnttILXw3c8p/9Omv
+        HR+zG//RemhxDzJGej7rnwi6ZWM7pTinNz9qoNrOhzdB7696L6VozOInuBcD8LFVt
+X-Received: by 2002:a50:d50a:: with SMTP id u10mr8933791edi.58.1608214871653;
+        Thu, 17 Dec 2020 06:21:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz3hTrIqdmHGdsi3U1PnxHfRaRQT9o2PkvtSkrbd/8ciiBLRIb0lsnRHkYqJRPNdib+8dzLKg==
+X-Received: by 2002:a50:d50a:: with SMTP id u10mr8933761edi.58.1608214871329;
+        Thu, 17 Dec 2020 06:21:11 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id be6sm23542372edb.29.2020.12.17.06.21.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Dec 2020 06:21:10 -0800 (PST)
+Subject: Re: [PATCH] KVM: mmu: Fix SPTE encoding of MMIO generation upper half
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        stable@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org
+References: <1607955407131211@kroah.com>
+ <f5cb26d9a45cbaf617928d1314e7c0efea597e05.1608169775.git.maciej.szmigiero@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2304633f-b9ae-c471-9edc-257fb3ceb390@redhat.com>
+Date:   Thu, 17 Dec 2020 15:21:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/q5z.CNi9D8q2e6l2k8nde8k";
-        protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Originating-IP: [37.59.142.98]
-X-ClientProxiedBy: DAG5EX2.mxp5.local (172.16.2.42) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 70f337f8-bdb8-4bf1-8a81-ebe8f5481bfe
-X-Ovh-Tracer-Id: 7495115682604226969
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudelgedgiedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtihesghdtreerredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnheplefggfefueegudegkeevieevveejfffhuddvgeffteekieevueefgfeltdfgieetnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepvghhrggskhhoshhtsehrvgguhhgrthdrtghomh
+In-Reply-To: <f5cb26d9a45cbaf617928d1314e7c0efea597e05.1608169775.git.maciej.szmigiero@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/q5z.CNi9D8q2e6l2k8nde8k
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 17/12/20 14:46, Maciej S. Szmigiero wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+> 
+> Commit cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
+> cleaned up the computation of MMIO generation SPTE masks, however it
+> introduced a bug how the upper part was encoded:
+> SPTE bits 52-61 were supposed to contain bits 10-19 of the current
+> generation number, however a missing shift encoded bits 1-10 there instead
+> (mostly duplicating the lower part of the encoded generation number that
+> then consisted of bits 1-9).
+> 
+> In the meantime, the upper part was shrunk by one bit and moved by
+> subsequent commits to become an upper half of the encoded generation number
+> (bits 9-17 of bits 0-17 encoded in a SPTE).
+> 
+> In addition to the above, commit 56871d444bc4 ("KVM: x86: fix overlap between SPTE_MMIO_MASK and generation")
+> has changed the SPTE bit range assigned to encode the generation number and
+> the total number of bits encoded but did not update them in the comment
+> attached to their defines, nor in the KVM MMU doc.
+> Let's do it here, too, since it is too trivial thing to warrant a separate
+> commit.
+> 
+> This is a backport of the upstream commit for 5.9.x stable series, in which
+> the x86 KVM MMU SPTE handling isn't yet split out to spte.{c,h} files.
+> Other than that, it's a straightforward port.
+> 
+> Fixes: cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
+> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> [Reorganize macros so that everything is computed from the bit ranges. - Paolo]
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> (cherry picked from commit 34c0f6f2695a2db81e09a3ab7bdb2853f45d4d3d)
+> Cc: stable@vger.kernel.org # 5.9.x
+> ---
+>   Documentation/virt/kvm/mmu.rst |  2 +-
+>   arch/x86/kvm/mmu/mmu.c         | 29 ++++++++++++++++++++---------
+>   2 files changed, 21 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
+> index 1c030dbac7c4..5bfe28b0728e 100644
+> --- a/Documentation/virt/kvm/mmu.rst
+> +++ b/Documentation/virt/kvm/mmu.rst
+> @@ -455,7 +455,7 @@ If the generation number of the spte does not equal the global generation
+>   number, it will ignore the cached MMIO information and handle the page
+>   fault through the slow path.
+>   
+> -Since only 19 bits are used to store generation-number on mmio spte, all
+> +Since only 18 bits are used to store generation-number on mmio spte, all
+>   pages are zapped when there is an overflow.
+>   
+>   Unfortunately, a single memory access might access kvm_memslots(kvm) multiple
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index d0ca3ab38952..c1b48d04a306 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -402,11 +402,11 @@ static inline bool is_access_track_spte(u64 spte)
+>   }
+>   
+>   /*
+> - * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
+> + * Due to limited space in PTEs, the MMIO generation is a 18 bit subset of
+>    * the memslots generation and is derived as follows:
+>    *
+>    * Bits 0-8 of the MMIO generation are propagated to spte bits 3-11
+> - * Bits 9-18 of the MMIO generation are propagated to spte bits 52-61
+> + * Bits 9-17 of the MMIO generation are propagated to spte bits 54-62
+>    *
+>    * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
+>    * the MMIO generation number, as doing so would require stealing a bit from
+> @@ -415,18 +415,29 @@ static inline bool is_access_track_spte(u64 spte)
+>    * requires a full MMU zap).  The flag is instead explicitly queried when
+>    * checking for MMIO spte cache hits.
+>    */
+> -#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(17, 0)
+>   
+>   #define MMIO_SPTE_GEN_LOW_START		3
+>   #define MMIO_SPTE_GEN_LOW_END		11
+> -#define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
+> -						    MMIO_SPTE_GEN_LOW_START)
+>   
+>   #define MMIO_SPTE_GEN_HIGH_START	PT64_SECOND_AVAIL_BITS_SHIFT
+>   #define MMIO_SPTE_GEN_HIGH_END		62
+> +
+> +#define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
+> +						    MMIO_SPTE_GEN_LOW_START)
+>   #define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
+>   						    MMIO_SPTE_GEN_HIGH_START)
+>   
+> +#define MMIO_SPTE_GEN_LOW_BITS		(MMIO_SPTE_GEN_LOW_END - MMIO_SPTE_GEN_LOW_START + 1)
+> +#define MMIO_SPTE_GEN_HIGH_BITS		(MMIO_SPTE_GEN_HIGH_END - MMIO_SPTE_GEN_HIGH_START + 1)
+> +
+> +/* remember to adjust the comment above as well if you change these */
+> +static_assert(MMIO_SPTE_GEN_LOW_BITS == 9 && MMIO_SPTE_GEN_HIGH_BITS == 9);
+> +
+> +#define MMIO_SPTE_GEN_LOW_SHIFT		(MMIO_SPTE_GEN_LOW_START - 0)
+> +#define MMIO_SPTE_GEN_HIGH_SHIFT	(MMIO_SPTE_GEN_HIGH_START - MMIO_SPTE_GEN_LOW_BITS)
+> +
+> +#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
+> +
+>   static u64 generation_mmio_spte_mask(u64 gen)
+>   {
+>   	u64 mask;
+> @@ -434,8 +445,8 @@ static u64 generation_mmio_spte_mask(u64 gen)
+>   	WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
+>   	BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK | MMIO_SPTE_GEN_LOW_MASK) & SPTE_SPECIAL_MASK);
+>   
+> -	mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
+> -	mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
+> +	mask = (gen << MMIO_SPTE_GEN_LOW_SHIFT) & MMIO_SPTE_GEN_LOW_MASK;
+> +	mask |= (gen << MMIO_SPTE_GEN_HIGH_SHIFT) & MMIO_SPTE_GEN_HIGH_MASK;
+>   	return mask;
+>   }
+>   
+> @@ -443,8 +454,8 @@ static u64 get_mmio_spte_generation(u64 spte)
+>   {
+>   	u64 gen;
+>   
+> -	gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_START;
+> -	gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_START;
+> +	gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_SHIFT;
+> +	gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_SHIFT;
+>   	return gen;
+>   }
+>   
+> 
 
-On Thu, 17 Dec 2020 12:38:42 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> On Thu, 17 Dec 2020 16:47:36 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Mon, Dec 14, 2020 at 06:22:40PM +0100, Cornelia Huck wrote:
-> > > On Fri,  4 Dec 2020 16:44:13 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > We haven't yet implemented the fairly involved handshaking that wil=
-l be
-> > > > needed to migrate PEF protected guests.  For now, just use a migrat=
-ion
-> > > > blocker so we get a meaningful error if someone attempts this (this=
- is the
-> > > > same approach used by AMD SEV).
-> > > >=20
-> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > ---
-> > > >  hw/ppc/pef.c | 9 +++++++++
-> > > >  1 file changed, 9 insertions(+)
-> > > >=20
-> > > > diff --git a/hw/ppc/pef.c b/hw/ppc/pef.c
-> > > > index 3ae3059cfe..edc3e744ba 100644
-> > > > --- a/hw/ppc/pef.c
-> > > > +++ b/hw/ppc/pef.c
-> > > > @@ -38,7 +38,11 @@ struct PefGuestState {
-> > > >  };
-> > > > =20
-> > > >  #ifdef CONFIG_KVM
-> > > > +static Error *pef_mig_blocker;
-> > > > +
-> > > >  static int kvmppc_svm_init(Error **errp) =20
-> > >=20
-> > > This looks weird? =20
-> >=20
-> > Oops.  Not sure how that made it past even my rudimentary compile
-> > testing.
-> >=20
-> > > > +
-> > > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
-> > > >  {
-> > > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUES=
-T)) {
-> > > >          error_setg(errp,
-> > > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
-> > > >          }
-> > > >      }
-> > > > =20
-> > > > +    /* add migration blocker */
-> > > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemente=
-d");
-> > > > +    /* NB: This can fail if --only-migratable is used */
-> > > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal); =20
-> > >=20
-> > > Just so that I understand: is PEF something that is enabled by the ho=
-st
-> > > (and the guest is either secured or doesn't start), or is it using a
-> > > model like s390x PV where the guest initiates the transition into
-> > > secured mode? =20
-> >=20
-> > Like s390x PV it's initiated by the guest.
-> >=20
-> > > Asking because s390x adds the migration blocker only when the
-> > > transition is actually happening (i.e. guests that do not transition
-> > > into secure mode remain migratable.) This has the side effect that you
-> > > might be able to start a machine with --only-migratable that
-> > > transitions into a non-migratable machine via a guest action, if I'm
-> > > not mistaken. Without the new object, I don't see a way to block with
-> > > --only-migratable; with it, we should be able to do that. Not sure wh=
-at
-> > > the desirable behaviour is here. =20
-> >=20
-
-The purpose of --only-migratable is specifically to prevent the machine
-to transition to a non-migrate state IIUC. The guest transition to
-secure mode should be nacked in this case.
-
-> > Hm, I'm not sure what the best option is here either.
->=20
-> If we agree on anything, it should be as consistent across
-> architectures as possible :)
->=20
-> If we want to add the migration blocker to s390x even before the guest
-> transitions, it needs to be tied to the new object; if we'd make it
-> dependent on the cpu feature bit, we'd block migration of all machines
-> on hardware with SE and a recent kernel.
->=20
-> Is there a convenient point in time when PEF guests transition where
-> QEMU can add a blocker?
->=20
-> >=20
-> > >  =20
-> > > > +
-> > > >      return 0;
-> > > >  }
-> > > >   =20
-> > >  =20
-> >=20
->=20
-
-
---Sig_/q5z.CNi9D8q2e6l2k8nde8k
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl/baAIACgkQcdTV5YIv
-c9b/tQ/9EY1sZYjVLPCl4rDkpINniFQpBYvmoIj5KjiVi5cp8g/LWvK/XvvXgoDX
-gz3aKzE7cOGJo2BN6BjitohZxgOWWz1wTdqaPP29rzvNAd7iCeByM47tvJ1WBDey
-6vBgmdaJZraYX+lcDE6sC7T4dRohZd5Jb0lh+ova937iT5gc8bhdP+AcOgYc/plo
-sSB7wHBGUyT2Ror812RXPTns58hmVf/+gPK0eaAb/hE8h/rxieEH8zZJJ0c86ZSU
-q+NYb6w4Ylu927EPPnyiaJsZV327GgLnBTRAdG7yi3ndaYDZZi07+ydxazbH6R5U
-sP2PXPnxhFUjFc05S7ljcgj3xE9eijLf1Wa7MSH649dXXNNm/tojkXGWrqDi9Lul
-HhtmaNUgfal1ufhq7BIiUUr5CNsoaeH5iiIxdcrwqInZaA0pTAdVra375QvRY9ZW
-xWTZyEX0+UOQToMqYvyeFp1TvEzPtFy6tmTL48Tnoxjm/jLawgtad2X5pY+HjbnV
-HcD1mzwu/7IBX0f+L6KMaYLoOHNPa9O385sgb5kbnEqmCYfiu/h++zP6pgntW9G2
-7yAvkaMhOMA4egNHh8iShtxAFLYMFXv99qKSj9MrPWEq14oKeYmD+mzwEQz8UNHl
-obBwnSDFFncLrOUbxgVtOPZ2lPF/0o/dNoGcvhpPYWco72TwFQk=
-=gjRQ
------END PGP SIGNATURE-----
-
---Sig_/q5z.CNi9D8q2e6l2k8nde8k--
