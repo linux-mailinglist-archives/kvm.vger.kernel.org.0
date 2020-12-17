@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 014112DD04F
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 12:27:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 584062DD093
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 12:40:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726503AbgLQL0u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 06:26:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53266 "EHLO
+        id S1727784AbgLQLkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 06:40:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60281 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725871AbgLQL0t (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 06:26:49 -0500
+        by vger.kernel.org with ESMTP id S1726840AbgLQLki (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 06:40:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608204322;
+        s=mimecast20190719; t=1608205152;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=lxpRQsHZQY7Zhu3tHDp4QojWc4yaEKZVUewR/UonSok=;
-        b=htDZB9NlajgA4XWKifDKQl+3SJ8LvvJd9KFOfbDC5JfEHyblbCNtN8TcMcKXPyPkDsIn1q
-        CcKzxAjTVr13a1sUDCwPNz+JjH+9cja/POgMiBGDS51h0ZwAzHcQ+IVqnxXXRy2o4TPRLw
-        5fiBHy3NVEV+ZtkDFvqoFW11dSMrijM=
+        bh=MgOj6EuRPRhgc87E1eKvG+ZcwKY4KgeCGuqpCKprihs=;
+        b=hkCyy7VLVQrMcFW8YIq1R6+3YqSx35B9guwNkDODbH6VlF+laTUPt9pRwNe7y/arZGaLoI
+        /yXrQm1NzIXgvSYr75wcWzwGszsSO81n1ocpjJJPbZqBjuRaMk1eeEmGMSripW8Tt8oiwD
+        3tguQDzgQBdQUZ/2rE6V1M/uAqfNluQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-0m8KPQnMPVORYFAcIXnkGw-1; Thu, 17 Dec 2020 06:25:18 -0500
-X-MC-Unique: 0m8KPQnMPVORYFAcIXnkGw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-445-KUnFFOc5NUOpCTQHrf2Jbw-1; Thu, 17 Dec 2020 06:39:10 -0500
+X-MC-Unique: KUnFFOc5NUOpCTQHrf2Jbw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3FC4809DCD;
-        Thu, 17 Dec 2020 11:25:16 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CB4A59;
+        Thu, 17 Dec 2020 11:39:08 +0000 (UTC)
 Received: from gondolin (ovpn-113-176.ams2.redhat.com [10.36.113.176])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 75A36100164C;
-        Thu, 17 Dec 2020 11:25:03 +0000 (UTC)
-Date:   Thu, 17 Dec 2020 12:24:35 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A1E4F2C314;
+        Thu, 17 Dec 2020 11:38:57 +0000 (UTC)
+Date:   Thu, 17 Dec 2020 12:38:42 +0100
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     David Gibson <david@gibson.dropbear.id.au>
 Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
@@ -45,144 +45,138 @@ Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
         david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
         borntraeger@de.ibm.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         pasic@linux.ibm.com
-Subject: Re: [for-6.0 v5 08/13] securable guest memory: Introduce sgm
- "ready" flag
-Message-ID: <20201217122435.5d7513fe.cohuck@redhat.com>
-In-Reply-To: <20201217053820.GG310465@yekko.fritz.box>
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20201217123842.51063918.cohuck@redhat.com>
+In-Reply-To: <20201217054736.GH310465@yekko.fritz.box>
 References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
-        <20201204054415.579042-9-david@gibson.dropbear.id.au>
-        <20201214180036.3837693e.cohuck@redhat.com>
-        <20201217053820.GG310465@yekko.fritz.box>
+        <20201204054415.579042-12-david@gibson.dropbear.id.au>
+        <20201214182240.2abd85eb.cohuck@redhat.com>
+        <20201217054736.GH310465@yekko.fritz.box>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/wsLjr2rTq1uwHIhjnWRYsmX";
+Content-Type: multipart/signed; boundary="Sig_/ukk4S5nSA=gXo.pxm5suYdZ";
  protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/wsLjr2rTq1uwHIhjnWRYsmX
+--Sig_/ukk4S5nSA=gXo.pxm5suYdZ
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 17 Dec 2020 16:38:20 +1100
+On Thu, 17 Dec 2020 16:47:36 +1100
 David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Mon, Dec 14, 2020 at 06:00:36PM +0100, Cornelia Huck wrote:
-> > On Fri,  4 Dec 2020 16:44:10 +1100
+> On Mon, Dec 14, 2020 at 06:22:40PM +0100, Cornelia Huck wrote:
+> > On Fri,  4 Dec 2020 16:44:13 +1100
 > > David Gibson <david@gibson.dropbear.id.au> wrote:
 > >  =20
-> > > The platform specific details of mechanisms for implementing securable
-> > > guest memory may require setup at various points during initializatio=
-n.
-> > > Thus, it's not really feasible to have a single sgm initialization ho=
-ok,
-> > > but instead each mechanism needs its own initialization calls in arch=
- or
-> > > machine specific code.
-> > >=20
-> > > However, to make it harder to have a bug where a mechanism isn't prop=
-erly
-> > > initialized under some circumstances, we want to have a common place,
-> > > relatively late in boot, where we verify that sgm has been initialize=
-d if
-> > > it was requested.
-> > >=20
-> > > This patch introduces a ready flag to the SecurableGuestMemory base t=
-ype
-> > > to accomplish this, which we verify just before the machine specific
-> > > initialization function.
+> > > We haven't yet implemented the fairly involved handshaking that will =
+be
+> > > needed to migrate PEF protected guests.  For now, just use a migration
+> > > blocker so we get a meaningful error if someone attempts this (this i=
+s the
+> > > same approach used by AMD SEV).
 > > >=20
 > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > > > ---
-> > >  hw/core/machine.c                     | 8 ++++++++
-> > >  include/exec/securable-guest-memory.h | 2 ++
-> > >  target/i386/sev.c                     | 2 ++
-> > >  3 files changed, 12 insertions(+)
+> > >  hw/ppc/pef.c | 9 +++++++++
+> > >  1 file changed, 9 insertions(+)
 > > >=20
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index 816ea3ae3e..a67a27d03c 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -1155,6 +1155,14 @@ void machine_run_board_init(MachineState *mach=
-ine)
+> > > diff --git a/hw/ppc/pef.c b/hw/ppc/pef.c
+> > > index 3ae3059cfe..edc3e744ba 100644
+> > > --- a/hw/ppc/pef.c
+> > > +++ b/hw/ppc/pef.c
+> > > @@ -38,7 +38,11 @@ struct PefGuestState {
+> > >  };
+> > > =20
+> > >  #ifdef CONFIG_KVM
+> > > +static Error *pef_mig_blocker;
+> > > +
+> > >  static int kvmppc_svm_init(Error **errp) =20
+> >=20
+> > This looks weird? =20
+>=20
+> Oops.  Not sure how that made it past even my rudimentary compile
+> testing.
+>=20
+> > > +
+> > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
+> > >  {
+> > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)=
+) {
+> > >          error_setg(errp,
+> > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
+> > >          }
 > > >      }
 > > > =20
-> > >      if (machine->sgm) {
-> > > +        /*
-> > > +         * Where securable guest memory is initialized depends on the
-> > > +         * specific mechanism in use.  But, we need to make sure it's
-> > > +         * ready by now.  If it isn't, that's a bug in the
-> > > +         * implementation of that sgm mechanism.
-> > > +         */
-> > > +        assert(machine->sgm->ready); =20
+> > > +    /* add migration blocker */
+> > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented"=
+);
+> > > +    /* NB: This can fail if --only-migratable is used */
+> > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal); =20
 > >=20
-> > Under which circumstances might we arrive here with 'ready' not set?
-> >=20
-> > - programming error, setup is happening too late -> assert() seems
-> >   appropriate =20
+> > Just so that I understand: is PEF something that is enabled by the host
+> > (and the guest is either secured or doesn't start), or is it using a
+> > model like s390x PV where the guest initiates the transition into
+> > secured mode? =20
 >=20
-> Yes, this is designed to catch programming errors.  In particular I'm
-> concerned about:
->   * Re-arranging the init code, and either entirely forgetting the sgm
->     setup, or accidentally moving it too late
->   * The sgm setup is buried in the machine setup code, conditional on
->     various things, and changes mean we no longer either call it or
->     (correctly) fail
->   * User has specified an sgm scheme designed for a machine type other
->     than the one they selected.  The arch/machine init code hasn't
->     correctly accounted for that possibility and ignores it, instead
->     of correctly throwing an error
-> =20
-> > - we tried to set it up, but some error happened -> should we rely on
-> >   the setup code to error out first? (i.e. we won't end up here, unless
-> >   there's a programming error, in which case the assert() looks
-> >   fine) =20
+> Like s390x PV it's initiated by the guest.
 >=20
-> Yes, that's my intention.
+> > Asking because s390x adds the migration blocker only when the
+> > transition is actually happening (i.e. guests that do not transition
+> > into secure mode remain migratable.) This has the side effect that you
+> > might be able to start a machine with --only-migratable that
+> > transitions into a non-migratable machine via a guest action, if I'm
+> > not mistaken. Without the new object, I don't see a way to block with
+> > --only-migratable; with it, we should be able to do that. Not sure what
+> > the desirable behaviour is here. =20
 >=20
-> >   Is there a possible use case for "we could not set it up, but we
-> >   support an unsecured guest (as long as it is clear what happens)"? =20
->=20
-> I don't think so.  My feeling is that if you specify that you want the
-> feature, qemu needs to either give it to you, or fail, not silently
-> degrade the features presented to the guest.
+> Hm, I'm not sure what the best option is here either.
 
-Yes, that should align with what QEMU is doing elsewhere.
+If we agree on anything, it should be as consistent across
+architectures as possible :)
+
+If we want to add the migration blocker to s390x even before the guest
+transitions, it needs to be tied to the new object; if we'd make it
+dependent on the cpu feature bit, we'd block migration of all machines
+on hardware with SE and a recent kernel.
+
+Is there a convenient point in time when PEF guests transition where
+QEMU can add a blocker?
 
 >=20
-> >   Likely only for guests that transition themselves, but one could
-> >   argue that QEMU should simply be invoked a second time without the
-> >   sgm stuff being specified in the error case. =20
+> >  =20
+> > > +
+> > >      return 0;
+> > >  }
+> > >   =20
+> >  =20
 >=20
-> Right - I think whatever error we give here is likely to be easier to
-> diagnose than the guest itself throwing an error when it fails to
-> transition to secure mode (plus we should catch it always, rather than
-> only if we run a guest which tries to go secure).
 
-Yes, that makes sense.
 
---Sig_/wsLjr2rTq1uwHIhjnWRYsmX
+--Sig_/ukk4S5nSA=gXo.pxm5suYdZ
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl/bP/MACgkQ3s9rk8bw
-L6/uTw//S3IbdBwx0BYRCbCnGHnICuCmlQmt5o41nd86PMCiN1dQ6egtoQf6j2RY
-fkRrd0AmD/5QtfO7KYUJnaIy9W3uSDgFQTIfGey0J7SvoY0BIxEW5gSMl31othxI
-jAkxrC6JRc4/SgpuvdWUTTf1NBph+v5LycOTjLfih6UvVrSLCsrAtt+X4opPx1ti
-reDAsF1qmeCaIUll9JgF3seJzsjl794hmW69DycTv9qLcLOdBHjwDhUnfh5Ttd0Y
-3Tf9wPBJDs3Wpdmxx5G6un+4n79MCZ+13QnFcrPObo21jn4+Tm2lVViPJrjKGhxc
-XQ8nJlaGRMaqtfpi9HEI1bxi7+2Js6oHudpWavXMKjOydtbmT5kI9/NjIKasnXLK
-tRN2ropRKxYUmSA8L2sStv1zUig1yp2A8Ih6r2CCnaCBJK7ls2o7vXF6ytwI7m7u
-+Rh+Xg871P0b+vtFW+TCSzcNBT2K9yFM4BDkWn3vsnJi72Z2bPku2o7wZJQx5GJJ
-DpBmroXYVLpwrgjjYmZHYpXKRNZIdfsGDkH1xj9hYoAqUFp0lwjvqmKRPjAIT92E
-ip6ejIcl4+rPUzn7b0tYH7EtNebYV2yzKvlDi7POdWoidFpmUzPCG9b8tmGpz+Os
-2N84KaCwSFn2PBDqUnR1uKXlViE1qitO+mUozNgyafFaaTmZpR8=
-=L1lU
+iQIyBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl/bQ0IACgkQ3s9rk8bw
+L6+AFA/4tEcBhNhYOgLqWDrIgP/QxylFpcbIrcxUr5u3yx5AdGqesDKqSgOiMcQX
+zNhP4JKbdrIPrgvWiGkknQnbXPy0Z4Ge1OUJ3eGMz+h3/L8cD7Kq51WMwTXK+NUB
+hySnI3x7LbNUhAkTFr3jN7OC2GTn+x/c/tSx6kAOGJHWLgN0Mk6cdKvgEHwTRm/I
+EW7GCEkpvQKS1ePdYaRHEjNtqFvP45PRg5Li/0hMEuQPkCGE1Wp0MV6kneQ8Z0cw
+eY1e6BjBblCJV9ZInWKstJSQGDityJ6ln0xlmF/bhQrmGszs0Jyka/wPyVZdEb73
+ypgU51dP6JDU9scKJSNNy/+oOpTDRHw50FrrS7NxF/AXd65QlOkRAveWtc+fWO4b
+FH0XlxnAsDLrae8AcGSUtQZzXXebtVtqXQKjV+CtIrR0uEObCLgPRozEQ7bLVqzZ
+AwzIOWRFHww/ILvnBxqK76HYfZW3Lc/goTPrpFctwiUvxzPuPau//H6ZgKwhDN+E
+QspwFSgRS1hw/PqM/837nlAJcJJsW/9kZpXVeJt4vjyNJxvpysn8pJq/7QGCuolW
+A1GvRARCQY/i+chjjobrrkGbN0n6Rro+2V/Mv2HAGR3CUo0uqRsd7nlhb+WHCLBI
+wUk8dOlzAsBFNlGBywqOQTxPd9JRoPz7gJGyx6YiNCGS5P96Xg==
+=07GC
 -----END PGP SIGNATURE-----
 
---Sig_/wsLjr2rTq1uwHIhjnWRYsmX--
+--Sig_/ukk4S5nSA=gXo.pxm5suYdZ--
 
