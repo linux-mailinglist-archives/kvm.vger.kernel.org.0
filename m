@@ -2,427 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFF602DD2BF
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 15:16:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42DD32DD43F
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 16:34:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728375AbgLQOPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 09:15:45 -0500
-Received: from foss.arm.com ([217.140.110.172]:38560 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728331AbgLQOPo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Dec 2020 09:15:44 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09F7A143D;
-        Thu, 17 Dec 2020 06:14:23 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BA193F85F;
-        Thu, 17 Dec 2020 06:14:21 -0800 (PST)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     drjones@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     andre.przywara@arm.com, eric.auger@redhat.com, yuzenghui@huawei.com
-Subject: [kvm-unit-tests PATCH v2 12/12] arm64: gic: Use IPI test checking for the LPI tests
-Date:   Thu, 17 Dec 2020 14:14:00 +0000
-Message-Id: <20201217141400.106137-13-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201217141400.106137-1-alexandru.elisei@arm.com>
-References: <20201217141400.106137-1-alexandru.elisei@arm.com>
+        id S1728429AbgLQPcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 10:32:54 -0500
+Received: from 2.mo51.mail-out.ovh.net ([178.33.255.19]:44096 "EHLO
+        2.mo51.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727160AbgLQPcy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 10:32:54 -0500
+X-Greylist: delayed 4202 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Dec 2020 10:32:52 EST
+Received: from mxplan5.mail.ovh.net (unknown [10.108.4.102])
+        by mo51.mail-out.ovh.net (Postfix) with ESMTPS id 5C1002496CD;
+        Thu, 17 Dec 2020 15:15:37 +0100 (CET)
+Received: from kaod.org (37.59.142.98) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 17 Dec
+ 2020 15:15:31 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-98R002eb1eb60c-f1ce-4f5a-a695-035b055ce97f,
+                    D250AAD16230E071DBA8D0F8473359178B71E032) smtp.auth=groug@kaod.org
+X-OVh-ClientIp: 82.253.208.248
+Date:   Thu, 17 Dec 2020 15:15:30 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     Cornelia Huck <cohuck@redhat.com>
+CC:     David Gibson <david@gibson.dropbear.id.au>, <pair@us.ibm.com>,
+        <brijesh.singh@amd.com>, <frankja@linux.ibm.com>,
+        <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, <david@redhat.com>,
+        <qemu-devel@nongnu.org>, <dgilbert@redhat.com>,
+        <pasic@linux.ibm.com>, <borntraeger@de.ibm.com>,
+        <qemu-s390x@nongnu.org>, <qemu-ppc@nongnu.org>,
+        <berrange@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        <thuth@redhat.com>, <pbonzini@redhat.com>, <rth@twiddle.net>,
+        <mdroth@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20201217151530.54431f0e@bahia.lan>
+In-Reply-To: <20201217123842.51063918.cohuck@redhat.com>
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+        <20201204054415.579042-12-david@gibson.dropbear.id.au>
+        <20201214182240.2abd85eb.cohuck@redhat.com>
+        <20201217054736.GH310465@yekko.fritz.box>
+        <20201217123842.51063918.cohuck@redhat.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/q5z.CNi9D8q2e6l2k8nde8k";
+        protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Originating-IP: [37.59.142.98]
+X-ClientProxiedBy: DAG5EX2.mxp5.local (172.16.2.42) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 70f337f8-bdb8-4bf1-8a81-ebe8f5481bfe
+X-Ovh-Tracer-Id: 7495115682604226969
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudelgedgiedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtihesghdtreerredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnheplefggfefueegudegkeevieevveejfffhuddvgeffteekieevueefgfeltdfgieetnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepvghhrggskhhoshhtsehrvgguhhgrthdrtghomh
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The LPI code validates a result similarly to the IPI tests, by checking if
-the target CPU received the interrupt with the expected interrupt number.
-However, the LPI tests invent their own way of checking the test results by
-creating a global struct (lpi_stats), using a separate interrupt handler
-(lpi_handler) and test function (check_lpi_stats).
+--Sig_/q5z.CNi9D8q2e6l2k8nde8k
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-There are several areas that can be improved in the LPI code, which are
-already covered by the IPI tests:
+On Thu, 17 Dec 2020 12:38:42 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-- check_lpi_stats() doesn't take into account that the target CPU can
-  receive the correct interrupt multiple times.
-- check_lpi_stats() doesn't take into the account the scenarios where all
-  online CPUs can receive the interrupt, but the target CPU is the last CPU
-  that touches lpi_stats.observed.
-- Insufficient or missing memory synchronization.
+> On Thu, 17 Dec 2020 16:47:36 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Mon, Dec 14, 2020 at 06:22:40PM +0100, Cornelia Huck wrote:
+> > > On Fri,  4 Dec 2020 16:44:13 +1100
+> > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > >  =20
+> > > > We haven't yet implemented the fairly involved handshaking that wil=
+l be
+> > > > needed to migrate PEF protected guests.  For now, just use a migrat=
+ion
+> > > > blocker so we get a meaningful error if someone attempts this (this=
+ is the
+> > > > same approach used by AMD SEV).
+> > > >=20
+> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > ---
+> > > >  hw/ppc/pef.c | 9 +++++++++
+> > > >  1 file changed, 9 insertions(+)
+> > > >=20
+> > > > diff --git a/hw/ppc/pef.c b/hw/ppc/pef.c
+> > > > index 3ae3059cfe..edc3e744ba 100644
+> > > > --- a/hw/ppc/pef.c
+> > > > +++ b/hw/ppc/pef.c
+> > > > @@ -38,7 +38,11 @@ struct PefGuestState {
+> > > >  };
+> > > > =20
+> > > >  #ifdef CONFIG_KVM
+> > > > +static Error *pef_mig_blocker;
+> > > > +
+> > > >  static int kvmppc_svm_init(Error **errp) =20
+> > >=20
+> > > This looks weird? =20
+> >=20
+> > Oops.  Not sure how that made it past even my rudimentary compile
+> > testing.
+> >=20
+> > > > +
+> > > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
+> > > >  {
+> > > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUES=
+T)) {
+> > > >          error_setg(errp,
+> > > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
+> > > >          }
+> > > >      }
+> > > > =20
+> > > > +    /* add migration blocker */
+> > > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemente=
+d");
+> > > > +    /* NB: This can fail if --only-migratable is used */
+> > > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal); =20
+> > >=20
+> > > Just so that I understand: is PEF something that is enabled by the ho=
+st
+> > > (and the guest is either secured or doesn't start), or is it using a
+> > > model like s390x PV where the guest initiates the transition into
+> > > secured mode? =20
+> >=20
+> > Like s390x PV it's initiated by the guest.
+> >=20
+> > > Asking because s390x adds the migration blocker only when the
+> > > transition is actually happening (i.e. guests that do not transition
+> > > into secure mode remain migratable.) This has the side effect that you
+> > > might be able to start a machine with --only-migratable that
+> > > transitions into a non-migratable machine via a guest action, if I'm
+> > > not mistaken. Without the new object, I don't see a way to block with
+> > > --only-migratable; with it, we should be able to do that. Not sure wh=
+at
+> > > the desirable behaviour is here. =20
+> >=20
 
-Instead of duplicating code, let's convert the LPI tests to use
-check_acked() and the same interrupt handler as the IPI tests, which has
-been renamed to irq_handler() to avoid any confusion.
+The purpose of --only-migratable is specifically to prevent the machine
+to transition to a non-migrate state IIUC. The guest transition to
+secure mode should be nacked in this case.
 
-check_lpi_stats() has been replaced with check_acked() which, together with
-using irq_handler(), instantly gives us more correctness checks and proper
-memory synchronization between threads. lpi_stats.expected has been
-replaced by the CPU mask and the expected interrupt number arguments to
-check_acked(), with no change in semantics.
+> > Hm, I'm not sure what the best option is here either.
+>=20
+> If we agree on anything, it should be as consistent across
+> architectures as possible :)
+>=20
+> If we want to add the migration blocker to s390x even before the guest
+> transitions, it needs to be tied to the new object; if we'd make it
+> dependent on the cpu feature bit, we'd block migration of all machines
+> on hardware with SE and a recent kernel.
+>=20
+> Is there a convenient point in time when PEF guests transition where
+> QEMU can add a blocker?
+>=20
+> >=20
+> > >  =20
+> > > > +
+> > > >      return 0;
+> > > >  }
+> > > >   =20
+> > >  =20
+> >=20
+>=20
 
-lpi_handler() aborted the test if the interrupt number was not an LPI. This
-was changed in favor of allowing the test to continue, as it will fail in
-check_acked(), but possibly print information useful for debugging. If the
-test receives spurious interrupts, those are reported via report_info() at
-the end of the test for consistency with the IPI tests, which don't treat
-spurious interrupts as critical errors.
 
-In the spirit of code reuse, secondary_lpi_tests() has been replaced with
-ipi_recv() because the two are now identical; ipi_recv() has been renamed
-to irq_recv(), similarly to irq_handler(), to avoid confusion.
+--Sig_/q5z.CNi9D8q2e6l2k8nde8k
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-CC: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/gic.c | 190 +++++++++++++++++++++++++-----------------------------
- 1 file changed, 87 insertions(+), 103 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/arm/gic.c b/arm/gic.c
-index aa3aa1763984..53944753db63 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -105,13 +105,12 @@ static bool check_acked(cpumask_t *mask, int sender, int irqnum)
- 				++missing;
- 			else if (acked[cpu] > 1)
- 				++extra;
--		} else {
--			if (acked[cpu])
-+		} else if (acked[cpu]) {
- 				++unexpected;
- 		}
- 		if (!acked[cpu])
- 			continue;
--		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
-+		smp_rmb(); /* pairs with smp_wmb in irq_handler */
- 
- 		if (has_gicv2 && irq_sender[cpu] != sender) {
- 			report_info("cpu%d received IPI from wrong sender %d",
-@@ -149,11 +148,12 @@ static void check_spurious(void)
- static int gic_get_sender(int irqstat)
- {
- 	if (gic_version() == 2)
-+		/* GICC_IAR.CPUID is RAZ for non-SGIs */
- 		return (irqstat >> 10) & 7;
- 	return -1;
- }
- 
--static void ipi_handler(struct pt_regs *regs __unused)
-+static void irq_handler(struct pt_regs *regs __unused)
- {
- 	u32 irqstat = gic_read_iar();
- 	u32 irqnr = gic_iar_irqnr(irqstat);
-@@ -192,75 +192,6 @@ static void setup_irq(irq_handler_fn handler)
- }
- 
- #if defined(__aarch64__)
--struct its_event {
--	int cpu_id;
--	int lpi_id;
--};
--
--struct its_stats {
--	struct its_event expected;
--	struct its_event observed;
--};
--
--static struct its_stats lpi_stats;
--
--static void lpi_handler(struct pt_regs *regs __unused)
--{
--	u32 irqstat = gic_read_iar();
--	int irqnr = gic_iar_irqnr(irqstat);
--
--	gic_write_eoir(irqstat);
--	assert(irqnr >= 8192);
--	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
--	lpi_stats.observed.cpu_id = smp_processor_id();
--	lpi_stats.observed.lpi_id = irqnr;
--	acked[lpi_stats.observed.cpu_id]++;
--	smp_wmb(); /* pairs with rmb in check_lpi_stats */
--}
--
--static void lpi_stats_expect(int exp_cpu_id, int exp_lpi_id)
--{
--	lpi_stats.expected.cpu_id = exp_cpu_id;
--	lpi_stats.expected.lpi_id = exp_lpi_id;
--	lpi_stats.observed.cpu_id = -1;
--	lpi_stats.observed.lpi_id = -1;
--	smp_wmb(); /* pairs with rmb in handler */
--}
--
--static void check_lpi_stats(const char *msg)
--{
--	int i;
--
--	for (i = 0; i < 50; i++) {
--		mdelay(100);
--		smp_rmb(); /* pairs with wmb in lpi_handler */
--		if (lpi_stats.observed.cpu_id == lpi_stats.expected.cpu_id &&
--		    lpi_stats.observed.lpi_id == lpi_stats.expected.lpi_id) {
--			report(true, "%s", msg);
--			return;
--		}
--	}
--
--	if (lpi_stats.observed.cpu_id == -1 && lpi_stats.observed.lpi_id == -1) {
--		report_info("No LPI received whereas (cpuid=%d, intid=%d) "
--			    "was expected", lpi_stats.expected.cpu_id,
--			    lpi_stats.expected.lpi_id);
--	} else {
--		report_info("Unexpected LPI (cpuid=%d, intid=%d)",
--			    lpi_stats.observed.cpu_id,
--			    lpi_stats.observed.lpi_id);
--	}
--	report(false, "%s", msg);
--}
--
--static void secondary_lpi_test(void)
--{
--	setup_irq(lpi_handler);
--	cpumask_set_cpu(smp_processor_id(), &ready);
--	while (1)
--		wfi();
--}
--
- static void check_lpi_hits(int *expected, const char *msg)
- {
- 	bool pass = true;
-@@ -350,7 +281,7 @@ static void ipi_test_smp(void)
- 
- static void ipi_send(void)
- {
--	setup_irq(ipi_handler);
-+	setup_irq(irq_handler);
- 	wait_on_ready();
- 	ipi_test_self();
- 	ipi_test_smp();
-@@ -358,9 +289,9 @@ static void ipi_send(void)
- 	exit(report_summary());
- }
- 
--static void ipi_recv(void)
-+static void irq_recv(void)
- {
--	setup_irq(ipi_handler);
-+	setup_irq(irq_handler);
- 	cpumask_set_cpu(smp_processor_id(), &ready);
- 	while (1)
- 		wfi();
-@@ -371,7 +302,7 @@ static void ipi_test(void *data __unused)
- 	if (smp_processor_id() == IPI_SENDER)
- 		ipi_send();
- 	else
--		ipi_recv();
-+		irq_recv();
- }
- 
- static struct gic gicv2 = {
-@@ -699,14 +630,12 @@ static int its_prerequisites(int nb_cpus)
- 		return -1;
- 	}
- 
--	stats_reset();
--
--	setup_irq(lpi_handler);
-+	setup_irq(irq_handler);
- 
- 	for_each_present_cpu(cpu) {
- 		if (cpu == 0)
- 			continue;
--		smp_boot_secondary(cpu, secondary_lpi_test);
-+		smp_boot_secondary(cpu, irq_recv);
- 	}
- 	wait_on_ready();
- 
-@@ -760,6 +689,7 @@ static void test_its_trigger(void)
- {
- 	struct its_collection *col3;
- 	struct its_device *dev2, *dev7;
-+	cpumask_t mask;
- 
- 	if (its_setup1())
- 		return;
-@@ -770,13 +700,21 @@ static void test_its_trigger(void)
- 
- 	report_prefix_push("int");
- 
--	lpi_stats_expect(3, 8195);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev=2, eventid=20  -> lpi= 8195, col=3");
- 
--	lpi_stats_expect(2, 8196);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(2, &mask);
- 	its_send_int(dev7, 255);
--	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8196),
-+			"dev=7, eventid=255 -> lpi= 8196, col=2");
- 
- 	report_prefix_pop();
- 
-@@ -789,9 +727,12 @@ static void test_its_trigger(void)
- 	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
- 	its_send_inv(dev2, 20);
- 
--	lpi_stats_expect(-1, -1);
-+	stats_reset();
-+	cpumask_clear(&mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, -1, -1),
-+			"dev2/eventid=20 does not trigger any LPI");
- 
- 	/*
- 	 * re-enable the LPI but willingly do not call invall
-@@ -799,18 +740,31 @@ static void test_its_trigger(void)
- 	 * The LPI should not hit
- 	 */
- 	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
--	lpi_stats_expect(-1, -1);
-+	stats_reset();
-+	cpumask_clear(&mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, -1, -1),
-+			"dev2/eventid=20 still does not trigger any LPI");
- 
- 	/* Now call the invall and check the LPI hits */
-+	stats_reset();
-+	/* The barrier is from its_send_int() */
-+	wmb();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_invall(col3);
--	lpi_stats_expect(3, 8195);
--	check_lpi_stats("dev2/eventid=20 pending LPI is received");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev2/eventid=20 pending LPI is received");
- 
--	lpi_stats_expect(3, 8195);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev2/eventid=20 now triggers an LPI");
- 
- 	report_prefix_pop();
- 
-@@ -821,9 +775,13 @@ static void test_its_trigger(void)
- 	 */
- 
- 	its_send_mapd(dev2, false);
--	lpi_stats_expect(-1, -1);
-+	stats_reset();
-+	cpumask_clear(&mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("no LPI after device unmap");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, -1, -1), "no LPI after device unmap");
-+
-+	check_spurious();
- 	report_prefix_pop();
- }
- 
-@@ -831,6 +789,7 @@ static void test_its_migration(void)
- {
- 	struct its_device *dev2, *dev7;
- 	bool test_skipped = false;
-+	cpumask_t mask;
- 
- 	if (its_setup1()) {
- 		test_skipped = true;
-@@ -847,13 +806,23 @@ do_migrate:
- 	if (test_skipped)
- 		return;
- 
--	lpi_stats_expect(3, 8195);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
- 
--	lpi_stats_expect(2, 8196);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(2, &mask);
- 	its_send_int(dev7, 255);
--	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8196),
-+			"dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
-+
-+	check_spurious();
- }
- 
- #define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
-@@ -863,6 +832,7 @@ static void test_migrate_unmapped_collection(void)
- 	struct its_collection *col = NULL;
- 	struct its_device *dev2 = NULL, *dev7 = NULL;
- 	bool test_skipped = false;
-+	cpumask_t mask;
- 	int pe0 = 0;
- 	u8 config;
- 
-@@ -897,17 +867,27 @@ do_migrate:
- 	its_send_mapc(col, true);
- 	its_send_invall(col);
- 
--	lpi_stats_expect(2, 8196);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(2, &mask);
- 	its_send_int(dev7, 255);
--	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8196),
-+			"dev7/eventid= 255 triggered LPI 8196 on PE #2");
- 
- 	config = gicv3_lpi_get_config(8192);
- 	report(config == LPI_PROP_DEFAULT,
- 	       "Config of LPI 8192 was properly migrated");
- 
--	lpi_stats_expect(pe0, 8192);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(pe0, &mask);
- 	its_send_int(dev2, 0);
--	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8192),
-+			"dev2/eventid = 0 triggered LPI 8192 on PE0");
-+
-+	check_spurious();
- }
- 
- static void test_its_pending_migration(void)
-@@ -964,6 +944,10 @@ static void test_its_pending_migration(void)
- 	pendbaser = readq(ptr);
- 	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
- 
-+	/*
-+	 * Reset and initialization values for acked are the same, so we don't
-+	 * need to explicitely call stats_reset().
-+	 */
- 	gicv3_lpi_rdist_enable(pe0);
- 	gicv3_lpi_rdist_enable(pe1);
- 
--- 
-2.29.2
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl/baAIACgkQcdTV5YIv
+c9b/tQ/9EY1sZYjVLPCl4rDkpINniFQpBYvmoIj5KjiVi5cp8g/LWvK/XvvXgoDX
+gz3aKzE7cOGJo2BN6BjitohZxgOWWz1wTdqaPP29rzvNAd7iCeByM47tvJ1WBDey
+6vBgmdaJZraYX+lcDE6sC7T4dRohZd5Jb0lh+ova937iT5gc8bhdP+AcOgYc/plo
+sSB7wHBGUyT2Ror812RXPTns58hmVf/+gPK0eaAb/hE8h/rxieEH8zZJJ0c86ZSU
+q+NYb6w4Ylu927EPPnyiaJsZV327GgLnBTRAdG7yi3ndaYDZZi07+ydxazbH6R5U
+sP2PXPnxhFUjFc05S7ljcgj3xE9eijLf1Wa7MSH649dXXNNm/tojkXGWrqDi9Lul
+HhtmaNUgfal1ufhq7BIiUUr5CNsoaeH5iiIxdcrwqInZaA0pTAdVra375QvRY9ZW
+xWTZyEX0+UOQToMqYvyeFp1TvEzPtFy6tmTL48Tnoxjm/jLawgtad2X5pY+HjbnV
+HcD1mzwu/7IBX0f+L6KMaYLoOHNPa9O385sgb5kbnEqmCYfiu/h++zP6pgntW9G2
+7yAvkaMhOMA4egNHh8iShtxAFLYMFXv99qKSj9MrPWEq14oKeYmD+mzwEQz8UNHl
+obBwnSDFFncLrOUbxgVtOPZ2lPF/0o/dNoGcvhpPYWco72TwFQk=
+=gjRQ
+-----END PGP SIGNATURE-----
 
+--Sig_/q5z.CNi9D8q2e6l2k8nde8k--
