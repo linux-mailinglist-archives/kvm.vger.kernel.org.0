@@ -2,296 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F23952DD373
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 15:59:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7CC12DD267
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 14:48:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728335AbgLQO71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 09:59:27 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11410 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726291AbgLQO71 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 09:59:27 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BHErmpM160158;
-        Thu, 17 Dec 2020 09:58:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Wyq1KpC+TeRF1/B0SAcqeYXbffnlH7ZpfUdxS6u0ATI=;
- b=BVThcQRfvOs/o6FnagppgJQfbWch1iQx2e1u9Ljxe1iVD/ZeervGEc6onZvecG8Vwfu8
- aT+qNjOmreYsSLzTJAL3z2z7BTrWKo8TnDwRPiZ9NJOhZRiRAgg4PJWtr2uxySR1zupR
- dzydUrWp9pUoV1xIjDLcUU9bXYzuvlvGOwDEF4GoP32I81tX1s4k2VnhC4UdFUTk9Ici
- WGVskfTHRJhA+9xNytBrF8ma2c5CuYt0EqH1nIT0f/dmN61ZVLysVVId2QIXeH8vC3Wr
- qJ+pdCJ65g7fB//8yAjors8bB6bZ0OLBE77mo7sSPOgmkt6jw0lNQd2CU5Vdk4AzhlMr sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35g9gdg2vw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 09:58:45 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BHEuMhh165994;
-        Thu, 17 Dec 2020 09:58:45 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35g9gdg2v8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 09:58:45 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BHEwBKx026749;
-        Thu, 17 Dec 2020 14:58:43 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 35fbp5hh7c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Dec 2020 14:58:43 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BHEwevk37617978
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Dec 2020 14:58:40 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 82CF2A405C;
-        Thu, 17 Dec 2020 14:58:40 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2B79DA4054;
-        Thu, 17 Dec 2020 14:58:40 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.12.102])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Dec 2020 14:58:40 +0000 (GMT)
-Date:   Thu, 17 Dec 2020 14:14:21 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 4/8] s390x: Split assembly and move to
- s390x/asm/
-Message-ID: <20201217141421.7179e19d@ibm-vm>
-In-Reply-To: <20201211100039.63597-5-frankja@linux.ibm.com>
-References: <20201211100039.63597-1-frankja@linux.ibm.com>
-        <20201211100039.63597-5-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1728406AbgLQNrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 08:47:13 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:36594 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727437AbgLQNrN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 08:47:13 -0500
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.93.0.4)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1kptbo-0007Nj-Md; Thu, 17 Dec 2020 14:46:21 +0100
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     stable@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org
+Subject: [PATCH] KVM: mmu: Fix SPTE encoding of MMIO generation upper half
+Date:   Thu, 17 Dec 2020 14:46:13 +0100
+Message-Id: <8bf9d5caf338d705744764c60256ace1d3f1d252.1608168540.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <1607955408254166@kroah.com>
+References: <1607955408254166@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-17_09:2020-12-15,2020-12-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 clxscore=1015
- malwarescore=0 spamscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012170099
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Dec 2020 05:00:35 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-> I've added too much to cstart64.S which is not start related
-> already. Now that I want to add even more code it's time to split
-> cstart64.S. lib.S has functions that are used in tests. macros.S
-> contains macros which are used in cstart64.S and lib.S
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/Makefile             |   8 +--
->  s390x/{ => asm}/cstart64.S | 119
-> ++----------------------------------- s390x/asm/lib.S            |
-> 65 ++++++++++++++++++++ s390x/asm/macros.S         |  77
-> ++++++++++++++++++++++++ 4 files changed, 150 insertions(+), 119
-> deletions(-) rename s390x/{ => asm}/cstart64.S (50%)
->  create mode 100644 s390x/asm/lib.S
->  create mode 100644 s390x/asm/macros.S 
+Commit cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
+cleaned up the computation of MMIO generation SPTE masks, however it
+introduced a bug how the upper part was encoded:
+SPTE bits 52-61 were supposed to contain bits 10-19 of the current
+generation number, however a missing shift encoded bits 1-10 there instead
+(mostly duplicating the lower part of the encoded generation number that
+then consisted of bits 1-9).
 
-[...]
+In the meantime, the upper part was shrunk by one bit and moved by
+subsequent commits to become an upper half of the encoded generation number
+(bits 9-17 of bits 0-17 encoded in a SPTE).
 
-> diff --git a/s390x/cstart64.S b/s390x/asm/cstart64.S
-> similarity index 50%
-> rename from s390x/cstart64.S
-> rename to s390x/asm/cstart64.S
-> index cc86fc7..ace0c0d 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/asm/cstart64.S
-> @@ -3,14 +3,17 @@
->   * s390x startup code
->   *
->   * Copyright (c) 2017 Red Hat Inc
-> + * Copyright (c) 2019 IBM Corp.
+In addition to the above, commit 56871d444bc4 ("KVM: x86: fix overlap between SPTE_MMIO_MASK and generation")
+has changed the SPTE bit range assigned to encode the generation number and
+the total number of bits encoded but did not update them in the comment
+attached to their defines, nor in the KVM MMU doc.
+Let's do it here, too, since it is too trivial thing to warrant a separate
+commit.
 
-2020 ?
+This is a backport of the upstream commit for 5.4.x stable series, which
+has KVM docs still in a raw text format and the x86 KVM MMU isn't yet split
+into separate files under "mmu" directory.
+Other than that, it's a straightforward port.
 
->   *
->   * Authors:
->   *  Thomas Huth <thuth@redhat.com>
->   *  David Hildenbrand <david@redhat.com>
-> + *  Janosch Frank <frankja@linux.ibm.com>
->   */
->  #include <asm/asm-offsets.h>
->  #include <asm/sigp.h>
+Fixes: cae7ed3c2cb0 ("KVM: x86: Refactor the MMIO SPTE generation handling")
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+[Reorganize macros so that everything is computed from the bit ranges. - Paolo]
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit 34c0f6f2695a2db81e09a3ab7bdb2853f45d4d3d)
+Cc: stable@vger.kernel.org # 5.4.x
+---
+ Documentation/virt/kvm/mmu.txt |  2 +-
+ arch/x86/kvm/mmu.c             | 29 ++++++++++++++++++++---------
+ 2 files changed, 21 insertions(+), 10 deletions(-)
 
-[...]
-
-> diff --git a/s390x/asm/lib.S b/s390x/asm/lib.S
-> new file mode 100644
-> index 0000000..4d78ec6
-> --- /dev/null
-> +++ b/s390x/asm/lib.S
-> @@ -0,0 +1,65 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * s390x assembly library
-> + *
-> + * Copyright (c) 2019 IBM Corp.
-
-also 2020?
-
-> + *
-> + * Authors:
-> + *    Janosch Frank <frankja@linux.ibm.com>
-> + */
-> +#include <asm/asm-offsets.h>
-> +#include <asm/sigp.h>
-> +
-> +#include "macros.S"
-> +
-> +/*
-> + * load_reset calling convention:
-> + * %r2 subcode (0 or 1)
-> + */
-> +.globl diag308_load_reset
-> +diag308_load_reset:
-> +	SAVE_REGS
-> +	/* Backup current PSW mask, as we have to restore it on
-> success */
-> +	epsw	%r0, %r1
-> +	st	%r0, GEN_LC_SW_INT_PSW
-> +	st	%r1, GEN_LC_SW_INT_PSW + 4
-> +	/* Load reset psw mask (short psw, 64 bit) */
-> +	lg	%r0, reset_psw
-> +	/* Load the success label address */
-> +	larl    %r1, 0f
-> +	/* Or it to the mask */
-> +	ogr	%r0, %r1
-> +	/* Store it at the reset PSW location (real 0x0) */
-> +	stg	%r0, 0
-> +	/* Do the reset */
-> +	diag    %r0,%r2,0x308
-> +	/* Failure path */
-> +	xgr	%r2, %r2
-> +	br	%r14
-> +	/* Success path */
-> +	/* load a cr0 that has the AFP control bit which enables all
-> FPRs */ +0:	larl	%r1, initial_cr0
-> +	lctlg	%c0, %c0, 0(%r1)
-> +	RESTORE_REGS
-> +	lhi	%r2, 1
-> +	larl	%r0, 1f
-> +	stg	%r0, GEN_LC_SW_INT_PSW + 8
-> +	lpswe	GEN_LC_SW_INT_PSW
-> +1:	br	%r14
-> +
-> +/* Sets up general registers and cr0 when a new cpu is brought
-> online. */ +.globl smp_cpu_setup_state
-> +smp_cpu_setup_state:
-> +	xgr	%r1, %r1
-> +	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
-> +	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
-> +	/* We should only go once through cpu setup and not for
-> every restart */
-> +	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
-> +	larl	%r14, 0f
-> +	lpswe	GEN_LC_SW_INT_PSW
-> +	/* If the function returns, just loop here */
-> +0:	j	0
-> +
-> +	.align	8
-> +reset_psw:
-> +	.quad	0x0008000180000000
-> diff --git a/s390x/asm/macros.S b/s390x/asm/macros.S
-> new file mode 100644
-> index 0000000..37a6a63
-> --- /dev/null
-> +++ b/s390x/asm/macros.S
-> @@ -0,0 +1,77 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * s390x assembly macros
-> + *
-> + * Copyright (c) 2017 Red Hat Inc
-> + * Copyright (c) 2020 IBM Corp.
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + *  David Hildenbrand <david@redhat.com>
-> + */
-> +#include <asm/asm-offsets.h>
-> +	.macro SAVE_REGS
-> +	/* save grs 0-15 */
-> +	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
-> +	/* save crs 0-15 */
-> +	stctg	%c0, %c15, GEN_LC_SW_INT_CRS
-> +	/* load a cr0 that has the AFP control bit which enables all
-> FPRs */
-> +	larl	%r1, initial_cr0
-> +	lctlg	%c0, %c0, 0(%r1)
-> +	/* save fprs 0-15 + fpc */
-> +	la	%r1, GEN_LC_SW_INT_FPRS
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	std	\i, \i * 8(%r1)
-> +	.endr
-> +	stfpc	GEN_LC_SW_INT_FPC
-> +	.endm
-> +
-> +	.macro RESTORE_REGS
-> +	/* restore fprs 0-15 + fpc */
-> +	la	%r1, GEN_LC_SW_INT_FPRS
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	ld	\i, \i * 8(%r1)
-> +	.endr
-> +	lfpc	GEN_LC_SW_INT_FPC
-> +	/* restore crs 0-15 */
-> +	lctlg	%c0, %c15, GEN_LC_SW_INT_CRS
-> +	/* restore grs 0-15 */
-> +	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
-> +	.endm
-> +
-> +/* Save registers on the stack (r15), so we can have stacked
-> interrupts. */
-> +	.macro SAVE_REGS_STACK
-> +	/* Allocate a stack frame for 15 general registers */
-> +	slgfi   %r15, 15 * 8
-> +	/* Store registers r0 to r14 on the stack */
-> +	stmg    %r0, %r14, 0(%r15)
-> +	/* Allocate a stack frame for 16 floating point registers */
-> +	/* The size of a FP register is the size of an double word */
-> +	slgfi   %r15, 16 * 8
-> +	/* Save fp register on stack: offset to SP is multiple of
-> reg number */
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	std	\i, \i * 8(%r15)
-> +	.endr
-> +	/* Save fpc, but keep stack aligned on 64bits */
-> +	slgfi   %r15, 8
-> +	efpc	%r0
-> +	stg	%r0, 0(%r15)
-> +	.endm
-> +
-> +/* Restore the register in reverse order */
-> +	.macro RESTORE_REGS_STACK
-> +	/* Restore fpc */
-> +	lfpc	0(%r15)
-> +	algfi	%r15, 8
-> +	/* Restore fp register from stack: SP still where it was
-> left */
-> +	/* and offset to SP is a multiple of reg number */
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	ld	\i, \i * 8(%r15)
-> +	.endr
-> +	/* Now that we're done, rewind the stack pointer by 16
-> double word */
-> +	algfi   %r15, 16 * 8
-> +	/* Load the registers from stack */
-> +	lmg     %r0, %r14, 0(%r15)
-> +	/* Rewind the stack by 15 double word */
-> +	algfi   %r15, 15 * 8
-> +	.endm
-
+diff --git a/Documentation/virt/kvm/mmu.txt b/Documentation/virt/kvm/mmu.txt
+index dadb29e8738f..ec072c6bc03f 100644
+--- a/Documentation/virt/kvm/mmu.txt
++++ b/Documentation/virt/kvm/mmu.txt
+@@ -420,7 +420,7 @@ If the generation number of the spte does not equal the global generation
+ number, it will ignore the cached MMIO information and handle the page
+ fault through the slow path.
+ 
+-Since only 19 bits are used to store generation-number on mmio spte, all
++Since only 18 bits are used to store generation-number on mmio spte, all
+ pages are zapped when there is an overflow.
+ 
+ Unfortunately, a single memory access might access kvm_memslots(kvm) multiple
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index b90e8fd2f6ce..47c27c6e3842 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -407,11 +407,11 @@ static inline bool is_access_track_spte(u64 spte)
+ }
+ 
+ /*
+- * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
++ * Due to limited space in PTEs, the MMIO generation is a 18 bit subset of
+  * the memslots generation and is derived as follows:
+  *
+  * Bits 0-8 of the MMIO generation are propagated to spte bits 3-11
+- * Bits 9-18 of the MMIO generation are propagated to spte bits 52-61
++ * Bits 9-17 of the MMIO generation are propagated to spte bits 54-62
+  *
+  * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
+  * the MMIO generation number, as doing so would require stealing a bit from
+@@ -420,18 +420,29 @@ static inline bool is_access_track_spte(u64 spte)
+  * requires a full MMU zap).  The flag is instead explicitly queried when
+  * checking for MMIO spte cache hits.
+  */
+-#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(17, 0)
+ 
+ #define MMIO_SPTE_GEN_LOW_START		3
+ #define MMIO_SPTE_GEN_LOW_END		11
+-#define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
+-						    MMIO_SPTE_GEN_LOW_START)
+ 
+ #define MMIO_SPTE_GEN_HIGH_START	PT64_SECOND_AVAIL_BITS_SHIFT
+ #define MMIO_SPTE_GEN_HIGH_END		62
++
++#define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
++						    MMIO_SPTE_GEN_LOW_START)
+ #define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
+ 						    MMIO_SPTE_GEN_HIGH_START)
+ 
++#define MMIO_SPTE_GEN_LOW_BITS		(MMIO_SPTE_GEN_LOW_END - MMIO_SPTE_GEN_LOW_START + 1)
++#define MMIO_SPTE_GEN_HIGH_BITS		(MMIO_SPTE_GEN_HIGH_END - MMIO_SPTE_GEN_HIGH_START + 1)
++
++/* remember to adjust the comment above as well if you change these */
++static_assert(MMIO_SPTE_GEN_LOW_BITS == 9 && MMIO_SPTE_GEN_HIGH_BITS == 9);
++
++#define MMIO_SPTE_GEN_LOW_SHIFT		(MMIO_SPTE_GEN_LOW_START - 0)
++#define MMIO_SPTE_GEN_HIGH_SHIFT	(MMIO_SPTE_GEN_HIGH_START - MMIO_SPTE_GEN_LOW_BITS)
++
++#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
++
+ static u64 generation_mmio_spte_mask(u64 gen)
+ {
+ 	u64 mask;
+@@ -439,8 +450,8 @@ static u64 generation_mmio_spte_mask(u64 gen)
+ 	WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
+ 	BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK | MMIO_SPTE_GEN_LOW_MASK) & SPTE_SPECIAL_MASK);
+ 
+-	mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
+-	mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
++	mask = (gen << MMIO_SPTE_GEN_LOW_SHIFT) & MMIO_SPTE_GEN_LOW_MASK;
++	mask |= (gen << MMIO_SPTE_GEN_HIGH_SHIFT) & MMIO_SPTE_GEN_HIGH_MASK;
+ 	return mask;
+ }
+ 
+@@ -448,8 +459,8 @@ static u64 get_mmio_spte_generation(u64 spte)
+ {
+ 	u64 gen;
+ 
+-	gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_START;
+-	gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_START;
++	gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_SHIFT;
++	gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_SHIFT;
+ 	return gen;
+ }
+ 
