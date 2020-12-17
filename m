@@ -2,147 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07A182DD44D
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 16:38:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FC072DD325
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 15:41:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727246AbgLQPiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 10:38:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54270 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726488AbgLQPiZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Dec 2020 10:38:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608219418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=haU9+3I1EhIsBNBQ9QQHsINvaKlrWDyUkN+Krpx5g3E=;
-        b=E2L2CR+HtbCq+MSQQJiNLkoLWDPhVqp6ibByKKJrjQpyq1OIhWlNo/QSuyL4dCtsjYo32p
-        eozrXoMPxrrestYA38NL4j+C7AAbjrj3FT+CujGJtyLSADnb3NjJyqbnNxuco7Kz+Dc3Sj
-        u44RDqZh5Rt7n55tV8TBHrcszlAG5us=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-527-DUapDB9LPfuK0b6oViVdOA-1; Thu, 17 Dec 2020 10:36:56 -0500
-X-MC-Unique: DUapDB9LPfuK0b6oViVdOA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BBC89CC03;
-        Thu, 17 Dec 2020 15:36:54 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-175.ams2.redhat.com [10.36.112.175])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C04AA19C71;
-        Thu, 17 Dec 2020 15:36:49 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 7/8] s390x: Add diag318 intercept test
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvm@vger.kernel.org
-Cc:     david@redhat.com, imbrenda@linux.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-References: <20201211100039.63597-1-frankja@linux.ibm.com>
- <20201211100039.63597-8-frankja@linux.ibm.com>
- <4f689585-ae2e-4632-9055-f2332d9f7751@redhat.com>
- <44d6ac32-f7ac-6b33-ea9e-e037f936a181@de.ibm.com>
- <24e9883c-22d5-de4f-0001-d271855d7ea3@redhat.com>
- <23af5bca-dd2c-43bd-b2b4-6c7e2031517f@linux.ibm.com>
- <b4bd9043-bf90-fe88-f237-b4f9948ba94e@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <dfc2c6bf-78ed-9f1f-0659-bee8437b46ca@redhat.com>
-Date:   Thu, 17 Dec 2020 16:36:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1728431AbgLQOlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 09:41:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38072 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726291AbgLQOlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 09:41:25 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 513E1C061794;
+        Thu, 17 Dec 2020 06:40:45 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id w6so19185002pfu.1;
+        Thu, 17 Dec 2020 06:40:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=enLPOtX+RwuUEW41weEYdgVO7wJosn5W764QBKADpC0=;
+        b=MIwIlFomCfpcfTP7hoYKE80dMrXthuwfQfIE41Eh9iO9XuLzVC0MHAVozM9FFECa4u
+         4auSn9F6mNrNxMIow8KyfmaaUqNnMwtiJ920yky/TQomMa2FqHvTDSCDrBMBKlMXG5gk
+         JsrjEq79Q0zxgvWEEH3w99F88LWoPr8/8A3UCCSaBvFhfE3NIBoU5sm7aSRlG6JbuRpr
+         Do2E8DA14oXXi9EOclDV2pGwUg6m+RPSTg7zzZYx+Bti4MpgiqDH80cibISlp4Dybgs8
+         mfWQZmMbFrv3yCD7xTNjUxBWuiQ/2p4egc0gxipwIPMiszEbN3gxHjL256OVu04uNZyA
+         qSWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=enLPOtX+RwuUEW41weEYdgVO7wJosn5W764QBKADpC0=;
+        b=J7ZZYeLzzxGogyT83B1+y7a5S1ZSuKwXFEYDa1n7DS1caOBWPrXJM4SNFa9Tp8wZ7z
+         TSm1dg8qIxJqxi383QYeUfK6y9c6oTpfHhWr4n+dkw+NmK9J6CSfcOJRGI710vIUg7vB
+         ecgJaex1ONLI7zAXJ1GVKpO/9Ku9atmfgCO0D5qwoeyNk3RNeTxSgMDKkL18enbpHQ0H
+         AVFmKg9eqAOPjk7VRYW3hi6lOrxlDiIBkXXVgTCzbea6RopADYRwV6bIFYANBEF6CCMv
+         GBIdYoWxaN6Fx65+vqxhnafq6Ugy4FZ9RrNAkWIRf4let5jsX84Z291dOt2iJqTnHDST
+         eVjw==
+X-Gm-Message-State: AOAM532C7YFqSMLSpwcpxZ+iRVB8EziYRW1Q9Gj4Uwk5J12K7sBhowV0
+        FUeHYIqwwVXjLLfYMdURYekDYo96leX8PA==
+X-Google-Smtp-Source: ABdhPJyHFpraaFLk+3QhMHDpQ4btopHivgWaat0v6SLM6H6sHi26qZvrt5X38vYkRmFQBca9pqKJcw==
+X-Received: by 2002:a65:534d:: with SMTP id w13mr37761820pgr.107.1608216044599;
+        Thu, 17 Dec 2020 06:40:44 -0800 (PST)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id p16sm5294396pju.47.2020.12.17.06.40.43
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 17 Dec 2020 06:40:44 -0800 (PST)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>, stable@vger.kernel.org
+Subject: [PATCH V3] kvm: check tlbs_dirty directly
+Date:   Thu, 17 Dec 2020 23:41:18 +0800
+Message-Id: <20201217154118.16497-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <X9kEAh7z1rmlmyhZ@google.com>
+References: <X9kEAh7z1rmlmyhZ@google.com>
 MIME-Version: 1.0
-In-Reply-To: <b4bd9043-bf90-fe88-f237-b4f9948ba94e@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/12/2020 16.31, Janosch Frank wrote:
-> On 12/17/20 3:31 PM, Janosch Frank wrote:
->> On 12/17/20 11:34 AM, Thomas Huth wrote:
->>> On 17/12/2020 10.59, Christian Borntraeger wrote:
->>>>
->>>>
->>>> On 17.12.20 10:53, Thomas Huth wrote:
->>>>> On 11/12/2020 11.00, Janosch Frank wrote:
->>>>>> Not much to test except for the privilege and specification
->>>>>> exceptions.
->>>>>>
->>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>>>> ---
->>>>>>  lib/s390x/sclp.c  |  2 ++
->>>>>>  lib/s390x/sclp.h  |  6 +++++-
->>>>>>  s390x/intercept.c | 19 +++++++++++++++++++
->>>>>>  3 files changed, 26 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
->>>>>> index cf6ea7c..0001993 100644
->>>>>> --- a/lib/s390x/sclp.c
->>>>>> +++ b/lib/s390x/sclp.c
->>>>>> @@ -138,6 +138,8 @@ void sclp_facilities_setup(void)
->>>>>>  
->>>>>>  	assert(read_info);
->>>>>>  
->>>>>> +	sclp_facilities.has_diag318 = read_info->byte_134_diag318;
->>>>>> +
->>>>>>  	cpu = (void *)read_info + read_info->offset_cpu;
->>>>>>  	for (i = 0; i < read_info->entries_cpu; i++, cpu++) {
->>>>>>  		if (cpu->address == cpu0_addr) {
->>>>>> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
->>>>>> index 6c86037..58f8e54 100644
->>>>>> --- a/lib/s390x/sclp.h
->>>>>> +++ b/lib/s390x/sclp.h
->>>>>> @@ -105,7 +105,8 @@ extern struct sclp_facilities sclp_facilities;
->>>>>>  
->>>>>>  struct sclp_facilities {
->>>>>>  	uint64_t has_sief2 : 1;
->>>>>> -	uint64_t : 63;
->>>>>> +	uint64_t has_diag318 : 1;
->>>>>> +	uint64_t : 62;
->>>>>>  };
->>>>>>  
->>>>>>  typedef struct ReadInfo {
->>>>>> @@ -130,6 +131,9 @@ typedef struct ReadInfo {
->>>>>>      uint16_t highest_cpu;
->>>>>>      uint8_t  _reserved5[124 - 122];     /* 122-123 */
->>>>>>      uint32_t hmfai;
->>>>>> +    uint8_t reserved7[134 - 128];
->>>>>> +    uint8_t byte_134_diag318 : 1;
->>>>>> +    uint8_t : 7;
->>>>>>      struct CPUEntry entries[0];
->>>>>
->>>>> ... the entries[] array can be moved around here without any further ado?
->>>>> Looks confusing to me. Should there be a CPUEntry array here at all, or only
->>>>> in ReadCpuInfo?
->>>>
->>>> there is offset_cpu for the cpu entries at the beginning of the structure.
->>>
->>> Ah, thanks, right, this was used earlier in the patch series, now I
->>> remember. But I think the "struct CPUEntry entries[0]" here is rather
->>> confusing, since there is no guarantee that the entries are really at this
->>> location ... I think this line should rather be replaced by a comment saying
->>> that offset_cpu should be used instead.
->>
->> Sure, as long as it's clear that there's something at the end, I'm fine
->> with it.
-> 
-> I would add that to the "fix style issues" patch or into an own patch.
-> Any preferences?
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-I think a separate patch is cleaner.
+In kvm_mmu_notifier_invalidate_range_start(), tlbs_dirty is used as:
+        need_tlb_flush |= kvm->tlbs_dirty;
+with need_tlb_flush's type being int and tlbs_dirty's type being long.
 
-> -       struct CPUEntry entries[0];
-> +       /*
-> +        * The cpu entries follow, they start at the offset specified
-> +        * in offset_cpu.
-> +        */
+It means that tlbs_dirty is always used as int and the higher 32 bits
+is useless.  We need to check tlbs_dirty in a correct way and this
+change checks it directly without propagating it to need_tlb_flush.
 
-Sounds good, thanks!
+Note: it's _extremely_ unlikely this neglecting of higher 32 bits can
+cause problems in practice.  It would require encountering tlbs_dirty
+on a 4 billion count boundary, and KVM would need to be using shadow
+paging or be running a nested guest.
 
- Thomas
+Cc: stable@vger.kernel.org
+Fixes: a4ee1ca4a36e ("KVM: MMU: delay flush all tlbs on sync_page path")
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+---
+Changed from V1:
+        Update the patch and the changelog as Sean Christopherson suggested.
+
+Changed from v2:
+	don't change the type of need_tlb_flush
+
+ virt/kvm/kvm_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2541a17ff1c4..3083fb53861d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -482,9 +482,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 	kvm->mmu_notifier_count++;
+ 	need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
+ 					     range->flags);
+-	need_tlb_flush |= kvm->tlbs_dirty;
+ 	/* we've to flush the tlb before the pages can be freed */
+-	if (need_tlb_flush)
++	if (need_tlb_flush || kvm->tlbs_dirty)
+ 		kvm_flush_remote_tlbs(kvm);
+ 
+ 	spin_unlock(&kvm->mmu_lock);
+-- 
+2.19.1.6.gb485710b
 
