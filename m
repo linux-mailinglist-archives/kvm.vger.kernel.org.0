@@ -2,173 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E85BB2DD89A
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 19:46:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08BC82DD97A
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 20:44:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729995AbgLQSpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 13:45:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47706 "EHLO
+        id S1729963AbgLQTlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 14:41:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728182AbgLQSpi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Dec 2020 13:45:38 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7C3C0617A7;
-        Thu, 17 Dec 2020 10:44:58 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id cm17so29727334edb.4;
-        Thu, 17 Dec 2020 10:44:57 -0800 (PST)
+        with ESMTP id S1726918AbgLQTlt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 14:41:49 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9898C0617B0
+        for <kvm@vger.kernel.org>; Thu, 17 Dec 2020 11:41:08 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id d2so24519pfq.5
+        for <kvm@vger.kernel.org>; Thu, 17 Dec 2020 11:41:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=a9fRIqvzJymHT2HZ/FU26JTBjEDUTwr5tEPTmXqVJpM=;
-        b=MwjMOllUK0/NSsp+i51FRUdBQl1xYyWF180W81NE+Ll3OUdEyyhvKWcvoTFQT7idAL
-         aAhOtYgN+59eBv7CDVMuRuYTkkl4OiJBQZEK8iTdp3SLX1oTgW6V+1rurF+BI4+i9CWp
-         JKy3wYAyIYCrjOIWrtwK29weGiMXKfmI3hYqnaxwnoYYNXA0vtix3i1sRJ1jGkOndvdm
-         +ALJH3T6vclBHkH9rei3Wo++kFHz2AmpMKxGDcGrO+gUNfTQ14oXBuyShBX67UKDzhVl
-         GkbD8zzPWTBnsdtpZcIRa/hMyDCIrvMsajgmfG4PBP7yBCDvTijo//X9FduCgzxIfSSa
-         xw/w==
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=oGlSDWZ94ObciHMURxpfYsKRlLh9/i8WxGRFy/xIrb0=;
+        b=oB46SiCaFqCblph5KLvrwi7hpFg40Vbut4PbBEne8/8q2UNMZ5MW7RZwz2tcNQYv/6
+         e1JFBr66qroaAwyidhyMLtGEUzth9BIoyCI4RfOtgEb7Vv4cXJLgwK7fw4U3JGaBIP7k
+         AN34rY+fpgxZif7vyJfefzZIPSmURVMCXOXcSR8MM00WWtF0n1bLbuF82ccHNIgp3Mo7
+         0e1AB5EazNiCyMjYHFskvmbxDisL/NgFLYWMoX9FW6GxVFsaaY2aGdBLzgeqfrBiPShS
+         fUuUKsNLNdztwNPsqF0+xLl+vH5g3oL2Bh3yRtMPGUKO85pDnLdRhB8L+AuZy5JpDScr
+         fsjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=a9fRIqvzJymHT2HZ/FU26JTBjEDUTwr5tEPTmXqVJpM=;
-        b=PDtTCPjHi7s408g4TXSMtqfGQbbQBqKUymSJbc1RVMfAqIsGq8Fd9QnwS7AIRUwqn0
-         n3FGMMVgVwrDH2RIiZ/+yn/kqLfeF9qnW1sEIHLwoMiBGC4b8I6h5M9Rwwy+hRCG/uLW
-         3CF3qHR6v4jT1ibaKCbZqWeTXeeF+YCu0N2iLQ5l+cGCTZ6cMOBx0JI1J3ZesJTH5Ij4
-         t3TQxpn3mDSlihJxwh2H122S/WCz4qBAWy9FXoPEqKOMyx1AFwhu2DqE90K0U1xLNZzi
-         wHMAU1YojweGplh+a6WntxbqJKkT2CDMIlIPrEeHX0cLGkcHPM7i4nU1q3kQTE10Ply2
-         uWFQ==
-X-Gm-Message-State: AOAM533KXzM29Tb6Axl79zSeKoGT1F70G5bEfPPnG/evhsLdvSXjy1Fd
-        hxLv6HYiusApI+JH6jn3o3Z9uZy9WznakA==
-X-Google-Smtp-Source: ABdhPJxvQPAIj76o5mOi9AIT9d+pRI5J4Gg8nLlRTQcN/prDDqJGBUHEHS85KXt2kfGvCtmjpFt2YQ==
-X-Received: by 2002:a50:fe8d:: with SMTP id d13mr738395edt.132.1608230696344;
-        Thu, 17 Dec 2020 10:44:56 -0800 (PST)
-Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id k3sm10849713eds.87.2020.12.17.10.44.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Dec 2020 10:44:55 -0800 (PST)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: [PATCH] KVM/nVMX: Use __vmx_vcpu_run in nested_vmx_check_vmentry_hw
-Date:   Thu, 17 Dec 2020 19:44:51 +0100
-Message-Id: <20201217184451.201311-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.26.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=oGlSDWZ94ObciHMURxpfYsKRlLh9/i8WxGRFy/xIrb0=;
+        b=C44DJXPXy+OgZeFfLM2lww3GoCW0aW+g5TWt145+RDVvTwrYWWAzd817s8bjDCSpbI
+         THskF7REuoi7ntFb4598tLxbd7BxhEIeTI5ZJfd2O+FsqDXi5UOaDXeMV/L/g+K1yu9b
+         X+3PmraqT4VrViD7ER9sYrgHC9ZVygNlxnq18/O6MrEEtGp3EE+3iM7xW9JAg3RuzUaC
+         X3z7MGilC6MH7/Ry7Zzp4KrMzn9EphurVqlW0QwXZvPs7yupTbFmdAB8eq34Z45TxpWL
+         iu0BQpCYZ/rPA02BSNs0jsrVGxvipPKFPxzXGkjctFEjHFs4aVfxX4jdBsK6wrGGIvP1
+         HQPQ==
+X-Gm-Message-State: AOAM5336l30OsdcgV1QDArrYKf3ZLRMR4dTz4L2y4Fsxwx4KgwTd4cgk
+        IlMXcoOqSoIuISEUF/rOWyk=
+X-Google-Smtp-Source: ABdhPJxCp/CVB6WaO/xFBgvaSDDcvNtoe3mt1JB/7FUkKAnrnPGvFiEPiJuB/D62u78YefM59QlliQ==
+X-Received: by 2002:a65:4544:: with SMTP id x4mr789999pgr.183.1608234068280;
+        Thu, 17 Dec 2020 11:41:08 -0800 (PST)
+Received: from ?IPv6:2601:647:4700:9b2:18dc:435f:36d7:18c9? ([2601:647:4700:9b2:18dc:435f:36d7:18c9])
+        by smtp.gmail.com with ESMTPSA id b22sm6569963pfo.163.2020.12.17.11.41.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 17 Dec 2020 11:41:07 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
+Subject: Re: [kvm-unit-tests PATCH v1 00/12] Fix and improve the page
+ allocator
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20201216201200.255172-1-imbrenda@linux.ibm.com>
+Date:   Thu, 17 Dec 2020 11:41:05 -0800
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, cohuck@redhat.com,
+        lvivier@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8A03C81A-BE59-4C1F-8056-94364C79933B@gmail.com>
+References: <20201216201200.255172-1-imbrenda@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace inline assembly in nested_vmx_check_vmentry_hw
-with a call to __vmx_vcpu_run.  The function is not
-performance critical, so (double) GPR save/restore
-in __vmx_vcpu_run can be tolerated, as far as performance
-effects are concerned.
+> On Dec 16, 2020, at 12:11 PM, Claudio Imbrenda =
+<imbrenda@linux.ibm.com> wrote:
+>=20
+> My previous patchseries was rushed and not polished enough. =
+Furthermore it
+> introduced some regressions.
+>=20
+> This patchseries fixes hopefully all the issues reported, and =
+introduces
+> some new features.
+>=20
+> It also simplifies the code and hopefully makes it more readable.
+>=20
+> Fixed:
+> * allocated memory is now zeroed by default
 
-v2: Mark vmx_vmenter SYM_FUNC_START_LOCAL.
+Thanks for doing that. Before I test it, did you also fix the issue of =
+x86=E2=80=99s
+setup_vm() [1]?
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Reviewed-and-tested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
----
- arch/x86/kvm/vmx/nested.c  | 32 +++-----------------------------
- arch/x86/kvm/vmx/vmenter.S |  2 +-
- arch/x86/kvm/vmx/vmx.c     |  2 --
- arch/x86/kvm/vmx/vmx.h     |  1 +
- 4 files changed, 5 insertions(+), 32 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 89af692deb7e..6ab62bf277c4 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -12,6 +12,7 @@
- #include "nested.h"
- #include "pmu.h"
- #include "trace.h"
-+#include "vmx.h"
- #include "x86.h"
- 
- static bool __read_mostly enable_shadow_vmcs = 1;
-@@ -3056,35 +3057,8 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
- 		vmx->loaded_vmcs->host_state.cr4 = cr4;
- 	}
- 
--	asm(
--		"sub $%c[wordsize], %%" _ASM_SP "\n\t" /* temporarily adjust RSP for CALL */
--		"cmp %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
--		"je 1f \n\t"
--		__ex("vmwrite %%" _ASM_SP ", %[HOST_RSP]") "\n\t"
--		"mov %%" _ASM_SP ", %c[host_state_rsp](%[loaded_vmcs]) \n\t"
--		"1: \n\t"
--		"add $%c[wordsize], %%" _ASM_SP "\n\t" /* un-adjust RSP */
--
--		/* Check if vmlaunch or vmresume is needed */
--		"cmpb $0, %c[launched](%[loaded_vmcs])\n\t"
--
--		/*
--		 * VMLAUNCH and VMRESUME clear RFLAGS.{CF,ZF} on VM-Exit, set
--		 * RFLAGS.CF on VM-Fail Invalid and set RFLAGS.ZF on VM-Fail
--		 * Valid.  vmx_vmenter() directly "returns" RFLAGS, and so the
--		 * results of VM-Enter is captured via CC_{SET,OUT} to vm_fail.
--		 */
--		"call vmx_vmenter\n\t"
--
--		CC_SET(be)
--	      : ASM_CALL_CONSTRAINT, CC_OUT(be) (vm_fail)
--	      :	[HOST_RSP]"r"((unsigned long)HOST_RSP),
--		[loaded_vmcs]"r"(vmx->loaded_vmcs),
--		[launched]"i"(offsetof(struct loaded_vmcs, launched)),
--		[host_state_rsp]"i"(offsetof(struct loaded_vmcs, host_state.rsp)),
--		[wordsize]"i"(sizeof(ulong))
--	      : "memory"
--	);
-+	vm_fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
-+				 vmx->loaded_vmcs->launched);
- 
- 	if (vmx->msr_autoload.host.nr)
- 		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 90ad7a6246e3..14abe1e37359 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -44,7 +44,7 @@
-  * they VM-Fail, whereas a successful VM-Enter + VM-Exit will jump
-  * to vmx_vmexit.
-  */
--SYM_FUNC_START(vmx_vmenter)
-+SYM_FUNC_START_LOCAL(vmx_vmenter)
- 	/* EFLAGS.ZF is set if VMCS.LAUNCHED == 0 */
- 	je 2f
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 47b8357b9751..72b496c54bc9 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6593,8 +6593,6 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
--
- static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 					struct vcpu_vmx *vmx)
- {
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index f6f66e5c6510..32db3b033e9b 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -339,6 +339,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
- struct vmx_uret_msr *vmx_find_uret_msr(struct vcpu_vmx *vmx, u32 msr);
- void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu);
- void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
-+bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
- int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr);
- void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
- 
--- 
-2.26.2
+[1] https://www.spinics.net/lists/kvm/msg230470.html
 
