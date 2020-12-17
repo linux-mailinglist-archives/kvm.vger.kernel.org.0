@@ -2,91 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09B3A2DD0CF
-	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 12:52:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 711D72DD102
+	for <lists+kvm@lfdr.de>; Thu, 17 Dec 2020 13:02:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727832AbgLQLuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 06:50:40 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2917 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727656AbgLQLuk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Dec 2020 06:50:40 -0500
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CxVdp4VVtz56Gr;
-        Thu, 17 Dec 2020 19:49:18 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Thu, 17 Dec 2020 19:49:56 +0800
-Received: from [10.174.185.137] (10.174.185.137) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Thu, 17 Dec 2020 19:49:55 +0800
-Subject: Re: [PATCH v11 04/13] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
- type
-To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
-        <robin.murphy@arm.com>, <alex.williamson@redhat.com>
-CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
-        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
-        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>,
-        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>,
-        <yuzenghui@huawei.com>
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-5-eric.auger@redhat.com>
-From:   Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <2b5031d4-fa1a-c893-e7e4-56c68da600e4@huawei.com>
-Date:   Thu, 17 Dec 2020 19:49:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1726354AbgLQMB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 07:01:56 -0500
+Received: from foss.arm.com ([217.140.110.172]:60192 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726012AbgLQMBy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 07:01:54 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A19BA31B;
+        Thu, 17 Dec 2020 04:01:08 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10C3A3F66B;
+        Thu, 17 Dec 2020 04:01:07 -0800 (PST)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: [kvm-unit-tests PATCH 0/1] Don't access PMU when not present
+Date:   Thu, 17 Dec 2020 12:00:56 +0000
+Message-Id: <20201217120057.88562-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20201116110030.32335-5-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [10.174.185.137]
-X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+Found this when reviewing the PMU undef patches [1], which will get merged
+for 5.11 (Paolo accepted the pull request [2]).
 
-On 2020/11/16 19:00, Eric Auger wrote:
-> Add a new specific DMA_FAULT region aiming to exposed nested mode
-> translation faults. This region only is exposed if the device
-> is attached to a nested domain.
->
-> The region has a ring buffer that contains the actual fault
-> records plus a header allowing to handle it (tail/head indices,
-> max capacity, entry size). At the moment the region is dimensionned
-> for 512 fault records.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
-[...]
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index b352e76cfb71..629dfb38d9e7 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -343,6 +343,9 @@ struct vfio_region_info_cap_type {
->   /* sub-types for VFIO_REGION_TYPE_GFX */
->   #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
->   
-> +#define VFIO_REGION_TYPE_NESTED			(2)
-> +#define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT	(1)
-> +
+This only happens if we try to run the PMU tests when creating a VCPU
+*without* the PMU feature. I think qemu creates the VCPU by default with a
+PMU and I don't know if or how that could be disabled. On the other hand,
+kvmtool doesn't enable the feature by default, and you need the specify the
+--pmu knob on the command line to enable guest PMU. I think this should
+only affect kvmtool users.
 
-The macro *define VFIO_REGION_TYPE_NESTED    (2)* is in conflict with
+For reference, this is what happens without the patch when I try to run a
+PMU test on a host built from the kvmarm-5.11 tag from the pull request
+(the --pmu knob is missing from the kvmtool command line):
 
-*#define VFIO_REGION_TYPE_CCW    (2)*.
+$ lkvm run -c1 -m64 -f arm/pmu.flat -p cycle-counter 
+  # lkvm run --firmware arm/pmu.flat -m 64 -c 1 --name guest-821
+  Info: Placing fdt at 0x80200000 - 0x80210000
+chr_testdev_init: chr-testdev: can't find a virtio-console
+Unhandled exception ec=0 (UNKNOWN)
+Vector: 4 (el1h_sync)
+ESR_EL1:         02000000, ec=0 (UNKNOWN)
+FAR_EL1: 1de7ec7edbadc0de (not valid)
+Exception frame registers:
+pc : [<000000008000b058>] lr : [<0000000080000084>] pstate: 00000000
+sp : 000000008003ff60
+x29: 0000000000000000 x28: 0000000000000000 
+x27: 0000000000000000 x26: 0000000000000000 
+x25: 0000000000000000 x24: 0000000000000000 
+x23: 0000000000000000 x22: 0000000000000000 
+x21: 0000000000000002 x20: 0000000080016a10 
+x19: 0000000000000000 x18: 0000000000000000 
+x17: 0000000000000000 x16: 0000000000000000 
+x15: 0000000080040000 x14: 0000000080040000 
+x13: 000000008003ff5c x12: 0000000000000058 
+x11: 0000000000000064 x10: 000000008003ff0c 
+x9 : 0000000000008400 x8 : 0000000000008008 
+x7 : 0000000000000001 x6 : 0000000000000004 
+x5 : 0000000000000000 x4 : 0000000080050003 
+x3 : 0000000000000001 x2 : 0000000080016d38 
+x1 : 0000000080016a10 x0 : 0000000000000002 
 
+With the patch applied:
 
-Thanks,
+$ lkvm run -c1 -m64 -f arm/pmu.flat -p cycle-counter 
+  # lkvm run --firmware arm/pmu.flat -m 64 -c 1 --name guest-1240
+  Info: Placing fdt at 0x80200000 - 0x80210000
+chr_testdev_init: chr-testdev: can't find a virtio-console
+No PMU found, test skipped...
+SUMMARY: 0 tests
 
-Kunkun Jiang.
+[1] https://www.spinics.net/lists/kvm-arm/msg43347.html
+[2] https://www.spinics.net/lists/kvm/msg231080.html
+
+Alexandru Elisei (1):
+  arm: pmu: Don't read PMCR if PMU is not present
+
+ arm/pmu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+-- 
+2.29.2
 
