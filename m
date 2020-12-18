@@ -2,142 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 498012DE8F9
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 19:38:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FC102DE9CD
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 20:34:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728433AbgLRShv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Dec 2020 13:37:51 -0500
-Received: from foss.arm.com ([217.140.110.172]:39904 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725822AbgLRShu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Dec 2020 13:37:50 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBF5330E;
-        Fri, 18 Dec 2020 10:37:04 -0800 (PST)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E9CA23F66E;
-        Fri, 18 Dec 2020 10:37:03 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 11/12] lib: arm64: gic-v3-its: Add wmb()
- barrier before INT command
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     eric.auger@redhat.com, yuzenghui@huawei.com
-References: <20201217141400.106137-1-alexandru.elisei@arm.com>
- <20201217141400.106137-12-alexandru.elisei@arm.com>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- xsFNBFNPCKMBEAC+6GVcuP9ri8r+gg2fHZDedOmFRZPtcrMMF2Cx6KrTUT0YEISsqPoJTKld
- tPfEG0KnRL9CWvftyHseWTnU2Gi7hKNwhRkC0oBL5Er2hhNpoi8x4VcsxQ6bHG5/dA7ctvL6
- kYvKAZw4X2Y3GTbAZIOLf+leNPiF9175S8pvqMPi0qu67RWZD5H/uT/TfLpvmmOlRzNiXMBm
- kGvewkBpL3R2clHquv7pB6KLoY3uvjFhZfEedqSqTwBVu/JVZZO7tvYCJPfyY5JG9+BjPmr+
- REe2gS6w/4DJ4D8oMWKoY3r6ZpHx3YS2hWZFUYiCYovPxfj5+bOr78sg3JleEd0OB0yYtzTT
- esiNlQpCo0oOevwHR+jUiaZevM4xCyt23L2G+euzdRsUZcK/M6qYf41Dy6Afqa+PxgMEiDto
- ITEH3Dv+zfzwdeqCuNU0VOGrQZs/vrKOUmU/QDlYL7G8OIg5Ekheq4N+Ay+3EYCROXkstQnf
- YYxRn5F1oeVeqoh1LgGH7YN9H9LeIajwBD8OgiZDVsmb67DdF6EQtklH0ycBcVodG1zTCfqM
- AavYMfhldNMBg4vaLh0cJ/3ZXZNIyDlV372GmxSJJiidxDm7E1PkgdfCnHk+pD8YeITmSNyb
- 7qeU08Hqqh4ui8SSeUp7+yie9zBhJB5vVBJoO5D0MikZAODIDwARAQABzS1BbmRyZSBQcnp5
- d2FyYSAoQVJNKSA8YW5kcmUucHJ6eXdhcmFAYXJtLmNvbT7CwXsEEwECACUCGwMGCwkIBwMC
- BhUIAgkKCwQWAgMBAh4BAheABQJTWSV8AhkBAAoJEAL1yD+ydue63REP/1tPqTo/f6StS00g
- NTUpjgVqxgsPWYWwSLkgkaUZn2z9Edv86BLpqTY8OBQZ19EUwfNehcnvR+Olw+7wxNnatyxo
- D2FG0paTia1SjxaJ8Nx3e85jy6l7N2AQrTCFCtFN9lp8Pc0LVBpSbjmP+Peh5Mi7gtCBNkpz
- KShEaJE25a/+rnIrIXzJHrsbC2GwcssAF3bd03iU41J1gMTalB6HCtQUwgqSsbG8MsR/IwHW
- XruOnVp0GQRJwlw07e9T3PKTLj3LWsAPe0LHm5W1Q+euoCLsZfYwr7phQ19HAxSCu8hzp43u
- zSw0+sEQsO+9wz2nGDgQCGepCcJR1lygVn2zwRTQKbq7Hjs+IWZ0gN2nDajScuR1RsxTE4WR
- lj0+Ne6VrAmPiW6QqRhliDO+e82riI75ywSWrJb9TQw0+UkIQ2DlNr0u0TwCUTcQNN6aKnru
- ouVt3qoRlcD5MuRhLH+ttAcmNITMg7GQ6RQajWrSKuKFrt6iuDbjgO2cnaTrLbNBBKPTG4oF
- D6kX8Zea0KvVBagBsaC1CDTDQQMxYBPDBSlqYCb/b2x7KHTvTAHUBSsBRL6MKz8wwruDodTM
- 4E4ToV9URl4aE/msBZ4GLTtEmUHBh4/AYwk6ACYByYKyx5r3PDG0iHnJ8bV0OeyQ9ujfgBBP
- B2t4oASNnIOeGEEcQ2rjzsFNBFNPCKMBEACm7Xqafb1Dp1nDl06aw/3O9ixWsGMv1Uhfd2B6
- it6wh1HDCn9HpekgouR2HLMvdd3Y//GG89irEasjzENZPsK82PS0bvkxxIHRFm0pikF4ljIb
- 6tca2sxFr/H7CCtWYZjZzPgnOPtnagN0qVVyEM7L5f7KjGb1/o5EDkVR2SVSSjrlmNdTL2Rd
- zaPqrBoxuR/y/n856deWqS1ZssOpqwKhxT1IVlF6S47CjFJ3+fiHNjkljLfxzDyQXwXCNoZn
- BKcW9PvAMf6W1DGASoXtsMg4HHzZ5fW+vnjzvWiC4pXrcP7Ivfxx5pB+nGiOfOY+/VSUlW/9
- GdzPlOIc1bGyKc6tGREH5lErmeoJZ5k7E9cMJx+xzuDItvnZbf6RuH5fg3QsljQy8jLlr4S6
- 8YwxlObySJ5K+suPRzZOG2+kq77RJVqAgZXp3Zdvdaov4a5J3H8pxzjj0yZ2JZlndM4X7Msr
- P5tfxy1WvV4Km6QeFAsjcF5gM+wWl+mf2qrlp3dRwniG1vkLsnQugQ4oNUrx0ahwOSm9p6kM
- CIiTITo+W7O9KEE9XCb4vV0ejmLlgdDV8ASVUekeTJkmRIBnz0fa4pa1vbtZoi6/LlIdAEEt
- PY6p3hgkLLtr2GRodOW/Y3vPRd9+rJHq/tLIfwc58ZhQKmRcgrhtlnuTGTmyUqGSiMNfpwAR
- AQABwsFfBBgBAgAJBQJTTwijAhsMAAoJEAL1yD+ydue64BgP/33QKczgAvSdj9XTC14wZCGE
- U8ygZwkkyNf021iNMj+o0dpLU48PIhHIMTXlM2aiiZlPWgKVlDRjlYuc9EZqGgbOOuR/pNYA
- JX9vaqszyE34JzXBL9DBKUuAui8z8GcxRcz49/xtzzP0kH3OQbBIqZWuMRxKEpRptRT0wzBL
- O31ygf4FRxs68jvPCuZjTGKELIo656/Hmk17cmjoBAJK7JHfqdGkDXk5tneeHCkB411p9WJU
- vMO2EqsHjobjuFm89hI0pSxlUoiTL0Nuk9Edemjw70W4anGNyaQtBq+qu1RdjUPBvoJec7y/
- EXJtoGxq9Y+tmm22xwApSiIOyMwUi9A1iLjQLmngLeUdsHyrEWTbEYHd2sAM2sqKoZRyBDSv
- ejRvZD6zwkY/9nRqXt02H1quVOP42xlkwOQU6gxm93o/bxd7S5tEA359Sli5gZRaucpNQkwd
- KLQdCvFdksD270r4jU/rwR2R/Ubi+txfy0dk2wGBjl1xpSf0Lbl/KMR5TQntELfLR4etizLq
- Xpd2byn96Ivi8C8u9zJruXTueHH8vt7gJ1oax3yKRGU5o2eipCRiKZ0s/T7fvkdq+8beg9ku
- fDO4SAgJMIl6H5awliCY2zQvLHysS/Wb8QuB09hmhLZ4AifdHyF1J5qeePEhgTA+BaUbiUZf
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <bb0faa84-d12f-05b7-9913-155ebfcb3073@arm.com>
-Date:   Fri, 18 Dec 2020 18:36:53 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1726147AbgLRTd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 14:33:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50374 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbgLRTd5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Dec 2020 14:33:57 -0500
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA81C0617A7
+        for <kvm@vger.kernel.org>; Fri, 18 Dec 2020 11:33:17 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id g24so3506507edw.9
+        for <kvm@vger.kernel.org>; Fri, 18 Dec 2020 11:33:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:subject:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=DyaXUffdTz42kgwCrZZre5sNuoftYYW8HJaP5FHPOHY=;
+        b=jJNDZN58yN+Ep6ObClpCXB4IaefdbTbIfsQ0LwKLwjB2cFmjp2XmewFtNIt0GLeEFA
+         dsaErWCAfH+T4LBtWzTOsjhNar6PGZjN48TeMfUhYdIST1yf3nBrNT1PKqT6SP849lWL
+         8mfR7wWziGm02QWZnYWAPONAsltRNnVn5n6DTpjO+GXUqgCO23ry4r3aDIik4fHlPxOE
+         TVHdC9nYs+QwJ0UvKpKspy1uFd3VOVOx8C0zwtm8Ym+8JUpvgVlOZ1NohHomq22G1D99
+         mcXoW2V+woual+Y3H49DGUTKi35WE8eADumQtpQSGYHwht1ZhMYxGUDrDjwMBCafureF
+         FW2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=DyaXUffdTz42kgwCrZZre5sNuoftYYW8HJaP5FHPOHY=;
+        b=h5RAWDJ1I09lF3Yr/vq/9An9gRqJbQPnjRt/No30pJdi+a+p8iYC/3LWLVcxSP75YH
+         Icyb+GZ2lgC9bqd0YJOscmG+6W2fWfGiVRZa+Plg7zm8EQ/JJK6wANJWvn+uNms052DI
+         lyQFtOpTySR4KoaHzip/KLYNY4mCdzFBnxQQ7zXvtxE005tkPIKvruW2F25R0cmPFn2U
+         NJmj+7+B2p4weh5dRqbtIuUm8zDnIuzrgCMNGMTPL+Cq1oH5Nb1gyx+NNgzbcxA7JuKp
+         6e9YUu6/lkh/TA6Drrd7fmnSaSU/JVCUJhKR2Kov2Ko4+tSq0mBLyfN484Josm8PXE3U
+         egsQ==
+X-Gm-Message-State: AOAM531N0nRZHz4BHLMlq62KN/Q6oC8LiZWd8mNmA+VNcKywVWqzrgmM
+        99uFulrqitumK2hpjUJsUZ3krQRS5Kg=
+X-Google-Smtp-Source: ABdhPJyUy95yc99x0YKxbY2/7hfVlujh8RZ4coSWzIiJK5H75ATJE+UP/47rPeUaU/MkhAPQYeAyfQ==
+X-Received: by 2002:a50:e0ce:: with SMTP id j14mr6100497edl.18.1608319995886;
+        Fri, 18 Dec 2020 11:33:15 -0800 (PST)
+Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
+        by smtp.gmail.com with ESMTPSA id dd12sm25513890edb.6.2020.12.18.11.33.15
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Dec 2020 11:33:15 -0800 (PST)
+Date:   Fri, 18 Dec 2020 20:33:10 +0100
+From:   Zdenek Kaspar <zkaspar82@gmail.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: Bad performance since 5.9-rc1
+Message-ID: <20201218203310.5025c17e.zkaspar82@gmail.com>
+In-Reply-To: <20201201073537.6749e2d7.zkaspar82@gmail.com>
+References: <20201119040526.5263f557.zkaspar82@gmail.com>
+        <20201201073537.6749e2d7.zkaspar82@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20201217141400.106137-12-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/12/2020 14:13, Alexandru Elisei wrote:
-> The ITS tests use the INT command like an SGI. The its_send_int() function
-> kicks a CPU and then the test checks that the interrupt was observed as
-> expected in check_lpi_stats(). This is done by using lpi_stats.observed and
-> lpi_stats.expected, where the target CPU only writes to lpi_stats.observed,
-> and the source CPU reads it and compares the values with
-> lpi_stats.expected.
-> 
-> The fact that the target CPU doesn't read data written by the source CPU
-> means that we don't need to do inter-processor memory synchronization
-> for that between the two at the moment.
-> 
-> The acked array is used by its-pending-migration test, but the reset value
-> for acked (zero) is the same as the initialization value for static
-> variables, so memory synchronization is again not needed.
-> 
-> However, that is all about to change when we modify all ITS tests to use
-> the same functions as the IPI tests. Add a write memory barrier to
-> its_send_int(), similar to the gicv3_ipi_send_mask(), which has similar
-> semantics.
+On Tue, 1 Dec 2020 07:35:37 +0100
+Zdenek Kaspar <zkaspar82@gmail.com> wrote:
 
-I agree to the requirement for having the barrier, but am not sure this
-is the right place. Wouldn't it be better to have the barrier in the
-callers?
-
-Besides: This command is written to the command queue (in normal
-memory), then we notify the ITS via an MMIO writeq. And this one has a
-"wmb" barrier already (though for other reasons).
-
-Cheers,
-Andre
-
-
+> On Thu, 19 Nov 2020 04:05:26 +0100
+> Zdenek Kaspar <zkaspar82@gmail.com> wrote:
 > 
-> Suggested-by: Auger Eric <eric.auger@redhat.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  lib/arm64/gic-v3-its-cmd.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> > Hi,
+> > 
+> > in my initial report
+> > (https://marc.info/?l=kvm&m=160502183220080&w=2 - now fixed by
+> > c887c9b9ca62c051d339b1c7b796edf2724029ed) I saw degraded
+> > performance going back somewhere between v5.8 - v5.9-rc1.
+> > 
+> > OpenBSD 6.8 (GENERIC.MP) guest performance (time ./test-build.sh)
+> > good: 0m13.54s real     0m10.51s user     0m10.96s system
+> > bad : 6m20.07s real    11m42.93s user     0m13.57s system
+> > 
+> > bisected to first bad commit:
+> > 6b82ef2c9cf18a48726e4bb359aa9014632f6466
+> > 
+> > git bisect log:
+> > # bad: [e47c4aee5bde03e7018f4fde45ba21028a8f8438] KVM: x86/mmu:
+> > Rename page_header() to to_shadow_page() # good:
+> > [01c3b2b5cdae39af8dfcf6e40fdf484ae0e812c5] KVM: SVM: Rename
+> > svm_nested_virtualize_tpr() to nested_svm_virtualize_tpr() git
+> > bisect start 'e47c4aee5bde' '01c3b2b5cdae' # bad:
+> > [ebdb292dac7993425c8e31e2c21c9978e914a676] KVM: x86/mmu: Batch zap
+> > MMU pages when shrinking the slab git bisect bad
+> > ebdb292dac7993425c8e31e2c21c9978e914a676 # good:
+> > [fb58a9c345f645f1774dcf6a36fda169253008ae] KVM: x86/mmu: Optimize
+> > MMU page cache lookup for fully direct MMUs git bisect good
+> > fb58a9c345f645f1774dcf6a36fda169253008ae # bad:
+> > [6b82ef2c9cf18a48726e4bb359aa9014632f6466] KVM: x86/mmu: Batch zap
+> > MMU pages when recycling oldest pages git bisect bad
+> > 6b82ef2c9cf18a48726e4bb359aa9014632f6466 # good:
+> > [f95eec9bed76d42194c23153cb1cc8f186bf91cb] KVM: x86/mmu: Don't put
+> > invalid SPs back on the list of active pages git bisect good
+> > f95eec9bed76d42194c23153cb1cc8f186bf91cb # first bad commit:
+> > [6b82ef2c9cf18a48726e4bb359aa9014632f6466] KVM: x86/mmu: Batch zap
+> > MMU pages when recycling oldest pages
+> > 
+> > Host machine is old Intel Core2 without EPT (TDP).
+> > 
+> > TIA, Z.
 > 
-> diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
-> index 34574f71d171..32703147ee85 100644
-> --- a/lib/arm64/gic-v3-its-cmd.c
-> +++ b/lib/arm64/gic-v3-its-cmd.c
-> @@ -385,6 +385,12 @@ void __its_send_int(struct its_device *dev, u32 event_id, bool verbose)
->  {
->  	struct its_cmd_desc desc;
->  
-> +	/*
-> +	 * The INT command is used by tests as an IPI. Ensure stores to Normal
-> +	 * memory are visible to other CPUs before sending the LPI.
-> +	 */
-> +	wmb();
-> +
->  	desc.its_int_cmd.dev = dev;
->  	desc.its_int_cmd.event_id = event_id;
->  	desc.verbose = verbose;
+> Hi, with v5.10-rc6:
+> get_mmio_spte: detect reserved bits on spte, addr 0xfe00d000, dump
+> hierarchy: ------ spte 0x8000030e level 3.
+> ------ spte 0xaf82027 level 2.
+> ------ spte 0x2038001ffe00d407 level 1.
+> ------------[ cut here ]------------
+> WARNING: CPU: 1 PID: 355 at kvm_mmu_page_fault.cold+0x42/0x4f [kvm]
+> ...
+> CPU: 1 PID: 355 Comm: qemu-build Not tainted 5.10.0-rc6-amd64 #1
+> Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426
+> 01/13/2010 RIP: 0010:kvm_mmu_page_fault.cold+0x42/0x4f [kvm]
+> Code: e2 ec 44 8b 04 24 8b 5c 24 0c 44 89 c5 89 da 83 eb 01 48 c7 c7
+> 20 b2 65 c0 48 63 c3 48 8b 74 c4 30 e8 dd 74 e2 ec 39 dd 7e e3 <0f>
+> 0b 41 b8 ea ff ff ff e9 27 99 ff ff 0f 0b 48 8b 54 24 10 48 83 RSP:
+> 0018:ffffb67400653d30 EFLAGS: 00010202 RAX: 0000000000000027 RBX:
+> 0000000000000000 RCX: ffffa271ff2976f8 RDX: 00000000ffffffd8 RSI:
+> 0000000000000027 RDI: ffffa271ff2976f0 RBP: 0000000000000001 R08:
+> ffffffffadd02ae8 R09: 0000000000000003 R10: 00000000ffffe000 R11:
+> 3fffffffffffffff R12: 00000000fe00d000 R13: 0000000000000000 R14:
+> 0000000000000000 R15: 0000000000000001 FS:  00007fc10ae3d640(0000)
+> GS:ffffa271ff280000(0000) knlGS:0000000000000000 CS:  0010 DS: 0000
+> ES: 0000 CR0: 0000000080050033 CR2: 0000000000000000 CR3:
+> 0000000002dc2000 CR4: 00000000000026e0 Call Trace:
+> kvm_arch_vcpu_ioctl_run+0xbaf/0x18f0 [kvm] ? do_futex+0x7c4/0xb80
+>  kvm_vcpu_ioctl+0x203/0x520 [kvm]
+>  ? set_next_entity+0x5b/0x80
+>  ? __switch_to_asm+0x32/0x60
+>  ? finish_task_switch+0x70/0x260
+>  __x64_sys_ioctl+0x338/0x720
+>  ? __x64_sys_futex+0x120/0x190
+>  do_syscall_64+0x33/0x40
+>  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> RIP: 0033:0x7fc10c389f6b
+> Code: 89 d8 49 8d 3c 1c 48 f7 d8 49 39 c4 72 b5 e8 1c ff ff ff 85 c0
+> 78 ba 4c 89 e0 5b 5d 41 5c c3 f3 0f 1e fa b8 10 00 00 00 0f 05 <48>
+> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 ae 0c 00 f7 d8 64 89 01 48 RSP:
+> 002b:00007fc10ae3c628 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007fc10c389f6b
+> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000012
+> RBP: 000055ad3767baf0 R08: 000055ad36be4850 R09: 00000000000000ff
+> R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
+> R13: 000055ad371d9800 R14: 0000000000000001 R15: 0000000000000002
+> ---[ end trace c5f7ae690f5abcc4 ]---
 > 
+> without: kvm: x86/mmu: Fix get_mmio_spte() on CPUs supporting 5-level
+> PT I can run guest again, but with degraded performance as before.
+> 
+> Z.
 
+With: KVM: x86/mmu: Bug fixes and cleanups in get_mmio_spte() series
+I can run guest again and performance is slightly better:
+
+v5.8:        0m13.54s real     0m10.51s user     0m10.96s system
+v5.9:        6m20.07s real    11m42.93s user     0m13.57s system
+v5.10+fixes: 5m50.77s real    10m38.29s user     0m15.96s system
+
+perf top from host when guest (openbsd) is compiling:
+  26.85%  [kernel]                  [k] queued_spin_lock_slowpath
+   8.49%  [kvm]                     [k] mmu_page_zap_pte
+   7.47%  [kvm]                     [k] __kvm_mmu_prepare_zap_page
+   3.61%  [kernel]                  [k] clear_page_rep
+   2.43%  [kernel]                  [k] page_counter_uncharge
+   2.30%  [kvm]                     [k] paging64_page_fault
+   2.03%  [kvm_intel]               [k] vmx_vcpu_run
+   2.02%  [kvm]                     [k] kvm_vcpu_gfn_to_memslot
+   1.95%  [kernel]                  [k] internal_get_user_pages_fast
+   1.64%  [kvm]                     [k] kvm_mmu_get_page
+   1.55%  [kernel]                  [k] page_counter_try_charge
+   1.33%  [kernel]                  [k] propagate_protected_usage
+   1.29%  [kvm]                     [k] kvm_arch_vcpu_ioctl_run
+   1.13%  [kernel]                  [k] get_page_from_freelist
+   1.01%  [kvm]                     [k] paging64_walk_addr_generic
+   0.83%  [kernel]                  [k] ___slab_alloc.constprop.0
+   0.83%  [kernel]                  [k] kmem_cache_free
+   0.82%  [kvm]                     [k] __pte_list_remove
+   0.77%  [kernel]                  [k] try_grab_compound_head
+   0.76%  [kvm_intel]               [k] 0x000000000001cfa0
+   0.74%  [kvm]                     [k] pte_list_add
+
+HTH, Z.
