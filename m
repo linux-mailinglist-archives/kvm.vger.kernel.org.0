@@ -2,81 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9BCA2DDCA1
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 02:30:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E232C2DDD0C
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 03:49:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727182AbgLRB2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Dec 2020 20:28:22 -0500
-Received: from belmont80srvr.owm.bell.net ([184.150.200.80]:33944 "EHLO
-        mtlfep01.bell.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726851AbgLRB2V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Dec 2020 20:28:21 -0500
-Received: from bell.net mtlfep01 184.150.200.30 by mtlfep01.bell.net
-          with ESMTP
-          id <20201218012740.FIXH120733.mtlfep01.bell.net@mtlspm01.bell.net>;
-          Thu, 17 Dec 2020 20:27:40 -0500
-Received: from starbug.dom ([67.68.23.153]) by mtlspm01.bell.net with ESMTP
-          id <20201218012740.MLKT130487.mtlspm01.bell.net@starbug.dom>;
-          Thu, 17 Dec 2020 20:27:40 -0500
-Received: from starbug.dom (localhost [127.0.0.1])
-        by starbug.dom (Postfix) with ESMTP id BB5551EBAC6;
-        Thu, 17 Dec 2020 20:27:38 -0500 (EST)
-From:   Richard Herbert <rherbert@sympatico.ca>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Subject: [PATCH 0/4] KVM: x86/mmu: Bug fixes and cleanups in get_mmio_spte()
-Date:   Thu, 17 Dec 2020 20:27:38 -0500
-Message-ID: <2001245.9o76ZdvQCi@starbug.dom>
-In-Reply-To: <2346556.XAFRqVoOGU@starbug.dom>
-References: <20201218003139.2167891-1-seanjc@google.com> <2346556.XAFRqVoOGU@starbug.dom>
+        id S1732463AbgLRCsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Dec 2020 21:48:33 -0500
+Received: from ozlabs.org ([203.11.71.1]:57001 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726851AbgLRCsc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Dec 2020 21:48:32 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CxtZZ1Hvjz9sWR;
+        Fri, 18 Dec 2020 13:47:50 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1608259670;
+        bh=9kLtd9vZRVb0Bzbu/us9QjmM3pXtlm84GlIUkd9FX7o=;
+        h=Date:From:To:Cc:Subject:From;
+        b=uZfdmiUHzYNu+cxFXGM/P0qEivh5ZpvXsloSwyFWIMSbpIhK6zxaX8EZieGJDEksM
+         eZSsQljpZRXskqU6qgGot0dRN+rZSFhNzosAMbGd9x2Dc7BxcRxGfZoNe8Gj61Twwc
+         jXBKc14aEZmSJor0sPWU+58J8/G5YTSGQLnplmcO7ASQs42cgjgqbuRPRFLV8SYHmb
+         3O73EwWUYWRT4KJ69RbDHKE86SoObvbIQ6EkjFKcwzB3XxfECZeWG9ECiNwpX4ViCj
+         HWwEFfs0UofEXtaGj5dlfAGhvEd8qjrXvat1GmGETbraYP7IU7P5a6CBufanmBKGaR
+         kv4mrrNk5aDoA==
+Date:   Fri, 18 Dec 2020 13:47:39 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>
+Subject: linux-next: manual merge of the kvm tree with the arm64-fixes tree
+Message-ID: <20201218134739.45973671@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-CM-Analysis: v=2.4 cv=AbB0o1bG c=1 sm=1 tr=0 ts=5fdc058c a=Kmoo8mppt6dxYrHuFgrAcA==:117 a=Kmoo8mppt6dxYrHuFgrAcA==:17 a=kj9zAlcOel0A:10 a=zTNgK-yGK50A:10 a=ww6PLmxxykeOsXVbiHUA:9 a=CjuIK1q_8ugA:10 a=pHzHmUro8NiASowvMSCR:22 a=nt3jZW36AmriUCFCBwmW:22
-X-CM-Envelope: MS4xfNEEu04CtsVlwGxMQ5DtGddkw/6a+MFkU8QWjQJfwp8dKIFe/Q7NwthaZuJ+Jv1xO7x5V0/T19wHB8nSF2kAn6myqlRv3UnQByhfdux1AGud6Uv6kQkM Vq3magofB7LyI7beJsF9voFs4AAYoWQZcpDgImNzXqJzBiTTsx6YyhvIa6dmt8F+rirnI8f/W+LE+8QdDc4AA/Vwl0c5z/VkuA3NeYk9ZQuUYLyhv5z8os5A
+Content-Type: multipart/signed; boundary="Sig_/PJC12DwrcG=i=a+srC9bCTG";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- Hi, Sean and all.
+--Sig_/PJC12DwrcG=i=a+srC9bCTG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks so much for these.  Very glad to report that the problem has been 
-solved.  I applied all four patches, recompiled kernel 5.10.1 and successfully 
-launched a Qemu VM.  Let's hope these will get merged into 5.10.2.
+Hi all,
 
-Thanks again for the hard work and quick fix.
+Today's linux-next merge of the kvm tree got a conflict in:
 
-Richard Herbert
+  arch/arm64/include/asm/kvm_asm.h
 
+between commit:
 
-On Thursday, December 17, 2020 7:31:35 PM EST Sean Christopherson wrote:
+  9fd339a45be5 ("arm64: Work around broken GCC 4.9 handling of "S" constrai=
+nt")
 
-> Two fixes for bugs that were introduced along with the TDP MMU (though I
-> strongly suspect only the one reported by Richard, fixed in patch 2/4, is
-> hittable in practice).  Two additional cleanup on top to try and make the
-> code a bit more readable and shave a few cycles.
-> 
-> Sean Christopherson (4):
->   KVM: x86/mmu: Use -1 to flag an undefined spte in get_mmio_spte()
->   KVM: x86/mmu: Get root level from walkers when retrieving MMIO SPTE
->   KVM: x86/mmu: Use raw level to index into MMIO walks' sptes array
->   KVM: x86/mmu: Optimize not-present/MMIO SPTE check in get_mmio_spte()
-> 
->  arch/x86/kvm/mmu/mmu.c     | 53 +++++++++++++++++++++-----------------
->  arch/x86/kvm/mmu/tdp_mmu.c |  9 ++++---
->  arch/x86/kvm/mmu/tdp_mmu.h |  4 ++-
->  3 files changed, 39 insertions(+), 27 deletions(-)
+from the arm64-fixes tree and commit:
 
+  b881cdce77b4 ("KVM: arm64: Allocate hyp vectors statically")
 
+from the kvm tree.
 
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
+--=20
+Cheers,
+Stephen Rothwell
 
+diff --cc arch/arm64/include/asm/kvm_asm.h
+index 8e5fa28b78c2,7ccf770c53d9..000000000000
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@@ -198,14 -199,6 +199,12 @@@ extern void __vgic_v3_init_lrs(void)
+ =20
+  extern u32 __kvm_get_mdcr_el2(void);
+ =20
+- extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
+-=20
+ +#if defined(GCC_VERSION) && GCC_VERSION < 50000
+ +#define SYM_CONSTRAINT	"i"
+ +#else
+ +#define SYM_CONSTRAINT	"S"
+ +#endif
+ +
+  /*
+   * Obtain the PC-relative address of a kernel symbol
+   * s: symbol
 
+--Sig_/PJC12DwrcG=i=a+srC9bCTG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/cGEsACgkQAVBC80lX
+0Gx/ewf9HzAAb5ayqTx0QmzpaUCw+K/jRogXkmCPyLKF5SVys5WDfnEVEBUi6U37
+s9HIieOp9sHY2OixrIzDhc86zNhr0WbA/r91JWzv4wkdXVCe4vzGH+9a5HyxhRtK
+lnAT5kaJGRmIeHPv6jX6ZmJxLBG7Fq4Z25hNrHuBsw9aacdPKlLYLL9lkNDOY/MH
+Hg9TLOHIaGhMyOAuDbNeUGd0vM5/XpOaI8FNyylZkXH2srwLghmFhZ2cfQUEcrT2
+LiUOscu9nCMKjokmnLOgcirWWhD9JZk7fapS87+T1RxlXV2pjvYpUN2gfsCLxX5v
+tyeL9xrWh1ACITdmkkaJfWUAmY0mng==
+=aBYp
+-----END PGP SIGNATURE-----
+
+--Sig_/PJC12DwrcG=i=a+srC9bCTG--
