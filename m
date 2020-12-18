@@ -2,194 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D1062DE270
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 13:10:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B095A2DE297
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 13:13:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726839AbgLRMKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Dec 2020 07:10:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35861 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726559AbgLRMKW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Dec 2020 07:10:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608293335;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qyhBcJSscLXt03rN/wlqP36IM0VuLCvIcf32trO8ph0=;
-        b=XU+q6UnS2CszvKzjmHZwDAebsZ3wKYySz0OUJB3phVEuzRAfzX7dxZyzeYPHnEEr+iW/XQ
-        v3F/aoNI9ABRhc+9hohRqMH56fVtJULz44H/LV9L1kwvMyfbCpkIsQhWO3P/qq23sIr/d4
-        /3E51m5+HNImvsGjI7PEwzKm9agrNms=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-112-EKwJsLpENtmXHXyBkdaN5w-1; Fri, 18 Dec 2020 07:08:53 -0500
-X-MC-Unique: EKwJsLpENtmXHXyBkdaN5w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A4A01006C88;
-        Fri, 18 Dec 2020 12:08:51 +0000 (UTC)
-Received: from work-vm (ovpn-114-200.ams2.redhat.com [10.36.114.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D362260C43;
-        Fri, 18 Dec 2020 12:08:38 +0000 (UTC)
-Date:   Fri, 18 Dec 2020 12:08:36 +0000
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Greg Kurz <groug@kaod.org>,
-        David Gibson <david@gibson.dropbear.id.au>, pair@us.ibm.com,
-        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
-        qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
-        qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, berrange@redhat.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        thuth@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
-        mdroth@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20201218120836.GA2956@work-vm>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
- <20201204054415.579042-12-david@gibson.dropbear.id.au>
- <20201214182240.2abd85eb.cohuck@redhat.com>
- <20201217054736.GH310465@yekko.fritz.box>
- <20201217123842.51063918.cohuck@redhat.com>
- <20201217151530.54431f0e@bahia.lan>
- <20201218124111.4957eb50.cohuck@redhat.com>
+        id S1727422AbgLRMMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 07:12:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38938 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727416AbgLRMMx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Dec 2020 07:12:53 -0500
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA6BC0611CE;
+        Fri, 18 Dec 2020 04:11:53 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id y24so1435658edt.10;
+        Fri, 18 Dec 2020 04:11:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fpfHgLjNqUef0wN0lc7+nNzCiw4Mf77uS73mqGKZnIM=;
+        b=mCkVQjDpB6nuKIaWx8YJljXcOY94LkJ5nKGV8N08bV1bxTNGuPBSeyEA7vA83YccO5
+         8SHhceT0oQJtyM4+hihCu6p3LQabHOp05TLVcAjJvxFU5XGY7cWaXEgkDmAksyy2I0+g
+         GQXz2py0/u5nox0lGpJiIPgfXnZNrOHaaFMIu+Fb18rcfUbMCFCYs8sIxgvEnRmLL5tZ
+         /50BZ79EQpqx+fpGZoWK7mxElPkr6BA3JPXIhjAFvx9USGSVqIWmJGe1pWcvoLugr6qe
+         9dcUQ1QlESgvPSqMg4H3BkdqE0G8lsuKMYBV+ZH6ljEQjdTq9JqSj+kiFq84xv6DrS91
+         e0sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fpfHgLjNqUef0wN0lc7+nNzCiw4Mf77uS73mqGKZnIM=;
+        b=BhjkzMydxt6vMnpRp51S0KLDw3so1MqdEMVkt65ufS7mi1Ftt6AELy56BlUfrp0eIx
+         otd+sjMf3fxB/eFB6//h2MI8Ynk8lgjxDPUiUGrMoh6YOIMrNL0IwAb8GClbjAesLUYT
+         CE/SUftwQwEPxH6iL0lhBIQs7blSQYoZfJHWD6/bRVFgLAlnWwLfQAUq+8sISFJ3VGjx
+         eS0d8Q53PV3LZoN/SQNa7JtQakL2N/cCzJCcYHGJoOvzavZpub7ZntWas63kLu15nySe
+         0Ktlp8FSXXvcx1vVjNs3G79Mo2knGRF6m5BbL2rUQ+Exfp392u0RmxZEl/hX8JtLTuz+
+         VsWA==
+X-Gm-Message-State: AOAM531vm/luIYPS9r1cc61dgIFur75Slz0Itn+Ll2/iQrkpcxC7CNLn
+        UVQKA2zNDDhWTruwqMRPj7FwOZiC6PFntw==
+X-Google-Smtp-Source: ABdhPJzfkGsxDIrFIIAEvsjC2QCxFCNKemW4SsggW8Fc3JEQLPdbEflH3gID8c3dDMLijzQHBOqdjw==
+X-Received: by 2002:aa7:ca03:: with SMTP id y3mr4106732eds.87.1608293512052;
+        Fri, 18 Dec 2020 04:11:52 -0800 (PST)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id i13sm15852716edu.22.2020.12.18.04.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Dec 2020 04:11:51 -0800 (PST)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [PATCH] KVM/x86: Move definition of __ex to x86.h
+Date:   Fri, 18 Dec 2020 13:11:46 +0100
+Message-Id: <20201218121146.432286-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201218124111.4957eb50.cohuck@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Cornelia Huck (cohuck@redhat.com) wrote:
-> On Thu, 17 Dec 2020 15:15:30 +0100
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > On Thu, 17 Dec 2020 12:38:42 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> > 
-> > > On Thu, 17 Dec 2020 16:47:36 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >   
-> > > > On Mon, Dec 14, 2020 at 06:22:40PM +0100, Cornelia Huck wrote:  
-> > > > > On Fri,  4 Dec 2020 16:44:13 +1100
-> > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > > >     
-> > > > > > We haven't yet implemented the fairly involved handshaking that will be
-> > > > > > needed to migrate PEF protected guests.  For now, just use a migration
-> > > > > > blocker so we get a meaningful error if someone attempts this (this is the
-> > > > > > same approach used by AMD SEV).
-> > > > > > 
-> > > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > > ---
-> > > > > >  hw/ppc/pef.c | 9 +++++++++
-> > > > > >  1 file changed, 9 insertions(+)
-> > > > > > 
-> > > > > > diff --git a/hw/ppc/pef.c b/hw/ppc/pef.c
-> > > > > > index 3ae3059cfe..edc3e744ba 100644
-> > > > > > --- a/hw/ppc/pef.c
-> > > > > > +++ b/hw/ppc/pef.c
-> > > > > > @@ -38,7 +38,11 @@ struct PefGuestState {
-> > > > > >  };
-> > > > > >  
-> > > > > >  #ifdef CONFIG_KVM
-> > > > > > +static Error *pef_mig_blocker;
-> > > > > > +
-> > > > > >  static int kvmppc_svm_init(Error **errp)    
-> > > > > 
-> > > > > This looks weird?    
-> > > > 
-> > > > Oops.  Not sure how that made it past even my rudimentary compile
-> > > > testing.
-> > > >   
-> > > > > > +
-> > > > > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
-> > > > > >  {
-> > > > > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)) {
-> > > > > >          error_setg(errp,
-> > > > > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
-> > > > > >          }
-> > > > > >      }
-> > > > > >  
-> > > > > > +    /* add migration blocker */
-> > > > > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
-> > > > > > +    /* NB: This can fail if --only-migratable is used */
-> > > > > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal);    
-> > > > > 
-> > > > > Just so that I understand: is PEF something that is enabled by the host
-> > > > > (and the guest is either secured or doesn't start), or is it using a
-> > > > > model like s390x PV where the guest initiates the transition into
-> > > > > secured mode?    
-> > > > 
-> > > > Like s390x PV it's initiated by the guest.
-> > > >   
-> > > > > Asking because s390x adds the migration blocker only when the
-> > > > > transition is actually happening (i.e. guests that do not transition
-> > > > > into secure mode remain migratable.) This has the side effect that you
-> > > > > might be able to start a machine with --only-migratable that
-> > > > > transitions into a non-migratable machine via a guest action, if I'm
-> > > > > not mistaken. Without the new object, I don't see a way to block with
-> > > > > --only-migratable; with it, we should be able to do that. Not sure what
-> > > > > the desirable behaviour is here.    
-> > > >   
-> > 
-> > The purpose of --only-migratable is specifically to prevent the machine
-> > to transition to a non-migrate state IIUC. The guest transition to
-> > secure mode should be nacked in this case.
-> 
-> Yes, that's what happens for s390x: The guest tries to transition, QEMU
-> can't add a migration blocker and fails the instruction used for
-> transitioning, the guest sees the error.
-> 
-> The drawback is that we see the failure only when we already launched
-> the machine and the guest tries to transition. If I start QEMU with
-> --only-migratable, it will refuse to start when non-migratable devices
-> are configured in the command line, so I see the issue right from the
-> start. (For s390x, that would possibly mean that we should not even
-> present the cpu feature bit when only_migratable is set?)
+Merge __kvm_handle_fault_on_reboot with its sole user
+and move the definition of __ex to a common include to be
+shared between VMX and SVM.
 
-I see --only-migratable as refusing to start if you've enabled anything
-that would stop migration.
-So I'd expect:
-  a) Allow the cpu flag to be turned on/off somehow
-     
-  b) If you ask for it (-cpu ...,_confidentialcomp or whatever) and
-you've got --only-migratable then you'd fail before startup.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+---
+ arch/x86/include/asm/kvm_host.h | 25 -------------------------
+ arch/x86/kvm/svm/svm.c          |  2 --
+ arch/x86/kvm/vmx/vmx_ops.h      |  4 +---
+ arch/x86/kvm/x86.h              | 23 +++++++++++++++++++++++
+ 4 files changed, 24 insertions(+), 30 deletions(-)
 
-Dave
-
-> > 
-> > > > Hm, I'm not sure what the best option is here either.  
-> > > 
-> > > If we agree on anything, it should be as consistent across
-> > > architectures as possible :)
-> > > 
-> > > If we want to add the migration blocker to s390x even before the guest
-> > > transitions, it needs to be tied to the new object; if we'd make it
-> > > dependent on the cpu feature bit, we'd block migration of all machines
-> > > on hardware with SE and a recent kernel.
-> > > 
-> > > Is there a convenient point in time when PEF guests transition where
-> > > QEMU can add a blocker?
-> > >   
-> > > >   
-> > > > >     
-> > > > > > +
-> > > > > >      return 0;
-> > > > > >  }
-> > > > > >      
-> > > > >     
-> > > >   
-> > >   
-> > 
-> 
-
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7e5f33a0d0e2..ff152ee1d63f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1623,31 +1623,6 @@ enum {
+ #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+ #define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
+ 
+-asmlinkage void kvm_spurious_fault(void);
+-
+-/*
+- * Hardware virtualization extension instructions may fault if a
+- * reboot turns off virtualization while processes are running.
+- * Usually after catching the fault we just panic; during reboot
+- * instead the instruction is ignored.
+- */
+-#define __kvm_handle_fault_on_reboot(insn)				\
+-	"666: \n\t"							\
+-	insn "\n\t"							\
+-	"jmp	668f \n\t"						\
+-	"667: \n\t"							\
+-	"1: \n\t"							\
+-	".pushsection .discard.instr_begin \n\t"			\
+-	".long 1b - . \n\t"						\
+-	".popsection \n\t"						\
+-	"call	kvm_spurious_fault \n\t"				\
+-	"1: \n\t"							\
+-	".pushsection .discard.instr_end \n\t"				\
+-	".long 1b - . \n\t"						\
+-	".popsection \n\t"						\
+-	"668: \n\t"							\
+-	_ASM_EXTABLE(666b, 667b)
+-
+ #define KVM_ARCH_WANT_MMU_NOTIFIER
+ int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
+ 			unsigned flags);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index da7eb4aaf44f..0a72ab9fd568 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -42,8 +42,6 @@
+ 
+ #include "svm.h"
+ 
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
+-
+ MODULE_AUTHOR("Qumranet");
+ MODULE_LICENSE("GPL");
+ 
+diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+index 692b0c31c9c8..7e3cb53c413f 100644
+--- a/arch/x86/kvm/vmx/vmx_ops.h
++++ b/arch/x86/kvm/vmx/vmx_ops.h
+@@ -4,13 +4,11 @@
+ 
+ #include <linux/nospec.h>
+ 
+-#include <asm/kvm_host.h>
+ #include <asm/vmx.h>
+ 
+ #include "evmcs.h"
+ #include "vmcs.h"
+-
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
++#include "x86.h"
+ 
+ asmlinkage void vmread_error(unsigned long field, bool fault);
+ __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index e7ca622a468f..608548d05e84 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -7,6 +7,29 @@
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+ 
++asmlinkage void kvm_spurious_fault(void);
++
++/*
++ * Hardware virtualization extension instructions may fault if a
++ * reboot turns off virtualization while processes are running.
++ * Usually after catching the fault we just panic; during reboot
++ * instead the instruction is ignored.
++ */
++#define __ex(insn)							\
++	"666:	" insn "\n"						\
++	"	jmp 669f\n"						\
++	"667:\n"							\
++	".pushsection .discard.instr_begin\n"				\
++	".long 667b - .\n"						\
++	".popsection\n"							\
++	"	call kvm_spurious_fault\n"				\
++	"668:\n"							\
++	".pushsection .discard.instr_end\n"				\
++	".long 668b - .\n"						\
++	".popsection\n"							\
++	"669:\n"							\
++	_ASM_EXTABLE(666b, 667b)
++
+ #define KVM_DEFAULT_PLE_GAP		128
+ #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
+ #define KVM_DEFAULT_PLE_WINDOW_GROW	2
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+2.26.2
 
