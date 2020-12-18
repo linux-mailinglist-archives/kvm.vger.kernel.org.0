@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 514502DE8DB
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 19:17:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 498012DE8F9
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 19:38:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727836AbgLRSQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Dec 2020 13:16:42 -0500
-Received: from foss.arm.com ([217.140.110.172]:39528 "EHLO foss.arm.com"
+        id S1728433AbgLRShv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 13:37:51 -0500
+Received: from foss.arm.com ([217.140.110.172]:39904 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725766AbgLRSQl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Dec 2020 13:16:41 -0500
+        id S1725822AbgLRShu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Dec 2020 13:37:50 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9AB3330E;
-        Fri, 18 Dec 2020 10:15:55 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBF5330E;
+        Fri, 18 Dec 2020 10:37:04 -0800 (PST)
 Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B9D953F66E;
-        Fri, 18 Dec 2020 10:15:54 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 10/12] arm64: gic: its-trigger: Don't
- trigger the LPI while it is pending
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E9CA23F66E;
+        Fri, 18 Dec 2020 10:37:03 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v2 11/12] lib: arm64: gic-v3-its: Add wmb()
+ barrier before INT command
 To:     Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     eric.auger@redhat.com, yuzenghui@huawei.com
 References: <20201217141400.106137-1-alexandru.elisei@arm.com>
- <20201217141400.106137-11-alexandru.elisei@arm.com>
+ <20201217141400.106137-12-alexandru.elisei@arm.com>
 From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
 Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
  xsFNBFNPCKMBEAC+6GVcuP9ri8r+gg2fHZDedOmFRZPtcrMMF2Cx6KrTUT0YEISsqPoJTKld
@@ -69,12 +69,12 @@ Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
  fDO4SAgJMIl6H5awliCY2zQvLHysS/Wb8QuB09hmhLZ4AifdHyF1J5qeePEhgTA+BaUbiUZf
  i4aIXCH3Wv6K
 Organization: ARM Ltd.
-Message-ID: <d24f7bf4-2a38-22f8-68e6-98940c61c65a@arm.com>
-Date:   Fri, 18 Dec 2020 18:15:43 +0000
+Message-ID: <bb0faa84-d12f-05b7-9913-155ebfcb3073@arm.com>
+Date:   Fri, 18 Dec 2020 18:36:53 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201217141400.106137-11-alexandru.elisei@arm.com>
+In-Reply-To: <20201217141400.106137-12-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -83,61 +83,61 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 17/12/2020 14:13, Alexandru Elisei wrote:
-> The its-trigger test checks that LPI 8195 is not delivered to the CPU while
-> it is disabled at the ITS level. After that it is re-enabled and the test
-> checks that the interrupt is properly asserted. After it's re-enabled and
-> before the stats are examined, the test triggers the interrupt again, which
-> can lead to the same interrupt being delivered twice: once after the
-> configuration invalidation and before the INT command, and once after the
-> INT command.
+> The ITS tests use the INT command like an SGI. The its_send_int() function
+> kicks a CPU and then the test checks that the interrupt was observed as
+> expected in check_lpi_stats(). This is done by using lpi_stats.observed and
+> lpi_stats.expected, where the target CPU only writes to lpi_stats.observed,
+> and the source CPU reads it and compares the values with
+> lpi_stats.expected.
 > 
-> Get rid of the INT command after the interrupt is re-enabled to prevent the
-
-This is confusing to read, since you don't remove anything in the patch.
-Can you reword this? Something like "Before explicitly triggering the
-interrupt, check that the unmasking worked, ..."
-
-> LPI from being asserted twice and add a separate check to test that the INT
-> command still works for the now re-enabled LPI 8195.
+> The fact that the target CPU doesn't read data written by the source CPU
+> means that we don't need to do inter-processor memory synchronization
+> for that between the two at the moment.
 > 
-> CC: Auger Eric <eric.auger@redhat.com>
-> Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> The acked array is used by its-pending-migration test, but the reset value
+> for acked (zero) is the same as the initialization value for static
+> variables, so memory synchronization is again not needed.
+> 
+> However, that is all about to change when we modify all ITS tests to use
+> the same functions as the IPI tests. Add a write memory barrier to
+> its_send_int(), similar to the gicv3_ipi_send_mask(), which has similar
+> semantics.
 
-Otherwise this looks fine, but I think there is another flaw: There is
-no requirement that an INV(ALL) is *needed* to update the status, it
-could also update anytime (think: "cache invalidate").
+I agree to the requirement for having the barrier, but am not sure this
+is the right place. Wouldn't it be better to have the barrier in the
+callers?
 
-The KVM ITS emulation *only* bothers to read the memory on an INV(ALL)
-command, so that matches the test. But that's not how unit-tests should
-work ;-)
-
-But that's a separate issue, just mentioning this to not forget about it.
-
-For this patch, with the message fixed:
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Besides: This command is written to the command queue (in normal
+memory), then we notify the ITS via an MMIO writeq. And this one has a
+"wmb" barrier already (though for other reasons).
 
 Cheers,
 Andre
 
-> ---
->  arm/gic.c | 3 +++
->  1 file changed, 3 insertions(+)
+
 > 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index fb91861900b7..aa3aa1763984 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -805,6 +805,9 @@ static void test_its_trigger(void)
+> Suggested-by: Auger Eric <eric.auger@redhat.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/arm64/gic-v3-its-cmd.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
+> index 34574f71d171..32703147ee85 100644
+> --- a/lib/arm64/gic-v3-its-cmd.c
+> +++ b/lib/arm64/gic-v3-its-cmd.c
+> @@ -385,6 +385,12 @@ void __its_send_int(struct its_device *dev, u32 event_id, bool verbose)
+>  {
+>  	struct its_cmd_desc desc;
 >  
->  	/* Now call the invall and check the LPI hits */
->  	its_send_invall(col3);
-> +	lpi_stats_expect(3, 8195);
-> +	check_lpi_stats("dev2/eventid=20 pending LPI is received");
+> +	/*
+> +	 * The INT command is used by tests as an IPI. Ensure stores to Normal
+> +	 * memory are visible to other CPUs before sending the LPI.
+> +	 */
+> +	wmb();
 > +
->  	lpi_stats_expect(3, 8195);
->  	its_send_int(dev2, 20);
->  	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+>  	desc.its_int_cmd.dev = dev;
+>  	desc.its_int_cmd.event_id = event_id;
+>  	desc.verbose = verbose;
 > 
 
