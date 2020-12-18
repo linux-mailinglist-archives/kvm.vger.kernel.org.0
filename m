@@ -2,189 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FC102DE9CD
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 20:34:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D80E2DE9DB
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 20:41:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726147AbgLRTd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Dec 2020 14:33:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbgLRTd5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Dec 2020 14:33:57 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA81C0617A7
-        for <kvm@vger.kernel.org>; Fri, 18 Dec 2020 11:33:17 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id g24so3506507edw.9
-        for <kvm@vger.kernel.org>; Fri, 18 Dec 2020 11:33:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=DyaXUffdTz42kgwCrZZre5sNuoftYYW8HJaP5FHPOHY=;
-        b=jJNDZN58yN+Ep6ObClpCXB4IaefdbTbIfsQ0LwKLwjB2cFmjp2XmewFtNIt0GLeEFA
-         dsaErWCAfH+T4LBtWzTOsjhNar6PGZjN48TeMfUhYdIST1yf3nBrNT1PKqT6SP849lWL
-         8mfR7wWziGm02QWZnYWAPONAsltRNnVn5n6DTpjO+GXUqgCO23ry4r3aDIik4fHlPxOE
-         TVHdC9nYs+QwJ0UvKpKspy1uFd3VOVOx8C0zwtm8Ym+8JUpvgVlOZ1NohHomq22G1D99
-         mcXoW2V+woual+Y3H49DGUTKi35WE8eADumQtpQSGYHwht1ZhMYxGUDrDjwMBCafureF
-         FW2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DyaXUffdTz42kgwCrZZre5sNuoftYYW8HJaP5FHPOHY=;
-        b=h5RAWDJ1I09lF3Yr/vq/9An9gRqJbQPnjRt/No30pJdi+a+p8iYC/3LWLVcxSP75YH
-         Icyb+GZ2lgC9bqd0YJOscmG+6W2fWfGiVRZa+Plg7zm8EQ/JJK6wANJWvn+uNms052DI
-         lyQFtOpTySR4KoaHzip/KLYNY4mCdzFBnxQQ7zXvtxE005tkPIKvruW2F25R0cmPFn2U
-         NJmj+7+B2p4weh5dRqbtIuUm8zDnIuzrgCMNGMTPL+Cq1oH5Nb1gyx+NNgzbcxA7JuKp
-         6e9YUu6/lkh/TA6Drrd7fmnSaSU/JVCUJhKR2Kov2Ko4+tSq0mBLyfN484Josm8PXE3U
-         egsQ==
-X-Gm-Message-State: AOAM531N0nRZHz4BHLMlq62KN/Q6oC8LiZWd8mNmA+VNcKywVWqzrgmM
-        99uFulrqitumK2hpjUJsUZ3krQRS5Kg=
-X-Google-Smtp-Source: ABdhPJyUy95yc99x0YKxbY2/7hfVlujh8RZ4coSWzIiJK5H75ATJE+UP/47rPeUaU/MkhAPQYeAyfQ==
-X-Received: by 2002:a50:e0ce:: with SMTP id j14mr6100497edl.18.1608319995886;
-        Fri, 18 Dec 2020 11:33:15 -0800 (PST)
-Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
-        by smtp.gmail.com with ESMTPSA id dd12sm25513890edb.6.2020.12.18.11.33.15
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Dec 2020 11:33:15 -0800 (PST)
-Date:   Fri, 18 Dec 2020 20:33:10 +0100
-From:   Zdenek Kaspar <zkaspar82@gmail.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: Bad performance since 5.9-rc1
-Message-ID: <20201218203310.5025c17e.zkaspar82@gmail.com>
-In-Reply-To: <20201201073537.6749e2d7.zkaspar82@gmail.com>
-References: <20201119040526.5263f557.zkaspar82@gmail.com>
-        <20201201073537.6749e2d7.zkaspar82@gmail.com>
+        id S1733248AbgLRTlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 14:41:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52522 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733244AbgLRTlf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Dec 2020 14:41:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608320408;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qTqL06D7b4fb7cUvZJDJjp0eb7f5gIGXVqXJeXuddJU=;
+        b=BgsYPRV1z3Neo417ImsrLI9EKwxySRMIKyEkn+sxAdGo7jQQbSSJyZk00aybTFlluDOzo+
+        dptVNVvOJzYBEbfQdL16U2Fe7UYgRQl08SlokvnP1wMNMWuzz8Nq02hy9/1ZYTGVYbBily
+        nBu72br64nqJtX11JIB5wT65hkxNPNY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-yIelHva4MIC_T5AEBbVHEQ-1; Fri, 18 Dec 2020 14:40:06 -0500
+X-MC-Unique: yIelHva4MIC_T5AEBbVHEQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 965086D522;
+        Fri, 18 Dec 2020 19:40:03 +0000 (UTC)
+Received: from work-vm (ovpn-114-200.ams2.redhat.com [10.36.114.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BD4172CE56;
+        Fri, 18 Dec 2020 19:39:58 +0000 (UTC)
+Date:   Fri, 18 Dec 2020 19:39:56 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Ashish Kalra <ashish.kalra@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, dovmurik@linux.vnet.ibm.com,
+        tobin@ibm.com, jejb@linux.ibm.com, frankeh@us.ibm.com
+Subject: Re: [PATCH v2 1/9] KVM: x86: Add AMD SEV specific Hypercall3
+Message-ID: <20201218193956.GJ2956@work-vm>
+References: <cover.1606782580.git.ashish.kalra@amd.com>
+ <b6bc54ed6c8ae4444f3acf1ed4386010783ad386.1606782580.git.ashish.kalra@amd.com>
+ <X8gyhCsEMf8QU9H/@google.com>
+ <d63529ce-d613-9f83-6cfc-012a8b333e38@redhat.com>
+ <X86Tlin14Ct38zDt@google.com>
+ <CABayD+esy0yeKi9W3wQw+ou4y4840LPCwd-PHhN1J6Uh_fvSjA@mail.gmail.com>
+ <765f86ae-7c68-6722-c6e0-c6150ce69e59@amd.com>
+ <20201211225542.GA30409@ashkalra_ubuntu_server>
+ <20201212045603.GA27415@ashkalra_ubuntu_server>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201212045603.GA27415@ashkalra_ubuntu_server>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 1 Dec 2020 07:35:37 +0100
-Zdenek Kaspar <zkaspar82@gmail.com> wrote:
-
-> On Thu, 19 Nov 2020 04:05:26 +0100
-> Zdenek Kaspar <zkaspar82@gmail.com> wrote:
+* Ashish Kalra (ashish.kalra@amd.com) wrote:
+> On Fri, Dec 11, 2020 at 10:55:42PM +0000, Ashish Kalra wrote:
+> > Hello All,
+> > 
+> > On Tue, Dec 08, 2020 at 10:29:05AM -0600, Brijesh Singh wrote:
+> > > 
+> > > On 12/7/20 9:09 PM, Steve Rutherford wrote:
+> > > > On Mon, Dec 7, 2020 at 12:42 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > >> On Sun, Dec 06, 2020, Paolo Bonzini wrote:
+> > > >>> On 03/12/20 01:34, Sean Christopherson wrote:
+> > > >>>> On Tue, Dec 01, 2020, Ashish Kalra wrote:
+> > > >>>>> From: Brijesh Singh <brijesh.singh@amd.com>
+> > > >>>>>
+> > > >>>>> KVM hypercall framework relies on alternative framework to patch the
+> > > >>>>> VMCALL -> VMMCALL on AMD platform. If a hypercall is made before
+> > > >>>>> apply_alternative() is called then it defaults to VMCALL. The approach
+> > > >>>>> works fine on non SEV guest. A VMCALL would causes #UD, and hypervisor
+> > > >>>>> will be able to decode the instruction and do the right things. But
+> > > >>>>> when SEV is active, guest memory is encrypted with guest key and
+> > > >>>>> hypervisor will not be able to decode the instruction bytes.
+> > > >>>>>
+> > > >>>>> Add SEV specific hypercall3, it unconditionally uses VMMCALL. The hypercall
+> > > >>>>> will be used by the SEV guest to notify encrypted pages to the hypervisor.
+> > > >>>> What if we invert KVM_HYPERCALL and X86_FEATURE_VMMCALL to default to VMMCALL
+> > > >>>> and opt into VMCALL?  It's a synthetic feature flag either way, and I don't
+> > > >>>> think there are any existing KVM hypercalls that happen before alternatives are
+> > > >>>> patched, i.e. it'll be a nop for sane kernel builds.
+> > > >>>>
+> > > >>>> I'm also skeptical that a KVM specific hypercall is the right approach for the
+> > > >>>> encryption behavior, but I'll take that up in the patches later in the series.
+> > > >>> Do you think that it's the guest that should "donate" memory for the bitmap
+> > > >>> instead?
+> > > >> No.  Two things I'd like to explore:
+> > > >>
+> > > >>   1. Making the hypercall to announce/request private vs. shared common across
+> > > >>      hypervisors (KVM, Hyper-V, VMware, etc...) and technologies (SEV-* and TDX).
+> > > >>      I'm concerned that we'll end up with multiple hypercalls that do more or
+> > > >>      less the same thing, e.g. KVM+SEV, Hyper-V+SEV, TDX, etc...  Maybe it's a
+> > > >>      pipe dream, but I'd like to at least explore options before shoving in KVM-
+> > > >>      only hypercalls.
+> > > >>
+> > > >>
+> > > >>   2. Tracking shared memory via a list of ranges instead of a using bitmap to
+> > > >>      track all of guest memory.  For most use cases, the vast majority of guest
+> > > >>      memory will be private, most ranges will be 2mb+, and conversions between
+> > > >>      private and shared will be uncommon events, i.e. the overhead to walk and
+> > > >>      split/merge list entries is hopefully not a big concern.  I suspect a list
+> > > >>      would consume far less memory, hopefully without impacting performance.
+> > > > For a fancier data structure, I'd suggest an interval tree. Linux
+> > > > already has an rbtree-based interval tree implementation, which would
+> > > > likely work, and would probably assuage any performance concerns.
+> > > >
+> > > > Something like this would not be worth doing unless most of the shared
+> > > > pages were physically contiguous. A sample Ubuntu 20.04 VM on GCP had
+> > > > 60ish discontiguous shared regions. This is by no means a thorough
+> > > > search, but it's suggestive. If this is typical, then the bitmap would
+> > > > be far less efficient than most any interval-based data structure.
+> > > >
+> > > > You'd have to allow userspace to upper bound the number of intervals
+> > > > (similar to the maximum bitmap size), to prevent host OOMs due to
+> > > > malicious guests. There's something nice about the guest donating
+> > > > memory for this, since that would eliminate the OOM risk.
+> > > 
+> > > 
+> > > Tracking the list of ranges may not be bad idea, especially if we use
+> > > the some kind of rbtree-based data structure to update the ranges. It
+> > > will certainly be better than bitmap which grows based on the guest
+> > > memory size and as you guys see in the practice most of the pages will
+> > > be guest private. I am not sure if guest donating a memory will cover
+> > > all the cases, e.g what if we do a memory hotplug (increase the guest
+> > > ram from 2GB to 64GB), will donated memory range will be enough to store
+> > > the metadata.
+> > > 
+> > >. 
+> > 
+> > With reference to internal discussions regarding the above, i am going
+> > to look into specific items as listed below :
+> > 
+> > 1). "hypercall" related :
+> > a). Explore the SEV-SNP page change request structure (included in GHCB),
+> > see if there is something common there than can be re-used for SEV/SEV-ES
+> > page encryption status hypercalls.
+> > b). Explore if there is any common hypercall framework i can use in 
+> > Linux/KVM.
+> > 
+> > 2). related to the "backing" data structure - explore using a range-based
+> > list or something like rbtree-based interval tree data structure
+> > (as mentioned by Steve above) to replace the current bitmap based
+> > implementation.
+> > 
+> > 
 > 
-> > Hi,
-> > 
-> > in my initial report
-> > (https://marc.info/?l=kvm&m=160502183220080&w=2 - now fixed by
-> > c887c9b9ca62c051d339b1c7b796edf2724029ed) I saw degraded
-> > performance going back somewhere between v5.8 - v5.9-rc1.
-> > 
-> > OpenBSD 6.8 (GENERIC.MP) guest performance (time ./test-build.sh)
-> > good: 0m13.54s real     0m10.51s user     0m10.96s system
-> > bad : 6m20.07s real    11m42.93s user     0m13.57s system
-> > 
-> > bisected to first bad commit:
-> > 6b82ef2c9cf18a48726e4bb359aa9014632f6466
-> > 
-> > git bisect log:
-> > # bad: [e47c4aee5bde03e7018f4fde45ba21028a8f8438] KVM: x86/mmu:
-> > Rename page_header() to to_shadow_page() # good:
-> > [01c3b2b5cdae39af8dfcf6e40fdf484ae0e812c5] KVM: SVM: Rename
-> > svm_nested_virtualize_tpr() to nested_svm_virtualize_tpr() git
-> > bisect start 'e47c4aee5bde' '01c3b2b5cdae' # bad:
-> > [ebdb292dac7993425c8e31e2c21c9978e914a676] KVM: x86/mmu: Batch zap
-> > MMU pages when shrinking the slab git bisect bad
-> > ebdb292dac7993425c8e31e2c21c9978e914a676 # good:
-> > [fb58a9c345f645f1774dcf6a36fda169253008ae] KVM: x86/mmu: Optimize
-> > MMU page cache lookup for fully direct MMUs git bisect good
-> > fb58a9c345f645f1774dcf6a36fda169253008ae # bad:
-> > [6b82ef2c9cf18a48726e4bb359aa9014632f6466] KVM: x86/mmu: Batch zap
-> > MMU pages when recycling oldest pages git bisect bad
-> > 6b82ef2c9cf18a48726e4bb359aa9014632f6466 # good:
-> > [f95eec9bed76d42194c23153cb1cc8f186bf91cb] KVM: x86/mmu: Don't put
-> > invalid SPs back on the list of active pages git bisect good
-> > f95eec9bed76d42194c23153cb1cc8f186bf91cb # first bad commit:
-> > [6b82ef2c9cf18a48726e4bb359aa9014632f6466] KVM: x86/mmu: Batch zap
-> > MMU pages when recycling oldest pages
-> > 
-> > Host machine is old Intel Core2 without EPT (TDP).
-> > 
-> > TIA, Z.
+> I do agree that a range-based list or an interval tree data structure is a
+> really good "logical" fit for the guest page encryption status tracking.
 > 
-> Hi, with v5.10-rc6:
-> get_mmio_spte: detect reserved bits on spte, addr 0xfe00d000, dump
-> hierarchy: ------ spte 0x8000030e level 3.
-> ------ spte 0xaf82027 level 2.
-> ------ spte 0x2038001ffe00d407 level 1.
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 355 at kvm_mmu_page_fault.cold+0x42/0x4f [kvm]
+> We can only keep track of the guest unencrypted shared pages in the
+> range(s) list (which will keep the data structure quite compact) and all
+> the guest private/encrypted memory does not really need any tracking in
+> the list, anything not in the list will be encrypted/private.
+> 
+> Also looking at a more "practical" use case, here is the current log of
+> page encryption status hypercalls when booting a linux guest :
+> 
 > ...
-> CPU: 1 PID: 355 Comm: qemu-build Not tainted 5.10.0-rc6-amd64 #1
-> Hardware name:  /DG35EC, BIOS ECG3510M.86A.0118.2010.0113.1426
-> 01/13/2010 RIP: 0010:kvm_mmu_page_fault.cold+0x42/0x4f [kvm]
-> Code: e2 ec 44 8b 04 24 8b 5c 24 0c 44 89 c5 89 da 83 eb 01 48 c7 c7
-> 20 b2 65 c0 48 63 c3 48 8b 74 c4 30 e8 dd 74 e2 ec 39 dd 7e e3 <0f>
-> 0b 41 b8 ea ff ff ff e9 27 99 ff ff 0f 0b 48 8b 54 24 10 48 83 RSP:
-> 0018:ffffb67400653d30 EFLAGS: 00010202 RAX: 0000000000000027 RBX:
-> 0000000000000000 RCX: ffffa271ff2976f8 RDX: 00000000ffffffd8 RSI:
-> 0000000000000027 RDI: ffffa271ff2976f0 RBP: 0000000000000001 R08:
-> ffffffffadd02ae8 R09: 0000000000000003 R10: 00000000ffffe000 R11:
-> 3fffffffffffffff R12: 00000000fe00d000 R13: 0000000000000000 R14:
-> 0000000000000000 R15: 0000000000000001 FS:  00007fc10ae3d640(0000)
-> GS:ffffa271ff280000(0000) knlGS:0000000000000000 CS:  0010 DS: 0000
-> ES: 0000 CR0: 0000000080050033 CR2: 0000000000000000 CR3:
-> 0000000002dc2000 CR4: 00000000000026e0 Call Trace:
-> kvm_arch_vcpu_ioctl_run+0xbaf/0x18f0 [kvm] ? do_futex+0x7c4/0xb80
->  kvm_vcpu_ioctl+0x203/0x520 [kvm]
->  ? set_next_entity+0x5b/0x80
->  ? __switch_to_asm+0x32/0x60
->  ? finish_task_switch+0x70/0x260
->  __x64_sys_ioctl+0x338/0x720
->  ? __x64_sys_futex+0x120/0x190
->  do_syscall_64+0x33/0x40
->  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7fc10c389f6b
-> Code: 89 d8 49 8d 3c 1c 48 f7 d8 49 39 c4 72 b5 e8 1c ff ff ff 85 c0
-> 78 ba 4c 89 e0 5b 5d 41 5c c3 f3 0f 1e fa b8 10 00 00 00 0f 05 <48>
-> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 ae 0c 00 f7 d8 64 89 01 48 RSP:
-> 002b:00007fc10ae3c628 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007fc10c389f6b
-> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000012
-> RBP: 000055ad3767baf0 R08: 000055ad36be4850 R09: 00000000000000ff
-> R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-> R13: 000055ad371d9800 R14: 0000000000000001 R15: 0000000000000002
-> ---[ end trace c5f7ae690f5abcc4 ]---
+
+<snip>
+
+> [   56.146336] page_enc_status_hc invoked, gpa = 1f018000, npages  = 1, enc = 1
+> [   56.146351] page_enc_status_hc invoked, gpa = 1f00e000, npages  = 1, enc = 0
+> [   56.147261] page_enc_status_hc invoked, gpa = 1f00e000, npages  = 1, enc = 0
+> [   56.147271] page_enc_status_hc invoked, gpa = 1f018000, npages  = 1, enc = 0
+....
+
+> [   56.180730] page_enc_status_hc invoked, gpa = 1f008000, npages  = 1, enc = 0
+> [   56.180741] page_enc_status_hc invoked, gpa = 1f006000, npages  = 1, enc = 0
+> [   56.180768] page_enc_status_hc invoked, gpa = 1f008000, npages  = 1, enc = 1
+> [   56.180782] page_enc_status_hc invoked, gpa = 1f006000, npages  = 1, enc = 1
+
+....
+> [   56.197110] page_enc_status_hc invoked, gpa = 1f007000, npages  = 1, enc = 0
+> [   56.197120] page_enc_status_hc invoked, gpa = 1f005000, npages  = 1, enc = 0
+> [   56.197136] page_enc_status_hc invoked, gpa = 1f007000, npages  = 1, enc = 1
+> [   56.197148] page_enc_status_hc invoked, gpa = 1f005000, npages  = 1, enc = 1
+....
+
+> [   56.222679] page_enc_status_hc invoked, gpa = 1e83b000, npages  = 1, enc = 0
+> [   56.222691] page_enc_status_hc invoked, gpa = 1e839000, npages  = 1, enc = 0
+> [   56.222707] page_enc_status_hc invoked, gpa = 1e83b000, npages  = 1, enc = 1
+> [   56.222720] page_enc_status_hc invoked, gpa = 1e839000, npages  = 1, enc = 1
+....
+
+> [   56.313747] page_enc_status_hc invoked, gpa = 1e5eb000, npages  = 1, enc = 0
+> [   56.313771] page_enc_status_hc invoked, gpa = 1e5e9000, npages  = 1, enc = 0
+> [   56.313789] page_enc_status_hc invoked, gpa = 1e5eb000, npages  = 1, enc = 1
+> [   56.313803] page_enc_status_hc invoked, gpa = 1e5e9000, npages  = 1, enc = 1
+....
+> [   56.459276] page_enc_status_hc invoked, gpa = 1d767000, npages  = 100, enc = 0
+> [   56.459428] page_enc_status_hc invoked, gpa = 1e501000, npages  = 1, enc = 1
+> [   56.460037] page_enc_status_hc invoked, gpa = 1d767000, npages  = 100, enc = 1
+> [   56.460216] page_enc_status_hc invoked, gpa = 1e501000, npages  = 1, enc = 0
+> [   56.460299] page_enc_status_hc invoked, gpa = 1d767000, npages  = 100, enc = 0
+> [   56.460448] page_enc_status_hc invoked, gpa = 1e501000, npages  = 1, enc = 1
+....
+
+> As can be observed here, all guest MMIO ranges are initially setup as
+> shared, and those are all contigious guest page ranges.
 > 
-> without: kvm: x86/mmu: Fix get_mmio_spte() on CPUs supporting 5-level
-> PT I can run guest again, but with degraded performance as before.
+> After that the encryption status hypercalls are invoked when DMA gets
+> triggered during disk i/o while booting the guest ... here again the
+> guest page ranges are contigious, though mostly single page is touched 
+> and a lot of page re-use is observed. 
 > 
-> Z.
+> So a range-based list/structure will be a "good" fit for such usage
+> scenarios.
 
-With: KVM: x86/mmu: Bug fixes and cleanups in get_mmio_spte() series
-I can run guest again and performance is slightly better:
+It seems surprisingly common to flick the same pages back and forth between
+encrypted and clear for quite a while;  why is this?
 
-v5.8:        0m13.54s real     0m10.51s user     0m10.96s system
-v5.9:        6m20.07s real    11m42.93s user     0m13.57s system
-v5.10+fixes: 5m50.77s real    10m38.29s user     0m15.96s system
+Dave
 
-perf top from host when guest (openbsd) is compiling:
-  26.85%  [kernel]                  [k] queued_spin_lock_slowpath
-   8.49%  [kvm]                     [k] mmu_page_zap_pte
-   7.47%  [kvm]                     [k] __kvm_mmu_prepare_zap_page
-   3.61%  [kernel]                  [k] clear_page_rep
-   2.43%  [kernel]                  [k] page_counter_uncharge
-   2.30%  [kvm]                     [k] paging64_page_fault
-   2.03%  [kvm_intel]               [k] vmx_vcpu_run
-   2.02%  [kvm]                     [k] kvm_vcpu_gfn_to_memslot
-   1.95%  [kernel]                  [k] internal_get_user_pages_fast
-   1.64%  [kvm]                     [k] kvm_mmu_get_page
-   1.55%  [kernel]                  [k] page_counter_try_charge
-   1.33%  [kernel]                  [k] propagate_protected_usage
-   1.29%  [kvm]                     [k] kvm_arch_vcpu_ioctl_run
-   1.13%  [kernel]                  [k] get_page_from_freelist
-   1.01%  [kvm]                     [k] paging64_walk_addr_generic
-   0.83%  [kernel]                  [k] ___slab_alloc.constprop.0
-   0.83%  [kernel]                  [k] kmem_cache_free
-   0.82%  [kvm]                     [k] __pte_list_remove
-   0.77%  [kernel]                  [k] try_grab_compound_head
-   0.76%  [kvm_intel]               [k] 0x000000000001cfa0
-   0.74%  [kvm]                     [k] pte_list_add
 
-HTH, Z.
+> Thanks,
+> Ashish
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
