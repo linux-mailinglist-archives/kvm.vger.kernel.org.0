@@ -2,172 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 747122DE256
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 13:07:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D1062DE270
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 13:10:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726658AbgLRMFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Dec 2020 07:05:31 -0500
-Received: from foss.arm.com ([217.140.110.172]:34120 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726532AbgLRMFa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Dec 2020 07:05:30 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B14D1063;
-        Fri, 18 Dec 2020 04:04:45 -0800 (PST)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E3043F66E;
-        Fri, 18 Dec 2020 04:04:44 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 05/12] arm/arm64: gic: Use correct
- memory ordering for the IPI test
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     eric.auger@redhat.com, yuzenghui@huawei.com
-References: <20201217141400.106137-1-alexandru.elisei@arm.com>
- <20201217141400.106137-6-alexandru.elisei@arm.com>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Organization: ARM Ltd.
-Message-ID: <dce1fe3c-1ee8-f4dc-e1d0-355f7ff8db42@arm.com>
-Date:   Fri, 18 Dec 2020 12:04:33 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1726839AbgLRMKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 07:10:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35861 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726559AbgLRMKW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Dec 2020 07:10:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608293335;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qyhBcJSscLXt03rN/wlqP36IM0VuLCvIcf32trO8ph0=;
+        b=XU+q6UnS2CszvKzjmHZwDAebsZ3wKYySz0OUJB3phVEuzRAfzX7dxZyzeYPHnEEr+iW/XQ
+        v3F/aoNI9ABRhc+9hohRqMH56fVtJULz44H/LV9L1kwvMyfbCpkIsQhWO3P/qq23sIr/d4
+        /3E51m5+HNImvsGjI7PEwzKm9agrNms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-EKwJsLpENtmXHXyBkdaN5w-1; Fri, 18 Dec 2020 07:08:53 -0500
+X-MC-Unique: EKwJsLpENtmXHXyBkdaN5w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A4A01006C88;
+        Fri, 18 Dec 2020 12:08:51 +0000 (UTC)
+Received: from work-vm (ovpn-114-200.ams2.redhat.com [10.36.114.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D362260C43;
+        Fri, 18 Dec 2020 12:08:38 +0000 (UTC)
+Date:   Fri, 18 Dec 2020 12:08:36 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Greg Kurz <groug@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>, pair@us.ibm.com,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
+        qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+        qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, berrange@redhat.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        thuth@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
+        mdroth@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20201218120836.GA2956@work-vm>
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+ <20201204054415.579042-12-david@gibson.dropbear.id.au>
+ <20201214182240.2abd85eb.cohuck@redhat.com>
+ <20201217054736.GH310465@yekko.fritz.box>
+ <20201217123842.51063918.cohuck@redhat.com>
+ <20201217151530.54431f0e@bahia.lan>
+ <20201218124111.4957eb50.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201217141400.106137-6-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201218124111.4957eb50.cohuck@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/12/2020 14:13, Alexandru Elisei wrote:
-> The IPI test works by sending IPIs to even numbered CPUs from the
-> IPI_SENDER CPU (CPU1), and then checking that the other CPUs received the
-> interrupts as expected. The check is done in check_acked() by the
-> IPI_SENDER CPU with the help of three arrays:
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Thu, 17 Dec 2020 15:15:30 +0100
+> Greg Kurz <groug@kaod.org> wrote:
 > 
-> - acked, where acked[i] == 1 means that CPU i received the interrupt.
-> - bad_irq, where bad_irq[i] == -1 means that the interrupt received by CPU
->   i had the expected interrupt number (IPI_IRQ).
-> - bad_sender, where bad_sender[i] == -1 means that the interrupt received
->   by CPU i was from the expected sender (IPI_SENDER, GICv2 only).
+> > On Thu, 17 Dec 2020 12:38:42 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> > 
+> > > On Thu, 17 Dec 2020 16:47:36 +1100
+> > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > >   
+> > > > On Mon, Dec 14, 2020 at 06:22:40PM +0100, Cornelia Huck wrote:  
+> > > > > On Fri,  4 Dec 2020 16:44:13 +1100
+> > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > > >     
+> > > > > > We haven't yet implemented the fairly involved handshaking that will be
+> > > > > > needed to migrate PEF protected guests.  For now, just use a migration
+> > > > > > blocker so we get a meaningful error if someone attempts this (this is the
+> > > > > > same approach used by AMD SEV).
+> > > > > > 
+> > > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > > ---
+> > > > > >  hw/ppc/pef.c | 9 +++++++++
+> > > > > >  1 file changed, 9 insertions(+)
+> > > > > > 
+> > > > > > diff --git a/hw/ppc/pef.c b/hw/ppc/pef.c
+> > > > > > index 3ae3059cfe..edc3e744ba 100644
+> > > > > > --- a/hw/ppc/pef.c
+> > > > > > +++ b/hw/ppc/pef.c
+> > > > > > @@ -38,7 +38,11 @@ struct PefGuestState {
+> > > > > >  };
+> > > > > >  
+> > > > > >  #ifdef CONFIG_KVM
+> > > > > > +static Error *pef_mig_blocker;
+> > > > > > +
+> > > > > >  static int kvmppc_svm_init(Error **errp)    
+> > > > > 
+> > > > > This looks weird?    
+> > > > 
+> > > > Oops.  Not sure how that made it past even my rudimentary compile
+> > > > testing.
+> > > >   
+> > > > > > +
+> > > > > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
+> > > > > >  {
+> > > > > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)) {
+> > > > > >          error_setg(errp,
+> > > > > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
+> > > > > >          }
+> > > > > >      }
+> > > > > >  
+> > > > > > +    /* add migration blocker */
+> > > > > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
+> > > > > > +    /* NB: This can fail if --only-migratable is used */
+> > > > > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal);    
+> > > > > 
+> > > > > Just so that I understand: is PEF something that is enabled by the host
+> > > > > (and the guest is either secured or doesn't start), or is it using a
+> > > > > model like s390x PV where the guest initiates the transition into
+> > > > > secured mode?    
+> > > > 
+> > > > Like s390x PV it's initiated by the guest.
+> > > >   
+> > > > > Asking because s390x adds the migration blocker only when the
+> > > > > transition is actually happening (i.e. guests that do not transition
+> > > > > into secure mode remain migratable.) This has the side effect that you
+> > > > > might be able to start a machine with --only-migratable that
+> > > > > transitions into a non-migratable machine via a guest action, if I'm
+> > > > > not mistaken. Without the new object, I don't see a way to block with
+> > > > > --only-migratable; with it, we should be able to do that. Not sure what
+> > > > > the desirable behaviour is here.    
+> > > >   
+> > 
+> > The purpose of --only-migratable is specifically to prevent the machine
+> > to transition to a non-migrate state IIUC. The guest transition to
+> > secure mode should be nacked in this case.
 > 
-> The assumption made by check_acked() is that if a CPU acked an interrupt,
-> then bad_sender and bad_irq have also been updated. This is a common
-> inter-thread communication pattern called message passing.  For message
-> passing to work correctly on weakly consistent memory model architectures,
-> like arm and arm64, barriers or address dependencies are required. This is
-> described in ARM DDI 0487F.b, in "Armv7 compatible approaches for ordering,
-> using DMB and DSB barriers" (page K11-7993), in the section with a single
-> observer, which is in our case the IPI_SENDER CPU.
+> Yes, that's what happens for s390x: The guest tries to transition, QEMU
+> can't add a migration blocker and fails the instruction used for
+> transitioning, the guest sees the error.
 > 
-> The IPI test attempts to enforce the correct ordering using memory
-> barriers, but it's not enough. For example, the program execution below is
-> valid from an architectural point of view:
-> 
-> 3 online CPUs, initial state (from stats_reset()):
-> 
-> acked[2] = 0;
-> bad_sender[2] = -1;
-> bad_irq[2] = -1;
-> 
-> CPU1 (in check_acked())		| CPU2 (in ipi_handler())
-> 				|
-> smp_rmb() // DMB ISHLD		| acked[2]++;
-> read 1 from acked[2]		|
-> nr_pass++ // nr_pass = 3	|
-> read -1 from bad_sender[2]	|
-> read -1 from bad_irq[2]		|
-> 				| // in check_ipi_sender()
-> 				| bad_sender[2] = <bad ipi sender>
-> 				| // in check_irqnr()
-> 				| bad_irq[2] = <bad irq number>
-> 				| smp_wmb() // DMB ISHST
-> nr_pass == nr_cpus, return	|
-> 
-> In this scenario, CPU1 will read the updated acked value, but it will read
-> the initial bad_sender and bad_irq values. This is permitted because the
-> memory barriers do not create a data dependency between the value read from
-> acked and the values read from bad_rq and bad_sender on CPU1, respectively
-> between the values written to acked, bad_sender and bad_irq on CPU2.
-> 
-> To avoid this situation, let's reorder the barriers and accesses to the
-> arrays to create the needed dependencies that ensure that message passing
-> behaves as expected.
-> 
-> In the interrupt handler, the writes to bad_sender and bad_irq are
-> reordered before the write to acked and a smp_wmb() barrier is added. This
-> ensures that if other PEs observe the write to acked, then they will also
-> observe the writes to the other two arrays.
-> 
-> In check_acked(), put the smp_rmb() barrier after the read from acked to
-> ensure that the subsequent reads from bad_sender, respectively bad_irq,
-> aren't reordered locally by the PE.
-> 
-> With these changes, the expected ordering of accesses is respected and we
-> end up with the pattern described in the Arm ARM and also in the Linux
-> litmus test MP+fencewmbonceonce+fencermbonceonce.litmus from
-> tools/memory-model/litmus-tests. More examples and explanations can be
-> found in the Linux source tree, in Documentation/memory-barriers.txt, in
-> the sections "SMP BARRIER PAIRING" and "READ MEMORY BARRIERS VS LOAD
-> SPECULATION".
-> 
-> For consistency with ipi_handler(), the array accesses in
-> ipi_clear_active_handler() have also been reordered. This shouldn't affect
-> the functionality of that test.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> The drawback is that we see the failure only when we already launched
+> the machine and the guest tries to transition. If I start QEMU with
+> --only-migratable, it will refuse to start when non-migratable devices
+> are configured in the command line, so I see the issue right from the
+> start. (For s390x, that would possibly mean that we should not even
+> present the cpu feature bit when only_migratable is set?)
 
-Yes, this is indeed a real ordering bug. Good find and analysis!
+I see --only-migratable as refusing to start if you've enabled anything
+that would stop migration.
+So I'd expect:
+  a) Allow the cpu flag to be turned on/off somehow
+     
+  b) If you ask for it (-cpu ...,_confidentialcomp or whatever) and
+you've got --only-migratable then you'd fail before startup.
 
-Meditated over the new code for a while and it now looks right to me.
+Dave
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre
-
-
-> ---
->  arm/gic.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > > > Hm, I'm not sure what the best option is here either.  
+> > > 
+> > > If we agree on anything, it should be as consistent across
+> > > architectures as possible :)
+> > > 
+> > > If we want to add the migration blocker to s390x even before the guest
+> > > transitions, it needs to be tied to the new object; if we'd make it
+> > > dependent on the cpu feature bit, we'd block migration of all machines
+> > > on hardware with SE and a recent kernel.
+> > > 
+> > > Is there a convenient point in time when PEF guests transition where
+> > > QEMU can add a blocker?
+> > >   
+> > > >   
+> > > > >     
+> > > > > > +
+> > > > > >      return 0;
+> > > > > >  }
+> > > > > >      
+> > > > >     
+> > > >   
+> > >   
+> > 
 > 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index d25529dd8b79..34643a73bd04 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -73,9 +73,9 @@ static void check_acked(const char *testname, cpumask_t *mask)
->  		mdelay(100);
->  		nr_pass = 0;
->  		for_each_present_cpu(cpu) {
-> -			smp_rmb();
->  			nr_pass += cpumask_test_cpu(cpu, mask) ?
->  				acked[cpu] == 1 : acked[cpu] == 0;
-> +			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
->  
->  			if (bad_sender[cpu] != -1) {
->  				printf("cpu%d received IPI from wrong sender %d\n",
-> @@ -156,10 +156,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
->  		 */
->  		if (gic_version() == 2)
->  			smp_rmb();
-> -		++acked[smp_processor_id()];
->  		check_ipi_sender(irqstat);
->  		check_irqnr(irqnr);
-> -		smp_wmb(); /* pairs with rmb in check_acked */
-> +		smp_wmb(); /* pairs with smp_rmb in check_acked */
-> +		++acked[smp_processor_id()];
->  	} else {
->  		++spurious[smp_processor_id()];
->  		smp_wmb();
-> @@ -386,8 +386,8 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
->  
->  		writel(val, base + GICD_ICACTIVER);
->  
-> -		++acked[smp_processor_id()];
->  		check_irqnr(irqnr);
-> +		++acked[smp_processor_id()];
->  	} else {
->  		++spurious[smp_processor_id()];
->  	}
-> 
+
+
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
