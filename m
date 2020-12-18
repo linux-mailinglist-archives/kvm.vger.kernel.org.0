@@ -2,77 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 948952DDD2F
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 04:12:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ACBE2DDE4D
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 07:02:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727134AbgLRDKr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 17 Dec 2020 22:10:47 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41306 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726951AbgLRDKr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Dec 2020 22:10:47 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 210695] error: kvm run failed Invalid argument
-Date:   Fri, 18 Dec 2020 03:10:06 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rherbert@sympatico.ca
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-210695-28872-QofEkBtmYs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-210695-28872@https.bugzilla.kernel.org/>
-References: <bug-210695-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1730159AbgLRGBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 01:01:44 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:9538 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725870AbgLRGBn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Dec 2020 01:01:43 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Cxyrk026gzhrg4;
+        Fri, 18 Dec 2020 14:00:22 +0800 (CST)
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.185.179) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 18 Dec 2020 14:00:50 +0800
+From:   Zenghui Yu <yuzenghui@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <maz@kernel.org>,
+        <tglx@linutronix.de>
+CC:     <kvm@vger.kernel.org>, <wanghaibin.wang@huawei.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] genirq/msi: Initialize msi_alloc_info to zero for msi_prepare API
+Date:   Fri, 18 Dec 2020 14:00:39 +0800
+Message-ID: <20201218060039.1770-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.185.179]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=210695
+Since commit 5fe71d271df8 ("irqchip/gic-v3-its: Tag ITS device as shared if
+allocating for a proxy device"), some of the devices are wrongly marked as
+"shared" by the ITS driver on systems equipped with the ITS(es). The
+problem is that the @info->flags may not be initialized anywhere and we end
+up looking at random bits on the stack. That's obviously not good.
 
-Richard Herbert (rherbert@sympatico.ca) changed:
+The straightforward fix is to properly initialize msi_alloc_info inside the
+.prepare callback of affected MSI domains (its-pci-msi, its-platform-msi,
+etc). We can also perform the initialization in IRQ core layer for
+msi_domain_prepare_irqs() API and it looks much neater to me.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |CODE_FIX
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
 
---- Comment #8 from Richard Herbert (rherbert@sympatico.ca) ---
-Get the so called "root" level from the low level shadow page table
-walkers instead of manually attempting to calculate it higher up the
-stack, e.g. in get_mmio_spte().  When KVM is using PAE shadow paging,
-the starting level of the walk, from the callers perspective, is not
-the CR3 root but rather the PDPTR "root".  Checking for reserved bits
-from the CR3 root causes get_mmio_spte() to consume uninitialized stack
-data due to indexing into sptes[] for a level that was not filled by
-get_walk().  This can result in false positives and/or negatives
-depending on what garbage happens to be on the stack.
+This was noticed when I was playing with the assigned devices on arm64 and
+VFIO failed to enable MSI-X vectors for almost all VFs (CCed kvm list in
+case others will hit the same issue). It turned out that these VFs are
+marked as "shared" by mistake and have trouble with the following sequence:
 
-Opportunistically nuke a few extra newlines.
+	pci_alloc_irq_vectors(pdev, 1, 1, flag);
+	pci_free_irq_vectors(pdev);
+	pci_alloc_irq_vectors(pdev, 1, 2, flag); --> we can only get
+						     *one* vector
 
-Fixes: 95fb5b0258b7 ("kvm: x86/mmu: Support MMIO in the TDP MMU")
+But besides VFIO, I guess there are already some devices get into trouble
+at probe time and can't work properly.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+ kernel/irq/msi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Marking as RESOLVED, with Thanks.
-
+diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+index 2c0c4d6d0f83..dc0e2d7fbdfd 100644
+--- a/kernel/irq/msi.c
++++ b/kernel/irq/msi.c
+@@ -402,7 +402,7 @@ int __msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+ 	struct msi_domain_ops *ops = info->ops;
+ 	struct irq_data *irq_data;
+ 	struct msi_desc *desc;
+-	msi_alloc_info_t arg;
++	msi_alloc_info_t arg = { };
+ 	int i, ret, virq;
+ 	bool can_reserve;
+ 
 -- 
-You may reply to this email to add a comment.
+2.19.1
 
-You are receiving this mail because:
-You are watching the assignee of the bug.
