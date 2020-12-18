@@ -2,110 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD6B42DE31C
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 14:09:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E31E52DE3D2
+	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 15:19:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727393AbgLRNJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Dec 2020 08:09:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38392 "EHLO
+        id S1727668AbgLROTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 09:19:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48310 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726105AbgLRNJb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Dec 2020 08:09:31 -0500
+        by vger.kernel.org with ESMTP id S1726047AbgLROTK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Dec 2020 09:19:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608296885;
+        s=mimecast20190719; t=1608301064;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MskcXaVRg2L1i5qBmFnapiyeVlhmZhu0sI/jlzmviKY=;
-        b=Bx8cnKPN7WyD7B96NASbtECtV1hTwMmQRaCpvoVOkWUUVtAmIz8ufdKTkDEgCHuqQknItm
-        NtIqq8C0avH/dmiTZpfBUDoAWbhu7b599f24ES9b1WxjOnHE+aRj2FB2y8x2tlV1GboChy
-        x5rwdg29BxxGlTBzhQf/xO1vuOWO3dc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-oo4wqSyTMXqKAfJz-glOSg-1; Fri, 18 Dec 2020 08:08:03 -0500
-X-MC-Unique: oo4wqSyTMXqKAfJz-glOSg-1
-Received: by mail-ed1-f70.google.com with SMTP id dc6so1043568edb.14
-        for <kvm@vger.kernel.org>; Fri, 18 Dec 2020 05:08:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MskcXaVRg2L1i5qBmFnapiyeVlhmZhu0sI/jlzmviKY=;
-        b=pBuYEYEhW9WMCHVTLKtriqVo9xpnbpmUQOPPxqQdO4gQmIYqgmrwlaNTdNEd/5nXUK
-         ci+E8bIbZpBPw/WiwatqcXYdojzkPMU8L5mVHxc7pA9Dxqu7oWPwzPc4UCYSfUaD6vFP
-         fJdldycaQpZmbWIhNXI45MzP785KvyWEkBjRVegD5MMo/DBaCUxwQJ1lkvGc0UAwdFAv
-         FCHnUo+aUJEV11Sl5GLa22ddwZTmrHlFuUXUvEocTJTb0XOoCA8WSmAmxjz2ce2Pr0Ji
-         NfWKLOubnzprkL+gqLxT5lYB7FEvYYf5vLLzbMuEAYnchsUqZW1kGqusURD5yodOo+Dt
-         Oy/A==
-X-Gm-Message-State: AOAM532c/Nq2a8I45KBCg3oIvMh/31BLhWFp2BYVdsLH0P1yJS2+kKcI
-        gqcIcKkK60Wibof59DKW1d7Zfx3pYcnW9tfgPrSQ6jgwERoDatzMBhwN5hREBdiY650zABpj5It
-        xNkLja8l5ZGNn
-X-Received: by 2002:a17:906:cc84:: with SMTP id oq4mr3933433ejb.513.1608296882183;
-        Fri, 18 Dec 2020 05:08:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwjbahq4jAtY2Lr3x6O/3x5Mhh+L8zMK95paHl/BNc0CS8OL6UHRNQIE8AqpaD15BWeJJmSmw==
-X-Received: by 2002:a17:906:cc84:: with SMTP id oq4mr3933401ejb.513.1608296881945;
-        Fri, 18 Dec 2020 05:08:01 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d6sm5382673ejy.114.2020.12.18.05.08.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Dec 2020 05:08:00 -0800 (PST)
-Subject: Re: [PATCH v3 0/4] KVM: selftests: Cleanups, take 2
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CmkwoaE0VgaOpvq0Fe5n9FUGHZ4XeJSYkI4GajNOFiY=;
+        b=J+YPLyJK/e5XoAvF134yugWgFwVXIlAwWMKwGnpHiJQ53s/MSl8Pd1i+TL+cVgiZviQWcC
+        8anNjRF2fIa4mgArUrnWK1K/B63nuqNnGy9b/bq8GHE6DLYYJySOgOrQDd76zrL06dUDTc
+        AAtvuDCBUDHoNqzPBpvuseYJ9/wwP2g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-cfQbNb2ZML-NFCj6p709MQ-1; Fri, 18 Dec 2020 09:17:42 -0500
+X-MC-Unique: cfQbNb2ZML-NFCj6p709MQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C19B8190A7A0;
+        Fri, 18 Dec 2020 14:17:40 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B80A22CFB1;
+        Fri, 18 Dec 2020 14:17:35 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
         bgardon@google.com, peterx@redhat.com
-References: <20201116121942.55031-1-drjones@redhat.com>
- <902d4020-e295-b21f-cc7a-df5cdfc056ea@redhat.com>
- <20201120080556.2enu4ygvlnslmqiz@kamzik.brq.redhat.com>
- <6c53eb4d-32ed-ed94-a3ef-dca139b0003d@redhat.com>
- <20201216124638.paliq7v3erhpgfh6@kamzik.brq.redhat.com>
- <72e73cdc-dcbd-871d-13fb-57ee3a65d407@redhat.com>
- <20201218111313.d6n6t4mrsgpvwxwu@kamzik.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c029c321-4ab7-bf61-a34a-65c410b5368a@redhat.com>
-Date:   Fri, 18 Dec 2020 14:08:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+Subject: [PATCH v4 0/3] KVM: selftests: Cleanups, take 2
+Date:   Fri, 18 Dec 2020 15:17:31 +0100
+Message-Id: <20201218141734.54359-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201218111313.d6n6t4mrsgpvwxwu@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/12/20 12:13, Andrew Jones wrote:
-> On Fri, Dec 18, 2020 at 11:32:02AM +0100, Paolo Bonzini wrote:
->> On 16/12/20 13:46, Andrew Jones wrote:
->>> On Fri, Nov 20, 2020 at 09:48:26AM +0100, Paolo Bonzini wrote:
->>>> On 20/11/20 09:05, Andrew Jones wrote:
->>>>> So I finally looked closely enough at the dirty-ring stuff to see that
->>>>> patch 2 was always a dumb idea. dirty_ring_create_vm_done() has a comment
->>>>> that says "Switch to dirty ring mode after VM creation but before any of
->>>>> the vcpu creation". I'd argue that that comment would be better served at
->>>>> the log_mode_create_vm_done() call, but that doesn't excuse my sloppiness
->>>>> here. Maybe someday we can add a patch that adds that comment and also
->>>>> tries to use common code for the number of pages calculation for the VM,
->>>>> but not today.
->>>>>
->>>>> Regarding this series, if the other three patches look good, then we
->>>>> can just drop 2/4. 3/4 and 4/4 should still apply cleanly and work.
->>>>
->>>> Yes, the rest is good.
->>>>
->>>
->>> Ping?
->>
->> Sorry, I was waiting for a resend.
->>
-> 
-> Oops, I understood that we'd just drop 2/4 while applying. Should I resend
-> now?
+This series attempts to clean up demand_paging_test, dirty_log_perf_test,
+and dirty_log_test by factoring out common code, creating some new API
+along the way. It also splits include/perf_test_util.h into a more
+conventional header and source pair.
 
-Yes, please.  Maybe there were conflicts, I don't remember why I dropped 
-the whole series on the floor.
+I've tested on x86 and AArch64 (one config each), but not s390x.
 
-Paolo
+v4:
+ - dropped "KVM: selftests: dirty_log_test: Remove create_vm" patch
+ - Rebased on latest kvm/queue (patches applied cleanly)
+ - Ensured dirty-ring was enabled on x86 when testing
+
+v3:
+ - Rebased remaining four patches from v2 onto kvm/queue
+ - Picked up r-b's from Peter and Ben
+
+v2: https://www.spinics.net/lists/kvm/msg228711.html   
+
+Thanks,
+drew
+
+
+Andrew Jones (3):
+  KVM: selftests: Factor out guest mode code
+  KVM: selftests: Use vm_create_with_vcpus in create_vm
+  KVM: selftests: Implement perf_test_util more conventionally
+
+ tools/testing/selftests/kvm/Makefile          |   2 +-
+ .../selftests/kvm/demand_paging_test.c        | 118 ++++---------
+ .../selftests/kvm/dirty_log_perf_test.c       | 145 +++++----------
+ tools/testing/selftests/kvm/dirty_log_test.c  | 125 ++++---------
+ .../selftests/kvm/include/guest_modes.h       |  21 +++
+ .../testing/selftests/kvm/include/kvm_util.h  |   9 +
+ .../selftests/kvm/include/perf_test_util.h    | 167 ++----------------
+ tools/testing/selftests/kvm/lib/guest_modes.c |  70 ++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   9 +-
+ .../selftests/kvm/lib/perf_test_util.c        | 134 ++++++++++++++
+ 10 files changed, 363 insertions(+), 437 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/guest_modes.h
+ create mode 100644 tools/testing/selftests/kvm/lib/guest_modes.c
+ create mode 100644 tools/testing/selftests/kvm/lib/perf_test_util.c
+
+-- 
+2.26.2
 
