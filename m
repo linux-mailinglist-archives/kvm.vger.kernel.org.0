@@ -2,262 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 931032DE9F5
-	for <lists+kvm@lfdr.de>; Fri, 18 Dec 2020 20:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B94D02DECA0
+	for <lists+kvm@lfdr.de>; Sat, 19 Dec 2020 02:23:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727187AbgLRT6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Dec 2020 14:58:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26049 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727084AbgLRT6T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Dec 2020 14:58:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608321411;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nNU3aA3e/U4axh3TyaUrSBdOjR1YOi5LUy4z3I+wU/E=;
-        b=Pt6ahc0SALma65Z+s4kyMrgD0p80jZsrGEYAps3vZuYcZ0t/Er/QmEMSnmlNlt4bXeWhDG
-        K3FZPQASZb2XfRI3QdTIMtKsf/dmW+LI/DezlSTXZ7Pja+WIQP1PD07ThfhA/0d3UyJn/H
-        RXSaG/nzWv9SbWCBuTiaL0TnpRc8/SI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-sd9j2c42PqK9owmeQNzRYw-1; Fri, 18 Dec 2020 14:56:50 -0500
-X-MC-Unique: sd9j2c42PqK9owmeQNzRYw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9990107ACE3;
-        Fri, 18 Dec 2020 19:56:47 +0000 (UTC)
-Received: from work-vm (ovpn-114-200.ams2.redhat.com [10.36.114.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FF4060CD1;
-        Fri, 18 Dec 2020 19:56:44 +0000 (UTC)
-Date:   Fri, 18 Dec 2020 19:56:41 +0000
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "dovmurik@linux.vnet.ibm.com" <dovmurik@linux.vnet.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "frankeh@us.ibm.com" <frankeh@us.ibm.com>
-Subject: Re: [PATCH v2 1/9] KVM: x86: Add AMD SEV specific Hypercall3
-Message-ID: <20201218195641.GL2956@work-vm>
-References: <b6bc54ed6c8ae4444f3acf1ed4386010783ad386.1606782580.git.ashish.kalra@amd.com>
- <X8gyhCsEMf8QU9H/@google.com>
- <d63529ce-d613-9f83-6cfc-012a8b333e38@redhat.com>
- <X86Tlin14Ct38zDt@google.com>
- <CABayD+esy0yeKi9W3wQw+ou4y4840LPCwd-PHhN1J6Uh_fvSjA@mail.gmail.com>
- <765f86ae-7c68-6722-c6e0-c6150ce69e59@amd.com>
- <20201211225542.GA30409@ashkalra_ubuntu_server>
- <20201212045603.GA27415@ashkalra_ubuntu_server>
- <20201218193956.GJ2956@work-vm>
- <E79E09A2-F314-4B59-B7AE-07B1D422DF2B@amd.com>
+        id S1726250AbgLSBWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Dec 2020 20:22:07 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:58202 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725879AbgLSBWG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Dec 2020 20:22:06 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BJ1LL4i001525;
+        Sat, 19 Dec 2020 01:21:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=hQSO5MFu84N3VcFSgjhzMr8qzFutIrqWQP36+NliQiE=;
+ b=vc1Xz9hWJZUCDpU2JLXohRyIJMMmC/D3iTKszPjw1zdDER1ZEnyIeQcS/ibsNg8Nk1YK
+ 56Mca4BlcTtdWcxmPNoa6y/302E7QAnbs/6snorBze5fNigACL/txyAgyfl4FVfJl9Jl
+ O2U3+uGYyJGz1D5yZpd5qFbiBwTwVK8GWL3KaYziuWewlW0qfGpvN0xezu34VedmOlIb
+ Vv7lSPHTY3LwzZKUiot/PgHhWZ+r2lEZQSM+C10wfstqq2ae/2pgRMPrauxW6v+KsDxD
+ Q8BI35eguPCfGBRZyZm1EOVKqCTf5cnrmNMJGbbX01+MGhFPleKUoOPp6npF1tkh5SZZ zA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 35cntmmrew-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Sat, 19 Dec 2020 01:21:21 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BJ1BZIK088210;
+        Sat, 19 Dec 2020 01:19:20 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 35h7j905tg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 19 Dec 2020 01:19:20 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0BJ1JJ5A003382;
+        Sat, 19 Dec 2020 01:19:19 GMT
+Received: from localhost.localdomain (/10.159.251.245)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 18 Dec 2020 17:19:19 -0800
+Subject: Re: [PATCH] KVM/x86: Move definition of __ex to x86.h
+To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20201218121146.432286-1-ubizjak@gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <030d8d0a-5315-8e4b-6a15-0149ca527d6b@oracle.com>
+Date:   Fri, 18 Dec 2020 17:19:18 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <E79E09A2-F314-4B59-B7AE-07B1D422DF2B@amd.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201218121146.432286-1-ubizjak@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9839 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 adultscore=0 spamscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012190002
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9839 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 mlxscore=0
+ lowpriorityscore=0 spamscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=999 impostorscore=0 priorityscore=1501 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012190003
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Kalra, Ashish (Ashish.Kalra@amd.com) wrote:
-> Hello Dave,
-> 
-> On Dec 18, 2020, at 1:40 PM, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> 
-> ﻿* Ashish Kalra (ashish.kalra@amd.com) wrote:
-> On Fri, Dec 11, 2020 at 10:55:42PM +0000, Ashish Kalra wrote:
-> Hello All,
-> 
-> On Tue, Dec 08, 2020 at 10:29:05AM -0600, Brijesh Singh wrote:
-> 
-> On 12/7/20 9:09 PM, Steve Rutherford wrote:
-> On Mon, Dec 7, 2020 at 12:42 PM Sean Christopherson <seanjc@google.com> wrote:
-> On Sun, Dec 06, 2020, Paolo Bonzini wrote:
-> On 03/12/20 01:34, Sean Christopherson wrote:
-> On Tue, Dec 01, 2020, Ashish Kalra wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> KVM hypercall framework relies on alternative framework to patch the
-> VMCALL -> VMMCALL on AMD platform. If a hypercall is made before
-> apply_alternative() is called then it defaults to VMCALL. The approach
-> works fine on non SEV guest. A VMCALL would causes #UD, and hypervisor
-> will be able to decode the instruction and do the right things. But
-> when SEV is active, guest memory is encrypted with guest key and
-> hypervisor will not be able to decode the instruction bytes.
-> 
-> Add SEV specific hypercall3, it unconditionally uses VMMCALL. The hypercall
-> will be used by the SEV guest to notify encrypted pages to the hypervisor.
-> What if we invert KVM_HYPERCALL and X86_FEATURE_VMMCALL to default to VMMCALL
-> and opt into VMCALL?  It's a synthetic feature flag either way, and I don't
-> think there are any existing KVM hypercalls that happen before alternatives are
-> patched, i.e. it'll be a nop for sane kernel builds.
-> 
-> I'm also skeptical that a KVM specific hypercall is the right approach for the
-> encryption behavior, but I'll take that up in the patches later in the series.
-> Do you think that it's the guest that should "donate" memory for the bitmap
-> instead?
-> No.  Two things I'd like to explore:
-> 
->  1. Making the hypercall to announce/request private vs. shared common across
->     hypervisors (KVM, Hyper-V, VMware, etc...) and technologies (SEV-* and TDX).
->     I'm concerned that we'll end up with multiple hypercalls that do more or
->     less the same thing, e.g. KVM+SEV, Hyper-V+SEV, TDX, etc...  Maybe it's a
->     pipe dream, but I'd like to at least explore options before shoving in KVM-
->     only hypercalls.
-> 
-> 
->  2. Tracking shared memory via a list of ranges instead of a using bitmap to
->     track all of guest memory.  For most use cases, the vast majority of guest
->     memory will be private, most ranges will be 2mb+, and conversions between
->     private and shared will be uncommon events, i.e. the overhead to walk and
->     split/merge list entries is hopefully not a big concern.  I suspect a list
->     would consume far less memory, hopefully without impacting performance.
-> For a fancier data structure, I'd suggest an interval tree. Linux
-> already has an rbtree-based interval tree implementation, which would
-> likely work, and would probably assuage any performance concerns.
-> 
-> Something like this would not be worth doing unless most of the shared
-> pages were physically contiguous. A sample Ubuntu 20.04 VM on GCP had
-> 60ish discontiguous shared regions. This is by no means a thorough
-> search, but it's suggestive. If this is typical, then the bitmap would
-> be far less efficient than most any interval-based data structure.
-> 
-> You'd have to allow userspace to upper bound the number of intervals
-> (similar to the maximum bitmap size), to prevent host OOMs due to
-> malicious guests. There's something nice about the guest donating
-> memory for this, since that would eliminate the OOM risk.
-> 
-> 
-> Tracking the list of ranges may not be bad idea, especially if we use
-> the some kind of rbtree-based data structure to update the ranges. It
-> will certainly be better than bitmap which grows based on the guest
-> memory size and as you guys see in the practice most of the pages will
-> be guest private. I am not sure if guest donating a memory will cover
-> all the cases, e.g what if we do a memory hotplug (increase the guest
-> ram from 2GB to 64GB), will donated memory range will be enough to store
-> the metadata.
-> 
-> .
-> 
-> With reference to internal discussions regarding the above, i am going
-> to look into specific items as listed below :
-> 
-> 1). "hypercall" related :
-> a). Explore the SEV-SNP page change request structure (included in GHCB),
-> see if there is something common there than can be re-used for SEV/SEV-ES
-> page encryption status hypercalls.
-> b). Explore if there is any common hypercall framework i can use in
-> Linux/KVM.
-> 
-> 2). related to the "backing" data structure - explore using a range-based
-> list or something like rbtree-based interval tree data structure
-> (as mentioned by Steve above) to replace the current bitmap based
-> implementation.
-> 
-> 
-> 
-> I do agree that a range-based list or an interval tree data structure is a
-> really good "logical" fit for the guest page encryption status tracking.
-> 
-> We can only keep track of the guest unencrypted shared pages in the
-> range(s) list (which will keep the data structure quite compact) and all
-> the guest private/encrypted memory does not really need any tracking in
-> the list, anything not in the list will be encrypted/private.
-> 
-> Also looking at a more "practical" use case, here is the current log of
-> page encryption status hypercalls when booting a linux guest :
-> 
-> ...
-> 
-> <snip>
-> 
-> [   56.146336] page_enc_status_hc invoked, gpa = 1f018000, npages  = 1, enc = 1
-> [   56.146351] page_enc_status_hc invoked, gpa = 1f00e000, npages  = 1, enc = 0
-> [   56.147261] page_enc_status_hc invoked, gpa = 1f00e000, npages  = 1, enc = 0
-> [   56.147271] page_enc_status_hc invoked, gpa = 1f018000, npages  = 1, enc = 0
-> ....
-> 
-> [   56.180730] page_enc_status_hc invoked, gpa = 1f008000, npages  = 1, enc = 0
-> [   56.180741] page_enc_status_hc invoked, gpa = 1f006000, npages  = 1, enc = 0
-> [   56.180768] page_enc_status_hc invoked, gpa = 1f008000, npages  = 1, enc = 1
-> [   56.180782] page_enc_status_hc invoked, gpa = 1f006000, npages  = 1, enc = 1
-> 
-> ....
-> [   56.197110] page_enc_status_hc invoked, gpa = 1f007000, npages  = 1, enc = 0
-> [   56.197120] page_enc_status_hc invoked, gpa = 1f005000, npages  = 1, enc = 0
-> [   56.197136] page_enc_status_hc invoked, gpa = 1f007000, npages  = 1, enc = 1
-> [   56.197148] page_enc_status_hc invoked, gpa = 1f005000, npages  = 1, enc = 1
-> ....
-> 
-> [   56.222679] page_enc_status_hc invoked, gpa = 1e83b000, npages  = 1, enc = 0
-> [   56.222691] page_enc_status_hc invoked, gpa = 1e839000, npages  = 1, enc = 0
-> [   56.222707] page_enc_status_hc invoked, gpa = 1e83b000, npages  = 1, enc = 1
-> [   56.222720] page_enc_status_hc invoked, gpa = 1e839000, npages  = 1, enc = 1
-> ....
-> 
-> [   56.313747] page_enc_status_hc invoked, gpa = 1e5eb000, npages  = 1, enc = 0
-> [   56.313771] page_enc_status_hc invoked, gpa = 1e5e9000, npages  = 1, enc = 0
-> [   56.313789] page_enc_status_hc invoked, gpa = 1e5eb000, npages  = 1, enc = 1
-> [   56.313803] page_enc_status_hc invoked, gpa = 1e5e9000, npages  = 1, enc = 1
-> ....
-> [   56.459276] page_enc_status_hc invoked, gpa = 1d767000, npages  = 100, enc = 0
-> [   56.459428] page_enc_status_hc invoked, gpa = 1e501000, npages  = 1, enc = 1
-> [   56.460037] page_enc_status_hc invoked, gpa = 1d767000, npages  = 100, enc = 1
-> [   56.460216] page_enc_status_hc invoked, gpa = 1e501000, npages  = 1, enc = 0
-> [   56.460299] page_enc_status_hc invoked, gpa = 1d767000, npages  = 100, enc = 0
-> [   56.460448] page_enc_status_hc invoked, gpa = 1e501000, npages  = 1, enc = 1
-> ....
-> 
-> As can be observed here, all guest MMIO ranges are initially setup as
-> shared, and those are all contigious guest page ranges.
-> 
-> After that the encryption status hypercalls are invoked when DMA gets
-> triggered during disk i/o while booting the guest ... here again the
-> guest page ranges are contigious, though mostly single page is touched
-> and a lot of page re-use is observed.
-> 
-> So a range-based list/structure will be a "good" fit for such usage
-> scenarios.
-> 
-> It seems surprisingly common to flick the same pages back and forth between
-> encrypted and clear for quite a while;  why is this?
-> 
-> 
-> dma_alloc_coherent()'s will allocate pages and then call
-> set_decrypted() on them and then at dma_free_coherent(), set_encrypted()
-> is called on the pages to be freed. So these observations in the logs
-> where a lot of single 4K pages are seeing C-bit transitions and
-> corresponding hypercalls are the ones associated with
-> dma_alloc_coherent().
 
-It makes me wonder if it might be worth teaching it to hold onto those
-DMA pages somewhere until it needs them for something else and avoid the
-extra hypercalls; just something to think about.
-
-Dave
-
-> Thanks,
-> Ashish
-> 
-> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+On 12/18/20 4:11 AM, Uros Bizjak wrote:
+> Merge __kvm_handle_fault_on_reboot with its sole user
+> and move the definition of __ex to a common include to be
+> shared between VMX and SVM.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 25 -------------------------
+>   arch/x86/kvm/svm/svm.c          |  2 --
+>   arch/x86/kvm/vmx/vmx_ops.h      |  4 +---
+>   arch/x86/kvm/x86.h              | 23 +++++++++++++++++++++++
+>   4 files changed, 24 insertions(+), 30 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 7e5f33a0d0e2..ff152ee1d63f 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1623,31 +1623,6 @@ enum {
+>   #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+>   #define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
+>   
+> -asmlinkage void kvm_spurious_fault(void);
+> -
+> -/*
+> - * Hardware virtualization extension instructions may fault if a
+> - * reboot turns off virtualization while processes are running.
+> - * Usually after catching the fault we just panic; during reboot
+> - * instead the instruction is ignored.
+> - */
+> -#define __kvm_handle_fault_on_reboot(insn)				\
+> -	"666: \n\t"							\
+> -	insn "\n\t"							\
+> -	"jmp	668f \n\t"						\
+> -	"667: \n\t"							\
+> -	"1: \n\t"							\
+> -	".pushsection .discard.instr_begin \n\t"			\
+> -	".long 1b - . \n\t"						\
+> -	".popsection \n\t"						\
+> -	"call	kvm_spurious_fault \n\t"				\
+> -	"1: \n\t"							\
+> -	".pushsection .discard.instr_end \n\t"				\
+> -	".long 1b - . \n\t"						\
+> -	".popsection \n\t"						\
+> -	"668: \n\t"							\
+> -	_ASM_EXTABLE(666b, 667b)
+> -
+>   #define KVM_ARCH_WANT_MMU_NOTIFIER
+>   int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
+>   			unsigned flags);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index da7eb4aaf44f..0a72ab9fd568 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -42,8 +42,6 @@
+>   
+>   #include "svm.h"
+>   
+> -#define __ex(x) __kvm_handle_fault_on_reboot(x)
+> -
+>   MODULE_AUTHOR("Qumranet");
+>   MODULE_LICENSE("GPL");
+>   
+> diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+> index 692b0c31c9c8..7e3cb53c413f 100644
+> --- a/arch/x86/kvm/vmx/vmx_ops.h
+> +++ b/arch/x86/kvm/vmx/vmx_ops.h
+> @@ -4,13 +4,11 @@
+>   
+>   #include <linux/nospec.h>
+>   
+> -#include <asm/kvm_host.h>
+>   #include <asm/vmx.h>
+>   
+>   #include "evmcs.h"
+>   #include "vmcs.h"
+> -
+> -#define __ex(x) __kvm_handle_fault_on_reboot(x)
+> +#include "x86.h"
+>   
+>   asmlinkage void vmread_error(unsigned long field, bool fault);
+>   __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index e7ca622a468f..608548d05e84 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -7,6 +7,29 @@
+>   #include "kvm_cache_regs.h"
+>   #include "kvm_emulate.h"
+>   
+> +asmlinkage void kvm_spurious_fault(void);
+> +
+> +/*
+> + * Hardware virtualization extension instructions may fault if a
+> + * reboot turns off virtualization while processes are running.
+> + * Usually after catching the fault we just panic; during reboot
+> + * instead the instruction is ignored.
+> + */
+> +#define __ex(insn)							\
+> +	"666:	" insn "\n"						\
+> +	"	jmp 669f\n"						\
+> +	"667:\n"							\
+> +	".pushsection .discard.instr_begin\n"				\
+> +	".long 667b - .\n"						\
+> +	".popsection\n"							\
+> +	"	call kvm_spurious_fault\n"				\
+> +	"668:\n"							\
+> +	".pushsection .discard.instr_end\n"				\
+> +	".long 668b - .\n"						\
+> +	".popsection\n"							\
+> +	"669:\n"							\
+> +	_ASM_EXTABLE(666b, 667b)
+> +
+>   #define KVM_DEFAULT_PLE_GAP		128
+>   #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
+>   #define KVM_DEFAULT_PLE_WINDOW_GROW	2
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
