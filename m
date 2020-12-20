@@ -2,116 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 602212DF4FA
-	for <lists+kvm@lfdr.de>; Sun, 20 Dec 2020 11:20:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6DE22DF694
+	for <lists+kvm@lfdr.de>; Sun, 20 Dec 2020 19:54:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727253AbgLTKPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Dec 2020 05:15:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31513 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726858AbgLTKPa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 20 Dec 2020 05:15:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608459243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L7WBlnc4uBH3yp60EsaVmDi0Gnm0WESlPJ7pAkexlYE=;
-        b=DRy611g2dWyYHGJ6E0rKQqgcsFC1pYd2V4n23wkCciITpt08V4+/SijjNNdwLqvLiB+ozu
-        mwo7rGasgm2Lo4YJA0SacV3BA0svf0GCiY7cZ3SwyMNuar+YqvGF7cwsYwwRZ39MO2NEEW
-        FuZ3TdC6mHUGcDy83zKzW5Rs0v7AA3M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-EkyDCo7HO9-EaJpq7SKZJg-1; Sun, 20 Dec 2020 05:14:01 -0500
-X-MC-Unique: EkyDCo7HO9-EaJpq7SKZJg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2519615720;
-        Sun, 20 Dec 2020 10:14:00 +0000 (UTC)
-Received: from [10.36.112.16] (ovpn-112-16.ams2.redhat.com [10.36.112.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A9D996294D;
-        Sun, 20 Dec 2020 10:13:58 +0000 (UTC)
-Subject: Re: [PATCH v1 4/4] s390/kvm: VSIE: correctly handle MVPG when in VSIE
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-kernel@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, stable@vger.kernel.org
-References: <20201218141811.310267-1-imbrenda@linux.ibm.com>
- <20201218141811.310267-5-imbrenda@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <6836573a-a49d-9d9f-49e0-96b5aa479c52@redhat.com>
-Date:   Sun, 20 Dec 2020 11:13:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
-MIME-Version: 1.0
-In-Reply-To: <20201218141811.310267-5-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1726950AbgLTSxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Dec 2020 13:53:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34788 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726470AbgLTSxf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Dec 2020 13:53:35 -0500
+Subject: Re: [GIT PULL] KVM changes for Linux 5.11
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608490375;
+        bh=2kq0SVXpFbbbHWfe2vPbHSgRRohRFH28EHUA6kH/ceE=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=cp9ttskZwXVnBG3Y/ogCVyVL1vSLwoOZv/j/BsJt4L+Pg9wE1o+wqtgUAa5PIze3c
+         51+51TOqzo/VyRvLxMZYCOXkaC82LHW61vyR9kIBBiM7c1XjujQlcmYIPJUUWBQns2
+         sXlbVRc5YlS32DQvwDtyBtYWa7I2FOx1UR1qeAT4Cx19bA8/9aNZXrdc5aELpXGMlm
+         MkB6dHuyTLj2RMfGIGSxvpKTkhMskm+NJazHVoQwIWGun7ABX49uNxjz8tARnIPXAj
+         lrVe+gt5vKYs61MrOmmea/ZhXqsDdp942MjugtMoBD4OIooPX/XSXQEviKrdzJEU69
+         jF/HuCsYf6IzA==
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20201220091112.1772425-1-pbonzini@redhat.com>
+References: <20201220091112.1772425-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20201220091112.1772425-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: d45f89f7437d0f2c8275b4434096164db106384d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 6a447b0e3151893f6d4a889956553c06d2e775c6
+Message-Id: <160849037486.26331.1493261589510472196.pr-tracker-bot@kernel.org>
+Date:   Sun, 20 Dec 2020 18:52:54 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.12.20 15:18, Claudio Imbrenda wrote:
-> Correctly handle the MVPG instruction when issued by a VSIE guest.
-> 
+The pull request you sent on Sun, 20 Dec 2020 04:11:12 -0500:
 
-I remember that MVPG SIE documentation was completely crazy and full of
-corner cases. :)
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Looking at arch/s390/kvm/intercept.c:handle_mvpg_pei(), I can spot that
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/6a447b0e3151893f6d4a889956553c06d2e775c6
 
-1. "This interception can only happen for guests with DAT disabled ..."
-2. KVM does not make use of any mvpg state inside the SCB.
-
-Can this be observed with Linux guests?
-
-
-Can I get some information on what information is stored at [0xc0, 0xd)
-inside the SCB? I assume it's:
-
-0xc0: guest physical address of source PTE
-0xc8: guest physical address of target PTE
-
-
-Also, which conditions have to be met such that we get a ICPT_PARTEXEC:
-
-a) State of guest DAT (I assume off?)
-b) State of PTEs: What happens if there is no PTE (I assume we need two
-PTEs, otherwise no such intercept)? I assume we get an intercept if one
-of both PTEs is not present or the destination PTE is protected. Correct?
-
-So, when we (g1) get an intercept for g3, can we be sure 0xc0 and 0xc8
-in the scb are both valid g1 addresses pointing at our PTE, and what do
-we know about these PTEs (one not present or destination protected)?
-
-[...]
->  /*
->   * Run the vsie on a shadow scb and a shadow gmap, without any further
->   * sanity checks, handling SIE faults.
-> @@ -1063,6 +1132,10 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
->  		if ((scb_s->ipa & 0xf000) != 0xf000)
->  			scb_s->ipa += 0x1000;
->  		break;
-> +	case ICPT_PARTEXEC:
-> +		if (scb_s->ipa == 0xb254)
-
-Old code hat "/* MVPG only */" - why is this condition now necessary?
-
-> +			rc = vsie_handle_mvpg(vcpu, vsie_page);
-> +		break;
->  	}
->  	return rc;
->  }
-> 
-
+Thank you!
 
 -- 
-Thanks,
-
-David / dhildenb
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
