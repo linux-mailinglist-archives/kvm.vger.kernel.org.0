@@ -2,86 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D28A2DF4DD
-	for <lists+kvm@lfdr.de>; Sun, 20 Dec 2020 10:42:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7CAC2DF4E3
+	for <lists+kvm@lfdr.de>; Sun, 20 Dec 2020 10:46:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727442AbgLTJmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Dec 2020 04:42:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34293 "EHLO
+        id S1727161AbgLTJq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Dec 2020 04:46:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52002 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727159AbgLTJmA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 20 Dec 2020 04:42:00 -0500
+        by vger.kernel.org with ESMTP id S1726377AbgLTJq3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 20 Dec 2020 04:46:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608457234;
+        s=mimecast20190719; t=1608457502;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Qu181/SxorcHfWdvdcSj+pkwAFVA8G1yAvMSmmXwoBY=;
-        b=GEjxzgTnHySXgpBRQpBgncUNvb07Tk94QfEcODZzpk73O17hxo9oAKtdUU5nEjG8sw6j3J
-        gG03r31QWajUOCLg57Jhn1O4I/ZU9rBpuZaFLgY5dwhexivfpxWbuoUoviKn/f+M0ButNN
-        TeEFGf0AnKDqIx154nHGxV0UR5G52bY=
+        bh=hZuuWYgsYqtOq9pElDc1NbTuuW8utHaswvEIseLkrwU=;
+        b=GStrCtjy0eGbfeO6grjBD5WXROi1jTal+meKsQjcQIOY4FsCUY8J+QsXcrInZunrgIvN56
+        nJsiTXQHqTJIeMGFDPhaYTf+oZv2vOU6W0wk/t9DqqtjyyL7qocvCfwpudmB4Zg9zN2Nzc
+        jGmKG2adjQ2zV+Z4Eharwfw2N36uN8I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-BXSYY0nONT25flmeROQzhA-1; Sun, 20 Dec 2020 04:40:30 -0500
-X-MC-Unique: BXSYY0nONT25flmeROQzhA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-282-4szOjY9POcaa_QH5pkrEHg-1; Sun, 20 Dec 2020 04:45:00 -0500
+X-MC-Unique: 4szOjY9POcaa_QH5pkrEHg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 744291005504;
-        Sun, 20 Dec 2020 09:40:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AA7F15720;
+        Sun, 20 Dec 2020 09:44:59 +0000 (UTC)
 Received: from [10.36.112.16] (ovpn-112-16.ams2.redhat.com [10.36.112.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 438AD2CD65;
-        Sun, 20 Dec 2020 09:40:28 +0000 (UTC)
-Subject: Re: [PATCH v1 0/4] s390/kvm: fix MVPG when in VSIE
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CE42E5C1B4;
+        Sun, 20 Dec 2020 09:44:57 +0000 (UTC)
+Subject: Re: [PATCH v1 1/4] s390/kvm: VSIE: stop leaking host addresses
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-kernel@vger.kernel.org
 Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
+        linux-s390@vger.kernel.org, stable@vger.kernel.org
 References: <20201218141811.310267-1-imbrenda@linux.ibm.com>
+ <20201218141811.310267-2-imbrenda@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Organization: Red Hat GmbH
-Message-ID: <5947ede7-7f9f-cdaa-b827-75a5715e4f12@redhat.com>
-Date:   Sun, 20 Dec 2020 10:40:27 +0100
+Message-ID: <b1a31982-a967-7439-1a7c-3c948deeb79d@redhat.com>
+Date:   Sun, 20 Dec 2020 10:44:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <20201218141811.310267-1-imbrenda@linux.ibm.com>
+In-Reply-To: <20201218141811.310267-2-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 18.12.20 15:18, Claudio Imbrenda wrote:
-> The current handling of the MVPG instruction when executed in a nested
-> guest is wrong, and can lead to the nested guest hanging.
+> The addresses in the SIE control block of the host should not be
+> forwarded to the guest. They are only meaningful to the host, and
+> moreover it would be a clear security issue.
 
-Hi,
+It's really almost impossible for someone without access to
+documentation to understand what we leak. I assume we're leaking the g1
+address of a page table (entry), used for translation of g2->g3 to g1.
+Can you try making that clearer?
 
-thanks for spotting and debugging! Is this related to nested guests
-hanging while migrating (mentioned by Janosch at some point)?
+In that case, it's pretty much a random number (of a random page used as
+a leave page table) and does not let g1 identify locations of symbols
+etc. If so, I don't think this is a "clear security issue" and suggest
+squashing this into the actual fix (#p4 I assume).
 
-Or can this not be reproduced with actual Linux guests?
-
-Thanks!
+@Christian, @Janosch? Am I missing something?
 
 > 
-> This patchset fixes the behaviour to be more architecturally correct,
-> and fixes the hangs observed.
+> Subsequent patches will actually put the right values in the guest SIE
+> control block.
 > 
-> Claudio Imbrenda (4):
->   s390/kvm: VSIE: stop leaking host addresses
->   s390/kvm: extend guest_translate for MVPG interpretation
->   s390/kvm: add kvm_s390_vsie_mvpg_check needed for VSIE MVPG
->   s390/kvm: VSIE: correctly handle MVPG when in VSIE
+> Fixes: a3508fbe9dc6d ("KVM: s390: vsie: initial support for nested virtualization")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  arch/s390/kvm/vsie.c | 5 -----
+>  1 file changed, 5 deletions(-)
 > 
->  arch/s390/kvm/gaccess.c | 88 ++++++++++++++++++++++++++++++++++++++---
->  arch/s390/kvm/gaccess.h |  3 ++
->  arch/s390/kvm/vsie.c    | 78 +++++++++++++++++++++++++++++++++---
->  3 files changed, 159 insertions(+), 10 deletions(-)
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index 4f3cbf6003a9..ada49583e530 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -416,11 +416,6 @@ static void unshadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  		memcpy((void *)((u64)scb_o + 0xc0),
+>  		       (void *)((u64)scb_s + 0xc0), 0xf0 - 0xc0);
+>  		break;
+> -	case ICPT_PARTEXEC:
+> -		/* MVPG only */
+> -		memcpy((void *)((u64)scb_o + 0xc0),
+> -		       (void *)((u64)scb_s + 0xc0), 0xd0 - 0xc0);
+> -		break;
+>  	}
+>  
+>  	if (scb_s->ihcpu != 0xffffU)
 > 
 
 
