@@ -2,140 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 952AF2DFF54
-	for <lists+kvm@lfdr.de>; Mon, 21 Dec 2020 19:09:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D7572DFF69
+	for <lists+kvm@lfdr.de>; Mon, 21 Dec 2020 19:14:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726253AbgLUSIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Dec 2020 13:08:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49306 "EHLO
+        id S1726603AbgLUSMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Dec 2020 13:12:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726107AbgLUSIW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Dec 2020 13:08:22 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E84C0613D6
-        for <kvm@vger.kernel.org>; Mon, 21 Dec 2020 10:07:42 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id q22so6866374pfk.12
-        for <kvm@vger.kernel.org>; Mon, 21 Dec 2020 10:07:42 -0800 (PST)
+        with ESMTP id S1726480AbgLUSMc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Dec 2020 13:12:32 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8130C061285
+        for <kvm@vger.kernel.org>; Mon, 21 Dec 2020 10:11:51 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id g18so6800664pgk.1
+        for <kvm@vger.kernel.org>; Mon, 21 Dec 2020 10:11:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=yNO8jGDtlS9/+qaDws58cBrDRouOJiQU2gAopS4B8Vk=;
-        b=O5gViP4Il+PXK/jxaMyajx9y3R+wQffH+a0fS4J4ATfsDnWH5gtawwOzYQmikzMgAA
-         sxNYcIUIYBPP7hIJZojc4XEVKFAYhl0MBrmcVz6hka7GEL4AINhnxCDSxOudOySrGoEU
-         FJFMsexJsPqupWC9zRb2obnd/bq7oiVf6eg4svMnL1l5u7NVut0PFdPHFlsJlxcIESg7
-         q/0z0aXSZ2dLNgaTaGPdjLIWe2N4N5I4qo8chOIEdhEJk3Pm0vlYZq6S4GRojmDOWT4r
-         I0zbCVKn+h8n3kOxsPDywSgj+F2Ia/sKMcnollo3wRTLTTqkOw/WqFQxDO78uxfTop/U
-         H0Rg==
+        bh=bOLplW+5pp4JzOv86AiZeqRbE94ulVTnl+pKmMDmJSY=;
+        b=HFWrQ9mvEZW6tq7gtcoW2W6O1cpRXIGiH7jNwK3Ivwz/2zIGkq9l678qT9/RTsTR4+
+         rItrhVmzPjQ2w0Yg+izh2swEM4bjuu8ijBXO45WGBF2ARYlueahJHDb4A/8AYANw6fvT
+         Gre+GIq7Ivj8wjoeIrWS2uhywzjU2dL7uCatGwBOLNsRVtRMwr4i5CeMfRWWio1ohGYG
+         f6P9Mb3+AJI2jgHOcmveCnMPmKz95m3SX6vcIxhXSwIxNDl2fi8Y3rQLho4y9vTBzvJT
+         /cVTftNX5dEHmdWPo+Dg6PqABaa8slheL5lY7yXey9mUqeszVoUfSypa64MjKyjBCgmx
+         kmIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=yNO8jGDtlS9/+qaDws58cBrDRouOJiQU2gAopS4B8Vk=;
-        b=Imid5KfC/XBLm6kBUkcMNCnxAVPwJkGRNJEPFgpjHy9Ll3wlyhHkBNbMkQ7NTfxMfY
-         mCy3WQz4QJwwx3IA4fGRjx6L0lnigc1KxD+YmBmVrYtEhU/47EeOwRhD5T2CGlY7sR9T
-         XyjwT4np6NG03498ereWJ7yBPr3TgYDIpWovBUSiMzXTOTaaT4/p/UZ88YH833kHRUHv
-         X4Z/yjKkOu/TOIwHUCEmYS+Xp/L6MJOV3faLMR+YVcALa2swC1db8oAxDcNNcZt45b8y
-         kUxwUEekFQsOuyXv8nr0AAzYxyXiY6OvbURGtQV0jvYtEX+Ftm3Pz+uTsg9lLGZcmBfN
-         AiTQ==
-X-Gm-Message-State: AOAM532LQSB049ZaMvJS8lx8HwSjeDRercOmt0YS+z+MmP5UAouAHDXq
-        E1kVXQi7+Vu/v9mlvn9psVohJWUC6px3UA==
-X-Google-Smtp-Source: ABdhPJzwIc6I9BTaZTa+kGOU8pPqqKdAE9u3nMXnJXQ0dAPXewB5flJ6IGkxSWudHvgZDJsiLNTnaQ==
-X-Received: by 2002:a63:dd53:: with SMTP id g19mr15929591pgj.291.1608570311088;
-        Mon, 21 Dec 2020 09:05:11 -0800 (PST)
+        bh=bOLplW+5pp4JzOv86AiZeqRbE94ulVTnl+pKmMDmJSY=;
+        b=hMc48iPxg+Xh9dJ3KyQk48qr6hso0ni7NuogRo+i1Jy9sxYB66S57kw9LudwsZniXO
+         D/3uUGv30jz+AWZFH4BUZRBwezQIKhBRWb6pUyeQXZA4EmYSiiXcXpYVwze0mRUCbOWg
+         X1TQhhY3hxWP3jDexGrv2/uqFh2wiMftHsQBgpSCNC5WuGiDREkMjKTThV1C2cbhvUdx
+         TYc4SzpuX0818IveXIAeGzL8d8prsxaG53oeLhfeyu6JZtlm5+LcTp5VRAl/aCWLrl37
+         oHJg8z4DiPwNzc3ryRvAWAHgATrS5tDTnHEtPJ3YIHq71r4RFvzthZVxsvgFV7lm9dzH
+         IkcA==
+X-Gm-Message-State: AOAM531Ah8qeuYcr2DQf8MFX5ZwDicMg54RsuXPg/eR2uvL9ADKVonVn
+        +OeBb9jey6jEgTkC78pLg4+QUClQ4wctsg==
+X-Google-Smtp-Source: ABdhPJzoQsNIctzyZlXh2aS6dXgzLjXlPRuPIlOiMY/6q2NocJbmuerTxlGVGSP70Q2xmfv0qYogTw==
+X-Received: by 2002:a63:2b42:: with SMTP id r63mr15934021pgr.316.1608572898493;
+        Mon, 21 Dec 2020 09:48:18 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id k15sm17662546pfp.115.2020.12.21.09.05.09
+        by smtp.gmail.com with ESMTPSA id 82sm17865501pfv.117.2020.12.21.09.48.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Dec 2020 09:05:10 -0800 (PST)
-Date:   Mon, 21 Dec 2020 09:05:03 -0800
+        Mon, 21 Dec 2020 09:48:17 -0800 (PST)
+Date:   Mon, 21 Dec 2020 09:48:10 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Nathan Chancellor <natechancellor@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Richard Herbert <rherbert@sympatico.ca>
-Subject: Re: [PATCH 1/4] KVM: x86/mmu: Use -1 to flag an undefined spte in
- get_mmio_spte()
-Message-ID: <X+DVv3/KjDn1+Iut@google.com>
-References: <20201218003139.2167891-1-seanjc@google.com>
- <20201218003139.2167891-2-seanjc@google.com>
- <87tusjtrqp.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH] KVM: SVM: Add register operand to vmsave call in
+ sev_es_vcpu_load
+Message-ID: <X+Df2oQczVBmwEzi@google.com>
+References: <20201219063711.3526947-1-natechancellor@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87tusjtrqp.fsf@vitty.brq.redhat.com>
+In-Reply-To: <20201219063711.3526947-1-natechancellor@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 18, 2020, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On Fri, Dec 18, 2020, Nathan Chancellor wrote:
+> When using LLVM's integrated assembler (LLVM_IAS=1) while building
+> x86_64_defconfig + CONFIG_KVM=y + CONFIG_KVM_AMD=y, the following build
+> error occurs:
 > 
-> > Return -1 from the get_walk() helpers if the shadow walk doesn't fill at
-> > least one spte, which can theoretically happen if the walk hits a
-> > not-present PTPDR.  Returning the root level in such a case will cause
+>  $ make LLVM=1 LLVM_IAS=1 arch/x86/kvm/svm/sev.o
+>  arch/x86/kvm/svm/sev.c:2004:15: error: too few operands for instruction
+>          asm volatile(__ex("vmsave") : : "a" (__sme_page_pa(sd->save_area)) : "memory");
+>                       ^
+>  arch/x86/kvm/svm/sev.c:28:17: note: expanded from macro '__ex'
+>  #define __ex(x) __kvm_handle_fault_on_reboot(x)
+>                  ^
+>  ./arch/x86/include/asm/kvm_host.h:1646:10: note: expanded from macro '__kvm_handle_fault_on_reboot'
+>          "666: \n\t"                                                     \
+>                  ^
+>  <inline asm>:2:2: note: instantiated into assembly here
+>          vmsave
+>          ^
+>  1 error generated.
 > 
-> PDPTR
-
-Doh.
-
-> > get_mmio_spte() to return garbage (uninitialized stack data).  In
-> > practice, such a scenario should be impossible as KVM shouldn't get a
-> > reserved-bit page fault with a not-present PDPTR.
-> >
-> > Note, using mmu->root_level in get_walk() is wrong for other reasons,
-> > too, but that's now a moot point.
-> >
-> > Fixes: 95fb5b0258b7 ("kvm: x86/mmu: Support MMIO in the TDP MMU")
-> > Cc: Ben Gardon <bgardon@google.com>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c     | 7 ++++++-
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
-> >  2 files changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 7a6ae9e90bd7..a48cd12c01d7 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3488,7 +3488,7 @@ static bool mmio_info_in_cache(struct kvm_vcpu *vcpu, u64 addr, bool direct)
-> >  static int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes)
-> >  {
-> >  	struct kvm_shadow_walk_iterator iterator;
-> > -	int leaf = vcpu->arch.mmu->root_level;
-> > +	int leaf = -1;
-> >  	u64 spte;
-> >  
-> >  
-> > @@ -3532,6 +3532,11 @@ static bool get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
-> >  	else
-> >  		leaf = get_walk(vcpu, addr, sptes);
-> >  
-> > +	if (unlikely(leaf < 0)) {
-> > +		*sptep = 0ull;
-> > +		return reserved;
-> > +	}
+> This happens because LLVM currently does not support calling vmsave
+> without the fixed register operand (%rax for 64-bit and %eax for
+> 32-bit). This will be fixed in LLVM 12 but the kernel currently supports
+> LLVM 10.0.1 and newer so this needs to be handled.
 > 
-> When SPTE=0 is returned from get_mmio_spte(), handle_mmio_page_fault()
-> will return RET_PF_RETRY -- should it be RET_PF_INVALID instead?
+> Add the proper register using the _ASM_AX macro, which matches the
+> vmsave call in vmenter.S.
 
-No, RET_PF_RETRY is the most appropriate.  A pae_root entry will only be zero if
-the corresponding guest PDPTR is !PRESENT, i.e. the page fault is effectively in
-the guest context.  The reason I say it should be an impossible condition is
-because KVM should also reset the MMU whenever it snapshots the guest's PDPTRs,
-i.e. it should be impossible to install a MMIO SPTE if the relevant PDPTR is
-!PRESENT, and all MMIO SPTEs should be wiped out if the PDPTRs are reloaded.
-I suppose by that argument, this should be a WARN_ON_ONCE, but I'm not sure if
-I'm _that_ confident in my analysis :-)
+There are also two instances in tools/testing/selftests/kvm/lib/x86_64/svm.c
+that likely need to be fixed.
+ 
+> Fixes: 861377730aa9 ("KVM: SVM: Provide support for SEV-ES vCPU loading")
+> Link: https://reviews.llvm.org/D93524
+> Link: https://github.com/ClangBuiltLinux/linux/issues/1216
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index e57847ff8bd2..958370758ed0 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2001,7 +2001,7 @@ void sev_es_vcpu_load(struct vcpu_svm *svm, int cpu)
+>  	 * of which one step is to perform a VMLOAD. Since hardware does not
+>  	 * perform a VMSAVE on VMRUN, the host savearea must be updated.
+>  	 */
+> -	asm volatile(__ex("vmsave") : : "a" (__sme_page_pa(sd->save_area)) : "memory");
+> +	asm volatile(__ex("vmsave %%"_ASM_AX) : : "a" (__sme_page_pa(sd->save_area)) : "memory");
 
-Related side topic, this snippet in get_mmio_spte() is dead code, as the same
-check is performed by its sole caller.  I'll send a patch to remove it (unless
-Paolo wants a v2 of this series, in which case I'll tack it on the end).
+I vote to add a helper in svm.h to encode VMSAVE, even if there is only the one
+user.  Between the rAX behavior (it _must_ be rAX) and taking the HPA of the
+VMCB, the semantics of VMSAVE are just odd enough to cause a bit of head
+scratching when reading the code for the first time.  E.g. something like:
 
-	if (!VALID_PAGE(vcpu->arch.mmu->root_hpa)) {
-		*sptep = 0ull;
-		return reserved;
-	}
+void vmsave(struct page *vmcb)
+{
+	/*
+	 * VMSAVE takes the HPA of a VMCB in rAX (hardcoded by VMSAVE itself).
+	 * The _ASM_AX operand is required to specify the address size, which
+	 * means VMSAVE cannot consume a 64-bit address outside of 64-bit mode.
+	 */
+	hpa_t vmcb_pa = __sme_page_pa(vmcb);
+
+	BUG_ON(!IS_ENABLED(CONFIG_X86_64) && (vmcb_pa >> 32));
+
+	asm volatile(__ex("vmsave %%"_ASM_AX) : : "a" (vmcb_pa) : "memory");
+}
+
+>  
+>  	/*
+>  	 * Certain MSRs are restored on VMEXIT, only save ones that aren't
+> -- 
+> 2.30.0.rc0
+> 
