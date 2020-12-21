@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D50652DF74D
-	for <lists+kvm@lfdr.de>; Mon, 21 Dec 2020 01:55:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC8BF2DF74F
+	for <lists+kvm@lfdr.de>; Mon, 21 Dec 2020 01:55:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbgLUAy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Dec 2020 19:54:27 -0500
-Received: from new2-smtp.messagingengine.com ([66.111.4.224]:44175 "EHLO
+        id S1726589AbgLUAyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Dec 2020 19:54:55 -0500
+Received: from new2-smtp.messagingengine.com ([66.111.4.224]:46517 "EHLO
         new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726027AbgLUAy1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 20 Dec 2020 19:54:27 -0500
+        by vger.kernel.org with ESMTP id S1725956AbgLUAyz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 20 Dec 2020 19:54:55 -0500
 Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 1AB015803F8;
-        Sun, 20 Dec 2020 19:53:41 -0500 (EST)
+        by mailnew.nyi.internal (Postfix) with ESMTP id 536F2580413;
+        Sun, 20 Dec 2020 19:53:49 -0500 (EST)
 Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Sun, 20 Dec 2020 19:53:41 -0500
+  by compute6.internal (MEProxy); Sun, 20 Dec 2020 19:53:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
         from:to:cc:subject:date:message-id:in-reply-to:references
-        :mime-version:content-transfer-encoding; s=fm1; bh=ld7CKW5vB77WI
-        lvV4wV47qN/agE7Mm627Lyt8Dw6I+8=; b=VbDRe6BhmOr/FLXZ04jZwqRWcsiSE
-        +mZ5syHy6w3ggZ2WvyAIvV+UGj2dwVPGx5lUgGnZFoNQcIv7Wn/o8AjOwvMOoerr
-        tzeDagLJ2Yfc1uoR3krKhWLWVdW83zaC2ifhxVT7ojsyDFOczjFlH4ATPKrzYm7x
-        Rk3esHNtiRPaJaFcDTxsZ3vE7yf0ElFrClmMVadSnwIc7TFTy/8bIUFoQCD4E6q+
-        vkzswXkYNBsHxKFExC+1WCRFcdVE2pWkAqCDhC+LBogClPaDUP4VEY9IzypBdh/S
-        aLjjADp8KPv7s3me94Z+7IVeyt55nBXL/ip94GP+3VsZkn56UYUBlkNKg==
+        :mime-version:content-transfer-encoding; s=fm1; bh=KWLNfn6cch3ST
+        kJIn9ZITmEXeddtBMzmWKV1IAEIciA=; b=SIelJS4Fke3A/aeRfSeo5JZd7hpoo
+        lGPByjwCuuxZZSdIaz5cO5929SskOcL0ukg0hPUgyWQuvuGqm7lg/ObLoHZbMvBY
+        xfdkJ9zqRhXOIUPTAuf6YuZLXp+XMLtd/MzkCTM/B/sP58UI0XrIMJhtCjf6zTK1
+        B3wv3LCN3BJOmT/6DdNQWM8QKAmKd/qfAj22xjk+6mCFiiVpNRcxq7NMK0Flo75v
+        /U95VeXOXneGZw9zeDMnRpWH9bOwG8T+WARTQuGsFcr8AwjNr/DLejg2g/kIvLOH
+        K80WrgvFTPeowZCv1YJifdyS6g955nYxkCC+2mG28cGMF7S6/XXSl3IHg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-transfer-encoding:date:from
         :in-reply-to:message-id:mime-version:references:subject:to
         :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; bh=ld7CKW5vB77WIlvV4wV47qN/agE7Mm627Lyt8Dw6I+8=; b=DP8AhrES
-        wUBmG1vdl7vtLE97r+OrKSVGunFvkFQQbgdiFf4RKmhIHlyyDRh2msAjWlAFD2mB
-        O8iFSsCckNMRGEfNODCRv5CeuF3L0z+q0eeQn0CN6NLsIuPt/QmuMLPkRk2aw1oi
-        5Hopcb/w8yfR+25IrBXn/a6+rJncsGTaEVDuiuzmTOO8MGmFG9QkM7jKdcBBVRk0
-        iSCrlIW6BP2JOuXCsExvVw51pn+D+Xpl4U8Ndt0wA6FooHxjUobzi/bOnX7SeeZX
-        NaL2Z17EJdYz8ob1nE7aMGeIUb48kMinTu1N9tn4RSx15lthfA8sTfooWzgyGrCI
-        obshvFFBdZvdkQ==
-X-ME-Sender: <xms:FPLfX24a8VisuVr_LPH-sqUNNoxM06by7-F2y8phaJmzRbFPazA2dw>
-    <xme:FPLfX_4wxYWX6nR0zZ1idZkYflGWi1lYBhSWVM0qPe61CjPq9t6vjsK4nMC9YKUDs
-    VijTEhWCjhTlkW0GKY>
+        fm1; bh=KWLNfn6cch3STkJIn9ZITmEXeddtBMzmWKV1IAEIciA=; b=TdJUcTr4
+        tJAhXwVjbuSZj2bwRxiwq3vjLrSeGQJhBOxVsxauF1dRlQxau4X89dB8t+iVW8EO
+        BrFTJevYoqc1S7HC0N9M2IsKxW+OFc8O4h4BeODsAqw2yEoPqPCri9RHE/mBvKgO
+        23/XADnLaiLPa7OGVzWqsdRibjcgUetjU3yPx2cZlBwqov6eLwcC1xnlE9Vqc549
+        4QPXmmOwJ4ENMshP2Kdyqrc4EpPrDM8Yeexw57Gsbb/dXXdLKOxlGLw78ipee+Mx
+        VOi3EqRJzMpUx8djRCzGqsGelVw+2EjXXpqGPXsgyN2xyyF1inWWQayYouqj5hQp
+        jMxdXVOz33Vz9w==
+X-ME-Sender: <xms:HPLfXzE5WPIREl4Aa5KPmO_-btAmCMXTG6QfeDBm0U4zyAhYPwOa9Q>
+    <xme:HPLfXwV8FPKLkeF6mTKWkSWrxC49-cOfhJfjRg-lP1-kUwsZiOyipOvcHelbv9GFh
+    6XnEYVVIwk3onwT-8I>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvddtuddgvdekucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
     cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeflihgrgihu
     nhcujggrnhhguceojhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtghomheqnecugg
-    ftrfgrthhtvghrnhepjeeuhfekgeehhefftefgueevuedvueekveekieegudfhhffgvddv
-    heehhfffhfdunecuffhomhgrihhnpegrlhhpihhnvghlihhnuhigrdhorhhgnecukfhppe
-    eghedrfeefrdehtddrvdehgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhep
-    mhgrihhlfhhrohhmpehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhm
-X-ME-Proxy: <xmx:FPLfX1dogoQ3mhTe_E3EtuRa1puwsO-A0JH-D8IDh4G2rTdA1tTVSg>
-    <xmx:FPLfXzIDXHzP4lH9w-JwSz_kCE1opnrjgx_Yy7Is316RO-VPzV6uuQ>
-    <xmx:FPLfX6IMaChvbEp2_6a2XZCLcOV68e7IEzHuQ3rdQ9EYPMPCw_Q2Og>
-    <xmx:FPLfX8j1NJSusrn0wJNIDurb048IU7JL5JaihxM6LwD6voiTzv7c5mdE26P2YMP1>
+    ftrfgrthhtvghrnhepjeeihffgteelkeelffdukedtheevudejvdegkeekjeefhffhhfet
+    udetgfdtffeunecukfhppeeghedrfeefrdehtddrvdehgeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjihgrgihunhdrhigrnhhgsehflhih
+    ghhorghtrdgtohhm
+X-ME-Proxy: <xmx:HPLfX1KkIRxG_Ykal9Up_fkfsPPDCsoR2__lED_Wc8lmgbWB9o5OoA>
+    <xmx:HPLfXxEPcBCBla-cwjKt1tjuKmsmar9qh9byjfQ3vMqfhBLPcOuTkw>
+    <xmx:HPLfX5V0L4vcwQQKUFsxwoqBXyhdXYTQ-swo_GMvyrRCwhvTEr5pJg>
+    <xmx:HfLfX6tYE8V6oc3zFe1YgpRfrG_5yKbEsaCX0mOD8S21Mg_REO-yJfo-rqAk8fkq>
 Received: from strike.U-LINK.com (li1000-254.members.linode.com [45.33.50.254])
-        by mail.messagingengine.com (Postfix) with ESMTPA id A112F24005C;
-        Sun, 20 Dec 2020 19:53:33 -0500 (EST)
+        by mail.messagingengine.com (Postfix) with ESMTPA id 7E63A240057;
+        Sun, 20 Dec 2020 19:53:41 -0500 (EST)
 From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
@@ -71,9 +71,9 @@ Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Greg Kurz <groug@kaod.org>,
         Alistair Francis <alistair@alistair23.me>, kvm@vger.kernel.org,
         qemu-block@nongnu.org, qemu-ppc@nongnu.org
-Subject: [PATCH 1/9] tests/docker: Add dockerfile for Alpine Linux
-Date:   Mon, 21 Dec 2020 08:53:10 +0800
-Message-Id: <20201221005318.11866-2-jiaxun.yang@flygoat.com>
+Subject: [PATCH 2/9] configure: Add sys/timex.h to probe clk_adjtime
+Date:   Mon, 21 Dec 2020 08:53:11 +0800
+Message-Id: <20201221005318.11866-3-jiaxun.yang@flygoat.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201221005318.11866-1-jiaxun.yang@flygoat.com>
 References: <20201221005318.11866-1-jiaxun.yang@flygoat.com>
@@ -83,83 +83,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alpine Linux[1] is a security-oriented, lightweight Linux distribution
-based on musl libc and busybox.
-
-It it popular among Docker guests and embedded applications.
-
-Adding it to test against different libc.
-
-[1]: https://alpinelinux.org/
+It is not a part of standard time.h. Glibc put it under
+time.h however musl treat it as a sys timex extension.
 
 Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- tests/docker/dockerfiles/alpine.docker | 56 ++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
- create mode 100644 tests/docker/dockerfiles/alpine.docker
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/docker/dockerfiles/alpine.docker b/tests/docker/dockerfiles/alpine.docker
-new file mode 100644
-index 0000000000..a1b80f08d2
---- /dev/null
-+++ b/tests/docker/dockerfiles/alpine.docker
-@@ -0,0 +1,56 @@
-+
-+FROM alpine:edge
-+
-+RUN apk update
-+RUN apk upgrade
-+
-+# Please keep this list sorted alphabetically
-+ENV PACKAGES \
-+	alsa-lib-dev \
-+	bash \
-+	bison \
-+	build-base \
-+	coreutils \
-+	curl-dev \
-+	flex \
-+	git \
-+	glib-dev \
-+	glib-static \
-+	gnutls-dev \
-+	gtk+3.0-dev \
-+	libaio-dev \
-+	libcap-dev \
-+	libcap-ng-dev \
-+	libjpeg-turbo-dev \
-+	libnfs-dev \
-+	libpng-dev \
-+	libseccomp-dev \
-+	libssh-dev \
-+	libusb-dev \
-+	libxml2-dev \
-+	linux-headers \
-+	lzo-dev \
-+	mesa-dev \
-+	mesa-egl \
-+	mesa-gbm \
-+	meson \
-+	ncurses-dev \
-+	ninja \
-+	paxmark \
-+	perl \
-+	pulseaudio-dev \
-+	python3 \
-+	py3-sphinx \
-+	snappy-dev \
-+	spice-dev \
-+	texinfo \
-+	usbredir-dev \
-+	util-linux-dev \
-+	vde2-dev \
-+	virglrenderer-dev \
-+	vte3-dev \
-+	xfsprogs-dev \
-+	zlib-dev \
-+	zlib-static
-+
-+RUN apk add $PACKAGES
+diff --git a/configure b/configure
+index c228f7c21e..990f37e123 100755
+--- a/configure
++++ b/configure
+@@ -4374,6 +4374,7 @@ fi
+ clock_adjtime=no
+ cat > $TMPC <<EOF
+ #include <time.h>
++#include <sys/timex.h>
+ 
+ int main(void)
+ {
 -- 
 2.29.2
 
