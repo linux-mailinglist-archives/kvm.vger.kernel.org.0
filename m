@@ -2,131 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A4FF2E0135
-	for <lists+kvm@lfdr.de>; Mon, 21 Dec 2020 20:42:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38AC92E0138
+	for <lists+kvm@lfdr.de>; Mon, 21 Dec 2020 20:49:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725891AbgLUTmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Dec 2020 14:42:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35964 "EHLO
+        id S1725849AbgLUTt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Dec 2020 14:49:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgLUTmc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Dec 2020 14:42:32 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6DA2C0613D6
-        for <kvm@vger.kernel.org>; Mon, 21 Dec 2020 11:41:51 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id f14so8787pju.4
-        for <kvm@vger.kernel.org>; Mon, 21 Dec 2020 11:41:51 -0800 (PST)
+        with ESMTP id S1725780AbgLUTt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Dec 2020 14:49:26 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 972AEC0613D3;
+        Mon, 21 Dec 2020 11:48:45 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id i24so10725960edj.8;
+        Mon, 21 Dec 2020 11:48:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qW/eGOHefr7u3yGewLONpfyTMK6vr0UpqPOgffa2C+8=;
-        b=caz4eWoFVIQeRzGTGTzgH0YV5LQ/fypaTTTsSgr6PaXlk6T3QyE+pi2iduz7le2QpV
-         C6jhDwnoRLSDbS2f4ZYMb8LioC4AgJJRDx6eHgYPpIVDtBrlUCPcqHnzALtGdc3xgtyy
-         l9uFyqxddjWZbu9kVuU9XgxE4VGa93kpnpEuKUuYRko0ecposdfZ6H7pcwdcBUSQtix+
-         FOtHqEgVC/4DXdaMoLkt6GlS37855cdJFmDrBDxfcgWxk1imDCivMAZ6dFLRdP1GZ0Df
-         Sa8lamvcTWgmYKphgoJ4BuL1/bmpZlORBq1rScX89pEkym7pTpRbAztPfgztGXRHfaCR
-         Sb+Q==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=REHRRpEqcqIxtzDgCEnLfnlCBNOPVwyGaF2sWG0peaw=;
+        b=I75EkRKy9tco2xXRkMTScAvl0XTsFdcdghintw0/yakTylDRDM0gY0iwi/2B1f0LMI
+         KybCNLMyFEx5wL+UY9IMHQrheJEYGLXeno66GKp8M2xyeCFgk3rUxvJhyt8SyuZp93+z
+         DIXtFRzPnrVn//ijRv6ZsF9hbnOrvOzBDQCPILTih8MckZWCPfCInQySmzmMfDdMhVJq
+         DWE3KoDdWQjdk8lnHQ/R5yoKuAm501e3/qp8nksov+UcM8kf/KewUDDMQVxcZVrqkDHs
+         rZD8Jivs82lgws0/dVrDqsHo1Ep3jyzpO5yBMHNyVlee455JOTibQHKKhxWs+5t2pycr
+         c5Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qW/eGOHefr7u3yGewLONpfyTMK6vr0UpqPOgffa2C+8=;
-        b=E79WW9t3i1v2YqbBAvbvNG5yaZBQVrsE9zin7gOVHV/LGQrqMNO0NIkklR87kEzQva
-         RrV2zp1/8rAs3w4oQKARVU4e8OW6sCUoEPBCAid/K2K1UQFCUVOL0mMK8ibbwQpuh5E3
-         uJimYeQklfx0QlULYZV3Du2txo8h+ysYHGHwZSDUARC7cG+Ko/Z/DseSrt2WHHNUdbSK
-         dDZvUjJApSP3V1/z9rUGJM2OxCogWXHvpMy4ZfZXTeIFvOlCsJOiwhVPKX8AgJ3tZoJl
-         rYvkHlhikz8tOAP8bHhSkEURttJg9xM4D0akxUKhAHxRHv5cdeG/qM+w5qsIW/gWq/f5
-         k1OQ==
-X-Gm-Message-State: AOAM5304hJw+T8bv5EXcjlSgP+dgpbrAx15GnI8DnpQcOjny93abVAbR
-        hZawqpcIZtzLj0jWg9DATP0Exw==
-X-Google-Smtp-Source: ABdhPJyCXE5PAYmV/Pqax5PWeMAY55g83Ee0qTei1C+sDt8AQiPJZ5vQebCA0dDeBdfc9/c2E8yOhA==
-X-Received: by 2002:a17:90a:1b29:: with SMTP id q38mr18599692pjq.223.1608579711176;
-        Mon, 21 Dec 2020 11:41:51 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id 14sm15191115pfi.131.2020.12.21.11.41.50
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=REHRRpEqcqIxtzDgCEnLfnlCBNOPVwyGaF2sWG0peaw=;
+        b=WX/Cj8tLagua4Hl4K4gUUxE/VPVxJHTa4vPB/bIUY+c4Nh2L+HRnVuzLZnxhQucUzb
+         GIJ5CkGHdqJp7kp/yynzHjgT9dtOOAhLPFYDgV3IVcCRDAmJaN2Ipsv/2gNpz+9vtLPU
+         +Lu6XzhOlley/KLjpQyWqVMnz8Ro1hz6Clkhd/jWtuzYVV66+5UHRvkorVsM9V6pZ3Ms
+         5K/dGlxhczgdvuJvH1CjXf/2bEAvuEjwAQgP3tyd06uGntYfHtOaUWwh+6woVtSw0q83
+         S+plRabQp0+FRAzly1PCyxmtHdmjxjVo6etEeZ3LXhwyKH7cfJ4YFsGytRzkNvSv0Kpe
+         nAQg==
+X-Gm-Message-State: AOAM532AYWguduLASa3zx2FkQr7uK/Dfbk0o+Kyho4f453SJ4diimLnV
+        x6qxmST5r/ZNx3Muo/fYcNcOfOdZVvFP6g==
+X-Google-Smtp-Source: ABdhPJx6v9VyJ2Qck17brnwjDjndTtBIhNvf5t6aDkT7+bbFSUQiA4206Z/iyEWbbZazfWPw2X4OLQ==
+X-Received: by 2002:a50:c3c5:: with SMTP id i5mr17332512edf.166.1608580123766;
+        Mon, 21 Dec 2020 11:48:43 -0800 (PST)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id qp16sm9450347ejb.74.2020.12.21.11.48.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Dec 2020 11:41:50 -0800 (PST)
-Date:   Mon, 21 Dec 2020 11:41:44 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zdenek Kaspar <zkaspar82@gmail.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: Bad performance since 5.9-rc1
-Message-ID: <X+D6eJn92Vt6v+U1@google.com>
-References: <20201119040526.5263f557.zkaspar82@gmail.com>
- <20201201073537.6749e2d7.zkaspar82@gmail.com>
- <20201218203310.5025c17e.zkaspar82@gmail.com>
+        Mon, 21 Dec 2020 11:48:43 -0800 (PST)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: [PATCH v3] KVM/x86: Move definition of __ex to x86.h
+Date:   Mon, 21 Dec 2020 20:48:00 +0100
+Message-Id: <20201221194800.46962-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201218203310.5025c17e.zkaspar82@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 18, 2020, Zdenek Kaspar wrote:
-> > without: kvm: x86/mmu: Fix get_mmio_spte() on CPUs supporting 5-level
-> > PT I can run guest again, but with degraded performance as before.
-> > 
-> > Z.
-> 
-> With: KVM: x86/mmu: Bug fixes and cleanups in get_mmio_spte() series
+Merge __kvm_handle_fault_on_reboot with its sole user
+and move the definition of __ex to a common include to be
+shared between VMX and SVM.
 
-Apologies, I completely missed your bug report for the get_mmio_spte() bugs.
+v2: Rebase to the latest kvm/queue.
 
-> I can run guest again and performance is slightly better:
-> 
-> v5.8:        0m13.54s real     0m10.51s user     0m10.96s system
-> v5.9:        6m20.07s real    11m42.93s user     0m13.57s system
-> v5.10+fixes: 5m50.77s real    10m38.29s user     0m15.96s system
-> 
-> perf top from host when guest (openbsd) is compiling:
->   26.85%  [kernel]                  [k] queued_spin_lock_slowpath
->    8.49%  [kvm]                     [k] mmu_page_zap_pte
->    7.47%  [kvm]                     [k] __kvm_mmu_prepare_zap_page
->    3.61%  [kernel]                  [k] clear_page_rep
->    2.43%  [kernel]                  [k] page_counter_uncharge
->    2.30%  [kvm]                     [k] paging64_page_fault
->    2.03%  [kvm_intel]               [k] vmx_vcpu_run
->    2.02%  [kvm]                     [k] kvm_vcpu_gfn_to_memslot
->    1.95%  [kernel]                  [k] internal_get_user_pages_fast
->    1.64%  [kvm]                     [k] kvm_mmu_get_page
->    1.55%  [kernel]                  [k] page_counter_try_charge
->    1.33%  [kernel]                  [k] propagate_protected_usage
->    1.29%  [kvm]                     [k] kvm_arch_vcpu_ioctl_run
->    1.13%  [kernel]                  [k] get_page_from_freelist
->    1.01%  [kvm]                     [k] paging64_walk_addr_generic
->    0.83%  [kernel]                  [k] ___slab_alloc.constprop.0
->    0.83%  [kernel]                  [k] kmem_cache_free
->    0.82%  [kvm]                     [k] __pte_list_remove
->    0.77%  [kernel]                  [k] try_grab_compound_head
->    0.76%  [kvm_intel]               [k] 0x000000000001cfa0
->    0.74%  [kvm]                     [k] pte_list_add
+v3: Incorporate changes from review comments.
 
-Can you try running with this debug hack to understand what is causing KVM to
-zap shadow pages?  The expected behavior is that you'll get backtraces for the
-first five cases where KVM zaps valid shadow pages.  Compile tested only.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+---
+ arch/x86/include/asm/kvm_host.h | 25 -------------------------
+ arch/x86/kvm/svm/sev.c          |  2 --
+ arch/x86/kvm/svm/svm.c          |  2 --
+ arch/x86/kvm/vmx/vmx.c          |  4 +---
+ arch/x86/kvm/vmx/vmx_ops.h      |  4 +---
+ arch/x86/kvm/x86.h              | 24 ++++++++++++++++++++++++
+ 6 files changed, 26 insertions(+), 35 deletions(-)
 
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5dfe0ede0e81..c5da993ac753 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2404,6 +2404,8 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
-        }
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 39707e72b062..a78e4b1a5d77 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1634,31 +1634,6 @@ enum {
+ #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+ #define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
+ 
+-asmlinkage void kvm_spurious_fault(void);
+-
+-/*
+- * Hardware virtualization extension instructions may fault if a
+- * reboot turns off virtualization while processes are running.
+- * Usually after catching the fault we just panic; during reboot
+- * instead the instruction is ignored.
+- */
+-#define __kvm_handle_fault_on_reboot(insn)				\
+-	"666: \n\t"							\
+-	insn "\n\t"							\
+-	"jmp	668f \n\t"						\
+-	"667: \n\t"							\
+-	"1: \n\t"							\
+-	".pushsection .discard.instr_begin \n\t"			\
+-	".long 1b - . \n\t"						\
+-	".popsection \n\t"						\
+-	"call	kvm_spurious_fault \n\t"				\
+-	"1: \n\t"							\
+-	".pushsection .discard.instr_end \n\t"				\
+-	".long 1b - . \n\t"						\
+-	".popsection \n\t"						\
+-	"668: \n\t"							\
+-	_ASM_EXTABLE(666b, 667b)
+-
+ #define KVM_ARCH_WANT_MMU_NOTIFIER
+ int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
+ 			unsigned flags);
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index e57847ff8bd2..ba492b6d37a0 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -25,8 +25,6 @@
+ #include "cpuid.h"
+ #include "trace.h"
+ 
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
+-
+ static u8 sev_enc_bit;
+ static int sev_flush_asids(void);
+ static DECLARE_RWSEM(sev_deactivate_lock);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 941e5251e13f..733d9f98a121 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -42,8 +42,6 @@
+ 
+ #include "svm.h"
+ 
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
+-
+ MODULE_AUTHOR("Qumranet");
+ MODULE_LICENSE("GPL");
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 75c9c6a0a3a4..b82f2689f2d7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2320,9 +2320,7 @@ static void vmclear_local_loaded_vmcss(void)
  }
-
-+static unsigned long zapped_warns;
-+
- static unsigned long kvm_mmu_zap_oldest_mmu_pages(struct kvm *kvm,
-                                                  unsigned long nr_to_zap)
+ 
+ 
+-/* Just like cpu_vmxoff(), but with the __kvm_handle_fault_on_reboot()
+- * tricks.
+- */
++/* Just like cpu_vmxoff(), but with the fault handling. */
+ static void kvm_cpu_vmxoff(void)
  {
-@@ -2435,6 +2437,8 @@ static unsigned long kvm_mmu_zap_oldest_mmu_pages(struct kvm *kvm,
-                        goto restart;
-        }
-
-+       WARN_ON(total_zapped && zapped_warns++ < 5);
+ 	asm volatile (__ex("vmxoff"));
+diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+index 692b0c31c9c8..7e3cb53c413f 100644
+--- a/arch/x86/kvm/vmx/vmx_ops.h
++++ b/arch/x86/kvm/vmx/vmx_ops.h
+@@ -4,13 +4,11 @@
+ 
+ #include <linux/nospec.h>
+ 
+-#include <asm/kvm_host.h>
+ #include <asm/vmx.h>
+ 
+ #include "evmcs.h"
+ #include "vmcs.h"
+-
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
++#include "x86.h"
+ 
+ asmlinkage void vmread_error(unsigned long field, bool fault);
+ __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index c5ee0f5ce0f1..5b16d2b5c3bc 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -8,6 +8,30 @@
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+ 
++asmlinkage void kvm_spurious_fault(void);
 +
-        kvm_mmu_commit_zap_page(kvm, &invalid_list);
++/*
++ * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
++ *
++ * Hardware virtualization extension instructions may fault if a reboot turns
++ * off virtualization while processes are running.  Usually after catching the
++ * fault we just panic; during reboot instead the instruction is ignored.
++ */
++#define __ex(insn)							\
++	"666:	" insn "\n"						\
++	"	jmp 669f\n"						\
++	"667:\n"							\
++	"	.pushsection .discard.instr_begin\n"			\
++	"	.long 667b - .\n"					\
++	"	.popsection\n"						\
++	"	call kvm_spurious_fault\n"				\
++	"668:\n"							\
++	"	.pushsection .discard.instr_end\n"			\
++	"	.long 668b - .\n"					\
++	"	.popsection\n"						\
++	"669:\n"							\
++	_ASM_EXTABLE(666b, 667b)
++
+ #define KVM_DEFAULT_PLE_GAP		128
+ #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
+ #define KVM_DEFAULT_PLE_WINDOW_GROW	2
+-- 
+2.29.2
 
-        kvm->stat.mmu_recycled += total_zapped;
