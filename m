@@ -2,101 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D4482E0E3E
-	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 19:34:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06B2C2E0E45
+	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 19:38:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725975AbgLVSdh convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 22 Dec 2020 13:33:37 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:39114 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725783AbgLVSdg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Dec 2020 13:33:36 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-146-vieJhqoKNaGruMocbz4_3Q-1; Tue, 22 Dec 2020 18:31:54 +0000
-X-MC-Unique: vieJhqoKNaGruMocbz4_3Q-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Tue, 22 Dec 2020 18:31:53 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Tue, 22 Dec 2020 18:31:53 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Sean Christopherson' <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com" 
-        <syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com>
-Subject: RE: [PATCH] KVM: x86: fix shift out of bounds reported by UBSAN
-Thread-Topic: [PATCH] KVM: x86: fix shift out of bounds reported by UBSAN
-Thread-Index: AQHW2I5xB2shRGddbUGbA42w1f+MfqoDb1cg
-Date:   Tue, 22 Dec 2020 18:31:53 +0000
-Message-ID: <01b7c21e3a864c0cb89fd036ebe03ccf@AcuMS.aculab.com>
-References: <20201222102132.1920018-1-pbonzini@redhat.com>
- <X+I3SFzLGhEZIzEa@google.com>
-In-Reply-To: <X+I3SFzLGhEZIzEa@google.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        id S1726335AbgLVSio (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Dec 2020 13:38:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54577 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726261AbgLVSin (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Dec 2020 13:38:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608662237;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6KnUynINZvlhXu4rZ2TlOFkmFyLhwXfee/nZ1xxVsBU=;
+        b=cowNNl0Nq/95dMlC4HRZAiau6qqyD6UwOhPF8kSNZCUJ7uXUWHoXZsHn8TPyJB2ORfx7VH
+        tHwSqQ8qY4nU3zZn50rI4n6XneZDWYLUWRLX3Ksk8mngyYOE5z8NOlsU7wKf0GjZpgipYq
+        pabTAhXEj/np4sdicvxuuZzCfWwRwlg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-RGdxtGI_MfG43c_rpkKVSQ-1; Tue, 22 Dec 2020 13:37:14 -0500
+X-MC-Unique: RGdxtGI_MfG43c_rpkKVSQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4289ABBEE2;
+        Tue, 22 Dec 2020 18:37:12 +0000 (UTC)
+Received: from wainer-laptop.localdomain (ovpn-114-123.rdu2.redhat.com [10.10.114.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4549760BF1;
+        Tue, 22 Dec 2020 18:37:05 +0000 (UTC)
+Subject: Re: [PATCH 1/9] tests/docker: Add dockerfile for Alpine Linux
+To:     Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org
+Cc:     Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+        qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        qemu-block@nongnu.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>
+References: <20201221005318.11866-1-jiaxun.yang@flygoat.com>
+ <20201221005318.11866-2-jiaxun.yang@flygoat.com>
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <db01b083-6b48-3e88-f46f-22191927acf3@redhat.com>
+Date:   Tue, 22 Dec 2020 15:37:04 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+In-Reply-To: <20201221005318.11866-2-jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson
-> Sent: 22 December 2020 18:13
-> 
-> On Tue, Dec 22, 2020, Paolo Bonzini wrote:
-> > Since we know that e >= s, we can reassociate the left shift,
-> > changing the shifted number from 1 to 2 in exchange for
-> > decreasing the right hand side by 1.
-> 
-> I assume the edge case is that this ends up as `(1ULL << 64) - 1` and overflows
-> SHL's max shift count of 63 when s=0 and e=63?  If so, that should be called
-> out.  If it's something else entirely, then an explanation is definitely in
-> order.
-> 
-> > Reported-by: syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  arch/x86/kvm/mmu.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> > index 9c4a9c8e43d9..581925e476d6 100644
-> > --- a/arch/x86/kvm/mmu.h
-> > +++ b/arch/x86/kvm/mmu.h
-> > @@ -49,7 +49,7 @@ static inline u64 rsvd_bits(int s, int e)
-> >  	if (e < s)
-> >  		return 0;
-> 
-> Maybe add a commment?  Again assuming my guess about the edge case is on point.
-> 
-> 	/*
-> 	 * Use 2ULL to incorporate the necessary +1 in the shift; adding +1 in
-> 	 * the shift count will overflow SHL's max shift of 63 if s=0 and e=63.
-> 	 */
+Hi,
 
-A comment of the desired output value would be more use.
-I think it is:
-	return 'e-s' ones followed by 's' zeros without shifting by 64.
+On 12/20/20 9:53 PM, Jiaxun Yang wrote:
+> Alpine Linux[1] is a security-oriented, lightweight Linux distribution
+> based on musl libc and busybox.
+>
+> It it popular among Docker guests and embedded applications.
+>
+> Adding it to test against different libc.
+>
+> [1]: https://alpinelinux.org/
+>
+> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
+>   tests/docker/dockerfiles/alpine.docker | 56 ++++++++++++++++++++++++++
+>   1 file changed, 56 insertions(+)
+>   create mode 100644 tests/docker/dockerfiles/alpine.docker
 
-> > -	return ((1ULL << (e - s + 1)) - 1) << s;
-> > +	return ((2ULL << (e - s)) - 1) << s;
+Unless one passes `NOUSER=1` as an argument (e.g. `make NOUSER=1 
+docker-image-alpine`) then the image build is going to fail due to the 
+lack of useradd command on the base Alpine image. See the error below. 
+As a result do build inside the container will fail (e.g. `make 
+docker-test-build@alpine`). Apparently this issue can be solved by 
+installing the "shadow" package in the image.
 
-	David
+Without applying the patches 02-08 the build will fail on Alpine (tested 
+with `make docker-test-build@alpine`). Actually patch 08 did not apply 
+on master tree (error: patch failed: tests/migration/stress.c:174) so I 
+could not successfully build it in the container.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+I suggest that you move the patch 01 later on this series, just after 
+all build issues are fixed so that it can be built inside the container.
+
+---
+
+$ make docker-image-alpine
+   BUILD   alpine
+Trying to pull registry.gitlab.com/qemu-project/qemu/qemu/alpine...
+   manifest unknown: manifest unknown
+Error: unable to pull registry.gitlab.com/qemu-project/qemu/qemu/alpine: 
+Error initializing source 
+docker://registry.gitlab.com/qemu-project/qemu/qemu/alpine:latest: Error 
+reading manifest latest in 
+registry.gitlab.com/qemu-project/qemu/qemu/alpine: manifest unknown: 
+manifest unknown
+/bin/sh: useradd: not found
+Error: error building at STEP "RUN id wmoschet 2>/dev/null || useradd -u 
+1000 -U wmoschet": error while running runtime: exit status 127
+Traceback (most recent call last):
+   File "/home/wmoschet/src/qemu/tests/docker/docker.py", line 709, in 
+<module>
+     sys.exit(main())
+   File "/home/wmoschet/src/qemu/tests/docker/docker.py", line 705, in main
+     return args.cmdobj.run(args, argv)
+   File "/home/wmoschet/src/qemu/tests/docker/docker.py", line 498, in run
+     dkr.build_image(tag, docker_dir, dockerfile,
+   File "/home/wmoschet/src/qemu/tests/docker/docker.py", line 353, in 
+build_image
+     self._do_check(build_args,
+   File "/home/wmoschet/src/qemu/tests/docker/docker.py", line 244, in 
+_do_check
+     return subprocess.check_call(self._command + cmd, **kwargs)
+   File "/usr/lib64/python3.9/subprocess.py", line 373, in check_call
+     raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['podman', 'build', '-t', 
+'qemu/alpine', '-f', '/tmp/docker_build063jqidd/tmpn9zbbxzu.docker', 
+'--cache-from', 'registry.gitlab.com/qemu-project/qemu/qemu/alpine', 
+'/tmp/docker_build063jqidd']' returned non-zero exit status 125.
+make: *** [/home/wmoschet/src/qemu/tests/docker/Makefile.include:62: 
+docker-image-alpine] Error 1
+---
+
+>
+> diff --git a/tests/docker/dockerfiles/alpine.docker b/tests/docker/dockerfiles/alpine.docker
+> new file mode 100644
+> index 0000000000..a1b80f08d2
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/alpine.docker
+> @@ -0,0 +1,56 @@
+> +
+> +FROM alpine:edge
+> +
+> +RUN apk update
+> +RUN apk upgrade
+> +
+> +# Please keep this list sorted alphabetically
+> +ENV PACKAGES \
+> +	alsa-lib-dev \
+> +	bash \
+> +	bison \
+> +	build-base \
+> +	coreutils \
+> +	curl-dev \
+> +	flex \
+> +	git \
+> +	glib-dev \
+> +	glib-static \
+> +	gnutls-dev \
+> +	gtk+3.0-dev \
+> +	libaio-dev \
+> +	libcap-dev \
+> +	libcap-ng-dev \
+> +	libjpeg-turbo-dev \
+> +	libnfs-dev \
+> +	libpng-dev \
+> +	libseccomp-dev \
+> +	libssh-dev \
+> +	libusb-dev \
+> +	libxml2-dev \
+> +	linux-headers \
+> +	lzo-dev \
+> +	mesa-dev \
+> +	mesa-egl \
+> +	mesa-gbm \
+> +	meson \
+> +	ncurses-dev \
+> +	ninja \
+> +	paxmark \
+> +	perl \
+> +	pulseaudio-dev \
+> +	python3 \
+> +	py3-sphinx \
+> +	snappy-dev \
+
+To solve the problem I mentioned above:
+
+diff --git a/tests/docker/dockerfiles/alpine.docker 
+b/tests/docker/dockerfiles/alpine.docker
+index a1b80f08d2..5be5198d00 100644
+--- a/tests/docker/dockerfiles/alpine.docker
++++ b/tests/docker/dockerfiles/alpine.docker
+@@ -41,6 +41,7 @@ ENV PACKAGES \
+         pulseaudio-dev \
+         python3 \
+         py3-sphinx \
++       shadow \
+         snappy-dev \
+         spice-dev \
+         texinfo \
+
+> +	spice-dev \
+> +	texinfo \
+> +	usbredir-dev \
+> +	util-linux-dev \
+> +	vde2-dev \
+> +	virglrenderer-dev \
+> +	vte3-dev \
+> +	xfsprogs-dev \
+> +	zlib-dev \
+> +	zlib-static
+> +
+> +RUN apk add $PACKAGES
 
