@@ -2,153 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF4522E0F0A
-	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 20:44:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8D942E0FD4
+	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 22:28:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726123AbgLVTo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Dec 2020 14:44:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54056 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725782AbgLVToZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Dec 2020 14:44:25 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BMJVvIh141664;
-        Tue, 22 Dec 2020 14:43:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=y+KzYvhhDTpXyRtVD37q3AhfB0MloRIzL8zzigYVZqw=;
- b=lI92gLIPdfMi1tYiriETVR9y5HwSdbKPsmLwgEalQW6b2FEGbl7UAcltuXViwsOegUkD
- bdKbm2FWgVEGwLKftGGz9jfnVIZGwW7HZSHgoI/TXS9+2MhRT6KrE6lTgiJTmeC83k91
- Ue9y1EYgL/Hwx7bjWHLBYkl8CE2pEYjSKF5UfRCt+qZb98wah8uc38wNotPoH0AhTaY4
- uisYZmIfh29neHRlD26btrIrgupmWgsRkkC7pSKcwabVeVcW8tuzjUSaAlvp+9uUI6Vc
- Fo1ZsidGdYGv4mG8swIdFMngOHSWVToLPvL/uqTM8VibgjsrpGWYlsBDhDdAvKMlAXsk Yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35knyq206r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Dec 2020 14:43:43 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BMJWAuU142136;
-        Tue, 22 Dec 2020 14:43:42 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35knyq206d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Dec 2020 14:43:42 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BMJhLkE002424;
-        Tue, 22 Dec 2020 19:43:41 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 35ja5rs2y9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Dec 2020 19:43:40 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BMJhcsp30146816
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Dec 2020 19:43:38 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0C78852050;
-        Tue, 22 Dec 2020 19:43:38 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.4.181])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id 68C475204E;
-        Tue, 22 Dec 2020 19:43:37 +0000 (GMT)
-Date:   Tue, 22 Dec 2020 20:43:35 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, borntraeger@de.ibm.com,
-        kwankhede@nvidia.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH v4] s390/vfio-ap: clean up vfio_ap resources when KVM
- pointer invalidated
-Message-ID: <20201222204335.1b456342.pasic@linux.ibm.com>
-In-Reply-To: <20201222165706.66e0120d.cohuck@redhat.com>
-References: <20201221185625.24914-1-akrowiak@linux.ibm.com>
-        <20201222050521.46af2bf1.pasic@linux.ibm.com>
-        <853da84f-092b-6b94-62d5-628f440abc40@linux.ibm.com>
-        <20201222165706.66e0120d.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726991AbgLVV1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Dec 2020 16:27:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47522 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726540AbgLVV1a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Dec 2020 16:27:30 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED438C0613D3
+        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 13:26:49 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id b9so20172015ejy.0
+        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 13:26:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Pb3fDswk6YSg+H//M9stnTo9YFgK32WUyn6PMLNAiis=;
+        b=R6YlMvBo0W/qPzVHT7LzFRvJVNaJsVEDwoDb6ikny2SUNCvLiyr9wgt/hsbl3lPRut
+         DM5QTMB0/DmLnycpDgKrVvYS4e1CvZAMxVANKk0ORDHND1G8zxsu8Y48yfF/ovuvCaFe
+         80IZcG/qeEnUIuVdwbO7XwS3WgYxeGghGB/54P3A1kwrDvUKLd9ca55v0+u1yaXycjr9
+         D++BEWggaVZDbhGjjptHj52E+w8bBqTc2Dl/b2RHppcFtCEwOS/F0Cor/aMs1mYLr5u0
+         cD4uLML7OHjunK+kCkkBlAd/mpGURISwj/gZ29CnZ1G6J9tWfLZG+6UG8gZ2yIXvkhiv
+         wfqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Pb3fDswk6YSg+H//M9stnTo9YFgK32WUyn6PMLNAiis=;
+        b=XtqfRlDKdTef4z2DUtRmwIZnhRUF/Q3LiWuX7RhFavtpTBMCstvvzlnXhHXxEQ0XxQ
+         iM43SK8V2yx6myeJrNZB8/xs4zSHT2wTVp27dejkbNO3dCUNjrZFunhSErG8cn3U67oP
+         ZOZGrQ1m7pAZTWemoWWPpEkmIMWxHlJbZ79q8ZtzUgiHm+LV4YJnqc4+hcH8sdLbVxkm
+         qSiK85jcfRCEXWeJVPlHUd8ZIWad3LA9D26lAfzxe6LK8yvHPeQBK4b6lUUem9icGFxG
+         0J2717iWEvFYbdlPfTZKWPpVpr9aUGXUqVfsMfm6+uF+BmddkOjyB/GDghP651bvL1km
+         NzGQ==
+X-Gm-Message-State: AOAM533woKRnePkbU/GkD05gRfO7SX5ToiPMVXGvLIPwKyqZdkLciqiU
+        Jrt6y5f3yDYgRNAfG08Z9jc=
+X-Google-Smtp-Source: ABdhPJycdl6ZD9l87f47xEv78ZOKa9AXgjF5D1TzB9LMdo3lx70cfHfbv29XUHaNME2MzXGRwN4rww==
+X-Received: by 2002:a17:906:254b:: with SMTP id j11mr21514626ejb.326.1608672408626;
+        Tue, 22 Dec 2020 13:26:48 -0800 (PST)
+Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
+        by smtp.gmail.com with ESMTPSA id dh19sm21592706edb.78.2020.12.22.13.26.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Dec 2020 13:26:48 -0800 (PST)
+Date:   Tue, 22 Dec 2020 22:26:45 +0100
+From:   Zdenek Kaspar <zkaspar82@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: Bad performance since 5.9-rc1
+Message-ID: <20201222222645.0d8e96b2.zkaspar82@gmail.com>
+In-Reply-To: <X+In2zIA40Ku19cM@google.com>
+References: <20201119040526.5263f557.zkaspar82@gmail.com>
+        <20201201073537.6749e2d7.zkaspar82@gmail.com>
+        <20201218203310.5025c17e.zkaspar82@gmail.com>
+        <X+D6eJn92Vt6v+U1@google.com>
+        <20201221221339.030684c4.zkaspar82@gmail.com>
+        <X+In2zIA40Ku19cM@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-22_10:2020-12-21,2020-12-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 phishscore=0 mlxlogscore=999 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012220138
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Dec 2020 16:57:06 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Tue, 22 Dec 2020 09:07:39 -0800
+Sean Christopherson <seanjc@google.com> wrote:
 
-> On Tue, 22 Dec 2020 10:37:01 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> On Mon, Dec 21, 2020, Zdenek Kaspar wrote:
+> > [  179.364305] WARNING: CPU: 0 PID: 369 at
+> > kvm_mmu_zap_oldest_mmu_pages+0xd1/0xe0 [kvm] [  179.365415] Call
+> > Trace: [  179.365443]  paging64_page_fault+0x244/0x8e0 [kvm]
 > 
-> > On 12/21/20 11:05 PM, Halil Pasic wrote:  
-> > > On Mon, 21 Dec 2020 13:56:25 -0500
-> > > Tony Krowiak <akrowiak@linux.ibm.com> wrote:  
+> This means the shadow page zapping is occuring because KVM is hitting
+> the max number of allowed MMU shadow pages.  Can you provide your
+> QEMU command line?  I can reproduce the performance degredation, but
+> only by deliberately overriding the max number of MMU pages via
+> `-machine kvm-shadow-mem` to be an absurdly low value.
 > 
-> > >>   static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
-> > >>   				       unsigned long action, void *data)
-> > >>   {
-> > >> -	int ret;
-> > >> +	int ret, notify_rc = NOTIFY_DONE;
-> > >>   	struct ap_matrix_mdev *matrix_mdev;
-> > >>   
-> > >>   	if (action != VFIO_GROUP_NOTIFY_SET_KVM)
-> > >>   		return NOTIFY_OK;
-> > >>   
-> > >>   	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
-> > >> +	mutex_lock(&matrix_dev->lock);
-> > >>   
-> > >>   	if (!data) {
-> > >> -		matrix_mdev->kvm = NULL;
-> > >> -		return NOTIFY_OK;
-> > >> +		if (matrix_mdev->kvm)
-> > >> +			vfio_ap_mdev_unset_kvm(matrix_mdev);
-> > >> +		notify_rc = NOTIFY_OK;
-> > >> +		goto notify_done;
-> > >>   	}
-> > >>   
-> > >>   	ret = vfio_ap_mdev_set_kvm(matrix_mdev, data);
-> > >>   	if (ret)
-> > >> -		return NOTIFY_DONE;
-> > >> +		goto notify_done;
-> > >>   
-> > >>   	/* If there is no CRYCB pointer, then we can't copy the masks */
-> > >>   	if (!matrix_mdev->kvm->arch.crypto.crycbd)
-> > >> -		return NOTIFY_DONE;
-> > >> +		goto notify_done;
-> > >>   
-> > >>   	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
-> > >>   				  matrix_mdev->matrix.aqm,
-> > >>   				  matrix_mdev->matrix.adm);
-> > >>   
-> > >> -	return NOTIFY_OK;    
-> > > Shouldn't there be an
-> > >   +	notify_rc = NOTIFY_OK;
-> > > here? I mean you initialize notify_rc to NOTIFY_DONE, in the !data branch
-> > > on success you set notify_rc to NOTIFY_OK, but in the !!data branch it
-> > > just stays NOTIFY_DONE. Or am I missing something?    
-> > 
-> > I don't think it matters much since NOTIFY_OK and NOTIFY_DONE have
-> > no further effect on processing of the notification queue, but I believe
-> > you are correct, this is a change from what we originally had. I can
-> > restore the original return values if you'd prefer.  
-> 
-> Even if they have the same semantics now, that might change in the
-> future; restoring the original behaviour looks like the right thing to
-> do.
+> > [  179.365596]  kvm_mmu_page_fault+0x376/0x550 [kvm]
+> > [  179.365725]  kvm_arch_vcpu_ioctl_run+0xbaf/0x18f0 [kvm]
+> > [  179.365772]  kvm_vcpu_ioctl+0x203/0x520 [kvm]
+> > [  179.365938]  __x64_sys_ioctl+0x338/0x720
+> > [  179.365992]  do_syscall_64+0x33/0x40
+> > [  179.366013]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
-I agree. Especially since we do care to preserve the behavior in
-the !data branch. If there is no difference between the two, then it
-would probably make sense to clean that up globally. 
+It's one long line, added "\" for mail readability:
 
-Regards,
-Halil
+qemu-system-x86_64 -machine type=q35,accel=kvm            \
+-cpu host,host-cache-info=on -smp cpus=2,cores=2          \
+-m size=1024 -global virtio-pci.disable-legacy=on         \
+-global virtio-pci.disable-modern=off                     \
+-device virtio-balloon                                    \
+-device virtio-net,netdev=tap-build,mac=DE:AD:BE:EF:00:80 \
+-object rng-random,filename=/dev/urandom,id=rng0          \
+-device virtio-rng,rng=rng0                               \
+-name build,process=qemu-build                            \
+-drive file=/mnt/data/export/unix/kvm/build/openbsd-amd64.img,if=virtio,cache=none,format=raw,aio=native \
+-netdev type=tap,id=tap-build,vhost=on                    \
+-serial none                                              \
+-parallel none                                            \
+-monitor unix:/dev/shm/kvm-build.sock,server,nowait       \
+-enable-kvm -daemonize -runas qemu
+
+Z.
