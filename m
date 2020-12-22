@@ -2,184 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C43062E0D24
-	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 17:17:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 861262E0D31
+	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 17:23:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727317AbgLVQPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Dec 2020 11:15:34 -0500
-Received: from mail-eopbgr700054.outbound.protection.outlook.com ([40.107.70.54]:56513
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727040AbgLVQPd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Dec 2020 11:15:33 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PE2TEbTAljI7PknU7OuNdYIUBdEYDm5fN8c3BP2on9EQjWg7T9DPryypfZG1rh5bLw6dWpaUXP5RPqESU3iQxqXIr0QxWmGNDrwyV2S6J6lr9PTUuIc1jWbnBagxMKsuDkX4hGqkcGTSle3qGYm6OjoF8z95yvfGC0jbfueZl6eaFrscMdZINtNrmi7qDIUbPSKFwogR7zkDvxnx0DXQW4t050Hb0SyIafwhSg0NDNeoU9UV+rB6BuAzVcktMly0C58Oxci8Dil4AsgQDp/UD83IGDCmQpv/bsyMhboI/jstn2MuyIjFEebWAtNa3BvfzcAiczuu3bdStGtnrnVBqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4h89+PAemGRpFfPNz31gQ1zlrmXfOn+kJbczcYQlocw=;
- b=PfEAqgcEBEQ+4d0+XZi10MuE27Vl96P0uEQ0rO+1lTgt+3OIcVSvY9MvWrrJiyrLk7bA560Rj91Lgw1hSeexFvJZND8IE6/eqA8mM9aiA3hRRo8TNkz+enmOsGNvNxGRwSVdXR9EewptWKU0mfSzT8P3JlBt+GjU0E2Zg7y3fqugmTKW3aA+Xvf/cNG0N7PG7ycv05ML8kT8f/DbXUTY5r5S9sAhjauwqyotMT2Mi+0Jr5ebgrDmvLpveNXPeFnTXYP1TCQpam9+CSOgjxYkMQUGp0/kMW/47VwNB5nJIDh51LEqGd64Td7CUpqUrGUfQozIRa2imG0UqebRLwcJNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4h89+PAemGRpFfPNz31gQ1zlrmXfOn+kJbczcYQlocw=;
- b=En6vMrdlcDAOxAnwgkD4kYeAwC0C/BakQ7ThFxIJA4cI5pX28GHZV1GqG7j9HYs+s5tkpjByYLMgYh1PGMF99gWECV1e+wWaJvUIjzcfm0/iwmpY1o8dH5H3EYmmOpny6PbpB1gC7PArmZiDOQ7AD+zxDoE0CinSrwJbSYRDrco=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2383.namprd12.prod.outlook.com (2603:10b6:802:26::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3700.27; Tue, 22 Dec
- 2020 16:14:44 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff%5]) with mapi id 15.20.3676.033; Tue, 22 Dec 2020
- 16:14:44 +0000
-From:   Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH 1/2] x86/cpufeatures: Add the Virtual SPEC_CTRL feature
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        kyung.min.park@intel.com, LKML <linux-kernel@vger.kernel.org>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, mgross@linux.intel.com,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kim.phillips@amd.com,
-        wei.huang2@amd.com
-References: <160738054169.28590.5171339079028237631.stgit@bmoger-ubuntu>
- <160738067105.28590.10158084163761735153.stgit@bmoger-ubuntu>
- <CALMp9eTk6B2832EN8EhL51m8UqmHLTfeOjdKs8TvFSSAUxGk2Q@mail.gmail.com>
- <2e929c9a-9da9-e7da-9fd4-8e0ea2163a19@amd.com>
- <CALMp9eRzYoVqr0zm60+pkJbGF+t0ry8k7y=X=R1paDhUUPSVCw@mail.gmail.com>
-Message-ID: <00fdc56a-5ac4-94a0-88b4-42e4cf46f083@amd.com>
-Date:   Tue, 22 Dec 2020 10:14:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <CALMp9eRzYoVqr0zm60+pkJbGF+t0ry8k7y=X=R1paDhUUPSVCw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA9PR13CA0203.namprd13.prod.outlook.com
- (2603:10b6:806:26::28) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+        id S1727852AbgLVQUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Dec 2020 11:20:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55846 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727647AbgLVQUB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Dec 2020 11:20:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608653914;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0adDvpYzZ1D1MwcZ49w9Z8ut6Q9/rh85w+C8lZNsCPc=;
+        b=cFFK5aKOQj/kjVOQyPJOPYcLIRv6wBox4bMjcKZRMUjBZ8740M/Frz3Ra76ZIyBG9nY48L
+        udx2+Z4VBmlbgIp+VWbZtZZOacZMWCAOzhFsRhoKynY3wHalKfBlpcBRHTbjDH1gtBgDv0
+        E8A2Rjvyu1CQEq4DPAvx2T+MtvodFkc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-q-NVYfT0N4aLjtaf6lGzWQ-1; Tue, 22 Dec 2020 11:18:32 -0500
+X-MC-Unique: q-NVYfT0N4aLjtaf6lGzWQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C78068145E0;
+        Tue, 22 Dec 2020 16:18:30 +0000 (UTC)
+Received: from gondolin (ovpn-113-192.ams2.redhat.com [10.36.113.192])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7983A5E1A8;
+        Tue, 22 Dec 2020 16:18:25 +0000 (UTC)
+Date:   Tue, 22 Dec 2020 17:18:22 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC 0/4] vfio-pci/zdev: Fixing s390 vfio-pci ISM support
+Message-ID: <20201222171822.2d9b5962.cohuck@redhat.com>
+In-Reply-To: <f9f312d8-1948-d5b8-22fe-82f1975c8a18@linux.ibm.com>
+References: <1607545670-1557-1-git-send-email-mjrosato@linux.ibm.com>
+        <20201210133306.70d1a556.cohuck@redhat.com>
+        <ce9d4ef2-2629-59b7-99ed-4c8212cb004f@linux.ibm.com>
+        <20201211153501.7767a603.cohuck@redhat.com>
+        <6c9528f3-f012-ba15-1d68-7caefb942356@linux.ibm.com>
+        <a974c5cc-fc42-7bf0-66a6-df095da7105f@linux.ibm.com>
+        <20201217135919.46d5c43f.cohuck@redhat.com>
+        <f9f312d8-1948-d5b8-22fe-82f1975c8a18@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.136] (165.204.77.1) by SA9PR13CA0203.namprd13.prod.outlook.com (2603:10b6:806:26::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3700.22 via Frontend Transport; Tue, 22 Dec 2020 16:14:43 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 96a1fd05-6071-477d-42d0-08d8a694b22d
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2383:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2383D8561091ED871EC4273095DF0@SN1PR12MB2383.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jO7GqdvXEYlCHCpF1/1ivjjyrUshnOWUwSxKBnDK37Tp9IlSaw9PSyw9AR1wWrxpYlxVc/z2O1k2rUYe/RjTu2p2Y/vSXzNjlkjSOOl0kgTOATU2x64hPiZwkPsrA6ObmdzVoXmv3DKyrd4VFnaLjjg+ge/GEx33l3Men5LcQyXTNb0lMaQ5fBEP+hdfiPpal8bvI/LkPDIubfs2uvF9Sty5Zic8sunIM2plPWuoD1aPb/4EC54lSKVuuetNX6XZlmQySlMIW6LboX5CifE5PXj5wtvPODDdoj7+CPQ2x572EDdluEQMwK1XmjKXgj5huMDTVw7RCxZAKJaZRn6BHWU4F+UC7Dy5LAvY7ZhqtnOXAZrZ4pZjkZ6BIBAd2C1B5OrsafSvingzLXbPjdQjWnEB3wLKZFlKROz4EsdZ1ZrJsJNSk7rHdI4kyCup0PUWZyfzKo9KnZanCflSy69MTjxQfuUyye4P+dfZbU5suZI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(53546011)(7416002)(86362001)(31696002)(66556008)(66476007)(66946007)(4326008)(8936002)(6916009)(36756003)(316002)(16576012)(31686004)(54906003)(2906002)(52116002)(478600001)(6486002)(26005)(5660300002)(44832011)(186003)(16526019)(8676002)(2616005)(956004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?TG4vQ0hVc1hlaGtGWU1OMUJIdWh1QmprZCs5YnduTmpUTVdLZ3g2TlZla0w0?=
- =?utf-8?B?K3BMaGp0aWxmb2xEanRhdXFmZGpmcHd6K09BSmpvNlFpbUd1VkJuVnBjbjRP?=
- =?utf-8?B?bVBNNGQ2RDNOWSt1ZzNHUVc2VTRIK2ZBWWY4cnBPa1B3RU0xVHcvdS9jR1dL?=
- =?utf-8?B?L0Q0WmdYYVZueVJmUklGa0QzS0dTaTkwOG1EZy8yTkh4K0doa3BBWk54L3Nr?=
- =?utf-8?B?THdzZDMzdDJ5TlhYV3FhY3hxMDdjczYxOTVXWkR5UHF3K3R5UVhvQUg3RE8y?=
- =?utf-8?B?Y1o1aUlmUHp3OWRFamRzU3YzRCtrTkVLYk1ScitvTXorNmhoM2VudXBWQTZt?=
- =?utf-8?B?c2lEMU1COVV3czBqMXJycVFiZEdCNHRTaHJxMWF1cnRkL1VNWHc1bElvTE1l?=
- =?utf-8?B?Y2Z4TlRjS2FkOE9TRGp3aDlLVkxxWFBYU1NLOFk4TEtCVTdaRzhOblpKQjE2?=
- =?utf-8?B?aE0yTXgyT3JJNHM5N29pMjI3OXBpWnN1SjIzV3AzQlNiQjhVZkwxMVh4cDFO?=
- =?utf-8?B?dlRKL01hNXU0WmpWZWliNTB6SWJjQUx0Z016RncrZmR5WEhESVpWRmJjcUJN?=
- =?utf-8?B?UkpYQlRXeVdmd2xJaUQ3RkhLREFQc3lyTm9OeEZ1Y2xXQWxrUmxuVlc0WGpo?=
- =?utf-8?B?MWoxRTNWUFRMalVKQVNVaFo2R3pMMHJaa2p5OFBCeUo0VW9PMTdoWk43V011?=
- =?utf-8?B?RktEZ0hSdXRYK1JDcFhrK1hzVC9CWThyNlBFUlh5SHdpc3dnbGVpdjhZQkZK?=
- =?utf-8?B?UHY2S1FseTlzd0Y3NEJSUGpEL0orbEd5dVBBR3E0UW5EMGUwSUNPaS9YZE9p?=
- =?utf-8?B?T0RNaW5UaGQ3UEZSeS93bmJ1clV2b0duaEVFR200bkRQOFpyZW53WThDbXV3?=
- =?utf-8?B?ZzBoa2cxTWtFQUJOZVowZGlneHRZc0FMSjVka1lodHFkTnMwamFjZktHZS9G?=
- =?utf-8?B?aFYwVXE2bGE3UE5XMXJ3akVEOUVZVkhmNWsrbDBPaHhJVGVtNWtOTGdIbVdE?=
- =?utf-8?B?YTV3NHFIbm15UEtIS29Jay8vcGFjdzArSFlNM3dMNVVvMCt4cmRvc1piMkFj?=
- =?utf-8?B?SXl0Y0N2Um5Qb20rNDRjT3dyc0VVMUN0dHFZeW95Szl1MmUrTzlSZDRsU0V0?=
- =?utf-8?B?S0gzei83elhmbnVzejQvS0Rxcm4vQ1JmbDMrYlB6eW1HRmc4TWVzQUtLWXpp?=
- =?utf-8?B?STVibXJHZDBzanF2Q242MVd5ZEpVaUQ1ZUorM3ZpUml1WDFvdzBpQjloWU96?=
- =?utf-8?B?eHUzdXBYWU96bnRxcjZNZG5JSTNTOWthNmVOUzBpa2d0VWsyV2p1bUdJSkh3?=
- =?utf-8?Q?qCOluWEsHZ6EU=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Dec 2020 16:14:44.5957
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96a1fd05-6071-477d-42d0-08d8a694b22d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nKz8N6FruDGKnW0WAN08Di9LnMhGy9uPJZWdWJt2SdoUOu4g45lVROfVVfbbJwFk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2383
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 17 Dec 2020 11:04:48 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
+> On 12/17/20 7:59 AM, Cornelia Huck wrote:
+> > The basic question I have is whether it makes sense to specialcase the
+> > ISM device (can we even find out that we're dealing with an ISM device
+> > here?) to force the non-MIO instructions, as it is just a device with =
+=20
+>=20
+> Yes, with the addition of the CLP data passed from the host via vfio=20
+> capabilities, we can tell this is an ISM device specifically via the=20
+> 'pft' field in VFOI_DEVICE_INFO_CAP_ZPCI_BASE.  We don't actually=20
+> surface that field to the guest itself in the Q PCI FN clp rsponse (has=20
+> to do with Function Measurement Block requirements) but we can certainly=
+=20
+> use that information in QEMU to restrict this behavior to only ISM device=
+s.
+>=20
+> > some special requirements, or tie non-MIO to relaxed alignment. (Could
+> > relaxed alignment devices in theory be served by MIO instructions as
+> > well?) =20
+>=20
+> In practice, I think there are none today, but per the architecture it=20
+> IS possible to have relaxed alignment devices served by MIO=20
+> instructions, so we shouldn't rely on that bit alone as I'm doing in=20
+> this RFC.  I think instead relying on the pft value as I mention above=20
+> is what we have to do.
 
-On 12/9/20 5:11 PM, Jim Mattson wrote:
-> On Wed, Dec 9, 2020 at 2:39 PM Babu Moger <babu.moger@amd.com> wrote:
->>
->>
->>
->> On 12/7/20 5:22 PM, Jim Mattson wrote:
->>> On Mon, Dec 7, 2020 at 2:38 PM Babu Moger <babu.moger@amd.com> wrote:
->>>>
->>>> Newer AMD processors have a feature to virtualize the use of the SPEC_CTRL
->>>> MSR. This feature is identified via CPUID 0x8000000A_EDX[20]. When present,
->>>> the SPEC_CTRL MSR is automatically virtualized and no longer requires
->>>> hypervisor intervention.
->>>>
->>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
->>>> ---
->>>>  arch/x86/include/asm/cpufeatures.h |    1 +
->>>>  1 file changed, 1 insertion(+)
->>>>
->>>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
->>>> index dad350d42ecf..d649ac5ed7c7 100644
->>>> --- a/arch/x86/include/asm/cpufeatures.h
->>>> +++ b/arch/x86/include/asm/cpufeatures.h
->>>> @@ -335,6 +335,7 @@
->>>>  #define X86_FEATURE_AVIC               (15*32+13) /* Virtual Interrupt Controller */
->>>>  #define X86_FEATURE_V_VMSAVE_VMLOAD    (15*32+15) /* Virtual VMSAVE VMLOAD */
->>>>  #define X86_FEATURE_VGIF               (15*32+16) /* Virtual GIF */
->>>> +#define X86_FEATURE_V_SPEC_CTRL                (15*32+20) /* Virtual SPEC_CTRL */
->>>
->>> Shouldn't this bit be reported by KVM_GET_SUPPORTED_CPUID when it's
->>> enumerated on the host?
->>
->> Jim, I am not sure if this needs to be reported by
->> KVM_GET_SUPPORTED_CPUID. I dont see V_VMSAVE_VMLOAD or VGIF being reported
->> via KVM_GET_SUPPORTED_CPUID. Do you see the need for that?
-> 
-> Every little bit helps. No, it isn't *needed*. But then again, this
-> entire patchset isn't *needed*, is it?
-> 
+=46rom what you write this looks like the best way to me as well.
 
-Working on v2 of these patches. Saw this code comment(in
-arch/x86/kvm/cpuid.c) on about exposing SVM features to the guest.
+>=20
+> >=20
+> > Another thing that came to my mind is whether we consider the guest to
+> > be using a pci device and needing weird instructions to do that because
+> > it's on s390, or whether it is issuing instructions for a device that
+> > happens to be a pci device (sorry if that sounds a bit meta :)
+> >  =20
+>=20
+> Typically, I'd classify things as the former but I think ISM seems more=20
+> like the latter -- To me, ISM seems like less a classic PCI device and=20
+> more a device that happens to be using s390 PCI interfaces to accomplish=
+=20
+> its goal.  But it's probably more of a case of this particular device=20
+> (and it's driver) are s390-specific and therefore built with the unique=20
+> s390 interface in-mind (and in fact invokes it directly rather than=20
+> through the general PCI layer), rather than fitting the typical PCI=20
+> device architecture on top of the s390 interface.
 
+Nod, it certainly feels like that.
 
-        /*
-         * Hide all SVM features by default, SVM will set the cap bits for
-         * features it emulates and/or exposes for L1.
-         */
-        kvm_cpu_cap_mask(CPUID_8000_000A_EDX, 0);
-
-
-Should we go ahead with the changes here?
-
-Thanks
-Babu
