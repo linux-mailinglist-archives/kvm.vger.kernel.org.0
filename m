@@ -2,166 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 411722E053A
-	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 05:06:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C6AC2E0740
+	for <lists+kvm@lfdr.de>; Tue, 22 Dec 2020 09:37:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725883AbgLVEGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Dec 2020 23:06:12 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30720 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725850AbgLVEGL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Dec 2020 23:06:11 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BM42l9c089894;
-        Mon, 21 Dec 2020 23:05:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=DeTNwgybqVw97C4oNA36gGo6Ss+jL03FUh0IHNhc/vg=;
- b=l0u5RnbWX2cii3EYk3iFQ3OdSOs1xhXdicJXkj4SuxskkGFixLaZO/ODlvF0LhKkZJad
- bf7IW5bfaFdhUAsZDc8S1Q/5Y2x+aDFIqDFUtkS8O2HoUzQoUabqTe58uWOXC3XRtBmY
- FvTzCP/7ePxCufW9RN8mU3pci7H+EOe3TP25IWuRfRcN06dTHHAfTvqOAXh+PSmdWZLF
- EB9XuvPq5SuRaUdz7Rlp89+EMhHg/ylHr8PSkdabPVeUAE81MAVDFvzPPLbWWMBM5HiU
- rt7b/lyHveGuvB0q0dkTdDzxvyEulwS/rFaPt6EUxP4c5DDijd0ZCg0mwJDvyPA628w0 7Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35k8r9grkm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Dec 2020 23:05:28 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BM43GkB093502;
-        Mon, 21 Dec 2020 23:05:28 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35k8r9grjt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Dec 2020 23:05:28 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BM3wTlZ005600;
-        Tue, 22 Dec 2020 04:05:26 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 35h8sh2ned-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Dec 2020 04:05:26 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BM45Ngh50397654
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Dec 2020 04:05:23 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 93C7F5204E;
-        Tue, 22 Dec 2020 04:05:23 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.5.180])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id 0043B5204F;
-        Tue, 22 Dec 2020 04:05:22 +0000 (GMT)
-Date:   Tue, 22 Dec 2020 05:05:21 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH v4] s390/vfio-ap: clean up vfio_ap resources when KVM
- pointer invalidated
-Message-ID: <20201222050521.46af2bf1.pasic@linux.ibm.com>
-In-Reply-To: <20201221185625.24914-1-akrowiak@linux.ibm.com>
-References: <20201221185625.24914-1-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726103AbgLVIg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Dec 2020 03:36:57 -0500
+Received: from mail-il1-f199.google.com ([209.85.166.199]:50804 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725300AbgLVIg5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Dec 2020 03:36:57 -0500
+Received: by mail-il1-f199.google.com with SMTP id t8so11197934ils.17
+        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 00:36:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=6myWaa8K9xi7b8Wgl0oK5a7b+azrf32/eUO0QSEaWnw=;
+        b=pC0R89/pV8sd9GGFk0LNublnOZbU/+5KtkQ8DEtijqgjzKUo61tXUvqGDVbiFM6Mi5
+         uKBB8nmidfLEfAnLHFJEbewBx78ORS30DV4RlSQPA1H9JTFeVU+dTuPf1an7i56zWCT/
+         BfzUjiFyvjMlP2fBz/XV9ww7P3tC33zzCEHt73A2+MaKvnzuAZz6vu2r4lr3b3sMQpa1
+         RunrpgKw7mw1GQGdOTfuTrP4ChHzEIW4ZUC2WwUF84+iEAqd2dZPJzkQSDiCqR2USeLO
+         akM+GN/u/z9654gPTf4R81JFZqmfmwN4DKyempIBiw/7UAl+BVlBjUx+nhIByyG6E5KG
+         5Eiw==
+X-Gm-Message-State: AOAM532DnuI4kNN9mTB0yRQNn4DZ1lphAidVgLmpyg4b8gQboBCTUWjI
+        k7vOAOHfKZF9f5X1mQ1RG16lo/uEyCGRcy8cMYbK1N5t267C
+X-Google-Smtp-Source: ABdhPJw19rvJhuyRqPbLIQThv+MeiywSWq0qGCnFzM0se/RZMldtYABf1arArUipx8jI1HrZhjzhf2nLweWYWXsVQtDzGETbqANF
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-22_01:2020-12-21,2020-12-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
- mlxscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012220023
+X-Received: by 2002:a05:6e02:8aa:: with SMTP id a10mr8245101ilt.157.1608626176594;
+ Tue, 22 Dec 2020 00:36:16 -0800 (PST)
+Date:   Tue, 22 Dec 2020 00:36:16 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d5173d05b7097755@google.com>
+Subject: UBSAN: shift-out-of-bounds in kvm_vcpu_after_set_cpuid
+From:   syzbot <syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Dec 2020 13:56:25 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+Hello,
 
-> The vfio_ap device driver registers a group notifier with VFIO when the
-> file descriptor for a VFIO mediated device for a KVM guest is opened to
-> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
-> event). When the KVM pointer is set, the vfio_ap driver takes the
-> following actions:
-> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
->    of the mediated device.
-> 2. Calls the kvm_get_kvm() function to increment its reference counter.
-> 3. Sets the function pointer to the function that handles interception of
->    the instruction that enables/disables interrupt processing.
-> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
->    the guest.
-> 
-> In order to avoid memory leaks, when the notifier is called to receive
-> notification that the KVM pointer has been set to NULL, the vfio_ap device
-> driver should reverse the actions taken when the KVM pointer was set.
-> 
-> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+syzbot found the following issue on:
 
-[..]
+HEAD commit:    5e60366d Merge tag 'fallthrough-fixes-clang-5.11-rc1' of g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11c7046b500000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=db720fe37a6a41d8
+dashboard link: https://syzkaller.appspot.com/bug?extid=e87846c48bf72bc85311
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+userspace arch: i386
 
->  static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
->  				       unsigned long action, void *data)
->  {
-> -	int ret;
-> +	int ret, notify_rc = NOTIFY_DONE;
->  	struct ap_matrix_mdev *matrix_mdev;
->  
->  	if (action != VFIO_GROUP_NOTIFY_SET_KVM)
->  		return NOTIFY_OK;
->  
->  	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
-> +	mutex_lock(&matrix_dev->lock);
->  
->  	if (!data) {
-> -		matrix_mdev->kvm = NULL;
-> -		return NOTIFY_OK;
-> +		if (matrix_mdev->kvm)
-> +			vfio_ap_mdev_unset_kvm(matrix_mdev);
-> +		notify_rc = NOTIFY_OK;
-> +		goto notify_done;
->  	}
->  
->  	ret = vfio_ap_mdev_set_kvm(matrix_mdev, data);
->  	if (ret)
-> -		return NOTIFY_DONE;
-> +		goto notify_done;
->  
->  	/* If there is no CRYCB pointer, then we can't copy the masks */
->  	if (!matrix_mdev->kvm->arch.crypto.crycbd)
-> -		return NOTIFY_DONE;
-> +		goto notify_done;
->  
->  	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
->  				  matrix_mdev->matrix.aqm,
->  				  matrix_mdev->matrix.adm);
->  
-> -	return NOTIFY_OK;
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Shouldn't there be an 
- +	notify_rc = NOTIFY_OK;
-here? I mean you initialize notify_rc to NOTIFY_DONE, in the !data branch
-on success you set notify_rc to NOTIFY_OK, but in the !!data branch it
-just stays NOTIFY_DONE. Or am I missing something?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com
 
-Otherwise LGTM!
+================================================================================
+UBSAN: shift-out-of-bounds in arch/x86/kvm/mmu.h:52:16
+shift exponent 64 is too large for 64-bit type 'long long unsigned int'
+CPU: 1 PID: 11156 Comm: syz-executor.1 Not tainted 5.10.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x107/0x163 lib/dump_stack.c:120
+ ubsan_epilogue+0xb/0x5a lib/ubsan.c:148
+ __ubsan_handle_shift_out_of_bounds.cold+0xb1/0x181 lib/ubsan.c:395
+ rsvd_bits arch/x86/kvm/mmu.h:52 [inline]
+ kvm_vcpu_after_set_cpuid.cold+0x35/0x3a arch/x86/kvm/cpuid.c:181
+ kvm_vcpu_ioctl_set_cpuid+0x28e/0x970 arch/x86/kvm/cpuid.c:273
+ kvm_arch_vcpu_ioctl+0x1091/0x2d70 arch/x86/kvm/x86.c:4699
+ kvm_vcpu_ioctl+0x7b9/0xdb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3386
+ kvm_vcpu_compat_ioctl+0x1a2/0x340 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3430
+ __do_compat_sys_ioctl+0x1d3/0x230 fs/ioctl.c:842
+ do_syscall_32_irqs_on arch/x86/entry/common.c:78 [inline]
+ __do_fast_syscall_32+0x56/0x80 arch/x86/entry/common.c:137
+ do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:160
+ entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+RIP: 0023:0xf7fe8549
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 eb 0d 90 90 90 90 90 90 90 90 90 90 90 90
+RSP: 002b:00000000f55e20cc EFLAGS: 00000296 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 000000004008ae8a
+RDX: 00000000200000c0 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+================================================================================
 
-Regards,
-Halil
 
-> +notify_done:
-> +	mutex_unlock(&matrix_dev->lock);
-> +	return notify_rc;
->  }
-> 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-[..] 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
