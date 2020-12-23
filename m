@@ -2,90 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E2A72E1D69
-	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 15:22:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 829452E1D79
+	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 15:39:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727775AbgLWOVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Dec 2020 09:21:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33716 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726614AbgLWOVw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Dec 2020 09:21:52 -0500
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB12C061793
-        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 06:21:12 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id q22so23057492eja.2
-        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 06:21:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fO2qSmrlcvH/Mg353URhHC+az0KYy8E1wxQsqV9SPRQ=;
-        b=W2D1X7Mt84Nb5kPnZCeMlcV6/EJ1C1Kf72P5VIvq1kMLdhbP0M0papBa7+vYe8Wi15
-         NPFhxbIqrr0t2ILjWlPDIBukPf+/Tm8P0Qjg82ORwp2ZDQ8kPKOOqHV6YCk+z5HoQQR2
-         N/sOA8wASeeWRe+9qMULmc2wP5q8YrthdFPb1yAV9z7fpBgJ+t6sqMkYt1BLGseE6Y93
-         WaBOyDYrQ0hCPgaVTBoTSiBOFYk2/A4CbS7rh517lN4Df+DtboPsZNaI8UW09LWwapvl
-         TqgC9nhiFXq80Wci02GtFXgyiKs0OkkjlcnKMXffPq68JG/1AH9qixjYGvtbrzeX0dKA
-         ophA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fO2qSmrlcvH/Mg353URhHC+az0KYy8E1wxQsqV9SPRQ=;
-        b=ZDKyNRWg43opQYaZfayZNdVVirOmM0Ru5oiCtQ8qTwb6ffBDipeditXMqvKgf/cnh1
-         chu0Eb5pfH4idID6FTI0cSeboUGgWy90ApRnE5zQGCZASf+bDNsdoUe1d3mF2gsWJ03T
-         JwBp7kRyvZUcDmj3bV5sZVYawt5Ho/Wu6bRmzCIYOJLhoURSMK9+sZlRA0Qhy7MX7h3Y
-         Wwtcg1pOyNwygAwsdqj/REyOdOlp/PV04idrQZB2vqOiBBJlRk1NdX9scgLL3o3TmfwS
-         dfRlYc7gEn0yyr+WXdStA/cBPUNN4EXoQ1ti8NC8eyxoxgR1FZNMfOGP8ebt/v/XlS7Z
-         JdFw==
-X-Gm-Message-State: AOAM530Lm12vRYB8OgLkbp6GHORGZVYk2EiR1Iw6JFQHH7+k0kGt/YWk
-        rlkZ6lFGX927mLJOxXLU3eXwZ6JfP9A6MQzLnCqC
-X-Google-Smtp-Source: ABdhPJyDZ7RLosJL1uvsLWRc15zFRYf5SX9dmIgXydDgct+kDOAYD16d+yCEo6mFFoh8eoAMZ1hGPgz68c4IgfcSJZk=
-X-Received: by 2002:a17:906:d0c2:: with SMTP id bq2mr24108121ejb.1.1608733270934;
- Wed, 23 Dec 2020 06:21:10 -0800 (PST)
+        id S1727398AbgLWOiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Dec 2020 09:38:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44354 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727057AbgLWOiV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Dec 2020 09:38:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608734214;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dUU452tRqrvkfJMA+eezzExr3vkzl56EFOyXCB1EYnQ=;
+        b=a1b1xHrxsAMK8QHX84bbO0Rm/rugtYM5L0++KkLEWxnRJQGevMDsqaSJWlYUqSWyp5oQHO
+        b6TKsv7Azk50qmMcHT752t9abeCokTdGbGDt1NXd7ISr4xgKgT0Gxrf71HHHGaQn81Su3G
+        E9yXAwrs8xdj4YwstOQh5kjTxw+5uHE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462--u0xtbG2N-2sRj1vrceUuw-1; Wed, 23 Dec 2020 09:36:49 -0500
+X-MC-Unique: -u0xtbG2N-2sRj1vrceUuw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9091E180A097;
+        Wed, 23 Dec 2020 14:36:48 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-112-247.ams2.redhat.com [10.36.112.247])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 89294614F5;
+        Wed, 23 Dec 2020 14:36:39 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [PATCH v2] vhost/vsock: add IOTLB API support
+Date:   Wed, 23 Dec 2020 15:36:38 +0100
+Message-Id: <20201223143638.123417-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-References: <CACycT3vevQQ8cGK_ac-1oyCb9+YPSAhLMue=4J3=2HzXVK7XHw@mail.gmail.com>
- <20201223081324.GA21558@infradead.org>
-In-Reply-To: <20201223081324.GA21558@infradead.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 23 Dec 2020 22:21:00 +0800
-Message-ID: <CACycT3u=1bBWzAN0w-cNxF7DPjsLw=s=kFVfCnMUCtk0vj81-A@mail.gmail.com>
-Subject: Re: [External] Re: [RFC v2 01/13] mm: export zap_page_range() for
- driver use
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
-        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 23, 2020 at 4:13 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Wed, Dec 23, 2020 at 02:32:07PM +0800, Yongji Xie wrote:
-> > Now I want to map/unmap some pages in an userland vma dynamically. The
-> > vm_insert_page() is being used for mapping. In the unmapping case, it
-> > looks like the zap_page_range() does what I want. So I export it.
-> > Otherwise, we need some ways to notify userspace to trigger it with
-> > madvise(MADV_DONTNEED), which might not be able to meet all our needs.
-> > For example, unmapping some pages in a memory shrinker function.
-> >
-> > So I'd like to know what's the limitation to use zap_page_range() in a
-> > module. And if we can't use it in a module, is there any acceptable
-> > way to achieve that?
->
-> I think the anser is: don't play funny games with unmapped outside of
-> munmap.  Especially as synchronization is very hard to get right.
+This patch enables the IOTLB API support for vhost-vsock devices,
+allowing the userspace to emulate an IOMMU for the guest.
 
-OK, I will try to let userspace do this.
+These changes were made following vhost-net, in details this patch:
+- exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
+  device if the feature is acked
+- implements VHOST_GET_BACKEND_FEATURES and
+  VHOST_SET_BACKEND_FEATURES ioctls
+- calls vq_meta_prefetch() before vq processing to prefetch vq
+  metadata address in IOTLB
+- provides .read_iter, .write_iter, and .poll callbacks for the
+  chardev; they are used by the userspace to exchange IOTLB messages
+
+This patch was tested specifying "intel_iommu=strict" in the guest
+kernel command line. I used QEMU with a patch applied [1] to fix a
+simple issue (that patch was merged in QEMU v5.2.0):
+    $ qemu -M q35,accel=kvm,kernel-irqchip=split \
+           -drive file=fedora.qcow2,format=qcow2,if=virtio \
+           -device intel-iommu,intremap=on,device-iotlb=on \
+           -device vhost-vsock-pci,guest-cid=3,iommu_platform=on,ats=on
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg09077.html
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+
+The patch is the same of v1, but I re-tested it with:
+- QEMU v5.2.0-551-ga05f8ecd88
+- Linux 5.9.15 (host)
+- Linux 5.9.15 and 5.10.0 (guest)
+Now, enabling 'ats' it works well, there are just a few simple changes.
+
+v1: https://www.spinics.net/lists/kernel/msg3716022.html
+v2:
+- updated commit message about QEMU version and string used to test
+- rebased on mst/vhost branch
 
 Thanks,
-Yongji
+Stefano
+---
+ drivers/vhost/vsock.c | 68 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 65 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index a483cec31d5c..5e78fb719602 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -30,7 +30,12 @@
+ #define VHOST_VSOCK_PKT_WEIGHT 256
+ 
+ enum {
+-	VHOST_VSOCK_FEATURES = VHOST_FEATURES,
++	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
++			       (1ULL << VIRTIO_F_ACCESS_PLATFORM)
++};
++
++enum {
++	VHOST_VSOCK_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
+ };
+ 
+ /* Used to track all the vhost_vsock instances on the system. */
+@@ -94,6 +99,9 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 	if (!vhost_vq_get_backend(vq))
+ 		goto out;
+ 
++	if (!vq_meta_prefetch(vq))
++		goto out;
++
+ 	/* Avoid further vmexits, we're already processing the virtqueue */
+ 	vhost_disable_notify(&vsock->dev, vq);
+ 
+@@ -449,6 +457,9 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+ 	if (!vhost_vq_get_backend(vq))
+ 		goto out;
+ 
++	if (!vq_meta_prefetch(vq))
++		goto out;
++
+ 	vhost_disable_notify(&vsock->dev, vq);
+ 	do {
+ 		u32 len;
+@@ -766,8 +777,12 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
+ 	mutex_lock(&vsock->dev.mutex);
+ 	if ((features & (1 << VHOST_F_LOG_ALL)) &&
+ 	    !vhost_log_access_ok(&vsock->dev)) {
+-		mutex_unlock(&vsock->dev.mutex);
+-		return -EFAULT;
++		goto err;
++	}
++
++	if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
++		if (vhost_init_device_iotlb(&vsock->dev, true))
++			goto err;
+ 	}
+ 
+ 	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
+@@ -778,6 +793,10 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
+ 	}
+ 	mutex_unlock(&vsock->dev.mutex);
+ 	return 0;
++
++err:
++	mutex_unlock(&vsock->dev.mutex);
++	return -EFAULT;
+ }
+ 
+ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
+@@ -811,6 +830,18 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
+ 		if (copy_from_user(&features, argp, sizeof(features)))
+ 			return -EFAULT;
+ 		return vhost_vsock_set_features(vsock, features);
++	case VHOST_GET_BACKEND_FEATURES:
++		features = VHOST_VSOCK_BACKEND_FEATURES;
++		if (copy_to_user(argp, &features, sizeof(features)))
++			return -EFAULT;
++		return 0;
++	case VHOST_SET_BACKEND_FEATURES:
++		if (copy_from_user(&features, argp, sizeof(features)))
++			return -EFAULT;
++		if (features & ~VHOST_VSOCK_BACKEND_FEATURES)
++			return -EOPNOTSUPP;
++		vhost_set_backend_features(&vsock->dev, features);
++		return 0;
+ 	default:
+ 		mutex_lock(&vsock->dev.mutex);
+ 		r = vhost_dev_ioctl(&vsock->dev, ioctl, argp);
+@@ -823,6 +854,34 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
+ 	}
+ }
+ 
++static ssize_t vhost_vsock_chr_read_iter(struct kiocb *iocb, struct iov_iter *to)
++{
++	struct file *file = iocb->ki_filp;
++	struct vhost_vsock *vsock = file->private_data;
++	struct vhost_dev *dev = &vsock->dev;
++	int noblock = file->f_flags & O_NONBLOCK;
++
++	return vhost_chr_read_iter(dev, to, noblock);
++}
++
++static ssize_t vhost_vsock_chr_write_iter(struct kiocb *iocb,
++					struct iov_iter *from)
++{
++	struct file *file = iocb->ki_filp;
++	struct vhost_vsock *vsock = file->private_data;
++	struct vhost_dev *dev = &vsock->dev;
++
++	return vhost_chr_write_iter(dev, from);
++}
++
++static __poll_t vhost_vsock_chr_poll(struct file *file, poll_table *wait)
++{
++	struct vhost_vsock *vsock = file->private_data;
++	struct vhost_dev *dev = &vsock->dev;
++
++	return vhost_chr_poll(file, dev, wait);
++}
++
+ static const struct file_operations vhost_vsock_fops = {
+ 	.owner          = THIS_MODULE,
+ 	.open           = vhost_vsock_dev_open,
+@@ -830,6 +889,9 @@ static const struct file_operations vhost_vsock_fops = {
+ 	.llseek		= noop_llseek,
+ 	.unlocked_ioctl = vhost_vsock_dev_ioctl,
+ 	.compat_ioctl   = compat_ptr_ioctl,
++	.read_iter      = vhost_vsock_chr_read_iter,
++	.write_iter     = vhost_vsock_chr_write_iter,
++	.poll           = vhost_vsock_chr_poll,
+ };
+ 
+ static struct miscdevice vhost_vsock_misc = {
+-- 
+2.26.2
+
