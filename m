@@ -2,225 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 829452E1D79
-	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 15:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6861F2E1D8B
+	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 15:46:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727398AbgLWOiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Dec 2020 09:38:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44354 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727057AbgLWOiV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Dec 2020 09:38:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608734214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=dUU452tRqrvkfJMA+eezzExr3vkzl56EFOyXCB1EYnQ=;
-        b=a1b1xHrxsAMK8QHX84bbO0Rm/rugtYM5L0++KkLEWxnRJQGevMDsqaSJWlYUqSWyp5oQHO
-        b6TKsv7Azk50qmMcHT752t9abeCokTdGbGDt1NXd7ISr4xgKgT0Gxrf71HHHGaQn81Su3G
-        E9yXAwrs8xdj4YwstOQh5kjTxw+5uHE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462--u0xtbG2N-2sRj1vrceUuw-1; Wed, 23 Dec 2020 09:36:49 -0500
-X-MC-Unique: -u0xtbG2N-2sRj1vrceUuw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9091E180A097;
-        Wed, 23 Dec 2020 14:36:48 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-112-247.ams2.redhat.com [10.36.112.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 89294614F5;
-        Wed, 23 Dec 2020 14:36:39 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [PATCH v2] vhost/vsock: add IOTLB API support
-Date:   Wed, 23 Dec 2020 15:36:38 +0100
-Message-Id: <20201223143638.123417-1-sgarzare@redhat.com>
+        id S1726766AbgLWOpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Dec 2020 09:45:51 -0500
+Received: from mail-wr1-f41.google.com ([209.85.221.41]:43011 "EHLO
+        mail-wr1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbgLWOpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Dec 2020 09:45:50 -0500
+Received: by mail-wr1-f41.google.com with SMTP id y17so18827568wrr.10;
+        Wed, 23 Dec 2020 06:45:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=/RYWY/ozUzONgf/e8tkqi1F1m1XJVpNw0P3pUzv1ZE8=;
+        b=X5+/Yo+mIvjsomxG9bItqm/LYiN44HTZO9dPshAARGhb2uaHn9Dj886EowJUeblVdO
+         KyZ7r7j1VOdPEzfIlXofnyd9j+p+RNm4Ul/rrWV1On23LbCXoYsqXc71/3qh8+Ql5zZq
+         2pIpVHRmanv4sCO3ezx05oYIA/5uTfN1pXrS9SLfcL+WXJuUrndEMs77ltqFSTxMhUoe
+         KCiTKUzzav4Qd/OSqvE1ut7HO/NR2qgZxxTdLhvNpW3/ueLnUzRgdayfEmsYPvOCvb1U
+         AtPqi6gTt9efY7myAbAwyhYvvCeMr/761eonzrBxf3piHMYJHquvhbLDZfE9Y+EG9rmH
+         bYtA==
+X-Gm-Message-State: AOAM533hKP7UfqqAwvcJlsuRN+4Fl/XgOVAPOxABhwVztAQ37SK5ngiv
+        0jTt7X7gGc3KIKkQBtvFayc=
+X-Google-Smtp-Source: ABdhPJzooqwx43SF6qvhRQyu88Dxbeu+iMIJK0mMPr7+eYzTZFzd16bPD4io+4sIJ33XfsCrvRJk2A==
+X-Received: by 2002:a5d:5385:: with SMTP id d5mr29641501wrv.384.1608734708673;
+        Wed, 23 Dec 2020 06:45:08 -0800 (PST)
+Received: from [127.0.1.1] (87.78.186.89.cust.ip.kpnqwest.it. [89.186.78.87])
+        by smtp.gmail.com with ESMTPSA id h9sm46305wme.11.2020.12.23.06.45.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Dec 2020 06:45:08 -0800 (PST)
+Subject: [PATCH] kvm: tracing: Fix unmatched kvm_entry and kvm_exit events
+From:   Dario Faggioli <dfaggioli@suse.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lorenzo Brescia <lorenzo.brescia@edu.unito.it>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Lorenzo Brescia <lorenzo.brescia@edu.unito.it>
+Date:   Wed, 23 Dec 2020 14:45:07 +0000
+Message-ID: <160873470698.11652.13483635328769030605.stgit@Wayrath>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch enables the IOTLB API support for vhost-vsock devices,
-allowing the userspace to emulate an IOMMU for the guest.
+From: Lorenzo Brescia <lorenzo.brescia@edu.unito.it>
 
-These changes were made following vhost-net, in details this patch:
-- exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
-  device if the feature is acked
-- implements VHOST_GET_BACKEND_FEATURES and
-  VHOST_SET_BACKEND_FEATURES ioctls
-- calls vq_meta_prefetch() before vq processing to prefetch vq
-  metadata address in IOTLB
-- provides .read_iter, .write_iter, and .poll callbacks for the
-  chardev; they are used by the userspace to exchange IOTLB messages
+On VMX, if we exit and then re-enter immediately without leaving
+the vmx_vcpu_run() function, the kvm_entry event is not logged.
+That means we will see one (or more) kvm_exit, without its (their)
+corresponding kvm_entry, as shown here:
 
-This patch was tested specifying "intel_iommu=strict" in the guest
-kernel command line. I used QEMU with a patch applied [1] to fix a
-simple issue (that patch was merged in QEMU v5.2.0):
-    $ qemu -M q35,accel=kvm,kernel-irqchip=split \
-           -drive file=fedora.qcow2,format=qcow2,if=virtio \
-           -device intel-iommu,intremap=on,device-iotlb=on \
-           -device vhost-vsock-pci,guest-cid=3,iommu_platform=on,ats=on
+ CPU-1979 [002] 89.871187: kvm_entry: vcpu 1
+ CPU-1979 [002] 89.871218: kvm_exit:  reason MSR_WRITE
+ CPU-1979 [002] 89.871259: kvm_exit:  reason MSR_WRITE
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg09077.html
+It also seems possible for a kvm_entry event to be logged, but then
+we leave vmx_vcpu_run() right away (if vmx->emulation_required is
+true). In this case, we will have a spurious kvm_entry event in the
+trace.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Fix these situations by moving trace_kvm_entry() inside vmx_vcpu_run()
+(where trace_kvm_exit() already is).
+
+A trace obtained with this patch applied looks like this:
+
+ CPU-14295 [000] 8388.395387: kvm_entry: vcpu 0
+ CPU-14295 [000] 8388.395392: kvm_exit:  reason MSR_WRITE
+ CPU-14295 [000] 8388.395393: kvm_entry: vcpu 0
+ CPU-14295 [000] 8388.395503: kvm_exit:  reason EXTERNAL_INTERRUPT
+
+Of course, not calling trace_kvm_entry() in common x86 code any
+longer means that we need to adjust the SVM side of things too.
+
+Signed-off-by: Lorenzo Brescia <lorenzo.brescia@edu.unito.it>
+Signed-off-by: Dario Faggioli <dfaggioli@suse.com>
 ---
-
-The patch is the same of v1, but I re-tested it with:
-- QEMU v5.2.0-551-ga05f8ecd88
-- Linux 5.9.15 (host)
-- Linux 5.9.15 and 5.10.0 (guest)
-Now, enabling 'ats' it works well, there are just a few simple changes.
-
-v1: https://www.spinics.net/lists/kernel/msg3716022.html
-v2:
-- updated commit message about QEMU version and string used to test
-- rebased on mst/vhost branch
-
-Thanks,
-Stefano
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: kvm@vger.kernel.org
+Cc: Lorenzo Brescia <lorenzo.brescia@edu.unito.it>
+Cc: Dario Faggioli <dfaggioli@suse.com>
 ---
- drivers/vhost/vsock.c | 68 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 65 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/svm.c |    2 ++
+ arch/x86/kvm/vmx/vmx.c |    2 ++
+ arch/x86/kvm/x86.c     |    3 +--
+ 3 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index a483cec31d5c..5e78fb719602 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -30,7 +30,12 @@
- #define VHOST_VSOCK_PKT_WEIGHT 256
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index cce0143a6f80..ed272fcf6495 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3741,6 +3741,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
- enum {
--	VHOST_VSOCK_FEATURES = VHOST_FEATURES,
-+	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
-+			       (1ULL << VIRTIO_F_ACCESS_PLATFORM)
-+};
++	trace_kvm_entry(vcpu);
 +
-+enum {
-+	VHOST_VSOCK_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
- };
+ 	svm->vmcb->save.rax = vcpu->arch.regs[VCPU_REGS_RAX];
+ 	svm->vmcb->save.rsp = vcpu->arch.regs[VCPU_REGS_RSP];
+ 	svm->vmcb->save.rip = vcpu->arch.regs[VCPU_REGS_RIP];
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 75c9c6a0a3a4..ff20f9e6e5b3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6653,6 +6653,8 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (vmx->emulation_required)
+ 		return EXIT_FASTPATH_NONE;
  
- /* Used to track all the vhost_vsock instances on the system. */
-@@ -94,6 +99,9 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
- 	if (!vhost_vq_get_backend(vq))
- 		goto out;
- 
-+	if (!vq_meta_prefetch(vq))
-+		goto out;
++	trace_kvm_entry(vcpu);
 +
- 	/* Avoid further vmexits, we're already processing the virtqueue */
- 	vhost_disable_notify(&vsock->dev, vq);
- 
-@@ -449,6 +457,9 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
- 	if (!vhost_vq_get_backend(vq))
- 		goto out;
- 
-+	if (!vq_meta_prefetch(vq))
-+		goto out;
-+
- 	vhost_disable_notify(&vsock->dev, vq);
- 	do {
- 		u32 len;
-@@ -766,8 +777,12 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
- 	mutex_lock(&vsock->dev.mutex);
- 	if ((features & (1 << VHOST_F_LOG_ALL)) &&
- 	    !vhost_log_access_ok(&vsock->dev)) {
--		mutex_unlock(&vsock->dev.mutex);
--		return -EFAULT;
-+		goto err;
-+	}
-+
-+	if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
-+		if (vhost_init_device_iotlb(&vsock->dev, true))
-+			goto err;
+ 	if (vmx->ple_window_dirty) {
+ 		vmx->ple_window_dirty = false;
+ 		vmcs_write32(PLE_WINDOW, vmx->ple_window);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3f7c1fc7a3ce..a79666204907 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8973,8 +8973,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		kvm_x86_ops.request_immediate_exit(vcpu);
  	}
  
- 	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
-@@ -778,6 +793,10 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
- 	}
- 	mutex_unlock(&vsock->dev.mutex);
- 	return 0;
-+
-+err:
-+	mutex_unlock(&vsock->dev.mutex);
-+	return -EFAULT;
+-	trace_kvm_entry(vcpu);
+-
+ 	fpregs_assert_state_consistent();
+ 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+ 		switch_fpu_return();
+@@ -11538,6 +11536,7 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
  }
+ EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
  
- static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
-@@ -811,6 +830,18 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
- 		if (copy_from_user(&features, argp, sizeof(features)))
- 			return -EFAULT;
- 		return vhost_vsock_set_features(vsock, features);
-+	case VHOST_GET_BACKEND_FEATURES:
-+		features = VHOST_VSOCK_BACKEND_FEATURES;
-+		if (copy_to_user(argp, &features, sizeof(features)))
-+			return -EFAULT;
-+		return 0;
-+	case VHOST_SET_BACKEND_FEATURES:
-+		if (copy_from_user(&features, argp, sizeof(features)))
-+			return -EFAULT;
-+		if (features & ~VHOST_VSOCK_BACKEND_FEATURES)
-+			return -EOPNOTSUPP;
-+		vhost_set_backend_features(&vsock->dev, features);
-+		return 0;
- 	default:
- 		mutex_lock(&vsock->dev.mutex);
- 		r = vhost_dev_ioctl(&vsock->dev, ioctl, argp);
-@@ -823,6 +854,34 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
- 	}
- }
- 
-+static ssize_t vhost_vsock_chr_read_iter(struct kiocb *iocb, struct iov_iter *to)
-+{
-+	struct file *file = iocb->ki_filp;
-+	struct vhost_vsock *vsock = file->private_data;
-+	struct vhost_dev *dev = &vsock->dev;
-+	int noblock = file->f_flags & O_NONBLOCK;
-+
-+	return vhost_chr_read_iter(dev, to, noblock);
-+}
-+
-+static ssize_t vhost_vsock_chr_write_iter(struct kiocb *iocb,
-+					struct iov_iter *from)
-+{
-+	struct file *file = iocb->ki_filp;
-+	struct vhost_vsock *vsock = file->private_data;
-+	struct vhost_dev *dev = &vsock->dev;
-+
-+	return vhost_chr_write_iter(dev, from);
-+}
-+
-+static __poll_t vhost_vsock_chr_poll(struct file *file, poll_table *wait)
-+{
-+	struct vhost_vsock *vsock = file->private_data;
-+	struct vhost_dev *dev = &vsock->dev;
-+
-+	return vhost_chr_poll(file, dev, wait);
-+}
-+
- static const struct file_operations vhost_vsock_fops = {
- 	.owner          = THIS_MODULE,
- 	.open           = vhost_vsock_dev_open,
-@@ -830,6 +889,9 @@ static const struct file_operations vhost_vsock_fops = {
- 	.llseek		= noop_llseek,
- 	.unlocked_ioctl = vhost_vsock_dev_ioctl,
- 	.compat_ioctl   = compat_ptr_ioctl,
-+	.read_iter      = vhost_vsock_chr_read_iter,
-+	.write_iter     = vhost_vsock_chr_write_iter,
-+	.poll           = vhost_vsock_chr_poll,
- };
- 
- static struct miscdevice vhost_vsock_misc = {
--- 
-2.26.2
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+
 
