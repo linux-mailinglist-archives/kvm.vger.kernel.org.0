@@ -2,54 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 057B82E1A14
-	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 09:39:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 579E32E1A17
+	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 09:39:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728206AbgLWIh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Dec 2020 03:37:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727734AbgLWIh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Dec 2020 03:37:26 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05328C0613D3
-        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 00:36:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=UbKHD1D3A6dPfj1vlrTWexn8YHrdnc0Hj54wByFxNDY=; b=lKWPG4Yr0D9q0XFo02cOeSvPj0
-        q7s1AcMT59U8DpAakc4fuNq/nLg0pGbo+WmzCu8qa5KINlR3mX/blceAFGnlaClhbeP5hDrSa9htc
-        5RsT05zVjXTkfYDMRUTn2qycH33gRrmhiDSNqXdnComAGLg0w6/9NsFo3dtNLjpzzAGW7Qz2R3dtQ
-        OySPx+Orshw9hXa85Ck0yeg9XYZ8MIrIgiuv2grwzAO7kdVets/wkERZf1w3dXPWrA0+eExQW9VYz
-        aoxniLhy2xgXicmmOUZ2XAaAlZLyIwb3aw+F4bH5NdmaBNysUc62SYneOWAcefKIoS8MFvDOUQMF9
-        fE/KUCCw==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1krzdU-0007Y5-GC; Wed, 23 Dec 2020 08:36:44 +0000
-Date:   Wed, 23 Dec 2020 08:36:44 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com
-Subject: Re: [PATCH v3 03/17] KVM: x86/xen: intercept xen hypercalls if
- enabled
-Message-ID: <20201223083644.GC27350@infradead.org>
-References: <20201214083905.2017260-1-dwmw2@infradead.org>
- <20201214083905.2017260-4-dwmw2@infradead.org>
+        id S1728203AbgLWIie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Dec 2020 03:38:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59150 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728052AbgLWIid (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Dec 2020 03:38:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608712627;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3qFyz9h7VZheiEP40gklGEtshCv6pLXIEhugrg/rlew=;
+        b=PgjnKbMzr6w9Os/BUJwa+Ro0NSx7tVlMRp1O2+VmmjeGP48hWB7S2fPw8zFPrp5pFBkrCT
+        qQ6THfDhutKlsTfkFXTJN/miVx4vTHcIZjMsIX8Gk6MFGv4HjkXFyh7tCqFJ2pbAo4GwqZ
+        pnqo/i+AeBP/brfgRRRbPwEqbiUWzbU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-Pbr5_DBoMqGoFC2SlLc90Q-1; Wed, 23 Dec 2020 03:37:02 -0500
+X-MC-Unique: Pbr5_DBoMqGoFC2SlLc90Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 893CD180A096;
+        Wed, 23 Dec 2020 08:37:00 +0000 (UTC)
+Received: from [10.72.12.54] (ovpn-12-54.pek2.redhat.com [10.72.12.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DCDED60C6A;
+        Wed, 23 Dec 2020 08:36:48 +0000 (UTC)
+Subject: Re: [RFC v2 08/13] vdpa: Introduce process_iotlb_msg() in
+ vdpa_config_ops
+To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
+        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
+        akpm@linux-foundation.org, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+References: <20201222145221.711-1-xieyongji@bytedance.com>
+ <20201222145221.711-9-xieyongji@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <5b36bc51-1e19-2b59-6287-66aed435c8ed@redhat.com>
+Date:   Wed, 23 Dec 2020 16:36:47 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201214083905.2017260-4-dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20201222145221.711-9-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I think all the Xen support code should be conditional on a new config
-option so that normal configs don't have to build the code (and open
-potential attack vectors).
+
+On 2020/12/22 下午10:52, Xie Yongji wrote:
+> This patch introduces a new method in the vdpa_config_ops to
+> support processing the raw vhost memory mapping message in the
+> vDPA device driver.
+>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>   drivers/vhost/vdpa.c | 5 ++++-
+>   include/linux/vdpa.h | 7 +++++++
+>   2 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 448be7875b6d..ccbb391e38be 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -728,6 +728,9 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+>   	if (r)
+>   		return r;
+>   
+> +	if (ops->process_iotlb_msg)
+> +		return ops->process_iotlb_msg(vdpa, msg);
+> +
+>   	switch (msg->type) {
+>   	case VHOST_IOTLB_UPDATE:
+>   		r = vhost_vdpa_process_iotlb_update(v, msg);
+> @@ -770,7 +773,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+>   	int ret;
+>   
+>   	/* Device want to do DMA by itself */
+> -	if (ops->set_map || ops->dma_map)
+> +	if (ops->set_map || ops->dma_map || ops->process_iotlb_msg)
+>   		return 0;
+>   
+>   	bus = dma_dev->bus;
+> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> index 656fe264234e..7bccedf22f4b 100644
+> --- a/include/linux/vdpa.h
+> +++ b/include/linux/vdpa.h
+> @@ -5,6 +5,7 @@
+>   #include <linux/kernel.h>
+>   #include <linux/device.h>
+>   #include <linux/interrupt.h>
+> +#include <linux/vhost_types.h>
+>   #include <linux/vhost_iotlb.h>
+>   #include <net/genetlink.h>
+>   
+> @@ -172,6 +173,10 @@ struct vdpa_iova_range {
+>    *				@vdev: vdpa device
+>    *				Returns the iova range supported by
+>    *				the device.
+> + * @process_iotlb_msg:		Process vhost memory mapping message (optional)
+> + *				Only used for VDUSE device now
+> + *				@vdev: vdpa device
+> + *				@msg: vhost memory mapping message
+>    * @set_map:			Set device memory mapping (optional)
+>    *				Needed for device that using device
+>    *				specific DMA translation (on-chip IOMMU)
+> @@ -240,6 +245,8 @@ struct vdpa_config_ops {
+>   	struct vdpa_iova_range (*get_iova_range)(struct vdpa_device *vdev);
+>   
+>   	/* DMA ops */
+> +	int (*process_iotlb_msg)(struct vdpa_device *vdev,
+> +				 struct vhost_iotlb_msg *msg);
+>   	int (*set_map)(struct vdpa_device *vdev, struct vhost_iotlb *iotlb);
+>   	int (*dma_map)(struct vdpa_device *vdev, u64 iova, u64 size,
+>   		       u64 pa, u32 perm);
+
+
+Is there any reason that it can't be done via dma_map/dma_unmap or set_map?
+
+Thanks
+
+
