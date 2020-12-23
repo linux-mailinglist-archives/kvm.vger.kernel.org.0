@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D80322E1109
-	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 02:10:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53B8E2E110A
+	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 02:10:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726526AbgLWBJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Dec 2020 20:09:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
+        id S1726597AbgLWBJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Dec 2020 20:09:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725300AbgLWBJg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Dec 2020 20:09:36 -0500
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A81F6C06179C
-        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:55 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id e25so4576322wme.0
-        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:55 -0800 (PST)
+        with ESMTP id S1725300AbgLWBJh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Dec 2020 20:09:37 -0500
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EAF0C0617A6
+        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:56 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id y23so4561615wmi.1
+        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=bWhDKCGsyM3Ql87nT5QipuNUsOUCpyWwRvfW/Lqd2Sg=;
-        b=N79PbMTi8NpQjgTd8sW2oPCOJF9wmw6ibgOYYlcpKPuvptoB4y1lAtP+L7mI9dj+N3
-         mpNFv3M5CpX1VEHEgIaBjV/CDiyZiAVVL/FE2OOJBgtslNZ3T3KPpBUtQiX1i9e1TZkP
-         y8b01R6XIvrt4N2arJ2cKMToA6kNmXctP6id5R611psQ1Cyi7WxmucQxK48lkuJbKJvz
-         K3TVWS1cyB9tksER2pgKIbgnfhWKDsk//vMfr1YW764gOkNcTtvLGY71rlyd5RRZvkDA
-         B2JURVL0BBUGfGsZP2E411nxOv0aFMA7QWzqxdLStsAYJF57Jn6PKrD6TpcR5Nqa8SM2
-         rSww==
+        bh=SqvxB++JbstIrAPr04yW9wMQ+lWNdxGPmHgGagwAD+g=;
+        b=acOuzm54IV6ZtzYuAxvLqs0BYxZbc9kEYU6lj6AjSTiw0yaMVrafsUp1yff1IDvSxj
+         IXlPfH5zgg1z3LcsC15yM7LGTTwhdx34D3RVGDU52glSgeQfhpwR+2AbXZewHCsNOnAh
+         a6MeQnaa7RUU4QcljeAb0/RU/i3a3/RoGu9J9YnNr9pC0WeJOG0LxA1nhITwqBhl0MBW
+         XGLDN7RJS+69fAA+kv3JwTE9Hai9G9vRLU2mnmmJs5fQtztNhJL0GlTeCnn8D7YZzeD1
+         Kj9iE+vzRXEpzR7sqGMA/PbjN6zccNcgIvB7PNUxgK6Wdoi8hL6OthhKOx/ksQ0WDTd7
+         Xxbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=bWhDKCGsyM3Ql87nT5QipuNUsOUCpyWwRvfW/Lqd2Sg=;
-        b=hn0Roz2CWipTm5ojpCPnXJE+DwL+fzrbiYbpVkw+FNnd23QUwbFA806v3zQpzHkgHE
-         kb+YsfMsL8ywgIhHoXnERK+/zPpAPEQiD/CnF4twWeHR/D0zmaFd/aLr01sfMsg4sL3G
-         N+8PCXZvoFntL2M9W2jXrYig6jED/YLuciyPI9rRIoZcy4r1T9JeSuiFWA90FuAMJTqv
-         Xmq2qhNnCW5xt/ParUkv/Tdib65Kr5orNgoeVaVJH7Z/vyL89XOAkLtX6cfNNCv+gtj3
-         4XGo+ausvBhlzFbyeOwMhemQzwgM7KA7tt2+85ecvVFtiO6A+gB+B9rdS8gkwLw5Pmdg
-         76Uw==
-X-Gm-Message-State: AOAM531PVUnD+wm8umjLzL4yRmRaAuClPM5uWYRfW4x1DrMak3NJtq6j
-        0jrOSsgjXp7VZgeFr7TH7a19Pa+6N08=
-X-Google-Smtp-Source: ABdhPJye/rodbBrAoSs2jjcNVYeirCUwUeKCmBlzKYnKW8TM/1W/3IsT4zTcDzYI+xQ9iGIf1X7HXQ==
-X-Received: by 2002:a1c:2785:: with SMTP id n127mr24448988wmn.148.1608685734179;
-        Tue, 22 Dec 2020 17:08:54 -0800 (PST)
+        bh=SqvxB++JbstIrAPr04yW9wMQ+lWNdxGPmHgGagwAD+g=;
+        b=sl/P4vRvqt28wRaJe06GRuAog0bqIxL/5tmuoDvn69ghjZd26lljxM9PtO9i2XyrzC
+         0Mb9QTFXx/hltv+zpwQmXoUld5AeSMulh5AEogA3UrG9rguJlJcxB2gjBFIxP6bLE49k
+         yLE/HNpMhc2f/XFIOFXd8O3RQJMRvlMr6Sqb6Q4YBbMEhlyZZdRONNi87RE5DiXfX+57
+         0Mf1GE/il/gPQdkRUM2+8zfrO4Jb3lSJTQ1AQvgsyNMofQwlLHrpRjlO+ps+vEtWrs4G
+         vDvpKF3OGLvMy9E1LSYBTuKFvlaxzb8m1aBxGHPhqrumpxTWW/ysEzeCoVhnPyGfUqlt
+         uxiw==
+X-Gm-Message-State: AOAM533CePvF4dJIwra/bAUTD+Gkz6YY9Y2UQhcUY/B9+gmBhwpO39Mn
+        fxQGmtCMLadTRCiS/ZdoZiSSrZvHSYc=
+X-Google-Smtp-Source: ABdhPJxMWezpctYhSLAA26t2cBHETe7XVKcu3ZBnP/+BEFsnvvXTnyWEWmIo9GsRtGoSRf6hXXU2ag==
+X-Received: by 2002:a05:600c:2246:: with SMTP id a6mr24224330wmm.80.1608685735272;
+        Tue, 22 Dec 2020 17:08:55 -0800 (PST)
 Received: from avogadro.lan ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id h83sm30995047wmf.9.2020.12.22.17.08.53
+        by smtp.gmail.com with ESMTPSA id h83sm30995047wmf.9.2020.12.22.17.08.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Dec 2020 17:08:53 -0800 (PST)
+        Tue, 22 Dec 2020 17:08:54 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     mlevitsk@redhat.com
-Subject: [PATCH kvm-unit-tests 2/4] chaos: add generic stress test
-Date:   Wed, 23 Dec 2020 02:08:48 +0100
-Message-Id: <20201223010850.111882-3-pbonzini@redhat.com>
+Subject: [PATCH kvm-unit-tests 3/4] chaos: add timer interrupt to the workload
+Date:   Wed, 23 Dec 2020 02:08:49 +0100
+Message-Id: <20201223010850.111882-4-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201223010850.111882-1-pbonzini@redhat.com>
 References: <20201223010850.111882-1-pbonzini@redhat.com>
@@ -65,157 +65,133 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- lib/x86/processor.h |   2 +-
- x86/Makefile.x86_64 |   1 +
- x86/chaos.c         | 114 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 116 insertions(+), 1 deletion(-)
- create mode 100644 x86/chaos.c
+ x86/chaos.c  | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 64 insertions(+)
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 291d24b..a53654a 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -546,7 +546,7 @@ static inline void irq_enable(void)
-     asm volatile("sti");
- }
- 
--static inline void invlpg(volatile void *va)
-+static inline void invlpg(const volatile void *va)
- {
- 	asm volatile("invlpg (%0)" ::"r" (va) : "memory");
- }
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index af61d85..761a1d9 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -20,6 +20,7 @@ tests += $(TEST_DIR)/tscdeadline_latency.flat
- tests += $(TEST_DIR)/intel-iommu.flat
- tests += $(TEST_DIR)/vmware_backdoors.flat
- tests += $(TEST_DIR)/rdpru.flat
-+tests += $(TEST_DIR)/chaos.flat
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
 diff --git a/x86/chaos.c b/x86/chaos.c
-new file mode 100644
-index 0000000..e723a3b
---- /dev/null
+index e723a3b..0b1e29c 100644
+--- a/x86/chaos.c
 +++ b/x86/chaos.c
-@@ -0,0 +1,114 @@
-+#include "libcflat.h"
-+#include "smp.h"
-+#include "bitops.h"
-+#include "string.h"
-+#include "alloc.h"
-+#include "alloc_page.h"
-+#include "asm/page.h"
-+#include "processor.h"
+@@ -1,5 +1,7 @@
+ #include "libcflat.h"
+ #include "smp.h"
++#include "isr.h"
++#include "apic.h"
+ #include "bitops.h"
+ #include "string.h"
+ #include "alloc.h"
+@@ -9,14 +11,24 @@
+ 
+ #define MAX_NR_CPUS 256
+ 
++#define TIMER_IRQ 0x44
 +
-+#define MAX_NR_CPUS 256
+ struct chaos_args {
+ 	long npages;		/* 0 for CPU workload. */
+ 	const char *mem;
+ 	int invtlb;
 +
-+struct chaos_args {
-+	long npages;		/* 0 for CPU workload. */
-+	const char *mem;
-+	int invtlb;
++	int hz;
++	bool hlt;
 +};
 +
-+int ncpus;
-+struct chaos_args all_args[MAX_NR_CPUS];
-+
-+static void parse_arg(struct chaos_args *args, const char *arg)
-+{
-+	char *s = strdup(arg);
-+	char *p = s;
-+
-+	while (*p) {
-+		char *word = p;
-+		char delim = strdelim(&p, ",=");
-+		long i = 0;
-+		bool have_arg = false;
-+		if (delim == '=') {
-+			char *num = p;
-+			strdelim(&p, ",");
-+			if (!parse_long(num, &i))
-+				printf("invalid argument for %s\n", word);
-+			else
-+				have_arg = true;
-+		}
-+
-+		if (!strcmp(word, "mem")) {
++struct counters {
++	int ticks_left;
+ };
+ 
+ int ncpus;
+ struct chaos_args all_args[MAX_NR_CPUS];
++struct counters cnt[MAX_NR_CPUS];
+ 
+ static void parse_arg(struct chaos_args *args, const char *arg)
+ {
+@@ -58,6 +70,20 @@ static void parse_arg(struct chaos_args *args, const char *arg)
+ 			}
+ 			args->invtlb = i;
+ 			printf("CPU %d: invtlb=%ld\n", smp_id(), i);
++		} else if (!strcmp(word, "hz")) {
 +			if (!have_arg)
-+				i = 12;
-+			else if (i >= BITS_PER_LONG - 1 - PAGE_SHIFT) {
-+				printf("mem argument too large, using 12\n");
-+				i = 12;
-+			}
-+			args->npages = 1 << i;
-+			args->mem = alloc_pages(i);
-+			if (!args->mem)
-+				printf("could not allocate memory\n");
-+			printf("CPU %d: mem=%ld @ %p\n", smp_id(), i, args->mem);
-+		} else if (!strcmp(word, "invtlb")) {
++				i = 1000;
++			args->hz = i;
++			printf("CPU %d: hz=%ld\n", smp_id(), i);
++		} else if (!strcmp(word, "hlt")) {
 +			if (!have_arg)
 +				i = 1;
 +			else if (i != 0 && i != 1) {
-+				printf("invtlb argument must be 0 or 1\n");
++				printf("hlt argument must be 0 or 1\n");
 +				i = 1;
 +			}
-+			args->invtlb = i;
-+			printf("CPU %d: invtlb=%ld\n", smp_id(), i);
-+		} else {
-+			printf("invalid argument %s\n", word);
-+		}
++			args->hlt = i;
++			printf("CPU %d: hlt=%ld\n", smp_id(), i);
+ 		} else {
+ 			printf("invalid argument %s\n", word);
+ 		}
+@@ -65,6 +91,31 @@ static void parse_arg(struct chaos_args *args, const char *arg)
+ 	free(s);
+ }
+ 
++static void do_timer(void)
++{
++	int cpu = smp_id();
++	struct counters *c = &cnt[cpu];
++	char out[4];
++	if (c->ticks_left > 0) {
++		c->ticks_left--;
++		return;
 +	}
-+	free(s);
++
++	c->ticks_left = all_args[cpu].hz;
++
++	/* Print current CPU number.  */
++	out[2] = (cpu % 10) + '0'; cpu /= 10;
++	out[1] = (cpu % 10) + '0'; cpu /= 10;
++	out[0] = (cpu % 10) + '0'; cpu /= 10;
++	puts(out + (ncpus < 100) + (ncpus < 10));
 +}
 +
-+static void __attribute__((noreturn)) stress(void *data)
++static void timer(isr_regs_t *regs)
 +{
-+    const char *arg = data;
-+    struct chaos_args *args = &all_args[smp_id()];
-+
-+    printf("starting CPU %d workload: %s\n", smp_id(), arg);
-+    parse_arg(args, arg);
-+
-+    for (;;) {
-+	    if (args->mem) {
-+		    const char *s = args->mem;
-+		    const char *e = s + (args->npages << PAGE_SHIFT);
-+		    long i;
-+		    for (i = args->npages; args->invtlb && i--; )
-+			    invlpg(s + ((args->npages - i) << PAGE_SHIFT));
-+		    while (s < e) {
-+			    (*(unsigned long *)s)++;
-+			    s += sizeof(unsigned long);
-+		    }
-+	    }
-+    }
++	do_timer();
++        eoi();
 +}
 +
-+int main(int argc, char *argv[])
-+{
-+    int i;
+ static void __attribute__((noreturn)) stress(void *data)
+ {
+     const char *arg = data;
+@@ -73,6 +124,15 @@ static void __attribute__((noreturn)) stress(void *data)
+     printf("starting CPU %d workload: %s\n", smp_id(), arg);
+     parse_arg(args, arg);
+ 
++    apic_write(APIC_TDCR, 0x0000000b);
++    if (args->hz) {
++	    /* FIXME: assumes that the LAPIC timer counts in nanoseconds.  */
 +
-+    setup_vm();
-+    if (argc <= 1) {
-+        return 1;
++	    apic_write(APIC_TMICT, 1000000000 / args->hz);
++	    apic_write(APIC_LVTT, TIMER_IRQ | APIC_LVT_TIMER_PERIODIC);
 +    }
 +
-+    argv++;
-+    argc--;
-+    ncpus = cpu_count();
-+    if (ncpus > MAX_NR_CPUS)
-+	    ncpus = MAX_NR_CPUS;
++    irq_enable();
+     for (;;) {
+ 	    if (args->mem) {
+ 		    const char *s = args->mem;
+@@ -85,6 +145,8 @@ static void __attribute__((noreturn)) stress(void *data)
+ 			    s += sizeof(unsigned long);
+ 		    }
+ 	    }
++	    if (args->hlt)
++		    asm volatile("hlt");
+     }
+ }
+ 
+@@ -103,6 +165,8 @@ int main(int argc, char *argv[])
+     if (ncpus > MAX_NR_CPUS)
+ 	    ncpus = MAX_NR_CPUS;
+ 
++    handle_irq(TIMER_IRQ, timer);
 +
-+    for (i = 1; i < ncpus; ++i) {
-+        if (i >= argc) {
-+            break;
-+        }
-+        on_cpu_async(i, stress, argv[i]);
-+    }
-+
-+    stress(argv[0]);
-+}
+     for (i = 1; i < ncpus; ++i) {
+         if (i >= argc) {
+             break;
 -- 
 2.29.2
 
