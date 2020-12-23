@@ -2,81 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A78F62E19D7
-	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 09:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D32B2E1A11
+	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 09:39:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727994AbgLWIQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Dec 2020 03:16:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44740 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727678AbgLWIQK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Dec 2020 03:16:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608711284;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=u0U6heNY7fxOOhdzytPgLhxCjf8UFXUIBZYCgUBbqf4=;
-        b=BWw3/xk39LUuQAk7Wl/pSXDXYdkhamoHdhq/9Z9GLYl1E+9iYUBxREXUxodoE8UqwHSjkR
-        W0K1RiokOacipyQdISluxJct7dxVZ4Ho+WcE8vEIqJWIR3DJNd7UWVuMNOuEKvs9OpM4BZ
-        lKfTvQsVFyVMozBS7UgDzm3agVVaWGs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-6cTF2La4MIuhN7JQfCiujg-1; Wed, 23 Dec 2020 03:14:42 -0500
-X-MC-Unique: 6cTF2La4MIuhN7JQfCiujg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 460971005513;
-        Wed, 23 Dec 2020 08:14:40 +0000 (UTC)
-Received: from [10.72.12.54] (ovpn-12-54.pek2.redhat.com [10.72.12.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2AE6060C69;
-        Wed, 23 Dec 2020 08:14:28 +0000 (UTC)
-Subject: Re: [RFC v2 00/13] Introduce VDUSE - vDPA Device in Userspace
-From:   Jason Wang <jasowang@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        akpm@linux-foundation.org, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net
-Cc:     linux-aio@kvack.org, kvm@vger.kernel.org, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org
-References: <20201222145221.711-1-xieyongji@bytedance.com>
- <c892652a-3f57-c337-8c67-084ba6d10834@redhat.com>
-Message-ID: <faa0b9ba-c230-931b-86c6-624a302f6637@redhat.com>
-Date:   Wed, 23 Dec 2020 16:14:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728243AbgLWIg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Dec 2020 03:36:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37252 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727744AbgLWIg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Dec 2020 03:36:28 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D480C0613D3
+        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 00:35:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=wl/+7sBmp7Ybu/aCWQsO+cYmX+3JnfDT+1cSTdm/e40=; b=FJ2b25cKaLORJ++J+0aDC5D6iI
+        wRX18pc3OqS9Wf3N4GXxT3nlgN8sxzhonjkfKJCVpEz3No8L8wK2BzSORUqZRzraONkGHt0SQoR+B
+        dryptN9Or0Vz6vTToeUlvnu12Mxwl5xkkUABCCa8DF12Ed2rNVDpqLpBNGsDETmrDxUjZR1bRmxsU
+        GyHtAeRsCJPHjCfn1NqOUWDsquPizLJsOR/zIbc4spO2Ri2P9/LOqytjsEQWhM3y2iZozPNM/TFN5
+        3AaZl9JKBbDwMxgSVF5N22IxVkYo80FuE+2HJhL5GaUh9BmteKyh+iLCACsTgwuv9/IsipYvPM0Sm
+        USV0bjIQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1krzcY-0007Um-EL; Wed, 23 Dec 2020 08:35:46 +0000
+Date:   Wed, 23 Dec 2020 08:35:46 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com
+Subject: Re: [PATCH v3 02/17] KVM: x86/xen: fix Xen hypercall page msr
+ handling
+Message-ID: <20201223083546.GB27350@infradead.org>
+References: <20201214083905.2017260-1-dwmw2@infradead.org>
+ <20201214083905.2017260-3-dwmw2@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <c892652a-3f57-c337-8c67-084ba6d10834@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201214083905.2017260-3-dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> +	if (msr && (msr == vcpu->kvm->arch.xen_hvm_config.msr))
+> +		return xen_hvm_config(vcpu, data);
 
-On 2020/12/23 下午2:38, Jason Wang wrote:
->>
->> V1 to V2:
->> - Add vhost-vdpa support
->
->
-> I may miss something but I don't see any code to support that. E.g 
-> neither set_map nor dma_map/unmap is implemented in the config ops.
->
-> Thanks 
-
-
-Speak too fast :(
-
-I saw a new config ops was introduced.
-
-Let me dive into that.
-
-Thanks
-
+Nit: no need for the inner braces.
