@@ -2,54 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11C612E1B4F
-	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 12:02:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E0FE2E1B69
+	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 12:08:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728285AbgLWLAe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Dec 2020 06:00:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59320 "EHLO
+        id S1728554AbgLWLHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Dec 2020 06:07:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726022AbgLWLAd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Dec 2020 06:00:33 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61058C0613D6
-        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 02:59:53 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id cm17so15844522edb.4
-        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 02:59:53 -0800 (PST)
+        with ESMTP id S1728305AbgLWLHY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Dec 2020 06:07:24 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3151C0617A6
+        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 03:06:37 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id b73so15810585edf.13
+        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 03:06:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=EJYssnIVO9+6+TEhutNIY19jP+0vyYszSOhuqVf4GPs=;
-        b=h3NR7oNJIn5F3wRuwjTuh1CxonfEpyDcUAjhDF8YqjPoKP68o7yGLicZas6bNXZLwI
-         mNwBwrPDtQho+r2o+MCdF/Hi4zNNnThaC0HyMSSdb75eteDBB2eS+bpUANrPGv8Jkjbe
-         uDt/0UzQ42zq/mEWOa30tpD8U/ZafqJbezlF0aW4uB4JicN7DA+lYQppmb/HvQDQSAs4
-         SrTu/o2DlHYvfmspF48uYG6PVAUtGcyNbBJJSh/SbRnhHDEYIrGVFAg0XzIX9owTt730
-         lxtkqqK3Id2P4VS7pYhEvy/kzQRfCSu1FRyeOdfoMP+7Z1yUZehTGO2Kpr/yFGYI67wz
-         kbgg==
+        bh=8r9lkR1ewmktO6f8Rf77A8AbHLVrP1WsFddPoMLwGkw=;
+        b=bMkg1xZT185KrHJXJFsW/EwmINi0UDjOk+dHKWE4lvYcn4hImVnrFp92fISdt0aYa5
+         b2+nuINy3rNZkuQYVBtbBj72q6+GigRtLd96X1RKIN9f2mmdmo1nMIzkT9bn6jY8qop2
+         0hKrf3owwfznx4wOfzMah97m1pCEhsyYCgLzEcjQ7dJ192Rt6+tdfusLkUdW4kS94HRA
+         Y59W/khhqjC9Q9epm1emX7cVly6JUlIBpszp891dJYSR9ciybbrHN/Z5FO3mAiFKlIcr
+         Pc7S+KrculE7i0JM+aucUbcORBSuH8QIfILEDRVyLkTn4mBGLY83ZsKvxafNn9r1GJRV
+         TyJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=EJYssnIVO9+6+TEhutNIY19jP+0vyYszSOhuqVf4GPs=;
-        b=IV11AWewBUwqkytg6GZK0MYRbXsUvWqWcpXCSGnmeipKZB+iQbyF4KCI+LBFuJRNkY
-         n0aVH98+5utZgZ6zjmlL4XztSS59tO9KRvmjHl5bdVmJZaDU2W3KBdhaehmNcnh+iXyg
-         8lxSgxWAEolXvHas9L1b6fdeTUJ1FhbRlE9Kd/RzMtXe7eWEISxSHa3C2lFlEEnr78mx
-         Y+iw8oZKQYuDGIqv+c9mx8ssuvU8APmmZ1ePmTHSnsWAO09kU9pexmcZW5B2Cc+sfg5D
-         zYkPxqwItvIJ0v9vn8wo62MbQjcm3W0KwG0p5FCOzVH1Ifg9gz2sgq0pvBPShQ5f3GZY
-         BzTg==
-X-Gm-Message-State: AOAM531cfG3i83khn5y+rbeoWqe4hyUxapYFzlZxYazQieSGgDHXFVIt
-        7S0O/Im/m+2vVDuwoNAVIym4yCl/tbmV6VCqVmqU
-X-Google-Smtp-Source: ABdhPJx3rYPUtrISFW4ljkWLabhg1Bc8Nd7OaYANMSQqXeNKfHuAJ4ghonPQ7GPKFsoidfowCFGFzBOXvuD4xF3IT3g=
-X-Received: by 2002:a50:f304:: with SMTP id p4mr23478658edm.118.1608721192052;
- Wed, 23 Dec 2020 02:59:52 -0800 (PST)
+        bh=8r9lkR1ewmktO6f8Rf77A8AbHLVrP1WsFddPoMLwGkw=;
+        b=iEtLfLtjdPpAAQcxJOCwRKT/WAf1b9GxrYPc6gnkxIx4y8Gx88CqKMoaQzGVIUWXBt
+         wf+6tyK9oav4YqskWHsI9gfhXhWEbJylvVUCnUxEEXwZO+edBpomztDQQ/9PwSCfLuDC
+         Pdn7Ks+AAnAdklEATWvJIDdJtGY0qwo/Ozw/0bVx6ieHmGioxBjJiv9GImIbAjSUT6IN
+         Bbrtwrmc4nZaoy/xpYdNJMAmmAboBz/CcSVW6lbu31P24RRwS4nzp4lLVHWWyv3VUDko
+         3o0LdytOaPAn4VrBypwsRJfKneVy5iaUonklzwPThjYHHfTNfIOFNfhmTXx220Lq09/T
+         E6PA==
+X-Gm-Message-State: AOAM532HJoiaM5+n0xMr2/8X7FWtUvhH4Aen5VQ20ojPEL+tqJrTXl/8
+        beW5usdmWZ43SqJLZIqeHtyHC5Oohr6SkhK5mUK2
+X-Google-Smtp-Source: ABdhPJyG19aAoEETogPYctEYJMED3IJISC+VgMuC0/oXotW9zb5O3R9AOF2iGjGgp5V5nFuNWEulpmdJHswyJmZvyJ4=
+X-Received: by 2002:a05:6402:407:: with SMTP id q7mr24171337edv.312.1608721596404;
+ Wed, 23 Dec 2020 03:06:36 -0800 (PST)
 MIME-Version: 1.0
-References: <20201222145221.711-1-xieyongji@bytedance.com> <c892652a-3f57-c337-8c67-084ba6d10834@redhat.com>
-In-Reply-To: <c892652a-3f57-c337-8c67-084ba6d10834@redhat.com>
+References: <20201222145221.711-1-xieyongji@bytedance.com> <20201222145221.711-9-xieyongji@bytedance.com>
+ <5b36bc51-1e19-2b59-6287-66aed435c8ed@redhat.com>
+In-Reply-To: <5b36bc51-1e19-2b59-6287-66aed435c8ed@redhat.com>
 From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 23 Dec 2020 18:59:41 +0800
-Message-ID: <CACycT3tr-1EDeH4j0AojD+-qM5yqDUU0tQHieVUXgL7AOTHyvQ@mail.gmail.com>
-Subject: Re: [RFC v2 00/13] Introduce VDUSE - vDPA Device in Userspace
+Date:   Wed, 23 Dec 2020 19:06:25 +0800
+Message-ID: <CACycT3tP8mgj043idjJW3BF12qmOhmHzYz8X5FyL8t5MbwLysw@mail.gmail.com>
+Subject: Re: [RFC v2 08/13] vdpa: Introduce process_iotlb_msg() in vdpa_config_ops
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
@@ -66,40 +67,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 23, 2020 at 2:38 PM Jason Wang <jasowang@redhat.com> wrote:
+On Wed, Dec 23, 2020 at 4:37 PM Jason Wang <jasowang@redhat.com> wrote:
 >
 >
 > On 2020/12/22 =E4=B8=8B=E5=8D=8810:52, Xie Yongji wrote:
-> > This series introduces a framework, which can be used to implement
-> > vDPA Devices in a userspace program. The work consist of two parts:
-> > control path forwarding and data path offloading.
+> > This patch introduces a new method in the vdpa_config_ops to
+> > support processing the raw vhost memory mapping message in the
+> > vDPA device driver.
 > >
-> > In the control path, the VDUSE driver will make use of message
-> > mechnism to forward the config operation from vdpa bus driver
-> > to userspace. Userspace can use read()/write() to receive/reply
-> > those control messages.
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
+> >   drivers/vhost/vdpa.c | 5 ++++-
+> >   include/linux/vdpa.h | 7 +++++++
+> >   2 files changed, 11 insertions(+), 1 deletion(-)
 > >
-> > In the data path, the core is mapping dma buffer into VDUSE
-> > daemon's address space, which can be implemented in different ways
-> > depending on the vdpa bus to which the vDPA device is attached.
+> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > index 448be7875b6d..ccbb391e38be 100644
+> > --- a/drivers/vhost/vdpa.c
+> > +++ b/drivers/vhost/vdpa.c
+> > @@ -728,6 +728,9 @@ static int vhost_vdpa_process_iotlb_msg(struct vhos=
+t_dev *dev,
+> >       if (r)
+> >               return r;
 > >
-> > In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver wit=
-h
-> > bounce-buffering mechanism to achieve that.
+> > +     if (ops->process_iotlb_msg)
+> > +             return ops->process_iotlb_msg(vdpa, msg);
+> > +
+> >       switch (msg->type) {
+> >       case VHOST_IOTLB_UPDATE:
+> >               r =3D vhost_vdpa_process_iotlb_update(v, msg);
+> > @@ -770,7 +773,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdp=
+a *v)
+> >       int ret;
+> >
+> >       /* Device want to do DMA by itself */
+> > -     if (ops->set_map || ops->dma_map)
+> > +     if (ops->set_map || ops->dma_map || ops->process_iotlb_msg)
+> >               return 0;
+> >
+> >       bus =3D dma_dev->bus;
+> > diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> > index 656fe264234e..7bccedf22f4b 100644
+> > --- a/include/linux/vdpa.h
+> > +++ b/include/linux/vdpa.h
+> > @@ -5,6 +5,7 @@
+> >   #include <linux/kernel.h>
+> >   #include <linux/device.h>
+> >   #include <linux/interrupt.h>
+> > +#include <linux/vhost_types.h>
+> >   #include <linux/vhost_iotlb.h>
+> >   #include <net/genetlink.h>
+> >
+> > @@ -172,6 +173,10 @@ struct vdpa_iova_range {
+> >    *                          @vdev: vdpa device
+> >    *                          Returns the iova range supported by
+> >    *                          the device.
+> > + * @process_iotlb_msg:               Process vhost memory mapping mess=
+age (optional)
+> > + *                           Only used for VDUSE device now
+> > + *                           @vdev: vdpa device
+> > + *                           @msg: vhost memory mapping message
+> >    * @set_map:                        Set device memory mapping (option=
+al)
+> >    *                          Needed for device that using device
+> >    *                          specific DMA translation (on-chip IOMMU)
+> > @@ -240,6 +245,8 @@ struct vdpa_config_ops {
+> >       struct vdpa_iova_range (*get_iova_range)(struct vdpa_device *vdev=
+);
+> >
+> >       /* DMA ops */
+> > +     int (*process_iotlb_msg)(struct vdpa_device *vdev,
+> > +                              struct vhost_iotlb_msg *msg);
+> >       int (*set_map)(struct vdpa_device *vdev, struct vhost_iotlb *iotl=
+b);
+> >       int (*dma_map)(struct vdpa_device *vdev, u64 iova, u64 size,
+> >                      u64 pa, u32 perm);
 >
 >
-> Rethink about the bounce buffer stuffs. I wonder instead of using kernel
-> pages with mmap(), how about just use userspace pages like what vhost did=
-?
->
-> It means we need a worker to do bouncing but we don't need to care about
-> annoying stuffs like page reclaiming?
+> Is there any reason that it can't be done via dma_map/dma_unmap or set_ma=
+p?
 >
 
-Now the I/O bouncing is done in the streaming DMA mapping routines
-which can be called from interrupt context. If we put this into a
-kworker, that means we need to synchronize with a kworker in an
-interrupt context. I think it can't work.
+To get the shmfd, we need the vma rather than physical address. And
+it's not necessary to pin the user pages in VDUSE case.
 
 Thanks,
 Yongji
