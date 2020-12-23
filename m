@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66ACA2E1108
+	by mail.lfdr.de (Postfix) with ESMTP id D80322E1109
 	for <lists+kvm@lfdr.de>; Wed, 23 Dec 2020 02:10:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbgLWBJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Dec 2020 20:09:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53350 "EHLO
+        id S1726526AbgLWBJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Dec 2020 20:09:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725300AbgLWBJe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Dec 2020 20:09:34 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D9DC061793
-        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:54 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id 91so16938743wrj.7
-        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:54 -0800 (PST)
+        with ESMTP id S1725300AbgLWBJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Dec 2020 20:09:36 -0500
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A81F6C06179C
+        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:55 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id e25so4576322wme.0
+        for <kvm@vger.kernel.org>; Tue, 22 Dec 2020 17:08:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=AELlSdlZPX/Uv45zWP6w9R8ftpPQUV4UnQSCu6+uF+8=;
-        b=iJ5Lq6x5oXdPH/BMfQ4sZoNOlrdKRMJpI9JBsiIlij3bJheLzlzq/4kqbK/UYTYREN
-         nPqFgiD6f7YUMY1+bpekRCna7wp2FTBNluFlRoMqGso6SV8RXKVK5+EsZifCaJTnsXH9
-         o6zFYovJ6p4cGaf1K6ydfFX+y73ikQbNlMuq3xbmmoDWiQa6wstKW+i8Q/3b750iuapG
-         Cx6Z9HMO6ttvjAGi1hY2sj0OkyBItKtFNavTuFrZuWtjAwZGwVG7B/13mJB9GRkxJi4W
-         scMao0Krzku57Do854uSpeRK8gHIpxE5PcbTavk1EiFj+LiT2eTzOhplH28dXsWq2Anw
-         68aw==
+        bh=bWhDKCGsyM3Ql87nT5QipuNUsOUCpyWwRvfW/Lqd2Sg=;
+        b=N79PbMTi8NpQjgTd8sW2oPCOJF9wmw6ibgOYYlcpKPuvptoB4y1lAtP+L7mI9dj+N3
+         mpNFv3M5CpX1VEHEgIaBjV/CDiyZiAVVL/FE2OOJBgtslNZ3T3KPpBUtQiX1i9e1TZkP
+         y8b01R6XIvrt4N2arJ2cKMToA6kNmXctP6id5R611psQ1Cyi7WxmucQxK48lkuJbKJvz
+         K3TVWS1cyB9tksER2pgKIbgnfhWKDsk//vMfr1YW764gOkNcTtvLGY71rlyd5RRZvkDA
+         B2JURVL0BBUGfGsZP2E411nxOv0aFMA7QWzqxdLStsAYJF57Jn6PKrD6TpcR5Nqa8SM2
+         rSww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=AELlSdlZPX/Uv45zWP6w9R8ftpPQUV4UnQSCu6+uF+8=;
-        b=KtaYgPhB9lEL4JM7PjBETxdY1ibjfgmuhY2kl76Du7HrDRzRdS4Mb6FxVHoaRhpwIC
-         WoRgnuQG0QtQcsRkveAB6sEaBd7toAC7urecQflhLqc3e8nMJHIavu658yzAdS8rdlos
-         eUnTmP7DG2Il7RTaMM+AlNL+8EJ/dxncOBenS3QU6tQK2zSgg55NeTogU79zhuEspr69
-         O7aoEkZRdF0VNE4TEqPYt7YqJrEmb0zhfn/nfZXqM7BWGryRqhiLkmnstjDFpfCNt5QF
-         eSQCn6HrdzO63YKmMCpMxuKcOmoD46K49OqbXJI/oHR2gAN4ClO5L8+R+SMB0x66vODe
-         3iXA==
-X-Gm-Message-State: AOAM530xn3D9gQkPhJMUtKnlHgF/t2RPaW2Dh3mTSbbxP3Kpyuvhxvv2
-        +5J/PMVvuhWI+r6w3YD5OULaZOVcU80=
-X-Google-Smtp-Source: ABdhPJwP6r5DdIbENK4G0rivMdNV1Dxj2qYlxZH4ov4r14vc0sIodi+kIv5yNChc3aOOylLHD2YcBQ==
-X-Received: by 2002:a5d:4641:: with SMTP id j1mr27013669wrs.94.1608685733191;
-        Tue, 22 Dec 2020 17:08:53 -0800 (PST)
+        bh=bWhDKCGsyM3Ql87nT5QipuNUsOUCpyWwRvfW/Lqd2Sg=;
+        b=hn0Roz2CWipTm5ojpCPnXJE+DwL+fzrbiYbpVkw+FNnd23QUwbFA806v3zQpzHkgHE
+         kb+YsfMsL8ywgIhHoXnERK+/zPpAPEQiD/CnF4twWeHR/D0zmaFd/aLr01sfMsg4sL3G
+         N+8PCXZvoFntL2M9W2jXrYig6jED/YLuciyPI9rRIoZcy4r1T9JeSuiFWA90FuAMJTqv
+         Xmq2qhNnCW5xt/ParUkv/Tdib65Kr5orNgoeVaVJH7Z/vyL89XOAkLtX6cfNNCv+gtj3
+         4XGo+ausvBhlzFbyeOwMhemQzwgM7KA7tt2+85ecvVFtiO6A+gB+B9rdS8gkwLw5Pmdg
+         76Uw==
+X-Gm-Message-State: AOAM531PVUnD+wm8umjLzL4yRmRaAuClPM5uWYRfW4x1DrMak3NJtq6j
+        0jrOSsgjXp7VZgeFr7TH7a19Pa+6N08=
+X-Google-Smtp-Source: ABdhPJye/rodbBrAoSs2jjcNVYeirCUwUeKCmBlzKYnKW8TM/1W/3IsT4zTcDzYI+xQ9iGIf1X7HXQ==
+X-Received: by 2002:a1c:2785:: with SMTP id n127mr24448988wmn.148.1608685734179;
+        Tue, 22 Dec 2020 17:08:54 -0800 (PST)
 Received: from avogadro.lan ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id h83sm30995047wmf.9.2020.12.22.17.08.52
+        by smtp.gmail.com with ESMTPSA id h83sm30995047wmf.9.2020.12.22.17.08.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Dec 2020 17:08:52 -0800 (PST)
+        Tue, 22 Dec 2020 17:08:53 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     mlevitsk@redhat.com
-Subject: [PATCH kvm-unit-tests 1/4] libcflat: add a few more runtime functions
-Date:   Wed, 23 Dec 2020 02:08:47 +0100
-Message-Id: <20201223010850.111882-2-pbonzini@redhat.com>
+Subject: [PATCH kvm-unit-tests 2/4] chaos: add generic stress test
+Date:   Wed, 23 Dec 2020 02:08:48 +0100
+Message-Id: <20201223010850.111882-3-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201223010850.111882-1-pbonzini@redhat.com>
 References: <20201223010850.111882-1-pbonzini@redhat.com>
@@ -63,167 +63,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These functions will be used to parse the chaos test's command line.
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- lib/alloc.c    |  9 +++++++-
- lib/alloc.h    |  1 +
- lib/libcflat.h |  4 +++-
- lib/string.c   | 59 +++++++++++++++++++++++++++++++++++++++++++++++---
- lib/string.h   |  3 +++
- 5 files changed, 71 insertions(+), 5 deletions(-)
+ lib/x86/processor.h |   2 +-
+ x86/Makefile.x86_64 |   1 +
+ x86/chaos.c         | 114 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 116 insertions(+), 1 deletion(-)
+ create mode 100644 x86/chaos.c
 
-diff --git a/lib/alloc.c b/lib/alloc.c
-index a46f464..a56f664 100644
---- a/lib/alloc.c
-+++ b/lib/alloc.c
-@@ -1,7 +1,7 @@
- #include "alloc.h"
- #include "bitops.h"
- #include "asm/page.h"
--#include "bitops.h"
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 291d24b..a53654a 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -546,7 +546,7 @@ static inline void irq_enable(void)
+     asm volatile("sti");
+ }
+ 
+-static inline void invlpg(volatile void *va)
++static inline void invlpg(const volatile void *va)
+ {
+ 	asm volatile("invlpg (%0)" ::"r" (va) : "memory");
+ }
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index af61d85..761a1d9 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -20,6 +20,7 @@ tests += $(TEST_DIR)/tscdeadline_latency.flat
+ tests += $(TEST_DIR)/intel-iommu.flat
+ tests += $(TEST_DIR)/vmware_backdoors.flat
+ tests += $(TEST_DIR)/rdpru.flat
++tests += $(TEST_DIR)/chaos.flat
+ 
+ include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+ 
+diff --git a/x86/chaos.c b/x86/chaos.c
+new file mode 100644
+index 0000000..e723a3b
+--- /dev/null
++++ b/x86/chaos.c
+@@ -0,0 +1,114 @@
++#include "libcflat.h"
++#include "smp.h"
++#include "bitops.h"
 +#include "string.h"
- 
- void *malloc(size_t size)
- {
-@@ -50,6 +50,13 @@ void *calloc(size_t nmemb, size_t size)
- 	return ptr;
- }
- 
-+char *strdup(const char *s)
++#include "alloc.h"
++#include "alloc_page.h"
++#include "asm/page.h"
++#include "processor.h"
++
++#define MAX_NR_CPUS 256
++
++struct chaos_args {
++	long npages;		/* 0 for CPU workload. */
++	const char *mem;
++	int invtlb;
++};
++
++int ncpus;
++struct chaos_args all_args[MAX_NR_CPUS];
++
++static void parse_arg(struct chaos_args *args, const char *arg)
 +{
-+	size_t len = strlen(s) + 1;
-+	char *d = malloc(len);
-+	return strcpy(d, s);
-+}
++	char *s = strdup(arg);
++	char *p = s;
 +
- void free(void *ptr)
- {
- 	if (alloc_ops->free)
-diff --git a/lib/alloc.h b/lib/alloc.h
-index 9b4b634..4139465 100644
---- a/lib/alloc.h
-+++ b/lib/alloc.h
-@@ -34,5 +34,6 @@ void *malloc(size_t size);
- void *calloc(size_t nmemb, size_t size);
- void free(void *ptr);
- void *memalign(size_t alignment, size_t size);
-+char *strdup(const char *s);
- 
- #endif /* _ALLOC_H_ */
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index 460a123..7d5d02e 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -80,9 +80,11 @@ extern int __getchar(void);
- extern int getchar(void);
- extern void exit(int code) __attribute__((noreturn));
- extern void abort(void) __attribute__((noreturn));
--extern long atol(const char *ptr);
- extern char *getenv(const char *name);
- 
-+extern long atol(const char *ptr);
-+extern int parse_long(const char *s, long *num);
-+
- extern int printf(const char *fmt, ...)
- 					__attribute__((format(printf, 1, 2)));
- extern int snprintf(char *buf, int size, const char *fmt, ...)
-diff --git a/lib/string.c b/lib/string.c
-index 75257f5..1ebefcb 100644
---- a/lib/string.c
-+++ b/lib/string.c
-@@ -135,10 +135,9 @@ void *memchr(const void *s, int c, size_t n)
-     return NULL;
- }
- 
--long atol(const char *ptr)
-+int parse_long(const char *s, long *num)
- {
-     long acc = 0;
--    const char *s = ptr;
-     int neg, c;
- 
-     while (*s == ' ' || *s == '\t')
-@@ -163,7 +162,15 @@ long atol(const char *ptr)
-     if (neg)
-         acc = -acc;
- 
--    return acc;
-+    *num = acc;
-+    return !*s;
-+}
-+
-+long atol(const char *ptr)
-+{
-+	long num;
-+	parse_long(ptr, &num);
-+	return num;
- }
- 
- extern char **environ;
-@@ -224,3 +231,49 @@ bool simple_glob(const char *text, const char *pattern)
- 
- 	return !strcmp(text, copy);
- }
-+
-+/* Based on musl libc.  */
-+#define BITOP(a,b,op) \
-+ ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
-+
-+size_t strcspn(const char *s, const char *c)
-+{
-+	const char *a = s;
-+	size_t byteset[32/sizeof(size_t)] = { 0 };
-+
-+	if (!c[0])
-+		return 0;
-+	if (!c[1]) {
-+		while (*s != *c)
-+			s++;
-+	} else {
-+		while (*c) {
-+			BITOP(byteset, *(unsigned char *)c, |=);
-+			c++;
++	while (*p) {
++		char *word = p;
++		char delim = strdelim(&p, ",=");
++		long i = 0;
++		bool have_arg = false;
++		if (delim == '=') {
++			char *num = p;
++			strdelim(&p, ",");
++			if (!parse_long(num, &i))
++				printf("invalid argument for %s\n", word);
++			else
++				have_arg = true;
 +		}
-+		while (*s && !BITOP(byteset, *(unsigned char *)s, &))
-+			s++;
++
++		if (!strcmp(word, "mem")) {
++			if (!have_arg)
++				i = 12;
++			else if (i >= BITS_PER_LONG - 1 - PAGE_SHIFT) {
++				printf("mem argument too large, using 12\n");
++				i = 12;
++			}
++			args->npages = 1 << i;
++			args->mem = alloc_pages(i);
++			if (!args->mem)
++				printf("could not allocate memory\n");
++			printf("CPU %d: mem=%ld @ %p\n", smp_id(), i, args->mem);
++		} else if (!strcmp(word, "invtlb")) {
++			if (!have_arg)
++				i = 1;
++			else if (i != 0 && i != 1) {
++				printf("invtlb argument must be 0 or 1\n");
++				i = 1;
++			}
++			args->invtlb = i;
++			printf("CPU %d: invtlb=%ld\n", smp_id(), i);
++		} else {
++			printf("invalid argument %s\n", word);
++		}
 +	}
-+	return s - a;
++	free(s);
 +}
 +
-+/*
-+ * Slightly more flexible strsep.  The pointer to the token
-+ * must be stashed by the caller, the delimiter is the return value.
-+ */
-+char strdelim(char **p, const char *sep)
++static void __attribute__((noreturn)) stress(void *data)
 +{
-+	char *e;
-+	char *s = *p;
-+	char delim;
++    const char *arg = data;
++    struct chaos_args *args = &all_args[smp_id()];
 +
-+	e = s + strcspn(s, sep);
-+	delim = *e;
-+	if (delim) {
-+		*e = 0;
-+		*p = ++e;
-+	} else {
-+		*p = e;
-+	}
-+	return delim;
++    printf("starting CPU %d workload: %s\n", smp_id(), arg);
++    parse_arg(args, arg);
++
++    for (;;) {
++	    if (args->mem) {
++		    const char *s = args->mem;
++		    const char *e = s + (args->npages << PAGE_SHIFT);
++		    long i;
++		    for (i = args->npages; args->invtlb && i--; )
++			    invlpg(s + ((args->npages - i) << PAGE_SHIFT));
++		    while (s < e) {
++			    (*(unsigned long *)s)++;
++			    s += sizeof(unsigned long);
++		    }
++	    }
++    }
 +}
-diff --git a/lib/string.h b/lib/string.h
-index 493d51b..da31668 100644
---- a/lib/string.h
-+++ b/lib/string.h
-@@ -20,4 +20,7 @@ extern int memcmp(const void *s1, const void *s2, size_t n);
- extern void *memmove(void *dest, const void *src, size_t n);
- extern void *memchr(const void *s, int c, size_t n);
- 
-+size_t strcspn(const char *s, const char *c);
-+char strdelim(char **p, const char *sep);
 +
- #endif /* _STRING_H */
++int main(int argc, char *argv[])
++{
++    int i;
++
++    setup_vm();
++    if (argc <= 1) {
++        return 1;
++    }
++
++    argv++;
++    argc--;
++    ncpus = cpu_count();
++    if (ncpus > MAX_NR_CPUS)
++	    ncpus = MAX_NR_CPUS;
++
++    for (i = 1; i < ncpus; ++i) {
++        if (i >= argc) {
++            break;
++        }
++        on_cpu_async(i, stress, argv[i]);
++    }
++
++    stress(argv[0]);
++}
 -- 
 2.29.2
 
