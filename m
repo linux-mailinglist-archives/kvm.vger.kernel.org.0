@@ -2,115 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 802B72E243E
-	for <lists+kvm@lfdr.de>; Thu, 24 Dec 2020 06:04:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 119232E2533
+	for <lists+kvm@lfdr.de>; Thu, 24 Dec 2020 08:26:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725767AbgLXFEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Dec 2020 00:04:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32596 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725355AbgLXFEP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Dec 2020 00:04:15 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BO52Knm001136;
-        Thu, 24 Dec 2020 00:03:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Ii6jRyv/9Sj1L+uzNzcLldGbFtG/uk3599WXpV0a+YA=;
- b=NYnoOkRwcYeG4AdfIWE2vN3i3Iv8X1jYaDmGFn5DV/y/wiouxOH9eCn6IbFVywtt912r
- h/6+cLYI8BSKwPy98IKMah2PknfQQjCd6y3Vz+U8PceU5Yj1NVH2O8G4+rECMq/BaOYR
- MJ6JB0p2suZJtAKVnd5Ylx9Esx3hM/h50HH5XOZla90CxW2e5UPp2k7lbIC9qGnu6uy9
- sLWXRbhRi+IGsDXMIlc1HtHD8J+7fm46xIKVlsf4EYVcfZr2CKyq3O+Dwd/MIR3esikg
- nnrW8JDUlBb92oEGROtlLive1UfRJObSv0J5OUc84Fot1K3e1iupBVVN8q4TtuZUqOcm bQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35mm0urhu5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Dec 2020 00:03:33 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BO53OtM006696;
-        Thu, 24 Dec 2020 00:03:33 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35mm0urhtj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Dec 2020 00:03:33 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BO4xp9Y031178;
-        Thu, 24 Dec 2020 05:03:30 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma02fra.de.ibm.com with ESMTP id 35hdguta4v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Dec 2020 05:03:30 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BO53RQd41746696
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Dec 2020 05:03:27 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC2444204F;
-        Thu, 24 Dec 2020 05:03:27 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1CE0142041;
-        Thu, 24 Dec 2020 05:03:27 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.171.52.24])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 24 Dec 2020 05:03:27 +0000 (GMT)
-Date:   Thu, 24 Dec 2020 06:03:25 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH v5] s390/vfio-ap: clean up vfio_ap resources when KVM
- pointer invalidated
-Message-ID: <20201224060325.2170d7e9.pasic@linux.ibm.com>
-In-Reply-To: <20201223012013.5418-1-akrowiak@linux.ibm.com>
-References: <20201223012013.5418-1-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726047AbgLXHZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Dec 2020 02:25:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49180 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725811AbgLXHZr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Dec 2020 02:25:47 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8093EC06179C
+        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 23:25:06 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id b2so1424023edm.3
+        for <kvm@vger.kernel.org>; Wed, 23 Dec 2020 23:25:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=wqSoUJ0wK428r/8qtbJUJtWlo8/XxBIZ7I2arOIoVvg=;
+        b=uCfDQp+rckuVdcZ/vely7IwCRxCR6p1idVLIxaoZT9ytRtnDQPr53X7ewWQqhyQeRt
+         DGMuYQ/Fnt3huQeBJtDG+Ek3MxXEHmmOPiQWIkWYaFZlyepi/JdTJezVIRCTSKgSdiQo
+         QYx56uo5cPF/9QZ0DvERgrRadxTp4j/sFjxeGc8+d1FaZPqGAMURnQONgUeeIzc+/VRS
+         AsZlCV8qbRQeBZ2i0xspi7zbX3DtDcn2ZK8muC7HN9BMacgiC+ikbOEG7paMdjGNt+a2
+         mvJycjddQn7HMe4Xj8tNRld7Dr4eRKlgCuW44RhNjMZ33MP8wgf+4jDILoVtr+fht/nF
+         NSFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=wqSoUJ0wK428r/8qtbJUJtWlo8/XxBIZ7I2arOIoVvg=;
+        b=ry685z+951VjuECU8dEIvWrJ7U9+Y2lVZ0g7arINtqi6iHJl03p8YorQdhv60af83P
+         jQ5uWpfKpMnx6JgGMyBpVxzVrsVjIdVET17e2CazMizKlph7GGhb9JUQYpnt2gW4FlXa
+         GWbTlGEj3J3oT7EAH0ykg8GsgefRcCqHBT2+SckPgYqSgsg2EnJ21sEE+mJ1pChdJ8+H
+         C0/kHyAPmsjRXwABV+gL6Vgo/EI0jmcmWTiuSRzxfLK5N+cqTRk6DxdoHXJqNqCL2RX5
+         aPs1yESd+ofxIuRg0kbzJH6Tl6u5wFffNkHvzODVlTuJI3NCiitymfCCYORJigo3IB2F
+         MR5w==
+X-Gm-Message-State: AOAM531PWHunpnJO1O6e/XOc05VMaZkpl5DCcPfaYg1K2XSv55ZSHmg1
+        Irdmh2VMq2+F+LSRcj8VyB+IDZ34a9a0W38zXdVz
+X-Google-Smtp-Source: ABdhPJxYtKj5zSF9sYKP0JW8AGDlYbzQ/DtgYlMviG2drnktYahrLMoBL4l3uXC37jhXyO2bXLesu8cNLrFWF81FKb8=
+X-Received: by 2002:aa7:c60c:: with SMTP id h12mr27893759edq.145.1608794704858;
+ Wed, 23 Dec 2020 23:25:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-24_02:2020-12-23,2020-12-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- lowpriorityscore=0 malwarescore=0 suspectscore=0 mlxscore=0
- mlxlogscore=999 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012240027
+References: <20201222145221.711-1-xieyongji@bytedance.com> <20201222145221.711-9-xieyongji@bytedance.com>
+ <5b36bc51-1e19-2b59-6287-66aed435c8ed@redhat.com> <CACycT3tP8mgj043idjJW3BF12qmOhmHzYz8X5FyL8t5MbwLysw@mail.gmail.com>
+ <4b13e574-d898-55cc-9ec6-78f28a7f2cd9@redhat.com>
+In-Reply-To: <4b13e574-d898-55cc-9ec6-78f28a7f2cd9@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 24 Dec 2020 15:24:54 +0800
+Message-ID: <CACycT3uPGEGsY-=Yak02B0pb77KCKH=bgvHMCQXvBdaWU=22zg@mail.gmail.com>
+Subject: Re: Re: [RFC v2 08/13] vdpa: Introduce process_iotlb_msg() in vdpa_config_ops
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
+        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Dec 2020 20:20:13 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Thu, Dec 24, 2020 at 10:37 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2020/12/23 =E4=B8=8B=E5=8D=887:06, Yongji Xie wrote:
+> > On Wed, Dec 23, 2020 at 4:37 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> On 2020/12/22 =E4=B8=8B=E5=8D=8810:52, Xie Yongji wrote:
+> >>> This patch introduces a new method in the vdpa_config_ops to
+> >>> support processing the raw vhost memory mapping message in the
+> >>> vDPA device driver.
+> >>>
+> >>> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> >>> ---
+> >>>    drivers/vhost/vdpa.c | 5 ++++-
+> >>>    include/linux/vdpa.h | 7 +++++++
+> >>>    2 files changed, 11 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> >>> index 448be7875b6d..ccbb391e38be 100644
+> >>> --- a/drivers/vhost/vdpa.c
+> >>> +++ b/drivers/vhost/vdpa.c
+> >>> @@ -728,6 +728,9 @@ static int vhost_vdpa_process_iotlb_msg(struct vh=
+ost_dev *dev,
+> >>>        if (r)
+> >>>                return r;
+> >>>
+> >>> +     if (ops->process_iotlb_msg)
+> >>> +             return ops->process_iotlb_msg(vdpa, msg);
+> >>> +
+> >>>        switch (msg->type) {
+> >>>        case VHOST_IOTLB_UPDATE:
+> >>>                r =3D vhost_vdpa_process_iotlb_update(v, msg);
+> >>> @@ -770,7 +773,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_v=
+dpa *v)
+> >>>        int ret;
+> >>>
+> >>>        /* Device want to do DMA by itself */
+> >>> -     if (ops->set_map || ops->dma_map)
+> >>> +     if (ops->set_map || ops->dma_map || ops->process_iotlb_msg)
+> >>>                return 0;
+> >>>
+> >>>        bus =3D dma_dev->bus;
+> >>> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> >>> index 656fe264234e..7bccedf22f4b 100644
+> >>> --- a/include/linux/vdpa.h
+> >>> +++ b/include/linux/vdpa.h
+> >>> @@ -5,6 +5,7 @@
+> >>>    #include <linux/kernel.h>
+> >>>    #include <linux/device.h>
+> >>>    #include <linux/interrupt.h>
+> >>> +#include <linux/vhost_types.h>
+> >>>    #include <linux/vhost_iotlb.h>
+> >>>    #include <net/genetlink.h>
+> >>>
+> >>> @@ -172,6 +173,10 @@ struct vdpa_iova_range {
+> >>>     *                          @vdev: vdpa device
+> >>>     *                          Returns the iova range supported by
+> >>>     *                          the device.
+> >>> + * @process_iotlb_msg:               Process vhost memory mapping me=
+ssage (optional)
+> >>> + *                           Only used for VDUSE device now
+> >>> + *                           @vdev: vdpa device
+> >>> + *                           @msg: vhost memory mapping message
+> >>>     * @set_map:                        Set device memory mapping (opt=
+ional)
+> >>>     *                          Needed for device that using device
+> >>>     *                          specific DMA translation (on-chip IOMM=
+U)
+> >>> @@ -240,6 +245,8 @@ struct vdpa_config_ops {
+> >>>        struct vdpa_iova_range (*get_iova_range)(struct vdpa_device *v=
+dev);
+> >>>
+> >>>        /* DMA ops */
+> >>> +     int (*process_iotlb_msg)(struct vdpa_device *vdev,
+> >>> +                              struct vhost_iotlb_msg *msg);
+> >>>        int (*set_map)(struct vdpa_device *vdev, struct vhost_iotlb *i=
+otlb);
+> >>>        int (*dma_map)(struct vdpa_device *vdev, u64 iova, u64 size,
+> >>>                       u64 pa, u32 perm);
+> >>
+> >> Is there any reason that it can't be done via dma_map/dma_unmap or set=
+_map?
+> >>
+> > To get the shmfd, we need the vma rather than physical address. And
+> > it's not necessary to pin the user pages in VDUSE case.
+>
+>
+> Right, actually, vhost-vDPA is planning to support shared virtual
+> address space.
+>
+> So let's try to reuse the existing config ops. How about just introduce
+> an attribute to vdpa device that tells the bus tells the bus it can do
+> shared virtual memory. Then when the device is probed by vhost-vDPA, use
+> pages won't be pinned and we will do VA->VA mapping as IOVA->PA mapping
+> in the vhost IOTLB and the config ops. vhost IOTLB needs to be extended
+> to accept opaque pointer to store the file. And the file was pass via
+> the config ops as well.
+>
 
-> The vfio_ap device driver registers a group notifier with VFIO when the
-> file descriptor for a VFIO mediated device for a KVM guest is opened to
-> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
-> event). When the KVM pointer is set, the vfio_ap driver takes the
-> following actions:
-> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
->    of the mediated device.
-> 2. Calls the kvm_get_kvm() function to increment its reference counter.
-> 3. Sets the function pointer to the function that handles interception of
->    the instruction that enables/disables interrupt processing.
-> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
->    the guest.
-> 
-> In order to avoid memory leaks, when the notifier is called to receive
-> notification that the KVM pointer has been set to NULL, the vfio_ap device
-> driver should reverse the actions taken when the KVM pointer was set.
-> 
-> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+OK, I see. Will try it in v3.
 
-LGTM.
-
-Christian, you wanted to pick this yourself directly, or? I think we are
-good to go!
+Thanks,
+Yongji
