@@ -2,163 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D17242E2893
-	for <lists+kvm@lfdr.de>; Thu, 24 Dec 2020 19:30:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 625252E28F2
+	for <lists+kvm@lfdr.de>; Thu, 24 Dec 2020 23:00:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728462AbgLXS2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Dec 2020 13:28:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727778AbgLXS2s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Dec 2020 13:28:48 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0257C061573;
-        Thu, 24 Dec 2020 10:28:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=VGafzW+gDLjGLMNoybNSBGNiUL4/Bi3JEFJxz+NnDOo=; b=EhJff5vA4Ww2XgctyYRLpm5zaW
-        fRb++J29JhQTcpWEtDdKhunxvfrubKlxzZI6mk3AeZEvGqrgkAZ8DnAxMnvlREgOTa9odqM6ubPUi
-        9VoylnGnIYzu+2X/G3J/CtrUMdrFMijVEKnIuYlm4v4kszYsGULZp1Nt3fBzThEONGsRLtKCj+CQs
-        Cs8EOGH/qKHER6lmIV04pGHhCSwHwvC3qezfOo6SqzswdE6qkFIfRoLDly20ykRbeL6Gi09JsixXi
-        8Nam8gVIdPJVmiDV2Xtfe5/BdGo2AENkRg2yBGtTnltj64CRb0vAf5ekbHFJ55JHDuBaJzCT7AllJ
-        1VEiqVXQ==;
-Received: from [2601:1c0:6280:3f0::64ea]
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ksVKp-0007Zk-7Z; Thu, 24 Dec 2020 18:27:35 +0000
-Subject: Re: [RFC V2 37/37] Add documentation for dmemfs
-To:     yulei.kernel@gmail.com, linux-mm@kvack.org,
-        akpm@linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        naoya.horiguchi@nec.com, viro@zeniv.linux.org.uk,
-        pbonzini@redhat.com
-Cc:     joao.m.martins@oracle.com, sean.j.christopherson@intel.com,
-        xiaoguangrong.eric@gmail.com, kernellwp@gmail.com,
-        lihaiwei.kernel@gmail.com, Yulei Zhang <yuleixzhang@tencent.com>
-References: <cover.1607332046.git.yuleixzhang@tencent.com>
- <6a3a71f75dad1fa440677fc1bcdc170f178be1d8.1607332046.git.yuleixzhang@tencent.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <a8920d25-e109-cfce-5137-1f4374c815e9@infradead.org>
-Date:   Thu, 24 Dec 2020 10:27:28 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <6a3a71f75dad1fa440677fc1bcdc170f178be1d8.1607332046.git.yuleixzhang@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1729121AbgLXWAM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Dec 2020 17:00:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40396 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729004AbgLXWAL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Dec 2020 17:00:11 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 4553022AED;
+        Thu, 24 Dec 2020 21:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608847171;
+        bh=57XCp+HRxi/jkyLBws5d5+r5kabghPGmjpfApkrGQy4=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=HL2LOgzE347X2+IxZT0fYzkcnArzEWkvA28TmsIO6NpiEvq4Hut7iTyidOWtsIp4M
+         5UjKMNqTBDp/wClTvZ07DRevAdY3q6L2Usdpkq5C/yPb+MFOzXaS1ZhVbr1ERimxnr
+         UMb1JKMdpFTfO8LJFEflRm3phUQRNjlOHvtke0x2yfD6Ll9sYrSdnNhtqsuvN6LFyk
+         VJcLEufJSdpREQEyVPSfp/ioLtPKT8hyiRVSRAoeWpKIfb9vp3ocejOxKo4SLNyAM4
+         VWkN7dB/KHNZYf6OfySA0H6WJM9YmaF4+Av0atjfa+DbnMV2x1tBGymwWbuHh0FUxZ
+         evHHQrFforjWw==
+Received: from pdx-korg-docbuild-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-1.ci.codeaurora.org (Postfix) with ESMTP id 369C7604E9;
+        Thu, 24 Dec 2020 21:59:31 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio,vdpa: features, cleanups, fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20201223072448-mutt-send-email-mst@kernel.org>
+References: <20201223072448-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20201223072448-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 418eddef050d5f6393c303a94e3173847ab85466
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 64145482d3339d71f58857591d021588040543f4
+Message-Id: <160884717121.31605.12367248989541455981.pr-tracker-bot@kernel.org>
+Date:   Thu, 24 Dec 2020 21:59:31 +0000
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        akpm@linux-foundation.org, christophe.jaillet@wanadoo.fr,
+        dan.carpenter@oracle.com, david@redhat.com, elic@nvidia.com,
+        file@sect.tu-berlin.de, hulkci@huawei.com, info@metux.net,
+        jasowang@redhat.com, mgurtovoy@nvidia.com, mhocko@kernel.org,
+        mst@redhat.com, osalvador@suse.de, pankaj.gupta.linux@gmail.com,
+        parav@nvidia.com, peng.fan@nxp.com,
+        richard.weiyang@linux.alibaba.com, robert.buhren@sect.tu-berlin.de,
+        sgarzare@redhat.com, tiantao6@hisilicon.com,
+        zhangchangzhong@huawei.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+The pull request you sent on Wed, 23 Dec 2020 07:24:48 -0500:
 
-On 12/7/20 3:31 AM, yulei.kernel@gmail.com wrote:
-> From: Yulei Zhang <yuleixzhang@tencent.com>
-> 
-> Introduce dmemfs.rst to document the basic usage of dmemfs.
-> 
-> Signed-off-by: Yulei Zhang <yuleixzhang@tencent.com>
-> ---
->  Documentation/filesystems/dmemfs.rst | 58 ++++++++++++++++++++++++++++++++++++
->  Documentation/filesystems/index.rst  |  1 +
->  2 files changed, 59 insertions(+)
->  create mode 100644 Documentation/filesystems/dmemfs.rst
-> 
-> diff --git a/Documentation/filesystems/dmemfs.rst b/Documentation/filesystems/dmemfs.rst
-> new file mode 100644
-> index 00000000..f13ed0c
-> --- /dev/null
-> +++ b/Documentation/filesystems/dmemfs.rst
-> @@ -0,0 +1,58 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=====================================
-> +The Direct Memory Filesystem - DMEMFS
-> +=====================================
-> +
-> +
-> +.. Table of contents
-> +
-> +   - Overview
-> +   - Compilation
-> +   - Usage
-> +
-> +Overview
-> +========
-> +
-> +Dmemfs (Direct Memory filesystem) is device memory or reserved
-> +memory based filesystem. This kind of memory is special as it
-> +is not managed by kernel and it is without 'struct page'. Therefore
-> +it can save extra memory from the host system for various usage,
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-                                                             usages,
-or                                                           uses,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/64145482d3339d71f58857591d021588040543f4
 
-> +especially for guest virtual machines.
-> +
-> +It uses a kernel boot parameter ``dmem=`` to reserve the system
-> +memory when the host system boots up, the details can be checked
-
-                               boots up. The detail
-
-> +in /Documentation/admin-guide/kernel-parameters.txt.
-> +
-> +Compilation
-> +===========
-> +
-> +The filesystem should be enabled by turning on the kernel configuration
-> +options::
-> +
-> +        CONFIG_DMEM_FS          - Direct Memory filesystem support
-> +        CONFIG_DMEM             - Allow reservation of memory for dmem
-
-Would anyone want DMEM_FS without DMEM?
-
-> +
-> +
-> +Additionally, the following can be turned on to aid debugging::
-> +
-> +        CONFIG_DMEM_DEBUG_FS    - Enable debug information for dmem
-> +
-> +Usage
-> +========
-> +
-> +Dmemfs supports mapping ``4K``, ``2M`` and ``1G`` size of pages to
-
-                                                     sizes
-
-> +the userspace, for example ::
-
-       userspace. For example::
-
-> +
-> +    # mount -t dmemfs none -o pagesize=4K /mnt/
-> +
-> +The it can create the backing storage with 4G size ::
-
-   Then
-
-> +
-> +    # truncate /mnt/dmemfs-uuid --size 4G
-> +
-> +To use as backing storage for virtual machine starts with qemu, just need
-
-                                                 started with qemu, just specify
-   the memory-backed-file
-
-> +to specify the memory-backed-file in the qemu command line like this ::
-> +
-> +    # -object memory-backend-file,id=ram-node0,mem-path=/mnt/dmemfs-uuid \
-
-                        backed
-
-
-> +        share=yes,size=4G,host-nodes=0,policy=preferred -numa node,nodeid=0,memdev=ram-node0
-> +
-
+Thank you!
 
 -- 
-~Randy
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
