@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F7FB2E288D
-	for <lists+kvm@lfdr.de>; Thu, 24 Dec 2020 19:20:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C38742E2888
+	for <lists+kvm@lfdr.de>; Thu, 24 Dec 2020 19:18:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728511AbgLXSUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Dec 2020 13:20:09 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:47036 "EHLO
+        id S1728718AbgLXSSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Dec 2020 13:18:21 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:44800 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727861AbgLXSUI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Dec 2020 13:20:08 -0500
+        with ESMTP id S1728350AbgLXSSV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Dec 2020 13:18:21 -0500
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BOI8wLW109413;
-        Thu, 24 Dec 2020 18:19:23 GMT
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BOI8jqc109339;
+        Thu, 24 Dec 2020 18:17:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
  cc : references : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=uRioHjes1jrALtVzK7cWfsY3nA+eDXhnqIe84jMZzI8=;
- b=kFJIT3Z9caX/M/DjDRWUECp/7XproIMp9nDDiJ/efKqnSye114rVgCr8UW4co21dVF0+
- SLJt8eU1n7J+qPEgXposd6+TI4b4irYQIm3OtWWZXthSLK40/pW+jBNBTCtanelzFUSz
- bxozsOckhuM9FFQ13TL+7KyERVec1zS0WaihvlkJu6DBYvNKrjeiziw6QyGLJDIw0pQY
- ALTTBH0qp/vezT2LBjgJwRwnTXjRHD0RBEj71I3eHENqbZK5H7J+eXMOVVJzpwla74im
- iRAO73PMgy3q99AGOBGcimc13nbOfR1UFuGJgEDYS4+aPe7xzruaAobC6fAebf1YhIfw kw== 
+ bh=MnY+U7XfRDqdc1Rs1zEn7FJ/klKVWICZtwK9lgl1BTc=;
+ b=ng/TSJKwDe2TDBj3TciO8yly0AwLDh9bd/NBlAupm3GtOIlkIOzHZ0bMK+ihH6AQDfME
+ ju+BQwYtw2kpdv0RT6s8NXqZsiJpTbNpH9Dj0o2lVreWHbADbXOxkbuKUiZQcvGx2eB2
+ Oy33xVbuy2XttKFa6d5/ps581VA1hseco3mnJl0R5crSkJhpkQh/Fjz1M6HnWIj5Ssgz
+ oXEQzWKFj3zs9ptJSm6EqBeSPQjPRrMz3oHO2qbZ5BfycMCcGsiOdWdWr+KnCqXz5mu5
+ H4mt1RxlTnycRfG2lyVp6bb8SDeL3RV7J0A/Fhap5HUFG4qtPN386vXfKTDGMM2RCB2q HQ== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 35ku8dxjjk-1
+        by userp2130.oracle.com with ESMTP id 35ku8dxjfy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 24 Dec 2020 18:19:23 +0000
+        Thu, 24 Dec 2020 18:17:34 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BOIBggc061210;
-        Thu, 24 Dec 2020 18:17:22 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 35k0e51266-1
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BOIBhMn061347;
+        Thu, 24 Dec 2020 18:17:33 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 35k0e5127s-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Dec 2020 18:17:22 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0BOIHLLp006109;
-        Thu, 24 Dec 2020 18:17:21 GMT
+        Thu, 24 Dec 2020 18:17:33 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0BOIHWvX012212;
+        Thu, 24 Dec 2020 18:17:32 GMT
 Received: from localhost.localdomain (/10.159.237.219)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 24 Dec 2020 10:17:21 -0800
+        with ESMTP ; Thu, 24 Dec 2020 10:17:32 -0800
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [kvm-unit-tests PATCH v1 06/12] lib/alloc.h: remove align_min
- from struct alloc_ops
+Subject: Re: [kvm-unit-tests PATCH v1 12/12] lib/alloc_page: default flags and
+ zero pages by default
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
         pbonzini@redhat.com, cohuck@redhat.com, lvivier@redhat.com,
         nadav.amit@gmail.com
 References: <20201216201200.255172-1-imbrenda@linux.ibm.com>
- <20201216201200.255172-7-imbrenda@linux.ibm.com>
-Message-ID: <efd03516-a0cc-b897-5b12-e25114103f71@oracle.com>
-Date:   Thu, 24 Dec 2020 10:17:20 -0800
+ <20201216201200.255172-13-imbrenda@linux.ibm.com>
+Message-ID: <c61ee0fb-5d06-8c61-fa97-975c6a603599@oracle.com>
+Date:   Thu, 24 Dec 2020 10:17:30 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201216201200.255172-7-imbrenda@linux.ibm.com>
+In-Reply-To: <20201216201200.255172-13-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -74,99 +74,80 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 12/16/20 12:11 PM, Claudio Imbrenda wrote:
-> Remove align_min from struct alloc_ops, since it is no longer used.
+On 12/16/20 12:12 PM, Claudio Imbrenda wrote:
+> The new function page_alloc_set_default_flags can be used to set the
+> default flags for allocations. The passed value will be ORed with the
+> flags argument passed to the allocator at each allocation.
+>
+> The default value for the default flags is FLAG_ZERO, which means that
+> by default all allocated memory is now zeroed, restoring the default
+> behaviour that had been accidentally removed by a previous commit.
+>
+> If needed, a testcase can call page_alloc_set_default_flags(0) in order
+> to get non-zeroed pages from the allocator. For example, if the
+> testcase will need fresh memory, the zero flag should be removed from
+> the default.
+>
+> Fixes: 8131e91a4b61 ("lib/alloc_page: complete rewrite of the page allocator")
+> Reported-by: Nadav Amit<nadav.amit@gmail.com>
 >
 > Signed-off-by: Claudio Imbrenda<imbrenda@linux.ibm.com>
 > ---
->   lib/alloc.h      | 1 -
->   lib/alloc_page.c | 1 -
->   lib/alloc_phys.c | 9 +++++----
->   lib/vmalloc.c    | 1 -
->   4 files changed, 5 insertions(+), 7 deletions(-)
+>   lib/alloc_page.h | 3 +++
+>   lib/alloc_page.c | 8 ++++++++
+>   2 files changed, 11 insertions(+)
 >
-> diff --git a/lib/alloc.h b/lib/alloc.h
-> index 9b4b634..db90b01 100644
-> --- a/lib/alloc.h
-> +++ b/lib/alloc.h
-> @@ -25,7 +25,6 @@
->   struct alloc_ops {
->   	void *(*memalign)(size_t alignment, size_t size);
->   	void (*free)(void *ptr);
-> -	size_t align_min;
->   };
+> diff --git a/lib/alloc_page.h b/lib/alloc_page.h
+> index 1039814..8b53a58 100644
+> --- a/lib/alloc_page.h
+> +++ b/lib/alloc_page.h
+> @@ -22,6 +22,9 @@
+>   /* Returns true if the page allocator has been initialized */
+>   bool page_alloc_initialized(void);
 >   
->   extern struct alloc_ops *alloc_ops;
+> +/* Sets the default flags for the page allocator, the default is FLAG_ZERO */
+> +void page_alloc_set_default_flags(unsigned int flags);
+> +
+>   /*
+>    * Initializes a memory area.
+>    * n is the number of the area to initialize
 > diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-> index 8d2700d..b1cdf21 100644
+> index 4d5722f..08e0d05 100644
 > --- a/lib/alloc_page.c
 > +++ b/lib/alloc_page.c
-> @@ -385,7 +385,6 @@ void *memalign_pages_area(unsigned int area, size_t alignment, size_t size)
->   static struct alloc_ops page_alloc_ops = {
->   	.memalign = memalign_pages,
->   	.free = free_pages,
-> -	.align_min = PAGE_SIZE,
->   };
+> @@ -54,12 +54,19 @@ static struct mem_area areas[MAX_AREAS];
+>   static unsigned int areas_mask;
+>   /* Protects areas and areas mask */
+>   static struct spinlock lock;
+> +/* Default behaviour: zero allocated pages */
+> +static unsigned int default_flags = FLAG_ZERO;
 >   
->   /*
-> diff --git a/lib/alloc_phys.c b/lib/alloc_phys.c
-> index 72e20f7..a4d2bf2 100644
-> --- a/lib/alloc_phys.c
-> +++ b/lib/alloc_phys.c
-> @@ -29,8 +29,8 @@ static phys_addr_t base, top;
->   static void *early_memalign(size_t alignment, size_t size);
->   static struct alloc_ops early_alloc_ops = {
->   	.memalign = early_memalign,
-> -	.align_min = DEFAULT_MINIMUM_ALIGNMENT
->   };
-> +static size_t align_min;
-
-
-I don't see any caller of phys_alloc_set_minimum_alignment(). So when 
-you are comparing against this variable in phys_alloc_aligned_safe() 
-below, you are comparing against zero. Is that what you is intended or 
-should 'align_min' be set some default ?
-
->   
->   struct alloc_ops *alloc_ops = &early_alloc_ops;
->   
-> @@ -39,8 +39,7 @@ void phys_alloc_show(void)
->   	int i;
->   
->   	spin_lock(&lock);
-> -	printf("phys_alloc minimum alignment: %#" PRIx64 "\n",
-> -		(u64)early_alloc_ops.align_min);
-> +	printf("phys_alloc minimum alignment: %#" PRIx64 "\n", (u64)align_min);
->   	for (i = 0; i < nr_regions; ++i)
->   		printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
->   			(u64)regions[i].base,
-> @@ -64,7 +63,7 @@ void phys_alloc_set_minimum_alignment(phys_addr_t align)
+>   bool page_alloc_initialized(void)
 >   {
->   	assert(align && !(align & (align - 1)));
->   	spin_lock(&lock);
-> -	early_alloc_ops.align_min = align;
-> +	align_min = align;
->   	spin_unlock(&lock);
+>   	return areas_mask != 0;
 >   }
 >   
-> @@ -83,6 +82,8 @@ static phys_addr_t phys_alloc_aligned_safe(phys_addr_t size,
->   		top_safe = MIN(top_safe, 1ULL << 32);
+> +void page_alloc_set_default_flags(unsigned int flags)
+> +{
+> +	default_flags = flags;
+
+
+Who calls this functions ?
+
+Just wondering if default flag should be a static set of flag values 
+which the caller can override based on needs rather than the caller 
+setting the default flag.
+
+> +}
+> +
+>   /*
+>    * Each memory area contains an array of metadata entries at the very
+>    * beginning. The usable memory follows immediately afterwards.
+> @@ -394,6 +401,7 @@ static void *page_memalign_order_flags(u8 ord, u8 al, u32 flags)
+>   	void *res = NULL;
+>   	int i, area, fresh;
 >   
->   	assert(base < top_safe);
-> +	if (align < align_min)
-> +		align = align_min;
->   
->   	addr = ALIGN(base, align);
->   	size += addr - base;
-> diff --git a/lib/vmalloc.c b/lib/vmalloc.c
-> index 7a49adf..e146162 100644
-> --- a/lib/vmalloc.c
-> +++ b/lib/vmalloc.c
-> @@ -190,7 +190,6 @@ static void vm_free(void *mem)
->   static struct alloc_ops vmalloc_ops = {
->   	.memalign = vm_memalign,
->   	.free = vm_free,
-> -	.align_min = PAGE_SIZE,
->   };
->   
->   void __attribute__((__weak__)) find_highmem(void)
+> +	flags |= default_flags;
+>   	fresh = !!(flags & FLAG_FRESH);
+>   	spin_lock(&lock);
+>   	area = (flags & AREA_MASK) ? flags & areas_mask : areas_mask;
