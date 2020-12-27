@@ -2,285 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 772922E2DF5
-	for <lists+kvm@lfdr.de>; Sat, 26 Dec 2020 11:28:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2AAE2E30DF
+	for <lists+kvm@lfdr.de>; Sun, 27 Dec 2020 12:14:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726219AbgLZK1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Dec 2020 05:27:31 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:56350 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725954AbgLZK1a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 26 Dec 2020 05:27:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1608978449; x=1640514449;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=2uBhCT1dLuMUMZSXHVdB92wrCkF2a7YKar4EdtUVD7E=;
-  b=ZLO5qjeI8JC1/3aETfqWwZ+W8XwOv48EWJxH+vk+ZHEJ+rnMeKG6J4dN
-   KyfEX0z38RfjYnGBzT459Mu1VoKK+7V3gJ5D8nFMxjy+CjkaFyJoWH5/P
-   6ieI2f4z36CYEc65nw0TluKLuENjbZ9hukE81xiCWxvFtCLWG0EeVcqGs
-   7eEM2wbDgItNitZYbALEWRuuuK0K5DKHtSP7oQlnOTDZ7iZ1QofOD76bw
-   n0F50hTz9IVqGybE4AsYjQpMHp7ZOPPbjVVtTiqMGyepBhztjOM4jEgE9
-   5+9JSjJNdxIfacG2phEpa6iq2x+FN/fBs5BNmAzFz7UlYlBlPMF5nG3zx
-   A==;
-IronPort-SDR: rGao0ILNdToQ9XZY6I55dPpAlOekbPmL0+j+JyeWVrmespeot+SNWm2x+QcktXIKHErlmUMJV/
- 4FWS/Ycu8ulUDxreaZ+64ODWBet5PngRR1VxuRyThmRDiOMnpRHROEcl6XBHGeaFDIDqRJv+1R
- ET1P2RilVACCbsZ0eUhShndtgWn2OYE09Izh/8xofUSxeyAdYmmQUsissFW4j0Dx9JTVjpYisI
- BRERwbEB5oKTy8WrvgqMeNuyUWUxMkmo798L5cZ19qK9KXPg1D/Yn+h1nhka3GNMz2lcE2Nex1
- DkM=
-X-IronPort-AV: E=Sophos;i="5.78,450,1599494400"; 
-   d="scan'208";a="157253460"
-Received: from mail-sn1nam02lp2054.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.54])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Dec 2020 18:26:22 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gANkQbR7Q9ACl2zdAJpnNPY4ltAr2nCdx84AFNivxwrPlLmKwNqhVAgOYSHs570PrXdATw1knhGi+bcq0a4OSsn7UNn6JsbqsBiZhMX3M9bxGHKShH0BhdplGa7TylnGrNXnVJkgWFfZAqHxGZSmwUKfWDxjmyL9AMbo1vTVfldDkOpTHKy+3Sg1jAZIXihtPdLQAvGhsHa+ntb6tI0N3zTIXxhOls2LndQitS+w5hJFUc/smDQpH7G/k+rSw12cu10km7O6aH7Z8M6VvhJqBeVpRdKW/UeBUg6QvtdPMH/LrJ49MBxcnz7od1I69PAgb0saLXro//QtLrbrrvRmsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eOpoDi2R0vT3HR1HDRH8grPMEQj1pW5bW2VR7lSmuGI=;
- b=YOvl6ME9N4jKUo5eSYQ4BRGb3tdkW/uVOlUN/dppiWC7yIcpBUkmuXm7D16O3PRqtBRe6IHzF53oD3zQuseromX6VymQfz/PTjimv7zA6u1QQVT0iVUP4HjN3Y0fg3m6yncx9Ua126+ef0k6oIiLLx5laH3EVC0E0nS5eoh6knVXg/1N/PB++vFoTvrOzNc00RDJG9DX/MWucruEt4xXir8CrlRnKkIMI8GrAUF72SJ/mjjbBFMDtBxPgzlW5yVZay/G6HjNXT+XJgyp25HdEAnzHML2FEVm6zA76Qu9TinLkHw2GykduBl2jvkDHaZsbv1IvxiciseYOkiGO3P9MA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eOpoDi2R0vT3HR1HDRH8grPMEQj1pW5bW2VR7lSmuGI=;
- b=M4YEW3qq0wXhOm9u1tyNuystxaiRk6X37ehE+rzMIJ3KYYfZcc6c532UsyjwjPOVjMK+xbMJUAt8jpO/rRP9QVQ3TnTvKaTNJ+Y2t5R/dfuAji5ai8ffGopMzAWfkXiF0blTIG/boFW2nbT275w7EojBOt1Tpzif+zcfN5NE5xw=
-Received: from MN2PR04MB6207.namprd04.prod.outlook.com (2603:10b6:208:de::32)
- by MN2PR04MB6095.namprd04.prod.outlook.com (2603:10b6:208:d7::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3676.29; Sat, 26 Dec
- 2020 10:26:20 +0000
-Received: from MN2PR04MB6207.namprd04.prod.outlook.com
- ([fe80::3c5e:9a36:34e0:9d67]) by MN2PR04MB6207.namprd04.prod.outlook.com
- ([fe80::3c5e:9a36:34e0:9d67%7]) with mapi id 15.20.3700.030; Sat, 26 Dec 2020
- 10:26:19 +0000
-From:   Anup Patel <Anup.Patel@wdc.com>
-To:     Jiangyifei <jiangyifei@huawei.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmerdabbelt@google.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>
-Subject: RE: [PATCH v15 12/17] RISC-V: KVM: Add timer functionality
-Thread-Topic: [PATCH v15 12/17] RISC-V: KVM: Add timer functionality
-Thread-Index: AQHWtoxLCxd6PUsl+UOoYMG9P79uk6oESuSAgAUq9xA=
-Date:   Sat, 26 Dec 2020 10:26:19 +0000
-Message-ID: <MN2PR04MB6207BDD8992D24AB94466C1E8DDB0@MN2PR04MB6207.namprd04.prod.outlook.com>
-References: <20201109113240.3733496-1-anup.patel@wdc.com>
- <20201109113240.3733496-13-anup.patel@wdc.com>
- <d3f3a7aea01c49afb9cadccd47498854@huawei.com>
-In-Reply-To: <d3f3a7aea01c49afb9cadccd47498854@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: huawei.com; dkim=none (message not signed)
- header.d=none;huawei.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [103.15.57.100]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 565df3db-e5f0-4274-7e85-08d8a988af9d
-x-ms-traffictypediagnostic: MN2PR04MB6095:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6095D7450282AB659905FB618DDB0@MN2PR04MB6095.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZTnz+v0VatQBEdV5cYvbQXb8VF5hA6mPXuz1siwnJ4L0jbA5NUMPIrowC12UQxquZz6g0+tOk3kjFYGhdZ+LyvQtS3DfrmvIs372mTWDRn0tDpKXOWKXuPtbKGYZ10kpuLRq5PVaatKslj1IMrIVi6GdNzP1JKbEG0C58hwgqVAcKZMZ5QoXK9GHnIHe9KPXOpIY0eZenBwK333qRsXgkhxvihXjjL6Dzy+cIjmdlyf9d9g5PD6M962dXOmZGk1QwYzFt1GmpfDXdD479H3h+m34JRYkHo/IJpUUBy28jaSv3cgbVQkefmZFcsNbribiho3zWOUTqN+a/h5/O28xVzHa+eeS9+Ve1FswUsFmwh02jYeAr3SBtGya4HNiIjRSWm1Uj5eFJL2b3q2GAz+5mg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR04MB6207.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39850400004)(396003)(376002)(136003)(366004)(316002)(64756008)(86362001)(66556008)(110136005)(2906002)(8676002)(66446008)(7696005)(9686003)(7416002)(33656002)(6506007)(186003)(52536014)(53546011)(55016002)(66476007)(76116006)(4326008)(478600001)(26005)(83380400001)(5660300002)(8936002)(66946007)(54906003)(71200400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Tbqa9bDfo3Vk/jKE9JeSmIB8SOXq0GrRwbvV9U+yNFCl6Dzrqne88qVK6bBx?=
- =?us-ascii?Q?bs4v5/CvjDYklpcRMKIHxai4KGXc6r+F9WRjCj2hqItikMniT5/zV33N+CSC?=
- =?us-ascii?Q?Kk06PU+PkltER4RIf1hAI7/XwJHXYB4vJls59X9f+E7KmBPKvOlC/AI+yrgF?=
- =?us-ascii?Q?pNwG5U72CJMSVndEwrTbadJCgCrOT5Hxp4cHQeyW28/z6vdh2MIBvir6WioX?=
- =?us-ascii?Q?XpP00mS5PiBQO8Ft+0/DGbsVUTkX4BWQYCfCxY2CFZs43xmyd2gWddcdARd5?=
- =?us-ascii?Q?yg1tRu+HJoVF4lDE53mEnZAqURye3Yz2QSQqUOfKNtjV/PbkQrDGkoxGpOmE?=
- =?us-ascii?Q?HbvvnqoSjPsGCY8V++ZmwnV9oeuB9754VOs9eE2YKsBYikkJP3Zd7ge4TobO?=
- =?us-ascii?Q?evp8T4Y34LzeoUqNeGUWAEoCxqPxuQNwVks63tpd91sV9bhLmiMBdpuoaBc+?=
- =?us-ascii?Q?KU2raBGKgwyedlkq0bAU4Qlv/f86GmHjWrzXQbrcCB01+I1Fkxi27s0dzMul?=
- =?us-ascii?Q?NurYcIY/fruOp0CrhDEy30rANYnvDvCI87deFmjO0nmECY6DolZUB9mURfbk?=
- =?us-ascii?Q?Dwm/5iyQbVA+Gq04H29ZyVSVMGUFE25rP/xjl9cO2FvbdFLuTNvz8tKpIobt?=
- =?us-ascii?Q?ipPmeOhJFnatD7hcUYuaaDbU8dZ+SzeJuIAaPAnb6NeEH+LQAEWTmHmNtrT2?=
- =?us-ascii?Q?OilVhve8c1cu3/kXGVj6jnJ7FBAqazhiyTfHMjrfO0oxiXi00HOT++J+EH9D?=
- =?us-ascii?Q?bUULIQ8+XMm6E/QWF0CuPdqsnh/ueEIQLZq55F9qv1EjXmLr8vdf8XC2r3+V?=
- =?us-ascii?Q?AIZo8hik6SabTC8iJcJByIEaGVy4dvfGXTC/DVjoOIqvxv12PRGV7DFheXT0?=
- =?us-ascii?Q?WTNiJIo3Uj2sNYegxJBVC+DFFuN6bVUJlmtf/SVEHAkuBEVqtUcQQb4lV5m2?=
- =?us-ascii?Q?OV+YXuO8KtdxwRoHVGXVDStbDXG7TY+txU8CIRVqz1c=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726134AbgL0LNl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Dec 2020 06:13:41 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12116 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726031AbgL0LNk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 27 Dec 2020 06:13:40 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BRB3E7G106285;
+        Sun, 27 Dec 2020 06:12:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=q4ZewLYFBsYdDeRAXAb5Z8x1vNVz73uAhuR4FFYjGxc=;
+ b=adtwf1+0/6cRaEVcrQAuezquAM+4Z9whNC1sdtFiR7lcJIS2qxdRjiOUPWRLvrcB1yxo
+ KDwcOWxfFErzLg1Xg22ZPRxPqZA9+T2C4lMq9f4GvZZQKUmMz68/J+abUnk9Rxnbl/Yx
+ fvaXiN4nNGLvHzm0RQ/EIAaR/naY3TKXkDVz5htuUm79ett/1E5fD264sSPV9u8gFVxL
+ Tz9UylBgGeqcQIcKP6RCcVtjm4rh4WnbWxTd7bN/3MXH/1DjYj7T77K7Wmt3WqUaAQif
+ 4+OtcW8XqC5xZgu5VqeRlup+dFnyA/iElQYlvEmdzQWMPJC/dTJ0yiXPW4E5hD77cMpH Aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35pqg2snmd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 27 Dec 2020 06:12:58 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BRB3Olx107172;
+        Sun, 27 Dec 2020 06:12:58 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35pqg2snm6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 27 Dec 2020 06:12:58 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BRBCKHe028337;
+        Sun, 27 Dec 2020 11:12:55 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 35nvt892j5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 27 Dec 2020 11:12:55 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BRBCqVC42139956
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 27 Dec 2020 11:12:52 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C40E24203F;
+        Sun, 27 Dec 2020 11:12:52 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2CBD542042;
+        Sun, 27 Dec 2020 11:12:52 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.34.111])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sun, 27 Dec 2020 11:12:52 +0000 (GMT)
+Subject: Re: [PATCH v5] s390/vfio-ap: clean up vfio_ap resources when KVM
+ pointer invalidated
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        Halil Pasic <pasic@linux.ibm.com>
+References: <20201223012013.5418-1-akrowiak@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <e8339b80-2466-5dd1-195c-f59b4794528c@de.ibm.com>
+Date:   Sun, 27 Dec 2020 12:12:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB6207.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 565df3db-e5f0-4274-7e85-08d8a988af9d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Dec 2020 10:26:19.9266
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WQOCPFfcmtRry1YM/M/vjf4jJivIR2BVNAPGzQj91RaYgJR5AVP8t2DyzZCCy9I3xzrvCXwvhND+SLl1DGP/IQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6095
+In-Reply-To: <20201223012013.5418-1-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-27_08:2020-12-24,2020-12-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 spamscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ phishscore=0 suspectscore=0 mlxscore=0 impostorscore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012270069
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-> -----Original Message-----
-> From: Jiangyifei <jiangyifei@huawei.com>
-> Sent: 23 December 2020 09:01
-> To: Anup Patel <Anup.Patel@wdc.com>; Palmer Dabbelt
-> <palmer@dabbelt.com>; Palmer Dabbelt <palmerdabbelt@google.com>;
-> Paul Walmsley <paul.walmsley@sifive.com>; Albert Ou
-> <aou@eecs.berkeley.edu>; Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Alexander Graf <graf@amazon.com>; Atish Patra
-> <Atish.Patra@wdc.com>; Alistair Francis <Alistair.Francis@wdc.com>;
-> Damien Le Moal <Damien.LeMoal@wdc.com>; Anup Patel
-> <anup@brainfault.org>; kvm@vger.kernel.org; kvm-
-> riscv@lists.infradead.org; linux-riscv@lists.infradead.org; linux-
-> kernel@vger.kernel.org; Daniel Lezcano <daniel.lezcano@linaro.org>
-> Subject: RE: [PATCH v15 12/17] RISC-V: KVM: Add timer functionality
->=20
->=20
-> > -----Original Message-----
-> > From: Anup Patel [mailto:anup.patel@wdc.com]
-> > Sent: Monday, November 9, 2020 7:33 PM
-> > To: Palmer Dabbelt <palmer@dabbelt.com>; Palmer Dabbelt
-> > <palmerdabbelt@google.com>; Paul Walmsley
-> <paul.walmsley@sifive.com>;
-> > Albert Ou <aou@eecs.berkeley.edu>; Paolo Bonzini
-> <pbonzini@redhat.com>
-> > Cc: Alexander Graf <graf@amazon.com>; Atish Patra
-> > <atish.patra@wdc.com>; Alistair Francis <Alistair.Francis@wdc.com>;
-> > Damien Le Moal <damien.lemoal@wdc.com>; Anup Patel
-> > <anup@brainfault.org>; kvm@vger.kernel.org;
-> > kvm-riscv@lists.infradead.org; linux-riscv@lists.infradead.org;
-> > linux-kernel@vger.kernel.org; Anup Patel <anup.patel@wdc.com>; Daniel
-> > Lezcano <daniel.lezcano@linaro.org>
-> > Subject: [PATCH v15 12/17] RISC-V: KVM: Add timer functionality
-> >
-> > From: Atish Patra <atish.patra@wdc.com>
-> >
-> > The RISC-V hypervisor specification doesn't have any virtual timer feat=
-ure.
-> >
-> > Due to this, the guest VCPU timer will be programmed via SBI calls.
-> > The host will use a separate hrtimer event for each guest VCPU to
-> > provide timer functionality. We inject a virtual timer interrupt to
-> > the guest VCPU whenever the guest VCPU hrtimer event expires.
-> >
-> > This patch adds guest VCPU timer implementation along with ONE_REG
-> > interface to access VCPU timer state from user space.
-> >
-> > Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Acked-by: Daniel Lezcano <daniel.lezcano@linaro.org>
-> > ---
-> >  arch/riscv/include/asm/kvm_host.h       |   7 +
-> >  arch/riscv/include/asm/kvm_vcpu_timer.h |  44 +++++
-> >  arch/riscv/include/uapi/asm/kvm.h       |  17 ++
-> >  arch/riscv/kvm/Makefile                 |   2 +-
-> >  arch/riscv/kvm/vcpu.c                   |  14 ++
-> >  arch/riscv/kvm/vcpu_timer.c             | 225
-> > ++++++++++++++++++++++++
-> >  arch/riscv/kvm/vm.c                     |   2 +-
-> >  drivers/clocksource/timer-riscv.c       |   8 +
-> >  include/clocksource/timer-riscv.h       |  16 ++
-> >  9 files changed, 333 insertions(+), 2 deletions(-)  create mode
-> > 100644 arch/riscv/include/asm/kvm_vcpu_timer.h
-> >  create mode 100644 arch/riscv/kvm/vcpu_timer.c  create mode 100644
-> > include/clocksource/timer-riscv.h
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h
-> > b/arch/riscv/include/asm/kvm_host.h
-> > index 64311b262ee1..4daffc93f36a 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -12,6 +12,7 @@
-> >  #include <linux/types.h>
-> >  #include <linux/kvm.h>
-> >  #include <linux/kvm_types.h>
-> > +#include <asm/kvm_vcpu_timer.h>
-> >
-> >  #ifdef CONFIG_64BIT
-> >  #define KVM_MAX_VCPUS			(1U << 16)
-> > @@ -66,6 +67,9 @@ struct kvm_arch {
-> >  	/* stage2 page table */
-> >  	pgd_t *pgd;
-> >  	phys_addr_t pgd_phys;
-> > +
-> > +	/* Guest Timer */
-> > +	struct kvm_guest_timer timer;
-> >  };
-> >
->=20
-> ...
->=20
-> > diff --git a/arch/riscv/include/uapi/asm/kvm.h
-> > b/arch/riscv/include/uapi/asm/kvm.h
-> > index f7e9dc388d54..00196a13d743 100644
-> > --- a/arch/riscv/include/uapi/asm/kvm.h
-> > +++ b/arch/riscv/include/uapi/asm/kvm.h
-> > @@ -74,6 +74,18 @@ struct kvm_riscv_csr {
-> >  	unsigned long scounteren;
-> >  };
-> >
-> > +/* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> > struct
-> > +kvm_riscv_timer {
-> > +	u64 frequency;
-> > +	u64 time;
-> > +	u64 compare;
-> > +	u64 state;
-> > +};
-> > +
->=20
-> Hi,
->=20
-> There are some building errors when we build kernel by using allmodconfig=
-.
-> The commands are as follow:
-> $ make allmodconfig ARCH=3Driscv CROSS_COMPILE=3Driscv64-linux-gnu- $ mak=
-e
-> -j64 ARCH=3Driscv CROSS_COMPILE=3Driscv64-linux-gnu-
->=20
-> The following error occurs:
-> [stdout] usr/include/Makefile:108: recipe for target
-> 'usr/include/asm/kvm.hdrtest' failed [stderr] ./usr/include/asm/kvm.h:79:=
-2:
-> error: unknown type name 'u64'
-> [stderr]   u64 frequency;
-> [stderr]   ^~~
-> [stderr] ./usr/include/asm/kvm.h:80:2: error: unknown type name 'u64'
-> [stderr]   u64 time;
-> [stderr]   ^~~
-> [stderr] ./usr/include/asm/kvm.h:81:2: error: unknown type name 'u64'
-> [stderr]   u64 compare;
-> [stderr]   ^~~
-> [stderr] ./usr/include/asm/kvm.h:82:2: error: unknown type name 'u64'
-> [stderr]   u64 state;
-> [stderr]   ^~~
-> [stderr] make[2]: *** [usr/include/asm/kvm.hdrtest] Error 1
->=20
-> Is it better to change u64 to __u64?
+On 23.12.20 02:20, Tony Krowiak wrote:
+> The vfio_ap device driver registers a group notifier with VFIO when the
+> file descriptor for a VFIO mediated device for a KVM guest is opened to
+> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
+> event). When the KVM pointer is set, the vfio_ap driver takes the
+> following actions:
+> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
+>    of the mediated device.
+> 2. Calls the kvm_get_kvm() function to increment its reference counter.
+> 3. Sets the function pointer to the function that handles interception of
+>    the instruction that enables/disables interrupt processing.
+> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
+>    the guest.
+> 
+> In order to avoid memory leaks, when the notifier is called to receive
+> notification that the KVM pointer has been set to NULL, the vfio_ap device
+> driver should reverse the actions taken when the KVM pointer was set.
+> 
+> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Okay, I will investigate and replace it.
+thanks, applied to the s390 tree.
 
-Regards,
-Anup
 
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 49 ++++++++++++++++++-------------
+>  1 file changed, 28 insertions(+), 21 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index e0bde8518745..7339043906cf 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1037,19 +1037,14 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+>  {
+>  	struct ap_matrix_mdev *m;
+>  
+> -	mutex_lock(&matrix_dev->lock);
+> -
+>  	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
+> -		if ((m != matrix_mdev) && (m->kvm == kvm)) {
+> -			mutex_unlock(&matrix_dev->lock);
+> +		if ((m != matrix_mdev) && (m->kvm == kvm))
+>  			return -EPERM;
+> -		}
+>  	}
+>  
+>  	matrix_mdev->kvm = kvm;
+>  	kvm_get_kvm(kvm);
+>  	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+> -	mutex_unlock(&matrix_dev->lock);
+>  
+>  	return 0;
+>  }
+> @@ -1083,35 +1078,52 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
+>  	return NOTIFY_DONE;
+>  }
+>  
+> +static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> +	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+> +	vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+> +	kvm_put_kvm(matrix_mdev->kvm);
+> +	matrix_mdev->kvm = NULL;
+> +}
+> +
+>  static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>  				       unsigned long action, void *data)
+>  {
+> -	int ret;
+> +	int ret, notify_rc = NOTIFY_OK;
+>  	struct ap_matrix_mdev *matrix_mdev;
+>  
+>  	if (action != VFIO_GROUP_NOTIFY_SET_KVM)
+>  		return NOTIFY_OK;
+>  
+>  	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
+> +	mutex_lock(&matrix_dev->lock);
+>  
+>  	if (!data) {
+> -		matrix_mdev->kvm = NULL;
+> -		return NOTIFY_OK;
+> +		if (matrix_mdev->kvm)
+> +			vfio_ap_mdev_unset_kvm(matrix_mdev);
+> +		goto notify_done;
+>  	}
+>  
+>  	ret = vfio_ap_mdev_set_kvm(matrix_mdev, data);
+> -	if (ret)
+> -		return NOTIFY_DONE;
+> +	if (ret) {
+> +		notify_rc = NOTIFY_DONE;
+> +		goto notify_done;
+> +	}
+>  
+>  	/* If there is no CRYCB pointer, then we can't copy the masks */
+> -	if (!matrix_mdev->kvm->arch.crypto.crycbd)
+> -		return NOTIFY_DONE;
+> +	if (!matrix_mdev->kvm->arch.crypto.crycbd) {
+> +		notify_rc = NOTIFY_DONE;
+> +		goto notify_done;
+> +	}
+>  
+>  	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
+>  				  matrix_mdev->matrix.aqm,
+>  				  matrix_mdev->matrix.adm);
+>  
+> -	return NOTIFY_OK;
+> +notify_done:
+> +	mutex_unlock(&matrix_dev->lock);
+> +	return notify_rc;
+>  }
+>  
+>  static void vfio_ap_irq_disable_apqn(int apqn)
+> @@ -1222,13 +1234,8 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  
+>  	mutex_lock(&matrix_dev->lock);
+> -	if (matrix_mdev->kvm) {
+> -		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> -		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+> -		vfio_ap_mdev_reset_queues(mdev);
+> -		kvm_put_kvm(matrix_mdev->kvm);
+> -		matrix_mdev->kvm = NULL;
+> -	}
+> +	if (matrix_mdev->kvm)
+> +		vfio_ap_mdev_unset_kvm(matrix_mdev);
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+>  	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+> 
