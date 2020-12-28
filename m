@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43C672E4362
-	for <lists+kvm@lfdr.de>; Mon, 28 Dec 2020 16:38:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36D632E63C7
+	for <lists+kvm@lfdr.de>; Mon, 28 Dec 2020 16:45:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407288AbgL1Pg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Dec 2020 10:36:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38006 "EHLO mail.kernel.org"
+        id S2405251AbgL1Pme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Dec 2020 10:42:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40180 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2408674AbgL1Pfz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Dec 2020 10:35:55 -0500
+        id S2633231AbgL1PmP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Dec 2020 10:42:15 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 44B2922475;
-        Mon, 28 Dec 2020 15:35:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7FE1A20776;
+        Mon, 28 Dec 2020 15:41:34 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1ktuYC-004FUG-4O; Mon, 28 Dec 2020 15:35:12 +0000
-Date:   Mon, 28 Dec 2020 15:35:11 +0000
-Message-ID: <87a6tyoseo.wl-maz@kernel.org>
+        id 1ktueK-004Fep-Aa; Mon, 28 Dec 2020 15:41:32 +0000
+Date:   Mon, 28 Dec 2020 15:41:31 +0000
+Message-ID: <878s9ios44.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Eric Auger <eric.auger@redhat.com>
 Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
@@ -30,10 +30,10 @@ Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
         drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com,
         julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
         shuah@kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH 3/9] KVM: arm64: vgic-v3: Fix error handling in vgic_v3_set_redist_base()
-In-Reply-To: <20201212185010.26579-4-eric.auger@redhat.com>
+Subject: Re: [PATCH 4/9] KVM: arm/arm64: vgic: Reset base address on kvm_vgic_dist_destroy()
+In-Reply-To: <20201212185010.26579-5-eric.auger@redhat.com>
 References: <20201212185010.26579-1-eric.auger@redhat.com>
-        <20201212185010.26579-4-eric.auger@redhat.com>
+        <20201212185010.26579-5-eric.auger@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -47,53 +47,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On Sat, 12 Dec 2020 18:50:04 +0000,
+On Sat, 12 Dec 2020 18:50:05 +0000,
 Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> vgic_register_all_redist_iodevs may succeed while
-> vgic_register_all_redist_iodevs fails. For example this can happen
-
-The same function cannot both fail and succeed ;-) Can you shed some
-light on what you had in mind?
-
-> while adding a redistributor region overlapping a dist region. The
-> failure only is detected on vgic_register_all_redist_iodevs when
-> vgic_v3_check_base() gets called.
-> 
-> In such a case, remove the newly added redistributor region and free
-> it.
+> On vgic_dist_destroy(), the addresses are not reset. However for
+> kvm selftest purpose this would allow to continue the test execution
+> even after a failure when running KVM_RUN. So let's reset the
+> base addresses.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/vgic/vgic-init.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index 8e8a862def76..581f0f490000 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -866,8 +866,14 @@ int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
->  	 * afterwards will register the iodevs when needed.
->  	 */
->  	ret = vgic_register_all_redist_iodevs(kvm);
-> -	if (ret)
-> +	if (ret) {
-> +		struct vgic_redist_region *rdreg =
-> +			vgic_v3_rdist_region_from_index(kvm, index);
-> +
-
-nit: consider splitting declaration and assignment so that we avoid
-the line split if you insist on the 80 character limit.
-
-> +		list_del(&rdreg->list);
-> +		kfree(rdreg);
->  		return ret;
-> +	}
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 32e32d67a127..6147bed56b1b 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -335,14 +335,16 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+>  	kfree(dist->spis);
+>  	dist->spis = NULL;
+>  	dist->nr_spis = 0;
+> +	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
 >  
->  	return 0;
+> -	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> +	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+>  		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
+>  			list_del(&rdreg->list);
+>  			kfree(rdreg);
+>  		}
+>  		INIT_LIST_HEAD(&dist->rd_regions);
+> -	}
+> +	} else
+> +		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+
+Since you have converted the hunk above to use dist->, you could do
+the same thing here. And the coding style dictates that you need {} on
+the else side as well.
+
+>
+>  	if (vgic_has_its(kvm))
+>  		vgic_lpi_translation_cache_destroy(kvm);
+> @@ -362,6 +364,7 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	vgic_flush_pending_lpis(vcpu);
+>  
+>  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+> +	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
 >  }
+>  
+>  /* To be called with kvm->lock held */
 > -- 
 > 2.21.3
 > 
