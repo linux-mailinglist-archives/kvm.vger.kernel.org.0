@@ -2,237 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C817A2E3486
-	for <lists+kvm@lfdr.de>; Mon, 28 Dec 2020 07:33:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1C822E34CF
+	for <lists+kvm@lfdr.de>; Mon, 28 Dec 2020 08:45:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728030AbgL1Gcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Dec 2020 01:32:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44564 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727857AbgL1Gck (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Dec 2020 01:32:40 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 308B0C061794
-        for <kvm@vger.kernel.org>; Sun, 27 Dec 2020 22:32:00 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id 30so2108803pgr.6
-        for <kvm@vger.kernel.org>; Sun, 27 Dec 2020 22:32:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=NQV9G1n3ZRJSWtmvuLfC74SPPVcLgQRYvsA0jba/+L0=;
-        b=cgd8huXSuc+8jRPviawDAd5dCe4q8hULZajtBkSVYY+fYwRe7EN54rW8E07YaghOJD
-         pIXY/v+3T6yNqnJX/P/a7fxiWrtIa5oFqISj6n9HZMbQaJ4kQzaWutPM8q+LUml/i3hG
-         JVlJn1AkOlFKHigk86oEVbGv/7KbyQkqfO2trS7iuzPs2e3et9z8MREkL/7/bRUY5MnO
-         5MFkaptLmfho5mwbDvWDOKmHkFxRnm4un4d8wa812cO4qbQ5RyfMXWqMbf5MGbe9Sj1S
-         7T8PWbg0hm1tVovDueHbOqR+5L2jXL/0STF4zPqefiKTcFbxKLdJMpItZLdPB22gDjWN
-         lwKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=NQV9G1n3ZRJSWtmvuLfC74SPPVcLgQRYvsA0jba/+L0=;
-        b=mwdwhxmh246f70frD2hm37Ivr00VYIbp0Q/Iy0qt+guCZoBterd6o3nKmyz19ny+H4
-         DVleBbwFp2qohxvUfP9Muy/s5EPGrwUMtTUpU5PrL7+q1r4LjIBSj4BVYEXerjP2+Qyk
-         N1NP4C9l054Vbm+4AkIshc0Pdg85yyvIKT7Dtm0z6cXF2BkaDhchNtR1/eI/shEYp9t2
-         12DLqtbhDSME0ShLf1kwXiu/TDuqEXd2W4/zX1FGefCB3FgfyYSQKR4JbCQviaUarU1s
-         CIK1L/36D+kqShDhmP02PfWKGtD7dtHkXPoXpwXuAYMVY2dddo+f9NcapKb4XAZ5vbIz
-         bKwA==
-X-Gm-Message-State: AOAM530EoP4AZIh+Otn50t3EgPnET7KZUrc5i22NnOLw7oLUVz+qHMeM
-        jRs2OSA7rS3OJ7k5kfEqAUQ=
-X-Google-Smtp-Source: ABdhPJySn/TEPXknqR2iPA5qgRUtH/NRDKAsJFpFGX1XrXIKBixQTxedOVwjok0Su6pE1ZiKqAjSyA==
-X-Received: by 2002:a62:ac09:0:b029:1a9:dd65:2f46 with SMTP id v9-20020a62ac090000b02901a9dd652f46mr22439419pfe.15.1609137119535;
-        Sun, 27 Dec 2020 22:31:59 -0800 (PST)
-Received: from ?IPv6:2601:647:4700:9b2:694a:9377:336e:5ed6? ([2601:647:4700:9b2:694a:9377:336e:5ed6])
-        by smtp.gmail.com with ESMTPSA id s10sm37381771pgg.76.2020.12.27.22.31.57
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 27 Dec 2020 22:31:58 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [kvm-unit-tests PATCH v1 00/12] Fix and improve the page
- allocator
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20201218151937.715bf26f@ibm-vm>
-Date:   Sun, 27 Dec 2020 22:31:56 -0800
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, cohuck@redhat.com,
-        lvivier@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C13936BE-B930-4822-AC69-8165B8636896@gmail.com>
-References: <20201216201200.255172-1-imbrenda@linux.ibm.com>
- <8A03C81A-BE59-4C1F-8056-94364C79933B@gmail.com>
- <20201218151937.715bf26f@ibm-vm>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+        id S1726327AbgL1How (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Dec 2020 02:44:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49834 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726282AbgL1Hov (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Dec 2020 02:44:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1609141404;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DUqT+VEpmHhWLOUn9+3++KLEXvtfbXB6JHxQWM389zk=;
+        b=Mf3skb855UcWMBxlbI+XUXdQD2yA8N+9ZQ1+DmnKdPP76L1sTCCcNBsApgSBWoJLGIRzZf
+        on3fGEmmAlKG21ZeSrg04tyowkL6uvWi9JVUZ/zA5wrixAZ1epvLg8gIRj4K4FOUAhQP8J
+        NL1ibJ/Nnuw8hh46d7jzPPJjL+2k7y0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-inycoFP9NTmopTKJEXh3dg-1; Mon, 28 Dec 2020 02:43:20 -0500
+X-MC-Unique: inycoFP9NTmopTKJEXh3dg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88979800D53;
+        Mon, 28 Dec 2020 07:43:17 +0000 (UTC)
+Received: from [10.72.13.159] (ovpn-13-159.pek2.redhat.com [10.72.13.159])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E52E60CC4;
+        Mon, 28 Dec 2020 07:43:04 +0000 (UTC)
+Subject: Re: [RFC v2 09/13] vduse: Add support for processing vhost iotlb
+ message
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
+        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+References: <20201222145221.711-1-xieyongji@bytedance.com>
+ <20201222145221.711-10-xieyongji@bytedance.com>
+ <6818a214-d587-4f0b-7de6-13c4e7e94ab6@redhat.com>
+ <CACycT3vVU9vg6R6UujSnSdk8cwxWPVgeJJs0JaBH_Zg4xC-epQ@mail.gmail.com>
+ <595fe7d6-7876-26e4-0b7c-1d63ca6d7a97@redhat.com>
+ <CACycT3s=m=PQb5WFoMGhz8TNGme4+=rmbbBTtrugF9ZmNnWxEw@mail.gmail.com>
+ <0e6faf9c-117a-e23c-8d6d-488d0ec37412@redhat.com>
+ <CACycT3uwXBYvRbKDWdN3oCekv+o6_Lc=-KTrxejD=fr-zgibGw@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <2b24398c-e6d9-14ec-2c0d-c303d528e377@redhat.com>
+Date:   Mon, 28 Dec 2020 15:43:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <CACycT3uwXBYvRbKDWdN3oCekv+o6_Lc=-KTrxejD=fr-zgibGw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Dec 18, 2020, at 6:19 AM, Claudio Imbrenda <imbrenda@linux.ibm.com> =
-wrote:
->=20
-> On Thu, 17 Dec 2020 11:41:05 -0800
-> Nadav Amit <nadav.amit@gmail.com> wrote:
->=20
->>> On Dec 16, 2020, at 12:11 PM, Claudio Imbrenda
->>> <imbrenda@linux.ibm.com> wrote:
->>>=20
->>> My previous patchseries was rushed and not polished enough.
->>> Furthermore it introduced some regressions.
->>>=20
->>> This patchseries fixes hopefully all the issues reported, and
->>> introduces some new features.
->>>=20
->>> It also simplifies the code and hopefully makes it more readable.
->>>=20
->>> Fixed:
->>> * allocated memory is now zeroed by default =20
->>=20
->> Thanks for doing that. Before I test it, did you also fix the issue
->> of x86=E2=80=99s setup_vm() [1]?
->>=20
->> [1] https://www.spinics.net/lists/kvm/msg230470.html
->=20
-> unfortunately no, because I could not reproduce it.
->=20
-> In theory setup_vm should just work, since it is called twice, but on
-> different address ranges.
->=20
-> The only issue I can think of is if the second call overlaps multiple
-> areas.
->=20
-> can you send me the memory map of that machine you're running the =
-tests
-> on? (/proc/iomem)
 
-Sorry for the late response.
+On 2020/12/25 下午6:31, Yongji Xie wrote:
+> On Fri, Dec 25, 2020 at 2:58 PM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On 2020/12/24 下午3:37, Yongji Xie wrote:
+>>> On Thu, Dec 24, 2020 at 10:41 AM Jason Wang <jasowang@redhat.com> wrote:
+>>>> On 2020/12/23 下午8:14, Yongji Xie wrote:
+>>>>> On Wed, Dec 23, 2020 at 5:05 PM Jason Wang <jasowang@redhat.com> wrote:
+>>>>>> On 2020/12/22 下午10:52, Xie Yongji wrote:
+>>>>>>> To support vhost-vdpa bus driver, we need a way to share the
+>>>>>>> vhost-vdpa backend process's memory with the userspace VDUSE process.
+>>>>>>>
+>>>>>>> This patch tries to make use of the vhost iotlb message to achieve
+>>>>>>> that. We will get the shm file from the iotlb message and pass it
+>>>>>>> to the userspace VDUSE process.
+>>>>>>>
+>>>>>>> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>>>>>>> ---
+>>>>>>>      Documentation/driver-api/vduse.rst |  15 +++-
+>>>>>>>      drivers/vdpa/vdpa_user/vduse_dev.c | 147 ++++++++++++++++++++++++++++++++++++-
+>>>>>>>      include/uapi/linux/vduse.h         |  11 +++
+>>>>>>>      3 files changed, 171 insertions(+), 2 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/Documentation/driver-api/vduse.rst b/Documentation/driver-api/vduse.rst
+>>>>>>> index 623f7b040ccf..48e4b1ba353f 100644
+>>>>>>> --- a/Documentation/driver-api/vduse.rst
+>>>>>>> +++ b/Documentation/driver-api/vduse.rst
+>>>>>>> @@ -46,13 +46,26 @@ The following types of messages are provided by the VDUSE framework now:
+>>>>>>>
+>>>>>>>      - VDUSE_GET_CONFIG: Read from device specific configuration space
+>>>>>>>
+>>>>>>> +- VDUSE_UPDATE_IOTLB: Update the memory mapping in device IOTLB
+>>>>>>> +
+>>>>>>> +- VDUSE_INVALIDATE_IOTLB: Invalidate the memory mapping in device IOTLB
+>>>>>>> +
+>>>>>>>      Please see include/linux/vdpa.h for details.
+>>>>>>>
+>>>>>>> -In the data path, VDUSE framework implements a MMU-based on-chip IOMMU
+>>>>>>> +The data path of userspace vDPA device is implemented in different ways
+>>>>>>> +depending on the vdpa bus to which it is attached.
+>>>>>>> +
+>>>>>>> +In virtio-vdpa case, VDUSE framework implements a MMU-based on-chip IOMMU
+>>>>>>>      driver which supports mapping the kernel dma buffer to a userspace iova
+>>>>>>>      region dynamically. The userspace iova region can be created by passing
+>>>>>>>      the userspace vDPA device fd to mmap(2).
+>>>>>>>
+>>>>>>> +In vhost-vdpa case, the dma buffer is reside in a userspace memory region
+>>>>>>> +which will be shared to the VDUSE userspace processs via the file
+>>>>>>> +descriptor in VDUSE_UPDATE_IOTLB message. And the corresponding address
+>>>>>>> +mapping (IOVA of dma buffer <-> VA of the memory region) is also included
+>>>>>>> +in this message.
+>>>>>>> +
+>>>>>>>      Besides, the eventfd mechanism is used to trigger interrupt callbacks and
+>>>>>>>      receive virtqueue kicks in userspace. The following ioctls on the userspace
+>>>>>>>      vDPA device fd are provided to support that:
+>>>>>>> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
+>>>>>>> index b974333ed4e9..d24aaacb6008 100644
+>>>>>>> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+>>>>>>> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+>>>>>>> @@ -34,6 +34,7 @@
+>>>>>>>
+>>>>>>>      struct vduse_dev_msg {
+>>>>>>>          struct vduse_dev_request req;
+>>>>>>> +     struct file *iotlb_file;
+>>>>>>>          struct vduse_dev_response resp;
+>>>>>>>          struct list_head list;
+>>>>>>>          wait_queue_head_t waitq;
+>>>>>>> @@ -325,12 +326,80 @@ static int vduse_dev_set_vq_state(struct vduse_dev *dev,
+>>>>>>>          return ret;
+>>>>>>>      }
+>>>>>>>
+>>>>>>> +static int vduse_dev_update_iotlb(struct vduse_dev *dev, struct file *file,
+>>>>>>> +                             u64 offset, u64 iova, u64 size, u8 perm)
+>>>>>>> +{
+>>>>>>> +     struct vduse_dev_msg *msg;
+>>>>>>> +     int ret;
+>>>>>>> +
+>>>>>>> +     if (!size)
+>>>>>>> +             return -EINVAL;
+>>>>>>> +
+>>>>>>> +     msg = vduse_dev_new_msg(dev, VDUSE_UPDATE_IOTLB);
+>>>>>>> +     msg->req.size = sizeof(struct vduse_iotlb);
+>>>>>>> +     msg->req.iotlb.offset = offset;
+>>>>>>> +     msg->req.iotlb.iova = iova;
+>>>>>>> +     msg->req.iotlb.size = size;
+>>>>>>> +     msg->req.iotlb.perm = perm;
+>>>>>>> +     msg->req.iotlb.fd = -1;
+>>>>>>> +     msg->iotlb_file = get_file(file);
+>>>>>>> +
+>>>>>>> +     ret = vduse_dev_msg_sync(dev, msg);
+>>>>>> My feeling is that we should provide consistent API for the userspace
+>>>>>> device to use.
+>>>>>>
+>>>>>> E.g we'd better carry the IOTLB message for both virtio/vhost drivers.
+>>>>>>
+>>>>>> It looks to me for virtio drivers we can still use UPDAT_IOTLB message
+>>>>>> by using VDUSE file as msg->iotlb_file here.
+>>>>>>
+>>>>> It's OK for me. One problem is when to transfer the UPDATE_IOTLB
+>>>>> message in virtio cases.
+>>>> Instead of generating IOTLB messages for userspace.
+>>>>
+>>>> How about record the mappings (which is a common case for device have
+>>>> on-chip IOMMU e.g mlx5e and vdpa simlator), then we can introduce ioctl
+>>>> for userspace to query?
+>>>>
+>>> If so, the IOTLB UPDATE is actually triggered by ioctl, but
+>>> IOTLB_INVALIDATE is triggered by the message. Is it a little odd?
+>>
+>> Good point.
+>>
+>> Some questions here:
+>>
+>> 1) Userspace think the IOTLB was flushed after IOTLB_INVALIDATE syscall
+>> is returned. But this patch doesn't have this guarantee. Can this lead
+>> some issues?
+> I'm not sure. But should it be guaranteed in VDUSE userspace? Just
+> like what vhost-user backend process does.
 
-I see two calls to _page_alloc_init_area() with AREA_LOW_NUMBER, one =
-with
-(base_pfn=3D621, top_pfn=3Dbfdd0) and one with (base_pfn=3D100000 =
-top_pfn=3D240000).
 
-As for /proc/iomem:
+I think so. This is because the userspace device needs a way to 
+synchronize invalidation with its datapath. Otherwise, guest may thing 
+the buffer is freed to be used by other parts but the it actually can be 
+used by the VDUSE device. The may cause security issues.
 
-00000000-00000fff : Reserved
-00001000-0009e7ff : System RAM
-0009e800-0009ffff : Reserved
-000a0000-000bffff : PCI Bus 0000:00
-000c0000-000c7fff : Video ROM
-000ca000-000cafff : Adapter ROM
-000cb000-000ccfff : Adapter ROM
-000d0000-000d3fff : PCI Bus 0000:00
-000d4000-000d7fff : PCI Bus 0000:00
-000d8000-000dbfff : PCI Bus 0000:00
-000dc000-000fffff : Reserved
-  000f0000-000fffff : System ROM
-00100000-bfecffff : System RAM
-  01000000-01c031d0 : Kernel code
-  01c031d1-0266f3bf : Kernel data
-  028ef000-02b97fff : Kernel bss
-bfed0000-bfefefff : ACPI Tables
-bfeff000-bfefffff : ACPI Non-volatile Storage
-bff00000-bfffffff : System RAM
-c0000000-febfffff : PCI Bus 0000:00
-  c0008000-c000bfff : 0000:00:10.0
-  e5b00000-e5bfffff : PCI Bus 0000:22
-  e5c00000-e5cfffff : PCI Bus 0000:1a
-  e5d00000-e5dfffff : PCI Bus 0000:12
-  e5e00000-e5efffff : PCI Bus 0000:0a
-  e5f00000-e5ffffff : PCI Bus 0000:21
-  e6000000-e60fffff : PCI Bus 0000:19
-  e6100000-e61fffff : PCI Bus 0000:11
-  e6200000-e62fffff : PCI Bus 0000:09
-  e6300000-e63fffff : PCI Bus 0000:20
-  e6400000-e64fffff : PCI Bus 0000:18
-  e6500000-e65fffff : PCI Bus 0000:10
-  e6600000-e66fffff : PCI Bus 0000:08
-  e6700000-e67fffff : PCI Bus 0000:1f
-  e6800000-e68fffff : PCI Bus 0000:17
-  e6900000-e69fffff : PCI Bus 0000:0f
-  e6a00000-e6afffff : PCI Bus 0000:07
-  e6b00000-e6bfffff : PCI Bus 0000:1e
-  e6c00000-e6cfffff : PCI Bus 0000:16
-  e6d00000-e6dfffff : PCI Bus 0000:0e
-  e6e00000-e6efffff : PCI Bus 0000:06
-  e6f00000-e6ffffff : PCI Bus 0000:1d
-  e7000000-e70fffff : PCI Bus 0000:15
-  e7100000-e71fffff : PCI Bus 0000:0d
-  e7200000-e72fffff : PCI Bus 0000:05
-  e7300000-e73fffff : PCI Bus 0000:1c
-  e7400000-e74fffff : PCI Bus 0000:14
-  e7500000-e75fffff : PCI Bus 0000:0c
-  e7600000-e76fffff : PCI Bus 0000:04
-  e7700000-e77fffff : PCI Bus 0000:1b
-  e7800000-e78fffff : PCI Bus 0000:13
-  e7900000-e79fffff : PCI Bus 0000:0b
-  e7a00000-e7afffff : PCI Bus 0000:03
-  e7b00000-e7ffffff : PCI Bus 0000:02
-  e8000000-efffffff : 0000:00:0f.0
-    e8000000-efffffff : vmwgfx probe
-  f0000000-f7ffffff : PCI MMCONFIG 0000 [bus 00-7f]
-    f0000000-f7ffffff : Reserved
-      f0000000-f7ffffff : pnp 00:08
-  fb500000-fb5fffff : PCI Bus 0000:22
-  fb600000-fb6fffff : PCI Bus 0000:1a
-  fb700000-fb7fffff : PCI Bus 0000:12
-  fb800000-fb8fffff : PCI Bus 0000:0a
-  fb900000-fb9fffff : PCI Bus 0000:21
-  fba00000-fbafffff : PCI Bus 0000:19
-  fbb00000-fbbfffff : PCI Bus 0000:11
-  fbc00000-fbcfffff : PCI Bus 0000:09
-  fbd00000-fbdfffff : PCI Bus 0000:20
-  fbe00000-fbefffff : PCI Bus 0000:18
-  fbf00000-fbffffff : PCI Bus 0000:10
-  fc000000-fc0fffff : PCI Bus 0000:08
-  fc100000-fc1fffff : PCI Bus 0000:1f
-  fc200000-fc2fffff : PCI Bus 0000:17
-  fc300000-fc3fffff : PCI Bus 0000:0f
-  fc400000-fc4fffff : PCI Bus 0000:07
-  fc500000-fc5fffff : PCI Bus 0000:1e
-  fc600000-fc6fffff : PCI Bus 0000:16
-  fc700000-fc7fffff : PCI Bus 0000:0e
-  fc800000-fc8fffff : PCI Bus 0000:06
-  fc900000-fc9fffff : PCI Bus 0000:1d
-  fca00000-fcafffff : PCI Bus 0000:15
-  fcb00000-fcbfffff : PCI Bus 0000:0d
-  fcc00000-fccfffff : PCI Bus 0000:05
-  fcd00000-fcdfffff : PCI Bus 0000:1c
-  fce00000-fcefffff : PCI Bus 0000:14
-  fcf00000-fcffffff : PCI Bus 0000:0c
-  fd000000-fd0fffff : PCI Bus 0000:04
-  fd100000-fd1fffff : PCI Bus 0000:1b
-  fd200000-fd2fffff : PCI Bus 0000:13
-  fd300000-fd3fffff : PCI Bus 0000:0b
-  fd400000-fd4fffff : PCI Bus 0000:03
-  fd500000-fdffffff : PCI Bus 0000:02
-    fd500000-fd50ffff : 0000:02:01.0
-    fd510000-fd51ffff : 0000:02:05.0
-    fd5c0000-fd5dffff : 0000:02:01.0
-      fd5c0000-fd5dffff : e1000
-    fd5ee000-fd5eefff : 0000:02:05.0
-      fd5ee000-fd5eefff : ahci
-    fd5ef000-fd5effff : 0000:02:03.0
-      fd5ef000-fd5effff : ehci_hcd
-    fdff0000-fdffffff : 0000:02:01.0
-      fdff0000-fdffffff : e1000
-  fe000000-fe7fffff : 0000:00:0f.0
-    fe000000-fe7fffff : vmwgfx probe
-  fe800000-fe9fffff : pnp 00:08
-  feba0000-febbffff : 0000:00:10.0
-    feba0000-febbffff : mpt
-  febc0000-febdffff : 0000:00:10.0
-    febc0000-febdffff : mpt
-  febfe000-febfffff : 0000:00:07.7
-fec00000-fec0ffff : Reserved
-  fec00000-fec003ff : IOAPIC 0
-fec10000-fec10fff : dmar0
-fed00000-fed003ff : HPET 0
-  fed00000-fed003ff : pnp 00:04
-fee00000-fee00fff : Local APIC
-  fee00000-fee00fff : Reserved
-fffe0000-ffffffff : Reserved
-100000000-23fffffff : System RAM=
+
+>
+>> 2) I think after VDUSE userspace receives IOTLB_INVALIDATE, it needs to
+>> issue a munmap(). What if it doesn't do that?
+>>
+> Yes, the munmap() is needed. If it doesn't do that, VDUSE userspace
+> could still access the corresponding guest memory region.
+
+
+I see. So all the above two questions are because VHOST_IOTLB_INVALIDATE 
+is expected to be synchronous. This need to be solved by tweaking the 
+current VDUSE API or we can re-visit to go with descriptors relaying first.
+
+Thanks
+
+
+>
+> Thanks,
+> Yongji
+>
+
