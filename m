@@ -2,107 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FD952E6C12
-	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 00:17:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B7702E6C85
+	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 00:31:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729532AbgL1Wzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Dec 2020 17:55:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51510 "EHLO
+        id S1728416AbgL1X3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Dec 2020 18:29:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729634AbgL1W0b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Dec 2020 17:26:31 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76187C0613D6
-        for <kvm@vger.kernel.org>; Mon, 28 Dec 2020 14:25:51 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id e2so6251490plt.12
-        for <kvm@vger.kernel.org>; Mon, 28 Dec 2020 14:25:51 -0800 (PST)
+        with ESMTP id S1728299AbgL1X3T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Dec 2020 18:29:19 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8085DC061793
+        for <kvm@vger.kernel.org>; Mon, 28 Dec 2020 15:28:39 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id p18so8167484pgm.11
+        for <kvm@vger.kernel.org>; Mon, 28 Dec 2020 15:28:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=LPPX7+eFG3tyTSGve36jHrhtPlkDKhxHBmp1S2kH5ho=;
-        b=IPmfLsLhg8QwTsq360DnlZ/77jDqDU0eCbhb6MUdO0bSP0xQ8TOuNE5zjFyRGo5FC5
-         qAklkfWKJQENdYdzY4+iL6cKWdZZttSeTPzGtHYDOneDyDA75D/NSCYefg82KSRRmcvZ
-         k7584wxsCoTCZioxKoUDcdDnn9wOyXPosljVkIZGpQ8/bHnprwHy8l6eoVv8Zw3vH+Fu
-         rU3g+wrq0jhCjaNww0Tx7rDYNmrrWyf2A80ntRJmxOLUZtD59EncwczToKKqUwhlGlHp
-         GYSZVj2oHo+xlJIzy0JJAQl0eZB7zR0KzwRIEuQQbwTD4sstD2QNsaH+LJBPRds1FOMz
-         5mEA==
+        bh=YHXv2Jc7uDRYfCGmkxwRFDrFxzJk/xjA57oTL7WqPAk=;
+        b=IG4n+U0iEnyjsOCZ36oBibFHyoOloR7t5DabLazjPAe2lmK9D0UpcdC1dKKsDHKU92
+         +cNGcUFXNXP9hkO3LbUWCr4BRQi8Whnn0wu2z0IWJBCvbK2HBZGFiD4+Zxu0/hukuw4o
+         lk5/1GiSFtPGVEp627njimpcVjMqmpIG/+hZ/x7/ZGthyf687XFMXEzCjJ1BNbefxYu1
+         Ckfm4sTb/14a3XTyZzu4k0DcHLu3bTxHYOdScTu399djk0ZSL++S4f0s0e8oFurmTvbQ
+         2KnzVqjqU5gz8irc4zLW+QTUznTF3rr51hGWnCeJsWt/b+EdNpgkby/LqoXldqBS97Se
+         5wpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=LPPX7+eFG3tyTSGve36jHrhtPlkDKhxHBmp1S2kH5ho=;
-        b=VsUy7HROrRFr00L/GykOYK4wF8qkk/3ag1zBfYoQ3gkP2MIXruJ2IuD4TkdbS6zV2N
-         SszPRF1gaV6KQQQo3WQDiJL4MQXWydT1Mx31RN096Az2DbhErg1r2dXrZs21VQ0SHrEp
-         HqV/atiQuE9M/KQnp/sO0QrNC4Ch9XBTLPAxRkdrAPd3KAwqOP/MJI5ZzLcmEGAOfgFv
-         6lAg3+B2gVjDFXeJvVnSKyowmS2Njsx2ZqKfNl3clZdtmKs0H98AO71v02l0UJon+J9e
-         vPy72DMj0GA6wqoBIYeUgY7s+l5T88lnf78sz/td7jPBUhncXB1VehM+fCqObwtuWVEj
-         0NJg==
-X-Gm-Message-State: AOAM530OOp0A+VA1/qNw0Aqn84UTdXu32gYVwolGBXNfNngkArjCMUau
-        IdBwElpbuivwrLh2nF0GAxcmDA==
-X-Google-Smtp-Source: ABdhPJxbcUJ3cipsbcXcxcQQpynygi48+MTHoEbF5slhgQW0LakTLEWc3PPdmp1+wCE8l4U2HueOpw==
-X-Received: by 2002:a17:902:fe07:b029:dc:43e4:fcbf with SMTP id g7-20020a170902fe07b02900dc43e4fcbfmr23478563plj.63.1609194350758;
-        Mon, 28 Dec 2020 14:25:50 -0800 (PST)
+        bh=YHXv2Jc7uDRYfCGmkxwRFDrFxzJk/xjA57oTL7WqPAk=;
+        b=AVD7ceUmIiH5how0Wsm2JWmjMtg69zlR1ROP2P0Dc1mUUnVczHmF2ePnXdY8WWiMCm
+         dYUmSrPz4Pzs6luoYKaTjOcVHNKjwYLKTbd0cB6qXIdgQPNfKIlQS0HnanErApT9w6t6
+         KYfek3f0nS8hPoVknYYWcOyMaHTCCUFu4wRLA/Kg0nlvDO3A4iv5QevseKTToXB8DxJz
+         7pVIwQXdXdtD70kJecyQDAkJrexNNfcFlPh+V82iMhj6TOj/O2JKo+spG/7jQDzlGsDL
+         jRC+Xl4znidvQNT9F3miHSt3Bs2Lszyq1dCbxti1lTQ1iqppr28lgyAuhoKzJv6yauT7
+         D23g==
+X-Gm-Message-State: AOAM5323ZSc3kSXTqTfoXB34tGIOwIN1fm+mGUrtkxPc6hZEpPW9Xtb8
+        CEsbDjy4vT5Qz5WRq5uSSQtaRg==
+X-Google-Smtp-Source: ABdhPJweRY8jL3It79h5jMNDyIgtwp8n/71UFFCLfDWomYceM6Sn3/Me6p1fMh1We7VQeu4ROtUHLA==
+X-Received: by 2002:a63:44d:: with SMTP id 74mr45370796pge.170.1609198118926;
+        Mon, 28 Dec 2020 15:28:38 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id g16sm35404479pfh.187.2020.12.28.14.25.49
+        by smtp.gmail.com with ESMTPSA id c199sm38708633pfb.108.2020.12.28.15.28.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Dec 2020 14:25:50 -0800 (PST)
-Date:   Mon, 28 Dec 2020 14:25:43 -0800
+        Mon, 28 Dec 2020 15:28:38 -0800 (PST)
+Date:   Mon, 28 Dec 2020 15:28:31 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, mlevitsk@redhat.com
-Subject: Re: [RFC PATCH kvm-unit-tests 0/4] add generic stress test
-Message-ID: <X+pbZ061gTIbM2Ef@google.com>
-References: <20201223010850.111882-1-pbonzini@redhat.com>
+To:     Zhimin Feng <fengzhimin@bytedance.com>
+Cc:     zhouyibo@bytedance.com, zhanghaozhong@bytedance.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Frederic Weisbecker <fweisbec@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC: timer passthrough 0/9] Support timer passthrough for VM
+Message-ID: <X+pqH77bs9nyhK8w@google.com>
+References: <20201228091559.25745-1-fengzhimin@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201223010850.111882-1-pbonzini@redhat.com>
+In-Reply-To: <20201228091559.25745-1-fengzhimin@bytedance.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 23, 2020, Paolo Bonzini wrote:
-> This short series adds a generic stress test to KVM unit tests that runs a
-> series of
+On Mon, Dec 28, 2020, Zhimin Feng wrote:
+> The main motivation for this patch is to improve the performance of VM.
 
-Unintentional cliffhanger?
+Do you have numbers that show when this improves performance, and by how much?
 
-> The test could grow a lot more features, including:
-> 
-> - wrapping the stress test with a VMX or SVM veneer which would forward
->   or inject interrupts periodically
-> 
-> - test perf events
-> 
-> - do some work in the MSI handler, so that they have a chance
->   of overlapping
-> 
-> - use PV EOI
-> 
-> - play with TPR and self IPIs, similar to Windows DPCs.
-> 
-> The configuration of the test is set individually for each VCPU on
-> the command line, for example:
-> 
->    ./x86/run x86/chaos.flat -smp 2 \
->       -append 'invtlb=1,mem=12,hz=100  hz=250,edu=1,edu_hz=53,hlt' -device edu
-> 
-> runs a continuous INVLPG+write test on 1<<12 pages on CPU 0, interrupted
-> by a 100 Hz timer tick; and keeps CPU 1 mostly idle except for 250 timer
-> ticks and 53 edu device interrupts per second.
-
-Maybe take the target cpu as part of the command line instead of implicitly
-defining it via group position?  The "duplicate" hz=??? is confusing.  E.g.
-
-    ./x86/run x86/chaos.flat -smp 2 \
-      -append 'cpu=0,invtlb=1,mem=12,hz=100 cpu=1,hz=250,edu=1,edu_hz=53,hlt' -device edu
-
-> For now, the test runs for an infinite time so it's not included in
-> unittests.cfg.  Do you think this is worth including in kvm-unit-tests,
-
-What's the motivation for this type of test?  What class of bugs can it find
-that won't be found by existing kvm-unit-tests or simple boot tests?
-
-> and if so are you interested in non-x86 versions of it?  Or should the
-> code be as pluggable as possible to make it easier to port it?
+This adds hundreds of cycles of overhead (VMWRITEs, WRMSRs, RDMSRs, etc...) to
+_every_ VM-Exit roundtrip, and the timer IRQ still incurs a VM-Exit.  It's not
+obvious that this is a net win, and it adds a fair amount of complexity and
+subtlety, e.g. there are multiple corner cases this gets wrong.  I suspect
+you'll have a tough time getting this reviewed, let alone merged, without hard
+numbers to justify the complexity and review effort.
