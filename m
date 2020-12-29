@@ -2,257 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0DED2E704B
-	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 13:02:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 743C62E707B
+	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 13:06:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726048AbgL2MB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Dec 2020 07:01:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47034 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725964AbgL2MBz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Dec 2020 07:01:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609243228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7ms4RXgdiNzYYLLtXPEJc7J5N06UtTw+28+1cWl1Rbw=;
-        b=RuOh9OBRwV9baaYzgzBrnP4Zm/aTks9lSwgvqXObtZs5eZ9v0NCDQRW4gw1dXv9YM26JMG
-        Sur2r2MF71738uJzlIFCzBm0vWk2B+Kzc7vlO1150VPjFiY/FvwP70/5JRL6HnY8Ljv831
-        aG7RLuLfPNu95NXIQ8o3MoszkuW9SAg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-1tg-Q8saMhuNXT2tH0LnCg-1; Tue, 29 Dec 2020 07:00:25 -0500
-X-MC-Unique: 1tg-Q8saMhuNXT2tH0LnCg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7577110054FF;
-        Tue, 29 Dec 2020 12:00:24 +0000 (UTC)
-Received: from localhost (ovpn-113-76.ams2.redhat.com [10.36.113.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 156E35D9DC;
-        Tue, 29 Dec 2020 12:00:23 +0000 (UTC)
-Date:   Tue, 29 Dec 2020 12:00:23 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Elena Afanasova <eafanasova@gmail.com>
-Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com
-Subject: Re: [RFC 2/2] KVM: add initial support for ioregionfd blocking
- read/write operations
-Message-ID: <20201229120023.GC55616@stefanha-x1.localdomain>
-References: <cover.1609231373.git.eafanasova@gmail.com>
- <a13b23ca540a8846891895462d2fb139ec597237.1609231374.git.eafanasova@gmail.com>
+        id S1726427AbgL2MGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Dec 2020 07:06:09 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:8373 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725866AbgL2MGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Dec 2020 07:06:09 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5feb1b880005>; Tue, 29 Dec 2020 04:05:28 -0800
+Received: from mtl-vdi-166.wap.labs.mlnx (172.20.145.6) by
+ HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Tue, 29 Dec 2020 12:05:08 +0000
+Date:   Tue, 29 Dec 2020 14:05:04 +0200
+From:   Eli Cohen <elic@nvidia.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     <mst@redhat.com>, <eperezma@redhat.com>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <lulu@redhat.com>, <eli@mellanox.com>, <lingshan.zhu@intel.com>,
+        <rob.miller@broadcom.com>, <stefanha@redhat.com>,
+        <sgarzare@redhat.com>
+Subject: Re: [PATCH 11/21] vhost-vdpa: introduce asid based IOTLB
+Message-ID: <20201229120504.GE195479@mtl-vdi-166.wap.labs.mlnx>
+References: <20201216064818.48239-1-jasowang@redhat.com>
+ <20201216064818.48239-12-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a13b23ca540a8846891895462d2fb139ec597237.1609231374.git.eafanasova@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="lCAWRPmW1mITcIfM"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
+In-Reply-To: <20201216064818.48239-12-jasowang@redhat.com>
+User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1609243528; bh=yeL80eBThKjFpOyBauK8Udo5xRQYwPMG1nU63oHFHLE=;
+        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+         Content-Type:Content-Disposition:In-Reply-To:User-Agent:
+         X-Originating-IP:X-ClientProxiedBy;
+        b=NkfwIkCS9nIBxWzBGFRJtDaauSGIxIQCPgCG3atO90ORA3NatItqDs0B7mvN5WKoj
+         bDE8qwXsa/NJWo9hZnTH5Lz4tdUXvVjfBMZw3Fx9MVwCVuYUfE5HgMVDMy9WZARn84
+         +ApjOimDt5GgGzD8ZD8SEai0aEzQJ0knO/GngwXXhZL5k/pcDZffkNAgRLE+ebCZYa
+         c6lAltWqm4i1w3tWhdL9gK8pWoqK+NpmWibAIPn1rw8st6xmvVwH2wt/EOHfJRbxXL
+         Jn7gBHRibUj+181BhGBVy7WvwO7RDOwS2cdHz18dtoqzbbKy3D1/4pmg3ppUK1Hlud
+         K+c2KhUCIR4sg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---lCAWRPmW1mITcIfM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 29, 2020 at 01:02:44PM +0300, Elena Afanasova wrote:
-> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+On Wed, Dec 16, 2020 at 02:48:08PM +0800, Jason Wang wrote:
+> This patch converts the vhost-vDPA device to support multiple IOTLBs
+> tagged via ASID via hlist. This will be used for supporting multiple
+> address spaces in the following patches.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  virt/kvm/ioregion.c | 157 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 157 insertions(+)
->=20
-> diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-> index a200c3761343..8523f4126337 100644
-> --- a/virt/kvm/ioregion.c
-> +++ b/virt/kvm/ioregion.c
-> @@ -4,6 +4,33 @@
->  #include <kvm/iodev.h>
->  #include "eventfd.h"
-> =20
-> +/* Wire protocol */
-> +struct ioregionfd_cmd {
-> +=09__u32 info;
-> +=09__u32 padding;
-> +=09__u64 user_data;
-> +=09__u64 offset;
-> +=09__u64 data;
+>  drivers/vhost/vdpa.c | 106 ++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 80 insertions(+), 26 deletions(-)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index feb6a58df22d..060d5b5b7e64 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -33,13 +33,21 @@ enum {
+>  
+>  #define VHOST_VDPA_DEV_MAX (1U << MINORBITS)
+>  
+> +#define VHOST_VDPA_IOTLB_BUCKETS 16
+> +
+> +struct vhost_vdpa_as {
+> +	struct hlist_node hash_link;
+> +	struct vhost_iotlb iotlb;
+> +	u32 id;
 > +};
 > +
-> +struct ioregionfd_resp {
-> +=09__u64 data;
-> +=09__u8 pad[24];
-> +};
-> +
-> +#define IOREGIONFD_CMD_READ    0
-> +#define IOREGIONFD_CMD_WRITE   1
-> +
-> +#define IOREGIONFD_SIZE_8BIT   0
-> +#define IOREGIONFD_SIZE_16BIT  1
-> +#define IOREGIONFD_SIZE_32BIT  2
-> +#define IOREGIONFD_SIZE_64BIT  3
-> +
-> +#define IOREGIONFD_SIZE_OFFSET 4
-> +#define IOREGIONFD_RESP_OFFSET 6
-> +#define IOREGIONFD_SIZE(x) ((x) << IOREGIONFD_SIZE_OFFSET)
-> +#define IOREGIONFD_RESP(x) ((x) << IOREGIONFD_RESP_OFFSET)
-
-These belong in the uapi header so userspace also has struct
-ioregionfd_cmd, struct ioregionfd_resp, etc.
-
-> +
->  void
->  kvm_ioregionfd_init(struct kvm *kvm)
->  {
-> @@ -38,10 +65,100 @@ ioregion_release(struct ioregion *p)
->  =09kfree(p);
->  }
-> =20
-> +static bool
-> +pack_cmd(struct ioregionfd_cmd *cmd, u64 offset, u64 len, int opt, bool =
-resp,
-> +=09 u64 user_data, const void *val)
+>  struct vhost_vdpa {
+>  	struct vhost_dev vdev;
+>  	struct iommu_domain *domain;
+>  	struct vhost_virtqueue *vqs;
+>  	struct completion completion;
+>  	struct vdpa_device *vdpa;
+> -	struct vhost_iotlb *iotlb;
+> +	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
+>  	struct device dev;
+>  	struct cdev cdev;
+>  	atomic_t opened;
+> @@ -49,12 +57,64 @@ struct vhost_vdpa {
+>  	struct eventfd_ctx *config_ctx;
+>  	int in_batch;
+>  	struct vdpa_iova_range range;
+> +	int used_as;
+>  };
+>  
+>  static DEFINE_IDA(vhost_vdpa_ida);
+>  
+>  static dev_t vhost_vdpa_major;
+>  
+> +static struct vhost_vdpa_as *asid_to_as(struct vhost_vdpa *v, u32 asid)
 > +{
-> +=09u64 size =3D 0;
+> +	struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
+> +	struct vhost_vdpa_as *as;
 > +
-> +=09switch (len) {
-> +=09case 1:
-> +=09=09size =3D IOREGIONFD_SIZE_8BIT;
-> +=09=09*((u8 *)&cmd->data) =3D val ? *(u8 *)val : 0;
-> +=09=09break;
-> +=09case 2:
-> +=09=09size =3D IOREGIONFD_SIZE_16BIT;
-> +=09=09*((u16 *)&cmd->data) =3D val ? *(u16 *)val : 0;
-> +=09=09break;
-> +=09case 4:
-> +=09=09size =3D IOREGIONFD_SIZE_32BIT;
-> +=09=09*((u32 *)&cmd->data) =3D val ? *(u32 *)val : 0;
-> +=09=09break;
-> +=09case 8:
-> +=09=09size =3D IOREGIONFD_SIZE_64BIT;
-> +=09=09*((u64 *)&cmd->data) =3D val ? *(u64 *)val : 0;
-> +=09=09break;
-> +=09default:
-> +=09=09return false;
->
-
-The assignments and casts can be replaced with a single memcpy after the
-switch statement. This is also how KVM_EXIT_MMIO and Coalesced MMIO do
-it:
-
-  memcpy(cmd->data, val, len);
-
-However, we need to make sure that cmd has been zeroed so that kernel
-memory is not accidentally exposed to userspace.
-
- +=09}
-> +=09cmd->user_data =3D user_data;
-> +=09cmd->offset =3D offset;
-> +=09cmd->info |=3D opt;
-> +=09cmd->info |=3D IOREGIONFD_SIZE(size);
-> +=09cmd->info |=3D IOREGIONFD_RESP(resp);
+> +	hlist_for_each_entry(as, head, hash_link)
+> +		if (as->id == asid)
+> +			return as;
 > +
-> +=09return true;
+> +	return NULL;
 > +}
 > +
->  static int
->  ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t a=
-ddr,
->  =09      int len, void *val)
+> +static struct vhost_vdpa_as *vhost_vdpa_alloc_as(struct vhost_vdpa *v, u32 asid)
+> +{
+> +	struct hlist_head *head = &v->as[asid % VHOST_VDPA_IOTLB_BUCKETS];
+> +	struct vhost_vdpa_as *as;
+> +
+> +	if (asid_to_as(v, asid))
+> +		return NULL;
+> +
+> +	as = kmalloc(sizeof(*as), GFP_KERNEL);
+> +	if (!as)
+> +		return NULL;
+> +
+> +	vhost_iotlb_init(&as->iotlb, 0, 0);
+> +	as->id = asid;
+> +	hlist_add_head(&as->hash_link, head);
+> +	++v->used_as;
+> +
+> +	return as;
+> +}
+> +
+> +static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
+
+The return value is never interpreted. I think it should either be made
+void or return values checked.
+
+> +{
+> +	struct vhost_vdpa_as *as = asid_to_as(v, asid);
+> +
+> +	/* Remove default address space is not allowed */
+> +	if (asid == 0)
+> +		return -EINVAL;
+
+Can you explain why? I think you have a memory leak due to this as no
+one will ever free as with id 0.
+
+> +
+> +	if (!as)
+> +		return -EINVAL;
+> +
+> +	hlist_del(&as->hash_link);
+> +	vhost_iotlb_reset(&as->iotlb);
+> +	kfree(as);
+> +	--v->used_as;
+> +
+> +	return 0;
+> +}
+> +
+>  static void handle_vq_kick(struct vhost_work *work)
 >  {
-> +=09struct ioregion *p =3D to_ioregion(this);
-> +=09struct ioregionfd_cmd *cmd;
-> +=09struct ioregionfd_resp *resp;
-> +=09size_t buf_size;
-> +=09void *buf;
-> +=09int ret =3D 0;
+>  	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
+> @@ -525,15 +585,6 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
+>  	}
+>  }
+>  
+> -static void vhost_vdpa_iotlb_free(struct vhost_vdpa *v)
+> -{
+> -	struct vhost_iotlb *iotlb = v->iotlb;
+> -
+> -	vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1);
+> -	kfree(v->iotlb);
+> -	v->iotlb = NULL;
+> -}
+> -
+>  static int perm_to_iommu_flags(u32 perm)
+>  {
+>  	int flags = 0;
+> @@ -745,7 +796,8 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u32 asid,
+>  	struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
+>  	struct vdpa_device *vdpa = v->vdpa;
+>  	const struct vdpa_config_ops *ops = vdpa->config;
+> -	struct vhost_iotlb *iotlb = v->iotlb;
+> +	struct vhost_vdpa_as *as = asid_to_as(v, 0);
+> +	struct vhost_iotlb *iotlb = &as->iotlb;
+>  	int r = 0;
+>  
+>  	if (asid != 0)
+> @@ -856,6 +908,13 @@ static void vhost_vdpa_set_iova_range(struct vhost_vdpa *v)
+>  	}
+>  }
+>  
+> +static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
+> +{
+> +	vhost_dev_cleanup(&v->vdev);
+> +	kfree(v->vdev.vqs);
+> +	vhost_vdpa_remove_as(v, 0);
+> +}
 > +
-> +=09if ((p->rf->f_flags & O_NONBLOCK) || (p->wf->f_flags & O_NONBLOCK))
-> +=09=09return -EINVAL;
-
-Another CPU could change file descriptor flags while we are running.
-Therefore it might be simplest to handle kernel_write() and
-kernel_read() -EAGAIN return values instead of trying to check.
-
-> +=09if ((addr + len - 1) > (p->paddr + p->size - 1))
-> +=09=09return -EINVAL;
+>  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>  {
+>  	struct vhost_vdpa *v;
+> @@ -886,15 +945,12 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>  	vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+>  		       vhost_vdpa_process_iotlb_msg);
+>  
+> -	v->iotlb = vhost_iotlb_alloc(0, 0);
+> -	if (!v->iotlb) {
+> -		r = -ENOMEM;
+> -		goto err_init_iotlb;
+> -	}
+> +	if (!vhost_vdpa_alloc_as(v, 0))
+> +		goto err_alloc_as;
+>  
+>  	r = vhost_vdpa_alloc_domain(v);
+>  	if (r)
+> -		goto err_alloc_domain;
+> +		goto err_alloc_as;
+>  
+>  	vhost_vdpa_set_iova_range(v);
+>  
+> @@ -902,11 +958,8 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>  
+>  	return 0;
+>  
+> -err_alloc_domain:
+> -	vhost_vdpa_iotlb_free(v);
+> -err_init_iotlb:
+> -	vhost_dev_cleanup(&v->vdev);
+> -	kfree(vqs);
+> +err_alloc_as:
+> +	vhost_vdpa_cleanup(v);
+>  err:
+>  	atomic_dec(&v->opened);
+>  	return r;
+> @@ -933,12 +986,10 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+>  	filep->private_data = NULL;
+>  	vhost_vdpa_reset(v);
+>  	vhost_dev_stop(&v->vdev);
+> -	vhost_vdpa_iotlb_free(v);
+>  	vhost_vdpa_free_domain(v);
+>  	vhost_vdpa_config_put(v);
+>  	vhost_vdpa_clean_irq(v);
+> -	vhost_dev_cleanup(&v->vdev);
+> -	kfree(v->vdev.vqs);
+> +	vhost_vdpa_cleanup(v);
+>  	mutex_unlock(&d->mutex);
+>  
+>  	atomic_dec(&v->opened);
+> @@ -1033,7 +1084,7 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>  	const struct vdpa_config_ops *ops = vdpa->config;
+>  	struct vhost_vdpa *v;
+>  	int minor;
+> -	int r;
+> +	int i, r;
+>  
+>  	/* Only support 1 address space and 1 groups */
+>  	if (vdpa->ngroups != 1 || vdpa->nas != 1)
+> @@ -1085,6 +1136,9 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>  	init_completion(&v->completion);
+>  	vdpa_set_drvdata(vdpa, v);
+>  
+> +	for (i = 0; i < VHOST_VDPA_IOTLB_BUCKETS; i++)
+> +		INIT_HLIST_HEAD(&v->as[i]);
 > +
-> +=09buf_size =3D max_t(size_t, sizeof(*cmd), sizeof(*resp));
-> +=09buf =3D kzalloc(buf_size, GFP_KERNEL);
-> +=09if (!buf)
-> +=09=09return -ENOMEM;
-> +=09cmd =3D (struct ioregionfd_cmd *)buf;
-> +=09resp =3D (struct ioregionfd_resp *)buf;
-
-I think they are small enough to declare them on the stack:
-
-  union {
-      struct ioregionfd_cmd cmd;
-      struct ioregionfd_resp resp;
-  } buf;
-
-  memset(&buf, 0, sizeof(buf));
-
-> +=09if (!pack_cmd(cmd, addr - p->paddr, len, IOREGIONFD_CMD_READ,
-> +=09=09      1, p->user_data, NULL)) {
-> +=09=09kfree(buf);
-> +=09=09return -EOPNOTSUPP;
-> +=09}
-> +
-> +=09ret =3D kernel_write(p->wf, cmd, sizeof(*cmd), 0);
-> +=09if (ret !=3D sizeof(*cmd)) {
-> +=09=09kfree(buf);
-> +=09=09return (ret < 0) ? ret : -EIO;
-> +=09}
-> +=09memset(buf, 0, buf_size);
-> +=09ret =3D kernel_read(p->rf, resp, sizeof(*resp), 0);
-> +=09if (ret !=3D sizeof(*resp)) {
-> +=09=09kfree(buf);
-> +=09=09return (ret < 0) ? ret : -EIO;
-> +=09}
-> +
-> +=09switch (len) {
-> +=09case 1:
-> +=09=09*(u8 *)val =3D (u8)resp->data;
-> +=09=09break;
-> +=09case 2:
-> +=09=09*(u16 *)val =3D (u16)resp->data;
-> +=09=09break;
-> +=09case 4:
-> +=09=09*(u32 *)val =3D (u32)resp->data;
-> +=09=09break;
-> +=09case 8:
-> +=09=09*(u64 *)val =3D (u64)resp->data;
-> +=09=09break;
-> +=09default:
-> +=09=09break;
-> +=09}
-
-This looks inconsistent. cmd->data is treated as a packed u8/u16/u32/864
-whereas resp->data is treated as u64?
-
-I was expecting memcpy(val, &resp->data, len) here not the u64 ->
-u8/u16/u32/u64 conversion.
-
---lCAWRPmW1mITcIfM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/rGlcACgkQnKSrs4Gr
-c8iRxQgAv7RtyvrVwiziibBV21NGM6PGmaFr4GYaxgGmzKIrdqJsgR44BS0blTkp
-zci9bU6skiZ8c0nzLJ6r3xBxgoXvW2gh9EPvHjuFdcPuAaqLs1yDC1mLi1MnL474
-noEYliyybktcHf47OPQ4hcxgxX0lnOSP9nT0NvRp1OBJr7p1ar0GOxrpvmLYwwvI
-M83tBwfb23J6CKHJvX0m66R598Bi07v32LHz3frbAXLqS9qYB5v7CMrm7HaECwyW
-Z4Uws71ghPfQcpyKeEtUrmHk+2D83PsEKvuQfIeFFe6JbXsPU/J2HJxZgCyDk96j
-iERHQRCS+5J23pjTqsm2JCzZjWnl+g==
-=M8xv
------END PGP SIGNATURE-----
-
---lCAWRPmW1mITcIfM--
-
+>  	return 0;
+>  
+>  err:
+> -- 
+> 2.25.1
+> 
