@@ -2,69 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1951F2E6CED
-	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 02:01:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB6662E6E99
+	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 07:38:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729876AbgL2BBX convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 28 Dec 2020 20:01:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50024 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729721AbgL2BBX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Dec 2020 20:01:23 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 0F5F422262
-        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 01:00:43 +0000 (UTC)
-Received: by pdx-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 0B31B81645; Tue, 29 Dec 2020 01:00:43 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 202055] Failed to PCI passthrough SSD with SMI SM2262
- controller.
-Date:   Tue, 29 Dec 2020 01:00:42 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: plantroon@plantroon.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-202055-28872-iWEAei1MNX@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-202055-28872@https.bugzilla.kernel.org/>
-References: <bug-202055-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726015AbgL2Gie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Dec 2020 01:38:34 -0500
+Received: from slavesmtp.scs-net.org ([213.178.226.251]:23104 "EHLO
+        shsmtp.scs-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725979AbgL2Gie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Dec 2020 01:38:34 -0500
+X-Greylist: delayed 902 seconds by postgrey-1.27 at vger.kernel.org; Tue, 29 Dec 2020 01:38:33 EST
+Received: from localhost (localhost [127.0.0.1])
+        by shsmtp.scs-net.org (Postfix) with ESMTP id B780B588A40;
+        Tue, 29 Dec 2020 08:15:43 +0200 (EET)
+X-Virus-Scanned: by SpamTitan at scs-net.org
+Received: from shsmtp.scs-net.org (localhost [127.0.0.1])
+        by shsmtp.scs-net.org (Postfix) with ESMTP id E7B27588A1D;
+        Tue, 29 Dec 2020 08:15:41 +0200 (EET)
+Authentication-Results: shsmtp.scs-net.org;
+        x-trusted-ip=pass
+Received: from out247.scs-net.org (outmail247.scs-net.org [213.178.226.247])
+        by shsmtp.scs-net.org (Postfix) with ESMTPS id 3C8E7588A29;
+        Tue, 29 Dec 2020 08:15:41 +0200 (EET)
+Received: from [13.76.244.185] (helo=User)
+        by out247.scs-net.org with esmtpa (Exim 4.89)
+        (envelope-from <fsa-ltk@scs-net.org>)
+        id 1ku8Cv-0000Ek-8f; Tue, 29 Dec 2020 08:10:10 +0200
+Reply-To: <reemhashimy178@yandex.com>
+From:   "Hello" <fsa-ltk@scs-net.org>
+Subject: Hello Friend  29/12/2020.
+Date:   Tue, 29 Dec 2020 06:15:39 -0000
 MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-Id: <E1ku8Cv-0000Ek-8f@out247.scs-net.org>
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=202055
-
-plantroon@plantroon.com changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |plantroon@plantroon.com
-
---- Comment #48 from plantroon@plantroon.com ---
-For Intel SSD 660p series, the latest firmware is required for pass-through to
-work without issues. The latest one should be from mid 2020 at the time of
-writing this.
-
-Not even any workarounds or special settings for qemu/libvirt are needed, just
-a simple pass-through setup as with any other PCIe device.
-
--- 
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.
+My name is Reem Hashimy, the Emirates Minister of State and Managing Director of the United Arab Emirates (Dubai) World Expo 2020 Committee which has been postponed to October 2021 to March 2022 because of the Covid-19 pandemic.
+I am writing to you to manage the funds I received as financial gratification from various foreign companies I assisted to receive a participation approval to the coming event. The amount is $44,762,906.00 United States dollars. But I can not personally manage the fund in my country because of the sensitive nature of my office and the certain restriction on married Muslim women.
+ 
+For this reason, an agreement was reached with a consulting firm to direct the various financial gifts into an open beneficiary account in my name with a bank where it will be possible for me to instruct the transfer of ownership right to a third party for investment purpose; which is the reason I am contacting you to receive the fund and manage it as my investment partner. Note that the fund is NOT connected to any criminal or terrorist activity.
+On your indication of interest with your information to include your name, your phone number and contact mailing address; I will instruct the consulting firm to process the fund from the bank to your country for investment purposes.
+ 
+Regards.
+Reem Hashimy.
