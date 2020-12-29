@@ -2,115 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FB652E6F41
-	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 10:15:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3234F2E6F90
+	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 11:10:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726072AbgL2JNB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Dec 2020 04:13:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27992 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725994AbgL2JNB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Dec 2020 04:13:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609233094;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V4ZbLL6gLiqu8bhAJp7vBUQdf9XdTVKfkKmlq8ZgHmE=;
-        b=IHuOJTBMUM0P5glrFzUgS/Un5YjLcjSPCfP+bUkAMfWIjQS8C+dcAgVutSPnzI8FJQEB/J
-        aUgWt1KIN+Y1InHXaZriCtvfFw9+iL96EQ4cpQPrk3WHL8ixg38y36C5uNfBIPr+KEBzkM
-        L0wavAsq5pNuQpDxeNFrrYHkFyBFsuA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-52sI5t4GNvatqdItb3kogA-1; Tue, 29 Dec 2020 04:11:30 -0500
-X-MC-Unique: 52sI5t4GNvatqdItb3kogA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CACA8800D55;
-        Tue, 29 Dec 2020 09:11:27 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8AAA35D9DC;
-        Tue, 29 Dec 2020 09:11:27 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 138524BB40;
-        Tue, 29 Dec 2020 09:11:26 +0000 (UTC)
-Date:   Tue, 29 Dec 2020 04:11:08 -0500 (EST)
-From:   Jason Wang <jasowang@redhat.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
-        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Message-ID: <1356137727.40748805.1609233068675.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CACycT3soQoX5avZiFBLEGBuJpdni6-UxdhAPGpWHBWVf+dEySg@mail.gmail.com>
-References: <20201222145221.711-1-xieyongji@bytedance.com> <CACycT3s=m=PQb5WFoMGhz8TNGme4+=rmbbBTtrugF9ZmNnWxEw@mail.gmail.com> <0e6faf9c-117a-e23c-8d6d-488d0ec37412@redhat.com> <CACycT3uwXBYvRbKDWdN3oCekv+o6_Lc=-KTrxejD=fr-zgibGw@mail.gmail.com> <2b24398c-e6d9-14ec-2c0d-c303d528e377@redhat.com> <CACycT3uDV43ecScrMh1QVpStuwDETHykJzzY=pkmZjP2Dd2kvg@mail.gmail.com> <e77c97c5-6bdc-cdd0-62c0-6ff75f6dbdff@redhat.com> <CACycT3soQoX5avZiFBLEGBuJpdni6-UxdhAPGpWHBWVf+dEySg@mail.gmail.com>
-Subject: Re: [RFC v2 09/13] vduse: Add support for processing vhost iotlb
- message
+        id S1726008AbgL2KIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Dec 2020 05:08:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46456 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725964AbgL2KIn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Dec 2020 05:08:43 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D92A3C0613D6
+        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 02:08:02 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id l11so29766044lfg.0
+        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 02:08:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ykn+or7byzvb1tXcbynmiwse3+d2HHncW3KrbdADuCk=;
+        b=IG39YNphU6ylEtHCuLOrXWO3wVMBVmSUjCiBbPD1MMC2S5z9H/LowHVfwrBo4CM8yO
+         CsfxACQOWkQ72n82LDBPMrkZfDHu01PB/PDKEZ8hRvqTctUz3LYDK93upoLpFSzVlAcR
+         SOaMZTeC7hnacw8W66X/wLoszQ3WgeHBRrQdm183ko3ZYtPbFPJnEBU85TLCpyqJUaax
+         xAIvzNBr7th9rm+fEFFIFicxsZWXOP4UTM2YU+laT1D8L/PDll51e+P688gBpPXLsNVr
+         poLiY1cT+BMEDagqza7m1D2gM0e7zGuNW1OW6jkmguFD+d75LWxGNOi3X6QwNXkPt+Kn
+         64Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ykn+or7byzvb1tXcbynmiwse3+d2HHncW3KrbdADuCk=;
+        b=sSKDuk2gKjGpWUwHWk5ZxxSZCttRc4KAVX7eu2aRntveHW3otjPUyt2YS2KDWWc7Bu
+         I55rzqQOeE1XIyuFuMDYBHUptAA9fLNE8Yh4+TKjidbk00Ed4uDX0eFDDYg0PcRsVhOn
+         G4SyHnVQ6NojivVBc8ZiiWT2j81/BJuumGORWaWaIAs2rwtQswePWCNwCG3raH1r9gO4
+         mY+h1a7Ri5WCyupfkXh+XlPGeabtKy6+2Nlnut8Ot7+wOcY4EoIUKwNB4cz5YhC2D2v4
+         +eTAcJN+6O9c+qerF6Muolz1xfYc9HtNusv9i82NGcJ5Gd+/HPMPisYSD82UNhJXkY8V
+         nGQg==
+X-Gm-Message-State: AOAM533SJqWDbFeyT493I4LUAYb2G5nHYmBsTckQ3Jr1NYeRFSRVpIQW
+        q+rOMlZO/dRGhMQf4zFzSqIll2Rt4LFK6Spb
+X-Google-Smtp-Source: ABdhPJxbKVxnopvA7bSaVz2VWxj7jByJOWI02FaHFMo/fI7D/I7wzCg+GmoJJxrZWfoi8MoLp5gixA==
+X-Received: by 2002:a19:b50:: with SMTP id 77mr22076149lfl.446.1609236480995;
+        Tue, 29 Dec 2020 02:08:00 -0800 (PST)
+Received: from localhost.localdomain (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
+        by smtp.gmail.com with ESMTPSA id y13sm5612901lfg.189.2020.12.29.02.07.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Dec 2020 02:08:00 -0800 (PST)
+From:   Elena Afanasova <eafanasova@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     stefanha@redhat.com, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com, Elena Afanasova <eafanasova@gmail.com>
+Subject: [RFC 0/2] Introduce MMIO/PIO dispatch file descriptors (ioregionfd)
+Date:   Tue, 29 Dec 2020 13:02:42 +0300
+Message-Id: <cover.1609231373.git.eafanasova@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.68.5.20, 10.4.195.9]
-Thread-Topic: vduse: Add support for processing vhost iotlb message
-Thread-Index: OBugpafsf525DDt1uUEs5wc+oTZ2vg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This patchset introduces a KVM dispatch mechanism which can be used 
+for handling MMIO/PIO accesses over file descriptors without returning 
+from ioctl(KVM_RUN). This allows device emulation to run in another task 
+separate from the vCPU task.
 
+This is achieved through KVM vm ioctl for registering MMIO/PIO regions and 
+a wire protocol that KVM uses to communicate with a task handling an 
+MMIO/PIO access.
 
------ Original Message -----
-> On Mon, Dec 28, 2020 at 4:43 PM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> >
-> > On 2020/12/28 =E4=B8=8B=E5=8D=884:14, Yongji Xie wrote:
-> > >> I see. So all the above two questions are because VHOST_IOTLB_INVALI=
-DATE
-> > >> is expected to be synchronous. This need to be solved by tweaking th=
-e
-> > >> current VDUSE API or we can re-visit to go with descriptors relaying
-> > >> first.
-> > >>
-> > > Actually all vdpa related operations are synchronous in current
-> > > implementation. The ops.set_map/dma_map/dma_unmap should not return
-> > > until the VDUSE_UPDATE_IOTLB/VDUSE_INVALIDATE_IOTLB message is replie=
-d
-> > > by userspace. Could it solve this problem?
-> >
-> >
-> >   I was thinking whether or not we need to generate IOTLB_INVALIDATE
-> > message to VDUSE during dma_unmap (vduse_dev_unmap_page).
-> >
-> > If we don't, we're probably fine.
-> >
->=20
-> It seems not feasible. This message will be also used in the
-> virtio-vdpa case to notify userspace to unmap some pages during
-> consistent dma unmapping. Maybe we can document it to make sure the
-> users can handle the message correctly.
+ioregionfd relies on kmemcg in order to limit the amount of kernel memory 
+that userspace can consume. Can NR_IOBUS_DEVS hardcoded limit be enforced 
+only in case kmemcg is disabled?
 
-Just to make sure I understand your point.
+Elena Afanasova (2):
+  KVM: add initial support for KVM_SET_IOREGION
+  KVM: add initial support for ioregionfd blocking read/write operations
 
-Do you mean you plan to notify the unmap of 1) streaming DMA or 2)
-coherent DMA?
+ arch/x86/kvm/Kconfig     |   1 +
+ arch/x86/kvm/Makefile    |   1 +
+ arch/x86/kvm/x86.c       |   1 +
+ include/linux/kvm_host.h |  17 ++
+ include/uapi/linux/kvm.h |  23 +++
+ virt/kvm/Kconfig         |   3 +
+ virt/kvm/eventfd.c       |  25 +++
+ virt/kvm/eventfd.h       |  14 ++
+ virt/kvm/ioregion.c      | 390 +++++++++++++++++++++++++++++++++++++++
+ virt/kvm/ioregion.h      |  15 ++
+ virt/kvm/kvm_main.c      |  20 +-
+ 11 files changed, 507 insertions(+), 3 deletions(-)
+ create mode 100644 virt/kvm/eventfd.h
+ create mode 100644 virt/kvm/ioregion.c
+ create mode 100644 virt/kvm/ioregion.h
 
-For 1) you probably need a workqueue to do that since dma unmap can
-be done in irq or bh context. And if usrspace does't do the unmap, it
-can still access the bounce buffer (if you don't zap pte)?
-
-Thanks
-
-
->=20
-> Thanks,
-> Yongji
->=20
->=20
+-- 
+2.25.1
 
