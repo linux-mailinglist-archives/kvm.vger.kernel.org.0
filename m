@@ -2,258 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 398082E6F92
-	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 11:10:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E1932E6F9D
+	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 11:22:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726129AbgL2KKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Dec 2020 05:10:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725964AbgL2KKV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Dec 2020 05:10:21 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1C7C061793
-        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 02:09:41 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id h22so29770553lfu.2
-        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 02:09:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=7Nw+eSXPW1AWQx8n0iy/pkPpHgQa7fwIT4e6iHXuq40=;
-        b=oVTDL0uCKjSQUs0PeRC/TCLefaCnOJWP5lypaOS9Q38E31AFnqkbsAh2NvGS9wyunH
-         CvH+0Qq9AjsaZzSzz8SOjY2733KSrxf/60DMduMrh3n/jDjaTG1JUZjLMzBpzbgYenDN
-         xPGLQvJe9r38eEFnYAIUvQbxGlt9/BYKTEsE0lYwSdTyh5ghbyK/0E9o3y23lEfI+yTk
-         xqJxEpFKajP2bhzp+qfZMz6dcijzVIuOXkxekmHdqzPCqKUgiOh8dmLYqqFwgARCxrIM
-         +lDLo7D6I77Fe8DtheXHqZX1r3F13VTX+PH9tD3njMjZtKu5Jm2coMo30pV1U3M4KRD2
-         JARQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7Nw+eSXPW1AWQx8n0iy/pkPpHgQa7fwIT4e6iHXuq40=;
-        b=Sh12J0Cb+JZb/8I9qWCGDz36P+41upmndCNHcgk7TAF+FlTwL7+Aeg9rfQzP6xHPJ4
-         xW84WepuM5d0w+dQhptT0kxoGLwFIbEKu8WLW1GWLSsbeaEnWwftwBfO90jCFoKeRQqc
-         L2baZM4OcT2Z11iqq0OZY7Quj0Ay2J7og5EHqXPDTqTJRuq5FeZWm6FZxdcYfgK0mMh/
-         2BEAGKgxNFCPpzkQfAiiETynD0C+Tv6+v5xBKoF6R7tcbjIxKB+do2HiM9ZDwEFSOb3q
-         PC4DtHfLvIzlIsxv00tGyPaLOtVEptNPW0dvwbePpPxPztMStHRTrpeZ30+mW7Wvqf/p
-         857Q==
-X-Gm-Message-State: AOAM533bISzE4fu5rLGWYLatjcTtAyHh47WTMjMVU4viJ/T/P2nRZUpz
-        XBBYY+uNSTnZtForA+eN7g8guSQ0aYv6OBYn
-X-Google-Smtp-Source: ABdhPJzPaOUdqNHiSIFu/c/0CTBbE6BwPqzxkSdp0Y/Hjb+Mu19qwg0SOLlx/6oUzp+/dUPXb3jkyw==
-X-Received: by 2002:a19:c5:: with SMTP id 188mr19555208lfa.511.1609236579434;
-        Tue, 29 Dec 2020 02:09:39 -0800 (PST)
-Received: from localhost.localdomain (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id y13sm5612901lfg.189.2020.12.29.02.09.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Dec 2020 02:09:38 -0800 (PST)
-From:   Elena Afanasova <eafanasova@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com, Elena Afanasova <eafanasova@gmail.com>
-Subject: [RFC 2/2] KVM: add initial support for ioregionfd blocking read/write operations
-Date:   Tue, 29 Dec 2020 13:02:44 +0300
-Message-Id: <a13b23ca540a8846891895462d2fb139ec597237.1609231374.git.eafanasova@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1609231373.git.eafanasova@gmail.com>
-References: <cover.1609231373.git.eafanasova@gmail.com>
+        id S1726160AbgL2KWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Dec 2020 05:22:08 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16453 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725979AbgL2KWH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Dec 2020 05:22:07 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5feb03260000>; Tue, 29 Dec 2020 02:21:26 -0800
+Received: from mtl-vdi-166.wap.labs.mlnx (172.20.145.6) by
+ HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Tue, 29 Dec 2020 10:21:03 +0000
+Date:   Tue, 29 Dec 2020 12:20:59 +0200
+From:   Eli Cohen <elic@nvidia.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     <mst@redhat.com>, <eperezma@redhat.com>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <lulu@redhat.com>, <eli@mellanox.com>, <lingshan.zhu@intel.com>,
+        <rob.miller@broadcom.com>, <stefanha@redhat.com>,
+        <sgarzare@redhat.com>
+Subject: Re: [PATCH 10/21] vhost: support ASID in IOTLB API
+Message-ID: <20201229102059.GB195479@mtl-vdi-166.wap.labs.mlnx>
+References: <20201216064818.48239-1-jasowang@redhat.com>
+ <20201216064818.48239-11-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20201216064818.48239-11-jasowang@redhat.com>
+User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1609237287; bh=tofAHIAZLSGlpLXOD0ABHSWLnadAm3VNx46BUQA75N8=;
+        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+         Content-Type:Content-Disposition:In-Reply-To:User-Agent:
+         X-Originating-IP:X-ClientProxiedBy;
+        b=S8b+DY6upOu3dlSkH9sfgInKfPs8y3sjgmmt1MqnWAdB6ThZ/8i15LyivStkRPTIp
+         0G4RPX3CZnY59juIF3ezxSJZgfdJkJf4Gqz0gnPzEcJwHAcICDXhyMlQ9xK99+sgWU
+         47GTdffyZiMRDTbDatTaeL3D0q5VNcwjfWQbto6JoJsEVrjIz3aMrbxKmiwIkkm4yh
+         l5ZGnycTAKkYlgAUQkPaC1ORG+aUcLByLkoV35EG1t6zRbqJkcHKEqpCIVi0Vts3F7
+         UD3G1zD62b4spf1GXGq/AUWMzLdVra5dGlWHPcmbIh3PHitwnyNp0xKOYnm3RYfVr4
+         g/WG8asMeoTtw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
----
- virt/kvm/ioregion.c | 157 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 157 insertions(+)
+On Wed, Dec 16, 2020 at 02:48:07PM +0800, Jason Wang wrote:
+> This patches allows userspace to send ASID based IOTLB message to
+> vhost. This idea is to use the reserved u32 field in the existing V2
+> IOTLB message. Vhost device should advertise this capability via
+> VHOST_BACKEND_F_IOTLB_ASID backend feature.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/vhost/vdpa.c             |  5 ++++-
+>  drivers/vhost/vhost.c            | 23 ++++++++++++++++++-----
+>  drivers/vhost/vhost.h            |  4 ++--
+>  include/uapi/linux/vhost_types.h |  5 ++++-
+>  4 files changed, 28 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 03a9b3311c6c..feb6a58df22d 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -739,7 +739,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>  	return ret;
+>  }
+>  
+> -static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+> +static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u32 asid,
+>  					struct vhost_iotlb_msg *msg)
+>  {
+>  	struct vhost_vdpa *v = container_of(dev, struct vhost_vdpa, vdev);
+> @@ -748,6 +748,9 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+>  	struct vhost_iotlb *iotlb = v->iotlb;
+>  	int r = 0;
+>  
+> +	if (asid != 0)
+> +		return -EINVAL;
+> +
+>  	r = vhost_dev_check_owner(dev);
+>  	if (r)
+>  		return r;
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index a262e12c6dc2..7477b724c29b 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -468,7 +468,7 @@ void vhost_dev_init(struct vhost_dev *dev,
+>  		    struct vhost_virtqueue **vqs, int nvqs,
+>  		    int iov_limit, int weight, int byte_weight,
+>  		    bool use_worker,
+> -		    int (*msg_handler)(struct vhost_dev *dev,
+> +		    int (*msg_handler)(struct vhost_dev *dev, u32 asid,
+>  				       struct vhost_iotlb_msg *msg))
+>  {
+>  	struct vhost_virtqueue *vq;
+> @@ -1084,11 +1084,14 @@ static bool umem_access_ok(u64 uaddr, u64 size, int access)
+>  	return true;
+>  }
+>  
+> -static int vhost_process_iotlb_msg(struct vhost_dev *dev,
+> +static int vhost_process_iotlb_msg(struct vhost_dev *dev, u16 asid,
+>  				   struct vhost_iotlb_msg *msg)
+>  {
+>  	int ret = 0;
+>  
+> +	if (asid != 0)
+> +		return -EINVAL;
+> +
+>  	mutex_lock(&dev->mutex);
+>  	vhost_dev_lock_vqs(dev);
+>  	switch (msg->type) {
+> @@ -1135,6 +1138,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
+>  	struct vhost_iotlb_msg msg;
+>  	size_t offset;
+>  	int type, ret;
+> +	u16 asid = 0;
 
-diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-index a200c3761343..8523f4126337 100644
---- a/virt/kvm/ioregion.c
-+++ b/virt/kvm/ioregion.c
-@@ -4,6 +4,33 @@
- #include <kvm/iodev.h>
- #include "eventfd.h"
- 
-+/* Wire protocol */
-+struct ioregionfd_cmd {
-+	__u32 info;
-+	__u32 padding;
-+	__u64 user_data;
-+	__u64 offset;
-+	__u64 data;
-+};
-+
-+struct ioregionfd_resp {
-+	__u64 data;
-+	__u8 pad[24];
-+};
-+
-+#define IOREGIONFD_CMD_READ    0
-+#define IOREGIONFD_CMD_WRITE   1
-+
-+#define IOREGIONFD_SIZE_8BIT   0
-+#define IOREGIONFD_SIZE_16BIT  1
-+#define IOREGIONFD_SIZE_32BIT  2
-+#define IOREGIONFD_SIZE_64BIT  3
-+
-+#define IOREGIONFD_SIZE_OFFSET 4
-+#define IOREGIONFD_RESP_OFFSET 6
-+#define IOREGIONFD_SIZE(x) ((x) << IOREGIONFD_SIZE_OFFSET)
-+#define IOREGIONFD_RESP(x) ((x) << IOREGIONFD_RESP_OFFSET)
-+
- void
- kvm_ioregionfd_init(struct kvm *kvm)
- {
-@@ -38,10 +65,100 @@ ioregion_release(struct ioregion *p)
- 	kfree(p);
- }
- 
-+static bool
-+pack_cmd(struct ioregionfd_cmd *cmd, u64 offset, u64 len, int opt, bool resp,
-+	 u64 user_data, const void *val)
-+{
-+	u64 size = 0;
-+
-+	switch (len) {
-+	case 1:
-+		size = IOREGIONFD_SIZE_8BIT;
-+		*((u8 *)&cmd->data) = val ? *(u8 *)val : 0;
-+		break;
-+	case 2:
-+		size = IOREGIONFD_SIZE_16BIT;
-+		*((u16 *)&cmd->data) = val ? *(u16 *)val : 0;
-+		break;
-+	case 4:
-+		size = IOREGIONFD_SIZE_32BIT;
-+		*((u32 *)&cmd->data) = val ? *(u32 *)val : 0;
-+		break;
-+	case 8:
-+		size = IOREGIONFD_SIZE_64BIT;
-+		*((u64 *)&cmd->data) = val ? *(u64 *)val : 0;
-+		break;
-+	default:
-+		return false;
-+	}
-+	cmd->user_data = user_data;
-+	cmd->offset = offset;
-+	cmd->info |= opt;
-+	cmd->info |= IOREGIONFD_SIZE(size);
-+	cmd->info |= IOREGIONFD_RESP(resp);
-+
-+	return true;
-+}
-+
- static int
- ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
- 	      int len, void *val)
- {
-+	struct ioregion *p = to_ioregion(this);
-+	struct ioregionfd_cmd *cmd;
-+	struct ioregionfd_resp *resp;
-+	size_t buf_size;
-+	void *buf;
-+	int ret = 0;
-+
-+	if ((p->rf->f_flags & O_NONBLOCK) || (p->wf->f_flags & O_NONBLOCK))
-+		return -EINVAL;
-+	if ((addr + len - 1) > (p->paddr + p->size - 1))
-+		return -EINVAL;
-+
-+	buf_size = max_t(size_t, sizeof(*cmd), sizeof(*resp));
-+	buf = kzalloc(buf_size, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+	cmd = (struct ioregionfd_cmd *)buf;
-+	resp = (struct ioregionfd_resp *)buf;
-+	if (!pack_cmd(cmd, addr - p->paddr, len, IOREGIONFD_CMD_READ,
-+		      1, p->user_data, NULL)) {
-+		kfree(buf);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ret = kernel_write(p->wf, cmd, sizeof(*cmd), 0);
-+	if (ret != sizeof(*cmd)) {
-+		kfree(buf);
-+		return (ret < 0) ? ret : -EIO;
-+	}
-+	memset(buf, 0, buf_size);
-+	ret = kernel_read(p->rf, resp, sizeof(*resp), 0);
-+	if (ret != sizeof(*resp)) {
-+		kfree(buf);
-+		return (ret < 0) ? ret : -EIO;
-+	}
-+
-+	switch (len) {
-+	case 1:
-+		*(u8 *)val = (u8)resp->data;
-+		break;
-+	case 2:
-+		*(u16 *)val = (u16)resp->data;
-+		break;
-+	case 4:
-+		*(u32 *)val = (u32)resp->data;
-+		break;
-+	case 8:
-+		*(u64 *)val = (u64)resp->data;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	kfree(buf);
-+
- 	return 0;
- }
- 
-@@ -49,6 +166,46 @@ static int
- ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
- 		int len, const void *val)
- {
-+	struct ioregion *p = to_ioregion(this);
-+	struct ioregionfd_cmd *cmd;
-+	struct ioregionfd_resp *resp;
-+	size_t buf_size = 0;
-+	void *buf;
-+	int ret = 0;
-+
-+	if ((p->rf->f_flags & O_NONBLOCK) || (p->wf->f_flags & O_NONBLOCK))
-+		return -EINVAL;
-+	if ((addr + len - 1) > (p->paddr + p->size - 1))
-+		return -EINVAL;
-+
-+	buf_size = max_t(size_t, sizeof(*cmd), sizeof(*resp));
-+	buf = kzalloc(buf_size, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+	cmd = (struct ioregionfd_cmd *)buf;
-+	if (!pack_cmd(cmd, addr - p->paddr, len, IOREGIONFD_CMD_WRITE,
-+		      p->posted_writes ? 0 : 1, p->user_data, val)) {
-+		kfree(buf);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ret = kernel_write(p->wf, cmd, sizeof(*cmd), 0);
-+	if (ret != sizeof(*cmd)) {
-+		kfree(buf);
-+		return (ret < 0) ? ret : -EIO;
-+	}
-+
-+	if (!p->posted_writes) {
-+		memset(buf, 0, buf_size);
-+		resp = (struct ioregionfd_resp *)buf;
-+		ret = kernel_read(p->rf, resp, sizeof(*resp), 0);
-+		if (ret != sizeof(*resp)) {
-+			kfree(buf);
-+			return (ret < 0) ? ret : -EIO;
-+		}
-+	}
-+	kfree(buf);
-+
- 	return 0;
- }
- 
--- 
-2.25.1
+You assume asid occupies just 16 bits. So maybe you should reserve the
+other 16 bits for future extension:
 
+struct vhost_msg_v2 {
+        __u32 type;
+-       __u32 reserved;
++       __u16 asid;
++       __u16 reserved;
+        union {
+
+Moreover, maybe this should be reflected in previous patches that use
+the asid:
+
+-static int mlx5_vdpa_set_map(struct vdpa_device *vdev, struct vhost_iotlb *iotlb)
++static int mlx5_vdpa_set_map(struct vdpa_device *vdev, u16 asid,
++                            struct vhost_iotlb *iotlb)
+
+-static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
++static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev, u16 asid,
+                                        struct vhost_iotlb_msg *msg)
+
+etc.
+
+>  
+>  	ret = copy_from_iter(&type, sizeof(type), from);
+>  	if (ret != sizeof(type)) {
+> @@ -1150,7 +1154,16 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
+>  		offset = offsetof(struct vhost_msg, iotlb) - sizeof(int);
+>  		break;
+>  	case VHOST_IOTLB_MSG_V2:
+> -		offset = sizeof(__u32);
+> +		if (vhost_backend_has_feature(dev->vqs[0],
+> +					      VHOST_BACKEND_F_IOTLB_ASID)) {
+> +			ret = copy_from_iter(&asid, sizeof(asid), from);
+> +			if (ret != sizeof(asid)) {
+> +				ret = -EINVAL;
+> +				goto done;
+> +			}
+> +			offset = sizeof(__u16);
+> +		} else
+> +			offset = sizeof(__u32);
+>  		break;
+>  	default:
+>  		ret = -EINVAL;
+> @@ -1165,9 +1178,9 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
+>  	}
+>  
+>  	if (dev->msg_handler)
+> -		ret = dev->msg_handler(dev, &msg);
+> +		ret = dev->msg_handler(dev, asid, &msg);
+>  	else
+> -		ret = vhost_process_iotlb_msg(dev, &msg);
+> +		ret = vhost_process_iotlb_msg(dev, asid, &msg);
+>  	if (ret) {
+>  		ret = -EFAULT;
+>  		goto done;
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index b063324c7669..19753a90875c 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -162,7 +162,7 @@ struct vhost_dev {
+>  	int byte_weight;
+>  	u64 kcov_handle;
+>  	bool use_worker;
+> -	int (*msg_handler)(struct vhost_dev *dev,
+> +	int (*msg_handler)(struct vhost_dev *dev, u32 asid,
+>  			   struct vhost_iotlb_msg *msg);
+>  };
+>  
+> @@ -170,7 +170,7 @@ bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts, int total_len);
+>  void vhost_dev_init(struct vhost_dev *, struct vhost_virtqueue **vqs,
+>  		    int nvqs, int iov_limit, int weight, int byte_weight,
+>  		    bool use_worker,
+> -		    int (*msg_handler)(struct vhost_dev *dev,
+> +		    int (*msg_handler)(struct vhost_dev *dev, u32 asid,
+>  				       struct vhost_iotlb_msg *msg));
+>  long vhost_dev_set_owner(struct vhost_dev *dev);
+>  bool vhost_dev_has_owner(struct vhost_dev *dev);
+> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+> index 76ee7016c501..222fc66ce2ac 100644
+> --- a/include/uapi/linux/vhost_types.h
+> +++ b/include/uapi/linux/vhost_types.h
+> @@ -87,7 +87,7 @@ struct vhost_msg {
+>  
+>  struct vhost_msg_v2 {
+>  	__u32 type;
+> -	__u32 reserved;
+> +	__u32 asid;
+>  	union {
+>  		struct vhost_iotlb_msg iotlb;
+>  		__u8 padding[64];
+> @@ -157,5 +157,8 @@ struct vhost_vdpa_iova_range {
+>  #define VHOST_BACKEND_F_IOTLB_MSG_V2 0x1
+>  /* IOTLB can accept batching hints */
+>  #define VHOST_BACKEND_F_IOTLB_BATCH  0x2
+> +/* IOTLB can accept address space identifier through V2 type of IOTLB
+> +   message */
+> +#define VHOST_BACKEND_F_IOTLB_ASID  0x3
+>  
+>  #endif
+> -- 
+> 2.25.1
+> 
