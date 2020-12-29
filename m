@@ -2,100 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 631BE2E709F
-	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 13:28:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCAA62E74F8
+	for <lists+kvm@lfdr.de>; Tue, 29 Dec 2020 23:15:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726227AbgL2M0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Dec 2020 07:26:00 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:9593 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725979AbgL2MZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Dec 2020 07:25:59 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5feb202e0000>; Tue, 29 Dec 2020 04:25:19 -0800
-Received: from mtl-vdi-166.wap.labs.mlnx (172.20.145.6) by
- HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Tue, 29 Dec 2020 12:24:59 +0000
-Date:   Tue, 29 Dec 2020 14:24:55 +0200
-From:   Eli Cohen <elic@nvidia.com>
-To:     Jason Wang <jasowang@redhat.com>
-CC:     <mst@redhat.com>, <eperezma@redhat.com>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <lulu@redhat.com>, <eli@mellanox.com>, <lingshan.zhu@intel.com>,
-        <rob.miller@broadcom.com>, <stefanha@redhat.com>,
-        <sgarzare@redhat.com>
-Subject: Re: [PATCH 12/21] vhost-vdpa: introduce uAPI to get the number of
- virtqueue groups
-Message-ID: <20201229122455.GF195479@mtl-vdi-166.wap.labs.mlnx>
-References: <20201216064818.48239-1-jasowang@redhat.com>
- <20201216064818.48239-13-jasowang@redhat.com>
+        id S1726263AbgL2WO6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Dec 2020 17:14:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45026 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726189AbgL2WO6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Dec 2020 17:14:58 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB7AC061574
+        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 14:14:17 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id e2so7727349plt.12
+        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 14:14:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=PizDOlpVsbZH64i8GikIjYAR5gm+hOoRIX/6bX40NPY=;
+        b=tIkFpkAYvxjSJbAi6xFgMwqFfQ1saKG9rOj6RgONZ75cs96TTDk3U4q+QkAzIWv+nL
+         jjStgb0rHgjLB2LmJ/6FZcjzd0V4XfBAtXZm+P6Y5NfOhxwPrnsNxXC6tyl5eO4waGxy
+         xCPwIbGAuh/eipyySHHCNgd4f7wveAwpY00nt9F2ho5JVq2OcNFuSerHcv96O/MJeveq
+         kvL/c4a1s8SDktbqBX8RBhp928WpSjoXYupqCttcYtDJa6oHJFXbKZI7K5BhVNSrmfky
+         y8vR3cDDnc3LDuyPA2fkD1CS+umzgKxHXk2wUeRRFC+OYR0beisUadB2OeI4eyPNbyc7
+         x8RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PizDOlpVsbZH64i8GikIjYAR5gm+hOoRIX/6bX40NPY=;
+        b=MFnDycEGTnUVIPTZL505YPez8w60neituW3nJNPG5BsU/jxQcAwik1zHBf24cwUiVB
+         Aa2K+5Gc65gsgPN5zgVhQWED8upVxIsned7flwFs1rflBKPlRfVLySWxVvYXnA05iHOT
+         NiOCjnQMWTscqQhUYbZoh0qsNZAgbott2U/K03LhymRrR4DPAVNfYAfDzegy/dew1tt3
+         RQp2wVvipy0jNLDf+r6XCOVWjK/pKx1VRU+1YPdEq7v0TNprFGQBHL25NzxU5EihbwnY
+         yKzBGd+234mIzkhqhW4dze5rTBJXud7UWnMd5/g812cVfpSLZ6DmtO8hHsR5qAsDuCH3
+         3Akw==
+X-Gm-Message-State: AOAM530cscWqsOZE9mn4a4kdRH3deHQuLsO++RuuRGNiXS14YQ9IDRtk
+        s+bzVTwaaSXeyK5yNmkGq4VELGtKBfAhPg==
+X-Google-Smtp-Source: ABdhPJwCYt4hVFX1UCVZSMle7MH/FQuzhRpMwILJYtblJPy2Nl/nv6I1upp2/FZoRpWvv4cwqDSx0Q==
+X-Received: by 2002:a17:902:7c04:b029:db:e44d:9366 with SMTP id x4-20020a1709027c04b02900dbe44d9366mr50594161pll.51.1609280057285;
+        Tue, 29 Dec 2020 14:14:17 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 4sm4346037pjn.14.2020.12.29.14.14.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Dec 2020 14:14:16 -0800 (PST)
+Date:   Tue, 29 Dec 2020 14:14:10 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [PATCH v3] KVM/x86: Move definition of __ex to x86.h
+Message-ID: <X+uqMvJDXCHH199o@google.com>
+References: <20201221194800.46962-1-ubizjak@gmail.com>
+ <X+pwQrLgVcMg0x3M@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201216064818.48239-13-jasowang@redhat.com>
-User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1609244719; bh=+8XYiEi/q5HKDzvQqa54cYO3f355IXFB+ScLRAlWPsU=;
-        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-         Content-Type:Content-Disposition:In-Reply-To:User-Agent:
-         X-Originating-IP:X-ClientProxiedBy;
-        b=HEIV+t0INic4qaBqWeWtT1rImVh+TVLiIuy0ssZa7v8n9braezHUy8yWm8jfhv1RP
-         9O2x1pRC6cQfcfT92Nd4Zn8Yv7lsRCv4sqclt2+VwJl0YIsfZL71x45F6yf6o/mdoD
-         fowN+93qOFelfgnoNVdnlBP9KyArRK+BC+WRiZDwowB3GgRQ2tO48Wp3TLXkBJ3Aj4
-         65TjbJs7ZuxerySPtKqIkbU3PezcUc9gqabkZ+XjZWe4rYTgUYRpkEqTelpX+q8nKd
-         /5QQgbVvukaARhEF+RXup8rHENxhubw8p65Mo/9cz0RgQoM8JPwkTNan9Bte4OFR86
-         yg8gu5sglRmNg==
+In-Reply-To: <X+pwQrLgVcMg0x3M@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 16, 2020 at 02:48:09PM +0800, Jason Wang wrote:
-> Follows the vDPA support for multiple address spaces, this patch
-> introduce uAPI for the userspace to know the number of virtqueue
-> groups supported by the vDPA device.
+On Mon, Dec 28, 2020, Sean Christopherson wrote:
+> On Mon, Dec 21, 2020, Uros Bizjak wrote:
+> > Merge __kvm_handle_fault_on_reboot with its sole user
+> > and move the definition of __ex to a common include to be
+> > shared between VMX and SVM.
+> > 
+> > v2: Rebase to the latest kvm/queue.
+> > 
+> > v3: Incorporate changes from review comments.
+> 
+> The v2, v3, ... vN patch history should go below the '---' so that it doesn't
+> need to be manually stripped when applying.
+> 
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> > Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > ---
+> 
+> vN stuff down here
+> 
+> >  arch/x86/include/asm/kvm_host.h | 25 -------------------------
+> >  arch/x86/kvm/svm/sev.c          |  2 --
+> >  arch/x86/kvm/svm/svm.c          |  2 --
+> >  arch/x86/kvm/vmx/vmx.c          |  4 +---
+> >  arch/x86/kvm/vmx/vmx_ops.h      |  4 +---
+> >  arch/x86/kvm/x86.h              | 24 ++++++++++++++++++++++++
+> >  6 files changed, 26 insertions(+), 35 deletions(-)
+> 
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-Can you explain what exactly you mean be userspace? Is it just qemu or
-is it destined to the virtio_net driver run by the qemu process?
-Also can you say for what purpose?
+Paolo, can you hold off on queuing this patch?  Long story short, this jogged my
+memory for something tangentially related and I ended up with series that kills
+off __ex() / ____kvm_handle_fault_on_reboot() completely.  It's coded up, I just
+need to test.  I'm OOO for a few days, will hopefully get it posted next week.
 
-> 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vhost/vdpa.c       | 4 ++++
->  include/uapi/linux/vhost.h | 3 +++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 060d5b5b7e64..1ba5901b28e7 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -536,6 +536,10 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
->  	case VHOST_VDPA_GET_VRING_NUM:
->  		r = vhost_vdpa_get_vring_num(v, argp);
->  		break;
-> +	case VHOST_VDPA_GET_GROUP_NUM:
-> +		r = copy_to_user(argp, &v->vdpa->ngroups,
-> +				 sizeof(v->vdpa->ngroups));
-> +		break;
->  	case VHOST_SET_LOG_BASE:
->  	case VHOST_SET_LOG_FD:
->  		r = -ENOIOCTLCMD;
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index 59c6c0fbaba1..8a4e6e426bbf 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -145,4 +145,7 @@
->  /* Get the valid iova range */
->  #define VHOST_VDPA_GET_IOVA_RANGE	_IOR(VHOST_VIRTIO, 0x78, \
->  					     struct vhost_vdpa_iova_range)
-> +/* Get the number of virtqueue groups. */
-> +#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x79, unsigned int)
-> +
->  #endif
-> -- 
-> 2.25.1
-> 
+Thanks!
