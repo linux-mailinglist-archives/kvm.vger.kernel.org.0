@@ -2,135 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 632F32E76AC
-	for <lists+kvm@lfdr.de>; Wed, 30 Dec 2020 07:51:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 393D82E76C3
+	for <lists+kvm@lfdr.de>; Wed, 30 Dec 2020 08:10:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726396AbgL3Guo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Dec 2020 01:50:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52347 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726420AbgL3Guo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Dec 2020 01:50:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609310958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=heg1e+a0V0k76vMPfwBRgNJmwNSkeMx7Vj1PPs8FGPE=;
-        b=VKKPcvhHq6gU9fQeXblMMGEbp3CZ6GsWgUTCkToPC0WiIigTK+l3djt2pnO/Ea9xwfEY4x
-        MfzvOD2yJXEdpw1/ZM9Y8Uw7V/5dr0kt6jSMu7Q9NUcpMmG/+P8bQFxeLkDo+9UHw+Bmr1
-        v8rr/TMiWKeCv3Cyp0dhFO31tJ/f/kc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-Te43lXXeP_qDJgvLF9ML3Q-1; Wed, 30 Dec 2020 01:49:17 -0500
-X-MC-Unique: Te43lXXeP_qDJgvLF9ML3Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C497107ACE6;
-        Wed, 30 Dec 2020 06:49:15 +0000 (UTC)
-Received: from [10.72.13.30] (ovpn-13-30.pek2.redhat.com [10.72.13.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E61FA71CBB;
-        Wed, 30 Dec 2020 06:49:04 +0000 (UTC)
-Subject: Re: [PATCH 12/21] vhost-vdpa: introduce uAPI to get the number of
- virtqueue groups
-To:     Eli Cohen <elic@nvidia.com>
-Cc:     mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lulu@redhat.com, eli@mellanox.com,
-        lingshan.zhu@intel.com, rob.miller@broadcom.com,
-        stefanha@redhat.com, sgarzare@redhat.com
-References: <20201216064818.48239-1-jasowang@redhat.com>
- <20201216064818.48239-13-jasowang@redhat.com>
- <20201229122455.GF195479@mtl-vdi-166.wap.labs.mlnx>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <f7e603f1-0200-566a-5360-f093da358b6d@redhat.com>
-Date:   Wed, 30 Dec 2020 14:49:03 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726198AbgL3HJ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Dec 2020 02:09:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725853AbgL3HJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Dec 2020 02:09:56 -0500
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 867E3C06179B
+        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 23:09:15 -0800 (PST)
+Received: by mail-ej1-x636.google.com with SMTP id lt17so20866146ejb.3
+        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 23:09:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=l8j4LBcYSM3A9J/lyobN/Td5iPDnCHBqIY/lSxbOPoI=;
+        b=an2vDV1/CDDLLSUvQH6Uvml6j8CxlkgAoU852XXsrwcYFpo5Ao01qFD5HAOuScQ+qa
+         QT3/PEoDuXvZdIc3jQfO05AoGVp8vIC6pI0hZBL+jA0VmErjD1qwAbj8HHm6s0ZO4EWi
+         QcYdggbqXxbShmXxf5mFh1jWSRWQe8ZIiP2WbCTnMFvvUFncKOinCVEORK9dYWS7Srq2
+         F2tyiD7J/Pq/Dp/lkoub23RdxuPhavSZPsXlGQGJ13t08izTxWrSz97txktHmXo2EqrK
+         lwl2krXf/q/AAWhJkgwnSu3ndkhVAy3gtvXeReSa5rG/wgPR/MHX2nNOcHFN5YUyI5Ot
+         xfDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=l8j4LBcYSM3A9J/lyobN/Td5iPDnCHBqIY/lSxbOPoI=;
+        b=BuZp9nDxBqKOLllhBu+LVG9jGLKSASWCKgKf88md63wlIv8XO4lO+J61wtugMvXoHS
+         o92hizhbzC9mTBDb8epzeJ1f/ME5uh8M3woRb6G7OYueaBlHkIWdQPKKtRe/gt86Akpf
+         Nd9GPoeU/zeG/QVe0DkNG4W/Hax0fJSmF892yPJ5mGuQpleSdcODGcKjKMiLrtvLc4Sv
+         IBNwjViDZsBDZ9qxUiZV+QBhNk/5LKatmEEUkIRo3M29UAIPWjceKOCttNA9VKVLvKaH
+         IryCaGiiPciXrdU5TLnOXX3IeJjPSkwWPhRNERA8tOWIVba32a+oJyY/3+/PxZq5z+5H
+         WE2Q==
+X-Gm-Message-State: AOAM532ufbQCHZx7DYnQ6PGoe/Y7NmyJA/jndbqs4JqK6j3TTr1BdPOd
+        z588fM+9dX9/w9WedXEqxy/2exWFWuPAozlvuS/9
+X-Google-Smtp-Source: ABdhPJxSggzhnaXhPdSiv6Fgwwsm7jrYKdGJWgqP2yGg8R6DbCqwUHnGXSyfiUFMd9tVV3XFaaGE9JgwBqfN+ujcONk=
+X-Received: by 2002:a17:907:961e:: with SMTP id gb30mr46516203ejc.197.1609312154151;
+ Tue, 29 Dec 2020 23:09:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201229122455.GF195479@mtl-vdi-166.wap.labs.mlnx>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20201222145221.711-1-xieyongji@bytedance.com> <CACycT3s=m=PQb5WFoMGhz8TNGme4+=rmbbBTtrugF9ZmNnWxEw@mail.gmail.com>
+ <0e6faf9c-117a-e23c-8d6d-488d0ec37412@redhat.com> <CACycT3uwXBYvRbKDWdN3oCekv+o6_Lc=-KTrxejD=fr-zgibGw@mail.gmail.com>
+ <2b24398c-e6d9-14ec-2c0d-c303d528e377@redhat.com> <CACycT3uDV43ecScrMh1QVpStuwDETHykJzzY=pkmZjP2Dd2kvg@mail.gmail.com>
+ <e77c97c5-6bdc-cdd0-62c0-6ff75f6dbdff@redhat.com> <CACycT3soQoX5avZiFBLEGBuJpdni6-UxdhAPGpWHBWVf+dEySg@mail.gmail.com>
+ <1356137727.40748805.1609233068675.JavaMail.zimbra@redhat.com>
+ <CACycT3sg61yRdupnD+jQEkWKsVEvMWfhkJ=5z_bYZLxCibDiHw@mail.gmail.com> <b1aef426-29c7-7244-5fc9-56d52e86abb4@redhat.com>
+In-Reply-To: <b1aef426-29c7-7244-5fc9-56d52e86abb4@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 30 Dec 2020 15:09:03 +0800
+Message-ID: <CACycT3vZ7V5WWhCFLBK6FuvVNmPmMj_yc=COOB4cjjC13yHUwg@mail.gmail.com>
+Subject: Re: Re: [RFC v2 09/13] vduse: Add support for processing vhost iotlb message
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
+        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Dec 30, 2020 at 2:11 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2020/12/29 =E4=B8=8B=E5=8D=886:26, Yongji Xie wrote:
+> > On Tue, Dec 29, 2020 at 5:11 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >>
+> >> ----- Original Message -----
+> >>> On Mon, Dec 28, 2020 at 4:43 PM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> >>>>
+> >>>> On 2020/12/28 =E4=B8=8B=E5=8D=884:14, Yongji Xie wrote:
+> >>>>>> I see. So all the above two questions are because VHOST_IOTLB_INVA=
+LIDATE
+> >>>>>> is expected to be synchronous. This need to be solved by tweaking =
+the
+> >>>>>> current VDUSE API or we can re-visit to go with descriptors relayi=
+ng
+> >>>>>> first.
+> >>>>>>
+> >>>>> Actually all vdpa related operations are synchronous in current
+> >>>>> implementation. The ops.set_map/dma_map/dma_unmap should not return
+> >>>>> until the VDUSE_UPDATE_IOTLB/VDUSE_INVALIDATE_IOTLB message is repl=
+ied
+> >>>>> by userspace. Could it solve this problem?
+> >>>>
+> >>>>    I was thinking whether or not we need to generate IOTLB_INVALIDAT=
+E
+> >>>> message to VDUSE during dma_unmap (vduse_dev_unmap_page).
+> >>>>
+> >>>> If we don't, we're probably fine.
+> >>>>
+> >>> It seems not feasible. This message will be also used in the
+> >>> virtio-vdpa case to notify userspace to unmap some pages during
+> >>> consistent dma unmapping. Maybe we can document it to make sure the
+> >>> users can handle the message correctly.
+> >> Just to make sure I understand your point.
+> >>
+> >> Do you mean you plan to notify the unmap of 1) streaming DMA or 2)
+> >> coherent DMA?
+> >>
+> >> For 1) you probably need a workqueue to do that since dma unmap can
+> >> be done in irq or bh context. And if usrspace does't do the unmap, it
+> >> can still access the bounce buffer (if you don't zap pte)?
+> >>
+> > I plan to do it in the coherent DMA case.
+>
+>
+> Any reason for treating coherent DMA differently?
+>
 
-On 2020/12/29 下午8:24, Eli Cohen wrote:
-> On Wed, Dec 16, 2020 at 02:48:09PM +0800, Jason Wang wrote:
->> Follows the vDPA support for multiple address spaces, this patch
->> introduce uAPI for the userspace to know the number of virtqueue
->> groups supported by the vDPA device.
-> Can you explain what exactly you mean be userspace?
-
-
-It's the userspace that uses the uAPI introduced in this patch.
-
-
-> Is it just qemu or
-> is it destined to the virtio_net driver run by the qemu process?
-
-
-It could be Qemu, DPDK or other userspace program.
-
-The guest virtio-net driver will not use this but talks to the virtio 
-device emulated by Qemu.
-
-
-> Also can you say for what purpose?
-
-
-This can be used for facilitate the checking of whether the control vq 
-could be supported.
-
-E.g if the device support less than 2 groups, qemu won't advertise 
-control vq.
-
-Yes, #groups could be inferred from GET_VRING_GROUP. But it's not 
-straightforward as this.
-
-Thanks
-
+Now the memory of the bounce buffer is allocated page by page in the
+page fault handler. So it can't be used in coherent DMA mapping case
+which needs some memory with contiguous virtual addresses. I can use
+vmalloc() to do allocation for the bounce buffer instead. But it might
+cause some memory waste. Any suggestion?
 
 >
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
->>   drivers/vhost/vdpa.c       | 4 ++++
->>   include/uapi/linux/vhost.h | 3 +++
->>   2 files changed, 7 insertions(+)
->>
->> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> index 060d5b5b7e64..1ba5901b28e7 100644
->> --- a/drivers/vhost/vdpa.c
->> +++ b/drivers/vhost/vdpa.c
->> @@ -536,6 +536,10 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
->>   	case VHOST_VDPA_GET_VRING_NUM:
->>   		r = vhost_vdpa_get_vring_num(v, argp);
->>   		break;
->> +	case VHOST_VDPA_GET_GROUP_NUM:
->> +		r = copy_to_user(argp, &v->vdpa->ngroups,
->> +				 sizeof(v->vdpa->ngroups));
->> +		break;
->>   	case VHOST_SET_LOG_BASE:
->>   	case VHOST_SET_LOG_FD:
->>   		r = -ENOIOCTLCMD;
->> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
->> index 59c6c0fbaba1..8a4e6e426bbf 100644
->> --- a/include/uapi/linux/vhost.h
->> +++ b/include/uapi/linux/vhost.h
->> @@ -145,4 +145,7 @@
->>   /* Get the valid iova range */
->>   #define VHOST_VDPA_GET_IOVA_RANGE	_IOR(VHOST_VIRTIO, 0x78, \
->>   					     struct vhost_vdpa_iova_range)
->> +/* Get the number of virtqueue groups. */
->> +#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x79, unsigned int)
->> +
->>   #endif
->> -- 
->> 2.25.1
->>
+> > It's true that userspace can
+> > access the dma buffer if userspace doesn't do the unmap. But the dma
+> > pages would not be freed and reused unless user space called munmap()
+> > for them.
+>
+>
+> I wonder whether or not we could recycle IOVA in this case to avoid the
+> IOTLB_UMAP message.
+>
 
+We can achieve that if we use vmalloc() to do allocation for the
+bounce buffer which can be used in coherent DMA mapping case. But
+looks like we still have no way to avoid the IOTLB_UMAP message in
+vhost-vdpa case.
+
+Thanks,
+Yongji
