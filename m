@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D1EE2E767D
-	for <lists+kvm@lfdr.de>; Wed, 30 Dec 2020 07:26:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 322C02E7699
+	for <lists+kvm@lfdr.de>; Wed, 30 Dec 2020 07:37:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbgL3GYq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Dec 2020 01:24:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57231 "EHLO
+        id S1726608AbgL3Gfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Dec 2020 01:35:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39168 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726161AbgL3GYp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Dec 2020 01:24:45 -0500
+        by vger.kernel.org with ESMTP id S1726599AbgL3Gfk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 30 Dec 2020 01:35:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609309399;
+        s=mimecast20190719; t=1609310053;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zMOHRQRlmmzuXmXJwYwsntjIgSSrZq/XW9h6GVg/eWI=;
-        b=C2YpLIUuFmK6KWn7zx+oHHhWTCL1e3hb7qQ6NnSKOBxLygA0/R8TvgZXFfRmfPos5PftRX
-        krNJC1J76DhoJ6f27gQdnUfRLUcoSze88Kcrolhqk03S9Sm0Lfq5s2SGay1B0v+em4++bJ
-        6FkLlopR0ZadX70p3rDwTsj6W5Gln9E=
+        bh=eBNGzwi7egS/zPmLxQnZGEadManYeUMP6ZIVWQPjrak=;
+        b=P2bd1VgWhmdmdFXmQ4r4SHoIb0enaVbs/53rBM9/wJtH8t9IV6moEHp5wX8voCtdPCir3c
+        XWCHZr1PUBx3s4EekXKTjarE3uMmUHnu7csGnJ5rT6c29sbKANEbF1hE6KwhLxC78n3q1N
+        fqx60hY9bmaVK2JlumHJbBQrrwWtZXg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-EQtmwsDoOMSTdZvFTvX8SQ-1; Wed, 30 Dec 2020 01:23:15 -0500
-X-MC-Unique: EQtmwsDoOMSTdZvFTvX8SQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-293-wWbJRowYPJ6KjjyT4C-i_Q-1; Wed, 30 Dec 2020 01:34:10 -0500
+X-MC-Unique: wWbJRowYPJ6KjjyT4C-i_Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CF0015720;
-        Wed, 30 Dec 2020 06:23:14 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 550E11005504;
+        Wed, 30 Dec 2020 06:34:08 +0000 (UTC)
 Received: from [10.72.13.30] (ovpn-13-30.pek2.redhat.com [10.72.13.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 50A6271C8B;
-        Wed, 30 Dec 2020 06:23:03 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 61882709B7;
+        Wed, 30 Dec 2020 06:33:54 +0000 (UTC)
 Subject: Re: [PATCH 11/21] vhost-vdpa: introduce asid based IOTLB
 To:     Eli Cohen <elic@nvidia.com>
 Cc:     mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
@@ -42,70 +42,45 @@ Cc:     mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
         stefanha@redhat.com, sgarzare@redhat.com
 References: <20201216064818.48239-1-jasowang@redhat.com>
  <20201216064818.48239-12-jasowang@redhat.com>
- <20201229114110.GC195479@mtl-vdi-166.wap.labs.mlnx>
+ <20201229120504.GE195479@mtl-vdi-166.wap.labs.mlnx>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <02c7a7ea-3765-3ff8-0742-0520d6cc4ca5@redhat.com>
-Date:   Wed, 30 Dec 2020 14:23:01 +0800
+Message-ID: <bc85dfe9-7689-2be1-b124-0f0529e1d8dc@redhat.com>
+Date:   Wed, 30 Dec 2020 14:33:53 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201229114110.GC195479@mtl-vdi-166.wap.labs.mlnx>
+In-Reply-To: <20201229120504.GE195479@mtl-vdi-166.wap.labs.mlnx>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2020/12/29 下午7:41, Eli Cohen wrote:
-> On Wed, Dec 16, 2020 at 02:48:08PM +0800, Jason Wang wrote:
->> This patch converts the vhost-vDPA device to support multiple IOTLBs
->> tagged via ASID via hlist. This will be used for supporting multiple
->> address spaces in the following patches.
->>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
->>   drivers/vhost/vdpa.c | 106 ++++++++++++++++++++++++++++++++-----------
->>   1 file changed, 80 insertions(+), 26 deletions(-)
->>
->> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> index feb6a58df22d..060d5b5b7e64 100644
->> --- a/drivers/vhost/vdpa.c
->> +++ b/drivers/vhost/vdpa.c
->> @@ -33,13 +33,21 @@ enum {
->>   
->>   #define VHOST_VDPA_DEV_MAX (1U << MINORBITS)
->>   
->> +#define VHOST_VDPA_IOTLB_BUCKETS 16
+On 2020/12/29 下午8:05, Eli Cohen wrote:
 >> +
->> +struct vhost_vdpa_as {
->> +	struct hlist_node hash_link;
->> +	struct vhost_iotlb iotlb;
->> +	u32 id;
->> +};
->> +
->>   struct vhost_vdpa {
->>   	struct vhost_dev vdev;
->>   	struct iommu_domain *domain;
->>   	struct vhost_virtqueue *vqs;
->>   	struct completion completion;
->>   	struct vdpa_device *vdpa;
->> -	struct vhost_iotlb *iotlb;
->> +	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
->>   	struct device dev;
->>   	struct cdev cdev;
->>   	atomic_t opened;
->> @@ -49,12 +57,64 @@ struct vhost_vdpa {
->>   	struct eventfd_ctx *config_ctx;
->>   	int in_batch;
->>   	struct vdpa_iova_range range;
->> +	int used_as;
-> This is not really used. Not in this patch and later removed.
+>> +static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
+> The return value is never interpreted. I think it should either be made
+> void or return values checked.
 
 
-Right, will remove this.
+Right, will make it void.
+
+
+>
+>> +{
+>> +	struct vhost_vdpa_as *as = asid_to_as(v, asid);
+>> +
+>> +	/* Remove default address space is not allowed */
+>> +	if (asid == 0)
+>> +		return -EINVAL;
+> Can you explain why? I think you have a memory leak due to this as no
+> one will ever free as with id 0.
+>
+
+Looks like a bug. Will remove this.
 
 Thanks
 
