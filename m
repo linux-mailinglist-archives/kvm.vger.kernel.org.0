@@ -2,147 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 393D82E76C3
-	for <lists+kvm@lfdr.de>; Wed, 30 Dec 2020 08:10:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 920FE2E76C9
+	for <lists+kvm@lfdr.de>; Wed, 30 Dec 2020 08:16:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726198AbgL3HJ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Dec 2020 02:09:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42304 "EHLO
+        id S1726338AbgL3HPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Dec 2020 02:15:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725853AbgL3HJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Dec 2020 02:09:56 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 867E3C06179B
-        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 23:09:15 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id lt17so20866146ejb.3
-        for <kvm@vger.kernel.org>; Tue, 29 Dec 2020 23:09:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=l8j4LBcYSM3A9J/lyobN/Td5iPDnCHBqIY/lSxbOPoI=;
-        b=an2vDV1/CDDLLSUvQH6Uvml6j8CxlkgAoU852XXsrwcYFpo5Ao01qFD5HAOuScQ+qa
-         QT3/PEoDuXvZdIc3jQfO05AoGVp8vIC6pI0hZBL+jA0VmErjD1qwAbj8HHm6s0ZO4EWi
-         QcYdggbqXxbShmXxf5mFh1jWSRWQe8ZIiP2WbCTnMFvvUFncKOinCVEORK9dYWS7Srq2
-         F2tyiD7J/Pq/Dp/lkoub23RdxuPhavSZPsXlGQGJ13t08izTxWrSz97txktHmXo2EqrK
-         lwl2krXf/q/AAWhJkgwnSu3ndkhVAy3gtvXeReSa5rG/wgPR/MHX2nNOcHFN5YUyI5Ot
-         xfDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=l8j4LBcYSM3A9J/lyobN/Td5iPDnCHBqIY/lSxbOPoI=;
-        b=BuZp9nDxBqKOLllhBu+LVG9jGLKSASWCKgKf88md63wlIv8XO4lO+J61wtugMvXoHS
-         o92hizhbzC9mTBDb8epzeJ1f/ME5uh8M3woRb6G7OYueaBlHkIWdQPKKtRe/gt86Akpf
-         Nd9GPoeU/zeG/QVe0DkNG4W/Hax0fJSmF892yPJ5mGuQpleSdcODGcKjKMiLrtvLc4Sv
-         IBNwjViDZsBDZ9qxUiZV+QBhNk/5LKatmEEUkIRo3M29UAIPWjceKOCttNA9VKVLvKaH
-         IryCaGiiPciXrdU5TLnOXX3IeJjPSkwWPhRNERA8tOWIVba32a+oJyY/3+/PxZq5z+5H
-         WE2Q==
-X-Gm-Message-State: AOAM532ufbQCHZx7DYnQ6PGoe/Y7NmyJA/jndbqs4JqK6j3TTr1BdPOd
-        z588fM+9dX9/w9WedXEqxy/2exWFWuPAozlvuS/9
-X-Google-Smtp-Source: ABdhPJxSggzhnaXhPdSiv6Fgwwsm7jrYKdGJWgqP2yGg8R6DbCqwUHnGXSyfiUFMd9tVV3XFaaGE9JgwBqfN+ujcONk=
-X-Received: by 2002:a17:907:961e:: with SMTP id gb30mr46516203ejc.197.1609312154151;
- Tue, 29 Dec 2020 23:09:14 -0800 (PST)
+        with ESMTP id S1726313AbgL3HPp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Dec 2020 02:15:45 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08135C061799;
+        Tue, 29 Dec 2020 23:15:05 -0800 (PST)
+Received: from zn.tnic (p200300ec2f0ae90058345bc89b9c20d2.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:e900:5834:5bc8:9b9c:20d2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4DAA61EC01E0;
+        Wed, 30 Dec 2020 08:15:03 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1609312503;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=fRCzYVFcIqOBFyAjy8t0dU3NQf+SBRgvC8B34AVqExw=;
+        b=hir7S9O+8qgwsIpoALUBHZSNPz1rldpLPcMJ4fkqUVq4uk1wkV+eRkkiVa4RJgrwz6LduN
+        G5MFOXqaaiS4A25vtjrNlFc0SIwoTspoXj6PeYITvoVIHscstkAUVNJmIDcyyrs3B8MfMw
+        2oKh7+/gxjFVWnHxbEEgbSiAZrXiLZE=
+Date:   Wed, 30 Dec 2020 08:15:01 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        fenghua.yu@intel.com, tony.luck@intel.com, wanpengli@tencent.com,
+        kvm@vger.kernel.org, thomas.lendacky@amd.com, peterz@infradead.org,
+        seanjc@google.com, joro@8bytes.org, x86@kernel.org,
+        kyung.min.park@intel.com, linux-kernel@vger.kernel.org,
+        krish.sadhukhan@oracle.com, hpa@zytor.com, mgross@linux.intel.com,
+        vkuznets@redhat.com, kim.phillips@amd.com, wei.huang2@amd.com,
+        jmattson@google.com
+Subject: Re: [PATCH v2 2/2] KVM: SVM: Add support for Virtual SPEC_CTRL
+Message-ID: <20201230071501.GB22022@zn.tnic>
+References: <160867624053.3471.7106539070175910424.stgit@bmoger-ubuntu>
+ <160867631505.3471.3808049369257008114.stgit@bmoger-ubuntu>
 MIME-Version: 1.0
-References: <20201222145221.711-1-xieyongji@bytedance.com> <CACycT3s=m=PQb5WFoMGhz8TNGme4+=rmbbBTtrugF9ZmNnWxEw@mail.gmail.com>
- <0e6faf9c-117a-e23c-8d6d-488d0ec37412@redhat.com> <CACycT3uwXBYvRbKDWdN3oCekv+o6_Lc=-KTrxejD=fr-zgibGw@mail.gmail.com>
- <2b24398c-e6d9-14ec-2c0d-c303d528e377@redhat.com> <CACycT3uDV43ecScrMh1QVpStuwDETHykJzzY=pkmZjP2Dd2kvg@mail.gmail.com>
- <e77c97c5-6bdc-cdd0-62c0-6ff75f6dbdff@redhat.com> <CACycT3soQoX5avZiFBLEGBuJpdni6-UxdhAPGpWHBWVf+dEySg@mail.gmail.com>
- <1356137727.40748805.1609233068675.JavaMail.zimbra@redhat.com>
- <CACycT3sg61yRdupnD+jQEkWKsVEvMWfhkJ=5z_bYZLxCibDiHw@mail.gmail.com> <b1aef426-29c7-7244-5fc9-56d52e86abb4@redhat.com>
-In-Reply-To: <b1aef426-29c7-7244-5fc9-56d52e86abb4@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 30 Dec 2020 15:09:03 +0800
-Message-ID: <CACycT3vZ7V5WWhCFLBK6FuvVNmPmMj_yc=COOB4cjjC13yHUwg@mail.gmail.com>
-Subject: Re: Re: [RFC v2 09/13] vduse: Add support for processing vhost iotlb message
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
-        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <160867631505.3471.3808049369257008114.stgit@bmoger-ubuntu>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 30, 2020 at 2:11 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/12/29 =E4=B8=8B=E5=8D=886:26, Yongji Xie wrote:
-> > On Tue, Dec 29, 2020 at 5:11 PM Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >>
-> >> ----- Original Message -----
-> >>> On Mon, Dec 28, 2020 at 4:43 PM Jason Wang <jasowang@redhat.com> wrot=
-e:
-> >>>>
-> >>>> On 2020/12/28 =E4=B8=8B=E5=8D=884:14, Yongji Xie wrote:
-> >>>>>> I see. So all the above two questions are because VHOST_IOTLB_INVA=
-LIDATE
-> >>>>>> is expected to be synchronous. This need to be solved by tweaking =
-the
-> >>>>>> current VDUSE API or we can re-visit to go with descriptors relayi=
-ng
-> >>>>>> first.
-> >>>>>>
-> >>>>> Actually all vdpa related operations are synchronous in current
-> >>>>> implementation. The ops.set_map/dma_map/dma_unmap should not return
-> >>>>> until the VDUSE_UPDATE_IOTLB/VDUSE_INVALIDATE_IOTLB message is repl=
-ied
-> >>>>> by userspace. Could it solve this problem?
-> >>>>
-> >>>>    I was thinking whether or not we need to generate IOTLB_INVALIDAT=
-E
-> >>>> message to VDUSE during dma_unmap (vduse_dev_unmap_page).
-> >>>>
-> >>>> If we don't, we're probably fine.
-> >>>>
-> >>> It seems not feasible. This message will be also used in the
-> >>> virtio-vdpa case to notify userspace to unmap some pages during
-> >>> consistent dma unmapping. Maybe we can document it to make sure the
-> >>> users can handle the message correctly.
-> >> Just to make sure I understand your point.
-> >>
-> >> Do you mean you plan to notify the unmap of 1) streaming DMA or 2)
-> >> coherent DMA?
-> >>
-> >> For 1) you probably need a workqueue to do that since dma unmap can
-> >> be done in irq or bh context. And if usrspace does't do the unmap, it
-> >> can still access the bounce buffer (if you don't zap pte)?
-> >>
-> > I plan to do it in the coherent DMA case.
->
->
-> Any reason for treating coherent DMA differently?
->
+On Tue, Dec 22, 2020 at 04:31:55PM -0600, Babu Moger wrote:
+> @@ -2549,7 +2559,10 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD))
+>  			return 1;
+>  
+> -		msr_info->data = svm->spec_ctrl;
+> +		if (static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+> +			msr_info->data = svm->vmcb->save.spec_ctrl;
+> +		else
+> +			msr_info->data = svm->spec_ctrl;
+>  		break;
+>  	case MSR_AMD64_VIRT_SPEC_CTRL:
+>  		if (!msr_info->host_initiated &&
+> @@ -2640,6 +2653,8 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>  			return 1;
+>  
+>  		svm->spec_ctrl = data;
+> +		if (static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+> +			svm->vmcb->save.spec_ctrl = data;
+>  		if (!data)
+>  			break;
+>  
 
-Now the memory of the bounce buffer is allocated page by page in the
-page fault handler. So it can't be used in coherent DMA mapping case
-which needs some memory with contiguous virtual addresses. I can use
-vmalloc() to do allocation for the bounce buffer instead. But it might
-cause some memory waste. Any suggestion?
+Are the get/set_msr() accessors such a fast path that they need
+static_cpu_has() ?
 
->
-> > It's true that userspace can
-> > access the dma buffer if userspace doesn't do the unmap. But the dma
-> > pages would not be freed and reused unless user space called munmap()
-> > for them.
->
->
-> I wonder whether or not we could recycle IOVA in this case to avoid the
-> IOTLB_UMAP message.
->
+svm_get_msr() already uses boot_cpu_has() for MSR_TSC_AUX...
 
-We can achieve that if we use vmalloc() to do allocation for the
-bounce buffer which can be used in coherent DMA mapping case. But
-looks like we still have no way to avoid the IOTLB_UMAP message in
-vhost-vdpa case.
+-- 
+Regards/Gruss,
+    Boris.
 
-Thanks,
-Yongji
+https://people.kernel.org/tglx/notes-about-netiquette
