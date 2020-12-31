@@ -2,93 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0771F2E7DE7
-	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 04:48:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E94A62E7E0C
+	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 06:20:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbgLaDsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Dec 2020 22:48:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27350 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726363AbgLaDsQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Dec 2020 22:48:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609386409;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N5OaX6F98I/drdoA444VeQQgChUSY/jiQHwro+QYrcg=;
-        b=gwz9Agl7YToGQXi+txwQf9xJVjuZI2Vf1U+ZX9iEDUnkclYcABJ0u+pYloV+/yMocwONTm
-        VNk4mvuVT0CUHEmF67vdwIAibgNV59kKuSBtq5wGPprBgDEFYdfhKXOsvVQVB59Upy3Cgj
-        GCCbqX3SZuDZ1XyBGlfb9rDeDBlh0uI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-TLv5Jar4OWCXAWc8oZbAoQ-1; Wed, 30 Dec 2020 22:46:45 -0500
-X-MC-Unique: TLv5Jar4OWCXAWc8oZbAoQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EB778015C6;
-        Thu, 31 Dec 2020 03:46:44 +0000 (UTC)
-Received: from [10.72.12.236] (ovpn-12-236.pek2.redhat.com [10.72.12.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 976E460BE2;
-        Thu, 31 Dec 2020 03:46:39 +0000 (UTC)
-Subject: Re: [RFC 2/2] KVM: add initial support for ioregionfd blocking
- read/write operations
-To:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com
-References: <cover.1609231373.git.eafanasova@gmail.com>
- <a13b23ca540a8846891895462d2fb139ec597237.1609231374.git.eafanasova@gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <72556405-8501-26bc-4939-69e312857e91@redhat.com>
-Date:   Thu, 31 Dec 2020 11:46:38 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726244AbgLaFQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Dec 2020 00:16:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48052 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726139AbgLaFQk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Dec 2020 00:16:40 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B9DC061799
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 21:16:00 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id cm17so17277143edb.4
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 21:16:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Fr8GvN1+YBA2/bLMNNrkP+yQOBmzJ011p/HaCmEdZ/0=;
+        b=XFJR6OoQ+EmCp4AYfNhOZ40sV2hBUq3MgIvdfNJv2GH3YoziryLKY7EKtuAQ3ppvpw
+         8CHRbGH2ANTsgrVBzf/5gUEtQjS8ZDlwgrZDmGoV9Vn85UL3c7oZm8nonYHld1evL+6W
+         5jZLPoVtG3MPLwDTX6tb9J2tiELJYjP6I3kENz/SrFDfehbLXe+K3mfpADKo/B/+3qOY
+         M+CrYPZY27Or6LYTB5Gb8yktbZ/V8D1BVEMN+eMeGFYo7jMMKV65YjqZSjB4YWvN/tDm
+         U2KIacSuYf+BaBXdXdoBaf53Z8T7eMDfTY7nYKXbcPsx9qScSB8HDWK8U3z76WDaVYs1
+         rnJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Fr8GvN1+YBA2/bLMNNrkP+yQOBmzJ011p/HaCmEdZ/0=;
+        b=h+zzmf0ZsXhfUoeDbTsSH6cgNRBU80MMUtHtIxMZC/vM+gnkUM9RpogU1scUZvDlVd
+         tlzsVchzztab9O/wpK+oX3rjoStmFWAV+nGOXRnGd6sS9kkIoz6YtmsiFbwBNA6FKVF1
+         EBLZYJwSIFu1xrf/pJNHZzFBNSINa3QYGkLlJ16T0YnZcpyK7mExVU+q73EKhDAz/Fms
+         jEu1etW8qACEiQGGphMCc4TGliRhLYOiCkhWFfDWvxVdFwbqIYC91toXlHdxkqCynUg6
+         rAFLWWncxl9SdKniTHNBCATTXpafOL2B5USmXV3bqu5aO/N94bhDMbUWyQRxYyPBtuwk
+         e6Hw==
+X-Gm-Message-State: AOAM533qB9shU6hDSVGCL+zAU2iXEBvaj8TcSlcLphwD+r5/L9V2bFWK
+        fDRUeLNZhiRn9/Tm66Uji2ZJDW6KPBhmW4B1Maxs
+X-Google-Smtp-Source: ABdhPJyDGyU+tI3srMa1F+hq5E4g0RZOH5eSzzR9KpND7TxAz97zJun+r+t0BDMFiLqvI0IkVgAgyXV5X8tcVzK4uSc=
+X-Received: by 2002:a50:f40e:: with SMTP id r14mr52010730edm.5.1609391758773;
+ Wed, 30 Dec 2020 21:15:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a13b23ca540a8846891895462d2fb139ec597237.1609231374.git.eafanasova@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20201222145221.711-1-xieyongji@bytedance.com> <CACycT3s=m=PQb5WFoMGhz8TNGme4+=rmbbBTtrugF9ZmNnWxEw@mail.gmail.com>
+ <0e6faf9c-117a-e23c-8d6d-488d0ec37412@redhat.com> <CACycT3uwXBYvRbKDWdN3oCekv+o6_Lc=-KTrxejD=fr-zgibGw@mail.gmail.com>
+ <2b24398c-e6d9-14ec-2c0d-c303d528e377@redhat.com> <CACycT3uDV43ecScrMh1QVpStuwDETHykJzzY=pkmZjP2Dd2kvg@mail.gmail.com>
+ <e77c97c5-6bdc-cdd0-62c0-6ff75f6dbdff@redhat.com> <CACycT3soQoX5avZiFBLEGBuJpdni6-UxdhAPGpWHBWVf+dEySg@mail.gmail.com>
+ <1356137727.40748805.1609233068675.JavaMail.zimbra@redhat.com>
+ <CACycT3sg61yRdupnD+jQEkWKsVEvMWfhkJ=5z_bYZLxCibDiHw@mail.gmail.com>
+ <b1aef426-29c7-7244-5fc9-56d52e86abb4@redhat.com> <CACycT3vZ7V5WWhCFLBK6FuvVNmPmMj_yc=COOB4cjjC13yHUwg@mail.gmail.com>
+ <3fc6a132-9fc2-c4e2-7fb1-b5a8bfb771fa@redhat.com> <CACycT3tD3zyvV6Zy5NT4x=02hBgrRGq35xeTsRXXx-_wPGJXpQ@mail.gmail.com>
+ <e0e693c3-1871-a410-c3d5-964518ec939a@redhat.com>
+In-Reply-To: <e0e693c3-1871-a410-c3d5-964518ec939a@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 31 Dec 2020 13:15:48 +0800
+Message-ID: <CACycT3vwMU5R7N8dZFBYX4-bxe2YT7EfK_M_jEkH8wzfH_GkBw@mail.gmail.com>
+Subject: Re: Re: [RFC v2 09/13] vduse: Add support for processing vhost iotlb message
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
+        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/12/29 下午6:02, Elena Afanasova wrote:
-> Signed-off-by: Elena Afanasova<eafanasova@gmail.com>
-> ---
->   virt/kvm/ioregion.c | 157 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 157 insertions(+)
+On Thu, Dec 31, 2020 at 10:49 AM Jason Wang <jasowang@redhat.com> wrote:
 >
-> diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-> index a200c3761343..8523f4126337 100644
-> --- a/virt/kvm/ioregion.c
-> +++ b/virt/kvm/ioregion.c
-> @@ -4,6 +4,33 @@
->   #include <kvm/iodev.h>
->   #include "eventfd.h"
->   
-> +/* Wire protocol */
-> +struct ioregionfd_cmd {
-> +	__u32 info;
-> +	__u32 padding;
-> +	__u64 user_data;
-> +	__u64 offset;
-> +	__u64 data;
-> +};
-> +
+>
+> On 2020/12/30 =E4=B8=8B=E5=8D=886:12, Yongji Xie wrote:
+> > On Wed, Dec 30, 2020 at 4:41 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> On 2020/12/30 =E4=B8=8B=E5=8D=883:09, Yongji Xie wrote:
+> >>> On Wed, Dec 30, 2020 at 2:11 PM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> >>>> On 2020/12/29 =E4=B8=8B=E5=8D=886:26, Yongji Xie wrote:
+> >>>>> On Tue, Dec 29, 2020 at 5:11 PM Jason Wang <jasowang@redhat.com> wr=
+ote:
+> >>>>>> ----- Original Message -----
+> >>>>>>> On Mon, Dec 28, 2020 at 4:43 PM Jason Wang <jasowang@redhat.com> =
+wrote:
+> >>>>>>>> On 2020/12/28 =E4=B8=8B=E5=8D=884:14, Yongji Xie wrote:
+> >>>>>>>>>> I see. So all the above two questions are because VHOST_IOTLB_=
+INVALIDATE
+> >>>>>>>>>> is expected to be synchronous. This need to be solved by tweak=
+ing the
+> >>>>>>>>>> current VDUSE API or we can re-visit to go with descriptors re=
+laying
+> >>>>>>>>>> first.
+> >>>>>>>>>>
+> >>>>>>>>> Actually all vdpa related operations are synchronous in current
+> >>>>>>>>> implementation. The ops.set_map/dma_map/dma_unmap should not re=
+turn
+> >>>>>>>>> until the VDUSE_UPDATE_IOTLB/VDUSE_INVALIDATE_IOTLB message is =
+replied
+> >>>>>>>>> by userspace. Could it solve this problem?
+> >>>>>>>>      I was thinking whether or not we need to generate IOTLB_INV=
+ALIDATE
+> >>>>>>>> message to VDUSE during dma_unmap (vduse_dev_unmap_page).
+> >>>>>>>>
+> >>>>>>>> If we don't, we're probably fine.
+> >>>>>>>>
+> >>>>>>> It seems not feasible. This message will be also used in the
+> >>>>>>> virtio-vdpa case to notify userspace to unmap some pages during
+> >>>>>>> consistent dma unmapping. Maybe we can document it to make sure t=
+he
+> >>>>>>> users can handle the message correctly.
+> >>>>>> Just to make sure I understand your point.
+> >>>>>>
+> >>>>>> Do you mean you plan to notify the unmap of 1) streaming DMA or 2)
+> >>>>>> coherent DMA?
+> >>>>>>
+> >>>>>> For 1) you probably need a workqueue to do that since dma unmap ca=
+n
+> >>>>>> be done in irq or bh context. And if usrspace does't do the unmap,=
+ it
+> >>>>>> can still access the bounce buffer (if you don't zap pte)?
+> >>>>>>
+> >>>>> I plan to do it in the coherent DMA case.
+> >>>> Any reason for treating coherent DMA differently?
+> >>>>
+> >>> Now the memory of the bounce buffer is allocated page by page in the
+> >>> page fault handler. So it can't be used in coherent DMA mapping case
+> >>> which needs some memory with contiguous virtual addresses. I can use
+> >>> vmalloc() to do allocation for the bounce buffer instead. But it migh=
+t
+> >>> cause some memory waste. Any suggestion?
+> >>
+> >> I may miss something. But I don't see a relationship between the
+> >> IOTLB_UNMAP and vmalloc().
+> >>
+> > In the vmalloc() case, the coherent DMA page will be taken from the
+> > memory allocated by vmalloc(). So IOTLB_UNMAP is not needed anymore
+> > during coherent DMA unmapping because those vmalloc'ed memory which
+> > has been mapped into userspace address space during initialization can
+> > be reused. And userspace should not unmap the region until we destroy
+> > the device.
+>
+>
+> Just to make sure I understand. My understanding is that IOTLB_UNMAP is
+> only needed when there's a change the mapping from IOVA to page.
+>
 
+Yes, that's true.
 
-I wonder do we need a seq in the protocol. It might be useful if we 
-allow a pair of file descriptors to be used for multiple different ranges.
+> So if we stick to the mapping, e.g during dma_unmap, we just put IOVA to
+> free list to be used by the next IOVA allocating. IOTLB_UNMAP could be
+> avoided.
+>
+> So we are not limited by how the pages are actually allocated?
+>
 
-Thanks
+In coherent DMA cases, we need to return some memory with contiguous
+kernel virtual addresses. That is the reason why we need vmalloc()
+here. If we allocate the memory page by page, the corresponding kernel
+virtual addresses in a contiguous IOVA range might not be contiguous.
+And in streaming DMA cases, there is no limit. So another choice is
+using vmalloc'ed memory only for coherent DMA cases.
 
+Not sure if this is clear for you.
 
-> +struct ioregionfd_resp {
-> +	__u64 data;
-> +	__u8 pad[24];
-> +};
-
+Thanks,
+Yongji
