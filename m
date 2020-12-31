@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F24492E7D67
-	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 01:30:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B4762E7D68
+	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 01:30:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbgLaA2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Dec 2020 19:28:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60368 "EHLO
+        id S1726638AbgLaA2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Dec 2020 19:28:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726579AbgLaA2H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Dec 2020 19:28:07 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BFAC06179B
-        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:26 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id j1so31401917ybj.11
-        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:26 -0800 (PST)
+        with ESMTP id S1726428AbgLaA2p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Dec 2020 19:28:45 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80771C06179E
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:29 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id d187so31548776ybc.6
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=rOxjhQpHu1RfWA8cWpiD6IGTVkEoEMcY9+NA6EUVZWk=;
-        b=eWtJP4mxfNkHF6+f0Z+ZCUumhU5z4MG+btS9lZOP0MGoxttBnbiPVrOv/cs3QKr2pe
-         yYHU/MiR5+CfS5HKckQfismEZ2onO1b43xvLt19DiaRfuuz7E5vm7ESC7NurhcvFBG4Y
-         SIfyDAtMkAP2H3hvQd5HaKqfz6yoYoHBQorZSe+M7OH5gl0ySennnI9r2vuP5DPL3QMb
-         NrfC+9yDGuMgcc9CPRSs9qNhB9PENGEY8C/jssqK9C16avVIu5pID2cquJ/3YPi0X5Nk
-         xc5IqvX88gxCaEJ89h4E4N/UN8ewUCKNETDimIU3V1m4b24vBykeCZS9R9QY100hftEU
-         lkHg==
+        bh=41wwaewfcJslPww7frzv8kWmZ0bKcG8QuMACLByWJEU=;
+        b=wMCCuSsz+pinc1Mj+WpSYsfU1nTpkmw9iuZLLXwxdfGKdkVNpDGMntA6BRSabJyS20
+         ZnSzKX94N2/XWIKYBi+BfKRV71OvxxokuM/+h17VtmWLrCIM2fUqweOhiwrVyITwix/o
+         pb5nwHtRk/fKLQ/JCrLCtAgyA3SAQrDp53HH8vwcGzL1OpaPDrOX/7CErqQwijjfSVe9
+         lSo7yP9KI8E2tYly5KdJNUytKeoj9cHNeTrr2hjmJiHhwfSwD3IeOZEKQ9I1eauS1qn7
+         8EIKKsS7Em+1i/T72DB2dWcR+F9ZCOqFhRtXtAa/wi8ehCgW8SU6twx6mt1SLYMS2hwn
+         t/1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=rOxjhQpHu1RfWA8cWpiD6IGTVkEoEMcY9+NA6EUVZWk=;
-        b=kPdq6SfGAh81cDL4WjEjqDdpaBZVN+mRcEGjhIuKrUPcEe5Vsfs8NEwo7auY8kHrCl
-         imDE7pfqDym3oJd57ncoF7tEOhvQineyY9FsV1iUuqi4zaDjmyGxodcjBDYpmA/dpECb
-         2EH8ikEBJzWFalSCQp9/rabySWdiETjHYOT7qMC5oqVuWMP2Tt4FyFfkiwjjC33fcAQ+
-         +G7P8YxOzGpVcp2qOcXerJ6olZC2Vm1apRUDEGPeBJPuo7p5OAvrSs2QDtefdvcuwQP9
-         NqhRWPuh+WlqfrQ9yGKOx1dBkEgZoMgtTz5RhMAnC83jg1Hz9mwgRU47hWn9XGUamR3V
-         zSNQ==
-X-Gm-Message-State: AOAM5330Xo9sjuKO7Y9H//SCT+CFjhReWP/NFYilKSYSFYsY5YzGC3tc
-        IzQw3ocIdEhvqsWhUnj+BAEI/7kXun4=
-X-Google-Smtp-Source: ABdhPJxzJSFVMtUWiaSVuoQJJUIlDSp5lHxECjas4or3vPMGlBJ8HdaSd0PwczifhPn2MQG8W/VGjRXTDA0=
+        bh=41wwaewfcJslPww7frzv8kWmZ0bKcG8QuMACLByWJEU=;
+        b=YxSzcAdQootxHZqzdw7qFXU0sfJDBjzWEDbRh57NYCX+7U16tGtr8FJgeibtvCqx/G
+         pPUxOZLIqdHijzPQFDSkktIMLKyqy8HIicbNbOvXR0iNWOTJ3RqhCabEs/F12gnFX7PK
+         auV6Z7kf16eqg6T7kaiLpKfx6XsrKOegtBlNXAIsry249L/N2nntE5Qbtq1UCPRJsdBe
+         Qmleq3tFyu6sHPIt18uNOBeAQgQeWdMvF3k5iVuB4buJ3BGEQbWIK04cooy5IzGbDNpX
+         rWcrUo03j3JiQV0qZAMuzjWeTeVI2xBcF4Wn+6hUdpwOnFDqbdRWghZ12126Xq3PMaft
+         2ndQ==
+X-Gm-Message-State: AOAM533PHl6GiqjFYr5IDyv30Y9ccJgREzEaE50f4HHlkS7eKz6qRlnJ
+        XwNu0dU4/1aEtIzoW7a7z/zPiz7Vi7c=
+X-Google-Smtp-Source: ABdhPJxbf3HbdMV1aaBlSXogwf9G9n/zBskYdZe0d0RHK0RHSyxpfbpVLkqSOXzyBWBDfO0j7+J4gxxiCOU=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a25:38d0:: with SMTP id f199mr75851834yba.8.1609374446107;
- Wed, 30 Dec 2020 16:27:26 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:d753:: with SMTP id o80mr73705503ybg.169.1609374448707;
+ Wed, 30 Dec 2020 16:27:28 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 30 Dec 2020 16:26:54 -0800
+Date:   Wed, 30 Dec 2020 16:26:55 -0800
 In-Reply-To: <20201231002702.2223707-1-seanjc@google.com>
-Message-Id: <20201231002702.2223707-2-seanjc@google.com>
+Message-Id: <20201231002702.2223707-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20201231002702.2223707-1-seanjc@google.com>
 X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
-Subject: [PATCH 1/9] x86/virt: Eat faults on VMXOFF in reboot flows
+Subject: [PATCH 2/9] x86/reboot: Force all cpus to exit VMX root if VMX is supported
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -73,58 +73,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Silently ignore all faults on VMXOFF in the reboot flows as such faults
-are all but guaranteed to be due to the CPU not being in VMX root.
-Because (a) VMXOFF may be executed in NMI context, e.g. after VMXOFF but
-before CR4.VMXE is cleared, (b) there's no way to query the CPU's VMX
-state without faulting, and (c) the whole point is to get out of VMX
-root, eating faults is the simplest way to achieve the desired behaior.
+Force all CPUs to do VMXOFF (via NMI shootdown) during an emergency
+reboot if VMX is _supported_, as VMX being off on the current CPU does
+not prevent other CPUs from being in VMX root (post-VMXON).  This fixes
+a bug where a crash/panic reboot could leave other CPUs in VMX root and
+prevent them from being woken via INIT-SIPI-SIPI in the new kernel.
 
-Technically, VMXOFF can fault (or fail) for other reasons, but all other
-fault and failure scenarios are mode related, i.e. the kernel would have
-to magically end up in RM, V86, compat mode, at CPL>0, or running with
-the SMI Transfer Monitor active.  The kernel is beyond hosed if any of
-those scenarios are encountered; trying to do something fancy in the
-error path to handle them cleanly is pointless.
-
-Fixes: 1e9931146c74 ("x86: asm/virtext.h: add cpu_vmxoff() inline function")
-Reported-by: David P. Reed <dpreed@deepplum.com>
+Fixes: d176720d34c7 ("x86: disable VMX on all CPUs on reboot")
 Cc: stable@vger.kernel.org
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: David P. Reed <dpreed@deepplum.com>
+[sean: reworked changelog and further tweaked comment]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/virtext.h | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ arch/x86/kernel/reboot.c | 30 ++++++++++--------------------
+ 1 file changed, 10 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/include/asm/virtext.h b/arch/x86/include/asm/virtext.h
-index 9aad0e0876fb..fda3e7747c22 100644
---- a/arch/x86/include/asm/virtext.h
-+++ b/arch/x86/include/asm/virtext.h
-@@ -30,15 +30,22 @@ static inline int cpu_has_vmx(void)
- }
+diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+index db115943e8bd..efbaef8b4de9 100644
+--- a/arch/x86/kernel/reboot.c
++++ b/arch/x86/kernel/reboot.c
+@@ -538,31 +538,21 @@ static void emergency_vmx_disable_all(void)
+ 	local_irq_disable();
  
+ 	/*
+-	 * We need to disable VMX on all CPUs before rebooting, otherwise
+-	 * we risk hanging up the machine, because the CPU ignores INIT
+-	 * signals when VMX is enabled.
++	 * Disable VMX on all CPUs before rebooting, otherwise we risk hanging
++	 * the machine, because the CPU blocks INIT when it's in VMX root.
+ 	 *
+-	 * We can't take any locks and we may be on an inconsistent
+-	 * state, so we use NMIs as IPIs to tell the other CPUs to disable
+-	 * VMX and halt.
++	 * We can't take any locks and we may be on an inconsistent state, so
++	 * use NMIs as IPIs to tell the other CPUs to exit VMX root and halt.
+ 	 *
+-	 * For safety, we will avoid running the nmi_shootdown_cpus()
+-	 * stuff unnecessarily, but we don't have a way to check
+-	 * if other CPUs have VMX enabled. So we will call it only if the
+-	 * CPU we are running on has VMX enabled.
+-	 *
+-	 * We will miss cases where VMX is not enabled on all CPUs. This
+-	 * shouldn't do much harm because KVM always enable VMX on all
+-	 * CPUs anyway. But we can miss it on the small window where KVM
+-	 * is still enabling VMX.
++	 * Do the NMI shootdown even if VMX if off on _this_ CPU, as that
++	 * doesn't prevent a different CPU from being in VMX root operation.
+ 	 */
+-	if (cpu_has_vmx() && cpu_vmx_enabled()) {
+-		/* Disable VMX on this CPU. */
+-		cpu_vmxoff();
++	if (cpu_has_vmx()) {
++		/* Safely force _this_ CPU out of VMX root operation. */
++		__cpu_emergency_vmxoff();
  
--/** Disable VMX on the current CPU
-+/**
-+ * cpu_vmxoff() - Disable VMX on the current CPU
-  *
-- * vmxoff causes a undefined-opcode exception if vmxon was not run
-- * on the CPU previously. Only call this function if you know VMX
-- * is enabled.
-+ * Disable VMX and clear CR4.VMXE (even if VMXOFF faults)
-+ *
-+ * Note, VMXOFF causes a #UD if the CPU is !post-VMXON, but it's impossible to
-+ * atomically track post-VMXON state, e.g. this may be called in NMI context.
-+ * Eat all faults as all other faults on VMXOFF faults are mode related, i.e.
-+ * faults are guaranteed to be due to the !post-VMXON check unless the CPU is
-+ * magically in RM, VM86, compat mode, or at CPL>0.
-  */
- static inline void cpu_vmxoff(void)
- {
--	asm volatile ("vmxoff");
-+	asm_volatile_goto("1: vmxoff\n\t"
-+			  _ASM_EXTABLE(1b, %l[fault]) :::: fault);
-+fault:
- 	cr4_clear_bits(X86_CR4_VMXE);
+-		/* Halt and disable VMX on the other CPUs */
++		/* Halt and exit VMX root operation on the other CPUs. */
+ 		nmi_shootdown_cpus(vmxoff_nmi);
+-
+ 	}
  }
  
 -- 
